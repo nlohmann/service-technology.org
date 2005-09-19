@@ -76,7 +76,7 @@ comment			([^-]|"-"[^-])*
 "onAlarm"		{ return K_ONALARM; }
 "onMessage"		{ return K_ONMESSAGE; }
 "otherwise"		{ return K_OTHERWISE; }
-"partner"		{ return K_PARTNER; }
+"partner"		{ BEGIN(ATTRIBUTE); return K_PARTNER; }
 "partnerLink"		{ BEGIN(ATTRIBUTE); return K_PARTNERLINK; }
 "partnerLinks"		{ return K_PARTNERLINKS; }
 "partners"		{ return K_PARTNERS; }

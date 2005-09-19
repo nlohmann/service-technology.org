@@ -33,9 +33,12 @@ extern int yylex();
 tProcess:
   X_OPEN K_PROCESS attributes X_NEXT
   tPartnerLinks_opt
+  tPartners_opt
   tVariables_opt
   tCorrelationSets_opt
   tFaultHandlers_opt
+  tCompensationHandler_opt
+  tEventHandlers_opt
   activity
   X_NEXT X_SLASH K_PROCESS X_CLOSE
 ;
@@ -46,15 +49,15 @@ activity:
 | tReceive
 | tReply
 | tAssign
-// tWait
-// tThrow
-// tTerminate
+| tWait
+| tThrow
+| tTerminate
 | tFlow
 | tSwitch
 | tWhile
 | tSequence
-// tPick
-// tScope
+| tPick
+| tScope
 ;
 
 tPartnerLinks_opt:
@@ -78,7 +81,27 @@ tPartnerLink:
 | K_PARTNERLINK attributes X_SLASH
 ;
 
-// TODO partner
+tPartners_opt:
+  /* empty */
+| tPartners
+;
+
+tPartners:
+  K_PARTNERS attributes X_NEXT
+  tPartner_list // 1-oo
+  X_SLASH K_PARTNERS
+;
+
+tPartner_list:
+  tPartner X_NEXT
+| tPartner X_NEXT tPartner_list
+;
+
+tPartner:
+  K_PARTNER attributes X_NEXT
+  tPartnerLink_list // 1-oo
+  X_SLASH K_PARTNER
+;
 
 tFaultHandlers_opt:
   /* empty */
@@ -86,10 +109,11 @@ tFaultHandlers_opt:
 ;
 
 tFaultHandlers:
-  K_FAULTHANDLERS X_NEXT
+  K_FAULTHANDLERS attributes X_NEXT
   tCatch_list // 0-oo
-  tCatchAll_list // 0-oo
+  tCatchAll_opt
   X_SLASH K_FAULTHANDLERS
+| K_FAULTHANDLERS attributes X_SLASH
 ;
 
 tCatch:
@@ -114,12 +138,6 @@ tCatchAll:
   X_SLASH K_CATCHALL
 ;
 
-tCatchAll_list:
-  /* empty */
-| tCatchAll X_NEXT tCatchAll_list
-;
-
-
 tActivityContainer:
   activity X_NEXT
 ;
@@ -129,12 +147,41 @@ tActivityOrCompensateContainer:
 | tCompensate X_NEXT
 ;
 
-// TODO tEventHandlers
+tEventHandlers_opt:
+  /* empty */
+| tEventHandlers
+;
 
-// TODO tOnMessage
+tEventHandlers:
+  K_EVENTHANDLERS attributes X_NEXT
+  tOnMessage_list // 0-oo
+  tOnAlarm_list // 0-oo
+  X_SLASH K_EVENTHANDLERS
+| K_EVENTHANDLERS attributes X_SLASH
+;
 
-// TODO tOnAlarm
+tOnMessage_list:
+  /* empty */
+| tOnMessage
+;
 
+tOnAlarm_list:
+  /* empty */
+| tOnAlarm
+;
+
+tOnMessage:
+  K_ONMESSAGE attributes X_NEXT
+  tCorrelations_opt 
+  activity
+  X_SLASH K_ONMESSAGE
+;
+
+tOnAlarm:
+  K_ONALARM attributes X_NEXT
+  tActivityContainer
+  X_SLASH K_ONALARM
+;
 
 tCompensationHandler_opt:
   /* empty */
@@ -142,7 +189,9 @@ tCompensationHandler_opt:
 ;
 
 tCompensationHandler:
-  K_COMPENSATIONHANDLER X_NEXT X_SLASH K_COMPENSATIONHANDLER
+  K_COMPENSATIONHANDLER X_NEXT
+  tActivityOrCompensateContainer
+  X_SLASH K_COMPENSATIONHANDLER
 ;
 
 tVariables_opt:
@@ -183,25 +232,13 @@ tCorrelationSet_list:
 ;
 
 tCorrelationSet:
-  K_CORRELATIONSET attributes X_NEXT
-  X_SLASH K_CORRELATIONSET
+  K_CORRELATIONSET attributes X_NEXT X_SLASH K_CORRELATIONSET
 | K_CORRELATIONSET attributes X_SLASH
 ;
-
 
 tActivity:
   tTarget_list //0-oo
   tSource_list //0-oo
-;
-
-tTarget_list:
-  /* empty */
-| tTarget X_NEXT tTarget_list
-;
-
-tTarget:
-  K_TARGET attributes X_NEXT X_SLASH K_TARGET
-| K_TARGET attributes X_SLASH
 ;
 
 tSource_list:
@@ -214,10 +251,18 @@ tSource:
 | K_SOURCE attributes X_SLASH
 ;
 
+tTarget_list:
+  /* empty */
+| tTarget X_NEXT tTarget_list
+;
+
+tTarget:
+  K_TARGET attributes X_NEXT X_SLASH K_TARGET
+| K_TARGET attributes X_SLASH
+;
+
 tEmpty:
-  K_EMPTY attributes X_NEXT
-  tActivity
-  X_SLASH K_EMPTY
+  K_EMPTY attributes X_NEXT tActivity X_SLASH K_EMPTY
 | K_EMPTY attributes X_SLASH
 ;
 
@@ -239,7 +284,6 @@ tCorrelation_list:
 
 tCorrelation:
   K_CORRELATION attributes X_NEXT X_SLASH K_CORRELATION
-  X_SLASH K_CORRELATION
 | K_CORRELATION attributes X_SLASH
 ;
 
@@ -260,8 +304,7 @@ tCorrelationWithPattern_list:
 ;
 
 tCorrelationWithPattern:
-  K_CORRELATION attributes X_NEXT X_SLASH K_CORRELATION
-  X_SLASH K_CORRELATION
+  K_CORRELATION attributes X_NEXT X_SLASH K_CORRELATION X_SLASH K_CORRELATION
 | K_CORRELATION attributes X_SLASH
 ;
 
@@ -322,17 +365,25 @@ tTo:
 | K_TO attributes X_SLASH
 ;
 
-// TODO tWait
+tWait:
+  K_WAIT attributes X_NEXT tActivity X_SLASH K_WAIT
+| K_WAIT attributes X_SLASH
+;
 
-// TODO tThrow
+tThrow:
+  K_THROW attributes X_NEXT tActivity X_SLASH K_THROW
+| K_THROW attributes X_SLASH
+;
 
 tCompensate:
-  K_COMPENSATE attributes X_NEXT X_SLASH K_COMPENSATE
-  tActivity
+  K_COMPENSATE attributes X_NEXT tActivity X_SLASH K_COMPENSATE
 | K_COMPENSATE attributes X_SLASH
 ;
 
-// TODO tTerminate
+tTerminate:
+  K_TERMINATE attributes X_NEXT tActivity X_SLASH K_TERMINATE
+| K_TERMINATE attributes X_SLASH
+;
 
 tFlow:
   K_FLOW attributes X_NEXT
@@ -412,7 +463,25 @@ tSequence:
   X_SLASH K_SEQUENCE
 ;
 
-// TODO tScope
+tPick:
+  K_PICK attributes X_NEXT
+  tActivity
+  tOnMessage X_NEXT tOnMessage_list //1-oo
+  tOnAlarm_list //0-oo
+  X_SLASH K_PICK
+;
+
+tScope:
+  K_SCOPE attributes X_NEXT
+  tActivity
+  tVariables_opt
+  tCorrelationSets_opt
+  tFaultHandlers_opt
+  tCompensationHandler_opt
+  tEventHandlers_opt
+  activity
+  X_SLASH K_SCOPE
+;
 
 attributes:
   /* empty */

@@ -54,18 +54,18 @@ comment			([^-]|"-"[^-])*
 
 
  /* names of BPEL-elements */
-"assign"		{ return K_ASSIGN; }
+"assign"		{ BEGIN(ATTRIBUTE); return K_ASSIGN; }
 "case"			{ BEGIN(ATTRIBUTE); return K_CASE; }
 "catch"			{ BEGIN(ATTRIBUTE); return K_CATCH; }
-"catchAll"		{ return K_CATCHALL; }
+"catchAll"		{ BEGIN(ATTRIBUTE); return K_CATCHALL; }
 "compensate"		{ return K_COMPENSATE; }
 "compensationHandler"	{ return K_COMPENSATIONHANDLER; }
-"copy"			{ return K_COPY; }
+"copy"			{ BEGIN(ATTRIBUTE); return K_COPY; }
 "correlation"		{ BEGIN(ATTRIBUTE); return K_CORRELATION; }
 "correlations"		{ return K_CORRELATIONS; }
 "correlationSet"	{ BEGIN(ATTRIBUTE); return K_CORRELATIONSET; }
 "correlationSets"	{ return K_CORRELATIONSETS; }
-"empty"			{ return K_EMPTY; }
+"empty"			{ BEGIN(ATTRIBUTE); return K_EMPTY; }
 "eventHandlers"		{ return K_EVENTHANDLERS; }
 "faultHandlers"		{ return K_FAULTHANDLERS; }
 "flow"			{ BEGIN(ATTRIBUTE); return K_FLOW; }
@@ -80,23 +80,25 @@ comment			([^-]|"-"[^-])*
 "partnerLink"		{ BEGIN(ATTRIBUTE); return K_PARTNERLINK; }
 "partnerLinks"		{ return K_PARTNERLINKS; }
 "partners"		{ return K_PARTNERS; }
-"pick"			{ return K_PICK; }
+"pick"			{ BEGIN(ATTRIBUTE); return K_PICK; }
 "process"		{ BEGIN(ATTRIBUTE); return K_PROCESS; }
 "receive"		{ BEGIN(ATTRIBUTE); return K_RECEIVE; }
 "reply"			{ BEGIN(ATTRIBUTE); return K_REPLY; }
-"scope"			{ return K_SCOPE; }
-"sequence"		{ return K_SEQUENCE; }
+"scope"			{ BEGIN(ATTRIBUTE); return K_SCOPE; }
+"sequence"		{ BEGIN(ATTRIBUTE); return K_SEQUENCE; }
 "source"		{ BEGIN(ATTRIBUTE); return K_SOURCE; }
-"switch"		{ return K_SWITCH; }
+"switch"		{ BEGIN(ATTRIBUTE); return K_SWITCH; }
 "target"		{ BEGIN(ATTRIBUTE); return K_TARGET; }
-"terminate"		{ return K_TERMINATE; }
-"throw"			{ return K_THROW; }
+"terminate"		{ BEGIN(ATTRIBUTE); return K_TERMINATE; }
+"throw"			{ BEGIN(ATTRIBUTE); return K_THROW; }
 "to"			{ BEGIN(ATTRIBUTE); return K_TO; }
 "variable"		{ BEGIN(ATTRIBUTE); return K_VARIABLE; }
 "variables"		{ return K_VARIABLES; }
-"wait"			{ return K_WAIT; }
+"wait"			{ BEGIN(ATTRIBUTE); return K_WAIT; }
 "while"			{ BEGIN(ATTRIBUTE); return K_WHILE; }
 
+
+{name}			{ BEGIN(ATTRIBUTE); return X_ELEMENTNAME; }
 
  /* white space */
 [ \t\r\n]*		{ /* skip */ }

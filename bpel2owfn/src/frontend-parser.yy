@@ -6,7 +6,7 @@
 %token K_SEQUENCE K_SOURCE K_SWITCH K_TARGET K_TERMINATE K_THROW K_TO
 %token K_VARIABLE K_VARIABLES K_WAIT K_WHILE
 
-%token X_OPEN X_SLASH X_CLOSE X_NEXT X_NAME X_STRING X_EQUALS
+%token X_OPEN X_SLASH X_CLOSE X_NEXT X_NAME X_STRING X_EQUALS X_ELEMENTNAME
 
 %start tProcess
 
@@ -32,6 +32,7 @@ extern int yylex();
 
 tProcess:
   X_OPEN K_PROCESS attributes X_NEXT
+  arbitraryElement_opt
   tPartnerLinks_opt
   tPartners_opt
   tVariables_opt
@@ -356,7 +357,7 @@ tCopy:
 ; 
 
 tFrom:
-  K_FROM attributes X_NEXT X_SLASH K_FROM
+  K_FROM attributes X_NEXT arbitraryElement_opt X_SLASH K_FROM
 | K_FROM attributes X_SLASH
 ;
 
@@ -486,4 +487,12 @@ tScope:
 attributes:
   /* empty */
 | X_NAME X_EQUALS X_STRING attributes
+;
+
+arbitraryElement_opt:
+  /* empty */
+| X_ELEMENTNAME attributes X_NEXT arbitraryElement_opt X_SLASH X_ELEMENTNAME X_NEXT
+| X_ELEMENTNAME X_CLOSE X_ELEMENTNAME X_OPEN X_SLASH X_ELEMENTNAME X_NEXT
+// X_ELEMENTNAME attributes X_CLOSE X_ELEMENTNAME  arbitraryElement_opt X_SLASH X_ELEMENTNAME X_NEXT
+//| X_ELEMENTNAME attributes X_SLASH X_NEXT arbitraryElement_opt
 ;

@@ -1,7 +1,5 @@
 #include "main.h"
 
-// blabla
-
 /// Filename of input file.
 char* filename = NULL;
 

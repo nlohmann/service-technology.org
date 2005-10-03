@@ -58,28 +58,28 @@ comment			([^-]|"-"[^-])*
 "case"			{ BEGIN(ATTRIBUTE); return K_CASE; }
 "catch"			{ BEGIN(ATTRIBUTE); return K_CATCH; }
 "catchAll"		{ BEGIN(ATTRIBUTE); return K_CATCHALL; }
-"compensate"		{ return K_COMPENSATE; }
-"compensationHandler"	{ return K_COMPENSATIONHANDLER; }
+"compensate"		{ BEGIN(ATTRIBUTE); return K_COMPENSATE; }
+"compensationHandler"	{ BEGIN(ATTRIBUTE); return K_COMPENSATIONHANDLER; }
 "copy"			{ BEGIN(ATTRIBUTE); return K_COPY; }
 "correlation"		{ BEGIN(ATTRIBUTE); return K_CORRELATION; }
-"correlations"		{ return K_CORRELATIONS; }
+"correlations"		{ BEGIN(ATTRIBUTE); return K_CORRELATIONS; }
 "correlationSet"	{ BEGIN(ATTRIBUTE); return K_CORRELATIONSET; }
-"correlationSets"	{ return K_CORRELATIONSETS; }
+"correlationSets"	{ BEGIN(ATTRIBUTE); return K_CORRELATIONSETS; }
 "empty"			{ BEGIN(ATTRIBUTE); return K_EMPTY; }
-"eventHandlers"		{ return K_EVENTHANDLERS; }
-"faultHandlers"		{ return K_FAULTHANDLERS; }
+"eventHandlers"		{ BEGIN(ATTRIBUTE); return K_EVENTHANDLERS; }
+"faultHandlers"		{ BEGIN(ATTRIBUTE); return K_FAULTHANDLERS; }
 "flow"			{ BEGIN(ATTRIBUTE); return K_FLOW; }
 "from"			{ BEGIN(ATTRIBUTE); return K_FROM; }
 "invoke"		{ BEGIN(ATTRIBUTE); return K_INVOKE; }
 "link"			{ BEGIN(ATTRIBUTE); return K_LINK; }
-"links"			{ return K_LINKS; }
-"onAlarm"		{ return K_ONALARM; }
-"onMessage"		{ return K_ONMESSAGE; }
-"otherwise"		{ return K_OTHERWISE; }
+"links"			{ BEGIN(ATTRIBUTE); return K_LINKS; }
+"onAlarm"		{ BEGIN(ATTRIBUTE); return K_ONALARM; }
+"onMessage"		{ BEGIN(ATTRIBUTE); return K_ONMESSAGE; }
+"otherwise"		{ BEGIN(ATTRIBUTE); return K_OTHERWISE; }
 "partner"		{ BEGIN(ATTRIBUTE); return K_PARTNER; }
 "partnerLink"		{ BEGIN(ATTRIBUTE); return K_PARTNERLINK; }
-"partnerLinks"		{ return K_PARTNERLINKS; }
-"partners"		{ return K_PARTNERS; }
+"partnerLinks"		{ BEGIN(ATTRIBUTE); return K_PARTNERLINKS; }
+"partners"		{ BEGIN(ATTRIBUTE); return K_PARTNERS; }
 "pick"			{ BEGIN(ATTRIBUTE); return K_PICK; }
 "process"		{ BEGIN(ATTRIBUTE); return K_PROCESS; }
 "receive"		{ BEGIN(ATTRIBUTE); return K_RECEIVE; }
@@ -93,7 +93,7 @@ comment			([^-]|"-"[^-])*
 "throw"			{ BEGIN(ATTRIBUTE); return K_THROW; }
 "to"			{ BEGIN(ATTRIBUTE); return K_TO; }
 "variable"		{ BEGIN(ATTRIBUTE); return K_VARIABLE; }
-"variables"		{ return K_VARIABLES; }
+"variables"		{ BEGIN(ATTRIBUTE); return K_VARIABLES; }
 "wait"			{ BEGIN(ATTRIBUTE); return K_WAIT; }
 "while"			{ BEGIN(ATTRIBUTE); return K_WHILE; }
 

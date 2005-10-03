@@ -87,8 +87,8 @@ tProcess:
   tFaultHandlers_opt
   tCompensationHandler_opt
   tEventHandlers_opt
-  activity
-  X_NEXT X_SLASH K_PROCESS X_CLOSE
+  activity X_NEXT
+  X_SLASH K_PROCESS X_CLOSE
 ;
 
 /*---------------------------------------------------------------------------*/
@@ -325,18 +325,18 @@ tEventHandlers:
 
 tOnMessage_list:
   /* empty */
-| tOnMessage
+| tOnMessage X_NEXT
 ;
 
 tOnAlarm_list:
   /* empty */
-| tOnAlarm
+| tOnAlarm X_NEXT
 ;
 
 tOnMessage:
   K_ONMESSAGE arbitraryAttributes X_NEXT
   tCorrelations_opt 
-  activity
+  activity X_NEXT
   X_SLASH K_ONMESSAGE
 ;
 
@@ -976,7 +976,7 @@ tScope:
   tFaultHandlers_opt
   tCompensationHandler_opt
   tEventHandlers_opt
-  activity
+  activity X_NEXT
   X_SLASH K_SCOPE
 ;
 

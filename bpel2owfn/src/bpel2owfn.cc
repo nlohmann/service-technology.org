@@ -64,7 +64,11 @@ int main( int argc, char *argv[])
   int error = yyparse();
 
   if (!error)
+  {
     fprintf(stderr, "Parsing complete.\n");
-    
+    TheProcess->print();
+  }
+  
+  
   return error;
 }

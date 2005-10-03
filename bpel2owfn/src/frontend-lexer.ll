@@ -5,6 +5,11 @@
 
 %{
 
+// from kimwitu++
+#include "bpel-kc-k.h"
+#include "bpel-kc-yystype.h"
+
+
 #include "bpel-syntax.h"
 #define ATTRIBUTE 1
 #define COMMENT 2

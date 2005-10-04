@@ -22,7 +22,7 @@ KC_TIME = .kc_time_stamp
 all: bpel2owfn
 
 bpel2owfn: bpel-syntax.o bpel-lexic.o main.o bpel-abstract.o bpel-kc-unpk.o\
-	bpel-kc-rk.o bpel-kc-csgiok.o bpel-kc-k.o
+	bpel-kc-rk.o bpel-kc-csgiok.o bpel-kc-k.o bpel-unparse.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 main.o: main.c main.h $(KC_TIME)
@@ -55,13 +55,16 @@ bpel-kc-k.o: $(KC_TIME)
 bpel-kc-rk.o: $(KC_TIME)
 	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
 
-bpel-abstract.o: $(KC_TIME)
-	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
-
 bpel-kc-unpk.o: $(KC_TIME)
 	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
 
-$(KC_TIME): bpel-abstract.k
+bpel-unparse.o: $(KC_TIME)
+	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
+
+bpel-abstract.o: $(KC_TIME)
+	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
+
+$(KC_TIME): bpel-abstract.k bpel-unparse.k
 	@touch $@
 	$(KC) $(KFLAGS) $^
 
@@ -73,5 +76,6 @@ clean:
 	@-rm -f bpel-lexic.c bpel-syntax.h bpel-syntax.c bpel-syntax.output
 	@-rm -f bpel-kc-*.c bpel-kc-*.h
 	@-rm -f bpel-abstract.c bpel-abstract.h
+	@-rm -f bpel-unparse.c bpel-unparse.h
 	@-rm -f $(KC_TIME)
 	@-rm -f *.o

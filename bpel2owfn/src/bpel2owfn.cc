@@ -67,6 +67,7 @@ int main( int argc, char *argv[])
   {
     fprintf(stderr, "Parsing complete.\n");
     TheProcess->print();
+    TheProcess->unparse(kc::printer, kc::xml);    
   }
   
   

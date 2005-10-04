@@ -1,5 +1,14 @@
 tProcess:
   Process(tPartnerLink_list tPartner_list tVariable_list tCorrelationSet_list tFaultHandlers_opt tCompensationHandler_opt tEventHandlers_opt activity)
+  {
+    casestring name;
+    casestring targetNamespace;
+    casestring queryLanguage;
+    casestring expressionLanguage;
+    casestring suppressJoinFailure;
+    casestring enableInstanceCompensation;
+    casestring abstractProcess; 
+  }
 ;
 
 /*---------------------------------------------------------------------------*/
@@ -33,6 +42,12 @@ tPartnerLink_list:
 
 tPartnerLink:
   PartnerLink()
+  {
+    casestring name;
+    casestring partnerLinkType;
+    casestring myRole;
+    casestring partnerRole;
+  }
 ;
 
 
@@ -46,6 +61,9 @@ tPartner_list:
 
 tPartner:
   Partner(tPartnerLink_list)
+  {
+    casestring name;
+  }
 ;
 
 
@@ -71,6 +89,10 @@ tCatchAll_list:
 
 tCatch:
   Catch(activity)
+  {
+    casestring faultName;
+    casestring faultVariable;
+  }
 ;
 
 tCatchAll:
@@ -100,10 +122,20 @@ tOnAlarm_list:
 
 tOnMessage:
   OnMessage(activity)
+  {
+    casestring partnerLink;
+    casestring portType;
+    casestring operation;
+    casestring variable;
+  }
 ;
 
 tOnAlarm:
   OnAlarm(activity)
+  {
+    casestring For; // "for" a keyword...
+    casestring until;
+  } 
 ;
 
 
@@ -130,6 +162,12 @@ tVariable_list:
 
 tVariable:
   Variable()
+  {
+    casestring name;
+    casestring messageType;
+    casestring type;
+    casestring element;
+  }
 ;
 
 
@@ -143,6 +181,10 @@ tCorrelationSet_list:
 
 tCorrelationSet:
   CorrelationSet()
+  {
+    casestring properties;
+    casestring name;
+  }
 ;
 
 
@@ -156,6 +198,11 @@ tCorrelation_list:
 
 tCorrelation:
   Correlation()
+  {
+    casestring set;
+    casestring initiate;
+    casestring pattern; // originally only in "tCorrelationWithPattern"
+  }
 ;
 
 
@@ -174,6 +221,13 @@ tEmpty:
 
 tInvoke:
   Invoke(standardElements tCorrelation_list tCatch_list tCatchAll_list tCompensationHandler_opt)
+  {
+    casestring partnerLink;
+    casestring portType;
+    casestring operation;
+    casestring inputVariable;
+    casestring outputVariable;
+  }
 ;
 
 
@@ -183,6 +237,13 @@ tInvoke:
 
 tReceive:
   Receive(standardElements tCorrelation_list)
+  {
+    casestring partnerLink;
+    casestring portType;
+    casestring operation;
+    casestring variable;
+    casestring createInstance;
+  }
 ;
 
 
@@ -192,6 +253,13 @@ tReceive:
 
 tReply:
   Reply(standardElements tCorrelation_list)
+  {
+    casestring partnerLink;
+    casestring portType;
+    casestring operation;
+    casestring variable;
+    casestring faultName;
+  }
 ;
 
 
@@ -213,10 +281,25 @@ tCopy:
 
 tFrom:
   From()
+  {
+    casestring variable;
+    casestring part;
+    casestring query;
+    casestring property;
+    casestring partnerLink;
+    casestring endpointReference;
+    casestring expression;
+    casestring opaque;
+  }
 ;
 
 tTo:
   To()
+  {
+    casestring expression;
+    casestring opaque;
+    casestring endpointReference;
+  }
 ;
 
 
@@ -226,6 +309,10 @@ tTo:
 
 tWait:
   Wait(standardElements)
+  {
+    casestring For; // "for" is a keyword
+    casestring until;
+  }
 ;
 
 
@@ -235,6 +322,10 @@ tWait:
 
 tThrow:
   Throw(standardElements)
+  {
+    casestring faultName;
+    casestring faultVariable;
+  }
 ;
 
 
@@ -244,6 +335,9 @@ tThrow:
 
 tCompensate:
   Compensate(standardElements)
+  {
+    casestring scope;
+  }
 ;
 
 
@@ -274,6 +368,9 @@ tLink_list:
 
 tLink:
   Link()
+  {
+    casestring name;
+  }
 ;
 
 
@@ -291,6 +388,9 @@ tCase_list:
 
 tCase:
   Case(activity)
+  {
+    casestring condition;
+  }
 ;
 
 tOtherwise_list:
@@ -308,6 +408,9 @@ tOtherwise:
 
 tWhile:
   While(standardElements activity)
+  {
+    casestring condition;
+  }
 ;
 
 
@@ -326,6 +429,9 @@ tSequence:
 
 tPick:
   Pick(standardElements tOnMessage_list tOnAlarm_list)
+  {
+    casestring createInstance;
+  }
 ;
 
 
@@ -335,6 +441,9 @@ tPick:
 
 tScope:
   Scope(standardElements tVariable_list tFaultHandlers_opt tCompensationHandler_opt tEventHandlers_opt activity)
+  {
+    casestring variableAccessSerializable;
+  }
 ;
 
 
@@ -345,6 +454,11 @@ tScope:
 
 standardElements:
   StandardElements(tTarget_list tSource_list)
+  {
+    casestring name;
+    casestring joinCondition;
+    casestring suppressJoinFailure;
+  }
 ;
 
 tTarget_list:
@@ -353,6 +467,9 @@ tTarget_list:
 
 tTarget:
   Target()
+  {
+    casestring linkName;
+  }
 ;
 
 tSource_list:
@@ -361,4 +478,8 @@ tSource_list:
 
 tSource:
   Source()
+  {
+    casestring linkName;
+    casestring transitionCondition;
+  }
 ;

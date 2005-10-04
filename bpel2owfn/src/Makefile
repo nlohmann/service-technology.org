@@ -17,7 +17,6 @@ KC_TIME = .kc_time_stamp
 
 all: bpel2owfn
 
-
 bpel2owfn: bpel-syntax.o bpel-lexic.o main.o bpel-abstract.o bpel-kc-unpk.o\
 	bpel-kc-rk.o bpel-kc-csgiok.o bpel-kc-k.o
 	$(CXX) $(CXXFLAGS) -o $@ $^

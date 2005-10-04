@@ -1,6 +1,6 @@
 .PHONY: all clean
 
-# ich kann
+
 
 # Tools
 YACC     = bison

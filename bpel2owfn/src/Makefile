@@ -15,6 +15,7 @@ KFLAGS   = -b -sc -fbpel-kc-
 KC_TIME = .kc_time_stamp
 
 ###############################################################################
+# Main Module
 
 all: bpel2owfn
 

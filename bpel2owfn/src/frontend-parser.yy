@@ -37,11 +37,61 @@ extern int yylex();
 %type <yt_tProcess> tProcess
 %type <yt_activity> activity
 %type <yt_activity_list> activity_list
+
+%type <yt_tPartnerLink_list> tPartnerLinks_opt
+%type <yt_tPartnerLink_list> tPartnerLinks
+%type <yt_tPartnerLink_list> tPartnerLink_list
+%type <yt_tPartnerLink> tPartnerLink
+
+%type <yt_tPartner_list> tPartners_opt
+%type <yt_tPartner_list> tPartners
+%type <yt_tPartner_list> tPartner_list
+%type <yt_tPartner> tPartner
+
+%type <yt_tFaultHandlers_opt> tFaultHandlers_opt
+%type <yt_tFaultHandlers> tFaultHandlers
+%type <yt_tCatch_list> tCatch_list
+%type <yt_tCatchAll_list> tCatchAll_opt
+%type <yt_tCatch> tCatch
+%type <yt_tCatchAll> tCatchAll
+
+%type <yt_tCompensationHandler_opt> tCompensationHandler_opt
+%type <yt_tCompensationHandler> tCompensationHandler
+
+%type <yt_tEventHandlers_opt> tEventHandlers_opt
+%type <yt_tEventHandlers> tEventHandlers
+%type <yt_tOnMessage_list> tOnMessage_list
+%type <yt_tOnAlarm_list> tOnAlarm_list
+%type <yt_tOnMessage> tOnMessage
+%type <yt_tOnAlarm> tOnAlarm
+
+%type <yt_tVariable_list> tVariables_opt
+%type <yt_tVariable_list> tVariables
+%type <yt_tVariable_list> tVariable_list
+%type <yt_tVariable> tVariable
+
+%type <yt_tCorrelationSet_list> tCorrelationSets_opt
+%type <yt_tCorrelationSet_list> tCorrelationSets
+%type <yt_tCorrelationSet_list> tCorrelationSet_list
+%type <yt_tCorrelationSet> tCorrelationSet
+
+%type <yt_tCorrelation_list> tCorrelations_opt
+%type <yt_tCorrelation_list> tCorrelations
+%type <yt_tCorrelation_list> tCorrelation_list
+%type <yt_tCorrelation> tCorrelation
+
 %type <yt_tEmpty> tEmpty
 %type <yt_tInvoke> tInvoke
 %type <yt_tReceive> tReceive
 %type <yt_tReply> tReply
 %type <yt_tAssign> tAssign
+
+%type <yt_tCopy_list> tCopy_list
+%type <yt_tCopy> tCopy
+%type <yt_tFrom> tFrom
+%type <yt_tTo> tTo
+
+
 %type <yt_tWait> tWait
 %type <yt_tThrow> tThrow
 %type <yt_tTerminate> tTerminate
@@ -58,10 +108,6 @@ extern int yylex();
 %type <yt_tWhile> tWhile
 %type <yt_tSequence> tSequence
 %type <yt_tPick> tPick
-%type <yt_tOnMessage_list> tOnMessage_list
-%type <yt_tOnAlarm_list> tOnAlarm_list
-%type <yt_tOnMessage> tOnMessage
-%type <yt_tOnAlarm> tOnAlarm
 %type <yt_tScope> tScope
 %type <yt_tCompensate> tCompensate
 %type <yt_standardElements> standardElements
@@ -133,7 +179,7 @@ tProcess:
   tEventHandlers_opt
   activity X_NEXT
   X_SLASH K_PROCESS X_CLOSE
-    { TheProcess = $$ = Process($12); }
+    { TheProcess = $$ = Process($5, $6, $7, $8, $9, $10, $11, $12); }
 ;
 
 /*---------------------------------------------------------------------------*/
@@ -217,23 +263,30 @@ activity:
 
 tPartnerLinks_opt:
   /* empty */
+    { $$ = NiltPartnerLink_list(); }
 | tPartnerLinks X_NEXT
+    { $$ = $1; }
 ;
 
 tPartnerLinks:
   K_PARTNERLINKS arbitraryAttributes X_NEXT
   tPartnerLink_list //1-oo
   X_SLASH K_PARTNERLINKS
+    { $$ = $4; }
 ;
 
 tPartnerLink_list:
   tPartnerLink X_NEXT
+    { $$ = ConstPartnerLink_list($1, NiltPartnerLink_list()); }
 | tPartnerLink X_NEXT tPartnerLink_list
+    { $$ = ConstPartnerLink_list($1, $3); }
 ;
 
 tPartnerLink:
   K_PARTNERLINK arbitraryAttributes X_NEXT X_SLASH K_PARTNERLINK
+    { $$ = PartnerLink(); }
 | K_PARTNERLINK arbitraryAttributes X_SLASH
+    { $$ = PartnerLink(); }
 ;
 
 
@@ -257,24 +310,30 @@ tPartnerLink:
 
 tPartners_opt:
   /* empty */
+    { $$ = NiltPartner_list(); }
 | tPartners
+    { $$ = $1; }
 ;
 
 tPartners:
   K_PARTNERS arbitraryAttributes X_NEXT
   tPartner_list // 1-oo
   X_SLASH K_PARTNERS
+    { $$ = $4; }
 ;
 
 tPartner_list:
   tPartner X_NEXT
+    { $$ = ConstPartner_list($1, NiltPartner_list()); }
 | tPartner X_NEXT tPartner_list
+    { $$ = ConstPartner_list($1, $3); }
 ;
 
 tPartner:
   K_PARTNER arbitraryAttributes X_NEXT
   tPartnerLink_list // 1-oo
   X_SLASH K_PARTNER
+    { $$ = Partner($4); }
 ;
 
 
@@ -310,7 +369,9 @@ tPartner:
 
 tFaultHandlers_opt:
   /* empty */
+    { $$ = NiltFaultHandlers_opt(); }
 | tFaultHandlers X_NEXT
+    { $$ = ConstFaultHandlers_opt($1, NiltFaultHandlers_opt()); }
 ;
 
 tFaultHandlers:
@@ -318,30 +379,76 @@ tFaultHandlers:
   tCatch_list // 0-oo
   tCatchAll_opt
   X_SLASH K_FAULTHANDLERS
+    { $$ = FaultHandlers($4, $5); }
 | K_FAULTHANDLERS arbitraryAttributes X_SLASH
+    { $$ = FaultHandlers(NiltCatch_list(), NiltCatchAll_list()); }
 ;
 
 tCatch_list:
   /* empty */
+    { $$ = NiltCatch_list(); }
 | tCatch X_NEXT tCatch_list
+    { $$ = ConstCatch_list($1, NiltCatch_list()); }
 ;
 
 tCatch:
   K_CATCH arbitraryAttributes X_NEXT
   activity X_NEXT // was: tActivityOrCompensateContainer
   X_SLASH K_CATCH
+    { $$ = Catch($4); }
 ;
 
 tCatchAll_opt:
   /* empty */
+    { $$ = NiltCatchAll_list(); }
 | tCatchAll X_NEXT
+    { $$ = ConstCatchAll_list($1, NiltCatchAll_list()); }
 ;
 
 tCatchAll:
   K_CATCHALL arbitraryAttributes X_NEXT
-  activity X_NEXT // tActivityOrCompensateContainer
+  activity X_NEXT // was: tActivityOrCompensateContainer
   X_SLASH K_CATCHALL
+    { $$ = CatchAll($4); }
 ;
+
+
+
+
+
+
+/******************************************************************************
+  COMPENSATION HANDLERS
+******************************************************************************/
+
+/*
+  Scopes can delineate a part of the behavior that is meant to be reversible
+  in an application-defined way by a compensation handler. Scopes with
+  compensation and fault handlers can be nested without constraint to arbitrary
+  depth.
+
+  <compensationHandler>?
+    activity
+  </compensationHandler>
+*/
+
+tCompensationHandler_opt:
+  /* empty */
+    { $$ = NiltCompensationHandler_opt(); }
+| tCompensationHandler X_NEXT
+    { $$ = ConstCompensationHandler_opt($1, NiltCompensationHandler_opt()); }
+;
+
+tCompensationHandler:
+  K_COMPENSATIONHANDLER arbitraryAttributes X_NEXT
+  activity X_NEXT // was: tActivityOrCompensateContainer
+  X_SLASH K_COMPENSATIONHANDLER
+    { $$ = CompensationHandler($4); }
+;
+
+
+
+
 
 
 /******************************************************************************
@@ -372,7 +479,9 @@ tCatchAll:
 
 tEventHandlers_opt:
   /* empty */
+    { $$ = NiltEventHandlers_opt(); }
 | tEventHandlers
+    { $$ = ConstEventHandlers_opt($1, NiltEventHandlers_opt()); }
 ;
 
 tEventHandlers:
@@ -380,7 +489,9 @@ tEventHandlers:
   tOnMessage_list // 0-oo
   tOnAlarm_list // 0-oo
   X_SLASH K_EVENTHANDLERS
+    { $$ = EventHandlers($4, $5); }
 | K_EVENTHANDLERS arbitraryAttributes X_SLASH
+    { $$ = EventHandlers(NiltOnMessage_list(), NiltOnAlarm_list()); }
 ;
 
 tOnMessage_list:
@@ -413,33 +524,6 @@ tOnAlarm:
 ;
 
 
-/******************************************************************************
-  COMPENSATION HANDLERS
-******************************************************************************/
-
-/*
-  Scopes can delineate a part of the behavior that is meant to be reversible
-  in an application-defined way by a compensation handler. Scopes with
-  compensation and fault handlers can be nested without constraint to arbitrary
-  depth.
-
-  <compensationHandler>?
-    activity
-  </compensationHandler>
-*/
-
-tCompensationHandler_opt:
-  /* empty */
-| tCompensationHandler X_NEXT
-;
-
-tCompensationHandler:
-  K_COMPENSATIONHANDLER arbitraryAttributes X_NEXT
-  activity X_NEXT // was: tActivityOrCompensateContainer
-  X_SLASH K_COMPENSATIONHANDLER
-;
-
-
 
 
 
@@ -468,23 +552,30 @@ tCompensationHandler:
 
 tVariables_opt:
   /* empty */
+    { $$ = NiltVariable_list(); }
 | tVariables X_NEXT
+    { $$ = $1; }
 ;
 
 tVariables:
   K_VARIABLES arbitraryAttributes X_NEXT
   tVariable_list // 1-oo
   X_SLASH K_VARIABLES
+    { $$ = $4; }
 ;
 
 tVariable_list:
   tVariable X_NEXT
+    { $$ = ConstVariable_list($1, NiltVariable_list()); }
 | tVariable X_NEXT tVariable_list
+    { $$ = ConstVariable_list($1, $3); }
 ;
 
 tVariable:
   K_VARIABLE arbitraryAttributes X_NEXT X_SLASH K_VARIABLE
+    { $$ = Variable(); }
 | K_VARIABLE arbitraryAttributes X_SLASH
+    { $$ = Variable(); }
 ;
 
 
@@ -512,23 +603,30 @@ tVariable:
 
 tCorrelationSets_opt:
   /* empty */
+    { $$ = NiltCorrelationSet_list(); }
 | tCorrelationSets X_NEXT
+    { $$ = $1; }
 ;
 
 tCorrelationSets:
   K_CORRELATIONSETS arbitraryAttributes X_NEXT
   tCorrelationSet_list //1-oo
   X_SLASH K_CORRELATIONSETS
+    { $$ = $4; }
 ;
 
 tCorrelationSet_list:
   tCorrelationSet X_NEXT
+    { $$ = ConstCorrelationSet_list($1, NiltCorrelationSet_list()); }
 | tCorrelationSet X_NEXT tCorrelationSet_list
+    { $$ = ConstCorrelationSet_list($1, $3); }
 ;
 
 tCorrelationSet:
   K_CORRELATIONSET arbitraryAttributes X_NEXT X_SLASH K_CORRELATIONSET
+    { $$ = CorrelationSet(); }
 | K_CORRELATIONSET arbitraryAttributes X_SLASH
+    { $$ = CorrelationSet(); }
 ;
 
 
@@ -538,22 +636,30 @@ tCorrelationSet:
 
 tCorrelations_opt:
   /* empty */
+    { $$ = NiltCorrelation_list(); }
 | tCorrelations X_NEXT
+    { $$ = $1; }
 ;
+
 tCorrelations:
   K_CORRELATIONS arbitraryAttributes X_NEXT
   tCorrelation_list //1-oo
   X_SLASH K_CORRELATIONS
+    { $$ = $4; }
 ;
 
 tCorrelation_list:
   tCorrelation X_NEXT
+    { $$ = ConstCorrelation_list($1, NiltCorrelation_list()); }
 | tCorrelation X_NEXT tCorrelation_list
+    { $$ = ConstCorrelation_list($1, $3); }
 ;
 
 tCorrelation:
   K_CORRELATION arbitraryAttributes X_NEXT X_SLASH K_CORRELATION
+    { $$ = Correlation(); }
 | K_CORRELATION arbitraryAttributes X_SLASH
+    { $$ = Correlation(); }
 ;
 
 
@@ -613,9 +719,9 @@ tInvoke:
   tCatchAll_opt
   tCompensationHandler_opt
   X_SLASH K_INVOKE
-    { $$ = Invoke($4); }
+    { $$ = Invoke($4, $5, $6, $7, $8); }
 | K_INVOKE arbitraryAttributes X_SLASH
-    { $$ = Invoke(StandardElements(NiltTarget_list(), NiltSource_list())); }
+    { $$ = Invoke(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list(), NiltCatch_list(), NiltCatchAll_list(), NiltCompensationHandler_opt()); }
 ;
 
 
@@ -642,9 +748,9 @@ tReceive:
   standardElements
   tCorrelations_opt
   X_SLASH K_RECEIVE
-    { $$ = Receive($4); }
+    { $$ = Receive($4, $5); }
 | K_RECEIVE arbitraryAttributes X_SLASH
-    { $$ = Receive(StandardElements(NiltTarget_list(), NiltSource_list())); }
+    { $$ = Receive(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list()); }
 ;
 
 
@@ -673,9 +779,9 @@ tReply:
   standardElements
   tCorrelations_opt
   X_SLASH K_REPLY
-    { $$ = Reply($4); }
+    { $$ = Reply($4, $5); }
 | K_REPLY arbitraryAttributes X_SLASH
-    { $$ = Reply(StandardElements(NiltTarget_list(), NiltSource_list())); }
+    { $$ = Reply(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list()); }
 ;
 
 
@@ -702,12 +808,14 @@ tAssign:
   standardElements
   tCopy_list //1-oo
   X_SLASH K_ASSIGN
-    { $$ = Assign($4); }
+    { $$ = Assign($4, $5); }
 ;
 
 tCopy_list:
   tCopy X_NEXT
+    { $$ = ConstCopy_list($1, NiltCopy_list()); }
 | tCopy X_NEXT tCopy_list
+    { $$ = ConstCopy_list($1, $3); }
 ;
 
 tCopy:
@@ -715,6 +823,7 @@ tCopy:
   tFrom X_NEXT
   tTo X_NEXT
   X_SLASH K_COPY
+    { $$ = Copy($4, $6); }
 ; 
 
 /*
@@ -731,7 +840,9 @@ tCopy:
 tFrom:
   K_FROM arbitraryAttributes X_NEXT
   X_SLASH K_FROM
+    { $$ = From(); }
 | K_FROM arbitraryAttributes X_SLASH
+    { $$ = From(); }
 ;
 
 /*
@@ -745,7 +856,9 @@ tFrom:
 tTo:
   K_TO arbitraryAttributes X_NEXT
   X_SLASH K_TO
+    { $$ = To(); }
 | K_TO arbitraryAttributes X_SLASH
+    { $$ = To(); }
 ;
 
 
@@ -1081,7 +1194,7 @@ tScope:
   tEventHandlers_opt
   activity X_NEXT
   X_SLASH K_SCOPE
-    { $$ = Scope($4, $10); }
+    { $$ = Scope($4, $5, $7, $8, $9, $10); }
 ;
 
 

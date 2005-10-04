@@ -1,6 +1,8 @@
 tProcess:
-  Process(activity)
+  Process(tPartnerLink_list tPartner_list tVariable_list tCorrelationSet_list tFaultHandlers_opt tCompensationHandler_opt tEventHandlers_opt activity)
 ;
+
+/*---------------------------------------------------------------------------*/
 
 activity:
   activityEmpty(tEmpty)
@@ -20,8 +22,140 @@ activity:
 | activityCompensate(tCompensate)
 ;
 
-activity_list:
-  list activity
+
+/******************************************************************************
+  PARTNER LINKS
+******************************************************************************/
+
+tPartnerLink_list:
+  list tPartnerLink
+;
+
+tPartnerLink:
+  PartnerLink()
+;
+
+
+/******************************************************************************
+  PARTNERS
+******************************************************************************/
+
+tPartner_list:
+  list tPartner
+;
+
+tPartner:
+  Partner(tPartnerLink_list)
+;
+
+
+/******************************************************************************
+  FAULT HANDLERS
+******************************************************************************/
+
+tFaultHandlers_opt:
+  list tFaultHandlers
+;
+  
+tFaultHandlers:
+  FaultHandlers(tCatch_list tCatchAll_list)
+;
+
+tCatch_list:
+  list tCatch
+;
+
+tCatchAll_list:
+  list tCatchAll
+;
+
+tCatch:
+  Catch(activity)
+;
+
+tCatchAll:
+  CatchAll(activity)
+;
+
+
+/******************************************************************************
+  EVENT HANDLERS
+******************************************************************************/
+
+tEventHandlers_opt:
+  list tEventHandlers
+;
+  
+tEventHandlers:
+  EventHandlers(tOnMessage_list tOnAlarm_list)
+;
+
+tOnMessage_list:
+  list tOnMessage
+;
+
+tOnAlarm_list:
+  list tOnAlarm
+;
+
+tOnMessage:
+  OnMessage(activity)
+;
+
+tOnAlarm:
+  OnAlarm(activity)
+;
+
+
+/******************************************************************************
+  COMPENSATION HANDLERS
+******************************************************************************/
+
+tCompensationHandler_opt:
+  list tCompensationHandler
+;
+  
+tCompensationHandler:
+  CompensationHandler(activity)
+;
+
+
+/******************************************************************************
+  VARIABLES
+******************************************************************************/
+
+tVariable_list:
+  list tVariable
+;
+
+tVariable:
+  Variable()
+;
+
+
+/******************************************************************************
+  CORRELATION SETS
+******************************************************************************/
+
+tCorrelationSet_list:
+  list tCorrelationSet
+;
+
+tCorrelationSet:
+  CorrelationSet()
+;
+
+
+/******************************************************************************
+  CORRELATIONS
+******************************************************************************/
+
+tCorrelation_list:
+  list tCorrelation
+;
+
+tCorrelation:
+  Correlation()
 ;
 
 
@@ -39,7 +173,7 @@ tEmpty:
 ******************************************************************************/
 
 tInvoke:
-  Invoke(standardElements)
+  Invoke(standardElements tCorrelation_list tCatch_list tCatchAll_list tCompensationHandler_opt)
 ;
 
 
@@ -48,7 +182,7 @@ tInvoke:
 ******************************************************************************/
 
 tReceive:
-  Receive(standardElements)
+  Receive(standardElements tCorrelation_list)
 ;
 
 
@@ -57,7 +191,7 @@ tReceive:
 ******************************************************************************/
 
 tReply:
-  Reply(standardElements)
+  Reply(standardElements tCorrelation_list)
 ;
 
 
@@ -66,7 +200,23 @@ tReply:
 ******************************************************************************/
 
 tAssign:
-  Assign(standardElements)
+  Assign(standardElements tCopy_list)
+;
+
+tCopy_list:
+  list tCopy
+;
+
+tCopy:
+  Copy(tFrom tTo)
+;
+
+tFrom:
+  From()
+;
+
+tTo:
+  To()
 ;
 
 
@@ -112,6 +262,10 @@ tTerminate:
 
 tFlow:
   Flow(standardElements tLink_list activity_list)
+;
+
+activity_list:
+  list activity
 ;
 
 tLink_list:
@@ -174,29 +328,13 @@ tPick:
   Pick(standardElements tOnMessage_list tOnAlarm_list)
 ;
 
-tOnMessage_list:
-  list tOnMessage
-;
-
-tOnAlarm_list:
-  list tOnAlarm
-;
-
-tOnMessage:
-  OnMessage(activity)
-;
-
-tOnAlarm:
-  OnAlarm(activity)
-;
-
 
 /******************************************************************************
   SCOPE
 ******************************************************************************/
 
 tScope:
-  Scope(standardElements activity)
+  Scope(standardElements tVariable_list tFaultHandlers_opt tCompensationHandler_opt tEventHandlers_opt activity)
 ;
 
 

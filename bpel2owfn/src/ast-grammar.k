@@ -212,6 +212,11 @@ tCorrelation:
 
 tEmpty:
   Empty(standardElements)
+  {
+    casestring name;
+    casestring joinCondition;
+    casestring suppressJoinFailure;	
+  }
 ;
 
 
@@ -222,6 +227,10 @@ tEmpty:
 tInvoke:
   Invoke(standardElements tCorrelation_list tCatch_list tCatchAll_list tCompensationHandler_opt)
   {
+    casestring name;
+    casestring joinCondition;
+    casestring suppressJoinFailure;	
+	  
     casestring partnerLink;
     casestring portType;
     casestring operation;
@@ -238,6 +247,10 @@ tInvoke:
 tReceive:
   Receive(standardElements tCorrelation_list)
   {
+    casestring name;
+    casestring joinCondition;
+    casestring suppressJoinFailure;	
+
     casestring partnerLink;
     casestring portType;
     casestring operation;
@@ -254,6 +267,10 @@ tReceive:
 tReply:
   Reply(standardElements tCorrelation_list)
   {
+    casestring name;
+    casestring joinCondition;
+    casestring suppressJoinFailure;
+
     casestring partnerLink;
     casestring portType;
     casestring operation;
@@ -269,6 +286,11 @@ tReply:
 
 tAssign:
   Assign(standardElements tCopy_list)
+  {
+    casestring name;
+    casestring joinCondition;
+    casestring suppressJoinFailure;	
+  }
 ;
 
 tCopy_list:
@@ -310,6 +332,10 @@ tTo:
 tWait:
   Wait(standardElements)
   {
+    casestring name;
+    casestring joinCondition;
+    casestring suppressJoinFailure;	
+	  
     casestring For; // "for" is a keyword
     casestring until;
   }
@@ -323,6 +349,10 @@ tWait:
 tThrow:
   Throw(standardElements)
   {
+    casestring name;
+    casestring joinCondition;
+    casestring suppressJoinFailure;	
+
     casestring faultName;
     casestring faultVariable;
   }
@@ -336,6 +366,10 @@ tThrow:
 tCompensate:
   Compensate(standardElements)
   {
+    casestring name;
+    casestring joinCondition;
+    casestring suppressJoinFailure;
+
     casestring scope;
   }
 ;
@@ -347,6 +381,11 @@ tCompensate:
 
 tTerminate:
   Terminate(standardElements)
+  {
+    casestring name;
+    casestring joinCondition;
+    casestring suppressJoinFailure;
+  }
 ;
 
 
@@ -356,6 +395,11 @@ tTerminate:
 
 tFlow:
   Flow(standardElements tLink_list activity_list)
+  {
+    casestring name;
+    casestring joinCondition;
+    casestring suppressJoinFailure;
+  }
 ;
 
 activity_list:
@@ -380,6 +424,11 @@ tLink:
 
 tSwitch:
   Switch(standardElements tCase_list tOtherwise_list)
+  {
+    casestring name;
+    casestring joinCondition;
+    casestring suppressJoinFailure;	
+  }
 ;
 
 tCase_list:
@@ -410,6 +459,10 @@ tWhile:
   While(standardElements activity)
   {
     casestring condition;
+
+    casestring name;
+    casestring joinCondition;
+    casestring suppressJoinFailure;    
   }
 ;
 
@@ -420,6 +473,11 @@ tWhile:
 
 tSequence:
   Sequence(standardElements activity_list)
+  {
+    casestring name;
+    casestring joinCondition;
+    casestring suppressJoinFailure;	
+  }
 ;
 
 
@@ -430,6 +488,10 @@ tSequence:
 tPick:
   Pick(standardElements tOnMessage_list tOnAlarm_list)
   {
+    casestring name;
+    casestring joinCondition;
+    casestring suppressJoinFailure;
+    
     casestring createInstance;
   }
 ;
@@ -442,6 +504,10 @@ tPick:
 tScope:
   Scope(standardElements tVariable_list tFaultHandlers_opt tCompensationHandler_opt tEventHandlers_opt activity)
   {
+    casestring name;
+    casestring joinCondition;
+    casestring suppressJoinFailure;	
+
     casestring variableAccessSerializable;
   }
 ;
@@ -454,11 +520,6 @@ tScope:
 
 standardElements:
   StandardElements(tTarget_list tSource_list)
-  {
-    casestring name;
-    casestring joinCondition;
-    casestring suppressJoinFailure;
-  }
 ;
 
 tTarget_list:

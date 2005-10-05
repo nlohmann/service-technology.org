@@ -6,7 +6,9 @@
 %token K_SEQUENCE K_SOURCE K_SWITCH K_TARGET K_TERMINATE K_THROW K_TO
 %token K_VARIABLE K_VARIABLES K_WAIT K_WHILE
 
-%token X_OPEN X_SLASH X_CLOSE X_NEXT X_NAME X_STRING X_EQUALS X_ELEMENTNAME
+%token X_OPEN X_SLASH X_CLOSE X_NEXT X_EQUALS X_ELEMENTNAME
+%token <yt_casestring> X_NAME
+%token <yt_casestring> X_STRING
 
 %start tProcess
 
@@ -23,13 +25,30 @@
 #include "bpel-kc-k.h"
 #include "bpel-kc-yystype.h"
 
+#include <iostream>
+#include <map>
+
+// manage attributes
+std::map<int, std::map<std::string, std::string> > attributeArray;
+unsigned int nodeId = 0;
+
+kc::casestring attribute(int id, std::string name)
+{
+  if(attributeArray[id][name] != "")
+    return kc::mkcasestring(attributeArray[id][name].c_str());
+  else
+    return kc::mkcasestring("\"\"");
+}
+
+
 using namespace kc;
 
+// the root of the abstract syntax tree
 tProcess TheProcess;
 
+// from flex
 extern int yyerror(const char *);
 extern char* yytext;
-
 extern int yylex();
 
 %}
@@ -116,6 +135,7 @@ extern int yylex();
 %type <yt_tSource_list> tSource_list
 %type <yt_tSource> tSource
 
+%type <yt_integer> arbitraryAttributes
 
 %%
 
@@ -177,9 +197,16 @@ tProcess:
   tFaultHandlers_opt
   tCompensationHandler_opt
   tEventHandlers_opt
-  activity X_NEXT
-  X_SLASH K_PROCESS X_CLOSE
-    { TheProcess = $$ = Process($5, $6, $7, $8, $9, $10, $11, $12); }
+  activity
+  X_NEXT X_SLASH K_PROCESS X_CLOSE
+    { TheProcess = $$ = Process($5, $6, $7, $8, $9, $10, $11, $12);
+      $$->name = attribute($3->value, "name");
+      $$->targetNamespace = attribute($3->value, "targetNamespace");
+      $$->queryLanguage = attribute($3->value, "queryLanguage");
+      $$->expressionLanguage = attribute($3->value, "expressionLanguage");
+      $$->suppressJoinFailure = attribute($3->value, "suppressJoinFailure");
+      $$->enableInstanceCompensation = attribute($3->value, "enableInstanceCompensation");
+      $$->abstractProcess = attribute($3->value, "abstractProcess"); }
 ;
 
 /*---------------------------------------------------------------------------*/
@@ -519,7 +546,7 @@ tOnMessage:
 tOnAlarm:
   K_ONALARM arbitraryAttributes X_NEXT
   activity X_NEXT // was: tActivityContainer
-  X_SLASH K_ONALARM
+  X_SLASH K_ONALARM 
     { $$ = OnAlarm($4); }
 ;
 
@@ -573,9 +600,17 @@ tVariable_list:
 
 tVariable:
   K_VARIABLE arbitraryAttributes X_NEXT X_SLASH K_VARIABLE
-    { $$ = Variable(); }
+    { $$ = Variable();
+      $$->name        = attribute($2->value, "name");
+      $$->messageType = attribute($2->value, "messageType");
+      $$->type        = attribute($2->value, "type");
+      $$->element     = attribute($2->value, "element"); }
 | K_VARIABLE arbitraryAttributes X_SLASH
-    { $$ = Variable(); }
+    { $$ = Variable();
+      $$->name        = attribute($2->value, "name");
+      $$->messageType = attribute($2->value, "messageType");
+      $$->type        = attribute($2->value, "type");
+      $$->element     = attribute($2->value, "element"); }
 ;
 
 
@@ -686,9 +721,15 @@ tEmpty:
   K_EMPTY arbitraryAttributes X_NEXT
   standardElements
   X_SLASH K_EMPTY
-    { $$ = Empty($4); }
+    { $$ = Empty($4);
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure"); }
 | K_EMPTY arbitraryAttributes X_SLASH
-    { $$ = Empty(StandardElements(NiltTarget_list(), NiltSource_list())); }
+    { $$ = Empty(StandardElements(NiltTarget_list(), NiltSource_list()));
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure"); }
 ;
 
 
@@ -719,9 +760,25 @@ tInvoke:
   tCatchAll_opt
   tCompensationHandler_opt
   X_SLASH K_INVOKE
-    { $$ = Invoke($4, $5, $6, $7, $8); }
+    { $$ = Invoke($4, $5, $6, $7, $8);
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure");
+      $$->partnerLink = attribute($2->value, "partnerLink");
+      $$->portType = attribute($2->value, "portType");
+      $$->operation = attribute($2->value, "operation");
+      $$->inputVariable = attribute($2->value, "inputVariable");
+      $$->outputVariable = attribute($2->value, "outputVariable"); }
 | K_INVOKE arbitraryAttributes X_SLASH
-    { $$ = Invoke(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list(), NiltCatch_list(), NiltCatchAll_list(), NiltCompensationHandler_opt()); }
+    { $$ = Invoke(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list(), NiltCatch_list(), NiltCatchAll_list(), NiltCompensationHandler_opt());
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure");
+      $$->partnerLink = attribute($2->value, "partnerLink");
+      $$->portType = attribute($2->value, "portType");
+      $$->operation = attribute($2->value, "operation");
+      $$->inputVariable = attribute($2->value, "inputVariable");
+      $$->outputVariable = attribute($2->value, "outputVariable"); }
 ;
 
 
@@ -748,9 +805,25 @@ tReceive:
   standardElements
   tCorrelations_opt
   X_SLASH K_RECEIVE
-    { $$ = Receive($4, $5); }
+    { $$ = Receive($4, $5);
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure");
+      $$->partnerLink = attribute($2->value, "partnerLink");
+      $$->portType = attribute($2->value, "portType");
+      $$->operation = attribute($2->value, "operation");
+      $$->variable = attribute($2->value, "variable");
+      $$->createInstance = attribute($2->value, "createInstance"); }
 | K_RECEIVE arbitraryAttributes X_SLASH
-    { $$ = Receive(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list()); }
+    { $$ = Receive(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list());
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure");
+      $$->partnerLink = attribute($2->value, "partnerLink");
+      $$->portType = attribute($2->value, "portType");
+      $$->operation = attribute($2->value, "operation");
+      $$->variable = attribute($2->value, "variable");
+      $$->createInstance = attribute($2->value, "createInstance"); }
 ;
 
 
@@ -779,9 +852,25 @@ tReply:
   standardElements
   tCorrelations_opt
   X_SLASH K_REPLY
-    { $$ = Reply($4, $5); }
+    { $$ = Reply($4, $5);
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure");
+      $$->partnerLink = attribute($2->value, "partnerLink");
+      $$->portType = attribute($2->value, "portType");
+      $$->operation = attribute($2->value, "operation");
+      $$->variable = attribute($2->value, "variable");
+      $$->faultName = attribute($2->value, "faultName"); }
 | K_REPLY arbitraryAttributes X_SLASH
-    { $$ = Reply(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list()); }
+    { $$ = Reply(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list());
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure");
+      $$->partnerLink = attribute($2->value, "partnerLink");
+      $$->portType = attribute($2->value, "portType");
+      $$->operation = attribute($2->value, "operation");
+      $$->variable = attribute($2->value, "variable");
+      $$->faultName = attribute($2->value, "faultName"); }
 ;
 
 
@@ -808,7 +897,10 @@ tAssign:
   standardElements
   tCopy_list //1-oo
   X_SLASH K_ASSIGN
-    { $$ = Assign($4, $5); }
+    { $$ = Assign($4, $5);
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure"); }
 ;
 
 tCopy_list:
@@ -840,9 +932,25 @@ tCopy:
 tFrom:
   K_FROM arbitraryAttributes X_NEXT
   X_SLASH K_FROM
-    { $$ = From(); }
+    { $$ = From();
+      $$->variable = attribute($2->value, "variable");
+      $$->part = attribute($2->value, "part");
+      $$->query = attribute($2->value, "query");
+      $$->property = attribute($2->value, "property");
+      $$->partnerLink = attribute($2->value, "partnerLink");
+      $$->endpointReference = attribute($2->value, "endpointReference");
+      $$->expression = attribute($2->value, "expression");
+      $$->opaque = attribute($2->value, "opaque"); }
 | K_FROM arbitraryAttributes X_SLASH
-    { $$ = From(); }
+    { $$ = From();
+      $$->variable = attribute($2->value, "variable");
+      $$->part = attribute($2->value, "part");
+      $$->query = attribute($2->value, "query");
+      $$->property = attribute($2->value, "property");
+      $$->partnerLink = attribute($2->value, "partnerLink");
+      $$->endpointReference = attribute($2->value, "endpointReference");
+      $$->expression = attribute($2->value, "expression");
+      $$->opaque = attribute($2->value, "opaque"); }
 ;
 
 /*
@@ -856,9 +964,15 @@ tFrom:
 tTo:
   K_TO arbitraryAttributes X_NEXT
   X_SLASH K_TO
-    { $$ = To(); }
+    { $$ = To();
+      $$->expression = attribute($2->value, "expression");
+      $$->opaque = attribute($2->value, "opaque");
+      $$->endpointReference = attribute($2->value, "endpointReference"); }
 | K_TO arbitraryAttributes X_SLASH
-    { $$ = To(); }
+    { $$ = To();
+      $$->expression = attribute($2->value, "expression");
+      $$->opaque = attribute($2->value, "opaque");
+      $$->endpointReference = attribute($2->value, "endpointReference"); }
 ;
 
 
@@ -880,9 +994,19 @@ tWait:
   K_WAIT arbitraryAttributes X_NEXT
   standardElements
   X_SLASH K_WAIT
-    { $$ = Wait($4); }
+    { $$ = Wait($4);
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure");
+      $$->For = attribute($2->value, "for"); // "for" is a keyword
+      $$->until = attribute($2->value, "until"); }
 | K_WAIT arbitraryAttributes X_SLASH
-    { $$ = Wait(StandardElements(NiltTarget_list(), NiltSource_list())); }
+    { $$ = Wait(StandardElements(NiltTarget_list(), NiltSource_list()));
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure");
+      $$->For = attribute($2->value, "for"); // "for" is a keyword
+      $$->until = attribute($2->value, "until"); }
 ;
 
 
@@ -902,9 +1026,19 @@ tThrow:
   K_THROW arbitraryAttributes X_NEXT
   standardElements
   X_SLASH K_THROW
-    { $$ = Throw($4); }
+    { $$ = Throw($4);
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure");
+      $$->faultName = attribute($2->value, "faultName");
+      $$->faultVariable = attribute($2->value, "faultVariable"); }
 | K_THROW arbitraryAttributes X_SLASH
-    { $$ = Throw(StandardElements(NiltTarget_list(), NiltSource_list())); }
+    { $$ = Throw(StandardElements(NiltTarget_list(), NiltSource_list()));
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure");
+      $$->faultName = attribute($2->value, "faultName");
+      $$->faultVariable = attribute($2->value, "faultVariable"); }
 ;
 
 
@@ -926,9 +1060,17 @@ tCompensate:
   K_COMPENSATE arbitraryAttributes X_NEXT
   standardElements
   X_SLASH K_COMPENSATE
-    { $$ = Compensate($4); }
+    { $$ = Compensate($4);
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure");
+      $$->scope = attribute($2->value, "scope"); }
 | K_COMPENSATE arbitraryAttributes X_SLASH
-    { $$ = Compensate(StandardElements(NiltTarget_list(), NiltSource_list())); }
+    { $$ = Compensate(StandardElements(NiltTarget_list(), NiltSource_list()));
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure");
+      $$->scope = attribute($2->value, "scope"); }
 ;
 
 
@@ -951,9 +1093,15 @@ tTerminate:
   K_TERMINATE arbitraryAttributes X_NEXT
   standardElements
   X_SLASH K_TERMINATE
-    { $$ = Terminate($4); }
+    { $$ = Terminate($4);
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure"); }
 | K_TERMINATE arbitraryAttributes X_SLASH
-    { $$ = Terminate(StandardElements(NiltTarget_list(), NiltSource_list())); }
+    { $$ = Terminate(StandardElements(NiltTarget_list(), NiltSource_list()));
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure"); }
 ;
 
 
@@ -981,7 +1129,10 @@ tFlow:
   tLinks_opt
   activity_list //1-oo
   X_SLASH K_FLOW
-    { $$ = Flow($4, $5, $6); }
+    { $$ = Flow($4, $5, $6);
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure"); }
 ;
 
 activity_list:
@@ -1014,9 +1165,11 @@ tLink_list:
 
 tLink:
   K_LINK arbitraryAttributes X_NEXT X_SLASH K_LINK
-    { $$ = Link(); }
+    { $$ = Link();
+      $$->name = attribute($2->value, "name"); }
 | K_LINK arbitraryAttributes X_SLASH
-    { $$ = Link(); }
+    { $$ = Link();
+      $$->name = attribute($2->value, "name"); }
 ;
 
 
@@ -1045,7 +1198,10 @@ tSwitch:
   tCase_list //1-oo
   tOtherwise_opt
   X_SLASH K_SWITCH
-    { $$ = Switch($4, $5, $6); }
+    { $$ = Switch($4, $5, $6);
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure"); }
 ;
 
 tCase_list:
@@ -1059,7 +1215,8 @@ tCase:
   K_CASE arbitraryAttributes X_NEXT
   activity X_NEXT // was: tActivityContainer
   X_SLASH K_CASE
-    { $$ = Case($4); }
+    { $$ = Case($4);
+      $$->condition = attribute($2->value, "condition"); }
 ;
 
 tOtherwise_opt:
@@ -1096,7 +1253,11 @@ tWhile:
   standardElements
   activity X_NEXT
   X_SLASH K_WHILE
-    { $$ = While($4, $5); }
+    { $$ = While($4, $5);
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure");
+      $$->condition = attribute($2->value, "condition"); }
 ;
 
 
@@ -1119,7 +1280,10 @@ tSequence:
   standardElements
   activity_list //1-oo
   X_SLASH K_SEQUENCE
-    { $$ = Sequence($4, $5); }
+    { $$ = Sequence($4, $5);
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure"); }
 ;
 
 
@@ -1154,7 +1318,11 @@ tPick:
   tOnMessage X_NEXT tOnMessage_list //1-oo
   tOnAlarm_list //0-oo
   X_SLASH K_PICK
-    { $$ = Pick($4, ConstOnMessage_list($5, $7), $8); }
+    { $$ = Pick($4, ConstOnMessage_list($5, $7), $8);
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure");
+      $$->createInstance = attribute($2->value, "createInstance"); }
 ;
 
 
@@ -1194,7 +1362,11 @@ tScope:
   tEventHandlers_opt
   activity X_NEXT
   X_SLASH K_SCOPE
-    { $$ = Scope($4, $5, $7, $8, $9, $10); }
+    { $$ = Scope($4, $5, $7, $8, $9, $10);
+      $$->name = attribute($2->value, "name");
+      $$->joinCondition = attribute($2->value, "joinCondition");
+      $$->suppressJoinFailure = attribute($2->value, "suppressJoinFailure");
+      $$->variableAccessSerializable = attribute($2->value, "variableAccessSerializable"); }
 ;
 
 
@@ -1256,5 +1428,7 @@ tSource:
 
 arbitraryAttributes:
   /* empty */
+    { $$ = mkinteger(++nodeId); }
 | X_NAME X_EQUALS X_STRING arbitraryAttributes
+    { $$ = $4; attributeArray[nodeId][$1->name] = $3->name; }
 ;

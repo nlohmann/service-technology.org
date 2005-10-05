@@ -46,8 +46,8 @@ comment			([^-]|"-"[^-])*
 
 
  /* attributes */
-<ATTRIBUTE>{name}	{ return X_NAME; }
-<ATTRIBUTE>{string}	{ return X_STRING; }
+<ATTRIBUTE>{name}	{ yylval.yt_casestring = kc::mkcasestring(yytext); return X_NAME; }
+<ATTRIBUTE>{string}	{ yylval.yt_casestring = kc::mkcasestring(yytext); return X_STRING; }
 <ATTRIBUTE>"="		{ return X_EQUALS; }
 
 

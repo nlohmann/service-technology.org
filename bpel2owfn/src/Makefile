@@ -22,7 +22,7 @@ KC_TIME = .kc_time_stamp
 all: bpel2owfn
 
 bpel2owfn: bpel-syntax.o bpel-lexic.o main.o bpel-abstract.o bpel-kc-unpk.o\
-	bpel-kc-rk.o bpel-kc-csgiok.o bpel-kc-k.o bpel-unparse.o
+	bpel-kc-rk.o bpel-kc-csgiok.o bpel-kc-k.o bpel-unparse.o bpel-attributes.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 main.o: main.c main.h $(KC_TIME)
@@ -42,6 +42,9 @@ bpel-syntax.o: bpel-syntax.c $(KC_TIME)
 
 bpel-syntax.c: bpel-syntax.y
 	$(YACC) $(YFLAGS) -o $@ -d $^
+
+bpel-attributes.o: bpel-attributes.c bpel-attributes.h $(KC_TIME)
+	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
 
 
 ##############################################################################

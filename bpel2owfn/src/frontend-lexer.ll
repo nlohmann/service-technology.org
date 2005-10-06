@@ -71,10 +71,11 @@ comment			([^-]|"-"[^-])*
 
 
  /* XML-elements */
-"<"			{ return X_OPEN; }
-"/"			{ return X_SLASH; }
-">"			{ BEGIN(INITIAL); return X_CLOSE; }
-">"[ \t\r\n]*"<"	{ BEGIN(INITIAL); return X_NEXT; }
+"<"				{ return X_OPEN; }
+"/"				{ return X_SLASH; }
+">"				{ BEGIN(INITIAL); return X_CLOSE; }
+">"[ \t\r\n]*"<"		{ BEGIN(INITIAL); return X_NEXT; }
+"<?xml version=\"1.0\"?>"	{ /* ignore XML-version */ }
 
 
  /* names of BPEL-elements */

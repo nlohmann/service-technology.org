@@ -369,6 +369,9 @@ tPartner:
   X_SLASH K_PARTNER
     { $$ = Partner($4);
       $$->name = att.read($2, "name"); }
+| K_PARTNER arbitraryAttributes X_SLASH
+    { $$ = Partner(NiltPartnerLink_list());
+      $$->name = att.read($2, "name"); }
 ;
 
 

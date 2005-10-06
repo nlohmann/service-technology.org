@@ -97,6 +97,10 @@ tCatch:
 
 tCatchAll:
   CatchAll(activity)
+  {
+    casestring faultName;
+    casestring faultVariable;
+  }
 ;
 
 

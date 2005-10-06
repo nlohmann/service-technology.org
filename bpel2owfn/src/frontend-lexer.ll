@@ -82,7 +82,7 @@ comment			([^-]|"-"[^-])*
 "assign"		{ BEGIN(ATTRIBUTE); return K_ASSIGN; }
 "case"			{ BEGIN(ATTRIBUTE); return K_CASE; }
 "catch"			{ BEGIN(ATTRIBUTE); return K_CATCH; }
-"catchAll"		{ return K_CATCHALL; }
+"catchAll"		{ BEGIN(ATTRIBUTE); return K_CATCHALL; }
 "compensate"		{ BEGIN(ATTRIBUTE); return K_COMPENSATE; }
 "compensationHandler"	{ return K_COMPENSATIONHANDLER; }
 "copy"			{ return K_COPY; }

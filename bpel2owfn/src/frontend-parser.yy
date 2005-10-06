@@ -446,10 +446,12 @@ tCatchAll_opt:
 ;
 
 tCatchAll:
-  K_CATCHALL X_NEXT
+  K_CATCHALL arbitraryAttributes X_NEXT
   activity X_NEXT // was: tActivityOrCompensateContainer
   X_SLASH K_CATCHALL
-    { $$ = CatchAll($3); }
+    { $$ = CatchAll($4);
+      $$->faultName = att.read($2, "faultName");
+      $$->faultVariable = att.read($2, "faultVariable"); }
 ;
 
 

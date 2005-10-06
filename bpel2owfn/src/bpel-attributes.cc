@@ -1,5 +1,7 @@
 #include "bpel-attributes.h"
 
+
+
 attributeManager::attributeManager()
 {
   this->attributeArray.clear();

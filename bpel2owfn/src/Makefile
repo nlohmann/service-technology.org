@@ -1,4 +1,4 @@
-.PHONY: all clean
+.PHONY: clean
 
 
 
@@ -6,7 +6,6 @@
 YACC     = bison
 LEX      = flex
 CXX      = g++
-CC       = g++
 KC       = kc++
 
 # Flags
@@ -14,28 +13,44 @@ YFLAGS   = -d -y -l -v
 CXXFLAGS = -Wno-unused -O3
 KFLAGS   = -b -sc -fbpel-kc-
 
+# Kimwitu++ helper file for make
 KC_TIME = .kc_time_stamp
 
+
+
 ###############################################################################
-# Main Module
+# Main target
 
 all: bpel2owfn
 
-bpel2owfn: bpel-syntax.o bpel-lexic.o main.o bpel-abstract.o bpel-kc-unpk.o\
-	bpel-kc-rk.o bpel-kc-csgiok.o bpel-kc-k.o bpel-unparse.o bpel-attributes.o
+bpel2owfn: bpel-syntax.o bpel-lexic.o\
+	main.o bpel-attributes.o\
+	bpel-abstract.o bpel-unparse.o bpel-rewrite.o\
+	bpel-kc-unpk.o\
+	bpel-kc-rk.o bpel-kc-csgiok.o bpel-kc-k.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
+
+
+
+###############################################################################
+# "Pure" C++-modules
 
 main.o: main.c main.h $(KC_TIME)
 	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
 
+bpel-attributes.o: bpel-attributes.c bpel-attributes.h $(KC_TIME)
+	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
+
+
 
 ###############################################################################
-# The Parser
+# Parser
+
 bpel-lexic.o: bpel-lexic.c
 	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
 
 bpel-lexic.c: bpel-lexic.l $(KC_TIME)
-	$(LEX) -o$@ $^
+	$(LEX) -o$@ $<
 
 bpel-syntax.o: bpel-syntax.c $(KC_TIME)
 	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
@@ -43,12 +58,11 @@ bpel-syntax.o: bpel-syntax.c $(KC_TIME)
 bpel-syntax.c: bpel-syntax.y
 	$(YACC) $(YFLAGS) -o $@ -d $^
 
-bpel-attributes.o: bpel-attributes.c bpel-attributes.h $(KC_TIME)
-	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
 
 
 ##############################################################################
-# Kimwitu++ Files
+# Kimwitu++ Files 1
+
 bpel-kc-csgiok.o: $(KC_TIME)
 	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
 
@@ -61,15 +75,24 @@ bpel-kc-rk.o: $(KC_TIME)
 bpel-kc-unpk.o: $(KC_TIME)
 	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
 
+
+
+##############################################################################
+# Kimwitu++ Files 2
+
 bpel-unparse.o: $(KC_TIME)
+	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
+
+bpel-rewrite.o: $(KC_TIME)
 	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
 
 bpel-abstract.o: $(KC_TIME)
 	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
 
-$(KC_TIME): bpel-abstract.k bpel-unparse.k
+$(KC_TIME): bpel-abstract.k bpel-unparse.k bpel-rewrite.k
 	@touch $@
 	$(KC) $(KFLAGS) $^
+
 
 
 ###############################################################################
@@ -80,5 +103,6 @@ clean:
 	@-rm -f bpel-kc-*.c bpel-kc-*.h
 	@-rm -f bpel-abstract.c bpel-abstract.h
 	@-rm -f bpel-unparse.c bpel-unparse.h
+	@-rm -f bpel-rewrite.c bpel-rewrite.h
 	@-rm -f $(KC_TIME)
 	@-rm -f *.o

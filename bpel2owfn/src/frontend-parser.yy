@@ -522,7 +522,7 @@ tCompensationHandler:
 tEventHandlers_opt:
   /* empty */
     { $$ = NiltEventHandlers_opt(); }
-| tEventHandlers
+| tEventHandlers X_NEXT
     { $$ = ConstEventHandlers_opt($1, NiltEventHandlers_opt()); }
 ;
 
@@ -779,6 +779,15 @@ tEmpty:
     <catchAll>?
     <compensationHandler>?
   </invoke>
+
+  Attributes:
+  * partnerLink: name of a partner declared in the script to who send a message
+    and optionally receive a response.
+  * portType: name of the 'port' as declared in corresponding WSDL file.
+  * operation: name of the operation to invoke
+  * inputVariable: name of the variable whose value will be used as the message
+    to the partner.
+  * outputVariable: name of the variable to which the response will be assigned. 
 */
 
 tInvoke:
@@ -827,6 +836,16 @@ tInvoke:
       <correlation set="ncname" initiate="yes|no"?>+
     </correlations>
   </receive>
+
+  Attributes:
+  * partnerLink: name of a partner declared in the script from which the
+    process is to receive a message.
+  * portType: name of the 'port' as declared in corresponding WSDL file.
+  * operation: name of the operation
+  * variable: name of the variable to which the received message will be
+    assigned.
+  * createInstance: used to make instance of the BPEL process and start its
+    execution. 
 */
 
 tReceive:
@@ -874,6 +893,15 @@ tReceive:
        <correlation set="ncname" initiate="yes|no"?>+
     </correlations>
   </reply>
+
+  Attributes:
+  * partnerLink: name of a partner declared in the script to which to send a
+    message.
+  * portType: name of the 'port' as declared in corresponding WSDL file.
+  * operation: name of the operation
+  * variable: name of the variable whose value will be used as output message.
+  * faultName
+
 */
 
 tReply:
@@ -1017,6 +1045,10 @@ tTo:
   <wait (for="duration-expr" | until="deadline-expr") standard-attributes>
     standard-elements
   </wait>
+
+  Attributes:
+  * for: a duration expression as defined in XMLSchema (for example PT10S)
+  * until: a date time expression as defined in XMLSchema
 */
 
 tWait:
@@ -1049,6 +1081,10 @@ tWait:
   <throw faultName="qname" faultVariable="ncname"? standard-attributes>
     standard-elements
   </throw>
+
+  Attributes:
+  * faultName: the fault code to be thrown.
+  * faultVariable
 */
 
 tThrow:
@@ -1275,6 +1311,10 @@ tOtherwise:
      standard-elements
      activity
   </while>
+
+  Attributes:
+  * condition: an XPath expression which will be evaluated every time before
+    contained activities. If this evaluates to false the loop finishes.
 */
 
 tWhile:
@@ -1339,6 +1379,10 @@ tSequence:
     </onAlarm>
   </pick>
 
+  Attributes:
+  * createInstance: This is an alternative of the 'receive' to make a new
+    process instance. And can be expressed as: 'pick' plus 'onMessage' equals to
+    'receive' activity.
 */
 
 tPick:

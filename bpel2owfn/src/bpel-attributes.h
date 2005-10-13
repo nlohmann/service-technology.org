@@ -31,6 +31,7 @@ class attributeManager
     /// defines an attribute
     void define(kc::casestring attributeName, kc::casestring attributeValue);
 
+    /// dummy for future check-function
     void check(kc::integer elementId, unsigned int type);
 };
 

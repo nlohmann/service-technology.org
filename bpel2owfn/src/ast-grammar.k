@@ -230,6 +230,7 @@ tEmpty:
 
 tInvoke:
   Invoke(standardElements tCorrelation_list tCatch_list tCatchAll_list tCompensationHandler_opt)
+| Invoke2(standardElements tCorrelation_list)
   {
     casestring name;
     casestring joinCondition;
@@ -240,7 +241,7 @@ tInvoke:
     casestring operation;
     casestring inputVariable;
     casestring outputVariable;
-  }
+  }	
 ;
 
 

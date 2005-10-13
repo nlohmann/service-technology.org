@@ -44,6 +44,7 @@ name			{namestart}{namechar}*
 esc			"&#"[0-9]+";"|"&#x"[0-9a-fA-F]+";"
 string			\"([^"]|{esc})*\"
 comment			([^-]|"-"[^-])*
+bpwsns			"bpws:"
 
 
  /* start conditions of the lexer */
@@ -76,51 +77,52 @@ comment			([^-]|"-"[^-])*
 ">"				{ BEGIN(INITIAL); return X_CLOSE; }
 ">"[ \t\r\n]*"<"		{ BEGIN(INITIAL); return X_NEXT; }
 "<?xml version=\"1.0\"?>"	{ /* ignore XML-version */ }
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"	{ /* ignore XML-version */ }
 
 
  /* names of BPEL-elements */
-"assign"		{ BEGIN(ATTRIBUTE); return K_ASSIGN; }
-"case"			{ BEGIN(ATTRIBUTE); return K_CASE; }
-"catch"			{ BEGIN(ATTRIBUTE); return K_CATCH; }
-"catchAll"		{ BEGIN(ATTRIBUTE); return K_CATCHALL; }
-"compensate"		{ BEGIN(ATTRIBUTE); return K_COMPENSATE; }
-"compensationHandler"	{ return K_COMPENSATIONHANDLER; }
-"copy"			{ return K_COPY; }
-"correlation"		{ BEGIN(ATTRIBUTE); return K_CORRELATION; }
-"correlations"		{ return K_CORRELATIONS; }
-"correlationSet"	{ BEGIN(ATTRIBUTE); return K_CORRELATIONSET; }
-"correlationSets"	{ return K_CORRELATIONSETS; }
-"empty"			{ BEGIN(ATTRIBUTE); return K_EMPTY; }
-"eventHandlers"		{ return K_EVENTHANDLERS; }
-"faultHandlers"		{ return K_FAULTHANDLERS; }
-"flow"			{ BEGIN(ATTRIBUTE); return K_FLOW; }
-"from"			{ BEGIN(ATTRIBUTE); return K_FROM; }
-"invoke"		{ BEGIN(ATTRIBUTE); return K_INVOKE; }
-"link"			{ BEGIN(ATTRIBUTE); return K_LINK; }
-"links"			{ BEGIN(ATTRIBUTE); return K_LINKS; }
-"onAlarm"		{ BEGIN(ATTRIBUTE); return K_ONALARM; }
-"onMessage"		{ BEGIN(ATTRIBUTE); return K_ONMESSAGE; }
-"otherwise"		{ return K_OTHERWISE; }
-"partner"		{ BEGIN(ATTRIBUTE); return K_PARTNER; }
-"partnerLink"		{ BEGIN(ATTRIBUTE); return K_PARTNERLINK; }
-"partnerLinks"		{ return K_PARTNERLINKS; }
-"partners"		{ return K_PARTNERS; }
-"pick"			{ BEGIN(ATTRIBUTE); return K_PICK; }
-"process"		{ BEGIN(ATTRIBUTE); return K_PROCESS; }
-"receive"		{ BEGIN(ATTRIBUTE); return K_RECEIVE; }
-"reply"			{ BEGIN(ATTRIBUTE); return K_REPLY; }
-"scope"			{ BEGIN(ATTRIBUTE); return K_SCOPE; }
-"sequence"		{ BEGIN(ATTRIBUTE); return K_SEQUENCE; }
-"source"		{ BEGIN(ATTRIBUTE); return K_SOURCE; }
-"switch"		{ BEGIN(ATTRIBUTE); return K_SWITCH; }
-"target"		{ BEGIN(ATTRIBUTE); return K_TARGET; }
-"terminate"		{ BEGIN(ATTRIBUTE); return K_TERMINATE; }
-"throw"			{ BEGIN(ATTRIBUTE); return K_THROW; }
-"to"			{ BEGIN(ATTRIBUTE); return K_TO; }
-"variable"		{ BEGIN(ATTRIBUTE); return K_VARIABLE; }
-"variables"		{ return K_VARIABLES; }
-"wait"			{ BEGIN(ATTRIBUTE); return K_WAIT; }
-"while"			{ BEGIN(ATTRIBUTE); return K_WHILE; }
+{bpwsns}?"assign"		{ BEGIN(ATTRIBUTE); return K_ASSIGN; }
+{bpwsns}?"case"			{ BEGIN(ATTRIBUTE); return K_CASE; }
+{bpwsns}?"catch"		{ BEGIN(ATTRIBUTE); return K_CATCH; }
+{bpwsns}?"catchAll"		{ BEGIN(ATTRIBUTE); return K_CATCHALL; }
+{bpwsns}?"compensate"		{ BEGIN(ATTRIBUTE); return K_COMPENSATE; }
+{bpwsns}?"compensationHandler"	{ return K_COMPENSATIONHANDLER; }
+{bpwsns}?"copy"			{ return K_COPY; }
+{bpwsns}?"correlation"		{ BEGIN(ATTRIBUTE); return K_CORRELATION; }
+{bpwsns}?"correlations"		{ return K_CORRELATIONS; }
+{bpwsns}?"correlationSet"	{ BEGIN(ATTRIBUTE); return K_CORRELATIONSET; }
+{bpwsns}?"correlationSets"	{ return K_CORRELATIONSETS; }
+{bpwsns}?"empty"		{ BEGIN(ATTRIBUTE); return K_EMPTY; }
+{bpwsns}?"eventHandlers"	{ return K_EVENTHANDLERS; }
+{bpwsns}?"faultHandlers"	{ return K_FAULTHANDLERS; }
+{bpwsns}?"flow"			{ BEGIN(ATTRIBUTE); return K_FLOW; }
+{bpwsns}?"from"			{ BEGIN(ATTRIBUTE); return K_FROM; }
+{bpwsns}?"invoke"		{ BEGIN(ATTRIBUTE); return K_INVOKE; }
+{bpwsns}?"link"			{ BEGIN(ATTRIBUTE); return K_LINK; }
+{bpwsns}?"links"		{ BEGIN(ATTRIBUTE); return K_LINKS; }
+{bpwsns}?"onAlarm"		{ BEGIN(ATTRIBUTE); return K_ONALARM; }
+{bpwsns}?"onMessage"		{ BEGIN(ATTRIBUTE); return K_ONMESSAGE; }
+{bpwsns}?"otherwise"		{ return K_OTHERWISE; }
+{bpwsns}?"partner"		{ BEGIN(ATTRIBUTE); return K_PARTNER; }
+{bpwsns}?"partnerLink"		{ BEGIN(ATTRIBUTE); return K_PARTNERLINK; }
+{bpwsns}?"partnerLinks"		{ return K_PARTNERLINKS; }
+{bpwsns}?"partners"		{ return K_PARTNERS; }
+{bpwsns}?"pick"			{ BEGIN(ATTRIBUTE); return K_PICK; }
+{bpwsns}?"process"		{ BEGIN(ATTRIBUTE); return K_PROCESS; }
+{bpwsns}?"receive"		{ BEGIN(ATTRIBUTE); return K_RECEIVE; }
+{bpwsns}?"reply"		{ BEGIN(ATTRIBUTE); return K_REPLY; }
+{bpwsns}?"scope"		{ BEGIN(ATTRIBUTE); return K_SCOPE; }
+{bpwsns}?"sequence"		{ BEGIN(ATTRIBUTE); return K_SEQUENCE; }
+{bpwsns}?"source"		{ BEGIN(ATTRIBUTE); return K_SOURCE; }
+{bpwsns}?"switch"		{ BEGIN(ATTRIBUTE); return K_SWITCH; }
+{bpwsns}?"target"		{ BEGIN(ATTRIBUTE); return K_TARGET; }
+{bpwsns}?"terminate"		{ BEGIN(ATTRIBUTE); return K_TERMINATE; }
+{bpwsns}?"throw"		{ BEGIN(ATTRIBUTE); return K_THROW; }
+{bpwsns}?"to"			{ BEGIN(ATTRIBUTE); return K_TO; }
+{bpwsns}?"variable"		{ BEGIN(ATTRIBUTE); return K_VARIABLE; }
+{bpwsns}?"variables"		{ return K_VARIABLES; }
+{bpwsns}?"wait"			{ BEGIN(ATTRIBUTE); return K_WAIT; }
+{bpwsns}?"while"		{ BEGIN(ATTRIBUTE); return K_WHILE; }
 
 
 {name}			{ BEGIN(ATTRIBUTE); return X_ELEMENTNAME; }

@@ -4,6 +4,9 @@
 char* filename = NULL;
 
 
+/// The Petri Net
+PetriNet *TheNet = new PetriNet();
+
 int yyerror(const char* msg)
 {
   // display passed error message
@@ -68,9 +71,11 @@ int main( int argc, char *argv[])
     fprintf(stderr, "Parsing complete.\n");
     //TheProcess->print();
     TheProcess = TheProcess->rewrite(kc::implicit);
-    TheProcess->unparse(kc::printer, kc::xml);    
+    //TheProcess->unparse(kc::printer, kc::xml);
+    TheProcess->unparse(kc::pseudoPrinter, kc::petrinet);
   }
   
+  TheNet->drawDot();
   
   return error;
 }

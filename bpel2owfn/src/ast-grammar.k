@@ -29,6 +29,9 @@ activity:
 | activityPick(tPick)
 | activityScope(tScope)
 | activityCompensate(tCompensate)
+  {
+    integer id;
+  }
 ;
 
 
@@ -219,7 +222,9 @@ tEmpty:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure;	
+    casestring suppressJoinFailure;
+    
+    integer id;
   }
 ;
 
@@ -241,6 +246,8 @@ tInvoke:
     casestring operation;
     casestring inputVariable;
     casestring outputVariable;
+    
+    integer id;
   }	
 ;
 
@@ -261,6 +268,8 @@ tReceive:
     casestring operation;
     casestring variable;
     casestring createInstance;
+
+    integer id;
   }
 ;
 
@@ -281,6 +290,8 @@ tReply:
     casestring operation;
     casestring variable;
     casestring faultName;
+
+    integer id;
   }
 ;
 
@@ -294,7 +305,9 @@ tAssign:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure;	
+    casestring suppressJoinFailure;
+
+    integer id;
   }
 ;
 
@@ -343,6 +356,8 @@ tWait:
 	  
     casestring For; // "for" is a keyword
     casestring until;
+
+    integer id;
   }
 ;
 
@@ -360,6 +375,8 @@ tThrow:
 
     casestring faultName;
     casestring faultVariable;
+
+    integer id;
   }
 ;
 
@@ -376,6 +393,8 @@ tCompensate:
     casestring suppressJoinFailure;
 
     casestring scope;
+
+    integer id;
   }
 ;
 
@@ -390,6 +409,8 @@ tTerminate:
     casestring name;
     casestring joinCondition;
     casestring suppressJoinFailure;
+
+    integer id;
   }
 ;
 
@@ -404,11 +425,16 @@ tFlow:
     casestring name;
     casestring joinCondition;
     casestring suppressJoinFailure;
+
+    integer id;
   }
 ;
 
 activity_list:
   list activity
+  {
+    integer children;
+  }
 ;
 
 tLink_list:
@@ -432,7 +458,9 @@ tSwitch:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure;	
+    casestring suppressJoinFailure;
+
+    integer id;
   }
 ;
 
@@ -467,7 +495,9 @@ tWhile:
 
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure;    
+    casestring suppressJoinFailure;
+    
+    integer id;
   }
 ;
 
@@ -482,6 +512,8 @@ tSequence:
     casestring name;
     casestring joinCondition;
     casestring suppressJoinFailure;	
+
+    integer id;
   }
 ;
 
@@ -498,6 +530,8 @@ tPick:
     casestring suppressJoinFailure;
     
     casestring createInstance;
+
+    integer id;
   }
 ;
 
@@ -514,6 +548,8 @@ tScope:
     casestring suppressJoinFailure;	
 
     casestring variableAccessSerializable;
+
+    integer id;
   }
 ;
 

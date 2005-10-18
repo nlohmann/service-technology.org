@@ -1220,11 +1220,9 @@ tFlow:
 
 activity_list:
   activity X_NEXT
-    { $$ = Consactivity_list($1, Nilactivity_list()); 
-      $$->children = mkinteger(1); }
+    { $$ = Consactivity_list($1, Nilactivity_list()); }
 | activity X_NEXT activity_list
-    { $$ = Consactivity_list($1, $3);
-      $$->children = mkinteger($3->children->value + 1); }
+    { $$ = Consactivity_list($1, $3); }
 ;
 
 tLinks_opt:

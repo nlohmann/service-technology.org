@@ -432,9 +432,6 @@ tFlow:
 
 activity_list:
   list activity
-  {
-    integer children;
-  }
 ;
 
 tLink_list:

@@ -30,6 +30,7 @@ class Transition: public Node
 {
   private:
     unsigned int type;
+
   public:
     Transition(std::string name, std::string role, unsigned int type);
 };
@@ -40,6 +41,7 @@ class Place: public Node
 {
   private:
     unsigned int type;
+    
   public:
     Place(std::string name, std::string role, unsigned int type);
 };
@@ -49,12 +51,20 @@ class Place: public Node
 class PetriNet
 {
   public:
-    Node *newPlace(std::string name, std::string role, unsigned int type);
-    Node *newTransition(std::string name, std::string role, unsigned int type);
+    Place *newPlace(std::string name, std::string role, unsigned int type);
+    Transition *newTransition(std::string name, std::string role, unsigned int type);
     Arc *newArc(Node *source, Node *target);
     void information();
     void drawDot();
+    void mergePlaces(Place *p1, Place *p2);
+    void removePlace(Place *p);
+    void removeArc(Arc *f);
+
+    std::vector<Node *> preset(Node *n);
+    std::vector<Node *> postset(Node *n);
+
     PetriNet();
+
 
   private:
     unsigned int places;

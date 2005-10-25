@@ -74,7 +74,8 @@ int main( int argc, char *argv[])
     //TheProcess->unparse(kc::printer, kc::xml);
     TheProcess->unparse(kc::pseudoPrinter, kc::petrinet);
   }
-  
+
+  //TheNet->simplify();  
   TheNet->drawDot();
   
   return error;

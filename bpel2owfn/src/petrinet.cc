@@ -1,5 +1,37 @@
 #include "petrinet.h"
 
+extern std::string intToString(int i);
+
+
+/* helpers */
+
+std::set<std::string> set_union(std::set<std::string> a, std::set<std::string> b)
+{
+  std::set<std::string> result = a;
+
+  for (std::set<std::string>::iterator it = b.begin(); it != b.end(); it++)
+  {
+    result.insert(*it);
+  }
+
+  return result;
+}
+
+std::set<Node *> set_union(std::set<Node *> a, std::set<Node *> b)
+{
+  std::set<Node *> result = a;
+
+  for (std::set<Node *>::iterator it = b.begin(); it != b.end(); it++)
+  {
+    result.insert(*it);
+  }
+
+  return result;
+}
+
+
+
+
 
 Arc::Arc(Node *mysource, Node* mytarget)
 {
@@ -13,7 +45,7 @@ Transition::Transition(std::string myname, std::string role, unsigned int mytype
 {
   type = mytype;
   name = myname;
-  roles.push_back(role);
+  roles.insert(role);
 }
 
 /*****************************************************************************/
@@ -22,7 +54,7 @@ Place::Place(std::string myname, std::string role, unsigned int mytype)
 {
   type = mytype;
   name = myname;
-  roles.push_back(role);
+  roles.insert(role);
 }
 
 /*****************************************************************************/
@@ -80,6 +112,36 @@ void PetriNet::removePlace(Place *p1)
     if (*p == p1)
     {
       P.erase(p);
+      return;
+    }
+  }
+}
+
+
+void PetriNet::removeTransition(Transition *t1)
+{
+  bool changes;
+  
+  do
+  {
+    changes = false;
+    for (std::vector<Arc *>::iterator f = F.begin(); f != F.end(); f++)
+    {
+      if (((*f)->source == t1) || ((*f)->target == t1))
+      {
+	removeArc(*f);
+	changes = true;
+	break;
+      }	
+    }
+  } while (changes);
+
+  
+  for (std::vector<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+  {
+    if (*t == t1)
+    {
+      T.erase(t);
       return;
     }
   }
@@ -144,42 +206,81 @@ void PetriNet::drawDot()
 
 
 
+void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
+{
+  Node *t12 = newTransition(t1->name + t2->name, t1->name + t2->name, 0);
+
+  t12->roles.clear();
+  
+  for (std::set<std::string>::iterator role = t1->roles.begin(); role != t1->roles.end(); role++)
+    t12->roles.insert(*role);
+  
+  for (std::set<std::string>::iterator role = t2->roles.begin(); role != t2->roles.end(); role++)
+    t12->roles.insert(*role);
+  
+  std::set<Node *> pre12 = set_union(preset(t1), preset(t2));
+  std::set<Node *> post12 = set_union(postset(t1), postset(t2));
+  
+  for (std::set<Node *>::iterator n = pre12.begin(); n != pre12.end(); n++)
+    newArc(*n, t12);
+
+  for (std::set<Node *>::iterator n = post12.begin(); n != post12.end(); n++)
+    newArc(t12, *n);
+  
+  removeTransition(t1);
+  removeTransition(t2);
+}
+
+
+
+
 void PetriNet::mergePlaces(Place *p1, Place *p2)
 {
   Node *p12 = newPlace(p1->name + p2->name, p1->name + p2->name, 0);
 
-  std::vector<Node *> pre1 = preset(p1);
-  std::vector<Node *> pre2 = preset(p2);
-  std::vector<Node *> post1 = postset(p1);
-  std::vector<Node *> post2 = postset(p2);
-
-  pre1.insert(pre1.end(), pre2.begin(), pre2.end());
-  post1.insert(post1.end(), post2.begin(), post2.end());
+  p12->roles.clear();
   
-  for (std::vector<Node *>::iterator n = pre1.begin(); n != pre1.end(); n++)
-  {
+  for (std::set<std::string>::iterator role = p1->roles.begin(); role != p1->roles.end(); role++)
+    p12->roles.insert(*role);
+  
+  for (std::set<std::string>::iterator role = p2->roles.begin(); role != p2->roles.end(); role++)
+    p12->roles.insert(*role);
+
+  std::set<Node *> pre12 = set_union(preset(p1), preset(p2));
+  std::set<Node *> post12 = set_union(postset(p1), postset(p2));
+  
+  for (std::set<Node *>::iterator n = pre12.begin(); n != pre12.end(); n++)
     newArc(*n, p12);
-  }
 
-  for (std::vector<Node *>::iterator n = post1.begin(); n != post1.end(); n++)
-  {
+  for (std::set<Node *>::iterator n = post12.begin(); n != post12.end(); n++)
     newArc(p12, *n);
-  }
-
+  
   removePlace(p1);
   removePlace(p2);
 }
 
 
 
-std::vector<Node *> PetriNet::preset(Node *n)
+void PetriNet::mergePlaces(std::string role1, std::string role2)
 {
-  std::vector<Node *> result;
+  mergePlaces(findPlaceRole(role1), findPlaceRole(role2));
+}
+
+
+void PetriNet::mergePlaces(kc::impl_activity* act1, std::string role1, kc::impl_activity* act2, std::string role2)
+{
+  mergePlaces(intToString(act1->id->value) + role1, intToString(act2->id->value) + role2);
+}
+
+
+std::set<Node *> PetriNet::preset(Node *n)
+{
+  std::set<Node *> result;
 
   for (std::vector<Arc *>::iterator f = F.begin(); f != F.end(); f++)
   {
     if ((*f)->target == n)
-      result.push_back((*f)->source);
+      result.insert((*f)->source);
   }
 
   return result;
@@ -187,19 +288,74 @@ std::vector<Node *> PetriNet::preset(Node *n)
 
 
 
-std::vector<Node *> PetriNet::postset(Node *n)
+std::set<Node *> PetriNet::postset(Node *n)
 {
-  std::vector<Node *> result;
+  std::set<Node *> result;
 
   for (std::vector<Arc *>::iterator f = F.begin(); f != F.end(); f++)
   {
     if ((*f)->source == n)
-      result.push_back((*f)->target);
+      result.insert((*f)->target);
   }
 
   return result;
 }
 
+
+
+Place *PetriNet::findPlace(std::string name)
+{
+  for (std::vector<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  {
+    if ( (*p)->name == name)
+      return *p;
+  }
+
+  std::cerr << "Node '" << name << "' not found!" << std::endl;  
+  return NULL;
+}
+
+
+
+Place *PetriNet::findPlaceRole(std::string role)
+{
+  for (std::vector<Place *>::iterator p = P.begin(); p != P.end(); p++)
+    for (std::set<std::string>::iterator r = (*p)->roles.begin(); r != (*p)->roles.end(); r++)
+      if ( (*r).substr((*r).find_first_of(".")+1) == role )
+	return *p;
+
+  std::cerr << "Node with role '" << role << "' not found!" << std::endl;  
+  return NULL;
+}
+
+
+
+
+
+void PetriNet::simplify()
+{
+  std::vector<Transition *> left;
+  std::vector<Transition *> right;
+  
+  for (std::vector<Transition *>::iterator t1 = T.begin(); t1 != T.end(); t1++)
+  {
+    for (std::vector<Transition *>::iterator t2 = t1; t2 != T.end(); t2++)
+    {
+      if (*t1 != *t2)
+      {
+	if ( (preset(*t1) == preset(*t2)) && (postset(*t1) == postset(*t2)) )
+	{
+	  left.push_back(*t1);
+	  right.push_back(*t2);
+	}
+      }
+    }
+  }
+
+  for (int i = 0; i < left.size(); i++)
+    mergeTransitions(left[i], right[i]);
+  
+}
 
 
 /******************************************************************************

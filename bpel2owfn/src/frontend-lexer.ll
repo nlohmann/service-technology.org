@@ -124,9 +124,6 @@ bpwsns			"bpws:"
 {bpwsns}?"wait"			{ BEGIN(ATTRIBUTE); return K_WAIT; }
 {bpwsns}?"while"		{ BEGIN(ATTRIBUTE); return K_WHILE; }
 
-
-{name}			{ BEGIN(ATTRIBUTE); return X_ELEMENTNAME; }
-
  /* white space */
 [ \t\r\n]*		{ /* skip */ }
 

@@ -1,37 +1,35 @@
 #include "petrinet.h"
 
-extern std::string intToString(int i);
+extern std::string intToString(int i); // defined in bpel-unparse.k
 
+/*****************************************************************************/
+/* helper functions */
 
-/* helpers */
-
+/// return the union of two string sets
 std::set<std::string> set_union(std::set<std::string> a, std::set<std::string> b)
 {
   std::set<std::string> result = a;
 
   for (std::set<std::string>::iterator it = b.begin(); it != b.end(); it++)
-  {
     result.insert(*it);
-  }
 
   return result;
 }
 
+/// return the union of two Node sets
 std::set<Node *> set_union(std::set<Node *> a, std::set<Node *> b)
 {
   std::set<Node *> result = a;
 
   for (std::set<Node *>::iterator it = b.begin(); it != b.end(); it++)
-  {
     result.insert(*it);
-  }
 
   return result;
 }
 
 
 
-
+/*****************************************************************************/
 
 Arc::Arc(Node *mysource, Node* mytarget)
 {
@@ -39,14 +37,18 @@ Arc::Arc(Node *mysource, Node* mytarget)
   target = mytarget;
 }
 
+
+
 /*****************************************************************************/
 
 Transition::Transition(std::string myname, std::string role, unsigned int mytype)
 {
   type = mytype;
   name = myname;
-  roles.insert(role);
+  history.insert(role);
 }
+
+
 
 /*****************************************************************************/
 
@@ -54,8 +56,10 @@ Place::Place(std::string myname, std::string role, unsigned int mytype)
 {
   type = mytype;
   name = myname;
-  roles.insert(role);
+  history.insert(role);
 }
+
+
 
 /*****************************************************************************/
 
@@ -84,6 +88,16 @@ Transition *PetriNet::newTransition(std::string name, std::string role, unsigned
   T.push_back(t);
   transitions++;
   return t;
+}
+
+
+
+Arc *PetriNet::newArc(Node *source, Node *target)
+{
+  Arc *f = new Arc(source, target);
+  F.push_back(f);
+  arcs++;
+  return f;
 }
 
 
@@ -163,16 +177,6 @@ void PetriNet::removeArc(Arc *f1)
 
 
 
-Arc *PetriNet::newArc(Node *source, Node *target)
-{
-  Arc *f = new Arc(source, target);
-  F.push_back(f);
-  arcs++;
-  return f;
-}
- 
-
-
 void PetriNet::information()
 {
   std::cout << places << " places" << std::endl;
@@ -186,21 +190,18 @@ void PetriNet::drawDot()
 {
   std::cout << "digraph N {" << std::endl;
   std::cout << " node [shape=circle fixedsize];" << std::endl;
+
   for (std::vector<Place *>::iterator p = P.begin(); p != P.end(); p++)
-  {
     std::cout << " " << (*p)->name << ";" << std::endl;
-  }
 
   std::cout << std::endl << " node [shape=box fixedsize];" << std::endl;
+
   for (std::vector<Transition *>::iterator t = T.begin(); t != T.end(); t++)
-  {
     std::cout << " " << (*t)->name << ";" << std::endl;
-  }
 
   for (std::vector<Arc *>::iterator f = F.begin(); f != F.end(); f++)
-  {
     std::cout << " " << (*f)->source->name << " -> " << (*f)->target->name << ";" << std::endl;
-  }
+
   std::cout << "}" << std::endl;
 }
 
@@ -210,13 +211,13 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 {
   Node *t12 = newTransition(t1->name + t2->name, t1->name + t2->name, 0);
 
-  t12->roles.clear();
+  t12->history.clear();
   
-  for (std::set<std::string>::iterator role = t1->roles.begin(); role != t1->roles.end(); role++)
-    t12->roles.insert(*role);
+  for (std::set<std::string>::iterator role = t1->history.begin(); role != t1->history.end(); role++)
+    t12->history.insert(*role);
   
-  for (std::set<std::string>::iterator role = t2->roles.begin(); role != t2->roles.end(); role++)
-    t12->roles.insert(*role);
+  for (std::set<std::string>::iterator role = t2->history.begin(); role != t2->history.end(); role++)
+    t12->history.insert(*role);
   
   std::set<Node *> pre12 = set_union(preset(t1), preset(t2));
   std::set<Node *> post12 = set_union(postset(t1), postset(t2));
@@ -238,13 +239,13 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
 {
   Node *p12 = newPlace(p1->name + p2->name, p1->name + p2->name, 0);
 
-  p12->roles.clear();
+  p12->history.clear();
   
-  for (std::set<std::string>::iterator role = p1->roles.begin(); role != p1->roles.end(); role++)
-    p12->roles.insert(*role);
+  for (std::set<std::string>::iterator role = p1->history.begin(); role != p1->history.end(); role++)
+    p12->history.insert(*role);
   
-  for (std::set<std::string>::iterator role = p2->roles.begin(); role != p2->roles.end(); role++)
-    p12->roles.insert(*role);
+  for (std::set<std::string>::iterator role = p2->history.begin(); role != p2->history.end(); role++)
+    p12->history.insert(*role);
 
   std::set<Node *> pre12 = set_union(preset(p1), preset(p2));
   std::set<Node *> post12 = set_union(postset(p1), postset(p2));
@@ -267,10 +268,12 @@ void PetriNet::mergePlaces(std::string role1, std::string role2)
 }
 
 
+
 void PetriNet::mergePlaces(kc::impl_activity* act1, std::string role1, kc::impl_activity* act2, std::string role2)
 {
   mergePlaces(intToString(act1->id->value) + role1, intToString(act2->id->value) + role2);
 }
+
 
 
 std::set<Node *> PetriNet::preset(Node *n)
@@ -320,15 +323,13 @@ Place *PetriNet::findPlace(std::string name)
 Place *PetriNet::findPlaceRole(std::string role)
 {
   for (std::vector<Place *>::iterator p = P.begin(); p != P.end(); p++)
-    for (std::set<std::string>::iterator r = (*p)->roles.begin(); r != (*p)->roles.end(); r++)
+    for (std::set<std::string>::iterator r = (*p)->history.begin(); r != (*p)->history.end(); r++)
       if ( (*r).substr((*r).find_first_of(".")+1) == role )
 	return *p;
 
   std::cerr << "Node with role '" << role << "' not found!" << std::endl;  
   return NULL;
 }
-
-
 
 
 
@@ -354,42 +355,4 @@ void PetriNet::simplify()
 
   for (int i = 0; i < left.size(); i++)
     mergeTransitions(left[i], right[i]);
-  
 }
-
-
-/******************************************************************************
-
-int main()
-{
-  PetriNet TheNet = PetriNet();
-  
-  Place *p1 = TheNet.newPlace("p1", "p1", 0);
-  Place *p2 = TheNet.newPlace("p2", "p2", 0);
-  Place *p3 = TheNet.newPlace("p3", "p3", 0);
-  Place *p4 = TheNet.newPlace("p4", "p4", 0);
-  Place *p5 = TheNet.newPlace("p5", "p5", 0);
-  Place *p6 = TheNet.newPlace("p6", "p6", 0);
-  
-  Transition *t1 = TheNet.newTransition("t1", "t1", 0);
-  Transition *t2 = TheNet.newTransition("t2", "t2", 0);
-  Transition *t3 = TheNet.newTransition("t3", "t3", 0);
-
-  TheNet.newArc(p1, t1);
-  TheNet.newArc(t1, p2);
-  TheNet.newArc(p3, t2);
-  TheNet.newArc(t2, p4);
-  TheNet.newArc(p5, t3);
-  TheNet.newArc(t3, p6);
-  
-  //TheNet.drawDot();
-
-  TheNet.mergePlaces(p2, p3);
-  TheNet.mergePlaces(p4, p5);
-
-  TheNet.drawDot();
-  
-  return 1;
-}
-
-******************************************************************************/

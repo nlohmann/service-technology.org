@@ -108,3 +108,12 @@ clean:
 	@-rm -f bpel-rewrite.c bpel-rewrite.h
 	@-rm -f $(KC_TIME)
 	@-rm -f *.o
+
+veryclean: clean
+	@echo removing documentation...
+	@-rm -f -r doc
+	@echo removing executable...
+	@-rm -f bpel2owfn.exe bpel2owfn
+
+doc: $(KC_TIME) bpel-syntax.c bpel-lexic.c
+	@doxygen

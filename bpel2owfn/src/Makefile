@@ -23,7 +23,7 @@ KC_TIME = .kc_time_stamp
 
 bpel2owfn: bpel-syntax.o bpel-lexic.o\
 	main.o bpel-attributes.o petrinet.o\
-	bpel-abstract.o bpel-unparse.o bpel-rewrite.o\
+	bpel-abstract.o bpel-unparse-xml.o bpel-unparse-petri.o bpel-rewrite.o\
 	bpel-kc-unpk.o\
 	bpel-kc-rk.o bpel-kc-csgiok.o bpel-kc-k.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
@@ -80,7 +80,10 @@ bpel-kc-unpk.o: $(KC_TIME)
 ##############################################################################
 # Kimwitu++ Files 2
 
-bpel-unparse.o: $(KC_TIME)
+bpel-unparse-xml.o: $(KC_TIME)
+	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
+
+bpel-unparse-petri.o: $(KC_TIME)
 	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
 
 bpel-rewrite.o: $(KC_TIME)
@@ -89,7 +92,7 @@ bpel-rewrite.o: $(KC_TIME)
 bpel-abstract.o: $(KC_TIME)
 	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
 
-$(KC_TIME): bpel-abstract.k bpel-unparse.k bpel-rewrite.k
+$(KC_TIME): bpel-abstract.k bpel-unparse-xml.k bpel-unparse-petri.k bpel-rewrite.k
 	@touch $@
 	$(KC) $(KFLAGS) $^
 
@@ -102,7 +105,8 @@ clean:
 	@-rm -f bpel-lexic.c bpel-syntax.h bpel-syntax.c bpel-syntax.output
 	@-rm -f bpel-kc-*.c bpel-kc-*.h
 	@-rm -f bpel-abstract.c bpel-abstract.h
-	@-rm -f bpel-unparse.c bpel-unparse.h
+	@-rm -f bpel-unparse-xml.c bpel-unparse-xml.h
+	@-rm -f bpel-unparse-petri.c bpel-unparse-petri.h
 	@-rm -f bpel-rewrite.c bpel-rewrite.h
 	@-rm -f $(KC_TIME)
 	@-rm -f *.o

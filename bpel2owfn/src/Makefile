@@ -21,8 +21,6 @@ KC_TIME = .kc_time_stamp
 ###############################################################################
 # Main target
 
-all: bpel2owfn
-
 bpel2owfn: bpel-syntax.o bpel-lexic.o\
 	main.o bpel-attributes.o petrinet.o\
 	bpel-abstract.o bpel-unparse.o bpel-rewrite.o\

@@ -31,10 +31,12 @@ std::set<Node *> set_union(std::set<Node *> a, std::set<Node *> b)
 
 /*****************************************************************************/
 
-Arc::Arc(Node *mysource, Node* mytarget)
+Arc::Arc(Node *mysource, Node* mytarget, arc_type mytype, std::string myinscription)
 {
   source = mysource;
   target = mytarget;
+  type = mytype;
+  inscription = myinscription;
 }
 
 
@@ -65,9 +67,6 @@ Place::Place(std::string myname, std::string role, unsigned int mytype)
 
 PetriNet::PetriNet()
 {
-  places = 0;
-  transitions = 0;
-  arcs = 0;
 }
 
 
@@ -76,7 +75,6 @@ Place *PetriNet::newPlace(std::string name, std::string role, unsigned int type)
 {
   Place *p = new Place(name, role, type);
   P.push_back(p);
-  places++;
   return p;
 }
 
@@ -86,7 +84,6 @@ Transition *PetriNet::newTransition(std::string name, std::string role, unsigned
 {
   Transition *t = new Transition(name, role, type);
   T.push_back(t);
-  transitions++;
   return t;
 }
 
@@ -94,9 +91,33 @@ Transition *PetriNet::newTransition(std::string name, std::string role, unsigned
 
 Arc *PetriNet::newArc(Node *source, Node *target)
 {
-  Arc *f = new Arc(source, target);
+  Arc *f = new Arc(source, target, STANDARD, "");
   F.push_back(f);
-  arcs++;
+  return f;
+}
+
+
+Arc *PetriNet::newArc(Node *source, Node *target, std::string inscription)
+{
+  Arc *f = new Arc(source, target, STANDARD, inscription);
+  F.push_back(f);
+  return f;
+}
+
+
+
+Arc *PetriNet::newArc(Node *source, Node *target, arc_type type)
+{
+  Arc *f = new Arc(source, target, type, "");
+  F.push_back(f);
+  return f;
+}
+
+
+Arc *PetriNet::newArc(Node *source, Node *target, arc_type type, std::string inscription)
+{
+  Arc *f = new Arc(source, target, type, inscription);
+  F.push_back(f);
   return f;
 }
 
@@ -179,9 +200,9 @@ void PetriNet::removeArc(Arc *f1)
 
 void PetriNet::information()
 {
-  std::cout << places << " places" << std::endl;
-  std::cout << transitions << " transitions" << std::endl;
-  std::cout << arcs << " arcs" << std::endl;
+  std::cout << P.size() << " places" << std::endl;
+  std::cout << T.size() << " transitions" << std::endl;
+  std::cout << F.size() << " arcs" << std::endl;
 }
 
 
@@ -200,7 +221,18 @@ void PetriNet::drawDot()
     std::cout << " " << (*t)->name << ";" << std::endl;
 
   for (std::vector<Arc *>::iterator f = F.begin(); f != F.end(); f++)
-    std::cout << " " << (*f)->source->name << " -> " << (*f)->target->name << ";" << std::endl;
+  {
+    std::cout << " " << (*f)->source->name << " -> " << (*f)->target->name << " [";
+    if ((*f)->type == RESET)
+      std::cout << " arrowtail=odot";
+    else if ((*f)->type == READ)
+      std::cout << " arrowhead=diamond arrowtail=tee";
+
+    if ((*f)->inscription != "")
+      std::cout << " label=\"" << (*f)->inscription << "\"";
+
+    std::cout << "];" << std::endl;
+  }
 
   std::cout << "}" << std::endl;
 }

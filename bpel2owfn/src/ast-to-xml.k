@@ -81,27 +81,8 @@ Process(a,b,c,d,e,f,g,h) ->
  
   f g
   
-  h { indown(); } "</process>"]
+  h { indown(); } "</process>\n"]
 ;
-
-
-/*---------------------------------------------------------------------------*/
-
-activityEmpty(a)      -> [xml: a];
-activityInvoke(a)     -> [xml: a];
-activityReceive(a)    -> [xml: a];
-activityReply(a)      -> [xml: a];
-activityAssign(a)     -> [xml: a];
-activityWait(a)       -> [xml: a];
-activityThrow(a)      -> [xml: a];
-activityTerminate(a)  -> [xml: a];
-activityFlow(a)       -> [xml: a];
-activitySwitch(a)     -> [xml: a];
-activityWhile(a)      -> [xml: a];
-activitySequence(a)   -> [xml: a];
-activityPick(a)       -> [xml: a];
-activityScope(a)      -> [xml: a];
-activityCompensate(a) -> [xml: a];
 
 
 /******************************************************************************

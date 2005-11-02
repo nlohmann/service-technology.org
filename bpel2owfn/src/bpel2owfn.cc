@@ -77,6 +77,10 @@ int main( int argc, char *argv[])
 
   TheNet->simplify();
   TheNet->drawDot();
+
+  //std::cout << std::endl;
+
+  //TheNet->information();
   
   return error;
 }

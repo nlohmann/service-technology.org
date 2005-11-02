@@ -69,27 +69,27 @@ Process(a,b,c,d,e,f,g,h) ->
       Node *t11 = TheNet->newTransition("n"+id+"t11", prefix + "t11", 0);
       Node *t12 = TheNet->newTransition("n"+id+"t12", prefix + "t12", 0);
 
-      TheNet->newArc(p1, t1); //read arc
-      TheNet->newArc(p5, t1);
-      TheNet->newArc(t1, p15);
+      TheNet->newArc(p1, t1, READ);
+      TheNet->newArc(p5, t1, "x");
+      TheNet->newArc(t1, p15, "x");
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       TheNet->newArc(t2, p21);
       TheNet->newArc(p3, t3);
-      TheNet->newArc(p5, t3); //reset arc
+      TheNet->newArc(p5, t3, RESET, "X");
       TheNet->newArc(p22, t3);
       TheNet->newArc(t3, p4);
-      TheNet->newArc(p5, t4);
-      TheNet->newArc(p9, t4);
+      TheNet->newArc(p5, t4, "x");
+      TheNet->newArc(p9, t4, "x");
       TheNet->newArc(t4, p2);
-      TheNet->newArc(t4, p4);
+      TheNet->newArc(t4, p6, "x");
       TheNet->newArc(t4, p10);
       TheNet->newArc(p4, t5);
-      TheNet->newArc(p6, t5);
+      TheNet->newArc(p6, t5, "x");
       TheNet->newArc(p14, t5);
       TheNet->newArc(t5, p1);
       TheNet->newArc(t5, p7);
-      TheNet->newArc(t5, p8);
+      TheNet->newArc(t5, p8, "x");
       TheNet->newArc(p9, t6);
       TheNet->newArc(p13, t6);
       TheNet->newArc(t6, p2);
@@ -100,18 +100,18 @@ Process(a,b,c,d,e,f,g,h) ->
       TheNet->newArc(p20, t7);
       TheNet->newArc(t7, p12);
       TheNet->newArc(t7, p16);
-      TheNet->newArc(p10, t8); //read arc
+      TheNet->newArc(p10, t8, READ);
       TheNet->newArc(p13, t8);
-      TheNet->newArc(p16, t9); //read arc
-      TheNet->newArc(p18, t9);
-      TheNet->newArc(p5, t10);
-      TheNet->newArc(p17, t10); //read arc
-      TheNet->newArc(t10, p18);
-      TheNet->newArc(p18, t11);
+      TheNet->newArc(p16, t9, READ);
+      TheNet->newArc(p18, t9, "x");
+      TheNet->newArc(p5, t10, "x");
+      TheNet->newArc(p17, t10, READ);
+      TheNet->newArc(t10, p18, "x");
+      TheNet->newArc(p18, t11, "x");
       TheNet->newArc(p20, t11);
-      TheNet->newArc(t11, p19);
+      TheNet->newArc(t11, p19, "x");
       TheNet->newArc(t11, p23);
-      TheNet->newArc(p19, t12);
+      TheNet->newArc(p19, t12, "x");
       TheNet->newArc(p24, t12);
       TheNet->newArc(t12, p16);      
       TheNet->newArc(t12, p12);      

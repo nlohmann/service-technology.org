@@ -31,43 +31,43 @@ Process(a,b,c,d,e,f,g,h) ->
       std::string id = "";
       
       /* the stop pattern */
-      Node *p1 = TheNet->newPlace("n"+id+"p1", prefix + "Faulted", 0);
-      Node *p2 = TheNet->newPlace("n"+id+"p2", prefix + "p2", 0);
-      Node *p3 = TheNet->newPlace("n"+id+"p3", prefix + "p3", 0);
-      Node *p4 = TheNet->newPlace("n"+id+"p4", prefix + "p4", 0);
-      Node *p5 = TheNet->newPlace("n"+id+"p5", prefix + "fault_in", 0);
-      Node *p6 = TheNet->newPlace("n"+id+"p6", prefix + "p6", 0);
-      Node *p7 = TheNet->newPlace("n"+id+"p7", prefix + "fault", 0);
-      Node *p8 = TheNet->newPlace("n"+id+"p8", prefix + "faultSave", 0);
-      Node *p9 = TheNet->newPlace("n"+id+"p9", prefix + "Active", 0);
-      Node *p10 = TheNet->newPlace("n"+id+"p10", prefix + "!Active", 0);
-      Node *p11 = TheNet->newPlace("n"+id+"p11", prefix + "p11", 0);
-      Node *p12 = TheNet->newPlace("n"+id+"p12", prefix + "final", 0);
-      Node *p13 = TheNet->newPlace("n"+id+"p13", prefix + "terminate", 0);
-      Node *p14 = TheNet->newPlace("n"+id+"p14", prefix + "!Faulted", 0);
-      Node *p15 = TheNet->newPlace("n"+id+"p15", prefix + "rethrow", 0);
-      Node *p16 = TheNet->newPlace("n"+id+"p16", prefix + "Ended", 0);
-      Node *p17 = TheNet->newPlace("n"+id+"p17", prefix + "Compensated", 0);
-      Node *p18 = TheNet->newPlace("n"+id+"p18", prefix + "p18", 0);
-      Node *p19 = TheNet->newPlace("n"+id+"p19", prefix + "p19", 0);
-      Node *p20 = TheNet->newPlace("n"+id+"p20", prefix + "!Ended", 0);
-      Node *p21 = TheNet->newPlace("n"+id+"p21", prefix + "stop", 0);
-      Node *p22 = TheNet->newPlace("n"+id+"p22", prefix + "stopped", 0);
-      Node *p23 = TheNet->newPlace("n"+id+"p23", prefix + "cleanCH", 0);
-      Node *p24 = TheNet->newPlace("n"+id+"p24", prefix + "ch_cleaned", 0);
+      Node *p1 = TheNet->newPlace("n"+id+"p1", prefix + "Faulted");
+      Node *p2 = TheNet->newPlace("n"+id+"p2", prefix + "p2");
+      Node *p3 = TheNet->newPlace("n"+id+"p3", prefix + "p3");
+      Node *p4 = TheNet->newPlace("n"+id+"p4", prefix + "p4");
+      Node *p5 = TheNet->newPlace("n"+id+"p5", prefix + "fault_in");
+      Node *p6 = TheNet->newPlace("n"+id+"p6", prefix + "p6");
+      Node *p7 = TheNet->newPlace("n"+id+"p7", prefix + "fault");
+      Node *p8 = TheNet->newPlace("n"+id+"p8", prefix + "faultSave");
+      Node *p9 = TheNet->newPlace("n"+id+"p9", prefix + "Active");
+      Node *p10 = TheNet->newPlace("n"+id+"p10", prefix + "!Active");
+      Node *p11 = TheNet->newPlace("n"+id+"p11", prefix + "p11");
+      Node *p12 = TheNet->newPlace("n"+id+"p12", prefix + "final");
+      Node *p13 = TheNet->newPlace("n"+id+"p13", prefix + "terminate");
+      Node *p14 = TheNet->newPlace("n"+id+"p14", prefix + "!Faulted");
+      Node *p15 = TheNet->newPlace("n"+id+"p15", prefix + "rethrow");
+      Node *p16 = TheNet->newPlace("n"+id+"p16", prefix + "Ended");
+      Node *p17 = TheNet->newPlace("n"+id+"p17", prefix + "Compensated");
+      Node *p18 = TheNet->newPlace("n"+id+"p18", prefix + "p18");
+      Node *p19 = TheNet->newPlace("n"+id+"p19", prefix + "p19");
+      Node *p20 = TheNet->newPlace("n"+id+"p20", prefix + "!Ended");
+      Node *p21 = TheNet->newPlace("n"+id+"p21", prefix + "stop");
+      Node *p22 = TheNet->newPlace("n"+id+"p22", prefix + "stopped");
+      Node *p23 = TheNet->newPlace("n"+id+"p23", prefix + "cleanCH");
+      Node *p24 = TheNet->newPlace("n"+id+"p24", prefix + "ch_cleaned");
 
-      Node *t1 = TheNet->newTransition("n"+id+"t1", prefix + "t1", 0);
-      Node *t2 = TheNet->newTransition("n"+id+"t2", prefix + "t2", 0);
-      Node *t3 = TheNet->newTransition("n"+id+"t3", prefix + "t3", 0);
-      Node *t4 = TheNet->newTransition("n"+id+"t4", prefix + "t4", 0);
-      Node *t5 = TheNet->newTransition("n"+id+"t5", prefix + "t5", 0);
-      Node *t6 = TheNet->newTransition("n"+id+"t6", prefix + "t6", 0);
-      Node *t7 = TheNet->newTransition("n"+id+"t7", prefix + "t7", 0);
-      Node *t8 = TheNet->newTransition("n"+id+"t8", prefix + "t8", 0);
-      Node *t9 = TheNet->newTransition("n"+id+"t9", prefix + "t9", 0);
-      Node *t10 = TheNet->newTransition("n"+id+"t10", prefix + "t10", 0);
-      Node *t11 = TheNet->newTransition("n"+id+"t11", prefix + "t11", 0);
-      Node *t12 = TheNet->newTransition("n"+id+"t12", prefix + "t12", 0);
+      Node *t1 = TheNet->newTransition("n"+id+"t1", prefix + "t1");
+      Node *t2 = TheNet->newTransition("n"+id+"t2", prefix + "t2");
+      Node *t3 = TheNet->newTransition("n"+id+"t3", prefix + "t3");
+      Node *t4 = TheNet->newTransition("n"+id+"t4", prefix + "t4");
+      Node *t5 = TheNet->newTransition("n"+id+"t5", prefix + "t5");
+      Node *t6 = TheNet->newTransition("n"+id+"t6", prefix + "t6");
+      Node *t7 = TheNet->newTransition("n"+id+"t7", prefix + "t7");
+      Node *t8 = TheNet->newTransition("n"+id+"t8", prefix + "t8");
+      Node *t9 = TheNet->newTransition("n"+id+"t9", prefix + "t9");
+      Node *t10 = TheNet->newTransition("n"+id+"t10", prefix + "t10");
+      Node *t11 = TheNet->newTransition("n"+id+"t11", prefix + "t11");
+      Node *t12 = TheNet->newTransition("n"+id+"t12", prefix + "t12");
 
       TheNet->newArc(p1, t1, READ);
       TheNet->newArc(p5, t1, "x");
@@ -175,13 +175,13 @@ Empty(a) ->
       std::string prefix = "empty." + intToString($0->id->value) + ".";
       std::string id = intToString($0->id->value);
       
-      Node *p1 = TheNet->newPlace("n"+id+"p1", prefix + "initial", 0);
-      Node *p2 = TheNet->newPlace("n"+id+"p2", prefix + "final", 0);
-      Node *p3 = TheNet->newPlace("n"+id+"p3", prefix + "stop", 0);
-      Node *p4 = TheNet->newPlace("n"+id+"p4", prefix + "stopped", 0);
-      Node *t1 = TheNet->newTransition("n"+id+"t1", prefix + "t1", 0);
-      Node *t2 = TheNet->newTransition("n"+id+"t2", prefix + "t2", 0);
-      Node *t3 = TheNet->newTransition("n"+id+"t3", prefix + "t3", 0);
+      Node *p1 = TheNet->newPlace("n"+id+"p1", prefix + "initial");
+      Node *p2 = TheNet->newPlace("n"+id+"p2", prefix + "final");
+      Node *p3 = TheNet->newPlace("n"+id+"p3", prefix + "stop");
+      Node *p4 = TheNet->newPlace("n"+id+"p4", prefix + "stopped");
+      Node *t1 = TheNet->newTransition("n"+id+"t1", prefix + "t1");
+      Node *t2 = TheNet->newTransition("n"+id+"t2", prefix + "t2");
+      Node *t3 = TheNet->newTransition("n"+id+"t3", prefix + "t3");
       TheNet->newArc(p1, t1);
       TheNet->newArc(p1, t2);
       TheNet->newArc(p2, t3);
@@ -203,6 +203,57 @@ Empty(a) ->
 /******************************************************************************
   RECEIVE
 ******************************************************************************/
+
+
+Receive(a,b) ->
+  [petrinet:
+    {
+      std::string prefix = "receive." + intToString($0->id->value) + ".";
+      std::string id = intToString($0->id->value);
+      
+      Node *p1 = TheNet->newPlace("n"+id+"p1", prefix + "initial");
+      Node *p2 = TheNet->newPlace("n"+id+"p2", prefix + "running");
+      Node *p3 = TheNet->newPlace("n"+id+"p3", prefix + "final");
+      Node *p4 = TheNet->newPlace("n"+id+"p4", prefix + "p4");
+      Node *p5 = TheNet->newPlace("n"+id+"p5", prefix + "stop");
+      Node *p6 = TheNet->newPlace("n"+id+"p6", prefix + "stopped");
+      Node *p7 = TheNet->newPlace("n"+id+"p7", prefix + "failed");
+      Node *t1 = TheNet->newTransition("n"+id+"t1", prefix + "t1");
+      Node *t2 = TheNet->newTransition("n"+id+"t2", prefix + "t2", "!guard");
+      Node *t3 = TheNet->newTransition("n"+id+"t3", prefix + "t3", "guard");
+      Node *t4 = TheNet->newTransition("n"+id+"t4", prefix + "t4");
+      Node *t5 = TheNet->newTransition("n"+id+"t5", prefix + "t5");
+      Node *t6 = TheNet->newTransition("n"+id+"t6", prefix + "t6");
+      Node *t7 = TheNet->newTransition("n"+id+"t7", prefix + "t7");
+      TheNet->newArc(p1, t1);
+      TheNet->newArc(t1, p2, "(X,CS)");
+
+      TheNet->newArc(p2, t2, "(X,CS)");
+      TheNet->newArc(t2, p3);
+
+      TheNet->newArc(t3, p4);
+      TheNet->newArc(t3, p7, "fault");
+      TheNet->newArc(p2, t3, "(X,CS)");
+
+      TheNet->newArc(p1, t4);
+      TheNet->newArc(p5, t4);
+      TheNet->newArc(t4, p6);
+
+      TheNet->newArc(p2, t5, "(X,CS)");      
+      TheNet->newArc(p5, t5);
+      TheNet->newArc(t5, p6);
+
+      TheNet->newArc(p4, t6);
+      TheNet->newArc(p5, t6);
+      TheNet->newArc(t6, p6);
+      
+      TheNet->newArc(p3, t7);
+      TheNet->newArc(p5, t7);
+      TheNet->newArc(t7, p6);
+      
+    } a b
+  ]
+;
 
 
 /******************************************************************************
@@ -260,10 +311,10 @@ activitySequence(Sequence(a,b)) ->
       std::string prefix = "sequence." + intToString($0->id->value) + ".";
       std::string id = intToString($0->id->value);
       
-      Node *p2 = TheNet->newPlace("n"+id+"p2", prefix + "initial", 0);
-      Node *p9 = TheNet->newPlace("n"+id+"p9", prefix + "final", 0);
-      Node *p10 = TheNet->newPlace("n"+id+"p10", prefix + "stop", 0);
-      Node *p11 = TheNet->newPlace("n"+id+"p11", prefix + "stopped", 0);
+      Node *p2 = TheNet->newPlace("n"+id+"p2", prefix + "initial");
+      Node *p9 = TheNet->newPlace("n"+id+"p9", prefix + "final");
+      Node *p10 = TheNet->newPlace("n"+id+"p10", prefix + "stop");
+      Node *p11 = TheNet->newPlace("n"+id+"p11", prefix + "stopped");
     }
     a b
     {

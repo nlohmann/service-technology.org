@@ -43,9 +43,9 @@ Arc::Arc(Node *mysource, Node* mytarget, arc_type mytype, std::string myinscript
 
 /*****************************************************************************/
 
-Transition::Transition(std::string myname, std::string role, unsigned int mytype)
+Transition::Transition(std::string myname, std::string role, std::string myguard)
 {
-  type = mytype;
+  guard = myguard;
   name = myname;
   history.insert(role);
 }
@@ -54,7 +54,7 @@ Transition::Transition(std::string myname, std::string role, unsigned int mytype
 
 /*****************************************************************************/
 
-Place::Place(std::string myname, std::string role, unsigned int mytype)
+Place::Place(std::string myname, std::string role, place_type mytype)
 {
   type = mytype;
   name = myname;
@@ -71,46 +71,49 @@ PetriNet::PetriNet()
 
 
 
-Place *PetriNet::newPlace(std::string name, std::string role, unsigned int type)
+Place *PetriNet::newPlace(std::string name, std::string role)
 {
-  Place *p = new Place(name, role, type);
+  return newPlace(name, role, LOW);
+}
+
+
+Place *PetriNet::newPlace(std::string name, std::string role, place_type mytype)
+{
+  Place *p = new Place(name, role, mytype);
   P.push_back(p);
   return p;
 }
 
 
-
-Transition *PetriNet::newTransition(std::string name, std::string role, unsigned int type)
+Transition *PetriNet::newTransition(std::string name, std::string role)
 {
-  Transition *t = new Transition(name, role, type);
+  return newTransition(name, role, "");
+}
+
+
+Transition *PetriNet::newTransition(std::string name, std::string role, std::string guard)
+{
+  Transition *t = new Transition(name, role, guard);
   T.push_back(t);
   return t;
 }
 
 
-
 Arc *PetriNet::newArc(Node *source, Node *target)
 {
-  Arc *f = new Arc(source, target, STANDARD, "");
-  F.push_back(f);
-  return f;
+  return newArc(source, target, STANDARD, "");
 }
 
 
 Arc *PetriNet::newArc(Node *source, Node *target, std::string inscription)
 {
-  Arc *f = new Arc(source, target, STANDARD, inscription);
-  F.push_back(f);
-  return f;
+  return newArc(source, target, STANDARD, inscription);
 }
-
 
 
 Arc *PetriNet::newArc(Node *source, Node *target, arc_type type)
 {
-  Arc *f = new Arc(source, target, type, "");
-  F.push_back(f);
-  return f;
+  return newArc(source, target, type, "");
 }
 
 
@@ -121,7 +124,7 @@ Arc *PetriNet::newArc(Node *source, Node *target, arc_type type, std::string ins
   return f;
 }
 
-
+/*---------------------------------------------------------------------------*/
 
 void PetriNet::removePlace(Place *p1)
 {
@@ -183,7 +186,6 @@ void PetriNet::removeTransition(Transition *t1)
 }
 
 
-
 void PetriNet::removeArc(Arc *f1)
 {
   for (std::vector<Arc *>::iterator f = F.begin(); f != F.end(); f++)
@@ -196,7 +198,7 @@ void PetriNet::removeArc(Arc *f1)
   }
 }
 
-
+/*---------------------------------------------------------------------------*/
 
 void PetriNet::information()
 {
@@ -210,16 +212,26 @@ void PetriNet::information()
 void PetriNet::drawDot()
 {
   std::cout << "digraph N {" << std::endl;
-  std::cout << " node [shape=circle fixedsize];" << std::endl;
 
+  // list the places
+  std::cout << " node [shape=circle fixedsize];" << std::endl;
   for (std::vector<Place *>::iterator p = P.begin(); p != P.end(); p++)
     std::cout << " " << (*p)->name << ";" << std::endl;
 
+  // list the transitions
   std::cout << std::endl << " node [shape=box fixedsize];" << std::endl;
-
   for (std::vector<Transition *>::iterator t = T.begin(); t != T.end(); t++)
-    std::cout << " " << (*t)->name << ";" << std::endl;
+  {
+    if ((*t)->guard != "")
+    {
+      std::cout << " " << (*t)->name << " [";
+      std::cout << " shape=record label=\"{" << (*t)->name << "|{" << (*t)->guard << "}}\"]" << std::endl;
+    }
+    else
+      std::cout << " " << (*t)->name << std::endl;
+  }
 
+  // list the arcs
   for (std::vector<Arc *>::iterator f = F.begin(); f != F.end(); f++)
   {
     std::cout << " " << (*f)->source->name << " -> " << (*f)->target->name << " [";
@@ -238,10 +250,18 @@ void PetriNet::drawDot()
 }
 
 
+/*---------------------------------------------------------------------------*/
+
 
 void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 {
-  Node *t12 = newTransition(t1->name + t2->name, t1->name + t2->name, 0);
+  if (t1->guard != "" || t2->guard != "")
+  {
+    std::cerr << "Merging of guarded transition not yet supported!" << std::endl;
+    return;
+  }
+	
+  Node *t12 = newTransition(t1->name + t2->name, t1->name + t2->name, "");
 
   t12->history.clear();
   
@@ -253,6 +273,8 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
   
   std::set<Node *> pre12 = set_union(preset(t1), preset(t2));
   std::set<Node *> post12 = set_union(postset(t1), postset(t2));
+  
+  // TODO we have to take care of reset and read arcs!
   
   for (std::set<Node *>::iterator n = pre12.begin(); n != pre12.end(); n++)
     newArc(*n, t12);
@@ -269,7 +291,13 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 
 void PetriNet::mergePlaces(Place *p1, Place *p2)
 {
-  Node *p12 = newPlace(p1->name + p2->name, p1->name + p2->name, 0);
+  if(p1->type != LOW || p2->type != LOW)
+  {
+    std::cerr << "Merging of high-level places not yet supported!" << std::endl;
+    return;
+  }
+  
+  Node *p12 = newPlace(p1->name + p2->name, p1->name + p2->name, LOW);
 
   p12->history.clear();
   
@@ -281,6 +309,8 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
 
   std::set<Node *> pre12 = set_union(preset(p1), preset(p2));
   std::set<Node *> post12 = set_union(postset(p1), postset(p2));
+  
+  // TODO we have to take care of reset and read arcs!
   
   for (std::set<Node *>::iterator n = pre12.begin(); n != pre12.end(); n++)
     newArc(*n, p12);
@@ -307,16 +337,16 @@ void PetriNet::mergePlaces(kc::impl_activity* act1, std::string role1, kc::impl_
 }
 
 
+/*---------------------------------------------------------------------------*/
+
 
 std::set<Node *> PetriNet::preset(Node *n)
 {
   std::set<Node *> result;
 
   for (std::vector<Arc *>::iterator f = F.begin(); f != F.end(); f++)
-  {
     if ((*f)->target == n)
       result.insert((*f)->source);
-  }
 
   return result;
 }
@@ -328,23 +358,21 @@ std::set<Node *> PetriNet::postset(Node *n)
   std::set<Node *> result;
 
   for (std::vector<Arc *>::iterator f = F.begin(); f != F.end(); f++)
-  {
     if ((*f)->source == n)
       result.insert((*f)->target);
-  }
 
   return result;
 }
 
 
+/*---------------------------------------------------------------------------*/
+
 
 Place *PetriNet::findPlace(std::string name)
 {
   for (std::vector<Place *>::iterator p = P.begin(); p != P.end(); p++)
-  {
     if ( (*p)->name == name)
       return *p;
-  }
 
   std::cerr << "Node '" << name << "' not found!" << std::endl;  
   return NULL;
@@ -363,6 +391,8 @@ Place *PetriNet::findPlaceRole(std::string role)
   return NULL;
 }
 
+
+/*---------------------------------------------------------------------------*/
 
 
 void PetriNet::simplify()

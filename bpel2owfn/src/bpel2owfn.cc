@@ -75,7 +75,7 @@ int main( int argc, char *argv[])
     TheProcess->unparse(kc::pseudoPrinter, kc::petrinet);
   }
 
-  TheNet->simplify();
+  //TheNet->simplify();
   TheNet->drawDot();
 
   //std::cout << std::endl;

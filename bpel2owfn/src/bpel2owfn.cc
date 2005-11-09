@@ -200,7 +200,11 @@ int main( int argc, char *argv[])
     {
       TheProcess->print();
     }
+    
+    trace(TRACE_INFORMATION, "Rewriting BPEL...\n");
     TheProcess = TheProcess->rewrite(kc::implicit);
+    trace(TRACE_INFORMATION, "Rewriting complete.\n");
+    
     if (mode_pretty_printer)
     {
       TheProcess->unparse(kc::printer, kc::xml);

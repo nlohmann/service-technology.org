@@ -27,6 +27,8 @@ extern PetriNet *TheNet;
 Process(a,b,c,d,e,f,g,h) ->
   [petrinet:
     {
+      trace(TRACE_INFORMATION, "Generating Petri net...\n");
+	    
       std::string prefix = "process.";
       std::string id = "";
       
@@ -117,7 +119,10 @@ Process(a,b,c,d,e,f,g,h) ->
       TheNet->newArc(t12, p12);      
 
     } a b c d e f g h
-  ]  
+    {
+      trace(TRACE_INFORMATION, "Generating Petri net complete.\n");
+    }
+  ]
   ;
 
 /*---------------------------------------------------------------------------*/
@@ -191,6 +196,9 @@ Empty(a) ->
       TheNet->newArc(t2, p4);
       TheNet->newArc(t3, p4);
     } a
+    {
+      trace(TRACE_DEBUG, "[PNU]\tCreated pattern for <empty> " + intToString($0->id->value) + ".\n");
+    }
   ]
 ;
 

@@ -1,6 +1,19 @@
+/*
+ * petrinet.c
+ *
+ * Change log:
+ * 
+ * date       | author        | changes
+ * ---------------------------------------------------------------------
+ * 2005-11-09 | Lohmann       | - added debug output
+ *
+ */
+
 #include "petrinet.h"
 
 extern std::string intToString(int i); // defined in bpel-unparse.k
+extern int debug_level;                // defined in debug.cc
+
 
 /*****************************************************************************/
 /* helper functions */
@@ -202,8 +215,8 @@ void PetriNet::removeArc(Arc *f1)
 
 void PetriNet::information()
 {
-  std::cout << P.size() << " places" << std::endl;
-  std::cout << T.size() << " transitions" << std::endl;
+  std::cout << P.size() << " places, ";
+  std::cout << T.size() << " transitions, ";
   std::cout << F.size() << " arcs" << std::endl;
 }
 
@@ -255,9 +268,11 @@ void PetriNet::drawDot()
 
 void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 {
+  trace(TRACE_DEBUG, "[PN]\tMerging transitions '" + t1->name + "' and '" + t2->name + "'.\n");
+  
   if (t1->guard != "" || t2->guard != "")
   {
-    std::cerr << "Merging of guarded transition not yet supported!" << std::endl;
+    std::cerr << "[PN]\tMerging of guarded transition not yet supported!" << std::endl;
     return;
   }
 	
@@ -291,9 +306,11 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 
 void PetriNet::mergePlaces(Place *p1, Place *p2)
 {
+  trace(TRACE_DEBUG, "[PN]\tMerging places '" + p1->name + "' and '" + p2->name + "'.\n");
+  
   if(p1->type != LOW || p2->type != LOW)
   {
-    std::cerr << "Merging of high-level places not yet supported!" << std::endl;
+    std::cerr << "[PN]\tMerging of high-level places not yet supported!" << std::endl;
     return;
   }
   
@@ -397,6 +414,14 @@ Place *PetriNet::findPlaceRole(std::string role)
 
 void PetriNet::simplify()
 {
+  if (debug_level > TRACE_INFORMATION)
+  {
+    trace(TRACE_DEBUG, "[PN]\tPetri net size before simplification: ");
+    information();
+  }
+  
+  trace(TRACE_INFORMATION, "Simplifying Petri net...\n");
+
   std::vector<Transition *> left;
   std::vector<Transition *> right;
   
@@ -417,4 +442,13 @@ void PetriNet::simplify()
 
   for (int i = 0; i < left.size(); i++)
     mergeTransitions(left[i], right[i]);
+
+  trace(TRACE_INFORMATION, "Simplifying complete.\n");
+
+  if (debug_level > TRACE_INFORMATION)
+  {
+    trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification: ");
+    information();
+  }
+  
 }

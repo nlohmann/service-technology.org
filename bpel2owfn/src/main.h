@@ -1,3 +1,14 @@
+/*
+ * main.h
+ *
+ * Change log:
+ * 
+ * date        | author        | changes
+ * ---------------------------------------------------------------------
+ *  2005-11-09 | Gierds        | added external variable debug_level
+ *
+ */
+
 #ifndef MAIN_H
 #define MAIN_H
 
@@ -13,6 +24,7 @@
 #include "bpel-unparse-xml.h"   // pretty-printers
 #include "bpel-unparse-petri.h" // pretty-printers
 #include "petrinet.h"           // Petri Net support
+#include "debug.h"		// debugging help
 
 /* defined by Bison */
 extern int yyparse();
@@ -30,5 +42,7 @@ extern FILE *yyin;
 /// function to display error messages from lexic and syntactical analysis
 int yyerror(const char* msg);
 
+/// used to indicate trace_level
+extern int debug_level;
 
 #endif

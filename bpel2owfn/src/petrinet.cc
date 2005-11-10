@@ -708,7 +708,7 @@ void PetriNet::simplify()
 	  transitionPairs.push_back(std::pair<Transition *, Transition *>(*t1, *t2));
 
   // merge the found transitions
-  for (int i = 0; i < transitionPairs.size(); i++)
+  for (unsigned int i = 0; i < transitionPairs.size(); i++)
     mergeTransitions(transitionPairs[i].first, transitionPairs[i].second);
   
 

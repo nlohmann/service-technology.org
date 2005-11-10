@@ -57,10 +57,13 @@
 #include <iostream>
 #include "petrinet.h"
 
+// introduced in main.c 
 extern PetriNet *TheNet;
-
-
 %}
+
+
+
+
 
 /******************************************************************************/
 
@@ -68,11 +71,13 @@ extern PetriNet *TheNet;
 // printers below.
 %{
 #include <iostream>
-#include <vector>
-#include <string>
 %}
 
 /******************************************************************************/
+
+
+
+
 
 Process(a,b,c,d,e,f,g,h) ->
   [petrinet:

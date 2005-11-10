@@ -51,27 +51,38 @@
 %{ KC_UNPARSE
 #include <iostream>
 
+/// number of spaces to be added as indention
 unsigned int indent = 0;
+
+/// number of spaces to be added when indention is increased
 unsigned int indentStep = 4;
 
 
+/// Adds whitespace to indent output
 void in()
 {
   for(unsigned int i=0; i<indent; i++)
     std::cout << " ";
 }
 
+
+/// Increases indention
 void inup()
 {
   in();
   indent += indentStep;
 }
 
+
+///Decreases indention
 void indown()
 {
   indent -= indentStep;
   in();
 }
+
+
+
 
 
 /*!
@@ -91,17 +102,25 @@ std::string intToString(int i)
 
 %}
 
+
+
+
+
+
 /******************************************************************************/
 
 // All the includes, variables and structs defined here can be used in the
 // printers below.
 %{
 #include <iostream>
-#include <vector>
-#include <string>
 %}
 
 /******************************************************************************/
+
+
+
+
+
 
 Process(a,b,c,d,e,f,g,h) ->
   [xml: { inup(); } "<process>\n" 

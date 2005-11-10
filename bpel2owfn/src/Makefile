@@ -105,7 +105,7 @@ $(KC_TIME): bpel-abstract.k bpel-unparse-xml.k bpel-unparse-petri.k bpel-rewrite
 clean:
 	@echo removing temporary files...
 	@-rm -f core *~ *.bak
-	@-rm -f bpel-lexic.c bpel-syntax.h bpel-syntax.c bpel-syntax.output
+	@-rm -f bpel-lexic.c bpel-syntax.h bpel-syntax.c
 	@-rm -f bpel-kc-*.cc bpel-kc-*.h
 	@-rm -f bpel-abstract.cc bpel-abstract.h
 	@-rm -f bpel-unparse-xml.cc bpel-unparse-xml.h

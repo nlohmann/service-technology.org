@@ -17,9 +17,10 @@
  *
  * \version
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
+ *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
+ *            Respected #dot_output for #drawDot function. Finished commenting.
  *          
  * \todo
- *          - finish commenting
  *          - move helper functions (#set_union) into another file
  */
 
@@ -33,52 +34,27 @@
 
 extern string intToString(int i); // defined in bpel-unparse.k
 extern int debug_level;           // defined in debug.cc
-
+extern std::ostream *dot_output;  // defined in main.c
 
 
 
 
 
 /*****************************************************************************/
-/* helper functions */
+/* helper function */
 
 /*!
- * \brief Returns the union of two sets of strings.
- * \param a set of strings
- * \param b set of strings
+ * \brief Returns the union of two sets of type T.
+ * \param a set of type T
+ * \param b set of type T
  * \return union of the sets a and b
- * \todo
- *       - improve performance (is there a STL-solution?)
  */
-set<string> set_union(set<string> a, set<string> b)
+template <typename T> set<T> set_union(set<T> a, set<T> b)
 {
-  set<string> result = a;
-
-  for (set<string>::iterator it = b.begin(); it != b.end(); it++)
-    result.insert(*it);
-
-  return result;
-}
-
-
-
-
-
-/*!
- * \brief Returns the union of two sets of Node pointers.
- * \param a set of Node pointers
- * \param b set of Node pointers
- * \return union of the sets a and b
- * \todo
- *       - improve performance (is there a STL-solution?)
- */
-set<Node *> set_union(set<Node *> a, set<Node *> b)
-{
-  set<Node *> result = a;
-
-  for (set<Node *>::iterator it = b.begin(); it != b.end(); it++)
-    result.insert(*it);
-
+  set<T> result;
+  insert_iterator<set<T, less<T> > > res_ins(result, result.begin());
+  set_union(a.begin(), a.end(), b.begin(), b.end(), res_ins);
+  
   return result;
 }
 
@@ -293,6 +269,7 @@ Arc *PetriNet::newArc(Node *source, Node *target, arc_type type, string inscript
 
 /*---------------------------------------------------------------------------*/
 
+
 /*!
  * Removes a place and all arcs connected with it.
  * \param p1 place to be removed
@@ -421,43 +398,45 @@ void PetriNet::information()
  */
 void PetriNet::drawDot()
 {
-  cout << "digraph N {" << endl;
+  (*dot_output) << "digraph N {" << endl;
 
   // list the places
-  cout << " node [shape=circle fixedsize];" << endl;
+  (*dot_output) << " node [shape=circle fixedsize];" << endl;
   for (vector<Place *>::iterator p = P.begin(); p != P.end(); p++)
-    cout << " " << (*p)->name << ";" << endl;
+    (*dot_output) << " " << (*p)->name << ";" << endl;
 
   // list the transitions
-  cout << endl << " node [shape=box fixedsize];" << endl;
+  (*dot_output) << endl << " node [shape=box fixedsize];" << endl;
   for (vector<Transition *>::iterator t = T.begin(); t != T.end(); t++)
   {
     if ((*t)->guard != "")
     {
-      cout << " " << (*t)->name << " [";
-      cout << " shape=record label=\"{" << (*t)->name << "|{" << (*t)->guard
-	<< "}}\"]" << endl;
+      (*dot_output) << " " << (*t)->name << " [";
+      (*dot_output) << " shape=record label=\"{" << (*t)->name << "|{"
+	<< (*t)->guard << "}}\"]" << endl;
     }
     else
-      cout << " " << (*t)->name << endl;
+      (*dot_output) << " " << (*t)->name << endl;
   }
 
   // list the arcs
   for (vector<Arc *>::iterator f = F.begin(); f != F.end(); f++)
   {
-    cout << " " << (*f)->source->name << " -> " << (*f)->target->name << " [";
+    (*dot_output) << " " << (*f)->source->name << " -> "
+      << (*f)->target->name << " [";
+    
     if ((*f)->type == RESET)
-      cout << " arrowtail=odot";
+      (*dot_output) << " arrowtail=odot";
     else if ((*f)->type == READ)
-      cout << " arrowhead=diamond arrowtail=tee";
+      (*dot_output) << " arrowhead=diamond arrowtail=tee";
 
     if ((*f)->inscription != "")
-      cout << " label=\"" << (*f)->inscription << "\"";
+      (*dot_output) << " label=\"" << (*f)->inscription << "\"";
 
-    cout << "];" << endl;
+    (*dot_output) << "];" << endl;
   }
 
-  cout << "}" << endl;
+  (*dot_output) << "}" << endl;
 }
 
 
@@ -468,13 +447,24 @@ void PetriNet::drawDot()
 
 
 /*!
+ * Merges two transitions. Given transitions t1 and t2:
+ *
+ * -# a new transition t12 with empty history is created
+ * -# this transition gets the union of the histories of transition t1 and t2
+ * -# the presets and postsets of t1 and t2 are calculated and united
+ * -# t12 is connected with all the places in the preset and postset
+ * -# the transitions t1 and t2 are removed
+ * 
+ * \param t1 first transition
+ * \param t2 second transition
+ * 
  * \todo
  *       - take care of read and reset arcs
+ *       - call an error-function to signal error 
  */
 void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 {
   trace(TRACE_DEBUG, "[PN]\tMerging transitions '" + t1->name + "' and '" + t2->name + "'.\n");
-  
   if (t1->guard != "" || t2->guard != "")
   {
     cerr << "[PN]\tMerging of guarded transition not yet supported!" << endl;
@@ -482,7 +472,6 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
   }
 	
   Node *t12 = newTransition(t1->name + t2->name, t1->name + t2->name, "");
-
   t12->history.clear();
   
   for (set<string>::iterator role = t1->history.begin(); role != t1->history.end(); role++)
@@ -493,8 +482,6 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
   
   set<Node *> pre12 = set_union(preset(t1), preset(t2));
   set<Node *> post12 = set_union(postset(t1), postset(t2));
-  
-  // TODO we have to take care of reset and read arcs!
   
   for (set<Node *>::iterator n = pre12.begin(); n != pre12.end(); n++)
     newArc(*n, t12);
@@ -511,13 +498,25 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 
 
 /*!
+ * The actual function to merge two places. Given places p1 and p2:
+ *
+ * -# a new place p12 with empty history is created
+ * -# this place gets the union of the histories of place p1 and p2
+ * -# the presets and postsets of p1 and p2 are calculated and united
+ * -# p12 is connected with all the transitions in the preset and postset
+ * -# the places p1 and p2 are removed
+ * 
+ * \param p1 first place
+ * \param p2 second place
+ * 
  * \todo
  *       - take care of read and reset arcs
+ *       - take care of markings
+ *       - call an error-function to signal error 
  */
 void PetriNet::mergePlaces(Place *p1, Place *p2)
 {
   trace(TRACE_DEBUG, "[PN]\tMerging places '" + p1->name + "' and '" + p2->name + "'.\n");
-  
   if(p1->type != LOW || p2->type != LOW)
   {
     cerr << "[PN]\tMerging of high-level places not yet supported!" << endl;
@@ -525,7 +524,6 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
   }
   
   Node *p12 = newPlace(p1->name + p2->name, p1->name + p2->name, LOW);
-
   p12->history.clear();
   
   for (set<string>::iterator role = p1->history.begin(); role != p1->history.end(); role++)
@@ -536,8 +534,6 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
 
   set<Node *> pre12 = set_union(preset(p1), preset(p2));
   set<Node *> post12 = set_union(postset(p1), postset(p2));
-  
-  // TODO we have to take care of reset and read arcs!
   
   for (set<Node *>::iterator n = pre12.begin(); n != pre12.end(); n++)
     newArc(*n, p12);
@@ -551,6 +547,12 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
 
 
 
+
+
+/*!
+ * \param role1 string describing the role of the first place
+ * \param role2 string describing the role of the second place
+ */
 void PetriNet::mergePlaces(string role1, string role2)
 {
   mergePlaces(findPlaceRole(role1), findPlaceRole(role2));
@@ -558,6 +560,18 @@ void PetriNet::mergePlaces(string role1, string role2)
 
 
 
+
+
+/*!
+ * Merges two places given two activity of the abstract syntax tree and the
+ * roles of the places. The activities are used to complete the role-string
+ * and pass the search request.
+ * 
+ * \param act1  activity of the AST represented by the first place
+ * \param role1 string describing the role of the first place
+ * \param act2  activity of the AST represented by the second place
+ * \param role2 string describing the role of the second place
+ */
 void PetriNet::mergePlaces(kc::impl_activity* act1, string role1, kc::impl_activity* act2, string role2)
 {
   mergePlaces(intToString(act1->id->value) + role1, intToString(act2->id->value) + role2);
@@ -605,9 +619,21 @@ set<Node *> PetriNet::postset(Node *n)
 }
 
 
+
+
+
 /*---------------------------------------------------------------------------*/
 
 
+/*!
+ * Finds a place of the Petri net given the internal name of the place.
+ *
+ * \param  name the demanded name
+ * \return a pointer to the place or NULL if the place was not found.
+ *
+ * \todo
+ *       - call an error-function to signal error
+ */
 Place *PetriNet::findPlace(string name)
 {
   for (vector<Place *>::iterator p = P.begin(); p != P.end(); p++)
@@ -620,6 +646,17 @@ Place *PetriNet::findPlace(string name)
 
 
 
+
+
+/*!
+ * Finds a place of the Petri net given a role the place fills or filled.
+ *
+ * \param  role the demanded role
+ * \return a pointer to the place or NULL if the place was not found.
+ *
+ * \todo
+ *       - call an error-function to signal error
+ */
 Place *PetriNet::findPlaceRole(string role)
 {
   for (vector<Place *>::iterator p = P.begin(); p != P.end(); p++)
@@ -632,9 +669,24 @@ Place *PetriNet::findPlaceRole(string role)
 }
 
 
+
+
+
 /*---------------------------------------------------------------------------*/
 
 
+/*!
+ * Implements some simple structural reduction rules for Petri nets:
+ * 
+ * - If two transitions t1 and t2 have the same preset and postset, one of them
+ *   can safely be removed.
+ *
+ * \todo
+ *       - improve performance
+ *       - implement more reduction rules
+ *       - does the transitions have to be merged or rather be removed?
+ *
+ */
 void PetriNet::simplify()
 {
   if (debug_level > TRACE_INFORMATION)
@@ -642,32 +694,25 @@ void PetriNet::simplify()
     trace(TRACE_DEBUG, "[PN]\tPetri net size before simplification: ");
     information();
   }
-  
   trace(TRACE_INFORMATION, "Simplifying Petri net...\n");
 
-  vector<Transition *> left;
-  vector<Transition *> right;
   
-  for (vector<Transition *>::iterator t1 = T.begin(); t1 != T.end(); t1++)
-  {
-    for (vector<Transition *>::iterator t2 = t1; t2 != T.end(); t2++)
-    {
-      if (*t1 != *t2)
-      {
-	if ( (preset(*t1) == preset(*t2)) && (postset(*t1) == postset(*t2)) )
-	{
-	  left.push_back(*t1);
-	  right.push_back(*t2);
-	}
-      }
-    }
-  }
+  // a pair to store transitions to be merged
+  vector <pair <Transition *, Transition *> > transitionPairs;
 
-  for (int i = 0; i < left.size(); i++)
-    mergeTransitions(left[i], right[i]);
+  // find transitions with same preset and postset  
+  for (vector<Transition *>::iterator t1 = T.begin(); t1 != T.end(); t1++)
+    for (vector<Transition *>::iterator t2 = t1; t2 != T.end(); t2++)
+      if (*t1 != *t2)
+	if ( (preset(*t1) == preset(*t2)) && (postset(*t1) == postset(*t2)) )
+	  transitionPairs.push_back(std::pair<Transition *, Transition *>(*t1, *t2));
+
+  // merge the found transitions
+  for (int i = 0; i < transitionPairs.size(); i++)
+    mergeTransitions(transitionPairs[i].first, transitionPairs[i].second);
+  
 
   trace(TRACE_INFORMATION, "Simplifying complete.\n");
-
   if (debug_level > TRACE_INFORMATION)
   {
     trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification: ");

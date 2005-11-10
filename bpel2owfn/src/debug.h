@@ -22,6 +22,8 @@
 #define TRACE_DEBUG 3
 #define TRACE_VERY_DEBUG 4
 
+extern std::string intToString(int i);
+
 void trace(int trace_level, std::string message);
 void trace(std::string message);
 

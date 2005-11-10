@@ -52,16 +52,23 @@ void trace(std::string message )
 int yyerror(const char* msg)
 {
   // display passed error message
-  // trace("Error in '" + filename + "' in line ");
-  // trace(*(new std::string(yylineno)));
-  // trace(":\n");
-  // trace("  token/text last read was '" + yytext + "'\n\n");
+  trace("\n");
+  
+  if (filename != "")
+  {
+    trace("Error in '" + filename + "' in line ");
+    trace(intToString(yylineno));
+    trace(":\n");
+    trace("  token/text last read was '");
+    trace(yytext);
+    trace("'\n\n");
 
-  // close input file
-  fclose(yyin);
+    // close input file
+    fclose(yyin);
+  }
 
 
-   trace("-------------------------------------------------------------------------------\n");
+  trace("-------------------------------------------------------------------------------\n");
   
   int firstShowedLine = ((yylineno-3)>0)?(yylineno-3):1;
 
@@ -73,7 +80,7 @@ int yyerror(const char* msg)
   // print the erroneous line (plus/minus three more)
   for (int i=firstShowedLine; i<=firstShowedLine+6; i++)
   {
-    trace(i + ": " + errorLine + "\n");
+    trace(intToString(i) + ": " + errorLine + "\n");
     getline(inputFile, errorLine);
     if (inputFile.eof())
       break;

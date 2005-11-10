@@ -1,3 +1,53 @@
+%{
+/*!
+ * \file bpel-unparse-petri.cc
+ *
+ * \brief Petri net unparser (implementation)
+ *
+ * This file defines and implements the conversion of each BPEL activity to its
+ * associated Petri net pattern followed by neccessary merge operations.
+ * 
+ * \author  
+ *          - Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          
+ * \date    2005-11-10
+ * 
+ * \note    This file is part of the tool BPEL2oWFN and was created during the
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
+ *          for details.
+ *
+ * \note    This file was created using Kimwitu++ version 2.3.8 (C) 1998-2003
+ *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
+ *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
+ *
+ * \version
+ *          - 2005-11-10 (nlohmann) Added doxygen comments.
+ * 
+ * \todo
+ *          - find a simple "merge-language" to ease the definition of new
+ *            patterns
+ *          - complete initial pattern database
+ *
+ * \bug
+ *          - conversion crashes if unimplemented patterns are used inside a
+ *            sequence
+ *          
+ */
+%}
+
+
+%{	
+/*!
+ * \file bpel-unparse-petri.h
+ * \brief Petri net unparser (interface)
+ *
+ * See \ref bpel-unparse-petri.cc for more information.
+ */
+%}
+
+
+
 %uview petrinet;
 
 /******************************************************************************/

@@ -1,3 +1,49 @@
+%{
+/*!
+ * \file bpel-rewrite.cc
+ *
+ * \brief Rewrite rules for BPEL (implementation)
+ *
+ * This file defines and implements certain rewrite rules to realize the
+ * implicit presence of e.g. scopes or other empty otherwise brances.
+ * 
+ * \author  
+ *          - Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          
+ * \date    2005-11-10
+ * 
+ * \note    This file is part of the tool BPEL2oWFN and was created during the
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
+ *          for details.
+ *
+ * \note    This file was created using Kimwitu++ version 2.3.8 (C) 1998-2003
+ *          Humboldt-University of Berlin reading file bpel-rewrite.k. See
+ *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
+ *
+ * \version
+ *          - 2005-11-10 (nlohmann) Added doxygen comments.
+ * 
+ * \todo
+ *          - there are certainly more implicit transformations neccessary
+ *
+ * \bug
+ *          - attributes seem to get lost during rewriting
+ * 
+ */
+%}
+
+
+%{	
+/*!
+ * \file bpel-rewrite.h
+ * \brief Rewrite rules for BPEL (interface)
+ *
+ * See \ref bpel-rewrite.cc for more information.
+ */
+%}
+
+
 %rview implicit;
 
 

@@ -1,3 +1,43 @@
+%{
+/*!
+ * \file bpel-lexic.c
+ *
+ * \brief BPEL lexic (implementation)
+ *
+ * This file defines and implements the lexic of BPEL. It consists mainly of
+ * three types of terminal symbols: BPEL keywords as the are defined in the
+ * BPEL4WS 1.1 specification, "arbitrary" strings for attribute names and
+ * values, and special symbols as XML brackets, whitespace etc.
+ *
+ * The lexer has two additional "start conditions":
+ *  - ATTRIBUTE to avoid lexical errors while reading an attribute
+ *  - COMMENT   to merge all XML-comments
+ * 
+ * \author  
+ *          - Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          
+ * \date    2005-11-10
+ * 
+ * \note    This file is part of the tool BPEL2oWFN and was created during the
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
+ *          for details.
+ *
+ * \note    This file was created using Flex 2.5.4 reading file bpel-lexic.l.
+ *          See http://www.gnu.org/software/flex for details
+ *
+ * \version
+ *          - 2005-11-10 (nlohmann) Added doxygen comments.
+ * 
+ * \todo
+ *          - add rules to ignored everything non-BPEL
+ *          - add a more elegant way to handle namespaces
+ */
+%}
+
+
+
+
  /* flex options */
 %option noyywrap
 %option yylineno
@@ -29,8 +69,8 @@ extern int yyerror(const char *msg);
 int currentView;
 
 // two additional views for attributes and comments
-#define ATTRIBUTE 1
-#define COMMENT 2
+#define ATTRIBUTE 1 ///< start condition to allow lexing attributes
+#define COMMENT 2   ///< start condition to allow lexing comments
 
 
 

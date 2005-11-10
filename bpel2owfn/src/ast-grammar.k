@@ -1,3 +1,52 @@
+%{
+/*!
+ * \file bpel-abstract.cc
+ *
+ * \brief Abstract grammar of BPEL (implementation)
+ *
+ * This file defines and implements the abstract grammar of BPEL and the phyla
+ * of the abstract syntax tree (AST).
+ * 
+ * \author  
+ *          - Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          
+ * \date    2005-11-10
+ * 
+ * \note    This file is part of the tool BPEL2oWFN and was created during the
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
+ *          for details.
+ *
+ * \note    This file was created using Kimwitu++ version 2.3.8 (C) 1998-2003
+ *          Humboldt-University of Berlin reading file bpel-abstract.k. See
+ *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
+ *
+ * \version
+ *          - 2005-11-10 (nlohmann) Added doxygen comments.
+ * 
+ *
+ */
+%}
+
+
+%{	
+/*!
+ * \file bpel-abstract.h
+ * \brief Abstract grammar of BPEL (interface)
+ *
+ * See \ref bpel-abstract.cc for more information.
+ */
+%}
+
+
+
+%{
+/*!
+ * \class kc::impl_tProcess
+ * \brief BPEL's <process>
+*/
+%}
+
 tProcess:
   Process(tPartnerLink_list tPartner_list tVariable_list tCorrelationSet_list tFaultHandlers_opt tCompensationHandler_opt tEventHandlers_opt activity)
   {
@@ -12,6 +61,13 @@ tProcess:
 ;
 
 /*---------------------------------------------------------------------------*/
+
+%{
+/*!
+ * \class kc::impl_activity
+ * \brief BPEL's activities
+*/
+%}
 
 activity:
   activityEmpty(tEmpty)
@@ -43,6 +99,13 @@ tPartnerLink_list:
   list tPartnerLink
 ;
 
+%{
+/*!
+ * \class kc::impl_tPartnerLink
+ * \brief BPEL's <partnerLink>
+*/
+%}
+
 tPartnerLink:
   PartnerLink()
   {
@@ -62,6 +125,13 @@ tPartner_list:
   list tPartner
 ;
 
+%{
+/*!
+ * \class kc::impl_tPartner
+ * \brief BPEL's <partner>
+*/
+%}
+
 tPartner:
   Partner(tPartnerLink_list)
   {
@@ -77,7 +147,14 @@ tPartner:
 tFaultHandlers_opt:
   list tFaultHandlers
 ;
-  
+
+%{
+/*!
+ * \class kc::impl_tFaultHandlers
+ * \brief BPEL's <faultHandlers>
+*/
+%}
+
 tFaultHandlers:
   FaultHandlers(tCatch_list tCatchAll_list)
 ;
@@ -90,6 +167,13 @@ tCatchAll_list:
   list tCatchAll
 ;
 
+%{
+/*!
+ * \class kc::impl_tCatch
+ * \brief BPEL's <catch>
+*/
+%}
+
 tCatch:
   Catch(activity)
   {
@@ -97,6 +181,13 @@ tCatch:
     casestring faultVariable;
   }
 ;
+
+%{
+/*!
+ * \class kc::impl_tCatchAll
+ * \brief BPEL's <catchAll>
+*/
+%}
 
 tCatchAll:
   CatchAll(activity)
@@ -114,7 +205,14 @@ tCatchAll:
 tEventHandlers_opt:
   list tEventHandlers
 ;
-  
+
+%{
+/*!
+ * \class kc::impl_tEventHandlers
+ * \brief BPEL's <eventHandlers>
+*/
+%}
+
 tEventHandlers:
   EventHandlers(tOnMessage_list tOnAlarm_list)
 ;
@@ -127,6 +225,13 @@ tOnAlarm_list:
   list tOnAlarm
 ;
 
+%{
+/*!
+ * \class kc::impl_tOnMessage
+ * \brief BPEL's <onMessage>
+*/
+%}
+
 tOnMessage:
   OnMessage(activity)
   {
@@ -136,6 +241,13 @@ tOnMessage:
     casestring variable;
   }
 ;
+
+%{
+/*!
+ * \class kc::impl_tonAlarm
+ * \brief BPEL's <onAlarm>
+*/
+%}
 
 tOnAlarm:
   OnAlarm(activity)
@@ -153,7 +265,14 @@ tOnAlarm:
 tCompensationHandler_opt:
   list tCompensationHandler
 ;
-  
+
+%{
+/*!
+ * \class kc::impl_tCompensationHandler
+ * \brief BPEL's <compensationHandler>
+*/
+%}
+
 tCompensationHandler:
   CompensationHandler(activity)
 ;
@@ -166,6 +285,13 @@ tCompensationHandler:
 tVariable_list:
   list tVariable
 ;
+
+%{
+/*!
+ * \class kc::impl_tVariable
+ * \brief BPEL's <variable>
+*/
+%}
 
 tVariable:
   Variable()
@@ -186,6 +312,13 @@ tCorrelationSet_list:
   list tCorrelationSet
 ;
 
+%{
+/*!
+ * \class kc::impl_tCorrelationSet
+ * \brief BPEL's <correlationSet>
+*/
+%}
+
 tCorrelationSet:
   CorrelationSet()
   {
@@ -203,6 +336,13 @@ tCorrelation_list:
   list tCorrelation
 ;
 
+%{
+/*!
+ * \class kc::impl_tCorrelation
+ * \brief BPEL's <correlation>
+*/
+%}
+
 tCorrelation:
   Correlation()
   {
@@ -216,6 +356,14 @@ tCorrelation:
 /******************************************************************************
   EMPTY
 ******************************************************************************/
+
+%{
+/*!
+ * \class kc::impl_tEmpty
+ * \brief BPEL's <empty>
+*/
+%}
+
 
 tEmpty:
   Empty(standardElements)
@@ -232,6 +380,13 @@ tEmpty:
 /******************************************************************************
   INVOKE
 ******************************************************************************/
+
+%{
+/*!
+ * \class kc::impl_tInvoke
+ * \brief BPEL's <invoke>
+*/
+%}
 
 tInvoke:
   Invoke(standardElements tCorrelation_list tCatch_list tCatchAll_list tCompensationHandler_opt)
@@ -256,6 +411,13 @@ tInvoke:
   RECEIVE
 ******************************************************************************/
 
+%{
+/*!
+ * \class kc::impl_tReceive
+ * \brief BPEL's <receive>
+*/
+%}
+
 tReceive:
   Receive(standardElements tCorrelation_list)
   {
@@ -277,6 +439,13 @@ tReceive:
 /******************************************************************************
   REPLY
 ******************************************************************************/
+
+%{
+/*!
+ * \class kc::impl_tReply
+ * \brief BPEL's <reply>
+*/
+%}
 
 tReply:
   Reply(standardElements tCorrelation_list)
@@ -300,6 +469,13 @@ tReply:
   ASSIGN
 ******************************************************************************/
 
+%{
+/*!
+ * \class kc::impl_tAssign
+ * \brief BPEL's <assign>
+*/
+%}
+
 tAssign:
   Assign(standardElements tCopy_list)
   {
@@ -315,9 +491,23 @@ tCopy_list:
   list tCopy
 ;
 
+%{
+/*!
+ * \class kc::impl_tCopy
+ * \brief BPEL's <copy>
+*/
+%}
+
 tCopy:
   Copy(tFrom tTo)
 ;
+
+%{
+/*!
+ * \class kc::impl_tFrom
+ * \brief BPEL's <from>
+*/
+%}
 
 tFrom:
   From()
@@ -333,6 +523,13 @@ tFrom:
   }
 ;
 
+%{
+/*!
+ * \class kc::impl_tTo
+ * \brief BPEL's <to>
+*/
+%}
+
 tTo:
   To()
   {
@@ -346,6 +543,13 @@ tTo:
 /******************************************************************************
   WAIT
 ******************************************************************************/
+
+%{
+/*!
+ * \class kc::impl_tWait
+ * \brief BPEL's <wait>
+*/
+%}
 
 tWait:
   Wait(standardElements)
@@ -366,6 +570,13 @@ tWait:
   THROW
 ******************************************************************************/
 
+%{
+/*!
+ * \class kc::impl_tThrow
+ * \brief BPEL's <throw>
+*/
+%}
+
 tThrow:
   Throw(standardElements)
   {
@@ -385,6 +596,13 @@ tThrow:
   COMPENSATE
 ******************************************************************************/
 
+%{
+/*!
+ * \class kc::impl_tCompensate
+ * \brief BPEL's <compensate>
+*/
+%}
+
 tCompensate:
   Compensate(standardElements)
   {
@@ -403,6 +621,13 @@ tCompensate:
   TERMINATE
 ******************************************************************************/
 
+%{
+/*!
+ * \class kc::impl_tTerminate
+ * \brief BPEL's <terminate>
+*/
+%}
+
 tTerminate:
   Terminate(standardElements)
   {
@@ -418,6 +643,13 @@ tTerminate:
 /******************************************************************************
   FLOW
 ******************************************************************************/
+
+%{
+/*!
+ * \class kc::impl_tFlow
+ * \brief BPEL's <flow>
+*/
+%}
 
 tFlow:
   Flow(standardElements tLink_list activity_list)
@@ -438,6 +670,13 @@ tLink_list:
   list tLink
 ;
 
+%{
+/*!
+ * \class kc::impl_tLink
+ * \brief BPEL's <link>
+*/
+%}
+
 tLink:
   Link()
   {
@@ -449,6 +688,13 @@ tLink:
 /******************************************************************************
   SWITCH
 ******************************************************************************/
+
+%{
+/*!
+ * \class kc::impl_tSwitch
+ * \brief BPEL's <switch>
+*/
+%}
 
 tSwitch:
   Switch(standardElements tCase_list tOtherwise_list)
@@ -465,6 +711,13 @@ tCase_list:
   list tCase
 ;
 
+%{
+/*!
+ * \class kc::impl_tCase
+ * \brief BPEL's <case>
+*/
+%}
+
 tCase:
   Case(activity)
   {
@@ -476,6 +729,13 @@ tOtherwise_list:
   list tOtherwise
 ;
 
+%{
+/*!
+ * \class kc::impl_tOtherwise
+ * \brief BPEL's <otherwise>
+*/
+%}
+
 tOtherwise:
   Otherwise(activity)
 ;
@@ -484,6 +744,13 @@ tOtherwise:
 /******************************************************************************
   WHILE
 ******************************************************************************/
+
+%{
+/*!
+ * \class kc::impl_tWhile
+ * \brief BPEL's <while>
+*/
+%}
 
 tWhile:
   While(standardElements activity)
@@ -503,6 +770,13 @@ tWhile:
   SEQUENCE
 ******************************************************************************/
 
+%{
+/*!
+ * \class kc::impl_tSequence
+ * \brief BPEL's <sequence>
+*/
+%}
+
 tSequence:
   Sequence(standardElements activity_list)
   {
@@ -518,6 +792,13 @@ tSequence:
 /******************************************************************************
   PICK
 ******************************************************************************/
+
+%{
+/*!
+ * \class kc::impl_tPick
+ * \brief BPEL's <pick>
+*/
+%}
 
 tPick:
   Pick(standardElements tOnMessage_list tOnAlarm_list)
@@ -536,6 +817,13 @@ tPick:
 /******************************************************************************
   SCOPE
 ******************************************************************************/
+
+%{
+/*!
+ * \class kc::impl_tScope
+ * \brief BPEL's <scope>
+*/
+%}
 
 tScope:
   Scope(standardElements tVariable_list tFaultHandlers_opt tCompensationHandler_opt tEventHandlers_opt activity)
@@ -556,6 +844,13 @@ tScope:
   STANDARD ELEMENTS
 ******************************************************************************/
 
+%{
+/*!
+ * \class kc::impl_standardElements
+ * \brief BPEL's standard elements
+*/
+%}
+
 standardElements:
   StandardElements(tTarget_list tSource_list)
 ;
@@ -563,6 +858,13 @@ standardElements:
 tTarget_list:
   list tTarget
 ;
+
+%{
+/*!
+ * \class kc::impl_tTarget
+ * \brief BPEL's <target>
+*/
+%}
 
 tTarget:
   Target()
@@ -574,6 +876,13 @@ tTarget:
 tSource_list:
   list tSource
 ;
+
+%{
+/*!
+ * \class kc::impl_tSource
+ * \brief BPEL's <source>
+*/
+%}
 
 tSource:
   Source()

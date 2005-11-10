@@ -1,3 +1,48 @@
+%{
+/*!
+ * \file bpel-unparse-xml.cc
+ *
+ * \brief XML unparser (implementation)
+ *
+ * This file defines and implements unparse rules to unparse BPEL to XML.
+ * 
+ * \author  
+ *          - Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          
+ * \date    2005-11-10
+ * 
+ * \note    This file is part of the tool BPEL2oWFN and was created during the
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
+ *          for details.
+ *
+ * \note    This file was created using Kimwitu++ version 2.3.8 (C) 1998-2003
+ *          Humboldt-University of Berlin reading file bpel-unparse.k. See
+ *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
+ *
+ * \version
+ *          - 2005-11-10 (nlohmann) Added doxygen comments.
+ * 
+ * \todo
+ *          - move helper functions (#in, #inup, #indown, #intToString) into
+ *            another file
+ *          
+ */
+%}
+
+
+%{	
+/*!
+ * \file bpel-unparse-xml.h
+ * \brief XML unparser (interface)
+ *
+ * See \ref bpel-unparse-xml.cc for more information.
+ */
+%}
+
+
+
+
 %uview xml;
 
 /******************************************************************************/
@@ -8,6 +53,7 @@
 
 unsigned int indent = 0;
 unsigned int indentStep = 4;
+
 
 void in()
 {
@@ -28,6 +74,12 @@ void indown()
 }
 
 
+/*!
+ * \brief Converts int to string
+ *
+ * \param i standard C int
+ * \return  C++ string representing i
+ */
 std::string intToString(int i)
 {
   char buffer[20];
@@ -374,7 +426,7 @@ Source() ->
 /*****************************************************************************/
 // the printer functions
 
-/// printer-function for output on stdout     
+/// printer-function for output on stdout
 void printer(const char *s, uview v)
 {
   std::cout << s;

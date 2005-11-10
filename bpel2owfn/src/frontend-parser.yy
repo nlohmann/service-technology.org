@@ -1,3 +1,50 @@
+%{
+/*!
+ * \file bpel-syntax.c
+ *
+ * \brief BPEL grammar (implementation)
+ *
+ * This file defines and implements the grammar of BPEL using standard 
+ * BNF-rules to describe the originally XML-based syntax as it is specified in
+ * the BPEL4WS 1.1 specification. All terminals are passed from the lexer
+ * (implemented in \ref bpel-lexic.c). Besides simple syntax-checking the
+ * grammar is used to build the abstract syntax tree as it is defined in
+ * bpel-abstract.k and implemented in \ref bpel-abstract.cc and
+ * \ref bpel-abstract.h.
+ * 
+ * \author  
+ *          - Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          
+ * \date    2005-11-10
+ * 
+ * \note    This file is part of the tool BPEL2oWFN and was created during the
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
+ *          for details.
+ *
+ * \note    This file was created using GNU Bison 1.875b reading file
+ *          bpel-syntax.y. Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002,
+ *          2003 Free Software Foundation, Inc.
+ *          See http://www.gnu.org/software/bison/bison.html for details
+ *
+ * \version
+ *          - 2005-11-10 (nlohmann) Added doxygen comments.
+ * 
+ * \todo
+ *          - add rules to ignored everything non-BPEL
+ */
+%}
+
+
+%{	
+/*!
+ * \file bpel-syntax.h
+ * \brief BPEL grammar (interface)
+ *
+ * See \ref bpel-syntax.c for more information.
+ */
+%}
+
 // the terminal symbols (tokens)
 %token K_ASSIGN K_CASE K_CATCH K_CATCHALL K_COMPENSATE K_COMPENSATIONHANDLER
 %token K_COPY K_CORRELATION K_CORRELATIONS K_CORRELATIONSET K_CORRELATIONSETS
@@ -44,12 +91,14 @@ extern char* yytext;
 extern int yylex();
 
 
-// defined in "bpel-main.h"
+// defined in "debug.h"
 extern int yyerror(const char *);
 
 
 // manage attributes
 #include "bpel-attributes.h"
+
+/// an instance of the attribute manager
 attributeManager att = attributeManager();
 
 
@@ -57,7 +106,7 @@ attributeManager att = attributeManager();
 using namespace kc;
 
 
-// the root of the abstract syntax tree
+/// the root of the abstract syntax tree
 tProcess TheProcess;
 
 

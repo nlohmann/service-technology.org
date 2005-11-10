@@ -1,8 +1,10 @@
 #include "main.h"
 
 /// Filename of input file.
-char* filename = NULL;
+std::string filename = "";
 
+std::string dot_filename = "";
+std::ostream * dot_output = &std::cout;
 
 /// The Petri Net
 PetriNet *TheNet = new PetriNet();
@@ -15,6 +17,8 @@ bool mode_petri_net = false;
 bool mode_simplify_petri_net = false;
 /// paint Petri Net with dot
 bool mode_dot_petri_net = false;
+/// paint Petri Net with dot and output to file
+bool mode_dot_2_file = false;
 /// pretty printer
 bool mode_pretty_printer = false;
 /// print AST
@@ -72,8 +76,8 @@ int main( int argc, char *argv[])
       {
         if (argument_counter < argc) 
 	{
-          filename = argv[argument_counter];
-          if (!(yyin = fopen(filename, "r"))) 
+          filename = (std::string) argv[argument_counter++];
+          if (!(yyin = fopen(filename.c_str(), "r"))) 
 	  {
             // fprintf(stderr, "  File '%s' not found.\n", filename);
             trace("  File '");
@@ -117,6 +121,14 @@ int main( int argc, char *argv[])
 	mode_petri_net = true;
       }
       
+      // generate dot output and write it into a file
+      else if (! strcmp(argument_string, "-D2F") || ! strcmp(argument_string, "--dot2file")) 
+      {
+        mode_dot_petri_net = true;
+	mode_dot_2_file = true;
+	mode_petri_net = true;
+      }
+      
       // debug
       else if (! strcmp(argument_string, "-d")) 
       {
@@ -138,7 +150,7 @@ int main( int argc, char *argv[])
       {
         if (argument_counter < argc) 
 	{
-          argument_string = argv[argument_counter];
+          argument_string = argv[argument_counter++];
 	  // instead of atoi we may use the stringstream class?
           debug_level = atoi(argument_string);
 	  if (debug_level < 1 || debug_level > 4) {
@@ -154,10 +166,16 @@ int main( int argc, char *argv[])
       }
 
       // help
-      if (! strcmp(argument_string, "-h") || ! strcmp(argument_string, "--help")) 
+      else if (! strcmp(argument_string, "-h") || ! strcmp(argument_string, "--help")) 
       {
         print_help();
         exit(1);
+      }
+      else
+      {
+	trace("Unknown option: " + ((std::string) argument_string) + "\n");
+	print_help();
+	exit(1);
       }
 
     }
@@ -169,11 +187,29 @@ int main( int argc, char *argv[])
     }
   }
 
-  if ( filename != NULL)
+  if ( filename != "")
   {
     trace(TRACE_INFORMATION, "Reading BPEL from file ");
     trace(TRACE_INFORMATION, (filename));
     trace(TRACE_INFORMATION, "\n");
+
+    // if wanted, create a dot output file
+    if ( mode_dot_2_file )
+    {
+      trace(TRACE_INFORMATION, "Creating file for dot output\n");
+      std::string dotti_file = filename;
+      if ( dotti_file.rfind(".bpel", 0) >= (dotti_file.length() - 8) )
+      {
+        dotti_file = dotti_file.replace( (dotti_file.length() - 5), 5, ".dot");
+      }
+      else
+      {
+        dotti_file += ".dot";
+      }
+      
+      dot_filename = dotti_file.c_str();
+      dot_output = new std::ofstream(dotti_file.c_str(), std::ofstream::out | std::ofstream::trunc);
+    }
   }
       
   // don't show debug messages from flex and Bison, unless highest debug mode is requested
@@ -227,6 +263,14 @@ int main( int argc, char *argv[])
   //std::cout << std::endl;
 
   //TheNet->information();
+
+
+  if (dot_filename != "")
+  {
+    trace(TRACE_INFORMATION,"Closing dot output file: " + dot_filename + "\n");
+    (*dot_output) << std::flush;
+    ((std::ofstream*)dot_output)->close();
+  }
   
   return error;
 }

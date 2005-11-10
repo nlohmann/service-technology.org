@@ -27,12 +27,15 @@ bool mode_ast = false;
 
 void print_help() 
 {
+  // 80 chars
+  //    "--------------------------------------------------------------------------------"
   trace("\n");
   trace("BPEL2oWFN\n");
   trace("---------\n");
   trace("Options: \n");
   trace("   -f | --file <filename>    - read input from <filename>,\n");
-  trace("                               if this parameter is omitted, input is read from STDIN\n");
+  trace("                               if this parameter is omitted, input is read from\n");
+  trace("                               STDIN\n");
   trace("   -d | -dd | -ddd | -dddd | - set debug level\n");
   trace("        --debug [1..4]         ... some more information soon\n");
   trace("   -h | --help               - print this screen\n");
@@ -41,15 +44,19 @@ void print_help()
   trace("output modes (choose at maximum one, default is just parsing):\n");
   trace("\n");
   trace("   -a  | --ast               - output the AST\n");
-  trace("   -x  | --xml               - output simple XML w/o any unnecessary informtion\n");
+  trace("   -x  | --xml               - output simple XML w/o any unnecessary\n");
+  trace("                               informtion\n");
   trace("   -pn | --petri-net         - output the Petri Net (in LoLA style?)\n");
   trace("\n");
   trace("special Petri Net modes:\n");
   trace("\n");
-  trace("   -s  | --simplify          - outout a structural simplified Petri Net\n");
+  trace("   -s   | --simplify         - outout a structural simplified Petri Net\n");
   trace("                               (implies option -pn)\n");
-  trace("   -D  | --dot               - output dot input\n");
+  trace("   -D   | --dot              - output dot input\n");
   trace("                               (implies option -pn)\n");
+  trace("   -D2F | --dot2file         - output dot input into file (same name as\n");
+  trace("                               input file\n");
+  trace("                               (implies option -D)\n");
   trace("\n");
   trace("For more information see:\n");
   trace("  http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel/\n");
@@ -166,7 +173,7 @@ int main( int argc, char *argv[])
       }
 
       // help
-      else if (! strcmp(argument_string, "-h") || ! strcmp(argument_string, "--help")) 
+      else if (! strcmp(argument_string, "-h") || ! strcmp(argument_string, "-?") || ! strcmp(argument_string, "--help")) 
       {
         print_help();
         exit(1);

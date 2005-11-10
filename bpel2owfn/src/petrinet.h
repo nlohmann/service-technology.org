@@ -88,7 +88,6 @@ typedef enum {
 /*!
  * \class  Node
  * \author Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- * \date   2005-11-09
  *
  * \brief Nodes of the Petri net
  *
@@ -117,7 +116,6 @@ class Node
 /*!
  * \class  Transition
  * \author Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- * \date   2005-11-09
  *
  * \brief Transitions of the Petri net
  *
@@ -145,7 +143,6 @@ class Transition: public Node
 /*!
  * \class  Place
  * \author Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- * \date   2005-11-09
  *
  * \brief Places of the Petri net
  *
@@ -173,7 +170,6 @@ class Place: public Node
 /*!
  * \class  Arc
  * \author Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- * \date   2005-11-09
  *
  * \brief Arcs of the Petri net
  *
@@ -211,7 +207,6 @@ class Arc
 /*!
  * \class  PetriNet
  * \author Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- * \date   2005-11-09
  *
  * \brief A Petri net
  *

@@ -31,7 +31,7 @@
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
- *          - add a more elegant way to handle namespaces
+ *          - add a more elegant way to handle XSD-namespaces
  */
 %}
 

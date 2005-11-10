@@ -17,7 +17,7 @@
 int debug_level = 0;
 
 /* variables from main.c */
-extern char* filename;
+extern std::string filename;
 extern bool mode_petri_net;
 extern bool mode_simplify_petri_net;
 extern bool mode_dot_petri_net;
@@ -44,7 +44,7 @@ void trace(int trace_level, std::string message)
 
 }
 
-void trace(std::string message)
+void trace(std::string message )
 {
   trace(TRACE_ALWAYS, message);
 }
@@ -52,18 +52,20 @@ void trace(std::string message)
 int yyerror(const char* msg)
 {
   // display passed error message
-  fprintf(stderr, "Error in '%s' in line %d:\n", filename, yylineno);
-  fprintf(stderr, "  token/text last read was '%s'\n\n", yytext);
+  // trace("Error in '" + filename + "' in line ");
+  // trace(*(new std::string(yylineno)));
+  // trace(":\n");
+  // trace("  token/text last read was '" + yytext + "'\n\n");
 
   // close input file
   fclose(yyin);
 
 
-  fprintf(stderr, "-------------------------------------------------------------------------------\n");
+   trace("-------------------------------------------------------------------------------\n");
   
   int firstShowedLine = ((yylineno-3)>0)?(yylineno-3):1;
 
-  std::ifstream inputFile(filename);
+  std::ifstream inputFile(filename.c_str());
   std::string errorLine;
   for (int i=0; i<firstShowedLine; i++)
     getline(inputFile, errorLine);
@@ -71,13 +73,13 @@ int yyerror(const char* msg)
   // print the erroneous line (plus/minus three more)
   for (int i=firstShowedLine; i<=firstShowedLine+6; i++)
   {
-    fprintf(stderr, "%d: %s\n", i, errorLine.c_str());
+    trace(i + ": " + errorLine + "\n");
     getline(inputFile, errorLine);
     if (inputFile.eof())
       break;
   }
   
-  fprintf(stderr, "-------------------------------------------------------------------------------\n");
+  trace("-------------------------------------------------------------------------------\n");
   
   inputFile.close();
   

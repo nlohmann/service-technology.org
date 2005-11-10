@@ -9,9 +9,9 @@ CXX      = g++
 KC       = kc++
 
 # Flags
-YFLAGS   = -d -y -l -v
+YFLAGS   = --defines --yacc --no-lines
 CXXFLAGS = -Wno-unused -O3
-KFLAGS   = -b -sc -fbpel-kc-
+KFLAGS   = --yystype --no-printdot --file-prefix=bpel-kc- --suffix=cc
 
 # Kimwitu++ helper file for make
 KC_TIME = .kc_time_stamp
@@ -67,16 +67,16 @@ bpel-syntax.c: bpel-syntax.y
 # Kimwitu++ Files 1
 
 bpel-kc-csgiok.o: $(KC_TIME)
-	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
+	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.cc)
 
 bpel-kc-k.o: $(KC_TIME)
-	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
+	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.cc)
 
 bpel-kc-rk.o: $(KC_TIME)
-	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
+	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.cc)
 
 bpel-kc-unpk.o: $(KC_TIME)
-	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
+	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.cc)
 
 
 
@@ -84,16 +84,16 @@ bpel-kc-unpk.o: $(KC_TIME)
 # Kimwitu++ Files 2
 
 bpel-unparse-xml.o: $(KC_TIME)
-	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
+	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.cc)
 
 bpel-unparse-petri.o: $(KC_TIME)
-	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
+	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.cc)
 
 bpel-rewrite.o: $(KC_TIME)
-	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
+	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.cc)
 
 bpel-abstract.o: $(KC_TIME)
-	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
+	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.cc)
 
 $(KC_TIME): bpel-abstract.k bpel-unparse-xml.k bpel-unparse-petri.k bpel-rewrite.k
 	@touch $@
@@ -106,11 +106,11 @@ clean:
 	@echo removing temporary files...
 	@-rm -f core *~ *.bak
 	@-rm -f bpel-lexic.c bpel-syntax.h bpel-syntax.c bpel-syntax.output
-	@-rm -f bpel-kc-*.c bpel-kc-*.h
-	@-rm -f bpel-abstract.c bpel-abstract.h
-	@-rm -f bpel-unparse-xml.c bpel-unparse-xml.h
-	@-rm -f bpel-unparse-petri.c bpel-unparse-petri.h
-	@-rm -f bpel-rewrite.c bpel-rewrite.h
+	@-rm -f bpel-kc-*.cc bpel-kc-*.h
+	@-rm -f bpel-abstract.cc bpel-abstract.h
+	@-rm -f bpel-unparse-xml.cc bpel-unparse-xml.h
+	@-rm -f bpel-unparse-petri.cc bpel-unparse-petri.h
+	@-rm -f bpel-rewrite.cc bpel-rewrite.h
 	@-rm -f $(KC_TIME)
 	@-rm -f *.o
 

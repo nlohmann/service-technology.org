@@ -44,6 +44,12 @@
 %}
 
 
+%{
+/*!
+ * \class kc::implicit_class
+ * \brief Rewrite rules: implicit transformations
+ */
+%}
 %rview implicit;
 
 

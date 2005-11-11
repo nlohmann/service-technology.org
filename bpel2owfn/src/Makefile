@@ -28,7 +28,7 @@ bpel2owfn: bpel-syntax.o bpel-lexic.o\
 	bpel-abstract.o bpel-unparse-xml.o bpel-unparse-petri.o bpel-rewrite.o\
 	bpel-kc-unpk.o\
 	bpel-kc-rk.o bpel-kc-csgiok.o bpel-kc-k.o
-	$(CXX) $(CXXFLAGS1) -o $@ $^
+	$(CXX) $(CXXFLAGS2) -o $@ $^
 
 
 

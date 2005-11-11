@@ -17,7 +17,7 @@
  * \author
  *          - Niels Lohmann <nlohmann@informatik.hu-berlin.de>
  * 
- * \date    2005-11-09
+ * \date    2005-11-11
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -27,7 +27,8 @@
  * \version
  *          - 2005-11-09 (nlohmann) Added doxygen-comments.
  *          - 2005-11-10 (nlohmann) Added many using commands for std.
- *
+ *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an id
+ *            (unsigned int).
  */
 
 
@@ -57,7 +58,7 @@ using std::endl;
 using std::less;
 using std::insert_iterator;
 using std::pair;
-
+using std::ostream;
 
 
 
@@ -92,17 +93,16 @@ typedef enum {
  * \brief Nodes of the Petri net
  *
  * Class to represent nodes (i.e. places and transitions) of Petri nets. Each
- * node has an internal name (e.g. for printing petri nets or export to other
- * formats) and a history (i.e. the list of roles the node had during the
- * processing of a BPEL-file).
+ * node has an id and a history (i.e. the list of roles the node had during
+ * the processing of a BPEL-file).
  * 
 */
 
 class Node
 {
   public:
-    /// the (internal) name of the node
-    string name;
+    /// the id of the node
+    unsigned int id;
 
     /// the set of roles (i.e. the history) of the node
     set<string> history;
@@ -120,7 +120,7 @@ class Node
  * \brief Transitions of the Petri net
  *
  * Class to represent transitions of Petri nets. In addition to the inherited
- * variables #name and #history, each transition can have a transition #guard
+ * variables #id and #history, each transition can have a transition #guard
  * stored as C++-string.
  * 
 */
@@ -132,7 +132,7 @@ class Transition: public Node
     string guard;
 
     /// constructor which creates a transition and adds a first role to the history
-    Transition(string name, string role, string guard);
+    Transition(unsigned int id, string role, string guard);
 };
 
 
@@ -147,7 +147,7 @@ class Transition: public Node
  * \brief Places of the Petri net
  *
  * Class to represent places of Petri nets. In addition to the inherited
- * variables #name and #history, each place has a type defined in the
+ * variables #id and #history, each place has a type defined in the
  * enumeation #place_type.
  * 
 */
@@ -159,7 +159,7 @@ class Place: public Node
     place_type type;
 
     /// constructor which creates a place and adds a first role to the history
-    Place(string name, string role, place_type type);
+    Place(unsigned int id, string role, place_type type);
 };
 
 
@@ -223,17 +223,23 @@ class Arc
 class PetriNet
 {
   public:
-    /// Adds a place with a given name and role (standard).
-    Place *newPlace(string name, string role);
+    /// Adds a place without an initial role.
+    Place *newPlace();
+	 
+    /// Adds a place with a given role (standard).
+    Place *newPlace(string role);
 
-    /// Adds a place with a given name, role and type.
-    Place *newPlace(string name, string role, place_type type);
+    /// Adds a place with a given role and type.
+    Place *newPlace(string role, place_type type);
 
-    /// Adds a transition with a given name and role (standard).
-    Transition *newTransition(string name, string role);
+    /// Adds a transition without an initial role.
+    Transition *newTransition();
+    
+    /// Adds a transition with a given role (standard).
+    Transition *newTransition(string role);
 
-    /// Adds a transition with a given name, role and guard.
-    Transition *newTransition(string name, string role, string guard);
+    /// Adds a transition with a given role and guard.
+    Transition *newTransition(string role, string guard);
 
     /// Adds an arc given source and target node (standard).
     Arc *newArc(Node *source, Node *target);
@@ -274,8 +280,8 @@ class PetriNet
     /// Removes an arc from the net.
     void removeArc(Arc *f);
 
-    /// Finds place given a name.
-    Place *findPlace(string name);
+    /// Finds place given an id.
+    Place *findPlace(unsigned int id);
 
     /// Finds place given a role.
     Place *findPlaceRole(string role);
@@ -292,6 +298,8 @@ class PetriNet
     /// Constructor to create an empty Petri net.
     PetriNet();
 
+    unsigned int getNextId();
+
   private:
     /// the list of places of the Petri net
     vector<Place *> P;
@@ -301,6 +309,9 @@ class PetriNet
     
     /// the list of arcs of the Petri net
     vector<Arc *> F;
+
+    /// the id that will be assigned to the next node
+    unsigned int nextId;
 };
 
 #endif

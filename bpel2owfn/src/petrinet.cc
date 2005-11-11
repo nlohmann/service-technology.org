@@ -8,7 +8,7 @@
  * \author  
  *          - Niels Lohmann <nlohmann@informatik.hu-berlin.de>
  *          
- * \date    2005-11-09
+ * \date    2005-11-11
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -19,6 +19,8 @@
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
+ *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an id
+ *            (unsigned int).
  *          
  * \todo
  *          - move helper functions (#set_union) into another file
@@ -34,8 +36,8 @@
 
 extern string intToString(int i); // defined in bpel-unparse.k
 extern int debug_level;           // defined in debug.cc
-extern std::ostream *dot_output;  // defined in main.c
-
+extern ostream *dot_output;  // defined in main.c
+extern string filename;           // defined in main.c
 
 
 
@@ -87,15 +89,17 @@ Arc::Arc(Node *mysource, Node* mytarget, arc_type mytype, string myinscription)
 
 
 /*!
- * \param myname  the internal name of the transition
+ * \param myid    the id of the transition
  * \param role    the first role of the transition
  * \param myguard the guard of the transition
  */
-Transition::Transition(string myname, string role, string myguard)
+Transition::Transition(unsigned int myid, string role, string myguard)
 {
   guard = myguard;
-  name = myname;
-  history.insert(role);
+  id = myid;
+  
+  if (role != "")
+    history.insert(role);
 }
 
 
@@ -106,15 +110,17 @@ Transition::Transition(string myname, string role, string myguard)
 
 
 /*!
- * \param myname the internal name of the place
+ * \param myid   the internal id of the place
  * \param role   the first role of the place
  * \param mytype the type of the place (as defined in #place_type)
  */
-Place::Place(string myname, string role, place_type mytype)
+Place::Place(unsigned int myid, string role, place_type mytype)
 {
   type = mytype;
-  name = myname;
-  history.insert(role);
+  id = myid;
+
+  if (role != "")
+    history.insert(role);
 }
 
 
@@ -130,6 +136,7 @@ Place::Place(string myname, string role, place_type mytype)
  */
 PetriNet::PetriNet()
 {
+  nextId = 0;
   trace(TRACE_DEBUG, "[PN]\tCreated a Petri net object.\n");
 }
 
@@ -138,14 +145,12 @@ PetriNet::PetriNet()
 
 
 /*!
- * Creates a low-level place.
- * \param name the internal name of the place
- * \param role the first role of the place
+ * Creates a low-level place without an initial role.
  * \return pointer of the created place
  */
-Place *PetriNet::newPlace(string name, string role)
+Place *PetriNet::newPlace()
 {
-  return newPlace(name, role, LOW);
+  return newPlace("", LOW);
 }
 
 
@@ -153,14 +158,30 @@ Place *PetriNet::newPlace(string name, string role)
 
 
 /*!
- * \param name   the internal name of the place
- * \param role   the first role of the place
+ * Creates a low-level place.
+ * \param role the initial role of the place
+ * \return pointer of the created place
+ */
+Place *PetriNet::newPlace(string role)
+{
+  return newPlace(role, LOW);
+}
+
+
+
+
+
+/*!
+ * The actual newPlace function called by all other overloaded newPlace
+ * functions.
+ *
+ * \param role   the initial role of the place
  * \param mytype the type of the place (as defined in #place_type)
  * \return pointer of the created place
  */
-Place *PetriNet::newPlace(string name, string role, place_type mytype)
+Place *PetriNet::newPlace(string role, place_type mytype)
 {
-  Place *p = new Place(name, role, mytype);
+  Place *p = new Place(getNextId(), role, mytype);
   P.push_back(p);
   return p;
 }
@@ -170,14 +191,12 @@ Place *PetriNet::newPlace(string name, string role, place_type mytype)
 
 
 /*!
- * Creates an unguarded transition.
- * \param name the internal name of the transition
- * \param role the first role of the transition
+ * Creates an unguarded transition without an initial role.
  * \return pointer of the created transition
  */
-Transition *PetriNet::newTransition(string name, string role)
+Transition *PetriNet::newTransition()
 {
-  return newTransition(name, role, "");
+  return newTransition("", "");
 }
 
 
@@ -185,14 +204,30 @@ Transition *PetriNet::newTransition(string name, string role)
 
 
 /*!
- * \param name  the internal name of the transition
- * \param role  the first role of the transition
+ * Creates an unguarded transition.
+ * \param role the initial role of the transition
+ * \return pointer of the created transition
+ */
+Transition *PetriNet::newTransition(string role)
+{
+  return newTransition(role, "");
+}
+
+
+
+
+
+/*!
+ * The actual newTransition function called by all other overloaded
+ * newTransition functions.
+ *
+ * \param role  the initial role of the transition
  * \param guard guard of the transition
  * \return pointer of the created transition
  */
-Transition *PetriNet::newTransition(string name, string role, string guard)
+Transition *PetriNet::newTransition(string role, string guard)
 {
-  Transition *t = new Transition(name, role, guard);
+  Transition *t = new Transition(getNextId(), role, guard);
   T.push_back(t);
   return t;
 }
@@ -399,36 +434,39 @@ void PetriNet::information()
 void PetriNet::drawDot()
 {
   (*dot_output) << "digraph N {" << endl;
-
+  (*dot_output) << " graph [fontname=\"Helvetica-Oblique\", label=\"" << filename << "\"];" << endl;
+  (*dot_output) << " node [fontname=\"Helvetica-Oblique\"];" << endl;
+  (*dot_output) << " edge [fontname=\"Helvetica-Oblique\"];" << endl << endl;
+  
   // list the places
-  (*dot_output) << " node [shape=circle fixedsize];" << endl;
+  (*dot_output) << " node [shape=circle, fixedsize];" << endl;
   for (vector<Place *>::iterator p = P.begin(); p != P.end(); p++)
-    (*dot_output) << " " << (*p)->name << ";" << endl;
+    (*dot_output) << " " << (*p)->id << "\t[label=\"p" << (*p)->id << "\"];" << endl;
 
   // list the transitions
-  (*dot_output) << endl << " node [shape=box fixedsize];" << endl;
+  (*dot_output) << endl << " node [shape=box, fixedsize];" << endl;
   for (vector<Transition *>::iterator t = T.begin(); t != T.end(); t++)
   {
     if ((*t)->guard != "")
     {
-      (*dot_output) << " " << (*t)->name << " [";
-      (*dot_output) << " shape=record label=\"{" << (*t)->name << "|{"
-	<< (*t)->guard << "}}\"]" << endl;
+      (*dot_output) << " " << (*t)->id << "\t[";
+      (*dot_output) << " shape=record label=\"{t" << (*t)->id << "|{"
+	<< (*t)->guard << "}}\"];" << endl;
     }
     else
-      (*dot_output) << " " << (*t)->name << endl;
+      (*dot_output) << " " << (*t)->id << "\t[label=\"t" << (*t)->id << "\"];" << endl;
   }
 
   // list the arcs
   for (vector<Arc *>::iterator f = F.begin(); f != F.end(); f++)
   {
-    (*dot_output) << " " << (*f)->source->name << " -> "
-      << (*f)->target->name << " [";
+    (*dot_output) << " " << (*f)->source->id << " -> "
+      << (*f)->target->id << "\t[";
     
     if ((*f)->type == RESET)
-      (*dot_output) << " arrowtail=odot";
+      (*dot_output) << "arrowtail=odot";
     else if ((*f)->type == READ)
-      (*dot_output) << " arrowhead=diamond arrowtail=tee";
+      (*dot_output) << "arrowhead=diamond arrowtail=tee";
 
     if ((*f)->inscription != "")
       (*dot_output) << " label=\"" << (*f)->inscription << "\"";
@@ -464,15 +502,14 @@ void PetriNet::drawDot()
  */
 void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 {
-  trace(TRACE_DEBUG, "[PN]\tMerging transitions '" + t1->name + "' and '" + t2->name + "'.\n");
+  trace(TRACE_DEBUG, "[PN]\tMerging transitions " + intToString(t1->id) + " and " + intToString(t2->id) + ".\n");
   if (t1->guard != "" || t2->guard != "")
   {
     cerr << "[PN]\tMerging of guarded transition not yet supported!" << endl;
     return;
   }
 	
-  Node *t12 = newTransition(t1->name + t2->name, t1->name + t2->name, "");
-  t12->history.clear();
+  Node *t12 = newTransition();
   
   for (set<string>::iterator role = t1->history.begin(); role != t1->history.end(); role++)
     t12->history.insert(*role);
@@ -516,15 +553,14 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
  */
 void PetriNet::mergePlaces(Place *p1, Place *p2)
 {
-  trace(TRACE_DEBUG, "[PN]\tMerging places '" + p1->name + "' and '" + p2->name + "'.\n");
+  trace(TRACE_DEBUG, "[PN]\tMerging places " + intToString(p1->id) + " and " + intToString(p2->id) + ".\n");
   if(p1->type != LOW || p2->type != LOW)
   {
     cerr << "[PN]\tMerging of high-level places not yet supported!" << endl;
     return;
   }
   
-  Node *p12 = newPlace(p1->name + p2->name, p1->name + p2->name, LOW);
-  p12->history.clear();
+  Node *p12 = newPlace();
   
   for (set<string>::iterator role = p1->history.begin(); role != p1->history.end(); role++)
     p12->history.insert(*role);
@@ -626,21 +662,21 @@ set<Node *> PetriNet::postset(Node *n)
 
 
 /*!
- * Finds a place of the Petri net given the internal name of the place.
+ * Finds a place of the Petri net given the id of the place.
  *
- * \param  name the demanded name
+ * \param  id the id
  * \return a pointer to the place or NULL if the place was not found.
  *
  * \todo
  *       - call an error-function to signal error
  */
-Place *PetriNet::findPlace(string name)
+Place *PetriNet::findPlace(unsigned int id)
 {
   for (vector<Place *>::iterator p = P.begin(); p != P.end(); p++)
-    if ( (*p)->name == name)
+    if ( (*p)->id == id)
       return *p;
 
-  cerr << "Node '" << name << "' not found!" << endl;  
+  cerr << "Node with id" << id << " not found!" << endl;  
   return NULL;
 }
 
@@ -718,4 +754,14 @@ void PetriNet::simplify()
     trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification: ");
     information();
   }
+}
+
+
+
+
+
+/// \todo comment me
+unsigned int PetriNet::getNextId()
+{
+  return nextId++;
 }

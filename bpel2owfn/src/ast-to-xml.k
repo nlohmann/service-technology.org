@@ -9,7 +9,7 @@
  * \author  
  *          - Niels Lohmann <nlohmann@informatik.hu-berlin.de>
  *          
- * \date    2005-11-10
+ * \date    2005-11-11
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -22,10 +22,10 @@
  *
  * \version
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
+ *          - 2005-11-11 (nlohmann) Moved #intToString to \ref helpers.cc.
  * 
  * \todo
- *          - move helper functions (#in, #inup, #indown, #intToString) into
- *            another file
+ *          - move helper functions (#in, #inup, #indown) into another file.
  *          
  */
 %}
@@ -55,6 +55,7 @@
 // All the includes and variables can be used during the unparsing.
 %{ KC_UNPARSE
 #include <iostream>
+#include "helpers.h"
 
 /// number of spaces to be added as indention
 unsigned int indent = 0;
@@ -88,21 +89,6 @@ void indown()
 
 
 
-
-
-/*!
- * \brief Converts int to string
- *
- * \param i standard C int
- * \return  C++ string representing i
- */
-std::string intToString(int i)
-{
-  char buffer[20];
-  sprintf(buffer, "%d", i);
-  std::string result = std::string(buffer);
-  return result;
-}
 
 
 %}

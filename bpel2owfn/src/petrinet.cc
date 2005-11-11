@@ -20,10 +20,8 @@
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
  *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an id
- *            (unsigned int).
- *          
- * \todo
- *          - move helper functions (#set_union) into another file
+ *            (unsigned int). Improved functions that use P, T, F that are sets
+ *            now.
  */
 
 
@@ -36,29 +34,8 @@
 
 extern string intToString(int i); // defined in bpel-unparse.k
 extern int debug_level;           // defined in debug.cc
-extern ostream *dot_output;  // defined in main.c
+extern ostream *dot_output;       // defined in main.c
 extern string filename;           // defined in main.c
-
-
-
-
-/*****************************************************************************/
-/* helper function */
-
-/*!
- * \brief Returns the union of two sets of type T.
- * \param a set of type T
- * \param b set of type T
- * \return union of the sets a and b
- */
-template <typename T> set<T> set_union(set<T> a, set<T> b)
-{
-  set<T> result;
-  insert_iterator<set<T, less<T> > > res_ins(result, result.begin());
-  set_union(a.begin(), a.end(), b.begin(), b.end(), res_ins);
-  
-  return result;
-}
 
 
 
@@ -144,6 +121,9 @@ PetriNet::PetriNet()
 
 
 
+/*---------------------------------------------------------------------------*/
+
+
 /*!
  * Creates a low-level place without an initial role.
  * \return pointer of the created place
@@ -181,13 +161,16 @@ Place *PetriNet::newPlace(string role)
  */
 Place *PetriNet::newPlace(string role, place_type mytype)
 {
-  Place *p = new Place(getNextId(), role, mytype);
-  P.push_back(p);
+  Place *p = new Place(getId(), role, mytype);
+  P.insert(p);
   return p;
 }
 
 
 
+
+
+/*---------------------------------------------------------------------------*/
 
 
 /*!
@@ -227,13 +210,16 @@ Transition *PetriNet::newTransition(string role)
  */
 Transition *PetriNet::newTransition(string role, string guard)
 {
-  Transition *t = new Transition(getNextId(), role, guard);
-  T.push_back(t);
+  Transition *t = new Transition(getId(), role, guard);
+  T.insert(t);
   return t;
 }
 
 
 
+
+
+/*---------------------------------------------------------------------------*/
 
 
 /*!
@@ -294,7 +280,7 @@ Arc *PetriNet::newArc(Node *source, Node *target, arc_type type)
 Arc *PetriNet::newArc(Node *source, Node *target, arc_type type, string inscription)
 {
   Arc *f = new Arc(source, target, type, inscription);
-  F.push_back(f);
+  F.insert(f);
   return f;
 }
 
@@ -307,21 +293,20 @@ Arc *PetriNet::newArc(Node *source, Node *target, arc_type type, string inscript
 
 /*!
  * Removes a place and all arcs connected with it.
- * \param p1 place to be removed
+ * \param p place to be removed
  * \todo
  *        - improve performance by avoiding the fixed point operation
- *        - improve performance by avoiding a linear search in P
  */
-void PetriNet::removePlace(Place *p1)
+void PetriNet::removePlace(Place *p)
 {
   // fixed-point operation: remove all in- and outgoing arcs
   bool changes;
   do
   {
     changes = false;
-    for (vector<Arc *>::iterator f = F.begin(); f != F.end(); f++)
+    for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     {
-      if (((*f)->source == p1) || ((*f)->target == p1))
+      if (((*f)->source == p) || ((*f)->target == p))
       {
 	removeArc(*f);
 	changes = true;
@@ -331,15 +316,8 @@ void PetriNet::removePlace(Place *p1)
   } while (changes);
 
   
-  // find the place and delete it
-  for (vector<Place *>::iterator p = P.begin(); p != P.end(); p++)
-  {
-    if (*p == p1)
-    {
-      P.erase(p);
-      return;
-    }
-  }
+  // delete the place
+  P.erase(p);
 }
 
 
@@ -348,21 +326,20 @@ void PetriNet::removePlace(Place *p1)
 
 /*!
  * Removes a transition and all arcs connected with it.
- * \param t1 transition to be removed
+ * \param t transition to be removed
  * \todo
  *        - improve performance by avoiding the fixed point operation
- *        - improve performance by avoiding a linear search in T
  */
-void PetriNet::removeTransition(Transition *t1)
+void PetriNet::removeTransition(Transition *t)
 {
   // fixed-point operation: remove all in- and outgoing arcs
   bool changes;
   do
   {
     changes = false;
-    for (vector<Arc *>::iterator f = F.begin(); f != F.end(); f++)
+    for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     {
-      if (((*f)->source == t1) || ((*f)->target == t1))
+      if (((*f)->source == t) || ((*f)->target == t))
       {
 	removeArc(*f);
 	changes = true;
@@ -371,15 +348,8 @@ void PetriNet::removeTransition(Transition *t1)
     }
   } while (changes);
 
-  // find the transition and delete it
-  for (vector<Transition *>::iterator t = T.begin(); t != T.end(); t++)
-  {
-    if (*t == t1)
-    {
-      T.erase(t);
-      return;
-    }
-  }
+  // delete the transition
+  T.erase(t);
 }
 
 
@@ -388,20 +358,11 @@ void PetriNet::removeTransition(Transition *t1)
 
 
 /*!
- * \param f1 arc to be removed
- * \todo
- *       - improve performance by avoiding a linear search in F
+ * \param f arc to be removed
  */
-void PetriNet::removeArc(Arc *f1)
+void PetriNet::removeArc(Arc *f)
 {
-  for (vector<Arc *>::iterator f = F.begin(); f != F.end(); f++)
-  {
-    if (*f == f1)
-    {
       F.erase(f);
-      return;
-    }
-  }
 }
 
 
@@ -440,12 +401,12 @@ void PetriNet::drawDot()
   
   // list the places
   (*dot_output) << " node [shape=circle, fixedsize];" << endl;
-  for (vector<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
     (*dot_output) << " " << (*p)->id << "\t[label=\"p" << (*p)->id << "\"];" << endl;
 
   // list the transitions
   (*dot_output) << endl << " node [shape=box, fixedsize];" << endl;
-  for (vector<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
   {
     if ((*t)->guard != "")
     {
@@ -458,7 +419,7 @@ void PetriNet::drawDot()
   }
 
   // list the arcs
-  for (vector<Arc *>::iterator f = F.begin(); f != F.end(); f++)
+  for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
   {
     (*dot_output) << " " << (*f)->source->id << " -> "
       << (*f)->target->id << "\t[";
@@ -517,8 +478,8 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
   for (set<string>::iterator role = t2->history.begin(); role != t2->history.end(); role++)
     t12->history.insert(*role);
   
-  set<Node *> pre12 = set_union(preset(t1), preset(t2));
-  set<Node *> post12 = set_union(postset(t1), postset(t2));
+  set<Node *> pre12 = setUnion(preset(t1), preset(t2));
+  set<Node *> post12 = setUnion(postset(t1), postset(t2));
   
   for (set<Node *>::iterator n = pre12.begin(); n != pre12.end(); n++)
     newArc(*n, t12);
@@ -568,8 +529,8 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
   for (set<string>::iterator role = p2->history.begin(); role != p2->history.end(); role++)
     p12->history.insert(*role);
 
-  set<Node *> pre12 = set_union(preset(p1), preset(p2));
-  set<Node *> post12 = set_union(postset(p1), postset(p2));
+  set<Node *> pre12 = setUnion(preset(p1), preset(p2));
+  set<Node *> post12 = setUnion(postset(p1), postset(p2));
   
   for (set<Node *>::iterator n = pre12.begin(); n != pre12.end(); n++)
     newArc(*n, p12);
@@ -628,7 +589,7 @@ set<Node *> PetriNet::preset(Node *n)
 {
   set<Node *> result;
 
-  for (vector<Arc *>::iterator f = F.begin(); f != F.end(); f++)
+  for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     if ((*f)->target == n)
       result.insert((*f)->source);
 
@@ -647,7 +608,7 @@ set<Node *> PetriNet::postset(Node *n)
 {
   set<Node *> result;
 
-  for (vector<Arc *>::iterator f = F.begin(); f != F.end(); f++)
+  for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     if ((*f)->source == n)
       result.insert((*f)->target);
 
@@ -672,7 +633,7 @@ set<Node *> PetriNet::postset(Node *n)
  */
 Place *PetriNet::findPlace(unsigned int id)
 {
-  for (vector<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
     if ( (*p)->id == id)
       return *p;
 
@@ -695,7 +656,7 @@ Place *PetriNet::findPlace(unsigned int id)
  */
 Place *PetriNet::findPlaceRole(string role)
 {
-  for (vector<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
     for (set<string>::iterator r = (*p)->history.begin(); r != (*p)->history.end(); r++)
       if ( (*r).substr((*r).find_first_of(".")+1) == role )
 	return *p;
@@ -720,7 +681,7 @@ Place *PetriNet::findPlaceRole(string role)
  * \todo
  *       - improve performance
  *       - implement more reduction rules
- *       - does the transitions have to be merged or rather be removed?
+ *       - Do the transitions have to be merged or rather be removed?
  *
  */
 void PetriNet::simplify()
@@ -737,8 +698,8 @@ void PetriNet::simplify()
   vector <pair <Transition *, Transition *> > transitionPairs;
 
   // find transitions with same preset and postset  
-  for (vector<Transition *>::iterator t1 = T.begin(); t1 != T.end(); t1++)
-    for (vector<Transition *>::iterator t2 = t1; t2 != T.end(); t2++)
+  for (set<Transition *>::iterator t1 = T.begin(); t1 != T.end(); t1++)
+    for (set<Transition *>::iterator t2 = t1; t2 != T.end(); t2++)
       if (*t1 != *t2)
 	if ( (preset(*t1) == preset(*t2)) && (postset(*t1) == postset(*t2)) )
 	  transitionPairs.push_back(std::pair<Transition *, Transition *>(*t1, *t2));
@@ -760,8 +721,13 @@ void PetriNet::simplify()
 
 
 
-/// \todo comment me
-unsigned int PetriNet::getNextId()
+/*---------------------------------------------------------------------------*/
+
+
+/*!
+ * \return id for new nodes
+ */
+unsigned int PetriNet::getId()
 {
   return nextId++;
 }

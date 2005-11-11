@@ -24,7 +24,7 @@ KC_TIME = .kc_time_stamp
 # Main target
 
 bpel2owfn: bpel-syntax.o bpel-lexic.o\
-	main.o debug.o bpel-attributes.o petrinet.o\
+	main.o debug.o bpel-attributes.o petrinet.o helpers.o\
 	bpel-abstract.o bpel-unparse-xml.o bpel-unparse-petri.o bpel-rewrite.o\
 	bpel-kc-unpk.o\
 	bpel-kc-rk.o bpel-kc-csgiok.o bpel-kc-k.o
@@ -45,6 +45,9 @@ petrinet.o: petrinet.h petrinet.c
 	$(CXX) $(CXXFLAGS2) -c -o $@ $(@:.o=.c)
 
 debug.o: debug.h debug.cc
+	$(CXX) $(CXXFLAGS2) -c -o $@ $(@:.o=.cc)
+
+helpers.o: helpers.h helpers.cc
 	$(CXX) $(CXXFLAGS2) -c -o $@ $(@:.o=.cc)
 
 

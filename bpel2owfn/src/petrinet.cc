@@ -8,7 +8,7 @@
  * \author  
  *          - Niels Lohmann <nlohmann@informatik.hu-berlin.de>
  *          
- * \date    2005-11-11
+ * \date    $Date: 2005/11/13 20:12:49 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -21,7 +21,10 @@
  *            Respected #dot_output for #drawDot function. Finished commenting.
  *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an id
  *            (unsigned int). Improved functions that use P, T, F that are sets
- *            now.
+ *            now. Added function #PetriNet::detachNode.
+ *          - 2005-11-13 (nlohmann) Added function #id(). Explicitly call
+ *            destructors of #Arc, #Place and #Transition. Added function
+ *            #makeLowLevel().
  */
 
 
@@ -113,8 +116,8 @@ Place::Place(unsigned int myid, string role, place_type mytype)
  */
 PetriNet::PetriNet()
 {
+  trace(TRACE_DEBUG, "[PN]\tCreating a Petri net object.\n");
   nextId = 0;
-  trace(TRACE_DEBUG, "[PN]\tCreated a Petri net object.\n");
 }
 
 
@@ -161,8 +164,15 @@ Place *PetriNet::newPlace(string role)
  */
 Place *PetriNet::newPlace(string role, place_type mytype)
 {
+  trace(TRACE_VERY_DEBUG, "[PN]\tCreating place " + intToString(id()) +
+      "...\n");
+  
   Place *p = new Place(getId(), role, mytype);
   P.insert(p);
+
+  if (P.size() % 100 == 0)
+    trace(TRACE_INFORMATION, "[PN]\t" + information() + "\n");
+  
   return p;
 }
 
@@ -210,8 +220,15 @@ Transition *PetriNet::newTransition(string role)
  */
 Transition *PetriNet::newTransition(string role, string guard)
 {
+  trace(TRACE_VERY_DEBUG, "[PN]\tCreating transition " + intToString(id()) +
+      "...\n");
+  
   Transition *t = new Transition(getId(), role, guard);
   T.insert(t);
+
+  if (T.size() % 100 == 0)
+    trace(TRACE_INFORMATION, "[PN]\t" + information() + "\n");
+  
   return t;
 }
 
@@ -279,8 +296,12 @@ Arc *PetriNet::newArc(Node *source, Node *target, arc_type type)
  */
 Arc *PetriNet::newArc(Node *source, Node *target, arc_type type, string inscription)
 {
+  trace(TRACE_VERY_DEBUG, "[PN]\tCreating arc (" + intToString(source->id) +
+      "," + intToString(target->id) + ")...\n");
+
   Arc *f = new Arc(source, target, type, inscription);
   F.insert(f);
+
   return f;
 }
 
@@ -290,34 +311,41 @@ Arc *PetriNet::newArc(Node *source, Node *target, arc_type type, string inscript
 
 /*---------------------------------------------------------------------------*/
 
+/*!
+ * Removes all ingoing and outgoing arcs of a node, i.e. detatches the node
+ * from the rest of the net.
+ * 
+ * \param n node to be detached
+ */
+void PetriNet::detachNode(Node *n)
+{
+  trace(TRACE_VERY_DEBUG, "[PN]\tDetaching node " + intToString(n->id) +
+      "...\n");
+  
+  vector<Arc *> removeList;
+
+  for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
+    if (((*f)->source == n) || ((*f)->target == n))
+      removeList.push_back(*f);
+
+  for (unsigned int i=0; i<removeList.size(); i++)
+    removeArc(removeList[i]);
+}
+
+
 
 /*!
  * Removes a place and all arcs connected with it.
  * \param p place to be removed
- * \todo
- *        - improve performance by avoiding the fixed point operation
  */
 void PetriNet::removePlace(Place *p)
 {
-  // fixed-point operation: remove all in- and outgoing arcs
-  bool changes;
-  do
-  {
-    changes = false;
-    for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
-    {
-      if (((*f)->source == p) || ((*f)->target == p))
-      {
-	removeArc(*f);
-	changes = true;
-	break;
-      }	
-    }
-  } while (changes);
-
+  trace(TRACE_VERY_DEBUG, "[PN]\tRemoving place " + intToString(p->id) +
+      "...\n");
   
-  // delete the place
+  detachNode(p);
   P.erase(p);
+  delete p;
 }
 
 
@@ -327,29 +355,15 @@ void PetriNet::removePlace(Place *p)
 /*!
  * Removes a transition and all arcs connected with it.
  * \param t transition to be removed
- * \todo
- *        - improve performance by avoiding the fixed point operation
  */
 void PetriNet::removeTransition(Transition *t)
 {
-  // fixed-point operation: remove all in- and outgoing arcs
-  bool changes;
-  do
-  {
-    changes = false;
-    for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
-    {
-      if (((*f)->source == t) || ((*f)->target == t))
-      {
-	removeArc(*f);
-	changes = true;
-	break;
-      }	
-    }
-  } while (changes);
-
-  // delete the transition
+  trace(TRACE_VERY_DEBUG, "[PN]\tRemoving transition " + intToString(t->id) +
+      "...\n");
+  
+  detachNode(t);
   T.erase(t);
+  delete t;
 }
 
 
@@ -362,7 +376,11 @@ void PetriNet::removeTransition(Transition *t)
  */
 void PetriNet::removeArc(Arc *f)
 {
-      F.erase(f);
+  trace(TRACE_VERY_DEBUG, "[PN]\tRemoving arc (" + intToString(f->source->id) +
+      "," + intToString(f->target->id) + ")...\n");
+  
+  F.erase(f);
+  delete f;
 }
 
 
@@ -373,11 +391,15 @@ void PetriNet::removeArc(Arc *f)
 /*---------------------------------------------------------------------------*/
 
 
-void PetriNet::information()
+/*!
+ * \return string containing information about the net
+ */
+string PetriNet::information()
 {
-  cerr << P.size() << " places, ";
-  cerr << T.size() << " transitions, ";
-  cerr << F.size() << " arcs" << endl;
+  string result;
+  result += intToString(P.size()) + " places, " + intToString(T.size()) +
+    " transitions, " +  intToString(F.size()) + " arcs";
+  return result;
 }
 
 
@@ -394,6 +416,9 @@ void PetriNet::information()
  */
 void PetriNet::drawDot()
 {
+  makeLowLevel();
+  trace(TRACE_DEBUG, "[PN]\tCreating DOT-output.\n");
+  
   (*dot_output) << "digraph N {" << endl;
   (*dot_output) << " graph [fontname=\"Helvetica-Oblique\", label=\"" << filename << "\"];" << endl;
   (*dot_output) << " node [fontname=\"Helvetica-Oblique\"];" << endl;
@@ -463,7 +488,8 @@ void PetriNet::drawDot()
  */
 void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 {
-  trace(TRACE_DEBUG, "[PN]\tMerging transitions " + intToString(t1->id) + " and " + intToString(t2->id) + ".\n");
+  trace(TRACE_VERY_DEBUG, "[PN]\tMerging transitions " + intToString(t1->id) +
+      " and " + intToString(t2->id) + "...\n");
   if (t1->guard != "" || t2->guard != "")
   {
     cerr << "[PN]\tMerging of guarded transition not yet supported!" << endl;
@@ -514,7 +540,8 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
  */
 void PetriNet::mergePlaces(Place *p1, Place *p2)
 {
-  trace(TRACE_DEBUG, "[PN]\tMerging places " + intToString(p1->id) + " and " + intToString(p2->id) + ".\n");
+  trace(TRACE_VERY_DEBUG, "[PN]\tMerging places " + intToString(p1->id) +
+      " and " + intToString(p2->id) + "...\n");
   if(p1->type != LOW || p2->type != LOW)
   {
     cerr << "[PN]\tMerging of high-level places not yet supported!" << endl;
@@ -681,16 +708,12 @@ Place *PetriNet::findPlaceRole(string role)
  * \todo
  *       - improve performance
  *       - implement more reduction rules
- *       - Do the transitions have to be merged or rather be removed?
  *
  */
 void PetriNet::simplify()
 {
-  if (debug_level > TRACE_INFORMATION)
-  {
-    trace(TRACE_DEBUG, "[PN]\tPetri net size before simplification: ");
-    information();
-  }
+  trace(TRACE_DEBUG, "[PN]\tPetri net size before simplification: " +
+      information() + "\n");
   trace(TRACE_INFORMATION, "Simplifying Petri net...\n");
 
   
@@ -710,11 +733,59 @@ void PetriNet::simplify()
   
 
   trace(TRACE_INFORMATION, "Simplifying complete.\n");
-  if (debug_level > TRACE_INFORMATION)
+  trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification: " +
+      information() + "\n");
+}
+
+
+
+
+
+/*!
+ * Converts the created Petri net to low-level representation. Therefore the
+ * following steps are taken:
+ *
+ * - Remove all transition guards -- decisions are now taken
+ *   non-deterministically.
+ * - Convert places of type #TIME and #PROPERTY to #LOW. (todo)
+ * - Convert places of type #MESSAGE to #IN resp. #OUT. (todo)
+ * - Remove arc inscriptions -- all places are low-level places anyway.
+ * - Convert read arcs to loops.
+ *
+ * Only reset arcs remain as high-level constructs. They will be converted
+ * (i.e. unfolded) in a later stage since this unfolding is target-format
+ * specific.
+ * 
+ * \todo
+ *       - take care of markings
+ *       - take care of places (#TIME, #PROPERTY, #IN, #OUT)
+ *       - rename to toOWFN?
+ */
+void PetriNet::makeLowLevel()
+{
+  trace(TRACE_INFORMATION, "Converting Petri net to low-level...\n");
+
+  
+  // remove transition guards
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+    (*t)->guard = "";
+
+  
+  // convert read arcs, remove inscriptions
+  set<Arc *> readArcs;
+
+  for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
   {
-    trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification: ");
-    information();
+    (*f)->inscription = "";
+    if ((*f)->type == READ)
+    {
+      (*f)->type = STANDARD;
+      readArcs.insert(*f);
+    }
   }
+
+  for (set<Arc *>::iterator f = readArcs.begin(); f != readArcs.end(); f++)
+    newArc( (*f)->target, (*f)->source );
 }
 
 
@@ -730,4 +801,17 @@ void PetriNet::simplify()
 unsigned int PetriNet::getId()
 {
   return nextId++;
+}
+
+
+
+
+
+
+/*!
+ * \return id for last added node
+ */
+unsigned int PetriNet::id()
+{
+  return nextId;
 }

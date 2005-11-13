@@ -17,7 +17,7 @@
  * \author
  *          - Niels Lohmann <nlohmann@informatik.hu-berlin.de>
  * 
- * \date    2005-11-11
+ * \date    $Date: 2005/11/13 20:12:49 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -27,8 +27,10 @@
  * \version
  *          - 2005-11-09 (nlohmann) Added doxygen-comments.
  *          - 2005-11-10 (nlohmann) Added many using commands for std.
- *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an id
- *            (unsigned int). Changed P, T, F to be sets.
+ *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an #id
+ *            (unsigned int). Changed #P, #T, #F to be sets.
+ *          - 2005-11-13 (nlohmann) Added functions #id, #makeLowLevel.
+ *            Added types #IN and #OUT to #place_type.
  */
 
 
@@ -57,7 +59,9 @@ typedef enum {
   LOW,        ///< low-level place (standard)
   TIME,       ///< place modelling time (e.g. for <wait>-statements)
   PROPERTY,   ///< place modelling properties (e.g. correlation sets)
-  MESSAGE     ///< place modelling message channels
+  MESSAGE,    ///< place modelling message channels
+  IN,         ///< input place of an open workflow net (oWFN)
+  OUT         ///< output place of an open workflow net (oWFN)
 } place_type;
 
 
@@ -243,7 +247,7 @@ class PetriNet
     Arc *newArc(Node *source, Node *target, arc_type type, string inscription);
 
     /// Statistical output.
-    void information();
+    string information();
 
     /// DOT (Graphviz) output.
     void drawDot();
@@ -259,7 +263,10 @@ class PetriNet
 
     /// Merges transitions given two transitions.
     void mergeTransitions(Transition *t1, Transition *t2);
-
+    
+    /// Removes all ingoing and outgoing arcs of a node.
+    void detachNode(Node *n);
+    
     /// Removes a place from the net.
     void removePlace(Place *p);
 
@@ -284,11 +291,17 @@ class PetriNet
     /// Simplifies the Petri net.
     void simplify();
 
+    /// Converts net to low-level net.
+    void makeLowLevel();
+
     /// Constructor to create an empty Petri net.
     PetriNet();
 
     /// Returns an id for new nodes.
     unsigned int getId();
+
+    /// Returns current id.
+    unsigned int id();
 
   private:
     /// the list of places of the Petri net

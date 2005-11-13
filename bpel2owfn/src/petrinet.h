@@ -15,16 +15,19 @@
  * 
  *
  * \author
- *          - Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          - last changes of: \$Author: nlohmann $
  * 
- * \date    $Date: 2005/11/13 20:12:49 $
+ * \date
+ *          - created: 2005/10/18
+ *          - last changed: \$Date: 2005/11/13 21:05:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *          
- * \version
+ * \version \$Revision: 1.14 $
  *          - 2005-11-09 (nlohmann) Added doxygen-comments.
  *          - 2005-11-10 (nlohmann) Added many using commands for std.
  *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an #id

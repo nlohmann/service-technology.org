@@ -53,6 +53,6 @@ string intToString(int i)
 {
   char buffer[20];
   sprintf(buffer, "%d", i);
-  string result = string(buffer);
-  return result;
+  
+  return string(buffer);
 }

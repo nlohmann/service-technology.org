@@ -6,9 +6,10 @@
  * This file implements the classes and functions defined in petrinet.h.
  * 
  * \author  
- *          - Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          - last changes of: $Author: nlohmann $
  *          
- * \date    $Date: 2005/11/13 20:12:49 $
+ * \date    $Date: 2005/11/13 20:20:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See

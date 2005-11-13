@@ -9,7 +9,7 @@
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
  *          - last changes of: \$Author: nlohmann $
  *          
- * \date    \$Date: 2005/11/13 20:26:40 $
+ * \date    \$Date: 2005/11/13 20:31:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -26,6 +26,11 @@
  *          - 2005-11-13 (nlohmann) Added function #id(). Explicitly call
  *            destructors of #Arc, #Place and #Transition. Added function
  *            #makeLowLevel().
+ *
+ * $Log: petrinet.cc,v $
+ * Revision 1.16  2005/11/13 20:31:02  nlohmann
+ * + added CVS-tags
+ *
  */
 
 

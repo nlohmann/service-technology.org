@@ -1,6 +1,8 @@
+# last changed $Date: 2005/11/13 21:28:07 $ by $Author: nlohmann $
+
+
+
 .PHONY: clean
-
-
 
 # Tools
 YACC     = bison
@@ -121,6 +123,7 @@ clean:
 
 veryclean: clean
 	@echo removing documentation...
+	@-rm -f -r doc
 	@-rm -f -r doc
 	@echo removing executable...
 	@-rm -f bpel2owfn.exe bpel2owfn

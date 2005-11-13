@@ -9,27 +9,25 @@
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
  *          - last changes of: \$Author: nlohmann $
  *          
- * \date    \$Date: 2005/11/13 20:31:02 $
+ * \date
+ *          - created: ?
+ *          - last changed: \$Date: 2005/11/13 20:58:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version
+ * \version \$Revision: 1.17 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
  *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an id
- *            (unsigned int). Improved functions that use P, T, F that are sets
- *            now. Added function #PetriNet::detachNode.
- *          - 2005-11-13 (nlohmann) Added function #id(). Explicitly call
- *            destructors of #Arc, #Place and #Transition. Added function
- *            #makeLowLevel().
- *
- * $Log: petrinet.cc,v $
- * Revision 1.16  2005/11/13 20:31:02  nlohmann
- * + added CVS-tags
+ *            (unsigned int). Improved functions that use #P, #T, #F that are
+ *            sets now. Added function #PetriNet::detachNode.
+ *          - 2005-11-13 (nlohmann) Added function #PetriNet::id. Explicitly
+ *            call destructors of #Arc, #Place and #Transition. Added function
+ *            #PetriNet::makeLowLevel. Added CVS-tags.
  *
  */
 

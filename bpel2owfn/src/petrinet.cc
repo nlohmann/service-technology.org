@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/13 21:01:33 $
+ *          - last changed: \$Date: 2005/11/14 10:29:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -28,6 +28,7 @@
  *          - 2005-11-13 (nlohmann) Added function #PetriNet::id. Explicitly
  *            call destructors of #Arc, #Place and #Transition. Added function
  *            #PetriNet::makeLowLevel. Added CVS-tags.
+ *          - 2005-11-14 (nlohmann) Added new reduction rule.
  *
  */
 
@@ -420,7 +421,8 @@ string PetriNet::information()
  */
 void PetriNet::drawDot()
 {
-  makeLowLevel();
+  makeLowLevel(); // (exprimental)
+
   trace(TRACE_DEBUG, "[PN]\tCreating DOT-output.\n");
   
   (*dot_output) << "digraph N {" << endl;
@@ -668,7 +670,7 @@ Place *PetriNet::findPlace(unsigned int id)
     if ( (*p)->id == id)
       return *p;
 
-  cerr << "Node with id" << id << " not found!" << endl;  
+  cerr << "Node with id " << id << " not found!" << endl;  
   return NULL;
 }
 
@@ -708,10 +710,13 @@ Place *PetriNet::findPlaceRole(string role)
  * 
  * - If two transitions t1 and t2 have the same preset and postset, one of them
  *   can safely be removed.
+ * - If a transition has a singleton preset and postset, the transition can be
+ *   removed (sequence) and the preset and postset can be merged.
  *
  * \todo
  *       - improve performance
  *       - implement more reduction rules
+ *       - Is second rule correct?
  *
  */
 void PetriNet::simplify()
@@ -729,12 +734,39 @@ void PetriNet::simplify()
     for (set<Transition *>::iterator t2 = t1; t2 != T.end(); t2++)
       if (*t1 != *t2)
 	if ( (preset(*t1) == preset(*t2)) && (postset(*t1) == postset(*t2)) )
-	  transitionPairs.push_back(std::pair<Transition *, Transition *>(*t1, *t2));
+	  transitionPairs.push_back(pair<Transition *, Transition *>(*t1, *t2));
 
   // merge the found transitions
   for (unsigned int i = 0; i < transitionPairs.size(); i++)
     mergeTransitions(transitionPairs[i].first, transitionPairs[i].second);
+
   
+  trace(TRACE_DEBUG, "[PN]\tnew reduction rule\n");
+
+  // a pair to store places to be merged
+  vector <Transition *> sequenceTransition;
+  vector <pair <string, string> > placeMerge;
+  
+  // find transitions with singelton preset and postset
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+    if (preset(*t).size() == 1 && postset(*t).size() == 1)
+    {
+      string id1 = *((*(preset(*t).begin()))->history.begin());
+      string id2 = *((*(postset(*t).begin()))->history.begin());
+      id1 = id1.substr(id1.find_first_of(".")+1); // cut prefix "empty."
+      id2 = id2.substr(id2.find_first_of(".")+1);
+      placeMerge.push_back(pair<string, string>(id1, id2));
+      sequenceTransition.push_back(*t);
+    }
+    
+  // merge preset and postset
+  for (unsigned int i = 0; i < placeMerge.size(); i++)
+    mergePlaces(placeMerge[i].first, placeMerge[i].second);
+
+  // remove "sequence"-transtions
+  for (unsigned int i = 0; i < sequenceTransition.size(); i++)
+    removeTransition(sequenceTransition[i]);
+
 
   trace(TRACE_INFORMATION, "Simplifying complete.\n");
   trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification: " +
@@ -763,7 +795,6 @@ void PetriNet::simplify()
  * \todo
  *       - take care of markings
  *       - take care of places (#TIME, #PROPERTY, #IN, #OUT)
- *       - rename to toOWFN?
  */
 void PetriNet::makeLowLevel()
 {

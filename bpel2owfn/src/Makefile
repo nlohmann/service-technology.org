@@ -1,4 +1,4 @@
-# last changed $Date: 2005/11/14 10:35:15 $ by $Author: nlohmann $
+# last changed $Date: 2005/11/14 13:45:30 $ by $Author: nlohmann $
 
 
 
@@ -37,14 +37,14 @@ bpel2owfn: bpel-syntax.o bpel-lexic.o\
 ###############################################################################
 # "Pure" C++-modules
 
-main.o: main.c main.h $(KC_TIME)
-	$(CXX) $(CXXFLAGS2) -c -o $@ $(@:.o=.c)
+main.o: main.cc main.h $(KC_TIME)
+	$(CXX) $(CXXFLAGS2) -c -o $@ $(@:.o=.cc)
 
 bpel-attributes.o: bpel-attributes.c bpel-attributes.h $(KC_TIME)
 	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
 
 petrinet.o: petrinet.h petrinet.cc
-	$(CXX) $(CXXFLAGS2) -c -o $@ $(@:.o=.c)
+	$(CXX) $(CXXFLAGS2) -c -o $@ $(@:.o=.cc)
 
 debug.o: debug.h debug.cc
 	$(CXX) $(CXXFLAGS2) -c -o $@ $(@:.o=.cc)

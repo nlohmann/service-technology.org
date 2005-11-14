@@ -1,4 +1,4 @@
-# last changed $Date: 2005/11/14 10:29:23 $ by $Author: nlohmann $
+# last changed $Date: 2005/11/14 10:35:15 $ by $Author: nlohmann $
 
 
 
@@ -43,7 +43,7 @@ main.o: main.c main.h $(KC_TIME)
 bpel-attributes.o: bpel-attributes.c bpel-attributes.h $(KC_TIME)
 	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
 
-petrinet.o: petrinet.h petrinet.c
+petrinet.o: petrinet.h petrinet.cc
 	$(CXX) $(CXXFLAGS2) -c -o $@ $(@:.o=.c)
 
 debug.o: debug.h debug.cc

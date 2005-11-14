@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/14 10:36:51 $
+ *          - last changed: \$Date: 2005/11/14 13:45:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -28,7 +28,8 @@
  *          - 2005-11-13 (nlohmann) Added function #PetriNet::id. Explicitly
  *            call destructors of #Arc, #Place and #Transition. Added function
  *            #PetriNet::makeLowLevel. Added CVS-tags.
- *          - 2005-11-14 (nlohmann) Added new reduction rule.
+ *          - 2005-11-14 (nlohmann) Added new reduction rule. Added function
+ *            #PetriNet::longInformation().
  *
  */
 
@@ -40,7 +41,6 @@
 #include "petrinet.h"
 
 
-extern string intToString(int i); // defined in bpel-unparse.k
 extern int debug_level;           // defined in debug.cc
 extern ostream *dot_output;       // defined in main.c
 extern string filename;           // defined in main.c
@@ -409,6 +409,70 @@ string PetriNet::information()
 
 
 
+/*!
+ * Prints information about the generated Petri net. In particular, for each
+ * place and transition all roles of the history are printed to understand
+ * the net and maybe LoLA's witness pathes later.
+ * 
+ * \todo
+ *       - add command-line parameter -i / --information
+ *       - write information to file
+ */
+void PetriNet::longInformation()
+{
+  // the places
+  trace("PLACES:\n");
+  trace("ID\tTYPE\t\tROLES\n");
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  {
+    trace("p" + intToString((*p)->id) + "\t");
+
+    switch ((*p)->type)
+    {
+      case(LOW):      { trace("low-level"); break; }
+      case(TIME):     { trace("time"); break; }
+      case(PROPERTY): { trace("property"); break; }
+      case(MESSAGE):  { trace("message"); break; }
+      default:        { trace("other"); }
+    }
+
+    for (set<string>::iterator role = (*p)->history.begin(); role != (*p)->history.end(); role++)
+    {
+      if (role == (*p)->history.begin())
+	trace("\t" + *role + "\n");
+      else
+	trace("\t\t\t" + *role + "\n");
+    }
+  }
+  
+  
+  // the transitions
+  trace("\nTRANSITIONS:\n");
+  trace("ID\tGUARD\t\tROLES\n");
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+  {
+    trace("t" + intToString((*t)->id) + "\t");
+    
+    if ((*t)->guard != "")
+      trace("{" + (*t)->guard + "} ");
+    else
+      trace("\t");
+    
+    for (set<string>::iterator role = (*t)->history.begin(); role != (*t)->history.end(); role++)
+    {
+      if (role == (*t)->history.begin())
+	trace("\t" + *role + "\n");
+      else
+	trace("\t\t\t" + *role + "\n");
+    }
+  }
+}
+
+
+
+
+
+/*---------------------------------------------------------------------------*/
 
 
 /*!
@@ -421,7 +485,8 @@ string PetriNet::information()
  */
 void PetriNet::drawDot()
 {
-  makeLowLevel(); // (exprimental)
+//  makeLowLevel();    // (exprimental)
+  longInformation(); // (exprimental)
 
   trace(TRACE_DEBUG, "[PN]\tCreating DOT-output.\n");
   
@@ -795,6 +860,7 @@ void PetriNet::simplify()
  * \todo
  *       - take care of markings
  *       - take care of places (#TIME, #PROPERTY, #IN, #OUT)
+ *       - add command-line parameter -ll / --low-level
  */
 void PetriNet::makeLowLevel()
 {

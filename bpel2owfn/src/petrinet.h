@@ -20,20 +20,21 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/13 21:05:12 $
+ *          - last changed: \$Date: 2005/11/14 13:45:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *          
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  *          - 2005-11-09 (nlohmann) Added doxygen-comments.
  *          - 2005-11-10 (nlohmann) Added many using commands for std.
  *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an #id
  *            (unsigned int). Changed #P, #T, #F to be sets.
  *          - 2005-11-13 (nlohmann) Added functions #id, #makeLowLevel.
  *            Added types #IN and #OUT to #place_type.
+ *          - 2005-11-14 (nlohmann) Added function #longInformation.
  */
 
 
@@ -251,6 +252,9 @@ class PetriNet
 
     /// Statistical output.
     string information();
+
+    /// Information about the net including histories of all nodes.
+    void longInformation();
 
     /// DOT (Graphviz) output.
     void drawDot();

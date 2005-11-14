@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/14 13:45:47 $
+ *          - last changed: \$Date: 2005/11/14 16:25:18 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -28,8 +28,8 @@
  *          - 2005-11-13 (nlohmann) Added function #PetriNet::id. Explicitly
  *            call destructors of #Arc, #Place and #Transition. Added function
  *            #PetriNet::makeLowLevel. Added CVS-tags.
- *          - 2005-11-14 (nlohmann) Added new reduction rule. Added function
- *            #PetriNet::longInformation().
+ *          - 2005-11-14 (nlohmann) Added new reduction rule. Added functions
+ *            #PetriNet::longInformation() and #PetriNet::lolaOut().
  *
  */
 
@@ -482,11 +482,12 @@ void PetriNet::longInformation()
  *
  * \todo
  *       - treatment of input and output places
+ *       - treatment of markings
  */
 void PetriNet::drawDot()
 {
-//  makeLowLevel();    // (exprimental)
-  longInformation(); // (exprimental)
+  //makeLowLevel();    // (exprimental)
+  //longInformation(); // (exprimental)
 
   trace(TRACE_DEBUG, "[PN]\tCreating DOT-output.\n");
   
@@ -532,8 +533,83 @@ void PetriNet::drawDot()
   }
 
   (*dot_output) << "}" << endl;
+
+  lolaOut(); // exprimental
 }
 
+
+
+
+/*!
+ * Outputs the net in LoLA-format.
+ *
+ * \todo
+ *       - add support for reset-arcs
+ *       - add support for high-level constructs
+ *       - add markings
+ *       - add file-output
+ */
+void PetriNet::lolaOut()
+{
+  trace(TRACE_DEBUG, "[PN]\tCreating LoLA-output.\n");
+
+  makeLowLevel();
+
+  // to be removed!
+  std::ostream * lola_output = &std::cout;
+  
+  (*lola_output) << "{ Petri net created by BPEL2oWFN reading file '" << filename << "' }" << endl << endl;
+  
+  // places
+  (*lola_output) << "PLACE" << endl;
+  unsigned int count = 1;
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); count++,p++)
+  {
+    (*lola_output) << "  p" << (*p)->id;
+    if (count < P.size())
+      (*lola_output) << ",";
+    else
+      (*lola_output) << ";";
+    (*lola_output) << "\t\t { " << (*(*p)->history.begin()) << " }" << endl;
+  }
+  (*lola_output) << endl << endl;
+  
+  (*lola_output) << "MARKING" << endl << ";" << endl << endl;
+
+  // transitions
+  count = 1;
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); count++,t++)
+  {
+    (*lola_output) << "TRANSITION t" << (*t)->id << "\t { " << (*(*t)->history.begin()) << " }" << endl;
+    set<Node *> consume = preset(*t);
+    set<Node *> produce = postset(*t);
+
+    (*lola_output) << "CONSUME" << endl;
+    unsigned int count2 = 1;
+    for (set<Node *>::iterator pre = consume.begin(); pre != consume.end(); count2++, pre++)
+    {
+      (*lola_output) << "  p" << (*pre)->id << ": 1";
+      if (count2 < consume.size())
+	(*lola_output) << ",";
+      else
+	(*lola_output) << ";";
+      (*lola_output) << "\t { " << (*(*pre)->history.begin()) << " }" << endl;
+    }
+
+    (*lola_output) << "PRODUCE" << endl;
+    count2 = 1;
+    for (set<Node *>::iterator post = produce.begin(); post != produce.end(); count2++, post++)
+    {
+      (*lola_output) << "  p" << (*post)->id << ": 1";
+      if (count2 < produce.size())
+	(*lola_output) << ",";
+      else
+	(*lola_output) << ";";
+      (*lola_output) << "\t { " << (*(*post)->history.begin()) << " }" << endl;
+    }
+    (*lola_output) << endl;
+  }
+}
 
 
 

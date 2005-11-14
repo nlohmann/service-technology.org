@@ -1,4 +1,4 @@
-# last changed $Date: 2005/11/13 21:28:07 $ by $Author: nlohmann $
+# last changed $Date: 2005/11/14 09:00:46 $ by $Author: nlohmann $
 
 
 
@@ -37,7 +37,7 @@ bpel2owfn: bpel-syntax.o bpel-lexic.o\
 ###############################################################################
 # "Pure" C++-modules
 
-main.o: main.c main.h $(KC_TIME)
+main.o: main.cc main.h $(KC_TIME)
 	$(CXX) $(CXXFLAGS2) -c -o $@ $(@:.o=.c)
 
 bpel-attributes.o: bpel-attributes.c bpel-attributes.h $(KC_TIME)

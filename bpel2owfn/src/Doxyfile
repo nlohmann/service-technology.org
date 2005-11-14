@@ -1,4 +1,5 @@
-# Doxyfile 1.4.5
+# last changed $Date: 2005/11/14 10:29:40 $ by $Author: nlohmann $
+
 
 #---------------------------------------------------------------------------
 # Project related configuration options
@@ -30,7 +31,7 @@ STRIP_FROM_INC_PATH    =
 SHORT_NAMES            = YES
 JAVADOC_AUTOBRIEF      = NO
 MULTILINE_CPP_IS_BRIEF = NO
-DETAILS_AT_TOP         = NO
+DETAILS_AT_TOP         = YES
 INHERIT_DOCS           = YES
 SEPARATE_MEMBER_PAGES  = YES
 TAB_SIZE               = 8

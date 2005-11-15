@@ -11,16 +11,17 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/15 13:24:26 $
+ *          - last changed: \$Date: 2005/11/15 14:13:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
+ *            Added option for LoLA output.
  *
  */
 
@@ -33,10 +34,16 @@ PetriNet *TheNet = new PetriNet();
 
 /// Filename of input file.
 std::string filename = "";
+
 /// Filename of dot output file
 std::string dot_filename = "";
 /// Pointer to dot output file
 std::ostream * dot_output = &std::cout;
+
+/// Filename of lola output file
+std::string lola_filename = "";
+/// Pointer to lola output file
+std::ostream * lola_output = &std::cout;
 
 // different modes controlled by command line
 
@@ -44,6 +51,10 @@ std::ostream * dot_output = &std::cout;
 bool mode_petri_net = false;
 /// simplify Petri Net
 bool mode_simplify_petri_net = false;
+/// paint Petri Net with lola
+bool mode_lola_petri_net = false;
+/// paint Petri Net with lola and output to file
+bool mode_lola_2_file = false;
 /// paint Petri Net with dot
 bool mode_dot_petri_net = false;
 /// paint Petri Net with dot and output to file
@@ -113,6 +124,11 @@ int main( int argc, char *argv[])
     TheNet->simplify();
   }
   // create dot output ?
+  if (mode_lola_petri_net)
+  {
+    TheNet->lolaOut();
+  }
+  // create dot output ?
   if (mode_dot_petri_net)
   {
     TheNet->drawDot();
@@ -125,6 +141,13 @@ int main( int argc, char *argv[])
   //TheNet->information();
 
 
+  if (lola_filename != "")
+  {
+    trace(TRACE_INFORMATION,"Closing LoLA output file: " + lola_filename + "\n");
+    (*lola_output) << std::flush;
+    ((std::ofstream*)lola_output)->close();
+  }
+  
   if (dot_filename != "")
   {
     trace(TRACE_INFORMATION,"Closing dot output file: " + dot_filename + "\n");

@@ -37,10 +37,16 @@ using namespace std;
 
 /// Filename of input file.
 extern std::string filename;
+
 /// Filename of dot output file
 extern std::string dot_filename;
 /// Pointer to dot output file
 extern std::ostream * dot_output;
+
+/// Filename of LoLA output file
+extern std::string lola_filename;
+/// Pointer to LoLA output file
+extern std::ostream * lola_output;
 
 
 // different modes controlled by command line (in main.cc)
@@ -49,6 +55,10 @@ extern std::ostream * dot_output;
 extern bool mode_petri_net;
 /// simplify Petri Net
 extern bool mode_simplify_petri_net;
+/// output Petri Net for LoLA
+extern bool mode_lola_petri_net;
+/// output Petri Net for LoLA to file
+extern bool mode_lola_2_file;
 /// paint Petri Net with dot
 extern bool mode_dot_petri_net;
 /// paint Petri Net with dot and output to file

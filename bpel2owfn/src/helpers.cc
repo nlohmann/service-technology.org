@@ -7,18 +7,22 @@
  * any other file.
  * 
  * \author  
- *          - Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          - last changes of: \$Author: gierds $
  *          
- * \date    2005-11-11
+ * \date
+ *          - created: 2005/11/11
+ *          - last changed: \$Date: 2005/11/15 14:13:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version
+ * \version \$Revision: 1.5 $
  *          - 2005-11-11 (nlohmann) Initial version.
  *          - 2005-11-15 (gierds) Moved commandline evaluation functions from main.cc to here.
+ *          Added LoLA command line arguments.
  */
 
 
@@ -84,9 +88,15 @@ void print_help()
   trace("\n");
   trace("   -s   | --simplify         - outpus a structural simplified Petri Net\n");
   trace("                               (implies option -pn)\n");
-  trace("   -l   | --low-level        - generate an abstract low level Petri Net\n");
+  trace("   -ll  | --low-level        - generate an abstract low level Petri Net\n");
   trace("                               (see manual for further information)\n");
   trace("                               (implies option -pn)\n"); 
+  trace("   -L   | --lola             - output LoLA input,\n");
+  trace("                               should not used together with -D\n");
+  trace("                               (implies option -pn)\n");
+  trace("   -L2F | --lola2file        - output LoLA input into file (same name as\n");
+  trace("                               input file\n");
+  trace("                               (implies option -L)\n");
   trace("   -D   | --dot              - output dot input\n");
   trace("                               (implies option -pn)\n");
   trace("   -D2F | --dot2file         - output dot input into file (same name as\n");
@@ -152,12 +162,27 @@ void parse_command_line(int argc, char* argv[])
       }
 
       // low level?
-      else if (! strcmp(argument_string, "-l") || ! strcmp(argument_string, "--low-level")) 
+      else if (! strcmp(argument_string, "-ll") || ! strcmp(argument_string, "--low-level")) 
       {
         mode_low_level_petri_net = true;
 	mode_petri_net = true;
       }
 
+      // generate lola output
+      else if (! strcmp(argument_string, "-L") || ! strcmp(argument_string, "--lola")) 
+      {
+        mode_lola_petri_net = true;
+	mode_petri_net = true;
+      }
+      
+      // generate lola output and write it into a file
+      else if (! strcmp(argument_string, "-L2F") || ! strcmp(argument_string, "--lola2file")) 
+      {
+        mode_lola_petri_net = true;
+	mode_lola_2_file = true;
+	mode_petri_net = true;
+      }
+      
       // generate dot output
       else if (! strcmp(argument_string, "-D") || ! strcmp(argument_string, "--dot")) 
       {
@@ -233,8 +258,60 @@ void parse_command_line(int argc, char* argv[])
     }
   }
 
+  // trace and check for some files to be created
+  if ( filename != "")
+  {
+    trace(TRACE_INFORMATION, "Reading BPEL from file ");
+    trace(TRACE_INFORMATION, (filename));
+    trace(TRACE_INFORMATION, "\n");
+
+    // if wanted, create a dot output file
+    if ( mode_dot_2_file )
+    {
+      trace(TRACE_INFORMATION, "Creating file for dot output\n");
+      std::string dotti_file = filename;
+      
+      // try to replace .bpel through .dot
+      if ( dotti_file.rfind(".bpel", 0) >= (dotti_file.length() - 6) )
+      {
+        dotti_file = dotti_file.replace( (dotti_file.length() - 5), 5, ".dot");
+      }
+      else
+      {
+        dotti_file += ".dot";
+      }
+      
+      /// set dot filename
+      dot_filename = dotti_file.c_str();
+      /// create dot file and point to it
+      dot_output = new std::ofstream(dotti_file.c_str(), std::ofstream::out | std::ofstream::trunc);
+    }
+
+    // if wanted, create a LoLA output file
+    if ( mode_lola_2_file )
+    {
+      trace(TRACE_INFORMATION, "Creating file for lola output\n");
+      std::string lola_file = filename;
+      
+      // try to replace .bpel through .lola
+      if ( lola_file.rfind(".bpel", 0) >= (lola_file.length() - 6) )
+      {
+        lola_file = lola_file.replace( (lola_file.length() - 5), 5, ".lola");
+      }
+      else
+      {
+        lola_file += ".dot";
+      }
+      
+      /// set dot filename
+      lola_filename = lola_file.c_str();
+      /// create dot file and point to it
+      lola_output = new std::ofstream(lola_file.c_str(), std::ofstream::out | std::ofstream::trunc);
+    }
+  }
+      
   // trace information about current mode
-  trace(TRACE_INFORMATION, "Modus operandi:\n");
+  trace(TRACE_INFORMATION, "\nModus operandi:\n");
   if (mode_simplify_petri_net)
   {
     trace(TRACE_INFORMATION, " - create structural simlified Petri Net\n");
@@ -248,9 +325,18 @@ void parse_command_line(int argc, char* argv[])
     trace(TRACE_INFORMATION, "   --> abstract to low level\n");
   }
 
+  if (mode_lola_2_file)
+  {
+    trace(TRACE_INFORMATION, " - output LoLA input of the Petri Net to file " + lola_filename + "\n");
+  }
+  else if (mode_lola_petri_net)
+  {
+    trace(TRACE_INFORMATION, " - output LoLA input of the Petri Net\n");
+  }
+
   if (mode_dot_2_file)
   {
-    trace(TRACE_INFORMATION, " - output dot representation of the Petri Net to file"+dot_filename+"\n");
+    trace(TRACE_INFORMATION, " - output dot representation of the Petri Net to file " + dot_filename + "\n");
   }
   else if (mode_dot_petri_net)
   {
@@ -269,36 +355,6 @@ void parse_command_line(int argc, char* argv[])
   
   trace(TRACE_INFORMATION, "\n");
 
-  // trace and check for some files to be created
-  if ( filename != "")
-  {
-    trace(TRACE_INFORMATION, "Reading BPEL from file ");
-    trace(TRACE_INFORMATION, (filename));
-    trace(TRACE_INFORMATION, "\n");
-
-    // if wanted, create a dot output file
-    if ( mode_dot_2_file )
-    {
-      trace(TRACE_INFORMATION, "Creating file for dot output\n");
-      std::string dotti_file = filename;
-      
-      // try to replace .bpel through .dot
-      if ( dotti_file.rfind(".bpel", 0) >= (dotti_file.length() - 8) )
-      {
-        dotti_file = dotti_file.replace( (dotti_file.length() - 5), 5, ".dot");
-      }
-      else
-      {
-        dotti_file += ".dot";
-      }
-      
-      /// set dot filename
-      dot_filename = dotti_file.c_str();
-      /// create dot file and point to it
-      dot_output = new std::ofstream(dotti_file.c_str(), std::ofstream::out | std::ofstream::trunc);
-    }
-  }
-      
   // don't show debug messages from flex and Bison, unless special debug mode is requested
   if (debug_level == -1) 
   {

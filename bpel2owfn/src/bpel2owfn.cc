@@ -11,15 +11,16 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/15 13:11:50 $
+ *          - last changed: \$Date: 2005/11/15 13:24:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
+ *            Added option to created (abstracted) low level nets.
  *
  */
 
@@ -64,8 +65,6 @@ bool mode_low_level_petri_net = false;
  *
  * \returns Error code (0 if everything went well)
  *
- * \todo
- * 	- integrate low level Petri Net option
  * 
  */
 int main( int argc, char *argv[])
@@ -103,10 +102,17 @@ int main( int argc, char *argv[])
     }
   }
 
+  // make low level ?
+  if (mode_low_level_petri_net)
+  {
+    TheNet->makeLowLevel();
+  }
+  // simplify net ?
   if (mode_simplify_petri_net)
   {
     TheNet->simplify();
   }
+  // create dot output ?
   if (mode_dot_petri_net)
   {
     TheNet->drawDot();

@@ -35,9 +35,9 @@ extern int yy_flex_debug;
 extern FILE *yyin;
 
 
-void trace(int trace_level, std::string message)
+void trace(trace_level pTraceLevel, std::string message)
 {
-  if (trace_level <= debug_level)
+  if (pTraceLevel <= debug_level)
   {
     std::cerr << message << std::flush;
   }

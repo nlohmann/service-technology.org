@@ -20,14 +20,14 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/15 13:28:59 $
+ *          - last changed: \$Date: 2005/11/15 14:00:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *          
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  *          - 2005-11-09 (nlohmann) Added doxygen-comments.
  *          - 2005-11-10 (nlohmann) Added many using commands for std.
  *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an #id
@@ -36,7 +36,8 @@
  *            #PetriNet::makeLowLevel(). Added types #IN and #OUT to #place_type.
  *          - 2005-11-14 (nlohmann) Added function #PetriNet::longInformation()
  *            and #PetriNet::lolaOut().
- *          - 2005-11-15 (nlohmann) Added variable #lowLevel.
+ *          - 2005-11-15 (nlohmann) Added variable #lowLevel. Made a number of
+ *            functions private.
  */
 
 
@@ -275,30 +276,12 @@ class PetriNet
 
     /// Merges transitions given two transitions.
     void mergeTransitions(Transition *t1, Transition *t2);
-    
-    /// Removes all ingoing and outgoing arcs of a node.
-    void detachNode(Node *n);
-    
-    /// Removes a place from the net.
-    void removePlace(Place *p);
-
-    /// Removes a transition from the net.
-    void removeTransition(Transition *t);
-
-    /// Removes an arc from the net.
-    void removeArc(Arc *f);
 
     /// Finds place given an id.
     Place *findPlace(unsigned int id);
 
     /// Finds place given a role.
     Place *findPlaceRole(string role);
-
-    /// Calculates the preset of a node.
-    set<Node *> preset(Node *n);
-
-    /// Calculates the postset of a node.
-    set<Node *> postset(Node *n);
 
     /// Simplifies the Petri net.
     void simplify();
@@ -316,6 +299,24 @@ class PetriNet
     unsigned int id();
 
   private:
+    /// Removes a place from the net.
+    void removePlace(Place *p);
+
+    /// Removes a transition from the net.
+    void removeTransition(Transition *t);
+
+    /// Removes an arc from the net.
+    void removeArc(Arc *f);
+
+    /// Removes all ingoing and outgoing arcs of a node.
+    void detachNode(Node *n);
+
+    /// Calculates the preset of a node.
+    set<Node *> preset(Node *n);
+
+    /// Calculates the postset of a node.
+    set<Node *> postset(Node *n);
+    
     /// the list of places of the Petri net
     set<Place *> P;
     

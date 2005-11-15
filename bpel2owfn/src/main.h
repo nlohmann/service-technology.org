@@ -1,11 +1,24 @@
-/*
- * main.h
+/*!
+ * \file main.h
  *
- * Change log:
+ * \brief Main file header
+ *
+ * \author  
+ *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
+ *          - last changes of: \$Author: gierds $
+ *          
+ * \date
+ *          - created: 2005/11/09
+ *          - last changed: \$Date: 2005/11/15 15:14:24 $
  * 
- * date        | author        | changes
- * ---------------------------------------------------------------------
- *  2005-11-09 | Gierds        | added external variable debug_level
+ * \note    This file is part of the tool BPEL2oWFN and was created during the
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
+ *          for details.
+ *
+ * \version \$Revision: 1.8 $
+ *          - 2005-11-09 (gierds) Initial version.
+ *          - 2005-11-15 (gierds) Added Exception class.
  *
  */
 
@@ -25,6 +38,7 @@
 #include "bpel-unparse-petri.h" // pretty-printers
 #include "petrinet.h"           // Petri Net support
 #include "debug.h"		// debugging help
+#include "exception.h"		// exception handling
 
 /* defined by Bison */
 extern int yyparse();

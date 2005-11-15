@@ -11,25 +11,15 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/15 14:11:58 $
+ *          - last changed: \$Date: 2005/11/15 15:14:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
- *
- */
-/*!
- * debug.h
- *
- * Change log:
- * 
- * date        | author        | changes
- * ---------------------------------------------------------------------
- *  2005-11-09 | Gierds        | initial release
  *
  */
 

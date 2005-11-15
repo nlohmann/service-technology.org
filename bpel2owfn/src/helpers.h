@@ -30,6 +30,7 @@
 #include <set>
 #include <string>
 #include "petrinet.h"
+#include "exception.h"	// exception handling
 
 using namespace std;
 

@@ -12,14 +12,14 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2005/11/15 14:13:28 $
+ *          - last changed: \$Date: 2005/11/15 15:14:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  *          - 2005-11-11 (nlohmann) Initial version.
  *          - 2005-11-15 (gierds) Moved commandline evaluation functions from main.cc to here.
  *          Added LoLA command line arguments.
@@ -126,6 +126,7 @@ void parse_command_line(int argc, char* argv[])
           filename = (std::string) argv[argument_counter++];
           if (!(yyin = fopen(filename.c_str(), "r"))) 
 	  {
+            throw Exception(2,"File '" + filename + "' not found.\n");
             // fprintf(stderr, "  File '%s' not found.\n", filename);
             trace("  File '");
 	    trace(filename);

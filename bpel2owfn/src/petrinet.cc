@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/14 16:25:18 $
+ *          - last changed: \$Date: 2005/11/15 13:28:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -122,6 +122,7 @@ Place::Place(unsigned int myid, string role, place_type mytype)
 PetriNet::PetriNet()
 {
   trace(TRACE_DEBUG, "[PN]\tCreating a Petri net object.\n");
+  lowLevel = false;
   nextId = 0;
 }
 
@@ -486,7 +487,6 @@ void PetriNet::longInformation()
  */
 void PetriNet::drawDot()
 {
-  //makeLowLevel();    // (exprimental)
   //longInformation(); // (exprimental)
 
   trace(TRACE_DEBUG, "[PN]\tCreating DOT-output.\n");
@@ -553,7 +553,8 @@ void PetriNet::lolaOut()
 {
   trace(TRACE_DEBUG, "[PN]\tCreating LoLA-output.\n");
 
-  makeLowLevel();
+  if (!lowLevel)
+    makeLowLevel();
 
   // to be removed!
   std::ostream * lola_output = &std::cout;
@@ -963,6 +964,8 @@ void PetriNet::makeLowLevel()
 
   for (set<Arc *>::iterator f = readArcs.begin(); f != readArcs.end(); f++)
     newArc( (*f)->target, (*f)->source );
+
+  lowLevel = true;
 }
 
 

@@ -20,22 +20,23 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/14 16:25:18 $
+ *          - last changed: \$Date: 2005/11/15 13:28:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *          
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
  *          - 2005-11-09 (nlohmann) Added doxygen-comments.
  *          - 2005-11-10 (nlohmann) Added many using commands for std.
  *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an #id
  *            (unsigned int). Changed #P, #T, #F to be sets.
- *          - 2005-11-13 (nlohmann) Added functions #id, #makeLowLevel.
- *            Added types #IN and #OUT to #place_type.
- *          - 2005-11-14 (nlohmann) Added function #longInformation and
- *            #lolaOut.
+ *          - 2005-11-13 (nlohmann) Added functions #PetriNet::id(),
+ *            #PetriNet::makeLowLevel(). Added types #IN and #OUT to #place_type.
+ *          - 2005-11-14 (nlohmann) Added function #PetriNet::longInformation()
+ *            and #PetriNet::lolaOut().
+ *          - 2005-11-15 (nlohmann) Added variable #lowLevel.
  */
 
 
@@ -326,6 +327,9 @@ class PetriNet
 
     /// the id that will be assigned to the next node
     unsigned int nextId;
+
+    /// true if function #PetriNet::makeLowLevel() was called
+    bool lowLevel;
 };
 
 #endif

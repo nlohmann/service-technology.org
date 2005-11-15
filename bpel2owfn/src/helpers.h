@@ -57,6 +57,8 @@ extern bool mode_dot_2_file;
 extern bool mode_pretty_printer;
 /// print AST
 extern bool mode_ast;
+/// print the "low level" Petri Net
+extern bool mode_low_level_petri_net;
 
 
 /// debug level (in debug.cc)

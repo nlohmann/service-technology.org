@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/15 11:44:31 $
+ *          - last changed: \$Date: 2005/11/15 13:11:50 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *
  */
@@ -51,9 +51,23 @@ bool mode_dot_2_file = false;
 bool mode_pretty_printer = false;
 /// print AST
 bool mode_ast = false;
+/// print the "low level" Petri Net
+bool mode_low_level_petri_net = false;
 
 
-
+/**
+ * Entry point for BPEL2oWFN.
+ * Controls the behaviour of input and output.
+ *
+ * \parameter argc	number of command line arguments
+ * \parameter argv	array with command line arguments
+ *
+ * \returns Error code (0 if everything went well)
+ *
+ * \todo
+ * 	- integrate low level Petri Net option
+ * 
+ */
 int main( int argc, char *argv[])
 {
   /***
@@ -98,6 +112,8 @@ int main( int argc, char *argv[])
     TheNet->drawDot();
   }
 
+
+  
   //std::cout << std::endl;
 
   //TheNet->information();

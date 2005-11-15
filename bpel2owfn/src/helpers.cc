@@ -82,8 +82,11 @@ void print_help()
   trace("\n");
   trace("special Petri Net modes:\n");
   trace("\n");
-  trace("   -s   | --simplify         - outout a structural simplified Petri Net\n");
+  trace("   -s   | --simplify         - outpus a structural simplified Petri Net\n");
   trace("                               (implies option -pn)\n");
+  trace("   -l   | --low-level        - generate an abstract low level Petri Net\n");
+  trace("                               (see manual for further information)\n");
+  trace("                               (implies option -pn)\n"); 
   trace("   -D   | --dot              - output dot input\n");
   trace("                               (implies option -pn)\n");
   trace("   -D2F | --dot2file         - output dot input into file (same name as\n");
@@ -148,6 +151,13 @@ void parse_command_line(int argc, char* argv[])
 	mode_petri_net = true;
       }
 
+      // low level?
+      else if (! strcmp(argument_string, "-l") || ! strcmp(argument_string, "--low-level")) 
+      {
+        mode_low_level_petri_net = true;
+	mode_petri_net = true;
+      }
+
       // generate dot output
       else if (! strcmp(argument_string, "-D") || ! strcmp(argument_string, "--dot")) 
       {
@@ -205,6 +215,8 @@ void parse_command_line(int argc, char* argv[])
         print_help();
         exit(1);
       }
+
+      // unknown parameter
       else
       {
 	trace("Unknown option: " + ((std::string) argument_string) + "\n");
@@ -221,6 +233,43 @@ void parse_command_line(int argc, char* argv[])
     }
   }
 
+  // trace information about current mode
+  trace(TRACE_INFORMATION, "Modus operandi:\n");
+  if (mode_simplify_petri_net)
+  {
+    trace(TRACE_INFORMATION, " - create structural simlified Petri Net\n");
+  }
+  else if (mode_petri_net)
+  {
+    trace(TRACE_INFORMATION, " - create Petri Net\n");
+  }
+  if (mode_low_level_petri_net)
+  {
+    trace(TRACE_INFORMATION, "   --> abstract to low level\n");
+  }
+
+  if (mode_dot_2_file)
+  {
+    trace(TRACE_INFORMATION, " - output dot representation of the Petri Net to file"+dot_filename+"\n");
+  }
+  else if (mode_dot_petri_net)
+  {
+    trace(TRACE_INFORMATION, " - output dot representation of the Petri Net\n");
+  }
+  
+  if (mode_pretty_printer)
+  {
+    trace(TRACE_INFORMATION, " - output \"pretty\" XML\n");
+  }
+
+  if (mode_ast)
+  {
+    trace(TRACE_INFORMATION, " - output AST\n");
+  }
+  
+  trace(TRACE_INFORMATION, "\n");
+
+  // trace and check for some files to be created
   if ( filename != "")
   {
     trace(TRACE_INFORMATION, "Reading BPEL from file ");
@@ -232,6 +281,8 @@ void parse_command_line(int argc, char* argv[])
     {
       trace(TRACE_INFORMATION, "Creating file for dot output\n");
       std::string dotti_file = filename;
+      
+      // try to replace .bpel through .dot
       if ( dotti_file.rfind(".bpel", 0) >= (dotti_file.length() - 8) )
       {
         dotti_file = dotti_file.replace( (dotti_file.length() - 5), 5, ".dot");
@@ -241,13 +292,15 @@ void parse_command_line(int argc, char* argv[])
         dotti_file += ".dot";
       }
       
+      /// set dot filename
       dot_filename = dotti_file.c_str();
+      /// create dot file and point to it
       dot_output = new std::ofstream(dotti_file.c_str(), std::ofstream::out | std::ofstream::trunc);
     }
   }
       
-  // don't show debug messages from flex and Bison, unless highest debug mode is requested
-  if (debug_level == TRACE_VERY_DEBUG) 
+  // don't show debug messages from flex and Bison, unless special debug mode is requested
+  if (debug_level == -1) 
   {
     yydebug = 1;
     yy_flex_debug = 1;

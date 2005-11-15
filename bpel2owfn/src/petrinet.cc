@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/15 15:39:18 $
+ *          - last changed: \$Date: 2005/11/15 16:17:18 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -29,8 +29,8 @@
  *            call destructors of #Arc, #Place and #Transition. Added function
  *            #PetriNet::makeLowLevel. Added CVS-tags.
  *          - 2005-11-14 (nlohmann) Added new reduction rule. Added functions
- *            #PetriNet::longInformation() and #PetriNet::lolaOut().
- *
+ *            #PetriNet::longInformation() and #PetriNet::lolaOut(). Use
+ *            #Exception-class to signal errors.
  */
 
 
@@ -488,8 +488,6 @@ void PetriNet::longInformation()
  */
 void PetriNet::drawDot()
 {
-  //longInformation(); // (exprimental)
-
   trace(TRACE_DEBUG, "[PN]\tCreating DOT-output.\n");
   
   (*dot_output) << "digraph N {" << endl;
@@ -534,9 +532,8 @@ void PetriNet::drawDot()
   }
 
   (*dot_output) << "}" << endl;
-
-  //lolaOut(); // exprimental
 }
+
 
 
 
@@ -553,12 +550,10 @@ void PetriNet::lolaOut()
 {
   trace(TRACE_DEBUG, "[PN]\tCreating LoLA-output.\n");
 
+  // we can only create low-level nets for LoLA right now
   if (!lowLevel)
     makeLowLevel();
 
-  // to be removed!
-  //std::ostream * lola_output = &std::cout;
-  
   (*lola_output) << "{ Petri net created by BPEL2oWFN reading file '" << filename << "' }" << endl << endl;
   
   // places
@@ -639,7 +634,7 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
       " and " + intToString(t2->id) + "...\n");
 
   if (t1->guard != "" || t2->guard != "")
-    throw Exception(3, "Merging of guarded transition not yet supported!\n");
+    throw Exception(MERGING_ERROR, "Merging of guarded transition not yet supported!\n", typeid(this).name());
 	
   Node *t12 = newTransition();
   
@@ -688,7 +683,7 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
       " and " + intToString(p2->id) + "...\n");
 
   if(p1->type != LOW || p2->type != LOW)
-    throw Exception(3, "Merging of high-level places not yet supported!\n");
+    throw Exception(MERGING_ERROR, "Merging of high-level places not yet supported!\n", typeid(this).name());
   
   Node *p12 = newPlace();
   
@@ -803,7 +798,7 @@ Place *PetriNet::findPlace(unsigned int id)
     if ( (*p)->id == id)
       return *p;
   
-  throw Exception(3, "Node with id " + intToString(id) + " not found!\n");
+  throw Exception(NODE_NOT_FOUND, "Node with id " + intToString(id) + " not found!\n", typeid(this).name());
 }
 
 
@@ -823,7 +818,7 @@ Place *PetriNet::findPlaceRole(string role)
       if ( (*r).substr((*r).find_first_of(".")+1) == role )
 	return *p;
 
-  throw Exception(3, "Node with role '" + role + "' not found!\n");
+  throw Exception(NODE_NOT_FOUND, "Node with role '" + role + "' not found!\n", typeid(this).name());
 }
 
 

@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/15 15:14:24 $
+ *          - last changed: \$Date: 2005/11/15 15:47:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -76,7 +76,8 @@ bool mode_low_level_petri_net = false;
  *
  * \returns Error code (0 if everything went well)
  *
- * 
+ * \todo
+ * 	- outsource error handling and big switch for exception_id 
  */
 int main( int argc, char *argv[])
 {
@@ -158,7 +159,16 @@ int main( int argc, char *argv[])
   {
 
     trace("\nException occured!\n\n");	    
-    trace(e.error);
+
+    trace("Number:\n    ");
+    trace(""+ (int) e.id);
+    trace("\n");
+
+    trace("Error: \n    " + e.error + "\n");
+    if (e.information != "")
+    {
+      trace("Addtional information:\n    " + e.information + "\n");
+    }
 
     exit(e.id);
   }

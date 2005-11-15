@@ -14,19 +14,24 @@
  *          
  * \date
  *          - created: 2005/11/15
- *          - last changed: \$Date: 2005/11/15 15:23:03 $
+ *          - last changed: \$Date: 2005/11/15 15:47:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.1 $
+ * \version \$Revision: 1.2 $
  *          - 2005-11-11 (gierds) Initial version.
  *
  */
 
 #include <string>
+
+typedef enum
+{
+  FILE_NOT_FOUND = 2	/// "File not found" exception
+} exception_id;
 
 /**
  * \class	Exception
@@ -43,14 +48,16 @@ class Exception
 {
   public:
     /// error number
-    int id;
+    exception_id id;
     /// error message
     std::string error;
     /// additional information
     std::string information;
 
-    /// Constructur with mandatory parameters #id and #error
-    Exception(int myid, std::string myerror);
+    /// Constructur with mandatory parameters #myid and #myerror
+    Exception(exception_id myid, std::string myerror);
+    /// Constructur with mandatory parameters #myid, #myerror and #myinformation
+    Exception(exception_id myid, std::string myerror, std::string myinformation);
     
 };
 

@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/15 13:40:05 $
+ *          - last changed: \$Date: 2005/11/15 15:39:18 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.25 $
+ * \version \$Revision: 1.26 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -548,7 +548,6 @@ void PetriNet::drawDot()
  *       - add support for reset-arcs
  *       - add support for high-level constructs
  *       - add markings
- *       - add file-output
  */
 void PetriNet::lolaOut()
 {
@@ -633,17 +632,14 @@ void PetriNet::lolaOut()
  * 
  * \todo
  *       - take care of read and reset arcs
- *       - call an error-function to signal error 
  */
 void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 {
   trace(TRACE_VERY_DEBUG, "[PN]\tMerging transitions " + intToString(t1->id) +
       " and " + intToString(t2->id) + "...\n");
+
   if (t1->guard != "" || t2->guard != "")
-  {
-    cerr << "[PN]\tMerging of guarded transition not yet supported!" << endl;
-    return;
-  }
+    throw Exception(3, "Merging of guarded transition not yet supported!\n");
 	
   Node *t12 = newTransition();
   
@@ -685,17 +681,14 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
  * \todo
  *       - take care of read and reset arcs
  *       - take care of markings
- *       - call an error-function to signal error 
  */
 void PetriNet::mergePlaces(Place *p1, Place *p2)
 {
   trace(TRACE_VERY_DEBUG, "[PN]\tMerging places " + intToString(p1->id) +
       " and " + intToString(p2->id) + "...\n");
+
   if(p1->type != LOW || p2->type != LOW)
-  {
-    cerr << "[PN]\tMerging of high-level places not yet supported!" << endl;
-    return;
-  }
+    throw Exception(3, "Merging of high-level places not yet supported!\n");
   
   Node *p12 = newPlace();
   
@@ -803,18 +796,14 @@ set<Node *> PetriNet::postset(Node *n)
  *
  * \param  id the id
  * \return a pointer to the place or NULL if the place was not found.
- *
- * \todo
- *       - call an error-function to signal error
  */
 Place *PetriNet::findPlace(unsigned int id)
 {
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
     if ( (*p)->id == id)
       return *p;
-
-  cerr << "Node with id " << id << " not found!" << endl;  
-  return NULL;
+  
+  throw Exception(3, "Node with id " + intToString(id) + " not found!\n");
 }
 
 
@@ -826,9 +815,6 @@ Place *PetriNet::findPlace(unsigned int id)
  *
  * \param  role the demanded role
  * \return a pointer to the place or NULL if the place was not found.
- *
- * \todo
- *       - call an error-function to signal error
  */
 Place *PetriNet::findPlaceRole(string role)
 {
@@ -837,8 +823,7 @@ Place *PetriNet::findPlaceRole(string role)
       if ( (*r).substr((*r).find_first_of(".")+1) == role )
 	return *p;
 
-  cerr << "Node with role '" << role << "' not found!" << endl;  
-  return NULL;
+  throw Exception(3, "Node with role '" + role + "' not found!\n");
 }
 
 
@@ -859,7 +844,6 @@ Place *PetriNet::findPlaceRole(string role)
  * \todo
  *       - improve performance
  *       - implement more reduction rules
- *       - Is second rule correct?
  *
  */
 void PetriNet::simplify()
@@ -938,7 +922,6 @@ void PetriNet::simplify()
  * \todo
  *       - take care of markings
  *       - take care of places (#TIME, #PROPERTY, #IN, #OUT)
- *       - add command-line parameter -ll / --low-level
  */
 void PetriNet::makeLowLevel()
 {

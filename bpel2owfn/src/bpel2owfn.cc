@@ -7,21 +7,22 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/15 15:47:24 $
+ *          - last changed: \$Date: 2005/11/15 16:33:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.25 $
+ * \version \$Revision: 1.26 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
+ *          - 2005-11-15 (nlohmann) Call Exception::info() to signal error.
  *
  */
 
@@ -71,8 +72,8 @@ bool mode_low_level_petri_net = false;
  * Entry point for BPEL2oWFN.
  * Controls the behaviour of input and output.
  *
- * \parameter argc	number of command line arguments
- * \parameter argv	array with command line arguments
+ * \param argc	number of command line arguments
+ * \param argv	array with command line arguments
  *
  * \returns Error code (0 if everything went well)
  *
@@ -157,19 +158,7 @@ int main( int argc, char *argv[])
   }
   catch (Exception e)
   {
-
-    trace("\nException occured!\n\n");	    
-
-    trace("Number:\n    ");
-    trace(""+ (int) e.id);
-    trace("\n");
-
-    trace("Error: \n    " + e.error + "\n");
-    if (e.information != "")
-    {
-      trace("Addtional information:\n    " + e.information + "\n");
-    }
-
+    e.info();
     exit(e.id);
   }
 

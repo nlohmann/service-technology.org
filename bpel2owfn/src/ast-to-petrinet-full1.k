@@ -8,9 +8,12 @@
  * associated Petri net pattern followed by neccessary merge operations.
  * 
  * \author  
- *          - Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          - last changes of: \$Author: nlohmann $
  *          
- * \date    2005-11-11
+ * \date    
+ *          - created 2005-11-01
+ *          - last changed: \$Date: 2005/11/16 16:41:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -26,11 +29,13 @@
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
  *          - 2005-11-15 (nlohmann) Removed prefix "empty" etc.
+ *          - 2005-11-16 (nlohmann) Added pattern for <while> and <flow>.
  * 
  * \todo
  *          - find a simple "merge-language" to ease the definition of new
  *            patterns
  *          - complete initial pattern database
+ *          - overwork <flow> pattern, i.e. enhance the class #PetriNet.
  *
  * \bug
  *          - conversion crashes if unimplemented patterns are used inside a
@@ -100,21 +105,21 @@ Process(a,b,c,d,e,f,g,h) ->
       Node *p2 = TheNet->newPlace(prefix + "p2");
       Node *p3 = TheNet->newPlace(prefix + "p3");
       Node *p4 = TheNet->newPlace(prefix + "p4");
-      Node *p5 = TheNet->newPlace(prefix + "fault_in");
-      Node *p6 = TheNet->newPlace(prefix + "p6");
+      Node *p5 = TheNet->newPlace(prefix + "fault_in", DATA);
+      Node *p6 = TheNet->newPlace(prefix + "p6", DATA);
       Node *p7 = TheNet->newPlace(prefix + "fault");
-      Node *p8 = TheNet->newPlace(prefix + "faultSave");
+      Node *p8 = TheNet->newPlace(prefix + "faultSave", DATA);
       Node *p9 = TheNet->newPlace(prefix + "Active");
       Node *p10 = TheNet->newPlace(prefix + "!Active");
       Node *p11 = TheNet->newPlace(prefix + "p11");
       Node *p12 = TheNet->newPlace(prefix + "final");
       Node *p13 = TheNet->newPlace(prefix + "terminate");
       Node *p14 = TheNet->newPlace(prefix + "!Faulted");
-      Node *p15 = TheNet->newPlace(prefix + "rethrow");
+      Node *p15 = TheNet->newPlace(prefix + "rethrow", DATA);
       Node *p16 = TheNet->newPlace(prefix + "Ended");
       Node *p17 = TheNet->newPlace(prefix + "Compensated");
-      Node *p18 = TheNet->newPlace(prefix + "p18");
-      Node *p19 = TheNet->newPlace(prefix + "p19");
+      Node *p18 = TheNet->newPlace(prefix + "p18", DATA);
+      Node *p19 = TheNet->newPlace(prefix + "p19", DATA);
       Node *p20 = TheNet->newPlace(prefix + "!Ended");
       Node *p21 = TheNet->newPlace(prefix + "stop");
       Node *p22 = TheNet->newPlace(prefix + "stopped");
@@ -178,8 +183,8 @@ Process(a,b,c,d,e,f,g,h) ->
       TheNet->newArc(t11, p23);
       TheNet->newArc(p19, t12, "x");
       TheNet->newArc(p24, t12);
-      TheNet->newArc(t12, p16);      
-      TheNet->newArc(t12, p12);      
+      TheNet->newArc(t12, p16);
+      TheNet->newArc(t12, p12);
     }
       a b c d e f g h
     {
@@ -305,7 +310,7 @@ Receive(a,b) ->
       TheNet->newArc(p1, t4);
       TheNet->newArc(p5, t4);
       TheNet->newArc(t4, p6);
-      TheNet->newArc(p2, t5, "(X,CS)");      
+      TheNet->newArc(p2, t5, "(X,CS)");
       TheNet->newArc(p5, t5);
       TheNet->newArc(t5, p6);
       TheNet->newArc(p4, t6);
@@ -353,6 +358,59 @@ Receive(a,b) ->
   FLOW
 ******************************************************************************/
 
+activityFlow(Flow(a,b,c)) ->
+  [petrinet:
+    {
+      std::string prefix = intToString($0->id->value) + ".";
+
+      Node *p7 = TheNet->newPlace(prefix + "initial");
+      Node *p8 = TheNet->newPlace(prefix + "final");
+      Node *p9 = TheNet->newPlace(prefix + "running");
+      Node *p15 = TheNet->newPlace(prefix + "stop");
+      Node *p16 = TheNet->newPlace(prefix + "stopped");
+
+      Node *t2 = TheNet->newTransition(prefix + "t2");
+      Node *t3 = TheNet->newTransition(prefix + "t3");
+      Node *t4 = TheNet->newTransition(prefix + "t4");
+      Node *t5 = TheNet->newTransition(prefix + "t5");
+      Node *t6 = TheNet->newTransition(prefix + "innerStopped");
+      Node *t7 = TheNet->newTransition(prefix + "t7");
+
+      TheNet->newArc(p7, t2);
+      TheNet->newArc(t2, p9);
+
+      TheNet->newArc(t3, p8);
+      TheNet->newArc(p9, t3);
+
+      TheNet->newArc(p7, t4);
+      TheNet->newArc(p15, t4);
+      TheNet->newArc(t4, p16);
+
+      TheNet->newArc(p9, t5);
+      TheNet->newArc(p15, t5);
+
+      TheNet->newArc(t6, p16);
+
+      TheNet->newArc(p8, t7);
+      TheNet->newArc(p15, t7);
+      TheNet->newArc(t7, p16);
+    }
+    a b c
+    {
+      foreach (e; activity_list c)
+      {
+	Place *initial = TheNet->findPlace(intToString(e->id->value) + ".initial");
+	Place *stop    = TheNet->findPlace(intToString(e->id->value) + ".stop");
+	Place *stopped = TheNet->findPlace(intToString(e->id->value) + ".stopped");
+	Place *final   = TheNet->findPlace(intToString(e->id->value) + ".final");
+	TheNet->newArc(t2, initial);
+	TheNet->newArc(t5, stop);
+	TheNet->newArc(stopped, t6);
+	TheNet->newArc(final, t3);
+      }	
+    }
+  ]  
+;
 
 /******************************************************************************
   SWITCH
@@ -363,6 +421,63 @@ Receive(a,b) ->
   WHILE
 ******************************************************************************/
 
+activityWhile(While(a,b)) ->
+  [petrinet:
+    {
+      std::string prefix = intToString($0->id->value) + ".";
+
+      Node *p1 = TheNet->newPlace(prefix + "initial");
+      Node *p2 = TheNet->newPlace(prefix + "running", DATA);
+      Node *p3 = TheNet->newPlace(prefix + "final");
+      Node *p4 = TheNet->newPlace(prefix + "p4");
+      Node *p5 = TheNet->newPlace(prefix + "p5");
+      Node *p6 = TheNet->newPlace(prefix + "p6");
+      Node *p7 = TheNet->newPlace(prefix + "stop");
+      Node *p8 = TheNet->newPlace(prefix + "stopped");
+      Node *p9 = TheNet->newPlace(prefix + "failed", DATA);
+      Node *t1 = TheNet->newTransition(prefix + "t1", "!cond & !guard");
+      Node *t2 = TheNet->newTransition(prefix + "t2");
+      Node *t3 = TheNet->newTransition(prefix + "t3", "cond & !guard");
+      Node *t4 = TheNet->newTransition(prefix + "t4");
+      Node *t5 = TheNet->newTransition(prefix + "t5", "guard");
+      Node *t6 = TheNet->newTransition(prefix + "t6");
+      Node *t7 = TheNet->newTransition(prefix + "t7");
+      Node *t8 = TheNet->newTransition(prefix + "t8");
+      Node *t9 = TheNet->newTransition(prefix + "t9");
+      
+      TheNet->newArc(p2, t1, "x");
+      TheNet->newArc(t1, p3);
+      TheNet->newArc(p1, t2);
+      TheNet->newArc(t2, p2, "x");
+      TheNet->newArc(p2, t3, "x");
+      TheNet->newArc(t3, p4);
+      TheNet->newArc(t4, p1);
+      TheNet->newArc(p5, t4);
+      TheNet->newArc(p2, t5, "x");
+      TheNet->newArc(t5, p6);
+      TheNet->newArc(t5, p9, "fault");
+      TheNet->newArc(p1, t6);
+      TheNet->newArc(p7, t6);
+      TheNet->newArc(t6, p8);
+      TheNet->newArc(p2, t7, "x");
+      TheNet->newArc(p7, t7);
+      TheNet->newArc(t7, p8);
+      TheNet->newArc(p6, t8);
+      TheNet->newArc(p7, t8);
+      TheNet->newArc(t8, p8);
+      TheNet->newArc(p3, t9);
+      TheNet->newArc(p7, t9);
+      TheNet->newArc(t9, p8);
+    }
+    a b
+    {
+      TheNet->mergePlaces(b, ".initial", $0, ".p4");
+      TheNet->mergePlaces(b, ".final", $0, ".p5");
+      TheNet->mergePlaces(b, ".stop", $0, ".stop");
+      TheNet->mergePlaces(b, ".stopped", $0, ".stopped");
+    }
+  ]  
+;
 
 /******************************************************************************
   SEQUENCE

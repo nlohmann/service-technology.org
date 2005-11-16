@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/15 16:17:18 $
+ *          - last changed: \$Date: 2005/11/16 10:38:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -31,6 +31,9 @@
  *          - 2005-11-14 (nlohmann) Added new reduction rule. Added functions
  *            #PetriNet::longInformation() and #PetriNet::lolaOut(). Use
  *            #Exception-class to signal errors.
+ *          - 2005-11-15 (nlohmann) Added a mapping for faster access to Nodes
+ *            given a role.
+ *
  */
 
 
@@ -39,6 +42,10 @@
 
 
 #include "petrinet.h"
+
+/// Mapping of roles to nodes of the Petri net.
+map <string, Node*> roleMap;
+
 
 
 extern int debug_level;           // defined in debug.cc
@@ -176,6 +183,9 @@ Place *PetriNet::newPlace(string role, place_type mytype)
   
   Place *p = new Place(getId(), role, mytype);
   P.insert(p);
+
+  if (role != "")
+    roleMap[role] = p;
 
   if (P.size() % 100 == 0)
     trace(TRACE_INFORMATION, "[PN]\t" + information() + "\n");
@@ -639,10 +649,16 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
   Node *t12 = newTransition();
   
   for (set<string>::iterator role = t1->history.begin(); role != t1->history.end(); role++)
+  {
+    roleMap[*role] = t12;
     t12->history.insert(*role);
+  }
   
   for (set<string>::iterator role = t2->history.begin(); role != t2->history.end(); role++)
+  {
+    roleMap[*role] = t12;
     t12->history.insert(*role);
+  }
   
   set<Node *> pre12 = setUnion(preset(t1), preset(t2));
   set<Node *> post12 = setUnion(postset(t1), postset(t2));
@@ -688,10 +704,16 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
   Node *p12 = newPlace();
   
   for (set<string>::iterator role = p1->history.begin(); role != p1->history.end(); role++)
+  {
     p12->history.insert(*role);
+    roleMap[*role] = p12;
+  }
   
   for (set<string>::iterator role = p2->history.begin(); role != p2->history.end(); role++)
+  {
     p12->history.insert(*role);
+    roleMap[*role] = p12;
+  }
 
   set<Node *> pre12 = setUnion(preset(p1), preset(p2));
   set<Node *> post12 = setUnion(postset(p1), postset(p2));
@@ -716,7 +738,7 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
  */
 void PetriNet::mergePlaces(string role1, string role2)
 {
-  mergePlaces(findPlaceRole(role1), findPlaceRole(role2));
+  mergePlaces(findPlace(role1), findPlace(role2));
 }
 
 
@@ -729,8 +751,10 @@ void PetriNet::mergePlaces(string role1, string role2)
  * and pass the search request.
  * 
  * \param act1  activity of the AST represented by the first place
- * \param role1 string describing the role of the first place
- * \param act2  activity of the AST represented by the second place
+ * \param role1 string describing the role of the first place (beginning with a
+ *              period: .empty
+ * \param act2  activity of the AST represented by the second place (beginning
+ *              with a period: .empty
  * \param role2 string describing the role of the second place
  */
 void PetriNet::mergePlaces(kc::impl_activity* act1, string role1, kc::impl_activity* act2, string role2)
@@ -787,38 +811,29 @@ set<Node *> PetriNet::postset(Node *n)
 
 
 /*!
- * Finds a place of the Petri net given the id of the place.
- *
- * \param  id the id
- * \return a pointer to the place or NULL if the place was not found.
- */
-Place *PetriNet::findPlace(unsigned int id)
-{
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
-    if ( (*p)->id == id)
-      return *p;
-  
-  throw Exception(NODE_NOT_FOUND, "Node with id " + intToString(id) + " not found!\n", typeid(this).name());
-}
-
-
-
-
-
-/*!
  * Finds a place of the Petri net given a role the place fills or filled.
  *
  * \param  role the demanded role
- * \return a pointer to the place or NULL if the place was not found.
+ * \return a pointer to the place or throw an exception if the place was not
+ *         found.
  */
-Place *PetriNet::findPlaceRole(string role)
+Place *PetriNet::findPlace(string role)
 {
+  Place *result = (Place *)roleMap[role];
+
+  if (result == NULL)
+    throw Exception(NODE_NOT_FOUND, "Node with role '" + role + "' not found!\n", typeid(this).name());
+  else
+    return result;
+
+  /*
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
     for (set<string>::iterator r = (*p)->history.begin(); r != (*p)->history.end(); r++)
-      if ( (*r).substr((*r).find_first_of(".")+1) == role )
+      if ((*r).substr((*r).find_first_of(".")+1) == role)
 	return *p;
 
   throw Exception(NODE_NOT_FOUND, "Node with role '" + role + "' not found!\n", typeid(this).name());
+  */
 }
 
 
@@ -875,8 +890,8 @@ void PetriNet::simplify()
     {
       string id1 = *((*(preset(*t).begin()))->history.begin());
       string id2 = *((*(postset(*t).begin()))->history.begin());
-      id1 = id1.substr(id1.find_first_of(".")+1); // cut prefix "empty."
-      id2 = id2.substr(id2.find_first_of(".")+1);
+      //id1 = id1.substr(id1.find_first_of(".")+1); // cut prefix "empty."
+      //id2 = id2.substr(id2.find_first_of(".")+1);
       placeMerge.push_back(pair<string, string>(id1, id2));
       sequenceTransition.push_back(*t);
     }

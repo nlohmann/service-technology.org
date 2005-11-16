@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/16 15:48:28 $
+ *          - last changed: \$Date: 2005/11/16 16:10:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.29 $
+ * \version \$Revision: 1.30 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -31,7 +31,7 @@
  *          - 2005-11-14 (nlohmann) Added new reduction rule. Added functions
  *            #PetriNet::longInformation() and #PetriNet::lolaOut(). Use
  *            #Exception-class to signal errors.
- *          - 2005-11-15 (nlohmann) Added a mapping for faster access to Nodes
+ *          - 2005-11-16 (nlohmann) Added a mapping for faster access to Nodes
  *            given a role.
  *
  */
@@ -538,7 +538,7 @@ void PetriNet::drawDot()
     {
       (*dot_output) << " " << (*t)->id << "\t[";
       (*dot_output) << " shape=record label=\"{t" << (*t)->id << "|{"
-	<< (*t)->guard << "}}\"];" << endl;
+	<< (*t)->guard << "}}\" style=filled fillcolor=green];" << endl;
     }
     else
       (*dot_output) << " " << (*t)->id << "\t[label=\"t" << (*t)->id << "\"];" << endl;
@@ -717,13 +717,12 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
  */
 void PetriNet::mergePlaces(Place *p1, Place *p2)
 {
-  if (p1 == p2) 
-    return;
-    //throw Exception(MERGING_ERROR, "Merging of same places undefined!\n", typeid(this).name());
-
-    
   trace(TRACE_VERY_DEBUG, "[PN]\tMerging places " + intToString(p1->id) +
       " and " + intToString(p2->id) + "...\n");
+  
+  if (p1 == p2)
+    return;
+    //throw Exception(MERGING_ERROR, "Merging of same places undefined!\n", typeid(this).name());
 
   if(p1->type != LOW || p2->type != LOW)
     throw Exception(MERGING_ERROR, "Merging of high-level places not yet supported!\n", typeid(this).name());
@@ -882,6 +881,8 @@ Place *PetriNet::findPlace(string role)
  * \todo
  *       - improve performance
  *       - implement more reduction rules
+ *
+ * \bug repeated excecution fails
  *
  */
 void PetriNet::simplify()

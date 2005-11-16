@@ -12,14 +12,14 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2005/11/16 10:49:16 $
+ *          - last changed: \$Date: 2005/11/16 11:05:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  *          - 2005-11-11 (nlohmann) Initial version.
  *          - 2005-11-15 (gierds) Moved commandline evaluation functions from main.cc to here.
  *            Added LoLA command line arguments.
@@ -440,6 +440,8 @@ void cleanup()
     trace(TRACE_INFORMATION," + Closing LoLA output file: " + lola_filename + "\n");
     (*lola_output) << std::flush;
     ((std::ofstream*)lola_output)->close();
+    delete(lola_output);
+    lola_output = NULL;
   }
 
   if (dot_filename != "")
@@ -447,6 +449,8 @@ void cleanup()
     trace(TRACE_INFORMATION," + Closing dot output file: " + dot_filename + "\n");
     (*dot_output) << std::flush;
     ((std::ofstream*)dot_output)->close();
+    delete(dot_output);
+    dot_output = NULL;
   }
 
   if (mode_petri_net) 

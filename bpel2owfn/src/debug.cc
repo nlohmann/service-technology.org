@@ -1,13 +1,24 @@
-/*
- * debug.cc
+/*!
+ * \file debug.cc
  *
- * Change log:
+ * \brief Some debugging tools for BPEL2oWFN
+ *
+ * \author  
+ *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
+ *          - last changes of: \$Author: gierds $
+ *          
+ * \date
+ *          - created: 2005/11/09
+ *          - last changed: \$Date: 2005/11/16 11:05:33 $
  * 
- * date        | author        | changes
- * ---------------------------------------------------------------------
- *  2005-11-09 | Gierds        | initial release:
- *             |               |  - simple trace methods
- *             |               |  - contains yyerror function
+ * \note    This file is part of the tool BPEL2oWFN and was created during the
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
+ *          for details.
+ *
+ * \version \$Revision: 1.5 $
+ *          - 2005-11-09 (gierds) Initial release.
+ *            Simple trace methods and new place for yyerror().
  *
  */
 
@@ -67,7 +78,6 @@ int yyerror(const char* msg)
     fclose(yyin);
   }
 
-
   trace("-------------------------------------------------------------------------------\n");
   
   int firstShowedLine = ((yylineno-3)>0)?(yylineno-3):1;
@@ -89,8 +99,8 @@ int yyerror(const char* msg)
   trace("-------------------------------------------------------------------------------\n");
   
   inputFile.close();
-  
-  
-  exit(1);
+ 
+  error();
+  return 1;
 }
 

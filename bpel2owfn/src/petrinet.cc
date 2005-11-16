@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/16 10:38:09 $
+ *          - last changed: \$Date: 2005/11/16 15:48:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.28 $
+ * \version \$Revision: 1.29 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -40,7 +40,6 @@
 
 
 
-
 #include "petrinet.h"
 
 /// Mapping of roles to nodes of the Petri net.
@@ -51,6 +50,7 @@ map <string, Node*> roleMap;
 extern int debug_level;           // defined in debug.cc
 extern ostream *dot_output;       // defined in main.c
 extern ostream *lola_output;      // defined in main.c
+extern ostream *info_output;      // defined in main.c
 extern string filename;           // defined in main.c
 
 
@@ -191,6 +191,14 @@ Place *PetriNet::newPlace(string role, place_type mytype)
     trace(TRACE_INFORMATION, "[PN]\t" + information() + "\n");
   
   return p;
+}
+
+
+
+
+
+void PetriNet::markPlace(Place *p)
+{
 }
 
 
@@ -430,52 +438,53 @@ string PetriNet::information()
  *       - add command-line parameter -i / --information
  *       - write information to file
  */
-void PetriNet::longInformation()
+void PetriNet::printInformation()
 {
   // the places
-  trace("PLACES:\n");
-  trace("ID\tTYPE\t\tROLES\n");
+  (*info_output) << "PLACES:\n";
+  (*info_output) << "ID\tTYPE\t\tROLES\n";
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
-    trace("p" + intToString((*p)->id) + "\t");
+    (*info_output) << "p" << ((*p)->id) << "\t";
 
     switch ((*p)->type)
     {
-      case(LOW):      { trace("low-level"); break; }
-      case(TIME):     { trace("time"); break; }
-      case(PROPERTY): { trace("property"); break; }
-      case(MESSAGE):  { trace("message"); break; }
-      default:        { trace("other"); }
+      case(LOW):      { (*info_output) << "low-level"; break; }
+      case(TIME):     { (*info_output) << "time"; break; }
+      case(PROPERTY): { (*info_output) << "property"; break; }
+      case(MESSAGE):  { (*info_output) << "message"; break; }
+      case(DATA):     { (*info_output) << "data"; break; }
+      default:        { (*info_output) << "other"; }
     }
 
     for (set<string>::iterator role = (*p)->history.begin(); role != (*p)->history.end(); role++)
     {
       if (role == (*p)->history.begin())
-	trace("\t" + *role + "\n");
+	(*info_output) << "\t" + *role + "\n";
       else
-	trace("\t\t\t" + *role + "\n");
+	(*info_output) << "\t\t\t" + *role + "\n";
     }
   }
   
   
   // the transitions
-  trace("\nTRANSITIONS:\n");
-  trace("ID\tGUARD\t\tROLES\n");
+  (*info_output) << "\nTRANSITIONS:\n";
+  (*info_output) << "ID\tGUARD\t\tROLES\n";
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
   {
-    trace("t" + intToString((*t)->id) + "\t");
+    (*info_output) << "t" + intToString((*t)->id) + "\t";
     
     if ((*t)->guard != "")
-      trace("{" + (*t)->guard + "} ");
+      (*info_output) << "{" + (*t)->guard + "} ";
     else
-      trace("\t");
+      (*info_output) << "\t";
     
     for (set<string>::iterator role = (*t)->history.begin(); role != (*t)->history.end(); role++)
     {
       if (role == (*t)->history.begin())
-	trace("\t" + *role + "\n");
+	(*info_output) << "\t" + *role + "\n";
       else
-	trace("\t\t\t" + *role + "\n");
+	(*info_output) << "\t\t\t" + *role + "\n";
     }
   }
 }
@@ -508,7 +517,18 @@ void PetriNet::drawDot()
   // list the places
   (*dot_output) << " node [shape=circle, fixedsize];" << endl;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
-    (*dot_output) << " " << (*p)->id << "\t[label=\"p" << (*p)->id << "\"];" << endl;
+  {
+    (*dot_output) << " " << (*p)->id << "\t[label=\"p" << (*p)->id << "\"";
+
+    // color high-level places
+    switch ((*p)->type)
+    {
+      case (DATA): { (*dot_output) << " style=filled fillcolor=green"; break; }
+      default:;
+    }
+      
+    (*dot_output) << "];" << endl;
+  }
 
   // list the transitions
   (*dot_output) << endl << " node [shape=box, fixedsize];" << endl;
@@ -671,6 +691,8 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
   
   removeTransition(t1);
   removeTransition(t2);
+
+  trace(TRACE_VERY_DEBUG, "[PN]\tMerging done.\n");
 }
 
 
@@ -695,6 +717,11 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
  */
 void PetriNet::mergePlaces(Place *p1, Place *p2)
 {
+  if (p1 == p2) 
+    return;
+    //throw Exception(MERGING_ERROR, "Merging of same places undefined!\n", typeid(this).name());
+
+    
   trace(TRACE_VERY_DEBUG, "[PN]\tMerging places " + intToString(p1->id) +
       " and " + intToString(p2->id) + "...\n");
 
@@ -726,6 +753,7 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
   
   removePlace(p1);
   removePlace(p2);
+  trace(TRACE_VERY_DEBUG, "[PN]\tMerging done.\n");
 }
 
 
@@ -890,8 +918,6 @@ void PetriNet::simplify()
     {
       string id1 = *((*(preset(*t).begin()))->history.begin());
       string id2 = *((*(postset(*t).begin()))->history.begin());
-      //id1 = id1.substr(id1.find_first_of(".")+1); // cut prefix "empty."
-      //id2 = id2.substr(id2.find_first_of(".")+1);
       placeMerge.push_back(pair<string, string>(id1, id2));
       sequenceTransition.push_back(*t);
     }
@@ -918,9 +944,10 @@ void PetriNet::simplify()
  * Converts the created Petri net to low-level representation. Therefore the
  * following steps are taken:
  *
+ * - Convert all places to low-level places.
  * - Remove all transition guards -- decisions are now taken
  *   non-deterministically.
- * - Convert places of type #TIME and #PROPERTY to #LOW. (todo)
+ * - Convert places of type #DATA, #TIME and #PROPERTY to #LOW. (todo)
  * - Convert places of type #MESSAGE to #IN resp. #OUT. (todo)
  * - Remove arc inscriptions -- all places are low-level places anyway.
  * - Convert read arcs to loops.
@@ -936,6 +963,10 @@ void PetriNet::simplify()
 void PetriNet::makeLowLevel()
 {
   trace(TRACE_INFORMATION, "Converting Petri net to low-level...\n");
+
+  // convert places to low-level places
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+    (*p)->type = LOW;
 
   
   // remove transition guards

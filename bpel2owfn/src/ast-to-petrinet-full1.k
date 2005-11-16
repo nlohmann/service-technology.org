@@ -25,6 +25,7 @@
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
+ *          - 2005-11-15 (nlohmann) Removed prefix "empty" etc.
  * 
  * \todo
  *          - find a simple "merge-language" to ease the definition of new
@@ -239,7 +240,7 @@ Process(a,b,c,d,e,f,g,h) ->
 Empty(a) ->
   [petrinet:
     {
-      std::string prefix = "empty." + intToString($0->id->value) + ".";
+      std::string prefix = intToString($0->id->value) + ".";
       
       Node *p1 = TheNet->newPlace(prefix + "initial");
       Node *p2 = TheNet->newPlace(prefix + "final");
@@ -277,7 +278,7 @@ Empty(a) ->
 Receive(a,b) ->
   [petrinet:
     {
-      std::string prefix = "receive." + intToString($0->id->value) + ".";
+      std::string prefix = intToString($0->id->value) + ".";
       
       Node *p1 = TheNet->newPlace(prefix + "initial");
       Node *p2 = TheNet->newPlace(prefix + "running");
@@ -370,7 +371,7 @@ Receive(a,b) ->
 activitySequence(Sequence(a,b)) ->
   [petrinet:
     {
-      std::string prefix = "sequence." + intToString($0->id->value) + ".";
+      std::string prefix = intToString($0->id->value) + ".";
 
       Node *p2 = TheNet->newPlace(prefix + "initial");
       Node *p9 = TheNet->newPlace(prefix + "final");

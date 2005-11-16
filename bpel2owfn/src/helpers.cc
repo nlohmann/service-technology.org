@@ -12,18 +12,19 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2005/11/16 10:32:25 $
+ *          - last changed: \$Date: 2005/11/16 10:49:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  *          - 2005-11-11 (nlohmann) Initial version.
  *          - 2005-11-15 (gierds) Moved commandline evaluation functions from main.cc to here.
  *            Added LoLA command line arguments.
  *          - 2005-11-16 (gierds) Added error() and cleanup() functions.
+ *            Added extra command line parameters to debug flex and bison.
  */
 
 
@@ -72,12 +73,14 @@ void print_help()
   trace("BPEL2oWFN\n");
   trace("---------\n");
   trace("Options: \n");
-  trace("   -f | --file <filename>    - read input from <filename>,\n");
-  trace("                               if this parameter is omitted, input is read from\n");
-  trace("                               STDIN\n");
-  trace("   -d | -dd | -ddd | -dddd | - set debug level\n");
-  trace("        --debug [1..4]         ... some more information soon\n");
-  trace("   -h | --help               - print this screen\n");
+  trace("   -f  | --file <filename>    - read input from <filename>,\n");
+  trace("                                if this parameter is omitted, input is read from\n");
+  trace("                                STDIN\n");
+  trace("   -d  | -dd | -ddd | -dddd | - set debug level\n");
+  trace("         --debug [1..4]         ... some more information soon\n");
+  trace("   -df | --debug-flex         - enable flex' debug mode\n");
+  trace("   -dy | --debug-yacc         - enable yacc's/bison's debug mode\n");
+  trace("   -h  | --help               - print this screen\n");
   trace("\n");
   trace("\n");
   trace("output modes (choose at maximum one, default is just parsing):\n");
@@ -114,6 +117,9 @@ void print_help()
 
 void parse_command_line(int argc, char* argv[])
 {
+  yydebug = 0;
+  yy_flex_debug = 0;
+
   if (argc > 1)
   {
     int argument_counter = 1;
@@ -238,6 +244,17 @@ void parse_command_line(int argc, char* argv[])
 	}
       }
 
+      // debug flex
+      else if (! strcmp(argument_string, "-df") || ! strcmp(argument_string, "--debug-flex")) 
+      {
+        yy_flex_debug = 1;
+      }
+      // debug yacc/bison
+      else if (! strcmp(argument_string, "-dy") || ! strcmp(argument_string, "--debug-yacc")) 
+      {
+        yydebug = 1;
+      }
+
       // help
       else if (! strcmp(argument_string, "-h") || ! strcmp(argument_string, "-?") || ! strcmp(argument_string, "--help")) 
       {
@@ -356,20 +373,22 @@ void parse_command_line(int argc, char* argv[])
   {
     trace(TRACE_INFORMATION, " - output AST\n");
   }
+
+  if (debug_level > 0)
+  {
+    trace(TRACE_INFORMATION, " - debug level is set to " + intToString(debug_level) + "\n");
+  }
+  
+  if (yy_flex_debug > 0)
+  {
+    trace(TRACE_INFORMATION, " - special debug mode for flex is enabled\n");
+  }
+  if (yydebug > 0)
+  {
+    trace(TRACE_INFORMATION, " - special debug mode for yacc/bison is enabled\n");
+  }
   
   trace(TRACE_INFORMATION, "\n");
-
-  // don't show debug messages from flex and Bison, unless special debug mode is requested
-  if (debug_level == -1) 
-  {
-    yydebug = 1;
-    yy_flex_debug = 1;
-  }
-  else 
-  {
-    yydebug = 0;
-    yy_flex_debug = 0;
-  }
 
 }
 

@@ -9,16 +9,17 @@
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2005/11/15 15:14:24 $
+ *          - last changed: \$Date: 2005/11/16 10:32:25 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  *          - 2005-11-09 (gierds) Initial version.
  *          - 2005-11-15 (gierds) Added Exception class.
+ *          - 2005-11-16 (gierds) Use of error() and cleanup() as defined in helpers.cc
  *
  */
 
@@ -58,5 +59,10 @@ int yyerror(const char* msg);
 
 /// used to indicate trace_level
 extern int debug_level;
+
+/// used in helpers.cc to cleanup and finish in case of an error
+extern void error();
+extern void error(Exception e);
+extern void cleanup();
 
 #endif

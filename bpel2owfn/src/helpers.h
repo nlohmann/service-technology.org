@@ -7,9 +7,12 @@
  * other file.
  * 
  * \author  
- *          - Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          - last changes by: \$Author: gierds $
  *          
- * \date    2005-11-11
+ * \date    
+ * 	    - created: 2005-11-11
+ *          - last changed: \$Date: 2005/11/16 10:32:25 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -18,6 +21,7 @@
  *
  * \version
  *          - 2005-11-11 (nlohmann) Initial version.
+ *          - 2005-11-16 (gierds) Added error() and cleanup() functions.
  */
 
 
@@ -101,5 +105,12 @@ void print_help();
 
 /// Evaluates command line arguments
 void parse_command_line(int argc, char * argv[]);
+
+/// Calls #cleanup(), then exits
+void error();
+void error(Exception e);
+
+/// Close all open files, delete all pointers.
+void cleanup();
 
 #endif

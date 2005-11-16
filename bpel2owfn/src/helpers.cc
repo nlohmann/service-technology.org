@@ -8,26 +8,29 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2005/11/15 16:18:03 $
+ *          - last changed: \$Date: 2005/11/16 10:32:25 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  *          - 2005-11-11 (nlohmann) Initial version.
  *          - 2005-11-15 (gierds) Moved commandline evaluation functions from main.cc to here.
- *          Added LoLA command line arguments.
+ *            Added LoLA command line arguments.
+ *          - 2005-11-16 (gierds) Added error() and cleanup() functions.
  */
 
 
 #include "helpers.h"
 
+/// The Petri Net
+extern PetriNet *TheNet;
 
 /*!
  * \param a set of Petri net nodes
@@ -370,3 +373,68 @@ void parse_command_line(int argc, char* argv[])
 
 }
 
+/**
+ * Some output in case an error has occured.
+ * 
+ */
+void error()
+{
+  trace("\nAn error has occured!\n\n");
+  cleanup();
+  trace(TRACE_WARNINGS, "-> Any output file might be in an undefinded state.\n");
+  exit(1);
+
+}
+
+/**
+ * Some output in case an error has occured.
+ * Prints out the exception's information.
+ *
+ * \param e The exception that triggered this function call. 
+ * 
+ */
+void error(Exception e)
+{
+  e.info();
+  cleanup();
+  trace(TRACE_WARNINGS, "-> Any output file might be in an undefinded state.\n");
+  exit(e.id);
+}
+
+/**
+ * Cleans up.
+ * Afterwards we should have an almost defined state.
+ *
+ */
+void cleanup()
+{
+  trace(TRACE_INFORMATION,"Cleaning up ...\n");
+ 
+  if (filename != "")
+  {
+    trace(TRACE_INFORMATION," + Closing input file: " + filename + "\n");
+    fclose(yyin);
+  }
+
+  if (lola_filename != "")
+  {
+    trace(TRACE_INFORMATION," + Closing LoLA output file: " + lola_filename + "\n");
+    (*lola_output) << std::flush;
+    ((std::ofstream*)lola_output)->close();
+  }
+
+  if (dot_filename != "")
+  {
+    trace(TRACE_INFORMATION," + Closing dot output file: " + dot_filename + "\n");
+    (*dot_output) << std::flush;
+    ((std::ofstream*)dot_output)->close();
+  }
+
+  if (mode_petri_net) 
+  {
+    trace(TRACE_INFORMATION," + Deleting Petri Net pointer\n");
+    delete(TheNet);
+    TheNet = NULL;
+  }
+
+}

@@ -7,22 +7,23 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/15 16:33:43 $
+ *          - last changed: \$Date: 2005/11/16 10:32:25 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
  *          - 2005-11-15 (nlohmann) Call Exception::info() to signal error.
+ *          - 2005-11-16 (gierds) Use of error() and cleanup() as defined in helpers.cc
  *
  */
 
@@ -78,7 +79,7 @@ bool mode_low_level_petri_net = false;
  * \returns Error code (0 if everything went well)
  *
  * \todo
- * 	- outsource error handling and big switch for exception_id 
+ * 	- outsource error handling 
  */
 int main( int argc, char *argv[])
 {
@@ -139,27 +140,13 @@ int main( int argc, char *argv[])
       TheNet->drawDot();
     }
 
-  
-    if (lola_filename != "")
-    {
-      trace(TRACE_INFORMATION,"Closing LoLA output file: " + lola_filename + "\n");
-      (*lola_output) << std::flush;
-      ((std::ofstream*)lola_output)->close();
-    }
-  
-    if (dot_filename != "")
-    {
-      trace(TRACE_INFORMATION,"Closing dot output file: " + dot_filename + "\n");
-      (*dot_output) << std::flush;
-      ((std::ofstream*)dot_output)->close();
-    }
+    cleanup();  
 
     return error;
   }
   catch (Exception e)
   {
-    e.info();
-    exit(e.id);
+    error(e);
   }
 
   return 0;  

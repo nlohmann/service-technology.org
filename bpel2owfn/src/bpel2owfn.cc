@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/16 10:32:25 $
+ *          - last changed: \$Date: 2005/11/16 15:16:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -46,6 +46,11 @@ std::ostream * dot_output = &std::cout;
 std::string lola_filename = "";
 /// Pointer to lola output file
 std::ostream * lola_output = &std::cout;
+
+/// Filename of PN info file
+std::string info_filename = "";
+/// Pointer to PN info file
+std::ostream * info_output = &std::cout;
 
 // different modes controlled by command line
 

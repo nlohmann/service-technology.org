@@ -12,7 +12,7 @@
  *          
  * \date    
  * 	    - created: 2005-11-11
- *          - last changed: \$Date: 2005/11/16 10:32:25 $
+ *          - last changed: \$Date: 2005/11/16 15:16:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -52,6 +52,11 @@ extern std::ostream * dot_output;
 extern std::string lola_filename;
 /// Pointer to LoLA output file
 extern std::ostream * lola_output;
+
+/// Filename of PN info file
+extern std::string info_filename;
+/// Pointer to PN info file
+extern std::ostream * info_output;
 
 
 // different modes controlled by command line (in main.cc)

@@ -12,14 +12,14 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2005/11/16 11:05:33 $
+ *          - last changed: \$Date: 2005/11/16 15:16:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  *          - 2005-11-11 (nlohmann) Initial version.
  *          - 2005-11-15 (gierds) Moved commandline evaluation functions from main.cc to here.
  *            Added LoLA command line arguments.
@@ -311,7 +311,7 @@ void parse_command_line(int argc, char* argv[])
     // if wanted, create a LoLA output file
     if ( mode_lola_2_file )
     {
-      trace(TRACE_INFORMATION, "Creating file for lola output\n");
+      trace(TRACE_INFORMATION, "Creating file for LoLA output\n");
       std::string lola_file = filename;
       
       // try to replace .bpel through .lola
@@ -321,13 +321,35 @@ void parse_command_line(int argc, char* argv[])
       }
       else
       {
-        lola_file += ".dot";
+        lola_file += ".lola";
       }
       
-      /// set dot filename
+      /// set lola filename
       lola_filename = lola_file.c_str();
-      /// create dot file and point to it
+      /// create lola file and point to it
       lola_output = new std::ofstream(lola_file.c_str(), std::ofstream::out | std::ofstream::trunc);
+    }
+
+    // create info file for Petri Net
+    if ( mode_petri_net )
+    {
+      trace ( TRACE_INFORMATION, "Creating file for Petri Net information\n");
+      std::string info_file = filename;
+      
+      // try to replace .bpel through .info
+      if ( info_file.rfind(".bpel", 0) >= (info_file.length() - 6) )
+      {
+        info_file = info_file.replace( (info_file.length() - 5), 5, ".info");
+      }
+      else
+      {
+        info_file += ".info";
+      }
+
+      /// set info filename
+      info_filename = info_file.c_str();
+      /// create info file and point to it
+      info_output = new std::ofstream(info_file.c_str(), std::ofstream::out | std::ofstream::trunc);
     }
   }
       
@@ -345,6 +367,11 @@ void parse_command_line(int argc, char* argv[])
   {
     trace(TRACE_INFORMATION, "   --> abstract to low level\n");
   }
+  if (mode_petri_net) 
+  {
+    trace(TRACE_INFORMATION, " - output information about the Petri Net to file " + info_filename + "\n");
+  }
+
 
   if (mode_lola_2_file)
   {
@@ -433,6 +460,15 @@ void cleanup()
   {
     trace(TRACE_INFORMATION," + Closing input file: " + filename + "\n");
     fclose(yyin);
+  }
+
+  if (info_filename != "")
+  {
+    trace(TRACE_INFORMATION," + Closing Petri Net info file: " + info_filename + "\n");
+    (*info_output) << std::flush;
+    ((std::ofstream*)info_output)->close();
+    delete(info_output);
+    info_output = NULL;
   }
 
   if (lola_filename != "")

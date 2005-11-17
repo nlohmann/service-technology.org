@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/16 16:10:07 $
+ *          - last changed: \$Date: 2005/11/17 08:52:50 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.30 $
+ * \version \$Revision: 1.31 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -32,7 +32,8 @@
  *            #PetriNet::longInformation() and #PetriNet::lolaOut(). Use
  *            #Exception-class to signal errors.
  *          - 2005-11-16 (nlohmann) Added a mapping for faster access to Nodes
- *            given a role.
+ *            given a role. Pimped DOT-output. Added several overloadings for
+ *            easier pattern definition.
  *
  */
 
@@ -47,11 +48,12 @@ map <string, Node*> roleMap;
 
 
 
-extern int debug_level;           // defined in debug.cc
-extern ostream *dot_output;       // defined in main.c
-extern ostream *lola_output;      // defined in main.c
-extern ostream *info_output;      // defined in main.c
-extern string filename;           // defined in main.c
+extern int debug_level;              // defined in debug.cc
+extern ostream *dot_output;          // defined in main.c
+extern ostream *lola_output;         // defined in main.c
+extern ostream *info_output;         // defined in main.c
+extern string filename;              // defined in main.c
+extern bool mode_simplify_petri_net; // defined in main.c
 
 
 
@@ -296,6 +298,22 @@ Arc *PetriNet::newArc(Node *source, Node *target, string inscription)
 
 
 /*!
+ * Creates an inscripted standard arc.
+ * \param source      source node of the arc
+ * \param target      target node of the arc
+ * \param inscription inscription of the arc
+ * \return pointer of the created arc
+ */
+Arc *PetriNet::newArc(Node *source, Node *target, kc::casestring inscription)
+{
+  return newArc(source, target, STANDARD, inscription->name);
+}
+
+
+
+
+
+/*!
  * Creates an uninscripted arc.
  * \param source source node of the arc
  * \param target target node of the arc
@@ -450,11 +468,11 @@ void PetriNet::printInformation()
     switch ((*p)->type)
     {
       case(LOW):      { (*info_output) << "low-level"; break; }
-      case(TIME):     { (*info_output) << "time"; break; }
-      case(PROPERTY): { (*info_output) << "property"; break; }
-      case(MESSAGE):  { (*info_output) << "message"; break; }
-      case(DATA):     { (*info_output) << "data"; break; }
-      default:        { (*info_output) << "other"; }
+      case(TIME):     { (*info_output) << "time     "; break; }
+      case(PROPERTY): { (*info_output) << "property "; break; }
+      case(MESSAGE):  { (*info_output) << "message  "; break; }
+      case(DATA):     { (*info_output) << "data     "; break; }
+      default:        { (*info_output) << "other    "; }
     }
 
     for (set<string>::iterator role = (*p)->history.begin(); role != (*p)->history.end(); role++)
@@ -504,15 +522,23 @@ void PetriNet::printInformation()
  * \todo
  *       - treatment of input and output places
  *       - treatment of markings
+ *       - escape labels
  */
 void PetriNet::drawDot()
 {
   trace(TRACE_DEBUG, "[PN]\tCreating DOT-output.\n");
   
   (*dot_output) << "digraph N {" << endl;
-  (*dot_output) << " graph [fontname=\"Helvetica-Oblique\", label=\"" << filename << "\"];" << endl;
-  (*dot_output) << " node [fontname=\"Helvetica-Oblique\"];" << endl;
-  (*dot_output) << " edge [fontname=\"Helvetica-Oblique\"];" << endl << endl;
+  (*dot_output) << " graph [fontname=\"Helvetica-Oblique\", label=\"";
+  
+  if (mode_simplify_petri_net)
+    (*dot_output) << "structural simplified ";
+  if (lowLevel)
+    (*dot_output) << "low-level ";
+  
+  (*dot_output) << "Petri net generated from " << filename << "\"];" << endl;
+  (*dot_output) << " node [fontname=\"Helvetica-Oblique\" fontsize=10];" << endl;
+  (*dot_output) << " edge [fontname=\"Helvetica-Oblique\" fontsize=10];" << endl << endl;
   
   // list the places
   (*dot_output) << " node [shape=circle, fixedsize];" << endl;
@@ -524,6 +550,7 @@ void PetriNet::drawDot()
     switch ((*p)->type)
     {
       case (DATA): { (*dot_output) << " style=filled fillcolor=green"; break; }
+      case (TIME): { (*dot_output) << " style=filled fillcolor=yellow"; break; }
       default:;
     }
       
@@ -716,16 +743,20 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
  *       - take care of markings
  */
 void PetriNet::mergePlaces(Place *p1, Place *p2)
-{
-  trace(TRACE_VERY_DEBUG, "[PN]\tMerging places " + intToString(p1->id) +
-      " and " + intToString(p2->id) + "...\n");
-  
+{  
   if (p1 == p2)
     return;
     //throw Exception(MERGING_ERROR, "Merging of same places undefined!\n", typeid(this).name());
 
+  if (p1 == NULL || p2 == NULL)
+    return;
+    //throw Exception(MERGING_ERROR, "One of the merging places is not found!\n", typeid(this).name());
+
   if(p1->type != LOW || p2->type != LOW)
     throw Exception(MERGING_ERROR, "Merging of high-level places not yet supported!\n", typeid(this).name());
+ 
+  trace(TRACE_VERY_DEBUG, "[PN]\tMerging places " + intToString(p1->id) +
+      " and " + intToString(p2->id) + "...\n");
   
   Node *p12 = newPlace();
   
@@ -846,12 +877,16 @@ set<Node *> PetriNet::postset(Node *n)
  */
 Place *PetriNet::findPlace(string role)
 {
+  return (Place *)roleMap[role];
+
+  /*
   Place *result = (Place *)roleMap[role];
 
   if (result == NULL)
     throw Exception(NODE_NOT_FOUND, "Node with role '" + role + "' not found!\n", typeid(this).name());
   else
     return result;
+  */
 
   /*
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
@@ -864,6 +899,12 @@ Place *PetriNet::findPlace(string role)
 }
 
 
+
+
+Place *PetriNet::findPlace(kc::impl_activity* activity, string role)
+{
+  return findPlace(intToString(activity->id->value) + role);
+}
 
 
 

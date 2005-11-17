@@ -20,14 +20,14 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/16 16:10:07 $
+ *          - last changed: \$Date: 2005/11/17 08:52:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *          
- * \version \$Revision: 1.23 $
+ * \version \$Revision: 1.24 $
  *          - 2005-11-09 (nlohmann) Added doxygen-comments.
  *          - 2005-11-10 (nlohmann) Added many using commands for std.
  *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an #id
@@ -254,6 +254,9 @@ class PetriNet
 
     /// Adds an arc given source and target node and an inscription.
     Arc *newArc(Node *source, Node *target, string inscription);
+
+    /// Adds an arc given source and target node and an inscription.
+    Arc *newArc(Node *source, Node *target, kc::casestring inscription);
     
     /// Adds an arc given source and target node and an arc type.
     Arc *newArc(Node *source, Node *target, arc_type type);
@@ -287,6 +290,9 @@ class PetriNet
 
     /// Finds place given a role.
     Place *findPlace(string role);
+
+    /// Finds place given an activity with a role.
+    Place *findPlace(kc::impl_activity* activity, string role);
 
     /// Simplifies the Petri net.
     void simplify();

@@ -12,14 +12,14 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2005/11/16 15:16:41 $
+ *          - last changed: \$Date: 2005/11/17 10:49:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
  *          - 2005-11-11 (nlohmann) Initial version.
  *          - 2005-11-15 (gierds) Moved commandline evaluation functions from main.cc to here.
  *            Added LoLA command line arguments.
@@ -130,7 +130,8 @@ void parse_command_line(int argc, char* argv[])
       // check for input other than stdin
       if (! strcmp(argument_string, "-f") || ! strcmp(argument_string, "--file")) 
       {
-        if (argument_counter < argc) 
+        mode_file = true;
+	if (argument_counter < argc) 
 	{
           filename = (std::string) argv[argument_counter++];
           if (!(yyin = fopen(filename.c_str(), "r"))) 
@@ -280,7 +281,7 @@ void parse_command_line(int argc, char* argv[])
   }
 
   // trace and check for some files to be created
-  if ( filename != "")
+  if ( mode_file )
   {
     trace(TRACE_INFORMATION, "Reading BPEL from file ");
     trace(TRACE_INFORMATION, (filename));
@@ -367,7 +368,7 @@ void parse_command_line(int argc, char* argv[])
   {
     trace(TRACE_INFORMATION, "   --> abstract to low level\n");
   }
-  if (mode_petri_net) 
+  if (mode_petri_net && mode_file) 
   {
     trace(TRACE_INFORMATION, " - output information about the Petri Net to file " + info_filename + "\n");
   }
@@ -456,13 +457,14 @@ void cleanup()
 {
   trace(TRACE_INFORMATION,"Cleaning up ...\n");
  
-  if (filename != "")
+  if ( mode_file )
   {
     trace(TRACE_INFORMATION," + Closing input file: " + filename + "\n");
     fclose(yyin);
   }
 
-  if (info_filename != "")
+  // close info file
+  if ( mode_file )
   {
     trace(TRACE_INFORMATION," + Closing Petri Net info file: " + info_filename + "\n");
     (*info_output) << std::flush;
@@ -471,7 +473,7 @@ void cleanup()
     info_output = NULL;
   }
 
-  if (lola_filename != "")
+  if ( mode_lola_2_file )
   {
     trace(TRACE_INFORMATION," + Closing LoLA output file: " + lola_filename + "\n");
     (*lola_output) << std::flush;
@@ -480,7 +482,7 @@ void cleanup()
     lola_output = NULL;
   }
 
-  if (dot_filename != "")
+  if (mode_dot_2_file)
   {
     trace(TRACE_INFORMATION," + Closing dot output file: " + dot_filename + "\n");
     (*dot_output) << std::flush;

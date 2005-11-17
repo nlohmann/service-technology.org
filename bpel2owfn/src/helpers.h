@@ -12,7 +12,7 @@
  *          
  * \date    
  * 	    - created: 2005-11-11
- *          - last changed: \$Date: 2005/11/16 15:16:41 $
+ *          - last changed: \$Date: 2005/11/17 10:49:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -61,6 +61,8 @@ extern std::ostream * info_output;
 
 // different modes controlled by command line (in main.cc)
 
+/// read from file ?
+extern bool mode_file;
 /// print the Petri Net
 extern bool mode_petri_net;
 /// simplify Petri Net

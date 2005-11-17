@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/16 15:24:47 $
+ *          - last changed: \$Date: 2005/11/17 10:49:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.29 $
+ * \version \$Revision: 1.30 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -35,7 +35,7 @@ PetriNet *TheNet = new PetriNet();
 // some file names and pointers
 
 /// Filename of input file.
-std::string filename = "";
+std::string filename = "<STDIN>";
 
 /// Filename of dot output file
 std::string dot_filename = "";
@@ -54,6 +54,8 @@ std::ostream * info_output = &std::cout;
 
 // different modes controlled by command line
 
+/// read from file
+bool mode_file = false;
 /// print the Petri Net
 bool mode_petri_net = false;
 /// simplify Petri Net
@@ -135,7 +137,7 @@ int main( int argc, char *argv[])
       TheNet->simplify();
     }
     // output info file ?
-    if (mode_petri_net)
+    if (mode_petri_net && mode_file )
     {
       TheNet->printInformation();
     }

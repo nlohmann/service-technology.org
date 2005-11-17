@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/17 08:52:50 $
+ *          - last changed: \$Date: 2005/11/17 14:22:32 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -54,6 +54,30 @@ extern ostream *lola_output;         // defined in main.c
 extern ostream *info_output;         // defined in main.c
 extern string filename;              // defined in main.c
 extern bool mode_simplify_petri_net; // defined in main.c
+
+
+
+
+
+/*****************************************************************************/
+
+
+/*!
+ * \todo comment me
+ */
+bool Node::singleMemberOf(string role)
+{
+  if (history.size() == 1)
+  {
+    string uniqueRole = *history.begin();
+    if (uniqueRole.substr(0, uniqueRole.find_last_of(".")) == role)
+      return true;
+    else
+      return false;
+  }
+  else
+    return false;
+}
 
 
 
@@ -193,14 +217,6 @@ Place *PetriNet::newPlace(string role, place_type mytype)
     trace(TRACE_INFORMATION, "[PN]\t" + information() + "\n");
   
   return p;
-}
-
-
-
-
-
-void PetriNet::markPlace(Place *p)
-{
 }
 
 
@@ -468,9 +484,6 @@ void PetriNet::printInformation()
     switch ((*p)->type)
     {
       case(LOW):      { (*info_output) << "low-level"; break; }
-      case(TIME):     { (*info_output) << "time     "; break; }
-      case(PROPERTY): { (*info_output) << "property "; break; }
-      case(MESSAGE):  { (*info_output) << "message  "; break; }
       case(DATA):     { (*info_output) << "data     "; break; }
       default:        { (*info_output) << "other    "; }
     }
@@ -521,7 +534,6 @@ void PetriNet::printInformation()
  *
  * \todo
  *       - treatment of input and output places
- *       - treatment of markings
  *       - escape labels
  */
 void PetriNet::drawDot()
@@ -539,6 +551,8 @@ void PetriNet::drawDot()
   (*dot_output) << "Petri net generated from " << filename << "\"];" << endl;
   (*dot_output) << " node [fontname=\"Helvetica-Oblique\" fontsize=10];" << endl;
   (*dot_output) << " edge [fontname=\"Helvetica-Oblique\" fontsize=10];" << endl << endl;
+
+
   
   // list the places
   (*dot_output) << " node [shape=circle, fixedsize];" << endl;
@@ -547,30 +561,37 @@ void PetriNet::drawDot()
     (*dot_output) << " " << (*p)->id << "\t[label=\"p" << (*p)->id << "\"";
 
     // color high-level places
-    switch ((*p)->type)
-    {
-      case (DATA): { (*dot_output) << " style=filled fillcolor=green"; break; }
-      case (TIME): { (*dot_output) << " style=filled fillcolor=yellow"; break; }
-      default:;
-    }
+    if ((*p)->type == DATA)
+      (*dot_output) << " style=filled fillcolor=green";
+
+//    if ((*p)->singleMemberOf("process.stop"))
+//      (*dot_output) << " style=filled fillcolor=grey80";    
+//    else if ((*p)->singleMemberOf("process"))
+//      (*dot_output) << " style=filled fillcolor=grey90";
       
     (*dot_output) << "];" << endl;
   }
+
+
 
   // list the transitions
   (*dot_output) << endl << " node [shape=box, fixedsize];" << endl;
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
   {
+    (*dot_output) << " " << (*t)->id << "\t[label=\"t" << (*t)->id << "\"";
+    
     if ((*t)->guard != "")
-    {
-      (*dot_output) << " " << (*t)->id << "\t[";
-      (*dot_output) << " shape=record label=\"{t" << (*t)->id << "|{"
-	<< (*t)->guard << "}}\" style=filled fillcolor=green];" << endl;
-    }
-    else
-      (*dot_output) << " " << (*t)->id << "\t[label=\"t" << (*t)->id << "\"];" << endl;
-  }
+      (*dot_output) << " shape=record label=\"{t" << (*t)->id << "|{" << (*t)->guard << "}}\"";
 
+//    if ((*t)->singleMemberOf("process.stop"))
+//      (*dot_output) << " style=filled fillcolor=grey80";    
+//    else if ((*t)->singleMemberOf("process"))
+//      (*dot_output) << " style=filled fillcolor=grey90";
+    
+    (*dot_output) << "];" << endl;
+  }
+  (*dot_output) << endl;
+  
   // list the arcs
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
   {
@@ -627,7 +648,12 @@ void PetriNet::lolaOut()
   }
   (*lola_output) << endl << endl;
   
-  (*lola_output) << "MARKING" << endl << ";" << endl << endl;
+  
+  // initial marking
+  (*lola_output) << "MARKING" << endl;
+  (*lola_output) << "  p" << findPlace("process.initial")->id << ": 1" << endl;
+  (*lola_output)   << ";" << endl << endl;
+
 
   // transitions
   count = 1;
@@ -740,7 +766,6 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
  * 
  * \todo
  *       - take care of read and reset arcs
- *       - take care of markings
  */
 void PetriNet::mergePlaces(Place *p1, Place *p2)
 {  
@@ -999,7 +1024,6 @@ void PetriNet::simplify()
  * specific.
  * 
  * \todo
- *       - take care of markings
  *       - take care of places (#TIME, #PROPERTY, #IN, #OUT)
  */
 void PetriNet::makeLowLevel()

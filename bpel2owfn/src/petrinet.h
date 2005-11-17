@@ -20,14 +20,14 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/17 08:52:51 $
+ *          - last changed: \$Date: 2005/11/17 14:22:32 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *          
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  *          - 2005-11-09 (nlohmann) Added doxygen-comments.
  *          - 2005-11-10 (nlohmann) Added many using commands for std.
  *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an #id
@@ -67,10 +67,7 @@ using namespace std;
 /// Enumeration of the possible types of a place.
 typedef enum {
   LOW,        ///< low-level place (standard)
-  TIME,       ///< place modelling time (e.g. for <wait>-statements)
-  PROPERTY,   ///< place modelling properties (e.g. correlation sets)
-  MESSAGE,    ///< place modelling message channels
-  DATA,       ///< place modelling variables
+  DATA,       ///< place modelling real data
   IN,         ///< input place of an open workflow net (oWFN)
   OUT         ///< output place of an open workflow net (oWFN)
 } place_type;
@@ -106,6 +103,9 @@ typedef enum {
 class Node
 {
   public:
+    /// comment here
+    bool singleMemberOf(string role);
+	  
     /// the id of the node
     unsigned int id;
 
@@ -237,9 +237,6 @@ class PetriNet
     /// Adds a place with a given role and type.
     Place *newPlace(string role, place_type type);
 
-    /// Marks a (low-level) place.
-    void markPlace(Place *p);
-    
     /// Adds a transition without an initial role.
     Transition *newTransition();
     

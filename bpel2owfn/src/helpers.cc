@@ -12,14 +12,14 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2005/11/17 10:49:47 $
+ *          - last changed: \$Date: 2005/11/17 13:59:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  *          - 2005-11-11 (nlohmann) Initial version.
  *          - 2005-11-15 (gierds) Moved commandline evaluation functions from main.cc to here.
  *            Added LoLA command line arguments.
@@ -103,7 +103,8 @@ void print_help()
   trace("   -L2F | --lola2file        - output LoLA input into file (same name as\n");
   trace("                               input file\n");
   trace("                               (implies option -L)\n");
-  trace("   -D   | --dot              - output dot input\n");
+  trace("   -D   | --dot              - output dot input,\n");
+  trace("                               should not used together with -L\n");
   trace("                               (implies option -pn)\n");
   trace("   -D2F | --dot2file         - output dot input into file (same name as\n");
   trace("                               input file\n");
@@ -353,7 +354,20 @@ void parse_command_line(int argc, char* argv[])
       info_output = new std::ofstream(info_file.c_str(), std::ofstream::out | std::ofstream::trunc);
     }
   }
-      
+  else
+  {
+    mode_lola_2_file = false;
+    mode_dot_2_file = false;
+  }  
+ 
+  // LoLA and dot on stdout are very confusing ! so abort 
+  if ((mode_lola_petri_net && mode_dot_petri_net) && !(mode_lola_2_file || mode_dot_2_file))
+  {
+    trace("LoLA and dot output on stdout are confusing, chose one!\n\n");	  
+    print_help();
+    exit(1);
+  }
+  
   // trace information about current mode
   trace(TRACE_INFORMATION, "\nModus operandi:\n");
   if (mode_simplify_petri_net)
@@ -464,7 +478,7 @@ void cleanup()
   }
 
   // close info file
-  if ( mode_file )
+  if ( mode_file && mode_petri_net )
   {
     trace(TRACE_INFORMATION," + Closing Petri Net info file: " + info_filename + "\n");
     (*info_output) << std::flush;

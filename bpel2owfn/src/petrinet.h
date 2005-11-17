@@ -20,14 +20,14 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/17 14:22:32 $
+ *          - last changed: \$Date: 2005/11/17 14:40:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *          
- * \version \$Revision: 1.25 $
+ * \version \$Revision: 1.26 $
  *          - 2005-11-09 (nlohmann) Added doxygen-comments.
  *          - 2005-11-10 (nlohmann) Added many using commands for std.
  *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an #id
@@ -103,7 +103,7 @@ typedef enum {
 class Node
 {
   public:
-    /// comment here
+    /// Checks whether the node has only a certain given role.
     bool singleMemberOf(string role);
 	  
     /// the id of the node
@@ -220,7 +220,6 @@ class Arc
  * are saved in three lists #P, #T and #F.
  *
  * \todo
- *        - add markings
  *        - declare mapping as private member of class #PetriNet
  */
 

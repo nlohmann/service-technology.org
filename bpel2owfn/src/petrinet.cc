@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/17 14:22:32 $
+ *          - last changed: \$Date: 2005/11/17 14:40:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -29,7 +29,7 @@
  *            call destructors of #Arc, #Place and #Transition. Added function
  *            #PetriNet::makeLowLevel. Added CVS-tags.
  *          - 2005-11-14 (nlohmann) Added new reduction rule. Added functions
- *            #PetriNet::longInformation() and #PetriNet::lolaOut(). Use
+ *            #PetriNet::printInformation() and #PetriNet::lolaOut(). Use
  *            #Exception-class to signal errors.
  *          - 2005-11-16 (nlohmann) Added a mapping for faster access to Nodes
  *            given a role. Pimped DOT-output. Added several overloadings for
@@ -63,7 +63,8 @@ extern bool mode_simplify_petri_net; // defined in main.c
 
 
 /*!
- * \todo comment me
+ * \param role a role of a node
+ * \return true, if the node has a singleton history containing the role
  */
 bool Node::singleMemberOf(string role)
 {
@@ -467,10 +468,6 @@ string PetriNet::information()
  * Prints information about the generated Petri net. In particular, for each
  * place and transition all roles of the history are printed to understand
  * the net and maybe LoLA's witness pathes later.
- * 
- * \todo
- *       - add command-line parameter -i / --information
- *       - write information to file
  */
 void PetriNet::printInformation()
 {
@@ -622,7 +619,6 @@ void PetriNet::drawDot()
  * \todo
  *       - add support for reset-arcs
  *       - add support for high-level constructs
- *       - add markings
  */
 void PetriNet::lolaOut()
 {
@@ -1014,7 +1010,7 @@ void PetriNet::simplify()
  * - Convert all places to low-level places.
  * - Remove all transition guards -- decisions are now taken
  *   non-deterministically.
- * - Convert places of type #DATA, #TIME and #PROPERTY to #LOW. (todo)
+ * - Convert places of type #DATA to #LOW.
  * - Convert places of type #MESSAGE to #IN resp. #OUT. (todo)
  * - Remove arc inscriptions -- all places are low-level places anyway.
  * - Convert read arcs to loops.
@@ -1024,7 +1020,7 @@ void PetriNet::simplify()
  * specific.
  * 
  * \todo
- *       - take care of places (#TIME, #PROPERTY, #IN, #OUT)
+ *       - take care of interface places (#IN, #OUT)
  */
 void PetriNet::makeLowLevel()
 {

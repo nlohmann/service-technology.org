@@ -21,7 +21,7 @@ kc::casestring attributeManager::read(kc::integer elementId, std::string attribu
   if(attributeArray[elementIdInt][attributeName].empty())
   {
     // no attribute-value given
-    result = "\"\"";
+    result = "";
   }
   else
   {

@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/17 14:40:30 $
+ *          - last changed: \$Date: 2005/11/17 15:20:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.33 $
+ * \version \$Revision: 1.34 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -64,20 +64,11 @@ extern bool mode_simplify_petri_net; // defined in main.c
 
 /*!
  * \param role a role of a node
- * \return true, if the node has a singleton history containing the role
+ * \return true, if the node has a singleton history beginning with the role
  */
 bool Node::singleMemberOf(string role)
 {
-  if (history.size() == 1)
-  {
-    string uniqueRole = *history.begin();
-    if (uniqueRole.substr(0, uniqueRole.find_last_of(".")) == role)
-      return true;
-    else
-      return false;
-  }
-  else
-    return false;
+  return ((history.size() == 1) && ((*history.begin()).find(role, 0) == 0));
 }
 
 
@@ -560,11 +551,8 @@ void PetriNet::drawDot()
     // color high-level places
     if ((*p)->type == DATA)
       (*dot_output) << " style=filled fillcolor=green";
-
-//    if ((*p)->singleMemberOf("process.stop"))
-//      (*dot_output) << " style=filled fillcolor=grey80";    
-//    else if ((*p)->singleMemberOf("process"))
-//      (*dot_output) << " style=filled fillcolor=grey90";
+    else if ((*p)->singleMemberOf("process"))
+      (*dot_output) << " style=filled fillcolor=grey90";
       
     (*dot_output) << "];" << endl;
   }
@@ -580,10 +568,8 @@ void PetriNet::drawDot()
     if ((*t)->guard != "")
       (*dot_output) << " shape=record label=\"{t" << (*t)->id << "|{" << (*t)->guard << "}}\"";
 
-//    if ((*t)->singleMemberOf("process.stop"))
-//      (*dot_output) << " style=filled fillcolor=grey80";    
-//    else if ((*t)->singleMemberOf("process"))
-//      (*dot_output) << " style=filled fillcolor=grey90";
+    if ((*t)->singleMemberOf("process"))
+      (*dot_output) << " style=filled fillcolor=grey90";
     
     (*dot_output) << "];" << endl;
   }
@@ -628,7 +614,7 @@ void PetriNet::lolaOut()
   if (!lowLevel)
     makeLowLevel();
 
-  (*lola_output) << "{ Petri net created by BPEL2oWFN reading file '" << filename << "' }" << endl << endl;
+  (*lola_output) << "{ Petri net created by BPEL2oWFN reading " << filename << " }" << endl << endl;
   
   // places
   (*lola_output) << "PLACE" << endl;
@@ -647,8 +633,9 @@ void PetriNet::lolaOut()
   
   // initial marking
   (*lola_output) << "MARKING" << endl;
-  (*lola_output) << "  p" << findPlace("process.initial")->id << ": 1" << endl;
-  (*lola_output)   << ";" << endl << endl;
+  (*lola_output) << "  p" << findPlace("process.initial")->id << ":\t1,\t { initial marking of the process }" << endl;
+  (*lola_output) << "  p" << findPlace("process.clock")->id << ":\t1\t { initial marking of the clock }" << endl;
+  (*lola_output)   << ";" << endl << endl << endl;
 
 
   // transitions
@@ -663,7 +650,7 @@ void PetriNet::lolaOut()
     unsigned int count2 = 1;
     for (set<Node *>::iterator pre = consume.begin(); pre != consume.end(); count2++, pre++)
     {
-      (*lola_output) << "  p" << (*pre)->id << ": 1";
+      (*lola_output) << "  p" << (*pre)->id << ":\t1";
       if (count2 < consume.size())
 	(*lola_output) << ",";
       else
@@ -675,7 +662,7 @@ void PetriNet::lolaOut()
     count2 = 1;
     for (set<Node *>::iterator post = produce.begin(); post != produce.end(); count2++, post++)
     {
-      (*lola_output) << "  p" << (*post)->id << ": 1";
+      (*lola_output) << "  p" << (*post)->id << ":\t1";
       if (count2 < produce.size())
 	(*lola_output) << ",";
       else
@@ -767,11 +754,9 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
 {  
   if (p1 == p2)
     return;
-    //throw Exception(MERGING_ERROR, "Merging of same places undefined!\n", typeid(this).name());
 
   if (p1 == NULL || p2 == NULL)
     return;
-    //throw Exception(MERGING_ERROR, "One of the merging places is not found!\n", typeid(this).name());
 
   if(p1->type != LOW || p2->type != LOW)
     throw Exception(MERGING_ERROR, "Merging of high-level places not yet supported!\n", typeid(this).name());
@@ -899,33 +884,21 @@ set<Node *> PetriNet::postset(Node *n)
 Place *PetriNet::findPlace(string role)
 {
   return (Place *)roleMap[role];
-
-  /*
-  Place *result = (Place *)roleMap[role];
-
-  if (result == NULL)
-    throw Exception(NODE_NOT_FOUND, "Node with role '" + role + "' not found!\n", typeid(this).name());
-  else
-    return result;
-  */
-
-  /*
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
-    for (set<string>::iterator r = (*p)->history.begin(); r != (*p)->history.end(); r++)
-      if ((*r).substr((*r).find_first_of(".")+1) == role)
-	return *p;
-
-  throw Exception(NODE_NOT_FOUND, "Node with role '" + role + "' not found!\n", typeid(this).name());
-  */
 }
 
 
 
 
+
+/*!
+ * \todo comment me!
+ */
 Place *PetriNet::findPlace(kc::impl_activity* activity, string role)
 {
   return findPlace(intToString(activity->id->value) + role);
 }
+
+
 
 
 

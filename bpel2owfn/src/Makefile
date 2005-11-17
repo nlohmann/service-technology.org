@@ -1,4 +1,4 @@
-# last changed $Date: 2005/11/15 15:14:23 $ by $Author: gierds $
+# last changed $Date: 2005/11/17 15:20:31 $ by $Author: nlohmann $
 
 
 
@@ -60,7 +60,7 @@ exception.o: exception.h exception.cc
 # Parser
 
 bpel-lexic.o: bpel-lexic.c
-	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
+	$(CXX) -Wall -O3 -c -o $@ $(@:.o=.c)
 
 bpel-lexic.c: bpel-lexic.l $(KC_TIME)
 	$(LEX) -o$@ $<

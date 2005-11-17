@@ -8,9 +8,12 @@
  * of the abstract syntax tree (AST).
  * 
  * \author  
- *          - Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          - last changes of: \$Author: nlohmann $ 
  *          
- * \date    2005-11-10
+ * \date
+ *          - created: 2005-10-03
+ *          - last changed: \$Date: 2005/11/17 09:26:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -21,10 +24,10 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version
+ * \version \$Revision: 1.10 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
+ *          - 2005-11-17 (nlohmann) Added default attributes.
  * 
- *
  */
 %}
 
@@ -52,11 +55,11 @@ tProcess:
   {
     casestring name;
     casestring targetNamespace;
-    casestring queryLanguage;
-    casestring expressionLanguage;
-    casestring suppressJoinFailure;
-    casestring enableInstanceCompensation;
-    casestring abstractProcess; 
+    casestring queryLanguage = mkcasestring("http://www.w3.org/TR/1999/REC-xpath-19991116");
+    casestring expressionLanguage = mkcasestring("http://www.w3.org/TR/1999/REC-xpath-19991116");
+    casestring suppressJoinFailure = mkcasestring("no");
+    casestring enableInstanceCompensation = mkcasestring("no");
+    casestring abstractProcess = mkcasestring("no"); 
   }
 ;
 
@@ -347,7 +350,7 @@ tCorrelation:
   Correlation()
   {
     casestring set;
-    casestring initiate;
+    casestring initiate = mkcasestring("no");
     casestring pattern; // originally only in "tCorrelationWithPattern"
   }
 ;
@@ -370,7 +373,7 @@ tEmpty:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure;
+    casestring suppressJoinFailure = mkcasestring("no");
     
     integer id;
   }
@@ -394,7 +397,7 @@ tInvoke:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure;	
+    casestring suppressJoinFailure = mkcasestring("no");
 	  
     casestring partnerLink;
     casestring portType;
@@ -423,13 +426,13 @@ tReceive:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure;	
+    casestring suppressJoinFailure = mkcasestring("no");
 
     casestring partnerLink;
     casestring portType;
     casestring operation;
     casestring variable;
-    casestring createInstance;
+    casestring createInstance = mkcasestring("no");
 
     integer id;
   }
@@ -452,7 +455,7 @@ tReply:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure;
+    casestring suppressJoinFailure = mkcasestring("no");
 
     casestring partnerLink;
     casestring portType;
@@ -481,7 +484,7 @@ tAssign:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure;
+    casestring suppressJoinFailure = mkcasestring("no");
 
     integer id;
   }
@@ -556,7 +559,7 @@ tWait:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure;	
+    casestring suppressJoinFailure = mkcasestring("no");
 	  
     casestring For; // "for" is a keyword
     casestring until;
@@ -582,7 +585,7 @@ tThrow:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure;	
+    casestring suppressJoinFailure = mkcasestring("no");
 
     casestring faultName;
     casestring faultVariable;
@@ -608,7 +611,7 @@ tCompensate:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure;
+    casestring suppressJoinFailure = mkcasestring("no");
 
     casestring scope;
 
@@ -633,7 +636,7 @@ tTerminate:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure;
+    casestring suppressJoinFailure = mkcasestring("no");
 
     integer id;
   }
@@ -656,7 +659,7 @@ tFlow:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure;
+    casestring suppressJoinFailure = mkcasestring("no");
 
     integer id;
   }
@@ -701,7 +704,7 @@ tSwitch:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure;
+    casestring suppressJoinFailure = mkcasestring("no");
 
     integer id;
   }
@@ -759,7 +762,7 @@ tWhile:
 
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure;
+    casestring suppressJoinFailure = mkcasestring("no");
     
     integer id;
   }
@@ -782,7 +785,7 @@ tSequence:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure;	
+    casestring suppressJoinFailure = mkcasestring("no");
 
     integer id;
   }
@@ -805,9 +808,9 @@ tPick:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure;
+    casestring suppressJoinFailure = mkcasestring("no");
     
-    casestring createInstance;
+    casestring createInstance = mkcasestring("no");
 
     integer id;
   }
@@ -830,9 +833,9 @@ tScope:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure;	
+    casestring suppressJoinFailure = mkcasestring("no");
 
-    casestring variableAccessSerializable;
+    casestring variableAccessSerializable = mkcasestring("no");
 
     integer id;
   }
@@ -888,6 +891,6 @@ tSource:
   Source()
   {
     casestring linkName;
-    casestring transitionCondition;
+    casestring transitionCondition = mkcasestring("true");
   }
 ;

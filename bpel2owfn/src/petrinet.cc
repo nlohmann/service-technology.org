@@ -10,15 +10,15 @@
  *          - last changes of: \$Author: nlohmann $
  *          
  * \date
- *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/17 15:20:09 $
+ *          - created: 2005-10-18
+ *          - last changed: \$Date: 2005/11/18 16:56:03 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -34,6 +34,8 @@
  *          - 2005-11-16 (nlohmann) Added a mapping for faster access to Nodes
  *            given a role. Pimped DOT-output. Added several overloadings for
  *            easier pattern definition.
+ *          - 2005-11-18 (nlohmann) Added a simple test to avoid arcs between
+ *            two places resp. two transitions.
  *
  */
 
@@ -344,11 +346,25 @@ Arc *PetriNet::newArc(Node *source, Node *target, arc_type type)
  * \param type        type of the arc (as defined in #arc_type)
  * \param inscription inscription of the arc 
  * \return pointer of the created arc
+ *
+ * \todo
+ *       - overwork initial tests
+ *       - add test to check whether one of the pointers is NULL
  */
 Arc *PetriNet::newArc(Node *source, Node *target, arc_type type, string inscription)
 {
   trace(TRACE_VERY_DEBUG, "[PN]\tCreating arc (" + intToString(source->id) +
       "," + intToString(target->id) + ")...\n");
+
+  if (T.find((Transition *)source) != T.end() && T.find((Transition *)target) != T.end())
+    throw Exception(ARC_ERROR, "Arc between two transitions!\n",
+	"t" + intToString(source->id) + " (" + *((source->history).begin()) + ") and t" + intToString(target->id) + " (" + *((target->history).begin()) + ")"
+	);
+
+  if (P.find((Place *)source) != P.end() && P.find((Place *)target) != P.end())
+    throw Exception(ARC_ERROR, "Arc between two places!\n"
+	"p" + intToString(source->id) + " (" + *((source->history).begin()) + ") and p" + intToString(target->id) + " (" + *((target->history).begin()) + ")"
+	);
 
   Arc *f = new Arc(source, target, type, inscription);
   F.insert(f);

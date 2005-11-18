@@ -7,9 +7,12 @@
  * This file defines and implements unparse rules to unparse BPEL to XML.
  * 
  * \author  
- *          - Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          - last changes of: \$Author: nlohmann $
  *          
- * \date    2005-11-11
+ * \date    
+ *          - created: 2005-11-01
+ *          - last changed: \$Date: 2005/11/18 16:57:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -20,9 +23,10 @@
  *          Humboldt-University of Berlin reading file bpel-unparse.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version
+ * \version \$Revision: 1.7 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Moved #intToString to \ref helpers.cc.
+ *          - 2005-11-18 (nlohmann) Identifiers are printed.
  * 
  * \todo
  *          - move helper functions (#in, #inup, #indown) into another file.
@@ -240,7 +244,7 @@ Correlation() ->
 ******************************************************************************/
 
 Empty(a) ->
-  [xml: { inup(); } "<empty>\n" a { indown(); } "</empty>\n"];
+  [xml: { inup(); } "<empty id=\"" $0->id "\">\n" a { indown(); } "</empty>\n"];
 
 
 /******************************************************************************
@@ -248,11 +252,11 @@ Empty(a) ->
 ******************************************************************************/
 
 Invoke(a,b,c,d,e) ->
-  [xml: { inup(); } "<invoke>\n" a b c d e { indown(); } "</invoke>\n"]
+  [xml: { inup(); } "<invoke id=\"" $0->id "\">\n" a b c d e { indown(); } "</invoke>\n"]
 ;
 
 Invoke2(a,b) ->
-  [xml: { inup(); } "<invoke>\n" a b { indown(); } "</invoke>\n"]
+  [xml: { inup(); } "<invoke id=\"" $0->id "\">\n" a b { indown(); } "</invoke>\n"]
 ;
 
 
@@ -261,7 +265,7 @@ Invoke2(a,b) ->
 ******************************************************************************/
 
 Receive(a,b) ->
-  [xml: { inup(); } "<receive>\n" a b { indown(); } "</receive>\n"]
+  [xml: { inup(); } "<receive id=\"" $0->id "\">\n" a b { indown(); } "</receive>\n"]
 ;
 
 
@@ -270,7 +274,7 @@ Receive(a,b) ->
 ******************************************************************************/
 
 Reply(a,b) ->
-  [xml: { inup(); } "<reply>\n" a b { indown(); } "</reply>\n"]
+  [xml: { inup(); } "<reply id=\"" $0->id "\">\n" a b { indown(); } "</reply>\n"]
 ;
 
 
@@ -279,7 +283,7 @@ Reply(a,b) ->
 ******************************************************************************/
 
 Assign(a,b) ->
-  [xml: { inup(); } "<assign>\n" a b { indown(); } "</assign>\n"]
+  [xml: { inup(); } "<assign id=\"" $0->id "\">\n" a b { indown(); } "</assign>\n"]
 ;
 
 Copy(a,b) ->
@@ -300,7 +304,7 @@ To() ->
 ******************************************************************************/
 
 Wait(a) ->
-  [xml: { inup(); } "<wait>\n" a { indown(); } "</wait>\n"]
+  [xml: { inup(); } "<wait id=\"" $0->id "\">\n" a { indown(); } "</wait>\n"]
 ;
 
 
@@ -309,7 +313,7 @@ Wait(a) ->
 ******************************************************************************/
 
 Throw(a) ->
-  [xml: { inup(); } "<throw>\n" a { indown(); } "</throw>\n"]
+  [xml: { inup(); } "<throw id=\"" $0->id "\">\n" a { indown(); } "</throw>\n"]
 ;
 
 
@@ -318,7 +322,7 @@ Throw(a) ->
 ******************************************************************************/
 
 Compensate(a) ->
-  [xml: { inup(); } "<compensate>\n" a { indown(); } "</compensate>\n"]
+  [xml: { inup(); } "<compensate id=\"" $0->id "\">\n" a { indown(); } "</compensate>\n"]
 ;
 
 
@@ -327,7 +331,7 @@ Compensate(a) ->
 ******************************************************************************/
 
 Terminate(a) ->
-  [xml: { inup(); } "<terminate>\n" a { indown(); } "</terminate>\n"]
+  [xml: { inup(); } "<terminate id=\"" $0->id "\">\n" a { indown(); } "</terminate>\n"]
 ;
 
 
@@ -336,11 +340,11 @@ Terminate(a) ->
 ******************************************************************************/
 
 Flow(a,NiltLink_list(),c) ->
-  [xml: { inup(); } "<flow>\n" a c { indown(); } "</flow>\n"]
+  [xml: { inup(); } "<flow id=\"" $0->id "\">\n" a c { indown(); } "</flow>\n"]
 ;
 
 Flow(a,b,c) ->
-  [xml: { inup(); } "<flow>\n" a { inup(); } "<links>\n" b { indown(); } "</links>\n" c { indown(); } "</flow>\n"]
+  [xml: { inup(); } "<flow id=\"" $0->id "\">\n" a { inup(); } "<links>\n" b { indown(); } "</links>\n" c { indown(); } "</flow>\n"]
 ;
 
 Link() ->
@@ -353,7 +357,7 @@ Link() ->
 ******************************************************************************/
 
 Switch(a,b,c) ->
-  [xml: { inup(); } "<switch>\n" a b c { indown(); } "</switch>\n"]
+  [xml: { inup(); } "<switch id=\"" $0->id "\">\n" a b c { indown(); } "</switch>\n"]
 ;
 
 Case(a) ->
@@ -370,7 +374,7 @@ Otherwise(a) ->
 ******************************************************************************/
 
 While(a,b) ->
-  [xml: { inup(); } "<while>\n" a b { indown(); } "</while>\n"]
+  [xml: { inup(); } "<while id=\"" $0->id "\">\n" a b { indown(); } "</while>\n"]
 ;
 
 
@@ -379,7 +383,7 @@ While(a,b) ->
 ******************************************************************************/
 
 activitySequence(Sequence(a,b)) ->
-  [xml: { inup(); } "<sequence>\n" a b { indown(); } "</sequence>\n"]
+  [xml: { inup(); } "<sequence id=\"" $0->id "\">\n" a b { indown(); } "</sequence>\n"]
 ;
 
 
@@ -388,7 +392,7 @@ activitySequence(Sequence(a,b)) ->
 ******************************************************************************/
 
 Pick(a,b,c) ->
-  [xml: { inup(); } "<pick>\n" a b c { indown(); } "</pick>\n"]
+  [xml: { inup(); } "<pick id=\"" $0->id "\">\n" a b c { indown(); } "</pick>\n"]
 ;
 
 
@@ -397,14 +401,14 @@ Pick(a,b,c) ->
 ******************************************************************************/
 
 Scope(a,b,c,d,e,f) ->
-  [xml: { inup(); } "<scope>\n" 
+  [xml: { inup(); } "<scope id=\"" $0->id "\">\n" 
   
   a
 
   { if (b->length() == 0) }
     ${ /* no Variables */ $}
   { else }
-    ${ { inup(); } "<variables>\n" b { indown(); } "</variables>\n" $}
+    ${ { inup(); } "<variables id=\"" $0->id "\">\n" b { indown(); } "</variables>\n" $}
 
   { if (c->length() == 0) }
     ${ /* no Fault Handlers */ $}

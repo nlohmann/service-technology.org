@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/11/15
- *          - last changed: \$Date: 2005/11/15 16:33:24 $
+ *          - last changed: \$Date: 2005/11/18 16:56:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  *          - 2005-11-15 (gierds) Initial version.
  *          - 2005-11-15 (nlohmann) Overworked class and moved error output
  *            into class.
@@ -44,7 +44,8 @@ typedef enum
 {
   FILE_NOT_FOUND = 2,	/// "File not found" exception
   NODE_NOT_FOUND,       /// "Node not found" exception (petrinet.cc)
-  MERGING_ERROR         /// "Merging-error" exception (petrinet.cc)
+  MERGING_ERROR,        /// "Merging-error" exception (petrinet.cc)
+  ARC_ERROR             /// "Arc between" exception (petrinet.cc)
 } exception_id;
 
 

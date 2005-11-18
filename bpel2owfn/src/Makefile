@@ -1,4 +1,4 @@
-# last changed $Date: 2005/11/17 15:20:31 $ by $Author: nlohmann $
+# last changed $Date: 2005/11/18 16:57:14 $ by $Author: nlohmann $
 
 
 
@@ -13,7 +13,8 @@ KC       = kc++
 # Flags
 CXXFLAGS2 = -pedantic -Wall -ansi -O3   # the most strict variant
 CXXFLAGS1 = -pedantic -Wall -O3         # less stricter, but against ISO C++
-CXXFLAGS  = -pedantic -Wno-unused -O3   # pedantic, yet least strict
+CXXFLAGS  = -pedantic -Wno-unused -O3   # pedantic
+CXXFLAGS0 = -Wno-unused -O3             # least strict
 YFLAGS    = --defines --yacc --no-lines
 KFLAGS    = --yystype --no-printdot --file-prefix=bpel-kc- --suffix=cc
 
@@ -25,7 +26,7 @@ KC_TIME = .kc_time_stamp
 ###############################################################################
 # Main target
 
-bpel2owfn: bpel-syntax.o bpel-lexic.o\
+bpel2owfn: $(KC_TIME) bpel-syntax.o bpel-lexic.o\
 	main.o debug.o exception.o bpel-attributes.o petrinet.o helpers.o\
 	bpel-abstract.o bpel-unparse-xml.o bpel-unparse-petri.o bpel-rewrite.o\
 	bpel-kc-unpk.o\
@@ -37,10 +38,10 @@ bpel2owfn: bpel-syntax.o bpel-lexic.o\
 ###############################################################################
 # "Pure" C++-modules
 
-main.o: main.cc main.h $(KC_TIME)
+main.o: main.cc main.h
 	$(CXX) $(CXXFLAGS2) -c -o $@ $(@:.o=.cc)
 
-bpel-attributes.o: bpel-attributes.c bpel-attributes.h $(KC_TIME)
+bpel-attributes.o: bpel-attributes.c bpel-attributes.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
 
 petrinet.o: petrinet.h petrinet.cc
@@ -60,12 +61,12 @@ exception.o: exception.h exception.cc
 # Parser
 
 bpel-lexic.o: bpel-lexic.c
-	$(CXX) -Wall -O3 -c -o $@ $(@:.o=.c)
+	$(CXX) $(CXXFLAGS0) -c -o $@ $(@:.o=.c)
 
-bpel-lexic.c: bpel-lexic.l $(KC_TIME)
+bpel-lexic.c: bpel-lexic.l
 	$(LEX) -o$@ $<
 
-bpel-syntax.o: bpel-syntax.c $(KC_TIME)
+bpel-syntax.o: bpel-syntax.c
 	$(CXX) $(CXXFLAGS2) -c -o $@ $(@:.o=.c)
 
 bpel-syntax.c: bpel-syntax.y

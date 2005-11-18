@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/11/17 14:22:52 $
+ *          - last changed: \$Date: 2005/11/18 16:54:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -32,12 +32,14 @@
  *          - 2005-11-16 (nlohmann) Added pattern for <while>, <wait>, <flow>,
  *            <throw>, <terminate>
  *          - 2005-11-17 (nlohmann) Completed simplest <process>-pattern.
+ *          - 2005-11-18 (nlohmann) Added pattern for <switch>.
  * 
  * \todo
  *          - find a simple "merge-language" to ease the definition of new
  *            patterns
  *          - complete initial pattern database
  *          - special treatment of <invoke>
+ *          - tidy up case discrimination of <switch>
  *
  */
 %}
@@ -469,7 +471,7 @@ Reply(a,b) ->
   ASSIGN
 ******************************************************************************/
 
-// dummy assign!
+// dummy assign! (in fact an <empty>)
 
 Assign(a,b) ->
   [petrinet:
@@ -691,21 +693,129 @@ activityFlow(Flow(a,b,c)) ->
   SWITCH
 ******************************************************************************/
 
-// not finished!
-
-activitySwitch(Switch(a,b,c)) ->
+s=activitySwitch(Switch(a,b,c)) ->
   [petrinet:
     {
       std::string prefix = intToString($0->id->value) + ".";
 
-      Node *p4 =  TheNet->newPlace(prefix + "final");
-      Node *p5 =  TheNet->newPlace(prefix + "initial");
-      Node *p6 =  TheNet->newPlace(prefix + "running", DATA);
-      Node *p11 = TheNet->newPlace(prefix + "stop");
-      Node *p12 = TheNet->newPlace(prefix + "stopped");
-      Node *p13 = TheNet->newPlace(prefix + "failed", DATA);
+      Node *switch_p4 =  TheNet->newPlace(prefix + "final");
+      Node *switch_p5 =  TheNet->newPlace(prefix + "initial");
+      Node *switch_p6 =  TheNet->newPlace(prefix + "running", DATA);
+      Node *switch_p10 = TheNet->newPlace(prefix + "p10");
+      Node *switch_p11 = TheNet->newPlace(prefix + "stop");
+      Node *switch_p12 = TheNet->newPlace(prefix + "stopped");
+      Node *switch_p13 = TheNet->newPlace(prefix + "failed", DATA);
+
+      Node *switch_t3 =  TheNet->newTransition(prefix + "t3");
+      Node *switch_t7 =  TheNet->newTransition(prefix + "t7", "guard");
+      Node *switch_t8 =  TheNet->newTransition(prefix + "t8");
+      Node *switch_t9 =  TheNet->newTransition(prefix + "t9");
+      Node *switch_t10 = TheNet->newTransition(prefix + "t10");
+      
+      TheNet->newArc(switch_p5, switch_t3);
+      TheNet->newArc(switch_t3, switch_p6, "x");
+
+      TheNet->newArc(switch_p6, switch_t7, "x");
+      TheNet->newArc(switch_t7, switch_p10);
+      TheNet->newArc(switch_t7, switch_p13, "fault");
+
+      TheNet->newArc(switch_p5, switch_t8);
+      TheNet->newArc(switch_p11, switch_t8);
+      TheNet->newArc(switch_t8, switch_p12);
+
+      TheNet->newArc(switch_p6, switch_t9, "x");
+      TheNet->newArc(switch_p11, switch_t9);
+      TheNet->newArc(switch_t9, switch_p12);
+      
+      TheNet->newArc(switch_p10, switch_t10);
+      TheNet->newArc(switch_p11, switch_t10);
+      TheNet->newArc(switch_t10, switch_p12);
     }
     a b c
+    {
+      int caseNumber = 1;
+      
+      Node *last;
+
+      foreach (o=Case(p=activity); tCase_list b)
+      {
+	std::string condition = o->condition->name;
+	
+	if (caseNumber == 1)
+	{
+	  // two transitions: guard fulfilled or not
+	  Node *t2 = TheNet->newTransition(prefix + "t2.1", "!guard & (" + condition + ")");
+	  Node *t4 = TheNet->newTransition(prefix + "t4.1", "!guard & !(" + condition + ")");
+	  
+	  // arcs connecting "running"-place
+	  TheNet->newArc(TheNet->findPlace(s, ".running"), t2, "x");
+	  TheNet->newArc(TheNet->findPlace(s, ".running"), t4, "x");
+	
+	  // embed the innerActivity
+	  TheNet->newArc(t2, TheNet->findPlace(p, ".initial"));
+	  TheNet->mergePlaces(p, ".final", s, ".final");
+	  TheNet->mergePlaces(p, ".stop", s, ".stop");
+	  TheNet->mergePlaces(p, ".stopped", s, ".stopped");
+	  
+	  last = t4;
+	}
+	else
+	{
+	  // two transitions: guard fulfilled or not
+	  Node *t2 = TheNet->newTransition(prefix + "t2." + intToString(caseNumber), condition);
+	  Node *t4 = TheNet->newTransition(prefix + "t4." + intToString(caseNumber), "!(" + condition + ")");
+
+	  // "running"-place
+	  Node *running =  TheNet->newPlace(prefix + "running." + intToString(caseNumber), DATA);
+
+	  // arcs connecting "running"-place
+	  TheNet->newArc(last, running, "x");
+	  TheNet->newArc(running, t2, "x");
+	  TheNet->newArc(running, t4, "x");
+
+	  // move token from "running"-place to stop
+	  Node *t11 = TheNet->newTransition(prefix + "t11." + intToString(caseNumber));
+	  TheNet->newArc(running, t11, "x");
+	  TheNet->newArc(TheNet->findPlace(s, ".stop"), t11);
+	  TheNet->newArc(t11, TheNet->findPlace(s, ".stopped"));
+
+	  // embed the innerActivity
+	  TheNet->newArc(t2, TheNet->findPlace(p, ".initial"));
+	  TheNet->mergePlaces(p, ".final", s, ".final");
+	  TheNet->mergePlaces(p, ".stop", s, ".stop");
+	  TheNet->mergePlaces(p, ".stopped", s, ".stopped");
+
+	  last = t4;
+	}		
+
+	caseNumber++;
+      }
+
+
+      foreach (Otherwise(p=activity); tOtherwise_list c)
+      {
+	Node *t2 = TheNet->newTransition(prefix + "t2", "otherwise");
+	
+	// "running"-place
+	Node *running = TheNet->newPlace(prefix + "running.o", DATA);
+
+	// arcs connecting "running"-place
+	TheNet->newArc(running, t2, "x");
+	TheNet->newArc(last, running, "x");
+
+	// remove token from "running"-place to stop
+	Node *t11 = TheNet->newTransition(prefix + "t11.o");
+	TheNet->newArc(running, t11, "x");
+	TheNet->newArc(TheNet->findPlace(s, ".stop"), t11);
+	TheNet->newArc(t11, TheNet->findPlace(s, ".stopped"));	
+	
+	// embed inner activity
+	TheNet->newArc(t2, TheNet->findPlace(p, ".initial"));
+	TheNet->mergePlaces(p, ".final", s, ".final");
+	TheNet->mergePlaces(p, ".stop", s, ".stop");
+	TheNet->mergePlaces(p, ".stopped", s, ".stopped");
+      }
+    }
   ]
 ;
 

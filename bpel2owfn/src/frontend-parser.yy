@@ -480,7 +480,7 @@ tCatch_list:
   /* empty */
     { $$ = NiltCatch_list(); }
 | tCatch X_NEXT tCatch_list
-    { $$ = ConstCatch_list($1, NiltCatch_list()); }
+    { $$ = ConstCatch_list($1, $3); }
 ;
 
 tCatch:

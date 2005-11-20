@@ -8,11 +8,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes by: \$Author: gierds $
+ *          - last changes by: \$Author: nlohmann $
  *          
  * \date    
  * 	    - created: 2005-11-11
- *          - last changed: \$Date: 2005/11/17 10:49:47 $
+ *          - last changed: \$Date: 2005/11/20 13:28:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -91,8 +91,6 @@ extern int debug_level;
 extern int yydebug;
 
 /* defined by flex */
-extern int yylineno;
-extern char *yytext;
 extern int yy_flex_debug;
 extern FILE *yyin;
 
@@ -115,6 +113,8 @@ void parse_command_line(int argc, char * argv[]);
 
 /// Calls #cleanup(), then exits
 void error();
+
+/// \todo comment me
 void error(Exception e);
 
 /// Close all open files, delete all pointers.

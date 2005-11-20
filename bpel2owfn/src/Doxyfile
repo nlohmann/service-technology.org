@@ -1,4 +1,4 @@
-# last changed $Date: 2005/11/14 10:29:40 $ by $Author: nlohmann $
+# last changed $Date: 2005/11/20 13:27:36 $ by $Author: nlohmann $
 
 
 #---------------------------------------------------------------------------
@@ -28,7 +28,7 @@ INLINE_INHERITED_MEMB  = YES
 FULL_PATH_NAMES        = NO
 STRIP_FROM_PATH        = 
 STRIP_FROM_INC_PATH    = 
-SHORT_NAMES            = YES
+SHORT_NAMES            = NO
 JAVADOC_AUTOBRIEF      = NO
 MULTILINE_CPP_IS_BRIEF = NO
 DETAILS_AT_TOP         = YES

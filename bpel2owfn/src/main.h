@@ -5,18 +5,18 @@
  *
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2005/11/16 10:32:25 $
+ *          - last changed: \$Date: 2005/11/20 13:28:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  *          - 2005-11-09 (gierds) Initial version.
  *          - 2005-11-15 (gierds) Added Exception class.
  *          - 2005-11-16 (gierds) Use of error() and cleanup() as defined in helpers.cc
@@ -48,21 +48,11 @@ extern kc::tProcess TheProcess;
 
 
 /* defined by flex */
-extern int yylineno;
-extern char *yytext;
-extern int yy_flex_debug;
-extern FILE *yyin;
+extern int yy_flex_debug; ///< if set to 1 the lexer trace is printed
+extern FILE *yyin;        ///< pointer to the input file
 
-
-/// function to display error messages from lexic and syntactical analysis
-int yyerror(const char* msg);
 
 /// used to indicate trace_level
 extern int debug_level;
-
-/// used in helpers.cc to cleanup and finish in case of an error
-extern void error();
-extern void error(Exception e);
-extern void cleanup();
 
 #endif

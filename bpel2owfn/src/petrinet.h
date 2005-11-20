@@ -20,14 +20,14 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/17 14:40:30 $
+ *          - last changed: \$Date: 2005/11/20 13:28:03 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *          
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
  *          - 2005-11-09 (nlohmann) Added doxygen-comments.
  *          - 2005-11-10 (nlohmann) Added many using commands for std.
  *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an #id
@@ -260,9 +260,6 @@ class PetriNet
     /// Adds an arc given source and target node, and arc type and an inscription.
     Arc *newArc(Node *source, Node *target, arc_type type, string inscription);
     
-    /// Statistical output.
-    string information();
-
     /// Information about the net including histories of all nodes.
     void printInformation();
 
@@ -332,6 +329,9 @@ class PetriNet
     
     /// the list of arcs of the Petri net
     set<Arc *> F;
+
+    /// Statistical output.
+    string information();    
 
     /// the id that will be assigned to the next node
     unsigned int nextId;

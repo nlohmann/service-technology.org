@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/11/18 16:56:03 $
+ *          - last changed: \$Date: 2005/11/20 13:28:03 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.35 $
+ * \version \$Revision: 1.36 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -620,7 +620,6 @@ void PetriNet::drawDot()
  *
  * \todo
  *       - add support for reset-arcs
- *       - add support for high-level constructs
  */
 void PetriNet::lolaOut()
 {
@@ -631,6 +630,7 @@ void PetriNet::lolaOut()
     makeLowLevel();
 
   (*lola_output) << "{ Petri net created by BPEL2oWFN reading " << filename << " }" << endl << endl;
+
   
   // places
   (*lola_output) << "PLACE" << endl;
@@ -894,8 +894,7 @@ set<Node *> PetriNet::postset(Node *n)
  * Finds a place of the Petri net given a role the place fills or filled.
  *
  * \param  role the demanded role
- * \return a pointer to the place or throw an exception if the place was not
- *         found.
+ * \return a pointer to the place or a NULL pointer if the place was not found.
  */
 Place *PetriNet::findPlace(string role)
 {
@@ -906,8 +905,12 @@ Place *PetriNet::findPlace(string role)
 
 
 
-/*!
- * \todo comment me!
+/*
+ * Finds a place of the Petri net given an activity and a role.
+ *
+ * \param  activity an activity of which the id is taken
+ * \param  role the demanded role
+ * \return a pointer to the place or a NULL pointer if the place was not found.
  */
 Place *PetriNet::findPlace(kc::impl_activity* activity, string role)
 {

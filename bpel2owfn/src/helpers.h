@@ -12,7 +12,7 @@
  *          
  * \date    
  * 	    - created: 2005-11-11
- *          - last changed: \$Date: 2005/11/20 13:28:27 $
+ *          - last changed: \$Date: 2005/11/20 22:48:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -97,7 +97,6 @@ extern FILE *yyin;
 
 // to avoid compile errors
 class Node;
-
 
 /// Returns the union of two sets of Petri net nodes.
 set<Node *> setUnion(set<Node *> a, set<Node *> b);

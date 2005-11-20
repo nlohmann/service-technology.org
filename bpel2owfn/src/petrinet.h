@@ -20,14 +20,14 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/20 13:28:03 $
+ *          - last changed: \$Date: 2005/11/20 22:48:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *          
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  *          - 2005-11-09 (nlohmann) Added doxygen-comments.
  *          - 2005-11-10 (nlohmann) Added many using commands for std.
  *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an #id
@@ -316,10 +316,10 @@ class PetriNet
     void detachNode(Node *n);
 
     /// Calculates the preset of a node.
-    set<Node *> preset(Node *n);
+    set<pair<Node *, arc_type> > preset(Node *n);
 
     /// Calculates the postset of a node.
-    set<Node *> postset(Node *n);
+    set<pair<Node *, arc_type> > postset(Node *n);
     
     /// the list of places of the Petri net
     set<Place *> P;

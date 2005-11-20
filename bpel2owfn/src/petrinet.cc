@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/11/20 18:07:18 $
+ *          - last changed: \$Date: 2005/11/20 22:48:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.38 $
+ * \version \$Revision: 1.39 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -36,6 +36,8 @@
  *            easier pattern definition.
  *          - 2005-11-18 (nlohmann) Added a simple test to avoid arcs between
  *            two places resp. two transitions.
+ *          - 2005-11-20 (nlohmann) Added support for high-level arcs for
+ *            merging.
  *
  */
 
@@ -56,6 +58,25 @@ extern ostream *lola_output;         // defined in main.c
 extern ostream *info_output;         // defined in main.c
 extern string filename;              // defined in main.c
 extern bool mode_simplify_petri_net; // defined in main.c
+
+
+
+
+
+/*!
+ * \todo
+ *       - comment me!
+ *       - optimize me!
+ */
+set<pair<Node *, arc_type> > setUnion(set<pair<Node *, arc_type> > a, set<pair<Node *, arc_type> > b)
+{
+  set<pair<Node *, arc_type> > result = a;
+  
+  for (set<pair<Node *, arc_type> >::iterator it = b.begin(); it != b.end(); it++)
+    result.insert(*it);
+  
+  return result;
+}
 
 
 
@@ -612,6 +633,36 @@ void PetriNet::drawDot()
     (*dot_output) << "];" << endl;
   }
 
+  /*
+  // make a cluster of the process' state places
+  (*dot_output) << endl << " subgraph cluster_0 {" << endl;
+  (*dot_output) << "  label = \"\";" << endl;
+  
+  Place *a;
+  a = findPlace("process.Active");
+  (*dot_output) << "  " << a->id << " [label=\"Active\\np" << a->id << "\"];" << endl;
+  a = findPlace("process.!Active");
+  (*dot_output) << "  " << a->id << " [label=\"!Active\\np" << a->id << "\"];" << endl;
+  a = findPlace("process.Completed");
+  (*dot_output) << "  " << a->id << " [label=\"Completed\\np" << a->id << "\"];" << endl;
+  a = findPlace("process.!Completed");
+  (*dot_output) << "  " << a->id << " [label=\"!Completed\\np" << a->id << "\"];" << endl;
+  a = findPlace("process.Compensated");
+  (*dot_output) << "  " << a->id << " [label=\"Compensated\\np" << a->id << "\"];" << endl;
+  a = findPlace("process.!Compensated");
+  (*dot_output) << "  " << a->id << " [label=\"!Compensated\\np" << a->id << "\"];" << endl;
+  a = findPlace("process.Ended");
+  (*dot_output) << "  " << a->id << " [label=\"Ended\\np" << a->id << "\"];" << endl;
+  a = findPlace("process.!Ended");
+  (*dot_output) << "  " << a->id << " [label=\"!Ended\\np" << a->id << "\"];" << endl;
+  a = findPlace("process.Faulted");
+  (*dot_output) << "  " << a->id << " [label=\"Faulted\\np" << a->id << "\"];" << endl;
+  a = findPlace("process.!Faulted");
+  (*dot_output) << "  " << a->id << " [label=\"!Faulted\\np" << a->id << "\"];" << endl;
+
+  (*dot_output) << " }" << endl << endl;
+  */
+
   (*dot_output) << "}" << endl;
 }
 
@@ -663,22 +714,22 @@ void PetriNet::lolaOut()
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); count++,t++)
   {
     (*lola_output) << "TRANSITION t" << (*t)->id << "\t { " << (*(*t)->history.begin()) << " }" << endl;
-    set<Node *> consume = preset(*t);
-    set<Node *> produce = postset(*t);
+    set<pair<Node *, arc_type> > consume = preset(*t);
+    set<pair<Node *, arc_type> > produce = postset(*t);
 
     (*lola_output) << "CONSUME" << endl;
     if (consume.empty())
       (*lola_output) << ";" << endl;
     
     unsigned int count2 = 1;
-    for (set<Node *>::iterator pre = consume.begin(); pre != consume.end(); count2++, pre++)
+    for (set<pair<Node *, arc_type> >::iterator pre = consume.begin(); pre != consume.end(); count2++, pre++)
     {
-      (*lola_output) << "  p" << (*pre)->id << ":\t1";
+      (*lola_output) << "  p" << (*pre).first->id << ":\t1";
       if (count2 < consume.size())
 	(*lola_output) << ",";
       else
 	(*lola_output) << ";";
-      (*lola_output) << "\t { " << (*(*pre)->history.begin()) << " }" << endl;
+      (*lola_output) << "\t { " << (*(*pre).first->history.begin()) << " }" << endl;
     }
 
     (*lola_output) << "PRODUCE" << endl;
@@ -686,14 +737,14 @@ void PetriNet::lolaOut()
       (*lola_output) << ";" << endl;
 
     count2 = 1;
-    for (set<Node *>::iterator post = produce.begin(); post != produce.end(); count2++, post++)
+    for (set<pair<Node *, arc_type> >::iterator post = produce.begin(); post != produce.end(); count2++, post++)
     {
-      (*lola_output) << "  p" << (*post)->id << ":\t1";
+      (*lola_output) << "  p" << (*post).first->id << ":\t1";
       if (count2 < produce.size())
 	(*lola_output) << ",";
       else
 	(*lola_output) << ";";
-      (*lola_output) << "\t { " << (*(*post)->history.begin()) << " }" << endl;
+      (*lola_output) << "\t { " << (*(*post).first->history.begin()) << " }" << endl;
     }
     (*lola_output) << endl;
   }
@@ -716,9 +767,7 @@ void PetriNet::lolaOut()
  * 
  * \param t1 first transition
  * \param t2 second transition
- * 
- * \todo
- *       - take care of read and reset arcs
+ *
  */
 void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 {
@@ -742,14 +791,14 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
     t12->history.insert(*role);
   }
   
-  set<Node *> pre12 = setUnion(preset(t1), preset(t2));
-  set<Node *> post12 = setUnion(postset(t1), postset(t2));
+  set<pair<Node *, arc_type> > pre12 = setUnion(preset(t1), preset(t2));
+  set<pair<Node *, arc_type> > post12 = setUnion(postset(t1), postset(t2));
   
-  for (set<Node *>::iterator n = pre12.begin(); n != pre12.end(); n++)
-    newArc(*n, t12);
+  for (set<pair<Node *, arc_type> >::iterator n = pre12.begin(); n != pre12.end(); n++)
+    newArc((*n).first, t12, (*n).second);
 
-  for (set<Node *>::iterator n = post12.begin(); n != post12.end(); n++)
-    newArc(t12, *n);
+  for (set<pair<Node *, arc_type> >::iterator n = post12.begin(); n != post12.end(); n++)
+    newArc(t12, (*n).first, (*n).second);
   
   removeTransition(t1);
   removeTransition(t2);
@@ -773,8 +822,6 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
  * \param p1 first place
  * \param p2 second place
  * 
- * \todo
- *       - take care of read and reset arcs
  */
 void PetriNet::mergePlaces(Place *p1, Place *p2)
 {  
@@ -805,14 +852,14 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
     roleMap[*role] = p12;
   }
 
-  set<Node *> pre12 = setUnion(preset(p1), preset(p2));
-  set<Node *> post12 = setUnion(postset(p1), postset(p2));
+  set<pair<Node *, arc_type> > pre12 = setUnion(preset(p1), preset(p2));
+  set<pair<Node *, arc_type> > post12 = setUnion(postset(p1), postset(p2));
   
-  for (set<Node *>::iterator n = pre12.begin(); n != pre12.end(); n++)
-    newArc(*n, p12);
+  for (set<pair<Node *, arc_type> >::iterator n = pre12.begin(); n != pre12.end(); n++)
+    newArc((*n).first, p12, (*n).second);
 
-  for (set<Node *>::iterator n = post12.begin(); n != post12.end(); n++)
-    newArc(p12, *n);
+  for (set<pair<Node *, arc_type> >::iterator n = post12.begin(); n != post12.end(); n++)
+    newArc(p12, (*n).first, (*n).second);
   
   removePlace(p1);
   removePlace(p2);
@@ -864,13 +911,16 @@ void PetriNet::mergePlaces(kc::impl_activity* act1, string role1, kc::impl_activ
  * \param n a node of the Petri net
  * \result the preset of node n
  */
-set<Node *> PetriNet::preset(Node *n)
+set<pair<Node *, arc_type> > PetriNet::preset(Node *n)
 {
-  set<Node *> result;
+  set<pair<Node *, arc_type> > result;
 
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     if ((*f)->target == n)
-      result.insert((*f)->source);
+    {
+      pair<Node *, arc_type> element = pair<Node *, arc_type>((*f)->source, (*f)->type);
+      result.insert(element);
+    }
 
   return result;
 }
@@ -883,13 +933,16 @@ set<Node *> PetriNet::preset(Node *n)
  * \param n a node of the Petri net
  * \result the postset of node n
  */
-set<Node *> PetriNet::postset(Node *n)
+set<pair<Node *, arc_type> > PetriNet::postset(Node *n)
 {
-  set<Node *> result;
+  set<pair<Node *, arc_type> > result;
 
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     if ((*f)->source == n)
-      result.insert((*f)->target);
+    {
+      pair<Node *, arc_type> element = pair<Node *, arc_type>((*f)->target, (*f)->type);
+      result.insert(element);
+    }
 
   return result;
 }
@@ -982,8 +1035,8 @@ void PetriNet::simplify()
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
     if (preset(*t).size() == 1 && postset(*t).size() == 1)
     {
-      string id1 = *((*(preset(*t).begin()))->history.begin());
-      string id2 = *((*(postset(*t).begin()))->history.begin());
+      string id1 = *((*(preset(*t).begin())).first->history.begin());
+      string id2 = *((*(postset(*t).begin())).first->history.begin());
       placeMerge.push_back(pair<string, string>(id1, id2));
       sequenceTransition.push_back(*t);
     }

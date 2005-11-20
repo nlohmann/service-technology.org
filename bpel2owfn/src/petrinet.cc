@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/11/20 16:41:04 $
+ *          - last changed: \$Date: 2005/11/20 18:07:18 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.37 $
+ * \version \$Revision: 1.38 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -786,7 +786,7 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
 
   if(p1->type != LOW || p2->type != LOW)
     throw Exception(MERGING_ERROR, "Merging of high-level places not yet supported!\n",
-	"place p" + intToString(p1->id) + " and p" + intToString(p2->id));
+	"place p" + intToString(p1->id) + " (type " + intToString(p2->type) + ") and p" + intToString(p2->id) + " (type " + intToString(p2->type) + ")");
  
   trace(TRACE_VERY_DEBUG, "[PN]\tMerging places " + intToString(p1->id) +
       " and " + intToString(p2->id) + "...\n");

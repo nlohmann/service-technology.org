@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/11/20 13:28:03 $
+ *          - last changed: \$Date: 2005/11/20 16:41:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.36 $
+ * \version \$Revision: 1.37 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -567,6 +567,8 @@ void PetriNet::drawDot()
     // color high-level places
     if ((*p)->type == DATA)
       (*dot_output) << " style=filled fillcolor=green";
+    else if ((*p)->singleMemberOf("process.faulthandler"))
+      (*dot_output) << " style=filled fillcolor=grey70";
     else if ((*p)->singleMemberOf("process"))
       (*dot_output) << " style=filled fillcolor=grey90";
       
@@ -584,7 +586,9 @@ void PetriNet::drawDot()
     if ((*t)->guard != "")
       (*dot_output) << " shape=record label=\"{t" << (*t)->id << "|{" << (*t)->guard << "}}\"";
 
-    if ((*t)->singleMemberOf("process"))
+    if ((*t)->singleMemberOf("process.faulthandler"))
+      (*dot_output) << " style=filled fillcolor=grey70";
+    else if ((*t)->singleMemberOf("process"))
       (*dot_output) << " style=filled fillcolor=grey90";
     
     (*dot_output) << "];" << endl;
@@ -663,6 +667,9 @@ void PetriNet::lolaOut()
     set<Node *> produce = postset(*t);
 
     (*lola_output) << "CONSUME" << endl;
+    if (consume.empty())
+      (*lola_output) << ";" << endl;
+    
     unsigned int count2 = 1;
     for (set<Node *>::iterator pre = consume.begin(); pre != consume.end(); count2++, pre++)
     {
@@ -675,6 +682,9 @@ void PetriNet::lolaOut()
     }
 
     (*lola_output) << "PRODUCE" << endl;
+    if (produce.empty())
+      (*lola_output) << ";" << endl;
+
     count2 = 1;
     for (set<Node *>::iterator post = produce.begin(); post != produce.end(); count2++, post++)
     {
@@ -775,7 +785,8 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
     return;
 
   if(p1->type != LOW || p2->type != LOW)
-    throw Exception(MERGING_ERROR, "Merging of high-level places not yet supported!\n", typeid(this).name());
+    throw Exception(MERGING_ERROR, "Merging of high-level places not yet supported!\n",
+	"place p" + intToString(p1->id) + " and p" + intToString(p2->id));
  
   trace(TRACE_VERY_DEBUG, "[PN]\tMerging places " + intToString(p1->id) +
       " and " + intToString(p2->id) + "...\n");

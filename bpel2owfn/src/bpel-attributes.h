@@ -12,9 +12,24 @@
 class attributeManager
 {
   private:
+  	/// an array to store attributenames with value
+  	typedef std::map<std::string, std::string> attributeDataModel;    
+    
     /// an array to store attributes of XML-elements
-    std::map<unsigned int, std::map<std::string, std::string> > attributeArray;
-  
+    std::map<unsigned int, attributeDataModel > attributeArray;
+	
+	/// an array to store [activities]->[atributes]->[opt?]
+    std::map<unsigned int, std::map<std::string, bool> > attributeDB;
+    
+    /// to initialize the attributeDB
+    void initAttributeDB();
+
+    /// is attribute of activity or not
+    bool isAttribute(unsigned int activity, std::string attribute);
+
+    /// attributes of activities are optional or not
+    bool isOptional(unsigned int activity, std::string attribute);
+
   public:
     /// constructor
     attributeManager();

@@ -26,9 +26,10 @@
  * 
  * \todo
  *          - there are certainly more implicit transformations neccessary
+ *          - add copy-rules for <invoke>-cases
  *
  * \bug
- *          - attributes seem to get lost during rewriting
+ *          - XML-output works, but Petri net output crashes
  * 
  */
 %}
@@ -54,11 +55,37 @@
 
 
 
-%{ KC_REWRITE
-#define KOMMA
-#define ASSIGN(x,y) ((x)=(y))
+
+
+%{ KC_REWRITE_HEADER
+#include "bpel-attributes.h"
+  
+tSwitch cp_attr(tSwitch from, tSwitch to);
+tEmpty implicitEmpty(tEmpty old);
 %}
 
+
+
+
+
+%{ KC_REWRITE
+tSwitch cp_attr(tSwitch from, tSwitch to)
+{
+  to->name = from->name;
+  to->joinCondition = from->joinCondition;
+  to->suppressJoinFailure = from->suppressJoinFailure;
+  to->id = from->id;
+  return to;
+}
+
+tEmpty implicitEmpty(tEmpty old)
+{
+  extern attributeManager att;
+  old->id = att.nextId();
+  old->name = mkcasestring("implicit_otherwise");
+  return old;
+}
+%}
 
 
 
@@ -224,7 +251,7 @@ activityInvoke(
    with an empty activity is deemed to be present.
 */
 
-Switch(
+origin=Switch(
     a, // standardElements
     b, // tCase_list
     NiltOtherwise_list() // tOtherwise_list
@@ -232,21 +259,21 @@ Switch(
 
 ->
 
-< implicit: Switch(
+< implicit: cp_attr(origin, Switch(
     a,
     b,
     ConstOtherwise_list( // create a tOtherwise_list
       Otherwise(
 	activityEmpty(
-	  Empty(
+	  implicitEmpty(Empty(
 	    StandardElements(
 	      NiltTarget_list(),
 	      NiltSource_list()
 	      )
 	    )
-	  )
+	  ))
 	),
       NiltOtherwise_list()
       )
-    )
+    ))
 >;

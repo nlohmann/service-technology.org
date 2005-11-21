@@ -13,7 +13,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2005/11/20 16:41:18 $
+ *          - last changed: \$Date: 2005/11/21 15:05:50 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-17 (nlohmann) Added default attributes.
  * 
@@ -59,7 +59,8 @@ tProcess:
     casestring expressionLanguage = mkcasestring("http://www.w3.org/TR/1999/REC-xpath-19991116");
     casestring suppressJoinFailure = mkcasestring("no");
     casestring enableInstanceCompensation = mkcasestring("no");
-    casestring abstractProcess = mkcasestring("no"); 
+    casestring abstractProcess = mkcasestring("no");
+    casestring xmlns = mkcasestring("http://schemas.xmlsoap.org/ws/2003/03/business-process/"); 
   }
 ;
 

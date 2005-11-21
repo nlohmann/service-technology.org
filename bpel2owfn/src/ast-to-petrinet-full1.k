@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/11/20 22:48:31 $
+ *          - last changed: \$Date: 2005/11/21 12:52:38 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -274,7 +274,7 @@ Process(a,b,c,d,e,f,g,h) ->
 		          TheNet->findPlace("process.stop"));
 
       TheNet->mergePlaces(TheNet->findPlace(h, ".failed"),
-		          TheNet->findPlace("process.faulthandler.fault"));
+		          TheNet->findPlace("process.fault_in"));
       
       trace(TRACE_INFORMATION, "Generating Petri net complete.\n");
     }

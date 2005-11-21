@@ -18,7 +18,7 @@
  * \date    2005-11-10
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universitï¿½ zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
@@ -29,6 +29,7 @@
  *
  * \version
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
+ *	      - 2005-11-21 (dreinert) Added tProcess	
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -259,7 +260,8 @@ tProcess:
       $$->expressionLanguage = att.read($3, "expressionLanguage");
       $$->suppressJoinFailure = att.read($3, "suppressJoinFailure");
       $$->enableInstanceCompensation = att.read($3, "enableInstanceCompensation");
-      $$->abstractProcess = att.read($3, "abstractProcess"); }
+      $$->abstractProcess = att.read($3, "abstractProcess");
+      $$->xmlns = att.read($3, "xmlns"); }
 ;
 
 /*---------------------------------------------------------------------------*/
@@ -911,7 +913,8 @@ tReceive:
   standardElements
   tCorrelations_opt
   X_SLASH K_RECEIVE
-    { $$ = Receive($4, $5);
+    { att.check($2, K_RECEIVE); 
+      $$ = Receive($4, $5);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
@@ -922,7 +925,8 @@ tReceive:
       $$->createInstance = att.read($2, "createInstance"); 
       $$->id = $2; }
 | K_RECEIVE arbitraryAttributes X_SLASH
-    { $$ = Receive(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list());
+    { att.check($2, K_RECEIVE); 
+      $$ = Receive(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list());
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");

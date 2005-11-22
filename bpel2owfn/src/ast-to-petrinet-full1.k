@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/11/22 16:42:08 $
+ *          - last changed: \$Date: 2005/11/22 20:21:25 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -35,6 +35,8 @@
  *          - 2005-11-18 (nlohmann) Added pattern for <switch>.
  *          - 2005-11-20 (nlohmann) Added pattern for user-defined
  *            <faultHandlers>.
+ *          - 2005-11-22 (nlohmann) Added pattern for implicit <faultHandlers>,
+ *            <pick> and alarm event handler.
  * 
  * \todo
  *          - find a simple "merge-language" to ease the definition of new
@@ -43,6 +45,7 @@
  *          - special treatment of <invoke>
  *          - tidy up case discrimination of <switch>
  *          - tidy up patterns <faultHandlers> and <process>
+ *          - what about the fault-places: are they always merged with the FH?
  *
  */
 %}
@@ -568,10 +571,122 @@ NiltFaultHandlers_opt() ->
   ]
 ;
 
+
+
+
+
 /******************************************************************************
   EVENT HANDLERS
 ******************************************************************************/
 
+EventHandlers(a,b) ->
+  [petrinet:
+    {
+      std::string prefix = "process.eventHandler.";
+      
+      Place *p6  = TheNet->newPlace(prefix + "initial");
+      Place *p8  = TheNet->newPlace(prefix + "final");
+      Place *p13 = TheNet->newPlace(prefix + "finish");
+      Place *p17 = TheNet->newPlace(prefix + "running");
+      Place *p18 = TheNet->newPlace(prefix + "finishing");
+      Place *p22 = TheNet->newPlace(prefix + "stop");
+      Place *p23 = TheNet->newPlace(prefix + "stopped");
+      Transition *t5  = TheNet->newTransition(prefix + "t5");
+      Transition *t7  = TheNet->newTransition(prefix + "allFinished");
+      Transition *t11 = TheNet->newTransition(prefix + "t11");
+      Transition *t16 = TheNet->newTransition(prefix + "allStopped");
+      Transition *t17 = TheNet->newTransition(prefix + "normalStop");
+      Transition *t18 = TheNet->newTransition(prefix + "t18");
+      Transition *t19 = TheNet->newTransition(prefix + "stop+finish");
+      Transition *t20 = TheNet->newTransition(prefix + "t20");
+      TheNet->newArc(p6, t5);
+      TheNet->newArc(t5, p17);
+      TheNet->newArc(TheNet->findPlace("process.clock"), t5, READ, "x");
+      TheNet->newArc(t7, p8);
+      TheNet->newArc(p18, t7);
+      TheNet->newArc(p13, t11);
+      TheNet->newArc(p17, t11);
+      TheNet->newArc(t11, p18);
+      TheNet->newArc(t16, p23);
+      TheNet->newArc(p18, t17);      
+      TheNet->newArc(p22, t17);
+      TheNet->newArc(p6, t18);
+      TheNet->newArc(p22, t18);
+      TheNet->newArc(t18, p23);
+      TheNet->newArc(p17, t19);
+      TheNet->newArc(p22, t19);
+      TheNet->newArc(p8, t20);
+      TheNet->newArc(p22, t20);
+      TheNet->newArc(t20, p23);
+    }
+    a b
+    {
+      int onMessageCount = 1;
+      
+      foreach (o=OnAlarm(p=activity); tOnAlarm_list b)
+      {
+	std::string onAlarmGuard;
+	std::string newprefix = prefix + "onAlarm" + intToString(onMessageCount) + ".";
+
+	if (o->For != mkcasestring(""))
+	  onAlarmGuard = "x + " + std::string(o->For->name) + " \\<= y";  // "<=" is escaped
+	else
+	  onAlarmGuard = std::string(o->until->name) + " \\<= y";  // "<=" is escaped
+	
+	Place *p1  = TheNet->newPlace(newprefix + "p1");
+	Place *p2  = TheNet->newPlace(newprefix + "p2");
+	Place *p3  = TheNet->newPlace(newprefix + "wait" + intToString(onMessageCount));
+	Place *p4  = TheNet->newPlace(newprefix + "p4");
+	Place *p5  = TheNet->newPlace(newprefix + "finish" + intToString(onMessageCount));
+	Place *p7  = TheNet->newPlace(newprefix + "stop+finish" + intToString(onMessageCount));
+	Place *p9  = TheNet->newPlace(newprefix + "stop" + intToString(onMessageCount));
+	Place *p10 = TheNet->newPlace(newprefix + "p10");
+	Transition *t1 = TheNet->newTransition(newprefix + "t1", onAlarmGuard);
+	Transition *t2 = TheNet->newTransition(newprefix + "t2");
+	Transition *t3 = TheNet->newTransition(newprefix + "t3");
+	Transition *t4 = TheNet->newTransition(newprefix + "t4");
+	Transition *t6 = TheNet->newTransition(newprefix + "t6");
+	Transition *t8 = TheNet->newTransition(newprefix + "t8");
+	TheNet->newArc(p3, t1, "x");
+	TheNet->newArc(t1, p1);
+	TheNet->newArc(TheNet->findPlace("process.clock"), t1, READ, "y");
+	TheNet->newArc(p2, t2);
+	TheNet->newArc(t2, p4);
+	TheNet->newArc(p5, t2);
+	TheNet->newArc(p3, t3, "x");
+	TheNet->newArc(t3, p4);
+	TheNet->newArc(p5, t3);
+	TheNet->newArc(p5, t4);
+	TheNet->newArc(p7, t4);
+	TheNet->newArc(t4, p9);
+	TheNet->newArc(p4, t6);
+	TheNet->newArc(p7, t6);
+	TheNet->newArc(t6, p10);
+	TheNet->newArc(p3, t8, "x");
+	TheNet->newArc(p9, t8);
+	TheNet->newArc(t8, p10);
+
+	// arcs from the EH
+	TheNet->newArc(t5, p3, "x");
+	TheNet->newArc(t11, p5);
+	TheNet->newArc(t17, p7);
+	TheNet->newArc(t19, p9);
+
+	// arcs to the EH
+	TheNet->newArc(p4, t7);
+	TheNet->newArc(p10, t16);
+	
+	// embed the innerActivity
+	TheNet->mergePlaces(TheNet->findPlace(p, ".initial"), p1);
+	TheNet->mergePlaces(TheNet->findPlace(p, ".stop"), p9);
+	TheNet->mergePlaces(TheNet->findPlace(p, ".stopped"), p10);
+	TheNet->mergePlaces(TheNet->findPlace(p, ".final"), p2);
+	
+	onMessageCount++;
+      }
+    }
+  ]
+;
 
 /******************************************************************************
   COMPENSATION HANDLERS
@@ -1292,7 +1407,7 @@ thepick=activityPick(Pick(a,b,c)) ->
       Transition *t7 = TheNet->newTransition(prefix + "t7");
       Transition *t8 = TheNet->newTransition(prefix + "t8");
 
-      TheNet->newArc(TheNet->findPlace("process.clock"), t5, "x");
+      TheNet->newArc(TheNet->findPlace("process.clock"), t5, READ, "x");
       TheNet->newArc(p6, t5);
       TheNet->newArc(t5, p7, "x");
 
@@ -1361,7 +1476,7 @@ thepick=activityPick(Pick(a,b,c)) ->
 
 	Transition *t6 = TheNet->newTransition(newprefix + "t6", onAlarmGuard);
 	
-	TheNet->newArc(TheNet->findPlace("process.clock"), t6, "y");
+	TheNet->newArc(TheNet->findPlace("process.clock"), t6, READ, "y");
 	TheNet->newArc(TheNet->findPlace(thepick, ".TimeStamp"), t6, "x");
 	TheNet->newArc(t6, TheNet->findPlace(p, ".initial"));
 	

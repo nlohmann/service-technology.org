@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/11/21 16:34:10 $
+ *          - last changed: \$Date: 2005/11/22 14:20:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.41 $
+ * \version \$Revision: 1.42 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -669,9 +669,6 @@ void PetriNet::drawDot()
 
 /*!
  * Outputs the net in LoLA-format.
- *
- * \todo
- *       - add support for reset-arcs
  */
 void PetriNet::lolaOut()
 {

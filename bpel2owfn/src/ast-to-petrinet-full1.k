@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/11/21 16:33:52 $
+ *          - last changed: \$Date: 2005/11/22 14:18:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -206,7 +206,7 @@ Process(a,b,c,d,e,f,g,h) ->
       TheNet->newArc(stop_t2, stop_p3);
       TheNet->newArc(stop_t2, stop_p21);
       TheNet->newArc(stop_p3, stop_t3);
-      TheNet->newArc(stop_p5, stop_t3, "X"); // here was the RESET arc
+      TheNet->newArc(stop_p5, stop_t3, "X"); // here was the RESET arc (now of type STANDARD)
       TheNet->newArc(stop_p22, stop_t3);
       TheNet->newArc(stop_t3, stop_p4);
       TheNet->newArc(stop_p5, stop_t4, "x");

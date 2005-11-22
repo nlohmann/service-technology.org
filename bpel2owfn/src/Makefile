@@ -1,4 +1,4 @@
-# last changed $Date: 2005/11/18 16:57:14 $ by $Author: nlohmann $
+# last changed $Date: 2005/11/22 09:03:55 $ by $Author: nlohmann $
 
 
 
@@ -26,11 +26,10 @@ KC_TIME = .kc_time_stamp
 ###############################################################################
 # Main target
 
-bpel2owfn: $(KC_TIME) bpel-syntax.o bpel-lexic.o\
+bpel2owfn: bpel-syntax.o bpel-lexic.o\
 	main.o debug.o exception.o bpel-attributes.o petrinet.o helpers.o\
 	bpel-abstract.o bpel-unparse-xml.o bpel-unparse-petri.o bpel-rewrite.o\
-	bpel-kc-unpk.o\
-	bpel-kc-rk.o bpel-kc-csgiok.o bpel-kc-k.o
+	bpel-kc-unpk.o bpel-kc-rk.o bpel-kc-csgiok.o bpel-kc-k.o
 	$(CXX) $(CXXFLAGS2) -o $@ $^
 
 
@@ -60,13 +59,13 @@ exception.o: exception.h exception.cc
 ###############################################################################
 # Parser
 
-bpel-lexic.o: bpel-lexic.c
+bpel-lexic.o: bpel-lexic.c $(KC_TIME)
 	$(CXX) $(CXXFLAGS0) -c -o $@ $(@:.o=.c)
 
 bpel-lexic.c: bpel-lexic.l
 	$(LEX) -o$@ $<
 
-bpel-syntax.o: bpel-syntax.c
+bpel-syntax.o: bpel-syntax.c $(KC_TIME)
 	$(CXX) $(CXXFLAGS2) -c -o $@ $(@:.o=.c)
 
 bpel-syntax.c: bpel-syntax.y

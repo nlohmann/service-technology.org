@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/11/22 14:18:39 $
+ *          - last changed: \$Date: 2005/11/22 16:39:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -305,7 +305,8 @@ Process(a,b,c,d,e,f,g,h) ->
   FAULT HANDLERS
 ******************************************************************************/
 
-FaultHandlers(a,b) ->
+// user-defined inside process
+ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) ->
   [petrinet:
     {
       // inside a <process>
@@ -437,6 +438,7 @@ FaultHandlers(a,b) ->
       }
       /*---------------------------------------------------------------------*/
       
+      // embed the fault handler
       TheNet->mergePlaces(TheNet->findPlace("process.fault"),
 		          TheNet->findPlace("process.faulthandler.fault"));
       TheNet->mergePlaces(TheNet->findPlace("process.faultSave"),
@@ -453,6 +455,115 @@ FaultHandlers(a,b) ->
 		          TheNet->findPlace("process.faulthandler.ch_out"));
       TheNet->mergePlaces(TheNet->findPlace("process.final"),
 		          TheNet->findPlace("process.faulthandler.final"));
+    }
+  ]
+;
+
+
+
+
+// implicit inside process
+NiltFaultHandlers_opt() ->
+  [petrinet:
+    {
+      std::string prefix = "process.faulthandler.";
+      
+      Place *p1 =  TheNet->newPlace(prefix + "fault");
+      Place *p2 =  TheNet->newPlace(prefix + "p2");
+      Place *p3 =  TheNet->newPlace(prefix + "p3");
+      Place *p4 =  TheNet->newPlace(prefix + "ch_fh");
+      Place *p5 =  TheNet->newPlace(prefix + "ch_out");
+      Place *p6 =  TheNet->newPlace(prefix + "p6");
+      Place *p7 =  TheNet->newPlace(prefix + "faultSave");
+      Place *p8 =  TheNet->newPlace(prefix + "p8");
+      Place *p9 =  TheNet->newPlace(prefix + "final");
+      Place *p10 = TheNet->newPlace(prefix + "rethrow");
+      Place *p11 = TheNet->newPlace(prefix + "!Ended");
+      Place *p12 = TheNet->newPlace(prefix + "Ended");
+
+      Transition *t1  = TheNet->newTransition(prefix + "t1");
+      Transition *t2  = TheNet->newTransition(prefix + "t2");
+      Transition *t3  = TheNet->newTransition(prefix + "t3");
+      Transition *t4  = TheNet->newTransition(prefix + "t4");
+      
+      TheNet->newArc(p2, t1);
+      TheNet->newArc(p7, t1, "x");
+      TheNet->newArc(t1, p9);
+      TheNet->newArc(p11, t1);
+      TheNet->newArc(t1, p12);
+      
+      TheNet->newArc(t2, p3);
+      TheNet->newArc(p7, t2, "x");
+      TheNet->newArc(t2, p8, "y");
+      TheNet->newArc(p10, t2, "y");
+      
+      TheNet->newArc(p6, t3);
+      TheNet->newArc(t3, p9);
+      TheNet->newArc(p8, t3, "y");
+      TheNet->newArc(p11, t3);
+      TheNet->newArc(t3, p12);
+
+      TheNet->newArc(p10, t4, "y");
+      TheNet->newArc(p12, t4, READ);
+
+      /*---------------------------------------------------------------------*/
+      // the <compensate />-element
+      prefix = "process.faulthandler.compensate.";
+
+      Place *compensate_p1 = TheNet->newPlace(prefix + "initial");
+      Place *compensate_p2 = TheNet->newPlace(prefix + "running");
+      Place *compensate_p3 = TheNet->newPlace(prefix + "final");
+      Place *compensate_p4 = TheNet->newPlace(prefix + "stop");
+      Place *compensate_p5 = TheNet->newPlace(prefix + "ch_fh");
+      Place *compensate_p6 = TheNet->newPlace(prefix + "ch_out");
+      Place *compensate_p7 = TheNet->newPlace(prefix + "stopped");
+      Transition *compensate_t1  = TheNet->newTransition(prefix + "t1");
+      Transition *compensate_t2  = TheNet->newTransition(prefix + "t2");
+      Transition *compensate_t3  = TheNet->newTransition(prefix + "t3");
+      Transition *compensate_t4  = TheNet->newTransition(prefix + "t4");
+      Transition *compensate_t5  = TheNet->newTransition(prefix + "t5");
+      TheNet->newArc(compensate_p1, compensate_t1);
+      TheNet->newArc(compensate_t1, compensate_p2);
+      TheNet->newArc(compensate_t1, compensate_p5);
+      TheNet->newArc(compensate_p2, compensate_t2);
+      TheNet->newArc(compensate_t2, compensate_p3);
+      TheNet->newArc(compensate_p6, compensate_t2);
+      TheNet->newArc(compensate_p1, compensate_t3);
+      TheNet->newArc(compensate_p4, compensate_t3);
+      TheNet->newArc(compensate_t3, compensate_p7);
+      TheNet->newArc(compensate_p2, compensate_t4);
+      TheNet->newArc(compensate_p4, compensate_t4);
+      TheNet->newArc(compensate_t4, compensate_p7);
+      TheNet->newArc(compensate_p2, compensate_t5);
+      TheNet->newArc(compensate_p3, compensate_t5);
+      TheNet->newArc(compensate_t5, compensate_p7);
+
+      // embed the <compensate />-element
+      TheNet->mergePlaces(compensate_p1, p1);
+      TheNet->mergePlaces(compensate_p3, p2);
+      TheNet->mergePlaces(compensate_p4, p3);
+      TheNet->mergePlaces(compensate_p5, p4);
+      TheNet->mergePlaces(compensate_p6, p5);
+      TheNet->mergePlaces(compensate_p7, p6);
+      /*---------------------------------------------------------------------*/
+
+      // embed the fault handler
+      TheNet->mergePlaces(TheNet->findPlace("process.fault"),
+		          TheNet->findPlace("process.faulthandler.fault"));
+      TheNet->mergePlaces(TheNet->findPlace("process.faultSave"),
+		          TheNet->findPlace("process.faulthandler.faultSave"));
+      TheNet->mergePlaces(TheNet->findPlace("process.rethrow"),
+		          TheNet->findPlace("process.faulthandler.rethrow"));
+      TheNet->mergePlaces(TheNet->findPlace("process.!Ended"),
+		          TheNet->findPlace("process.faulthandler.!Ended"));
+      TheNet->mergePlaces(TheNet->findPlace("process.Ended"),
+		          TheNet->findPlace("process.faulthandler.Ended"));
+      TheNet->mergePlaces(TheNet->findPlace("process.ch_fh"),
+		          TheNet->findPlace("process.faulthandler.ch_fh"));
+      TheNet->mergePlaces(TheNet->findPlace("process.ch_out"),
+		          TheNet->findPlace("process.faulthandler.ch_out"));
+      TheNet->mergePlaces(TheNet->findPlace("process.final"),
+		          TheNet->findPlace("process.faulthandler.final"));      
     }
   ]
 ;
@@ -1165,12 +1276,11 @@ activitySequence(Sequence(a,b)) ->
   PICK
 ******************************************************************************/
 
-activityPick(Pick(a,b,c)) ->
+thepick=activityPick(Pick(a,b,c)) ->
   [petrinet:
     {
       std::string prefix = intToString($0->id->value) + ".";
 
-      Place *p3 = TheNet->newPlace(prefix + "p3");
       Place *p5 = TheNet->newPlace(prefix + "final");
       Place *p6 = TheNet->newPlace(prefix + "initial");
       Place *p7 = TheNet->newPlace(prefix + "TimeStamp");
@@ -1178,15 +1288,11 @@ activityPick(Pick(a,b,c)) ->
       Place *p12 = TheNet->newPlace(prefix + "stopped");
       Place *p13 = TheNet->newPlace(prefix + "failed");
 
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
       Transition *t5 = TheNet->newTransition(prefix + "t5");
       Transition *t7 = TheNet->newTransition(prefix + "t7");
       Transition *t8 = TheNet->newTransition(prefix + "t8");
-      Transition *t9 = TheNet->newTransition(prefix + "t9");
 
-      TheNet->newArc(p7, t2, "x");
-      TheNet->newArc(t2, p3, "(M1,CS1)");
-
+      TheNet->newArc(TheNet->findPlace("process.clock"), t5, "x");
       TheNet->newArc(p6, t5);
       TheNet->newArc(t5, p7, "x");
 
@@ -1196,13 +1302,76 @@ activityPick(Pick(a,b,c)) ->
 
       TheNet->newArc(p7, t8, "x");
       TheNet->newArc(p11, t8);
-      TheNet->newArc(t8, p12);
-      
-      TheNet->newArc(p3, t9, "(M1,CS1)");
-      TheNet->newArc(p11, t9);
-      TheNet->newArc(t9, p12);
+      TheNet->newArc(t8, p12);      
     }
     a b c
+    {
+      int onMessageCount = 1;
+      
+      foreach (o=OnMessage(p=activity); tOnMessage_list b)
+      {
+	std::string newprefix = prefix + "onMessage" + intToString(onMessageCount) + ".";
+
+	Place *p3 = TheNet->newPlace(newprefix + "p3");
+	Place *p10 = TheNet->newPlace(newprefix + "p10");
+	
+	Transition *t2 = TheNet->newTransition(newprefix + "t2");
+	Transition *t3 = TheNet->newTransition(newprefix + "t3", "!guard" + intToString(onMessageCount));
+	Transition *t4 = TheNet->newTransition(newprefix + "t4", "guard" + intToString(onMessageCount));
+	Transition *t9 = TheNet->newTransition(newprefix + "t9");
+	Transition *t10 = TheNet->newTransition(newprefix + "t10");
+	
+	TheNet->newArc(TheNet->findPlace(thepick, ".TimeStamp"), t2, "x");
+	TheNet->newArc(t2, p3, "M" + intToString(onMessageCount) );
+
+	TheNet->newArc(p3, t3, "M" + intToString(onMessageCount) );
+	TheNet->newArc(t3, TheNet->findPlace(p, ".initial"));
+	
+	TheNet->newArc(p3, t4, "M" + intToString(onMessageCount) );
+	TheNet->newArc(t4, p10);
+	TheNet->newArc(t4, TheNet->findPlace(thepick, ".failed"), "fault");
+
+	TheNet->newArc(p3, t9, "M" + intToString(onMessageCount) );
+	TheNet->newArc(TheNet->findPlace(thepick, ".stop"), t9);
+	TheNet->newArc(t9, TheNet->findPlace(thepick, ".stopped"));
+
+	TheNet->newArc(p10, t10);
+	TheNet->newArc(TheNet->findPlace(thepick, ".stop"), t10);
+	TheNet->newArc(t10, TheNet->findPlace(thepick, ".stopped"));
+	
+	TheNet->mergePlaces(p, ".stop", thepick, ".stop");
+	TheNet->mergePlaces(p, ".stopped", thepick, ".stopped");
+	TheNet->mergePlaces(p, ".final", thepick, ".final");
+
+	onMessageCount++;
+      }
+
+
+      int onAlarmCount = 1;
+      
+      foreach (o=OnAlarm(p=activity); tOnAlarm_list c)
+      {
+	std::string newprefix = prefix + "onAlarm" + intToString(onAlarmCount) + ".";
+	std::string onAlarmGuard;
+
+	if (o->For != mkcasestring(""))
+	  onAlarmGuard = "x + " + std::string(o->For->name) + " \\<= y";  // "<=" is escaped
+	else
+	  onAlarmGuard = std::string(o->until->name) + " \\<= y";  // "<=" is escaped
+
+	Transition *t6 = TheNet->newTransition(newprefix + "t6", onAlarmGuard);
+	
+	TheNet->newArc(TheNet->findPlace("process.clock"), t6, "y");
+	TheNet->newArc(TheNet->findPlace(thepick, ".TimeStamp"), t6, "x");
+	TheNet->newArc(t6, TheNet->findPlace(p, ".initial"));
+	
+	TheNet->mergePlaces(p, ".stop", thepick, ".stop");
+	TheNet->mergePlaces(p, ".stopped", thepick, ".stopped");
+	TheNet->mergePlaces(p, ".final", thepick, ".final");
+
+	onMessageCount++;
+      }
+    }
   ]
 ;
 

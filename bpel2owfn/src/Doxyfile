@@ -1,5 +1,4 @@
-# last changed $Date: 2005/11/20 13:27:36 $ by $Author: nlohmann $
-
+# Doxyfile 1.4.5
 
 #---------------------------------------------------------------------------
 # Project related configuration options
@@ -257,4 +256,4 @@ DOT_CLEANUP            = YES
 #---------------------------------------------------------------------------
 # Configuration::additions related to the search engine   
 #---------------------------------------------------------------------------
-SEARCHENGINE           = NO
+SEARCHENGINE           = YES

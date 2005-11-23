@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/11/23 11:39:04 $
+ *          - last changed: \$Date: 2005/11/23 17:05:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -315,7 +315,10 @@ Process(a,b,c,d,e,f,g,h) ->
   FAULT HANDLERS
 ******************************************************************************/
 
-// user-defined inside process
+/*
+ * The user-defined fault handler inside a process. See Fig. 36 for details.
+ */
+  
 ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) ->
   [petrinet:
     {
@@ -364,20 +367,20 @@ ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) ->
       
       /*---------------------------------------------------------------------*/
       // the <compensate />-element
-      prefix = "process.faulthandler.compensate.";
+      std::string new_prefix = "process.faulthandler.compensate.";
 
-      Place *compensate_p1 = TheNet->newPlace(prefix + "initial");
-      Place *compensate_p2 = TheNet->newPlace(prefix + "running");
-      Place *compensate_p3 = TheNet->newPlace(prefix + "final");
-      Place *compensate_p4 = TheNet->newPlace(prefix + "stop");
-      Place *compensate_p5 = TheNet->newPlace(prefix + "ch_fh");
-      Place *compensate_p6 = TheNet->newPlace(prefix + "ch_out");
-      Place *compensate_p7 = TheNet->newPlace(prefix + "stopped");
-      Transition *compensate_t1  = TheNet->newTransition(prefix + "t1");
-      Transition *compensate_t2  = TheNet->newTransition(prefix + "t2");
-      Transition *compensate_t3  = TheNet->newTransition(prefix + "t3");
-      Transition *compensate_t4  = TheNet->newTransition(prefix + "t4");
-      Transition *compensate_t5  = TheNet->newTransition(prefix + "t5");
+      Place *compensate_p1 = TheNet->newPlace(new_prefix + "initial");
+      Place *compensate_p2 = TheNet->newPlace(new_prefix + "running");
+      Place *compensate_p3 = TheNet->newPlace(new_prefix + "final");
+      Place *compensate_p4 = TheNet->newPlace(new_prefix + "stop");
+      Place *compensate_p5 = TheNet->newPlace(new_prefix + "ch_fh");
+      Place *compensate_p6 = TheNet->newPlace(new_prefix + "ch_out");
+      Place *compensate_p7 = TheNet->newPlace(new_prefix + "stopped");
+      Transition *compensate_t1  = TheNet->newTransition(new_prefix + "t1");
+      Transition *compensate_t2  = TheNet->newTransition(new_prefix + "t2");
+      Transition *compensate_t3  = TheNet->newTransition(new_prefix + "t3");
+      Transition *compensate_t4  = TheNet->newTransition(new_prefix + "t4");
+      Transition *compensate_t5  = TheNet->newTransition(new_prefix + "t5");
       TheNet->newArc(compensate_p1, compensate_t1);
       TheNet->newArc(compensate_t1, compensate_p2);
       TheNet->newArc(compensate_t1, compensate_p5);
@@ -405,9 +408,6 @@ ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) ->
     }
     a b
     {
-      /*---------------------------------------------------------------------*/
-      prefix = "process.faulthandler.";
-      
       foreach (catchLeaf=Catch(catchActivity=activity); tCatch_list a)
       {
 	string faultToCatch = catchLeaf->faultName->name;
@@ -464,7 +464,11 @@ ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) ->
 
 
 
-// implicit inside process
+
+/*
+ * The implicit fault handler inside a process. See Fig. 35 for details.
+ */
+
 NiltFaultHandlers_opt() ->
   [petrinet:
     {
@@ -570,7 +574,16 @@ NiltFaultHandlers_opt() ->
   EVENT HANDLERS
 ******************************************************************************/
 
-EventHandlers(a,b) ->
+/*
+ * Instead of creating patterns for a alarm event handler and a message event
+ * handler we united both patterns to a single event handler. In order to do
+ * so, we used the place and transition numberings as they are introduced in
+ * Fig. 29. This situation leads to different numberings when embedding the
+ * onAlarm-activities into the event handler. In this case, both names (the
+ * name in Fig. 29 and in Fig. 30) are mentioned in a comment.
+ */
+
+ConstEventHandlers_opt(EventHandlers(a,b), NiltEventHandlers_opt()) ->
   [petrinet:
     {
       std::string prefix = "process.eventHandler.";
@@ -754,6 +767,56 @@ EventHandlers(a,b) ->
     }
   ]
 ;
+
+
+
+
+
+/*
+ * This is an implicit eventhandler, i.e. a pattern that is inserted if no
+ * event handler is given. This pattern is not inside the semantics of
+ * [Sta04]. It is a "stub" with the only use of moving the tokes so that the
+ * surrounding process or scope functions correctly.
+ */
+
+NiltEventHandlers_opt() ->
+  [petrinet:
+    {
+      std::string prefix = "process.eventHandler.";
+      
+      Place *p1  = TheNet->newPlace(prefix + "initial");
+      Place *p2  = TheNet->newPlace(prefix + "finish");
+      Place *p3  = TheNet->newPlace(prefix + "final");
+      Place *p4  = TheNet->newPlace(prefix + "stop");
+      Place *p5  = TheNet->newPlace(prefix + "stopped");
+      Place *p6  = TheNet->newPlace(prefix + "running");
+      Place *p7  = TheNet->newPlace(prefix + "finishing");
+      Transition *t1 = TheNet->newTransition(prefix + "t1");
+      Transition *t2 = TheNet->newTransition(prefix + "t2");
+      Transition *t3 = TheNet->newTransition(prefix + "allFinished");
+      Transition *t4 = TheNet->newTransition(prefix + "stop+finish");
+      Transition *t5 = TheNet->newTransition(prefix + "normalStop");
+      Transition *t6 = TheNet->newTransition(prefix + "t6");
+      TheNet->newArc(p1, t1);
+      TheNet->newArc(t1, p6);
+      TheNet->newArc(p2, t2);
+      TheNet->newArc(p6, t2);
+      TheNet->newArc(t2, p7);
+      TheNet->newArc(t3, p3);
+      TheNet->newArc(p7, t3);
+      TheNet->newArc(p4, t4);
+      TheNet->newArc(t4, p5);
+      TheNet->newArc(p6, t4);
+      TheNet->newArc(p4, t5);
+      TheNet->newArc(t5, p5);
+      TheNet->newArc(p6, t5);
+      TheNet->newArc(p3, t6);      
+      TheNet->newArc(p4, t6);
+      TheNet->newArc(t6, p5);      
+    }
+  ]
+;
+
 
 /******************************************************************************
   COMPENSATION HANDLERS

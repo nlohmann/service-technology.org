@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/11/22 16:40:45 $
+ *          - last changed: \$Date: 2005/11/23 11:39:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -582,11 +582,12 @@ void PetriNet::drawDot()
   {
     (*dot_output) << " " << (*p)->id << "\t[label=\"p" << (*p)->id << "\"";
 
-    // color high-level places
-    if ((*p)->type == DATA)
-      (*dot_output) << " style=filled fillcolor=green";
+    if ((*p)->singleMemberOf("process.eventHandler"))
+      (*dot_output) << " style=filled fillcolor=plum";
+    else if ((*p)->singleMemberOf("process.stop."))
+      (*dot_output) << " style=filled fillcolor=lightskyblue2";
     else if ((*p)->singleMemberOf("process.faulthandler"))
-      (*dot_output) << " style=filled fillcolor=grey70";
+      (*dot_output) << " style=filled fillcolor=pink";
     else if ((*p)->singleMemberOf("process"))
       (*dot_output) << " style=filled fillcolor=grey90";
       
@@ -604,8 +605,12 @@ void PetriNet::drawDot()
     if ((*t)->guard != "")
       (*dot_output) << " shape=record label=\"{t" << (*t)->id << "|{" << (*t)->guard << "}}\"";
 
-    if ((*t)->singleMemberOf("process.faulthandler"))
-      (*dot_output) << " style=filled fillcolor=grey70";
+    if ((*t)->singleMemberOf("process.eventHandler"))
+      (*dot_output) << " style=filled fillcolor=plum";
+    else if ((*t)->singleMemberOf("process.stop."))
+      (*dot_output) << " style=filled fillcolor=lightskyblue2";
+    else if ((*t)->singleMemberOf("process.faulthandler"))
+      (*dot_output) << " style=filled fillcolor=pink";
     else if ((*t)->singleMemberOf("process"))
       (*dot_output) << " style=filled fillcolor=grey90";
     

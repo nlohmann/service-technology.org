@@ -10,15 +10,16 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/11/24 10:41:00 $
+ *          - last changed: \$Date: 2005/11/24 12:00:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.1 $
+ * \version \$Revision: 1.2 $
  *          - 2005-11-22 (gierds) Initial version.
+ *          - 2005-11-22 (gierds) Put all funcionality in to a class #SymbolManager
  *
  */
 
@@ -36,12 +37,51 @@
 
 using namespace std;
 
-// forward declaration of classes
+// forward declaration of classesi
+class SymbolManager;
 class SymbolScope;
 class ScopeScope;
 class FlowScope;
 class csPartnerLink;
 class csVariable;
+
+class SymbolManager
+{
+  private:
+    /// most outer scope - the Process
+    SymbolScope * processScope;
+    /// the current scope
+    SymbolScope * currentScope;
+    /// a stack to return to higher scopes
+    // stack<SymbolScope *> scopeStack;
+
+  public:
+    /// constructor
+    SymbolManager();
+
+    /// destructor
+    ~SymbolManager();
+
+    /// initialise the Process scope
+    void initialiseProcessScope(kc::integer id);
+    /// add a new Scope scope
+    void newScopeScope(kc::integer id);
+    /// add a new Flow scope
+    void newFlowScope(kc::integer id);
+    /// quit a scope
+    void quitScope();
+
+    /// add a PartnerLink to the current scope
+    void addPartnerLink(kc::integer id, csPartnerLink* pl);
+    /// check, if a PartnerLink exists in the current scope
+    void checkPartnerLink(csPartnerLink* pl);
+    /// add a Variable to the current scope
+    void addVariable(kc::integer id, csVariable* var);
+
+
+    /// prints the scope tree
+    void printScope();
+};
 
 /**
  * \class	Scope
@@ -208,23 +248,6 @@ class csVariable
     /// our own equality
     bool operator==(csVariable& other);
 };
-
-
-/// initialise the Process scope
-void initialiseProcessScope(kc::integer id);
-/// add a new Scope scope
-void csNewScopeScope(kc::integer id);
-/// add a new Flow scope
-void csNewFlowScope(kc::integer id);
-/// quit a scope
-void csQuitScope();
-
-/// add a PartnerLink to the current scope
-void csAddPartnerLink(kc::integer id, csPartnerLink* pl);
-/// check, if a PartnerLink exists in the current scope
-void csCheckPartnerLink(csPartnerLink* pl);
-/// add a Variable to the current scope
-void csAddVariable(kc::integer id, csVariable* var);
 
 #endif
 

@@ -12,14 +12,14 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2005/11/24 10:40:59 $
+ *          - last changed: \$Date: 2005/11/24 12:00:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  *          - 2005-11-11 (nlohmann) Initial version.
  *          - 2005-11-15 (gierds) Moved commandline evaluation functions from
  *            main.cc to here.
@@ -512,13 +512,6 @@ void cleanup()
     dot_output = NULL;
   }
 
-  if (processScope != NULL)
-  {
-    delete(processScope);
-    processScope = NULL;
-    currentScope = NULL;
-  }
-  
   if (mode_petri_net) 
   {
     trace(TRACE_INFORMATION," + Deleting Petri Net pointer\n");

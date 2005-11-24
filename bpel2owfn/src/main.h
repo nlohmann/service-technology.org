@@ -9,14 +9,14 @@
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2005/11/24 10:40:59 $
+ *          - last changed: \$Date: 2005/11/24 12:00:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  *          - 2005-11-09 (gierds) Initial version.
  *          - 2005-11-15 (gierds) Added Exception class.
  *          - 2005-11-16 (gierds) Use of error() and cleanup() as defined in helpers.cc
@@ -61,7 +61,7 @@ extern FILE *yyin;        ///< pointer to the input file
 extern int debug_level;
 
 // from check-symbols
-extern SymbolScope * processScope;
+extern SymbolManager symMan;
 
 
 #endif

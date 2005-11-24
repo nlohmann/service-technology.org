@@ -13,9 +13,12 @@
  * \ref bpel-abstract.h.
  * 
  * \author  
- *          - Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          - last changes of: \$Author: gierds $
  *          
- * \date    2005-11-10
+ * \date 
+ *          - created: 2005/11/10
+ *          - last changed: \$Date: 2005/11/24 12:00:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -27,11 +30,12 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version
+ * \version \$Revision: 1.24 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
  *            initiateCorrelationSet to tCorrelation_list.
+ *          - 2005-11-24 (gierds) Added basic symbol manager 
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -104,6 +108,10 @@ extern int yyerror(const char *);
 /// an instance of the attribute manager
 attributeManager att = attributeManager();
 
+#include "check-symbols.h"
+
+// from check-symbols
+SymbolManager symMan = SymbolManager();
 
 // to simplify phylum-calls
 using namespace kc;
@@ -112,19 +120,6 @@ using namespace kc;
 /// the root of the abstract syntax tree
 tProcess TheProcess;
 
-#include "check-symbols.h"
-
-// from check-symbols
-extern SymbolScope * processScope;
-extern SymbolScope * currentScope;
-extern void initialiseProcessScope(kc::integer id);
-extern void csNewScopeScope(kc::integer id);
-extern void csNewFlowScope(kc::integer id);
-extern void csQuitScope();
-extern void csAddPartnerLink(kc::integer id, csPartnerLink* pl);
-extern void csAddVariable(kc::integer id, csVariable* var);
-extern void csCheckPartnerLink(csPartnerLink* pl);
-extern void csCheckPartners(csPartnerLink* pl);
 
 %}
 
@@ -258,7 +253,7 @@ extern void csCheckPartners(csPartnerLink* pl);
 tProcess:
   X_OPEN K_PROCESS arbitraryAttributes X_NEXT
     {
-      initialiseProcessScope($3);
+      symMan.initialiseProcessScope($3);
     } 
   tPartnerLinks_opt
   tPartners_opt
@@ -271,7 +266,7 @@ tProcess:
   X_NEXT X_SLASH K_PROCESS X_CLOSE
     { TheProcess = $$ = Process($6, $7, $8, $9, $10, $11, $12, $13);
       att.check($3, K_PROCESS);
-      csQuitScope();
+      symMan.quitScope();
       $$->name = att.read($3, "name");
       $$->targetNamespace = att.read($3, "targetNamespace");
       $$->queryLanguage = att.read($3, "queryLanguage");
@@ -389,7 +384,7 @@ tPartnerLink:
       $$->partnerLinkType = att.read($2, "partnerLinkType");
       $$->myRole = att.read($2, "myRole");
       $$->partnerRole = att.read($2, "partnerRole"); 
-      csAddPartnerLink($2, new csPartnerLink($$->name->name, $$->partnerLinkType->name, 
+      symMan.addPartnerLink($2, new csPartnerLink($$->name->name, $$->partnerLinkType->name, 
 			                     $$->myRole->name, $$->partnerRole->name)); 
     }
 | K_PARTNERLINK arbitraryAttributes X_SLASH
@@ -398,7 +393,7 @@ tPartnerLink:
       $$->partnerLinkType = att.read($2, "partnerLinkType");
       $$->myRole = att.read($2, "myRole");
       $$->partnerRole = att.read($2, "partnerRole");
-      csAddPartnerLink($2, new csPartnerLink($$->name->name, $$->partnerLinkType->name, 
+      symMan.addPartnerLink($2, new csPartnerLink($$->name->name, $$->partnerLinkType->name, 
 			                     $$->myRole->name, $$->partnerRole->name)); 
     }
 ;
@@ -706,7 +701,7 @@ tVariable:
       $$->messageType = att.read($2, "messageType");
       $$->type = att.read($2, "type");
       $$->element = att.read($2, "element"); 
-      csAddVariable($2, new csVariable($$->name->name, $$->messageType->name, $$->type->name, $$->element->name));
+      symMan.addVariable($2, new csVariable($$->name->name, $$->messageType->name, $$->type->name, $$->element->name));
     }
 | K_VARIABLE arbitraryAttributes X_SLASH
     { $$ = Variable();
@@ -714,7 +709,7 @@ tVariable:
       $$->messageType = att.read($2, "messageType");
       $$->type = att.read($2, "type");
       $$->element = att.read($2, "element"); 
-      csAddVariable($2, new csVariable($$->name->name, $$->messageType->name, $$->type->name, $$->element->name));
+      symMan.addVariable($2, new csVariable($$->name->name, $$->messageType->name, $$->type->name, $$->element->name));
     }
 ;
 
@@ -1300,7 +1295,7 @@ tTerminate:
 tFlow:
   K_FLOW arbitraryAttributes X_NEXT
     {
-      csNewFlowScope($2);
+      symMan.newFlowScope($2);
     } 
   standardElements
   tLinks_opt
@@ -1311,7 +1306,7 @@ tFlow:
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
       $$->id = $2;
-      csQuitScope();
+      symMan.quitScope();
     }
 ;
 
@@ -1547,7 +1542,7 @@ tPick:
 tScope:
   K_SCOPE arbitraryAttributes X_NEXT
   {
-    csNewScopeScope($2);
+    symMan.newScopeScope($2);
   }
   standardElements
   tVariables_opt
@@ -1563,7 +1558,7 @@ tScope:
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
       $$->variableAccessSerializable = att.read($2, "variableAccessSerializable");
       $$->id = $2; 
-      csQuitScope();
+      symMan.quitScope();
     }
 ;
 

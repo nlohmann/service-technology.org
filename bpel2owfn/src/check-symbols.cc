@@ -10,14 +10,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/11/24 10:41:00 $
+ *          - last changed: \$Date: 2005/11/24 12:00:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.1 $
+ * \version \$Revision: 1.2 $
  *          - 2005-11-22 (gierds) Initial version.
  *
  * \todo    - bug in Kimwitu++ (attributes have extra signs) might sabotage us
@@ -30,15 +30,24 @@
 
 extern std::string intToString(int);	// little helper function (helpers.cc)
 
-/// most outer scope - the Process
-SymbolScope * processScope = NULL;
-/// the current scope
-SymbolScope * currentScope = NULL;
-/// a stack to return to higher scopes
-// stack<SymbolScope *> scopeStack;
-
 /// variable to format scope tree output
 int SymbolScope::indent = 0;
+
+SymbolManager::SymbolManager()
+{
+  processScope = NULL;
+  currentScope = NULL;
+}
+
+SymbolManager::~SymbolManager()
+{
+  if (processScope != NULL)
+  {
+    delete(processScope);
+    processScope = NULL;
+    currentScope = NULL;
+  }
+}  
 
 /**
  * Initialise the Process Scope.
@@ -46,7 +55,7 @@ int SymbolScope::indent = 0;
  * \param id ID of the AST node
  *
  */
-void initialiseProcessScope(kc::integer id)
+void SymbolManager::initialiseProcessScope(kc::integer id)
 {
   processScope = new ProcessScope(id);
   currentScope = processScope;
@@ -58,7 +67,7 @@ void initialiseProcessScope(kc::integer id)
  * \param id ID of the AST node
  *
  */
-void csNewScopeScope(kc::integer id)
+void SymbolManager::newScopeScope(kc::integer id)
 {
   currentScope = new ScopeScope(id, currentScope);
 }
@@ -69,7 +78,7 @@ void csNewScopeScope(kc::integer id)
  * \param id ID of the AST node
  *
  */
-void csNewFlowScope(kc::integer id)
+void SymbolManager::newFlowScope(kc::integer id)
 {
   currentScope = new FlowScope(id, currentScope);
 }
@@ -78,7 +87,7 @@ void csNewFlowScope(kc::integer id)
  * Leaves the current scope to the parent scope (if any).
  *
  */
-void csQuitScope()
+void SymbolManager::quitScope()
 {
   trace(TRACE_DEBUG, "[CS] - Leaving scope " + intToString(currentScope->id->value));
 
@@ -102,7 +111,7 @@ void csQuitScope()
  * \param pl Pointer to the PartnerLink that shall be added 
  *
  */
-void csAddPartnerLink(kc::integer id, csPartnerLink* pl)
+void SymbolManager::addPartnerLink(kc::integer id, csPartnerLink* pl)
 {
   trace(TRACE_VERY_DEBUG, "[CS] Adding PartnerLink " + pl->name + ", " + pl->partnerLinkType + ", "
 		      + pl->myRole + ", " + pl->partnerRole + "\n");
@@ -134,7 +143,7 @@ void csAddPartnerLink(kc::integer id, csPartnerLink* pl)
  * \param pl The PartnerLink to be checked
  *
  */
-void csCheckPartnerLink(csPartnerLink* pl)
+void SymbolManager::checkPartnerLink(csPartnerLink* pl)
 {
   trace(TRACE_DEBUG, "[CS] Checking PartnerLink " + pl->name + ", " + pl->partnerLinkType + ", "
 		      + pl->myRole + ", " + pl->partnerRole + "\n");
@@ -176,7 +185,7 @@ void csCheckPartnerLink(csPartnerLink* pl)
 }
 
 
-void csAddVariable(kc::integer id, csVariable* var)
+void SymbolManager::addVariable(kc::integer id, csVariable* var)
 {
   trace(TRACE_VERY_DEBUG, "[CS] Adding Variable " + var->name + ", " + var->messageType + ", "
 		      + var->type + ", " + var->element + "\n");
@@ -192,6 +201,15 @@ void csAddVariable(kc::integer id, csVariable* var)
   currentScope->variables.push_back(var);
 }
 
+void SymbolManager::printScope()
+{
+  if (processScope != NULL)
+  {
+    trace(TRACE_DEBUG, "\nPrinting scope tree:\n\n");
+    processScope->print();
+    trace(TRACE_DEBUG, "\n");
+  }
+}
 
 SymbolScope::SymbolScope(kc::integer myid)
 {

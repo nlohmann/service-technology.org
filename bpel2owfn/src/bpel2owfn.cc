@@ -12,14 +12,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/24 10:40:59 $
+ *          - last changed: \$Date: 2005/11/24 12:00:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -107,9 +107,7 @@ int main( int argc, char *argv[])
     {
       trace(TRACE_INFORMATION, "Parsing complete.\n");
       
-      trace(TRACE_DEBUG, "\nPrinting scope tree:\n\n");
-      processScope->print();
-      trace(TRACE_DEBUG, "\n");
+      symMan.printScope();
       
       if (mode_ast)
       {

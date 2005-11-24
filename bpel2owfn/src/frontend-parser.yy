@@ -1088,9 +1088,10 @@ tFrom:
       $$->query = att.read($2, "query");
       $$->property = att.read($2, "property");
       $$->partnerLink = att.read($2, "partnerLink");
-      $$->endpointReference = att.read($2, "endpointReference");
-      $$->expression = att.read($2, "expression");
-      $$->opaque = att.read($2, "opaque"); }
+//      $$->endpointReference = att.read($2, "endpointReference");
+//      $$->expression = att.read($2, "expression");
+//      $$->opaque = att.read($2, "opaque");
+}
 | K_FROM arbitraryAttributes X_SLASH
     { $$ = From();
       $$->variable = att.read($2, "variable");
@@ -1098,9 +1099,10 @@ tFrom:
       $$->query = att.read($2, "query");
       $$->property = att.read($2, "property");
       $$->partnerLink = att.read($2, "partnerLink");
-      $$->endpointReference = att.read($2, "endpointReference");
-      $$->expression = att.read($2, "expression");
-      $$->opaque = att.read($2, "opaque"); }
+//      $$->endpointReference = att.read($2, "endpointReference");
+//      $$->expression = att.read($2, "expression");
+//      $$->opaque = att.read($2, "opaque"); 
+}
 ;
 
 /*
@@ -1115,14 +1117,16 @@ tTo:
   K_TO arbitraryAttributes X_NEXT
   X_SLASH K_TO
     { $$ = To();
-      $$->expression = att.read($2, "expression");
-      $$->opaque = att.read($2, "opaque");
-      $$->endpointReference = att.read($2, "endpointReference"); }
+//      $$->expression = att.read($2, "expression");
+//      $$->opaque = att.read($2, "opaque");
+//      $$->endpointReference = att.read($2, "endpointReference");
+}
 | K_TO arbitraryAttributes X_SLASH
     { $$ = To();
-      $$->expression = att.read($2, "expression");
-      $$->opaque = att.read($2, "opaque");
-      $$->endpointReference = att.read($2, "endpointReference"); }
+//      $$->expression = att.read($2, "expression");
+//      $$->opaque = att.read($2, "opaque");
+//      $$->endpointReference = att.read($2, "endpointReference");
+}
 ;
 
 

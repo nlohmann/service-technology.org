@@ -3,27 +3,29 @@
  *
  * \brief The control component for BPEL2oWFN
  *
- * This file controls the behaviour of BPEL2oWFN and is the interface to the environment.
+ * This file controls the behaviour of BPEL2oWFN and is the interface to the 
+ * environment.
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/20 13:28:58 $
+ *          - last changed: \$Date: 2005/11/24 10:40:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
  *          - 2005-11-15 (nlohmann) Call Exception::info() to signal error.
- *          - 2005-11-16 (gierds) Use of error() and cleanup() as defined in helpers.cc
+ *          - 2005-11-16 (gierds) Use of error() and cleanup() as defined in 
+ *            helpers.cc
  *
  */
 
@@ -104,6 +106,11 @@ int main( int argc, char *argv[])
     if (!error)
     {
       trace(TRACE_INFORMATION, "Parsing complete.\n");
+      
+      trace(TRACE_DEBUG, "\nPrinting scope tree:\n\n");
+      processScope->print();
+      trace(TRACE_DEBUG, "\n");
+      
       if (mode_ast)
       {
         TheProcess->print();
@@ -154,7 +161,7 @@ int main( int argc, char *argv[])
 
     return error;
   }
-  catch (Exception e)
+  catch (Exception& e)
   {
     error(e);
   }

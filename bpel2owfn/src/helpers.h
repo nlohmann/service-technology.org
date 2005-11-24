@@ -8,11 +8,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes by: \$Author: nlohmann $
+ *          - last changes by: \$Author: gierds $
  *          
  * \date    
  * 	    - created: 2005-11-11
- *          - last changed: \$Date: 2005/11/20 22:48:17 $
+ *          - last changed: \$Date: 2005/11/24 10:40:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -22,11 +22,9 @@
  * \version
  *          - 2005-11-11 (nlohmann) Initial version.
  *          - 2005-11-16 (gierds) Added error() and cleanup() functions.
+ *          - 2005-11-22 (gierds) Include #check-symbols.h to know about
+ *            #Scope.
  */
-
-
-
-
 
 #ifndef HELPERS_H
 #define HELPERS_H
@@ -35,6 +33,7 @@
 #include <string>
 #include "petrinet.h"
 #include "exception.h"	// exception handling
+#include "check-symbols.h"
 
 using namespace std;
 

@@ -7,18 +7,18 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/11/15
- *          - last changed: \$Date: 2005/11/20 13:29:43 $
+ *          - last changed: \$Date: 2005/11/24 10:40:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  *          - 2005-11-15 (gierds) Initial version.
  *          - 2005-11-15 (nlohmann) Overworked class and moved error output
  *            into class.
@@ -42,10 +42,14 @@ using namespace std;
 /// Enumeration holding the error-codes of the possible exceptions.
 typedef enum
 {
-  FILE_NOT_FOUND = 2,	///< "File not found" exception
-  NODE_NOT_FOUND,       ///< "Node not found" exception (petrinet.cc)
-  MERGING_ERROR,        ///< "Merging-error" exception (petrinet.cc)
-  ARC_ERROR             ///< "Arc between" exception (petrinet.cc)
+  FILE_NOT_FOUND = 2,	    ///< "File not found" exception
+  NODE_NOT_FOUND,           ///< "Node not found" exception (petrinet.cc)
+  MERGING_ERROR,            ///< "Merging-error" exception (petrinet.cc)
+  ARC_ERROR,                ///< "Arc between" exception (petrinet.cc)
+  CHECK_SYMBOLS_CAST_ERROR, ///< "Dynamic cast error" exception (check-symbols.cc)
+  DOUBLE_PARTNERLINK,       ///< "Two PartnerLinks with same name" exception (check-symbols.cc)	  
+  DOUBLE_VARIABLE,          ///< "Two Variables with same name" exception (check-symbols.cc)	  
+  PARTNERLINK_UNDEFINED     ///< "PartnerLink does not exist" exception (check-symbols.cc)
 } exception_id;
 
 

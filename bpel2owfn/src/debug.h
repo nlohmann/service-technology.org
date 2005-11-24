@@ -5,18 +5,18 @@
  *
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2005/11/20 13:29:25 $
+ *          - last changed: \$Date: 2005/11/24 10:40:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  *          - 2005-11-15 (gierds) Trace level as enum.
  *
  */
@@ -27,6 +27,8 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <exception>
+
 #include "helpers.h"
 
 

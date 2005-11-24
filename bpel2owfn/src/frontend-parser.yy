@@ -110,7 +110,19 @@ using namespace kc;
 /// the root of the abstract syntax tree
 tProcess TheProcess;
 
+#include "check-symbols.h"
 
+// from check-symbols
+extern SymbolScope * processScope;
+extern SymbolScope * currentScope;
+extern void initialiseProcessScope(kc::integer id);
+extern void csNewScopeScope(kc::integer id);
+extern void csNewFlowScope(kc::integer id);
+extern void csQuitScope();
+extern void csAddPartnerLink(kc::integer id, csPartnerLink* pl);
+extern void csAddVariable(kc::integer id, csVariable* var);
+extern void csCheckPartnerLink(csPartnerLink* pl);
+extern void csCheckPartners(csPartnerLink* pl);
 
 %}
 
@@ -243,6 +255,9 @@ tProcess TheProcess;
 
 tProcess:
   X_OPEN K_PROCESS arbitraryAttributes X_NEXT
+    {
+      initialiseProcessScope($3);
+    } 
   tPartnerLinks_opt
   tPartners_opt
   tVariables_opt
@@ -252,8 +267,9 @@ tProcess:
   tEventHandlers_opt
   activity
   X_NEXT X_SLASH K_PROCESS X_CLOSE
-    { TheProcess = $$ = Process($5, $6, $7, $8, $9, $10, $11, $12);
+    { TheProcess = $$ = Process($6, $7, $8, $9, $10, $11, $12, $13);
       att.check($3, K_PROCESS);
+      csQuitScope();
       $$->name = att.read($3, "name");
       $$->targetNamespace = att.read($3, "targetNamespace");
       $$->queryLanguage = att.read($3, "queryLanguage");
@@ -370,13 +386,19 @@ tPartnerLink:
       $$->name = att.read($2, "name");
       $$->partnerLinkType = att.read($2, "partnerLinkType");
       $$->myRole = att.read($2, "myRole");
-      $$->partnerRole = att.read($2, "partnerRole"); }
+      $$->partnerRole = att.read($2, "partnerRole"); 
+      csAddPartnerLink($2, new csPartnerLink($$->name->name, $$->partnerLinkType->name, 
+			                     $$->myRole->name, $$->partnerRole->name)); 
+    }
 | K_PARTNERLINK arbitraryAttributes X_SLASH
     { $$ = PartnerLink();
       $$->name = att.read($2, "name");
       $$->partnerLinkType = att.read($2, "partnerLinkType");
       $$->myRole = att.read($2, "myRole");
-      $$->partnerRole = att.read($2, "partnerRole"); }
+      $$->partnerRole = att.read($2, "partnerRole");
+      csAddPartnerLink($2, new csPartnerLink($$->name->name, $$->partnerLinkType->name, 
+			                     $$->myRole->name, $$->partnerRole->name)); 
+    }
 ;
 
 
@@ -681,13 +703,17 @@ tVariable:
       $$->name = att.read($2, "name");
       $$->messageType = att.read($2, "messageType");
       $$->type = att.read($2, "type");
-      $$->element = att.read($2, "element"); }
+      $$->element = att.read($2, "element"); 
+      csAddVariable($2, new csVariable($$->name->name, $$->messageType->name, $$->type->name, $$->element->name));
+    }
 | K_VARIABLE arbitraryAttributes X_SLASH
     { $$ = Variable();
       $$->name = att.read($2, "name");
       $$->messageType = att.read($2, "messageType");
       $$->type = att.read($2, "type");
-      $$->element = att.read($2, "element"); }
+      $$->element = att.read($2, "element"); 
+      csAddVariable($2, new csVariable($$->name->name, $$->messageType->name, $$->type->name, $$->element->name));
+    }
 ;
 
 
@@ -1265,15 +1291,20 @@ tTerminate:
 
 tFlow:
   K_FLOW arbitraryAttributes X_NEXT
+    {
+      csNewFlowScope($2);
+    } 
   standardElements
   tLinks_opt
   activity_list //1-oo
   X_SLASH K_FLOW
-    { $$ = Flow($4, $5, $6);
+    { $$ = Flow($5, $6, $7);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
-      $$->id = $2; }
+      $$->id = $2;
+      csQuitScope();
+    }
 ;
 
 activity_list:
@@ -1507,6 +1538,9 @@ tPick:
 
 tScope:
   K_SCOPE arbitraryAttributes X_NEXT
+  {
+    csNewScopeScope($2);
+  }
   standardElements
   tVariables_opt
   tCorrelationSets_opt
@@ -1515,12 +1549,14 @@ tScope:
   tEventHandlers_opt
   activity X_NEXT
   X_SLASH K_SCOPE
-    { $$ = Scope($4, $5, $7, $8, $9, $10);
+    { $$ = Scope($5, $6, $8, $9, $10, $11);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
       $$->variableAccessSerializable = att.read($2, "variableAccessSerializable");
-      $$->id = $2; }
+      $$->id = $2; 
+      csQuitScope();
+    }
 ;
 
 

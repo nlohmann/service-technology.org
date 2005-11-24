@@ -12,19 +12,21 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2005/11/17 13:59:47 $
+ *          - last changed: \$Date: 2005/11/24 10:40:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  *          - 2005-11-11 (nlohmann) Initial version.
- *          - 2005-11-15 (gierds) Moved commandline evaluation functions from main.cc to here.
+ *          - 2005-11-15 (gierds) Moved commandline evaluation functions from
+ *            main.cc to here.
  *            Added LoLA command line arguments.
  *          - 2005-11-16 (gierds) Added error() and cleanup() functions.
  *            Added extra command line parameters to debug flex and bison.
+ *          - 2005-11-22 (gierds) Added cleanup of scopes.
  */
 
 
@@ -32,6 +34,11 @@
 
 /// The Petri Net
 extern PetriNet *TheNet;
+
+/// processScope from #check-symbols.cc
+extern SymbolScope * processScope;
+/// currentScope from #check-symbols.cc
+extern SymbolScope * currentScope;
 
 /*!
  * \param a set of Petri net nodes
@@ -505,6 +512,13 @@ void cleanup()
     dot_output = NULL;
   }
 
+  if (processScope != NULL)
+  {
+    delete(processScope);
+    processScope = NULL;
+    currentScope = NULL;
+  }
+  
   if (mode_petri_net) 
   {
     trace(TRACE_INFORMATION," + Deleting Petri Net pointer\n");

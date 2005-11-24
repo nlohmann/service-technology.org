@@ -1,4 +1,4 @@
-# last changed $Date: 2005/11/22 09:03:55 $ by $Author: nlohmann $
+# last changed $Date: 2005/11/24 10:40:59 $ by $Author: gierds $
 
 
 
@@ -29,7 +29,8 @@ KC_TIME = .kc_time_stamp
 bpel2owfn: bpel-syntax.o bpel-lexic.o\
 	main.o debug.o exception.o bpel-attributes.o petrinet.o helpers.o\
 	bpel-abstract.o bpel-unparse-xml.o bpel-unparse-petri.o bpel-rewrite.o\
-	bpel-kc-unpk.o bpel-kc-rk.o bpel-kc-csgiok.o bpel-kc-k.o
+	bpel-kc-unpk.o bpel-kc-rk.o bpel-kc-csgiok.o bpel-kc-k.o\
+	check-symbols.o
 	$(CXX) $(CXXFLAGS2) -o $@ $^
 
 
@@ -55,6 +56,8 @@ helpers.o: helpers.h helpers.cc
 exception.o: exception.h exception.cc
 	$(CXX) $(CXXFLAGS2) -c -o $@ $(@:.o=.cc)
 
+check-symbols.o: check-symbols.h check-symbols.cc $(KC_TIME)
+	$(CXX) $(CXXFLAGS2) -c -o $@ $(@:.o=.cc)
 
 ###############################################################################
 # Parser
@@ -65,7 +68,7 @@ bpel-lexic.o: bpel-lexic.c $(KC_TIME)
 bpel-lexic.c: bpel-lexic.l
 	$(LEX) -o$@ $<
 
-bpel-syntax.o: bpel-syntax.c $(KC_TIME)
+bpel-syntax.o: bpel-syntax.c $(KC_TIME) check-symbols.h
 	$(CXX) $(CXXFLAGS2) -c -o $@ $(@:.o=.c)
 
 bpel-syntax.c: bpel-syntax.y

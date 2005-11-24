@@ -5,18 +5,18 @@
  *
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2005/11/20 13:28:58 $
+ *          - last changed: \$Date: 2005/11/24 10:40:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  *          - 2005-11-09 (gierds) Initial version.
  *          - 2005-11-15 (gierds) Added Exception class.
  *          - 2005-11-16 (gierds) Use of error() and cleanup() as defined in helpers.cc
@@ -40,6 +40,11 @@
 #include "petrinet.h"           // Petri Net support
 #include "debug.h"		// debugging help
 #include "exception.h"		// exception handling
+#include "check-symbols.h"	// scope handling and checking
+
+// from check-symbols
+extern SymbolScope * processScope;
+
 
 /* defined by Bison */
 extern int yyparse();
@@ -54,5 +59,9 @@ extern FILE *yyin;        ///< pointer to the input file
 
 /// used to indicate trace_level
 extern int debug_level;
+
+// from check-symbols
+extern SymbolScope * processScope;
+
 
 #endif

@@ -13,7 +13,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2005/11/21 15:05:50 $
+ *          - last changed: \$Date: 2005/11/24 10:42:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-17 (nlohmann) Added default attributes.
  * 
@@ -341,6 +341,9 @@ tCorrelationSet:
 
 tCorrelation_list:
   list tCorrelation
+  {
+    bool initiateCorrelationSet;
+  }
 ;
 
 %{
@@ -521,12 +524,12 @@ tFrom:
   {
     casestring variable;
     casestring part;
-    casestring query;
-    casestring property;
+    casestring query; // only excecutable processes
     casestring partnerLink;
     casestring endpointReference;
+    casestring property;
     casestring expression;
-    casestring opaque;
+    casestring opaque; // only abstract processes
   }
 ;
 
@@ -540,9 +543,13 @@ tFrom:
 tTo:
   To()
   {
-    casestring expression;
-    casestring opaque;
-    casestring endpointReference;
+    //casestring expression; (prohibited)
+    //casestring opaque; (prohibited)
+    //casestring endpointReference; (prohibited)
+    casestring variable;
+    casestring part;
+    casestring partnerLink;
+    casestring property;
   }
 ;
 

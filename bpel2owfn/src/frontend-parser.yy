@@ -29,7 +29,9 @@
  *
  * \version
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
- *	      - 2005-11-21 (dreinert) Added tProcess	
+ *	    - 2005-11-21 (dreinert) Added tProcess.
+ *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
+ *            initiateCorrelationSet to tCorrelation_list.
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -790,9 +792,13 @@ tCorrelations:
 
 tCorrelation_list:
   tCorrelation X_NEXT
-    { $$ = ConstCorrelation_list($1, NiltCorrelation_list()); }
+    { $$ = ConstCorrelation_list($1, NiltCorrelation_list());
+      if ($1->initiate = mkcasestring("yes"))
+        $$->initiateCorrelationSet = true; }
 | tCorrelation X_NEXT tCorrelation_list
-    { $$ = ConstCorrelation_list($1, $3); }
+    { $$ = ConstCorrelation_list($1, $3);
+      if ($1->initiate = mkcasestring("yes"))
+        $$->initiateCorrelationSet = true; }
 ;
 
 tCorrelation:
@@ -1086,23 +1092,21 @@ tFrom:
       $$->variable = att.read($2, "variable");
       $$->part = att.read($2, "part");
       $$->query = att.read($2, "query");
-      $$->property = att.read($2, "property");
       $$->partnerLink = att.read($2, "partnerLink");
-//      $$->endpointReference = att.read($2, "endpointReference");
-//      $$->expression = att.read($2, "expression");
-//      $$->opaque = att.read($2, "opaque");
-}
+      $$->endpointReference = att.read($2, "endpointReference");
+      $$->property = att.read($2, "property");
+      $$->expression = att.read($2, "expression");
+      $$->opaque = att.read($2, "opaque"); }
 | K_FROM arbitraryAttributes X_SLASH
     { $$ = From();
       $$->variable = att.read($2, "variable");
       $$->part = att.read($2, "part");
       $$->query = att.read($2, "query");
-      $$->property = att.read($2, "property");
       $$->partnerLink = att.read($2, "partnerLink");
-//      $$->endpointReference = att.read($2, "endpointReference");
-//      $$->expression = att.read($2, "expression");
-//      $$->opaque = att.read($2, "opaque"); 
-}
+      $$->endpointReference = att.read($2, "endpointReference");
+      $$->property = att.read($2, "property");
+      $$->expression = att.read($2, "expression");
+      $$->opaque = att.read($2, "opaque"); }
 ;
 
 /*
@@ -1117,16 +1121,16 @@ tTo:
   K_TO arbitraryAttributes X_NEXT
   X_SLASH K_TO
     { $$ = To();
-//      $$->expression = att.read($2, "expression");
-//      $$->opaque = att.read($2, "opaque");
-//      $$->endpointReference = att.read($2, "endpointReference");
-}
+      $$->variable = att.read($2, "variable");
+      $$->part = att.read($2, "part");
+      $$->partnerLink = att.read($2, "partnerLink");
+      $$->property = att.read($2, "property"); }
 | K_TO arbitraryAttributes X_SLASH
     { $$ = To();
-//      $$->expression = att.read($2, "expression");
-//      $$->opaque = att.read($2, "opaque");
-//      $$->endpointReference = att.read($2, "endpointReference");
-}
+      $$->variable = att.read($2, "variable");
+      $$->part = att.read($2, "part");
+      $$->partnerLink = att.read($2, "partnerLink");
+      $$->property = att.read($2, "property"); }
 ;
 
 

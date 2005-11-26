@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/11/26 14:11:29 $
+ *          - last changed: \$Date: 2005/11/26 16:20:46 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.45 $
+ * \version \$Revision: 1.46 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -896,7 +896,9 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
  * 
  * \param p1 first place
  * \param p2 second place
- * 
+ *
+ * \todo
+ *       - Take care of arc inscriptions.
  */
 void PetriNet::mergePlaces(Place *p1, Place *p2)
 {  
@@ -1037,7 +1039,12 @@ set<pair<Node *, arc_type> > PetriNet::postset(Node *n)
  */
 Place *PetriNet::findPlace(string role)
 {
-  return (Place *)roleMap[role];
+  Place *result = (Place *)roleMap[role];
+
+  if (result == NULL)
+    trace(TRACE_DEBUG, "[PN]\tPlace with role \"" + role + "\" not found.\n");
+
+  return result;
 }
 
 

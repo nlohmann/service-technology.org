@@ -14,11 +14,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/11/24 12:00:53 $
+ *          - last changed: \$Date: 2005/11/26 12:13:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,12 +30,13 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
  *            initiateCorrelationSet to tCorrelation_list.
- *          - 2005-11-24 (gierds) Added basic symbol manager 
+ *          - 2005-11-24 (gierds) Added basic symbol manager.
+ *          - 2005-11-26 (nlohmann) Added <import>-tag
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -55,8 +56,8 @@
 // the terminal symbols (tokens)
 %token K_ASSIGN K_CASE K_CATCH K_CATCHALL K_COMPENSATE K_COMPENSATIONHANDLER
 %token K_COPY K_CORRELATION K_CORRELATIONS K_CORRELATIONSET K_CORRELATIONSETS
-%token K_EMPTY K_EVENTHANDLERS K_FAULTHANDLERS K_FLOW K_FROM K_INVOKE K_LINK
-%token K_LINKS K_ONALARM K_ONMESSAGE K_OTHERWISE K_PARTNER K_PARTNERLINK
+%token K_EMPTY K_EVENTHANDLERS K_FAULTHANDLERS K_FLOW K_FROM K_IMPORT K_INVOKE
+%token K_LINK K_LINKS K_ONALARM K_ONMESSAGE K_OTHERWISE K_PARTNER K_PARTNERLINK
 %token K_PARTNERLINKS K_PARTNERS K_PICK K_PROCESS K_RECEIVE K_REPLY K_SCOPE
 %token K_SEQUENCE K_SOURCE K_SWITCH K_TARGET K_TERMINATE K_THROW K_TO
 %token K_VARIABLE K_VARIABLES K_WAIT K_WHILE
@@ -255,6 +256,7 @@ tProcess:
     {
       symMan.initialiseProcessScope($3);
     } 
+  imports
   tPartnerLinks_opt
   tPartners_opt
   tVariables_opt
@@ -264,7 +266,7 @@ tProcess:
   tEventHandlers_opt
   activity
   X_NEXT X_SLASH K_PROCESS X_CLOSE
-    { TheProcess = $$ = Process($6, $7, $8, $9, $10, $11, $12, $13);
+    { TheProcess = $$ = Process($7, $8, $9, $10, $11, $12, $13, $14);
       att.check($3, K_PROCESS);
       symMan.quitScope();
       $$->name = att.read($3, "name");
@@ -277,7 +279,14 @@ tProcess:
       $$->xmlns = att.read($3, "xmlns"); }
 ;
 
+/* import other namespaces */
+imports:
+  /* empty */
+| K_IMPORT arbitraryAttributes X_SLASH X_NEXT imports
+;
+
 /*---------------------------------------------------------------------------*/
+
 
 /*
   The token "activity" can be any of the following:
@@ -685,6 +694,8 @@ tVariables:
   tVariable_list // 1-oo
   X_SLASH K_VARIABLES
     { $$ = $3; }
+| K_VARIABLES X_SLASH
+    { $$ = NiltVariable_list(); }
 ;
 
 tVariable_list:

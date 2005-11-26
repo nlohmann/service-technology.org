@@ -19,7 +19,7 @@
  *          
  * \date
  *          - created 2005-11-10
- *          - last changed: \$Date: 2005/11/17 08:53:01 $
+ *          - last changed: \$Date: 2005/11/26 12:13:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -32,6 +32,7 @@
  * \version
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-16 (nlohmann) Cut quotes from strings.
+ *          - 2005-11-25 (nlohmann) Added <import>-tag.
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -76,6 +77,7 @@ int currentView;
 // two additional views for attributes and comments
 #define ATTRIBUTE 1 ///< start condition to allow lexing attributes
 #define COMMENT 2   ///< start condition to allow lexing comments
+#define XMLHEADER 3 ///< start condition to allow lexing xml headers
 
 
 
@@ -89,12 +91,14 @@ name			{namestart}{namechar}*
 esc			"&#"[0-9]+";"|"&#x"[0-9a-fA-F]+";"
 string			\"([^"]|{esc})*\"
 comment			([^-]|"-"[^-])*
-bpwsns			"bpws:"
+xmlheader		([^?]|"-"[^?])*
+bpwsns			"bpws:"|"bpel:"
 
 
  /* start conditions of the lexer */
 %s ATTRIBUTE
 %s COMMENT
+%s XMLHEADER
 
 
 
@@ -106,6 +110,10 @@ bpwsns			"bpws:"
 "!--"				{ currentView = YY_START; BEGIN(COMMENT); }
 <COMMENT>{comment}		{ /* skip */ }
 <COMMENT>"-->"[ \t\r\n]*"<"	{ BEGIN(currentView); }
+
+"?xml"				{ currentView = YY_START; BEGIN(XMLHEADER); }
+<XMLHEADER>{xmlheader}		{ /* skip */ }
+<XMLHEADER>"?>"[ \t\r\n]*"<"	{ BEGIN(currentView); }
 
 
  /* attributes */
@@ -123,8 +131,6 @@ bpwsns			"bpws:"
 "/"				{ return X_SLASH; }
 ">"				{ BEGIN(INITIAL); return X_CLOSE; }
 ">"[ \t\r\n]*"<"		{ BEGIN(INITIAL); return X_NEXT; }
-"<?xml version=\"1.0\"?>"	{ /* ignore XML-version */ }
-"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"	{ /* ignore XML-version */ }
 
 
  /* names of BPEL-elements */
@@ -144,6 +150,7 @@ bpwsns			"bpws:"
 {bpwsns}?"faultHandlers"	{ return K_FAULTHANDLERS; }
 {bpwsns}?"flow"			{ BEGIN(ATTRIBUTE); return K_FLOW; }
 {bpwsns}?"from"			{ BEGIN(ATTRIBUTE); return K_FROM; }
+{bpwsns}?"import"		{ BEGIN(ATTRIBUTE); return K_IMPORT; }
 {bpwsns}?"invoke"		{ BEGIN(ATTRIBUTE); return K_INVOKE; }
 {bpwsns}?"link"			{ BEGIN(ATTRIBUTE); return K_LINK; }
 {bpwsns}?"links"		{ BEGIN(ATTRIBUTE); return K_LINKS; }

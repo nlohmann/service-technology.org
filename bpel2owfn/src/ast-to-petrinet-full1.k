@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/11/23 22:23:02 $
+ *          - last changed: \$Date: 2005/11/26 13:29:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -414,7 +414,7 @@ ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) ->
     }
     a b
     {
-      foreach (catchLeaf=Catch(catchActivity=activity); tCatch_list a)
+      foreach (catchLeaf=Catch(innerActivity); tCatch_list a)
       {
 	string faultToCatch = catchLeaf->faultName->name;
 	Transition *t1 = TheNet->newTransition(prefix + "t1." + faultToCatch, faultToCatch);
@@ -423,18 +423,18 @@ ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) ->
 	TheNet->newArc(p4, t1);
 	TheNet->newArc(p7, t1, READ, "x");
 
-	TheNet->newArc(t1, TheNet->findPlace(catchActivity, ".initial"));
-	TheNet->newArc(TheNet->findPlace(catchActivity, ".final"), t2);
-	TheNet->mergePlaces(TheNet->findPlace(catchActivity, ".stop"),
+	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
+	TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t2);
+	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".stop"),
 			    TheNet->findPlace("process.faulthandler.p11"));
-	TheNet->mergePlaces(TheNet->findPlace(catchActivity, ".stopped"),
+	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".stopped"),
 			    TheNet->findPlace("process.faulthandler.p12"));
 	
 	TheNet->newArc(t2, p3);
 	TheNet->newArc(p7, t2, "x");
       }
 
-      foreach (catchAllLeaf=CatchAll(catchAllActivity=activity); tCatchAll_list b)
+      foreach (CatchAll(innerActivity); tCatchAll_list b)
       {
 	Transition *t3 = TheNet->newTransition(prefix + "t3.catchAll", "catchAll");
 	Transition *t4 = TheNet->newTransition(prefix + "t4.catchAll");
@@ -442,11 +442,11 @@ ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) ->
 	TheNet->newArc(p4, t3);
 	TheNet->newArc(p7, t3, READ, "x");
 
-	TheNet->newArc(t3, TheNet->findPlace(catchAllActivity, ".initial"));
-	TheNet->newArc(TheNet->findPlace(catchAllActivity, ".final"), t4);
-	TheNet->mergePlaces(TheNet->findPlace(catchAllActivity, ".stop"),
+	TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
+	TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t4);
+	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".stop"),
 			    TheNet->findPlace("process.faulthandler.p11"));
-	TheNet->mergePlaces(TheNet->findPlace(catchAllActivity, ".stopped"),
+	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".stopped"),
 			    TheNet->findPlace("process.faulthandler.p12"));
 
 	TheNet->newArc(t4, p3);
@@ -634,7 +634,7 @@ ConstEventHandlers_opt(EventHandlers(a,b), NiltEventHandlers_opt()) ->
       // the <onMessage>s
       int onMessageCount = 1;
 
-      foreach (o=OnMessage(p=activity); tOnMessage_list a)
+      foreach (OnMessage(innerActivity); tOnMessage_list a)
       {
 	std::string newprefix = prefix + "onMessage" + intToString(onMessageCount) + ".";
 
@@ -696,10 +696,10 @@ ConstEventHandlers_opt(EventHandlers(a,b), NiltEventHandlers_opt()) ->
 	TheNet->newArc(onMessage_p12, t16);
 
 	// embed the innerActivity
-	TheNet->mergePlaces(TheNet->findPlace(p, ".initial"), onMessage_p3);
-	TheNet->mergePlaces(TheNet->findPlace(p, ".stop"), onMessage_p11);
-	TheNet->mergePlaces(TheNet->findPlace(p, ".stopped"), onMessage_p12);
-	TheNet->mergePlaces(TheNet->findPlace(p, ".final"), onMessage_p4);
+	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".initial"), onMessage_p3);
+	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".stop"), onMessage_p11);
+	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".stopped"), onMessage_p12);
+	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".final"), onMessage_p4);
 	
 	onMessageCount++;
       }
@@ -707,7 +707,7 @@ ConstEventHandlers_opt(EventHandlers(a,b), NiltEventHandlers_opt()) ->
 
       // the <onAlarm>s
       int onAlarmCount = 1;
-      foreach (o=OnAlarm(p=activity); tOnAlarm_list b)
+      foreach (o=OnAlarm(innerActivity); tOnAlarm_list b)
       {
 	std::string onAlarmGuard;
 	std::string newprefix = prefix + "onAlarm" + intToString(onAlarmCount) + ".";
@@ -761,10 +761,10 @@ ConstEventHandlers_opt(EventHandlers(a,b), NiltEventHandlers_opt()) ->
 	TheNet->newArc(onAlarm_p10, t16);
 	
 	// embed the innerActivity
-	TheNet->mergePlaces(TheNet->findPlace(p, ".initial"), onAlarm_p1);
-	TheNet->mergePlaces(TheNet->findPlace(p, ".stop"), onAlarm_p9);
-	TheNet->mergePlaces(TheNet->findPlace(p, ".stopped"), onAlarm_p10);
-	TheNet->mergePlaces(TheNet->findPlace(p, ".final"), onAlarm_p2);
+	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".initial"), onAlarm_p1);
+	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".stop"), onAlarm_p9);
+	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".stopped"), onAlarm_p10);
+	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".final"), onAlarm_p2);
 	
 	onMessageCount++;
       }
@@ -1483,16 +1483,16 @@ This=Flow(a,b,c) ->
     }
     a b c
     {
-      foreach (e; activity_list c)
+      foreach (innerActivity; activity_list c)
       {
-	Place *initial = TheNet->findPlace(e, ".initial");
-	Place *stop    = TheNet->findPlace(e, ".stop");
-	Place *stopped = TheNet->findPlace(e, ".stopped");
-	Place *final   = TheNet->findPlace(e, ".final");
-	TheNet->newArc(t2, initial);
-	TheNet->newArc(t5, stop);
-	TheNet->newArc(stopped, t6);
-	TheNet->newArc(final, t3);
+	Place *innerActivity_initial = TheNet->findPlace(innerActivity, ".initial");
+	Place *innerActivity_stop    = TheNet->findPlace(innerActivity, ".stop");
+	Place *innerActivity_stopped = TheNet->findPlace(innerActivity, ".stopped");
+	Place *innerActivity_final   = TheNet->findPlace(innerActivity, ".final");
+	TheNet->newArc(t2, innerActivity_initial);
+	TheNet->newArc(t5, innerActivity_stop);
+	TheNet->newArc(innerActivity_stopped, t6);
+	TheNet->newArc(innerActivity_final, t3);
       }	
     }
   ]  
@@ -1549,7 +1549,7 @@ This=activitySwitch(Switch(a,b,c)) ->
       // the case branches
       int currentCase = 1;
       Transition *last;
-      foreach (o=Case(p=activity); tCase_list b)
+      foreach (o=Case(innerActivity); tCase_list b)
       {
 	std::string condition = o->condition->name;
 	
@@ -1564,10 +1564,10 @@ This=activitySwitch(Switch(a,b,c)) ->
 	  TheNet->newArc(TheNet->findPlace(This, ".running"), t4, "x");
 	
 	  // embed the innerActivity
-	  TheNet->newArc(t2, TheNet->findPlace(p, ".initial"));
-	  TheNet->mergePlaces(p, ".final",   This, ".final");
-	  TheNet->mergePlaces(p, ".stop",    This, ".stop");
-	  TheNet->mergePlaces(p, ".stopped", This, ".stopped");
+	  TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
+	  TheNet->mergePlaces(innerActivity, ".final",   This, ".final");
+	  TheNet->mergePlaces(innerActivity, ".stop",    This, ".stop");
+	  TheNet->mergePlaces(innerActivity, ".stopped", This, ".stopped");
 	  
 	  last = t4;
 	}
@@ -1593,10 +1593,10 @@ This=activitySwitch(Switch(a,b,c)) ->
 	  TheNet->newArc(t11, TheNet->findPlace(This, ".stopped"));
 
 	  // embed the innerActivity
-	  TheNet->newArc(t2, TheNet->findPlace(p, ".initial"));
-	  TheNet->mergePlaces(p, ".final",   This, ".final");
-	  TheNet->mergePlaces(p, ".stop",    This, ".stop");
-	  TheNet->mergePlaces(p, ".stopped", This, ".stopped");
+	  TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
+	  TheNet->mergePlaces(innerActivity, ".final",   This, ".final");
+	  TheNet->mergePlaces(innerActivity, ".stop",    This, ".stop");
+	  TheNet->mergePlaces(innerActivity, ".stopped", This, ".stopped");
 
 	  last = t4;
 	}
@@ -1604,7 +1604,7 @@ This=activitySwitch(Switch(a,b,c)) ->
       }
 
       // the otherwise branch
-      foreach (Otherwise(p=activity); tOtherwise_list c)
+      foreach (Otherwise(innerActivity); tOtherwise_list c)
       {
 	Transition *t2 = TheNet->newTransition(prefix + "t2.otherwise");
 	
@@ -1622,10 +1622,10 @@ This=activitySwitch(Switch(a,b,c)) ->
 	TheNet->newArc(t11, TheNet->findPlace(This, ".stopped"));	
 	
 	// embed inner activity
-	TheNet->newArc(t2, TheNet->findPlace(p, ".initial"));
-	TheNet->mergePlaces(p, ".final",   This, ".final");
-	TheNet->mergePlaces(p, ".stop",    This, ".stop");
-	TheNet->mergePlaces(p, ".stopped", This, ".stopped");
+	TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
+	TheNet->mergePlaces(innerActivity, ".final",   This, ".final");
+	TheNet->mergePlaces(innerActivity, ".stop",    This, ".stop");
+	TheNet->mergePlaces(innerActivity, ".stopped", This, ".stopped");
       }
     }
   ]
@@ -1729,21 +1729,21 @@ This=activitySequence(Sequence(a,b)) ->
       int i = 0;
       kc::impl_activity* last;
       
-      foreach (e; activity_list b)
+      foreach (innerActivity; activity_list b)
       {
 	if (i == 0)
-	  TheNet->mergePlaces(e, ".initial", This, ".initial");
+	  TheNet->mergePlaces(innerActivity, ".initial", This, ".initial");
 	else
-	  TheNet->mergePlaces(e, ".initial", last, ".final");
+	  TheNet->mergePlaces(innerActivity, ".initial", last, ".final");
 	
-	if (e == b->last())
-	  TheNet->mergePlaces(e, ".final", This, ".final");
+	if (innerActivity == b->last())
+	  TheNet->mergePlaces(innerActivity, ".final", This, ".final");
 	
-	last = e;
+	last = innerActivity;
 	i++;
 
-	TheNet->mergePlaces(e, ".stopped", This, ".stopped");
-	TheNet->mergePlaces(e, ".stop", This, ".stop");
+	TheNet->mergePlaces(innerActivity, ".stopped", This, ".stopped");
+	TheNet->mergePlaces(innerActivity, ".stop", This, ".stop");
       }
     }
   ]  
@@ -1789,7 +1789,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
     {
       // the onMessage branches
       int onMessageCount = 1;      
-      foreach (o=OnMessage(p=activity); tOnMessage_list b)
+      foreach (OnMessage(innerActivity); tOnMessage_list b)
       {
 	std::string newprefix = prefix + "onMessage" + intToString(onMessageCount) + ".";
 
@@ -1803,7 +1803,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	TheNet->newArc(TheNet->findPlace(TheActivity, ".TimeStamp"), t2, "x");
 	TheNet->newArc(t2, p3, "M" + intToString(onMessageCount) );
 	TheNet->newArc(p3, t3, "M" + intToString(onMessageCount) );
-	TheNet->newArc(t3, TheNet->findPlace(p, ".initial"));
+	TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
 	TheNet->newArc(p3, t4, "M" + intToString(onMessageCount) );
 	TheNet->newArc(t4, p10);
 	TheNet->newArc(t4, TheNet->findPlace(TheActivity, ".failed"), "fault");
@@ -1814,16 +1814,16 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	TheNet->newArc(TheNet->findPlace(TheActivity, ".stop"), t10);
 	TheNet->newArc(t10, TheNet->findPlace(TheActivity, ".stopped"));
 
-	TheNet->mergePlaces(p, ".stop", TheActivity, ".stop");
-	TheNet->mergePlaces(p, ".stopped", TheActivity, ".stopped");
-	TheNet->mergePlaces(p, ".final", TheActivity, ".final");
+	TheNet->mergePlaces(innerActivity, ".stop", TheActivity, ".stop");
+	TheNet->mergePlaces(innerActivity, ".stopped", TheActivity, ".stopped");
+	TheNet->mergePlaces(innerActivity, ".final", TheActivity, ".final");
 
 	onMessageCount++;
       }
 
       // the onAlarm branches
       int onAlarmCount = 1;      
-      foreach (o=OnAlarm(p=activity); tOnAlarm_list c)
+      foreach (o=OnAlarm(innerActivity); tOnAlarm_list c)
       {
 	std::string newprefix = prefix + "onAlarm" + intToString(onAlarmCount) + ".";
 	std::string onAlarmGuard;
@@ -1836,11 +1836,11 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	Transition *t6 = TheNet->newTransition(newprefix + "t6", onAlarmGuard);
 	TheNet->newArc(TheNet->findPlace("process.clock"), t6, READ, "y");
 	TheNet->newArc(TheNet->findPlace(TheActivity, ".TimeStamp"), t6, "x");
-	TheNet->newArc(t6, TheNet->findPlace(p, ".initial"));
+	TheNet->newArc(t6, TheNet->findPlace(innerActivity, ".initial"));
 	
-	TheNet->mergePlaces(p, ".stop", TheActivity, ".stop");
-	TheNet->mergePlaces(p, ".stopped", TheActivity, ".stopped");
-	TheNet->mergePlaces(p, ".final", TheActivity, ".final");
+	TheNet->mergePlaces(innerActivity, ".stop", TheActivity, ".stop");
+	TheNet->mergePlaces(innerActivity, ".stopped", TheActivity, ".stopped");
+	TheNet->mergePlaces(innerActivity, ".final", TheActivity, ".final");
 
 	onMessageCount++;
       }

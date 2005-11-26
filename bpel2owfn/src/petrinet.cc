@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/11/23 11:39:12 $
+ *          - last changed: \$Date: 2005/11/26 14:11:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.44 $
+ * \version \$Revision: 1.45 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -584,6 +584,8 @@ void PetriNet::drawDot()
 
     if ((*p)->singleMemberOf("process.eventHandler"))
       (*dot_output) << " style=filled fillcolor=plum";
+    else if ((*p)->singleMemberOf("process.compensationHandler."))
+      (*dot_output) << " style=filled fillcolor=aquamarine";
     else if ((*p)->singleMemberOf("process.stop."))
       (*dot_output) << " style=filled fillcolor=lightskyblue2";
     else if ((*p)->singleMemberOf("process.faulthandler"))
@@ -607,6 +609,8 @@ void PetriNet::drawDot()
 
     if ((*t)->singleMemberOf("process.eventHandler"))
       (*dot_output) << " style=filled fillcolor=plum";
+    else if ((*t)->singleMemberOf("process.compensationHandler."))
+      (*dot_output) << " style=filled fillcolor=aquamarine";
     else if ((*t)->singleMemberOf("process.stop."))
       (*dot_output) << " style=filled fillcolor=lightskyblue2";
     else if ((*t)->singleMemberOf("process.faulthandler"))

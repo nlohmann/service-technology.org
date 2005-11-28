@@ -1,4 +1,4 @@
-# last changed $Date: 2005/11/24 10:40:59 $ by $Author: gierds $
+# last changed $Date: 2005/11/28 13:36:54 $ by $Author: nlohmann $
 
 
 
@@ -72,7 +72,7 @@ bpel-syntax.o: bpel-syntax.c $(KC_TIME) check-symbols.h
 	$(CXX) $(CXXFLAGS2) -c -o $@ $(@:.o=.c)
 
 bpel-syntax.c: bpel-syntax.y
-	$(YACC) $(YFLAGS) -o $@ -d $^
+	$(YACC) $(YFLAGS) -o $@ $^
 
 
 

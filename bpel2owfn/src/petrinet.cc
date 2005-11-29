@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/11/26 16:20:46 $
+ *          - last changed: \$Date: 2005/11/29 09:20:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.46 $
+ * \version \$Revision: 1.47 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -38,6 +38,7 @@
  *            two places resp. two transitions.
  *          - 2005-11-20 (nlohmann) Added support for high-level arcs for
  *            merging.
+ *          - 2005-11-29 (nlohmann) Roles are now organized in a vector.
  *
  */
 
@@ -130,7 +131,7 @@ Transition::Transition(unsigned int myid, string role, string myguard)
   id = myid;
   
   if (role != "")
-    history.insert(role);
+    history.push_back(role);
 }
 
 
@@ -151,7 +152,7 @@ Place::Place(unsigned int myid, string role, place_type mytype)
   id = myid;
 
   if (role != "")
-    history.insert(role);
+    history.push_back(role);
 }
 
 
@@ -510,7 +511,7 @@ void PetriNet::printInformation()
       default:        { (*info_output) << "other    "; }
     }
 
-    for (set<string>::iterator role = (*p)->history.begin(); role != (*p)->history.end(); role++)
+    for (vector<string>::iterator role = (*p)->history.begin(); role != (*p)->history.end(); role++)
     {
       if (role == (*p)->history.begin())
 	(*info_output) << "\t" + *role + "\n";
@@ -532,7 +533,7 @@ void PetriNet::printInformation()
     else
       (*info_output) << "\t";
     
-    for (set<string>::iterator role = (*t)->history.begin(); role != (*t)->history.end(); role++)
+    for (vector<string>::iterator role = (*t)->history.begin(); role != (*t)->history.end(); role++)
     {
       if (role == (*t)->history.begin())
 	(*info_output) << "\t" + *role + "\n";
@@ -854,16 +855,16 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 	
   Node *t12 = newTransition();
   
-  for (set<string>::iterator role = t1->history.begin(); role != t1->history.end(); role++)
+  for (vector<string>::iterator role = t1->history.begin(); role != t1->history.end(); role++)
   {
     roleMap[*role] = t12;
-    t12->history.insert(*role);
+    t12->history.push_back(*role);
   }
   
-  for (set<string>::iterator role = t2->history.begin(); role != t2->history.end(); role++)
+  for (vector<string>::iterator role = t2->history.begin(); role != t2->history.end(); role++)
   {
     roleMap[*role] = t12;
-    t12->history.insert(*role);
+    t12->history.push_back(*role);
   }
   
   set<pair<Node *, arc_type> > pre12 = setUnion(preset(t1), preset(t2));
@@ -917,15 +918,15 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
   
   Node *p12 = newPlace();
   
-  for (set<string>::iterator role = p1->history.begin(); role != p1->history.end(); role++)
+  for (vector<string>::iterator role = p1->history.begin(); role != p1->history.end(); role++)
   {
-    p12->history.insert(*role);
+    p12->history.push_back(*role);
     roleMap[*role] = p12;
   }
   
-  for (set<string>::iterator role = p2->history.begin(); role != p2->history.end(); role++)
+  for (vector<string>::iterator role = p2->history.begin(); role != p2->history.end(); role++)
   {
-    p12->history.insert(*role);
+    p12->history.push_back(*role);
     roleMap[*role] = p12;
   }
 

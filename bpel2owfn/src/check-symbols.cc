@@ -10,14 +10,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/11/24 12:00:53 $
+ *          - last changed: \$Date: 2005/11/29 13:41:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.3 $
  *          - 2005-11-22 (gierds) Initial version.
  *
  * \todo    - bug in Kimwitu++ (attributes have extra signs) might sabotage us
@@ -59,6 +59,8 @@ void SymbolManager::initialiseProcessScope(kc::integer id)
 {
   processScope = new ProcessScope(id);
   currentScope = processScope;
+
+  mapping[id] = currentScope;
 }
 
 /**
@@ -70,6 +72,8 @@ void SymbolManager::initialiseProcessScope(kc::integer id)
 void SymbolManager::newScopeScope(kc::integer id)
 {
   currentScope = new ScopeScope(id, currentScope);
+
+  mapping[id] = currentScope;
 }
 
 /**
@@ -81,6 +85,8 @@ void SymbolManager::newScopeScope(kc::integer id)
 void SymbolManager::newFlowScope(kc::integer id)
 {
   currentScope = new FlowScope(id, currentScope);
+
+  mapping[id] = currentScope;
 }
 
 /**
@@ -91,6 +97,12 @@ void SymbolManager::quitScope()
 {
   trace(TRACE_DEBUG, "[CS] - Leaving scope " + intToString(currentScope->id->value));
 
+  /// \todo just testing #mapping, remove the following line:
+  if (currentScope != getScope(currentScope->id))
+  {
+    throw Exception(CHECK_SYMBOLS_CAST_ERROR,"Scope IDs suck");
+  }
+  
   if ( currentScope->parent != NULL )
   {
     currentScope = currentScope->parent;
@@ -101,6 +113,19 @@ void SymbolManager::quitScope()
     currentScope = NULL;
     trace(TRACE_DEBUG, " -> no further scope above\n");
   }
+}
+
+/**
+ * Returns a pointer to the scope that corresponds to a
+ * given id.
+ *
+ * \param id ID of the AST node
+ * \returns a pointer to the appropriate scope
+ *
+ */
+SymbolScope * SymbolManager::getScope(kc::integer id)
+{
+  return mapping[id];
 }
 
 

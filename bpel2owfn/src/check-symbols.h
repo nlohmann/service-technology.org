@@ -10,14 +10,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/11/24 12:00:53 $
+ *          - last changed: \$Date: 2005/11/29 13:41:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.3 $
  *          - 2005-11-22 (gierds) Initial version.
  *          - 2005-11-22 (gierds) Put all funcionality in to a class #SymbolManager
  *
@@ -29,6 +29,7 @@
 #include <list>
 #include <algorithm>
 #include <typeinfo>
+#include <map>
 
 #include "bpel-kc-k.h" // phylum definitions
 #include "bpel-kc-yystype.h" // data types for tokens and non-terminals
@@ -54,7 +55,9 @@ class SymbolManager
     SymbolScope * currentScope;
     /// a stack to return to higher scopes
     // stack<SymbolScope *> scopeStack;
-
+    /// mapping of AST IDs to pointer of SymbolScope
+    map<kc::integer, SymbolScope*> mapping;
+    
   public:
     /// constructor
     SymbolManager();
@@ -71,6 +74,9 @@ class SymbolManager
     /// quit a scope
     void quitScope();
 
+    /// returns SymbolScope pointer to the appropriate scope with ID
+    SymbolScope * getScope(kc::integer id);
+    
     /// add a PartnerLink to the current scope
     void addPartnerLink(kc::integer id, csPartnerLink* pl);
     /// check, if a PartnerLink exists in the current scope

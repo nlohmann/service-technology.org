@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/11/26 16:21:11 $
+ *          - last changed: \$Date: 2005/11/29 10:38:18 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -41,6 +41,9 @@
  *            message).
  *          - 2005-11-26 (nlohmann) Simplified code. Added implcit
  *            <compensationHandler>. Faults are now passed to the process.
+ *          - 2005-11-29 (nlohmann) Fixed several bugs such as the loop in the
+ *            implicit compensation handler. Fixed order of arguments of the
+ *            mergePlaces-function to assure correct labels.
  * 
  * \todo
  *          - find a simple "merge-language" to ease the definition of new
@@ -49,17 +52,9 @@
  *          - special treatment of <invoke>
  *          - tidy up case discrimination of <switch>
  *          - tidy up patterns <faultHandlers> and <process>
- *          - What about the fault-places: are they always merged with the FH?
- *          - When do inner activities should be merged: upon creation or
- *            later?
  *          - The assign-element has more attributes that have to be added to
  *            the abstract grammar as well as to the syntax file.
- *          - The attribute "initiate" is missing.
- *          - All faults have to be merged (failed-places).
- *          - Make sure all faults are passed to process/scope.
  *
- * \bug
- *          - Implicit compensation handler has a loop.
  */
 %}
 
@@ -247,7 +242,7 @@ Process(a,b,c,d,e,f,g,h) ->
       TheNet->newArc(stop_t2, stop_p3);
       TheNet->newArc(stop_t2, stop_p21);
       TheNet->newArc(stop_p3, stop_t3);
-      TheNet->newArc(stop_p5, stop_t3, "X"); // here was the RESET arc (now of type STANDARD)
+//      TheNet->newArc(stop_p5, stop_t3, "X"); // here was the RESET arc (now of type STANDARD)
       TheNet->newArc(stop_p22, stop_t3);
       TheNet->newArc(stop_t3, stop_p4);
       TheNet->newArc(stop_p5, stop_t4, "x");
@@ -288,23 +283,23 @@ Process(a,b,c,d,e,f,g,h) ->
       TheNet->newArc(stop_t12, stop_p12);
 
       // embed stop-pattern in process
-      TheNet->mergePlaces("process.stop.Faulted",     "process.Faulted");
-      TheNet->mergePlaces("process.stop.fault_in",    "process.p5");
-      TheNet->mergePlaces("process.stop.fault",       "process.fault");
-      TheNet->mergePlaces("process.stop.faultSave",   "process.faultSave");
-      TheNet->mergePlaces("process.stop.Active",      "process.Active");
-      TheNet->mergePlaces("process.stop.!Active",     "process.!Active");
-      TheNet->mergePlaces("process.stop.final",       "process.final");
-      TheNet->mergePlaces("process.stop.terminate",   "process.terminate");
-      TheNet->mergePlaces("process.stop.!Faulted",    "process.!Faulted");
-      TheNet->mergePlaces("process.stop.rethrow",     "process.rethrow");
-      TheNet->mergePlaces("process.stop.Ended",       "process.Ended");
-      TheNet->mergePlaces("process.stop.Compensated", "process.Compensated");
-      TheNet->mergePlaces("process.stop.!Ended",      "process.!Ended");
-      TheNet->mergePlaces("process.stop.stop",        "process.p21");
-      TheNet->mergePlaces("process.stop.stopped",     "process.p34");
-      TheNet->mergePlaces("process.stop.cleanCH",     "process.p35");
-      TheNet->mergePlaces("process.stop.ch_cleaned",  "process.p36");
+      TheNet->mergePlaces("process.Faulted",     "process.stop.Faulted");
+      TheNet->mergePlaces("process.p5",          "process.stop.fault_in");
+      TheNet->mergePlaces("process.fault",       "process.stop.fault");
+      TheNet->mergePlaces("process.faultSave",   "process.stop.faultSave");
+      TheNet->mergePlaces("process.Active",      "process.stop.Active");
+      TheNet->mergePlaces("process.!Active",     "process.stop.!Active");
+      TheNet->mergePlaces("process.final",       "process.stop.final");
+      TheNet->mergePlaces("process.terminate",   "process.stop.terminate");
+      TheNet->mergePlaces("process.!Faulted",    "process.stop.!Faulted");
+      TheNet->mergePlaces("process.rethrow",     "process.stop.rethrow");
+      TheNet->mergePlaces("process.Ended",       "process.stop.Ended");
+      TheNet->mergePlaces("process.Compensated", "process.stop.Compensated");
+      TheNet->mergePlaces("process.!Ended",      "process.stop.!Ended");
+      TheNet->mergePlaces("process.p21",         "process.stop.stop");
+      TheNet->mergePlaces("process.p34",         "process.stop.stopped");
+      TheNet->mergePlaces("process.p35",         "process.stop.cleanCH");
+      TheNet->mergePlaces("process.p36",         "process.stop.ch_cleaned");
       /*---------------------------------------------------------------------*/
 #endif
     }
@@ -446,12 +441,12 @@ ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) ->
       TheNet->newArc(compensate_t5, compensate_p7);
 
       // embed the <compensate />-element
-      TheNet->mergePlaces(compensate_p1, p8);
-      TheNet->mergePlaces(compensate_p3, p9);
-      TheNet->mergePlaces(compensate_p4, p11);
-      TheNet->mergePlaces(compensate_p5, p17);
-      TheNet->mergePlaces(compensate_p6, p18);
-      TheNet->mergePlaces(compensate_p7, p12);
+      TheNet->mergePlaces(p8,  compensate_p1);
+      TheNet->mergePlaces(p9,  compensate_p3);
+      TheNet->mergePlaces(p11, compensate_p4);
+      TheNet->mergePlaces(p17, compensate_p5);
+      TheNet->mergePlaces(p18, compensate_p6);
+      TheNet->mergePlaces(p12, compensate_p7);
       /*---------------------------------------------------------------------*/
     }
     a b
@@ -467,10 +462,10 @@ ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) ->
 
 	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
 	TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t2);
-	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".stop"),
-			    TheNet->findPlace("process.faulthandler.p11"));
-	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".stopped"),
-			    TheNet->findPlace("process.faulthandler.p12"));
+	TheNet->mergePlaces(TheNet->findPlace("process.faulthandler.p11"),
+			    TheNet->findPlace(innerActivity, ".stop"));
+	TheNet->mergePlaces(TheNet->findPlace("process.faulthandler.p12"),
+			    TheNet->findPlace(innerActivity, ".stopped"));
 	
 	TheNet->newArc(t2, p3);
 	TheNet->newArc(p7, t2, "x");
@@ -486,10 +481,10 @@ ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) ->
 
 	TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
 	TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t4);
-	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".stop"),
-			    TheNet->findPlace("process.faulthandler.p11"));
-	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".stopped"),
-			    TheNet->findPlace("process.faulthandler.p12"));
+	TheNet->mergePlaces(TheNet->findPlace("process.faulthandler.p11"),
+			    TheNet->findPlace(innerActivity, ".stop"));
+	TheNet->mergePlaces(TheNet->findPlace("process.faulthandler.p12"),
+			    TheNet->findPlace(innerActivity, ".stopped"));
 
 	TheNet->newArc(t4, p3);
 	TheNet->newArc(p7, t4, "x");
@@ -582,12 +577,12 @@ NiltFaultHandlers_opt() ->
       TheNet->newArc(compensate_t5, compensate_p7);
 
       // embed the <compensate />-element
-      TheNet->mergePlaces(compensate_p1, p1);
-      TheNet->mergePlaces(compensate_p3, p2);
-      TheNet->mergePlaces(compensate_p4, p3);
-      TheNet->mergePlaces(compensate_p5, p4);
-      TheNet->mergePlaces(compensate_p6, p5);
-      TheNet->mergePlaces(compensate_p7, p6);
+      TheNet->mergePlaces(p1, compensate_p1);
+      TheNet->mergePlaces(p2, compensate_p3);
+      TheNet->mergePlaces(p3, compensate_p4);
+      TheNet->mergePlaces(p4, compensate_p5);
+      TheNet->mergePlaces(p5, compensate_p6);
+      TheNet->mergePlaces(p6, compensate_p7);
     }
   ]
 ;
@@ -717,10 +712,10 @@ ConstEventHandlers_opt(EventHandlers(a,b), NiltEventHandlers_opt()) ->
 	TheNet->newArc(onMessage_p12, t16);
 
 	// embed the innerActivity
-	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".initial"), onMessage_p3);
-	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".stop"), onMessage_p11);
-	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".stopped"), onMessage_p12);
-	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".final"), onMessage_p4);
+	TheNet->mergePlaces(onMessage_p3,  TheNet->findPlace(innerActivity, ".initial"));
+	TheNet->mergePlaces(onMessage_p11, TheNet->findPlace(innerActivity, ".stop"));
+	TheNet->mergePlaces(onMessage_p12, TheNet->findPlace(innerActivity, ".stopped"));
+	TheNet->mergePlaces(onMessage_p4,  TheNet->findPlace(innerActivity, ".final"));
 	
 	onMessageCount++;
       }
@@ -782,10 +777,10 @@ ConstEventHandlers_opt(EventHandlers(a,b), NiltEventHandlers_opt()) ->
 	TheNet->newArc(onAlarm_p10, t16);
 	
 	// embed the innerActivity
-	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".initial"), onAlarm_p1);
-	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".stop"), onAlarm_p9);
-	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".stopped"), onAlarm_p10);
-	TheNet->mergePlaces(TheNet->findPlace(innerActivity, ".final"), onAlarm_p2);
+	TheNet->mergePlaces(onAlarm_p1,  TheNet->findPlace(innerActivity, ".initial"));
+	TheNet->mergePlaces(onAlarm_p9,  TheNet->findPlace(innerActivity, ".stop"));
+	TheNet->mergePlaces(onAlarm_p10, TheNet->findPlace(innerActivity, ".stopped"));
+	TheNet->mergePlaces(onAlarm_p2,  TheNet->findPlace(innerActivity, ".final"));
 	
 	onMessageCount++;
       }
@@ -850,7 +845,6 @@ NiltEventHandlers_opt() ->
   COMPENSATION HANDLERS
 ******************************************************************************/
 
-/*
 
 NiltCompensationHandler_opt() ->
   [petrinet:
@@ -871,8 +865,8 @@ NiltCompensationHandler_opt() ->
       Place *p16 = TheNet->newPlace(prefix + "fh_call");
       Place *p17 = TheNet->newPlace(prefix + "ch_out");
       Place *p18 = TheNet->newPlace(prefix + "scopeCompensated");
-      Place *p20 = TheNet->newPlace(prefix + "push");
-      Place *p22 = TheNet->newPlace(prefix + "!push");
+//      Place *p20 = TheNet->newPlace(prefix + "push");
+//      Place *p22 = TheNet->newPlace(prefix + "!push");
       Place *p19 = TheNet->newPlace(prefix + "compScope");
       Place *p24 = TheNet->newPlace(prefix + "clean");
       Place *p25 = TheNet->newPlace(prefix + "failed");
@@ -888,7 +882,7 @@ NiltCompensationHandler_opt() ->
       Transition *t10 = TheNet->newTransition(prefix + "t10");
       Transition *t11 = TheNet->newTransition(prefix + "t11");
       Transition *t12 = TheNet->newTransition(prefix + "t12");
-      Transition *t13 = TheNet->newTransition(prefix + "t13");
+//      Transition *t13 = TheNet->newTransition(prefix + "t13");
       Transition *t15 = TheNet->newTransition(prefix + "t15");
       Transition *t16 = TheNet->newTransition(prefix + "t16");
 
@@ -920,20 +914,20 @@ NiltCompensationHandler_opt() ->
       TheNet->newArc(t7, p9, "scopeName");
       TheNet->newArc(p11, t7);
       TheNet->newArc(p15, t7);
-      TheNet->newArc(p20, t7);
+//      TheNet->newArc(p20, t7);
 
       TheNet->newArc(p11, t8);
       TheNet->newArc(p16, t8);
       TheNet->newArc(t8, p17);
-      TheNet->newArc(p20, t8);
+//      TheNet->newArc(p20, t8);
 
       TheNet->newArc(t9, p11);
       TheNet->newArc(p16, t9, READ);
       TheNet->newArc(p18, t9, "copeScopeName");
 
       TheNet->newArc(t10, p11);
-      TheNet->newArc(p15, t9, READ);
-      TheNet->newArc(p18, t9, "compScopeName");
+      TheNet->newArc(p15, t10, READ);
+      TheNet->newArc(p18, t10, "compScopeName");
 
       TheNet->newArc(t11, p13);
       TheNet->newArc(p15, t11);
@@ -943,10 +937,10 @@ NiltCompensationHandler_opt() ->
       TheNet->newArc(p16, t12);
       TheNet->newArc(p24, t12);
 
-      TheNet->newArc(p11, t13);
-      TheNet->newArc(t13, p19, "s");
-      TheNet->newArc(t13, p20);
-      TheNet->newArc(p22, t13, "s");
+//      TheNet->newArc(p11, t13);
+//      TheNet->newArc(t13, p19, "s");
+//      TheNet->newArc(t13, p20);
+//      TheNet->newArc(p22, t13, "s");
       
       TheNet->newArc(p9, t15, "scopeName");
       TheNet->newArc(t15, p13);
@@ -959,7 +953,7 @@ NiltCompensationHandler_opt() ->
   ]
 ;
 
-*/
+
 
 
 
@@ -1567,9 +1561,9 @@ This=Terminate(a) ->
       TheNet->newArc(p3, t4);
       TheNet->newArc(t4, p7);
 
-      TheNet->mergePlaces(p4, TheNet->findPlace("process.!Terminated"));
-      TheNet->mergePlaces(p5, TheNet->findPlace("process.Terminated"));
-      TheNet->mergePlaces(p6, TheNet->findPlace("process.terminate"));
+      TheNet->mergePlaces(TheNet->findPlace("process.!Terminated"), p4);
+      TheNet->mergePlaces(TheNet->findPlace("process.Terminated"), p5);
+      TheNet->mergePlaces(TheNet->findPlace("process.terminate"), p6);
     }
   a
   ]
@@ -1626,7 +1620,7 @@ TheActivity=activityFlow(This=Flow(a,b,c)) ->
 	TheNet->newArc(t5, TheNet->findPlace(innerActivity, ".stop"));
 	TheNet->newArc(TheNet->findPlace(innerActivity, ".stopped"), t6);
 	TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t3);
-	TheNet->mergePlaces(innerActivity, ".failed", TheActivity, ".failed");
+	TheNet->mergePlaces(TheActivity, ".failed", innerActivity, ".failed");
       }	
     }
   ]  
@@ -1699,10 +1693,10 @@ This=activitySwitch(Switch(a,b,c)) ->
 	
 	  // embed the innerActivity
 	  TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
-	  TheNet->mergePlaces(innerActivity, ".final",   This, ".final");
-	  TheNet->mergePlaces(innerActivity, ".stop",    This, ".stop");
-	  TheNet->mergePlaces(innerActivity, ".stopped", This, ".stopped");
-	  TheNet->mergePlaces(innerActivity, ".failed",  This, ".failed");
+	  TheNet->mergePlaces(This, ".final",   innerActivity, ".final");
+	  TheNet->mergePlaces(This, ".stop",    innerActivity, ".stop");
+	  TheNet->mergePlaces(This, ".stopped", innerActivity, ".stopped");
+	  TheNet->mergePlaces(This, ".failed",  innerActivity, ".failed");
 	  
 	  last = t4;
 	}
@@ -1729,10 +1723,10 @@ This=activitySwitch(Switch(a,b,c)) ->
 
 	  // embed the innerActivity
 	  TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
-	  TheNet->mergePlaces(innerActivity, ".final",   This, ".final");
-	  TheNet->mergePlaces(innerActivity, ".stop",    This, ".stop");
-	  TheNet->mergePlaces(innerActivity, ".stopped", This, ".stopped");
-	  TheNet->mergePlaces(innerActivity, ".failed",  This, ".failed");
+	  TheNet->mergePlaces(This, ".final",   innerActivity, ".final");
+	  TheNet->mergePlaces(This, ".stop",    innerActivity, ".stop");
+	  TheNet->mergePlaces(This, ".stopped", innerActivity, ".stopped");
+	  TheNet->mergePlaces(This, ".failed",  innerActivity, ".failed");
 
 	  last = t4;
 	}
@@ -1759,9 +1753,9 @@ This=activitySwitch(Switch(a,b,c)) ->
 	
 	// embed inner activity
 	TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
-	TheNet->mergePlaces(innerActivity, ".final",   This, ".final");
-	TheNet->mergePlaces(innerActivity, ".stop",    This, ".stop");
-	TheNet->mergePlaces(innerActivity, ".stopped", This, ".stopped");
+	TheNet->mergePlaces(This, ".final",   innerActivity, ".final");
+	TheNet->mergePlaces(This, ".stop",    innerActivity, ".stop");
+	TheNet->mergePlaces(This, ".stopped", innerActivity, ".stopped");
       }
     }
   ]
@@ -1829,11 +1823,11 @@ TheActivity=activityWhile(TheWhile=While(a,b)) ->
     }
     a b
     {
-      TheNet->mergePlaces(b, ".initial", TheActivity, ".p4");
-      TheNet->mergePlaces(b, ".final", TheActivity, ".p5");
-      TheNet->mergePlaces(b, ".stop", TheActivity, ".stop");
-      TheNet->mergePlaces(b, ".stopped", TheActivity, ".stopped");
-      TheNet->mergePlaces(b, ".failed", TheActivity, ".failed");
+      TheNet->mergePlaces(TheActivity, ".p4",      b, ".initial");
+      TheNet->mergePlaces(TheActivity, ".p5",      b, ".final");
+      TheNet->mergePlaces(TheActivity, ".stop",    b, ".stop");
+      TheNet->mergePlaces(TheActivity, ".stopped", b, ".stopped");
+      TheNet->mergePlaces(TheActivity, ".failed",  b, ".failed");
     }
   ]  
 ;
@@ -1870,18 +1864,18 @@ This=activitySequence(Sequence(a,b)) ->
       foreach (innerActivity; activity_list b)
       {
 	if (i == 0)
-	  TheNet->mergePlaces(innerActivity, ".initial", This, ".initial");
+	  TheNet->mergePlaces(This, ".initial", innerActivity, ".initial");
 	else
-	  TheNet->mergePlaces(innerActivity, ".initial", last, ".final");
+	  TheNet->mergePlaces(last, ".initial", innerActivity, ".final");
 	
 	if (innerActivity == b->last())
-	  TheNet->mergePlaces(innerActivity, ".final", This, ".final");
+	  TheNet->mergePlaces(This, ".final", innerActivity, ".final");
 	
 	last = innerActivity;
 	i++;
 
-	TheNet->mergePlaces(innerActivity, ".stopped", This, ".stopped");
-	TheNet->mergePlaces(innerActivity, ".failed", This, ".failed");
+	TheNet->mergePlaces(This, ".stopped", innerActivity, ".stopped");
+	TheNet->mergePlaces(This, ".failed", innerActivity, ".failed");
       }
     }
   ]  
@@ -1952,10 +1946,10 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	TheNet->newArc(TheNet->findPlace(TheActivity, ".stop"), t10);
 	TheNet->newArc(t10, TheNet->findPlace(TheActivity, ".stopped"));
 
-	TheNet->mergePlaces(innerActivity, ".stop",    TheActivity, ".stop");
-	TheNet->mergePlaces(innerActivity, ".stopped", TheActivity, ".stopped");
-	TheNet->mergePlaces(innerActivity, ".final",   TheActivity, ".final");
-	TheNet->mergePlaces(innerActivity, ".failed",  TheActivity, ".failed");
+	TheNet->mergePlaces(TheActivity, ".stop",    innerActivity, ".stop");
+	TheNet->mergePlaces(TheActivity, ".stopped", innerActivity, ".stopped");
+	TheNet->mergePlaces(TheActivity, ".final",   innerActivity, ".final");
+	TheNet->mergePlaces(TheActivity, ".failed",  innerActivity, ".failed");
 
 	onMessageCount++;
       }
@@ -1977,10 +1971,10 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	TheNet->newArc(TheNet->findPlace(TheActivity, ".TimeStamp"), t6, "x");
 	TheNet->newArc(t6, TheNet->findPlace(innerActivity, ".initial"));
 	
-	TheNet->mergePlaces(innerActivity, ".stop",    TheActivity, ".stop");
-	TheNet->mergePlaces(innerActivity, ".stopped", TheActivity, ".stopped");
-	TheNet->mergePlaces(innerActivity, ".final",   TheActivity, ".final");
-	TheNet->mergePlaces(innerActivity, ".failed",  TheActivity, ".failed");
+	TheNet->mergePlaces(TheActivity, ".stop",    innerActivity, ".stop");
+	TheNet->mergePlaces(TheActivity, ".stopped", innerActivity, ".stopped");
+	TheNet->mergePlaces(TheActivity, ".final",   innerActivity, ".final");
+	TheNet->mergePlaces(TheActivity, ".failed",  innerActivity, ".failed");
 
 	onMessageCount++;
       }

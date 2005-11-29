@@ -8,18 +8,18 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/24 12:00:53 $
+ *          - last changed: \$Date: 2005/11/29 10:49:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.33 $
+ * \version \$Revision: 1.34 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -128,6 +128,17 @@ int main( int argc, char *argv[])
       }
     }
 
+    // create dot output ?
+    if (mode_lola_petri_net)
+    {
+      TheNet->lolaOut();
+    }
+    // create dot output ?
+    if (mode_dot_petri_net)
+    {
+      TheNet->drawDot();
+    }
+    
     // make low level ?
     if (mode_low_level_petri_net)
     {
@@ -144,16 +155,6 @@ int main( int argc, char *argv[])
       TheNet->printInformation();
     }
 
-    // create dot output ?
-    if (mode_lola_petri_net)
-    {
-      TheNet->lolaOut();
-    }
-    // create dot output ?
-    if (mode_dot_petri_net)
-    {
-      TheNet->drawDot();
-    }
 
     cleanup();  
 

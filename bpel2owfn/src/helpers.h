@@ -12,7 +12,7 @@
  *          
  * \date    
  * 	    - created: 2005-11-11
- *          - last changed: \$Date: 2005/11/24 10:40:59 $
+ *          - last changed: \$Date: 2005/11/29 14:01:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -112,7 +112,7 @@ void parse_command_line(int argc, char * argv[]);
 /// Calls #cleanup(), then exits
 void error();
 
-/// \todo comment me
+/// Prints information about #Exception e, calls #cleanup() and exits 
 void error(Exception e);
 
 /// Close all open files, delete all pointers.

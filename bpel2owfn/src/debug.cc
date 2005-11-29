@@ -5,18 +5,18 @@
  *
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2005/11/20 13:29:25 $
+ *          - last changed: \$Date: 2005/11/29 14:01:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  *          - 2005-11-09 (gierds) Initial release.
  *            Simple trace methods and new place for yyerror().
  *          - 2005-11-20 (nlohmann) Overworked and commented yyerror().
@@ -32,8 +32,14 @@ int debug_level = 0;
 
 
 
-
-/// \todo comment me
+/**
+ * Provides output to stderr using different #trace_level 
+ * (in order to regulate amount of output)
+ *
+ * \param pTraceLevel	the #trace_level
+ * \param message	the output
+ *
+ */
 void trace(trace_level pTraceLevel, std::string message)
 {
   if (pTraceLevel <= debug_level)
@@ -43,10 +49,12 @@ void trace(trace_level pTraceLevel, std::string message)
 }
 
 
-
-
-
-/// \todo comment me
+/**
+ * Works like #trace(trace_level,std::string) with trace_level = TRACE_ALWAYS
+ *
+ * \param message the output
+ *
+ */
 void trace(std::string message )
 {
   trace(TRACE_ALWAYS, message);

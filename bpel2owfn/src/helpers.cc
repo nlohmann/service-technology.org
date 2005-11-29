@@ -12,14 +12,14 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2005/11/24 12:00:53 $
+ *          - last changed: \$Date: 2005/11/29 14:01:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  *          - 2005-11-11 (nlohmann) Initial version.
  *          - 2005-11-15 (gierds) Moved commandline evaluation functions from
  *            main.cc to here.
@@ -448,6 +448,7 @@ void parse_command_line(int argc, char* argv[])
 void error()
 {
   trace("\nAn error has occured!\n\n");
+  // call #cleanup()
   cleanup();
   trace(TRACE_WARNINGS, "-> Any output file might be in an undefinded state.\n");
   exit(1);
@@ -463,9 +464,12 @@ void error()
  */
 void error(Exception e)
 {
+  // output information about the exception
   e.info();
+  // call #cleanup()
   cleanup();
   trace(TRACE_WARNINGS, "-> Any output file might be in an undefinded state.\n");
+  // stop execution
   exit(e.id);
 }
 

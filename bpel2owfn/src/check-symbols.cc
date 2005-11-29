@@ -10,14 +10,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/11/29 13:41:04 $
+ *          - last changed: \$Date: 2005/11/29 15:47:03 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  *          - 2005-11-22 (gierds) Initial version.
  *
  * \todo    - bug in Kimwitu++ (attributes have extra signs) might sabotage us
@@ -97,10 +97,10 @@ void SymbolManager::quitScope()
 {
   trace(TRACE_DEBUG, "[CS] - Leaving scope " + intToString(currentScope->id->value));
 
-  /// \todo just testing #mapping, remove the following line:
+  /// \todo just testing #mapping, remove the following lines:
   if (currentScope != getScope(currentScope->id))
   {
-    throw Exception(CHECK_SYMBOLS_CAST_ERROR,"Scope IDs suck");
+    throw Exception(CHECK_SYMBOLS_CAST_ERROR,"Scope mapping sucks!\n");
   }
   
   if ( currentScope->parent != NULL )
@@ -138,7 +138,8 @@ SymbolScope * SymbolManager::getScope(kc::integer id)
  */
 void SymbolManager::addPartnerLink(kc::integer id, csPartnerLink* pl)
 {
-  trace(TRACE_VERY_DEBUG, "[CS] Adding PartnerLink " + pl->name + ", " + pl->partnerLinkType + ", "
+  trace(TRACE_VERY_DEBUG, "[CS] Adding (" + intToString(currentScope->id->value) 
+		        + ") PartnerLink " + pl->name + ", " + pl->partnerLinkType + ", "
 		      + pl->myRole + ", " + pl->partnerRole + "\n");
   // since we want to add a PartnerLink, we assume currentScope is a ProcessScope
   try
@@ -178,22 +179,32 @@ void SymbolManager::checkPartnerLink(csPartnerLink* pl)
     // check, if PartnerLink name is present, otherwise throw Exception
     bool found = false;
     SymbolScope * scope = currentScope;
-    while (! found && scope != NULL)
+    while ((! found) && (scope != NULL))
     {
-      for (list<csPartnerLink*>::iterator iter = (dynamic_cast <ProcessScope *> (currentScope))->partnerLinks.begin();
- 		    iter != (dynamic_cast <ProcessScope *> (currentScope))->partnerLinks.end(); iter++)
+      // ascent to next scope with variable definitions
+      trace(TRACE_VERY_DEBUG, "[CS]   Ascending to Process scope ...\n");
+      while ((scope != NULL) && (typeid(*scope) != typeid(ProcessScope)))
+      {
+        trace(TRACE_VERY_DEBUG, "[CS]     typeids are ");
+        trace(TRACE_VERY_DEBUG, typeid(*scope).name());
+        trace(TRACE_VERY_DEBUG, " and ");
+        trace(TRACE_VERY_DEBUG, typeid(ProcessScope).name());
+        trace(TRACE_VERY_DEBUG, "\n");
+ 	     
+        trace(TRACE_VERY_DEBUG, "[CS]     ... leaving scope " + intToString(scope->id->value) + "\n");
+        scope = scope->parent;
+      }
+
+      trace(TRACE_VERY_DEBUG, "[CS]   Looking for defined PartnerLinks ...\n");
+      for (list<csPartnerLink*>::iterator iter = (dynamic_cast <ProcessScope *> (scope))->partnerLinks.begin();
+ 		    iter != (dynamic_cast <ProcessScope *> (scope))->partnerLinks.end(); iter++)
       {
         if (*(*iter) == *pl)
         {
   	  found = true;
         }
       }
-      // ascent to next scope with variable definitions
-      do
-      {
-        scope = scope->parent;
-      }
-      while (scope != NULL && typeid(scope) != typeid(ProcessScope)); //  && typeid(scope) != typeid(ScopeScope)
+      scope = scope->parent;
     }
     if (!found)
     {
@@ -333,6 +344,7 @@ FlowScope::FlowScope(kc::integer myid, SymbolScope* myparent) : SymbolScope(myid
 
 csPartnerLink::csPartnerLink ( string myname, string mytype, string mymyrole, string mypartnerRole)
 {
+  // trace(TRACE_VERY_DEBUG, "Creating new PartnerLink\n");
   name            = myname;
   partnerLinkType = mytype;
   myRole          = mymyrole;

@@ -14,11 +14,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/11/26 12:13:02 $
+ *          - last changed: \$Date: 2005/11/29 15:47:03 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.25 $
+ * \version \$Revision: 1.26 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -111,8 +111,11 @@ attributeManager att = attributeManager();
 
 #include "check-symbols.h"
 
-// from check-symbols
+/// from check-symbols
 SymbolManager symMan = SymbolManager();
+
+/// needed to distinguish context of tPartnerLink
+bool inPartners = false;
 
 // to simplify phylum-calls
 using namespace kc;
@@ -393,8 +396,14 @@ tPartnerLink:
       $$->partnerLinkType = att.read($2, "partnerLinkType");
       $$->myRole = att.read($2, "myRole");
       $$->partnerRole = att.read($2, "partnerRole"); 
-      symMan.addPartnerLink($2, new csPartnerLink($$->name->name, $$->partnerLinkType->name, 
-			                     $$->myRole->name, $$->partnerRole->name)); 
+      if (inPartners) {
+        symMan.checkPartnerLink(new csPartnerLink($$->name->name, "", "", ""));
+      }
+      else
+      {
+        symMan.addPartnerLink($2, new csPartnerLink($$->name->name, $$->partnerLinkType->name, 
+	  		                       $$->myRole->name, $$->partnerRole->name)); 
+      }
     }
 | K_PARTNERLINK arbitraryAttributes X_SLASH
     { $$ = PartnerLink();
@@ -402,8 +411,14 @@ tPartnerLink:
       $$->partnerLinkType = att.read($2, "partnerLinkType");
       $$->myRole = att.read($2, "myRole");
       $$->partnerRole = att.read($2, "partnerRole");
-      symMan.addPartnerLink($2, new csPartnerLink($$->name->name, $$->partnerLinkType->name, 
-			                     $$->myRole->name, $$->partnerRole->name)); 
+      if (inPartners) {
+        symMan.checkPartnerLink(new csPartnerLink($$->name->name, "", "", ""));
+      }
+      else
+      {
+        symMan.addPartnerLink($2, new csPartnerLink($$->name->name, $$->partnerLinkType->name, 
+	  		                       $$->myRole->name, $$->partnerRole->name)); 
+      }
     }
 ;
 
@@ -429,15 +444,21 @@ tPartnerLink:
 tPartners_opt:
   /* empty */
     { $$ = NiltPartner_list(); }
-| tPartners
+| tPartners X_NEXT
     { $$ = $1; }
 ;
 
 tPartners:
   K_PARTNERS X_NEXT
+    {
+      inPartners = true;
+    }
   tPartner_list // 1-oo
   X_SLASH K_PARTNERS
-    { $$ = $3; }
+    { 
+      $$ = $4;
+      inPartners = false;
+    }
 ;
 
 tPartner_list:
@@ -961,7 +982,9 @@ tReceive:
       $$->operation = att.read($2, "operation");
       $$->variable = att.read($2, "variable");
       $$->createInstance = att.read($2, "createInstance"); 
-      $$->id = $2; }
+      $$->id = $2; 
+      symMan.checkPartnerLink(new csPartnerLink($$->partnerLink->name, "", "", ""));
+    }
 | K_RECEIVE arbitraryAttributes X_SLASH
     { att.check($2, K_RECEIVE); 
       $$ = Receive(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list());
@@ -973,7 +996,9 @@ tReceive:
       $$->operation = att.read($2, "operation");
       $$->variable = att.read($2, "variable");
       $$->createInstance = att.read($2, "createInstance");
-      $$->id = $2; }
+      $$->id = $2; 
+      symMan.checkPartnerLink(new csPartnerLink($$->partnerLink->name, "", "", ""));
+    }
 ;
 
 

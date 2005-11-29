@@ -12,14 +12,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/29 10:49:40 $
+ *          - last changed: \$Date: 2005/11/29 11:22:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -128,6 +128,11 @@ int main( int argc, char *argv[])
       }
     }
 
+    // make low level ?
+    if (mode_low_level_petri_net)
+    {
+      TheNet->makeLowLevel();
+    }    
     // create dot output ?
     if (mode_lola_petri_net)
     {
@@ -137,13 +142,7 @@ int main( int argc, char *argv[])
     if (mode_dot_petri_net)
     {
       TheNet->drawDot();
-    }
-    
-    // make low level ?
-    if (mode_low_level_petri_net)
-    {
-      TheNet->makeLowLevel();
-    }
+    }    
     // simplify net ?
     if (mode_simplify_petri_net)
     {

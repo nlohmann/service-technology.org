@@ -26,4 +26,4 @@
 #DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
 
 ALL /vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/fixperms /vol/neon-vol2/parallel/nlohmann/tools4bpel/cvsroot &
-DEFAULT (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email %{sVv}; /vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/backup)
+bpel2owfn (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email %{sVv}; /vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/backup)

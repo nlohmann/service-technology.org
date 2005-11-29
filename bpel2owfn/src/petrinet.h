@@ -20,14 +20,14 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/29 10:47:34 $
+ *          - last changed: \$Date: 2005/11/29 13:33:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *          
- * \version \$Revision: 1.30 $
+ * \version \$Revision: 1.31 $
  *          - 2005-11-09 (nlohmann) Added doxygen-comments.
  *          - 2005-11-10 (nlohmann) Added many using commands for std.
  *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an #id
@@ -219,8 +219,6 @@ class Arc
  * #Place, transitions of class #Transition and arcs of class #Arc. The sets
  * are saved in three lists #P, #T and #F.
  *
- * \todo
- *        - declare mapping as private member of class #PetriNet
  */
 
 
@@ -338,6 +336,9 @@ class PetriNet
 
     /// true if function #PetriNet::makeLowLevel() was called
     bool lowLevel;
+
+    /// Mapping of roles to nodes of the Petri net.
+    map <string, Node*> roleMap;
 };
 
 #endif

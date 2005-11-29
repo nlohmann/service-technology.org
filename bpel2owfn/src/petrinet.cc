@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/11/29 10:47:34 $
+ *          - last changed: \$Date: 2005/11/29 13:33:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.48 $
+ * \version \$Revision: 1.49 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -48,8 +48,7 @@
 
 #include "petrinet.h"
 
-/// Mapping of roles to nodes of the Petri net.
-map <string, Node*> roleMap;
+
 
 
 

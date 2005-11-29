@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/11/29 13:33:57 $
+ *          - last changed: \$Date: 2005/11/29 20:33:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -88,8 +88,27 @@ set<pair<Node *, arc_type> > setUnion(set<pair<Node *, arc_type> > a, set<pair<N
  */
 bool Node::firstMemberOf(string role)
 {	
-  // return ((history.size() == 1) && ((*history.begin()).find(role, 0) == 0));
   return ((*history.begin()).find(role, 0) == 0);
+}
+
+
+
+
+
+/*
+ * \return the name of the node type
+ */
+string Node::nodeTypeName()
+{
+  switch(nodeType)
+  {
+    case(PLACE):
+      return "place";
+    case(TRANSITION):
+      return "transition";
+    default:
+      return "uninitialized node";
+  }
 }
 
 
@@ -129,6 +148,7 @@ Transition::Transition(unsigned int myid, string role, string myguard)
 {
   guard = myguard;
   id = myid;
+  nodeType = TRANSITION;
   
   if (role != "")
     history.push_back(role);
@@ -150,6 +170,7 @@ Place::Place(unsigned int myid, string role, place_type mytype)
 {
   type = mytype;
   id = myid;
+  nodeType = PLACE;
 
   if (role != "")
     history.push_back(role);
@@ -367,7 +388,6 @@ Arc *PetriNet::newArc(Node *source, Node *target, arc_type type)
  * \return pointer of the created arc
  *
  * \todo
- *       - overwork initial tests
  *       - add test to check whether one of the pointers is NULL
  */
 Arc *PetriNet::newArc(Node *source, Node *target, arc_type type, string inscription)
@@ -375,16 +395,10 @@ Arc *PetriNet::newArc(Node *source, Node *target, arc_type type, string inscript
   trace(TRACE_VERY_DEBUG, "[PN]\tCreating arc (" + intToString(source->id) +
       "," + intToString(target->id) + ")...\n");
 
-  if (T.find((Transition *)source) != T.end() && T.find((Transition *)target) != T.end())
-    throw Exception(ARC_ERROR, "Arc between two transitions!\n",
-	"t" + intToString(source->id) + " (" + *((source->history).begin()) + ") and t" + intToString(target->id) + " (" + *((target->history).begin()) + ")"
-	);
-
-  if (P.find((Place *)source) != P.end() && P.find((Place *)target) != P.end())
-    throw Exception(ARC_ERROR, "Arc between two places!\n"
-	"p" + intToString(source->id) + " (" + *((source->history).begin()) + ") and p" + intToString(target->id) + " (" + *((target->history).begin()) + ")"
-	);
-
+  if (source->nodeType == target->nodeType)
+    throw Exception(ARC_ERROR, "Arc between two " + source->nodeTypeName() + "s!\n",
+	*((source->history).begin()) + " and " + *((target->history).begin()));
+  
   Arc *f = new Arc(source, target, type, inscription);
   F.insert(f);
 
@@ -417,6 +431,7 @@ void PetriNet::detachNode(Node *n)
   for (unsigned int i=0; i<removeList.size(); i++)
     removeArc(removeList[i]);
 }
+
 
 
 
@@ -473,7 +488,6 @@ void PetriNet::removeArc(Arc *f)
 
 
 
-
 /*---------------------------------------------------------------------------*/
 
 
@@ -490,6 +504,8 @@ string PetriNet::information()
 
 
 
+
+
 /*!
  * Prints information about the generated Petri net. In particular, for each
  * place and transition all roles of the history are printed to understand
@@ -498,8 +514,7 @@ string PetriNet::information()
 void PetriNet::printInformation()
 {
   // the places
-  (*info_output) << "PLACES:\n";
-  (*info_output) << "ID\tTYPE\t\tROLES\n";
+  (*info_output) << "PLACES:\nID\tTYPE\t\tROLES\n";
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
     (*info_output) << "p" << ((*p)->id) << "\t";
@@ -575,7 +590,6 @@ void PetriNet::drawDot()
   (*dot_output) << " node [fontname=\"Helvetica-Oblique\" fontsize=10];" << endl;
   (*dot_output) << " edge [fontname=\"Helvetica-Oblique\" fontsize=10];" << endl << endl;
 
-
   
   // list the places
   (*dot_output) << " node [shape=circle, fixedsize];" << endl;
@@ -596,7 +610,6 @@ void PetriNet::drawDot()
       
     (*dot_output) << "];" << endl;
   }
-
 
 
   // list the transitions
@@ -622,6 +635,7 @@ void PetriNet::drawDot()
     (*dot_output) << "];" << endl;
   }
   (*dot_output) << endl;
+
   
   // list the arcs
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
@@ -639,36 +653,6 @@ void PetriNet::drawDot()
 
     (*dot_output) << "];" << endl;
   }
-
-  /*
-  // make a cluster of the process' state places
-  (*dot_output) << endl << " subgraph cluster_0 {" << endl;
-  (*dot_output) << "  label = \"\";" << endl;
-  
-  Place *a;
-  a = findPlace("process.Active");
-  (*dot_output) << "  " << a->id << " [label=\"Active\\np" << a->id << "\"];" << endl;
-  a = findPlace("process.!Active");
-  (*dot_output) << "  " << a->id << " [label=\"!Active\\np" << a->id << "\"];" << endl;
-  a = findPlace("process.Completed");
-  (*dot_output) << "  " << a->id << " [label=\"Completed\\np" << a->id << "\"];" << endl;
-  a = findPlace("process.!Completed");
-  (*dot_output) << "  " << a->id << " [label=\"!Completed\\np" << a->id << "\"];" << endl;
-  a = findPlace("process.Compensated");
-  (*dot_output) << "  " << a->id << " [label=\"Compensated\\np" << a->id << "\"];" << endl;
-  a = findPlace("process.!Compensated");
-  (*dot_output) << "  " << a->id << " [label=\"!Compensated\\np" << a->id << "\"];" << endl;
-  a = findPlace("process.Ended");
-  (*dot_output) << "  " << a->id << " [label=\"Ended\\np" << a->id << "\"];" << endl;
-  a = findPlace("process.!Ended");
-  (*dot_output) << "  " << a->id << " [label=\"!Ended\\np" << a->id << "\"];" << endl;
-  a = findPlace("process.Faulted");
-  (*dot_output) << "  " << a->id << " [label=\"Faulted\\np" << a->id << "\"];" << endl;
-  a = findPlace("process.!Faulted");
-  (*dot_output) << "  " << a->id << " [label=\"!Faulted\\np" << a->id << "\"];" << endl;
-
-  (*dot_output) << " }" << endl << endl;
-  */
 
   (*dot_output) << "}" << endl;
 }
@@ -822,6 +806,7 @@ void PetriNet::lolaOut()
       (*lola_output) << "\t { " << (*(*post).first->history.begin()) << " }" << endl;
     }
     (*lola_output) << endl;
+    (*lola_output) << "{ END OF FILE }" << endl;
   }
 }
 
@@ -1151,8 +1136,7 @@ void PetriNet::simplify()
  * - Convert all places to low-level places.
  * - Remove all transition guards -- decisions are now taken
  *   non-deterministically.
- * - Convert places of type #DATA to #LOW.
- * - Convert places of type #MESSAGE to #IN resp. #OUT. (todo)
+ * - Convert all places to type #LOW.
  * - Remove arc inscriptions -- all places are low-level places anyway.
  * - Convert read arcs to loops.
  *

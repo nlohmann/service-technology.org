@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/11/29 16:44:32 $
+ *          - last changed: \$Date: 2005/11/29 20:33:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.29 $
+ * \version \$Revision: 1.30 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -162,29 +162,29 @@ Process(a,b,c,d,e,f,g,h) ->
       Transition *process_t5 =  TheNet->newTransition(prefix + "t5");
       Transition *process_t6 =  TheNet->newTransition(prefix + "t6");   
       TheNet->newArc(process_p27, process_t1);
-      TheNet->newArc(process_t1, process_p34);
-      TheNet->newArc(process_p1, process_t2);
-      TheNet->newArc(process_t2, process_p7);
-      TheNet->newArc(process_t2, process_p8);
-      TheNet->newArc(process_t2, process_p10);
-      TheNet->newArc(process_t2, process_p13);
-      TheNet->newArc(process_t2, process_p15);
-      TheNet->newArc(process_t2, process_p17);
-      TheNet->newArc(process_t2, process_p19);
-      TheNet->newArc(process_t2, process_p23);      
+      TheNet->newArc(process_t1,  process_p34);
+      TheNet->newArc(process_p1,  process_t2);
+      TheNet->newArc(process_t2,  process_p7);
+      TheNet->newArc(process_t2,  process_p8);
+      TheNet->newArc(process_t2,  process_p10);
+      TheNet->newArc(process_t2,  process_p13);
+      TheNet->newArc(process_t2,  process_p15);
+      TheNet->newArc(process_t2,  process_p17);
+      TheNet->newArc(process_t2,  process_p19);
+      TheNet->newArc(process_t2,  process_p23);      
       TheNet->newArc(process_p20, process_t3);
-      TheNet->newArc(process_t3, process_p33);
-      TheNet->newArc(process_t3, process_p24);
-      TheNet->newArc(process_p7, process_t4);
-      TheNet->newArc(process_p8, process_t4);
-      TheNet->newArc(process_t4, process_p9);
-      TheNet->newArc(process_t4, process_p11);
+      TheNet->newArc(process_t3,  process_p33);
+      TheNet->newArc(process_t3,  process_p24);
+      TheNet->newArc(process_p7,  process_t4);
+      TheNet->newArc(process_p8,  process_t4);
+      TheNet->newArc(process_t4,  process_p9);
+      TheNet->newArc(process_t4,  process_p11);
       TheNet->newArc(process_p25, process_t4);
       TheNet->newArc(process_p33, process_t4);
-      TheNet->newArc(process_t4, process_p39);
+      TheNet->newArc(process_t4,  process_p39);
       TheNet->newArc(process_p22, process_t5);
-      TheNet->newArc(process_t5, process_p26);
-      TheNet->newArc(process_t6, process_p26);
+      TheNet->newArc(process_t5,  process_p26);
+      TheNet->newArc(process_t6,  process_p26);
       TheNet->newArc(process_p21, process_t6);
       TheNet->newArc(process_p33, process_t6);
 
@@ -452,7 +452,7 @@ Process(a,b,c,d,e,f,g,h) ->
       TheNet->mergePlaces(TheNet->findPlace("process.p20"), TheNet->findPlace(h, ".final"));
       TheNet->mergePlaces(TheNet->findPlace("process.p21"), TheNet->findPlace(h, ".stop"));
       TheNet->mergePlaces(TheNet->findPlace("process.p22"), TheNet->findPlace(h, ".stopped"));
-      TheNet->mergePlaces(TheNet->findPlace("process.p5"), TheNet->findPlace(h, ".failed"));
+      TheNet->mergePlaces(TheNet->findPlace("process.p5"),  TheNet->findPlace(h, ".failed"));
 
       // embed event handler
       TheNet->mergePlaces("process.p23", "process.eventHandler.initial");
@@ -603,10 +603,8 @@ ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) ->
 
 	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
 	TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t2);
-	TheNet->mergePlaces(TheNet->findPlace("process.faulthandler.p11"),
-			    TheNet->findPlace(innerActivity, ".stop"));
-	TheNet->mergePlaces(TheNet->findPlace("process.faulthandler.p12"),
-			    TheNet->findPlace(innerActivity, ".stopped"));
+	TheNet->mergePlaces(TheNet->findPlace("process.faulthandler.p11"), TheNet->findPlace(innerActivity, ".stop"));
+	TheNet->mergePlaces(TheNet->findPlace("process.faulthandler.p12"), TheNet->findPlace(innerActivity, ".stopped"));
 	
 	TheNet->newArc(t2, p3);
 	TheNet->newArc(p7, t2, "x");
@@ -622,10 +620,8 @@ ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) ->
 
 	TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
 	TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t4);
-	TheNet->mergePlaces(TheNet->findPlace("process.faulthandler.p11"),
-			    TheNet->findPlace(innerActivity, ".stop"));
-	TheNet->mergePlaces(TheNet->findPlace("process.faulthandler.p12"),
-			    TheNet->findPlace(innerActivity, ".stopped"));
+	TheNet->mergePlaces(TheNet->findPlace("process.faulthandler.p11"), TheNet->findPlace(innerActivity, ".stop"));
+	TheNet->mergePlaces(TheNet->findPlace("process.faulthandler.p12"), TheNet->findPlace(innerActivity, ".stopped"));
 
 	TheNet->newArc(t4, p3);
 	TheNet->newArc(p7, t4, "x");
@@ -1294,6 +1290,9 @@ This=Receive(a,b) ->
 ;
 
 
+
+
+
 /******************************************************************************
   REPLY
 ******************************************************************************/
@@ -1379,6 +1378,8 @@ Copy(a,b) provided (a->variable == mkcasestring("")) ->
 
   ]
 ;
+
+
 
 
 
@@ -2087,6 +2088,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	TheNet->newArc(TheNet->findPlace(TheActivity, ".stop"), t10);
 	TheNet->newArc(t10, TheNet->findPlace(TheActivity, ".stopped"));
 
+	// embed the inner activity
 	TheNet->mergePlaces(TheActivity, ".stop",    innerActivity, ".stop");
 	TheNet->mergePlaces(TheActivity, ".stopped", innerActivity, ".stopped");
 	TheNet->mergePlaces(TheActivity, ".final",   innerActivity, ".final");
@@ -2111,7 +2113,8 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	TheNet->newArc(TheNet->findPlace("process.clock"), t6, READ, "y");
 	TheNet->newArc(TheNet->findPlace(TheActivity, ".TimeStamp"), t6, "x");
 	TheNet->newArc(t6, TheNet->findPlace(innerActivity, ".initial"));
-	
+
+	// embed the inner activity	
 	TheNet->mergePlaces(TheActivity, ".stop",    innerActivity, ".stop");
 	TheNet->mergePlaces(TheActivity, ".stopped", innerActivity, ".stopped");
 	TheNet->mergePlaces(TheActivity, ".final",   innerActivity, ".final");
@@ -2122,6 +2125,10 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
     }
   ]
 ;
+
+
+
+
 
 /******************************************************************************
   SCOPE

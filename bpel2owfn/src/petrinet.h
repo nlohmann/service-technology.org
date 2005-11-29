@@ -20,14 +20,14 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/29 13:33:58 $
+ *          - last changed: \$Date: 2005/11/29 20:33:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *          
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  *          - 2005-11-09 (nlohmann) Added doxygen-comments.
  *          - 2005-11-10 (nlohmann) Added many using commands for std.
  *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an #id
@@ -87,6 +87,15 @@ typedef enum {
 
 
 
+/// Enumeration of the possible types of a node.
+typedef enum {
+  PLACE,      ///< a place
+  TRANSITION  ///< a transition 
+} node_type;
+
+
+
+
 
 /*!
  * \class  Node
@@ -109,6 +118,12 @@ class Node
     /// the id of the node
     unsigned int id;
 
+    /// the name of the type
+    string nodeTypeName();
+    
+    /// the type of the node
+    node_type nodeType;
+    
     /// the set of roles (i.e. the history) of the node
     vector<string> history;
 };
@@ -224,18 +239,12 @@ class Arc
 
 class PetriNet
 {
-  public:
-    /// Adds a place without an initial role.
-    Place *newPlace();
-	 
+  public:	 
     /// Adds a place with a given role (standard).
     Place *newPlace(string role);
 
     /// Adds a place with a given role and type.
     Place *newPlace(string role, place_type type);
-
-    /// Adds a transition without an initial role.
-    Transition *newTransition();
     
     /// Adds a transition with a given role (standard).
     Transition *newTransition(string role);
@@ -294,16 +303,16 @@ class PetriNet
     /// Constructor to create an empty Petri net.
     PetriNet();
 
-    /// Returns an id for new nodes.
-    unsigned int getId();
-
-    /// Returns current id.
-    unsigned int id();
-
   private:
+    /// Adds a place without an initial role.
+    Place *newPlace();
+    
     /// Removes a place from the net.
     void removePlace(Place *p);
 
+    /// Adds a transition without an initial role.
+    Transition *newTransition();
+    
     /// Removes a transition from the net.
     void removeTransition(Transition *t);
 
@@ -331,6 +340,12 @@ class PetriNet
     /// Statistical output.
     string information();    
 
+    /// Returns an id for new nodes.
+    unsigned int getId();
+
+    /// Returns current id.
+    unsigned int id();
+    
     /// the id that will be assigned to the next node
     unsigned int nextId;
 

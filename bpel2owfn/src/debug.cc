@@ -9,14 +9,14 @@
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2005/11/30 14:45:54 $
+ *          - last changed: \$Date: 2005/11/30 14:47:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  *          - 2005-11-09 (gierds) Initial release.
  *            Simple trace methods and new place for yyerror().
  *          - 2005-11-20 (nlohmann) Overworked and commented yyerror().
@@ -105,7 +105,6 @@ int yyerror(const char* msg)
     std::string errorLine;
     for (unsigned int i=0; i<firstShowedLine; i++)
     {
-      trace(".");
       getline(inputFile, errorLine);
     }
     // print the erroneous line (plus/minus three more)

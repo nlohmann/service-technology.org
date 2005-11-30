@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/11/29 21:22:37 $
+ *          - last changed: \$Date: 2005/11/30 13:56:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -85,11 +85,17 @@
 #include <iostream>
 #include <string>
 #include "petrinet.h"
-
+#include "check-symbols.h"
+	
 // introduced in main.c 
 extern PetriNet *TheNet;
 
-//#define DEBUGPN
+// introduced in bpel-syntax.y
+extern SymbolManager symMan;
+
+using namespace std;
+
+#define DEBUGPN
 %}
 
 
@@ -110,12 +116,13 @@ extern PetriNet *TheNet;
 
 
 
-Process(a,b,c,d,e,f,g,h) ->
+This=Process(a,b,c,d,e,f,g,h) ->
   [petrinet:
     {
       trace(TRACE_INFORMATION, "Generating Petri net...\n");
-#ifndef DEBUGPN      
-      std::string prefix = "process.";
+#ifndef DEBUGPN
+      
+      string prefix = "process.";
       Place *process_p1  = TheNet->newPlace(prefix + "initial");
       Place *process_p2  = TheNet->newPlace(prefix + "ch_in");
       Place *process_p3  = TheNet->newPlace(prefix + "scopeCompensated");
@@ -195,7 +202,15 @@ Process(a,b,c,d,e,f,g,h) ->
       /*---------------------------------------------------------------------*/
 
 
+      /*---------------------------------------------------------------------*/
+      // the children of the process
+      //SymbolScope *me = symMan.getScope($0->id);
 
+      //for (list<SymbolScope *>::iterator child = me->childs.begin(); child != me->childs.end(); child++)
+	//Place *push = TheNet->newPlace(prefix + "!push" + intToString((*child)->id->value)
+      /*---------------------------------------------------------------------*/
+
+      
       /*---------------------------------------------------------------------*/
       // the old stop-pattern
       prefix = "process.stop.";
@@ -441,7 +456,7 @@ Process(a,b,c,d,e,f,g,h) ->
       TheNet->mergePlaces("process.p34",         "process.stop.stopped");
       TheNet->mergePlaces("process.p35",         "process.stop.cleanCH");
       TheNet->mergePlaces("process.p36",         "process.stop.ch_cleaned");
-      ---------------------------------------------------------------------*/
+      ---------------------------------------------------------------------*/	
 #endif
     }
       a b c d e f g
@@ -507,7 +522,7 @@ ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) ->
   [petrinet:
     {
       // inside a <process>
-      std::string prefix = "process.faulthandler.";
+      string prefix = "process.faulthandler.";
       
       Place *p3 =  TheNet->newPlace(prefix + "final");
       Place *p4 =  TheNet->newPlace(prefix + "fault");
@@ -551,7 +566,7 @@ ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) ->
       
       /*---------------------------------------------------------------------*/
       // the <compensate />-element
-      std::string new_prefix = "process.faulthandler.compensate.";
+      string new_prefix = "process.faulthandler.compensate.";
 
       Place *compensate_p1 = TheNet->newPlace(new_prefix + "initial");
       Place *compensate_p2 = TheNet->newPlace(new_prefix + "running");
@@ -641,7 +656,7 @@ ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) ->
 NiltFaultHandlers_opt() ->
   [petrinet:
     {
-      std::string prefix = "process.faulthandler.";
+      string prefix = "process.faulthandler.";
       
       Place *p1 =  TheNet->newPlace(prefix + "fault");
       Place *p2 =  TheNet->newPlace(prefix + "p2");
@@ -745,7 +760,7 @@ NiltFaultHandlers_opt() ->
 ConstEventHandlers_opt(EventHandlers(a,b), NiltEventHandlers_opt()) ->
   [petrinet:
     {
-      std::string prefix = "process.eventHandler.";
+      string prefix = "process.eventHandler.";
       
       Place *p6  = TheNet->newPlace(prefix + "initial");
       Place *p8  = TheNet->newPlace(prefix + "final");
@@ -789,7 +804,7 @@ ConstEventHandlers_opt(EventHandlers(a,b), NiltEventHandlers_opt()) ->
 
       foreach (OnMessage(innerActivity); tOnMessage_list a)
       {
-	std::string newprefix = prefix + "onMessage" + intToString(onMessageCount) + ".";
+	string newprefix = prefix + "onMessage" + intToString(onMessageCount) + ".";
 
 	Place *onMessage_p1  = TheNet->newPlace(newprefix + "p1");
 	Place *onMessage_p2  = TheNet->newPlace(newprefix + "p2");
@@ -862,13 +877,13 @@ ConstEventHandlers_opt(EventHandlers(a,b), NiltEventHandlers_opt()) ->
       int onAlarmCount = 1;
       foreach (o=OnAlarm(innerActivity); tOnAlarm_list b)
       {
-	std::string onAlarmGuard;
-	std::string newprefix = prefix + "onAlarm" + intToString(onAlarmCount) + ".";
+	string onAlarmGuard;
+	string newprefix = prefix + "onAlarm" + intToString(onAlarmCount) + ".";
 
 	if (o->For != mkcasestring(""))
-	  onAlarmGuard = "x + " + std::string(o->For->name) + " \\<= y";  // "<=" is escaped
+	  onAlarmGuard = "x + " + string(o->For->name) + " \\<= y";  // "<=" is escaped
 	else
-	  onAlarmGuard = std::string(o->until->name) + " \\<= y";  // "<=" is escaped
+	  onAlarmGuard = string(o->until->name) + " \\<= y";  // "<=" is escaped
 	
 	Place *onAlarm_p1  = TheNet->newPlace(newprefix + "p1");
 	Place *onAlarm_p2  = TheNet->newPlace(newprefix + "p2");
@@ -939,7 +954,7 @@ ConstEventHandlers_opt(EventHandlers(a,b), NiltEventHandlers_opt()) ->
 NiltEventHandlers_opt() ->
   [petrinet:
     {
-      std::string prefix = "process.eventHandler.";
+      string prefix = "process.eventHandler.";
       
       Place *p1  = TheNet->newPlace(prefix + "initial");
       Place *p2  = TheNet->newPlace(prefix + "finish");
@@ -986,7 +1001,7 @@ NiltEventHandlers_opt() ->
 NiltCompensationHandler_opt() ->
   [petrinet:
     {
-      std::string prefix = "process.compensationHandler.";
+      string prefix = "process.compensationHandler.";
       
       Place *p1  = TheNet->newPlace(prefix + "p1");
       Place *p2  = TheNet->newPlace(prefix + "ch_in");
@@ -1102,7 +1117,7 @@ NiltCompensationHandler_opt() ->
 This=Empty(a) ->
   [petrinet:
     {
-      std::string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".";
       
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -1135,7 +1150,7 @@ This=Empty(a) ->
 This=Invoke(a,b,c,d,e) provided (This->outputVariable == mkcasestring("")) ->
   [petrinet:
     {
-      std::string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -1178,7 +1193,7 @@ This=Invoke(a,b,c,d,e) provided (This->outputVariable == mkcasestring("")) ->
 This=Invoke(a,b,c,d,e) provided (This->outputVariable != mkcasestring("")) ->
   [petrinet:
     {
-      std::string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running1");
@@ -1249,7 +1264,7 @@ This=Invoke(a,b,c,d,e) provided (This->outputVariable != mkcasestring("")) ->
 This=Receive(a,b) ->
   [petrinet:
     {
-      std::string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".";
       
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -1301,7 +1316,7 @@ This=Receive(a,b) ->
 This=Reply(a,b) ->
   [petrinet:
     {
-      std::string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".";
       
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -1352,7 +1367,7 @@ This=Reply(a,b) ->
 This=Assign(a,b) ->
   [petrinet:
     {
-      std::string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".";
       
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p3 = TheNet->newPlace(prefix + "final");
@@ -1396,9 +1411,9 @@ Copy(a,b) provided (a->variable == mkcasestring("")) ->
 This=Wait(a) provided (This->until != mkcasestring("")) ->
   [petrinet:
     {
-      std::string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".";
       
-      std::string guard = "(" + std::string(This->until->name) + " \\<= x)"; // "<=" is escaped
+      string guard = "(" + string(This->until->name) + " \\<= x)"; // "<=" is escaped
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
       Place *p3 = TheNet->newPlace(prefix + "stop");
@@ -1423,9 +1438,9 @@ This=Wait(a) provided (This->until != mkcasestring("")) ->
 This=Wait(a) provided (This->For != mkcasestring("")) ->
   [petrinet:
     {
-      std::string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".";
       
-      std::string guard = "(x + " + std::string(This->For->name) + " \\<= y)"; // "<=" is escaped
+      string guard = "(x + " + string(This->For->name) + " \\<= y)"; // "<=" is escaped
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "TimeStamp");
       Place *p3 = TheNet->newPlace(prefix + "final");
@@ -1470,7 +1485,7 @@ This=Wait(a) provided (This->For != mkcasestring("")) ->
 This=Throw(a) ->
   [petrinet:
     {
-      std::string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "p2");
@@ -1513,7 +1528,7 @@ This=Throw(a) ->
 This=Compensate(a) provided (!This->inFaultHandler && This->scope == mkcasestring("")) ->
   [petrinet:
     {
-      std::string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -1550,7 +1565,7 @@ This=Compensate(a) provided (!This->inFaultHandler && This->scope == mkcasestrin
 This=Compensate(a) provided (This->inFaultHandler && This->scope == mkcasestring("")) ->
   [petrinet:
     {
-      std::string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -1587,7 +1602,7 @@ This=Compensate(a) provided (This->inFaultHandler && This->scope == mkcasestring
 This=Compensate(a) provided (!This->inFaultHandler && This->scope != mkcasestring("")) ->
   [petrinet:
     {
-      std::string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -1597,13 +1612,13 @@ This=Compensate(a) provided (!This->inFaultHandler && This->scope != mkcasestrin
       Place *p6 = TheNet->newPlace(prefix + "scopeCompensated");
       Place *p7 = TheNet->newPlace(prefix + "stopped");
       Transition *t1  = TheNet->newTransition(prefix + "t1");
-      Transition *t2  = TheNet->newTransition(prefix + "t2", std::string(This->scope->name) + "=scopeName");
+      Transition *t2  = TheNet->newTransition(prefix + "t2", string(This->scope->name) + "=scopeName");
       Transition *t3  = TheNet->newTransition(prefix + "t3");
       Transition *t4  = TheNet->newTransition(prefix + "t4");
       Transition *t5  = TheNet->newTransition(prefix + "t5");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
-      TheNet->newArc(t1, p5, std::string(This->scope->name));
+      TheNet->newArc(t1, p5, string(This->scope->name));
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       TheNet->newArc(p6, t2, "scopeName");
@@ -1624,7 +1639,7 @@ This=Compensate(a) provided (!This->inFaultHandler && This->scope != mkcasestrin
 This=Compensate(a) provided (This->inFaultHandler && This->scope != mkcasestring("")) ->
   [petrinet:
     {
-      std::string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -1634,13 +1649,13 @@ This=Compensate(a) provided (This->inFaultHandler && This->scope != mkcasestring
       Place *p6 = TheNet->newPlace(prefix + "compensated");
       Place *p7 = TheNet->newPlace(prefix + "stopped");
       Transition *t1  = TheNet->newTransition(prefix + "t1");
-      Transition *t2  = TheNet->newTransition(prefix + "t2", std::string(This->scope->name) + "=scopeName");
+      Transition *t2  = TheNet->newTransition(prefix + "t2", string(This->scope->name) + "=scopeName");
       Transition *t3  = TheNet->newTransition(prefix + "t3");
       Transition *t4  = TheNet->newTransition(prefix + "t4");
       Transition *t5  = TheNet->newTransition(prefix + "t5");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
-      TheNet->newArc(t1, p5, std::string(This->scope->name));
+      TheNet->newArc(t1, p5, string(This->scope->name));
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       TheNet->newArc(p6, t2, "scopeName");
@@ -1675,7 +1690,7 @@ This=Compensate(a) provided (This->inFaultHandler && This->scope != mkcasestring
 This=Terminate(a) ->
   [petrinet:
     {
-      std::string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -1726,7 +1741,7 @@ This=Terminate(a) ->
 TheActivity=activityFlow(This=Flow(a,b,c)) ->
   [petrinet:
     {
-      std::string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".";
 
       Place *p7  = TheNet->newPlace(prefix + "initial");
       Place *p8  = TheNet->newPlace(prefix + "final");
@@ -1785,7 +1800,7 @@ TheActivity=activityFlow(This=Flow(a,b,c)) ->
 This=activitySwitch(Switch(a,b,c)) ->
   [petrinet:
     {
-      std::string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".";
 
       Place *switch_p4 =  TheNet->newPlace(prefix + "final");
       Place *switch_p5 =  TheNet->newPlace(prefix + "initial");
@@ -1821,7 +1836,7 @@ This=activitySwitch(Switch(a,b,c)) ->
       Transition *last;
       foreach (o=Case(innerActivity); tCase_list b)
       {
-	std::string condition = o->condition->name;
+	string condition = o->condition->name;
 	
 	if (currentCase == 1)
 	{
@@ -1845,7 +1860,7 @@ This=activitySwitch(Switch(a,b,c)) ->
 	else
 	{
 	  // two transitions: guard fulfilled or not
-	  std::string caseNumber = intToString(currentCase);
+	  string caseNumber = intToString(currentCase);
 	  Transition *t2 = TheNet->newTransition(prefix + "t2.case" + caseNumber, condition);
 	  Transition *t4 = TheNet->newTransition(prefix + "t4.case" + caseNumber, "!(" + condition + ")");
 
@@ -1918,8 +1933,8 @@ This=activitySwitch(Switch(a,b,c)) ->
 TheActivity=activityWhile(TheWhile=While(a,b)) ->
   [petrinet:
     {
-      std::string prefix = intToString(TheWhile->id->value) + ".";
-      std::string condition = std::string(TheWhile->condition->name);
+      string prefix = intToString(TheWhile->id->value) + ".";
+      string condition = string(TheWhile->condition->name);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -1989,7 +2004,7 @@ TheActivity=activityWhile(TheWhile=While(a,b)) ->
 This=activitySequence(Sequence(a,b)) ->
   [petrinet:
     {
-      std::string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".";
 
       Place *p2 = TheNet->newPlace(prefix + "initial");
       Place *p9 = TheNet->newPlace(prefix + "final");
@@ -2038,7 +2053,7 @@ This=activitySequence(Sequence(a,b)) ->
 TheActivity=activityPick(This=Pick(a,b,c)) ->
   [petrinet:
     {
-      std::string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".";
 
       Place *p5 = TheNet->newPlace(prefix + "final");
       Place *p6 = TheNet->newPlace(prefix + "initial");
@@ -2065,7 +2080,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
       int onMessageCount = 1;      
       foreach (OnMessage(innerActivity); tOnMessage_list b)
       {
-	std::string newprefix = prefix + "onMessage" + intToString(onMessageCount) + ".";
+	string newprefix = prefix + "onMessage" + intToString(onMessageCount) + ".";
 
 	Place *p3 = TheNet->newPlace(newprefix + "p3");
 	Place *p10 = TheNet->newPlace(newprefix + "p10");
@@ -2101,13 +2116,13 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
       int onAlarmCount = 1;      
       foreach (o=OnAlarm(innerActivity); tOnAlarm_list c)
       {
-	std::string newprefix = prefix + "onAlarm" + intToString(onAlarmCount) + ".";
-	std::string onAlarmGuard;
+	string newprefix = prefix + "onAlarm" + intToString(onAlarmCount) + ".";
+	string onAlarmGuard;
 
 	if (o->For != mkcasestring(""))
-	  onAlarmGuard = "x + " + std::string(o->For->name) + " \\<= y";  // "<=" is escaped
+	  onAlarmGuard = "x + " + string(o->For->name) + " \\<= y";  // "<=" is escaped
 	else
-	  onAlarmGuard = std::string(o->until->name) + " \\<= y";  // "<=" is escaped
+	  onAlarmGuard = string(o->until->name) + " \\<= y";  // "<=" is escaped
 
 	Transition *t6 = TheNet->newTransition(newprefix + "t6", onAlarmGuard);
 	TheNet->newArc(TheNet->findPlace("process.clock"), t6, READ, "y");
@@ -2133,6 +2148,142 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 /******************************************************************************
   SCOPE
 ******************************************************************************/
+
+This=Scope(a,b,c,d,e,f)
+ ->
+  [petrinet:
+    {
+      string prefix = intToString(This->id->value) + ".";
+
+      Place *p2  = TheNet->newPlace(prefix + "initial");
+      Place *p3  = TheNet->newPlace(prefix + "ch_in");
+      Place *p4  = TheNet->newPlace(prefix + "scopeCompensated");
+      Place *p5  = TheNet->newPlace(prefix + "push");
+      Place *p6  = TheNet->newPlace(prefix + "p6");
+      Place *p7  = TheNet->newPlace(prefix + "upperTerminate");
+      Place *p8  = TheNet->newPlace(prefix + "!Terminated");
+      Place *p9  = TheNet->newPlace(prefix + "Terminated");
+      Place *p10 = TheNet->newPlace(prefix + "Active");
+      Place *p11 = TheNet->newPlace(prefix + "!Completed");
+      Place *p12 = TheNet->newPlace(prefix + "Completed");
+      Place *p13 = TheNet->newPlace(prefix + "!Compensated");
+      Place *p14 = TheNet->newPlace(prefix + "!Active");
+      Place *p15 = TheNet->newPlace(prefix + "Compensated");
+      Place *p16 = TheNet->newPlace(prefix + "!Ended");
+      Place *p17 = TheNet->newPlace(prefix + "Ended");
+      Place *p18 = TheNet->newPlace(prefix + "!Faulted");
+      Place *p19 = TheNet->newPlace(prefix + "Faulted");
+      Place *p20 = TheNet->newPlace(prefix + "stop");
+      Place *p21 = TheNet->newPlace(prefix + "p21");
+      Place *p22 = TheNet->newPlace(prefix + "p22");
+      Place *p23 = TheNet->newPlace(prefix + "p23");
+      Place *p24 = TheNet->newPlace(prefix + "p24");
+      Place *p25 = TheNet->newPlace(prefix + "p25");
+      Place *p26 = TheNet->newPlace(prefix + "p26");
+      Place *p27 = TheNet->newPlace(prefix + "p27");
+      Place *p28 = TheNet->newPlace(prefix + "p28");
+      Place *p29 = TheNet->newPlace(prefix + "p29");
+      Place *p35 = TheNet->newPlace(prefix + "p35");
+      Place *p36 = TheNet->newPlace(prefix + "p36");
+      Place *p37 = TheNet->newPlace(prefix + "p37");
+      Place *p38 = TheNet->newPlace(prefix + "p38");
+      Place *p39 = TheNet->newPlace(prefix + "p39");
+      Place *p40 = TheNet->newPlace(prefix + "p40");
+      Place *p41 = TheNet->newPlace(prefix + "p41");
+      Place *p42 = TheNet->newPlace(prefix + "p42");
+      Place *p43 = TheNet->newPlace(prefix + "p43");
+      Place *p44 = TheNet->newPlace(prefix + "p44");
+      Place *p45 = TheNet->newPlace(prefix + "stopped");
+      Place *p46 = TheNet->newPlace(prefix + "p46");
+      Place *p47 = TheNet->newPlace(prefix + "p47");
+      Place *p48 = TheNet->newPlace(prefix + "p48");
+      Place *p49 = TheNet->newPlace(prefix + "p49");
+      Place *p50 = TheNet->newPlace(prefix + "p50");
+      Place *p51 = TheNet->newPlace(prefix + "final");
+      Place *p52 = TheNet->newPlace(prefix + "p52");
+      Place *p53 = TheNet->newPlace(prefix + "p53");
+      Place *p54 = TheNet->newPlace(prefix + "p54");
+      Place *p56 = TheNet->newPlace(prefix + "p56");
+      Place *p57 = TheNet->newPlace(prefix + "p57");
+      Place *p67 = TheNet->newPlace(prefix + "!push");
+      Transition *t1  = TheNet->newTransition(prefix + "t1");
+      Transition *t2  = TheNet->newTransition(prefix + "t2");
+      Transition *t3  = TheNet->newTransition(prefix + "t3");
+      Transition *t4  = TheNet->newTransition(prefix + "t4");
+      Transition *t5  = TheNet->newTransition(prefix + "t5");
+      Transition *t6  = TheNet->newTransition(prefix + "t6");
+      Transition *t7  = TheNet->newTransition(prefix + "t7");
+      Transition *t8  = TheNet->newTransition(prefix + "t8");
+      Transition *t9  = TheNet->newTransition(prefix + "t9");
+      Transition *t10 = TheNet->newTransition(prefix + "t10");
+      Transition *t11 = TheNet->newTransition(prefix + "t11");
+      
+      TheNet->newArc(p27, t1);
+      TheNet->newArc(t1, p38);
+      
+      TheNet->newArc(p2, t2);
+      TheNet->newArc(t2, p10);
+      TheNet->newArc(t2, p11);
+      TheNet->newArc(t2, p13);
+      TheNet->newArc(t2, p16);
+      TheNet->newArc(t2, p18);
+      TheNet->newArc(t2, p21);
+      TheNet->newArc(t2, p25);
+
+      TheNet->newArc(p22, t3);
+      TheNet->newArc(t3, p26);
+      TheNet->newArc(t3, p35);
+
+      TheNet->newArc(p10, t4);
+      TheNet->newArc(p11, t4);
+      TheNet->newArc(t4, p12);
+      TheNet->newArc(t4, p14);
+      TheNet->newArc(p27, t4);
+      TheNet->newArc(p35, t4);
+      TheNet->newArc(t4, p51);
+
+      TheNet->newArc(p24, t5);
+      TheNet->newArc(t5, p28);
+
+      TheNet->newArc(p23, t6);
+      TheNet->newArc(t6, p28);
+      TheNet->newArc(p35, t6);
+
+      TheNet->newArc(p8, t7, READ);
+      TheNet->newArc(p10, t7);
+      TheNet->newArc(t7, p14);
+      TheNet->newArc(p20, t7);
+      TheNet->newArc(t7, p36);
+      
+      TheNet->newArc(p9, t8, READ);
+      TheNet->newArc(p10, t8);
+      TheNet->newArc(t8, p14);
+      TheNet->newArc(p20, t8);
+      TheNet->newArc(t8, p37);
+
+      TheNet->newArc(p2, t9);
+      TheNet->newArc(p20, t9);
+      TheNet->newArc(t9, p45);
+      
+      TheNet->newArc(p17, t10, READ);
+      TheNet->newArc(p20, t10);
+      TheNet->newArc(t10, p45);
+
+      TheNet->newArc(p20, t11);
+      TheNet->newArc(t11, p45);
+      TheNet->newArc(p51, t11);
+    }
+    a b c d e f
+    {
+      // embed the inner activity
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "p21"), TheNet->findPlace(f, ".initial"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "p22"), TheNet->findPlace(f, ".final"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "p23"), TheNet->findPlace(f, ".stop"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "p24"), TheNet->findPlace(f, ".stopped"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "p6"),  TheNet->findPlace(f, ".failed"));
+    }
+  ]
+;
 
 
 /******************************************************************************

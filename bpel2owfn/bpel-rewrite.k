@@ -141,6 +141,7 @@ activityInvoke(
 	),
       e, //tCompensationHandler_opt of <invoke>
       NiltEventHandlers_opt(),
+      StopInScope(),
       activityInvoke(
 	Invoke2(
 	  StandardElements(
@@ -183,6 +184,7 @@ activityInvoke(
 	),
       e, //tCompensationHandler_opt of <invoke>
       NiltEventHandlers_opt(),
+      StopInScope(),
       activityInvoke(
 	Invoke2(
 	  StandardElements(
@@ -226,6 +228,7 @@ activityInvoke(
 	),
       e, //tCompensationHandler_opt of <invoke>
       NiltEventHandlers_opt(),
+      StopInScope(),
       activityInvoke(
 	Invoke2(
 	  StandardElements(

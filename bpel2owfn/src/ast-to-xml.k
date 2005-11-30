@@ -12,7 +12,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2005/11/30 14:33:53 $
+ *          - last changed: \$Date: 2005/11/30 16:08:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -23,7 +23,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Moved #intToString to \ref helpers.cc.
  *          - 2005-11-18 (nlohmann) Identifiers are printed.
@@ -394,7 +394,7 @@ Pick(a,b,c) ->
   SCOPE
 ******************************************************************************/
 
-Scope(a,b,c,d,e,f) ->
+Scope(a,b,c,d,e,f,g) ->
   [xml: { inup(); } "<scope id=\"" $0->id "\">\n" 
   
   a
@@ -409,7 +409,7 @@ Scope(a,b,c,d,e,f) ->
   { else }
     ${ c $}
 
-  d e f
+  d e f g
     
   { indown(); } "</scope>\n" ]
 ;

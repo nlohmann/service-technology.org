@@ -18,7 +18,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/11/30 14:47:26 $
+ *          - last changed: \$Date: 2005/11/30 16:08:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.30 $
+ * \version \$Revision: 1.31 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -1622,7 +1622,7 @@ tScope:
   tEventHandlers_opt
   activity X_NEXT
   X_SLASH K_SCOPE
-    { $$ = Scope($5, $6, $8, $9, $10, $11);
+    { $$ = Scope($5, $6, $8, $9, $10, StopInScope(), $11);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");

@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/11/30 14:33:53 $
+ *          - last changed: \$Date: 2005/11/30 14:47:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.33 $
+ * \version \$Revision: 1.34 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -199,264 +199,7 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       /*---------------------------------------------------------------------*/
       // special places
       Place *process_clock = TheNet->newPlace(prefix + "clock");
-      /*---------------------------------------------------------------------*/
-
-
-      /*---------------------------------------------------------------------*/
-      // the children of the process
-      //SymbolScope *me = symMan.getScope($0->id);
-
-      //for (list<SymbolScope *>::iterator child = me->childs.begin(); child != me->childs.end(); child++)
-	//Place *push = TheNet->newPlace(prefix + "!push" + intToString((*child)->id->value)
-      /*---------------------------------------------------------------------*/
-
-      
-      /*---------------------------------------------------------------------*/
-      // the old stop-pattern
-      prefix = "process.stop.";
-      Place *stop_p1  = TheNet->newPlace(prefix + "Faulted");
-      Place *stop_p2  = TheNet->newPlace(prefix + "p2");
-      Place *stop_p3  = TheNet->newPlace(prefix + "p3");
-      Place *stop_p4  = TheNet->newPlace(prefix + "p4");
-      Place *stop_p5  = TheNet->newPlace(prefix + "fault_in");
-      Place *stop_p6  = TheNet->newPlace(prefix + "p6");
-      Place *stop_p7  = TheNet->newPlace(prefix + "fault");
-      Place *stop_p8  = TheNet->newPlace(prefix + "faultSave");
-      Place *stop_p9  = TheNet->newPlace(prefix + "Active");
-      Place *stop_p10 = TheNet->newPlace(prefix + "!Active");
-      Place *stop_p11 = TheNet->newPlace(prefix + "p11");
-      Place *stop_p12 = TheNet->newPlace(prefix + "final");
-      Place *stop_p13 = TheNet->newPlace(prefix + "terminate");
-      Place *stop_p14 = TheNet->newPlace(prefix + "!Faulted");
-      Place *stop_p15 = TheNet->newPlace(prefix + "rethrow");
-      Place *stop_p16 = TheNet->newPlace(prefix + "Ended");
-      Place *stop_p17 = TheNet->newPlace(prefix + "Compensated");
-      Place *stop_p18 = TheNet->newPlace(prefix + "p18");
-      Place *stop_p19 = TheNet->newPlace(prefix + "p19");
-      Place *stop_p20 = TheNet->newPlace(prefix + "!Ended");
-      Place *stop_p21 = TheNet->newPlace(prefix + "stop");
-      Place *stop_p22 = TheNet->newPlace(prefix + "stopped");
-      Place *stop_p23 = TheNet->newPlace(prefix + "cleanCH");
-      Place *stop_p24 = TheNet->newPlace(prefix + "ch_cleaned");
-      Transition *stop_t1 =  TheNet->newTransition(prefix + "t1");
-      Transition *stop_t2 =  TheNet->newTransition(prefix + "t2");
-      Transition *stop_t3 =  TheNet->newTransition(prefix + "t3");
-      Transition *stop_t4 =  TheNet->newTransition(prefix + "t4");
-      Transition *stop_t5 =  TheNet->newTransition(prefix + "t5");
-      Transition *stop_t6 =  TheNet->newTransition(prefix + "t6");
-      Transition *stop_t7 =  TheNet->newTransition(prefix + "t7");
-      Transition *stop_t8 =  TheNet->newTransition(prefix + "t8");
-      Transition *stop_t9 =  TheNet->newTransition(prefix + "kill");
-      Transition *stop_t10 = TheNet->newTransition(prefix + "t10");
-      Transition *stop_t11 = TheNet->newTransition(prefix + "t11");
-      Transition *stop_t12 = TheNet->newTransition(prefix + "t12");
-      TheNet->newArc(stop_p1, stop_t1, READ);
-      TheNet->newArc(stop_p5, stop_t1, "x");
-      TheNet->newArc(stop_t1, stop_p15, "x");
-      TheNet->newArc(stop_p2, stop_t2);
-      TheNet->newArc(stop_t2, stop_p3);
-      TheNet->newArc(stop_t2, stop_p21);
-      TheNet->newArc(stop_p3, stop_t3);
-//      TheNet->newArc(stop_p5, stop_t3, "X"); // here was the RESET arc (now of type STANDARD)
-      TheNet->newArc(stop_p22, stop_t3);
-      TheNet->newArc(stop_t3, stop_p4);
-      TheNet->newArc(stop_p5, stop_t4, "x");
-      TheNet->newArc(stop_p9, stop_t4);
-      TheNet->newArc(stop_t4, stop_p2);
-      TheNet->newArc(stop_t4, stop_p6, "x");
-      TheNet->newArc(stop_t4, stop_p10);
-      TheNet->newArc(stop_p4, stop_t5);
-      TheNet->newArc(stop_p6, stop_t5, "x");
-      TheNet->newArc(stop_p14, stop_t5);
-      TheNet->newArc(stop_t5, stop_p1);
-      TheNet->newArc(stop_t5, stop_p7);
-      TheNet->newArc(stop_t5, stop_p8, "x");
-      TheNet->newArc(stop_p9, stop_t6);
-      TheNet->newArc(stop_p13, stop_t6);
-      TheNet->newArc(stop_t6, stop_p2);
-      TheNet->newArc(stop_t6, stop_p10);
-      TheNet->newArc(stop_t6, stop_p11);
-      TheNet->newArc(stop_p4, stop_t7);
-      TheNet->newArc(stop_p11, stop_t7);
-      TheNet->newArc(stop_p20, stop_t7);
-      TheNet->newArc(stop_t7, stop_p12);
-      TheNet->newArc(stop_t7, stop_p16);
-      TheNet->newArc(stop_p10, stop_t8, READ);
-      TheNet->newArc(stop_p13, stop_t8);
-      TheNet->newArc(stop_p16, stop_t9, READ);
-      TheNet->newArc(stop_p18, stop_t9, "x");
-      TheNet->newArc(stop_p5, stop_t10, "x");
-      TheNet->newArc(stop_p17, stop_t10, READ);
-      TheNet->newArc(stop_t10, stop_p18, "x");
-      TheNet->newArc(stop_p18, stop_t11, "x");
-      TheNet->newArc(stop_p20, stop_t11);
-      TheNet->newArc(stop_t11, stop_p19, "x");
-      TheNet->newArc(stop_t11, stop_p23);
-      TheNet->newArc(stop_p19, stop_t12, "x");
-      TheNet->newArc(stop_p24, stop_t12);
-      TheNet->newArc(stop_t12, stop_p16);
-      TheNet->newArc(stop_t12, stop_p12);
-
-      // embed stop-pattern in process
-      TheNet->mergePlaces("process.Faulted",     "process.stop.Faulted");
-      TheNet->mergePlaces("process.p5",          "process.stop.fault_in");
-      TheNet->mergePlaces("process.fault",       "process.stop.fault");
-      TheNet->mergePlaces("process.faultSave",   "process.stop.faultSave");
-      TheNet->mergePlaces("process.Active",      "process.stop.Active");
-      TheNet->mergePlaces("process.!Active",     "process.stop.!Active");
-      TheNet->mergePlaces("process.final",       "process.stop.final");
-      TheNet->mergePlaces("process.terminate",   "process.stop.terminate");
-      TheNet->mergePlaces("process.!Faulted",    "process.stop.!Faulted");
-      TheNet->mergePlaces("process.rethrow",     "process.stop.rethrow");
-      TheNet->mergePlaces("process.Ended",       "process.stop.Ended");
-      TheNet->mergePlaces("process.Compensated", "process.stop.Compensated");
-      TheNet->mergePlaces("process.!Ended",      "process.stop.!Ended");
-      TheNet->mergePlaces("process.p21",         "process.stop.stop");
-      TheNet->mergePlaces("process.p34",         "process.stop.stopped");
-      TheNet->mergePlaces("process.p35",         "process.stop.cleanCH");
-      TheNet->mergePlaces("process.p36",         "process.stop.ch_cleaned");
-      /*---------------------------------------------------------------------*/      
-
-      
-      /*---------------------------------------------------------------------
-      // the stop-pattern (Niels' extension)
-      prefix = "process.stop.";
-      Place *stop_p1  = TheNet->newPlace(prefix + "Faulted");
-      Place *stop_p2  = TheNet->newPlace(prefix + "p2");
-      Place *stop_p3  = TheNet->newPlace(prefix + "p3");
-      Place *stop_p4  = TheNet->newPlace(prefix + "p4");
-      Place *stop_p5  = TheNet->newPlace(prefix + "fault_in");
-      Place *stop_p6  = TheNet->newPlace(prefix + "p6");
-      Place *stop_p7  = TheNet->newPlace(prefix + "fault");
-      Place *stop_p8  = TheNet->newPlace(prefix + "faultSave");
-      Place *stop_p9  = TheNet->newPlace(prefix + "Active");
-      Place *stop_p10 = TheNet->newPlace(prefix + "!Active");
-      Place *stop_p11 = TheNet->newPlace(prefix + "p11");
-      Place *stop_p12 = TheNet->newPlace(prefix + "final");
-      Place *stop_p13 = TheNet->newPlace(prefix + "terminate");
-      Place *stop_p14 = TheNet->newPlace(prefix + "!Faulted");
-      Place *stop_p15 = TheNet->newPlace(prefix + "rethrow");
-      Place *stop_p16 = TheNet->newPlace(prefix + "Ended");
-      Place *stop_p17 = TheNet->newPlace(prefix + "Compensated");
-      Place *stop_p18 = TheNet->newPlace(prefix + "p18");
-      Place *stop_p19 = TheNet->newPlace(prefix + "p19");
-      Place *stop_p20 = TheNet->newPlace(prefix + "!Ended");
-      Place *stop_p21 = TheNet->newPlace(prefix + "stop");
-      Place *stop_p22 = TheNet->newPlace(prefix + "stopped");
-      Place *stop_p23 = TheNet->newPlace(prefix + "cleanCH");
-      Place *stop_p24 = TheNet->newPlace(prefix + "ch_cleaned");
-      
-      Transition *stop_t1 =  TheNet->newTransition(prefix + "t1");
-      Transition *stop_t2 =  TheNet->newTransition(prefix + "t2");
-      Transition *stop_t3 =  TheNet->newTransition(prefix + "t3");
-      Transition *stop_t4 =  TheNet->newTransition(prefix + "t4");
-      Transition *stop_t5 =  TheNet->newTransition(prefix + "t5");
-      Transition *stop_t6 =  TheNet->newTransition(prefix + "t6");
-      Transition *stop_t7 =  TheNet->newTransition(prefix + "t7");
-      Transition *stop_t8 =  TheNet->newTransition(prefix + "t8");
-      Transition *stop_t9 =  TheNet->newTransition(prefix + "kill");
-      Transition *stop_t10 = TheNet->newTransition(prefix + "t10");
-      Transition *stop_t11 = TheNet->newTransition(prefix + "t11");
-      Transition *stop_t12 = TheNet->newTransition(prefix + "t12");
-
-
-      // Niels' extension
-      Place *stop_left = TheNet->newPlace(prefix + "left");
-      Place *stop_right = TheNet->newPlace(prefix + "right");
-      Place *stop_fault_IA = TheNet->newPlace(prefix + "faultIA");
-      Place *stop_fault_FH = TheNet->newPlace(prefix + "faultFH");
-      Transition *stop_goleft = TheNet->newTransition(prefix + "goleft");
-      Transition *stop_goright = TheNet->newTransition(prefix + "goright");
-      Transition *stop_killfaults = TheNet->newTransition(prefix + "killFaults");
-      TheNet->newArc(stop_p5, stop_goleft, "x");
-      TheNet->newArc(stop_goleft, stop_fault_FH, "x");
-      TheNet->newArc(stop_left, stop_goleft, READ);
-      TheNet->newArc(stop_p5, stop_goright, "x");
-      TheNet->newArc(stop_goright, stop_fault_IA, "x");
-      TheNet->newArc(stop_right, stop_goright, READ);
-      TheNet->newArc(stop_left, stop_killfaults, READ);
-      TheNet->newArc(stop_fault_IA, stop_killfaults);
-      TheNet->newArc(process_t2, stop_right);
-
-      
-      TheNet->newArc(stop_p1, stop_t1, READ);
-      TheNet->newArc(stop_fault_FH, stop_t1, "x"); // was reading from stop_p5
-      TheNet->newArc(stop_t1, stop_p15, "x");
-
-      TheNet->newArc(stop_p2, stop_t2);
-      TheNet->newArc(stop_t2, stop_p3);
-      TheNet->newArc(stop_t2, stop_p21);
-
-      TheNet->newArc(stop_p3, stop_t3);
-      TheNet->newArc(stop_p22, stop_t3);
-      TheNet->newArc(stop_t3, stop_p4);
-      TheNet->newArc(stop_t3, stop_left);	// new!
-      TheNet->newArc(stop_right, stop_t3);	// new!
-
-      TheNet->newArc(stop_fault_IA, stop_t4, "x"); // was reading from stop_p5
-      TheNet->newArc(stop_p9, stop_t4);
-      TheNet->newArc(stop_t4, stop_p2);
-      TheNet->newArc(stop_t4, stop_p6, "x");
-      TheNet->newArc(stop_t4, stop_p10);
-
-      TheNet->newArc(stop_p4, stop_t5);
-      TheNet->newArc(stop_p6, stop_t5, "x");
-      TheNet->newArc(stop_p14, stop_t5);
-      TheNet->newArc(stop_t5, stop_p1);
-      TheNet->newArc(stop_t5, stop_p7);
-      TheNet->newArc(stop_t5, stop_p8, "x");
-
-      TheNet->newArc(stop_p9, stop_t6);
-      TheNet->newArc(stop_p13, stop_t6);
-      TheNet->newArc(stop_t6, stop_p2);
-      TheNet->newArc(stop_t6, stop_p10);
-      TheNet->newArc(stop_t6, stop_p11);
-
-      TheNet->newArc(stop_p4, stop_t7);
-      TheNet->newArc(stop_p11, stop_t7);
-      TheNet->newArc(stop_p20, stop_t7);
-      TheNet->newArc(stop_t7, stop_p12);
-      TheNet->newArc(stop_t7, stop_p16);
-
-      TheNet->newArc(stop_p10, stop_t8, READ);
-      TheNet->newArc(stop_p13, stop_t8);
-
-      TheNet->newArc(stop_p16, stop_t9, READ);
-      TheNet->newArc(stop_p18, stop_t9, "x");
-
-      TheNet->newArc(stop_p5, stop_t10, "x");
-      TheNet->newArc(stop_p17, stop_t10, READ);
-      TheNet->newArc(stop_t10, stop_p18, "x");
-
-      TheNet->newArc(stop_p18, stop_t11, "x");
-      TheNet->newArc(stop_p20, stop_t11);
-      TheNet->newArc(stop_t11, stop_p19, "x");
-      TheNet->newArc(stop_t11, stop_p23);
-
-      TheNet->newArc(stop_p19, stop_t12, "x");
-      TheNet->newArc(stop_p24, stop_t12);
-      TheNet->newArc(stop_t12, stop_p16);
-      TheNet->newArc(stop_t12, stop_p12);
-
-      // embed stop-pattern in process
-      TheNet->mergePlaces("process.Faulted",     "process.stop.Faulted");
-      TheNet->mergePlaces("process.p5",          "process.stop.fault_in");
-      TheNet->mergePlaces("process.fault",       "process.stop.fault");
-      TheNet->mergePlaces("process.faultSave",   "process.stop.faultSave");
-      TheNet->mergePlaces("process.Active",      "process.stop.Active");
-      TheNet->mergePlaces("process.!Active",     "process.stop.!Active");
-      TheNet->mergePlaces("process.final",       "process.stop.final");
-      TheNet->mergePlaces("process.terminate",   "process.stop.terminate");
-      TheNet->mergePlaces("process.!Faulted",    "process.stop.!Faulted");
-      TheNet->mergePlaces("process.rethrow",     "process.stop.rethrow");
-      TheNet->mergePlaces("process.Ended",       "process.stop.Ended");
-      TheNet->mergePlaces("process.Compensated", "process.stop.Compensated");
-      TheNet->mergePlaces("process.!Ended",      "process.stop.!Ended");
-      TheNet->mergePlaces("process.p21",         "process.stop.stop");
-      TheNet->mergePlaces("process.p34",         "process.stop.stopped");
-      TheNet->mergePlaces("process.p35",         "process.stop.cleanCH");
-      TheNet->mergePlaces("process.p36",         "process.stop.ch_cleaned");
-      ---------------------------------------------------------------------*/	
+      /*---------------------------------------------------------------------*/ 
 #endif
     }
       a b c d e f g h i
@@ -499,14 +242,243 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       TheNet->mergePlaces("process.compScope",        "process.compensationHandler.compScope");
       TheNet->mergePlaces("process.ch_out",           "process.compensationHandler.ch_out");
       TheNet->mergePlaces("process.compensated",      "process.compensationHandler.compensated");
+
+      // embed stop-pattern in process
+      TheNet->mergePlaces("process.Faulted",     "process.stop.Faulted");
+      TheNet->mergePlaces("process.p5",          "process.stop.fault_in");
+      TheNet->mergePlaces("process.fault",       "process.stop.fault");
+      TheNet->mergePlaces("process.faultSave",   "process.stop.faultSave");
+      TheNet->mergePlaces("process.Active",      "process.stop.Active");
+      TheNet->mergePlaces("process.!Active",     "process.stop.!Active");
+      TheNet->mergePlaces("process.final",       "process.stop.final");
+      TheNet->mergePlaces("process.terminate",   "process.stop.terminate");
+      TheNet->mergePlaces("process.!Faulted",    "process.stop.!Faulted");
+      TheNet->mergePlaces("process.rethrow",     "process.stop.rethrow");
+      TheNet->mergePlaces("process.Ended",       "process.stop.Ended");
+      TheNet->mergePlaces("process.Compensated", "process.stop.Compensated");
+      TheNet->mergePlaces("process.!Ended",      "process.stop.!Ended");
+      TheNet->mergePlaces("process.p21",         "process.stop.stop");
+      TheNet->mergePlaces("process.p34",         "process.stop.stopped");
+      TheNet->mergePlaces("process.p35",         "process.stop.cleanCH");
+      TheNet->mergePlaces("process.p36",         "process.stop.ch_cleaned");      
       
       trace(TRACE_INFORMATION, "Generating Petri net complete.\n");
     }
   ]
-  ;
+;
 
 
 
+StopInProcess() ->
+  [petrinet:
+    {
+      string prefix = "process.stop.";
+      Place *p1  = TheNet->newPlace(prefix + "Faulted");
+      Place *p2  = TheNet->newPlace(prefix + "p2");
+      Place *p3  = TheNet->newPlace(prefix + "p3");
+      Place *p4  = TheNet->newPlace(prefix + "p4");
+      Place *p5  = TheNet->newPlace(prefix + "fault_in");
+      Place *p6  = TheNet->newPlace(prefix + "p6");
+      Place *p7  = TheNet->newPlace(prefix + "fault");
+      Place *p8  = TheNet->newPlace(prefix + "faultSave");
+      Place *p9  = TheNet->newPlace(prefix + "Active");
+      Place *p10 = TheNet->newPlace(prefix + "!Active");
+      Place *p11 = TheNet->newPlace(prefix + "p11");
+      Place *p12 = TheNet->newPlace(prefix + "final");
+      Place *p13 = TheNet->newPlace(prefix + "terminate");
+      Place *p14 = TheNet->newPlace(prefix + "!Faulted");
+      Place *p15 = TheNet->newPlace(prefix + "rethrow");
+      Place *p16 = TheNet->newPlace(prefix + "Ended");
+      Place *p17 = TheNet->newPlace(prefix + "Compensated");
+      Place *p18 = TheNet->newPlace(prefix + "p18");
+      Place *p19 = TheNet->newPlace(prefix + "p19");
+      Place *p20 = TheNet->newPlace(prefix + "!Ended");
+      Place *p21 = TheNet->newPlace(prefix + "stop");
+      Place *p22 = TheNet->newPlace(prefix + "stopped");
+      Place *p23 = TheNet->newPlace(prefix + "cleanCH");
+      Place *p24 = TheNet->newPlace(prefix + "ch_cleaned");
+      Transition *t1 =  TheNet->newTransition(prefix + "t1");
+      Transition *t2 =  TheNet->newTransition(prefix + "t2");
+      Transition *t3 =  TheNet->newTransition(prefix + "t3");
+      Transition *t4 =  TheNet->newTransition(prefix + "t4");
+      Transition *t5 =  TheNet->newTransition(prefix + "t5");
+      Transition *t6 =  TheNet->newTransition(prefix + "t6");
+      Transition *t7 =  TheNet->newTransition(prefix + "t7");
+      Transition *t8 =  TheNet->newTransition(prefix + "t8");
+      Transition *t9 =  TheNet->newTransition(prefix + "kill");
+      Transition *t10 = TheNet->newTransition(prefix + "t10");
+      Transition *t11 = TheNet->newTransition(prefix + "t11");
+      Transition *t12 = TheNet->newTransition(prefix + "t12");
+      TheNet->newArc(p1, t1, READ);
+      TheNet->newArc(p5, t1, "x");
+      TheNet->newArc(t1, p15, "x");
+      TheNet->newArc(p2, t2);
+      TheNet->newArc(t2, p3);
+      TheNet->newArc(t2, p21);
+      TheNet->newArc(p3, t3);
+//      TheNet->newArc(p5, t3, "X"); // here was the RESET arc (now of type STANDARD)
+      TheNet->newArc(p22, t3);
+      TheNet->newArc(t3, p4);
+      TheNet->newArc(p5, t4, "x");
+      TheNet->newArc(p9, t4);
+      TheNet->newArc(t4, p2);
+      TheNet->newArc(t4, p6, "x");
+      TheNet->newArc(t4, p10);
+      TheNet->newArc(p4, t5);
+      TheNet->newArc(p6, t5, "x");
+      TheNet->newArc(p14, t5);
+      TheNet->newArc(t5, p1);
+      TheNet->newArc(t5, p7);
+      TheNet->newArc(t5, p8, "x");
+      TheNet->newArc(p9, t6);
+      TheNet->newArc(p13, t6);
+      TheNet->newArc(t6, p2);
+      TheNet->newArc(t6, p10);
+      TheNet->newArc(t6, p11);
+      TheNet->newArc(p4, t7);
+      TheNet->newArc(p11, t7);
+      TheNet->newArc(p20, t7);
+      TheNet->newArc(t7, p12);
+      TheNet->newArc(t7, p16);
+      TheNet->newArc(p10, t8, READ);
+      TheNet->newArc(p13, t8);
+      TheNet->newArc(p16, t9, READ);
+      TheNet->newArc(p18, t9, "x");
+      TheNet->newArc(p5, t10, "x");
+      TheNet->newArc(p17, t10, READ);
+      TheNet->newArc(t10, p18, "x");
+      TheNet->newArc(p18, t11, "x");
+      TheNet->newArc(p20, t11);
+      TheNet->newArc(t11, p19, "x");
+      TheNet->newArc(t11, p23);
+      TheNet->newArc(p19, t12, "x");
+      TheNet->newArc(p24, t12);
+      TheNet->newArc(t12, p16);
+      TheNet->newArc(t12, p12);
+
+      /*---------------------------------------------------------------------
+      // the stop-pattern (Niels' extension)
+      prefix = "process.stop.";
+      Place *p1  = TheNet->newPlace(prefix + "Faulted");
+      Place *p2  = TheNet->newPlace(prefix + "p2");
+      Place *p3  = TheNet->newPlace(prefix + "p3");
+      Place *p4  = TheNet->newPlace(prefix + "p4");
+      Place *p5  = TheNet->newPlace(prefix + "fault_in");
+      Place *p6  = TheNet->newPlace(prefix + "p6");
+      Place *p7  = TheNet->newPlace(prefix + "fault");
+      Place *p8  = TheNet->newPlace(prefix + "faultSave");
+      Place *p9  = TheNet->newPlace(prefix + "Active");
+      Place *p10 = TheNet->newPlace(prefix + "!Active");
+      Place *p11 = TheNet->newPlace(prefix + "p11");
+      Place *p12 = TheNet->newPlace(prefix + "final");
+      Place *p13 = TheNet->newPlace(prefix + "terminate");
+      Place *p14 = TheNet->newPlace(prefix + "!Faulted");
+      Place *p15 = TheNet->newPlace(prefix + "rethrow");
+      Place *p16 = TheNet->newPlace(prefix + "Ended");
+      Place *p17 = TheNet->newPlace(prefix + "Compensated");
+      Place *p18 = TheNet->newPlace(prefix + "p18");
+      Place *p19 = TheNet->newPlace(prefix + "p19");
+      Place *p20 = TheNet->newPlace(prefix + "!Ended");
+      Place *p21 = TheNet->newPlace(prefix + "stop");
+      Place *p22 = TheNet->newPlace(prefix + "stopped");
+      Place *p23 = TheNet->newPlace(prefix + "cleanCH");
+      Place *p24 = TheNet->newPlace(prefix + "ch_cleaned");
+      
+      Transition *t1 =  TheNet->newTransition(prefix + "t1");
+      Transition *t2 =  TheNet->newTransition(prefix + "t2");
+      Transition *t3 =  TheNet->newTransition(prefix + "t3");
+      Transition *t4 =  TheNet->newTransition(prefix + "t4");
+      Transition *t5 =  TheNet->newTransition(prefix + "t5");
+      Transition *t6 =  TheNet->newTransition(prefix + "t6");
+      Transition *t7 =  TheNet->newTransition(prefix + "t7");
+      Transition *t8 =  TheNet->newTransition(prefix + "t8");
+      Transition *t9 =  TheNet->newTransition(prefix + "kill");
+      Transition *t10 = TheNet->newTransition(prefix + "t10");
+      Transition *t11 = TheNet->newTransition(prefix + "t11");
+      Transition *t12 = TheNet->newTransition(prefix + "t12");
+
+
+      // Niels' extension
+      Place *left = TheNet->newPlace(prefix + "left");
+      Place *right = TheNet->newPlace(prefix + "right");
+      Place *fault_IA = TheNet->newPlace(prefix + "faultIA");
+      Place *fault_FH = TheNet->newPlace(prefix + "faultFH");
+      Transition *goleft = TheNet->newTransition(prefix + "goleft");
+      Transition *goright = TheNet->newTransition(prefix + "goright");
+      Transition *killfaults = TheNet->newTransition(prefix + "killFaults");
+      TheNet->newArc(p5, goleft, "x");
+      TheNet->newArc(goleft, fault_FH, "x");
+      TheNet->newArc(left, goleft, READ);
+      TheNet->newArc(p5, goright, "x");
+      TheNet->newArc(goright, fault_IA, "x");
+      TheNet->newArc(right, goright, READ);
+      TheNet->newArc(left, killfaults, READ);
+      TheNet->newArc(fault_IA, killfaults);
+      TheNet->newArc(process_t2, right);
+
+      
+      TheNet->newArc(p1, t1, READ);
+      TheNet->newArc(fault_FH, t1, "x"); // was reading from p5
+      TheNet->newArc(t1, p15, "x");
+
+      TheNet->newArc(p2, t2);
+      TheNet->newArc(t2, p3);
+      TheNet->newArc(t2, p21);
+
+      TheNet->newArc(p3, t3);
+      TheNet->newArc(p22, t3);
+      TheNet->newArc(t3, p4);
+      TheNet->newArc(t3, left);	// new!
+      TheNet->newArc(right, t3);	// new!
+
+      TheNet->newArc(fault_IA, t4, "x"); // was reading from p5
+      TheNet->newArc(p9, t4);
+      TheNet->newArc(t4, p2);
+      TheNet->newArc(t4, p6, "x");
+      TheNet->newArc(t4, p10);
+
+      TheNet->newArc(p4, t5);
+      TheNet->newArc(p6, t5, "x");
+      TheNet->newArc(p14, t5);
+      TheNet->newArc(t5, p1);
+      TheNet->newArc(t5, p7);
+      TheNet->newArc(t5, p8, "x");
+
+      TheNet->newArc(p9, t6);
+      TheNet->newArc(p13, t6);
+      TheNet->newArc(t6, p2);
+      TheNet->newArc(t6, p10);
+      TheNet->newArc(t6, p11);
+
+      TheNet->newArc(p4, t7);
+      TheNet->newArc(p11, t7);
+      TheNet->newArc(p20, t7);
+      TheNet->newArc(t7, p12);
+      TheNet->newArc(t7, p16);
+
+      TheNet->newArc(p10, t8, READ);
+      TheNet->newArc(p13, t8);
+
+      TheNet->newArc(p16, t9, READ);
+      TheNet->newArc(p18, t9, "x");
+
+      TheNet->newArc(p5, t10, "x");
+      TheNet->newArc(p17, t10, READ);
+      TheNet->newArc(t10, p18, "x");
+
+      TheNet->newArc(p18, t11, "x");
+      TheNet->newArc(p20, t11);
+      TheNet->newArc(t11, p19, "x");
+      TheNet->newArc(t11, p23);
+
+      TheNet->newArc(p19, t12, "x");
+      TheNet->newArc(p24, t12);
+      TheNet->newArc(t12, p16);
+      TheNet->newArc(t12, p12); */      
+    }
+  ]
+;
+  
 
 
 /******************************************************************************
@@ -517,7 +489,7 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
  * The user-defined fault handler inside a process. See Fig. 36 for details.
  */
   
-ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) ->
+This=ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) provided (This->inProcess) ->
   [petrinet:
     {
       // inside a <process>
@@ -652,7 +624,7 @@ ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) ->
  * The implicit fault handler inside a process. See Fig. 35 for details.
  */
 
-NiltFaultHandlers_opt() ->
+This=NiltFaultHandlers_opt() provided (This->inProcess) ->
   [petrinet:
     {
       string prefix = "process.faulthandler.";

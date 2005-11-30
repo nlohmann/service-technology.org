@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/11/29 21:22:37 $
+ *          - last changed: \$Date: 2005/11/30 14:34:01 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.51 $
+ * \version \$Revision: 1.52 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -238,8 +238,8 @@ Place *PetriNet::newPlace(string role)
  */
 Place *PetriNet::newPlace(string role, place_type mytype)
 {
-  trace(TRACE_VERY_DEBUG, "[PN]\tCreating place " + intToString(id()) +
-      "...\n");
+  trace(TRACE_VERY_DEBUG, "[PN]\tCreating place p" + intToString(id()) +
+      " (" + role + ") ...\n");
   
   Place *p = new Place(getId(), role, mytype);
   P.insert(p);
@@ -297,8 +297,8 @@ Transition *PetriNet::newTransition(string role)
  */
 Transition *PetriNet::newTransition(string role, string guard)
 {
-  trace(TRACE_VERY_DEBUG, "[PN]\tCreating transition " + intToString(id()) +
-      "...\n");
+  trace(TRACE_VERY_DEBUG, "[PN]\tCreating transition t" + intToString(id()) +
+      " (" + role + ") ...\n");
   
   Transition *t = new Transition(getId(), role, guard);
   T.insert(t);

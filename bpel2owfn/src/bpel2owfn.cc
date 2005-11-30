@@ -8,18 +8,18 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/11/29 21:22:37 $
+ *          - last changed: \$Date: 2005/11/30 09:00:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.36 $
+ * \version \$Revision: 1.37 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -161,6 +161,12 @@ int main( int argc, char *argv[])
   }
   catch (Exception& e)
   {
+    // output info file ?
+    if (mode_petri_net && mode_file )
+    {
+      // in case of an exception, the Petri Net information might help us!
+      TheNet->printInformation();
+    }
     error(e);
   }
 

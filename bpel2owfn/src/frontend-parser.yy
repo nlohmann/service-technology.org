@@ -18,7 +18,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/11/30 14:33:53 $
+ *          - last changed: \$Date: 2005/11/30 14:47:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.29 $
+ * \version \$Revision: 1.30 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -260,9 +260,7 @@ tProcess TheProcess;
 
 tProcess:
   X_OPEN K_PROCESS arbitraryAttributes X_NEXT
-    {
-      symMan.initialiseProcessScope($3);
-    } 
+    { symMan.initialiseProcessScope($3); } 
   imports
   tPartnerLinks_opt
   tPartners_opt
@@ -271,9 +269,10 @@ tProcess:
   tFaultHandlers_opt
   tCompensationHandler_opt
   tEventHandlers_opt
+    { inProcess = false; }
   activity
   X_NEXT X_SLASH K_PROCESS X_CLOSE
-    { TheProcess = $$ = Process($7, $8, $9, $10, $11, $12, $13, StopInProcess(), $14);
+    { TheProcess = $$ = Process($7, $8, $9, $10, $11, $12, $13, StopInProcess(), $15);
       att.check($3, K_PROCESS);
       symMan.quitScope();
       $$->name = att.read($3, "name");
@@ -284,8 +283,7 @@ tProcess:
       $$->enableInstanceCompensation = att.read($3, "enableInstanceCompensation");
       $$->abstractProcess = att.read($3, "abstractProcess");
       $$->xmlns = att.read($3, "xmlns");
-      $$->id = $3;
-      inProcess = false; }
+      $$->id = $3; }
 ;
 
 /* import other namespaces */

@@ -9,11 +9,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $ 
+ *          - last changes of: \$Author: nlohmann $ 
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2005/11/24 16:04:59 $
+ *          - last changed: \$Date: 2005/11/30 08:35:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-17 (nlohmann) Added default attributes.
  * 
@@ -60,7 +60,9 @@ tProcess:
     casestring suppressJoinFailure = mkcasestring("no");
     casestring enableInstanceCompensation = mkcasestring("no");
     casestring abstractProcess = mkcasestring("no");
-    casestring xmlns = mkcasestring("http://schemas.xmlsoap.org/ws/2003/03/business-process/"); 
+    casestring xmlns = mkcasestring("http://schemas.xmlsoap.org/ws/2003/03/business-process/");
+
+    integer id;
   }
 ;
 

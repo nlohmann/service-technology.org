@@ -14,11 +14,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/11/29 15:47:03 $
+ *          - last changed: \$Date: 2005/11/30 08:35:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -279,7 +279,8 @@ tProcess:
       $$->suppressJoinFailure = att.read($3, "suppressJoinFailure");
       $$->enableInstanceCompensation = att.read($3, "enableInstanceCompensation");
       $$->abstractProcess = att.read($3, "abstractProcess");
-      $$->xmlns = att.read($3, "xmlns"); }
+      $$->xmlns = att.read($3, "xmlns");
+      $$->id = $3; }
 ;
 
 /* import other namespaces */

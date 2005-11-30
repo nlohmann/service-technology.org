@@ -12,7 +12,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2005/11/30 08:36:11 $
+ *          - last changed: \$Date: 2005/11/30 14:33:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -23,7 +23,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Moved #intToString to \ref helpers.cc.
  *          - 2005-11-18 (nlohmann) Identifiers are printed.
@@ -113,7 +113,7 @@ void indown()
 
 
 
-Process(a,b,c,d,e,f,g,h) ->
+Process(a,b,c,d,e,f,g,h,i) ->
   [xml: { inup(); } "<process id=\"" $0->id ">\n" 
   
   { if (a->length() == 0) }
@@ -141,9 +141,7 @@ Process(a,b,c,d,e,f,g,h) ->
   { else }
     ${ e $}
  
-  f g
-  
-  h { indown(); } "</process>\n"]
+  f g h i { indown(); } "</process>\n"]
 ;
 
 

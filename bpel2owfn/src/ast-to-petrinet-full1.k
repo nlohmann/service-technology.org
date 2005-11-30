@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/11/30 13:56:08 $
+ *          - last changed: \$Date: 2005/11/30 14:33:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -116,7 +116,7 @@ using namespace std;
 
 
 
-This=Process(a,b,c,d,e,f,g,h) ->
+This=Process(a,b,c,d,e,f,g,h,i) ->
   [petrinet:
     {
       trace(TRACE_INFORMATION, "Generating Petri net...\n");
@@ -459,15 +459,14 @@ This=Process(a,b,c,d,e,f,g,h) ->
       ---------------------------------------------------------------------*/	
 #endif
     }
-      a b c d e f g
-      h
+      a b c d e f g h i
     {
       // embed the inner activity
-      TheNet->mergePlaces(TheNet->findPlace("process.p19"), TheNet->findPlace(h, ".initial"));
-      TheNet->mergePlaces(TheNet->findPlace("process.p20"), TheNet->findPlace(h, ".final"));
-      TheNet->mergePlaces(TheNet->findPlace("process.p21"), TheNet->findPlace(h, ".stop"));
-      TheNet->mergePlaces(TheNet->findPlace("process.p22"), TheNet->findPlace(h, ".stopped"));
-      TheNet->mergePlaces(TheNet->findPlace("process.p5"),  TheNet->findPlace(h, ".failed"));
+      TheNet->mergePlaces(TheNet->findPlace("process.p19"), TheNet->findPlace(i, ".initial"));
+      TheNet->mergePlaces(TheNet->findPlace("process.p20"), TheNet->findPlace(i, ".final"));
+      TheNet->mergePlaces(TheNet->findPlace("process.p21"), TheNet->findPlace(i, ".stop"));
+      TheNet->mergePlaces(TheNet->findPlace("process.p22"), TheNet->findPlace(i, ".stopped"));
+      TheNet->mergePlaces(TheNet->findPlace("process.p5"),  TheNet->findPlace(i, ".failed"));
 
       // embed event handler
       TheNet->mergePlaces("process.p23", "process.eventHandler.initial");

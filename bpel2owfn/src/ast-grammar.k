@@ -9,11 +9,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $ 
+ *          - last changes of: \$Author: nlohmann $ 
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2005/11/30 13:55:13 $
+ *          - last changed: \$Date: 2005/11/30 14:33:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-17 (nlohmann) Added default attributes.
  * 
@@ -51,7 +51,7 @@
 %}
 
 tProcess:
-  Process(tPartnerLink_list tPartner_list tVariable_list tCorrelationSet_list tFaultHandlers_opt tCompensationHandler_opt tEventHandlers_opt activity)
+  Process(tPartnerLink_list tPartner_list tVariable_list tCorrelationSet_list tFaultHandlers_opt tCompensationHandler_opt tEventHandlers_opt tStop activity)
   {
     casestring name;
     casestring targetNamespace;
@@ -65,6 +65,13 @@ tProcess:
     integer id;
   }
 ;
+
+
+tStop:
+  StopInProcess()
+| StopInScope()
+;
+
 
 /*---------------------------------------------------------------------------*/
 
@@ -152,6 +159,9 @@ tPartner:
 
 tFaultHandlers_opt:
   list tFaultHandlers
+  {
+    bool inProcess;
+  }  
 ;
 
 %{
@@ -163,9 +173,6 @@ tFaultHandlers_opt:
 
 tFaultHandlers:
   FaultHandlers(tCatch_list tCatchAll_list)
-  {
-    bool inProcess = true;
-  }
 ;
 
 tCatch_list:

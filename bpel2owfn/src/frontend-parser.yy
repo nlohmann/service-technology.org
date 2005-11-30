@@ -14,11 +14,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/11/30 16:08:13 $
+ *          - last changed: \$Date: 2005/11/30 16:57:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -546,7 +546,9 @@ tCatch:
   X_SLASH K_CATCH
     { $$ = Catch($4);
       $$->faultName = att.read($2, "faultName");
-      $$->faultVariable = att.read($2, "faultVariable"); }
+      $$->faultVariable = att.read($2, "faultVariable"); 
+      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "faultVariable")->name)).c_str());
+    }
 ;
 
 tCatchAll_opt:
@@ -673,6 +675,7 @@ tOnMessage:
       $$->partnerLink = att.read($2, "partnerLink");
       $$->portType = att.read($2, "portType");
       $$->operation = att.read($2, "operation");
+      $$->uniqueID  = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
       $$->variable = att.read($2, "variable"); }
 ;
 
@@ -945,6 +948,8 @@ tInvoke:
       $$->operation = att.read($2, "operation");
       $$->inputVariable = att.read($2, "inputVariable");
       $$->outputVariable = att.read($2, "outputVariable");
+      $$->uniqueIDin  = mkcasestring((symMan.checkVariable(att.read($2, "inputVariable")->name)).c_str());
+      $$->uniqueIDout = mkcasestring((symMan.checkVariable(att.read($2, "outputVariable")->name)).c_str());
       $$->id = $2; }
 | K_INVOKE arbitraryAttributes X_SLASH
     { $$ = Invoke(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list(), NiltCatch_list(), NiltCatchAll_list(), NiltCompensationHandler_opt());
@@ -1009,6 +1014,7 @@ tReceive:
       $$->operation = att.read($2, "operation");
       $$->variable = att.read($2, "variable");
       $$->createInstance = att.read($2, "createInstance"); 
+      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
       $$->id = $2; 
     }
 | K_RECEIVE arbitraryAttributes X_SLASH
@@ -1022,6 +1028,7 @@ tReceive:
       $$->operation = att.read($2, "operation");
       $$->variable = att.read($2, "variable");
       $$->createInstance = att.read($2, "createInstance");
+      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
       $$->id = $2; 
       symMan.checkPartnerLink($$->partnerLink->name);
     }
@@ -1071,6 +1078,7 @@ tReply:
       $$->operation = att.read($2, "operation");
       $$->variable = att.read($2, "variable");
       $$->faultName = att.read($2, "faultName");
+      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
       $$->id = $2; }
 | K_REPLY arbitraryAttributes X_SLASH
     { $$ = Reply(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list());
@@ -1082,6 +1090,7 @@ tReply:
       $$->operation = att.read($2, "operation");
       $$->variable = att.read($2, "variable");
       $$->faultName = att.read($2, "faultName");
+      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
       $$->id = $2; }
 ;
 
@@ -1154,6 +1163,7 @@ tFrom:
       $$->property = att.read($2, "property");
       $$->expression = att.read($2, "expression");
       $$->opaque = att.read($2, "opaque"); 
+      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
       symMan.checkPartnerLink($$->partnerLink->name);
     }
 | K_FROM arbitraryAttributes X_SLASH
@@ -1166,6 +1176,7 @@ tFrom:
       $$->property = att.read($2, "property");
       $$->expression = att.read($2, "expression");
       $$->opaque = att.read($2, "opaque"); 
+      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
       symMan.checkPartnerLink($$->partnerLink->name);
     }
 ;
@@ -1186,6 +1197,7 @@ tTo:
       $$->part = att.read($2, "part");
       $$->partnerLink = att.read($2, "partnerLink");
       $$->property = att.read($2, "property"); 
+      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
       symMan.checkPartnerLink($$->partnerLink->name);
     }
 | K_TO arbitraryAttributes X_SLASH
@@ -1194,6 +1206,7 @@ tTo:
       $$->part = att.read($2, "part");
       $$->partnerLink = att.read($2, "partnerLink");
       $$->property = att.read($2, "property"); 
+      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
       symMan.checkPartnerLink($$->partnerLink->name);
     }
 ;
@@ -1265,6 +1278,7 @@ tThrow:
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
       $$->faultName = att.read($2, "faultName");
       $$->faultVariable = att.read($2, "faultVariable");
+      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "faultVariable")->name)).c_str());
       $$->id = $2; }
 | K_THROW arbitraryAttributes X_SLASH
     { $$ = Throw(StandardElements(NiltTarget_list(), NiltSource_list()));
@@ -1273,6 +1287,7 @@ tThrow:
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
       $$->faultName = att.read($2, "faultName");
       $$->faultVariable = att.read($2, "faultVariable");
+      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "faultVariable")->name)).c_str());
       $$->id = $2; }
 ;
 

@@ -10,14 +10,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/11/30 14:45:54 $
+ *          - last changed: \$Date: 2005/11/30 16:57:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  *          - 2005-11-22 (gierds) Initial version.
  *	    - 2005-11-30 (gierds) Checking for PartnerLinks completed.
  *
@@ -174,7 +174,7 @@ void SymbolManager::checkPartnerLink(csPartnerLink* pl)
   // if no name is set, there was probably no PartnerLink given
   if (pl->name == "")
   {
-    trace(TRACE_DEBUG, "[CS] Checking PartnerLink, but no name is given; returning.\n");
+    trace(TRACE_VERY_DEBUG, "[CS] Checking PartnerLink, but no name is given; returning.\n");
     return;
   }
 
@@ -236,7 +236,9 @@ void SymbolManager::checkPartnerLink(std::string name)
 {
   checkPartnerLink(new csPartnerLink(name, "", "", ""));
 }
-	
+
+
+/// \todo (gierds) comment me
 std::string SymbolManager::addVariable(kc::integer id, csVariable* var)
 {
   trace(TRACE_VERY_DEBUG, "[CS] Adding Variable " + var->name + ", " + var->messageType + ", "
@@ -252,9 +254,92 @@ std::string SymbolManager::addVariable(kc::integer id, csVariable* var)
   }
   currentScope->variables.push_back(var);
 
-  return (intToString(id->value) + "." + var->name);
+  trace(TRACE_VERY_DEBUG, "[CS] Unique ID of Variable is " + std::string(intToString(currentScope->id->value) + "." + var->name) + "\n");
+  return (intToString(currentScope->id->value) + "." + var->name);
 }
 
+/**
+ * Checks, if Variable is defined in scope.
+ *
+ * \param pl The Variable to be checked
+ *
+ */
+std::string SymbolManager::checkVariable(csVariable* var)
+{
+  int id = 0;
+  
+  // if no name is set, there was probably no Variable given
+  if (var->name == "")
+  {
+    trace(TRACE_VERY_DEBUG, "[CS] Checking Variable, but no name is given; returning.\n");
+    return "";
+  }
+
+  trace(TRACE_DEBUG, "[CS] Checking Variable " + var->name + ", " + var->messageType + ", "
+		      + var->type + ", " + var->element + "\n");
+  try
+  {
+    // check, if Variable name is present, otherwise throw Exception
+    bool found = false;
+    SymbolScope * scope = currentScope;
+    while ((! found) && (scope != NULL))
+    {
+      // ascent to next scope with variable definitions
+      trace(TRACE_VERY_DEBUG, "[CS]   Ascending to next suitable scope ...\n");
+      while ((scope != NULL) && (typeid(*scope) != typeid(ProcessScope)) && (typeid(*scope) != typeid(ScopeScope)))
+      {
+        trace(TRACE_VERY_DEBUG, "[CS]     typeids are ");
+        trace(TRACE_VERY_DEBUG, typeid(*scope).name());
+        trace(TRACE_VERY_DEBUG, "\n");
+ 	     
+        trace(TRACE_VERY_DEBUG, "[CS]     ... leaving scope " + intToString(scope->id->value) + "\n");
+        scope = scope->parent;
+      }
+
+      trace(TRACE_VERY_DEBUG, "[CS]   Looking for defined variables ...\n");
+      for (list<csVariable*>::iterator iter = scope->variables.begin();
+ 		    iter != scope->variables.end(); iter++)
+      {
+        if (*(*iter) == *var)
+        {
+  	  found = true;
+	  id = scope->id->value;
+        }
+      }
+      scope = scope->parent;
+    }
+    if (!found)
+    {
+      yyerror(string("Name of undefined Variable is \"" + var->name + "\"\n").c_str());
+    }
+  }
+  catch(bad_cast)
+  {
+    throw Exception(CHECK_SYMBOLS_CAST_ERROR,"Dynamic cast error while checking Variables\n"); 
+  }
+
+  trace(TRACE_VERY_DEBUG, "[CS] Unique ID of Variable is " + std::string(intToString(id) + "." + var->name) + "\n");
+  return std::string(intToString(id) + "." + var->name);
+  
+}
+
+/**
+ * Checks, if Variable is defined in scope.
+ *
+ * \param name Name of the Variable to be checked
+ *
+ */
+std::string SymbolManager::checkVariable(std::string name)
+{
+  return checkVariable(new csVariable(name, "", "", ""));
+}
+
+
+/**
+ *
+ *  \todo (gierds) comment me
+ *
+ */
 void SymbolManager::printScope()
 {
   if (processScope != NULL)
@@ -265,6 +350,7 @@ void SymbolManager::printScope()
   }
 }
 
+/// \todo (gierds) comment me
 SymbolScope::SymbolScope(kc::integer myid)
 {
   trace(TRACE_DEBUG, "[CS] Creating new scope without parent for action " + intToString((int) myid->value) + "\n");
@@ -274,7 +360,7 @@ SymbolScope::SymbolScope(kc::integer myid)
 
 }
 
-
+/// \todo (gierds) comment me
 SymbolScope::SymbolScope(kc::integer myid, SymbolScope * myparent)
 {
   trace(TRACE_DEBUG, "[CS] Creating new scope with parent " + intToString((int) (myparent->id)->value) + " for action " 
@@ -286,6 +372,7 @@ SymbolScope::SymbolScope(kc::integer myid, SymbolScope * myparent)
 
 }
 
+/// \todo (gierds) comment me
 SymbolScope::~SymbolScope()
 {
   trace(TRACE_DEBUG, "[CS]   ~ Destructing scope starting in " + intToString( id->value ) + "\n");
@@ -311,6 +398,7 @@ SymbolScope::~SymbolScope()
   
 }
 
+/// \todo (gierds) comment me
 void SymbolScope::print()
 {
   for (int i = 0; i < indent; i++)
@@ -329,37 +417,44 @@ void SymbolScope::print()
 }
 
 
+/// \todo (gierds) comment me
 ProcessScope::ProcessScope(kc::integer myid) : SymbolScope(myid)
 {
   // empty	
 }
 
+/// \todo (gierds) comment me
 ProcessScope::ProcessScope(kc::integer myid, SymbolScope* myparent) : SymbolScope(myid, myparent)
 {
   // empty
 }
 
+/// \todo (gierds) comment me
 ScopeScope::ScopeScope(kc::integer myid) : SymbolScope(myid)
 {
   // empty	
 }
 
+/// \todo (gierds) comment me
 ScopeScope::ScopeScope(kc::integer myid, SymbolScope* myparent) : SymbolScope(myid, myparent)
 {
   // empty
 }
 
+/// \todo (gierds) comment me
 FlowScope::FlowScope(kc::integer myid) : SymbolScope(myid)
 {
   // empty	
 }
 
+/// \todo (gierds) comment me
 FlowScope::FlowScope(kc::integer myid, SymbolScope* myparent) : SymbolScope(myid, myparent)
 {
   // empty
 }
 
 
+/// \todo (gierds) comment me
 csPartnerLink::csPartnerLink ( string myname, string mytype, string mymyrole, string mypartnerRole)
 {
   // trace(TRACE_VERY_DEBUG, "Creating new PartnerLink\n");
@@ -370,6 +465,7 @@ csPartnerLink::csPartnerLink ( string myname, string mytype, string mymyrole, st
 
 }
 
+/// \todo (gierds) comment me
 bool csPartnerLink::operator==(csPartnerLink& other)
 {
   return (name == other.name); // not needed&& (myRole == other.myRole) && 
@@ -384,6 +480,7 @@ csVariable::csVariable ( string myname, string mymessageType, string mytype, str
 
 }
 
+/// \todo (gierds) comment me
 bool csVariable::operator==(csVariable& other)
 {
   return (name == other.name);

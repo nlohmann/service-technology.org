@@ -9,11 +9,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $ 
+ *          - last changes of: \$Author: gierds $ 
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2005/11/30 16:08:12 $
+ *          - last changed: \$Date: 2005/11/30 16:57:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-17 (nlohmann) Added default attributes.
  * 
@@ -195,6 +195,7 @@ tCatch:
   {
     casestring faultName;
     casestring faultVariable;
+    casestring uniqueID;
   }
 ;
 
@@ -255,6 +256,8 @@ tOnMessage:
     casestring portType;
     casestring operation;
     casestring variable;
+
+    casestring uniqueID;
   }
 ;
 
@@ -422,6 +425,9 @@ tInvoke:
     casestring inputVariable;
     casestring outputVariable;
     
+    casestring uniqueIDin;
+    casestring uniqueIDout;
+
     integer id;
   }	
 ;
@@ -451,6 +457,8 @@ tReceive:
     casestring variable;
     casestring createInstance = mkcasestring("no");
 
+    casestring uniqueID;
+    
     integer id;
   }
 ;
@@ -479,6 +487,8 @@ tReply:
     casestring operation;
     casestring variable;
     casestring faultName;
+
+    casestring uniqueID;
 
     integer id;
   }
@@ -540,6 +550,8 @@ tFrom:
     casestring property;
     casestring expression;
     casestring opaque; // only abstract processes
+
+    casestring uniqueID;
   }
 ;
 
@@ -560,6 +572,8 @@ tTo:
     casestring part;
     casestring partnerLink;
     casestring property;
+
+    casestring uniqueID;
   }
 ;
 
@@ -610,6 +624,8 @@ tThrow:
 
     casestring faultName;
     casestring faultVariable;
+
+    casestring uniqueID;
 
     integer id;
   }

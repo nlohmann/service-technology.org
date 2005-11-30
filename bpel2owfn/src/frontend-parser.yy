@@ -14,11 +14,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/11/30 08:35:58 $
+ *          - last changed: \$Date: 2005/11/30 13:55:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -398,7 +398,7 @@ tPartnerLink:
       $$->myRole = att.read($2, "myRole");
       $$->partnerRole = att.read($2, "partnerRole"); 
       if (inPartners) {
-        symMan.checkPartnerLink(new csPartnerLink($$->name->name, "", "", ""));
+        symMan.checkPartnerLink($$->name->name);
       }
       else
       {
@@ -413,7 +413,7 @@ tPartnerLink:
       $$->myRole = att.read($2, "myRole");
       $$->partnerRole = att.read($2, "partnerRole");
       if (inPartners) {
-        symMan.checkPartnerLink(new csPartnerLink($$->name->name, "", "", ""));
+        symMan.checkPartnerLink($$->name->name);
       }
       else
       {
@@ -658,10 +658,13 @@ tOnAlarm_list:
 
 tOnMessage:
   K_ONMESSAGE arbitraryAttributes X_NEXT
+    {
+      symMan.checkPartnerLink(att.read($2, "partnerLink")->name);
+    }
   tCorrelations_opt 
   activity X_NEXT
   X_SLASH K_ONMESSAGE
-    { $$ = OnMessage($5);
+    { $$ = OnMessage($6);
       $$->partnerLink = att.read($2, "partnerLink");
       $$->portType = att.read($2, "portType");
       $$->operation = att.read($2, "operation");
@@ -734,7 +737,11 @@ tVariable:
       $$->messageType = att.read($2, "messageType");
       $$->type = att.read($2, "type");
       $$->element = att.read($2, "element"); 
-      symMan.addVariable($2, new csVariable($$->name->name, $$->messageType->name, $$->type->name, $$->element->name));
+      $$->uniqueID = mkcasestring((symMan.addVariable($2, 
+	              new csVariable($$->name->name, 
+				     $$->messageType->name, 
+				     $$->type->name, 
+				     $$->element->name))).c_str());
     }
 | K_VARIABLE arbitraryAttributes X_SLASH
     { $$ = Variable();
@@ -742,7 +749,11 @@ tVariable:
       $$->messageType = att.read($2, "messageType");
       $$->type = att.read($2, "type");
       $$->element = att.read($2, "element"); 
-      symMan.addVariable($2, new csVariable($$->name->name, $$->messageType->name, $$->type->name, $$->element->name));
+      $$->uniqueID = mkcasestring((symMan.addVariable($2, 
+	              new csVariable($$->name->name, 
+				     $$->messageType->name, 
+				     $$->type->name, 
+				     $$->element->name))).c_str());
     }
 ;
 
@@ -910,13 +921,17 @@ tEmpty:
 
 tInvoke:
   K_INVOKE arbitraryAttributes X_NEXT
+    {
+      // automatically create scope?
+      symMan.checkPartnerLink(att.read($2, "partnerLink")->name);
+    }
   standardElements
   tCorrelations_opt // was: tCorrelationsWithPattern_opt
   tCatch_list //0-oo
   tCatchAll_opt
   tCompensationHandler_opt
   X_SLASH K_INVOKE
-    { $$ = Invoke($4, $5, $6, $7, $8);
+    { $$ = Invoke($5, $6, $7, $8, $9);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
@@ -936,7 +951,9 @@ tInvoke:
       $$->operation = att.read($2, "operation");
       $$->inputVariable = att.read($2, "inputVariable");
       $$->outputVariable = att.read($2, "outputVariable"); 
-      $$->id = $2; }
+      $$->id = $2;
+      symMan.checkPartnerLink($$->partnerLink->name);
+    }
 ;
 
 
@@ -970,11 +987,15 @@ tInvoke:
 
 tReceive:
   K_RECEIVE arbitraryAttributes X_NEXT
+    {
+      att.check($2,K_RECEIVE);
+      symMan.checkPartnerLink(att.read($2, "partnerLink")->name);
+    }
   standardElements
   tCorrelations_opt
   X_SLASH K_RECEIVE
-    { att.check($2, K_RECEIVE); 
-      $$ = Receive($4, $5);
+    {  
+      $$ = Receive($5, $6);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
@@ -984,7 +1005,6 @@ tReceive:
       $$->variable = att.read($2, "variable");
       $$->createInstance = att.read($2, "createInstance"); 
       $$->id = $2; 
-      symMan.checkPartnerLink(new csPartnerLink($$->partnerLink->name, "", "", ""));
     }
 | K_RECEIVE arbitraryAttributes X_SLASH
     { att.check($2, K_RECEIVE); 
@@ -998,7 +1018,7 @@ tReceive:
       $$->variable = att.read($2, "variable");
       $$->createInstance = att.read($2, "createInstance");
       $$->id = $2; 
-      symMan.checkPartnerLink(new csPartnerLink($$->partnerLink->name, "", "", ""));
+      symMan.checkPartnerLink($$->partnerLink->name);
     }
 ;
 
@@ -1128,7 +1148,9 @@ tFrom:
       $$->endpointReference = att.read($2, "endpointReference");
       $$->property = att.read($2, "property");
       $$->expression = att.read($2, "expression");
-      $$->opaque = att.read($2, "opaque"); }
+      $$->opaque = att.read($2, "opaque"); 
+      symMan.checkPartnerLink($$->partnerLink->name);
+    }
 | K_FROM arbitraryAttributes X_SLASH
     { $$ = From();
       $$->variable = att.read($2, "variable");
@@ -1138,7 +1160,9 @@ tFrom:
       $$->endpointReference = att.read($2, "endpointReference");
       $$->property = att.read($2, "property");
       $$->expression = att.read($2, "expression");
-      $$->opaque = att.read($2, "opaque"); }
+      $$->opaque = att.read($2, "opaque"); 
+      symMan.checkPartnerLink($$->partnerLink->name);
+    }
 ;
 
 /*
@@ -1156,13 +1180,17 @@ tTo:
       $$->variable = att.read($2, "variable");
       $$->part = att.read($2, "part");
       $$->partnerLink = att.read($2, "partnerLink");
-      $$->property = att.read($2, "property"); }
+      $$->property = att.read($2, "property"); 
+      symMan.checkPartnerLink($$->partnerLink->name);
+    }
 | K_TO arbitraryAttributes X_SLASH
     { $$ = To();
       $$->variable = att.read($2, "variable");
       $$->part = att.read($2, "part");
       $$->partnerLink = att.read($2, "partnerLink");
-      $$->property = att.read($2, "property"); }
+      $$->property = att.read($2, "property"); 
+      symMan.checkPartnerLink($$->partnerLink->name);
+    }
 ;
 
 

@@ -10,16 +10,16 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/11/29 13:41:04 $
+ *          - last changed: \$Date: 2005/11/30 13:55:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  *          - 2005-11-22 (gierds) Initial version.
- *          - 2005-11-22 (gierds) Put all funcionality in to a class #SymbolManager
+ *          - 2005-11-22 (gierds) Put all funcionality into a class #SymbolManager
  *
  */
 
@@ -81,8 +81,10 @@ class SymbolManager
     void addPartnerLink(kc::integer id, csPartnerLink* pl);
     /// check, if a PartnerLink exists in the current scope
     void checkPartnerLink(csPartnerLink* pl);
+    /// check, if a PartnerLink with name exists in the current scope
+    void checkPartnerLink(std::string);
     /// add a Variable to the current scope
-    void addVariable(kc::integer id, csVariable* var);
+    std::string addVariable(kc::integer id, csVariable* var);
 
 
     /// prints the scope tree
@@ -90,14 +92,14 @@ class SymbolManager
 };
 
 /**
- * \class	Scope
+ * \class	SymbolScope
  *
  * \author	Christian Gierds <gierds@informatik.hu-berlin.de>
  *
  * \brief	Represents a scope in genral.
  *
  * This class shall be used to represent a scope (not only a BPEL Scope)
- * in a process with all necessary elements like parent scope and childs.
+ * in a process with all necessary elements like parent scope and children.
  *
  */
 class SymbolScope
@@ -108,8 +110,8 @@ class SymbolScope
     /// the scope we are nested in
     SymbolScope* parent;
     /// out child scopes, needed?
-    list<SymbolScope*> childs;
-    /// ids of all childs (necessary?)
+    list<SymbolScope*> children;
+    /// ids of all children (necessary?)
     list<kc::integer> ids;
     /// list of variables (not needed for Flows)	
     list<csVariable*> variables;

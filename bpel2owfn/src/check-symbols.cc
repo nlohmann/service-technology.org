@@ -10,14 +10,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/11/29 15:47:03 $
+ *          - last changed: \$Date: 2005/11/30 13:55:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  *          - 2005-11-22 (gierds) Initial version.
  *
  * \todo    - bug in Kimwitu++ (attributes have extra signs) might sabotage us
@@ -29,6 +29,7 @@
 #include <stack>
 
 extern std::string intToString(int);	// little helper function (helpers.cc)
+extern int yylineno;			// line number from flex/bison
 
 /// variable to format scope tree output
 int SymbolScope::indent = 0;
@@ -171,6 +172,13 @@ void SymbolManager::addPartnerLink(kc::integer id, csPartnerLink* pl)
  */
 void SymbolManager::checkPartnerLink(csPartnerLink* pl)
 {
+  // if no name is set, there was probably no PartnerLink given
+  if (pl->name == "")
+  {
+    trace(TRACE_DEBUG, "[CS] Checking PartnerLink, but no name is given; returning.\n");
+    return;
+  }
+
   trace(TRACE_DEBUG, "[CS] Checking PartnerLink " + pl->name + ", " + pl->partnerLinkType + ", "
 		      + pl->myRole + ", " + pl->partnerRole + "\n");
   // since we want to add a PartnerLink, we assume currentScope is a ProcessScope
@@ -208,8 +216,17 @@ void SymbolManager::checkPartnerLink(csPartnerLink* pl)
     }
     if (!found)
     {
-      throw Exception(PARTNERLINK_UNDEFINED, "PartnerLink does not exist\n",
-         	      "Name of PartnerLink is \"" + pl->name + "\"\n");
+      if(mode_file)
+      {
+        throw Exception(PARTNERLINK_UNDEFINED, "PartnerLink does not exist\n",
+          	        "Name of PartnerLink is \"" + pl->name + "\"\n" +  
+			"    PartnerLink was used in line " + intToString(yylineno) + "\n");
+      }
+      else
+      {
+        throw Exception(PARTNERLINK_UNDEFINED, "PartnerLink does not exist\n",
+          	        "Name of PartnerLink is \"" + pl->name + "\"\n");
+      }
     }
   }
   catch(bad_cast)
@@ -220,8 +237,18 @@ void SymbolManager::checkPartnerLink(csPartnerLink* pl)
   
 }
 
-
-void SymbolManager::addVariable(kc::integer id, csVariable* var)
+/**
+ * Checks, if PartnerLink is defined in scope.
+ *
+ * \param name Name of the PartnerLink to be checked
+ *
+ */
+void SymbolManager::checkPartnerLink(std::string name)
+{
+  checkPartnerLink(new csPartnerLink(name, "", "", ""));
+}
+	
+std::string SymbolManager::addVariable(kc::integer id, csVariable* var)
 {
   trace(TRACE_VERY_DEBUG, "[CS] Adding Variable " + var->name + ", " + var->messageType + ", "
 		      + var->type + ", " + var->element + "\n");
@@ -235,6 +262,8 @@ void SymbolManager::addVariable(kc::integer id, csVariable* var)
     }
   }
   currentScope->variables.push_back(var);
+
+  return (intToString(id->value) + "." + var->name);
 }
 
 void SymbolManager::printScope()
@@ -264,7 +293,7 @@ SymbolScope::SymbolScope(kc::integer myid, SymbolScope * myparent)
 
   id = myid;
   parent = myparent;
-  parent->childs.push_back(this);
+  parent->children.push_back(this);
 
 }
 
@@ -281,11 +310,11 @@ SymbolScope::~SymbolScope()
     delete(*elem);
   }
 
-  if ( childs.empty() ) 
+  if ( children.empty() ) 
   {
-    trace(TRACE_VERY_DEBUG, "[CS]      No childs.\n");     
+    trace(TRACE_VERY_DEBUG, "[CS]      No children.\n");     
   }
-  for ( list<SymbolScope*>::iterator elem = childs.begin(); elem != childs.end(); elem++)
+  for ( list<SymbolScope*>::iterator elem = children.begin(); elem != children.end(); elem++)
   {
     trace(TRACE_VERY_DEBUG, "[CS]      Deleting child element " + intToString(( (*elem)->id )->value) + "\n");
     delete(*elem);
@@ -303,7 +332,7 @@ void SymbolScope::print()
   trace(TRACE_DEBUG, typeid(*this).name());
   trace(TRACE_DEBUG, "\n");
   indent += 4;
-  for (list<SymbolScope*>::iterator iter = childs.begin(); iter != childs.end(); iter++)
+  for (list<SymbolScope*>::iterator iter = children.begin(); iter != children.end(); iter++)
   {
     (*iter)->print();
   }

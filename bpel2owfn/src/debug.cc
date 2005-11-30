@@ -9,14 +9,14 @@
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2005/11/29 14:01:44 $
+ *          - last changed: \$Date: 2005/11/30 14:45:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  *          - 2005-11-09 (gierds) Initial release.
  *            Simple trace methods and new place for yyerror().
  *          - 2005-11-20 (nlohmann) Overworked and commented yyerror().
@@ -79,9 +79,12 @@ int yyerror(const char* msg)
   extern int yylineno;      ///< line number of current token
   extern char *yytext;      ///< text of the current token
 
+  trace("Error while parsing!\n\n");
+  trace(msg);
+  trace("\n");
 	
   // display passed error message
-  trace("Syntax error in '" + filename + "' in line ");
+  trace("Error in '" + filename + "' in line ");
   trace(intToString(yylineno));
   trace(":\n");
   trace("  token/text last read was '");
@@ -94,15 +97,17 @@ int yyerror(const char* msg)
     trace("-------------------------------------------------------------------------------\n");
     
     // number of lines to print before and after errorneous line
-    unsigned int environment = 3;
+    int environment = 4;
 
     unsigned int firstShowedLine = ((yylineno-environment)>0)?(yylineno-environment):1;
   
     std::ifstream inputFile(filename.c_str());
     std::string errorLine;
     for (unsigned int i=0; i<firstShowedLine; i++)
+    {
+      trace(".");
       getline(inputFile, errorLine);
-    
+    }
     // print the erroneous line (plus/minus three more)
     for (unsigned int i=firstShowedLine; i<=firstShowedLine+(2*environment); i++)
     {

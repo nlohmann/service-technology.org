@@ -10,17 +10,16 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/11/30 13:55:13 $
+ *          - last changed: \$Date: 2005/11/30 14:45:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  *          - 2005-11-22 (gierds) Initial version.
- *
- * \todo    - bug in Kimwitu++ (attributes have extra signs) might sabotage us
+ *	    - 2005-11-30 (gierds) Checking for PartnerLinks completed.
  *
  */
 
@@ -216,17 +215,7 @@ void SymbolManager::checkPartnerLink(csPartnerLink* pl)
     }
     if (!found)
     {
-      if(mode_file)
-      {
-        throw Exception(PARTNERLINK_UNDEFINED, "PartnerLink does not exist\n",
-          	        "Name of PartnerLink is \"" + pl->name + "\"\n" +  
-			"    PartnerLink was used in line " + intToString(yylineno) + "\n");
-      }
-      else
-      {
-        throw Exception(PARTNERLINK_UNDEFINED, "PartnerLink does not exist\n",
-          	        "Name of PartnerLink is \"" + pl->name + "\"\n");
-      }
+      yyerror(string("Name of undefined PartnerLink is \"" + pl->name + "\"\n").c_str());
     }
   }
   catch(bad_cast)

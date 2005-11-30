@@ -19,7 +19,7 @@
  *          
  * \date
  *          - created 2005-11-10
- *          - last changed: \$Date: 2005/11/26 12:13:02 $
+ *          - last changed: \$Date: 2005/11/30 08:36:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -119,9 +119,8 @@ bpwsns			"bpws:"|"bpel:"
  /* attributes */
 <ATTRIBUTE>{name}	{ yylval.yt_casestring = kc::mkcasestring(yytext);
                           return X_NAME; }
-<ATTRIBUTE>{string}	{ char *s = (char *)malloc((strlen(yytext)-2) * sizeof(char)); // cut the quotes
-                          s = strncpy(s, ++yytext, strlen(yytext)-2);
-                          yylval.yt_casestring = kc::mkcasestring(s);
+<ATTRIBUTE>{string}	{ std::string stringwoquotes = std::string(yytext).substr(1, strlen(yytext)-2);
+                          yylval.yt_casestring = kc::mkcasestring(stringwoquotes.c_str());
                           return X_STRING; }
 <ATTRIBUTE>"="		{ return X_EQUALS; }
 

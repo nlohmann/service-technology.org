@@ -18,7 +18,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/11/30 16:57:23 $
+ *          - last changed: \$Date: 2005/12/01 11:20:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -547,7 +547,7 @@ tCatch:
     { $$ = Catch($4);
       $$->faultName = att.read($2, "faultName");
       $$->faultVariable = att.read($2, "faultVariable"); 
-      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "faultVariable")->name)).c_str());
+      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "faultVariable")->name, true)).c_str());
     }
 ;
 

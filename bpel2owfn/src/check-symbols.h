@@ -10,14 +10,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/11/30 16:57:23 $
+ *          - last changed: \$Date: 2005/12/01 11:20:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  *          - 2005-11-22 (gierds) Initial version.
  *          - 2005-11-22 (gierds) Put all funcionality into a class #SymbolManager
  *
@@ -86,9 +86,9 @@ class SymbolManager
     /// add a Variable to the current scope
     std::string addVariable(kc::integer id, csVariable* var);
     /// check, if a Variable exists in the current scope
-    std::string checkVariable(csVariable* pl);
+    std::string checkVariable(csVariable* pl, bool isFaultVariable = false);
     /// check, if a Variable with name exists in the current scope
-    std::string checkVariable(std::string);
+    std::string checkVariable(std::string, bool isFaultVariable = false);
 
 
     /// prints the scope tree

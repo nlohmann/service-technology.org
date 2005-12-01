@@ -10,14 +10,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/11/30 16:57:23 $
+ *          - last changed: \$Date: 2005/12/01 11:20:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  *          - 2005-11-22 (gierds) Initial version.
  *	    - 2005-11-30 (gierds) Checking for PartnerLinks completed.
  *
@@ -264,9 +264,10 @@ std::string SymbolManager::addVariable(kc::integer id, csVariable* var)
  * \param pl The Variable to be checked
  *
  */
-std::string SymbolManager::checkVariable(csVariable* var)
+std::string SymbolManager::checkVariable(csVariable* var, bool isFaultVariable)
 {
   int id = 0;
+  std::string uniqueID;
   
   // if no name is set, there was probably no Variable given
   if (var->name == "")
@@ -307,10 +308,18 @@ std::string SymbolManager::checkVariable(csVariable* var)
         }
       }
       scope = scope->parent;
+
     }
-    if (!found)
+    uniqueID = std::string(intToString(id) + "." + var->name);
+    if ((!found) && (!isFaultVariable))
     {
       yyerror(string("Name of undefined Variable is \"" + var->name + "\"\n").c_str());
+    }
+    else
+    if ((!found) && (isFaultVariable))
+    {
+      // Fault Variables might be undefined, but that works for us
+      uniqueID = addVariable(currentScope->id, var);
     }
   }
   catch(bad_cast)
@@ -319,7 +328,7 @@ std::string SymbolManager::checkVariable(csVariable* var)
   }
 
   trace(TRACE_VERY_DEBUG, "[CS] Unique ID of Variable is " + std::string(intToString(id) + "." + var->name) + "\n");
-  return std::string(intToString(id) + "." + var->name);
+  return uniqueID;
   
 }
 
@@ -329,9 +338,13 @@ std::string SymbolManager::checkVariable(csVariable* var)
  * \param name Name of the Variable to be checked
  *
  */
-std::string SymbolManager::checkVariable(std::string name)
+std::string SymbolManager::checkVariable(std::string name, bool isFaultVariable)
 {
-  return checkVariable(new csVariable(name, "", "", ""));
+  if (isFaultVariable)
+  {
+    trace(TRACE_VERY_DEBUG, "[CS] Checking Fault Variable");
+  }
+  return checkVariable(new csVariable(name, "", "", ""), isFaultVariable);
 }
 
 

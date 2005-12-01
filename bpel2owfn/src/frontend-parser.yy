@@ -14,11 +14,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/01 11:20:52 $
+ *          - last changed: \$Date: 2005/12/01 14:04:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.33 $
+ * \version \$Revision: 1.34 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -260,7 +260,7 @@ tProcess TheProcess;
 
 tProcess:
   X_OPEN K_PROCESS arbitraryAttributes X_NEXT
-    { symMan.initialiseProcessScope($3); } 
+    { symMan.initialiseProcessScope($3);} 
   imports
   tPartnerLinks_opt
   tPartners_opt
@@ -272,8 +272,8 @@ tProcess:
     { inProcess = false; }
   activity
   X_NEXT X_SLASH K_PROCESS X_CLOSE
-    { TheProcess = $$ = Process($7, $8, $9, $10, $11, $12, $13, StopInProcess(), $15);
-      att.check($3, K_PROCESS);
+    { att.check($3, K_PROCESS);
+      TheProcess = $$ = Process($7, $8, $9, $10, $11, $12, $13, StopInProcess(), $15);
       symMan.quitScope();
       $$->name = att.read($3, "name");
       $$->targetNamespace = att.read($3, "targetNamespace");
@@ -885,13 +885,15 @@ tEmpty:
   K_EMPTY arbitraryAttributes X_NEXT
   standardElements
   X_SLASH K_EMPTY
-    { $$ = Empty($4);
+    { att.check($2, K_EMPTY);
+      $$ = Empty($4);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
       $$->id = $2; }
 | K_EMPTY arbitraryAttributes X_SLASH
-    { $$ = Empty(StandardElements(NiltTarget_list(), NiltSource_list()));
+    { att.check($2, K_EMPTY);
+      $$ = Empty(StandardElements(NiltTarget_list(), NiltSource_list()));
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
@@ -939,7 +941,8 @@ tInvoke:
   tCatchAll_opt
   tCompensationHandler_opt
   X_SLASH K_INVOKE
-    { $$ = Invoke($5, $6, $7, $8, $9);
+    { att.check($2, K_INVOKE);
+      $$ = Invoke($5, $6, $7, $8, $9);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
@@ -952,7 +955,8 @@ tInvoke:
       $$->uniqueIDout = mkcasestring((symMan.checkVariable(att.read($2, "outputVariable")->name)).c_str());
       $$->id = $2; }
 | K_INVOKE arbitraryAttributes X_SLASH
-    { $$ = Invoke(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list(), NiltCatch_list(), NiltCatchAll_list(), NiltCompensationHandler_opt());
+    { att.check($2, K_INVOKE);
+      $$ = Invoke(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list(), NiltCatch_list(), NiltCatchAll_list(), NiltCompensationHandler_opt());
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
@@ -1069,7 +1073,8 @@ tReply:
   standardElements
   tCorrelations_opt
   X_SLASH K_REPLY
-    { $$ = Reply($4, $5);
+    { att.check($2, K_REPLY);
+      $$ = Reply($4, $5);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
@@ -1081,7 +1086,8 @@ tReply:
       $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
       $$->id = $2; }
 | K_REPLY arbitraryAttributes X_SLASH
-    { $$ = Reply(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list());
+    { att.check($2, K_REPLY);
+      $$ = Reply(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list());
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
@@ -1118,7 +1124,8 @@ tAssign:
   standardElements
   tCopy_list //1-oo
   X_SLASH K_ASSIGN
-    { $$ = Assign($4, $5);
+    { att.check($2, K_ASSIGN);
+      $$ = Assign($4, $5);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
@@ -1234,7 +1241,8 @@ tWait:
   K_WAIT arbitraryAttributes X_NEXT
   standardElements
   X_SLASH K_WAIT
-    { $$ = Wait($4);
+    { att.check($2, K_WAIT);
+      $$ = Wait($4);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
@@ -1242,7 +1250,8 @@ tWait:
       $$->until = att.read($2, "until");
       $$->id = $2; }
 | K_WAIT arbitraryAttributes X_SLASH
-    { $$ = Wait(StandardElements(NiltTarget_list(), NiltSource_list()));
+    { att.check($2, K_WAIT);
+      $$ = Wait(StandardElements(NiltTarget_list(), NiltSource_list()));
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
@@ -1272,7 +1281,8 @@ tThrow:
   K_THROW arbitraryAttributes X_NEXT
   standardElements
   X_SLASH K_THROW
-    { $$ = Throw($4);
+    { att.check($2, K_THROW);
+      $$ = Throw($4);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
@@ -1281,7 +1291,8 @@ tThrow:
       $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "faultVariable")->name)).c_str());
       $$->id = $2; }
 | K_THROW arbitraryAttributes X_SLASH
-    { $$ = Throw(StandardElements(NiltTarget_list(), NiltSource_list()));
+    { att.check($2, K_THROW);
+      $$ = Throw(StandardElements(NiltTarget_list(), NiltSource_list()));
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
@@ -1310,14 +1321,16 @@ tCompensate:
   K_COMPENSATE arbitraryAttributes X_NEXT
   standardElements
   X_SLASH K_COMPENSATE
-    { $$ = Compensate($4);
+    { att.check($2, K_COMPENSATE);
+      $$ = Compensate($4);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
       $$->scope = att.read($2, "scope");
       $$->id = $2; }
 | K_COMPENSATE arbitraryAttributes X_SLASH
-    { $$ = Compensate(StandardElements(NiltTarget_list(), NiltSource_list()));
+    { att.check($2, K_COMPENSATE);
+      $$ = Compensate(StandardElements(NiltTarget_list(), NiltSource_list()));
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
@@ -1345,13 +1358,15 @@ tTerminate:
   K_TERMINATE arbitraryAttributes X_NEXT
   standardElements
   X_SLASH K_TERMINATE
-    { $$ = Terminate($4);
+    { att.check($2, K_TERMINATE);
+      $$ = Terminate($4);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
       $$->id = $2; }
 | K_TERMINATE arbitraryAttributes X_SLASH
-    { $$ = Terminate(StandardElements(NiltTarget_list(), NiltSource_list()));
+    { att.check($2, K_TERMINATE);
+      $$ = Terminate(StandardElements(NiltTarget_list(), NiltSource_list()));
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
@@ -1458,7 +1473,8 @@ tSwitch:
   tCase_list //1-oo
   tOtherwise_opt
   X_SLASH K_SWITCH
-    { $$ = Switch($4, $5, $6);
+    { att.check($2, K_SWITCH);
+      $$ = Switch($4, $5, $6);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
@@ -1518,7 +1534,8 @@ tWhile:
   standardElements
   activity X_NEXT
   X_SLASH K_WHILE
-    { $$ = While($4, $5);
+    { att.check($2, K_WHILE);
+      $$ = While($4, $5);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
@@ -1546,7 +1563,8 @@ tSequence:
   standardElements
   activity_list //1-oo
   X_SLASH K_SEQUENCE
-    { $$ = Sequence($4, $5);
+    { att.check($2, K_SEQUENCE);
+      $$ = Sequence($4, $5);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
@@ -1589,7 +1607,8 @@ tPick:
   tOnMessage X_NEXT tOnMessage_list //1-oo
   tOnAlarm_list //0-oo
   X_SLASH K_PICK
-    { $$ = Pick($4, ConstOnMessage_list($5, $7), $8);
+    { att.check($2, K_PICK);
+      $$ = Pick($4, ConstOnMessage_list($5, $7), $8);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
@@ -1637,7 +1656,8 @@ tScope:
   tEventHandlers_opt
   activity X_NEXT
   X_SLASH K_SCOPE
-    { $$ = Scope($5, $6, $8, $9, $10, StopInScope(), $11);
+    { att.check($2, K_SCOPE);
+      $$ = Scope($5, $6, $8, $9, $10, StopInScope(), $11);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");

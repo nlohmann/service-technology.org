@@ -15,11 +15,11 @@
  * 
  * \author  
  *          - responsible Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of \$Author: nlohmann $
+ *          - last changes of \$Author: gierds $
  *          
  * \date
  *          - created 2005-11-10
- *          - last changed: \$Date: 2005/11/30 08:36:29 $
+ *          - last changed: \$Date: 2005/12/01 11:44:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -86,7 +86,7 @@ int currentView;
 
 
 namestart		[A-Za-z\200-\377_]
-namechar		[A-Za-z\200-\377_0-9.-:]
+namechar		[A-Za-z\200-\377_0-9.\-:]
 name			{namestart}{namechar}*
 esc			"&#"[0-9]+";"|"&#x"[0-9a-fA-F]+";"
 string			\"([^"]|{esc})*\"

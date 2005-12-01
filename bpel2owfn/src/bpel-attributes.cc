@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/01 14:05:32 $
+ *          - last changed: \$Date: 2005/12/01 14:56:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  *
  */
 
@@ -84,10 +84,11 @@ kc::integer attributeManager::nextId()
 void attributeManager::define(kc::casestring attributeName, kc::casestring attributeValue)
 {
   scannerResult[this->nodeId][attributeName->name] = attributeValue->name;
-  trace(attributeName->name);
-  trace("=");
-  trace(attributeValue->name);
-  trace("\n");
+/*  trace(TRACE_DEBUG,attributeName->name);
+  trace(TRACE_DEBUG,"=");
+  trace(TRACE_DEBUG,attributeValue->name);
+  trace(TRACE_DEBUG,"\n");
+*/
 }
 
 
@@ -164,7 +165,7 @@ void attributeManager::initAttributeDB()
 	// wait
 	this->attributeDB[K_WAIT][A__FOR] = new attributeDBData(false, false, 0);	
 	this->attributeDB[K_WAIT][A__UNTIL] = new attributeDBData(false, false, 0);
-	//	standard-attributes
+	//	standard-attributesTRACE_DEBUG,
 	this->attributeDB[K_RECEIVE][A__NAME] = new attributeDBData(true, false, 0);
 	this->attributeDB[K_RECEIVE][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
 	this->attributeDB[K_RECEIVE][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
@@ -243,6 +244,7 @@ bool attributeManager::isValidElement(unsigned int elementId, unsigned int activ
 		/// to tag all found accurate attributes
 		if(isAttribute(activityId, (*scannerResultDataIterator).first))
 		{
+			trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
 			(this->attributeDB[activityId][(*scannerResultDataIterator).first])->setTag(true);
 		}
 		else
@@ -264,7 +266,7 @@ bool attributeManager::isValidElement(unsigned int elementId, unsigned int activ
 	///
 	if(!checkAttributeContent(activityId))
 	{
-		return false;
+		//return false;
 	}
 		
 	return true;
@@ -274,7 +276,7 @@ bool attributeManager::isValidElement(unsigned int elementId, unsigned int activ
 /*!
  * 
  */
-bool attributeManager::isAttribute(unsigned int activityId, std::string attributeName)
+bool attributeManager::isAttribute(unsigned int activityId, std::string elementAttributeName)
 {	
 	/// iterator for the embedded map
 	std::map<std::string, attributeDBData*>::iterator attributeDBDataIterator;
@@ -282,7 +284,7 @@ bool attributeManager::isAttribute(unsigned int activityId, std::string attribut
 	
 	while(attributeDBDataIterator != attributeDB[activityId].end())
 	{	
-		if(attributeName.compare((*attributeDBDataIterator).first) == 0)
+		if(elementAttributeName.compare((*attributeDBDataIterator).first) == 0)
 		{
 			return true;
 		}
@@ -303,10 +305,11 @@ bool attributeManager::isAccurateCombinationOfAttributes(unsigned int activityId
 	while(attributeDBDataIterator != attributeDB[activityId].end())
 	{	
 		/// check of mandatory attribute
-		if(!(!isOptional(activityId, (*attributeDBDataIterator).first) ==
-			  isTagged(activityId, (*attributeDBDataIterator).first)));
+		if((!isOptional(activityId, (*attributeDBDataIterator).first) &&
+			  !isTagged(activityId, (*attributeDBDataIterator).first)));
 		{
 			/* doesn't scanned mandatory attribute was found */
+			trace(TRACE_DEBUG,"HALLO" + (*attributeDBDataIterator).first + "\n");
 			return false;	
 		}
 		
@@ -358,7 +361,7 @@ void attributeManager::check(kc::integer elementId, unsigned int activityId)
 
 	if(!isValidElement(elementId->value, activityId))
 	{
-		//yyerror("attribute error");
+		yyerror(string("+----------------------------------------- \n attributeManager: attribute error \n+----------------------------------------- \n ").c_str());
 	}
 }
 

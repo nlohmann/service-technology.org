@@ -10,6 +10,7 @@
 
 /// names of attributes
 const std::string A__ABSTRACT_PROCESS = "abstractProcess";
+const std::string A__CONDITION = "condition";
 const std::string A__CREATE_INSTANCE = "createInstance";
 const std::string A__ENABLE_INSTANCE_COMPENSATION = "enableInstanceCompensation";
 const std::string A__EXPRESSION_LANGUAGE = "expressionLanguage";
@@ -24,10 +25,12 @@ const std::string A__PORT_TYPE = "portType";
 const std::string A__OPERATION = "operation";
 const std::string A__OUTPUT_VARIABLE = "outputVariable";
 const std::string A__QUERY_LANGUAGE = "queryLanguage";
-const std::string A__TARGET_NAMESPACE = "targetNamespace";
+const std::string A__SCOPE = "scope";
 const std::string A__SUPPRESS_JOIN_FAILURE = "suppressJoinFailure"; // standard-attribute
+const std::string A__TARGET_NAMESPACE = "targetNamespace";
 const std::string A__UNTIL = "until";
 const std::string A__VARIABLE = "variable";
+const std::string A__VARIABLE_ACCESS_SERIALIZABLE = "variableAccessSerializable";
 const std::string A__XMLNS = "xmlns";
 
 class attributeDBData

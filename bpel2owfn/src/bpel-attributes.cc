@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/01 13:13:51 $
+ *          - last changed: \$Date: 2005/12/01 14:05:32 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  *
  */
 
@@ -147,7 +147,6 @@ void attributeManager::initAttributeDB()
 	this->attributeDB[K_RECEIVE][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
 	this->attributeDB[K_RECEIVE][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
 	
-	
 	// assign
 	//	standard-attributes
 	this->attributeDB[K_ASSIGN][A__NAME] = new attributeDBData(true, false, 0);
@@ -161,7 +160,6 @@ void attributeManager::initAttributeDB()
 	this->attributeDB[K_RECEIVE][A__NAME] = new attributeDBData(true, false, 0);
 	this->attributeDB[K_RECEIVE][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
 	this->attributeDB[K_RECEIVE][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
-		
 	
 	// wait
 	this->attributeDB[K_WAIT][A__FOR] = new attributeDBData(false, false, 0);	
@@ -170,7 +168,6 @@ void attributeManager::initAttributeDB()
 	this->attributeDB[K_RECEIVE][A__NAME] = new attributeDBData(true, false, 0);
 	this->attributeDB[K_RECEIVE][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
 	this->attributeDB[K_RECEIVE][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
-		
 	
 	// empty
 	//	standard-attributes
@@ -189,7 +186,6 @@ void attributeManager::initAttributeDB()
 	this->attributeDB[K_RECEIVE][A__NAME] = new attributeDBData(true, false, 0);
 	this->attributeDB[K_RECEIVE][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
 	this->attributeDB[K_RECEIVE][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
-
 	
 	// switch
 	//	standard-attributes
@@ -198,12 +194,11 @@ void attributeManager::initAttributeDB()
 	this->attributeDB[K_SWITCH][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
 	
 	// while
-
+	this->attributeDB[K_WHILE][A__CONDITION] = new attributeDBData(false, false, 0);
 	//	standard-attributes
 	this->attributeDB[K_WHILE][A__NAME] = new attributeDBData(true, false, 0);
 	this->attributeDB[K_WHILE][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
 	this->attributeDB[K_WHILE][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
-
 	
 	// sequence
 	//	standard-attributes
@@ -212,20 +207,25 @@ void attributeManager::initAttributeDB()
 	this->attributeDB[K_SEQUENCE][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
 	
 	// pick
-
+	this->attributeDB[K_PICK][A__CREATE_INSTANCE] = new attributeDBData(true, false, 1);
 	//	standard-attributes
 	this->attributeDB[K_PICK][A__NAME] = new attributeDBData(true, false, 0);
 	this->attributeDB[K_PICK][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
 	this->attributeDB[K_PICK][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
 	
 	// scope
+	this->attributeDB[K_SCOPE][A__VARIABLE_ACCESS_SERIALIZABLE] = new attributeDBData(false, false, 1);	
 	//	standard-attributes
-	this->attributeDB[K_RECEIVE][A__NAME] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_RECEIVE][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_RECEIVE][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
-	
+	this->attributeDB[K_SCOPE][A__NAME] = new attributeDBData(true, false, 0);
+	this->attributeDB[K_SCOPE][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
+	this->attributeDB[K_SCOPE][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
 	
 	// compensate
+	this->attributeDB[K_COMPENSATE][A__SCOPE] = new attributeDBData(true, false, 0);	
+	//	standard-attributes
+	this->attributeDB[K_COMPENSATE][A__NAME] = new attributeDBData(true, false, 0);
+	this->attributeDB[K_COMPENSATE][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
+	this->attributeDB[K_COMPENSATE][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
 	
 }
 

@@ -45,9 +45,6 @@ class attributeDBData
 		///
 		unsigned int contentType;
 		
-		///
-		std::string defaultAttributeContent;
-		
 	public:
 		/// constructor		
 		attributeDBData(bool opt, bool tag, unsigned int ctype)
@@ -81,7 +78,7 @@ class attributeManager
 	bool isValidElement(unsigned int elementId, unsigned int activityId);
 
     /// is attribute of activity or not
-    bool isAttribute(unsigned int activityId, std::string attributeName);
+    bool isAttribute(unsigned int activityId, std::string elementAttributeName);
 	
 	/// check the combination of scanned attributes
 	bool isAccurateCombinationOfAttributes(unsigned int activityId);

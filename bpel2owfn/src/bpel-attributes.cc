@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/01 14:56:30 $
+ *          - last changed: \$Date: 2005/12/01 15:00:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  *
  */
 
@@ -244,7 +244,7 @@ bool attributeManager::isValidElement(unsigned int elementId, unsigned int activ
 		/// to tag all found accurate attributes
 		if(isAttribute(activityId, (*scannerResultDataIterator).first))
 		{
-			trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
+			trace(TRACE_VERY_DEBUG,(*scannerResultDataIterator).first + "\n");
 			(this->attributeDB[activityId][(*scannerResultDataIterator).first])->setTag(true);
 		}
 		else
@@ -361,7 +361,7 @@ void attributeManager::check(kc::integer elementId, unsigned int activityId)
 
 	if(!isValidElement(elementId->value, activityId))
 	{
-		yyerror(string("+----------------------------------------- \n attributeManager: attribute error \n+----------------------------------------- \n ").c_str());
+		//yyerror(string("+----------------------------------------- \n attributeManager: attribute error \n+----------------------------------------- \n ").c_str());
 	}
 }
 

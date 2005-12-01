@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/11/30 14:34:01 $
+ *          - last changed: \$Date: 2005/12/01 13:04:49 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -87,8 +87,9 @@ set<pair<Node *, arc_type> > setUnion(set<pair<Node *, arc_type> > a, set<pair<N
  * \return true, if the node's first history entry begins with the given role
  */
 bool Node::firstMemberOf(string role)
-{	
-  return ((*history.begin()).find(role, 0) == 0);
+{
+  string firstEntry = (*history.begin());
+  return (firstEntry.find(role, 0) == firstEntry.find_first_of(".")+1);
 }
 
 
@@ -597,16 +598,14 @@ void PetriNet::drawDot()
   {
     (*dot_output) << " " << (*p)->id << "\t[label=\"p" << (*p)->id << "\"";
 
-    if ((*p)->firstMemberOf("process.eventHandler"))
+    if ((*p)->firstMemberOf("eventHandler."))
       (*dot_output) << " style=filled fillcolor=plum";
-    else if ((*p)->firstMemberOf("process.compensationHandler."))
+    else if ((*p)->firstMemberOf("compensationHandler."))
       (*dot_output) << " style=filled fillcolor=aquamarine";
-    else if ((*p)->firstMemberOf("process.stop."))
+    else if ((*p)->firstMemberOf("stop."))
       (*dot_output) << " style=filled fillcolor=lightskyblue2";
-    else if ((*p)->firstMemberOf("process.faulthandler"))
+    else if ((*p)->firstMemberOf("faulthandler."))
       (*dot_output) << " style=filled fillcolor=pink";
-    else if ((*p)->firstMemberOf("process"))
-      (*dot_output) << " style=filled fillcolor=grey90";
       
     (*dot_output) << "];" << endl;
   }
@@ -621,16 +620,14 @@ void PetriNet::drawDot()
     if ((*t)->guard != "")
       (*dot_output) << " shape=record label=\"{t" << (*t)->id << "|{" << (*t)->guard << "}}\"";
 
-    if ((*t)->firstMemberOf("process.eventHandler"))
+    if ((*t)->firstMemberOf("eventHandler."))
       (*dot_output) << " style=filled fillcolor=plum";
-    else if ((*t)->firstMemberOf("process.compensationHandler."))
+    else if ((*t)->firstMemberOf("compensationHandler."))
       (*dot_output) << " style=filled fillcolor=aquamarine";
-    else if ((*t)->firstMemberOf("process.stop."))
+    else if ((*t)->firstMemberOf("stop."))
       (*dot_output) << " style=filled fillcolor=lightskyblue2";
-    else if ((*t)->firstMemberOf("process.faulthandler"))
+    else if ((*t)->firstMemberOf("faulthandler."))
       (*dot_output) << " style=filled fillcolor=pink";
-    else if ((*t)->firstMemberOf("process"))
-      (*dot_output) << " style=filled fillcolor=grey90";
     
     (*dot_output) << "];" << endl;
   }

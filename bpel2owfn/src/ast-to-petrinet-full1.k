@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/11/30 16:08:13 $
+ *          - last changed: \$Date: 2005/12/01 13:05:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.35 $
+ * \version \$Revision: 1.36 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -99,7 +99,10 @@ extern SymbolManager symMan;
 
 using namespace std;
 
-// #define DEBUGPN
+/// prefix of the current scope
+string currentScope;
+
+//#define DEBUGPN
 %}
 
 
@@ -124,9 +127,10 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
   [petrinet:
     {
       trace(TRACE_INFORMATION, "Generating Petri net...\n");
-#ifndef DEBUGPN
       
       string prefix = "process.";
+      currentScope = prefix;
+#ifndef DEBUGPN
       Place *process_p1  = TheNet->newPlace(prefix + "initial");
       Place *process_p2  = TheNet->newPlace(prefix + "ch_in");
       Place *process_p3  = TheNet->newPlace(prefix + "scopeCompensated");
@@ -488,8 +492,7 @@ StopInProcess() ->
 StopInScope() ->
   [petrinet:
     {
-      // this one should have a better prefix
-      string prefix = "scope.stop.";
+      string prefix = currentScope + "stop.";
 
       Place *p1 =  TheNet->newPlace(prefix + "ft_in");
       Place *p2 =  TheNet->newPlace(prefix + "p2");
@@ -859,7 +862,7 @@ This=NiltFaultHandlers_opt() provided (This->inProcess) ->
 ConstEventHandlers_opt(EventHandlers(a,b), NiltEventHandlers_opt()) ->
   [petrinet:
     {
-      string prefix = "process.eventHandler.";
+      string prefix = currentScope + "eventHandler.";
       
       Place *p6  = TheNet->newPlace(prefix + "initial");
       Place *p8  = TheNet->newPlace(prefix + "final");
@@ -1053,7 +1056,7 @@ ConstEventHandlers_opt(EventHandlers(a,b), NiltEventHandlers_opt()) ->
 NiltEventHandlers_opt() ->
   [petrinet:
     {
-      string prefix = "process.eventHandler.";
+      string prefix = currentScope + "eventHandler.";
       
       Place *p1  = TheNet->newPlace(prefix + "initial");
       Place *p2  = TheNet->newPlace(prefix + "finish");
@@ -1100,7 +1103,7 @@ NiltEventHandlers_opt() ->
 NiltCompensationHandler_opt() ->
   [petrinet:
     {
-      string prefix = "process.compensationHandler.";
+      string prefix = currentScope + "compensationHandler.";
       
       Place *p1  = TheNet->newPlace(prefix + "p1");
       Place *p2  = TheNet->newPlace(prefix + "ch_in");
@@ -1116,8 +1119,8 @@ NiltCompensationHandler_opt() ->
       Place *p16 = TheNet->newPlace(prefix + "fh_call");
       Place *p17 = TheNet->newPlace(prefix + "ch_out");
       Place *p18 = TheNet->newPlace(prefix + "scopeCompensated");
-//      Place *p20 = TheNet->newPlace(prefix + "push");
-//      Place *p22 = TheNet->newPlace(prefix + "!push");
+      Place *p20 = TheNet->newPlace(prefix + "push");
+      Place *p22 = TheNet->newPlace(prefix + "!push");
       Place *p19 = TheNet->newPlace(prefix + "compScope");
       Place *p24 = TheNet->newPlace(prefix + "clean");
       Place *p25 = TheNet->newPlace(prefix + "failed");
@@ -1133,7 +1136,7 @@ NiltCompensationHandler_opt() ->
       Transition *t10 = TheNet->newTransition(prefix + "t10");
       Transition *t11 = TheNet->newTransition(prefix + "t11");
       Transition *t12 = TheNet->newTransition(prefix + "t12");
-//      Transition *t13 = TheNet->newTransition(prefix + "t13");
+      Transition *t13 = TheNet->newTransition(prefix + "t13");
       Transition *t15 = TheNet->newTransition(prefix + "t15");
       Transition *t16 = TheNet->newTransition(prefix + "t16");
 
@@ -1165,12 +1168,12 @@ NiltCompensationHandler_opt() ->
       TheNet->newArc(t7, p9, "scopeName");
       TheNet->newArc(p11, t7);
       TheNet->newArc(p15, t7);
-//      TheNet->newArc(p20, t7);
+      TheNet->newArc(p20, t7);
 
       TheNet->newArc(p11, t8);
       TheNet->newArc(p16, t8);
       TheNet->newArc(t8, p17);
-//      TheNet->newArc(p20, t8);
+      TheNet->newArc(p20, t8);
 
       TheNet->newArc(t9, p11);
       TheNet->newArc(p16, t9, READ);
@@ -1188,10 +1191,10 @@ NiltCompensationHandler_opt() ->
       TheNet->newArc(p16, t12);
       TheNet->newArc(p24, t12);
 
-//      TheNet->newArc(p11, t13);
-//      TheNet->newArc(t13, p19, "s");
-//      TheNet->newArc(t13, p20);
-//      TheNet->newArc(p22, t13, "s");
+      TheNet->newArc(p11, t13);
+      TheNet->newArc(t13, p19, "s");
+      TheNet->newArc(t13, p20);
+      TheNet->newArc(p22, t13, "s");
       
       TheNet->newArc(p9, t15, "scopeName");
       TheNet->newArc(t15, p13);
@@ -2253,6 +2256,7 @@ This=Scope(a,b,c,d,e,f,g)
   [petrinet:
     {
       string prefix = intToString(This->id->value) + ".";
+      currentScope = prefix;
 
       Place *p2  = TheNet->newPlace(prefix + "initial");
       Place *p3  = TheNet->newPlace(prefix + "ch_in");
@@ -2302,8 +2306,8 @@ This=Scope(a,b,c,d,e,f,g)
       Place *p52 = TheNet->newPlace(prefix + "p52");
       Place *p53 = TheNet->newPlace(prefix + "p53");
       Place *p54 = TheNet->newPlace(prefix + "p54");
-      Place *p56 = TheNet->newPlace(prefix + "p56");
-      Place *p57 = TheNet->newPlace(prefix + "p57");
+      Place *p56 = TheNet->newPlace(prefix + "compensated");
+      Place *p57 = TheNet->newPlace(prefix + "compScope");
       Place *p67 = TheNet->newPlace(prefix + "!push");
       Transition *t1  = TheNet->newTransition(prefix + "t1");
       Transition *t2  = TheNet->newTransition(prefix + "t2");
@@ -2370,30 +2374,53 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p24"), TheNet->findPlace(g, ".stopped"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p6"),  TheNet->findPlace(g, ".failed"));
 
+      // embed event handler
+      TheNet->mergePlaces(prefix + "p25", currentScope + "eventHandler.initial");
+      TheNet->mergePlaces(prefix + "p26", currentScope + "eventHandler.finish");
+      TheNet->mergePlaces(prefix + "p27", currentScope + "eventHandler.final");
+      TheNet->mergePlaces(prefix + "p28", currentScope + "eventHandler.stop");
+      TheNet->mergePlaces(prefix + "p29", currentScope + "eventHandler.stopped");
+      
       // embed the stop pattern
-      TheNet->mergePlaces(prefix + "p36",            "scope.stop.ft_in");
-      TheNet->mergePlaces(prefix + "Faulted",        "scope.stop.Faulted");
-      TheNet->mergePlaces(prefix + "p6",             "scope.stop.fault_in");
-      TheNet->mergePlaces(prefix + "Active",         "scope.stop.Active");
-      TheNet->mergePlaces(prefix + "p37",            "scope.stop.terminate_up");
-      TheNet->mergePlaces(prefix + "!Active",        "scope.stop.!Active");
-      TheNet->mergePlaces(prefix + "upperTerminate", "scope.stop.terminate");
-      TheNet->mergePlaces(prefix + "!Faulted",       "scope.stop.!Faulted");
-      TheNet->mergePlaces(prefix + "Ended",          "scope.stop.Ended");
-      TheNet->mergePlaces(prefix + "Compensated",    "scope.stop.Compensated");
-      TheNet->mergePlaces(prefix + "!Ended",         "scope.stop.!Ended");
-      TheNet->mergePlaces(prefix + "p23",            "scope.stop.stop");
-      TheNet->mergePlaces(prefix + "p38",            "scope.stop.stopped");
-      TheNet->mergePlaces(prefix + "p39",            "scope.stop.cleanCH");
-      TheNet->mergePlaces(prefix + "p40",            "scope.stop.ch_cleaned");
-      TheNet->mergePlaces(prefix + "p41",            "scope.stop.ftSave");
-      TheNet->mergePlaces(prefix + "p42",            "scope.stop.ft");
-      TheNet->mergePlaces(prefix + "p43",            "scope.stop.fault");
-      TheNet->mergePlaces(prefix + "p44",            "scope.stop.faultSave");
-      TheNet->mergePlaces(prefix + "stopped",        "scope.stop.stopped_s");
-      TheNet->mergePlaces(prefix + "p46",            "scope.stop.upperTerminate");
-      TheNet->mergePlaces(prefix + "p47",            "scope.stop.rethrow");
-      TheNet->mergePlaces(prefix + "p48",            "scope.stop.upperFH");
+      TheNet->mergePlaces(prefix + "p36",            currentScope + "stop.ft_in");
+      TheNet->mergePlaces(prefix + "Faulted",        currentScope + "stop.Faulted");
+      TheNet->mergePlaces(prefix + "p6",             currentScope + "stop.fault_in");
+      TheNet->mergePlaces(prefix + "Active",         currentScope + "stop.Active");
+      TheNet->mergePlaces(prefix + "p37",            currentScope + "stop.terminate_up");
+      TheNet->mergePlaces(prefix + "!Active",        currentScope + "stop.!Active");
+      TheNet->mergePlaces(prefix + "upperTerminate", currentScope + "stop.terminate");
+      TheNet->mergePlaces(prefix + "!Faulted",       currentScope + "stop.!Faulted");
+      TheNet->mergePlaces(prefix + "Ended",          currentScope + "stop.Ended");
+      TheNet->mergePlaces(prefix + "Compensated",    currentScope + "stop.Compensated");
+      TheNet->mergePlaces(prefix + "!Ended",         currentScope + "stop.!Ended");
+      TheNet->mergePlaces(prefix + "p23",            currentScope + "stop.stop");
+      TheNet->mergePlaces(prefix + "p38",            currentScope + "stop.stopped");
+      TheNet->mergePlaces(prefix + "p39",            currentScope + "stop.cleanCH");
+      TheNet->mergePlaces(prefix + "p40",            currentScope + "stop.ch_cleaned");
+      TheNet->mergePlaces(prefix + "p41",            currentScope + "stop.ftSave");
+      TheNet->mergePlaces(prefix + "p42",            currentScope + "stop.ft");
+      TheNet->mergePlaces(prefix + "p43",            currentScope + "stop.fault");
+      TheNet->mergePlaces(prefix + "p44",            currentScope + "stop.faultSave");
+      TheNet->mergePlaces(prefix + "stopped",        currentScope + "stop.stopped_s");
+      TheNet->mergePlaces(prefix + "p46",            currentScope + "stop.upperTerminate");
+      TheNet->mergePlaces(prefix + "p47",            currentScope + "stop.rethrow");
+      TheNet->mergePlaces(prefix + "p48",            currentScope + "stop.upperFH");
+
+      // embed the compensation handler
+      TheNet->mergePlaces(prefix + "ch_in",            currentScope + "compensationHandler.ch_in");
+      TheNet->mergePlaces(prefix + "Completed",        currentScope + "compensationHandler.Completed");
+      TheNet->mergePlaces(prefix + "!Completed",       currentScope + "compensationHandler.!Completed");
+      TheNet->mergePlaces(prefix + "Compensated",      currentScope + "compensationHandler.Compensated");
+      TheNet->mergePlaces(prefix + "p49",              currentScope + "compensationHandler.fh");
+      TheNet->mergePlaces(prefix + "scopeCompensated", currentScope + "compensationHandler.scopeCompensated");
+      TheNet->mergePlaces(prefix + "push",             currentScope + "compensationHandler.push");
+      TheNet->mergePlaces(prefix + "!push",            currentScope + "compensationHandler.!push");
+      TheNet->mergePlaces(prefix + "p39",              currentScope + "compensationHandler.clean");
+      TheNet->mergePlaces(prefix + "p40",              currentScope + "compensationHandler.cleaned");
+      TheNet->mergePlaces(prefix + "p6",               currentScope + "compensationHandler.failed");
+      TheNet->mergePlaces(prefix + "compScope",        currentScope + "compensationHandler.compScope");
+      TheNet->mergePlaces(prefix + "p50",              currentScope + "compensationHandler.ch_out");
+      TheNet->mergePlaces(prefix + "compensated",      currentScope + "compensationHandler.compensated");      
     }
   ]
 ;

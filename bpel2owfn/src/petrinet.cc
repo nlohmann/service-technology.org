@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/12/01 13:04:49 $
+ *          - last changed: \$Date: 2005/12/02 11:58:36 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.53 $
+ * \version \$Revision: 1.54 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -674,7 +674,7 @@ void PetriNet::lolaOut()
   /*
   // the reset-arc
   unsigned maxErrors = 3;
-  Node *fault_place = findPlace("process.fault_in");
+  Node *fault_place = findPlace("1.fault_in");
   unsigned int fault_id = fault_place->id;
 
   set<unsigned int> fault_t_in;
@@ -696,17 +696,17 @@ void PetriNet::lolaOut()
 
   // the neccessary functions of the reset-arc
   (*lola_output) << "SORT" << endl;
-  (*lola_output) << "  process.maxErrors = [ 0 , " << maxErrors << " ] ;" << endl << endl;
-  (*lola_output) << "FUNCTION inc_p" << fault_id << "(x:process.maxErrors):process.maxErrors" << endl;
+  (*lola_output) << "  1.maxErrors = [ 0 , " << maxErrors << " ] ;" << endl << endl;
+  (*lola_output) << "FUNCTION inc_p" << fault_id << "(x:1.maxErrors):1.maxErrors" << endl;
   (*lola_output) << "BEGIN" << endl << "  RETURN x + 1" << endl << "END" << endl << endl;
 
-  (*lola_output) << "FUNCTION dec_p" << fault_id << "(x:process.maxErrors):process.maxErrors" << endl;
+  (*lola_output) << "FUNCTION dec_p" << fault_id << "(x:1.maxErrors):1.maxErrors" << endl;
   (*lola_output) << "BEGIN" << endl << "  RETURN x - 1" << endl << "END" << endl << endl;
 
-  (*lola_output) << "FUNCTION reset_p" << fault_id << "(x:process.maxErrors):process.maxErrors" << endl;
+  (*lola_output) << "FUNCTION reset_p" << fault_id << "(x:1.maxErrors):1.maxErrors" << endl;
   (*lola_output) << "BEGIN" << endl << "  RETURN 0" << endl << "END" << endl << endl;
 
-  (*lola_output) << "FUNCTION zero_p" << fault_id << "():process.maxErrors" << endl;
+  (*lola_output) << "FUNCTION zero_p" << fault_id << "():1.maxErrors" << endl;
   (*lola_output) << "BEGIN" << endl << "  RETURN 0" << endl << "END" << endl << endl;
   */
   
@@ -720,7 +720,7 @@ void PetriNet::lolaOut()
     /*
     // the error-place
     if ((*p)->id == fault_id)
-      (*lola_output) << " : process.maxErrors";
+      (*lola_output) << " : 1.maxErrors";
 
     */
       
@@ -735,8 +735,8 @@ void PetriNet::lolaOut()
   
   // initial marking
   (*lola_output) << "MARKING" << endl;
-  (*lola_output) << "  p" << findPlace("process.initial")->id << ":\t1,\t { initial marking of the process }" << endl;
-  (*lola_output) << "  p" << findPlace("process.clock")->id << ":\t1\t { initial marking of the clock }" << endl;
+  (*lola_output) << "  p" << findPlace("1.initial")->id << ":\t1,\t { initial marking of the process }" << endl;
+  (*lola_output) << "  p" << findPlace("1.clock")->id << ":\t1\t { initial marking of the clock }" << endl;
   //(*lola_output) << "  p" << fault_id << ":\tzero_p" << fault_id << "()\t { initial marking of the fault place }" << endl;
   (*lola_output)   << ";" << endl << endl << endl;
 
@@ -752,7 +752,7 @@ void PetriNet::lolaOut()
     /*
     if ( fault_t_in.find( (*t)->id ) != fault_t_in.end() || fault_t_out.find( (*t)->id ) != fault_t_out.end() )
     {
-      (*lola_output) << "VAR x : process.maxErrors;" << endl;
+      (*lola_output) << "VAR x : 1.maxErrors;" << endl;
       (*lola_output) << "GUARD x > 0" << endl;
     }
     */

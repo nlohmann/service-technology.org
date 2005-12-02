@@ -11,46 +11,35 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/01 15:00:02 $
+ *          - last changed: \$Date: 2005/12/02 15:59:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  *
  */
 
-#include "bpel-attributes.h" // ...
-#include "bpel-syntax.h" // K_PROCESS ...
-#include "debug.h" // trace() ... 
+#include "bpel-attributes.h"
+#include "bpel-syntax.h"
+#include "debug.h"
 
 
-/********************************************
- * implementation of attributeManager CLASS
- ********************************************/
-
-/*!
- * contructor
- */
 attributeManager::attributeManager()
 {
   this->scannerResult.clear();
-  this->attributeDB.clear();
   this->nodeId = 0;
-  initAttributeDB();
 }
 
-/*!
- * 
- */
+
+
 kc::casestring attributeManager::read(kc::integer elementId, std::string attributeName)
 {
   // "cast" Kimwitu++ to C++
   unsigned int elementIdInt = elementId->value;
-  	
-  //trace(attributeName + "=" + intToString(elementIdInt) + "\n");
+
   
   std::string result;
   
@@ -68,9 +57,7 @@ kc::casestring attributeManager::read(kc::integer elementId, std::string attribu
 }
 
 
-/*!
- * 
- */
+
 kc::integer attributeManager::nextId()
 {
   this->nodeId++;
@@ -78,417 +65,358 @@ kc::integer attributeManager::nextId()
 }
 
 
-/*!
- * 
- */
+
 void attributeManager::define(kc::casestring attributeName, kc::casestring attributeValue)
 {
   scannerResult[this->nodeId][attributeName->name] = attributeValue->name;
-/*  trace(TRACE_DEBUG,attributeName->name);
-  trace(TRACE_DEBUG,"=");
-  trace(TRACE_DEBUG,attributeValue->name);
-  trace(TRACE_DEBUG,"\n");
-*/
 }
 
-
-/*!
- * to initialize the attributeDB
- */ 
-void attributeManager::initAttributeDB()
+void attributeManager::printCheckErrorMsg(std::string errorMsg)
 {
-	/*
-	 *  [activity-id][attribute-name][optional][tagged][content type][default content]
-	 * 	
-	 * 	[optional] -> true <optional attribute> | false <mandotory attribute>
-	 * 	[tagged] -> true | false
-	 * 	[content type] -> 0 <not empty> | 1 <yes | no>
-	 */
-	
-	// process
-	this->attributeDB[K_PROCESS][A__NAME] = new attributeDBData(false, false, 0);
-	this->attributeDB[K_PROCESS][A__TARGET_NAMESPACE] = new attributeDBData(false, false, 0);
-	this->attributeDB[K_PROCESS][A__QUERY_LANGUAGE] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_PROCESS][A__EXPRESSION_LANGUAGE] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_PROCESS][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);
-	this->attributeDB[K_PROCESS][A__ENABLE_INSTANCE_COMPENSATION] = new attributeDBData(true, false, 1);
-	this->attributeDB[K_PROCESS][A__ABSTRACT_PROCESS] = new attributeDBData(true, false, 1);
-	this->attributeDB[K_PROCESS][A__XMLNS] = new attributeDBData(false, false, 0);
-	
-	// receive
-	this->attributeDB[K_RECEIVE][A__PARTNER_LINK] = new attributeDBData(false, false, 0);
-	this->attributeDB[K_RECEIVE][A__PORT_TYPE] = new attributeDBData(false, false, 0);
-	this->attributeDB[K_RECEIVE][A__OPERATION] = new attributeDBData(false, false, 0);
-	this->attributeDB[K_RECEIVE][A__VARIABLE] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_RECEIVE][A__CREATE_INSTANCE] = new attributeDBData(true, false, 1);
-	//	standard-attributes
-	this->attributeDB[K_RECEIVE][A__NAME] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_RECEIVE][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_RECEIVE][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
-	
-	// reply
-	this->attributeDB[K_REPLY][A__PARTNER_LINK] = new attributeDBData(false, false, 0);
-	this->attributeDB[K_REPLY][A__PORT_TYPE] = new attributeDBData(false, false, 0);
-	this->attributeDB[K_REPLY][A__OPERATION] = new attributeDBData(false, false, 0);
-	this->attributeDB[K_REPLY][A__VARIABLE] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_REPLY][A__FAULT_NAME] = new attributeDBData(true, false, 0);
-	//	standard-attributes
-	this->attributeDB[K_REPLY][A__NAME] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_REPLY][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_REPLY][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
-
-	// invoke
-	this->attributeDB[K_REPLY][A__PARTNER_LINK] = new attributeDBData(false, false, 0);
-	this->attributeDB[K_REPLY][A__PORT_TYPE] = new attributeDBData(false, false, 0);
-	this->attributeDB[K_REPLY][A__OPERATION] = new attributeDBData(false, false, 0);
-	this->attributeDB[K_REPLY][A__INPUT_VARIABLE] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_REPLY][A__OUTPUT_VARIABLE] = new attributeDBData(true, false, 0);
-	//	standard-attributes
-	this->attributeDB[K_RECEIVE][A__NAME] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_RECEIVE][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_RECEIVE][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
-	
-	// assign
-	//	standard-attributes
-	this->attributeDB[K_ASSIGN][A__NAME] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_ASSIGN][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_ASSIGN][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
-	
-	// throw
-	this->attributeDB[K_THROW][A__FAULT_NAME] = new attributeDBData(false, false, 0);
-	this->attributeDB[K_THROW][A__FAULT_VARIABLE] = new attributeDBData(true, false, 0);
-	//	standard-attributes
-	this->attributeDB[K_RECEIVE][A__NAME] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_RECEIVE][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_RECEIVE][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
-	
-	// wait
-	this->attributeDB[K_WAIT][A__FOR] = new attributeDBData(false, false, 0);	
-	this->attributeDB[K_WAIT][A__UNTIL] = new attributeDBData(false, false, 0);
-	//	standard-attributesTRACE_DEBUG,
-	this->attributeDB[K_RECEIVE][A__NAME] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_RECEIVE][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_RECEIVE][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
-	
-	// empty
-	//	standard-attributes
-	this->attributeDB[K_EMPTY][A__NAME] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_EMPTY][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_EMPTY][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
-		
-	// terminate
-	//	standard-attributes
-	this->attributeDB[K_TERMINATE][A__NAME] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_TERMINATE][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_TERMINATE][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);
-	
-	// flow
-	//	standard-attributes
-	this->attributeDB[K_RECEIVE][A__NAME] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_RECEIVE][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_RECEIVE][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
-	
-	// switch
-	//	standard-attributes
-	this->attributeDB[K_SWITCH][A__NAME] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_SWITCH][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_SWITCH][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
-	
-	// while
-	this->attributeDB[K_WHILE][A__CONDITION] = new attributeDBData(false, false, 0);
-	//	standard-attributes
-	this->attributeDB[K_WHILE][A__NAME] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_WHILE][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_WHILE][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
-	
-	// sequence
-	//	standard-attributes
-	this->attributeDB[K_SEQUENCE][A__NAME] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_SEQUENCE][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_SEQUENCE][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
-	
-	// pick
-	this->attributeDB[K_PICK][A__CREATE_INSTANCE] = new attributeDBData(true, false, 1);
-	//	standard-attributes
-	this->attributeDB[K_PICK][A__NAME] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_PICK][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_PICK][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
-	
-	// scope
-	this->attributeDB[K_SCOPE][A__VARIABLE_ACCESS_SERIALIZABLE] = new attributeDBData(false, false, 1);	
-	//	standard-attributes
-	this->attributeDB[K_SCOPE][A__NAME] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_SCOPE][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_SCOPE][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
-	
-	// compensate
-	this->attributeDB[K_COMPENSATE][A__SCOPE] = new attributeDBData(true, false, 0);	
-	//	standard-attributes
-	this->attributeDB[K_COMPENSATE][A__NAME] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_COMPENSATE][A__JOIN_CONDITION] = new attributeDBData(true, false, 0);
-	this->attributeDB[K_COMPENSATE][A__SUPPRESS_JOIN_FAILURE] = new attributeDBData(true, false, 1);	
-	
+	yyerror(string("[AttributeManager]: " + errorMsg + "\n").c_str());
 }
 
-/*!
- * 
- */
-bool attributeManager::isValidElement(unsigned int elementId, unsigned int activityId) {
-	/// iterator for the embedded map
-	std::map<std::string, std::string>::iterator scannerResultDataIterator;
-	scannerResultDataIterator = this->scannerResult[elementId].begin();
-	
-	/// iteration loop about all xml-element attributes
-	while(scannerResultDataIterator != this->scannerResult[elementId].end())
-	{
-		/// to tag all found accurate attributes
-		if(isAttribute(activityId, (*scannerResultDataIterator).first))
-		{
-			trace(TRACE_VERY_DEBUG,(*scannerResultDataIterator).first + "\n");
-			(this->attributeDB[activityId][(*scannerResultDataIterator).first])->setTag(true);
-		}
-		else
-		{
-			/* ignore
-			 * 	- wrong spelling
-			 *  - unknown attributes
-			 *  */	
-		}	
-		++scannerResultDataIterator;
-	}
-	
-	///	
-	if(!isAccurateCombinationOfAttributes(activityId))
-	{
-		return false;
-	}
-	
-	///
-	if(!checkAttributeContent(activityId))
-	{
-		//return false;
-	}
-		
-	return true;
-}
-
-
-/*!
- * 
- */
-bool attributeManager::isAttribute(unsigned int activityId, std::string elementAttributeName)
-{	
-	/// iterator for the embedded map
-	std::map<std::string, attributeDBData*>::iterator attributeDBDataIterator;
-	attributeDBDataIterator = this->attributeDB[activityId].begin();
-	
-	while(attributeDBDataIterator != attributeDB[activityId].end())
-	{	
-		if(elementAttributeName.compare((*attributeDBDataIterator).first) == 0)
-		{
-			return true;
-		}
-		++attributeDBDataIterator;
-	}	
-	return false;
-}
-
-/*!
- * 
- */
-bool attributeManager::isAccurateCombinationOfAttributes(unsigned int activityId)
-{
-	/// iterator for the embedded map
-	std::map<std::string, attributeDBData*>::iterator attributeDBDataIterator;
-	attributeDBDataIterator = this->attributeDB[activityId].begin();
-
-	while(attributeDBDataIterator != attributeDB[activityId].end())
-	{	
-		/// check of mandatory attribute
-		if((!isOptional(activityId, (*attributeDBDataIterator).first) &&
-			  !isTagged(activityId, (*attributeDBDataIterator).first)));
-		{
-			/* doesn't scanned mandatory attribute was found */
-			trace(TRACE_DEBUG,"HALLO" + (*attributeDBDataIterator).first + "\n");
-			return false;	
-		}
-		
-		/*blabla="naja"
-		 * more checks are necessary
-		 *	-  
-		 *
-		 */
-		
-		++attributeDBDataIterator;
-	}
-	
-	return true;	
-}
-
-/*!
- * 
- */
-bool attributeManager::isOptional(unsigned int activityId, std::string attributeName)
-{	
-	return (this->attributeDB[activityId][attributeName])->getOptional();
-}
-
-/*!
- * 
- */
-bool attributeManager::isTagged(unsigned int activityId, std::string attributeName)
-{	
-	return (this->attributeDB[activityId][attributeName])->getTag();
-}
-
-/*!
- * 
- */
-bool attributeManager::checkAttributeContent(unsigned int activityId)
-{
-	return true;
-}
-
-/*!
- * 
- * \param elementId	
- * \param type
- */
 void attributeManager::check(kc::integer elementId, unsigned int activityId)
-{	
-//	trace("AttrM-ID: " + intToString(elementId->value) + "\n");
-//	trace("Type: " + intToString(activityId) + "\n");
-
-	if(!isValidElement(elementId->value, activityId))
-	{
-		//yyerror(string("+----------------------------------------- \n attributeManager: attribute error \n+----------------------------------------- \n ").c_str());
-	}
-}
-
-
-/********************************************
- * implementation of attributeDBData CLASS
- ********************************************/
-
-/*!
- * 
- */
-void attributeDBData::setOptional(bool val)
 {
-	this->optional = val;
-}
-
-/*!
- * 
- */
-void attributeDBData::setTag(bool val)
-{
-	this->tag = val;
-}
-
-/*!
- * 
- */
-void attributeDBData::setContentType(unsigned int val)
-{
-	this->contentType = val;
-}
-
-/*!
- * 
- */
-bool attributeDBData::getOptional()
-{
-	return this->optional;	
-}
-
-/*!
- * 
- */
-bool attributeDBData::getTag(){
-	return this->tag;	
-}
-
-/*!
- * 
- */
-unsigned int attributeDBData::getContentType(){
-	return this->contentType;	
-}
-
-
-/*
-
+	// "cast" Kimwitu++ to C++
+  	unsigned int elementIdInt = elementId->value; 
+	/// iterator for the embedded map
+    std::map<std::string, string>::iterator scannerResultDataIterator;
+	
 	switch(activityId) {
 		case K_PROCESS:
 			{
-				trace("PROCESS!!! \n");
-				if(!isValidElement(elementId->value, activityId))
+				trace(TRACE_DEBUG,"PROCESS!!! \n");
+				
+				bool nameFlag, targetNamespaceFlag;
+				nameFlag = targetNamespaceFlag = true;
+				 
+				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
+				
+				///
+				while(scannerResultDataIterator != scannerResult[elementIdInt].end())
+				{	
+					if(((*scannerResultDataIterator).first) == A__NAME)
+					{
+						nameFlag = false;
+						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
+					}
+					else if(((*scannerResultDataIterator).first) == A__TARGET_NAMESPACE)
+					{
+						targetNamespaceFlag = false;
+						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
+					}
+					++scannerResultDataIterator;
+				}
+				
+				if(nameFlag)
 				{
-				}				
+					printCheckErrorMsg("attribute " + A__NAME + "=\"" + T__NCNAME + "\" is missing");					
+				}
+				else if(targetNamespaceFlag)
+				{
+					printCheckErrorMsg("attribute " + A__TARGET_NAMESPACE + "=\"" + T__ANYURI + "\" is missing");					
+				}
+				
 			}
 			break;		
 
 		case K_RECEIVE:
 			{
-				trace("RECEIVE!!! \n");
-				if(!isValidElement(elementId->value, activityId))
+				trace(TRACE_DEBUG,"RECEIVE!!! \n");			
+
+				bool partnerLinkFlag, portTypeFlag, operationFlag;
+				partnerLinkFlag = portTypeFlag = operationFlag = true;
+				 
+				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
+				
+				///
+				while(scannerResultDataIterator != scannerResult[elementIdInt].end())
+				{	
+					if(((*scannerResultDataIterator).first) == A__PARTNER_LINK)
+					{
+						partnerLinkFlag = false;
+						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
+					}
+					else if(((*scannerResultDataIterator).first) == A__PORT_TYPE)
+					{
+						portTypeFlag = false;
+						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
+					}
+					else if(((*scannerResultDataIterator).first) == A__OPERATION)
+					{
+						operationFlag = false;
+						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
+					}					
+					++scannerResultDataIterator;
+				}
+				
+				if(partnerLinkFlag)
 				{
-					yyerror("FEHLER");
+					printCheckErrorMsg("attribute " + A__PARTNER_LINK + "=\"" + T__NCNAME + "\" is missing");					
+				}
+				else if(portTypeFlag)
+				{
+					printCheckErrorMsg("attribute " + A__PORT_TYPE + "=\"" + T__QNAME + "\" is missing");					
+				}
+				else if(operationFlag)
+				{
+					printCheckErrorMsg("attribute " + A__OPERATION + "=\"" + T__NCNAME + "\" is missing");					
 				}
 			}
 			break;		
 
 		case K_REPLY:
 			{
-				trace("REPLY!!!");
-				if(!isValidElement(elementId->value, activityId))
+				trace(TRACE_DEBUG,"REPLY!!! \n");
+
+				bool partnerLinkFlag, portTypeFlag, operationFlag;
+				partnerLinkFlag = portTypeFlag = operationFlag = true;
+				 
+				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
+				
+				///
+				while(scannerResultDataIterator != scannerResult[elementIdInt].end())
+				{	
+					if(((*scannerResultDataIterator).first) == A__PARTNER_LINK)
+					{
+						partnerLinkFlag = false;
+						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
+					}
+					else if(((*scannerResultDataIterator).first) == A__PORT_TYPE)
+					{
+						portTypeFlag = false;
+						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
+					}
+					else if(((*scannerResultDataIterator).first) == A__OPERATION)
+					{
+						operationFlag = false;
+						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
+					}					
+					++scannerResultDataIterator;
+				}
+				
+				if(partnerLinkFlag)
 				{
+					printCheckErrorMsg("attribute " + A__PARTNER_LINK + "=\"" + T__NCNAME + "\" is missing");					
+				}
+				else if(portTypeFlag)
+				{
+					printCheckErrorMsg("attribute " + A__PORT_TYPE + "=\"" + T__QNAME + "\" is missing");					
+				}
+				else if(operationFlag)
+				{
+					printCheckErrorMsg("attribute " + A__OPERATION + "=\"" + T__NCNAME + "\" is missing");					
 				}				
 			}
 			break;		
 
 		case K_INVOKE:
 			{
-				trace("INVOKE!!!");
-				if(!isValidElement(elementId->value, activityId))
+				trace(TRACE_DEBUG,"INVOKE!!! \n");
+
+				bool partnerLinkFlag, portTypeFlag, operationFlag;
+				partnerLinkFlag = portTypeFlag = operationFlag = true;
+				 
+				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
+				
+				///
+				while(scannerResultDataIterator != scannerResult[elementIdInt].end())
+				{	
+					if(((*scannerResultDataIterator).first) == A__PARTNER_LINK)
+					{
+						partnerLinkFlag = false;
+						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
+					}
+					else if(((*scannerResultDataIterator).first) == A__PORT_TYPE)
+					{
+						portTypeFlag = false;
+						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
+					}
+					else if(((*scannerResultDataIterator).first) == A__OPERATION)
+					{
+						operationFlag = false;
+						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
+					}					
+					++scannerResultDataIterator;
+				}
+				
+				if(partnerLinkFlag)
 				{
-				}				
+					printCheckErrorMsg("attribute " + A__PARTNER_LINK + "=\"" + T__NCNAME + "\" is missing");					
+				}
+				else if(portTypeFlag)
+				{
+					printCheckErrorMsg("attribute " + A__PORT_TYPE + "=\"" + T__QNAME + "\" is missing");					
+				}
+				else if(operationFlag)
+				{
+					printCheckErrorMsg("attribute " + A__OPERATION + "=\"" + T__NCNAME + "\" is missing");					
+				}								
 			}
 			break;		
 
 		case K_ASSIGN:
 			{
-				trace("ASSIGN!!!");
+				trace(TRACE_DEBUG,"ASSIGN!!! \n");
+
+				/* no mandatory attributes */				
+
 			}
 			break;		
 
 		case K_THROW:
 			{
-				trace("THROW!!!");
+				trace(TRACE_DEBUG,"THROW!!! \n");
+
+				bool faultNameFlag;
+				faultNameFlag = true;
+				 
+				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
+				
+				///
+				while(scannerResultDataIterator != scannerResult[elementIdInt].end())
+				{	
+					if(((*scannerResultDataIterator).first) == A__FAULT_NAME)
+					{
+						faultNameFlag = false;
+						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
+					}
+					++scannerResultDataIterator;
+				}
+				
+				if(faultNameFlag)
+				{
+					printCheckErrorMsg("attribute " + A__FAULT_NAME + "=\"" + T__QNAME + "\" is missing");					
+				}
+
 			}
 			break;		
 
 		case K_WAIT:
 			{
-				trace("WAIT!!!");
+				trace(TRACE_DEBUG,"WAIT!!! \n");
+				
+				bool forFlag, untilFlag;
+				forFlag = untilFlag = true;
+				 
+				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
+				
+				///
+				while(scannerResultDataIterator != scannerResult[elementIdInt].end())
+				{	
+					if(((*scannerResultDataIterator).first) == A__FOR)
+					{
+						forFlag = false;
+						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
+					}
+					else if(((*scannerResultDataIterator).first) == A__UNTIL)
+					{
+						untilFlag = false;
+						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
+					}
+					++scannerResultDataIterator;
+				}
+
+				/// XOR
+				if((forFlag && !untilFlag) || (!forFlag && untilFlag))
+				{				
+					if(forFlag)
+					{
+						printCheckErrorMsg("attribute " + A__FOR + "=\"" + T__DURATION_EXPR + "\" is missing");					
+					}
+					else if(untilFlag)
+					{
+						printCheckErrorMsg("attribute " + A__UNTIL + "=\"" + T__DEADLINE_EXPR + "\" is missing");					
+					}
+				}				
 			}
 			break;		
 
 		case K_EMPTY:
 			{
-				trace("EMPTY!!!");
+				trace(TRACE_DEBUG,"EMPTY!!! \n");
+				
+				/* no mandatory attributes */
+				
 			}
 			break;		
 
 		case K_TERMINATE:
 			{
-				trace("TERMINATE!!!");
+				trace(TRACE_DEBUG,"TERMINATE!!! \n");
+				
+				/* no mandatory attributes */
+				
 			}
 			break;		
+		case K_SCOPE:
+			{
+				trace(TRACE_DEBUG,"SCOPE!!! \n");
+				
+				/* default attribute */
+				
+			}
+			break;
+		case K_COMPENSATE:
+			{
+				trace(TRACE_DEBUG,"COMPENSATE!!! \n");
 
+				/* no mandatory attributes */				
+				
+			}
+			break;				
+		case K_PICK:
+			{
+				trace(TRACE_DEBUG,"PICK!!! \n");
+				
+				/* default attribute */
+			}
+			break;				
+		case K_SEQUENCE:
+			{
+				trace(TRACE_DEBUG,"SEQUENCE!!! \n");
+
+				/* no mandatory attributes */				
+				
+			}
+			break;				
+		case K_SWITCH:
+			{
+				trace(TRACE_DEBUG,"SWITCH!!! \n");
+
+				/* no mandatory attributes */				
+
+			}
+			break;				
+		case K_WHILE:
+			{
+				trace(TRACE_DEBUG,"WHILE!!! \n");
+
+				bool conditionFlag;
+				conditionFlag = true;
+				 
+				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
+				
+				///
+				while(scannerResultDataIterator != scannerResult[elementIdInt].end())
+				{	
+					if(((*scannerResultDataIterator).first) == A__CONDITION)
+					{
+						conditionFlag = false;
+						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
+					}
+					++scannerResultDataIterator;
+				}
+				
+				if(conditionFlag)
+				{
+					printCheckErrorMsg("attribute " + A__CONDITION + "=\"" + T__BOOLEAN_EXPR + "\" is missing");					
+				}
+	
+				
+			}
+			break;				
 	}
 
-
-
-*/
+}

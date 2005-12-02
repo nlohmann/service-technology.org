@@ -9,58 +9,23 @@
 #include <map>
 
 /// names of attributes
-const std::string A__ABSTRACT_PROCESS = "abstractProcess";
 const std::string A__CONDITION = "condition";
-const std::string A__CREATE_INSTANCE = "createInstance";
-const std::string A__ENABLE_INSTANCE_COMPENSATION = "enableInstanceCompensation";
-const std::string A__EXPRESSION_LANGUAGE = "expressionLanguage";
 const std::string A__FAULT_NAME = "faultName";
-const std::string A__FAULT_VARIABLE = "faultVariable";
 const std::string A__FOR = "for";
-const std::string A__INPUT_VARIABLE = "inputVariable";
-const std::string A__JOIN_CONDITION = "joinCondition"; // standard-attribute
-const std::string A__NAME = "name"; // standard-attribute
+const std::string A__NAME = "name";
 const std::string A__PARTNER_LINK = "partnerLink";
 const std::string A__PORT_TYPE = "portType";
 const std::string A__OPERATION = "operation";
-const std::string A__OUTPUT_VARIABLE = "outputVariable";
-const std::string A__QUERY_LANGUAGE = "queryLanguage";
-const std::string A__SCOPE = "scope";
-const std::string A__SUPPRESS_JOIN_FAILURE = "suppressJoinFailure"; // standard-attribute
 const std::string A__TARGET_NAMESPACE = "targetNamespace";
 const std::string A__UNTIL = "until";
-const std::string A__VARIABLE = "variable";
-const std::string A__VARIABLE_ACCESS_SERIALIZABLE = "variableAccessSerializable";
-const std::string A__XMLNS = "xmlns";
 
-class attributeDBData
-{
-	private:
-		///	is a attribute optional or not
-		bool optional;
-		
-		/// to tag found attributes
-		bool tag;
-		
-		///
-		unsigned int contentType;
-		
-	public:
-		/// constructor		
-		attributeDBData(bool opt, bool tag, unsigned int ctype)
-		{setOptional(opt); setTag(tag); setContentType(ctype);}
-		
-		///
-		void setOptional(bool val);
-		void setTag(bool val);
-		void setContentType(unsigned int val);
-		
-		///
-		bool getOptional();
-		bool getTag();
-		unsigned int getContentType();
-		
-};
+/// types of attributes
+const std::string T__NCNAME = "NCName";
+const std::string T__QNAME = "QName";
+const std::string T__ANYURI = "anyURI";
+const std::string T__DURATION_EXPR = "bpws:tDuration-expr";
+const std::string T__DEADLINE_EXPR = "bpws:tDeadline-expr";
+const std::string T__BOOLEAN_EXPR = "bpws:tBoolean-expr";
 
 class attributeManager
 {
@@ -68,30 +33,9 @@ class attributeManager
     /// an array to store attributes of XML-elements
     std::map<unsigned int, std::map<std::string, std::string> > scannerResult;
 	
-	/// an array to store [activity-id]->[atributename]-> ...
-    std::map<unsigned int, std::map<std::string, attributeDBData*> > attributeDB;
-    
-    /// to initialize the attributeDB
-    void initAttributeDB();
-	
-	/// is valid XML-Element with attributes or not
-	bool isValidElement(unsigned int elementId, unsigned int activityId);
-
-    /// is attribute of activity or not
-    bool isAttribute(unsigned int activityId, std::string elementAttributeName);
-	
-	/// check the combination of scanned attributes
-	bool isAccurateCombinationOfAttributes(unsigned int activityId);
-
-    /// attributes of activities are optional or not
-    bool isOptional(unsigned int activityId, std::string attributeName);
-
-    /// attributes of activities are optional or not
-    bool isTagged(unsigned int activityId, std::string attributeName);
-
-    /// 
-    bool checkAttributeContent(unsigned int activityId);
-
+	/// 
+	void printCheckErrorMsg(std::string errorMsg);
+  
   public:
     /// constructor
     attributeManager();
@@ -109,8 +53,10 @@ class attributeManager
     void define(kc::casestring attributeName, kc::casestring attributeValue);
 
     /// dummy for future check-function
-    void check(kc::integer elementId, unsigned int activityId);
+    void check(kc::integer elementId, unsigned int type);
 };
+
+
 
 
 /*

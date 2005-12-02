@@ -14,11 +14,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/01 14:04:59 $
+ *          - last changed: \$Date: 2005/12/02 11:21:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -103,6 +103,10 @@ extern int yylex();
 extern int yyerror(const char *);
 
 
+using namespace kc;
+using namespace std;
+
+
 // manage attributes
 #include "bpel-attributes.h"
 
@@ -121,8 +125,10 @@ bool inPartners = false;
 /// needed to distinguish context of the Fault Handler
 bool inProcess = true;
 
-// to simplify phylum-calls
-using namespace kc;
+/// needed to tag handlers
+integer currentScopeId;
+
+
 
 
 /// the root of the abstract syntax tree
@@ -260,7 +266,8 @@ tProcess TheProcess;
 
 tProcess:
   X_OPEN K_PROCESS arbitraryAttributes X_NEXT
-    { symMan.initialiseProcessScope($3);} 
+    { symMan.initialiseProcessScope($3);
+      currentScopeId = $3; } 
   imports
   tPartnerLinks_opt
   tPartners_opt
@@ -517,10 +524,12 @@ tPartner:
 tFaultHandlers_opt:
   /* empty */
     { $$ = NiltFaultHandlers_opt();
-      $$->inProcess = inProcess; }
+      $$->inProcess = inProcess;
+      $$->parentScopeId = currentScopeId; }
 | tFaultHandlers X_NEXT
     { $$ = ConstFaultHandlers_opt($1, NiltFaultHandlers_opt());
-      $$->inProcess = inProcess; }
+      $$->inProcess = inProcess;
+      $$->parentScopeId = currentScopeId; }
 ;
 
 tFaultHandlers:
@@ -589,9 +598,11 @@ tCatchAll:
 
 tCompensationHandler_opt:
   /* empty */
-    { $$ = NiltCompensationHandler_opt(); }
+    { $$ = NiltCompensationHandler_opt();
+      $$->parentScopeId = currentScopeId; }
 | tCompensationHandler X_NEXT
-    { $$ = ConstCompensationHandler_opt($1, NiltCompensationHandler_opt()); }
+    { $$ = ConstCompensationHandler_opt($1, NiltCompensationHandler_opt());
+      $$->parentScopeId = currentScopeId; }
 ;
 
 tCompensationHandler:
@@ -634,9 +645,11 @@ tCompensationHandler:
 
 tEventHandlers_opt:
   /* empty */
-    { $$ = NiltEventHandlers_opt(); }
+    { $$ = NiltEventHandlers_opt();
+      $$->parentScopeId = currentScopeId; }
 | tEventHandlers X_NEXT
-    { $$ = ConstEventHandlers_opt($1, NiltEventHandlers_opt()); }
+    { $$ = ConstEventHandlers_opt($1, NiltEventHandlers_opt());
+      $$->parentScopeId = currentScopeId; }
 ;
 
 tEventHandlers:
@@ -1647,6 +1660,7 @@ tScope:
   K_SCOPE arbitraryAttributes X_NEXT
   {
     symMan.newScopeScope($2);
+    currentScopeId = $2;
   }
   standardElements
   tVariables_opt

@@ -9,11 +9,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $ 
+ *          - last changes of: \$Author: nlohmann $ 
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2005/11/30 16:57:23 $
+ *          - last changed: \$Date: 2005/12/02 11:21:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.19 $
+ * \version \$Revision: 1.20 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-17 (nlohmann) Added default attributes.
  * 
@@ -161,6 +161,7 @@ tFaultHandlers_opt:
   list tFaultHandlers
   {
     bool inProcess;
+    integer parentScopeId;
   }  
 ;
 
@@ -221,6 +222,9 @@ tCatchAll:
 
 tEventHandlers_opt:
   list tEventHandlers
+  {
+    integer parentScopeId;
+  }
 ;
 
 %{
@@ -283,6 +287,9 @@ tOnAlarm:
 
 tCompensationHandler_opt:
   list tCompensationHandler
+  {
+    integer parentScopeId;
+  }
 ;
 
 %{

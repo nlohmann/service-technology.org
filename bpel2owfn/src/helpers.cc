@@ -12,14 +12,14 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2005/11/29 14:01:44 $
+ *          - last changed: \$Date: 2005/12/02 15:05:01 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
  *          - 2005-11-11 (nlohmann) Initial version.
  *          - 2005-11-15 (gierds) Moved commandline evaluation functions from
  *            main.cc to here.
@@ -81,8 +81,8 @@ void print_help()
   trace("---------\n");
   trace("Options: \n");
   trace("   -f  | --file <filename>    - read input from <filename>,\n");
-  trace("                                if this parameter is omitted, input is read from\n");
-  trace("                                STDIN\n");
+  trace("                                if this parameter is omitted, input is read\n");
+  trace("                                from <STDIN>\n");
   trace("   -d  | -dd | -ddd | -dddd | - set debug level\n");
   trace("         --debug [1..4]         ... some more information soon\n");
   trace("   -df | --debug-flex         - enable flex' debug mode\n");
@@ -447,7 +447,7 @@ void parse_command_line(int argc, char* argv[])
  */
 void error()
 {
-  trace("\nAn error has occured!\n\n");
+  trace("\nAn error has occured while parsing \"" + filename + "\"!\n\n");
   // call #cleanup()
   cleanup();
   trace(TRACE_WARNINGS, "-> Any output file might be in an undefinded state.\n");
@@ -464,6 +464,7 @@ void error()
  */
 void error(Exception e)
 {
+  trace("\nAn error has occured while parsing \"" + filename + "\"!\n\n");
   // output information about the exception
   e.info();
   // call #cleanup()

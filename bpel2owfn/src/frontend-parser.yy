@@ -18,7 +18,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/02 11:21:59 $
+ *          - last changed: \$Date: 2005/12/03 12:52:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.35 $
+ * \version \$Revision: 1.36 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -265,9 +265,11 @@ tProcess TheProcess;
 */
 
 tProcess:
-  X_OPEN K_PROCESS arbitraryAttributes X_NEXT
-    { symMan.initialiseProcessScope($3);
-      currentScopeId = $3; } 
+  X_OPEN K_PROCESS arbitraryAttributes
+    { att.check($3, K_PROCESS);
+      symMan.initialiseProcessScope($3);
+      currentScopeId = $3; }
+  X_NEXT
   imports
   tPartnerLinks_opt
   tPartners_opt
@@ -279,8 +281,7 @@ tProcess:
     { inProcess = false; }
   activity
   X_NEXT X_SLASH K_PROCESS X_CLOSE
-    { att.check($3, K_PROCESS);
-      TheProcess = $$ = Process($7, $8, $9, $10, $11, $12, $13, StopInProcess(), $15);
+    { TheProcess = $$ = Process($7, $8, $9, $10, $11, $12, $13, StopInProcess(), $15);
       symMan.quitScope();
       $$->name = att.read($3, "name");
       $$->targetNamespace = att.read($3, "targetNamespace");

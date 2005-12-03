@@ -25,11 +25,11 @@
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  * 
  * \todo
- *          - there are certainly more implicit transformations neccessary
- *          - add copy-rules for <invoke>-cases
+ *          - Implement all rewrite-rules in the parser.
  *
  * \bug
- *          - XML-output works, but Petri net output crashes
+ *          - XML-output works, but Petri net output crashes.
+ *          - Rewriting of recursive phyla does not work at all.
  * 
  */
 %}

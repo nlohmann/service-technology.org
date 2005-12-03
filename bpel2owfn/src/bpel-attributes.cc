@@ -6,20 +6,25 @@
  * This file implements the classes and functions defined in bpel-attributes.h.
  * 
  * \author  
- *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $
+ *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/02 16:07:57 $
+ *          - last changed: \$Date: 2005/12/03 15:45:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universitï¿½ zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  *
+ * \todo
+ *       - (reinert) Comment this file and its classes.
+ *       - (reinert) Attributes for <wait> are not checked properly.
+ *       - (reinert) Variables for <onAlarm> are not checked.
+ *       - (reibert) Check data types (e.g. is a value "yes" or "no").
  */
 
 #include "bpel-attributes.h"

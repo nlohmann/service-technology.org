@@ -1,3 +1,11 @@
+/*!
+ * \file bpel-attributes.h
+ *
+ * \todo
+ *       - (reinert) Comment this file and its classes.
+ */
+
+
 #ifndef BPEL_ATTRIBUTES_H
 #define BPEL_ATTRIBUTES_H
 

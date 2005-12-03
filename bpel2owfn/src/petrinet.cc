@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/12/02 11:58:36 $
+ *          - last changed: \$Date: 2005/12/03 15:45:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.54 $
+ * \version \$Revision: 1.55 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -65,8 +65,8 @@ extern bool mode_simplify_petri_net; // defined in main.c
 
 /*!
  * \todo
- *       - comment me!
- *       - put me into helpers.cc
+ *       - (nlohmann) comment me!
+ *       - (nlohmann) put me into helpers.cc
  */
 set<pair<Node *, arc_type> > setUnion(set<pair<Node *, arc_type> > a, set<pair<Node *, arc_type> > b)
 {
@@ -389,7 +389,7 @@ Arc *PetriNet::newArc(Node *source, Node *target, arc_type type)
  * \return pointer of the created arc
  *
  * \todo
- *       - add test to check whether one of the pointers is NULL
+ *       - (nlohmann) add test to check whether one of the pointers is NULL
  */
 Arc *PetriNet::newArc(Node *source, Node *target, arc_type type, string inscription)
 {
@@ -572,8 +572,8 @@ void PetriNet::printInformation()
  * neccessary. It also distinguishes the three arc types of #arc_type.
  *
  * \todo
- *       - treatment of input and output places
- *       - escape labels
+ *       - (nlohmann) treatment of input and output places
+ *       - (nlohmann) escape labels
  */
 void PetriNet::drawDot()
 {
@@ -881,7 +881,7 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
  * \param p2 second place
  *
  * \todo
- *       - Take care of arc inscriptions.
+ *       - (nlohmann) Take care of arc inscriptions.
  */
 void PetriNet::mergePlaces(Place *p1, Place *p2)
 {  
@@ -1062,8 +1062,8 @@ Place *PetriNet::findPlace(kc::impl_activity* activity, string role)
  *   removed (sequence) and the preset and postset can be merged.
  *
  * \todo
- *       - improve performance
- *       - implement more reduction rules
+ *       - (nlohmann) improve performance
+ *       - (nlohmann) implement more reduction rules
  *
  * \bug
  *      - repeated excecution fails
@@ -1142,7 +1142,7 @@ void PetriNet::simplify()
  * specific.
  * 
  * \todo
- *       - take care of interface places (#IN, #OUT)
+ *       - (nlohmann) take care of interface places (#IN, #OUT)
  */
 void PetriNet::makeLowLevel()
 {

@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/03 12:52:29 $
+ *          - last changed: \$Date: 2005/12/03 15:43:42 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.40 $
+ * \version \$Revision: 1.41 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -46,16 +46,17 @@
  *            mergePlaces-function to assure correct labels.
  *          - 2005-11-30 (nlohmann) Added two phyla for stop patterns. Added
  *            <scope> with its stop pattern. Added support for faultHandlers
- *            in scope/1.
+ *            in scope.
+ *          - 2005-12-03 (nlohmann) Cleaned code. Fixed several bugs inside the
+ *            event handler.
  * 
  * \todo
- *          - find a simple "merge-language" to ease the definition of new
- *            patterns
- *          - complete initial pattern database
- *          - The assign-element has more attributes that have to be added to
- *            the abstract grammar as well as to the syntax file.
- *          - handle multiple/nested scopes
- *          - outsource <compensate />-elements
+ *          - (nlohmann) find a simple "merge-language" to ease the definition
+ *            of new patterns
+ *          - (nlohmann) complete initial pattern database
+ *          - (nlohmann) The assign-element has more attributes that have to
+ *            be added to the abstract grammar as well as to the syntax file.
+ *          - (nlohmann) outsource <compensate />-elements
  *
  * \bug
  *          - the child of a process should always be a scope, not a flow!
@@ -73,13 +74,6 @@
  */
 %}
 
-
-%{
-/*!
- * \class kc::petrinet_class
- * \brief Unparse rules: Petri net
- */
-%}
 
 %uview petrinet;
 
@@ -104,22 +98,6 @@ extern SymbolManager symMan;
 string currentScope;
 
 %}
-
-
-
-
-
-/******************************************************************************/
-
-// All the includes, variables and structs defined here can be used in the
-// printers below.
-%{
-#include <iostream>
-%}
-
-/******************************************************************************/
-
-
 
 
 
@@ -262,7 +240,8 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       TheNet->mergePlaces("1.p25", "1.eventHandler.final");
       TheNet->mergePlaces("1.p26", "1.eventHandler.stop");
       TheNet->mergePlaces("1.p27", "1.eventHandler.stopped");
-
+      TheNet->mergePlaces("1.p5" , "1.eventHandler.failed"); //new
+   
       // embed the stop-pattern
       TheNet->mergePlaces("1.Faulted",     "1.stop.Faulted");
       TheNet->mergePlaces("1.p5",          "1.stop.fault_in");
@@ -1065,7 +1044,7 @@ This=NiltFaultHandlers_opt() provided (!This->inProcess) ->
 This=ConstEventHandlers_opt(EventHandlers(a,b), NiltEventHandlers_opt()) ->
   [petrinet:
     {
-      string prefix = intToString(This->parentScopeId->value) + ".eventHandler.";    
+      string prefix = intToString(This->parentScopeId->value) + ".eventHandler.";
       Place *p6  = TheNet->newPlace(prefix + "initial");
       Place *p8  = TheNet->newPlace(prefix + "final");
       Place *p13 = TheNet->newPlace(prefix + "finish");
@@ -1073,6 +1052,7 @@ This=ConstEventHandlers_opt(EventHandlers(a,b), NiltEventHandlers_opt()) ->
       Place *p18 = TheNet->newPlace(prefix + "finishing");
       Place *p22 = TheNet->newPlace(prefix + "stop");
       Place *p23 = TheNet->newPlace(prefix + "stopped");
+      Place *p28 = TheNet->newPlace(prefix + "failed");
       Transition *t5  = TheNet->newTransition(prefix + "t5");
       Transition *t7  = TheNet->newTransition(prefix + "allFinished");
       Transition *t11 = TheNet->newTransition(prefix + "t11");
@@ -1131,12 +1111,13 @@ This=ConstEventHandlers_opt(EventHandlers(a,b), NiltEventHandlers_opt()) ->
 	Transition *onMessage_t12 = TheNet->newTransition(newprefix + "t12");
 	TheNet->newArc(onMessage_p2, onMessage_t1, "(M" + intToString(onMessageCount) + ",CS" + intToString(onMessageCount) + ")" );
 	TheNet->newArc(onMessage_t1, onMessage_p1);
+	TheNet->newArc(onMessage_t1, TheNet->findPlace(intToString(This->parentScopeId->value) + ".eventHandler.failed"), "fault" + intToString(onMessageCount));
 	TheNet->newArc(onMessage_t2, onMessage_p2, "(M" + intToString(onMessageCount) + ",CS" + intToString(onMessageCount) + ")" );
 	TheNet->newArc(onMessage_p5, onMessage_t2);
 	TheNet->newArc(onMessage_p2, onMessage_t3, "(M" + intToString(onMessageCount) + ",CS" + intToString(onMessageCount) + ")" );
 	TheNet->newArc(onMessage_t3, onMessage_p3);
+	TheNet->newArc(onMessage_p4, onMessage_t4);
 	TheNet->newArc(onMessage_t4, onMessage_p5);
-	TheNet->newArc(onMessage_p6, onMessage_t4);
 	TheNet->newArc(onMessage_p5, onMessage_t5);
 	TheNet->newArc(onMessage_t5, onMessage_p6);
 	TheNet->newArc(onMessage_p7, onMessage_t5);
@@ -1171,6 +1152,7 @@ This=ConstEventHandlers_opt(EventHandlers(a,b), NiltEventHandlers_opt()) ->
 	TheNet->mergePlaces(onMessage_p11, TheNet->findPlace(innerActivity, ".stop"));
 	TheNet->mergePlaces(onMessage_p12, TheNet->findPlace(innerActivity, ".stopped"));
 	TheNet->mergePlaces(onMessage_p4,  TheNet->findPlace(innerActivity, ".final"));
+	TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId->value) + ".eventHandler.failed"),  TheNet->findPlace(innerActivity, ".failed")); //new	
 	
 	onMessageCount++;
       }
@@ -2601,6 +2583,7 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->mergePlaces(prefix + "p27", prefix + "eventHandler.final");
       TheNet->mergePlaces(prefix + "p28", prefix + "eventHandler.stop");
       TheNet->mergePlaces(prefix + "p29", prefix + "eventHandler.stopped");
+      TheNet->mergePlaces(prefix + "p6",  prefix + "eventHandler.failed"); //new      
       
       // embed the stop pattern
       TheNet->mergePlaces(prefix + "p36",            prefix + "stop.ft_in");

@@ -13,7 +13,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2005/12/04 14:16:06 $
+ *          - last changed: \$Date: 2005/12/04 15:40:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-17 (nlohmann) Added default attributes.
  *          - 2005-12-04 (nlohmann) Changed representation of handlers.
@@ -143,7 +143,7 @@ tPartner:
 ******************************************************************************/
 
 tFaultHandlers:
-  userDefinedFaultHandler(tCatch_list tCatchAll_list)
+  userDefinedFaultHandler(tCatch_list tCatchAll)
 | implicitFaultHandler()	
   {
     bool inProcess;
@@ -153,10 +153,6 @@ tFaultHandlers:
 
 tCatch_list:
   list tCatch
-;
-
-tCatchAll_list:
-  list tCatchAll
 ;
 
 tCatch:
@@ -170,6 +166,7 @@ tCatch:
 
 tCatchAll:
   CatchAll(activity)
+| NoCatchAll()
   {
     casestring faultName;
     casestring faultVariable;

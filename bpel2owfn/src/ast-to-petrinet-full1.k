@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/04 14:16:06 $
+ *          - last changed: \$Date: 2005/12/04 15:40:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.46 $
+ * \version \$Revision: 1.47 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -49,6 +49,8 @@
  *            in scope.
  *          - 2005-12-03 (nlohmann) Cleaned code. Fixed several bugs inside the
  *            event handler.
+ *          - 2005-12-04 (nlohmann) Re-organized fault handler's catchAll
+ *            branch.
  * 
  * \todo
  *          - (nlohmann) complete initial pattern database
@@ -616,25 +618,31 @@ This=userDefinedFaultHandler(a,b) provided (This->inProcess) ->
 	TheNet->newArc(p7, t2, "x");
       }
 
-      foreach (CatchAll(innerActivity); tCatchAll_list b)
-      {
-	Transition *t3 = TheNet->newTransition(prefix + "t3.catchAll", "catchAll");
-	Transition *t4 = TheNet->newTransition(prefix + "t4.catchAll");
-
-	// embed innerActivity_n
-	TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
-	TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t4);
-	TheNet->mergePlaces(TheNet->findPlace("1.faulthandler.p11"), TheNet->findPlace(innerActivity, ".stop"));
-	TheNet->mergePlaces(TheNet->findPlace("1.faulthandler.p12"), TheNet->findPlace(innerActivity, ".stopped"));
-
-	TheNet->newArc(p4, t3);
-	TheNet->newArc(p7, t3, READ, "x");
-	TheNet->newArc(t4, p3);
-	TheNet->newArc(p7, t4, "x");
+      with(b) {
+	CatchAll(innerActivity):
+	{
+	  Transition *t3 = TheNet->newTransition(prefix + "t3.catchAll", "catchAll");
+	  Transition *t4 = TheNet->newTransition(prefix + "t4.catchAll");
+	  
+	  // embed innerActivity_n
+	  TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
+	  TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t4);
+	  TheNet->mergePlaces(TheNet->findPlace("1.faulthandler.p11"), TheNet->findPlace(innerActivity, ".stop"));
+	  TheNet->mergePlaces(TheNet->findPlace("1.faulthandler.p12"), TheNet->findPlace(innerActivity, ".stopped"));
+	  // TODO merge failed-places
+	  
+	  TheNet->newArc(p4, t3);
+	  TheNet->newArc(p7, t3, READ, "x");
+	  TheNet->newArc(t4, p3);
+	  TheNet->newArc(p7, t4, "x");
+	}
       }
     }
   ]
 ;
+
+
+
 
 
 
@@ -892,23 +900,26 @@ This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
 	TheNet->newArc(p9, t2, "x");
       }
 
-      foreach (CatchAll(innerActivity); tCatchAll_list b)
-      {
-	Transition *t3 = TheNet->newTransition(prefix + "t3.catchAll", "catchAll");
-	Transition *t4 = TheNet->newTransition(prefix + "t4.catchAll");
-
-	// embed innerActivity_n
-	TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
-	TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t4);
-	TheNet->mergePlaces(TheNet->findPlace(prefix + "p13"), TheNet->findPlace(innerActivity, ".stop"));
-	TheNet->mergePlaces(TheNet->findPlace(prefix + "p14"), TheNet->findPlace(innerActivity, ".stopped"));
-
-	TheNet->newArc(p4, t3);
-	TheNet->newArc(p9, t9, READ, "x");	
-	TheNet->newArc(t4, p3);
-	TheNet->newArc(t4, p7);
-	TheNet->newArc(t4, p8);
-	TheNet->newArc(p9, t4, "x");
+      with(b) {
+	CatchAll(innerActivity):
+	{
+	  Transition *t3 = TheNet->newTransition(prefix + "t3.catchAll", "catchAll");
+	  Transition *t4 = TheNet->newTransition(prefix + "t4.catchAll");
+	  
+	  // embed innerActivity_n
+	  TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
+	  TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t4);
+	  TheNet->mergePlaces(TheNet->findPlace(prefix + "p13"), TheNet->findPlace(innerActivity, ".stop"));
+	  TheNet->mergePlaces(TheNet->findPlace(prefix + "p14"), TheNet->findPlace(innerActivity, ".stopped"));
+	  // TODO merge failed-places
+	  
+	  TheNet->newArc(p4, t3);
+	  TheNet->newArc(p9, t9, READ, "x");	
+	  TheNet->newArc(t4, p3);
+	  TheNet->newArc(t4, p7);
+	  TheNet->newArc(t4, p8);
+	  TheNet->newArc(p9, t4, "x");
+	}
       }
     }
   ]
@@ -1018,6 +1029,14 @@ This=implicitFaultHandler() provided (!This->inProcess) ->
       TheNet->mergePlaces(prefix + "ft", prefix + "fault");
     }
   ]
+;
+
+
+
+
+
+CatchAll(innerActivity) ->
+  [petrinet: innerActivity]
 ;
 
 

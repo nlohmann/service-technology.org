@@ -18,7 +18,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/04 14:16:06 $
+ *          - last changed: \$Date: 2005/12/04 15:40:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,13 +30,16 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
  *            initiateCorrelationSet to tCorrelation_list.
  *          - 2005-11-24 (gierds) Added basic symbol manager.
  *          - 2005-11-26 (nlohmann) Added <import>-tag
+ *          - 2005-12-04 (nlohmann) Re-organized handlers. Added implicit
+ *            rewriting rules. Simplified grammar. Removed
+ *            "_opt"-non-terminals.
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -141,75 +144,66 @@ tProcess TheProcess;
 
 
 /* the types of the non-terminal symbols */
-%type <yt_tProcess> tProcess
-%type <yt_activity> activity
 %type <yt_activity_list> activity_list
-%type <yt_tPartnerLink_list> tPartnerLinks_opt
-%type <yt_tPartnerLink_list> tPartnerLinks
-%type <yt_tPartnerLink_list> tPartnerLink_list
-%type <yt_tPartnerLink> tPartnerLink
-%type <yt_tPartner_list> tPartners_opt
-%type <yt_tPartner_list> tPartners
-%type <yt_tPartner_list> tPartner_list
-%type <yt_tPartner> tPartner
-%type <yt_tFaultHandlers> tFaultHandlers
-%type <yt_tCatch_list> tCatch_list
-%type <yt_tCatchAll_list> tCatchAll_opt
-%type <yt_tCatch> tCatch
-%type <yt_tCatchAll> tCatchAll
-//%type <yt_tCompensationHandler_opt> tCompensationHandler_opt
-%type <yt_tCompensationHandler> tCompensationHandler
-//%type <yt_tEventHandlers_opt> tEventHandlers_opt
-%type <yt_tEventHandlers> tEventHandlers
-%type <yt_tOnMessage_list> tOnMessage_list
-%type <yt_tOnAlarm_list> tOnAlarm_list
-%type <yt_tOnMessage> tOnMessage
-%type <yt_tOnAlarm> tOnAlarm
-%type <yt_tVariable_list> tVariables_opt
-%type <yt_tVariable_list> tVariables
-%type <yt_tVariable_list> tVariable_list
-%type <yt_tVariable> tVariable
-%type <yt_tCorrelationSet_list> tCorrelationSets_opt
-%type <yt_tCorrelationSet_list> tCorrelationSets
-%type <yt_tCorrelationSet_list> tCorrelationSet_list
-%type <yt_tCorrelationSet> tCorrelationSet
-%type <yt_tCorrelation_list> tCorrelations_opt
-%type <yt_tCorrelation_list> tCorrelations
-%type <yt_tCorrelation_list> tCorrelation_list
-%type <yt_tCorrelation> tCorrelation
-%type <yt_tEmpty> tEmpty
-%type <yt_tInvoke> tInvoke
-%type <yt_tReceive> tReceive
-%type <yt_tReply> tReply
+%type <yt_activity> activity
+%type <yt_integer> arbitraryAttributes
+%type <yt_standardElements> standardElements
 %type <yt_tAssign> tAssign
-%type <yt_tCopy_list> tCopy_list
-%type <yt_tCopy> tCopy
-%type <yt_tFrom> tFrom
-%type <yt_tTo> tTo
-%type <yt_tWait> tWait
-%type <yt_tThrow> tThrow
-%type <yt_tTerminate> tTerminate
-%type <yt_tFlow> tFlow
-%type <yt_tLink_list> tLink_list
-%type <yt_tLink_list> tLinks_opt
-%type <yt_tLink_list> tLinks
-%type <yt_tLink> tLink
-%type <yt_tSwitch> tSwitch
 %type <yt_tCase_list> tCase_list
 %type <yt_tCase> tCase
-//%type <yt_tOtherwise_list> tOtherwise_opt
-%type <yt_tOtherwise> tOtherwise
-%type <yt_tWhile> tWhile
-%type <yt_tSequence> tSequence
-%type <yt_tPick> tPick
-%type <yt_tScope> tScope
+%type <yt_tCatch_list> tCatch_list
+%type <yt_tCatch> tCatch
+%type <yt_tCatchAll> tCatchAll
 %type <yt_tCompensate> tCompensate
-%type <yt_standardElements> standardElements
-%type <yt_tTarget_list> tTarget_list
-%type <yt_tTarget> tTarget
+%type <yt_tCompensationHandler> tCompensationHandler
+%type <yt_tCopy_list> tCopy_list
+%type <yt_tCopy> tCopy
+%type <yt_tCorrelation_list> tCorrelation_list
+%type <yt_tCorrelation_list> tCorrelations
+%type <yt_tCorrelation> tCorrelation
+%type <yt_tCorrelationSet_list> tCorrelationSet_list
+%type <yt_tCorrelationSet_list> tCorrelationSets
+%type <yt_tCorrelationSet> tCorrelationSet
+%type <yt_tEmpty> tEmpty
+%type <yt_tEventHandlers> tEventHandlers
+%type <yt_tFaultHandlers> tFaultHandlers
+%type <yt_tFlow> tFlow
+%type <yt_tFrom> tFrom
+%type <yt_tInvoke> tInvoke
+%type <yt_tLink_list> tLink_list
+%type <yt_tLink_list> tLinks
+%type <yt_tLink> tLink
+%type <yt_tOnAlarm_list> tOnAlarm_list
+%type <yt_tOnAlarm> tOnAlarm
+%type <yt_tOnMessage_list> tOnMessage_list
+%type <yt_tOnMessage> tOnMessage
+%type <yt_tOtherwise> tOtherwise
+%type <yt_tPartner_list> tPartner_list
+%type <yt_tPartner_list> tPartners
+%type <yt_tPartner> tPartner
+%type <yt_tPartnerLink_list> tPartnerLink_list
+%type <yt_tPartnerLink_list> tPartnerLinks
+%type <yt_tPartnerLink> tPartnerLink
+%type <yt_tPick> tPick
+%type <yt_tProcess> tProcess
+%type <yt_tReceive> tReceive
+%type <yt_tReply> tReply
+%type <yt_tScope> tScope
+%type <yt_tSequence> tSequence
 %type <yt_tSource_list> tSource_list
 %type <yt_tSource> tSource
-%type <yt_integer> arbitraryAttributes
+%type <yt_tSwitch> tSwitch
+%type <yt_tTarget_list> tTarget_list
+%type <yt_tTarget> tTarget
+%type <yt_tTerminate> tTerminate
+%type <yt_tThrow> tThrow
+%type <yt_tTo> tTo
+%type <yt_tVariable_list> tVariable_list
+%type <yt_tVariable_list> tVariables
+%type <yt_tVariable> tVariable
+%type <yt_tWait> tWait
+%type <yt_tWhile> tWhile
+
 
 
 
@@ -271,10 +265,10 @@ tProcess:
       currentScopeId = $3; }
   X_NEXT
   imports
-  tPartnerLinks_opt
-  tPartners_opt
-  tVariables_opt
-  tCorrelationSets_opt
+  tPartnerLinks
+  tPartners
+  tVariables
+  tCorrelationSets
   tFaultHandlers
   tCompensationHandler
   tEventHandlers
@@ -380,18 +374,13 @@ activity:
   </partnerLinks>
 */
 
-tPartnerLinks_opt:
+tPartnerLinks:
   /* empty */
     { $$ = NiltPartnerLink_list(); }
-| tPartnerLinks X_NEXT
-    { $$ = $1; }
-;
-
-tPartnerLinks:
-  K_PARTNERLINKS X_NEXT
+| K_PARTNERLINKS X_NEXT
   tPartnerLink_list //1-oo
-  X_SLASH K_PARTNERLINKS
-    { $$ = $3; }
+  X_SLASH K_PARTNERLINKS X_NEXT
+    { $$ = $3; } 
 ;
 
 tPartnerLink_list:
@@ -453,24 +442,15 @@ tPartnerLink:
   </partners>
 */
 
-tPartners_opt:
+tPartners:
   /* empty */
     { $$ = NiltPartner_list(); }
-| tPartners X_NEXT
-    { $$ = $1; }
-;
-
-tPartners:
-  K_PARTNERS X_NEXT
-    {
-      inPartners = true;
-    }
+| K_PARTNERS X_NEXT
+    { inPartners = true; }
   tPartner_list // 1-oo
-  X_SLASH K_PARTNERS
-    { 
-      $$ = $4;
-      inPartners = false;
-    }
+  X_SLASH K_PARTNERS X_NEXT
+    { $$ = $4;
+      inPartners = false; }
 ;
 
 tPartner_list:
@@ -529,7 +509,7 @@ tFaultHandlers:
       $$->parentScopeId = currentScopeId; }
 | K_FAULTHANDLERS X_NEXT
   tCatch_list // 0-oo
-  tCatchAll_opt
+  tCatchAll
   X_SLASH K_FAULTHANDLERS X_NEXT
     { $$ = userDefinedFaultHandler($3, $4);
       $$->inProcess = inProcess;
@@ -554,17 +534,12 @@ tCatch:
     }
 ;
 
-tCatchAll_opt:
-  /* empty */
-    { $$ = NiltCatchAll_list(); }
-| tCatchAll X_NEXT
-    { $$ = ConstCatchAll_list($1, NiltCatchAll_list()); }
-;
-
 tCatchAll:
-  K_CATCHALL arbitraryAttributes X_NEXT
+  /* empty */
+    { $$ = NoCatchAll(); }
+| K_CATCHALL arbitraryAttributes X_NEXT
   activity X_NEXT // was: tActivityOrCompensateContainer
-  X_SLASH K_CATCHALL
+  X_SLASH K_CATCHALL X_NEXT
     { $$ = CatchAll($4);
       $$->faultName = att.read($2, "faultName");
       $$->faultVariable = att.read($2, "faultVariable"); }
@@ -663,7 +638,7 @@ tOnMessage:
     {
       symMan.checkPartnerLink(att.read($2, "partnerLink")->name);
     }
-  tCorrelations_opt 
+  tCorrelations 
   activity X_NEXT
   X_SLASH K_ONMESSAGE
     { $$ = OnMessage($6);
@@ -710,20 +685,13 @@ tOnAlarm:
   </variables>
 */
 
-tVariables_opt:
+tVariables:
   /* empty */
     { $$ = NiltVariable_list(); }
-| tVariables X_NEXT
-    { $$ = $1; }
-;
-
-tVariables:
-  K_VARIABLES X_NEXT
+| K_VARIABLES X_NEXT
   tVariable_list // 1-oo
-  X_SLASH K_VARIABLES
+  X_SLASH K_VARIABLES X_NEXT
     { $$ = $3; }
-| K_VARIABLES X_SLASH
-    { $$ = NiltVariable_list(); }
 ;
 
 tVariable_list:
@@ -783,17 +751,12 @@ tVariable:
   </correlationSets>
 */
 
-tCorrelationSets_opt:
+tCorrelationSets:
   /* empty */
     { $$ = NiltCorrelationSet_list(); }
-| tCorrelationSets X_NEXT
-    { $$ = $1; }
-;
-
-tCorrelationSets:
-  K_CORRELATIONSETS X_NEXT
+| K_CORRELATIONSETS X_NEXT
   tCorrelationSet_list //1-oo
-  X_SLASH K_CORRELATIONSETS
+  X_SLASH K_CORRELATIONSETS X_NEXT
     { $$ = $3; }
 ;
 
@@ -818,17 +781,12 @@ tCorrelationSet:
   CORRELATIONS
 ******************************************************************************/
 
-tCorrelations_opt:
+tCorrelations:
   /* empty */
     { $$ = NiltCorrelation_list(); }
-| tCorrelations X_NEXT
-    { $$ = $1; }
-;
-
-tCorrelations:
-  K_CORRELATIONS X_NEXT
+| K_CORRELATIONS X_NEXT
   tCorrelation_list //1-oo
-  X_SLASH K_CORRELATIONS
+  X_SLASH K_CORRELATIONS X_NEXT
     { $$ = $3; }
 ;
 
@@ -931,9 +889,9 @@ tInvoke:
       symMan.checkPartnerLink(att.read($2, "partnerLink")->name);
     }
   standardElements
-  tCorrelations_opt // was: tCorrelationsWithPattern_opt
+  tCorrelations // was: tCorrelationsWithPattern_opt
   tCatch_list //0-oo
-  tCatchAll_opt
+  tCatchAll
   tCompensationHandler
   X_SLASH K_INVOKE
     { att.check($2, K_INVOKE);
@@ -1013,7 +971,7 @@ tReceive:
       symMan.checkPartnerLink(att.read($2, "partnerLink")->name);
     }
   standardElements
-  tCorrelations_opt
+  tCorrelations
   X_SLASH K_RECEIVE
     {  
       $$ = Receive($5, $6);
@@ -1078,7 +1036,7 @@ tReceive:
 tReply:
   K_REPLY arbitraryAttributes X_NEXT
   standardElements
-  tCorrelations_opt
+  tCorrelations
   X_SLASH K_REPLY
     { att.check($2, K_REPLY);
       $$ = Reply($4, $5);
@@ -1405,7 +1363,7 @@ tFlow:
       symMan.newFlowScope($2);
     } 
   standardElements
-  tLinks_opt
+  tLinks
   activity_list //1-oo
   X_SLASH K_FLOW
     { $$ = Flow($5, $6, $7);
@@ -1424,17 +1382,12 @@ activity_list:
     { $$ = Consactivity_list($1, $3); }
 ;
 
-tLinks_opt:
+tLinks:
   /* empty */
   { $$ = NiltLink_list(); }
-| tLinks X_NEXT
-  { $$ = $1; }
-;
-
-tLinks:
-  K_LINKS arbitraryAttributes X_NEXT
+| K_LINKS arbitraryAttributes X_NEXT
   tLink_list // 1-oo
-  X_SLASH K_LINKS
+  X_SLASH K_LINKS X_NEXT
     { $$ = $4; }
 ;
 
@@ -1653,8 +1606,8 @@ tScope:
     currentScopeId = $2;
   }
   standardElements
-  tVariables_opt
-  tCorrelationSets_opt
+  tVariables
+  tCorrelationSets
   tFaultHandlers
   tCompensationHandler
   tEventHandlers

@@ -1,4 +1,4 @@
-# last changed $Date: 2005/12/03 15:47:03 $ by $Author: nlohmann $
+# last changed $Date: 2005/12/04 13:29:21 $ by $Author: nlohmann $
 
 
 
@@ -28,7 +28,7 @@ KC_TIME = .kc_time_stamp
 
 bpel2owfn: bpel-syntax.o bpel-lexic.o\
 	main.o debug.o exception.o bpel-attributes.o petrinet.o helpers.o check-symbols.o\
-	bpel-abstract.o bpel-unparse-xml.o bpel-unparse-petri.o bpel-rewrite.o\
+	bpel-abstract.o bpel-unparse-xml.o bpel-unparse-petri.o\
 	bpel-kc-unpk.o bpel-kc-rk.o bpel-kc-csgiok.o bpel-kc-k.o
 	$(CXX) $(CXXFLAGS2) -o $@ $^
 
@@ -101,13 +101,10 @@ bpel-unparse-xml.o: $(KC_TIME)
 bpel-unparse-petri.o: $(KC_TIME)
 	$(CXX) $(CXXFLAGS2) -c -o $@ $(@:.o=.cc)
 
-bpel-rewrite.o: $(KC_TIME)
-	$(CXX) $(CXXFLAGS2) -c -o $@ $(@:.o=.cc)
-
 bpel-abstract.o: $(KC_TIME)
 	$(CXX) $(CXXFLAGS2) -c -o $@ $(@:.o=.cc)
 
-$(KC_TIME): bpel-abstract.k bpel-unparse-xml.k bpel-unparse-petri.k bpel-rewrite.k
+$(KC_TIME): bpel-abstract.k bpel-unparse-xml.k bpel-unparse-petri.k
 	@touch $@
 	$(KC) $(KFLAGS) $^
 

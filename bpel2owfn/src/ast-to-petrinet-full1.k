@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/04 15:40:31 $
+ *          - last changed: \$Date: 2005/12/04 18:10:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.47 $
+ * \version \$Revision: 1.48 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -331,7 +331,7 @@ StopInProcess() ->
       TheNet->newArc(t2, p3);
       TheNet->newArc(t2, p21);
       TheNet->newArc(p3, t3);
-      TheNet->newArc(p5, t3, RESET, "X");
+      //TheNet->newArc(p5, t3, RESET, "X");
       TheNet->newArc(p22, t3);
       TheNet->newArc(t3, p4);
       TheNet->newArc(p5, t4, "x");
@@ -451,7 +451,7 @@ StopInScope() ->
       TheNet->newArc(t4, p29);
       TheNet->newArc(p7, t5);
       TheNet->newArc(t5, p8);
-      TheNet->newArc(p10, t5, RESET, "X");
+      //TheNet->newArc(p10, t5, RESET, "X");
       TheNet->newArc(p30, t5);
       TheNet->newArc(t6, p6);
       TheNet->newArc(p10, t6, "x");
@@ -2241,6 +2241,7 @@ This=activityWhile(TheWhile=While(a,b)) ->
       TheNet->newArc(p2, t5, "x");
       TheNet->newArc(t5, p6);
       TheNet->newArc(t5, p9, "fault");
+      //TheNet->newArc(TheNet->findPlace("1.Active"), t5, READ); // added to test new idea of stop pattern
       TheNet->newArc(p1, t6);
       TheNet->newArc(p7, t6);
       TheNet->newArc(t6, p8);
@@ -2257,6 +2258,7 @@ This=activityWhile(TheWhile=While(a,b)) ->
     a // standardElements
     b // innerActivity
     {
+      // embed innerActivity
       TheNet->mergePlaces(This, ".p4",      b, ".initial");
       TheNet->mergePlaces(This, ".p5",      b, ".final");
       TheNet->mergePlaces(This, ".stop",    b, ".stop");

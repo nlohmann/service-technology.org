@@ -18,7 +18,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/04 12:50:33 $
+ *          - last changed: \$Date: 2005/12/04 13:11:36 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.38 $
+ * \version \$Revision: 1.39 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -159,7 +159,7 @@ tProcess TheProcess;
 %type <yt_tCatchAll> tCatchAll
 //%type <yt_tCompensationHandler_opt> tCompensationHandler_opt
 %type <yt_tCompensationHandler> tCompensationHandler
-%type <yt_tEventHandlers_opt> tEventHandlers_opt
+//%type <yt_tEventHandlers_opt> tEventHandlers_opt
 %type <yt_tEventHandlers> tEventHandlers
 %type <yt_tOnMessage_list> tOnMessage_list
 %type <yt_tOnAlarm_list> tOnAlarm_list
@@ -277,7 +277,7 @@ tProcess:
   tCorrelationSets_opt
   tFaultHandlers
   tCompensationHandler
-  tEventHandlers_opt
+  tEventHandlers
     { inProcess = false; }
   activity
   X_NEXT X_SLASH K_PROCESS X_CLOSE
@@ -632,23 +632,16 @@ tCompensationHandler:
   </eventHandlers>
 */
 
-tEventHandlers_opt:
-  /* empty */
-    { $$ = NiltEventHandlers_opt();
-      $$->parentScopeId = currentScopeId; }
-| tEventHandlers X_NEXT
-    { $$ = ConstEventHandlers_opt($1, NiltEventHandlers_opt());
-      $$->parentScopeId = currentScopeId; }
-;
-
 tEventHandlers:
-  K_EVENTHANDLERS X_NEXT
+  /* empty */
+    { $$ = implicitEventHandler();
+      $$->parentScopeId = currentScopeId; }
+| K_EVENTHANDLERS X_NEXT
   tOnMessage_list // 0-oo
   tOnAlarm_list // 0-oo
-  X_SLASH K_EVENTHANDLERS
-    { $$ = EventHandlers($3, $4); }
-| K_EVENTHANDLERS X_SLASH
-    { $$ = EventHandlers(NiltOnMessage_list(), NiltOnAlarm_list()); }
+  X_SLASH K_EVENTHANDLERS X_NEXT
+    { $$ = EventHandler($3, $4);
+      $$->parentScopeId = currentScopeId; }
 ;
 
 tOnMessage_list:
@@ -1656,7 +1649,7 @@ tScope:
   tCorrelationSets_opt
   tFaultHandlers
   tCompensationHandler
-  tEventHandlers_opt
+  tEventHandlers
   activity X_NEXT
   X_SLASH K_SCOPE
     { att.check($2, K_SCOPE);

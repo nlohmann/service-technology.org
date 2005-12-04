@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/04 12:50:33 $
+ *          - last changed: \$Date: 2005/12/04 13:11:36 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -1038,7 +1038,7 @@ This=implicitFaultHandler() provided (!This->inProcess) ->
  */
 
 
-This=ConstEventHandlers_opt(EventHandlers(a,b), NiltEventHandlers_opt()) ->
+This=EventHandler(a,b) ->
   [petrinet:
     {
       string prefix = intToString(This->parentScopeId->value) + ".eventHandler.";
@@ -1232,7 +1232,7 @@ This=ConstEventHandlers_opt(EventHandlers(a,b), NiltEventHandlers_opt()) ->
  * surrounding process or scope functions correctly.
  */
 
-This=NiltEventHandlers_opt() ->
+This=implicitEventHandler() ->
   [petrinet:
     {
       string prefix = intToString(This->parentScopeId->value) + ".eventHandler.";
@@ -1268,7 +1268,6 @@ This=NiltEventHandlers_opt() ->
     }
   ]
 ;
-
 
 
 

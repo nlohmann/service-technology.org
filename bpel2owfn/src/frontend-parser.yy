@@ -18,7 +18,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/03 15:45:57 $
+ *          - last changed: \$Date: 2005/12/04 12:50:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.37 $
+ * \version \$Revision: 1.38 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -152,13 +152,12 @@ tProcess TheProcess;
 %type <yt_tPartner_list> tPartners
 %type <yt_tPartner_list> tPartner_list
 %type <yt_tPartner> tPartner
-%type <yt_tFaultHandlers_opt> tFaultHandlers_opt
 %type <yt_tFaultHandlers> tFaultHandlers
 %type <yt_tCatch_list> tCatch_list
 %type <yt_tCatchAll_list> tCatchAll_opt
 %type <yt_tCatch> tCatch
 %type <yt_tCatchAll> tCatchAll
-%type <yt_tCompensationHandler_opt> tCompensationHandler_opt
+//%type <yt_tCompensationHandler_opt> tCompensationHandler_opt
 %type <yt_tCompensationHandler> tCompensationHandler
 %type <yt_tEventHandlers_opt> tEventHandlers_opt
 %type <yt_tEventHandlers> tEventHandlers
@@ -276,8 +275,8 @@ tProcess:
   tPartners_opt
   tVariables_opt
   tCorrelationSets_opt
-  tFaultHandlers_opt
-  tCompensationHandler_opt
+  tFaultHandlers
+  tCompensationHandler
   tEventHandlers_opt
     { inProcess = false; }
   activity
@@ -523,25 +522,18 @@ tPartner:
   </faultHandlers>
 */
 
-tFaultHandlers_opt:
-  /* empty */
-    { $$ = NiltFaultHandlers_opt();
-      $$->inProcess = inProcess;
-      $$->parentScopeId = currentScopeId; }
-| tFaultHandlers X_NEXT
-    { $$ = ConstFaultHandlers_opt($1, NiltFaultHandlers_opt());
-      $$->inProcess = inProcess;
-      $$->parentScopeId = currentScopeId; }
-;
-
 tFaultHandlers:
-  K_FAULTHANDLERS X_NEXT
+  /* empty */
+    { $$ = implicitFaultHandler();
+      $$->inProcess = inProcess;
+      $$->parentScopeId = currentScopeId; }
+| K_FAULTHANDLERS X_NEXT
   tCatch_list // 0-oo
   tCatchAll_opt
-  X_SLASH K_FAULTHANDLERS
-    { $$ = FaultHandlers($3, $4); }
-| K_FAULTHANDLERS X_SLASH
-    { $$ = FaultHandlers(NiltCatch_list(), NiltCatchAll_list()); }
+  X_SLASH K_FAULTHANDLERS X_NEXT
+    { $$ = userDefinedFaultHandler($3, $4);
+      $$->inProcess = inProcess;
+      $$->parentScopeId = currentScopeId; }
 ;
 
 tCatch_list:
@@ -598,20 +590,15 @@ tCatchAll:
   </compensationHandler>
 */
 
-tCompensationHandler_opt:
-  /* empty */
-    { $$ = NiltCompensationHandler_opt();
-      $$->parentScopeId = currentScopeId; }
-| tCompensationHandler X_NEXT
-    { $$ = ConstCompensationHandler_opt($1, NiltCompensationHandler_opt());
-      $$->parentScopeId = currentScopeId; }
-;
-
 tCompensationHandler:
-  K_COMPENSATIONHANDLER X_NEXT
+  /* empty */
+    { $$ = implicitCompensationHandler();
+      $$->parentScopeId = currentScopeId; }
+| K_COMPENSATIONHANDLER X_NEXT
   activity X_NEXT // was: tActivityOrCompensateContainer
-  X_SLASH K_COMPENSATIONHANDLER
-    { $$ = CompensationHandler($3); }
+  X_SLASH K_COMPENSATIONHANDLER X_NEXT
+    { $$ = userDefinedCompensationHandler($3);
+      $$->parentScopeId = currentScopeId; }
 ;
 
 
@@ -954,7 +941,7 @@ tInvoke:
   tCorrelations_opt // was: tCorrelationsWithPattern_opt
   tCatch_list //0-oo
   tCatchAll_opt
-  tCompensationHandler_opt
+  tCompensationHandler
   X_SLASH K_INVOKE
     { att.check($2, K_INVOKE);
       $$ = Invoke($5, $6, $7, $8, $9);
@@ -971,7 +958,7 @@ tInvoke:
       $$->id = $2; }
 | K_INVOKE arbitraryAttributes X_SLASH
     { att.check($2, K_INVOKE);
-      $$ = Invoke(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list(), NiltCatch_list(), NiltCatchAll_list(), NiltCompensationHandler_opt());
+      $$ = Invoke(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list(), NiltCatch_list(), NiltCatchAll_list(), implicitCompensationHandler());
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
@@ -1667,8 +1654,8 @@ tScope:
   standardElements
   tVariables_opt
   tCorrelationSets_opt
-  tFaultHandlers_opt
-  tCompensationHandler_opt
+  tFaultHandlers
+  tCompensationHandler
   tEventHandlers_opt
   activity X_NEXT
   X_SLASH K_SCOPE

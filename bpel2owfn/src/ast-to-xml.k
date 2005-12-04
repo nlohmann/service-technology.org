@@ -12,7 +12,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2005/11/30 16:08:13 $
+ *          - last changed: \$Date: 2005/12/04 12:50:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -23,7 +23,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Moved #intToString to \ref helpers.cc.
  *          - 2005-11-18 (nlohmann) Identifiers are printed.
@@ -136,12 +136,7 @@ Process(a,b,c,d,e,f,g,h,i) ->
   { else }
     ${ { inup(); } "<correlationSets>\n" d { indown(); } "</correlationSets>\n" $}
 
-  { if (e->length() == 0) }
-    ${ /* no Fault Handlers */ $}
-  { else }
-    ${ e $}
- 
-  f g h i { indown(); } "</process>\n"]
+  e f g h i { indown(); } "</process>\n"]
 ;
 
 
@@ -167,7 +162,7 @@ Partner(a) ->
   FAULT HANDLERS
 ******************************************************************************/
 
-FaultHandlers(a,b) ->
+userDefinedFaultHandler(a,b) ->
   [xml: { inup(); } "<faultHandlers>\n" a b { indown(); } "</faultHandlers>\n"]
 ;
 
@@ -201,7 +196,7 @@ OnAlarm(a) ->
   COMPENSATION HANDLERS
 ******************************************************************************/
 
-CompensationHandler(a) ->
+userDefinedCompensationHandler(a) ->
   [xml: { inup(); } "<compensationHandler>\n" a { indown(); } "</compensationHandler>\n"]
 ;
 
@@ -404,12 +399,7 @@ Scope(a,b,c,d,e,f,g) ->
   { else }
     ${ { inup(); } "<variables id=\"" $0->id "\">\n" b { indown(); } "</variables>\n" $}
 
-  { if (c->length() == 0) }
-    ${ /* no Fault Handlers */ $}
-  { else }
-    ${ c $}
-
-  d e f g
+  c d e f g
     
   { indown(); } "</scope>\n" ]
 ;

@@ -116,6 +116,7 @@ tEmpty implicitEmpty(tEmpty old)
 
 /* case 1a: there is a <catch>-element */
 
+/*
 activityInvoke(
     Invoke(
       a, //standardElements
@@ -154,11 +155,11 @@ activityInvoke(
       )
     )	
 >;
-
-
+*/
 
 /* case 1b: there is a <catchAll>-element */
 
+/*
 activityInvoke(
     Invoke(
       a, //standardElements
@@ -197,12 +198,12 @@ activityInvoke(
       )
     )	
 >;
-
+*/
 
 
 
 /* case 2: there is a Compensation Handler in the <invoke> */
-
+/*
 activityInvoke(
     Invoke(
       a, //standardElements
@@ -241,7 +242,7 @@ activityInvoke(
       )
     )	
 >;
-
+*/
 
 
 

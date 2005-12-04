@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/03 15:43:42 $
+ *          - last changed: \$Date: 2005/12/04 12:50:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.41 $
+ * \version \$Revision: 1.42 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -51,8 +51,6 @@
  *            event handler.
  * 
  * \todo
- *          - (nlohmann) find a simple "merge-language" to ease the definition
- *            of new patterns
  *          - (nlohmann) complete initial pattern database
  *          - (nlohmann) The assign-element has more attributes that have to
  *            be added to the abstract grammar as well as to the syntax file.
@@ -96,7 +94,6 @@ extern SymbolManager symMan;
 
 /// prefix of the current scope (read by the stop pattern)
 string currentScope;
-
 %}
 
 
@@ -515,7 +512,7 @@ StopInScope() ->
  * The user-defined fault handler inside a process. See Fig. 37 for details.
  */
   
-This=ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) provided (This->inProcess) ->
+This=userDefinedFaultHandler(a,b) provided (This->inProcess) ->
   [petrinet:
     {
       string prefix = "1.faulthandler.";
@@ -645,7 +642,7 @@ This=ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) provide
  * The implicit fault handler inside a process. See Fig. 35 for details.
  */
 
-This=NiltFaultHandlers_opt() provided (This->inProcess) ->
+This=implicitFaultHandler() provided (This->inProcess) ->
   [petrinet:
     {
       string prefix = "1.faulthandler.";      
@@ -733,7 +730,7 @@ This=NiltFaultHandlers_opt() provided (This->inProcess) ->
  * The user-defined fault handler inside a scope. See Fig. 36 for details.
  */
   
-This=ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) provided (!This->inProcess) ->
+This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
   [petrinet:
     {
       string prefix = intToString(This->parentScopeId->value) + ".faulthandler.";    
@@ -923,7 +920,7 @@ This=ConstFaultHandlers_opt(FaultHandlers(a,b), NiltFaultHandlers_opt()) provide
  * The implicit fault handler inside a scope. See Fig. 34 for details.
  */
 
-This=NiltFaultHandlers_opt() provided (!This->inProcess) ->
+This=implicitFaultHandler() provided (!This->inProcess) ->
   [petrinet:
     {
       string prefix = intToString(This->parentScopeId->value) + ".faulthandler.";      
@@ -1284,7 +1281,7 @@ This=NiltEventHandlers_opt() ->
  * Implicit compensation handler as it is depicted in Fig. 42.
  */
 
-This=NiltCompensationHandler_opt() ->
+This=implicitCompensationHandler() ->
   [petrinet:
     {
       string prefix = intToString(This->parentScopeId->value) + ".compensationHandler.";     

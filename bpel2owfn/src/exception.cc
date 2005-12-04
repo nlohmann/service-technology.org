@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/11/15
- *          - last changed: \$Date: 2005/11/15 16:33:24 $
+ *          - last changed: \$Date: 2005/12/04 12:51:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  *          - 2005-11-15 (gierds) Initial version.
  *          - 2005-11-15 (nlohmann) Implemented #Exception::info().
  *

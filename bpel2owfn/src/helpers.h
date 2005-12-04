@@ -8,11 +8,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes by: \$Author: gierds $
+ *          - last changes by: \$Author: nlohmann $
  *          
  * \date    
  * 	    - created: 2005-11-11
- *          - last changed: \$Date: 2005/11/29 14:01:44 $
+ *          - last changed: \$Date: 2005/12/04 12:51:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See

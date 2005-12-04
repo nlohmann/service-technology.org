@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/04 13:11:36 $
+ *          - last changed: \$Date: 2005/12/04 13:30:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -2060,7 +2060,7 @@ TheActivity=activityFlow(This=Flow(a,b,c)) ->
  * defined).
  */
 
-This=activitySwitch(Switch(a,b,c)) ->
+This=activitySwitch(Switch(a,b,Otherwise(c))) ->
   [petrinet:
     {
       string prefix = intToString(This->id->value) + ".";
@@ -2092,7 +2092,6 @@ This=activitySwitch(Switch(a,b,c)) ->
       TheNet->newArc(switch_t10, switch_p12);
     }
     a // standardElements
-    b // case branches
     c // otherwise branch
     {
       int currentCase = 1;
@@ -2152,31 +2151,27 @@ This=activitySwitch(Switch(a,b,c)) ->
 	}
 	currentCase++;
       }
-
-
-      foreach (Otherwise(innerActivity); tOtherwise_list c)
-      {
-	Transition *t2 = TheNet->newTransition(prefix + "t2.otherwise");
-	
-	// "running"-place
-	Place *running = TheNet->newPlace(prefix + "running.otherwise");
-
-	// arcs connecting "running"-place
-	TheNet->newArc(running, t2, "x");
-	TheNet->newArc(last, running, "x");
-
-	// remove token from "running"-place to stop
-	Transition *t11 = TheNet->newTransition(prefix + "t11.o");
-	TheNet->newArc(running, t11, "x");
-	TheNet->newArc(TheNet->findPlace(This, ".stop"), t11);
-	TheNet->newArc(t11, TheNet->findPlace(This, ".stopped"));	
-	
-	// embed inner activity
-	TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
-	TheNet->mergePlaces(This, ".final",   innerActivity, ".final");
-	TheNet->mergePlaces(This, ".stop",    innerActivity, ".stop");
-	TheNet->mergePlaces(This, ".stopped", innerActivity, ".stopped");
-      }
+      
+      Transition *t2 = TheNet->newTransition(prefix + "t2.otherwise");
+      
+      // "running"-place
+      Place *running = TheNet->newPlace(prefix + "running.otherwise");
+      
+      // arcs connecting "running"-place
+      TheNet->newArc(running, t2, "x");
+      TheNet->newArc(last, running, "x");
+      
+      // remove token from "running"-place to stop
+      Transition *t11 = TheNet->newTransition(prefix + "t11.o");
+      TheNet->newArc(running, t11, "x");
+      TheNet->newArc(TheNet->findPlace(This, ".stop"), t11);
+      TheNet->newArc(t11, TheNet->findPlace(This, ".stopped"));	
+      
+      // embed inner activity
+      TheNet->newArc(t2, TheNet->findPlace(c, ".initial"));
+      TheNet->mergePlaces(This, ".final",   c, ".final");
+      TheNet->mergePlaces(This, ".stop",    c, ".stop");
+      TheNet->mergePlaces(This, ".stopped", c, ".stopped");
     }
   ]
 ;

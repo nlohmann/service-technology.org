@@ -13,7 +13,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2005/12/04 13:11:36 $
+ *          - last changed: \$Date: 2005/12/04 13:30:01 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,9 +24,10 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.23 $
+ * \version \$Revision: 1.24 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-17 (nlohmann) Added default attributes.
+ *          - 2005-12-04 (nlohmann) Changed representation of handlers.
  * 
  */
 %}
@@ -541,7 +542,7 @@ tLink:
 ******************************************************************************/
 
 tSwitch:
-  Switch(standardElements tCase_list tOtherwise_list)
+  Switch(standardElements tCase_list tOtherwise)
   {
     casestring name;
     casestring joinCondition;
@@ -560,10 +561,6 @@ tCase:
   {
     casestring condition;
   }
-;
-
-tOtherwise_list:
-  list tOtherwise
 ;
 
 tOtherwise:

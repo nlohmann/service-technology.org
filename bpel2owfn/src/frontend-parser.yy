@@ -18,7 +18,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/04 13:11:36 $
+ *          - last changed: \$Date: 2005/12/04 13:30:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.39 $
+ * \version \$Revision: 1.40 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -197,7 +197,7 @@ tProcess TheProcess;
 %type <yt_tSwitch> tSwitch
 %type <yt_tCase_list> tCase_list
 %type <yt_tCase> tCase
-%type <yt_tOtherwise_list> tOtherwise_opt
+//%type <yt_tOtherwise_list> tOtherwise_opt
 %type <yt_tOtherwise> tOtherwise
 %type <yt_tWhile> tWhile
 %type <yt_tSequence> tSequence
@@ -1466,7 +1466,7 @@ tSwitch:
   K_SWITCH arbitraryAttributes X_NEXT
   standardElements
   tCase_list //1-oo
-  tOtherwise_opt
+  tOtherwise
   X_SLASH K_SWITCH
     { att.check($2, K_SWITCH);
       $$ = Switch($4, $5, $6);
@@ -1484,24 +1484,20 @@ tCase_list:
 ;
 
 tCase:
-  K_CASE arbitraryAttributes X_NEXT
-  activity X_NEXT // was: tActivityContainer
-  X_SLASH K_CASE
+  K_CASE arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CASE
     { $$ = Case($4);
       $$->condition = att.read($2, "condition"); }
 ;
 
-tOtherwise_opt:
-  /* empty */
-    { $$ = NiltOtherwise_list(); }
-| tOtherwise X_NEXT
-    { $$ = ConstOtherwise_list($1, NiltOtherwise_list()); }
-;
+/*
+  If the otherwise branch is not explicitly specified, then an otherwise branch
+   with an empty activity is deemed to be present.
+*/
 
 tOtherwise:
-  K_OTHERWISE X_NEXT
-  activity X_NEXT // was: tActivityContainer
-  X_SLASH K_OTHERWISE
+  /* empty */
+    { $$ = Otherwise(activityEmpty(Empty(StandardElements(NiltTarget_list(),NiltSource_list())))); }
+| K_OTHERWISE X_NEXT activity X_NEXT X_SLASH K_OTHERWISE
     { $$ = Otherwise($3); }
 ;
 

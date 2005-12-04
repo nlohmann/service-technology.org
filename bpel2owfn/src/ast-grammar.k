@@ -13,7 +13,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2005/12/04 13:30:01 $
+ *          - last changed: \$Date: 2005/12/04 14:00:32 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-17 (nlohmann) Added default attributes.
  *          - 2005-12-04 (nlohmann) Changed representation of handlers.
@@ -309,8 +309,7 @@ tEmpty:
 ******************************************************************************/
 
 tInvoke:
-  Invoke(standardElements tCorrelation_list tCatch_list tCatchAll_list tCompensationHandler)
-| Invoke2(standardElements tCorrelation_list)
+  Invoke(standardElements tCorrelation_list)
   {
     casestring name;
     casestring joinCondition;

@@ -12,7 +12,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2005/12/04 13:11:36 $
+ *          - last changed: \$Date: 2005/12/04 14:00:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -23,7 +23,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Moved #intToString to \ref helpers.cc.
  *          - 2005-11-18 (nlohmann) Identifiers are printed.
@@ -240,11 +240,7 @@ Empty(a) ->
   INVOKE
 ******************************************************************************/
 
-Invoke(a,b,c,d,e) ->
-  [xml: { inup(); } "<invoke id=\"" $0->id "\">\n" a b c d e { indown(); } "</invoke>\n"]
-;
-
-Invoke2(a,b) ->
+Invoke(a,b) ->
   [xml: { inup(); } "<invoke id=\"" $0->id "\">\n" a b { indown(); } "</invoke>\n"]
 ;
 

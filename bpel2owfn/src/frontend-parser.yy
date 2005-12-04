@@ -18,7 +18,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/04 13:30:02 $
+ *          - last changed: \$Date: 2005/12/04 14:00:32 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.40 $
+ * \version \$Revision: 1.41 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -937,7 +937,19 @@ tInvoke:
   tCompensationHandler
   X_SLASH K_INVOKE
     { att.check($2, K_INVOKE);
-      $$ = Invoke($5, $6, $7, $8, $9);
+/*
+      if ($7->length() > 0 || $8->length() > 0 || string($9->op_name()) != "implicitCompensationHandler")
+      {
+        cerr << "embed in scope" << endl;
+        $$ = Scope($5, NiltVariable_list(), implicitFaultHandler(), $9, implicitEventHandler(), StopInScope(), activityInvoke(Invoke(StandardElements(NiltTarget_list(), NiltSource_list()), $6)));
+      }
+      else
+      {
+        cerr << "don't embed" << endl;
+        $$ = Invoke($5, $6);
+      }
+*/
+      $$ = Invoke($5, $6);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
@@ -951,7 +963,7 @@ tInvoke:
       $$->id = $2; }
 | K_INVOKE arbitraryAttributes X_SLASH
     { att.check($2, K_INVOKE);
-      $$ = Invoke(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list(), NiltCatch_list(), NiltCatchAll_list(), implicitCompensationHandler());
+      $$ = Invoke(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list());
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");

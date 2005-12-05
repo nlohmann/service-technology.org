@@ -11,35 +11,37 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/05 14:10:10 $
+ *          - last changed: \$Date: 2005/12/05 14:49:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  *
  * \todo
  *       - (reinert) Comment this file and its classes.
- *       - (reinert) Attributes for <wait> are not checked properly.
  *       - (reinert) Variables for <onAlarm> are not checked.
- *       - (reibert) Check data types (e.g. is a value "yes" or "no").
+ *       - (reinert) Check data types (e.g. is a value "yes" or "no").
  */
 
 #include "bpel-attributes.h"
 #include "bpel-syntax.h"
 #include "debug.h"
 
-
+/*!
+ * 
+ */
 attributeManager::attributeManager()
 {
   this->scannerResult.clear();
   this->nodeId = 0;
 }
 
-
-
+/*!
+ * 
+ */
 kc::casestring attributeManager::read(kc::integer elementId, std::string attributeName)
 {
   // "cast" Kimwitu++ to C++
@@ -61,26 +63,58 @@ kc::casestring attributeManager::read(kc::integer elementId, std::string attribu
   return kc::mkcasestring(result.c_str());
 }
 
+/*!
+ * 
+ */
+kc::casestring attributeManager::read(kc::integer elementId, std::string attributeName, kc::casestring defaultValue)
+{
+  // "cast" Kimwitu++ to C++
+  unsigned int elementIdInt = elementId->value;
 
+  
+  std::string result;
+  
+  if(scannerResult[elementIdInt][attributeName].empty())
+  {
+	return defaultValue;
+  }
+  else
+  {
+    result = scannerResult[elementIdInt][attributeName];
+    return kc::mkcasestring(result.c_str());
+  }
+   
+}
 
+/*!
+ * 
+ */
 kc::integer attributeManager::nextId()
 {
   this->nodeId++;
   return kc::mkinteger(this->nodeId);
 }
 
-
+/*!
+ * 
+ */
 
 void attributeManager::define(kc::casestring attributeName, kc::casestring attributeValue)
 {
   scannerResult[this->nodeId][attributeName->name] = attributeValue->name;
 }
 
+/*!
+ *  
+ */
 void attributeManager::printCheckErrorMsg(std::string errorMsg)
 {
 	yyerror(string("[AttributeManager]: " + errorMsg + "\n").c_str());
 }
 
+/*!
+ * 
+ */
 void attributeManager::check(kc::integer elementId, unsigned int activityId)
 {
 	// "cast" Kimwitu++ to C++

@@ -53,6 +53,9 @@ class attributeManager
 
     /// returns the value of an attribute
     kc::casestring read(kc::integer elementId, std::string attributeName);
+    
+    /// returns the value of an attribute
+    kc::casestring read(kc::integer elementId, std::string attributeName, kc::casestring defaultValue);    
 
     /// increases the id
     kc::integer nextId();

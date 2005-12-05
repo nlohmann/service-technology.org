@@ -18,7 +18,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/04 16:02:40 $
+ *          - last changed: \$Date: 2005/12/05 13:05:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.44 $
+ * \version \$Revision: 1.45 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -843,7 +843,8 @@ tEmpty:
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
-      $$->id = $2; }
+      $$->id = $2;
+      $4->parentId = $2; }
 | K_EMPTY arbitraryAttributes X_SLASH
     { att.check($2, K_EMPTY);
       $$ = Empty(StandardElements(NiltTarget_list(), NiltSource_list()));
@@ -918,7 +919,8 @@ tInvoke:
       $$->outputVariable = att.read($2, "outputVariable");
       $$->uniqueIDin  = mkcasestring((symMan.checkVariable(att.read($2, "inputVariable")->name)).c_str());
       $$->uniqueIDout = mkcasestring((symMan.checkVariable(att.read($2, "outputVariable")->name)).c_str());
-      $$->id = $2; }
+      $$->id = $2;
+      $5->parentId = $2; }
 | K_INVOKE arbitraryAttributes X_SLASH
     { att.check($2, K_INVOKE);
       $$ = Invoke(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list());
@@ -985,6 +987,7 @@ tReceive:
       $$->createInstance = att.read($2, "createInstance"); 
       $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
       $$->id = $2; 
+      $5->parentId = $2;
     }
 | K_RECEIVE arbitraryAttributes X_SLASH
     { att.check($2, K_RECEIVE); 
@@ -1049,7 +1052,8 @@ tReply:
       $$->variable = att.read($2, "variable");
       $$->faultName = att.read($2, "faultName");
       $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
-      $$->id = $2; }
+      $$->id = $2;
+      $4->parentId = $2; }
 | K_REPLY arbitraryAttributes X_SLASH
     { att.check($2, K_REPLY);
       $$ = Reply(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list());
@@ -1094,7 +1098,8 @@ tAssign:
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
-      $$->id = $2; }
+      $$->id = $2;
+      $4->parentId = $2; }
 ;
 
 tCopy_list:
@@ -1213,7 +1218,8 @@ tWait:
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
       $$->For = att.read($2, "for"); // "for" is a keyword
       $$->until = att.read($2, "until");
-      $$->id = $2; }
+      $$->id = $2;
+      $4->parentId = $2; }
 | K_WAIT arbitraryAttributes X_SLASH
     { att.check($2, K_WAIT);
       $$ = Wait(StandardElements(NiltTarget_list(), NiltSource_list()));
@@ -1254,7 +1260,8 @@ tThrow:
       $$->faultName = att.read($2, "faultName");
       $$->faultVariable = att.read($2, "faultVariable");
       $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "faultVariable")->name)).c_str());
-      $$->id = $2; }
+      $$->id = $2;
+      $4->parentId = $2; }
 | K_THROW arbitraryAttributes X_SLASH
     { att.check($2, K_THROW);
       $$ = Throw(StandardElements(NiltTarget_list(), NiltSource_list()));
@@ -1292,7 +1299,8 @@ tCompensate:
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
       $$->scope = att.read($2, "scope");
-      $$->id = $2; }
+      $$->id = $2;
+      $4->parentId = $2; }
 | K_COMPENSATE arbitraryAttributes X_SLASH
     { att.check($2, K_COMPENSATE);
       $$ = Compensate(StandardElements(NiltTarget_list(), NiltSource_list()));
@@ -1328,7 +1336,8 @@ tTerminate:
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
-      $$->id = $2; }
+      $$->id = $2;
+      $4->parentId = $2; }
 | K_TERMINATE arbitraryAttributes X_SLASH
     { att.check($2, K_TERMINATE);
       $$ = Terminate(StandardElements(NiltTarget_list(), NiltSource_list()));
@@ -1371,6 +1380,7 @@ tFlow:
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
       $$->id = $2;
+      $5->parentId = $2;
       symMan.quitScope();
     }
 ;
@@ -1438,7 +1448,8 @@ tSwitch:
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
-      $$->id = $2; }
+      $$->id = $2;
+      $4->parentId = $2; }
 ;
 
 tCase_list:
@@ -1496,7 +1507,8 @@ tWhile:
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
       $$->condition = att.read($2, "condition");
-      $$->id = $2; }
+      $$->id = $2;
+      $4->parentId = $2; }
 ;
 
 
@@ -1524,7 +1536,8 @@ tSequence:
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
-      $$->id = $2; }
+      $$->id = $2;
+      $4->parentId = $2; }
 ;
 
 
@@ -1569,7 +1582,8 @@ tPick:
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
       $$->createInstance = att.read($2, "createInstance");
-      $$->id = $2; }
+      $$->id = $2;
+      $4->parentId = $2; }
 ;
 
 
@@ -1619,7 +1633,8 @@ tScope:
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
       $$->variableAccessSerializable = att.read($2, "variableAccessSerializable");
-      $$->id = $2; 
+      $$->id = $2;
+      $5->parentId = $2;
       symMan.quitScope();
     }
 ;

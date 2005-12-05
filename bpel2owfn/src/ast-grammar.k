@@ -13,7 +13,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2005/12/04 15:40:31 $
+ *          - last changed: \$Date: 2005/12/05 13:05:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-17 (nlohmann) Added default attributes.
  *          - 2005-12-04 (nlohmann) Changed representation of handlers.
@@ -649,6 +649,9 @@ tScope:
 
 standardElements:
   StandardElements(tTarget_list tSource_list)
+  {
+    integer parentId = 0;
+  }
 ;
 
 tTarget_list:

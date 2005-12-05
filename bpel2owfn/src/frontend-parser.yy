@@ -14,11 +14,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/05 21:14:01 $
+ *          - last changed: \$Date: 2005/12/05 22:29:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -530,8 +530,7 @@ tCatch:
     { $$ = Catch($4);
       $$->faultName = att.read($2, "faultName");
       $$->faultVariable = att.read($2, "faultVariable"); 
-      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "faultVariable")->name, true)).c_str());
-    }
+      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "faultVariable")->name, true)).c_str()); }
 ;
 
 tCatchAll:
@@ -712,8 +711,7 @@ tVariable:
 	              new csVariable($$->name->name, 
 				     $$->messageType->name, 
 				     $$->type->name, 
-				     $$->element->name))).c_str());
-    }
+				     $$->element->name))).c_str()); }
 | K_VARIABLE arbitraryAttributes X_SLASH
     { $$ = Variable();
       $$->name = att.read($2, "name");
@@ -724,8 +722,7 @@ tVariable:
 	              new csVariable($$->name->name, 
 				     $$->messageType->name, 
 				     $$->type->name, 
-				     $$->element->name))).c_str());
-    }
+				     $$->element->name))).c_str()); }
 ;
 
 
@@ -841,10 +838,9 @@ tEmpty:
     { att.check($2, K_EMPTY);
       $$ = Empty($4);
       $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
-      $$->id = $2;
-      $4->parentId = $2; }
+      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->id = $4->parentId = $2; }
 | K_EMPTY arbitraryAttributes X_SLASH
     { att.check($2, K_EMPTY);
       $$ = Empty(StandardElements(NiltTarget_list(), NiltSource_list()));
@@ -910,8 +906,8 @@ tInvoke:
 */
       $$ = Invoke($5, $6);
       $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->partnerLink = att.read($2, "partnerLink");
       $$->portType = att.read($2, "portType");
       $$->operation = att.read($2, "operation");
@@ -919,8 +915,7 @@ tInvoke:
       $$->outputVariable = att.read($2, "outputVariable");
       $$->uniqueIDin  = mkcasestring((symMan.checkVariable(att.read($2, "inputVariable")->name)).c_str());
       $$->uniqueIDout = mkcasestring((symMan.checkVariable(att.read($2, "outputVariable")->name)).c_str());
-      $$->id = $2;
-      $5->parentId = $2; }
+      $$->id = $5->parentId = $2; }
 | K_INVOKE arbitraryAttributes X_SLASH
     { att.check($2, K_INVOKE);
       $$ = Invoke(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list());
@@ -933,8 +928,7 @@ tInvoke:
       $$->inputVariable = att.read($2, "inputVariable");
       $$->outputVariable = att.read($2, "outputVariable"); 
       $$->id = $2;
-      symMan.checkPartnerLink($$->partnerLink->name);
-    }
+      symMan.checkPartnerLink($$->partnerLink->name); }
 ;
 
 
@@ -978,17 +972,15 @@ tReceive:
     {  
       $$ = Receive($5, $6);
       $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->partnerLink = att.read($2, "partnerLink");
       $$->portType = att.read($2, "portType");
       $$->operation = att.read($2, "operation");
       $$->variable = att.read($2, "variable");
       $$->createInstance = att.read($2, "createInstance", $$->createInstance); 
       $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
-      $$->id = $2; 
-      $5->parentId = $2;
-    }
+      $$->id = $5->parentId = $2; }
 | K_RECEIVE arbitraryAttributes X_SLASH
     { att.check($2, K_RECEIVE); 
       $$ = Receive(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list());
@@ -1002,8 +994,7 @@ tReceive:
       $$->createInstance = att.read($2, "createInstance", $$->createInstance);
       $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
       $$->id = $2; 
-      symMan.checkPartnerLink($$->partnerLink->name);
-    }
+      symMan.checkPartnerLink($$->partnerLink->name); }
 ;
 
 
@@ -1044,16 +1035,15 @@ tReply:
     { att.check($2, K_REPLY);
       $$ = Reply($4, $5);
       $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->partnerLink = att.read($2, "partnerLink");
       $$->portType = att.read($2, "portType");
       $$->operation = att.read($2, "operation");
       $$->variable = att.read($2, "variable");
       $$->faultName = att.read($2, "faultName");
       $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
-      $$->id = $2;
-      $4->parentId = $2; }
+      $$->id = $4->parentId = $2; }
 | K_REPLY arbitraryAttributes X_SLASH
     { att.check($2, K_REPLY);
       $$ = Reply(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list());
@@ -1096,10 +1086,9 @@ tAssign:
     { att.check($2, K_ASSIGN);
       $$ = Assign($4, $5);
       $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
-      $$->id = $2;
-      $4->parentId = $2; }
+      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->id = $4->parentId = $2; }
 ;
 
 tCopy_list:
@@ -1141,8 +1130,7 @@ tFrom:
       $$->expression = att.read($2, "expression");
       $$->opaque = att.read($2, "opaque"); 
       $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
-      symMan.checkPartnerLink($$->partnerLink->name);
-    }
+      symMan.checkPartnerLink($$->partnerLink->name); }
 | K_FROM arbitraryAttributes X_SLASH
     { $$ = From();
       $$->variable = att.read($2, "variable");
@@ -1154,8 +1142,7 @@ tFrom:
       $$->expression = att.read($2, "expression");
       $$->opaque = att.read($2, "opaque"); 
       $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
-      symMan.checkPartnerLink($$->partnerLink->name);
-    }
+      symMan.checkPartnerLink($$->partnerLink->name); }
 ;
 
 /*
@@ -1175,8 +1162,7 @@ tTo:
       $$->partnerLink = att.read($2, "partnerLink");
       $$->property = att.read($2, "property"); 
       $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
-      symMan.checkPartnerLink($$->partnerLink->name);
-    }
+      symMan.checkPartnerLink($$->partnerLink->name); }
 | K_TO arbitraryAttributes X_SLASH
     { $$ = To();
       $$->variable = att.read($2, "variable");
@@ -1184,8 +1170,7 @@ tTo:
       $$->partnerLink = att.read($2, "partnerLink");
       $$->property = att.read($2, "property"); 
       $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
-      symMan.checkPartnerLink($$->partnerLink->name);
-    }
+      symMan.checkPartnerLink($$->partnerLink->name); }
 ;
 
 
@@ -1214,12 +1199,11 @@ tWait:
     { att.check($2, K_WAIT);
       $$ = Wait($4);
       $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->For = att.read($2, "for"); // "for" is a keyword
       $$->until = att.read($2, "until");
-      $$->id = $2;
-      $4->parentId = $2; }
+      $$->id = $4->parentId = $2; }
 | K_WAIT arbitraryAttributes X_SLASH
     { att.check($2, K_WAIT);
       $$ = Wait(StandardElements(NiltTarget_list(), NiltSource_list()));
@@ -1255,13 +1239,12 @@ tThrow:
     { att.check($2, K_THROW);
       $$ = Throw($4);
       $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->faultName = att.read($2, "faultName");
       $$->faultVariable = att.read($2, "faultVariable");
       $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "faultVariable")->name)).c_str());
-      $$->id = $2;
-      $4->parentId = $2; }
+      $$->id = $4->parentId = $2; }
 | K_THROW arbitraryAttributes X_SLASH
     { att.check($2, K_THROW);
       $$ = Throw(StandardElements(NiltTarget_list(), NiltSource_list()));
@@ -1296,11 +1279,10 @@ tCompensate:
     { att.check($2, K_COMPENSATE);
       $$ = Compensate($4);
       $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->scope = att.read($2, "scope");
-      $$->id = $2;
-      $4->parentId = $2; }
+      $$->id = $4->parentId = $2; }
 | K_COMPENSATE arbitraryAttributes X_SLASH
     { att.check($2, K_COMPENSATE);
       $$ = Compensate(StandardElements(NiltTarget_list(), NiltSource_list()));
@@ -1334,10 +1316,9 @@ tTerminate:
     { att.check($2, K_TERMINATE);
       $$ = Terminate($4);
       $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
-      $$->id = $2;
-      $4->parentId = $2; }
+      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->id = $4->parentId = $2; }
 | K_TERMINATE arbitraryAttributes X_SLASH
     { att.check($2, K_TERMINATE);
       $$ = Terminate(StandardElements(NiltTarget_list(), NiltSource_list()));
@@ -1377,12 +1358,10 @@ tFlow:
   X_SLASH K_FLOW
     { $$ = Flow($5, $6, $7);
       $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
-      $$->id = $2;
-      $5->parentId = $2;
-      symMan.quitScope();
-    }
+      $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->id = $5->parentId = $2;
+      symMan.quitScope(); }
 ;
 
 activity_list:
@@ -1412,13 +1391,11 @@ tLink:
   K_LINK arbitraryAttributes X_NEXT X_SLASH K_LINK
     { $$ = Link();
       $$->name = att.read($2, "name"); 
-      $$->linkID = mkcasestring(symMan.addLink(new csLink($$->name->name)).c_str());
-    }
+      $$->linkID = mkcasestring(symMan.addLink(new csLink($$->name->name)).c_str()); }
 | K_LINK arbitraryAttributes X_SLASH
     { $$ = Link();
       $$->name = att.read($2, "name"); 
-      $$->linkID = mkcasestring(symMan.addLink(new csLink($$->name->name)).c_str());
-    }
+      $$->linkID = mkcasestring(symMan.addLink(new csLink($$->name->name)).c_str()); }
 ;
 
 
@@ -1450,10 +1427,9 @@ tSwitch:
     { att.check($2, K_SWITCH);
       $$ = Switch($4, $5, $6);
       $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
-      $$->id = $2;
-      $4->parentId = $2; }
+      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->id = $4->parentId = $2; }
 ;
 
 tCase_list:
@@ -1508,11 +1484,10 @@ tWhile:
     { att.check($2, K_WHILE);
       $$ = While($4, $5);
       $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->condition = att.read($2, "condition");
-      $$->id = $2;
-      $4->parentId = $2; }
+      $$->id = $4->parentId = $2; }
 ;
 
 
@@ -1538,10 +1513,9 @@ tSequence:
     { att.check($2, K_SEQUENCE);
       $$ = Sequence($4, $5);
       $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
-      $$->id = $2;
-      $4->parentId = $2; }
+      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->id = $4->parentId = $2; }
 ;
 
 
@@ -1583,11 +1557,10 @@ tPick:
     { att.check($2, K_PICK);
       $$ = Pick($4, ConstOnMessage_list($5, $7), $8);
       $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->createInstance = att.read($2, "createInstance", $$->createInstance);
-      $$->id = $2;
-      $4->parentId = $2; }
+      $$->id = $4->parentId = $2; }
 ;
 
 
@@ -1634,13 +1607,11 @@ tScope:
     { att.check($2, K_SCOPE);
       $$ = Scope($5, $6, $8, $9, $10, StopInScope(), $11);
       $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->variableAccessSerializable = att.read($2, "variableAccessSerializable", $$->variableAccessSerializable);
-      $$->id = $2;
-      $5->parentId = $2;
-      symMan.quitScope();
-    }
+      $$->id = $5->parentId = $2;
+      symMan.quitScope(); }
 ;
 
 
@@ -1680,13 +1651,11 @@ tTarget:
   K_TARGET arbitraryAttributes X_NEXT X_SLASH K_TARGET
     { $$ = Target();
       $$->linkName = att.read($2, "linkName"); 
-      $$->linkID = mkcasestring(symMan.checkLink($$->linkName->name, false).c_str());
-    }
+      $$->linkID = mkcasestring(symMan.checkLink($$->linkName->name, false).c_str()); }
 | K_TARGET arbitraryAttributes X_SLASH
     { $$ = Target();
       $$->linkName = att.read($2, "linkName"); 
-      $$->linkID = mkcasestring(symMan.checkLink($$->linkName->name, false).c_str());
-    }
+      $$->linkID = mkcasestring(symMan.checkLink($$->linkName->name, false).c_str()); }
 ;
 
 tSource_list:
@@ -1701,14 +1670,12 @@ tSource:
     { $$ = Source();
       $$->linkName = att.read($2, "linkName");
       $$->transitionCondition = att.read($2, "transitionCondition", $$->transitionCondition); 
-      $$->linkID = mkcasestring(symMan.checkLink($$->linkName->name, true).c_str());
-    }
+      $$->linkID = mkcasestring(symMan.checkLink($$->linkName->name, true).c_str()); }
 | K_SOURCE arbitraryAttributes X_SLASH
     { $$ = Source();
       $$->linkName = att.read($2, "linkName");
       $$->transitionCondition = att.read($2, "transitionCondition", $$->transitionCondition); 
-      $$->linkID = mkcasestring(symMan.checkLink($$->linkName->name, true).c_str());
-    }
+      $$->linkID = mkcasestring(symMan.checkLink($$->linkName->name, true).c_str()); }
 ;
 
 

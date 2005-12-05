@@ -16,7 +16,7 @@
 
 #include <map>
 
-/// names of attributes
+/// names of mandatory attributes
 const std::string A__CONDITION = "condition";
 const std::string A__FAULT_NAME = "faultName";
 const std::string A__FOR = "for";
@@ -26,6 +26,13 @@ const std::string A__PORT_TYPE = "portType";
 const std::string A__OPERATION = "operation";
 const std::string A__TARGET_NAMESPACE = "targetNamespace";
 const std::string A__UNTIL = "until";
+/// yes or no
+const std::string A__ABSTRACT_PROCESS = "abstractProcess";
+const std::string A__CREATE_INSTANCE = "createInstance";
+const std::string A__ENABLE_INSTANCE_COMPENSATION = "enableInstanceCompensation";
+const std::string A__INITIATE = "initiate";
+const std::string A__SUPPRESS_JOIN_FAILURE = "suppressJoinFailure";
+const std::string A__VARIABLE_ACCESS_SERIALIZABLE = "variableAccessSerializable";
 
 /// types of attributes
 const std::string T__NCNAME = "NCName";
@@ -41,8 +48,11 @@ class attributeManager
     /// an array to store attributes of XML-elements
     std::map<unsigned int, std::map<std::string, std::string> > scannerResult;
 	
+	///
+	void traceAM(std::string traceMsg);
+	
 	/// 
-	void printCheckErrorMsg(std::string errorMsg);
+	void printErrorMsg(std::string errorMsg);
   
   public:
     /// constructor

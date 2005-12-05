@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/05 11:43:20 $
+ *          - last changed: \$Date: 2005/12/05 16:58:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -2634,9 +2634,241 @@ This=Scope(a,b,c,d,e,f,g)
   STANDARD ELEMENTS
 ******************************************************************************/
 
+StandardElements(NiltTarget_list(), NiltSource_list()) ->
+  [petrinet: /* do nothing */ ]
+;
 
+This=StandardElements(NiltTarget_list(), a) ->
+  [petrinet:
+    {
+      string prefix = intToString(This->parentId->value) + ".link."; 
+      Place *p1 = TheNet->newPlace(prefix + "negLink");
+      Place *p2 = TheNet->newPlace(prefix + "initial");
+      Place *p3 = TheNet->newPlace(prefix + "p3");
+      Place *p4 = TheNet->newPlace(prefix + "p4");
+      Place *p5 = TheNet->newPlace(prefix + "final");
+      Place *p6 = TheNet->newPlace(prefix + "stop");
+      Place *p7 = TheNet->newPlace(prefix + "stopped");
+      Transition *t1 = TheNet->newTransition(prefix + "t1");
+      Transition *t2 = TheNet->newTransition(prefix + "t2");
+      Transition *t3 = TheNet->newTransition(prefix + "t3");
+      Transition *t4 = TheNet->newTransition(prefix + "t4");
+      TheNet->newArc(p1, t1);
+      TheNet->newArc(t1, p3);
+      TheNet->newArc(p4, t2);
+      TheNet->newArc(t2, p5);
+      TheNet->newArc(p4, t3);
+      TheNet->newArc(t3, p5);
+      TheNet->newArc(p5, t4);
+      TheNet->newArc(p6, t4);
+      TheNet->newArc(t4, p7);
 
+      foreach (link; tSource_list a)
+      {
+	Place *outLink = TheNet->findPlace(string(link->linkName->name));
+	Place *NoutLink = TheNet->findPlace("!" + string(link->linkName->name));
+	TheNet->newArc(NoutLink, t1);
+	TheNet->newArc(t1, outLink, "false");
+	TheNet->newArc(NoutLink, t2);
+	TheNet->newArc(t2, outLink, string(link->transitionCondition->name));
+	TheNet->newArc(outLink, t3, READ);
+      }
+   }
+  ]
+;
 
+This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure == mkcasestring("no")) ->
+  [petrinet:
+    {
+      string prefix = intToString(This->parentId->value) + ".link.";
+      Place *p5  = TheNet->newPlace(prefix + "negLink");
+      Place *p6  = TheNet->newPlace(prefix + "p6");
+      Place *p7  = TheNet->newPlace(prefix + "final");
+      Place *p8  = TheNet->newPlace(prefix + "initial");
+      Place *p9  = TheNet->newPlace(prefix + "stop");
+      Place *p10 = TheNet->newPlace(prefix + "stopped");
+      Place *p11 = TheNet->newPlace(prefix + "p11");
+      Place *p12 = TheNet->newPlace(prefix + "failed");
+      Transition *t1 = TheNet->newTransition(prefix + "t1", string(This->joinCondition->name));
+      Transition *t2 = TheNet->newTransition(prefix + "t2", "!(" + string(This->joinCondition->name) + ")");
+      Transition *t3 = TheNet->newTransition(prefix + "t3");
+      Transition *t4 = TheNet->newTransition(prefix + "t4");
+      TheNet->newArc(t1, p6);
+      TheNet->newArc(p8, t1);      
+      TheNet->newArc(p8, t2);
+      TheNet->newArc(t2, p5);
+      TheNet->newArc(t2, p11);
+      TheNet->newArc(t2, p12, "fault");
+      TheNet->newArc(p8, t3);
+      TheNet->newArc(p9, t3);
+      TheNet->newArc(t3, p10);
+      TheNet->newArc(p9, t4);
+      TheNet->newArc(t4, p10);
+      TheNet->newArc(p11, t4);
+
+      int i = 1;
+      foreach (link; tTarget_list a)
+      {
+	Place *inLink = TheNet->findPlace(string(link->linkName->name));
+	Place *NinLink = TheNet->findPlace("!" + string(link->linkName->name));
+	TheNet->newArc(t1, NinLink);
+	TheNet->newArc(inLink, t1, "b" + intToString(i));
+	TheNet->newArc(inLink, t2, "b" + intToString(i));
+	i++;
+      }
+    }
+  ]
+;
+
+This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure == mkcasestring("yes")) ->
+  [petrinet:
+    {
+      string prefix = intToString(This->parentId->value) + ".link.";
+      Place *p5  = TheNet->newPlace(prefix + "negLink");
+      Place *p6  = TheNet->newPlace(prefix + "p6");
+      Place *p7  = TheNet->newPlace(prefix + "final");
+      Place *p8  = TheNet->newPlace(prefix + "initial");
+      Place *p9  = TheNet->newPlace(prefix + "stop");
+      Place *p10 = TheNet->newPlace(prefix + "stopped");
+      Transition *t1 = TheNet->newTransition(prefix + "t1", string(This->joinCondition->name));
+      Transition *t2 = TheNet->newTransition(prefix + "t2", "!(" + string(This->joinCondition->name) + ")");
+      Transition *t3 = TheNet->newTransition(prefix + "t3");
+      TheNet->newArc(t1, p6);
+      TheNet->newArc(p8, t1);
+      TheNet->newArc(p8, t2);
+      TheNet->newArc(t2, p5);
+      TheNet->newArc(t2, p7);
+      TheNet->newArc(p8, t3);
+      TheNet->newArc(p9, t3);
+      TheNet->newArc(t3, p10);
+
+      int i = 1;
+      foreach (link; tTarget_list a)
+      {
+	Place *inLink = TheNet->findPlace(string(link->linkName->name));
+	Place *NinLink = TheNet->findPlace("!" + string(link->linkName->name));
+	TheNet->newArc(t1, NinLink);
+	TheNet->newArc(inLink, t1, "b" + intToString(i));
+	TheNet->newArc(inLink, t2, "b" + intToString(i));
+	i++;
+      }      
+    }
+  ]
+;
+
+This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("no")) ->
+  [petrinet:
+    {
+      string prefix = intToString(This->parentId->value) + ".link.";
+      Place *p9  = TheNet->newPlace(prefix + "negLink");
+      Place *p10 = TheNet->newPlace(prefix + "p10");
+      Place *p11 = TheNet->newPlace(prefix + "p11");
+      Place *p12 = TheNet->newPlace(prefix + "p12");
+      Place *p13 = TheNet->newPlace(prefix + "final");
+      Place *p14 = TheNet->newPlace(prefix + "stop");
+      Place *p15 = TheNet->newPlace(prefix + "stopped");
+      Place *p16 = TheNet->newPlace(prefix + "initial");
+      Transition *t1 = TheNet->newTransition(prefix + "t1");
+      Transition *t2 = TheNet->newTransition(prefix + "t2", string(This->joinCondition->name));
+      Transition *t3 = TheNet->newTransition(prefix + "t3");
+      Transition *t4 = TheNet->newTransition(prefix + "t4");
+      Transition *t5 = TheNet->newTransition(prefix + "t5", "!(" + string(This->joinCondition->name) + ")");
+      Transition *t6 = TheNet->newTransition(prefix + "t6");
+      Transition *t7 = TheNet->newTransition(prefix + "t7");
+      TheNet->newArc(p9, t1);
+      TheNet->newArc(t1, p10);
+      TheNet->newArc(t2, p11);
+      TheNet->newArc(p16, t2);
+      TheNet->newArc(p12, t3);
+      TheNet->newArc(t3, p13);
+      TheNet->newArc(p12, t4);
+      TheNet->newArc(t4, p13);
+      TheNet->newArc(t5, p10);
+      TheNet->newArc(t5, p13);
+      TheNet->newArc(p16, t5);
+      TheNet->newArc(p14, t6);
+      TheNet->newArc(t6, p15);
+      TheNet->newArc(p16, t6);
+      TheNet->newArc(p13, t7);
+      TheNet->newArc(p14, t7);
+      TheNet->newArc(t7, p15);
+
+      int i = 1;
+      foreach (link; tTarget_list a)
+      {
+	Place *inLink = TheNet->findPlace(string(link->linkName->name));
+	Place *NinLink = TheNet->findPlace("!" + string(link->linkName->name));
+        TheNet->newArc(t2, NinLink);	
+	TheNet->newArc(inLink, t2, "b" + intToString(i));
+        TheNet->newArc(t5, NinLink);
+	TheNet->newArc(inLink, t5, "b" + intToString(i));
+	i++;
+      }
+
+      i = 1;
+      foreach (link; tSource_list b)
+      {
+	Place *outLink = TheNet->findPlace(string(link->linkName->name));
+	Place *NoutLink = TheNet->findPlace("!" + string(link->linkName->name));
+        TheNet->newArc(NoutLink, t1);
+        TheNet->newArc(t1, outLink, "false");
+        TheNet->newArc(NoutLink, t3);
+        TheNet->newArc(t3, outLink, string(link->transitionCondition->name));
+        TheNet->newArc(NoutLink, t5);
+        TheNet->newArc(t5, outLink, "false");
+	TheNet->newArc(outLink, t4, READ);
+	i++;
+      }
+    }
+  ]
+;
+
+This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("yes")) ->
+  [petrinet:
+    {
+      string prefix = intToString(This->parentId->value) + ".link.";
+      Place *p9  = TheNet->newPlace(prefix + "negLink");
+      Place *p10 = TheNet->newPlace(prefix + "p10");
+      Place *p11 = TheNet->newPlace(prefix + "p11");
+      Place *p12 = TheNet->newPlace(prefix + "p12");
+      Place *p13 = TheNet->newPlace(prefix + "final");
+      Place *p14 = TheNet->newPlace(prefix + "stop");
+      Place *p15 = TheNet->newPlace(prefix + "stopped");
+      Place *p16 = TheNet->newPlace(prefix + "initial");
+      Place *p17 = TheNet->newPlace(prefix + "initial");
+      Place *p18 = TheNet->newPlace(prefix + "failed");
+      Transition *t1 = TheNet->newTransition(prefix + "t1");
+      Transition *t2 = TheNet->newTransition(prefix + "t2", string(This->joinCondition->name));
+      Transition *t3 = TheNet->newTransition(prefix + "t3");
+      Transition *t4 = TheNet->newTransition(prefix + "t4");
+      Transition *t5 = TheNet->newTransition(prefix + "t5", "!(" + string(This->joinCondition->name) + ")");
+      Transition *t6 = TheNet->newTransition(prefix + "t6");
+      Transition *t7 = TheNet->newTransition(prefix + "t7");
+      Transition *t8 = TheNet->newTransition(prefix + "t8");
+      TheNet->newArc(p9, t1);
+      TheNet->newArc(t1, p10);
+      TheNet->newArc(t2, p11);
+      TheNet->newArc(p16, t2);
+      TheNet->newArc(p12, t3);
+      TheNet->newArc(t3, p13);
+      TheNet->newArc(p12, t4);
+      TheNet->newArc(t4, p13);
+      TheNet->newArc(t5, p10);
+      TheNet->newArc(t5, p17);
+      TheNet->newArc(t5, p18, "fault");
+      TheNet->newArc(p16, t5);
+      TheNet->newArc(p14, t6);
+      TheNet->newArc(t6, p15);
+      TheNet->newArc(p16, t6);
+      TheNet->newArc(p17, t7);
+      TheNet->newArc(p14, t7);
+      TheNet->newArc(t7, p15);
+      TheNet->newArc(p13, t8);
+      TheNet->newArc(p14, t8);
+      TheNet->newArc(t8, p15);
+    }
+  ]
+;
 
 
 /*****************************************************************************/

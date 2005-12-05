@@ -14,11 +14,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/05 13:05:41 $
+ *          - last changed: \$Date: 2005/12/05 14:49:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.45 $
+ * \version \$Revision: 1.46 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -1692,11 +1692,11 @@ tSource:
   K_SOURCE arbitraryAttributes X_NEXT X_SLASH K_SOURCE
     { $$ = Source();
       $$->linkName = att.read($2, "linkName");
-      $$->transitionCondition = att.read($2, "transitionCondition"); }
+      $$->transitionCondition = att.read($2, "transitionCondition", $$->transitionCondition); }
 | K_SOURCE arbitraryAttributes X_SLASH
     { $$ = Source();
       $$->linkName = att.read($2, "linkName");
-      $$->transitionCondition = att.read($2, "transitionCondition"); }
+      $$->transitionCondition = att.read($2, "transitionCondition", $$->transitionCondition); }
 ;
 
 

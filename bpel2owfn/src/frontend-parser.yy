@@ -18,7 +18,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/05 14:49:02 $
+ *          - last changed: \$Date: 2005/12/05 15:27:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.46 $
+ * \version \$Revision: 1.47 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -279,12 +279,12 @@ tProcess:
       symMan.quitScope();
       $$->name = att.read($3, "name");
       $$->targetNamespace = att.read($3, "targetNamespace");
-      $$->queryLanguage = att.read($3, "queryLanguage");
-      $$->expressionLanguage = att.read($3, "expressionLanguage");
-      $$->suppressJoinFailure = att.read($3, "suppressJoinFailure");
-      $$->enableInstanceCompensation = att.read($3, "enableInstanceCompensation");
-      $$->abstractProcess = att.read($3, "abstractProcess");
-      $$->xmlns = att.read($3, "xmlns");
+      $$->queryLanguage = att.read($3, "queryLanguage", $$->queryLanguage);
+      $$->expressionLanguage = att.read($3, "expressionLanguage", $$->expressionLanguage);
+      $$->suppressJoinFailure = att.read($3, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->enableInstanceCompensation = att.read($3, "enableInstanceCompensation", $$->enableInstanceCompensation);
+      $$->abstractProcess = att.read($3, "abstractProcess", $$->abstractProcess);
+      $$->xmlns = att.read($3, "xmlns", $$->xmlns);
       $$->id = $3; }
 ;
 
@@ -805,12 +805,12 @@ tCorrelation:
   K_CORRELATION arbitraryAttributes X_NEXT X_SLASH K_CORRELATION
     { $$ = Correlation();
       $$->set = att.read($2, "set");
-      $$->initiate = att.read($2, "initiate");
+      $$->initiate = att.read($2, "initiate", $$->initiate);
       $$->pattern = att.read($2, "pattern"); }
 | K_CORRELATION arbitraryAttributes X_SLASH
     { $$ = Correlation();
       $$->set = att.read($2, "set");
-      $$->initiate = att.read($2, "initiate");
+      $$->initiate = att.read($2, "initiate", $$->initiate);
       $$->pattern = att.read($2, "pattern"); }
 ;
 
@@ -842,7 +842,7 @@ tEmpty:
       $$ = Empty($4);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->id = $2;
       $4->parentId = $2; }
 | K_EMPTY arbitraryAttributes X_SLASH
@@ -850,7 +850,7 @@ tEmpty:
       $$ = Empty(StandardElements(NiltTarget_list(), NiltSource_list()));
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->id = $2; }
 ;
 
@@ -911,7 +911,7 @@ tInvoke:
       $$ = Invoke($5, $6);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->partnerLink = att.read($2, "partnerLink");
       $$->portType = att.read($2, "portType");
       $$->operation = att.read($2, "operation");
@@ -926,7 +926,7 @@ tInvoke:
       $$ = Invoke(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list());
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->partnerLink = att.read($2, "partnerLink");
       $$->portType = att.read($2, "portType");
       $$->operation = att.read($2, "operation");
@@ -979,12 +979,12 @@ tReceive:
       $$ = Receive($5, $6);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->partnerLink = att.read($2, "partnerLink");
       $$->portType = att.read($2, "portType");
       $$->operation = att.read($2, "operation");
       $$->variable = att.read($2, "variable");
-      $$->createInstance = att.read($2, "createInstance"); 
+      $$->createInstance = att.read($2, "createInstance", $$->createInstance); 
       $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
       $$->id = $2; 
       $5->parentId = $2;
@@ -994,12 +994,12 @@ tReceive:
       $$ = Receive(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list());
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->partnerLink = att.read($2, "partnerLink");
       $$->portType = att.read($2, "portType");
       $$->operation = att.read($2, "operation");
       $$->variable = att.read($2, "variable");
-      $$->createInstance = att.read($2, "createInstance");
+      $$->createInstance = att.read($2, "createInstance", $$->createInstance);
       $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
       $$->id = $2; 
       symMan.checkPartnerLink($$->partnerLink->name);
@@ -1045,7 +1045,7 @@ tReply:
       $$ = Reply($4, $5);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->partnerLink = att.read($2, "partnerLink");
       $$->portType = att.read($2, "portType");
       $$->operation = att.read($2, "operation");
@@ -1059,7 +1059,7 @@ tReply:
       $$ = Reply(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list());
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->partnerLink = att.read($2, "partnerLink");
       $$->portType = att.read($2, "portType");
       $$->operation = att.read($2, "operation");
@@ -1097,7 +1097,7 @@ tAssign:
       $$ = Assign($4, $5);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->id = $2;
       $4->parentId = $2; }
 ;
@@ -1215,7 +1215,7 @@ tWait:
       $$ = Wait($4);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->For = att.read($2, "for"); // "for" is a keyword
       $$->until = att.read($2, "until");
       $$->id = $2;
@@ -1225,7 +1225,7 @@ tWait:
       $$ = Wait(StandardElements(NiltTarget_list(), NiltSource_list()));
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->For = att.read($2, "for"); // "for" is a keyword
       $$->until = att.read($2, "until");
       $$->id = $2; }
@@ -1256,7 +1256,7 @@ tThrow:
       $$ = Throw($4);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->faultName = att.read($2, "faultName");
       $$->faultVariable = att.read($2, "faultVariable");
       $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "faultVariable")->name)).c_str());
@@ -1267,7 +1267,7 @@ tThrow:
       $$ = Throw(StandardElements(NiltTarget_list(), NiltSource_list()));
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->faultName = att.read($2, "faultName");
       $$->faultVariable = att.read($2, "faultVariable");
       $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "faultVariable")->name)).c_str());
@@ -1297,7 +1297,7 @@ tCompensate:
       $$ = Compensate($4);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->scope = att.read($2, "scope");
       $$->id = $2;
       $4->parentId = $2; }
@@ -1306,7 +1306,7 @@ tCompensate:
       $$ = Compensate(StandardElements(NiltTarget_list(), NiltSource_list()));
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->scope = att.read($2, "scope");
       $$->id = $2; }
 ;
@@ -1335,7 +1335,7 @@ tTerminate:
       $$ = Terminate($4);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->id = $2;
       $4->parentId = $2; }
 | K_TERMINATE arbitraryAttributes X_SLASH
@@ -1343,7 +1343,7 @@ tTerminate:
       $$ = Terminate(StandardElements(NiltTarget_list(), NiltSource_list()));
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->id = $2; }
 ;
 
@@ -1378,7 +1378,7 @@ tFlow:
     { $$ = Flow($5, $6, $7);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->id = $2;
       $5->parentId = $2;
       symMan.quitScope();
@@ -1447,7 +1447,7 @@ tSwitch:
       $$ = Switch($4, $5, $6);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->id = $2;
       $4->parentId = $2; }
 ;
@@ -1505,7 +1505,7 @@ tWhile:
       $$ = While($4, $5);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->condition = att.read($2, "condition");
       $$->id = $2;
       $4->parentId = $2; }
@@ -1535,7 +1535,7 @@ tSequence:
       $$ = Sequence($4, $5);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->id = $2;
       $4->parentId = $2; }
 ;
@@ -1580,8 +1580,8 @@ tPick:
       $$ = Pick($4, ConstOnMessage_list($5, $7), $8);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
-      $$->createInstance = att.read($2, "createInstance");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->createInstance = att.read($2, "createInstance", $$->createInstance);
       $$->id = $2;
       $4->parentId = $2; }
 ;
@@ -1631,8 +1631,8 @@ tScope:
       $$ = Scope($5, $6, $8, $9, $10, StopInScope(), $11);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure");
-      $$->variableAccessSerializable = att.read($2, "variableAccessSerializable");
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->variableAccessSerializable = att.read($2, "variableAccessSerializable", $$->variableAccessSerializable);
       $$->id = $2;
       $5->parentId = $2;
       symMan.quitScope();

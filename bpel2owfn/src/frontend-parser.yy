@@ -14,11 +14,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/05 15:27:59 $
+ *          - last changed: \$Date: 2005/12/05 15:49:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.47 $
+ * \version \$Revision: 1.48 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -402,8 +402,8 @@ tPartnerLink:
       }
       else
       {
-        symMan.addPartnerLink($2, new csPartnerLink($$->name->name, $$->partnerLinkType->name, 
-	  		                       $$->myRole->name, $$->partnerRole->name)); 
+        symMan.addPartnerLink(new csPartnerLink($$->name->name, $$->partnerLinkType->name, 
+	  		                        $$->myRole->name, $$->partnerRole->name)); 
       }
     }
 | K_PARTNERLINK arbitraryAttributes X_SLASH
@@ -417,8 +417,8 @@ tPartnerLink:
       }
       else
       {
-        symMan.addPartnerLink($2, new csPartnerLink($$->name->name, $$->partnerLinkType->name, 
-	  		                       $$->myRole->name, $$->partnerRole->name)); 
+        symMan.addPartnerLink(new csPartnerLink($$->name->name, $$->partnerLinkType->name, 
+	  		                        $$->myRole->name, $$->partnerRole->name)); 
       }
     }
 ;
@@ -708,7 +708,7 @@ tVariable:
       $$->messageType = att.read($2, "messageType");
       $$->type = att.read($2, "type");
       $$->element = att.read($2, "element"); 
-      $$->uniqueID = mkcasestring((symMan.addVariable($2, 
+      $$->uniqueID = mkcasestring((symMan.addVariable( 
 	              new csVariable($$->name->name, 
 				     $$->messageType->name, 
 				     $$->type->name, 
@@ -720,7 +720,7 @@ tVariable:
       $$->messageType = att.read($2, "messageType");
       $$->type = att.read($2, "type");
       $$->element = att.read($2, "element"); 
-      $$->uniqueID = mkcasestring((symMan.addVariable($2, 
+      $$->uniqueID = mkcasestring((symMan.addVariable( 
 	              new csVariable($$->name->name, 
 				     $$->messageType->name, 
 				     $$->type->name, 
@@ -1411,10 +1411,14 @@ tLink_list:
 tLink:
   K_LINK arbitraryAttributes X_NEXT X_SLASH K_LINK
     { $$ = Link();
-      $$->name = att.read($2, "name"); }
+      $$->name = att.read($2, "name"); 
+      symMan.addLink(new csLink($$->name->name));
+    }
 | K_LINK arbitraryAttributes X_SLASH
     { $$ = Link();
-      $$->name = att.read($2, "name"); }
+      $$->name = att.read($2, "name"); 
+      symMan.addLink(new csLink($$->name->name));
+    }
 ;
 
 
@@ -1675,10 +1679,14 @@ tTarget_list:
 tTarget:
   K_TARGET arbitraryAttributes X_NEXT X_SLASH K_TARGET
     { $$ = Target();
-      $$->linkName = att.read($2, "linkName"); }
+      $$->linkName = att.read($2, "linkName"); 
+      symMan.checkLink($$->linkName->name, false);
+    }
 | K_TARGET arbitraryAttributes X_SLASH
     { $$ = Target();
-      $$->linkName = att.read($2, "linkName"); }
+      $$->linkName = att.read($2, "linkName"); 
+      symMan.checkLink($$->linkName->name, false);
+    }
 ;
 
 tSource_list:
@@ -1692,11 +1700,15 @@ tSource:
   K_SOURCE arbitraryAttributes X_NEXT X_SLASH K_SOURCE
     { $$ = Source();
       $$->linkName = att.read($2, "linkName");
-      $$->transitionCondition = att.read($2, "transitionCondition", $$->transitionCondition); }
+      $$->transitionCondition = att.read($2, "transitionCondition", $$->transitionCondition); 
+      symMan.checkLink($$->linkName->name, true);
+    }
 | K_SOURCE arbitraryAttributes X_SLASH
     { $$ = Source();
       $$->linkName = att.read($2, "linkName");
-      $$->transitionCondition = att.read($2, "transitionCondition", $$->transitionCondition); }
+      $$->transitionCondition = att.read($2, "transitionCondition", $$->transitionCondition); 
+      symMan.checkLink($$->linkName->name, true);
+    }
 ;
 
 

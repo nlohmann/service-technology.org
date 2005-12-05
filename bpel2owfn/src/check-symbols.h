@@ -6,20 +6,22 @@
  *
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/04 14:16:06 $
+ *          - last changed: \$Date: 2005/12/05 15:49:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  *          - 2005-11-22 (gierds) Initial version.
- *          - 2005-11-22 (gierds) Put all funcionality into a class #SymbolManager
+ *          - 2005-11-24 (gierds) Put all funcionality into a class #SymbolManager
+ *          - 2005-11-29 (gierds) Added checking of variables.
+ *          - 2005-12-01 (gierds) Added checking of links.
  *
  */
 
@@ -38,13 +40,14 @@
 
 using namespace std;
 
-// forward declaration of classesi
+// forward declaration of classes
 class SymbolManager;
 class SymbolScope;
 class ScopeScope;
 class FlowScope;
 class csPartnerLink;
 class csVariable;
+class csLink;
 
 class SymbolManager
 {
@@ -78,18 +81,25 @@ class SymbolManager
     SymbolScope * getScope(kc::integer id);
     
     /// add a PartnerLink to the current scope
-    void addPartnerLink(kc::integer id, csPartnerLink* pl);
+    void addPartnerLink(csPartnerLink* pl);
     /// check, if a PartnerLink exists in the current scope
     void checkPartnerLink(csPartnerLink* pl);
     /// check, if a PartnerLink with name exists in the current scope
     void checkPartnerLink(std::string);
+
     /// add a Variable to the current scope
-    std::string addVariable(kc::integer id, csVariable* var);
+    std::string addVariable(csVariable* var);
     /// check, if a Variable exists in the current scope
-    std::string checkVariable(csVariable* pl, bool isFaultVariable = false);
+    std::string checkVariable(csVariable* var, bool isFaultVariable = false);
     /// check, if a Variable with name exists in the current scope
     std::string checkVariable(std::string, bool isFaultVariable = false);
 
+    /// add a Variable to the current scope
+    std::string addLink(csLink* link);
+    /// check, if a Variable exists in the current scope
+    std::string checkLink(csLink* link, bool asSource);
+    /// check, if a Variable with name exists in the current scope
+    std::string checkLink(std::string, bool asSource);
 
     /// prints the scope tree
     void printScope();
@@ -194,12 +204,14 @@ class FlowScope: public SymbolScope
 {
   public:
     /// list of links defined within a Flow
-    list<kc::integer> links;
+    list<csLink *> links;
 
     /// Constructor for scope without parent
     FlowScope(kc::integer myid);
     /// Constructor for scope with parent scope
     FlowScope(kc::integer myid, SymbolScope* myparent);
+
+    ~FlowScope();
 };
 
 
@@ -254,11 +266,31 @@ class csVariable
     /// attribute element
     string element;
 
-    /// Constructor that demands a value (maybe NULL) for all possible attributes
+    /// Constructor that demands a value (maybe "") for all possible attributes
     csVariable ( string myname, string mymessageType, string mytype, string myelement);
 
     /// our own equality
     bool operator==(csVariable& other);
+};
+
+class csLink
+{
+  public:
+    /// attribute name
+    string name;
+
+    /// flag indicating the link's usage as a source
+    bool isSource;
+    /// flag indicating the link's usage as a target
+    bool isTarget;
+
+    // csLink * Target;
+
+    /// Constructor
+    csLink( string myname );
+
+    /// our own equality
+    bool operator==(csLink& other);
 };
 
 #endif

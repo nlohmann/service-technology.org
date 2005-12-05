@@ -6,18 +6,18 @@
  *
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/04 14:16:06 $
+ *          - last changed: \$Date: 2005/12/05 15:49:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  *          - 2005-11-22 (gierds) Initial version.
  *	    - 2005-11-30 (gierds) Checking for PartnerLinks completed.
  *
@@ -136,7 +136,7 @@ SymbolScope * SymbolManager::getScope(kc::integer id)
  * \param pl Pointer to the PartnerLink that shall be added 
  *
  */
-void SymbolManager::addPartnerLink(kc::integer id, csPartnerLink* pl)
+void SymbolManager::addPartnerLink(csPartnerLink* pl)
 {
   trace(TRACE_VERY_DEBUG, "[CS] Adding (" + intToString(currentScope->id->value) 
 		        + ") PartnerLink " + pl->name + ", " + pl->partnerLinkType + ", "
@@ -159,7 +159,7 @@ void SymbolManager::addPartnerLink(kc::integer id, csPartnerLink* pl)
   catch(bad_cast)
   {
     throw Exception(CHECK_SYMBOLS_CAST_ERROR,"Dynamic cast error while building scope tree\n",
-		    "Seems node " + intToString(id->value) + " is no Process\n"); 
+		    "Seems node " + intToString(currentScope->id->value) + " is no Process\n"); 
   }
 }
 
@@ -202,16 +202,19 @@ void SymbolManager::checkPartnerLink(csPartnerLink* pl)
         scope = scope->parent;
       }
 
-      trace(TRACE_VERY_DEBUG, "[CS]   Looking for defined PartnerLinks ...\n");
-      for (list<csPartnerLink*>::iterator iter = (dynamic_cast <ProcessScope *> (scope))->partnerLinks.begin();
- 		    iter != (dynamic_cast <ProcessScope *> (scope))->partnerLinks.end(); iter++)
+      if (scope != NULL)
       {
-        if (*(*iter) == *pl)
+        trace(TRACE_VERY_DEBUG, "[CS]   Looking for defined PartnerLinks ...\n");
+        for (list<csPartnerLink*>::iterator iter = (dynamic_cast <ProcessScope *> (scope))->partnerLinks.begin();
+ 		    iter != (dynamic_cast <ProcessScope *> (scope))->partnerLinks.end(); iter++)
         {
-  	  found = true;
+          if (*(*iter) == *pl)
+          {
+  	    found = true;
+          }
         }
+        scope = scope->parent;
       }
-      scope = scope->parent;
     }
     if (!found)
     {
@@ -239,7 +242,7 @@ void SymbolManager::checkPartnerLink(std::string name)
 
 
 /// \todo (gierds) comment me
-std::string SymbolManager::addVariable(kc::integer id, csVariable* var)
+std::string SymbolManager::addVariable(csVariable* var)
 {
   trace(TRACE_VERY_DEBUG, "[CS] Adding Variable " + var->name + ", " + var->messageType + ", "
 		      + var->type + ", " + var->element + "\n");
@@ -254,7 +257,9 @@ std::string SymbolManager::addVariable(kc::integer id, csVariable* var)
   }
   currentScope->variables.push_back(var);
 
-  trace(TRACE_VERY_DEBUG, "[CS] Unique ID of Variable is " + std::string(intToString(currentScope->id->value) + "." + var->name) + "\n");
+  trace(TRACE_VERY_DEBUG, "[CS] Unique ID of Variable is " 
+		          + std::string(intToString(currentScope->id->value) 
+		          + "." + var->name) + "\n");
   return (intToString(currentScope->id->value) + "." + var->name);
 }
 
@@ -297,19 +302,21 @@ std::string SymbolManager::checkVariable(csVariable* var, bool isFaultVariable)
         scope = scope->parent;
       }
 
-      trace(TRACE_VERY_DEBUG, "[CS]   Looking for defined variables ...\n");
-      for (list<csVariable*>::iterator iter = scope->variables.begin();
- 		    iter != scope->variables.end(); iter++)
+      if (scope != NULL)
       {
-        if (*(*iter) == *var)
+        trace(TRACE_VERY_DEBUG, "[CS]   Looking for defined variables ...\n");
+        for (list<csVariable*>::iterator iter = scope->variables.begin();
+ 	 	    iter != scope->variables.end(); iter++)
         {
-  	  found = true;
-	  id = scope->id->value;
+          if (*(*iter) == *var)
+          {
+  	    found = true;
+	    id = scope->id->value;
+          }
         }
+        scope = scope->parent;
       }
-      scope = scope->parent;
-
-    }
+    }  
     uniqueID = std::string(intToString(id) + "." + var->name);
     if ((!found) && (!isFaultVariable))
     {
@@ -319,7 +326,7 @@ std::string SymbolManager::checkVariable(csVariable* var, bool isFaultVariable)
     if ((!found) && (isFaultVariable))
     {
       // Fault Variables might be undefined, but that works for us
-      uniqueID = addVariable(currentScope->id, var);
+      uniqueID = addVariable(var);
     }
   }
   catch(bad_cast)
@@ -345,6 +352,153 @@ std::string SymbolManager::checkVariable(std::string name, bool isFaultVariable)
     trace(TRACE_VERY_DEBUG, "[CS] Checking Fault Variable");
   }
   return checkVariable(new csVariable(name, "", "", ""), isFaultVariable);
+}
+
+/**
+ * Adds a Link to the current scope (should be a <flow>).
+ *
+ * \param id   ID of the AST node
+ * \param link the Link to be added
+ * \return     the unique Link ID
+ * 
+ */
+std::string SymbolManager::addLink(csLink* link)
+{
+  trace(TRACE_VERY_DEBUG, "[CS] Adding Link " + link->name + "\n");
+
+  // since we want to add a Link, we assume currentScope is a FlowScope
+  try
+  {
+    // check, if Link name is unique, otherwise call yyerror
+    for (list<csLink*>::iterator 
+	    iter = (dynamic_cast <FlowScope *> (currentScope))->links.begin();
+	    iter != (dynamic_cast <FlowScope *> (currentScope))->links.end(); 
+	    iter++)
+    {
+      if (*(*iter) == *link)
+      {
+        yyerror(string("Two Links with same name\nName of double Link is \"" + 
+			link->name + "\"\n").c_str());
+      }
+    }
+    ((dynamic_cast <FlowScope *> (currentScope))->links).push_back(link);
+  }
+  catch(bad_cast)
+  {
+    throw Exception(CHECK_SYMBOLS_CAST_ERROR,
+		    "Dynamic cast error while building scope tree\n",
+		    "Seems node " + intToString(currentScope->id->value) + 
+		    " is no Flow\n"); 
+  }
+
+  trace(TRACE_VERY_DEBUG, "[CS] Unique ID of Link is " 
+		  + std::string(intToString(currentScope->id->value) + "." 
+		  + link->name) + "\n");
+  return (intToString(currentScope->id->value) + "." + link->name);
+}
+
+/**
+ * Checks, if Link is defined in scope.
+ *
+ * \param pl       The Link to be checked
+ * \param asSource false, iff used as Source of a Link (otherwise as a Target)
+ * \return         the unique ID of the Link
+ *
+ */
+std::string SymbolManager::checkLink(csLink* link, bool asSource)
+{
+  int id = 0;
+  std::string uniqueID;
+  
+  // if no name is set, there was probably no Link given
+  if (link->name == "")
+  {
+    trace(TRACE_VERY_DEBUG, "[CS] Checking Link, but no name is given; returning.\n");
+    return "";
+  }
+
+  trace(TRACE_DEBUG, "[CS] Checking Link " + link->name + "\n");
+  try
+  {
+    // check, if Link name is present, otherwise throw Exception
+    bool found = false;
+    SymbolScope * scope = currentScope;
+    while ((! found) && (scope != NULL))
+    {
+      // ascent to next scope with variable definitions
+      trace(TRACE_VERY_DEBUG, "[CS]   Ascending to next suitable scope ...\n");
+      while ((scope != NULL) && (typeid(*scope) != typeid(FlowScope)))
+      {
+        trace(TRACE_VERY_DEBUG, "[CS]     typeids are ");
+        trace(TRACE_VERY_DEBUG, typeid(*scope).name());
+        trace(TRACE_VERY_DEBUG, " and ");
+        trace(TRACE_VERY_DEBUG, typeid(FlowScope).name());
+        trace(TRACE_VERY_DEBUG, "\n");
+ 	     
+        trace(TRACE_VERY_DEBUG, "[CS]     ... leaving scope " + intToString(scope->id->value) + "\n");
+        scope = scope->parent;
+      }
+
+      if (scope != NULL)
+      {
+        trace(TRACE_VERY_DEBUG, "[CS]   Looking for defined Links ...\n");
+        for (list<csLink*>::iterator 
+	        iter = (dynamic_cast <FlowScope *> (scope))->links.begin();
+ 	        iter != (dynamic_cast <FlowScope *> (scope))->links.end(); 
+	        iter++)
+        {
+          if (*(*iter) == *link)
+          {
+    	    found = true;
+	    if (asSource)
+	    {
+              if ((*iter)->isSource)
+	      {
+                yyerror(string("Link \"" + link->name + "\" was already used as source\n").c_str());
+	      }
+	      (*iter)->isSource = true;
+	    }
+	    else
+	    {
+              if ((*iter)->isTarget)
+	      {
+                yyerror(string("Link \"" + link->name + "\" was already used as target\n").c_str());
+	      }
+	      (*iter)->isTarget = true;
+	    }
+	    id = scope->id->value;
+          }
+        }
+        scope = scope->parent;
+      }
+    }
+    uniqueID = std::string(intToString(id) + "." + link->name);
+    if ((!found))
+    {
+      yyerror(string("Name of undefined Link is \"" + link->name + "\"\n").c_str());
+    }
+  }
+  catch(bad_cast)
+  {
+    throw Exception(CHECK_SYMBOLS_CAST_ERROR,"Dynamic cast error while checking Links\n"); 
+  }
+
+  trace(TRACE_VERY_DEBUG, "[CS] Unique ID of Link is " + std::string(intToString(id) + "." + link->name) + "\n");
+  return uniqueID;
+  
+}
+
+/**
+ * Checks, if Link is defined in scope.
+ *
+ * \param name     Name of the Link to be checked
+ * \param asSource false, iff used as Source of a Link (otherwise as a Target)
+ * \return         the unique ID of the Link
+ *
+ */
+std::string SymbolManager::checkLink(std::string name, bool asSource)
+{
+  return checkLink(new csLink(name), asSource);
 }
 
 
@@ -466,6 +620,14 @@ FlowScope::FlowScope(kc::integer myid, SymbolScope* myparent) : SymbolScope(myid
   // empty
 }
 
+FlowScope::~FlowScope()
+{
+  for( list<csLink*>::iterator iter = links.begin(); iter != links.end(); iter++)
+  {
+    trace(TRACE_VERY_DEBUG, "[CS]      Deleting link " + (*iter)->name + "\n");
+    delete(*iter);
+  }
+}
 
 /// \todo (gierds) comment me
 csPartnerLink::csPartnerLink ( string myname, string mytype, string mymyrole, string mypartnerRole)
@@ -495,6 +657,18 @@ csVariable::csVariable ( string myname, string mymessageType, string mytype, str
 
 /// \todo (gierds) comment me
 bool csVariable::operator==(csVariable& other)
+{
+  return (name == other.name);
+}
+
+/// \todo (gierds) comment me
+csLink::csLink( string myname )
+{
+  name = myname;
+}
+
+/// \todo (gierds) comment me
+bool csLink::operator==(csLink& other)
 {
   return (name == other.name);
 }

@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/04 18:10:30 $
+ *          - last changed: \$Date: 2005/12/05 11:43:20 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.48 $
+ * \version \$Revision: 1.49 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -1104,20 +1104,21 @@ This=EventHandler(a,b) ->
       int onMessageCount = 1;
       foreach (OnMessage(innerActivity); tOnMessage_list a)
       {
-	string newprefix = prefix + "onMessage" + intToString(onMessageCount) + ".";
+	string message = intToString(onMessageCount);
+	string newprefix = prefix + "onMessage" + message + ".";
 	Place *onMessage_p1  = TheNet->newPlace(newprefix + "p1");
 	Place *onMessage_p2  = TheNet->newPlace(newprefix + "p2");
 	Place *onMessage_p3  = TheNet->newPlace(newprefix + "p3");
 	Place *onMessage_p4  = TheNet->newPlace(newprefix + "p4");
-	Place *onMessage_p5  = TheNet->newPlace(newprefix + "wait" + intToString(onMessageCount) );
+	Place *onMessage_p5  = TheNet->newPlace(newprefix + "wait" + message );
 	Place *onMessage_p6  = TheNet->newPlace(newprefix + "p6");
-	Place *onMessage_p7  = TheNet->newPlace(newprefix + "finish" + intToString(onMessageCount) );
-	Place *onMessage_p9  = TheNet->newPlace(newprefix + "finish+stop" + intToString(onMessageCount) );
-	Place *onMessage_p11 = TheNet->newPlace(newprefix + "stop" + intToString(onMessageCount) );
+	Place *onMessage_p7  = TheNet->newPlace(newprefix + "finish" + message );
+	Place *onMessage_p9  = TheNet->newPlace(newprefix + "finish+stop" + message );
+	Place *onMessage_p11 = TheNet->newPlace(newprefix + "stop" + message );
 	Place *onMessage_p12 = TheNet->newPlace(newprefix + "p12");
-	Transition *onMessage_t1  = TheNet->newTransition(newprefix + "t1", "guard" + intToString(onMessageCount) );
+	Transition *onMessage_t1  = TheNet->newTransition(newprefix + "t1", "guard" + message );
 	Transition *onMessage_t2  = TheNet->newTransition(newprefix + "t2");
-	Transition *onMessage_t3  = TheNet->newTransition(newprefix + "t3", "!guard" + intToString(onMessageCount) );
+	Transition *onMessage_t3  = TheNet->newTransition(newprefix + "t3", "!guard" + message );
 	Transition *onMessage_t4  = TheNet->newTransition(newprefix + "t4");
 	Transition *onMessage_t5  = TheNet->newTransition(newprefix + "t5");
 	Transition *onMessage_t7  = TheNet->newTransition(newprefix + "t7");
@@ -1125,12 +1126,12 @@ This=EventHandler(a,b) ->
 	Transition *onMessage_t10 = TheNet->newTransition(newprefix + "t10");
 	Transition *onMessage_t11 = TheNet->newTransition(newprefix + "t11");
 	Transition *onMessage_t12 = TheNet->newTransition(newprefix + "t12");
-	TheNet->newArc(onMessage_p2, onMessage_t1, "(M" + intToString(onMessageCount) + ",CS" + intToString(onMessageCount) + ")" );
+	TheNet->newArc(onMessage_p2, onMessage_t1, "(M" + message + ",CS" + message + ")" );
 	TheNet->newArc(onMessage_t1, onMessage_p1);
-	TheNet->newArc(onMessage_t1, TheNet->findPlace(intToString(This->parentScopeId->value) + ".eventHandler.failed"), "fault" + intToString(onMessageCount));
-	TheNet->newArc(onMessage_t2, onMessage_p2, "(M" + intToString(onMessageCount) + ",CS" + intToString(onMessageCount) + ")" );
+	TheNet->newArc(onMessage_t1, TheNet->findPlace(intToString(This->parentScopeId->value) + ".eventHandler.failed"), "fault" + message);
+	TheNet->newArc(onMessage_t2, onMessage_p2, "(M" + message + ",CS" + message + ")" );
 	TheNet->newArc(onMessage_p5, onMessage_t2);
-	TheNet->newArc(onMessage_p2, onMessage_t3, "(M" + intToString(onMessageCount) + ",CS" + intToString(onMessageCount) + ")" );
+	TheNet->newArc(onMessage_p2, onMessage_t3, "(M" + message + ",CS" + message + ")" );
 	TheNet->newArc(onMessage_t3, onMessage_p3);
 	TheNet->newArc(onMessage_p4, onMessage_t4);
 	TheNet->newArc(onMessage_t4, onMessage_p5);
@@ -1146,7 +1147,7 @@ This=EventHandler(a,b) ->
 	TheNet->newArc(onMessage_p1, onMessage_t10);
 	TheNet->newArc(onMessage_p11, onMessage_t10);
 	TheNet->newArc(onMessage_t10, onMessage_p12);
-	TheNet->newArc(onMessage_p2, onMessage_t11, "(M" + intToString(onMessageCount) + ",CS" + intToString(onMessageCount) + ")" );
+	TheNet->newArc(onMessage_p2, onMessage_t11, "(M" + message + ",CS" + message + ")" );
 	TheNet->newArc(onMessage_p11, onMessage_t11);
 	TheNet->newArc(onMessage_t11, onMessage_p12);
 	TheNet->newArc(onMessage_p5, onMessage_t12);
@@ -1408,8 +1409,7 @@ This=implicitCompensationHandler() ->
 This=Empty(a) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".";
-      
+      string prefix = intToString(This->id->value) + ".";     
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
       Place *p3 = TheNet->newPlace(prefix + "stop");
@@ -1486,7 +1486,6 @@ This=Invoke(a,b) provided (This->outputVariable != mkcasestring("")) ->
   [petrinet:
     {
       string prefix = intToString(This->id->value) + ".";
-
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running1");
       Place *p3 = TheNet->newPlace(prefix + "p3");
@@ -1658,8 +1657,7 @@ This=Reply(a,b) ->
 This=Assign(a,b) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".";
-      
+      string prefix = intToString(This->id->value) + ".";     
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p3 = TheNet->newPlace(prefix + "final");
       Place *p5 = TheNet->newPlace(prefix + "stop");
@@ -2359,22 +2357,23 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
       int onMessageCount = 1;      
       foreach (OnMessage(innerActivity); tOnMessage_list b)
       {
-	string newprefix = prefix + "onMessage" + intToString(onMessageCount) + ".";
+	string message = intToString(onMessageCount);
+	string newprefix = prefix + "onMessage" + message + ".";
 	Place *p3 = TheNet->newPlace(newprefix + "p3");
 	Place *p10 = TheNet->newPlace(newprefix + "p10");
 	Transition *t2 = TheNet->newTransition(newprefix + "t2");
-	Transition *t3 = TheNet->newTransition(newprefix + "t3", "!guard" + intToString(onMessageCount));
-	Transition *t4 = TheNet->newTransition(newprefix + "t4", "guard" + intToString(onMessageCount));
+	Transition *t3 = TheNet->newTransition(newprefix + "t3", "!guard" + message);
+	Transition *t4 = TheNet->newTransition(newprefix + "t4", "guard" + message);
 	Transition *t9 = TheNet->newTransition(newprefix + "t9");
 	Transition *t10 = TheNet->newTransition(newprefix + "t10");
 	TheNet->newArc(TheNet->findPlace(TheActivity, ".TimeStamp"), t2, "x");
-	TheNet->newArc(t2, p3, "M" + intToString(onMessageCount) );
-	TheNet->newArc(p3, t3, "M" + intToString(onMessageCount) );
+	TheNet->newArc(t2, p3, "M" + message );
+	TheNet->newArc(p3, t3, "M" + message );
 	TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
-	TheNet->newArc(p3, t4, "M" + intToString(onMessageCount) );
+	TheNet->newArc(p3, t4, "M" + message );
 	TheNet->newArc(t4, p10);
 	TheNet->newArc(t4, TheNet->findPlace(TheActivity, ".failed"), "fault");
-	TheNet->newArc(p3, t9, "M" + intToString(onMessageCount) );
+	TheNet->newArc(p3, t9, "M" + message );
 	TheNet->newArc(TheNet->findPlace(TheActivity, ".stop"), t9);
 	TheNet->newArc(t9, TheNet->findPlace(TheActivity, ".stopped"));
 	TheNet->newArc(p10, t10);
@@ -2556,8 +2555,6 @@ This=Scope(a,b,c,d,e,f,g)
     f // Stop Pattern
     g // innerActivity
     {
-      prefix = intToString(This->id->value) + ".";
-
       // embed fault handler
       TheNet->mergePlaces(prefix + "p43",    prefix + "faulthandler.fault");
       TheNet->mergePlaces(prefix + "p44",    prefix + "faulthandler.faultSave");

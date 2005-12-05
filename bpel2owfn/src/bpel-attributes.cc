@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/05 16:58:37 $
+ *          - last changed: \$Date: 2005/12/05 17:01:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  *
  * \todo
  *       - (reinert) Comment this file and its classes.
@@ -164,7 +164,7 @@ void attributeManager::printErrorMsg(std::string errorMsg)
 
 void attributeManager::traceAM(std::string traceMsg)
 {
-	trace(TRACE_DEBUG, traceMsg);	
+	//trace(TRACE_DEBUG, traceMsg);	
 }
 /*!
  * 

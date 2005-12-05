@@ -7,18 +7,18 @@
  * 
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/04 14:16:06 $
+ *          - last changed: \$Date: 2005/12/05 14:10:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universitï¿½t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  *
  * \todo
  *       - (reinert) Comment this file and its classes.
@@ -94,7 +94,7 @@ void attributeManager::check(kc::integer elementId, unsigned int activityId)
 				trace(TRACE_DEBUG,"PROCESS!!! \n");
 				
 				bool nameFlag, targetNamespaceFlag;
-				nameFlag = targetNamespaceFlag = true;
+				nameFlag = targetNamespaceFlag = false;
 				 
 				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
 				
@@ -103,22 +103,22 @@ void attributeManager::check(kc::integer elementId, unsigned int activityId)
 				{	
 					if(((*scannerResultDataIterator).first) == A__NAME)
 					{
-						nameFlag = false;
+						nameFlag = true;
 						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
 					}
 					else if(((*scannerResultDataIterator).first) == A__TARGET_NAMESPACE)
 					{
-						targetNamespaceFlag = false;
+						targetNamespaceFlag = true;
 						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
 					}
 					++scannerResultDataIterator;
 				}
 				
-				if(nameFlag)
+				if(!nameFlag)
 				{
 					printCheckErrorMsg("attribute " + A__NAME + "=\"" + T__NCNAME + "\" is missing");					
 				}
-				else if(targetNamespaceFlag)
+				else if(!targetNamespaceFlag)
 				{
 					printCheckErrorMsg("attribute " + A__TARGET_NAMESPACE + "=\"" + T__ANYURI + "\" is missing");					
 				}
@@ -131,7 +131,7 @@ void attributeManager::check(kc::integer elementId, unsigned int activityId)
 				trace(TRACE_DEBUG,"RECEIVE!!! \n");			
 
 				bool partnerLinkFlag, portTypeFlag, operationFlag;
-				partnerLinkFlag = portTypeFlag = operationFlag = true;
+				partnerLinkFlag = portTypeFlag = operationFlag = false;
 				 
 				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
 				
@@ -140,31 +140,31 @@ void attributeManager::check(kc::integer elementId, unsigned int activityId)
 				{	
 					if(((*scannerResultDataIterator).first) == A__PARTNER_LINK)
 					{
-						partnerLinkFlag = false;
+						partnerLinkFlag = true;
 						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
 					}
 					else if(((*scannerResultDataIterator).first) == A__PORT_TYPE)
 					{
-						portTypeFlag = false;
+						portTypeFlag = true;
 						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
 					}
 					else if(((*scannerResultDataIterator).first) == A__OPERATION)
 					{
-						operationFlag = false;
+						operationFlag = true;
 						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
 					}					
 					++scannerResultDataIterator;
 				}
 				
-				if(partnerLinkFlag)
+				if(!partnerLinkFlag)
 				{
 					printCheckErrorMsg("attribute " + A__PARTNER_LINK + "=\"" + T__NCNAME + "\" is missing");					
 				}
-				else if(portTypeFlag)
+				else if(!portTypeFlag)
 				{
 					printCheckErrorMsg("attribute " + A__PORT_TYPE + "=\"" + T__QNAME + "\" is missing");					
 				}
-				else if(operationFlag)
+				else if(!operationFlag)
 				{
 					printCheckErrorMsg("attribute " + A__OPERATION + "=\"" + T__NCNAME + "\" is missing");					
 				}
@@ -176,7 +176,7 @@ void attributeManager::check(kc::integer elementId, unsigned int activityId)
 				trace(TRACE_DEBUG,"REPLY!!! \n");
 
 				bool partnerLinkFlag, portTypeFlag, operationFlag;
-				partnerLinkFlag = portTypeFlag = operationFlag = true;
+				partnerLinkFlag = portTypeFlag = operationFlag = false;
 				 
 				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
 				
@@ -185,31 +185,31 @@ void attributeManager::check(kc::integer elementId, unsigned int activityId)
 				{	
 					if(((*scannerResultDataIterator).first) == A__PARTNER_LINK)
 					{
-						partnerLinkFlag = false;
+						partnerLinkFlag = true;
 						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
 					}
 					else if(((*scannerResultDataIterator).first) == A__PORT_TYPE)
 					{
-						portTypeFlag = false;
+						portTypeFlag = true;
 						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
 					}
 					else if(((*scannerResultDataIterator).first) == A__OPERATION)
 					{
-						operationFlag = false;
+						operationFlag = true;
 						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
 					}					
 					++scannerResultDataIterator;
 				}
 				
-				if(partnerLinkFlag)
+				if(!partnerLinkFlag)
 				{
 					printCheckErrorMsg("attribute " + A__PARTNER_LINK + "=\"" + T__NCNAME + "\" is missing");					
 				}
-				else if(portTypeFlag)
+				else if(!portTypeFlag)
 				{
 					printCheckErrorMsg("attribute " + A__PORT_TYPE + "=\"" + T__QNAME + "\" is missing");					
 				}
-				else if(operationFlag)
+				else if(!operationFlag)
 				{
 					printCheckErrorMsg("attribute " + A__OPERATION + "=\"" + T__NCNAME + "\" is missing");					
 				}				
@@ -221,7 +221,7 @@ void attributeManager::check(kc::integer elementId, unsigned int activityId)
 				trace(TRACE_DEBUG,"INVOKE!!! \n");
 
 				bool partnerLinkFlag, portTypeFlag, operationFlag;
-				partnerLinkFlag = portTypeFlag = operationFlag = true;
+				partnerLinkFlag = portTypeFlag = operationFlag = false;
 				 
 				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
 				
@@ -230,31 +230,31 @@ void attributeManager::check(kc::integer elementId, unsigned int activityId)
 				{	
 					if(((*scannerResultDataIterator).first) == A__PARTNER_LINK)
 					{
-						partnerLinkFlag = false;
+						partnerLinkFlag = true;
 						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
 					}
 					else if(((*scannerResultDataIterator).first) == A__PORT_TYPE)
 					{
-						portTypeFlag = false;
+						portTypeFlag = true;
 						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
 					}
 					else if(((*scannerResultDataIterator).first) == A__OPERATION)
 					{
-						operationFlag = false;
+						operationFlag = true;
 						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
 					}					
 					++scannerResultDataIterator;
 				}
 				
-				if(partnerLinkFlag)
+				if(!partnerLinkFlag)
 				{
 					printCheckErrorMsg("attribute " + A__PARTNER_LINK + "=\"" + T__NCNAME + "\" is missing");					
 				}
-				else if(portTypeFlag)
+				else if(!portTypeFlag)
 				{
 					printCheckErrorMsg("attribute " + A__PORT_TYPE + "=\"" + T__QNAME + "\" is missing");					
 				}
-				else if(operationFlag)
+				else if(!operationFlag)
 				{
 					printCheckErrorMsg("attribute " + A__OPERATION + "=\"" + T__NCNAME + "\" is missing");					
 				}								
@@ -275,7 +275,7 @@ void attributeManager::check(kc::integer elementId, unsigned int activityId)
 				trace(TRACE_DEBUG,"THROW!!! \n");
 
 				bool faultNameFlag;
-				faultNameFlag = true;
+				faultNameFlag = false;
 				 
 				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
 				
@@ -284,13 +284,13 @@ void attributeManager::check(kc::integer elementId, unsigned int activityId)
 				{	
 					if(((*scannerResultDataIterator).first) == A__FAULT_NAME)
 					{
-						faultNameFlag = false;
+						faultNameFlag = true;
 						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
 					}
 					++scannerResultDataIterator;
 				}
 				
-				if(faultNameFlag)
+				if(!faultNameFlag)
 				{
 					printCheckErrorMsg("attribute " + A__FAULT_NAME + "=\"" + T__QNAME + "\" is missing");					
 				}
@@ -303,7 +303,7 @@ void attributeManager::check(kc::integer elementId, unsigned int activityId)
 				trace(TRACE_DEBUG,"WAIT!!! \n");
 				
 				bool forFlag, untilFlag;
-				forFlag = untilFlag = true;
+				forFlag = untilFlag = false;
 				 
 				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
 				
@@ -312,29 +312,35 @@ void attributeManager::check(kc::integer elementId, unsigned int activityId)
 				{	
 					if(((*scannerResultDataIterator).first) == A__FOR)
 					{
-						forFlag = false;
+						forFlag = true;
 						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
 					}
 					else if(((*scannerResultDataIterator).first) == A__UNTIL)
 					{
-						untilFlag = false;
+						untilFlag = true;
 						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
 					}
 					++scannerResultDataIterator;
 				}
 
-				/// XOR
-				if((forFlag && !untilFlag) || (!forFlag && untilFlag))
-				{				
-					if(forFlag)
+				/// only one attribute is allowed
+				if((forFlag && !untilFlag) || (untilFlag && !forFlag))
+				{	
+					/* all okay */
+				}
+				else
+				{
+					// no attribute
+					if(!forFlag && !untilFlag)
 					{
-						printCheckErrorMsg("attribute " + A__FOR + "=\"" + T__DURATION_EXPR + "\" is missing");					
+						printCheckErrorMsg("attribute " + A__FOR + "=\"" + T__DURATION_EXPR + "\"  or " + A__UNTIL + "=\"" + T__DEADLINE_EXPR + " is missing");						
 					}
-					else if(untilFlag)
+					// to much attributes, only one is allowed
+					else
 					{
-						printCheckErrorMsg("attribute " + A__UNTIL + "=\"" + T__DEADLINE_EXPR + "\" is missing");					
+						printCheckErrorMsg("both attributes " + A__FOR + "=\"" + T__DURATION_EXPR + "\"  and " + A__UNTIL + "=\"" + T__DEADLINE_EXPR + " are not allowed");												
 					}
-				}				
+				}
 			}
 			break;		
 
@@ -399,7 +405,7 @@ void attributeManager::check(kc::integer elementId, unsigned int activityId)
 				trace(TRACE_DEBUG,"WHILE!!! \n");
 
 				bool conditionFlag;
-				conditionFlag = true;
+				conditionFlag = false;
 				 
 				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
 				
@@ -408,13 +414,13 @@ void attributeManager::check(kc::integer elementId, unsigned int activityId)
 				{	
 					if(((*scannerResultDataIterator).first) == A__CONDITION)
 					{
-						conditionFlag = false;
+						conditionFlag = true;
 						trace(TRACE_DEBUG,(*scannerResultDataIterator).first + "\n");
 					}
 					++scannerResultDataIterator;
 				}
 				
-				if(conditionFlag)
+				if(!conditionFlag)
 				{
 					printCheckErrorMsg("attribute " + A__CONDITION + "=\"" + T__BOOLEAN_EXPR + "\" is missing");					
 				}

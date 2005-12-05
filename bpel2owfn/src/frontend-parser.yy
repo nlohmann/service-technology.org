@@ -18,7 +18,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/05 22:29:10 $
+ *          - last changed: \$Date: 2005/12/05 22:51:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -263,15 +263,7 @@ tProcess:
     { att.check($3, K_PROCESS);
       symMan.initialiseProcessScope($3);
       currentScopeId = $3; }
-  X_NEXT
-  imports
-  tPartnerLinks
-  tPartners
-  tVariables
-  tCorrelationSets
-  tFaultHandlers
-  tCompensationHandler
-  tEventHandlers
+  X_NEXT imports tPartnerLinks tPartners tVariables tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers
     { inProcess = false; }
   activity
   X_NEXT X_SLASH K_PROCESS X_CLOSE
@@ -377,9 +369,7 @@ activity:
 tPartnerLinks:
   /* empty */
     { $$ = NiltPartnerLink_list(); }
-| K_PARTNERLINKS X_NEXT
-  tPartnerLink_list //1-oo
-  X_SLASH K_PARTNERLINKS X_NEXT
+| K_PARTNERLINKS X_NEXT tPartnerLink_list X_SLASH K_PARTNERLINKS X_NEXT
     { $$ = $3; } 
 ;
 
@@ -447,8 +437,7 @@ tPartners:
     { $$ = NiltPartner_list(); }
 | K_PARTNERS X_NEXT
     { inPartners = true; }
-  tPartner_list // 1-oo
-  X_SLASH K_PARTNERS X_NEXT
+  tPartner_list X_SLASH K_PARTNERS X_NEXT
     { $$ = $4;
       inPartners = false; }
 ;
@@ -461,9 +450,7 @@ tPartner_list:
 ;
 
 tPartner:
-  K_PARTNER arbitraryAttributes X_NEXT
-  tPartnerLink_list // 1-oo
-  X_SLASH K_PARTNER
+  K_PARTNER arbitraryAttributes X_NEXT tPartnerLink_list X_SLASH K_PARTNER
     { $$ = Partner($4);
       $$->name = att.read($2, "name"); }
 | K_PARTNER arbitraryAttributes X_SLASH
@@ -507,10 +494,7 @@ tFaultHandlers:
     { $$ = implicitFaultHandler();
       $$->inProcess = inProcess;
       $$->parentScopeId = currentScopeId; }
-| K_FAULTHANDLERS X_NEXT
-  tCatch_list // 0-oo
-  tCatchAll
-  X_SLASH K_FAULTHANDLERS X_NEXT
+| K_FAULTHANDLERS X_NEXT tCatch_list  tCatchAll X_SLASH K_FAULTHANDLERS X_NEXT
     { $$ = userDefinedFaultHandler($3, $4);
       $$->inProcess = inProcess;
       $$->parentScopeId = currentScopeId; }
@@ -524,9 +508,7 @@ tCatch_list:
 ;
 
 tCatch:
-  K_CATCH arbitraryAttributes X_NEXT
-  activity X_NEXT // was: tActivityOrCompensateContainer
-  X_SLASH K_CATCH
+  K_CATCH arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CATCH
     { $$ = Catch($4);
       $$->faultName = att.read($2, "faultName");
       $$->faultVariable = att.read($2, "faultVariable"); 
@@ -536,9 +518,7 @@ tCatch:
 tCatchAll:
   /* empty */
     { $$ = NoCatchAll(); }
-| K_CATCHALL arbitraryAttributes X_NEXT
-  activity X_NEXT // was: tActivityOrCompensateContainer
-  X_SLASH K_CATCHALL X_NEXT
+| K_CATCHALL arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CATCHALL X_NEXT
     { $$ = CatchAll($4);
       $$->faultName = att.read($2, "faultName");
       $$->faultVariable = att.read($2, "faultVariable"); }
@@ -568,9 +548,7 @@ tCompensationHandler:
   /* empty */
     { $$ = implicitCompensationHandler();
       $$->parentScopeId = currentScopeId; }
-| K_COMPENSATIONHANDLER X_NEXT
-  activity X_NEXT // was: tActivityOrCompensateContainer
-  X_SLASH K_COMPENSATIONHANDLER X_NEXT
+| K_COMPENSATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_COMPENSATIONHANDLER X_NEXT
     { $$ = userDefinedCompensationHandler($3);
       $$->parentScopeId = currentScopeId; }
 ;
@@ -610,10 +588,7 @@ tEventHandlers:
   /* empty */
     { $$ = implicitEventHandler();
       $$->parentScopeId = currentScopeId; }
-| K_EVENTHANDLERS X_NEXT
-  tOnMessage_list // 0-oo
-  tOnAlarm_list // 0-oo
-  X_SLASH K_EVENTHANDLERS X_NEXT
+| K_EVENTHANDLERS X_NEXT tOnMessage_list tOnAlarm_list X_SLASH K_EVENTHANDLERS X_NEXT
     { $$ = EventHandler($3, $4);
       $$->parentScopeId = currentScopeId; }
 ;
@@ -637,9 +612,7 @@ tOnMessage:
     {
       symMan.checkPartnerLink(att.read($2, "partnerLink")->name);
     }
-  tCorrelations 
-  activity X_NEXT
-  X_SLASH K_ONMESSAGE
+  tCorrelations activity X_NEXT X_SLASH K_ONMESSAGE
     { $$ = OnMessage($6);
       $$->partnerLink = att.read($2, "partnerLink");
       $$->portType = att.read($2, "portType");
@@ -649,9 +622,7 @@ tOnMessage:
 ;
 
 tOnAlarm:
-  K_ONALARM arbitraryAttributes X_NEXT
-  activity X_NEXT // was: tActivityContainer
-  X_SLASH K_ONALARM 
+  K_ONALARM arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_ONALARM 
     { $$ = OnAlarm($4);
       $$->For = att.read($2, "for");  // "for" is a keyword
       $$->until = att.read($2, "until"); }
@@ -687,9 +658,7 @@ tOnAlarm:
 tVariables:
   /* empty */
     { $$ = NiltVariable_list(); }
-| K_VARIABLES X_NEXT
-  tVariable_list // 1-oo
-  X_SLASH K_VARIABLES X_NEXT
+| K_VARIABLES X_NEXT tVariable_list X_SLASH K_VARIABLES X_NEXT
     { $$ = $3; }
 ;
 
@@ -751,9 +720,7 @@ tVariable:
 tCorrelationSets:
   /* empty */
     { $$ = NiltCorrelationSet_list(); }
-| K_CORRELATIONSETS X_NEXT
-  tCorrelationSet_list //1-oo
-  X_SLASH K_CORRELATIONSETS X_NEXT
+| K_CORRELATIONSETS X_NEXT tCorrelationSet_list X_SLASH K_CORRELATIONSETS X_NEXT
     { $$ = $3; }
 ;
 
@@ -781,9 +748,7 @@ tCorrelationSet:
 tCorrelations:
   /* empty */
     { $$ = NiltCorrelation_list(); }
-| K_CORRELATIONS X_NEXT
-  tCorrelation_list //1-oo
-  X_SLASH K_CORRELATIONS X_NEXT
+| K_CORRELATIONS X_NEXT tCorrelation_list X_SLASH K_CORRELATIONS X_NEXT
     { $$ = $3; }
 ;
 
@@ -832,9 +797,7 @@ tCorrelation:
 */
 
 tEmpty:
-  K_EMPTY arbitraryAttributes X_NEXT
-  standardElements
-  X_SLASH K_EMPTY
+  K_EMPTY arbitraryAttributes X_NEXT standardElements X_SLASH K_EMPTY
     { att.check($2, K_EMPTY);
       $$ = Empty($4);
       $$->name = att.read($2, "name");
@@ -885,12 +848,7 @@ tInvoke:
       // automatically create scope?
       symMan.checkPartnerLink(att.read($2, "partnerLink")->name);
     }
-  standardElements
-  tCorrelations // was: tCorrelationsWithPattern_opt
-  tCatch_list //0-oo
-  tCatchAll
-  tCompensationHandler
-  X_SLASH K_INVOKE
+  standardElements tCorrelations tCatch_list  tCatchAll tCompensationHandler X_SLASH K_INVOKE
     { att.check($2, K_INVOKE);
 /*
       if ($7->length() > 0 || $8->length() > 0 || string($9->op_name()) != "implicitCompensationHandler")
@@ -966,9 +924,7 @@ tReceive:
       att.check($2,K_RECEIVE);
       symMan.checkPartnerLink(att.read($2, "partnerLink")->name);
     }
-  standardElements
-  tCorrelations
-  X_SLASH K_RECEIVE
+  standardElements tCorrelations X_SLASH K_RECEIVE
     {  
       $$ = Receive($5, $6);
       $$->name = att.read($2, "name");
@@ -1028,10 +984,7 @@ tReceive:
 */
 
 tReply:
-  K_REPLY arbitraryAttributes X_NEXT
-  standardElements
-  tCorrelations
-  X_SLASH K_REPLY
+  K_REPLY arbitraryAttributes X_NEXT standardElements tCorrelations X_SLASH K_REPLY
     { att.check($2, K_REPLY);
       $$ = Reply($4, $5);
       $$->name = att.read($2, "name");
@@ -1079,10 +1032,7 @@ tReply:
 */
 
 tAssign:
-  K_ASSIGN arbitraryAttributes X_NEXT
-  standardElements
-  tCopy_list //1-oo
-  X_SLASH K_ASSIGN
+  K_ASSIGN arbitraryAttributes X_NEXT standardElements tCopy_list  X_SLASH K_ASSIGN
     { att.check($2, K_ASSIGN);
       $$ = Assign($4, $5);
       $$->name = att.read($2, "name");
@@ -1099,10 +1049,7 @@ tCopy_list:
 ;
 
 tCopy:
-  K_COPY X_NEXT
-  tFrom X_NEXT
-  tTo X_NEXT
-  X_SLASH K_COPY
+  K_COPY X_NEXT tFrom X_NEXT tTo X_NEXT X_SLASH K_COPY
     { $$ = Copy($3, $5); }
 ; 
 
@@ -1118,8 +1065,7 @@ tCopy:
 */
 
 tFrom:
-  K_FROM arbitraryAttributes X_NEXT
-  X_SLASH K_FROM
+  K_FROM arbitraryAttributes X_NEXT X_SLASH K_FROM
     { $$ = From();
       $$->variable = att.read($2, "variable");
       $$->part = att.read($2, "part");
@@ -1154,8 +1100,7 @@ tFrom:
 */
 
 tTo:
-  K_TO arbitraryAttributes X_NEXT
-  X_SLASH K_TO
+  K_TO arbitraryAttributes X_NEXT X_SLASH K_TO
     { $$ = To();
       $$->variable = att.read($2, "variable");
       $$->part = att.read($2, "part");
@@ -1193,9 +1138,7 @@ tTo:
 */
 
 tWait:
-  K_WAIT arbitraryAttributes X_NEXT
-  standardElements
-  X_SLASH K_WAIT
+  K_WAIT arbitraryAttributes X_NEXT standardElements X_SLASH K_WAIT
     { att.check($2, K_WAIT);
       $$ = Wait($4);
       $$->name = att.read($2, "name");
@@ -1233,9 +1176,7 @@ tWait:
 */
 
 tThrow:
-  K_THROW arbitraryAttributes X_NEXT
-  standardElements
-  X_SLASH K_THROW
+  K_THROW arbitraryAttributes X_NEXT standardElements X_SLASH K_THROW
     { att.check($2, K_THROW);
       $$ = Throw($4);
       $$->name = att.read($2, "name");
@@ -1273,9 +1214,7 @@ tThrow:
 */
 
 tCompensate:
-  K_COMPENSATE arbitraryAttributes X_NEXT
-  standardElements
-  X_SLASH K_COMPENSATE
+  K_COMPENSATE arbitraryAttributes X_NEXT standardElements X_SLASH K_COMPENSATE
     { att.check($2, K_COMPENSATE);
       $$ = Compensate($4);
       $$->name = att.read($2, "name");
@@ -1310,9 +1249,7 @@ tCompensate:
 */
 
 tTerminate:
-  K_TERMINATE arbitraryAttributes X_NEXT
-  standardElements
-  X_SLASH K_TERMINATE
+  K_TERMINATE arbitraryAttributes X_NEXT standardElements X_SLASH K_TERMINATE
     { att.check($2, K_TERMINATE);
       $$ = Terminate($4);
       $$->name = att.read($2, "name");
@@ -1352,10 +1289,7 @@ tFlow:
     {
       symMan.newFlowScope($2);
     } 
-  standardElements
-  tLinks
-  activity_list //1-oo
-  X_SLASH K_FLOW
+  standardElements tLinks activity_list X_SLASH K_FLOW
     { $$ = Flow($5, $6, $7);
       $$->name = att.read($2, "name");
       $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");
@@ -1373,10 +1307,8 @@ activity_list:
 
 tLinks:
   /* empty */
-  { $$ = NiltLink_list(); }
-| K_LINKS arbitraryAttributes X_NEXT
-  tLink_list // 1-oo
-  X_SLASH K_LINKS X_NEXT
+    { $$ = NiltLink_list(); }
+| K_LINKS arbitraryAttributes X_NEXT tLink_list X_SLASH K_LINKS X_NEXT
     { $$ = $4; }
 ;
 
@@ -1419,11 +1351,7 @@ tLink:
 */
 
 tSwitch:
-  K_SWITCH arbitraryAttributes X_NEXT
-  standardElements
-  tCase_list //1-oo
-  tOtherwise
-  X_SLASH K_SWITCH
+  K_SWITCH arbitraryAttributes X_NEXT standardElements tCase_list tOtherwise X_SLASH K_SWITCH
     { att.check($2, K_SWITCH);
       $$ = Switch($4, $5, $6);
       $$->name = att.read($2, "name");
@@ -1445,13 +1373,11 @@ tCase:
       $$->condition = att.read($2, "condition"); }
 ;
 
-/*
-  If the otherwise branch is not explicitly specified, then an otherwise branch
-   with an empty activity is deemed to be present.
-*/
+
 
 tOtherwise:
-  /* empty */
+  /* If the otherwise branch is not explicitly specified, then an otherwise
+     branch with an empty activity is deemed to be present. */
     { $$ = Otherwise(activityEmpty(Empty(StandardElements(NiltTarget_list(),NiltSource_list())))); }
 | K_OTHERWISE X_NEXT activity X_NEXT X_SLASH K_OTHERWISE X_NEXT
     { $$ = Otherwise($3); }
@@ -1477,10 +1403,7 @@ tOtherwise:
 */
 
 tWhile:
-  K_WHILE arbitraryAttributes X_NEXT
-  standardElements
-  activity X_NEXT
-  X_SLASH K_WHILE
+  K_WHILE arbitraryAttributes X_NEXT standardElements activity X_NEXT X_SLASH K_WHILE
     { att.check($2, K_WHILE);
       $$ = While($4, $5);
       $$->name = att.read($2, "name");
@@ -1506,10 +1429,7 @@ tWhile:
 */
 
 tSequence:
-  K_SEQUENCE arbitraryAttributes X_NEXT
-  standardElements
-  activity_list //1-oo
-  X_SLASH K_SEQUENCE
+  K_SEQUENCE arbitraryAttributes X_NEXT standardElements activity_list X_SLASH K_SEQUENCE
     { att.check($2, K_SEQUENCE);
       $$ = Sequence($4, $5);
       $$->name = att.read($2, "name");
@@ -1549,11 +1469,7 @@ tSequence:
 */
 
 tPick:
-  K_PICK arbitraryAttributes X_NEXT
-  standardElements
-  tOnMessage X_NEXT tOnMessage_list //1-oo
-  tOnAlarm_list //0-oo
-  X_SLASH K_PICK
+  K_PICK arbitraryAttributes X_NEXT standardElements tOnMessage X_NEXT tOnMessage_list tOnAlarm_list X_SLASH K_PICK
     { att.check($2, K_PICK);
       $$ = Pick($4, ConstOnMessage_list($5, $7), $8);
       $$->name = att.read($2, "name");
@@ -1592,18 +1508,11 @@ tPick:
 
 tScope:
   K_SCOPE arbitraryAttributes X_NEXT
-  {
-    symMan.newScopeScope($2);
-    currentScopeId = $2;
-  }
-  standardElements
-  tVariables
-  tCorrelationSets
-  tFaultHandlers
-  tCompensationHandler
-  tEventHandlers
-  activity X_NEXT
-  X_SLASH K_SCOPE
+    {
+      symMan.newScopeScope($2);
+      currentScopeId = $2;
+    }
+  standardElements tVariables tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers activity X_NEXT X_SLASH K_SCOPE
     { att.check($2, K_SCOPE);
       $$ = Scope($5, $6, $8, $9, $10, StopInScope(), $11);
       $$->name = att.read($2, "name");
@@ -1635,8 +1544,7 @@ tScope:
 */
 
 standardElements:
-  tTarget_list //0-oo
-  tSource_list //0-oo
+  tTarget_list tSource_list
     { $$ = StandardElements($1, $2); }
 ;
 

@@ -18,7 +18,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/05 15:49:11 $
+ *          - last changed: \$Date: 2005/12/05 21:14:01 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.48 $
+ * \version \$Revision: 1.49 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -1412,12 +1412,12 @@ tLink:
   K_LINK arbitraryAttributes X_NEXT X_SLASH K_LINK
     { $$ = Link();
       $$->name = att.read($2, "name"); 
-      symMan.addLink(new csLink($$->name->name));
+      $$->linkID = mkcasestring(symMan.addLink(new csLink($$->name->name)).c_str());
     }
 | K_LINK arbitraryAttributes X_SLASH
     { $$ = Link();
       $$->name = att.read($2, "name"); 
-      symMan.addLink(new csLink($$->name->name));
+      $$->linkID = mkcasestring(symMan.addLink(new csLink($$->name->name)).c_str());
     }
 ;
 
@@ -1680,12 +1680,12 @@ tTarget:
   K_TARGET arbitraryAttributes X_NEXT X_SLASH K_TARGET
     { $$ = Target();
       $$->linkName = att.read($2, "linkName"); 
-      symMan.checkLink($$->linkName->name, false);
+      $$->linkID = mkcasestring(symMan.checkLink($$->linkName->name, false).c_str());
     }
 | K_TARGET arbitraryAttributes X_SLASH
     { $$ = Target();
       $$->linkName = att.read($2, "linkName"); 
-      symMan.checkLink($$->linkName->name, false);
+      $$->linkID = mkcasestring(symMan.checkLink($$->linkName->name, false).c_str());
     }
 ;
 
@@ -1701,13 +1701,13 @@ tSource:
     { $$ = Source();
       $$->linkName = att.read($2, "linkName");
       $$->transitionCondition = att.read($2, "transitionCondition", $$->transitionCondition); 
-      symMan.checkLink($$->linkName->name, true);
+      $$->linkID = mkcasestring(symMan.checkLink($$->linkName->name, true).c_str());
     }
 | K_SOURCE arbitraryAttributes X_SLASH
     { $$ = Source();
       $$->linkName = att.read($2, "linkName");
       $$->transitionCondition = att.read($2, "transitionCondition", $$->transitionCondition); 
-      symMan.checkLink($$->linkName->name, true);
+      $$->linkID = mkcasestring(symMan.checkLink($$->linkName->name, true).c_str());
     }
 ;
 

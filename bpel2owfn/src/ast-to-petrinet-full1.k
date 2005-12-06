@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/05 22:29:10 $
+ *          - last changed: \$Date: 2005/12/06 13:42:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.51 $
+ * \version \$Revision: 1.52 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -2068,8 +2068,8 @@ TheActivity=activityFlow(This=Flow(a,b,c)) ->
 This=Link() ->
   [petrinet:
     {
-      TheNet->newPlace("link." + string(This->linkID->name));
-      TheNet->newPlace("!link." + string(This->linkID->name));
+      Place *p1 = TheNet->newPlace("link." + string(This->linkID->name));
+      Place *p2 = TheNet->newPlace("!link." + string(This->linkID->name));
     }
   ]
 ;
@@ -2642,8 +2642,25 @@ This=Scope(a,b,c,d,e,f,g)
   STANDARD ELEMENTS
 ******************************************************************************/
 
-StandardElements(NiltTarget_list(), NiltSource_list()) ->
-  [petrinet: /* do nothing */ ]
+This=StandardElements(NiltTarget_list(), NiltSource_list()) ->
+  [petrinet:
+    {
+      string prefix = intToString(This->parentId->value) + ".link."; 
+      Place *p1 = TheNet->newPlace(prefix + "negLink");
+      Place *p2 = TheNet->newPlace(prefix + "initial");
+      Place *p3 = TheNet->newPlace(prefix + "final");
+      Place *p4 = TheNet->newPlace(prefix + "stop");
+      Place *p5 = TheNet->newPlace(prefix + "stopped");
+
+      // embed activity X
+      prefix = intToString(This->parentId->value);
+      TheNet->mergePlaces(p1, TheNet->findPlace(prefix + ".negLink"));
+      TheNet->mergePlaces(p2, TheNet->findPlace(prefix + ".initial"));
+      TheNet->mergePlaces(p3, TheNet->findPlace(prefix + ".final"));
+      TheNet->mergePlaces(p4, TheNet->findPlace(prefix + ".stop"));
+      TheNet->mergePlaces(p5, TheNet->findPlace(prefix + ".stopped"));
+    }
+  ]
 ;
 
 This=StandardElements(NiltTarget_list(), a) ->
@@ -2682,6 +2699,14 @@ This=StandardElements(NiltTarget_list(), a) ->
 	TheNet->newArc(t2, p10, string(link->transitionCondition->name));
 	TheNet->newArc(p10, t3, READ);
       }
+
+      // embed activity X
+      prefix = intToString(This->parentId->value);
+      TheNet->mergePlaces(p3, TheNet->findPlace(prefix + ".negLink"));
+      TheNet->mergePlaces(p2, TheNet->findPlace(prefix + ".initial"));
+      TheNet->mergePlaces(p4, TheNet->findPlace(prefix + ".final"));
+      TheNet->mergePlaces(p6, TheNet->findPlace(prefix + ".stop"));
+      TheNet->mergePlaces(p7, TheNet->findPlace(prefix + ".stopped"));      
    }
   ]
 ;
@@ -2727,6 +2752,14 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
 	TheNet->newArc(p3, t2, "b" + intToString(i));
 	i++;
       }
+
+      // embed activity X
+      prefix = intToString(This->parentId->value);
+      TheNet->mergePlaces(p5, TheNet->findPlace(prefix + ".negLink"));
+      TheNet->mergePlaces(p6, TheNet->findPlace(prefix + ".initial"));
+      TheNet->mergePlaces(p7, TheNet->findPlace(prefix + ".final"));
+      TheNet->mergePlaces(p9, TheNet->findPlace(prefix + ".stop"));
+      TheNet->mergePlaces(p10, TheNet->findPlace(prefix + ".stopped"));            
     }
   ]
 ;
@@ -2763,7 +2796,15 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
 	TheNet->newArc(p3, t1, "b" + intToString(i));
 	TheNet->newArc(p3, t2, "b" + intToString(i));
 	i++;
-      }      
+      }
+
+      // embed activity X
+      prefix = intToString(This->parentId->value);
+      TheNet->mergePlaces(p5, TheNet->findPlace(prefix + ".negLink"));
+      TheNet->mergePlaces(p6, TheNet->findPlace(prefix + ".initial"));
+      TheNet->mergePlaces(p7, TheNet->findPlace(prefix + ".final"));
+      TheNet->mergePlaces(p9, TheNet->findPlace(prefix + ".stop"));
+      TheNet->mergePlaces(p10, TheNet->findPlace(prefix + ".stopped"));      
     }
   ]
 ;
@@ -2832,6 +2873,14 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
 	TheNet->newArc(p7, t4, READ);
 	i++;
       }
+
+      // embed activity X
+      prefix = intToString(This->parentId->value);
+      TheNet->mergePlaces(p10, TheNet->findPlace(prefix + ".negLink"));
+      TheNet->mergePlaces(p11, TheNet->findPlace(prefix + ".initial"));
+      TheNet->mergePlaces(p12, TheNet->findPlace(prefix + ".final"));
+      TheNet->mergePlaces(p14, TheNet->findPlace(prefix + ".stop"));
+      TheNet->mergePlaces(p15, TheNet->findPlace(prefix + ".stopped"));                  
     }
   ]
 ;
@@ -2905,6 +2954,14 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
 	TheNet->newArc(p7, t4, READ);
 	i++;
       }
+
+      // embed activity X
+      prefix = intToString(This->parentId->value);
+      TheNet->mergePlaces(p10, TheNet->findPlace(prefix + ".negLink"));
+      TheNet->mergePlaces(p11, TheNet->findPlace(prefix + ".initial"));
+      TheNet->mergePlaces(p12, TheNet->findPlace(prefix + ".final"));
+      TheNet->mergePlaces(p14, TheNet->findPlace(prefix + ".stop"));
+      TheNet->mergePlaces(p15, TheNet->findPlace(prefix + ".stopped"));
     }
   ]
 ;

@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/06 13:42:29 $
+ *          - last changed: \$Date: 2005/12/06 14:20:50 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -51,6 +51,7 @@
  *            event handler.
  *          - 2005-12-04 (nlohmann) Re-organized fault handler's catchAll
  *            branch.
+ *          - 2005-12-06 (nlohmann) Added containers for linked activities.
  * 
  * \todo
  *          - (nlohmann) complete initial pattern database
@@ -1410,7 +1411,7 @@ This=implicitCompensationHandler() ->
 This=Empty(a) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".";     
+      string prefix = intToString(This->id->value) + ".internal.";     
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
       Place *p3 = TheNet->newPlace(prefix + "stop");
@@ -1443,7 +1444,7 @@ This=Empty(a) ->
 This=Invoke(a,b) provided (This->outputVariable == mkcasestring("")) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".internal.";
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
       Place *p3 = TheNet->newPlace(prefix + "final");
@@ -1486,7 +1487,7 @@ This=Invoke(a,b) provided (This->outputVariable == mkcasestring("")) ->
 This=Invoke(a,b) provided (This->outputVariable != mkcasestring("")) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".internal.";
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running1");
       Place *p3 = TheNet->newPlace(prefix + "p3");
@@ -1557,7 +1558,7 @@ This=Invoke(a,b) provided (This->outputVariable != mkcasestring("")) ->
 This=Receive(a,b) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".";     
+      string prefix = intToString(This->id->value) + ".internal.";     
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
       Place *p3 = TheNet->newPlace(prefix + "final");
@@ -1608,7 +1609,7 @@ This=Receive(a,b) ->
 This=Reply(a,b) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".";      
+      string prefix = intToString(This->id->value) + ".internal.";      
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
       Place *p3 = TheNet->newPlace(prefix + "final");
@@ -1658,7 +1659,7 @@ This=Reply(a,b) ->
 This=Assign(a,b) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".";     
+      string prefix = intToString(This->id->value) + ".internal.";     
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p3 = TheNet->newPlace(prefix + "final");
       Place *p5 = TheNet->newPlace(prefix + "stop");
@@ -1701,7 +1702,7 @@ Copy(a,b) provided (a->variable == mkcasestring("")) ->
 This=Wait(a) provided (This->until != mkcasestring("")) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".";  
+      string prefix = intToString(This->id->value) + ".internal.";  
       string guard = "(" + string(This->until->name) + " \\<= x)"; // "<=" is escaped
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -1727,7 +1728,7 @@ This=Wait(a) provided (This->until != mkcasestring("")) ->
 This=Wait(a) provided (This->For != mkcasestring("")) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".";     
+      string prefix = intToString(This->id->value) + ".internal.";     
       string guard = "(x + " + string(This->For->name) + " \\<= y)"; // "<=" is escaped
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "TimeStamp");
@@ -1774,7 +1775,7 @@ This=Wait(a) provided (This->For != mkcasestring("")) ->
 This=Throw(a) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".internal.";
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "p2");
       Place *p3 = TheNet->newPlace(prefix + "stop");
@@ -1816,7 +1817,7 @@ This=Throw(a) ->
 This=Compensate(a) provided (!This->inFaultHandler && This->scope == mkcasestring("")) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".internal.";
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
       Place *p3 = TheNet->newPlace(prefix + "final");
@@ -1852,7 +1853,7 @@ This=Compensate(a) provided (!This->inFaultHandler && This->scope == mkcasestrin
 This=Compensate(a) provided (This->inFaultHandler && This->scope == mkcasestring("")) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".internal.";
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
       Place *p3 = TheNet->newPlace(prefix + "final");
@@ -1888,7 +1889,7 @@ This=Compensate(a) provided (This->inFaultHandler && This->scope == mkcasestring
 This=Compensate(a) provided (!This->inFaultHandler && This->scope != mkcasestring("")) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".internal.";
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
       Place *p3 = TheNet->newPlace(prefix + "final");
@@ -1924,7 +1925,7 @@ This=Compensate(a) provided (!This->inFaultHandler && This->scope != mkcasestrin
 This=Compensate(a) provided (This->inFaultHandler && This->scope != mkcasestring("")) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".internal.";
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
       Place *p3 = TheNet->newPlace(prefix + "final");
@@ -1973,7 +1974,7 @@ This=Compensate(a) provided (This->inFaultHandler && This->scope != mkcasestring
 This=Terminate(a) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".internal.";
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
       Place *p3 = TheNet->newPlace(prefix + "stop");
@@ -2022,7 +2023,7 @@ This=Terminate(a) ->
 TheActivity=activityFlow(This=Flow(a,b,c)) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".internal.";
       Place *p7  = TheNet->newPlace(prefix + "initial");
       Place *p8  = TheNet->newPlace(prefix + "final");
       Place *p9  = TheNet->newPlace(prefix + "running");
@@ -2088,7 +2089,7 @@ This=Link() ->
 This=activitySwitch(Switch(a,b,Otherwise(c))) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".internal.";
       Place *switch_p4 =  TheNet->newPlace(prefix + "final");
       Place *switch_p5 =  TheNet->newPlace(prefix + "initial");
       Place *switch_p6 =  TheNet->newPlace(prefix + "running");
@@ -2216,7 +2217,7 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
 This=activityWhile(TheWhile=While(a,b)) ->
   [petrinet:
     {
-      string prefix = intToString(TheWhile->id->value) + ".";
+      string prefix = intToString(TheWhile->id->value) + ".internal.";
       string condition = string(TheWhile->condition->name);
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -2289,7 +2290,7 @@ This=activityWhile(TheWhile=While(a,b)) ->
 This=activitySequence(Sequence(a,b)) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".internal.";
       Place *p2 = TheNet->newPlace(prefix + "initial");
       Place *p9 = TheNet->newPlace(prefix + "final");
       Place *p10 = TheNet->newPlace(prefix + "stop");
@@ -2338,7 +2339,7 @@ This=activitySequence(Sequence(a,b)) ->
 TheActivity=activityPick(This=Pick(a,b,c)) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".internal.";
       Place *p5 = TheNet->newPlace(prefix + "final");
       Place *p6 = TheNet->newPlace(prefix + "initial");
       Place *p7 = TheNet->newPlace(prefix + "TimeStamp");
@@ -2438,7 +2439,7 @@ This=Scope(a,b,c,d,e,f,g)
  ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".";
+      string prefix = intToString(This->id->value) + ".internal.";
       currentScope = prefix;
       SymbolScope *me = symMan.getScope(this->id);      
 
@@ -2645,7 +2646,7 @@ This=Scope(a,b,c,d,e,f,g)
 This=StandardElements(NiltTarget_list(), NiltSource_list()) ->
   [petrinet:
     {
-      string prefix = intToString(This->parentId->value) + ".link."; 
+      string prefix = intToString(This->parentId->value) + "."; 
       Place *p1 = TheNet->newPlace(prefix + "negLink");
       Place *p2 = TheNet->newPlace(prefix + "initial");
       Place *p3 = TheNet->newPlace(prefix + "final");
@@ -2653,7 +2654,7 @@ This=StandardElements(NiltTarget_list(), NiltSource_list()) ->
       Place *p5 = TheNet->newPlace(prefix + "stopped");
 
       // embed activity X
-      prefix = intToString(This->parentId->value);
+      prefix = intToString(This->parentId->value) + ".internal";
       TheNet->mergePlaces(p1, TheNet->findPlace(prefix + ".negLink"));
       TheNet->mergePlaces(p2, TheNet->findPlace(prefix + ".initial"));
       TheNet->mergePlaces(p3, TheNet->findPlace(prefix + ".final"));
@@ -2667,7 +2668,7 @@ This=StandardElements(NiltTarget_list(), a) ->
   [petrinet:
     {
       trace(TRACE_VERY_DEBUG, "[PNU]\tFig. 22\n");
-      string prefix = intToString(This->parentId->value) + ".link."; 
+      string prefix = intToString(This->parentId->value) + "."; 
       Place *p1 = TheNet->newPlace(prefix + "negLink");
       Place *p2 = TheNet->newPlace(prefix + "initial");
       Place *p3 = TheNet->newPlace(prefix + "p3");
@@ -2701,7 +2702,7 @@ This=StandardElements(NiltTarget_list(), a) ->
       }
 
       // embed activity X
-      prefix = intToString(This->parentId->value);
+      prefix = intToString(This->parentId->value) + ".internal";
       TheNet->mergePlaces(p3, TheNet->findPlace(prefix + ".negLink"));
       TheNet->mergePlaces(p2, TheNet->findPlace(prefix + ".initial"));
       TheNet->mergePlaces(p4, TheNet->findPlace(prefix + ".final"));
@@ -2715,7 +2716,7 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
   [petrinet:
     {
       trace(TRACE_VERY_DEBUG, "[PNU]\tFig. 23\n");
-      string prefix = intToString(This->parentId->value) + ".link.";
+      string prefix = intToString(This->parentId->value) + ".";
       Place *p5  = TheNet->newPlace(prefix + "negLink");
       Place *p6  = TheNet->newPlace(prefix + "p6");
       Place *p7  = TheNet->newPlace(prefix + "final");
@@ -2754,7 +2755,7 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
       }
 
       // embed activity X
-      prefix = intToString(This->parentId->value);
+      prefix = intToString(This->parentId->value) + ".internal";
       TheNet->mergePlaces(p5, TheNet->findPlace(prefix + ".negLink"));
       TheNet->mergePlaces(p6, TheNet->findPlace(prefix + ".initial"));
       TheNet->mergePlaces(p7, TheNet->findPlace(prefix + ".final"));
@@ -2768,7 +2769,7 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
   [petrinet:
     {
       trace(TRACE_VERY_DEBUG, "[PNU]\tFig. 24\n");
-      string prefix = intToString(This->parentId->value) + ".link.";
+      string prefix = intToString(This->parentId->value) + ".";
       Place *p5  = TheNet->newPlace(prefix + "negLink");
       Place *p6  = TheNet->newPlace(prefix + "p6");
       Place *p7  = TheNet->newPlace(prefix + "final");
@@ -2799,7 +2800,7 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
       }
 
       // embed activity X
-      prefix = intToString(This->parentId->value);
+      prefix = intToString(This->parentId->value) + ".internal";
       TheNet->mergePlaces(p5, TheNet->findPlace(prefix + ".negLink"));
       TheNet->mergePlaces(p6, TheNet->findPlace(prefix + ".initial"));
       TheNet->mergePlaces(p7, TheNet->findPlace(prefix + ".final"));
@@ -2813,7 +2814,7 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
   [petrinet:
     {
       trace(TRACE_VERY_DEBUG, "[PNU]\tFig. 25\n");
-      string prefix = intToString(This->parentId->value) + ".link.";
+      string prefix = intToString(This->parentId->value) + ".";
       Place *p9  = TheNet->newPlace(prefix + "negLink");
       Place *p10 = TheNet->newPlace(prefix + "p10");
       Place *p11 = TheNet->newPlace(prefix + "p11");
@@ -2875,7 +2876,7 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
       }
 
       // embed activity X
-      prefix = intToString(This->parentId->value);
+      prefix = intToString(This->parentId->value) + ".internal";
       TheNet->mergePlaces(p10, TheNet->findPlace(prefix + ".negLink"));
       TheNet->mergePlaces(p11, TheNet->findPlace(prefix + ".initial"));
       TheNet->mergePlaces(p12, TheNet->findPlace(prefix + ".final"));
@@ -2889,7 +2890,7 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
   [petrinet:
     {
       trace(TRACE_VERY_DEBUG, "[PNU]\tFig. 26\n");
-      string prefix = intToString(This->parentId->value) + ".link.";
+      string prefix = intToString(This->parentId->value) + ".";
       Place *p9  = TheNet->newPlace(prefix + "negLink");
       Place *p10 = TheNet->newPlace(prefix + "p10");
       Place *p11 = TheNet->newPlace(prefix + "p11");
@@ -2956,7 +2957,7 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
       }
 
       // embed activity X
-      prefix = intToString(This->parentId->value);
+      prefix = intToString(This->parentId->value) + ".internal";
       TheNet->mergePlaces(p10, TheNet->findPlace(prefix + ".negLink"));
       TheNet->mergePlaces(p11, TheNet->findPlace(prefix + ".initial"));
       TheNet->mergePlaces(p12, TheNet->findPlace(prefix + ".final"));

@@ -18,7 +18,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/05 22:51:35 $
+ *          - last changed: \$Date: 2005/12/06 13:42:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.51 $
+ * \version \$Revision: 1.52 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -806,7 +806,9 @@ tEmpty:
       $$->id = $4->parentId = $2; }
 | K_EMPTY arbitraryAttributes X_SLASH
     { att.check($2, K_EMPTY);
-      $$ = Empty(StandardElements(NiltTarget_list(), NiltSource_list()));
+      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+      noLinks->parentId = $2;
+      $$ = Empty(noLinks);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
@@ -876,7 +878,9 @@ tInvoke:
       $$->id = $5->parentId = $2; }
 | K_INVOKE arbitraryAttributes X_SLASH
     { att.check($2, K_INVOKE);
-      $$ = Invoke(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list());
+      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+      noLinks->parentId = $2;
+      $$ = Invoke(noLinks, NiltCorrelation_list());
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
@@ -938,8 +942,10 @@ tReceive:
       $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
       $$->id = $5->parentId = $2; }
 | K_RECEIVE arbitraryAttributes X_SLASH
-    { att.check($2, K_RECEIVE); 
-      $$ = Receive(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list());
+    { att.check($2, K_RECEIVE);
+      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+      noLinks->parentId = $2;
+      $$ = Receive(noLinks, NiltCorrelation_list());
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
@@ -999,7 +1005,9 @@ tReply:
       $$->id = $4->parentId = $2; }
 | K_REPLY arbitraryAttributes X_SLASH
     { att.check($2, K_REPLY);
-      $$ = Reply(StandardElements(NiltTarget_list(), NiltSource_list()), NiltCorrelation_list());
+      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+      noLinks->parentId = $2;
+      $$ = Reply(noLinks, NiltCorrelation_list());
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
@@ -1149,7 +1157,9 @@ tWait:
       $$->id = $4->parentId = $2; }
 | K_WAIT arbitraryAttributes X_SLASH
     { att.check($2, K_WAIT);
-      $$ = Wait(StandardElements(NiltTarget_list(), NiltSource_list()));
+      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+      noLinks->parentId = $2;
+      $$ = Wait(noLinks);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
@@ -1188,7 +1198,9 @@ tThrow:
       $$->id = $4->parentId = $2; }
 | K_THROW arbitraryAttributes X_SLASH
     { att.check($2, K_THROW);
-      $$ = Throw(StandardElements(NiltTarget_list(), NiltSource_list()));
+      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+      noLinks->parentId = $2;
+      $$ = Throw(noLinks);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
@@ -1224,7 +1236,9 @@ tCompensate:
       $$->id = $4->parentId = $2; }
 | K_COMPENSATE arbitraryAttributes X_SLASH
     { att.check($2, K_COMPENSATE);
-      $$ = Compensate(StandardElements(NiltTarget_list(), NiltSource_list()));
+      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+      noLinks->parentId = $2;
+      $$ = Compensate(noLinks);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
@@ -1258,7 +1272,9 @@ tTerminate:
       $$->id = $4->parentId = $2; }
 | K_TERMINATE arbitraryAttributes X_SLASH
     { att.check($2, K_TERMINATE);
-      $$ = Terminate(StandardElements(NiltTarget_list(), NiltSource_list()));
+      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+      noLinks->parentId = $2;
+      $$ = Terminate(noLinks);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);

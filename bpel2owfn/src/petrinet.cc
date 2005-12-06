@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/12/04 14:16:07 $
+ *          - last changed: \$Date: 2005/12/06 12:32:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.57 $
+ * \version \$Revision: 1.58 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -92,6 +92,16 @@ bool Node::firstMemberOf(string role)
   return (firstEntry.find(role, 0) == firstEntry.find_first_of(".")+1);
 }
 
+
+
+/*!
+ * \todo (nlohmann) comment me
+ */
+bool Node::firstMemberIs(string role)
+{
+  string firstEntry = (*history.begin());
+  return (firstEntry.find(role, 0) == 0);
+}
 
 
 
@@ -606,7 +616,23 @@ void PetriNet::drawDot()
       (*dot_output) << " style=filled fillcolor=lightskyblue2";
     else if ((*p)->firstMemberOf("faulthandler."))
       (*dot_output) << " style=filled fillcolor=pink";
-      
+    else if ((*p)->firstMemberIs("link.") || (*p)->firstMemberIs("!link."))
+      (*dot_output) << " style=filled fillcolor=yellow";
+    else if ((*p)->firstMemberOf("Active") || (*p)->firstMemberOf("!Active"))
+      (*dot_output) << " style=filled fillcolor=yellowgreen ";
+    else if ((*p)->firstMemberOf("Completed") || (*p)->firstMemberOf("!Completed"))
+      (*dot_output) << " style=filled fillcolor=yellowgreen ";
+    else if ((*p)->firstMemberOf("Compensated") || (*p)->firstMemberOf("!Compensated"))
+      (*dot_output) << " style=filled fillcolor=yellowgreen ";
+    else if ((*p)->firstMemberOf("Ended") || (*p)->firstMemberOf("!Ended"))
+      (*dot_output) << " style=filled fillcolor=yellowgreen ";
+    else if ((*p)->firstMemberOf("Faulted") || (*p)->firstMemberOf("!Faulted"))
+      (*dot_output) << " style=filled fillcolor=yellowgreen ";
+    else if ((*p)->firstMemberOf("Terminated") || (*p)->firstMemberOf("!Terminated"))
+      (*dot_output) << " style=filled fillcolor=yellowgreen ";
+    else if ((*p)->firstMemberIs("1.initial") || (*p)->firstMemberIs("1.final"))
+      (*dot_output) << " style=filled fillcolor=green";
+
     (*dot_output) << "];" << endl;
   }
 
@@ -1044,6 +1070,27 @@ Place *PetriNet::findPlace(string role)
 Place *PetriNet::findPlace(kc::impl_activity* activity, string role)
 {
   return findPlace(intToString(activity->id->value) + role);
+}
+
+
+
+
+
+/*!
+ * Finds a transition of the Petri net given a role the place fills or filled.
+ *
+ * \param  role the demanded role
+ * \return a pointer to the transition or a NULL pointer if the place was not
+ *         found.
+ */
+Transition *PetriNet::findTransition(string role)
+{
+  Transition *result = (Transition *)roleMap[role];
+
+  if (result == NULL)
+    trace(TRACE_DEBUG, "[PN]\tTransition with role \"" + role + "\" not found.\n");
+
+  return result;
 }
 
 

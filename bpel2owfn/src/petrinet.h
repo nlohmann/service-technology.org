@@ -20,14 +20,14 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/04 14:16:07 $
+ *          - last changed: \$Date: 2005/12/06 13:37:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *          
- * \version \$Revision: 1.35 $
+ * \version \$Revision: 1.36 $
  *          - 2005-11-09 (nlohmann) Added doxygen-comments.
  *          - 2005-11-10 (nlohmann) Added many using commands for std.
  *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an #id
@@ -112,8 +112,8 @@ typedef enum {
 class Node
 {
   public:
-    /// Checks whether the node has only a certain given role.
     bool firstMemberOf(string role);
+    bool firstMemberIs(string role);
 	  
     /// the id of the node
     unsigned int id;
@@ -294,6 +294,9 @@ class PetriNet
     /// Finds place given an activity with a role.
     Place *findPlace(kc::impl_activity* activity, string role);
 
+    /// Finds transition given a role.
+    Transition *findTransition(string role);
+    
     /// Simplifies the Petri net.
     void simplify();
 

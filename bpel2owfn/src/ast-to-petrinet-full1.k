@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/07 17:09:27 $
+ *          - last changed: \$Date: 2005/12/07 17:28:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.56 $
+ * \version \$Revision: 1.57 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -651,6 +651,7 @@ This=userDefinedFaultHandler(a,b) provided (This->inProcess) ->
 	  TheNet->newArc(t4, p3);
 	  TheNet->newArc(p7, t4, "x");
 	}
+	default: { /* empty */ }
       }
     }
   ]
@@ -935,6 +936,7 @@ This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
 	  TheNet->newArc(t4, p8);
 	  TheNet->newArc(p9, t4, "x");
 	}
+	default: { /* empty */ }
       }
     }
   ]

@@ -14,11 +14,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/06 13:42:53 $
+ *          - last changed: \$Date: 2005/12/07 11:46:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -1311,6 +1311,7 @@ tFlow:
       $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->id = $5->parentId = $2;
+      symMan.checkLinks();
       symMan.quitScope(); }
 ;
 

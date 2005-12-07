@@ -10,14 +10,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/07 10:10:04 $
+ *          - last changed: \$Date: 2005/12/07 11:46:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
  *          - 2005-11-22 (gierds) Initial version.
  *	    - 2005-11-30 (gierds) Checking for PartnerLinks completed.
  *
@@ -510,6 +510,72 @@ std::string SymbolManager::checkLink(std::string name, bool asSource)
   return checkLink(new csLink(name), asSource);
 }
 
+/**
+ * Performes some simple checks on the links defined in the current scope
+ * (should be a FlowScope, otherwise an #Exception is thrown).
+ * 
+ * Checks:
+ *  - link is used as a source as well as a target
+ * 
+ */
+void SymbolManager::checkLinks()
+{
+  bool problems = false;
+  try
+  {
+    trace(TRACE_DEBUG,"[CS] Checking correct usage of links\n");
+    if (typeid(*currentScope) == typeid(FlowScope))
+    {
+//        for (list<csLink*>::iterator 
+//	        iter = (dynamic_cast <FlowScope *> (scope))->links.begin();
+// 	        iter != (dynamic_cast <FlowScope *> (scope))->links.end(); 
+//	        iter++)
+      for (list<csLink*>::iterator 
+		      iter = (dynamic_cast <FlowScope*> (currentScope))->links.begin();
+		      iter != (dynamic_cast <FlowScope*> (currentScope))->links.end();
+		      iter++)
+      {
+        if (!((*iter)->isSource && (*iter)->isTarget))
+	{
+	  problems = true;
+          if ( (*iter)->isSource )
+	  {
+            trace("The Link " + (*iter)->name + " defined in line " 
+		  + intToString((*iter)->line)+ " was used as source,"
+		  + " but never as a target!\n");
+	  }
+	  else if ( (*iter)->isTarget )
+	  {
+            trace("The Link " + (*iter)->name + " defined in line " 
+		  + intToString((*iter)->line)+ " was used as target,"
+		  + " but never as a source!\n");
+	  }
+	  else
+	  {
+            trace("The Link " + (*iter)->name + " defined in line " 
+		  + intToString((*iter)->line)+ " has never been used!\n");
+	  }
+	}
+      }
+      if (problems)
+      {
+      yyerror (string("The Flow finished in line " + intToString(yylineno)
+		      + " has problems with the used links! (see above)\n").c_str());
+      }
+    }
+    else
+    {
+      // you should only use this function in a FlowScope!
+      //throw (bad_cast;
+    }
+  }
+  catch (bad_cast)
+  {
+    throw Exception(CHECK_SYMBOLS_CAST_ERROR,"Dynamic cast error while checking Links\n"); 
+  }
+
+}
+
 
 /**
  *
@@ -674,6 +740,7 @@ bool csVariable::operator==(csVariable& other)
 csLink::csLink( string myname )
 {
   name = myname;
+  line = yylineno;
 }
 
 /// \todo (gierds) comment me

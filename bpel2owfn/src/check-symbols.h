@@ -10,14 +10,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/07 10:10:04 $
+ *          - last changed: \$Date: 2005/12/07 11:46:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  *          - 2005-11-22 (gierds) Initial version.
  *          - 2005-11-24 (gierds) Put all funcionality into a class #SymbolManager
  *          - 2005-11-29 (gierds) Added checking of variables.
@@ -283,6 +283,8 @@ class csLink
   public:
     /// attribute name
     string name;
+    /// line number of the link's definition
+    int line;
 
     /// flag indicating the link's usage as a source
     bool isSource;

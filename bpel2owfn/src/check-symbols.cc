@@ -10,14 +10,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/07 11:46:21 $
+ *          - last changed: \$Date: 2005/12/07 13:46:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  *          - 2005-11-22 (gierds) Initial version.
  *	    - 2005-11-30 (gierds) Checking for PartnerLinks completed.
  *
@@ -29,6 +29,7 @@
 
 extern std::string intToString(int);	// little helper function (helpers.cc)
 extern int yylineno;			// line number from flex/bison
+extern bool inWhile;			// flag if in while activity (bpel-syntax.y)
 
 /// variable to format scope tree output
 int SymbolScope::indent = 0;
@@ -424,6 +425,12 @@ std::string SymbolManager::checkLink(csLink* link, bool asSource)
   {
     trace(TRACE_VERY_DEBUG, "[CS] Checking Link, but no name is given; returning.\n");
     return "";
+  }
+
+  // exit because in while activities no links are allowed
+  if (inWhile)
+  {
+    yyerror(string("Usage of Links is not allowed within Whiles\n").c_str());
   }
 
   trace(TRACE_DEBUG, "[CS] Checking Link " + link->name + "\n");

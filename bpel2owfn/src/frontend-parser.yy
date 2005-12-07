@@ -18,7 +18,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/07 11:46:21 $
+ *          - last changed: \$Date: 2005/12/07 13:46:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.53 $
+ * \version \$Revision: 1.54 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -124,7 +124,8 @@ SymbolManager symMan = SymbolManager();
 
 /// needed to distinguish context of tPartnerLink
 bool inPartners = false;
-
+/// needed to check occurence of links within whiles
+bool inWhile = false;
 
 /// needed to distinguish context of the Fault Handler
 bool inProcess = true;
@@ -1420,14 +1421,22 @@ tOtherwise:
 */
 
 tWhile:
-  K_WHILE arbitraryAttributes X_NEXT standardElements activity X_NEXT X_SLASH K_WHILE
+  K_WHILE arbitraryAttributes X_NEXT 
+    {
+      inWhile = true;
+    }
+  standardElements 
+  activity 
+  X_NEXT X_SLASH K_WHILE
     { att.check($2, K_WHILE);
-      $$ = While($4, $5);
+      $$ = While($5, $6);
       $$->name = att.read($2, "name");
-      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->condition = att.read($2, "condition");
-      $$->id = $4->parentId = $2; }
+      $$->id = $5->parentId = $2; 
+      inWhile=false;
+    }
 ;
 
 

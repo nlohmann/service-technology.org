@@ -10,14 +10,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/05 15:49:11 $
+ *          - last changed: \$Date: 2005/12/07 10:10:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  *          - 2005-11-22 (gierds) Initial version.
  *          - 2005-11-24 (gierds) Put all funcionality into a class #SymbolManager
  *          - 2005-11-29 (gierds) Added checking of variables.
@@ -62,6 +62,9 @@ class SymbolManager
     map<kc::integer, SymbolScope*> mapping;
     
   public:
+    /// list of all Links in a Process
+    list<std::string> links; 
+
     /// constructor
     SymbolManager();
 
@@ -100,6 +103,8 @@ class SymbolManager
     std::string checkLink(csLink* link, bool asSource);
     /// check, if a Variable with name exists in the current scope
     std::string checkLink(std::string, bool asSource);
+    /// run some simple checks on the Links defined in the current scope
+    void checkLinks();
 
     /// prints the scope tree
     void printScope();

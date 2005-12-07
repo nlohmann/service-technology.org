@@ -10,14 +10,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/05 15:49:11 $
+ *          - last changed: \$Date: 2005/12/07 10:10:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  *          - 2005-11-22 (gierds) Initial version.
  *	    - 2005-11-30 (gierds) Checking for PartnerLinks completed.
  *
@@ -84,7 +84,12 @@ void SymbolManager::newScopeScope(kc::integer id)
  */
 void SymbolManager::newFlowScope(kc::integer id)
 {
-  currentScope = new FlowScope(id, currentScope);
+  // no need for Flows to be in the children list
+  // currentScope = new FlowScope(id, currentScope);
+
+  SymbolScope * parent = currentScope;
+  currentScope = new FlowScope(id);
+  currentScope->parent = parent;
 
   mapping[id] = currentScope;
 }
@@ -364,7 +369,10 @@ std::string SymbolManager::checkVariable(std::string name, bool isFaultVariable)
  */
 std::string SymbolManager::addLink(csLink* link)
 {
+  std::string linkID;
+	
   trace(TRACE_VERY_DEBUG, "[CS] Adding Link " + link->name + "\n");
+  
 
   // since we want to add a Link, we assume currentScope is a FlowScope
   try
@@ -382,6 +390,8 @@ std::string SymbolManager::addLink(csLink* link)
       }
     }
     ((dynamic_cast <FlowScope *> (currentScope))->links).push_back(link);
+    linkID = (intToString(currentScope->id->value) + "." + link->name);
+    links.push_back(linkID);
   }
   catch(bad_cast)
   {
@@ -392,9 +402,8 @@ std::string SymbolManager::addLink(csLink* link)
   }
 
   trace(TRACE_VERY_DEBUG, "[CS] Unique ID of Link is " 
-		  + std::string(intToString(currentScope->id->value) + "." 
-		  + link->name) + "\n");
-  return (intToString(currentScope->id->value) + "." + link->name);
+		  + linkID + "\n");
+  return linkID;
 }
 
 /**

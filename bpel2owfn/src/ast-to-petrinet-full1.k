@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/07 11:22:37 $
+ *          - last changed: \$Date: 2005/12/07 11:47:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.54 $
+ * \version \$Revision: 1.55 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -58,9 +58,6 @@
  *          - (nlohmann) The assign-element has more attributes that have to
  *            be added to the abstract grammar as well as to the syntax file.
  *          - (nlohmann) outsource <compensate />-elements
- *
- * \bug
- *          - the child of a process should always be a scope, not a flow!
  *
  */
 %}
@@ -129,6 +126,13 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
 	Place *push_child    = TheNet->newPlace( intToString((*child)->id->value) + ".push");
 	Place *notPush_child = TheNet->newPlace( intToString((*child)->id->value) + ".!push");
       }
+
+      // create the links
+      for (list<string>::iterator link = symMan.links.begin(); link != symMan.links.end(); link++)
+      {
+	TheNet->newPlace("link." + *link);
+	TheNet->newPlace("!link." + *link);
+      }      
 
       Place *process_p1  = TheNet->newPlace(prefix + "initial");
       Place *process_p2  = TheNet->newPlace(prefix + "ch_in");
@@ -215,6 +219,10 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       for (list<SymbolScope*>::iterator child = me->children.begin(); child != me->children.end(); child++)
 	TheNet->newArc(process_t2, TheNet->findPlace( intToString((*child)->id->value) + ".!push" ));
 
+      // initialize all links
+      for (list<string>::iterator link = symMan.links.begin(); link != symMan.links.end(); link++)
+	TheNet->newArc(process_t2, TheNet->findPlace("!link." + *link));
+      
       // embed the fault handler
       TheNet->mergePlaces("1.fault",     "1.faultHandler.fault");
       TheNet->mergePlaces("1.faultSave", "1.faultHandler.faultSave");
@@ -2105,7 +2113,7 @@ TheActivity=activityFlow(This=Flow(a,b,c)) ->
       TheNet->newArc(t7, p16);
     }
     a // standardElements
-    b // links
+    //b // links
     c // inner activities
     {
       foreach (innerActivity; activity_list c)
@@ -2122,16 +2130,8 @@ TheActivity=activityFlow(This=Flow(a,b,c)) ->
   ]  
 ;
 
-This=Link() ->
-  [petrinet:
-    {
-      trace(TRACE_DEBUG, "[PNU]\t<link>\n");	          
-      Place *p1 = TheNet->newPlace("link." + string(This->linkID->name));
-      Place *p2 = TheNet->newPlace("!link." + string(This->linkID->name));
-      trace(TRACE_DEBUG, "[PNU]\t</link>\n");	          
-    }
-  ]
-;
+
+
 
 
 /******************************************************************************

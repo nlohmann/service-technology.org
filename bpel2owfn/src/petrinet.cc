@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/12/06 12:32:15 $
+ *          - last changed: \$Date: 2005/12/07 11:22:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.58 $
+ * \version \$Revision: 1.59 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -632,6 +632,8 @@ void PetriNet::drawDot()
       (*dot_output) << " style=filled fillcolor=yellowgreen ";
     else if ((*p)->firstMemberIs("1.initial") || (*p)->firstMemberIs("1.final"))
       (*dot_output) << " style=filled fillcolor=green";
+    else if ((*p)->firstMemberIs("1.clock"))
+      (*dot_output) << " style=filled fillcolor=seagreen";
 
     (*dot_output) << "];" << endl;
   }

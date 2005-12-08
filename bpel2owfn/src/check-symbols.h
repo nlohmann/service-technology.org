@@ -10,14 +10,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/07 11:46:21 $
+ *          - last changed: \$Date: 2005/12/08 10:44:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  *          - 2005-11-22 (gierds) Initial version.
  *          - 2005-11-24 (gierds) Put all funcionality into a class #SymbolManager
  *          - 2005-11-29 (gierds) Added checking of variables.
@@ -134,6 +134,11 @@ class SymbolScope
     list<kc::integer> ids;
     /// list of variables (not needed for Flows)	
     list<csVariable*> variables;
+
+    /// number of incoming links
+    int inLinks;
+    /// number of outgoing links
+    int outLinks;
     
     /// Constructor for scope without parent
     SymbolScope(kc::integer myid);

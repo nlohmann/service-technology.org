@@ -10,14 +10,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/07 13:46:58 $
+ *          - last changed: \$Date: 2005/12/08 10:44:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  *          - 2005-11-22 (gierds) Initial version.
  *	    - 2005-11-30 (gierds) Checking for PartnerLinks completed.
  *
@@ -250,6 +250,8 @@ void SymbolManager::checkPartnerLink(std::string name)
 /// \todo (gierds) comment me
 std::string SymbolManager::addVariable(csVariable* var)
 {
+  std::string uniqueID;
+	
   trace(TRACE_VERY_DEBUG, "[CS] Adding Variable " + var->name + ", " + var->messageType + ", "
 		      + var->type + ", " + var->element + "\n");
   for (list<csVariable*>::iterator iter = currentScope->variables.begin();
@@ -261,12 +263,16 @@ std::string SymbolManager::addVariable(csVariable* var)
 		      "Name of double Variable is \"" + var->name + "\"\n");
     }
   }
+  // add to currentScope for later checking
   currentScope->variables.push_back(var);
 
+  uniqueID = std::string(intToString(currentScope->id->value) + "." + var->name);
+  // add unique name to global variable list
+  variables.push_back(var->name);
+
   trace(TRACE_VERY_DEBUG, "[CS] Unique ID of Variable is " 
-		          + std::string(intToString(currentScope->id->value) 
-		          + "." + var->name) + "\n");
-  return (intToString(currentScope->id->value) + "." + var->name);
+		          + uniqueID + "\n");
+  return uniqueID;
 }
 
 /**

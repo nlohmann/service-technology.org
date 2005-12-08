@@ -14,11 +14,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/08 10:49:37 $
+ *          - last changed: \$Date: 2005/12/08 15:19:19 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.56 $
+ * \version \$Revision: 1.57 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -890,6 +890,8 @@ tInvoke:
       $$->operation = att.read($2, "operation");
       $$->inputVariable = att.read($2, "inputVariable");
       $$->outputVariable = att.read($2, "outputVariable"); 
+      $$->uniqueIDin  = mkcasestring((symMan.checkVariable(att.read($2, "inputVariable")->name)).c_str());
+      $$->uniqueIDout = mkcasestring((symMan.checkVariable(att.read($2, "outputVariable")->name)).c_str());
       $$->id = $2;
       symMan.checkPartnerLink($$->partnerLink->name); }
 ;

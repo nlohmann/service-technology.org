@@ -10,18 +10,19 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/08 13:03:17 $
+ *          - last changed: \$Date: 2005/12/08 15:02:20 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  *          - 2005-11-22 (gierds) Initial version.
  *          - 2005-11-24 (gierds) Put all funcionality into a class #SymbolManager
  *          - 2005-11-29 (gierds) Added checking of variables.
  *          - 2005-12-01 (gierds) Added checking of links.
+ *          - 2005-12-08 (gierds) Added channels in SymbolManager
  *
  */
 
@@ -48,6 +49,7 @@ class FlowScope;
 class csPartnerLink;
 class csVariable;
 class csLink;
+class csChannel;
 
 class SymbolManager
 {
@@ -66,6 +68,10 @@ class SymbolManager
     list<std::string> links; 
     /// list of all Variables in a Process
     list<std::string> variables;
+    /// list of all outgoing channels
+    list<csChannel *> outChannels;
+    /// list of all incoming channels
+    list<csChannel *> inChannels;
 
     /// constructor
     SymbolManager();

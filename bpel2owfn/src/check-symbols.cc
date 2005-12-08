@@ -10,14 +10,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/08 10:44:48 $
+ *          - last changed: \$Date: 2005/12/08 15:02:19 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  *          - 2005-11-22 (gierds) Initial version.
  *	    - 2005-11-30 (gierds) Checking for PartnerLinks completed.
  *
@@ -268,7 +268,7 @@ std::string SymbolManager::addVariable(csVariable* var)
 
   uniqueID = std::string(intToString(currentScope->id->value) + "." + var->name);
   // add unique name to global variable list
-  variables.push_back(var->name);
+  variables.push_back(uniqueID);
 
   trace(TRACE_VERY_DEBUG, "[CS] Unique ID of Variable is " 
 		          + uniqueID + "\n");

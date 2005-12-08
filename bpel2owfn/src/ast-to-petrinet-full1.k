@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/08 13:09:45 $
+ *          - last changed: \$Date: 2005/12/08 14:50:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.59 $
+ * \version \$Revision: 1.60 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -133,7 +133,10 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       {
 	TheNet->newPlace("link." + *link);
 	TheNet->newPlace("!link." + *link);
-      }      
+      }
+
+      for (list<string>::iterator variable = symMan.variables.begin(); variable != symMan.variables.end(); variable++)
+	TheNet->newPlace("variable." + *variable);
 
       Place *process_p1  = TheNet->newPlace(prefix + "initial");
       Place *process_p2  = TheNet->newPlace(prefix + "ch_in");
@@ -1720,38 +1723,85 @@ This=Assign(a,b) ->
       Place *p6 = TheNet->newPlace(prefix + "stopped");
       Place *p7 = TheNet->newPlace(prefix + "failed");
       Transition* t4 = TheNet->newTransition(prefix + "t4");
-      Transition* t7 = TheNet->newTransition(prefix + "t7");
       TheNet->newArc(p1, t4);
       TheNet->newArc(p5, t4);
       TheNet->newArc(t4, p6);
-      TheNet->newArc(p3, t7);
-      TheNet->newArc(p5, t7);
-      TheNet->newArc(t7, p6);
     }
     a // standardElements
     {
       int copyCount = 1;
-      Place *last = p1;
+      Place *lastPlace = TheNet->findPlace(prefix + "initial");
       
+      Place *assign_stop    = TheNet->findPlace(prefix + "stop");
+      Place *assign_stopped = TheNet->findPlace(prefix + "stopped");
+      Place *assign_failed  = TheNet->findPlace(prefix + "failed");
+      Place *assign_final   = TheNet->findPlace(prefix + "final");
+
       foreach (copy=Copy(from,to); tCopy_list b)
       {
 	string new_prefix = prefix + "copy." + intToString(copyCount) + ".";
-	
+
 	if (from->variable != mkcasestring(""))
 	{
 	  Place *p2 = TheNet->newPlace(new_prefix + "running");
 	  Place *p4 = TheNet->newPlace(new_prefix + "p4");
+	  Place *p8 = TheNet->newPlace(new_prefix + "final"); //new
 	  Transition *t1 = TheNet->newTransition(new_prefix + "t1");
 	  Transition *t2 = TheNet->newTransition(new_prefix + "t2", "!guard");
 	  Transition *t3 = TheNet->newTransition(new_prefix + "t3", "guard");
 	  Transition *t5 = TheNet->newTransition(new_prefix + "t5");
 	  Transition *t6 = TheNet->newTransition(new_prefix + "t6");
+	  Transition *t7 = TheNet->newTransition(new_prefix + "t7");
+	  TheNet->newArc(lastPlace, t1);
+	  TheNet->newArc(TheNet->findPlace("variable." + string(from->variable->name)), t1, READ, "X");
+	  TheNet->newArc(t1, p2, "X");
+	  TheNet->newArc(p2, t2, "X");
+	  TheNet->newArc(p2, t3, "X");
+	  TheNet->newArc(t2, p8);
+	  TheNet->newArc(TheNet->findPlace("variable." + string(to->variable->name)), t2, "Y");
+	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(to->variable->name)), "X");
+	  TheNet->newArc(t3, p4);
+	  TheNet->newArc(t3, assign_failed, "fault");
+	  TheNet->newArc(p2, t5, "X");
+	  TheNet->newArc(assign_stop, t5);
+	  TheNet->newArc(t5, assign_stopped);
+	  TheNet->newArc(p4, t6);
+	  TheNet->newArc(assign_stop, t6);
+	  TheNet->newArc(t6, assign_stopped);
+	  TheNet->newArc(p8, t7);
+	  TheNet->newArc(assign_stop, t7);
+	  TheNet->newArc(t7, assign_stopped);
+
+	  lastPlace = p8;	  
 	}
-	else if (from->literalValue != mkcasestring(""));
+	else // if (from->literalValue != mkcasestring(""));
 	{
+	  Place *p4 = TheNet->newPlace(new_prefix + "p4");
+	  Place *p8 = TheNet->newPlace(new_prefix + "final"); //new
+	  Transition *t2 = TheNet->newTransition(new_prefix + "t2", "!guard");
+	  Transition *t3 = TheNet->newTransition(new_prefix + "t3", "guard");
+	  Transition *t6 = TheNet->newTransition(new_prefix + "t6");
+	  Transition *t7 = TheNet->newTransition(new_prefix + "t7");
+	  TheNet->newArc(lastPlace, t2);
+	  TheNet->newArc(TheNet->findPlace("variable." + string(to->variable->name)), t2, "Y");
+	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(to->variable->name)), string(from->literalValue->name));
+	  TheNet->newArc(t2, p8);	  
+	  TheNet->newArc(lastPlace, t3);	  
+	  TheNet->newArc(t3, p4);
+	  TheNet->newArc(t3, assign_failed, "fault");
+	  TheNet->newArc(p4, t6);
+	  TheNet->newArc(assign_stop, t6);
+	  TheNet->newArc(t6, assign_stopped);
+	  TheNet->newArc(p8, t7);
+	  TheNet->newArc(assign_stop, t7);
+	  TheNet->newArc(t7, assign_stopped);
+	  
+	  lastPlace = p8;
 	}
+	copyCount++;
       }
 
+      TheNet->mergePlaces(assign_final, lastPlace);
       trace(TRACE_DEBUG, "[PNU]\t</assign>\n");
     }
   ]

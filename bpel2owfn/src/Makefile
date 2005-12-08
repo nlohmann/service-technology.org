@@ -1,4 +1,4 @@
-# last changed $Date: 2005/12/08 13:10:05 $ by $Author: nlohmann $
+# last changed $Date: 2005/12/08 13:13:26 $ by $Author: gierds $
 
 
 
@@ -11,10 +11,12 @@ CXX      = g++
 KC       = kc++
 
 # Flags
-CXXFLAGS2 = -pedantic -Wall -ansi       # the most strict variant
-CXXFLAGS1 = -pedantic -Wall             # less stricter, but against ISO C++
-CXXFLAGS  = -pedantic -Wno-unused       # pedantic
-CXXFLAGS0 = -Wno-unused                 # least strict
+OPTIMIZE  = 
+CXXFLAGS2 = -pedantic -Wall -ansi $(OPTIMIZE)   # the most strict variant
+CXXFLAGS1 = -pedantic -Wall       $(OPTIMIZE)   # less stricter,
+						# but against ISO C++
+CXXFLAGS  = -pedantic -Wno-unused $(OPTIMIZE)   # pedantic
+CXXFLAGS0 = -Wno-unused           $(OPTIMIZE)   # least strict
 YFLAGS    = --defines --yacc --no-lines
 KFLAGS    = --yystype --no-printdot --file-prefix=bpel-kc- --suffix=cc
 

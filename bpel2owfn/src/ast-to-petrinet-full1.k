@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/07 17:28:41 $
+ *          - last changed: \$Date: 2005/12/08 12:35:22 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.57 $
+ * \version \$Revision: 1.58 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -79,6 +79,7 @@
 
 // All the includes and variables can be used during the unparsing.
 %{ KC_UNPARSE
+/* These lines are from bpel-unparse-petri.k */
 #include <iostream>
 #include <string>
 #include "petrinet.h"
@@ -1420,6 +1421,16 @@ This=implicitCompensationHandler() ->
 
 
 
+
+
+
+
+
+
+
+
+
+
 /******************************************************************************
   EMPTY
 ******************************************************************************/
@@ -1700,31 +1711,46 @@ This=Reply(a,b) ->
 This=Assign(a,b) ->
   [petrinet:
     {
+      trace(TRACE_DEBUG, "[PNU]\t<assign>\n");
       string prefix = intToString(This->id->value) + ".internal."; 
+
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p3 = TheNet->newPlace(prefix + "final");
       Place *p5 = TheNet->newPlace(prefix + "stop");
       Place *p6 = TheNet->newPlace(prefix + "stopped");
       Place *p7 = TheNet->newPlace(prefix + "failed");
-
-      Transition* t4 = TheNet->newTransition(prefix + "t1");
+      Transition* t4 = TheNet->newTransition(prefix + "t4");
       Transition* t7 = TheNet->newTransition(prefix + "t7");
-    } a b
+      TheNet->newArc(p1, t4);
+      TheNet->newArc(p5, t4);
+      TheNet->newArc(t4, p6);
+      TheNet->newArc(p3, t7);
+      TheNet->newArc(p5, t7);
+      TheNet->newArc(t7, p6);
+    }
+    a // standardElements
+    {
+      int copyCount = 1;
+      Place *last = p1;
+      
+      foreach (copy=Copy(from,to); tCopy_list b)
+      {
+	string 
+	if (from->variable != mkcasestring(""))
+	{
+	  Transition *t1 = TheNet->newTransition("t1")
+	}
+	else if (from->literalValue != mkcasestring(""))
+	{
+
+	}
+      }
+
+      trace(TRACE_DEBUG, "[PNU]\t</assign>\n");
+    }
   ]
 ;
 
-
-Copy(a,b) provided (a->variable != mkcasestring("")) ->
-  [petrinet:
-
-  ]
-;
-
-Copy(a,b) provided (a->variable == mkcasestring("")) ->
-  [petrinet:
-
-  ]
-;
 
 
 

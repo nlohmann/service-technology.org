@@ -9,11 +9,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $ 
+ *          - last changes of: \$Author: nlohmann $ 
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2005/12/08 10:44:48 $
+ *          - last changed: \$Date: 2005/12/08 10:49:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-17 (nlohmann) Added default attributes.
  *          - 2005-12-04 (nlohmann) Changed representation of handlers.
@@ -160,9 +160,7 @@ tCatch:
   {
     casestring faultName;
     casestring faultVariable;
-
-    /// additional attribute to save the unique name of the variable
-    casestring variableID;
+    casestring uniqueID;
   }
 ;
 
@@ -204,8 +202,7 @@ tOnMessage:
     casestring operation;
     casestring variable;
 
-    /// additional attribute to save the unique name of the variable
-    casestring variableID;
+    casestring uniqueID;
   }
 ;
 
@@ -245,9 +242,7 @@ tVariable:
     casestring messageType;
     casestring type;
     casestring element;
-
-    /// additional attribute to save the unique name of the variable
-    casestring variableID;
+    casestring uniqueID;
   }
 ;
 
@@ -323,10 +318,8 @@ tInvoke:
     casestring inputVariable;
     casestring outputVariable;
     
-
-    /// additional attribute to save the unique name of the variable
-    casestring variableIDin;
-    casestring variableIDout;
+    casestring uniqueIDin;
+    casestring uniqueIDout;
 
     integer id;
   }	
@@ -350,8 +343,7 @@ tReceive:
     casestring variable;
     casestring createInstance = mkcasestring("no");
 
-    /// additional attribute to save the unique name of the variable
-    casestring variableID;
+    casestring uniqueID;
     
     integer id;
   }
@@ -375,8 +367,7 @@ tReply:
     casestring variable;
     casestring faultName;
 
-    /// additional attribute to save the unique name of the variable
-    casestring variableID;
+    casestring uniqueID;
 
     integer id;
   }
@@ -418,8 +409,8 @@ tFrom:
     casestring expression;
     casestring opaque; // only abstract processes
 
-    /// additional attribute to save the unique name of the variable
-    casestring variableID;
+    casestring literalValue = mkcasestring(""); // used in case of <from>literal</from>
+    casestring uniqueID;
   }
 ;
 
@@ -431,8 +422,7 @@ tTo:
     casestring partnerLink;
     casestring property;
 
-    /// additional attribute to save the unique name of the variable
-    casestring variableID;
+    casestring uniqueID;
   }
 ;
 
@@ -470,8 +460,7 @@ tThrow:
     casestring faultName;
     casestring faultVariable;
 
-    /// additional attribute to save the unique name of the variable
-    casestring variableID;
+    casestring uniqueID;
 
     integer id;
   }
@@ -541,8 +530,6 @@ tLink:
   Link()
   {
     casestring name;
-
-    /// additional attribute to save the unique name of a link
     casestring linkID;
   }
 ;
@@ -679,8 +666,6 @@ tTarget:
   Target()
   {
     casestring linkName;
-
-    /// additional attribute to save the unique name of a link
     casestring linkID;
   }
 ;
@@ -694,8 +679,6 @@ tSource:
   {
     casestring linkName;
     casestring transitionCondition = mkcasestring("true");
-
-    /// additional attribute to save the unique name of a link
     casestring linkID;
   }
 ;

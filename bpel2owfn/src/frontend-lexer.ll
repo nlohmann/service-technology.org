@@ -19,7 +19,7 @@
  *          
  * \date
  *          - created 2005-11-10
- *          - last changed: \$Date: 2005/12/04 14:16:06 $
+ *          - last changed: \$Date: 2005/12/08 10:49:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -33,6 +33,7 @@
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-16 (nlohmann) Cut quotes from strings.
  *          - 2005-11-25 (nlohmann) Added <import>-tag.
+ *          - 2005-12-08 (nlohmann) Added "literal tag" X_NAME.
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -178,12 +179,14 @@ bpwsns			"bpws:"|"bpel:"
 {bpwsns}?"while"		{ BEGIN(ATTRIBUTE); return K_WHILE; }
 
  /* white space */
-[ \t\r\n]*		{ /* skip */ }
+[ \t\r\n]*			{ /* skip */ }
 
+{name}				{ yylval.yt_casestring = kc::mkcasestring(yytext);
+                                  return X_NAME; }
 
  /* end of input file */
-<<EOF>>			{ return EOF; }
+<<EOF>>				{ return EOF; }
 
 
  /* anything else */
-.			{ yyerror("lexical error"); }
+.				{ yyerror("lexical error"); }

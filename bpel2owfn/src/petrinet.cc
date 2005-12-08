@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/12/07 11:22:11 $
+ *          - last changed: \$Date: 2005/12/08 14:50:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.59 $
+ * \version \$Revision: 1.60 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -614,10 +614,12 @@ void PetriNet::drawDot()
       (*dot_output) << " style=filled fillcolor=aquamarine";
     else if ((*p)->firstMemberOf("stop."))
       (*dot_output) << " style=filled fillcolor=lightskyblue2";
-    else if ((*p)->firstMemberOf("faulthandler."))
+    else if ((*p)->firstMemberOf("faultHandler."))
       (*dot_output) << " style=filled fillcolor=pink";
     else if ((*p)->firstMemberIs("link.") || (*p)->firstMemberIs("!link."))
       (*dot_output) << " style=filled fillcolor=yellow";
+    else if ((*p)->firstMemberIs("variable."))
+      (*dot_output) << " style=filled fillcolor=cyan shape=ellipse";
     else if ((*p)->firstMemberOf("Active") || (*p)->firstMemberOf("!Active"))
       (*dot_output) << " style=filled fillcolor=yellowgreen ";
     else if ((*p)->firstMemberOf("Completed") || (*p)->firstMemberOf("!Completed"))
@@ -654,7 +656,7 @@ void PetriNet::drawDot()
       (*dot_output) << " style=filled fillcolor=aquamarine";
     else if ((*t)->firstMemberOf("stop."))
       (*dot_output) << " style=filled fillcolor=lightskyblue2";
-    else if ((*t)->firstMemberOf("faulthandler."))
+    else if ((*t)->firstMemberOf("faultHandler."))
       (*dot_output) << " style=filled fillcolor=pink";
     
     (*dot_output) << "];" << endl;

@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/08 12:35:22 $
+ *          - last changed: \$Date: 2005/12/08 13:09:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.58 $
+ * \version \$Revision: 1.59 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -1735,14 +1735,20 @@ This=Assign(a,b) ->
       
       foreach (copy=Copy(from,to); tCopy_list b)
       {
-	string 
+	string new_prefix = prefix + "copy." + intToString(copyCount) + ".";
+	
 	if (from->variable != mkcasestring(""))
 	{
-	  Transition *t1 = TheNet->newTransition("t1")
+	  Place *p2 = TheNet->newPlace(new_prefix + "running");
+	  Place *p4 = TheNet->newPlace(new_prefix + "p4");
+	  Transition *t1 = TheNet->newTransition(new_prefix + "t1");
+	  Transition *t2 = TheNet->newTransition(new_prefix + "t2", "!guard");
+	  Transition *t3 = TheNet->newTransition(new_prefix + "t3", "guard");
+	  Transition *t5 = TheNet->newTransition(new_prefix + "t5");
+	  Transition *t6 = TheNet->newTransition(new_prefix + "t6");
 	}
-	else if (from->literalValue != mkcasestring(""))
+	else if (from->literalValue != mkcasestring(""));
 	{
-
 	}
       }
 

@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/08 15:26:04 $
+ *          - last changed: \$Date: 2005/12/09 15:23:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.62 $
+ * \version \$Revision: 1.63 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -354,7 +354,7 @@ StopInProcess() ->
       TheNet->newArc(p22, t3);
       TheNet->newArc(t3, p4);
       TheNet->newArc(p5, t4, "x");
-      TheNet->newArc(p9, t4);
+      //TheNet->newArc(p9, t4);
       TheNet->newArc(t4, p2);
       TheNet->newArc(t4, p6, "x");
       TheNet->newArc(t4, p10);
@@ -475,7 +475,7 @@ StopInScope() ->
       TheNet->newArc(t6, p6);
       TheNet->newArc(p10, t6, "x");
       TheNet->newArc(t6, p11, "x");
-      TheNet->newArc(p14, t6);
+      //TheNet->newArc(p14, t6);
       TheNet->newArc(t6, p18);
       TheNet->newArc(t7, p5);
       TheNet->newArc(p8, t7);
@@ -1503,6 +1503,7 @@ This=Invoke(a,b) provided (This->outputVariable == mkcasestring("")) ->
       TheNet->newArc(t2, p3);
       TheNet->newArc(t3, p4);
       TheNet->newArc(t3, p7, "fault");
+      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t3); // new fault management
       TheNet->newArc(p2, t3, "(X,CS)");
       TheNet->newArc(p1, t4);
       TheNet->newArc(p5, t4);
@@ -1566,9 +1567,11 @@ This=Invoke(a,b) provided (This->outputVariable != mkcasestring("")) ->
       TheNet->newArc(p4, t5, "(Y,CS2)");
       TheNet->newArc(t5, p6);
       TheNet->newArc(t5, p9, "fault2");
+      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t5); // new fault management
       TheNet->newArc(p2, t6, "(X,CS1)");
       TheNet->newArc(t6, p6);
       TheNet->newArc(t6, p9, "fault1");
+      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t6); // new fault management
       TheNet->newArc(p1, t7);
       TheNet->newArc(p7, t7);
       TheNet->newArc(t7, p8);
@@ -1632,6 +1635,7 @@ This=Receive(a,b) ->
       TheNet->newArc(t2, TheNet->findPlace("variable." + string(This->uniqueID->name)), "X");
       TheNet->newArc(t3, p4);
       TheNet->newArc(t3, p7, "fault");
+      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t3); // new fault management
       TheNet->newArc(p2, t3, "(X,CS)");
       TheNet->newArc(p1, t4);
       TheNet->newArc(p5, t4);
@@ -1689,6 +1693,7 @@ This=Reply(a,b) ->
       TheNet->newArc(t2, p3);
       TheNet->newArc(t3, p4);
       TheNet->newArc(t3, p7, "fault");
+      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t3); // new fault management
       TheNet->newArc(p2, t3, "(X,CS)");
       TheNet->newArc(p1, t4);
       TheNet->newArc(p5, t4);
@@ -1769,6 +1774,7 @@ This=Assign(a,b) ->
 	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(to->uniqueID->name)), "X");
 	  TheNet->newArc(t3, p4);
 	  TheNet->newArc(t3, assign_failed, "fault");
+	  TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t3); // new fault management
 	  TheNet->newArc(p2, t5, "X");
 	  TheNet->newArc(assign_stop, t5);
 	  TheNet->newArc(t5, assign_stopped);
@@ -1796,6 +1802,7 @@ This=Assign(a,b) ->
 	  TheNet->newArc(lastPlace, t3);	  
 	  TheNet->newArc(t3, p4);
 	  TheNet->newArc(t3, assign_failed, "fault");
+	  TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t3); // new fault management
 	  TheNet->newArc(p4, t6);
 	  TheNet->newArc(assign_stop, t6);
 	  TheNet->newArc(t6, assign_stopped);
@@ -2280,6 +2287,7 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
       TheNet->newArc(switch_p6, switch_t7, "x");
       TheNet->newArc(switch_t7, switch_p10);
       TheNet->newArc(switch_t7, switch_p13, "fault");
+      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), switch_t7); // new fault management
       TheNet->newArc(switch_p5, switch_t8);
       TheNet->newArc(switch_p11, switch_t8);
       TheNet->newArc(switch_t8, switch_p12);
@@ -2430,6 +2438,7 @@ This=activityWhile(TheWhile=While(a,b)) ->
       TheNet->newArc(p2, t5, "x");
       TheNet->newArc(t5, p6);
       TheNet->newArc(t5, p9, "fault");
+      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t5); // new fault management
       TheNet->newArc(p1, t6);
       TheNet->newArc(p7, t6);
       TheNet->newArc(t6, p8);
@@ -2575,6 +2584,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	TheNet->newArc(p3, t4, "M" + message );
 	TheNet->newArc(t4, p10);
 	TheNet->newArc(t4, TheNet->findPlace(TheActivity, ".failed"), "fault");
+	TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t4); // new fault management
 	TheNet->newArc(p3, t9, "M" + message );
 	TheNet->newArc(TheNet->findPlace(TheActivity, ".stop"), t9);
 	TheNet->newArc(t9, TheNet->findPlace(TheActivity, ".stopped"));
@@ -2725,8 +2735,8 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->newArc(p11, t4);
       TheNet->newArc(t4, p12);
       TheNet->newArc(t4, p14);
-      TheNet->newArc(TheNet->findPlace(prefix + "!push"), t4);
-      TheNet->newArc(t4, TheNet->findPlace(prefix + "push"));
+      TheNet->newArc(TheNet->findPlace(intToString(This->id->value) + ".!push"), t4);
+      TheNet->newArc(t4, TheNet->findPlace(intToString(This->id->value) + ".push"));
       TheNet->newArc(p27, t4);
       TheNet->newArc(p35, t4);
       TheNet->newArc(t4, p51);
@@ -2762,44 +2772,46 @@ This=Scope(a,b,c,d,e,f,g)
     f // Stop Pattern
     g // innerActivity
     {
+      string prefix2 = intToString(This->id->value) + ".";
+	    
       // embed fault handler
-      TheNet->mergePlaces(prefix + "p43",    prefix + "faultHandler.fault");
-      TheNet->mergePlaces(prefix + "p44",    prefix + "faultHandler.faultSave");
-      TheNet->mergePlaces(prefix + "p47",    prefix + "faultHandler.rethrow");
-      TheNet->mergePlaces(prefix + "p41",    prefix + "faultHandler.ft");
-      TheNet->mergePlaces(prefix + "p42",    prefix + "faultHandler.ftSave");
-      TheNet->mergePlaces(prefix + "!Ended", prefix + "faultHandler.!Ended");
-      TheNet->mergePlaces(prefix + "Ended",  prefix + "faultHandler.Ended");
-      TheNet->mergePlaces(prefix + "p49",    prefix + "faultHandler.ch_fh");
-      TheNet->mergePlaces(prefix + "p50",    prefix + "faultHandler.ch_out");
-      TheNet->mergePlaces(prefix + "final",  prefix + "faultHandler.out");
-      TheNet->mergePlaces(prefix + "p52",    prefix + "faultHandler.trueOut");
-      TheNet->mergePlaces(prefix + "p53",    prefix + "faultHandler.sourceFalse");
-      TheNet->mergePlaces(prefix + "p54",    prefix + "faultHandler.falseOut");
-      TheNet->mergePlaces(prefix + "p48",    prefix + "faultHandler.upperFH");
-      TheNet->mergePlaces(prefix + "p46",    prefix + "faultHandler.stopped");
+      TheNet->mergePlaces(prefix + "p43",    prefix2 + "faultHandler.fault");
+      TheNet->mergePlaces(prefix + "p44",    prefix2 + "faultHandler.faultSave");
+      TheNet->mergePlaces(prefix + "p47",    prefix2 + "faultHandler.rethrow");
+      TheNet->mergePlaces(prefix + "p41",    prefix2 + "faultHandler.ft");
+      TheNet->mergePlaces(prefix + "p42",    prefix2 + "faultHandler.ftSave");
+      TheNet->mergePlaces(prefix + "!Ended", prefix2 + "faultHandler.!Ended");
+      TheNet->mergePlaces(prefix + "Ended",  prefix2 + "faultHandler.Ended");
+      TheNet->mergePlaces(prefix + "p49",    prefix2 + "faultHandler.ch_fh");
+      TheNet->mergePlaces(prefix + "p50",    prefix2 + "faultHandler.ch_out");
+      TheNet->mergePlaces(prefix + "final",  prefix2 + "faultHandler.out");
+      TheNet->mergePlaces(prefix + "p52",    prefix2 + "faultHandler.trueOut");
+      TheNet->mergePlaces(prefix + "p53",    prefix2 + "faultHandler.sourceFalse");
+      TheNet->mergePlaces(prefix + "p54",    prefix2 + "faultHandler.falseOut");
+      TheNet->mergePlaces(prefix + "p48",    prefix2 + "faultHandler.upperFH");
+      TheNet->mergePlaces(prefix + "p46",    prefix2 + "faultHandler.stopped");
 
       // embed the compensation handler
-      TheNet->mergePlaces(prefix + "ch_in",            prefix + "compensationHandler.ch_in");
-      TheNet->mergePlaces(prefix + "Completed",        prefix + "compensationHandler.Completed");
-      TheNet->mergePlaces(prefix + "!Completed",       prefix + "compensationHandler.!Completed");
-      TheNet->mergePlaces(prefix + "Compensated",      prefix + "compensationHandler.Compensated");
-      TheNet->mergePlaces(prefix + "p49",              prefix + "compensationHandler.fh");
-      TheNet->mergePlaces(prefix + "scopeCompensated", prefix + "compensationHandler.scopeCompensated");
-      TheNet->mergePlaces(prefix + "p39",              prefix + "compensationHandler.clean");
-      TheNet->mergePlaces(prefix + "p40",              prefix + "compensationHandler.cleaned");
-      TheNet->mergePlaces(prefix + "p6",               prefix + "compensationHandler.failed");
-      TheNet->mergePlaces(prefix + "compScope",        prefix + "compensationHandler.compScope");
-      TheNet->mergePlaces(prefix + "p50",              prefix + "compensationHandler.ch_out");
-      TheNet->mergePlaces(prefix + "compensated",      prefix + "compensationHandler.compensated");
+      TheNet->mergePlaces(prefix + "ch_in",            prefix2 + "compensationHandler.ch_in");
+      TheNet->mergePlaces(prefix + "Completed",        prefix2 + "compensationHandler.Completed");
+      TheNet->mergePlaces(prefix + "!Completed",       prefix2 + "compensationHandler.!Completed");
+      TheNet->mergePlaces(prefix + "Compensated",      prefix2 + "compensationHandler.Compensated");
+      TheNet->mergePlaces(prefix + "p49",              prefix2 + "compensationHandler.fh");
+      TheNet->mergePlaces(prefix + "scopeCompensated", prefix2 + "compensationHandler.scopeCompensated");
+      TheNet->mergePlaces(prefix + "p39",              prefix2 + "compensationHandler.clean");
+      TheNet->mergePlaces(prefix + "p40",              prefix2 + "compensationHandler.cleaned");
+      TheNet->mergePlaces(prefix + "p6",               prefix2 + "compensationHandler.failed");
+      TheNet->mergePlaces(prefix + "compScope",        prefix2 + "compensationHandler.compScope");
+      TheNet->mergePlaces(prefix + "p50",              prefix2 + "compensationHandler.ch_out");
+      TheNet->mergePlaces(prefix + "compensated",      prefix2 + "compensationHandler.compensated");
 
       // embed event handler
-      TheNet->mergePlaces(prefix + "p25", prefix + "eventHandler.initial");
-      TheNet->mergePlaces(prefix + "p26", prefix + "eventHandler.finish");
-      TheNet->mergePlaces(prefix + "p27", prefix + "eventHandler.final");
-      TheNet->mergePlaces(prefix + "p28", prefix + "eventHandler.stop");
-      TheNet->mergePlaces(prefix + "p29", prefix + "eventHandler.stopped");
-      TheNet->mergePlaces(prefix + "p6",  prefix + "eventHandler.failed"); //new      
+      TheNet->mergePlaces(prefix + "p25", prefix2 + "eventHandler.initial");
+      TheNet->mergePlaces(prefix + "p26", prefix2 + "eventHandler.finish");
+      TheNet->mergePlaces(prefix + "p27", prefix2 + "eventHandler.final");
+      TheNet->mergePlaces(prefix + "p28", prefix2 + "eventHandler.stop");
+      TheNet->mergePlaces(prefix + "p29", prefix2 + "eventHandler.stopped");
+      TheNet->mergePlaces(prefix + "p6",  prefix2 + "eventHandler.failed"); //new      
       
       // embed the stop pattern
       TheNet->mergePlaces(prefix + "p36",            prefix + "stop.ft_in");
@@ -2939,6 +2951,7 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
       TheNet->newArc(t2, p5);
       TheNet->newArc(t2, p11);
       TheNet->newArc(t2, p12, "fault");
+      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t2); // new fault management
       TheNet->newArc(p8, t3);
       TheNet->newArc(p9, t3);
       TheNet->newArc(t3, p10);
@@ -3129,6 +3142,7 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
       TheNet->newArc(t5, p10);
       TheNet->newArc(t5, p17);
       TheNet->newArc(t5, p18, "fault");
+      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t5); // new fault management
       TheNet->newArc(p16, t5);
       TheNet->newArc(p14, t6);
       TheNet->newArc(t6, p15);

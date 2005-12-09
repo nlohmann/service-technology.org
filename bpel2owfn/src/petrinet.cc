@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/12/08 14:50:06 $
+ *          - last changed: \$Date: 2005/12/09 10:56:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.60 $
+ * \version \$Revision: 1.61 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -39,6 +39,7 @@
  *          - 2005-11-20 (nlohmann) Added support for high-level arcs for
  *            merging.
  *          - 2005-11-29 (nlohmann) Roles are now organized in a vector.
+ *          - 2005-12-09 (nlohmann) Added marking of variables.
  *
  */
 
@@ -58,7 +59,7 @@ extern ostream *lola_output;         // defined in main.c
 extern ostream *info_output;         // defined in main.c
 extern string filename;              // defined in main.c
 extern bool mode_simplify_petri_net; // defined in main.c
-
+extern SymbolManager symMan;         // defined in bpel-syntax.y
 
 
 
@@ -621,17 +622,17 @@ void PetriNet::drawDot()
     else if ((*p)->firstMemberIs("variable."))
       (*dot_output) << " style=filled fillcolor=cyan shape=ellipse";
     else if ((*p)->firstMemberOf("Active") || (*p)->firstMemberOf("!Active"))
-      (*dot_output) << " style=filled fillcolor=yellowgreen ";
+      (*dot_output) << " style=filled fillcolor=yellowgreen";
     else if ((*p)->firstMemberOf("Completed") || (*p)->firstMemberOf("!Completed"))
       (*dot_output) << " style=filled fillcolor=yellowgreen ";
     else if ((*p)->firstMemberOf("Compensated") || (*p)->firstMemberOf("!Compensated"))
-      (*dot_output) << " style=filled fillcolor=yellowgreen ";
+      (*dot_output) << " style=filled fillcolor=yellowgreen";
     else if ((*p)->firstMemberOf("Ended") || (*p)->firstMemberOf("!Ended"))
-      (*dot_output) << " style=filled fillcolor=yellowgreen ";
+      (*dot_output) << " style=filled fillcolor=yellowgreen";
     else if ((*p)->firstMemberOf("Faulted") || (*p)->firstMemberOf("!Faulted"))
-      (*dot_output) << " style=filled fillcolor=yellowgreen ";
+      (*dot_output) << " style=filled fillcolor=yellowgreen";
     else if ((*p)->firstMemberOf("Terminated") || (*p)->firstMemberOf("!Terminated"))
-      (*dot_output) << " style=filled fillcolor=yellowgreen ";
+      (*dot_output) << " style=filled fillcolor=yellowgreen";
     else if ((*p)->firstMemberIs("1.initial") || (*p)->firstMemberIs("1.final"))
       (*dot_output) << " style=filled fillcolor=green";
     else if ((*p)->firstMemberIs("1.clock"))
@@ -700,45 +701,6 @@ void PetriNet::lolaOut()
     makeLowLevel();
 
   (*lola_output) << "{ Petri net created by BPEL2oWFN reading " << filename << " }" << endl << endl;
-
-  /*
-  // the reset-arc
-  unsigned maxErrors = 3;
-  Node *fault_place = findPlace("1.fault_in");
-  unsigned int fault_id = fault_place->id;
-
-  set<unsigned int> fault_t_in;
-  set<pair<Node *, arc_type> > fault_preset = preset(fault_place);
-  for (set<pair<Node *, arc_type> >::iterator it = fault_preset.begin(); it != fault_preset.end(); it++)
-  {
-    fault_t_in.insert( (*it).first->id );
-    cerr << "in:  " << (*it).first->id << endl;
-  }
-  
-  set<unsigned int> fault_t_out;  
-  set<pair<Node *, arc_type> > fault_postset = postset(fault_place);
-  for (set<pair<Node *, arc_type> >::iterator it = fault_postset.begin(); it != fault_postset.end(); it++)
-  {
-    fault_t_out.insert( (*it).first->id );
-    cerr << "out: " << (*it).first->id << endl;
-  }
-
-
-  // the neccessary functions of the reset-arc
-  (*lola_output) << "SORT" << endl;
-  (*lola_output) << "  1.maxErrors = [ 0 , " << maxErrors << " ] ;" << endl << endl;
-  (*lola_output) << "FUNCTION inc_p" << fault_id << "(x:1.maxErrors):1.maxErrors" << endl;
-  (*lola_output) << "BEGIN" << endl << "  RETURN x + 1" << endl << "END" << endl << endl;
-
-  (*lola_output) << "FUNCTION dec_p" << fault_id << "(x:1.maxErrors):1.maxErrors" << endl;
-  (*lola_output) << "BEGIN" << endl << "  RETURN x - 1" << endl << "END" << endl << endl;
-
-  (*lola_output) << "FUNCTION reset_p" << fault_id << "(x:1.maxErrors):1.maxErrors" << endl;
-  (*lola_output) << "BEGIN" << endl << "  RETURN 0" << endl << "END" << endl << endl;
-
-  (*lola_output) << "FUNCTION zero_p" << fault_id << "():1.maxErrors" << endl;
-  (*lola_output) << "BEGIN" << endl << "  RETURN 0" << endl << "END" << endl << endl;
-  */
   
   // places
   (*lola_output) << "PLACE" << endl;
@@ -747,13 +709,6 @@ void PetriNet::lolaOut()
   {
     (*lola_output) << "  p" << (*p)->id;
     
-    /*
-    // the error-place
-    if ((*p)->id == fault_id)
-      (*lola_output) << " : 1.maxErrors";
-
-    */
-      
     if (count < P.size())
       (*lola_output) << ",";
     else
@@ -766,8 +721,11 @@ void PetriNet::lolaOut()
   // initial marking
   (*lola_output) << "MARKING" << endl;
   (*lola_output) << "  p" << findPlace("1.initial")->id << ":\t1,\t { initial marking of the process }" << endl;
+
+  for (list<string>::iterator variable = symMan.variables.begin(); variable != symMan.variables.end(); variable++)
+    (*lola_output) << "  p" << findPlace("variable." + *variable)->id << ":\t1,\t { initial marking of variable" << *variable << " }" << endl;
+
   (*lola_output) << "  p" << findPlace("1.clock")->id << ":\t1\t { initial marking of the clock }" << endl;
-  //(*lola_output) << "  p" << fault_id << ":\tzero_p" << fault_id << "()\t { initial marking of the fault place }" << endl;
   (*lola_output)   << ";" << endl << endl << endl;
 
 
@@ -777,16 +735,7 @@ void PetriNet::lolaOut()
   {
     (*lola_output) << "TRANSITION t" << (*t)->id << "\t { " << (*(*t)->history.begin()) << " }" << endl;
     set<pair<Node *, arc_type> > consume = preset(*t);
-    set<pair<Node *, arc_type> > produce = postset(*t);
-
-    /*
-    if ( fault_t_in.find( (*t)->id ) != fault_t_in.end() || fault_t_out.find( (*t)->id ) != fault_t_out.end() )
-    {
-      (*lola_output) << "VAR x : 1.maxErrors;" << endl;
-      (*lola_output) << "GUARD x > 0" << endl;
-    }
-    */
-    
+    set<pair<Node *, arc_type> > produce = postset(*t);    
 
     (*lola_output) << "CONSUME" << endl;
     if (consume.empty())
@@ -795,46 +744,31 @@ void PetriNet::lolaOut()
     unsigned int count2 = 1;
     for (set<pair<Node *, arc_type> >::iterator pre = consume.begin(); pre != consume.end(); count2++, pre++)
     {
-      //if( (*pre).first->id != fault_id )
       (*lola_output) << "  p" << (*pre).first->id << ":\t1";
-      //else
-	//(*lola_output) << "  p" << (*pre).first->id << ":\tx";
 
       if (count2 < consume.size())
-	(*lola_output) << ",";
+	(*lola_output) << "," << endl;
       else
-	(*lola_output) << ";";
-      (*lola_output) << "\t { " << (*(*pre).first->history.begin()) << " }" << endl;
+	(*lola_output) << ";" << endl;
     }
-
-    
+  
     (*lola_output) << "PRODUCE" << endl;
     if (produce.empty())
       (*lola_output) << ";" << endl;
     
-    /*
-    // decrement the fault place (since it was in the preset)
-    if (fault_t_out.find( (*t)->id ) != fault_t_out.end() )
-      (*lola_output) << "  p" << fault_id << ":\tdec_p" << fault_id << "(x)," << endl;
-    */
-      
     count2 = 1;
     for (set<pair<Node *, arc_type> >::iterator post = produce.begin(); post != produce.end(); count2++, post++)
     {
-      //if( (*post).first->id != fault_id )
       (*lola_output) << "  p" << (*post).first->id << ":\t1";
-      //else
-	//(*lola_output) << "  p" << (*post).first->id << ":\tinc_p" << fault_id << "(x)";
 
       if (count2 < produce.size())
-	(*lola_output) << ",";
+	(*lola_output) << "," << endl;
       else
-	(*lola_output) << ";";
-      (*lola_output) << "\t { " << (*(*post).first->history.begin()) << " }" << endl;
+	(*lola_output) << ";" << endl;
     }
     (*lola_output) << endl;
-    (*lola_output) << "{ END OF FILE }" << endl;
   }
+  (*lola_output) << "{ END OF FILE }" << endl;
 }
 
 

@@ -14,11 +14,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/09 16:16:14 $
+ *          - last changed: \$Date: 2005/12/09 16:20:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.58 $
+ * \version \$Revision: 1.59 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -132,6 +132,9 @@ bool inProcess = true;
 
 /// needed to tag handlers
 integer currentScopeId;
+
+/// needed to tag scopes
+integer oldScopeId;
 
 
 
@@ -1555,6 +1558,7 @@ tScope:
   K_SCOPE arbitraryAttributes X_NEXT
     {
       symMan.newScopeScope($2);
+      oldScopeId = currentScopeId;
       currentScopeId = $2;
     }
   standardElements tVariables tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers activity X_NEXT X_SLASH K_SCOPE
@@ -1565,6 +1569,7 @@ tScope:
       $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->variableAccessSerializable = att.read($2, "variableAccessSerializable", $$->variableAccessSerializable);
       $$->id = $5->parentId = $2;
+      $$->parentScopeId = oldScopeId;
       symMan.quitScope(); }
 ;
 

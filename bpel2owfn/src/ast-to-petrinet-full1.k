@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/09 15:23:52 $
+ *          - last changed: \$Date: 2005/12/09 16:59:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.63 $
+ * \version \$Revision: 1.64 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -58,7 +58,9 @@
  * \todo
  *          - (nlohmann) complete initial pattern database
  *          - (nlohmann) outsource <compensate />-elements
- *
+ * 
+ * \bug
+ *          - (nlohmann) ch_in -> compScope linkage is not working
  */
 %}
 
@@ -2718,6 +2720,8 @@ This=Scope(a,b,c,d,e,f,g)
       Transition *t9  = TheNet->newTransition(prefix + "t9");
       Transition *t10 = TheNet->newTransition(prefix + "t10");
       Transition *t11 = TheNet->newTransition(prefix + "t11"); 
+      Transition *t12 = TheNet->newTransition(prefix + "passFaultUp");
+      Transition *t13 = TheNet->newTransition(prefix + "ignoreFault");
       TheNet->newArc(p29, t1);
       TheNet->newArc(t1, p38); 
       TheNet->newArc(p2, t2);
@@ -2764,6 +2768,16 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->newArc(p20, t11);
       TheNet->newArc(t11, p45);
       TheNet->newArc(p51, t11);
+
+      // new transitions to pass fault to parent
+      TheNet->newArc(p48, t12);
+      TheNet->newArc(TheNet->findPlace(intToString(This->parentScopeId->value) + ".Active"), t12);
+      TheNet->newArc(t12, TheNet->findPlace(intToString(This->parentScopeId->value) + ".stop.fault_in"));
+      TheNet->newArc(p48, t13);
+      TheNet->newArc(TheNet->findPlace(intToString(This->parentScopeId->value) + ".!Active"), t13, READ);
+
+      // merge "compScope" with "ch_in" of the parent scope
+      TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId->value) + ".ch_in"), p57);
     }
     a // standardElements
     c // Fault Handler

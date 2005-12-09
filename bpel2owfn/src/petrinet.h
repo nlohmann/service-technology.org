@@ -20,14 +20,14 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/06 13:37:44 $
+ *          - last changed: \$Date: 2005/12/09 11:32:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *          
- * \version \$Revision: 1.36 $
+ * \version \$Revision: 1.37 $
  *          - 2005-11-09 (nlohmann) Added doxygen-comments.
  *          - 2005-11-10 (nlohmann) Added many using commands for std.
  *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an #id
@@ -39,6 +39,7 @@
  *          - 2005-11-15 (nlohmann) Added variable #lowLevel. Made a number of
  *            functions private.
  *          - 2005-11-29 (nlohmann) Roles are now organized in a vector.
+ *          - 2005-12-09 (nlohmann) Merged prototypes of new* functions.
  */
 
 
@@ -240,32 +241,20 @@ class Arc
 class PetriNet
 {
   public:	 
-    /// Adds a place with a given role (standard).
-    Place *newPlace(string role);
-
     /// Adds a place with a given role and type.
-    Place *newPlace(string role, place_type type);
+    Place *newPlace(string role, place_type type=LOW);
     
-    /// Adds a transition with a given role (standard).
-    Transition *newTransition(string role);
-
     /// Adds a transition with a given role and guard.
-    Transition *newTransition(string role, string guard);
-
-    /// Adds an arc given source and target node (standard).
-    Arc *newArc(Node *source, Node *target);
+    Transition *newTransition(string role, string guard="");
 
     /// Adds an arc given source and target node and an inscription.
-    Arc *newArc(Node *source, Node *target, string inscription);
+    Arc *newArc(Node *source, Node *target, string inscription="");
 
     /// Adds an arc given source and target node and an inscription.
     Arc *newArc(Node *source, Node *target, kc::casestring inscription);
     
-    /// Adds an arc given source and target node and an arc type.
-    Arc *newArc(Node *source, Node *target, arc_type type);
-
     /// Adds an arc given source and target node, and arc type and an inscription.
-    Arc *newArc(Node *source, Node *target, arc_type type, string inscription);
+    Arc *newArc(Node *source, Node *target, arc_type type, string inscription="");
     
     /// Information about the net including histories of all nodes.
     void printInformation();
@@ -294,9 +283,6 @@ class PetriNet
     /// Finds place given an activity with a role.
     Place *findPlace(kc::impl_activity* activity, string role);
 
-    /// Finds transition given a role.
-    Transition *findTransition(string role);
-    
     /// Simplifies the Petri net.
     void simplify();
 

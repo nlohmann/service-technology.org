@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/12/09 10:56:56 $
+ *          - last changed: \$Date: 2005/12/09 11:32:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.61 $
+ * \version \$Revision: 1.62 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -227,20 +227,6 @@ Place *PetriNet::newPlace()
 
 
 /*!
- * Creates a low-level place.
- * \param role the initial role of the place
- * \return pointer of the created place
- */
-Place *PetriNet::newPlace(string role)
-{
-  return newPlace(role, LOW);
-}
-
-
-
-
-
-/*!
  * The actual newPlace function called by all other overloaded newPlace
  * functions.
  *
@@ -286,20 +272,6 @@ Transition *PetriNet::newTransition()
 
 
 /*!
- * Creates an unguarded transition.
- * \param role the initial role of the transition
- * \return pointer of the created transition
- */
-Transition *PetriNet::newTransition(string role)
-{
-  return newTransition(role, "");
-}
-
-
-
-
-
-/*!
  * The actual newTransition function called by all other overloaded
  * newTransition functions.
  *
@@ -329,21 +301,6 @@ Transition *PetriNet::newTransition(string role, string guard)
 
 
 /*!
- * Creates a (uninscripted) standard arc.
- * \param source source node of the arc
- * \param target target node of the arc
- * \return pointer of the created arc
- */
-Arc *PetriNet::newArc(Node *source, Node *target)
-{
-  return newArc(source, target, STANDARD, "");
-}
-
-
-
-
-
-/*!
  * Creates an inscripted standard arc.
  * \param source      source node of the arc
  * \param target      target node of the arc
@@ -369,22 +326,6 @@ Arc *PetriNet::newArc(Node *source, Node *target, string inscription)
 Arc *PetriNet::newArc(Node *source, Node *target, kc::casestring inscription)
 {
   return newArc(source, target, STANDARD, inscription->name);
-}
-
-
-
-
-
-/*!
- * Creates an uninscripted arc.
- * \param source source node of the arc
- * \param target target node of the arc
- * \param type   type of the arc (as defined in #arc_type)
- * \return pointer of the created arc
- */
-Arc *PetriNet::newArc(Node *source, Node *target, arc_type type)
-{
-  return newArc(source, target, type, "");
 }
 
 
@@ -609,6 +550,7 @@ void PetriNet::drawDot()
   {
     (*dot_output) << " " << (*p)->id << "\t[label=\"p" << (*p)->id << "\"";
 
+    // color special places
     if ((*p)->firstMemberOf("eventHandler."))
       (*dot_output) << " style=filled fillcolor=plum";
     else if ((*p)->firstMemberOf("compensationHandler."))
@@ -651,6 +593,7 @@ void PetriNet::drawDot()
     if ((*t)->guard != "")
       (*dot_output) << " shape=record label=\"{t" << (*t)->id << "|{" << (*t)->guard << "}}\"";
 
+    // color special transitions
     if ((*t)->firstMemberOf("eventHandler."))
       (*dot_output) << " style=filled fillcolor=plum";
     else if ((*t)->firstMemberOf("compensationHandler."))
@@ -1008,27 +951,6 @@ Place *PetriNet::findPlace(string role)
 Place *PetriNet::findPlace(kc::impl_activity* activity, string role)
 {
   return findPlace(intToString(activity->id->value) + role);
-}
-
-
-
-
-
-/*!
- * Finds a transition of the Petri net given a role the place fills or filled.
- *
- * \param  role the demanded role
- * \return a pointer to the transition or a NULL pointer if the place was not
- *         found.
- */
-Transition *PetriNet::findTransition(string role)
-{
-  Transition *result = (Transition *)roleMap[role];
-
-  if (result == NULL)
-    trace(TRACE_DEBUG, "[PN]\tTransition with role \"" + role + "\" not found.\n");
-
-  return result;
 }
 
 

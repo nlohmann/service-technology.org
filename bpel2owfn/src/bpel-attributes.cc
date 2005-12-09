@@ -11,19 +11,20 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/05 17:01:11 $
+ *          - last changed: \$Date: 2005/12/09 18:16:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
  *
  * \todo
  *       - (reinert) Comment this file and its classes.
  *       - (reinert) Variables for <onAlarm> are not checked.
  *       - (reinert) Check data types (e.g. is a value "yes" or "no").
+ *       - (reinert) Better error msg. in the from clause. 
  */
 
 #include "bpel-attributes.h"
@@ -98,60 +99,65 @@ kc::integer attributeManager::nextId()
 /*!
  * 
  */
+void attributeManager::checkAttributeValueYesNo(std::string attributeName, std::string attributeValue)
+{
+   	if((attributeValue != (string)"yes") && (attributeValue != (string)"no"))
+  	{
+  		printErrorMsg("wrong value of " + attributeName + " attribute");
+  	}	
+}
+
+/*!
+ * 
+ */
+bool attributeManager::isValidAttributeValue(std::string attributeName, std::string attributeValue)
+{
+
+  /// check all attributes with yes or no domain
+  if(attributeName == A__ABSTRACT_PROCESS)
+  {
+	checkAttributeValueYesNo(attributeName, attributeValue);
+  }
+  else if(attributeName == A__CREATE_INSTANCE)
+  {
+	checkAttributeValueYesNo(attributeName, attributeValue);  	
+  }
+  else if(attributeName == A__ENABLE_INSTANCE_COMPENSATION)
+  {
+	checkAttributeValueYesNo(attributeName, attributeValue);
+  }
+  else if(attributeName == A__INITIATE)
+  {
+	checkAttributeValueYesNo(attributeName, attributeValue);  	
+  }
+  else if(attributeName == A__SUPPRESS_JOIN_FAILURE)
+  {
+	checkAttributeValueYesNo(attributeName, attributeValue);  	
+  }
+  else if(attributeName == A__VARIABLE_ACCESS_SERIALIZABLE)
+  {
+	checkAttributeValueYesNo(attributeName, attributeValue);  	
+  }
+  
+  return true;
+}
+/*!
+ * 
+ */
 void attributeManager::define(kc::casestring attributeName, kc::casestring attributeValue)
 {  	
-  /*
-    traceAM("define \n");
+  
+/*    traceAM("define \n");
 	traceAM(attributeName->name);
   	traceAM("=");
   	traceAM(attributeValue->name);
   	traceAM("\n");
   */
 
-  if(attributeName->name == A__ABSTRACT_PROCESS)
+  if(isValidAttributeValue(attributeName->name, attributeValue->name))  
   {
-   	if((attributeValue->name != (string)"yes") && (attributeValue->name != (string)"no"))
-  	{
-  		printErrorMsg("wrong value of " + A__ABSTRACT_PROCESS + " attribute");
-  	}
+  	scannerResult[this->nodeId][attributeName->name] = attributeValue->name;
   }
-  else if(attributeName->name == A__CREATE_INSTANCE)
-  {
-   	if((attributeValue->name != (string)"yes") && (attributeValue->name != (string)"no"))
-  	{
-  		printErrorMsg("wrong value of " + A__CREATE_INSTANCE + " attribute");
-  	}
-  }
-  else if(attributeName->name == A__ENABLE_INSTANCE_COMPENSATION)
-  {
-   	if((attributeValue->name != (string)"yes") && (attributeValue->name != (string)"no"))
-  	{
-  		printErrorMsg("wrong value of " + A__ENABLE_INSTANCE_COMPENSATION + " attribute");
-  	}
-  }
-  else if(attributeName->name == A__INITIATE)
-  {
-   	if((attributeValue->name != (string)"yes") && (attributeValue->name != (string)"no"))
-  	{
-  		printErrorMsg("wrong value of " + A__INITIATE + " attribute");
-  	}
-  }
-  else if(attributeName->name == A__SUPPRESS_JOIN_FAILURE)
-  {
-   	if((attributeValue->name != (string)"yes") && (attributeValue->name != (string)"no"))
-  	{
-  		printErrorMsg("wrong value of " + A__SUPPRESS_JOIN_FAILURE + " attribute");
-  	}
-  }
-  else if(attributeName->name == A__VARIABLE_ACCESS_SERIALIZABLE)
-  {
-   	if((attributeValue->name != (string)"yes") && (attributeValue->name != (string)"no"))
-  	{
-  		printErrorMsg("wrong value of " + A__VARIABLE_ACCESS_SERIALIZABLE + " attribute");
-  	}
-  }
-  
-  scannerResult[this->nodeId][attributeName->name] = attributeValue->name;
 }
 
 /*!
@@ -177,6 +183,215 @@ void attributeManager::check(kc::integer elementId, unsigned int activityId)
     std::map<std::string, string>::iterator scannerResultDataIterator;
 	
 	switch(activityId) {
+		case K_ASSIGN:
+			{
+				traceAM("ASSIGN!!! \n");
+
+				/* no mandatory attributes */				
+
+			}
+			break;
+
+		case K_CASE:
+			{
+				traceAM("CASE!!! \n");
+
+				bool conditionFlag;
+				conditionFlag = false;
+				 
+				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
+				
+				///
+				while(scannerResultDataIterator != scannerResult[elementIdInt].end())
+				{	
+					if(((*scannerResultDataIterator).first) == A__CONDITION)
+					{
+						conditionFlag = true;
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}
+					++scannerResultDataIterator;
+				}
+				
+				if(!conditionFlag)
+				{
+					printErrorMsg("attribute " + A__CONDITION + "=\"" + T__BOOLEAN_EXPR + "\" is missing");					
+				}				
+				
+			}
+			break;
+
+		case K_COMPENSATE:
+			{
+				traceAM("COMPENSATE!!! \n");
+
+				/* no mandatory attributes */				
+				
+			}
+			break;
+
+		case K_FROM:
+			{
+				traceAM("FROM!!! \n");
+				
+				bool validFrom = false;
+				unsigned int attributeCompareCounter;
+							
+				// array to tag found attributes
+				// to store the number of found attributes -> COUNTER field
+				unsigned int foundAttributes[] =
+				{	/*variable, part, query, partnerLk, endpointRef, property, expression, opaque, COUNTER*/
+						 0,      0,     0,       0,          0,          0,         0,        0,      0
+				};
+
+				unsigned int CSIZE = 7; // number of valid combination of attributes
+				unsigned int ASIZE = 9; // number of attributes + COUNTER
+				unsigned int COUNTER = 8; // position of counter within the arrays 
+
+				// matrix for valid combination of attributes
+				unsigned int validAttributeCombination[][9] =
+				{	/*variable, part, query, partnerLk, endpointRef, property, expression, opaque, COUNTER*/
+				 	{	 1,      0,     0,       0,          0,          0,         0,        0,      1    },
+				 	{	 1,      1,     0,       0,          0,          0,         0,        0,      2    },
+				 	{	 1,      1,     1,       0,          0,          0,         0,        0,      3    },
+				 	{	 0,      0,     0,       1,          1,          0,         0,        0,      2    },
+				 	{	 1,      0,     0,       0,          0,          1,         0,        0,      2    },
+				 	{	 0,      0,     0,       0,          0,          0,         1,        0,      1    },
+				 	{	 0,      0,     0,       0,          0,          0,         0,        1,      1    }
+				};
+				 
+				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
+				
+				///
+				while(scannerResultDataIterator != scannerResult[elementIdInt].end())
+				{	
+					if(((*scannerResultDataIterator).first) == A__VARIABLE)
+					{
+						foundAttributes[0] = 1;
+						foundAttributes[COUNTER]++;
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}
+					else if(((*scannerResultDataIterator).first) == A__PART)
+					{
+						foundAttributes[1] = 1;
+						foundAttributes[COUNTER]++;
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}
+					else if(((*scannerResultDataIterator).first) == A__QUERY)
+					{
+						foundAttributes[2] = 1;
+						foundAttributes[COUNTER]++;						
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}					
+					else if(((*scannerResultDataIterator).first) == A__PARTNER_LINK)
+					{
+						foundAttributes[3] = 1;
+						foundAttributes[COUNTER]++;						
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}
+					else if(((*scannerResultDataIterator).first) == A__ENDPOINT_REFERENCE)
+					{
+						foundAttributes[4] = 1;
+						foundAttributes[COUNTER]++;
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}
+					else if(((*scannerResultDataIterator).first) == A__PROPERTY)
+					{
+						foundAttributes[5] = 1;
+						foundAttributes[COUNTER]++;
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}
+					else if(((*scannerResultDataIterator).first) == A__EXPRESSION)
+					{
+						foundAttributes[6] = 1;
+						foundAttributes[COUNTER]++;						
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}
+					else if(((*scannerResultDataIterator).first) == A__OPAQUE)
+					{
+						foundAttributes[7] = 1;
+						foundAttributes[COUNTER]++;						
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}																				
+					++scannerResultDataIterator;
+				}
+								
+				// iteration about valid attribute combination
+				for(unsigned int c = 0; c < CSIZE; c++)
+				{
+					// under or too much found attributes ... next combination
+					if(validAttributeCombination[c][COUNTER] != foundAttributes[COUNTER]) continue;
+	
+					attributeCompareCounter = 0;
+					
+					// iteration about attributes
+					for(unsigned int a = 0; a < ASIZE; a++)
+					{	// compare scanned combination of attributes with allowed combination of attributes
+						if((validAttributeCombination[c][a] == 1) && (foundAttributes[a] == 1))
+						{
+							attributeCompareCounter++;
+						}
+					}
+
+					if(validAttributeCombination[c][COUNTER] == attributeCompareCounter)
+					{
+						validFrom = true;
+						break;	
+					}
+					
+				}
+				
+				if(!validFrom)
+				{
+					printErrorMsg("attribute combination within the from clause is wrong");					
+				}				
+			}
+			break;		
+		
+		case K_INVOKE:
+			{
+				traceAM("INVOKE!!! \n");
+
+				bool partnerLinkFlag, portTypeFlag, operationFlag;
+				partnerLinkFlag = portTypeFlag = operationFlag = false;
+				 
+				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
+				
+				///
+				while(scannerResultDataIterator != scannerResult[elementIdInt].end())
+				{	
+					if(((*scannerResultDataIterator).first) == A__PARTNER_LINK)
+					{
+						partnerLinkFlag = true;
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}
+					else if(((*scannerResultDataIterator).first) == A__PORT_TYPE)
+					{
+						portTypeFlag = true;
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}
+					else if(((*scannerResultDataIterator).first) == A__OPERATION)
+					{
+						operationFlag = true;
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}					
+					++scannerResultDataIterator;
+				}
+				
+				if(!partnerLinkFlag)
+				{
+					printErrorMsg("attribute " + A__PARTNER_LINK + "=\"" + T__NCNAME + "\" is missing");					
+				}
+				else if(!portTypeFlag)
+				{
+					printErrorMsg("attribute " + A__PORT_TYPE + "=\"" + T__QNAME + "\" is missing");					
+				}
+				else if(!operationFlag)
+				{
+					printErrorMsg("attribute " + A__OPERATION + "=\"" + T__NCNAME + "\" is missing");					
+				}								
+			}
+			break;	
+
 		case K_PROCESS:
 			{
 				traceAM("PROCESS!!! \n");
@@ -304,57 +519,39 @@ void attributeManager::check(kc::integer elementId, unsigned int activityId)
 			}
 			break;		
 
-		case K_INVOKE:
+		case K_SCOPE:
 			{
-				traceAM("INVOKE!!! \n");
-
-				bool partnerLinkFlag, portTypeFlag, operationFlag;
-				partnerLinkFlag = portTypeFlag = operationFlag = false;
-				 
-				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
+				traceAM("SCOPE!!! \n");
 				
-				///
-				while(scannerResultDataIterator != scannerResult[elementIdInt].end())
-				{	
-					if(((*scannerResultDataIterator).first) == A__PARTNER_LINK)
-					{
-						partnerLinkFlag = true;
-						traceAM((*scannerResultDataIterator).first + "\n");
-					}
-					else if(((*scannerResultDataIterator).first) == A__PORT_TYPE)
-					{
-						portTypeFlag = true;
-						traceAM((*scannerResultDataIterator).first + "\n");
-					}
-					else if(((*scannerResultDataIterator).first) == A__OPERATION)
-					{
-						operationFlag = true;
-						traceAM((*scannerResultDataIterator).first + "\n");
-					}					
-					++scannerResultDataIterator;
-				}
+				/* default attribute */
 				
-				if(!partnerLinkFlag)
-				{
-					printErrorMsg("attribute " + A__PARTNER_LINK + "=\"" + T__NCNAME + "\" is missing");					
-				}
-				else if(!portTypeFlag)
-				{
-					printErrorMsg("attribute " + A__PORT_TYPE + "=\"" + T__QNAME + "\" is missing");					
-				}
-				else if(!operationFlag)
-				{
-					printErrorMsg("attribute " + A__OPERATION + "=\"" + T__NCNAME + "\" is missing");					
-				}								
 			}
-			break;		
+			break;
 
-		case K_ASSIGN:
+		case K_SEQUENCE:
 			{
-				traceAM("ASSIGN!!! \n");
+				traceAM("SEQUENCE!!! \n");
+
+				/* no mandatory attributes */				
+				
+			}
+			break;				
+
+		case K_SWITCH:
+			{
+				traceAM("SWITCH!!! \n");
 
 				/* no mandatory attributes */				
 
+			}
+			break;				
+
+		case K_TERMINATE:
+			{
+				traceAM("TERMINATE!!! \n");
+				
+				/* no mandatory attributes */
+				
 			}
 			break;		
 
@@ -432,39 +629,7 @@ void attributeManager::check(kc::integer elementId, unsigned int activityId)
 			}
 			break;		
 
-		case K_EMPTY:
-			{
-				traceAM("EMPTY!!! \n");
 				
-				/* no mandatory attributes */
-				
-			}
-			break;		
-
-		case K_TERMINATE:
-			{
-				traceAM("TERMINATE!!! \n");
-				
-				/* no mandatory attributes */
-				
-			}
-			break;		
-		case K_SCOPE:
-			{
-				traceAM("SCOPE!!! \n");
-				
-				/* default attribute */
-				
-			}
-			break;
-		case K_COMPENSATE:
-			{
-				traceAM("COMPENSATE!!! \n");
-
-				/* no mandatory attributes */				
-				
-			}
-			break;				
 		case K_PICK:
 			{
 				traceAM("PICK!!! \n");
@@ -472,22 +637,7 @@ void attributeManager::check(kc::integer elementId, unsigned int activityId)
 				/* default attribute */
 			}
 			break;				
-		case K_SEQUENCE:
-			{
-				traceAM("SEQUENCE!!! \n");
-
-				/* no mandatory attributes */				
-				
-			}
-			break;				
-		case K_SWITCH:
-			{
-				traceAM("SWITCH!!! \n");
-
-				/* no mandatory attributes */				
-
-			}
-			break;				
+			
 		case K_WHILE:
 			{
 				traceAM("WHILE!!! \n");

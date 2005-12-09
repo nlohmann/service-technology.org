@@ -16,17 +16,26 @@
 
 #include <map>
 
-/// names of mandatory attributes
+/// names attributes
 const std::string A__CONDITION = "condition";
+const std::string A__ENDPOINT_REFERENCE = "endpointReference";
+const std::string A__EXPRESSION = "expression";
 const std::string A__FAULT_NAME = "faultName";
 const std::string A__FOR = "for";
 const std::string A__NAME = "name";
+const std::string A__OPERATION = "operation";
+const std::string A__PART = "part";
 const std::string A__PARTNER_LINK = "partnerLink";
 const std::string A__PORT_TYPE = "portType";
-const std::string A__OPERATION = "operation";
+const std::string A__PROPERTY = "property";
+const std::string A__QUERY = "query";
+const std::string A__VARIABLE = "variable";
 const std::string A__TARGET_NAMESPACE = "targetNamespace";
 const std::string A__UNTIL = "until";
 /// yes or no
+
+const std::string A__OPAQUE = "opaque";
+
 const std::string A__ABSTRACT_PROCESS = "abstractProcess";
 const std::string A__CREATE_INSTANCE = "createInstance";
 const std::string A__ENABLE_INSTANCE_COMPENSATION = "enableInstanceCompensation";
@@ -41,6 +50,9 @@ const std::string T__ANYURI = "anyURI";
 const std::string T__DURATION_EXPR = "bpws:tDuration-expr";
 const std::string T__DEADLINE_EXPR = "bpws:tDeadline-expr";
 const std::string T__BOOLEAN_EXPR = "bpws:tBoolean-expr";
+const std::string T__STRING = "string";
+const std::string T__ROLES = "bpws:tRoles";
+const std::string T__BOOLEAN = "bpws:tBoolean";
 
 class attributeManager
 {
@@ -53,6 +65,12 @@ class attributeManager
 	
 	/// 
 	void printErrorMsg(std::string errorMsg);
+
+	///
+	void checkAttributeValueYesNo(std::string attributeName, std::string attributeValue);	
+	
+	///
+	bool isValidAttributeValue(std::string attributeName, std::string attributeValue);
   
   public:
     /// constructor

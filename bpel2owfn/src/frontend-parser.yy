@@ -14,11 +14,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/08 15:19:19 $
+ *          - last changed: \$Date: 2005/12/09 16:16:14 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.57 $
+ * \version \$Revision: 1.58 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -1077,7 +1077,8 @@ tCopy:
 
 tFrom:
   K_FROM arbitraryAttributes X_NEXT X_SLASH K_FROM
-    { $$ = From();
+    { att.check($2, K_FROM);
+      $$ = From();
       $$->variable = att.read($2, "variable");
       $$->part = att.read($2, "part");
       $$->query = att.read($2, "query");
@@ -1089,7 +1090,8 @@ tFrom:
       $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
       symMan.checkPartnerLink($$->partnerLink->name); }
 | K_FROM arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_FROM
-    { $$ = From();
+    { att.check($2, K_FROM);
+      $$ = From();
       $$->variable = att.read($2, "variable");
       $$->part = att.read($2, "part");
       $$->query = att.read($2, "query");
@@ -1102,7 +1104,8 @@ tFrom:
       $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
       symMan.checkPartnerLink($$->partnerLink->name); }
 | K_FROM arbitraryAttributes X_SLASH
-    { $$ = From();
+    { att.check($2, K_FROM);
+      $$ = From();
       $$->variable = att.read($2, "variable");
       $$->part = att.read($2, "part");
       $$->query = att.read($2, "query");
@@ -1402,7 +1405,8 @@ tCase_list:
 
 tCase:
   K_CASE arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CASE
-    { $$ = Case($4);
+    { att.check($2, K_CASE);
+      $$ = Case($4);
       $$->condition = att.read($2, "condition"); }
 ;
 

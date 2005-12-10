@@ -10,14 +10,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/08 15:02:19 $
+ *          - last changed: \$Date: 2005/12/10 15:26:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  *          - 2005-11-22 (gierds) Initial version.
  *	    - 2005-11-30 (gierds) Checking for PartnerLinks completed.
  *
@@ -248,7 +248,7 @@ void SymbolManager::checkPartnerLink(std::string name)
 
 
 /// \todo (gierds) comment me
-std::string SymbolManager::addVariable(csVariable* var)
+kc::casestring SymbolManager::addVariable(csVariable* var)
 {
   std::string uniqueID;
 	
@@ -272,7 +272,7 @@ std::string SymbolManager::addVariable(csVariable* var)
 
   trace(TRACE_VERY_DEBUG, "[CS] Unique ID of Variable is " 
 		          + uniqueID + "\n");
-  return uniqueID;
+  return kc::mkcasestring(uniqueID.c_str());
 }
 
 /**
@@ -281,7 +281,7 @@ std::string SymbolManager::addVariable(csVariable* var)
  * \param pl The Variable to be checked
  *
  */
-std::string SymbolManager::checkVariable(csVariable* var, bool isFaultVariable)
+kc::casestring SymbolManager::checkVariable(csVariable* var, bool isFaultVariable)
 {
   int id = 0;
   std::string uniqueID;
@@ -290,7 +290,7 @@ std::string SymbolManager::checkVariable(csVariable* var, bool isFaultVariable)
   if (var->name == "")
   {
     trace(TRACE_VERY_DEBUG, "[CS] Checking Variable, but no name is given; returning.\n");
-    return "";
+    return kc::mkcasestring(string().c_str());
   }
 
   trace(TRACE_DEBUG, "[CS] Checking Variable " + var->name + ", " + var->messageType + ", "
@@ -338,7 +338,7 @@ std::string SymbolManager::checkVariable(csVariable* var, bool isFaultVariable)
     if ((!found) && (isFaultVariable))
     {
       // Fault Variables might be undefined, but that works for us
-      uniqueID = addVariable(var);
+      uniqueID = string(addVariable(var)->name);
     }
   }
   catch(bad_cast)
@@ -347,7 +347,7 @@ std::string SymbolManager::checkVariable(csVariable* var, bool isFaultVariable)
   }
 
   trace(TRACE_VERY_DEBUG, "[CS] Unique ID of Variable is " + std::string(intToString(id) + "." + var->name) + "\n");
-  return uniqueID;
+  return kc::mkcasestring(uniqueID.c_str());
   
 }
 
@@ -357,7 +357,7 @@ std::string SymbolManager::checkVariable(csVariable* var, bool isFaultVariable)
  * \param name Name of the Variable to be checked
  *
  */
-std::string SymbolManager::checkVariable(std::string name, bool isFaultVariable)
+kc::casestring SymbolManager::checkVariable(std::string name, bool isFaultVariable)
 {
   if (isFaultVariable)
   {
@@ -374,7 +374,7 @@ std::string SymbolManager::checkVariable(std::string name, bool isFaultVariable)
  * \return     the unique Link ID
  * 
  */
-std::string SymbolManager::addLink(csLink* link)
+kc::casestring SymbolManager::addLink(csLink* link)
 {
   std::string linkID;
 	
@@ -410,7 +410,7 @@ std::string SymbolManager::addLink(csLink* link)
 
   trace(TRACE_VERY_DEBUG, "[CS] Unique ID of Link is " 
 		  + linkID + "\n");
-  return linkID;
+  return kc::mkcasestring(linkID.c_str());
 }
 
 /**
@@ -421,7 +421,7 @@ std::string SymbolManager::addLink(csLink* link)
  * \return         the unique ID of the Link
  *
  */
-std::string SymbolManager::checkLink(csLink* link, bool asSource)
+kc::casestring SymbolManager::checkLink(csLink* link, bool asSource)
 {
   int id = 0;
   std::string uniqueID;
@@ -430,7 +430,7 @@ std::string SymbolManager::checkLink(csLink* link, bool asSource)
   if (link->name == "")
   {
     trace(TRACE_VERY_DEBUG, "[CS] Checking Link, but no name is given; returning.\n");
-    return "";
+    return kc::mkcasestring(string().c_str());
   }
 
   // exit because in while activities no links are allowed
@@ -506,7 +506,7 @@ std::string SymbolManager::checkLink(csLink* link, bool asSource)
   }
 
   trace(TRACE_VERY_DEBUG, "[CS] Unique ID of Link is " + std::string(intToString(id) + "." + link->name) + "\n");
-  return uniqueID;
+  return kc::mkcasestring(uniqueID.c_str());
   
 }
 
@@ -518,7 +518,7 @@ std::string SymbolManager::checkLink(csLink* link, bool asSource)
  * \return         the unique ID of the Link
  *
  */
-std::string SymbolManager::checkLink(std::string name, bool asSource)
+kc::casestring SymbolManager::checkLink(std::string name, bool asSource)
 {
   return checkLink(new csLink(name), asSource);
 }
@@ -589,10 +589,21 @@ void SymbolManager::checkLinks()
 
 }
 
+/**
+ * Adds a channel to the in list, under the condition that it is not in
+ * the outChannel list.
+ *
+ * \param channel the channel to add
+ * \return        the unique channel name
+ *
+ */
+kc::casestring SymbolManager::addInChannel(csChannel * channel)
+{
+  return kc::mkcasestring(string().c_str());
+}
 
 /**
- *
- *  \todo (gierds) comment me
+ * Prints recursively a very simple tree of the scopes.
  *
  */
 void SymbolManager::printScope()
@@ -760,5 +771,19 @@ csLink::csLink( string myname )
 bool csLink::operator==(csLink& other)
 {
   return (name == other.name);
+}
+
+/// \todo (gierds) comment me
+csChannel::csChannel(string myportType, string myoperation, string mypartnerLink)
+{
+  portType    = myportType;
+  operation   = myoperation;
+  partnerLink = mypartnerLink;
+}
+
+/// our own equality
+bool csChannel::operator==(csChannel& other)
+{
+  return (portType == other.portType && operation == other.operation && partnerLink == other.partnerLink);
 }
 

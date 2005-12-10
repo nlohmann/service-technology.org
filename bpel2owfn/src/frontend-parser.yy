@@ -14,11 +14,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/09 16:20:30 $
+ *          - last changed: \$Date: 2005/12/10 15:26:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.59 $
+ * \version \$Revision: 1.60 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -516,7 +516,7 @@ tCatch:
     { $$ = Catch($4);
       $$->faultName = att.read($2, "faultName");
       $$->faultVariable = att.read($2, "faultVariable"); 
-      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "faultVariable")->name, true)).c_str()); }
+      $$->variableID = symMan.checkVariable(att.read($2, "faultVariable")->name, true); }
 ;
 
 tCatchAll:
@@ -525,7 +525,9 @@ tCatchAll:
 | K_CATCHALL arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CATCHALL X_NEXT
     { $$ = CatchAll($4);
       $$->faultName = att.read($2, "faultName");
-      $$->faultVariable = att.read($2, "faultVariable"); }
+      $$->faultVariable = att.read($2, "faultVariable");
+      // $$->variableID = symMan.checkVariable(att.read($2, "faultVariable")->name, true); 
+    }
 ;
 
 
@@ -621,7 +623,7 @@ tOnMessage:
       $$->partnerLink = att.read($2, "partnerLink");
       $$->portType = att.read($2, "portType");
       $$->operation = att.read($2, "operation");
-      $$->uniqueID  = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
+      $$->variableID  = symMan.checkVariable(att.read($2, "variable")->name);
       $$->variable = att.read($2, "variable"); }
 ;
 
@@ -680,22 +682,22 @@ tVariable:
       $$->messageType = att.read($2, "messageType");
       $$->type = att.read($2, "type");
       $$->element = att.read($2, "element"); 
-      $$->uniqueID = mkcasestring((symMan.addVariable( 
+      $$->variableID = symMan.addVariable( 
 	              new csVariable($$->name->name, 
 				     $$->messageType->name, 
 				     $$->type->name, 
-				     $$->element->name))).c_str()); }
+				     $$->element->name)); }
 | K_VARIABLE arbitraryAttributes X_SLASH
     { $$ = Variable();
       $$->name = att.read($2, "name");
       $$->messageType = att.read($2, "messageType");
       $$->type = att.read($2, "type");
       $$->element = att.read($2, "element"); 
-      $$->uniqueID = mkcasestring((symMan.addVariable( 
+      $$->variableID = symMan.addVariable( 
 	              new csVariable($$->name->name, 
 				     $$->messageType->name, 
 				     $$->type->name, 
-				     $$->element->name))).c_str()); }
+				     $$->element->name)); }
 ;
 
 
@@ -877,8 +879,8 @@ tInvoke:
       $$->operation = att.read($2, "operation");
       $$->inputVariable = att.read($2, "inputVariable");
       $$->outputVariable = att.read($2, "outputVariable");
-      $$->uniqueIDin  = mkcasestring((symMan.checkVariable(att.read($2, "inputVariable")->name)).c_str());
-      $$->uniqueIDout = mkcasestring((symMan.checkVariable(att.read($2, "outputVariable")->name)).c_str());
+      $$->variableIDin  = symMan.checkVariable(att.read($2, "inputVariable")->name);
+      $$->variableIDout = symMan.checkVariable(att.read($2, "outputVariable")->name);
       $$->id = $5->parentId = $2; }
 | K_INVOKE arbitraryAttributes X_SLASH
     { att.check($2, K_INVOKE);
@@ -893,8 +895,8 @@ tInvoke:
       $$->operation = att.read($2, "operation");
       $$->inputVariable = att.read($2, "inputVariable");
       $$->outputVariable = att.read($2, "outputVariable"); 
-      $$->uniqueIDin  = mkcasestring((symMan.checkVariable(att.read($2, "inputVariable")->name)).c_str());
-      $$->uniqueIDout = mkcasestring((symMan.checkVariable(att.read($2, "outputVariable")->name)).c_str());
+      $$->variableIDin  = symMan.checkVariable(att.read($2, "inputVariable")->name);
+      $$->variableIDout = symMan.checkVariable(att.read($2, "outputVariable")->name);
       $$->id = $2;
       symMan.checkPartnerLink($$->partnerLink->name); }
 ;
@@ -945,7 +947,7 @@ tReceive:
       $$->operation = att.read($2, "operation");
       $$->variable = att.read($2, "variable");
       $$->createInstance = att.read($2, "createInstance", $$->createInstance); 
-      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
+      $$->variableID = symMan.checkVariable(att.read($2, "variable")->name);
       $$->id = $5->parentId = $2; }
 | K_RECEIVE arbitraryAttributes X_SLASH
     { att.check($2, K_RECEIVE);
@@ -960,7 +962,7 @@ tReceive:
       $$->operation = att.read($2, "operation");
       $$->variable = att.read($2, "variable");
       $$->createInstance = att.read($2, "createInstance", $$->createInstance);
-      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
+      $$->variableID = symMan.checkVariable(att.read($2, "variable")->name);
       $$->id = $2; 
       symMan.checkPartnerLink($$->partnerLink->name); }
 ;
@@ -1007,7 +1009,7 @@ tReply:
       $$->operation = att.read($2, "operation");
       $$->variable = att.read($2, "variable");
       $$->faultName = att.read($2, "faultName");
-      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
+      $$->variableID = symMan.checkVariable(att.read($2, "variable")->name);
       $$->id = $4->parentId = $2; }
 | K_REPLY arbitraryAttributes X_SLASH
     { att.check($2, K_REPLY);
@@ -1022,7 +1024,7 @@ tReply:
       $$->operation = att.read($2, "operation");
       $$->variable = att.read($2, "variable");
       $$->faultName = att.read($2, "faultName");
-      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
+      $$->variableID = symMan.checkVariable(att.read($2, "variable")->name);
       $$->id = $2; }
 ;
 
@@ -1090,7 +1092,7 @@ tFrom:
       $$->property = att.read($2, "property");
       $$->expression = att.read($2, "expression");
       $$->opaque = att.read($2, "opaque"); 
-      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
+      $$->variableID = symMan.checkVariable(att.read($2, "variable")->name);
       symMan.checkPartnerLink($$->partnerLink->name); }
 | K_FROM arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_FROM
     { att.check($2, K_FROM);
@@ -1104,7 +1106,7 @@ tFrom:
       $$->expression = att.read($2, "expression");
       $$->opaque = att.read($2, "opaque");
       $$->literalValue = $4;
-      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
+      $$->variableID = symMan.checkVariable(att.read($2, "variable")->name);
       symMan.checkPartnerLink($$->partnerLink->name); }
 | K_FROM arbitraryAttributes X_SLASH
     { att.check($2, K_FROM);
@@ -1117,7 +1119,7 @@ tFrom:
       $$->property = att.read($2, "property");
       $$->expression = att.read($2, "expression");
       $$->opaque = att.read($2, "opaque"); 
-      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
+      $$->variableID = symMan.checkVariable(att.read($2, "variable")->name);
       symMan.checkPartnerLink($$->partnerLink->name); }
 ;
 
@@ -1136,7 +1138,7 @@ tTo:
       $$->part = att.read($2, "part");
       $$->partnerLink = att.read($2, "partnerLink");
       $$->property = att.read($2, "property"); 
-      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
+      $$->variableID = symMan.checkVariable(att.read($2, "variable")->name);
       symMan.checkPartnerLink($$->partnerLink->name); }
 | K_TO arbitraryAttributes X_SLASH
     { $$ = To();
@@ -1144,7 +1146,7 @@ tTo:
       $$->part = att.read($2, "part");
       $$->partnerLink = att.read($2, "partnerLink");
       $$->property = att.read($2, "property"); 
-      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "variable")->name)).c_str());
+      $$->variableID = symMan.checkVariable(att.read($2, "variable")->name);
       symMan.checkPartnerLink($$->partnerLink->name); }
 ;
 
@@ -1216,7 +1218,7 @@ tThrow:
       $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->faultName = att.read($2, "faultName");
       $$->faultVariable = att.read($2, "faultVariable");
-      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "faultVariable")->name)).c_str());
+      $$->variableID = symMan.checkVariable(att.read($2, "faultVariable")->name);
       $$->id = $4->parentId = $2; }
 | K_THROW arbitraryAttributes X_SLASH
     { att.check($2, K_THROW);
@@ -1228,7 +1230,7 @@ tThrow:
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->faultName = att.read($2, "faultName");
       $$->faultVariable = att.read($2, "faultVariable");
-      $$->uniqueID = mkcasestring((symMan.checkVariable(att.read($2, "faultVariable")->name)).c_str());
+      $$->variableID = symMan.checkVariable(att.read($2, "faultVariable")->name);
       $$->id = $2; }
 ;
 
@@ -1362,11 +1364,11 @@ tLink:
   K_LINK arbitraryAttributes X_NEXT X_SLASH K_LINK
     { $$ = Link();
       $$->name = att.read($2, "name"); 
-      $$->linkID = mkcasestring(symMan.addLink(new csLink($$->name->name)).c_str()); }
+      $$->linkID = symMan.addLink(new csLink($$->name->name)); }
 | K_LINK arbitraryAttributes X_SLASH
     { $$ = Link();
       $$->name = att.read($2, "name"); 
-      $$->linkID = mkcasestring(symMan.addLink(new csLink($$->name->name)).c_str()); }
+      $$->linkID = symMan.addLink(new csLink($$->name->name)); }
 ;
 
 
@@ -1609,11 +1611,11 @@ tTarget:
   K_TARGET arbitraryAttributes X_NEXT X_SLASH K_TARGET
     { $$ = Target();
       $$->linkName = att.read($2, "linkName"); 
-      $$->linkID = mkcasestring(symMan.checkLink($$->linkName->name, false).c_str()); }
+      $$->linkID = symMan.checkLink($$->linkName->name, false); }
 | K_TARGET arbitraryAttributes X_SLASH
     { $$ = Target();
       $$->linkName = att.read($2, "linkName"); 
-      $$->linkID = mkcasestring(symMan.checkLink($$->linkName->name, false).c_str()); }
+      $$->linkID = symMan.checkLink($$->linkName->name, false); }
 ;
 
 tSource_list:
@@ -1628,12 +1630,14 @@ tSource:
     { $$ = Source();
       $$->linkName = att.read($2, "linkName");
       $$->transitionCondition = att.read($2, "transitionCondition", $$->transitionCondition); 
-      $$->linkID = mkcasestring(symMan.checkLink($$->linkName->name, true).c_str()); }
+      $$->linkID = symMan.checkLink($$->linkName->name, true);
+    }
 | K_SOURCE arbitraryAttributes X_SLASH
     { $$ = Source();
       $$->linkName = att.read($2, "linkName");
       $$->transitionCondition = att.read($2, "transitionCondition", $$->transitionCondition); 
-      $$->linkID = mkcasestring(symMan.checkLink($$->linkName->name, true).c_str()); }
+      $$->linkID = symMan.checkLink($$->linkName->name, true);
+    }
 ;
 
 

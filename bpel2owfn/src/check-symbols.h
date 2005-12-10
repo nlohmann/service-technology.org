@@ -10,14 +10,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/08 15:02:20 $
+ *          - last changed: \$Date: 2005/12/10 15:26:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  *          - 2005-11-22 (gierds) Initial version.
  *          - 2005-11-24 (gierds) Put all funcionality into a class #SymbolManager
  *          - 2005-11-29 (gierds) Added checking of variables.
@@ -99,21 +99,26 @@ class SymbolManager
     void checkPartnerLink(std::string);
 
     /// add a Variable to the current scope
-    std::string addVariable(csVariable* var);
+    kc::casestring addVariable(csVariable* var);
     /// check, if a Variable exists in the current scope
-    std::string checkVariable(csVariable* var, bool isFaultVariable = false);
+    kc::casestring checkVariable(csVariable* var, bool isFaultVariable = false);
     /// check, if a Variable with name exists in the current scope
-    std::string checkVariable(std::string, bool isFaultVariable = false);
+    kc::casestring checkVariable(std::string, bool isFaultVariable = false);
 
     /// add a Variable to the current scope
-    std::string addLink(csLink* link);
+    kc::casestring addLink(csLink* link);
     /// check, if a Variable exists in the current scope
-    std::string checkLink(csLink* link, bool asSource);
+    kc::casestring checkLink(csLink* link, bool asSource);
     /// check, if a Variable with name exists in the current scope
-    std::string checkLink(std::string, bool asSource);
+    kc::casestring checkLink(std::string, bool asSource);
     /// run some simple checks on the Links defined in the current scope
     void checkLinks();
 
+    /// add a channel to the inChannel list
+    kc::casestring addInChannel(csChannel *);
+    /// add a channel to the outChannel list
+    kc::casestring addOutChannel(csChannel *);
+ 
     /// prints the scope tree
     void printScope();
 };
@@ -311,6 +316,23 @@ class csLink
 
     /// our own equality
     bool operator==(csLink& other);
+};
+
+class csChannel
+{
+  public:
+    /// attribute portType
+    string portType;
+    /// attribute operation
+    string operation;
+    /// attribute partnerLink
+    string partnerLink;
+
+    /// Constructor
+    csChannel(string myportType, string myoperation, string mypartnerLink);
+
+    /// our own equality
+    bool operator==(csChannel& other);
 };
 
 #endif

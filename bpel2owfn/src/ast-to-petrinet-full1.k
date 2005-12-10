@@ -9,11 +9,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/09 16:59:27 $
+ *          - last changed: \$Date: 2005/12/10 15:26:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.64 $
+ * \version \$Revision: 1.65 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -1498,8 +1498,8 @@ This=Invoke(a,b) provided (This->outputVariable == mkcasestring("")) ->
       Transition *t5 = TheNet->newTransition(prefix + "t5");
       Transition *t6 = TheNet->newTransition(prefix + "t6");
       Transition *t7 = TheNet->newTransition(prefix + "t7");
-      TheNet->newArc(p1, t1); TheNet->findPlace("variable." + string(This->uniqueIDin->name));
-      TheNet->newArc(TheNet->findPlace("variable." + string(This->uniqueIDin->name)), t1, READ, "X");
+      TheNet->newArc(p1, t1); TheNet->findPlace("variable." + string(This->variableIDin->name));
+      TheNet->newArc(TheNet->findPlace("variable." + string(This->variableIDin->name)), t1, READ, "X");
       TheNet->newArc(t1, p2, "(X,CS)");
       TheNet->newArc(p2, t2, "(X,CS)");
       TheNet->newArc(t2, p3);
@@ -1556,7 +1556,7 @@ This=Invoke(a,b) provided (This->outputVariable != mkcasestring("")) ->
       Transition *t11 = TheNet->newTransition(prefix + "t11");
       Transition *t12 = TheNet->newTransition(prefix + "t12");
       TheNet->newArc(p1, t1);
-      TheNet->newArc(TheNet->findPlace("variable." + string(This->uniqueIDin->name)), t1, READ, "X");
+      TheNet->newArc(TheNet->findPlace("variable." + string(This->variableIDin->name)), t1, READ, "X");
       TheNet->newArc(t1, p2, "(X,CS1)");
       TheNet->newArc(p2, t2, "(X,CS1)");
       TheNet->newArc(t2, p3);
@@ -1564,8 +1564,8 @@ This=Invoke(a,b) provided (This->outputVariable != mkcasestring("")) ->
       TheNet->newArc(t3, p4, "(Y,CS2)");
       TheNet->newArc(p4, t4, "(Y,CS2)");
       TheNet->newArc(t4, p5);
-      TheNet->newArc(TheNet->findPlace("variable." + string(This->uniqueIDout->name)), t4, "V");
-      TheNet->newArc(t4, TheNet->findPlace("variable." + string(This->uniqueIDout->name)), "Y");
+      TheNet->newArc(TheNet->findPlace("variable." + string(This->variableIDout->name)), t4, "V");
+      TheNet->newArc(t4, TheNet->findPlace("variable." + string(This->variableIDout->name)), "Y");
       TheNet->newArc(p4, t5, "(Y,CS2)");
       TheNet->newArc(t5, p6);
       TheNet->newArc(t5, p9, "fault2");
@@ -1633,8 +1633,8 @@ This=Receive(a,b) ->
       TheNet->newArc(t1, p2, "(X,CS)");
       TheNet->newArc(p2, t2, "(X,CS)");
       TheNet->newArc(t2, p3);
-      TheNet->newArc(TheNet->findPlace("variable." + string(This->uniqueID->name)), t2, "V");
-      TheNet->newArc(t2, TheNet->findPlace("variable." + string(This->uniqueID->name)), "X");
+      TheNet->newArc(TheNet->findPlace("variable." + string(This->variableID->name)), t2, "V");
+      TheNet->newArc(t2, TheNet->findPlace("variable." + string(This->variableID->name)), "X");
       TheNet->newArc(t3, p4);
       TheNet->newArc(t3, p7, "fault");
       TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t3); // new fault management
@@ -1689,7 +1689,7 @@ This=Reply(a,b) ->
       Transition *t6 = TheNet->newTransition(prefix + "t6");
       Transition *t7 = TheNet->newTransition(prefix + "t7");
       TheNet->newArc(p1, t1);
-      TheNet->newArc(TheNet->findPlace("variable." + string(This->uniqueID->name)), t1, READ, "X");      
+      TheNet->newArc(TheNet->findPlace("variable." + string(This->variableID->name)), t1, READ, "X");      
       TheNet->newArc(t1, p2, "(X,CS)");
       TheNet->newArc(p2, t2, "(X,CS)");
       TheNet->newArc(t2, p3);
@@ -1767,13 +1767,13 @@ This=Assign(a,b) ->
 	  Transition *t6 = TheNet->newTransition(new_prefix + "t6");
 	  Transition *t7 = TheNet->newTransition(new_prefix + "t7");
 	  TheNet->newArc(lastPlace, t1);
-	  TheNet->newArc(TheNet->findPlace("variable." + string(from->uniqueID->name)), t1, READ, "X");
+	  TheNet->newArc(TheNet->findPlace("variable." + string(from->variableID->name)), t1, READ, "X");
 	  TheNet->newArc(t1, p2, "X");
 	  TheNet->newArc(p2, t2, "X");
 	  TheNet->newArc(p2, t3, "X");
 	  TheNet->newArc(t2, p8);
-	  TheNet->newArc(TheNet->findPlace("variable." + string(to->uniqueID->name)), t2, "Y");
-	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(to->uniqueID->name)), "X");
+	  TheNet->newArc(TheNet->findPlace("variable." + string(to->variableID->name)), t2, "Y");
+	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(to->variableID->name)), "X");
 	  TheNet->newArc(t3, p4);
 	  TheNet->newArc(t3, assign_failed, "fault");
 	  TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t3); // new fault management
@@ -1798,8 +1798,8 @@ This=Assign(a,b) ->
 	  Transition *t6 = TheNet->newTransition(new_prefix + "t6");
 	  Transition *t7 = TheNet->newTransition(new_prefix + "t7");
 	  TheNet->newArc(lastPlace, t2);
-	  TheNet->newArc(TheNet->findPlace("variable." + string(to->uniqueID->name)), t2, "Y");
-	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(to->uniqueID->name)), string(from->literalValue->name));
+	  TheNet->newArc(TheNet->findPlace("variable." + string(to->variableID->name)), t2, "Y");
+	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(to->variableID->name)), string(from->literalValue->name));
 	  TheNet->newArc(t2, p8);	  
 	  TheNet->newArc(lastPlace, t3);	  
 	  TheNet->newArc(t3, p4);

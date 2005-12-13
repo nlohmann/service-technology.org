@@ -14,11 +14,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/10 15:26:11 $
+ *          - last changed: \$Date: 2005/12/13 07:51:19 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.60 $
+ * \version \$Revision: 1.61 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -1572,6 +1572,7 @@ tScope:
       $$->variableAccessSerializable = att.read($2, "variableAccessSerializable", $$->variableAccessSerializable);
       $$->id = $5->parentId = $2;
       $$->parentScopeId = oldScopeId;
+      currentScopeId = oldScopeId; //new
       symMan.quitScope(); }
 ;
 

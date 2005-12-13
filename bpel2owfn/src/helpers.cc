@@ -8,18 +8,18 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2005/12/13 15:34:26 $
+ *          - last changed: \$Date: 2005/12/13 21:49:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
  *          - 2005-11-11 (nlohmann) Initial version.
  *          - 2005-11-15 (gierds) Moved commandline evaluation functions from
  *            main.cc to here.
@@ -65,6 +65,23 @@ string intToString(int i)
   
   return string(buffer);
 }
+
+
+
+
+
+/*!
+ * \todo (nlohmann) Comment me!
+ */
+string pos(const char *file, int line, const char *function)
+{
+  string result = "function " + string(function) + " (" + string(file) + ":" + intToString(line) + ")\n";
+  return result;
+}
+
+
+
+
 
 // --------------------- functions for command line evaluation --------------------------------
 

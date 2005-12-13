@@ -8,11 +8,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes by: \$Author: gierds $
+ *          - last changes by: \$Author: nlohmann $
  *          
  * \date    
  * 	    - created: 2005-11-11
- *          - last changed: \$Date: 2005/12/13 15:29:26 $
+ *          - last changed: \$Date: 2005/12/13 21:49:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -113,6 +113,9 @@ set<Node *> setUnion(set<Node *> a, set<Node *> b);
 
 /// Converts int to string.
 string intToString(int i);
+
+///
+string pos(const char *file, int line, const char *function);
 
 /// Prints help for command line arguments
 void print_help();

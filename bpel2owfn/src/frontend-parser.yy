@@ -18,7 +18,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/13 15:03:43 $
+ *          - last changed: \$Date: 2005/12/13 15:29:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.64 $
+ * \version \$Revision: 1.65 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -40,6 +40,8 @@
  *          - 2005-12-04 (nlohmann) Re-organized handlers. Added implicit
  *            rewriting rules. Simplified grammar. Removed
  *            "_opt"-non-terminals.
+ *	    - 2005-12-13 (gierds) Added additional attribute variableID,
+ * 	      linkID and channelID where necessary
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL

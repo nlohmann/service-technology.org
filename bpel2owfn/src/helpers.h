@@ -8,11 +8,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes by: \$Author: nlohmann $
+ *          - last changes by: \$Author: gierds $
  *          
  * \date    
  * 	    - created: 2005-11-11
- *          - last changed: \$Date: 2005/12/04 14:16:07 $
+ *          - last changed: \$Date: 2005/12/13 15:29:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,6 +24,8 @@
  *          - 2005-11-16 (gierds) Added error() and cleanup() functions.
  *          - 2005-11-22 (gierds) Include #check-symbols.h to know about
  *            #Scope.
+ *          - 2005-12-13 (gierds) Added variables in order to handle creation
+ *            of oWFNs.  
  */
 
 #ifndef HELPERS_H
@@ -52,6 +54,11 @@ extern std::string lola_filename;
 /// Pointer to LoLA output file
 extern std::ostream * lola_output;
 
+/// Filename of oWFN output file
+extern std::string owfn_filename;
+/// Pointer to oWFN output file
+extern std::ostream * owfn_output;
+
 /// Filename of PN info file
 extern std::string info_filename;
 /// Pointer to PN info file
@@ -70,6 +77,10 @@ extern bool mode_simplify_petri_net;
 extern bool mode_lola_petri_net;
 /// output Petri Net for LoLA to file
 extern bool mode_lola_2_file;
+/// output Petri Net for oWFN
+extern bool mode_owfn_petri_net;
+/// output Petri Net for oWFN to file
+extern bool mode_owfn_2_file;
 /// paint Petri Net with dot
 extern bool mode_dot_petri_net;
 /// paint Petri Net with dot and output to file

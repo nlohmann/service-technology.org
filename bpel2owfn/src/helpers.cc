@@ -8,18 +8,18 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2005/12/04 14:16:07 $
+ *          - last changed: \$Date: 2005/12/13 15:29:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  *          - 2005-11-11 (nlohmann) Initial version.
  *          - 2005-11-15 (gierds) Moved commandline evaluation functions from
  *            main.cc to here.
@@ -27,6 +27,7 @@
  *          - 2005-11-16 (gierds) Added error() and cleanup() functions.
  *            Added extra command line parameters to debug flex and bison.
  *          - 2005-11-22 (gierds) Added cleanup of scopes.
+ *          - 2005-12-13 (gierds) Added command line option to create oWFN.
  */
 
 
@@ -34,11 +35,6 @@
 
 /// The Petri Net
 extern PetriNet *TheNet;
-
-/// processScope from #check-symbols.cc
-extern SymbolScope * processScope;
-/// currentScope from #check-symbols.cc
-extern SymbolScope * currentScope;
 
 /*!
  * \param a set of Petri net nodes
@@ -105,11 +101,18 @@ void print_help()
   trace("                               (see manual for further information)\n");
   trace("                               (implies option -pn)\n"); 
   trace("   -L   | --lola             - output LoLA input,\n");
-  trace("                               should not used together with -D\n");
+  trace("                               should not used together with -D, -O\n");
   trace("                               (implies option -pn)\n");
   trace("   -L2F | --lola2file        - output LoLA input into file (same name as\n");
   trace("                               input file\n");
   trace("                               (implies option -L)\n");
+  /// \todo give the oWFN tool a name
+  trace("   -O   | --owfn             - output oWFN input,\n");
+  trace("                               should not used together with -D, -L\n");
+  trace("                               (implies option -pn)\n");
+  trace("   -O2F | --owfn2file        - output oWFN input into file (same name as\n");
+  trace("                               input file\n");
+  trace("                               (implies option -O)\n");
   trace("   -D   | --dot              - output dot input,\n");
   trace("                               should not used together with -L\n");
   trace("                               (implies option -pn)\n");
@@ -199,6 +202,21 @@ void parse_command_line(int argc, char* argv[])
       {
         mode_lola_petri_net = true;
 	mode_lola_2_file = true;
+	mode_petri_net = true;
+      }
+      
+      // generate owfn output
+      else if (! strcmp(argument_string, "-O") || ! strcmp(argument_string, "--owfn")) 
+      {
+        mode_owfn_petri_net = true;
+	mode_petri_net = true;
+      }
+      
+      // generate owfn output and write it into a file
+      else if (! strcmp(argument_string, "-O2F") || ! strcmp(argument_string, "--owfn2file")) 
+      {
+        mode_owfn_petri_net = true;
+	mode_owfn_2_file = true;
 	mode_petri_net = true;
       }
       
@@ -339,6 +357,28 @@ void parse_command_line(int argc, char* argv[])
       lola_output = new std::ofstream(lola_file.c_str(), std::ofstream::out | std::ofstream::trunc);
     }
 
+    // if wanted, create a oWFN output file
+    if ( mode_owfn_2_file )
+    {
+      trace(TRACE_INFORMATION, "Creating file for oWFN output\n");
+      std::string owfn_file = filename;
+      
+      // try to replace .bpel through .owfn
+      if ( owfn_file.rfind(".bpel", 0) >= (owfn_file.length() - 6) )
+      {
+        owfn_file = owfn_file.replace( (owfn_file.length() - 5), 5, ".owfn");
+      }
+      else
+      {
+        owfn_file += ".owfn";
+      }
+      
+      /// set owfn filename
+      owfn_filename = owfn_file.c_str();
+      /// create owfn file and point to it
+      owfn_output = new std::ofstream(owfn_file.c_str(), std::ofstream::out | std::ofstream::trunc);
+    }
+
     // create info file for Petri Net
     if ( mode_petri_net )
     {
@@ -364,6 +404,7 @@ void parse_command_line(int argc, char* argv[])
   else
   {
     mode_lola_2_file = false;
+    mode_owfn_2_file = false;
     mode_dot_2_file = false;
   }  
  
@@ -371,6 +412,20 @@ void parse_command_line(int argc, char* argv[])
   if ((mode_lola_petri_net && mode_dot_petri_net) && !(mode_lola_2_file || mode_dot_2_file))
   {
     trace("LoLA and dot output on stdout are confusing, chose one!\n\n");	  
+    print_help();
+    exit(1);
+  }
+  // LoLA and oWFN on stdout are very confusing ! so abort 
+  if ((mode_lola_petri_net && mode_owfn_petri_net) && !(mode_lola_2_file || mode_owfn_2_file))
+  {
+    trace("LoLA and oWFN output on stdout are confusing, chose one!\n\n");	  
+    print_help();
+    exit(1);
+  }
+  // oWFN and dot on stdout are very confusing ! so abort 
+  if ((mode_owfn_petri_net && mode_dot_petri_net) && !(mode_owfn_2_file || mode_dot_2_file))
+  {
+    trace("oWFN and dot output on stdout are confusing, chose one!\n\n");	  
     print_help();
     exit(1);
   }
@@ -402,6 +457,15 @@ void parse_command_line(int argc, char* argv[])
   else if (mode_lola_petri_net)
   {
     trace(TRACE_INFORMATION, " - output LoLA input of the Petri Net\n");
+  }
+
+  if (mode_owfn_2_file)
+  {
+    trace(TRACE_INFORMATION, " - output oWFN input of the Petri Net to file " + owfn_filename + "\n");
+  }
+  else if (mode_owfn_petri_net)
+  {
+    trace(TRACE_INFORMATION, " - output oWFN input of the Petri Net\n");
   }
 
   if (mode_dot_2_file)
@@ -506,6 +570,15 @@ void cleanup()
     ((std::ofstream*)lola_output)->close();
     delete(lola_output);
     lola_output = NULL;
+  }
+
+  if ( mode_owfn_2_file )
+  {
+    trace(TRACE_INFORMATION," + Closing oWFN output file: " + owfn_filename + "\n");
+    (*owfn_output) << std::flush;
+    ((std::ofstream*)owfn_output)->close();
+    delete(owfn_output);
+    owfn_output = NULL;
   }
 
   if (mode_dot_2_file)

@@ -8,24 +8,26 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/04 14:16:07 $
+ *          - last changed: \$Date: 2005/12/13 15:29:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.40 $
+ * \version \$Revision: 1.41 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
  *          - 2005-11-15 (nlohmann) Call Exception::info() to signal error.
  *          - 2005-11-16 (gierds) Use of error() and cleanup() as defined in 
  *            helpers.cc
+ *          - 2005-12-13 (gierds) Added variables in order to handle creation
+ *            of oWFNs.  
  *
  */
 
@@ -49,6 +51,11 @@ std::string lola_filename = "";
 /// Pointer to lola output file
 std::ostream * lola_output = &std::cout;
 
+/// Filename of owfn output file
+std::string owfn_filename = "";
+/// Pointer to owfn output file
+std::ostream * owfn_output = &std::cout;
+
 /// Filename of PN info file
 std::string info_filename = "";
 /// Pointer to PN info file
@@ -62,10 +69,14 @@ bool mode_file = false;
 bool mode_petri_net = false;
 /// simplify Petri Net
 bool mode_simplify_petri_net = false;
-/// paint Petri Net with lola
+/// paint Petri Net for lola
 bool mode_lola_petri_net = false;
-/// paint Petri Net with lola and output to file
+/// paint Petri Net for lola and output to file
 bool mode_lola_2_file = false;
+/// paint Petri Net for owfn
+bool mode_owfn_petri_net = false;
+/// paint Petri Net for owfn and output to file
+bool mode_owfn_2_file = false;
 /// paint Petri Net with dot
 bool mode_dot_petri_net = false;
 /// paint Petri Net with dot and output to file

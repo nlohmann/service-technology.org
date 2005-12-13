@@ -10,14 +10,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/13 14:02:12 $
+ *          - last changed: \$Date: 2005/12/13 14:40:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  *          - 2005-11-22 (gierds) Initial version.
  *	    - 2005-11-30 (gierds) Checking for PartnerLinks completed.
  *
@@ -72,7 +72,14 @@ void SymbolManager::initialiseProcessScope(kc::integer id)
  */
 void SymbolManager::newScopeScope(kc::integer id)
 {
+  SymbolScope * higherScope = currentScope;
+  while ( typeid(*higherScope) == typeid(FlowScope) )
+  {
+    higherScope = higherScope->parent;
+  }
   currentScope = new ScopeScope(id, currentScope);
+
+  higherScope->children.push_back(currentScope);
 
   mapping[id] = currentScope;
 }
@@ -601,16 +608,16 @@ void SymbolManager::checkLinks()
 kc::casestring SymbolManager::addChannel(csChannel * channel, bool isInChannel)
 {
 
-  trace(TRACE_DEBUG, "[CS] Adding channel\n"); 
   std::string key = string(channel->name()->name);
+  trace(TRACE_DEBUG, "[CS] Adding channel " + key + "\n"); 
   if (isInChannel)
   {
-    trace(TRACE_VERY_DEBUG, "[CS]  --> incoming channel " + key + "\n");
+    trace(TRACE_VERY_DEBUG, "[CS]  --> incoming channel\n");
     inChannels.insert(key);
   }
   else
   {
-    trace(TRACE_VERY_DEBUG, "[CS]  --> outgoinig channel " + key + "\n");
+    trace(TRACE_VERY_DEBUG, "[CS]  --> outgoinig channel\n");
     outChannels.insert(key);
   }
   // return unique name
@@ -623,12 +630,14 @@ kc::casestring SymbolManager::addChannel(csChannel * channel, bool isInChannel)
  */
 void SymbolManager::printScope()
 {
+	
   if (processScope != NULL)
   {
-    trace(TRACE_DEBUG, "\nPrinting scope tree:\n\n");
+    trace(TRACE_DEBUG, "\nPrinting scope tree (without Flows):\n\n");
     processScope->print();
     trace(TRACE_DEBUG, "\n");
   }
+       
 }
 
 /// \todo (gierds) comment me
@@ -676,7 +685,6 @@ SymbolScope::~SymbolScope()
     trace(TRACE_VERY_DEBUG, "[CS]      Deleting child element " + intToString(( (*elem)->id )->value) + "\n");
     delete(*elem);
   }
-  
 }
 
 /// \todo (gierds) comment me

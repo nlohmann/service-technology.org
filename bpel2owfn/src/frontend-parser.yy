@@ -18,7 +18,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/13 14:02:12 $
+ *          - last changed: \$Date: 2005/12/13 14:40:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.62 $
+ * \version \$Revision: 1.63 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -888,7 +888,7 @@ tInvoke:
 					$$->partnerLink->name),
                           true);
       }
-      else
+      if (string($$->variableIDout->name) != "")
       {
         symMan.addChannel(new csChannel($$->portType->name, 
 					$$->operation->name, 
@@ -919,7 +919,7 @@ tInvoke:
 					$$->partnerLink->name),
                           true);
       }
-      else
+      if (string($$->variableIDout->name) != "")
       {
         symMan.addChannel(new csChannel($$->portType->name, 
 					$$->operation->name, 

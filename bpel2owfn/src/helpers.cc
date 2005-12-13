@@ -12,14 +12,14 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2005/12/13 15:29:26 $
+ *          - last changed: \$Date: 2005/12/13 15:34:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  *          - 2005-11-11 (nlohmann) Initial version.
  *          - 2005-11-15 (gierds) Moved commandline evaluation functions from
  *            main.cc to here.
@@ -114,7 +114,7 @@ void print_help()
   trace("                               input file\n");
   trace("                               (implies option -O)\n");
   trace("   -D   | --dot              - output dot input,\n");
-  trace("                               should not used together with -L\n");
+  trace("                               should not used together with -L, -O\n");
   trace("                               (implies option -pn)\n");
   trace("   -D2F | --dot2file         - output dot input into file (same name as\n");
   trace("                               input file\n");
@@ -306,6 +306,28 @@ void parse_command_line(int argc, char* argv[])
     }
   }
 
+  // LoLA and dot on stdout are very confusing ! so abort 
+  if ((mode_lola_petri_net && mode_dot_petri_net) && !(mode_lola_2_file || mode_dot_2_file))
+  {
+    trace("LoLA and dot output on stdout are confusing, chose one!\n\n");	  
+    print_help();
+    exit(1);
+  }
+  // LoLA and oWFN on stdout are very confusing ! so abort 
+  if ((mode_lola_petri_net && mode_owfn_petri_net) && !(mode_lola_2_file || mode_owfn_2_file))
+  {
+    trace("LoLA and oWFN output on stdout are confusing, chose one!\n\n");	  
+    print_help();
+    exit(1);
+  }
+  // oWFN and dot on stdout are very confusing ! so abort 
+  if ((mode_owfn_petri_net && mode_dot_petri_net) && !(mode_owfn_2_file || mode_dot_2_file))
+  {
+    trace("oWFN and dot output on stdout are confusing, chose one!\n\n");	  
+    print_help();
+    exit(1);
+  }
+  
   // trace and check for some files to be created
   if ( mode_file )
   {
@@ -408,28 +430,6 @@ void parse_command_line(int argc, char* argv[])
     mode_dot_2_file = false;
   }  
  
-  // LoLA and dot on stdout are very confusing ! so abort 
-  if ((mode_lola_petri_net && mode_dot_petri_net) && !(mode_lola_2_file || mode_dot_2_file))
-  {
-    trace("LoLA and dot output on stdout are confusing, chose one!\n\n");	  
-    print_help();
-    exit(1);
-  }
-  // LoLA and oWFN on stdout are very confusing ! so abort 
-  if ((mode_lola_petri_net && mode_owfn_petri_net) && !(mode_lola_2_file || mode_owfn_2_file))
-  {
-    trace("LoLA and oWFN output on stdout are confusing, chose one!\n\n");	  
-    print_help();
-    exit(1);
-  }
-  // oWFN and dot on stdout are very confusing ! so abort 
-  if ((mode_owfn_petri_net && mode_dot_petri_net) && !(mode_owfn_2_file || mode_dot_2_file))
-  {
-    trace("oWFN and dot output on stdout are confusing, chose one!\n\n");	  
-    print_help();
-    exit(1);
-  }
-  
   // trace information about current mode
   trace(TRACE_INFORMATION, "\nModus operandi:\n");
   if (mode_simplify_petri_net)

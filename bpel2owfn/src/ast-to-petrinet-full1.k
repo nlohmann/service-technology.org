@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/13 13:39:53 $
+ *          - last changed: \$Date: 2005/12/13 21:50:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.67 $
+ * \version \$Revision: 1.68 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -54,13 +54,12 @@
  *          - 2005-12-06 (nlohmann) Added containers for linked activities.
  *          - 2005-12-09 (nlohmann) Added <assign>. Added variables to the
  *            communication activities.
+ *          - 2005-12-13 (nlohmann) Added input and output places.
  * 
  * \todo
- *          - (nlohmann) complete initial pattern database
+ *          - (nlohmann) user-defined compensation handlers
  *          - (nlohmann) outsource <compensate />-elements
  * 
- * \bug
- *          - (nlohmann) ch_in -> compScope linkage is not working
  */
 %}
 
@@ -83,7 +82,6 @@
 %{ KC_UNPARSE
 /* These lines are from bpel-unparse-petri.k */
 #include <iostream>
-#include <string>
 #include "petrinet.h"
 #include "check-symbols.h"
 
@@ -97,8 +95,6 @@ extern SymbolManager symMan;
 
 /// prefix of the current scope (read by the stop pattern)
 string currentScope;
-
-//#define PETRINET_DEBUG
 %}
 
 
@@ -122,7 +118,12 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       currentScope = prefix;
       SymbolScope *me = symMan.getScope(this->id);
 
-#ifndef PETRINET_DEBUG
+      // create the interface places
+      for (set<string>::iterator in = symMan.inChannels.begin(); in != symMan.inChannels.end(); in++)
+	TheNet->newPlace("in." + *in, IN);
+      for (set<string>::iterator out = symMan.outChannels.begin(); out != symMan.outChannels.end(); out++)
+	TheNet->newPlace("out." + *out, OUT);
+
       // create push-places for the children of the process
       for (list<SymbolScope *>::iterator child = me->children.begin(); child != me->children.end(); child++)
       {
@@ -130,15 +131,20 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
 	Place *notPush_child = TheNet->newPlace( intToString((*child)->id->value) + ".!push");
       }
 
-      // create the links
+      // create the places for the links
       for (list<string>::iterator link = symMan.links.begin(); link != symMan.links.end(); link++)
       {
 	TheNet->newPlace("link." + *link);
 	TheNet->newPlace("!link." + *link);
       }
 
+      // create variable places
       for (list<string>::iterator variable = symMan.variables.begin(); variable != symMan.variables.end(); variable++)
 	TheNet->newPlace("variable." + *variable);
+
+      // the global clock
+      Place *process_clock = TheNet->newPlace(prefix + "clock");      
+
 
       Place *process_p1  = TheNet->newPlace(prefix + "initial");
       //Place *process_p2  = TheNet->newPlace(prefix + "ch_in");
@@ -210,9 +216,6 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       TheNet->newArc(process_t6,  process_p26);
       TheNet->newArc(process_p21, process_t6);
       TheNet->newArc(process_p33, process_t6);
-#endif
-      // special places
-      Place *process_clock = TheNet->newPlace(prefix + "clock");
     }
       e // FaultHandler
       f // Compensation Handler
@@ -220,7 +223,6 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       h // Stop Pattern
       i // innerActivity
     {
-#ifndef PETRINET_DEBUG
       // connect t2 with the push-places of the child-scopes
       for (list<SymbolScope*>::iterator child = me->children.begin(); child != me->children.end(); child++)
 	TheNet->newArc(process_t2, TheNet->findPlace( intToString((*child)->id->value) + ".!push" ));
@@ -286,7 +288,7 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       TheNet->mergePlaces(TheNet->findPlace("1.internal.p21"), TheNet->findPlace(i, ".stop"));
       TheNet->mergePlaces(TheNet->findPlace("1.internal.p22"), TheNet->findPlace(i, ".stopped"));
       TheNet->mergePlaces(TheNet->findPlace("1.internal.stop.fault_in"),  TheNet->findPlace(i, ".failed"));
-#endif
+
       trace(TRACE_DEBUG, "[PNU]\t</process>\n");
       trace(TRACE_INFORMATION, "Generating Petri net complete.\n");
     }
@@ -396,7 +398,7 @@ StopInProcess() ->
 ;
 
 
-/*---------------------------------------------------------------------------*/
+
 
 
 /*
@@ -1326,7 +1328,6 @@ This=implicitEventHandler() ->
 This=implicitCompensationHandler() ->
   [petrinet:
     {
-#ifndef PETRINET_DEBUG
       string prefix = intToString(This->parentScopeId->value) + ".internal.compensationHandler."; 
       Place *p1  = TheNet->newPlace(prefix + "p1");
       Place *p2  = TheNet->newPlace(prefix + "ch_in");
@@ -1417,7 +1418,6 @@ This=implicitCompensationHandler() ->
 	TheNet->newArc(t13, p20);
 	TheNet->newArc(p21, t13, "s");
       }
-#endif
     }
   ]
 ;
@@ -1500,6 +1500,7 @@ This=Invoke(a,b) provided (This->outputVariable == mkcasestring("")) ->
       Transition *t7 = TheNet->newTransition(prefix + "t7");
       TheNet->newArc(p1, t1); TheNet->findPlace("variable." + string(This->variableIDin->name));
       TheNet->newArc(TheNet->findPlace("variable." + string(This->variableIDin->name)), t1, READ, "X");
+      TheNet->newArc(TheNet->findPlace("in." + string(This->channelID->name)), t1, "X");
       TheNet->newArc(t1, p2, "(X,CS)");
       TheNet->newArc(p2, t2, "(X,CS)");
       TheNet->newArc(t2, p3);
@@ -1559,8 +1560,10 @@ This=Invoke(a,b) provided (This->outputVariable != mkcasestring("")) ->
       TheNet->newArc(p1, t1);
       TheNet->newArc(TheNet->findPlace("variable." + string(This->variableIDin->name)), t1, READ, "X");
       TheNet->newArc(t1, p2, "(X,CS1)");
+      TheNet->newArc(t2, TheNet->findPlace("out." + string(This->channelID->name)), "X");
       TheNet->newArc(p2, t2, "(X,CS1)");
       TheNet->newArc(t2, p3);
+      TheNet->newArc(TheNet->findPlace("in." + string(This->channelID->name)), t3, "Y");
       TheNet->newArc(p3, t3);
       TheNet->newArc(t3, p4, "(Y,CS2)");
       TheNet->newArc(p4, t4, "(Y,CS2)");
@@ -1632,6 +1635,7 @@ This=Receive(a,b) ->
       Transition *t5 = TheNet->newTransition(prefix + "t5");
       Transition *t6 = TheNet->newTransition(prefix + "t6");
       Transition *t7 = TheNet->newTransition(prefix + "t7");
+      TheNet->newArc(TheNet->findPlace("in." + string(This->channelID->name)), t1, "X");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2, "(X,CS)");
       TheNet->newArc(p2, t2, "(X,CS)");
@@ -1695,6 +1699,7 @@ This=Reply(a,b) ->
       TheNet->newArc(p1, t1);
       TheNet->newArc(TheNet->findPlace("variable." + string(This->variableID->name)), t1, READ, "X");      
       TheNet->newArc(t1, p2, "(X,CS)");
+      TheNet->newArc(t2, TheNet->findPlace("out." + string(This->channelID->name)), "X");
       TheNet->newArc(p2, t2, "(X,CS)");
       TheNet->newArc(t2, p3);
       TheNet->newArc(t3, p4);

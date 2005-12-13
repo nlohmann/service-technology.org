@@ -10,14 +10,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/10 15:26:11 $
+ *          - last changed: \$Date: 2005/12/13 14:02:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  *          - 2005-11-22 (gierds) Initial version.
  *          - 2005-11-24 (gierds) Put all funcionality into a class #SymbolManager
  *          - 2005-11-29 (gierds) Added checking of variables.
@@ -58,8 +58,6 @@ class SymbolManager
     SymbolScope * processScope;
     /// the current scope
     SymbolScope * currentScope;
-    /// a stack to return to higher scopes
-    // stack<SymbolScope *> scopeStack;
     /// mapping of AST IDs to pointer of SymbolScope
     map<kc::integer, SymbolScope*> mapping;
     
@@ -69,9 +67,11 @@ class SymbolManager
     /// list of all Variables in a Process
     list<std::string> variables;
     /// list of all outgoing channels
-    list<csChannel *> outChannels;
+    set<std::string> outChannels;
     /// list of all incoming channels
-    list<csChannel *> inChannels;
+    set<std::string> inChannels;
+    /// mapping of channel names to either "in" or "out"
+    // map<std::string, std::string> channels;    
 
     /// constructor
     SymbolManager();
@@ -115,9 +115,11 @@ class SymbolManager
     void checkLinks();
 
     /// add a channel to the inChannel list
-    kc::casestring addInChannel(csChannel *);
+    // kc::casestring addInChannel(csChannel *);
     /// add a channel to the outChannel list
-    kc::casestring addOutChannel(csChannel *);
+    // kc::casestring addOutChannel(csChannel *);
+    /// adds a channel with an appropriate type
+    kc::casestring addChannel(csChannel * channel, bool isInChannel);
  
     /// prints the scope tree
     void printScope();
@@ -333,6 +335,8 @@ class csChannel
 
     /// our own equality
     bool operator==(csChannel& other);
+
+    kc::casestring name();
 };
 
 #endif

@@ -10,14 +10,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/10 15:26:11 $
+ *          - last changed: \$Date: 2005/12/13 14:02:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
  *          - 2005-11-22 (gierds) Initial version.
  *	    - 2005-11-30 (gierds) Checking for PartnerLinks completed.
  *
@@ -590,16 +590,31 @@ void SymbolManager::checkLinks()
 }
 
 /**
- * Adds a channel to the in list, under the condition that it is not in
- * the outChannel list.
+ * Adds a channel to the list of #channels with type, under the condition that it is not in
+ * the l list.
  *
- * \param channel the channel to add
- * \return        the unique channel name
+ * \param channel	the channel to add
+ * \param isInChannel 	true iff channel shall be an incoming channel, otherwise it shall be an outgoing channel
+ * \return        	the unique channel name
  *
  */
-kc::casestring SymbolManager::addInChannel(csChannel * channel)
+kc::casestring SymbolManager::addChannel(csChannel * channel, bool isInChannel)
 {
-  return kc::mkcasestring(string().c_str());
+
+  trace(TRACE_DEBUG, "[CS] Adding channel\n"); 
+  std::string key = string(channel->name()->name);
+  if (isInChannel)
+  {
+    trace(TRACE_VERY_DEBUG, "[CS]  --> incoming channel " + key + "\n");
+    inChannels.insert(key);
+  }
+  else
+  {
+    trace(TRACE_VERY_DEBUG, "[CS]  --> outgoinig channel " + key + "\n");
+    outChannels.insert(key);
+  }
+  // return unique name
+  return channel->name();
 }
 
 /**
@@ -785,5 +800,10 @@ csChannel::csChannel(string myportType, string myoperation, string mypartnerLink
 bool csChannel::operator==(csChannel& other)
 {
   return (portType == other.portType && operation == other.operation && partnerLink == other.partnerLink);
+}
+
+kc::casestring csChannel::name()
+{
+  return kc::mkcasestring(string(partnerLink + "." + portType + "." + operation).c_str());
 }
 

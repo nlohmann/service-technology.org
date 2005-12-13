@@ -14,11 +14,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/13 07:51:19 $
+ *          - last changed: \$Date: 2005/12/13 14:02:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.61 $
+ * \version \$Revision: 1.62 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -881,6 +881,20 @@ tInvoke:
       $$->outputVariable = att.read($2, "outputVariable");
       $$->variableIDin  = symMan.checkVariable(att.read($2, "inputVariable")->name);
       $$->variableIDout = symMan.checkVariable(att.read($2, "outputVariable")->name);
+      if (string($$->variableIDin->name) != "")
+      {
+        symMan.addChannel(new csChannel($$->portType->name, 
+					$$->operation->name, 
+					$$->partnerLink->name),
+                          true);
+      }
+      else
+      {
+        symMan.addChannel(new csChannel($$->portType->name, 
+					$$->operation->name, 
+					$$->partnerLink->name),
+			  false);
+      }
       $$->id = $5->parentId = $2; }
 | K_INVOKE arbitraryAttributes X_SLASH
     { att.check($2, K_INVOKE);
@@ -897,8 +911,23 @@ tInvoke:
       $$->outputVariable = att.read($2, "outputVariable"); 
       $$->variableIDin  = symMan.checkVariable(att.read($2, "inputVariable")->name);
       $$->variableIDout = symMan.checkVariable(att.read($2, "outputVariable")->name);
+      symMan.checkPartnerLink($$->partnerLink->name); 
+      if (string($$->variableIDin->name) != "")
+      {
+        symMan.addChannel(new csChannel($$->portType->name, 
+					$$->operation->name, 
+					$$->partnerLink->name),
+                          true);
+      }
+      else
+      {
+        symMan.addChannel(new csChannel($$->portType->name, 
+					$$->operation->name, 
+					$$->partnerLink->name),
+			  false);
+      }
       $$->id = $2;
-      symMan.checkPartnerLink($$->partnerLink->name); }
+    }
 ;
 
 
@@ -948,6 +977,10 @@ tReceive:
       $$->variable = att.read($2, "variable");
       $$->createInstance = att.read($2, "createInstance", $$->createInstance); 
       $$->variableID = symMan.checkVariable(att.read($2, "variable")->name);
+      symMan.addChannel(new csChannel($$->portType->name, 
+				      $$->operation->name, 
+				      $$->partnerLink->name),
+			true);
       $$->id = $5->parentId = $2; }
 | K_RECEIVE arbitraryAttributes X_SLASH
     { att.check($2, K_RECEIVE);
@@ -964,7 +997,12 @@ tReceive:
       $$->createInstance = att.read($2, "createInstance", $$->createInstance);
       $$->variableID = symMan.checkVariable(att.read($2, "variable")->name);
       $$->id = $2; 
-      symMan.checkPartnerLink($$->partnerLink->name); }
+      symMan.checkPartnerLink($$->partnerLink->name); 
+      symMan.addChannel(new csChannel($$->portType->name, 
+				      $$->operation->name, 
+				      $$->partnerLink->name),
+			true);
+    }
 ;
 
 
@@ -1010,6 +1048,11 @@ tReply:
       $$->variable = att.read($2, "variable");
       $$->faultName = att.read($2, "faultName");
       $$->variableID = symMan.checkVariable(att.read($2, "variable")->name);
+      symMan.checkPartnerLink($$->partnerLink->name); 
+      symMan.addChannel(new csChannel($$->portType->name, 
+				      $$->operation->name, 
+				      $$->partnerLink->name),
+			false);
       $$->id = $4->parentId = $2; }
 | K_REPLY arbitraryAttributes X_SLASH
     { att.check($2, K_REPLY);
@@ -1025,6 +1068,11 @@ tReply:
       $$->variable = att.read($2, "variable");
       $$->faultName = att.read($2, "faultName");
       $$->variableID = symMan.checkVariable(att.read($2, "variable")->name);
+      symMan.checkPartnerLink($$->partnerLink->name); 
+      symMan.addChannel(new csChannel($$->portType->name, 
+				      $$->operation->name, 
+				      $$->partnerLink->name),
+			false);
       $$->id = $2; }
 ;
 

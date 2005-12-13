@@ -18,7 +18,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/13 14:40:16 $
+ *          - last changed: \$Date: 2005/12/13 15:03:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +30,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.63 $
+ * \version \$Revision: 1.64 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute
@@ -624,7 +624,12 @@ tOnMessage:
       $$->portType = att.read($2, "portType");
       $$->operation = att.read($2, "operation");
       $$->variableID  = symMan.checkVariable(att.read($2, "variable")->name);
-      $$->variable = att.read($2, "variable"); }
+      $$->variable = att.read($2, "variable"); 
+      $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
+				      $$->operation->name, 
+				      $$->partnerLink->name),
+			false);
+    }
 ;
 
 tOnAlarm:
@@ -883,14 +888,14 @@ tInvoke:
       $$->variableIDout = symMan.checkVariable(att.read($2, "outputVariable")->name);
       if (string($$->variableIDin->name) != "")
       {
-        symMan.addChannel(new csChannel($$->portType->name, 
+        $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 					$$->operation->name, 
 					$$->partnerLink->name),
                           true);
       }
       if (string($$->variableIDout->name) != "")
       {
-        symMan.addChannel(new csChannel($$->portType->name, 
+        $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 					$$->operation->name, 
 					$$->partnerLink->name),
 			  false);
@@ -914,14 +919,14 @@ tInvoke:
       symMan.checkPartnerLink($$->partnerLink->name); 
       if (string($$->variableIDin->name) != "")
       {
-        symMan.addChannel(new csChannel($$->portType->name, 
+        $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 					$$->operation->name, 
 					$$->partnerLink->name),
                           true);
       }
       if (string($$->variableIDout->name) != "")
       {
-        symMan.addChannel(new csChannel($$->portType->name, 
+        $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 					$$->operation->name, 
 					$$->partnerLink->name),
 			  false);
@@ -977,7 +982,7 @@ tReceive:
       $$->variable = att.read($2, "variable");
       $$->createInstance = att.read($2, "createInstance", $$->createInstance); 
       $$->variableID = symMan.checkVariable(att.read($2, "variable")->name);
-      symMan.addChannel(new csChannel($$->portType->name, 
+      $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
 				      $$->partnerLink->name),
 			true);
@@ -998,7 +1003,7 @@ tReceive:
       $$->variableID = symMan.checkVariable(att.read($2, "variable")->name);
       $$->id = $2; 
       symMan.checkPartnerLink($$->partnerLink->name); 
-      symMan.addChannel(new csChannel($$->portType->name, 
+      $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
 				      $$->partnerLink->name),
 			true);
@@ -1049,7 +1054,7 @@ tReply:
       $$->faultName = att.read($2, "faultName");
       $$->variableID = symMan.checkVariable(att.read($2, "variable")->name);
       symMan.checkPartnerLink($$->partnerLink->name); 
-      symMan.addChannel(new csChannel($$->portType->name, 
+      $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
 				      $$->partnerLink->name),
 			false);
@@ -1069,7 +1074,7 @@ tReply:
       $$->faultName = att.read($2, "faultName");
       $$->variableID = symMan.checkVariable(att.read($2, "variable")->name);
       symMan.checkPartnerLink($$->partnerLink->name); 
-      symMan.addChannel(new csChannel($$->portType->name, 
+      $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
 				      $$->partnerLink->name),
 			false);

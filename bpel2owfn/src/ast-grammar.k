@@ -13,7 +13,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2005/12/10 15:26:11 $
+ *          - last changed: \$Date: 2005/12/13 15:03:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.35 $
+ * \version \$Revision: 1.36 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-17 (nlohmann) Added default attributes.
  *          - 2005-12-04 (nlohmann) Changed representation of handlers.
@@ -206,6 +206,9 @@ tOnMessage:
 
     /// additional attribute containing the unique variable name    
     casestring variableID;
+
+    /// additional attribute containing the channel name
+    casestring channelID;
   }
 ;
 
@@ -323,9 +326,12 @@ tInvoke:
     casestring inputVariable;
     casestring outputVariable;
     
-    /// additional attribute containing the unique variable name    
+    /// additional attributes containing the unique variable name    
     casestring variableIDin;
     casestring variableIDout;
+
+    /// additional attribute containing the channel name
+    casestring channelID;
 
     integer id;
   }	
@@ -351,6 +357,9 @@ tReceive:
 
     /// additional attribute containing the unique variable name    
     casestring variableID;
+
+    /// additional attribute containing the channel name
+    casestring channelID;
     
     integer id;
   }
@@ -376,6 +385,9 @@ tReply:
 
     /// additional attribute containing the unique variable name    
     casestring variableID;
+
+    /// additional attribute containing the channel name
+    casestring channelID;
 
     integer id;
   }

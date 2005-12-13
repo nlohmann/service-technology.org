@@ -1,3 +1,23 @@
+/*****************************************************************************\
+ * Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert      *
+ *                                                                           *
+ * This file is part of BPEL2oWFN.                                           *
+ *                                                                           *
+ * BPEL2oWFN is free software; you can redistribute it and/or modify it      *
+ * under the terms of the GNU General Public License as published by the     *
+ * Free Software Foundation; either version 2 of the License, or (at your    *
+ * option) any later version.                                                *
+ *                                                                           *
+ * BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT  *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
+ * more details.                                                             *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License along   *
+ * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
+\****************************************************************************/
+
 %{
 /*!
  * \file bpel-unparse-xml.cc
@@ -12,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2005/12/08 12:32:01 $
+ *          - last changed: \$Date: 2005/12/13 22:33:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -23,7 +43,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Moved #intToString to \ref helpers.cc.
  *          - 2005-11-18 (nlohmann) Identifiers are printed.

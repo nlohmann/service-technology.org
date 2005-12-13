@@ -1,3 +1,23 @@
+/*****************************************************************************\
+ * Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert      *
+ *                                                                           *
+ * This file is part of BPEL2oWFN.                                           *
+ *                                                                           *
+ * BPEL2oWFN is free software; you can redistribute it and/or modify it      *
+ * under the terms of the GNU General Public License as published by the     *
+ * Free Software Foundation; either version 2 of the License, or (at your    *
+ * option) any later version.                                                *
+ *                                                                           *
+ * BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT  *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
+ * more details.                                                             *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License along   *
+ * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
+\****************************************************************************/
+
 %{
 /*!
  * \file bpel-syntax.c
@@ -14,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/13 15:29:26 $
+ *          - last changed: \$Date: 2005/12/13 22:33:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -30,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.65 $
+ * \version \$Revision: 1.66 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *	    - 2005-11-21 (dreinert) Added tProcess.
  *          - 2005-11-24 (nlohmann) Overworked assign. Added attribute

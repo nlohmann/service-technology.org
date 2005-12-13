@@ -1,3 +1,23 @@
+/*****************************************************************************\
+ * Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert      *
+ *                                                                           *
+ * This file is part of BPEL2oWFN.                                           *
+ *                                                                           *
+ * BPEL2oWFN is free software; you can redistribute it and/or modify it      *
+ * under the terms of the GNU General Public License as published by the     *
+ * Free Software Foundation; either version 2 of the License, or (at your    *
+ * option) any later version.                                                *
+ *                                                                           *
+ * BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT  *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
+ * more details.                                                             *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License along   *
+ * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
+\****************************************************************************/
+
 /*!
  * \file petrinet.cc
  *
@@ -11,14 +31,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/12/13 21:50:48 $
+ *          - last changed: \$Date: 2005/12/13 22:33:49 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.65 $
+ * \version \$Revision: 1.66 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.

@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/12/13 07:51:50 $
+ *          - last changed: \$Date: 2005/12/13 13:39:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.63 $
+ * \version \$Revision: 1.64 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -244,9 +244,6 @@ Place *PetriNet::newPlace(string role, place_type mytype)
 
   if (role != "")
     roleMap[role] = p;
-
-  if (P.size() % 100 == 0)
-    trace(TRACE_INFORMATION, "[PN]\t" + information() + "\n");
   
   return p;
 }
@@ -286,10 +283,7 @@ Transition *PetriNet::newTransition(string role, string guard)
   
   Transition *t = new Transition(getId(), role, guard);
   T.insert(t);
-
-  if (T.size() % 100 == 0)
-    trace(TRACE_INFORMATION, "[PN]\t" + information() + "\n");
-  
+ 
   return t;
 }
 
@@ -351,6 +345,9 @@ Arc *PetriNet::newArc(Node *source, Node *target, arc_type type, string inscript
   if (source->nodeType == target->nodeType)
     throw Exception(ARC_ERROR, "Arc between two " + source->nodeTypeName() + "s!\n",
 	*((source->history).begin()) + " and " + *((target->history).begin()));
+  
+  if (F.size() % 1000 == 0)
+    trace(TRACE_INFORMATION, "[PN]\t" + information() + "\n");
   
   Arc *f = new Arc(source, target, type, inscription);
   F.insert(f);

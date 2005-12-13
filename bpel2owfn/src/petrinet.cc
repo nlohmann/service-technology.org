@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/12/09 11:32:53 $
+ *          - last changed: \$Date: 2005/12/13 07:51:50 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.62 $
+ * \version \$Revision: 1.63 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -663,12 +663,12 @@ void PetriNet::lolaOut()
   
   // initial marking
   (*lola_output) << "MARKING" << endl;
-  (*lola_output) << "  p" << findPlace("1.initial")->id << ":\t1,\t { initial marking of the process }" << endl;
+  (*lola_output) << "  p" << findPlace("1.internal.initial")->id << ":\t1,\t { initial marking of the process }" << endl;
 
   for (list<string>::iterator variable = symMan.variables.begin(); variable != symMan.variables.end(); variable++)
     (*lola_output) << "  p" << findPlace("variable." + *variable)->id << ":\t1,\t { initial marking of variable" << *variable << " }" << endl;
 
-  (*lola_output) << "  p" << findPlace("1.clock")->id << ":\t1\t { initial marking of the clock }" << endl;
+  (*lola_output) << "  p" << findPlace("1.internal.clock")->id << ":\t1\t { initial marking of the clock }" << endl;
   (*lola_output)   << ";" << endl << endl << endl;
 
 

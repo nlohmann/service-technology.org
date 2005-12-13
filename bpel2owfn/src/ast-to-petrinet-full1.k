@@ -13,7 +13,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/13 07:51:38 $
+ *          - last changed: \$Date: 2005/12/13 13:39:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -24,7 +24,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.66 $
+ * \version \$Revision: 1.67 $
  *          - 2005-11-10 (nlohmann) Added doxygen comments.
  *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
  *            \ref petrinet.c
@@ -2309,6 +2309,7 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
       TheNet->newArc(switch_t10, switch_p12);
     }
     a // standardElements
+    b // case braches
     c // otherwise branch
     {
       int currentCase = 1;
@@ -2325,8 +2326,8 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
 	  Transition *t4 = TheNet->newTransition(prefix + "t4.case1", "!guard & !(" + condition + ")");
 	  
 	  // arcs connecting "running"-place
-	  TheNet->newArc(TheNet->findPlace(This, ".running"), t2, "x");
-	  TheNet->newArc(TheNet->findPlace(This, ".running"), t4, "x");
+	  TheNet->newArc(TheNet->findPlace(This, ".internal.running"), t2, "x");
+	  TheNet->newArc(TheNet->findPlace(This, ".internal.running"), t4, "x");
 	
 	  // embed the innerActivity
 	  TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
@@ -2588,7 +2589,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	Transition *t4 = TheNet->newTransition(newprefix + "t4", "guard" + message);
 	Transition *t9 = TheNet->newTransition(newprefix + "t9");
 	Transition *t10 = TheNet->newTransition(newprefix + "t10");
-	TheNet->newArc(TheNet->findPlace(TheActivity, ".TimeStamp"), t2, "x");
+	TheNet->newArc(TheNet->findPlace(TheActivity, ".internal.TimeStamp"), t2, "x");
 	TheNet->newArc(t2, p3, "M" + message );
 	TheNet->newArc(p3, t3, "M" + message );
 	TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
@@ -2629,7 +2630,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 
 	Transition *t6 = TheNet->newTransition(newprefix + "t6", onAlarmGuard);
 	TheNet->newArc(TheNet->findPlace("1.internal.clock"), t6, READ, "y");
-	TheNet->newArc(TheNet->findPlace(TheActivity, ".TimeStamp"), t6, "x");
+	TheNet->newArc(TheNet->findPlace(TheActivity, ".internal.TimeStamp"), t6, "x");
 	TheNet->newArc(t6, TheNet->findPlace(innerActivity, ".initial"));
 
 	// embed the inner activity	

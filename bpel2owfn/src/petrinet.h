@@ -20,14 +20,14 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/09 11:32:53 $
+ *          - last changed: \$Date: 2005/12/13 21:50:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *          
- * \version \$Revision: 1.37 $
+ * \version \$Revision: 1.38 $
  *          - 2005-11-09 (nlohmann) Added doxygen-comments.
  *          - 2005-11-10 (nlohmann) Added many using commands for std.
  *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an #id
@@ -67,8 +67,7 @@ using namespace std;
 
 /// Enumeration of the possible types of a place.
 typedef enum {
-  LOW,        ///< low-level place (standard)
-  DATA,       ///< place modelling real data
+  INTERNAL,   ///< low-level place (standard)
   IN,         ///< input place of an open workflow net (oWFN)
   OUT         ///< output place of an open workflow net (oWFN)
 } place_type;
@@ -154,6 +153,8 @@ class Transition: public Node
 
     /// constructor which creates a transition and adds a first role to the history
     Transition(unsigned int id, string role, string guard);
+
+    string dotOut();
 };
 
 
@@ -181,6 +182,8 @@ class Place: public Node
 
     /// constructor which creates a place and adds a first role to the history
     Place(unsigned int id, string role, place_type type);
+
+    string dotOut();
 };
 
 
@@ -218,6 +221,8 @@ class Arc
 
     /// Constructor to create an arc of certain type and inscription.
     Arc(Node *source, Node *target, arc_type type, string inscription);
+
+    string dotOut();
 };
 
 
@@ -242,7 +247,7 @@ class PetriNet
 {
   public:	 
     /// Adds a place with a given role and type.
-    Place *newPlace(string role, place_type type=LOW);
+    Place *newPlace(string role, place_type type=INTERNAL);
     
     /// Adds a transition with a given role and guard.
     Transition *newTransition(string role, string guard="");
@@ -260,7 +265,7 @@ class PetriNet
     void printInformation();
 
     /// DOT (Graphviz) output.
-    void drawDot();
+    void dotOut();
 
     /// LoLA-output.
     void lolaOut();

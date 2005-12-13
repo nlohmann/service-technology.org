@@ -11,14 +11,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/12/13 13:39:44 $
+ *          - last changed: \$Date: 2005/12/13 21:50:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.64 $
+ * \version \$Revision: 1.65 $
  *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
  *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
  *            Respected #dot_output for #drawDot function. Finished commenting.
@@ -40,6 +40,8 @@
  *            merging.
  *          - 2005-11-29 (nlohmann) Roles are now organized in a vector.
  *          - 2005-12-09 (nlohmann) Added marking of variables.
+ *          - 2005-12-13 (nlohmann) Added interface places. Overworked DOT
+ *            output.
  *
  */
 
@@ -64,6 +66,7 @@ extern SymbolManager symMan;         // defined in bpel-syntax.y
 
 
 
+
 /*!
  * \todo
  *       - (nlohmann) comment me!
@@ -77,6 +80,8 @@ set<pair<Node *, arc_type> > setUnion(set<pair<Node *, arc_type> > a, set<pair<N
   
   return result;
 }
+
+
 
 
 
@@ -119,7 +124,7 @@ string Node::nodeTypeName()
     case(TRANSITION):
       return "transition";
     default:
-      return "uninitialized node";
+      return "uninitialized node"; // should never happen
   }
 }
 
@@ -148,6 +153,31 @@ Arc::Arc(Node *mysource, Node* mytarget, arc_type mytype, string myinscription)
 
 
 
+/*!
+ * \todo
+ *       - (nlohmann) comment me
+*/
+string Arc::dotOut()
+{
+  string result;
+  result += " " + intToString(source->id) + " -> " + intToString(target->id) + "\t[";
+  
+  if (type == RESET)
+    result += "arrowtail=odot ";
+  else if (type == READ)
+    result += "arrowhead=diamond arrowtail=tee ";
+
+  if (inscription != "")
+    result += "label=\"" + inscription + "\" ";
+
+  result += "];\n";
+  return result;
+}
+
+
+
+
+
 /*****************************************************************************/
 
 
@@ -164,6 +194,36 @@ Transition::Transition(unsigned int myid, string role, string myguard)
   
   if (role != "")
     history.push_back(role);
+}
+
+
+
+
+
+/*!
+ * \todo
+ *       - (nlohmann) escape guards
+ *       - (nlohmann) comment me
+*/
+string Transition::dotOut()
+{
+  string result;
+  result += " " + intToString(id) + "\t[label=\"t" + intToString(id) + "\"";
+  
+  if (guard != "")
+    result += " shape=record label=\"{t" + intToString(id) + "|{" + guard + "}}\"";
+  
+  if (firstMemberOf("internal.eventHandler."))
+    result += " style=filled fillcolor=plum";
+  else if (firstMemberOf("internal.compensationHandler."))
+    result += " style=filled fillcolor=aquamarine";
+  else if (firstMemberOf("internal.stop."))
+    result += " style=filled fillcolor=lightskyblue2";
+  else if (firstMemberOf("internal.faultHandler."))
+    result += " style=filled fillcolor=pink";
+    
+  result += "];\n";
+  return result;
 }
 
 
@@ -192,16 +252,59 @@ Place::Place(unsigned int myid, string role, place_type mytype)
 
 
 
+/*!
+ * \todo
+ *       - (nlohmann) comment me
+*/
+string Place::dotOut()
+{
+  string result;
+  result += " " + intToString(id) + "\t[label=\"p" + intToString(id) + "\"";
+
+  if (firstMemberOf("eventHandler."))
+    result += " style=filled fillcolor=plum";
+  else if (firstMemberOf("internal.compensationHandler."))
+    result += " style=filled fillcolor=aquamarine";
+  else if (firstMemberOf("internal.stop."))
+    result += " style=filled fillcolor=lightskyblue2";
+  else if (firstMemberOf("internal.faultHandler."))
+    result += " style=filled fillcolor=pink";
+  else if (firstMemberIs("link.") || firstMemberIs("!link."))
+    result += " style=filled fillcolor=yellow";
+  else if (firstMemberIs("variable."))
+    result += " style=filled fillcolor=cyan shape=ellipse";
+  else if (firstMemberIs("in.") || firstMemberIs("out."))
+    result += " style=filled fillcolor=gold shape=ellipse";
+  else if (firstMemberOf("internal.Active") || firstMemberOf("internal.!Active"))
+    result += " style=filled fillcolor=yellowgreen";
+  else if (firstMemberOf("internal.Completed") || firstMemberOf("internal.!Completed"))
+    result += " style=filled fillcolor=yellowgreen ";
+  else if (firstMemberOf("internal.Compensated") || firstMemberOf("internal.!Compensated"))
+    result += " style=filled fillcolor=yellowgreen";
+  else if (firstMemberOf("internal.Ended") || firstMemberOf("internal.!Ended"))
+    result += " style=filled fillcolor=yellowgreen";
+  else if (firstMemberOf("internal.Faulted") || firstMemberOf("internal.!Faulted"))
+    result += " style=filled fillcolor=yellowgreen";
+  else if (firstMemberOf("internal.Terminated") || firstMemberOf("internal.!Terminated"))
+    result += " style=filled fillcolor=yellowgreen";
+  else if (firstMemberIs("1.internal.initial") || firstMemberIs("1.internal.final"))
+    result += " style=filled fillcolor=green";
+  else if (firstMemberIs("1.internal.clock"))
+    result += " style=filled fillcolor=seagreen";
+  
+  result += "];\n";
+  return result;
+}
+
+
+
+
+
 /*****************************************************************************/
 
 
-/*!
- * \bug
- *      - debug text is not printed
- */
 PetriNet::PetriNet()
 {
-  trace(TRACE_DEBUG, "[PN]\tCreating a Petri net object.\n");
   lowLevel = false;
   nextId = 0;
 }
@@ -210,16 +313,13 @@ PetriNet::PetriNet()
 
 
 
-/*---------------------------------------------------------------------------*/
-
-
 /*!
  * Creates a low-level place without an initial role.
  * \return pointer of the created place
  */
 Place *PetriNet::newPlace()
 {
-  return newPlace("", LOW);
+  return newPlace("", INTERNAL);
 }
 
 
@@ -333,18 +433,49 @@ Arc *PetriNet::newArc(Node *source, Node *target, kc::casestring inscription)
  * \param type        type of the arc (as defined in #arc_type)
  * \param inscription inscription of the arc 
  * \return pointer of the created arc
- *
- * \todo
- *       - (nlohmann) add test to check whether one of the pointers is NULL
  */
 Arc *PetriNet::newArc(Node *source, Node *target, arc_type type, string inscription)
 {
+  if ((Place *)source == NULL || (Transition *)source == NULL)
+  {
+    string name = "unknown";
+    string role = "unknown";
+    if ( (Place *)target != NULL)
+    {
+      name = target->nodeTypeName() + " p" + intToString(target->id);
+      role = *(target->history.begin());
+    }
+    if ( (Transition *)target != NULL)
+    {
+      name = target->nodeTypeName() + " t" + intToString(target->id);
+      role = *(target->history.begin());
+    }
+    throw Exception(ARC_ERROR, "Source of arc to " + name + " (" + role + ") not found!\n", pos(__FILE__, __LINE__, __FUNCTION__));
+  }
+
+  if ((Place *)target == NULL || (Transition *)target == NULL)
+  {
+    string name = "unknown";
+    string role = "unknown";
+    if ( (Place *)source != NULL)
+    {
+      name = source->nodeTypeName() + " p" + intToString(source->id);
+      role = *(source->history.begin());
+    }
+    if ( (Transition *)source != NULL)
+    {
+      name = source->nodeTypeName() + " t" + intToString(source->id);
+      role = *(source->history.begin());
+    }
+    throw Exception(ARC_ERROR, "Target of arc from " + name + " (" + role + ") not found!\n", pos(__FILE__, __LINE__, __FUNCTION__));
+  }
+  
   trace(TRACE_VERY_DEBUG, "[PN]\tCreating arc (" + intToString(source->id) +
       "," + intToString(target->id) + ")...\n");
 
   if (source->nodeType == target->nodeType)
-    throw Exception(ARC_ERROR, "Arc between two " + source->nodeTypeName() + "s!\n",
-	*((source->history).begin()) + " and " + *((target->history).begin()));
+    throw Exception(ARC_ERROR, "Arc between two " + source->nodeTypeName() + "s!\n" +
+	*((source->history).begin()) + " and " + *((target->history).begin()), pos(__FILE__, __LINE__, __FUNCTION__));
   
   if (F.size() % 1000 == 0)
     trace(TRACE_INFORMATION, "[PN]\t" + information() + "\n");
@@ -385,6 +516,7 @@ void PetriNet::detachNode(Node *n)
 
 
 
+
 /*!
  * Removes a place and all arcs connected with it.
  * \param p place to be removed
@@ -416,7 +548,6 @@ void PetriNet::removeTransition(Transition *t)
   T.erase(t);
   delete t;
 }
-
 
 
 
@@ -471,9 +602,10 @@ void PetriNet::printInformation()
 
     switch ((*p)->type)
     {
-      case(LOW):      { (*info_output) << "low-level"; break; }
-      case(DATA):     { (*info_output) << "data     "; break; }
-      default:        { (*info_output) << "other    "; }
+      case(INTERNAL): { (*info_output) << "internal"; break; }
+      case(IN):       { (*info_output) << "input   "; break; }
+      case(OUT):      { (*info_output) << "output  "; break; }		      
+      default:        { (*info_output) << "other   "; } // should never happen
     }
 
     for (vector<string>::iterator role = (*p)->history.begin(); role != (*p)->history.end(); role++)
@@ -519,12 +651,8 @@ void PetriNet::printInformation()
  * Creates a DOT output (see http://www.graphviz.org) of the Petri net. It uses
  * the digraph-statement and adds labels to transitions, places and arcs if
  * neccessary. It also distinguishes the three arc types of #arc_type.
- *
- * \todo
- *       - (nlohmann) treatment of input and output places
- *       - (nlohmann) escape labels
  */
-void PetriNet::drawDot()
+void PetriNet::dotOut()
 {
   trace(TRACE_DEBUG, "[PN]\tCreating DOT-output.\n");
   
@@ -537,90 +665,22 @@ void PetriNet::drawDot()
     (*dot_output) << "low-level ";
   
   (*dot_output) << "Petri net generated from " << filename << "\"];" << endl;
-  (*dot_output) << " node [fontname=\"Helvetica-Oblique\" fontsize=10];" << endl;
+  (*dot_output) << " node [fontname=\"Helvetica-Oblique\" fontsize=10 fixedsize];" << endl;
   (*dot_output) << " edge [fontname=\"Helvetica-Oblique\" fontsize=10];" << endl << endl;
-
   
   // list the places
-  (*dot_output) << " node [shape=circle, fixedsize];" << endl;
+  (*dot_output) << endl << " node [shape=circle];" << endl;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
-  {
-    (*dot_output) << " " << (*p)->id << "\t[label=\"p" << (*p)->id << "\"";
-
-    // color special places
-    if ((*p)->firstMemberOf("eventHandler."))
-      (*dot_output) << " style=filled fillcolor=plum";
-    else if ((*p)->firstMemberOf("compensationHandler."))
-      (*dot_output) << " style=filled fillcolor=aquamarine";
-    else if ((*p)->firstMemberOf("stop."))
-      (*dot_output) << " style=filled fillcolor=lightskyblue2";
-    else if ((*p)->firstMemberOf("faultHandler."))
-      (*dot_output) << " style=filled fillcolor=pink";
-    else if ((*p)->firstMemberIs("link.") || (*p)->firstMemberIs("!link."))
-      (*dot_output) << " style=filled fillcolor=yellow";
-    else if ((*p)->firstMemberIs("variable."))
-      (*dot_output) << " style=filled fillcolor=cyan shape=ellipse";
-    else if ((*p)->firstMemberOf("Active") || (*p)->firstMemberOf("!Active"))
-      (*dot_output) << " style=filled fillcolor=yellowgreen";
-    else if ((*p)->firstMemberOf("Completed") || (*p)->firstMemberOf("!Completed"))
-      (*dot_output) << " style=filled fillcolor=yellowgreen ";
-    else if ((*p)->firstMemberOf("Compensated") || (*p)->firstMemberOf("!Compensated"))
-      (*dot_output) << " style=filled fillcolor=yellowgreen";
-    else if ((*p)->firstMemberOf("Ended") || (*p)->firstMemberOf("!Ended"))
-      (*dot_output) << " style=filled fillcolor=yellowgreen";
-    else if ((*p)->firstMemberOf("Faulted") || (*p)->firstMemberOf("!Faulted"))
-      (*dot_output) << " style=filled fillcolor=yellowgreen";
-    else if ((*p)->firstMemberOf("Terminated") || (*p)->firstMemberOf("!Terminated"))
-      (*dot_output) << " style=filled fillcolor=yellowgreen";
-    else if ((*p)->firstMemberIs("1.initial") || (*p)->firstMemberIs("1.final"))
-      (*dot_output) << " style=filled fillcolor=green";
-    else if ((*p)->firstMemberIs("1.clock"))
-      (*dot_output) << " style=filled fillcolor=seagreen";
-
-    (*dot_output) << "];" << endl;
-  }
-
+    (*dot_output) << (*p)->dotOut();
 
   // list the transitions
-  (*dot_output) << endl << " node [shape=box, fixedsize];" << endl;
+  (*dot_output) << endl << " node [shape=box];" << endl;
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
-  {
-    (*dot_output) << " " << (*t)->id << "\t[label=\"t" << (*t)->id << "\"";
+    (*dot_output) << (*t)->dotOut();
     
-    if ((*t)->guard != "")
-      (*dot_output) << " shape=record label=\"{t" << (*t)->id << "|{" << (*t)->guard << "}}\"";
-
-    // color special transitions
-    if ((*t)->firstMemberOf("eventHandler."))
-      (*dot_output) << " style=filled fillcolor=plum";
-    else if ((*t)->firstMemberOf("compensationHandler."))
-      (*dot_output) << " style=filled fillcolor=aquamarine";
-    else if ((*t)->firstMemberOf("stop."))
-      (*dot_output) << " style=filled fillcolor=lightskyblue2";
-    else if ((*t)->firstMemberOf("faultHandler."))
-      (*dot_output) << " style=filled fillcolor=pink";
-    
-    (*dot_output) << "];" << endl;
-  }
-  (*dot_output) << endl;
-
-  
   // list the arcs
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
-  {
-    (*dot_output) << " " << (*f)->source->id << " -> "
-      << (*f)->target->id << "\t[";
-    
-    if ((*f)->type == RESET)
-      (*dot_output) << "arrowtail=odot";
-    else if ((*f)->type == READ)
-      (*dot_output) << "arrowhead=diamond arrowtail=tee";
-
-    if ((*f)->inscription != "")
-      (*dot_output) << " label=\"" << (*f)->inscription << "\"";
-
-    (*dot_output) << "];" << endl;
-  }
+    (*dot_output) << (*f)->dotOut();
 
   (*dot_output) << "}" << endl;
 }
@@ -636,7 +696,6 @@ void PetriNet::lolaOut()
 {
   trace(TRACE_DEBUG, "[PN]\tCreating LoLA-output.\n");
 
-  // we can only create low-level nets for LoLA right now
   if (!lowLevel)
     makeLowLevel();
 
@@ -733,11 +792,14 @@ void PetriNet::lolaOut()
  */
 void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 {
+  if (t1 == NULL || t2 == NULL)
+    throw Exception(MERGING_ERROR, "One of the transitions is null!\n", pos(__FILE__, __LINE__, __FUNCTION__));
+  
   trace(TRACE_VERY_DEBUG, "[PN]\tMerging transitions " + intToString(t1->id) +
       " and " + intToString(t2->id) + "...\n");
 
   if (t1->guard != "" || t2->guard != "")
-    throw Exception(MERGING_ERROR, "Merging of guarded transition not yet supported!\n", typeid(this).name());
+    throw Exception(MERGING_ERROR, "Merging of guarded transition not yet supported!\n", pos(__FILE__, __LINE__, __FUNCTION__));
 	
   Node *t12 = newTransition();
   
@@ -795,9 +857,10 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
   if (p1 == NULL || p2 == NULL)
     return;
 
-  if(p1->type != LOW || p2->type != LOW)
-    throw Exception(MERGING_ERROR, "Merging of high-level places not yet supported!\n",
-	"place p" + intToString(p1->id) + " (type " + intToString(p2->type) + ") and p" + intToString(p2->id) + " (type " + intToString(p2->type) + ")");
+  if(p1->type != INTERNAL || p2->type != INTERNAL)
+    throw Exception(MERGING_ERROR, (string)"Merging of interface places not yet supported!\n" +
+	"place p" + intToString(p1->id) + " (type " + intToString(p2->type) + ") and p" + intToString(p2->id) + " (type " + intToString(p2->type) + ")",
+	pos(__FILE__, __LINE__, __FUNCTION__));
  
   trace(TRACE_VERY_DEBUG, "[PN]\tMerging places " + intToString(p1->id) +
       " and " + intToString(p2->id) + "...\n");
@@ -980,10 +1043,15 @@ void PetriNet::simplify()
       information() + "\n");
   trace(TRACE_INFORMATION, "Simplifying Petri net...\n");
 
-  
+/*  
+  An idea: instead of saving pointers to the transitions, save their
+  name and use this name to find transitions. The same is with the
+  reduction rule below (new reduction rule).
+    
   // a pair to store transitions to be merged
   vector <pair <Transition *, Transition *> > transitionPairs;
 
+  trace(TRACE_VERY_DEBUG, "[PN]\tFinding transitions with same preset and postset...\n");
   // find transitions with same preset and postset  
   for (set<Transition *>::iterator t1 = T.begin(); t1 != T.end(); t1++)
     for (set<Transition *>::iterator t2 = t1; t2 != T.end(); t2++)
@@ -991,12 +1059,15 @@ void PetriNet::simplify()
 	if ( (preset(*t1) == preset(*t2)) && (postset(*t1) == postset(*t2)) )
 	  transitionPairs.push_back(pair<Transition *, Transition *>(*t1, *t2));
 
+  trace(TRACE_VERY_DEBUG, "[PN]\tFound " + intToString(transitionPairs.size()) + " transitions with same preset and postset...\n");
+  
   // merge the found transitions
   for (unsigned int i = 0; i < transitionPairs.size(); i++)
     mergeTransitions(transitionPairs[i].first, transitionPairs[i].second);
 
+*/
   
-  trace(TRACE_DEBUG, "[PN]\tnew reduction rule\n");
+  trace(TRACE_VERY_DEBUG, "[PN]\tnew reduction rule\n");
 
   // a pair to store places to be merged
   vector <Transition *> sequenceTransition;
@@ -1037,25 +1108,17 @@ void PetriNet::simplify()
  * - Convert all places to low-level places.
  * - Remove all transition guards -- decisions are now taken
  *   non-deterministically.
- * - Convert all places to type #LOW.
  * - Remove arc inscriptions -- all places are low-level places anyway.
  * - Convert read arcs to loops.
  *
  * Only reset arcs remain as high-level constructs. They will be converted
  * (i.e. unfolded) in a later stage since this unfolding is target-format
  * specific.
- * 
- * \todo
- *       - (nlohmann) take care of interface places (#IN, #OUT)
+ *
  */
 void PetriNet::makeLowLevel()
 {
   trace(TRACE_INFORMATION, "Converting Petri net to low-level...\n");
-
-  // convert places to low-level places
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
-    (*p)->type = LOW;
-
   
   // remove transition guards
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)

@@ -26,20 +26,16 @@
  *
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/13 22:33:48 $
+ *          - last changed: \$Date: 2005/12/14 10:16:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
- *
- * \version \$Revision: 1.20 $
- *          - 2005-11-22 (gierds) Initial version.
- *	    - 2005-11-30 (gierds) Checking for PartnerLinks completed.
  *
  */
 
@@ -92,15 +88,21 @@ void SymbolManager::initialiseProcessScope(kc::integer id)
  */
 void SymbolManager::newScopeScope(kc::integer id)
 {
+  
   SymbolScope * higherScope = currentScope;
-  while ( typeid(*higherScope) == typeid(FlowScope) )
-  {
-    higherScope = higherScope->parent;
-  }
   currentScope = new ScopeScope(id, currentScope);
+  
+  // we want to inform a higher scope, that is no Flow
+  if (typeid(*higherScope) == typeid(FlowScope))
+  {
+    while ( typeid(*higherScope) == typeid(FlowScope) )
+    {
+      higherScope = higherScope->parent;
+    }
 
-  higherScope->children.push_back(currentScope);
-
+    higherScope->children.push_back(currentScope);
+  }
+  
   mapping[id] = currentScope;
 }
 

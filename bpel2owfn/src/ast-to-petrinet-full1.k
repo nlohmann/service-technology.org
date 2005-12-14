@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/14 11:53:44 $
+ *          - last changed: \$Date: 2005/12/14 13:50:36 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.71 $
+ * \version \$Revision: 1.72 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
@@ -2795,6 +2795,11 @@ This=Scope(a,b,c,d,e,f,g)
     f // Stop Pattern
     g // innerActivity
     {
+
+      // connect t2 with the push-places of the child-scopes
+      for (list<SymbolScope*>::iterator child = me->children.begin(); child != me->children.end(); child++)
+	TheNet->newArc(t2, TheNet->findPlace( intToString((*child)->id->value) + ".!push" ));
+      
       string prefix2 = intToString(This->id->value) + ".internal.";
 	    
       // embed fault handler

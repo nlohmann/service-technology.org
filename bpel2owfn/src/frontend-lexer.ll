@@ -39,7 +39,7 @@
  *          
  * \date
  *          - created 2005-11-10
- *          - last changed: \$Date: 2005/12/14 10:08:53 $
+ *          - last changed: \$Date: 2005/12/14 10:10:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -48,6 +48,8 @@
  *
  * \note    This file was created using Flex 2.5.4 reading file bpel-lexic.l.
  *          See http://www.gnu.org/software/flex for details.
+ *
+ * \version \$Revision: 1.23 $
  *
  * \todo
  *          - add rules to ignored everything non-BPEL

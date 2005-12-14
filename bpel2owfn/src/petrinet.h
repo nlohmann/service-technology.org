@@ -40,14 +40,14 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/14 10:02:01 $
+ *          - last changed: \$Date: 2005/12/14 10:14:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *          
- * \version \$Revision: 1.40 $
+ * \version \$Revision: 1.41 $
  */
 
 
@@ -105,6 +105,9 @@ typedef enum {
 
 
 
+/*****************************************************************************/
+
+
 /*!
  * \class  Node
  * \author Niels Lohmann <nlohmann@informatik.hu-berlin.de>
@@ -143,6 +146,8 @@ class Node
 
 
 
+/*****************************************************************************/
+
 
 /*!
  * \class  Transition
@@ -173,6 +178,8 @@ class Transition: public Node
 
 
 
+/*****************************************************************************/
+
 
 /*!
  * \class  Place
@@ -202,6 +209,8 @@ class Place: public Node
 
 
 
+
+/*****************************************************************************/
 
 
 /*!
@@ -242,6 +251,8 @@ class Arc
 
 
 
+
+/*****************************************************************************/
 
 
 /*!

@@ -40,26 +40,14 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/13 22:33:49 $
+ *          - last changed: \$Date: 2005/12/14 10:02:01 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *          
- * \version \$Revision: 1.39 $
- *          - 2005-11-09 (nlohmann) Added doxygen-comments.
- *          - 2005-11-10 (nlohmann) Added many using commands for std.
- *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an #id
- *            (unsigned int). Changed #P, #T, #F to be sets.
- *          - 2005-11-13 (nlohmann) Added functions #PetriNet::id(),
- *            #PetriNet::makeLowLevel(). Added types #IN and #OUT to #place_type.
- *          - 2005-11-14 (nlohmann) Added function #PetriNet::longInformation()
- *            and #PetriNet::lolaOut().
- *          - 2005-11-15 (nlohmann) Added variable #lowLevel. Made a number of
- *            functions private.
- *          - 2005-11-29 (nlohmann) Roles are now organized in a vector.
- *          - 2005-12-09 (nlohmann) Merged prototypes of new* functions.
+ * \version \$Revision: 1.40 $
  */
 
 
@@ -131,10 +119,7 @@ typedef enum {
 
 class Node
 {
-  public:
-    bool firstMemberOf(string role);
-    bool firstMemberIs(string role);
-	  
+  public:	  
     /// the id of the node
     unsigned int id;
 
@@ -146,6 +131,12 @@ class Node
     
     /// the set of roles (i.e. the history) of the node
     vector<string> history;
+
+    /// true if first role contains role
+    bool firstMemberAs(string role);
+    
+    /// true if first role begins with role
+    bool firstMemberIs(string role);
 };
 
 
@@ -174,6 +165,7 @@ class Transition: public Node
     /// constructor which creates a transition and adds a first role to the history
     Transition(unsigned int id, string role, string guard);
 
+    /// DOT-output of the transition (used by PetriNet::dotOut())
     string dotOut();
 };
 
@@ -203,6 +195,7 @@ class Place: public Node
     /// constructor which creates a place and adds a first role to the history
     Place(unsigned int id, string role, place_type type);
 
+    /// DOT-output of the place (used by PetriNet::dotOut())
     string dotOut();
 };
 
@@ -242,6 +235,7 @@ class Arc
     /// Constructor to create an arc of certain type and inscription.
     Arc(Node *source, Node *target, arc_type type, string inscription);
 
+    /// DOT-output of the arc (used by PetriNet::dotOut())
     string dotOut();
 };
 

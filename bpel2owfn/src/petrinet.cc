@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License along   *
  * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
  * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
-\****************************************************************************/
+\*****************************************************************************/
 
 /*!
  * \file petrinet.cc
@@ -31,38 +31,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/12/13 22:33:49 $
+ *          - last changed: \$Date: 2005/12/14 10:02:00 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.66 $
- *          - 2005-11-09 (nlohmann) Added debug output and doxygen comments.
- *          - 2005-11-10 (nlohmann) Improved #set_union, #PetriNet::simplify.
- *            Respected #dot_output for #drawDot function. Finished commenting.
- *          - 2005-11-11 (nlohmann) Changed intenal name (string) to an id
- *            (unsigned int). Improved functions that use #P, #T, #F that are
- *            sets now. Added function #PetriNet::detachNode.
- *          - 2005-11-13 (nlohmann) Added function #PetriNet::id. Explicitly
- *            call destructors of #Arc, #Place and #Transition. Added function
- *            #PetriNet::makeLowLevel. Added CVS-tags.
- *          - 2005-11-14 (nlohmann) Added new reduction rule. Added functions
- *            #PetriNet::printInformation() and #PetriNet::lolaOut(). Use
- *            #Exception-class to signal errors.
- *          - 2005-11-16 (nlohmann) Added a mapping for faster access to Nodes
- *            given a role. Pimped DOT-output. Added several overloadings for
- *            easier pattern definition.
- *          - 2005-11-18 (nlohmann) Added a simple test to avoid arcs between
- *            two places resp. two transitions.
- *          - 2005-11-20 (nlohmann) Added support for high-level arcs for
- *            merging.
- *          - 2005-11-29 (nlohmann) Roles are now organized in a vector.
- *          - 2005-12-09 (nlohmann) Added marking of variables.
- *          - 2005-12-13 (nlohmann) Added interface places. Overworked DOT
- *            output.
- *
+ * \version \$Revision: 1.67 $
  */
 
 
@@ -110,9 +86,9 @@ set<pair<Node *, arc_type> > setUnion(set<pair<Node *, arc_type> > a, set<pair<N
 
 /*!
  * \param role a role of a node
- * \return true, if the node's first history entry begins with the given role
+ * \return true, if the node's first history entry contains the given role
  */
-bool Node::firstMemberOf(string role)
+bool Node::firstMemberAs(string role)
 {
   string firstEntry = (*history.begin());
   return (firstEntry.find(role, 0) == firstEntry.find_first_of(".")+1);
@@ -120,14 +96,18 @@ bool Node::firstMemberOf(string role)
 
 
 
+
+
 /*!
- * \todo (nlohmann) comment me
+ * \param role a role of a node
+ * \return true, if the node's first history entry begins with the given role
  */
 bool Node::firstMemberIs(string role)
 {
   string firstEntry = (*history.begin());
   return (firstEntry.find(role, 0) == 0);
 }
+
 
 
 
@@ -174,8 +154,7 @@ Arc::Arc(Node *mysource, Node* mytarget, arc_type mytype, string myinscription)
 
 
 /*!
- * \todo
- *       - (nlohmann) comment me
+ * DOT-output of the arc.
 */
 string Arc::dotOut()
 {
@@ -221,9 +200,11 @@ Transition::Transition(unsigned int myid, string role, string myguard)
 
 
 /*!
+ * DOT-output of the transition. Transitions are colored corresponding to their
+ * initial role.
+ *
  * \todo
  *       - (nlohmann) escape guards
- *       - (nlohmann) comment me
 */
 string Transition::dotOut()
 {
@@ -233,13 +214,13 @@ string Transition::dotOut()
   if (guard != "")
     result += " shape=record label=\"{t" + intToString(id) + "|{" + guard + "}}\"";
   
-  if (firstMemberOf("internal.eventHandler."))
+  if (firstMemberAs("internal.eventHandler."))
     result += " style=filled fillcolor=plum";
-  else if (firstMemberOf("internal.compensationHandler."))
+  else if (firstMemberAs("internal.compensationHandler."))
     result += " style=filled fillcolor=aquamarine";
-  else if (firstMemberOf("internal.stop."))
+  else if (firstMemberAs("internal.stop."))
     result += " style=filled fillcolor=lightskyblue2";
-  else if (firstMemberOf("internal.faultHandler."))
+  else if (firstMemberAs("internal.faultHandler."))
     result += " style=filled fillcolor=pink";
     
   result += "];\n";
@@ -273,21 +254,21 @@ Place::Place(unsigned int myid, string role, place_type mytype)
 
 
 /*!
- * \todo
- *       - (nlohmann) comment me
+ * DOT-output of the place. Places are colored corresponding to their initial
+ * role.
 */
 string Place::dotOut()
 {
   string result;
   result += " " + intToString(id) + "\t[label=\"p" + intToString(id) + "\"";
 
-  if (firstMemberOf("eventHandler."))
+  if (firstMemberAs("eventHandler."))
     result += " style=filled fillcolor=plum";
-  else if (firstMemberOf("internal.compensationHandler."))
+  else if (firstMemberAs("internal.compensationHandler."))
     result += " style=filled fillcolor=aquamarine";
-  else if (firstMemberOf("internal.stop."))
+  else if (firstMemberAs("internal.stop."))
     result += " style=filled fillcolor=lightskyblue2";
-  else if (firstMemberOf("internal.faultHandler."))
+  else if (firstMemberAs("internal.faultHandler."))
     result += " style=filled fillcolor=pink";
   else if (firstMemberIs("link.") || firstMemberIs("!link."))
     result += " style=filled fillcolor=yellow";
@@ -295,17 +276,17 @@ string Place::dotOut()
     result += " style=filled fillcolor=cyan shape=ellipse";
   else if (firstMemberIs("in.") || firstMemberIs("out."))
     result += " style=filled fillcolor=gold shape=ellipse";
-  else if (firstMemberOf("internal.Active") || firstMemberOf("internal.!Active"))
+  else if (firstMemberAs("internal.Active") || firstMemberAs("internal.!Active"))
     result += " style=filled fillcolor=yellowgreen";
-  else if (firstMemberOf("internal.Completed") || firstMemberOf("internal.!Completed"))
+  else if (firstMemberAs("internal.Completed") || firstMemberAs("internal.!Completed"))
     result += " style=filled fillcolor=yellowgreen ";
-  else if (firstMemberOf("internal.Compensated") || firstMemberOf("internal.!Compensated"))
+  else if (firstMemberAs("internal.Compensated") || firstMemberAs("internal.!Compensated"))
     result += " style=filled fillcolor=yellowgreen";
-  else if (firstMemberOf("internal.Ended") || firstMemberOf("internal.!Ended"))
+  else if (firstMemberAs("internal.Ended") || firstMemberAs("internal.!Ended"))
     result += " style=filled fillcolor=yellowgreen";
-  else if (firstMemberOf("internal.Faulted") || firstMemberOf("internal.!Faulted"))
+  else if (firstMemberAs("internal.Faulted") || firstMemberAs("internal.!Faulted"))
     result += " style=filled fillcolor=yellowgreen";
-  else if (firstMemberOf("internal.Terminated") || firstMemberOf("internal.!Terminated"))
+  else if (firstMemberAs("internal.Terminated") || firstMemberAs("internal.!Terminated"))
     result += " style=filled fillcolor=yellowgreen";
   else if (firstMemberIs("1.internal.initial") || firstMemberIs("1.internal.final"))
     result += " style=filled fillcolor=green";

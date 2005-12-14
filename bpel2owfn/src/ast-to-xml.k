@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License along   *
  * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
  * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
-\****************************************************************************/
+\*****************************************************************************/
 
 %{
 /*!
@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2005/12/13 22:33:48 $
+ *          - last changed: \$Date: 2005/12/14 10:14:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,10 +43,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.17 $
- *          - 2005-11-10 (nlohmann) Added doxygen comments.
- *          - 2005-11-11 (nlohmann) Moved #intToString to \ref helpers.cc.
- *          - 2005-11-18 (nlohmann) Identifiers are printed.
+ * \version \$Revision: 1.18 $
  */
 %}
 
@@ -101,7 +98,7 @@ void inup()
 }
 
 
-///Decreases indention
+/// Decreases indention
 void indown()
 {
   indent -= indentStep;

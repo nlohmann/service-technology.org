@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License along   *
  * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
  * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
-\****************************************************************************/
+\*****************************************************************************/
 
 %{
 /*!
@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2005/12/13 22:33:48 $
+ *          - last changed: \$Date: 2005/12/14 10:06:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,11 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.37 $
- *          - 2005-11-10 (nlohmann) Added doxygen comments.
- *          - 2005-11-17 (nlohmann) Added default attributes.
- *          - 2005-12-04 (nlohmann) Changed representation of handlers.
- * 
+ * \version \$Revision: 1.38 $
  */
 %}
 
@@ -308,7 +304,7 @@ tCorrelation:
   {
     casestring set;
     casestring initiate = mkcasestring("no");
-    casestring pattern; // originally only in "tCorrelationWithPattern"
+    casestring pattern;
   }
 ;
 

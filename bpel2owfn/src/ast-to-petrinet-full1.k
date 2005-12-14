@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License along   *
  * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
  * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
-\****************************************************************************/
+\*****************************************************************************/
 
 %{
 /*!
@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/13 22:33:48 $
+ *          - last changed: \$Date: 2005/12/14 10:14:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,42 +44,11 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.69 $
- *          - 2005-11-10 (nlohmann) Added doxygen comments.
- *          - 2005-11-11 (nlohmann) Changed patterns to respect changes in
- *            \ref petrinet.c
- *          - 2005-11-15 (nlohmann) Removed prefix "empty" etc.
- *          - 2005-11-16 (nlohmann) Added pattern for <while>, <wait>, <flow>,
- *            <throw>, <terminate>
- *          - 2005-11-17 (nlohmann) Completed simplest <process>-pattern.
- *          - 2005-11-18 (nlohmann) Added pattern for <switch>.
- *          - 2005-11-20 (nlohmann) Added pattern for user-defined
- *            <faultHandlers>.
- *          - 2005-11-22 (nlohmann) Added pattern for implicit <faultHandlers>,
- *            <pick> and alarm event handler.
- *          - 2005-11-23 (nlohmann) Added <eventHandlers> (both alarm and
- *            message).
- *          - 2005-11-26 (nlohmann) Simplified code. Added implcit
- *            <compensationHandler>. Faults are now passed to the 1.internal.
- *          - 2005-11-29 (nlohmann) Fixed several bugs such as the loop in the
- *            implicit compensation handler. Fixed order of arguments of the
- *            mergePlaces-function to assure correct labels.
- *          - 2005-11-30 (nlohmann) Added two phyla for stop patterns. Added
- *            <scope> with its stop pattern. Added support for faultHandlers
- *            in scope.
- *          - 2005-12-03 (nlohmann) Cleaned code. Fixed several bugs inside the
- *            event handler.
- *          - 2005-12-04 (nlohmann) Re-organized fault handler's catchAll
- *            branch.
- *          - 2005-12-06 (nlohmann) Added containers for linked activities.
- *          - 2005-12-09 (nlohmann) Added <assign>. Added variables to the
- *            communication activities.
- *          - 2005-12-13 (nlohmann) Added input and output places.
+ * \version \$Revision: 1.70 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
  *          - (nlohmann) outsource <compensate />-elements
- * 
  */
 %}
 

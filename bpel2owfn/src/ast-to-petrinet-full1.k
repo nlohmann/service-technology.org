@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/14 10:14:12 $
+ *          - last changed: \$Date: 2005/12/14 11:53:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.70 $
+ * \version \$Revision: 1.71 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
@@ -2773,7 +2773,7 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->newArc(p20, t11);
       TheNet->newArc(t11, p45);
       TheNet->newArc(p51, t11);
-
+      
       // new transitions to pass fault to parent
       TheNet->newArc(p48, t12);
       TheNet->newArc(TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.Active"), t12);

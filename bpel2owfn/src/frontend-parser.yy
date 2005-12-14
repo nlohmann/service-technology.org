@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/14 10:10:16 $
+ *          - last changed: \$Date: 2005/12/14 11:53:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.67 $
+ * \version \$Revision: 1.68 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -107,6 +107,7 @@
 #include "bpel-kc-k.h" // phylum definitions
 #include "bpel-kc-yystype.h" // data types for tokens and non-terminals
 
+#include <map>
 
 // from flex
 extern char* yytext;
@@ -134,6 +135,7 @@ SymbolManager symMan = SymbolManager();
 
 /// needed to distinguish context of tPartnerLink
 bool inPartners = false;
+
 /// needed to check occurence of links within whiles
 bool inWhile = false;
 
@@ -144,10 +146,7 @@ bool inProcess = true;
 integer currentScopeId;
 
 /// needed to tag scopes
-integer oldScopeId;
-
-
-
+map <integer, integer> parent;
 
 /// the root of the abstract syntax tree
 tProcess TheProcess;
@@ -1623,7 +1622,7 @@ tScope:
   K_SCOPE arbitraryAttributes X_NEXT
     {
       symMan.newScopeScope($2);
-      oldScopeId = currentScopeId;
+      parent[$2] = currentScopeId;
       currentScopeId = $2;
     }
   standardElements tVariables tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers activity X_NEXT X_SLASH K_SCOPE
@@ -1634,8 +1633,7 @@ tScope:
       $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->variableAccessSerializable = att.read($2, "variableAccessSerializable", $$->variableAccessSerializable);
       $$->id = $5->parentId = $2;
-      $$->parentScopeId = oldScopeId;
-      currentScopeId = oldScopeId; //new
+      $$->parentScopeId = currentScopeId = parent[$2];
       symMan.quitScope(); }
 ;
 

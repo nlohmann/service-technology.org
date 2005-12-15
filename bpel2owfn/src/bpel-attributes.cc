@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/15 15:10:27 $
+ *          - last changed: \$Date: 2005/12/15 15:45:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  *
  * \todo
  *       - (reinert) Comment this file and its classes.
@@ -372,7 +372,7 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 					attributeCompareCounter = 0;
 					
 					// iteration about attributes
-					for(unsigned int a = 0; a < ASIZE; a++)
+					for(unsigned int a = 0; a < ASIZE-1; a++)
 					{	// compare scanned combination of attributes with allowed combination of attributes
 						if((validAttributeCombination[c][a] == 1) && (foundAttributes[a] == 1))
 						{
@@ -630,6 +630,106 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 
 			}
 			break;		
+
+		case K_TO:
+			{
+				traceAM("TO!!! \n");
+				
+				bool validTo = false;
+				unsigned int attributeCompareCounter;
+							
+				// array to tag found attributes
+				// to store the number of found attributes -> COUNTER field
+				unsigned int foundAttributes[] =
+				{	/*variable, part, query, partnerLk, property, COUNTER*/
+						 0,      0,     0,       0,          0,      0
+				};
+
+				unsigned int CSIZE = 5; // number of valid combination of attributes
+				unsigned int ASIZE = 6; // number of attributes + COUNTER
+				unsigned int COUNTER = 5; // position of counter within the arrays 
+
+				// matrix for valid combination of attributes
+				unsigned int validAttributeCombination[][6] =
+				{	/*variable, part, query, partnerLk, property, COUNTER*/
+				 	{	 1,      0,     0,       0,        0,        1    },
+				 	{	 1,      1,     0,       0,        0,        2    },
+				 	{	 1,      1,     1,       0,        0,        3    },
+				 	{	 0,      0,     0,       1,        0,        1    },
+				 	{	 1,      0,     0,       0,        1,        2    }
+				};
+				 
+				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
+				
+				///
+				while(scannerResultDataIterator != scannerResult[elementIdInt].end())
+				{	
+					if(((*scannerResultDataIterator).first) == A__VARIABLE)
+					{
+						foundAttributes[0] = 1;
+						foundAttributes[COUNTER]++;
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}
+					else if(((*scannerResultDataIterator).first) == A__PART)
+					{
+						foundAttributes[1] = 1;
+						foundAttributes[COUNTER]++;
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}
+					else if(((*scannerResultDataIterator).first) == A__QUERY)
+					{
+						foundAttributes[2] = 1;
+						foundAttributes[COUNTER]++;						
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}					
+					else if(((*scannerResultDataIterator).first) == A__PARTNER_LINK)
+					{
+						foundAttributes[3] = 1;
+						foundAttributes[COUNTER]++;						
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}
+					else if(((*scannerResultDataIterator).first) == A__PROPERTY)
+					{
+						foundAttributes[4] = 1;
+						foundAttributes[COUNTER]++;
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}
+					++scannerResultDataIterator;
+				}
+								
+				// iteration about valid attribute combination
+				for(unsigned int c = 0; c < CSIZE; c++)
+				{
+					// under or too much found attributes ... next combination
+					if(validAttributeCombination[c][COUNTER] != foundAttributes[COUNTER]) continue;
+	
+					attributeCompareCounter = 0;
+					
+					// iteration about attributes
+					for(unsigned int a = 0; a < ASIZE-1; a++)
+					{	// compare scanned combination of attributes with allowed combination of attributes
+						if((validAttributeCombination[c][a] == 1) && (foundAttributes[a] == 1))
+						{
+							attributeCompareCounter++;
+						}
+					}
+
+					if(validAttributeCombination[c][COUNTER] == attributeCompareCounter)
+					{
+						validTo = true;
+						break;	
+					}
+					
+				}
+				
+				if(!validTo)
+				{
+					printErrorMsg("attribute combination within the to clause is wrong");					
+				}				
+			}
+			break;		
+		
+
 
 		case K_WAIT:
 			{

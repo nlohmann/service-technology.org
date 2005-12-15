@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/14 13:50:36 $
+ *          - last changed: \$Date: 2005/12/15 14:34:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.72 $
+ * \version \$Revision: 1.73 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
@@ -754,7 +754,7 @@ This=implicitFaultHandler() provided (This->inProcess) ->
 This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
   [petrinet:
     {
-      string prefix = intToString(This->parentScopeId->value) + ".faultHandler."; 
+      string prefix = intToString(This->parentScopeId->value) + ".internal.faultHandler."; 
       Place *p3 =  TheNet->newPlace(prefix + "out");
       Place *p4 =  TheNet->newPlace(prefix + "fault");
       Place *p7 =  TheNet->newPlace(prefix + "trueOut");
@@ -785,7 +785,7 @@ This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
       Transition *t10 = TheNet->newTransition(prefix + "t10");
       Transition *t11 = TheNet->newTransition(prefix + "t11");
       TheNet->newArc(p4, t5);
-      TheNet->newArc(p9, t5, "x");
+      TheNet->newArc(p9, t5, READ, "x");
       TheNet->newArc(t5, p10);
       TheNet->newArc(t6, p8);
       TheNet->newArc(p9, t6, "x");
@@ -850,8 +850,8 @@ This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p10"), compensate1_p1);
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p11"), compensate1_p3);
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p13"), compensate1_p4);
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "p25"), compensate1_p5);
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "p26"), compensate1_p6);
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_fh"), compensate1_p5);
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_out"), compensate1_p6);
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p14"), compensate1_p7);
 
       // the right <compensate />-element
@@ -887,8 +887,8 @@ This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
       // embed the <compensate />-element
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p21"), compensate2_p1);
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p22"), compensate2_p3);
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "p25"), compensate2_p5);
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "p26"), compensate2_p6);
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_fh"), compensate2_p5);
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_out"), compensate2_p6);
     }
     a // catch branches
     b // catchAll branch
@@ -927,7 +927,7 @@ This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
 	  // TODO merge failed-places
 	  
 	  TheNet->newArc(p4, t3);
-	  TheNet->newArc(p9, t9, READ, "x");	
+	  TheNet->newArc(p9, t3, READ, "x");	
 	  TheNet->newArc(t4, p3);
 	  TheNet->newArc(t4, p7);
 	  TheNet->newArc(t4, p8);
@@ -2913,7 +2913,7 @@ This=StandardElements(NiltTarget_list(), NiltSource_list()) ->
 This=StandardElements(NiltTarget_list(), a) ->
   [petrinet:
     {
-      trace(TRACE_VERY_DEBUG, "[PNU]\tFig. 22\n");
+      trace(TRACE_DEBUG, "[PNU]\tFig. 22\n");
       string prefix = intToString(This->parentId->value) + "."; 
       Place *p1 = TheNet->newPlace(prefix + "negLink");
       Place *p2 = TheNet->newPlace(prefix + "initial");
@@ -2963,7 +2963,7 @@ This=StandardElements(NiltTarget_list(), a) ->
 This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure == mkcasestring("no")) ->
   [petrinet:
     {
-      trace(TRACE_VERY_DEBUG, "[PNU]\tFig. 23\n");
+      trace(TRACE_DEBUG, "[PNU]\tFig. 23\n");
       string prefix = intToString(This->parentId->value) + ".";
       Place *p5  = TheNet->newPlace(prefix + "negLink");
       Place *p6  = TheNet->newPlace(prefix + "p6");
@@ -3019,7 +3019,7 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
 This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure == mkcasestring("yes")) ->
   [petrinet:
     {
-      trace(TRACE_VERY_DEBUG, "[PNU]\tFig. 24\n");
+      trace(TRACE_DEBUG, "[PNU]\tFig. 24\n");
       string prefix = intToString(This->parentId->value) + ".";
       Place *p5  = TheNet->newPlace(prefix + "negLink");
       Place *p6  = TheNet->newPlace(prefix + "p6");
@@ -3066,7 +3066,7 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
 This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("yes")) ->
   [petrinet:
     {
-      trace(TRACE_VERY_DEBUG, "[PNU]\tFig. 25\n");
+      trace(TRACE_DEBUG, "[PNU]\tFig. 25\n");
       string prefix = intToString(This->parentId->value) + ".";
       Place *p9  = TheNet->newPlace(prefix + "negLink");
       Place *p10 = TheNet->newPlace(prefix + "p10");
@@ -3144,7 +3144,7 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
 This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("no")) ->
   [petrinet:
     {
-      trace(TRACE_VERY_DEBUG, "[PNU]\tFig. 26\n");
+      trace(TRACE_DEBUG, "[PNU]\tFig. 26\n");
       string prefix = intToString(This->parentId->value) + ".";
       Place *p9  = TheNet->newPlace(prefix + "negLink");
       Place *p10 = TheNet->newPlace(prefix + "p10");
@@ -3154,7 +3154,7 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
       Place *p14 = TheNet->newPlace(prefix + "stop");
       Place *p15 = TheNet->newPlace(prefix + "stopped");
       Place *p16 = TheNet->newPlace(prefix + "initial");
-      Place *p17 = TheNet->newPlace(prefix + "initial");
+      Place *p17 = TheNet->newPlace(prefix + "p17");
       Place *p18 = TheNet->newPlace(prefix + "failed");
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       Transition *t2 = TheNet->newTransition(prefix + "t2", string(This->joinCondition->name));

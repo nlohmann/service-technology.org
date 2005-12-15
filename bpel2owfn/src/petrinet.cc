@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/12/14 10:02:00 $
+ *          - last changed: \$Date: 2005/12/15 14:33:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.67 $
+ * \version \$Revision: 1.68 $
  */
 
 
@@ -344,8 +344,13 @@ Place *PetriNet::newPlace(string role, place_type mytype)
   P.insert(p);
 
   if (role != "")
-    roleMap[role] = p;
-  
+  {
+    if (roleMap[role] != NULL)
+      throw Exception(DOUBLE_NODE, "Place with role '" + role + "' already defined.\n", pos(__FILE__, __LINE__, __FUNCTION__));
+    else
+      roleMap[role] = p;
+  }
+
   return p;
 }
 

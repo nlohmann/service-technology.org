@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/14 11:53:44 $
+ *          - last changed: \$Date: 2005/12/15 15:10:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.68 $
+ * \version \$Revision: 1.69 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -1157,7 +1157,7 @@ tFrom:
       $$->variableID = symMan.checkVariable(att.read($2, "variable")->name);
       symMan.checkPartnerLink($$->partnerLink->name); }
 | K_FROM arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_FROM
-    { att.check($2, K_FROM);
+    { att.check($2, $4, K_FROM);
       $$ = From();
       $$->variable = att.read($2, "variable");
       $$->part = att.read($2, "part");

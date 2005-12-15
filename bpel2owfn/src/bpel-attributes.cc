@@ -27,18 +27,18 @@
  * 
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/13 22:33:48 $
+ *          - last changed: \$Date: 2005/12/15 15:10:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.19 $
+ * \version \$Revision: 1.20 $
  *
  * \todo
  *       - (reinert) Comment this file and its classes.
@@ -192,17 +192,45 @@ void attributeManager::traceAM(std::string traceMsg)
 {
 	//trace(TRACE_DEBUG, traceMsg);	
 }
+
 /*!
  * 
  */
-void attributeManager::check(kc::integer elementId, unsigned int activityId)
+void attributeManager::check(kc::integer elementId, kc::casestring literalValue, unsigned int elementType)
+{	
+	if(elementType == K_FROM)
+	{	
+		std::string lit = literalValue->name;
+		/* without attributes */
+		if(scannerResult[elementId->value].size() == 0)
+		{	/* literal value is empty */
+			if(lit.empty())
+			{
+				printErrorMsg("from clause is wrong");
+			}
+		}
+		else
+		{	/* with attributes */
+			check(elementId, elementType);
+		}
+	}
+	else
+	{	
+		check(elementId, elementType);			
+	}
+}
+
+/*!
+ * 
+ */
+void attributeManager::check(kc::integer elementId, unsigned int elementType)
 {
 	// "cast" Kimwitu++ to C++
   	unsigned int elementIdInt = elementId->value; 
 	/// iterator for the embedded map
     std::map<std::string, string>::iterator scannerResultDataIterator;
 	
-	switch(activityId) {
+	switch(elementType) {
 		case K_ASSIGN:
 			{
 				traceAM("ASSIGN!!! \n");

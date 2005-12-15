@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/12/15 14:33:52 $
+ *          - last changed: \$Date: 2005/12/15 15:32:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.68 $
+ * \version \$Revision: 1.69 $
  */
 
 
@@ -695,6 +695,26 @@ void PetriNet::dotOut()
 
 
 
+void PetriNet::removeInterface()
+{
+  trace(TRACE_DEBUG, "[PN]\tRemoving interface places.\n");
+  
+  list <Place *> killList;
+  
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  {
+    if ((*p)->type == IN || (*p)->type == OUT)
+      killList.push_back(*p);
+  }
+
+  for (list<Place *>::iterator it = killList.begin(); it != killList.end(); it++)
+    removePlace(*it);
+  
+}
+
+
+
+
 /*!
  * Outputs the net in LoLA-format.
  */
@@ -705,6 +725,8 @@ void PetriNet::lolaOut()
   if (!lowLevel)
     makeLowLevel();
 
+  removeInterface();
+  
   (*lola_output) << "{ Petri net created by BPEL2oWFN reading " << filename << " }" << endl << endl;
   
   // places

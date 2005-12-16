@@ -36,7 +36,7 @@
 
 #include <map>
 
-/// names attributes
+/// BPEL attribute names
 const std::string A__CONDITION = "condition";
 const std::string A__ENDPOINT_REFERENCE = "endpointReference";
 const std::string A__EXPRESSION = "expression";
@@ -45,7 +45,7 @@ const std::string A__FOR = "for";
 const std::string A__INPUT_VARIABLE = "inputVariable";
 const std::string A__NAME = "name";
 const std::string A__OPERATION = "operation";
-const std::string A__OUTPUT_VARIABLE = "outputVariable";
+//const std::string A__OUTPUT_VARIABLE = "outputVariable";
 const std::string A__PART = "part";
 const std::string A__PARTNER_LINK = "partnerLink";
 const std::string A__PORT_TYPE = "portType";
@@ -65,33 +65,31 @@ const std::string A__INITIATE = "initiate";
 const std::string A__SUPPRESS_JOIN_FAILURE = "suppressJoinFailure";
 const std::string A__VARIABLE_ACCESS_SERIALIZABLE = "variableAccessSerializable";
 
-/// types of attributes
+/// types of BPEL attributes
 const std::string T__NCNAME = "NCName";
 const std::string T__QNAME = "QName";
 const std::string T__ANYURI = "anyURI";
 const std::string T__DURATION_EXPR = "bpws:tDuration-expr";
 const std::string T__DEADLINE_EXPR = "bpws:tDeadline-expr";
 const std::string T__BOOLEAN_EXPR = "bpws:tBoolean-expr";
-const std::string T__STRING = "string";
-const std::string T__ROLES = "bpws:tRoles";
-const std::string T__BOOLEAN = "bpws:tBoolean";
 
 class attributeManager
 {
   private:
+    
     /// an array to store attributes of XML-elements
     std::map<unsigned int, std::map<std::string, std::string> > scannerResult;
 	
-	///
+	/// AM traces
 	void traceAM(std::string traceMsg);
 	
-	/// 
+	/// print formatted attribute manager error message
 	void printErrorMsg(std::string errorMsg);
 
-	///
+	/// domain check
 	void checkAttributeValueYesNo(std::string attributeName, std::string attributeValue);	
 	
-	///
+	/// returns valid or unvalid depending on attribute value
 	bool isValidAttributeValue(std::string attributeName, std::string attributeValue);
   
   public:
@@ -113,11 +111,11 @@ class attributeManager
     /// defines an attribute
     void define(kc::casestring attributeName, kc::casestring attributeValue);
 
-    ///
+    /// checked the attributes of BPEL-elements
     void check(kc::integer elementId, unsigned int elementType);
     
-    /// special check function 
-    void check(kc::integer elementId, kc::casestring literalValue, unsigned int elementType);
+    /// checked the attributes and the value of BPEL-elements
+    void check(kc::integer elementId, kc::casestring elementValue, unsigned int elementType);
 };
 
 

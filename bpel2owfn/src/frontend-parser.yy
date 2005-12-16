@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/16 11:40:09 $
+ *          - last changed: \$Date: 2005/12/16 16:06:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.71 $
+ * \version \$Revision: 1.72 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -628,7 +628,8 @@ tOnMessage:
       symMan.checkPartnerLink(att.read($2, "partnerLink")->name);
     }
   tCorrelations activity X_NEXT X_SLASH K_ONMESSAGE
-    { $$ = OnMessage($6);
+    { att.check($2, K_ONMESSAGE);
+      $$ = OnMessage($6);
       $$->partnerLink = att.read($2, "partnerLink");
       $$->portType = att.read($2, "portType");
       $$->operation = att.read($2, "operation");

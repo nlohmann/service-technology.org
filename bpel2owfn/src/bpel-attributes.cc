@@ -31,19 +31,18 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/16 11:40:09 $
+ *          - last changed: \$Date: 2005/12/16 16:06:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.23 $
+ * \version \$Revision: 1.24 $
  *
  * \todo
  *       - (reinert) Comment this file and its classes.
  *       - (reinert) Check data types (e.g. is a value "yes" or "no").
- *       - (reinert) Better error msg. in the from clause. 
  */
 
 #include "bpel-attributes.h"
@@ -51,7 +50,7 @@
 #include "debug.h"
 
 /*!
- * 
+ * constructor
  */
 attributeManager::attributeManager()
 {
@@ -60,7 +59,9 @@ attributeManager::attributeManager()
 }
 
 /*!
- * 
+ * returns the value of an attribute which was stored in the AM array
+ * \param elementId key to identification the BPEL-element in the AM array
+ * \param attributeName key to attribute value
  */
 kc::casestring attributeManager::read(kc::integer elementId, std::string attributeName)
 {
@@ -83,8 +84,11 @@ kc::casestring attributeManager::read(kc::integer elementId, std::string attribu
   return kc::mkcasestring(result.c_str());
 }
 
-/*!
- * 
+ /*!
+ * returns the value of an attribute which was stored in the AM array
+ * \param elementId key to identification the BPEL-element in the AM array
+ * \param attributeName key to attribute value
+ * \param defaultValue
  */
 kc::casestring attributeManager::read(kc::integer elementId, std::string attributeName, kc::casestring defaultValue)
 {
@@ -107,7 +111,7 @@ kc::casestring attributeManager::read(kc::integer elementId, std::string attribu
 }
 
 /*!
- * 
+ * increase the elementId of the AM array 
  */
 kc::integer attributeManager::nextId()
 {
@@ -116,7 +120,9 @@ kc::integer attributeManager::nextId()
 }
 
 /*!
- * 
+ * yes-no domain check
+ * \param attributeName
+ * \param attributeValue 
  */
 void attributeManager::checkAttributeValueYesNo(std::string attributeName, std::string attributeValue)
 {
@@ -127,7 +133,9 @@ void attributeManager::checkAttributeValueYesNo(std::string attributeName, std::
 }
 
 /*!
- * 
+ * returns valid or unvalid depending on attribute value
+ * \param attributeName
+ * \param attributeValue 
  */
 bool attributeManager::isValidAttributeValue(std::string attributeName, std::string attributeValue)
 {
@@ -160,18 +168,17 @@ bool attributeManager::isValidAttributeValue(std::string attributeName, std::str
   
   return true;
 }
+
 /*!
- * 
+ * Stored an attribute with his name and value into the AM array under
+ * the current BPEL-element id. The BPEL element id is managed by the AM.
+ * \param attributeName
+ * \param attributeValue 
  */
 void attributeManager::define(kc::casestring attributeName, kc::casestring attributeValue)
 {  	
   
-/*    traceAM("define \n");
-	traceAM(attributeName->name);
-  	traceAM("=");
-  	traceAM(attributeValue->name);
-  	traceAM("\n");
-  */
+  //traceAM("define\n" + string(attributeName->name) + "=" + string(attributeValue->name) + "\n");
 
   if(isValidAttributeValue(attributeName->name, attributeValue->name))  
   {
@@ -180,26 +187,34 @@ void attributeManager::define(kc::casestring attributeName, kc::casestring attri
 }
 
 /*!
- *  printing formatted attribute manager error message
+ * print formatted attribute manager error message
+ * \param errorMsg
  */
 void attributeManager::printErrorMsg(std::string errorMsg)
 {
 	yyerror(string("[AttributeManager]: " + errorMsg + "\n").c_str());
 }
 
+/*!
+ * trace method for the AM class
+ * \param traceMsg
+ */
 void attributeManager::traceAM(std::string traceMsg)
 {
-	//trace(TRACE_DEBUG, traceMsg);	
+	//trace(TRACE_DEBUG, "[AM] " + traceMsg);	
 }
 
 /*!
- * 
+ * checked the attributes and the value of BPEL-elements
+ * \param elementId
+ * \param elementValue
+ * \param elementType
  */
-void attributeManager::check(kc::integer elementId, kc::casestring literalValue, unsigned int elementType)
+void attributeManager::check(kc::integer elementId, kc::casestring elementValue, unsigned int elementType)
 {	
 	if(elementType == K_FROM)
 	{	
-		std::string lit = literalValue->name;
+		std::string lit = elementValue->name;
 
 		/* without attributes */
 		if(scannerResult[elementId->value].size() == 0)
@@ -230,7 +245,9 @@ void attributeManager::check(kc::integer elementId, kc::casestring literalValue,
 }
 
 /*!
- * 
+ * checked the attributes of BPEL-elements
+ * \param elementId
+ * \param elementType
  */
 void attributeManager::check(kc::integer elementId, unsigned int elementType)
 {
@@ -242,7 +259,7 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 	switch(elementType) {
 		case K_ASSIGN:
 			{
-				traceAM("ASSIGN!!! \n");
+				traceAM("ASSIGN\n");
 
 				/* no mandatory attributes */				
 
@@ -251,7 +268,7 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 
 		case K_CASE:
 			{
-				traceAM("CASE!!! \n");
+				traceAM("CASE\n");
 
 				bool conditionFlag;
 				conditionFlag = false;
@@ -277,9 +294,18 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 			}
 			break;
 
+		case K_CATCH:
+			{
+				traceAM("CATCH\n");
+				
+				/* no mandatory attributes */
+				
+			}
+			break;	
+
 		case K_COMPENSATE:
 			{
-				traceAM("COMPENSATE!!! \n");
+				traceAM("COMPENSATE\n");
 
 				/* no mandatory attributes */				
 				
@@ -288,7 +314,7 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 
 		case K_FROM:
 			{
-				traceAM("FROM!!! \n");
+				traceAM("FROM\n");
 				
 				bool validFrom = false;
 				unsigned int attributeCompareCounter;
@@ -406,14 +432,12 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 		
 		case K_INVOKE:
 			{
-				traceAM("INVOKE!!! \n");
+				traceAM("INVOKE\n");
 
 				bool partnerLinkFlag, portTypeFlag, operationFlag, inputVariableFlag, outputVariableFlag;
 				partnerLinkFlag = portTypeFlag = operationFlag = inputVariableFlag = outputVariableFlag =false;
 				 
 				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
-				
-				/* warnung wenn variables weggelassen, bpel zwar richtig, jedoch benutzen wir keine abstrakten prozesse*/
 				
 				///
 				while(scannerResultDataIterator != scannerResult[elementIdInt].end())
@@ -475,7 +499,7 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 
 		case K_ONALARM:
 			{
-				traceAM("ONALARM!!! \n");
+				traceAM("ONALARM\n");
 				
 				bool forFlag, untilFlag;
 				forFlag = untilFlag = false;
@@ -518,10 +542,55 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 				}
 			}
 			break;		
+
+		case K_ONMESSAGE:
+			{
+				traceAM("ONMESSAGE\n");
+				
+				bool partnerLinkFlag, portTypeFlag, operationFlag;
+				partnerLinkFlag = portTypeFlag = operationFlag = false;
+				 
+				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
+				
+				///
+				while(scannerResultDataIterator != scannerResult[elementIdInt].end())
+				{	
+					if(((*scannerResultDataIterator).first) == A__PARTNER_LINK)
+					{
+						partnerLinkFlag = true;
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}
+					else if(((*scannerResultDataIterator).first) == A__PORT_TYPE)
+					{
+						portTypeFlag = true;
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}
+					else if(((*scannerResultDataIterator).first) == A__OPERATION)
+					{
+						operationFlag = true;
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}					
+					++scannerResultDataIterator;
+				}
+				
+				if(!partnerLinkFlag)
+				{
+					printErrorMsg("attribute " + A__PARTNER_LINK + "=\"" + T__NCNAME + "\" is missing");					
+				}
+				else if(!portTypeFlag)
+				{
+					printErrorMsg("attribute " + A__PORT_TYPE + "=\"" + T__QNAME + "\" is missing");					
+				}
+				else if(!operationFlag)
+				{
+					printErrorMsg("attribute " + A__OPERATION + "=\"" + T__NCNAME + "\" is missing");					
+				}
+			}
+			break;
 				
 		case K_PICK:
 			{
-				traceAM("PICK!!! \n");
+				traceAM("PICK\n");
 				
 				/* default attribute */
 			}
@@ -529,7 +598,7 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 
 		case K_PROCESS:
 			{
-				traceAM("PROCESS!!! \n");
+				traceAM("PROCESS\n");
 				
 				bool nameFlag, targetNamespaceFlag;
 				nameFlag = targetNamespaceFlag = false;
@@ -566,7 +635,7 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 
 		case K_RECEIVE:
 			{
-				traceAM("RECEIVE!!! \n");			
+				traceAM("RECEIVE\n");			
 
 				bool partnerLinkFlag, portTypeFlag, operationFlag;
 				partnerLinkFlag = portTypeFlag = operationFlag = false;
@@ -611,7 +680,7 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 
 		case K_REPLY:
 			{
-				traceAM("REPLY!!! \n");
+				traceAM("REPLY\n");
 
 				bool partnerLinkFlag, portTypeFlag, operationFlag;
 				partnerLinkFlag = portTypeFlag = operationFlag = false;
@@ -656,7 +725,7 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 
 		case K_SCOPE:
 			{
-				traceAM("SCOPE!!! \n");
+				traceAM("SCOPE\n");
 				
 				/* default attribute */
 				
@@ -665,7 +734,7 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 
 		case K_SEQUENCE:
 			{
-				traceAM("SEQUENCE!!! \n");
+				traceAM("SEQUENCE\n");
 
 				/* no mandatory attributes */				
 				
@@ -674,7 +743,7 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 
 		case K_SWITCH:
 			{
-				traceAM("SWITCH!!! \n");
+				traceAM("SWITCH\n");
 
 				/* no mandatory attributes */				
 
@@ -683,7 +752,7 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 
 		case K_TERMINATE:
 			{
-				traceAM("TERMINATE!!! \n");
+				traceAM("TERMINATE\n");
 				
 				/* no mandatory attributes */
 				
@@ -692,7 +761,7 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 
 		case K_THROW:
 			{
-				traceAM("THROW!!! \n");
+				traceAM("THROW\n");
 
 				bool faultNameFlag;
 				faultNameFlag = false;
@@ -720,7 +789,7 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 
 		case K_TO:
 			{
-				traceAM("TO!!! \n");
+				traceAM("TO\n");
 				
 				bool validTo = false;
 				unsigned int attributeCompareCounter;
@@ -818,7 +887,7 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 
 		case K_WAIT:
 			{
-				traceAM("WAIT!!! \n");
+				traceAM("WAIT\n");
 				
 				bool forFlag, untilFlag;
 				forFlag = untilFlag = false;
@@ -864,7 +933,7 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 
 		case K_WHILE:
 			{
-				traceAM("WHILE!!! \n");
+				traceAM("WHILE\n");
 
 				bool conditionFlag;
 				conditionFlag = false;

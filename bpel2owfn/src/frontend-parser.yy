@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/15 15:45:52 $
+ *          - last changed: \$Date: 2005/12/16 11:40:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.70 $
+ * \version \$Revision: 1.71 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -643,7 +643,8 @@ tOnMessage:
 
 tOnAlarm:
   K_ONALARM arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_ONALARM 
-    { $$ = OnAlarm($4);
+    { att.check($2, K_ONALARM);
+      $$ = OnAlarm($4);
       $$->For = att.read($2, "for");  // "for" is a keyword
       $$->until = att.read($2, "until"); }
 ;

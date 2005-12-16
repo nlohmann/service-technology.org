@@ -31,18 +31,17 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/16 11:26:22 $
+ *          - last changed: \$Date: 2005/12/16 11:40:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
  *
  * \todo
  *       - (reinert) Comment this file and its classes.
- *       - (reinert) Variables for <onAlarm> are not checked.
  *       - (reinert) Check data types (e.g. is a value "yes" or "no").
  *       - (reinert) Better error msg. in the from clause. 
  */
@@ -474,6 +473,60 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 			}
 			break;	
 
+		case K_ONALARM:
+			{
+				traceAM("ONALARM!!! \n");
+				
+				bool forFlag, untilFlag;
+				forFlag = untilFlag = false;
+				 
+				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
+				
+				///
+				while(scannerResultDataIterator != scannerResult[elementIdInt].end())
+				{	
+					if(((*scannerResultDataIterator).first) == A__FOR)
+					{
+						forFlag = true;
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}
+					else if(((*scannerResultDataIterator).first) == A__UNTIL)
+					{
+						untilFlag = true;
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}
+					++scannerResultDataIterator;
+				}
+
+				/// only one attribute is allowed
+				if((forFlag && !untilFlag) || (untilFlag && !forFlag))
+				{	
+					/* all okay */
+				}
+				else
+				{
+					// no attribute
+					if(!forFlag && !untilFlag)
+					{
+						printErrorMsg("attribute " + A__FOR + "=\"" + T__DURATION_EXPR + "\"  or " + A__UNTIL + "=\"" + T__DEADLINE_EXPR + " is missing");						
+					}
+					// to much attributes, only one is allowed
+					else
+					{
+						printErrorMsg("both attributes " + A__FOR + "=\"" + T__DURATION_EXPR + "\"  and " + A__UNTIL + "=\"" + T__DEADLINE_EXPR + " are not allowed");												
+					}
+				}
+			}
+			break;		
+				
+		case K_PICK:
+			{
+				traceAM("PICK!!! \n");
+				
+				/* default attribute */
+			}
+			break;				
+
 		case K_PROCESS:
 			{
 				traceAM("PROCESS!!! \n");
@@ -762,8 +815,6 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 				}				
 			}
 			break;		
-		
-
 
 		case K_WAIT:
 			{
@@ -811,15 +862,6 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 			}
 			break;		
 
-				
-		case K_PICK:
-			{
-				traceAM("PICK!!! \n");
-				
-				/* default attribute */
-			}
-			break;				
-			
 		case K_WHILE:
 			{
 				traceAM("WHILE!!! \n");

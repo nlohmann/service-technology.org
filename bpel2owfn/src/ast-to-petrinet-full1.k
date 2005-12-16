@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/16 10:33:09 $
+ *          - last changed: \$Date: 2005/12/16 14:37:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.74 $
+ * \version \$Revision: 1.75 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
@@ -2179,7 +2179,7 @@ This=Terminate(a) ->
       TheNet->newArc(t4, p7);
       TheNet->mergePlaces(TheNet->findPlace("1.internal.!Terminated"), p4);
       TheNet->mergePlaces(TheNet->findPlace("1.internal.Terminated"), p5);
-      TheNet->mergePlaces(TheNet->findPlace("1.internal.terminate"), p6);
+      TheNet->mergePlaces(TheNet->findPlace(currentScope + "upperTerminate"), p6);
     }
     a // standardElements
     {
@@ -2874,6 +2874,10 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p24"), TheNet->findPlace(g, ".stopped"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p6"),  TheNet->findPlace(g, ".failed"));
 
+      // merge (!)Terminated places
+      TheNet->mergePlaces(TheNet->findPlace("1.internal.!Terminated"), p8);
+      TheNet->mergePlaces(TheNet->findPlace("1.internal.Terminated"), p9);
+      
       trace(TRACE_DEBUG, "[PNU]\t</scope>\n");
     }
   ]

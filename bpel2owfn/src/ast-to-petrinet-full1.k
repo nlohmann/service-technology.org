@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/15 14:34:24 $
+ *          - last changed: \$Date: 2005/12/16 10:33:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.73 $
+ * \version \$Revision: 1.74 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
@@ -1397,8 +1397,8 @@ This=implicitCompensationHandler() ->
       SymbolScope *me = symMan.getScope(This->parentScopeId); 
       for (list< SymbolScope * >::iterator child = me->children.begin(); child != me->children.end(); child++)
       {
-	Place *p20 = TheNet->findPlace(intToString((*child)->id->value) + ".push");
-	Place *p21 = TheNet->findPlace(intToString((*child)->id->value) + ".!push");
+	Place *p20 = TheNet->findPlace(intToString((*child)->id->value) + ".!push");
+	Place *p21 = TheNet->findPlace(intToString((*child)->id->value) + ".push");
 	Transition *t13 = TheNet->newTransition(prefix + "t13." + intToString((*child)->id->value));
 	TheNet->newArc(p20, t7);
 	TheNet->newArc(p20, t8);

@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/18 20:37:25 $
+ *          - last changed: \$Date: 2005/12/18 23:16:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.73 $
+ * \version \$Revision: 1.74 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -221,6 +221,7 @@ tProcess TheProcess;
 
 
 %%
+
 
 
 
@@ -637,9 +638,7 @@ tOnMessage:
       $$->variable = att.read($2, "variable"); 
       $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
-				      $$->partnerLink->name),
-			true);
-    }
+				      $$->partnerLink->name), true); }
 ;
 
 tOnAlarm:
@@ -901,15 +900,13 @@ tInvoke:
       {
         $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 					$$->operation->name, 
-					$$->partnerLink->name),
-                          true);
+					$$->partnerLink->name), true);
       }
       if (string($$->variableIDout->name) != "")
       {
         $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 					$$->operation->name, 
-					$$->partnerLink->name),
-			  false);
+					$$->partnerLink->name), false);
       }
       $$->id = $5->parentId = $2; }
 | K_INVOKE arbitraryAttributes X_SLASH
@@ -932,18 +929,15 @@ tInvoke:
       {
         $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 					$$->operation->name, 
-					$$->partnerLink->name),
-                          true);
+					$$->partnerLink->name), true);
       }
       if (string($$->variableIDout->name) != "")
       {
         $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 					$$->operation->name, 
-					$$->partnerLink->name),
-			  false);
+					$$->partnerLink->name), false);
       }
-      $$->id = $2;
-    }
+      $$->id = $2; }
 ;
 
 
@@ -977,13 +971,10 @@ tInvoke:
 
 tReceive:
   K_RECEIVE arbitraryAttributes X_NEXT
-    {
-      att.check($2,K_RECEIVE);
-      symMan.checkPartnerLink(att.read($2, "partnerLink")->name);
-    }
+    { att.check($2,K_RECEIVE);
+      symMan.checkPartnerLink(att.read($2, "partnerLink")->name); }
   standardElements tCorrelations X_SLASH K_RECEIVE
-    {  
-      $$ = Receive($5, $6);
+    { $$ = Receive($5, $6);
       $$->name = att.read($2, "name");
       $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
@@ -995,8 +986,7 @@ tReceive:
       $$->variableID = symMan.checkVariable(att.read($2, "variable")->name);
       $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
-				      $$->partnerLink->name),
-			true);
+				      $$->partnerLink->name), true);
       $$->id = $5->parentId = $2; }
 | K_RECEIVE arbitraryAttributes X_SLASH
     { att.check($2, K_RECEIVE);
@@ -1016,9 +1006,7 @@ tReceive:
       symMan.checkPartnerLink($$->partnerLink->name); 
       $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
-				      $$->partnerLink->name),
-			true);
-    }
+				      $$->partnerLink->name), true); }
 ;
 
 
@@ -1067,8 +1055,7 @@ tReply:
       symMan.checkPartnerLink($$->partnerLink->name); 
       $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
-				      $$->partnerLink->name),
-			false);
+				      $$->partnerLink->name), false);
       $$->id = $4->parentId = $2; }
 | K_REPLY arbitraryAttributes X_SLASH
     { att.check($2, K_REPLY);
@@ -1087,8 +1074,7 @@ tReply:
       symMan.checkPartnerLink($$->partnerLink->name); 
       $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
-				      $$->partnerLink->name),
-			false);
+				      $$->partnerLink->name), false);
       $$->id = $2; }
 ;
 
@@ -1512,9 +1498,7 @@ tOtherwise:
 
 tWhile:
   K_WHILE arbitraryAttributes X_NEXT 
-    {
-      inWhile = true;
-    }
+    { inWhile = true; }
   standardElements 
   activity 
   X_NEXT X_SLASH K_WHILE
@@ -1525,8 +1509,7 @@ tWhile:
       $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->condition = att.read($2, "condition");
       $$->id = $5->parentId = $2; 
-      inWhile=false;
-    }
+      inWhile=false; }
 ;
 
 
@@ -1599,8 +1582,6 @@ tPick:
 
 
 
-
-
 /******************************************************************************
   SCOPE
 ******************************************************************************/
@@ -1624,11 +1605,9 @@ tPick:
 
 tScope:
   K_SCOPE arbitraryAttributes X_NEXT
-    {
-      symMan.newScopeScope($2);
+    { symMan.newScopeScope($2);
       parent[$2] = currentScopeId;
-      currentScopeId = $2;
-    }
+      currentScopeId = $2; }
   standardElements tVariables tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers activity X_NEXT X_SLASH K_SCOPE
     { att.check($2, K_SCOPE);
       $$ = Scope($5, $6, $8, $9, $10, StopInScope(), $11);
@@ -1640,8 +1619,6 @@ tScope:
       $$->parentScopeId = currentScopeId = parent[$2];
       symMan.quitScope(); }
 ;
-
-
 
 
 
@@ -1696,14 +1673,12 @@ tSource:
     { $$ = Source();
       $$->linkName = att.read($2, "linkName");
       $$->transitionCondition = att.read($2, "transitionCondition", $$->transitionCondition); 
-      $$->linkID = symMan.checkLink($$->linkName->name, true);
-    }
+      $$->linkID = symMan.checkLink($$->linkName->name, true); }
 | K_SOURCE arbitraryAttributes X_SLASH
     { $$ = Source();
       $$->linkName = att.read($2, "linkName");
       $$->transitionCondition = att.read($2, "transitionCondition", $$->transitionCondition); 
-      $$->linkID = symMan.checkLink($$->linkName->name, true);
-    }
+      $$->linkID = symMan.checkLink($$->linkName->name, true); }
 ;
 
 

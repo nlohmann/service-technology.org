@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/12/18 12:59:39 $
+ *          - last changed: \$Date: 2005/12/18 15:58:36 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.70 $
+ * \version \$Revision: 1.71 $
  */
 
 
@@ -1089,45 +1089,43 @@ Transition *PetriNet::findTransition(string role)
  *       - (nlohmann) improve performance
  *       - (nlohmann) implement more reduction rules
  *
- * \bug
- *      - repeated excecution fails
- *      - reduction chrashes sometimes during merging of places
- *
  */
 void PetriNet::simplify()
-{
-  trace(TRACE_DEBUG, "[PN]\tPetri net size before simplification: " +
-      information() + "\n");
+{  
+  trace(TRACE_DEBUG, "[PN]\tPetri net size before simplification: " + information() + "\n");
   trace(TRACE_INFORMATION, "Simplifying Petri net...\n");
 
-/*  
-  An idea: instead of saving pointers to the transitions, save their
-  name and use this name to find transitions. The same is with the
-  reduction rule below (new reduction rule).
     
   // a pair to store transitions to be merged
-  vector <pair <Transition *, Transition *> > transitionPairs;
+  vector <pair <string, string> > transitionPairs;
 
-  trace(TRACE_VERY_DEBUG, "[PN]\tFinding transitions with same preset and postset...\n");
+  trace(TRACE_VERY_DEBUG, "[PN]\tSearching for transitions with same preset and postset...\n");
   // find transitions with same preset and postset  
   for (set<Transition *>::iterator t1 = T.begin(); t1 != T.end(); t1++)
     for (set<Transition *>::iterator t2 = t1; t2 != T.end(); t2++)
       if (*t1 != *t2)
 	if ( (preset(*t1) == preset(*t2)) && (postset(*t1) == postset(*t2)) )
-	  transitionPairs.push_back(pair<Transition *, Transition *>(*t1, *t2));
+	  transitionPairs.push_back(pair<string, string>(*((*t1)->history.begin()), *((*t2)->history.begin())));
 
   trace(TRACE_VERY_DEBUG, "[PN]\tFound " + intToString(transitionPairs.size()) + " transitions with same preset and postset...\n");
   
   // merge the found transitions
   for (unsigned int i = 0; i < transitionPairs.size(); i++)
-    mergeTransitions(transitionPairs[i].first, transitionPairs[i].second);
+  {
+    Transition *t1 = findTransition(transitionPairs[i].first);
+    Transition *t2 = findTransition(transitionPairs[i].second);
 
-*/
+    if (t1 != NULL && t2 != NULL && t1 != t2)
+      mergeTransitions(t1, t2);
+  }
+
   
+  
+
   trace(TRACE_VERY_DEBUG, "[PN]\tnew reduction rule\n");
 
   // a pair to store places to be merged
-  vector <Transition *> sequenceTransition;
+  vector <string> sequenceTransitions;
   vector <pair <string, string> > placeMerge;
   
   // find transitions with singelton preset and postset
@@ -1137,7 +1135,7 @@ void PetriNet::simplify()
       string id1 = *((*(preset(*t).begin())).first->history.begin());
       string id2 = *((*(postset(*t).begin())).first->history.begin());
       placeMerge.push_back(pair<string, string>(id1, id2));
-      sequenceTransition.push_back(*t);
+      sequenceTransitions.push_back(*((*t)->history.begin()));
     }
     
   // merge preset and postset
@@ -1145,8 +1143,12 @@ void PetriNet::simplify()
     mergePlaces(placeMerge[i].first, placeMerge[i].second);
 
   // remove "sequence"-transtions
-  for (unsigned int i = 0; i < sequenceTransition.size(); i++)
-    removeTransition(sequenceTransition[i]);
+  for (unsigned int i = 0; i < sequenceTransitions.size(); i++)
+  {
+    Transition *sequenceTransition = findTransition(sequenceTransitions[i]);
+    if (sequenceTransition != NULL)
+      removeTransition(sequenceTransition);
+  }
 
 
   trace(TRACE_INFORMATION, "Simplifying complete.\n");

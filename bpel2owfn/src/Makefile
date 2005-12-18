@@ -1,22 +1,21 @@
-# last changed $Date: 2005/12/08 13:13:26 $ by $Author: gierds $
+# last changed $Date: 2005/12/18 22:21:37 $ by $Author: nlohmann $
 
 
 
 .PHONY: clean
 
 # Tools
-YACC     = bison
-LEX      = flex
-CXX      = g++
-KC       = kc++
+BISON     = bison
+FLEX      = flex
+CXX       = g++
+KC        = kc++
 
 # Flags
 OPTIMIZE  = 
-CXXFLAGS2 = -pedantic -Wall -ansi $(OPTIMIZE)   # the most strict variant
-CXXFLAGS1 = -pedantic -Wall       $(OPTIMIZE)   # less stricter,
-						# but against ISO C++
-CXXFLAGS  = -pedantic -Wno-unused $(OPTIMIZE)   # pedantic
-CXXFLAGS0 = -Wno-unused           $(OPTIMIZE)   # least strict
+CXXFLAGS2 = -g -pedantic -Wall -ansi $(OPTIMIZE)   # the most strict variant
+CXXFLAGS1 = -g -pedantic -Wall       $(OPTIMIZE)   # less stricter, but against ISO C++
+CXXFLAGS  = -g -pedantic -Wno-unused $(OPTIMIZE)   # pedantic
+CXXFLAGS0 = -g -Wno-unused           $(OPTIMIZE)   # least strict
 YFLAGS    = --defines --yacc --no-lines
 KFLAGS    = --yystype --no-printdot --file-prefix=bpel-kc- --suffix=cc
 
@@ -27,6 +26,8 @@ KC_TIME = .kc_time_stamp
 
 ###############################################################################
 # Main target
+
+all: bpel2owfn
 
 bpel2owfn: bpel-syntax.o bpel-lexic.o\
 	main.o debug.o exception.o bpel-attributes.o petrinet.o helpers.o check-symbols.o\

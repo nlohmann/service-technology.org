@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/18 20:36:25 $
+ *          - last changed: \$Date: 2005/12/18 20:59:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,11 +44,13 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.77 $
+ * \version \$Revision: 1.78 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
  *          - (nlohmann) outsource <compensate />-elements
+ *          - (nlohmann) DPE in pick
+ *          - (nlohmann) variables in communicating actions should be optional
  */
 %}
 
@@ -82,7 +84,8 @@ extern PetriNet *TheNet;
 // introduced in bpel-syntax.y
 extern SymbolManager symMan;
 
-/// prefix of the current scope (read by the stop pattern)
+/// prefix of the current scope (read by the stop pattern and used to direct
+/// failures to the correct fault_in place)
 string currentScope;
 %}
 
@@ -1120,7 +1123,7 @@ This=EventHandler(a,b) ->
     {
 
       int onMessageCount = 1;
-      foreach (OnMessage(innerActivity); tOnMessage_list a)
+      foreach (ThisBranch = OnMessage(innerActivity); tOnMessage_list a)
       {
 	string message = intToString(onMessageCount);
 	string newprefix = prefix + "onMessage" + message + ".";
@@ -1146,9 +1149,12 @@ This=EventHandler(a,b) ->
 	Transition *onMessage_t12 = TheNet->newTransition(newprefix + "t12");
 	TheNet->newArc(onMessage_p2, onMessage_t1, "(M" + message + ",CS" + message + ")" );
 	TheNet->newArc(onMessage_t1, onMessage_p1);
-	TheNet->newArc(onMessage_t1, TheNet->findPlace(intToString(This->parentScopeId->value) + ".eventHandler.failed"), "fault" + message);
+	TheNet->newArc(onMessage_t1, TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.eventHandler.failed"), "fault" + message);
+	TheNet->newArc(TheNet->findPlace("in." + string(ThisBranch->channelID->name)), onMessage_t2, "M" + message);
 	TheNet->newArc(onMessage_t2, onMessage_p2, "(M" + message + ",CS" + message + ")" );
 	TheNet->newArc(onMessage_p5, onMessage_t2);
+  	TheNet->newArc(TheNet->findPlace("variable." + string(ThisBranch->variableID->name)), onMessage_t3, "V" + message);
+  	TheNet->newArc(onMessage_t3, TheNet->findPlace("variable." + string(ThisBranch->variableID->name)), "M" + message);
 	TheNet->newArc(onMessage_p2, onMessage_t3, "(M" + message + ",CS" + message + ")" );
 	TheNet->newArc(onMessage_t3, onMessage_p3);
 	TheNet->newArc(onMessage_p4, onMessage_t4);
@@ -1187,7 +1193,7 @@ This=EventHandler(a,b) ->
 	TheNet->mergePlaces(onMessage_p11, TheNet->findPlace(innerActivity, ".stop"));
 	TheNet->mergePlaces(onMessage_p12, TheNet->findPlace(innerActivity, ".stopped"));
 	TheNet->mergePlaces(onMessage_p4,  TheNet->findPlace(innerActivity, ".final"));
-	TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId->value) + ".eventHandler.failed"),  TheNet->findPlace(innerActivity, ".failed")); //new	
+	TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.eventHandler.failed"),  TheNet->findPlace(innerActivity, ".failed")); //new	
 	
 	onMessageCount++;
       }
@@ -2662,6 +2668,10 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	onMessageCount++;
 	trace(TRACE_DEBUG, "[PNU]\t</onAlarm>\n");
       }
+
+      // create the arcs for the DPE
+      // TODO
+      
       trace(TRACE_DEBUG, "[PNU]\t</pick>\n");
     }
   ]

@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/13 22:33:49 $
+ *          - last changed: \$Date: 2005/12/18 20:35:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -169,6 +169,11 @@ int main( int argc, char *argv[])
     if (mode_lola_petri_net)
     {
       TheNet->lolaOut();
+    }
+    // create oWFN output ?
+    if (mode_owfn_petri_net)
+    {
+      TheNet->owfnOut();
     }
     // create dot output ?
     if (mode_dot_petri_net)

@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/18 12:59:22 $
+ *          - last changed: \$Date: 2005/12/18 20:36:25 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.76 $
+ * \version \$Revision: 1.77 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
@@ -2593,7 +2593,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
     c // onAlarm branches
     {
       int onMessageCount = 1; 
-      foreach (OnMessage(innerActivity); tOnMessage_list b)
+      foreach (ThisBranch = OnMessage(innerActivity); tOnMessage_list b)
       {
 	trace(TRACE_DEBUG, "[PNU]\t<onMessage>\n");
 	string message = intToString(onMessageCount);
@@ -2606,8 +2606,11 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	Transition *t4 = TheNet->newTransition(newprefix + "t4", "guard" + message);
 	Transition *t9 = TheNet->newTransition(newprefix + "t9");
 	Transition *t10 = TheNet->newTransition(newprefix + "t10");
+    	TheNet->newArc(TheNet->findPlace("in." + string(ThisBranch->channelID->name)), t2, "M" + message);
 	TheNet->newArc(TheNet->findPlace(TheActivity, ".internal.TimeStamp"), t2, "x");
 	TheNet->newArc(t2, p3, "M" + message );
+  	TheNet->newArc(TheNet->findPlace("variable." + string(ThisBranch->variableID->name)), t3, "V" + message);
+  	TheNet->newArc(t3, TheNet->findPlace("variable." + string(ThisBranch->variableID->name)), "M" + message);
 	TheNet->newArc(p3, t3, "M" + message );
 	TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
 	TheNet->newArc(p3, t4, "M" + message );
@@ -2621,7 +2624,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	TheNet->newArc(p10, t10);
 	TheNet->newArc(TheNet->findPlace(TheActivity, ".stop"), t10);
 	TheNet->newArc(t10, TheNet->findPlace(TheActivity, ".stopped"));
-
+	
 	// embed the inner activity
 	TheNet->mergePlaces(TheActivity, ".stop",    innerActivity, ".stop");
 	TheNet->mergePlaces(TheActivity, ".stopped", innerActivity, ".stopped");

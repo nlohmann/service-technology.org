@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/16 16:06:21 $
+ *          - last changed: \$Date: 2005/12/18 20:37:25 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.72 $
+ * \version \$Revision: 1.73 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -638,7 +638,7 @@ tOnMessage:
       $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
 				      $$->partnerLink->name),
-			false);
+			true);
     }
 ;
 

@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/12/15 15:32:27 $
+ *          - last changed: \$Date: 2005/12/18 12:59:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.69 $
+ * \version \$Revision: 1.70 $
  */
 
 
@@ -389,7 +389,15 @@ Transition *PetriNet::newTransition(string role, string guard)
   
   Transition *t = new Transition(getId(), role, guard);
   T.insert(t);
- 
+
+  if (role != "")
+  {
+    if (roleMap[role] != NULL)
+      throw Exception(DOUBLE_NODE, "Place with role '" + role + "' already defined.\n", pos(__FILE__, __LINE__, __FUNCTION__));
+    else
+      roleMap[role] = t;
+  }
+  
   return t;
 }
 
@@ -1039,6 +1047,27 @@ Place *PetriNet::findPlace(string role)
 Place *PetriNet::findPlace(kc::impl_activity* activity, string role)
 {
   return findPlace(intToString(activity->id->value) + role);
+}
+
+
+
+
+
+/*!
+ * Finds a transition of the Petri net given a role the place fills or filled.
+ *
+ * \param  role the demanded role
+ * \return a pointer to the transition or a NULL pointer if the place was not
+ *         found.
+ */
+Transition *PetriNet::findTransition(string role)
+{
+  Transition *result = (Transition *)roleMap[role];
+
+  if (result == NULL)
+    trace(TRACE_DEBUG, "[PN]\tTransition with role \"" + role + "\" not found.\n");
+
+  return result;
 }
 
 

@@ -40,14 +40,14 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/15 15:32:27 $
+ *          - last changed: \$Date: 2005/12/18 12:59:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *          
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
  */
 
 
@@ -313,6 +313,9 @@ class PetriNet
     /// Finds place given an activity with a role.
     Place *findPlace(kc::impl_activity* activity, string role);
 
+    /// Finds transition given a role.
+    Transition *findTransition(string role);
+    
     /// Simplifies the Petri net.
     void simplify();
 

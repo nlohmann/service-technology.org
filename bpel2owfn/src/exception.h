@@ -31,18 +31,14 @@
  *          
  * \date
  *          - created: 2005/11/15
- *          - last changed: \$Date: 2005/12/15 14:33:52 $
+ *          - last changed: \$Date: 2005/12/18 23:05:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.11 $
- *          - 2005-11-15 (gierds) Initial version.
- *          - 2005-11-15 (nlohmann) Overworked class and moved error output
- *            into class.
- *
+ * \version \$Revision: 1.12 $
  */
 
 

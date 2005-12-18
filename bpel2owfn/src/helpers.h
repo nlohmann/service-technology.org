@@ -32,7 +32,7 @@
  *          
  * \date    
  * 	    - created: 2005-11-11
- *          - last changed: \$Date: 2005/12/13 22:33:49 $
+ *          - last changed: \$Date: 2005/12/18 23:05:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -134,7 +134,7 @@ set<Node *> setUnion(set<Node *> a, set<Node *> b);
 /// Converts int to string.
 string intToString(int i);
 
-///
+/// Formats a debug information.
 string pos(const char *file, int line, const char *function);
 
 /// Prints help for command line arguments

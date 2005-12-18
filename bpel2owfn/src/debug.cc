@@ -29,18 +29,14 @@
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2005/12/13 22:33:48 $
+ *          - last changed: \$Date: 2005/12/18 23:05:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.12 $
- *          - 2005-11-09 (gierds) Initial release.
- *            Simple trace methods and new place for yyerror().
- *          - 2005-11-20 (nlohmann) Overworked and commented yyerror().
- *
+ * \version \$Revision: 1.13 $
  */
 
 #include "debug.h"
@@ -67,6 +63,9 @@ void trace(trace_level pTraceLevel, std::string message)
     std::cerr << message << std::flush;
   }
 }
+
+
+
 
 
 /**

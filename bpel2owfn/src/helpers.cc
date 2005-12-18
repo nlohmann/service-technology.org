@@ -32,29 +32,35 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2005/12/13 22:33:49 $
+ *          - last changed: \$Date: 2005/12/18 23:05:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.24 $
- *          - 2005-11-11 (nlohmann) Initial version.
- *          - 2005-11-15 (gierds) Moved commandline evaluation functions from
- *            main.cc to here.
- *            Added LoLA command line arguments.
- *          - 2005-11-16 (gierds) Added error() and cleanup() functions.
- *            Added extra command line parameters to debug flex and bison.
- *          - 2005-11-22 (gierds) Added cleanup of scopes.
- *          - 2005-12-13 (gierds) Added command line option to create oWFN.
+ * \version \$Revision: 1.25 $
+ *
+ * \todo
+ *       - add a version output
  */
+
+
+
 
 
 #include "helpers.h"
 
+
+
+
+
 /// The Petri Net
 extern PetriNet *TheNet;
+
+
+
+
 
 /*!
  * \param a set of Petri net nodes
@@ -91,7 +97,10 @@ string intToString(int i)
 
 
 /*!
- * \todo (nlohmann) Comment me!
+ * \param  file     a filename
+ * \param  line     a line number
+ * \param  function a function
+ * \return a formatted string uniting the given information
  */
 string pos(const char *file, int line, const char *function)
 {
@@ -103,7 +112,7 @@ string pos(const char *file, int line, const char *function)
 
 
 
-// --------------------- functions for command line evaluation --------------------------------
+// --------------------- functions for command line evaluation ------------------------
 
 void print_help() 
 {
@@ -123,7 +132,7 @@ void print_help()
   trace("   -h  | --help               - print this screen\n");
   trace("\n");
   trace("\n");
-  trace("output modes (choose at maximum one, default is just parsing):\n");
+  trace("output modes (choose at most one, default is just parsing):\n");
   trace("\n");
   trace("   -a  | --ast               - output the AST\n");
   trace("   -x  | --xml               - output simple XML w/o any unnecessary\n");
@@ -158,10 +167,14 @@ void print_help()
   trace("                               (implies option -D)\n");
   trace("\n");
   trace("For more information see:\n");
-  trace("  http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel/\n");
+  trace("  http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel\n");
   trace("\n");
 
 }
+
+
+
+
 
 void parse_command_line(int argc, char* argv[])
 {
@@ -470,77 +483,52 @@ void parse_command_line(int argc, char* argv[])
   // trace information about current mode
   trace(TRACE_INFORMATION, "\nModus operandi:\n");
   if (mode_simplify_petri_net)
-  {
     trace(TRACE_INFORMATION, " - create structural simlified Petri Net\n");
-  }
   else if (mode_petri_net)
-  {
     trace(TRACE_INFORMATION, " - create Petri Net\n");
-  }
-  if (mode_low_level_petri_net)
-  {
-    trace(TRACE_INFORMATION, "   --> abstract to low level\n");
-  }
-  if (mode_petri_net && mode_file) 
-  {
-    trace(TRACE_INFORMATION, " - output information about the Petri Net to file " + info_filename + "\n");
-  }
 
+  if (mode_low_level_petri_net)
+    trace(TRACE_INFORMATION, "   --> abstract to low level\n");
+
+  if (mode_petri_net && mode_file) 
+    trace(TRACE_INFORMATION, " - output information about the Petri Net to file " + info_filename + "\n");
 
   if (mode_lola_2_file)
-  {
     trace(TRACE_INFORMATION, " - output LoLA input of the Petri Net to file " + lola_filename + "\n");
-  }
   else if (mode_lola_petri_net)
-  {
     trace(TRACE_INFORMATION, " - output LoLA input of the Petri Net\n");
-  }
 
   if (mode_owfn_2_file)
-  {
     trace(TRACE_INFORMATION, " - output oWFN input of the Petri Net to file " + owfn_filename + "\n");
-  }
   else if (mode_owfn_petri_net)
-  {
     trace(TRACE_INFORMATION, " - output oWFN input of the Petri Net\n");
-  }
 
   if (mode_dot_2_file)
-  {
     trace(TRACE_INFORMATION, " - output dot representation of the Petri Net to file " + dot_filename + "\n");
-  }
   else if (mode_dot_petri_net)
-  {
     trace(TRACE_INFORMATION, " - output dot representation of the Petri Net\n");
-  }
   
   if (mode_pretty_printer)
-  {
     trace(TRACE_INFORMATION, " - output \"pretty\" XML\n");
-  }
 
   if (mode_ast)
-  {
     trace(TRACE_INFORMATION, " - output AST\n");
-  }
 
   if (debug_level > 0)
-  {
     trace(TRACE_INFORMATION, " - debug level is set to " + intToString(debug_level) + "\n");
-  }
-  
+ 
   if (yy_flex_debug > 0)
-  {
     trace(TRACE_INFORMATION, " - special debug mode for flex is enabled\n");
-  }
+
   if (yydebug > 0)
-  {
     trace(TRACE_INFORMATION, " - special debug mode for yacc/bison is enabled\n");
-  }
   
   trace(TRACE_INFORMATION, "\n");
-
 }
+
+
+
+
 
 /**
  * Some output in case an error has occured.
@@ -555,6 +543,10 @@ void error()
   exit(1);
 
 }
+
+
+
+
 
 /**
  * Some output in case an error has occured.
@@ -574,6 +566,10 @@ void error(Exception e)
   // stop execution
   exit(e.id);
 }
+
+
+
+
 
 /**
  * Cleans up.

@@ -29,16 +29,14 @@
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2005/12/13 22:33:48 $
+ *          - last changed: \$Date: 2005/12/18 23:05:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.12 $
- *          - 2005-11-15 (gierds) Trace level as enum.
- *
+ * \version \$Revision: 1.13 $
  */
 
 #ifndef DEBUG_H
@@ -62,6 +60,9 @@ typedef enum
 } trace_level;
 
 
+
+
+
 /**
  * Provides output to stderr using different #trace_level 
  * (in order to regulate amount of output)
@@ -72,6 +73,10 @@ typedef enum
  */
 void trace(trace_level pTraceLevel, std::string message);
 
+
+
+
+
 /**
  * Works like #trace(trace_level,std::string) with trace_level = TRACE_ALWAYS
  *
@@ -79,6 +84,10 @@ void trace(trace_level pTraceLevel, std::string message);
  *
  */
 void trace(std::string message);
+
+
+
+
 
 /// Signalling syntax errors.
 int yyerror(const char* msg);

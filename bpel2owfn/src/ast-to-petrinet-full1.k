@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/16 14:37:51 $
+ *          - last changed: \$Date: 2005/12/18 12:59:22 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.75 $
+ * \version \$Revision: 1.76 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
@@ -178,7 +178,11 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       Transition *process_t3 =  TheNet->newTransition(prefix + "t3");
       Transition *process_t4 =  TheNet->newTransition(prefix + "t4");
       Transition *process_t5 =  TheNet->newTransition(prefix + "t5");
-      Transition *process_t6 =  TheNet->newTransition(prefix + "t6"); 
+      Transition *process_t6 =  TheNet->newTransition(prefix + "t6");
+      
+      Transition *process_loop =  TheNet->newTransition(prefix + "finishloop"); // added so that all deadlocks are evil!
+      TheNet->newArc(process_p39, process_loop, READ);
+      
       TheNet->newArc(process_p27, process_t1);
       TheNet->newArc(process_t1,  process_p34);
       TheNet->newArc(process_p1,  process_t2);
@@ -1338,7 +1342,7 @@ This=implicitCompensationHandler() ->
       Transition *t1  = TheNet->newTransition(prefix + "t1", "scope=s");
       Transition *t2  = TheNet->newTransition(prefix + "t2", "scope=s");
       Transition *t3  = TheNet->newTransition(prefix + "t3");
-      Transition *t4  = TheNet->newTransition(prefix + "t2", "scope=s");
+      Transition *t4  = TheNet->newTransition(prefix + "t4", "scope=s");
       Transition *t6  = TheNet->newTransition(prefix + "t6");
       Transition *t7  = TheNet->newTransition(prefix + "t7");
       Transition *t8  = TheNet->newTransition(prefix + "t8");
@@ -1938,7 +1942,7 @@ This=Throw(a) ->
       Transition *t3  = TheNet->newTransition(prefix + "t3");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
-      TheNet->newArc(t1, p5, This->faultName);
+      TheNet->newArc(t1, p5, string(This->faultName->name));
       TheNet->newArc(p1, t2);
       TheNet->newArc(p3, t2);
       TheNet->newArc(t2, p4);
@@ -2390,6 +2394,25 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
       TheNet->mergePlaces(This, ".internal.failed", c, ".failed");
 
       trace(TRACE_DEBUG, "[PNU]\t</otherwise>\n");
+
+
+      // create the arcs for the DPE
+      int currentCase1 = 1;
+      foreach (thisCaseBranch=Case(innerActivity1); tCase_list b)
+      {
+	int currentCase2 = 1;
+	foreach (otherCaseBranch=Case(innerActivity2); tCase_list b)
+	{
+	  if (innerActivity1 != innerActivity2)
+	    TheNet->newArc(TheNet->findTransition(prefix + "t2.case" + intToString(currentCase1)), TheNet->findPlace(innerActivity2, ".negLink"));
+
+	  TheNet->newArc(TheNet->findTransition(prefix + "t2.case" + intToString(currentCase1)), TheNet->findPlace(c, ".negLink"));
+	  currentCase2++;
+	}
+	TheNet->newArc(TheNet->findTransition(prefix + "t2.otherwise"), TheNet->findPlace(innerActivity1, ".negLink"));
+	currentCase1++;
+      }
+      
       trace(TRACE_DEBUG, "[PNU]\t</switch>\n");
     }
   ]
@@ -2803,21 +2826,21 @@ This=Scope(a,b,c,d,e,f,g)
       string prefix2 = intToString(This->id->value) + ".internal.";
 	    
       // embed fault handler
-      TheNet->mergePlaces(prefix + "p43",    prefix2 + "faultHandler.fault");
-      TheNet->mergePlaces(prefix + "p44",    prefix2 + "faultHandler.faultSave");
-      TheNet->mergePlaces(prefix + "p47",    prefix2 + "faultHandler.rethrow");
-      TheNet->mergePlaces(prefix + "p41",    prefix2 + "faultHandler.ft");
-      TheNet->mergePlaces(prefix + "p42",    prefix2 + "faultHandler.ftSave");
-      TheNet->mergePlaces(prefix + "!Ended", prefix2 + "faultHandler.!Ended");
-      TheNet->mergePlaces(prefix + "Ended",  prefix2 + "faultHandler.Ended");
-      TheNet->mergePlaces(prefix + "p49",    prefix2 + "faultHandler.ch_fh");
-      TheNet->mergePlaces(prefix + "p50",    prefix2 + "faultHandler.ch_out");
-      TheNet->mergePlaces(prefix + "final",  prefix2 + "faultHandler.out");
-      TheNet->mergePlaces(prefix + "p52",    prefix2 + "faultHandler.trueOut");
-      TheNet->mergePlaces(prefix + "p53",    prefix2 + "faultHandler.sourceFalse");
-      TheNet->mergePlaces(prefix + "p54",    prefix2 + "faultHandler.falseOut");
-      TheNet->mergePlaces(prefix + "p48",    prefix2 + "faultHandler.upperFH");
-      TheNet->mergePlaces(prefix + "p46",    prefix2 + "faultHandler.stopped");
+      TheNet->mergePlaces(prefix + "p43",     prefix2 + "faultHandler.fault");
+      TheNet->mergePlaces(prefix + "p44",     prefix2 + "faultHandler.faultSave");
+      TheNet->mergePlaces(prefix + "p47",     prefix2 + "faultHandler.rethrow");
+      TheNet->mergePlaces(prefix + "p41",     prefix2 + "faultHandler.ft");
+      TheNet->mergePlaces(prefix + "p42",     prefix2 + "faultHandler.ftSave");
+      TheNet->mergePlaces(prefix + "!Ended",  prefix2 + "faultHandler.!Ended");
+      TheNet->mergePlaces(prefix + "Ended",   prefix2 + "faultHandler.Ended");
+      TheNet->mergePlaces(prefix + "p49",     prefix2 + "faultHandler.ch_fh");
+      TheNet->mergePlaces(prefix + "p50",     prefix2 + "faultHandler.ch_out");
+      TheNet->mergePlaces(prefix + "final",   prefix2 + "faultHandler.out");
+      TheNet->mergePlaces(prefix + "p52",     prefix2 + "faultHandler.trueOut");
+      TheNet->mergePlaces(prefix + "p53",     prefix2 + "faultHandler.sourceFalse");
+      TheNet->mergePlaces(prefix + "p54",     prefix2 + "faultHandler.falseOut");
+      TheNet->mergePlaces(prefix + "p48",     prefix2 + "faultHandler.upperFH");
+      TheNet->mergePlaces(prefix + "stopped", prefix2 + "faultHandler.stopped");
 
       // embed the compensation handler
       TheNet->mergePlaces(prefix + "ch_in",            prefix2 + "compensationHandler.ch_in");
@@ -2877,7 +2900,8 @@ This=Scope(a,b,c,d,e,f,g)
       // merge (!)Terminated places
       TheNet->mergePlaces(TheNet->findPlace("1.internal.!Terminated"), p8);
       TheNet->mergePlaces(TheNet->findPlace("1.internal.Terminated"), p9);
-      
+
+      currentScope = intToString(This->parentScopeId->value) + ".internal.";
       trace(TRACE_DEBUG, "[PNU]\t</scope>\n");
     }
   ]

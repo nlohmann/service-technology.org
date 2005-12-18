@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/18 20:59:47 $
+ *          - last changed: \$Date: 2005/12/18 22:02:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,12 +44,11 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.78 $
+ * \version \$Revision: 1.79 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
  *          - (nlohmann) outsource <compensate />-elements
- *          - (nlohmann) DPE in pick
  *          - (nlohmann) variables in communicating actions should be optional
  */
 %}
@@ -1259,7 +1258,7 @@ This=EventHandler(a,b) ->
 	TheNet->mergePlaces(onAlarm_p10, TheNet->findPlace(innerActivity, ".stopped"));
 	TheNet->mergePlaces(onAlarm_p2,  TheNet->findPlace(innerActivity, ".final"));
 	
-	onMessageCount++;
+	onAlarmCount++;
       }
     }
   ]
@@ -2403,20 +2402,18 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
 
 
       // create the arcs for the DPE
-      int currentCase1 = 1;
+      currentCase = 1;
       foreach (thisCaseBranch=Case(innerActivity1); tCase_list b)
       {
-	int currentCase2 = 1;
 	foreach (otherCaseBranch=Case(innerActivity2); tCase_list b)
 	{
 	  if (innerActivity1 != innerActivity2)
-	    TheNet->newArc(TheNet->findTransition(prefix + "t2.case" + intToString(currentCase1)), TheNet->findPlace(innerActivity2, ".negLink"));
+	    TheNet->newArc(TheNet->findTransition(prefix + "t2.case" + intToString(currentCase)), TheNet->findPlace(innerActivity2, ".negLink"));
 
-	  TheNet->newArc(TheNet->findTransition(prefix + "t2.case" + intToString(currentCase1)), TheNet->findPlace(c, ".negLink"));
-	  currentCase2++;
+	  TheNet->newArc(TheNet->findTransition(prefix + "t2.case" + intToString(currentCase)), TheNet->findPlace(c, ".negLink"));
 	}
 	TheNet->newArc(TheNet->findTransition(prefix + "t2.otherwise"), TheNet->findPlace(innerActivity1, ".negLink"));
-	currentCase1++;
+	currentCase++;
       }
       
       trace(TRACE_DEBUG, "[PNU]\t</switch>\n");
@@ -2665,13 +2662,45 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	TheNet->mergePlaces(TheActivity, ".final",   innerActivity, ".final");
 	TheNet->mergePlaces(TheActivity, ".failed",  innerActivity, ".failed");
 
-	onMessageCount++;
+	onAlarmCount++;
 	trace(TRACE_DEBUG, "[PNU]\t</onAlarm>\n");
       }
 
+
       // create the arcs for the DPE
-      // TODO
+      int currentMessage = 1;
+      foreach (OnMessage(innerActivity1); tOnMessage_list b)
+      {
+	foreach (OnMessage(innerActivity2); tOnMessage_list b)
+	{
+	  if (innerActivity1 != innerActivity2)
+	    TheNet->newArc(TheNet->findTransition(prefix + "onMessage" + intToString(currentMessage) + ".t3"), TheNet->findPlace(innerActivity2, ".negLink"));
+	}
+
+	foreach (OnAlarm(innerActivity2); tOnAlarm_list c)
+	{
+	  TheNet->newArc(TheNet->findTransition(prefix + "onMessage" + intToString(currentMessage) + ".t3"), TheNet->findPlace(innerActivity2, ".negLink"));
+	}
+	currentMessage++;
+      }
       
+      int currentAlarm = 1;
+      foreach (OnAlarm(innerActivity1); tOnAlarm_list c)
+      {
+	foreach (OnAlarm(innerActivity2); tOnAlarm_list c)
+	{
+	  if (innerActivity1 != innerActivity2)
+	    TheNet->newArc(TheNet->findTransition(prefix + "onAlarm" + intToString(currentAlarm) + ".t6"), TheNet->findPlace(innerActivity2, ".negLink"));
+	}
+
+	foreach (OnMessage(innerActivity2); tOnMessage_list b)
+	{
+	  TheNet->newArc(TheNet->findTransition(prefix + "onAlarm" + intToString(currentAlarm) + ".t6"), TheNet->findPlace(innerActivity2, ".negLink"));
+	}
+	currentAlarm++;
+      }
+      
+     
       trace(TRACE_DEBUG, "[PNU]\t</pick>\n");
     }
   ]

@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/18 22:02:21 $
+ *          - last changed: \$Date: 2005/12/18 22:41:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,12 +44,14 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.79 $
+ * \version \$Revision: 1.80 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
  *          - (nlohmann) outsource <compensate />-elements
  *          - (nlohmann) variables in communicating actions should be optional
+ *          - (nlohmann) handle faults in fault handlers
+ *          - (nlohmann) What if a becomes active while a fault is handled?
  */
 %}
 
@@ -1426,7 +1428,7 @@ This=implicitCompensationHandler() ->
 
 
 
-
+/*------------------- below is the positive control flow --------------------*/
 
 
 

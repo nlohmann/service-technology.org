@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2005/12/18 15:58:36 $
+ *          - last changed: \$Date: 2005/12/18 19:22:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.71 $
+ * \version \$Revision: 1.72 $
  */
 
 
@@ -52,11 +52,12 @@
 
 
 extern int debug_level;              // defined in debug.cc
-extern ostream *dot_output;          // defined in main.c
-extern ostream *lola_output;         // defined in main.c
-extern ostream *info_output;         // defined in main.c
-extern string filename;              // defined in main.c
-extern bool mode_simplify_petri_net; // defined in main.c
+extern ostream *dot_output;          // defined in main.cc
+extern ostream *lola_output;         // defined in main.cc
+extern ostream *info_output;         // defined in main.cc
+extern ostream *owfn_output;         // defined in main.cc
+extern string filename;              // defined in main.cc
+extern bool mode_simplify_petri_net; // defined in main.cc
 extern SymbolManager symMan;         // defined in bpel-syntax.y
 
 
@@ -723,6 +724,7 @@ void PetriNet::removeInterface()
 
 
 
+
 /*!
  * Outputs the net in LoLA-format.
  */
@@ -804,6 +806,134 @@ void PetriNet::lolaOut()
     (*lola_output) << endl;
   }
   (*lola_output) << "{ END OF FILE }" << endl;
+}
+
+
+
+
+
+/*!
+ * Outputs the net in oWFN-format.
+ */
+void PetriNet::owfnOut()
+{
+  trace(TRACE_DEBUG, "[PN]\tCreating oWFN-output.\n");
+
+  if (!lowLevel)
+    makeLowLevel();
+
+  (*owfn_output) << "{ oWFN created by BPEL2oWFN reading " << filename << " }" << endl << endl;
+  
+  // places
+  (*owfn_output) << "PLACE" << endl;
+
+  // input places
+  (*owfn_output) << "  INPUT" << endl;
+  unsigned int count = 1;
+  string comment;
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  {
+    if ( (*p)->type == IN)
+    {
+      if (count == 1)
+	(*owfn_output) << "    p" << (*p)->id;	
+      else
+	(*owfn_output) << ", " << comment << "    p" << (*p)->id;
+
+      comment = "\t\t { " + (*(*p)->history.begin()) + " }\n";
+      count++;
+    }
+  }
+  (*owfn_output) << "; " << comment << endl;
+
+  // output places
+  (*owfn_output) << "  OUTPUT" << endl;
+  count = 1;
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  {
+    if ( (*p)->type == OUT)
+    {
+      if (count == 1)
+	(*owfn_output) << "    p" << (*p)->id;	
+      else
+	(*owfn_output) << ", " << comment << "    p" << (*p)->id;
+
+      comment = "\t\t { " + (*(*p)->history.begin()) + " }\n";
+      count++;
+    }
+  }
+  (*owfn_output) << "; " << comment << endl;
+  
+  // internal places
+  (*owfn_output) << "  INTERNAL" << endl;
+  count = 1;
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  {
+    if ( (*p)->type == INTERNAL)
+    {
+      if (count == 1)
+	(*owfn_output) << "    p" << (*p)->id;	
+      else
+	(*owfn_output) << ", " << comment << "    p" << (*p)->id;
+
+      comment = "\t\t { " + (*(*p)->history.begin()) + " }\n";
+      count++;
+    }
+  }
+  (*owfn_output) << "; " << comment << endl << endl;
+  
+  
+  // initial marking
+  (*owfn_output) << "MARKING" << endl;
+  (*owfn_output) << "  p" << findPlace("1.internal.initial")->id << ":\t1,\t { initial marking of the process }" << endl;
+
+  for (list<string>::iterator variable = symMan.variables.begin(); variable != symMan.variables.end(); variable++)
+    (*owfn_output) << "  p" << findPlace("variable." + *variable)->id << ":\t1,\t { initial marking of variable" << *variable << " }" << endl;
+
+  (*owfn_output) << "  p" << findPlace("1.internal.clock")->id << ":\t1\t { initial marking of the clock }" << endl;
+  (*owfn_output)   << ";" << endl << endl << endl;
+
+
+  // transitions
+  count = 1;
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); count++,t++)
+  {
+    (*owfn_output) << "TRANSITION t" << (*t)->id << "\t { " << (*(*t)->history.begin()) << " }" << endl;
+    set<pair<Node *, arc_type> > consume = preset(*t);
+    set<pair<Node *, arc_type> > produce = postset(*t);    
+
+    (*owfn_output) << "CONSUME" << endl;
+    if (consume.empty())
+      (*owfn_output) << ";" << endl;
+    
+    unsigned int count2 = 1;
+    for (set<pair<Node *, arc_type> >::iterator pre = consume.begin(); pre != consume.end(); count2++, pre++)
+    {
+      (*owfn_output) << "  p" << (*pre).first->id << ":\t1";
+
+      if (count2 < consume.size())
+	(*owfn_output) << "," << endl;
+      else
+	(*owfn_output) << ";" << endl;
+    }
+  
+    (*owfn_output) << "PRODUCE" << endl;
+    if (produce.empty())
+      (*owfn_output) << ";" << endl;
+    
+    count2 = 1;
+    for (set<pair<Node *, arc_type> >::iterator post = produce.begin(); post != produce.end(); count2++, post++)
+    {
+      (*owfn_output) << "  p" << (*post).first->id << ":\t1";
+
+      if (count2 < produce.size())
+	(*owfn_output) << "," << endl;
+      else
+	(*owfn_output) << ";" << endl;
+    }
+    (*owfn_output) << endl;
+  }
+  (*owfn_output) << "{ END OF FILE }" << endl;
 }
 
 

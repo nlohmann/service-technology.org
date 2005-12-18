@@ -40,14 +40,14 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/18 12:59:39 $
+ *          - last changed: \$Date: 2005/12/18 19:22:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *          
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
  */
 
 
@@ -294,6 +294,9 @@ class PetriNet
 
     /// LoLA-output.
     void lolaOut();
+
+    /// oWFN-output.
+    void owfnOut();
     
     /// Merges places given two places.
     void mergePlaces(Place *p1, Place *p2);

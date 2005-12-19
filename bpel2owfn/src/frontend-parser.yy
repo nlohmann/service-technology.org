@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/18 23:16:02 $
+ *          - last changed: \$Date: 2005/12/19 16:25:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.74 $
+ * \version \$Revision: 1.75 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -1498,7 +1498,9 @@ tOtherwise:
 
 tWhile:
   K_WHILE arbitraryAttributes X_NEXT 
-    { inWhile = true; }
+    { 
+      // inWhile = true;
+    }
   standardElements 
   activity 
   X_NEXT X_SLASH K_WHILE
@@ -1509,7 +1511,8 @@ tWhile:
       $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->condition = att.read($2, "condition");
       $$->id = $5->parentId = $2; 
-      inWhile=false; }
+      // inWhile=false; 
+    }
 ;
 
 

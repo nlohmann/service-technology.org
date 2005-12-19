@@ -26,18 +26,18 @@
  *
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/13 22:33:48 $
+ *          - last changed: \$Date: 2005/12/19 16:25:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
  *          - 2005-11-22 (gierds) Initial version.
  *          - 2005-11-24 (gierds) Put all funcionality into a class #SymbolManager
  *          - 2005-11-29 (gierds) Added checking of variables.
@@ -66,6 +66,7 @@ class SymbolManager;
 class SymbolScope;
 class ScopeScope;
 class FlowScope;
+class BoundScope;
 class csPartnerLink;
 class csVariable;
 class csLink;
@@ -257,6 +258,29 @@ class FlowScope: public SymbolScope
     FlowScope(kc::integer myid, SymbolScope* myparent);
 
     ~FlowScope();
+};
+
+/**
+ * \class	BoundScope
+ *
+ * \author	Christian Gierds <gierds@informatik.hu-berlin.de>
+ *
+ * \brief	This is just an abstract scope class.
+ *
+ * This class is used as a bound for while activities, fault,
+ * compensation and event handler, in order to ensure, that no
+ * links cross the boudaries of these activities.
+ *
+ */
+class BoundScope: public SymbolScope
+{
+  public:
+    /// Constructor for scope without parent
+    BoundScope(kc::integer myid);
+    /// Constructor for scope with parent scope
+    BoundScope(kc::integer myid, SymbolScope* myparent);
+
+    ~BoundScope();
 };
 
 

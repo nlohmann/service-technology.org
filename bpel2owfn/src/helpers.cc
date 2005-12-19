@@ -28,18 +28,18 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2005/12/18 23:05:07 $
+ *          - last changed: \$Date: 2005/12/19 16:25:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.25 $
+ * \version \$Revision: 1.26 $
  *
  * \todo
  *       - add a version output
@@ -150,20 +150,20 @@ void print_help()
   trace("                               should not used together with -D, -O\n");
   trace("                               (implies option -pn)\n");
   trace("   -L2F | --lola2file        - output LoLA input into file (same name as\n");
-  trace("                               input file\n");
+  trace("                               input file)\n");
   trace("                               (implies option -L)\n");
   /// \todo give the oWFN tool a name
   trace("   -O   | --owfn             - output oWFN input,\n");
   trace("                               should not used together with -D, -L\n");
   trace("                               (implies option -pn)\n");
   trace("   -O2F | --owfn2file        - output oWFN input into file (same name as\n");
-  trace("                               input file\n");
+  trace("                               input file)\n");
   trace("                               (implies option -O)\n");
   trace("   -D   | --dot              - output dot input,\n");
   trace("                               should not used together with -L, -O\n");
   trace("                               (implies option -pn)\n");
   trace("   -D2F | --dot2file         - output dot input into file (same name as\n");
-  trace("                               input file\n");
+  trace("                               input file)\n");
   trace("                               (implies option -D)\n");
   trace("\n");
   trace("For more information see:\n");

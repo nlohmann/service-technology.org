@@ -30,7 +30,7 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/14 10:16:28 $
+ *          - last changed: \$Date: 2005/12/19 16:25:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
@@ -462,12 +462,6 @@ kc::casestring SymbolManager::checkLink(csLink* link, bool asSource)
     return kc::mkcasestring(string().c_str());
   }
 
-  // exit because in while activities no links are allowed
-  if (inWhile)
-  {
-    yyerror(string("Usage of Links is not allowed within Whiles\n").c_str());
-  }
-
   trace(TRACE_DEBUG, "[CS] Checking Link " + link->name + "\n");
   try
   {
@@ -771,6 +765,23 @@ FlowScope::~FlowScope()
     trace(TRACE_VERY_DEBUG, "[CS]      Deleting link " + (*iter)->name + "\n");
     delete(*iter);
   }
+}
+
+/// \todo (gierds) comment me
+BoundScope::BoundScope(kc::integer myid) : SymbolScope(myid)
+{
+  // empty	
+}
+
+/// \todo (gierds) comment me
+BoundScope::BoundScope(kc::integer myid, SymbolScope* myparent) : SymbolScope(myid, myparent)
+{
+  // empty
+}
+
+BoundScope::~BoundScope()
+{
+  // empty  
 }
 
 /// \todo (gierds) comment me

@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/18 22:41:57 $
+ *          - last changed: \$Date: 2005/12/19 15:59:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.80 $
+ * \version \$Revision: 1.81 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
@@ -1949,6 +1949,8 @@ This=Throw(a) ->
       Transition *t3  = TheNet->newTransition(prefix + "t3");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
+      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t1); // new fault management
+      TheNet->newArc(t1, TheNet->findPlace(currentScope + "!Active")); // newer fault management
       TheNet->newArc(t1, p5, string(This->faultName->name));
       TheNet->newArc(p1, t2);
       TheNet->newArc(p3, t2);

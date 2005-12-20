@@ -29,11 +29,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $ 
+ *          - last changes of: \$Author: gierds $ 
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2005/12/14 10:06:21 $
+ *          - last changed: \$Date: 2005/12/20 16:01:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.38 $
+ * \version \$Revision: 1.39 $
  */
 %}
 
@@ -206,6 +206,10 @@ tEventHandlers:
 
 tOnMessage_list:
   list tOnMessage
+  {
+    /// additional attribute for DPE
+    integer dpe;
+  }
 ;
 
 tOnAlarm_list:
@@ -225,6 +229,9 @@ tOnMessage:
 
     /// additional attribute containing the channel name
     casestring channelID;
+
+    /// additional attribute for DPE
+    integer dpe;
   }
 ;
 
@@ -348,6 +355,9 @@ tInvoke:
 
     /// additional attribute containing the channel name
     casestring channelID;
+
+    /// additional attribute for DPE
+    integer dpe;
 
     integer id;
   }	
@@ -554,6 +564,9 @@ tFlow:
     casestring joinCondition;
     casestring suppressJoinFailure = mkcasestring("no");
 
+    /// additional attribute for DPE
+    integer dpe;
+
     integer id;
   }
 ;
@@ -588,18 +601,28 @@ tSwitch:
     casestring joinCondition;
     casestring suppressJoinFailure = mkcasestring("no");
 
+    /// additional attribute for DPE
+    integer dpe;
+
     integer id;
   }
 ;
 
 tCase_list:
   list tCase
+  {
+    // additional attribute for DPE
+    integer dpe;
+  }
 ;
 
 tCase:
   Case(activity)
   {
     casestring condition;
+
+    // additional attribute for DPE
+    integer dpe;
   }
 ;
 
@@ -638,6 +661,9 @@ tSequence:
     casestring suppressJoinFailure = mkcasestring("no");
 
     integer id;
+
+    // additional attribute for DPE
+    integer dpe;
   }
 ;
 
@@ -654,6 +680,9 @@ tPick:
     casestring suppressJoinFailure = mkcasestring("no");
     
     casestring createInstance = mkcasestring("no");
+
+    /// additional attribute for DPE
+    integer dpe;
 
     integer id;
   }
@@ -683,6 +712,9 @@ tScope:
 
     integer id;
     integer parentScopeId;
+
+    // additional attribute for DPE
+    integer dpe;
   }
 ;
 
@@ -698,6 +730,9 @@ standardElements:
     integer parentId;
     casestring suppressJoinFailure; // actually a value of the parent
     casestring joinCondition;       // actually a value of the parent
+
+    // additional attribute for DPE
+    integer dpe;
   }
 ;
 
@@ -717,6 +752,10 @@ tTarget:
 
 tSource_list:
   list tSource
+  {
+    // additional attribute for DPE
+    integer dpe;
+  }
 ;
 
 tSource:
@@ -727,5 +766,8 @@ tSource:
 
     // additional attribute containing the unique link name
     casestring linkID;
+
+    // additional attribute for DPE
+    integer dpe;
   }
 ;

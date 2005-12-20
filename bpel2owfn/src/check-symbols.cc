@@ -30,7 +30,7 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/19 16:25:47 $
+ *          - last changed: \$Date: 2005/12/20 16:01:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
@@ -470,7 +470,7 @@ kc::casestring SymbolManager::checkLink(csLink* link, bool asSource)
     SymbolScope * scope = currentScope;
     while ((! found) && (scope != NULL))
     {
-      // ascent to next scope with variable definitions
+      // ascent to next scope with link definitions
       trace(TRACE_VERY_DEBUG, "[CS]   Ascending to next suitable scope ...\n");
       while ((scope != NULL) && (typeid(*scope) != typeid(FlowScope)))
       {
@@ -522,6 +522,22 @@ kc::casestring SymbolManager::checkLink(csLink* link, bool asSource)
     {
       yyerror(string("Name of undefined Link is \"" + link->name + "\"\n").c_str());
     }
+    // if there is a surrounding scope, tell it that the link exists
+    if (asSource)
+    {
+      scope = currentScope;
+      while( (scope != NULL) && (typeid(*scope) != typeid(ScopeScope)) )
+      {
+        scope = scope->parent;
+      }
+      if ( (scope != NULL) && typeid(*scope) == typeid(ScopeScope))
+      {
+        trace(TRACE_VERY_DEBUG, "[CS]   Adding " + uniqueID 
+	  	              + " to list of inner links for Scope " 
+			      + intToString(scope->id->value) + "\n");
+        (dynamic_cast <ScopeScope *> (scope))->innerLinks.push_back(uniqueID);
+      }
+    }
   }
   catch(bad_cast)
   {
@@ -562,10 +578,6 @@ void SymbolManager::checkLinks()
     trace(TRACE_DEBUG,"[CS] Checking correct usage of links\n");
     if (typeid(*currentScope) == typeid(FlowScope))
     {
-//        for (list<csLink*>::iterator 
-//	        iter = (dynamic_cast <FlowScope *> (scope))->links.begin();
-// 	        iter != (dynamic_cast <FlowScope *> (scope))->links.end(); 
-//	        iter++)
       for (list<csLink*>::iterator 
 		      iter = (dynamic_cast <FlowScope*> (currentScope))->links.begin();
 		      iter != (dynamic_cast <FlowScope*> (currentScope))->links.end();
@@ -639,6 +651,72 @@ kc::casestring SymbolManager::addChannel(csChannel * channel, bool isInChannel)
   // return unique name
   return channel->name();
 }
+
+/* --- Dead Path Elimination --- */
+/// add a possible start for DPE
+void SymbolManager::addDPEstart()
+{
+  trace(TRACE_VERY_DEBUG, "[CS] DPE: Adding possible start\n");
+  dpePossibleStarts++;
+}
+
+/// add a possible end for DPE
+void SymbolManager::addDPEend()
+{
+  trace(TRACE_VERY_DEBUG, "[CS] DPE: Adding possible end\n");
+  dpePossibleEnds++;
+}
+
+/// remove a possible start for DPE
+void SymbolManager::remDPEstart()
+{
+  trace(TRACE_VERY_DEBUG, "[CS] DPE: Removing possible start\n");
+  dpePossibleStarts--;
+}
+
+/// remove a possible end for DPE
+void SymbolManager::remDPEend()
+{
+  trace(TRACE_VERY_DEBUG, "[CS] DPE: Removing possible end(s)\n");
+  dpePossibleEnds = 0;
+}
+
+/// links are not allowed to cross the borders of whiles, so special treatment
+void SymbolManager::startDPEinWhile()
+{
+  trace(TRACE_VERY_DEBUG, "[CS] DPE: Entering while\n");
+  dpeStartStack.push(dpePossibleStarts);
+  dpePossibleStarts = 0;
+  dpePossibleEnds = 0;
+}
+
+/// links are not allowed to cross the borders of whiles, so special treatment
+void SymbolManager::endDPEinWhile()
+{
+  trace(TRACE_VERY_DEBUG, "[CS] DPE: Leaving while\n");
+  dpePossibleStarts = dpeStartStack.top();
+  dpeStartStack.pop();
+  dpePossibleEnds = 0;
+}
+
+/// checks if weed need a negLink under current conditions
+kc::integer SymbolManager::needsDPE()
+{
+  // if we have possible starts and ends, we need a negLink and return 1
+  if ( (dpePossibleEnds > 0) && (dpePossibleStarts > 0))
+  {
+    trace(TRACE_DEBUG, "[CS] DPE: negLink needed\n");
+    trace(TRACE_VERY_DEBUG, "[CS] DPE: possible starts: " + intToString(dpePossibleStarts) + "\n"
+		          + "          possible ends: " + intToString(dpePossibleEnds) + "\n");
+    return kc::mkinteger(1);
+  }
+  // no need for a negLink, so return 0
+  trace(TRACE_DEBUG, "[CS] DPE: no negLink needed\n");
+  trace(TRACE_VERY_DEBUG, "[CS] DPE: possible starts: " + intToString(dpePossibleStarts) + "\n"
+		        + "          possible ends: " + intToString(dpePossibleEnds) + "\n");
+  return kc::mkinteger(0);
+}
+
 
 /**
  * Prints recursively a very simple tree of the scopes.

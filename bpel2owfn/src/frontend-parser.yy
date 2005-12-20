@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/19 16:25:47 $
+ *          - last changed: \$Date: 2005/12/20 16:01:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.75 $
+ * \version \$Revision: 1.76 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -508,10 +508,18 @@ tFaultHandlers:
     { $$ = implicitFaultHandler();
       $$->inProcess = inProcess;
       $$->parentScopeId = currentScopeId; }
-| K_FAULTHANDLERS X_NEXT tCatch_list  tCatchAll X_SLASH K_FAULTHANDLERS X_NEXT
-    { $$ = userDefinedFaultHandler($3, $4);
+| K_FAULTHANDLERS X_NEXT 
+    {
+      symMan.startDPEinWhile();
+    }
+  tCatch_list  
+  tCatchAll 
+  X_SLASH K_FAULTHANDLERS X_NEXT
+    { $$ = userDefinedFaultHandler($4, $5);
       $$->inProcess = inProcess;
-      $$->parentScopeId = currentScopeId; }
+      $$->parentScopeId = currentScopeId;
+      symMan.endDPEinWhile();
+    }
 ;
 
 tCatch_list:
@@ -564,9 +572,16 @@ tCompensationHandler:
   /* empty */
     { $$ = implicitCompensationHandler();
       $$->parentScopeId = currentScopeId; }
-| K_COMPENSATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_COMPENSATIONHANDLER X_NEXT
-    { $$ = userDefinedCompensationHandler($3);
-      $$->parentScopeId = currentScopeId; }
+| K_COMPENSATIONHANDLER X_NEXT 
+    {
+      symMan.startDPEinWhile();
+    }
+  activity 
+  X_NEXT X_SLASH K_COMPENSATIONHANDLER X_NEXT
+    { $$ = userDefinedCompensationHandler($4);
+      $$->parentScopeId = currentScopeId; 
+      symMan.endDPEinWhile();
+    }
 ;
 
 
@@ -604,16 +619,28 @@ tEventHandlers:
   /* empty */
     { $$ = implicitEventHandler();
       $$->parentScopeId = currentScopeId; }
-| K_EVENTHANDLERS X_NEXT tOnMessage_list tOnAlarm_list X_SLASH K_EVENTHANDLERS X_NEXT
-    { $$ = EventHandler($3, $4);
-      $$->parentScopeId = currentScopeId; }
+| K_EVENTHANDLERS X_NEXT 
+    {
+      symMan.startDPEinWhile();
+    }
+  tOnMessage_list 
+  tOnAlarm_list 
+  X_SLASH K_EVENTHANDLERS X_NEXT
+    { $$ = EventHandler($4, $5);
+      $$->parentScopeId = currentScopeId; 
+      symMan.endDPEinWhile();
+    }
 ;
 
 tOnMessage_list:
   /* empty */
-    { $$ = NiltOnMessage_list(); }
+    { $$ = NiltOnMessage_list(); 
+      $$->dpe = kc::mkinteger(0);
+    }
 | tOnMessage X_NEXT tOnMessage_list
-    { $$ = ConstOnMessage_list($1, $3); }
+    { $$ = ConstOnMessage_list($1, $3); 
+      $$->dpe = kc::mkinteger($1->dpe->value + $3->dpe->value);
+    }
 ;
 
 tOnAlarm_list:
@@ -627,6 +654,7 @@ tOnMessage:
   K_ONMESSAGE arbitraryAttributes X_NEXT
     {
       symMan.checkPartnerLink(att.read($2, "partnerLink")->name);
+      symMan.remDPEend();
     }
   tCorrelations activity X_NEXT X_SLASH K_ONMESSAGE
     { att.check($2, K_ONMESSAGE);
@@ -824,7 +852,12 @@ tEmpty:
       $$->name = att.read($2, "name");
       $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
-      $$->id = $4->parentId = $2; }
+      $$->id = $4->parentId = $2; 
+      if ($4->dpe->value > 0)
+      {
+        symMan.addDPEend();
+      }
+    }
 | K_EMPTY arbitraryAttributes X_SLASH
     { att.check($2, K_EMPTY);
       impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
@@ -871,7 +904,8 @@ tInvoke:
       // automatically create scope?
       symMan.checkPartnerLink(att.read($2, "partnerLink")->name);
     }
-  standardElements tCorrelations tCatch_list  tCatchAll tCompensationHandler X_SLASH K_INVOKE
+  standardElements 
+  tCorrelations tCatch_list  tCatchAll tCompensationHandler X_SLASH K_INVOKE
     { att.check($2, K_INVOKE);
 /*
       if ($7->length() > 0 || $8->length() > 0 || string($9->op_name()) != "implicitCompensationHandler")
@@ -908,6 +942,11 @@ tInvoke:
 					$$->operation->name, 
 					$$->partnerLink->name), false);
       }
+      $$->dpe = symMan.needsDPE();
+      if ($5->dpe->value > 0)
+      {
+        symMan.addDPEend();
+      }
       $$->id = $5->parentId = $2; }
 | K_INVOKE arbitraryAttributes X_SLASH
     { att.check($2, K_INVOKE);
@@ -937,6 +976,7 @@ tInvoke:
 					$$->operation->name, 
 					$$->partnerLink->name), false);
       }
+      $$->dpe = kc::mkinteger(0);
       $$->id = $2; }
 ;
 
@@ -987,6 +1027,10 @@ tReceive:
       $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
 				      $$->partnerLink->name), true);
+      if ($5->dpe->value > 0)
+      {
+        symMan.addDPEend();
+      }
       $$->id = $5->parentId = $2; }
 | K_RECEIVE arbitraryAttributes X_SLASH
     { att.check($2, K_RECEIVE);
@@ -1006,7 +1050,8 @@ tReceive:
       symMan.checkPartnerLink($$->partnerLink->name); 
       $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
-				      $$->partnerLink->name), true); }
+				      $$->partnerLink->name), true); 
+    }
 ;
 
 
@@ -1040,7 +1085,10 @@ tReceive:
 */
 
 tReply:
-  K_REPLY arbitraryAttributes X_NEXT standardElements tCorrelations X_SLASH K_REPLY
+  K_REPLY arbitraryAttributes X_NEXT 
+  standardElements 
+  tCorrelations
+  X_SLASH K_REPLY
     { att.check($2, K_REPLY);
       $$ = Reply($4, $5);
       $$->name = att.read($2, "name");
@@ -1056,6 +1104,10 @@ tReply:
       $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
 				      $$->partnerLink->name), false);
+      if ($4->dpe->value > 0)
+      {
+        symMan.addDPEend();
+      }
       $$->id = $4->parentId = $2; }
 | K_REPLY arbitraryAttributes X_SLASH
     { att.check($2, K_REPLY);
@@ -1104,6 +1156,10 @@ tAssign:
       $$->name = att.read($2, "name");
       $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      if ($4->dpe->value > 0)
+      {
+        symMan.addDPEend();
+      }
       $$->id = $4->parentId = $2; }
 ;
 
@@ -1230,6 +1286,10 @@ tWait:
       $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->For = att.read($2, "for"); // "for" is a keyword
       $$->until = att.read($2, "until");
+      if ($4->dpe->value > 0)
+      {
+        symMan.addDPEend();
+      }
       $$->id = $4->parentId = $2; }
 | K_WAIT arbitraryAttributes X_SLASH
     { att.check($2, K_WAIT);
@@ -1271,6 +1331,10 @@ tThrow:
       $$->faultName = att.read($2, "faultName");
       $$->faultVariable = att.read($2, "faultVariable");
       $$->variableID = symMan.checkVariable(att.read($2, "faultVariable")->name);
+      if ($4->dpe->value > 0)
+      {
+        symMan.addDPEend();
+      }
       $$->id = $4->parentId = $2; }
 | K_THROW arbitraryAttributes X_SLASH
     { att.check($2, K_THROW);
@@ -1309,6 +1373,10 @@ tCompensate:
       $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->scope = att.read($2, "scope");
+      if ($4->dpe->value > 0)
+      {
+        symMan.addDPEend();
+      }
       $$->id = $4->parentId = $2; }
 | K_COMPENSATE arbitraryAttributes X_SLASH
     { att.check($2, K_COMPENSATE);
@@ -1345,6 +1413,10 @@ tTerminate:
       $$->name = att.read($2, "name");
       $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      if ($4->dpe->value > 0)
+      {
+        symMan.addDPEend();
+      }
       $$->id = $4->parentId = $2; }
 | K_TERMINATE arbitraryAttributes X_SLASH
     { att.check($2, K_TERMINATE);
@@ -1386,6 +1458,11 @@ tFlow:
       $$->name = att.read($2, "name");
       $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->dpe = symMan.needsDPE();
+      if ($5->dpe->value > 0)
+      {
+        symMan.addDPEend();
+      }
       $$->id = $5->parentId = $2;
       symMan.checkLinks();
       symMan.quitScope(); }
@@ -1444,27 +1521,53 @@ tLink:
 */
 
 tSwitch:
-  K_SWITCH arbitraryAttributes X_NEXT standardElements tCase_list tOtherwise X_SLASH K_SWITCH
+  K_SWITCH arbitraryAttributes X_NEXT 
+  standardElements 
+    {
+      symMan.addDPEstart();
+    }
+  tCase_list 
+  tOtherwise 
+  X_SLASH K_SWITCH
     { att.check($2, K_SWITCH);
-      $$ = Switch($4, $5, $6);
+      $$ = Switch($4, $6, $7);
       $$->name = att.read($2, "name");
       $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
-      $$->id = $4->parentId = $2; }
+      symMan.remDPEstart();
+      $$->dpe = symMan.needsDPE();
+      if ($4->dpe->value > 0)
+      {
+        symMan.addDPEend();
+      }
+      $$->id = $4->parentId = $2;
+    }
 ;
 
 tCase_list:
   tCase X_NEXT
-    { $$ = ConstCase_list($1, NiltCase_list()); }
+    { $$ = ConstCase_list($1, NiltCase_list()); 
+      $$->dpe = $1->dpe;
+    }
 | tCase X_NEXT tCase_list
-    { $$ = ConstCase_list($1, $3); }
+    { $$ = ConstCase_list($1, $3); 
+      $$->dpe = kc::mkinteger($1->dpe->value + $3->dpe->value);
+    }
 ;
 
 tCase:
-  K_CASE arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CASE
+  K_CASE arbitraryAttributes X_NEXT 
+    {
+      // since we descend, set DPE ends to 0
+      symMan.remDPEend();
+    }
+  activity 
+  X_NEXT X_SLASH K_CASE
     { att.check($2, K_CASE);
-      $$ = Case($4);
-      $$->condition = att.read($2, "condition"); }
+      $$ = Case($5);
+      $$->condition = att.read($2, "condition"); 
+      $$->dpe = symMan.needsDPE();
+    }
 ;
 
 
@@ -1498,20 +1601,20 @@ tOtherwise:
 
 tWhile:
   K_WHILE arbitraryAttributes X_NEXT 
-    { 
-      // inWhile = true;
-    }
   standardElements 
+    { 
+      symMan.startDPEinWhile();
+    }
   activity 
   X_NEXT X_SLASH K_WHILE
     { att.check($2, K_WHILE);
-      $$ = While($5, $6);
+      $$ = While($4, $6);
       $$->name = att.read($2, "name");
-      $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->condition = att.read($2, "condition");
-      $$->id = $5->parentId = $2; 
-      // inWhile=false; 
+      $$->id = $4->parentId = $2; 
+      symMan.endDPEinWhile();
     }
 ;
 
@@ -1531,13 +1634,23 @@ tWhile:
 */
 
 tSequence:
-  K_SEQUENCE arbitraryAttributes X_NEXT standardElements activity_list X_SLASH K_SEQUENCE
+  K_SEQUENCE arbitraryAttributes X_NEXT 
+  standardElements 
+  activity_list 
+  X_SLASH 
+  K_SEQUENCE
     { att.check($2, K_SEQUENCE);
       $$ = Sequence($4, $5);
       $$->name = att.read($2, "name");
       $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
-      $$->id = $4->parentId = $2; }
+      $$->id = $4->parentId = $2; 
+      $$->dpe = symMan.needsDPE();
+      if ($4->dpe->value > 0)
+      {
+        symMan.addDPEend();
+      }
+    }
 ;
 
 
@@ -1571,14 +1684,29 @@ tSequence:
 */
 
 tPick:
-  K_PICK arbitraryAttributes X_NEXT standardElements tOnMessage X_NEXT tOnMessage_list tOnAlarm_list X_SLASH K_PICK
+  K_PICK arbitraryAttributes X_NEXT 
+  standardElements 
+    {
+      symMan.addDPEstart();
+    }
+  tOnMessage X_NEXT 
+  tOnMessage_list 
+  tOnAlarm_list 
+  X_SLASH K_PICK
     { att.check($2, K_PICK);
-      $$ = Pick($4, ConstOnMessage_list($5, $7), $8);
+      $$ = Pick($4, ConstOnMessage_list($6, $8), $9);
       $$->name = att.read($2, "name");
       $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
       $$->createInstance = att.read($2, "createInstance", $$->createInstance);
-      $$->id = $4->parentId = $2; }
+      symMan.remDPEstart();
+      $$->dpe = symMan.needsDPE();
+      if ($4->dpe->value > 0)
+      {
+        symMan.addDPEend();
+      }
+      $$->id = $4->parentId = $2;
+    }
 ;
 
 
@@ -1611,7 +1739,14 @@ tScope:
     { symMan.newScopeScope($2);
       parent[$2] = currentScopeId;
       currentScopeId = $2; }
-  standardElements tVariables tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers activity X_NEXT X_SLASH K_SCOPE
+  standardElements 
+  tVariables 
+  tCorrelationSets 
+  tFaultHandlers 
+  tCompensationHandler 
+  tEventHandlers 
+  activity 
+  X_NEXT X_SLASH K_SCOPE
     { att.check($2, K_SCOPE);
       $$ = Scope($5, $6, $8, $9, $10, StopInScope(), $11);
       $$->name = att.read($2, "name");
@@ -1620,6 +1755,11 @@ tScope:
       $$->variableAccessSerializable = att.read($2, "variableAccessSerializable", $$->variableAccessSerializable);
       $$->id = $5->parentId = $2;
       $$->parentScopeId = currentScopeId = parent[$2];
+      $$->dpe = symMan.needsDPE();
+      if ($5->dpe->value > 0)
+      {
+        symMan.addDPEend();
+      }
       symMan.quitScope(); }
 ;
 
@@ -1643,7 +1783,9 @@ tScope:
 
 standardElements:
   tTarget_list tSource_list
-    { $$ = StandardElements($1, $2); }
+    { $$ = StandardElements($1, $2); 
+      $$->dpe = $2->dpe;
+    }
 ;
 
 tTarget_list:
@@ -1666,9 +1808,13 @@ tTarget:
 
 tSource_list:
   /* empty */
-    { $$ = NiltSource_list(); }
+    { $$ = NiltSource_list(); 
+      $$->dpe = kc::mkinteger(0);
+    }
 | tSource X_NEXT tSource_list
-    { $$ = ConstSource_list($1, $3); }
+    { $$ = ConstSource_list($1, $3);
+      $$->dpe = kc::mkinteger($1->dpe->value + $3->dpe->value);
+    }
 ;
 
 tSource:
@@ -1676,12 +1822,20 @@ tSource:
     { $$ = Source();
       $$->linkName = att.read($2, "linkName");
       $$->transitionCondition = att.read($2, "transitionCondition", $$->transitionCondition); 
-      $$->linkID = symMan.checkLink($$->linkName->name, true); }
+      $$->linkID = symMan.checkLink($$->linkName->name, true); 
+      symMan.addDPEend();
+      $$->dpe = symMan.needsDPE();
+      symMan.remDPEend();
+    }
 | K_SOURCE arbitraryAttributes X_SLASH
     { $$ = Source();
       $$->linkName = att.read($2, "linkName");
       $$->transitionCondition = att.read($2, "transitionCondition", $$->transitionCondition); 
-      $$->linkID = symMan.checkLink($$->linkName->name, true); }
+      $$->linkID = symMan.checkLink($$->linkName->name, true);
+      symMan.addDPEend();
+      $$->dpe = symMan.needsDPE();
+      symMan.remDPEend();
+    }
 ;
 
 

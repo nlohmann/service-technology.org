@@ -30,14 +30,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/19 16:25:48 $
+ *          - last changed: \$Date: 2005/12/20 16:01:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  *          - 2005-11-22 (gierds) Initial version.
  *          - 2005-11-24 (gierds) Put all funcionality into a class #SymbolManager
  *          - 2005-11-29 (gierds) Added checking of variables.
@@ -53,6 +53,7 @@
 #include <algorithm>
 #include <typeinfo>
 #include <map>
+#include <stack>
 
 #include "bpel-kc-k.h" // phylum definitions
 #include "bpel-kc-yystype.h" // data types for tokens and non-terminals
@@ -82,6 +83,13 @@ class SymbolManager
     /// mapping of AST IDs to pointer of SymbolScope
     map<kc::integer, SymbolScope*> mapping;
     
+    /// number of possible activities, where to start DPE from
+    int dpePossibleStarts;
+    /// number of possible activities, where to end DPE 
+    int dpePossibleEnds;
+    /// stack to save possible starts when entering while
+    stack<int> dpeStartStack;
+    
   public:
     /// list of all Links in a Process
     list<std::string> links; 
@@ -99,7 +107,8 @@ class SymbolManager
 
     /// destructor
     ~SymbolManager();
-
+    
+    /* --- Scopes --- */
     /// initialise the Process scope
     void initialiseProcessScope(kc::integer id);
     /// add a new Scope scope
@@ -108,10 +117,10 @@ class SymbolManager
     void newFlowScope(kc::integer id);
     /// quit a scope
     void quitScope();
-
     /// returns SymbolScope pointer to the appropriate scope with ID
     SymbolScope * getScope(kc::integer id);
     
+    /* --- PartnerLinks --- */
     /// add a PartnerLink to the current scope
     void addPartnerLink(csPartnerLink* pl);
     /// check, if a PartnerLink exists in the current scope
@@ -119,6 +128,7 @@ class SymbolManager
     /// check, if a PartnerLink with name exists in the current scope
     void checkPartnerLink(std::string);
 
+    /* --- Variables --- */
     /// add a Variable to the current scope
     kc::casestring addVariable(csVariable* var);
     /// check, if a Variable exists in the current scope
@@ -126,6 +136,7 @@ class SymbolManager
     /// check, if a Variable with name exists in the current scope
     kc::casestring checkVariable(std::string, bool isFaultVariable = false);
 
+    /* --- Links --- */
     /// add a Variable to the current scope
     kc::casestring addLink(csLink* link);
     /// check, if a Variable exists in the current scope
@@ -135,13 +146,27 @@ class SymbolManager
     /// run some simple checks on the Links defined in the current scope
     void checkLinks();
 
-    /// add a channel to the inChannel list
-    // kc::casestring addInChannel(csChannel *);
-    /// add a channel to the outChannel list
-    // kc::casestring addOutChannel(csChannel *);
+    /* --- Channels --- */
     /// adds a channel with an appropriate type
     kc::casestring addChannel(csChannel * channel, bool isInChannel);
  
+    /* --- Dead Path Elimination --- */
+    /// add a possible start for DPE
+    void addDPEstart();
+    /// add a possible end for DPE
+    void addDPEend();
+    /// remove a possible start for DPE
+    void remDPEstart();
+    /// remove a possible end for DPE
+    void remDPEend();
+    /// links are not allowed to cross the borders of whiles, so special treatment
+    void startDPEinWhile();
+    /// links are not allowed to cross the borders of whiles, so special treatment
+    void endDPEinWhile();
+    /// checks if weed need a negLink under current conditions
+    kc::integer needsDPE();
+
+    /* --- the rest --- */
     /// prints the scope tree
     void printScope();
 };
@@ -172,9 +197,9 @@ class SymbolScope
     list<csVariable*> variables;
 
     /// number of incoming links
-    int inLinks;
+    // int inLinks;
     /// number of outgoing links
-    int outLinks;
+    // int outLinks;
     
     /// Constructor for scope without parent
     SymbolScope(kc::integer myid);
@@ -228,6 +253,9 @@ class ScopeScope: public SymbolScope
 {
 
   public:
+    /// list of links that may need to be set to false in case the fault handler fires
+    list<std::string> innerLinks;
+	  
     /// Constructor for scope without parent
     ScopeScope(kc::integer myid);
     /// Constructor for scope with parent scope

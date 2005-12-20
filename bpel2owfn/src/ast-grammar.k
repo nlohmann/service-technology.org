@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2005/12/20 16:01:13 $
+ *          - last changed: \$Date: 2005/12/20 17:17:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.39 $
+ * \version \$Revision: 1.40 $
  */
 %}
 
@@ -214,6 +214,10 @@ tOnMessage_list:
 
 tOnAlarm_list:
   list tOnAlarm
+  {
+    /// additional attribute for DPE
+    integer dpe;
+  }
 ;
 
 tOnMessage:
@@ -240,6 +244,9 @@ tOnAlarm:
   {
     casestring For; // "for" is a keyword...
     casestring until;
+
+    /// additional attribute for DPE
+    integer dpe;
   } 
 ;
 
@@ -628,6 +635,10 @@ tCase:
 
 tOtherwise:
   Otherwise(activity)
+  {
+    /// additional attribute for DPE
+    integer dpe;
+  }
 ;
 
 

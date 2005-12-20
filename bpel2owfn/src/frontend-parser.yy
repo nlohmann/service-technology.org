@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/20 16:01:13 $
+ *          - last changed: \$Date: 2005/12/20 17:17:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.76 $
+ * \version \$Revision: 1.77 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -645,9 +645,13 @@ tOnMessage_list:
 
 tOnAlarm_list:
   /* empty */
-    { $$ = NiltOnAlarm_list(); }
+    { $$ = NiltOnAlarm_list(); 
+      $$->dpe = kc::mkinteger(0);
+    }
 | tOnAlarm X_NEXT tOnAlarm_list
-    { $$ = ConstOnAlarm_list($1, $3); }
+    { $$ = ConstOnAlarm_list($1, $3); 
+      $$->dpe = kc::mkinteger($1->dpe->value + $3->dpe->value);
+    }
 ;
 
 tOnMessage:
@@ -666,15 +670,23 @@ tOnMessage:
       $$->variable = att.read($2, "variable"); 
       $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
-				      $$->partnerLink->name), true); }
+				      $$->partnerLink->name), true); 
+      $$->dpe = symMan.needsDPE();
+    }
 ;
 
 tOnAlarm:
-  K_ONALARM arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_ONALARM 
+  K_ONALARM arbitraryAttributes X_NEXT 
+    {
+      symMan.remDPEend();
+    }
+  activity X_NEXT X_SLASH K_ONALARM 
     { att.check($2, K_ONALARM);
-      $$ = OnAlarm($4);
+      $$ = OnAlarm($5);
       $$->For = att.read($2, "for");  // "for" is a keyword
-      $$->until = att.read($2, "until"); }
+      $$->until = att.read($2, "until");
+      $$->dpe = symMan.needsDPE();
+    }
 ;
 
 
@@ -1575,9 +1587,13 @@ tCase:
 tOtherwise:
   /* If the otherwise branch is not explicitly specified, then an otherwise
      branch with an empty activity is deemed to be present. */
-    { $$ = Otherwise(activityEmpty(Empty(StandardElements(NiltTarget_list(),NiltSource_list())))); }
+    { $$ = Otherwise(activityEmpty(Empty(StandardElements(NiltTarget_list(),NiltSource_list())))); 
+      $$->dpe = kc::mkinteger(0);
+    }
 | K_OTHERWISE X_NEXT activity X_NEXT X_SLASH K_OTHERWISE X_NEXT
-    { $$ = Otherwise($3); }
+    { $$ = Otherwise($3); 
+      $$->dpe = symMan.needsDPE();
+    }
 ;
 
 
@@ -1790,9 +1806,11 @@ standardElements:
 
 tTarget_list:
   /* empty */
-    { $$ = NiltTarget_list(); }
+    { $$ = NiltTarget_list(); 
+    }
 | tTarget X_NEXT tTarget_list
-    { $$ = ConstTarget_list($1, $3); }
+    { $$ = ConstTarget_list($1, $3); 
+    }
 ;
 
 tTarget:

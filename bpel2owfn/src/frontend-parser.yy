@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/20 17:17:10 $
+ *          - last changed: \$Date: 2005/12/20 17:47:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.77 $
+ * \version \$Revision: 1.78 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -658,7 +658,7 @@ tOnMessage:
   K_ONMESSAGE arbitraryAttributes X_NEXT
     {
       symMan.checkPartnerLink(att.read($2, "partnerLink")->name);
-      symMan.remDPEend();
+      symMan.resetDPEend();
     }
   tCorrelations activity X_NEXT X_SLASH K_ONMESSAGE
     { att.check($2, K_ONMESSAGE);
@@ -678,7 +678,7 @@ tOnMessage:
 tOnAlarm:
   K_ONALARM arbitraryAttributes X_NEXT 
     {
-      symMan.remDPEend();
+      symMan.resetDPEend();
     }
   activity X_NEXT X_SLASH K_ONALARM 
     { att.check($2, K_ONALARM);
@@ -1571,7 +1571,7 @@ tCase:
   K_CASE arbitraryAttributes X_NEXT 
     {
       // since we descend, set DPE ends to 0
-      symMan.remDPEend();
+      symMan.resetDPEend();
     }
   activity 
   X_NEXT X_SLASH K_CASE

@@ -30,7 +30,7 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/20 16:01:13 $
+ *          - last changed: \$Date: 2005/12/20 17:47:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
@@ -678,6 +678,13 @@ void SymbolManager::remDPEstart()
 void SymbolManager::remDPEend()
 {
   trace(TRACE_VERY_DEBUG, "[CS] DPE: Removing possible end(s)\n");
+  dpePossibleEnds--;
+}
+
+/// set number of possible DPE ends to 0
+void SymbolManager::resetDPEend()
+{
+  trace(TRACE_VERY_DEBUG, "[CS] DPE: Resetting number of possible ends\n");
   dpePossibleEnds = 0;
 }
 

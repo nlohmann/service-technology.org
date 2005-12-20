@@ -30,14 +30,14 @@
  *          
  * \date
  *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/20 16:01:13 $
+ *          - last changed: \$Date: 2005/12/20 17:47:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.19 $
+ * \version \$Revision: 1.20 $
  *          - 2005-11-22 (gierds) Initial version.
  *          - 2005-11-24 (gierds) Put all funcionality into a class #SymbolManager
  *          - 2005-11-29 (gierds) Added checking of variables.
@@ -159,6 +159,8 @@ class SymbolManager
     void remDPEstart();
     /// remove a possible end for DPE
     void remDPEend();
+    /// set number of possible ends to 0
+    void resetDPEend();
     /// links are not allowed to cross the borders of whiles, so special treatment
     void startDPEinWhile();
     /// links are not allowed to cross the borders of whiles, so special treatment

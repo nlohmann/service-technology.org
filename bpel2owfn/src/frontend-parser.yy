@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/20 17:47:43 $
+ *          - last changed: \$Date: 2005/12/21 11:15:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.78 $
+ * \version \$Revision: 1.79 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -1587,7 +1587,17 @@ tCase:
 tOtherwise:
   /* If the otherwise branch is not explicitly specified, then an otherwise
      branch with an empty activity is deemed to be present. */
-    { $$ = Otherwise(activityEmpty(Empty(StandardElements(NiltTarget_list(),NiltSource_list())))); 
+    { // creaty empty activit with id, without links etc.
+      integer id = att.nextId();
+      impl_standardElements_StandardElements* noLinks = StandardElements(NiltTarget_list(),NiltSource_list());
+      noLinks->parentId = id;
+      impl_tEmpty_Empty* implicitEmpty = Empty(noLinks);
+      implicitEmpty->id = id;
+      implicitEmpty->name = mkcasestring("implicit empty in otherwise");
+      impl_activity *otherwiseActivity = activityEmpty(implicitEmpty);
+      otherwiseActivity->id = id;
+
+      $$ = Otherwise(otherwiseActivity);
       $$->dpe = kc::mkinteger(0);
     }
 | K_OTHERWISE X_NEXT activity X_NEXT X_SLASH K_OTHERWISE X_NEXT

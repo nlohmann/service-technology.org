@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/19 15:59:12 $
+ *          - last changed: \$Date: 2005/12/21 11:15:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.81 $
+ * \version \$Revision: 1.82 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
@@ -1122,7 +1122,6 @@ This=EventHandler(a,b) ->
     a // onMessage branches
     b // onAlarm branches
     {
-
       int onMessageCount = 1;
       foreach (ThisBranch = OnMessage(innerActivity); tOnMessage_list a)
       {
@@ -1151,6 +1150,8 @@ This=EventHandler(a,b) ->
 	TheNet->newArc(onMessage_p2, onMessage_t1, "(M" + message + ",CS" + message + ")" );
 	TheNet->newArc(onMessage_t1, onMessage_p1);
 	TheNet->newArc(onMessage_t1, TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.eventHandler.failed"), "fault" + message);
+	TheNet->newArc(TheNet->findPlace(currentScope + "Active"), onMessage_t1); // new fault management
+	TheNet->newArc(onMessage_t1, TheNet->findPlace(currentScope + "!Active")); // newer fault management
 	TheNet->newArc(TheNet->findPlace("in." + string(ThisBranch->channelID->name)), onMessage_t2, "M" + message);
 	TheNet->newArc(onMessage_t2, onMessage_p2, "(M" + message + ",CS" + message + ")" );
 	TheNet->newArc(onMessage_p5, onMessage_t2);

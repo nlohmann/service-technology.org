@@ -29,11 +29,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $ 
+ *          - last changes of: \$Author: nlohmann $ 
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2005/12/20 17:17:10 $
+ *          - last changed: \$Date: 2005/12/21 11:15:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.40 $
+ * \version \$Revision: 1.41 $
  */
 %}
 
@@ -208,7 +208,7 @@ tOnMessage_list:
   list tOnMessage
   {
     /// additional attribute for DPE
-    integer dpe;
+    integer dpe = mkinteger(0);
   }
 ;
 
@@ -216,7 +216,7 @@ tOnAlarm_list:
   list tOnAlarm
   {
     /// additional attribute for DPE
-    integer dpe;
+    integer dpe = mkinteger(0);
   }
 ;
 
@@ -235,7 +235,7 @@ tOnMessage:
     casestring channelID;
 
     /// additional attribute for DPE
-    integer dpe;
+    integer dpe = mkinteger(0);
   }
 ;
 
@@ -246,7 +246,7 @@ tOnAlarm:
     casestring until;
 
     /// additional attribute for DPE
-    integer dpe;
+    integer dpe = mkinteger(0);
   } 
 ;
 
@@ -364,7 +364,7 @@ tInvoke:
     casestring channelID;
 
     /// additional attribute for DPE
-    integer dpe;
+    integer dpe = mkinteger(0);
 
     integer id;
   }	
@@ -537,6 +537,7 @@ tCompensate:
 
     casestring scope;
 
+    /// additional attribute used to identify the correct pattern
     bool inFaultHandler = true;
     
     integer id;
@@ -572,7 +573,7 @@ tFlow:
     casestring suppressJoinFailure = mkcasestring("no");
 
     /// additional attribute for DPE
-    integer dpe;
+    integer dpe = mkinteger(0);
 
     integer id;
   }
@@ -591,7 +592,7 @@ tLink:
   {
     casestring name;
 
-    // additional attribute containing the unique link name
+    /// additional attribute containing the unique link name
     casestring linkID;
   }
 ;
@@ -609,7 +610,7 @@ tSwitch:
     casestring suppressJoinFailure = mkcasestring("no");
 
     /// additional attribute for DPE
-    integer dpe;
+    integer dpe = mkinteger(0);
 
     integer id;
   }
@@ -618,8 +619,8 @@ tSwitch:
 tCase_list:
   list tCase
   {
-    // additional attribute for DPE
-    integer dpe;
+    /// additional attribute for DPE
+    integer dpe = mkinteger(0);
   }
 ;
 
@@ -628,8 +629,8 @@ tCase:
   {
     casestring condition;
 
-    // additional attribute for DPE
-    integer dpe;
+    /// additional attribute for DPE
+    integer dpe = mkinteger(0);
   }
 ;
 
@@ -637,7 +638,7 @@ tOtherwise:
   Otherwise(activity)
   {
     /// additional attribute for DPE
-    integer dpe;
+    integer dpe = mkinteger(0);
   }
 ;
 
@@ -673,8 +674,8 @@ tSequence:
 
     integer id;
 
-    // additional attribute for DPE
-    integer dpe;
+    /// additional attribute for DPE
+    integer dpe = mkinteger(0);
   }
 ;
 
@@ -693,7 +694,7 @@ tPick:
     casestring createInstance = mkcasestring("no");
 
     /// additional attribute for DPE
-    integer dpe;
+    integer dpe = mkinteger(0);
 
     integer id;
   }
@@ -722,10 +723,12 @@ tScope:
     casestring variableAccessSerializable = mkcasestring("no");
 
     integer id;
+
+    /// additional attribute used for inter-scope communication (push-places)
     integer parentScopeId;
 
-    // additional attribute for DPE
-    integer dpe;
+    /// additional attribute for DPE
+    integer dpe = mkinteger(0);
   }
 ;
 
@@ -742,8 +745,8 @@ standardElements:
     casestring suppressJoinFailure; // actually a value of the parent
     casestring joinCondition;       // actually a value of the parent
 
-    // additional attribute for DPE
-    integer dpe;
+    /// additional attribute for DPE
+    integer dpe = mkinteger(0);
   }
 ;
 
@@ -756,7 +759,7 @@ tTarget:
   {
     casestring linkName;
 
-    // additional attribute containing the unique link name
+    /// additional attribute containing the unique link name
     casestring linkID;
   }
 ;
@@ -764,8 +767,8 @@ tTarget:
 tSource_list:
   list tSource
   {
-    // additional attribute for DPE
-    integer dpe;
+    /// additional attribute for DPE
+    integer dpe = mkinteger(0);
   }
 ;
 
@@ -775,10 +778,10 @@ tSource:
     casestring linkName;
     casestring transitionCondition = mkcasestring("true");
 
-    // additional attribute containing the unique link name
+    /// additional attribute containing the unique link name
     casestring linkID;
 
-    // additional attribute for DPE
-    integer dpe;
+    /// additional attribute for DPE
+    integer dpe = mkinteger(0);
   }
 ;

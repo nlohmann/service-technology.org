@@ -21,9 +21,7 @@
 /*!
  * \file bpel-attributes.c
  *
- * \brief Functions for Petri nets (implementation)
- *
- * This file implements the classes and functions defined in bpel-attributes.h.
+ * \brief This file implements the classes and functions defined in bpel-attributes.h.
  * 
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
@@ -31,14 +29,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/16 16:06:21 $
+ *          - last changed: \$Date: 2005/12/29 10:20:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  *
  * \todo
  *       - (reinert) Comment this file and its classes.

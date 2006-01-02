@@ -25,19 +25,17 @@
  * 	  symbols within a BPEL process.
  *
  * \author  
- *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
  *          - last changes of: \$Author: gierds $
  *          
  * \date
- *          - created: 2005/11/22
- *          - last changed: \$Date: 2005/12/20 17:47:44 $
+ *          - last changed: \$Date: 2006/01/02 20:14:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  *          - 2005-11-22 (gierds) Initial version.
  *          - 2005-11-24 (gierds) Put all funcionality into a class #SymbolManager
  *          - 2005-11-29 (gierds) Added checking of variables.
@@ -73,6 +71,16 @@ class csVariable;
 class csLink;
 class csChannel;
 
+/**
+ * \class	SymbolManager
+ *
+ * \brief	Management class for handling scopes, variables, etc.
+ *
+ * The SymbolManager can be used to handle scopes, check the correct usage
+ * of Variables, Links, PartnerLinks and Channels, and it provides basic
+ * functions for Dead Path Elimination.
+ * 
+ */
 class SymbolManager
 {
   private:
@@ -99,8 +107,6 @@ class SymbolManager
     set<std::string> outChannels;
     /// list of all incoming channels
     set<std::string> inChannels;
-    /// mapping of channel names to either "in" or "out"
-    // map<std::string, std::string> channels;    
 
     /// constructor
     SymbolManager();
@@ -161,9 +167,9 @@ class SymbolManager
     void remDPEend();
     /// set number of possible ends to 0
     void resetDPEend();
-    /// links are not allowed to cross the borders of whiles, so special treatment
+    /// links are not allowed to cross while borders, so special treatment
     void startDPEinWhile();
-    /// links are not allowed to cross the borders of whiles, so special treatment
+    /// links are not allowed to cross while borders, so special treatment
     void endDPEinWhile();
     /// checks if weed need a negLink under current conditions
     kc::integer needsDPE();
@@ -198,22 +204,19 @@ class SymbolScope
     /// list of variables (not needed for Flows)	
     list<csVariable*> variables;
 
-    /// number of incoming links
-    // int inLinks;
-    /// number of outgoing links
-    // int outLinks;
-    
     /// Constructor for scope without parent
     SymbolScope(kc::integer myid);
     /// Constructor for scope with parent scope
     SymbolScope(kc::integer myid, SymbolScope* myparent);
     
-    // cleans up the object (deletion of all members etc.)
+    /// cleans up the object (deletion of all members etc.)
     virtual ~SymbolScope();   
 
+    /// print out the hierarchical structure of the scopes
     virtual void print();
     
   private:
+    /// needed for #print()
     static int indent;
 };
 
@@ -223,8 +226,6 @@ class SymbolScope
  * \author	Christian Gierds <gierds@informatik.hu-berlin.de>
  *
  * \brief	Represents the scope given through a Process
- *
- * 
  *
  */
 class ProcessScope: public SymbolScope
@@ -246,8 +247,6 @@ class ProcessScope: public SymbolScope
  * \author	Christian Gierds <gierds@informatik.hu-berlin.de>
  *
  * \brief	Represents the scope given through a Scope
- *
- * 
  *
  */
 
@@ -273,8 +272,6 @@ class ScopeScope: public SymbolScope
  *
  * \brief	Represents the scope given through a Flow
  *
- * 
- *
  */
 class FlowScope: public SymbolScope
 {
@@ -287,32 +284,9 @@ class FlowScope: public SymbolScope
     /// Constructor for scope with parent scope
     FlowScope(kc::integer myid, SymbolScope* myparent);
 
+    /// own destructor in order to delete #links
     ~FlowScope();
 };
-
-/**
- * \class	BoundScope
- *
- * \author	Christian Gierds <gierds@informatik.hu-berlin.de>
- *
- * \brief	This is just an abstract scope class.
- *
- * This class is used as a bound for while activities, fault,
- * compensation and event handler, in order to ensure, that no
- * links cross the boudaries of these activities.
- *
- */
-class BoundScope: public SymbolScope
-{
-  public:
-    /// Constructor for scope without parent
-    BoundScope(kc::integer myid);
-    /// Constructor for scope with parent scope
-    BoundScope(kc::integer myid, SymbolScope* myparent);
-
-    ~BoundScope();
-};
-
 
 /**
  * \class	csPartnerLink
@@ -410,6 +384,7 @@ class csChannel
     /// our own equality
     bool operator==(csChannel& other);
 
+    /// returns a name for the channel
     kc::casestring name();
 };
 

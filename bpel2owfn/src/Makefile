@@ -1,4 +1,4 @@
-# last changed $Date: 2005/12/18 22:21:37 $ by $Author: nlohmann $
+# last changed $Date: 2006/01/02 15:22:32 $ by $Author: nlohmann $
 
 
 
@@ -126,7 +126,7 @@ clean:
 	@-rm -f $(KC_TIME)
 	@-rm -f *.o
 
-veryclean: clean
+distclean: clean
 	@echo removing documentation...
 	@-rm -f -r doc
 	@-rm -f -r doc

@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2005/12/21 11:15:21 $
+ *          - last changed: \$Date: 2006/01/02 15:21:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.82 $
+ * \version \$Revision: 1.83 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
@@ -785,13 +785,14 @@ This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
       Place *p24 = TheNet->newPlace(prefix + "!Ended");
       Place *p25 = TheNet->newPlace(prefix + "ch_fh");
       Place *p26 = TheNet->newPlace(prefix + "ch_out");
-      Transition *t5 = TheNet->newTransition(prefix + "t5", "{rethrowComp}");
+      Transition *t5 = TheNet->newTransition(prefix + "t5", "rethrowComp");
       Transition *t6 = TheNet->newTransition(prefix + "t6");
       Transition *t7 = TheNet->newTransition(prefix + "t7");
       Transition *t8 = TheNet->newTransition(prefix + "t8");
       Transition *t9 = TheNet->newTransition(prefix + "t9");
       Transition *t10 = TheNet->newTransition(prefix + "t10");
       Transition *t11 = TheNet->newTransition(prefix + "t11");
+      Transition *t12 = TheNet->newTransition(prefix + "t12"); // forgotten
       TheNet->newArc(p4, t5);
       TheNet->newArc(p9, t5, READ, "x");
       TheNet->newArc(t5, p10);
@@ -822,6 +823,8 @@ This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
       TheNet->newArc(p19, t11);
       TheNet->newArc(p22, t11);
       TheNet->newArc(t11, p23);
+      TheNet->newArc(p20, t12);
+      TheNet->newArc(t12, p21);
 
       /*---------------------------------------------------------------------*/
       // the left <compensate />-element
@@ -1409,13 +1412,15 @@ This=implicitCompensationHandler() ->
       SymbolScope *me = symMan.getScope(This->parentScopeId); 
       for (list< SymbolScope * >::iterator child = me->children.begin(); child != me->children.end(); child++)
       {
+	Place *p19_new = TheNet->newPlace(prefix + "compScope." + intToString((*child)->id->value)); // a "compScope" for each child
 	Place *p20 = TheNet->findPlace(intToString((*child)->id->value) + ".!push");
 	Place *p21 = TheNet->findPlace(intToString((*child)->id->value) + ".push");
 	Transition *t13 = TheNet->newTransition(prefix + "t13." + intToString((*child)->id->value));
 	TheNet->newArc(p20, t7);
 	TheNet->newArc(p20, t8);
 	TheNet->newArc(p11, t13);
-	TheNet->newArc(t13, p19, "s");
+//	TheNet->newArc(t13, p19, "s"); // this was one place for all children
+	TheNet->newArc(t13, p19_new, "s");
 	TheNet->newArc(t13, p20);
 	TheNet->newArc(p21, t13, "s");
       }
@@ -2853,7 +2858,7 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->newArc(TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.!Active"), t13, READ);
 
       // merge places with parent scope
-      TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.compScope"), p3);
+      TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.compensationHandler.compScope." + intToString(This->id->value)), p3); // was "....internal.compScope."
       TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.scopeCompensated"), p56);
       TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.upperTerminate"), p46);
       //TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId->value) + ".upperFH"), p48);
@@ -2928,8 +2933,8 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->mergePlaces(prefix + "p38",            prefix + "stop.stopped");
       TheNet->mergePlaces(prefix + "p39",            prefix + "stop.cleanCH");
       TheNet->mergePlaces(prefix + "p40",            prefix + "stop.ch_cleaned");
-      TheNet->mergePlaces(prefix + "p41",            prefix + "stop.ftSave");
-      TheNet->mergePlaces(prefix + "p42",            prefix + "stop.ft");
+      TheNet->mergePlaces(prefix + "p41",            prefix + "stop.ft"); // switch this line with the line below
+      TheNet->mergePlaces(prefix + "p42",            prefix + "stop.ftSave");
       TheNet->mergePlaces(prefix + "p43",            prefix + "stop.fault");
       TheNet->mergePlaces(prefix + "p44",            prefix + "stop.faultSave");
       TheNet->mergePlaces(prefix + "stopped",        prefix + "stop.stopped_s");

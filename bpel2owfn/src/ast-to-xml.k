@@ -28,11 +28,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2005/12/20 17:17:10 $
+ *          - last changed: \$Date: 2006/01/02 15:57:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.19 $
+ * \version \$Revision: 1.20 $
  */
 %}
 
@@ -132,7 +132,7 @@ void indown()
 
 
 Process(a,b,c,d,e,f,g,h,i) ->
-  [xml: { inup(); } "<process id=\"" $0->id ">\n" 
+  [xml: { inup(); } "<process id=\"" $0->id "\">\n" 
   
   { if (a->length() == 0) }
     ${ /* no Partner Links */ $}

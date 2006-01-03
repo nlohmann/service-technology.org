@@ -1,4 +1,4 @@
-# last changed $Date: 2006/01/03 11:27:40 $ by $Author: nlohmann $
+# last changed $Date: 2006/01/03 14:38:48 $ by $Author: nlohmann $
 
 .PHONY: all clean distclean
 
@@ -13,3 +13,6 @@ clean:
 distclean:
 	$(MAKE) distclean --directory=src
 	$(MAKE) distclean --directory=doc
+
+check:
+	$(MAKE) check --directory=test

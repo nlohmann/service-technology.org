@@ -1,4 +1,4 @@
-# last changed $Date: 2006/01/03 11:39:37 $ by $Author: nlohmann $
+# last changed $Date: 2006/01/03 14:20:43 $ by $Author: nlohmann $
 
 
 
@@ -29,8 +29,8 @@ KC_TIME = .kc_time_stamp
 
 all: bpel2owfn
 
-bpel2owfn: bpel-syntax.o bpel-lexic.o\
-	main.o debug.o exception.o bpel-attributes.o petrinet.o helpers.o check-symbols.o\
+bpel2owfn: bpel-syntax.o bpel-lexic.o main.o debug.o exception.o\
+	bpel-attributes.o petrinet.o helpers.o check-symbols.o\
 	bpel-abstract.o bpel-unparse-xml.o bpel-unparse-petri.o\
 	bpel-kc-unpk.o bpel-kc-rk.o bpel-kc-csgiok.o bpel-kc-k.o
 	$(CXX) $(CXXFLAGS2) -o $@ $^

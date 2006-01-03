@@ -1,5 +1,5 @@
-BPEL2oWFN Version 1.0
-=====================
+BPEL2oWFN Version 1.0 (16 January 2006)
+=======================================
 
 - To compile the excecutable and create the documentation, type `make'.
 
@@ -7,3 +7,5 @@ BPEL2oWFN Version 1.0
   binary is not deleted.
 
 - To delete all files created by building the program, type `make distclean'.
+
+- To check the built excecutable, type `make check'.

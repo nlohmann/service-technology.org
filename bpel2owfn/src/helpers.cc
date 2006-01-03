@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/01/03 10:55:57 $
+ *          - last changed: \$Date: 2006/01/03 13:27:19 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  *
  * \todo
  *       - add a version output
@@ -358,31 +358,33 @@ void parse_command_line(int argc, char* argv[])
     // take care of the output modes
     if ((mode_petri_net && mode_ast) || (mode_petri_net && mode_pretty_printer) || (mode_ast && mode_pretty_printer))
     {
-      print_help();
-      exit(1);
+    throw Exception(OPTION_MISMATCH, 
+		    "Chosen parameter cannot work together (see parameter -h).\n",
+		    "Chose only one of mode Petri Net, AST or XML!\n");
     }
   }
 
   // LoLA and dot on stdout are very confusing ! so abort 
   if ((mode_lola_petri_net && mode_dot_petri_net) && !(mode_lola_2_file || mode_dot_2_file))
   {
-    trace("LoLA and dot output on stdout are confusing, chose one!\n\n");	  
-    print_help();
-    exit(1);
+    throw Exception(OPTION_MISMATCH, 
+		    "Chosen parameter cannot work together (see parameter -h).\n",
+		    "LoLA and dot output on stdout are confusing, chose one!\n");
   }
   // LoLA and oWFN on stdout are very confusing ! so abort 
   if ((mode_lola_petri_net && mode_owfn_petri_net) && !(mode_lola_2_file || mode_owfn_2_file))
   {
-    trace("LoLA and oWFN output on stdout are confusing, chose one!\n\n");	  
-    print_help();
-    exit(1);
+    throw Exception(OPTION_MISMATCH, 
+		    "Chosen parameter cannot work together (see parameter -h).\n",
+		    "LoLA and oWFN output on stdout are confusing, chose one!\n");
   }
   // oWFN and dot on stdout are very confusing ! so abort 
   if ((mode_owfn_petri_net && mode_dot_petri_net) && !(mode_owfn_2_file || mode_dot_2_file))
   {
-    trace("oWFN and dot output on stdout are confusing, chose one!\n\n");	  
-    print_help();
-    exit(1);
+    throw Exception(OPTION_MISMATCH, 
+		    "Chosen parameter cannot work together (see parameter -h).\n",
+		    "oWFN and dot output on stdout are confusing, chose one!\n");
+    // exit(1);
   }
   
   // trace and check for some files to be created

@@ -25,12 +25,10 @@
  * 	  symbols within a BPEL process.
  *
  * \author  
- *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
  *          - last changes of: \$Author: gierds $
  *          
  * \date
- *          - created: 2005/11/22
- *          - last changed: \$Date: 2006/01/02 20:14:48 $
+ *          - last changed: \$Date: 2006/01/03 13:27:19 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
@@ -196,8 +194,8 @@ void SymbolManager::addPartnerLink(csPartnerLink* pl)
     {
       if (*(*iter) == *pl)
       {
-        throw Exception(DOUBLE_PARTNERLINK, "Two PartnerLinks with same name\n",
-		       	"Name of double PartnerLink is \"" + pl->name + "\"\n");
+        yyerror(string("Two PartnerLinks with same name\nName of double PartnerLink is \"" 
+		       + pl->name + "\"\n").c_str());
       }
     }
     ((dynamic_cast <ProcessScope *> (currentScope))->partnerLinks).push_back(pl);
@@ -318,8 +316,9 @@ kc::casestring SymbolManager::addVariable(csVariable* var)
   {
     if (*(*iter) == *var)
     {
-      throw Exception(DOUBLE_VARIABLE, "Two Variables with same name\n",
-		      "Name of double Variable is \"" + var->name + "\"\n");
+      yyerror(string("Two Variables with same name\nName of double Variable is \"" 
+		     + var->name 
+		     + "\"\n").c_str());
     }
   }
   // add to currentScope for later checking

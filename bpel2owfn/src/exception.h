@@ -26,19 +26,17 @@
  * This file declares the exception class.
  * 
  * \author  
- *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
- *          - created: 2005/11/15
- *          - last changed: \$Date: 2006/01/03 09:09:15 $
+ *          - last changed: \$Date: 2006/01/03 13:27:19 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  */
 
 
@@ -64,10 +62,6 @@ typedef enum
   OPTION_MISMATCH = 10,
   
   CHECK_SYMBOLS_CAST_ERROR = 20, ///< "Dynamic cast error" exception (check-symbols.cc)
-
-  DOUBLE_PARTNERLINK = 30,       ///< "Two PartnerLinks with same name" exception (check-symbols.cc)	  
-  PARTNERLINK_UNDEFINED,         ///< "PartnerLink does not exist" exception (check-symbols.cc)
-  DOUBLE_VARIABLE,               ///< "Two Variables with same name" exception (check-symbols.cc)	  
 
   NODE_NOT_FOUND = 40,           ///< "Node not found" exception (petrinet.cc)
   DOUBLE_NODE,                   ///< "Node already seen exception (petrinet.cc)

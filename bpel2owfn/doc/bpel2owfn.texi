@@ -347,7 +347,8 @@ An example:
 An error has occured while parsing "example.bpel"!
 
 Exception #3 occured!
-  File 'example.bpel' not found.
+
+   File 'example.bpel' not found.
 @end smallexample
 
 
@@ -360,20 +361,9 @@ LoLA and dot output on stdout are confusing, chose one!
 @end smallexample
 
 
-@item 20
-@b{`Dynamic cast error' exception.}
-
-
 @item 30
-@b{`Two PartnerLinks with same name' exception.}
-
-
-@item 31
-@b{`PartnerLink does not exist' exception.}
-
-
-@item 32
-@b{`Two Variables with same name' exception.}
+@b{`Dynamic cast error' exception.} While building an internal scope tree an unexpected error has occured.
+(This should not happen - if it do so nevertheless, please inform us.)
 
 
 @item 40
@@ -389,7 +379,9 @@ An example:
 An error has occured while parsing "example.bpel"!
 
 Exception #11 occured!
-  Place with role `1.internal.final' already defined.
+
+   Place with role `1.internal.final' already defined.
+
 @end smallexample
 
 
@@ -407,7 +399,7 @@ arc between two transitions (or two places, resp.) should be drawn or when the
 source or target node of an arc was not found.
 @end table
 
-Please report the occurence of any exception with numbers from 40 since it
+Please report the occurence of any exception with numbers from 30 since it
 indicates a bug in @acronym{BPEL2oWFN} we would like to fix immediatley (see
 @ref{Reporting Bugs}).
 
@@ -456,7 +448,7 @@ affected and in this case will never be executed.
 The roles are named using the following conventions:
 
 @itemize
-@item Each @acronym{BPEL} activity has an identifier <verteilt> during the
+@item Each @acronym{BPEL} activity has been assigned an identifier during the
 syntactic analysis of the input process. Each node added to the Petri net
 from the Petri net pattern of that activity begins with that identifier.
 

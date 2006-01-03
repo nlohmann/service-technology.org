@@ -1,4 +1,4 @@
-# last changed $Date: 2006/01/03 10:44:49 $ by $Author: nlohmann $
+# last changed $Date: 2006/01/03 11:41:28 $ by $Author: nlohmann $
 
 
 
@@ -35,4 +35,5 @@ clean:
 	@-rm -f *~
 
 distclean: clean
+	@echo removing generated files...
 	@-rm -f *.dvi *.pdf *.ps

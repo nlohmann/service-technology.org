@@ -27,25 +27,16 @@
  * other file.
  * 
  * \author  
- *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes by: \$Author: nlohmann $
+ *          - last changes by: \$Author: gierds $
  *          
  * \date    
- * 	    - created: 2005-11-11
- *          - last changed: \$Date: 2005/12/18 23:05:07 $
+ *          - last changed: \$Date: 2006/01/03 10:55:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version
- *          - 2005-11-11 (nlohmann) Initial version.
- *          - 2005-11-16 (gierds) Added error() and cleanup() functions.
- *          - 2005-11-22 (gierds) Include #check-symbols.h to know about
- *            #Scope.
- *          - 2005-12-13 (gierds) Added variables in order to handle creation
- *            of oWFNs.  
  */
 
 #ifndef HELPERS_H
@@ -112,7 +103,6 @@ extern bool mode_ast;
 /// print the "low level" Petri Net
 extern bool mode_low_level_petri_net;
 
-
 /// debug level (in debug.cc)
 extern int debug_level;
 
@@ -139,6 +129,9 @@ string pos(const char *file, int line, const char *function);
 
 /// Prints help for command line arguments
 void print_help();
+
+/// Prints version information
+void print_version(std::string name);
 
 /// Evaluates command line arguments
 void parse_command_line(int argc, char * argv[]);

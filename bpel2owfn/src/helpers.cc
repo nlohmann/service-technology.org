@@ -32,35 +32,24 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2005/12/19 16:25:48 $
+ *          - last changed: \$Date: 2006/01/03 10:55:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
  *
  * \todo
  *       - add a version output
  */
 
 
-
-
-
 #include "helpers.h"
-
-
-
-
 
 /// The Petri Net
 extern PetriNet *TheNet;
-
-
-
-
 
 /*!
  * \param a set of Petri net nodes
@@ -93,9 +82,6 @@ string intToString(int i)
 }
 
 
-
-
-
 /*!
  * \param  file     a filename
  * \param  line     a line number
@@ -109,11 +95,11 @@ string pos(const char *file, int line, const char *function)
 }
 
 
-
-
-
 // --------------------- functions for command line evaluation ------------------------
-
+/**
+ * Prints an overview of all commandline arguments.
+ *
+ */
 void print_help() 
 {
   // 80 chars
@@ -130,14 +116,15 @@ void print_help()
   trace("   -df | --debug-flex         - enable flex' debug mode\n");
   trace("   -dy | --debug-yacc         - enable yacc's/bison's debug mode\n");
   trace("   -h  | --help               - print this screen\n");
+  trace("   -v  | --version            - prints some version information\n");
   trace("\n");
   trace("\n");
   trace("output modes (choose at most one, default is just parsing):\n");
   trace("\n");
-  trace("   -a  | --ast               - output the AST\n");
-  trace("   -x  | --xml               - output simple XML w/o any unnecessary\n");
+  trace("   -a   | --ast              - output the AST\n");
+  trace("   -x   | --xml              - output simple XML w/o any unnecessary\n");
   trace("                               informtion\n");
-  trace("   -pn | --petri-net         - output the Petri Net (in LoLA style?)\n");
+  trace("   -pn  | --petri-net        - output the Petri Net (in LoLA style?)\n");
   trace("\n");
   trace("special Petri Net modes:\n");
   trace("\n");
@@ -172,7 +159,23 @@ void print_help()
 
 }
 
-
+/**
+ * Prints some version information
+ *
+ * \param name commandline name of the this program
+ *
+ *
+ */
+void print_version(std::string name)
+{
+  trace(name + " (BPEL2oWFN) 1.0\n");
+  trace("Written by Niels Lohmann, Christian Gierds and Dennis Reinert\n");
+  trace("\n");
+  trace("Copyright (C) 2005,2006 Niels Lohmann, Christian Gierds and Dennis Reinert\n");
+  trace("This is free software; see the source for copying conditions.  There is NO\n");
+  trace("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
+  trace("\n");
+}
 
 
 
@@ -198,7 +201,6 @@ void parse_command_line(int argc, char* argv[])
           if (!(yyin = fopen(filename.c_str(), "r"))) 
 	  {
             throw Exception(FILE_NOT_FOUND, "File '" + filename + "' not found.\n");
-            // fprintf(stderr, "  File '%s' not found.\n", filename);
             trace("  File '");
 	    trace(filename);
 	    trace("' not found.\n");
@@ -210,6 +212,11 @@ void parse_command_line(int argc, char* argv[])
           print_help();
 	  exit(1);
 	}
+      }
+
+      else if (! strcmp(argument_string, "-v") || ! strcmp(argument_string, "--version")) {
+	print_version(string(argv[0]));
+	exit(0);
       }
 
       // select output, default is just parsing

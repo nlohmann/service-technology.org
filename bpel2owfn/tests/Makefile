@@ -1,4 +1,4 @@
-# last changed $Date: 2006/01/03 14:39:12 $ by $Author: nlohmann $
+# last changed $Date: 2006/01/03 14:54:07 $ by $Author: nlohmann $
 
 
 
@@ -14,16 +14,19 @@ check: test1 test2 test3
 
 test1:
 	$(BPEL2OWFN) -f purchase.bpel
-
-test2:
 	$(BPEL2OWFN) -f loan.bpel
-
-test3:
 	$(BPEL2OWFN) -f shipping.bpel
 
+test2:
+	$(BPEL2OWFN) -f purchase.bpel -O2F
+	$(BPEL2OWFN) -f loan.bpel -L2F
+	$(BPEL2OWFN) -f shipping.bpel -pn -s -D2F
+
+test3:
+	-$(BPEL2OWFN) -f error.bpel
+	-$(BPEL2OWFN) -f foo.bpel
 
 ###############################################################################
 clean:
 	@echo removing temporary files...
-	@-rm -f *.aux *.cp *.fn *.ky *.log *.pg *.tmp *.toc *.tp *.vr
-	@-rm -f *~
+	@-rm -f *.info *.lola *.owfn *.dot

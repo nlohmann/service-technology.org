@@ -29,14 +29,14 @@
  *          - last changes of: \$Author: gierds $
  *          
  * \date
- *          - last changed: \$Date: 2006/01/03 13:27:19 $
+ *          - last changed: \$Date: 2006/01/03 13:44:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  */
 
 
@@ -61,7 +61,7 @@ typedef enum
 
   OPTION_MISMATCH = 10,
   
-  CHECK_SYMBOLS_CAST_ERROR = 20, ///< "Dynamic cast error" exception (check-symbols.cc)
+  CHECK_SYMBOLS_CAST_ERROR = 30, ///< "Dynamic cast error" exception (check-symbols.cc)
 
   NODE_NOT_FOUND = 40,           ///< "Node not found" exception (petrinet.cc)
   DOUBLE_NODE,                   ///< "Node already seen exception (petrinet.cc)

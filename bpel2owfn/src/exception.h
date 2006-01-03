@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2005/11/15
- *          - last changed: \$Date: 2005/12/18 23:05:07 $
+ *          - last changed: \$Date: 2006/01/03 09:09:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
  */
 
 
@@ -56,17 +56,23 @@ using namespace std;
 
 
 /// Enumeration holding the error-codes of the possible exceptions.
+/// \todo Overwork comments here and when throwing exceptions
 typedef enum
 {
-  FILE_NOT_FOUND = 2,	    ///< "File not found" exception
-  NODE_NOT_FOUND,           ///< "Node not found" exception (petrinet.cc)
-  MERGING_ERROR,            ///< "Merging-error" exception (petrinet.cc)
-  ARC_ERROR,                ///< "Arc between" exception (petrinet.cc)
-  CHECK_SYMBOLS_CAST_ERROR, ///< "Dynamic cast error" exception (check-symbols.cc)
-  DOUBLE_PARTNERLINK,       ///< "Two PartnerLinks with same name" exception (check-symbols.cc)	  
-  DOUBLE_VARIABLE,          ///< "Two Variables with same name" exception (check-symbols.cc)	  
-  PARTNERLINK_UNDEFINED,    ///< "PartnerLink does not exist" exception (check-symbols.cc)
-  DOUBLE_NODE               ///< "Node already seen exception (petrinet.cc)
+  FILE_NOT_FOUND = 2,	         ///< "File not found" exception
+
+  OPTION_MISMATCH = 10,
+  
+  CHECK_SYMBOLS_CAST_ERROR = 20, ///< "Dynamic cast error" exception (check-symbols.cc)
+
+  DOUBLE_PARTNERLINK = 30,       ///< "Two PartnerLinks with same name" exception (check-symbols.cc)	  
+  PARTNERLINK_UNDEFINED,         ///< "PartnerLink does not exist" exception (check-symbols.cc)
+  DOUBLE_VARIABLE,               ///< "Two Variables with same name" exception (check-symbols.cc)	  
+
+  NODE_NOT_FOUND = 40,           ///< "Node not found" exception (petrinet.cc)
+  DOUBLE_NODE,                   ///< "Node already seen exception (petrinet.cc)
+  MERGING_ERROR,                 ///< "Merging-error" exception (petrinet.cc)
+  ARC_ERROR                      ///< "Arc between" exception (petrinet.cc)  
 } exception_id;
 
 

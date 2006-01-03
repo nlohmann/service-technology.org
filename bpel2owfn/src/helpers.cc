@@ -32,17 +32,17 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/01/03 13:27:19 $
+ *          - last changed: \$Date: 2006/01/03 15:22:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.28 $
+ * \version \$Revision: 1.29 $
  *
  * \todo
- *       - add a version output
+ *       - first read all options and than react accordingly
  */
 
 
@@ -194,24 +194,16 @@ void parse_command_line(int argc, char* argv[])
       // check for input other than stdin
       if (! strcmp(argument_string, "-f") || ! strcmp(argument_string, "--file")) 
       {
-        mode_file = true;
 	if (argument_counter < argc) 
 	{
           filename = (std::string) argv[argument_counter++];
-          if (!(yyin = fopen(filename.c_str(), "r"))) 
-	  {
-            throw Exception(FILE_NOT_FOUND, "File '" + filename + "' not found.\n");
-            trace("  File '");
-	    trace(filename);
-	    trace("' not found.\n");
-            exit(2);
-          }
 	}
 	else 
 	{
           print_help();
 	  exit(1);
 	}
+        mode_file = true;
       }
 
       else if (! strcmp(argument_string, "-v") || ! strcmp(argument_string, "--version")) {
@@ -355,6 +347,18 @@ void parse_command_line(int argc, char* argv[])
       }
 
     }
+
+    // open input file
+    if (mode_file)
+    {
+      if (!(yyin = fopen(filename.c_str(), "r"))) 
+      {
+	mode_file = false;
+        throw Exception(FILE_NOT_FOUND, "File '" + filename + "' not found.\n");
+      }
+
+    }
+    
     // take care of the output modes
     if ((mode_petri_net && mode_ast) || (mode_petri_net && mode_pretty_printer) || (mode_ast && mode_pretty_printer))
     {
@@ -605,33 +609,36 @@ void cleanup()
     info_output = NULL;
   }
 
-  if ( mode_lola_2_file )
+  if ( mode_file )
   {
-    trace(TRACE_INFORMATION," + Closing LoLA output file: " + lola_filename + "\n");
-    (*lola_output) << std::flush;
-    ((std::ofstream*)lola_output)->close();
-    delete(lola_output);
-    lola_output = NULL;
-  }
+    if ( mode_lola_2_file )
+    {
+      trace(TRACE_INFORMATION," + Closing LoLA output file: " + lola_filename + "\n");
+      (*lola_output) << std::flush;
+      ((std::ofstream*)lola_output)->close();
+      delete(lola_output);
+      lola_output = NULL;
+    }
 
-  if ( mode_owfn_2_file )
-  {
-    trace(TRACE_INFORMATION," + Closing oWFN output file: " + owfn_filename + "\n");
-    (*owfn_output) << std::flush;
-    ((std::ofstream*)owfn_output)->close();
-    delete(owfn_output);
-    owfn_output = NULL;
-  }
+    if ( mode_owfn_2_file )
+    {
+      trace(TRACE_INFORMATION," + Closing oWFN output file: " + owfn_filename + "\n");
+      (*owfn_output) << std::flush;
+      ((std::ofstream*)owfn_output)->close();
+      delete(owfn_output);
+      owfn_output = NULL;
+    }
 
-  if (mode_dot_2_file)
-  {
-    trace(TRACE_INFORMATION," + Closing dot output file: " + dot_filename + "\n");
-    (*dot_output) << std::flush;
-    ((std::ofstream*)dot_output)->close();
-    delete(dot_output);
-    dot_output = NULL;
+    if (mode_dot_2_file)
+    {
+      trace(TRACE_INFORMATION," + Closing dot output file: " + dot_filename + "\n");
+      (*dot_output) << std::flush;
+      ((std::ofstream*)dot_output)->close();
+      delete(dot_output);
+      dot_output = NULL;
+    }
   }
-
+    
   if (mode_petri_net) 
   {
     trace(TRACE_INFORMATION," + Deleting Petri Net pointer\n");
@@ -640,3 +647,4 @@ void cleanup()
   }
 
 }
+

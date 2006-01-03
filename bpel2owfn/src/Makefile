@@ -1,4 +1,4 @@
-# last changed $Date: 2006/01/03 09:28:15 $ by $Author: nlohmann $
+# last changed $Date: 2006/01/03 11:39:37 $ by $Author: nlohmann $
 
 
 
@@ -127,11 +127,5 @@ clean:
 	@-rm -f *.o
 
 distclean: clean
-	@echo removing documentation...
-	@-rm -f -r doc
-	@-rm -f -r doc
 	@echo removing executable...
 	@-rm -f bpel2owfn.exe bpel2owfn
-
-html-reference: $(KC_TIME) bpel-syntax.c bpel-lexic.c
-	@doxygen

@@ -625,8 +625,9 @@ Web Services, Version 1.1}. Technical report, BEA Systems, IBM, Microsoft, SAP,
 Siebel Systems. May 2003.
 
 @item [Hin05]
-Sebastian Hinz. @b{Implementation einer Petrinetz-Semantik f@"ur BPEL4WS}
-@i{(in German)}. Diplomarbeit, Humboldt-Universit@"at zu Berlin, March 2005.
+Sebastian Hinz. @b{Implementation einer Petrinetz-Semantik f@"ur
+@acronym{BPEL4WS}} @i{(in German)}. Diplomarbeit, Humboldt-Universit@"at zu
+Berlin, March 2005.
 
 @item [LoLA]
 Karsten Schmidt: @b{@acronym{LoLA}: A Low Level Analyser}. Manual. Available at
@@ -640,7 +641,7 @@ zu Berlin, Mathematisch-Naturwissenschaftliche Fakult@"at II, 2003.
 @item [MRS05]
 Peter Massuthe, Wolfgang Reisig, and Karsten Schmidt. @b{An Operating Guideline
 Approach to the SOA}. Proceedings of the 2nd South-East European Workshop on
-Formal Methods 2005 (SEEFM05), Ohrid, Republic of Macedonia, 2005.
+Formal Methods 2005 (@acronym{SEEFM}05), Ohrid, Republic of Macedonia, 2005.
 
 @item [Sch00]
 Karsten Schmidt: @b{@acronym{LoLA}: A Low Level Analyser}. In: Mogens Nielsen,
@@ -649,8 +650,8 @@ International Conference (ICATPN 2000)}, pp. 465-474, Springer-Verlag (LNCS
 1825), June 2000.
 
 @item [Sta05]
-Christian Stahl. @b{A Petri Net Semantics for BPEL}. Informatik-Berichte 188,
-Humboldt-Universit@"at zu Berlin, July 2005.
+Christian Stahl. @b{A Petri Net Semantics for @acronym{BPEL}}.
+Informatik-Berichte 188, Humboldt-Universit@"at zu Berlin, July 2005.
 
 @item [Wei04]
 Daniela Weinberg. @b{Analyse der Bedienbarkeit}. Diplomarbeit,

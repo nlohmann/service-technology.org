@@ -1,1 +1,9 @@
-Type make.
+BPEL2oWFN Version 1.0
+=====================
+
+- To compile the excecutable and create the documentation, type `make'.
+
+- To clean up all temporary files, type `make clean'. The documentation and the
+  binary is not deleted.
+
+- To delete all files created by building the program, type `make distclean'.

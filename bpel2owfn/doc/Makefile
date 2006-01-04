@@ -1,4 +1,4 @@
-# last changed $Date: 2006/01/04 09:56:24 $ by $Author: nlohmann $
+# last changed $Date: 2006/01/04 20:47:21 $ by $Author: nlohmann $
 
 
 
@@ -21,12 +21,16 @@ all: dvi ps pdf
 dvi: bpel2owfn.texi gpl.texi version.texi
 	$(TEXI2DVI) $(TEXI2DVIFLAGS) bpel2owfn.texi
 	$(TEXI2DVI) $(TEXI2DVIFLAGS) bpel2owfn.texi
+	$(TEXI2DVI) $(TEXI2DVIFLAGS) install.texi
+	$(TEXI2DVI) $(TEXI2DVIFLAGS) install.texi
 
 ps: dvi
 	$(DVIPS) $(DVIPSFLAGS) bpel2owfn.dvi -o bpel2owfn.ps
+	$(DVIPS) $(DVIPSFLAGS) install.dvi -o install.ps
 
 pdf: dvi
 	$(TEXI2DVI) $(TEXI2DVIFLAGS) --pdf bpel2owfn.texi
+	$(TEXI2DVI) $(TEXI2DVIFLAGS) --pdf install.texi
 
 ###############################################################################
 clean:

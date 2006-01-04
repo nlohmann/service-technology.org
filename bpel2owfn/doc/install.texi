@@ -2,11 +2,16 @@
 @setfilename bpel2owfn
 @include version.texi
 @afourpaper
-@settitle Translating @acronym{BPEL} Processes to Open Workflow Nets
+@finalout
+@settitle @acronym{BPEL2oWFN} Installation Manual
 
 @c ----------------------------------------------------------------------------
 
 @copying
+@ifhtml
+@image{images/bpel2owfn}
+@end ifhtml
+
 This manual describes the installation of @acronym{BPEL2oWFN}, Version
 @value{VERSION}, a tool translating business processes described in
 @acronym{BPEL} to open workflow nets (@acronym{oWFN}),
@@ -26,6 +31,10 @@ Reinert.
 @iftex
 @image{images/tools4bpel,,0.4in}
 @end iftex
+
+@ifhtml
+@image{images/tools4bpel}
+@end ifhtml
 
 @acronym{BPEL2oWFN} is part of the Tools4@acronym{BPEL} project funded by the
 Bundesministerium f@"ur Bildung und Forschung.
@@ -87,7 +96,6 @@ Bundesministerium f@"ur Bildung und Forschung.
 @chapter Contents of this Distribution
 
 @section Files
-
 @table @code
 @item AUTHORS
 A list of all authors of @acronym{BPEL2oWFN} as well as acknowledgements.
@@ -172,12 +180,29 @@ Include the version number of your distribution (version @value{VERSION} of
 @value{UPDATED}). Also include in your message the output that the make process
 produced. We will try to answer your mail within a week.
 
+If you are not interested in compiling @acronym{BPEL2oWFN} yourself you can
+alternatively download executable binaries for several operating systems on the
+website of @acronym{BPEL2oWFN}
+(@url{www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel/bpel2owfn}).
 
 @section Makefile Targets
 
 @table @code
 @item all
-Compile @acronym{BPEL2oWFN} and its documentation.
+Compile @acronym{BPEL2oWFN} and create an executable binary @file{bpel2owfn}
+(or @file{bpel2owfn.exe} on systems running Microsoft Windows) in the directory
+@file{@value{FILENAME}/src}.
+
+@item dvi
+@itemx html
+@itemx pdf
+@itemx ps
+@itemx info
+Generate documentation files in the given format which can be @acronym{DVI},
+@acronym{HTML}, @acronym{PDF}, PostScript or @acronym{GNU} Info. The
+documentation is generated in the directory @file{@value{FILENAME}/doc} and
+is named @file{bpel2owfn.@var{format}} (User's Manual) and
+@file{install.@var{format}} (Installation Manual), resp.
 
 @item clean
 Clean all temporary files created during the compilation. Executables as well
@@ -185,15 +210,16 @@ as generated documentation are preserved.
 
 @item distclean
 Clean everything that does not belong to the distribution, i.e. any file
-created during compilation. Executables as well as the created documentation
+created during compilation. Executables as well as created documentation files
 are also removed.
 
 @item check
-Performs a number of self-tests. The directory @file{test} contains several
-@acronym{BPEL} processes.
+Perform a number of self-tests: the directory @file{test} contains several
+@acronym{BPEL} processes which are processed.
 
 @item dist
-Creates a zipped tarball containing all files of the distribution.
+Create a zipped distribution tar file containing all files of the distribution
+(calls @samp{distclean} before).
 @end table
 
 

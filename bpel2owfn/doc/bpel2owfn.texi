@@ -2,11 +2,16 @@
 @setfilename bpel2owfn
 @include version.texi
 @afourpaper
-@settitle Translating @acronym{BPEL} Processes to Open Workflow Nets
+@finalout
+@settitle @acronym{BPEL2oWFN} User's Manual
 
 @c ----------------------------------------------------------------------------
 
 @copying
+@ifhtml
+@image{images/bpel2owfn}
+@end ifhtml
+
 This manual is for @acronym{BPEL2oWFN}, Version @value{VERSION}, a tool
 translating business processes described in @acronym{BPEL} to open workflow
 nets (@acronym{oWFN}), last updated @value{UPDATED}.
@@ -25,6 +30,10 @@ Reinert.
 @iftex
 @image{images/tools4bpel,,0.4in}
 @end iftex
+
+@ifhtml
+@image{images/tools4bpel}
+@end ifhtml
 
 @acronym{BPEL2oWFN} is part of the Tools4@acronym{BPEL} project funded by the
 Bundesministerium f@"ur Bildung und Forschung.

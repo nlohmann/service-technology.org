@@ -1,4 +1,4 @@
-# last changed $Date: 2006/01/04 20:47:21 $ by $Author: nlohmann $
+# last changed $Date: 2006/01/04 22:52:07 $ by $Author: nlohmann $
 
 
 
@@ -16,9 +16,7 @@ DVIPSFLAGS = -q
 ###############################################################################
 # Main target
 
-all: dvi ps pdf
-
-dvi: bpel2owfn.texi gpl.texi version.texi
+dvi: bpel2owfn.texi gpl.texi version.texi install.texi
 	$(TEXI2DVI) $(TEXI2DVIFLAGS) bpel2owfn.texi
 	$(TEXI2DVI) $(TEXI2DVIFLAGS) bpel2owfn.texi
 	$(TEXI2DVI) $(TEXI2DVIFLAGS) install.texi
@@ -32,6 +30,23 @@ pdf: dvi
 	$(TEXI2DVI) $(TEXI2DVIFLAGS) --pdf bpel2owfn.texi
 	$(TEXI2DVI) $(TEXI2DVIFLAGS) --pdf install.texi
 
+info: bpel2owfn.info install.info
+
+bpel2owfn.info: bpel2owfn.texi
+	$(MAKEINFO) $< --no-split --output=$@
+
+install.info: install.texi
+	$(MAKEINFO) $< --no-split --output=$@
+
+html: bpel2owfn.html install.html
+
+bpel2owfn.html: bpel2owfn.texi
+	$(MAKEINFO) $< --html --no-split --output=$@
+
+install.html: install.texi
+	$(MAKEINFO) $< --html --no-split --output=$@
+
+
 ###############################################################################
 clean:
 	@echo removing temporary files...
@@ -40,4 +55,4 @@ clean:
 
 distclean: clean
 	@echo removing generated files...
-	@-rm -f *.dvi *.pdf *.ps
+	@-rm -f *.dvi *.pdf *.ps *.html *.info

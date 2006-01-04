@@ -4,12 +4,14 @@
 @afourpaper
 @settitle Translating @acronym{BPEL} Processes to Open Workflow Nets
 
+
 @c ----------------------------------------------------------------------------
 
 @copying
-This manual is for @acronym{BPEL2oWFN}, Version @value{VERSION}, a tool
-translating business processes described in @acronym{BPEL} to open workflow
-nets (@acronym{oWFN}), last updated @value{UPDATED}.
+This manual describes the installation of @acronym{BPEL2oWFN}, Version
+@value{VERSION}, a tool translating business processes described in
+@acronym{BPEL} to open workflow nets (@acronym{oWFN}),
+last updated @value{UPDATED}.
 
 Copyright @copyright{} 2005, 2006 Niels Lohmann
 
@@ -51,8 +53,10 @@ Reinert.
 @c ----------------------------------------------------------------------------
 
 @menu
-* Make Targets::
-* Programs Needed::
+* Contents of this Distribution::
+* Setup and Installation::
+* Needed Programs::
+* Authors and Acknowledgements::
 @end menu
 
 @c ----------------------------------------------------------------------------
@@ -64,19 +68,110 @@ Reinert.
 
 @c ----------------------------------------------------------------------------
 
-@node Make Targets
-@chapter Make Targets
+@node Contents of this Distribution
+@chapter Contents of this Distribution
 
-@table @samp
+@section Files
+
+@table @code
+@item AUTHORS
+A list of all authors of @acronym{BPEL2oWFN} as well as acknowledgements.
+
+@item CHANGES
+The change log listing all changes made during the distribution versions of
+@acronym{BPEL2oWFN}.
+
+@item COPYING
+The @acronym{GNU} General Public License (@acronym{GPL}) under which
+@acronym{BPEL2oWFN} is distributed. The @acronym{GPL} is also a chapter of the
+manual.
+
+@item INSTALL
+Setup and Installation instructions and all information needed to bootstrap
+@acronym{BPEL2oWFN}.
+
+@item Makefile
+The Makefile controlling the compilation of @acronym{BPEL2oWFN} and the
+generation of the documentation.
+
+@item README
+A file describing the contents of the distribution.
+@end table
+
+
+
+@section Directories
+
+@table @code
+@item src
+The sources of @acronym{BPEL2oWFN}. Files ending with @samp{.k} are Kimwitu++
+source files. Each file contains a short documentation of what it does as well
+as Doxygen-styled comments (see @url{http://www.stack.nl/~dimitri/doxygen} for
+details).
+
+@item doc
+The documentation of @acronym{BPEL2oWFN} consisting of a manual and
+@ifnottex
+an
+@end ifnottex
+@iftex
+this
+@end iftex
+installation manual. The documentation is in Texinfo format and can be compiled
+using @samp{make}.
+
+@item test
+Several test processes to self-test @acronym{BPEL2oWFN}. The processes
+@file{loan.bpel}, @file{purchase.bpel} and @file{shipping.bpel} were taken from
+the @acronym{BPEL4WS} 1.1 specification.
+@end table
+
+
+
+
+
+@c ----------------------------------------------------------------------------
+
+@node Setup and Installation
+@chapter Setup and Installation
+
+@section Compilation
+Compile @acronym{BPEL2oWFN} is controlled by several Makefiles. Make sure that
+all essential programs (see @ref{Essential Programs}) are reachable in your
+path. To compile @acronym{BPEL2oWFN}, just run @samp{make}. After successful
+compilation an executable file @file{bpel2owfn} (or @file{bpel2owfn.exe} on
+systems running Microsoft Windows) is created in the directory
+@file{@value{FILENAME}/src} of the distribution. This file has no dependencies
+to other files of the distribution and can be copied to any directory.
+
+Any warning during an in other respects successful compilation can be
+ignored---these warnings mostly occur in generated files from Flex, Bison or
+Kimwitu++ and are outside of our scope.
+
+@acronym{BPEL2oWFN} was tested on several operating systems such as Microsoft
+Windows (running cygwin), Linux and Sun OS. Anyway, if the compilation fails
+please make sure you use the most recent versions of the @acronym{GNU}
+Compiler Collection, Flex, Bison and Kimwitu++. If this does not help please
+send us an electronic mail to @email{nlohmann@@informatik.hu-berlin.de}.
+Include the version number of your distribution (version @value{VERSION} of
+@value{UPDATED}). Also include in your message the output that the make process
+produced. We will try to answer your mail within a week.
+
+
+@section Makefile Targets
+
+@table @code
 @item all
 Compile @acronym{BPEL2oWFN} and its documentation.
 
 @item clean
-Clean all temporary files created during the compilation.
+Clean all temporary files created during the compilation. Executables as well
+as generated documentation are preserved.
 
 @item distclean
-Clean all that do not belong to the distribution, i.e. any file created during
-compilation. Executables as well as the created documentation are also removed.
+Clean everything that does not belong to the distribution, i.e. any file
+created during compilation. Executables as well as the created documentation
+are also removed.
 
 @item check
 Performs a number of self-tests. The directory @file{test} contains several
@@ -87,13 +182,22 @@ Creates a zipped tarball containing all files of the distribution.
 @end table
 
 
+@c ----------------------------------------------------------------------------
 
 
-@node Programs Needed
-@chapter Programs Needed
+
+
+
+@node Needed Programs
+@chapter Needed Programs
+
+@anchor{Essential Programs}
+@section Essential Programs
+
 To compile @acronym{BPEL2oWFN} you need the following programs. These programs
 are (as @acronym{BPEL2oWFN} itself) free software distributed under the
 @acronym{GNU} General Public License.
+
 
 @table @asis
 @item @b{Flex}, A fast scanner generator
@@ -117,25 +221,58 @@ Kimwitu++ is available under
 @url{http://site.informatik.hu-berlin.de/kimwitu++}.
 @end table
 
+
+@section Optional Programs
+
 @acronym{BPEL2oWFN} is a compiler and thus creating output files which can be
 read by several other programs. These programs are not needed to compile
 @acronym{BPEL2oWFN} yet without these programs @acronym{BPEL2oWFN} makes not
 much sense.
 
+
 @table @asis
-@item @b{LoLA}, a Low Level Petri net Analyzer
-LoLA is an explicit model checker implementing a broad variety of reduction
-techniques such as partial order reduction, symmetries or the sweep line
-method. LoLA was written by Karsten Schmidt. LoLA is available under
-@url{http://www.informatik.hu-berlin.de/~kschmidt/lola.html}.
+@item @b{@acronym{LoLA}}, a Low Level Petri net Analyzer
+@acronym{LoLA} is an explicit model checker implementing a broad variety of
+reduction techniques such as partial order reduction, symmetries or the sweep
+line method. @acronym{LoLA} was written by Karsten Schmidt and is available
+under @url{http://www.informatik.hu-berlin.de/~kschmidt/lola.html}.
 
 @item @b{Graphviz}, the Graph Visualization Software
 Graphviz is a graph visualization software with several graph layout programs
 including dot. Graphviz is maintained by AT&T Labs and is available under
 @url{http://www.graphviz.org}.
-
 @end table
 
 
+
+
+
+@c ----------------------------------------------------------------------------
+
+@node Authors and Acknowledgements
+@chapter Authors and Acknowledgements
+
+@acronym{BPEL2oWFN} was written by:
+@itemize
+@item Niels Lohmann (Humboldt-Universit@"at zu Berlin)
+@item Christian Gierds (Humboldt-Universit@"at zu Berlin)
+@item Dennis Reinert (Humboldt-Universit@"at zu Berlin)
+@end itemize
+
+The Petri net patterns were created by:
+@itemize
+@item Christian Stahl (Humboldt-Universit@"at zu Berlin)
+@end itemize
+
+We would like to thank:
+@itemize
+@item Simon Moser (IBM) for valuable advice concerning @acronym{BPEL}
+@item Michael Piefel (Humboldt-Universit@"at zu Berlin) for help with Kimwitu++
+@item Oliver Kopp (Universit@"at Stuttgart) for challenging @acronym{BPEL}
+processes
+@end itemize
+
+@acronym{BPEL2oWFN} is part of the Tools4@acronym{BPEL} project funded by the
+Bundesministerium f@"ur Bildung und Forschung.
+
 @bye
-@c hello.texi ends here

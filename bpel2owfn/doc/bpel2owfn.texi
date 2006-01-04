@@ -582,7 +582,7 @@ Processes using these elements are rejected with a syntax error message.
 
 If you find a bug in @acronym{BPEL2oWFN}, please first check that it is not a
 known bug listed in `Known Bugs'. Otherwise please send us an electronic mail
-to @email{nlohmann@@informatik.hu-berlin.de}. Include the version number, which
+to @email{nlohmann@@informatik.hu-berlin.de}. Include the version number which
 you can find by running @samp{bpel2owfn --version}. Also include in your
 message the input @acronym{BPEL} process and the output that the program
 produced. We will try to answer your mail within a week.

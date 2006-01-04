@@ -1,0 +1,141 @@
+\input texinfo
+@setfilename bpel2owfn
+@include version.texi
+@afourpaper
+@settitle Translating @acronym{BPEL} Processes to Open Workflow Nets
+
+@c ----------------------------------------------------------------------------
+
+@copying
+This manual is for @acronym{BPEL2oWFN}, Version @value{VERSION}, a tool
+translating business processes described in @acronym{BPEL} to open workflow
+nets (@acronym{oWFN}), last updated @value{UPDATED}.
+
+Copyright @copyright{} 2005, 2006 Niels Lohmann
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+
+
+@acronym{BPEL2oWFN} is licensed under the @acronym{GNU} General Public License.
+
+Copyright @copyright{} 2005, 2006 Niels Lohmann, Christian Gierds and Dennis
+Reinert.
+
+@end copying
+
+@c ----------------------------------------------------------------------------
+
+@titlepage
+@title @acronym{BPEL2oWFN}
+@subtitle Installation Manual
+@subtitle Translating @acronym{BPEL} Processes to Open Workflow Nets
+@subtitle @acronym{BPEL2oWFN} Version @value{VERSION}, @value{UPDATED}
+@author Niels Lohmann
+
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@c ----------------------------------------------------------------------------
+
+@ifnottex
+@node Top
+@top @acronym{BPEL2oWFN}
+@insertcopying
+@end ifnottex
+
+@c ----------------------------------------------------------------------------
+
+@menu
+* Make Targets::
+* Programs Needed::
+@end menu
+
+@c ----------------------------------------------------------------------------
+
+@contents
+@paragraphindent none
+
+
+
+@c ----------------------------------------------------------------------------
+
+@node Make Targets
+@chapter Make Targets
+
+@table @samp
+@item all
+Compile @acronym{BPEL2oWFN} and its documentation.
+
+@item clean
+Clean all temporary files created during the compilation.
+
+@item distclean
+Clean all that do not belong to the distribution, i.e. any file created during
+compilation. Executables as well as the created documentation are also removed.
+
+@item check
+Performs a number of self-tests. The directory @file{test} contains several
+@acronym{BPEL} processes.
+
+@item dist
+Creates a zipped tarball containing all files of the distribution.
+@end table
+
+
+
+
+@node Programs Needed
+@chapter Programs Needed
+To compile @acronym{BPEL2oWFN} you need the following programs. These programs
+are (as @acronym{BPEL2oWFN} itself) free software distributed under the
+@acronym{GNU} General Public License.
+
+@table @asis
+@item @b{Flex}, A fast scanner generator
+Flex is needed to generate the lexer of @acronym{BPEL2oWFN}. Flex was written
+by Vern Paxon. Copyright @copyright{} 1990 The Regents of the University of
+California. All rights reserved. Flex is available under
+@url{http://www.gnu.org/software/flex/flex.html}.
+
+@item @b{Bison}, The YACC-compatible Parser Generator
+Bison is needed to generate the parser of @acronym{BPEL2oWFN}. Bison was
+written by Robert Corbett und Richard Stallman. Copyright @copyright{} 1992,
+1998, 1999, 2003, 2004, 2005 Free Software Foundation, Inc. Bison is available
+under @url{http://www.gnu.org/software/bison/bison.html}.
+
+@item @b{Kimwitu++}, The Term Processor
+Kimwitu++ is needed to generate all files managing the @acronym{AST, abstract
+syntax tree}. Kimwitu++ was written by Toby Neumann and Michael Piefel.
+Copyright @copyright{} 1988-1997  Axel Belinfante, University of Twente.
+Copyright @copyright{} 1997-2000  Michael Piefel, Humboldt-University Berlin.
+Kimwitu++ is available under
+@url{http://site.informatik.hu-berlin.de/kimwitu++}.
+@end table
+
+@acronym{BPEL2oWFN} is a compiler and thus creating output files which can be
+read by several other programs. These programs are not needed to compile
+@acronym{BPEL2oWFN} yet without these programs @acronym{BPEL2oWFN} makes not
+much sense.
+
+@table @asis
+@item @b{LoLA}, a Low Level Petri net Analyzer
+LoLA is an explicit model checker implementing a broad variety of reduction
+techniques such as partial order reduction, symmetries or the sweep line
+method. LoLA was written by Karsten Schmidt. LoLA is available under
+@url{http://www.informatik.hu-berlin.de/~kschmidt/lola.html}.
+
+@item @b{Graphviz}, the Graph Visualization Software
+Graphviz is a graph visualization software with several graph layout programs
+including dot. Graphviz is maintained by AT&T Labs and is available under
+@url{http://www.graphviz.org}.
+
+@end table
+
+
+@bye
+@c hello.texi ends here

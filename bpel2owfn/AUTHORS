@@ -1,6 +1,49 @@
 BPEL2oWFN Version 1.0 (16 January 2006)
-=======================================
+***************************************
 
-Niels Lohmann    <nlohmann@informatik.hu-berlin.de>
-Christian Gierds <gierds@informatik.hu-berlin.de>
-Dennis Reinert   <reinert@informatik.hu-berlin.de>
+Authors
+=======
+
+BPEL2oWFN was written by:
+   * Niels Lohmann (Humboldt-Universita"t zu Berlin)
+
+   * Christian Gierds (Humboldt-Universita"t zu Berlin)
+
+   * Dennis Reinert (Humboldt-Universita"t zu Berlin)
+
+The Petri net patterns were created by:
+   * Christian Stahl (Humboldt-Universita"t zu Berlin)
+
+Acknowledgements
+================
+
+We would like to thank:
+   * Simon Moser (IBM) for valuable advice concerning BPEL
+
+   * Michael Piefel (Humboldt-Universita"t zu Berlin) for help with
+     Kimwitu++
+
+   * Oliver Kopp (Universita"t Stuttgart) for challenging BPEL processes
+
+BPEL2oWFN is part of the Tools4BPEL project funded by the
+Bundesministerium fu"r Bildung und Forschung.
+
+Contact Person
+==============
+
+Niels Lohmann
+
+Humboldt-Universita"t zu Berlin
+Institut fu"r Informatik
+Unter den Linden 6
+10099 Berlin, Germany
+
+Homepage
+     `http://www.informatik.hu-berlin.de/top/mitarbeiter/lohmann'
+
+E-mail
+     <nlohmann@informatik.hu-berlin.de>
+
+Phone
+     (+49) (30) 2093 3070
+

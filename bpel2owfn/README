@@ -1,12 +1,46 @@
 BPEL2oWFN Version 1.0 (16 January 2006)
-=======================================
+***************************************
 
-This BPEL2oWFN distribution consists of the following files:
+Files
+=====
 
-	README		This message
+`AUTHORS'
+     A list of all authors of BPEL2oWFN as well as acknowledgements.
 
-	CHANGES		Differences between the various releases
+`CHANGES'
+     The change log listing all changes made during the distribution
+     versions of BPEL2oWFN.
 
-	INSTALL		General installation information
+`COPYING'
+     The GNU General Public License (GPL) under which BPEL2oWFN is
+     distributed. The GPL is also a chapter of the manual.
 
-	COPYING		BPEL2oWFN's copyright
+`INSTALL'
+     Setup and Installation instructions and all information needed to
+     bootstrap BPEL2oWFN.
+
+`Makefile'
+     The Makefile controlling the compilation of BPEL2oWFN and the
+     generation of the documentation.
+
+`README'
+     A file describing the contents of the distribution.
+
+Directories
+===========
+
+`src'
+     The sources of BPEL2oWFN. Files ending with `.k' are Kimwitu++
+     source files. Each file contains a short documentation of what it
+     does as well as Doxygen-styled comments (see
+     `http://www.stack.nl/~dimitri/doxygen' for details).
+
+`doc'
+     The documentation of BPEL2oWFN consisting of a manual and an
+     installation manual. The documentation is in Texinfo format and
+     can be compiled using `make'.
+
+`test'
+     Several test processes to self-test BPEL2oWFN. The processes
+     `loan.bpel', `purchase.bpel' and `shipping.bpel' were taken from
+     the BPEL4WS 1.1 specification.

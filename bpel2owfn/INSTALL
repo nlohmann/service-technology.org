@@ -1,11 +1,94 @@
 BPEL2oWFN Version 1.0 (16 January 2006)
-=======================================
+***************************************
 
-- To compile the excecutable and create the documentation, type `make'.
+Compilation
+===========
 
-- To clean up all temporary files, type `make clean'. The documentation and the
-  binary is not deleted.
+Compile BPEL2oWFN is controlled by several Makefiles. Make sure that
+all required programs (see *Note Required Programs::) are reachable in
+your path. To compile BPEL2oWFN, just run `make'. After successful
+compilation an executable file `bpel2owfn' (or `bpel2owfn.exe' on
+systems running Microsoft Windows) is created in the directory
+`bpel2owfn-1.0/src' of the distribution. This file has no dependencies
+to other files of the distribution and can be copied to any directory.
 
-- To delete all files created by building the program, type `make distclean'.
+Any warning during an in other respects successful compilation can be
+ignored--these warnings mostly occur in generated files from Flex,
+Bison or Kimwitu++ and are outside of our scope.
 
-- To check the built excecutable, type `make check'.
+BPEL2oWFN was tested on several operating systems such as Microsoft
+Windows (running cygwin), Linux and Sun OS. Anyway, if the compilation
+fails please make sure you use the most recent versions of the GNU
+Compiler Collection, Flex, Bison and Kimwitu++. If this does not help
+please send us an electronic mail to <nlohmann@informatik.hu-berlin.de>.
+Include the version number of your distribution (version 1.0 of 26
+January 2006). Also include in your message the output that the make
+process produced. We will try to answer your mail within a week.
+
+Makefile Targets
+================
+
+`all'
+     Compile BPEL2oWFN and its documentation.
+
+`clean'
+     Clean all temporary files created during the compilation.
+     Executables as well as generated documentation are preserved.
+
+`distclean'
+     Clean everything that does not belong to the distribution, i.e.
+     any file created during compilation. Executables as well as the
+     created documentation are also removed.
+
+`check'
+     Performs a number of self-tests. The directory `test' contains
+     several BPEL processes.
+
+`dist'
+     Creates a zipped tarball containing all files of the distribution.
+
+Required Programs
+=================
+
+To compile BPEL2oWFN you need the following programs. These programs
+are (as BPEL2oWFN itself) free software distributed under the GNU
+General Public License.
+
+Flex, A fast scanner generator
+     Flex is needed to generate the lexer of BPEL2oWFN. Flex was written
+     by Vern Paxon. Copyright (C) 1990 The Regents of the University of
+     California. All rights reserved. Flex is available under
+     `http://www.gnu.org/software/flex/flex.html'.
+
+Bison, The YACC-compatible Parser Generator
+     Bison is needed to generate the parser of BPEL2oWFN. Bison was
+     written by Robert Corbett und Richard Stallman. Copyright (C) 1992,
+     1998, 1999, 2003, 2004, 2005 Free Software Foundation, Inc. Bison
+     is available under `http://www.gnu.org/software/bison/bison.html'.
+
+Kimwitu++, The Term Processor
+     Kimwitu++ is needed to generate all files managing the AST
+     (abstract syntax tree). Kimwitu++ was written by Toby Neumann and
+     Michael Piefel.  Copyright (C) 1988-1997  Axel Belinfante,
+     University of Twente.  Copyright (C) 1997-2000  Michael Piefel,
+     Humboldt-University Berlin.  Kimwitu++ is available under
+     `http://site.informatik.hu-berlin.de/kimwitu++'.
+
+Optional Programs
+=================
+
+BPEL2oWFN is a compiler and thus creating output files which can be
+read by several other programs. These programs are not needed to compile
+BPEL2oWFN yet without these programs BPEL2oWFN makes not much sense.
+
+LoLA, a Low Level Petri net Analyzer
+     LoLA is an explicit model checker implementing a broad variety of
+     reduction techniques such as partial order reduction, symmetries
+     or the sweep line method. LoLA was written by Karsten Schmidt and
+     is available under
+     `http://www.informatik.hu-berlin.de/~kschmidt/lola.html'.
+
+Graphviz, the Graph Visualization Software
+     Graphviz is a graph visualization software with several graph
+     layout programs including dot. Graphviz is maintained by AT&T Labs
+     and is available under `http://www.graphviz.org'.

@@ -1,4 +1,4 @@
-# last changed $Date: 2006/01/04 22:51:54 $ by $Author: nlohmann $
+# last changed $Date: 2006/01/04 23:18:28 $ by $Author: nlohmann $
 
 .PHONY: all clean distclean
 
@@ -7,7 +7,7 @@ DISTNAME = bpel2owfn-1.0
 
 # Files
 DISTFILES = AUTHORS CHANGES COPYING INSTALL README Makefile
-DISTDIRS  = doc src
+DISTDIRS  = doc src test
 
 all:
 	$(MAKE) all --directory=src

@@ -28,7 +28,7 @@
  *          - last changes of: \$Author: gierds $
  *          
  * \date
- *          - last changed: \$Date: 2006/01/03 13:27:19 $
+ *          - last changed: \$Date: 2006/01/04 11:43:32 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
@@ -1044,6 +1044,8 @@ csLink::csLink( string myname )
 {
   name = myname;
   line = yylineno;
+  isSource = false;
+  isTarget = false;
 }
 
 /**

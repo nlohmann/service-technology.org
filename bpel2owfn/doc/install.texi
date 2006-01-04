@@ -4,7 +4,6 @@
 @afourpaper
 @settitle Translating @acronym{BPEL} Processes to Open Workflow Nets
 
-
 @c ----------------------------------------------------------------------------
 
 @copying
@@ -19,22 +18,37 @@ Copying and distribution of this file, with or without modification,
 are permitted in any medium without royalty provided the copyright
 notice and this notice are preserved.
 
-
-
 @acronym{BPEL2oWFN} is licensed under the @acronym{GNU} General Public License.
 
 Copyright @copyright{} 2005, 2006 Niels Lohmann, Christian Gierds and Dennis
 Reinert.
+
+@iftex
+@image{images/tools4bpel,,0.4in}
+@end iftex
+
+@acronym{BPEL2oWFN} is part of the Tools4@acronym{BPEL} project funded by the
+Bundesministerium f@"ur Bildung und Forschung.
 
 @end copying
 
 @c ----------------------------------------------------------------------------
 
 @titlepage
+
+@iftex
+@title @image{images/bpel2owfn,,0.5in}
+@end iftex
+
+@ifnottex
 @title @acronym{BPEL2oWFN}
-@subtitle Installation Manual
+@end ifnottex
+
 @subtitle Translating @acronym{BPEL} Processes to Open Workflow Nets
 @subtitle @acronym{BPEL2oWFN} Version @value{VERSION}, @value{UPDATED}
+@vskip 4pt
+@subtitle Installation Manual
+
 @author Niels Lohmann
 
 @page
@@ -56,6 +70,7 @@ Reinert.
 * Contents of this Distribution::
 * Setup and Installation::
 * Needed Programs::
+* Change Log::
 * Authors and Acknowledgements::
 @end menu
 
@@ -137,7 +152,7 @@ the @acronym{BPEL4WS} 1.1 specification.
 
 @section Compilation
 Compile @acronym{BPEL2oWFN} is controlled by several Makefiles. Make sure that
-all essential programs (see @ref{Essential Programs}) are reachable in your
+all required programs (see @ref{Required Programs}) are reachable in your
 path. To compile @acronym{BPEL2oWFN}, just run @samp{make}. After successful
 compilation an executable file @file{bpel2owfn} (or @file{bpel2owfn.exe} on
 systems running Microsoft Windows) is created in the directory
@@ -191,8 +206,8 @@ Creates a zipped tarball containing all files of the distribution.
 @node Needed Programs
 @chapter Needed Programs
 
-@anchor{Essential Programs}
-@section Essential Programs
+@anchor{Required Programs}
+@section Required Programs
 
 To compile @acronym{BPEL2oWFN} you need the following programs. These programs
 are (as @acronym{BPEL2oWFN} itself) free software distributed under the
@@ -249,8 +264,24 @@ including dot. Graphviz is maintained by AT&T Labs and is available under
 
 @c ----------------------------------------------------------------------------
 
+@node Change Log
+@chapter Change Log
+
+@table @b
+@item Version 1.0 (16.01.2006)
+@itemize --
+@item initial release
+@end itemize
+@end table
+
+
+
+@c ----------------------------------------------------------------------------
+
 @node Authors and Acknowledgements
 @chapter Authors and Acknowledgements
+
+@section Authors
 
 @acronym{BPEL2oWFN} was written by:
 @itemize
@@ -264,6 +295,8 @@ The Petri net patterns were created by:
 @item Christian Stahl (Humboldt-Universit@"at zu Berlin)
 @end itemize
 
+@section Acknowledgements
+
 We would like to thank:
 @itemize
 @item Simon Moser (IBM) for valuable advice concerning @acronym{BPEL}
@@ -274,5 +307,24 @@ processes
 
 @acronym{BPEL2oWFN} is part of the Tools4@acronym{BPEL} project funded by the
 Bundesministerium f@"ur Bildung und Forschung.
+
+@section Contact Person
+Niels Lohmann
+
+Humboldt-Universit@"at zu Berlin@*
+Institut f@"ur Informatik@*
+Unter den Linden 6@*
+10099 Berlin, Germany
+
+@table @asis
+@itemx Homepage
+@url{http://www.informatik.hu-berlin.de/top/mitarbeiter/lohmann}
+
+@itemx E-mail
+@email{nlohmann@@informatik.hu-berlin.de}
+
+@itemx Phone
+(+49) (30) 2093 3070
+@end table
 
 @bye

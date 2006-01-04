@@ -1,4 +1,4 @@
-# last changed $Date: 2006/01/03 11:41:28 $ by $Author: nlohmann $
+# last changed $Date: 2006/01/04 09:56:24 $ by $Author: nlohmann $
 
 
 
@@ -23,7 +23,7 @@ dvi: bpel2owfn.texi gpl.texi version.texi
 	$(TEXI2DVI) $(TEXI2DVIFLAGS) bpel2owfn.texi
 
 ps: dvi
-	$(DVIPS) $(DVIPSFLAGS) bpel2owfn.dvi
+	$(DVIPS) $(DVIPSFLAGS) bpel2owfn.dvi -o bpel2owfn.ps
 
 pdf: dvi
 	$(TEXI2DVI) $(TEXI2DVIFLAGS) --pdf bpel2owfn.texi

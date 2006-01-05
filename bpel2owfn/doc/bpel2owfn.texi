@@ -387,7 +387,14 @@ Exception #2 occured!
 An example:
 @cartouche
 @smallexample
-LoLA and dot output on stdout are confusing, chose one!
+An error has occured while parsing "example.bpel"!
+
+Exception #10 occured!
+
+   Chosen parameters cannot work together (see parameter -h).
+
+ Additional information:
+   LoLA and dot output on stdout are confusing, chose one!
 @end smallexample
 @end cartouche
 

@@ -1,4 +1,4 @@
-# last changed $Date: 2006/01/04 22:52:07 $ by $Author: nlohmann $
+# last changed $Date: 2006/01/05 09:14:22 $ by $Author: nlohmann $
 
 
 
@@ -45,6 +45,14 @@ bpel2owfn.html: bpel2owfn.texi
 
 install.html: install.texi
 	$(MAKEINFO) $< --html --no-split --output=$@
+
+distinstructions: install.texi
+	$(MAKEINFO) $< -oinstall.txt --no-split --no-headers --no-number-section
+	sed -n '/BEGIN OF README/,/END OF README/w ../README' install.txt
+	sed -n '/BEGIN OF CHANGES/,/END OF CHANGES/w ../CHANGES' install.txt
+	sed -n '/BEGIN OF AUTHORS/,/END OF AUTHORS/w ../AUTHORS' install.txt
+	sed -n '/BEGIN OF INSTALL/,/END OF INSTALL/w ../INSTALL' install.txt
+	rm install.txt
 
 
 ###############################################################################

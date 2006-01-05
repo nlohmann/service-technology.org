@@ -1,3 +1,5 @@
+BEGIN OF README file for BPEL2oWFN Version 1.0
+
 Contents of this Distribution
 *****************************
 
@@ -44,3 +46,5 @@ Directories
      Several test processes to self-test BPEL2oWFN. The processes
      `loan.bpel', `purchase.bpel' and `shipping.bpel' were taken from
      the BPEL4WS 1.1 specification.
+
+END OF README file for BPEL2oWFN Version 1.0

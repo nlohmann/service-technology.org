@@ -1,3 +1,5 @@
+BEGIN OF INSTALL file for BPEL2oWFN Version 1.0
+
 Setup and Installation
 **********************
 
@@ -114,3 +116,5 @@ Graphviz, the Graph Visualization Software
      Graphviz is a graph visualization software with several graph
      layout programs including dot. Graphviz is maintained by AT&T Labs
      and is available under `http://www.graphviz.org'.
+
+END OF INSTALL file for BPEL2oWFN Version 1.0

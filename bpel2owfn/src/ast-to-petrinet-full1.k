@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/02 15:21:52 $
+ *          - last changed: \$Date: 2006/01/05 13:40:00 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.83 $
+ * \version \$Revision: 1.84 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
@@ -2739,7 +2739,7 @@ This=Scope(a,b,c,d,e,f,g)
 	Place *push_child    = TheNet->newPlace( intToString((*child)->id->value) + ".push");
 	Place *notPush_child = TheNet->newPlace( intToString((*child)->id->value) + ".!push");
       }
-      
+      Place *p1  = TheNet->newPlace(prefix + "negLink");
       Place *p2  = TheNet->newPlace(prefix + "initial");
       Place *p3  = TheNet->newPlace(prefix + "ch_in");
       Place *p4  = TheNet->newPlace(prefix + "scopeCompensated");
@@ -2943,6 +2943,7 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->mergePlaces(prefix + "p48",            prefix + "stop.upperFH"); 
       
       // embed the inner activity
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "negLink"), TheNet->findPlace(g, ".negLink"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p21"), TheNet->findPlace(g, ".initial"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p22"), TheNet->findPlace(g, ".final"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p23"), TheNet->findPlace(g, ".stop"));

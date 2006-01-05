@@ -92,6 +92,10 @@ Bundesministerium f@"ur Bildung und Forschung.
 
 @c ----------------------------------------------------------------------------
 
+@ifplaintext
+BEGIN OF README file for BPEL2oWFN Version @value{VERSION}
+@end ifplaintext
+
 @node Contents of this Distribution
 @chapter Contents of this Distribution
 
@@ -149,11 +153,18 @@ Several test processes to self-test @acronym{BPEL2oWFN}. The processes
 the @acronym{BPEL4WS} 1.1 specification.
 @end table
 
+@ifplaintext
+END OF README file for BPEL2oWFN Version @value{VERSION}
+@end ifplaintext
 
 
 
 
 @c ----------------------------------------------------------------------------
+
+@ifplaintext
+BEGIN OF INSTALL file for BPEL2oWFN Version @value{VERSION}
+@end ifplaintext
 
 @node Setup and Installation
 @chapter Setup and Installation
@@ -284,11 +295,18 @@ including dot. Graphviz is maintained by AT&T Labs and is available under
 @url{http://www.graphviz.org}.
 @end table
 
+@ifplaintext
+END OF INSTALL file for BPEL2oWFN Version @value{VERSION}
+@end ifplaintext
 
 
 
 
 @c ----------------------------------------------------------------------------
+
+@ifplaintext
+BEGIN OF CHANGES file for BPEL2oWFN Version @value{VERSION}
+@end ifplaintext
 
 @node Change Log
 @chapter Change Log
@@ -300,9 +318,16 @@ including dot. Graphviz is maintained by AT&T Labs and is available under
 @end itemize
 @end table
 
+@ifplaintext
+END OF CHANGES file for BPEL2oWFN Version @value{VERSION}
+@end ifplaintext
 
 
 @c ----------------------------------------------------------------------------
+
+@ifplaintext
+BEGIN OF AUTHORS file for BPEL2oWFN Version @value{VERSION}
+@end ifplaintext
 
 @node Authors and Acknowledgements
 @chapter Authors and Acknowledgements
@@ -352,5 +377,9 @@ Unter den Linden 6@*
 @itemx Phone
 (+49) (30) 2093 3070
 @end table
+
+@ifplaintext
+END OF AUTHORS file for BPEL2oWFN Version @value{VERSION}
+@end ifplaintext
 
 @bye

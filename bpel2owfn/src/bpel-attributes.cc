@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/01/05 15:55:43 $
+ *          - last changed: \$Date: 2006/01/05 16:23:32 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
  *
  * \todo
  *       - (reinert) Comment this file and its classes.
@@ -766,6 +766,35 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 			}
 			break;				
 
+		case K_SOURCE:
+			{
+				traceAM("SOURCE\n");
+
+				bool linkNameFlag;
+				linkNameFlag = false;
+				 
+				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
+				
+				///
+				while(scannerResultDataIterator != scannerResult[elementIdInt].end())
+				{	
+					if(((*scannerResultDataIterator).first) == A__LINK_NAME)
+					{
+						linkNameFlag = true;
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}
+					++scannerResultDataIterator;
+				}
+				
+				if(!linkNameFlag)
+				{
+					printErrorMsg("attribute " + A__LINK_NAME + "=\"" + T__NCNAME + "\" is missing");					
+				}
+
+			}
+			break;	
+
+
 		case K_SWITCH:
 			{
 				traceAM("SWITCH\n");
@@ -774,6 +803,34 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 
 			}
 			break;				
+
+		case K_TARGET:
+			{
+				traceAM("TARGET\n");
+
+				bool linkNameFlag;
+				linkNameFlag = false;
+				 
+				scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
+				
+				///
+				while(scannerResultDataIterator != scannerResult[elementIdInt].end())
+				{	
+					if(((*scannerResultDataIterator).first) == A__LINK_NAME)
+					{
+						linkNameFlag = true;
+						traceAM((*scannerResultDataIterator).first + "\n");
+					}
+					++scannerResultDataIterator;
+				}
+				
+				if(!linkNameFlag)
+				{
+					printErrorMsg("attribute " + A__LINK_NAME + "=\"" + T__NCNAME + "\" is missing");					
+				}
+
+			}
+			break;	
 
 		case K_TERMINATE:
 			{

@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2005/12/21 11:15:21 $
+ *          - last changed: \$Date: 2006/01/05 16:23:32 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.79 $
+ * \version \$Revision: 1.80 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -1825,11 +1825,13 @@ tTarget_list:
 
 tTarget:
   K_TARGET arbitraryAttributes X_NEXT X_SLASH K_TARGET
-    { $$ = Target();
+    { att.check($2, K_TARGET);
+      $$ = Target();
       $$->linkName = att.read($2, "linkName"); 
       $$->linkID = symMan.checkLink($$->linkName->name, false); }
 | K_TARGET arbitraryAttributes X_SLASH
-    { $$ = Target();
+    { att.check($2, K_TARGET);
+      $$ = Target();
       $$->linkName = att.read($2, "linkName"); 
       $$->linkID = symMan.checkLink($$->linkName->name, false); }
 ;
@@ -1847,7 +1849,8 @@ tSource_list:
 
 tSource:
   K_SOURCE arbitraryAttributes X_NEXT X_SLASH K_SOURCE
-    { $$ = Source();
+    { att.check($2, K_SOURCE);
+      $$ = Source();
       $$->linkName = att.read($2, "linkName");
       $$->transitionCondition = att.read($2, "transitionCondition", $$->transitionCondition); 
       $$->linkID = symMan.checkLink($$->linkName->name, true); 
@@ -1856,7 +1859,8 @@ tSource:
       symMan.remDPEend();
     }
 | K_SOURCE arbitraryAttributes X_SLASH
-    { $$ = Source();
+    { att.check($2, K_SOURCE);
+      $$ = Source();
       $$->linkName = att.read($2, "linkName");
       $$->transitionCondition = att.read($2, "transitionCondition", $$->transitionCondition); 
       $$->linkID = symMan.checkLink($$->linkName->name, true);

@@ -41,6 +41,7 @@ const std::string A__EXPRESSION = "expression";
 const std::string A__FAULT_NAME = "faultName";
 const std::string A__FOR = "for";
 const std::string A__INPUT_VARIABLE = "inputVariable";
+const std::string A__LINK_NAME = "linkName";
 const std::string A__NAME = "name";
 const std::string A__OPERATION = "operation";
 //const std::string A__OUTPUT_VARIABLE = "outputVariable";

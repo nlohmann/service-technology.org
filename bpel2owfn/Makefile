@@ -1,4 +1,4 @@
-# last changed $Date: 2006/01/04 23:18:28 $ by $Author: nlohmann $
+# last changed $Date: 2006/01/05 09:57:37 $ by $Author: nlohmann $
 
 .PHONY: all clean distclean
 
@@ -28,7 +28,6 @@ check:
 
 dist: distclean
 	mkdir $(DISTNAME)
-	chmod 777 $(DISTNAME)
 	cp -R $(DISTDIRS) $(DISTNAME)
 	cp $(DISTFILES) $(DISTNAME)
 	tar cvf $(DISTNAME).tar $(DISTNAME)

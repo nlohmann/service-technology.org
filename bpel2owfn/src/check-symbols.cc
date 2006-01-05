@@ -28,7 +28,7 @@
  *          - last changes of: \$Author: gierds $
  *          
  * \date
- *          - last changed: \$Date: 2006/01/04 11:43:32 $
+ *          - last changed: \$Date: 2006/01/05 15:02:49 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
@@ -579,16 +579,16 @@ kc::casestring SymbolManager::checkLink(csLink* link, bool asSource)
     if (asSource)
     {
       scope = currentScope;
-      while( (scope != NULL) && (typeid(*scope) != typeid(ScopeScope)) )
+      while( (scope != NULL) )
       {
+        if ( typeid(*scope) == typeid(ScopeScope))
+        {
+          trace(TRACE_VERY_DEBUG, "[CS]   Adding " + uniqueID 
+	  	                + " to list of inner links for Scope " 
+  			        + intToString(scope->id->value) + "\n");
+          (dynamic_cast <ScopeScope *> (scope))->innerLinks.push_back(uniqueID);
+        }
         scope = scope->parent;
-      }
-      if ( (scope != NULL) && typeid(*scope) == typeid(ScopeScope))
-      {
-        trace(TRACE_VERY_DEBUG, "[CS]   Adding " + uniqueID 
-	  	              + " to list of inner links for Scope " 
-			      + intToString(scope->id->value) + "\n");
-        (dynamic_cast <ScopeScope *> (scope))->innerLinks.push_back(uniqueID);
       }
     }
   }

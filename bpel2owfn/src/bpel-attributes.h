@@ -21,8 +21,6 @@
 /*!
  * \file bpel-attributes.h
  *
- * \todo
- *       - (reinert) Comment this file and its classes.
  */
 
 
@@ -78,6 +76,7 @@ class attributeManager
   private:
     
     /// an array to store attributes of XML-elements
+    /// <bpel-element-id, <attribute name, attribute value>>
     std::map<unsigned int, std::map<std::string, std::string> > scannerResult;
 	
 	/// AM traces
@@ -91,6 +90,9 @@ class attributeManager
 	
 	/// returns valid or unvalid depending on attribute value
 	bool isValidAttributeValue(std::string attributeName, std::string attributeValue);
+	
+	/// returns valid or unvalid depending on attribute already exists or not
+	bool isDuplicate(std::string attributeName);
   
   public:
     /// constructor

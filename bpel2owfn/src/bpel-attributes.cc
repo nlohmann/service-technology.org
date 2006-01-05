@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/29 10:20:41 $
+ *          - last changed: \$Date: 2006/01/05 15:55:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.25 $
+ * \version \$Revision: 1.26 $
  *
  * \todo
  *       - (reinert) Comment this file and its classes.
@@ -168,6 +168,27 @@ bool attributeManager::isValidAttributeValue(std::string attributeName, std::str
 }
 
 /*!
+ * 
+ */
+bool attributeManager::isDuplicate(std::string attributeName)
+{
+
+	std::map<std::string, std::string>::iterator scannerResultDataIterator;
+	scannerResultDataIterator = this->scannerResult[this->nodeId].begin();
+	
+	/// iteration loop about all xml-element attributes
+	while(scannerResultDataIterator != this->scannerResult[this->nodeId].end())
+	{
+		if(attributeName.compare((*scannerResultDataIterator).first) == 0)
+		{
+			return true;
+		}
+		++scannerResultDataIterator;
+	}	
+	return false;	
+}
+
+/*!
  * Stored an attribute with his name and value into the AM array under
  * the current BPEL-element id. The BPEL element id is managed by the AM.
  * \param attributeName
@@ -175,8 +196,14 @@ bool attributeManager::isValidAttributeValue(std::string attributeName, std::str
  */
 void attributeManager::define(kc::casestring attributeName, kc::casestring attributeValue)
 {  	
-  
+	  
   //traceAM("define\n" + string(attributeName->name) + "=" + string(attributeValue->name) + "\n");
+
+  if(isDuplicate(attributeName->name))
+  {
+  	//traceAM("define DUPLIKAT GEFUNDEN\n" + string(attributeName->name) + "=" + string(attributeValue->name) + "\n");
+  	printErrorMsg("attribute <" + (string)attributeName->name + "> already exist");
+  }
 
   if(isValidAttributeValue(attributeName->name, attributeValue->name))  
   {
@@ -199,7 +226,7 @@ void attributeManager::printErrorMsg(std::string errorMsg)
  */
 void attributeManager::traceAM(std::string traceMsg)
 {
-	//trace(TRACE_DEBUG, "[AM] " + traceMsg);	
+	trace(TRACE_DEBUG, "[AM] " + traceMsg);	
 }
 
 /*!

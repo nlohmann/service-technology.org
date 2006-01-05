@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/05 13:40:00 $
+ *          - last changed: \$Date: 2006/01/05 17:14:36 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.84 $
+ * \version \$Revision: 1.85 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
@@ -1263,6 +1263,7 @@ This=EventHandler(a,b) ->
 	TheNet->mergePlaces(onAlarm_p9,  TheNet->findPlace(innerActivity, ".stop"));
 	TheNet->mergePlaces(onAlarm_p10, TheNet->findPlace(innerActivity, ".stopped"));
 	TheNet->mergePlaces(onAlarm_p2,  TheNet->findPlace(innerActivity, ".final"));
+	TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.eventHandler.failed"),  TheNet->findPlace(innerActivity, ".failed"));
 	
 	onAlarmCount++;
       }

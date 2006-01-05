@@ -36,8 +36,9 @@ Reinert.
 @end ifhtml
 
 @acronym{BPEL2oWFN} is part of the Tools4@acronym{BPEL} project funded by the
-Bundesministerium f@"ur Bildung und Forschung.
-
+Bundesministerium f@"ur Bildung und Forschung. See
+@url{www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel} for
+details.
 @end copying
 
 @c ----------------------------------------------------------------------------

@@ -12,12 +12,12 @@
 @image{images/bpel2owfn}
 @end ifhtml
 
-This manual describes the installation of @acronym{BPEL2oWFN}, Version
+This manual describes the installation of @acronym{BPEL2oWFN}, version
 @value{VERSION}, a tool translating business processes described in
 @acronym{BPEL} to open workflow nets (@acronym{oWFN}),
 last updated @value{UPDATED}.
 
-Copyright @copyright{} 2005, 2006 Niels Lohmann
+Copyright @copyright{} 2006 Niels Lohmann
 
 Copying and distribution of this file, with or without modification,
 are permitted in any medium without royalty provided the copyright
@@ -38,8 +38,7 @@ Reinert.
 
 @acronym{BPEL2oWFN} is part of the Tools4@acronym{BPEL} project funded by the
 Bundesministerium f@"ur Bildung und Forschung. See
-@url{www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel} for
-details.
+@url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
 
 @end copying
 
@@ -96,6 +95,21 @@ details.
 
 @ifplaintext
 BEGIN OF README file for BPEL2oWFN Version @value{VERSION}
+
+@chapter About this Distribution
+This file describes this distribution of @acronym{BPEL2oWFN}, version
+@value{VERSION}, a tool translating business processes described in
+@acronym{BPEL} to open workflow nets (@acronym{oWFN}),
+last updated @value{UPDATED}.
+
+@acronym{BPEL2oWFN} is licensed under the @acronym{GNU} General Public License.
+
+Copyright @copyright{} 2005, 2006 Niels Lohmann, Christian Gierds and Dennis
+Reinert.
+
+@acronym{BPEL2oWFN} is part of the Tools4@acronym{BPEL} project funded by the
+Bundesministerium f@"ur Bildung und Forschung. See
+@url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
 @end ifplaintext
 
 @node Contents of this Distribution
@@ -113,7 +127,7 @@ The change log listing all changes made during the distribution versions of
 @item COPYING
 The @acronym{GNU} General Public License (@acronym{GPL}) under which
 @acronym{BPEL2oWFN} is distributed. The @acronym{GPL} is also a chapter of the
-manual.
+User's Manual.
 
 @item INSTALL
 Setup and Installation instructions and all information needed to bootstrap
@@ -121,7 +135,7 @@ Setup and Installation instructions and all information needed to bootstrap
 
 @item Makefile
 The Makefile controlling the compilation of @acronym{BPEL2oWFN} and the
-generation of the documentation.
+generation of the documentation files.
 
 @item README
 A file describing the contents of the distribution.
@@ -150,8 +164,10 @@ an
 @iftex
 this
 @end iftex
-installation manual. The documentation is in Texinfo format and can be compiled
-using @samp{make}.
+installation manual. The documentation is in Texinfo format and can be
+converted into many file formats using @samp{make @var{format}} where
+@samp{@var{format}} is a file format out of @samp{dvi}, @samp{html},
+@samp{pdf}, @samp{ps} or @samp{info}.
 
 @item test
 Several test processes to self-test @acronym{BPEL2oWFN}. The processes
@@ -201,7 +217,7 @@ produced. We will try to answer your mail within a week.
 If you are not interested in compiling @acronym{BPEL2oWFN} yourself you can
 alternatively download executable binaries for several operating systems on the
 website of @acronym{BPEL2oWFN}
-(@url{www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel/bpel2owfn}).
+(@url{http://www.informatik.hu-berlin.de/top/tools4bpel/bpel2owfn}).
 
 @section Makefile Targets
 
@@ -233,12 +249,18 @@ are also removed.
 
 @item check
 Perform a number of self-tests: the directory @file{test} contains several
-@acronym{BPEL} processes which are processed.
+@acronym{BPEL} processes which are read and compiled.
 
 @item dist
 Create a zipped distribution tar file containing all files of the distribution
 (calls @samp{distclean} before).
 @end table
+
+For the compilation of the sources in the directory @file{@value{FILENAME}/src}
+it is possible to set an optimization level of @code{g++} by setting a variable
+@samp{OPTIMIZE}. For example, @samp{make OPTIMIZE=-O3} invokes a compilation
+with all possible optimization which yields to a smaller and faster executable
+and longer compilation time.
 
 
 @c ----------------------------------------------------------------------------
@@ -382,7 +404,10 @@ Unter den Linden 6@*
 @email{nlohmann@@informatik.hu-berlin.de}
 
 @itemx Phone
-(+49) (30) 2093 3070
+(+49) (30) 2093-3070
+
+@itemx Fax
+(+49) (30) 2093-3067
 @end table
 
 @ifplaintext

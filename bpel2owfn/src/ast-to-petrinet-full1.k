@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/05 17:14:36 $
+ *          - last changed: \$Date: 2006/01/06 10:36:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.85 $
+ * \version \$Revision: 1.86 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
@@ -2803,6 +2803,7 @@ This=Scope(a,b,c,d,e,f,g)
       Transition *t11 = TheNet->newTransition(prefix + "t11"); 
       Transition *t12 = TheNet->newTransition(prefix + "passFaultUp");
       Transition *t13 = TheNet->newTransition(prefix + "ignoreFault");
+      Transition *t16 = TheNet->newTransition(prefix + "t16");
       TheNet->newArc(p29, t1);
       TheNet->newArc(t1, p38); 
       TheNet->newArc(p2, t2);
@@ -2849,6 +2850,7 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->newArc(p20, t11);
       TheNet->newArc(t11, p45);
       TheNet->newArc(p51, t11);
+      TheNet->newArc(p53, t16, "false");
       
       // new transitions to pass fault to parent
       TheNet->newArc(p48, t12);
@@ -2954,6 +2956,22 @@ This=Scope(a,b,c,d,e,f,g)
       // merge (!)Terminated places
       TheNet->mergePlaces(TheNet->findPlace("1.internal.!Terminated"), p8);
       TheNet->mergePlaces(TheNet->findPlace("1.internal.Terminated"), p9);
+
+      // setting all enclosed links to false in case of an error
+      for (list<string>::iterator link = ((ScopeScope *)me)->innerLinks.begin(); link != ((ScopeScope *)me)->innerLinks.end(); link++)
+      {
+	Place *p61 = TheNet->newPlace(prefix + "p61.link." + *link);
+	Place *p62 = TheNet->findPlace("link." + *link);
+	Place *p63 = TheNet->findPlace("!link." + *link);
+	Transition *t14 = TheNet->newTransition(prefix + "t14.link." + *link);
+	Transition *t15 = TheNet->newTransition(prefix + "t15.link." + *link);
+	TheNet->newArc(p61, t14, "b");
+	TheNet->newArc(t14, p62, "b");
+	TheNet->newArc(p63, t14);
+	TheNet->newArc(p61, t15, "b");
+	TheNet->newArc(t16, p61, "b");
+	TheNet->newArc(p62, t15, READ, "b");
+      }      
 
       currentScope = intToString(This->parentScopeId->value) + ".internal.";
       trace(TRACE_DEBUG, "[PNU]\t</scope>\n");

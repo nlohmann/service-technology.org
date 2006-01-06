@@ -31,107 +31,106 @@ THE BPEL4WS SPECIFICATION.
 -->
 
 <process name="shippingService"
-      targetNamespace="http://acme.com/shipping"
-         xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
-      xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-      xmlns:sns="http://ship.org/wsdl/shipping"
+	 targetNamespace="http://acme.com/shipping"
+	 xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+	 xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	 xmlns:sns="http://ship.org/wsdl/shipping"
          xmlns:props="http://example.com/shipProps/"
          abstractProcess="yes">
 
-<partnerLinks>
-  <partnerLink name="customer"
-           partnerLinkType="sns:shippingLT"
-        partnerRole="shippingServiceCustomer"
-        myRole="shippingService"/>
-</partnerLinks>
+    <partnerLinks>
+	<partnerLink name="customer"
+	             partnerLinkType="sns:shippingLT"
+	             partnerRole="shippingServiceCustomer"
+		     myRole="shippingService" />
+    </partnerLinks>
 
-<variables>
-  <variable name="shipRequest"
-             messageType="sns:shippingRequestMsg"/>
-  <variable name="shipNotice"
-        messageType="sns:shippingNoticeMsg"/>
-  <variable name="itemsShipped"
-             type="props:itemCountType"/>
-</variables>
+    <variables>
+	<variable name="shipRequest"
+		  messageType="sns:shippingRequestMsg" />
+	<variable name="shipNotice"
+		  messageType="sns:shippingNoticeMsg" />
+	<variable name="itemsShipped"
+		  type="props:itemCountType" />
+    </variables>
 
-<correlationSets>
-  <correlationSet name="shipOrder"
-         properties="props:shipOrderID"/>
-</correlationSets>
+    <correlationSets>
+	<correlationSet name="shipOrder"
+	                properties="props:shipOrderID" />
+    </correlationSets>
 
-<sequence>
+    <sequence>
+	<receive partnerLink="customer"
+    		 portType="sns:shippingServicePT"
+    		 operation="shippingRequest"
+    		 variable="shipRequest">
+	    <correlations>
+		<correlation set="shipOrder" initiate="yes" />
+    	    </correlations>
+	</receive>
 
-  <receive partnerLink="customer"
-           portType="sns:shippingServicePT"
-        operation="shippingRequest"
-        variable="shipRequest">
-    <correlations>
-      <correlation set="shipOrder" initiate="yes"/>
-    </correlations>
-  </receive>
-
-  <switch>
-    <case condition=
-       "bpws:getVariableProperty('shipRequest','props:shipComplete')" >
-      <sequence>
-     <assign>
-          <copy>
-            <from variable="shipRequest" property="props:itemsCount"/>
-            <to variable="shipNotice" property="props:itemsCount"/>
-          </copy>
-        </assign>
-        <invoke partnerLink="customer"
-        portType="sns:shippingServiceCustomerPT"
-              operation="shippingNotice"
-        inputVariable="shipNotice">
-       <correlations>
-         <correlation set="shipOrder" pattern="out"/>
-       </correlations>
-     </invoke>
-      </sequence>
-    </case>
-    <otherwise>
-      <sequence>
-        <assign>
-          <copy>
-         <from expression="0"/>
-         <to variable="itemsShipped"/>
-          </copy>
-     </assign>
-     <while condition=
-         "bpws:getVariableData('itemsShipped') &lt;
-          bpws:getVariableProperty('shipRequest','props:itemsTotal')">
-           <sequence>
-           <assign>
-                <copy>
-               <from opaque="yes"/>
-               <to variable="shipNotice" property="props:itemsCount"/>
-                </copy>
-          </assign>
-             <invoke partnerLink="customer"
-               portType="sns:shippingServiceCustomerPT"
-                     operation="shippingNotice"
-               inputVariable="shipNotice">
-             <correlations>
-                <correlation set="shipOrder" pattern="out"/>
-             </correlations>
-          </invoke>
-          <assign>
-                <copy>
-               <from expression=
-                        "bpws:getVariableData('itemsShipped')
-                         + 
-                         bpws:getVariableProperty('shipNotice',
-                                                  'props:itemsCount')"/>
-               <to variable="itemsShipped"/>
-                </copy>  
-          </assign>
-           </sequence>
-      </while>
-       </sequence>
-    </otherwise>
-  </switch>
-</sequence>
+	<switch>
+	    <case condition="bpws:getVariableProperty('shipRequest','props:shipComplete')">
+		<sequence>
+		    <assign>
+			<copy>
+			    <from variable="shipRequest" property="props:itemsCount" />
+			    <to variable="shipNotice" property="props:itemsCount" />
+			</copy>
+		    </assign>
+		
+		    <invoke partnerLink="customer"
+			    portType="sns:shippingServiceCustomerPT"
+			    operation="shippingNotice"
+			    inputVariable="shipNotice">
+			<correlations>
+			    <correlation set="shipOrder" pattern="out"/>
+			</correlations>
+		    </invoke>
+		</sequence>
+	    </case>
+    
+	    <otherwise>
+		<sequence>
+		    <assign>
+			<copy>
+			    <from expression="0"/>
+			    <to variable="itemsShipped"/>
+			</copy>
+		    </assign>
+		    <while condition="bpws:getVariableData('itemsShipped') &lt;
+				     bpws:getVariableProperty('shipRequest','props:itemsTotal')">
+			<sequence>
+			    <assign>
+				<copy>
+				    <from opaque="yes"/>
+				    <to variable="shipNotice" property="props:itemsCount"/>
+				</copy>
+			    </assign>
+			
+			    <invoke partnerLink="customer"
+				    portType="sns:shippingServiceCustomerPT"
+				    operation="shippingNotice"
+				    inputVariable="shipNotice">
+				<correlations>
+				    <correlation set="shipOrder" pattern="out"/>
+				</correlations>
+			    </invoke>
+			    <assign>
+				<copy>
+				    <from expression=
+					"bpws:getVariableData('itemsShipped')
+					+
+					bpws:getVariableProperty('shipNotice',
+					'props:itemsCount')" />
+				    <to variable="itemsShipped"/>
+				 </copy>
+			    </assign>
+			</sequence>
+		    </while>
+		</sequence>
+	    </otherwise>
+	</switch>
+    </sequence>
 
 </process>
-

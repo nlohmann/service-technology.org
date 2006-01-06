@@ -29,18 +29,19 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/01/05 16:23:32 $
+ *          - last changed: \$Date: 2006/01/06 14:52:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  *
  * \todo
  *       - (reinert) Comment this file and its classes.
  *       - (reinert) Check data types (e.g. is a value "yes" or "no").
+ *       - (reinert) suppressJoinFailure
  */
 
 #include "bpel-attributes.h"
@@ -168,7 +169,9 @@ bool attributeManager::isValidAttributeValue(std::string attributeName, std::str
 }
 
 /*!
- * 
+ * this function checks whether the submitted name of attribute already element
+ * of the attribute-name-set of the current BPEL-element is.
+ * \param attributeName name of BPEL-element attribute
  */
 bool attributeManager::isDuplicate(std::string attributeName)
 {

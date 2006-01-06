@@ -6,13 +6,14 @@ Setup and Installation
 Compilation
 ===========
 
-Compile BPEL2oWFN is controlled by several Makefiles. Make sure that
-all required programs (see *Note Required Programs::) are reachable in
-your path. To compile BPEL2oWFN, just run `make'. After successful
-compilation an executable file `bpel2owfn' (or `bpel2owfn.exe' on
-systems running Microsoft Windows) is created in the directory
-`bpel2owfn-1.0/src' of the distribution. This file has no dependencies
-to other files of the distribution and can be copied to any directory.
+The compilation BPEL2oWFN is controlled by several Makefiles. Make sure
+that all required programs (see *Note Required Programs::) are
+reachable in your path. To compile BPEL2oWFN, just run `make'. After
+successful compilation an executable file `bpel2owfn' (or
+`bpel2owfn.exe' on systems running Microsoft Windows) is created in the
+directory `bpel2owfn-1.0/src' of the distribution. This file has no
+dependencies to other files of the distribution and can be copied to any
+directory.
 
 Any warning during an in other respects successful compilation can be
 ignored--these warnings mostly occur in generated files from Flex,
@@ -30,7 +31,7 @@ process produced. We will try to answer your mail within a week.
 If you are not interested in compiling BPEL2oWFN yourself you can
 alternatively download executable binaries for several operating
 systems on the website of BPEL2oWFN
-(`www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel/bpel2owfn').
+(`http://www.informatik.hu-berlin.de/top/tools4bpel/bpel2owfn').
 
 Makefile Targets
 ================
@@ -62,11 +63,17 @@ Makefile Targets
 
 `check'
      Perform a number of self-tests: the directory `test' contains
-     several BPEL processes which are processed.
+     several BPEL processes which are read and compiled.
 
 `dist'
      Create a zipped distribution tar file containing all files of the
      distribution (calls `distclean' before).
+
+For the compilation of the sources in the directory `bpel2owfn-1.0/src'
+it is possible to set an optimization level of `g++' by setting a
+variable `OPTIMIZE'. For example, `make OPTIMIZE=-O3' invokes a
+compilation with all possible optimization which yields to a smaller
+and faster executable and longer compilation time.
 
 Needed Programs
 ***************

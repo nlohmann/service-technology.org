@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2005/12/21 11:15:21 $
+ *          - last changed: \$Date: 2006/01/06 16:02:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.41 $
+ * \version \$Revision: 1.42 $
  */
 %}
 
@@ -260,6 +260,12 @@ tCompensationHandler:
 | userDefinedCompensationHandler(activity)
   {
     integer parentScopeId;
+
+    /// handler contains <compensate/> (i.e. pattern in Fig. 43)
+    bool compensateWithoutScope = false;
+
+    /// handler contains <compensate scope="A"/> (i.e. pattern Fig. 44)
+    bool compensateWithScope = false;
   }
 ;
 

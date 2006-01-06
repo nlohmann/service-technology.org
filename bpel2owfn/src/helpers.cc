@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/01/04 10:06:45 $
+ *          - last changed: \$Date: 2006/01/06 08:27:03 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  *
  */
 
@@ -365,7 +365,7 @@ void parse_command_line(int argc, char* argv[])
     if ((mode_petri_net && mode_ast) || (mode_petri_net && mode_pretty_printer) || (mode_ast && mode_pretty_printer))
     {
     throw Exception(OPTION_MISMATCH, 
-		    "Chosen parameter cannot work together (see parameter -h).\n",
+		    "Chosen parameters cannot work together (see parameter -h).\n",
 		    "Chose only one of mode Petri Net, AST or XML!\n");
     }
   }
@@ -374,21 +374,21 @@ void parse_command_line(int argc, char* argv[])
   if ((mode_lola_petri_net && mode_dot_petri_net) && !(mode_lola_2_file || mode_dot_2_file))
   {
     throw Exception(OPTION_MISMATCH, 
-		    "Chosen parameter cannot work together (see parameter -h).\n",
+		    "Chosen parameters cannot work together (see parameter -h).\n",
 		    "LoLA and dot output on stdout are confusing, chose one!\n");
   }
   // LoLA and oWFN on stdout are very confusing ! so abort 
   if ((mode_lola_petri_net && mode_owfn_petri_net) && !(mode_lola_2_file || mode_owfn_2_file))
   {
     throw Exception(OPTION_MISMATCH, 
-		    "Chosen parameter cannot work together (see parameter -h).\n",
+		    "Chosen parameters cannot work together (see parameter -h).\n",
 		    "LoLA and oWFN output on stdout are confusing, chose one!\n");
   }
   // oWFN and dot on stdout are very confusing ! so abort 
   if ((mode_owfn_petri_net && mode_dot_petri_net) && !(mode_owfn_2_file || mode_dot_2_file))
   {
     throw Exception(OPTION_MISMATCH, 
-		    "Chosen parameter cannot work together (see parameter -h).\n",
+		    "Chosen parameters cannot work together (see parameter -h).\n",
 		    "oWFN and dot output on stdout are confusing, chose one!\n");
     // exit(1);
   }

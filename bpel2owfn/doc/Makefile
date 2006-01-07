@@ -1,65 +1,63 @@
-# last changed $Date: 2006/01/06 20:48:19 $ by $Author: nlohmann $
+# last changed $Date: 2006/01/07 15:33:55 $ by $Author: nlohmann $
 
 .PHONY: clean
 
+.SUFFIXES:
+.SUFFIXES: .texi .html .ps .dvi .info
+
 # Tools
-TEXI2DVI = texi2dvi
+MAKEINFO = makeinfo  # GNU standard
+TEXI2DVI = texi2dvi  # GNU standard
 DVIPS    = dvips
 
 # Flags
 TEXI2DVIFLAGS = --quiet
 DVIPSFLAGS = -q
+MAKEINFOFLAGS = --no-split
+
+# Documentation files to be created
+DOCUFILES = bpel2owfn install
 
 
 ##############################################################################
 
-dvi: bpel2owfn.dvi install.dvi
+dvi: $(DOCUFILES:=.dvi)
 
-html: bpel2owfn.html install.html
+html: $(DOCUFILES:=.html)
 
-ps: bpel2owfn.ps install.ps
+ps: $(DOCUFILES:=.ps)
 
-pdf: bpel2owfn.pdf install.pdf
+pdf: $(DOCUFILES:=.pdf)
 
-info: bpel2owfn.info install.info
+info: $(DOCUFILES:=.info)
 
 
 ##############################################################################
 
 bpel2owfn.dvi: bpel2owfn.texi version.texi gpl.texi
-	$(TEXI2DVI) $(TEXI2DVIFLAGS) bpel2owfn.texi
-	$(TEXI2DVI) $(TEXI2DVIFLAGS) bpel2owfn.texi
+	$(TEXI2DVI) $(TEXI2DVIFLAGS) $<
+	$(TEXI2DVI) $(TEXI2DVIFLAGS) $<
 
 install.dvi: install.texi version.texi
-	$(TEXI2DVI) $(TEXI2DVIFLAGS) install.texi
-	$(TEXI2DVI) $(TEXI2DVIFLAGS) install.texi	
+	$(TEXI2DVI) $(TEXI2DVIFLAGS) $<
+	$(TEXI2DVI) $(TEXI2DVIFLAGS) $<
 
-bpel2owfn.html: bpel2owfn.texi
-	$(MAKEINFO) $< --html --no-split --output=$@
+.texi.html:
+	$(MAKEINFO) $< $(MAKEINFOFLAGS) --html --output=$@
 
-install.html: install.texi
-	$(MAKEINFO) $< --html --no-split --output=$@
-
-bpel2owfn.ps: bpel2owfn.dvi
-	$(DVIPS) $(DVIPSFLAGS) $< -o $@
-
-install.ps: install.dvi
+.dvi.ps:
 	$(DVIPS) $(DVIPSFLAGS) $< -o $@
 
 bpel2owfn.pdf: bpel2owfn.texi version.texi gpl.texi
-	$(TEXI2DVI) $(TEXI2DVIFLAGS) --pdf bpel2owfn.texi
-	$(TEXI2DVI) $(TEXI2DVIFLAGS) --pdf bpel2owfn.texi
+	$(TEXI2DVI) $(TEXI2DVIFLAGS) --pdf $<
+	$(TEXI2DVI) $(TEXI2DVIFLAGS) --pdf $<
 
 install.pdf: install.texi version.texi
-	$(TEXI2DVI) $(TEXI2DVIFLAGS) --pdf install.texi
-	$(TEXI2DVI) $(TEXI2DVIFLAGS) --pdf install.texi
+	$(TEXI2DVI) $(TEXI2DVIFLAGS) --pdf $<
+	$(TEXI2DVI) $(TEXI2DVIFLAGS) --pdf $<
 
-bpel2owfn.info: bpel2owfn.texi
-	$(MAKEINFO) $< --no-split --output=$@
-
-install.info: install.texi
-	$(MAKEINFO) $< --no-split --output=$@
-
+.texi.info:
+	$(MAKEINFO) $< $(MAKEINFOFLAGS) --output=$@
 
 ###############################################################################
 # This target creates a plain text version of the file `install.texi' and
@@ -78,9 +76,13 @@ distinstructions: install.texi
 
 clean:
 	@echo removing temporary files...
-	@-rm -f *.aux *.cp *.fn *.ky *.log *.pg *.tmp *.toc *.tp *.vr
+	@-rm -f $(DOCUFILES:=.aux) $(DOCUFILES:=.cp) $(DOCUFILES:=.fn)\
+	$(DOCUFILES:=.ky) $(DOCUFILES:=.log) $(DOCUFILES:=.pg)\
+	$(DOCUFILES:=.tmp) $(DOCUFILES:=.toc) $(DOCUFILES:=.tp)\
+	$(DOCUFILES:=.vr)
 	@-rm -f *~
 
 distclean: clean
 	@echo removing generated files...
-	@-rm -f *.dvi *.pdf *.ps *.html *.info
+	@-rm -f $(DOCUFILES:=.dvi) $(DOCUFILES:=.pdf) $(DOCUFILES:=.ps)\
+	$(DOCUFILES:=.html) $(DOCUFILES:=.info)

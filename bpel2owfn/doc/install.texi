@@ -8,6 +8,8 @@
 @c ----------------------------------------------------------------------------
 
 @copying
+@ifnotplaintext
+
 @ifhtml
 @image{images/bpel2owfn}
 @end ifhtml
@@ -40,6 +42,31 @@ Reinert.
 Bundesministerium f@"ur Bildung und Forschung. See
 @url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
 
+@end ifnotplaintext
+
+@ifplaintext
+-----------------------------------------------------------------------
+
+Copyright @copyright{} 2005, 2006 Niels Lohmann, Christian Gierds and Dennis
+Reinert.
+
+This file is part of @acronym{BPEL2oWFN}, a tool translating business processes
+described in @acronym{BPEL} to open workflow nets (@acronym{oWFN}).
+
+@acronym{BPEL2oWFN} is free software; you can redistribute it and/or modify it
+under the terms of the @acronym{GNU} General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at your option)
+any later version.
+
+@acronym{BPEL2oWFN} is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the @acronym{GNU} General Public License
+for more details.
+
+You should have received a copy of the @acronym{GNU} General Public License
+along with @acronym{BPEL2oWFN}; if not, write to the Free Software Foundation,
+Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+@end ifplaintext
 @end copying
 
 @c ----------------------------------------------------------------------------
@@ -176,6 +203,8 @@ the @acronym{BPEL4WS} 1.1 specification.
 @end table
 
 @ifplaintext
+@insertcopying
+
 END OF README file for BPEL2oWFN Version @value{VERSION}
 @end ifplaintext
 
@@ -197,7 +226,7 @@ sure that all required programs (see @ref{Required Programs}) are reachable in
 your path. To compile @acronym{BPEL2oWFN}, just run @samp{make}. After
 successful compilation an executable file @file{bpel2owfn} (or
 @file{bpel2owfn.exe} on systems running Microsoft Windows) is created in the
-directory @file{@value{FILENAME}/src} of the distribution. This file has no
+directory @file{bpel2owfn-@value{VERSION}/src} of the distribution. This file has no
 dependencies to other files of the distribution and can be copied to any
 directory.
 
@@ -225,7 +254,7 @@ website of @acronym{BPEL2oWFN}
 @item all
 Compile @acronym{BPEL2oWFN} and create an executable binary @file{bpel2owfn}
 (or @file{bpel2owfn.exe} on systems running Microsoft Windows) in the directory
-@file{@value{FILENAME}/src}.
+@file{bpel2owfn-@value{VERSION}/src}.
 
 @item dvi
 @itemx html
@@ -234,7 +263,7 @@ Compile @acronym{BPEL2oWFN} and create an executable binary @file{bpel2owfn}
 @itemx info
 Generate documentation files in the given format which can be @acronym{DVI},
 @acronym{HTML}, @acronym{PDF}, PostScript or @acronym{GNU} Info. The
-documentation is generated in the directory @file{@value{FILENAME}/doc} and
+documentation is generated in the directory @file{bpel2owfn-@value{VERSION}/doc} and
 is named @file{bpel2owfn.@var{format}} (User's Manual) and
 @file{install.@var{format}} (Installation Manual), resp.
 
@@ -256,7 +285,7 @@ Create a zipped distribution tar file containing all files of the distribution
 (calls @samp{distclean} before).
 @end table
 
-For the compilation of the sources in the directory @file{@value{FILENAME}/src}
+For the compilation of the sources in the directory @file{bpel2owfn-@value{VERSION}/src}
 it is possible to set an optimization level of @code{g++} by setting a variable
 @samp{OPTIMIZE}. For example, @samp{make OPTIMIZE=-O3} invokes a compilation
 with all possible optimization which yields to a smaller and faster executable
@@ -325,6 +354,8 @@ including dot. Graphviz is maintained by AT&T Labs and is available under
 @end table
 
 @ifplaintext
+@insertcopying
+
 END OF INSTALL file for BPEL2oWFN Version @value{VERSION}
 @end ifplaintext
 
@@ -348,6 +379,8 @@ BEGIN OF CHANGES file for BPEL2oWFN Version @value{VERSION}
 @end table
 
 @ifplaintext
+@insertcopying
+
 END OF CHANGES file for BPEL2oWFN Version @value{VERSION}
 @end ifplaintext
 
@@ -411,6 +444,8 @@ Unter den Linden 6@*
 @end table
 
 @ifplaintext
+@insertcopying
+
 END OF AUTHORS file for BPEL2oWFN Version @value{VERSION}
 @end ifplaintext
 

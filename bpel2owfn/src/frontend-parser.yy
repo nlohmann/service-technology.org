@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/01/05 16:23:32 $
+ *          - last changed: \$Date: 2006/01/07 16:14:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.80 $
+ * \version \$Revision: 1.81 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -1763,9 +1763,13 @@ tPick:
 tScope:
   K_SCOPE arbitraryAttributes X_NEXT
     { symMan.newScopeScope($2);
+      symMan.setBlackListMode(true);
       parent[$2] = currentScopeId;
       currentScopeId = $2; }
   standardElements 
+    {
+      symMan.setBlackListMode(false);
+    }
   tVariables 
   tCorrelationSets 
   tFaultHandlers 
@@ -1774,7 +1778,7 @@ tScope:
   activity 
   X_NEXT X_SLASH K_SCOPE
     { att.check($2, K_SCOPE);
-      $$ = Scope($5, $6, $8, $9, $10, StopInScope(), $11);
+      $$ = Scope($5, $7, $9, $10, $11, StopInScope(), $12);
       $$->name = att.read($2, "name");
       $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);

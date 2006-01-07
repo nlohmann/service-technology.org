@@ -28,14 +28,14 @@
  *          - last changes of: \$Author: gierds $
  *          
  * \date
- *          - last changed: \$Date: 2006/01/02 20:14:48 $
+ *          - last changed: \$Date: 2006/01/07 16:14:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  *          - 2005-11-22 (gierds) Initial version.
  *          - 2005-11-24 (gierds) Put all funcionality into a class #SymbolManager
  *          - 2005-11-29 (gierds) Added checking of variables.
@@ -97,6 +97,9 @@ class SymbolManager
     int dpePossibleEnds;
     /// stack to save possible starts when entering while
     stack<int> dpeStartStack;
+
+    /// flag for link blacklist mode
+    bool inBLM;
     
   public:
     /// list of all Links in a Process
@@ -151,6 +154,8 @@ class SymbolManager
     kc::casestring checkLink(std::string, bool asSource);
     /// run some simple checks on the Links defined in the current scope
     void checkLinks();
+    /// set blacklist mode for links in Scopes
+    void setBlackListMode(bool blm);
 
     /* --- Channels --- */
     /// adds a channel with an appropriate type
@@ -252,7 +257,6 @@ class ProcessScope: public SymbolScope
 
 class ScopeScope: public SymbolScope
 {
-
   public:
     /// list of links that may need to be set to false in case the fault handler fires
     list<std::string> innerLinks;

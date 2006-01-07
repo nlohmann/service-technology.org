@@ -28,7 +28,7 @@
  *          - last changes of: \$Author: gierds $
  *          
  * \date
- *          - last changed: \$Date: 2006/01/05 15:02:49 $
+ *          - last changed: \$Date: 2006/01/07 16:14:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
@@ -53,6 +53,9 @@ SymbolManager::SymbolManager()
 {
   processScope = NULL;
   currentScope = NULL;
+  dpePossibleStarts = 0;
+  dpePossibleEnds = 0;
+  inBLM = false;
 }
 
 /// destructor for class SymbolManager
@@ -579,6 +582,10 @@ kc::casestring SymbolManager::checkLink(csLink* link, bool asSource)
     if (asSource)
     {
       scope = currentScope;
+      if (scope != NULL and inBLM)
+      {
+        scope = scope->parent;
+      }
       while( (scope != NULL) )
       {
         if ( typeid(*scope) == typeid(ScopeScope))
@@ -680,6 +687,11 @@ void SymbolManager::checkLinks()
 		    "Dynamic cast error while checking Links\n"); 
   }
 
+}
+
+void SymbolManager::setBlackListMode(bool blm)
+{
+  inBLM = blm;
 }
 
 /**

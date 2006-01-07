@@ -19,24 +19,24 @@
 \****************************************************************************/
 
 /*!
- * \file bpel-attributes.c
+ * \file bpel-attributes.cc
  *
  * \brief This file implements the classes and functions defined in bpel-attributes.h.
  * 
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/01/06 14:52:39 $
+ *          - last changed: \$Date: 2006/01/07 15:33:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.28 $
+ * \version \$Revision: 1.29 $
  *
  * \todo
  *       - (reinert) Comment this file and its classes.

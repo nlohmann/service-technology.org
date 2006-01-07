@@ -1,4 +1,4 @@
-# last changed $Date: 2006/01/03 15:17:39 $ by $Author: nlohmann $
+# last changed $Date: 2006/01/07 15:33:28 $ by $Author: nlohmann $
 
 
 
@@ -43,7 +43,7 @@ bpel2owfn: bpel-syntax.o bpel-lexic.o main.o debug.o exception.o\
 main.o: main.cc main.h
 	$(CXX) $(CXXFLAGS2) -c -o $@ $(@:.o=.cc)
 
-bpel-attributes.o: bpel-attributes.c bpel-attributes.h
+bpel-attributes.o: bpel-attributes.cc bpel-attributes.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $(@:.o=.c)
 
 petrinet.o: petrinet.h petrinet.cc

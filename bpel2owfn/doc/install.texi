@@ -453,7 +453,7 @@ END OF INSTALL file for BPEL2oWFN Version @value{VERSION}
 @c ----------------------------------------------------------------------------
 
 @ifplaintext
-BEGIN OF CHANGES file for BPEL2oWFN Version @value{VERSION}
+BEGIN OF ChangeLog file for BPEL2oWFN Version @value{VERSION}
 @end ifplaintext
 
 @node Change Log
@@ -469,7 +469,7 @@ BEGIN OF CHANGES file for BPEL2oWFN Version @value{VERSION}
 @ifplaintext
 @insertcopying
 
-END OF CHANGES file for BPEL2oWFN Version @value{VERSION}
+END OF ChangeLog file for BPEL2oWFN Version @value{VERSION}
 @end ifplaintext
 
 

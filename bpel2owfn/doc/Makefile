@@ -1,4 +1,4 @@
-# last changed $Date: 2006/01/07 15:33:55 $ by $Author: nlohmann $
+# last changed $Date: 2006/01/08 15:32:42 $ by $Author: nlohmann $
 
 .PHONY: clean
 
@@ -67,7 +67,7 @@ install.pdf: install.texi version.texi
 distinstructions: install.texi
 	$(MAKEINFO) $< -oinstall.txt --no-split --no-headers --no-number-section
 	sed -n '/BEGIN OF README/,/END OF README/w ../README' install.txt
-	sed -n '/BEGIN OF CHANGES/,/END OF CHANGES/w ../CHANGES' install.txt
+	sed -n '/BEGIN OF ChangeLog/,/END OF ChangeLog/w ../ChangeLog' install.txt
 	sed -n '/BEGIN OF AUTHORS/,/END OF AUTHORS/w ../AUTHORS' install.txt
 	sed -n '/BEGIN OF INSTALL/,/END OF INSTALL/w ../INSTALL' install.txt
 	rm install.txt

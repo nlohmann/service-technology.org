@@ -1,4 +1,4 @@
-# last changed $Date: 2006/01/07 15:37:57 $ by $Author: nlohmann $
+# last changed $Date: 2006/01/08 10:43:41 $ by $Author: nlohmann $
 
 
 
@@ -67,13 +67,13 @@ check-symbols.o: check-symbols.h check-symbols.cc $(KC_TIME)
 bpel-lexic.o: bpel-lexic.c $(KC_TIME)
 	$(CXX) $(CXXFLAGS0) -c -o $@ $(@:.o=.c)
 
-bpel-lexic.c: bpel-lexic.l
+bpel-lexic.c: bpel-lexic.ll
 	$(FLEX) -o$@ $<
 
 bpel-syntax.o: bpel-syntax.c $(KC_TIME) check-symbols.h
 	$(CXX) $(CXXFLAGS2) -c -o $@ $(@:.o=.c)
 
-bpel-syntax.c: bpel-syntax.y
+bpel-syntax.c: bpel-syntax.yy
 	$(BISON) $(YFLAGS) -o $@ $^
 
 

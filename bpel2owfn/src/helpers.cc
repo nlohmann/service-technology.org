@@ -28,18 +28,18 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/01/06 08:27:03 $
+ *          - last changed: \$Date: 2006/01/08 10:08:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  *
  */
 
@@ -337,7 +337,7 @@ void parse_command_line(int argc, char* argv[])
       else if (! strcmp(argument_string, "-h") || ! strcmp(argument_string, "-?") || ! strcmp(argument_string, "--help")) 
       {
         print_help();
-        exit(1);
+        exit(0);
       }
 
       // unknown parameter

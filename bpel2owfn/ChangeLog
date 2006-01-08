@@ -1,4 +1,4 @@
-BEGIN OF CHANGES file for BPEL2oWFN Version 1.0
+BEGIN OF ChangeLog file for BPEL2oWFN Version 1.0
 
 Change Log
 **********
@@ -28,4 +28,4 @@ You should have received a copy of the GNU General Public License along
 with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 
-END OF CHANGES file for BPEL2oWFN Version 1.0
+END OF ChangeLog file for BPEL2oWFN Version 1.0

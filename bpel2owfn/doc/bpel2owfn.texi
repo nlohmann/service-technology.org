@@ -133,12 +133,12 @@ Bundesministerium f@"ur Bildung und Forschung. See
 The translation process of the @acronym{BPEL} business process is performed in
 five steps:
 
-@enumerate 
-@item lexical analyis (lexer)
+@enumerate
+@item lexical analysis (lexer)
 @item syntactical analysis (parser, symbol table)
 @item semantic analysis (variables, links)
 @item code generation (pattern database)
-@item code optimization (structual reduction)
+@item code optimization (structural reduction)
 @end enumerate
 
 
@@ -148,7 +148,7 @@ five steps:
 @subsection Abstract Syntax Tree
 
 The @acronym{AST, abstract syntax tree} is an abstraction of the syntax tree
-generated while parsing the @acronym{BPEL} process: any unneccesary information
+generated while parsing the @acronym{BPEL} process: any unnecessary information
 (e.g. indention, brackets or other ``syntax-supporting'' elements) is omitted.
 It is the central data structure of @acronym{BPEL2oWFN}. The nodes of the
 @acronym{AST} are annotated during the analysis steps. These annotations are
@@ -161,7 +161,7 @@ check a given property.
 The idea of flexible model generation is to find the most compact model to
 check a given property. The patterns of the Petri net semantics of [Sta05] are
 designed to fit in any given context. However when the context is known some
-behaviour modelled in the patterns (i.e. some of the nodes) can be safely
+behavior modeled in the patterns (i.e. some of the nodes) can be safely
 removed without changing its semantics. @acronym{BPEL2oWFN} is designed to hold
 several sets of Petri net patterns each suitable in certain contexts. These
 patterns are collected in a pattern database.
@@ -177,7 +177,7 @@ allowing to add more output file formats (e.g. @acronym{PNML, Petri Net Markup
 Language}, @acronym{PEP} notation, etc.), structural simplification rules
 (optimized to preserve certain properties such as deadlock freedom or liveness)
 or abstractions (e.g. abstraction from variables, abstraction from external
-behaviour).
+behavior).
 
 
 
@@ -188,7 +188,7 @@ behaviour).
 @node Invoking BPEL2oWFN
 @chapter Invoking @acronym{BPEL2oWFN}
 
-The standard invokation of @acronym{BPEL2oWFN} is:
+The standard invocation of @acronym{BPEL2oWFN} is:
 
 @example
 bpel2owfn -f inputfile.bpel -O2F
@@ -237,7 +237,7 @@ reasons.
 @item --xml
 @itemx -x
 Outputs the parsed @acronym{BPEL} file in @acronym{XML} representation. Any
-unneccesary attributes are omitted. This option is mostly used for debugging
+unnecessary attributes are omitted. This option is mostly used for debugging
 reasons.
 
 @item --petrinet
@@ -258,12 +258,12 @@ See @ref{Naming Conventions} for more information.
 @table @samp
 @item --simplify
 @itemx -s
-Uses several rules to struturally simplify the generated Petri net. See
+Uses several rules to structurally simplify the generated Petri net. See
 @ref{Petri Net Related Functions} for more details.
 
 @item --low-level
 @itemx -ll
-Abstracts the generated Petri net to low-level representation. See 
+Abstracts the generated Petri net to low-level representation. See
 @ref{Petri Net Related Functions} for more details.
 
 @item --lola
@@ -372,9 +372,9 @@ not be opened.
 An example:
 @cartouche
 @smallexample
-An error has occured while parsing "example.bpel"!
+An error has occurred while parsing "example.bpel"!
 
-Exception #2 occured!
+Exception #2 occurred!
 
    File `example.bpel' not found.
 @end smallexample
@@ -386,9 +386,9 @@ Exception #2 occured!
 An example:
 @cartouche
 @smallexample
-An error has occured while parsing "example.bpel"!
+An error has occurred while parsing "example.bpel"!
 
-Exception #10 occured!
+Exception #10 occurred!
 
    Chosen parameters cannot work together (see parameter -h).
 
@@ -400,7 +400,7 @@ Exception #10 occured!
 
 @item 30
 @b{`Dynamic cast error' exception.} While building an internal scope tree an
-unexpected error has occured. (This should not happen - if it do so nevertheless,
+unexpected error has occurred. (This should not happen - if it do so nevertheless,
 please inform us.)
 
 
@@ -415,9 +415,9 @@ found having a history entry covered by another node before.
 An example:
 @cartouche
 @smallexample
-An error has occured while parsing "example.bpel"!
+An error has occurred while parsing "example.bpel"!
 
-Exception #41 occured!
+Exception #41 occurred!
 
    Place with role `1.internal.final' already defined.
 @end smallexample
@@ -425,21 +425,21 @@ Exception #41 occured!
 
 
 @item 42
-@b{`Merging error' exception.} While generating the Petri net an error occured
+@b{`Merging error' exception.} While generating the Petri net an error occurred
 while merging two nodes. It happens either when one of the nodes was not found
 or one of the nodes is a guarded transition---the merging of guarded
 transitions is not yet supported.
 
 
 @item 43
-@b{`Arc error' exception.} While generating the Petri net an error occured
+@b{`Arc error' exception.} While generating the Petri net an error occurred
 while adding an arc to the net. It happens either on type errors---i.e. an
 arc between two transitions (or two places, resp.) should be drawn---or when
 the source or target node of an arc was not found.
 @end table
 
-Please report the occurence of any exception with numbers from 30 since it
-indicates a bug in @acronym{BPEL2oWFN} we would like to fix immediatley (see
+Please report the occurrence of any exception with numbers from 30 since it
+indicates a bug in @acronym{BPEL2oWFN} we would like to fix immediately (see
 @ref{Reporting Bugs}).
 
 
@@ -471,14 +471,14 @@ see @ref{Naming Conventions}.
 @subsection Naming Conventions
 
 @acronym{BPEL2oWFN} generates the output Petri net by creating and merging
-parametrized patterns of the Petri net semantics defined in [Sta05]. Due to
+parameterized patterns of the Petri net semantics defined in [Sta05]. Due to
 merging and simplifying the Petri net nodes ``belong'' to more than one
 pattern. For example, in a sequence the initial place of the sequence and
 the initial place of its first activity are merged so that the final Petri net
 contains one place with two @i{roles}.
 
 The roles of each place are collected during the Petri net generation. They
-form the @i{history} of the node. It is used to locate errors of the modelled
+form the @i{history} of the node. It is used to locate errors of the modeled
 business process: If, for example, @acronym{BPEL2oWFN} generates a Petri net
 of a business process and the model checker @acronym{LoLA} finds a dead
 transition, its history helps to find which @acronym{BPEL} constructs are
@@ -497,7 +497,7 @@ so that all nodes of the process pattern begin with @samp{1.}.
 @item In most cases each @acronym{BPEL} activity can be source or target of
 links. The semantics defined in [Sta05] organizes this link concept by several
 wrappers. For an activity with the identifier @var{id} the nodes of the wrapper
-begin with @samp{@var{id}.} wherease the nodes of the actual activity begin
+begin with @samp{@var{id}.} whereas the nodes of the actual activity begin
 with @samp{@var{id}.internal.}.
 @end itemize
 
@@ -570,7 +570,7 @@ resulting model.} At most one error can occur in the positive control flow. Yet
 this confines the possible runs of the process it is only a little change of
 the semantics of the process, since --- according to the @acronym{BPEL}
 specification --- only one fault is handled anyway. While further faults
-occuring before stopping the positive control flow are ignored in the original
+occurring before stopping the positive control flow are ignored in the original
 semantics of [Sta05] (in fact collected and then consumed by a reset arc) they
 are prevented implemented semantics.
 
@@ -595,7 +595,7 @@ high-level) of the patterns some places () were unfolded.
 @item @i{Change}. A transition named @samp{1.internal.finishloop} was added
 to livelock the process upon completion. This leads to deadlock-free Petri nets
 in case of processes with ``reasonable'' control flow and helps to find
-unwanted deadlocks occuring due wrong modeling. If, for example, the links of a
+unwanted deadlocks occurring due wrong modeling. If, for example, the links of a
 process model are cyclic the generated Petri net will deadlock.
 
 In future versions of @acronym{BPEL2oWFN} these found deadlocks shall be mapped
@@ -614,7 +614,7 @@ back into the @acronym{BPEL} code to highlight the ``unreasonable'' activities
 Currently implemented Petri net-specific functions:
 @itemize
 @item structural simplification
-@item abstraction of communicational behaviour
+@item abstraction of communicational behavior
 @end itemize
 
 
@@ -628,11 +628,11 @@ Currently implemented Petri net-specific functions:
 
 
 @section Limitations
-	
+
 The current version of @acronym{BPEL2oWFN} underlies several limitations:
 
 @itemize
-@item The pattern databse consists of only one collection of patterns (i.e. the
+@item The pattern database consists of only one collection of patterns (i.e. the
 semantics of [Sta05], see @cite{Petri Net Patterns}).
 @end itemize
 
@@ -659,7 +659,7 @@ large number of nodes.
 @b{Solution:} Avoid using the @samp{-s} mode in this case.
 
 @item @b{Problem:} The parser of @acronym{BPEL2oWFN} is not capable of skipping
-@acronym{XML} elements orginating other namespaces than `@code{bpws}'.
+@acronym{XML} elements originating other namespaces than `@code{bpws}'.
 Processes using these elements are rejected with a syntax error message.
 
 @b{Solution:} Try removing or commenting these elements.

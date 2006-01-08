@@ -196,7 +196,7 @@ converted into many file formats using @samp{make @var{format}} where
 @samp{@var{format}} is a file format out of @samp{dvi}, @samp{html},
 @samp{pdf}, @samp{ps} or @samp{info}.
 
-@item test
+@item tests
 Several test processes to self-test @acronym{BPEL2oWFN}. The processes
 @file{loan.bpel}, @file{purchase.bpel} and @file{shipping.bpel} were taken from
 the @acronym{BPEL4WS} 1.1 specification.
@@ -220,15 +220,87 @@ BEGIN OF INSTALL file for BPEL2oWFN Version @value{VERSION}
 @node Setup and Installation
 @chapter Setup and Installation
 
-@section Compilation
+
+@section Setup
+Entering@footnote{Cygwin users should open an @code{tcsh}-shell before.}
+
+@smallexample
+gunzip bpel2owfn-1.0.tar.gz
+tar xf bpel2owfn-1.0.tar
+cd bpel2owfn-1.0
+./configure
+@end smallexample
+
+should lead to an output like:
+
+@cartouche
+@smallexample
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for gawk... gawk
+checking whether make sets $(MAKE)... yes
+checking for g++... g++
+checking for C++ compiler default output file name... a.exe
+checking whether the C++ compiler works... yes
+checking whether we are cross compiling... no
+checking for suffix of executables... .exe
+checking for suffix of object files... o
+checking whether we are using the GNU C++ compiler... yes
+checking whether g++ accepts -g... yes
+checking for style of include used by make... GNU
+checking dependency style of g++... gcc3
+checking for a BSD-compatible install... /usr/bin/install -c
+checking for flex... flex
+checking for yywrap in -lfl... yes
+checking lex output file root... lex.yy
+checking whether yytext is a pointer... no
+checking for bison... bison
+checking for kc++... kc++
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating doc/Makefile
+config.status: creating src/Makefile
+config.status: creating tests/Makefile
+config.status: executing depfiles commands
+@end smallexample
+@end cartouche
+
+After that, simply execute @samp{make}. When everything goes well, you can
+self-check @acronym{BPEL2oWFN} by invoking @samp{make check}. After a lot of
+output it should announce
+
+@cartouche
+@smallexample
+==================
+All 3 tests passed
+==================
+@end smallexample
+@end cartouche
+
+or, if anything went wrong, prints error message and requests to report the
+encountered bug to @email{nlohmann@@informatik.hu-berlin.de}.
+
+
+@section Installation
+
+@ignore
 The compilation @acronym{BPEL2oWFN} is controlled by several Makefiles. Make
 sure that all required programs (see @ref{Required Programs}) are reachable in
-your path. To compile @acronym{BPEL2oWFN}, just run @samp{make}. After
-successful compilation an executable file @file{bpel2owfn} (or
-@file{bpel2owfn.exe} on systems running Microsoft Windows) is created in the
-directory @file{bpel2owfn-@value{VERSION}/src} of the distribution. This file has no
-dependencies to other files of the distribution and can be copied to any
-directory.
+your path. To compile @acronym{BPEL2oWFN}, just run @samp{make}.
+@end ignore
+
+After successful compilation and self tests an executable file @file{bpel2owfn}
+(or @file{bpel2owfn.exe} on systems running Microsoft Windows) is created in
+the directory @file{bpel2owfn-@value{VERSION}/src} of the distribution. This
+file has no dependencies to other files of the distribution and can be copied
+to any directory.
+
+Alternatively you can install @acronym{BPEL2oWFN} properly by executing
+@samp{make install}.@footnote{Usually, @samp{make install} has to be
+executed by the root/administrator.}
+
+
+@section Problems during Setup or Installation
 
 Any warning during an in other respects successful compilation can be
 ignored---these warnings mostly occur in generated files from Flex, Bison or
@@ -277,7 +349,7 @@ created during compilation. Executables as well as created documentation files
 are also removed.
 
 @item check
-Perform a number of self-tests: the directory @file{test} contains several
+Perform a number of self-tests: the directory @file{tests} contains several
 @acronym{BPEL} processes which are read and compiled.
 
 @item dist

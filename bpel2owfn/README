@@ -60,7 +60,7 @@ Directories
      `FORMAT' is a file format out of `dvi', `html', `pdf', `ps' or
      `info'.
 
-`test'
+`tests'
      Several test processes to self-test BPEL2oWFN. The processes
      `loan.bpel', `purchase.bpel' and `shipping.bpel' were taken from
      the BPEL4WS 1.1 specification.

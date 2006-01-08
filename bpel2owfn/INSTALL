@@ -3,17 +3,71 @@ BEGIN OF INSTALL file for BPEL2oWFN Version 1.0
 Setup and Installation
 **********************
 
-Compilation
-===========
+Setup
+=====
 
-The compilation BPEL2oWFN is controlled by several Makefiles. Make sure
-that all required programs (see *Note Required Programs::) are
-reachable in your path. To compile BPEL2oWFN, just run `make'. After
-successful compilation an executable file `bpel2owfn' (or
-`bpel2owfn.exe' on systems running Microsoft Windows) is created in the
-directory `bpel2owfn-1.0/src' of the distribution. This file has no
-dependencies to other files of the distribution and can be copied to any
-directory.
+Entering(1)
+
+     gunzip bpel2owfn-1.0.tar.gz
+     tar xf bpel2owfn-1.0.tar
+     cd bpel2owfn-1.0
+     ./configure
+
+should lead to an output like:
+
+     checking for a BSD-compatible install... /usr/bin/install -c
+     checking whether build environment is sane... yes
+     checking for gawk... gawk
+     checking whether make sets $(MAKE)... yes
+     checking for g++... g++
+     checking for C++ compiler default output file name... a.exe
+     checking whether the C++ compiler works... yes
+     checking whether we are cross compiling... no
+     checking for suffix of executables... .exe
+     checking for suffix of object files... o
+     checking whether we are using the GNU C++ compiler... yes
+     checking whether g++ accepts -g... yes
+     checking for style of include used by make... GNU
+     checking dependency style of g++... gcc3
+     checking for a BSD-compatible install... /usr/bin/install -c
+     checking for flex... flex
+     checking for yywrap in -lfl... yes
+     checking lex output file root... lex.yy
+     checking whether yytext is a pointer... no
+     checking for bison... bison
+     checking for kc++... kc++
+     configure: creating ./config.status
+     config.status: creating Makefile
+     config.status: creating doc/Makefile
+     config.status: creating src/Makefile
+     config.status: creating tests/Makefile
+     config.status: executing depfiles commands
+
+After that, simply execute `make'. When everything goes well, you can
+self-check BPEL2oWFN by invoking `make check'. After a lot of output it
+should announce
+
+     ==================
+     All 3 tests passed
+     ==================
+
+or, if anything went wrong, prints error message and requests to report
+the encountered bug to <nlohmann@informatik.hu-berlin.de>.
+
+Installation
+============
+
+After successful compilation and self tests an executable file
+`bpel2owfn' (or `bpel2owfn.exe' on systems running Microsoft Windows)
+is created in the directory `bpel2owfn-1.0/src' of the distribution.
+This file has no dependencies to other files of the distribution and
+can be copied to any directory.
+
+Alternatively you can install BPEL2oWFN properly by executing `make
+install'.(2)
+
+Problems during Setup or Installation
+=====================================
 
 Any warning during an in other respects successful compilation can be
 ignored--these warnings mostly occur in generated files from Flex,
@@ -62,7 +116,7 @@ Makefile Targets
      created documentation files are also removed.
 
 `check'
-     Perform a number of self-tests: the directory `test' contains
+     Perform a number of self-tests: the directory `tests' contains
      several BPEL processes which are read and compiled.
 
 `dist'
@@ -74,6 +128,13 @@ it is possible to set an optimization level of `g++' by setting a
 variable `OPTIMIZE'. For example, `make OPTIMIZE=-O3' invokes a
 compilation with all possible optimization which yields to a smaller
 and faster executable and longer compilation time.
+
+---------- Footnotes ----------
+
+(1) Cygwin users should open an `tcsh'-shell before.
+
+(2) Usually, `make install' has to be executed by the
+root/administrator.
 
 Needed Programs
 ***************

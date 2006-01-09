@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/01/09 08:38:09 $
+ *          - last changed: \$Date: 2006/01/09 13:14:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.83 $
+ * \version \$Revision: 1.84 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -276,7 +276,6 @@ tProcess:
   X_OPEN K_PROCESS arbitraryAttributes
     { att.check($3, K_PROCESS);
       att.pushSJFStack($3, att.read($3, "suppressJoinFailure", $$->suppressJoinFailure));
-      att.traceAM(string("tProcess: ") + (att.read($3, "suppressJoinFailure"))->name + string("\n"));
       symMan.initialiseProcessScope($3);
       currentScopeId = $3; }
   X_NEXT imports tPartnerLinks tPartners tVariables tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers
@@ -290,6 +289,7 @@ tProcess:
       $$->queryLanguage = att.read($3, "queryLanguage", $$->queryLanguage);
       $$->expressionLanguage = att.read($3, "expressionLanguage", $$->expressionLanguage);
       $$->suppressJoinFailure = att.read($3, "suppressJoinFailure", $$->suppressJoinFailure);
+      att.traceAM(string("tProcess: ") + ($$->suppressJoinFailure)->name + string("\n"));      
       att.popSJFStack();
       $$->enableInstanceCompensation = att.read($3, "enableInstanceCompensation", $$->enableInstanceCompensation);
       $$->abstractProcess = att.read($3, "abstractProcess", $$->abstractProcess);
@@ -867,7 +867,13 @@ tEmpty:
       att.check($2, K_EMPTY);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     }   
   X_NEXT standardElements X_SLASH K_EMPTY
@@ -890,7 +896,13 @@ tEmpty:
       att.check($2, K_EMPTY);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     }   
   X_SLASH
@@ -941,7 +953,13 @@ tInvoke:
       att.check($2, K_INVOKE);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     }   
   X_NEXT
@@ -1001,7 +1019,13 @@ tInvoke:
       att.check($2, K_INVOKE);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     }   
   X_SLASH
@@ -1074,7 +1098,13 @@ tReceive:
       att.check($2, K_RECEIVE);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     }   
   X_NEXT
@@ -1106,7 +1136,13 @@ tReceive:
       att.check($2, K_RECEIVE);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     }   
   X_SLASH
@@ -1169,7 +1205,13 @@ tReply:
       att.check($2, K_REPLY);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     }   
   X_NEXT 
@@ -1203,7 +1245,13 @@ tReply:
       att.check($2, K_REPLY);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     }   
   X_SLASH
@@ -1254,7 +1302,13 @@ tAssign:
       att.check($2, K_ASSIGN);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     }   
   X_NEXT standardElements tCopy_list  X_SLASH K_ASSIGN
@@ -1392,7 +1446,13 @@ tWait:
       att.check($2, K_WAIT);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     }   
   X_NEXT standardElements X_SLASH K_WAIT
@@ -1415,7 +1475,13 @@ tWait:
       att.check($2, K_WAIT);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     }   
   X_SLASH
@@ -1456,7 +1522,13 @@ tThrow:
       att.check($2, K_THROW);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     }   
   X_NEXT standardElements X_SLASH K_THROW
@@ -1481,7 +1553,13 @@ tThrow:
       att.check($2, K_THROW);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     }   
   X_SLASH
@@ -1521,7 +1599,13 @@ tCompensate:
       att.check($2, K_COMPENSATE);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     }   
   X_NEXT standardElements X_SLASH K_COMPENSATE
@@ -1543,7 +1627,13 @@ tCompensate:
       att.check($2, K_COMPENSATE);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     }   
   X_SLASH
@@ -1582,7 +1672,13 @@ tTerminate:
       att.check($2, K_TERMINATE);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     }   
   X_NEXT standardElements X_SLASH K_TERMINATE
@@ -1603,7 +1699,13 @@ tTerminate:
       att.check($2, K_TERMINATE);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     }   
   X_SLASH
@@ -1644,7 +1746,13 @@ tFlow:
       att.check($2, K_FLOW);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     }   
   X_NEXT
@@ -1727,7 +1835,13 @@ tSwitch:
       att.check($2, K_SWITCH);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     } 
   X_NEXT 
@@ -1738,8 +1852,7 @@ tSwitch:
   tCase_list 
   tOtherwise 
   X_SLASH K_SWITCH
-    { att.check($2, K_SWITCH);
-      $$ = Switch($5, $7, $8);
+    { $$ = Switch($5, $7, $8);
       $$->name = att.read($2, "name");
       $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
@@ -1831,7 +1944,13 @@ tWhile:
       att.check($2, K_WHILE);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     }    
   X_NEXT 
@@ -1876,7 +1995,13 @@ tSequence:
       att.check($2, K_SEQUENCE);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     }
   X_NEXT 
@@ -1936,7 +2061,13 @@ tPick:
       att.check($2, K_PICK);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     }
   X_NEXT 
@@ -1997,7 +2128,13 @@ tScope:
       att.check($2, K_SCOPE);
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
+      	/// parent BPEL-element attribute value
       	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
       }
     }  
   X_NEXT

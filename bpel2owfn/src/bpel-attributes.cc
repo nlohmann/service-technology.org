@@ -25,18 +25,18 @@
  * 
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/01/07 15:33:28 $
+ *          - last changed: \$Date: 2006/01/09 06:24:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.29 $
+ * \version \$Revision: 1.30 $
  *
  * \todo
  *       - (reinert) Comment this file and its classes.
@@ -48,6 +48,11 @@
 #include "bpel-syntax.h"
 #include "debug.h"
 
+
+/********************************************
+ * implementation of attributeManager CLASS
+ ********************************************/
+
 /*!
  * constructor
  */
@@ -58,26 +63,37 @@ attributeManager::attributeManager()
 }
 
 /*!
+ * 
+ */
+bool attributeManager::isAttributeValueEmpty(kc::integer elementId, std::string attributeName)
+{
+	
+  if(scannerResult[elementId->value][attributeName].empty())
+  {
+	return true;
+  }
+  
+  return false;
+}
+
+/*!
  * returns the value of an attribute which was stored in the AM array
  * \param elementId key to identification the BPEL-element in the AM array
  * \param attributeName key to attribute value
  */
 kc::casestring attributeManager::read(kc::integer elementId, std::string attributeName)
 {
-  // "cast" Kimwitu++ to C++
-  unsigned int elementIdInt = elementId->value;
 
-  
   std::string result;
   
-  if(scannerResult[elementIdInt][attributeName].empty())
+  if(isAttributeValueEmpty(elementId, attributeName))
   {
     // no attribute-value given
     result = "";
   }
   else
   {
-    result = scannerResult[elementIdInt][attributeName];
+    result = scannerResult[elementId->value][attributeName];
   }
 
   return kc::mkcasestring(result.c_str());
@@ -91,19 +107,16 @@ kc::casestring attributeManager::read(kc::integer elementId, std::string attribu
  */
 kc::casestring attributeManager::read(kc::integer elementId, std::string attributeName, kc::casestring defaultValue)
 {
-  // "cast" Kimwitu++ to C++
-  unsigned int elementIdInt = elementId->value;
-
-  
+ 
   std::string result;
   
-  if(scannerResult[elementIdInt][attributeName].empty())
+  if(isAttributeValueEmpty(elementId, attributeName))
   {
 	return defaultValue;
   }
   else
   {
-    result = scannerResult[elementIdInt][attributeName];
+    result = scannerResult[elementId->value][attributeName];
     return kc::mkcasestring(result.c_str());
   }
    
@@ -1046,4 +1059,61 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 			break;				
 	}
 
+}
+
+/*!
+ * 
+ */
+void attributeManager::pushSJFStack(kc::integer elementId, kc::casestring attributeValue)
+{
+	this->SJFStack.push(new SJFStackElement(elementId, attributeValue));
+}
+
+/*!
+ * 
+ */
+void attributeManager::popSJFStack()
+{
+	this->SJFStack.pop();
+}
+
+
+/*!
+ * 
+ */
+SJFStackElement attributeManager::topSJFStack()
+{
+	return *(this->SJFStack.top());
+}
+
+/*!
+ * 
+ */
+bool attributeManager::emptySJFStack()
+{
+	return this->SJFStack.empty();
+}
+
+/********************************************
+ * implementation of SJFStackElement CLASS
+ ********************************************/
+
+void SJFStackElement::setElementId(kc::integer val)
+{
+	this->elementId = val;
+}
+
+void SJFStackElement::setSJFValue(kc::casestring val)
+{
+	this->sjfValue = val;
+}
+
+kc::integer SJFStackElement::getElementId()
+{
+	return this->elementId;	
+}
+
+kc::casestring SJFStackElement::getSJFValue()
+{
+	return this->sjfValue;	
 }

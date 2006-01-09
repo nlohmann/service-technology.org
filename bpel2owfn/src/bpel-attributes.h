@@ -33,6 +33,7 @@
 #include "bpel-kc-yystype.h" // data types for tokens and non-terminals
 
 #include <map>
+#include <stack>
 
 /// BPEL attribute names
 const std::string A__CONDITION = "condition";
@@ -72,6 +73,30 @@ const std::string T__DURATION_EXPR = "bpws:tDuration-expr";
 const std::string T__DEADLINE_EXPR = "bpws:tDeadline-expr";
 const std::string T__BOOLEAN_EXPR = "bpws:tBoolean-expr";
 
+class SJFStackElement
+{
+  private:
+	
+	///
+	kc::integer elementId;
+	
+	///
+	kc::casestring sjfValue;
+  
+  public:
+	/// constructor
+	SJFStackElement(kc::integer elementId, kc::casestring value) {setElementId(elementId); setSJFValue(value);}
+	
+	///
+	void setElementId(kc::integer elementId);
+	void setSJFValue(kc::casestring value);
+	
+	///
+	kc::integer getElementId();
+	kc::casestring getSJFValue();
+
+};
+
 class attributeManager
 {
   private:
@@ -80,8 +105,8 @@ class attributeManager
     /// <bpel-element-id, <attribute name, attribute value>>
     std::map<unsigned int, std::map<std::string, std::string> > scannerResult;
 	
-	/// AM traces
-	void traceAM(std::string traceMsg);
+	///
+	std::stack<SJFStackElement*> SJFStack;
 	
 	/// print formatted attribute manager error message
 	void printErrorMsg(std::string errorMsg);
@@ -101,6 +126,24 @@ class attributeManager
 
     /// consecutive enumeration of XML-elements
     unsigned int nodeId;
+	
+	///
+	bool isAttributeValueEmpty(kc::integer elementId, std::string attributeName);
+	
+	///
+	void pushSJFStack(kc::integer elementId, kc::casestring attributeValue);
+	
+	///
+	void popSJFStack();
+	
+	///
+	SJFStackElement topSJFStack();
+	
+	///
+	bool emptySJFStack();
+	
+	/// AM traces
+	void traceAM(std::string traceMsg);
 
     /// returns the value of an attribute
     kc::casestring read(kc::integer elementId, std::string attributeName);
@@ -120,8 +163,6 @@ class attributeManager
     /// checked the attributes and the value of BPEL-elements
     void check(kc::integer elementId, kc::casestring elementValue, unsigned int elementType);
 };
-
-
 
 
 /*

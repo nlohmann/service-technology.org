@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/01/07 16:14:43 $
+ *          - last changed: \$Date: 2006/01/09 06:24:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.81 $
+ * \version \$Revision: 1.82 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -136,7 +136,7 @@ SymbolManager symMan = SymbolManager();
 /// needed to distinguish context of tPartnerLink
 bool inPartners = false;
 
-/// needed to check occurence of links within whiles
+/// needed to check occurrence of links within whiles
 bool inWhile = false;
 
 /// needed to distinguish context of the Fault Handler
@@ -275,6 +275,8 @@ tProcess TheProcess;
 tProcess:
   X_OPEN K_PROCESS arbitraryAttributes
     { att.check($3, K_PROCESS);
+      att.pushSJFStack($3, att.read($3, "suppressJoinFailure", $$->suppressJoinFailure));
+      att.traceAM(string("tProcess: ") + (att.read($3, "suppressJoinFailure"))->name + string("\n"));
       symMan.initialiseProcessScope($3);
       currentScopeId = $3; }
   X_NEXT imports tPartnerLinks tPartners tVariables tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers
@@ -288,6 +290,7 @@ tProcess:
       $$->queryLanguage = att.read($3, "queryLanguage", $$->queryLanguage);
       $$->expressionLanguage = att.read($3, "expressionLanguage", $$->expressionLanguage);
       $$->suppressJoinFailure = att.read($3, "suppressJoinFailure", $$->suppressJoinFailure);
+      att.popSJFStack();
       $$->enableInstanceCompensation = att.read($3, "enableInstanceCompensation", $$->enableInstanceCompensation);
       $$->abstractProcess = att.read($3, "abstractProcess", $$->abstractProcess);
       $$->xmlns = att.read($3, "xmlns", $$->xmlns);
@@ -858,26 +861,47 @@ tCorrelation:
 */
 
 tEmpty:
-  K_EMPTY arbitraryAttributes X_NEXT standardElements X_SLASH K_EMPTY
-    { att.check($2, K_EMPTY);
-      $$ = Empty($4);
+  K_EMPTY 
+  arbitraryAttributes 
+    { 
+      att.check($2, K_EMPTY);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    }   
+  X_NEXT standardElements X_SLASH K_EMPTY
+    { $$ = Empty($5);
       $$->name = att.read($2, "name");
-      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
-      $$->id = $4->parentId = $2; 
-      if ($4->dpe->value > 0)
+      $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");
+      att.traceAM(string("tEmpty: ") + (att.read($2, "suppressJoinFailure"))->name + string("\n"));
+      $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tEmpty: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();
+      $$->id = $5->parentId = $2; 
+      if ($5->dpe->value > 0)
       {
         symMan.addDPEend();
       }
     }
-| K_EMPTY arbitraryAttributes X_SLASH
-    { att.check($2, K_EMPTY);
-      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+| K_EMPTY 
+  arbitraryAttributes 
+    { 
+      att.check($2, K_EMPTY);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    }   
+  X_SLASH
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
       noLinks->parentId = $2;
       $$ = Empty(noLinks);
       $$->name = att.read($2, "name");
       $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tEmpty: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();      
       $$->id = $2; }
 ;
 
@@ -911,30 +935,41 @@ tEmpty:
 */
 
 tInvoke:
-  K_INVOKE arbitraryAttributes X_NEXT
+  K_INVOKE 
+  arbitraryAttributes 
+    { 
+      att.check($2, K_INVOKE);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    }   
+  X_NEXT
     {
       // automatically create scope?
       symMan.checkPartnerLink(att.read($2, "partnerLink")->name);
     }
   standardElements 
   tCorrelations tCatch_list  tCatchAll tCompensationHandler X_SLASH K_INVOKE
-    { att.check($2, K_INVOKE);
+    { 
 /*
-      if ($7->length() > 0 || $8->length() > 0 || string($9->op_name()) != "implicitCompensationHandler")
+      if ($8->length() > 0 || $9->length() > 0 || string($10->op_name()) != "implicitCompensationHandler")
       {
         cerr << "embed in scope" << endl;
-        $$ = Scope($5, NiltVariable_list(), implicitFaultHandler(), $9, implicitEventHandler(), StopInScope(), activityInvoke(Invoke(StandardElements(NiltTarget_list(), NiltSource_list()), $6)));
+        $$ = Scope($6, NiltVariable_list(), implicitFaultHandler(), $10, implicitEventHandler(), StopInScope(), activityInvoke(Invoke(StandardElements(NiltTarget_list(), NiltSource_list()), $7)));
       }
       else
       {
         cerr << "don't embed" << endl;
-        $$ = Invoke($5, $6);
+        $$ = Invoke($6, $7);
       }
 */
-      $$ = Invoke($5, $6);
+      $$ = Invoke($6, $7);
       $$->name = att.read($2, "name");
-      $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = $6->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $6->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tInvoke: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();
       $$->partnerLink = att.read($2, "partnerLink");
       $$->portType = att.read($2, "portType");
       $$->operation = att.read($2, "operation");
@@ -955,19 +990,30 @@ tInvoke:
 					$$->partnerLink->name), false);
       }
       $$->dpe = symMan.needsDPE();
-      if ($5->dpe->value > 0)
+      if ($6->dpe->value > 0)
       {
         symMan.addDPEend();
       }
-      $$->id = $5->parentId = $2; }
-| K_INVOKE arbitraryAttributes X_SLASH
-    { att.check($2, K_INVOKE);
+      $$->id = $6->parentId = $2; }
+| K_INVOKE 
+  arbitraryAttributes 
+    { 
+      att.check($2, K_INVOKE);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    }   
+  X_SLASH
+    { 
       impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
       noLinks->parentId = $2;
       $$ = Invoke(noLinks, NiltCorrelation_list());
       $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = att.read($2, "joinCondition");    
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tInvoke: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();
       $$->partnerLink = att.read($2, "partnerLink");
       $$->portType = att.read($2, "portType");
       $$->operation = att.read($2, "operation");
@@ -1022,14 +1068,24 @@ tInvoke:
 */
 
 tReceive:
-  K_RECEIVE arbitraryAttributes X_NEXT
-    { att.check($2,K_RECEIVE);
-      symMan.checkPartnerLink(att.read($2, "partnerLink")->name); }
+  K_RECEIVE
+  arbitraryAttributes
+    { 
+      att.check($2, K_RECEIVE);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    }   
+  X_NEXT
+    { symMan.checkPartnerLink(att.read($2, "partnerLink")->name); }
   standardElements tCorrelations X_SLASH K_RECEIVE
-    { $$ = Receive($5, $6);
+    { $$ = Receive($6, $7);
       $$->name = att.read($2, "name");
-      $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = $6->joinCondition = att.read($2, "joinCondition");    
+      $$->suppressJoinFailure = $6->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tReceive: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();
       $$->partnerLink = att.read($2, "partnerLink");
       $$->portType = att.read($2, "portType");
       $$->operation = att.read($2, "operation");
@@ -1039,19 +1095,29 @@ tReceive:
       $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
 				      $$->partnerLink->name), true);
-      if ($5->dpe->value > 0)
+      if ($6->dpe->value > 0)
       {
         symMan.addDPEend();
       }
-      $$->id = $5->parentId = $2; }
-| K_RECEIVE arbitraryAttributes X_SLASH
-    { att.check($2, K_RECEIVE);
-      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+      $$->id = $6->parentId = $2; }
+| K_RECEIVE
+  arbitraryAttributes
+    { 
+      att.check($2, K_RECEIVE);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    }   
+  X_SLASH
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
       noLinks->parentId = $2;
       $$ = Receive(noLinks, NiltCorrelation_list());
       $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = att.read($2, "joinCondition");     
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tReceive: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();
       $$->partnerLink = att.read($2, "partnerLink");
       $$->portType = att.read($2, "portType");
       $$->operation = att.read($2, "operation");
@@ -1097,15 +1163,25 @@ tReceive:
 */
 
 tReply:
-  K_REPLY arbitraryAttributes X_NEXT 
+  K_REPLY
+  arbitraryAttributes
+    { 
+      att.check($2, K_REPLY);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    }   
+  X_NEXT 
   standardElements 
   tCorrelations
   X_SLASH K_REPLY
-    { att.check($2, K_REPLY);
-      $$ = Reply($4, $5);
+    { $$ = Reply($5, $6);
       $$->name = att.read($2, "name");
-      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tReply: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();
       $$->partnerLink = att.read($2, "partnerLink");
       $$->portType = att.read($2, "portType");
       $$->operation = att.read($2, "operation");
@@ -1116,19 +1192,29 @@ tReply:
       $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
 				      $$->partnerLink->name), false);
-      if ($4->dpe->value > 0)
+      if ($5->dpe->value > 0)
       {
         symMan.addDPEend();
       }
-      $$->id = $4->parentId = $2; }
-| K_REPLY arbitraryAttributes X_SLASH
-    { att.check($2, K_REPLY);
-      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+      $$->id = $5->parentId = $2; }
+| K_REPLY
+  arbitraryAttributes
+    { 
+      att.check($2, K_REPLY);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    }   
+  X_SLASH
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
       noLinks->parentId = $2;
       $$ = Reply(noLinks, NiltCorrelation_list());
       $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = att.read($2, "joinCondition");    
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tReply: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();
       $$->partnerLink = att.read($2, "partnerLink");
       $$->portType = att.read($2, "portType");
       $$->operation = att.read($2, "operation");
@@ -1162,17 +1248,27 @@ tReply:
 */
 
 tAssign:
-  K_ASSIGN arbitraryAttributes X_NEXT standardElements tCopy_list  X_SLASH K_ASSIGN
-    { att.check($2, K_ASSIGN);
-      $$ = Assign($4, $5);
+  K_ASSIGN 
+  arbitraryAttributes
+    { 
+      att.check($2, K_ASSIGN);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    }   
+  X_NEXT standardElements tCopy_list  X_SLASH K_ASSIGN
+    { $$ = Assign($5, $6);
       $$->name = att.read($2, "name");
-      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
-      if ($4->dpe->value > 0)
+      $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");     
+      $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tAssign: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();
+      if ($5->dpe->value > 0)
       {
         symMan.addDPEend();
       }
-      $$->id = $4->parentId = $2; }
+      $$->id = $5->parentId = $2; }
 ;
 
 tCopy_list:
@@ -1290,27 +1386,47 @@ tTo:
 */
 
 tWait:
-  K_WAIT arbitraryAttributes X_NEXT standardElements X_SLASH K_WAIT
-    { att.check($2, K_WAIT);
-      $$ = Wait($4);
+  K_WAIT
+  arbitraryAttributes
+    { 
+      att.check($2, K_WAIT);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    }   
+  X_NEXT standardElements X_SLASH K_WAIT
+    { $$ = Wait($5);
       $$->name = att.read($2, "name");
-      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");     
+      $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tWait: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();      
       $$->For = att.read($2, "for"); // "for" is a keyword
       $$->until = att.read($2, "until");
-      if ($4->dpe->value > 0)
+      if ($5->dpe->value > 0)
       {
         symMan.addDPEend();
       }
-      $$->id = $4->parentId = $2; }
-| K_WAIT arbitraryAttributes X_SLASH
-    { att.check($2, K_WAIT);
-      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+      $$->id = $5->parentId = $2; }
+| K_WAIT
+  arbitraryAttributes
+    { 
+      att.check($2, K_WAIT);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    }   
+  X_SLASH
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
       noLinks->parentId = $2;
       $$ = Wait(noLinks);
       $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = att.read($2, "joinCondition");    
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tWait: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();      
       $$->For = att.read($2, "for"); // "for" is a keyword
       $$->until = att.read($2, "until");
       $$->id = $2; }
@@ -1334,28 +1450,49 @@ tWait:
 */
 
 tThrow:
-  K_THROW arbitraryAttributes X_NEXT standardElements X_SLASH K_THROW
+  K_THROW
+  arbitraryAttributes
+    { 
+      att.check($2, K_THROW);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    }   
+  X_NEXT standardElements X_SLASH K_THROW
     { att.check($2, K_THROW);
-      $$ = Throw($4);
+      $$ = Throw($5);
       $$->name = att.read($2, "name");
-      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");    
+      $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tThrow: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();      
       $$->faultName = att.read($2, "faultName");
       $$->faultVariable = att.read($2, "faultVariable");
       $$->variableID = symMan.checkVariable(att.read($2, "faultVariable")->name);
-      if ($4->dpe->value > 0)
+      if ($5->dpe->value > 0)
       {
         symMan.addDPEend();
       }
-      $$->id = $4->parentId = $2; }
-| K_THROW arbitraryAttributes X_SLASH
-    { att.check($2, K_THROW);
-      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+      $$->id = $5->parentId = $2; }
+| K_THROW
+  arbitraryAttributes
+    { 
+      att.check($2, K_THROW);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    }   
+  X_SLASH
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
       noLinks->parentId = $2;
       $$ = Throw(noLinks);
       $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = att.read($2, "joinCondition");   
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tThrow: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();
       $$->faultName = att.read($2, "faultName");
       $$->faultVariable = att.read($2, "faultVariable");
       $$->variableID = symMan.checkVariable(att.read($2, "faultVariable")->name);
@@ -1378,26 +1515,46 @@ tThrow:
 */
 
 tCompensate:
-  K_COMPENSATE arbitraryAttributes X_NEXT standardElements X_SLASH K_COMPENSATE
-    { att.check($2, K_COMPENSATE);
-      $$ = Compensate($4);
+  K_COMPENSATE
+  arbitraryAttributes
+    { 
+      att.check($2, K_COMPENSATE);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    }   
+  X_NEXT standardElements X_SLASH K_COMPENSATE
+    { $$ = Compensate($5);
       $$->name = att.read($2, "name");
-      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");   
+      $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tCompensate: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();
       $$->scope = att.read($2, "scope");
-      if ($4->dpe->value > 0)
+      if ($5->dpe->value > 0)
       {
         symMan.addDPEend();
       }
-      $$->id = $4->parentId = $2; }
-| K_COMPENSATE arbitraryAttributes X_SLASH
-    { att.check($2, K_COMPENSATE);
-      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+      $$->id = $5->parentId = $2; }
+| K_COMPENSATE
+  arbitraryAttributes
+    { 
+      att.check($2, K_COMPENSATE);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    }   
+  X_SLASH
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
       noLinks->parentId = $2;
       $$ = Compensate(noLinks);
       $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = att.read($2, "joinCondition");     
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tCompensate: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();
       $$->scope = att.read($2, "scope");
       $$->id = $2; }
 ;
@@ -1419,25 +1576,45 @@ tCompensate:
 */
 
 tTerminate:
-  K_TERMINATE arbitraryAttributes X_NEXT standardElements X_SLASH K_TERMINATE
-    { att.check($2, K_TERMINATE);
-      $$ = Terminate($4);
+  K_TERMINATE
+  arbitraryAttributes
+    { 
+      att.check($2, K_TERMINATE);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    }   
+  X_NEXT standardElements X_SLASH K_TERMINATE
+    { $$ = Terminate($5);
       $$->name = att.read($2, "name");
-      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
-      if ($4->dpe->value > 0)
+      $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");    
+      $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tTerminate: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();
+      if ($5->dpe->value > 0)
       {
         symMan.addDPEend();
       }
-      $$->id = $4->parentId = $2; }
-| K_TERMINATE arbitraryAttributes X_SLASH
-    { att.check($2, K_TERMINATE);
-      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+      $$->id = $5->parentId = $2; }
+| K_TERMINATE
+  arbitraryAttributes
+    { 
+      att.check($2, K_TERMINATE);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    }   
+  X_SLASH
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
       noLinks->parentId = $2;
       $$ = Terminate(noLinks);
       $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = att.read($2, "joinCondition");     
+      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tTerminate: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();
       $$->id = $2; }
 ;
 
@@ -1461,21 +1638,32 @@ tTerminate:
 */
 
 tFlow:
-  K_FLOW arbitraryAttributes X_NEXT
+  K_FLOW
+  arbitraryAttributes
+    { 
+      att.check($2, K_FLOW);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    }   
+  X_NEXT
     {
       symMan.newFlowScope($2);
     } 
   standardElements tLinks activity_list X_SLASH K_FLOW
-    { $$ = Flow($5, $6, $7);
+    { $$ = Flow($6, $7, $8);
       $$->name = att.read($2, "name");
-      $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = $6->joinCondition = att.read($2, "joinCondition");     
+      $$->suppressJoinFailure = $6->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tFlow: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();
       $$->dpe = symMan.needsDPE();
-      if ($5->dpe->value > 0)
+      if ($6->dpe->value > 0)
       {
         symMan.addDPEend();
       }
-      $$->id = $5->parentId = $2;
+      $$->id = $6->parentId = $2;
       symMan.checkLinks();
       symMan.quitScope(); }
 ;
@@ -1533,7 +1721,16 @@ tLink:
 */
 
 tSwitch:
-  K_SWITCH arbitraryAttributes X_NEXT 
+  K_SWITCH
+  arbitraryAttributes
+    { 
+      att.check($2, K_SWITCH);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    } 
+  X_NEXT 
   standardElements 
     {
       symMan.addDPEstart();
@@ -1542,17 +1739,19 @@ tSwitch:
   tOtherwise 
   X_SLASH K_SWITCH
     { att.check($2, K_SWITCH);
-      $$ = Switch($4, $6, $7);
+      $$ = Switch($5, $7, $8);
       $$->name = att.read($2, "name");
-      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tSwitch: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();
       symMan.remDPEstart();
       $$->dpe = symMan.needsDPE();
-      if ($4->dpe->value > 0)
+      if ($5->dpe->value > 0)
       {
         symMan.addDPEend();
       }
-      $$->id = $4->parentId = $2;
+      $$->id = $5->parentId = $2;
     }
 ;
 
@@ -1626,7 +1825,16 @@ tOtherwise:
 */
 
 tWhile:
-  K_WHILE arbitraryAttributes X_NEXT 
+  K_WHILE
+  arbitraryAttributes
+    { 
+      att.check($2, K_WHILE);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    }    
+  X_NEXT 
   standardElements 
     { 
       symMan.startDPEinWhile();
@@ -1634,12 +1842,14 @@ tWhile:
   activity 
   X_NEXT X_SLASH K_WHILE
     { att.check($2, K_WHILE);
-      $$ = While($4, $6);
+      $$ = While($5, $7);
       $$->name = att.read($2, "name");
-      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");     
+      $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tWhile: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();
       $$->condition = att.read($2, "condition");
-      $$->id = $4->parentId = $2; 
+      $$->id = $5->parentId = $2; 
       symMan.endDPEinWhile();
     }
 ;
@@ -1660,19 +1870,29 @@ tWhile:
 */
 
 tSequence:
-  K_SEQUENCE arbitraryAttributes X_NEXT 
+  K_SEQUENCE
+  arbitraryAttributes 
+    { 
+      att.check($2, K_SEQUENCE);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    }
+  X_NEXT 
   standardElements 
   activity_list 
   X_SLASH 
   K_SEQUENCE
-    { att.check($2, K_SEQUENCE);
-      $$ = Sequence($4, $5);
+    { $$ = Sequence($5, $6);
       $$->name = att.read($2, "name");
-      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
-      $$->id = $4->parentId = $2; 
+      $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tSequence: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();
+      $$->id = $5->parentId = $2; 
       $$->dpe = symMan.needsDPE();
-      if ($4->dpe->value > 0)
+      if ($5->dpe->value > 0)
       {
         symMan.addDPEend();
       }
@@ -1710,7 +1930,16 @@ tSequence:
 */
 
 tPick:
-  K_PICK arbitraryAttributes X_NEXT 
+  K_PICK
+  arbitraryAttributes
+    { 
+      att.check($2, K_PICK);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    }
+  X_NEXT 
   standardElements 
     {
       symMan.addDPEstart();
@@ -1719,19 +1948,20 @@ tPick:
   tOnMessage_list 
   tOnAlarm_list 
   X_SLASH K_PICK
-    { att.check($2, K_PICK);
-      $$ = Pick($4, ConstOnMessage_list($6, $8), $9);
+    { $$ = Pick($5, ConstOnMessage_list($7, $9), $10);
       $$->name = att.read($2, "name");
-      $$->joinCondition = $4->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = $4->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tPick: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();
       $$->createInstance = att.read($2, "createInstance", $$->createInstance);
       symMan.remDPEstart();
       $$->dpe = symMan.needsDPE();
-      if ($4->dpe->value > 0)
+      if ($5->dpe->value > 0)
       {
         symMan.addDPEend();
       }
-      $$->id = $4->parentId = $2;
+      $$->id = $5->parentId = $2;
     }
 ;
 
@@ -1761,7 +1991,16 @@ tPick:
 */
 
 tScope:
-  K_SCOPE arbitraryAttributes X_NEXT
+  K_SCOPE
+  arbitraryAttributes
+    { 
+      att.check($2, K_SCOPE);
+      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      {
+      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      }
+    }  
+  X_NEXT
     { symMan.newScopeScope($2);
       symMan.setBlackListMode(true);
       parent[$2] = currentScopeId;
@@ -1778,15 +2017,17 @@ tScope:
   activity 
   X_NEXT X_SLASH K_SCOPE
     { att.check($2, K_SCOPE);
-      $$ = Scope($5, $7, $9, $10, $11, StopInScope(), $12);
+      $$ = Scope($6, $8, $10, $11, $12, StopInScope(), $13);
       $$->name = att.read($2, "name");
-      $$->joinCondition = $5->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->joinCondition = $6->joinCondition = att.read($2, "joinCondition");
+      $$->suppressJoinFailure = $6->suppressJoinFailure = att.read($2, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tScope: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      att.popSJFStack();
       $$->variableAccessSerializable = att.read($2, "variableAccessSerializable", $$->variableAccessSerializable);
-      $$->id = $5->parentId = $2;
+      $$->id = $6->parentId = $2;
       $$->parentScopeId = currentScopeId = parent[$2];
       $$->dpe = symMan.needsDPE();
-      if ($5->dpe->value > 0)
+      if ($6->dpe->value > 0)
       {
         symMan.addDPEend();
       }

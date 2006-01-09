@@ -29,14 +29,14 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $ 
+ *          - last changes of: \$Author: reinert $ 
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/01/06 16:02:21 $
+ *          - last changed: \$Date: 2006/01/09 06:22:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universitï¿½t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
  */
 %}
 
@@ -338,7 +338,7 @@ tEmpty:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure = mkcasestring("no");
+    casestring suppressJoinFailure;
     
     integer id;
   }
@@ -354,7 +354,7 @@ tInvoke:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure = mkcasestring("no");
+    casestring suppressJoinFailure;    
 	  
     casestring partnerLink;
     casestring portType;
@@ -386,7 +386,7 @@ tReceive:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure = mkcasestring("no");
+    casestring suppressJoinFailure;    
 
     casestring partnerLink;
     casestring portType;
@@ -414,7 +414,7 @@ tReply:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure = mkcasestring("no");
+    casestring suppressJoinFailure;        
 
     casestring partnerLink;
     casestring portType;
@@ -442,7 +442,7 @@ tAssign:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure = mkcasestring("no");
+    casestring suppressJoinFailure;
 
     integer id;
   }
@@ -498,7 +498,7 @@ tWait:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure = mkcasestring("no");
+    casestring suppressJoinFailure;
 	  
     casestring For; // "for" is a keyword
     casestring until;
@@ -517,7 +517,7 @@ tThrow:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure = mkcasestring("no");
+    casestring suppressJoinFailure;
 
     casestring faultName;
     casestring faultVariable;
@@ -539,7 +539,7 @@ tCompensate:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure = mkcasestring("no");
+    casestring suppressJoinFailure;
 
     casestring scope;
 
@@ -560,7 +560,7 @@ tTerminate:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure = mkcasestring("no");
+    casestring suppressJoinFailure;
 
     integer id;
   }
@@ -576,7 +576,7 @@ tFlow:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure = mkcasestring("no");
+    casestring suppressJoinFailure;
 
     /// additional attribute for DPE
     integer dpe = mkinteger(0);
@@ -613,7 +613,7 @@ tSwitch:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure = mkcasestring("no");
+    casestring suppressJoinFailure;
 
     /// additional attribute for DPE
     integer dpe = mkinteger(0);
@@ -660,7 +660,7 @@ tWhile:
 
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure = mkcasestring("no");
+    casestring suppressJoinFailure;
     
     integer id;
   }
@@ -676,7 +676,7 @@ tSequence:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure = mkcasestring("no");
+    casestring suppressJoinFailure;
 
     integer id;
 
@@ -695,7 +695,7 @@ tPick:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure = mkcasestring("no");
+    casestring suppressJoinFailure;
     
     casestring createInstance = mkcasestring("no");
 
@@ -724,7 +724,7 @@ tScope:
   {
     casestring name;
     casestring joinCondition;
-    casestring suppressJoinFailure = mkcasestring("no");
+    casestring suppressJoinFailure;
 
     casestring variableAccessSerializable = mkcasestring("no");
 

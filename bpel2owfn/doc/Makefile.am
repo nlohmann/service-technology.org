@@ -25,6 +25,7 @@ CLEANFILES = install.aux \
 	     install.tmp \
 	     install.tp
 
+EXTRA_DIST = install.texi
 
 # rules to create the distribution documentation
 hu-createdistdocs: install.texi

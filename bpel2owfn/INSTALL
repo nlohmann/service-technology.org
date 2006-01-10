@@ -3,56 +3,88 @@ BEGIN OF INSTALL file for BPEL2oWFN Version 1.0
 Setup and Installation
 **********************
 
+The distribution environment of BPEL2oWFN was created using the GNU
+Autotools. If you are familiar with the setup and installation
+procedure of any GNU tool you may skip this section.
+
 Setup
 =====
 
-Entering(1)
+To setup the installation environment and to compile BPEL2oWFN simply
+follow these steps:
 
-     gunzip bpel2owfn-1.0.tar.gz
-     tar xf bpel2owfn-1.0.tar
-     cd bpel2owfn-1.0
-     ./configure
+  1. Unpack the source tarball by entering(1)
 
-should lead to an output like:
+          gunzip bpel2owfn-1.0.tar.gz
+          tar xf bpel2owfn-1.0.tar
 
-     checking for a BSD-compatible install... /usr/bin/install -c
-     checking whether build environment is sane... yes
-     checking for gawk... gawk
-     checking whether make sets $(MAKE)... yes
-     checking for g++... g++
-     checking for C++ compiler default output file name... a.exe
-     checking whether the C++ compiler works... yes
-     checking whether we are cross compiling... no
-     checking for suffix of executables... .exe
-     checking for suffix of object files... o
-     checking whether we are using the GNU C++ compiler... yes
-     checking whether g++ accepts -g... yes
-     checking for style of include used by make... GNU
-     checking dependency style of g++... gcc3
-     checking for a BSD-compatible install... /usr/bin/install -c
-     checking for flex... flex
-     checking for yywrap in -lfl... yes
-     checking lex output file root... lex.yy
-     checking whether yytext is a pointer... no
-     checking for bison... bison
-     checking for kc++... kc++
-     configure: creating ./config.status
-     config.status: creating Makefile
-     config.status: creating doc/Makefile
-     config.status: creating src/Makefile
-     config.status: creating tests/Makefile
-     config.status: executing depfiles commands
+  2. Enter that directory:
+          cd bpel2owfn-1.0
 
-After that, simply execute `make'. When everything goes well, you can
-self-check BPEL2oWFN by invoking `make check'. After a lot of output it
-should announce
+  3. Run the configure shell script which attempts to guess correct
+     values for various system-dependent variables used during
+     compilation. It uses those values to create a `Makefile' in each
+     directory of the package. Entering
 
-     ==================
-     All 3 tests passed
-     ==================
+          ./configure
 
-or, if anything went wrong, prints error message and requests to report
-the encountered bug to <nlohmann@informatik.hu-berlin.de>.
+     should lead to an output like:
+
+          checking for a BSD-compatible install... /usr/bin/install -c
+          checking whether build environment is sane... yes
+          checking for gawk... gawk
+          checking whether make sets $(MAKE)... yes
+          checking for g++... g++
+          checking for C++ compiler default output file name... a.exe
+          checking whether the C++ compiler works... yes
+          checking whether we are cross compiling... no
+          checking for suffix of executables... .exe
+          checking for suffix of object files... o
+          checking whether we are using the GNU C++ compiler... yes
+          checking whether g++ accepts -g... yes
+          checking for style of include used by make... GNU
+          checking dependency style of g++... gcc3
+          checking for a BSD-compatible install... /usr/bin/install -c
+          checking for flex... flex
+          checking for yywrap in -lfl... yes
+          checking lex output file root... lex.yy
+          checking whether yytext is a pointer... no
+          checking for bison... bison
+          checking for kc++... kc++
+          configure: creating ./config.status
+          config.status: creating Makefile
+          config.status: creating doc/Makefile
+          config.status: creating src/Makefile
+          config.status: creating tests/Makefile
+          config.status: creating src/bpel2owfn.h
+          config.status: executing depfiles commands
+
+     or complains about a tool which could not be found in your system
+     path. In this case please check *Note Needed Programs::, as
+     BPEL2oWFN cannot be compiled without these tools.
+
+  4. After all Makefiles are created, run
+
+          make
+
+     to compile the executable binary as well as a documentation file.
+
+  5. Alternativly, you can run
+
+          make check
+
+     to self-test the created binary. After many lines of output `make
+     check' should announce
+
+          PASS: test1
+          PASS: test2
+          PASS: test3
+          ==================
+          All 3 tests passed
+          ==================
+
+     or, if anything went wrong, prints error message and requests to
+     report the encountered bug to <nlohmann@informatik.hu-berlin.de>.
 
 Installation
 ============
@@ -63,24 +95,42 @@ is created in the directory `bpel2owfn-1.0/src' of the distribution.
 This file has no dependencies to other files of the distribution and
 can be copied to any directory.
 
-Alternatively you can install BPEL2oWFN properly by executing `make
-install'.(2)
+Alternatively you can install BPEL2oWFN properly by executing (2)
+
+     make install
+
+to copy the binary to the directory `/usr/local/bin' and to make the
+documentation accessible (i.e. copy it to `/usr/local/info') for
+
+     info bpel2owfn
+
+You can undo the installation by entering
+
+     make uninstall
+
+The setup and installation procedure can be customized by running
+`./configure' with several command-line options. Type
+
+     ./configure --help
+
+for more information.
 
 Problems during Setup or Installation
 =====================================
 
 Any warning during an in other respects successful compilation can be
-ignored--these warnings mostly occur in generated files from Flex,
+ignored -- these warnings mostly occur in generated files from Flex,
 Bison or Kimwitu++ and are outside of our scope.
 
-BPEL2oWFN was tested on several operating systems such as Microsoft
-Windows (running cygwin), Linux and Sun OS. Anyway, if the compilation
-fails please make sure you use the most recent versions of the GNU
-Compiler Collection, Flex, Bison and Kimwitu++. If this does not help
-please send us an electronic mail to <nlohmann@informatik.hu-berlin.de>.
-Include the version number of your distribution (version 1.0 of 26
-January 2006). Also include in your message the output that the make
-process produced. We will try to answer your mail within a week.
+The compilation of BPEL2oWFN was tested on several operating systems
+such as Microsoft Windows (running cygwin), Linux and Sun OS. Anyway,
+if the compilation fails please make sure you use the most recent
+versions of the GNU Compiler Collection, Flex, Bison and Kimwitu++. If
+this does not help please send us an electronic mail to
+<nlohmann@informatik.hu-berlin.de>. Include the version number of your
+distribution (version 1.0 of 26 January 2006). Also include in your
+message the output that the make process produced. We will try to
+answer your mail within a week.
 
 If you are not interested in compiling BPEL2oWFN yourself you can
 alternatively download executable binaries for several operating
@@ -89,6 +139,8 @@ systems on the website of BPEL2oWFN
 
 Makefile Targets
 ================
+
+The generated Makefiles serve different targets:
 
 `all'
      Compile BPEL2oWFN and create an executable binary `bpel2owfn' (or
@@ -113,28 +165,24 @@ Makefile Targets
 `distclean'
      Clean everything that does not belong to the distribution, i.e.
      any file created during compilation. Executables as well as
-     created documentation files are also removed.
+     created documentation files are also removed. To re-compile you
+     have to run `./configure' again.
 
 `check'
      Perform a number of self-tests: the directory `tests' contains
      several BPEL processes which are read and compiled.
 
-`dist'
-     Create a zipped distribution tar file containing all files of the
-     distribution (calls `distclean' before).
-
-For the compilation of the sources in the directory `bpel2owfn-1.0/src'
-it is possible to set an optimization level of `g++' by setting a
-variable `OPTIMIZE'. For example, `make OPTIMIZE=-O3' invokes a
-compilation with all possible optimization which yields to a smaller
-and faster executable and longer compilation time.
+`pure-windows-executable'
+     Create an executable binary which is independent of the Cygwin
+     libraries. This file can be executed on any system running
+     Microsoft Windows, independently of a Cygwin environment.
 
 ---------- Footnotes ----------
 
-(1) Cygwin users should open an `tcsh'-shell before.
+(1) Cygwin users should open a `tcsh'-shell before.
 
-(2) Usually, `make install' has to be executed by the
-root/administrator.
+(2) Usually, `make install' and `make uninstall' can only be executed
+by the root user.
 
 Needed Programs
 ***************

@@ -12,9 +12,17 @@
 @image{images/bpel2owfn}
 @end ifhtml
 
+@b{About this document:}
+
 This manual is for @acronym{BPEL2oWFN}, Version @value{VERSION}, a tool
 translating business processes described in @acronym{BPEL} to open workflow
-nets (@acronym{oWFN}), last updated @value{UPDATED}.
+nets (@acronym{oWFN}), last updated @value{UPDATED}. This manual does not
+explain how to setup or install @acronym{BPEL2oWFN}. For this information
+please read the Installation Manual which is part of the distribution or can be
+downloaded from the website of @acronym{BPEL2oWFN}
+(@url{http://www.informatik.hu-berlin.de/top/tools4bpel/bpel2owfn}).
+
+@vskip 20pt
 
 Copyright @copyright{} 2006 Niels Lohmann
 

@@ -2,6 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 AC_INIT(BPEL2oWFN, 1.0, nlohmann@informatik.hu-berlin.de, bpel2owfn)
 
 AC_CONFIG_SRCDIR(src/main.cc)
+AC_CONFIG_HEADERS(src/bpel2owfn.h)
 
 AC_LANG([C++])
 

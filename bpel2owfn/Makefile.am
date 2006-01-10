@@ -22,12 +22,12 @@ hu-prepare: distclean
 	-rm -f doc/Makefile.in
 	-rm -f src/Makefile.in
 	-rm -f tests/Makefile.in
-	@echo -------------------------------------
+	@echo -----------------------------------------------------
 	@echo To recreate installation status enter
 	@echo   aclocal
 	@echo   autoconf
+	@echo   autoheader
 	@echo   automake -a -c
-	@echo -------------------------------------
 
 # target to create an executable that is independet of Cygwin
 hu-mingwexe: clean

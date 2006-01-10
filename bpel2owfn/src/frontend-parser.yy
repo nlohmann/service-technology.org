@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/01/09 13:14:05 $
+ *          - last changed: \$Date: 2006/01/10 02:22:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.84 $
+ * \version \$Revision: 1.85 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -275,7 +275,16 @@ tProcess TheProcess;
 tProcess:
   X_OPEN K_PROCESS arbitraryAttributes
     { att.check($3, K_PROCESS);
-      att.pushSJFStack($3, att.read($3, "suppressJoinFailure", $$->suppressJoinFailure));
+      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+      {
+      	/// default attribute value
+      	att.pushSJFStack($3, mkcasestring("no"));
+      }
+      else
+      {
+        /// current BPEL-element attribute value
+      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+      }      
       symMan.initialiseProcessScope($3);
       currentScopeId = $3; }
   X_NEXT imports tPartnerLinks tPartners tVariables tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers

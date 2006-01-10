@@ -1,0 +1,26 @@
+#! /bin/sh
+
+bpel2owfn --version
+result1=$?
+
+bpel2owfn --help
+echo $result2
+result2=$?
+
+bpel2owfn --file $testdir/error.bpel
+result3=$?
+
+bpel2owfn --file $testdir/foo.bpel
+result4=$?
+
+echo "<process>" | bpel2owfn
+result5=$?
+
+if [ $result1 -eq 0 -a $result2 -eq 0 -a $result3 -eq 1 -a $result4 -eq 2 -a $result5 -eq 1 ]
+then
+  result=0
+else
+  result=1
+fi
+
+exit $result

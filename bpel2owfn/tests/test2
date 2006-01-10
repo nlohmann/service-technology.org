@@ -1,0 +1,20 @@
+#! /bin/sh
+
+bpel2owfn --file $testdir/loan.bpel
+result1=$?
+
+bpel2owfn --file $testdir/purchase.bpel -x > purchase.xml
+result2=$?
+
+bpel2owfn --file $testdir/shipping.bpel -a > shipping.ast
+result3=$?
+
+if test \( $result1 -eq 0 -a $result2 -eq 0 -a $result3 -eq 0 \) -a \
+	\( -e purchase.xml -a -e shipping.ast \)
+then
+  result=0
+else
+  result=1
+fi
+
+exit $result

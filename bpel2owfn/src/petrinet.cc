@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/01/10 10:14:22 $
+ *          - last changed: \$Date: 2006/01/10 10:20:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.73 $
+ * \version \$Revision: 1.74 $
  */
 
 
@@ -74,7 +74,7 @@ set < pair < Node *, arc_type > >setUnion (set < pair < Node *, arc_type > >a,
 {
   set < pair < Node *, arc_type > >result;
   insert_iterator < set < pair < Node *, arc_type >, less < pair < Node *,
-    arc_type > >>>res_ins (result, result.begin ());
+    arc_type > > > >res_ins (result, result.begin ());
   set_union (a.begin (), a.end (), b.begin (), b.end (), res_ins);
 
   return result;

@@ -1,5 +1,0 @@
-@set UPDATED 26 January 2006
-@set UPDATED-MONTH January 2006
-@set EDITION 1.0
-@set VERSION 1.0
-@set FILENAME bpel2owfn-1.0

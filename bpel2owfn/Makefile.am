@@ -16,6 +16,9 @@ hu-prepare: distclean
 	-rm -f missing
 	-rm -f -r autom4te.cache
 	-rm -f doc/mdate-sh
+	-rm -f doc/bpel2owfn
+	-rm -f doc/stamp-vti
+	-rm -f doc/version.texi
 	-rm -f doc/Makefile.in
 	-rm -f src/Makefile.in
 	-rm -f tests/Makefile.in

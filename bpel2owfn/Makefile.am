@@ -8,6 +8,7 @@ dist-hook:
 
 # delete all files that can be created by other files
 hu-prepare: distclean
+	-rm -f COPYING
 	-rm -f aclocal.m4
 	-rm -f configure
 	-rm -f depcomp

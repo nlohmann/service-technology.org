@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/01/09 06:24:09 $
+ *          - last changed: \$Date: 2006/01/10 10:31:01 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.30 $
+ * \version \$Revision: 1.31 $
  *
  * \todo
  *       - (reinert) Comment this file and its classes.
@@ -1062,7 +1062,8 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 }
 
 /*!
- * 
+ * \param elementId 
+ * \param attributeValue
  */
 void attributeManager::pushSJFStack(kc::integer elementId, kc::casestring attributeValue)
 {

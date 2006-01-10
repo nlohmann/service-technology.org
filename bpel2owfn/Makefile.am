@@ -32,7 +32,7 @@ hu-prepare: distclean
 
 # target to create an executable that is independet of Cygwin
 hu-mingwexe: clean
-	make CXXFLAGS="-g -mno-cygwin -O3 -U _WIN32" --directory=src
+	make CXXFLAGS="-g -mno-cygwin -U _WIN32" --directory=src
 
 # targets to distribute the mingw executable
 mingwdistdir = $(distdir)-mingw

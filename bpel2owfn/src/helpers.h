@@ -30,7 +30,7 @@
  *          - last changes by: \$Author: gierds $
  *          
  * \date    
- *          - last changed: \$Date: 2006/01/03 10:55:57 $
+ *          - last changed: \$Date: 2006/01/11 09:10:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -47,6 +47,7 @@
 #include "petrinet.h"
 #include "exception.h"	// exception handling
 #include "check-symbols.h"
+#include "bpel2owfn.h"
 
 using namespace std;
 

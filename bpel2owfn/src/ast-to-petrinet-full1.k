@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/11 09:42:42 $
+ *          - last changed: \$Date: 2006/01/11 15:46:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.89 $
+ * \version \$Revision: 1.90 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
@@ -2964,7 +2964,8 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->newArc(TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.!Active"), t13, READ);
 
       // merge places with parent scope
-      TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.compensationHandler.compScope." + intToString(This->id->value)), p3); // was "....internal.compScope."
+      TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId->value) +
+	    ".internal.compensationHandler.compScope." + intToString(This->id->value)), p3); // was "....internal.compScope."
       TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.scopeCompensated"), p56);
       TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.upperTerminate"), p46);
       //TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId->value) + ".upperFH"), p48);
@@ -3060,6 +3061,7 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->mergePlaces(TheNet->findPlace("1.internal.!Terminated"), p8);
       TheNet->mergePlaces(TheNet->findPlace("1.internal.Terminated"), p9);
 
+      
       // setting all enclosed links to false in case of an error
       for (list<string>::iterator link = ((ScopeScope *)me)->innerLinks.begin(); link != ((ScopeScope *)me)->innerLinks.end(); link++)
       {

@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/06 16:02:38 $
+ *          - last changed: \$Date: 2006/01/11 09:21:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.87 $
+ * \version \$Revision: 1.88 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
@@ -1841,6 +1841,16 @@ This=Reply(a,b) ->
   ASSIGN
 ******************************************************************************/
 
+/*
+ * This pattern has been changed to fulfill the BPEL specification:
+ *
+ *    The assign activities are sufficiently short-lived that they are allowed
+ *    to complete rather than being interrupted when termination is forced.
+ *
+ * Therefore the pattern now has only stop-transitions for the initial and
+ * final place, as well as for all places after a fault has occured.
+ */
+
 This=Assign(a,b) ->
   [petrinet:
     {
@@ -1853,6 +1863,7 @@ This=Assign(a,b) ->
       Place *p6 = TheNet->newPlace(prefix + "stopped");
       Place *p7 = TheNet->newPlace(prefix + "failed");
       Transition* t4 = TheNet->newTransition(prefix + "t4");
+      Transition* t7 = TheNet->newTransition(prefix + "t7");
       TheNet->newArc(p1, t4);
       TheNet->newArc(p5, t4);
       TheNet->newArc(t4, p6);
@@ -1879,9 +1890,7 @@ This=Assign(a,b) ->
 	  Transition *t1 = TheNet->newTransition(new_prefix + "t1");
 	  Transition *t2 = TheNet->newTransition(new_prefix + "t2", "!guard");
 	  Transition *t3 = TheNet->newTransition(new_prefix + "t3", "guard");
-	  Transition *t5 = TheNet->newTransition(new_prefix + "t5");
 	  Transition *t6 = TheNet->newTransition(new_prefix + "t6");
-	  Transition *t7 = TheNet->newTransition(new_prefix + "t7");
 	  TheNet->newArc(lastPlace, t1);
 	  TheNet->newArc(TheNet->findPlace("variable." + string(from->variableID->name)), t1, READ, "X");
 	  TheNet->newArc(t1, p2, "X");
@@ -1894,15 +1903,9 @@ This=Assign(a,b) ->
 	  TheNet->newArc(t3, assign_failed, "fault");
 	  TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t3); // new fault management
 	  TheNet->newArc(t3, TheNet->findPlace(currentScope + "!Active")); // newer fault management
-	  TheNet->newArc(p2, t5, "X");
-	  TheNet->newArc(assign_stop, t5);
-	  TheNet->newArc(t5, assign_stopped);
-	  TheNet->newArc(p4, t6);
+	  TheNet->newArc(p4, t6); // stop after fault
 	  TheNet->newArc(assign_stop, t6);
 	  TheNet->newArc(t6, assign_stopped);
-	  TheNet->newArc(p8, t7);
-	  TheNet->newArc(assign_stop, t7);
-	  TheNet->newArc(t7, assign_stopped);
 
 	  lastPlace = p8;	  
 	}
@@ -1913,7 +1916,6 @@ This=Assign(a,b) ->
 	  Transition *t2 = TheNet->newTransition(new_prefix + "t2", "!guard");
 	  Transition *t3 = TheNet->newTransition(new_prefix + "t3", "guard");
 	  Transition *t6 = TheNet->newTransition(new_prefix + "t6");
-	  Transition *t7 = TheNet->newTransition(new_prefix + "t7");
 	  TheNet->newArc(lastPlace, t2);
 	  TheNet->newArc(TheNet->findPlace("variable." + string(to->variableID->name)), t2, "Y");
 	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(to->variableID->name)), string(from->literalValue->name));
@@ -1923,18 +1925,19 @@ This=Assign(a,b) ->
 	  TheNet->newArc(t3, assign_failed, "fault");
 	  TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t3); // new fault management
 	  TheNet->newArc(t3, TheNet->findPlace(currentScope + "!Active")); // newer fault management
-	  TheNet->newArc(p4, t6);
+	  TheNet->newArc(p4, t6); // stop after fault
 	  TheNet->newArc(assign_stop, t6);
 	  TheNet->newArc(t6, assign_stopped);
-	  TheNet->newArc(p8, t7);
-	  TheNet->newArc(assign_stop, t7);
-	  TheNet->newArc(t7, assign_stopped);
 	  
 	  lastPlace = p8;
 	}
 	copyCount++;
       }
-
+      
+      TheNet->newArc(lastPlace, t7);
+      TheNet->newArc(assign_stop, t7);
+      TheNet->newArc(t7, lastPlace);
+      
       TheNet->mergePlaces(assign_final, lastPlace);
       trace(TRACE_DEBUG, "[PNU]\t</assign>\n");
     }

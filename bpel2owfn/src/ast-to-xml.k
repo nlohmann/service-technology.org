@@ -28,11 +28,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/01/02 15:57:33 $
+ *          - last changed: \$Date: 2006/01/11 16:45:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  */
 %}
 
@@ -251,7 +251,7 @@ Correlation() ->
 ******************************************************************************/
 
 Empty(a) ->
-  [xml: { inup(); } "<empty id=\"" $0->id "\">\n" a { indown(); } "</empty>\n"];
+  [xml: { inup(); } "<empty id=\"" $0->id "\" pcf=\"" $0->positiveControlFlow "\">\n" a { indown(); } "</empty>\n"];
 
 
 /******************************************************************************
@@ -259,7 +259,7 @@ Empty(a) ->
 ******************************************************************************/
 
 Invoke(a,b) ->
-  [xml: { inup(); } "<invoke id=\"" $0->id "\" dpe=\"" $0->dpe "\">\n" a b { indown(); } "</invoke>\n"]
+  [xml: { inup(); } "<invoke id=\"" $0->id "\" pcf=\"" $0->positiveControlFlow "\" dpe=\"" $0->dpe "\">\n" a b { indown(); } "</invoke>\n"]
 ;
 
 
@@ -268,7 +268,7 @@ Invoke(a,b) ->
 ******************************************************************************/
 
 Receive(a,b) ->
-  [xml: { inup(); } "<receive id=\"" $0->id "\">\n" a b { indown(); } "</receive>\n"]
+  [xml: { inup(); } "<receive id=\"" $0->id "\" pcf=\"" $0->positiveControlFlow "\">\n" a b { indown(); } "</receive>\n"]
 ;
 
 
@@ -277,7 +277,7 @@ Receive(a,b) ->
 ******************************************************************************/
 
 Reply(a,b) ->
-  [xml: { inup(); } "<reply id=\"" $0->id "\">\n" a b { indown(); } "</reply>\n"]
+  [xml: { inup(); } "<reply id=\"" $0->id "\" pcf=\"" $0->positiveControlFlow "\">\n" a b { indown(); } "</reply>\n"]
 ;
 
 
@@ -286,7 +286,7 @@ Reply(a,b) ->
 ******************************************************************************/
 
 Assign(a,b) ->
-  [xml: { inup(); } "<assign id=\"" $0->id "\">\n" a b { indown(); } "</assign>\n"]
+  [xml: { inup(); } "<assign id=\"" $0->id "\" pcf=\"" $0->positiveControlFlow "\">\n" a b { indown(); } "</assign>\n"]
 ;
 
 Copy(a,b) ->
@@ -307,7 +307,7 @@ To() ->
 ******************************************************************************/
 
 Wait(a) ->
-  [xml: { inup(); } "<wait id=\"" $0->id "\">\n" a { indown(); } "</wait>\n"]
+  [xml: { inup(); } "<wait id=\"" $0->id "\" pcf=\"" $0->positiveControlFlow "\">\n" a { indown(); } "</wait>\n"]
 ;
 
 
@@ -316,7 +316,7 @@ Wait(a) ->
 ******************************************************************************/
 
 Throw(a) ->
-  [xml: { inup(); } "<throw id=\"" $0->id "\">\n" a { indown(); } "</throw>\n"]
+  [xml: { inup(); } "<throw id=\"" $0->id "\" pcf=\"" $0->positiveControlFlow "\">\n" a { indown(); } "</throw>\n"]
 ;
 
 
@@ -325,7 +325,7 @@ Throw(a) ->
 ******************************************************************************/
 
 Compensate(a) ->
-  [xml: { inup(); } "<compensate id=\"" $0->id "\">\n" a { indown(); } "</compensate>\n"]
+  [xml: { inup(); } "<compensate id=\"" $0->id "\" pcf=\"" $0->positiveControlFlow "\">\n" a { indown(); } "</compensate>\n"]
 ;
 
 
@@ -334,7 +334,7 @@ Compensate(a) ->
 ******************************************************************************/
 
 Terminate(a) ->
-  [xml: { inup(); } "<terminate id=\"" $0->id "\">\n" a { indown(); } "</terminate>\n"]
+  [xml: { inup(); } "<terminate id=\"" $0->id "\" pcf=\"" $0->positiveControlFlow "\">\n" a { indown(); } "</terminate>\n"]
 ;
 
 
@@ -343,11 +343,11 @@ Terminate(a) ->
 ******************************************************************************/
 
 Flow(a,NiltLink_list(),c) ->
-  [xml: { inup(); } "<flow id=\"" $0->id "\" dpe=\"" $0->dpe "\">\n" a c { indown(); } "</flow>\n"]
+  [xml: { inup(); } "<flow id=\"" $0->id "\" pcf=\"" $0->positiveControlFlow "\" dpe=\"" $0->dpe "\">\n" a c { indown(); } "</flow>\n"]
 ;
 
 Flow(a,b,c) ->
-  [xml: { inup(); } "<flow id=\"" $0->id "\" dpe=\"" $0->dpe "\">\n" a { inup(); } "<links>\n" b { indown(); } "</links>\n" c { indown(); } "</flow>\n"]
+  [xml: { inup(); } "<flow id=\"" $0->id "\" pcf=\"" $0->positiveControlFlow "\" dpe=\"" $0->dpe "\">\n" a { inup(); } "<links>\n" b { indown(); } "</links>\n" c { indown(); } "</flow>\n"]
 ;
 
 Link() ->
@@ -360,7 +360,7 @@ Link() ->
 ******************************************************************************/
 
 Switch(a,b,c) ->
-  [xml: { inup(); } "<switch id=\"" $0->id "\" dpe=\"" $0->dpe "\">\n" a b c { indown(); } "</switch>\n"]
+  [xml: { inup(); } "<switch id=\"" $0->id "\" pcf=\"" $0->positiveControlFlow "\" dpe=\"" $0->dpe "\">\n" a b c { indown(); } "</switch>\n"]
 ;
 
 Case(a) ->
@@ -377,7 +377,7 @@ Otherwise(a) ->
 ******************************************************************************/
 
 While(a,b) ->
-  [xml: { inup(); } "<while id=\"" $0->id "\">\n" a b { indown(); } "</while>\n"]
+  [xml: { inup(); } "<while id=\"" $0->id "\" pcf=\"" $0->positiveControlFlow "\">\n" a b { indown(); } "</while>\n"]
 ;
 
 
@@ -386,7 +386,7 @@ While(a,b) ->
 ******************************************************************************/
 
 activitySequence(Sequence(a,b)) ->
-  [xml: { inup(); } "<sequence id=\"" $0->id "\">\n" a b { indown(); } "</sequence>\n"]
+  [xml: { inup(); } "<sequence id=\"" $0->id "\" pcf=\"" $0->positiveControlFlow "\">\n" a b { indown(); } "</sequence>\n"]
 ;
 
 
@@ -395,7 +395,7 @@ activitySequence(Sequence(a,b)) ->
 ******************************************************************************/
 
 Pick(a,b,c) ->
-  [xml: { inup(); } "<pick id=\"" $0->id "\" dpe=\"" $0->dpe "\">\n" a b c { indown(); } "</pick>\n"]
+  [xml: { inup(); } "<pick id=\"" $0->id "\" pcf=\"" $0->positiveControlFlow "\" dpe=\"" $0->dpe "\">\n" a b c { indown(); } "</pick>\n"]
 ;
 
 
@@ -404,14 +404,14 @@ Pick(a,b,c) ->
 ******************************************************************************/
 
 Scope(a,b,c,d,e,f,g) ->
-  [xml: { inup(); } "<scope id=\"" $0->id "\" dpe=\"" $0->dpe "\">\n" 
+  [xml: { inup(); } "<scope id=\"" $0->id "\" pcf=\"" $0->positiveControlFlow "\" dpe=\"" $0->dpe "\">\n" 
   
   a
 
   { if (b->length() == 0) }
     ${ /* no Variables */ $}
   { else }
-    ${ { inup(); } "<variables id=\"" $0->id "\">\n" b { indown(); } "</variables>\n" $}
+    ${ { inup(); } "<variables id=\"" $0->id "\" pcf=\"" $0->positiveControlFlow "\">\n" b { indown(); } "</variables>\n" $}
 
   c d e f g
     

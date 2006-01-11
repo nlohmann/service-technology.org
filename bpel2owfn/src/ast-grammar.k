@@ -29,11 +29,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $ 
+ *          - last changes of: \$Author: gierds $ 
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/01/09 06:22:26 $
+ *          - last changed: \$Date: 2006/01/11 16:45:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
  */
 %}
 
@@ -115,6 +115,7 @@ activity:
 | activityCompensate(tCompensate)
   {
     integer id;
+    bool positiveControlFlow;
   }
 ;
 
@@ -340,6 +341,7 @@ tEmpty:
     casestring joinCondition;
     casestring suppressJoinFailure;
     
+    bool positiveControlFlow;
     integer id;
   }
 ;
@@ -372,6 +374,7 @@ tInvoke:
     /// additional attribute for DPE
     integer dpe = mkinteger(0);
 
+    bool positiveControlFlow;
     integer id;
   }	
 ;
@@ -400,6 +403,7 @@ tReceive:
     /// additional attribute containing the channel name
     casestring channelID;
     
+    bool positiveControlFlow;
     integer id;
   }
 ;
@@ -428,6 +432,7 @@ tReply:
     /// additional attribute containing the channel name
     casestring channelID;
 
+    bool positiveControlFlow;
     integer id;
   }
 ;
@@ -444,6 +449,7 @@ tAssign:
     casestring joinCondition;
     casestring suppressJoinFailure;
 
+    bool positiveControlFlow;
     integer id;
   }
 ;
@@ -503,6 +509,7 @@ tWait:
     casestring For; // "for" is a keyword
     casestring until;
 
+    bool positiveControlFlow;
     integer id;
   }
 ;
@@ -525,6 +532,7 @@ tThrow:
     /// additional attribute containing the unique variable name    
     casestring variableID;
 
+    bool positiveControlFlow;
     integer id;
   }
 ;
@@ -546,6 +554,7 @@ tCompensate:
     /// additional attribute used to identify the correct pattern
     bool inFaultHandler = true;
     
+    bool positiveControlFlow;
     integer id;
   }
 ;
@@ -562,6 +571,7 @@ tTerminate:
     casestring joinCondition;
     casestring suppressJoinFailure;
 
+    bool positiveControlFlow;
     integer id;
   }
 ;
@@ -581,6 +591,7 @@ tFlow:
     /// additional attribute for DPE
     integer dpe = mkinteger(0);
 
+    bool positiveControlFlow;
     integer id;
   }
 ;
@@ -618,6 +629,7 @@ tSwitch:
     /// additional attribute for DPE
     integer dpe = mkinteger(0);
 
+    bool positiveControlFlow;
     integer id;
   }
 ;
@@ -662,6 +674,7 @@ tWhile:
     casestring joinCondition;
     casestring suppressJoinFailure;
     
+    bool positiveControlFlow;
     integer id;
   }
 ;
@@ -678,6 +691,7 @@ tSequence:
     casestring joinCondition;
     casestring suppressJoinFailure;
 
+    bool positiveControlFlow;
     integer id;
 
     /// additional attribute for DPE
@@ -702,6 +716,7 @@ tPick:
     /// additional attribute for DPE
     integer dpe = mkinteger(0);
 
+    bool positiveControlFlow;
     integer id;
   }
 ;
@@ -728,6 +743,7 @@ tScope:
 
     casestring variableAccessSerializable = mkcasestring("no");
 
+    bool positiveControlFlow;
     integer id;
 
     /// additional attribute used for inter-scope communication (push-places)

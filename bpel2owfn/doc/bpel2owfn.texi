@@ -408,8 +408,8 @@ Exception #10 occurred!
 
 @item 30
 @b{`Dynamic cast error' exception.} While building an internal scope tree an
-unexpected error has occurred. (This should not happen - if it do so nevertheless,
-please inform us.)
+unexpected error has occurred. (This should not happen --- if it does so
+nevertheless, please inform us.)
 
 
 @item 40

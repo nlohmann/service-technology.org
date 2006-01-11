@@ -210,7 +210,7 @@ this
 installation manual. The documentation is in Texinfo format and can be
 converted into many file formats using @samp{make @var{format}} where
 @samp{@var{format}} is a file format out of @samp{dvi}, @samp{html},
-@samp{pdf}, @samp{ps} or @samp{info}.
+@samp{pdf} or @samp{ps}.
 
 @item tests
 Several test processes to self-test @acronym{BPEL2oWFN}. The processes
@@ -419,12 +419,11 @@ Compile @acronym{BPEL2oWFN} and create an executable binary @file{bpel2owfn}
 @itemx html
 @itemx pdf
 @itemx ps
-@itemx info
 Generate documentation files in the given format which can be @acronym{DVI},
-@acronym{HTML}, @acronym{PDF}, PostScript or @acronym{GNU} Info. The
-documentation is generated in the directory
-@file{bpel2owfn-@value{VERSION}/doc} and is named @file{bpel2owfn.@var{format}}
-(User's Manual) and @file{install.@var{format}} (Installation Manual), resp.
+@acronym{HTML}, @acronym{PDF} or PostScript. The documentation is generated
+in the directory @file{bpel2owfn-@value{VERSION}/doc} and is named
+@file{bpel2owfn.@var{format}} (User's Manual) and @file{install.@var{format}}
+(Installation Manual), resp.
 
 @item clean
 Clean all temporary files created during the compilation. Executables as well

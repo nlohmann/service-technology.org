@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/01/12 11:39:16 $
+ *          - last changed: \$Date: 2006/01/12 15:45:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.88 $
+ * \version \$Revision: 1.89 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -940,7 +940,7 @@ tEmpty:
       $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
       att.traceAM(string("tEmpty: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->negativeControlFlow = $5->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $5->parentId = $2; 
       if ($5->dpe->value > 0)
       {
@@ -970,8 +970,8 @@ tEmpty:
       $$->joinCondition = att.read($2, "joinCondition");
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
       att.traceAM(string("tEmpty: ") + ($$->suppressJoinFailure)->name + string("\n"));
-      att.popSJFStack();      
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      att.popSJFStack();
+      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; }
 ;
 
@@ -1070,7 +1070,7 @@ tInvoke:
       {
         symMan.addDPEend();
       }
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2; }
 | K_INVOKE 
   arbitraryAttributes 
@@ -1118,7 +1118,7 @@ tInvoke:
 					$$->partnerLink->name), false);
       }
       $$->dpe = kc::mkinteger(0);
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; }
 ;
 
@@ -1189,7 +1189,7 @@ tReceive:
       {
         symMan.addDPEend();
       }
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2; }
 | K_RECEIVE
   arbitraryAttributes
@@ -1221,7 +1221,7 @@ tReceive:
       $$->variable = att.read($2, "variable");
       $$->createInstance = att.read($2, "createInstance", $$->createInstance);
       $$->variableID = symMan.checkVariable(att.read($2, "variable")->name);
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; 
       symMan.checkPartnerLink($$->partnerLink->name); 
       $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
@@ -1300,7 +1300,7 @@ tReply:
       {
         symMan.addDPEend();
       }
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->negativeControlFlow = $5->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $5->parentId = $2; }
 | K_REPLY
   arbitraryAttributes
@@ -1336,7 +1336,7 @@ tReply:
       $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
 				      $$->partnerLink->name), false);
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; }
 ;
 
@@ -1386,7 +1386,7 @@ tAssign:
       {
         symMan.addDPEend();
       }
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->negativeControlFlow = $5->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $5->parentId = $2; }
 ;
 
@@ -1533,7 +1533,7 @@ tWait:
       {
         symMan.addDPEend();
       }
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->negativeControlFlow = $5->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $5->parentId = $2; }
 | K_WAIT
   arbitraryAttributes
@@ -1561,7 +1561,7 @@ tWait:
       att.popSJFStack();      
       $$->For = att.read($2, "for"); // "for" is a keyword
       $$->until = att.read($2, "until");
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; }
 ;
 
@@ -1613,7 +1613,7 @@ tThrow:
       {
         symMan.addDPEend();
       }
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->negativeControlFlow = $5->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $5->parentId = $2; }
 | K_THROW
   arbitraryAttributes
@@ -1642,7 +1642,7 @@ tThrow:
       $$->faultName = att.read($2, "faultName");
       $$->faultVariable = att.read($2, "faultVariable");
       $$->variableID = symMan.checkVariable(att.read($2, "faultVariable")->name);
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; }
 ;
 
@@ -1712,7 +1712,7 @@ tCompensate:
       {
         symMan.addDPEend();
       }
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->negativeControlFlow = $5->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $5->parentId = $2; }
 | K_COMPENSATE
   arbitraryAttributes
@@ -1762,7 +1762,7 @@ tCompensate:
       att.traceAM(string("tCompensate: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
       $$->scope = att.read($2, "scope");
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; }
 ;
 
@@ -1809,7 +1809,7 @@ tTerminate:
       {
         symMan.addDPEend();
       }
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->negativeControlFlow = $5->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $5->parentId = $2; }
 | K_TERMINATE
   arbitraryAttributes
@@ -1835,7 +1835,7 @@ tTerminate:
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
       att.traceAM(string("tTerminate: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; }
 ;
 
@@ -1890,7 +1890,7 @@ tFlow:
       {
         symMan.addDPEend();
       }
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2;
       symMan.checkLinks();
       symMan.quitScope(); }
@@ -1984,7 +1984,7 @@ tSwitch:
       {
         symMan.addDPEend();
       }
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->negativeControlFlow = $5->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $5->parentId = $2;
     }
 ;
@@ -2089,7 +2089,7 @@ tWhile:
       att.traceAM(string("tWhile: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
       $$->condition = att.read($2, "condition");
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->negativeControlFlow = $5->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $5->parentId = $2; 
       symMan.endDPEinWhile();
     }
@@ -2137,7 +2137,7 @@ tSequence:
       $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
       att.traceAM(string("tSequence: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->negativeControlFlow = $5->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $5->parentId = $2; 
       $$->dpe = symMan.needsDPE();
       if ($5->dpe->value > 0)
@@ -2216,7 +2216,7 @@ tPick:
         symMan.addDPEend();
       }
       $$->id = $5->parentId = $2;
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->negativeControlFlow = $5->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
     }
 ;
 
@@ -2290,7 +2290,7 @@ tScope:
       att.traceAM(string("tScope: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
       $$->variableAccessSerializable = att.read($2, "variableAccessSerializable", $$->variableAccessSerializable);
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2;
       $$->parentScopeId = currentScopeId = parent[$2];
       $$->dpe = symMan.needsDPE();

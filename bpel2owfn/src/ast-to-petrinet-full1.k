@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/12 15:33:58 $
+ *          - last changed: \$Date: 2006/01/12 16:14:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,15 +44,12 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.96 $
+ * \version \$Revision: 1.97 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
  *          - (nlohmann) outsource <compensate />-elements
  *          - (nlohmann) variables in communicating actions should be optional
- *          - (nlohmann) handle faults in fault handlers
- *          - (nlohmann) What if an event handler becomes active while a fault
- *            is handled?
  */
 %}
 
@@ -3300,7 +3297,7 @@ This=StandardElements(NiltTarget_list(), a) ->
       Place *p5 = TheNet->newPlace(prefix + "final");
       Place *p6 = TheNet->newPlace(prefix + "stop");
       Place *p7 = TheNet->newPlace(prefix + "stopped");
-      Place *p8 = TheNet->newPlace(prefix + "failed"); //new
+//      Place *p8 = TheNet->newPlace(prefix + "failed"); //new
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       Transition *t2 = TheNet->newTransition(prefix + "t2");
       Transition *t3 = TheNet->newTransition(prefix + "t3");
@@ -3350,19 +3347,22 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
       Place *p9  = TheNet->newPlace(prefix + "stop");
       Place *p10 = TheNet->newPlace(prefix + "stopped");
       Place *p11 = TheNet->newPlace(prefix + "p11");
-      Place *p12 = TheNet->newPlace(prefix + "failed");
+//      Place *p12 = TheNet->newPlace(prefix + "failed");
       Transition *t1 = TheNet->newTransition(prefix + "t1", string(This->joinCondition->name));
-      Transition *t2 = TheNet->newTransition(prefix + "t2", "!(" + string(This->joinCondition->name) + ")");
+//      Transition *t2 = TheNet->newTransition(prefix + "t2", "!(" + string(This->joinCondition->name) + ")");
       Transition *t3 = TheNet->newTransition(prefix + "t3");
       Transition *t4 = TheNet->newTransition(prefix + "t4");
       TheNet->newArc(t1, p6);
       TheNet->newArc(p8, t1); 
-      TheNet->newArc(p8, t2);
-      TheNet->newArc(t2, p5);
-      TheNet->newArc(t2, p11);
-      TheNet->newArc(t2, p12, "fault");
-      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t2); // new fault management
-      TheNet->newArc(t2, TheNet->findPlace(currentScope + "!Active")); // newer fault management
+
+      throwFault(p8, p11, "!(" + string(This->joinCondition->name) + ")", "initial", "", prefix, This->negativeControlFlow);
+//      TheNet->newArc(p8, t2);
+//      TheNet->newArc(t2, p5);
+//      TheNet->newArc(t2, p11);
+//      TheNet->newArc(t2, p12, "fault");
+//      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t2); // new fault management
+//      TheNet->newArc(t2, TheNet->findPlace(currentScope + "!Active")); // newer fault management
+
       TheNet->newArc(p8, t3);
       TheNet->newArc(p9, t3);
       TheNet->newArc(t3, p10);
@@ -3377,8 +3377,13 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
 	Place *p3 = TheNet->findPlace("link." + string(link->linkID->name));
 	TheNet->newArc(t1, p1);
 	TheNet->newArc(p3, t1, "b" + intToString(i));
-	TheNet->newArc(t2, p1);
-	TheNet->newArc(p3, t2, "b" + intToString(i));
+
+	//TheNet->newArc(t2, p1);
+	//TheNet->newArc(p3, t2, "b" + intToString(i));
+	Transition* faultTransition = TheNet->findTransition(prefix + "throwFault.initial");
+	TheNet->newArc(faultTransition, p1);
+	TheNet->newArc(p3, faultTransition, "b" + intToString(i));
+
 	i++;
       }
 
@@ -3405,7 +3410,7 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
       Place *p8  = TheNet->newPlace(prefix + "initial");
       Place *p9  = TheNet->newPlace(prefix + "stop");
       Place *p10 = TheNet->newPlace(prefix + "stopped");
-      Place *p11 = TheNet->newPlace(prefix + "failed"); //new
+//      Place *p11 = TheNet->newPlace(prefix + "failed"); //new
       Transition *t1 = TheNet->newTransition(prefix + "t1", string(This->joinCondition->name));
       Transition *t2 = TheNet->newTransition(prefix + "t2", "!(" + string(This->joinCondition->name) + ")");
       Transition *t3 = TheNet->newTransition(prefix + "t3");
@@ -3454,7 +3459,7 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
       Place *p14 = TheNet->newPlace(prefix + "stop");
       Place *p15 = TheNet->newPlace(prefix + "stopped");
       Place *p16 = TheNet->newPlace(prefix + "initial");
-      Place *p17 = TheNet->newPlace(prefix + "failed");
+//      Place *p17 = TheNet->newPlace(prefix + "failed");
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       Transition *t2 = TheNet->newTransition(prefix + "t2", string(This->joinCondition->name));
       Transition *t3 = TheNet->newTransition(prefix + "t3");
@@ -3533,12 +3538,12 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
       Place *p15 = TheNet->newPlace(prefix + "stopped");
       Place *p16 = TheNet->newPlace(prefix + "initial");
       Place *p17 = TheNet->newPlace(prefix + "p17");
-      Place *p18 = TheNet->newPlace(prefix + "failed");
+//      Place *p18 = TheNet->newPlace(prefix + "failed");
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       Transition *t2 = TheNet->newTransition(prefix + "t2", string(This->joinCondition->name));
       Transition *t3 = TheNet->newTransition(prefix + "t3");
       Transition *t4 = TheNet->newTransition(prefix + "t4");
-      Transition *t5 = TheNet->newTransition(prefix + "t5", "!(" + string(This->joinCondition->name) + ")");
+//      Transition *t5 = TheNet->newTransition(prefix + "t5", "!(" + string(This->joinCondition->name) + ")");
       Transition *t6 = TheNet->newTransition(prefix + "t6");
       Transition *t7 = TheNet->newTransition(prefix + "t7");
       Transition *t8 = TheNet->newTransition(prefix + "t8");
@@ -3550,12 +3555,15 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
       TheNet->newArc(t3, p13);
       TheNet->newArc(p12, t4);
       TheNet->newArc(t4, p13);
-      TheNet->newArc(t5, p10);
-      TheNet->newArc(t5, p17);
-      TheNet->newArc(t5, p18, "fault");
-      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t5); // new fault management
-      TheNet->newArc(t5, TheNet->findPlace(currentScope + "!Active")); // newer fault management
-      TheNet->newArc(p16, t5);
+
+      throwFault(p16, p17, "!(" + string(This->joinCondition->name) + ")", "initial", "", prefix, This->negativeControlFlow);
+//      TheNet->newArc(t5, p10);
+//      TheNet->newArc(t5, p17);
+//      TheNet->newArc(t5, p18, "fault");
+//      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t5); // new fault management
+//      TheNet->newArc(t5, TheNet->findPlace(currentScope + "!Active")); // newer fault management
+//      TheNet->newArc(p16, t5);
+
       TheNet->newArc(p14, t6);
       TheNet->newArc(t6, p15);
       TheNet->newArc(p16, t6);
@@ -3573,8 +3581,13 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
 	Place *p3 = TheNet->findPlace("link." + string(link->linkID->name));
         TheNet->newArc(t2, p1);	
 	TheNet->newArc(p3, t2, "b" + intToString(i));
-        TheNet->newArc(t5, p1);
-	TheNet->newArc(p3, t5, "b" + intToString(i));
+	
+        //TheNet->newArc(t5, p1);
+	//TheNet->newArc(p3, t5, "b" + intToString(i));
+	Transition* faultTransition = TheNet->findTransition(prefix + "throwFault.initial");
+	TheNet->newArc(faultTransition, p1);
+	TheNet->newArc(p3, faultTransition, "b" + intToString(i));
+
 	i++;
       }
       

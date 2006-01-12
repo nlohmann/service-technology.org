@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/12 10:37:40 $
+ *          - last changed: \$Date: 2006/01/12 12:21:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.92 $
+ * \version \$Revision: 1.93 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
@@ -111,7 +111,7 @@ string currentScope;
  * \param positiveControlFlow true if the fault occurs inside a scope or
  *        process
  */
-void throwFault(Place *p1, Place *p2, string guard, string p1name, string inscription, string prefix, bool positiveControlFlow)
+void throwFault(Place *p1, Place *p2, string guard, string p1name, string inscription, string prefix, integer positiveControlFlow)
 {
   // first fault in scope
   Transition *faultTransition1 = TheNet->newTransition(prefix + "throwFault." + p1name, guard);
@@ -1641,7 +1641,7 @@ This=Invoke(a,b) provided (This->outputVariable == mkcasestring("")) ->
       Place *p7 = TheNet->newPlace(prefix + "failed");
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       Transition *t2 = TheNet->newTransition(prefix + "t2", "!guard");
-      Transition *t3 = TheNet->newTransition(prefix + "t3", "guard");
+//      Transition *t3 = TheNet->newTransition(prefix + "t3", "guard");
       Transition *t4 = TheNet->newTransition(prefix + "t4");
       Transition *t5 = TheNet->newTransition(prefix + "t5");
       Transition *t6 = TheNet->newTransition(prefix + "t6");
@@ -1652,11 +1652,15 @@ This=Invoke(a,b) provided (This->outputVariable == mkcasestring("")) ->
       TheNet->newArc(t1, p2, "(X,CS)");
       TheNet->newArc(p2, t2, "(X,CS)");
       TheNet->newArc(t2, p3);
-      TheNet->newArc(t3, p4);
-      TheNet->newArc(t3, p7, "fault");
-      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t3); // new fault management
-      TheNet->newArc(t3, TheNet->findPlace(currentScope + "!Active")); // newer fault management
-      TheNet->newArc(p2, t3, "(X,CS)");
+
+//      TheNet->newArc(t3, p4);
+//      TheNet->newArc(t3, p7, "fault");
+//      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t3); // new fault management
+//      TheNet->newArc(t3, TheNet->findPlace(currentScope + "!Active")); // newer fault management
+//      TheNet->newArc(p2, t3, "(X,CS)");
+      
+      throwFault(p2, p4, "guard", "running", "(X,CS)", prefix, This->positiveControlFlow);      
+
       TheNet->newArc(p1, t4);
       TheNet->newArc(p5, t4);
       TheNet->newArc(t4, p6);
@@ -1697,8 +1701,8 @@ This=Invoke(a,b) provided (This->outputVariable != mkcasestring("")) ->
       Transition *t2  = TheNet->newTransition(prefix + "t2", "!guard1");
       Transition *t3  = TheNet->newTransition(prefix + "t3");
       Transition *t4  = TheNet->newTransition(prefix + "t4", "!guard2");
-      Transition *t5  = TheNet->newTransition(prefix + "t5", "guard2");
-      Transition *t6  = TheNet->newTransition(prefix + "t6", "guard1");
+//      Transition *t5  = TheNet->newTransition(prefix + "t5", "guard2");
+//      Transition *t6  = TheNet->newTransition(prefix + "t6", "guard1");
       Transition *t7  = TheNet->newTransition(prefix + "t7");
       Transition *t8  = TheNet->newTransition(prefix + "t8");
       Transition *t9  = TheNet->newTransition(prefix + "t9");
@@ -1718,16 +1722,23 @@ This=Invoke(a,b) provided (This->outputVariable != mkcasestring("")) ->
       TheNet->newArc(t4, p5);
       TheNet->newArc(TheNet->findPlace("variable." + string(This->variableIDout->name)), t4, "V");
       TheNet->newArc(t4, TheNet->findPlace("variable." + string(This->variableIDout->name)), "Y");
-      TheNet->newArc(p4, t5, "(Y,CS2)");
-      TheNet->newArc(t5, p6);
-      TheNet->newArc(t5, p9, "fault2");
-      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t5); // new fault management
-      TheNet->newArc(t5, TheNet->findPlace(currentScope + "!Active")); // newer fault management
-      TheNet->newArc(p2, t6, "(X,CS1)");
-      TheNet->newArc(t6, p6);
-      TheNet->newArc(t6, p9, "fault1");
-      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t6); // new fault management
-      TheNet->newArc(t6, TheNet->findPlace(currentScope + "!Active")); // newer fault management
+
+      throwFault(p4, p6, "guard2", "running2", "(Y,CS2)", prefix, This->positiveControlFlow);      
+      
+//      TheNet->newArc(p4, t5, "(Y,CS2)");
+//      TheNet->newArc(t5, p6);
+//      TheNet->newArc(t5, p9, "fault2");
+//      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t5); // new fault management
+//      TheNet->newArc(t5, TheNet->findPlace(currentScope + "!Active")); // newer fault management
+
+      throwFault(p2, p6, "guard1", "running1", "(X,CS1)", prefix, This->positiveControlFlow);      
+      
+//      TheNet->newArc(p2, t6, "(X,CS1)");
+//      TheNet->newArc(t6, p6);
+//      TheNet->newArc(t6, p9, "fault1");
+//      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t6); // new fault management
+//      TheNet->newArc(t6, TheNet->findPlace(currentScope + "!Active")); // newer fault management
+
       TheNet->newArc(p1, t7);
       TheNet->newArc(p7, t7);
       TheNet->newArc(t7, p8);
@@ -1778,7 +1789,7 @@ This=Receive(a,b) ->
       Place *p7 = TheNet->newPlace(prefix + "failed");
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       Transition *t2 = TheNet->newTransition(prefix + "t2", "!guard");
-      Transition *t3 = TheNet->newTransition(prefix + "t3", "guard");
+//      Transition *t3 = TheNet->newTransition(prefix + "t3", "guard");
       Transition *t4 = TheNet->newTransition(prefix + "t4");
       Transition *t5 = TheNet->newTransition(prefix + "t5");
       Transition *t6 = TheNet->newTransition(prefix + "t6");
@@ -1791,13 +1802,13 @@ This=Receive(a,b) ->
       TheNet->newArc(TheNet->findPlace("variable." + string(This->variableID->name)), t2, "V");
       TheNet->newArc(t2, TheNet->findPlace("variable." + string(This->variableID->name)), "X");
 
-      TheNet->newArc(t3, p4);
-      TheNet->newArc(t3, p7, "fault");
-      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t3); // new fault management
-      TheNet->newArc(t3, TheNet->findPlace(currentScope + "!Active")); // newer fault management
-      TheNet->newArc(p2, t3, "(X,CS)");
+//      TheNet->newArc(t3, p4);
+//      TheNet->newArc(t3, p7, "fault");
+//      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t3); // new fault management
+//      TheNet->newArc(t3, TheNet->findPlace(currentScope + "!Active")); // newer fault management
+//      TheNet->newArc(p2, t3, "(X,CS)");
 
-//      throwFault(p2, p4, "guard", "running", "(X,CS)", prefix, This->positiveControlFlow);
+      throwFault(p2, p4, "guard", "running", "(X,CS)", prefix, This->positiveControlFlow);
 
       TheNet->newArc(p1, t4);
       TheNet->newArc(p5, t4);
@@ -1843,7 +1854,7 @@ This=Reply(a,b) ->
       Place *p7 = TheNet->newPlace(prefix + "failed");
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       Transition *t2 = TheNet->newTransition(prefix + "t2", "!guard");
-      Transition *t3 = TheNet->newTransition(prefix + "t3", "guard");
+//      Transition *t3 = TheNet->newTransition(prefix + "t3", "guard");
       Transition *t4 = TheNet->newTransition(prefix + "t4");
       Transition *t5 = TheNet->newTransition(prefix + "t5");
       Transition *t6 = TheNet->newTransition(prefix + "t6");
@@ -1854,11 +1865,15 @@ This=Reply(a,b) ->
       TheNet->newArc(t2, TheNet->findPlace("out." + string(This->channelID->name)), "X");
       TheNet->newArc(p2, t2, "(X,CS)");
       TheNet->newArc(t2, p3);
-      TheNet->newArc(t3, p4);
-      TheNet->newArc(t3, p7, "fault");
-      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t3); // new fault management
-      TheNet->newArc(t3, TheNet->findPlace(currentScope + "!Active")); // newer fault management
-      TheNet->newArc(p2, t3, "(X,CS)");
+      
+      throwFault(p2, p4, "guard", "running", "(X,CS)", prefix, This->positiveControlFlow);
+      
+//      TheNet->newArc(t3, p4);
+//      TheNet->newArc(t3, p7, "fault");
+//      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t3); // new fault management
+//      TheNet->newArc(t3, TheNet->findPlace(currentScope + "!Active")); // newer fault management
+//      TheNet->newArc(p2, t3, "(X,CS)");
+
       TheNet->newArc(p1, t4);
       TheNet->newArc(p5, t4);
       TheNet->newArc(t4, p6);
@@ -1935,20 +1950,24 @@ This=Assign(a,b) ->
 	  Place *p8 = TheNet->newPlace(new_prefix + "final"); //new
 	  Transition *t1 = TheNet->newTransition(new_prefix + "t1");
 	  Transition *t2 = TheNet->newTransition(new_prefix + "t2", "!guard");
-	  Transition *t3 = TheNet->newTransition(new_prefix + "t3", "guard");
+//	  Transition *t3 = TheNet->newTransition(new_prefix + "t3", "guard");
 	  Transition *t6 = TheNet->newTransition(new_prefix + "t6");
 	  TheNet->newArc(lastPlace, t1);
 	  TheNet->newArc(TheNet->findPlace("variable." + string(from->variableID->name)), t1, READ, "X");
 	  TheNet->newArc(t1, p2, "X");
 	  TheNet->newArc(p2, t2, "X");
-	  TheNet->newArc(p2, t3, "X");
 	  TheNet->newArc(t2, p8);
 	  TheNet->newArc(TheNet->findPlace("variable." + string(to->variableID->name)), t2, "Y");
 	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(to->variableID->name)), "X");
-	  TheNet->newArc(t3, p4);
-	  TheNet->newArc(t3, assign_failed, "fault");
-	  TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t3); // new fault management
-	  TheNet->newArc(t3, TheNet->findPlace(currentScope + "!Active")); // newer fault management
+
+	  throwFault(p2, p4, "guard", "running", "X", prefix, This->positiveControlFlow);
+
+//	  TheNet->newArc(p2, t3, "X");
+//	  TheNet->newArc(t3, p4);
+//	  TheNet->newArc(t3, assign_failed, "fault");
+//	  TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t3); // new fault management
+//	  TheNet->newArc(t3, TheNet->findPlace(currentScope + "!Active")); // newer fault management
+
 	  TheNet->newArc(p4, t6); // stop after fault
 	  TheNet->newArc(assign_stop, t6);
 	  TheNet->newArc(t6, assign_stopped);
@@ -1960,17 +1979,21 @@ This=Assign(a,b) ->
 	  Place *p4 = TheNet->newPlace(new_prefix + "p4");
 	  Place *p8 = TheNet->newPlace(new_prefix + "final"); //new
 	  Transition *t2 = TheNet->newTransition(new_prefix + "t2", "!guard");
-	  Transition *t3 = TheNet->newTransition(new_prefix + "t3", "guard");
+//	  Transition *t3 = TheNet->newTransition(new_prefix + "t3", "guard");
 	  Transition *t6 = TheNet->newTransition(new_prefix + "t6");
 	  TheNet->newArc(lastPlace, t2);
 	  TheNet->newArc(TheNet->findPlace("variable." + string(to->variableID->name)), t2, "Y");
 	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(to->variableID->name)), string(from->literalValue->name));
-	  TheNet->newArc(t2, p8);	  
-	  TheNet->newArc(lastPlace, t3);	  
-	  TheNet->newArc(t3, p4);
-	  TheNet->newArc(t3, assign_failed, "fault");
-	  TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t3); // new fault management
-	  TheNet->newArc(t3, TheNet->findPlace(currentScope + "!Active")); // newer fault management
+	  TheNet->newArc(t2, p8);
+	  
+	  throwFault(lastPlace, p4, "guard", "initial", "", prefix, This->positiveControlFlow);
+	  
+//	  TheNet->newArc(lastPlace, t3);	  
+//	  TheNet->newArc(t3, p4);
+//	  TheNet->newArc(t3, assign_failed, "fault");
+//	  TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t3); // new fault management
+//	  TheNet->newArc(t3, TheNet->findPlace(currentScope + "!Active")); // newer fault management
+
 	  TheNet->newArc(p4, t6); // stop after fault
 	  TheNet->newArc(assign_stop, t6);
 	  TheNet->newArc(t6, assign_stopped);
@@ -2099,14 +2122,17 @@ This=Throw(a) ->
       Place *p3 = TheNet->newPlace(prefix + "stop");
       Place *p4 = TheNet->newPlace(prefix + "stopped");
       Place *p5 = TheNet->newPlace(prefix + "failed");
-      Transition *t1  = TheNet->newTransition(prefix + "t1");
+//      Transition *t1  = TheNet->newTransition(prefix + "t1");
       Transition *t2  = TheNet->newTransition(prefix + "t2");
       Transition *t3  = TheNet->newTransition(prefix + "t3");
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(t1, p2);
-      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t1); // new fault management
-      TheNet->newArc(t1, TheNet->findPlace(currentScope + "!Active")); // newer fault management
-      TheNet->newArc(t1, p5, string(This->faultName->name));
+      
+      throwFault(p1, p2, "", "initial", "", prefix, This->positiveControlFlow);      
+      
+//      TheNet->newArc(p1, t1);
+//      TheNet->newArc(t1, p2);
+//      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t1); // new fault management
+//      TheNet->newArc(t1, TheNet->findPlace(currentScope + "!Active")); // newer fault management
+//      TheNet->newArc(t1, p5, string(This->faultName->name));
       TheNet->newArc(p1, t2);
       TheNet->newArc(p3, t2);
       TheNet->newArc(t2, p4);
@@ -2449,17 +2475,21 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
       Place *switch_p12 = TheNet->newPlace(prefix + "stopped");
       Place *switch_p13 = TheNet->newPlace(prefix + "failed");
       Transition *switch_t3 =  TheNet->newTransition(prefix + "t3");
-      Transition *switch_t7 =  TheNet->newTransition(prefix + "t7", "guard");
+//      Transition *switch_t7 =  TheNet->newTransition(prefix + "t7", "guard");
       Transition *switch_t8 =  TheNet->newTransition(prefix + "t8");
       Transition *switch_t9 =  TheNet->newTransition(prefix + "t9");
       Transition *switch_t10 = TheNet->newTransition(prefix + "t10");
       TheNet->newArc(switch_p5, switch_t3);
       TheNet->newArc(switch_t3, switch_p6, "x");
-      TheNet->newArc(switch_p6, switch_t7, "x");
-      TheNet->newArc(switch_t7, switch_p10);
-      TheNet->newArc(switch_t7, switch_p13, "fault");
-      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), switch_t7); // new fault management
-      TheNet->newArc(switch_t7, TheNet->findPlace(currentScope + "!Active")); // newer fault management
+
+//      TheNet->newArc(switch_p6, switch_t7, "x");
+//      TheNet->newArc(switch_t7, switch_p10);
+//      TheNet->newArc(switch_t7, switch_p13, "fault");
+//      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), switch_t7); // new fault management
+//      TheNet->newArc(switch_t7, TheNet->findPlace(currentScope + "!Active")); // newer fault management
+
+      throwFault(p2, p4, "guard", "running", "x", prefix, This->positiveControlFlow);
+      
       TheNet->newArc(switch_p5, switch_t8);
       TheNet->newArc(switch_p11, switch_t8);
       TheNet->newArc(switch_t8, switch_p12);

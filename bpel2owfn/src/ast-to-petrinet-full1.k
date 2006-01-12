@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/12 10:03:27 $
+ *          - last changed: \$Date: 2006/01/12 10:37:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.91 $
+ * \version \$Revision: 1.92 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
@@ -90,6 +90,27 @@ extern SymbolManager symMan;
 /// failures to the correct fault_in place)
 string currentScope;
 
+
+
+
+/**
+ * Generates transitions to throw a fault.
+ * 
+ * \param p1 the place in positive control flow from which the control flow
+ *        enters the negative control flow
+ * \param p2 place of the pattern on which a token shall be produced which can
+ *        only be removed by stopping the pattern
+ * \param guard guard of the transition which throws the fault (usually
+ *        "guard")
+ * \param p1name name of place p1 which is used to label the generated
+ *        transitions (e.g. if p1 is called "running" generated transitions
+ *        end with this name (e.g. "throwFault.running")
+ * \param inscription inscription of the incoming arc to the fault transition
+ * \param prefix prefix of the pattern to label generated places and
+ *        transitions
+ * \param positiveControlFlow true if the fault occurs inside a scope or
+ *        process
+ */
 void throwFault(Place *p1, Place *p2, string guard, string p1name, string inscription, string prefix, bool positiveControlFlow)
 {
   // first fault in scope

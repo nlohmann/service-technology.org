@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/11 15:46:40 $
+ *          - last changed: \$Date: 2006/01/12 10:03:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.90 $
+ * \version \$Revision: 1.91 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
@@ -89,6 +89,26 @@ extern SymbolManager symMan;
 /// prefix of the current scope (read by the stop pattern and used to direct
 /// failures to the correct fault_in place)
 string currentScope;
+
+void throwFault(Place *p1, Place *p2, string guard, string p1name, string inscription, string prefix, bool positiveControlFlow)
+{
+  // first fault in scope
+  Transition *faultTransition1 = TheNet->newTransition(prefix + "throwFault." + p1name, guard);
+  TheNet->newArc(TheNet->findPlace(currentScope + "Active"), faultTransition1);
+  TheNet->newArc(faultTransition1, TheNet->findPlace(currentScope + "!Active"));
+  TheNet->newArc(p1, faultTransition1, inscription); // leave positive control flow
+  TheNet->newArc(faultTransition1, p2); // place p2 will be connected with stop
+  TheNet->newArc(faultTransition1, TheNet->findPlace(currentScope + "stop.fault_in"), "fault");
+
+  /*
+  // further fault in scope
+  Transition *faultTransition2 = TheNet->newTransition(prefix + "ignoreFault." + p1name, guard);
+  TheNet->newArc(TheNet->findPlace(currentScope + "!Active"), faultTransition2, READ);
+  TheNet->newArc(p1, faultTransition2, inscription); // leave positive control flow
+  TheNet->newArc(faultTransition2, p2); // place p2 will be connected with stop
+  */
+}
+
 %}
 
 
@@ -1749,11 +1769,15 @@ This=Receive(a,b) ->
       TheNet->newArc(t2, p3);
       TheNet->newArc(TheNet->findPlace("variable." + string(This->variableID->name)), t2, "V");
       TheNet->newArc(t2, TheNet->findPlace("variable." + string(This->variableID->name)), "X");
+
       TheNet->newArc(t3, p4);
       TheNet->newArc(t3, p7, "fault");
       TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t3); // new fault management
       TheNet->newArc(t3, TheNet->findPlace(currentScope + "!Active")); // newer fault management
       TheNet->newArc(p2, t3, "(X,CS)");
+
+//      throwFault(p2, p4, "guard", "running", "(X,CS)", prefix, This->positiveControlFlow);
+
       TheNet->newArc(p1, t4);
       TheNet->newArc(p5, t4);
       TheNet->newArc(t4, p6);
@@ -1937,7 +1961,7 @@ This=Assign(a,b) ->
       
       TheNet->newArc(lastPlace, t7);
       TheNet->newArc(assign_stop, t7);
-      TheNet->newArc(t7, lastPlace);
+      TheNet->newArc(t7, assign_stopped);
       
       TheNet->mergePlaces(assign_final, lastPlace);
       trace(TRACE_DEBUG, "[PNU]\t</assign>\n");

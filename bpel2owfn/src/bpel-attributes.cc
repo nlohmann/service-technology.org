@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/01/10 10:31:01 $
+ *          - last changed: \$Date: 2006/01/12 14:15:14 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  *
  * \todo
  *       - (reinert) Comment this file and its classes.
@@ -63,7 +63,8 @@ attributeManager::attributeManager()
 }
 
 /*!
- * 
+ * \param elementId
+ * \param attributeName
  */
 bool attributeManager::isAttributeValueEmpty(kc::integer elementId, std::string attributeName)
 {
@@ -1099,21 +1100,33 @@ bool attributeManager::emptySJFStack()
  * implementation of SJFStackElement CLASS
  ********************************************/
 
+/*!
+ * \param val
+ */
 void SJFStackElement::setElementId(kc::integer val)
 {
 	this->elementId = val;
 }
 
+/*!
+ * \param val
+ */
 void SJFStackElement::setSJFValue(kc::casestring val)
 {
 	this->sjfValue = val;
 }
 
+/*!
+ * 
+ */
 kc::integer SJFStackElement::getElementId()
 {
 	return this->elementId;	
 }
 
+/*!
+ * 
+ */
 kc::casestring SJFStackElement::getSJFValue()
 {
 	return this->sjfValue;	

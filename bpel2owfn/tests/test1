@@ -4,7 +4,6 @@ bpel2owfn --version
 result1=$?
 
 bpel2owfn --help
-echo $result2
 result2=$?
 
 bpel2owfn --file $testdir/error.bpel

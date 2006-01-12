@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/12 14:20:46 $
+ *          - last changed: \$Date: 2006/01/12 15:00:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.94 $
+ * \version \$Revision: 1.95 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
@@ -145,6 +145,14 @@ void throwFault(Place *p1, Place *p2, string guard, string p1name, string inscri
       TheNet->newArc(faultTransition1, p2); // place p2 will be connected with stop
       TheNet->newArc(faultTransition1, TheNet->findPlace(currentScope + "stop.fh_fault_in"), "fault");
       break;
+
+      /*
+      // further fault in fault handler
+      Transition *faultTransition2 = TheNet->newTransition(prefix + "ignoreFault." + p1name, guard);
+      TheNet->newArc(TheNet->findPlace(currentScope + "FHFaulted"), faultTransition2, READ);
+      TheNet->newArc(p1, faultTransition2, inscription); // leave positive control flow
+      TheNet->newArc(faultTransition2, p2); // place p2 will be connected with stop
+      */
     }
 
     case(2): // activity in compensation handler
@@ -247,9 +255,11 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       Place *process_p41 = TheNet->newPlace(prefix + "p41");
       Place *process_p42 = TheNet->newPlace(prefix + "ch_out");
 
-      // to prevent more than one error from the FH
+      // to prevent more than one error from the FH/CH
       Place *process_fh_faulted = TheNet->newPlace(prefix + "FHFaulted");
       Place *process_fh_not_faulted = TheNet->newPlace(prefix + "!FHFaulted");
+      Place *process_ch_faulted = TheNet->newPlace(prefix + "CHFaulted");
+      Place *process_ch_not_faulted = TheNet->newPlace(prefix + "!CHFaulted");
       
       //Place *process_p43 = TheNet->newPlace(prefix + "compensated");
 //      Place *process_p44 = TheNet->newPlace(prefix + "compScope");
@@ -357,6 +367,8 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       TheNet->mergePlaces("1.internal.p36",            "1.internal.stop.ch_cleaned"); 
       TheNet->mergePlaces("1.internal.FHFaulted",      "1.internal.stop.FHFaulted");
       TheNet->mergePlaces("1.internal.!FHFaulted",     "1.internal.stop.!FHFaulted");
+      TheNet->mergePlaces("1.internal.CHFaulted",      "1.internal.stop.CHFaulted");
+      TheNet->mergePlaces("1.internal.!CHFaulted",     "1.internal.stop.!CHFaulted");
 
       
       // embed the inner activity
@@ -415,6 +427,9 @@ StopInProcess() ->
       Place *fh_faulted = TheNet->newPlace(prefix + "FHFaulted");
       Place *fh_not_faulted = TheNet->newPlace(prefix + "!FHFaulted");
       Place *fh_fault_in = TheNet->newPlace(prefix + "fh_fault_in");  // for faults from the FH
+      Place *ch_faulted = TheNet->newPlace(prefix + "CHFaulted");
+      Place *ch_not_faulted = TheNet->newPlace(prefix + "!CHFaulted");
+      Place *ch_fault_in = TheNet->newPlace(prefix + "ch_fault_in");  // for faults from the CH
       Transition *t1 =  TheNet->newTransition(prefix + "t1");
       Transition *t2 =  TheNet->newTransition(prefix + "t2");
       Transition *t3 =  TheNet->newTransition(prefix + "t3");
@@ -524,6 +539,9 @@ StopInScope() ->
       Place *fh_faulted = TheNet->newPlace(prefix + "FHFaulted");
       Place *fh_not_faulted = TheNet->newPlace(prefix + "!FHFaulted");
       Place *fh_fault_in = TheNet->newPlace(prefix + "fh_fault_in"); // for faults from the FH
+      Place *ch_faulted = TheNet->newPlace(prefix + "CHFaulted");
+      Place *ch_not_faulted = TheNet->newPlace(prefix + "!CHFaulted");
+      Place *ch_fault_in = TheNet->newPlace(prefix + "ch_fault_in"); // for faults from the CH
       Transition *t1 =  TheNet->newTransition(prefix + "t1");
       Transition *t2 =  TheNet->newTransition(prefix + "t2");
       Transition *t3 =  TheNet->newTransition(prefix + "t3");
@@ -3021,9 +3039,11 @@ This=Scope(a,b,c,d,e,f,g)
       Place *p56 = TheNet->newPlace(prefix + "compensated");
 //      Place *p57 = TheNet->newPlace(prefix + "compScope");
 
-      // to prevent more than one error from the FH
+      // to prevent more than one error from the FH/CH
       Place *fh_faulted = TheNet->newPlace(prefix + "FHFaulted");
       Place *fh_not_faulted = TheNet->newPlace(prefix + "!FHFaulted");
+      Place *ch_faulted = TheNet->newPlace(prefix + "CHFaulted");
+      Place *ch_not_faulted = TheNet->newPlace(prefix + "!CHFaulted");
       
       Transition *t1  = TheNet->newTransition(prefix + "t1");
       Transition *t2  = TheNet->newTransition(prefix + "t2");
@@ -3183,6 +3203,8 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->mergePlaces(prefix + "p48",            prefix + "stop.upperFH"); 
       TheNet->mergePlaces(prefix + "FHFaulted",      prefix + "stop.FHFaulted");
       TheNet->mergePlaces(prefix + "!FHFaulted",     prefix + "stop.!FHFaulted");
+      TheNet->mergePlaces(prefix + "CHFaulted",      prefix + "stop.CHFaulted");
+      TheNet->mergePlaces(prefix + "!CHFaulted",     prefix + "stop.!CHFaulted");
       
       // embed the inner activity
       TheNet->mergePlaces(TheNet->findPlace(prefix + "negLink"), TheNet->findPlace(g, ".negLink"));

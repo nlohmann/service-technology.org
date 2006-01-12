@@ -27,6 +27,7 @@ bpel2owfn_SOURCES = $(KCDUMMY)\
 		    bpel-lexic.ll\
 		    bpel-attributes.cc bpel-attributes.h\
 		    check-symbols.cc check-symbols.h\
+		    symbol-table.cc symbol-table.cc\
 		    debug.cc debug.h\
 		    exception.cc exception.h\
 		    helpers.cc helpers.h\

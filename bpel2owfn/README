@@ -5,7 +5,7 @@ About this Distribution
 
 This file describes this distribution of BPEL2oWFN, version 1.0, a tool
 translating business processes described in BPEL to open workflow nets
-(oWFN), last updated 26 January 2006.
+(oWFN), last updated 11 January 2006.
 
 BPEL2oWFN is licensed under the GNU General Public License.
 
@@ -60,8 +60,7 @@ Directories
      The documentation of BPEL2oWFN consisting of a manual and an
      installation manual. The documentation is in Texinfo format and
      can be converted into many file formats using `make FORMAT' where
-     `FORMAT' is a file format out of `dvi', `html', `pdf', `ps' or
-     `info'.
+     `FORMAT' is a file format out of `dvi', `html', `pdf' or `ps'.
 
 `tests'
      Several test processes to self-test BPEL2oWFN. The processes

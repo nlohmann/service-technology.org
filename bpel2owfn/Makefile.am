@@ -22,6 +22,8 @@ hu-prepare: distclean
 	-rm -f doc/version.texi
 	-rm -f doc/Makefile.in
 	-rm -f src/Makefile.in
+	-rm -f -r src/.deps
+	-rm -f src/bpel2owfn.h.in
 	-rm -f tests/Makefile.in
 	@echo -----------------------------------------------------
 	@echo To recreate installation status enter

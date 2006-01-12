@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/01/11 16:45:55 $
+ *          - last changed: \$Date: 2006/01/12 11:39:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.87 $
+ * \version \$Revision: 1.88 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -121,7 +121,6 @@ extern int yyerror(const char *);
 using namespace kc;
 using namespace std;
 
-
 // manage attributes
 #include "bpel-attributes.h"
 
@@ -151,8 +150,11 @@ map <integer, integer> parent;
 /// the root of the abstract syntax tree
 tProcess TheProcess;
 
-/// stack
-stack<bool> isPositiveControlFlow;
+/// stack for checking for FaultHandler
+stack<bool> isInFH;
+/// stack for checking for CompensationHandler
+stack< pair<bool,int> > isInCH;
+int hasCompensate;
 
 %}
 
@@ -289,7 +291,9 @@ tProcess:
       }      
       symMan.initialiseProcessScope($3);
       currentScopeId = $3;
-      isPositiveControlFlow.push(true);
+      isInFH.push(false);
+      isInCH.push(pair<bool,int>(false,0));
+      hasCompensate = 0;
    }
   X_NEXT imports tPartnerLinks tPartners tVariables tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers
     { inProcess = false; }
@@ -307,7 +311,8 @@ tProcess:
       $$->enableInstanceCompensation = att.read($3, "enableInstanceCompensation", $$->enableInstanceCompensation);
       $$->abstractProcess = att.read($3, "abstractProcess", $$->abstractProcess);
       $$->xmlns = att.read($3, "xmlns", $$->xmlns);
-      isPositiveControlFlow.pop();
+      isInFH.pop();
+      isInCH.pop();
       $$->id = $3; }
 ;
 
@@ -348,49 +353,49 @@ imports:
 activity:
   tEmpty
     { $$ = activityEmpty($1); $$->id = $1->id; 
-      $$->positiveControlFlow = $1->positiveControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow; }
 | tInvoke
     { $$ = activityInvoke($1); $$->id = $1->id; 
-      $$->positiveControlFlow = $1->positiveControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow; }
 | tReceive
     { $$ = activityReceive($1); $$->id = $1->id; 
-      $$->positiveControlFlow = $1->positiveControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow; }
 | tReply
     { $$ = activityReply($1); $$->id = $1->id; 
-      $$->positiveControlFlow = $1->positiveControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow; }
 | tAssign
     { $$ = activityAssign($1); $$->id = $1->id; 
-      $$->positiveControlFlow = $1->positiveControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow; }
 | tWait
     { $$ = activityWait($1); $$->id = $1->id; 
-      $$->positiveControlFlow = $1->positiveControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow; }
 | tThrow
     { $$ = activityThrow($1); $$->id = $1->id; 
-      $$->positiveControlFlow = $1->positiveControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow; }
 | tTerminate
     { $$ = activityTerminate($1); $$->id = $1->id; 
-      $$->positiveControlFlow = $1->positiveControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow; }
 | tFlow
     { $$ = activityFlow($1); $$->id = $1->id; 
-      $$->positiveControlFlow = $1->positiveControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow; }
 | tSwitch
     { $$ = activitySwitch($1); $$->id = $1->id; 
-      $$->positiveControlFlow = $1->positiveControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow; }
 | tWhile
     { $$ = activityWhile($1); $$->id = $1->id; 
-      $$->positiveControlFlow = $1->positiveControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow; }
 | tSequence
     { $$ = activitySequence($1); $$->id = $1->id; 
-      $$->positiveControlFlow = $1->positiveControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow; }
 | tPick
     { $$ = activityPick($1); $$->id = $1->id; 
-      $$->positiveControlFlow = $1->positiveControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow; }
 | tScope
     { $$ = activityScope($1); $$->id = $1->id; 
-      $$->positiveControlFlow = $1->positiveControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow; }
 | tCompensate
     { $$ = activityCompensate($1); $$->id = $1->id; 
-      $$->positiveControlFlow = $1->positiveControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow; }
 ;
 
 
@@ -544,7 +549,8 @@ tFaultHandlers:
 | K_FAULTHANDLERS X_NEXT 
     {
       symMan.startDPEinWhile();
-      isPositiveControlFlow.push(false);
+      isInFH.push(true);
+      hasCompensate = 0;
     }
   tCatch_list  
   tCatchAll 
@@ -552,7 +558,8 @@ tFaultHandlers:
     { $$ = userDefinedFaultHandler($4, $5);
       $$->inProcess = inProcess;
       $$->parentScopeId = currentScopeId;
-      isPositiveControlFlow.pop();
+      isInFH.pop();
+      hasCompensate = 0;
       symMan.endDPEinWhile();
     }
 ;
@@ -611,12 +618,26 @@ tCompensationHandler:
 | K_COMPENSATIONHANDLER X_NEXT 
     {
       symMan.startDPEinWhile();
-      isPositiveControlFlow.push(true);
+      isInCH.push(pair<bool,int>(true,hasCompensate));
+      hasCompensate = 0;
     }
   activity 
   X_NEXT X_SLASH K_COMPENSATIONHANDLER X_NEXT
     { $$ = userDefinedCompensationHandler($4);
-      isPositiveControlFlow.pop();
+      switch ( hasCompensate ) {
+        case 1 : $$->compensateWithoutScope = true;
+                 $$->compensateWithScope = false;
+                 break;
+        case 2 : $$->compensateWithoutScope = false;
+                 $$->compensateWithScope = true;
+                 break;
+        default: $$->compensateWithoutScope = false;
+                 $$->compensateWithScope = false;
+                 break;
+      }
+      hasCompensate = isInCH.top().second;
+      isInCH.pop();
+
       $$->parentScopeId = currentScopeId; 
       symMan.endDPEinWhile();
     }
@@ -919,7 +940,7 @@ tEmpty:
       $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
       att.traceAM(string("tEmpty: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $5->parentId = $2; 
       if ($5->dpe->value > 0)
       {
@@ -950,7 +971,7 @@ tEmpty:
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
       att.traceAM(string("tEmpty: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();      
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; }
 ;
 
@@ -1049,7 +1070,7 @@ tInvoke:
       {
         symMan.addDPEend();
       }
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2; }
 | K_INVOKE 
   arbitraryAttributes 
@@ -1097,7 +1118,7 @@ tInvoke:
 					$$->partnerLink->name), false);
       }
       $$->dpe = kc::mkinteger(0);
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; }
 ;
 
@@ -1168,7 +1189,7 @@ tReceive:
       {
         symMan.addDPEend();
       }
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2; }
 | K_RECEIVE
   arbitraryAttributes
@@ -1200,7 +1221,7 @@ tReceive:
       $$->variable = att.read($2, "variable");
       $$->createInstance = att.read($2, "createInstance", $$->createInstance);
       $$->variableID = symMan.checkVariable(att.read($2, "variable")->name);
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; 
       symMan.checkPartnerLink($$->partnerLink->name); 
       $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
@@ -1279,7 +1300,7 @@ tReply:
       {
         symMan.addDPEend();
       }
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $5->parentId = $2; }
 | K_REPLY
   arbitraryAttributes
@@ -1315,7 +1336,7 @@ tReply:
       $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
 				      $$->partnerLink->name), false);
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; }
 ;
 
@@ -1365,7 +1386,7 @@ tAssign:
       {
         symMan.addDPEend();
       }
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $5->parentId = $2; }
 ;
 
@@ -1512,7 +1533,7 @@ tWait:
       {
         symMan.addDPEend();
       }
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $5->parentId = $2; }
 | K_WAIT
   arbitraryAttributes
@@ -1540,7 +1561,7 @@ tWait:
       att.popSJFStack();      
       $$->For = att.read($2, "for"); // "for" is a keyword
       $$->until = att.read($2, "until");
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; }
 ;
 
@@ -1592,7 +1613,7 @@ tThrow:
       {
         symMan.addDPEend();
       }
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $5->parentId = $2; }
 | K_THROW
   arbitraryAttributes
@@ -1621,7 +1642,7 @@ tThrow:
       $$->faultName = att.read($2, "faultName");
       $$->faultVariable = att.read($2, "faultVariable");
       $$->variableID = symMan.checkVariable(att.read($2, "faultVariable")->name);
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; }
 ;
 
@@ -1645,6 +1666,29 @@ tCompensate:
   arbitraryAttributes
     { 
       att.check($2, K_COMPENSATE);
+
+      // compensate only is allowed within Compensation- or FaultHandler
+      if ( ! (isInCH.top().first || isInFH.top()) )
+      {
+        yyerror(string("The activity <compensate> is only allowed with in a Compensation of FaultHandler.\n").c_str());
+      }
+      if(string(att.read($2, "scope")->name) == "")
+      {
+        if ( hasCompensate > 0)
+        {
+          yyerror(string("You may only define one <compensate> if you're using it without attributes.\n").c_str());
+        }
+        hasCompensate = 1;
+      }
+      else
+      {
+        if ( hasCompensate == 1)
+        {
+          yyerror(string("You may only define one <compensate> if you're using it without attributes.\n").c_str());
+        }
+        hasCompensate = 2;
+      }
+
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -1668,12 +1712,35 @@ tCompensate:
       {
         symMan.addDPEend();
       }
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $5->parentId = $2; }
 | K_COMPENSATE
   arbitraryAttributes
     { 
       att.check($2, K_COMPENSATE);
+
+      // compensate only is allowed within Compensation- or FaultHandler
+      if ( ! (isInCH.top().first || isInFH.top()) )
+      {
+        yyerror(string("The activity <compensate> is only allowed with in a Compensation of FaultHandler.\n").c_str());
+      }
+      if(string(att.read($2, "scope")->name) == "")
+      {
+        if ( hasCompensate > 0)
+        {
+          yyerror(string("You may only define one <compensate> if you're using it without attributes.\n").c_str());
+        }
+        hasCompensate = 1;
+      }
+      else
+      {
+        if ( hasCompensate == 1)
+        {
+          yyerror(string("You may only define one <compensate> if you're using it without attributes.\n").c_str());
+        }
+        hasCompensate = 2;
+      }
+
       if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -1695,7 +1762,7 @@ tCompensate:
       att.traceAM(string("tCompensate: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
       $$->scope = att.read($2, "scope");
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; }
 ;
 
@@ -1742,7 +1809,7 @@ tTerminate:
       {
         symMan.addDPEend();
       }
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $5->parentId = $2; }
 | K_TERMINATE
   arbitraryAttributes
@@ -1768,7 +1835,7 @@ tTerminate:
       $$->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
       att.traceAM(string("tTerminate: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; }
 ;
 
@@ -1823,7 +1890,7 @@ tFlow:
       {
         symMan.addDPEend();
       }
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2;
       symMan.checkLinks();
       symMan.quitScope(); }
@@ -1917,7 +1984,7 @@ tSwitch:
       {
         symMan.addDPEend();
       }
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $5->parentId = $2;
     }
 ;
@@ -2022,7 +2089,7 @@ tWhile:
       att.traceAM(string("tWhile: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
       $$->condition = att.read($2, "condition");
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $5->parentId = $2; 
       symMan.endDPEinWhile();
     }
@@ -2070,7 +2137,7 @@ tSequence:
       $$->suppressJoinFailure = $5->suppressJoinFailure = att.read($2, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
       att.traceAM(string("tSequence: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $5->parentId = $2; 
       $$->dpe = symMan.needsDPE();
       if ($5->dpe->value > 0)
@@ -2149,7 +2216,7 @@ tPick:
         symMan.addDPEend();
       }
       $$->id = $5->parentId = $2;
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
     }
 ;
 
@@ -2197,7 +2264,8 @@ tScope:
   X_NEXT
     { symMan.newScopeScope($2);
       symMan.setBlackListMode(true);
-      isPositiveControlFlow.push(true);
+      isInFH.push(false);
+      isInCH.push(pair<bool,int>(false,hasCompensate));
       parent[$2] = currentScopeId;
       currentScopeId = $2; }
   standardElements 
@@ -2212,7 +2280,9 @@ tScope:
   activity 
   X_NEXT X_SLASH K_SCOPE
     { att.check($2, K_SCOPE);
-      isPositiveControlFlow.pop();
+      isInFH.pop();
+      hasCompensate = isInCH.top().second;
+      isInCH.pop();
       $$ = Scope($6, $8, $10, $11, $12, StopInScope(), $13);
       $$->name = att.read($2, "name");
       $$->joinCondition = $6->joinCondition = att.read($2, "joinCondition");
@@ -2220,7 +2290,7 @@ tScope:
       att.traceAM(string("tScope: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
       $$->variableAccessSerializable = att.read($2, "variableAccessSerializable", $$->variableAccessSerializable);
-      $$->positiveControlFlow = isPositiveControlFlow.top();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2;
       $$->parentScopeId = currentScopeId = parent[$2];
       $$->dpe = symMan.needsDPE();

@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/01/12 15:45:48 $
+ *          - last changed: \$Date: 2006/01/13 10:05:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.89 $
+ * \version \$Revision: 1.90 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -2026,6 +2026,8 @@ tOtherwise:
       noLinks->parentId = id;
       impl_tEmpty_Empty* implicitEmpty = Empty(noLinks);
       implicitEmpty->id = id;
+      implicitEmpty->negativeControlFlow = noLinks->negativeControlFlow = mkinteger(0);
+//      implicitEmpty->dpe = mkinteger(0);
       implicitEmpty->name = mkcasestring("implicit empty in otherwise");
       impl_activity *otherwiseActivity = activityEmpty(implicitEmpty);
       otherwiseActivity->id = id;

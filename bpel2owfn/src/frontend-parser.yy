@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/01/13 14:23:47 $
+ *          - last changed: \$Date: 2006/01/13 14:56:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.91 $
+ * \version \$Revision: 1.92 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -186,7 +186,7 @@ int hasCompensate;
 %type <yt_tFaultHandlers> tFaultHandlers
 %type <yt_tFlow> tFlow
 %type <yt_tFrom> tFrom
-%type <yt_tInvoke> tInvoke
+%type <yt_activity> tInvoke
 %type <yt_tLink_list> tLink_list
 %type <yt_tLink_list> tLinks
 %type <yt_tLink> tLink
@@ -355,8 +355,12 @@ activity:
     { $$ = activityEmpty($1); $$->id = $1->id; 
       $$->negativeControlFlow = $1->negativeControlFlow; }
 | tInvoke
+    { $$ = $1;  }
+/*
+| tInvoke
     { $$ = activityInvoke($1); $$->id = $1->id; 
       $$->negativeControlFlow = $1->negativeControlFlow; }
+*/
 | tReceive
     { $$ = activityReceive($1); $$->id = $1->id; 
       $$->negativeControlFlow = $1->negativeControlFlow; }
@@ -1025,54 +1029,122 @@ tInvoke:
     {
       // automatically create scope?
       symMan.checkPartnerLink(att.read($2, "partnerLink")->name);
+      isInFH.push(false);
+      isInCH.push(pair<bool,int>(false,hasCompensate));
+      parent[$2] = currentScopeId;
+      currentScopeId = $2; 
     }
   standardElements 
   tCorrelations tCatch_list  tCatchAll tCompensationHandler X_SLASH K_INVOKE
     { 
-/*
-      if ($8->length() > 0 || $9->length() > 0 || string($10->op_name()) != "implicitCompensationHandler")
+      isInFH.pop();
+      hasCompensate = isInCH.top().second;
+      isInCH.pop();
+      if ($8->length() > 0 
+           || (string($9->op_name()) != "NoCatchAll") 
+           || string($10->op_name()) != "implicitCompensationHandler")
       {
         cerr << "embed in scope" << endl;
-        $$ = Scope($6, NiltVariable_list(), implicitFaultHandler(), $10, implicitEventHandler(), StopInScope(), activityInvoke(Invoke(StandardElements(NiltTarget_list(), NiltSource_list()), $7)));
+        standardElements se =  StandardElements(NiltTarget_list(), NiltSource_list());
+        tInvoke invoke = Invoke(se, $7);
+        activity ai = activityInvoke(invoke);
+        tFaultHandlers fh = userDefinedFaultHandler($8, $9);
+        tEventHandlers eh = implicitEventHandler();
+        tScope scope = Scope($6, NiltVariable_list(), fh, $10, eh, StopInScope(), ai);
+
+        fh->inProcess = false;
+        fh->parentScopeId = $2;
+        $10->parentScopeId = $2;
+        eh->parentScopeId = $2;
+
+        symMan.newScopeScope($2);
+        symMan.quitScope();
+
+	invoke->name = att.read($2, "name");
+        scope->name = att.read($2, "name");
+        scope->joinCondition = invoke->joinCondition = $6->joinCondition = att.read($2, "joinCondition");
+        scope->suppressJoinFailure = invoke->suppressJoinFailure = $6->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+        scope->variableAccessSerializable = mkcasestring("");
+        att.traceAM(string("tInvoke: ") + (invoke->suppressJoinFailure)->name + string("\n"));
+	att.popSJFStack();
+	invoke->partnerLink = att.read($2, "partnerLink");
+        invoke->portType = att.read($2, "portType");
+        invoke->operation = att.read($2, "operation");
+        invoke->inputVariable = att.read($2, "inputVariable");
+        invoke->outputVariable = att.read($2, "outputVariable");
+        invoke->variableIDin  = symMan.checkVariable(att.read($2, "inputVariable")->name);
+        invoke->variableIDout = symMan.checkVariable(att.read($2, "outputVariable")->name);
+        if (string(invoke->variableIDin->name) != "")
+        {
+          invoke->channelID = symMan.addChannel(new csChannel(invoke->portType->name, 
+					  invoke->operation->name, 
+					  invoke->partnerLink->name), true);
+        }
+        if (string(invoke->variableIDout->name) != "")
+        {
+          invoke->channelID = symMan.addChannel(new csChannel(invoke->portType->name, 
+					  invoke->operation->name, 
+					  invoke->partnerLink->name), false);
+        }
+	scope->dpe = invoke->dpe = mkinteger(0);
+        // symMan.needsDPE();
+	if ($6->dpe->value > 0)
+        {
+          symMan.addDPEend();
+        }
+        scope->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+        invoke->negativeControlFlow = mkinteger(0);
+        scope->id = $6->parentId = $2; 
+        invoke->id = ai->id = se->parentId = att.nextId();
+        currentScopeId = scope->parentScopeId = parent[$2];
+
+        $$ = activity(activityScope(scope));
+
+        $$->id = scope->id;
+        $$->negativeControlFlow = scope->negativeControlFlow;
       }
       else
-      {
+      { 
         cerr << "don't embed" << endl;
-        $$ = Invoke($6, $7);
-      }
-*/
-      $$ = Invoke($6, $7);
-      $$->name = att.read($2, "name");
-      $$->joinCondition = $6->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = $6->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
-      att.traceAM(string("tInvoke: ") + ($$->suppressJoinFailure)->name + string("\n"));
-      att.popSJFStack();
-      $$->partnerLink = att.read($2, "partnerLink");
-      $$->portType = att.read($2, "portType");
-      $$->operation = att.read($2, "operation");
-      $$->inputVariable = att.read($2, "inputVariable");
-      $$->outputVariable = att.read($2, "outputVariable");
-      $$->variableIDin  = symMan.checkVariable(att.read($2, "inputVariable")->name);
-      $$->variableIDout = symMan.checkVariable(att.read($2, "outputVariable")->name);
-      if (string($$->variableIDin->name) != "")
-      {
-        $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
-					$$->operation->name, 
-					$$->partnerLink->name), true);
-      }
-      if (string($$->variableIDout->name) != "")
-      {
-        $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
-					$$->operation->name, 
-					$$->partnerLink->name), false);
-      }
-      $$->dpe = symMan.needsDPE();
-      if ($6->dpe->value > 0)
-      {
-        symMan.addDPEend();
-      }
-      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $2; }
+        tInvoke invoke = Invoke($6, $7);
+
+	invoke->name = att.read($2, "name");
+        invoke->joinCondition = $6->joinCondition = att.read($2, "joinCondition");
+        invoke->suppressJoinFailure = $6->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+        att.traceAM(string("tInvoke: ") + (invoke->suppressJoinFailure)->name + string("\n"));
+        att.popSJFStack();
+        invoke->partnerLink = att.read($2, "partnerLink");
+        invoke->portType = att.read($2, "portType");
+        invoke->operation = att.read($2, "operation");
+        invoke->inputVariable = att.read($2, "inputVariable");
+        invoke->outputVariable = att.read($2, "outputVariable");
+        invoke->variableIDin  = symMan.checkVariable(att.read($2, "inputVariable")->name);
+        invoke->variableIDout = symMan.checkVariable(att.read($2, "outputVariable")->name);
+        if (string(invoke->variableIDin->name) != "")
+        {
+          invoke->channelID = symMan.addChannel(new csChannel(invoke->portType->name, 
+					  invoke->operation->name, 
+					  invoke->partnerLink->name), true);
+        }
+        if (string(invoke->variableIDout->name) != "")
+        {
+          invoke->channelID = symMan.addChannel(new csChannel(invoke->portType->name, 
+					  invoke->operation->name, 
+					  invoke->partnerLink->name), false);
+        }
+        invoke->dpe = symMan.needsDPE();
+        if ($6->dpe->value > 0)
+        {
+          symMan.addDPEend();
+        }
+        invoke->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+        invoke->id = $6->parentId = $2; 
+
+        $$ = activity(activityInvoke(invoke));
+        $$->id = invoke->id;
+        $$->negativeControlFlow = invoke->negativeControlFlow;
+      }    
+    }
 | K_INVOKE 
   arbitraryAttributes 
     { 
@@ -1092,35 +1164,40 @@ tInvoke:
     { 
       impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
       noLinks->parentId = $2;
-      $$ = Invoke(noLinks, NiltCorrelation_list());
-      $$->name = att.read($2, "name");
-      $$->joinCondition = att.read($2, "joinCondition");    
-      $$->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
-      att.traceAM(string("tInvoke: ") + ($$->suppressJoinFailure)->name + string("\n"));
+      tInvoke invoke = Invoke(noLinks, NiltCorrelation_list());
+      invoke->name = att.read($2, "name");
+      invoke->joinCondition = att.read($2, "joinCondition");    
+      invoke->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+      att.traceAM(string("tInvoke: ") + (invoke->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
-      $$->partnerLink = att.read($2, "partnerLink");
-      $$->portType = att.read($2, "portType");
-      $$->operation = att.read($2, "operation");
-      $$->inputVariable = att.read($2, "inputVariable");
-      $$->outputVariable = att.read($2, "outputVariable"); 
-      $$->variableIDin  = symMan.checkVariable(att.read($2, "inputVariable")->name);
-      $$->variableIDout = symMan.checkVariable(att.read($2, "outputVariable")->name);
-      symMan.checkPartnerLink($$->partnerLink->name); 
-      if (string($$->variableIDin->name) != "")
+      invoke->partnerLink = att.read($2, "partnerLink");
+      invoke->portType = att.read($2, "portType");
+      invoke->operation = att.read($2, "operation");
+      invoke->inputVariable = att.read($2, "inputVariable");
+      invoke->outputVariable = att.read($2, "outputVariable"); 
+      invoke->variableIDin  = symMan.checkVariable(att.read($2, "inputVariable")->name);
+      invoke->variableIDout = symMan.checkVariable(att.read($2, "outputVariable")->name);
+      symMan.checkPartnerLink(invoke->partnerLink->name); 
+      if (string(invoke->variableIDin->name) != "")
       {
-        $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
-					$$->operation->name, 
-					$$->partnerLink->name), true);
+        invoke->channelID = symMan.addChannel(new csChannel(invoke->portType->name, 
+					invoke->operation->name, 
+					invoke->partnerLink->name), true);
       }
-      if (string($$->variableIDout->name) != "")
+      if (string(invoke->variableIDout->name) != "")
       {
-        $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
-					$$->operation->name, 
-					$$->partnerLink->name), false);
+        invoke->channelID = symMan.addChannel(new csChannel(invoke->portType->name, 
+					invoke->operation->name, 
+					invoke->partnerLink->name), false);
       }
-      $$->dpe = kc::mkinteger(0);
-      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $2; }
+      invoke->dpe = kc::mkinteger(0);
+      invoke->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      invoke->id = $2; 
+
+      $$ = activity(activityInvoke(invoke));
+      $$->id = invoke->id;
+      $$->negativeControlFlow = invoke->negativeControlFlow;
+}
 ;
 
 
@@ -2326,6 +2403,7 @@ standardElements:
   tTarget_list tSource_list
     { $$ = StandardElements($1, $2); 
       $$->dpe = $2->dpe;
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
     }
 ;
 

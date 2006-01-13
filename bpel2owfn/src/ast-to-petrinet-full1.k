@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/12 16:14:56 $
+ *          - last changed: \$Date: 2006/01/13 08:42:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.97 $
+ * \version \$Revision: 1.98 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
@@ -2035,7 +2035,7 @@ This=Assign(a,b) ->
 	  TheNet->newArc(TheNet->findPlace("variable." + string(to->variableID->name)), t2, "Y");
 	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(to->variableID->name)), "X");
 
-	  throwFault(p2, p4, "guard", "running", "X", prefix, This->negativeControlFlow);
+	  throwFault(p2, p4, "guard", "running", "X", new_prefix, This->negativeControlFlow);
 
 //	  TheNet->newArc(p2, t3, "X");
 //	  TheNet->newArc(t3, p4);
@@ -2061,7 +2061,7 @@ This=Assign(a,b) ->
 	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(to->variableID->name)), string(from->literalValue->name));
 	  TheNet->newArc(t2, p8);
 	  
-	  throwFault(lastPlace, p4, "guard", "initial", "", prefix, This->negativeControlFlow);
+	  throwFault(lastPlace, p4, "guard", "initial", "", new_prefix, This->negativeControlFlow);
 	  
 //	  TheNet->newArc(lastPlace, t3);	  
 //	  TheNet->newArc(t3, p4);
@@ -2891,7 +2891,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 //	TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t4); // new fault management
 //	TheNet->newArc(t4, TheNet->findPlace(currentScope + "!Active")); // newer fault management
 
-	throwFault(p3, p10, "guard" + message, "p3", "M" + message, prefix, This->negativeControlFlow);
+	throwFault(p3, p10, "guard" + message, "p3", "M" + message, newprefix, This->negativeControlFlow);
 
 	TheNet->newArc(p3, t9, "M" + message );
 	TheNet->newArc(TheNet->findPlace(TheActivity, ".stop"), t9);

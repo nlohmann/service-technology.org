@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/01/13 15:03:23 $
+ *          - last changed: \$Date: 2006/01/13 15:13:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.93 $
+ * \version \$Revision: 1.94 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -1046,7 +1046,7 @@ tInvoke:
            || (string($9->op_name()) != "NoCatchAll") 
            || string($10->op_name()) != "implicitCompensationHandler")
       {
-        cerr << "embed in scope" << endl;
+        //cerr << "embed in scope" << endl;
         standardElements se =  StandardElements(NiltTarget_list(), NiltSource_list());
         tInvoke invoke = Invoke(se, $7);
         activity ai = activityInvoke(invoke);
@@ -1107,7 +1107,7 @@ tInvoke:
       }
       else
       { 
-        cerr << "don't embed" << endl;
+        //cerr << "don't embed" << endl;
         tInvoke invoke = Invoke($6, $7);
 
 	invoke->name = att.read($2, "name");

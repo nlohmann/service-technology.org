@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/13 09:43:06 $
+ *          - last changed: \$Date: 2006/01/13 13:51:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.100 $
+ * \version \$Revision: 1.101 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
@@ -1574,10 +1574,16 @@ This=implicitCompensationHandler() ->
 ;
 
 
-This=userDefinedCompensationHandler(innerActivity) provided (!This->compensateWithoutScope && !This->compensateWithScope) ->
+/*
+ * user-defined compensation handler
+ */
+
+This=userDefinedCompensationHandler(innerActivity) ->
   [petrinet:
     {
-      string prefix = intToString(This->parentScopeId->value) + ".internal.compensationHandler."; 
+      string prefix = intToString(This->parentScopeId->value) + ".internal.compensationHandler.";
+      SymbolScope *me = symMan.getScope(This->parentScopeId);
+
       Place *p1  = TheNet->newPlace(prefix + "p1");
       Place *p2  = TheNet->newPlace(prefix + "ch_in");
       Place *p3  = TheNet->newPlace(prefix + "Compensated");
@@ -1644,9 +1650,47 @@ This=userDefinedCompensationHandler(innerActivity) provided (!This->compensateWi
       TheNet->newArc(t16, p13);
       TheNet->newArc(p17, t16);
       TheNet->newArc(p24, t16);
+
+
+      // above is the standard case as depicted in Fig. 45
+      if (This->compensateWithoutScope)
+      {
+	// pattern of Fig. 43
+	Place *p10 = TheNet->newPlace(prefix + "p10");
+	Place *p12 = TheNet->newPlace(prefix + "p12");
+	Place *p15 = TheNet->newPlace(prefix + "ch_call");
+	Transition *t7 = TheNet->newTransition(prefix + "t7");
+	Transition *t10 = TheNet->newTransition(prefix + "t10");
+	Transition *t11 = TheNet->newTransition(prefix + "t11");
+
+	TheNet->newArc(p11, t7);
+	TheNet->newArc(t7, p12);
+	TheNet->newArc(p15, t7, READ);
+	for (list< SymbolScope * >::iterator child = me->children.begin(); child != me->children.end(); child++)
+	  TheNet->newArc(TheNet->findPlace(intToString((*child)->id->value) + ".!push"), t7);
+	
+	TheNet->newArc(t10, p11);
+	TheNet->newArc(p12, t10, "compScopeName");
+	TheNet->newArc(p15, t10, READ);
+	TheNet->newArc(t11, p10);
+	TheNet->newArc(p15, t11);
+	TheNet->newArc(p24, t11);
+      }
+      if (This->compensateWithScope)
+      {
+	// pattern of Fig. 44
+	Place *p10 = TheNet->newPlace(prefix + "p10");
+	Place *p15 = TheNet->newPlace(prefix + "ch_call");
+	Transition *t11 = TheNet->newTransition(prefix + "t11");
+	TheNet->newArc(t4, p15);
+	TheNet->newArc(p15, t5);
+	TheNet->newArc(t11, p10);
+	TheNet->newArc(p15, t11);
+	TheNet->newArc(p24, t11);
+      }
+	
       
       // generate transitions t13 for the child scopes
-      SymbolScope *me = symMan.getScope(This->parentScopeId); 
       for (list< SymbolScope * >::iterator child = me->children.begin(); child != me->children.end(); child++)
       {
 	Place *p19_new = TheNet->newPlace(prefix + "compScope." + intToString((*child)->id->value)); // a "compScope" for each child
@@ -2298,6 +2342,10 @@ This=Compensate(a) provided (!This->inFaultHandler && This->scope == mkcasestrin
       TheNet->newArc(p2, t5);
       TheNet->newArc(p3, t5);
       TheNet->newArc(t5, p7);
+
+      // embed this <compensate /> activity in compensation handler
+      TheNet->mergePlaces(p4, TheNet->findPlace(currentScope + "internal.compensationHandler.p10"));
+      TheNet->mergePlaces(p6, TheNet->findPlace(currentScope + "internal.compensationHandler.p12"));
     }
     a // standardElements
     {
@@ -2380,6 +2428,9 @@ This=Compensate(a) provided (!This->inFaultHandler && This->scope != mkcasestrin
       TheNet->newArc(p2, t5);
       TheNet->newArc(p3, t5);
       TheNet->newArc(t5, p7);
+
+      // embed this <compensate scope="C"/> activity in compensation handler
+      TheNet->mergePlaces(p4, TheNet->findPlace(currentScope + "internal.compensationHandler.p10"));
     }
     a // standardElements
     {

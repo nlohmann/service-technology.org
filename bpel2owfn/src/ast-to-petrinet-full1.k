@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/13 13:51:05 $
+ *          - last changed: \$Date: 2006/01/13 15:03:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,10 +44,9 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.101 $
+ * \version \$Revision: 1.102 $
  * 
  * \todo
- *          - (nlohmann) user-defined compensation handlers
  *          - (nlohmann) outsource <compensate />-elements
  *          - (nlohmann) variables in communicating actions should be optional
  */
@@ -2387,6 +2386,10 @@ This=Compensate(a) provided (This->inFaultHandler && This->scope == mkcasestring
       TheNet->newArc(p2, t5);
       TheNet->newArc(p3, t5);
       TheNet->newArc(t5, p7);
+
+      // embed this <compensate /> activity in fault handler
+      TheNet->mergePlaces(p5, TheNet->findPlace(currentScope + "faultHandler.ch_fh"));
+      TheNet->mergePlaces(p6, TheNet->findPlace(currentScope + "faultHandler.ch_out"));      
     }
     a // standardElements
     {
@@ -2449,7 +2452,7 @@ This=Compensate(a) provided (This->inFaultHandler && This->scope != mkcasestring
       Place *p2 = TheNet->newPlace(prefix + "running");
       Place *p3 = TheNet->newPlace(prefix + "final");
       Place *p4 = TheNet->newPlace(prefix + "stop");
-      Place *p5 = TheNet->newPlace(prefix + "ch_fh");
+      Place *p5 = TheNet->newPlace(prefix + "ch_in");
       Place *p6 = TheNet->newPlace(prefix + "compensated");
       Place *p7 = TheNet->newPlace(prefix + "stopped");
       Transition *t1  = TheNet->newTransition(prefix + "t1");
@@ -2472,6 +2475,10 @@ This=Compensate(a) provided (This->inFaultHandler && This->scope != mkcasestring
       TheNet->newArc(p2, t5);
       TheNet->newArc(p3, t5);
       TheNet->newArc(t5, p7);
+
+      // embed this <compensate scope="C"/> activity in fault handler
+      TheNet->mergePlaces(p5, TheNet->findPlace(currentScope + "faultHandler.ch_fh"));
+      TheNet->mergePlaces(p6, TheNet->findPlace(currentScope + "faultHandler.ch_out"));      
     }
     a // standardElements
     {

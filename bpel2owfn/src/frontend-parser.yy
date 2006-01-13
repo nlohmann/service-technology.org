@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/01/13 14:56:13 $
+ *          - last changed: \$Date: 2006/01/13 15:03:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,10 +50,11 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.92 $
+ * \version \$Revision: 1.93 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
+ *          - inProcess can be replaced by "(currentScopeId->value == 1)"
  */
 %}
 
@@ -561,7 +562,8 @@ tFaultHandlers:
   tCatchAll 
   X_SLASH K_FAULTHANDLERS X_NEXT
     { $$ = userDefinedFaultHandler($4, $5);
-      $$->inProcess = inProcess;
+      $$->inProcess = (currentScopeId->value == 1);
+      inProcess = false; // hack!
       $$->parentScopeId = currentScopeId;
       isInFH.pop();
       hasCompensate = 0;

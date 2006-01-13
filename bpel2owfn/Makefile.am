@@ -33,15 +33,15 @@ hu-prepare: distclean
 	@echo   automake -a -c
 
 # target to create an executable that is independet of Cygwin
-hu-mingwexe: clean
+pure-windows-executable: clean
 	make CXXFLAGS="-g -mno-cygwin -U _WIN32" --directory=src
 
-# targets to distribute the mingw executable
-mingwdistdir = $(distdir)-mingw
+# targets to distribute the win32 executable
+win32distdir = $(distdir)-win32
 
 MINGWDISTFILES = src/$(PACKAGE)$(EXEEXT) doc/$(PACKAGE).pdf
 
-hu-mingwdist: hu-mingwexe dvi pdf
-	$(mkdir_p) $(mingwdistdir)
-	cp $(MINGWDISTFILES) $(mingwdistdir)
-	zip -9 -m -r $(mingwdistdir).zip $(mingwdistdir)
+hu-win32dist: pure-windows-executable dvi pdf
+	$(mkdir_p) $(win32distdir)
+	cp $(MINGWDISTFILES) $(win32distdir)
+	zip -9 -m -r $(win32distdir).zip $(win32distdir)

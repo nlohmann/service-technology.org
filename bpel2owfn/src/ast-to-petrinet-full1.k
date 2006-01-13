@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/13 09:26:59 $
+ *          - last changed: \$Date: 2006/01/13 09:43:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.99 $
+ * \version \$Revision: 1.100 $
  * 
  * \todo
  *          - (nlohmann) user-defined compensation handlers
@@ -2756,10 +2756,10 @@ This=activityWhile(TheWhile=While(a,b)) ->
       TheNet->newArc(p2, t3, "x");
       TheNet->newArc(t3, p4);
       TheNet->newArc(t4, p1);
+      TheNet->newArc(p5, t4);
 
       throwFault(p2, p6, "guard", "running", "x", prefix, This->negativeControlFlow);
       
-//      TheNet->newArc(p5, t4);
 //      TheNet->newArc(p2, t5, "x");
 //      TheNet->newArc(t5, p6);
 //      TheNet->newArc(t5, p9, "fault");

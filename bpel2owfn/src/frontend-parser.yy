@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/01/13 10:05:08 $
+ *          - last changed: \$Date: 2006/01/13 14:23:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.90 $
+ * \version \$Revision: 1.91 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -551,6 +551,7 @@ tFaultHandlers:
       symMan.startDPEinWhile();
       isInFH.push(true);
       hasCompensate = 0;
+      inProcess = false;
     }
   tCatch_list  
   tCatchAll 

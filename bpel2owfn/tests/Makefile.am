@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/01/15 18:14:19 $ by $Author: nlohmann $.
-# Version $Revison$
+# File last changed $Date: 2006/01/15 18:18:23 $ by $Author: nlohmann $.
+# Version $Revision: 1.3 $
 
 TESTS = test1 test2 test3
 

@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/01/15 18:14:13 $ by $Author: nlohmann $.
-# Version $Revison$
+# File last changed $Date: 2006/01/15 18:18:17 $ by $Author: nlohmann $.
+# Version $Revision: 1.5 $
 
 info_TEXINFOS = bpel2owfn.texi
 

@@ -14,26 +14,28 @@
 
 @b{About this document:}
 
-This manual is for @acronym{BPEL2oWFN}, Version @value{VERSION}, a tool
-translating business processes described in @acronym{BPEL} to open workflow
-nets (@acronym{oWFN}), last updated @value{UPDATED}. This manual does not
-explain how to setup or install @acronym{BPEL2oWFN}. For this information
-please read the Installation Manual which is part of the distribution or can be
+This manual is for @acronym{BPEL2oWFN}, Version @value{VERSION}, a
+tool translating business processes described in @acronym{BPEL} to
+open workflow nets (@acronym{oWFN}), last updated @value{UPDATED}.
+This manual does not explain how to setup or install
+@acronym{BPEL2oWFN}. For this information please read the
+Installation Manual which is part of the distribution or can be
 downloaded from the website of @acronym{BPEL2oWFN}
 (@url{http://www.informatik.hu-berlin.de/top/tools4bpel/bpel2owfn}).
 
 @vskip 20pt
 
-Copyright @copyright{} 2006 Niels Lohmann
+Copyright @copyright{} 2005, 2006 Niels Lohmann
 
 Copying and distribution of this file, with or without modification,
 are permitted in any medium without royalty provided the copyright
 notice and this notice are preserved.
 
-@acronym{BPEL2oWFN} is licensed under the @acronym{GNU} General Public License.
+@acronym{BPEL2oWFN} is licensed under the @acronym{GNU} General
+Public License.
 
-Copyright @copyright{} 2005, 2006 Niels Lohmann, Christian Gierds and Dennis
-Reinert.
+Copyright @copyright{} 2005, 2006 Niels Lohmann, Christian Gierds
+and Dennis Reinert.
 
 @iftex
 @image{images/tools4bpel,,0.4in}
@@ -43,8 +45,8 @@ Reinert.
 @image{images/tools4bpel}
 @end ifhtml
 
-@acronym{BPEL2oWFN} is part of the Tools4@acronym{BPEL} project funded by the
-Bundesministerium f@"ur Bildung und Forschung. See
+@acronym{BPEL2oWFN} is part of the Tools4@acronym{BPEL} project
+funded by the Bundesministerium f@"ur Bildung und Forschung. See
 @url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
 @end copying
 
@@ -88,7 +90,7 @@ Bundesministerium f@"ur Bildung und Forschung. See
 * Invoking BPEL2oWFN:: How to invoke @acronym{BPEL2oWFN}.
 * File Formats:: Which file formats are supported.
 * Petri Net Patterns:: Which patterns are implemented.
-* Petri Net Related Functions:: What is done with the Petri net.
+* Petri Net related Functions:: What is done with the Petri net.
 * Limitations and Bugs:: What @acronym{BPEL2oWFN} cannot do.
 * Future Work:: What @acronym{BPEL2oWFN} will do in the future.
 * References:: Bibliography of cited literature.
@@ -113,8 +115,8 @@ Bundesministerium f@"ur Bildung und Forschung. See
 
 @acronym{BPEL2oWFN} translates a business processes expressed in
 @acronym{BPEL, Business Process Execution Language for Web Services}
-[ACD@math{^+}03] to an @acronym{oWFN, open Workflow Net} [MRS05]. This
-@acronym{oWFN} can be used to:
+[ACD@math{^+}03] to an @acronym{oWFN, open Workflow Net} [MRS05].
+This @acronym{oWFN} can be used to:
 
 @itemize
 @item check controllability [Mar03, Wei04],
@@ -125,13 +127,13 @@ Bundesministerium f@"ur Bildung und Forschung. See
 @acronym{LoLA, Low-Level Analyzer} [Sch00].
 @end itemize
 
-In future versions of @acronym{BPEL2oWFN} static analysis is used to find the
-smallest @acronym{oWFN} to analyze a chosen property. This is called
-@i{flexible model generation} (see @ref{Future Work}).
+In future versions of @acronym{BPEL2oWFN} static analysis is used to
+find the smallest @acronym{oWFN} to analyze a chosen property. This
+is called @i{flexible model generation} (see @ref{Future Work}).
 
-@acronym{BPEL2oWFN} was written by Niels Lohmann, Christian Gierds and Dennis
-Reinert. It is part of the Tools4@acronym{BPEL} project funded by the
-Bundesministerium f@"ur Bildung und Forschung. See
+@acronym{BPEL2oWFN} was written by Niels Lohmann, Christian Gierds
+and Dennis Reinert. It is part of the Tools4@acronym{BPEL} project
+funded by the Bundesministerium f@"ur Bildung und Forschung. See
 @url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
 
 
@@ -142,9 +144,9 @@ The translation process of the @acronym{BPEL} business process is performed in
 five steps:
 
 @enumerate
-@item lexical analysis (lexer)
-@item syntactical analysis (parser, symbol table)
+@item lexical and syntactical analysis (lexer, parser, symbol table)
 @item semantic analysis (variables, links)
+@item @acronym{AST} generation (abstract grammar, implicit transformation)
 @item code generation (pattern database)
 @item code optimization (structural reduction)
 @end enumerate
@@ -155,37 +157,40 @@ five steps:
 
 @subsection Abstract Syntax Tree
 
-The @acronym{AST, abstract syntax tree} is an abstraction of the syntax tree
-generated while parsing the @acronym{BPEL} process: any unnecessary information
-(e.g. indention, brackets or other ``syntax-supporting'' elements) is omitted.
-It is the central data structure of @acronym{BPEL2oWFN}. The nodes of the
-@acronym{AST} are annotated during the analysis steps. These annotations are
-used to select the most compact Petri net pattern from the pattern database to
-check a given property.
+The @acronym{AST, abstract syntax tree} is an abstraction of the
+syntax tree generated while parsing the @acronym{BPEL} process: any
+unnecessary information (e.g. indention, brackets or other
+``syntax-supporting'' elements) is omitted. It is the central data
+structure of @acronym{BPEL2oWFN}. The nodes of the @acronym{AST} are
+annotated during the analysis steps. These annotations are used to
+select the most compact Petri net pattern from the pattern database
+to check a given property.
 
 
 @subsection Pattern Database
 
-The idea of flexible model generation is to find the most compact model to
-check a given property. The patterns of the Petri net semantics of [Sta05] are
-designed to fit in any given context. However when the context is known some
-behavior modeled in the patterns (i.e. some of the nodes) can be safely
-removed without changing its semantics. @acronym{BPEL2oWFN} is designed to hold
-several sets of Petri net patterns each suitable in certain contexts. These
-patterns are collected in a pattern database.
+The idea of flexible model generation is to find the most compact
+model to check a given property. The patterns of the Petri net
+semantics of [Sta05] are designed to fit in any given context.
+However when the context is known some behavior modeled in the
+patterns (i.e. some of the nodes) can be safely removed without
+changing its semantics. @acronym{BPEL2oWFN} is designed to hold
+several sets of Petri net patterns each suitable in certain
+contexts. These patterns are collected in a pattern database.
 
 
 @subsection Petri Net Class
 
-@acronym{BPEL2oWFN} provides many algorithms and data structures to build,
-represent, modify and simplify Petri nets and open workflow nets, resp. They
-are the interface between the pattern database and the file output for the
-model checking tool. The functions are collected in an extensible class
-allowing to add more output file formats (e.g. @acronym{PNML, Petri Net Markup
-Language}, @acronym{PEP} notation, etc.), structural simplification rules
-(optimized to preserve certain properties such as deadlock freedom or liveness)
-or abstractions (e.g. abstraction from variables, abstraction from external
-behavior).
+@acronym{BPEL2oWFN} provides many algorithms and data structures to
+build, represent, modify and simplify Petri nets and open workflow
+nets, resp. They are the interface between the pattern database and
+the file output for the model checking tool. The functions are
+collected in an extensible class allowing to add more output file
+formats (e.g. @acronym{PNML, Petri Net Markup Language},
+@acronym{PEP} notation, etc.), structural simplification rules
+(optimized to preserve certain properties such as deadlock freedom
+or liveness) or abstractions (e.g. abstraction from variables,
+abstraction from external behavior).
 
 
 
@@ -202,10 +207,11 @@ The standard invocation of @acronym{BPEL2oWFN} is:
 bpel2owfn -f inputfile.bpel -O2F
 @end example
 
-where @file{inputfile.bpel} is a @acronym{BPEL} process. The option @code{-O2F}
-causes @acronym{BPEL2oWFN} to generate an open workflow net named
-@file{inputfile.owfn} and a file @file{inputfile.info} describing the places
-and transitions of the net. For more examples, see @ref{Examples}.
+where @file{inputfile.bpel} is a @acronym{BPEL} process. The option
+@code{-O2F} causes @acronym{BPEL2oWFN} to generate an open workflow
+net named @file{inputfile.owfn} and a file @file{inputfile.info}
+describing the places and transitions of the net. For more examples,
+see @ref{Examples}.
 
 
 
@@ -215,9 +221,10 @@ and transitions of the net. For more examples, see @ref{Examples}.
 @table @samp
 @item --file @var{filename}.bpel
 @itemx -f @var{filename}.bpel
-Read @acronym{BPEL} input from file @file{@var{filename}.bpel}. The filename is
-used to name any files generated by @acronym{BPEL2oWFN}. If this parameter is
-omitted, input is read from standard input.
+
+Read @acronym{BPEL} input from file @file{@var{filename}.bpel}. The
+filename is used to name any files generated by @acronym{BPEL2oWFN}.
+If this parameter is omitted, input is read from standard input.
 
 @item --help
 @itemx -h
@@ -231,112 +238,133 @@ Print version information and exit.
 
 @subsection Output modes
 
-When invoking @acronym{BPEL2oWFN} several output modes are possible. While the
-@samp{-pn}-mode can be implied by other options the other modes have to be set
-explicitly. Either way, at most one of these options can be chosen.
+When invoking @acronym{BPEL2oWFN} several output modes are possible.
+While the @samp{-pn}-mode can be implied by other options the other
+modes have to be set explicitly. Either way, at most one of these
+options can be chosen.
 
 @table @samp
 @item --ast
 @itemx -a
-Outputs the @acronym{AST, abstract syntax tree} generated while parsing the
-input file to standard output. This option is mostly used for debugging
-reasons.
+
+Outputs the @acronym{AST, abstract syntax tree} generated while
+parsing the input file to standard output. This option is mostly
+used for debugging reasons.
 
 @item --xml
 @itemx -x
-Outputs the parsed @acronym{BPEL} file in @acronym{XML} representation. Any
-unnecessary attributes are omitted. This option is mostly used for debugging
-reasons.
+
+Outputs the parsed @acronym{BPEL} file in @acronym{XML}
+representation. Any unnecessary attributes are omitted. This option
+is mostly used for debugging reasons.
 
 @item --petrinet
 @itemx -pn
-Generates a Petri net representing the semantics of the given process. Other
-options can be added to simplify, abstract or modify that Petri net (see
-below).
-@end table
+
+Generates a Petri net representing the semantics of the given
+process. Other options can be added to simplify, abstract or modify
+that Petri net (see below). @end table
 
 
 @subsection Petri net related options
 
-These options imply the @samp{-pn}-option. When @acronym{BPEL2oWFN} is run with
-the @samp{-pn}-option reading a file @file{input.bpel}, a file @file{input.info}
-holding the information about the nodes of the created Petri net is generated.
-See @ref{Naming Conventions} for more information.
+These options imply the @samp{-pn}-option. When @acronym{BPEL2oWFN}
+is run with the @samp{-pn}-option reading a file @file{input.bpel},
+a file @file{input.info} holding the information about the nodes of
+the created Petri net is generated. See @ref{Naming Conventions} for
+more information.
 
 @table @samp
 @item --simplify
 @itemx -s
-Uses several rules to structurally simplify the generated Petri net. See
-@ref{Petri Net Related Functions} for more details.
+
+Uses several rules to structurally simplify the generated Petri net.
+See @ref{Petri Net related Functions} for more details.
 
 @item --low-level
 @itemx -ll
+
 Abstracts the generated Petri net to low-level representation. See
-@ref{Petri Net Related Functions} for more details.
+@ref{Petri Net related Functions} for more details.
 
 @item --lola
 @itemx -L
-Outputs a low-level Petri net representation in the @acronym{LoLA} format
-(see @ref{File Formats}). This option should not be used together with @samp{-D},
-@samp{-D2F}, @samp{-O}, @samp{-O2F}. This option implies @samp{-ll}.
+
+Outputs a low-level Petri net representation in the @acronym{LoLA}
+format (see @ref{File Formats}). This option should not be used
+together with @samp{-D}, @samp{-D2F}, @samp{-O}, @samp{-O2F}. This
+option implies @samp{-ll}.
 
 
 @item --lola2file
 @itemx -L2F
-The same effect as the @samp{--lola} option, yet an output file is generated:
-If the input @acronym{BPEL} process is read from @file{file.bpel}, the
-@acronym{LoLA} net is named @file{file.lola}.
+
+The same effect as the @samp{--lola} option, yet an output file is
+generated: If the input @acronym{BPEL} process is read from
+@file{file.bpel}, the @acronym{LoLA} net is named @file{file.lola}.
 
 @item --owfn
 @itemx -O
-Outputs an @acronym{oWFN} representing the semantics of the input process (see
-@ref{File Formats}). This option should not used together with @samp{-D},
-@samp{-D2F}, @samp{-L} or @samp{-L2F}.
+
+Outputs an @acronym{oWFN} representing the semantics of the input
+process (see @ref{File Formats}). This option should not used
+together with @samp{-D}, @samp{-D2F}, @samp{-L} or @samp{-L2F}.
 
 @item  --owfn2file
 @itemx -O2F
-The same effect as the @samp{--owfn} option, yet an output file is generated:
-If the input @acronym{BPEL} process is read from @file{file.bpel}, the
-@acronym{oWFN} is named @file{file.owfn}.
+
+The same effect as the @samp{--owfn} option, yet an output file is
+generated: If the input @acronym{BPEL} process is read from
+@file{file.bpel}, the @acronym{oWFN} is named @file{file.owfn}.
 
 @item --dot
 @itemx  -D
-Outputs a Dot representation of the Petri net (see @ref{File Formats}). Should
-not used together with options @samp{-L}, @samp{-L2F}, @samp{-O}, @samp{-O2F}.
-Implies option @samp{-pn}.
+
+Outputs a Dot representation of the Petri net (see @ref{File
+Formats}). Should not used together with options @samp{-L},
+@samp{-L2F}, @samp{-O}, @samp{-O2F}. Implies option @samp{-pn}.
 
 @item --dot2file
 @itemx -D2F
-The same effect as the @samp{--dot} option, yet an output file is generated:
-If the input @acronym{BPEL} process is read from @file{file.bpel}, the
-Dot representation is named @file{file.dot}.
+
+The same effect as the @samp{--dot} option, yet an output file is
+generated: If the input @acronym{BPEL} process is read from
+@file{file.bpel}, the Dot representation is named @file{file.dot}.
 @end table
 
 
 
 @anchor{Examples}
 @section Examples
-In this section we show some examples how @acronym{BPEL2oWFN} can be invoked.
+In this section we show some examples how @acronym{BPEL2oWFN} can be
+invoked.
 
 @table @samp
 @item bpel2owfn -f sample.bpel -L2F -s
-Reads the file @file{sample.bpel}, generates a structural simplified low-level
-Petri net and saves it in a @acronym{LoLA} file @file{sample.lola}. For further
-information a file @file{sample.info} is generated.
+
+Reads the file @file{sample.bpel}, generates a structural simplified
+low-level Petri net and saves it in a @acronym{LoLA} file
+@file{sample.lola}. For further information a file
+@file{sample.info} is generated.
 
 @item bpel2owfn -f sample.bpel -O2F -ddd
-Reads the file @file{sample.bpel}, generates a low-level open workflow net
-and saves it in an @acronym{oWFN} file @file{sample.owfn}. For further
-information a file @file{sample.info} is generated. During the conversion
-several debug messages are printed to standard output.
+
+Reads the file @file{sample.bpel}, generates a low-level open
+workflow net and saves it in an @acronym{oWFN} file
+@file{sample.owfn}. For further information a file
+@file{sample.info} is generated. During the conversion several debug
+messages are printed to standard output.
 
 @item @var{prog} | bpel2owfn -D -ll | dot -Tpng -osample.png
-Runs the program @var{prog} and reads its output as @acronym{BPEL} process,
-generates a low-level Petri net and outputs its Dot representation. This stream
-is read by Dot which layouts the Petri net and creates an output
-@acronym{PNG, Portable Network Graphic} file @file{sample.png}.
+
+Runs the program @var{prog} and reads its output as @acronym{BPEL}
+process, generates a low-level Petri net and outputs its Dot
+representation. This stream is read by Dot which layouts the Petri
+net and creates an output @acronym{PNG, Portable Network Graphic}
+file @file{sample.png}.
 
 @item bpel2owfn -f sample.bpel -a
+
 Reads the file @file{sample.bpel} and prints the abstract syntax tree
 (@acronym{AST}) to standard output.
 @end table
@@ -345,20 +373,23 @@ Reads the file @file{sample.bpel} and prints the abstract syntax tree
 
 @section Exit Values
 
-When @acronym{BPEL2oWFN} is invoked and run without any error, the exit value
-is 0.
+When @acronym{BPEL2oWFN} is invoked and run without any error, the
+exit value is 0.
 
 @table @asis
 @item 0
-@b{No error.} The input file could be correctly opened, parsed and the output
-file(s) could be generated without any error.
+
+@b{No error.} The input file could be correctly opened, parsed and
+the output file(s) could be generated without any error.
 
 
 @item 1
-@b{Lexical or syntax error.} This error occurs while lexing or parsing the input
-file. It is thrown by the lexer or the parser, resp. Usually the `source' of the
-error (i.e. the filename and line number) is indicated together with the
-unexpected (last read) and expected token.
+
+@b{Lexical or syntax error.} This error occurs while lexing or
+parsing the input file. It is thrown by the lexer or the parser,
+resp. Usually the `source' of the error (i.e. the filename and line
+number) is indicated together with the unexpected (last read) and
+expected token.
 
 An example:
 @cartouche
@@ -371,12 +402,14 @@ Error in `example.bpel' in line 12:
 @end smallexample
 @end cartouche
 
-Please note that the indicated position (i.e. the line number) may be fuzzy ---
-it should be understood as a hint to the errorneous line.
+Please note that the indicated position (i.e. the line number) may
+be fuzzy --- it should be understood as a hint to the erroneous
+line.
 
 @item 2
-@b{`File not found' exception.} The given input file was not found resp. could
-not be opened.
+
+@b{`File not found' exception.} The given input file was not found
+resp. could not be opened.
 
 An example:
 @cartouche
@@ -390,7 +423,9 @@ Exception #2 occurred!
 @end cartouche
 
 @item 10
-@b{Option mismatch.} The given command-line options cannot be processed together.
+
+@b{Option mismatch.} The given command-line options cannot be
+processed together.
 
 An example:
 @cartouche
@@ -408,9 +443,10 @@ Exception #10 occurred!
 
 
 @item 30
-@b{`Dynamic cast error' exception.} While building an internal scope tree an
-unexpected error has occurred. (This should not happen --- if it does so
-nevertheless, please inform us.)
+
+@b{`Dynamic cast error' exception.} While building an internal scope
+tree an unexpected error has occurred. (This should not happen ---
+if it does so nevertheless, please inform us.)
 
 
 @item 40
@@ -418,8 +454,10 @@ nevertheless, please inform us.)
 
 
 @item 41
-@b{`Node already defined' exception.} While generating the Petri net a node was
-found having a history entry covered by another node before.
+
+@b{`Node already defined' exception.} While generating the Petri net
+a node was found having a history entry covered by another node
+before.
 
 An example:
 @cartouche
@@ -434,22 +472,26 @@ Exception #41 occurred!
 
 
 @item 42
-@b{`Merging error' exception.} While generating the Petri net an error occurred
-while merging two nodes. It happens either when one of the nodes was not found
-or one of the nodes is a guarded transition---the merging of guarded
-transitions is not yet supported.
+
+@b{`Merging error' exception.} While generating the Petri net an
+error occurred while merging two nodes. It happens either when one
+of the nodes was not found or one of the nodes is a guarded
+transition---the merging of guarded transitions is not yet
+supported.
 
 
 @item 43
-@b{`Arc error' exception.} While generating the Petri net an error occurred
-while adding an arc to the net. It happens either on type errors---i.e. an
-arc between two transitions (or two places, resp.) should be drawn---or when
-the source or target node of an arc was not found.
+
+@b{`Arc error' exception.} While generating the Petri net an error
+occurred while adding an arc to the net. It happens either on type
+errors---i.e. an arc between two transitions (or two places, resp.)
+should be drawn---or when the source or target node of an arc was
+not found.
 @end table
 
-Please report the occurrence of any exception with numbers from 30 since it
-indicates a bug in @acronym{BPEL2oWFN} we would like to fix immediately (see
-@ref{Reporting Bugs}).
+Please report the occurrence of any exception with numbers from 30
+since it indicates a bug in @acronym{BPEL2oWFN} we would like to fix
+immediately (see @ref{Reporting Bugs}).
 
 
 
@@ -466,10 +508,10 @@ indicates a bug in @acronym{BPEL2oWFN} we would like to fix immediately (see
 
 @section @acronym{LoLA} place/transition net
 
-A (low-level) place/transition net as described in [LoLA]. For each node of
-the generated Petri net the first entry of its history is used as name. For
-more information on the node naming conventions of @acronym{BPEL2oWFN},
-see @ref{Naming Conventions}.
+A (low-level) place/transition net as described in [LoLA]. For each
+node of the generated Petri net the first entry of its history is
+used as name. For more information on the node naming conventions of
+@acronym{BPEL2oWFN}, see @ref{Naming Conventions}.
 
 
 
@@ -479,19 +521,21 @@ see @ref{Naming Conventions}.
 @anchor{Naming Conventions}
 @subsection Naming Conventions
 
-@acronym{BPEL2oWFN} generates the output Petri net by creating and merging
-parameterized patterns of the Petri net semantics defined in [Sta05]. Due to
-merging and simplifying the Petri net nodes ``belong'' to more than one
-pattern. For example, in a sequence the initial place of the sequence and
-the initial place of its first activity are merged so that the final Petri net
-contains one place with two @i{roles}.
+@acronym{BPEL2oWFN} generates the output Petri net by creating and
+merging parameterized patterns of the Petri net semantics defined in
+[Sta05]. Due to merging and simplifying the Petri net nodes
+``belong'' to more than one pattern. For example, in a sequence the
+initial place of the sequence and the initial place of its first
+activity are merged so that the final Petri net contains one place
+with two @i{roles}.
 
-The roles of each place are collected during the Petri net generation. They
-form the @i{history} of the node. It is used to locate errors of the modeled
-business process: If, for example, @acronym{BPEL2oWFN} generates a Petri net
-of a business process and the model checker @acronym{LoLA} finds a dead
-transition, its history helps to find which @acronym{BPEL} constructs are
-affected and in this case will never be executed.
+The roles of each place are collected during the Petri net
+generation. They form the @i{history} of the node. It is used to
+locate errors of the modeled business process: If, for example,
+@acronym{BPEL2oWFN} generates a Petri net of a business process and
+the model checker @acronym{LoLA} finds a dead transition, its
+history helps to find which @acronym{BPEL} constructs are affected
+and in this case will never be executed.
 
 The roles are named using the following conventions:
 
@@ -535,69 +579,71 @@ patterns are implemented:
 
 
 @section Petri net semantics from [Sta05]
+
 The Petri net semantics for @acronym{BPEL4WS} from Christian Stahl
 (Humboldt-Universit@"at zu Berlin) published in [Sta04].
 
 @subsection Overview
-Feature complete semantics covering both positive control flow with event
-handling and negative control flow (fault and compensation handling).
+
+Feature complete semantics covering both positive control flow with
+event handling and negative control flow (fault and compensation
+handling).
 
 @anchor{Limitations of the semantics}
 @subsection Limitations of the semantics
 @itemize
-@item Only one instance of a @acronym{BPEL} process can be transformed into a
-Petri net.
 
-@item The semantics abstracts from the connection of a @acronym{BPEL} process
-to its partner processes. The interface of a @acronym{BPEL} process is
-transformed into a set of message channels, i.e. places in the Petri net.
+@item Only one instance of a @acronym{BPEL} process can be
+transformed into a Petri net.
 
-@item In our Petri net patterns we model data, but we abstract from the
-definition of the functions which edit the data. Furthermore, we did not
-specify the transition guards and so we did not specify which circumstances are
-necessary that a specific fault can occur.
+@item The semantics abstracts from the connection of a
+@acronym{BPEL} process to its partner processes. The interface of a
+@acronym{BPEL} process is transformed into a set of message
+channels, i.e. places in the Petri net.
 
-@item Every activity is limited to one correlation set (except the synchronous
-invoke which is limited to two correlation sets).
+@item In our Petri net patterns we model data, but we abstract from
+the definition of the functions which edit the data. Furthermore, we
+did not specify the transition guards and so we did not specify
+which circumstances are necessary that a specific fault can occur.
+
+@item Every activity is limited to one correlation set (except the
+synchronous invoke which is limited to two correlation sets).
+
 @end itemize
 
 
+@anchor{Changes and Modulation}
 @subsection Changes and Modulation
-We tried to stick as close to the Petri net patterns of [Sta05] as possible.
-However, the implemented patterns in the pattern database sometimes differ to
-the given patterns due to discovery of bugs or implementation decisions. In
-this subsection we sum up these changes to help you understand the generated
-Petri net model.
+
+We tried to stick as close to the Petri net patterns of [Sta05] as
+possible. However, the implemented patterns in the pattern database
+sometimes differ to the given patterns due to discovery of bugs or
+implementation decisions. In this subsection we sum up these changes
+to help you understand the generated Petri net model.
 
 @itemize
-@item @b{Assign activity}. All copy branches of an assign activity are modeled
-in a single pattern (i.e. Fig. 6 and Fig. 7 are merged). Furthermore, when an
-error occurs, an active assign-activity is not stopped until all copy branches
-have finished. This is described in [ACD@math{^+}03] as:
-@quotation
-The assign activities are sufficiently short-lived that they are allowed to
-complete rather than being interrupted when termination is forced.
-@end quotation
-This change fixes a bug in the Petri net semantics.
 
 @item @b{Faults}. At most one error can occur in the positive
-control flow of each scope or process. Yet this confines the possible runs of the process it
-is only a little change of the semantics of the process, since ---
-according to the @acronym{BPEL} specification --- only one fault is
-handled anyway. While further faults occurring before stopping the
-positive control flow are ignored in the original semantics of
-[Sta05] (in fact collected on place @samp{fault_in} and then consumed by a reset arc) they
-are prevented in the implemented semantics.
+control flow of each scope or process. Yet this confines the
+possible runs of the process it is only a little change of the
+semantics, since --- according to the specification --- only the
+first fault is handled anyway. While further faults occurring before
+the positive control flow is stopped are ignored in the original
+semantics of [Sta05] (in fact, the faults are collected on place
+@samp{fault_in} and then consumed by a reset arc) they are prevented
+in the implemented semantics. In our model, exactly the @i{first}
+occurring fault is handled, whereas in [Sta05] one fault is chosen
+non-deterministically.
 
 Furthermore, all @samp{failed} places of the activities were
 removed. In the original Petri net semantics, all faults of a scope
 were collected on the @samp{fault_in} of the stop-pattern and then
 classified as being the first fault of the scope, a following fault,
 a fault from the fault handler, a fault from the compensation
-handler, or a fault from a child scope. In our implementation,
-new places (@samp{fh_fault_in} and @samp{ch_fault_in}) were
-introduced and each activity throws its faults to the ``correct''
-place automatically.
+handler, or a fault from a child scope. In our implementation, new
+places (@samp{fh_fault_in} and @samp{ch_fault_in}) were introduced
+and each activity throws its faults to the ``correct'' place
+automatically.
 
 To ensure that at most one error can occur (i.e. at most one token
 is produced on any fault place) the fault places are guarded by
@@ -609,9 +655,9 @@ faults to occur. The places @samp{fh_fault_in} and
 @samp{!FHFaulted}/@samp{FHFaulted} and
 @samp{!CHFaulted}/@samp{CHFaulted}, resp.
 
-Moreover, the generated Petri nets have less nodes than those generated by
-@acronym{BPEL2PN} [SHS05] since an unfolding of the reset arcs in not
-neccessary any more.
+Moreover, the generated Petri nets have less nodes than those
+generated by @acronym{BPEL2PN} [SHS05] since an unfolding of the
+reset arcs in not necessary any more.
 
 @item @b{1-safety}. The new modeling of the fault management yields
 to 1-safe Petri nets (i.e. any reachable state of the Petri net
@@ -623,9 +669,22 @@ prerequisite to use the Model Checking Kit [MCK]), features not
 supported by the Petri net semantics can be discovered since the
 generated net will most likely violate 1-safety when an unsupported
 @acronym{BPEL} feature is used. If, for example, a scope is enclosed
-in a while loop (which would model instantiation which is not supported by
-the Petri net semantics @ref{Limitations of the semantics}), the state
-places of that scope would not be 1-safe.
+in a while loop (which would model instantiation which is not
+supported by the Petri net semantics @ref{Limitations of the
+semantics}), the state places of that scope would not be 1-safe.
+
+@item @b{Assign activity}. All copy branches of an assign activity
+are modeled in a single pattern (i.e. Fig. 6 and Fig. 7 are merged).
+Furthermore, when an error (outside that activity) occurs, an active
+assign-activity is not stopped until all copy branches have
+finished. This is described in [ACD@math{^+}03] as:
+
+@quotation
+The assign activities are sufficiently short-lived that they are allowed to
+complete rather than being interrupted when termination is forced.
+@end quotation
+
+This change fixes a bug in the Petri net semantics.
 
 @item @b{Event handlers}. There is one pattern for both alarm and
 message event handlers (i.e. Fig. 29 and Fig. 30 are merged). When
@@ -666,15 +725,72 @@ are simply ignored during parsing.
 
 @c ----------------------------------------------------------------------------
 
-@node Petri Net Related Functions
-@chapter Petri Net Related Functions
+@node Petri Net related Functions
+@chapter Petri Net related Functions
 
 Currently implemented Petri net-specific functions:
+@section Structural Simplification
 @itemize
-@item structural simplification
-@item abstraction of communicational behavior
+
+@item If two transitions @math{t_1} and @math{t_2} have the same
+preset and postset, one of them can be removed.
+
+@item If a transition has a singleton preset and postset, the
+transition can be removed (sequence) and the preset and postset can
+be merged. @end itemize
+
+These structural reduction rules are implemented in the command-line option
+@samp{--simplify}, see @ref{Invoking BPEL2oWFN}).
+
+
+
+@section Abstractions
+@itemize
+
+@item To obtain a place/transition Petri net from an open workflow
+net the communication places are removed. (Implemented in
+command-line option @samp{--lola}.)
+
+@item To improve readability of the implemented patterns all
+transition guards, arc inscriptions and arc types were adopted from
+[Sta05]. To ``convert'' these patterns to a low-level Petri net, all
+transition guards and arc inscriptions were removed (decisions are
+now made non-deterministically) and read arcs are ``unfolded'' to
+loops. Due to a new fault management (see @ref{Changes and
+Modulation}) the semantics does not contain any reset arcs.
+
+These abstractions are implemented in the command-line option
+@samp{--low-level}.
 @end itemize
 
+
+
+@section Markings
+
+The following places are initially marked to ensure a deadlock-free
+model of processes with ``reasonable'' control-flow (e.g. with an
+acyclic link structure):
+
+@itemize
+
+@item the initial place of the process (@samp{1.internal.initial}),
+
+@item the variable places (@samp{variable.@var{variablename}}), and
+
+@item the clock (@samp{1.internal.clock}).
+
+@end itemize
+
+All interleavings should end in a livelock-marking which covers
+@samp{1.internal.final} and in which only transition
+@samp{1.internal.finishloop} can fire. All livelock-markings differ
+in the marking of the state places of the process and its child
+scopes.
+
+Deadlocks indicate modeling mistakes (e.g. a cyclic link structure).
+Non-1-safe markings indicate the usage of an unsupported feature of
+the Petri net semantics (e.g. instantiation, see @ref{Limitations of
+the semantics}).
 
 
 
@@ -697,30 +813,35 @@ semantics of [Sta05], see @cite{Petri Net Patterns}).
 
 
 @section Known Bugs
-As this is the first public version of @acronym{BPEL2oWFN} the translation from
-a @acronym{BPEL} process to an open workflow net might be unstable or incorrect
-in some few scenarios:
+
+As this is the first public version of @acronym{BPEL2oWFN} the
+translation from a @acronym{BPEL} process to an open workflow net
+might be unstable or incorrect in some few scenarios:
 
 @itemize
-@item @b{Problem:} The original semantics of [Sta05] was created to support
-executable @acronym{BPEL} processes. Therefore the translation of abstract
-@acronym{BPEL} processes (business protocols) might throw an exception or even
-crash.
 
-@b{Solution:} Each communicating activity (i.e. @code{invoke}, @code{receive},
-@code{reply}) should be defined with (input/output) variables.
+@item @b{Problem:} The original semantics of [Sta05] was created to
+support executable @acronym{BPEL} processes. Therefore the
+translation of abstract @acronym{BPEL} processes (business
+protocols) might throw an exception or even crash.
 
-@item @b{Problem:} The implementation of the structural reduction rules might
-crash when applied to @acronym{BPEL} processes that created Petri nets with a
-large number of nodes.
+@b{Solution:} Each communicating activity (i.e. @code{invoke},
+@code{receive}, @code{reply}) should be defined with (input/output)
+variables.
+
+@item @b{Problem:} The implementation of the structural reduction
+rules might crash when applied to @acronym{BPEL} processes that
+created Petri nets with a large number of nodes.
 
 @b{Solution:} Avoid using the @samp{-s} mode in this case.
 
-@item @b{Problem:} The parser of @acronym{BPEL2oWFN} is not capable of skipping
-@acronym{XML} elements originating other namespaces than `@code{bpws}'.
-Processes using these elements are rejected with a syntax error message.
+@item @b{Problem:} The parser of @acronym{BPEL2oWFN} is not capable
+of skipping @acronym{XML} elements originating other namespaces than
+`@code{bpws}'. Processes using these elements are rejected with a
+syntax error message.
 
 @b{Solution:} Try removing or commenting these elements.
+
 @end itemize
 
 
@@ -728,15 +849,17 @@ Processes using these elements are rejected with a syntax error message.
 @anchor{Reporting Bugs}
 @section Reporting Bugs
 
-If you find a bug in @acronym{BPEL2oWFN}, please first check that it is not a
-known bug listed in `Known Bugs'. Otherwise please send us an electronic mail
-to @email{nlohmann@@informatik.hu-berlin.de}. Include the version number which
-you can find by running @samp{bpel2owfn --version}. Also include in your
-message the input @acronym{BPEL} process and the output that the program
-produced. We will try to answer your mail within a week.
+If you find a bug in @acronym{BPEL2oWFN}, please first check that it
+is not a known bug listed in `Known Bugs'. Otherwise please send us
+an electronic mail to @email{nlohmann@@informatik.hu-berlin.de}.
+Include the version number which you can find by running
+@samp{bpel2owfn --version}. Also include in your message the input
+@acronym{BPEL} process and the output that the program produced. We
+will try to answer your mail within a week.
 
-If you have other questions, comments or suggestions about @acronym{BPEL2oWFN},
-contact us via electronic mail to @email{nlohmann@@informatik.hu-berlin.de}.
+If you have other questions, comments or suggestions about
+@acronym{BPEL2oWFN}, contact us via electronic mail to
+@email{nlohmann@@informatik.hu-berlin.de}.
 
 
 
@@ -770,12 +893,40 @@ Unter den Linden 6@*
 @node Future Work
 @chapter Future Work
 
+For future releases of @acronym{BPEL2oWFN} the following features are planned:
+
 @itemize
-@item flexible model generation
-@item different Petri net patterns
-@item static analysis
-@item more file formats
-@item @acronym{WS-BPEL}
+
+@item @b{Flexible model generation}. Originally, @acronym{BPEL2oWFN}
+was designed to support flexible model generation, i.e. finding the
+most abstract (thus smallest) model capable to check a given
+property. With static analysis we hope to generate the smallest
+Petri net possible to check properties like deadlock-freedom or
+controllability.
+
+@item @b{More Petri net patterns}. Being feature-complete the Petri
+nets generated from the Petri net semantics of [Sta05] consist of a
+large number of nodes and might be to large to be analyzed by model
+checkers. The elaboration of different petri net patterns
+specialized for certain purposes (e.g. omitting the negative control
+flow) does not only help to find smaller models, but is also a
+prerequisite for flexible model generation.
+
+@item @b{More output file formats}. The currently supported output
+file formats limit the analysis of the generated Petri net to the
+model checker @acronym{LoLA}. The support of more output file
+formats such as the low-level @acronym{PEP} notation allows the
+analysis of the generated models with the large number of both
+explicit and symbolic model checking tools embedded in the Model
+Checking Kit [MCK].
+
+@item @b{Support for @acronym{WS-BPEL}}. The specification of
+@acronym{WS-BPEL, Web Service Business Process Execution Language}
+version 2.0 is in its final phase. As soon as the standardization is
+completed, @acronym{WS-BPEL} can be supported by @acronym{BPEL2oWFN}
+by overworking the grammar and adding appropriate patterns to the
+pattern database.
+
 @end itemize
 
 

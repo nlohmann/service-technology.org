@@ -276,42 +276,40 @@ Abstracts the generated Petri net to low-level representation. See
 
 @item --lola
 @itemx -L
-Outputs a low-level Petri net representation in the @acronym{LoLA} format. This
-option should not be used together with @samp{-D}, @samp{-D2F}, @samp{-O},
-@samp{-O2F}. This option implies @samp{-ll}.
+Outputs a low-level Petri net representation in the @acronym{LoLA} format
+(see @ref{File Formats}). This option should not be used together with @samp{-D},
+@samp{-D2F}, @samp{-O}, @samp{-O2F}. This option implies @samp{-ll}.
 
 
-@ignore
 @item --lola2file
 @itemx -L2F
-Outputs the generated @acronym{LoLA} into file (implies option @samp{-L}). If
-the input @acronym{BPEL} process is read from @file{file.bpel}, the
+The same effect as the @samp{--lola} option, yet an output file is generated:
+If the input @acronym{BPEL} process is read from @file{file.bpel}, the
 @acronym{LoLA} net is named @file{file.lola}.
-@end ignore
 
 @item --owfn
 @itemx -O
-Outputs @acronym{oWFN} input. This option should not used together with
-@samp{-D}, @samp{-D2F}, @samp{-L} or @samp{-L2F}.
+Outputs an @acronym{oWFN} representing the semantics of the input process (see
+@ref{File Formats}). This option should not used together with @samp{-D},
+@samp{-D2F}, @samp{-L} or @samp{-L2F}.
 
-@ignore
 @item  --owfn2file
 @itemx -O2F
-Outputs @acronym{oWFN} input into file (same name as input file) (implies
-option @samp{-O})
-@end ignore
+The same effect as the @samp{--owfn} option, yet an output file is generated:
+If the input @acronym{BPEL} process is read from @file{file.bpel}, the
+@acronym{oWFN} is named @file{file.owfn}.
 
 @item --dot
 @itemx  -D
-Output dot input. Should not used together with options @samp{-L}, @samp{-L2F},
-@samp{-O}, @samp{-O2F}. Implies option @samp{-pn}.
+Outputs a Dot representation of the Petri net (see @ref{File Formats}). Should
+not used together with options @samp{-L}, @samp{-L2F}, @samp{-O}, @samp{-O2F}.
+Implies option @samp{-pn}.
 
-@ignore
 @item --dot2file
 @itemx -D2F
-Outputs dot input into file (same name as input file) (implies option
-@samp{-D})
-@end ignore
+The same effect as the @samp{--dot} option, yet an output file is generated:
+If the input @acronym{BPEL} process is read from @file{file.bpel}, the
+Dot representation is named @file{file.dot}.
 @end table
 
 
@@ -372,6 +370,9 @@ Error in `example.bpel' in line 12:
   token/text last read was `/'
 @end smallexample
 @end cartouche
+
+Please note that the indicated position (i.e. the line number) may be fuzzy ---
+it should be understood as a hint to the errorneous line.
 
 @item 2
 @b{`File not found' exception.} The given input file was not found resp. could
@@ -515,7 +516,7 @@ with @samp{@var{id}.internal.}.
 
 
 
-@section @acronym{DOT}
+@section Dot
 
 
 @subsection Colors
@@ -537,10 +538,11 @@ patterns are implemented:
 The Petri net semantics for @acronym{BPEL4WS} from Christian Stahl
 (Humboldt-Universit@"at zu Berlin) published in [Sta04].
 
-@subsection Features
+@subsection Overview
 Feature complete semantics covering both positive control flow with event
 handling and negative control flow (fault and compensation handling).
 
+@anchor{Limitations of the semantics}
 @subsection Limitations of the semantics
 @itemize
 @item Only one instance of a @acronym{BPEL} process can be transformed into a
@@ -566,50 +568,98 @@ However, the implemented patterns in the pattern database sometimes differ to
 the given patterns due to discovery of bugs or implementation decisions. In
 this subsection we sum up these changes to help you understand the generated
 Petri net model.
+
 @itemize
-@item @i{Bugfix}.@footnote{Issues marked with `@i{Bugfix}' fix a bug in the
-underlying patterns.} Fault handlers are now processed sequentially, i.e. the
-several defined catch branches are checked one by one, as described in
-[ACD@math{^+}03].
+@item @b{Assign activity}. All copy branches of an assign activity are modeled
+in a single pattern (i.e. Fig. 6 and Fig. 7 are merged). Furthermore, when an
+error occurs, an active assign-activity is not stopped until all copy branches
+have finished. This is described in [ACD@math{^+}03] as:
+@quotation
+The assign activities are sufficiently short-lived that they are allowed to
+complete rather than being interrupted when termination is forced.
+@end quotation
+This change fixes a bug in the Petri net semantics.
 
-@item @i{Change}.@footnote{Issues marked with `@i{Change}' describe changes
-made implementing the patterns. These changes might alter the semantics of the
-resulting model.} At most one error can occur in the positive control flow. Yet
-this confines the possible runs of the process it is only a little change of
-the semantics of the process, since --- according to the @acronym{BPEL}
-specification --- only one fault is handled anyway. While further faults
-occurring before stopping the positive control flow are ignored in the original
-semantics of [Sta05] (in fact collected and then consumed by a reset arc) they
-are prevented implemented semantics.
+@item @b{Faults}. At most one error can occur in the positive
+control flow of each scope or process. Yet this confines the possible runs of the process it
+is only a little change of the semantics of the process, since ---
+according to the @acronym{BPEL} specification --- only one fault is
+handled anyway. While further faults occurring before stopping the
+positive control flow are ignored in the original semantics of
+[Sta05] (in fact collected on place @samp{fault_in} and then consumed by a reset arc) they
+are prevented in the implemented semantics.
 
-Due to this changes the generated Petri net model is 1-safe, i.e. each place
-holds at most one token.
+Furthermore, all @samp{failed} places of the activities were
+removed. In the original Petri net semantics, all faults of a scope
+were collected on the @samp{fault_in} of the stop-pattern and then
+classified as being the first fault of the scope, a following fault,
+a fault from the fault handler, a fault from the compensation
+handler, or a fault from a child scope. In our implementation,
+new places (@samp{fh_fault_in} and @samp{ch_fault_in}) were
+introduced and each activity throws its faults to the ``correct''
+place automatically.
 
-@item @i{Simplification}.@footnote{Issues marked with `@i{Simplification}'
-change the patterns so that the resulting Petri net has less nodes or is easier
-to understand. The model's semantics is not affected.} There is one pattern for
-both alarm and message event handlers.
+To ensure that at most one error can occur (i.e. at most one token
+is produced on any fault place) the fault places are guarded by
+state places: To throw a fault from an activity enclosed in a scope,
+the state of that scope has to be @samp{Active}. The first thrown
+fault changes the state to @samp{!Active} thus preventing more
+faults to occur. The places @samp{fh_fault_in} and
+@samp{ch_fault_in}, resp. are guarded by
+@samp{!FHFaulted}/@samp{FHFaulted} and
+@samp{!CHFaulted}/@samp{CHFaulted}, resp.
 
-@item @i{Simplification}. All copy branches of an assign activity are modeled
-in a single pattern.
+Moreover, the generated Petri nets have less nodes than those generated by
+@acronym{BPEL2PN} [SHS05] since an unfolding of the reset arcs in not
+neccessary any more.
 
-@item @i{Deficiency}.@footnote{Issues marked with `@i{Deficiency}' describe an
-aspect of the patterns that is not (yet) implemented.} Correlation sets are not
-implemented and are ignored during parsing.
+@item @b{1-safety}. The new modeling of the fault management yields
+to 1-safe Petri nets (i.e. any reachable state of the Petri net
+model puts at most one token on each place of the net).
 
-@item @i{Change}. Due to the abstraction of the abstraction (low-level to
-high-level) of the patterns some places () were unfolded.
+Beside performance (e.g. only 1 bit is needed to store the marking
+of a place) and compatibility issues (e.g. 1-safety is a
+prerequisite to use the Model Checking Kit [MCK]), features not
+supported by the Petri net semantics can be discovered since the
+generated net will most likely violate 1-safety when an unsupported
+@acronym{BPEL} feature is used. If, for example, a scope is enclosed
+in a while loop (which would model instantiation which is not supported by
+the Petri net semantics @ref{Limitations of the semantics}), the state
+places of that scope would not be 1-safe.
 
-@item @i{Change}. A transition named @samp{1.internal.finishloop} was added
-to livelock the process upon completion. This leads to deadlock-free Petri nets
-in case of processes with ``reasonable'' control flow and helps to find
-unwanted deadlocks occurring due wrong modeling. If, for example, the links of a
-process model are cyclic the generated Petri net will deadlock.
+@item @b{Event handlers}. There is one pattern for both alarm and
+message event handlers (i.e. Fig. 29 and Fig. 30 are merged). When
+no event handler is specified, an ``implicit'' event handler is
+installed which is just a stub and does not change the semantics.
 
-In future versions of @acronym{BPEL2oWFN} these found deadlocks shall be mapped
-back into the @acronym{BPEL} code to highlight the ``unreasonable'' activities
-(i.e. a cycle-closing link).
+@item @b{Deadlocks}. A transition named @samp{1.internal.finishloop}
+was added to livelock the process upon completion. This leads to
+deadlock-free Petri nets in case of processes with ``reasonable''
+control flow and helps to find unwanted deadlocks occurring due
+wrong modeling. If, for example, the links of a process model are
+cyclic the generated Petri net will deadlock.
+
+In future versions of @acronym{BPEL2oWFN} these found deadlocks
+shall be mapped back into the @acronym{BPEL} code to highlight the
+``unreasonable'' activities (i.e. a cycle-closing link).
+
+@item @b{Unfoldings}. Due to the abstraction (high-level to
+low-level) of the patterns some places were unfolded: the place
+@samp{compScope} of Fig. 42--44. usually holding a token with a name
+of a scope is unfolded to @samp{compScope.@var{scopename}} and only
+merged with the @samp{ch_in}-place of that respective scope. In all
+other cases the places are ``converted'' to low-level places so the
+generated model completely abstracts from data.
+
+@item @b{Link semantics}. The generated Petri net model always
+generates @samp{negLink} places for structured activities
+independently of the presence of links. Anyway, the semantics is not
+changed since the resulting subnets are dead in this case.
+
+@item @b{Correlation sets}. Correlation sets are not implemented and
+are simply ignored during parsing.
 @end itemize
+
 
 
 
@@ -746,38 +796,47 @@ Trickovic, and Sanjiva Weerawarana. @b{Business Process Execution Language for
 Web Services, Version 1.1}. Technical report, BEA Systems, IBM, Microsoft, SAP,
 Siebel Systems. May 2003.
 
-@item [Hin05]
-Sebastian Hinz. @b{Implementation einer Petrinetz-Semantik f@"ur
-@acronym{BPEL4WS}} @i{(in German)}. Diplomarbeit, Humboldt-Universit@"at zu
-Berlin, March 2005.
+@item [SHS05]
+Sebastian Hinz, Karsten Schmidt, and Christian Stahl. @b{Transforming BPEL to
+Petri Nets}. In W.M.P. van der Aalst, B. Benatallah, F. Casati, and F. Curbera,
+editors, @i{Proceedings of the Third International Conference on Business
+Process Management (@acronym{BPM} 2005)}, pp. 220-235, Springer-Verlag
+(@acronym{LNCS} 3649), September 2005.@footnote{Tool available at @url{http://www.informatik.hu-berlin.de/top/bpel2pn}}
 
 @item [LoLA]
-Karsten Schmidt: @b{@acronym{LoLA}: A Low Level Analyser}. Manual. Available at
-@url{http://www.informatik.hu-berlin.de/top/lola/lola.html}.
+Karsten Schmidt: @b{@acronym{LoLA}: A Low Level Analyser}. Manual.
+@footnote{@url{http://www.informatik.hu-berlin.de/top/lola/doku.ps}}
 
 @item [Mar03]
 Axel Martens. @b{Verteilte Gesch@"aftsprozesse -- Modellierung und Verifikation
 mit Hilfe von Web Services} @i{(in German)}. PhD thesis, Humboldt-Universit@"at
 zu Berlin, Mathematisch-Naturwissenschaftliche Fakult@"at II, 2003.
 
+@item [MCK]
+Javier Esparza, Claus Schr@"oter, and Stefan Schwoon. @b{Model-Checking Kit}.
+@footnote{@url{http://www.fmi.uni-stuttgart.de/szs/tools/mckit}}
+
 @item [MRS05]
 Peter Massuthe, Wolfgang Reisig, and Karsten Schmidt. @b{An Operating Guideline
 Approach to the SOA}. Proceedings of the 2nd South-East European Workshop on
 Formal Methods 2005 (@acronym{SEEFM}05), Ohrid, Republic of Macedonia, 2005.
+@footnote{@url{http://www.informatik.hu-berlin.de/top/download/publications/MassutheReisigSchmidt-OGApproach.ps}}
 
 @item [Sch00]
 Karsten Schmidt: @b{@acronym{LoLA}: A Low Level Analyser}. In: Mogens Nielsen,
 and Dan Simpson, editors: @i{Application and Theory of Petri Nets, 21st
-International Conference (ICATPN 2000)}, pp. 465-474, Springer-Verlag (LNCS
-1825), June 2000.
+International Conference (@acronym{ICATPN} 2000)}, pp. 465-474, Springer-Verlag
+(@acronym{LNCS} 1825), June 2000.
 
 @item [Sta05]
 Christian Stahl. @b{A Petri Net Semantics for @acronym{BPEL}}.
 Informatik-Berichte 188, Humboldt-Universit@"at zu Berlin, July 2005.
+@footnote{@url{http://www.informatik.hu-berlin.de/Institut/struktur/systemanalyse/preprint/stahl188.pdf}}
 
 @item [Wei04]
 Daniela Weinberg. @b{Analyse der Bedienbarkeit}. Diplomarbeit,
 Humboldt-Universit@"at zu Berlin, October 2004.
+@footnote{@url{http://www.informatik.hu-berlin.de/top/download/publications/weinberg04.pdf}}
 
 @end table
 

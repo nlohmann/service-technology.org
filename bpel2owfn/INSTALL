@@ -69,7 +69,7 @@ follow these steps:
 
      to compile the executable binary as well as a documentation file.
 
-  5. Alternativly, you can run
+  5. Alternatively, you can run
 
           make check
 
@@ -123,12 +123,12 @@ ignored -- these warnings mostly occur in generated files from Flex,
 Bison or Kimwitu++ and are outside of our scope.
 
 The compilation of BPEL2oWFN was tested on several operating systems
-such as Microsoft Windows (running cygwin), Linux and Sun OS. Anyway,
+such as Microsoft Windows (running Cygwin), Linux and Sun OS. Anyway,
 if the compilation fails please make sure you use the most recent
 versions of the GNU Compiler Collection, Flex, Bison and Kimwitu++. If
 this does not help please send us an electronic mail to
 <nlohmann@informatik.hu-berlin.de>. Include the version number of your
-distribution (version 1.0 of 11 January 2006). Also include in your
+distribution (version 1.0 of 15 January 2006). Also include in your
 message the output that the make process produced. We will try to
 answer your mail within a week.
 
@@ -154,7 +154,7 @@ The generated Makefiles serve different targets:
      Generate documentation files in the given format which can be DVI,
      HTML, PDF or PostScript. The documentation is generated in the
      directory `bpel2owfn-1.0/doc' and is named `bpel2owfn.FORMAT'
-     (User's Manual) and `install.FORMAT' (Installation Manual), resp.
+     (User's Manual).
 
 `clean'
      Clean all temporary files created during the compilation.

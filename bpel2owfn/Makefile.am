@@ -31,6 +31,7 @@ hu-prepare: distclean
 	@echo   autoconf
 	@echo   autoheader
 	@echo   automake -a -c
+	@echo
 
 # target to create an executable that is independet of Cygwin
 pure-windows-executable: clean
@@ -39,9 +40,30 @@ pure-windows-executable: clean
 # targets to distribute the win32 executable
 win32distdir = $(distdir)-win32
 
-MINGWDISTFILES = src/$(PACKAGE)$(EXEEXT) doc/$(PACKAGE).pdf
+MINGWDISTFILES = src/$(PACKAGE)$(EXEEXT) doc/$(PACKAGE).pdf COPYING
 
 hu-win32dist: pure-windows-executable dvi pdf
 	$(mkdir_p) $(win32distdir)
+	@echo -e Copyright \(C\) 2005, 2006 Niels Lohmann, Christian Gierds and Dennis > $(win32distdir)/README
+	@echo -e Reinert. >> $(win32distdir)/README
+	@echo >> $(win32distdir)/README
+	@echo -e This is a binary distribution of BPEL2oWFN, a tool translating business >> $(win32distdir)/README
+	@echo -e processes described in BPEL to open workflow nets \(oWFN\). The sources >> $(win32distdir)/README
+	@echo -e of BPEL2oWFN can be downloaded from the website of BPEL2oWFN >> $(win32distdir)/README
+	@echo -e \(http://www.informatik.hu-berlin.de/top/tools4bpel/bpel2owfn\). >> $(win32distdir)/README
+	@echo >> $(win32distdir)/README
+	@echo -e BPEL2oWFN is free software\; you can redistribute it and/or modify it >> $(win32distdir)/README
+	@echo -e under the terms of the GNU General Public License as published by the >> $(win32distdir)/README
+	@echo -e Free Software Foundation\; either version 2 of the License, or \(at your >> $(win32distdir)/README
+	@echo -e option\) any later version. >> $(win32distdir)/README
+	@echo >> $(win32distdir)/README
+	@echo -e BPEL2oWFN is distributed in the hope that it will be useful, but >> $(win32distdir)/README
+	@echo -e WITHOUT ANY WARRANTY\; without even the implied warranty of >> $(win32distdir)/README
+	@echo -e MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU >> $(win32distdir)/README
+	@echo -e General Public License for more details. >> $(win32distdir)/README
+	@echo >> $(win32distdir)/README
+	@echo -e You should have received a copy of the GNU General Public License along >> $(win32distdir)/README
+	@echo -e with BPEL2oWFN\; if not, write to the Free Software Foundation, Inc., 51 >> $(win32distdir)/README
+	@echo -e Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. >> $(win32distdir)/README
 	cp $(MINGWDISTFILES) $(win32distdir)
 	zip -9 -m -r $(win32distdir).zip $(win32distdir)

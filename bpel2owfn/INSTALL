@@ -128,7 +128,7 @@ if the compilation fails please make sure you use the most recent
 versions of the GNU Compiler Collection, Flex, Bison and Kimwitu++. If
 this does not help please send us an electronic mail to
 <nlohmann@informatik.hu-berlin.de>. Include the version number of your
-distribution (version 1.0 of 15 January 2006). Also include in your
+distribution (version 1.0 of 16 January 2006). Also include in your
 message the output that the make process produced. We will try to
 answer your mail within a week.
 

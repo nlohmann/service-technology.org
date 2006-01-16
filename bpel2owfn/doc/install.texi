@@ -360,7 +360,7 @@ make install
 @end smallexample
 
 to copy the binary to the directory @file{/usr/local/bin} and to make the
-documentation accessible (i.e. copy it to @file{/usr/local/info}) for
+documentation accessible (i.e.@: copy it to @file{/usr/local/info}) for
 
 @smallexample
 info bpel2owfn
@@ -429,7 +429,7 @@ Clean all temporary files created during the compilation. Executables as well
 as generated documentation are preserved.
 
 @item distclean
-Clean everything that does not belong to the distribution, i.e. any file
+Clean everything that does not belong to the distribution, i.e.@: any file
 created during compilation. Executables as well as created documentation files
 are also removed. To re-compile you have to run @code{./configure} again.
 

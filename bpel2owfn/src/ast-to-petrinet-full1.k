@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/17 13:50:42 $
+ *          - last changed: \$Date: 2006/01/17 14:12:18 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.103 $
+ * \version \$Revision: 1.104 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -3507,16 +3507,18 @@ This=StandardElements(NiltTarget_list(), a) ->
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       Transition *t2 = TheNet->newTransition(prefix + "t2");
       Transition *t3 = TheNet->newTransition(prefix + "t3");
-      Transition *t4 = TheNet->newTransition(prefix + "t4");
+//      Transition *t4 = TheNet->newTransition(prefix + "t4");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p3);
       TheNet->newArc(p4, t2);
       TheNet->newArc(t2, p5);
       TheNet->newArc(p4, t3);
       TheNet->newArc(t3, p5);
-      TheNet->newArc(p5, t4);
-      TheNet->newArc(p6, t4);
-      TheNet->newArc(t4, p7);
+
+      stop(p5, "final", "", prefix);
+//      TheNet->newArc(p5, t4);
+//      TheNet->newArc(p6, t4);
+//      TheNet->newArc(t4, p7);
 
       foreach (link; tSource_list a)
       {
@@ -3556,8 +3558,8 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
 //      Place *p12 = TheNet->newPlace(prefix + "failed");
       Transition *t1 = TheNet->newTransition(prefix + "t1", string(This->joinCondition->name));
 //      Transition *t2 = TheNet->newTransition(prefix + "t2", "!(" + string(This->joinCondition->name) + ")");
-      Transition *t3 = TheNet->newTransition(prefix + "t3");
-      Transition *t4 = TheNet->newTransition(prefix + "t4");
+//      Transition *t3 = TheNet->newTransition(prefix + "t3");
+//      Transition *t4 = TheNet->newTransition(prefix + "t4");
       TheNet->newArc(t1, p6);
       TheNet->newArc(p8, t1); 
 
@@ -3569,12 +3571,15 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
 //      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t2); // new fault management
 //      TheNet->newArc(t2, TheNet->findPlace(currentScope + "!Active")); // newer fault management
 
-      TheNet->newArc(p8, t3);
-      TheNet->newArc(p9, t3);
-      TheNet->newArc(t3, p10);
-      TheNet->newArc(p9, t4);
-      TheNet->newArc(t4, p10);
-      TheNet->newArc(p11, t4);
+        stop(p8, "initial", "", prefix);
+	stop(p11, "p11", "", prefix);
+      
+//      TheNet->newArc(p8, t3);
+//      TheNet->newArc(p9, t3);
+//      TheNet->newArc(t3, p10);
+//      TheNet->newArc(p9, t4);
+//      TheNet->newArc(t4, p10);
+//      TheNet->newArc(p11, t4);
 
       int i = 1;
       foreach (link; tTarget_list a)
@@ -3619,15 +3624,17 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
 //      Place *p11 = TheNet->newPlace(prefix + "failed"); //new
       Transition *t1 = TheNet->newTransition(prefix + "t1", string(This->joinCondition->name));
       Transition *t2 = TheNet->newTransition(prefix + "t2", "!(" + string(This->joinCondition->name) + ")");
-      Transition *t3 = TheNet->newTransition(prefix + "t3");
+//      Transition *t3 = TheNet->newTransition(prefix + "t3");
       TheNet->newArc(t1, p6);
       TheNet->newArc(p8, t1);
       TheNet->newArc(p8, t2);
       TheNet->newArc(t2, p5);
       TheNet->newArc(t2, p7);
-      TheNet->newArc(p8, t3);
-      TheNet->newArc(p9, t3);
-      TheNet->newArc(t3, p10);
+//      TheNet->newArc(p8, t3);
+//      TheNet->newArc(p9, t3);
+//      TheNet->newArc(t3, p10);
+
+      stop(p8, "initial", "", prefix);
 
       int i = 1;
       foreach (link; tTarget_list a)
@@ -3671,8 +3678,8 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
       Transition *t3 = TheNet->newTransition(prefix + "t3");
       Transition *t4 = TheNet->newTransition(prefix + "t4");
       Transition *t5 = TheNet->newTransition(prefix + "t5", "!(" + string(This->joinCondition->name) + ")");
-      Transition *t6 = TheNet->newTransition(prefix + "t6");
-      Transition *t7 = TheNet->newTransition(prefix + "t7");
+//      Transition *t6 = TheNet->newTransition(prefix + "t6");
+//      Transition *t7 = TheNet->newTransition(prefix + "t7");
       TheNet->newArc(p9, t1);
       TheNet->newArc(t1, p10);
       TheNet->newArc(t2, p11);
@@ -3684,12 +3691,15 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
       TheNet->newArc(t5, p10);
       TheNet->newArc(t5, p13);
       TheNet->newArc(p16, t5);
-      TheNet->newArc(p14, t6);
-      TheNet->newArc(t6, p15);
-      TheNet->newArc(p16, t6);
-      TheNet->newArc(p13, t7);
-      TheNet->newArc(p14, t7);
-      TheNet->newArc(t7, p15);
+//      TheNet->newArc(p14, t6);
+//      TheNet->newArc(t6, p15);
+//      TheNet->newArc(p16, t6);
+//      TheNet->newArc(p13, t7);
+//      TheNet->newArc(p14, t7);
+//      TheNet->newArc(t7, p15);
+
+      stop(p16, "initial", "", prefix);
+      stop(p13, "final", "", prefix);
 
       int i = 1;
       foreach (link; tTarget_list a)
@@ -3750,9 +3760,9 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
       Transition *t3 = TheNet->newTransition(prefix + "t3");
       Transition *t4 = TheNet->newTransition(prefix + "t4");
 //      Transition *t5 = TheNet->newTransition(prefix + "t5", "!(" + string(This->joinCondition->name) + ")");
-      Transition *t6 = TheNet->newTransition(prefix + "t6");
-      Transition *t7 = TheNet->newTransition(prefix + "t7");
-      Transition *t8 = TheNet->newTransition(prefix + "t8");
+//      Transition *t6 = TheNet->newTransition(prefix + "t6");
+//      Transition *t7 = TheNet->newTransition(prefix + "t7");
+//      Transition *t8 = TheNet->newTransition(prefix + "t8");
       TheNet->newArc(p9, t1);
       TheNet->newArc(t1, p10);
       TheNet->newArc(t2, p11);
@@ -3770,15 +3780,19 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
 //      TheNet->newArc(t5, TheNet->findPlace(currentScope + "!Active")); // newer fault management
 //      TheNet->newArc(p16, t5);
 
-      TheNet->newArc(p14, t6);
-      TheNet->newArc(t6, p15);
-      TheNet->newArc(p16, t6);
-      TheNet->newArc(p17, t7);
-      TheNet->newArc(p14, t7);
-      TheNet->newArc(t7, p15);
-      TheNet->newArc(p13, t8);
-      TheNet->newArc(p14, t8);
-      TheNet->newArc(t8, p15);
+      stop(p16, "initial", "", prefix);
+      stop(p17, "p17", "", prefix);
+      stop(p13, "final", "", prefix);
+      
+//      TheNet->newArc(p14, t6);
+//      TheNet->newArc(t6, p15);
+//      TheNet->newArc(p16, t6);
+//      TheNet->newArc(p17, t7);
+//      TheNet->newArc(p14, t7);
+//      TheNet->newArc(t7, p15);
+//      TheNet->newArc(p13, t8);
+//      TheNet->newArc(p14, t8);
+//      TheNet->newArc(t8, p15);
 
       int i = 1;
       foreach (link; tTarget_list a)

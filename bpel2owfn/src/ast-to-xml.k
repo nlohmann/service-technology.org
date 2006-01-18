@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/01/12 11:39:16 $
+ *          - last changed: \$Date: 2006/01/18 15:30:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
  */
 %}
 
@@ -424,11 +424,11 @@ Scope(a,b,c,d,e,f,g) ->
 ******************************************************************************/
 
 Target() ->
-  [xml: { in(); } "<target />\n"]
+  [xml: { in(); } "<target ncf=\"" $0->negativeControlFlow "\" />\n"]
 ;
 
 Source() ->
-  [xml: { in(); } "<source dpe=\"" $0->dpe "\" />\n"]
+  [xml: { in(); } "<source dpe=\"" $0->dpe "\" ncf=\"" $0->negativeControlFlow "\" />\n"]
 ;
 
 

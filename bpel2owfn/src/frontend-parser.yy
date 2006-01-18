@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/01/17 14:06:21 $
+ *          - last changed: \$Date: 2006/01/18 15:30:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit� zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.95 $
+ * \version \$Revision: 1.96 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -382,21 +382,26 @@ activity:
       $$->negativeControlFlow = $1->negativeControlFlow; }
 | tFlow
     { $$ = activityFlow($1); $$->id = $1->id; 
+      $$->dpe = $1->dpe;
       $$->negativeControlFlow = $1->negativeControlFlow; }
 | tSwitch
     { $$ = activitySwitch($1); $$->id = $1->id; 
+      $$->dpe = $1->dpe;
       $$->negativeControlFlow = $1->negativeControlFlow; }
 | tWhile
     { $$ = activityWhile($1); $$->id = $1->id; 
       $$->negativeControlFlow = $1->negativeControlFlow; }
 | tSequence
     { $$ = activitySequence($1); $$->id = $1->id; 
+      $$->dpe = $1->dpe;
       $$->negativeControlFlow = $1->negativeControlFlow; }
 | tPick
     { $$ = activityPick($1); $$->id = $1->id; 
+      $$->dpe = $1->dpe;
       $$->negativeControlFlow = $1->negativeControlFlow; }
 | tScope
     { $$ = activityScope($1); $$->id = $1->id; 
+      $$->dpe = $1->dpe;
       $$->negativeControlFlow = $1->negativeControlFlow; }
 | tCompensate
     { $$ = activityCompensate($1); $$->id = $1->id; 
@@ -2426,11 +2431,13 @@ tTarget:
   K_TARGET arbitraryAttributes X_NEXT X_SLASH K_TARGET
     { att.check($2, K_TARGET);
       $$ = Target();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->linkName = att.read($2, "linkName"); 
       $$->linkID = symMan.checkLink($$->linkName->name, false); }
 | K_TARGET arbitraryAttributes X_SLASH
     { att.check($2, K_TARGET);
       $$ = Target();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->linkName = att.read($2, "linkName"); 
       $$->linkID = symMan.checkLink($$->linkName->name, false); }
 ;
@@ -2456,6 +2463,7 @@ tSource:
       symMan.addDPEend();
       $$->dpe = symMan.needsDPE();
       symMan.remDPEend();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
     }
 | K_SOURCE arbitraryAttributes X_SLASH
     { att.check($2, K_SOURCE);
@@ -2466,6 +2474,7 @@ tSource:
       symMan.addDPEend();
       $$->dpe = symMan.needsDPE();
       symMan.remDPEend();
+      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
     }
 ;
 

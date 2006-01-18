@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/01/13 14:56:13 $
+ *          - last changed: \$Date: 2006/01/18 15:30:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.47 $
+ * \version \$Revision: 1.48 $
  */
 %}
 
@@ -115,7 +115,15 @@ activity:
 | activityCompensate(tCompensate)
   {
     integer id;
+
+    /** 
+     * 0 = positive control flow
+     * 1 = control flow in fault handler
+     * 2 = control flow in compensation handler
+     */
     integer negativeControlFlow;
+    
+    integer dpe;
   }
 ;
 
@@ -786,6 +794,9 @@ tTarget:
 
     /// additional attribute containing the unique link name
     casestring linkID;
+
+    /// used here to create the patterns
+    integer negativeControlFlow;
   }
 ;
 
@@ -808,5 +819,8 @@ tSource:
 
     /// additional attribute for DPE
     integer dpe = mkinteger(0);
+
+    /// used here to create the patterns
+    integer negativeControlFlow;
   }
 ;

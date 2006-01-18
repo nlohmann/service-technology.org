@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/18 10:34:44 $
+ *          - last changed: \$Date: 2006/01/18 10:52:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.107 $
+ * \version \$Revision: 1.108 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -2211,7 +2211,7 @@ This=Assign(a,b) ->
 	copyCount++;
       }
 
-      TheNet->mergePlaces(p3, lastPlace);
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "final"), lastPlace);
             
       trace(TRACE_DEBUG, "[PNU]\t</assign>\n");
     }

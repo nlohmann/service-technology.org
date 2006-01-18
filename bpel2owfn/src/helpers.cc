@@ -28,18 +28,18 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/01/11 09:40:48 $
+ *          - last changed: \$Date: 2006/01/18 11:38:22 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.35 $
+ * \version \$Revision: 1.36 $
  *
  */
 
@@ -166,17 +166,12 @@ void print_help()
  */
 void print_version(std::string name)
 {
-  trace("\n");
-  trace(std::string(PACKAGE_STRING) + "\n");
-  trace("---------------------\n");
+  trace(std::string(PACKAGE_STRING) + " -- ");
   trace("Translating BPEL Processes to Open Workflow Nets\n");
   trace("\n");
-  trace("Written by Niels Lohmann, Christian Gierds and Dennis Reinert\n");
-  trace("\n");
   trace("Copyright (C) 2005, 2006 Niels Lohmann, Christian Gierds and Dennis Reinert\n");
-  trace("This is free software; see the source for copying conditions.  There is NO\n");
+  trace("This is free software; see the source for copying conditions. There is NO\n");
   trace("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
-  trace("\n");
 }
 
 

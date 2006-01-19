@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/19 13:43:04 $
+ *          - last changed: \$Date: 2006/01/19 14:40:18 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.112 $
+ * \version \$Revision: 1.113 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -494,7 +494,7 @@ StopInProcess() ->
       Place *p15 = TheNet->newPlace(prefix + "rethrow");
       Place *p16 = TheNet->newPlace(prefix + "Ended");
       Place *p17 = TheNet->newPlace(prefix + "Compensated");
-      Place *p18 = TheNet->newPlace(prefix + "p18");
+//      Place *p18 = TheNet->newPlace(prefix + "p18");
       Place *p19 = TheNet->newPlace(prefix + "p19");
       Place *p20 = TheNet->newPlace(prefix + "!Ended");
       Place *p21 = TheNet->newPlace(prefix + "stop");
@@ -565,13 +565,12 @@ StopInProcess() ->
       //TheNet->newArc(p5, t10, "x");
       TheNet->newArc(ch_fault_in, t10, "x");
       TheNet->newArc(p17, t10, READ);
-      TheNet->newArc(t10, p18, "x");
-
-      Transition *t11 = TheNet->newTransition(prefix + "t11");
-      TheNet->newArc(p18, t11, "x");
-      TheNet->newArc(p20, t11);
-      TheNet->newArc(t11, p19, "x");
-      TheNet->newArc(t11, p23);
+//      TheNet->newArc(t10, p18, "x");
+//      Transition *t11 = TheNet->newTransition(prefix + "t11");
+//      TheNet->newArc(p18, t11, "x");
+      TheNet->newArc(p20, t10);
+      TheNet->newArc(t10, p19, "x");
+      TheNet->newArc(t10, p23);
 
       Transition *t12 = TheNet->newTransition(prefix + "t12");
       TheNet->newArc(p19, t12, "x");
@@ -719,13 +718,12 @@ StopInScope() ->
 //      TheNet->newArc(p10, t14, "x");
       TheNet->newArc(ch_fault_in, t14, "x");
       TheNet->newArc(p24, t14, READ);
-      TheNet->newArc(t14, p25, "x");
-
-      Transition *t15 = TheNet->newTransition(prefix + "t15");
-      TheNet->newArc(p25, t15, "x");
-      TheNet->newArc(t15, p26, "x");
-      TheNet->newArc(p28, t15);
-      TheNet->newArc(t15, p31);
+//      TheNet->newArc(t14, p25, "x");
+//      Transition *t15 = TheNet->newTransition(prefix + "t15");
+//      TheNet->newArc(p25, t15, "x");
+      TheNet->newArc(t14, p26, "x");
+      TheNet->newArc(p28, t14);
+      TheNet->newArc(t14, p31);
 
       Transition *t16 = TheNet->newTransition(prefix + "t16");
       TheNet->newArc(t16, p22);

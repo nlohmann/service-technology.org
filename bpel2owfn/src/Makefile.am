@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/01/15 18:18:20 $ by $Author: nlohmann $.
-# Version $Revision: 1.5 $
+# File last changed $Date: 2006/01/19 15:04:13 $ by $Author: gierds $.
+# Version $Revision: 1.6 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -32,7 +32,8 @@ YYSOURCES = bpel-syntax.h bpel-syntax.cc bpel-lexic.cc
 
 # everything about the Kimwitu++ sources
 KCDUMMY = bpel-kc-dummy.cc
-KCFILES = bpel-abstract.k bpel-unparse-petri.k bpel-unparse-xml.k
+KCFILES = bpel-abstract.k bpel-unparse-petri.k bpel-unparse-xml.k \
+	  bpel-unparse-cfg.k
 KCGENERATED = bpel-kc-csgiok bpel-kc-k bpel-kc-rk bpel-kc-unpk
 KCSOURCES = $(KCFILES:.k=.cc) \
 	    $(KCFILES:.k=.h) \
@@ -55,7 +56,8 @@ bpel2owfn_SOURCES = $(KCDUMMY)\
 		    exception.cc exception.h\
 		    helpers.cc helpers.h\
 		    main.cc main.h\
-		    petrinet.cc petrinet.h
+		    petrinet.cc petrinet.h\
+		    cfg.cc cfg.h
 
 # the list of generated files which do not belong to the distribution
 nodist_bpel2owfn_SOURCES = $(KCSOURCES)

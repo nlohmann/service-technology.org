@@ -28,18 +28,18 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/01/18 11:38:22 $
+ *          - last changed: \$Date: 2006/01/19 15:23:00 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.36 $
+ * \version \$Revision: 1.37 $
  *
  */
 
@@ -418,7 +418,7 @@ void parse_command_line(int argc, char* argv[])
       /// set dot filename
       dot_filename = dotti_file.c_str();
       /// create dot file and point to it
-      dot_output = new std::ofstream(dotti_file.c_str(), std::ofstream::out | std::ofstream::trunc);
+      dot_output = new std::ofstream(dotti_file.c_str(), std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
     }
 
     // if wanted, create a LoLA output file
@@ -440,7 +440,7 @@ void parse_command_line(int argc, char* argv[])
       /// set lola filename
       lola_filename = lola_file.c_str();
       /// create lola file and point to it
-      lola_output = new std::ofstream(lola_file.c_str(), std::ofstream::out | std::ofstream::trunc);
+      lola_output = new std::ofstream(lola_file.c_str(), std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
     }
 
     // if wanted, create a oWFN output file
@@ -462,7 +462,7 @@ void parse_command_line(int argc, char* argv[])
       /// set owfn filename
       owfn_filename = owfn_file.c_str();
       /// create owfn file and point to it
-      owfn_output = new std::ofstream(owfn_file.c_str(), std::ofstream::out | std::ofstream::trunc);
+      owfn_output = new std::ofstream(owfn_file.c_str(), std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
     }
 
     // create info file for Petri Net
@@ -484,7 +484,7 @@ void parse_command_line(int argc, char* argv[])
       /// set info filename
       info_filename = info_file.c_str();
       /// create info file and point to it
-      info_output = new std::ofstream(info_file.c_str(), std::ofstream::out | std::ofstream::trunc);
+      info_output = new std::ofstream(info_file.c_str(), std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
     }
   }
   else

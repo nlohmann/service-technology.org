@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/01/19 13:35:26 $
+ *          - last changed: \$Date: 2006/01/19 17:44:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
  */
 %}
 
@@ -83,6 +83,9 @@ tProcess:
     casestring enableInstanceCompensation = mkcasestring("no");
     casestring abstractProcess = mkcasestring("no");
     casestring xmlns = mkcasestring("http://schemas.xmlsoap.org/ws/2003/03/business-process/");
+
+    /// has this process an event handler?
+    bool hasEH;
 
     integer id;
   }
@@ -210,7 +213,7 @@ tCatchAll:
 
 tEventHandlers:
   implicitEventHandler()
-| EventHandler(tOnMessage_list tOnAlarm_list)
+| userDefinedEventHandler(tOnMessage_list tOnAlarm_list)
   {
     integer parentScopeId;
   }

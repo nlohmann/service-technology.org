@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/01/19 13:35:26 $
+ *          - last changed: \$Date: 2006/01/19 17:44:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.97 $
+ * \version \$Revision: 1.98 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -317,7 +317,8 @@ tProcess:
       $$->xmlns = att.read($3, "xmlns", $$->xmlns);
       isInFH.pop();
       isInCH.pop();
-      $$->id = $3; }
+      $$->id = $3;
+      $$->hasEH = (string($13->op_name()) == "userDefinedEventHandler"); }
 ;
 
 /* import other namespaces */
@@ -704,7 +705,7 @@ tEventHandlers:
   tOnMessage_list 
   tOnAlarm_list 
   X_SLASH K_EVENTHANDLERS X_NEXT
-    { $$ = EventHandler($4, $5);
+    { $$ = userDefinedEventHandler($4, $5);
       $$->parentScopeId = currentScopeId; 
       symMan.endDPEinWhile();
     }

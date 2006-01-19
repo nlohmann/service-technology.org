@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/18 10:52:05 $
+ *          - last changed: \$Date: 2006/01/19 11:48:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.108 $
+ * \version \$Revision: 1.109 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -2829,14 +2829,18 @@ This=activitySequence(Sequence(a,b)) ->
       trace(TRACE_DEBUG, "[PNU]\t<sequence>\n");
       string prefix = intToString(This->id->value) + ".internal.";
 
-      Place *p1  = TheNet->newPlace(prefix + "negLink"); //DPE//
       Place *p2  = TheNet->newPlace(prefix + "initial");
       Place *p9  = TheNet->newPlace(prefix + "final");
       Place *p10 = TheNet->newPlace(prefix + "stop");
       Place *p11 = TheNet->newPlace(prefix + "stopped");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(p1, t1);
+      // DPE
+      if (This->dpe == mkinteger(1))
+      {
+	Place *p1  = TheNet->newPlace(prefix + "negLink");
+	Transition *t1 = TheNet->newTransition(prefix + "t1");
+	TheNet->newArc(p1, t1);
+      }
     }
     a // standardElements for this activity
     b // inner activities
@@ -2854,7 +2858,10 @@ This=activitySequence(Sequence(a,b)) ->
 	if (activityCount == b->length())
 	  TheNet->mergePlaces(This, ".internal.final", innerActivity, ".final");
 	
-	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".negLink")); //DPE//
+	// DPE
+	if (This->dpe == mkinteger(1) && innerActivity->dpe == mkinteger(1))
+	  TheNet->newArc(TheNet->findTransition(prefix + "t1"), TheNet->findPlace(innerActivity, ".negLink"));
+	
 	TheNet->mergePlaces(This, ".internal.stop", innerActivity, ".stop");
 	TheNet->mergePlaces(This, ".internal.stopped", innerActivity, ".stopped");
 	
@@ -3321,7 +3328,6 @@ This=StandardElements(NiltTarget_list(), a) ->
     {
       trace(TRACE_DEBUG, "[PNU]\tFig. 22\n");
       string prefix = intToString(This->parentId->value) + "."; 
-      Place *p1 = TheNet->newPlace(prefix + "negLink");
       Place *p2 = TheNet->newPlace(prefix + "initial");
       Place *p3 = TheNet->newPlace(prefix + "p3");
       Place *p4 = TheNet->newPlace(prefix + "p4");
@@ -3329,9 +3335,14 @@ This=StandardElements(NiltTarget_list(), a) ->
       Place *p6 = TheNet->newPlace(prefix + "stop");
       Place *p7 = TheNet->newPlace(prefix + "stopped");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(t1, p3);
+      if (This->dpe == mkinteger(1))
+      {
+	Place *p1 = TheNet->newPlace(prefix + "negLink");
+	Transition *t1 = TheNet->newTransition(prefix + "t1");
+	TheNet->newArc(p1, t1);
+	if (TheNet->findPlace(intToString(This->parentId->value) + ".internal.negLink") != NULL)
+	  TheNet->newArc(t1, p3);
+      }
 
       Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p4, t2);
@@ -3347,8 +3358,13 @@ This=StandardElements(NiltTarget_list(), a) ->
       {
 	Place *p8 = TheNet->findPlace("!link." + string(link->linkID->name));
 	Place *p10 = TheNet->findPlace("link." + string(link->linkID->name));
-	TheNet->newArc(p8, t1);
-	TheNet->newArc(t1, p10, "false");
+
+	if (This->dpe == mkinteger(1))
+	{
+	  TheNet->newArc(p8, TheNet->findTransition(prefix + "t1"));
+	  TheNet->newArc(TheNet->findTransition(prefix + "t1"), p10, "false");
+	}
+
 	TheNet->newArc(p8, t2);
 	TheNet->newArc(t2, p10, string(link->transitionCondition->name));
 	TheNet->newArc(p10, t3, READ);
@@ -3370,22 +3386,31 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
     {
       trace(TRACE_DEBUG, "[PNU]\tFig. 23\n");
       string prefix = intToString(This->parentId->value) + ".";
-      Place *p5  = TheNet->newPlace(prefix + "negLink");
       Place *p6  = TheNet->newPlace(prefix + "p6");
       Place *p7  = TheNet->newPlace(prefix + "final");
       Place *p8  = TheNet->newPlace(prefix + "initial");
       Place *p9  = TheNet->newPlace(prefix + "stop");
       Place *p10 = TheNet->newPlace(prefix + "stopped");
       Place *p11 = TheNet->newPlace(prefix + "p11");
-
+      
       Transition *t1 = TheNet->newTransition(prefix + "t1", string(This->joinCondition->name));
       TheNet->newArc(t1, p6);
       TheNet->newArc(p8, t1); 
 
-      throwFault(p8, p11, "!(" + string(This->joinCondition->name) + ")", "initial", "", prefix, This->negativeControlFlow);
+      Transition *t2 = TheNet->newTransition(prefix + "t2", "!(" + string(This->joinCondition->name) + ")");
+      TheNet->newArc(p8, t2);
+      TheNet->newArc(t2, p7);
 
-      stop(p8, "initial", "", prefix);
-      stop(p11, "p11", "", prefix);
+      if (TheNet->findPlace(intToString(This->parentId->value) + ".internal.negLink") != NULL)
+      {
+	Place *p5  = TheNet->newPlace(intToString(This->parentId->value) + ".internal.negLink");
+	TheNet->newArc(t2, p5);
+	TheNet->mergePlaces(p5,  TheNet->findPlace(prefix + ".negLink"));
+      }
+      
+      throwFault(p8, p11, "!(" + string(This->joinCondition->name) + ")", "initial", "", prefix, This->negativeControlFlow); // t2
+      stop(p8, "initial", "", prefix);	// t3
+      stop(p11, "p11", "", prefix);	// t4
       
       int i = 1;
       foreach (link; tTarget_list a)
@@ -3393,6 +3418,7 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
 	Place *p1 = TheNet->findPlace("!link." + string(link->linkID->name));
 	Place *p3 = TheNet->findPlace("link." + string(link->linkID->name));
 	TheNet->newArc(t1, p1);
+	TheNet->newArc(t2, p1);	
 	TheNet->newArc(p3, t1, "b" + intToString(i));
 
 	Transition* faultTransition = TheNet->findTransition(prefix + "throwFault.initial");
@@ -3401,10 +3427,9 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
 
 	i++;
       }
-
+      
       // embed activity X
       prefix = intToString(This->parentId->value) + ".internal";
-      TheNet->mergePlaces(p5,  TheNet->findPlace(prefix + ".negLink"));
       TheNet->mergePlaces(p6,  TheNet->findPlace(prefix + ".initial"));
       TheNet->mergePlaces(p7,  TheNet->findPlace(prefix + ".final"));
       TheNet->mergePlaces(p9,  TheNet->findPlace(prefix + ".stop"));
@@ -3442,6 +3467,7 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
 	Place *p1 = TheNet->findPlace("!link." + string(link->linkID->name));
 	Place *p3 = TheNet->findPlace("link." + string(link->linkID->name));
 	TheNet->newArc(t1, p1);
+	TheNet->newArc(t2, p1);
 	TheNet->newArc(p3, t1, "b" + intToString(i));
 	TheNet->newArc(p3, t2, "b" + intToString(i));
 	i++;

@@ -34,14 +34,14 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/01/18 15:30:12 $
+ *          - last changed: \$Date: 2006/01/19 13:35:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universitï¿½ zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.96 $
+ * \version \$Revision: 1.97 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -150,6 +150,9 @@ map <integer, integer> parent;
 
 /// the root of the abstract syntax tree
 tProcess TheProcess;
+
+/// needed to find out if a FH has a <catchAll> element
+bool hasCatchAll = false;
 
 /// stack for checking for FaultHandler
 stack<bool> isInFH;
@@ -555,6 +558,7 @@ tFaultHandlers:
     { $$ = implicitFaultHandler();
       $$->inProcess = inProcess;
       $$->parentScopeId = currentScopeId; 
+      $$->hasCatchAll = false;
     }
 | K_FAULTHANDLERS X_NEXT 
     {
@@ -570,6 +574,7 @@ tFaultHandlers:
       $$->inProcess = (currentScopeId->value == 1);
       inProcess = false; // hack!
       $$->parentScopeId = currentScopeId;
+      $$->hasCatchAll = hasCatchAll;
       isInFH.pop();
       hasCompensate = 0;
       symMan.endDPEinWhile();
@@ -594,9 +599,11 @@ tCatch:
 
 tCatchAll:
   /* empty */
-    { $$ = NoCatchAll(); }
+    { hasCatchAll = false;
+      $$ = NoCatchAll(); }
 | K_CATCHALL arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CATCHALL X_NEXT
-    { $$ = CatchAll($4);
+    { hasCatchAll = true;
+      $$ = CatchAll($4);
       $$->faultName = att.read($2, "faultName");
       $$->faultVariable = att.read($2, "faultVariable");
       // $$->variableID = symMan.checkVariable(att.read($2, "faultVariable")->name, true); 
@@ -1056,6 +1063,7 @@ tInvoke:
         tInvoke invoke = Invoke(se, $7);
         activity ai = activityInvoke(invoke);
         tFaultHandlers fh = userDefinedFaultHandler($8, $9);
+        fh->hasCatchAll = hasCatchAll;
         tEventHandlers eh = implicitEventHandler();
         tScope scope = Scope($6, NiltVariable_list(), fh, $10, eh, StopInScope(), ai);
 

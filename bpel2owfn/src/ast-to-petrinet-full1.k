@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/19 11:48:23 $
+ *          - last changed: \$Date: 2006/01/19 13:04:20 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.109 $
+ * \version \$Revision: 1.110 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -3559,6 +3559,7 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
     }
   ]
 ;
+
 
 This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("no")) ->
   [petrinet:

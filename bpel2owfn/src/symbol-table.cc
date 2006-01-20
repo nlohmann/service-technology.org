@@ -35,4 +35,36 @@
  */ 
 
 #include "symbol-table.h"
+#include "bpel-attributes.h"
+#include "bpel-syntax.h"
+#include "debug.h"
 
+/********************************************
+ * implementation of SymbolTable CLASS
+ ********************************************/
+
+/*!
+ * constructor
+ */
+SymbolTable::SymbolTable()
+{
+  this->symTab.clear();
+  this->entryId = 0;
+}
+
+/*!
+ * increase the entryId of the SymbolTable 
+ */
+kc::integer SymbolTable::nextId()
+{
+  this->entryId++;
+  return kc::mkinteger(this->entryId);
+}
+
+/*!
+ * 
+ */
+void SymbolTable::insert()
+{
+	
+}

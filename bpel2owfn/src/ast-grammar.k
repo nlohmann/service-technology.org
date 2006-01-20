@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/01/19 17:44:59 $
+ *          - last changed: \$Date: 2006/01/20 07:47:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-abstract.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  */
 %}
 
@@ -765,6 +765,9 @@ tScope:
 
     /// additional attribute for DPE
     integer dpe = mkinteger(0);
+
+    /// has this scope an event handler?
+    bool hasEH;    
   }
 ;
 

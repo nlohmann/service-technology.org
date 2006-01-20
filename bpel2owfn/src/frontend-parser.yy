@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/01/19 17:44:59 $
+ *          - last changed: \$Date: 2006/01/20 07:47:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.98 $
+ * \version \$Revision: 1.99 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -1112,6 +1112,7 @@ tInvoke:
         invoke->negativeControlFlow = mkinteger(0);
         scope->id = $6->parentId = $2; 
         invoke->id = ai->id = se->parentId = att.nextId();
+        scope->hasEH = false;
         currentScopeId = scope->parentScopeId = parent[$2];
 
         $$ = activity(activityScope(scope));
@@ -2394,6 +2395,7 @@ tScope:
       $$->id = $6->parentId = $2;
       $$->parentScopeId = currentScopeId = parent[$2];
       $$->dpe = symMan.needsDPE();
+      $$->hasEH = (string($12->op_name()) == "userDefinedEventHandler");
       if ($6->dpe->value > 0)
       {
         symMan.addDPEend();

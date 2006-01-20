@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/20 07:47:59 $
+ *          - last changed: \$Date: 2006/01/20 08:49:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.114 $
+ * \version \$Revision: 1.115 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -400,7 +400,7 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       TheNet->mergePlaces("1.internal.scopeCompensated", "1.internal.compensationHandler.scopeCompensated");
       TheNet->mergePlaces("1.internal.p34",              "1.internal.compensationHandler.clean");
       TheNet->mergePlaces("1.internal.p35",              "1.internal.compensationHandler.cleaned");
-      TheNet->mergePlaces("1.internal.upperFH",          "1.internal.compensationHandler.failed");
+//      TheNet->mergePlaces("1.internal.upperFH",          "1.internal.compensationHandler.failed");
 //      TheNet->mergePlaces("1.internal.compScope",        "1.internal.compensationHandler.compScope");
       TheNet->mergePlaces("1.internal.ch_out",           "1.internal.compensationHandler.ch_out");
       //TheNet->mergePlaces("1.internal.compensated",      "1.internal.compensationHandler.compensated");
@@ -1664,13 +1664,16 @@ This=implicitCompensationHandler() ->
       Place *p18 = TheNet->newPlace(prefix + "scopeCompensated");
 //      Place *p19 = TheNet->newPlace(prefix + "compScope");
       Place *p24 = TheNet->newPlace(prefix + "clean");
-      Place *p25 = TheNet->newPlace(prefix + "failed");
+//      Place *p25 = TheNet->newPlace(prefix + "failed");
       
-      Transition *t1  = TheNet->newTransition(prefix + "t1", "scope=s");
-      TheNet->newArc(t1, p1); 
-      TheNet->newArc(p2, t1, "s");
-      TheNet->newArc(p3, t1, READ);
-      TheNet->newArc(t1, p25, "fault");
+//      Transition *t1  = TheNet->newTransition(prefix + "t1", "scope=s");
+//      TheNet->newArc(t1, p1); 
+//      TheNet->newArc(p2, t1, "s");
+//      TheNet->newArc(p3, t1, READ);
+//      TheNet->newArc(t1, p25, "fault");
+
+      throwFault(p2, p1, "scope=s", "ch_in", "s", prefix, mkinteger(2)); // t1
+      TheNet->newArc(p3, TheNet->findPlace(prefix + "throwFault.ch_in"), READ);
 
       Transition *t2  = TheNet->newTransition(prefix + "t2", "scope=s");
       TheNet->newArc(p2, t2, "s");
@@ -1784,14 +1787,17 @@ This=userDefinedCompensationHandler(innerActivity) ->
       Place *p17 = TheNet->newPlace(prefix + "ch_out");
 //      Place *p19 = TheNet->newPlace(prefix + "compScope");
       Place *p24 = TheNet->newPlace(prefix + "clean");
-      Place *p25 = TheNet->newPlace(prefix + "failed");
+//      Place *p25 = TheNet->newPlace(prefix + "failed");
       
-      Transition *t1  = TheNet->newTransition(prefix + "t1", "scope=s");
-      TheNet->newArc(t1, p1);
-      TheNet->newArc(p2, t1, "s");
-      TheNet->newArc(p3, t1, READ);
-      TheNet->newArc(t1, p25, "fault");
+//      Transition *t1  = TheNet->newTransition(prefix + "t1", "scope=s");
+//      TheNet->newArc(t1, p1);
+//      TheNet->newArc(p2, t1, "s");
+//      TheNet->newArc(p3, t1, READ);
+//      TheNet->newArc(t1, p25, "fault");
 
+      throwFault(p2, p1, "scope=s", "ch_in", "s", prefix, mkinteger(2)); // t1
+      TheNet->newArc(p3, TheNet->findPlace(prefix + "throwFault.ch_in"), READ);
+      
       Transition *t2  = TheNet->newTransition(prefix + "t2", "scope=s");
       TheNet->newArc(p2, t2, "s");
       TheNet->newArc(p4, t2, READ);
@@ -3245,7 +3251,7 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->mergePlaces(prefix + "scopeCompensated", prefix2 + "compensationHandler.scopeCompensated");
       TheNet->mergePlaces(prefix + "p39",              prefix2 + "compensationHandler.clean");
       TheNet->mergePlaces(prefix + "p40",              prefix2 + "compensationHandler.cleaned");
-      TheNet->mergePlaces(prefix + "p6",               prefix2 + "compensationHandler.failed");
+//      TheNet->mergePlaces(prefix + "p6",               prefix2 + "compensationHandler.failed");
 //      TheNet->mergePlaces(prefix + "compScope",        prefix2 + "compensationHandler.compScope");
       TheNet->mergePlaces(prefix + "p50",              prefix2 + "compensationHandler.ch_out");
       TheNet->mergePlaces(prefix + "compensated",      prefix2 + "compensationHandler.compensated");

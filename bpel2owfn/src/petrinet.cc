@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/01/10 10:20:33 $
+ *          - last changed: \$Date: 2006/01/20 09:31:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.74 $
+ * \version \$Revision: 1.75 $
  */
 
 
@@ -813,8 +813,8 @@ PetriNet::lolaOut ()
 
   removeInterface ();
 
-  (*lola_output) << "{ Petri net created by BPEL2oWFN reading " << filename <<
-    " }" << endl << endl;
+  (*lola_output) << "{ Petri net created by " << PACKAGE_STRING <<
+    " reading " << filename << " }" << endl << endl;
 
   // places
   (*lola_output) << "PLACE" << endl;
@@ -913,16 +913,34 @@ PetriNet::owfnOut ()
   if (!lowLevel)
     makeLowLevel ();
 
-  (*owfn_output) << "{ oWFN created by BPEL2oWFN reading " << filename << " }"
-    << endl << endl;
+  (*owfn_output) << "{ oWFN created by " << PACKAGE_STRING <<
+    " reading " << filename << " }" << endl << endl;
 
   // places
   (*owfn_output) << "PLACE" << endl;
 
-  // input places
-  (*owfn_output) << "  INPUT" << endl;
+  // internal places
+  (*owfn_output) << "  INTERNAL" << endl;
   unsigned int count = 1;
   string comment;
+  for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
+    {
+      if ((*p)->type == INTERNAL)
+	{
+	  if (count == 1)
+	    (*owfn_output) << "    p" << (*p)->id;
+	  else
+	    (*owfn_output) << ", " << comment << "    p" << (*p)->id;
+
+	  comment = "\t\t { " + (*(*p)->history.begin ()) + " }\n";
+	  count++;
+	}
+    }
+  (*owfn_output) << "; " << comment << endl;
+
+  // input places
+  (*owfn_output) << "  INPUT" << endl;
+  count = 1;
   for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
     {
       if ((*p)->type == IN)
@@ -944,24 +962,6 @@ PetriNet::owfnOut ()
   for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
     {
       if ((*p)->type == OUT)
-	{
-	  if (count == 1)
-	    (*owfn_output) << "    p" << (*p)->id;
-	  else
-	    (*owfn_output) << ", " << comment << "    p" << (*p)->id;
-
-	  comment = "\t\t { " + (*(*p)->history.begin ()) + " }\n";
-	  count++;
-	}
-    }
-  (*owfn_output) << "; " << comment << endl;
-
-  // internal places
-  (*owfn_output) << "  INTERNAL" << endl;
-  count = 1;
-  for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
-    {
-      if ((*p)->type == INTERNAL)
 	{
 	  if (count == 1)
 	    (*owfn_output) << "    p" << (*p)->id;

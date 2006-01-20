@@ -40,14 +40,14 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/01/10 10:14:22 $
+ *          - last changed: \$Date: 2006/01/20 09:31:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *          
- * \version \$Revision: 1.45 $
+ * \version \$Revision: 1.46 $
  */
 
 
@@ -68,6 +68,7 @@
 #include "debug.h"		// debugging help
 #include "helpers.h"		// helper functions
 #include "exception.h"		// exception class
+#include "bpel2owfn.h"
 
 using namespace std;
 

@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/19 14:40:18 $
+ *          - last changed: \$Date: 2006/01/20 07:47:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.113 $
+ * \version \$Revision: 1.114 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -289,11 +289,6 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       Place *process_p20 = TheNet->newPlace(prefix + "p20");
       Place *process_p21 = TheNet->newPlace(prefix + "p21");
       Place *process_p22 = TheNet->newPlace(prefix + "p22");
-      Place *process_p23 = TheNet->newPlace(prefix + "p23");
-      Place *process_p24 = TheNet->newPlace(prefix + "p24");
-      Place *process_p25 = TheNet->newPlace(prefix + "p25");
-      Place *process_p26 = TheNet->newPlace(prefix + "p26");
-      Place *process_p27 = TheNet->newPlace(prefix + "p27");
       Place *process_p33 = TheNet->newPlace(prefix + "p33");
       Place *process_p34 = TheNet->newPlace(prefix + "p34");
       Place *process_p35 = TheNet->newPlace(prefix + "p35");
@@ -317,10 +312,6 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       Transition *process_loop =  TheNet->newTransition(prefix + "finishloop"); // added so that all deadlocks are evil!
       TheNet->newArc(process_p39, process_loop, READ);
       
-      Transition *process_t1 =  TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(process_p27, process_t1);
-      TheNet->newArc(process_t1,  process_p34);
-
       Transition *process_t2 =  TheNet->newTransition(prefix + "t2");
       TheNet->newArc(process_p1,  process_t2);
       TheNet->newArc(process_t2,  process_p7);
@@ -330,31 +321,51 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       TheNet->newArc(process_t2,  process_p15);
       TheNet->newArc(process_t2,  process_p17);
       TheNet->newArc(process_t2,  process_p19);
-      TheNet->newArc(process_t2,  process_p23);
       TheNet->newArc(process_t2,  process_fh_not_faulted);
-
-      Transition *process_t3 =  TheNet->newTransition(prefix + "t3");
-      TheNet->newArc(process_p20, process_t3);
-      TheNet->newArc(process_t3,  process_p33);
-      TheNet->newArc(process_t3,  process_p24);
 
       Transition *process_t4 =  TheNet->newTransition(prefix + "t4");
       TheNet->newArc(process_p7,  process_t4);
       TheNet->newArc(process_p8,  process_t4);
       TheNet->newArc(process_t4,  process_p9);
       TheNet->newArc(process_t4,  process_p11);
-      TheNet->newArc(process_p25, process_t4);
       TheNet->newArc(process_p33, process_t4);
       TheNet->newArc(process_t4,  process_p39);
 
-      Transition *process_t5 =  TheNet->newTransition(prefix + "t5");
-      TheNet->newArc(process_p22, process_t5);
-      TheNet->newArc(process_t5,  process_p26);
+      if (This->hasEH)
+      {
+	Place *process_p23 = TheNet->newPlace(prefix + "p23");
+	Place *process_p24 = TheNet->newPlace(prefix + "p24");
+	Place *process_p25 = TheNet->newPlace(prefix + "p25");
+	Place *process_p26 = TheNet->newPlace(prefix + "p26");
+	Place *process_p27 = TheNet->newPlace(prefix + "p27");
 
-      Transition *process_t6 =  TheNet->newTransition(prefix + "t6");
-      TheNet->newArc(process_t6,  process_p26);
-      TheNet->newArc(process_p21, process_t6);
-      TheNet->newArc(process_p33, process_t6);
+	TheNet->newArc(process_t2,  process_p23);	
+	TheNet->newArc(process_p25, process_t4);
+
+	Transition *process_t1 =  TheNet->newTransition(prefix + "t1");
+    	TheNet->newArc(process_p27, process_t1);
+  	TheNet->newArc(process_t1,  process_p34);
+
+	Transition *process_t3 =  TheNet->newTransition(prefix + "t3");
+	TheNet->newArc(process_p20, process_t3);
+	TheNet->newArc(process_t3,  process_p33);
+	TheNet->newArc(process_t3,  process_p24);
+      
+	Transition *process_t5 =  TheNet->newTransition(prefix + "t5");
+	TheNet->newArc(process_p22, process_t5);
+	TheNet->newArc(process_t5,  process_p26);
+
+	Transition *process_t6 =  TheNet->newTransition(prefix + "t6");
+	TheNet->newArc(process_t6,  process_p26);
+	TheNet->newArc(process_p21, process_t6);
+	TheNet->newArc(process_p33, process_t6);
+      }
+      else
+      {
+	TheNet->mergePlaces(process_p20, process_p33);
+	TheNet->mergePlaces(process_p22, process_p34);
+      }
+
     }
       h // Stop Pattern
       e // FaultHandler
@@ -395,11 +406,14 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       //TheNet->mergePlaces("1.internal.compensated",      "1.internal.compensationHandler.compensated");
 
       // embed event handler
-      TheNet->mergePlaces("1.internal.p23",      "1.internal.eventHandler.initial");
-      TheNet->mergePlaces("1.internal.p24",      "1.internal.eventHandler.finish");
-      TheNet->mergePlaces("1.internal.p25",      "1.internal.eventHandler.final");
-      TheNet->mergePlaces("1.internal.p26",      "1.internal.eventHandler.stop");
-      TheNet->mergePlaces("1.internal.p27",      "1.internal.eventHandler.stopped");
+      if (This->hasEH)
+      {
+	TheNet->mergePlaces("1.internal.p23",      "1.internal.eventHandler.initial");
+	TheNet->mergePlaces("1.internal.p24",      "1.internal.eventHandler.finish");
+	TheNet->mergePlaces("1.internal.p25",      "1.internal.eventHandler.final");
+	TheNet->mergePlaces("1.internal.p26",      "1.internal.eventHandler.stop");
+	TheNet->mergePlaces("1.internal.p27",      "1.internal.eventHandler.stopped");
+      }
    
       // embed the stop-pattern
       TheNet->mergePlaces("1.internal.Faulted",        "1.internal.stop.Faulted");
@@ -1356,8 +1370,7 @@ CatchAll(innerActivity) ->
  * name in Fig. 29 and in Fig. 30) are mentioned in a comment.
  */
 
-
-This=EventHandler(a,b) ->
+This=userDefinedEventHandler(a,b) ->
   [petrinet:
     {
       string prefix = intToString(This->parentScopeId->value) + ".internal.eventHandler.";
@@ -1574,6 +1587,7 @@ This=EventHandler(a,b) ->
  * surrounding process or scope functions correctly.
  */
 
+/*
 This=implicitEventHandler() ->
   [petrinet:
     {
@@ -1617,7 +1631,7 @@ This=implicitEventHandler() ->
     }
   ]
 ;
-
+*/
 
 
 
@@ -3057,11 +3071,6 @@ This=Scope(a,b,c,d,e,f,g)
       Place *p22 = TheNet->newPlace(prefix + "p22");
       Place *p23 = TheNet->newPlace(prefix + "p23");
       Place *p24 = TheNet->newPlace(prefix + "p24");
-      Place *p25 = TheNet->newPlace(prefix + "p25");
-      Place *p26 = TheNet->newPlace(prefix + "p26");
-      Place *p27 = TheNet->newPlace(prefix + "p27");
-      Place *p28 = TheNet->newPlace(prefix + "p28");
-      Place *p29 = TheNet->newPlace(prefix + "p29");
       Place *p35 = TheNet->newPlace(prefix + "p35");
       Place *p36 = TheNet->newPlace(prefix + "p36");
       Place *p37 = TheNet->newPlace(prefix + "p37");
@@ -3091,10 +3100,6 @@ This=Scope(a,b,c,d,e,f,g)
       Place *ch_faulted = TheNet->newPlace(prefix + "CHFaulted");
       Place *ch_not_faulted = TheNet->newPlace(prefix + "!CHFaulted");
       
-      Transition *t1  = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(p29, t1);
-      TheNet->newArc(t1, p38); 
-
       Transition *t2  = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p10);
@@ -3103,13 +3108,7 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->newArc(t2, p16);
       TheNet->newArc(t2, p18);
       TheNet->newArc(t2, p21);
-      TheNet->newArc(t2, p25);
       TheNet->newArc(t2, fh_not_faulted);
-
-      Transition *t3  = TheNet->newTransition(prefix + "t3");
-      TheNet->newArc(p22, t3);
-      TheNet->newArc(t3, p26);
-      TheNet->newArc(t3, p35);
 
       Transition *t4  = TheNet->newTransition(prefix + "t4");
       TheNet->newArc(p10, t4);
@@ -3118,18 +3117,8 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->newArc(t4, p14);
       TheNet->newArc(TheNet->findPlace(intToString(This->id->value) + ".!push"), t4);
       TheNet->newArc(t4, TheNet->findPlace(intToString(This->id->value) + ".push"));
-      TheNet->newArc(p27, t4);
       TheNet->newArc(p35, t4);
       TheNet->newArc(t4, p51);
-
-      Transition *t5  = TheNet->newTransition(prefix + "t5");
-      TheNet->newArc(p24, t5);
-      TheNet->newArc(t5, p28);
-
-      Transition *t6  = TheNet->newTransition(prefix + "t6");
-      TheNet->newArc(p23, t6);
-      TheNet->newArc(t6, p28);
-      TheNet->newArc(p35, t6);
 
       Transition *t7  = TheNet->newTransition(prefix + "t7");
       TheNet->newArc(p8, t7, READ);
@@ -3162,6 +3151,41 @@ This=Scope(a,b,c,d,e,f,g)
 
       Transition *t16 = TheNet->newTransition(prefix + "t16");      
       TheNet->newArc(p53, t16, "false");
+
+      if (This->hasEH)
+      {
+	Place *p25 = TheNet->newPlace(prefix + "p25");
+	Place *p26 = TheNet->newPlace(prefix + "p26");
+	Place *p27 = TheNet->newPlace(prefix + "p27");
+	Place *p28 = TheNet->newPlace(prefix + "p28");
+	Place *p29 = TheNet->newPlace(prefix + "p29");
+	
+  	TheNet->newArc(t2, p25);    
+	TheNet->newArc(p27, t4);
+	
+      	Transition *t1  = TheNet->newTransition(prefix + "t1");
+    	TheNet->newArc(p29, t1);
+  	TheNet->newArc(t1, p38); 
+	
+	Transition *t3  = TheNet->newTransition(prefix + "t3");
+      	TheNet->newArc(p22, t3);
+    	TheNet->newArc(t3, p26);
+  	TheNet->newArc(t3, p35);
+	
+	Transition *t5  = TheNet->newTransition(prefix + "t5");
+	TheNet->newArc(p24, t5);
+	TheNet->newArc(t5, p28);
+
+	Transition *t6  = TheNet->newTransition(prefix + "t6");
+	TheNet->newArc(p23, t6);
+	TheNet->newArc(t6, p28);
+	TheNet->newArc(p35, t6);
+      }
+      else
+      {
+	TheNet->mergePlaces(p22, p35);
+	TheNet->mergePlaces(p24, p38);
+      }
       
       // new transitions to pass fault to parent
       Transition *t12 = TheNet->newTransition(prefix + "passFaultUp");

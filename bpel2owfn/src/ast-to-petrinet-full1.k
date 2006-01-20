@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/20 08:49:13 $
+ *          - last changed: \$Date: 2006/01/20 09:11:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.115 $
+ * \version \$Revision: 1.116 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -118,6 +118,8 @@ string currentScope;
  * \param preventFurtherFaults  controls what happens to further faults
  *                               - true: these faults are prevented (standard)
  *                               - false: these faults are suppressed
+ *
+ * \todo outsource this function
 */
 void throwFault(Place *p1, Place *p2,
     string guard, string p1name, string inscription, string prefix,
@@ -205,6 +207,8 @@ void throwFault(Place *p1, Place *p2,
  * \param inscription  inscription of the incoming arc to the fault transition
  *
  * \param prefix  prefix of the pattern to label generated transition
+ *
+ * \todo outsource this function
  */
 void stop(Place *p, string p_name, string inscription, string prefix)
 {
@@ -218,6 +222,7 @@ void stop(Place *p, string p_name, string inscription, string prefix)
 
 
 %}
+
 
 
 
@@ -249,8 +254,8 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       // create push-places for the children of the process
       for (list<SymbolScope *>::iterator child = me->children.begin(); child != me->children.end(); child++)
       {
-	Place *push_child    = TheNet->newPlace( intToString((*child)->id->value) + ".push");
-	Place *notPush_child = TheNet->newPlace( intToString((*child)->id->value) + ".!push");
+	TheNet->newPlace( intToString((*child)->id->value) + ".push");
+	TheNet->newPlace( intToString((*child)->id->value) + ".!push");
       }
 
       // create the places for the links
@@ -265,105 +270,105 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
 	TheNet->newPlace("variable." + *variable);
 
       // the global clock
-      Place *process_clock = TheNet->newPlace(prefix + "clock");      
+      TheNet->newPlace(prefix + "clock");      
 
 
-      Place *process_p1  = TheNet->newPlace(prefix + "initial");
-      //Place *process_p2  = TheNet->newPlace(prefix + "ch_in");
-      Place *process_p3  = TheNet->newPlace(prefix + "scopeCompensated");
-      Place *process_p5  = TheNet->newPlace(prefix + "upperFH");
-      Place *process_p6  = TheNet->newPlace(prefix + "upperTerminate");
-      Place *process_p7  = TheNet->newPlace(prefix + "Active");
-      Place *process_p8  = TheNet->newPlace(prefix + "!Completed");
-      Place *process_p9  = TheNet->newPlace(prefix + "Completed");
-      Place *process_p10 = TheNet->newPlace(prefix + "!Compensated");
-      Place *process_p11 = TheNet->newPlace(prefix + "!Active");
-      Place *process_p12 = TheNet->newPlace(prefix + "Compensated");
-      Place *process_p13 = TheNet->newPlace(prefix + "!Ended");
-      Place *process_p14 = TheNet->newPlace(prefix + "Ended");
-      Place *process_p15 = TheNet->newPlace(prefix + "!Faulted");
-      Place *process_p16 = TheNet->newPlace(prefix + "Faulted");
-      Place *process_p17 = TheNet->newPlace(prefix + "!Terminated");
-      Place *process_p18 = TheNet->newPlace(prefix + "Terminated");
-      Place *process_p19 = TheNet->newPlace(prefix + "p19");
-      Place *process_p20 = TheNet->newPlace(prefix + "p20");
-      Place *process_p21 = TheNet->newPlace(prefix + "p21");
-      Place *process_p22 = TheNet->newPlace(prefix + "p22");
-      Place *process_p33 = TheNet->newPlace(prefix + "p33");
-      Place *process_p34 = TheNet->newPlace(prefix + "p34");
-      Place *process_p35 = TheNet->newPlace(prefix + "p35");
-      Place *process_p36 = TheNet->newPlace(prefix + "p36");
-      Place *process_p37 = TheNet->newPlace(prefix + "fault");
-      Place *process_p38 = TheNet->newPlace(prefix + "faultSave");
-      Place *process_p39 = TheNet->newPlace(prefix + "final");
-      Place *process_p40 = TheNet->newPlace(prefix + "rethrow");
-      Place *process_p41 = TheNet->newPlace(prefix + "p41");
-      Place *process_p42 = TheNet->newPlace(prefix + "ch_out");
+      Place *p1  = TheNet->newPlace(prefix + "initial");
+      //Place *p2  = TheNet->newPlace(prefix + "ch_in");
+      Place *p3  = TheNet->newPlace(prefix + "scopeCompensated");
+      Place *p5  = TheNet->newPlace(prefix + "upperFH");
+      Place *p6  = TheNet->newPlace(prefix + "upperTerminate");
+      Place *p7  = TheNet->newPlace(prefix + "Active");
+      Place *p8  = TheNet->newPlace(prefix + "!Completed");
+      Place *p9  = TheNet->newPlace(prefix + "Completed");
+      Place *p10 = TheNet->newPlace(prefix + "!Compensated");
+      Place *p11 = TheNet->newPlace(prefix + "!Active");
+      Place *p12 = TheNet->newPlace(prefix + "Compensated");
+      Place *p13 = TheNet->newPlace(prefix + "!Ended");
+      Place *p14 = TheNet->newPlace(prefix + "Ended");
+      Place *p15 = TheNet->newPlace(prefix + "!Faulted");
+      Place *p16 = TheNet->newPlace(prefix + "Faulted");
+      Place *p17 = TheNet->newPlace(prefix + "!Terminated");
+      Place *p18 = TheNet->newPlace(prefix + "Terminated");
+      Place *p19 = TheNet->newPlace(prefix + "p19");
+      Place *p20 = TheNet->newPlace(prefix + "p20");
+      Place *p21 = TheNet->newPlace(prefix + "p21");
+      Place *p22 = TheNet->newPlace(prefix + "p22");
+      Place *p33 = TheNet->newPlace(prefix + "p33");
+      Place *p34 = TheNet->newPlace(prefix + "p34");
+      Place *p35 = TheNet->newPlace(prefix + "p35");
+      Place *p36 = TheNet->newPlace(prefix + "p36");
+      Place *p37 = TheNet->newPlace(prefix + "fault");
+      Place *p38 = TheNet->newPlace(prefix + "faultSave");
+      Place *p39 = TheNet->newPlace(prefix + "final");
+      Place *p40 = TheNet->newPlace(prefix + "rethrow");
+      Place *p41 = TheNet->newPlace(prefix + "p41");
+      Place *p42 = TheNet->newPlace(prefix + "ch_out");
 
       // to prevent more than one error from the FH/CH
-      Place *process_fh_faulted = TheNet->newPlace(prefix + "FHFaulted");
-      Place *process_fh_not_faulted = TheNet->newPlace(prefix + "!FHFaulted");
-      Place *process_ch_faulted = TheNet->newPlace(prefix + "CHFaulted");
-      Place *process_ch_not_faulted = TheNet->newPlace(prefix + "!CHFaulted");
+      Place *fh_faulted = TheNet->newPlace(prefix + "FHFaulted");
+      Place *fh_not_faulted = TheNet->newPlace(prefix + "!FHFaulted");
+      Place *ch_faulted = TheNet->newPlace(prefix + "CHFaulted");
+      Place *ch_not_faulted = TheNet->newPlace(prefix + "!CHFaulted");
       
-      //Place *process_p43 = TheNet->newPlace(prefix + "compensated");
-//      Place *process_p44 = TheNet->newPlace(prefix + "compScope");
+      //Place *p43 = TheNet->newPlace(prefix + "compensated");
+//      Place *p44 = TheNet->newPlace(prefix + "compScope");
       
       Transition *process_loop =  TheNet->newTransition(prefix + "finishloop"); // added so that all deadlocks are evil!
-      TheNet->newArc(process_p39, process_loop, READ);
+      TheNet->newArc(p39, process_loop, READ);
       
-      Transition *process_t2 =  TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(process_p1,  process_t2);
-      TheNet->newArc(process_t2,  process_p7);
-      TheNet->newArc(process_t2,  process_p8);
-      TheNet->newArc(process_t2,  process_p10);
-      TheNet->newArc(process_t2,  process_p13);
-      TheNet->newArc(process_t2,  process_p15);
-      TheNet->newArc(process_t2,  process_p17);
-      TheNet->newArc(process_t2,  process_p19);
-      TheNet->newArc(process_t2,  process_fh_not_faulted);
+      Transition *t2 =  TheNet->newTransition(prefix + "t2");
+      TheNet->newArc(p1, t2);
+      TheNet->newArc(t2, p7);
+      TheNet->newArc(t2, p8);
+      TheNet->newArc(t2, p10);
+      TheNet->newArc(t2, p13);
+      TheNet->newArc(t2, p15);
+      TheNet->newArc(t2, p17);
+      TheNet->newArc(t2, p19);
+      TheNet->newArc(t2, fh_not_faulted);
 
-      Transition *process_t4 =  TheNet->newTransition(prefix + "t4");
-      TheNet->newArc(process_p7,  process_t4);
-      TheNet->newArc(process_p8,  process_t4);
-      TheNet->newArc(process_t4,  process_p9);
-      TheNet->newArc(process_t4,  process_p11);
-      TheNet->newArc(process_p33, process_t4);
-      TheNet->newArc(process_t4,  process_p39);
+      Transition *t4 =  TheNet->newTransition(prefix + "t4");
+      TheNet->newArc(p7, t4);
+      TheNet->newArc(p8, t4);
+      TheNet->newArc(t4, p9);
+      TheNet->newArc(t4, p11);
+      TheNet->newArc(p33, t4);
+      TheNet->newArc(t4, p39);
 
       if (This->hasEH)
       {
-	Place *process_p23 = TheNet->newPlace(prefix + "p23");
-	Place *process_p24 = TheNet->newPlace(prefix + "p24");
-	Place *process_p25 = TheNet->newPlace(prefix + "p25");
-	Place *process_p26 = TheNet->newPlace(prefix + "p26");
-	Place *process_p27 = TheNet->newPlace(prefix + "p27");
+	Place *p23 = TheNet->newPlace(prefix + "p23");
+	Place *p24 = TheNet->newPlace(prefix + "p24");
+	Place *p25 = TheNet->newPlace(prefix + "p25");
+	Place *p26 = TheNet->newPlace(prefix + "p26");
+	Place *p27 = TheNet->newPlace(prefix + "p27");
 
-	TheNet->newArc(process_t2,  process_p23);	
-	TheNet->newArc(process_p25, process_t4);
+	TheNet->newArc(t2, p23);	
+	TheNet->newArc(p25, t4);
 
-	Transition *process_t1 =  TheNet->newTransition(prefix + "t1");
-    	TheNet->newArc(process_p27, process_t1);
-  	TheNet->newArc(process_t1,  process_p34);
+	Transition *t1 =  TheNet->newTransition(prefix + "t1");
+    	TheNet->newArc(p27, t1);
+  	TheNet->newArc(t1, p34);
 
-	Transition *process_t3 =  TheNet->newTransition(prefix + "t3");
-	TheNet->newArc(process_p20, process_t3);
-	TheNet->newArc(process_t3,  process_p33);
-	TheNet->newArc(process_t3,  process_p24);
+	Transition *t3 =  TheNet->newTransition(prefix + "t3");
+	TheNet->newArc(p20, t3);
+	TheNet->newArc(t3, p33);
+	TheNet->newArc(t3, p24);
       
-	Transition *process_t5 =  TheNet->newTransition(prefix + "t5");
-	TheNet->newArc(process_p22, process_t5);
-	TheNet->newArc(process_t5,  process_p26);
+	Transition *t5 =  TheNet->newTransition(prefix + "t5");
+	TheNet->newArc(p22, t5);
+	TheNet->newArc(t5, p26);
 
-	Transition *process_t6 =  TheNet->newTransition(prefix + "t6");
-	TheNet->newArc(process_t6,  process_p26);
-	TheNet->newArc(process_p21, process_t6);
-	TheNet->newArc(process_p33, process_t6);
+	Transition *t6 =  TheNet->newTransition(prefix + "t6");
+	TheNet->newArc(t6, p26);
+	TheNet->newArc(p21, t6);
+	TheNet->newArc(p33, t6);
       }
       else
       {
-	TheNet->mergePlaces(process_p20, process_p33);
-	TheNet->mergePlaces(process_p22, process_p34);
+	TheNet->mergePlaces(p20, p33);
+	TheNet->mergePlaces(p22, p34);
       }
 
     }
@@ -375,11 +380,11 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
     {
       // connect t2 with the push-places of the child-scopes
       for (list<SymbolScope*>::iterator child = me->children.begin(); child != me->children.end(); child++)
-	TheNet->newArc(process_t2, TheNet->findPlace( intToString((*child)->id->value) + ".!push" ));
+	TheNet->newArc(t2, TheNet->findPlace( intToString((*child)->id->value) + ".!push" ));
 
       // initialize all links
       for (list<string>::iterator link = symMan.links.begin(); link != symMan.links.end(); link++)
-	TheNet->newArc(process_t2, TheNet->findPlace("!link." + *link));
+	TheNet->newArc(t2, TheNet->findPlace("!link." + *link));
       
       // embed the fault handler
       TheNet->mergePlaces("1.internal.fault",     "1.internal.faultHandler.fault");

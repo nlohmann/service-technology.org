@@ -32,7 +32,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 
+ * \version \$Revision: 1.3 $: 
  *
  */
 
@@ -44,37 +44,49 @@
 
 #include "bpel-attributes.h"
 
+using namespace std;
+
+
+
+typedef enum
+{
+  SCOPE,
+  FAULTHANDLER,
+  COMPENSATIONHANDLER
+} ActivityPositionId;
+
+
 // forward declaration of classes
 class Activity;
 class Attribute;
 class CompensationHandler;
 class CorrelationSet;
-class CorrelationSets;
 class Element;
 class Envelope;
 class EventHandlers;
 class FaultHandlers;
 class PartnerLink;
-class PartnerLinks;
 class Process;
 class Scope;
 class SymbolTable;
 class SymbolTableEntry;
 class Variable;
-class Variables;
+
+
+
+
 
 class SymbolTableEntry
 {
   public:
-
-    ///     
+    ///   
     unsigned int entryId;
 
     /// BPEL-element Id
     unsigned int elementId;
     
     /// cast information
-    std::string elementType;
+    string elementType;
     
     /// contructor
     SymbolTableEntry();
@@ -82,93 +94,118 @@ class SymbolTableEntry
     /// destructor
     ~SymbolTableEntry();
     
-    std::string getElementId();
+    string getElementId();
     
-    std::string getElementType();    
-  
+    string getElementType();
 };
+
+
+
+
 
 class Element
 {
   public:
-    ///
-    std::list<Attribute*> listOfAttributes;
+    /// a list of the element's attributes
+    list<Attribute*> listOfAttributes;
     
-    /// line position of element within bpel file
+    /// line position of attribute within BPEL file
     unsigned int line;
     
-    ///
-    unsigned int negativeControlFlow; 
+    /// position of the activity (Scope/Process, FH, CH) to distribute error
+    /// tokens correctly
+    ActivityPositionId activityPosition;
 };
+
+
+
+
 
 class Attribute
 {
   public:
-	/// name of attribute
+    /// name of attribute
     kc::casestring name;
     
     /// attribute value
     kc::casestring value;
     
     /// type of attribute value
-    std::string type;
+    string type;
     
-    /// line position of attribute within bpel file
+    /// line position of attribute within BPEL file
     unsigned int line;
 };
 
-class Variables
-{
-  public:
-    ///
-    std::list<Variable*> listOfVariables;
-};
+
+
+
 
 class Variable: public Element
 {
   public:
-    /// 
-    bool used;  
+    /// true if variable is used in an activity
+    bool used;
 };
 
-class PartnerLinks
-{
-  public:
-    ///
-    std::list<PartnerLink*> listOfPartnerLinks;    	
-};
+
+
+
 
 class PartnerLink: public Element
 {
-  public:
-    ///
 };
 
-class CorrelationSets
-{
-  public:
-    ///
-    std::list<CorrelationSet*> listOfCorrelationSets;    	
-};
+
+
+
 
 class CorrelationSet: public Element
 {
-  public:
-    ///
 };
+
+
+
+
 
 class FaultHandlers
 {
   public:
-    ///
-    
+    /// true if fault handler has an <catchAll> branch
+    bool hasCatchAll;
+
+    /// true if fault handler is user-defined, false if implicit
+    bool isUserDefined;
+
+    /// true if fault handler is enclosed in process, false if enclosed in a
+    /// scope
+    bool isInProcess;
+
+    /// the identifier of the scope or process that encloses this fault handler
+    int parentScopeId;
 };
+
+
+
+
 
 class CompensationHandler
 {
   public:
-    ///
+    /// true if compensation handler encloses an <compensate/> activity
+    bool hasCompensateWithoutScope;
+
+    /// true if compensation handler encloses an <compensate scope="A"/>
+    /// activity
+    bool hasCompensateWithScope;
+
+    /// true if compensation handler is user-defined, false if implicit
+    bool isUserDefined;
 };
+
+
+
+
 
 class EventHandlers
 {
@@ -176,53 +213,115 @@ class EventHandlers
     ///
 };
 
+
+
+
+
+/**
+ * An envelope for the process and scopes, i.e. those activities that may
+ * enclose variables, correlation sets, fault handlers, compensation handlers
+ * or event handlers.
+ */
 class Envelope
 {
   public:
-    ///
-    Variables* var;
+    /// a list of variables declared in this scope/process
+    list<Variable*> variables;
     
-    ///
-    CorrelationSets cor;
+    /// a list of correlation sets declared in this scope/process
+    list<CorrelationSet> correlationSets;
     
-    ///
-    FaultHandlers* fHandler;
+    /// the fault handler of the scope/process
+    FaultHandlers* faultHandler;
     
-    ///
-    CompensationHandler* cHandler;  
+    /// the compensation handler of the scope/process
+    CompensationHandler* compensationHandler;
     
-    ///
-    EventHandlers* eHandler;
+    /// the event handler of the scope/process
+    EventHandlers* eventHandler;
+
+    /// true if scope had an event handler?
+    bool hasEventHandler;    
 };
 
+
+
+
+
+/**
+ * The <process> activity.
+ */
 class Process: public Element, Envelope, SymbolTableEntry
 {
   public:
-    ///
-    PartnerLinks* links;
+    /// a list of partner links declared in the process
+    list<PartnerLink*> partnerLinks;
+
+    /// true if process is abstract (i.e. a business protocol)
+    bool abstractProcess;
 };
 
+
+
+
+
+/**
+ * The <scope> activity.
+ */
 class Scope: public Element, Envelope, SymbolTableEntry
 {
   public:
     /// additional attribute used for inter-scope communication (push-places)
     unsigned int parentScopeId;
-    
-    /// has this scope an event handler?
-    bool hasEH;
 };
 
+
+
+
+
+/**
+ * All other activities.
+ */
 class Activity: public Element, SymbolTableEntry
 {
   public:
-    ///
+    /// true if activity is source of a link
+    bool isSourceOfLink;
+
+    /// true if activity is target of a link
+    bool isTargetOfLink;
+    
+    // only used for <invoke> activity
+    /// true if <invoke> has both input and output variable
+    bool isSynchronousInvoke;
+
+    // only used for communication activities
+    string channelId;
+    Variable *inputVariable;
+    Variable *outputVariable;
+
+    // only used for <wait> activity
+    /// true if <wait> has a "until" attribute
+    bool isWaitUntil;
+
+    // only used for <compensate> activity
+    bool isInFaultHandler;
+    bool isInCompensationHandler;
+    bool hasScopeName;
+
+    // only used for <terminate> activity
+    bool isFirstTerminate;
 };
+
+
+
+
 
 class SymbolTable
 {
   private:
     /// a container to store ...
-    std::map<unsigned int, SymbolTableEntry*> symTab;
+    map<unsigned int, SymbolTableEntry*> symTab;
     
   public:
     /// constructor

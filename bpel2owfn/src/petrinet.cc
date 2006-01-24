@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/01/20 09:31:54 $
+ *          - last changed: \$Date: 2006/01/24 10:42:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.75 $
+ * \version \$Revision: 1.76 $
  */
 
 
@@ -762,7 +762,7 @@ PetriNet::dotOut ()
     (*dot_output) << (*p)->dotOut ();
 
   // list the transitions
-  (*dot_output) << endl << " node [shape=box];" << endl;
+  (*dot_output) << endl << " node [shape=box regular=true];" << endl;
   for (set < Transition * >::iterator t = T.begin (); t != T.end (); t++)
     (*dot_output) << (*t)->dotOut ();
 

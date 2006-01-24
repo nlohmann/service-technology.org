@@ -32,7 +32,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.3 $: 
+ * \version \$Revision: 1.4 $: 
  *
  */
 
@@ -48,12 +48,14 @@ using namespace std;
 
 
 
+/// enumeration of possible locations of an activity used to send failures to
+/// the correct place in the Petri net
 typedef enum
 {
-  SCOPE,
-  FAULTHANDLER,
-  COMPENSATIONHANDLER
-} ActivityPositionId;
+  SCOPE,		///< activity enclosed in scope or process
+  FAULTHANDLER,		///< activity enclosed in fault handler
+  COMPENSATIONHANDLER	///< activity enclosed in compensation handler
+} ActivityLocationId;
 
 
 // forward declaration of classes
@@ -71,6 +73,7 @@ class Scope;
 class SymbolTable;
 class SymbolTableEntry;
 class Variable;
+class Link;
 
 
 
@@ -112,9 +115,9 @@ class Element
     /// line position of attribute within BPEL file
     unsigned int line;
     
-    /// position of the activity (Scope/Process, FH, CH) to distribute error
+    /// location of the activity (Scope/Process, FH, CH) to distribute error
     /// tokens correctly
-    ActivityPositionId activityPosition;
+    ActivityLocationId activityLocation;
 };
 
 
@@ -151,6 +154,25 @@ class Variable: public Element
 
 
 
+class Link: public Element
+{
+  public:
+    /// the name of the link
+    string name;
+    
+    /// the identifier of the source activity
+    unsigned int sourceId;
+    
+    /// the identifier of the target activity
+    unsigned int targetId;
+
+    /// the identifier of the flow which defined the link
+    unsigned int parentId;
+};
+
+
+
+
 
 class PartnerLink: public Element
 {
@@ -168,6 +190,9 @@ class CorrelationSet: public Element
 
 
 
+/**
+ * Everything about <faultHandlers>.
+ */
 class FaultHandlers
 {
   public:
@@ -189,6 +214,9 @@ class FaultHandlers
 
 
 
+/**
+ * Everything about <compensationHandler>.
+ */
 class CompensationHandler
 {
   public:
@@ -207,10 +235,11 @@ class CompensationHandler
 
 
 
+/**
+ * Everything about <eventHandlers>.
+ */
 class EventHandlers
 {
-  public:
-    ///
 };
 
 
@@ -273,6 +302,9 @@ class Scope: public Element, Envelope, SymbolTableEntry
   public:
     /// additional attribute used for inter-scope communication (push-places)
     unsigned int parentScopeId;
+
+    /// list of all enclosed links (recursively)
+    list<Link*> enclosedLinks;
 };
 
 
@@ -341,7 +373,6 @@ class SymbolTable
     
     ///
     SymbolTableEntry lookup(kc::integer entryId);
-    
 };
 
 #endif

@@ -24,6 +24,7 @@
  * \brief
  *
  * \author  
+ *          - last changes of: \$Author: reinert $
  *          
  * \date
  * 
@@ -32,7 +33,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.4 $: 
+ * \version \$Revision: 1.5 $: 
  *
  */
 
@@ -78,7 +79,12 @@ class Link;
 
 
 
-
+/**
+ * \class	SymbolTableEntry
+ *
+ * \brief
+ * 
+ */
 class SymbolTableEntry
 {
   public:
@@ -105,7 +111,12 @@ class SymbolTableEntry
 
 
 
-
+/**
+ * \class	Element
+ *
+ * \brief
+ * 
+ */
 class Element
 {
   public:
@@ -123,7 +134,12 @@ class Element
 
 
 
-
+/**
+ * \class	Attribute
+ *
+ * \brief
+ * 
+ */
 class Attribute
 {
   public:
@@ -143,7 +159,12 @@ class Attribute
 
 
 
-
+/**
+ * \class	Variable
+ *
+ * \brief
+ * 
+ */
 class Variable: public Element
 {
   public:
@@ -153,7 +174,12 @@ class Variable: public Element
 
 
 
-
+/**
+ * \class	Link
+ *
+ * \brief
+ * 
+ */
 class Link: public Element
 {
   public:
@@ -173,15 +199,24 @@ class Link: public Element
 
 
 
-
+/**
+ * \class	PartnerLink
+ *
+ * \brief
+ * 
+ */
 class PartnerLink: public Element
 {
 };
 
 
 
-
-
+/**
+ * \class	CorrelationSet
+ *
+ * \brief
+ * 
+ */
 class CorrelationSet: public Element
 {
 };
@@ -189,9 +224,13 @@ class CorrelationSet: public Element
 
 
 
-
 /**
+ * \class	FaultHandlers
+ *
+ * \brief
+ * 
  * Everything about <faultHandlers>.
+ * 
  */
 class FaultHandlers
 {
@@ -211,11 +250,13 @@ class FaultHandlers
 };
 
 
-
-
-
 /**
+ * \class	CompensationHandler
+ *
+ * \brief
+ * 
  * Everything about <compensationHandler>.
+ * 
  */
 class CompensationHandler
 {
@@ -236,7 +277,12 @@ class CompensationHandler
 
 
 /**
+ * \class	EventHandlers
+ *
+ * \brief
+ * 
  * Everything about <eventHandlers>.
+ * 
  */
 class EventHandlers
 {
@@ -244,12 +290,15 @@ class EventHandlers
 
 
 
-
-
 /**
+ * \class	Envelope
+ *
+ * \brief
+ * 
  * An envelope for the process and scopes, i.e. those activities that may
  * enclose variables, correlation sets, fault handlers, compensation handlers
  * or event handlers.
+ * 
  */
 class Envelope
 {
@@ -258,7 +307,7 @@ class Envelope
     list<Variable*> variables;
     
     /// a list of correlation sets declared in this scope/process
-    list<CorrelationSet> correlationSets;
+    list<CorrelationSet*> correlationSets;
     
     /// the fault handler of the scope/process
     FaultHandlers* faultHandler;
@@ -278,7 +327,12 @@ class Envelope
 
 
 /**
+ * \class	Process
+ *
+ * \brief
+ * 
  * The <process> activity.
+ * 
  */
 class Process: public Element, Envelope, SymbolTableEntry
 {
@@ -293,9 +347,13 @@ class Process: public Element, Envelope, SymbolTableEntry
 
 
 
-
 /**
+ * \class	Scope
+ *
+ * \brief
+ * 
  * The <scope> activity.
+ * 
  */
 class Scope: public Element, Envelope, SymbolTableEntry
 {
@@ -310,9 +368,13 @@ class Scope: public Element, Envelope, SymbolTableEntry
 
 
 
-
 /**
+ * \class	Activity
+ *
+ * \brief
+ * 
  * All other activities.
+ * 
  */
 class Activity: public Element, SymbolTableEntry
 {
@@ -348,7 +410,12 @@ class Activity: public Element, SymbolTableEntry
 
 
 
-
+/**
+ * \class	SymbolTable
+ *
+ * \brief
+ * 
+ */
 class SymbolTable
 {
   private:
@@ -367,9 +434,12 @@ class SymbolTable
     
     /// increase the id
     kc::integer nextId();
+
+	/// ST traces
+	void traceST(string traceMsg);
     
     ///
-    void insert();
+    void insert(unsigned int elementType);
     
     ///
     SymbolTableEntry lookup(kc::integer entryId);

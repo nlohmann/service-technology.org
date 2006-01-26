@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/01/26 10:07:44 $
+ *          - last changed: \$Date: 2006/01/26 15:15:34 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.3 $
  * 
  * \todo
  */
@@ -406,8 +406,8 @@ Scope(a,b,c,d,e,f,g) ->
 	}
         g //activity
 	{
-	  scope->nextBlock = cfgMap.find(intToString(g->id->value))->second;
-	  (cfgMap.find(intToString(g->id->value))->second)->prevBlock = scope;
+	  scope->innerActivity = cfgMap.find(intToString(g->id->value))->second;
+	  // (cfgMap.find(intToString(g->id->value))->second)->prevBlock = scope;
 	}
   ]
 ;

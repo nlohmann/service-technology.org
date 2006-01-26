@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/01/26 10:07:44 $
+ *          - last changed: \$Date: 2006/01/26 15:15:34 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.3 $
  */
 
 #ifndef CFG_H
@@ -93,6 +93,7 @@ class CFGBlock {
     std::string getType(); 
     /// dot_output
     virtual void print_dot();
+    virtual void dot_nextBlock();
     /// returns the name of the first node in this block
     virtual std::string firstNodeName();
     /// returns the name of the last node in this block
@@ -351,6 +352,8 @@ class CFGPick : public CFGBlock {
 
 class CFGScope : public CFGBlock {
   public:
+    CFGBlock * innerActivity;
+
     CFGScope(std::string id);
     CFGScope(kc::integer id);
     

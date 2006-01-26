@@ -31,16 +31,16 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/01/26 10:07:44 $
+ *          - last changed: \$Date: 2006/01/26 15:15:34 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.3 $
  *
- * \todo    - draw Process end 
+ * \todo    - commandline option to control drawing of clusters 
  */
 
 #include "cfg.h"
@@ -94,8 +94,20 @@ std::string CFGBlock::getType()
 /// generic dot printout
 void CFGBlock::print_dot()
 {
-  cout << "    node [shape=box]" << endl;
+  // cout << "    node [shape=box]" << endl;
   cout << "    " << type << label << " [label=\"" << type << " (" << label << ")\"]" << endl;
+
+  dot_nextBlock();
+}
+
+void CFGBlock::dot_nextBlock()
+{
+  if (nextBlock != NULL)
+  {
+    nextBlock->print_dot();
+    cout << "    " << lastNodeName() << " -> " << nextBlock->firstNodeName() << ";" << endl;
+  }
+  cout << endl;
 }
 
 /// returns the name of the first node in this block
@@ -281,13 +293,15 @@ CFGAssign::~CFGAssign()
 void CFGAssign::print_dot()
 {
   cout << endl;
+/*
   cout << "  subgraph cluster" << type << label << " {" << endl;
   cout << "    label=\"" << type << " (" << label << ")\";" << endl;
   cout << "    labelangle=90.0;" << endl;
-  cout << "    labeljust=r;" << endl;
+  cout << "    labeljust=l;" << endl;
   cout << "    color=blue;" << endl;
   cout << "    style=dotted;" << endl;
-
+*/
+/*
   for(list<CFGCopy *>::iterator iter = copyList.begin(); iter != copyList.end(); iter++)
   {
     (*iter)->print_dot();
@@ -297,8 +311,16 @@ void CFGAssign::print_dot()
 	   << " -> " << (*iter)->firstNodeName() << ";" << endl;
     }
   }
-  
+*/
+  if (! copyList.empty())
+  {
+    (*(copyList.begin()))->print_dot();
+  }
+/*  
   cout << "  }" << endl;
+*/
+
+  dot_nextBlock();
   cout << endl;
 }
 
@@ -462,13 +484,15 @@ CFGFlow::~CFGFlow()
 void CFGFlow::print_dot()
 {
   cout << endl;
+/*
   cout << "  subgraph cluster" << type << label << " {" << endl;
   cout << "    label=\"" << type << " (" << label << ")\";" << endl;
   cout << "    labelangle=90.0;" << endl;
-  cout << "    labeljust=r;" << endl;
+  cout << "    labeljust=l;" << endl;
   cout << "    color=blue;" << endl;
   cout << "    style=dotted;" << endl;
   cout << "    node [shape=box]" << endl;
+*/
   cout << "    " << firstNodeName() << " [label=\"" << type << " (" << label << "_entry)\"]" << endl;
   cout << "    " << lastNodeName()  << " [label=\"" << type << " (" << label << "_exit)\"]" << endl;
 
@@ -480,8 +504,10 @@ void CFGFlow::print_dot()
     cout << "    " << (*iter)->lastNodeName()
 	 << " -> " << lastNodeName() << ";" << endl;
   }
-  
+/*  
   cout << "  }" << endl;
+*/
+  dot_nextBlock();
   cout << endl;
 }
 
@@ -538,13 +564,15 @@ CFGSwitch::~CFGSwitch()
 void CFGSwitch::print_dot()
 {
   cout << endl;
+/*
   cout << "  subgraph cluster" << type << label << " {" << endl;
   cout << "    label=\"" << type << " (" << label << ")\";" << endl;
   cout << "    labelangle=90.0;" << endl;
-  cout << "    labeljust=r;" << endl;
+  cout << "    labeljust=l;" << endl;
   cout << "    color=blue;" << endl;
   cout << "    style=dotted;" << endl;
   cout << "    node [shape=box];" << endl;
+*/
   cout << "    " << firstNodeName() << " [label=\"" << type << " (" << label << "_entry)\"];" << endl;
   cout << "    " << lastNodeName()  << " [label=\"" << type << " (" << label << "_exit)\"];" << endl;
 
@@ -552,25 +580,53 @@ void CFGSwitch::print_dot()
   for(list<CFGBlock *>::iterator iter = caseList.begin(); iter != caseList.end(); iter++)
   {
     (*iter)->print_dot();
+    cout << "    " << firstNodeName() << "Case" << i 
+	 << " [label=\"Case " << i << "(" << label << ")\"]" 
+	 << ";" << endl;
+    if (i > 1)
+    {
+      cout << "    " << firstNodeName() << "Case" << (i - 1) 
+           << " -> " << firstNodeName() << "Case" << i  
+	   << " [taillabel=\"false\" labelangle=-45.0 fontsize=8]"
+	   << ";" << endl;
+    }
+    else
+    {
+      cout << "    " << firstNodeName() 
+           << " -> " << firstNodeName() << "Case" << i  
+	   // << " [taillabel=\"false\" labelangle=-45.0  fontsize=8]"
+	   << ";" << endl;
+    }
+    cout << "    " << firstNodeName() << "Case" << i 
+         << " -> " << (*iter)->firstNodeName() 
+	 << " [taillabel=\"true\" labelangle=-45.0 fontsize=8]"
+	 << ";" << endl;
+    cout << "    " << (*iter)->lastNodeName()
+	 << " -> " << lastNodeName() << ";" << endl;
+    i++;
+/*
     cout << "    " << firstNodeName() 
          << " -> " << (*iter)->firstNodeName() 
 	 << " [label=\"Case " << i++ << "\" fontsize=8]"
 	 << ";" << endl;
     cout << "    " << (*iter)->lastNodeName()
 	 << " -> " << lastNodeName() << ";" << endl;
+*/
   }
   if (otherwise != NULL)
   {
     otherwise->print_dot();
-    cout << "    " << firstNodeName() 
-         << " -> " << otherwise->firstNodeName()
-	 << " [label=\"otherwise\" fontsize=8]"
+    cout << "    " << firstNodeName() << "Case" << (i - 1) 
+         << " -> " << otherwise->firstNodeName()  
+	 << " [taillabel=\"otherwise\" labelangle=-45.0 fontsize=8]"
 	 << ";" << endl;
     cout << "    " << otherwise->lastNodeName()
 	 << " -> " << lastNodeName() << ";" << endl;
   }
-  
+/*  
   cout << "  }" << endl;
+*/
+  dot_nextBlock();
   cout << endl;
 }
 
@@ -620,13 +676,15 @@ CFGWhile::~CFGWhile()
 void CFGWhile::print_dot()
 {
   cout << endl;
+/*
   cout << "  subgraph cluster" << type << label << " {" << endl;
   cout << "    label=\"" << type << " (" << label << ")\";" << endl;
   cout << "    labelangle=90.0;" << endl;
-  cout << "    labeljust=r;" << endl;
+  cout << "    labeljust=l;" << endl;
   cout << "    color=blue;" << endl;
   cout << "    style=dotted;" << endl;
   cout << "    node [shape=box];" << endl;
+*/
   cout << "    " << firstNodeName() << " [label=\"" << type << " (" << label << "_cond)\"];" << endl;
 
   int i = 1;
@@ -635,12 +693,15 @@ void CFGWhile::print_dot()
     loopActivity->print_dot();
     cout << "    " << firstNodeName() 
          << " -> " << loopActivity->firstNodeName()
+	 << " [taillabel=\"true\" labelangle=-45.0 fontsize=\"8\"]"
 	 << ";" << endl;
     cout << "    " << loopActivity->lastNodeName()
 	 << " -> " << lastNodeName() << ";" << endl;
   }
-  
+/*  
   cout << "  }" << endl;
+*/
+  dot_nextBlock();
   cout << endl;
 }
 
@@ -686,13 +747,19 @@ CFGSequence::~CFGSequence()
 void CFGSequence::print_dot()
 {
   cout << endl;
+/*
   cout << "  subgraph cluster" << type << label << " {" << endl;
   cout << "    label=\"" << type << " (" << label << ")\";" << endl;
   cout << "    labelangle=90.0;" << endl;
-  cout << "    labeljust=r;" << endl;
+  cout << "    labeljust=l;" << endl;
   cout << "    color=blue;" << endl;
   cout << "    style=dotted;" << endl;
-
+*/
+  if(!activityList.empty())
+  {
+    (*(activityList.begin()))->print_dot();
+  }
+/*
   for(list<CFGBlock *>::iterator iter = activityList.begin(); iter != activityList.end(); iter++)
   {
     (*iter)->print_dot();
@@ -702,8 +769,11 @@ void CFGSequence::print_dot()
 	   << " -> " << (*iter)->firstNodeName() << ";" << endl;
     }
   }
-  
+*/
+/*  
   cout << "  }" << endl;
+*/
+  dot_nextBlock();
   cout << endl;
 }
 
@@ -773,13 +843,15 @@ CFGPick::~CFGPick()
 void CFGPick::print_dot()
 {
   cout << endl;
+/*
   cout << "  subgraph cluster" << type << label << " {" << endl;
   cout << "    label=\"" << type << " (" << label << ")\";" << endl;
   cout << "    labelangle=90.0;" << endl;
-  cout << "    labeljust=r;" << endl;
+  cout << "    labeljust=l;" << endl;
   cout << "    color=blue;" << endl;
   cout << "    style=dotted;" << endl;
   cout << "    node [shape=box];" << endl;
+*/
   cout << "    " << firstNodeName() << " [label=\"" << type << " (" << label << "_entry)\"];" << endl;
   cout << "    " << lastNodeName()  << " [label=\"" << type << " (" << label << "_exit)\"];" << endl;
 
@@ -805,8 +877,10 @@ void CFGPick::print_dot()
     cout << "    " << (*iter)->lastNodeName()
 	 << " -> " << lastNodeName() << ";" << endl;
   }
-  
+/*  
   cout << "  }" << endl;
+*/
+  dot_nextBlock();
   cout << endl;
 }
 
@@ -843,24 +917,29 @@ CFGScope::CFGScope(kc::integer id)
 
 void CFGScope::print_dot()
 {
+  cout << endl;
+/*
   cout << "  subgraph cluster" << type << label << " {" << endl;
   cout << "    label=\"" << type << " (" << label << ")\";" << endl;
   cout << "    labelangle=90.0;" << endl;
-  cout << "    labeljust=r;" << endl;
+  cout << "    labeljust=l;" << endl;
   cout << "    color=blue;" << endl;
   cout << "    style=dotted;" << endl;
   cout << "    node [shape=box];" << endl;
+*/
   cout << "    " << firstNodeName() << " [label=\"" << type << " (" << label << "_entry)\"];" << endl;
   cout << "    " << lastNodeName()  << " [label=\"" << type << " (" << label << "_exit)\"];" << endl;
 
-  if (nextBlock != NULL)
+  if (innerActivity != NULL)
   {
-    nextBlock->print_dot();
-    cout << "    " << firstNodeName() << " -> " << nextBlock->firstNodeName() << ";" << endl;
-    cout << "    " << nextBlock->lastNodeName() << " -> " << lastNodeName() << ";" << endl;
+    innerActivity->print_dot();
+    cout << "    " << firstNodeName() << " -> " << innerActivity->firstNodeName() << ";" << endl;
+    cout << "    " << innerActivity->lastNodeName() << " -> " << lastNodeName() << ";" << endl;
   }
-  
+/*  
   cout << "}" << endl;
+*/
+  dot_nextBlock();
 }
 
 /// returns the name of the first node in this block

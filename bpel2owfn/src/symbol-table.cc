@@ -64,7 +64,7 @@ kc::integer SymbolTable::nextId()
 /*!
  * 
  */
-void SymbolTable::insert()
+void SymbolTable::insert(unsigned int elementType)
 {
 	
 }

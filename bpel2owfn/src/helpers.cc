@@ -28,18 +28,18 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/01/19 15:23:00 $
+ *          - last changed: \$Date: 2006/01/26 09:11:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.37 $
+ * \version \$Revision: 1.38 $
  *
  */
 
@@ -236,6 +236,21 @@ void parse_command_line(int argc, char* argv[])
 	mode_petri_net = true;
       }
 
+      // generate APPN output
+      else if (! strcmp(argument_string, "-A") || ! strcmp(argument_string, "--appn")) 
+      {
+        mode_appn_petri_net = true;
+	mode_petri_net = true;
+      }
+      
+      // generate APPN output and write it into a file
+      else if (! strcmp(argument_string, "-A2F") || ! strcmp(argument_string, "--appn2file")) 
+      {
+        mode_appn_petri_net = true;
+	mode_appn_2_file = true;
+	mode_petri_net = true;
+      }
+      
       // generate lola output
       else if (! strcmp(argument_string, "-L") || ! strcmp(argument_string, "--lola")) 
       {
@@ -421,6 +436,28 @@ void parse_command_line(int argc, char* argv[])
       dot_output = new std::ofstream(dotti_file.c_str(), std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
     }
 
+    // if wanted, create a APPN output file
+    if ( mode_appn_2_file )
+    {
+      trace(TRACE_INFORMATION, "Creating file for APPN output\n");
+      std::string appn_file = filename;
+      
+      // try to replace .bpel through .lola
+      if ( appn_file.rfind(".bpel", 0) >= (appn_file.length() - 6) )
+      {
+        appn_file = appn_file.replace( (appn_file.length() - 5), 5, ".appn");
+      }
+      else
+      {
+        appn_file += ".appn";
+      }
+      
+      /// set appn filename
+      appn_filename = appn_file.c_str();
+      /// create appn file and point to it
+      appn_output = new std::ofstream(appn_file.c_str(), std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
+    }
+    
     // if wanted, create a LoLA output file
     if ( mode_lola_2_file )
     {

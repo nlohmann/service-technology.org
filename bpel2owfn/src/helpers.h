@@ -27,10 +27,10 @@
  * other file.
  * 
  * \author  
- *          - last changes by: \$Author: gierds $
+ *          - last changes by: \$Author: nlohmann $
  *          
  * \date    
- *          - last changed: \$Date: 2006/01/11 09:10:05 $
+ *          - last changed: \$Date: 2006/01/26 09:11:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -61,6 +61,11 @@ extern std::string dot_filename;
 /// Pointer to dot output file
 extern std::ostream * dot_output;
 
+/// Filename of APPN output file
+extern std::string appn_filename;
+/// Pointer to APPN output file
+extern std::ostream * appn_output;
+
 /// Filename of LoLA output file
 extern std::string lola_filename;
 /// Pointer to LoLA output file
@@ -85,6 +90,10 @@ extern bool mode_file;
 extern bool mode_petri_net;
 /// simplify Petri Net
 extern bool mode_simplify_petri_net;
+/// output Petri Net for APPN
+extern bool mode_appn_petri_net;
+/// output Petri Net for APPN to file
+extern bool mode_appn_2_file;
 /// output Petri Net for LoLA
 extern bool mode_lola_petri_net;
 /// output Petri Net for LoLA to file

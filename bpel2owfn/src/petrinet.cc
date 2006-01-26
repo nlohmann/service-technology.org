@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/01/26 08:42:36 $
+ *          - last changed: \$Date: 2006/01/26 09:11:20 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.77 $
+ * \version \$Revision: 1.78 $
  */
 
 
@@ -849,9 +849,9 @@ PetriNet::appnOut ()
   int arcNumber = 1;
   for (set < Arc * >::iterator f = F.begin (); f != F.end (); f++, arcNumber++)
   {
-    (*appn_output) << "  \\arc{a" << arcNumber << "}";
-    (*appn_output) << "\\from{" << (*f)->source->nodeShortName() << "}";
-    (*appn_output) << "\t\\to{}" << (*f)->target->nodeShortName() << "}" << endl;
+    (*appn_output) << "  \\arc{a" << arcNumber << "}{ ";
+    (*appn_output) << "\\from{" << (*f)->source->nodeShortName() << "} ";
+    (*appn_output) << "\\to{" << (*f)->target->nodeShortName() << "} }" << endl;
   }
   (*appn_output) << endl;
   

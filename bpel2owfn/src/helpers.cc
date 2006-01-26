@@ -28,18 +28,18 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/01/26 09:11:04 $
+ *          - last changed: \$Date: 2006/01/26 10:07:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.38 $
+ * \version \$Revision: 1.39 $
  *
  */
 
@@ -122,7 +122,8 @@ void print_help()
   trace("   -a   | --ast              - output the AST\n");
   trace("   -x   | --xml              - output simple XML w/o any unnecessary\n");
   trace("                               informtion\n");
-  trace("   -pn  | --petri-net        - output the Petri Net (in LoLA style?)\n");
+  trace("   -c   | --cfg              - output the CFG in dot format\n");
+  trace("   -pn  | --petri-net        - create Petri Net (for possible output see below)\n");
   trace("\n");
   trace("special Petri Net modes:\n");
   trace("\n");
@@ -212,6 +213,10 @@ void parse_command_line(int argc, char* argv[])
       else if (! strcmp(argument_string, "-pn") || ! strcmp(argument_string, "--petri-net")) {
 	// output a Petri Net
         mode_petri_net = true;
+      }
+      else if (! strcmp(argument_string, "-c") || ! strcmp(argument_string, "--cfg")) {
+	// output CFG
+        mode_cfg = true;
       }
       else if (! strcmp(argument_string, "-x") || ! strcmp(argument_string, "--xml")) {
 	// output a pretty xml
@@ -361,12 +366,13 @@ void parse_command_line(int argc, char* argv[])
     }
     
     // take care of the output modes
-    if ((mode_petri_net && mode_ast) || (mode_petri_net && mode_pretty_printer) || (mode_ast && mode_pretty_printer))
+    if ((mode_petri_net && mode_ast) || (mode_petri_net && mode_pretty_printer) || (mode_ast && mode_pretty_printer) ||
+	(mode_cfg && mode_ast) || (mode_cfg && mode_pretty_printer) || (mode_cfg && mode_petri_net))
     {
       mode_file = false;
       throw Exception(OPTION_MISMATCH, 
 		      "Chosen parameters cannot work together (see parameter -h).\n",
-		      "Chose only one of mode Petri Net, AST or XML!\n");
+		      "Chose only one of mode Petri Net, AST, XML, or CFG!\n");
     }
 
     // LoLA and dot on stdout are very confusing ! so abort 

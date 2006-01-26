@@ -27,10 +27,10 @@
  * other file.
  * 
  * \author  
- *          - last changes by: \$Author: nlohmann $
+ *          - last changes by: \$Author: gierds $
  *          
  * \date    
- *          - last changed: \$Date: 2006/01/26 09:11:04 $
+ *          - last changed: \$Date: 2006/01/26 10:07:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -106,6 +106,8 @@ extern bool mode_owfn_2_file;
 extern bool mode_dot_petri_net;
 /// paint Petri Net with dot and output to file
 extern bool mode_dot_2_file;
+/// pretty printer
+extern bool mode_cfg;
 /// pretty printer
 extern bool mode_pretty_printer;
 /// print AST

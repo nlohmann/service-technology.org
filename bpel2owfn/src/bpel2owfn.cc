@@ -28,18 +28,18 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/01/26 08:43:05 $
+ *          - last changed: \$Date: 2006/01/26 10:07:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.45 $
+ * \version \$Revision: 1.46 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -55,6 +55,9 @@
 
 /// The Petri Net
 PetriNet *TheNet = new PetriNet();
+
+/// The CFG
+CFGBlock * TheCFG = NULL;
 
 // some file names and pointers
 
@@ -110,6 +113,8 @@ bool mode_owfn_2_file = false;
 bool mode_dot_petri_net = false;
 /// paint Petri Net with dot and output to file
 bool mode_dot_2_file = false;
+/// CFG
+bool mode_cfg = false;
 /// pretty printer
 bool mode_pretty_printer = false;
 /// print AST
@@ -158,6 +163,16 @@ int main( int argc, char *argv[])
       {
         TheProcess->unparse(kc::printer, kc::xml);
       }
+      
+      if (mode_cfg)
+      {
+        // output CFG;
+	trace("Dot output for CFG will come here!\n");
+        TheProcess->unparse(kc::pseudoPrinter, kc::cfg);
+	TheCFG->print_dot();
+	delete(TheCFG);
+      }
+
       if (mode_petri_net)
       {
         TheProcess->unparse(kc::pseudoPrinter, kc::petrinet);

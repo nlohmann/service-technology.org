@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/01/24 10:42:58 $
+ *          - last changed: \$Date: 2006/01/26 08:42:36 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.76 $
+ * \version \$Revision: 1.77 $
  */
 
 
@@ -56,6 +56,7 @@ extern ostream *dot_output;	// defined in main.cc
 extern ostream *lola_output;	// defined in main.cc
 extern ostream *info_output;	// defined in main.cc
 extern ostream *owfn_output;	// defined in main.cc
+extern ostream *appn_output;	// defined in main.cc
 extern string filename;		// defined in main.cc
 extern bool mode_simplify_petri_net;	// defined in main.cc
 extern SymbolManager symMan;	// defined in bpel-syntax.y
@@ -117,7 +118,7 @@ bool Node::firstMemberIs (string role)
 
 
 
-/*
+/*!
  * \return the name of the node type
  */
 string Node::nodeTypeName ()
@@ -133,6 +134,22 @@ string Node::nodeTypeName ()
     }
 }
 
+
+
+
+
+/*!
+ * \return the short name of the node, e.g. for LoLA output
+ */
+string Node::nodeShortName ()
+{
+  if (nodeType == PLACE)
+    return ("p" + intToString(id));
+  if (nodeType == TRANSITION)
+    return ("t" + intToString(id));
+  else
+    return NULL;
+}
 
 
 
@@ -217,13 +234,12 @@ Transition::Transition (unsigned int myid, string role, string myguard)
 */
 string Transition::dotOut ()
 {
-  string
-    result;
-  result += " " + intToString (id) + "\t[label=\"t" + intToString (id) + "\"";
+  string result;
+  result += " " + intToString (id) + "\t[label=\"" + nodeShortName() + "\"";
 
   if (guard != "")
     result +=
-      " shape=record label=\"{t" + intToString (id) + "|{" + guard + "}}\"";
+      " shape=record label=\"{" + nodeShortName() + "|{" + guard + "}}\"";
 
   if (firstMemberAs ("internal.eventHandler."))
     result += " style=filled fillcolor=plum";
@@ -272,7 +288,7 @@ string Place::dotOut ()
 {
   string
     result;
-  result += " " + intToString (id) + "\t[label=\"p" + intToString (id) + "\"";
+  result += " " + intToString (id) + "\t[label=\"" + nodeShortName() + "\"";
 
   if (firstMemberAs ("eventHandler."))
     result += " style=filled fillcolor=plum";
@@ -494,12 +510,12 @@ PetriNet::newArc (Node * source, Node * target, arc_type type,
       string role = "unknown";
       if ((Place *) target != NULL)
 	{
-	  name = target->nodeTypeName () + " p" + intToString (target->id);
+	  name = target->nodeTypeName () + " " + target->nodeShortName();
 	  role = *(target->history.begin ());
 	}
       if ((Transition *) target != NULL)
 	{
-	  name = target->nodeTypeName () + " t" + intToString (target->id);
+	  name = target->nodeTypeName () + " " + target->nodeShortName();
 	  role = *(target->history.begin ());
 	}
       throw Exception (ARC_ERROR,
@@ -514,12 +530,12 @@ PetriNet::newArc (Node * source, Node * target, arc_type type,
       string role = "unknown";
       if ((Place *) source != NULL)
 	{
-	  name = source->nodeTypeName () + " p" + intToString (source->id);
+	  name = source->nodeTypeName () + " " + source->nodeShortName();
 	  role = *(source->history.begin ());
 	}
       if ((Transition *) source != NULL)
 	{
-	  name = source->nodeTypeName () + " t" + intToString (source->id);
+	  name = source->nodeTypeName () + " " + source->nodeShortName();
 	  role = *(source->history.begin ());
 	}
       throw Exception (ARC_ERROR,
@@ -666,7 +682,7 @@ PetriNet::printInformation ()
   (*info_output) << "PLACES:\nID\tTYPE\t\tROLES\n";
   for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
     {
-      (*info_output) << "p" << ((*p)->id) << "\t";
+      (*info_output) << (*p)->nodeShortName() << "\t";
 
       switch ((*p)->type)
 	{
@@ -707,7 +723,7 @@ PetriNet::printInformation ()
   (*info_output) << "ID\tGUARD\t\tROLES\n";
   for (set < Transition * >::iterator t = T.begin (); t != T.end (); t++)
     {
-      (*info_output) << "t" + intToString ((*t)->id) + "\t";
+      (*info_output) << (*t)->nodeShortName() + "\t";
 
       if ((*t)->guard != "")
 	(*info_output) << "{" + (*t)->guard + "} ";
@@ -801,6 +817,52 @@ PetriNet::removeInterface ()
 
 
 /*!
+ * Outputs the net in APNN (Abstract Petri Net Notation).
+ */
+void
+PetriNet::appnOut ()
+{
+  trace (TRACE_DEBUG, "[PN]\tCreating APPN-output.\n");
+
+  if (!lowLevel)
+    makeLowLevel ();
+
+  removeInterface ();
+
+  (*appn_output) << "\\beginnet{" << filename << "}" << endl << endl;
+
+  // places
+  for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
+  {
+    (*appn_output) << "  \\place{" << (*p)->nodeShortName() << "}{}" << endl;
+  }
+  (*appn_output) << endl;
+
+  // transitions
+  for (set < Transition * >::iterator t = T.begin (); t != T.end (); t++)
+  {
+    (*appn_output) << "  \\transition{" << (*t)->nodeShortName() << "}{}" << endl;
+  }
+  (*appn_output) << endl;
+
+  // arcs
+  int arcNumber = 1;
+  for (set < Arc * >::iterator f = F.begin (); f != F.end (); f++, arcNumber++)
+  {
+    (*appn_output) << "  \\arc{a" << arcNumber << "}";
+    (*appn_output) << "\\from{" << (*f)->source->nodeShortName() << "}";
+    (*appn_output) << "\t\\to{}" << (*f)->target->nodeShortName() << "}" << endl;
+  }
+  (*appn_output) << endl;
+  
+  (*appn_output) << "\\endnet" << endl;
+}
+
+
+
+
+
+/*!
  * Outputs the net in LoLA-format.
  */
 void
@@ -821,7 +883,7 @@ PetriNet::lolaOut ()
   unsigned int count = 1;
   for (set < Place * >::iterator p = P.begin (); p != P.end (); count++, p++)
     {
-      (*lola_output) << "  p" << (*p)->id;
+      (*lola_output) << "  " << (*p)->nodeShortName();
 
       if (count < P.size ())
 	(*lola_output) << ",";
@@ -835,18 +897,15 @@ PetriNet::lolaOut ()
 
   // initial marking
   (*lola_output) << "MARKING" << endl;
-  (*lola_output) << "  p" << findPlace ("1.internal.initial")->
-    id << ":\t1,\t { initial marking of the process }" << endl;
+  (*lola_output) << "  " << findPlace("1.internal.initial")->nodeShortName()
+	  << ":\t1,\t { initial marking of the process }" << endl;
 
   for (list < string >::iterator variable = symMan.variables.begin ();
        variable != symMan.variables.end (); variable++)
-    (*lola_output) << "  p" << findPlace ("variable." +
-					  *variable)->
-      id << ":\t1,\t { initial marking of variable" << *variable << " }" <<
+    (*lola_output) << "  " << findPlace("variable." + *variable)->nodeShortName() << ":\t1,\t { initial marking of variable" << *variable << " }" <<
       endl;
 
-  (*lola_output) << "  p" << findPlace ("1.internal.clock")->
-    id << ":\t1\t { initial marking of the clock }" << endl;
+  (*lola_output) << "  " << findPlace("1.internal.clock")->nodeShortName() << ":\t1\t { initial marking of the clock }" << endl;
   (*lola_output) << ";" << endl << endl << endl;
 
 
@@ -855,10 +914,7 @@ PetriNet::lolaOut ()
   for (set < Transition * >::iterator t = T.begin (); t != T.end ();
        count++, t++)
     {
-      (*lola_output) << "TRANSITION t" << (*t)->id << "\t { " << (*(*t)->
-								  history.
-								  begin ()) <<
-	" }" << endl;
+      (*lola_output) << "TRANSITION " << (*t)->nodeShortName() << "\t { " << (*(*t)->history.begin()) << " }" << endl;
       set < pair < Node *, arc_type > >consume = preset (*t);
       set < pair < Node *, arc_type > >produce = postset (*t);
 
@@ -870,7 +926,7 @@ PetriNet::lolaOut ()
       for (set < pair < Node *, arc_type > >::iterator pre = consume.begin ();
 	   pre != consume.end (); count2++, pre++)
 	{
-	  (*lola_output) << "  p" << (*pre).first->id << ":\t1";
+	  (*lola_output) << "  " << (*pre).first->nodeShortName() << ":\t1";
 
 	  if (count2 < consume.size ())
 	    (*lola_output) << "," << endl;
@@ -886,7 +942,7 @@ PetriNet::lolaOut ()
       for (set < pair < Node *, arc_type > >::iterator post =
 	   produce.begin (); post != produce.end (); count2++, post++)
 	{
-	  (*lola_output) << "  p" << (*post).first->id << ":\t1";
+	  (*lola_output) << "  " << (*post).first->nodeShortName() << ":\t1";
 
 	  if (count2 < produce.size ())
 	    (*lola_output) << "," << endl;
@@ -928,9 +984,9 @@ PetriNet::owfnOut ()
       if ((*p)->type == INTERNAL)
 	{
 	  if (count == 1)
-	    (*owfn_output) << "    p" << (*p)->id;
+	    (*owfn_output) << "    " << (*p)->nodeShortName();
 	  else
-	    (*owfn_output) << ", " << comment << "    p" << (*p)->id;
+	    (*owfn_output) << ", " << comment << "    " << (*p)->nodeShortName();
 
 	  comment = "\t\t { " + (*(*p)->history.begin ()) + " }\n";
 	  count++;
@@ -946,9 +1002,9 @@ PetriNet::owfnOut ()
       if ((*p)->type == IN)
 	{
 	  if (count == 1)
-	    (*owfn_output) << "    p" << (*p)->id;
+	    (*owfn_output) << "    " << (*p)->nodeShortName();
 	  else
-	    (*owfn_output) << ", " << comment << "    p" << (*p)->id;
+	    (*owfn_output) << ", " << comment << "    " << (*p)->nodeShortName();
 
 	  comment = "\t\t { " + (*(*p)->history.begin ()) + " }\n";
 	  count++;
@@ -964,9 +1020,9 @@ PetriNet::owfnOut ()
       if ((*p)->type == OUT)
 	{
 	  if (count == 1)
-	    (*owfn_output) << "    p" << (*p)->id;
+	    (*owfn_output) << "    " << (*p)->nodeShortName();
 	  else
-	    (*owfn_output) << ", " << comment << "    p" << (*p)->id;
+	    (*owfn_output) << ", " << comment << "    " << (*p)->nodeShortName();
 
 	  comment = "\t\t { " + (*(*p)->history.begin ()) + " }\n";
 	  count++;
@@ -977,18 +1033,14 @@ PetriNet::owfnOut ()
 
   // initial marking
   (*owfn_output) << "MARKING" << endl;
-  (*owfn_output) << "  p" << findPlace ("1.internal.initial")->
-    id << ":\t1,\t { initial marking of the process }" << endl;
+  (*owfn_output) << "  " << findPlace("1.internal.initial")->nodeShortName() << ":\t1,\t { initial marking of the process }" << endl;
 
   for (list < string >::iterator variable = symMan.variables.begin ();
        variable != symMan.variables.end (); variable++)
-    (*owfn_output) << "  p" << findPlace ("variable." +
-					  *variable)->
-      id << ":\t1,\t { initial marking of variable" << *variable << " }" <<
+    (*owfn_output) << "  " << findPlace("variable." + *variable)->nodeShortName() << ":\t1,\t { initial marking of variable" << *variable << " }" <<
       endl;
 
-  (*owfn_output) << "  p" << findPlace ("1.internal.clock")->
-    id << ":\t1\t { initial marking of the clock }" << endl;
+  (*owfn_output) << "  " << findPlace ("1.internal.clock")->nodeShortName() << ":\t1\t { initial marking of the clock }" << endl;
   (*owfn_output) << ";" << endl << endl << endl;
 
 
@@ -997,10 +1049,7 @@ PetriNet::owfnOut ()
   for (set < Transition * >::iterator t = T.begin (); t != T.end ();
        count++, t++)
     {
-      (*owfn_output) << "TRANSITION t" << (*t)->id << "\t { " << (*(*t)->
-								  history.
-								  begin ()) <<
-	" }" << endl;
+      (*owfn_output) << "TRANSITION " << (*t)->nodeShortName() << "\t { " << (*(*t)->history.begin()) << " }" << endl;
       set < pair < Node *, arc_type > >consume = preset (*t);
       set < pair < Node *, arc_type > >produce = postset (*t);
 
@@ -1012,7 +1061,7 @@ PetriNet::owfnOut ()
       for (set < pair < Node *, arc_type > >::iterator pre = consume.begin ();
 	   pre != consume.end (); count2++, pre++)
 	{
-	  (*owfn_output) << "  p" << (*pre).first->id << ":\t1";
+	  (*owfn_output) << "  " << (*pre).first->nodeShortName() << ":\t1";
 
 	  if (count2 < consume.size ())
 	    (*owfn_output) << "," << endl;
@@ -1028,7 +1077,7 @@ PetriNet::owfnOut ()
       for (set < pair < Node *, arc_type > >::iterator post =
 	   produce.begin (); post != produce.end (); count2++, post++)
 	{
-	  (*owfn_output) << "  p" << (*post).first->id << ":\t1";
+	  (*owfn_output) << "  " << (*post).first->nodeShortName() << ":\t1";
 
 	  if (count2 < produce.size ())
 	    (*owfn_output) << "," << endl;
@@ -1143,9 +1192,9 @@ PetriNet::mergePlaces (Place * p1, Place * p2)
     throw Exception (MERGING_ERROR,
 		     (string)
 		     "Merging of interface places not yet supported!\n" +
-		     "place p" + intToString (p1->id) + " (type " +
-		     intToString (p2->type) + ") and p" +
-		     intToString (p2->id) + " (type " +
+		     "place " + p1->nodeShortName() + " (type " +
+		     intToString (p2->type) + ") and " +
+		     p2->nodeShortName() + " (type " +
 		     intToString (p2->type) + ")", pos (__FILE__, __LINE__,
 							__FUNCTION__));
 

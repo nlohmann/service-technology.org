@@ -1,5 +1,5 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert      *
+ * Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinertf      *
  *                                                                           *
  * This file is part of BPEL2oWFN.                                           *
  *                                                                           *
@@ -40,14 +40,14 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/01/20 09:31:54 $
+ *          - last changed: \$Date: 2006/01/26 08:42:36 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *          
- * \version \$Revision: 1.46 $
+ * \version \$Revision: 1.47 $
  */
 
 
@@ -133,11 +133,14 @@ public:
   /// the name of the type
   string nodeTypeName ();
 
+  /// the short name of the node
+  string nodeShortName ();
+  
   /// the type of the node
   node_type nodeType;
 
   /// the set of roles (i.e. the history) of the node
-    vector < string > history;
+  vector < string > history;
 
   /// true if first role contains role
   bool firstMemberAs (string role);
@@ -246,7 +249,7 @@ public:
   string inscription;
 
   /// Constructor to create an arc of certain type and inscription.
-    Arc (Node * source, Node * target, arc_type type, string inscription);
+  Arc (Node * source, Node * target, arc_type type, string inscription);
 
   /// DOT-output of the arc (used by PetriNet::dotOut())
   string dotOut ();
@@ -297,6 +300,9 @@ public:
   /// DOT (Graphviz) output.
   void dotOut ();
 
+  /// APPN (Abstract Petri Net Notation) output.
+  void appnOut ();
+  
   /// LoLA-output.
   void lolaOut ();
 
@@ -332,11 +338,11 @@ public:
   void makeLowLevel ();
 
   /// Constructor to create an empty Petri net.
-    PetriNet ();
+  PetriNet ();
 
 private:
   /// Adds a place without an initial role.
-    Place * newPlace ();
+  Place * newPlace ();
 
   /// Removes a place from the net.
   void removePlace (Place * p);
@@ -354,19 +360,19 @@ private:
   void detachNode (Node * n);
 
   /// Calculates the preset of a node.
-    set < pair < Node *, arc_type > >preset (Node * n);
+  set < pair < Node *, arc_type > >preset (Node * n);
 
   /// Calculates the postset of a node.
-    set < pair < Node *, arc_type > >postset (Node * n);
+  set < pair < Node *, arc_type > >postset (Node * n);
 
   /// the list of places of the Petri net
-    set < Place * >P;
+  set < Place * >P;
 
   /// the list of transitions of the Petri net
-    set < Transition * >T;
+  set < Transition * >T;
 
   /// the list of arcs of the Petri net
-    set < Arc * >F;
+  set < Arc * >F;
 
   /// Statistical output.
   string information ();
@@ -387,7 +393,7 @@ private:
   bool lowLevel;
 
   /// Mapping of roles to nodes of the Petri net.
-    map < string, Node * >roleMap;
+  map < string, Node * >roleMap;
 };
 
 #endif

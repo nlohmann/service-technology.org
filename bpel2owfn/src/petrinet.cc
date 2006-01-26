@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/01/26 13:41:27 $
+ *          - last changed: \$Date: 2006/01/26 14:34:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.80 $
+ * \version \$Revision: 1.81 $
  */
 
 
@@ -378,6 +378,7 @@ PetriNet::newPlace (string role, place_type mytype)
 	 " (" + role + ") ...\n");
 
   Place *p = new Place (getId (), role, mytype);
+  p->initialMarking = 0;
   P.insert (p);
 
   if (role != "")
@@ -816,6 +817,10 @@ PetriNet::removeInterface ()
 
 
 
+/*****************************************************************************
+ * Output formats
+ *****************************************************************************/
+
 /*!
  * Outputs the net in low-level PEP notation.
  */
@@ -828,6 +833,7 @@ PetriNet::pepOut()
     makeLowLevel ();
 
   removeInterface ();
+  calculateInitialMarking();
   
   // header
   cout << "PEP" << endl << "PTNet" << endl << "FORMAT_N" << endl;
@@ -835,7 +841,12 @@ PetriNet::pepOut()
   // places
   cout << "PL" << endl;
   for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
-    cout << (*p)->id << "\"" << (*p)->nodeShortName() << "\"80@40k1" << endl;
+  {
+    cout << (*p)->id << "\"" << (*p)->nodeShortName() << "\"80@40";
+    if ((*p)->initialMarking > 0)
+      cout << "M" << (*p)->initialMarking;
+    cout << "k1" << endl;
+  }
 
   // transitions
   cout << "TR" << endl;
@@ -871,13 +882,17 @@ PetriNet::appnOut ()
     makeLowLevel ();
 
   removeInterface ();
-
+  calculateInitialMarking();
+  
   (*appn_output) << "\\beginnet{" << filename << "}" << endl << endl;
 
   // places
   for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
   {
-    (*appn_output) << "  \\place{" << (*p)->nodeShortName() << "}{}" << endl;
+    (*appn_output) << "  \\place{" << (*p)->nodeShortName() << "}{";
+    if ((*p)->initialMarking > 0)
+      (*appn_output) << "\\init{" << (*p)->initialMarking << "}";
+    (*appn_output) << "}" << endl;
   }
   (*appn_output) << endl;
 
@@ -1577,6 +1592,15 @@ PetriNet::makeLowLevel ()
 
 
 
+
+
+void
+PetriNet::calculateInitialMarking ()
+{
+  findPlace("1.internal.initial")->initialMarking = 1;
+  for (list < string >::iterator variable = symMan.variables.begin (); variable != symMan.variables.end (); variable++)
+    findPlace("variable." + *variable)->initialMarking = 1;
+}
 
 
 /*---------------------------------------------------------------------------*/

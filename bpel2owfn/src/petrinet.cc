@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/01/26 09:11:20 $
+ *          - last changed: \$Date: 2006/01/26 12:58:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.78 $
+ * \version \$Revision: 1.79 $
  */
 
 
@@ -810,6 +810,56 @@ PetriNet::removeInterface ()
        it != killList.end (); it++)
     removePlace (*it);
 
+}
+
+
+
+
+
+/*!
+ * Outputs the net in low-level PEP notation.
+ */
+void
+PetriNet::pepOut()
+{
+  trace (TRACE_DEBUG, "[PN]\tCreating PEP-output.\n");
+
+  if (!lowLevel)
+    makeLowLevel ();
+
+  removeInterface ();
+  
+  // header
+  cout << "% Petri net created by " << PACKAGE_STRING << " reading " << filename << endl; 
+  cout << "PEP" << endl << "PTNet" << endl << "FORMAT_N" << endl;
+  
+  // places
+  cout << "% -------- Places --------" << endl;
+  cout << "PL" << endl;
+  for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
+    cout << (*p)->id << "\"" << (*p)->nodeShortName() << "\"80@40b\"" << (*(*p)->history.begin ()) << "\"k1" << endl;
+
+  // transitions
+  cout << "% -------- Transitions --------" << endl;
+  cout << "TR" << endl;
+  for (set < Transition * >::iterator t = T.begin (); t != T.end (); t++)
+    cout << (*t)->id << "\"" << (*t)->nodeShortName() << "\"80@40b\"" << (*(*t)->history.begin ()) << "\"" << endl;
+  
+  // arcs from transitions to places
+  cout << "% -------- Transition -> Place Arcs --------" << endl;
+  cout << "TP" << endl;
+  for (set < Arc * >::iterator f = F.begin (); f != F.end (); f++)
+    if (((*f)->source->nodeType) == TRANSITION)
+      cout << (*f)->source->id << "<" << (*f)->target->id << endl;
+
+  // arcs from places to transitions
+  cout << "% -------- Place -> Transition Arcs --------" << endl;
+  cout << "PT" << endl;
+  for (set < Arc * >::iterator f = F.begin (); f != F.end (); f++)
+    if (((*f)->source->nodeType) == PLACE)
+      cout << (*f)->source->id << ">" << (*f)->target->id << endl;
+
+  cout << "% -------- End of file --------" << endl;
 }
 
 

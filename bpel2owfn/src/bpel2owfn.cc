@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2005/12/18 20:35:48 $
+ *          - last changed: \$Date: 2006/01/26 08:43:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.44 $
+ * \version \$Revision: 1.45 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -66,6 +66,11 @@ std::string dot_filename = "";
 /// Pointer to dot output file
 std::ostream * dot_output = &std::cout;
 
+/// Filename of APPN output file
+std::string appn_filename = "";
+/// Pointer to APPN output file
+std::ostream * appn_output = &std::cout;
+
 /// Filename of lola output file
 std::string lola_filename = "";
 /// Pointer to lola output file
@@ -89,6 +94,10 @@ bool mode_file = false;
 bool mode_petri_net = false;
 /// simplify Petri Net
 bool mode_simplify_petri_net = false;
+/// paint Petri Net in APPN format
+bool mode_appn_petri_net = false;
+/// paint Petri Net in APPN format and output to file
+bool mode_appn_2_file = false;
 /// paint Petri Net for lola
 bool mode_lola_petri_net = false;
 /// paint Petri Net for lola and output to file
@@ -169,6 +178,11 @@ int main( int argc, char *argv[])
     if (mode_lola_petri_net)
     {
       TheNet->lolaOut();
+    }
+    // create APPN output ?
+    if (mode_appn_petri_net)
+    {
+      TheNet->appnOut();
     }
     // create oWFN output ?
     if (mode_owfn_petri_net)

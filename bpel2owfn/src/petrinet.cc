@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/01/27 07:53:32 $
+ *          - last changed: \$Date: 2006/01/27 08:30:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.82 $
+ * \version \$Revision: 1.83 $
  */
 
 
@@ -822,6 +822,71 @@ PetriNet::removeInterface ()
  *****************************************************************************/
 
 /*!
+ * Outputs the net in PNML (Petri Net Markup Language).
+ */
+void
+PetriNet::pnmlOut ()
+{
+  trace (TRACE_DEBUG, "[PN]\tCreating PNML-output.\n");
+
+  if (!lowLevel)
+    makeLowLevel ();
+
+  removeInterface ();
+  calculateInitialMarking();
+
+
+  cout << "<!-- Petri net created by " << PACKAGE_STRING << " reading file " << filename << " -->" << endl << endl;
+  
+  cout << "<pnml>" << endl;
+  cout << "  <net id=\"" << filename << "\" type=\"\">" << endl << endl;
+  
+  // places
+  for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
+  {
+    cout << "    <place id=\"" << (*p)->nodeShortName() << "\">" << endl;
+    cout << "      <name>" << endl;
+    cout << "        <text>" << (*(*p)->history.begin()) << "</text>" << endl;
+    cout << "      </name>" << endl;
+    if ((*p)->initialMarking > 0)
+    {
+      cout << "      <initialMarking>" << endl;
+      cout << "        <text>" << (*p)->initialMarking << "</text>" << endl;
+      cout << "      </initialMarking>" << endl;
+    }
+    cout << "    </place>" << endl << endl;
+  }
+
+  // transitions
+  for (set < Transition * >::iterator t = T.begin (); t != T.end (); t++)
+  {
+    cout << "    <transition id=\"" << (*t)->nodeShortName() << "\">" << endl;
+    cout << "      <name>" << endl;
+    cout << "        <text>" << (*(*t)->history.begin()) << "</text>" << endl;
+    cout << "      </name>" << endl;
+    cout << "    </transition>" << endl << endl;
+  }
+  cout << endl;
+
+  // arcs
+  int arcNumber = 1;
+  for (set < Arc * >::iterator f = F.begin (); f != F.end (); f++, arcNumber++)
+  {
+    cout << "    <arc id=\"a" << arcNumber << "\" ";
+    cout << "source=\"" << (*f)->source->nodeShortName() << "\" ";
+    cout << "target=\"" << (*f)->source->nodeShortName() << "\" />" << endl;
+  }
+  cout << endl;
+  cout << "  </net>" << endl;
+  cout << "</pnml>" << endl;
+  cout << endl << "<!-- END OF FILE -->" << endl;
+}
+
+
+
+
+
+/*!
  * Outputs the net in low-level PEP notation.
  */
 void
@@ -947,8 +1012,7 @@ PetriNet::lolaOut ()
 	(*lola_output) << ",";
       else
 	(*lola_output) << ";";
-      (*lola_output) << "\t\t { " << (*(*p)->history.
-				      begin ()) << " }" << endl;
+      (*lola_output) << "\t\t { " << (*(*p)->history.begin()) << " }" << endl;
     }
   (*lola_output) << endl << endl;
 

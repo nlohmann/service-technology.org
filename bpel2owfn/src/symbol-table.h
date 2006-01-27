@@ -33,7 +33,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.5 $: 
+ * \version \$Revision: 1.6 $: 
  *
  */
 
@@ -60,52 +60,98 @@ typedef enum
 
 
 // forward declaration of classes
-class Activity;
-class Attribute;
-class CompensationHandler;
-class CorrelationSet;
-class Element;
-class Envelope;
-class EventHandlers;
-class FaultHandlers;
-class PartnerLink;
-class Process;
-class Scope;
+class STActivity;
+class STAttribute;
+class STCompensationHandler;
+class STCorrelationSet;
+class STElement;
+class STEnvelope;
+class STEventHandlers;
+class STFaultHandlers;
+class STLink;
+class STPartnerLink;
+class STProcess;
+class STScope;
 class SymbolTable;
 class SymbolTableEntry;
-class Variable;
-class Link;
+class STVariable;
 
+/**
+ * \class	SymbolTable
+ *
+ * \brief
+ * 
+ */
+class SymbolTable
+{
+  private:
+    /// a container to store ...
+    map<unsigned int, SymbolTableEntry*> symTab;
+    
+  public:
+    /// constructor
+    SymbolTable();
+    
+    /// destructor
+    ~SymbolTable();
+    
+    /// current entry key
+    unsigned int entryKey;
+    
+    /// increase the map key
+    unsigned int nextKey();
 
-
+	/// ST traces
+	void traceST(string traceMsg);
+    
+    /// return the key of the last insert element
+    unsigned int getCurrentEntryKey();
+    
+    /// create a new entry in the symbol table and return symbol table entry key
+    unsigned int insert(unsigned int elementId);
+    
+    /// create a new attribute
+    STAttribute* newAttribute(kc::casestring name, kc::casestring value);
+    
+    /// to add an attribute to the special symbol table entry
+    void addAttribute(unsigned int entryKey, STAttribute* attribute);
+    
+    /// return value from desired attribute
+    STAttribute* readAttribute(unsigned int entryKey, string name);
+    
+    /// return entry of symbol table
+    SymbolTableEntry* lookup(unsigned int entryKey);
+};
 
 /**
  * \class	SymbolTableEntry
  *
- * \brief
+ * \brief the grandmother
  * 
  */
 class SymbolTableEntry
 {
   public:
-    ///   
-    unsigned int entryId;
+    /// entry key within symbol table
+    unsigned int entryKey;
 
-    /// BPEL-element Id
+    /// BPEL-element Id, used for cast decision
     unsigned int elementId;
     
-    /// cast information
-    string elementType;
-    
     /// contructor
-    SymbolTableEntry();
+    SymbolTableEntry(unsigned int elementId);
+    SymbolTableEntry(unsigned int elementId, unsigned int entryKey);
     
     /// destructor
-    ~SymbolTableEntry();
+    virtual ~SymbolTableEntry();
     
-    string getElementId();
+    ///
+    void setEntryKey(unsigned int val);
+    void setElementId(unsigned int val);
     
-    string getElementType();
+    ///
+    unsigned int getEntryKey();
+    unsigned int getElementId();
 };
 
 
@@ -117,11 +163,11 @@ class SymbolTableEntry
  * \brief
  * 
  */
-class Element
+class STElement
 {
   public:
-    /// a list of the element's attributes
-    list<Attribute*> listOfAttributes;
+    /// a map of the element's attributes
+    map<string, STAttribute*> mapOfAttributes;
     
     /// line position of attribute within BPEL file
     unsigned int line;
@@ -140,9 +186,15 @@ class Element
  * \brief
  * 
  */
-class Attribute
+class STAttribute
 {
   public:
+    /// constructor
+    STAttribute(kc::casestring name, kc::casestring value);
+    
+    ///
+    ~STAttribute();
+  
     /// name of attribute
     kc::casestring name;
     
@@ -165,9 +217,15 @@ class Attribute
  * \brief
  * 
  */
-class Variable: public Element
+class STVariable : public STElement
 {
   public:
+    /// constructor
+    STVariable();
+    
+    /// destructor
+    ~STVariable();
+    
     /// true if variable is used in an activity
     bool used;
 };
@@ -180,7 +238,7 @@ class Variable: public Element
  * \brief
  * 
  */
-class Link: public Element
+class STLink: public STElement
 {
   public:
     /// the name of the link
@@ -205,8 +263,9 @@ class Link: public Element
  * \brief
  * 
  */
-class PartnerLink: public Element
+class STPartnerLink: public STElement
 {
+  public:
 };
 
 
@@ -217,8 +276,9 @@ class PartnerLink: public Element
  * \brief
  * 
  */
-class CorrelationSet: public Element
+class STCorrelationSet: public STElement
 {
+  public:
 };
 
 
@@ -232,7 +292,7 @@ class CorrelationSet: public Element
  * Everything about <faultHandlers>.
  * 
  */
-class FaultHandlers
+class STFaultHandlers
 {
   public:
     /// true if fault handler has an <catchAll> branch
@@ -258,7 +318,7 @@ class FaultHandlers
  * Everything about <compensationHandler>.
  * 
  */
-class CompensationHandler
+class STCompensationHandler
 {
   public:
     /// true if compensation handler encloses an <compensate/> activity
@@ -284,8 +344,9 @@ class CompensationHandler
  * Everything about <eventHandlers>.
  * 
  */
-class EventHandlers
+class STEventHandlers
 {
+  public:
 };
 
 
@@ -300,23 +361,23 @@ class EventHandlers
  * or event handlers.
  * 
  */
-class Envelope
+class STEnvelope
 {
   public:
     /// a list of variables declared in this scope/process
-    list<Variable*> variables;
+    list<STVariable*> variables;
     
     /// a list of correlation sets declared in this scope/process
-    list<CorrelationSet*> correlationSets;
+    list<STCorrelationSet*> correlationSets;
     
     /// the fault handler of the scope/process
-    FaultHandlers* faultHandler;
+    STFaultHandlers* faultHandler;
     
     /// the compensation handler of the scope/process
-    CompensationHandler* compensationHandler;
+    STCompensationHandler* compensationHandler;
     
     /// the event handler of the scope/process
-    EventHandlers* eventHandler;
+    STEventHandlers* eventHandler;
 
     /// true if scope had an event handler?
     bool hasEventHandler;    
@@ -327,18 +388,22 @@ class Envelope
 
 
 /**
- * \class	Process
+ * \class	STProcess
  *
  * \brief
  * 
  * The <process> activity.
  * 
  */
-class Process: public Element, Envelope, SymbolTableEntry
+class STProcess: public STElement, public STEnvelope, public SymbolTableEntry
 {
   public:
+    /// constructor
+    STProcess(unsigned int elementId);
+    STProcess(unsigned int elementId, unsigned int entryKey);
+    
     /// a list of partner links declared in the process
-    list<PartnerLink*> partnerLinks;
+    list<STPartnerLink*> partnerLinks;
 
     /// true if process is abstract (i.e. a business protocol)
     bool abstractProcess;
@@ -355,14 +420,14 @@ class Process: public Element, Envelope, SymbolTableEntry
  * The <scope> activity.
  * 
  */
-class Scope: public Element, Envelope, SymbolTableEntry
+class STScope: public STElement, public STEnvelope, public SymbolTableEntry
 {
   public:
     /// additional attribute used for inter-scope communication (push-places)
     unsigned int parentScopeId;
 
     /// list of all enclosed links (recursively)
-    list<Link*> enclosedLinks;
+    list<STLink*> enclosedLinks;
 };
 
 
@@ -376,7 +441,7 @@ class Scope: public Element, Envelope, SymbolTableEntry
  * All other activities.
  * 
  */
-class Activity: public Element, SymbolTableEntry
+class STActivity: public STElement, public SymbolTableEntry
 {
   public:
     /// true if activity is source of a link
@@ -391,8 +456,8 @@ class Activity: public Element, SymbolTableEntry
 
     // only used for communication activities
     string channelId;
-    Variable *inputVariable;
-    Variable *outputVariable;
+    STVariable *inputVariable;
+    STVariable *outputVariable;
 
     // only used for <wait> activity
     /// true if <wait> has a "until" attribute
@@ -405,44 +470,6 @@ class Activity: public Element, SymbolTableEntry
 
     // only used for <terminate> activity
     bool isFirstTerminate;
-};
-
-
-
-
-/**
- * \class	SymbolTable
- *
- * \brief
- * 
- */
-class SymbolTable
-{
-  private:
-    /// a container to store ...
-    map<unsigned int, SymbolTableEntry*> symTab;
-    
-  public:
-    /// constructor
-    SymbolTable();
-    
-    /// destructor
-    ~SymbolTable();
-    
-    /// 
-    unsigned int entryId;
-    
-    /// increase the id
-    kc::integer nextId();
-
-	/// ST traces
-	void traceST(string traceMsg);
-    
-    ///
-    void insert(unsigned int elementType);
-    
-    ///
-    SymbolTableEntry lookup(kc::integer entryId);
 };
 
 #endif

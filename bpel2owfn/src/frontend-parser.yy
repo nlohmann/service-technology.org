@@ -34,14 +34,14 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/01/20 07:47:30 $
+ *          - last changed: \$Date: 2006/01/27 22:34:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universitï¿½t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.99 $
+ * \version \$Revision: 1.100 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -121,6 +121,14 @@ extern int yyerror(const char *);
 
 using namespace kc;
 using namespace std;
+
+// symbol table
+#include "symbol-table.h"
+
+/// an instance of the symbol table
+SymbolTable symTab = SymbolTable();
+SymbolTableEntry* currentSymTabEntry;
+unsigned int currentSymTabEntryKey = 0;
 
 // manage attributes
 #include "bpel-attributes.h"
@@ -281,20 +289,25 @@ int hasCompensate;
 */
 
 tProcess:
-  X_OPEN K_PROCESS arbitraryAttributes
-    { att.check($3, K_PROCESS);
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+  X_OPEN K_PROCESS
+  { currentSymTabEntryKey = symTab.insert(K_PROCESS);
+    currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
+  }
+  arbitraryAttributes
+    { symTab.traceST(string((symTab.readAttribute(currentSymTabEntryKey, "name"))->value->name) + "\n");
+      att.check($4, K_PROCESS);
+      if(att.isAttributeValueEmpty($4, "suppressJoinFailure"))
       {
       	/// default attribute value
-      	att.pushSJFStack($3, mkcasestring("no"));
+      	att.pushSJFStack($4, mkcasestring("no"));
       }
       else
       {
         /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+      	att.pushSJFStack($4, att.read($4, "suppressJoinFailure"));      
       }      
-      symMan.initialiseProcessScope($3);
-      currentScopeId = $3;
+      symMan.initialiseProcessScope($4);
+      currentScopeId = $4;
       isInFH.push(false);
       isInCH.push(pair<bool,int>(false,0));
       hasCompensate = 0;
@@ -303,22 +316,22 @@ tProcess:
     { inProcess = false; }
   activity
   X_NEXT X_SLASH K_PROCESS X_CLOSE
-    { TheProcess = $$ = Process($7, $8, $9, $10, $11, $12, $13, StopInProcess(), $15);
+    { TheProcess = $$ = Process($8, $9, $10, $11, $12, $13, $14, StopInProcess(), $16);
       symMan.quitScope();
-      $$->name = att.read($3, "name");
-      $$->targetNamespace = att.read($3, "targetNamespace");
-      $$->queryLanguage = att.read($3, "queryLanguage", $$->queryLanguage);
-      $$->expressionLanguage = att.read($3, "expressionLanguage", $$->expressionLanguage);
-      $$->suppressJoinFailure = att.read($3, "suppressJoinFailure", $$->suppressJoinFailure);
+      $$->name = att.read($4, "name");
+      $$->targetNamespace = att.read($4, "targetNamespace");
+      $$->queryLanguage = att.read($4, "queryLanguage", $$->queryLanguage);
+      $$->expressionLanguage = att.read($4, "expressionLanguage", $$->expressionLanguage);
+      $$->suppressJoinFailure = att.read($4, "suppressJoinFailure", $$->suppressJoinFailure);
       att.traceAM(string("tProcess: ") + ($$->suppressJoinFailure)->name + string("\n"));      
       att.popSJFStack();
-      $$->enableInstanceCompensation = att.read($3, "enableInstanceCompensation", $$->enableInstanceCompensation);
-      $$->abstractProcess = att.read($3, "abstractProcess", $$->abstractProcess);
-      $$->xmlns = att.read($3, "xmlns", $$->xmlns);
+      $$->enableInstanceCompensation = att.read($4, "enableInstanceCompensation", $$->enableInstanceCompensation);
+      $$->abstractProcess = att.read($4, "abstractProcess", $$->abstractProcess);
+      $$->xmlns = att.read($4, "xmlns", $$->xmlns);
       isInFH.pop();
       isInCH.pop();
-      $$->id = $3;
-      $$->hasEH = (string($13->op_name()) == "userDefinedEventHandler"); }
+      $$->id = $4;
+      $$->hasEH = (string($14->op_name()) == "userDefinedEventHandler"); }
 ;
 
 /* import other namespaces */
@@ -2497,5 +2510,7 @@ arbitraryAttributes:
     { $$ = att.nextId(); }
 | X_NAME X_EQUALS X_STRING arbitraryAttributes
     { $$ = $4;
-      att.define($1, $3); }
+      att.define($1, $3); 
+      symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute($1, $3));
+    }
 ;

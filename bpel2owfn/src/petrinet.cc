@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/01/26 14:34:56 $
+ *          - last changed: \$Date: 2006/01/27 07:53:32 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.81 $
+ * \version \$Revision: 1.82 $
  */
 
 
@@ -851,7 +851,7 @@ PetriNet::pepOut()
   // transitions
   cout << "TR" << endl;
   for (set < Transition * >::iterator t = T.begin (); t != T.end (); t++)
-    cout << (*t)->id << "\"" << (*t)->nodeShortName() << "\"80@40b" << endl;
+    cout << (*t)->id << "\"" << (*t)->nodeShortName() << "\"80@40" << endl;
   
   // arcs from transitions to places
   cout << "TP" << endl;

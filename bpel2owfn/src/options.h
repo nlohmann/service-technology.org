@@ -3,7 +3,7 @@
 
 #include <getopt.h>
 
-// some file names and pointers (in main.cc)
+// some file names and pointers (in options.cc)
 
 /// Filename of input file.
 extern std::string filename;
@@ -34,7 +34,7 @@ extern std::string info_filename;
 extern std::ostream * info_output;
 
 
-// different modes controlled by command line (in main.cc)
+// different modes controlled by command line (in options.cc)
 
 /// read from file ?
 extern bool mode_file;
@@ -80,6 +80,8 @@ extern FILE *yyin;
 
 // long options
 
+extern struct option longopts[];
+extern const char * par_string;
 
 #endif
 

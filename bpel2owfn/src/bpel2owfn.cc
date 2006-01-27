@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/01/26 10:07:44 $
+ *          - last changed: \$Date: 2006/01/27 14:41:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.46 $
+ * \version \$Revision: 1.47 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -52,75 +52,13 @@
  */
 
 #include "main.h"
+#include "options.h"
 
 /// The Petri Net
 PetriNet *TheNet = new PetriNet();
 
 /// The CFG
 CFGBlock * TheCFG = NULL;
-
-// some file names and pointers
-
-/// Filename of input file.
-std::string filename = "<STDIN>";
-
-/// Filename of dot output file
-std::string dot_filename = "";
-/// Pointer to dot output file
-std::ostream * dot_output = &std::cout;
-
-/// Filename of APPN output file
-std::string appn_filename = "";
-/// Pointer to APPN output file
-std::ostream * appn_output = &std::cout;
-
-/// Filename of lola output file
-std::string lola_filename = "";
-/// Pointer to lola output file
-std::ostream * lola_output = &std::cout;
-
-/// Filename of owfn output file
-std::string owfn_filename = "";
-/// Pointer to owfn output file
-std::ostream * owfn_output = &std::cout;
-
-/// Filename of PN info file
-std::string info_filename = "";
-/// Pointer to PN info file
-std::ostream * info_output = &std::cout;
-
-// different modes controlled by command line
-
-/// read from file
-bool mode_file = false;
-/// print the Petri Net
-bool mode_petri_net = false;
-/// simplify Petri Net
-bool mode_simplify_petri_net = false;
-/// paint Petri Net in APPN format
-bool mode_appn_petri_net = false;
-/// paint Petri Net in APPN format and output to file
-bool mode_appn_2_file = false;
-/// paint Petri Net for lola
-bool mode_lola_petri_net = false;
-/// paint Petri Net for lola and output to file
-bool mode_lola_2_file = false;
-/// paint Petri Net for owfn
-bool mode_owfn_petri_net = false;
-/// paint Petri Net for owfn and output to file
-bool mode_owfn_2_file = false;
-/// paint Petri Net with dot
-bool mode_dot_petri_net = false;
-/// paint Petri Net with dot and output to file
-bool mode_dot_2_file = false;
-/// CFG
-bool mode_cfg = false;
-/// pretty printer
-bool mode_pretty_printer = false;
-/// print AST
-bool mode_ast = false;
-/// print the "low level" Petri Net
-bool mode_low_level_petri_net = false;
 
 
 /**

@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/01/27 10:11:16 $ by $Author: gierds $.
-# Version $Revision: 1.7 $
+# File last changed $Date: 2006/01/27 14:41:30 $ by $Author: gierds $.
+# Version $Revision: 1.8 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -58,7 +58,7 @@ bpel2owfn_SOURCES = $(KCDUMMY)\
 		    main.cc main.h\
 		    petrinet.cc petrinet.h\
 		    cfg.cc cfg.h\
-		    options.h
+		    options.cc options.h
 
 # the list of generated files which do not belong to the distribution
 nodist_bpel2owfn_SOURCES = $(KCSOURCES)

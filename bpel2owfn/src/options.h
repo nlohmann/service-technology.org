@@ -1,7 +1,7 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
-#include <getopt.h>
+// #include <getopt.h>
 
 // some file names and pointers (in options.cc)
 
@@ -78,10 +78,6 @@ extern int yydebug;
 extern int yy_flex_debug;
 extern FILE *yyin;
 
-// long options
-
-extern struct option longopts[];
-extern const char * par_string;
 
 #endif
 

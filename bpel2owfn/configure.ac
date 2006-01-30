@@ -18,40 +18,41 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/01/17 13:03:42 $ by $Author: nlohmann $.
-# Version $Revision: 1.5 $
+# File last changed $Date: 2006/01/30 09:11:48 $ by $Author: nlohmann $.
+# Version $Revision: 1.6 $
 
-dnl Process this file with autoconf to produce a configure script.
+# Process this file with autoconf to produce a configure script.
 AC_INIT(BPEL2oWFN, 1.1, nlohmann@informatik.hu-berlin.de, bpel2owfn)
+AC_REVISION($Revision: 1.6 $)
 
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/bpel2owfn.h)
 
-AC_LANG([C++])
-
 AM_INIT_AUTOMAKE
 
+AC_LANG([C++])
 AC_PROG_CXX
 AC_PROG_INSTALL
-AC_PROG_LEX
 
+
+# check if the compiler generators are there
+AC_PROG_LEX
 if test "$LEX" != "flex"; then
- AC_MSG_FAILURE([BPEL2oWFN cannot be compiled without Flex. For details, read section `Needed Programs' in file README.])
+ AC_MSG_WARN([Flex was not found.])
 fi
 
 AC_CHECK_PROG(YACC, bison, bison, not found)
-
 if test "$YACC" = "not found"; then
- AC_MSG_FAILURE([BPEL2oWFN cannot be compiled without Bison. For details, read section `Needed Programs' in file README.])
+ AC_MSG_WARN([Bison was not found.])
 fi
 
 AC_CHECK_PROG(KC, kc++, kc++, not found)
-
 if test "$KC" = "not found"; then
- AC_MSG_FAILURE([BPEL2oWFN cannot be compiled without Kimwitu++. For details, read section `Needed Programs' in file README.])
+ AC_MSG_WARN([Kimwitu++ was not found.])
 fi
 
-dnl no optimization flag here as it takes too much time
+
+# no optimization flag here as it takes too much time
 CXXFLAGS=-g
 
 AC_OUTPUT(Makefile \

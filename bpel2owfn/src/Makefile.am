@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/01/30 09:11:51 $ by $Author: nlohmann $.
-# Version $Revision: 1.10 $
+# File last changed $Date: 2006/01/30 14:12:17 $ by $Author: nlohmann $.
+# Version $Revision: 1.11 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -58,7 +58,8 @@ bpel2owfn_SOURCES = $(KCDUMMY)\
 		    main.cc main.h\
 		    petrinet.cc petrinet.h\
 		    cfg.cc cfg.h\
-		    options.cc options.h
+		    options.cc options.h\
+		    getopt.h
 
 
 # dependencies of the Kimwitu++ files

@@ -19,16 +19,16 @@
 \****************************************************************************/
 
 /*!
- * \file check_symbols.cc
+ * \file check-symbols.cc
  *
  * \brief Provides classes and functions in order to check the correct use of
  * 	  symbols within a BPEL process.
  *
  * \author  
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
- *          - last changed: \$Date: 2006/01/07 16:14:43 $
+ *          - last changed: \$Date: 2006/01/30 10:54:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See

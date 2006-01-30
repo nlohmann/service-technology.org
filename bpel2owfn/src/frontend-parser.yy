@@ -20,7 +20,7 @@
 
 %{
 /*!
- * \file bpel-syntax.c
+ * \file bpel-syntax.cc
  *
  * \brief BPEL grammar (implementation)
  *
@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/01/30 08:00:20 $
+ *          - last changed: \$Date: 2006/01/30 10:52:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.101 $
+ * \version \$Revision: 1.102 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL

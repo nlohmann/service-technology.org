@@ -18,12 +18,12 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/01/30 09:27:17 $ by $Author: nlohmann $.
-# Version $Revision: 1.7 $
+# File last changed $Date: 2006/01/31 10:52:12 $ by $Author: gierds $.
+# Version $Revision: 1.8 $
 
 # Process this file with autoconf to produce a configure script.
 AC_INIT(BPEL2oWFN, 1.1, nlohmann@informatik.hu-berlin.de, bpel2owfn)
-AC_REVISION($Revision: 1.7 $)
+AC_REVISION($Revision: 1.8 $)
 
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/bpel2owfn.h)
@@ -32,6 +32,7 @@ AM_INIT_AUTOMAKE
 
 AC_LANG([C++])
 AC_PROG_CXX
+AC_PROG_CC
 AC_PROG_INSTALL
 
 

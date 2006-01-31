@@ -143,7 +143,8 @@ struct option
    errors, only prototype getopt for the GNU C library.  */
 extern int getopt (int __argc, char *const *__argv, const char *__shortopts);
 # else /* not __GNU_LIBRARY__ */
-extern int getopt ();
+// changed 2006-01-31 by gierds: under Unix this line brings us into trouble
+// extern int getopt ();
 # endif /* __GNU_LIBRARY__ */
 
 # ifndef __need_getopt

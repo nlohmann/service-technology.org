@@ -26,11 +26,12 @@
 # define _NO_PROTO
 #endif
 
-/*
+
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+// changed 2006-01-31 by gierds: our config.h is called bpel2owfn.h
+# include <bpel2owfn.h>
 #endif
-*/
+
 
 #if !defined __STDC__ || !__STDC__
 /* This is a separate conditional since some stdc systems

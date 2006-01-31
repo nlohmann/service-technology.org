@@ -33,7 +33,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.6 $: 
+ * \version \$Revision: 1.7 $: 
  *
  */
 
@@ -139,6 +139,7 @@ class SymbolTableEntry
     unsigned int elementId;
     
     /// contructor
+    SymbolTableEntry();
     SymbolTableEntry(unsigned int elementId);
     SymbolTableEntry(unsigned int elementId, unsigned int entryKey);
     

@@ -205,6 +205,7 @@ SymbolTableEntry::SymbolTableEntry(unsigned int elementId)
   setElementId(elementId);
 }
 
+
 /*!
  * constructor
  */

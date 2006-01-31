@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/01/30 10:52:48 $
+ *          - last changed: \$Date: 2006/01/31 01:44:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.102 $
+ * \version \$Revision: 1.103 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -123,12 +123,12 @@ using namespace kc;
 using namespace std;
 
 // symbol table
-//#include "symbol-table.h"
+#include "symbol-table.h"
 
 /// an instance of the symbol table
-//SymbolTable symTab = SymbolTable();
-//SymbolTableEntry* currentSymTabEntry;
-//unsigned int currentSymTabEntryKey = 0;
+SymbolTable symTab = SymbolTable();
+SymbolTableEntry* currentSymTabEntry;
+unsigned int currentSymTabEntryKey = 0;
 
 // manage attributes
 #include "bpel-attributes.h"
@@ -290,8 +290,8 @@ int hasCompensate;
 
 tProcess:
   X_OPEN K_PROCESS
-  { //currentSymTabEntryKey = symTab.insert(K_PROCESS);
-    //currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
+  { currentSymTabEntryKey = symTab.insert(K_PROCESS);
+    currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
   }
   arbitraryAttributes
     { //symTab.traceST(string((symTab.readAttribute(currentSymTabEntryKey, "name"))->value->name) + "\n");
@@ -2511,6 +2511,6 @@ arbitraryAttributes:
 | X_NAME X_EQUALS X_STRING arbitraryAttributes
     { $$ = $4;
       att.define($1, $3); 
-      //symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute($1, $3));
+      symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute($1, $3));
     }
 ;

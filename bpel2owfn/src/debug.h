@@ -25,18 +25,18 @@
  *
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2005/12/18 23:05:06 $
+ *          - last changed: \$Date: 2006/02/02 15:31:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  */
 
 #ifndef DEBUG_H
@@ -59,7 +59,7 @@ typedef enum
   TRACE_VERY_DEBUG	/// trace level for everything (? information collapse)
 } trace_level;
 
-
+extern trace_level debug_level;
 
 
 

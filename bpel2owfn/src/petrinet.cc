@@ -27,18 +27,18 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/01/27 08:30:07 $
+ *          - last changed: \$Date: 2006/02/02 15:31:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.83 $
+ * \version \$Revision: 1.84 $
  */
 
 
@@ -47,19 +47,10 @@
 
 #include "petrinet.h"
 
+#include "options.h"
 
 
-
-
-extern int debug_level;		// defined in debug.cc
-extern ostream *dot_output;	// defined in main.cc
-extern ostream *lola_output;	// defined in main.cc
-extern ostream *info_output;	// defined in main.cc
-extern ostream *owfn_output;	// defined in main.cc
-extern ostream *appn_output;	// defined in main.cc
-extern string filename;		// defined in main.cc
-extern bool mode_simplify_petri_net;	// defined in main.cc
-extern SymbolManager symMan;	// defined in bpel-syntax.y
+extern SymbolManager symMan;	// defined in bpel-syntax.yy
 
 
 
@@ -680,31 +671,31 @@ void
 PetriNet::printInformation ()
 {
   // the places
-  (*info_output) << "PLACES:\nID\tTYPE\t\tROLES\n";
+  (*output) << "PLACES:\nID\tTYPE\t\tROLES\n";
   for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
     {
-      (*info_output) << (*p)->nodeShortName() << "\t";
+      (*output) << (*p)->nodeShortName() << "\t";
 
       switch ((*p)->type)
 	{
 	case (INTERNAL):
 	  {
-	    (*info_output) << "internal";
+	    (*output) << "internal";
 	    break;
 	  }
 	case (IN):
 	  {
-	    (*info_output) << "input   ";
+	    (*output) << "input   ";
 	    break;
 	  }
 	case (OUT):
 	  {
-	    (*info_output) << "output  ";
+	    (*output) << "output  ";
 	    break;
 	  }
 	default:
 	  {
-	    (*info_output) << "other   ";
+	    (*output) << "other   ";
 	  }			// should never happen
 	}
 
@@ -712,32 +703,32 @@ PetriNet::printInformation ()
 	   role != (*p)->history.end (); role++)
 	{
 	  if (role == (*p)->history.begin ())
-	    (*info_output) << "\t" + *role + "\n";
+	    (*output) << "\t" + *role + "\n";
 	  else
-	    (*info_output) << "\t\t\t" + *role + "\n";
+	    (*output) << "\t\t\t" + *role + "\n";
 	}
     }
 
 
   // the transitions
-  (*info_output) << "\nTRANSITIONS:\n";
-  (*info_output) << "ID\tGUARD\t\tROLES\n";
+  (*output) << "\nTRANSITIONS:\n";
+  (*output) << "ID\tGUARD\t\tROLES\n";
   for (set < Transition * >::iterator t = T.begin (); t != T.end (); t++)
     {
-      (*info_output) << (*t)->nodeShortName() + "\t";
+      (*output) << (*t)->nodeShortName() + "\t";
 
       if ((*t)->guard != "")
-	(*info_output) << "{" + (*t)->guard + "} ";
+	(*output) << "{" + (*t)->guard + "} ";
       else
-	(*info_output) << "\t";
+	(*output) << "\t";
 
       for (vector < string >::iterator role = (*t)->history.begin ();
 	   role != (*t)->history.end (); role++)
 	{
 	  if (role == (*t)->history.begin ())
-	    (*info_output) << "\t" + *role + "\n";
+	    (*output) << "\t" + *role + "\n";
 	  else
-	    (*info_output) << "\t\t\t" + *role + "\n";
+	    (*output) << "\t\t\t" + *role + "\n";
 	}
     }
 }
@@ -759,35 +750,35 @@ PetriNet::dotOut ()
 {
   trace (TRACE_DEBUG, "[PN]\tCreating DOT-output.\n");
 
-  (*dot_output) << "digraph N {" << endl;
-  (*dot_output) << " graph [fontname=\"Helvetica-Oblique\", label=\"";
+  (*output) << "digraph N {" << endl;
+  (*output) << " graph [fontname=\"Helvetica-Oblique\", label=\"";
 
-  if (mode_simplify_petri_net)
-    (*dot_output) << "structural simplified ";
+  if (parameters[P_SIMPLIFY])
+    (*output) << "structural simplified ";
   if (lowLevel)
-    (*dot_output) << "low-level ";
+    (*output) << "low-level ";
 
-  (*dot_output) << "Petri net generated from " << filename << "\"];" << endl;
-  (*dot_output) <<
+  (*output) << "Petri net generated from " << filename << "\"];" << endl;
+  (*output) <<
     " node [fontname=\"Helvetica-Oblique\" fontsize=10 fixedsize];" << endl;
-  (*dot_output) << " edge [fontname=\"Helvetica-Oblique\" fontsize=10];" <<
+  (*output) << " edge [fontname=\"Helvetica-Oblique\" fontsize=10];" <<
     endl << endl;
 
   // list the places
-  (*dot_output) << endl << " node [shape=circle];" << endl;
+  (*output) << endl << " node [shape=circle];" << endl;
   for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
-    (*dot_output) << (*p)->dotOut ();
+    (*output) << (*p)->dotOut ();
 
   // list the transitions
-  (*dot_output) << endl << " node [shape=box regular=true];" << endl;
+  (*output) << endl << " node [shape=box regular=true];" << endl;
   for (set < Transition * >::iterator t = T.begin (); t != T.end (); t++)
-    (*dot_output) << (*t)->dotOut ();
+    (*output) << (*t)->dotOut ();
 
   // list the arcs
   for (set < Arc * >::iterator f = F.begin (); f != F.end (); f++)
-    (*dot_output) << (*f)->dotOut ();
+    (*output) << (*f)->dotOut ();
 
-  (*dot_output) << "}" << endl;
+  (*output) << "}" << endl;
 }
 
 
@@ -949,36 +940,36 @@ PetriNet::appnOut ()
   removeInterface ();
   calculateInitialMarking();
   
-  (*appn_output) << "\\beginnet{" << filename << "}" << endl << endl;
+  (*output) << "\\beginnet{" << filename << "}" << endl << endl;
 
   // places
   for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
   {
-    (*appn_output) << "  \\place{" << (*p)->nodeShortName() << "}{";
+    (*output) << "  \\place{" << (*p)->nodeShortName() << "}{";
     if ((*p)->initialMarking > 0)
-      (*appn_output) << "\\init{" << (*p)->initialMarking << "}";
-    (*appn_output) << "}" << endl;
+      (*output) << "\\init{" << (*p)->initialMarking << "}";
+    (*output) << "}" << endl;
   }
-  (*appn_output) << endl;
+  (*output) << endl;
 
   // transitions
   for (set < Transition * >::iterator t = T.begin (); t != T.end (); t++)
   {
-    (*appn_output) << "  \\transition{" << (*t)->nodeShortName() << "}{}" << endl;
+    (*output) << "  \\transition{" << (*t)->nodeShortName() << "}{}" << endl;
   }
-  (*appn_output) << endl;
+  (*output) << endl;
 
   // arcs
   int arcNumber = 1;
   for (set < Arc * >::iterator f = F.begin (); f != F.end (); f++, arcNumber++)
   {
-    (*appn_output) << "  \\arc{a" << arcNumber << "}{ ";
-    (*appn_output) << "\\from{" << (*f)->source->nodeShortName() << "} ";
-    (*appn_output) << "\\to{" << (*f)->target->nodeShortName() << "} }" << endl;
+    (*output) << "  \\arc{a" << arcNumber << "}{ ";
+    (*output) << "\\from{" << (*f)->source->nodeShortName() << "} ";
+    (*output) << "\\to{" << (*f)->target->nodeShortName() << "} }" << endl;
   }
-  (*appn_output) << endl;
+  (*output) << endl;
   
-  (*appn_output) << "\\endnet" << endl;
+  (*output) << "\\endnet" << endl;
 }
 
 
@@ -998,37 +989,37 @@ PetriNet::lolaOut ()
 
   removeInterface ();
 
-  (*lola_output) << "{ Petri net created by " << PACKAGE_STRING <<
+  (*output) << "{ Petri net created by " << PACKAGE_STRING <<
     " reading " << filename << " }" << endl << endl;
 
   // places
-  (*lola_output) << "PLACE" << endl;
+  (*output) << "PLACE" << endl;
   unsigned int count = 1;
   for (set < Place * >::iterator p = P.begin (); p != P.end (); count++, p++)
     {
-      (*lola_output) << "  " << (*p)->nodeShortName();
+      (*output) << "  " << (*p)->nodeShortName();
 
       if (count < P.size ())
-	(*lola_output) << ",";
+	(*output) << ",";
       else
-	(*lola_output) << ";";
-      (*lola_output) << "\t\t { " << (*(*p)->history.begin()) << " }" << endl;
+	(*output) << ";";
+      (*output) << "\t\t { " << (*(*p)->history.begin()) << " }" << endl;
     }
-  (*lola_output) << endl << endl;
+  (*output) << endl << endl;
 
 
   // initial marking
-  (*lola_output) << "MARKING" << endl;
-  (*lola_output) << "  " << findPlace("1.internal.initial")->nodeShortName()
+  (*output) << "MARKING" << endl;
+  (*output) << "  " << findPlace("1.internal.initial")->nodeShortName()
 	  << ":\t1,\t { initial marking of the process }" << endl;
 
   for (list < string >::iterator variable = symMan.variables.begin ();
        variable != symMan.variables.end (); variable++)
-    (*lola_output) << "  " << findPlace("variable." + *variable)->nodeShortName() << ":\t1,\t { initial marking of variable" << *variable << " }" <<
+    (*output) << "  " << findPlace("variable." + *variable)->nodeShortName() << ":\t1,\t { initial marking of variable" << *variable << " }" <<
       endl;
 
-  (*lola_output) << "  " << findPlace("1.internal.clock")->nodeShortName() << ":\t1\t { initial marking of the clock }" << endl;
-  (*lola_output) << ";" << endl << endl << endl;
+  (*output) << "  " << findPlace("1.internal.clock")->nodeShortName() << ":\t1\t { initial marking of the clock }" << endl;
+  (*output) << ";" << endl << endl << endl;
 
 
   // transitions
@@ -1036,44 +1027,44 @@ PetriNet::lolaOut ()
   for (set < Transition * >::iterator t = T.begin (); t != T.end ();
        count++, t++)
     {
-      (*lola_output) << "TRANSITION " << (*t)->nodeShortName() << "\t { " << (*(*t)->history.begin()) << " }" << endl;
+      (*output) << "TRANSITION " << (*t)->nodeShortName() << "\t { " << (*(*t)->history.begin()) << " }" << endl;
       set < pair < Node *, arc_type > >consume = preset (*t);
       set < pair < Node *, arc_type > >produce = postset (*t);
 
-      (*lola_output) << "CONSUME" << endl;
+      (*output) << "CONSUME" << endl;
       if (consume.empty ())
-	(*lola_output) << ";" << endl;
+	(*output) << ";" << endl;
 
       unsigned int count2 = 1;
       for (set < pair < Node *, arc_type > >::iterator pre = consume.begin ();
 	   pre != consume.end (); count2++, pre++)
 	{
-	  (*lola_output) << "  " << (*pre).first->nodeShortName() << ":\t1";
+	  (*output) << "  " << (*pre).first->nodeShortName() << ":\t1";
 
 	  if (count2 < consume.size ())
-	    (*lola_output) << "," << endl;
+	    (*output) << "," << endl;
 	  else
-	    (*lola_output) << ";" << endl;
+	    (*output) << ";" << endl;
 	}
 
-      (*lola_output) << "PRODUCE" << endl;
+      (*output) << "PRODUCE" << endl;
       if (produce.empty ())
-	(*lola_output) << ";" << endl;
+	(*output) << ";" << endl;
 
       count2 = 1;
       for (set < pair < Node *, arc_type > >::iterator post =
 	   produce.begin (); post != produce.end (); count2++, post++)
 	{
-	  (*lola_output) << "  " << (*post).first->nodeShortName() << ":\t1";
+	  (*output) << "  " << (*post).first->nodeShortName() << ":\t1";
 
 	  if (count2 < produce.size ())
-	    (*lola_output) << "," << endl;
+	    (*output) << "," << endl;
 	  else
-	    (*lola_output) << ";" << endl;
+	    (*output) << ";" << endl;
 	}
-      (*lola_output) << endl;
+      (*output) << endl;
     }
-  (*lola_output) << "{ END OF FILE }" << endl;
+  (*output) << "{ END OF FILE }" << endl;
 }
 
 
@@ -1091,14 +1082,14 @@ PetriNet::owfnOut ()
   if (!lowLevel)
     makeLowLevel ();
 
-  (*owfn_output) << "{ oWFN created by " << PACKAGE_STRING <<
+  (*output) << "{ oWFN created by " << PACKAGE_STRING <<
     " reading " << filename << " }" << endl << endl;
 
   // places
-  (*owfn_output) << "PLACE" << endl;
+  (*output) << "PLACE" << endl;
 
   // internal places
-  (*owfn_output) << "  INTERNAL" << endl;
+  (*output) << "  INTERNAL" << endl;
   unsigned int count = 1;
   string comment;
   for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
@@ -1106,64 +1097,64 @@ PetriNet::owfnOut ()
       if ((*p)->type == INTERNAL)
 	{
 	  if (count == 1)
-	    (*owfn_output) << "    " << (*p)->nodeShortName();
+	    (*output) << "    " << (*p)->nodeShortName();
 	  else
-	    (*owfn_output) << ", " << comment << "    " << (*p)->nodeShortName();
+	    (*output) << ", " << comment << "    " << (*p)->nodeShortName();
 
 	  comment = "\t\t { " + (*(*p)->history.begin ()) + " }\n";
 	  count++;
 	}
     }
-  (*owfn_output) << "; " << comment << endl;
+  (*output) << "; " << comment << endl;
 
   // input places
-  (*owfn_output) << "  INPUT" << endl;
+  (*output) << "  INPUT" << endl;
   count = 1;
   for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
     {
       if ((*p)->type == IN)
 	{
 	  if (count == 1)
-	    (*owfn_output) << "    " << (*p)->nodeShortName();
+	    (*output) << "    " << (*p)->nodeShortName();
 	  else
-	    (*owfn_output) << ", " << comment << "    " << (*p)->nodeShortName();
+	    (*output) << ", " << comment << "    " << (*p)->nodeShortName();
 
 	  comment = "\t\t { " + (*(*p)->history.begin ()) + " }\n";
 	  count++;
 	}
     }
-  (*owfn_output) << "; " << comment << endl;
+  (*output) << "; " << comment << endl;
 
   // output places
-  (*owfn_output) << "  OUTPUT" << endl;
+  (*output) << "  OUTPUT" << endl;
   count = 1;
   for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
     {
       if ((*p)->type == OUT)
 	{
 	  if (count == 1)
-	    (*owfn_output) << "    " << (*p)->nodeShortName();
+	    (*output) << "    " << (*p)->nodeShortName();
 	  else
-	    (*owfn_output) << ", " << comment << "    " << (*p)->nodeShortName();
+	    (*output) << ", " << comment << "    " << (*p)->nodeShortName();
 
 	  comment = "\t\t { " + (*(*p)->history.begin ()) + " }\n";
 	  count++;
 	}
     }
-  (*owfn_output) << "; " << comment << endl << endl;
+  (*output) << "; " << comment << endl << endl;
 
 
   // initial marking
-  (*owfn_output) << "MARKING" << endl;
-  (*owfn_output) << "  " << findPlace("1.internal.initial")->nodeShortName() << ":\t1,\t { initial marking of the process }" << endl;
+  (*output) << "MARKING" << endl;
+  (*output) << "  " << findPlace("1.internal.initial")->nodeShortName() << ":\t1,\t { initial marking of the process }" << endl;
 
   for (list < string >::iterator variable = symMan.variables.begin ();
        variable != symMan.variables.end (); variable++)
-    (*owfn_output) << "  " << findPlace("variable." + *variable)->nodeShortName() << ":\t1,\t { initial marking of variable" << *variable << " }" <<
+    (*output) << "  " << findPlace("variable." + *variable)->nodeShortName() << ":\t1,\t { initial marking of variable" << *variable << " }" <<
       endl;
 
-  (*owfn_output) << "  " << findPlace ("1.internal.clock")->nodeShortName() << ":\t1\t { initial marking of the clock }" << endl;
-  (*owfn_output) << ";" << endl << endl << endl;
+  (*output) << "  " << findPlace ("1.internal.clock")->nodeShortName() << ":\t1\t { initial marking of the clock }" << endl;
+  (*output) << ";" << endl << endl << endl;
 
 
   // transitions
@@ -1171,44 +1162,44 @@ PetriNet::owfnOut ()
   for (set < Transition * >::iterator t = T.begin (); t != T.end ();
        count++, t++)
     {
-      (*owfn_output) << "TRANSITION " << (*t)->nodeShortName() << "\t { " << (*(*t)->history.begin()) << " }" << endl;
+      (*output) << "TRANSITION " << (*t)->nodeShortName() << "\t { " << (*(*t)->history.begin()) << " }" << endl;
       set < pair < Node *, arc_type > >consume = preset (*t);
       set < pair < Node *, arc_type > >produce = postset (*t);
 
-      (*owfn_output) << "CONSUME" << endl;
+      (*output) << "CONSUME" << endl;
       if (consume.empty ())
-	(*owfn_output) << ";" << endl;
+	(*output) << ";" << endl;
 
       unsigned int count2 = 1;
       for (set < pair < Node *, arc_type > >::iterator pre = consume.begin ();
 	   pre != consume.end (); count2++, pre++)
 	{
-	  (*owfn_output) << "  " << (*pre).first->nodeShortName() << ":\t1";
+	  (*output) << "  " << (*pre).first->nodeShortName() << ":\t1";
 
 	  if (count2 < consume.size ())
-	    (*owfn_output) << "," << endl;
+	    (*output) << "," << endl;
 	  else
-	    (*owfn_output) << ";" << endl;
+	    (*output) << ";" << endl;
 	}
 
-      (*owfn_output) << "PRODUCE" << endl;
+      (*output) << "PRODUCE" << endl;
       if (produce.empty ())
-	(*owfn_output) << ";" << endl;
+	(*output) << ";" << endl;
 
       count2 = 1;
       for (set < pair < Node *, arc_type > >::iterator post =
 	   produce.begin (); post != produce.end (); count2++, post++)
 	{
-	  (*owfn_output) << "  " << (*post).first->nodeShortName() << ":\t1";
+	  (*output) << "  " << (*post).first->nodeShortName() << ":\t1";
 
 	  if (count2 < produce.size ())
-	    (*owfn_output) << "," << endl;
+	    (*output) << "," << endl;
 	  else
-	    (*owfn_output) << ";" << endl;
+	    (*output) << ";" << endl;
 	}
-      (*owfn_output) << endl;
+      (*output) << endl;
     }
-  (*owfn_output) << "{ END OF FILE }" << endl;
+  (*output) << "{ END OF FILE }" << endl;
 }
 
 

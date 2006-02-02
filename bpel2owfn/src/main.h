@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2006/01/26 10:07:45 $
+ *          - last changed: \$Date: 2006/02/02 15:31:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  *          - 2005-11-09 (gierds) Initial version.
  *          - 2005-11-15 (gierds) Added Exception class.
  *          - 2005-11-16 (gierds) Use of error() and cleanup() as defined in helpers.cc
@@ -77,9 +77,6 @@ extern kc::tProcess TheProcess;
 extern int yy_flex_debug; ///< if set to 1 the lexer trace is printed
 extern FILE *yyin;        ///< pointer to the input file
 
-
-/// used to indicate trace_level
-extern int debug_level;
 
 // from check-symbols
 extern SymbolManager symMan;

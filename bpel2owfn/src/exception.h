@@ -29,14 +29,14 @@
  *          - last changes of: \$Author: gierds $
  *          
  * \date
- *          - last changed: \$Date: 2006/01/03 13:44:40 $
+ *          - last changed: \$Date: 2006/02/02 15:31:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  */
 
 
@@ -58,6 +58,7 @@ using namespace std;
 typedef enum
 {
   FILE_NOT_FOUND = 2,	         ///< "File not found" exception
+  FILE_NOT_OPEN,		 ///< "File could not be opened" exception
 
   OPTION_MISMATCH = 10,
   

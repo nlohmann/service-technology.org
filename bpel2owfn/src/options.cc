@@ -8,72 +8,34 @@
 
 // some file names and pointers
 
-/// Filename of input file.
+/// Filename of input file
 std::string filename = "<STDIN>";
+/// Filename of input file
+std::string output_filename = "";
 
-/// Filename of dot output file
-std::string dot_filename = "";
-/// Pointer to dot output file
-std::ostream * dot_output = &std::cout;
+/// pointer to input stream
+std::istream * input = &std::cin;
+/// pointer to output stream
+std::ostream * output = &std::cout;
+/// pointer to log stream
+std::ostream * log = &std::clog;
 
-/// Filename of APPN output file
-std::string appn_filename = "";
-/// Pointer to APPN output file
-std::ostream * appn_output = &std::cout;
+/// Filename of log file
+std::string log_filename = "";
 
-/// Filename of lola output file
-std::string lola_filename = "";
-/// Pointer to lola output file
-std::ostream * lola_output = &std::cout;
-
-/// Filename of owfn output file
-std::string owfn_filename = "";
-/// Pointer to owfn output file
-std::ostream * owfn_output = &std::cout;
-
-/// Filename of PN info file
-std::string info_filename = "";
-/// Pointer to PN info file
-std::ostream * info_output = &std::cout;
+bool createOutputFile = false;
 
 // different modes controlled by command line
 
-bool par_help = false;
-bool par_version = false;
+possibleModi modus;
 
-/// read from file
-bool mode_file = false;
-/// print the Petri Net
-bool mode_petri_net = false;
-/// simplify Petri Net
-bool mode_simplify_petri_net = false;
-/// paint Petri Net in APPN format
-bool mode_appn_petri_net = false;
-/// paint Petri Net in APPN format and output to file
-bool mode_appn_2_file = false;
-/// paint Petri Net for lola
-bool mode_lola_petri_net = false;
-/// paint Petri Net for lola and output to file
-bool mode_lola_2_file = false;
-/// paint Petri Net for owfn
-bool mode_owfn_petri_net = false;
-/// paint Petri Net for owfn and output to file
-bool mode_owfn_2_file = false;
-/// paint Petri Net with dot
-bool mode_dot_petri_net = false;
-/// paint Petri Net with dot and output to file
-bool mode_dot_2_file = false;
-/// CFG
-bool mode_cfg = false;
-/// pretty printer
-bool mode_pretty_printer = false;
-/// print AST
-bool mode_ast = false;
-/// print the "low level" Petri Net
-bool mode_low_level_petri_net = false;
+map<possibleOptions,    bool> options;
+map<possibleParameters, bool> parameters;
+map<possibleFormats,    bool> formats;
+// suffixes are defined in parse_command_line();
+map<possibleFormats,  string> suffixes;
 
 // long options
-/*
 static struct option longopts[] =
 {
   { "help",       no_argument,       NULL, 'h' },
@@ -89,17 +51,13 @@ static struct option longopts[] =
   { "debug",      required_argument, NULL, 'd' }
 };
 
-const char * par_string = "hvm:l:i:of:p:d:";
-*/
-map<std::string, bool> parameters;
-
+const char * par_string = "hvm:li:of:p:d:";
 
 // --------------------- functions for command line evaluation ------------------------
 /**
  * Prints an overview of all commandline arguments.
  *
  */
-/*
 void print_help() 
 {
   // 80 chars
@@ -109,12 +67,32 @@ void print_help()
   trace("\n");
   trace("Options: \n");
   trace("\n");
+  trace(" -h | --help            - print these information and exit\n");
+  trace(" -v | --version         - print version information and exit\n");
+  trace("\n");
+  trace(" -m | --mode=<modus>    - select one of the following modes:\n");
+  trace("                          ast, pretty, petrinet, cfg\n");
+  trace(" -p | --parameter=<par> - select additional parameters like:\n");
+  trace("                          simplify, lowlevel, nointerface etc.\n");
+  trace("                          (see documentation for further information)\n");
+  trace("\n");
+  trace(" -i | --input=<file>    - read input from <file>\n");
+  trace(" -o | --output=<prefix> - write output to <prefix>.X\n");
+  trace("\n");
+  trace(" -f | --format          - select output formats (as far as supported for mode):\n");
+  trace("                          lola, owfn, dot, pep, appn, info, pnml, txt\n");
+  trace("\n");
+  trace(" -d | --debug           - set debug level: 1-4\n");
+  trace(" -l | --log[=<file>]    - write additional information into file\n");
+  trace("\n");
+  
+  trace("\n");
   trace("For more information see:\n");
   trace("  http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel\n");
   trace("\n");
 
 }
-*/
+
 /**
  * Prints some version information
  *
@@ -122,7 +100,7 @@ void print_help()
  *
  *
  */
-/*
+
 void print_version(std::string name)
 {
   trace(std::string(PACKAGE_STRING) + " -- ");
@@ -132,95 +110,376 @@ void print_version(std::string name)
   trace("This is free software; see the source for copying conditions. There is NO\n");
   trace("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
 }
-*/
-/*
+
+
 void parse_command_line(int argc, char* argv[])
 {
+  suffixes[F_LOLA] = "lola";
+  suffixes[F_OWFN] = "owfn";
+  suffixes[F_DOT]  = "dot" ;
+  suffixes[F_PEP]  = "pep" ;
+  suffixes[F_APPN] = "appn";
+  suffixes[F_INFO] = "info";
+  suffixes[F_PNML] = "pnml";
+  suffixes[F_TXT]  = "txt" ;
+
+  map< pair<possibleModi,possibleFormats>, bool > validFormats;
+  
+  // validFormats[pair<possibleModi,possibleFormats>(M_AST,F_TXT)] = true;
+
+  validFormats[pair<possibleModi,possibleFormats>(M_PRETTY,F_TXT)] = true;
+
+  validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_LOLA)] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_OWFN)] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_DOT )] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_PEP )] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_APPN)] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_INFO)] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_PNML)] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_TXT )] = true;
+
+  validFormats[pair<possibleModi,possibleFormats>(M_CFG,F_DOT)] = true;
 
   string progname = string(argv[0]);
+
+  yydebug = 0;
+  yy_flex_debug = 0;
+
   int optc = 0;
   while ((optc = getopt_long (argc, argv, par_string, longopts, (int *) 0))
          != EOF)
   {
+    // \todo call one of them argument and remove the rest
+    string mode = "";
+    string format = "";
+    string parameter = "";
+    string debug = "";
     switch (optc)
       {
       case 'h':
-	      parameters["help"] = true;
+	      options[O_HELP] = true;
   	      break;
       case 'v':
-	      par_version = true;
+	      options[O_VERSION] = true;
       	      break;
       case 'm':
-	trace("-> mode\n");
-	trace(optarg);
-	trace("\n");
-        break;
+	      if (options[O_MODE])
+	      {
+		throw Exception(OPTION_MISMATCH, 
+				"Choose only one mode\n",
+				"Type " + progname + " -h for more information.\n");
+	      }
+	      options[O_MODE] = true;
+	      mode = string(optarg);
+	      if (mode == "ast") {
+		modus = M_AST;
+	      }
+	      else if (mode == "pretty") {
+		modus = M_PRETTY;
+	      }
+	      else if (mode == "petrinet") {
+		modus = M_PETRINET;
+	      }
+	      else if (mode == "cfg") {
+		modus = M_CFG;
+	      }
+	      break;
       case 'l':
-	trace("-> log\n");
-	if (optarg != NULL)
-	{
-	  trace(optarg);
-	  trace("\n");
-	}
-        break;
+	      options[O_LOG] = true;
+	      if (optarg != NULL)
+	      {
+	        log_filename = string(optarg);
+	      }
+              break;
       case 'i':
-	trace("-> input\n");
-	trace(optarg);
-	trace("\n");
-        break;
+	      if (options[O_INPUT])
+	      {
+		trace(TRACE_WARNINGS, "Multiple input options are given, only last one is used!\n");
+	      }
+	      options[O_INPUT] = true;
+	      filename = string(optarg);
+              break;
       case 'o':
-	trace("-> output\n");
-	if (optarg != NULL)
-	{
-	  trace(optarg);
-	  trace("\n");
-	}
+	      if (options[O_OUTPUT])
+	      {
+		trace(TRACE_WARNINGS, "Multiple output options are given, only last given name is used!\n");
+	      }
+	      options[O_OUTPUT] = true;
+	      if (optarg != NULL)
+	      {
+		output_filename = string(optarg);
+	      }
         break;
       case 'f':
-	trace("-> format\n");
-	trace(optarg);
-	trace("\n");
-        break;
+	      options[O_FORMAT] = true;
+	      format = string(optarg);
+	      if (format == suffixes[F_LOLA])
+	      {
+		formats[F_LOLA] = true;
+	      }
+	      else if (format == suffixes[F_OWFN])
+	      {
+		formats[F_OWFN] = true;
+	      }
+	      else if (format == suffixes[F_DOT])
+	      {
+		formats[F_DOT] = true;
+	      }
+	      else if (format == suffixes[F_PEP])
+	      {
+		formats[F_PEP] = true;
+	      }
+	      else if (format == suffixes[F_APPN])
+	      {
+		formats[F_APPN] = true;
+	      }
+	      else if (format == suffixes[F_INFO])
+	      {
+		formats[F_INFO] = true;
+	      }
+	      else if (format == suffixes[F_PNML])
+	      {
+		formats[F_PNML] = true;
+	      }
+	      else if (format == suffixes[F_TXT])
+	      {
+		formats[F_TXT] = true;
+	      }
+	      break;
       case 'p':
-	trace("-> parameter\n");
-	trace(optarg);
-	trace("\n");
-        break;
+	      options[O_PARAMETER] = true;
+	      parameter = string(optarg);
+	      if ( parameter == "simplify" )
+	      {
+	        parameters[P_SIMPLIFY] = "true";
+	      }
+	      else if ( parameter == "lowlevel" )
+	      {
+	        parameters[P_LOWLEVEL] = "true";
+	      }
+	      else if ( parameter == "nointerface" )
+	      {
+	        parameters[P_NOINTERFACE] = "true";
+	      }
+	      else if ( parameter == "finalmarking" )
+	      {
+	        parameters[P_FINALMARKING] = "true";
+	      }
+	      else if ( parameter == "uniquefault" )
+	      {
+	        parameters[P_UNIQUEFAULT] = "true";
+	      }
+	      break;
       case 'd':
-	trace("-> debug\n");
-	trace(optarg);
-	trace("\n");
-        break;
+	      options[O_DEBUG] = true;
+	      debug = string(optarg);
+	      if ( debug == "flex" )
+	      {
+		yy_flex_debug = 1;
+	      }
+	      else if ( debug == "bison" )
+	      {
+		yydebug = 1;
+	      }
+	      else if ( debug == "1" )
+	      {
+		debug_level = TRACE_WARNINGS;
+	      }
+	      else if ( debug == "2" )
+	      {
+		debug_level = TRACE_INFORMATION;
+	      }
+	      else if ( debug == "3" )
+	      {
+		debug_level = TRACE_DEBUG;
+	      }
+	      else if ( debug == "4" )
+	      {
+		debug_level = TRACE_VERY_DEBUG;
+	      }
+	      else
+	      {
+		throw Exception(OPTION_MISMATCH, 
+				"Unrecognised debug mode!\n",
+				"Type " + progname + " -h for more information.\n");
+	      }
+	      break;
       default:
-	trace("unknown\n");
-        break;
+	     throw Exception(OPTION_MISMATCH,
+			     "Unknown option!\n",
+			     "Type " + progname + " -h for more information.\n");
+             break;
       }
-      */
-/*  
-  if (optind == argc - 1 && strcmp (argv[optind], "sailor") == 0)
-    z = 1;
-  else if (lose || optind < argc)
-    {
-      if (optind < argc)
-        fputs (_("Too many arguments\n"), stderr);
-      fprintf (stderr, _("Try `%s --help' for more information.\n"), 
-               progname);
-      exit (1);
-    }
-*/
-/*
+      
   }
 
-  if (parameters["help"])
+  // print help and exit
+  if (options[O_HELP])
   {
     print_help();
     exit(0);
   }
-  if (par_version)
+  // print version and exit
+  if (options[O_VERSION])
   {
     print_version("");
     exit(0);
   }
-  exit(0);
+
+
+  // if input file is given, bind it to yyin
+  if (options[O_INPUT])
+  {
+    if (!(yyin = fopen(filename.c_str(), "r")))
+    {
+      throw Exception(FILE_NOT_FOUND, "File '" + filename + "' not found.\n");
+    }
+  }
+
+  if ( options[O_OUTPUT] )
+  {
+    createOutputFile = true;
+  }
+
+  // set output file name if non is already chosen
+  if ((options[O_OUTPUT] || options[O_LOG]) && (output_filename == ""))
+  {
+    int pos = filename.rfind(".bpel", filename.length());
+    if (pos == (filename.length() - 5))
+    {
+      output_filename = filename.substr(0, pos);
+    }
+  }
+	  
+  if (options[O_LOG])
+  {
+    if (log_filename == "")
+    {
+      int pos = filename.rfind(".bpel", filename.length());
+      if (pos == (filename.length() - 5))
+      {
+        log_filename = filename.substr(0, pos) + ".log";
+      }
+    }
+    log = openOutput(log_filename);
+	  // new std::ofstream(log_filename.c_str(), std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
+  }
+  
+  // check for valid formats
+  if ( options[O_MODE] )
+  {
+    int counter = 0;
+    if ( validFormats[pair<possibleModi, possibleFormats>(modus,F_LOLA)] && formats[F_LOLA] )
+    {
+      counter++;
+    }
+    else if ( formats[F_LOLA] )
+    {
+      trace(TRACE_WARNINGS, "WARNING: lola is no valid format for the chosen mode: omitting.\n");
+      formats[F_LOLA] = false;
+    }
+    if ( validFormats[pair<possibleModi, possibleFormats>(modus,F_OWFN)] && formats[F_OWFN] )
+    {
+      counter++;
+    }
+    else if ( formats[F_OWFN] )
+    {
+      trace(TRACE_WARNINGS, "WARNING: owfn is no valid format for the chosen mode: omitting.\n");
+      formats[F_OWFN] = false;
+    }
+    if ( validFormats[pair<possibleModi, possibleFormats>(modus,F_DOT)] && formats[F_DOT] )
+    {
+      counter++;
+    }
+    else if ( formats[F_DOT] )
+    {
+      trace(TRACE_WARNINGS, "WARNING: dot is no valid format for the chosen mode: omitting.\n");
+      formats[F_DOT] = false;
+    }
+    if ( validFormats[pair<possibleModi, possibleFormats>(modus,F_PEP)] && formats[F_PEP] )
+    {
+      counter++;
+    }
+    else if ( formats[F_PEP] )
+    {
+      trace(TRACE_WARNINGS, "WARNING: pep is no valid format for the chosen mode: omitting.\n");
+      formats[F_PEP] = false;
+    }
+    if ( validFormats[pair<possibleModi, possibleFormats>(modus,F_APPN)] && formats[F_APPN] )
+    {
+      counter++;
+    }
+    else if ( formats[F_APPN] )
+    {
+      trace(TRACE_WARNINGS, "WARNING: appn is no valid format for the chosen mode: omitting.\n");
+      formats[F_APPN] = false;
+    }
+    if ( validFormats[pair<possibleModi, possibleFormats>(modus,F_INFO)] && formats[F_INFO] )
+    {
+      counter++;
+    }
+    else if ( formats[F_INFO] )
+    {
+      trace(TRACE_WARNINGS, "WARNING: info is no valid format for the chosen mode: omitting.\n");
+      formats[F_INFO] = false;
+    }
+    if ( validFormats[pair<possibleModi, possibleFormats>(modus,F_PNML)] && formats[F_PNML] )
+    {
+      counter++;
+    }
+    else if ( formats[F_PNML] )
+    {
+      trace(TRACE_WARNINGS, "WARNING: pnml is no valid format for the chosen mode: omitting.\n");
+      formats[F_PNML] = false;
+    }
+    if ( validFormats[pair<possibleModi, possibleFormats>(modus,F_TXT)] && formats[F_TXT] )
+    {
+      counter++;
+    }
+    else if ( formats[F_TXT] )
+    {
+      trace(TRACE_WARNINGS, "WARNING: txt is no valid format for the chosen mode: omitting.\n");
+      formats[F_TXT] = false;
+    }
+    if ((counter > 1) && !options[O_OUTPUT])
+    {
+      trace(TRACE_WARNINGS, "WARNING: More than one format was selected, but not the output file option.\n");
+      trace(TRACE_WARNINGS, "         Therefore all ouput will be mixed on STDOUT.\n");
+    }
+  }
+
+  // \todo: TODO (gierds) complete information for modus operandi
+  trace(TRACE_INFORMATION, "Modus operandi:\n");
+  if (options[O_OUTPUT])
+  {
+    trace(TRACE_INFORMATION, " - output files will be named \"" + output_filename + ".X\"\n");
+  }
+  if (options[O_LOG])
+  {
+    trace(TRACE_INFORMATION, " - Logging additional information to \"" + log_filename + "\"\n");
+  }
+
 }
-*/
+
+std::ostream * openOutput(std::string name)
+{
+  std::ofstream * file = new std::ofstream(name.c_str(), std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
+  if (!file->is_open())
+  {
+    throw Exception(FILE_NOT_OPEN, "File \"" + name + "\" could not be opened for writing access!\n");
+  } 
+
+  return file;
+}
+
+void closeOutput(std::ostream * file)
+{
+  if ( file != NULL )
+  {
+    (*file) << std::flush;
+    ((std::ofstream*)file)->close();
+    delete(file);
+    file = NULL;
+  }
+}
+

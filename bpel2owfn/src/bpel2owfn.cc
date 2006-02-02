@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/01/27 14:41:30 $
+ *          - last changed: \$Date: 2006/02/02 15:31:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.47 $
+ * \version \$Revision: 1.48 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -91,68 +91,143 @@ int main( int argc, char *argv[])
       trace(TRACE_INFORMATION, "Parsing complete.\n");
       
       symMan.printScope();
-      
-      if (mode_ast)
+      if (modus == M_AST)
       {
-        TheProcess->print();
+	TheProcess->print();
       }
         
-      if (mode_pretty_printer)
+      if (modus == M_PRETTY)
       {
+	if (formats[F_TXT] && output_filename != "")
+	{
+	  output = openOutput(output_filename + "." + suffixes[F_TXT]);
+	}
         TheProcess->unparse(kc::printer, kc::xml);
+	if (formats[F_TXT] && output_filename != "")
+	{
+	  closeOutput(output);
+	  output = NULL;
+	}
       }
       
-      if (mode_cfg)
+      // create CFG
+      if (modus == M_CFG || modus == M_PETRINET)
       {
-        // output CFG;
-	trace("Dot output for CFG will come here!\n");
         TheProcess->unparse(kc::pseudoPrinter, kc::cfg);
-	TheCFG->print_dot();
+	// do some business with CFG
+      }
+
+      if (modus == M_CFG)
+      {
+	if (formats[F_DOT])
+	{
+	  if (output_filename != "")
+	  {
+ 	    output = openOutput(output_filename + ".cfg." + suffixes[F_DOT]);
+	  }
+          // output CFG;
+  	  TheCFG->print_dot();
+	  if (output_filename != "")
+	  {
+	    closeOutput(output);
+	    output = NULL;
+	  }
+	}
+      }
+
+      // delete CFG
+      if (modus == M_CFG || modus == M_PETRINET)
+      {
 	delete(TheCFG);
       }
 
-      if (mode_petri_net)
+      if (modus == M_PETRINET)
       {
         TheProcess->unparse(kc::pseudoPrinter, kc::petrinet);
+        // make low level ?
+	if ( parameters[P_LOWLEVEL] )
+        {
+          TheNet->makeLowLevel();
+        }    
+        // simplify net ?
+ 	if ( parameters[P_SIMPLIFY] )
+        {
+          TheNet->simplify();
+        }    
+        // create LoLA output ?
+        if ( formats[F_LOLA] )
+        {
+	  if (output_filename != "")
+	  {
+ 	    output = openOutput(output_filename + "." + suffixes[F_LOLA]);
+	  }
+	  trace("LOLA!\n");
+          TheNet->lolaOut();
+	  if (output_filename != "")
+	  {
+	    closeOutput(output);
+	    output = NULL;
+	  }
+        }
+        // create APPN output ?
+        if ( formats[F_APPN] )
+        {
+	  if (output_filename != "")
+	  {
+ 	    output = openOutput(output_filename + "." + suffixes[F_APPN]);
+	  }
+          TheNet->appnOut();
+	  if (output_filename != "")
+	  {
+	    closeOutput(output);
+	    output = NULL;
+	  }
+        }
+        // create oWFN output ?
+        if ( formats[F_OWFN] )
+        {
+	  if (output_filename != "")
+	  {
+ 	    output = openOutput(output_filename + "." + suffixes[F_OWFN]);
+	  }
+          TheNet->owfnOut();
+	  if (output_filename != "")
+	  {
+	    closeOutput(output);
+	    output = NULL;
+	  }
+        }
+        // create dot output ?
+        if ( formats[F_DOT] )
+        {
+	  if (output_filename != "")
+	  {
+ 	    output = openOutput(output_filename + "." + suffixes[F_DOT]);
+	  }
+          TheNet->dotOut();
+	  if (output_filename != "")
+	  {
+	    closeOutput(output);
+	    output = NULL;
+	  }
+        }
+        // create info file ?
+        if ( formats[F_INFO] )
+        {
+	  if (output_filename != "")
+	  {
+ 	    output = openOutput(output_filename + "." + suffixes[F_INFO]);
+	  }
+          TheNet->printInformation();
+	  if (output_filename != "")
+	  {
+	    closeOutput(output);
+	    output = NULL;
+	  }
+        }
       }
-    }
 
-    // make low level ?
-    if (mode_low_level_petri_net)
-    {
-      TheNet->makeLowLevel();
-    }    
-    // simplify net ?
-    if (mode_simplify_petri_net)
-    {
-      TheNet->simplify();
-    }    
-    // create LoLA output ?
-    if (mode_lola_petri_net)
-    {
-      TheNet->lolaOut();
     }
-    // create APPN output ?
-    if (mode_appn_petri_net)
-    {
-      TheNet->appnOut();
-    }
-    // create oWFN output ?
-    if (mode_owfn_petri_net)
-    {
-      TheNet->owfnOut();
-    }
-    // create dot output ?
-    if (mode_dot_petri_net)
-    {
-      TheNet->dotOut();
-    }    
-    // output info file ?
-    if (mode_petri_net && mode_file )
-    {
-      TheNet->printInformation();
-    }
-
 
     cleanup();  
 
@@ -161,10 +236,18 @@ int main( int argc, char *argv[])
   catch (Exception& e)
   {
     // output info file ?
-    if (mode_petri_net && mode_file )
+    if ( modus == M_PETRINET )
     {
-      // in case of an exception, the Petri Net information might help us!
+      if (output_filename != "")
+      {
+        output = openOutput(output_filename + "." + suffixes[F_INFO]);
+      }
       TheNet->printInformation();
+      if (output_filename != "")
+      {
+        closeOutput(output);
+        output = NULL;
+      }
     }
     error(e);
   }

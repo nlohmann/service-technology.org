@@ -33,7 +33,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.7 $: 
+ * \version \$Revision: 1.8 $: 
  *
  */
 
@@ -218,12 +218,13 @@ class STAttribute
  * \brief
  * 
  */
-class STVariable : public STElement
+class STVariable : public STElement, public SymbolTableEntry
 {
   public:
     /// constructor
     STVariable();
-    
+    STVariable(unsigned int elementId, unsigned int entryKey);
+        
     /// destructor
     ~STVariable();
     
@@ -264,11 +265,33 @@ class STLink: public STElement
  * \brief
  * 
  */
-class STPartnerLink: public STElement
+class STPartnerLink: public STElement, public SymbolTableEntry
 {
   public:
+    /// constructor
+    STPartnerLink();
+    STPartnerLink(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STPartnerLink();
 };
 
+/**
+ * \class	Partner
+ *
+ * \brief
+ * 
+ */
+class STPartner: public STElement, public SymbolTableEntry
+{
+  public:
+    /// constructor
+    STPartner();
+    STPartner(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STPartner();
+};
 
 
 /**
@@ -400,8 +423,11 @@ class STProcess: public STElement, public STEnvelope, public SymbolTableEntry
 {
   public:
     /// constructor
-    STProcess(unsigned int elementId);
+    STProcess();
     STProcess(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STProcess();
     
     /// a list of partner links declared in the process
     list<STPartnerLink*> partnerLinks;
@@ -424,6 +450,13 @@ class STProcess: public STElement, public STEnvelope, public SymbolTableEntry
 class STScope: public STElement, public STEnvelope, public SymbolTableEntry
 {
   public:
+    /// constructor
+    STScope();
+    STScope(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STScope();
+
     /// additional attribute used for inter-scope communication (push-places)
     unsigned int parentScopeId;
 
@@ -445,6 +478,13 @@ class STScope: public STElement, public STEnvelope, public SymbolTableEntry
 class STActivity: public STElement, public SymbolTableEntry
 {
   public:
+    /// constructor
+    STActivity();
+    STActivity(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STActivity();
+
     /// true if activity is source of a link
     bool isSourceOfLink;
 

@@ -73,6 +73,14 @@ unsigned int SymbolTable::insert(unsigned int elementId)
 {
   switch(elementId)
   {
+    case K_PARTNERLINK:
+    {
+      traceST("PARTNERLINK\n");
+      symTab[this->nextKey()] = new STPartnerLink(elementId, this->entryKey);
+//      traceST("--> " + intToString(this->entryKey) + "\n");
+    }
+    break;
+
     case K_PROCESS:
     {
       traceST("PROCESS\n");
@@ -80,18 +88,28 @@ unsigned int SymbolTable::insert(unsigned int elementId)
 //      traceST("--> " + intToString(this->entryKey) + "\n");
     }
     break;
-    
+   
     case K_SCOPE:
     {
       traceST("Scope\n");
-//      symTab[this->nextKey()] = new STScope(elementId);      
+      symTab[this->nextKey()] = new STScope(elementId, this->entryKey);
+//      traceST("--> " + intToString(this->entryKey) + "\n");      
+    }
+    break;
+
+    case K_VARIABLE:
+    {
+      traceST("VARIABLE\n");
+      symTab[this->nextKey()] = new STVariable(elementId, this->entryKey);
+//      traceST("--> " + intToString(this->entryKey) + "\n");
     }
     break;
 
     default : /* activities */
     {
       traceST("activities\n");
-//      symTab[this->nextKey()] = new STActivity(elementId);      
+      symTab[this->nextKey()] = new STActivity(elementId, this->entryKey);
+//      traceST("--> " + intToString(this->entryKey) + "\n");      
     }
     break;
   }
@@ -133,18 +151,41 @@ void SymbolTable::addAttribute(unsigned int entryKey, STAttribute* attribute)
   ///
   switch((dynamic_cast <SymbolTableEntry*> (symTab[entryKey]))->elementId)
   {
+    case K_PARTNER:
+    {
+//      traceST("cast to STPartner\n");
+      (dynamic_cast <STPartner*> (symTab[entryKey]))->mapOfAttributes[attribute->name->name] = attribute;
+      break;
+    }
+
+    case K_PARTNERLINK:
+    {
+//      traceST("cast to STPartnerLink\n");
+      (dynamic_cast <STPartnerLink*> (symTab[entryKey]))->mapOfAttributes[attribute->name->name] = attribute;
+      break;
+    }
+
     case K_PROCESS:
     {
 //      traceST("cast to STProcess\n");
       (dynamic_cast <STProcess*> (symTab[entryKey]))->mapOfAttributes[attribute->name->name] = attribute;
       break;
     }
+
     case K_SCOPE:
     {
 //      traceST("cast to STScope\n");
       (dynamic_cast <STScope*> (symTab[entryKey]))->mapOfAttributes[attribute->name->name] = attribute;
       break;
     }    
+
+    case K_VARIABLE:
+    {
+//      traceST("cast to STProcess\n");
+      (dynamic_cast <STVariable*> (symTab[entryKey]))->mapOfAttributes[attribute->name->name] = attribute;
+      break;
+    }
+
     default:
     { /* cast to Activity */
 //      traceST("cast to STActivity\n");    	
@@ -162,18 +203,41 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
   ///
   switch((dynamic_cast <SymbolTableEntry*> (symTab[entryKey]))->elementId)
   {
+    case K_PARTNER:
+    {
+//      traceST("cast to STPartner\n");
+      return (dynamic_cast <STPartner*> (symTab[entryKey]))->mapOfAttributes[name];
+      break;
+    }
+
+    case K_PARTNERLINK:
+    {
+//      traceST("cast to STPartnerLink\n");
+      return (dynamic_cast <STPartnerLink*> (symTab[entryKey]))->mapOfAttributes[name];
+      break;
+    }
+
     case K_PROCESS:
     {
 //      traceST("cast to STProcess\n");
       return (dynamic_cast <STProcess*> (symTab[entryKey]))->mapOfAttributes[name];
       break;
     }
+    
     case K_SCOPE:
     {
 //      traceST("cast to STScope\n");
       return (dynamic_cast <STScope*> (symTab[entryKey]))->mapOfAttributes[name];
       break;
     }    
+
+    case K_VARIABLE:
+    {
+//      traceST("cast to STPartnerLink\n");
+      return (dynamic_cast <STVariable*> (symTab[entryKey]))->mapOfAttributes[name];
+      break;
+    }
+    
     default:
     { /* cast to Activity */
 //      traceST("cast to STActivity\n");    	
@@ -260,6 +324,21 @@ unsigned int SymbolTableEntry::getEntryKey()
 /*!
  * constructor
  */
+STActivity::STActivity(unsigned int elementId, unsigned int entryKey)
+ :SymbolTableEntry(elementId, entryKey) {}
+
+/*!
+ * destructor
+ */
+STActivity::~STActivity() {}
+ 
+/********************************************
+ * implementation of Attribute CLASS
+ ********************************************/
+
+/*!
+ * constructor
+ */
 STAttribute::STAttribute(kc::casestring name, kc::casestring value)
 {
   this->name = name;
@@ -271,10 +350,6 @@ STAttribute::STAttribute(kc::casestring name, kc::casestring value)
  * destructor
  */
 STAttribute::~STAttribute() {}
- 
-/********************************************
- * implementation of Attribute CLASS
- ********************************************/
  
 /********************************************
  * implementation of CompensationHandler CLASS
@@ -303,11 +378,38 @@ STAttribute::~STAttribute() {}
 /********************************************
  * implementation of Link CLASS
  ********************************************/
+
+/********************************************
+ * implementation of Partner CLASS
+ ********************************************/
+
+/*!
+ * constructor
+ */
+STPartner::STPartner(unsigned int elementId, unsigned int entryKey)
+ :SymbolTableEntry(elementId, entryKey) {}
+
+/*!
+ * destructor
+ */
+STPartner::~STPartner() {}
+
  
 /********************************************
  * implementation of PartnerLink CLASS
  ********************************************/
- 
+
+/*!
+ * constructor
+ */
+STPartnerLink::STPartnerLink(unsigned int elementId, unsigned int entryKey)
+ :SymbolTableEntry(elementId, entryKey) {}
+
+/*!
+ * destructor
+ */
+STPartnerLink::~STPartnerLink() {}
+
 /********************************************
  * implementation of Process CLASS
  ********************************************/
@@ -315,14 +417,28 @@ STAttribute::~STAttribute() {}
 /*!
  * constructor
  */
-STProcess::STProcess(unsigned int elementId) :SymbolTableEntry(elementId) {}
-
 STProcess::STProcess(unsigned int elementId, unsigned int entryKey)
  :SymbolTableEntry(elementId, entryKey) {}
- 
+
+/*!
+ * destructor
+ */
+STProcess::~STProcess() {}
+
 /********************************************
  * implementation of Scope CLASS
  ********************************************/
+
+/*!
+ * constructor
+ */
+STScope::STScope(unsigned int elementId, unsigned int entryKey)
+ :SymbolTableEntry(elementId, entryKey) {}
+
+/*!
+ * destructor
+ */
+STScope::~STScope() {}
  
 /********************************************
  * implementation of Variable CLASS
@@ -331,10 +447,10 @@ STProcess::STProcess(unsigned int elementId, unsigned int entryKey)
 /*!
  * constructor
  */
-STVariable::STVariable() {}
+STVariable::STVariable(unsigned int elementId, unsigned int entryKey)
+ :SymbolTableEntry(elementId, entryKey) {}
 
 /*!
  * destructor
  */
 STVariable::~STVariable() {}
-

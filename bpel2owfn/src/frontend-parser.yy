@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/01/31 01:44:16 $
+ *          - last changed: \$Date: 2006/02/02 15:37:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.103 $
+ * \version \$Revision: 1.104 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -295,6 +295,10 @@ tProcess:
   }
   arbitraryAttributes
     { //symTab.traceST(string((symTab.readAttribute(currentSymTabEntryKey, "name"))->value->name) + "\n");
+      (dynamic_cast <STProcess*> (currentSymTabEntry))->abstractProcess = true;
+      if((dynamic_cast <STProcess*> (currentSymTabEntry))->abstractProcess) symTab.traceST("TRUE\n");
+      else  symTab.traceST("FALSE");
+      
       att.check($4, K_PROCESS);
       if(att.isAttributeValueEmpty($4, "suppressJoinFailure"))
       {
@@ -459,12 +463,13 @@ tPartnerLink_list:
 ;
 
 tPartnerLink:
-  K_PARTNERLINK arbitraryAttributes X_NEXT X_SLASH K_PARTNERLINK
+  K_PARTNERLINK genSymTabEntry_PartnerLink
+    arbitraryAttributes X_NEXT X_SLASH K_PARTNERLINK
     { $$ = PartnerLink();
-      $$->name = att.read($2, "name");
-      $$->partnerLinkType = att.read($2, "partnerLinkType");
-      $$->myRole = att.read($2, "myRole");
-      $$->partnerRole = att.read($2, "partnerRole"); 
+      $$->name = att.read($3, "name");
+      $$->partnerLinkType = att.read($3, "partnerLinkType");
+      $$->myRole = att.read($3, "myRole");
+      $$->partnerRole = att.read($3, "partnerRole"); 
       if (inPartners) {
         symMan.checkPartnerLink($$->name->name);
       }
@@ -474,12 +479,13 @@ tPartnerLink:
 	  		                        $$->myRole->name, $$->partnerRole->name)); 
       }
     }
-| K_PARTNERLINK arbitraryAttributes X_SLASH
+| K_PARTNERLINK genSymTabEntry_PartnerLink
+    arbitraryAttributes X_SLASH
     { $$ = PartnerLink();
-      $$->name = att.read($2, "name");
-      $$->partnerLinkType = att.read($2, "partnerLinkType");
-      $$->myRole = att.read($2, "myRole");
-      $$->partnerRole = att.read($2, "partnerRole");
+      $$->name = att.read($3, "name");
+      $$->partnerLinkType = att.read($3, "partnerLinkType");
+      $$->myRole = att.read($3, "myRole");
+      $$->partnerRole = att.read($3, "partnerRole");
       if (inPartners) {
         symMan.checkPartnerLink($$->name->name);
       }
@@ -491,6 +497,11 @@ tPartnerLink:
     }
 ;
 
+genSymTabEntry_PartnerLink:
+  { currentSymTabEntryKey = symTab.insert(K_PARTNERLINK);
+    currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
+  }
+;
 
 /******************************************************************************
   PARTNERS
@@ -528,19 +539,19 @@ tPartner_list:
 ;
 
 tPartner:
-  K_PARTNER arbitraryAttributes X_NEXT tPartnerLink_list X_SLASH K_PARTNER
-    { $$ = Partner($4);
-      $$->name = att.read($2, "name"); }
-| K_PARTNER arbitraryAttributes X_SLASH
+  K_PARTNER genSymTabEntry_Partner arbitraryAttributes X_NEXT tPartnerLink_list X_SLASH K_PARTNER
+    { $$ = Partner($5);
+      $$->name = att.read($3, "name"); }
+| K_PARTNER genSymTabEntry_Partner arbitraryAttributes X_SLASH
     { $$ = Partner(NiltPartnerLink_list());
-      $$->name = att.read($2, "name"); }
+      $$->name = att.read($3, "name"); }
 ;
 
-
-
-
-
-
+genSymTabEntry_Partner:
+  { currentSymTabEntryKey = symTab.insert(K_PARTNER);
+    currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
+  }
+;
 
 /******************************************************************************
   FAULT HANDLERS
@@ -823,23 +834,23 @@ tVariable_list:
 ;
 
 tVariable:
-  K_VARIABLE arbitraryAttributes X_NEXT X_SLASH K_VARIABLE
+  K_VARIABLE genSymTabEntry_Variable arbitraryAttributes X_NEXT X_SLASH K_VARIABLE
     { $$ = Variable();
-      $$->name = att.read($2, "name");
-      $$->messageType = att.read($2, "messageType");
-      $$->type = att.read($2, "type");
-      $$->element = att.read($2, "element"); 
+      $$->name = att.read($3, "name");
+      $$->messageType = att.read($3, "messageType");
+      $$->type = att.read($3, "type");
+      $$->element = att.read($3, "element"); 
       $$->variableID = symMan.addVariable( 
 	              new csVariable($$->name->name, 
 				     $$->messageType->name, 
 				     $$->type->name, 
 				     $$->element->name)); }
-| K_VARIABLE arbitraryAttributes X_SLASH
+| K_VARIABLE genSymTabEntry_Variable arbitraryAttributes X_SLASH
     { $$ = Variable();
-      $$->name = att.read($2, "name");
-      $$->messageType = att.read($2, "messageType");
-      $$->type = att.read($2, "type");
-      $$->element = att.read($2, "element"); 
+      $$->name = att.read($3, "name");
+      $$->messageType = att.read($3, "messageType");
+      $$->type = att.read($3, "type");
+      $$->element = att.read($3, "element"); 
       $$->variableID = symMan.addVariable( 
 	              new csVariable($$->name->name, 
 				     $$->messageType->name, 
@@ -847,6 +858,11 @@ tVariable:
 				     $$->element->name)); }
 ;
 
+genSymTabEntry_Variable:
+  { currentSymTabEntryKey = symTab.insert(K_VARIABLE);
+    currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
+  }
+;
 
 /******************************************************************************
   CORRELATION SETS
@@ -1038,29 +1054,29 @@ tEmpty:
 */
 
 tInvoke:
-  K_INVOKE 
+  K_INVOKE genSymTabEntry_Invoke 
   arbitraryAttributes 
     { 
-      att.check($2, K_INVOKE);
-      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      att.check($3, K_INVOKE);
+      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
-      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
       }
       else
       {
         /// current BPEL-element attribute value
-      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
+      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
       }
     }   
   X_NEXT
     {
       // automatically create scope?
-      symMan.checkPartnerLink(att.read($2, "partnerLink")->name);
+      symMan.checkPartnerLink(att.read($3, "partnerLink")->name);
       isInFH.push(false);
       isInCH.push(pair<bool,int>(false,hasCompensate));
-      parent[$2] = currentScopeId;
-      currentScopeId = $2; 
+      parent[$3] = currentScopeId;
+      currentScopeId = $3; 
     }
   standardElements 
   tCorrelations tCatch_list  tCatchAll tCompensationHandler X_SLASH K_INVOKE
@@ -1068,41 +1084,41 @@ tInvoke:
       isInFH.pop();
       hasCompensate = isInCH.top().second;
       isInCH.pop();
-      if ($8->length() > 0 
-           || (string($9->op_name()) != "NoCatchAll") 
-           || string($10->op_name()) != "implicitCompensationHandler")
+      if ($9->length() > 0 
+           || (string($10->op_name()) != "NoCatchAll") 
+           || string($11->op_name()) != "implicitCompensationHandler")
       {
         //cerr << "embed in scope" << endl;
         standardElements se =  StandardElements(NiltTarget_list(), NiltSource_list());
-        tInvoke invoke = Invoke(se, $7);
+        tInvoke invoke = Invoke(se, $8);
         activity ai = activityInvoke(invoke);
-        tFaultHandlers fh = userDefinedFaultHandler($8, $9);
+        tFaultHandlers fh = userDefinedFaultHandler($9, $10);
         fh->hasCatchAll = hasCatchAll;
         tEventHandlers eh = implicitEventHandler();
-        tScope scope = Scope($6, NiltVariable_list(), fh, $10, eh, StopInScope(), ai);
+        tScope scope = Scope($7, NiltVariable_list(), fh, $11, eh, StopInScope(), ai);
 
         fh->inProcess = false;
-        fh->parentScopeId = $2;
-        $10->parentScopeId = $2;
-        eh->parentScopeId = $2;
+        fh->parentScopeId = $3;
+        $11->parentScopeId = $3;
+        eh->parentScopeId = $3;
 
-        symMan.newScopeScope($2);
+        symMan.newScopeScope($3);
         symMan.quitScope();
 
-	invoke->name = att.read($2, "name");
-        scope->name = att.read($2, "name");
-        scope->joinCondition = invoke->joinCondition = $6->joinCondition = att.read($2, "joinCondition");
-        scope->suppressJoinFailure = invoke->suppressJoinFailure = $6->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+	invoke->name = att.read($3, "name");
+        scope->name = att.read($3, "name");
+        scope->joinCondition = invoke->joinCondition = $7->joinCondition = att.read($3, "joinCondition");
+        scope->suppressJoinFailure = invoke->suppressJoinFailure = $7->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
         scope->variableAccessSerializable = mkcasestring("");
         att.traceAM(string("tInvoke: ") + (invoke->suppressJoinFailure)->name + string("\n"));
 	att.popSJFStack();
-	invoke->partnerLink = att.read($2, "partnerLink");
-        invoke->portType = att.read($2, "portType");
-        invoke->operation = att.read($2, "operation");
-        invoke->inputVariable = att.read($2, "inputVariable");
-        invoke->outputVariable = att.read($2, "outputVariable");
-        invoke->variableIDin  = symMan.checkVariable(att.read($2, "inputVariable")->name);
-        invoke->variableIDout = symMan.checkVariable(att.read($2, "outputVariable")->name);
+	invoke->partnerLink = att.read($3, "partnerLink");
+        invoke->portType = att.read($3, "portType");
+        invoke->operation = att.read($3, "operation");
+        invoke->inputVariable = att.read($3, "inputVariable");
+        invoke->outputVariable = att.read($3, "outputVariable");
+        invoke->variableIDin  = symMan.checkVariable(att.read($3, "inputVariable")->name);
+        invoke->variableIDout = symMan.checkVariable(att.read($3, "outputVariable")->name);
         if (string(invoke->variableIDin->name) != "")
         {
           invoke->channelID = symMan.addChannel(new csChannel(invoke->portType->name, 
@@ -1117,16 +1133,16 @@ tInvoke:
         }
 	scope->dpe = invoke->dpe = mkinteger(0);
         // symMan.needsDPE();
-	if ($6->dpe->value > 0)
+	if ($7->dpe->value > 0)
         {
           symMan.addDPEend();
         }
         scope->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
         invoke->negativeControlFlow = mkinteger(0);
-        scope->id = $6->parentId = $2; 
+        scope->id = $7->parentId = $3; 
         invoke->id = ai->id = se->parentId = att.nextId();
         scope->hasEH = false;
-        currentScopeId = scope->parentScopeId = parent[$2];
+        currentScopeId = scope->parentScopeId = parent[$3];
 
         $$ = activity(activityScope(scope));
 
@@ -1138,22 +1154,22 @@ tInvoke:
         //cerr << "don't embed" << endl;
 
         //restore real scope ID
-        currentScopeId = parent[$2];
+        currentScopeId = parent[$3];
 
-        tInvoke invoke = Invoke($6, $7);
+        tInvoke invoke = Invoke($7, $8);
 
-	invoke->name = att.read($2, "name");
-        invoke->joinCondition = $6->joinCondition = att.read($2, "joinCondition");
-        invoke->suppressJoinFailure = $6->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+	invoke->name = att.read($3, "name");
+        invoke->joinCondition = $7->joinCondition = att.read($3, "joinCondition");
+        invoke->suppressJoinFailure = $7->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
         att.traceAM(string("tInvoke: ") + (invoke->suppressJoinFailure)->name + string("\n"));
         att.popSJFStack();
-        invoke->partnerLink = att.read($2, "partnerLink");
-        invoke->portType = att.read($2, "portType");
-        invoke->operation = att.read($2, "operation");
-        invoke->inputVariable = att.read($2, "inputVariable");
-        invoke->outputVariable = att.read($2, "outputVariable");
-        invoke->variableIDin  = symMan.checkVariable(att.read($2, "inputVariable")->name);
-        invoke->variableIDout = symMan.checkVariable(att.read($2, "outputVariable")->name);
+        invoke->partnerLink = att.read($3, "partnerLink");
+        invoke->portType = att.read($3, "portType");
+        invoke->operation = att.read($3, "operation");
+        invoke->inputVariable = att.read($3, "inputVariable");
+        invoke->outputVariable = att.read($3, "outputVariable");
+        invoke->variableIDin  = symMan.checkVariable(att.read($3, "inputVariable")->name);
+        invoke->variableIDout = symMan.checkVariable(att.read($3, "outputVariable")->name);
         if (string(invoke->variableIDin->name) != "")
         {
           invoke->channelID = symMan.addChannel(new csChannel(invoke->portType->name, 
@@ -1167,50 +1183,50 @@ tInvoke:
 					  invoke->partnerLink->name), false);
         }
         invoke->dpe = symMan.needsDPE();
-        if ($6->dpe->value > 0)
+        if ($7->dpe->value > 0)
         {
           symMan.addDPEend();
         }
         invoke->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-        invoke->id = $6->parentId = $2; 
+        invoke->id = $7->parentId = $3; 
 
         $$ = activity(activityInvoke(invoke));
         $$->id = invoke->id;
         $$->negativeControlFlow = invoke->negativeControlFlow;
       }    
     }
-| K_INVOKE 
+| K_INVOKE genSymTabEntry_Invoke 
   arbitraryAttributes 
     { 
-      att.check($2, K_INVOKE);
-      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      att.check($3, K_INVOKE);
+      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
-      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
       }
       else
       {
         /// current BPEL-element attribute value
-      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
+      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
       }
     }   
   X_SLASH
     { 
       impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
-      noLinks->parentId = $2;
+      noLinks->parentId = $3;
       tInvoke invoke = Invoke(noLinks, NiltCorrelation_list());
-      invoke->name = att.read($2, "name");
-      invoke->joinCondition = att.read($2, "joinCondition");    
-      invoke->suppressJoinFailure = att.read($2, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+      invoke->name = att.read($3, "name");
+      invoke->joinCondition = att.read($3, "joinCondition");    
+      invoke->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
       att.traceAM(string("tInvoke: ") + (invoke->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
-      invoke->partnerLink = att.read($2, "partnerLink");
-      invoke->portType = att.read($2, "portType");
-      invoke->operation = att.read($2, "operation");
-      invoke->inputVariable = att.read($2, "inputVariable");
-      invoke->outputVariable = att.read($2, "outputVariable"); 
-      invoke->variableIDin  = symMan.checkVariable(att.read($2, "inputVariable")->name);
-      invoke->variableIDout = symMan.checkVariable(att.read($2, "outputVariable")->name);
+      invoke->partnerLink = att.read($3, "partnerLink");
+      invoke->portType = att.read($3, "portType");
+      invoke->operation = att.read($3, "operation");
+      invoke->inputVariable = att.read($3, "inputVariable");
+      invoke->outputVariable = att.read($3, "outputVariable"); 
+      invoke->variableIDin  = symMan.checkVariable(att.read($3, "inputVariable")->name);
+      invoke->variableIDout = symMan.checkVariable(att.read($3, "outputVariable")->name);
       symMan.checkPartnerLink(invoke->partnerLink->name); 
       if (string(invoke->variableIDin->name) != "")
       {
@@ -1226,12 +1242,18 @@ tInvoke:
       }
       invoke->dpe = kc::mkinteger(0);
       invoke->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      invoke->id = $2; 
+      invoke->id = $3; 
 
       $$ = activity(activityInvoke(invoke));
       $$->id = invoke->id;
       $$->negativeControlFlow = invoke->negativeControlFlow;
 }
+;
+
+genSymTabEntry_Invoke:
+  { currentSymTabEntryKey = symTab.insert(K_INVOKE);
+    currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
+  }
 ;
 
 
@@ -2361,27 +2383,30 @@ tPick:
 
 tScope:
   K_SCOPE
+  { currentSymTabEntryKey = symTab.insert(K_SCOPE);
+    currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
+  }
   arbitraryAttributes
     { 
-      att.check($2, K_SCOPE);
-      if(att.isAttributeValueEmpty($2, "suppressJoinFailure"))
+      att.check($3, K_SCOPE);
+      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
-      	att.pushSJFStack($2, (att.topSJFStack()).getSJFValue());
+      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
       }
       else
       {
         /// current BPEL-element attribute value
-      	att.pushSJFStack($2, att.read($2, "suppressJoinFailure"));      
+      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
       }
     }  
   X_NEXT
-    { symMan.newScopeScope($2);
+    { symMan.newScopeScope($3);
       symMan.setBlackListMode(true);
       isInFH.push(false);
       isInCH.push(pair<bool,int>(false,hasCompensate));
-      parent[$2] = currentScopeId;
-      currentScopeId = $2; }
+      parent[$3] = currentScopeId;
+      currentScopeId = $3; }
   standardElements 
     {
       symMan.setBlackListMode(false);
@@ -2393,32 +2418,28 @@ tScope:
   tEventHandlers 
   activity 
   X_NEXT X_SLASH K_SCOPE
-    { att.check($2, K_SCOPE);
+    { att.check($3, K_SCOPE);
       isInFH.pop();
       hasCompensate = isInCH.top().second;
       isInCH.pop();
-      $$ = Scope($6, $8, $10, $11, $12, StopInScope(), $13);
-      $$->name = att.read($2, "name");
-      $$->joinCondition = $6->joinCondition = att.read($2, "joinCondition");
-      $$->suppressJoinFailure = $6->suppressJoinFailure = att.read($2, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
+      $$ = Scope($7, $9, $11, $12, $13, StopInScope(), $14);
+      $$->name = att.read($3, "name");
+      $$->joinCondition = $7->joinCondition = att.read($3, "joinCondition");
+      $$->suppressJoinFailure = $7->suppressJoinFailure = att.read($3, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
       att.traceAM(string("tScope: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
-      $$->variableAccessSerializable = att.read($2, "variableAccessSerializable", $$->variableAccessSerializable);
-      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $2;
-      $$->parentScopeId = currentScopeId = parent[$2];
+      $$->variableAccessSerializable = att.read($3, "variableAccessSerializable", $$->variableAccessSerializable);
+      $$->negativeControlFlow = $7->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$->id = $7->parentId = $3;
+      $$->parentScopeId = currentScopeId = parent[$3];
       $$->dpe = symMan.needsDPE();
-      $$->hasEH = (string($12->op_name()) == "userDefinedEventHandler");
-      if ($6->dpe->value > 0)
+      $$->hasEH = (string($13->op_name()) == "userDefinedEventHandler");
+      if ($7->dpe->value > 0)
       {
         symMan.addDPEend();
       }
       symMan.quitScope(); }
 ;
-
-
-
-
 
 /******************************************************************************
   STANDARD ELEMENTS
@@ -2510,7 +2531,7 @@ arbitraryAttributes:
     { $$ = att.nextId(); }
 | X_NAME X_EQUALS X_STRING arbitraryAttributes
     { $$ = $4;
-      att.define($1, $3); 
+      att.define($1, $3);
       symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute($1, $3));
     }
 ;

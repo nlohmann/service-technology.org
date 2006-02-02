@@ -155,7 +155,6 @@ void parse_command_line(int argc, char* argv[])
     string format = "";
     string parameter = "";
     string debug = "";
-    cerr << "option " << optc << endl;
     switch (optc)
       {
       case 'h':

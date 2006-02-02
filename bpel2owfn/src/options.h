@@ -19,7 +19,7 @@ typedef enum
 
 typedef enum
 {
-  M_AST,
+  M_AST = 1,
   M_PRETTY,
   M_PETRINET,
   M_CFG

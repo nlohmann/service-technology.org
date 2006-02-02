@@ -48,7 +48,8 @@ static struct option longopts[] =
   { "outputfile", optional_argument, NULL, 'o' },
   { "format",     required_argument, NULL, 'f' },
   { "parameter",  required_argument, NULL, 'p' },
-  { "debug",      required_argument, NULL, 'd' }
+  { "debug",      required_argument, NULL, 'd' },
+  NULL
 };
 
 const char * par_string = "hvm:li:of:p:d:";
@@ -154,6 +155,7 @@ void parse_command_line(int argc, char* argv[])
     string format = "";
     string parameter = "";
     string debug = "";
+    cerr << "option " << optc << endl;
     switch (optc)
       {
       case 'h':
@@ -209,7 +211,7 @@ void parse_command_line(int argc, char* argv[])
 	      {
 		output_filename = string(optarg);
 	      }
-        break;
+              break;
       case 'f':
 	      options[O_FORMAT] = true;
 	      format = string(optarg);

@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/02/02 15:31:54 $
+ *          - last changed: \$Date: 2006/02/03 09:14:25 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.40 $
+ * \version \$Revision: 1.41 $
  *
  */
 
@@ -178,13 +178,13 @@ void cleanup()
     output = NULL;
   }
  
-  if ( log != &std::clog )
+  if ( log_output != &std::clog )
   {
     trace(TRACE_INFORMATION," + Closing log file: " + log_filename + "\n");
-    (*log) << std::flush;
-    ((std::ofstream*)log)->close();
-    delete(log);
-    log = &std::cerr;
+    (*log_output) << std::flush;
+    ((std::ofstream*)log_output)->close();
+    delete(log_output);
+    log_output = &std::cerr;
   }
 
 }

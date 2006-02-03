@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2006/02/02 15:31:54 $
+ *          - last changed: \$Date: 2006/02/03 09:14:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  */
 
 #include "debug.h"
@@ -60,7 +60,7 @@ void trace(trace_level pTraceLevel, std::string message)
 {
   if (pTraceLevel <= debug_level)
   {
-    (*log) << message << std::flush;
+    (*log_output) << message << std::flush;
   }
 }
 

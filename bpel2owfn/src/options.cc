@@ -18,7 +18,7 @@ std::istream * input = &std::cin;
 /// pointer to output stream
 std::ostream * output = &std::cout;
 /// pointer to log stream
-std::ostream * log = &std::clog;
+std::ostream * log_output = &std::clog;
 
 /// Filename of log file
 std::string log_filename = "";
@@ -362,7 +362,7 @@ void parse_command_line(int argc, char* argv[])
         log_filename = filename.substr(0, pos) + ".log";
       }
     }
-    log = openOutput(log_filename);
+    log_output = openOutput(log_filename);
 	  // new std::ofstream(log_filename.c_str(), std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
   }
   

@@ -61,7 +61,7 @@ extern std::istream * input;
 /// pointer to output stream
 extern std::ostream * output;
 /// pointer to log stream
-extern std::ostream * log;
+extern std::ostream * log_output;
 
 extern bool createOutputFile;
 

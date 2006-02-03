@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/01/19 17:44:59 $
+ *          - last changed: \$Date: 2006/02/03 09:43:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  */
 %}
 
@@ -122,6 +122,7 @@ void indown()
 // printers below.
 %{
 #include <iostream>
+#include "options.h"
 %}
 
 /******************************************************************************/
@@ -441,5 +442,5 @@ Source() ->
 /// printer-function for output on stdout
 void printer(const char *s, uview v)
 {
-  std::cout << s;
+  *output << s;
 }

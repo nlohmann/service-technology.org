@@ -44,7 +44,8 @@ typedef enum
   P_LOWLEVEL,
   P_NOINTERFACE,
   P_FINALMARKING,
-  P_UNIQUEFAULT
+  P_UNIQUEFAULT,
+  P_FINISHLOOP
 } possibleParameters;
 
 

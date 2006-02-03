@@ -277,6 +277,10 @@ void parse_command_line(int argc, char* argv[])
 	      {
 	        parameters[P_UNIQUEFAULT] = "true";
 	      }
+	      else if ( parameter == "finishloop" )
+	      {
+	        parameters[P_FINISHLOOP] = "true";
+	      }
 	      break;
       case 'd':
 	      options[O_DEBUG] = true;

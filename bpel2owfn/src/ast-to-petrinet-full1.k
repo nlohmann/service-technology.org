@@ -29,11 +29,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/01/20 09:11:08 $
+ *          - last changed: \$Date: 2006/02/03 14:27:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.116 $
+ * \version \$Revision: 1.117 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -73,7 +73,8 @@
 #include <iostream>
 #include "petrinet.h"
 #include "check-symbols.h"
-
+#include "options.h"
+	
 using namespace std;
 
 // introduced in main.c 
@@ -314,8 +315,11 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       //Place *p43 = TheNet->newPlace(prefix + "compensated");
 //      Place *p44 = TheNet->newPlace(prefix + "compScope");
       
-      Transition *process_loop =  TheNet->newTransition(prefix + "finishloop"); // added so that all deadlocks are evil!
-      TheNet->newArc(p39, process_loop, READ);
+      if ( parameters[P_FINISHLOOP] )
+      {
+        Transition *process_loop =  TheNet->newTransition(prefix + "finishloop"); // added so that all deadlocks are evil!
+        TheNet->newArc(p39, process_loop, READ);
+      }
       
       Transition *t2 =  TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p1, t2);

@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/02/02 15:31:54 $
+ *          - last changed: \$Date: 2006/02/03 10:00:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.48 $
+ * \version \$Revision: 1.49 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -98,15 +98,18 @@ int main( int argc, char *argv[])
         
       if (modus == M_PRETTY)
       {
-	if (formats[F_TXT] && output_filename != "")
+	if (formats[F_XML])
 	{
-	  output = openOutput(output_filename + "." + suffixes[F_TXT]);
-	}
-        TheProcess->unparse(kc::printer, kc::xml);
-	if (formats[F_TXT] && output_filename != "")
-	{
-	  closeOutput(output);
-	  output = NULL;
+	  if (output_filename != "")
+	  {
+ 	    output = openOutput(output_filename + "." + suffixes[F_XML]);
+	  }
+          TheProcess->unparse(kc::printer, kc::xml);
+	  if (output_filename != "")
+	  {
+	    closeOutput(output);
+	    output = NULL;
+	  }
 	}
       }
       

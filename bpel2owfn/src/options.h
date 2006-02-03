@@ -34,7 +34,8 @@ typedef enum
   F_APPN,
   F_INFO,
   F_PNML,
-  F_TXT
+  F_TXT,
+  F_XML
 } possibleFormats;
 
 typedef enum

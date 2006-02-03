@@ -28,11 +28,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/02/03 09:43:35 $
+ *          - last changed: \$Date: 2006/02/03 10:00:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.25 $
+ * \version \$Revision: 1.26 $
  */
 %}
 
@@ -86,7 +86,7 @@ unsigned int indentStep = 4;
 void in()
 {
   for(unsigned int i=0; i<indent; i++)
-    std::cout << " ";
+    *output << " ";
 }
 
 

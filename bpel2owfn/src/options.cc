@@ -81,7 +81,7 @@ void print_help()
   trace(" -o | --output=<prefix> - write output to <prefix>.X\n");
   trace("\n");
   trace(" -f | --format          - select output formats (as far as supported for mode):\n");
-  trace("                          lola, owfn, dot, pep, appn, info, pnml, txt\n");
+  trace("                          lola, owfn, dot, pep, appn, info, pnml, txt, xml\n");
   trace("\n");
   trace(" -d | --debug           - set debug level: 1-4\n");
   trace(" -l | --log[=<file>]    - write additional information into file\n");
@@ -89,7 +89,7 @@ void print_help()
   
   trace("\n");
   trace("For more information see:\n");
-  trace("  http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel\n");
+  trace("  http://www.informatik.hu-berlin.de/top/tools4bpel\n");
   trace("\n");
 
 }
@@ -123,12 +123,13 @@ void parse_command_line(int argc, char* argv[])
   suffixes[F_INFO] = "info";
   suffixes[F_PNML] = "pnml";
   suffixes[F_TXT]  = "txt" ;
+  suffixes[F_XML]  = "xml" ;
 
   map< pair<possibleModi,possibleFormats>, bool > validFormats;
   
   // validFormats[pair<possibleModi,possibleFormats>(M_AST,F_TXT)] = true;
 
-  validFormats[pair<possibleModi,possibleFormats>(M_PRETTY,F_TXT)] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_PRETTY,F_XML)] = true;
 
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_LOLA)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_OWFN)] = true;
@@ -245,6 +246,10 @@ void parse_command_line(int argc, char* argv[])
 	      else if (format == suffixes[F_TXT])
 	      {
 		formats[F_TXT] = true;
+	      }
+	      else if (format == suffixes[F_XML])
+	      {
+		formats[F_XML] = true;
 	      }
 	      break;
       case 'p':
@@ -441,6 +446,15 @@ void parse_command_line(int argc, char* argv[])
     {
       trace(TRACE_WARNINGS, "WARNING: txt is no valid format for the chosen mode: omitting.\n");
       formats[F_TXT] = false;
+    }
+    if ( validFormats[pair<possibleModi, possibleFormats>(modus,F_XML)] && formats[F_XML] )
+    {
+      counter++;
+    }
+    else if ( formats[F_XML] )
+    {
+      trace(TRACE_WARNINGS, "WARNING: txt is no valid format for the chosen mode: omitting.\n");
+      formats[F_XML] = false;
     }
     if ((counter > 1) && !options[O_OUTPUT])
     {

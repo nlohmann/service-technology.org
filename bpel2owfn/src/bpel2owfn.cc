@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/02/03 10:00:04 $
+ *          - last changed: \$Date: 2006/02/03 10:56:03 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -164,7 +164,6 @@ int main( int argc, char *argv[])
 	  {
  	    output = openOutput(output_filename + "." + suffixes[F_LOLA]);
 	  }
-	  trace("LOLA!\n");
           TheNet->lolaOut();
 	  if (output_filename != "")
 	  {

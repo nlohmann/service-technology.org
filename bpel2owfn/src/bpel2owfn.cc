@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/02/03 10:56:03 $
+ *          - last changed: \$Date: 2006/02/03 14:11:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -93,7 +93,8 @@ int main( int argc, char *argv[])
       symMan.printScope();
       if (modus == M_AST)
       {
-	TheProcess->print();
+	trace(TRACE_INFORMATION, "-> Printing AST ...\n");
+        TheProcess->print();
       }
         
       if (modus == M_PRETTY)
@@ -104,6 +105,7 @@ int main( int argc, char *argv[])
 	  {
  	    output = openOutput(output_filename + "." + suffixes[F_XML]);
 	  }
+ 	  trace(TRACE_INFORMATION, "-> Printing \"pretty\" XML ...\n");
           TheProcess->unparse(kc::printer, kc::xml);
 	  if (output_filename != "")
 	  {
@@ -116,6 +118,7 @@ int main( int argc, char *argv[])
       // create CFG
       if (modus == M_CFG || modus == M_PETRINET)
       {
+        trace(TRACE_INFORMATION, "-> Unparsing AST to CFG ...\n");
         TheProcess->unparse(kc::pseudoPrinter, kc::cfg);
 	// do some business with CFG
       }
@@ -128,6 +131,7 @@ int main( int argc, char *argv[])
 	  {
  	    output = openOutput(output_filename + ".cfg." + suffixes[F_DOT]);
 	  }
+ 	  trace(TRACE_INFORMATION, "-> Printing CFG in dot ...\n");
           // output CFG;
   	  TheCFG->print_dot();
 	  if (output_filename != "")
@@ -146,15 +150,18 @@ int main( int argc, char *argv[])
 
       if (modus == M_PETRINET)
       {
+        trace(TRACE_INFORMATION, "-> Unparsing AST to Petri net ...\n");
         TheProcess->unparse(kc::pseudoPrinter, kc::petrinet);
         // make low level ?
 	if ( parameters[P_LOWLEVEL] )
         {
+ 	  trace(TRACE_INFORMATION, "-> Convert Petri net to Low Level Petri Net ...\n");
           TheNet->makeLowLevel();
         }    
         // simplify net ?
  	if ( parameters[P_SIMPLIFY] )
         {
+ 	  trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
           TheNet->simplify();
         }    
         // create LoLA output ?
@@ -164,6 +171,7 @@ int main( int argc, char *argv[])
 	  {
  	    output = openOutput(output_filename + "." + suffixes[F_LOLA]);
 	  }
+ 	  trace(TRACE_INFORMATION, "-> Printing Petri net for LoLA ...\n");
           TheNet->lolaOut();
 	  if (output_filename != "")
 	  {
@@ -178,6 +186,7 @@ int main( int argc, char *argv[])
 	  {
  	    output = openOutput(output_filename + "." + suffixes[F_APPN]);
 	  }
+ 	  trace(TRACE_INFORMATION, "-> Printing Petri net for APPN ...\n");
           TheNet->appnOut();
 	  if (output_filename != "")
 	  {
@@ -192,6 +201,7 @@ int main( int argc, char *argv[])
 	  {
  	    output = openOutput(output_filename + "." + suffixes[F_OWFN]);
 	  }
+ 	  trace(TRACE_INFORMATION, "-> Printing Petri net for oWFN ...\n");
           TheNet->owfnOut();
 	  if (output_filename != "")
 	  {
@@ -206,6 +216,7 @@ int main( int argc, char *argv[])
 	  {
  	    output = openOutput(output_filename + "." + suffixes[F_DOT]);
 	  }
+ 	  trace(TRACE_INFORMATION, "-> Printing Petri net for dot ...\n");
           TheNet->dotOut();
 	  if (output_filename != "")
 	  {
@@ -220,6 +231,7 @@ int main( int argc, char *argv[])
 	  {
  	    output = openOutput(output_filename + "." + suffixes[F_INFO]);
 	  }
+ 	  trace(TRACE_INFORMATION, "-> Printing Petri net information ...\n");
           TheNet->printInformation();
 	  if (output_filename != "")
 	  {

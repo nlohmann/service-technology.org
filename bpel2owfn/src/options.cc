@@ -125,6 +125,8 @@ void parse_command_line(int argc, char* argv[])
   suffixes[F_TXT]  = "txt" ;
   suffixes[F_XML]  = "xml" ;
 
+  possibleFormats format[] = { F_LOLA, F_OWFN, F_DOT, F_PEP, F_APPN, F_INFO, F_PNML, F_TXT, F_XML };
+
   map< pair<possibleModi,possibleFormats>, bool > validFormats;
   
   // validFormats[pair<possibleModi,possibleFormats>(M_AST,F_TXT)] = true;
@@ -138,7 +140,7 @@ void parse_command_line(int argc, char* argv[])
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_APPN)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_INFO)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_PNML)] = true;
-  validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_TXT )] = true;
+  // validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_TXT )] = true;
 
   validFormats[pair<possibleModi,possibleFormats>(M_CFG,F_DOT)] = true;
 
@@ -368,93 +370,24 @@ void parse_command_line(int argc, char* argv[])
       }
     }
     log_output = openOutput(log_filename);
-	  // new std::ofstream(log_filename.c_str(), std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
   }
   
   // check for valid formats
   if ( options[O_MODE] )
   {
     int counter = 0;
-    if ( validFormats[pair<possibleModi, possibleFormats>(modus,F_LOLA)] && formats[F_LOLA] )
+
+    for ( int i = 0; i < (sizeof(format) / sizeof(possibleFormats)); i++)
     {
-      counter++;
-    }
-    else if ( formats[F_LOLA] )
-    {
-      trace(TRACE_WARNINGS, "WARNING: lola is no valid format for the chosen mode: omitting.\n");
-      formats[F_LOLA] = false;
-    }
-    if ( validFormats[pair<possibleModi, possibleFormats>(modus,F_OWFN)] && formats[F_OWFN] )
-    {
-      counter++;
-    }
-    else if ( formats[F_OWFN] )
-    {
-      trace(TRACE_WARNINGS, "WARNING: owfn is no valid format for the chosen mode: omitting.\n");
-      formats[F_OWFN] = false;
-    }
-    if ( validFormats[pair<possibleModi, possibleFormats>(modus,F_DOT)] && formats[F_DOT] )
-    {
-      counter++;
-    }
-    else if ( formats[F_DOT] )
-    {
-      trace(TRACE_WARNINGS, "WARNING: dot is no valid format for the chosen mode: omitting.\n");
-      formats[F_DOT] = false;
-    }
-    if ( validFormats[pair<possibleModi, possibleFormats>(modus,F_PEP)] && formats[F_PEP] )
-    {
-      counter++;
-    }
-    else if ( formats[F_PEP] )
-    {
-      trace(TRACE_WARNINGS, "WARNING: pep is no valid format for the chosen mode: omitting.\n");
-      formats[F_PEP] = false;
-    }
-    if ( validFormats[pair<possibleModi, possibleFormats>(modus,F_APPN)] && formats[F_APPN] )
-    {
-      counter++;
-    }
-    else if ( formats[F_APPN] )
-    {
-      trace(TRACE_WARNINGS, "WARNING: appn is no valid format for the chosen mode: omitting.\n");
-      formats[F_APPN] = false;
-    }
-    if ( validFormats[pair<possibleModi, possibleFormats>(modus,F_INFO)] && formats[F_INFO] )
-    {
-      counter++;
-    }
-    else if ( formats[F_INFO] )
-    {
-      trace(TRACE_WARNINGS, "WARNING: info is no valid format for the chosen mode: omitting.\n");
-      formats[F_INFO] = false;
-    }
-    if ( validFormats[pair<possibleModi, possibleFormats>(modus,F_PNML)] && formats[F_PNML] )
-    {
-      counter++;
-    }
-    else if ( formats[F_PNML] )
-    {
-      trace(TRACE_WARNINGS, "WARNING: pnml is no valid format for the chosen mode: omitting.\n");
-      formats[F_PNML] = false;
-    }
-    if ( validFormats[pair<possibleModi, possibleFormats>(modus,F_TXT)] && formats[F_TXT] )
-    {
-      counter++;
-    }
-    else if ( formats[F_TXT] )
-    {
-      trace(TRACE_WARNINGS, "WARNING: txt is no valid format for the chosen mode: omitting.\n");
-      formats[F_TXT] = false;
-    }
-    if ( validFormats[pair<possibleModi, possibleFormats>(modus,F_XML)] && formats[F_XML] )
-    {
-      counter++;
-    }
-    else if ( formats[F_XML] )
-    {
-      trace(TRACE_WARNINGS, "WARNING: txt is no valid format for the chosen mode: omitting.\n");
-      formats[F_XML] = false;
+      if ( validFormats[pair<possibleModi, possibleFormats>(modus,format[i])] && formats[format[i]] )
+      {
+        counter++;
+      }
+      else if ( formats[format[i]] )
+      {
+        trace(TRACE_WARNINGS, "WARNING: " + suffixes[format[i]] + " is no valid format for the chosen mode: omitting.\n");
+        formats[format[i]] = false;
+      }
     }
     if ((counter > 1) && !options[O_OUTPUT])
     {
@@ -465,6 +398,26 @@ void parse_command_line(int argc, char* argv[])
 
   // \todo: TODO (gierds) complete information for modus operandi
   trace(TRACE_INFORMATION, "Modus operandi:\n");
+  switch ( modus )
+  {
+    case M_AST: 
+            trace(TRACE_INFORMATION, " - generate AST\n");
+	    break;
+    case M_PRETTY:
+	    trace(TRACE_INFORMATION, " - generate XML\n");
+	    break;
+    case M_CFG:
+	    trace(TRACE_INFORMATION, " - generate CFG and do some analysis\n");
+	    break;
+    case M_PETRINET:
+	    trace(TRACE_INFORMATION, " - generate Petri net\n");
+	    break;
+  }
+
+  if (options[O_INPUT])
+  {
+    trace(TRACE_INFORMATION, " - input is read from \"" + filename + "\"\n");
+  }
   if (options[O_OUTPUT])
   {
     trace(TRACE_INFORMATION, " - output files will be named \"" + output_filename + ".X\"\n");

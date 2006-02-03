@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/02/03 09:14:25 $
+ *          - last changed: \$Date: 2006/02/03 10:07:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.41 $
+ * \version \$Revision: 1.42 $
  *
  */
 
@@ -163,7 +163,7 @@ void cleanup()
     TheNet = NULL;
   }
 
-  if ( filename != "<STDIN>" )
+  if ( filename != "<STDIN>" && yyin != NULL)
   {
     trace(TRACE_INFORMATION," + Closing input file: " + filename + "\n");
     fclose(yyin);

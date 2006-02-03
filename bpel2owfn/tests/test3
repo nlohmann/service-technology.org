@@ -20,20 +20,20 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/02/02 16:17:08 $ by $Author: nlohmann $.
-# Version $Revision: 1.4 $
+# File last changed $Date: 2006/02/03 10:48:05 $ by $Author: gierds $.
+# Version $Revision: 1.5 $
 
-bpel2owfn --input=$testdir/purchase.bpel --format=owfn > purchase.owfn
+bpel2owfn --input=$testdir/purchase.bpel --mode=petrinet --format=owfn -o
 result1=$?
 
-bpel2owfn --input=$testdir/loan.bpel --format=lola > loan.lola
+bpel2owfn --input=$testdir/loan.bpel --mode=petrinet --format=lola -o
 result2=$?
 
-bpel2owfn --input=$testdir/shipping.bpel --mode=petrinet --parameter=simplify > shipping.dot
+bpel2owfn --input=$testdir/shipping.bpel --mode=petrinet --parameter=simplify --format=dot -o
 result3=$?
 
 if test \( $result1 -eq 0 -a $result2 -eq 0 -a $result3 -eq 0 \) -a \
-       	\( -e purchase.owfn -a -e loan.lola -a -e shipping.dot \)
+       	\( -f purchase.owfn -a -f loan.lola -a -f shipping.dot \)
 then 
   result=0
 else

@@ -40,14 +40,14 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/01/27 08:30:07 $
+ *          - last changed: \$Date: 2006/02/07 09:21:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *          
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  */
 
 
@@ -376,6 +376,12 @@ private:
   /// the list of places of the Petri net
   set < Place * >P;
 
+  /// the list of input places of the oWFN
+  set < Place * >P_in;
+
+  /// the list of output places of the oWFN
+  set < Place * >P_out;
+  
   /// the list of transitions of the Petri net
   set < Transition * >T;
 

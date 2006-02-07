@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/02/07 07:47:01 $
+ *          - last changed: \$Date: 2006/02/07 09:21:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.85 $
+ * \version \$Revision: 1.86 $
  */
 
 
@@ -46,7 +46,6 @@
 
 
 #include "petrinet.h"
-
 #include "options.h"
 
 
@@ -262,6 +261,7 @@ Place::Place (unsigned int myid, string role, place_type mytype)
   type = mytype;
   id = myid;
   nodeType = PLACE;
+  initialMarking = 0;
 
   if (role != "")
     history.push_back (role);
@@ -369,9 +369,26 @@ PetriNet::newPlace (string role, place_type mytype)
 	 " (" + role + ") ...\n");
 
   Place *p = new Place (getId (), role, mytype);
-  p->initialMarking = 0;
-  P.insert (p);
 
+  switch (mytype)
+  {
+    case (IN):
+      {
+	P_in.insert(p);
+	break;
+      }
+    case (OUT):
+      {
+	P_out.insert(p);
+	break;
+      }
+    default:
+      {
+	P.insert(p);
+	break;
+      }
+  }
+  
   if (role != "")
     {
       if (roleMap[role] != NULL)
@@ -598,7 +615,26 @@ PetriNet::removePlace (Place * p)
 	 "...\n");
 
   detachNode (p);
-  P.erase (p);
+
+  switch (p->type)
+  {
+    case (IN):
+      {
+	P_in.erase(p);
+	break;
+      }
+    case (OUT):
+      {
+	P_out.erase(p);
+	break;
+      }
+    default:
+      {
+	P.erase(p);
+	break;
+      }
+  }
+  
   delete p;
 }
 
@@ -666,6 +702,8 @@ string PetriNet::information ()
  * Prints information about the generated Petri net. In particular, for each
  * place and transition all roles of the history are printed to understand
  * the net and maybe LoLA's witness pathes later.
+ *
+ * \todo put this to the nodes
  */
 void
 PetriNet::printInformation ()
@@ -674,30 +712,33 @@ PetriNet::printInformation ()
   (*output) << "PLACES:\nID\tTYPE\t\tROLES\n";
   for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
     {
-      (*output) << (*p)->nodeShortName() << "\t";
+      (*output) << (*p)->nodeShortName() << "\tinternal";
 
-      switch ((*p)->type)
+      for (vector < string >::iterator role = (*p)->history.begin ();
+	   role != (*p)->history.end (); role++)
 	{
-	case (INTERNAL):
-	  {
-	    (*output) << "internal";
-	    break;
-	  }
-	case (IN):
-	  {
-	    (*output) << "input   ";
-	    break;
-	  }
-	case (OUT):
-	  {
-	    (*output) << "output  ";
-	    break;
-	  }
-	default:
-	  {
-	    (*output) << "other   ";
-	  }			// should never happen
+	  if (role == (*p)->history.begin ())
+	    (*output) << "\t" + *role + "\n";
+	  else
+	    (*output) << "\t\t\t" + *role + "\n";
 	}
+    }
+  for (set < Place * >::iterator p = P_in.begin (); p != P_in.end (); p++)
+    {
+      (*output) << (*p)->nodeShortName() << "\tinput   ";
+
+      for (vector < string >::iterator role = (*p)->history.begin ();
+	   role != (*p)->history.end (); role++)
+	{
+	  if (role == (*p)->history.begin ())
+	    (*output) << "\t" + *role + "\n";
+	  else
+	    (*output) << "\t\t\t" + *role + "\n";
+	}
+    }
+  for (set < Place * >::iterator p = P_out.begin (); p != P_out.end (); p++)
+    {
+      (*output) << (*p)->nodeShortName() << "\toutput  ";
 
       for (vector < string >::iterator role = (*p)->history.begin ();
 	   role != (*p)->history.end (); role++)
@@ -744,6 +785,8 @@ PetriNet::printInformation ()
  * Creates a DOT output (see http://www.graphviz.org) of the Petri net. It uses
  * the digraph-statement and adds labels to transitions, places and arcs if
  * neccessary. It also distinguishes the three arc types of #arc_type.
+ *
+ * \todo input and output places only to be printed if net is owfn
  */
 void
 PetriNet::dotOut ()
@@ -767,6 +810,10 @@ PetriNet::dotOut ()
   // list the places
   (*output) << endl << " node [shape=circle];" << endl;
   for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
+    (*output) << (*p)->dotOut ();
+  for (set < Place * >::iterator p = P_in.begin (); p != P_in.end (); p++)
+    (*output) << (*p)->dotOut ();
+  for (set < Place * >::iterator p = P_out.begin (); p != P_out.end (); p++)
     (*output) << (*p)->dotOut ();
 
   // list the transitions
@@ -792,12 +839,12 @@ PetriNet::removeInterface ()
 
   list < Place * >killList;
 
-  for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
-    {
-      if ((*p)->type == IN || (*p)->type == OUT)
-	killList.push_back (*p);
-    }
+  for (set < Place * >::iterator p = P_in.begin (); p != P_in.end (); p++)
+    killList.push_back (*p);
 
+  for (set < Place * >::iterator p = P_out.begin (); p != P_out.end (); p++)
+    killList.push_back (*p);
+  
   for (list < Place * >::iterator it = killList.begin ();
        it != killList.end (); it++)
     removePlace (*it);
@@ -832,7 +879,7 @@ PetriNet::pnmlOut ()
   cout << "<pnml>" << endl;
   cout << "  <net id=\"" << filename << "\" type=\"\">" << endl << endl;
   
-  // places
+  // places (only internal)
   for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
   {
     cout << "    <place id=\"" << (*p)->nodeShortName() << "\">" << endl;
@@ -894,7 +941,7 @@ PetriNet::pepOut()
   // header
   cout << "PEP" << endl << "PTNet" << endl << "FORMAT_N" << endl;
   
-  // places
+  // places (only internal)
   cout << "PL" << endl;
   for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
   {
@@ -942,7 +989,7 @@ PetriNet::appnOut ()
   
   (*output) << "\\beginnet{" << filename << "}" << endl << endl;
 
-  // places
+  // places (only internal)
   for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
   {
     (*output) << "  \\place{" << (*p)->nodeShortName() << "}{";
@@ -992,7 +1039,7 @@ PetriNet::lolaOut ()
   (*output) << "{ Petri net created by " << PACKAGE_STRING <<
     " reading " << filename << " }" << endl << endl;
 
-  // places
+  // places (only internal)
   (*output) << "PLACE" << endl;
   unsigned int count = 1;
   for (set < Place * >::iterator p = P.begin (); p != P.end (); count++, p++)
@@ -1073,6 +1120,8 @@ PetriNet::lolaOut ()
 
 /*!
  * Outputs the net in oWFN-format.
+ *
+ * \todo make this shorter
  */
 void
 PetriNet::owfnOut ()
@@ -1087,61 +1136,60 @@ PetriNet::owfnOut ()
 
   // places
   (*output) << "PLACE" << endl;
-
+  
   // internal places
   (*output) << "  INTERNAL" << endl;
   unsigned int count = 1;
   string comment;
   for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
     {
-      if ((*p)->type == INTERNAL)
-	{
-	  if (count == 1)
-	    (*output) << "    " << (*p)->nodeShortName();
-	  else
-	    (*output) << ", " << comment << "    " << (*p)->nodeShortName();
-
-	  comment = "\t\t { " + (*(*p)->history.begin ()) + " }\n";
-	  count++;
-	}
+      if (count == 1)
+	(*output) << "    " << (*p)->nodeShortName();
+      else
+	(*output) << ", " << comment << "    " << (*p)->nodeShortName();
+      
+      comment = "\t\t { " + (*(*p)->history.begin ()) + " }\n";
+      count++;
     }
   (*output) << "; " << comment << endl;
+
 
   // input places
   (*output) << "  INPUT" << endl;
   count = 1;
-  for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
+  for (set < Place * >::iterator p = P_in.begin (); p != P_in.end (); p++)
     {
-      if ((*p)->type == IN)
-	{
-	  if (count == 1)
-	    (*output) << "    " << (*p)->nodeShortName();
-	  else
-	    (*output) << ", " << comment << "    " << (*p)->nodeShortName();
-
-	  comment = "\t\t { " + (*(*p)->history.begin ()) + " }\n";
-	  count++;
-	}
+      if (count == 1)
+	(*output) << "    " << (*p)->nodeShortName();
+      else
+	(*output) << ", " << comment << "    " << (*p)->nodeShortName();
+      
+      comment = "\t\t { " + (*(*p)->history.begin ()) + " }\n";
+      count++;
     }
-  (*output) << "; " << comment << endl;
+  (*output) << "; ";
+    if (P_in.size() > 0)
+    (*output) << comment;
+  (*output) << endl << endl;
 
+  
   // output places
   (*output) << "  OUTPUT" << endl;
   count = 1;
-  for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
+  for (set < Place * >::iterator p = P_out.begin (); p != P_out.end (); p++)
     {
-      if ((*p)->type == OUT)
-	{
-	  if (count == 1)
-	    (*output) << "    " << (*p)->nodeShortName();
-	  else
-	    (*output) << ", " << comment << "    " << (*p)->nodeShortName();
-
-	  comment = "\t\t { " + (*(*p)->history.begin ()) + " }\n";
-	  count++;
-	}
+      if (count == 1)
+	(*output) << "    " << (*p)->nodeShortName();
+      else
+	(*output) << ", " << comment << "    " << (*p)->nodeShortName();
+      
+      comment = "\t\t { " + (*(*p)->history.begin ()) + " }\n";
+      count++;
     }
-  (*output) << "; " << comment << endl << endl;
+  (*output) << "; ";
+  if (P_out.size() > 0)
+    (*output) << comment;
+  (*output) << endl << endl;
 
 
   // initial marking
@@ -1295,6 +1343,7 @@ PetriNet::mergeTransitions (Transition * t1, Transition * t2)
  *
  * \todo
  *       - (nlohmann) Take care of arc inscriptions.
+ *       - (nlohmann) Make use of P_in and P_out
  */
 void
 PetriNet::mergePlaces (Place * p1, Place * p2)

@@ -27,18 +27,18 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/02/02 15:31:55 $
+ *          - last changed: \$Date: 2006/02/07 07:47:01 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.84 $
+ * \version \$Revision: 1.85 $
  */
 
 
@@ -1145,18 +1145,22 @@ PetriNet::owfnOut ()
 
 
   // initial marking
-  (*output) << "MARKING" << endl;
+  (*output) << "INITIALMARKING" << endl;
   (*output) << "  " << findPlace("1.internal.initial")->nodeShortName() << ":\t1,\t { initial marking of the process }" << endl;
-
+  
   for (list < string >::iterator variable = symMan.variables.begin ();
        variable != symMan.variables.end (); variable++)
     (*output) << "  " << findPlace("variable." + *variable)->nodeShortName() << ":\t1,\t { initial marking of variable" << *variable << " }" <<
       endl;
 
   (*output) << "  " << findPlace ("1.internal.clock")->nodeShortName() << ":\t1\t { initial marking of the clock }" << endl;
+  (*output) << ";" << endl << endl;
+
+  // final marking
+  (*output) << "FINALMARKING" << endl;
+  (*output) << "  " << findPlace("1.internal.final")->nodeShortName() << ":\t1\t { final marking of the process }" << endl;
   (*output) << ";" << endl << endl << endl;
-
-
+  
   // transitions
   count = 1;
   for (set < Transition * >::iterator t = T.begin (); t != T.end ();

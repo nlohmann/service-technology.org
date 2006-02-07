@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/02/07 09:21:06 $
+ *          - last changed: \$Date: 2006/02/07 09:33:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.86 $
+ * \version \$Revision: 1.87 $
  */
 
 
@@ -84,8 +84,7 @@ set < pair < Node *, arc_type > >setUnion (set < pair < Node *, arc_type > >a,
  */
 bool Node::firstMemberAs (string role)
 {
-  string
-    firstEntry = (*history.begin ());
+  string firstEntry = (*history.begin ());
   return (firstEntry.find (role, 0) == firstEntry.find_first_of (".") + 1);
 }
 
@@ -99,8 +98,7 @@ bool Node::firstMemberAs (string role)
  */
 bool Node::firstMemberIs (string role)
 {
-  string
-    firstEntry = (*history.begin ());
+  string firstEntry = (*history.begin ());
   return (firstEntry.find (role, 0) == 0);
 }
 
@@ -333,6 +331,7 @@ string Place::dotOut ()
 PetriNet::PetriNet ()
 {
   lowLevel = false;
+  hasNoInterface = false;
   nextId = 0;
 }
 
@@ -785,8 +784,6 @@ PetriNet::printInformation ()
  * Creates a DOT output (see http://www.graphviz.org) of the Petri net. It uses
  * the digraph-statement and adds labels to transitions, places and arcs if
  * neccessary. It also distinguishes the three arc types of #arc_type.
- *
- * \todo input and output places only to be printed if net is owfn
  */
 void
 PetriNet::dotOut ()
@@ -811,10 +808,14 @@ PetriNet::dotOut ()
   (*output) << endl << " node [shape=circle];" << endl;
   for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
     (*output) << (*p)->dotOut ();
-  for (set < Place * >::iterator p = P_in.begin (); p != P_in.end (); p++)
-    (*output) << (*p)->dotOut ();
-  for (set < Place * >::iterator p = P_out.begin (); p != P_out.end (); p++)
-    (*output) << (*p)->dotOut ();
+
+  if (!hasNoInterface)
+  {
+    for (set < Place * >::iterator p = P_in.begin (); p != P_in.end (); p++)
+      (*output) << (*p)->dotOut ();
+    for (set < Place * >::iterator p = P_out.begin (); p != P_out.end (); p++)
+      (*output) << (*p)->dotOut ();
+  }
 
   // list the transitions
   (*output) << endl << " node [shape=box regular=true];" << endl;
@@ -831,7 +832,9 @@ PetriNet::dotOut ()
 
 
 
-
+/*!
+ * Collect all input and output places and remove (i.e. detach) them.
+ */
 void
 PetriNet::removeInterface ()
 {
@@ -845,10 +848,10 @@ PetriNet::removeInterface ()
   for (set < Place * >::iterator p = P_out.begin (); p != P_out.end (); p++)
     killList.push_back (*p);
   
-  for (list < Place * >::iterator it = killList.begin ();
-       it != killList.end (); it++)
+  for (list < Place * >::iterator it = killList.begin (); it != killList.end (); it++)
     removePlace (*it);
 
+  hasNoInterface = true;
 }
 
 

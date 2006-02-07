@@ -40,14 +40,14 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/02/07 09:21:07 $
+ *          - last changed: \$Date: 2006/02/07 09:33:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *          
- * \version \$Revision: 1.51 $
+ * \version \$Revision: 1.52 $
  */
 
 
@@ -408,6 +408,9 @@ private:
 
   /// true if function #PetriNet::makeLowLevel() was called
   bool lowLevel;
+
+  /// true if function #PetriNet::removeInterface() was called
+  bool hasNoInterface;
 
   /// Mapping of roles to nodes of the Petri net.
   map < string, Node * >roleMap;

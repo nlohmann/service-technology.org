@@ -29,11 +29,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/03 14:27:44 $
+ *          - last changed: \$Date: 2006/02/07 14:01:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.117 $
+ * \version \$Revision: 1.118 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -2002,7 +2002,7 @@ This=Invoke(a,b) provided (This->outputVariable == mkcasestring("")) ->
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1); TheNet->findPlace("variable." + string(This->variableIDin->name));
       TheNet->newArc(TheNet->findPlace("variable." + string(This->variableIDin->name)), t1, READ, "X");
-      TheNet->newArc(TheNet->findPlace("in." + string(This->channelID->name)), t1, "X");
+      TheNet->newArc(TheNet->findPlace("out." + string(This->channelID->name)), t1, "X");
       TheNet->newArc(t1, p2, "(X,CS)");
 
       Transition *t2 = TheNet->newTransition(prefix + "t2", "!guard");

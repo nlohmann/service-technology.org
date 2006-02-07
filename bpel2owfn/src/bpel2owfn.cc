@@ -28,18 +28,18 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/02/07 10:24:49 $
+ *          - last changed: \$Date: 2006/02/07 13:36:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -256,7 +256,7 @@ int main( int argc, char *argv[])
         }
         // create info file ?
         if ( formats[F_INFO] )
-        {
+        {	
 	  if (output_filename != "")
 	  {
  	    output = openOutput(output_filename + "." + suffixes[F_INFO]);
@@ -282,16 +282,8 @@ int main( int argc, char *argv[])
     // output info file ?
     if ( modus == M_PETRINET )
     {
-      if (output_filename != "")
-      {
-        output = openOutput(output_filename + "." + suffixes[F_INFO]);
-      }
+      // just print to std::out
       TheNet->printInformation();
-      if (output_filename != "")
-      {
-        closeOutput(output);
-        output = NULL;
-      }
     }
     error(e);
   }

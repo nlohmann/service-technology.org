@@ -115,15 +115,15 @@ void print_version(std::string name)
 
 void parse_command_line(int argc, char* argv[])
 {
-  suffixes[F_LOLA] = "lola";
-  suffixes[F_OWFN] = "owfn";
-  suffixes[F_DOT]  = "dot" ;
-  suffixes[F_PEP]  = "pep" ;
-  suffixes[F_APPN] = "appn";
-  suffixes[F_INFO] = "info";
-  suffixes[F_PNML] = "pnml";
-  suffixes[F_TXT]  = "txt" ;
-  suffixes[F_XML]  = "xml" ;
+  suffixes[F_LOLA] = "lola"  ;
+  suffixes[F_OWFN] = "owfn"  ;
+  suffixes[F_DOT]  = "dot"   ;
+  suffixes[F_PEP]  = "ll_net";
+  suffixes[F_APPN] = "appn"  ;
+  suffixes[F_INFO] = "info"  ;
+  suffixes[F_PNML] = "pnml"  ;
+  suffixes[F_TXT]  = "txt"   ;
+  suffixes[F_XML]  = "xml"   ;
 
   possibleFormats format[] = { F_LOLA, F_OWFN, F_DOT, F_PEP, F_APPN, F_INFO, F_PNML, F_TXT, F_XML };
 
@@ -229,7 +229,7 @@ void parse_command_line(int argc, char* argv[])
 	      {
 		formats[F_DOT] = true;
 	      }
-	      else if (format == suffixes[F_PEP])
+	      else if (format == "pep")
 	      {
 		formats[F_PEP] = true;
 	      }

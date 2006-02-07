@@ -20,16 +20,16 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/02/03 10:48:05 $ by $Author: gierds $.
-# Version $Revision: 1.5 $
+# File last changed $Date: 2006/02/07 13:26:15 $ by $Author: gierds $.
+# Version $Revision: 1.6 $
 
-bpel2owfn --input=$testdir/purchase.bpel --mode=petrinet --format=owfn -o
+bpel2owfn --input=$testdir/purchase.bpel --mode=petrinet --format=owfn > purchase.owfn
 result1=$?
 
-bpel2owfn --input=$testdir/loan.bpel --mode=petrinet --format=lola -o
+bpel2owfn --input=$testdir/loan.bpel --mode=petrinet --format=lola > loan.lola
 result2=$?
 
-bpel2owfn --input=$testdir/shipping.bpel --mode=petrinet --parameter=simplify --format=dot -o
+bpel2owfn --input=$testdir/shipping.bpel --mode=petrinet --parameter=simplify --format=dot > shipping.dot
 result3=$?
 
 if test \( $result1 -eq 0 -a $result2 -eq 0 -a $result3 -eq 0 \) -a \

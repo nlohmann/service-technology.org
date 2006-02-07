@@ -82,6 +82,7 @@ void print_help()
   trace("\n");
   trace(" -f | --format          - select output formats (as far as supported for mode):\n");
   trace("                          lola, owfn, dot, pep, appn, info, pnml, txt, xml\n");
+  trace("                          (note: lola,owfn,pep,appn,pnml imply modus=petrinet\n");
   trace("\n");
   trace(" -d | --debug           - set debug level: 1-4\n");
   trace(" -l | --log[=<file>]    - write additional information into file\n");
@@ -158,6 +159,7 @@ void parse_command_line(int argc, char* argv[])
     string format = "";
     string parameter = "";
     string debug = "";
+    possibleModi old_modus;
     switch (optc)
       {
       case 'h':
@@ -167,13 +169,7 @@ void parse_command_line(int argc, char* argv[])
 	      options[O_VERSION] = true;
       	      break;
       case 'm':
-	      if (options[O_MODE])
-	      {
-		throw Exception(OPTION_MISMATCH, 
-				"Choose only one mode\n",
-				"Type " + progname + " -h for more information.\n");
-	      }
-	      options[O_MODE] = true;
+	      old_modus = modus;
 	      mode = string(optarg);
 	      if (mode == "ast") {
 		modus = M_AST;
@@ -187,6 +183,13 @@ void parse_command_line(int argc, char* argv[])
 	      else if (mode == "cfg") {
 		modus = M_CFG;
 	      }
+	      if (options[O_MODE] && modus != old_modus)
+	      {
+		throw Exception(OPTION_MISMATCH, 
+				"Choose only one mode\n",
+				"Type " + progname + " -h for more information.\n");
+	      }
+	      options[O_MODE] = true;
 	      break;
       case 'l':
 	      options[O_LOG] = true;
@@ -220,10 +223,26 @@ void parse_command_line(int argc, char* argv[])
 	      if (format == suffixes[F_LOLA])
 	      {
 		formats[F_LOLA] = true;
+ 	        if (options[O_MODE] && modus != M_PETRINET)
+	        {
+		  throw Exception(OPTION_MISMATCH, 
+				  "Choose only one mode\n",
+				  "Type " + progname + " -h for more information.\n");
+	        }
+	    	modus = M_PETRINET;
+	        options[O_MODE] = true;
 	      }
 	      else if (format == suffixes[F_OWFN])
 	      {
 		formats[F_OWFN] = true;
+ 	        if (options[O_MODE] && modus != M_PETRINET)
+	        {
+		  throw Exception(OPTION_MISMATCH, 
+				  "Choose only one mode\n",
+				  "Type " + progname + " -h for more information.\n");
+	        }
+	    	modus = M_PETRINET;
+	        options[O_MODE] = true;
 	      }
 	      else if (format == suffixes[F_DOT])
 	      {
@@ -232,10 +251,26 @@ void parse_command_line(int argc, char* argv[])
 	      else if (format == "pep")
 	      {
 		formats[F_PEP] = true;
+ 	        if (options[O_MODE] && modus != M_PETRINET)
+	        {
+		  throw Exception(OPTION_MISMATCH, 
+				  "Choose only one mode\n",
+				  "Type " + progname + " -h for more information.\n");
+	        }
+	    	modus = M_PETRINET;
+	        options[O_MODE] = true;
 	      }
 	      else if (format == suffixes[F_APPN])
 	      {
 		formats[F_APPN] = true;
+ 	        if (options[O_MODE] && modus != M_PETRINET)
+	        {
+		  throw Exception(OPTION_MISMATCH, 
+				  "Choose only one mode\n",
+				  "Type " + progname + " -h for more information.\n");
+	        }
+	    	modus = M_PETRINET;
+	        options[O_MODE] = true;
 	      }
 	      else if (format == suffixes[F_INFO])
 	      {
@@ -244,6 +279,14 @@ void parse_command_line(int argc, char* argv[])
 	      else if (format == suffixes[F_PNML])
 	      {
 		formats[F_PNML] = true;
+ 	        if (options[O_MODE] && modus != M_PETRINET)
+	        {
+		  throw Exception(OPTION_MISMATCH, 
+				  "Choose only one mode\n",
+				  "Type " + progname + " -h for more information.\n");
+	        }
+	    	modus = M_PETRINET;
+	        options[O_MODE] = true;
 	      }
 	      else if (format == suffixes[F_TXT])
 	      {

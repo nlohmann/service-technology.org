@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/02/07 09:33:12 $
+ *          - last changed: \$Date: 2006/02/07 10:24:50 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.87 $
+ * \version \$Revision: 1.88 $
  */
 
 
@@ -877,50 +877,50 @@ PetriNet::pnmlOut ()
   calculateInitialMarking();
 
 
-  cout << "<!-- Petri net created by " << PACKAGE_STRING << " reading file " << filename << " -->" << endl << endl;
+  (*output) << "<!-- Petri net created by " << PACKAGE_STRING << " reading file " << filename << " -->" << endl << endl;
   
-  cout << "<pnml>" << endl;
-  cout << "  <net id=\"" << filename << "\" type=\"\">" << endl << endl;
+  (*output) << "<pnml>" << endl;
+  (*output) << "  <net id=\"" << filename << "\" type=\"\">" << endl << endl;
   
   // places (only internal)
   for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
   {
-    cout << "    <place id=\"" << (*p)->nodeShortName() << "\">" << endl;
-    cout << "      <name>" << endl;
-    cout << "        <text>" << (*(*p)->history.begin()) << "</text>" << endl;
-    cout << "      </name>" << endl;
+    (*output) << "    <place id=\"" << (*p)->nodeShortName() << "\">" << endl;
+    (*output) << "      <name>" << endl;
+    (*output) << "        <text>" << (*(*p)->history.begin()) << "</text>" << endl;
+    (*output) << "      </name>" << endl;
     if ((*p)->initialMarking > 0)
     {
-      cout << "      <initialMarking>" << endl;
-      cout << "        <text>" << (*p)->initialMarking << "</text>" << endl;
-      cout << "      </initialMarking>" << endl;
+      (*output) << "      <initialMarking>" << endl;
+      (*output) << "        <text>" << (*p)->initialMarking << "</text>" << endl;
+      (*output) << "      </initialMarking>" << endl;
     }
-    cout << "    </place>" << endl << endl;
+    (*output) << "    </place>" << endl << endl;
   }
 
   // transitions
   for (set < Transition * >::iterator t = T.begin (); t != T.end (); t++)
   {
-    cout << "    <transition id=\"" << (*t)->nodeShortName() << "\">" << endl;
-    cout << "      <name>" << endl;
-    cout << "        <text>" << (*(*t)->history.begin()) << "</text>" << endl;
-    cout << "      </name>" << endl;
-    cout << "    </transition>" << endl << endl;
+    (*output) << "    <transition id=\"" << (*t)->nodeShortName() << "\">" << endl;
+    (*output) << "      <name>" << endl;
+    (*output) << "        <text>" << (*(*t)->history.begin()) << "</text>" << endl;
+    (*output) << "      </name>" << endl;
+    (*output) << "    </transition>" << endl << endl;
   }
-  cout << endl;
+  (*output) << endl;
 
   // arcs
   int arcNumber = 1;
   for (set < Arc * >::iterator f = F.begin (); f != F.end (); f++, arcNumber++)
   {
-    cout << "    <arc id=\"a" << arcNumber << "\" ";
-    cout << "source=\"" << (*f)->source->nodeShortName() << "\" ";
-    cout << "target=\"" << (*f)->source->nodeShortName() << "\" />" << endl;
+    (*output) << "    <arc id=\"a" << arcNumber << "\" ";
+    (*output) << "source=\"" << (*f)->source->nodeShortName() << "\" ";
+    (*output) << "target=\"" << (*f)->source->nodeShortName() << "\" />" << endl;
   }
-  cout << endl;
-  cout << "  </net>" << endl;
-  cout << "</pnml>" << endl;
-  cout << endl << "<!-- END OF FILE -->" << endl;
+  (*output) << endl;
+  (*output) << "  </net>" << endl;
+  (*output) << "</pnml>" << endl;
+  (*output) << endl << "<!-- END OF FILE -->" << endl;
 }
 
 
@@ -942,34 +942,34 @@ PetriNet::pepOut()
   calculateInitialMarking();
   
   // header
-  cout << "PEP" << endl << "PTNet" << endl << "FORMAT_N" << endl;
+  (*output) << "PEP" << endl << "PTNet" << endl << "FORMAT_N" << endl;
   
   // places (only internal)
-  cout << "PL" << endl;
+  (*output) << "PL" << endl;
   for (set < Place * >::iterator p = P.begin (); p != P.end (); p++)
   {
-    cout << (*p)->id << "\"" << (*p)->nodeShortName() << "\"80@40";
+    (*output) << (*p)->id << "\"" << (*p)->nodeShortName() << "\"80@40";
     if ((*p)->initialMarking > 0)
-      cout << "M" << (*p)->initialMarking;
-    cout << "k1" << endl;
+      (*output) << "M" << (*p)->initialMarking;
+    (*output) << "k1" << endl;
   }
 
   // transitions
-  cout << "TR" << endl;
+  (*output) << "TR" << endl;
   for (set < Transition * >::iterator t = T.begin (); t != T.end (); t++)
-    cout << (*t)->id << "\"" << (*t)->nodeShortName() << "\"80@40" << endl;
+    (*output) << (*t)->id << "\"" << (*t)->nodeShortName() << "\"80@40" << endl;
   
   // arcs from transitions to places
-  cout << "TP" << endl;
+  (*output) << "TP" << endl;
   for (set < Arc * >::iterator f = F.begin (); f != F.end (); f++)
     if (((*f)->source->nodeType) == TRANSITION)
-      cout << (*f)->source->id << "<" << (*f)->target->id << endl;
+      (*output) << (*f)->source->id << "<" << (*f)->target->id << endl;
 
   // arcs from places to transitions
-  cout << "PT" << endl;
+  (*output) << "PT" << endl;
   for (set < Arc * >::iterator f = F.begin (); f != F.end (); f++)
     if (((*f)->source->nodeType) == PLACE)
-      cout << (*f)->source->id << ">" << (*f)->target->id << endl;
+      (*output) << (*f)->source->id << ">" << (*f)->target->id << endl;
 }
 
 

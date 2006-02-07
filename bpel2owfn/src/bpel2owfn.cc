@@ -28,18 +28,18 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/02/03 14:11:27 $
+ *          - last changed: \$Date: 2006/02/07 10:24:49 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.51 $
+ * \version \$Revision: 1.52 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -173,6 +173,36 @@ int main( int argc, char *argv[])
 	  }
  	  trace(TRACE_INFORMATION, "-> Printing Petri net for LoLA ...\n");
           TheNet->lolaOut();
+	  if (output_filename != "")
+	  {
+	    closeOutput(output);
+	    output = NULL;
+	  }
+        }
+        // create PNML output ?
+        if ( formats[F_PNML] )
+        {
+	  if (output_filename != "")
+	  {
+ 	    output = openOutput(output_filename + "." + suffixes[F_PNML]);
+	  }
+ 	  trace(TRACE_INFORMATION, "-> Printing Petri net for PNML ...\n");
+          TheNet->pnmlOut();
+	  if (output_filename != "")
+	  {
+	    closeOutput(output);
+	    output = NULL;
+	  }
+        }
+        // create PEP output ?
+        if ( formats[F_PEP] )
+        {
+	  if (output_filename != "")
+	  {
+ 	    output = openOutput(output_filename + "." + suffixes[F_PEP]);
+	  }
+ 	  trace(TRACE_INFORMATION, "-> Printing Petri net for PEP ...\n");
+          TheNet->pepOut();
 	  if (output_filename != "")
 	  {
 	    closeOutput(output);

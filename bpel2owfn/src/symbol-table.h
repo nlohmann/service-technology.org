@@ -33,7 +33,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.9 $: 
+ * \version \$Revision: 1.10 $: 
  *
  */
 
@@ -60,6 +60,8 @@ typedef enum
 
 
 // forward declaration of classes
+class SymbolTable;
+class SymbolTableEntry;
 class STActivity;
 class STAttribute;
 class STCompensationHandler;
@@ -69,12 +71,33 @@ class STEnvelope;
 class STEventHandlers;
 class STFaultHandlers;
 class STLink;
+class STPartner;
 class STPartnerLink;
 class STProcess;
 class STScope;
-class SymbolTable;
-class SymbolTableEntry;
 class STVariable;
+
+
+/**
+ * \class	Element
+ *
+ * \brief
+ * 
+ */
+class STElement
+{
+  public:
+    /// a map of the element's attributes
+    map<string, STAttribute*> mapOfAttributes;
+    
+    /// line position of attribute within BPEL file
+    unsigned int line;
+    
+    /// location of the activity (Scope/Process, FH, CH) to distribute error
+    /// tokens correctly
+    ActivityLocationId activityLocation;
+};
+
 
 /**
  * \class	SymbolTable
@@ -85,6 +108,9 @@ class STVariable;
 class SymbolTable
 {
   private:
+    /// mapping from AST id to symTab entry  
+    map<unsigned int, unsigned int> id2key;
+
     /// a container to store ...
     map<unsigned int, SymbolTableEntry*> symTab;
     
@@ -121,7 +147,17 @@ class SymbolTable
     
     /// return entry of symbol table
     SymbolTableEntry* lookup(unsigned int entryKey);
+    
+    /// mapping between AST Id and symbol table entries
+    void setMapping(unsigned int entryKey, kc::integer astId);
+    
+    /// return retranslation from elementId to BPEL-element name, e.g. K_ASSIGN->"assign"
+    string translateToElementName(unsigned int elementId);
+    
+    /// return
+    string getInformation(kc::integer astId);
 };
+
 
 /**
  * \class	SymbolTableEntry
@@ -153,322 +189,6 @@ class SymbolTableEntry
     ///
     unsigned int getEntryKey();
     unsigned int getElementId();
-};
-
-
-
-
-/**
- * \class	Element
- *
- * \brief
- * 
- */
-class STElement
-{
-  public:
-    /// a map of the element's attributes
-    map<string, STAttribute*> mapOfAttributes;
-    
-    /// line position of attribute within BPEL file
-    unsigned int line;
-    
-    /// location of the activity (Scope/Process, FH, CH) to distribute error
-    /// tokens correctly
-    ActivityLocationId activityLocation;
-};
-
-
-
-
-/**
- * \class	Attribute
- *
- * \brief
- * 
- */
-class STAttribute
-{
-  public:
-    /// constructor
-    STAttribute(kc::casestring name, kc::casestring value);
-    
-    ///
-    ~STAttribute();
-  
-    /// name of attribute
-    kc::casestring name;
-    
-    /// attribute value
-    kc::casestring value;
-    
-    /// type of attribute value
-    string type;
-    
-    /// line position of attribute within BPEL file
-    unsigned int line;
-};
-
-
-
-
-/**
- * \class	Variable
- *
- * \brief
- * 
- */
-class STVariable : public STElement, public SymbolTableEntry
-{
-  public:
-    /// constructor
-    STVariable();
-    STVariable(unsigned int elementId, unsigned int entryKey);
-        
-    /// destructor
-    ~STVariable();
-    
-    /// true if variable is used in an activity
-    bool used;
-};
-
-
-
-/**
- * \class	Link
- *
- * \brief
- * 
- */
-class STLink: public STElement, public SymbolTableEntry
-{
-  public:
-    /// constructor
-    STLink();
-    STLink(unsigned int elementId, unsigned int entryKey);
-        
-    /// destructor
-    ~STLink();
-
-    /// the name of the link
-    string name;
-    
-    /// the identifier of the source activity
-    unsigned int sourceId;
-    
-    /// the identifier of the target activity
-    unsigned int targetId;
-
-    /// the identifier of the flow which defined the link
-    unsigned int parentId;
-};
-
-
-
-
-/**
- * \class	PartnerLink
- *
- * \brief
- * 
- */
-class STPartnerLink: public STElement, public SymbolTableEntry
-{
-  public:
-    /// constructor
-    STPartnerLink();
-    STPartnerLink(unsigned int elementId, unsigned int entryKey);
-    
-    /// destructor
-    ~STPartnerLink();
-};
-
-/**
- * \class	Partner
- *
- * \brief
- * 
- */
-class STPartner: public STElement, public SymbolTableEntry
-{
-  public:
-    /// constructor
-    STPartner();
-    STPartner(unsigned int elementId, unsigned int entryKey);
-    
-    /// destructor
-    ~STPartner();
-};
-
-
-/**
- * \class	CorrelationSet
- *
- * \brief
- * 
- */
-class STCorrelationSet: public STElement
-{
-  public:
-};
-
-
-
-
-/**
- * \class	FaultHandlers
- *
- * \brief
- * 
- * Everything about <faultHandlers>.
- * 
- */
-class STFaultHandlers
-{
-  public:
-    /// true if fault handler has an <catchAll> branch
-    bool hasCatchAll;
-
-    /// true if fault handler is user-defined, false if implicit
-    bool isUserDefined;
-
-    /// true if fault handler is enclosed in process, false if enclosed in a
-    /// scope
-    bool isInProcess;
-
-    /// the identifier of the scope or process that encloses this fault handler
-    int parentScopeId;
-};
-
-
-/**
- * \class	CompensationHandler
- *
- * \brief
- * 
- * Everything about <compensationHandler>.
- * 
- */
-class STCompensationHandler
-{
-  public:
-    /// true if compensation handler encloses an <compensate/> activity
-    bool hasCompensateWithoutScope;
-
-    /// true if compensation handler encloses an <compensate scope="A"/>
-    /// activity
-    bool hasCompensateWithScope;
-
-    /// true if compensation handler is user-defined, false if implicit
-    bool isUserDefined;
-};
-
-
-
-
-
-/**
- * \class	EventHandlers
- *
- * \brief
- * 
- * Everything about <eventHandlers>.
- * 
- */
-class STEventHandlers
-{
-  public:
-};
-
-
-
-/**
- * \class	Envelope
- *
- * \brief
- * 
- * An envelope for the process and scopes, i.e. those activities that may
- * enclose variables, correlation sets, fault handlers, compensation handlers
- * or event handlers.
- * 
- */
-class STEnvelope
-{
-  public:
-    /// a list of variables declared in this scope/process
-    list<STVariable*> variables;
-    
-    /// a list of correlation sets declared in this scope/process
-    list<STCorrelationSet*> correlationSets;
-    
-    /// the fault handler of the scope/process
-    STFaultHandlers* faultHandler;
-    
-    /// the compensation handler of the scope/process
-    STCompensationHandler* compensationHandler;
-    
-    /// the event handler of the scope/process
-    STEventHandlers* eventHandler;
-
-    /// true if scope had an event handler?
-    bool hasEventHandler;    
-};
-
-
-
-
-
-/**
- * \class	STProcess
- *
- * \brief
- * 
- * The <process> activity.
- * 
- */
-class STProcess: public STElement, public STEnvelope, public SymbolTableEntry
-{
-  public:
-    /// constructor
-    STProcess();
-    STProcess(unsigned int elementId, unsigned int entryKey);
-    
-    /// destructor
-    ~STProcess();
-    
-    /// a list of partner links declared in the process
-    list<STPartnerLink*> partnerLinks;
-
-    /// true if process is abstract (i.e. a business protocol)
-    bool abstractProcess;
-};
-
-
-
-
-/**
- * \class	Scope
- *
- * \brief
- * 
- * The <scope> activity.
- * 
- */
-class STScope: public STElement, public STEnvelope, public SymbolTableEntry
-{
-  public:
-    /// constructor
-    STScope();
-    STScope(unsigned int elementId, unsigned int entryKey);
-    
-    /// destructor
-    ~STScope();
-
-    /// additional attribute used for inter-scope communication (push-places)
-    unsigned int parentScopeId;
-
-    /// list of all enclosed links (recursively)
-    list<STLink*> enclosedLinks;
 };
 
 
@@ -518,6 +238,282 @@ class STActivity: public STElement, public SymbolTableEntry
 
     // only used for <terminate> activity
     bool isFirstTerminate;
+};
+
+
+/**
+ * \class	Attribute
+ *
+ * \brief
+ * 
+ */
+class STAttribute
+{
+  public:
+    /// constructor
+    STAttribute(kc::casestring name, kc::casestring value);
+    
+    ///
+    ~STAttribute();
+  
+    /// name of attribute
+    kc::casestring name;
+    
+    /// attribute value
+    kc::casestring value;
+    
+    /// type of attribute value
+    string type;
+    
+    /// line position of attribute within BPEL file
+    unsigned int line;
+};
+
+
+/**
+ * \class	CompensationHandler
+ *
+ * \brief
+ * 
+ * Everything about <compensationHandler>.
+ * 
+ */
+class STCompensationHandler
+{
+  public:
+    /// true if compensation handler encloses an <compensate/> activity
+    bool hasCompensateWithoutScope;
+
+    /// true if compensation handler encloses an <compensate scope="A"/>
+    /// activity
+    bool hasCompensateWithScope;
+
+    /// true if compensation handler is user-defined, false if implicit
+    bool isUserDefined;
+};
+
+
+/**
+ * \class	CorrelationSet
+ *
+ * \brief
+ * 
+ */
+class STCorrelationSet: public STElement
+{
+  public:
+};
+
+
+/**
+ * \class	Envelope
+ *
+ * \brief
+ * 
+ * An envelope for the process and scopes, i.e. those activities that may
+ * enclose variables, correlation sets, fault handlers, compensation handlers
+ * or event handlers.
+ * 
+ */
+class STEnvelope
+{
+  public:
+    /// a list of variables declared in this scope/process
+    list<STVariable*> variables;
+    
+    /// a list of correlation sets declared in this scope/process
+    list<STCorrelationSet*> correlationSets;
+    
+    /// the fault handler of the scope/process
+    STFaultHandlers* faultHandler;
+    
+    /// the compensation handler of the scope/process
+    STCompensationHandler* compensationHandler;
+    
+    /// the event handler of the scope/process
+    STEventHandlers* eventHandler;
+
+    /// true if scope had an event handler?
+    bool hasEventHandler;    
+};
+
+
+/**
+ * \class	EventHandlers
+ *
+ * \brief
+ * 
+ * Everything about <eventHandlers>.
+ * 
+ */
+class STEventHandlers
+{
+  public:
+};
+
+
+/**
+ * \class	FaultHandlers
+ *
+ * \brief
+ * 
+ * Everything about <faultHandlers>.
+ * 
+ */
+class STFaultHandlers
+{
+  public:
+    /// true if fault handler has an <catchAll> branch
+    bool hasCatchAll;
+
+    /// true if fault handler is user-defined, false if implicit
+    bool isUserDefined;
+
+    /// true if fault handler is enclosed in process, false if enclosed in a
+    /// scope
+    bool isInProcess;
+
+    /// the identifier of the scope or process that encloses this fault handler
+    int parentScopeId;
+};
+
+
+/**
+ * \class	Link
+ *
+ * \brief
+ * 
+ */
+class STLink: public STElement, public SymbolTableEntry
+{
+  public:
+    /// constructor
+    STLink();
+    STLink(unsigned int elementId, unsigned int entryKey);
+        
+    /// destructor
+    ~STLink();
+
+    /// the name of the link
+    string name;
+    
+    /// the identifier of the source activity
+    unsigned int sourceId;
+    
+    /// the identifier of the target activity
+    unsigned int targetId;
+
+    /// the identifier of the flow which defined the link
+    unsigned int parentId;
+};
+
+
+/**
+ * \class	Partner
+ *
+ * \brief
+ * 
+ */
+class STPartner: public STElement, public SymbolTableEntry
+{
+  public:
+    /// constructor
+    STPartner();
+    STPartner(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STPartner();
+};
+
+
+/**
+ * \class	PartnerLink
+ *
+ * \brief
+ * 
+ */
+class STPartnerLink: public STElement, public SymbolTableEntry
+{
+  public:
+    /// constructor
+    STPartnerLink();
+    STPartnerLink(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STPartnerLink();
+};
+
+
+/**
+ * \class	STProcess
+ *
+ * \brief
+ * 
+ * The <process> activity.
+ * 
+ */
+class STProcess: public STElement, public STEnvelope, public SymbolTableEntry
+{
+  public:
+    /// constructor
+    STProcess();
+    STProcess(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STProcess();
+    
+    /// a list of partner links declared in the process
+    list<STPartnerLink*> partnerLinks;
+
+    /// true if process is abstract (i.e. a business protocol)
+    bool abstractProcess;
+};
+
+
+/**
+ * \class	Scope
+ *
+ * \brief
+ * 
+ * The <scope> activity.
+ * 
+ */
+class STScope: public STElement, public STEnvelope, public SymbolTableEntry
+{
+  public:
+    /// constructor
+    STScope();
+    STScope(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STScope();
+
+    /// additional attribute used for inter-scope communication (push-places)
+    unsigned int parentScopeId;
+
+    /// list of all enclosed links (recursively)
+    list<STLink*> enclosedLinks;
+};
+
+
+/**
+ * \class	Variable
+ *
+ * \brief
+ * 
+ */
+class STVariable : public STElement, public SymbolTableEntry
+{
+  public:
+    /// constructor
+    STVariable();
+    STVariable(unsigned int elementId, unsigned int entryKey);
+        
+    /// destructor
+    ~STVariable();
+    
+    /// true if variable is used in an activity
+    bool used;
 };
 
 #endif

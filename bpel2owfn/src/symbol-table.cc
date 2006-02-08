@@ -48,6 +48,7 @@
  */
 SymbolTable::SymbolTable()
 {
+  this->id2key.clear();
   this->symTab.clear();
   this->entryKey = 0;
 }
@@ -65,6 +66,215 @@ unsigned int SymbolTable::nextKey()
   this->entryKey++;
   return this->entryKey;
 }
+
+/*!
+ * 
+ */
+void SymbolTable::setMapping(unsigned int entryKey, kc::integer astId)
+{
+  id2key[astId->value] = entryKey;	
+}
+
+/*!
+ * 
+ */
+string SymbolTable::getInformation(kc::integer astId)
+{
+  return string("<" + translateToElementName((lookup(id2key[astId->value]))->getElementId()) + " id=" + intToString(astId->value) + ">");
+}
+
+/*!
+ * 
+ */
+string SymbolTable::translateToElementName(unsigned int elementId)
+{
+  traceST("translateToElementName:\n");
+  switch(elementId)
+  {
+    case K_ASSIGN:
+    {
+      traceST("\tASSIGN\n");
+      return "assign";
+    }
+    break;
+
+    case K_CATCH:
+    {
+      traceST("\tCATCH\n");
+      return "catch";
+    }
+    break;
+
+    case K_COMPENSATE:
+    {
+      traceST("\tCOMPENSATE\n");
+      return "compensate";
+    }
+    break;
+
+    case K_CORRELATION:
+    {
+      traceST("\tCORRELATION\n");
+      return "correlation";
+    }
+    break;
+
+    case K_CORRELATIONSET:
+    {
+      traceST("\tCORRELATIONSET\n");
+      return "correlationSet";
+    }
+    break;
+
+    case K_EMPTY:
+    {
+      traceST("\tEMPTY\n");
+      return "empty";
+    }
+    break;
+
+    case K_FLOW:
+    {
+      traceST("\tFLOW\n");
+      return "flow";
+    }
+    break;
+
+    case K_INVOKE:
+    {
+      traceST("\tINVOKE\n");
+      return "invoke";
+    }
+    break;
+
+    case K_LINK:
+    {
+      traceST("\tLINK\n");
+      return "link";
+    }
+    break;
+
+    case K_ONALARM:
+    {
+      traceST("\tONALARM\n");
+      return "onAlarm";
+    }
+    break;
+
+    case K_ONMESSAGE:
+    {
+      traceST("\tONMESSAGE\n");
+      return "onMessage";
+    }
+    break;
+
+    case K_PARTNER:
+    {
+      traceST("\tPARTNER\n");
+      return "partner";
+    }
+    break;
+
+    case K_PARTNERLINK:
+    {
+      traceST("\tPARTNERLINK\n");
+      return "partnerLink";
+    }
+    break;
+
+    case K_PICK:
+    {
+      traceST("\tPICK\n");
+      return "pick";
+    }
+    break;
+
+    case K_PROCESS:
+    {
+      traceST("\tPROCESS\n");
+      return "process";
+    }
+    break;
+
+    case K_RECEIVE:
+    {
+      traceST("\tRECEIVE\n");
+      return "receive";
+    }
+    break;
+
+    case K_REPLY:
+    {
+      traceST("\tREPLY\n");
+      return "reply";
+    }
+    break;
+
+    case K_SCOPE:
+    {
+      traceST("\tSCOPE\n");
+      return "scope";
+    }
+    break;
+
+    case K_SEQUENCE:
+    {
+      traceST("\tSEQUENCE\n");
+      return "sequence";
+    }
+    break;
+
+    case K_SOURCE:
+    {
+      traceST("\tSOURCE\n");
+      return "source";
+    }
+    break;
+
+    case K_SWITCH:
+    {
+      traceST("\tSWITCH\n");
+      return "switch";
+    }
+    break;
+
+    case K_TARGET:
+    {
+      traceST("\tPARTNER\n");
+      return "target";
+    }
+    break;
+
+    case K_TERMINATE:
+    {
+      traceST("\tTERMINATE\n");
+      return "terminate";
+    }
+    break;
+
+    case K_VARIABLE:
+    {
+      traceST("\tVARIABLE\n");
+      return "variable";
+    }
+    break;
+
+    case K_WAIT:
+    {
+      traceST("\tWAIT\n");
+      return "wait";
+    }
+    break;
+
+    case K_WHILE:
+    {
+      traceST("\tWHILE\n");
+      return "while";
+    }
+    break;    
+  }
+  return "";
+} 
 
 /*!
  * 

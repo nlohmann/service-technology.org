@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/08 10:22:42 $
+ *          - last changed: \$Date: 2006/02/08 11:29:19 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.119 $
+ * \version \$Revision: 1.120 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -1491,7 +1491,8 @@ This=userDefinedEventHandler(a,b) ->
 	TheNet->newArc(onMessage_p11, onMessage_t12);
 	TheNet->newArc(onMessage_t12, onMessage_p12);
 
-	throwFault(onMessage_p2, onMessage_p1, "guard" + message, "p2", "(M" + message + ",CS" + message + ")", prefix, mkinteger(0)); // t1
+	if (parameters[P_NOSTANDARDFAULTS] == false)
+	  throwFault(onMessage_p2, onMessage_p1, "guard" + message, "p2", "(M" + message + ",CS" + message + ")", prefix, mkinteger(0)); // t1
 	
 	// arcs from the EH
 	TheNet->newArc(t11, onMessage_p7); // t11 in AEH is t13 in MEH
@@ -1681,8 +1682,11 @@ This=implicitCompensationHandler() ->
 //      TheNet->newArc(p3, t1, READ);
 //      TheNet->newArc(t1, p25, "fault");
 
-      throwFault(p2, p1, "scope=s", "ch_in", "s", prefix, mkinteger(2)); // t1
-      TheNet->newArc(p3, TheNet->findPlace(prefix + "throwFault.ch_in"), READ);
+      if (parameters[P_NOSTANDARDFAULTS] == false)
+      {
+	throwFault(p2, p1, "scope=s", "ch_in", "s", prefix, mkinteger(2)); // t1
+	TheNet->newArc(p3, TheNet->findPlace(prefix + "throwFault.ch_in"), READ);
+      }
 
       Transition *t2  = TheNet->newTransition(prefix + "t2", "scope=s");
       TheNet->newArc(p2, t2, "s");
@@ -1804,8 +1808,11 @@ This=userDefinedCompensationHandler(innerActivity) ->
 //      TheNet->newArc(p3, t1, READ);
 //      TheNet->newArc(t1, p25, "fault");
 
-      throwFault(p2, p1, "scope=s", "ch_in", "s", prefix, mkinteger(2)); // t1
-      TheNet->newArc(p3, TheNet->findPlace(prefix + "throwFault.ch_in"), READ);
+      if (parameters[P_NOSTANDARDFAULTS] == false)
+      {
+	throwFault(p2, p1, "scope=s", "ch_in", "s", prefix, mkinteger(2)); // t1
+	TheNet->newArc(p3, TheNet->findPlace(prefix + "throwFault.ch_in"), READ);
+      }
       
       Transition *t2  = TheNet->newTransition(prefix + "t2", "scope=s");
       TheNet->newArc(p2, t2, "s");
@@ -2009,7 +2016,8 @@ This=Invoke(a,b) provided (This->outputVariable == mkcasestring("")) ->
       TheNet->newArc(p2, t2, "(X,CS)");
       TheNet->newArc(t2, p3);
 
-      throwFault(p2, p4, "guard", "running", "(X,CS)", prefix, This->negativeControlFlow); // t3      
+      if (parameters[P_NOSTANDARDFAULTS] == false)
+	throwFault(p2, p4, "guard", "running", "(X,CS)", prefix, This->negativeControlFlow); // t3
       stop(p1, "initial", "", prefix);		// t4
       stop(p2, "running", "(X,CS)", prefix);	// t5
       stop(p3, "final", "", prefix);		// t7
@@ -2059,8 +2067,11 @@ This=Invoke(a,b) provided (This->outputVariable != mkcasestring("")) ->
       TheNet->newArc(TheNet->findPlace("variable." + string(This->variableIDout->name)), t4, "V");
       TheNet->newArc(t4, TheNet->findPlace("variable." + string(This->variableIDout->name)), "Y");
 
-      throwFault(p4, p6, "guard2", "running2", "(Y,CS2)", prefix, This->negativeControlFlow); // t5
-      throwFault(p2, p6, "guard1", "running1", "(X,CS1)", prefix, This->negativeControlFlow); // t6
+      if (parameters[P_NOSTANDARDFAULTS] == false)
+      {
+	throwFault(p4, p6, "guard2", "running2", "(Y,CS2)", prefix, This->negativeControlFlow); // t5
+	throwFault(p2, p6, "guard1", "running1", "(X,CS1)", prefix, This->negativeControlFlow); // t6
+      }
       stop(p1, "initial", "", prefix);		// t7
       stop(p2, "running1", "(X,CS1)", prefix);	// t8
       stop(p3, "p3", "", prefix);		// t9
@@ -2108,7 +2119,8 @@ This=Receive(a,b) ->
       TheNet->newArc(TheNet->findPlace("variable." + string(This->variableID->name)), t2, "V");
       TheNet->newArc(t2, TheNet->findPlace("variable." + string(This->variableID->name)), "X");
 
-      throwFault(p2, p4, "guard", "running", "(X,CS)", prefix, This->negativeControlFlow); // t3
+      if (parameters[P_NOSTANDARDFAULTS] == false)
+	throwFault(p2, p4, "guard", "running", "(X,CS)", prefix, This->negativeControlFlow); // t3
       stop(p1, "initial", "", prefix);		// t4
       stop(p2, "running", "(X,CS)", prefix);	// t5
       stop(p3, "final", "", prefix);		// t7
@@ -2153,7 +2165,8 @@ This=Reply(a,b) ->
       TheNet->newArc(p2, t2, "(X,CS)");
       TheNet->newArc(t2, p3);
       
-      throwFault(p2, p4, "guard", "running", "(X,CS)", prefix, This->negativeControlFlow); // t3      
+      if (parameters[P_NOSTANDARDFAULTS] == false)
+	throwFault(p2, p4, "guard", "running", "(X,CS)", prefix, This->negativeControlFlow); // t3      
       stop(p1, "initial", "", prefix);		// t4
       stop(p2, "running", "(X,CS)", prefix);	// t5
       stop(p3, "final", "", prefix);		// t7
@@ -2224,7 +2237,8 @@ This=Assign(a,b) ->
 	  TheNet->newArc(TheNet->findPlace("variable." + string(to->variableID->name)), t2, "Y");
 	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(to->variableID->name)), "X");
 
-	  throwFault(p2, p4, "guard", "running", "X", newPrefix, This->negativeControlFlow); // t3
+	  if (parameters[P_NOSTANDARDFAULTS] == false)
+	    throwFault(p2, p4, "guard", "running", "X", newPrefix, This->negativeControlFlow); // t3
 	  stop(p4, "p4at" + intToString(copyCount), "", prefix); // t6
 	  
 	  lastPlace = p8;	  
@@ -2239,8 +2253,9 @@ This=Assign(a,b) ->
 	  TheNet->newArc(TheNet->findPlace("variable." + string(to->variableID->name)), t2, "Y");
 	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(to->variableID->name)), string(from->literalValue->name));
 	  TheNet->newArc(t2, p8);
-	  	  
-	  throwFault(lastPlace, p4, "guard", "initial", "", newPrefix, This->negativeControlFlow); // t3
+	  
+	  if (parameters[P_NOSTANDARDFAULTS] == false)
+	    throwFault(lastPlace, p4, "guard", "initial", "", newPrefix, This->negativeControlFlow); // t3
 	  stop(p4, "p4at" + intToString(copyCount), "", prefix); // t6
 	    
 	  lastPlace = p8;
@@ -2702,7 +2717,8 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
       TheNet->newArc(p5, t3);
       TheNet->newArc(t3, p6, "x");
 
-      throwFault(p6, p10, "guard", "running", "x", prefix, This->negativeControlFlow); // t7
+      if (parameters[P_NOSTANDARDFAULTS] == false)
+	throwFault(p6, p10, "guard", "running", "x", prefix, This->negativeControlFlow); // t7
       stop(p5, "initial", "", prefix);	// t8
       stop(p6, "running", "x", prefix);	// t9
       stop(p10, "p10", "", prefix);	// t10
@@ -2852,7 +2868,8 @@ This=activityWhile(TheWhile=While(a,b)) ->
       TheNet->newArc(t4, p1);
       TheNet->newArc(p5, t4);
 
-      throwFault(p2, p6, "guard", "running", "x", prefix, This->negativeControlFlow); // t5      
+      if (parameters[P_NOSTANDARDFAULTS] == false)
+	throwFault(p2, p6, "guard", "running", "x", prefix, This->negativeControlFlow); // t5      
       stop(p1, "initial", "", prefix);	// t6
       stop(p2, "running", "x", prefix);	// t7
       stop(p3, "final", "", prefix);	// t9
@@ -3001,7 +3018,8 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	TheNet->newArc(p3, t3, "M" + message );
 	TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
 
-	throwFault(p3, p10, "guard" + message, "p3", "M" + message, newPrefix, This->negativeControlFlow); // t4
+	if (parameters[P_NOSTANDARDFAULTS] == false)
+	  throwFault(p3, p10, "guard" + message, "p3", "M" + message, newPrefix, This->negativeControlFlow); // t4
         stop(p3, "p3at" + message, "M" + message, prefix);	// t9
 	stop(p10, "p10at" + message, "", prefix);		// t10
 	

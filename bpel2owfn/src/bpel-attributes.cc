@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/01/12 15:59:18 $
+ *          - last changed: \$Date: 2006/02/08 19:28:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.33 $
+ * \version \$Revision: 1.34 $
  *
  * \todo
  *       - (reinert) Comment this file and its classes.
@@ -206,8 +206,8 @@ bool attributeManager::isDuplicate(std::string attributeName)
  */
 void attributeManager::define(kc::casestring attributeName, kc::casestring attributeValue)
 {
-  //traceAM("define\n" + string(attributeName->name) + "=" + string(attributeValue->name) + "\n");
-
+  //traceAM("define\n" + intToString(this->nodeId) + " -> "  + string(attributeName->name) + "=" + string(attributeValue->name) + "\n");
+  
   if(isDuplicate(attributeName->name))
   {
     //traceAM("define DUPLIKAT GEFUNDEN\n" + string(attributeName->name) + "=" + string(attributeValue->name) + "\n");

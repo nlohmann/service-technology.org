@@ -302,27 +302,31 @@ void parse_command_line(int argc, char* argv[])
 	      parameter = string(optarg);
 	      if ( parameter == "simplify" )
 	      {
-	        parameters[P_SIMPLIFY] = "true";
+	        parameters[P_SIMPLIFY] = true;
 	      }
 	      else if ( parameter == "lowlevel" )
 	      {
-	        parameters[P_LOWLEVEL] = "true";
+	        parameters[P_LOWLEVEL] = true;
 	      }
 	      else if ( parameter == "nointerface" )
 	      {
-	        parameters[P_NOINTERFACE] = "true";
+	        parameters[P_NOINTERFACE] = true;
 	      }
 	      else if ( parameter == "finalmarking" )
 	      {
-	        parameters[P_FINALMARKING] = "true";
+	        parameters[P_FINALMARKING] = true;
 	      }
 	      else if ( parameter == "uniquefault" )
 	      {
-	        parameters[P_UNIQUEFAULT] = "true";
+	        parameters[P_UNIQUEFAULT] = true;
 	      }
 	      else if ( parameter == "finishloop" )
 	      {
-	        parameters[P_FINISHLOOP] = "true";
+	        parameters[P_FINISHLOOP] = true;
+	      }
+	      else if ( parameter == "nostandardfaults" )
+	      {
+		parameters[P_NOSTANDARDFAULTS] = true;
 	      }
 	      break;
       case 'd':

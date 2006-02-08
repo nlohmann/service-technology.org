@@ -45,7 +45,8 @@ typedef enum
   P_NOINTERFACE,
   P_FINALMARKING,
   P_UNIQUEFAULT,
-  P_FINISHLOOP
+  P_FINISHLOOP,
+  P_NOSTANDARDFAULTS
 } possibleParameters;
 
 

@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/08 11:43:42 $
+ *          - last changed: \$Date: 2006/02/08 16:00:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.121 $
+ * \version \$Revision: 1.122 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -3609,7 +3609,7 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
       {
 	Place *p9  = TheNet->newPlace(prefix + "negLink");
 	
-	Transition *t1 = TheNet->newTransition(prefix + "t1");
+	t1 = TheNet->newTransition(prefix + "t1");
 	TheNet->newArc(p9, t1);
 	
 	Place *p10 = TheNet->findPlace(newPrefix + ".negLink");
@@ -3654,14 +3654,15 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
       {
 	Place *p5 = TheNet->findPlace("!link." + string(link->linkID->name));
 	Place *p7 = TheNet->findPlace("link." + string(link->linkID->name));
-
+	
 	if (This->dpe->value > 0)
 	{
 	  TheNet->newArc(p5, t1);
 	  TheNet->newArc(t1, p7, "false");
 	}
 
-        TheNet->newArc(p5, t3);
+
+	TheNet->newArc(p5, t3);
         TheNet->newArc(t3, p7, string(link->transitionCondition->name));
 	TheNet->newArc(p7, t4, READ);
 	i++;

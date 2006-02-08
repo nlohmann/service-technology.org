@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/08 16:00:41 $
+ *          - last changed: \$Date: 2006/02/08 16:07:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.122 $
+ * \version \$Revision: 1.123 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -187,7 +187,7 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
         TheNet->newArc(p39, process_loop, READ);
       }
       
-      Transition *t2 =  TheNet->newTransition(prefix + "t2");
+      Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p1, t2);
       TheNet->newArc(t2, p7);
       TheNet->newArc(t2, p8);
@@ -198,7 +198,7 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       TheNet->newArc(t2, p19);
       TheNet->newArc(t2, fh_not_faulted);
 
-      Transition *t4 =  TheNet->newTransition(prefix + "t4");
+      Transition *t4 = TheNet->newTransition(prefix + "t4");
       TheNet->newArc(p7, t4);
       TheNet->newArc(p8, t4);
       TheNet->newArc(t4, p9);
@@ -217,20 +217,20 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
 	TheNet->newArc(t2, p23);	
 	TheNet->newArc(p25, t4);
 
-	Transition *t1 =  TheNet->newTransition(prefix + "t1");
+	Transition *t1 = TheNet->newTransition(prefix + "t1");
     	TheNet->newArc(p27, t1);
   	TheNet->newArc(t1, p34);
 
-	Transition *t3 =  TheNet->newTransition(prefix + "t3");
+	Transition *t3 = TheNet->newTransition(prefix + "t3");
 	TheNet->newArc(p20, t3);
 	TheNet->newArc(t3, p33);
 	TheNet->newArc(t3, p24);
       
-	Transition *t5 =  TheNet->newTransition(prefix + "t5");
+	Transition *t5 = TheNet->newTransition(prefix + "t5");
 	TheNet->newArc(p22, t5);
 	TheNet->newArc(t5, p26);
 
-	Transition *t6 =  TheNet->newTransition(prefix + "t6");
+	Transition *t6 = TheNet->newTransition(prefix + "t6");
 	TheNet->newArc(t6, p26);
 	TheNet->newArc(p21, t6);
 	TheNet->newArc(p33, t6);
@@ -397,17 +397,17 @@ StopInProcess() ->
       Place *ch_not_faulted = TheNet->newPlace(prefix + "!CHFaulted");
       Place *ch_fault_in = TheNet->newPlace(prefix + "ch_fault_in");  // for faults from the CH
 
-      Transition *t1 =  TheNet->newTransition(prefix + "t1");
+      Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1, READ);
       TheNet->newArc(fh_fault_in, t1, "x"); // was: take from p5
       TheNet->newArc(t1, p15, "x");
 
-      Transition *t2 =  TheNet->newTransition(prefix + "t2");
+      Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       TheNet->newArc(t2, p21);
 
-      Transition *t3 =  TheNet->newTransition(prefix + "t3");
+      Transition *t3 = TheNet->newTransition(prefix + "t3");
       TheNet->newArc(p3, t3);
       //TheNet->newArc(p5, t3, RESET, "X");
       TheNet->newArc(p22, t3);
@@ -420,7 +420,7 @@ StopInProcess() ->
       TheNet->newArc(t4, p6, "x");
       //TheNet->newArc(t4, p10);
 
-      Transition *t5 =  TheNet->newTransition(prefix + "t5");
+      Transition *t5 = TheNet->newTransition(prefix + "t5");
       TheNet->newArc(p4, t5);
       TheNet->newArc(p6, t5, "x");
       TheNet->newArc(p14, t5);
@@ -428,21 +428,21 @@ StopInProcess() ->
       TheNet->newArc(t5, p7);
       TheNet->newArc(t5, p8, "x");
 
-      Transition *t6 =  TheNet->newTransition(prefix + "t6");
+      Transition *t6 = TheNet->newTransition(prefix + "t6");
       TheNet->newArc(p9, t6);
       TheNet->newArc(p13, t6);
       TheNet->newArc(t6, p2);
       TheNet->newArc(t6, p10);
       TheNet->newArc(t6, p11);
 
-      Transition *t7 =  TheNet->newTransition(prefix + "t7");
+      Transition *t7 = TheNet->newTransition(prefix + "t7");
       TheNet->newArc(p4, t7);
       TheNet->newArc(p11, t7);
       TheNet->newArc(p20, t7);
       TheNet->newArc(t7, p12);
       TheNet->newArc(t7, p16);
 
-      Transition *t8 =  TheNet->newTransition(prefix + "t8");
+      Transition *t8 = TheNet->newTransition(prefix + "t8");
       TheNet->newArc(p10, t8, READ);
       TheNet->newArc(p13, t8);
 
@@ -524,12 +524,12 @@ StopInScope() ->
       Place *ch_not_faulted = TheNet->newPlace(prefix + "!CHFaulted");
       Place *ch_fault_in = TheNet->newPlace(prefix + "ch_fault_in"); // for faults from the CH
 
-      Transition *t1 =  TheNet->newTransition(prefix + "t1");
+      Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       TheNet->newArc(t1, p6); 
 
-      Transition *t2 =  TheNet->newTransition(prefix + "t2");
+      Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       TheNet->newArc(t2, p4);
@@ -537,30 +537,30 @@ StopInScope() ->
       TheNet->newArc(p8, t2);
       TheNet->newArc(p9, t2);
 
-      Transition *t3 =  TheNet->newTransition(prefix + "t3");
+      Transition *t3 = TheNet->newTransition(prefix + "t3");
       TheNet->newArc(p5, t3, READ);
       TheNet->newArc(fh_fault_in, t3, "x"); // was: read from p10
       TheNet->newArc(t3, p23, "x");
 
-      Transition *t4 =  TheNet->newTransition(prefix + "t4");
+      Transition *t4 = TheNet->newTransition(prefix + "t4");
       TheNet->newArc(p6, t4);
       TheNet->newArc(t4, p7);
       TheNet->newArc(t4, p29);
 
-      Transition *t5 =  TheNet->newTransition(prefix + "t5");
+      Transition *t5 = TheNet->newTransition(prefix + "t5");
       TheNet->newArc(p7, t5);
       TheNet->newArc(t5, p8);
       //TheNet->newArc(p10, t5, RESET, "X");
       TheNet->newArc(p30, t5);
 
-      Transition *t6 =  TheNet->newTransition(prefix + "t6");
+      Transition *t6 = TheNet->newTransition(prefix + "t6");
       TheNet->newArc(t6, p6);
       TheNet->newArc(p10, t6, "x");
       TheNet->newArc(t6, p11, "x");
       //TheNet->newArc(p14, t6);
       //TheNet->newArc(t6, p18);
 
-      Transition *t7 =  TheNet->newTransition(prefix + "t7");
+      Transition *t7 = TheNet->newTransition(prefix + "t7");
       TheNet->newArc(t7, p5);
       TheNet->newArc(p8, t7);
       TheNet->newArc(p9, t7);
@@ -568,12 +568,12 @@ StopInScope() ->
       TheNet->newArc(t7, p12);
       TheNet->newArc(t7, p13, "x");
 
-      Transition *t8 =  TheNet->newTransition(prefix + "t8");
+      Transition *t8 = TheNet->newTransition(prefix + "t8");
       TheNet->newArc(t8, p6);
       TheNet->newArc(p15, t8);
       TheNet->newArc(t8, p16);
 
-      Transition *t9 =  TheNet->newTransition(prefix + "t9");
+      Transition *t9 = TheNet->newTransition(prefix + "t9");
       TheNet->newArc(p8, t9);
       TheNet->newArc(p16, t9);
       TheNet->newArc(t9, p17);
@@ -699,27 +699,27 @@ This=userDefinedFaultHandler(a,b) provided (This->inProcess) ->
 	Place *compensate_p6 = TheNet->newPlace(newPrefix + "ch_out");
 	Place *compensate_p7 = TheNet->newPlace(newPrefix + "stopped");
 
-	Transition *compensate_t1  = TheNet->newTransition(newPrefix + "t1");
+	Transition *compensate_t1 = TheNet->newTransition(newPrefix + "t1");
 	TheNet->newArc(compensate_p1, compensate_t1);
 	TheNet->newArc(compensate_t1, compensate_p2);
 	TheNet->newArc(compensate_t1, compensate_p5);
 
-	Transition *compensate_t2  = TheNet->newTransition(newPrefix + "t2");
+	Transition *compensate_t2 = TheNet->newTransition(newPrefix + "t2");
 	TheNet->newArc(compensate_p2, compensate_t2);
 	TheNet->newArc(compensate_t2, compensate_p3);
 	TheNet->newArc(compensate_p6, compensate_t2);
 
-	Transition *compensate_t3  = TheNet->newTransition(newPrefix + "t3");
+	Transition *compensate_t3 = TheNet->newTransition(newPrefix + "t3");
 	TheNet->newArc(compensate_p1, compensate_t3);
 	TheNet->newArc(compensate_p4, compensate_t3);
 	TheNet->newArc(compensate_t3, compensate_p7);
 
-	Transition *compensate_t4  = TheNet->newTransition(newPrefix + "t4");
+	Transition *compensate_t4 = TheNet->newTransition(newPrefix + "t4");
 	TheNet->newArc(compensate_p2, compensate_t4);
 	TheNet->newArc(compensate_p4, compensate_t4);
 	TheNet->newArc(compensate_t4, compensate_p7);
 
-	Transition *compensate_t5  = TheNet->newTransition(newPrefix + "t5");
+	Transition *compensate_t5 = TheNet->newTransition(newPrefix + "t5");
 	TheNet->newArc(compensate_p2, compensate_t5);
 	TheNet->newArc(compensate_p3, compensate_t5);
 	TheNet->newArc(compensate_t5, compensate_p7);
@@ -804,27 +804,27 @@ This=implicitFaultHandler() provided (This->inProcess) ->
       Place *p11 = TheNet->newPlace(prefix + "!Ended");
       Place *p12 = TheNet->newPlace(prefix + "Ended");
 
-      Transition *t1  = TheNet->newTransition(prefix + "t1");
+      Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p2, t1);
       TheNet->newArc(p7, t1, "x");
       TheNet->newArc(t1, p9);
       TheNet->newArc(p11, t1);
       TheNet->newArc(t1, p12);
 
-      Transition *t2  = TheNet->newTransition(prefix + "t2");
+      Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(t2, p3);
       TheNet->newArc(p7, t2, "x");
       TheNet->newArc(t2, p8, "y");
       TheNet->newArc(p10, t2, "y");
 
-      Transition *t3  = TheNet->newTransition(prefix + "t3");
+      Transition *t3 = TheNet->newTransition(prefix + "t3");
       TheNet->newArc(p6, t3);
       TheNet->newArc(t3, p9);
       TheNet->newArc(p8, t3, "y");
       TheNet->newArc(p11, t3);
       TheNet->newArc(t3, p12);
 
-      Transition *t4  = TheNet->newTransition(prefix + "t4");
+      Transition *t4 = TheNet->newTransition(prefix + "t4");
       TheNet->newArc(p10, t4, "y");
       TheNet->newArc(p12, t4, READ);
 
@@ -840,27 +840,27 @@ This=implicitFaultHandler() provided (This->inProcess) ->
       Place *compensate_p6 = TheNet->newPlace(prefix + "ch_out");
       Place *compensate_p7 = TheNet->newPlace(prefix + "stopped");
 
-      Transition *compensate_t1  = TheNet->newTransition(prefix + "t1");
+      Transition *compensate_t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(compensate_p1, compensate_t1);
       TheNet->newArc(compensate_t1, compensate_p2);
       TheNet->newArc(compensate_t1, compensate_p5);
 
-      Transition *compensate_t2  = TheNet->newTransition(prefix + "t2");
+      Transition *compensate_t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(compensate_p2, compensate_t2);
       TheNet->newArc(compensate_t2, compensate_p3);
       TheNet->newArc(compensate_p6, compensate_t2);
 
-      Transition *compensate_t3  = TheNet->newTransition(prefix + "t3");
+      Transition *compensate_t3 = TheNet->newTransition(prefix + "t3");
       TheNet->newArc(compensate_p1, compensate_t3);
       TheNet->newArc(compensate_p4, compensate_t3);
       TheNet->newArc(compensate_t3, compensate_p7);
 
-      Transition *compensate_t4  = TheNet->newTransition(prefix + "t4");
+      Transition *compensate_t4 = TheNet->newTransition(prefix + "t4");
       TheNet->newArc(compensate_p2, compensate_t4);
       TheNet->newArc(compensate_p4, compensate_t4);
       TheNet->newArc(compensate_t4, compensate_p7);
 
-      Transition *compensate_t5  = TheNet->newTransition(prefix + "t5");
+      Transition *compensate_t5 = TheNet->newTransition(prefix + "t5");
       TheNet->newArc(compensate_p2, compensate_t5);
       TheNet->newArc(compensate_p3, compensate_t5);
       TheNet->newArc(compensate_t5, compensate_p7);
@@ -976,27 +976,27 @@ This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
 	Place *compensate1_p6 = TheNet->newPlace(newPrefix + "ch_out");
 	Place *compensate1_p7 = TheNet->newPlace(newPrefix + "stopped");
 
-	Transition *compensate1_t1  = TheNet->newTransition(newPrefix + "t1");
+	Transition *compensate1_t1 = TheNet->newTransition(newPrefix + "t1");
 	TheNet->newArc(compensate1_p1, compensate1_t1);
 	TheNet->newArc(compensate1_t1, compensate1_p2);
 	TheNet->newArc(compensate1_t1, compensate1_p5);
 
-	Transition *compensate1_t2  = TheNet->newTransition(newPrefix + "t2");
+	Transition *compensate1_t2 = TheNet->newTransition(newPrefix + "t2");
 	TheNet->newArc(compensate1_p2, compensate1_t2);
 	TheNet->newArc(compensate1_t2, compensate1_p3);
 	TheNet->newArc(compensate1_p6, compensate1_t2);
 
-	Transition *compensate1_t3  = TheNet->newTransition(newPrefix + "t3");
+	Transition *compensate1_t3 = TheNet->newTransition(newPrefix + "t3");
 	TheNet->newArc(compensate1_p1, compensate1_t3);
 	TheNet->newArc(compensate1_p4, compensate1_t3);
 	TheNet->newArc(compensate1_t3, compensate1_p7);
 
-	Transition *compensate1_t4  = TheNet->newTransition(newPrefix + "t4");
+	Transition *compensate1_t4 = TheNet->newTransition(newPrefix + "t4");
 	TheNet->newArc(compensate1_p2, compensate1_t4);
 	TheNet->newArc(compensate1_p4, compensate1_t4);
 	TheNet->newArc(compensate1_t4, compensate1_p7);
 
-	Transition *compensate1_t5  = TheNet->newTransition(newPrefix + "t5");
+	Transition *compensate1_t5 = TheNet->newTransition(newPrefix + "t5");
 	TheNet->newArc(compensate1_p2, compensate1_t5);
 	TheNet->newArc(compensate1_p3, compensate1_t5);
 	TheNet->newArc(compensate1_t5, compensate1_p7);
@@ -1021,27 +1021,27 @@ This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
       Place *compensate2_p6 = TheNet->newPlace(newPrefix + "ch_out");
       Place *compensate2_p7 = TheNet->newPlace(newPrefix + "stopped");
       
-      Transition *compensate2_t1  = TheNet->newTransition(newPrefix + "t1");
+      Transition *compensate2_t1 = TheNet->newTransition(newPrefix + "t1");
       TheNet->newArc(compensate2_p1, compensate2_t1);
       TheNet->newArc(compensate2_t1, compensate2_p2);
       TheNet->newArc(compensate2_t1, compensate2_p5);
 
-      Transition *compensate2_t2  = TheNet->newTransition(newPrefix + "t2");
+      Transition *compensate2_t2 = TheNet->newTransition(newPrefix + "t2");
       TheNet->newArc(compensate2_p2, compensate2_t2);
       TheNet->newArc(compensate2_t2, compensate2_p3);
       TheNet->newArc(compensate2_p6, compensate2_t2);
 
-      Transition *compensate2_t3  = TheNet->newTransition(newPrefix + "t3");
+      Transition *compensate2_t3 = TheNet->newTransition(newPrefix + "t3");
       TheNet->newArc(compensate2_p1, compensate2_t3);
       TheNet->newArc(compensate2_p4, compensate2_t3);
       TheNet->newArc(compensate2_t3, compensate2_p7);
 
-      Transition *compensate2_t4  = TheNet->newTransition(newPrefix + "t4");
+      Transition *compensate2_t4 = TheNet->newTransition(newPrefix + "t4");
       TheNet->newArc(compensate2_p2, compensate2_t4);
       TheNet->newArc(compensate2_p4, compensate2_t4);
       TheNet->newArc(compensate2_t4, compensate2_p7);
 
-      Transition *compensate2_t5  = TheNet->newTransition(newPrefix + "t5");
+      Transition *compensate2_t5 = TheNet->newTransition(newPrefix + "t5");
       TheNet->newArc(compensate2_p2, compensate2_t5);
       TheNet->newArc(compensate2_p3, compensate2_t5);
       TheNet->newArc(compensate2_t5, compensate2_p7);
@@ -1131,7 +1131,7 @@ This=implicitFaultHandler() provided (!This->inProcess) ->
       Place *p16 = TheNet->newPlace(prefix + "!Ended");
       Place *p17 = TheNet->newPlace(prefix + "Ended");
 
-      Transition *t1  = TheNet->newTransition(prefix + "t1");
+      Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p2, t1);
       TheNet->newArc(p7, t1, "x");
       TheNet->newArc(t1, p9, "x");
@@ -1140,20 +1140,20 @@ This=implicitFaultHandler() provided (!This->inProcess) ->
       TheNet->newArc(p16, t1);
       TheNet->newArc(t1, p17);
 
-      Transition *t2  = TheNet->newTransition(prefix + "t2");
+      Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p2, t2);
       TheNet->newArc(p8, t2);
       TheNet->newArc(t2, p10);
       TheNet->newArc(t2, p11);
       TheNet->newArc(t2, p14);
 
-      Transition *t3  = TheNet->newTransition(prefix + "t3");
+      Transition *t3 = TheNet->newTransition(prefix + "t3");
       TheNet->newArc(t3, p3);
       TheNet->newArc(p7, t3, "x");
       TheNet->newArc(t3, p12, "y");
       TheNet->newArc(p13, t3, "y");
 
-      Transition *t4  = TheNet->newTransition(prefix + "t4");
+      Transition *t4 = TheNet->newTransition(prefix + "t4");
       TheNet->newArc(p6, t4);
       TheNet->newArc(t4, p9, "y");
       TheNet->newArc(t4, p11);
@@ -1162,11 +1162,11 @@ This=implicitFaultHandler() provided (!This->inProcess) ->
       TheNet->newArc(p16, t4);
       TheNet->newArc(t4, p17);
 
-      Transition *t5  = TheNet->newTransition(prefix + "t5");
+      Transition *t5 = TheNet->newTransition(prefix + "t5");
       TheNet->newArc(p8, t5, READ);
       TheNet->newArc(p13, t5, "y");
 
-      Transition *t6  = TheNet->newTransition(prefix + "t6");
+      Transition *t6 = TheNet->newTransition(prefix + "t6");
       TheNet->newArc(p13, t6, "y");
       TheNet->newArc(p17, t6, READ);
       
@@ -1182,27 +1182,27 @@ This=implicitFaultHandler() provided (!This->inProcess) ->
       Place *compensate_p6 = TheNet->newPlace(compensate_prefix + "ch_out");
       Place *compensate_p7 = TheNet->newPlace(compensate_prefix + "stopped");
 
-      Transition *compensate_t1  = TheNet->newTransition(compensate_prefix + "t1");
+      Transition *compensate_t1 = TheNet->newTransition(compensate_prefix + "t1");
       TheNet->newArc(compensate_p1, compensate_t1);
       TheNet->newArc(compensate_t1, compensate_p2);
       TheNet->newArc(compensate_t1, compensate_p5);
 
-      Transition *compensate_t2  = TheNet->newTransition(compensate_prefix + "t2");
+      Transition *compensate_t2 = TheNet->newTransition(compensate_prefix + "t2");
       TheNet->newArc(compensate_p2, compensate_t2);
       TheNet->newArc(compensate_t2, compensate_p3);
       TheNet->newArc(compensate_p6, compensate_t2);
 
-      Transition *compensate_t3  = TheNet->newTransition(compensate_prefix + "t3");
+      Transition *compensate_t3 = TheNet->newTransition(compensate_prefix + "t3");
       TheNet->newArc(compensate_p1, compensate_t3);
       TheNet->newArc(compensate_p4, compensate_t3);
       TheNet->newArc(compensate_t3, compensate_p7);
 
-      Transition *compensate_t4  = TheNet->newTransition(compensate_prefix + "t4");
+      Transition *compensate_t4 = TheNet->newTransition(compensate_prefix + "t4");
       TheNet->newArc(compensate_p2, compensate_t4);
       TheNet->newArc(compensate_p4, compensate_t4);
       TheNet->newArc(compensate_t4, compensate_p7);
 
-      Transition *compensate_t5  = TheNet->newTransition(compensate_prefix + "t5");
+      Transition *compensate_t5 = TheNet->newTransition(compensate_prefix + "t5");
       TheNet->newArc(compensate_p2, compensate_t5);
       TheNet->newArc(compensate_p3, compensate_t5);
       TheNet->newArc(compensate_t5, compensate_p7);
@@ -1257,12 +1257,12 @@ This=userDefinedEventHandler(a,b) ->
       Place *p22 = TheNet->newPlace(prefix + "stop");
       Place *p23 = TheNet->newPlace(prefix + "stopped");
 
-      Transition *t5  = TheNet->newTransition(prefix + "t5");
+      Transition *t5 = TheNet->newTransition(prefix + "t5");
       TheNet->newArc(p6, t5);
       TheNet->newArc(t5, p17);
       TheNet->newArc(TheNet->findPlace("1.internal.clock"), t5, READ, "x");
 
-      Transition *t7  = TheNet->newTransition(prefix + "allFinished");
+      Transition *t7 = TheNet->newTransition(prefix + "allFinished");
       TheNet->newArc(t7, p8);
       TheNet->newArc(p18, t7);
 
@@ -1312,32 +1312,32 @@ This=userDefinedEventHandler(a,b) ->
 	Place *onMessage_p11 = TheNet->newPlace(newPrefix + "stop" + message );
 	Place *onMessage_p12 = TheNet->newPlace(newPrefix + "p12");
 
-	Transition *onMessage_t2  = TheNet->newTransition(newPrefix + "t2");
+	Transition *onMessage_t2 = TheNet->newTransition(newPrefix + "t2");
 	TheNet->newArc(TheNet->findPlace("in." + string(ThisBranch->channelID->name)), onMessage_t2, "M" + message);
 	TheNet->newArc(onMessage_t2, onMessage_p2, "(M" + message + ",CS" + message + ")" );
 	TheNet->newArc(onMessage_p5, onMessage_t2);
 
-	Transition *onMessage_t3  = TheNet->newTransition(newPrefix + "t3", "!guard" + message );
+	Transition *onMessage_t3 = TheNet->newTransition(newPrefix + "t3", "!guard" + message );
 	TheNet->newArc(TheNet->findPlace("variable." + string(ThisBranch->variableID->name)), onMessage_t3, "V" + message);
   	TheNet->newArc(onMessage_t3, TheNet->findPlace("variable." + string(ThisBranch->variableID->name)), "M" + message);
 	TheNet->newArc(onMessage_p2, onMessage_t3, "(M" + message + ",CS" + message + ")" );
 	TheNet->newArc(onMessage_t3, onMessage_p3);
 
-	Transition *onMessage_t4  = TheNet->newTransition(newPrefix + "t4");
+	Transition *onMessage_t4 = TheNet->newTransition(newPrefix + "t4");
 	TheNet->newArc(onMessage_p4, onMessage_t4);
 	TheNet->newArc(onMessage_t4, onMessage_p5);
 
-	Transition *onMessage_t5  = TheNet->newTransition(newPrefix + "t5");
+	Transition *onMessage_t5 = TheNet->newTransition(newPrefix + "t5");
 	TheNet->newArc(onMessage_p5, onMessage_t5);
 	TheNet->newArc(onMessage_t5, onMessage_p6);
 	TheNet->newArc(onMessage_p7, onMessage_t5);
 
-	Transition *onMessage_t7  = TheNet->newTransition(newPrefix + "t7");
+	Transition *onMessage_t7 = TheNet->newTransition(newPrefix + "t7");
 	TheNet->newArc(onMessage_p7, onMessage_t7);
 	TheNet->newArc(onMessage_p9, onMessage_t7);
 	TheNet->newArc(onMessage_t7, onMessage_p11);
 
-	Transition *onMessage_t8  = TheNet->newTransition(newPrefix + "t8");
+	Transition *onMessage_t8 = TheNet->newTransition(newPrefix + "t8");
 	TheNet->newArc(onMessage_p6, onMessage_t8);
 	TheNet->newArc(onMessage_p9, onMessage_t8);
 	TheNet->newArc(onMessage_t8, onMessage_p12);
@@ -1554,18 +1554,18 @@ This=implicitCompensationHandler() ->
 	TheNet->newArc(p3, TheNet->findPlace(prefix + "throwFault.ch_in"), READ);
       }
 
-      Transition *t2  = TheNet->newTransition(prefix + "t2", "scope=s");
+      Transition *t2 = TheNet->newTransition(prefix + "t2", "scope=s");
       TheNet->newArc(p2, t2, "s");
       TheNet->newArc(p4, t2, READ);
       TheNet->newArc(p5, t2, READ);
       TheNet->newArc(t2, p9, "scopeName");
 
-      Transition *t3  = TheNet->newTransition(prefix + "t3");
+      Transition *t3 = TheNet->newTransition(prefix + "t3");
       TheNet->newArc(p1, t3);
       TheNet->newArc(t3, p13);
       TheNet->newArc(p24, t3);
 
-      Transition *t4  = TheNet->newTransition(prefix + "t4", "scope=s");
+      Transition *t4 = TheNet->newTransition(prefix + "t4", "scope=s");
       TheNet->newArc(p2, t4);
       TheNet->newArc(t4, p3);
       TheNet->newArc(p5, t4);
@@ -1573,22 +1573,22 @@ This=implicitCompensationHandler() ->
       TheNet->newArc(t4, p11);
       TheNet->newArc(t4, p15);
 
-      Transition *t6  = TheNet->newTransition(prefix + "t6");
+      Transition *t6 = TheNet->newTransition(prefix + "t6");
       TheNet->newArc(p14, t6);
       TheNet->newArc(t6, p11);
       TheNet->newArc(t6, p16);
 
-      Transition *t7  = TheNet->newTransition(prefix + "t7");
+      Transition *t7 = TheNet->newTransition(prefix + "t7");
       TheNet->newArc(t7, p9, "scopeName");
       TheNet->newArc(p11, t7);
       TheNet->newArc(p15, t7);
 
-      Transition *t8  = TheNet->newTransition(prefix + "t8");
+      Transition *t8 = TheNet->newTransition(prefix + "t8");
       TheNet->newArc(p11, t8);
       TheNet->newArc(p16, t8);
       TheNet->newArc(t8, p17);
 
-      Transition *t9  = TheNet->newTransition(prefix + "t9");
+      Transition *t9 = TheNet->newTransition(prefix + "t9");
       TheNet->newArc(t9, p11);
       TheNet->newArc(p16, t9, READ);
       TheNet->newArc(p18, t9, "copeScopeName");
@@ -1680,39 +1680,39 @@ This=userDefinedCompensationHandler(innerActivity) ->
 	TheNet->newArc(p3, TheNet->findPlace(prefix + "throwFault.ch_in"), READ);
       }
       
-      Transition *t2  = TheNet->newTransition(prefix + "t2", "scope=s");
+      Transition *t2 = TheNet->newTransition(prefix + "t2", "scope=s");
       TheNet->newArc(p2, t2, "s");
       TheNet->newArc(p4, t2, READ);
       TheNet->newArc(p5, t2, READ);
       TheNet->newArc(t2, p9);
 
-      Transition *t3  = TheNet->newTransition(prefix + "t3");
+      Transition *t3 = TheNet->newTransition(prefix + "t3");
       TheNet->newArc(p1, t3);
       TheNet->newArc(t3, p13);
       TheNet->newArc(p24, t3);
 
-      Transition *t4  = TheNet->newTransition(prefix + "t4", "scope=s");
+      Transition *t4 = TheNet->newTransition(prefix + "t4", "scope=s");
       TheNet->newArc(p2, t4, "s");
       TheNet->newArc(t4, p3);
       TheNet->newArc(p5, t4);
       TheNet->newArc(p6, t4, READ);
       TheNet->newArc(t4, p7);
 
-      Transition *t5  = TheNet->newTransition(prefix + "t5");
+      Transition *t5 = TheNet->newTransition(prefix + "t5");
       TheNet->newArc(p8, t5);
       TheNet->newArc(t5, p9);
 
-      Transition *t6  = TheNet->newTransition(prefix + "t6");
+      Transition *t6 = TheNet->newTransition(prefix + "t6");
       TheNet->newArc(t6, p11);
       TheNet->newArc(p14, t6);
       TheNet->newArc(t6, p16);
 
-      Transition *t8  = TheNet->newTransition(prefix + "t8");
+      Transition *t8 = TheNet->newTransition(prefix + "t8");
       TheNet->newArc(p11, t8);
       TheNet->newArc(p16, t8);
       TheNet->newArc(t8, p17);
 
-      Transition *t9  = TheNet->newTransition(prefix + "t9");
+      Transition *t9 = TheNet->newTransition(prefix + "t9");
       TheNet->newArc(t9, p11);
       TheNet->newArc(p12, t9);
       TheNet->newArc(p16, t9, READ);
@@ -1912,22 +1912,22 @@ This=Invoke(a,b) provided (This->outputVariable != mkcasestring("")) ->
       Place *p7 = TheNet->newPlace(prefix + "stop");
       Place *p8 = TheNet->newPlace(prefix + "stopped");
 
-      Transition *t1  = TheNet->newTransition(prefix + "t1");
+      Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1);
       TheNet->newArc(TheNet->findPlace("variable." + string(This->variableIDin->name)), t1, READ, "X");
       TheNet->newArc(t1, p2, "(X,CS1)");
 
-      Transition *t2  = TheNet->newTransition(prefix + "t2", "!guard1");
+      Transition *t2 = TheNet->newTransition(prefix + "t2", "!guard1");
       TheNet->newArc(t2, TheNet->findPlace("out." + string(This->channelID->name)), "X");
       TheNet->newArc(p2, t2, "(X,CS1)");
       TheNet->newArc(t2, p3);
 
-      Transition *t3  = TheNet->newTransition(prefix + "t3");
+      Transition *t3 = TheNet->newTransition(prefix + "t3");
       TheNet->newArc(TheNet->findPlace("in." + string(This->channelID->name)), t3, "Y");
       TheNet->newArc(p3, t3);
       TheNet->newArc(t3, p4, "(Y,CS2)");
 
-      Transition *t4  = TheNet->newTransition(prefix + "t4", "!guard2");
+      Transition *t4 = TheNet->newTransition(prefix + "t4", "!guard2");
       TheNet->newArc(p4, t4, "(Y,CS2)");
       TheNet->newArc(t4, p5);
       TheNet->newArc(TheNet->findPlace("variable." + string(This->variableIDout->name)), t4, "V");
@@ -2163,7 +2163,7 @@ This=Wait(a) provided (This->until != mkcasestring("")) ->
       Place *p3 = TheNet->newPlace(prefix + "stop");
       Place *p4 = TheNet->newPlace(prefix + "stopped");
 
-      Transition *t1  = TheNet->newTransition(prefix + "t1", guard);
+      Transition *t1 = TheNet->newTransition(prefix + "t1", guard);
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       TheNet->newArc(TheNet->findPlace("1.internal.clock"), t1, READ, "x");
@@ -2191,12 +2191,12 @@ This=Wait(a) provided (This->For != mkcasestring("")) ->
       Place *p4 = TheNet->newPlace(prefix + "stop");
       Place *p5 = TheNet->newPlace(prefix + "stopped");
 
-      Transition *t1  = TheNet->newTransition(prefix + "t1");
+      Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2, "x");
       TheNet->newArc(TheNet->findPlace("1.internal.clock"), t1, READ, "x");
 
-      Transition *t2  = TheNet->newTransition(prefix + "t2", guard);
+      Transition *t2 = TheNet->newTransition(prefix + "t2", guard);
       TheNet->newArc(p2, t2, "x");
       TheNet->newArc(t2, p3);
       TheNet->newArc(TheNet->findPlace("1.internal.clock"), t2, READ, "y");
@@ -2276,12 +2276,12 @@ This=Compensate(a) provided (!This->inFaultHandler && This->scope == mkcasestrin
       Place *p6 = TheNet->newPlace(prefix + "done");
       Place *p7 = TheNet->newPlace(prefix + "stopped");
 
-      Transition *t1  = TheNet->newTransition(prefix + "t1");
+      Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       TheNet->newArc(t1, p5);
 
-      Transition *t2  = TheNet->newTransition(prefix + "t2");
+      Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       TheNet->newArc(p6, t2);
@@ -2315,12 +2315,12 @@ This=Compensate(a) provided (This->inFaultHandler && This->scope == mkcasestring
       Place *p6 = TheNet->newPlace(prefix + "ch_out");
       Place *p7 = TheNet->newPlace(prefix + "stopped");
 
-      Transition *t1  = TheNet->newTransition(prefix + "t1");
+      Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       TheNet->newArc(t1, p5);
 
-      Transition *t2  = TheNet->newTransition(prefix + "t2");
+      Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       TheNet->newArc(p6, t2);
@@ -2354,12 +2354,12 @@ This=Compensate(a) provided (!This->inFaultHandler && This->scope != mkcasestrin
       Place *p6 = TheNet->newPlace(prefix + "scopeCompensated");
       Place *p7 = TheNet->newPlace(prefix + "stopped");
 
-      Transition *t1  = TheNet->newTransition(prefix + "t1");
+      Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       TheNet->newArc(t1, p5, string(This->scope->name));
 
-      Transition *t2  = TheNet->newTransition(prefix + "t2", string(This->scope->name) + "=scopeName");
+      Transition *t2 = TheNet->newTransition(prefix + "t2", string(This->scope->name) + "=scopeName");
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       TheNet->newArc(p6, t2, "scopeName");
@@ -2392,12 +2392,12 @@ This=Compensate(a) provided (This->inFaultHandler && This->scope != mkcasestring
       Place *p6 = TheNet->newPlace(prefix + "compensated");
       Place *p7 = TheNet->newPlace(prefix + "stopped");
 
-      Transition *t1  = TheNet->newTransition(prefix + "t1");
+      Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       TheNet->newArc(t1, p5, string(This->scope->name));
 
-      Transition *t2  = TheNet->newTransition(prefix + "t2", string(This->scope->name) + "=scopeName");
+      Transition *t2 = TheNet->newTransition(prefix + "t2", string(This->scope->name) + "=scopeName");
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       TheNet->newArc(p6, t2, "scopeName");
@@ -2444,12 +2444,12 @@ This=Terminate(a) ->
       Place *p6 = TheNet->newPlace(prefix + "terminate");
       Place *p7 = TheNet->newPlace(prefix + "stopped");
 
-      Transition *t1  = TheNet->newTransition(prefix + "t1");
+      Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       TheNet->newArc(p5, t1, READ);
 
-      Transition *t2  = TheNet->newTransition(prefix + "t2");
+      Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p1, t2);
       TheNet->newArc(t2, p2);
       TheNet->newArc(t2, p5);
@@ -2497,7 +2497,7 @@ TheActivity=activityFlow(This=Flow(a,b,c)) ->
       Place *p16 = TheNet->newPlace(prefix + "stopped");
 
       // DPE //
-      Transition *t1;
+      Transition *t1 = NULL;
       if (This->dpe->value > 0)
       {
 	Place *p1  = TheNet->newPlace(prefix + "negLink"); //DPE//
@@ -2571,7 +2571,7 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
       Place *p11 = TheNet->newPlace(prefix + "stop");
       Place *p12 = TheNet->newPlace(prefix + "stopped");
 
-      Transition *t1;
+      Transition *t1 = NULL;
       if (This->dpe->value > 0)
       {
 	t1 = TheNet->newTransition(prefix + "t1");
@@ -2579,7 +2579,7 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
 	TheNet->newArc(p1, t1);
       }
       
-      Transition *t3 =  TheNet->newTransition(prefix + "t3");
+      Transition *t3 = TheNet->newTransition(prefix + "t3");
       TheNet->newArc(p5, t3);
       TheNet->newArc(t3, p6, "x");
 
@@ -2601,8 +2601,8 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
 	string condition = caseBranch->condition->name;
 	string caseNumber = intToString(currentCase);
 
-	Transition *t2;
-	Transition *t4;
+	Transition *t2 = NULL;
+	Transition *t4 = NULL;
 	
 	if (currentCase == 1)
 	{
@@ -2779,7 +2779,7 @@ This=activitySequence(Sequence(a,b)) ->
       Place *p11 = TheNet->newPlace(prefix + "stopped");
 
       // DPE //
-      Transition *t1;
+      Transition *t1 = NULL;
       if (This->dpe->value > 0)
       {
 	Place *p1  = TheNet->newPlace(prefix + "negLink");
@@ -2843,7 +2843,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
       Place *p12 = TheNet->newPlace(prefix + "stopped");
 
       // DPE
-      Transition *t1;
+      Transition *t1 = NULL;
       if (This->dpe->value > 0)
       {
 	t1 = TheNet->newTransition(prefix + "t1");
@@ -3049,7 +3049,7 @@ This=Scope(a,b,c,d,e,f,g)
       Place *ch_faulted = TheNet->newPlace(prefix + "CHFaulted");
       Place *ch_not_faulted = TheNet->newPlace(prefix + "!CHFaulted");
       
-      Transition *t2  = TheNet->newTransition(prefix + "t2");
+      Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p10);
       TheNet->newArc(t2, p11);
@@ -3059,7 +3059,7 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->newArc(t2, p21);
       TheNet->newArc(t2, fh_not_faulted);
 
-      Transition *t4  = TheNet->newTransition(prefix + "t4");
+      Transition *t4 = TheNet->newTransition(prefix + "t4");
       TheNet->newArc(p10, t4);
       TheNet->newArc(p11, t4);
       TheNet->newArc(t4, p12);
@@ -3069,21 +3069,21 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->newArc(p35, t4);
       TheNet->newArc(t4, p51);
 
-      Transition *t7  = TheNet->newTransition(prefix + "t7");
+      Transition *t7 = TheNet->newTransition(prefix + "t7");
       TheNet->newArc(p8, t7, READ);
       TheNet->newArc(p10, t7);
       TheNet->newArc(t7, p14);
       TheNet->newArc(p20, t7);
       TheNet->newArc(t7, p36); 
 
-      Transition *t8  = TheNet->newTransition(prefix + "t8");
+      Transition *t8 = TheNet->newTransition(prefix + "t8");
       TheNet->newArc(p9, t8, READ);
       TheNet->newArc(p10, t8);
       TheNet->newArc(t8, p14);
       TheNet->newArc(p20, t8);
       TheNet->newArc(t8, p37);
 
-      Transition *t9  = TheNet->newTransition(prefix + "t9");
+      Transition *t9 = TheNet->newTransition(prefix + "t9");
       TheNet->newArc(p2, t9);
       TheNet->newArc(p20, t9);
       TheNet->newArc(t9, p45);
@@ -3112,20 +3112,20 @@ This=Scope(a,b,c,d,e,f,g)
   	TheNet->newArc(t2, p25);    
 	TheNet->newArc(p27, t4);
 	
-      	Transition *t1  = TheNet->newTransition(prefix + "t1");
+      	Transition *t1 = TheNet->newTransition(prefix + "t1");
     	TheNet->newArc(p29, t1);
   	TheNet->newArc(t1, p38); 
 	
-	Transition *t3  = TheNet->newTransition(prefix + "t3");
+	Transition *t3 = TheNet->newTransition(prefix + "t3");
       	TheNet->newArc(p22, t3);
     	TheNet->newArc(t3, p26);
   	TheNet->newArc(t3, p35);
 	
-	Transition *t5  = TheNet->newTransition(prefix + "t5");
+	Transition *t5 = TheNet->newTransition(prefix + "t5");
 	TheNet->newArc(p24, t5);
 	TheNet->newArc(t5, p28);
 
-	Transition *t6  = TheNet->newTransition(prefix + "t6");
+	Transition *t6 = TheNet->newTransition(prefix + "t6");
 	TheNet->newArc(p23, t6);
 	TheNet->newArc(t6, p28);
 	TheNet->newArc(p35, t6);
@@ -3320,7 +3320,7 @@ This=StandardElements(NiltTarget_list(), a) ->
       Place *p7 = TheNet->newPlace(prefix + "stopped");
 
       // DPE
-      Transition *t1;
+      Transition *t1 = NULL;
       if (This->dpe->value > 0)
       {
 	t1 = TheNet->newTransition(prefix + "t1");
@@ -3501,7 +3501,7 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
       Place *p16 = TheNet->newPlace(prefix + "initial");
 
       // DPE
-      Transition *t1;
+      Transition *t1 = NULL;
       if (This->dpe->value > 0)
       {
 	Place *p9  = TheNet->newPlace(prefix + "negLink");
@@ -3604,7 +3604,7 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
       Place *p17 = TheNet->newPlace(prefix + "p17");
 
       // DPE
-      Transition *t1;
+      Transition *t1 = NULL;
       if (This->dpe->value > 0)
       {
 	Place *p9  = TheNet->newPlace(prefix + "negLink");

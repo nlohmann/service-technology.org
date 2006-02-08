@@ -28,11 +28,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/02/03 10:00:04 $
+ *          - last changed: \$Date: 2006/02/08 10:22:42 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
  */
 %}
 
@@ -387,7 +387,7 @@ While(a,b) ->
 ******************************************************************************/
 
 activitySequence(Sequence(a,b)) ->
-  [xml: { inup(); } "<sequence id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a b { indown(); } "</sequence>\n"]
+  [xml: { inup(); } "<sequence id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\" dpe=\"" $0->dpe "\">\n" a b { indown(); } "</sequence>\n"]
 ;
 
 

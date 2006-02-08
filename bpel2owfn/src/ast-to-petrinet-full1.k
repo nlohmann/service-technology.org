@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/08 11:29:19 $
+ *          - last changed: \$Date: 2006/02/08 11:43:42 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.120 $
+ * \version \$Revision: 1.121 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -74,6 +74,7 @@
 #include "petrinet.h"
 #include "check-symbols.h"
 #include "options.h"
+#include "bpel-unparse-tools.h"
 	
 using namespace std;
 
@@ -86,141 +87,6 @@ extern SymbolManager symMan;
 /// prefix of the current scope (read by the stop pattern and used to direct
 /// failures to the correct fault_in place)
 string currentScope;
-
-
-
-
-/**
- * Generates transitions to throw a fault.
- * 
- * \param p1  the place in positive control flow from which the control flow
- *            enters the negative control flow
- *
- * \param p2  the place of the pattern on which a token shall be produced which
- *            can only be removed by stopping the pattern
- *
- * \param guard  guard of the transition which throws the fault (usually
- *               "guard")
- *
- * \param p1name  name of place p1 which is used to label the generated
- *                transitions (e.g. if p1 is called "running" generated
- *                transitions end with this name (e.g. "throwFault.running")
- *
- * \param inscription  inscription of the incoming arc to the fault transition
- *
- * \param prefix  prefix of the pattern to label generated places and
- *                transitions
- *
- * \param negativeControlFlow  signals where the activity is located:
- *                             - 0: inside a scope or the process
- *                             - 1: inside a fault handler
- *                             - 2: inside a compensation handler
- *
- * \param preventFurtherFaults  controls what happens to further faults
- *                               - true: these faults are prevented (standard)
- *                               - false: these faults are suppressed
- *
- * \todo outsource this function
-*/
-void throwFault(Place *p1, Place *p2,
-    string guard, string p1name, string inscription, string prefix,
-    integer negativeControlFlow, bool preventFurtherFaults = true)
-{
-  switch (negativeControlFlow->value)
-  {
-    case(0): // activity in scope or process
-    {
-      Transition *faultTransition1 = TheNet->newTransition(prefix + "throwFault." + p1name, guard);
-      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), faultTransition1);
-      TheNet->newArc(faultTransition1, TheNet->findPlace(currentScope + "!Active"));
-      TheNet->newArc(p1, faultTransition1, inscription); // leave positive control flow
-      TheNet->newArc(faultTransition1, p2); // place p2 will be connected with stop
-      TheNet->newArc(faultTransition1, TheNet->findPlace(currentScope + "stop.fault_in"), "fault");
-
-      if (!preventFurtherFaults)
-      {
-	Transition *faultTransition2 = TheNet->newTransition(prefix + "ignoreFault." + p1name, guard);
-	TheNet->newArc(TheNet->findPlace(currentScope + "!Active"), faultTransition2, READ);
-	TheNet->newArc(p1, faultTransition2, inscription); // leave positive control flow
-	TheNet->newArc(faultTransition2, p2); // place p2 will be connected with stop
-      }
-      break;
-    }
-
-    case(1): // activity in fault handler
-    {
-      Transition *faultTransition1 = TheNet->newTransition(prefix + "throwFault." + p1name, guard);
-      TheNet->newArc(TheNet->findPlace(currentScope + "!FHFaulted"), faultTransition1);
-      TheNet->newArc(faultTransition1, TheNet->findPlace(currentScope + "FHFaulted"));
-      TheNet->newArc(p1, faultTransition1, inscription); // leave positive control flow
-      TheNet->newArc(faultTransition1, p2); // place p2 will be connected with stop
-      TheNet->newArc(faultTransition1, TheNet->findPlace(currentScope + "stop.fh_fault_in"), "fault");
-
-      if (!preventFurtherFaults)
-      {
-	Transition *faultTransition2 = TheNet->newTransition(prefix + "ignoreFault." + p1name, guard);
-	TheNet->newArc(TheNet->findPlace(currentScope + "FHFaulted"), faultTransition2, READ);
-	TheNet->newArc(p1, faultTransition2, inscription); // leave positive control flow
-	TheNet->newArc(faultTransition2, p2); // place p2 will be connected with stop
-      }
-      break;
-    }
-
-    case(2): // activity in compensation handler
-    {
-      Transition *faultTransition1 = TheNet->newTransition(prefix + "throwFault." + p1name, guard);
-      TheNet->newArc(TheNet->findPlace(currentScope + "!CHFaulted"), faultTransition1);
-      TheNet->newArc(faultTransition1, TheNet->findPlace(currentScope + "CHFaulted"));
-      TheNet->newArc(p1, faultTransition1, inscription); // leave positive control flow
-      TheNet->newArc(faultTransition1, p2); // place p2 will be connected with stop
-      TheNet->newArc(faultTransition1, TheNet->findPlace(currentScope + "stop.ch_fault_in"), "fault");
-
-      if (!preventFurtherFaults)
-      {
-	Transition *faultTransition2 = TheNet->newTransition(prefix + "ignoreFault." + p1name, guard);
-	TheNet->newArc(TheNet->findPlace(currentScope + "CHFaulted"), faultTransition2, READ);
-	TheNet->newArc(p1, faultTransition2, inscription); // leave positive control flow
-	TheNet->newArc(faultTransition2, p2); // place p2 will be connected with stop
-      }
-      break;
-    }
-
-    default:
-    {
-      /* should never happen */
-    }    
-  }
-}
-
-
-
-/**
- * Generates a transition to stop the activity, i.e. a transition moving a
- * token on the "stop" place to "stopped".
- * 
- * \param p  the place in control flow from which the token is move to
- *           "stop"
- *
- * \param p_name  name of place p which is used to label the generated
- *                transition (e.g. if p1 is called "running" generated
- *                transition end with this name (e.g. "stop.running")
- *
- * \param inscription  inscription of the incoming arc to the fault transition
- *
- * \param prefix  prefix of the pattern to label generated transition
- *
- * \todo outsource this function
- */
-void stop(Place *p, string p_name, string inscription, string prefix)
-{
-  Transition *stopTransition = TheNet->newTransition(prefix + "stoppedAt." + p_name);
-  TheNet->newArc(TheNet->findPlace(prefix + "stop"), stopTransition);
-  TheNet->newArc(stopTransition, TheNet->findPlace(prefix + "stopped"));
-  TheNet->newArc(p, stopTransition, inscription);
-}
-
-
-
 
 %}
 

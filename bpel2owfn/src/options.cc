@@ -183,10 +183,16 @@ void parse_command_line(int argc, char* argv[])
 	      else if (mode == "cfg") {
 		modus = M_CFG;
 	      }
+	      else
+	      {
+		throw Exception(OPTION_MISMATCH, 
+				"Unknown mode \"" + mode +"\".\n",
+				"Type " + progname + " -h for more information.\n");
+	      }
 	      if (options[O_MODE] && modus != old_modus)
 	      {
 		throw Exception(OPTION_MISMATCH, 
-				"Choose only one mode\n",
+				"Choose only one mode!\n",
 				"Type " + progname + " -h for more information.\n");
 	      }
 	      options[O_MODE] = true;
@@ -295,6 +301,20 @@ void parse_command_line(int argc, char* argv[])
 	      else if (format == suffixes[F_XML])
 	      {
 		formats[F_XML] = true;
+ 	        if (options[O_MODE] && modus != M_PRETTY)
+	        {
+		  throw Exception(OPTION_MISMATCH, 
+				  "Choose only one mode\n",
+				  "Type " + progname + " -h for more information.\n");
+	        }
+	    	modus = M_PRETTY;
+	        options[O_MODE] = true;
+	      }
+	      else
+	      {
+		throw Exception(OPTION_MISMATCH, 
+				"Unknown format \"" + format +"\".\n",
+				"Type " + progname + " -h for more information.\n");
 	      }
 	      break;
       case 'p':
@@ -327,6 +347,12 @@ void parse_command_line(int argc, char* argv[])
 	      else if ( parameter == "nostandardfaults" )
 	      {
 		parameters[P_NOSTANDARDFAULTS] = true;
+	      }
+	      else
+	      {
+		throw Exception(OPTION_MISMATCH, 
+				"Unknown parameter \"" + parameter +"\".\n",
+				"Type " + progname + " -h for more information.\n");
 	      }
 	      break;
       case 'd':

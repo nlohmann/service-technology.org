@@ -73,6 +73,23 @@ unsigned int SymbolTable::insert(unsigned int elementId)
 {
   switch(elementId)
   {
+    case K_LINK:
+    {
+      traceST("LINK\n");
+      symTab[this->nextKey()] = new STLink(elementId, this->entryKey);
+//      traceST("--> " + intToString(this->entryKey) + "\n");
+    }
+
+    break;
+
+    case K_PARTNER:
+    {
+      traceST("PARTNER\n");
+      symTab[this->nextKey()] = new STPartner(elementId, this->entryKey);
+//      traceST("--> " + intToString(this->entryKey) + "\n");
+    }
+    break;
+
     case K_PARTNERLINK:
     {
       traceST("PARTNERLINK\n");
@@ -151,6 +168,13 @@ void SymbolTable::addAttribute(unsigned int entryKey, STAttribute* attribute)
   ///
   switch((dynamic_cast <SymbolTableEntry*> (symTab[entryKey]))->elementId)
   {
+    case K_LINK:
+    {
+//      traceST("cast to STLink\n");
+      (dynamic_cast <STLink*> (symTab[entryKey]))->mapOfAttributes[attribute->name->name] = attribute;
+      break;
+    }
+
     case K_PARTNER:
     {
 //      traceST("cast to STPartner\n");
@@ -203,6 +227,13 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
   ///
   switch((dynamic_cast <SymbolTableEntry*> (symTab[entryKey]))->elementId)
   {
+    case K_LINK:
+    {
+//      traceST("cast to STLink\n");
+      return (dynamic_cast <STLink*> (symTab[entryKey]))->mapOfAttributes[name];
+      break;
+    }
+
     case K_PARTNER:
     {
 //      traceST("cast to STPartner\n");
@@ -378,6 +409,17 @@ STAttribute::~STAttribute() {}
 /********************************************
  * implementation of Link CLASS
  ********************************************/
+
+/*!
+ * constructor
+ */
+STLink::STLink(unsigned int elementId, unsigned int entryKey)
+ :SymbolTableEntry(elementId, entryKey) {}
+
+/*!
+ * destructor
+ */
+STLink::~STLink() {}
 
 /********************************************
  * implementation of Partner CLASS

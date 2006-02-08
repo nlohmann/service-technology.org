@@ -33,7 +33,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.8 $: 
+ * \version \$Revision: 1.9 $: 
  *
  */
 
@@ -240,9 +240,16 @@ class STVariable : public STElement, public SymbolTableEntry
  * \brief
  * 
  */
-class STLink: public STElement
+class STLink: public STElement, public SymbolTableEntry
 {
   public:
+    /// constructor
+    STLink();
+    STLink(unsigned int elementId, unsigned int entryKey);
+        
+    /// destructor
+    ~STLink();
+
     /// the name of the link
     string name;
     

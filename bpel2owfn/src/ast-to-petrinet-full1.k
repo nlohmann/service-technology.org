@@ -33,18 +33,17 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/09 15:04:05 $
+ *          - last changed: \$Date: 2006/02/09 19:09:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
- *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
- *          for details.
+ *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \note    This file was created using Kimwitu++ version 2.3.8 (C) 1998-2003
- *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
+ * \note    This file was created using Kimwitu++ reading file
+ *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.129 $
+ * \version \$Revision: 1.130 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements

@@ -40,14 +40,13 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/02/07 09:33:13 $
+ *          - last changed: \$Date: 2006/02/09 19:09:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
- *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
- *          for details.
+ *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *          
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  */
 
 
@@ -56,6 +55,14 @@
 
 #ifndef PETRINET_H
 #define PETRINET_H
+
+
+
+
+
+/******************************************************************************
+ * Headers
+ *****************************************************************************/
 
 #include <string>
 #include <iostream>
@@ -68,11 +75,18 @@
 #include "debug.h"		// debugging help
 #include "helpers.h"		// helper functions
 #include "exception.h"		// exception class
+#include "options.h"
 #include "bpel2owfn.h"
 
 using namespace std;
 
 
+
+
+
+/******************************************************************************
+ * Data structures
+ *****************************************************************************/
 
 /// Enumeration of the possible types of a place.
 typedef enum
@@ -109,8 +123,9 @@ typedef enum
 
 
 
-/*****************************************************************************/
-
+/******************************************************************************
+ * Classes
+ *****************************************************************************/
 
 /*!
  * \class  Node

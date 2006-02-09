@@ -31,14 +31,13 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/02/09 11:07:38 $
+ *          - last changed: \$Date: 2006/02/09 19:09:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
- *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
- *          for details.
+ *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.89 $
+ * \version \$Revision: 1.90 $
  */
 
 
@@ -46,14 +45,24 @@
 
 
 #include "petrinet.h"
-#include "options.h"
 
+
+
+
+
+/******************************************************************************
+ * External variables
+ *****************************************************************************/
 
 extern SymbolManager symMan;	// defined in bpel-syntax.yy
 
 
 
 
+
+/******************************************************************************
+ * Helper functions
+ *****************************************************************************/
 
 /*!
  * \todo
@@ -75,8 +84,9 @@ set < pair < Node *, arc_type > >setUnion (set < pair < Node *, arc_type > >a,
 
 
 
-/*****************************************************************************/
-
+/******************************************************************************
+ * Implementation of class functions
+ *****************************************************************************/
 
 /*!
  * \param role a role of a node
@@ -371,21 +381,9 @@ PetriNet::newPlace (string role, place_type mytype)
 
   switch (mytype)
   {
-    case (IN):
-      {
-	P_in.insert(p);
-	break;
-      }
-    case (OUT):
-      {
-	P_out.insert(p);
-	break;
-      }
-    default:
-      {
-	P.insert(p);
-	break;
-      }
+    case (IN):	{ P_in.insert(p); break; }
+    case (OUT):	{ P_out.insert(p); break; }
+    default:	{ P.insert(p); break; }
   }
   
   if (role != "")

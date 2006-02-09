@@ -33,18 +33,16 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/02/08 10:22:42 $
+ *          - last changed: \$Date: 2006/02/09 19:09:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universitï¿½t zu Berlin. See
- *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
- *          for details.
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \note    This file was created using Kimwitu++ version 2.3.8 (C) 1998-2003
- *          Humboldt-University of Berlin reading file bpel-abstract.k. See
- *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
+ * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
+ *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  */
 %}
 

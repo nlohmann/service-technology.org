@@ -28,25 +28,22 @@
  * associated control flow block.
  * 
  * \author  
- *          - responsible: Christian Gierds <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/01/26 15:15:34 $
+ *          - last changed: \$Date: 2006/02/09 19:09:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
- *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
- *          for details.
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \note    This file was created using Kimwitu++ version 2.3.8 (C) 1998-2003
- *          Humboldt-University of Berlin reading file bpel-unparse-cfg.k.
+ * \note    This file was created using Kimwitu++ reading file
+ *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.3 $
- * 
- * \todo
+ * \version \$Revision: 1.4 $
  */
 %}
 

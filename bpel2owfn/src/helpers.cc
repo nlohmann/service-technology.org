@@ -28,26 +28,39 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/02/03 10:07:16 $
+ *          - last changed: \$Date: 2006/02/09 19:09:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
- *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
- *          for details.
+ *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.42 $
- *
+ * \version \$Revision: 1.43 $
  */
+
+
+
 
 
 #include "helpers.h"
 
+
+
+
+
+/******************************************************************************
+ * External variables
+ *****************************************************************************/
+
 /// The Petri Net
 extern PetriNet *TheNet;
+
+
+
+
 
 /*!
  * \param a set of Petri net nodes
@@ -78,6 +91,9 @@ string intToString(int i)
   
   return string(buffer);
 }
+
+
+
 
 
 /*!
@@ -186,6 +202,4 @@ void cleanup()
     delete(log_output);
     log_output = &std::cerr;
   }
-
 }
-

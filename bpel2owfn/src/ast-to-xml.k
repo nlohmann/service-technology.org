@@ -32,18 +32,16 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/02/09 11:07:19 $
+ *          - last changed: \$Date: 2006/02/09 19:09:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
- *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
- *          for details.
+ *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \note    This file was created using Kimwitu++ version 2.3.8 (C) 1998-2003
- *          Humboldt-University of Berlin reading file bpel-unparse.k. See
- *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
+ * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
+ *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.28 $
+ * \version \$Revision: 1.29 $
  */
 %}
 

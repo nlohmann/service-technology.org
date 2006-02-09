@@ -31,13 +31,13 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/02/09 20:41:57 $
+ *          - last changed: \$Date: 2006/02/09 20:55:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.92 $
+ * \version \$Revision: 1.93 $
  */
 
 
@@ -55,30 +55,6 @@
  *****************************************************************************/
 
 extern SymbolManager symMan;	// defined in bpel-syntax.yy
-
-
-
-
-
-/******************************************************************************
- * Helper functions
- *****************************************************************************/
-
-/*!
- * \todo
- *       - (nlohmann) comment me!
- *       - (nlohmann) put me into helpers.cc
- */
-set < pair < Node *, arc_type > >setUnion (set < pair < Node *, arc_type > >a,
-					   set < pair < Node *, arc_type > >b)
-{
-  set < pair < Node *, arc_type > >result;
-  insert_iterator < set < pair < Node *, arc_type >, less < pair < Node *,
-    arc_type > > > >res_ins (result, result.begin ());
-  set_union (a.begin (), a.end (), b.begin (), b.end (), res_ins);
-
-  return result;
-}
 
 
 

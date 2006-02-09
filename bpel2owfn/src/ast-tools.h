@@ -18,6 +18,35 @@
  * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
 \****************************************************************************/ 
 
+/*!
+ * \file bpel-unparse-tools.cc
+ *
+ * \brief Unparse helper tools (interface)
+ *
+ * This file defines several helpe functions used during the unparsing
+ * of the abstract syntax tree.
+ * 
+ * \author  
+ *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          - last changes of: \$Author: nlohmann $
+ *          
+ * \date
+ *          - created: 2006/02/08
+ *          - last changed: \$Date: 2006/02/09 15:28:15 $
+ * 
+ * \note    This file is part of the tool BPEL2oWFN and was created during the
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
+ *          for details.
+ *
+ * \version \$Revision: 1.5 $
+ *
+ */
+
+
+
+
+
 #ifndef BPEL_UNPARSE_TOOLS_H
 #define BPEL_UNPARSE_TOOLS_H
 
@@ -40,21 +69,35 @@ extern string currentScope;
 
 
 
+
+
+/******************************************************************************
+ * Functions for the Petri net unparser defined in bpel-unparse-petri.k
+ *****************************************************************************/
+
 Transition *throwFault(Place *p1, Place *p2,
     string guard, string p1name, string inscription, string prefix,
     kc::integer negativeControlFlow, bool preventFurtherFaults = true);
 
 Transition *stop(Place *p, string p_name, string inscription, string prefix);
 
+string inString();
+void header(kc::integer id, bool indent = false);
+void footer(kc::integer id, bool indent = false);
+
+
+
+
+
+/******************************************************************************
+ * Functions for the XML (pretty) unparser defined in bpel-unparse-xml.k
+ *****************************************************************************/
 
 void in();
 void inup();
 void indown();
 
 
-string inString();
-void header(kc::integer id, bool indent = false);
-void footer(kc::integer id, bool indent = false);
 
 
 #endif

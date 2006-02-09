@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/09 14:58:30 $
+ *          - last changed: \$Date: 2006/02/09 15:04:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.128 $
+ * \version \$Revision: 1.129 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -3056,12 +3056,16 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
       foreach (OnMessage(innerActivity1); tOnMessage_list b)
       {
 	foreach (OnMessage(innerActivity2); tOnMessage_list b)
+	{
 	  if ((innerActivity1 != innerActivity2) && (innerActivity2->dpe->value > 0))
 	    TheNet->newArc(TheNet->findTransition(prefix + "onMessage" + intToString(currentMessage) + ".t3"), TheNet->findPlace(innerActivity2, ".negLink"));
+	}
 
 	foreach (OnAlarm(innerActivity2); tOnAlarm_list c)
+	{
 	  if (innerActivity2->dpe->value > 0)
 	    TheNet->newArc(TheNet->findTransition(prefix + "onMessage" + intToString(currentMessage) + ".t3"), TheNet->findPlace(innerActivity2, ".negLink"));
+	}
 
 	currentMessage++;
 
@@ -3073,12 +3077,16 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
       foreach (OnAlarm(innerActivity1); tOnAlarm_list c)
       {
 	foreach (OnAlarm(innerActivity2); tOnAlarm_list c)
+	{
 	  if ((innerActivity1 != innerActivity2) && (innerActivity2->dpe->value > 0))
 	    TheNet->newArc(TheNet->findTransition(prefix + "onAlarm" + intToString(currentAlarm) + ".t6"), TheNet->findPlace(innerActivity2, ".negLink"));
+	}
 
 	foreach (OnMessage(innerActivity2); tOnMessage_list b)
+	{
 	  if (innerActivity2->dpe->value > 0)
 	    TheNet->newArc(TheNet->findTransition(prefix + "onAlarm" + intToString(currentAlarm) + ".t6"), TheNet->findPlace(innerActivity2, ".negLink"));
+	}
 
 	currentAlarm++;
 

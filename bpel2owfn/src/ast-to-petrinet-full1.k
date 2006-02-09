@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/09 11:07:19 $
+ *          - last changed: \$Date: 2006/02/09 13:10:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.126 $
+ * \version \$Revision: 1.127 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -1122,7 +1122,7 @@ This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
 	default: { /* this should never happen */ }
       }
 
-      trace(TRACE_DEBUG, "[PNU]\t\tUser-defined Fault Handler inside scope " + currentScope + "\n");
+      trace(TRACE_DEBUG, "[PNU]\t\tUser-defined Fault Handler inside scope " + currentScope + " (end)\n");
     }
   ]
 ;
@@ -1247,7 +1247,7 @@ This=implicitFaultHandler() provided (!This->inProcess) ->
 
       TheNet->mergePlaces(prefix + "ft", prefix + "fault");
 
-      trace(TRACE_DEBUG, "[PNU]\t\tImplicit Fault Handler inside scope " + currentScope + "\n");
+      trace(TRACE_DEBUG, "[PNU]\t\tImplicit Fault Handler inside scope " + currentScope + " (end)\n");
     }
   ]
 ;
@@ -1486,7 +1486,7 @@ This=userDefinedEventHandler(a,b) ->
 	onAlarmCount++;
       }
 
-      trace(TRACE_DEBUG, "[PNU]\t\tEvent Handler inside scope/process " + currentScope + "\n");      
+      trace(TRACE_DEBUG, "[PNU]\t\tEvent Handler inside scope/process " + currentScope + " (end)\n");      
     }
   ]
 ;
@@ -1616,7 +1616,7 @@ This=implicitCompensationHandler() ->
 	TheNet->newArc(p21, t13, "s");
       }
 
-      trace(TRACE_DEBUG, "[PNU]\t\tImplicit Compensation Handler inside scope/process " + currentScope + "\n");      
+      trace(TRACE_DEBUG, "[PNU]\t\tImplicit Compensation Handler inside scope/process " + currentScope + " (end)\n");      
     }
   ]
 ;
@@ -1846,7 +1846,7 @@ This=Invoke(a,b) provided (This->outputVariable == mkcasestring("")) ->
   [petrinet:
     {
       string prefix = intToString(This->id->value) + ".internal.";
-      header(This->id);
+      //header(This->id);
       
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -1875,7 +1875,7 @@ This=Invoke(a,b) provided (This->outputVariable == mkcasestring("")) ->
     }
     a // standardElements
     {
-      footer(This->id);
+      //footer(This->id);
     }
   ]
 ;
@@ -1885,7 +1885,7 @@ This=Invoke(a,b) provided (This->outputVariable != mkcasestring("")) ->
   [petrinet:
     {
       string prefix = intToString(This->id->value) + ".internal.";
-      header(This->id);
+      //header(This->id);
       
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running1");
@@ -1932,7 +1932,7 @@ This=Invoke(a,b) provided (This->outputVariable != mkcasestring("")) ->
     }
     a // standardElements
     {
-      footer(This->id);
+      //footer(This->id);
     }
   ]
 ;
@@ -3028,7 +3028,6 @@ This=Scope(a,b,c,d,e,f,g)
       Place *p53 = TheNet->newPlace(prefix + "p53");
       Place *p54 = TheNet->newPlace(prefix + "p54");
       Place *p56 = TheNet->newPlace(prefix + "compensated");
-//      Place *p57 = TheNet->newPlace(prefix + "compScope");
 
       // to prevent more than one error from the FH/CH
       Place *fh_faulted = TheNet->newPlace(prefix + "FHFaulted");
@@ -3181,17 +3180,18 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->mergePlaces(prefix + "scopeCompensated", prefix2 + "compensationHandler.scopeCompensated");
       TheNet->mergePlaces(prefix + "p39",              prefix2 + "compensationHandler.clean");
       TheNet->mergePlaces(prefix + "p40",              prefix2 + "compensationHandler.cleaned");
-//      TheNet->mergePlaces(prefix + "p6",               prefix2 + "compensationHandler.failed");
-//      TheNet->mergePlaces(prefix + "compScope",        prefix2 + "compensationHandler.compScope");
       TheNet->mergePlaces(prefix + "p50",              prefix2 + "compensationHandler.ch_out");
       TheNet->mergePlaces(prefix + "compensated",      prefix2 + "compensationHandler.compensated");
 
-      // embed event handler
-      TheNet->mergePlaces(prefix + "p25", prefix2 + "eventHandler.initial");
-      TheNet->mergePlaces(prefix + "p26", prefix2 + "eventHandler.finish");
-      TheNet->mergePlaces(prefix + "p27", prefix2 + "eventHandler.final");
-      TheNet->mergePlaces(prefix + "p28", prefix2 + "eventHandler.stop");
-      TheNet->mergePlaces(prefix + "p29", prefix2 + "eventHandler.stopped");
+      // If present, embed the event handler of the process.
+      if (This->hasEH)
+      {
+	TheNet->mergePlaces(prefix + "p25", prefix2 + "eventHandler.initial");
+	TheNet->mergePlaces(prefix + "p26", prefix2 + "eventHandler.finish");
+	TheNet->mergePlaces(prefix + "p27", prefix2 + "eventHandler.final");
+	TheNet->mergePlaces(prefix + "p28", prefix2 + "eventHandler.stop");
+	TheNet->mergePlaces(prefix + "p29", prefix2 + "eventHandler.stopped");
+      }
       
       // embed the stop pattern
       TheNet->mergePlaces(prefix + "p36",            prefix + "stop.ft_in");
@@ -3217,6 +3217,7 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->mergePlaces(prefix + "p46",            prefix + "stop.upperTerminate");
       TheNet->mergePlaces(prefix + "p47",            prefix + "stop.rethrow");
       TheNet->mergePlaces(prefix + "p48",            prefix + "stop.upperFH"); 
+      
       TheNet->mergePlaces(prefix + "FHFaulted",      prefix + "stop.FHFaulted");
       TheNet->mergePlaces(prefix + "!FHFaulted",     prefix + "stop.!FHFaulted");
       TheNet->mergePlaces(prefix + "CHFaulted",      prefix + "stop.CHFaulted");

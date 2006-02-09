@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/09 13:10:41 $
+ *          - last changed: \$Date: 2006/02/09 14:58:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -44,7 +44,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.127 $
+ * \version \$Revision: 1.128 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -100,7 +100,7 @@ string currentScope;
 ******************************************************************************/
 
 /*
- * Pattern of BPEL's process as it is depicted in Fig. 28. Note that it
+ * Pattern of BPEL's <process> as it is depicted in Fig. 28. Note that it
  * contains only one event handler since alarm-event handler and message-event
  * handler are merged.
  */
@@ -427,7 +427,7 @@ StopInProcess() ->
 
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1, READ);
-      TheNet->newArc(fh_fault_in, t1, "x"); // was: take from p5
+      TheNet->newArc(fh_fault_in, t1, "x");
       TheNet->newArc(t1, p15, "x");
 
       Transition *t2 = TheNet->newTransition(prefix + "t2");
@@ -1808,6 +1808,10 @@ This=userDefinedCompensationHandler(innerActivity) ->
   EMPTY
 ******************************************************************************/
 
+/*
+ * The <empty> activity as depicted in Fig. 3.
+ */
+
 This=Empty(a) ->
   [petrinet:
     {
@@ -1823,8 +1827,10 @@ This=Empty(a) ->
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
 
-      stop(p1, "initial", "", prefix);	// t2
-      stop(p2, "final", "", prefix);	// t3
+      
+      // Transitions for the negative control flow.
+      Transition *t2 = stop(p1, "initial", "", prefix);
+      Transition *t3 = stop(p2, "final", "", prefix);
     }
     a // standardElements
     {
@@ -1841,7 +1847,12 @@ This=Empty(a) ->
   INVOKE
 ******************************************************************************/
 
-// asynchronous invoke (case initiate="no")
+/*
+ * The (asynchronous) <invoke> activity as depicted in Fig. 10. Since
+ * correlation sets are ignored, the resulting pattern is the same as in
+ * Fig. 11.
+ */
+
 This=Invoke(a,b) provided (This->outputVariable == mkcasestring("")) ->
   [petrinet:
     {
@@ -1865,13 +1876,15 @@ This=Invoke(a,b) provided (This->outputVariable == mkcasestring("")) ->
       TheNet->newArc(p2, t2, "(X,CS)");
       TheNet->newArc(t2, p3);
 
+
+      // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
 	throwFault(p2, p4, "guard", "running", "(X,CS)", prefix, This->negativeControlFlow); // t3
 
-      stop(p1, "initial", "", prefix);		// t4
-      stop(p2, "running", "(X,CS)", prefix);	// t5
-      stop(p3, "final", "", prefix);		// t7
-      stop(p4, "p4", "", prefix);		// t6
+      Transition *t4 = stop(p1, "initial", "", prefix);
+      Transition *t5 = stop(p2, "running", "(X,CS)", prefix);
+      Transition *t6 = stop(p4, "p4", "", prefix);
+      Transition *t7 = stop(p3, "final", "", prefix);
     }
     a // standardElements
     {
@@ -1880,7 +1893,16 @@ This=Invoke(a,b) provided (This->outputVariable == mkcasestring("")) ->
   ]
 ;
 
-// synchronous invoke (case initiate="no")
+
+
+
+
+/*
+ * The (synchronous) <invoke> activity as depicted in Fig. 12. Since
+ * correlation sets are ignored, the resulting pattern is the same as in
+ * Fig. 13.
+ */
+
 This=Invoke(a,b) provided (This->outputVariable != mkcasestring("")) ->
   [petrinet:
     {
@@ -1917,18 +1939,20 @@ This=Invoke(a,b) provided (This->outputVariable != mkcasestring("")) ->
       TheNet->newArc(TheNet->findPlace("variable." + string(This->variableIDout->name)), t4, "V");
       TheNet->newArc(t4, TheNet->findPlace("variable." + string(This->variableIDout->name)), "Y");
 
+
+      // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
       {
-	throwFault(p4, p6, "guard2", "running2", "(Y,CS2)", prefix, This->negativeControlFlow); // t5
-	throwFault(p2, p6, "guard1", "running1", "(X,CS1)", prefix, This->negativeControlFlow); // t6
+	Transition *t5 = throwFault(p4, p6, "guard2", "running2", "(Y,CS2)", prefix, This->negativeControlFlow);
+	Transition *t6 = throwFault(p2, p6, "guard1", "running1", "(X,CS1)", prefix, This->negativeControlFlow);
       }
 
-      stop(p1, "initial", "", prefix);		// t7
-      stop(p2, "running1", "(X,CS1)", prefix);	// t8
-      stop(p3, "p3", "", prefix);		// t9
-      stop(p4, "running2", "(Y,CS2)", prefix);	// t10
-      stop(p5, "final", "", prefix);		// t12
-      stop(p6, "p6", "", prefix);		// t11
+      Transition *t7  = stop(p1, "initial", "", prefix);
+      Transition *t8  = stop(p2, "running1", "(X,CS1)", prefix);
+      Transition *t9  = stop(p3, "p3", "", prefix);
+      Transition *t10 = stop(p4, "running2", "(Y,CS2)", prefix);
+      Transition *t11 = stop(p6, "p6", "", prefix);
+      Transition *t12 = stop(p5, "final", "", prefix);
     }
     a // standardElements
     {
@@ -1945,12 +1969,16 @@ This=Invoke(a,b) provided (This->outputVariable != mkcasestring("")) ->
   RECEIVE
 ******************************************************************************/
 
-// receive in case of initiate="no"
+/*
+ * The <receive> activity as depicted in Fig. 1. Since correlation sets are
+ * ignored, the resulting pattern is the same as in Fig. 2.
+ */
+
 This=Receive(a,b) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".internal."; 
       header(This->id);
+      string prefix = intToString(This->id->value) + ".internal."; 
       
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -1970,13 +1998,15 @@ This=Receive(a,b) ->
       TheNet->newArc(TheNet->findPlace("variable." + string(This->variableID->name)), t2, "V");
       TheNet->newArc(t2, TheNet->findPlace("variable." + string(This->variableID->name)), "X");
 
+      
+      // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
-	throwFault(p2, p4, "guard", "running", "(X,CS)", prefix, This->negativeControlFlow); // t3
+	Transition *t3 = throwFault(p2, p4, "guard", "running", "(X,CS)", prefix, This->negativeControlFlow);
 
-      stop(p1, "initial", "", prefix);		// t4
-      stop(p2, "running", "(X,CS)", prefix);	// t5
-      stop(p3, "final", "", prefix);		// t7
-      stop(p4, "p4", "", prefix);		// t6
+      Transition *t4 = stop(p1, "initial", "", prefix);
+      Transition *t5 = stop(p2, "running", "(X,CS)", prefix);
+      Transition *t6 = stop(p4, "p4", "", prefix);
+      Transition *t7 = stop(p3, "final", "", prefix);
     }
     a // standardElements
     {
@@ -1993,12 +2023,16 @@ This=Receive(a,b) ->
   REPLY
 ******************************************************************************/
 
-// reply in case of initiate="no"
+/*
+ * The <reply> activity as depicted in Fig. 8. Since correlation sets are
+ * ignored, the resulting pattern is the same as in Fig. 9.
+ */
+
 This=Reply(a,b) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".internal.";
       header(This->id);
+      string prefix = intToString(This->id->value) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -2016,14 +2050,16 @@ This=Reply(a,b) ->
       TheNet->newArc(t2, TheNet->findPlace("out." + string(This->channelID->name)), "X");
       TheNet->newArc(p2, t2, "(X,CS)");
       TheNet->newArc(t2, p3);
-      
-      if (parameters[P_NOSTANDARDFAULTS] == false)
-	throwFault(p2, p4, "guard", "running", "(X,CS)", prefix, This->negativeControlFlow); // t3      
 
-      stop(p1, "initial", "", prefix);		// t4
-      stop(p2, "running", "(X,CS)", prefix);	// t5
-      stop(p3, "final", "", prefix);		// t7
-      stop(p4, "p4", "", prefix);		// t6
+
+      // Transitions for the negative control flow.
+      if (parameters[P_NOSTANDARDFAULTS] == false)
+	Transition *t3 = throwFault(p2, p4, "guard", "running", "(X,CS)", prefix, This->negativeControlFlow);
+
+      Transition *t3 = stop(p1, "initial", "", prefix);
+      Transition *t5 = stop(p2, "running", "(X,CS)", prefix);
+      Transition *t6 = stop(p4, "p4", "", prefix);
+      Transition *t7 = stop(p3, "final", "", prefix);
     }
     a // standardElements
     {
@@ -2040,8 +2076,8 @@ This=Reply(a,b) ->
   ASSIGN
 ******************************************************************************/
 
-/*
- * This pattern has been changed to fulfill the BPEL specification:
+/* The <assign> activity -- a mixture of the patterns depicted in Fig. 6 and
+ * Fig. 7. The patterns have been changed to fulfill the BPEL specification:
  *
  *    The assign activities are sufficiently short-lived that they are allowed
  *    to complete rather than being interrupted when termination is forced.
@@ -2053,16 +2089,16 @@ This=Reply(a,b) ->
 This=Assign(a,b) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".internal."; 
       header(This->id);
+      string prefix = intToString(This->id->value) + ".internal."; 
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p3 = TheNet->newPlace(prefix + "final");
       Place *p5 = TheNet->newPlace(prefix + "stop");
       Place *p6 = TheNet->newPlace(prefix + "stopped");
 
-      stop(p1, "initial", "", prefix);	// t4
-      stop(p3, "final", "", prefix);	// t7
+      Transition *t4 = stop(p1, "initial", "", prefix);
+      Transition *t7 = stop(p3, "final", "", prefix);
     }
     a // standardElements
     {
@@ -2090,34 +2126,42 @@ This=Assign(a,b) ->
 	  TheNet->newArc(TheNet->findPlace("variable." + string(to->variableID->name)), t2, "Y");
 	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(to->variableID->name)), "X");
 
+	  
+	  // Transitions for the negative control flow.
 	  if (parameters[P_NOSTANDARDFAULTS] == false)
-	    throwFault(p2, p4, "guard", "running", "X", newPrefix, This->negativeControlFlow); // t3
-	  stop(p4, "p4at" + intToString(copyCount), "", prefix); // t6
+	    Transition *t3 = throwFault(p2, p4, "guard", "running", "X", newPrefix, This->negativeControlFlow);
+	  
+	  Transition *t6 = stop(p4, "p4at" + intToString(copyCount), "", prefix);
+
 	  
 	  lastPlace = p8;	  
 	}
 	else // if (from->literalValue != mkcasestring(""));
 	{
 	  Place *p4 = TheNet->newPlace(newPrefix + "p4");
-	  Place *p8 = TheNet->newPlace(newPrefix + "final"); //new
+	  Place *p8 = TheNet->newPlace(newPrefix + "final");
 
 	  Transition *t2 = TheNet->newTransition(newPrefix + "t2", "!guard");
 	  TheNet->newArc(lastPlace, t2);
 	  TheNet->newArc(TheNet->findPlace("variable." + string(to->variableID->name)), t2, "Y");
 	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(to->variableID->name)), string(from->literalValue->name));
 	  TheNet->newArc(t2, p8);
-	  
+
+
+	  // Transitions for the negative control flow.
 	  if (parameters[P_NOSTANDARDFAULTS] == false)
-	    throwFault(lastPlace, p4, "guard", "initial", "", newPrefix, This->negativeControlFlow); // t3
-	  stop(p4, "p4at" + intToString(copyCount), "", prefix); // t6
-	    
+	    Transition *t3 = throwFault(lastPlace, p4, "guard", "initial", "", newPrefix, This->negativeControlFlow);
+	  
+	  Transition *t6 = stop(p4, "p4at" + intToString(copyCount), "", prefix);
+
+
 	  lastPlace = p8;
 	}
 	copyCount++;
       }
 
       TheNet->mergePlaces(TheNet->findPlace(prefix + "final"), lastPlace);
-            
+
       footer(This->id);
     }
   ]
@@ -2133,9 +2177,7 @@ This=Assign(a,b) ->
 ******************************************************************************/
 
 /*
- * The two patterns for a wait element:
- * - with an until condition (Fig. 4)
- * - with a for expression (Fig. 5)
+ * The <wait until=""> activity as depicted in Fig. 4.
  */
 
 This=Wait(a) provided (This->until != mkcasestring("")) ->
@@ -2155,8 +2197,10 @@ This=Wait(a) provided (This->until != mkcasestring("")) ->
       TheNet->newArc(t1, p2);
       TheNet->newArc(TheNet->findPlace("1.internal.clock"), t1, READ, "x");
 
-      stop(p1, "initial", "", prefix);	// t2
-      stop(p2, "final", "", prefix);	// t3
+
+      // Transitions for the negative control flow.
+      Transition *t2 = stop(p1, "initial", "", prefix);
+      Transition *t3 = stop(p2, "final", "", prefix);
     }
     a // standardElements
     {
@@ -2164,6 +2208,14 @@ This=Wait(a) provided (This->until != mkcasestring("")) ->
     }
   ]
 ;
+
+
+
+
+
+/*
+ * The <wait for=""> activity as depicted in Fig. 5.
+ */
 
 This=Wait(a) provided (This->For != mkcasestring("")) ->
   [petrinet:
@@ -2188,9 +2240,11 @@ This=Wait(a) provided (This->For != mkcasestring("")) ->
       TheNet->newArc(t2, p3);
       TheNet->newArc(TheNet->findPlace("1.internal.clock"), t2, READ, "y");
 
-      stop(p1, "initial", "", prefix);		// t3
-      stop(p2, "TimeStamp", "x", prefix);	// t4
-      stop(p3, "final", "", prefix);		// t5
+
+      // Transitions for the negative control flow.
+      Transition *t3 = stop(p1, "initial", "", prefix);
+      Transition *t4 = stop(p2, "TimeStamp", "x", prefix);
+      Transition *t5 = stop(p3, "final", "", prefix);
     }
     a // standardElements
     {
@@ -2208,7 +2262,7 @@ This=Wait(a) provided (This->For != mkcasestring("")) ->
 ******************************************************************************/
 
 /*
- * Throw as it is depicted in Fig. 14.
+ * The <throw> activity as it is depicted in Fig. 14.
  */
 
 This=Throw(a) ->
@@ -2222,14 +2276,16 @@ This=Throw(a) ->
       Place *p3 = TheNet->newPlace(prefix + "stop");
       Place *p4 = TheNet->newPlace(prefix + "stopped");
       
-      throwFault(p1, p2, "", "initial", "", prefix, This->negativeControlFlow); // t1
-      stop(p1, "initial", "", prefix);	// t2
-      stop(p2, "p2", "", prefix);	// t3
+
+      // Transitions for the negative control flow.
+      Transition *t1 = throwFault(p1, p2, "", "initial", "", prefix, This->negativeControlFlow);
+      Transition *t2 = stop(p1, "initial", "", prefix);
+      Transition *t3 = stop(p2, "p2", "", prefix);
     }
-  a // standardElements
-  {
-    footer(This->id);
-  }
+    a // standardElements
+    {
+      footer(This->id);
+    }
   ]
 ;
 
@@ -2247,6 +2303,12 @@ This=Throw(a) ->
  *  - <compensate /> in a fault handler
  *  - <compensate scope="C"/> in a compensation handler
  *  - <compensate scope="C"/> in a fault handler
+ */
+
+/*
+ * The <compensate/> activity as depicted in Fig. 38. As the context (embedded
+ * in a compensation handler) is clear, the pattern is directly embedded to the
+ * compensation handler of the current scope.
  */
 
 This=Compensate(a) provided (!This->inFaultHandler && This->scope == mkcasestring("")) ->
@@ -2273,11 +2335,14 @@ This=Compensate(a) provided (!This->inFaultHandler && This->scope == mkcasestrin
       TheNet->newArc(t2, p3);
       TheNet->newArc(p6, t2);
 
-      stop(p1, "initial", "", prefix);	// t3
-      stop(p2, "running", "", prefix);	// t4
-      stop(p3, "final", "", prefix);	// t5
+
+      // Transitions for the negative control flow.
+      Transition *t3 = stop(p1, "initial", "", prefix);
+      Transition *t4 = stop(p2, "running", "", prefix);
+      Transition *t5 = stop(p3, "final", "", prefix);
       
-      // embed this <compensate /> activity in compensation handler
+
+      // Embed this <compensate /> activity in compensation handler.
       TheNet->mergePlaces(p4, TheNet->findPlace(currentScope + "internal.compensationHandler.p10"));
       TheNet->mergePlaces(p6, TheNet->findPlace(currentScope + "internal.compensationHandler.p12"));
     }
@@ -2287,6 +2352,16 @@ This=Compensate(a) provided (!This->inFaultHandler && This->scope == mkcasestrin
     }  
   ]
 ;
+
+
+
+
+
+/*
+ * The <compensate/> activity as depicted in Fig. 39. As the context (embedded
+ * in a fault handler) is clear, the pattern is directly embedded to the fault
+ * handler of the current scope.
+ */
 
 This=Compensate(a) provided (This->inFaultHandler && This->scope == mkcasestring("")) ->
   [petrinet:
@@ -2312,11 +2387,14 @@ This=Compensate(a) provided (This->inFaultHandler && This->scope == mkcasestring
       TheNet->newArc(t2, p3);
       TheNet->newArc(p6, t2);
 
-      stop(p1, "initial", "", prefix);	// t3
-      stop(p2, "running", "", prefix);	// t4
-      stop(p3, "final", "", prefix);	// t5
 
-      // embed this <compensate /> activity in fault handler
+      // Transitions for the negative control flow.
+      Transition *t3 = stop(p1, "initial", "", prefix);
+      Transition *t4 = stop(p2, "running", "", prefix);
+      Transition *t5 = stop(p3, "final", "", prefix);
+
+
+      // Embed this <compensate /> activity in fault handler.
       TheNet->mergePlaces(p5, TheNet->findPlace(currentScope + "faultHandler.ch_fh"));
       TheNet->mergePlaces(p6, TheNet->findPlace(currentScope + "faultHandler.ch_out"));      
     }
@@ -2326,6 +2404,16 @@ This=Compensate(a) provided (This->inFaultHandler && This->scope == mkcasestring
     }  
   ]
 ;
+
+
+
+
+
+/*
+ * The <compensate scope="C"/> activity as depicted in Fig.40. As the context
+ * (embedded in a compensation handler) is clear, the pattern is directly
+ * embedded to the compensation handler of the current scope.
+ */
 
 This=Compensate(a) provided (!This->inFaultHandler && This->scope != mkcasestring("")) ->
   [petrinet:
@@ -2351,11 +2439,14 @@ This=Compensate(a) provided (!This->inFaultHandler && This->scope != mkcasestrin
       TheNet->newArc(t2, p3);
       TheNet->newArc(p6, t2, "scopeName");
 
-      stop(p1, "initial", "", prefix);	// t3
-      stop(p2, "running", "", prefix);	// t4
-      stop(p3, "final", "", prefix);	// t5
+
+      // Transitions for the negative control flow.
+      Transition *t3 = stop(p1, "initial", "", prefix);
+      Transition *t4 = stop(p2, "running", "", prefix);
+      Transition *t5 = stop(p3, "final", "", prefix);
       
-      // embed this <compensate scope="C"/> activity in compensation handler
+      
+      // Embed this <compensate scope="C"/> activity in compensation handler.
       TheNet->mergePlaces(p4, TheNet->findPlace(currentScope + "internal.compensationHandler.p10"));
     }
     a // standardElements
@@ -2364,6 +2455,16 @@ This=Compensate(a) provided (!This->inFaultHandler && This->scope != mkcasestrin
     }  
   ]
 ;
+
+
+
+
+
+/*
+ * The <compensate scope="C"/> activity as depicted in Fig.41. As the context
+ * (embedded in a fault handler) is clear, the pattern is directly embedded to
+ * the fault handler of the current scope.
+ */
 
 This=Compensate(a) provided (This->inFaultHandler && This->scope != mkcasestring("")) ->
   [petrinet:
@@ -2389,11 +2490,14 @@ This=Compensate(a) provided (This->inFaultHandler && This->scope != mkcasestring
       TheNet->newArc(t2, p3);
       TheNet->newArc(p6, t2, "scopeName");
 
-      stop(p1, "initial", "", prefix);	// t3
-      stop(p2, "running", "", prefix);	// t4
-      stop(p3, "final", "", prefix);	// t5
+      
+      // Transitions for the negative control flow.
+      Transition *t3 = stop(p1, "initial", "", prefix);
+      Transition *t4 = stop(p2, "running", "", prefix);
+      Transition *t5 = stop(p3, "final", "", prefix);
 
-      // embed this <compensate scope="C"/> activity in fault handler
+      
+      // Embed this <compensate scope="C"/> activity in fault handler.
       TheNet->mergePlaces(p5, TheNet->findPlace(currentScope + "faultHandler.ch_fh"));
       TheNet->mergePlaces(p6, TheNet->findPlace(currentScope + "faultHandler.ch_out"));      
     }
@@ -2413,8 +2517,8 @@ This=Compensate(a) provided (This->inFaultHandler && This->scope != mkcasestring
 ******************************************************************************/
 
 /*
- * Terminate as it is depicted in Fig. 22. Note that places p4 and p5 are
- * correctly correlated with "(!)Terminated" here.
+ * The <terminate> activity as it is depicted in Fig. 22. Note that places p4
+ * and p5 are correctly correlated with "(!)Terminated" here.
  */
 
 This=Terminate(a) ->
@@ -2443,10 +2547,13 @@ This=Terminate(a) ->
       TheNet->newArc(p4, t2);
       TheNet->newArc(t2, p6);
 
-      stop(p1, "initial", "", prefix);	// t3
-      stop(p2, "final", "", prefix);	// t4
+      
+      // Transitions for the negative control flow.
+      Transition *t3 = stop(p1, "initial", "", prefix);
+      Transition *t4 = stop(p2, "final", "", prefix);
 
-      // embed the <terminate /> activity in the process      
+      
+      // Embed the <terminate /> activity in the process.
       TheNet->mergePlaces(TheNet->findPlace("1.internal.!Terminated"), p4);
       TheNet->mergePlaces(TheNet->findPlace("1.internal.Terminated"), p5);
       TheNet->mergePlaces(TheNet->findPlace(currentScope + "upperTerminate"), p6);
@@ -2468,7 +2575,7 @@ This=Terminate(a) ->
 ******************************************************************************/
 
 /*
- * Flow as it is depicted in Fig. 17.
+ * The <flow> activity as it is depicted in Fig. 17.
  */
 
 TheActivity=activityFlow(This=Flow(a,b,c)) ->
@@ -2482,16 +2589,7 @@ TheActivity=activityFlow(This=Flow(a,b,c)) ->
       Place *p9  = TheNet->newPlace(prefix + "running");
       Place *p15 = TheNet->newPlace(prefix + "stop");
       Place *p16 = TheNet->newPlace(prefix + "stopped");
-
-      // DPE //
-      Transition *t1 = NULL;
-      if (This->dpe->value > 0)
-      {
-	Place *p1  = TheNet->newPlace(prefix + "negLink"); //DPE//
-	t1 = TheNet->newTransition(prefix + "t1");
-	TheNet->newArc(p1, t1);
-      }
-
+      
       Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p7, t2);
       TheNet->newArc(t2, p9);
@@ -2507,20 +2605,29 @@ TheActivity=activityFlow(This=Flow(a,b,c)) ->
       Transition *t6 = TheNet->newTransition(prefix + "innerStopped");
       TheNet->newArc(t6, p16);
 
-      stop(p7, "initial", "", prefix);	// t4
-      stop(p8, "final", "", prefix);	// t7
+
+      // Transitions for the negative control flow.
+      Transition *t4 = stop(p7, "initial", "", prefix);
+      Transition *t7 = stop(p8, "final", "", prefix);
+
+
+      // Dead-Path-Elimination.
+      Transition *t1 = NULL;
+      if (This->dpe->value > 0)
+      {
+	Place *p1  = TheNet->newPlace(prefix + "negLink");
+	t1 = TheNet->newTransition(prefix + "t1");
+	TheNet->newArc(p1, t1);
+      }
     }
     a // standardElements
     c // inner activities
     {
       foreach (innerActivity; activity_list c)
       {
-	// embed inner activity
-	
-	// DPE //
+	// Embed the inner activity.
 	if (innerActivity->dpe->value > 0)
 	  TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".negLink"));
-	
 	TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
 	TheNet->newArc(t5, TheNet->findPlace(innerActivity, ".stop"));
 	TheNet->newArc(TheNet->findPlace(innerActivity, ".stopped"), t6);
@@ -2540,9 +2647,8 @@ TheActivity=activityFlow(This=Flow(a,b,c)) ->
 ******************************************************************************/
 
 /*
- * Switch as it is depicted in Fig. 19. Please note that due applying rewrite
- * rules there is always an otherwise-branch (holding an empty if it is not
- * defined).
+ * The <switch> activity as it is depicted in Fig. 19. Please note that during
+ * parsing an empty otherwise branch was added if it was not specified.
  */
 
 This=activitySwitch(Switch(a,b,Otherwise(c))) ->
@@ -2557,7 +2663,22 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
       Place *p10 = TheNet->newPlace(prefix + "p10");
       Place *p11 = TheNet->newPlace(prefix + "stop");
       Place *p12 = TheNet->newPlace(prefix + "stopped");
+      
+      Transition *t3 = TheNet->newTransition(prefix + "t3");
+      TheNet->newArc(p5, t3);
+      TheNet->newArc(t3, p6, "x");
 
+      
+      // Transitions for the negative control flow.
+      if (parameters[P_NOSTANDARDFAULTS] == false)
+	Transition *t7 = throwFault(p6, p10, "guard", "running", "x", prefix, This->negativeControlFlow);
+      
+      Transition *t8  = stop(p5, "initial", "", prefix);
+      Transition *t9  = stop(p6, "running", "x", prefix);
+      Transition *t10 = stop(p10, "p10", "", prefix);
+
+
+      // Dead Path Elimination
       Transition *t1 = NULL;
       if (This->dpe->value > 0)
       {
@@ -2565,16 +2686,6 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
 	Place *p1 = TheNet->newPlace(prefix + "negLink");
 	TheNet->newArc(p1, t1);
       }
-      
-      Transition *t3 = TheNet->newTransition(prefix + "t3");
-      TheNet->newArc(p5, t3);
-      TheNet->newArc(t3, p6, "x");
-
-      if (parameters[P_NOSTANDARDFAULTS] == false)
-	throwFault(p6, p10, "guard", "running", "x", prefix, This->negativeControlFlow); // t7
-      stop(p5, "initial", "", prefix);	// t8
-      stop(p6, "running", "x", prefix);	// t9
-      stop(p10, "p10", "", prefix);	// t10
     }
     a // standardElements
     b // case braches
@@ -2615,12 +2726,12 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
 	  TheNet->newArc(running, t2, "x");
 	  TheNet->newArc(running, t4, "x");
 
-	  stop(running, "runningCase" + caseNumber, "", prefix); // t11
+	  Transition *t11 = stop(running, "runningCase" + caseNumber, "", prefix);
 
 	  last = t4;
 	}
 	
-	// embed the innerActivity
+	// Embed the inner activity.
 	TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
 	TheNet->mergePlaces(This, ".internal.final",   innerActivity, ".final");
 	TheNet->mergePlaces(This, ".internal.stop",    innerActivity, ".stop");
@@ -2639,7 +2750,7 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
       TheNet->newArc(running, t2, "x");
       TheNet->newArc(last, running, "x");
       
-      stop(running, "runningOtherwise", "", prefix);
+      Transition *tnoname = stop(running, "runningOtherwise", "", prefix);
       
       // embed inner activity
       TheNet->newArc(t2, TheNet->findPlace(c, ".initial"));
@@ -2650,7 +2761,12 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
       trace(TRACE_DEBUG, "[PNU]\t\t</otherwise>\n");
 
 
-      // create the arcs for the DPE
+      // Create the arcs for the Dead Path elimination: each chosen activity
+      // (i.e. firing of the respective t2-transition) has to be connected with
+      // the negLink places of all other cases' activities as well as to the
+      // activity in the otherwise branch. Of course, the arcs are only added
+      // if the negLink place is existing (i.e. a source link can be reached
+      // after all.
       currentCase = 1;
       foreach (thisCaseBranch=Case(innerActivity1); tCase_list b)
       {
@@ -2686,7 +2802,7 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
 ******************************************************************************/
 
 /*
- * While as it is depicted in Fig. 18.
+ * The <while> activity as it is depicted in Fig. 18.
  */
 
 This=activityWhile(TheWhile=While(a,b)) ->
@@ -2721,17 +2837,20 @@ This=activityWhile(TheWhile=While(a,b)) ->
       TheNet->newArc(t4, p1);
       TheNet->newArc(p5, t4);
 
+
+      // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
-	throwFault(p2, p6, "guard", "running", "x", prefix, This->negativeControlFlow); // t5      
-      stop(p1, "initial", "", prefix);	// t6
-      stop(p2, "running", "x", prefix);	// t7
-      stop(p3, "final", "", prefix);	// t9
-      stop(p6, "p6", "", prefix);	// t8
+	Transition *t5 = throwFault(p2, p6, "guard", "running", "x", prefix, This->negativeControlFlow);
+      
+      Transition *t6 = stop(p1, "initial", "", prefix);
+      Transition *t7 = stop(p2, "running", "x", prefix);
+      Transition *t8 = stop(p6, "p6", "", prefix);
+      Transition *t9 = stop(p3, "final", "", prefix);
     }
     a // standardElements
     b // innerActivity
     {
-      // embed innerActivity
+      // Embed the inner activity.
       TheNet->mergePlaces(This, ".internal.p4",      b, ".initial");
       TheNet->mergePlaces(This, ".internal.p5",      b, ".final");
       TheNet->mergePlaces(This, ".internal.stop",    b, ".stop");
@@ -2751,7 +2870,7 @@ This=activityWhile(TheWhile=While(a,b)) ->
 ******************************************************************************/
 
 /*
- * Sequence as it is depicted in Fig. 16.
+ * The <sequence> activity as it is depicted in Fig. 16.
  */
 
 This=activitySequence(Sequence(a,b)) ->
@@ -2765,7 +2884,8 @@ This=activitySequence(Sequence(a,b)) ->
       Place *p10 = TheNet->newPlace(prefix + "stop");
       Place *p11 = TheNet->newPlace(prefix + "stopped");
 
-      // DPE //
+
+      // If needed, transition t1 and a place negLink is created.
       Transition *t1 = NULL;
       if (This->dpe->value > 0)
       {
@@ -2791,10 +2911,12 @@ This=activitySequence(Sequence(a,b)) ->
 	if (activityCount == b->length())
 	  TheNet->mergePlaces(This, ".internal.final", innerActivity, ".final");
 	
-	// DPE //
+	// If an inner activity has a place negLink, it is connected to the transition
+	// t1.
 	if (innerActivity->dpe->value > 0)
 	  TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".negLink"));
-	
+
+
 	TheNet->mergePlaces(This, ".internal.stop", innerActivity, ".stop");
 	TheNet->mergePlaces(This, ".internal.stopped", innerActivity, ".stopped");
 	
@@ -2815,7 +2937,7 @@ This=activitySequence(Sequence(a,b)) ->
 ******************************************************************************/
 
 /*
- * Pick as it is depicted in Fig. 20.
+ * The <pick> activity as it is depicted in Fig. 20.
  */
 
 TheActivity=activityPick(This=Pick(a,b,c)) ->
@@ -2830,7 +2952,14 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
       Place *p11 = TheNet->newPlace(prefix + "stop");
       Place *p12 = TheNet->newPlace(prefix + "stopped");
 
-      // DPE
+      
+      Transition *t5 = TheNet->newTransition(prefix + "t5");
+      TheNet->newArc(TheNet->findPlace("1.internal.clock"), t5, READ, "x");
+      TheNet->newArc(p6, t5);
+      TheNet->newArc(t5, p7, "x");
+
+
+      // If needed, transition t1 and a place negLink is created.
       Transition *t1 = NULL;
       if (This->dpe->value > 0)
       {
@@ -2839,18 +2968,16 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	TheNet->newArc(p1, t1);
       }
       
-      Transition *t5 = TheNet->newTransition(prefix + "t5");
-      TheNet->newArc(TheNet->findPlace("1.internal.clock"), t5, READ, "x");
-      TheNet->newArc(p6, t5);
-      TheNet->newArc(t5, p7, "x");
 
-      stop(p6, "initial", "", prefix);		// t7
-      stop(p7, "TimeStamp", "x", prefix);	// t8
+      // Transitions for the negative control flow.
+      Transition *t7 = stop(p6, "initial", "", prefix);
+      Transition *t8 = stop(p7, "TimeStamp", "x", prefix);
     }
     a // standardElements
     b // onMessage branches
     c // onAlarm branches
     {
+      // Traverse the <onMessage> branches.
       int onMessageCount = 1; 
       foreach (ThisBranch = OnMessage(innerActivity); tOnMessage_list b)
       {
@@ -2872,12 +2999,16 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	TheNet->newArc(p3, t3, "M" + message );
 	TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
 
+
+	// Transitions for the negative control flow.
 	if (parameters[P_NOSTANDARDFAULTS] == false)
-	  throwFault(p3, p10, "guard" + message, "p3", "M" + message, newPrefix, This->negativeControlFlow); // t4
-        stop(p3, "p3at" + message, "M" + message, prefix);	// t9
-	stop(p10, "p10at" + message, "", prefix);		// t10
+	  Transition *t4 = throwFault(p3, p10, "guard" + message, "p3", "M" + message, newPrefix, This->negativeControlFlow);
 	
-	// embed the inner activity
+        Transition *t9  = stop(p3, "p3at" + message, "M" + message, prefix);
+	Transition *t10 = stop(p10, "p10at" + message, "", prefix);
+	
+	
+	// Embed the inner activity.
 	TheNet->mergePlaces(TheActivity, ".stop",    innerActivity, ".stop");
 	TheNet->mergePlaces(TheActivity, ".stopped", innerActivity, ".stopped");
 	TheNet->mergePlaces(TheActivity, ".final",   innerActivity, ".final");
@@ -2887,6 +3018,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
       }
 
 
+      // Traverse the <onAlarm> branches.
       int onAlarmCount = 1; 
       foreach (onAlarmBranch=OnAlarm(innerActivity); tOnAlarm_list c)
       {
@@ -2904,7 +3036,8 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	TheNet->newArc(TheNet->findPlace(TheActivity, ".internal.TimeStamp"), t6, "x");
 	TheNet->newArc(t6, TheNet->findPlace(innerActivity, ".initial"));
 
-	// embed the inner activity	
+
+	// Embed the inner activity.
 	TheNet->mergePlaces(TheActivity, ".stop",    innerActivity, ".stop");
 	TheNet->mergePlaces(TheActivity, ".stopped", innerActivity, ".stopped");
 	TheNet->mergePlaces(TheActivity, ".final",   innerActivity, ".final");
@@ -2914,21 +3047,22 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
       }
 
 
-      // create the arcs for the DPE
+      // Create the arcs for the Dead Path elimination: each chosen activity
+      // (i.e. firing of the respective t2-transition) has to be connected with
+      // the negLink places of all other <onAlarm> or <onMessage> activities.
+      // Of course, the arcs are only added if the negLink place is existing
+      // (i.e. a source link can be reached after all.
       int currentMessage = 1;
       foreach (OnMessage(innerActivity1); tOnMessage_list b)
       {
 	foreach (OnMessage(innerActivity2); tOnMessage_list b)
-	{
 	  if ((innerActivity1 != innerActivity2) && (innerActivity2->dpe->value > 0))
 	    TheNet->newArc(TheNet->findTransition(prefix + "onMessage" + intToString(currentMessage) + ".t3"), TheNet->findPlace(innerActivity2, ".negLink"));
-	}
 
 	foreach (OnAlarm(innerActivity2); tOnAlarm_list c)
-	{
 	  if (innerActivity2->dpe->value > 0)
 	    TheNet->newArc(TheNet->findTransition(prefix + "onMessage" + intToString(currentMessage) + ".t3"), TheNet->findPlace(innerActivity2, ".negLink"));
-	}
+
 	currentMessage++;
 
 	if ((innerActivity1->dpe->value > 0) && (This->dpe->value > 0))
@@ -2939,16 +3073,13 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
       foreach (OnAlarm(innerActivity1); tOnAlarm_list c)
       {
 	foreach (OnAlarm(innerActivity2); tOnAlarm_list c)
-	{
 	  if ((innerActivity1 != innerActivity2) && (innerActivity2->dpe->value > 0))
 	    TheNet->newArc(TheNet->findTransition(prefix + "onAlarm" + intToString(currentAlarm) + ".t6"), TheNet->findPlace(innerActivity2, ".negLink"));
-	}
 
 	foreach (OnMessage(innerActivity2); tOnMessage_list b)
-	{
 	  if (innerActivity2->dpe->value > 0)
 	    TheNet->newArc(TheNet->findTransition(prefix + "onAlarm" + intToString(currentAlarm) + ".t6"), TheNet->findPlace(innerActivity2, ".negLink"));
-	}
+
 	currentAlarm++;
 
 	if ((innerActivity1->dpe->value > 0) && (This->dpe->value > 0))
@@ -2968,8 +3099,13 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
   SCOPE
 ******************************************************************************/
 
-This=Scope(a,b,c,d,e,f,g)
- ->
+/*
+ * The <scope> activity as it is depicted in Fig. 27. Note that it contains
+ * only one event handler since alarm-event handler and message-event handler
+ * are merged.
+ */
+
+This=Scope(a,b,c,d,e,f,g) ->
   [petrinet:
     {
       header(This->id, true);
@@ -2977,13 +3113,16 @@ This=Scope(a,b,c,d,e,f,g)
       currentScope = prefix;
       SymbolScope *me = symMan.getScope(this->id);
 
-      // create push-places for the children of the scope
+      
+      // Create push-places for the children of the scope.
       for (list< SymbolScope * >::iterator child = me->children.begin(); child != me->children.end(); child++)
       {
 	Place *push_child    = TheNet->newPlace( intToString((*child)->id->value) + ".push");
 	Place *notPush_child = TheNet->newPlace( intToString((*child)->id->value) + ".!push");
       }
 
+
+      // Create the internal places of the scope pattern.
       Place *p1  = TheNet->newPlace(prefix + "negLink");
       Place *p2  = TheNet->newPlace(prefix + "initial");
       Place *p3  = TheNet->newPlace(prefix + "ch_in");
@@ -3029,12 +3168,18 @@ This=Scope(a,b,c,d,e,f,g)
       Place *p54 = TheNet->newPlace(prefix + "p54");
       Place *p56 = TheNet->newPlace(prefix + "compensated");
 
-      // to prevent more than one error from the FH/CH
+
+      // State places of the scope modeling the new fault model: The places
+      // guarantee that the occurrence of more than one fault inside the fault
+      // or compensation handler is prevented. The places are used as guards
+      // by the transitions signalling faults.
       Place *fh_faulted = TheNet->newPlace(prefix + "FHFaulted");
       Place *fh_not_faulted = TheNet->newPlace(prefix + "!FHFaulted");
       Place *ch_faulted = TheNet->newPlace(prefix + "CHFaulted");
       Place *ch_not_faulted = TheNet->newPlace(prefix + "!CHFaulted");
       
+
+      // The transitions of the process pattern.
       Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p10);
@@ -3069,6 +3214,17 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->newArc(p20, t8);
       TheNet->newArc(t8, p37);
 
+      Transition *t16 = TheNet->newTransition(prefix + "t16");      
+      TheNet->newArc(p53, t16, "false");
+      
+
+      // Transitions for the negative control flow.
+      Transition *t9  = stop(p2, "initial", "", prefix);
+      Transition *t10 = stop(p17, "Ended", "", prefix);
+      TheNet->newArc(t10, p17); // p17 is only read
+      Transition *t11 = stop(p51, "final", "", prefix);
+      
+      /*
       Transition *t9 = TheNet->newTransition(prefix + "t9");
       TheNet->newArc(p2, t9);
       TheNet->newArc(p20, t9);
@@ -3083,10 +3239,12 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->newArc(p20, t11);
       TheNet->newArc(t11, p45);
       TheNet->newArc(p51, t11);
+      */
 
-      Transition *t16 = TheNet->newTransition(prefix + "t16");      
-      TheNet->newArc(p53, t16, "false");
 
+      // If the process has an event handler several places and transitions
+      // have to be added to embed it. If the process lacks an event handler
+      // some places can be merged.      
       if (This->hasEH)
       {
 	Place *p25 = TheNet->newPlace(prefix + "p25");
@@ -3122,7 +3280,7 @@ This=Scope(a,b,c,d,e,f,g)
 	TheNet->mergePlaces(p24, p38);
       }
       
-      // new transitions to pass fault to parent
+      // New transitions to pass fault to parent.
       Transition *t12 = TheNet->newTransition(prefix + "passFaultUp");
       TheNet->newArc(p48, t12);
       TheNet->newArc(TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.Active"), t12);
@@ -3133,7 +3291,8 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->newArc(p48, t13);
       TheNet->newArc(TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.!Active"), t13, READ);
 
-      // merge places with parent scope
+      
+      // Merge places with parent scope.
       TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId->value) +
 	    ".internal.compensationHandler.compScope." + intToString(This->id->value)), p3); // was "....internal.compScope."
       TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.scopeCompensated"), p56);
@@ -3146,14 +3305,16 @@ This=Scope(a,b,c,d,e,f,g)
     e // Event Handler
     g // innerActivity
     {
-
-      // connect t2 with the push-places of the child-scopes
+      // After the patterns of the inner activity of the process are generated
+      // the push places of the child scopes are available and have to be
+      // connected with the transition t2 of the process.
       for (list<SymbolScope*>::iterator child = me->children.begin(); child != me->children.end(); child++)
 	TheNet->newArc(t2, TheNet->findPlace( intToString((*child)->id->value) + ".!push" ));
       
       string prefix2 = intToString(This->id->value) + ".internal.";
-	    
-      // embed fault handler
+
+      
+      // Embed the fault handler of the scope.
       TheNet->mergePlaces(prefix + "p43",     prefix2 + "faultHandler.fault");
       TheNet->mergePlaces(prefix + "p44",     prefix2 + "faultHandler.faultSave");
       TheNet->mergePlaces(prefix + "p47",     prefix2 + "faultHandler.rethrow");
@@ -3170,7 +3331,8 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->mergePlaces(prefix + "p48",     prefix2 + "faultHandler.upperFH");
       TheNet->mergePlaces(prefix + "stopped", prefix2 + "faultHandler.stopped");
 
-      // embed the compensation handler
+      
+      // Embed the compensation handler of the scope.
       TheNet->mergePlaces(prefix + "ch_in",            prefix2 + "compensationHandler.ch_in");
       TheNet->mergePlaces(prefix + "Completed",        prefix2 + "compensationHandler.Completed");
       TheNet->mergePlaces(prefix + "!Completed",       prefix2 + "compensationHandler.!Completed");
@@ -3183,7 +3345,8 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->mergePlaces(prefix + "p50",              prefix2 + "compensationHandler.ch_out");
       TheNet->mergePlaces(prefix + "compensated",      prefix2 + "compensationHandler.compensated");
 
-      // If present, embed the event handler of the process.
+      
+      // If present, embed the event handler of the scope.
       if (This->hasEH)
       {
 	TheNet->mergePlaces(prefix + "p25", prefix2 + "eventHandler.initial");
@@ -3192,8 +3355,9 @@ This=Scope(a,b,c,d,e,f,g)
 	TheNet->mergePlaces(prefix + "p28", prefix2 + "eventHandler.stop");
 	TheNet->mergePlaces(prefix + "p29", prefix2 + "eventHandler.stopped");
       }
+
       
-      // embed the stop pattern
+      // Embed the stop-pattern of the scope.
       TheNet->mergePlaces(prefix + "p36",            prefix + "stop.ft_in");
       TheNet->mergePlaces(prefix + "Faulted",        prefix + "stop.Faulted");
       TheNet->mergePlaces(prefix + "p6",             prefix + "stop.fault_in");
@@ -3223,18 +3387,22 @@ This=Scope(a,b,c,d,e,f,g)
       TheNet->mergePlaces(prefix + "CHFaulted",      prefix + "stop.CHFaulted");
       TheNet->mergePlaces(prefix + "!CHFaulted",     prefix + "stop.!CHFaulted");
       
-      // embed the inner activity
+
+      
+      // Embed the inner activity of the scope.
       TheNet->mergePlaces(TheNet->findPlace(prefix + "negLink"), TheNet->findPlace(g, ".negLink"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p21"), TheNet->findPlace(g, ".initial"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p22"), TheNet->findPlace(g, ".final"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p23"), TheNet->findPlace(g, ".stop"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p24"), TheNet->findPlace(g, ".stopped"));
 
-      // merge (!)Terminated places
+      
+      // Merge (!)Terminated places
       TheNet->mergePlaces(TheNet->findPlace("1.internal.!Terminated"), p8);
       TheNet->mergePlaces(TheNet->findPlace("1.internal.Terminated"), p9);
 
-      // setting all enclosed links to false in case of an error
+      
+      // Setting all enclosed links to false in case of an error.
       for (list<string>::iterator link = ((ScopeScope *)me)->innerLinks.begin(); link != ((ScopeScope *)me)->innerLinks.end(); link++)
       {
 	Place *p61 = TheNet->newPlace(prefix + "p61.link." + *link);
@@ -3269,20 +3437,23 @@ This=StandardElements(NiltTarget_list(), NiltSource_list()) ->
     {
       string prefix = intToString(This->parentId->value) + "."; 
       string newPrefix = intToString(This->parentId->value) + ".internal";
-
-      // DPE
-      if (This->dpe->value > 0)
-      {
-	Place *p1 = TheNet->newPlace(prefix + "negLink");
-	TheNet->mergePlaces(p1, TheNet->findPlace(newPrefix + ".negLink"));
-      }
       
       Place *p2 = TheNet->newPlace(prefix + "initial");
       Place *p3 = TheNet->newPlace(prefix + "final");
       Place *p4 = TheNet->newPlace(prefix + "stop");
       Place *p5 = TheNet->newPlace(prefix + "stopped");
 
-      // embed activity X
+
+      // If the inner activity has a place negLink, connect merge this place
+      // with a new created one.
+      if (This->dpe->value > 0)
+      {
+	Place *p1 = TheNet->newPlace(prefix + "negLink");
+	TheNet->mergePlaces(p1, TheNet->findPlace(newPrefix + ".negLink"));
+      }
+
+      
+      // Embed the inner activity.
       TheNet->mergePlaces(p2, TheNet->findPlace(newPrefix + ".initial"));
       TheNet->mergePlaces(p3, TheNet->findPlace(newPrefix + ".final"));
       TheNet->mergePlaces(p4, TheNet->findPlace(newPrefix + ".stop"));
@@ -3291,6 +3462,13 @@ This=StandardElements(NiltTarget_list(), NiltSource_list()) ->
   ]
 ;
 
+
+
+
+
+/******************************************************************************
+ * Figure 22: Pattern for an activity that is source of links.
+ *****************************************************************************/
 
 This=StandardElements(NiltTarget_list(), a) ->
   [petrinet:
@@ -3307,7 +3485,21 @@ This=StandardElements(NiltTarget_list(), a) ->
       Place *p6 = TheNet->newPlace(prefix + "stop");
       Place *p7 = TheNet->newPlace(prefix + "stopped");
 
-      // DPE
+      Transition *t2 = TheNet->newTransition(prefix + "t2");
+      TheNet->newArc(p4, t2);
+      TheNet->newArc(t2, p5);
+
+      Transition *t3 = TheNet->newTransition(prefix + "t3");
+      TheNet->newArc(p4, t3);
+      TheNet->newArc(t3, p5);
+
+
+      // Transition for the negative control flow.
+      Transition *t4 = stop(p5, "final", "", prefix);
+
+
+      // If needed, transition t1 is created and connected with the negLink
+      // place of the inner activity if existing for dead path elimination.
       Transition *t1 = NULL;
       if (This->dpe->value > 0)
       {
@@ -3322,34 +3514,27 @@ This=StandardElements(NiltTarget_list(), a) ->
 	}
       }
 
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(p4, t2);
-      TheNet->newArc(t2, p5);
-
-      Transition *t3 = TheNet->newTransition(prefix + "t3");
-      TheNet->newArc(p4, t3);
-      TheNet->newArc(t3, p5);
-
-      stop(p5, "final", "", prefix); // t4
-
+      
+      // Connect all source link places with t2 and, if needed, with transition
+      // t1 for dead path elimination.
       foreach (link; tSource_list a)
       {
 	Place *p8 = TheNet->findPlace("!link." + string(link->linkID->name));
 	Place *p10 = TheNet->findPlace("link." + string(link->linkID->name));
 	
-	// DPE
+	TheNet->newArc(p8, t2);
+	TheNet->newArc(t2, p10, string(link->transitionCondition->name));
+	TheNet->newArc(p10, t3, READ);
+
 	if (This->dpe->value > 0)
 	{
 	  TheNet->newArc(t1, p10, "false");
 	  TheNet->newArc(p8, t1);
 	}
-	
-	TheNet->newArc(p8, t2);
-	TheNet->newArc(t2, p10, string(link->transitionCondition->name));
-	TheNet->newArc(p10, t3, READ);
       }
 
-      // embed activity X
+
+      // Embed the inner activity.
       TheNet->mergePlaces(p2, TheNet->findPlace(newPrefix + ".initial"));
       TheNet->mergePlaces(p4, TheNet->findPlace(newPrefix + ".final"));
       TheNet->mergePlaces(p6, TheNet->findPlace(newPrefix + ".stop"));
@@ -3359,6 +3544,14 @@ This=StandardElements(NiltTarget_list(), a) ->
 ;
 
 
+
+
+
+/******************************************************************************
+ * Figure 23: Pattern for an activity that is target of links in case of
+ * suppressJoinFailure="no".
+ *****************************************************************************/
+
 This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure == mkcasestring("no")) ->
   [petrinet:
     {
@@ -3366,7 +3559,6 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
       string prefix = intToString(This->parentId->value) + ".";
       string newPrefix = intToString(This->parentId->value) + ".internal";
       
-      //Place *p5  = TheNet->newPlace(prefix + "negLink");
       Place *p6  = TheNet->newPlace(prefix + "p6");
       Place *p7  = TheNet->newPlace(prefix + "final");
       Place *p8  = TheNet->newPlace(prefix + "initial");
@@ -3378,36 +3570,42 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
       TheNet->newArc(t1, p6);
       TheNet->newArc(p8, t1); 
 
-      throwFault(p8, p11, "!(" + string(This->joinCondition->name) + ")", "initial", "", prefix, This->negativeControlFlow); // t2
-      stop(p8, "initial", "", prefix);	// t3
-      stop(p11, "p11", "", prefix);	// t4
+
+      // Transitions for the negative control flow.
+      Transition *t2 = throwFault(p8, p11, "!(" + string(This->joinCondition->name) + ")", "initial", "", prefix, This->negativeControlFlow);
+
+      Transition *t3 = stop(p8, "initial", "", prefix);
+      Transition *t4 = stop(p11, "p11", "", prefix);
       
+
+      // Connect the target links with transitions t1 and t2.
       int i = 1;
       foreach (link; tTarget_list a)
       {
 	Place *p1 = TheNet->findPlace("!link." + string(link->linkID->name));
 	Place *p3 = TheNet->findPlace("link." + string(link->linkID->name));
+	
 	TheNet->newArc(t1, p1);
 	TheNet->newArc(p3, t1, "b" + intToString(i));
-
-	Transition* t2 = TheNet->findTransition(prefix + "throwFault.initial");
+	
 	TheNet->newArc(t2, p1);
 	TheNet->newArc(p3, t2, "b" + intToString(i));
-
 	i++;
       }
 
-      // DPE
+      
+      // If the inner activity has a place negLink, connect this place with
+      // transition t2 for dead path elimination.
       Place *p5 = TheNet->findPlace(newPrefix + ".negLink");
       if (p5 != NULL)
       {
-	Place *p5a  = TheNet->newPlace(prefix + "negLink");
-	TheNet->newArc(TheNet->findTransition(prefix + "throwFault.initial"), p5a);
+	Place *p5a = TheNet->newPlace(prefix + "negLink");
+	TheNet->newArc(t2, p5a);
 	TheNet->mergePlaces(p5a, TheNet->findPlace(newPrefix + ".negLink"));
       }
       
-      // embed activity X
-      //TheNet->mergePlaces(p5,  TheNet->findPlace(newPrefix + ".negLink"));
+
+      // Embed the inner activity.
       TheNet->mergePlaces(p6,  TheNet->findPlace(newPrefix + ".initial"));
       TheNet->mergePlaces(p7,  TheNet->findPlace(newPrefix + ".final"));
       TheNet->mergePlaces(p9,  TheNet->findPlace(newPrefix + ".stop"));
@@ -3417,6 +3615,14 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
 ;
 
 
+
+
+
+/******************************************************************************
+ * Figure 24: Pattern for an activity that is target of links in case of
+ * suppressJoinFailure="yes".
+ *****************************************************************************/
+
 This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure == mkcasestring("yes")) ->
   [petrinet:
     {
@@ -3424,7 +3630,6 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
       string prefix = intToString(This->parentId->value) + ".";
       string newPrefix = intToString(This->parentId->value) + ".internal";
 
-      //Place *p5  = TheNet->newPlace(prefix + "negLink");
       Place *p6  = TheNet->newPlace(prefix + "p6");
       Place *p7  = TheNet->newPlace(prefix + "final");
       Place *p8  = TheNet->newPlace(prefix + "initial");
@@ -3437,11 +3642,14 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
 
       Transition *t2 = TheNet->newTransition(prefix + "t2", "!(" + string(This->joinCondition->name) + ")");
       TheNet->newArc(p8, t2);
-      //TheNet->newArc(t2, p5);
       TheNet->newArc(t2, p7);
 
-      stop(p8, "initial", "", prefix); // t3
 
+      // Transition for the negative control flow.
+      Transition *t3 = stop(p8, "initial", "", prefix);
+
+
+      // Connect the target links with transitions t1 and t2.
       int i = 1;
       foreach (link; tTarget_list a)
       {
@@ -3453,7 +3661,9 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
 	i++;
       }
 
-      // DPE
+
+      // If the inner activity has a place negLink, connect this place with
+      // transition t2 for dead path elimination.
       Place *p5 = TheNet->findPlace(newPrefix + ".negLink");
       if (p5 != NULL)
       {
@@ -3461,8 +3671,8 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
 	TheNet->mergePlaces(p5, TheNet->findPlace(newPrefix + ".negLink"));
       }
       
-      // embed activity X
-      //TheNet->mergePlaces(p5, TheNet->findPlace(newPrefix + ".negLink"));
+
+      // Embed the inner activity.
       TheNet->mergePlaces(p6, TheNet->findPlace(newPrefix + ".initial"));
       TheNet->mergePlaces(p7, TheNet->findPlace(newPrefix + ".final"));
       TheNet->mergePlaces(p9, TheNet->findPlace(newPrefix + ".stop"));
@@ -3472,6 +3682,14 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
 ;
 
 
+
+
+
+/******************************************************************************
+ * Figure 25: Pattern for an activity that is source and target of links in
+ * case of suppressJoinFailure="yes".
+ *****************************************************************************/
+
 This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("yes")) ->
   [petrinet:
     {
@@ -3479,28 +3697,12 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
       string prefix = intToString(This->parentId->value) + ".";
       string newPrefix = intToString(This->parentId->value) + ".internal";      
 
-      //Place *p9  = TheNet->newPlace(prefix + "negLink");
-      //Place *p10 = TheNet->newPlace(prefix + "p10");
       Place *p11 = TheNet->newPlace(prefix + "p11");
       Place *p12 = TheNet->newPlace(prefix + "p12");
       Place *p13 = TheNet->newPlace(prefix + "final");
       Place *p14 = TheNet->newPlace(prefix + "stop");
       Place *p15 = TheNet->newPlace(prefix + "stopped");
       Place *p16 = TheNet->newPlace(prefix + "initial");
-
-      // DPE
-      Transition *t1 = NULL;
-      if (This->dpe->value > 0)
-      {
-	Place *p9  = TheNet->newPlace(prefix + "negLink");
-	
-	Transition *t1 = TheNet->newTransition(prefix + "t1");
-	TheNet->newArc(p9, t1);
-	
-	Place *p10 = TheNet->findPlace(newPrefix + ".negLink");
-	if (p10 != NULL)
-	  TheNet->newArc(t1, p10);
-      }
 
       Transition *t2 = TheNet->newTransition(prefix + "t2", string(This->joinCondition->name));
       TheNet->newArc(t2, p11);
@@ -3515,13 +3717,32 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
       TheNet->newArc(t4, p13);
 
       Transition *t5 = TheNet->newTransition(prefix + "t5", "!(" + string(This->joinCondition->name) + ")");
-      //TheNet->newArc(t5, p10);
       TheNet->newArc(t5, p13);
       TheNet->newArc(p16, t5);
 
-      stop(p16, "initial", "", prefix);	// t6
-      stop(p13, "final", "", prefix);	// t7
 
+      // Transitions for the negative control flow.
+      Transition *t6 = stop(p16, "initial", "", prefix);
+      Transition *t7 = stop(p13, "final", "", prefix);
+
+
+      // If needed, transition t1 is created and connected with the negLink
+      // place of the inner activity if existing for dead path elimination.
+      Transition *t1 = NULL;
+      if (This->dpe->value > 0)
+      {
+	Place *p9  = TheNet->newPlace(prefix + "negLink");
+	
+	Transition *t1 = TheNet->newTransition(prefix + "t1");
+	TheNet->newArc(p9, t1);
+	
+	Place *p10 = TheNet->findPlace(newPrefix + ".negLink");
+	if (p10 != NULL)
+	  TheNet->newArc(t1, p10);
+      }
+
+      
+      // Connect each target links with t2 and t5.
       int i = 1;
       foreach (link; tTarget_list a)
       {
@@ -3534,27 +3755,33 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
 	i++;
       }
 
+
+      // Connect all source link places with t3 and t4 and, if needed, with
+      // transition t1 for dead path elimination.
       i = 1;
       foreach (link; tSource_list b)
       {
 	Place *p5 = TheNet->findPlace("!link." + string(link->linkID->name));
 	Place *p7 = TheNet->findPlace("link." + string(link->linkID->name));
 
-	if (This->dpe->value > 0)
-	{
-	  TheNet->newArc(p5, t1);
-	  TheNet->newArc(t1, p7, "false");
-	}
-
         TheNet->newArc(p5, t3);
         TheNet->newArc(t3, p7, string(link->transitionCondition->name));
         TheNet->newArc(p5, t5);
         TheNet->newArc(t5, p7, "false");
 	TheNet->newArc(p7, t4, READ);
+
+	if (This->dpe->value > 0)
+	{
+	  TheNet->newArc(p5, t1);
+	  TheNet->newArc(t1, p7, "false");
+	}
+	
 	i++;
       }
 
-      // DPE
+      
+      // If the inner activity has a place negLink, connect this place with
+      // transition t5 for dead path elimination.
       Place *p10 = TheNet->findPlace(newPrefix + ".negLink");
       if (p10 != NULL)
       {
@@ -3563,8 +3790,8 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
 	  TheNet->mergePlaces(p10, TheNet->findPlace(newPrefix + ".negLink"));
       }
       
-      // embed activity X
-      //TheNet->mergePlaces(p10, TheNet->findPlace(newPrefix + ".negLink"));
+
+      // Embed the inner activity.
       TheNet->mergePlaces(p11, TheNet->findPlace(newPrefix + ".initial"));
       TheNet->mergePlaces(p12, TheNet->findPlace(newPrefix + ".final"));
       TheNet->mergePlaces(p14, TheNet->findPlace(newPrefix + ".stop"));
@@ -3574,6 +3801,15 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
 ;
 
 
+
+
+
+
+/******************************************************************************
+ * Figure 26: Pattern for an activity that is source and target of links in
+ * case of suppressJoinFailure="no".
+ *****************************************************************************/
+
 This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("no")) ->
   [petrinet:
     {
@@ -3581,8 +3817,6 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
       string prefix = intToString(This->parentId->value) + ".";
       string newPrefix = intToString(This->parentId->value) + ".internal";
 
-      //Place *p9  = TheNet->newPlace(prefix + "negLink");
-      //Place *p10 = TheNet->newPlace(prefix + "p10");
       Place *p11 = TheNet->newPlace(prefix + "p11");
       Place *p12 = TheNet->newPlace(prefix + "p12");
       Place *p13 = TheNet->newPlace(prefix + "final");
@@ -3590,20 +3824,6 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
       Place *p15 = TheNet->newPlace(prefix + "stopped");
       Place *p16 = TheNet->newPlace(prefix + "initial");
       Place *p17 = TheNet->newPlace(prefix + "p17");
-
-      // DPE
-      Transition *t1 = NULL;
-      if (This->dpe->value > 0)
-      {
-	Place *p9  = TheNet->newPlace(prefix + "negLink");
-	
-	t1 = TheNet->newTransition(prefix + "t1");
-	TheNet->newArc(p9, t1);
-	
-	Place *p10 = TheNet->findPlace(newPrefix + ".negLink");
-	if (p10 != NULL)
-	  TheNet->newArc(t1, p10);
-      }
 
       Transition *t2 = TheNet->newTransition(prefix + "t2", string(This->joinCondition->name));
       TheNet->newArc(t2, p11);
@@ -3617,11 +3837,32 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
       TheNet->newArc(p12, t4);
       TheNet->newArc(t4, p13);
 
-      throwFault(p16, p17, "!(" + string(This->joinCondition->name) + ")", "initial", "", prefix, This->negativeControlFlow); // t5
-      stop(p16, "initial", "", prefix);	// t6
-      stop(p17, "p17", "", prefix);	// t7
-      stop(p13, "final", "", prefix);	// t8
 
+      // Transitions for the negative control flow.
+      Transition *t5 = throwFault(p16, p17, "!(" + string(This->joinCondition->name) + ")", "initial", "", prefix, This->negativeControlFlow);
+
+      Transition *t6 = stop(p16, "initial", "", prefix);
+      Transition *t7 = stop(p17, "p17", "", prefix);
+      Transition *t8 = stop(p13, "final", "", prefix);
+
+
+      // If needed, transition t1 is created and connected with the negLink
+      // place of the inner activity if existing for dead path elimination.
+      Transition *t1 = NULL;
+      if (This->dpe->value > 0)
+      {
+	Place *p9  = TheNet->newPlace(prefix + "negLink");
+	
+	t1 = TheNet->newTransition(prefix + "t1");
+	TheNet->newArc(p9, t1);
+	
+	Place *p10 = TheNet->findPlace(newPrefix + ".negLink");
+	if (p10 != NULL)
+	  TheNet->newArc(t1, p10);
+      }
+      
+
+      // Connect each target links with t2 and t5.
       int i = 1;
       foreach (link; tTarget_list a)
       {
@@ -3629,44 +3870,46 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
 	Place *p3 = TheNet->findPlace("link." + string(link->linkID->name));
         TheNet->newArc(t2, p1);	
 	TheNet->newArc(p3, t2, "b" + intToString(i));
-	
-	Transition* faultTransition = TheNet->findTransition(prefix + "throwFault.initial");
-	TheNet->newArc(faultTransition, p1);
-	TheNet->newArc(p3, faultTransition, "b" + intToString(i));
-
+	TheNet->newArc(t5, p1);
+	TheNet->newArc(p3, t5, "b" + intToString(i));
 	i++;
       }
       
+
+      // Connect all source link places with t3 and t4 and, if needed, with
+      // transition t1 for dead path elimination.
       i = 1;
       foreach (link; tSource_list b)
       {
 	Place *p5 = TheNet->findPlace("!link." + string(link->linkID->name));
 	Place *p7 = TheNet->findPlace("link." + string(link->linkID->name));
 	
+	TheNet->newArc(p5, t3);
+        TheNet->newArc(t3, p7, string(link->transitionCondition->name));
+	TheNet->newArc(p7, t4, READ);
+
 	if (This->dpe->value > 0)
 	{
 	  TheNet->newArc(p5, t1);
 	  TheNet->newArc(t1, p7, "false");
 	}
-
-
-	TheNet->newArc(p5, t3);
-        TheNet->newArc(t3, p7, string(link->transitionCondition->name));
-	TheNet->newArc(p7, t4, READ);
+	
 	i++;
       }
 
-      // DPE
+
+      // If the inner activity has a place negLink, connect this place with
+      // transition t5 for dead path elimination.
       Place *p10 = TheNet->findPlace(newPrefix + ".negLink");
       if (p10 != NULL)
       {
-	TheNet->newArc(TheNet->findTransition(prefix + "throwFault.initial"), p10);
+	TheNet->newArc(t5, p10);
 	if (This->dpe->value > 0)
 	  TheNet->mergePlaces(p10, TheNet->findPlace(newPrefix + ".negLink"));
       }
-      
-      // embed activity X
-      //TheNet->mergePlaces(p10, TheNet->findPlace(newPrefix + ".negLink"));
+
+
+      // Embed the inner activity.
       TheNet->mergePlaces(p11, TheNet->findPlace(newPrefix + ".initial"));
       TheNet->mergePlaces(p12, TheNet->findPlace(newPrefix + ".final"));
       TheNet->mergePlaces(p14, TheNet->findPlace(newPrefix + ".stop"));

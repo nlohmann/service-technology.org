@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/02/08 10:22:42 $
+ *          - last changed: \$Date: 2006/02/09 11:07:19 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          Humboldt-University of Berlin reading file bpel-unparse.k. See
  *          http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  */
 %}
 
@@ -73,42 +73,7 @@
 %{ KC_UNPARSE
 /* These lines are from bpel-unparse-xml.k */
 #include <iostream>
-#include "helpers.h"
-
-/// number of spaces to be added as indention
-unsigned int indent = 0;
-
-/// number of spaces to be added when indention is increased
-unsigned int indentStep = 4;
-
-
-/// Adds whitespace to indent output
-void in()
-{
-  for(unsigned int i=0; i<indent; i++)
-    *output << " ";
-}
-
-
-/// Increases indention
-void inup()
-{
-  in();
-  indent += indentStep;
-}
-
-
-/// Decreases indention
-void indown()
-{
-  indent -= indentStep;
-  in();
-}
-
-
-
-
-
+#include "bpel-unparse-tools.h"
 %}
 
 

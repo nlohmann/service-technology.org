@@ -41,7 +41,6 @@ typedef enum
 typedef enum
 {
   P_SIMPLIFY,
-  P_LOWLEVEL,
   P_NOINTERFACE,
   P_FINALMARKING,
   P_UNIQUEFAULT,

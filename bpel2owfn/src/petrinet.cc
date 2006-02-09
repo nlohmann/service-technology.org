@@ -31,13 +31,13 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/02/09 20:20:10 $
+ *          - last changed: \$Date: 2006/02/09 20:41:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.91 $
+ * \version \$Revision: 1.92 $
  */
 
 
@@ -158,13 +158,11 @@ string Node::nodeShortName ()
 /*!
  * \param mysource      the source-node of the arc
  * \param mytarget      the target-node of the arc
- * \param mytype        the type of the arc (as defined in #arc_type)
  */
-Arc::Arc (Node * mysource, Node * mytarget, arc_type mytype)
+Arc::Arc (Node * mysource, Node * mytarget)
 {
   source = mysource;
   target = mytarget;
-  type = mytype;
 }
 
 
@@ -176,17 +174,7 @@ Arc::Arc (Node * mysource, Node * mytarget, arc_type mytype)
 */
 string Arc::dotOut ()
 {
-  string
-    result;
-  result +=
-    " " + intToString (source->id) + " -> " + intToString (target->id) +
-    "\t[";
-
-  if (type == READ)
-    result += "arrowhead=diamond arrowtail=tee";
-
-  result += "];\n";
-  return result;
+  return " " + intToString (source->id) + " -> " + intToString (target->id) + ";\n";
 }
 
 
@@ -323,7 +311,6 @@ string Place::dotOut ()
 
 PetriNet::PetriNet ()
 {
-  lowLevel = false;
   hasNoInterface = false;
   nextId = 0;
 }
@@ -510,8 +497,14 @@ PetriNet::newArc (Node * source, Node * target, arc_type type)
   if ((!F.empty()) && (F.size () % 1000 == 0))
     trace (TRACE_INFORMATION, "[PN]\t" + information () + "\n");
 
-  Arc *f = new Arc (source, target, type);
+  Arc *f = new Arc (source, target);
   F.insert (f);
+
+  if (type == READ)
+  {
+    Arc *f2 = new Arc (target, source);
+    F.insert (f2);
+  }
 
   return f;
 }
@@ -735,8 +728,6 @@ PetriNet::dotOut ()
 
   if (parameters[P_SIMPLIFY])
     (*output) << "structural simplified ";
-  if (lowLevel)
-    (*output) << "low-level ";
 
   (*output) << "Petri net generated from " << filename << "\"];" << endl;
   (*output) <<
@@ -810,9 +801,6 @@ PetriNet::pnmlOut ()
 {
   trace (TRACE_DEBUG, "[PN]\tCreating PNML-output.\n");
 
-  if (!lowLevel)
-    makeLowLevel ();
-
   removeInterface ();
   calculateInitialMarking();
 
@@ -875,9 +863,6 @@ PetriNet::pepOut()
 {
   trace (TRACE_DEBUG, "[PN]\tCreating PEP-output.\n");
 
-  if (!lowLevel)
-    makeLowLevel ();
-
   removeInterface ();
   calculateInitialMarking();
   
@@ -923,9 +908,6 @@ void
 PetriNet::appnOut ()
 {
   trace (TRACE_DEBUG, "[PN]\tCreating APPN-output.\n");
-
-  if (!lowLevel)
-    makeLowLevel ();
 
   removeInterface ();
   calculateInitialMarking();
@@ -974,9 +956,6 @@ PetriNet::lolaOut ()
 {
   trace (TRACE_DEBUG, "[PN]\tCreating LoLA-output.\n");
 
-  if (!lowLevel)
-    makeLowLevel ();
-
   removeInterface ();
 
   (*output) << "{ Petri net created by " << PACKAGE_STRING <<
@@ -1018,18 +997,17 @@ PetriNet::lolaOut ()
        count++, t++)
     {
       (*output) << "TRANSITION " << (*t)->nodeShortName() << "\t { " << (*(*t)->history.begin()) << " }" << endl;
-      set < pair < Node *, arc_type > >consume = preset (*t);
-      set < pair < Node *, arc_type > >produce = postset (*t);
+      set<Node *> consume = preset (*t);
+      set<Node *> produce = postset (*t);
 
       (*output) << "CONSUME" << endl;
       if (consume.empty ())
 	(*output) << ";" << endl;
 
       unsigned int count2 = 1;
-      for (set < pair < Node *, arc_type > >::iterator pre = consume.begin ();
-	   pre != consume.end (); count2++, pre++)
+      for (set<Node *>::iterator pre = consume.begin(); pre != consume.end(); count2++, pre++)
 	{
-	  (*output) << "  " << (*pre).first->nodeShortName() << ":\t1";
+	  (*output) << "  " << (*pre)->nodeShortName() << ":\t1";
 
 	  if (count2 < consume.size ())
 	    (*output) << "," << endl;
@@ -1042,10 +1020,9 @@ PetriNet::lolaOut ()
 	(*output) << ";" << endl;
 
       count2 = 1;
-      for (set < pair < Node *, arc_type > >::iterator post =
-	   produce.begin (); post != produce.end (); count2++, post++)
+      for (set<Node *>::iterator post = produce.begin(); post != produce.end(); count2++, post++)
 	{
-	  (*output) << "  " << (*post).first->nodeShortName() << ":\t1";
+	  (*output) << "  " << (*post)->nodeShortName() << ":\t1";
 
 	  if (count2 < produce.size ())
 	    (*output) << "," << endl;
@@ -1070,9 +1047,6 @@ void
 PetriNet::owfnOut ()
 {
   trace (TRACE_DEBUG, "[PN]\tCreating oWFN-output.\n");
-
-  if (!lowLevel)
-    makeLowLevel ();
 
   (*output) << "{ oWFN created by " << PACKAGE_STRING <<
     " reading " << filename << " }" << endl << endl;
@@ -1158,18 +1132,17 @@ PetriNet::owfnOut ()
        count++, t++)
     {
       (*output) << "TRANSITION " << (*t)->nodeShortName() << "\t { " << (*(*t)->history.begin()) << " }" << endl;
-      set < pair < Node *, arc_type > >consume = preset (*t);
-      set < pair < Node *, arc_type > >produce = postset (*t);
+      set<Node *> consume = preset (*t);
+      set<Node *> produce = postset (*t);
 
       (*output) << "CONSUME" << endl;
       if (consume.empty ())
 	(*output) << ";" << endl;
 
       unsigned int count2 = 1;
-      for (set < pair < Node *, arc_type > >::iterator pre = consume.begin ();
-	   pre != consume.end (); count2++, pre++)
+      for (set<Node *>::iterator pre = consume.begin(); pre != consume.end(); count2++, pre++)
 	{
-	  (*output) << "  " << (*pre).first->nodeShortName() << ":\t1";
+	  (*output) << "  " << (*pre)->nodeShortName() << ":\t1";
 
 	  if (count2 < consume.size ())
 	    (*output) << "," << endl;
@@ -1182,10 +1155,9 @@ PetriNet::owfnOut ()
 	(*output) << ";" << endl;
 
       count2 = 1;
-      for (set < pair < Node *, arc_type > >::iterator post =
-	   produce.begin (); post != produce.end (); count2++, post++)
+      for (set<Node *>::iterator post = produce.begin(); post != produce.end(); count2++, post++)
 	{
-	  (*output) << "  " << (*post).first->nodeShortName() << ":\t1";
+	  (*output) << "  " << (*post)->nodeShortName() << ":\t1";
 
 	  if (count2 < produce.size ())
 	    (*output) << "," << endl;
@@ -1244,18 +1216,14 @@ PetriNet::mergeTransitions (Transition * t1, Transition * t2)
       t12->history.push_back (*role);
     }
 
-  set < pair < Node *, arc_type > >pre12 =
-    setUnion (preset (t1), preset (t2));
-  set < pair < Node *, arc_type > >post12 =
-    setUnion (postset (t1), postset (t2));
+  set<Node *> pre12 = setUnion(preset (t1), preset (t2));
+  set<Node *> post12 = setUnion (postset (t1), postset (t2));
 
-  for (set < pair < Node *, arc_type > >::iterator n = pre12.begin ();
-       n != pre12.end (); n++)
-    newArc ((*n).first, t12, (*n).second);
+  for (set<Node *>::iterator n = pre12.begin(); n != pre12.end(); n++)
+    newArc ((*n), t12);
 
-  for (set < pair < Node *, arc_type > >::iterator n = post12.begin ();
-       n != post12.end (); n++)
-    newArc (t12, (*n).first, (*n).second);
+  for (set<Node *>::iterator n = post12.begin(); n != post12.end(); n++)
+    newArc (t12, (*n));
 
   removeTransition (t1);
   removeTransition (t2);
@@ -1320,18 +1288,14 @@ PetriNet::mergePlaces (Place * p1, Place * p2)
       roleMap[*role] = p12;
     }
 
-  set < pair < Node *, arc_type > >pre12 =
-    setUnion (preset (p1), preset (p2));
-  set < pair < Node *, arc_type > >post12 =
-    setUnion (postset (p1), postset (p2));
+  set<Node *> pre12 = setUnion (preset (p1), preset (p2));
+  set<Node *> post12 = setUnion (postset (p1), postset (p2));
 
-  for (set < pair < Node *, arc_type > >::iterator n = pre12.begin ();
-       n != pre12.end (); n++)
-    newArc ((*n).first, p12, (*n).second);
+  for (set<Node *>::iterator n = pre12.begin(); n != pre12.end(); n++)
+    newArc((*n), p12);
 
-  for (set < pair < Node *, arc_type > >::iterator n = post12.begin ();
-       n != post12.end (); n++)
-    newArc (p12, (*n).first, (*n).second);
+  for (set<Node *>::iterator n = post12.begin(); n != post12.end(); n++)
+    newArc(p12, (*n));
 
   removePlace (p1);
   removePlace (p2);
@@ -1387,17 +1351,13 @@ PetriNet::mergePlaces (kc::impl_activity * act1, string role1,
  * \param n a node of the Petri net
  * \result the preset of node n
  */
-set < pair < Node *, arc_type > >PetriNet::preset (Node * n)
+set<Node *> PetriNet::preset (Node * n)
 {
-  set < pair < Node *, arc_type > >result;
+  set<Node *> result;
 
   for (set < Arc * >::iterator f = F.begin (); f != F.end (); f++)
     if ((*f)->target == n)
-      {
-	pair < Node *, arc_type > element =
-	  pair < Node *, arc_type > ((*f)->source, (*f)->type);
-	result.insert (element);
-      }
+      result.insert((*f)->source);
 
   return result;
 }
@@ -1410,17 +1370,13 @@ set < pair < Node *, arc_type > >PetriNet::preset (Node * n)
  * \param n a node of the Petri net
  * \result the postset of node n
  */
-set < pair < Node *, arc_type > >PetriNet::postset (Node * n)
+set<Node *> PetriNet::postset (Node * n)
 {
-  set < pair < Node *, arc_type > >result;
+  set<Node *> result;
 
   for (set < Arc * >::iterator f = F.begin (); f != F.end (); f++)
     if ((*f)->source == n)
-      {
-	pair < Node *, arc_type > element =
-	  pair < Node *, arc_type > ((*f)->target, (*f)->type);
-	result.insert (element);
-      }
+      result.insert((*f)->target);
 
   return result;
 }
@@ -1561,8 +1517,8 @@ PetriNet::simplify ()
   for (set < Transition * >::iterator t = T.begin (); t != T.end (); t++)
     if (preset (*t).size () == 1 && postset (*t).size () == 1)
       {
-	string id1 = *((*(preset (*t).begin ())).first->history.begin ());
-	string id2 = *((*(postset (*t).begin ())).first->history.begin ());
+	string id1 = *((*(preset (*t).begin ()))->history.begin ());
+	string id2 = *((*(postset (*t).begin ()))->history.begin ());
 	placeMerge.push_back (pair < string, string > (id1, id2));
 	sequenceTransitions.push_back (*((*t)->history.begin ()));
       }
@@ -1584,46 +1540,6 @@ PetriNet::simplify ()
   trace (TRACE_INFORMATION, "Simplifying complete.\n");
   trace (TRACE_DEBUG, "[PN]\tPetri net size after simplification: " +
 	 information () + "\n");
-}
-
-
-
-
-
-/*!
- * Converts the created Petri net to low-level representation. Therefore the
- * following steps are taken:
- *
- * - Convert all places to low-level places.
- * - Convert read arcs to loops.
- *
- * Only reset arcs remain as high-level constructs. They will be converted
- * (i.e. unfolded) in a later stage since this unfolding is target-format
- * specific.
- *
- */
-void
-PetriNet::makeLowLevel ()
-{
-  trace (TRACE_INFORMATION, "Converting Petri net to low-level...\n");
-
-  // convert read arcs
-  set < Arc * >readArcs;
-
-  for (set < Arc * >::iterator f = F.begin (); f != F.end (); f++)
-    {
-      if ((*f)->type == READ)
-	{
-	  (*f)->type = STANDARD;
-	  readArcs.insert (*f);
-	}
-    }
-
-  for (set < Arc * >::iterator f = readArcs.begin (); f != readArcs.end ();
-       f++)
-    newArc ((*f)->target, (*f)->source);
-
-  lowLevel = true;
 }
 
 

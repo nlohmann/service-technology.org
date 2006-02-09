@@ -74,7 +74,7 @@ void print_help()
   trace(" -m | --mode=<modus>    - select one of the following modes:\n");
   trace("                          ast, pretty, petrinet, cfg\n");
   trace(" -p | --parameter=<par> - select additional parameters like:\n");
-  trace("                          simplify, lowlevel, nointerface etc.\n");
+  trace("                          simplify, nointerface etc.\n");
   trace("                          (see documentation for further information)\n");
   trace("\n");
   trace(" -i | --input=<file>    - read input from <file>\n");
@@ -325,10 +325,6 @@ void parse_command_line(int argc, char* argv[])
 	      if ( parameter == "simplify" )
 	      {
 	        parameters[P_SIMPLIFY] = true;
-	      }
-	      else if ( parameter == "lowlevel" )
-	      {
-	        parameters[P_LOWLEVEL] = true;
 	      }
 	      else if ( parameter == "nointerface" )
 	      {

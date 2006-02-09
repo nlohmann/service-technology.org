@@ -40,13 +40,13 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/02/09 20:20:10 $
+ *          - last changed: \$Date: 2006/02/09 20:41:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *          
- * \version \$Revision: 1.54 $
+ * \version \$Revision: 1.55 $
  */
 
 
@@ -239,8 +239,7 @@ public:
  * \brief Arcs of the Petri net
  *
  * Class to represent arcs of Petri nets. An arc written as a tupel (n1,n2)
- * has n1 as #source and n2 as #target. Moreover each arc has a type defined
- * in the enumeration #arc_type.
+ * has n1 as #source and n2 as #target.
  * 
 */
 
@@ -253,11 +252,8 @@ public:
   /// target node of the arc
   Node *target;
 
-  /// type of the arc (as defined in #arc_type)
-  arc_type type;
-
   /// Constructor to create an arc of certain type.
-  Arc (Node * source, Node * target, arc_type type);
+  Arc (Node * source, Node * target);
 
   /// DOT-output of the arc (used by PetriNet::dotOut())
   string dotOut ();
@@ -341,9 +337,6 @@ public:
   /// Simplifies the Petri net.
   void simplify ();
 
-  /// Converts net to low-level net.
-  void makeLowLevel ();
-
   /// Constructor to create an empty Petri net.
   PetriNet ();
 
@@ -367,10 +360,10 @@ private:
   void detachNode (Node * n);
 
   /// Calculates the preset of a node.
-  set < pair < Node *, arc_type > >preset (Node * n);
+  set < Node * >preset (Node * n);
 
   /// Calculates the postset of a node.
-  set < pair < Node *, arc_type > >postset (Node * n);
+  set < Node * >postset (Node * n);
 
   /// the list of places of the Petri net
   set < Place * >P;
@@ -404,9 +397,6 @@ private:
 
   /// the id that will be assigned to the next node
   unsigned int nextId;
-
-  /// true if function #PetriNet::makeLowLevel() was called
-  bool lowLevel;
 
   /// true if function #PetriNet::removeInterface() was called
   bool hasNoInterface;

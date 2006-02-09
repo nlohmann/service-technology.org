@@ -176,6 +176,8 @@ void parse_command_line(int argc, char* argv[])
 	      }
 	      else if (mode == "pretty") {
 		modus = M_PRETTY;
+		formats[F_XML] = true;
+		options[O_FORMAT] = true;
 	      }
 	      else if (mode == "petrinet") {
 		modus = M_PETRINET;

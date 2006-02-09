@@ -40,13 +40,13 @@
  * 
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/02/09 19:09:06 $
+ *          - last changed: \$Date: 2006/02/09 20:20:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *          
- * \version \$Revision: 1.53 $
+ * \version \$Revision: 1.54 $
  */
 
 
@@ -104,8 +104,7 @@ typedef enum
 typedef enum
 {
   STANDARD,			///< low-level arc (standard)
-  READ,				///< read arc
-  RESET				///< reset arc
+  READ				///< read arc
 } arc_type;
 
 
@@ -177,20 +176,16 @@ public:
  *
  * \brief Transitions of the Petri net
  *
- * Class to represent transitions of Petri nets. In addition to the inherited
- * variables #id and #history, each transition can have a transition #guard
- * stored as C++-string.
+ * Class to represent transitions of Petri nets. Each transition inherits the
+ * variables #id and #history.
  * 
 */
 
 class Transition:public Node
 {
 public:
-  /// guard of the transition
-  string guard;
-
   /// constructor which creates a transition and adds a first role to the history
-  Transition (unsigned int id, string role, string guard);
+  Transition (unsigned int id, string role);
 
   /// DOT-output of the transition (used by PetriNet::dotOut())
   string dotOut ();
@@ -245,8 +240,7 @@ public:
  *
  * Class to represent arcs of Petri nets. An arc written as a tupel (n1,n2)
  * has n1 as #source and n2 as #target. Moreover each arc has a type defined
- * in the enumeration #arc_type and an optional #inscription for high-level
- * Petri nets to be evaluated by guarded transitions.
+ * in the enumeration #arc_type.
  * 
 */
 
@@ -262,11 +256,8 @@ public:
   /// type of the arc (as defined in #arc_type)
   arc_type type;
 
-  /// inscription of the arc for high-level Petri nets
-  string inscription;
-
-  /// Constructor to create an arc of certain type and inscription.
-  Arc (Node * source, Node * target, arc_type type, string inscription);
+  /// Constructor to create an arc of certain type.
+  Arc (Node * source, Node * target, arc_type type);
 
   /// DOT-output of the arc (used by PetriNet::dotOut())
   string dotOut ();
@@ -298,18 +289,11 @@ public:
   /// Adds a place with a given role and type.
   Place * newPlace (string role, place_type type = INTERNAL);
 
-  /// Adds a transition with a given role and guard.
-  Transition *newTransition (string role, string guard = "");
+  /// Adds a transition with a given role.
+  Transition *newTransition (string role);
 
-  /// Adds an arc given source and target node and an inscription.
-  Arc *newArc (Node * source, Node * target, string inscription = "");
-
-  /// Adds an arc given source and target node and an inscription.
-  Arc *newArc (Node * source, Node * target, kc::casestring inscription);
-
-  /// Adds an arc given source and target node, and arc type and an inscription.
-  Arc *newArc (Node * source, Node * target, arc_type type,
-	       string inscription = "");
+  /// Adds an arc given source and target node, and arc type.
+  Arc *newArc (Node * source, Node * target, arc_type type = STANDARD);
 
   /// Information about the net including histories of all nodes.
   void printInformation ();

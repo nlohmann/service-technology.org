@@ -32,13 +32,13 @@
  *          
  * \date
  *          - created: 2006/02/08
- *          - last changed: \$Date: 2006/02/09 19:09:06 $
+ *          - last changed: \$Date: 2006/02/09 20:20:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  */
 
 
@@ -74,10 +74,10 @@ using namespace std;
  *****************************************************************************/
 
 Transition *throwFault(Place *p1, Place *p2,
-    string guard, string p1name, string inscription, string prefix,
+    string p1name, string prefix,
     kc::integer negativeControlFlow, bool preventFurtherFaults = true);
 
-Transition *stop(Place *p, string p_name, string inscription, string prefix);
+Transition *stop(Place *p, string p_name, string prefix);
 
 string inString();
 void header(kc::integer id, bool indent = false);

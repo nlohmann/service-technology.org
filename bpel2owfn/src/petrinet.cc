@@ -31,13 +31,13 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/02/09 19:09:06 $
+ *          - last changed: \$Date: 2006/02/09 20:20:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.90 $
+ * \version \$Revision: 1.91 $
  */
 
 
@@ -159,15 +159,12 @@ string Node::nodeShortName ()
  * \param mysource      the source-node of the arc
  * \param mytarget      the target-node of the arc
  * \param mytype        the type of the arc (as defined in #arc_type)
- * \param myinscription the inscription of the arc (empty string for none)
  */
-Arc::Arc (Node * mysource, Node * mytarget, arc_type mytype,
-	  string myinscription)
+Arc::Arc (Node * mysource, Node * mytarget, arc_type mytype)
 {
   source = mysource;
   target = mytarget;
   type = mytype;
-  inscription = myinscription;
 }
 
 
@@ -185,13 +182,8 @@ string Arc::dotOut ()
     " " + intToString (source->id) + " -> " + intToString (target->id) +
     "\t[";
 
-  if (type == RESET)
-    result += "arrowtail=odot ";
-  else if (type == READ)
-    result += "arrowhead=diamond arrowtail=tee ";
-
-  if (inscription != "")
-    result += "label=\"" + inscription + "\" ";
+  if (type == READ)
+    result += "arrowhead=diamond arrowtail=tee";
 
   result += "];\n";
   return result;
@@ -207,11 +199,9 @@ string Arc::dotOut ()
 /*!
  * \param myid    the id of the transition
  * \param role    the first role of the transition
- * \param myguard the guard of the transition
  */
-Transition::Transition (unsigned int myid, string role, string myguard)
+Transition::Transition (unsigned int myid, string role)
 {
-  guard = myguard;
   id = myid;
   nodeType = TRANSITION;
 
@@ -226,18 +216,11 @@ Transition::Transition (unsigned int myid, string role, string myguard)
 /*!
  * DOT-output of the transition. Transitions are colored corresponding to their
  * initial role.
- *
- * \todo
- *       - (nlohmann) escape guards
 */
 string Transition::dotOut ()
 {
   string result;
   result += " " + intToString (id) + "\t[label=\"" + nodeShortName() + "\"";
-
-  if (guard != "")
-    result +=
-      " shape=record label=\"{" + nodeShortName() + "|{" + guard + "}}\"";
 
   if (firstMemberAs ("internal.eventHandler."))
     result += " style=filled fillcolor=plum";
@@ -410,13 +393,13 @@ PetriNet::newPlace (string role, place_type mytype)
 
 
 /*!
- * Creates an unguarded transition without an initial role.
+ * Creates a transition without an initial role.
  * \return pointer of the created transition
  */
 Transition *
 PetriNet::newTransition ()
 {
-  return newTransition ("", "");
+  return newTransition("");
 }
 
 
@@ -428,17 +411,16 @@ PetriNet::newTransition ()
  * newTransition functions.
  *
  * \param role  the initial role of the transition
- * \param guard guard of the transition
  * \return pointer of the created transition
  */
 Transition *
-PetriNet::newTransition (string role, string guard)
+PetriNet::newTransition (string role)
 {
   trace (TRACE_VERY_DEBUG,
 	 "[PN]\tCreating transition t" + intToString (id ()) + " (" + role +
 	 ") ...\n");
 
-  Transition *t = new Transition (getId (), role, guard);
+  Transition *t = new Transition (getId (), role);
   T.insert (t);
 
   if (role != "")
@@ -465,50 +447,14 @@ PetriNet::newTransition (string role, string guard)
 
 
 /*!
- * Creates an inscripted standard arc.
- * \param source      source node of the arc
- * \param target      target node of the arc
- * \param inscription inscription of the arc
- * \return pointer of the created arc
- */
-Arc *
-PetriNet::newArc (Node * source, Node * target, string inscription)
-{
-  return newArc (source, target, STANDARD, inscription);
-}
-
-
-
-
-
-/*!
- * Creates an inscripted standard arc.
- * \param source      source node of the arc
- * \param target      target node of the arc
- * \param inscription inscription of the arc
- * \return pointer of the created arc
- */
-Arc *
-PetriNet::newArc (Node * source, Node * target, kc::casestring inscription)
-{
-  return newArc (source, target, STANDARD, inscription->name);
-}
-
-
-
-
-
-/*!
- * Creates an arc with arbitrary inscription and type.
+ * Creates an arc with arbitrary type.
  * \param source      source node of the arc
  * \param target      target node of the arc
  * \param type        type of the arc (as defined in #arc_type)
- * \param inscription inscription of the arc 
  * \return pointer of the created arc
  */
 Arc *
-PetriNet::newArc (Node * source, Node * target, arc_type type,
-		  string inscription)
+PetriNet::newArc (Node * source, Node * target, arc_type type)
 {
   if ((Place *) source == NULL || (Transition *) source == NULL)
     {
@@ -560,10 +506,11 @@ PetriNet::newArc (Node * source, Node * target, arc_type type,
 		     *((target->history).begin ()), pos (__FILE__, __LINE__,
 							 __FUNCTION__));
 
+  // Verbose output every 1000 arcs.
   if ((!F.empty()) && (F.size () % 1000 == 0))
     trace (TRACE_INFORMATION, "[PN]\t" + information () + "\n");
 
-  Arc *f = new Arc (source, target, type, inscription);
+  Arc *f = new Arc (source, target, type);
   F.insert (f);
 
   return f;
@@ -753,12 +700,7 @@ PetriNet::printInformation ()
   (*output) << "ID\tGUARD\t\tROLES\n";
   for (set < Transition * >::iterator t = T.begin (); t != T.end (); t++)
     {
-      (*output) << (*t)->nodeShortName() + "\t";
-
-      if ((*t)->guard != "")
-	(*output) << "{" + (*t)->guard + "} ";
-      else
-	(*output) << "\t";
+      (*output) << (*t)->nodeShortName() + "\t\t";
 
       for (vector < string >::iterator role = (*t)->history.begin ();
 	   role != (*t)->history.end (); role++)
@@ -1286,11 +1228,6 @@ PetriNet::mergeTransitions (Transition * t1, Transition * t2)
 	 "[PN]\tMerging transitions " + intToString (t1->id) + " and " +
 	 intToString (t2->id) + "...\n");
 
-  if (t1->guard != "" || t2->guard != "")
-    throw Exception (MERGING_ERROR,
-		     "Merging of guarded transition not yet supported!\n",
-		     pos (__FILE__, __LINE__, __FUNCTION__));
-
   Node *t12 = newTransition ();
 
   for (vector < string >::iterator role = t1->history.begin ();
@@ -1343,7 +1280,6 @@ PetriNet::mergeTransitions (Transition * t1, Transition * t2)
  * \param p2 second place
  *
  * \todo
- *       - (nlohmann) Take care of arc inscriptions.
  *       - (nlohmann) Make use of P_in and P_out
  */
 void
@@ -1659,9 +1595,6 @@ PetriNet::simplify ()
  * following steps are taken:
  *
  * - Convert all places to low-level places.
- * - Remove all transition guards -- decisions are now taken
- *   non-deterministically.
- * - Remove arc inscriptions -- all places are low-level places anyway.
  * - Convert read arcs to loops.
  *
  * Only reset arcs remain as high-level constructs. They will be converted
@@ -1674,17 +1607,11 @@ PetriNet::makeLowLevel ()
 {
   trace (TRACE_INFORMATION, "Converting Petri net to low-level...\n");
 
-  // remove transition guards
-  for (set < Transition * >::iterator t = T.begin (); t != T.end (); t++)
-    (*t)->guard = "";
-
-
-  // convert read arcs, remove inscriptions
+  // convert read arcs
   set < Arc * >readArcs;
 
   for (set < Arc * >::iterator f = F.begin (); f != F.end (); f++)
     {
-      (*f)->inscription = "";
       if ((*f)->type == READ)
 	{
 	  (*f)->type = STANDARD;

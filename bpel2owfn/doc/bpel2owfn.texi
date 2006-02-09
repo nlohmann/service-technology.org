@@ -332,11 +332,6 @@ These options control some options, mainly for generating Petri nets.
 Uses several rules to structurally simplify the generated Petri net.
 See @ref{Petri Net related Functions} for more details.
 
-@item lowlevel
-
-Abstracts the generated Petri net to low-level representation. See
-@ref{Petri Net related Functions} for more details.
-
 @item nointerface
 
 The interface places of the owfn are omitted.
@@ -431,13 +426,12 @@ workflow net and saves it in an @acronym{oWFN} file
 @file{sample.info} is generated. During the conversion several debug
 messages are printed to standard output.
 
-@item @var{prog} | bpel2owfn -fdot -p lowlevel | dot -Tpng -osample.png
+@item @var{prog} | bpel2owfn -fdot -m petrinet | dot -Tpng -osample.png
 
 Runs the program @var{prog} and reads its output as @acronym{BPEL}
-process, generates a low-level Petri net and outputs its Dot
-representation. This stream is read by Dot which layouts the Petri
-net and creates an output @acronym{PNG, Portable Network Graphic}
-file @file{sample.png}.
+process, generates a Petri net and outputs its Dot representation.
+This stream is read by Dot which layouts the Petri net and creates an output
+@acronym{PNG, Portable Network Graphic} file @file{sample.png}.
 
 @item bpel2owfn -i sample.bpel -m ast
 

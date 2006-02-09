@@ -40,11 +40,11 @@ extern string currentScope;
 
 
 
-void throwFault(Place *p1, Place *p2,
+Transition *throwFault(Place *p1, Place *p2,
     string guard, string p1name, string inscription, string prefix,
     kc::integer negativeControlFlow, bool preventFurtherFaults = true);
 
-void stop(Place *p, string p_name, string inscription, string prefix);
+Transition *stop(Place *p, string p_name, string inscription, string prefix);
 
 
 void in();

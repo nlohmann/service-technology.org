@@ -78,9 +78,17 @@ void SymbolTable::setMapping(unsigned int entryKey, kc::integer astId)
 /*!
  * 
  */
-string SymbolTable::getInformation(kc::integer astId)
+string SymbolTable::getInformation(kc::integer astId, bool closeTag)
 {
-  return string("<" + translateToElementName((lookup(id2key[astId->value]))->getElementId()) + " id=" + intToString(astId->value) + ">");
+  string result = "<";
+  
+  if (closeTag)
+    result += "/";
+  
+  result += translateToElementName((lookup(id2key[astId->value]))->getElementId());
+  result += " id=\"" + intToString(astId->value) + "\">";
+  
+  return result;
 }
 
 /*!
@@ -88,193 +96,40 @@ string SymbolTable::getInformation(kc::integer astId)
  */
 string SymbolTable::translateToElementName(unsigned int elementId)
 {
-  traceST("translateToElementName:\n");
+  //traceST("translateToElementName:\n");
   switch(elementId)
   {
-    case K_ASSIGN:
-    {
-      traceST("\tASSIGN\n");
-      return "assign";
-    }
-    break;
-
-    case K_CATCH:
-    {
-      traceST("\tCATCH\n");
-      return "catch";
-    }
-    break;
-
-    case K_COMPENSATE:
-    {
-      traceST("\tCOMPENSATE\n");
-      return "compensate";
-    }
-    break;
-
-    case K_CORRELATION:
-    {
-      traceST("\tCORRELATION\n");
-      return "correlation";
-    }
-    break;
-
-    case K_CORRELATIONSET:
-    {
-      traceST("\tCORRELATIONSET\n");
-      return "correlationSet";
-    }
-    break;
-
-    case K_EMPTY:
-    {
-      traceST("\tEMPTY\n");
-      return "empty";
-    }
-    break;
-
-    case K_FLOW:
-    {
-      traceST("\tFLOW\n");
-      return "flow";
-    }
-    break;
-
-    case K_INVOKE:
-    {
-      traceST("\tINVOKE\n");
-      return "invoke";
-    }
-    break;
-
-    case K_LINK:
-    {
-      traceST("\tLINK\n");
-      return "link";
-    }
-    break;
-
-    case K_ONALARM:
-    {
-      traceST("\tONALARM\n");
-      return "onAlarm";
-    }
-    break;
-
-    case K_ONMESSAGE:
-    {
-      traceST("\tONMESSAGE\n");
-      return "onMessage";
-    }
-    break;
-
-    case K_PARTNER:
-    {
-      traceST("\tPARTNER\n");
-      return "partner";
-    }
-    break;
-
-    case K_PARTNERLINK:
-    {
-      traceST("\tPARTNERLINK\n");
-      return "partnerLink";
-    }
-    break;
-
-    case K_PICK:
-    {
-      traceST("\tPICK\n");
-      return "pick";
-    }
-    break;
-
-    case K_PROCESS:
-    {
-      traceST("\tPROCESS\n");
-      return "process";
-    }
-    break;
-
-    case K_RECEIVE:
-    {
-      traceST("\tRECEIVE\n");
-      return "receive";
-    }
-    break;
-
-    case K_REPLY:
-    {
-      traceST("\tREPLY\n");
-      return "reply";
-    }
-    break;
-
-    case K_SCOPE:
-    {
-      traceST("\tSCOPE\n");
-      return "scope";
-    }
-    break;
-
-    case K_SEQUENCE:
-    {
-      traceST("\tSEQUENCE\n");
-      return "sequence";
-    }
-    break;
-
-    case K_SOURCE:
-    {
-      traceST("\tSOURCE\n");
-      return "source";
-    }
-    break;
-
-    case K_SWITCH:
-    {
-      traceST("\tSWITCH\n");
-      return "switch";
-    }
-    break;
-
-    case K_TARGET:
-    {
-      traceST("\tPARTNER\n");
-      return "target";
-    }
-    break;
-
-    case K_TERMINATE:
-    {
-      traceST("\tTERMINATE\n");
-      return "terminate";
-    }
-    break;
-
-    case K_VARIABLE:
-    {
-      traceST("\tVARIABLE\n");
-      return "variable";
-    }
-    break;
-
-    case K_WAIT:
-    {
-      traceST("\tWAIT\n");
-      return "wait";
-    }
-    break;
-
-    case K_WHILE:
-    {
-      traceST("\tWHILE\n");
-      return "while";
-    }
-    break;    
+    case K_ASSIGN:	return "assign";
+    case K_CATCH:	return "catch";
+    case K_COMPENSATE:	return "compensate";
+    case K_CORRELATION:	return "correlation";
+    case K_CORRELATIONSET: return "correlationSet";
+    case K_EMPTY:	return "empty";
+    case K_FLOW:	return "flow";
+    case K_INVOKE:	return "invoke";
+    case K_LINK:	return "link";
+    case K_ONALARM:	return "onAlarm";
+    case K_ONMESSAGE:	return "onMessage";
+    case K_PARTNER:	return "partner";
+    case K_PARTNERLINK:	return "partnerLink";
+    case K_PICK:	return "pick";
+    case K_PROCESS:	return "process";
+    case K_RECEIVE:	return "receive";
+    case K_REPLY:	return "reply";
+    case K_SCOPE:	return "scope";
+    case K_SEQUENCE:	return "sequence";
+    case K_SOURCE:	return "source";
+    case K_SWITCH:	return "switch";
+    case K_TARGET:	return "target";
+    case K_TERMINATE:	return "terminate";
+    case K_VARIABLE:	return "variable";
+    case K_WAIT:	return "wait";
+    case K_WHILE:	return "while";
+    default:		return "";
   }
-  return "";
 } 
+
+
 
 /*!
  * 

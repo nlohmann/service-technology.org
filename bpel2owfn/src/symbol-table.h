@@ -24,7 +24,7 @@
  * \brief
  *
  * \author  
- *          - last changes of: \$Author: reinert $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  * 
@@ -33,7 +33,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.10 $: 
+ * \version \$Revision: 1.11 $: 
  *
  */
 
@@ -155,7 +155,7 @@ class SymbolTable
     string translateToElementName(unsigned int elementId);
     
     /// return
-    string getInformation(kc::integer astId);
+    string getInformation(kc::integer astId, bool closeTag = false);
 };
 
 

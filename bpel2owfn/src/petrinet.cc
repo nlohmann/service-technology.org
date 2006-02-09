@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/02/07 10:24:50 $
+ *          - last changed: \$Date: 2006/02/09 11:07:38 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.88 $
+ * \version \$Revision: 1.89 $
  */
 
 
@@ -562,7 +562,7 @@ PetriNet::newArc (Node * source, Node * target, arc_type type,
 		     *((target->history).begin ()), pos (__FILE__, __LINE__,
 							 __FUNCTION__));
 
-  if (F.size () % 1000 == 0)
+  if ((!F.empty()) && (F.size () % 1000 == 0))
     trace (TRACE_INFORMATION, "[PN]\t" + information () + "\n");
 
   Arc *f = new Arc (source, target, type, inscription);

@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/02/08 19:31:57 $
+ *          - last changed: \$Date: 2006/02/09 11:07:38 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -50,7 +50,7 @@
  *          2003 Free Software Foundation, Inc.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.108 $
+ * \version \$Revision: 1.109 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -298,9 +298,6 @@ tProcess:
       (dynamic_cast <STProcess*> (currentSymTabEntry))->abstractProcess = true;
       if((dynamic_cast <STProcess*> (currentSymTabEntry))->abstractProcess) symTab.traceST("TRUE\n");
       else  symTab.traceST("FALSE");
-      
-      //fuer NIELS!
-      symTab.traceST(symTab.getInformation($4) + "\n");
       
       att.check($4, K_PROCESS);
       if(att.isAttributeValueEmpty($4, "suppressJoinFailure"))
@@ -2598,7 +2595,6 @@ tSource:
   K_SOURCE genSymTabEntry_Source
   arbitraryAttributes X_NEXT X_SLASH K_SOURCE
     { att.check($3, K_SOURCE);
-      symTab.traceST(symTab.getInformation($3) + "\n");    
       $$ = Source();
       $$->linkName = att.read($3, "linkName");
       $$->transitionCondition = att.read($3, "transitionCondition", $$->transitionCondition); 
@@ -2611,7 +2607,6 @@ tSource:
 | K_SOURCE genSymTabEntry_Source
   arbitraryAttributes X_SLASH
     { att.check($3, K_SOURCE);
-      symTab.traceST(symTab.getInformation($3) + "\n");        
       $$ = Source();
       $$->linkName = att.read($3, "linkName");
       $$->transitionCondition = att.read($3, "transitionCondition", $$->transitionCondition); 

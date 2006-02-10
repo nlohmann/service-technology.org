@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/09 20:20:10 $
+ *          - last changed: \$Date: 2006/02/10 11:54:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.131 $
+ * \version \$Revision: 1.132 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -2797,7 +2797,14 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
 ******************************************************************************/
 
 /*
- * The <while> activity as it is depicted in Fig. 18.
+ * The <while> activity as it is depicted in Fig. 18, but with two possible
+ * scenarios:
+ *
+ *   - cyclic <while>: the standard case as it is depicted in Fig. 18.
+ *   - acyclic <while>: a different case leading to an acyclic pattern.
+ *
+ * The scenario is selected by setting the parameter "-p cyclicwhile". For more
+ * information refer to the comments below or the User's Manual.
  */
 
 This=activityWhile(TheWhile=While(a,b)) ->
@@ -2828,9 +2835,17 @@ This=activityWhile(TheWhile=While(a,b)) ->
       TheNet->newArc(p2, t3);
       TheNet->newArc(t3, p4);
 
-      Transition *t4 = TheNet->newTransition(prefix + "t4");
-      TheNet->newArc(t4, p1);
-      TheNet->newArc(p5, t4);
+
+      // When the parameter "-p cyclicwhile" is set, the pattern is created as
+      // it is depicted in Fig. 18. Setting this option might lead to not
+      // 1-safe Petri nets as links embedded in the inner activity might be
+      // initialized more than once.
+      if (parameters[P_CYCLICWHILE] == true)
+      {
+	Transition *t4 = TheNet->newTransition(prefix + "t4");
+	TheNet->newArc(t4, p1);
+	TheNet->newArc(p5, t4);
+      }
 
 
       // Transitions for the negative control flow.
@@ -2850,6 +2865,15 @@ This=activityWhile(TheWhile=While(a,b)) ->
       TheNet->mergePlaces(This, ".internal.p5",      b, ".final");
       TheNet->mergePlaces(This, ".internal.stop",    b, ".stop");
       TheNet->mergePlaces(This, ".internal.stopped", b, ".stopped");
+
+
+      // When the parameter "-p cyclicwhile" is not set, the created pattern
+      // differs from the original pattern depicted in Fig. 18: instead of
+      // executing the inner activity each time the given condition holds, it
+      // is executed at most once to avoid problems with links embedded in the
+      // inner activity.
+      if (parameters[P_CYCLICWHILE] == false)
+	TheNet->mergePlaces(This, ".internal.p5", This, ".internal.p3");
 
       footer(This->id, true);
     }

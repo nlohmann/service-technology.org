@@ -74,7 +74,7 @@ void print_help()
   trace(" -m | --mode=<modus>    - select one of the following modes:\n");
   trace("                          ast, pretty, petrinet, cfg\n");
   trace(" -p | --parameter=<par> - select additional parameters like:\n");
-  trace("                          simplify, nointerface etc.\n");
+  trace("                          simplify, nointerface, acyclicwhile etc.\n");
   trace("                          (see documentation for further information)\n");
   trace("\n");
   trace(" -i | --input=<file>    - read input from <file>\n");
@@ -340,6 +340,10 @@ void parse_command_line(int argc, char* argv[])
 	      else if ( parameter == "finishloop" )
 	      {
 	        parameters[P_FINISHLOOP] = true;
+	      }
+	      else if ( parameter == "acyclicwhile" )
+	      {
+	        parameters[P_CYCLICWHILE] = true;
 	      }
 	      else if ( parameter == "nostandardfaults" )
 	      {

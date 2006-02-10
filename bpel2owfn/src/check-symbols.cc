@@ -25,10 +25,10 @@
  * 	  symbols within a BPEL process.
  *
  * \author  
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
- *          - last changed: \$Date: 2006/01/30 10:54:39 $
+ *          - last changed: \$Date: 2006/02/10 10:15:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
@@ -61,6 +61,7 @@ SymbolManager::SymbolManager()
 /// destructor for class SymbolManager
 SymbolManager::~SymbolManager()
 {
+  trace(TRACE_DEBUG, "[CS] Destroying SymbolManager ...\n");
   // if != NULL we have scopes (should always be so)
   if (processScope != NULL)
   {
@@ -74,6 +75,7 @@ SymbolManager::~SymbolManager()
     processScope = NULL;
     currentScope = NULL;
   }
+  trace(TRACE_DEBUG, "[CS] Destroying SymbolManager done.\n");
 }  
 
 /**

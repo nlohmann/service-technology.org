@@ -28,18 +28,18 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/02/09 20:41:57 $
+ *          - last changed: \$Date: 2006/02/10 10:15:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.55 $
+ * \version \$Revision: 1.56 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -114,7 +114,7 @@ int main( int argc, char *argv[])
 	  }
 	}
       }
-      
+     
       // create CFG
       if (modus == M_CFG || modus == M_PETRINET)
       {
@@ -263,6 +263,7 @@ int main( int argc, char *argv[])
 	    output = NULL;
 	  }
         }
+
       }
 
     }

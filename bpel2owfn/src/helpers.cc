@@ -28,17 +28,17 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/02/09 19:09:06 $
+ *          - last changed: \$Date: 2006/02/10 10:15:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
  */
 
 
@@ -46,6 +46,8 @@
 
 
 #include "helpers.h"
+#include "check-symbols.h"
+#include "bpel-attributes.h"
 
 
 
@@ -171,7 +173,7 @@ void error(Exception e)
 void cleanup()
 {
   trace(TRACE_INFORMATION,"Cleaning up ...\n");
- 
+
   if ( modus == M_PETRINET ) 
   {
     trace(TRACE_INFORMATION," + Deleting Petri Net pointer\n");
@@ -203,3 +205,4 @@ void cleanup()
     log_output = &std::cerr;
   }
 }
+

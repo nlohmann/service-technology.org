@@ -116,6 +116,7 @@ void print_version(std::string name)
 
 void parse_command_line(int argc, char* argv[])
 {
+  // suffixes stores the file suffixes for the various supported file types
   suffixes[F_LOLA] = "lola"  ;
   suffixes[F_OWFN] = "owfn"  ;
   suffixes[F_DOT]  = "dot"   ;
@@ -126,12 +127,12 @@ void parse_command_line(int argc, char* argv[])
   suffixes[F_TXT]  = "txt"   ;
   suffixes[F_XML]  = "xml"   ;
 
+  // this array helps us to automatically check the valid formats
   possibleFormats format[] = { F_LOLA, F_OWFN, F_DOT, F_PEP, F_APPN, F_INFO, F_PNML, F_TXT, F_XML };
 
+  // this map indicates, whether a certain format is valid for a mode
   map< pair<possibleModi,possibleFormats>, bool > validFormats;
   
-  // validFormats[pair<possibleModi,possibleFormats>(M_AST,F_TXT)] = true;
-
   validFormats[pair<possibleModi,possibleFormats>(M_PRETTY,F_XML)] = true;
 
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_LOLA)] = true;
@@ -141,12 +142,13 @@ void parse_command_line(int argc, char* argv[])
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_APPN)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_INFO)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_PNML)] = true;
-  // validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_TXT )] = true;
 
   validFormats[pair<possibleModi,possibleFormats>(M_CFG,F_DOT)] = true;
 
+  // the programme's name on the commandline
   string progname = string(argv[0]);
 
+  // turn off debug modi of flex and bison by default
   yydebug = 0;
   yy_flex_debug = 0;
 
@@ -155,10 +157,7 @@ void parse_command_line(int argc, char* argv[])
          != EOF)
   {
     // \todo call one of them argument and remove the rest
-    string mode = "";
-    string format = "";
     string parameter = "";
-    string debug = "";
     possibleModi old_modus;
     switch (optc)
       {
@@ -170,25 +169,25 @@ void parse_command_line(int argc, char* argv[])
       	      break;
       case 'm':
 	      old_modus = modus;
-	      mode = string(optarg);
-	      if (mode == "ast") {
+	      parameter = string(optarg);
+	      if (parameter == "ast") {
 		modus = M_AST;
 	      }
-	      else if (mode == "pretty") {
+	      else if (parameter == "pretty") {
 		modus = M_PRETTY;
 		formats[F_XML] = true;
 		options[O_FORMAT] = true;
 	      }
-	      else if (mode == "petrinet") {
+	      else if (parameter == "petrinet") {
 		modus = M_PETRINET;
 	      }
-	      else if (mode == "cfg") {
+	      else if (parameter == "cfg") {
 		modus = M_CFG;
 	      }
 	      else
 	      {
 		throw Exception(OPTION_MISMATCH, 
-				"Unknown mode \"" + mode +"\".\n",
+				"Unknown mode \"" + parameter +"\".\n",
 				"Type " + progname + " -h for more information.\n");
 	      }
 	      if (options[O_MODE] && modus != old_modus)
@@ -227,8 +226,8 @@ void parse_command_line(int argc, char* argv[])
               break;
       case 'f':
 	      options[O_FORMAT] = true;
-	      format = string(optarg);
-	      if (format == suffixes[F_LOLA])
+	      parameter = string(optarg);
+	      if (parameter == suffixes[F_LOLA])
 	      {
 		formats[F_LOLA] = true;
  	        if (options[O_MODE] && modus != M_PETRINET)
@@ -240,7 +239,7 @@ void parse_command_line(int argc, char* argv[])
 	    	modus = M_PETRINET;
 	        options[O_MODE] = true;
 	      }
-	      else if (format == suffixes[F_OWFN])
+	      else if (parameter == suffixes[F_OWFN])
 	      {
 		formats[F_OWFN] = true;
  	        if (options[O_MODE] && modus != M_PETRINET)
@@ -252,11 +251,11 @@ void parse_command_line(int argc, char* argv[])
 	    	modus = M_PETRINET;
 	        options[O_MODE] = true;
 	      }
-	      else if (format == suffixes[F_DOT])
+	      else if (parameter == suffixes[F_DOT])
 	      {
 		formats[F_DOT] = true;
 	      }
-	      else if (format == "pep")
+	      else if (parameter == "pep")
 	      {
 		formats[F_PEP] = true;
  	        if (options[O_MODE] && modus != M_PETRINET)
@@ -268,7 +267,7 @@ void parse_command_line(int argc, char* argv[])
 	    	modus = M_PETRINET;
 	        options[O_MODE] = true;
 	      }
-	      else if (format == suffixes[F_APPN])
+	      else if (parameter == suffixes[F_APPN])
 	      {
 		formats[F_APPN] = true;
  	        if (options[O_MODE] && modus != M_PETRINET)
@@ -280,11 +279,11 @@ void parse_command_line(int argc, char* argv[])
 	    	modus = M_PETRINET;
 	        options[O_MODE] = true;
 	      }
-	      else if (format == suffixes[F_INFO])
+	      else if (parameter == suffixes[F_INFO])
 	      {
 		formats[F_INFO] = true;
 	      }
-	      else if (format == suffixes[F_PNML])
+	      else if (parameter == suffixes[F_PNML])
 	      {
 		formats[F_PNML] = true;
  	        if (options[O_MODE] && modus != M_PETRINET)
@@ -296,11 +295,11 @@ void parse_command_line(int argc, char* argv[])
 	    	modus = M_PETRINET;
 	        options[O_MODE] = true;
 	      }
-	      else if (format == suffixes[F_TXT])
+	      else if (parameter == suffixes[F_TXT])
 	      {
 		formats[F_TXT] = true;
 	      }
-	      else if (format == suffixes[F_XML])
+	      else if (parameter == suffixes[F_XML])
 	      {
 		formats[F_XML] = true;
  	        if (options[O_MODE] && modus != M_PRETTY)
@@ -315,7 +314,7 @@ void parse_command_line(int argc, char* argv[])
 	      else
 	      {
 		throw Exception(OPTION_MISMATCH, 
-				"Unknown format \"" + format +"\".\n",
+				"Unknown format \"" + parameter +"\".\n",
 				"Type " + progname + " -h for more information.\n");
 	      }
 	      break;
@@ -355,28 +354,28 @@ void parse_command_line(int argc, char* argv[])
 	      break;
       case 'd':
 	      options[O_DEBUG] = true;
-	      debug = string(optarg);
-	      if ( debug == "flex" )
+	      parameter = string(optarg);
+	      if ( parameter == "flex" )
 	      {
 		yy_flex_debug = 1;
 	      }
-	      else if ( debug == "bison" )
+	      else if ( parameter == "bison" )
 	      {
 		yydebug = 1;
 	      }
-	      else if ( debug == "1" )
+	      else if ( parameter == "1" )
 	      {
 		debug_level = TRACE_WARNINGS;
 	      }
-	      else if ( debug == "2" )
+	      else if ( parameter == "2" )
 	      {
 		debug_level = TRACE_INFORMATION;
 	      }
-	      else if ( debug == "3" )
+	      else if ( parameter == "3" )
 	      {
 		debug_level = TRACE_DEBUG;
 	      }
-	      else if ( debug == "4" )
+	      else if ( parameter == "4" )
 	      {
 		debug_level = TRACE_VERY_DEBUG;
 	      }
@@ -497,6 +496,14 @@ void parse_command_line(int argc, char* argv[])
   {
     trace(TRACE_INFORMATION, " - output files will be named \"" + output_filename + ".X\"\n");
   }
+  for ( int i = 0; i < (sizeof(format) / sizeof(possibleFormats)); i++)
+  {
+    if ( formats[format[i]] )
+    {
+      trace(TRACE_INFORMATION, "   + output will be written in " + suffixes[format[i]] + " style\n");
+    }
+  }
+  
   if (options[O_LOG])
   {
     trace(TRACE_INFORMATION, " - Logging additional information to \"" + log_filename + "\"\n");

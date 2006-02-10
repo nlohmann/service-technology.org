@@ -125,7 +125,7 @@ string SymbolTable::translateToElementName(unsigned int elementId)
     case K_VARIABLE:	return "variable";
     case K_WAIT:	return "wait";
     case K_WHILE:	return "while";
-    default:		return "";
+    default:		return "unknown";
   }
 } 
 

@@ -341,7 +341,7 @@ void parse_command_line(int argc, char* argv[])
 	      {
 	        parameters[P_FINISHLOOP] = true;
 	      }
-	      else if ( parameter == "acyclicwhile" )
+	      else if ( parameter == "cyclicwhile" )
 	      {
 	        parameters[P_CYCLICWHILE] = true;
 	      }

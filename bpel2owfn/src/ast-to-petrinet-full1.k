@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/10 11:54:27 $
+ *          - last changed: \$Date: 2006/02/10 13:10:42 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.132 $
+ * \version \$Revision: 1.133 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -1854,7 +1854,7 @@ This=Invoke(a,b) provided (This->outputVariable == mkcasestring("")) ->
   [petrinet:
     {
       string prefix = intToString(This->id->value) + ".internal.";
-      //header(This->id);
+      header(This->id);
       
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -1885,7 +1885,7 @@ This=Invoke(a,b) provided (This->outputVariable == mkcasestring("")) ->
     }
     a // standardElements
     {
-      //footer(This->id);
+      footer(This->id);
     }
   ]
 ;

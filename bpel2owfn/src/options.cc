@@ -90,7 +90,7 @@ void print_help()
   
   trace("\n");
   trace("For more information see:\n");
-  trace("  http://www.informatik.hu-berlin.de/top/tools4bpel\n");
+  trace("  http://www.informatik.hu-berlin.de/top/tools4bpel/bpel2owfn\n");
   trace("\n");
 
 }

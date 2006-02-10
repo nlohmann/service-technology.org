@@ -34,20 +34,20 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/02/09 19:09:05 $
+ *          - last changed: \$Date: 2006/02/10 13:48:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universitï¿½t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.110 $
+ * \version \$Revision: 1.111 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -1087,7 +1087,9 @@ tInvoke:
       isInFH.push(false);
       isInCH.push(pair<bool,int>(false,hasCompensate));
       parent[$3] = currentScopeId;
-      currentScopeId = $3; 
+      kc::integer qad_id = att.nextId();
+      parent[qad_id] = currentScopeId;
+      currentScopeId = qad_id; 
     }
   standardElements 
   tCorrelations tCatch_list  tCatchAll tCompensationHandler X_SLASH K_INVOKE
@@ -1108,18 +1110,30 @@ tInvoke:
         tEventHandlers eh = implicitEventHandler();
         tScope scope = Scope($7, NiltVariable_list(), fh, $11, eh, StopInScope(), ai);
 
-        fh->inProcess = false;
-        fh->parentScopeId = $3;
-        $11->parentScopeId = $3;
-        eh->parentScopeId = $3;
+        scope->id = $7->parentId = currentScopeId; 
+        invoke->id = ai->id = se->parentId = $3;
 
-        symMan.newScopeScope($3);
+        fh->inProcess = false;
+        fh->parentScopeId = scope->id;
+        $11->parentScopeId = scope->id;
+        eh->parentScopeId = scope->id;
+
+        symMan.newScopeScope(scope->id);
         symMan.quitScope();
 
 	invoke->name = att.read($3, "name");
+
+        currentSymTabEntryKey = symTab.insert(K_SCOPE);
+        currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
+		symTab.setMapping(currentSymTabEntryKey, scope->id);
+		
+		
         scope->name = att.read($3, "name");
+        symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute(mkcasestring("name"), scope->name));
         scope->joinCondition = invoke->joinCondition = $7->joinCondition = att.read($3, "joinCondition");
+        symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute(mkcasestring("joinCondition"), scope->joinCondition));
         scope->suppressJoinFailure = invoke->suppressJoinFailure = $7->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+        symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute(mkcasestring("suppressJoinFailure"), scope->suppressJoinFailure));
         scope->variableAccessSerializable = mkcasestring("");
         att.traceAM(string("tInvoke: ") + (invoke->suppressJoinFailure)->name + string("\n"));
 	att.popSJFStack();
@@ -1151,8 +1165,10 @@ tInvoke:
         }
         scope->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
         invoke->negativeControlFlow = mkinteger(0);
+        /*
         scope->id = $7->parentId = $3; 
         invoke->id = ai->id = se->parentId = att.nextId();
+        */
         scope->hasEH = false;
         currentScopeId = scope->parentScopeId = parent[$3];
 

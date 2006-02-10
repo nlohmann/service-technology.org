@@ -31,13 +31,13 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/02/09 22:04:00 $
+ *          - last changed: \$Date: 2006/02/10 16:13:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.94 $
+ * \version \$Revision: 1.95 $
  */
 
 
@@ -318,7 +318,7 @@ Place *PetriNet::newPlace()
  */
 Place *PetriNet::newPlace(string role, place_type mytype)
 {
-  trace(TRACE_VERY_DEBUG, "[PN]\tCreating place p" + intToString(id()) + "(" + role + ") ...\n");
+  trace(TRACE_VERY_DEBUG, "[PN]\tCreating place p" + intToString(id()) + " (" + role + ") ...\n");
 
   Place *p = new Place(getId(), role, mytype);
 
@@ -373,7 +373,7 @@ Transition *PetriNet::newTransition()
  */
 Transition *PetriNet::newTransition(string role)
 {
-  trace(TRACE_VERY_DEBUG, "[PN]\tCreating transition t" + intToString(id()) + "(" + role + ") ...\n");
+  trace(TRACE_VERY_DEBUG, "[PN]\tCreating transition t" + intToString(id()) + " (" + role + ") ...\n");
 
   Transition *t = new Transition(getId(), role);
   T.insert(t);
@@ -427,7 +427,7 @@ Arc *PetriNet::newArc(Node * source, Node * target, arc_type type)
       role = *(target->history.begin());
     }
     
-    throw Exception(ARC_ERROR, "Source of arc to " + name + "(" + role + ") not found!\n", pos(__FILE__, __LINE__, __FUNCTION__));
+    throw Exception(ARC_ERROR, "Source of arc to " + name + " (" + role + ") not found!\n", pos(__FILE__, __LINE__, __FUNCTION__));
   }
     
   // Tests if the target node is a NULL pointer, i.e. the node was not found
@@ -447,7 +447,7 @@ Arc *PetriNet::newArc(Node * source, Node * target, arc_type type)
       role = *(source->history.begin());
     }
     
-    throw Exception(ARC_ERROR, "Target of arc from " + name + "(" + role + ") not found!\n", pos(__FILE__, __LINE__, __FUNCTION__));
+    throw Exception(ARC_ERROR, "Target of arc from " + name + " (" + role + ") not found!\n", pos(__FILE__, __LINE__, __FUNCTION__));
   }
 
   // Now we can be sure both nodes exist.

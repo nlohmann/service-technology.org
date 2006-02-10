@@ -284,6 +284,11 @@ checking whether we are using the GNU C++ compiler... yes
 checking whether g++ accepts -g... yes
 checking for style of include used by make... GNU
 checking dependency style of g++... gcc3
+checking for gcc... gcc
+checking whether we are using the GNU C compiler... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to accept ANSI C... none needed
+checking dependency style of gcc... gcc3
 checking for a BSD-compatible install... /usr/bin/install -c
 checking for flex... flex
 checking for yywrap in -lfl... yes
@@ -301,9 +306,11 @@ config.status: executing depfiles commands
 @end smallexample
 @end cartouche
 
-or complains about a tool which could not be found in your system path. In this
-case please check @ref{Needed Programs}, as @acronym{BPEL2oWFN} cannot be
-compiled without these tools.
+In some cases the configure script complains (i.e.@: warns) about tools which
+could not be found in your system path. In this case please check
+@ref{Needed Programs}. @acronym{BPEL2oWFN} can be compiled without these tools.
+However, you cannot make changes to large parts of the programm as you will not
+be able to generate source files without the tools.
 
 @item After all Makefiles are created, run
 
@@ -389,10 +396,10 @@ ignored --- these warnings mostly occur in generated files from Flex, Bison or
 Kimwitu++ and are outside of our scope.
 
 The compilation of @acronym{BPEL2oWFN} was tested on several operating systems
-such as Microsoft Windows (running Cygwin), Linux and Sun OS. Anyway, if the
-compilation fails please make sure you use the most recent versions of the
-@acronym{GNU} Compiler Collection, Flex, Bison and Kimwitu++. If this does not
-help please send us an electronic mail to
+such as Microsoft Windows (running Cygwin), Linux, Apple MacOS X and Sun OS.
+Anyway, if the compilation fails please make sure you use the most recent
+(stable) versions of the @acronym{GNU} Compiler Collection, Flex, Bison and
+Kimwitu++. If this does not help please send us an electronic mail to
 @email{nlohmann@@informatik.hu-berlin.de}. Include the version number of your
 distribution (version @value{VERSION} of @value{UPDATED}). Also include in your
 message the output that the make process produced. We will try to answer your
@@ -510,6 +517,24 @@ including dot. Graphviz is maintained by AT&T Labs and is available under
 END OF INSTALL file for BPEL2oWFN Version @value{VERSION}
 @end ifplaintext
 
+
+
+
+@section Reference System
+
+As of @value{UPDATED-MONTH}, we use the following system developing and
+building @acronym{BPEL2oWFN}:
+
+@itemize
+@item Intel Pentium M processor, 1.60 GHz
+@item 1 GB RAM
+@item Microsoft Windows XP Home Edition Service Pack 2
+@item Cygwin with cygwin.dll version 1.5.19-4
+@item @acronym{GNU} Compiler Collection 3.4.4
+@item Flex version 2.5.4
+@item @acronym{GNU} Bison version 1.875b
+@item Kimwitu++ version 2.3.8
+@end itemize
 
 
 

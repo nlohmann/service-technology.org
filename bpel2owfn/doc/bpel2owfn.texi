@@ -123,17 +123,17 @@ This @acronym{oWFN} can be used to:
 @item generate the operating guidelines [MRS05],
 @item check for deadlocks, or
 @item check any temporal logic formula expressed in
-@acronym{CTL, Computation Tree Logic} with the model checking tool
-@acronym{LoLA, Low-Level Analyzer} [Sch00].
+@acronym{CTL, Computation Tree Logic} with the a checking tool such as
+@acronym{LoLA, Low-Level Analyzer} [Sch00] or the Model Checking Kit [MCK].
 @end itemize
 
 In future versions of @acronym{BPEL2oWFN} static analysis is used to
-find the smallest @acronym{oWFN} to analyze a chosen property. This
+find smaller @acronym{oWFN}s to analyze a chosen property. This
 is called @i{flexible model generation} (see @ref{Future Work}).
 
 @acronym{BPEL2oWFN} was written by Niels Lohmann, Christian Gierds
 and Dennis Reinert. It is part of the Tools4@acronym{BPEL} project
-funded by the Bundesministerium f@"ur Bildung und Forschung. See
+funded by the German Bundesministerium f@"ur Bildung und Forschung. See
 @url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
 
 
@@ -236,13 +236,13 @@ as a parser for @acronym{BPEL}, that reads its input from STDIN.
 The intended standard invocation of @acronym{BPEL2oWFN} is:
 
 @example
-bpel2owfn -i inputfile.bpel -m petrinet -f owfn -o
+bpel2owfn -i inputfile.bpel -f owfn -o
 @end example
 
 where @file{inputfile.bpel} is a @acronym{BPEL} process. The options
-@code{-m petrinet} and @code{-f owfn} cause @acronym{BPEL2oWFN} to generate an 
-open workflow net which is written to a file named @file{inputfile.owfn}
-because of the option @code{-o}.
+@samp{-f owfn} cause @acronym{BPEL2oWFN} to generate an open workflow net which
+is written to a file named @file{inputfile.owfn}, because of the option
+@samp{-o}.
 
 For more examples, see @ref{Examples}.
 
@@ -334,7 +334,8 @@ See @ref{Petri Net related Functions} for more details.
 
 @item nointerface
 
-The interface places of the owfn are omitted.
+The interface places of the owfn are omitted. This option is always implied if
+a Petri net format other than @acronym{oWFN} is selected.
 
 @item finalmarking
 
@@ -371,12 +372,13 @@ Creates output for @acronym{oWFN}. This implies the mode @code{petrinet}.
 
 @item dot
 
-Create output for dot.
+Create output for Dot.
+
 This option can be used with mode @code{petrinet} and @code{cfg}.
 
 @item pep
 
-Create output for @acronym{PEP}.
+Create output in low-level @acronym{PEP} notation.
 This implies the mode @code{petrinet}.
 
 @item appn
@@ -672,9 +674,19 @@ name of each node.
 The @samp{@var{arcname}} is just added to meet the syntactic requirements and
 is just an enumeration of the arcs (@samp{a1}, @samp{a2}, @dots{}).
 
-@section @acronym{PEP, Programming Environment based on Petri Nets} input files
+
+
+
+@section Low-level @acronym{PEP} Notation
+
+@acronym{PEP, Programming Environment based on Petri Nets}
 
 @c TODO: Enter reference here
+
+
+
+
+
 
 @section Info-files
 

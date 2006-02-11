@@ -1,7 +1,9 @@
-BEGIN OF ChangeLog file for BPEL2oWFN Version 1.0
+BEGIN OF ChangeLog file for BPEL2oWFN Version 1.1
 
 Change Log
 **********
+
+Most recent version at the end of this section.
 
 Version 1.0 (16 January 2006)
    - input:
@@ -19,6 +21,45 @@ Version 1.0 (16 January 2006)
         * Christian Stahl. A Petri Net Semantics for BPEL.
           Informatik-Berichte 188, Humboldt-Universita"t zu Berlin,
           July 2005.
+
+Version 1.1 (17 February 2006)
+   - new output formats:
+        * APPN (Abstract Petri Net Notation) Petri net
+
+        * PNML (Petri Net Markup Language) Petri net
+
+        * low-level PEP (Programming Environment based on Petri Nets)
+          Petri net
+
+   - overworked patterns:
+        * the Stahl-semantics (see version 1.0) has been enhanced and
+          can be parametrized:
+             * original semantics
+
+             * models without BPEL's standard faults
+
+             * acyclic models
+          For more information please refer to the User's Manual.
+
+   - static analysis:
+        * d
+
+   - miscellaneous:
+        * GNU getopt allows more flexible command-line parameter
+          processing allowing to create several output file formats in
+          a single run.
+
+        * Debug output can be written into a log file.
+
+        * The classes organizing the Petri nets are overworked for
+          performance and extensibility.
+
+   - fixed bugs:
+        * The generation of all possible types of the `<invoke>'
+          activity (synchronous, asynchronous, with and without
+          implicit scope) is overworked and does produce errorenous
+          nets.
+
 
 ----------------------------------------------------------------------
 
@@ -42,4 +83,4 @@ You should have received a copy of the GNU General Public License along
 with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 
-END OF ChangeLog file for BPEL2oWFN Version 1.0
+END OF ChangeLog file for BPEL2oWFN Version 1.1

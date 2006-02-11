@@ -1,4 +1,4 @@
-BEGIN OF AUTHORS file for BPEL2oWFN Version 1.0
+BEGIN OF AUTHORS file for BPEL2oWFN Version 1.1
 
 Authors and Acknowledgements
 ****************************
@@ -27,7 +27,7 @@ We would like to thank:
 
    * Oliver Kopp (Universita"t Stuttgart) for challenging BPEL processes
 
-BPEL2oWFN is part of the Tools4BPEL project funded by the
+BPEL2oWFN is part of the Tools4BPEL project funded by the German
 Bundesministerium fu"r Bildung und Forschung.
 
 Contact Person
@@ -74,4 +74,4 @@ You should have received a copy of the GNU General Public License along
 with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 
-END OF AUTHORS file for BPEL2oWFN Version 1.0
+END OF AUTHORS file for BPEL2oWFN Version 1.1

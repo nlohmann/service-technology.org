@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/13 16:21:19 $
+ *          - last changed: \$Date: 2006/02/13 16:22:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.139 $
+ * \version \$Revision: 1.140 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -2874,7 +2874,6 @@ This=activityWhile(TheWhile=While(a,b)) ->
       // inner activity.
       if (parameters[P_CYCLICWHILE] == false)
 	TheNet->mergePlaces(This, ".internal.p5", This, ".internal.final");
-
 
       footer(This->id, true);
     }

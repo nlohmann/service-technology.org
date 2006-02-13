@@ -136,7 +136,7 @@ Sun OS.  Anyway, if the compilation fails please make sure you use the
 most recent (stable) versions of the GNU Compiler Collection, Flex,
 Bison and Kimwitu++. If this does not help please send us an electronic
 mail to <nlohmann@informatik.hu-berlin.de>. Include the version number
-of your distribution (version 1.1 of 10 February 2006). Also include in
+of your distribution (version 1.1 of 13 February 2006). Also include in
 your message the output that the make process produced. We will try to
 answer your mail within a week.
 
@@ -198,9 +198,11 @@ Needed Programs
 Required Programs
 =================
 
-To compile BPEL2oWFN you need the following programs. These programs
-are (as BPEL2oWFN itself) free software distributed under the GNU
-General Public License.
+To compile BPEL2oWFN you do not need any specific program other than
+the GNU Compiler Collection. If you however want to change the program
+(e.g. add new Petri net patterns) you need the following programs to
+generate source code. These programs are (as BPEL2oWFN itself) free
+software distributed under the GNU General Public License.
 
 Flex, A fast scanner generator
      Flex is needed to generate the lexer of BPEL2oWFN. Flex was written
@@ -235,6 +237,16 @@ LoLA, a Low Level Petri net Analyzer
      or the sweep line method. LoLA was written by Karsten Schmidt and
      is available under
      `http://www.informatik.hu-berlin.de/~kschmidt/lola.html'.
+
+The Model-Checking Kit
+     The Model-Checking Kit is a collection of programs which allow to
+     model a finite-state system using a variety of modelling
+     languages, and verify it using a variety of checkers, including
+     deadlock-checkers, reachability-checkers, and model-checkers for
+     the temporal logics CTL and LTL. The Model-Checking Kit is
+     maintained by Javier Esparza, Claus Schröter and Stefan Schwoon at
+     the University of Stuttgart and is available under
+     `http://www.fmi.uni-stuttgart.de/szs/tools/mckit'.
 
 Graphviz, the Graph Visualization Software
      Graphviz is a graph visualization software with several graph

@@ -124,7 +124,7 @@ This @acronym{oWFN} can be used to:
 @item check for deadlocks, or
 @item check any temporal logic formula expressed in
 @acronym{CTL, Computation Tree Logic} with the a checking tool such as
-@acronym{LoLA, Low-Level Analyzer} [Sch00] or the Model Checking Kit [MCK].
+@acronym{LoLA, Low-Level Analyzer} [Sch00] or the Model-Checking Kit [MCK].
 @end itemize
 
 In future versions of @acronym{BPEL2oWFN} static analysis is used to
@@ -886,7 +886,7 @@ model puts at most one token on each place of the net).
 
 Beside performance (e.g.@: only 1 bit is needed to store the marking
 of a place) and compatibility issues (e.g.@: 1-safety is a
-prerequisite to use the Model Checking Kit [MCK]), features not
+prerequisite to use the Model-Checking Kit [MCK]), features not
 supported by the Petri net semantics can be discovered since the
 generated net will most likely violate 1-safety when an unsupported
 @acronym{BPEL} feature is used. If, for example, a scope is enclosed

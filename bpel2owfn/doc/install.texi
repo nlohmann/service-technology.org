@@ -464,9 +464,11 @@ a Cygwin environment.
 @anchor{Required Programs}
 @section Required Programs
 
-To compile @acronym{BPEL2oWFN} you need the following programs. These programs
-are (as @acronym{BPEL2oWFN} itself) free software distributed under the
-@acronym{GNU} General Public License.
+To compile @acronym{BPEL2oWFN} you do not need any specific program other than
+the @acronym{GNU} Compiler Collection. If you however want to change the
+program (e.g. add new Petri net patterns) you need the following programs to
+generate source code. These programs are (as @acronym{BPEL2oWFN} itself) free
+software distributed under the @acronym{GNU} General Public License.
 
 
 @table @asis
@@ -506,6 +508,16 @@ much sense.
 reduction techniques such as partial order reduction, symmetries or the sweep
 line method. @acronym{LoLA} was written by Karsten Schmidt and is available
 under @url{http://www.informatik.hu-berlin.de/~kschmidt/lola.html}.
+
+@item @b{The Model-Checking Kit}
+The Model-Checking Kit is a collection of programs which allow to model a
+finite-state system using a variety of modelling languages, and verify it using
+a variety of checkers, including deadlock-checkers, reachability-checkers, and
+model-checkers for the temporal logics CTL and LTL. The Model-Checking Kit is
+maintained by Javier Esparza, Claus Schröter and Stefan Schwoon at the
+University of Stuttgart and is available under
+@url{http://www.fmi.uni-stuttgart.de/szs/tools/mckit}.
+
 
 @item @b{Graphviz}, the Graph Visualization Software
 Graphviz is a graph visualization software with several graph layout programs
@@ -601,12 +613,17 @@ For more information please refer to the User's Manual.
 
 @item static analysis:
 @itemize
-@item d
+@item To reduce the size of the Petri net model static analysis is used to only
+generate nodes for the @acronym{DPE, dead path elimination} when necessary.
 @end itemize
 
 
 @item miscellaneous:
 @itemize
+@item The compiler generator tools Flex, Bison and Kimwitu++ are not any more
+necessary to compile @acronym{BPEL2oWFN}: the generated sources are now part of
+the distrubution.
+@item The @acronym{oWFN} format was overworked and allows final markings.
 @item @acronym{GNU} getopt allows more flexible command-line parameter
 processing allowing to create several output file formats in a single run.
 @item Debug output can be written into a log file.

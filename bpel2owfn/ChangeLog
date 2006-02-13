@@ -42,9 +42,17 @@ Version 1.1 (17 February 2006)
           For more information please refer to the User's Manual.
 
    - static analysis:
-        * d
+        * To reduce the size of the Petri net model static analysis is
+          used to only generate nodes for the DPE (dead path
+          elimination) when necessary.
 
    - miscellaneous:
+        * The compiler generator tools Flex, Bison and Kimwitu++ are
+          not any more necessary to compile BPEL2oWFN: the generated
+          sources are now part of the distrubution.
+
+        * The oWFN format was overworked and allows final markings.
+
         * GNU getopt allows more flexible command-line parameter
           processing allowing to create several output file formats in
           a single run.

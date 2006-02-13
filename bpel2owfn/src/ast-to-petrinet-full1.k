@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/10 14:45:35 $
+ *          - last changed: \$Date: 2006/02/13 14:08:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.134 $
+ * \version \$Revision: 1.135 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -392,7 +392,7 @@ StopInProcess() ->
   [petrinet:
     {
       string prefix = "1.internal.stop.";
-      trace(TRACE_DEBUG, "[PNU]\t\tStop Pattern inside the process (begin)\n");
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "<stopPatternInsideProcess>\n");
       
       Place *p1  = TheNet->newPlace(prefix + "Faulted");
       Place *p2  = TheNet->newPlace(prefix + "p2");
@@ -483,7 +483,7 @@ StopInProcess() ->
       TheNet->newArc(t12, p16);
       TheNet->newArc(t12, p12);
 
-      trace(TRACE_DEBUG, "[PNU]\t\tStop Pattern inside the process (end)\n");
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "</stopPatternInsideProcess>\n");
     }
   ]
 ;
@@ -502,7 +502,7 @@ StopInScope() ->
   [petrinet:
     {
       string prefix = currentScope + "stop.";
-      trace(TRACE_DEBUG, "[PNU]\t\tStop Pattern inside the scope " + currentScope + " (begin)\n");      
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "<stopPatternInsideScope scope=\"" + currentScope + "\">\n");      
       
       Place *p1 =  TheNet->newPlace(prefix + "ft_in");
       Place *p2 =  TheNet->newPlace(prefix + "p2");
@@ -628,7 +628,7 @@ StopInScope() ->
       TheNet->newArc(t16, p27);
       TheNet->newArc(p32, t16);
 
-      trace(TRACE_DEBUG, "[PNU]\t\tStop Pattern inside the scope " + currentScope + "\n");
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "</stopPatternInsideScope scope=\"" + currentScope + "\">\n");
     }
   ]
 ;
@@ -649,7 +649,7 @@ This=userDefinedFaultHandler(a,b) provided (This->inProcess) ->
   [petrinet:
     {
       string prefix = "1.internal.faultHandler.";
-      trace(TRACE_DEBUG, "[PNU]\t\tUser-defined Fault Handler inside the process (begin)\n");
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "<userDefinedFaultHandlerInsideProcess>\n");
       
       Place *p3 =  TheNet->newPlace(prefix + "final");
       Place *p4 =  TheNet->newPlace(prefix + "fault");
@@ -786,7 +786,7 @@ This=userDefinedFaultHandler(a,b) provided (This->inProcess) ->
 	default: { /* this should never happen */ }
       }
       
-      trace(TRACE_DEBUG, "[PNU]\t\tUser-defined Fault Handler inside the process (end)\n");
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "</userDefinedFaultHandlerInsideProcess>\n");
     }
   ]
 ;
@@ -804,7 +804,7 @@ This=implicitFaultHandler() provided (This->inProcess) ->
   [petrinet:
     {
       string prefix = "1.internal.faultHandler.";
-      trace(TRACE_DEBUG, "[PNU]\t\tImplicit Fault Handler inside the process (begin)\n");      
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "<implicitFaultHandlerInsideProcess>\n");
       
       Place *p1 =  TheNet->newPlace(prefix + "fault");
       Place *p2 =  TheNet->newPlace(prefix + "p2");
@@ -889,7 +889,7 @@ This=implicitFaultHandler() provided (This->inProcess) ->
       TheNet->mergePlaces(p5, compensate_p6);
       TheNet->mergePlaces(p6, compensate_p7);
 
-      trace(TRACE_DEBUG, "[PNU]\t\tImplicit Fault Handler inside the process (end)\n");      
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "</implicitFaultHandlerInsideProcess>\n");
     }
   ]
 ;
@@ -906,7 +906,7 @@ This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
   [petrinet:
     {
       string prefix = intToString(This->parentScopeId->value) + ".internal.faultHandler.";
-      trace(TRACE_DEBUG, "[PNU]\t\tUser-defined Fault Handler inside scope " + currentScope + " (begin)\n");
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "<userDefinedFaultHandlerInsideScope scope=\"" + currentScope + "\">\n");
       
       Place *p3 =  TheNet->newPlace(prefix + "out");
       Place *p4 =  TheNet->newPlace(prefix + "fault");
@@ -1121,7 +1121,7 @@ This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
 	default: { /* this should never happen */ }
       }
 
-      trace(TRACE_DEBUG, "[PNU]\t\tUser-defined Fault Handler inside scope " + currentScope + " (end)\n");
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "</userDefinedFaultHandlerInsideScope scope=\"" + currentScope + "\">\n");
     }
   ]
 ;
@@ -1138,7 +1138,7 @@ This=implicitFaultHandler() provided (!This->inProcess) ->
   [petrinet:
     {
       string prefix = intToString(This->parentScopeId->value) + ".internal.faultHandler.";
-      trace(TRACE_DEBUG, "[PNU]\t\tImplicit Fault Handler inside scope " + currentScope + " (begin)\n");      
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "<implicitFaultHandlerInsideScope scope=\"" + currentScope + "\">\n");      
       
       Place *p1 =  TheNet->newPlace(prefix + "ft");
       Place *p1a = TheNet->newPlace(prefix + "fault");
@@ -1246,7 +1246,7 @@ This=implicitFaultHandler() provided (!This->inProcess) ->
 
       TheNet->mergePlaces(prefix + "ft", prefix + "fault");
 
-      trace(TRACE_DEBUG, "[PNU]\t\tImplicit Fault Handler inside scope " + currentScope + " (end)\n");
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "</implicitFaultHandlerInsideScope scope=\"" + currentScope + "\">\n");
     }
   ]
 ;
@@ -1279,7 +1279,7 @@ CatchAll(innerActivity) ->
 This=userDefinedEventHandler(a,b) ->
   [petrinet:
     {
-      trace(TRACE_DEBUG, "[PNU]\t\tEvent Handler inside scope/process " + currentScope + " (begin)\n");
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "<eventHandler scope=\"" + currentScope + "\">\n");
 	    
       string prefix = intToString(This->parentScopeId->value) + ".internal.eventHandler.";
       Place *p6  = TheNet->newPlace(prefix + "initial");
@@ -1483,7 +1483,7 @@ This=userDefinedEventHandler(a,b) ->
 	onAlarmCount++;
       }
 
-      trace(TRACE_DEBUG, "[PNU]\t\tEvent Handler inside scope/process " + currentScope + " (end)\n");      
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "</eventHandler scope=\"" + currentScope + "\">\n");      
     }
   ]
 ;
@@ -1505,7 +1505,7 @@ This=implicitCompensationHandler() ->
   [petrinet:
     {
       string prefix = intToString(This->parentScopeId->value) + ".internal.compensationHandler."; 
-      trace(TRACE_DEBUG, "[PNU]\t\tImplicit Compensation Handler inside scope/process " + currentScope + " (begin)\n");      
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "<implicitCompensationHandler scope=\"" + currentScope + "\">\n");
       
       Place *p1  = TheNet->newPlace(prefix + "p1");
       Place *p2  = TheNet->newPlace(prefix + "ch_in");
@@ -1613,7 +1613,7 @@ This=implicitCompensationHandler() ->
 	TheNet->newArc(p21, t13);
       }
 
-      trace(TRACE_DEBUG, "[PNU]\t\tImplicit Compensation Handler inside scope/process " + currentScope + " (end)\n");      
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "</implicitCompensationHandler scope=\"" + currentScope + "\">\n");
     }
   ]
 ;
@@ -1627,7 +1627,7 @@ This=userDefinedCompensationHandler(innerActivity) ->
   [petrinet:
     {	    
       string prefix = intToString(This->parentScopeId->value) + ".internal.compensationHandler.";
-      trace(TRACE_DEBUG, "[PNU]\t\tUser-defined Compensation Handler inside scope/process " + currentScope + " (begin)\n");      
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "<userDefinedCompensationHandler scope=\"" + currentScope + "\">\n");
       SymbolScope *me = symMan.getScope(This->parentScopeId);
 
       Place *p1  = TheNet->newPlace(prefix + "p1");
@@ -1772,7 +1772,7 @@ This=userDefinedCompensationHandler(innerActivity) ->
       TheNet->mergePlaces(p24, TheNet->findPlace(innerActivity, ".stop"));
       TheNet->mergePlaces(p13, TheNet->findPlace(innerActivity, ".stopped"));
 
-      trace(TRACE_DEBUG, "[PNU]\t\tUser-defined Compensation Handler inside scope/process " + currentScope + "\n");      
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "</userDefinedCompensationHandler scope=\"" + currentScope + "\">\n");
     }
   ]
 ;
@@ -2686,11 +2686,12 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
     b // case braches
     c // otherwise branch
     {
+      // The <case> branches.
+	    
       int currentCase = 1;
       Transition *last;
       foreach (caseBranch=Case(innerActivity); tCase_list b)
       {
-	trace(TRACE_DEBUG, "[PNU]\t\t<case>\n");
 	string condition = caseBranch->condition->name;
 	string caseNumber = intToString(currentCase);
 
@@ -2733,11 +2734,12 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
 	TheNet->mergePlaces(This, ".internal.stopped", innerActivity, ".stopped");
 	
 	currentCase++;
-	trace(TRACE_DEBUG, "[PNU]\t\t</case>\n");
+	indown();
       }
 
-      
-      trace(TRACE_DEBUG, "[PNU]\t\t<otherwise>\n");
+
+      // The <otherwise> branch.
+
       Transition *t2 = TheNet->newTransition(prefix + "t2.otherwise");
       
       // "running"-place and connecting arcs
@@ -2752,8 +2754,6 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
       TheNet->mergePlaces(This, ".internal.final",   c, ".final");
       TheNet->mergePlaces(This, ".internal.stop",    c, ".stop");
       TheNet->mergePlaces(This, ".internal.stopped", c, ".stopped");
-
-      trace(TRACE_DEBUG, "[PNU]\t\t</otherwise>\n");
 
 
       // Create the arcs for the Dead Path elimination: each chosen activity
@@ -3481,7 +3481,7 @@ This=StandardElements(NiltTarget_list(), NiltSource_list()) ->
 This=StandardElements(NiltTarget_list(), a) ->
   [petrinet:
     {
-      trace(TRACE_DEBUG, "[PNU]\t\tFig. 22\n");
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 22\n");
       string prefix = intToString(This->parentId->value) + "."; 
       string newPrefix = intToString(This->parentId->value) + ".internal";
 
@@ -3563,7 +3563,7 @@ This=StandardElements(NiltTarget_list(), a) ->
 This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure == mkcasestring("no")) ->
   [petrinet:
     {
-      trace(TRACE_DEBUG, "[PNU]\t\tFig. 23\n");
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 23\n");
       string prefix = intToString(This->parentId->value) + ".";
       string newPrefix = intToString(This->parentId->value) + ".internal";
       
@@ -3632,7 +3632,7 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
 This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure == mkcasestring("yes")) ->
   [petrinet:
     {
-      trace(TRACE_DEBUG, "[PNU]\t\tFig. 24\n");
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 24\n");
       string prefix = intToString(This->parentId->value) + ".";
       string newPrefix = intToString(This->parentId->value) + ".internal";
 
@@ -3697,7 +3697,7 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
 This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("yes")) ->
   [petrinet:
     {
-      trace(TRACE_DEBUG, "[PNU]\t\tFig. 25\n");
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 25\n");
       string prefix = intToString(This->parentId->value) + ".";
       string newPrefix = intToString(This->parentId->value) + ".internal";      
 
@@ -3812,7 +3812,7 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
 This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("no")) ->
   [petrinet:
     {
-      trace(TRACE_DEBUG, "[PNU]\t\tFig. 26\n");
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 26\n");
       string prefix = intToString(This->parentId->value) + ".";
       string newPrefix = intToString(This->parentId->value) + ".internal";
 

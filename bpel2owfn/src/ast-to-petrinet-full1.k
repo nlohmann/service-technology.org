@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/13 14:40:19 $
+ *          - last changed: \$Date: 2006/02/13 14:54:38 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.136 $
+ * \version \$Revision: 1.137 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -2735,7 +2735,6 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
 	TheNet->mergePlaces(This, ".internal.stopped", innerActivity, ".stopped");
 	
 	currentCase++;
-	indown();
       }
 
 
@@ -2943,6 +2942,7 @@ This=activitySequence(Sequence(a,b)) ->
 	lastActivity = innerActivity;
 	activityCount++;
       }
+
       footer(This->id, true);
     }
   ]  

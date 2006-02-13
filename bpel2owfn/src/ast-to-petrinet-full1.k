@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/13 14:08:17 $
+ *          - last changed: \$Date: 2006/02/13 14:40:19 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.135 $
+ * \version \$Revision: 1.136 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -2686,14 +2686,15 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
     b // case braches
     c // otherwise branch
     {
-      // The <case> branches.
-	    
       int currentCase = 1;
       Transition *last;
       foreach (caseBranch=Case(innerActivity); tCase_list b)
       {
 	string condition = caseBranch->condition->name;
 	string caseNumber = intToString(currentCase);
+
+	trace(TRACE_VERY_DEBUG, "[PNU]\tEmbedding case branch " + caseNumber + "...\n");
+
 
 	Transition *t2 = NULL;
 	Transition *t4 = NULL;
@@ -2738,8 +2739,8 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
       }
 
 
+      trace(TRACE_VERY_DEBUG, "[PNU]\tEmbedding otherwise branch...\n");
       // The <otherwise> branch.
-
       Transition *t2 = TheNet->newTransition(prefix + "t2.otherwise");
       
       // "running"-place and connecting arcs
@@ -2782,7 +2783,7 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
 	if ((This->dpe->value > 0) && (innerActivity1->dpe->value > 0))
 	  TheNet->newArc(t1, TheNet->findPlace(innerActivity1, ".negLink"));
       }
-      
+     
       footer(This->id, true);
     }
   ]

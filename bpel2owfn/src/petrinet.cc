@@ -31,13 +31,13 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/02/10 16:13:12 $
+ *          - last changed: \$Date: 2006/02/13 14:40:20 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.95 $
+ * \version \$Revision: 1.96 $
  */
 
 
@@ -451,7 +451,7 @@ Arc *PetriNet::newArc(Node * source, Node * target, arc_type type)
   }
 
   // Now we can be sure both nodes exist.
-  trace(TRACE_VERY_DEBUG, "[PN]\tCreating arc(" + intToString(source->id) + "," + intToString(target->id) + ")...\n");
+  trace(TRACE_VERY_DEBUG, "[PN]\tCreating arc (" + intToString(source->id) + "," + intToString(target->id) + ")...\n");
 
   // Tests if the two nodes are of different types, i.e. we only draw arcs
   // between places and transitions.
@@ -473,7 +473,6 @@ Arc *PetriNet::newArc(Node * source, Node * target, arc_type type)
     Arc *f2 = new Arc(target, source);
     F.insert(f2);
   }
-
 
   return f;
 }
@@ -556,7 +555,7 @@ void PetriNet::removeTransition(Transition * t)
  */
 void PetriNet::removeArc(Arc * f)
 {
-  trace(TRACE_VERY_DEBUG, "[PN]\tRemoving arc(" + intToString(f->source->id) + "," + intToString(f->target->id) + ")...\n");
+  trace(TRACE_VERY_DEBUG, "[PN]\tRemoving arc (" + intToString(f->source->id) + "," + intToString(f->target->id) + ")...\n");
 
   F.erase(f);
   delete f;

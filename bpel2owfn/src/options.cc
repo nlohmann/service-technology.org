@@ -325,18 +325,18 @@ void parse_command_line(int argc, char* argv[])
 	      {
 	        parameters[P_SIMPLIFY] = true;
 	      }
-	      else if ( parameter == "nointerface" )
-	      {
-	        parameters[P_NOINTERFACE] = true;
-	      }
-	      else if ( parameter == "finalmarking" )
-	      {
-	        parameters[P_FINALMARKING] = true;
-	      }
-	      else if ( parameter == "uniquefault" )
-	      {
-	        parameters[P_UNIQUEFAULT] = true;
-	      }
+//	      else if ( parameter == "nointerface" )
+//	      {
+//	        parameters[P_NOINTERFACE] = true;
+//	      }
+//	      else if ( parameter == "finalmarking" )
+//	      {
+//	        parameters[P_FINALMARKING] = true;
+//	      }
+//	      else if ( parameter == "uniquefault" )
+//	      {
+//	        parameters[P_UNIQUEFAULT] = true;
+//	      }
 	      else if ( parameter == "finishloop" )
 	      {
 	        parameters[P_FINISHLOOP] = true;

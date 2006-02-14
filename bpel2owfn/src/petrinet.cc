@@ -31,13 +31,13 @@
  *          
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/02/13 14:40:20 $
+ *          - last changed: \$Date: 2006/02/14 10:18:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.96 $
+ * \version \$Revision: 1.97 $
  */
 
 
@@ -631,17 +631,17 @@ void PetriNet::printInformation()
 
   // the transitions
   (*output) << "\nTRANSITIONS:\n";
-  (*output) << "ID\tGUARD\t\tROLES\n";
+  (*output) << "ID\tROLES\n";
 
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
   {
-    (*output) <<(*t)->nodeShortName() + "\t\t";
+    (*output) << (*t)->nodeShortName() + "\t";
     
     for (vector<string>::iterator role =(*t)->history.begin(); role !=(*t)->history.end(); role++)
-      if (role ==(*t)->history.begin())
-	(*output) << "\t" + *role + "\n";
+      if (role == (*t)->history.begin())
+	(*output) << *role + "\n";
       else
-	(*output) << "\t\t\t" + *role + "\n";
+	(*output) << "\t\t" + *role + "\n";
   }  
 }
 

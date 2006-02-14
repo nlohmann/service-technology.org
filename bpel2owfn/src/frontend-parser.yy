@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/02/14 14:34:00 $
+ *          - last changed: \$Date: 2006/02/14 14:53:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,11 +47,10 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.115 $
+ * \version \$Revision: 1.116 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
- *          - inProcess can be replaced by "(currentScopeId->value == 1)"
  */
 %}
 
@@ -143,9 +142,6 @@ bool inPartners = false;
 
 /// needed to check occurrence of links within whiles
 bool inWhile = false;
-
-/// needed to distinguish context of the Fault Handler
-bool inProcess = true;
 
 /// needed to tag handlers
 integer currentScopeId;
@@ -314,12 +310,10 @@ tProcess:
       hasCompensate = 0;
    }
   X_NEXT imports tPartnerLinks tPartners tVariables tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers
-    { inProcess = false; }
   activity
   X_NEXT X_SLASH K_PROCESS X_CLOSE
-    { TheProcess = $$ = Process($8, $9, $10, $11, $12, $13, $14, StopInProcess(), $16);
+    { TheProcess = $$ = Process($8, $9, $10, $11, $12, $13, $14, StopInProcess(), $15);
       symMan.quitScope();
-      $13->inProcess = true; // to reduce the size of the process' compensation handler
       $$->name = att.read($4, "name");
       $$->targetNamespace = att.read($4, "targetNamespace");
       $$->queryLanguage = att.read($4, "queryLanguage", $$->queryLanguage);
@@ -579,7 +573,7 @@ genSymTabEntry_Partner:
 tFaultHandlers:
   /* empty */
     { $$ = implicitFaultHandler();
-      $$->inProcess = inProcess;
+      $$->inProcess = (currentScopeId->value == 1);
       $$->parentScopeId = currentScopeId; 
       $$->hasCatchAll = false;
     }
@@ -588,14 +582,12 @@ tFaultHandlers:
       symMan.startDPEinWhile();
       isInFH.push(true);
       hasCompensate = 0;
-      inProcess = false;
     }
   tCatch_list  
   tCatchAll 
   X_SLASH K_FAULTHANDLERS X_NEXT
     { $$ = userDefinedFaultHandler($4, $5);
       $$->inProcess = (currentScopeId->value == 1);
-      inProcess = false; // hack!
       $$->parentScopeId = currentScopeId;
       $$->hasCatchAll = hasCatchAll;
       isInFH.pop();
@@ -655,7 +647,10 @@ tCatchAll:
 
 tCompensationHandler:
   /* empty */
-    { $$ = implicitCompensationHandler();
+    { if (currentScopeId->value == 1)
+        $$ = processCompensationHandler();
+      else
+        $$ = implicitCompensationHandler();
       $$->parentScopeId = currentScopeId; }
 | K_COMPENSATIONHANDLER X_NEXT 
     {
@@ -665,7 +660,11 @@ tCompensationHandler:
     }
   activity 
   X_NEXT X_SLASH K_COMPENSATIONHANDLER X_NEXT
-    { $$ = userDefinedCompensationHandler($4);
+    { if (currentScopeId->value == 1)
+        $$ = processCompensationHandler();
+      else
+        $$ = userDefinedCompensationHandler($4);
+
       switch ( hasCompensate ) {
         case 1 : $$->compensateWithoutScope = true;
                  $$->compensateWithScope = false;

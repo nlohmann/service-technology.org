@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/14 11:42:57 $
+ *          - last changed: \$Date: 2006/02/14 14:53:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.141 $
+ * \version \$Revision: 1.142 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -1507,7 +1507,6 @@ This=implicitCompensationHandler() ->
       string prefix = intToString(This->parentScopeId->value) + ".internal.compensationHandler."; 
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<implicitCompensationHandler scope=\"" + currentScope + "\">\n");
       
-      Place *p1  = TheNet->newPlace(prefix + "p1");
       Place *p2  = TheNet->newPlace(prefix + "ch_in");
       Place *p3  = TheNet->newPlace(prefix + "Compensated");
       Place *p4  = TheNet->newPlace(prefix + "!Completed");
@@ -1523,22 +1522,28 @@ This=implicitCompensationHandler() ->
       Place *p18 = TheNet->newPlace(prefix + "scopeCompensated");
       Place *p24 = TheNet->newPlace(prefix + "clean");
 
+      
+      // The following subnet is only needed if the standard faults are
+      // switched on (i.e. not using the parameter "nostandardfaults").
       if (parameters[P_NOSTANDARDFAULTS] == false)
       {
+	Place *p1  = TheNet->newPlace(prefix + "p1");
+	
 	Transition *t1 = throwFault(p2, p1, "ch_in", prefix, mkinteger(2));
 	TheNet->newArc(p3, t1, READ);
+
+	Transition *t3 = TheNet->newTransition(prefix + "t3");
+	TheNet->newArc(p1, t3);
+	TheNet->newArc(t3, p13);
+	TheNet->newArc(p24, t3);
       }
 
+      
       Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p2, t2);
       TheNet->newArc(p4, t2, READ);
       TheNet->newArc(p5, t2, READ);
       TheNet->newArc(t2, p9);
-
-      Transition *t3 = TheNet->newTransition(prefix + "t3");
-      TheNet->newArc(p1, t3);
-      TheNet->newArc(t3, p13);
-      TheNet->newArc(p24, t3);
 
       Transition *t4 = TheNet->newTransition(prefix + "t4");
       TheNet->newArc(p2, t4);
@@ -1619,8 +1624,12 @@ This=implicitCompensationHandler() ->
 ;
 
 
+
+
+
 /*
- * user-defined compensation handler
+ * User-defined compensation handler as depicted in Fig. 42-45. Please note
+ * that this pattern combines the four different compensation handler patterns.
  */
 
 This=userDefinedCompensationHandler(innerActivity) ->
@@ -1630,7 +1639,6 @@ This=userDefinedCompensationHandler(innerActivity) ->
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<userDefinedCompensationHandler scope=\"" + currentScope + "\">\n");
       SymbolScope *me = symMan.getScope(This->parentScopeId);
 
-      Place *p1  = TheNet->newPlace(prefix + "p1");
       Place *p2  = TheNet->newPlace(prefix + "ch_in");
       Place *p3  = TheNet->newPlace(prefix + "Compensated");
       Place *p4  = TheNet->newPlace(prefix + "!Completed");
@@ -1648,41 +1656,34 @@ This=userDefinedCompensationHandler(innerActivity) ->
       Place *p24 = TheNet->newPlace(prefix + "clean");
 
       
-      // The fault transition t1 shall only be created if the option
-      // "nostandardfaults" is not set and if the compensation handler is
-      // embedded in a child scope.
-      if ((parameters[P_NOSTANDARDFAULTS] == false) && (!This->inProcess))
+      // The following subnet is only needed if the standard faults are
+      // switched on (i.e. not using the parameter "nostandardfaults").
+      if (parameters[P_NOSTANDARDFAULTS] == false)
       {
+	Place *p1  = TheNet->newPlace(prefix + "p1");
+	      
 	Transition *t1 = throwFault(p2, p1, "ch_in", prefix, mkinteger(2));
 	TheNet->newArc(p3, t1, READ);
+
+	Transition *t3 = TheNet->newTransition(prefix + "t3");
+	TheNet->newArc(p1, t3);
+	TheNet->newArc(t3, p13);
+	TheNet->newArc(p24, t3);	
       }
 
       
-      // The transitions t2 and t4 are only used if there is an activity to
-      // embed which is only the case if the compensation handler is embedded
-      // in a child scope.
-      Transition *t4 = NULL;
-      if (!This->inProcess)
-      {
-	Transition *t2 = TheNet->newTransition(prefix + "t2");
-	TheNet->newArc(p2, t2);
-	TheNet->newArc(p4, t2, READ);
-	TheNet->newArc(p5, t2, READ);
-	TheNet->newArc(t2, p9);
-	
-	t4 = TheNet->newTransition(prefix + "t4");
-	TheNet->newArc(p2, t4);
-	TheNet->newArc(t4, p3);
-	TheNet->newArc(p5, t4);
-	TheNet->newArc(p6, t4, READ);
-	TheNet->newArc(t4, p7);
-      }
+      Transition *t2 = TheNet->newTransition(prefix + "t2");
+      TheNet->newArc(p2, t2);
+      TheNet->newArc(p4, t2, READ);
+      TheNet->newArc(p5, t2, READ);
+      TheNet->newArc(t2, p9);  
       
-      
-      Transition *t3 = TheNet->newTransition(prefix + "t3");
-      TheNet->newArc(p1, t3);
-      TheNet->newArc(t3, p13);
-      TheNet->newArc(p24, t3);
+      Transition *t4 = TheNet->newTransition(prefix + "t4");
+      TheNet->newArc(p2, t4);
+      TheNet->newArc(t4, p3);
+      TheNet->newArc(p5, t4);
+      TheNet->newArc(p6, t4, READ);
+      TheNet->newArc(t4, p7);
       
       Transition *t5 = TheNet->newTransition(prefix + "t5");
       TheNet->newArc(p8, t5);
@@ -1777,25 +1778,13 @@ This=userDefinedCompensationHandler(innerActivity) ->
 	TheNet->newArc(p21, t13);
       }
     }
-    
-    // Only create a pattern for the inner activity if it is embedded in a
-    // compensation handler of a child scope of the process, because otherwise
-    // it will not be executed anyway as the process' compensation handler is
-    // never invoked.
-    { if (!This->inProcess) }
-      ${
-	 innerActivity
-      $}
-    
+    innerActivity
     {
       // Embed inner activity.
-      if (!This->inProcess)
-      {
-	TheNet->newArc(t4, TheNet->findPlace(innerActivity, ".initial"));
-	TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t5);
-	TheNet->mergePlaces(p24, TheNet->findPlace(innerActivity, ".stop"));
-	TheNet->mergePlaces(p13, TheNet->findPlace(innerActivity, ".stopped"));
-      }
+      TheNet->newArc(t4, TheNet->findPlace(innerActivity, ".initial"));
+      TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t5);
+      TheNet->mergePlaces(p24, TheNet->findPlace(innerActivity, ".stop"));
+      TheNet->mergePlaces(p13, TheNet->findPlace(innerActivity, ".stopped"));
 
       trace(TRACE_DEBUG, "[PNU]" + inString() + "</userDefinedCompensationHandler scope=\"" + currentScope + "\">\n");
     }
@@ -1805,8 +1794,100 @@ This=userDefinedCompensationHandler(innerActivity) ->
 
 
 
+/*
+ * Dummy
+ */
+This=processCompensationHandler() ->
+  [petrinet:
+    {
+      string prefix = intToString(This->parentScopeId->value) + ".internal.compensationHandler."; 
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "<processCompensationHandler>\n");
+      
+      Place *p1  = TheNet->newPlace(prefix + "p1");
+      Place *p2  = TheNet->newPlace(prefix + "ch_in");
+      Place *p3  = TheNet->newPlace(prefix + "Compensated");
+      Place *p4  = TheNet->newPlace(prefix + "!Completed");
+      Place *p5  = TheNet->newPlace(prefix + "!Compensated");
+      Place *p6  = TheNet->newPlace(prefix + "Completed");
+      Place *p9  = TheNet->newPlace(prefix + "compensated");
+      Place *p11 = TheNet->newPlace(prefix + "comp");
+      Place *p13 = TheNet->newPlace(prefix + "cleaned");
+      Place *p14 = TheNet->newPlace(prefix + "fh");
+      Place *p15 = TheNet->newPlace(prefix + "ch_call");
+      Place *p16 = TheNet->newPlace(prefix + "fh_call");
+      Place *p17 = TheNet->newPlace(prefix + "ch_out");
+      Place *p18 = TheNet->newPlace(prefix + "scopeCompensated");
+      Place *p24 = TheNet->newPlace(prefix + "clean");
 
+      Transition *t6 = TheNet->newTransition(prefix + "t6");
+      TheNet->newArc(p14, t6);
+      TheNet->newArc(t6, p11);
+      TheNet->newArc(t6, p16);
 
+      Transition *t7 = TheNet->newTransition(prefix + "t7");
+      TheNet->newArc(t7, p9);
+      TheNet->newArc(p11, t7);
+      TheNet->newArc(p15, t7);
+
+      Transition *t8 = TheNet->newTransition(prefix + "t8");
+      TheNet->newArc(p11, t8);
+      TheNet->newArc(p16, t8);
+      TheNet->newArc(t8, p17);
+
+      Transition *t9 = TheNet->newTransition(prefix + "t9");
+      TheNet->newArc(t9, p11);
+      TheNet->newArc(p16, t9, READ);
+      TheNet->newArc(p18, t9);
+
+      Transition *t10 = TheNet->newTransition(prefix + "t10");
+      TheNet->newArc(t10, p11);
+      TheNet->newArc(p15, t10, READ);
+      TheNet->newArc(p18, t10);
+
+      Transition *t11 = TheNet->newTransition(prefix + "t11");
+      TheNet->newArc(t11, p13);
+      TheNet->newArc(p15, t11);
+      TheNet->newArc(p24, t11);
+
+      Transition *t12 = TheNet->newTransition(prefix + "t12");
+      TheNet->newArc(t12, p13);
+      TheNet->newArc(p16, t12);
+      TheNet->newArc(p24, t12);
+
+      Transition *t15 = TheNet->newTransition(prefix + "t15");
+      TheNet->newArc(p9, t15);
+      TheNet->newArc(t15, p13);
+      TheNet->newArc(p24, t15);
+
+      Transition *t16 = TheNet->newTransition(prefix + "t16");
+      TheNet->newArc(t16, p13);
+      TheNet->newArc(p17, t16);
+      TheNet->newArc(p24, t16);
+
+      
+      // Generate transitions t13 for the child scopes. This transition was
+      // guarded in the original semantics and has to be unfolded for the
+      // low-level representation. Therefore, each child gets its own place
+      // "compScope".
+      SymbolScope *me = symMan.getScope(This->parentScopeId); 
+      for (list< SymbolScope * >::iterator child = me->children.begin(); child != me->children.end(); child++)
+      {
+	Place *p19_new = TheNet->newPlace(prefix + "compScope." + intToString((*child)->id->value));
+	Place *p20 = TheNet->findPlace(intToString((*child)->id->value) + ".!push");
+	Place *p21 = TheNet->findPlace(intToString((*child)->id->value) + ".push");
+	Transition *t13 = TheNet->newTransition(prefix + "t13." + intToString((*child)->id->value));
+	TheNet->newArc(p20, t7);
+	TheNet->newArc(p20, t8);
+	TheNet->newArc(p11, t13);
+	TheNet->newArc(t13, p19_new);
+	TheNet->newArc(t13, p20);
+	TheNet->newArc(p21, t13);
+      }
+
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "</processCompensationHandler>\n");
+    }
+  ]
+;
 
 
 

@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/02/14 14:53:58 $
+ *          - last changed: \$Date: 2006/02/14 15:12:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.116 $
+ * \version \$Revision: 1.117 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -1125,7 +1125,7 @@ tInvoke:
 
         currentSymTabEntryKey = symTab.insert(K_SCOPE);
         currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
-		symTab.setMapping(currentSymTabEntryKey, scope->id);
+	symTab.setMapping(currentSymTabEntryKey, scope->id);
 		
 		
         scope->name = att.read($3, "name");
@@ -2261,6 +2261,7 @@ tOtherwise:
     { // creaty empty activit with id, without links etc.
       integer id = att.nextId();
       impl_standardElements_StandardElements* noLinks = StandardElements(NiltTarget_list(),NiltSource_list());
+//      noLinks->dpe = kc::mkinteger(0);
       noLinks->parentId = id;
       impl_tEmpty_Empty* implicitEmpty = Empty(noLinks);
       implicitEmpty->id = id;
@@ -2269,6 +2270,12 @@ tOtherwise:
       implicitEmpty->name = mkcasestring("implicit empty in otherwise");
       impl_activity *otherwiseActivity = activityEmpty(implicitEmpty);
       otherwiseActivity->id = id;
+
+      currentSymTabEntryKey = symTab.insert(K_OTHERWISE);
+      currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
+      currentSymTabEntryKey = symTab.insert(K_EMPTY);
+      currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
+      symTab.setMapping(currentSymTabEntryKey, id);
 
       $$ = Otherwise(otherwiseActivity);
       $$->dpe = kc::mkinteger(0);

@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/02/14 10:38:55 $
+ *          - last changed: \$Date: 2006/02/14 11:45:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.112 $
+ * \version \$Revision: 1.113 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -2100,7 +2100,7 @@ tFlow:
       $$->suppressJoinFailure = $7->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
       att.traceAM(string("tFlow: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
-      $$->dpe = symMan.needsDPE();
+      $$->dpe = $9->dpe;
       if ($7->dpe->value > 0)
       {
         symMan.addDPEend();
@@ -2112,10 +2112,20 @@ tFlow:
 ;
 
 activity_list:
-  activity X_NEXT
-    { $$ = Consactivity_list($1, Nilactivity_list()); }
-| activity X_NEXT activity_list
-    { $$ = Consactivity_list($1, $3); }
+  descent_activity_list activity X_NEXT
+    { $$ = Consactivity_list($2, Nilactivity_list()); 
+      $$->dpe = $2->dpe;
+    }
+| descent_activity_list activity X_NEXT activity_list
+    { $$ = Consactivity_list($2, $4); 
+      $$->dpe = mkinteger($2->dpe->value + $4->dpe->value);
+    }
+;
+
+descent_activity_list:
+    {
+      symMan.resetDPEend();
+    }
 ;
 
 tLinks:
@@ -2265,8 +2275,13 @@ tOtherwise:
       $$ = Otherwise(otherwiseActivity);
       $$->dpe = kc::mkinteger(0);
     }
-| K_OTHERWISE X_NEXT activity X_NEXT X_SLASH K_OTHERWISE X_NEXT
-    { $$ = Otherwise($3); 
+| K_OTHERWISE X_NEXT 
+    {
+      // since we descend, set DPE ends to 0
+      symMan.resetDPEend();
+    }
+  activity X_NEXT X_SLASH K_OTHERWISE X_NEXT
+    { $$ = Otherwise($4); 
       $$->dpe = symMan.needsDPE();
     }
 ;
@@ -2376,7 +2391,7 @@ tSequence:
       att.popSJFStack();
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $3; 
-      $$->dpe = symMan.needsDPE();
+      $$->dpe = $7->dpe;
       if ($6->dpe->value > 0)
       {
         symMan.addDPEend();

@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/02/09 19:09:05 $
+ *          - last changed: \$Date: 2006/02/14 10:38:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.53 $
+ * \version \$Revision: 1.54 $
  */
 %}
 
@@ -279,6 +279,9 @@ tCompensationHandler:
 
     /// handler contains <compensate scope="A"/> (i.e. pattern Fig. 44)
     bool compensateWithScope = false;
+
+    /// to reduce the size of the process' compensation handler
+    bool inProcess = false;
   }
 ;
 

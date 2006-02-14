@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/02/10 13:48:40 $
+ *          - last changed: \$Date: 2006/02/14 10:38:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.111 $
+ * \version \$Revision: 1.112 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -319,6 +319,7 @@ tProcess:
   X_NEXT X_SLASH K_PROCESS X_CLOSE
     { TheProcess = $$ = Process($8, $9, $10, $11, $12, $13, $14, StopInProcess(), $16);
       symMan.quitScope();
+      $13->inProcess = true; // to reduce the size of the process' compensation handler
       $$->name = att.read($4, "name");
       $$->targetNamespace = att.read($4, "targetNamespace");
       $$->queryLanguage = att.read($4, "queryLanguage", $$->queryLanguage);

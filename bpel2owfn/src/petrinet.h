@@ -32,21 +32,21 @@
  *   - Place
  * - Arc
  * - PetriNet
- * 
+ *
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
  *          - last changes of: \$Author: nlohmann $
- * 
+ *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/02/09 22:04:00 $
- * 
+ *          - last changed: \$Date: 2006/02/14 15:34:34 $
+ *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
- *          
- * \version \$Revision: 1.56 $
+ *
+ * \version \$Revision: 1.57 $
  */
 
 
@@ -115,7 +115,7 @@ typedef enum
 typedef enum
 {
   PLACE,			///< a place
-  TRANSITION			///< a transition 
+  TRANSITION			///< a transition
 } node_type;
 
 
@@ -135,7 +135,7 @@ typedef enum
  * Class to represent nodes (i.e. places and transitions) of Petri nets. Each
  * node has an id and a history (i.e. the list of roles the node had during
  * the processing of a BPEL-file).
- * 
+ *
 */
 
 class Node
@@ -149,7 +149,7 @@ public:
 
   /// the short name of the node
   string nodeShortName();
-  
+
   /// the type of the node
   node_type nodeType;
 
@@ -178,7 +178,7 @@ public:
  *
  * Class to represent transitions of Petri nets. Each transition inherits the
  * variables #id and #history.
- * 
+ *
 */
 
 class Transition:public Node
@@ -207,7 +207,7 @@ public:
  * Class to represent places of Petri nets. In addition to the inherited
  * variables #id and #history, each place has a type defined in the
  * enumeation #place_type.
- * 
+ *
 */
 
 class Place:public Node
@@ -240,7 +240,7 @@ public:
  *
  * Class to represent arcs of Petri nets. An arc written as a tupel (n1,n2)
  * has n1 as #source and n2 as #target.
- * 
+ *
 */
 
 class Arc
@@ -302,10 +302,10 @@ public:
 
   /// low-level PEP output.
   void pepOut();
-  
+
   /// APPN (Abstract Petri Net Notation) output.
   void appnOut();
-  
+
   /// LoLA-output.
   void lolaOut();
 
@@ -373,7 +373,7 @@ private:
 
   /// the list of output places of the oWFN
   set<Place *> P_out;
-  
+
   /// the list of transitions of the Petri net
   set<Transition *> T;
 

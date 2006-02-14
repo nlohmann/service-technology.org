@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License along   *
  * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
  * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
-\****************************************************************************/ 
+\****************************************************************************/
 
 /*!
  * \file bpel-unparse-tools.h
@@ -25,20 +25,20 @@
  *
  * This file defines several helpe functions used during the unparsing
  * of the abstract syntax tree.
- * 
- * \author  
+ *
+ * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
  *          - last changes of: \$Author: nlohmann $
- *          
+ *
  * \date
  *          - created: 2006/02/08
- *          - last changed: \$Date: 2006/02/09 20:20:10 $
- * 
+ *          - last changed: \$Date: 2006/02/14 15:34:33 $
+ *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  */
 
 

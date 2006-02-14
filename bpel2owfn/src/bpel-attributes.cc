@@ -25,18 +25,18 @@
  * 
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/02/08 19:28:58 $
+ *          - last changed: \$Date: 2006/02/14 13:53:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
  *
  * \todo
  *       - (reinert) Comment this file and its classes.
@@ -576,8 +576,8 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
     {
       traceAM("ONMESSAGE\n");
       
-      bool partnerLinkFlag, portTypeFlag, operationFlag;
-      partnerLinkFlag = portTypeFlag = operationFlag = false;
+      bool partnerLinkFlag, portTypeFlag, operationFlag, variableFlag;
+      partnerLinkFlag = portTypeFlag = operationFlag = variableFlag = false;
        
       scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
       
@@ -599,6 +599,11 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
           operationFlag = true;
           traceAM((*scannerResultDataIterator).first + "\n");
         }        
+        else if(((*scannerResultDataIterator).first) == A__VARIABLE)
+        {
+          variableFlag = true;
+          traceAM((*scannerResultDataIterator).first + "\n");
+        }        
         ++scannerResultDataIterator;
       }
       
@@ -613,6 +618,10 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
       else if(!operationFlag)
       {
         printErrorMsg("attribute " + A__OPERATION + "=\"" + T__NCNAME + "\" is missing");        
+      }
+      else if(!variableFlag)
+      {
+        printErrorMsg("attribute " + A__VARIABLE + "=\"" + T__NCNAME + "\" is missing");        
       }
     }
     break;
@@ -665,8 +674,8 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
     {
       traceAM("RECEIVE\n");      
 
-      bool partnerLinkFlag, portTypeFlag, operationFlag;
-      partnerLinkFlag = portTypeFlag = operationFlag = false;
+      bool partnerLinkFlag, portTypeFlag, operationFlag, variableFlag;
+      partnerLinkFlag = portTypeFlag = operationFlag = variableFlag = false;
        
       scannerResultDataIterator = this->scannerResult[elementIdInt].begin();
       
@@ -688,6 +697,11 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
           operationFlag = true;
           traceAM((*scannerResultDataIterator).first + "\n");
         }        
+        else if(((*scannerResultDataIterator).first) == A__VARIABLE)
+        {
+          variableFlag = true;
+          traceAM((*scannerResultDataIterator).first + "\n");
+        }        
         ++scannerResultDataIterator;
       }
       
@@ -702,6 +716,10 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
       else if(!operationFlag)
       {
         printErrorMsg("attribute " + A__OPERATION + "=\"" + T__NCNAME + "\" is missing");        
+      }
+      else if(!variableFlag)
+      {
+        printErrorMsg("attribute " + A__VARIABLE + "=\"" + T__NCNAME + "\" is missing");        
       }
     }
     break;    

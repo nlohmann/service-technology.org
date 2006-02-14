@@ -31,17 +31,18 @@
  *          
  * \date
  *          - created: 2005/11/15
- *          - last changed: \$Date: 2006/01/03 13:27:19 $
+ *          - last changed: \$Date: 2006/02/14 10:08:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  */
 
 #include "exception.h"
+#include "options.h"
 
 Exception::Exception(exception_id myid, std::string myerror)
 {
@@ -67,9 +68,9 @@ Exception::Exception(exception_id myid, std::string myerror, std::string myinfor
 
 void Exception::info()
 {
-  cerr << "Exception #" << id << " occured!" << endl << endl;
-  cerr << "   " << error << endl << flush;
+  (*log_output) << "Exception #" << id << " occured!" << endl << endl;
+  (*log_output) << "   " << error << endl << flush;
 
   if (information != "")
-    cerr << " Additional information: " << endl << "   " << information << endl << endl << flush;
+    (*log_output) << " Additional information: " << endl << "   " << information << endl << endl << flush;
 }

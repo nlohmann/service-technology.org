@@ -32,13 +32,13 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/02/10 10:15:43 $
+ *          - last changed: \$Date: 2006/02/14 10:08:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.44 $
+ * \version \$Revision: 1.45 $
  */
 
 
@@ -187,7 +187,7 @@ void cleanup()
     fclose(yyin);
   }
  
-  if ( output != &std::cout && output != NULL )
+  if ( output != &std::cout && output != &std::clog && output != NULL )
   {
     trace(TRACE_INFORMATION," + Closing output file: " + output_filename + ".X\n");
     (*output) << std::flush;

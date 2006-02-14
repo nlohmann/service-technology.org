@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/13 16:22:04 $
+ *          - last changed: \$Date: 2006/02/14 11:42:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.140 $
+ * \version \$Revision: 1.141 $
  * 
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -1647,30 +1647,43 @@ This=userDefinedCompensationHandler(innerActivity) ->
       Place *p17 = TheNet->newPlace(prefix + "ch_out");
       Place *p24 = TheNet->newPlace(prefix + "clean");
 
-      if (parameters[P_NOSTANDARDFAULTS] == false)
+      
+      // The fault transition t1 shall only be created if the option
+      // "nostandardfaults" is not set and if the compensation handler is
+      // embedded in a child scope.
+      if ((parameters[P_NOSTANDARDFAULTS] == false) && (!This->inProcess))
       {
 	Transition *t1 = throwFault(p2, p1, "ch_in", prefix, mkinteger(2));
 	TheNet->newArc(p3, t1, READ);
       }
-      
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(p2, t2);
-      TheNet->newArc(p4, t2, READ);
-      TheNet->newArc(p5, t2, READ);
-      TheNet->newArc(t2, p9);
 
+      
+      // The transitions t2 and t4 are only used if there is an activity to
+      // embed which is only the case if the compensation handler is embedded
+      // in a child scope.
+      Transition *t4 = NULL;
+      if (!This->inProcess)
+      {
+	Transition *t2 = TheNet->newTransition(prefix + "t2");
+	TheNet->newArc(p2, t2);
+	TheNet->newArc(p4, t2, READ);
+	TheNet->newArc(p5, t2, READ);
+	TheNet->newArc(t2, p9);
+	
+	t4 = TheNet->newTransition(prefix + "t4");
+	TheNet->newArc(p2, t4);
+	TheNet->newArc(t4, p3);
+	TheNet->newArc(p5, t4);
+	TheNet->newArc(p6, t4, READ);
+	TheNet->newArc(t4, p7);
+      }
+      
+      
       Transition *t3 = TheNet->newTransition(prefix + "t3");
       TheNet->newArc(p1, t3);
       TheNet->newArc(t3, p13);
       TheNet->newArc(p24, t3);
-
-      Transition *t4 = TheNet->newTransition(prefix + "t4");
-      TheNet->newArc(p2, t4);
-      TheNet->newArc(t4, p3);
-      TheNet->newArc(p5, t4);
-      TheNet->newArc(p6, t4, READ);
-      TheNet->newArc(t4, p7);
-
+      
       Transition *t5 = TheNet->newTransition(prefix + "t5");
       TheNet->newArc(p8, t5);
       TheNet->newArc(t5, p9);
@@ -1764,13 +1777,25 @@ This=userDefinedCompensationHandler(innerActivity) ->
 	TheNet->newArc(p21, t13);
       }
     }
-    innerActivity // the inner activity of the compensation handler
+    
+    // Only create a pattern for the inner activity if it is embedded in a
+    // compensation handler of a child scope of the process, because otherwise
+    // it will not be executed anyway as the process' compensation handler is
+    // never invoked.
+    { if (!This->inProcess) }
+      ${
+	 innerActivity
+      $}
+    
     {
       // Embed inner activity.
-      TheNet->newArc(t4, TheNet->findPlace(innerActivity, ".initial"));
-      TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t5);
-      TheNet->mergePlaces(p24, TheNet->findPlace(innerActivity, ".stop"));
-      TheNet->mergePlaces(p13, TheNet->findPlace(innerActivity, ".stopped"));
+      if (!This->inProcess)
+      {
+	TheNet->newArc(t4, TheNet->findPlace(innerActivity, ".initial"));
+	TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t5);
+	TheNet->mergePlaces(p24, TheNet->findPlace(innerActivity, ".stop"));
+	TheNet->mergePlaces(p13, TheNet->findPlace(innerActivity, ".stopped"));
+      }
 
       trace(TRACE_DEBUG, "[PNU]" + inString() + "</userDefinedCompensationHandler scope=\"" + currentScope + "\">\n");
     }

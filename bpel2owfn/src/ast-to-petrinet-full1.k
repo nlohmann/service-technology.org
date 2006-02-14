@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/14 15:34:33 $
+ *          - last changed: \$Date: 2006/02/14 16:00:31 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.143 $
+ * \version \$Revision: 1.144 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -1795,7 +1795,9 @@ This=userDefinedCompensationHandler(innerActivity) ->
 
 
 /*
- * Dummy
+ * Compensation handler inside of a process. Since this compensation handler
+ * will never be called from a surrounding scope, the whole "left" part of the
+ * pattern depicted in Fig. 42 is not necessary.
  */
 This=processCompensationHandler() ->
   [petrinet:
@@ -1803,7 +1805,6 @@ This=processCompensationHandler() ->
       string prefix = intToString(This->parentScopeId->value) + ".internal.compensationHandler.";
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<processCompensationHandler>\n");
 
-      Place *p1  = TheNet->newPlace(prefix + "p1");
       Place *p2  = TheNet->newPlace(prefix + "ch_in");
       Place *p3  = TheNet->newPlace(prefix + "Compensated");
       Place *p4  = TheNet->newPlace(prefix + "!Completed");

@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/02/14 15:34:33 $
+ *          - last changed: \$Date: 2006/02/14 15:51:14 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.98 $
+ * \version \$Revision: 1.99 $
  */
 
 
@@ -980,41 +980,36 @@ void PetriNet::owfnOut()
 {
   trace(TRACE_DEBUG, "[PN]\tCreating oWFN-output.\n");
 
-  (*output) << "{ oWFN created by " << PACKAGE_STRING <<
-    " reading " << filename << " }" << endl << endl;
+  (*output) << "{ oWFN created by " << PACKAGE_STRING << " reading " << filename << " }" << endl << endl;
 
   // places
   (*output) << "PLACE" << endl;
 
   // internal places
   (*output) << "  INTERNAL" << endl;
-  unsigned int count = 1;
   string comment;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
     {
-      if (count == 1)
+      if (p == P.begin())
 	 (*output) << "    " <<(*p)->nodeShortName();
       else
 	 (*output) << ", " << comment << "    " <<(*p)->nodeShortName();
 
       comment = "\t\t { " +(*(*p)->history.begin()) + " }\n";
-      count++;
     }
   (*output) << "; " << comment << endl;
 
 
   // input places
   (*output) << "  INPUT" << endl;
-  count = 1;
   for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
     {
-      if (count == 1)
+      if (p == P_in.begin())
 	 (*output) << "    " <<(*p)->nodeShortName();
       else
 	 (*output) << ", " << comment << "    " <<(*p)->nodeShortName();
 
       comment = "\t\t { " +(*(*p)->history.begin()) + " }\n";
-      count++;
     }
   (*output) << "; ";
     if (P_in.size() > 0)
@@ -1024,16 +1019,14 @@ void PetriNet::owfnOut()
 
   // output places
   (*output) << "  OUTPUT" << endl;
-  count = 1;
   for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
     {
-      if (count == 1)
+      if (p == P_out.begin())
 	 (*output) << "    " <<(*p)->nodeShortName();
       else
 	 (*output) << ", " << comment << "    " <<(*p)->nodeShortName();
 
       comment = "\t\t { " +(*(*p)->history.begin()) + " }\n";
-      count++;
     }
   (*output) << "; ";
   if (P_out.size() > 0)
@@ -1059,9 +1052,8 @@ void PetriNet::owfnOut()
   (*output) << ";" << endl << endl << endl;
 
   // transitions
-  count = 1;
-  for (set<Transition *>::iterator t = T.begin(); t != T.end();
-       count++, t++)
+  unsigned int count = 1;
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); count++, t++)
     {
       (*output) << "TRANSITION " <<(*t)->nodeShortName() << "\t { " <<(*(*t)->history.begin()) << " }" << endl;
       set<Node *> consume = preset(*t);

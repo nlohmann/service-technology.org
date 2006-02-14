@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/02/14 15:12:45 $
+ *          - last changed: \$Date: 2006/02/14 15:55:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.117 $
+ * \version \$Revision: 1.118 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -2100,8 +2100,13 @@ tFlow:
       att.traceAM(string("tFlow: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
       $$->dpe = mkinteger($9->dpe->value + (symMan.needsDPE())->value);
+      if ($7->dpe->value > 0);
       {
         symMan.addDPEend();
+      }
+      if ($$->dpe->value > 0)
+      {
+	$7->dpe = mkinteger(1);
       }
       $$->negativeControlFlow = $7->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $7->parentId = $3;
@@ -2217,6 +2222,10 @@ tSwitch:
       if ($6->dpe->value > 0)
       {
         symMan.addDPEend();
+      }
+      if ($$->dpe->value > 0)
+      {
+	$6->dpe = mkinteger(1);
       }
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $3;
@@ -2401,6 +2410,10 @@ tSequence:
       {
         symMan.addDPEend();
       }
+      if ($$->dpe->value > 0)
+      {
+	$6->dpe = mkinteger(1);
+      }
     }
 ;
 
@@ -2473,6 +2486,10 @@ tPick:
       if ($6->dpe->value > 0)
       {
         symMan.addDPEend();
+      }
+      if ($$->dpe->value > 0)
+      {
+	$6->dpe = mkinteger(1);
       }
       $$->id = $6->parentId = $3;
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));

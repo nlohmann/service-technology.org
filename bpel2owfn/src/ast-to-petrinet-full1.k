@@ -29,11 +29,11 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/14 16:00:31 $
+ *          - last changed: \$Date: 2006/02/15 10:29:28 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.144 $
+ * \version \$Revision: 1.145 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -3845,7 +3845,7 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
       {
 	Place *p9  = TheNet->newPlace(prefix + "negLink");
 
-	Transition *t1 = TheNet->newTransition(prefix + "t1");
+	t1 = TheNet->newTransition(prefix + "t1");
 	TheNet->newArc(p9, t1);
 
 	Place *p10 = TheNet->findPlace(newPrefix + ".negLink");
@@ -3878,12 +3878,14 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
         TheNet->newArc(p5, t5);
         TheNet->newArc(t5, p7);
 	TheNet->newArc(p7, t4, READ);
-
+	(*log_output) << "?????" << endl;
 	if (This->dpe->value > 0)
 	{
+	  (*log_output) << "!!!!!" << endl;
 	  TheNet->newArc(p5, t1);
 	  TheNet->newArc(t1, p7);
 	}
+	(*log_output) << "#####" << endl;
       }
 
 

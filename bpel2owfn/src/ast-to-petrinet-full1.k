@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/15 10:29:28 $
+ *          - last changed: \$Date: 2006/02/15 13:44:13 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.145 $
+ * \version \$Revision: 1.146 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -3878,14 +3878,11 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
         TheNet->newArc(p5, t5);
         TheNet->newArc(t5, p7);
 	TheNet->newArc(p7, t4, READ);
-	(*log_output) << "?????" << endl;
 	if (This->dpe->value > 0)
 	{
-	  (*log_output) << "!!!!!" << endl;
 	  TheNet->newArc(p5, t1);
 	  TheNet->newArc(t1, p7);
 	}
-	(*log_output) << "#####" << endl;
       }
 
 

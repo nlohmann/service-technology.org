@@ -90,7 +90,7 @@ funded by the Bundesministerium f@"ur Bildung und Forschung. See
 * Invoking BPEL2oWFN:: How to invoke @acronym{BPEL2oWFN}.
 * File Formats:: Which file formats are supported.
 * Petri Net Patterns:: Which patterns are implemented.
-* Petri Net related Functions:: What is done with the Petri net.
+* Petri Net-related Functions:: What is done with the Petri net.
 * Limitations and Bugs:: What @acronym{BPEL2oWFN} cannot do.
 * Future Work:: What @acronym{BPEL2oWFN} will do in the future.
 * References:: Bibliography of cited literature.
@@ -122,14 +122,17 @@ This @acronym{oWFN} can be used to:
 @item check controllability [Mar03, Wei04],
 @item generate the operating guidelines [MRS05],
 @item check for deadlocks, or
-@item check any temporal logic formula expressed in
-@acronym{CTL, Computation Tree Logic} with the a checking tool such as
-@acronym{LoLA, Low-Level Analyzer} [Sch00] or the Model-Checking Kit [MCK].
+@item check any temporal logic formula with the model checking tools.
 @end itemize
 
-In future versions of @acronym{BPEL2oWFN} static analysis is used to
-find smaller @acronym{oWFN}s to analyze a chosen property. This
-is called @i{flexible model generation} (see @ref{Future Work}).
+@acronym{BPEL2oWFN} uses static analysis to make the generated @acronym{oWFN}
+as compact as possible to analyze a chosen property. This is called
+@i{flexible model generation} (see @ref{Future Work}).
+
+@acronym{BPEL2oWFN} is the successor from @acronym{BPEL2PN} [SHS05], a
+Java-based compiler generating low-level Petri nets. @acronym{BPEL2oWFN} can be
+understood as a re-implementation for extensibility and performance issues. Its
+functionality is a superset of the functionality of @acronym{BPEL2PN}.
 
 @acronym{BPEL2oWFN} was written by Niels Lohmann, Christian Gierds
 and Dennis Reinert. It is part of the Tools4@acronym{BPEL} project
@@ -215,11 +218,9 @@ build, represent, modify and simplify Petri nets and open workflow
 nets, resp.@: They are the interface between the pattern database and
 the file output for the model checking tool. The functions are
 collected in an extensible class allowing to add more output file
-formats (e.g.@: @acronym{PNML, Petri Net Markup Language},
-@acronym{PEP} notation, etc.), structural simplification rules
-(optimized to preserve certain properties such as deadlock freedom
-or liveness) or abstractions (e.g.@: abstraction from variables,
-abstraction from external behavior).
+formats, structural simplification rules (optimized to preserve certain
+properties such as deadlock freedom or liveness) or abstractions
+(e.g.@: abstraction from variables, abstraction from external behavior).
 
 
 
@@ -230,25 +231,27 @@ abstraction from external behavior).
 @node Invoking BPEL2oWFN
 @chapter Invoking @acronym{BPEL2oWFN}
 
-@acronym{BPEL2oWFN} can be called without any parameter. In this case, it acts
-as a parser for @acronym{BPEL}, that reads its input from STDIN.
-
-The intended standard invocation of @acronym{BPEL2oWFN} is:
+The standard invocation of @acronym{BPEL2oWFN} is:
 
 @example
 bpel2owfn -i inputfile.bpel -f owfn -o
 @end example
 
-where @file{inputfile.bpel} is a @acronym{BPEL} process. The options
-@samp{-f owfn} cause @acronym{BPEL2oWFN} to generate an open workflow net which
-is written to a file named @file{inputfile.owfn}, because of the option
-@samp{-o}.
+where @file{inputfile.bpel} is a @acronym{BPEL} process. The option
+@samp{-f owfn} cause @acronym{BPEL2oWFN} to generate an open workflow net. This
+net is written to a file named @file{inputfile.owfn}, because of the option
+@samp{-o}. For more examples, see @ref{Examples}.
 
-For more examples, see @ref{Examples}.
+@acronym{BPEL2oWFN} can be called without any parameter. In this case, it acts
+as a parser for @acronym{BPEL}, that reads its input from the standard input
+(@code{stdin}).
+
+
 
 
 
 @section Options
+
 @acronym{BPEL2oWFN} supports the following command-line options:
 
 @table @samp
@@ -263,21 +266,24 @@ Print version information and exit.
 @item --input=@var{filename}.bpel
 @itemx -i @var{filename}.bpel
 Read @acronym{BPEL} input from file @file{@var{filename}.bpel}.
-If this parameter is omitted, input is read from standard input.
+If this parameter is omitted, input is read from standard input (@code{stdin}).
 
 @item --log[=@var{filename}]
 @itemx -l 
 All additional information like warnings and processing information
 are written to a file called @var{filename}. If the short form is used
 or the @var{filename} is omitted, the output file name is taken and 
-extended by the suffix ".log".
-If this parameter is omitted, these information are passed to STDERR.
+extended by the suffix @samp{.log}. If this parameter is omitted, the
+information is passed to the standard error output (@code{stderr}).
 
 @item --debug=1-4 | flex | bison
 @itemx -d 1-4 | flex | bison
 This option triggers different debug levels, and can enable additional
-information about flex and bison (which really is not recommended).
+information from Flex and Bison about how the input is lexed and parsed.
 @end table
+
+
+
 
 
 @subsection Modes
@@ -289,71 +295,79 @@ When invoking @acronym{BPEL2oWFN} several modes are possible.
 @itemx -m @var{modus}
 
 @acronym{BPEL2oWFN} supports four different modes for handling 
-@acronym{BPEL}, so @var{modus} can be one of the following options:
+@acronym{BPEL}, so @samp{@var{modus}} can be one of the following options:
 
 @table @samp
 @item ast
 Outputs the @acronym{AST, abstract syntax tree} generated while
 parsing the input file to standard output. This option is mostly
-used for debugging reasons.
+used for debugging reasons since it shows the implicit transformations
+and the phylum names used when generating the Petri net.
 
-@item pretty
-Outputs the parsed @acronym{BPEL} file in @acronym{XML}
-representation. Any unnecessary attributes are omitted. This option
-is mostly used for debugging reasons.
+@item cfg
+For control flow analysis (a form of static analysis) a @acronym{CFG, Control
+Flow Graph} is generated. It might be printed in graphical (Dot)
+representation. This option is in an early alpha-stage and is not used for any
+analysis steps yet. For more information, see @ref{Future Work}.
 
 @item petrinet
 Generates a Petri net representing the semantics of the given
-process. Other options can be added to simplify, abstract or modify
-that Petri net (see below).
+process. Other options can be added to simplify or modify that generated Petri
+net (see below).
 
-@item cfg
-For control flow analysis a @acronym{CFG, Control Flow Graph} is generated.
-It might be printed in graphical representation.
-This option is mostly used for debugging reasons.
-
+@item pretty
+Outputs the parsed @acronym{BPEL} file in @acronym{XML} representation. Any
+unnecessary attributes are omitted. This option is mostly used for debugging
+reasons as it shows the implicit transformations and the identifiers of the
+@acronym{BPEL} constructs.
 @end table
-
 @end table
+Please note that you can only use at most one mode.
+
+
+
 
 @subsection Additional parameters
 
-These options control some options, mainly for generating Petri nets.
+These options control some Petri net-related options. See @ref{Petri Net-related
+Functions} for more details.
 
 @table @samp
 @item --parameter=@var{par}
 @itemx -p @var{par}
 
-@var{par} might have the following values:
-
 @table @samp
 @item simplify
-
-Uses several rules to structurally simplify the generated Petri net.
-See @ref{Petri Net related Functions} for more details.
-
-@item nointerface
-
-The interface places of the owfn are omitted. This option is always implied if
-a Petri net format other than @acronym{oWFN} is selected.
-
-@item finalmarking
-
-@item uniquefault
+Structurally simplify the generated Petri net.
 
 @item finishloop
+Add an extra loop transition to the final place of the generated Petri net to
+live-lock the system in order to find deadlocks.
 
-An extra loop transition for the final place of the Petri net is created in
-order to check for deadlocks.
+@item nostandardfaults
+When the parameter is set, only used-defined faults using the @code{<throw>}
+activity can occur.
 
+@item cyclicwhile
+When the parameter is set, the pattern for the @code{<while>} activity is
+cyclic as depicted in Fig. 18 of [Sta05]. If the parameter is not set
+(standard case), the pattern is acyclic: the activity embedded in the
+@code{<while>} activity is at most executed once, chosen non-deterministically.
+@end table
 @end table
 
-@end table
+If you want to enable more than one parameter you have to add @samp{-p}/
+@samp{--parameter} to each parameter.
+
+
+
+
 
 @subsection Output formats
 
-Especially for the Petri net mode, a variaty of output formats are supported.
-There are invoked by the following option:
+Especially for the Petri net mode, a variaty of output formats are supported,
+see @ref{File Formats} for more information. There are invoked by the
+following option:
 
 @table @samp
 
@@ -361,51 +375,47 @@ There are invoked by the following option:
 @itemx -f @var{fileformat} 
 
 @table @samp
-
-@item lola
-
-Creates output for @acronym{LoLA}. This implies the mode @code{petrinet}.
-
-@item owfn
-
-Creates output for @acronym{oWFN}. This implies the mode @code{petrinet}.
+@item appn
+Create a Petri net in @acronym{APPN, Abstract Petri Net Notation}. Implies the
+mode @samp{petrinet}.
 
 @item dot
-
-Create output for Dot.
-
-This option can be used with mode @code{petrinet} and @code{cfg}.
-
-@item pep
-
-Create output in low-level @acronym{PEP} notation.
-This implies the mode @code{petrinet}.
-
-@item appn
-
-Create output for @acronym{APPN}. This implies the mode @code{petrinet}.
+Create a Dot representation of the structure generated in the current mode
+which can be any kind of Petri net (mode @samp{petrinet}) or the control flow
+graph (mode @samp{cfg}).
 
 @item info
+Create an additional information file. Implies the mode @samp{petrinet}.
 
-Create an additional information file.
-This option can be used with mode @code{petrinet}.
+@item lola
+Create a @acronym{LoLA} place/transition net. Implies the mode @code{petrinet}.
+
+@item owfn
+Create a low-level @acronym{oWFN} in @acronym{LoLA} file format. Implies the
+mode @samp{petrinet}.
+
+@item pep
+Create a Petri net in low-level @acronym{PEP} notation. Implies the mode
+@samp{petrinet}.
 
 @item pnml
-
-Create an @acronym{PNML} file. This implies the mode @code{petrinet}.
-
-@item txt
-
-Create a text file.
+Create a @acronym{PNML} Petri net. Implies the mode @samp{petrinet}.
 
 @item xml
-
-Create an @acronym{XML, Extensible Markup Lanuage} file.
-This option can be used with mode @code{pretty}.
-
+Create an @acronym{XML, Extensible Markup Lanuage} file. Implies the mode
+@code{pretty}.
+@end table
 @end table
 
-@end table
+If you want to use more than one output file format you have to add @samp{-f}/
+@samp{--fileformat} to each file format. Please note that the underlying modes
+of the given file formats are the same, i.e. you cannot create @acronym{XML} and
+@acronym{LoLA} files together since @acronym{XML} uses the mode @samp{pretty}
+whereas @acronym{LoLA} uses the mode @samp{petrinet}.
+
+
+
+
 
 @anchor{Examples}
 @section Examples
@@ -440,6 +450,8 @@ This stream is read by Dot which layouts the Petri net and creates an output
 Reads the file @file{sample.bpel} and prints the abstract syntax tree
 (@acronym{AST}) to standard output.
 @end table
+
+
 
 
 
@@ -585,104 +597,43 @@ immediately (see @ref{Reporting Bugs}).
 
 @acronym{BPEL2oWFN} can generate several file formats:
 
+@section Petri Net File Formats
+These file formats output the generated Petri net model to various Petri net
+file formats to support as much model checking and analysis tools as possible.
+The nodes of the Petri net are named using the internal (numeric) names
+generated by @acronym{BPEL2oWFN}. For more information on the node naming
+conventions of @acronym{BPEL2oWFN}, see @ref{Naming Conventions}.
+
+In all file formats, the inital place of the process, the process clock and all
+variable places are initially marked.
 
 
-@section @acronym{LoLA} place/transition net
+@subsection @acronym{LoLA} place/transition net
 
-A (low-level) place/transition net as described in [LoLA]. The places and
-transitions are named using the internal (numeric) name of each node.
-Furthermore, the first entry of the history of each node is added as a comment.
-
-@cartouche
-@smallexample
-@{ Petri net created by BPEL2oWFN reading @var{filename.bpel} @}
-
-PLACE
-  @var{a comma-separated list of places}
-
-MARKING
-  @var{the initial marking}
-
-@var{a comma-separated list of transitions}
-
-@{ END OF FILE @}
-@end smallexample
-@end cartouche
-
-For more information on the node naming conventions of @acronym{BPEL2oWFN}, see
-@ref{Naming Conventions}.
+A (low-level) place/transition net as described in [LoLA].
+The first entry of the history of each node is added as a comment.
 
 
-
-
-@section @acronym{oWFN} in @acronym{LoLA} format
+@subsection @acronym{oWFN} in @acronym{LoLA} format
 
 An open workflow net is a Petri net with an @i{interface}, i.e.@: two sets of
-places: @i{input places} and @i{output places}. To represent @acronym{oWFN}s
-the @acronym{LoLA} format was extended to implement this categorization:
-
-@cartouche
-@smallexample
-@{ oWFN created by BPEL2oWFN reading @var{filename.bpel} @}
-
-PLACE
-  INTERNAL
-    @var{a comma-separated list of internal places}
-  INPUT
-    @var{a comma-separated list of input places}
-  OUTPUT
-    @var{a comma-separated list of output places}
-
-MARKING
-  @var{the initial marking}
-
-@var{a comma-separated list of transitions}
-
-@{ END OF FILE @}
-@end smallexample
-@end cartouche
-
-Additionally an open workflow net has a set of final markings. Since there
-exist no tools reading @acronym{oWFN}s yet, the representation of final
-markings is not implemented.
+places: @i{input places} and @i{output places}. Additionally an open workflow
+net has a set of final markings. To represent @acronym{oWFN}s
+the @acronym{LoLA} format was extended to implement this categorization.
 
 
-
-@section Abstract Petri Net Notation (@acronym{APPN})
+@subsection Abstract Petri Net Notation (@acronym{APPN})
 
 A (low-level) place/transition net in Abstract Petri Net Notation as described
-in [BKK95]. The places and transitions are named using the internal (numeric)
-name of each node.
-
-@cartouche
-@smallexample
-\beginnet@{@var{filename.bpel}@}
-
-  \place@{@var{placename}@}@{@}
-     @var{all other places}
-
-  \transition@{@var{transitionname}@}@{@}
-     @var{all other transitions}
-
-  \arc@{@var{arcname}@}@{ \from@{@var{nodename}@} \to@{@var{nodename}@} @}
-     @var{all other arcs}
-
-\endnet
-@end smallexample
-@end cartouche
-
-The @samp{@var{arcname}} is just added to meet the syntactic requirements and
-is just an enumeration of the arcs (@samp{a1}, @samp{a2}, @dots{}).
+in [BKK95]. An @samp{@var{arcname}} value is just added to meet the
+syntactic requirements and is just an enumeration of the arcs (@samp{a1},
+@samp{a2}, @dots{}).
 
 
+@subsection Low-level @acronym{PEP} Notation
 
-
-@section Low-level @acronym{PEP} Notation
-
-@acronym{PEP, Programming Environment based on Petri Nets}
-
-@c TODO: Enter reference here
-
+A (low-level) place/transition net in low-level @acronym{PEP, Programming
+Environment based on Petri Nets} notation as described in [PEP].
 
 
 
@@ -779,7 +730,9 @@ activities) the labels of the figures of [Sta05] are trailed by an numeration
 
 
 
-@section Dot Graph
+
+
+@section Dot Graphics
 To bugfix@footnote{The Petri nets usually have a large number of nodes so that
 the graphical representation of a `real world' process would not be suitable to
 process, read or understand. That is why the Dot output shall be seen as a
@@ -946,8 +899,8 @@ are simply ignored during parsing.
 
 @c ----------------------------------------------------------------------------
 
-@node Petri Net related Functions
-@chapter Petri Net related Functions
+@node Petri Net-related Functions
+@chapter Petri Net-related Functions
 
 Currently implemented Petri net-specific functions:
 @section Structural Simplification
@@ -1188,7 +1141,7 @@ Process Management (@acronym{BPM} 2005)}, pp. 220-235, Springer-Verlag
 @footnote{@url{http://www.informatik.hu-berlin.de/top/bpel2pn}}
 
 @item [LoLA]
-Karsten Schmidt: @b{@acronym{LoLA}: A Low Level Analyser}. Manual.
+Karsten Schmidt. @b{@acronym{LoLA}: A Low Level Analyser}. Manual.
 @footnote{@url{http://www.informatik.hu-berlin.de/top/lola/doku.ps}}
 
 @item [Mar03]
@@ -1206,8 +1159,13 @@ Approach to the SOA}. Proceedings of the 2nd South-East European Workshop on
 Formal Methods 2005 (@acronym{SEEFM}05), Ohrid, Republic of Macedonia, 2005.
 @footnote{@url{http://www.informatik.hu-berlin.de/top/download/publications/MassutheReisigSchmidt-OGApproach.ps}}
 
+@item [PEP]
+University of Oldenburg, Department of Computing Science. @b{@acronym{PEP,
+Programming Environment based on Petri Nets}}. Manual.
+@footnote{@url{http://parsys.informatik.uni-oldenburg.de/~pep}}
+
 @item [Sch00]
-Karsten Schmidt: @b{@acronym{LoLA}: A Low Level Analyser}. In: Mogens Nielsen,
+Karsten Schmidt. @b{@acronym{LoLA}: A Low Level Analyser}. In: Mogens Nielsen,
 and Dan Simpson, editors: @i{Application and Theory of Petri Nets, 21st
 International Conference (@acronym{ICATPN} 2000)}, pp. 465-474, Springer-Verlag
 (@acronym{LNCS} 1825), June 2000.

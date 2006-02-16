@@ -48,11 +48,12 @@ static struct option longopts[] =
   { "outputfile", optional_argument, NULL, 'o' },
   { "format",     required_argument, NULL, 'f' },
   { "parameter",  required_argument, NULL, 'p' },
+  { "bpel2pn",    no_argument,	     NULL, 'b' },
   { "debug",      required_argument, NULL, 'd' },
   NULL
 };
 
-const char * par_string = "hvm:li:of:p:d:";
+const char * par_string = "hvm:li:of:p:bd:";
 
 // --------------------- functions for command line evaluation ------------------------
 /**
@@ -76,6 +77,7 @@ void print_help()
   trace(" -p | --parameter=<par> - select additional parameters like:\n");
   trace("                          simplify, nointerface, acyclicwhile etc.\n");
   trace("                          (see documentation for further information)\n");
+  trace(" -b | --bpel2pn         - implies \"-flola -finfo -o\"\n");
   trace("\n");
   trace(" -i | --input=<file>    - read input from <file>\n");
   trace(" -o | --output=<prefix> - write output to <prefix>.X\n");
@@ -197,6 +199,21 @@ void parse_command_line(int argc, char* argv[])
 				"Type " + progname + " -h for more information.\n");
 	      }
 	      options[O_MODE] = true;
+	      break;
+      case 'b':
+ 	      if (options[O_MODE] && modus != M_PETRINET)
+	      {
+	        throw Exception(OPTION_MISMATCH,
+				"Choose only one mode\n",
+				"Type " + progname + " -h for more information.\n");
+	      }
+	      formats[F_LOLA] = true;
+	      formats[F_INFO] = true;
+	      options[O_OUTPUT] = true;
+	      modus = M_PETRINET;
+	      options[O_MODE] = true;
+	      options[O_FORMAT] = true;
+	      options[O_BPEL2PN] = true;
 	      break;
       case 'l':
 	      options[O_LOG] = true;

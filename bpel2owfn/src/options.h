@@ -11,6 +11,7 @@ typedef enum
    O_INPUT,
    O_OUTPUT,
    O_MODE,
+   O_BPEL2PN,
    O_LOG,
    O_FORMAT,
    O_PARAMETER,

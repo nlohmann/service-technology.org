@@ -375,8 +375,8 @@ following option:
 @itemx -f @var{fileformat} 
 
 @table @samp
-@item appn
-Create a Petri net in @acronym{APPN, Abstract Petri Net Notation}. Implies the
+@item apnn
+Create a Petri net in @acronym{APNN, Abstract Petri Net Notation}. Implies the
 mode @samp{petrinet}.
 
 @item dot
@@ -607,14 +607,16 @@ conventions of @acronym{BPEL2oWFN}, see @ref{Naming Conventions}.
 In all file formats, the inital place of the process, the process clock and all
 variable places are initially marked.
 
+@table @b
 
-@subsection @acronym{LoLA} place/transition net
+
+@item @acronym{LoLA} place/transition net
 
 A (low-level) place/transition net as described in [LoLA].
 The first entry of the history of each node is added as a comment.
 
 
-@subsection @acronym{oWFN} in @acronym{LoLA} format
+@item @acronym{oWFN} in @acronym{LoLA} format
 
 An open workflow net is a Petri net with an @i{interface}, i.e.@: two sets of
 places: @i{input places} and @i{output places}. Additionally an open workflow
@@ -622,7 +624,7 @@ net has a set of final markings. To represent @acronym{oWFN}s
 the @acronym{LoLA} format was extended to implement this categorization.
 
 
-@subsection Abstract Petri Net Notation (@acronym{APPN})
+@item Abstract Petri Net Notation (@acronym{APNN})
 
 A (low-level) place/transition net in Abstract Petri Net Notation as described
 in [BKK95]. An @samp{@var{arcname}} value is just added to meet the
@@ -630,11 +632,12 @@ syntactic requirements and is just an enumeration of the arcs (@samp{a1},
 @samp{a2}, @dots{}).
 
 
-@subsection Low-level @acronym{PEP} Notation
+@item Low-level @acronym{PEP} Notation
 
 A (low-level) place/transition net in low-level @acronym{PEP, Programming
 Environment based on Petri Nets} notation as described in [PEP].
 
+@end table
 
 
 

@@ -31,7 +31,7 @@ typedef enum
   F_OWFN,
   F_DOT,
   F_PEP,
-  F_APPN,
+  F_APNN,
   F_INFO,
   F_PNML,
   F_TXT,

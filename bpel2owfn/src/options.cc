@@ -81,8 +81,8 @@ void print_help()
   trace(" -o | --output=<prefix> - write output to <prefix>.X\n");
   trace("\n");
   trace(" -f | --format          - select output formats (as far as supported for mode):\n");
-  trace("                          lola, owfn, dot, pep, appn, info, pnml, txt, xml\n");
-  trace("                          (note: lola,owfn,pep,appn,pnml imply modus=petrinet\n");
+  trace("                          lola, owfn, dot, pep, apnn, info, pnml, txt, xml\n");
+  trace("                          (note: lola,owfn,pep,apnn,pnml imply modus=petrinet\n");
   trace("\n");
   trace(" -d | --debug           - set debug level: 1-4\n");
   trace(" -l | --log[=<file>]    - write additional information into file\n");
@@ -121,14 +121,14 @@ void parse_command_line(int argc, char* argv[])
   suffixes[F_OWFN] = "owfn"  ;
   suffixes[F_DOT]  = "dot"   ;
   suffixes[F_PEP]  = "ll_net";
-  suffixes[F_APPN] = "appn"  ;
+  suffixes[F_APNN] = "apnn"  ;
   suffixes[F_INFO] = "info"  ;
   suffixes[F_PNML] = "pnml"  ;
   suffixes[F_TXT]  = "txt"   ;
   suffixes[F_XML]  = "xml"   ;
 
   // this array helps us to automatically check the valid formats
-  possibleFormats format[] = { F_LOLA, F_OWFN, F_DOT, F_PEP, F_APPN, F_INFO, F_PNML, F_TXT, F_XML };
+  possibleFormats format[] = { F_LOLA, F_OWFN, F_DOT, F_PEP, F_APNN, F_INFO, F_PNML, F_TXT, F_XML };
 
   // this map indicates, whether a certain format is valid for a mode
   map< pair<possibleModi,possibleFormats>, bool > validFormats;
@@ -139,7 +139,7 @@ void parse_command_line(int argc, char* argv[])
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_OWFN)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_DOT )] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_PEP )] = true;
-  validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_APPN)] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_APNN)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_INFO)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_PNML)] = true;
 
@@ -267,9 +267,9 @@ void parse_command_line(int argc, char* argv[])
 	    	modus = M_PETRINET;
 	        options[O_MODE] = true;
 	      }
-	      else if (parameter == suffixes[F_APPN])
+	      else if (parameter == suffixes[F_APNN])
 	      {
-		formats[F_APPN] = true;
+		formats[F_APNN] = true;
  	        if (options[O_MODE] && modus != M_PETRINET)
 	        {
 		  throw Exception(OPTION_MISMATCH, 

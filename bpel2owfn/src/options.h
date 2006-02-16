@@ -41,9 +41,6 @@ typedef enum
 typedef enum
 {
   P_SIMPLIFY,		// structural reduction rules
-//  P_NOINTERFACE,
-//  P_FINALMARKING,
-//  P_UNIQUEFAULT,
   P_FINISHLOOP,		// live-lock "well-formed" systems
   P_NOSTANDARDFAULTS,	// only user-defined faults can occur
   P_CYCLICWHILE		// use the original <while> pattern

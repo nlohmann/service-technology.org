@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/16 14:22:01 $
+ *          - last changed: \$Date: 2006/02/16 16:59:13 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.147 $
+ * \version \$Revision: 1.148 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -2874,19 +2874,22 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
       {
 	foreach (otherCaseBranch=Case(innerActivity2); tCase_list b)
 	{
-	  if ((innerActivity1 != innerActivity2) && (innerActivity2->dpe->value > 0))
+	  if ((innerActivity1 != innerActivity2) && (otherCaseBranch->dpe->value > 0))
 	    TheNet->newArc(TheNet->findTransition(prefix + "t2.case" + intToString(currentCase)), TheNet->findPlace(innerActivity2, ".negLink"));
 
 	  if (c->dpe->value > 0)
 	    TheNet->newArc(TheNet->findTransition(prefix + "t2.case" + intToString(currentCase)), TheNet->findPlace(c, ".negLink"));
 	}
 
-	if (innerActivity1->dpe->value > 0)
+	if (thisCaseBranch->dpe->value > 0)
+	{
 	  TheNet->newArc(TheNet->findTransition(prefix + "t2.otherwise"), TheNet->findPlace(innerActivity1, ".negLink"));
+	}
+	  
 
 	currentCase++;
 
-	if ((This->dpe->value > 0) && (innerActivity1->dpe->value > 0))
+	if ((This->dpe->value > 0) && (thisCaseBranch->dpe->value > 0))
 	  TheNet->newArc(t1, TheNet->findPlace(innerActivity1, ".negLink"));
       }
 
@@ -3178,44 +3181,45 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
       // Of course, the arcs are only added if the negLink place is existing
       // (i.e. a source link can be reached after all.
       int currentMessage = 1;
-      foreach (OnMessage(innerActivity1); tOnMessage_list b)
+      foreach (thisonmessage=OnMessage(innerActivity1); tOnMessage_list b)
       {
-	foreach (OnMessage(innerActivity2); tOnMessage_list b)
+	foreach (otheronmessage=OnMessage(innerActivity2); tOnMessage_list b)
 	{
-	  if ((innerActivity1 != innerActivity2) && (innerActivity2->dpe->value > 0))
+	  if ((innerActivity1 != innerActivity2) && (otheronmessage->dpe->value > 0))
 	    TheNet->newArc(TheNet->findTransition(prefix + "onMessage" + intToString(currentMessage) + ".t3"), TheNet->findPlace(innerActivity2, ".negLink"));
 	}
 
-	foreach (OnAlarm(innerActivity2); tOnAlarm_list c)
+	foreach (thisonalarm=OnAlarm(innerActivity2); tOnAlarm_list c)
 	{
-	  if (innerActivity2->dpe->value > 0)
+	  if (thisonalarm->dpe->value > 0)
 	    TheNet->newArc(TheNet->findTransition(prefix + "onMessage" + intToString(currentMessage) + ".t3"), TheNet->findPlace(innerActivity2, ".negLink"));
 	}
 
 	currentMessage++;
 
-	if ((innerActivity1->dpe->value > 0) && (This->dpe->value > 0))
+	if ((thisonmessage->dpe->value > 0) && (This->dpe->value > 0))
 	  TheNet->newArc(t1, TheNet->findPlace(innerActivity1, ".negLink"));
       }
 
+      
       int currentAlarm = 1;
-      foreach (OnAlarm(innerActivity1); tOnAlarm_list c)
+      foreach (thisonalarm=OnAlarm(innerActivity1); tOnAlarm_list c)
       {
-	foreach (OnAlarm(innerActivity2); tOnAlarm_list c)
+	foreach (otheronalarm=OnAlarm(innerActivity2); tOnAlarm_list c)
 	{
-	  if ((innerActivity1 != innerActivity2) && (innerActivity2->dpe->value > 0))
+	  if ((innerActivity1 != innerActivity2) && (otheronalarm->dpe->value > 0))
 	    TheNet->newArc(TheNet->findTransition(prefix + "onAlarm" + intToString(currentAlarm) + ".t6"), TheNet->findPlace(innerActivity2, ".negLink"));
 	}
 
-	foreach (OnMessage(innerActivity2); tOnMessage_list b)
+	foreach (thisonmessage=OnMessage(innerActivity2); tOnMessage_list b)
 	{
-	  if (innerActivity2->dpe->value > 0)
+	  if (thisonmessage->dpe->value > 0)
 	    TheNet->newArc(TheNet->findTransition(prefix + "onAlarm" + intToString(currentAlarm) + ".t6"), TheNet->findPlace(innerActivity2, ".negLink"));
 	}
 
 	currentAlarm++;
 
-	if ((innerActivity1->dpe->value > 0) && (This->dpe->value > 0))
+	if ((thisonalarm->dpe->value > 0) && (This->dpe->value > 0))
 	  TheNet->newArc(t1, TheNet->findPlace(innerActivity1, ".negLink"));
       }
 

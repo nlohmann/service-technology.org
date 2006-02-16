@@ -29,11 +29,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $ 
+ *          - last changes of: \$Author: gierds $ 
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/02/14 14:53:58 $
+ *          - last changed: \$Date: 2006/02/16 15:39:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.56 $
+ * \version \$Revision: 1.57 $
  */
 %}
 
@@ -791,11 +791,17 @@ standardElements:
 
     /// used here to create the patterns
     integer negativeControlFlow;
+
+    ///
+    bool hasTarget = false;
   }
 ;
 
 tTarget_list:
   list tTarget
+  {
+    bool hasTarget = false;
+  }
 ;
 
 tTarget:

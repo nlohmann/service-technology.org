@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/02/15 10:29:28 $
+ *          - last changed: \$Date: 2006/02/16 15:39:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.119 $
+ * \version \$Revision: 1.120 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -996,6 +996,10 @@ tEmpty:
       att.popSJFStack();
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $3; 
+      if ($6->hasTarget)
+      {
+	symMan.remDPEstart();
+      }
       if ($6->dpe->value > 0)
       {
         symMan.addDPEend();
@@ -1159,6 +1163,10 @@ tInvoke:
         }
 	scope->dpe = invoke->dpe = mkinteger(0);
         // symMan.needsDPE();
+        if ($7->hasTarget)
+        {
+	 symMan.remDPEstart();
+	}
 	if ($7->dpe->value > 0)
         {
           symMan.addDPEend();
@@ -1212,6 +1220,10 @@ tInvoke:
 					  invoke->partnerLink->name), true);
         }
         invoke->dpe = symMan.needsDPE();
+        if ($7->hasTarget)
+        {
+	  symMan.remDPEstart();
+	}
         if ($7->dpe->value > 0)
         {
           symMan.addDPEend();
@@ -1349,6 +1361,10 @@ tReceive:
       $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
 				      $$->partnerLink->name), true);
+      if ($7->hasTarget)
+      {
+	symMan.remDPEstart();
+      }
       if ($7->dpe->value > 0)
       {
         symMan.addDPEend();
@@ -1465,6 +1481,10 @@ tReply:
       $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
 				      $$->partnerLink->name), false);
+      if ($6->hasTarget)
+      {
+	symMan.remDPEstart();
+      }
       if ($6->dpe->value > 0)
       {
         symMan.addDPEend();
@@ -1560,6 +1580,10 @@ tAssign:
       $$->suppressJoinFailure = $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
       att.traceAM(string("tAssign: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
+      if ($6->hasTarget)
+      {
+	symMan.remDPEstart();
+      }
       if ($6->dpe->value > 0)
       {
         symMan.addDPEend();
@@ -1719,6 +1743,10 @@ tWait:
       att.popSJFStack();      
       $$->For = att.read($3, "for"); // "for" is a keyword
       $$->until = att.read($3, "until");
+      if ($6->hasTarget)
+      {
+	symMan.remDPEstart();
+      }
       if ($6->dpe->value > 0)
       {
         symMan.addDPEend();
@@ -1805,6 +1833,10 @@ tThrow:
       $$->faultName = att.read($3, "faultName");
       $$->faultVariable = att.read($3, "faultVariable");
       $$->variableID = symMan.checkVariable(att.read($3, "faultVariable")->name);
+      if ($6->hasTarget)
+      {
+	symMan.remDPEstart();
+      }
       if ($6->dpe->value > 0)
       {
         symMan.addDPEend();
@@ -1909,6 +1941,10 @@ tCompensate:
       att.traceAM(string("tCompensate: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
       $$->scope = att.read($3, "scope");
+      if ($6->hasTarget)
+      {
+	symMan.remDPEstart();
+      }
       if ($6->dpe->value > 0)
       {
         symMan.addDPEend();
@@ -2011,6 +2047,10 @@ tTerminate:
       $$->suppressJoinFailure = $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
       att.traceAM(string("tTerminate: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
+      if ($6->hasTarget)
+      {
+	symMan.remDPEstart();
+      }
       if ($6->dpe->value > 0)
       {
         symMan.addDPEend();
@@ -2099,6 +2139,10 @@ tFlow:
       $$->suppressJoinFailure = $7->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
       att.traceAM(string("tFlow: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
+      if ($7->hasTarget)
+      {
+	symMan.remDPEstart();
+      }
       $$->dpe = mkinteger($9->dpe->value + (symMan.needsDPE())->value);
       if ($7->dpe->value > 0);
       {
@@ -2218,6 +2262,10 @@ tSwitch:
       att.traceAM(string("tSwitch: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
       symMan.remDPEstart();
+      if ($6->hasTarget)
+      {
+	symMan.remDPEstart();
+      }
       $$->dpe = symMan.needsDPE();
       if ($6->dpe->value > 0)
       {
@@ -2405,6 +2453,10 @@ tSequence:
       att.popSJFStack();
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $3; 
+      if ($6->hasTarget)
+      {
+	symMan.remDPEstart();
+      }
       $$->dpe = mkinteger($7->dpe->value + (symMan.needsDPE())->value);
       if ($6->dpe->value > 0)
       {
@@ -2482,6 +2534,10 @@ tPick:
       att.popSJFStack();
       $$->createInstance = att.read($3, "createInstance", $$->createInstance);
       symMan.remDPEstart();
+      if ($6->hasTarget)
+      {
+	symMan.remDPEstart();
+      }
       $$->dpe = symMan.needsDPE();
       if ($6->dpe->value > 0)
       {
@@ -2568,6 +2624,10 @@ tScope:
       $$->negativeControlFlow = $7->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $7->parentId = $3;
       $$->parentScopeId = currentScopeId = parent[$3];
+      if ($7->hasTarget)
+      {
+	symMan.remDPEstart();
+      }
       $$->dpe = mkinteger($14->dpe->value + (symMan.needsDPE())->value);
       $$->hasEH = (string($13->op_name()) == "userDefinedEventHandler");
       if ($7->dpe->value > 0)
@@ -2600,6 +2660,11 @@ standardElements:
     { $$ = StandardElements($1, $2); 
       $$->dpe = $2->dpe;
       $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      if ($1->length() > 0)
+      {
+	symMan.addDPEstart();
+	$$->hasTarget = true;
+      }
     }
 ;
 

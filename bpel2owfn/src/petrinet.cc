@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/02/14 15:51:14 $
+ *          - last changed: \$Date: 2006/02/16 14:56:22 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.99 $
+ * \version \$Revision: 1.100 $
  */
 
 
@@ -1429,6 +1429,22 @@ void PetriNet::simplify()
 
   trace(TRACE_INFORMATION, "Simplifying complete.\n");
   trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification: " + information() + "\n");
+}
+
+
+
+
+
+void PetriNet::removeIsolatedNodes()
+{
+  set<Place *> isolatedPlaces;
+  
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+    if (preset(*p).empty() && postset(*p).empty())
+      isolatedPlaces.insert(*p);
+
+  for (set<Place *>::iterator p = isolatedPlaces.begin(); p != isolatedPlaces.end(); p++)
+    removePlace(*p);
 }
 
 

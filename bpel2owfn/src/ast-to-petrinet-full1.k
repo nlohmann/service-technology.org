@@ -29,11 +29,11 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/15 13:44:13 $
+ *          - last changed: \$Date: 2006/02/16 14:22:01 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.146 $
+ * \version \$Revision: 1.147 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -3593,7 +3593,6 @@ This=StandardElements(NiltTarget_list(), a) ->
       string prefix = intToString(This->parentId->value) + ".";
       string newPrefix = intToString(This->parentId->value) + ".internal";
 
-      Place *p1 = TheNet->newPlace(prefix + "negLink");
       Place *p2 = TheNet->newPlace(prefix + "initial");
       Place *p3 = TheNet->newPlace(prefix + "p3");
       Place *p4 = TheNet->newPlace(prefix + "p4");
@@ -3614,11 +3613,13 @@ This=StandardElements(NiltTarget_list(), a) ->
       Transition *t4 = stop(p5, "final", prefix);
 
 
-      // If needed, transition t1 is created and connected with the negLink
-      // place of the inner activity if existing for dead path elimination.
+      // If needed, transition t1 and the place p1 is created and connected
+      // with the negLink place of the inner activity if existing for dead path
+      // elimination.
       Transition *t1 = NULL;
       if (This->dpe->value > 0)
       {
+        Place *p1 = TheNet->newPlace(prefix + "negLink");
 	t1 = TheNet->newTransition(prefix + "t1");
 	TheNet->newArc(p1, t1);
 
@@ -3699,10 +3700,8 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
       {
 	Place *p1 = TheNet->findPlace("!link." + string(link->linkID->name));
 	Place *p3 = TheNet->findPlace("link." + string(link->linkID->name));
-
 	TheNet->newArc(t1, p1);
 	TheNet->newArc(p3, t1);
-
 	TheNet->newArc(t2, p1);
 	TheNet->newArc(p3, t2);
       }
@@ -3770,6 +3769,7 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
 	Place *p3 = TheNet->findPlace("link." + string(link->linkID->name));
 	TheNet->newArc(t1, p1);
 	TheNet->newArc(p3, t1);
+	TheNet->newArc(t2, p1);
 	TheNet->newArc(p3, t2);
       }
 

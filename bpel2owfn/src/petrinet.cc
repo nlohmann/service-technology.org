@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/02/16 15:09:11 $
+ *          - last changed: \$Date: 2006/02/16 16:32:08 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.101 $
+ * \version \$Revision: 1.102 $
  */
 
 
@@ -288,7 +288,7 @@ string Place::dotOut()
 PetriNet::PetriNet()
 {
   hasNoInterface = false;
-  nextId = 0;
+  nextId = 1;
 }
 
 
@@ -515,7 +515,7 @@ void PetriNet::removePlace(Place * p)
 {
   trace(TRACE_VERY_DEBUG, "[PN]\tRemoving place " + intToString(p->id) +
 	 "...\n");
-
+  
   detachNode(p);
 
   // Decide from which set of places the place has to be removed.
@@ -525,6 +525,8 @@ void PetriNet::removePlace(Place * p)
     case(OUT): { P_out.erase(p); break; }
     default:   { P.erase(p); break; }
   }
+
+
 
   delete p;
 }
@@ -890,80 +892,70 @@ void PetriNet::lolaOut()
   trace(TRACE_DEBUG, "[PN]\tCreating LoLA-output.\n");
 
   removeInterface();
+  calculateInitialMarking();
 
-  (*output) << "{ Petri net created by " << PACKAGE_STRING <<
-    " reading " << filename << " }" << endl << endl;
+  (*output) << "{ Petri net created by " << PACKAGE_STRING << " reading " << filename << " }" << endl << endl;
 
-  // places(only internal)
+  
+  // places (only internal)
   (*output) << "PLACE" << endl;
   unsigned int count = 1;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); count++, p++)
-    {
-      (*output) << "  " <<(*p)->nodeShortName();
-
-      if (count < P.size())
-	 (*output) << ",";
-      else
-	 (*output) << ";";
-      (*output) << "\t\t { " <<(*(*p)->history.begin()) << " }" << endl;
-    }
-  (*output) << endl << endl;
+  {
+    (*output) << "  " <<(*p)->nodeShortName();
+    
+    if (count < P.size())
+      (*output) << "," << endl;
+  }
+  (*output) << endl << ";" << endl << endl << endl;
 
 
   // initial marking
   (*output) << "MARKING" << endl;
-  (*output) << "  " << findPlace("1.internal.initial")->nodeShortName()
-	  << ":\t1,\t { initial marking of the process }" << endl;
-
-  for (list < string >::iterator variable = symMan.variables.begin();
-       variable != symMan.variables.end(); variable++)
-    (*output) << "  " << findPlace("variable." + *variable)->nodeShortName() << ":\t1,\t { initial marking of variable" << *variable << " }" <<
-      endl;
-
-  (*output) << "  " << findPlace("1.internal.clock")->nodeShortName() << ":\t1\t { initial marking of the clock }" << endl;
-  (*output) << ";" << endl << endl << endl;
+  count = 1;
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  {
+    if ((*p)->initialMarking > 0)
+    {
+      if (count++ != 1)
+	(*output) << "," << endl;
+      
+      (*output) << "  " << (*p)->nodeShortName() << ":\t1";
+    }
+  }
+  (*output) << endl << ";" << endl << endl << endl;
 
 
   // transitions
-  count = 1;
-  for (set<Transition *>::iterator t = T.begin(); t != T.end();
-       count++, t++)
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+  {
+    (*output) << "TRANSITION " << (*t)->nodeShortName() << endl;
+    set<Node *> consume = preset(*t);
+    set<Node *> produce = postset(*t);
+    
+    (*output) << "CONSUME" << endl;
+    count = 1;
+    for (set<Node *>::iterator pre = consume.begin(); pre != consume.end(); count++, pre++)
     {
-      (*output) << "TRANSITION " <<(*t)->nodeShortName() << "\t { " <<(*(*t)->history.begin()) << " }" << endl;
-      set<Node *> consume = preset(*t);
-      set<Node *> produce = postset(*t);
-
-      (*output) << "CONSUME" << endl;
-      if (consume.empty())
-	 (*output) << ";" << endl;
-
-      unsigned int count2 = 1;
-      for (set<Node *>::iterator pre = consume.begin(); pre != consume.end(); count2++, pre++)
-	{
-	  (*output) << "  " <<(*pre)->nodeShortName() << ":\t1";
-
-	  if (count2 < consume.size())
-	    (*output) << "," << endl;
-	  else
-	    (*output) << ";" << endl;
-	}
-
-      (*output) << "PRODUCE" << endl;
-      if (produce.empty())
-	 (*output) << ";" << endl;
-
-      count2 = 1;
-      for (set<Node *>::iterator post = produce.begin(); post != produce.end(); count2++, post++)
-	{
-	  (*output) << "  " <<(*post)->nodeShortName() << ":\t1";
-
-	  if (count2 < produce.size())
-	    (*output) << "," << endl;
-	  else
-	    (*output) << ";" << endl;
-	}
-      (*output) << endl;
+      (*output) << "  " << (*pre)->nodeShortName() << ":\t1";
+      
+      if (count < consume.size())
+	(*output) << "," << endl;
     }
+    (*output) << ";" << endl;
+    
+    (*output) << "PRODUCE" << endl;
+    count = 1;
+    for (set<Node *>::iterator post = produce.begin(); post != produce.end(); count++, post++)
+    {
+      (*output) << "  " << (*post)->nodeShortName() << ":\t1";
+      
+      if (count < produce.size())
+	(*output) << "," << endl;
+    }
+    
+    (*output) << ";" << endl << endl;
+  }  
   (*output) << "{ END OF FILE }" << endl;
 }
 
@@ -980,6 +972,8 @@ void PetriNet::owfnOut()
 {
   trace(TRACE_DEBUG, "[PN]\tCreating oWFN-output.\n");
 
+  calculateInitialMarking();
+
   (*output) << "{ oWFN created by " << PACKAGE_STRING << " reading " << filename << " }" << endl << endl;
 
   // places
@@ -987,109 +981,95 @@ void PetriNet::owfnOut()
 
   // internal places
   (*output) << "  INTERNAL" << endl;
-  string comment;
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
-    {
-      if (p == P.begin())
-	 (*output) << "    " <<(*p)->nodeShortName();
-      else
-	 (*output) << ", " << comment << "    " <<(*p)->nodeShortName();
-
-      comment = "\t\t { " +(*(*p)->history.begin()) + " }\n";
-    }
-  (*output) << "; " << comment << endl;
+  unsigned int count = 1;
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); count++, p++)
+  {
+    (*output) << "    " <<(*p)->nodeShortName();
+    
+    if (count < P.size())
+      (*output) << "," << endl;
+  }
+  (*output) << endl << ";" << endl << endl;
 
 
   // input places
   (*output) << "  INPUT" << endl;
-  for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
-    {
-      if (p == P_in.begin())
-	 (*output) << "    " <<(*p)->nodeShortName();
-      else
-	 (*output) << ", " << comment << "    " <<(*p)->nodeShortName();
-
-      comment = "\t\t { " +(*(*p)->history.begin()) + " }\n";
-    }
-  (*output) << "; ";
-    if (P_in.size() > 0)
-    (*output) << comment;
-  (*output) << endl << endl;
+  count = 1;
+  for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); count++, p++)
+  {
+    (*output) << "    " <<(*p)->nodeShortName();
+    
+    if (count < P_in.size())
+      (*output) << "," << endl;
+  }
+  (*output) << endl << ";" << endl << endl;
 
 
   // output places
   (*output) << "  OUTPUT" << endl;
-  for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
-    {
-      if (p == P_out.begin())
-	 (*output) << "    " <<(*p)->nodeShortName();
-      else
-	 (*output) << ", " << comment << "    " <<(*p)->nodeShortName();
-
-      comment = "\t\t { " +(*(*p)->history.begin()) + " }\n";
-    }
-  (*output) << "; ";
-  if (P_out.size() > 0)
-    (*output) << comment;
-  (*output) << endl << endl;
-
+  count = 1;
+  for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); count++, p++)
+  {
+    (*output) << "    " <<(*p)->nodeShortName();
+    
+    if (count < P_out.size())
+      (*output) << "," << endl;
+  }
+  (*output) << endl << ";" << endl << endl;
+  
 
   // initial marking
-  (*output) << "INITIALMARKING" << endl;
-  (*output) << "  " << findPlace("1.internal.initial")->nodeShortName() << ":\t1,\t { initial marking of the process }" << endl;
+  (*output) << "MARKING" << endl;
+  count = 1;
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  {
+    if ((*p)->initialMarking > 0)
+    {
+      if (count++ != 1)
+	(*output) << "," << endl;
+      
+      (*output) << "  " << (*p)->nodeShortName() << ":\t1";
+    }
+  }
+  (*output) << endl << ";" << endl << endl;  
 
-  for (list < string >::iterator variable = symMan.variables.begin();
-       variable != symMan.variables.end(); variable++)
-    (*output) << "  " << findPlace("variable." + *variable)->nodeShortName() << ":\t1,\t { initial marking of variable" << *variable << " }" <<
-      endl;
-
-  (*output) << "  " << findPlace("1.internal.clock")->nodeShortName() << ":\t1\t { initial marking of the clock }" << endl;
-  (*output) << ";" << endl << endl;
 
   // final marking
   (*output) << "FINALMARKING" << endl;
-  (*output) << "  " << findPlace("1.internal.final")->nodeShortName() << ":\t1\t { final marking of the process }" << endl;
+  (*output) << "  " << findPlace("1.internal.final")->nodeShortName() << ":\t1" << endl;
   (*output) << ";" << endl << endl << endl;
 
+
   // transitions
-  unsigned int count = 1;
-  for (set<Transition *>::iterator t = T.begin(); t != T.end(); count++, t++)
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+  {
+    (*output) << "TRANSITION " << (*t)->nodeShortName() << endl;
+    set<Node *> consume = preset(*t);
+    set<Node *> produce = postset(*t);
+    
+    (*output) << "CONSUME" << endl;
+    count = 1;
+    for (set<Node *>::iterator pre = consume.begin(); pre != consume.end(); count++, pre++)
     {
-      (*output) << "TRANSITION " <<(*t)->nodeShortName() << "\t { " <<(*(*t)->history.begin()) << " }" << endl;
-      set<Node *> consume = preset(*t);
-      set<Node *> produce = postset(*t);
-
-      (*output) << "CONSUME" << endl;
-     if (consume.empty())
-        (*output) << ";" << endl;
-
-     unsigned int count2 = 1;
-     for (set<Node *>::iterator pre = consume.begin(); pre != consume.end(); count2++, pre++)
-     {
-        (*output) << "  " <<(*pre)->nodeShortName() << ":\t1";
-
-       if (count2 < consume.size())
-	  (*output) << "," << endl;
-       else
-	  (*output) << ";" << endl;
-     }
-
-      (*output) << "PRODUCE" << endl;
-     if (produce.empty())
-        (*output) << ";" << endl;
-
-     count2 = 1;
-     for (set<Node *>::iterator post = produce.begin(); post != produce.end(); count2++, post++)
-     {
-        (*output) << "  " <<(*post)->nodeShortName() << ":\t1";
-
-       if (count2 < produce.size())
-	  (*output) << "," << endl;
-       else
-	  (*output) << ";" << endl;
-     }
-      (*output) << endl;
+      (*output) << "  " << (*pre)->nodeShortName() << ":\t1";
+      
+      if (count < consume.size())
+	(*output) << "," << endl;
     }
+    (*output) << ";" << endl;
+    
+    (*output) << "PRODUCE" << endl;
+    count = 1;
+    for (set<Node *>::iterator post = produce.begin(); post != produce.end(); count++, post++)
+    {
+      (*output) << "  " << (*post)->nodeShortName() << ":\t1";
+      
+      if (count < produce.size())
+	(*output) << "," << endl;
+    }
+    
+    (*output) << ";" << endl << endl;
+  }  
   (*output) << "{ END OF FILE }" << endl;
 }
 

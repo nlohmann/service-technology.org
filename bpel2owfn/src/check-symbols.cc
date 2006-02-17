@@ -25,10 +25,10 @@
  * 	  symbols within a BPEL process.
  *
  * \author  
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
- *          - last changed: \$Date: 2006/02/10 10:15:43 $
+ *          - last changed: \$Date: 2006/02/17 14:18:25 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
@@ -584,7 +584,7 @@ kc::casestring SymbolManager::checkLink(csLink* link, bool asSource)
     if (asSource)
     {
       scope = currentScope;
-      if (scope != NULL and inBLM)
+      if (scope != NULL && inBLM)
       {
         scope = scope->parent;
       }

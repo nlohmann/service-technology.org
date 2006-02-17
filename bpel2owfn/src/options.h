@@ -2,6 +2,7 @@
 #define OPTIONS_H
 
 #include <map>
+#include <cstdio>
 #include "getopt.h"
 
 typedef enum

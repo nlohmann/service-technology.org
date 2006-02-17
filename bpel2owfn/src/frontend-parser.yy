@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/02/16 15:39:28 $
+ *          - last changed: \$Date: 2006/02/17 13:53:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.120 $
+ * \version \$Revision: 1.121 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -226,6 +226,7 @@ int hasCompensate;
 %type <yt_tWait> tWait
 %type <yt_tWhile> tWhile
 
+%type <yt_integer> descent_activity_list
 
 
 
@@ -395,7 +396,7 @@ activity:
       $$->negativeControlFlow = $1->negativeControlFlow; }
 | tFlow
     { $$ = activityFlow($1); $$->id = $1->id; 
-      $$->dpe = $1->dpe;
+      $$->dpe = $1->dpe ;
       $$->negativeControlFlow = $1->negativeControlFlow; }
 | tSwitch
     { $$ = activitySwitch($1); $$->id = $1->id; 
@@ -2143,6 +2144,7 @@ tFlow:
       {
 	symMan.remDPEstart();
       }
+      cerr << "Flow: " << $3->value << " DPE: " << $9->dpe->value << endl;
       $$->dpe = mkinteger($9->dpe->value + (symMan.needsDPE())->value);
       if ($7->dpe->value > 0);
       {
@@ -2161,16 +2163,25 @@ tFlow:
 activity_list:
   descent_activity_list activity X_NEXT
     { $$ = Consactivity_list($2, Nilactivity_list()); 
+      for(int i = 0; i < $1->value; ++i)
+      { 
+	symMan.addDPEend();
+      }
       $$->dpe = $2->dpe;
     }
 | descent_activity_list activity X_NEXT activity_list
     { $$ = Consactivity_list($2, $4); 
+      for(int i = 0; i < $1->value; ++i)
+      { 
+	symMan.addDPEend();
+      }
       $$->dpe = mkinteger($2->dpe->value + $4->dpe->value);
     }
 ;
 
 descent_activity_list:
     {
+      $$ = symMan.needsDPE();
       symMan.resetDPEend();
     }
 ;
@@ -2457,6 +2468,7 @@ tSequence:
       {
 	symMan.remDPEstart();
       }
+      cerr << "Sequence: " << $3->value << " DPE: " << $7->dpe->value << endl;
       $$->dpe = mkinteger($7->dpe->value + (symMan.needsDPE())->value);
       if ($6->dpe->value > 0)
       {

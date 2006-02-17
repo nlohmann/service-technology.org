@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/02/17 09:34:23 $
+ *          - last changed: \$Date: 2006/02/17 13:28:31 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.103 $
+ * \version \$Revision: 1.104 $
  */
 
 
@@ -525,11 +525,18 @@ void PetriNet::detachNode(Node * n)
  */
 void PetriNet::removePlace(Place * p)
 {
-  trace(TRACE_VERY_DEBUG, "[PN]\tRemoving place " + intToString(p->id) +
-	 "...\n");
+  trace(TRACE_VERY_DEBUG, "[PN]\tRemoving place " + intToString(p->id) + "...\n");
   
   detachNode(p);
 
+
+  // Remove the roles of the place p, i.e. set the mappings to the NULL
+  // pointer.  
+  for (vector<string>::iterator role = p->history.begin(); role != p->history.end(); role++)
+    if (roleMap[*role] == p)
+      roleMap[*role] = NULL;
+
+  
   // Decide from which set of places the place has to be removed.
   switch(p->type)
   {
@@ -537,8 +544,6 @@ void PetriNet::removePlace(Place * p)
     case(OUT): { P_out.erase(p); break; }
     default:   { P.erase(p); break; }
   }
-
-
 
   delete p;
 }

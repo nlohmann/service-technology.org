@@ -40,13 +40,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/02/17 09:34:23 $
+ *          - last changed: \$Date: 2006/02/17 13:28:31 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.60 $
+ * \version \$Revision: 1.61 $
  */
 
 
@@ -154,7 +154,7 @@ public:
   node_type nodeType;
 
   /// the set of roles(i.e. the history) of the node
-  vector < string > history;
+  vector<string> history;
 
   /// true if first role contains role
   bool firstMemberAs(string role);

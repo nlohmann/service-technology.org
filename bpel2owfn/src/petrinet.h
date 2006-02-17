@@ -40,13 +40,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/02/16 15:09:12 $
+ *          - last changed: \$Date: 2006/02/17 09:34:23 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.59 $
+ * \version \$Revision: 1.60 $
  */
 
 
@@ -206,7 +206,9 @@ public:
  *
  * Class to represent places of Petri nets. In addition to the inherited
  * variables #id and #history, each place has a type defined in the
- * enumeation #place_type.
+ * enumeation #place_type and an initial marking. As the generated net and its
+ * inital marking is 1-safe, it is sufficent to represent the initial marking
+ * as a boolean value.
  *
 */
 
@@ -222,7 +224,11 @@ public:
   /// DOT-output of the place (used by PetriNet::dotOut())
   string dotOut();
 
-  unsigned int initialMarking;
+  /// Mark the current place.
+  void mark();
+
+  /// the initial marking of the place
+  bool marked;
 };
 
 
@@ -383,8 +389,8 @@ private:
   /// the list of arcs of the Petri net
   set<Arc *> F;
 
-  /// Calculate the initial marking of the net.
-  void calculateInitialMarking();
+//  /// Calculate the initial marking of the net.
+//  void calculateInitialMarking();
 
   /// Statistical output.
   string information();

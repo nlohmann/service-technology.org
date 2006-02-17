@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/16 16:59:13 $
+ *          - last changed: \$Date: 2006/02/17 09:34:23 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.148 $
+ * \version \$Revision: 1.149 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -142,17 +142,24 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       }
 
 
-      // Create variable places.
+      // Create variable places and initially mark them.
       for (list<string>::iterator variable = symMan.variables.begin(); variable != symMan.variables.end(); variable++)
-	TheNet->newPlace("variable." + *variable);
+      {
+	Place *v = TheNet->newPlace("variable." + *variable);
+	v->mark();
+      }
 
 
-      // Create a place for the global clock.
-      TheNet->newPlace(prefix + "clock");
+      // Create a place for the global clock and mark it.
+      Place *clock = TheNet->newPlace(prefix + "clock");
+      clock->mark();
 
 
+      // Create the initial place of the process pattern and mark it.
+      Place *p1 = TheNet->newPlace(prefix + "initial");
+      p1->mark();
+      
       // Create the internal places of the process pattern.
-      Place *p1  = TheNet->newPlace(prefix + "initial");
       Place *p3  = TheNet->newPlace(prefix + "scopeCompensated");
       Place *p5  = TheNet->newPlace(prefix + "upperFH");
       Place *p6  = TheNet->newPlace(prefix + "upperTerminate");

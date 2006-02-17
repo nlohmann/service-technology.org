@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/02/16 16:32:08 $
+ *          - last changed: \$Date: 2006/02/17 09:34:23 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.102 $
+ * \version \$Revision: 1.103 $
  */
 
 
@@ -216,10 +216,22 @@ Place::Place(unsigned int myid, string role, place_type mytype)
   type = mytype;
   id = myid;
   nodeType = PLACE;
-  initialMarking = 0;
+  marked = false;
 
   if (role != "")
     history.push_back(role);
+}
+
+
+
+
+
+/*
+ * Initially mark the place.
+ */
+void Place::mark()
+{
+  marked = true;
 }
 
 
@@ -739,9 +751,8 @@ void PetriNet::pnmlOut()
 {
   trace(TRACE_DEBUG, "[PN]\tCreating PNML-output.\n");
 
+  // remove interface since we do not create an open workflow net
   removeInterface();
-  calculateInitialMarking();
-
 
   (*output) << "<!-- Petri net created by " << PACKAGE_STRING << " reading file " << filename << " -->" << endl << endl;
 
@@ -755,10 +766,10 @@ void PetriNet::pnmlOut()
     (*output) << "      <name>" << endl;
     (*output) << "        <text>" <<(*(*p)->history.begin()) << "</text>" << endl;
     (*output) << "      </name>" << endl;
-    if ((*p)->initialMarking > 0)
+    if ((*p)->marked)
     {
       (*output) << "      <initialMarking>" << endl;
-      (*output) << "        <text>" <<(*p)->initialMarking << "</text>" << endl;
+      (*output) << "        <text>1</text>" << endl;
       (*output) << "      </initialMarking>" << endl;
     }
     (*output) << "    </place>" << endl << endl;
@@ -800,8 +811,8 @@ void PetriNet::pepOut()
 {
   trace(TRACE_DEBUG, "[PN]\tCreating PEP-output.\n");
 
+  // remove interface since we do not create an open workflow net
   removeInterface();
-  calculateInitialMarking();
 
   // header
   (*output) << "PEP" << endl << "PTNet" << endl << "FORMAT_N" << endl;
@@ -811,8 +822,8 @@ void PetriNet::pepOut()
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
     (*output) <<(*p)->id << "\"" <<(*p)->nodeShortName() << "\"80@40";
-    if ((*p)->initialMarking > 0)
-      (*output) << "M" <<(*p)->initialMarking;
+    if ((*p)->marked)
+      (*output) << "M1";
     (*output) << "k1" << endl;
   }
 
@@ -845,8 +856,8 @@ void PetriNet::apnnOut()
 {
   trace(TRACE_DEBUG, "[PN]\tCreating APNN-output.\n");
 
+  // remove interface since we do not create an open workflow net
   removeInterface();
-  calculateInitialMarking();
 
   (*output) << "\\beginnet{" << filename << "}" << endl << endl;
 
@@ -854,8 +865,8 @@ void PetriNet::apnnOut()
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
     (*output) << "  \\place{" <<(*p)->nodeShortName() << "}{";
-    if ((*p)->initialMarking > 0)
-      (*output) << "\\init{" <<(*p)->initialMarking << "}";
+    if ((*p)->marked)
+      (*output) << "\\init{1}";
     (*output) << "}" << endl;
   }
   (*output) << endl;
@@ -891,8 +902,8 @@ void PetriNet::lolaOut()
 {
   trace(TRACE_DEBUG, "[PN]\tCreating LoLA-output.\n");
 
+  // remove interface since we do not create an open workflow net
   removeInterface();
-  calculateInitialMarking();
 
   (*output) << "{ Petri net created by " << PACKAGE_STRING << " reading " << filename << " }" << endl << endl;
 
@@ -915,7 +926,7 @@ void PetriNet::lolaOut()
   count = 1;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
-    if ((*p)->initialMarking > 0)
+    if ((*p)->marked)
     {
       if (count++ != 1)
 	(*output) << "," << endl;
@@ -965,14 +976,10 @@ void PetriNet::lolaOut()
 
 /*!
  * Outputs the net in oWFN-format.
- *
- * \todo make this shorter
  */
 void PetriNet::owfnOut()
 {
   trace(TRACE_DEBUG, "[PN]\tCreating oWFN-output.\n");
-
-  calculateInitialMarking();
 
   (*output) << "{ oWFN created by " << PACKAGE_STRING << " reading " << filename << " }" << endl << endl;
 
@@ -1023,7 +1030,7 @@ void PetriNet::owfnOut()
   count = 1;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
-    if ((*p)->initialMarking > 0)
+    if ((*p)->marked)
     {
       if (count++ != 1)
 	(*output) << "," << endl;
@@ -1429,14 +1436,6 @@ void PetriNet::removeIsolatedNodes()
 
 
 
-
-
-void PetriNet::calculateInitialMarking()
-{
-  findPlace("1.internal.initial")->initialMarking = 1;
-  for (list<string>::iterator variable = symMan.variables.begin(); variable != symMan.variables.end(); variable++)
-    findPlace("variable." + *variable)->initialMarking = 1;
-}
 
 
 /*---------------------------------------------------------------------------*/

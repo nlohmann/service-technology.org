@@ -268,6 +268,13 @@ Print version information and exit.
 Read @acronym{BPEL} input from file @file{@var{filename}.bpel}.
 If this parameter is omitted, input is read from standard input (@code{stdin}).
 
+@item --output[=@var{filename}]
+@itemx -o
+The generated files are written to a file called @var{filename}. If the short
+form is used or the @var{filename} is omitted, the input file name is taken and 
+extended by the suffix of the chosen file format(s). If this parameter is
+omitted, the output is passed to the standard output (@code{stdout}).
+
 @item --log[=@var{filename}]
 @itemx -l 
 All additional information like warnings and processing information
@@ -280,6 +287,12 @@ information is passed to the standard error output (@code{stderr}).
 @itemx -d 1-4 | flex | bison
 This option triggers different debug levels, and can enable additional
 information from Flex and Bison about how the input is lexed and parsed.
+
+@item --bpel2pn
+This option makes @acronym{BPEL2oWFN} behave like its predecessor,
+@acronym{BPEL2PN}: it generates a Petri net @acronym{LoLA} format and an
+information file. The option @samp{--bpel2pn} is a shortcut for
+@samp{--mode=petrinet --format=lola --format=info --output}.
 @end table
 
 
@@ -304,11 +317,11 @@ parsing the input file to standard output. This option is mostly
 used for debugging reasons since it shows the implicit transformations
 and the phylum names used when generating the Petri net.
 
-@item cfg
-For control flow analysis (a form of static analysis) a @acronym{CFG, Control
-Flow Graph} is generated. It might be printed in graphical (Dot)
-representation. This option is in an early alpha-stage and is not used for any
-analysis steps yet. For more information, see @ref{Future Work}.
+@c @item cfg
+@c For control flow analysis (a form of static analysis) a @acronym{CFG, Control
+@c Flow Graph} is generated. It might be printed in graphical (Dot)
+@c representation. This option is in an early alpha-stage and is not used for any
+@c analysis steps yet. For more information, see @ref{Future Work}.
 
 @item petrinet
 Generates a Petri net representing the semantics of the given
@@ -381,8 +394,8 @@ mode @samp{petrinet}.
 
 @item dot
 Create a Dot representation of the structure generated in the current mode
-which can be any kind of Petri net (mode @samp{petrinet}) or the control flow
-graph (mode @samp{cfg}).
+which can be any kind of Petri net (mode @samp{petrinet}).@c  or the control flow
+@c graph (mode @samp{cfg}).
 
 @item info
 Create an additional information file. Implies the mode @samp{petrinet}.
@@ -656,7 +669,7 @@ ID  TYPE        ROLES
 @var{a list of places}
 
 TRANSITIONS:
-ID  GUARD       ROLES
+ID      ROLES
 @var{a list of transitions}
 @end smallexample
 @end cartouche

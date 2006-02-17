@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/02/17 13:28:31 $
+ *          - last changed: \$Date: 2006/02/17 16:24:51 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.104 $
+ * \version \$Revision: 1.105 $
  */
 
 
@@ -660,7 +660,7 @@ void PetriNet::printInformation()
       if (role == (*t)->history.begin())
 	(*output) << *role + "\n";
       else
-	(*output) << "\t\t" + *role + "\n";
+	(*output) << "\t" + *role + "\n";
   }
 }
 
@@ -1031,7 +1031,7 @@ void PetriNet::owfnOut()
   
 
   // initial marking
-  (*output) << "MARKING" << endl;
+  (*output) << "INITIALMARKING" << endl;
   count = 1;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {

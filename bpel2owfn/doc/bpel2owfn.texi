@@ -133,6 +133,8 @@ as compact as possible to analyze a chosen property. This is called
 Java-based compiler generating low-level Petri nets. @acronym{BPEL2oWFN} can be
 understood as a re-implementation for extensibility and performance issues. Its
 functionality is a superset of the functionality of @acronym{BPEL2PN}.
+@footnote{In fact, @acronym{BPEL2oWFN} can simulate the behavior of
+@acronym{BPEL2PN} with a command-line parameter (see @ref{Invoking BPEL2oWFN}).}
 
 @acronym{BPEL2oWFN} was written by Niels Lohmann, Christian Gierds
 and Dennis Reinert. It is part of the Tools4@acronym{BPEL} project
@@ -1045,6 +1047,14 @@ syntax error message.
 
 @b{Solution:} Try removing or commenting these elements.
 
+@item @b{Problem:} @acronym{LoLA} does not accept the generated files and
+reports parse errors in the first line.
+
+@b{Solution:} This problem occurs using a pre-compiled windows version
+of @acronym{BPEL2oWFN}. The generated files are in Windows format, yet
+@acronym{LoLA} only supports files in Unix format. To overcome this
+limitation of @acronym{LoLA}, use a tool like @samp{dos2unix} or
+change the file format in an editor like vi.
 @end itemize
 
 

@@ -122,7 +122,7 @@ This @acronym{oWFN} can be used to:
 @item check controllability [Mar03, Wei04],
 @item generate the operating guidelines [MRS05],
 @item check for deadlocks, or
-@item check any temporal logic formula with the model checking tools.
+@item check any temporal logic formula with model checking tools.
 @end itemize
 
 @acronym{BPEL2oWFN} uses static analysis to make the generated @acronym{oWFN}

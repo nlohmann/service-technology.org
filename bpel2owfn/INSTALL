@@ -136,7 +136,7 @@ Sun OS.  Anyway, if the compilation fails please make sure you use the
 most recent (stable) versions of the GNU Compiler Collection, Flex,
 Bison and Kimwitu++. If this does not help please send us an electronic
 mail to <nlohmann@informatik.hu-berlin.de>. Include the version number
-of your distribution (version 1.1 of 13 February 2006). Also include in
+of your distribution (version 1.1 of 20 February 2006). Also include in
 your message the output that the make process produced. We will try to
 answer your mail within a week.
 

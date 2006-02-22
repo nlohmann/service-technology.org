@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/02/22 11:29:36 $
+ *          - last changed: \$Date: 2006/02/22 13:53:49 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.123 $
+ * \version \$Revision: 1.124 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -2145,7 +2145,7 @@ tFlow:
       {
 	symMan.remDPEstart();
       }
-      $$->dpe = mkinteger($9->dpe->value + (symMan.needsDPE())->value);
+      $$->dpe = mkinteger((symMan.needsDPE())->value);
       if ($7->dpe->value > 0)
       {
         symMan.addDPEend();
@@ -2332,7 +2332,7 @@ tCase:
     { att.check($3, K_CASE);
       $$ = Case($6);
       $$->condition = att.read($3, "condition"); 
-      $$->dpe = mkinteger($6->dpe->value + (symMan.needsDPE())->value);
+      $$->dpe = mkinteger((symMan.needsDPE())->value);
       
     }
 ;
@@ -2484,7 +2484,7 @@ tSequence:
       {
 	symMan.remDPEstart();
       }
-      $$->dpe = mkinteger($7->dpe->value + (symMan.needsDPE())->value);
+      $$->dpe = mkinteger((symMan.needsDPE())->value);
       if ($6->dpe->value > 0)
       {
         symMan.addDPEend();
@@ -2655,7 +2655,7 @@ tScope:
       {
 	symMan.remDPEstart();
       }
-      $$->dpe = mkinteger($14->dpe->value + (symMan.needsDPE())->value);
+      $$->dpe = mkinteger((symMan.needsDPE())->value);
       $$->hasEH = (string($13->op_name()) == "userDefinedEventHandler");
       if ($7->dpe->value > 0)
       {

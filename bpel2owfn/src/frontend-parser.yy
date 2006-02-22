@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/02/17 13:59:16 $
+ *          - last changed: \$Date: 2006/02/22 11:29:36 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.122 $
+ * \version \$Revision: 1.123 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -227,6 +227,7 @@ int hasCompensate;
 %type <yt_tWhile> tWhile
 
 %type <yt_integer> descent_activity_list
+%type <yt_integer> descent_case_list
 
 
 
@@ -2145,7 +2146,7 @@ tFlow:
 	symMan.remDPEstart();
       }
       $$->dpe = mkinteger($9->dpe->value + (symMan.needsDPE())->value);
-      if ($7->dpe->value > 0);
+      if ($7->dpe->value > 0)
       {
         symMan.addDPEend();
       }
@@ -2291,13 +2292,28 @@ tSwitch:
 ;
 
 tCase_list:
-  tCase X_NEXT
-    { $$ = ConstCase_list($1, NiltCase_list()); 
-      $$->dpe = $1->dpe;
+  descent_case_list tCase X_NEXT
+    { $$ = ConstCase_list($2, NiltCase_list()); 
+      for(int i = 0; i < $1->value; ++i)
+      { 
+	symMan.addDPEend();
+      }
+      $$->dpe = $2->dpe;
     }
-| tCase X_NEXT tCase_list
-    { $$ = ConstCase_list($1, $3); 
-      $$->dpe = kc::mkinteger($1->dpe->value + $3->dpe->value);
+| descent_case_list tCase X_NEXT tCase_list
+    { $$ = ConstCase_list($2, $4); 
+      for(int i = 0; i < $1->value; ++i)
+      { 
+	symMan.addDPEend();
+      }
+      $$->dpe = mkinteger($2->dpe->value + $4->dpe->value);
+    }
+;
+
+descent_case_list:
+    {
+      $$ = symMan.needsDPE();
+      symMan.resetDPEend();
     }
 ;
 
@@ -2309,7 +2325,7 @@ tCase:
   arbitraryAttributes X_NEXT 
     {
       // since we descend, set DPE ends to 0
-      symMan.resetDPEend();
+      // symMan.resetDPEend();
     }
   activity 
   X_NEXT X_SLASH K_CASE
@@ -2317,6 +2333,7 @@ tCase:
       $$ = Case($6);
       $$->condition = att.read($3, "condition"); 
       $$->dpe = mkinteger($6->dpe->value + (symMan.needsDPE())->value);
+      
     }
 ;
 

@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/17 09:34:23 $
+ *          - last changed: \$Date: 2006/02/22 11:46:04 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.149 $
+ * \version \$Revision: 1.150 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -3725,10 +3725,10 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
       {
 	Place *p5a = TheNet->newPlace(prefix + "negLink");
 	TheNet->newArc(t2, p5a);
-	TheNet->mergePlaces(p5a, TheNet->findPlace(newPrefix + ".negLink"));
+	TheNet->mergePlaces(p5a, p5);
       }
 
-
+      
       // Embed the inner activity.
       TheNet->mergePlaces(p6,  TheNet->findPlace(newPrefix + ".initial"));
       TheNet->mergePlaces(p7,  TheNet->findPlace(newPrefix + ".final"));
@@ -3790,8 +3790,9 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
       Place *p5 = TheNet->findPlace(newPrefix + ".negLink");
       if (p5 != NULL)
       {
-	TheNet->newArc(t2, p5);
-	TheNet->mergePlaces(p5, TheNet->findPlace(newPrefix + ".negLink"));
+	Place *p5a = TheNet->newPlace(prefix + "negLink");
+	TheNet->newArc(t2, p5a);
+	TheNet->mergePlaces(p5a, p5);
       }
 
 

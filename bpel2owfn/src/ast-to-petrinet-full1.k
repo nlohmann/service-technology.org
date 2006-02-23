@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/23 14:25:31 $
+ *          - last changed: \$Date: 2006/02/23 15:00:00 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.152 $
+ * \version \$Revision: 1.153 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -2736,7 +2736,7 @@ This=Flow(a,b,c) ->
       {
         string newPrefix = intToString(innerActivity->id->value);
         // Embed the inner activity.
-	if (TheNet->findPlace(newPrefix + ".negLink") != NULL)
+	if (This->dpe->value > 0 && TheNet->findPlace(newPrefix + ".negLink") != NULL)
 	{
 	  cerr << "found inner negLink place for " << newPrefix << endl;
 	  TheNet->newArc(t1, TheNet->findPlace(newPrefix + ".negLink"));
@@ -3054,7 +3054,7 @@ This=activitySequence(Sequence(a,b)) ->
 	// If an inner activity has a place negLink, it is connected to the transition
 	// t1.
         string newPrefix = intToString(innerActivity->id->value);
-	if (TheNet->findPlace(newPrefix + ".negLink") != NULL)
+	if (This->dpe->value > 0 && TheNet->findPlace(newPrefix + ".negLink") != NULL)
 	  TheNet->newArc(t1, TheNet->findPlace(newPrefix + ".negLink"));
 
 
@@ -3802,7 +3802,7 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
       if (p5 != NULL)
       {
 	Place *p5a = TheNet->newPlace(prefix + "negLink");
-	TheNet->newArc(t2, p5a);
+	TheNet->newArc(t2, p5);
 	TheNet->mergePlaces(p5a, p5);
       }
 

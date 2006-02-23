@@ -29,11 +29,11 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/22 11:46:04 $
+ *          - last changed: \$Date: 2006/02/23 13:42:08 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.150 $
+ * \version \$Revision: 1.151 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -2734,9 +2734,10 @@ This=Flow(a,b,c) ->
     {
       foreach (innerActivity; activity_list c)
       {
-	// Embed the inner activity.
-	if (innerActivity->dpe->value > 0)
-	  TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".negLink"));
+        string newPrefix = intToString(innerActivity->id->value);
+        // Embed the inner activity.
+	if (TheNet->findPlace(newPrefix + ".negLink") != NULL)
+	  TheNet->newArc(t1, TheNet->findPlace(newPrefix + ".negLink"));
 	TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
 	TheNet->newArc(t5, TheNet->findPlace(innerActivity, ".stop"));
 	TheNet->newArc(TheNet->findPlace(innerActivity, ".stopped"), t6);
@@ -3049,8 +3050,9 @@ This=activitySequence(Sequence(a,b)) ->
 
 	// If an inner activity has a place negLink, it is connected to the transition
 	// t1.
-	if (innerActivity->dpe->value > 0)
-	  TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".negLink"));
+        string newPrefix = intToString(innerActivity->id->value);
+	if (TheNet->findPlace(newPrefix + ".negLink") != NULL)
+	  TheNet->newArc(t1, TheNet->findPlace(newPrefix + ".negLink"));
 
 
 	TheNet->mergePlaces(This, ".internal.stop", innerActivity, ".stop");

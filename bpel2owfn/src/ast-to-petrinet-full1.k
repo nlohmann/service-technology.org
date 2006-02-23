@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/23 13:42:08 $
+ *          - last changed: \$Date: 2006/02/23 14:25:31 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.151 $
+ * \version \$Revision: 1.152 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -2737,7 +2737,10 @@ This=Flow(a,b,c) ->
         string newPrefix = intToString(innerActivity->id->value);
         // Embed the inner activity.
 	if (TheNet->findPlace(newPrefix + ".negLink") != NULL)
+	{
+	  cerr << "found inner negLink place for " << newPrefix << endl;
 	  TheNet->newArc(t1, TheNet->findPlace(newPrefix + ".negLink"));
+	}
 	TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
 	TheNet->newArc(t5, TheNet->findPlace(innerActivity, ".stop"));
 	TheNet->newArc(TheNet->findPlace(innerActivity, ".stopped"), t6);
@@ -3269,7 +3272,10 @@ This=Scope(a,b,c,d,e,f,g) ->
 
 
       // Create the internal places of the scope pattern.
-      Place *p1  = TheNet->newPlace(prefix + "negLink");
+      if (This->dpe->value > 0)
+      {
+	Place *p1  = TheNet->newPlace(prefix + "negLink");
+      }
       Place *p2  = TheNet->newPlace(prefix + "initial");
       Place *p3  = TheNet->newPlace(prefix + "ch_in");
       Place *p4  = TheNet->newPlace(prefix + "scopeCompensated");
@@ -3519,7 +3525,10 @@ This=Scope(a,b,c,d,e,f,g) ->
 
 
       // Embed the inner activity of the scope.
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "negLink"), TheNet->findPlace(g, ".negLink"));
+      if (This->dpe->value > 0)
+      {
+        TheNet->mergePlaces(TheNet->findPlace(prefix + "negLink"), TheNet->findPlace(g, ".negLink"));
+      }
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p21"), TheNet->findPlace(g, ".initial"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p22"), TheNet->findPlace(g, ".final"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p23"), TheNet->findPlace(g, ".stop"));

@@ -50,6 +50,7 @@ const std::string A__PART = "part";
 const std::string A__PARTNER_LINK = "partnerLink";
 const std::string A__PORT_TYPE = "portType";
 const std::string A__PROPERTY = "property";
+const std::string A__PROPERTIES = "properties";
 const std::string A__QUERY = "query";
 const std::string A__VARIABLE = "variable";
 const std::string A__TARGET_NAMESPACE = "targetNamespace";

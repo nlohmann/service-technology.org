@@ -24,7 +24,8 @@
  * \brief
  *
  * \author  
- *          - last changes of: \$Author: nlohmann $
+ *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
+ *          - last changes of: \$Author: reinert $
  *          
  * \date
  * 
@@ -33,7 +34,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.11 $: 
+ * \version \$Revision: 1.12 $: 
  *
  */
 
@@ -46,8 +47,6 @@
 #include "bpel-attributes.h"
 
 using namespace std;
-
-
 
 /// enumeration of possible locations of an activity used to send failures to
 /// the correct place in the Petri net
@@ -64,22 +63,29 @@ class SymbolTable;
 class SymbolTableEntry;
 class STActivity;
 class STAttribute;
+class STCommunicationActivity;
+class STCompensate;
 class STCompensationHandler;
 class STCorrelationSet;
 class STElement;
 class STEnvelope;
 class STEventHandlers;
 class STFaultHandlers;
+class STInvoke;
 class STLink;
 class STPartner;
 class STPartnerLink;
 class STProcess;
+class STReceive;
+class STReply;
 class STScope;
+class STTerminate;
 class STVariable;
+class STWait;
 
 
 /**
- * \class	Element
+ * \class	STElement
  *
  * \brief
  * 
@@ -113,6 +119,34 @@ class SymbolTable
 
     /// a container to store ...
     map<unsigned int, SymbolTableEntry*> symTab;
+
+    /// print formatted symbol table error message
+	void printErrorMsg(string errorMsg);
+    
+    /// return the key of the last insert element
+    unsigned int getCurrentEntryKey();
+
+    /// return retranslation from elementId to BPEL-element name, e.g. K_ASSIGN->"assign"
+    string translateToElementName(unsigned int elementId);
+
+	/***
+	 *
+	 *   help functions and methods for attribute check
+	 * 
+	 * 
+	 ***/
+	
+	/// domain check
+	void checkAttributeValueYesNo(std::string attributeName, std::string attributeValue);	
+	
+	/// returns valid or unvalid depending on attribute value
+	bool isValidAttributeValue(std::string attributeName, std::string attributeValue);
+	
+	/// returns valid or unvalid depending on attribute already exists or not
+	bool isDuplicate(std::string attributeName);
+	
+	///
+	bool isAttributeValueEmpty(kc::integer elementId, std::string attributeName);
     
   public:
     /// constructor
@@ -130,30 +164,39 @@ class SymbolTable
 	/// ST traces
 	void traceST(string traceMsg);
     
-    /// return the key of the last insert element
-    unsigned int getCurrentEntryKey();
-    
     /// create a new entry in the symbol table and return symbol table entry key
     unsigned int insert(unsigned int elementId);
+
+    /// return entry of symbol table
+    SymbolTableEntry* lookup(unsigned int entryKey);
+
+    /// to add an attribute to the special symbol table entry
+    void addAttribute(unsigned int entryKey, STAttribute* attribute);
+
+    /// return value from desired attribute
+    STAttribute* readAttribute(unsigned int entryKey, string name);
     
     /// create a new attribute
     STAttribute* newAttribute(kc::casestring name, kc::casestring value);
     
-    /// to add an attribute to the special symbol table entry
-    void addAttribute(unsigned int entryKey, STAttribute* attribute);
+    /// wrapper for checkAttributes(unsigned int entryKey, kc::casestring bpelElementValue)
+	void checkAttributes(kc::integer astId, kc::casestring bpelElementValue);
+
+    /// wrapper for checkAttributes(unsigned int entryKey)
+    void checkAttributes(kc::integer astId);
+	
+	/// checked the attributes and the value of BPEL-elements
+	void checkAttributes(unsigned int entryKey, kc::casestring bpelElementValue);
+
+    /// checked the attributes and the value of BPEL-elements
+    void checkAttributes(unsigned int entryKey);
     
-    /// return value from desired attribute
-    STAttribute* readAttribute(unsigned int entryKey, string name);
-    
-    /// return entry of symbol table
-    SymbolTableEntry* lookup(unsigned int entryKey);
+    /// return 
+    unsigned int idToKey(kc::integer astId);
     
     /// mapping between AST Id and symbol table entries
     void setMapping(unsigned int entryKey, kc::integer astId);
-    
-    /// return retranslation from elementId to BPEL-element name, e.g. K_ASSIGN->"assign"
-    string translateToElementName(unsigned int elementId);
-    
+  
     /// return
     string getInformation(kc::integer astId, bool closeTag = false);
 };
@@ -192,10 +235,8 @@ class SymbolTableEntry
 };
 
 
-
-
 /**
- * \class	Activity
+ * \class	STActivity
  *
  * \brief
  * 
@@ -217,24 +258,23 @@ class STActivity: public STElement, public SymbolTableEntry
 
     /// true if activity is target of a link
     bool isTargetOfLink;
+};
+
+/**
+ * \class	STTerminate
+ *
+ * \brief
+ * 
+ */
+class STTerminate: public STActivity
+{
+  public:
+    /// constructor
+    STTerminate();
+    STTerminate(unsigned int elementId, unsigned int entryKey);
     
-    // only used for <invoke> activity
-    /// true if <invoke> has both input and output variable
-    bool isSynchronousInvoke;
-
-    // only used for communication activities
-    string channelId;
-    STVariable *inputVariable;
-    STVariable *outputVariable;
-
-    // only used for <wait> activity
-    /// true if <wait> has a "until" attribute
-    bool isWaitUntil;
-
-    // only used for <compensate> activity
-    bool isInFaultHandler;
-    bool isInCompensationHandler;
-    bool hasScopeName;
+    /// destructor
+    ~STTerminate();
 
     // only used for <terminate> activity
     bool isFirstTerminate;
@@ -242,7 +282,52 @@ class STActivity: public STElement, public SymbolTableEntry
 
 
 /**
- * \class	Attribute
+ * \class	STCompensate
+ *
+ * \brief
+ * 
+ */
+class STCompensate: public STActivity
+{
+  public:
+    /// constructor
+    STCompensate();
+    STCompensate(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STCompensate();
+
+    // only used for <compensate> activity
+    bool isInFaultHandler;
+    bool isInCompensationHandler;
+    bool hasScopeName;
+};
+
+
+/**
+ * \class	STWait
+ *
+ * \brief
+ * 
+ */
+class STWait: public STActivity
+{
+  public:
+    /// constructor
+    STWait();
+    STWait(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STWait();
+
+    // only used for <wait> activity
+    /// true if <wait> has a "until" attribute
+    bool isWaitUntil;
+};
+
+
+/**
+ * \class	STAttribute
  *
  * \brief
  * 
@@ -271,7 +356,7 @@ class STAttribute
 
 
 /**
- * \class	CompensationHandler
+ * \class	STCompensationHandler
  *
  * \brief
  * 
@@ -294,7 +379,7 @@ class STCompensationHandler
 
 
 /**
- * \class	CorrelationSet
+ * \class	STCorrelationSet
  *
  * \brief
  * 
@@ -306,7 +391,7 @@ class STCorrelationSet: public STElement
 
 
 /**
- * \class	Envelope
+ * \class	STEnvelope
  *
  * \brief
  * 
@@ -339,7 +424,7 @@ class STEnvelope
 
 
 /**
- * \class	EventHandlers
+ * \class	STEventHandlers
  *
  * \brief
  * 
@@ -353,7 +438,7 @@ class STEventHandlers
 
 
 /**
- * \class	FaultHandlers
+ * \class	STFaultHandlers
  *
  * \brief
  * 
@@ -379,7 +464,89 @@ class STFaultHandlers
 
 
 /**
- * \class	Link
+ * \class	STCommunicationActivity
+ *
+ * \brief   for <onMessage>, <invoke>, <receive> and <reply>
+ * 
+ */
+class STCommunicationActivity: public STActivity
+{
+  public:
+    /// constructor
+    STCommunicationActivity();
+    STCommunicationActivity(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STCommunicationActivity();
+
+    // only used for communication activities
+    string channelId;
+    STVariable *inputVariable;
+    STVariable *outputVariable;
+};
+
+
+/**
+ * \class	STInvoke
+ *
+ * \brief
+ * 
+ */
+class STInvoke: public STCommunicationActivity
+{
+  public:
+    /// constructor
+    STInvoke();
+    STInvoke(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STInvoke();
+
+    // only used for <invoke> activity
+    /// true if <invoke> has both input and output variable
+    bool isSynchronousInvoke;
+    
+};
+
+
+/**
+ * \class	STReceive
+ *
+ * \brief
+ * 
+ */
+class STReceive: public STCommunicationActivity
+{
+  public:
+    /// constructor
+    STReceive();
+    STReceive(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STReceive();
+};
+
+/**
+ * \class	STReply
+ *
+ * \brief
+ * 
+ */
+class STReply: public STCommunicationActivity
+{
+  public:
+    /// constructor
+    STReply();
+    STReply(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STReply();
+};
+
+
+
+/**
+ * \class	STLink
  *
  * \brief
  * 
@@ -409,7 +576,7 @@ class STLink: public STElement, public SymbolTableEntry
 
 
 /**
- * \class	Partner
+ * \class	STPartner
  *
  * \brief
  * 
@@ -427,7 +594,7 @@ class STPartner: public STElement, public SymbolTableEntry
 
 
 /**
- * \class	PartnerLink
+ * \class	STPartnerLink
  *
  * \brief
  * 
@@ -471,7 +638,7 @@ class STProcess: public STElement, public STEnvelope, public SymbolTableEntry
 
 
 /**
- * \class	Scope
+ * \class	STScope
  *
  * \brief
  * 
@@ -497,7 +664,7 @@ class STScope: public STElement, public STEnvelope, public SymbolTableEntry
 
 
 /**
- * \class	Variable
+ * \class	STVariable
  *
  * \brief
  * 

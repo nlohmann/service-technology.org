@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/02/23 15:00:00 $
+ *          - last changed: \$Date: 2006/02/24 08:43:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.125 $
+ * \version \$Revision: 1.126 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -225,6 +225,16 @@ int hasCompensate;
 %type <yt_tVariable> tVariable
 %type <yt_tWait> tWait
 %type <yt_tWhile> tWhile
+%type <yt_integer> genSymTabEntry_Process
+%type <yt_integer> genSymTabEntry_Case
+%type <yt_integer> genSymTabEntry_PartnerLink
+%type <yt_integer> genSymTabEntry_Partner
+%type <yt_integer> genSymTabEntry_Catch
+%type <yt_integer> genSymTabEntry_CatchAll
+%type <yt_integer> genSymTabEntry_OnMessage
+%type <yt_integer> genSymTabEntry_OnAlarm
+%type <yt_integer> genSymTabEntry_Variable
+%type <yt_integer> genSymTabEntry_CorrelationSet
 
 %type <yt_integer> descent_activity_list
 %type <yt_integer> descent_case_list
@@ -284,16 +294,10 @@ int hasCompensate;
 */
 
 tProcess:
-  X_OPEN K_PROCESS
-  { currentSymTabEntryKey = symTab.insert(K_PROCESS);
-    currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
-  }
+  X_OPEN K_PROCESS genSymTabEntry_Process
   arbitraryAttributes
-    { //symTab.traceST(string((symTab.readAttribute(currentSymTabEntryKey, "name"))->value->name) + "\n");
-      (dynamic_cast <STProcess*> (currentSymTabEntry))->abstractProcess = true;
-      if((dynamic_cast <STProcess*> (currentSymTabEntry))->abstractProcess) symTab.traceST("TRUE\n");
-      else  symTab.traceST("FALSE");
-      
+    { symTab.checkAttributes($3);
+     
       att.check($4, K_PROCESS);
       if(att.isAttributeValueEmpty($4, "suppressJoinFailure"))
       {
@@ -305,6 +309,7 @@ tProcess:
         /// current BPEL-element attribute value
       	att.pushSJFStack($4, att.read($4, "suppressJoinFailure"));      
       }      
+
       symMan.initialiseProcessScope($4);
       currentScopeId = $4;
       isInFH.push(false);
@@ -330,6 +335,12 @@ tProcess:
       isInCH.pop();
       $$->id = $4;
       $$->hasEH = (string($14->op_name()) == "userDefinedEventHandler"); }
+;
+
+genSymTabEntry_Process:
+  { currentSymTabEntryKey = symTab.insert(K_PROCESS);
+    $$ = mkinteger(currentSymTabEntryKey);
+  }
 ;
 
 /* import other namespaces */
@@ -493,7 +504,7 @@ tPartnerLink:
 
 genSymTabEntry_PartnerLink:
   { currentSymTabEntryKey = symTab.insert(K_PARTNERLINK);
-    currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
+    $$ = mkinteger(currentSymTabEntryKey);
   }
 ;
 
@@ -543,7 +554,7 @@ tPartner:
 
 genSymTabEntry_Partner:
   { currentSymTabEntryKey = symTab.insert(K_PARTNER);
-    currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
+    $$ = mkinteger(currentSymTabEntryKey);
   }
 ;
 
@@ -606,10 +617,7 @@ tCatch_list:
 ;
 
 tCatch:
-  K_CATCH
-  { currentSymTabEntryKey = symTab.insert(K_CATCH);
-    currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
-  }
+  K_CATCH genSymTabEntry_Catch
   arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CATCH
     { $$ = Catch($5);
       $$->faultName = att.read($3, "faultName");
@@ -618,19 +626,33 @@ tCatch:
     }
 ;
 
+genSymTabEntry_Catch:
+  { currentSymTabEntryKey = symTab.insert(K_CATCH);
+    $$ = mkinteger(currentSymTabEntryKey);
+  }
+;
+
 tCatchAll:
   /* empty */
     { hasCatchAll = false;
       $$ = NoCatchAll(); }
-| K_CATCHALL arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CATCHALL X_NEXT
+| K_CATCHALL genSymTabEntry_CatchAll
+  arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CATCHALL X_NEXT
     { hasCatchAll = true;
-      $$ = CatchAll($4);
-      $$->faultName = att.read($2, "faultName");
-      $$->faultVariable = att.read($2, "faultVariable");
-      // $$->variableID = symMan.checkVariable(att.read($2, "faultVariable")->name, true); 
+      $$ = CatchAll($5);
+   /* DR
+      $$->faultName = att.read($3, "faultName");
+      $$->faultVariable = att.read($3, "faultVariable");
+   */
+      // $$->variableID = symMan.checkVariable(att.read($3, "faultVariable")->name, true); 
     }
 ;
 
+genSymTabEntry_CatchAll:
+  { currentSymTabEntryKey = symTab.insert(K_CATCHALL);
+    $$ = mkinteger(currentSymTabEntryKey);
+  }
+;
 
 /******************************************************************************
   COMPENSATION HANDLERS
@@ -752,18 +774,15 @@ tOnAlarm_list:
 ;
 
 tOnMessage:
-  K_ONMESSAGE
-  { currentSymTabEntryKey = symTab.insert(K_ONMESSAGE);
-    currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
-  }
+  K_ONMESSAGE genSymTabEntry_OnMessage
   arbitraryAttributes X_NEXT
-    {
+    { symTab.checkAttributes($2); att.check($3, K_ONMESSAGE);
+      
       symMan.checkPartnerLink(att.read($3, "partnerLink")->name);
       symMan.resetDPEend();
     }
   tCorrelations activity X_NEXT X_SLASH K_ONMESSAGE
-    { att.check($3, K_ONMESSAGE);
-      $$ = OnMessage($7);
+    { $$ = OnMessage($7);
       $$->partnerLink = att.read($3, "partnerLink");
       $$->portType = att.read($3, "portType");
       $$->operation = att.read($3, "operation");
@@ -776,22 +795,32 @@ tOnMessage:
     }
 ;
 
-tOnAlarm:
-  K_ONALARM
-  { currentSymTabEntryKey = symTab.insert(K_ONALARM);
-    currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
+genSymTabEntry_OnMessage:
+  { currentSymTabEntryKey = symTab.insert(K_ONMESSAGE);
+    $$ = mkinteger(currentSymTabEntryKey);
   }
+;
+
+
+tOnAlarm:
+  K_ONALARM genSymTabEntry_OnAlarm
   arbitraryAttributes X_NEXT 
-    {
+    { symTab.checkAttributes($2); att.check($3, K_ONALARM);
+      
       symMan.resetDPEend();
     }
   activity X_NEXT X_SLASH K_ONALARM 
-    { att.check($3, K_ONALARM);
-      $$ = OnAlarm($6);
+    { $$ = OnAlarm($6);
       $$->For = att.read($3, "for");  // "for" is a keyword
       $$->until = att.read($3, "until");
       $$->dpe = symMan.needsDPE();
     }
+;
+
+genSymTabEntry_OnAlarm:
+  { currentSymTabEntryKey = symTab.insert(K_ONALARM);
+    $$ = mkinteger(currentSymTabEntryKey);
+  }
 ;
 
 
@@ -831,8 +860,10 @@ tVariable_list:
 ;
 
 tVariable:
-  K_VARIABLE genSymTabEntry_Variable arbitraryAttributes X_NEXT X_SLASH K_VARIABLE
-    { $$ = Variable();
+  K_VARIABLE genSymTabEntry_Variable
+  arbitraryAttributes X_NEXT X_SLASH K_VARIABLE
+    { symTab.checkAttributes($2); //att.check($3, K_VARIABLE);
+      $$ = Variable();
       $$->name = att.read($3, "name");
       $$->messageType = att.read($3, "messageType");
       $$->type = att.read($3, "type");
@@ -842,8 +873,10 @@ tVariable:
 				     $$->messageType->name, 
 				     $$->type->name, 
 				     $$->element->name)); }
-| K_VARIABLE genSymTabEntry_Variable arbitraryAttributes X_SLASH
-    { $$ = Variable();
+| K_VARIABLE genSymTabEntry_Variable
+  arbitraryAttributes X_SLASH
+    { symTab.checkAttributes($2); //att.check($3, K_VARIABLE);
+      $$ = Variable();
       $$->name = att.read($3, "name");
       $$->messageType = att.read($3, "messageType");
       $$->type = att.read($3, "type");
@@ -857,9 +890,10 @@ tVariable:
 
 genSymTabEntry_Variable:
   { currentSymTabEntryKey = symTab.insert(K_VARIABLE);
-    currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
+    $$ = mkinteger(currentSymTabEntryKey);
   }
 ;
+
 
 /******************************************************************************
   CORRELATION SETS
@@ -900,19 +934,22 @@ tCorrelationSet_list:
 tCorrelationSet:
   K_CORRELATIONSET genSymTabEntry_CorrelationSet
   arbitraryAttributes X_NEXT X_SLASH K_CORRELATIONSET
-    { $$ = CorrelationSet(); }
+    { symTab.checkAttributes($2); //att.check($3, K_CORRELATIONSET);
+      $$ = CorrelationSet(); }
 | K_CORRELATIONSET genSymTabEntry_CorrelationSet
   arbitraryAttributes X_SLASH
-    { $$ = CorrelationSet();
+    { symTab.checkAttributes($2); //att.check($3, K_CORRELATIONSET);
+      $$ = CorrelationSet();
       $$->properties = att.read($3, "properties");
       $$->name = att.read($3, "name"); }
 ;
 
 genSymTabEntry_CorrelationSet:
   { currentSymTabEntryKey = symTab.insert(K_CORRELATIONSET);
-    currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
+    $$ = mkinteger(currentSymTabEntryKey);
   }
 ;
+
 
 /******************************************************************************
   CORRELATIONS
@@ -976,7 +1013,7 @@ tEmpty:
   K_EMPTY genSymTabEntry_Empty  
   arbitraryAttributes 
     { 
-      att.check($3, K_EMPTY);
+      symTab.checkAttributes($3); att.check($3, K_EMPTY);
       if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -1010,7 +1047,7 @@ tEmpty:
 | K_EMPTY genSymTabEntry_Empty
   arbitraryAttributes 
     { 
-      att.check($3, K_EMPTY);
+      symTab.checkAttributes($3); att.check($3, K_EMPTY);
       if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -1074,7 +1111,7 @@ tInvoke:
   K_INVOKE genSymTabEntry_Invoke 
   arbitraryAttributes 
     { 
-      att.check($3, K_INVOKE);
+      symTab.checkAttributes($3); att.check($3, K_INVOKE);
       if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -1241,7 +1278,7 @@ tInvoke:
 | K_INVOKE genSymTabEntry_Invoke 
   arbitraryAttributes 
     { 
-      att.check($3, K_INVOKE);
+      symTab.checkAttributes($3); att.check($3, K_INVOKE);
       if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -1333,7 +1370,7 @@ tReceive:
   K_RECEIVE genSymTabEntry_Receive
   arbitraryAttributes
     { 
-      att.check($3, K_RECEIVE);
+      symTab.checkAttributes($3); att.check($3, K_RECEIVE);
       if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -1376,7 +1413,7 @@ tReceive:
 | K_RECEIVE genSymTabEntry_Receive
   arbitraryAttributes
     { 
-      att.check($3, K_RECEIVE);
+      symTab.checkAttributes($3); att.check($3, K_RECEIVE);
       if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -1451,7 +1488,7 @@ tReply:
   K_REPLY genSymTabEntry_Reply
   arbitraryAttributes
     { 
-      att.check($3, K_REPLY);
+      symTab.checkAttributes($3); att.check($3, K_REPLY);
       if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -1496,7 +1533,7 @@ tReply:
 | K_REPLY genSymTabEntry_Reply
   arbitraryAttributes
     { 
-      att.check($3, K_REPLY);
+      symTab.checkAttributes($3); att.check($3, K_REPLY);
       if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -1563,7 +1600,7 @@ tAssign:
   }
   arbitraryAttributes
     { 
-      att.check($3, K_ASSIGN);
+      symTab.checkAttributes($3); att.check($3, K_ASSIGN);
       if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -1619,7 +1656,7 @@ tCopy:
 
 tFrom:
   K_FROM genSymTabEntry_From arbitraryAttributes X_NEXT X_SLASH K_FROM
-    { att.check($3, K_FROM);
+    { symTab.checkAttributes($3); att.check($3, K_FROM);
       $$ = From();
       $$->variable = att.read($3, "variable");
       $$->part = att.read($3, "part");
@@ -1632,7 +1669,7 @@ tFrom:
       $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
       symMan.checkPartnerLink($$->partnerLink->name); }
 | K_FROM genSymTabEntry_From arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_FROM
-    { att.check($3, $5, K_FROM);
+    { symTab.checkAttributes($3, $5); att.check($3, $5, K_FROM);
       $$ = From();
       $$->variable = att.read($3, "variable");
       $$->part = att.read($3, "part");
@@ -1646,7 +1683,7 @@ tFrom:
       $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
       symMan.checkPartnerLink($$->partnerLink->name); }
 | K_FROM genSymTabEntry_From arbitraryAttributes X_SLASH
-    { att.check($3, K_FROM);
+    { symTab.checkAttributes($3); att.check($3, K_FROM);
       $$ = From();
       $$->variable = att.read($3, "variable");
       $$->part = att.read($3, "part");
@@ -1677,7 +1714,7 @@ genSymTabEntry_From:
 
 tTo:
   K_TO genSymTabEntry_To arbitraryAttributes X_NEXT X_SLASH K_TO
-    { att.check($3, K_TO);
+    { symTab.checkAttributes($3); att.check($3, K_TO);
       $$ = To();
       $$->variable = att.read($3, "variable");
       $$->part = att.read($3, "part");
@@ -1686,7 +1723,7 @@ tTo:
       $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
       symMan.checkPartnerLink($$->partnerLink->name); }
 | K_TO genSymTabEntry_To arbitraryAttributes X_SLASH
-    { att.check($3, K_TO);
+    { symTab.checkAttributes($3); att.check($3, K_TO);
       $$ = To();
       $$->variable = att.read($3, "variable");
       $$->part = att.read($3, "part");
@@ -1724,7 +1761,7 @@ tWait:
   K_WAIT genSymTabEntry_Wait
   arbitraryAttributes
     { 
-      att.check($3, K_WAIT);
+      symTab.checkAttributes($3); att.check($3, K_WAIT);
       if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -1758,7 +1795,7 @@ tWait:
 | K_WAIT genSymTabEntry_Wait
   arbitraryAttributes
     { 
-      att.check($3, K_WAIT);
+      symTab.checkAttributes($3); att.check($3, K_WAIT);
       if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -1812,7 +1849,7 @@ tThrow:
   K_THROW genSymTabEntry_Throw
   arbitraryAttributes
     { 
-      att.check($3, K_THROW);
+      symTab.checkAttributes($3); att.check($3, K_THROW);
       if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -1825,7 +1862,7 @@ tThrow:
       }
     }   
   X_NEXT standardElements X_SLASH K_THROW
-    { att.check($3, K_THROW);
+    { symTab.checkAttributes($3); att.check($3, K_THROW);
       $$ = Throw($6);
       $$->name = att.read($3, "name");
       $$->joinCondition = $6->joinCondition = att.read($3, "joinCondition");    
@@ -1848,7 +1885,7 @@ tThrow:
 | K_THROW genSymTabEntry_Throw
   arbitraryAttributes
     { 
-      att.check($3, K_THROW);
+      symTab.checkAttributes($3); att.check($3, K_THROW);
       if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -1900,7 +1937,7 @@ tCompensate:
   K_COMPENSATE genSymTabEntry_Compensate
   arbitraryAttributes
     { 
-      att.check($3, K_COMPENSATE);
+      symTab.checkAttributes($3); att.check($3, K_COMPENSATE);
 
       // compensate only is allowed within Compensation- or FaultHandler
       if ( ! (isInCH.top().first || isInFH.top()) )
@@ -1956,7 +1993,7 @@ tCompensate:
 | K_COMPENSATE genSymTabEntry_Compensate
   arbitraryAttributes
     { 
-      att.check($3, K_COMPENSATE);
+      symTab.checkAttributes($3); att.check($3, K_COMPENSATE);
 
       // compensate only is allowed within Compensation- or FaultHandler
       if ( ! (isInCH.top().first || isInFH.top()) )
@@ -2030,7 +2067,7 @@ tTerminate:
   K_TERMINATE genSymTabEntry_Terminate
   arbitraryAttributes
     { 
-      att.check($3, K_TERMINATE);
+      symTab.checkAttributes($3); att.check($3, K_TERMINATE);
       if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -2062,7 +2099,7 @@ tTerminate:
 | K_TERMINATE genSymTabEntry_Terminate
   arbitraryAttributes
     { 
-      att.check($3, K_TERMINATE);
+      symTab.checkAttributes($3); att.check($3, K_TERMINATE);
       if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -2118,7 +2155,7 @@ tFlow:
   }
   arbitraryAttributes
     { 
-      att.check($3, K_FLOW);
+      symTab.checkAttributes($3); att.check($3, K_FLOW);
       if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -2246,7 +2283,7 @@ tSwitch:
   }
   arbitraryAttributes
     { 
-      att.check($3, K_SWITCH);
+      symTab.checkAttributes($3); att.check($3, K_SWITCH);
       if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -2318,10 +2355,7 @@ descent_case_list:
 ;
 
 tCase:
-  K_CASE
-  { currentSymTabEntryKey = symTab.insert(K_CASE);
-    currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
-  }
+  K_CASE genSymTabEntry_Case
   arbitraryAttributes X_NEXT 
     {
       // since we descend, set DPE ends to 0
@@ -2329,7 +2363,7 @@ tCase:
     }
   activity 
   X_NEXT X_SLASH K_CASE
-    { att.check($3, K_CASE);
+    { symTab.checkAttributes($2); att.check($3, K_CASE);
       $$ = Case($6);
       $$->condition = att.read($3, "condition"); 
       $$->dpe = mkinteger((symMan.needsDPE())->value);
@@ -2337,7 +2371,11 @@ tCase:
     }
 ;
 
-
+genSymTabEntry_Case:
+  { currentSymTabEntryKey = symTab.insert(K_CASE);
+	$$ = mkinteger(currentSymTabEntryKey);
+  }
+;
 
 tOtherwise:
   /* If the otherwise branch is not explicitly specified, then an otherwise
@@ -2401,7 +2439,7 @@ tWhile:
   }  
   arbitraryAttributes
     { 
-      att.check($3, K_WHILE);
+      symTab.checkAttributes($3); att.check($3, K_WHILE);
       if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -2420,7 +2458,7 @@ tWhile:
     }
   activity 
   X_NEXT X_SLASH K_WHILE
-    { att.check($3, K_WHILE);
+    { symTab.checkAttributes($3); att.check($3, K_WHILE);
       $$ = While($6, $8);
       $$->name = att.read($3, "name");
       $$->joinCondition = $6->joinCondition = att.read($3, "joinCondition");     
@@ -2455,7 +2493,7 @@ tSequence:
   }
   arbitraryAttributes 
     { 
-      att.check($3, K_SEQUENCE);
+      symTab.checkAttributes($3); att.check($3, K_SEQUENCE);
       if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -2532,7 +2570,7 @@ tPick:
   }
   arbitraryAttributes
     { 
-      att.check($3, K_PICK);
+      symTab.checkAttributes($3); att.check($3, K_PICK);
       if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -2607,7 +2645,7 @@ tScope:
   }
   arbitraryAttributes
     { 
-      att.check($3, K_SCOPE);
+      symTab.checkAttributes($3); att.check($3, K_SCOPE);
       if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -2637,7 +2675,7 @@ tScope:
   tEventHandlers 
   activity 
   X_NEXT X_SLASH K_SCOPE
-    { att.check($3, K_SCOPE);
+    { symTab.checkAttributes($3); att.check($3, K_SCOPE);
       isInFH.pop();
       hasCompensate = isInCH.top().second;
       isInCH.pop();
@@ -2707,14 +2745,14 @@ tTarget_list:
 tTarget:
   K_TARGET genSymTabEntry_Target
   arbitraryAttributes X_NEXT X_SLASH K_TARGET
-    { att.check($3, K_TARGET);
+    { symTab.checkAttributes($3); att.check($3, K_TARGET);
       $$ = Target();
       $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->linkName = att.read($3, "linkName"); 
       $$->linkID = symMan.checkLink($$->linkName->name, false); }
 | K_TARGET genSymTabEntry_Target
   arbitraryAttributes X_SLASH
-    { att.check($3, K_TARGET);
+    { symTab.checkAttributes($3); att.check($3, K_TARGET);
       $$ = Target();
       $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->linkName = att.read($3, "linkName"); 
@@ -2741,7 +2779,7 @@ tSource_list:
 tSource:
   K_SOURCE genSymTabEntry_Source
   arbitraryAttributes X_NEXT X_SLASH K_SOURCE
-    { att.check($3, K_SOURCE);
+    { symTab.checkAttributes($3); att.check($3, K_SOURCE);
       $$ = Source();
       $$->linkName = att.read($3, "linkName");
       $$->transitionCondition = att.read($3, "transitionCondition", $$->transitionCondition); 
@@ -2753,7 +2791,7 @@ tSource:
     }
 | K_SOURCE genSymTabEntry_Source
   arbitraryAttributes X_SLASH
-    { att.check($3, K_SOURCE);
+    { symTab.checkAttributes($3); att.check($3, K_SOURCE);
       $$ = Source();
       $$->linkName = att.read($3, "linkName");
       $$->transitionCondition = att.read($3, "transitionCondition", $$->transitionCondition); 
@@ -2779,8 +2817,8 @@ arbitraryAttributes:
       symTab.setMapping(currentSymTabEntryKey, $$);
     }
 | X_NAME X_EQUALS X_STRING arbitraryAttributes
-    { $$ = $4;
+    { symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute($1, $3));
       att.define($1, $3);
-      symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute($1, $3));
+      $$ = $4;
     }
 ;

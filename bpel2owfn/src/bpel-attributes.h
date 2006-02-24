@@ -48,13 +48,15 @@ const std::string A__OPERATION = "operation";
 //const std::string A__OUTPUT_VARIABLE = "outputVariable";
 const std::string A__PART = "part";
 const std::string A__PARTNER_LINK = "partnerLink";
+const std::string A__PARTNER_LINK_TYPE = "partnerLinkType";
 const std::string A__PORT_TYPE = "portType";
 const std::string A__PROPERTY = "property";
 const std::string A__PROPERTIES = "properties";
 const std::string A__QUERY = "query";
-const std::string A__VARIABLE = "variable";
+const std::string A__SET = "set";
 const std::string A__TARGET_NAMESPACE = "targetNamespace";
 const std::string A__UNTIL = "until";
+const std::string A__VARIABLE = "variable";
 /// yes or no
 
 const std::string A__OPAQUE = "opaque";

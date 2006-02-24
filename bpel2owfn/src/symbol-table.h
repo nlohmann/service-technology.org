@@ -34,7 +34,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.12 $: 
+ * \version \$Revision: 1.13 $: 
  *
  */
 
@@ -180,10 +180,10 @@ class SymbolTable
     STAttribute* newAttribute(kc::casestring name, kc::casestring value);
     
     /// wrapper for checkAttributes(unsigned int entryKey, kc::casestring bpelElementValue)
-	void checkAttributes(kc::integer astId, kc::casestring bpelElementValue);
+	void checkAttributes(kc::integer entryKey, kc::casestring bpelElementValue);
 
     /// wrapper for checkAttributes(unsigned int entryKey)
-    void checkAttributes(kc::integer astId);
+    void checkAttributes(kc::integer entryKey);
 	
 	/// checked the attributes and the value of BPEL-elements
 	void checkAttributes(unsigned int entryKey, kc::casestring bpelElementValue);

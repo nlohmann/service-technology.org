@@ -513,22 +513,22 @@ void SymbolTable::traceST(string traceMsg)
 
 /*!
  * wrapper for checkAttributes(unsigned int entryKey, kc::casestring bpelElementValue)
- * \param astId
+ * \param entryKey
  * \param bpelElementValue
  */
-void SymbolTable::checkAttributes(kc::integer astId, kc::casestring bpelElementValue)
+void SymbolTable::checkAttributes(kc::integer entryKey, kc::casestring bpelElementValue)
 {
-  checkAttributes(idToKey(astId), bpelElementValue);
+  checkAttributes(entryKey->value, bpelElementValue);
 }
 
 
 /*!
  * wrapper for checkAttributes(unsigned int entryKey)
- * \param astId
+ * \param entryKey
  */
-void SymbolTable::checkAttributes(kc::integer astId)
+void SymbolTable::checkAttributes(kc::integer entryKey)
 {
-  checkAttributes(idToKey(astId));
+  checkAttributes(entryKey->value);
 }
 
 /*!
@@ -630,7 +630,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
     case K_CATCH:
     {
       traceST("CATCH\n");
-      /* no mandatory attributes */
+      /* todo */
     }
     break;  
 
@@ -647,6 +647,33 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       /* no mandatory attributes */        
     }
     break;
+
+    case K_CORRELATION:
+    {
+      traceST("CORRELATION\n");
+      
+      bool setFlag;
+      setFlag = false;
+       
+      mapOfAttributesIterator = mapOfAttributes->begin();
+      
+      ///
+      while(mapOfAttributesIterator != mapOfAttributes->end())
+      {  
+        if(((*mapOfAttributesIterator).first) == A__SET)
+        {
+          setFlag = true;
+          traceST((*mapOfAttributesIterator).first + "\n");
+        }
+        ++mapOfAttributesIterator;
+      }
+      
+      if(!setFlag)
+      {
+        printErrorMsg("attribute " + A__SET + "=\"" + T__NCNAME + "\" is missing");        
+      }
+    }
+    break;    
 
     case K_CORRELATIONSET:
     {
@@ -684,6 +711,13 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       
     }
     break;    
+
+    case K_EMPTY:
+    {
+      traceST("EMPTY\n");
+      /* */
+    }
+    break;  
 
     case K_FROM:
     {
@@ -802,7 +836,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       }        
     }
     break;    
-    
+ 
     case K_INVOKE:
     {
       traceST("INVOKE\n");
@@ -867,8 +901,36 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       {
         printErrorMsg("attribute " + A__OUTPUT_VARIABLE + "=\"" + T__NCNAME + "\" is missing");        
       }*/
+    }
+    break;  
+
+    case K_LINK:
+    {
+      traceST("LINK\n");
+
+      bool nameFlag;
+      nameFlag = false;
+       
+      mapOfAttributesIterator = mapOfAttributes->begin();
+      
+      ///
+      while(mapOfAttributesIterator != mapOfAttributes->end())
+      {  
+        if(((*mapOfAttributesIterator).first) == A__NAME)
+        {
+          nameFlag = true;
+          traceST((*mapOfAttributesIterator).first + "\n");
+        }
+        ++mapOfAttributesIterator;
       }
-      break;  
+      
+      if(!nameFlag)
+      {
+        printErrorMsg("attribute " + A__NAME + "=\"" + T__NCNAME + "\" is missing");        
+      }
+
+    }
+    break;  
 
     case K_ONALARM:
     {
@@ -969,6 +1031,70 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       }
     }
     break;
+
+    case K_PARTNER:
+    {
+      traceST("PARTNER\n");
+      
+      bool nameFlag;
+      nameFlag = false;
+       
+      mapOfAttributesIterator = mapOfAttributes->begin();
+      
+      ///
+      while(mapOfAttributesIterator != mapOfAttributes->end())
+      {  
+        if(((*mapOfAttributesIterator).first) == A__NAME)
+        {
+          nameFlag = true;
+          traceST((*mapOfAttributesIterator).first + "\n");
+        }
+        ++mapOfAttributesIterator;
+      }
+      
+      if(!nameFlag)
+      {
+        printErrorMsg("attribute " + A__NAME + "=\"" + T__NCNAME + "\" is missing");        
+      }
+    }
+    break;    
+
+    case K_PARTNERLINK:
+    {
+      traceST("PARTNERLINK\n");
+      
+      bool nameFlag, partnerLinkTypeFlag;
+      nameFlag = partnerLinkTypeFlag = false;
+       
+      mapOfAttributesIterator = mapOfAttributes->begin();
+      
+      ///
+      while(mapOfAttributesIterator != mapOfAttributes->end())
+      {  
+        if(((*mapOfAttributesIterator).first) == A__NAME)
+        {
+          nameFlag = true;
+          traceST((*mapOfAttributesIterator).first + "\n");
+        }
+        else if(((*mapOfAttributesIterator).first) == A__PARTNER_LINK_TYPE)
+        {
+          partnerLinkTypeFlag = true;
+          traceST((*mapOfAttributesIterator).first + "\n");
+        }
+        ++mapOfAttributesIterator;
+      }
+      
+      if(!nameFlag)
+      {
+        printErrorMsg("attribute " + A__NAME + "=\"" + T__NCNAME + "\" is missing");        
+      }
+      else if(!partnerLinkTypeFlag)
+      {
+        printErrorMsg("attribute " + A__PARTNER_LINK_TYPE + "=\"" + T__QNAME + "\" is missing");        
+      }
+      
+    }
+    break;    
       
     case K_PICK:
     {

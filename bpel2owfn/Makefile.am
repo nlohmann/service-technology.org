@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/02/21 16:13:36 $ by $Author: gierds $.
-# Version $Revision: 1.13 $
+# File last changed $Date: 2006/02/24 13:13:16 $ by $Author: gierds $.
+# Version $Revision: 1.14 $
 
 SUBDIRS = src doc tests
 
@@ -83,28 +83,37 @@ binarydistreadme:
 	@echo -e Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. >> BINARYREADME
 
 # target to create an executable that is independet of Cygwin
-pure-windows-executable: clean
-	make CXXFLAGS="-g -mno-cygwin -U _WIN32" CFLAGS="-g -mno-cygwin -U _WIN32" --directory=src
+pure-windows-executable:
+	make hu-binarydist OS=win32 CXXFLAGS="-g -mno-cygwin -U _WIN32" CFLAGS="-g -mno-cygwin -U _WIN32" 
 
 # name of the directory/archive for a binary distribution
-WIN32DISTDIR = $(distdir)-win32
+#WIN32DISTDIR = $(distdir)-win32
 BINARYDISTDIR = $(distdir)-$(OS)
 
 # files that are distributed in a binary distribution
 BINARYDISTFILES = src/$(PACKAGE)$(EXEEXT) doc/$(PACKAGE).pdf COPYING
 
-# target to create a distribution for an operation system named OS
-# (set the variable OS by calling "make hu-binarydist OS=linux")
-hu-binarydist: clean dvi pdf binarydistreadme
+DOCFILES = doc/$(PACKAGE).pdf
+BINARYFILES = src/$(PACKAGE)$(EXEEXT) COPYING
+
+hu-docdist: dvi pdf
+	$(mkdir_p) $(BINARYDISTDIR)
+	cp $(DOCFILES) $(BINARYDISTDIR)
+	zip -9 -m -r $(BINARYDISTDIR).zip $(BINARYDISTDIR)
+	
+hu-bindist: binarydistreadme
+	make --directory=src clean
 	make --directory=src
 	$(mkdir_p) $(BINARYDISTDIR)
-	cp $(BINARYDISTFILES) $(BINARYDISTDIR)
+	cp $(BINARYFILES) $(BINARYDISTDIR)
 	mv BINARYREADME $(BINARYDISTDIR)/README
 	zip -9 -m -r $(BINARYDISTDIR).zip $(BINARYDISTDIR)
 
+# target to create a distribution for an operation system named OS
+# (set the variable OS by calling "make hu-binarydist OS=linux")
+hu-binarydist: hu-docdist hu-bindist
+
 # target to create a pure windows binary distribution
-hu-win32dist: pure-windows-executable dvi pdf binarydistreadme
-	$(mkdir_p) $(WIN32DISTDIR)
-	cp $(BINARYDISTFILES) $(WIN32DISTDIR)
-	mv BINARYREADME $(WIN32DISTDIR)/README
-	zip -9 -m -r $(WIN32DISTDIR).zip $(WIN32DISTDIR)
+hu-win32dist: pure-windows-executable
+
+

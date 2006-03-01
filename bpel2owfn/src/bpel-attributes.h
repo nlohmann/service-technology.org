@@ -35,46 +35,66 @@
 #include <map>
 #include <stack>
 
+using namespace std;
+
 /// BPEL attribute names
-const std::string A__CONDITION = "condition";
-const std::string A__ENDPOINT_REFERENCE = "endpointReference";
-const std::string A__EXPRESSION = "expression";
-const std::string A__FAULT_NAME = "faultName";
-const std::string A__FOR = "for";
-const std::string A__INPUT_VARIABLE = "inputVariable";
-const std::string A__LINK_NAME = "linkName";
-const std::string A__NAME = "name";
-const std::string A__OPERATION = "operation";
-//const std::string A__OUTPUT_VARIABLE = "outputVariable";
-const std::string A__PART = "part";
-const std::string A__PARTNER_LINK = "partnerLink";
-const std::string A__PARTNER_LINK_TYPE = "partnerLinkType";
-const std::string A__PORT_TYPE = "portType";
-const std::string A__PROPERTY = "property";
-const std::string A__PROPERTIES = "properties";
-const std::string A__QUERY = "query";
-const std::string A__SET = "set";
-const std::string A__TARGET_NAMESPACE = "targetNamespace";
-const std::string A__UNTIL = "until";
-const std::string A__VARIABLE = "variable";
+const string A__CONDITION = "condition";
+const string A__ENDPOINT_REFERENCE = "endpointReference";
+const string A__EXPRESSION = "expression";
+const string A__EXPRESSION_LANGUAGE = "expressionLanguage";
+const string A__FAULT_NAME = "faultName";
+const string A__FOR = "for";
+const string A__INPUT_VARIABLE = "inputVariable";
+const string A__LINK_NAME = "linkName";
+const string A__NAME = "name";
+const string A__OPERATION = "operation";
+//const string A__OUTPUT_VARIABLE = "outputVariable";
+const string A__PART = "part";
+const string A__PARTNER_LINK = "partnerLink";
+const string A__PARTNER_LINK_TYPE = "partnerLinkType";
+const string A__PORT_TYPE = "portType";
+const string A__PROPERTY = "property";
+const string A__PROPERTIES = "properties";
+const string A__QUERY = "query";
+const string A__QUERY_LANGUAGE = "queryLanguage";
+const string A__SET = "set";
+const string A__TARGET_NAMESPACE = "targetNamespace";
+const string A__TRANSITION_CONDITION = "transitionCondition";
+const string A__UNTIL = "until";
+const string A__VARIABLE = "variable";
+const string A__XMLNS = "xmlns";
+
 /// yes or no
 
-const std::string A__OPAQUE = "opaque";
+const string A__OPAQUE = "opaque";
 
-const std::string A__ABSTRACT_PROCESS = "abstractProcess";
-const std::string A__CREATE_INSTANCE = "createInstance";
-const std::string A__ENABLE_INSTANCE_COMPENSATION = "enableInstanceCompensation";
-const std::string A__INITIATE = "initiate";
-const std::string A__SUPPRESS_JOIN_FAILURE = "suppressJoinFailure";
-const std::string A__VARIABLE_ACCESS_SERIALIZABLE = "variableAccessSerializable";
+const string A__ABSTRACT_PROCESS = "abstractProcess";
+const string A__CREATE_INSTANCE = "createInstance";
+const string A__ENABLE_INSTANCE_COMPENSATION = "enableInstanceCompensation";
+const string A__INITIATE = "initiate";
+const string A__SUPPRESS_JOIN_FAILURE = "suppressJoinFailure";
+const string A__VARIABLE_ACCESS_SERIALIZABLE = "variableAccessSerializable";
 
 /// types of BPEL attributes
-const std::string T__NCNAME = "NCName";
-const std::string T__QNAME = "QName";
-const std::string T__ANYURI = "anyURI";
-const std::string T__DURATION_EXPR = "bpws:tDuration-expr";
-const std::string T__DEADLINE_EXPR = "bpws:tDeadline-expr";
-const std::string T__BOOLEAN_EXPR = "bpws:tBoolean-expr";
+const string T__NCNAME = "NCName";
+const string T__QNAME = "QName";
+const string T__ANYURI = "anyURI";
+const string T__DURATION_EXPR = "bpws:tDuration-expr";
+const string T__DEADLINE_EXPR = "bpws:tDeadline-expr";
+const string T__BOOLEAN_EXPR = "bpws:tBoolean-expr";
+
+/// default values of attributes
+const string DV__QUERY_LANGUAGE = "http://www.w3.org/TR/1999/REC-xpath-19991116";
+const string DV__EXPRESSION_LANGUAGE = "http://www.w3.org/TR/1999/REC-xpath-19991116";
+const string DV__SUPPRESS_JOIN_FAILURE = "no";
+const string DV__ENABLE_INSTANCE_COMPENSATION = "no";
+const string DV__ABSTRACT_PROCESS = "no";
+const string DV__XMLNS = "http://schemas.xmlsoap.org/ws/2003/03/business-process/";
+const string DV__INITIATE = "no";
+const string DV__CREATE_INSTANCE = "no";
+const string DV__VARIABLE_ACCESS_SERIALIZABLE = "no";
+const string DV__TRANSITION_CONDITION = "true";
+
 
 class SJFStackElement
 {

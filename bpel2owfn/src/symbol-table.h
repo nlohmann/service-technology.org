@@ -34,7 +34,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.13 $: 
+ * \version \$Revision: 1.14 $: 
  *
  */
 
@@ -144,9 +144,6 @@ class SymbolTable
 	
 	/// returns valid or unvalid depending on attribute already exists or not
 	bool isDuplicate(std::string attributeName);
-	
-	///
-	bool isAttributeValueEmpty(kc::integer elementId, std::string attributeName);
     
   public:
     /// constructor
@@ -172,6 +169,9 @@ class SymbolTable
 
     /// to add an attribute to the special symbol table entry
     void addAttribute(unsigned int entryKey, STAttribute* attribute);
+
+    /// wrapper for <readAttribute(unsigned int, string)> and return value from desired attribute
+    STAttribute* readAttribute(kc::integer entryKey, string name);
 
     /// return value from desired attribute
     STAttribute* readAttribute(unsigned int entryKey, string name);
@@ -336,16 +336,16 @@ class STAttribute
 {
   public:
     /// constructor
-    STAttribute(kc::casestring name, kc::casestring value);
+    STAttribute(string name, string value);
     
     ///
     ~STAttribute();
   
     /// name of attribute
-    kc::casestring name;
+    string name;
     
     /// attribute value
-    kc::casestring value;
+    string value;
     
     /// type of attribute value
     string type;

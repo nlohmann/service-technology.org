@@ -36,9 +36,11 @@
  *          for details.
  *
  * \todo
- *          - check <checkAttributes(FROM)> (special case with literals)
- *          - attention ... checkAttributes(kc::integer astId)and
+ *          - (ready) check <checkAttributes(FROM)> (special case with literals)
+ *          - (ready) attention ... checkAttributes(kc::integer astId)and
  *            checkAttributes(kc::integer entryKey) <- NEW
+ *          - (3/4) attribute value check -> empty then default value
+ *                  suppressJoinFailure is missing
  * 
  */ 
 
@@ -76,7 +78,9 @@ unsigned int SymbolTable::nextKey()
 }
 
 /*!
- * 
+ * set mapping between AST id and symbol table entry key
+ * \param entryKey  symbol table entry key
+ * \astId           id of an AST (astract syntax tree) element
  */
 void SymbolTable::setMapping(unsigned int entryKey, kc::integer astId)
 {
@@ -84,7 +88,7 @@ void SymbolTable::setMapping(unsigned int entryKey, kc::integer astId)
 }
 
 /*!
- * 
+ * \param astId  id of an AST (astract syntax tree) element
  */
 unsigned int SymbolTable::idToKey(kc::integer astId)
 {
@@ -92,7 +96,8 @@ unsigned int SymbolTable::idToKey(kc::integer astId)
 } 
 
 /*!
- * 
+ * \param astId
+ * \param closeTag 
  */
 string SymbolTable::getInformation(kc::integer astId, bool closeTag)
 {
@@ -108,7 +113,8 @@ string SymbolTable::getInformation(kc::integer astId, bool closeTag)
 }
 
 /*!
- * 
+ * retranslate the internal parse id of BPEL element to the real BPEL string
+ * \param elementId BPEL element-id
  */
 string SymbolTable::translateToElementName(unsigned int elementId)
 {
@@ -149,7 +155,8 @@ string SymbolTable::translateToElementName(unsigned int elementId)
 
 
 /*!
- * 
+ * create a new special BPEL element-object and insert these into symbol table
+ * \param elementId  BPEL element-id (e.g. K_PROCESS)
  */
 unsigned int SymbolTable::insert(unsigned int elementId)
 {
@@ -266,7 +273,8 @@ unsigned int SymbolTable::insert(unsigned int elementId)
 }
 
 /*!
- * 
+ * return symbol table entry
+ * \param entryKey  symbol table entry key
  */
 SymbolTableEntry* SymbolTable::lookup(unsigned int entryKey)
 {
@@ -275,7 +283,7 @@ SymbolTableEntry* SymbolTable::lookup(unsigned int entryKey)
 }
 
 /*!
- * 
+ * return
  */
 unsigned int SymbolTable::getCurrentEntryKey()
 {
@@ -283,120 +291,138 @@ unsigned int SymbolTable::getCurrentEntryKey()
 }
 
 /*!
- * 
+ * create a new attribute object and return a pointer of these
+ * \param name  name of attribute
+ * \param value value of attribute
  */
 STAttribute* SymbolTable::newAttribute(kc::casestring name, kc::casestring value)
 {
-  return (new STAttribute(name, value));
+  return (new STAttribute(name->name, value->name));
 }
 
 /*!
- * 
+ * add an attribute object to an existend symbol table entry
+ * \param entryKey  symbol table entry Key
+ * \param attribute attribute object
  */
 void SymbolTable::addAttribute(unsigned int entryKey, STAttribute* attribute)
 {
-  traceST("addAttribute(entryKey=" + intToString(entryKey) + ", [name=" + attribute->name->name + ", value=" + attribute->value->name + "])\n");	
+  traceST("addAttribute(entryKey=" + intToString(entryKey) + ", [name=" + attribute->name + ", value=" + attribute->value + "])\n");	
   ///
   switch((dynamic_cast <SymbolTableEntry*> (symTab[entryKey]))->elementId)
   {
     case K_COMPENSATE:
     {
 //     traceST("cast to STCompensate\n");
-      (dynamic_cast <STCompensate*> (symTab[entryKey]))->mapOfAttributes[attribute->name->name] = attribute;
+      (dynamic_cast <STCompensate*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
       break;
     }
 
     case K_INVOKE:
     {
 //      traceST("cast to STInvoke\n");
-      (dynamic_cast <STInvoke*> (symTab[entryKey]))->mapOfAttributes[attribute->name->name] = attribute;
+      (dynamic_cast <STInvoke*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
       break;
     }
     
     case K_LINK:
     {
 //      traceST("cast to STLink\n");
-      (dynamic_cast <STLink*> (symTab[entryKey]))->mapOfAttributes[attribute->name->name] = attribute;
+      (dynamic_cast <STLink*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
       break;
     }
 
     case K_PARTNER:
     {
 //      traceST("cast to STPartner\n");
-      (dynamic_cast <STPartner*> (symTab[entryKey]))->mapOfAttributes[attribute->name->name] = attribute;
+      (dynamic_cast <STPartner*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
       break;
     }
 
     case K_PARTNERLINK:
     {
 //      traceST("cast to STPartnerLink\n");
-      (dynamic_cast <STPartnerLink*> (symTab[entryKey]))->mapOfAttributes[attribute->name->name] = attribute;
+      (dynamic_cast <STPartnerLink*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
       break;
     }
 
     case K_PROCESS:
     {
 //      traceST("cast to STProcess\n");
-      (dynamic_cast <STProcess*> (symTab[entryKey]))->mapOfAttributes[attribute->name->name] = attribute;
+      (dynamic_cast <STProcess*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
       break;
     }
 
     case K_RECEIVE:
     {
 //      traceST("cast to STReceive\n");
-      (dynamic_cast <STReceive*> (symTab[entryKey]))->mapOfAttributes[attribute->name->name] = attribute;
+      (dynamic_cast <STReceive*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
       break;
     }
 
     case K_REPLY:
     {
 //      traceST("cast to STReply\n");
-      (dynamic_cast <STReply*> (symTab[entryKey]))->mapOfAttributes[attribute->name->name] = attribute;
+      (dynamic_cast <STReply*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
       break;
     }
         
     case K_SCOPE:
     {
 //      traceST("cast to STScope\n");
-      (dynamic_cast <STScope*> (symTab[entryKey]))->mapOfAttributes[attribute->name->name] = attribute;
+      (dynamic_cast <STScope*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
       break;
     }    
 
     case K_TERMINATE:
     {
 //      traceST("cast to STTerminate\n");
-      (dynamic_cast <STTerminate*> (symTab[entryKey]))->mapOfAttributes[attribute->name->name] = attribute;
+      (dynamic_cast <STTerminate*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
       break;
     }
     
     case K_VARIABLE:
     {
 //      traceST("cast to STProcess\n");
-      (dynamic_cast <STVariable*> (symTab[entryKey]))->mapOfAttributes[attribute->name->name] = attribute;
+      (dynamic_cast <STVariable*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
       break;
     }
 
     case K_WAIT:
     {
 //      traceST("cast to STWait\n");
-      (dynamic_cast <STWait*> (symTab[entryKey]))->mapOfAttributes[attribute->name->name] = attribute;
+      (dynamic_cast <STWait*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
       break;
     }
 
     default:
     { /* cast to Activity */
 //      traceST("cast to STActivity\n");    	
-      (dynamic_cast <STActivity*> (symTab[entryKey]))->mapOfAttributes[attribute->name->name] = attribute;
+      (dynamic_cast <STActivity*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
       break;
     }
   }
 }
 
 /*!
- * 
+ * wrapper
+ * \param entryKey
+ * \param name
+ */
+STAttribute* SymbolTable::readAttribute(kc::integer entryKey, string name)
+{
+  return readAttribute(entryKey->value, name);
+}
+
+/*!
+ * returns a pointer of an attribute object
+ * \param entryKey  symbol table entry key
+ * \param name      name of attribute 
  */
 STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
 {
+  traceST("readAttribute(entryKey=" + intToString(entryKey) + ", name=" + name + ")\n");
+  
   ///
   switch((dynamic_cast <SymbolTableEntry*> (symTab[entryKey]))->elementId)
   {
@@ -404,91 +430,177 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
     {
 //      traceST("cast to STCompensate\n");
       return (dynamic_cast <STCompensate*> (symTab[entryKey]))->mapOfAttributes[name];
-      break;
+    }
+
+    case K_CORRELATION:
+    {
+//      traceST("cast to STActivity Correlation\n");
+      STAttribute* attribute = (dynamic_cast <STActivity*> (symTab[entryKey]))->mapOfAttributes[name];
+	  
+	  /// if attribute value empty then set default value
+      if(attribute->value.empty())
+      {
+      	if(attribute->name == A__INITIATE)
+      	{
+      	  attribute->name = DV__INITIATE;
+      	}
+      }
+      return attribute;
     }
 
     case K_INVOKE:
     {
 //      traceST("cast to STInvoke\n");
       return (dynamic_cast <STInvoke*> (symTab[entryKey]))->mapOfAttributes[name];
-      break;
     }
 
     case K_LINK:
     {
 //      traceST("cast to STLink\n");
       return (dynamic_cast <STLink*> (symTab[entryKey]))->mapOfAttributes[name];
-      break;
     }
 
     case K_PARTNER:
     {
 //      traceST("cast to STPartner\n");
       return (dynamic_cast <STPartner*> (symTab[entryKey]))->mapOfAttributes[name];
-      break;
     }
 
     case K_PARTNERLINK:
     {
 //      traceST("cast to STPartnerLink\n");
       return (dynamic_cast <STPartnerLink*> (symTab[entryKey]))->mapOfAttributes[name];
-      break;
+    }
+
+    case K_PICK:
+    {
+//      traceST("cast to STActivity Pick\n");
+      STAttribute* attribute = (dynamic_cast <STActivity*> (symTab[entryKey]))->mapOfAttributes[name];
+	  
+	  /// if attribute value empty then set default value
+      if(attribute->value.empty())
+      {
+      	if(attribute->name == A__CREATE_INSTANCE)
+      	{
+      	  attribute->name = DV__CREATE_INSTANCE;
+      	}
+      }
+      return attribute;
     }
 
     case K_PROCESS:
     {
 //      traceST("cast to STProcess\n");
-      return (dynamic_cast <STProcess*> (symTab[entryKey]))->mapOfAttributes[name];
-      break;
+      STAttribute* attribute = (dynamic_cast <STProcess*> (symTab[entryKey]))->mapOfAttributes[name];
+	  
+	  /// if attribute value empty then set default value
+      if(attribute->value.empty())
+      {
+      	if(attribute->name == A__QUERY_LANGUAGE)
+      	{
+      	  attribute->name = DV__QUERY_LANGUAGE;
+      	}
+      	else if(attribute->name == A__EXPRESSION_LANGUAGE)
+      	{
+      	  attribute->name = DV__EXPRESSION_LANGUAGE;
+      	}
+      	else if(attribute->name == A__SUPPRESS_JOIN_FAILURE)
+      	{
+      	  attribute->name = DV__SUPPRESS_JOIN_FAILURE;
+      	}
+      	else if(attribute->name == A__ENABLE_INSTANCE_COMPENSATION)
+      	{
+          attribute->name = DV__ENABLE_INSTANCE_COMPENSATION;
+      	}
+      	else if(attribute->name == A__ABSTRACT_PROCESS)
+      	{
+      	  attribute->name = DV__ABSTRACT_PROCESS;
+      	}
+      	else if(attribute->name == A__XMLNS)
+      	{ 
+      	  attribute->name = DV__XMLNS;
+      	}	      	
+      }
+
+      return attribute;
     }
 
     case K_RECEIVE:
     {
 //      traceST("cast to STReceive\n");
-      return (dynamic_cast <STReceive*> (symTab[entryKey]))->mapOfAttributes[name];
-      break;
+      STAttribute* attribute = (dynamic_cast <STReceive*> (symTab[entryKey]))->mapOfAttributes[name];
+	  
+	  /// if attribute value empty then set default value
+      if(attribute->value.empty())
+      {
+      	if(attribute->name == A__CREATE_INSTANCE)
+      	{
+      	  attribute->name = DV__CREATE_INSTANCE;
+      	}
+      }
+      return attribute;
     }
     
     case K_REPLY:
     {
 //      traceST("cast to STReply\n");
       return (dynamic_cast <STReply*> (symTab[entryKey]))->mapOfAttributes[name];
-      break;
     }
    
     case K_SCOPE:
     {
 //      traceST("cast to STScope\n");
-      return (dynamic_cast <STScope*> (symTab[entryKey]))->mapOfAttributes[name];
-      break;
+      STAttribute* attribute = (dynamic_cast <STScope*> (symTab[entryKey]))->mapOfAttributes[name];
+	  
+	  /// if attribute value empty then set default value
+      if(attribute->value.empty())
+      {
+      	if(attribute->name == A__VARIABLE_ACCESS_SERIALIZABLE)
+      	{
+      	  attribute->name = DV__VARIABLE_ACCESS_SERIALIZABLE;
+      	}
+      }
+      return attribute;
     }    
+
+    case K_SOURCE:
+    {
+//      traceST("cast to STActivity Source\n");
+      STAttribute* attribute = (dynamic_cast <STActivity*> (symTab[entryKey]))->mapOfAttributes[name];
+	  
+	  /// if attribute value empty then set default value
+      if(attribute->value.empty())
+      {
+      	if(attribute->name == A__TRANSITION_CONDITION)
+      	{
+      	  attribute->name = DV__TRANSITION_CONDITION;
+      	}
+      }
+      return attribute;
+    }
 
     case K_TERMINATE:
     {
 //      traceST("cast to STTerminate\n");
       return (dynamic_cast <STTerminate*> (symTab[entryKey]))->mapOfAttributes[name];
-      break;
     }
 
     case K_VARIABLE:
     {
 //      traceST("cast to STPartnerLink\n");
       return (dynamic_cast <STVariable*> (symTab[entryKey]))->mapOfAttributes[name];
-      break;
     }
     
     case K_WAIT:
     {
 //      traceST("cast to STWait\n");
       return (dynamic_cast <STWait*> (symTab[entryKey]))->mapOfAttributes[name];
-      break;
     }
     
     default:
     { /* cast to Activity */
 //      traceST("cast to STActivity\n");    	
       return (dynamic_cast <STActivity*> (symTab[entryKey]))->mapOfAttributes[name];
-      break;
     }
   }
 } 
@@ -1639,7 +1751,7 @@ STActivity::~STActivity() {}
 /*!
  * constructor
  */
-STAttribute::STAttribute(kc::casestring name, kc::casestring value)
+STAttribute::STAttribute(string name, string value)
 {
   this->name = name;
   this->value = value;

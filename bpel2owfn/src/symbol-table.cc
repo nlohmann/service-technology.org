@@ -301,6 +301,78 @@ STAttribute* SymbolTable::newAttribute(kc::casestring name, kc::casestring value
 }
 
 /*!
+ * yes-no domain check
+ * \param attributeName
+ * \param attributeValue 
+ */
+void SymbolTable::checkAttributeValueYesNo(string attributeName, string attributeValue)
+{
+  if((attributeValue != (string)"yes") && (attributeValue != (string)"no"))
+  {
+    printErrorMsg("wrong value of " + attributeName + " attribute");
+  }
+}
+
+/*!
+ * returns valid or unvalid depending on attribute value
+ * \param attributeName
+ * \param attributeValue 
+ */
+bool SymbolTable::isValidAttributeValue(string attributeName, string attributeValue)
+{
+  /// check all attributes with yes or no domain
+  if(attributeName == A__ABSTRACT_PROCESS)
+  {
+    checkAttributeValueYesNo(attributeName, attributeValue);
+  }
+  else if(attributeName == A__CREATE_INSTANCE)
+  {
+    checkAttributeValueYesNo(attributeName, attributeValue);
+  }
+  else if(attributeName == A__ENABLE_INSTANCE_COMPENSATION)
+  {
+    checkAttributeValueYesNo(attributeName, attributeValue);
+  }
+  else if(attributeName == A__INITIATE)
+  {
+    checkAttributeValueYesNo(attributeName, attributeValue);
+  }
+  else if(attributeName == A__SUPPRESS_JOIN_FAILURE)
+  {
+    checkAttributeValueYesNo(attributeName, attributeValue);
+  }
+  else if(attributeName == A__VARIABLE_ACCESS_SERIALIZABLE)
+  {
+    checkAttributeValueYesNo(attributeName, attributeValue);
+  }
+  
+  return true;
+}
+
+/*!
+ * this function checks whether the submitted name of attribute already element
+ * of the attribute-name-set of the current BPEL-element is.
+ * \param attributeName name of BPEL-element attribute
+ */
+bool SymbolTable::isDuplicate(string attributeName)
+{
+/*  std::map<std::string, std::string>::iterator scannerResultDataIterator;
+  scannerResultDataIterator = this->scannerResult[this->nodeId].begin();
+  
+  /// iteration loop about all xml-element attributes
+  while(scannerResultDataIterator != this->scannerResult[this->nodeId].end())
+  {
+    if(attributeName.compare((*scannerResultDataIterator).first) == 0)
+    {
+      return true;
+    }
+    ++scannerResultDataIterator;
+  }*/
+  return false;
+}
+
+
+/*!
  * add an attribute object to an existend symbol table entry
  * \param entryKey  symbol table entry Key
  * \param attribute attribute object
@@ -415,7 +487,8 @@ STAttribute* SymbolTable::readAttribute(kc::integer entryKey, string name)
 }
 
 /*!
- * returns a pointer of an attribute object
+ * return a pointer of an attribute object,
+ * doesn't exist an desired attribute then to create a new attribute with default value or empty string
  * \param entryKey  symbol table entry key
  * \param name      name of attribute 
  */
@@ -429,13 +502,19 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
     case K_COMPENSATE:
     {
 //      traceST("cast to STCompensate\n");
-      return (dynamic_cast <STCompensate*> (symTab[entryKey]))->mapOfAttributes[name];
+      STAttribute* attribute = (dynamic_cast <STCompensate*> (symTab[entryKey]))->mapOfAttributes[name];
+
+	  if(attribute == NULL) attribute = new STAttribute(name,"");
+
+      return attribute;
     }
 
     case K_CORRELATION:
     {
 //      traceST("cast to STActivity Correlation\n");
       STAttribute* attribute = (dynamic_cast <STActivity*> (symTab[entryKey]))->mapOfAttributes[name];
+	  
+	  if(attribute == NULL) attribute = new STAttribute(name,"");	  
 	  
 	  /// if attribute value empty then set default value
       if(attribute->value.empty())
@@ -451,31 +530,49 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
     case K_INVOKE:
     {
 //      traceST("cast to STInvoke\n");
-      return (dynamic_cast <STInvoke*> (symTab[entryKey]))->mapOfAttributes[name];
+      STAttribute* attribute = (dynamic_cast <STInvoke*> (symTab[entryKey]))->mapOfAttributes[name];
+
+	  if(attribute == NULL) attribute = new STAttribute(name,"");
+
+      return attribute;
     }
 
     case K_LINK:
     {
 //      traceST("cast to STLink\n");
-      return (dynamic_cast <STLink*> (symTab[entryKey]))->mapOfAttributes[name];
+      STAttribute* attribute = (dynamic_cast <STLink*> (symTab[entryKey]))->mapOfAttributes[name];
+
+	  if(attribute == NULL) attribute = new STAttribute(name,"");
+
+      return attribute;
     }
 
     case K_PARTNER:
     {
 //      traceST("cast to STPartner\n");
-      return (dynamic_cast <STPartner*> (symTab[entryKey]))->mapOfAttributes[name];
+      STAttribute* attribute = (dynamic_cast <STPartner*> (symTab[entryKey]))->mapOfAttributes[name];
+
+	  if(attribute == NULL) attribute = new STAttribute(name,"");
+
+      return attribute;
     }
 
     case K_PARTNERLINK:
     {
 //      traceST("cast to STPartnerLink\n");
-      return (dynamic_cast <STPartnerLink*> (symTab[entryKey]))->mapOfAttributes[name];
+      STAttribute* attribute = (dynamic_cast <STPartnerLink*> (symTab[entryKey]))->mapOfAttributes[name];
+
+	  if(attribute == NULL) attribute = new STAttribute(name,"");
+
+      return attribute;
     }
 
     case K_PICK:
     {
 //      traceST("cast to STActivity Pick\n");
       STAttribute* attribute = (dynamic_cast <STActivity*> (symTab[entryKey]))->mapOfAttributes[name];
+
+	  if(attribute == NULL) attribute = new STAttribute(name,"");
 	  
 	  /// if attribute value empty then set default value
       if(attribute->value.empty())
@@ -492,6 +589,8 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
     {
 //      traceST("cast to STProcess\n");
       STAttribute* attribute = (dynamic_cast <STProcess*> (symTab[entryKey]))->mapOfAttributes[name];
+	  
+	  if(attribute == NULL) attribute = new STAttribute(name,"");
 	  
 	  /// if attribute value empty then set default value
       if(attribute->value.empty())
@@ -530,6 +629,8 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
 //      traceST("cast to STReceive\n");
       STAttribute* attribute = (dynamic_cast <STReceive*> (symTab[entryKey]))->mapOfAttributes[name];
 	  
+	  if(attribute == NULL) attribute = new STAttribute(name,"");	  
+	  
 	  /// if attribute value empty then set default value
       if(attribute->value.empty())
       {
@@ -544,13 +645,19 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
     case K_REPLY:
     {
 //      traceST("cast to STReply\n");
-      return (dynamic_cast <STReply*> (symTab[entryKey]))->mapOfAttributes[name];
+      STAttribute* attribute = (dynamic_cast <STReply*> (symTab[entryKey]))->mapOfAttributes[name];
+
+	  if(attribute == NULL) attribute = new STAttribute(name,"");
+
+      return attribute;
     }
    
     case K_SCOPE:
     {
 //      traceST("cast to STScope\n");
       STAttribute* attribute = (dynamic_cast <STScope*> (symTab[entryKey]))->mapOfAttributes[name];
+
+	  if(attribute == NULL) attribute = new STAttribute(name,"");
 	  
 	  /// if attribute value empty then set default value
       if(attribute->value.empty())
@@ -567,6 +674,8 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
     {
 //      traceST("cast to STActivity Source\n");
       STAttribute* attribute = (dynamic_cast <STActivity*> (symTab[entryKey]))->mapOfAttributes[name];
+
+	  if(attribute == NULL) attribute = new STAttribute(name,"");
 	  
 	  /// if attribute value empty then set default value
       if(attribute->value.empty())
@@ -582,25 +691,41 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
     case K_TERMINATE:
     {
 //      traceST("cast to STTerminate\n");
-      return (dynamic_cast <STTerminate*> (symTab[entryKey]))->mapOfAttributes[name];
+      STAttribute* attribute = (dynamic_cast <STTerminate*> (symTab[entryKey]))->mapOfAttributes[name];
+
+	  if(attribute == NULL) attribute = new STAttribute(name,"");
+
+      return attribute;
     }
 
     case K_VARIABLE:
     {
 //      traceST("cast to STPartnerLink\n");
-      return (dynamic_cast <STVariable*> (symTab[entryKey]))->mapOfAttributes[name];
+      STAttribute* attribute = (dynamic_cast <STVariable*> (symTab[entryKey]))->mapOfAttributes[name];
+
+	  if(attribute == NULL) attribute = new STAttribute(name,"");
+
+      return attribute;
     }
     
     case K_WAIT:
     {
 //      traceST("cast to STWait\n");
-      return (dynamic_cast <STWait*> (symTab[entryKey]))->mapOfAttributes[name];
+      STAttribute* attribute = (dynamic_cast <STWait*> (symTab[entryKey]))->mapOfAttributes[name];
+
+	  if(attribute == NULL) attribute = new STAttribute(name,"");
+
+      return attribute;
     }
     
     default:
     { /* cast to Activity */
 //      traceST("cast to STActivity\n");    	
-      return (dynamic_cast <STActivity*> (symTab[entryKey]))->mapOfAttributes[name];
+      STAttribute* attribute = (dynamic_cast <STActivity*> (symTab[entryKey]))->mapOfAttributes[name];
+
+	  if(attribute == NULL) attribute = new STAttribute(name,"");
+
+      return attribute;
     }
   }
 } 

@@ -34,7 +34,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.14 $: 
+ * \version \$Revision: 1.15 $: 
  *
  */
 
@@ -137,13 +137,13 @@ class SymbolTable
 	 ***/
 	
 	/// domain check
-	void checkAttributeValueYesNo(std::string attributeName, std::string attributeValue);	
+	void checkAttributeValueYesNo(string attributeName, string attributeValue);	
 	
 	/// returns valid or unvalid depending on attribute value
-	bool isValidAttributeValue(std::string attributeName, std::string attributeValue);
+	bool isValidAttributeValue(string attributeName, string attributeValue);
 	
 	/// returns valid or unvalid depending on attribute already exists or not
-	bool isDuplicate(std::string attributeName);
+	bool isDuplicate(string attributeName);
     
   public:
     /// constructor
@@ -171,13 +171,13 @@ class SymbolTable
     void addAttribute(unsigned int entryKey, STAttribute* attribute);
 
     /// wrapper for <readAttribute(unsigned int, string)> and return value from desired attribute
-    STAttribute* readAttribute(kc::integer entryKey, string name);
+    STAttribute* readAttribute(kc::integer entryKey, string attributeName);
 
     /// return value from desired attribute
-    STAttribute* readAttribute(unsigned int entryKey, string name);
+    STAttribute* readAttribute(unsigned int entryKey, string attributeName);
     
     /// create a new attribute
-    STAttribute* newAttribute(kc::casestring name, kc::casestring value);
+    STAttribute* newAttribute(kc::casestring attributeName, kc::casestring attributeValue);
     
     /// wrapper for checkAttributes(unsigned int entryKey, kc::casestring bpelElementValue)
 	void checkAttributes(kc::integer entryKey, kc::casestring bpelElementValue);
@@ -197,7 +197,7 @@ class SymbolTable
     /// mapping between AST Id and symbol table entries
     void setMapping(unsigned int entryKey, kc::integer astId);
   
-    /// return
+    /// return symbol table information string
     string getInformation(kc::integer astId, bool closeTag = false);
 };
 
@@ -214,7 +214,7 @@ class SymbolTableEntry
     /// entry key within symbol table
     unsigned int entryKey;
 
-    /// BPEL-element Id, used for cast decision
+    /// BPEL-element Id, e.g. used for cast decision
     unsigned int elementId;
     
     /// contructor
@@ -338,7 +338,7 @@ class STAttribute
     /// constructor
     STAttribute(string name, string value);
     
-    ///
+    /// destructor
     ~STAttribute();
   
     /// name of attribute

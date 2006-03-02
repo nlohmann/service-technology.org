@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/02/24 13:37:59 $
+ *          - last changed: \$Date: 2006/03/02 19:13:01 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.127 $
+ * \version \$Revision: 1.128 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -228,8 +228,11 @@ int hasCompensate;
 %type <yt_integer> genSymTabEntry_Process
 %type <yt_integer> genSymTabEntry_PartnerLink
 %type <yt_integer> genSymTabEntry_Partner
+%type <yt_integer> genSymTabEntry_FaultHandlers
 %type <yt_integer> genSymTabEntry_Catch
 %type <yt_integer> genSymTabEntry_CatchAll
+%type <yt_integer> genSymTabEntry_CompensationHandler
+%type <yt_integer> genSymTabEntry_EventHandlers
 %type <yt_integer> genSymTabEntry_OnMessage
 %type <yt_integer> genSymTabEntry_OnAlarm
 %type <yt_integer> genSymTabEntry_Variable
@@ -341,7 +344,9 @@ tProcess:
     { TheProcess = $$ = Process($8, $9, $10, $11, $12, $13, $14, StopInProcess(), $15);
       symMan.quitScope();
       $$->name = att.read($4, "name");
+      //symTab.traceST(string(symTab.readAttribute($3,"abstractProcess")->name));
       $$->targetNamespace = att.read($4, "targetNamespace");
+      //symTab.traceST("\t\t\t\t HALLO " + string((att.read($4, "abstractProcess")->name)) + "\n");      
       $$->queryLanguage = att.read($4, "queryLanguage", $$->queryLanguage);
       $$->expressionLanguage = att.read($4, "expressionLanguage", $$->expressionLanguage);
       $$->suppressJoinFailure = att.read($4, "suppressJoinFailure", $$->suppressJoinFailure);
@@ -608,12 +613,13 @@ genSymTabEntry_Partner:
 
 tFaultHandlers:
   /* empty */
-    { $$ = implicitFaultHandler();
+    { currentSymTabEntryKey = symTab.insert(K_FAULTHANDLERS);
+      $$ = implicitFaultHandler();
       $$->inProcess = (currentScopeId->value == 1);
       $$->parentScopeId = currentScopeId; 
       $$->hasCatchAll = false;
     }
-| K_FAULTHANDLERS X_NEXT 
+| K_FAULTHANDLERS genSymTabEntry_FaultHandlers X_NEXT 
     {
       symMan.startDPEinWhile();
       isInFH.push(true);
@@ -622,7 +628,7 @@ tFaultHandlers:
   tCatch_list  
   tCatchAll 
   X_SLASH K_FAULTHANDLERS X_NEXT
-    { $$ = userDefinedFaultHandler($4, $5);
+    { $$ = userDefinedFaultHandler($5, $6);
       $$->inProcess = (currentScopeId->value == 1);
       $$->parentScopeId = currentScopeId;
       $$->hasCatchAll = hasCatchAll;
@@ -630,6 +636,12 @@ tFaultHandlers:
       hasCompensate = 0;
       symMan.endDPEinWhile();
     }
+;
+
+genSymTabEntry_FaultHandlers:
+  { currentSymTabEntryKey = symTab.insert(K_FAULTHANDLERS);
+    $$ = mkinteger(currentSymTabEntryKey);
+  }
 ;
 
 tCatch_list:
@@ -695,12 +707,13 @@ genSymTabEntry_CatchAll:
 
 tCompensationHandler:
   /* empty */
-    { if (currentScopeId->value == 1)
+    { currentSymTabEntryKey = symTab.insert(K_COMPENSATIONHANDLER);
+      if (currentScopeId->value == 1)
         $$ = processCompensationHandler();
       else
         $$ = implicitCompensationHandler();
       $$->parentScopeId = currentScopeId; }
-| K_COMPENSATIONHANDLER X_NEXT 
+| K_COMPENSATIONHANDLER genSymTabEntry_CompensationHandler X_NEXT 
     {
       symMan.startDPEinWhile();
       isInCH.push(pair<bool,int>(true,hasCompensate));
@@ -711,7 +724,7 @@ tCompensationHandler:
     { if (currentScopeId->value == 1)
         $$ = processCompensationHandler();
       else
-        $$ = userDefinedCompensationHandler($4);
+        $$ = userDefinedCompensationHandler($5);
 
       switch ( hasCompensate ) {
         case 1 : $$->compensateWithoutScope = true;
@@ -730,6 +743,12 @@ tCompensationHandler:
       $$->parentScopeId = currentScopeId; 
       symMan.endDPEinWhile();
     }
+;
+
+genSymTabEntry_CompensationHandler:
+  { currentSymTabEntryKey = symTab.insert(K_COMPENSATIONHANDLER);
+    $$ = mkinteger(currentSymTabEntryKey);
+  }
 ;
 
 /******************************************************************************
@@ -760,19 +779,26 @@ tCompensationHandler:
 
 tEventHandlers:
   /* empty */
-    { $$ = implicitEventHandler();
+    { currentSymTabEntryKey = symTab.insert(K_EVENTHANDLERS);
+      $$ = implicitEventHandler();
       $$->parentScopeId = currentScopeId; }
-| K_EVENTHANDLERS X_NEXT 
+| K_EVENTHANDLERS genSymTabEntry_EventHandlers X_NEXT 
     {
       symMan.startDPEinWhile();
     }
   tOnMessage_list 
   tOnAlarm_list 
   X_SLASH K_EVENTHANDLERS X_NEXT
-    { $$ = userDefinedEventHandler($4, $5);
+    { $$ = userDefinedEventHandler($5, $6);
       $$->parentScopeId = currentScopeId; 
       symMan.endDPEinWhile();
     }
+;
+
+genSymTabEntry_EventHandlers:
+  { currentSymTabEntryKey = symTab.insert(K_EVENTHANDLERS);
+    $$ = mkinteger(currentSymTabEntryKey);
+  }
 ;
 
 tOnMessage_list:
@@ -1661,7 +1687,9 @@ tCopy_list:
 
 tCopy:
   K_COPY X_NEXT tFrom X_NEXT tTo X_NEXT X_SLASH K_COPY
-    { $$ = Copy($3, $5); }
+    { currentSymTabEntryKey = symTab.insert(K_COPY);
+      $$ = Copy($3, $5);
+    }
 ; 
 
 /*

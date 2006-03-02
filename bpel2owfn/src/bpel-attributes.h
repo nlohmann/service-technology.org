@@ -78,6 +78,7 @@ const string A__VARIABLE_ACCESS_SERIALIZABLE = "variableAccessSerializable";
 /// types of BPEL attributes
 const string T__NCNAME = "NCName";
 const string T__QNAME = "QName";
+const string T__QNAME_LIST = "QName-List";
 const string T__ANYURI = "anyURI";
 const string T__DURATION_EXPR = "bpws:tDuration-expr";
 const string T__DEADLINE_EXPR = "bpws:tDeadline-expr";

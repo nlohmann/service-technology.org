@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.16 $: 
+ * \version \$Revision: 1.17 $: 
  *
  */
 
@@ -358,9 +358,16 @@ class STAttribute
  * Everything about <compensationHandler>.
  * 
  */
-class STCompensationHandler
+class STCompensationHandler: public STElement, public SymbolTableEntry
 {
   public:
+    /// constructor
+    STCompensationHandler();
+    STCompensationHandler(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STCompensationHandler();
+
     /// true if compensation handler encloses an <compensate/> activity
     bool hasCompensateWithoutScope;
 
@@ -379,9 +386,15 @@ class STCompensationHandler
  * \brief
  * 
  */
-class STCorrelationSet: public STElement
+class STCorrelationSet: public STElement, public SymbolTableEntry
 {
   public:
+    /// constructor
+    STCorrelationSet();
+    STCorrelationSet(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STCorrelationSet();
 };
 
 
@@ -426,9 +439,15 @@ class STEnvelope
  * Everything about <eventHandlers>.
  * 
  */
-class STEventHandlers
+class STEventHandlers: public STElement, public SymbolTableEntry
 {
   public:
+    /// constructor
+    STEventHandlers();
+    STEventHandlers(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STEventHandlers();
 };
 
 
@@ -440,9 +459,16 @@ class STEventHandlers
  * Everything about <faultHandlers>.
  * 
  */
-class STFaultHandlers
+class STFaultHandlers: public STElement, public SymbolTableEntry
 {
   public:
+    /// constructor
+    STFaultHandlers();
+    STFaultHandlers(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STFaultHandlers();
+
     /// true if fault handler has an <catchAll> branch
     bool hasCatchAll;
 

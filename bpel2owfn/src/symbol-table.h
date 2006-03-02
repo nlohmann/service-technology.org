@@ -21,20 +21,22 @@
 /*!
  * \file symbol-table.h
  *
- * \brief
+ * \brief   Central storage for all parsed BPEL activities and whose datas.
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
  *          - last changes of: \$Author: reinert $
  *          
  * \date
+ *          - created:
+ *          - last changed:
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.15 $: 
+ * \version \$Revision: 1.16 $: 
  *
  */
 
@@ -108,7 +110,7 @@ class STElement
 /**
  * \class	SymbolTable
  *
- * \brief
+ * \brief   - administrated the central storage for all parsed BPEL activities and whose datas 
  * 
  */
 class SymbolTable
@@ -128,13 +130,6 @@ class SymbolTable
 
     /// return retranslation from elementId to BPEL-element name, e.g. K_ASSIGN->"assign"
     string translateToElementName(unsigned int elementId);
-
-	/***
-	 *
-	 *   help functions and methods for attribute check
-	 * 
-	 * 
-	 ***/
 	
 	/// domain check
 	void checkAttributeValueYesNo(string attributeName, string attributeValue);	
@@ -143,7 +138,7 @@ class SymbolTable
 	bool isValidAttributeValue(string attributeName, string attributeValue);
 	
 	/// returns valid or unvalid depending on attribute already exists or not
-	bool isDuplicate(string attributeName);
+	bool isDuplicate(unsigned int entryKey, STAttribute* attribute);
     
   public:
     /// constructor
@@ -205,7 +200,7 @@ class SymbolTable
 /**
  * \class	SymbolTableEntry
  *
- * \brief the grandmother
+ * \brief
  * 
  */
 class SymbolTableEntry

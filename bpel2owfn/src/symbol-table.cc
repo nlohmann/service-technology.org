@@ -153,7 +153,6 @@ string SymbolTable::translateToElementName(unsigned int elementId)
 } 
 
 
-
 /*!
  * create a new special BPEL element-object and insert these into symbol table
  * \param elementId  BPEL element-id (e.g. K_PROCESS)
@@ -163,113 +162,23 @@ unsigned int SymbolTable::insert(unsigned int elementId)
   traceST("insert(" + translateToElementName(elementId) + ")\n");
   switch(elementId)
   {
-    case K_COMPENSATE:
-    {
-//      traceST("COMPENSATE\n");
-      symTab[this->nextKey()] = new STCompensate(elementId, this->entryKey);
-//      traceST("--> " + intToString(this->entryKey) + "\n");
-    }
-    break;
-
-    case K_INVOKE:
-    {
-//      traceST("INVOKE\n");
-      symTab[this->nextKey()] = new STInvoke(elementId, this->entryKey);
-//      traceST("--> " + intToString(this->entryKey) + "\n");
-    }
-    break;
-
-    case K_LINK:
-    {
-//      traceST("LINK\n");
-      symTab[this->nextKey()] = new STLink(elementId, this->entryKey);
-//      traceST("--> " + intToString(this->entryKey) + "\n");
-    }
-    break;
-
-    case K_PARTNER:
-    {
-//      traceST("PARTNER\n");
-      symTab[this->nextKey()] = new STPartner(elementId, this->entryKey);
-//      traceST("--> " + intToString(this->entryKey) + "\n");
-    }
-    break;
-
-    case K_PARTNERLINK:
-    {
-//      traceST("PARTNERLINK\n");
-      symTab[this->nextKey()] = new STPartnerLink(elementId, this->entryKey);
-//      traceST("--> " + intToString(this->entryKey) + "\n");
-    }
-    break;
-
-    case K_PROCESS:
-    {
-//      traceST("PROCESS\n");
-      symTab[this->nextKey()] = new STProcess(elementId, this->entryKey);
-//      traceST("--> " + intToString(this->entryKey) + "\n");
-    }
-    break;
-
-    case K_RECEIVE:
-    {
-//      traceST("RECEIVE\n");
-      symTab[this->nextKey()] = new STReceive(elementId, this->entryKey);
-//      traceST("--> " + intToString(this->entryKey) + "\n");
-    }
-    break;
-
-    case K_REPLY:
-    {
-//      traceST("REPLY\n");
-      symTab[this->nextKey()] = new STReply(elementId, this->entryKey);
-//      traceST("--> " + intToString(this->entryKey) + "\n");
-    }
-    break;
-  
-    case K_SCOPE:
-    {
-//      traceST("Scope\n");
-      symTab[this->nextKey()] = new STScope(elementId, this->entryKey);
-//      traceST("--> " + intToString(this->entryKey) + "\n");      
-    }
-    break;
-
-    case K_TERMINATE:
-    {
-//      traceST("TERMINATE\n");
-      symTab[this->nextKey()] = new STTerminate(elementId, this->entryKey);
-//      traceST("--> " + intToString(this->entryKey) + "\n");
-    }
-    break;
-    
-    case K_VARIABLE:
-    {
-//      traceST("VARIABLE\n");
-      symTab[this->nextKey()] = new STVariable(elementId, this->entryKey);
-//      traceST("--> " + intToString(this->entryKey) + "\n");
-    }
-    break;
-
-    case K_WAIT:
-    {
-//      traceST("WAIT\n");
-      symTab[this->nextKey()] = new STWait(elementId, this->entryKey);
-//      traceST("--> " + intToString(this->entryKey) + "\n");
-    }
-    break;
-
-    default : /* activities */
-    {
-//      traceST("activities\n");
-      symTab[this->nextKey()] = new STActivity(elementId, this->entryKey);
-//      traceST("--> " + intToString(this->entryKey) + "\n");      
-    }
-    break;
+    case K_COMPENSATE:   {symTab[this->nextKey()] = new STCompensate(elementId, this->entryKey);} break;
+    case K_INVOKE:       {symTab[this->nextKey()] = new STInvoke(elementId, this->entryKey);} break;
+    case K_LINK:         {symTab[this->nextKey()] = new STLink(elementId, this->entryKey);} break;
+    case K_PARTNER:      {symTab[this->nextKey()] = new STPartner(elementId, this->entryKey);} break;
+    case K_PARTNERLINK:  {symTab[this->nextKey()] = new STPartnerLink(elementId, this->entryKey);} break;
+    case K_PROCESS:      {symTab[this->nextKey()] = new STProcess(elementId, this->entryKey);} break;
+    case K_RECEIVE:      {symTab[this->nextKey()] = new STReceive(elementId, this->entryKey);} break;
+    case K_REPLY:        {symTab[this->nextKey()] = new STReply(elementId, this->entryKey);} break;
+    case K_SCOPE:        {symTab[this->nextKey()] = new STScope(elementId, this->entryKey);} break;
+    case K_TERMINATE:    {symTab[this->nextKey()] = new STTerminate(elementId, this->entryKey);} break;
+    case K_VARIABLE:     {symTab[this->nextKey()] = new STVariable(elementId, this->entryKey);} break;
+    case K_WAIT:         {symTab[this->nextKey()] = new STWait(elementId, this->entryKey);} break;
+    /* all other activities */
+    default :            {symTab[this->nextKey()] = new STActivity(elementId, this->entryKey);} break;
   }
   
   return this->entryKey;
-
 }
 
 /*!
@@ -354,20 +263,25 @@ bool SymbolTable::isValidAttributeValue(string attributeName, string attributeVa
  * of the attribute-name-set of the current BPEL-element is.
  * \param attributeName name of BPEL-element attribute
  */
-bool SymbolTable::isDuplicate(string attributeName)
+bool SymbolTable::isDuplicate(unsigned int entryKey, STAttribute* attribute)
 {
-/*  std::map<std::string, std::string>::iterator scannerResultDataIterator;
-  scannerResultDataIterator = this->scannerResult[this->nodeId].begin();
-  
-  /// iteration loop about all xml-element attributes
-  while(scannerResultDataIterator != this->scannerResult[this->nodeId].end())
-  {
-    if(attributeName.compare((*scannerResultDataIterator).first) == 0)
+  /// pointer of attribute map
+  std::map<string, STAttribute*>* mapOfAttributes;
+  mapOfAttributes = &((dynamic_cast <STElement*> (symTab[entryKey]))->mapOfAttributes);	
+
+  /// iterator
+  std::map<std::string, STAttribute*>::iterator mapOfAttributesIterator;  
+  mapOfAttributesIterator = mapOfAttributes->begin();
+
+  /// iteration loop over all attributes of the desired symbol table entry       
+  while(mapOfAttributesIterator != mapOfAttributes->end())
+  {  
+    if(attribute->name.compare((*mapOfAttributesIterator).first) == 0)
     {
       return true;
     }
-    ++scannerResultDataIterator;
-  }*/
+    ++mapOfAttributesIterator;
+  }
   return false;
 }
 
@@ -380,9 +294,19 @@ bool SymbolTable::isDuplicate(string attributeName)
 void SymbolTable::addAttribute(unsigned int entryKey, STAttribute* attribute)
 {
   traceST("addAttribute(entryKey=" + intToString(entryKey) + ", [name=" + attribute->name + ", value=" + attribute->value + "])\n");	
-  ///
-  switch((dynamic_cast <SymbolTableEntry*> (symTab[entryKey]))->elementId)
+  
+  // duplicate check
+  if(isDuplicate(entryKey, attribute))
   {
+    //traceST("DUPLIKAT GEFUNDEN\n" + string(attribute->name) + "=" + string(attribute->value) + "\n");
+    printErrorMsg("attribute <" + (string)attribute->name + "> already exist");
+  }
+  // domain check
+  else if(isValidAttributeValue(attribute->name, attribute->value))  
+  {
+   /// add attribute
+   switch((dynamic_cast <SymbolTableEntry*> (symTab[entryKey]))->elementId)
+   {
     case K_COMPENSATE:
     {
 //     traceST("cast to STCompensate\n");
@@ -473,13 +397,14 @@ void SymbolTable::addAttribute(unsigned int entryKey, STAttribute* attribute)
       (dynamic_cast <STActivity*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
       break;
     }
-  }
+   } // end switch
+  } // end if
 }
 
 /*!
- * wrapper
- * \param entryKey
- * \param name
+ * wrapper for readAttribute(unsigned int, string)
+ * \param entryKey  symbol table entry key
+ * \param name      name of attribute
  */
 STAttribute* SymbolTable::readAttribute(kc::integer entryKey, string name)
 {
@@ -732,16 +657,16 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
 
 /*!
  * print formatted symbol table error message
- * \param errorMsg
+ * \param errorMsg  message
  */
-void SymbolTable::printErrorMsg(std::string errorMsg)
+void SymbolTable::printErrorMsg(string errorMsg)
 {
   yyerror(string("[SymbolTable]: " + errorMsg + "\n").c_str());
 }
 
 /*!
  * trace method for the ST class
- * \param traceMsg
+ * \param traceMsg  message
  */
 void SymbolTable::traceST(string traceMsg)
 {
@@ -750,8 +675,8 @@ void SymbolTable::traceST(string traceMsg)
 
 /*!
  * wrapper for checkAttributes(unsigned int entryKey, kc::casestring bpelElementValue)
- * \param entryKey
- * \param bpelElementValue
+ * \param entryKey  symbol table entry key
+ * \param bpelElementValue  content of the BPEL-XML-element (e.g. <from> ... content ... </from>)
  */
 void SymbolTable::checkAttributes(kc::integer entryKey, kc::casestring bpelElementValue)
 {
@@ -761,7 +686,7 @@ void SymbolTable::checkAttributes(kc::integer entryKey, kc::casestring bpelEleme
 
 /*!
  * wrapper for checkAttributes(unsigned int entryKey)
- * \param entryKey
+ * \param entryKey  symbol table entry key
  */
 void SymbolTable::checkAttributes(kc::integer entryKey)
 {
@@ -770,8 +695,8 @@ void SymbolTable::checkAttributes(kc::integer entryKey)
 
 /*!
  * checked the attributes and the value of BPEL-elements
- * \param entryKey
- * \param bpelElementValue
+ * \param entryKey  symbol table entry key
+ * \param bpelElementValue  content of the BPEL-XML-element (e.g. <from> ... content ... </from>)
  */
 void SymbolTable::checkAttributes(unsigned int entryKey, kc::casestring bpelElementValue)
 {
@@ -816,7 +741,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey, kc::casestring bpelElem
 
 /*!
  * checked the attributes of BPEL-elements
- * \param entryKey
+ * \param entryKey  symbol table entry key
  */
 void SymbolTable::checkAttributes(unsigned int entryKey)
 {

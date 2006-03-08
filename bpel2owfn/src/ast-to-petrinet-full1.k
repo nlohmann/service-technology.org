@@ -29,11 +29,11 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/02/23 15:05:57 $
+ *          - last changed: \$Date: 2006/03/08 12:20:27 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.154 $
+ * \version \$Revision: 1.155 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -1978,14 +1978,14 @@ This=Invoke(a,b) provided (This->outputVariable == mkcasestring("")) ->
       Place *p6 = TheNet->newPlace(prefix + "stopped");
 
       Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(p1, t1); TheNet->findPlace("variable." + string(This->variableIDin->name));
+      TheNet->newArc(p1, t1); 
       TheNet->newArc(TheNet->findPlace("variable." + string(This->variableIDin->name)), t1, READ);
-      TheNet->newArc(TheNet->findPlace("out." + string(This->channelID->name)), t1);
       TheNet->newArc(t1, p2);
 
       Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
+      TheNet->newArc(t2, TheNet->findPlace("out." + string(This->channelID->name)));
 
 
       // Transitions for the negative control flow.

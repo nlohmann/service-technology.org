@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/02/17 16:24:51 $
+ *          - last changed: \$Date: 2006/03/08 09:48:09 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.105 $
+ * \version \$Revision: 1.106 $
  */
 
 
@@ -735,7 +735,7 @@ void PetriNet::removeInterface()
   for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
     killList.push_back(*p);
 
-  for (list < Place * >::iterator it = killList.begin(); it != killList.end(); it++)
+  for (list<Place *>::iterator it = killList.begin(); it != killList.end(); it++)
     removePlace(*it);
 
   hasNoInterface = true;
@@ -1047,9 +1047,14 @@ void PetriNet::owfnOut()
 
 
   // final marking
-  (*output) << "FINALMARKING" << endl;
-  (*output) << "  " << findPlace("1.internal.final")->nodeShortName() << ":\t1" << endl;
-  (*output) << ";" << endl << endl << endl;
+  (*output) << "FINALCONDITION  ";
+  (*output) << "(" << findPlace("1.internal.final")->nodeShortName() << " > 0);" << endl;
+  (*output) << endl << endl << endl;
+
+//    // final marking
+//  (*output) << "FINALMARKING" << endl;
+//  (*output) << "  " << findPlace("1.internal.final")->nodeShortName() << ":\t1" << endl;
+//  (*output) << ";" << endl << endl << endl;
 
 
   // transitions

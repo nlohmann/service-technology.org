@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/02 19:13:01 $
+ *          - last changed: \$Date: 2006/03/08 15:39:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.128 $
+ * \version \$Revision: 1.129 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -358,7 +358,13 @@ tProcess:
       isInFH.pop();
       isInCH.pop();
       $$->id = $4;
-      $$->hasEH = (string($14->op_name()) == "userDefinedEventHandler"); }
+      $$->hasEH = (string($14->op_name()) == "userDefinedEventHandler");
+      ((STProcess*)symTab.lookup($3))->hasEventHandler = (string($14->op_name()) == "userDefinedEventHandler");
+      if(((STProcess*)symTab.lookup($3))->hasEventHandler)
+        symTab.traceST(string("TRUE"));
+      else 
+        symTab.traceST(string("FALSE"));
+    }
 ;
 
 genSymTabEntry_Process:

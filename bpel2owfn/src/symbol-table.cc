@@ -194,6 +194,15 @@ unsigned int SymbolTable::insert(unsigned int elementId)
  * return symbol table entry
  * \param entryKey  symbol table entry key
  */
+SymbolTableEntry* SymbolTable::lookup(kc::integer entryKey)
+{
+  return lookup(entryKey->value);
+}
+
+/*!
+ * return symbol table entry
+ * \param entryKey  symbol table entry key
+ */
 SymbolTableEntry* SymbolTable::lookup(unsigned int entryKey)
 {
   traceST("lookup(entryKey=" + intToString((dynamic_cast <SymbolTableEntry*> (symTab[entryKey]))->entryKey) + ")\n");

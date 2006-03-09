@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.18 $: 
+ * \version \$Revision: 1.19 $: 
  *
  */
 
@@ -159,7 +159,7 @@ class SymbolTable
     /// create a new entry in the symbol table and return symbol table entry key
     unsigned int insert(unsigned int elementId);
 
-    ///
+    /// wrapper for <lookup(unsigned int)> and return entry of symbol table
     SymbolTableEntry* lookup(kc::integer entryKey);
 
     /// return entry of symbol table

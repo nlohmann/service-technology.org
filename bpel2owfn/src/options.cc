@@ -366,6 +366,10 @@ void parse_command_line(int argc, char* argv[])
 	      {
 		parameters[P_NOSTANDARDFAULTS] = true;
 	      }
+	      else if ( parameter == "nofhfaults" )
+	      {
+		parameters[P_NOFHFAULTS] = true;
+	      }
 	      else
 	      {
 		throw Exception(OPTION_MISMATCH, 

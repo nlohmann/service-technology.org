@@ -42,10 +42,11 @@ typedef enum
 
 typedef enum
 {
-  P_SIMPLIFY,		// structural reduction rules
-  P_FINISHLOOP,		// live-lock "well-formed" systems
-  P_NOSTANDARDFAULTS,	// only user-defined faults can occur
-  P_CYCLICWHILE		// use the original <while> pattern
+  P_SIMPLIFY,		///< structural reduction rules
+  P_FINISHLOOP,		///< live-lock "well-formed" systems
+  P_NOSTANDARDFAULTS,	///< only user-defined faults can occur
+  P_CYCLICWHILE,	///< use the original <while> pattern
+  P_NOFHFAULTS		///< activities inside the FH throw no faults
 } possibleParameters;
 
 

@@ -29,20 +29,20 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $ 
+ *          - last changes of: \$Author: reinert $ 
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/03/09 08:21:43 $
+ *          - last changed: \$Date: 2006/03/09 16:05:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universitï¿½t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.58 $
+ * \version \$Revision: 1.59 $
  */
 %}
 
@@ -174,6 +174,7 @@ tFaultHandlers:
 
     // needed to compact pattern
     bool hasCatchAll; 
+    integer id;
   }  
 ;
 
@@ -211,6 +212,7 @@ tEventHandlers:
 | userDefinedEventHandler(tOnMessage_list tOnAlarm_list)
   {
     integer parentScopeId;
+    integer id;
   }
 ;
 
@@ -277,6 +279,7 @@ tCompensationHandler:
 
     /// handler contains <compensate scope="A"/> (i.e. pattern Fig. 44)
     bool compensateWithScope = false;
+    integer id;
   }
 ;
 

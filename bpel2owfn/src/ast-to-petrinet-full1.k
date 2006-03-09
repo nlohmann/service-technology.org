@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/03/08 12:20:27 $
+ *          - last changed: \$Date: 2006/03/09 08:21:43 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.155 $
+ * \version \$Revision: 1.156 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -109,6 +109,7 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
     {
       trace(TRACE_INFORMATION, "Generating Petri net...\n");
       header(This->id, true);
+      STProcess* myself = ((STProcess*)symTab.lookup(This->id));
 
       string prefix = intToString(This->id->value) + ".internal.";
       currentScope = prefix;
@@ -238,7 +239,7 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       // If the process has an event handler several places and transitions
       // have to be added to embed it. If the process lacks an event handler
       // some places can be merged.
-      if (This->hasEH)
+      if (myself->hasEventHandler)
       {
 	Place *p23 = TheNet->newPlace(prefix + "p23");
 	Place *p24 = TheNet->newPlace(prefix + "p24");
@@ -314,7 +315,7 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
 
 
       // If present, embed the event handler of the process.
-      if (This->hasEH)
+      if (myself->hasEventHandler)
       {
 	TheNet->mergePlaces("1.internal.p23",      "1.internal.eventHandler.initial");
 	TheNet->mergePlaces("1.internal.p24",      "1.internal.eventHandler.finish");
@@ -3260,7 +3261,7 @@ This=Scope(a,b,c,d,e,f,g) ->
       string prefix = intToString(This->id->value) + ".internal.";
       currentScope = prefix;
       SymbolScope *me = symMan.getScope(this->id);
-
+      STScope* myself = ((STScope*)symTab.lookup(This->id));
 
       // Create push-places for the children of the scope.
       for (list< SymbolScope * >::iterator child = me->children.begin(); child != me->children.end(); child++)
@@ -3379,7 +3380,7 @@ This=Scope(a,b,c,d,e,f,g) ->
       // If the process has an event handler several places and transitions
       // have to be added to embed it. If the process lacks an event handler
       // some places can be merged.
-      if (This->hasEH)
+      if (myself->hasEventHandler)
       {
 	Place *p25 = TheNet->newPlace(prefix + "p25");
 	Place *p26 = TheNet->newPlace(prefix + "p26");
@@ -3481,7 +3482,7 @@ This=Scope(a,b,c,d,e,f,g) ->
 
 
       // If present, embed the event handler of the scope.
-      if (This->hasEH)
+      if (myself->hasEventHandler)
       {
 	TheNet->mergePlaces(prefix + "p25", prefix2 + "eventHandler.initial");
 	TheNet->mergePlaces(prefix + "p26", prefix2 + "eventHandler.finish");

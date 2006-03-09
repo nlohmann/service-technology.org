@@ -29,11 +29,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $ 
+ *          - last changes of: \$Author: nlohmann $ 
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/02/16 15:39:56 $
+ *          - last changed: \$Date: 2006/03/09 08:21:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.57 $
+ * \version \$Revision: 1.58 $
  */
 %}
 
@@ -81,9 +81,6 @@ tProcess:
     casestring enableInstanceCompensation = mkcasestring("no");
     casestring abstractProcess = mkcasestring("no");
     casestring xmlns = mkcasestring("http://schemas.xmlsoap.org/ws/2003/03/business-process/");
-
-    /// has this process an event handler?
-    bool hasEH;
 
     integer id;
   }
@@ -767,9 +764,6 @@ tScope:
 
     /// additional attribute for DPE
     integer dpe = mkinteger(0);
-
-    /// has this scope an event handler?
-    bool hasEH;    
   }
 ;
 

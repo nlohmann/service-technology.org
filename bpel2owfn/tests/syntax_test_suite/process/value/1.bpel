@@ -1,0 +1,12 @@
+<process name="processTest1" targetNamespace="http://acme.com/loanprocessing"
+	 queryLanguage="http://"
+	 expressionLanguage="http://"
+	 suppressJoinFailure="yes"
+	 enableInstanceCompensation="yes"
+	 abstractProcess="yes"
+	 xmlns="http://"
+>
+
+<empty/>
+
+</process>

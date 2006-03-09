@@ -1,0 +1,7 @@
+<process name="processTest7" targetNamespace="http://acme.com/loanprocessing"
+	 enableInstanceCompensation="No"
+>
+
+<empty/>
+
+</process>

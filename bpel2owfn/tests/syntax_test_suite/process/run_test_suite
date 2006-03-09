@@ -1,0 +1,75 @@
+#! /bin/sh
+
+############################################################################
+# Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert     #
+#                                                                          #
+# This file is part of BPEL2oWFN.                                          #
+#                                                                          #
+# BPEL2oWFN is free software; you can redistribute it and/or modify it     #
+# under the terms of the GNU General Public License as published by the    #
+# Free Software Foundation; either version 2 of the License, or (at your   #
+# option) any later version.                                               #
+#                                                                          #
+# BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT #
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or    #
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for #
+# more details.                                                            #
+#                                                                          #
+# You should have received a copy of the GNU General Public License along  #
+# with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51  #
+# Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
+############################################################################
+
+#PROCESS test case
+testCaseDir="process"
+
+#attributes check
+#presence check of mandatory attributes
+bpel2owfn --input="$TEST_SUITE_DIR/$testCaseDir/attribute/1.bpel"
+result1=$?
+bpel2owfn --input="$TEST_SUITE_DIR/$testCaseDir/attribute/2.bpel"
+result2=$?
+bpel2owfn --input="$TEST_SUITE_DIR/$testCaseDir/attribute/3.bpel"
+result3=$?
+#double check
+bpel2owfn --input="$TEST_SUITE_DIR/$testCaseDir/attribute/4.bpel"
+result4=$?
+bpel2owfn --input="$TEST_SUITE_DIR/$testCaseDir/attribute/5.bpel"
+result5=$?
+
+#value check
+bpel2owfn --input="$TEST_SUITE_DIR/$testCaseDir/value/1.bpel"
+result6=$?
+bpel2owfn --input="$TEST_SUITE_DIR/$testCaseDir/value/2.bpel"
+result7=$?
+bpel2owfn --input="$TEST_SUITE_DIR/$testCaseDir/value/3.bpel"
+result8=$?
+bpel2owfn --input="$TEST_SUITE_DIR/$testCaseDir/value/4.bpel"
+result9=$?
+bpel2owfn --input="$TEST_SUITE_DIR/$testCaseDir/value/5.bpel"
+result10=$?
+bpel2owfn --input="$TEST_SUITE_DIR/$testCaseDir/value/6.bpel"
+result11=$?
+bpel2owfn --input="$TEST_SUITE_DIR/$testCaseDir/value/7.bpel"
+result12=$?
+bpel2owfn --input="$TEST_SUITE_DIR/$testCaseDir/value/8.bpel"
+result13=$?
+bpel2owfn --input="$TEST_SUITE_DIR/$testCaseDir/value/9.bpel"
+result14=$?
+bpel2owfn --input="$TEST_SUITE_DIR/$testCaseDir/value/10.bpel"
+result15=$?
+bpel2owfn --input="$TEST_SUITE_DIR/$testCaseDir/value/11.bpel"
+result16=$?
+
+
+if [ $result1 -eq 0 -a $result2 -eq 1 -a $result3 -eq 1 -a $result4 -eq 1 -a $result5 -eq 1 -a \
+      $result6 -eq 0 -a $result7 -eq 0 -a $result8 -eq 1 -a $result9 -eq 1 -a \
+      $result10 -eq 1 -a $result11 -eq 1 -a $result12 -eq 1 -a $result13 -eq 1 -a \
+      $result14 -eq 1 -a $result15 -eq 1 -a $result16 -eq 1 ]
+then
+  result=0
+else
+  result=1
+fi
+
+exit $result

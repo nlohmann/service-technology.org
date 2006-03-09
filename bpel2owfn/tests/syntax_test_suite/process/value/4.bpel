@@ -1,0 +1,7 @@
+<process name="processTest4" targetNamespace="http://acme.com/loanprocessing"
+	 suppressJoinFailure="No"
+>
+
+<empty/>
+
+</process>

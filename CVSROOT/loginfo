@@ -30,3 +30,4 @@ bpel2owfn (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email %{sVv};
 bpel_processes (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email %{sVv})
 alol (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email %{sVv}; /vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/backup)
 tools4owfn (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email2 %{sVv}; /vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/backup)
+bpm2006 (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email3 %{sVv}; /vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/backup)

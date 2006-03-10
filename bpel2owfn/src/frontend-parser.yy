@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/09 08:21:43 $
+ *          - last changed: \$Date: 2006/03/10 14:08:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.130 $
+ * \version \$Revision: 1.131 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -495,7 +495,13 @@ tPartnerLink_list:
 tPartnerLink:
   K_PARTNERLINK genSymTabEntry_PartnerLink
     arbitraryAttributes X_NEXT X_SLASH K_PARTNERLINK
-    { symTab.checkAttributes($2);
+    { if(inPartners) {
+        ((STPartnerLink*)symTab.lookup($2))->isInPartners = true;
+      }
+      else {
+        ((STPartnerLink*)symTab.lookup($2))->isInPartners = false;      
+      }
+      symTab.checkAttributes($2);
       $$ = PartnerLink();
       $$->name = att.read($3, "name");
       $$->partnerLinkType = att.read($3, "partnerLinkType");
@@ -512,7 +518,13 @@ tPartnerLink:
     }
 | K_PARTNERLINK genSymTabEntry_PartnerLink
     arbitraryAttributes X_SLASH
-    { symTab.checkAttributes($2);
+    { if(inPartners) {
+        ((STPartnerLink*)symTab.lookup($2))->isInPartners = true;
+      }
+      else {
+        ((STPartnerLink*)symTab.lookup($2))->isInPartners = false;      
+      }
+      symTab.checkAttributes($2);
       $$ = PartnerLink();
       $$->name = att.read($3, "name");
       $$->partnerLinkType = att.read($3, "partnerLinkType");

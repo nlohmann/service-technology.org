@@ -1321,7 +1321,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       {
         printErrorMsg("attribute " + A__NAME + "=\"" + T__NCNAME + "\" is missing");        
       }
-      else if(!partnerLinkTypeFlag)
+      else if((((STPartnerLink*)symTab[entryKey])->isInPartners == false) && !partnerLinkTypeFlag)
       {
         printErrorMsg("attribute " + A__PARTNER_LINK_TYPE + "=\"" + T__QNAME + "\" is missing");        
       }

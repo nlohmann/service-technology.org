@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.19 $: 
+ * \version \$Revision: 1.20 $: 
  *
  */
 
@@ -632,6 +632,9 @@ class STPartnerLink: public STElement, public SymbolTableEntry
     
     /// destructor
     ~STPartnerLink();
+    
+    /// is partnerLink group by <partners> or not
+    bool isInPartners;
 };
 
 

@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/03/10 10:42:53 $
+ *          - last changed: \$Date: 2006/03/10 15:54:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  */
 
 #ifndef CFG_H
@@ -75,7 +75,9 @@ typedef enum
   CFGWhile,
   CFGSequence,
   CFGPick,
-  CFGScope
+  CFGScope,
+  CFGTarget,
+  CFGSource
 } CFGBlockType;
 
 // forward declarations
@@ -122,6 +124,8 @@ class CFGBlock {
     /// dot_output
     virtual void print_dot();
     virtual std::string dot_name();
+
+    std::string channel_name;
 
   private:
     bool dotted;

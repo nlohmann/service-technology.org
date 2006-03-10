@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/03/10 10:42:53 $
+ *          - last changed: \$Date: 2006/03/10 15:54:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  */
 %}
 
@@ -157,6 +157,7 @@ Empty(a) ->
 
 	  cfgMap[intToString($0->id->value)] = block; 
 	}
+	a // standard elements
   ];
 
   
@@ -167,10 +168,13 @@ Empty(a) ->
 Invoke(a,b) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Invoke\n");
-	  CFGBlock * block = new CFGBlock(CFGInvoke, $0->id, "Invoke"); 
+	  CFGBlock * block = new CFGBlock(CFGInvoke, $0->id, "Invoke");
+
+	  block->channel_name = $0->channelID->name; 
 
 	  cfgMap[intToString($0->id->value)] = block; 
   	}
+	a // standard elements
   ];
 
 
@@ -184,8 +188,11 @@ Receive(a,b) ->
 	  trace(TRACE_DEBUG, "[CFG] Receive\n");
 	  CFGBlock * block = new CFGBlock(CFGReceive, $0->id, "Receive"); 
 
+	  block->channel_name = $0->channelID->name; 
+
 	  cfgMap[intToString($0->id->value)] = block; 
     	}
+	a // standard elements
   ]
 ;
 
@@ -199,8 +206,11 @@ Reply(a,b) ->
 	  trace(TRACE_DEBUG, "[CFG] Reply\n");
 	  CFGBlock * block = new CFGBlock(CFGReply, $0->id, "Reply"); 
 
+	  block->channel_name = $0->channelID->name; 
+
 	  cfgMap[intToString($0->id->value)] = block; 
   	}
+	a // standard elements
   ]
 ;
 
@@ -230,6 +240,7 @@ Assign(a,b) ->
 	  } 
 	  connectBlocks(last, lastBlock);
   	}
+	a // standard elements
   ]
 ;
 
@@ -246,6 +257,7 @@ Wait(a) ->
 
 	  cfgMap[intToString($0->id->value)] = block; 
   	} 
+	a // standard elements
   ]
 ;
 
@@ -261,6 +273,7 @@ Throw(a) ->
 
 	  cfgMap[intToString($0->id->value)] = block; 
   	}
+	a // standard elements
   ]
 ;
 
@@ -276,6 +289,7 @@ Compensate(a) ->
 
 	  cfgMap[intToString($0->id->value)] = block; 
   	}
+	a // standard elements
   ]
 ;
 
@@ -291,6 +305,7 @@ Terminate(a) ->
 
 	  cfgMap[intToString($0->id->value)] = block; 
   	}
+	a // standard elements
   ]
 ;
 
@@ -321,6 +336,10 @@ Flow(a,b,c) ->
 	    connectBlocks(innerLast, lastBlock);
 	  } 
   	}
+	a // standard elements
+	{
+	  trace(TRACE_DEBUG, "[CFG] ~Flow\n");
+	}
   ]
 ;
 
@@ -367,6 +386,7 @@ This=Switch(a,b,Otherwise(c)) ->
 	  connectBlocks(otherwiseBlock, innerFirst);
 	  connectBlocks(innerLast, lastBlock);
   	}
+	a // standard elements
   ]
 ;
 
@@ -390,6 +410,7 @@ While(a,b) ->
 	  connectBlocks(block, innerFirst);
 	  connectBlocks(innerLast, block);
 	}
+	a // standard elements
   ]
 ;
 
@@ -416,11 +437,15 @@ Sequence(a,b) ->
 	  {
  	    CFGBlock * current = cfgMap.find(intToString(innerActivity->id->value))->second;
 	  
-	    connectBlocks(last, current);
+	    connectBlocks(last, current->firstBlock);
 	    last = current->lastBlock;
 	  } 
 	  connectBlocks(last, lastBlock);
   	}
+	a // standard elements
+	{
+	  trace(TRACE_DEBUG, "[CFG] ~Sequence\n");
+	}
   ]
 ;
 
@@ -460,6 +485,7 @@ Pick(a,b,c) ->
 	    connectBlocks(innerLast, lastBlock);
 	  } 
   	}
+	a // standard elements
   ]
 ;
 
@@ -487,6 +513,67 @@ Scope(a,b,c,d,e,f,g) ->
 	  connectBlocks(firstBlock, innerFirst);
 	  connectBlocks(innerLast, lastBlock);
 	}
+	a // standard elements
+	{
+	  trace(TRACE_DEBUG, "[CFG] ~Scope\n");
+	}
+  ]
+;
+
+
+/******************************************************************************
+  STANDARD ELEMENTS
+******************************************************************************/
+
+This=StandardElements(a,b) ->
+  [cfg:
+    {
+
+      CFGBlock * innerFirst = cfgMap.find(intToString(This->parentId->value))->second->firstBlock;
+      CFGBlock * innerLast = cfgMap.find(intToString(This->parentId->value))->second->lastBlock;
+      foreach (link; tTarget_list a)
+      {
+	  trace(TRACE_DEBUG, "[CFG] Target\n");
+	  CFGBlock * target = new CFGBlock(CFGTarget, $0->parentId, "Target_" + std::string(link->linkName->name));
+	  /// \todo: use link to connect source and target
+/*	  for (list<CFGBlock *>::iterator iter = innerFirst->prevBlocks.begin(); iter != innerFirst->prevBlocks.end(); iter++)
+	  {
+	    // really necessary?
+	    (*iter)->nextBlocks.remove(innerFirst);
+	    innerFirst->prevBlocks.remove((*iter));
+	    connectBlocks((*iter), target);
+	  }
+*/	  connectBlocks(target, innerFirst->firstBlock);
+	  innerFirst->firstBlock = target;
+	  target->lastBlock = innerLast->lastBlock;
+      }
+
+      foreach (link; tSource_list b)
+      {
+	  trace(TRACE_DEBUG, "[CFG] Source\n");
+	  CFGBlock * source = new CFGBlock(CFGSource, $0->parentId, "Source_" + std::string(link->linkName->name));
+	  /// \todo: use link to connect source and target
+
+/*	  for (list<CFGBlock *>::iterator iter = innerLast->nextBlocks.begin(); iter != innerLast->nextBlocks.end(); iter++)
+	  {
+	    trace("i");
+	    // really necessary?
+	    CFGBlock * next = (*iter);
+	    next->prevBlocks.remove(innerLast);
+	    innerLast->nextBlocks.remove(next);
+	    connectBlocks(source, next);
+	  }
+*/
+	  connectBlocks(innerLast->lastBlock, source);
+	  innerLast->lastBlock = innerFirst->lastBlock = source;
+	  // trace("set last block again\n");
+	  innerFirst->firstBlock->lastBlock = source;
+	  trace(TRACE_DEBUG, "[CFG] ~Source\n");
+
+      }
+
+
+    }
   ]
 ;
 

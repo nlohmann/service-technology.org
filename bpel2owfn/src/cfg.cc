@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/03/10 10:42:53 $
+ *          - last changed: \$Date: 2006/03/10 15:54:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -80,7 +80,21 @@ void CFGBlock::print_dot()
     dotted = true;
 
     (*output) << "  // " << dot_name() << endl;
-    (*output) << "  " << dot_name() << " [ label=\"" << label << " (" << id->value <<")\" ]; " << endl;
+    (*output) << "  " << dot_name() << " [ label=\"" << label << " (" << id->value <<")";
+    if (channel_name != "")
+    {
+      (*output) << "\\nchannel: " << channel_name;
+    }
+    (*output) << "\"";
+    if (type == CFGSource)
+    {
+      (*output) << " color=red style=filled"; // style=filled
+    }
+    if (type == CFGTarget)
+    {
+      (*output) << " color=green style=filled"; //
+    }
+    (*output) << " ]; " << endl;
     (*output) << "  // all outgoing edges" << endl;
     for(list<CFGBlock *>::iterator iter = nextBlocks.begin(); iter != nextBlocks.end(); iter++)
     {

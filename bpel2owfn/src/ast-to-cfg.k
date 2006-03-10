@@ -29,11 +29,11 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/02/09 19:09:05 $
+ *          - last changed: \$Date: 2006/03/10 10:42:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  */
 %}
 
@@ -85,14 +85,23 @@ map <std::string, CFGBlock *> cfgMap;
 
 Process(a,b,c,d,e,f,g,h,i) ->
   [cfg: {
-//	  trace("[CFG] Process\n"); 
-	  TheCFG = new CFGProcess($0->id);
+	  trace(TRACE_DEBUG, "[CFG] Process\n");
+	  CFGBlock * firstBlock = new CFGBlock(CFGProcess, $0->id, "Process_begin"); 
+	  CFGBlock * lastBlock = new CFGBlock(CFGProcess, $0->id, "Process_end");
+
+	  firstBlock->firstBlock = lastBlock->firstBlock = firstBlock;
+	  firstBlock->lastBlock  = lastBlock->lastBlock  = lastBlock;
+	  
+	  TheCFG = firstBlock;
 	  cfgMap[intToString($0->id->value)] = TheCFG; 
 	}
         i //activity
 	{
-	  TheCFG->nextBlock = cfgMap.find(intToString(i->id->value))->second;
-	  (cfgMap.find(intToString(i->id->value))->second)->prevBlock = TheCFG;
+	  CFGBlock * innerFirst = cfgMap.find(intToString(i->id->value))->second->firstBlock;
+	  CFGBlock * innerLast = cfgMap.find(intToString(i->id->value))->second->lastBlock;
+	  
+	  connectBlocks(firstBlock, innerFirst);
+	  connectBlocks(innerLast, lastBlock);
 	}
   ];
 
@@ -143,7 +152,10 @@ Process(a,b,c,d,e,f,g,h,i) ->
 
 Empty(a) ->
   [cfg: { 
-	  cfgMap[intToString($0->id->value)] = new CFGEmpty($0->id); 
+	  trace(TRACE_DEBUG, "[CFG] Empty\n");
+	  CFGBlock * block = new CFGBlock(CFGEmpty, $0->id, "Empty"); 
+
+	  cfgMap[intToString($0->id->value)] = block; 
 	}
   ];
 
@@ -154,7 +166,10 @@ Empty(a) ->
 
 Invoke(a,b) ->
   [cfg: { 
-	  cfgMap[intToString($0->id->value)] = new CFGInvoke($0->id); 
+	  trace(TRACE_DEBUG, "[CFG] Invoke\n");
+	  CFGBlock * block = new CFGBlock(CFGInvoke, $0->id, "Invoke"); 
+
+	  cfgMap[intToString($0->id->value)] = block; 
   	}
   ];
 
@@ -166,7 +181,10 @@ Invoke(a,b) ->
 
 Receive(a,b) ->
   [cfg: { 
-	  cfgMap[intToString($0->id->value)] = new CFGReceive($0->id); 
+	  trace(TRACE_DEBUG, "[CFG] Receive\n");
+	  CFGBlock * block = new CFGBlock(CFGReceive, $0->id, "Receive"); 
+
+	  cfgMap[intToString($0->id->value)] = block; 
     	}
   ]
 ;
@@ -178,7 +196,10 @@ Receive(a,b) ->
 
 Reply(a,b) ->
   [cfg: { 
-	  cfgMap[intToString($0->id->value)] = new CFGReply($0->id); 
+	  trace(TRACE_DEBUG, "[CFG] Reply\n");
+	  CFGBlock * block = new CFGBlock(CFGReply, $0->id, "Reply"); 
+
+	  cfgMap[intToString($0->id->value)] = block; 
   	}
   ]
 ;
@@ -190,23 +211,24 @@ Reply(a,b) ->
 
 Assign(a,b) ->
   [cfg: {
-	  CFGAssign * assign = new CFGAssign($0->id);
-	  cfgMap[intToString($0->id->value)] = assign;
-	  CFGBlock * last = NULL;
-	  int i = 1;
-	  std::string prefix = intToString($0->id->value);
+	  trace(TRACE_DEBUG, "[CFG] Assign\n");
+	  CFGBlock * firstBlock = new CFGBlock(CFGAssign, $0->id, "Assign_begin"); 
+	  CFGBlock * lastBlock = new CFGBlock(CFGAssign, $0->id, "Assign_end");
+
+	  firstBlock->firstBlock = lastBlock->firstBlock = firstBlock;
+	  firstBlock->lastBlock  = lastBlock->lastBlock  = lastBlock;
 	  
+	  cfgMap[intToString($0->id->value)] = firstBlock; 
+
+	  CFGBlock * last = firstBlock;
+	  int i = 1;
 	  foreach(copy; tCopy_list b)
 	  {
-	    CFGCopy * copyBlock = new CFGCopy(prefix + "_" + intToString(i++));
-	    copyBlock->prevBlock = last;
-	    if (last != NULL)
-	    {
-              last->nextBlock = copyBlock;
-	    }
-	    assign->copyList.push_back(copyBlock);
+	    CFGBlock * copyBlock = new CFGBlock(CFGCopy, $0->id, "Copy_" + intToString(i++));
+	    connectBlocks(last, copyBlock);
 	    last = copyBlock;
 	  } 
+	  connectBlocks(last, lastBlock);
   	}
   ]
 ;
@@ -219,7 +241,10 @@ Assign(a,b) ->
 
 Wait(a) ->
   [cfg: { 
-	  cfgMap[intToString($0->id->value)] = new CFGWait($0->id); 
+	  trace(TRACE_DEBUG, "[CFG] Wait\n");
+	  CFGBlock * block = new CFGBlock(CFGWait, $0->id, "Wait"); 
+
+	  cfgMap[intToString($0->id->value)] = block; 
   	} 
   ]
 ;
@@ -231,7 +256,10 @@ Wait(a) ->
 
 Throw(a) ->
   [cfg: { 
-	  cfgMap[intToString($0->id->value)] = new CFGThrow($0->id); 
+	  trace(TRACE_DEBUG, "[CFG] Throw\n");
+	  CFGBlock * block = new CFGBlock(CFGThrow, $0->id, "Throw"); 
+
+	  cfgMap[intToString($0->id->value)] = block; 
   	}
   ]
 ;
@@ -243,7 +271,10 @@ Throw(a) ->
 
 Compensate(a) ->
   [cfg: { 
-	  cfgMap[intToString($0->id->value)] = new CFGCompensate($0->id); 
+	  trace(TRACE_DEBUG, "[CFG] Compensate\n");
+	  CFGBlock * block = new CFGBlock(CFGCompensate, $0->id, "Compensate"); 
+
+	  cfgMap[intToString($0->id->value)] = block; 
   	}
   ]
 ;
@@ -255,7 +286,10 @@ Compensate(a) ->
 
 Terminate(a) ->
   [cfg: { 
-	  cfgMap[intToString($0->id->value)] = new CFGTerminate($0->id); 
+	  trace(TRACE_DEBUG, "[CFG] Terminate\n");
+	  CFGBlock * block = new CFGBlock(CFGTerminate, $0->id, "Terminate"); 
+
+	  cfgMap[intToString($0->id->value)] = block; 
   	}
   ]
 ;
@@ -267,17 +301,24 @@ Terminate(a) ->
 
 Flow(a,b,c) ->
   [cfg: { 
-	  CFGFlow * flow = new CFGFlow($0->id);
-	  cfgMap[intToString($0->id->value)] = flow;
+	  trace(TRACE_DEBUG, "[CFG] Flow\n");
+	  CFGBlock * firstBlock = new CFGBlock(CFGFlow, $0->id, "Flow_begin"); 
+	  CFGBlock * lastBlock = new CFGBlock(CFGFlow, $0->id, "Flow_end");
+
+	  firstBlock->firstBlock = lastBlock->firstBlock = firstBlock;
+	  firstBlock->lastBlock  = lastBlock->lastBlock  = lastBlock;
+	  
+	  cfgMap[intToString($0->id->value)] = firstBlock; 
 	}
 	c
 	{
 	  foreach(innerActivity; activity_list c)
 	  {
-	    std::string label = intToString(innerActivity->id->value);
-	    CFGBlock * activity = cfgMap.find(label)->second;
-	    activity->prevBlock = flow;
-	    flow->activityList.push_back(activity);
+ 	    CFGBlock * innerFirst = cfgMap.find(intToString(innerActivity->id->value))->second->firstBlock;
+	    CFGBlock * innerLast = cfgMap.find(intToString(innerActivity->id->value))->second->lastBlock;
+	  
+	    connectBlocks(firstBlock, innerFirst);
+	    connectBlocks(innerLast, lastBlock);
 	  } 
   	}
   ]
@@ -288,25 +329,43 @@ Flow(a,b,c) ->
   SWITCH
 ******************************************************************************/
 
-Switch(a,b,Otherwise(c)) ->
+This=Switch(a,b,Otherwise(c)) ->
   [cfg: {
-	  CFGSwitch * cfgSwitch = new CFGSwitch($0->id);
-	  cfgMap[intToString($0->id->value)] = cfgSwitch;
+	  trace(TRACE_DEBUG, "[CFG] Switch\n");
+	  CFGBlock * firstBlock = new CFGBlock(CFGSwitch, $0->id, "Switch_begin"); 
+	  CFGBlock * lastBlock = new CFGBlock(CFGSwitch, $0->id, "Switch_end");
+
+	  firstBlock->firstBlock = lastBlock->firstBlock = firstBlock;
+	  firstBlock->lastBlock  = lastBlock->lastBlock  = lastBlock;
+	  
+	  cfgMap[intToString($0->id->value)] = firstBlock; 
 	}
 	b // tCase_list
 	c // tOtherwise
 	{
+	  CFGBlock * last = firstBlock;
+	  int i = 1;
 	  foreach(caseBranch=Case(innerActivity); tCase_list b)
 	  {
-	    std::string label = intToString(innerActivity->id->value);
-	    CFGBlock * activity = cfgMap.find(label)->second;
-	    activity->prevBlock = cfgSwitch;
-	    cfgSwitch->caseList.push_back(activity);
-	  }
-	  std::string label = intToString(c->id->value);
-	  CFGBlock * otherwise = cfgMap.find(label)->second;
-	  otherwise->prevBlock = cfgSwitch;
-	  cfgSwitch->otherwise = otherwise;
+	    CFGBlock * caseBlock = new CFGBlock(CFGCase, This->id, "Case_" + intToString(i));
+	    
+ 	    CFGBlock * innerFirst = cfgMap.find(intToString(innerActivity->id->value))->second->firstBlock;
+	    CFGBlock * innerLast = cfgMap.find(intToString(innerActivity->id->value))->second->lastBlock;
+
+	    connectBlocks(last, caseBlock);
+	    connectBlocks(caseBlock, innerFirst);
+	    connectBlocks(innerLast, lastBlock);
+
+	    last = caseBlock;	    
+	    i++;
+	  } 
+          CFGBlock * otherwiseBlock = new CFGBlock(CFGOtherwise, $0->id, "Otherwise");
+ 	  CFGBlock * innerFirst = cfgMap.find(intToString(c->id->value))->second->firstBlock;
+	  CFGBlock * innerLast = cfgMap.find(intToString(c->id->value))->second->lastBlock;
+
+	  connectBlocks(last, otherwiseBlock);
+	  connectBlocks(otherwiseBlock, innerFirst);
+	  connectBlocks(innerLast, lastBlock);
   	}
   ]
 ;
@@ -318,15 +377,18 @@ Switch(a,b,Otherwise(c)) ->
 
 While(a,b) ->
   [cfg: { 
-	  CFGWhile * cfgWhile = new CFGWhile($0->id);
-	  cfgMap[intToString($0->id->value)] = cfgWhile;
+	  trace(TRACE_DEBUG, "[CFG] While\n");
+	  CFGBlock * block = new CFGBlock(CFGWhile, $0->id, "While"); 
+
+	  cfgMap[intToString($0->id->value)] = block; 
   	}
 	b
 	{
-          std::string label = intToString(b->id->value);
-          CFGBlock * activity = cfgMap.find(label)->second;
-          activity->prevBlock = cfgWhile;
-	  cfgWhile->loopActivity = activity;
+	  CFGBlock * innerFirst = cfgMap.find(intToString(b->id->value))->second->firstBlock;
+	  CFGBlock * innerLast = cfgMap.find(intToString(b->id->value))->second->lastBlock;
+	  
+	  connectBlocks(block, innerFirst);
+	  connectBlocks(innerLast, block);
 	}
   ]
 ;
@@ -338,24 +400,26 @@ While(a,b) ->
 
 Sequence(a,b) ->
   [cfg: {
-	  CFGSequence * sequence = new CFGSequence($0->id);
-	  cfgMap[intToString($0->id->value)] = sequence;
-	  CFGBlock * last = NULL;
-  	}
+	  trace(TRACE_DEBUG, "[CFG] Sequence\n");
+	  CFGBlock * firstBlock = new CFGBlock(CFGSequence, $0->id, "Sequence_begin"); 
+	  CFGBlock * lastBlock = new CFGBlock(CFGSequence, $0->id, "Sequence_end");
+
+	  firstBlock->firstBlock = lastBlock->firstBlock = firstBlock;
+	  firstBlock->lastBlock  = lastBlock->lastBlock  = lastBlock;
+	  
+	  cfgMap[intToString($0->id->value)] = firstBlock; 
+	}
 	b
-	{	
+	{
+	  CFGBlock * last = firstBlock;
 	  foreach(innerActivity; activity_list b)
 	  {
-	    std::string label = intToString(innerActivity->id->value);
-	    CFGBlock * current = cfgMap.find(label)->second;
-	    current->prevBlock = last;
-	    if (last != NULL)
-	    {
-              last->nextBlock = current;
-	    }
-	    sequence->activityList.push_back(current);
-	    last = current;
+ 	    CFGBlock * current = cfgMap.find(intToString(innerActivity->id->value))->second;
+	  
+	    connectBlocks(last, current);
+	    last = current->lastBlock;
 	  } 
+	  connectBlocks(last, lastBlock);
   	}
   ]
 ;
@@ -367,26 +431,34 @@ Sequence(a,b) ->
 
 Pick(a,b,c) ->
   [cfg: { 
-	  CFGPick * cfgPick = new CFGPick($0->id);
-	  cfgMap[intToString($0->id->value)] = cfgPick;
+	  trace(TRACE_DEBUG, "[CFG] Pick\n");
+	  CFGBlock * firstBlock = new CFGBlock(CFGPick, $0->id, "Pick_begin"); 
+	  CFGBlock * lastBlock = new CFGBlock(CFGPick, $0->id, "Pick_end");
+
+	  firstBlock->firstBlock = lastBlock->firstBlock = firstBlock;
+	  firstBlock->lastBlock  = lastBlock->lastBlock  = lastBlock;
+	  
+	  cfgMap[intToString($0->id->value)] = firstBlock; 
 	}
 	b // tOnMessage_list
 	c // tOnAlarm_list
 	{
 	  foreach(message=OnMessage(innerActivity); tOnMessage_list b)
 	  {
-	    std::string label = intToString(innerActivity->id->value);
-	    CFGBlock * activity = cfgMap.find(label)->second;
-	    activity->prevBlock = cfgPick;
-	    cfgPick->messageList.push_back(activity);
-	  }
+ 	    CFGBlock * innerFirst = cfgMap.find(intToString(innerActivity->id->value))->second->firstBlock;
+	    CFGBlock * innerLast = cfgMap.find(intToString(innerActivity->id->value))->second->lastBlock;
+	  
+	    connectBlocks(firstBlock, innerFirst);
+	    connectBlocks(innerLast, lastBlock);
+	  } 
 	  foreach(alarm=OnAlarm(innerActivity); tOnAlarm_list c)
 	  {
-	    std::string label = intToString(innerActivity->id->value);
-	    CFGBlock * activity = cfgMap.find(label)->second;
-	    activity->prevBlock = cfgPick;
-	    cfgPick->alarmList.push_back(activity);
-	  }
+ 	    CFGBlock * innerFirst = cfgMap.find(intToString(innerActivity->id->value))->second->firstBlock;
+	    CFGBlock * innerLast = cfgMap.find(intToString(innerActivity->id->value))->second->lastBlock;
+	  
+	    connectBlocks(firstBlock, innerFirst);
+	    connectBlocks(innerLast, lastBlock);
+	  } 
   	}
   ]
 ;
@@ -398,13 +470,22 @@ Pick(a,b,c) ->
 
 Scope(a,b,c,d,e,f,g) ->
   [cfg: { 
-	  CFGScope * scope = new CFGScope($0->id);
-	  cfgMap[intToString($0->id->value)] = scope; 
+	  trace(TRACE_DEBUG, "[CFG] Scope\n");
+	  CFGBlock * firstBlock = new CFGBlock(CFGScope, $0->id, "Scope_begin"); 
+	  CFGBlock * lastBlock = new CFGBlock(CFGScope, $0->id, "Scope_end");
+
+	  firstBlock->firstBlock = lastBlock->firstBlock = firstBlock;
+	  firstBlock->lastBlock  = lastBlock->lastBlock  = lastBlock;
+	  
+	  cfgMap[intToString($0->id->value)] = firstBlock; 
 	}
-        g //activity
+	g // activity
 	{
-	  scope->innerActivity = cfgMap.find(intToString(g->id->value))->second;
-	  // (cfgMap.find(intToString(g->id->value))->second)->prevBlock = scope;
+	  CFGBlock * innerFirst = cfgMap.find(intToString(g->id->value))->second->firstBlock;
+	  CFGBlock * innerLast = cfgMap.find(intToString(g->id->value))->second->lastBlock;
+	  
+	  connectBlocks(firstBlock, innerFirst);
+	  connectBlocks(innerLast, lastBlock);
 	}
   ]
 ;

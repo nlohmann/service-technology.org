@@ -40,13 +40,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/02/17 13:28:31 $
+ *          - last changed: \$Date: 2006/03/12 18:15:59 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.61 $
+ * \version \$Revision: 1.62 $
  */
 
 
@@ -389,8 +389,6 @@ private:
   /// the list of arcs of the Petri net
   set<Arc *> F;
 
-//  /// Calculate the initial marking of the net.
-//  void calculateInitialMarking();
 
   /// Statistical output.
   string information();

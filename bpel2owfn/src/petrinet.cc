@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/03/08 09:48:09 $
+ *          - last changed: \$Date: 2006/03/12 18:15:59 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.106 $
+ * \version \$Revision: 1.107 $
  */
 
 
@@ -526,6 +526,7 @@ void PetriNet::detachNode(Node * n)
 void PetriNet::removePlace(Place * p)
 {
   trace(TRACE_VERY_DEBUG, "[PN]\tRemoving place " + intToString(p->id) + "...\n");
+  
   
   detachNode(p);
 
@@ -1371,6 +1372,60 @@ void PetriNet::simplify()
   trace(TRACE_INFORMATION, "Simplifying Petri net...\n");
 
 
+
+  
+  // remove structural dead nodes
+  bool done = false;
+  while (!done)
+  {
+    done = true;
+  
+    list<Place*> deadPlaces;
+    list<Transition*> deadTransitions;
+    list<Place*> tempPlaces;
+
+    // find unmarked places with empty preset
+    for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
+    {
+      if (preset(*p).empty() && !(*p)->marked)
+      {
+	deadPlaces.push_back(*p);
+	tempPlaces.push_back(*p);
+	trace(TRACE_VERY_DEBUG, "[PN]\tPlace p" + intToString((*p)->id) + " is structurally dead.\n");
+	done = false;
+      }
+    }
+
+    while (!tempPlaces.empty())
+    {
+      // p is a dead place
+      Place* p = tempPlaces.back();
+      tempPlaces.pop_back();
+      set<Node*> ps = postset(p);
+
+      // transitions in the postset of a dead place are dead
+      for (set<Node*>::iterator t = ps.begin(); t != ps.end(); t++)
+      {
+      	deadTransitions.push_back( (Transition*)(*t) );
+	trace(TRACE_VERY_DEBUG, "[PN]\tTransition t" + intToString((*t)->id) + " is structurally dead\n");
+	done = false;
+      }
+    }
+
+
+    // remove dead nodes
+    for (list<Place*>::iterator p = deadPlaces.begin(); p != deadPlaces.end(); p++)
+      if (P.find(*p) != P.end())
+	removePlace(*p);
+    for (list<Transition*>::iterator t = deadTransitions.begin(); t != deadTransitions.end(); t++)
+      if (T. find(*t) != T.end())
+	removeTransition(*t);
+  }
+
+
+  
+  
+  
   // a pair to store transitions to be merged
   vector<pair<string, string> > transitionPairs;
 

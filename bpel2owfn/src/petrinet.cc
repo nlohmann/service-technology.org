@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/03/13 10:57:56 $
+ *          - last changed: \$Date: 2006/03/13 16:05:09 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.109 $
+ * \version \$Revision: 1.110 $
  */
 
 
@@ -1046,7 +1046,7 @@ void PetriNet::owfnOut()
   }
   (*output) << endl << ";" << endl << endl;  
 
-
+/*
   // final condition
   (*output) << "FINALCONDITION" << endl << "  (";
   
@@ -1068,11 +1068,12 @@ void PetriNet::owfnOut()
 
   (*output) << endl << "   (" << findPlace("1.internal.final")->nodeShortName() << " > 0));" << endl;
   (*output) << endl << endl << endl;
+*/
 
-//    // final marking
-//  (*output) << "FINALMARKING" << endl;
-//  (*output) << "  " << findPlace("1.internal.final")->nodeShortName() << ":\t1" << endl;
-//  (*output) << ";" << endl << endl << endl;
+  // final marking
+  (*output) << "FINALMARKING" << endl;
+  (*output) << "  " << findPlace("1.internal.final")->nodeShortName() << ":\t1" << endl;
+  (*output) << ";" << endl << endl << endl;
 
 
   // transitions
@@ -1466,7 +1467,6 @@ void PetriNet::simplify()
       mergeTransitions(t1, t2);
   }
 
-/*
   trace(TRACE_VERY_DEBUG, "[PN]\tnew reduction rule\n");
 
   // a pair to store places to be merged
@@ -1494,7 +1494,6 @@ void PetriNet::simplify()
       if (sequenceTransition != NULL)
 	removeTransition(sequenceTransition);
     }
-*/
 
   trace(TRACE_INFORMATION, "Simplifying complete.\n");
   trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification: " + information() + "\n");

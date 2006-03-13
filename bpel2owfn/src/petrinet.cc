@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/03/12 18:15:59 $
+ *          - last changed: \$Date: 2006/03/13 09:36:59 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.107 $
+ * \version \$Revision: 1.108 $
  */
 
 
@@ -1499,6 +1499,17 @@ void PetriNet::removeIsolatedNodes()
     removePlace(*p);
 }
 
+
+
+void PetriNet::removeVariables()
+{
+  extern SymbolManager symMan;
+  
+  for (list<string>::iterator variable = symMan.variables.begin(); variable != symMan.variables.end(); variable++)
+  {
+    removePlace( findPlace("variable." + *variable) );
+  }
+}
 
 
 

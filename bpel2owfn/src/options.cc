@@ -370,6 +370,10 @@ void parse_command_line(int argc, char* argv[])
 	      {
 		parameters[P_NOFHFAULTS] = true;
 	      }
+	      else if ( parameter == "novariables" )
+	      {
+		parameters[P_NOVARIABLES] = true;
+	      }
 	      else
 	      {
 		throw Exception(OPTION_MISMATCH, 

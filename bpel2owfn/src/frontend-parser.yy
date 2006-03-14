@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/10 14:08:31 $
+ *          - last changed: \$Date: 2006/03/14 13:46:32 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.131 $
+ * \version \$Revision: 1.132 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -358,7 +358,8 @@ tProcess:
       isInFH.pop();
       isInCH.pop();
       $$->id = $4;
-      ((STProcess*)symTab.lookup($3))->hasEventHandler = (string($14->op_name()) == "userDefinedEventHandler");
+//      ((STProcess*)symTab.lookup($3))->hasEventHandler = (string($14->op_name()) == "userDefinedEventHandler");
+      $$->hasEH = (string($14->op_name()) == "userDefinedEventHandler");
     }
 ;
 
@@ -1278,7 +1279,8 @@ tInvoke:
         scope->id = $7->parentId = $3; 
         invoke->id = ai->id = se->parentId = att.nextId();
         */
-        ((STScope*)symTab.lookup(currentSymTabEntryKey))->hasEventHandler = false;
+//        ((STScope*)symTab.lookup(currentSymTabEntryKey))->hasEventHandler = false;
+        scope->hasEH = false;
 
         currentScopeId = scope->parentScopeId = parent[$3];
 
@@ -2760,7 +2762,8 @@ tScope:
       {
 	symMan.remDPEstart();
       }
-      ((STScope*)symTab.lookup($2))->hasEventHandler = (string($13->op_name()) == "userDefinedEventHandler");
+//      ((STScope*)symTab.lookup($2))->hasEventHandler = (string($13->op_name()) == "userDefinedEventHandler");
+      $$->hasEH = (string($13->op_name()) == "userDefinedEventHandler");
       if ($7->dpe->value > 0)
       {
         symMan.addDPEend();

@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/14 13:46:32 $
+ *          - last changed: \$Date: 2006/03/15 18:23:22 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.132 $
+ * \version \$Revision: 1.133 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -504,6 +504,7 @@ tPartnerLink:
       }
       symTab.checkAttributes($2);
       $$ = PartnerLink();
+      $$->id = $2;
       $$->name = att.read($3, "name");
       $$->partnerLinkType = att.read($3, "partnerLinkType");
       $$->myRole = att.read($3, "myRole");
@@ -527,6 +528,7 @@ tPartnerLink:
       }
       symTab.checkAttributes($2);
       $$ = PartnerLink();
+      $$->id = $2;
       $$->name = att.read($3, "name");
       $$->partnerLinkType = att.read($3, "partnerLinkType");
       $$->myRole = att.read($3, "myRole");
@@ -629,6 +631,7 @@ tFaultHandlers:
   /* empty */
     { currentSymTabEntryKey = symTab.insert(K_FAULTHANDLERS);
       $$ = implicitFaultHandler();
+      $$->id = mkinteger(currentSymTabEntryKey);
       $$->inProcess = (currentScopeId->value == 1);
       $$->parentScopeId = currentScopeId; 
       $$->hasCatchAll = false;
@@ -643,6 +646,7 @@ tFaultHandlers:
   tCatchAll 
   X_SLASH K_FAULTHANDLERS X_NEXT
     { $$ = userDefinedFaultHandler($5, $6);
+      $$->id = $2;
       $$->inProcess = (currentScopeId->value == 1);
       $$->parentScopeId = currentScopeId;
       $$->hasCatchAll = hasCatchAll;
@@ -670,6 +674,7 @@ tCatch:
   arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CATCH
     { symTab.checkAttributes($2);
       $$ = Catch($5);
+      $$->id = $2;
       $$->faultName = att.read($3, "faultName");
       $$->faultVariable = att.read($3, "faultVariable"); 
       $$->variableID = symMan.checkVariable(att.read($3, "faultVariable")->name, true); 
@@ -928,6 +933,7 @@ tVariable:
   arbitraryAttributes X_NEXT X_SLASH K_VARIABLE
     { symTab.checkAttributes($2); //att.check($3, K_VARIABLE);
       $$ = Variable();
+      $$->id = $2;
       $$->name = att.read($3, "name");
       $$->messageType = att.read($3, "messageType");
       $$->type = att.read($3, "type");
@@ -941,6 +947,7 @@ tVariable:
   arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2); //att.check($3, K_VARIABLE);
       $$ = Variable();
+      $$->id = $2;
       $$->name = att.read($3, "name");
       $$->messageType = att.read($3, "messageType");
       $$->type = att.read($3, "type");
@@ -2303,12 +2310,14 @@ tLink:
   arbitraryAttributes X_NEXT X_SLASH K_LINK
     { symTab.checkAttributes($2);
       $$ = Link();
+      $$->id = $2;
       $$->name = att.read($3, "name"); 
       $$->linkID = symMan.addLink(new csLink($$->name->name)); }
 | K_LINK genSymTabEntry_Link
   arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2);
       $$ = Link();
+      $$->id = $2;
       $$->name = att.read($3, "name"); 
       $$->linkID = symMan.addLink(new csLink($$->name->name)); }
 ;

@@ -28,20 +28,20 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/02/09 19:09:06 $
+ *          - last changed: \$Date: 2006/03/15 18:18:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universitï¿½t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.29 $
+ * \version \$Revision: 1.30 $
  */
 %}
 
@@ -127,7 +127,8 @@ Process(a,b,c,d,e,f,g,h,i) ->
 ******************************************************************************/
 
 PartnerLink() ->
-  [xml: { in(); } "<partnerLink />\n"]
+  [xml: { in(); } "<partnerLink id=\"" $0->id "\"/>\n"]
+//  [xml: { in(); } "<partnerLink />\n"]
 ;
 
 
@@ -136,7 +137,8 @@ PartnerLink() ->
 ******************************************************************************/
 
 Partner(a) ->
-  [xml: { inup(); } "<partner>\n" a { indown(); } "</partner>\n"]
+  [xml: { inup(); } "<partner id=\"" $0->id "\">\n" a { indown(); } "</partner>\n"]
+//  [xml: { inup(); } "<partner>\n" a { indown(); } "</partner>\n"]
 ;
 
 
@@ -145,11 +147,13 @@ Partner(a) ->
 ******************************************************************************/
 
 userDefinedFaultHandler(a,b) ->
-  [xml: { inup(); } "<faultHandlers>\n" a b { indown(); } "</faultHandlers>\n"]
+//  [xml: { inup(); } "<faultHandlers id=\"" $0->id "\">\n" a b { indown(); } "</faultHandlers>\n"]
+  [xml: { inup(); } "<faultHandlers>\n" a b { indown(); } "</faultHandlers>\n"] 
 ;
 
 Catch(a) ->
-  [xml: { inup(); } "<catch>\n" a { indown(); } "</catch>\n"]
+  [xml: { inup(); } "<catch id=\"" $0->id "\">\n" a { indown(); } "</catch>\n"]
+//  [xml: { inup(); } "<catch>\n" a { indown(); } "</catch>\n"]  
 ;
 
 CatchAll(a) ->
@@ -188,7 +192,8 @@ userDefinedCompensationHandler(a) ->
 ******************************************************************************/
 
 Variable() ->
-  [xml: { in(); } "<variable />\n"]
+  [xml: { in(); } "<variable id=\"" $0->id "\"/>\n"]
+//   [xml: { in(); } "<variable />\n"]  
 ;
 
 
@@ -315,7 +320,8 @@ Flow(a,b,c) ->
 ;
 
 Link() ->
-  [xml: { in(); } "<link />\n"]
+  [xml: { in(); } "<link id=\"" $0->id "\"/>\n"]
+//  [xml: { in(); } "<link />\n"]  
 ;
 
 

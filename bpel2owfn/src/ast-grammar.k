@@ -29,11 +29,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $ 
+ *          - last changes of: \$Author: reinert $ 
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/03/14 13:46:32 $
+ *          - last changed: \$Date: 2006/03/15 17:56:50 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.60 $
+ * \version \$Revision: 1.61 $
  */
 %}
 
@@ -143,6 +143,8 @@ tPartnerLink:
     casestring partnerLinkType;
     casestring myRole;
     casestring partnerRole;
+    
+    integer id;
   }
 ;
 
@@ -159,6 +161,8 @@ tPartner:
   Partner(tPartnerLink_list)
   {
     casestring name;
+    
+    integer id;
   }
 ;
 
@@ -192,6 +196,8 @@ tCatch:
 
     /// additional attribute containing the unique variable name    
     casestring variableID;
+    
+    integer id;
   }
 ;
 
@@ -201,6 +207,7 @@ tCatchAll:
   {
     casestring faultName;
     casestring faultVariable;
+    integer id;
   }
 ;
 
@@ -250,6 +257,8 @@ tOnMessage:
 
     /// additional attribute for DPE
     integer dpe = mkinteger(0);
+    
+    integer id;
   }
 ;
 
@@ -261,6 +270,8 @@ tOnAlarm:
 
     /// additional attribute for DPE
     integer dpe = mkinteger(0);
+    
+    integer id;
   } 
 ;
 
@@ -303,6 +314,8 @@ tVariable:
 
     /// additional attribute containing the unique variable name    
     casestring variableID;
+    
+    integer id;
   }
 ;
 
@@ -320,6 +333,8 @@ tCorrelationSet:
   {
     casestring properties;
     casestring name;
+    
+    integer id;
   }
 ;
 
@@ -341,6 +356,8 @@ tCorrelation:
     casestring set;
     casestring initiate = mkcasestring("no");
     casestring pattern;
+    
+    integer id;
   }
 ;
 
@@ -629,6 +646,8 @@ tLink:
 
     /// additional attribute containing the unique link name
     casestring linkID;
+    
+    integer id;
   }
 ;
 

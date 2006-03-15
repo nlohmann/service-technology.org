@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.20 $: 
+ * \version \$Revision: 1.21 $: 
  *
  */
 
@@ -49,6 +49,7 @@
 #include "bpel-attributes.h"
 
 using namespace std;
+
 
 /// enumeration of possible locations of an activity used to send failures to
 /// the correct place in the Petri net
@@ -104,6 +105,8 @@ class STElement
     /// location of the activity (Scope/Process, FH, CH) to distribute error
     /// tokens correctly
     ActivityLocationId activityLocation;
+    
+    virtual ~STElement();
 };
 
 
@@ -116,7 +119,7 @@ class STElement
 class SymbolTable
 {
   private:
-    /// mapping from AST id to symTab entry  
+    /// mapping from AST id to symTab entry key  
     map<unsigned int, unsigned int> id2key;
 
     /// a container to store ...
@@ -127,9 +130,6 @@ class SymbolTable
     
     /// return the key of the last insert element
     unsigned int getCurrentEntryKey();
-
-    /// return retranslation from elementId to BPEL-element name, e.g. K_ASSIGN->"assign"
-    string translateToElementName(unsigned int elementId);
 	
 	/// domain check
 	void checkAttributeValueYesNo(string attributeName, string attributeValue);	
@@ -152,6 +152,9 @@ class SymbolTable
     
     /// increase the map key
     unsigned int nextKey();
+
+    /// increases the id (used ST key generator -> nextKey())
+    kc::integer nextId();
 
 	/// ST traces
 	void traceST(string traceMsg);
@@ -189,12 +192,18 @@ class SymbolTable
     /// checked the attributes and the value of BPEL-elements
     void checkAttributes(unsigned int entryKey);
     
-    /// return 
+    /// translated the AST id to symbol table entry key and return symbol table entry key
     unsigned int idToKey(kc::integer astId);
+    
+    /// translated the symbol table entry key to ASt id and return AST id
+    kc::integer keyToId(kc::integer entryKey);
     
     /// mapping between AST Id and symbol table entries
     void setMapping(unsigned int entryKey, kc::integer astId);
-  
+
+    /// return retranslation from elementId to BPEL-element name, e.g. K_ASSIGN->"assign"
+    string translateToElementName(unsigned int elementId);
+ 
     /// return symbol table information string
     string getInformation(kc::integer astId, bool closeTag = false);
 };
@@ -431,6 +440,8 @@ class STEnvelope
 
     /// true if scope had an event handler?
     bool hasEventHandler;    
+    
+    virtual ~STEnvelope();
 };
 
 

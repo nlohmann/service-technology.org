@@ -66,12 +66,20 @@ SymbolTable::SymbolTable()
 SymbolTable::~SymbolTable() {}
 
 /*!
- * increase the entryId of the SymbolTable 
+ * increase the entryKey of the SymbolTable 
  */
 unsigned int SymbolTable::nextKey()
 {
   this->entryKey++;
   return this->entryKey;
+}
+
+/*!
+ * 
+ */
+kc::integer SymbolTable::nextId()
+{
+  return kc::mkinteger(nextKey());
 }
 
 /*!
@@ -90,6 +98,39 @@ void SymbolTable::setMapping(unsigned int entryKey, kc::integer astId)
 unsigned int SymbolTable::idToKey(kc::integer astId)
 {
   return id2key[astId->value];
+} 
+
+/*!
+ * \param astId  id of an AST (astract syntax tree) element
+ */
+kc::integer SymbolTable::keyToId(kc::integer entryKey)
+{
+/*  /// iterator
+  std::map<unsigned int, unsigned int>::iterator id2KeyIterator;  
+  id2KeyIterator = id2key.begin();
+ 
+  traceST("\t\t\tkeyToId key=" + intToString(entryKey->value) + "\n");
+  if((entryKey->value == 14) || (entryKey->value == 15) || (entryKey->value == 16)){
+  /// iteration loop over all attributes of the desired symbol table entry       
+  while(id2KeyIterator != id2key.end())
+  {  
+  	traceST("\t\t\t id=" + intToString((*id2KeyIterator).first) + " key=" + intToString((*id2KeyIterator).second) + "\n");
+    ++id2KeyIterator;
+  }
+  }
+
+  /// iteration loop over all attributes of the desired symbol table entry       
+  while(id2KeyIterator != id2key.end())
+  {  
+    if((entryKey->value). == ((*id2KeyIterator).first))
+    {
+	  traceST("\t\t\tkeyToId id=" + intToString((*id2KeyIterator).first) + "\n");
+      return kc::mkinteger((*id2KeyIterator).first);
+    }
+    ++id2KeyIterator;
+  }
+*/
+  return kc::mkinteger(-1);
 } 
 
 /*!
@@ -1296,6 +1337,22 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
     {
       traceST("PARTNERLINK\n");
       
+      /* attention case differentation
+       * case 1:
+	   *     <partnerLinks>?
+	   *       <partnerLink name="ncname" partnerLinkType="qname"
+	   *                    myRole="ncname"? partnerRole="ncname"?>+
+	   *       </partnerLink>
+	   *     </partnerLinks>
+       * case 2:
+	   *     <partners>?
+	   *       <partner name="ncname">+
+	   *         <partnerLink name="ncname"/>+
+	   *       </partner>
+	   *     </partners> 
+       * 
+       */
+      
       bool nameFlag, partnerLinkTypeFlag;
       nameFlag = partnerLinkTypeFlag = false;
        
@@ -1317,10 +1374,12 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
         ++mapOfAttributesIterator;
       }
       
+      // important for both cases
       if(!nameFlag)
       {
         printErrorMsg("attribute " + A__NAME + "=\"" + T__NCNAME + "\" is missing");        
       }
+      // important for case 1
       else if((((STPartnerLink*)symTab[entryKey])->isInPartners == false) && !partnerLinkTypeFlag)
       {
         printErrorMsg("attribute " + A__PARTNER_LINK_TYPE + "=\"" + T__QNAME + "\" is missing");        
@@ -1947,10 +2006,14 @@ STCorrelationSet::~STCorrelationSet() {}
 /********************************************
  * implementation of Element CLASS
  ********************************************/
+
+ STElement::~STElement() {}
  
 /********************************************
- * implementation of Envelope CLASS
+ * implementation of STEnvelope CLASS
  ********************************************/
+ 
+ STEnvelope::~STEnvelope() {}
  
 /********************************************
  * implementation of EventHandlers CLASS

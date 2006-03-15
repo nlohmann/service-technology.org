@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/03/10 16:01:56 $
+ *          - last changed: \$Date: 2006/03/15 13:13:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -47,6 +47,9 @@
 
 using std::cout;
 using std::endl;
+
+map<std::string, CFGBlock*> sources;
+map<std::string, CFGBlock*> targets;
 
 CFGBlock::CFGBlock()
 {
@@ -101,6 +104,14 @@ void CFGBlock::print_dot()
       (*output) << "  \"" << dot_name() << "\" -> \"" << (*iter)->dot_name() << "\";" << endl;
     }
     (*output) << endl;
+    // draw link
+    if (type == CFGSource)
+    {
+      std::string targ = "dummy";
+      if (targets[dot_name()] != NULL)
+	  targ = (targets[dot_name()])->dot_name();
+      (*output) << "  \"" << dot_name() << "\" -> \"" << targ << "\" [ style=dotted ];" << endl;
+    }
 
     for(list<CFGBlock *>::iterator iter = nextBlocks.begin(); iter != nextBlocks.end(); iter++)
     {
@@ -111,7 +122,14 @@ void CFGBlock::print_dot()
 
 std::string CFGBlock::dot_name()
 {
-  return label + "_" + intToString(id->value);
+  if (type == CFGSource || type == CFGTarget)
+  {
+    return label;
+  }
+  else
+  {
+    return label + "_" + intToString(id->value);
+  }
 }
 
 void cfgDot(CFGBlock * block)

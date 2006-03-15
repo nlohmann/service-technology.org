@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/03/10 15:54:17 $
+ *          - last changed: \$Date: 2006/03/15 13:13:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  */
 %}
 
@@ -534,7 +534,8 @@ This=StandardElements(a,b) ->
       foreach (link; tTarget_list a)
       {
 	  trace(TRACE_DEBUG, "[CFG] Target\n");
-	  CFGBlock * target = new CFGBlock(CFGTarget, $0->parentId, "Target_" + std::string(link->linkName->name));
+	  CFGBlock * target = new CFGBlock(CFGTarget, $0->parentId, "Target_" + std::string(link->linkID->name));
+	  targets["Source_" + std::string(link->linkID->name)] = target;
 	  /// \todo: use link to connect source and target
 /*	  for (list<CFGBlock *>::iterator iter = innerFirst->prevBlocks.begin(); iter != innerFirst->prevBlocks.end(); iter++)
 	  {
@@ -551,7 +552,8 @@ This=StandardElements(a,b) ->
       foreach (link; tSource_list b)
       {
 	  trace(TRACE_DEBUG, "[CFG] Source\n");
-	  CFGBlock * source = new CFGBlock(CFGSource, $0->parentId, "Source_" + std::string(link->linkName->name));
+	  CFGBlock * source = new CFGBlock(CFGSource, $0->parentId, "Source_" + std::string(link->linkID->name));
+	  sources["Target_" + std::string(link->linkID->name)] = source;
 	  /// \todo: use link to connect source and target
 
 /*	  for (list<CFGBlock *>::iterator iter = innerLast->nextBlocks.begin(); iter != innerLast->nextBlocks.end(); iter++)

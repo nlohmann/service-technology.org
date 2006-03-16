@@ -29,21 +29,21 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: reinert $
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/03/14 13:46:32 $
+ *          - last changed: \$Date: 2006/03/16 15:01:34 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universitï¿½t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  * \note    This file was created using Kimwitu++ reading file
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.157 $
+ * \version \$Revision: 1.158 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -109,7 +109,7 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
     {
       trace(TRACE_INFORMATION, "Generating Petri net...\n");
       header(This->id, true);
-      STProcess* myself = ((STProcess*)symTab.lookup(This->id));
+      STProcess* myself = dynamic_cast <STProcess*> (symTab.lookup(This->id));
 
       string prefix = intToString(This->id->value) + ".internal.";
       currentScope = prefix;
@@ -3261,7 +3261,7 @@ This=Scope(a,b,c,d,e,f,g) ->
       string prefix = intToString(This->id->value) + ".internal.";
       currentScope = prefix;
       SymbolScope *me = symMan.getScope(this->id);
-      STEnvelope* myself = ((STEnvelope*)symTab.lookup(This->id));
+      STScope* myself = dynamic_cast <STScope*> (symTab.lookup(This->id));
 
       // Create push-places for the children of the scope.
       for (list< SymbolScope * >::iterator child = me->children.begin(); child != me->children.end(); child++)

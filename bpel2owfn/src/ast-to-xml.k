@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/03/15 18:18:43 $
+ *          - last changed: \$Date: 2006/03/16 15:01:34 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.30 $
+ * \version \$Revision: 1.31 $
  */
 %}
 
@@ -147,8 +147,8 @@ Partner(a) ->
 ******************************************************************************/
 
 userDefinedFaultHandler(a,b) ->
-//  [xml: { inup(); } "<faultHandlers id=\"" $0->id "\">\n" a b { indown(); } "</faultHandlers>\n"]
-  [xml: { inup(); } "<faultHandlers>\n" a b { indown(); } "</faultHandlers>\n"] 
+  [xml: { inup(); } "<faultHandlers id=\"" $0->id "\">\n" a b { indown(); } "</faultHandlers>\n"]
+//  [xml: { inup(); } "<faultHandlers>\n" a b { indown(); } "</faultHandlers>\n"] 
 ;
 
 Catch(a) ->
@@ -166,7 +166,8 @@ CatchAll(a) ->
 ******************************************************************************/
 
 userDefinedEventHandler(a,b) ->
-  [xml: { inup(); } "<eventHandlers>\n" a b { indown(); } "</eventHandlers>\n"]
+  [xml: { inup(); } "<eventHandlers id=\"" $0->id "\">\n" a b { indown(); } "</eventHandlers>\n"]
+//  [xml: { inup(); } "<eventHandlers>\n" a b { indown(); } "</eventHandlers>\n"]  
 ;
 
 OnMessage(a) ->
@@ -183,7 +184,8 @@ OnAlarm(a) ->
 ******************************************************************************/
 
 userDefinedCompensationHandler(a) ->
-  [xml: { inup(); } "<compensationHandler>\n" a { indown(); } "</compensationHandler>\n"]
+  [xml: { inup(); } "<compensationHandler id=\"" $0->id "\">\n" a { indown(); } "</compensationHandler>\n"]
+//  [xml: { inup(); } "<compensationHandler>\n" a { indown(); } "</compensationHandler>\n"]  
 ;
 
 

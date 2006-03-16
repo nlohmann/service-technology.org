@@ -144,7 +144,7 @@ string SymbolTable::getInformation(kc::integer astId, bool closeTag)
   if (closeTag)
     result += "/";
   
-  result += translateToElementName((lookup(idToKey(astId)))->getElementId());
+  result += translateToElementName((lookup(astId))->getElementId());
   result += " id=\"" + intToString(astId->value) + "\">";
   
   return result;

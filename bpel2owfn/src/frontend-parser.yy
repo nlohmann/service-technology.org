@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/16 13:18:43 $
+ *          - last changed: \$Date: 2006/03/16 15:01:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.134 $
+ * \version \$Revision: 1.135 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -332,8 +332,8 @@ tProcess:
       	att.pushSJFStack($4, att.read($4, "suppressJoinFailure"));      
       }      
 
-      symMan.initialiseProcessScope($4);
-      currentScopeId = $4;
+      symMan.initialiseProcessScope($3);
+      currentScopeId = $3;
       isInFH.push(false);
       isInCH.push(pair<bool,int>(false,0));
       hasCompensate = 0;
@@ -357,7 +357,7 @@ tProcess:
       $$->xmlns = att.read($4, "xmlns", $$->xmlns);
       isInFH.pop();
       isInCH.pop();
-      $$->id = $4;
+      $$->id = $3;
 //      ((STProcess*)symTab.lookup($3))->hasEventHandler = (string($14->op_name()) == "userDefinedEventHandler");
       $$->hasEH = (string($14->op_name()) == "userDefinedEventHandler");
     }
@@ -697,6 +697,7 @@ tCatchAll:
   arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CATCHALL X_NEXT
     { hasCatchAll = true;
       $$ = CatchAll($5);
+      $$->id = $2;      
    /* DR
       $$->faultName = att.read($3, "faultName");
       $$->faultVariable = att.read($3, "faultVariable");
@@ -733,6 +734,7 @@ tCompensationHandler:
         $$ = processCompensationHandler();
       else
         $$ = implicitCompensationHandler();
+      $$->id = mkinteger(currentSymTabEntryKey);              
       $$->parentScopeId = currentScopeId; }
 | K_COMPENSATIONHANDLER genSymTabEntry_CompensationHandler X_NEXT 
     {
@@ -760,7 +762,8 @@ tCompensationHandler:
       }
       hasCompensate = isInCH.top().second;
       isInCH.pop();
-
+      
+      $$->id = $2;
       $$->parentScopeId = currentScopeId; 
       symMan.endDPEinWhile();
     }
@@ -802,6 +805,7 @@ tEventHandlers:
   /* empty */
     { currentSymTabEntryKey = symTab.insert(K_EVENTHANDLERS);
       $$ = implicitEventHandler();
+      $$->id = mkinteger(currentSymTabEntryKey);      
       $$->parentScopeId = currentScopeId; }
 | K_EVENTHANDLERS genSymTabEntry_EventHandlers X_NEXT 
     {
@@ -811,6 +815,7 @@ tEventHandlers:
   tOnAlarm_list 
   X_SLASH K_EVENTHANDLERS X_NEXT
     { $$ = userDefinedEventHandler($5, $6);
+      $$->id = $2;    
       $$->parentScopeId = currentScopeId; 
       symMan.endDPEinWhile();
     }
@@ -854,6 +859,7 @@ tOnMessage:
     }
   tCorrelations activity X_NEXT X_SLASH K_ONMESSAGE
     { $$ = OnMessage($7);
+      $$->id = $2;    
       $$->partnerLink = att.read($3, "partnerLink");
       $$->portType = att.read($3, "portType");
       $$->operation = att.read($3, "operation");
@@ -882,6 +888,7 @@ tOnAlarm:
     }
   activity X_NEXT X_SLASH K_ONALARM 
     { $$ = OnAlarm($6);
+      $$->id = $2;
       $$->For = att.read($3, "for");  // "for" is a keyword
       $$->until = att.read($3, "until");
       $$->dpe = symMan.needsDPE();
@@ -1008,11 +1015,14 @@ tCorrelationSet:
   K_CORRELATIONSET genSymTabEntry_CorrelationSet
   arbitraryAttributes X_NEXT X_SLASH K_CORRELATIONSET
     { symTab.checkAttributes($2); //att.check($3, K_CORRELATIONSET);
-      $$ = CorrelationSet(); }
+      $$ = CorrelationSet();
+      $$->id = $2;      
+    }
 | K_CORRELATIONSET genSymTabEntry_CorrelationSet
   arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2); //att.check($3, K_CORRELATIONSET);
       $$ = CorrelationSet();
+      $$->id = $2;      
       $$->properties = att.read($3, "properties");
       $$->name = att.read($3, "name"); }
 ;
@@ -1051,6 +1061,7 @@ tCorrelation:
   arbitraryAttributes X_NEXT X_SLASH K_CORRELATION
     { symTab.checkAttributes($2);
       $$ = Correlation();
+      $$->id = $2;      
       $$->set = att.read($3, "set");
       $$->initiate = att.read($3, "initiate", $$->initiate);
       $$->pattern = att.read($3, "pattern"); }
@@ -1058,6 +1069,7 @@ tCorrelation:
   arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2);
       $$ = Correlation();
+      $$->id = $2;      
       $$->set = att.read($3, "set");
       $$->initiate = att.read($3, "initiate", $$->initiate);
       $$->pattern = att.read($3, "pattern"); }
@@ -1108,7 +1120,7 @@ tEmpty:
       att.traceAM(string("tEmpty: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $3; 
+      $$->id = $6->parentId = $2; 
       if ($6->hasTarget)
       {
 	symMan.remDPEstart();
@@ -1142,7 +1154,7 @@ tEmpty:
       att.traceAM(string("tEmpty: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $3; }
+      $$->id = $2; }
 ;
 
 genSymTabEntry_Empty:
@@ -1201,8 +1213,8 @@ tInvoke:
       symMan.checkPartnerLink(att.read($3, "partnerLink")->name);
       isInFH.push(false);
       isInCH.push(pair<bool,int>(false,hasCompensate));
-      parent[$3] = currentScopeId;
-      kc::integer qad_id = att.nextId();
+      parent[$2] = currentScopeId;
+      kc::integer qad_id = symTab.nextId();
       parent[qad_id] = currentScopeId;
       currentScopeId = qad_id; 
     }
@@ -1226,7 +1238,7 @@ tInvoke:
         tScope scope = Scope($7, NiltVariable_list(), fh, $11, eh, StopInScope(), ai);
 
         scope->id = $7->parentId = currentScopeId; 
-        invoke->id = ai->id = se->parentId = $3;
+        invoke->id = ai->id = se->parentId = $2;
 
         fh->inProcess = false;
         fh->parentScopeId = scope->id;
@@ -1285,13 +1297,13 @@ tInvoke:
         scope->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
         invoke->negativeControlFlow = mkinteger(0);
         /*
-        scope->id = $7->parentId = $3; 
-        invoke->id = ai->id = se->parentId = att.nextId();
+        scope->id = $7->parentId = $2; 
+        invoke->id = ai->id = se->parentId = symTab.nextId();
         */
 //        ((STScope*)symTab.lookup(currentSymTabEntryKey))->hasEventHandler = false;
         scope->hasEH = false;
 
-        currentScopeId = scope->parentScopeId = parent[$3];
+        currentScopeId = scope->parentScopeId = parent[$2];
 
         $$ = activity(activityScope(scope));
 
@@ -1303,7 +1315,7 @@ tInvoke:
         //cerr << "don't embed" << endl;
 
         //restore real scope ID
-        currentScopeId = parent[$3];
+        currentScopeId = parent[$2];
 
         tInvoke invoke = Invoke($7, $8);
 
@@ -1342,7 +1354,7 @@ tInvoke:
           symMan.addDPEend();
         }
         invoke->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-        invoke->id = $7->parentId = $3; 
+        invoke->id = $7->parentId = $2; 
 
         $$ = activity(activityInvoke(invoke));
         $$->id = invoke->id;
@@ -1367,7 +1379,7 @@ tInvoke:
   X_SLASH
     { 
       impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
-      noLinks->parentId = $3;
+      noLinks->parentId = $2;
       tInvoke invoke = Invoke(noLinks, NiltCorrelation_list());
       invoke->name = att.read($3, "name");
       invoke->joinCondition = att.read($3, "joinCondition");    
@@ -1397,7 +1409,7 @@ tInvoke:
       }
       invoke->dpe = kc::mkinteger(0);
       invoke->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      invoke->id = $3; 
+      invoke->id = $2; 
 
       $$ = activity(activityInvoke(invoke));
       $$->id = invoke->id;
@@ -1482,7 +1494,7 @@ tReceive:
         symMan.addDPEend();
       }
       $$->negativeControlFlow = $7->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $7->parentId = $3; }
+      $$->id = $7->parentId = $2; }
 | K_RECEIVE genSymTabEntry_Receive
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_RECEIVE);
@@ -1499,7 +1511,7 @@ tReceive:
     }   
   X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
-      noLinks->parentId = $3;
+      noLinks->parentId = $2;
       $$ = Receive(noLinks, NiltCorrelation_list());
       $$->name = att.read($3, "name");
       $$->joinCondition = att.read($3, "joinCondition");     
@@ -1513,7 +1525,7 @@ tReceive:
       $$->createInstance = att.read($3, "createInstance", $$->createInstance);
       $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $3; 
+      $$->id = $2; 
       symMan.checkPartnerLink($$->partnerLink->name); 
       $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
@@ -1600,7 +1612,7 @@ tReply:
         symMan.addDPEend();
       }
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $3; }
+      $$->id = $6->parentId = $2; }
 | K_REPLY genSymTabEntry_Reply
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_REPLY);
@@ -1617,7 +1629,7 @@ tReply:
     }   
   X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
-      noLinks->parentId = $3;
+      noLinks->parentId = $2;
       $$ = Reply(noLinks, NiltCorrelation_list());
       $$->name = att.read($3, "name");
       $$->joinCondition = att.read($3, "joinCondition");    
@@ -1635,7 +1647,7 @@ tReply:
 				      $$->operation->name, 
 				      $$->partnerLink->name), false);
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $3; }
+      $$->id = $2; }
 ;
 
 genSymTabEntry_Reply:
@@ -1694,7 +1706,7 @@ tAssign:
         symMan.addDPEend();
       }
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $3; }
+      $$->id = $6->parentId = $2; }
 ;
 
 genSymTabEntry_Assign:
@@ -1732,6 +1744,7 @@ tFrom:
   K_FROM genSymTabEntry_From arbitraryAttributes X_NEXT X_SLASH K_FROM
     { symTab.checkAttributes($2); //att.check($3, K_FROM);
       $$ = From();
+      $$->id = $2;      
       $$->variable = att.read($3, "variable");
       $$->part = att.read($3, "part");
       $$->query = att.read($3, "query");
@@ -1745,6 +1758,7 @@ tFrom:
 | K_FROM genSymTabEntry_From arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_FROM
     { symTab.checkAttributes($2, $5); //att.check($3, $5, K_FROM);
       $$ = From();
+      $$->id = $2;      
       $$->variable = att.read($3, "variable");
       $$->part = att.read($3, "part");
       $$->query = att.read($3, "query");
@@ -1759,6 +1773,7 @@ tFrom:
 | K_FROM genSymTabEntry_From arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2); //att.check($3, K_FROM);
       $$ = From();
+      $$->id = $2;      
       $$->variable = att.read($3, "variable");
       $$->part = att.read($3, "part");
       $$->query = att.read($3, "query");
@@ -1789,6 +1804,7 @@ tTo:
   K_TO genSymTabEntry_To arbitraryAttributes X_NEXT X_SLASH K_TO
     { symTab.checkAttributes($2); //att.check($3, K_TO);
       $$ = To();
+      $$->id = $2;      
       $$->variable = att.read($3, "variable");
       $$->part = att.read($3, "part");
       $$->partnerLink = att.read($3, "partnerLink");
@@ -1798,6 +1814,7 @@ tTo:
 | K_TO genSymTabEntry_To arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2); //att.check($3, K_TO);
       $$ = To();
+      $$->id = $2;      
       $$->variable = att.read($3, "variable");
       $$->part = att.read($3, "part");
       $$->partnerLink = att.read($3, "partnerLink");
@@ -1847,7 +1864,7 @@ tWait:
       }
     }   
   X_NEXT standardElements X_SLASH K_WAIT
-    { $$ = Wait($6);
+    { $$ = Wait($6);    
       $$->name = att.read($3, "name");
       $$->joinCondition = $6->joinCondition = att.read($3, "joinCondition");     
       $$->suppressJoinFailure = $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
@@ -1864,7 +1881,7 @@ tWait:
         symMan.addDPEend();
       }
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $3; }
+      $$->id = $6->parentId = $2; }
 | K_WAIT genSymTabEntry_Wait
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_WAIT);
@@ -1881,7 +1898,7 @@ tWait:
     }   
   X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
-      noLinks->parentId = $3;
+      noLinks->parentId = $2;
       $$ = Wait(noLinks);
       $$->name = att.read($3, "name");
       $$->joinCondition = att.read($3, "joinCondition");    
@@ -1891,7 +1908,7 @@ tWait:
       $$->For = att.read($3, "for"); // "for" is a keyword
       $$->until = att.read($3, "until");
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $3; }
+      $$->id = $2; }
 ;
 
 genSymTabEntry_Wait:
@@ -1952,7 +1969,7 @@ tThrow:
         symMan.addDPEend();
       }
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $3; }
+      $$->id = $6->parentId = $2; }
 | K_THROW genSymTabEntry_Throw
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_THROW);
@@ -1980,7 +1997,7 @@ tThrow:
       $$->faultVariable = att.read($3, "faultVariable");
       $$->variableID = symMan.checkVariable(att.read($3, "faultVariable")->name);
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $3; }
+      $$->id = $2; }
 ;
 
 genSymTabEntry_Throw:
@@ -2059,7 +2076,7 @@ tCompensate:
         symMan.addDPEend();
       }
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $3; }
+      $$->id = $6->parentId = $2; }
 | K_COMPENSATE genSymTabEntry_Compensate
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_COMPENSATE);
@@ -2099,7 +2116,7 @@ tCompensate:
     }   
   X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
-      noLinks->parentId = $3;
+      noLinks->parentId = $2;
       $$ = Compensate(noLinks);
       $$->name = att.read($3, "name");
       $$->joinCondition = att.read($3, "joinCondition");     
@@ -2108,7 +2125,7 @@ tCompensate:
       att.popSJFStack();
       $$->scope = att.read($3, "scope");
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $3; }
+      $$->id = $2; }
 ;
 
 genSymTabEntry_Compensate:
@@ -2164,7 +2181,7 @@ tTerminate:
         symMan.addDPEend();
       }
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $3; }
+      $$->id = $6->parentId = $2; }
 | K_TERMINATE genSymTabEntry_Terminate
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_TERMINATE);
@@ -2181,7 +2198,7 @@ tTerminate:
     }   
   X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
-      noLinks->parentId = $3;
+      noLinks->parentId = $2;
       $$ = Terminate(noLinks);
       $$->name = att.read($3, "name");
       $$->joinCondition = att.read($3, "joinCondition");     
@@ -2189,7 +2206,7 @@ tTerminate:
       att.traceAM(string("tTerminate: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $3; }
+      $$->id = $2; }
 ;
 
 genSymTabEntry_Terminate:
@@ -2233,7 +2250,7 @@ tFlow:
     }   
   X_NEXT
     {
-      symMan.newFlowScope($3);
+      symMan.newFlowScope($2);
     } 
   standardElements tLinks activity_list X_SLASH K_FLOW
     { $$ = Flow($7, $8, $9);
@@ -2256,7 +2273,7 @@ tFlow:
 	$7->dpe = mkinteger(1);
       }
       $$->negativeControlFlow = $7->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $7->parentId = $3;
+      $$->id = $7->parentId = $2;
       symMan.checkLinks();
       symMan.quitScope(); }
 ;
@@ -2394,7 +2411,7 @@ tSwitch:
 	$6->dpe = mkinteger(1);
       }
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $3;
+      $$->id = $6->parentId = $2;
     }
 ;
 
@@ -2440,6 +2457,7 @@ tCase:
   activity 
   X_NEXT X_SLASH K_CASE
     { $$ = Case($6);
+      $$->id = $2;    
       $$->condition = att.read($3, "condition"); 
       $$->dpe = mkinteger((symMan.needsDPE())->value);
       
@@ -2456,7 +2474,7 @@ tOtherwise:
   /* If the otherwise branch is not explicitly specified, then an otherwise
      branch with an empty activity is deemed to be present. */
     { // creaty empty activit with id, without links etc.
-      integer id = att.nextId();
+      integer id = symTab.nextId();
       impl_standardElements_StandardElements* noLinks = StandardElements(NiltTarget_list(),NiltSource_list());
 //      noLinks->dpe = kc::mkinteger(0);
       noLinks->parentId = id;
@@ -2538,7 +2556,7 @@ tWhile:
       att.popSJFStack();
       $$->condition = att.read($3, "condition");
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $3; 
+      $$->id = $6->parentId = $2; 
       symMan.endDPEinWhile();
     }
 ;
@@ -2591,7 +2609,7 @@ tSequence:
       att.traceAM(string("tSequence: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $3; 
+      $$->id = $6->parentId = $2; 
       $$->dpe = mkinteger((symMan.needsDPE())->value);
       if ($6->hasTarget)
       {
@@ -2689,7 +2707,7 @@ tPick:
       {
 	$6->dpe = mkinteger(1);
       }
-      $$->id = $6->parentId = $3;
+      $$->id = $6->parentId = $2;
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
     }
 ;
@@ -2738,12 +2756,12 @@ tScope:
       }
     }  
   X_NEXT
-    { symMan.newScopeScope($3);
+    { symMan.newScopeScope($2);
       symMan.setBlackListMode(true);
       isInFH.push(false);
       isInCH.push(pair<bool,int>(false,hasCompensate));
-      parent[$3] = currentScopeId;
-      currentScopeId = $3; }
+      parent[$2] = currentScopeId;
+      currentScopeId = $2; }
   standardElements 
     {
       symMan.setBlackListMode(false);
@@ -2766,8 +2784,8 @@ tScope:
       att.popSJFStack();
       $$->variableAccessSerializable = att.read($3, "variableAccessSerializable", $$->variableAccessSerializable);
       $$->negativeControlFlow = $7->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $7->parentId = $3;
-      $$->parentScopeId = currentScopeId = parent[$3];
+      $$->id = $7->parentId = $2;
+      $$->parentScopeId = currentScopeId = parent[$2];
       $$->dpe = mkinteger((symMan.needsDPE())->value);
       if ($7->hasTarget)
       {
@@ -2834,6 +2852,7 @@ tTarget:
   arbitraryAttributes X_NEXT X_SLASH K_TARGET
     { symTab.checkAttributes($2); //att.check($3, K_TARGET);
       $$ = Target();
+      $$->id = $2;      
       $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->linkName = att.read($3, "linkName"); 
       $$->linkID = symMan.checkLink($$->linkName->name, false); }
@@ -2841,6 +2860,7 @@ tTarget:
   arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2); //att.check($3, K_TARGET);
       $$ = Target();
+      $$->id = $2;      
       $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->linkName = att.read($3, "linkName"); 
       $$->linkID = symMan.checkLink($$->linkName->name, false); }
@@ -2868,6 +2888,7 @@ tSource:
   arbitraryAttributes X_NEXT X_SLASH K_SOURCE
     { symTab.checkAttributes($2); //att.check($3, K_SOURCE);
       $$ = Source();
+      $$->id = $2;      
       $$->linkName = att.read($3, "linkName");
       $$->transitionCondition = att.read($3, "transitionCondition", $$->transitionCondition); 
       $$->linkID = symMan.checkLink($$->linkName->name, true); 
@@ -2880,6 +2901,7 @@ tSource:
   arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2); //att.check($3, K_SOURCE);
       $$ = Source();
+      $$->id = $2;      
       $$->linkName = att.read($3, "linkName");
       $$->transitionCondition = att.read($3, "transitionCondition", $$->transitionCondition); 
       $$->linkID = symMan.checkLink($$->linkName->name, true);

@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/03/16 09:43:39 $
+ *          - last changed: \$Date: 2006/03/16 13:58:11 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.1 $
+ * \version \$Revision: 1.2 $
  */
 
 
@@ -298,15 +298,15 @@ void PetriNet::dotOut()
   trace(TRACE_DEBUG, "[PN]\tCreating DOT-output.\n");
 
   (*output) << "digraph N {" << endl;
-  (*output) << " graph [fontname=\"Helvetica-Oblique\", label=\"";
+  (*output) << " graph [fontname=\"Helvetica\", label=\"";
 
   if (parameters[P_SIMPLIFY])
     (*output) << "structural simplified ";
 
   (*output) << "Petri net generated from " << filename << "\"];" << endl;
   (*output) <<
-    " node [fontname=\"Helvetica-Oblique\" fontsize=10 fixedsize];" << endl;
-  (*output) << " edge [fontname=\"Helvetica-Oblique\" fontsize=10];" <<
+    " node [fontname=\"Helvetica\" fontsize=10 fixedsize];" << endl;
+  (*output) << " edge [fontname=\"Helvetica\" fontsize=10];" <<
     endl << endl;
 
   // list the places

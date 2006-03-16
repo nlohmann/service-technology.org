@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/02/08 11:43:42 $ by $Author: nlohmann $.
-# Version $Revision: 1.14 $
+# File last changed $Date: 2006/03/16 09:43:39 $ by $Author: nlohmann $.
+# Version $Revision: 1.15 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -58,7 +58,8 @@ bpel2owfn_SOURCES = $(KCDUMMY)\
 		    exception.cc exception.h\
 		    helpers.cc helpers.h\
 		    main.cc main.h\
-		    petrinet.cc petrinet.h\
+		    petrinet.h\
+		    petrinet.cc petrinet-output.cc petrinet-reduction.cc\
 		    cfg.cc cfg.h\
 		    options.cc options.h\
 		    getopt.h getopt.c getopt1.c

@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/15 18:23:22 $
+ *          - last changed: \$Date: 2006/03/16 13:18:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.133 $
+ * \version \$Revision: 1.134 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -589,10 +589,12 @@ tPartner:
   K_PARTNER genSymTabEntry_Partner arbitraryAttributes X_NEXT tPartnerLink_list X_SLASH K_PARTNER
     { symTab.checkAttributes($2);
       $$ = Partner($5);
+      $$->id = $2;
       $$->name = att.read($3, "name"); }
 | K_PARTNER genSymTabEntry_Partner arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2);
       $$ = Partner(NiltPartnerLink_list());
+      $$->id = $2;      
       $$->name = att.read($3, "name"); }
 ;
 

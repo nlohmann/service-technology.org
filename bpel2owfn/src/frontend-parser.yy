@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/16 15:01:33 $
+ *          - last changed: \$Date: 2006/03/16 15:45:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.135 $
+ * \version \$Revision: 1.136 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -372,7 +372,9 @@ genSymTabEntry_Process:
 /* import other namespaces */
 imports:
   /* empty */
-| K_IMPORT arbitraryAttributes X_SLASH X_NEXT imports
+| K_IMPORT
+  { currentSymTabEntryKey = 0; /* no entry in SymbolTable */ } arbitraryAttributes
+  X_SLASH X_NEXT imports
 ;
 
 /*---------------------------------------------------------------------------*/
@@ -2926,7 +2928,8 @@ arbitraryAttributes:
       symTab.setMapping(currentSymTabEntryKey, $$);
     }
 | X_NAME X_EQUALS X_STRING arbitraryAttributes
-    { symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute($1, $3));
+    { // ignore imports
+      if(currentSymTabEntryKey > 0) symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute($1, $3));
       att.define($1, $3);
       $$ = $4;
     }

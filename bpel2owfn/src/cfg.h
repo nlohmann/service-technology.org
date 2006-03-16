@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/03/15 13:13:51 $
+ *          - last changed: \$Date: 2006/03/16 16:15:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  */
 
 #ifndef CFG_H
@@ -131,9 +131,15 @@ class CFGBlock {
 
     std::string channel_name;
 
+    bool needsDPE(int hasStartingBlock, list<kc::integer>& lastTarget);
+    
   private:
     bool dotted;
     bool processed;
+
+    /// \todo: move to symbol table
+    bool dpe;
+    list<CFGBlock * > dpeList;
 	  
 };
 

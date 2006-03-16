@@ -28,18 +28,18 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/03/13 09:36:59 $
+ *          - last changed: \$Date: 2006/03/16 16:15:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.61 $
+ * \version \$Revision: 1.62 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -121,6 +121,8 @@ int main( int argc, char *argv[])
         trace(TRACE_INFORMATION, "-> Unparsing AST to CFG ...\n");
         TheProcess->unparse(kc::pseudoPrinter, kc::cfg);
 	// do some business with CFG
+	list<kc::integer> kcl;
+	TheCFG->needsDPE(0, kcl);
       }
 
       if (modus == M_CFG)

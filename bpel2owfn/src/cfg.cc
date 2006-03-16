@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/03/15 13:13:51 $
+ *          - last changed: \$Date: 2006/03/16 16:15:38 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -57,6 +57,7 @@ CFGBlock::CFGBlock()
   lastBlock  = this;
   dotted = false;
   processed = false;
+  dpe = false;
   
 }
 
@@ -69,6 +70,7 @@ CFGBlock::CFGBlock(CFGBlockType pType, kc::integer pId = kc::mkinteger(0), std::
   label = pLabel;
   dotted = false;
   processed = false;
+  dpe = false;
 }
 
 CFGBlock::~CFGBlock()
@@ -96,6 +98,10 @@ void CFGBlock::print_dot()
     if (type == CFGTarget)
     {
       (*output) << " color=green style=filled"; //
+    }
+    if (dpe)
+    {
+      (*output) << " fontcolor=blue";
     }
     (*output) << " ]; " << endl;
     (*output) << "  // all outgoing edges" << endl;
@@ -146,6 +152,80 @@ void cfgDot(CFGBlock * block)
   (*output) << "}" << endl;
 
 }
+
+bool CFGBlock::needsDPE(int hasStartingBlock, list<kc::integer>& lastTargets)
+{
+ 
+  if (processed)
+  {
+    return dpe;
+  }
+  
+  bool childrenDPE = false;
+  int newStartingBlockNumber = hasStartingBlock;
+  list<kc::integer> localTargetList;
+
+  if (!lastTargets.empty())
+  {
+    for (list<kc::integer>::iterator iter = lastTargets.begin(); iter != lastTargets.end(); iter++)
+    {
+      localTargetList.push_back(*iter);
+    }
+  }
+
+  processed = true;
+
+  if (! nextBlocks.empty())
+  {
+    switch (type)
+    {
+      case CFGSwitch :  if (label == "Switch_begin")
+			{
+			  newStartingBlockNumber++;
+			}
+			else
+			{
+			  newStartingBlockNumber--;
+			}
+			break; 
+      case CFGPick :	if (label == "Pick_begin")
+			{
+			  newStartingBlockNumber++;
+			}
+			else
+			{
+			  newStartingBlockNumber--;
+			}
+			break; 
+      case CFGTarget :	localTargetList.push_back(id);
+			break;
+      default :		if (! localTargetList.empty())
+			{
+			  while ( (*(--localTargetList.end()))->value > id->value)
+			  {
+			    localTargetList.remove( *(--localTargetList.end()) );
+			  }
+			}
+			break;
+    }
+    for (list<CFGBlock *>::iterator iter = nextBlocks.begin(); iter != nextBlocks.end(); iter++)
+    {
+      bool result = (*iter)->needsDPE(newStartingBlockNumber, localTargetList);
+      childrenDPE = childrenDPE || result;
+    }
+    if (type == CFGSource)
+    {
+      childrenDPE = true;
+    }
+    
+    return dpe = (childrenDPE && ((hasStartingBlock > 0) || !localTargetList.empty()) );
+  }
+  else
+  {
+    return childrenDPE;
+  }
+}
+
 
 void connectBlocks(CFGBlock * from, CFGBlock * to)
 {

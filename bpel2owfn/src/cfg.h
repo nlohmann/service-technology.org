@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/03/16 16:15:39 $
+ *          - last changed: \$Date: 2006/03/17 14:43:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  */
 
 #ifndef CFG_H
@@ -56,6 +56,7 @@
 
 extern std::string filename;
 
+/// enumeration for the possible block types, that can occur in the CFG
 typedef enum
 {
   CFGProcess = 1,
@@ -84,7 +85,9 @@ typedef enum
 // forward declarations
 class CFGBlock;
 
+/// map for assigning a target to its appropriate source object
 extern map<std::string, CFGBlock *> sources;
+/// map for assigning a source to its appropriate target object
 extern map<std::string, CFGBlock *> targets;
 
 /**
@@ -127,14 +130,19 @@ class CFGBlock {
     CFGBlockType getType(); 
     /// dot_output
     virtual void print_dot();
+    /// the name of the dot node
     virtual std::string dot_name();
 
+    /// additional name of the channel
     std::string channel_name;
 
+    /// checks which blocks need DPE
     bool needsDPE(int hasStartingBlock, list<kc::integer>& lastTarget);
     
   private:
+    /// flag, if block was dotted
     bool dotted;
+    /// flag, if block was processed by an algorithm (has to be resetted afterwards)
     bool processed;
 
     /// \todo: move to symbol table

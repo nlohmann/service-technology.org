@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/03/16 16:15:38 $
+ *          - last changed: \$Date: 2006/03/17 14:43:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -201,7 +201,7 @@ bool CFGBlock::needsDPE(int hasStartingBlock, list<kc::integer>& lastTargets)
 			break;
       default :		if (! localTargetList.empty())
 			{
-			  while ( (*(--localTargetList.end()))->value > id->value)
+			  while ( ! localTargetList.empty() && (*(--localTargetList.end()))->value > id->value)
 			  {
 			    localTargetList.remove( *(--localTargetList.end()) );
 			  }

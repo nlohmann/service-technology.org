@@ -40,13 +40,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/03/13 09:36:59 $
+ *          - last changed: \$Date: 2006/03/17 10:24:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.63 $
+ * \version \$Revision: 1.64 $
  */
 
 
@@ -343,14 +343,12 @@ public:
   /// Simplifies the Petri net.
   void simplify();
 
-  /// Removes nodes with empty preset and postset. 
-  void removeIsolatedNodes();
-
   /// Removes all variable places.
   void removeVariables();
   
   /// Constructor to create an empty Petri net.
   PetriNet();
+
 
 private:
   /// Adds a place without an initial role.
@@ -377,6 +375,7 @@ private:
   /// Calculates the postset of a node.
   set<Node *> postset(Node * n);
 
+
   /// the list of places of the Petri net
   set<Place *> P;
 
@@ -392,6 +391,15 @@ private:
   /// the list of arcs of the Petri net
   set<Arc *> F;
 
+
+  /// remove dead nodes of the Petri net
+  void removeDeadNodes();
+
+  /// merge twin transitions
+  void mergeTwinTransitions();
+
+  /// collapse simple sequences
+  void collapseSequences();
 
   /// Statistical output.
   string information();

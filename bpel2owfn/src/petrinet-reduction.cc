@@ -36,13 +36,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/03/16 09:43:39 $
+ *          - last changed: \$Date: 2006/03/17 10:24:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.1 $
+ * \version \$Revision: 1.2 $
  */
 
 
@@ -56,18 +56,12 @@
 
 
 /******************************************************************************
- * External variables
+ * Functions to remove several aspects of the Petri net model
  *****************************************************************************/
 
-extern SymbolManager symMan;	// defined in bpel-syntax.yy
-
-
-
-
-
-
 /*!
- * Collect all input and output places and remove(i.e. detach) them.
+ * Collect all input and output places and remove (i.e. detach) them. Formally
+ * the inner of the generated open workflow is builded.
  */
 void PetriNet::removeInterface()
 {
@@ -91,34 +85,34 @@ void PetriNet::removeInterface()
 
 
 
+/*!
+ * Remove the places modelling variables.
+ */
+void PetriNet::removeVariables()
+{
+  extern SymbolManager symMan;
+  
+  for (list<string>::iterator variable = symMan.variables.begin();
+      variable != symMan.variables.end(); variable++)
+  {
+    removePlace( findPlace("variable." + *variable) );
+  }
+}
 
 
 
-/*---------------------------------------------------------------------------*/
+
+
+/******************************************************************************
+ * Functions to structurally simplify the Petri net model
+ *****************************************************************************/
 
 
 /*!
- * Implements some simple structural reduction rules for Petri nets:
- *
- * - If two transitions t1 and t2 have the same preset and postset, one of them
- *   can safely be removed.
- * - If a transition has a singleton preset and postset, the transition can be
- *   removed(sequence) and the preset and postset can be merged.
- *
- * \todo
- *       -(nlohmann) improve performance
- *       -(nlohmann) implement more reduction rules
- *
+ * Remove structural dead nodes.
  */
-void PetriNet::simplify()
+void PetriNet::removeDeadNodes()
 {
-  trace(TRACE_DEBUG, "[PN]\tPetri net size before simplification: " + information() + "\n");
-  trace(TRACE_INFORMATION, "Simplifying Petri net...\n");
-
-
-
-  
-  // remove structural dead nodes
   bool done = false;
   while (!done)
   {
@@ -157,7 +151,7 @@ void PetriNet::simplify()
     }
 
 
-    // remove dead nodes
+    // remove dead places and transitions
     for (list<Place*>::iterator p = deadPlaces.begin(); p != deadPlaces.end(); p++)
       if (P.find(*p) != P.end())
 	removePlace(*p);
@@ -165,11 +159,17 @@ void PetriNet::simplify()
       if (T. find(*t) != T.end())
 	removeTransition(*t);
   }
+}
 
 
-  
-  
-  
+
+
+
+/*!
+ * Merges twin transitions.
+ */
+void PetriNet::mergeTwinTransitions()
+{
   // a pair to store transitions to be merged
   vector<pair<string, string> > transitionPairs;
 
@@ -178,7 +178,7 @@ void PetriNet::simplify()
   for (set<Transition *>::iterator t1 = T.begin(); t1 != T.end(); t1++)
     for (set<Transition *>::iterator t2 = t1; t2 != T.end(); t2++)
       if (*t1 != *t2)
-	if ((preset(*t1) == preset(*t2)) &&(postset(*t1) == postset(*t2)))
+	if ((preset(*t1) == preset(*t2)) && (postset(*t1) == postset(*t2)))
 	  transitionPairs.push_back(pair<string, string>(*((*t1)->history.begin()), *((*t2)->history.begin())));
 
   trace(TRACE_VERY_DEBUG, "[PN]\tFound " + intToString(transitionPairs.size()) + " transitions with same preset and postset...\n");
@@ -192,8 +192,18 @@ void PetriNet::simplify()
     if ((t1 != NULL) && (t2 != NULL) && (t1 != t2))
       mergeTransitions(t1, t2);
   }
+}
 
-  trace(TRACE_VERY_DEBUG, "[PN]\tnew reduction rule\n");
+
+
+
+
+/*!
+ * Collapse simple sequences.
+ */
+void PetriNet::collapseSequences()
+{
+  trace(TRACE_VERY_DEBUG, "[PN]\tCollapsing simple sequences\n");
 
   // a pair to store places to be merged
   vector<string> sequenceTransitions;
@@ -201,13 +211,15 @@ void PetriNet::simplify()
 
   // find transitions with singelton preset and postset
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+  {
     if (preset(*t).size() == 1 && postset(*t).size() == 1)
-      {
-	string id1 = *((*(preset(*t).begin()))->history.begin());
-	string id2 = *((*(postset(*t).begin()))->history.begin());
-	placeMerge.push_back(pair < string, string >(id1, id2));
-	sequenceTransitions.push_back(*((*t)->history.begin()));
-      }
+    {
+      string id1 = *((*(preset(*t).begin()))->history.begin());
+      string id2 = *((*(postset(*t).begin()))->history.begin());
+      placeMerge.push_back(pair < string, string >(id1, id2));
+      sequenceTransitions.push_back(*((*t)->history.begin()));
+    }
+  }
 
   // merge preset and postset
   for (unsigned int i = 0; i < placeMerge.size(); i++)
@@ -215,40 +227,41 @@ void PetriNet::simplify()
 
   // remove "sequence"-transtions
   for (unsigned int i = 0; i < sequenceTransitions.size(); i++)
-    {
-      Transition *sequenceTransition = findTransition(sequenceTransitions[i]);
-      if (sequenceTransition != NULL)
-	removeTransition(sequenceTransition);
-    }
+  {
+    Transition *sequenceTransition = findTransition(sequenceTransitions[i]);
+    if (sequenceTransition != NULL)
+      removeTransition(sequenceTransition);
+  }  
+}
+
+
+
+
+
+/*!
+ * Implements some simple structural reduction rules for Petri nets:
+ *
+ * - Structural dead nodes are removed.
+ * - If two transitions t1 and t2 have the same preset and postset, one of them
+ *   can safely be removed.
+ * - If a transition has a singleton preset and postset, the transition can be
+ *   removed(sequence) and the preset and postset can be merged.
+ *
+ * \todo
+ *       -(nlohmann) improve performance
+ *       -(nlohmann) implement more reduction rules
+ *
+ */
+void PetriNet::simplify()
+{
+  trace(TRACE_DEBUG, "[PN]\tPetri net size before simplification: " + information() + "\n");
+  trace(TRACE_INFORMATION, "Simplifying Petri net...\n");
+
+
+  removeDeadNodes();
+  mergeTwinTransitions();
+  collapseSequences();
 
   trace(TRACE_INFORMATION, "Simplifying complete.\n");
   trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification: " + information() + "\n");
-}
-
-
-
-
-
-void PetriNet::removeIsolatedNodes()
-{
-  set<Place *> isolatedPlaces;
-  
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
-    if (preset(*p).empty() && postset(*p).empty())
-      isolatedPlaces.insert(*p);
-
-  for (set<Place *>::iterator p = isolatedPlaces.begin(); p != isolatedPlaces.end(); p++)
-    removePlace(*p);
-}
-
-
-
-void PetriNet::removeVariables()
-{
-  extern SymbolManager symMan;
-  
-  for (list<string>::iterator variable = symMan.variables.begin(); variable != symMan.variables.end(); variable++)
-  {
-    removePlace( findPlace("variable." + *variable) );
-  }
 }

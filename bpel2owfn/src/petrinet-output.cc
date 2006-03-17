@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/03/16 13:58:11 $
+ *          - last changed: \$Date: 2006/03/17 10:24:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.3 $
  */
 
 
@@ -63,7 +63,7 @@
 
 
 /******************************************************************************
- * Implementation of class functions
+ * Functions to print information of the net and its nodes
  *****************************************************************************/
 
 /*!
@@ -99,108 +99,8 @@ string Node::nodeShortName()
     return NULL;
 }
 
-/*****************************************************************************/
 
 
-/*!
- * DOT-output of the arc.
-*/
-string Arc::dotOut()
-{
-  return " " + intToString(source->id) + " -> " + intToString(target->id) + ";\n";
-}
-
-
-
-/*****************************************************************************/
-
-
-/*!
- * DOT-output of the transition. Transitions are colored corresponding to their
- * initial role.
-*/
-string Transition::dotOut()
-{
-  string result;
-  result += " " + intToString(id) + "\t[label=\"" + nodeShortName() + "\"";
-
-  if (firstMemberAs("internal.eventHandler."))
-    result += " style=filled fillcolor=plum";
-  else if (firstMemberAs("internal.compensationHandler."))
-    result += " style=filled fillcolor=aquamarine";
-  else if (firstMemberAs("internal.stop."))
-    result += " style=filled fillcolor=lightskyblue2";
-  else if (firstMemberAs("internal.faultHandler."))
-    result += " style=filled fillcolor=pink";
-
-  result += "];\n";
-  return result;
-}
-
-
-
-
-
-/*****************************************************************************/
-
-
-/*!
- * DOT-output of the place. Places are colored corresponding to their initial
- * role.
-*/
-string Place::dotOut()
-{
-  string
-    result;
-  result += " " + intToString(id) + "\t[label=\"" + nodeShortName() + "\"";
-
-  if (firstMemberAs("eventHandler."))
-    result += " style=filled fillcolor=plum";
-  else if (firstMemberAs("internal.compensationHandler."))
-    result += " style=filled fillcolor=aquamarine";
-  else if (firstMemberAs("internal.stop."))
-    result += " style=filled fillcolor=lightskyblue2";
-  else if (firstMemberAs("internal.faultHandler."))
-    result += " style=filled fillcolor=pink";
-  else if (firstMemberIs("link.") || firstMemberIs("!link."))
-    result += " style=filled fillcolor=yellow";
-  else if (firstMemberIs("variable."))
-    result += " style=filled fillcolor=cyan shape=ellipse";
-  else if (firstMemberIs("in.") || firstMemberIs("out."))
-    result += " style=filled fillcolor=gold shape=ellipse";
-  else if (firstMemberAs("internal.Active")
-	   || firstMemberAs("internal.!Active"))
-    result += " style=filled fillcolor=yellowgreen";
-  else if (firstMemberAs("internal.Completed")
-	   || firstMemberAs("internal.!Completed"))
-    result += " style=filled fillcolor=yellowgreen ";
-  else if (firstMemberAs("internal.Compensated")
-	   || firstMemberAs("internal.!Compensated"))
-    result += " style=filled fillcolor=yellowgreen";
-  else if (firstMemberAs("internal.Ended")
-	   || firstMemberAs("internal.!Ended"))
-    result += " style=filled fillcolor=yellowgreen";
-  else if (firstMemberAs("internal.Faulted")
-	   || firstMemberAs("internal.!Faulted"))
-    result += " style=filled fillcolor=yellowgreen";
-  else if (firstMemberAs("internal.Terminated")
-	   || firstMemberAs("internal.!Terminated"))
-    result += " style=filled fillcolor=yellowgreen";
-  else if (firstMemberIs("1.internal.initial")
-	   || firstMemberIs("1.internal.final"))
-    result += " style=filled fillcolor=green";
-  else if (firstMemberIs("1.internal.clock"))
-    result += " style=filled fillcolor=seagreen";
-
-  result += "];\n";
-  return result;
-}
-
-
-
-
-
-/*---------------------------------------------------------------------------*/
 
 
 /*!
@@ -285,7 +185,103 @@ void PetriNet::printInformation()
 
 
 
-/*---------------------------------------------------------------------------*/
+/******************************************************************************
+ * DOT output of the net
+ *****************************************************************************/
+
+
+/*!
+ * DOT-output of the arc.
+*/
+string Arc::dotOut()
+{
+  return " " + intToString(source->id) + " -> " + intToString(target->id) + ";\n";
+}
+
+
+
+
+
+/*!
+ * DOT-output of the transition. Transitions are colored corresponding to their
+ * initial role.
+*/
+string Transition::dotOut()
+{
+  string result;
+  result += " " + intToString(id) + "\t[label=\"" + nodeShortName() + "\"";
+
+  if (firstMemberAs("internal.eventHandler."))
+    result += " style=filled fillcolor=plum";
+  else if (firstMemberAs("internal.compensationHandler."))
+    result += " style=filled fillcolor=aquamarine";
+  else if (firstMemberAs("internal.stop."))
+    result += " style=filled fillcolor=lightskyblue2";
+  else if (firstMemberAs("internal.faultHandler."))
+    result += " style=filled fillcolor=pink";
+
+  result += "];\n";
+  return result;
+}
+
+
+
+
+
+/*!
+ * DOT-output of the place. Places are colored corresponding to their initial
+ * role.
+*/
+string Place::dotOut()
+{
+  string
+    result;
+  result += " " + intToString(id) + "\t[label=\"" + nodeShortName() + "\"";
+
+  if (firstMemberAs("eventHandler."))
+    result += " style=filled fillcolor=plum";
+  else if (firstMemberAs("internal.compensationHandler."))
+    result += " style=filled fillcolor=aquamarine";
+  else if (firstMemberAs("internal.stop."))
+    result += " style=filled fillcolor=lightskyblue2";
+  else if (firstMemberAs("internal.faultHandler."))
+    result += " style=filled fillcolor=pink";
+  else if (firstMemberIs("link.") || firstMemberIs("!link."))
+    result += " style=filled fillcolor=yellow";
+  else if (firstMemberIs("variable."))
+    result += " style=filled fillcolor=cyan shape=ellipse";
+  else if (firstMemberIs("in.") || firstMemberIs("out."))
+    result += " style=filled fillcolor=gold shape=ellipse";
+  else if (firstMemberAs("internal.Active")
+	   || firstMemberAs("internal.!Active"))
+    result += " style=filled fillcolor=yellowgreen";
+  else if (firstMemberAs("internal.Completed")
+	   || firstMemberAs("internal.!Completed"))
+    result += " style=filled fillcolor=yellowgreen ";
+  else if (firstMemberAs("internal.Compensated")
+	   || firstMemberAs("internal.!Compensated"))
+    result += " style=filled fillcolor=yellowgreen";
+  else if (firstMemberAs("internal.Ended")
+	   || firstMemberAs("internal.!Ended"))
+    result += " style=filled fillcolor=yellowgreen";
+  else if (firstMemberAs("internal.Faulted")
+	   || firstMemberAs("internal.!Faulted"))
+    result += " style=filled fillcolor=yellowgreen";
+  else if (firstMemberAs("internal.Terminated")
+	   || firstMemberAs("internal.!Terminated"))
+    result += " style=filled fillcolor=yellowgreen";
+  else if (firstMemberIs("1.internal.initial")
+	   || firstMemberIs("1.internal.final"))
+    result += " style=filled fillcolor=green";
+  else if (firstMemberIs("1.internal.clock"))
+    result += " style=filled fillcolor=seagreen";
+
+  result += "];\n";
+  return result;
+}
+
+
+
 
 
 /*!
@@ -338,8 +334,8 @@ void PetriNet::dotOut()
 
 
 
-/*****************************************************************************
- * Output formats
+/******************************************************************************
+ * Petri net file formats
  *****************************************************************************/
 
 /*!
@@ -571,6 +567,10 @@ void PetriNet::lolaOut()
 
 
 
+
+/******************************************************************************
+ * oWFN file format
+ *****************************************************************************/
 
 /*!
  * Outputs the net in oWFN-format.

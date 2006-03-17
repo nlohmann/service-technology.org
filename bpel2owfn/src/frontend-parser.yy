@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/17 09:28:17 $
+ *          - last changed: \$Date: 2006/03/17 10:58:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.137 $
+ * \version \$Revision: 1.138 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -1148,7 +1148,7 @@ tEmpty:
     }   
   X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
-      noLinks->parentId = $3;
+      noLinks->parentId = $2;
       $$ = Empty(noLinks);
       $$->name = att.read($3, "name");
       $$->joinCondition = att.read($3, "joinCondition");

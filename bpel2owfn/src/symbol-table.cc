@@ -55,9 +55,11 @@
  */
 SymbolTable::SymbolTable()
 {
-  this->id2key.clear();
   this->symTab.clear();
   this->entryKey = 0;
+  this->horizontal = "";
+  this->smallHorizontal = "";
+  this->vertical = "";
 }
 
 /*!
@@ -83,55 +85,175 @@ kc::integer SymbolTable::nextId()
 }
 
 /*!
- * set mapping between AST id and symbol table entry key
- * \param entryKey  symbol table entry key
- * \astId           id of an AST (astract syntax tree) element
+ * 
  */
-void SymbolTable::setMapping(unsigned int entryKey, kc::integer astId)
+void SymbolTable::printSymbolTable()
 {
-  id2key[astId->value] = entryKey;	
+  traceST("printing SymbolTable ... \n");
+  
+  horizontal      = "+--------------------------------------------+";
+  smallHorizontal = "---------------------";
+  vertical        = "| ";
+  
+  /// iterator
+  std::map<unsigned int, SymbolTableEntry*>::iterator symTabIterator;  
+  symTabIterator = symTab.begin();
+	
+  /// iteration about symbol table 
+  while(symTabIterator != symTab.end())
+  {  
+  	SymbolTableEntry* currentEntry = lookup((*symTabIterator).first);
+    
+    traceSTwp(horizontal); traceSTwp("\n");
+    
+  	printSymbolTableEntry(currentEntry);
+  	printSTElement(currentEntry);
+
+    switch(currentEntry->elementId)
+    {
+      case K_COMPENSATE:
+      {
+      } break;
+      case K_COMPENSATIONHANDLER:
+      {
+      } break;
+      case K_CORRELATIONSET:
+      {
+      } break;
+      case K_EVENTHANDLERS:
+      {
+      } break;
+      case K_FAULTHANDLERS:
+      {
+      } break;
+      case K_INVOKE:
+      {
+      } break;
+      case K_LINK:
+      {
+      } break;
+      case K_PARTNER:
+      {
+      } break;
+      case K_PARTNERLINK:
+      {
+      } break;
+      case K_PROCESS:
+      {
+      	printSTEnvelope(currentEntry);
+      } break;
+      case K_RECEIVE:
+      {
+      } break;
+      case K_REPLY:
+      {
+      } break;
+      case K_SCOPE:
+      {
+      	printSTEnvelope(currentEntry);
+      } break;
+      case K_TERMINATE:
+      {
+      } break;
+      case K_VARIABLE:
+      {
+      } break;
+      case K_WAIT:
+      {
+      } break;
+      /* all other */
+      default :
+      {
+      } break;
+    }
+    traceSTwp(horizontal); traceSTwp("\n"); 
+    traceSTwp("\n");        
+    ++symTabIterator;
+  }
+} 
+
+/*!
+ * 
+ */
+void SymbolTable::printSymbolTableEntry(SymbolTableEntry* entry)
+{ 
+  traceSTwp(vertical); traceSTwp(translateToElementName(entry->elementId)); traceSTwp("\n");	
+  traceSTwp(vertical); traceSTwp(smallHorizontal + "<SymbolTableEntry>"); traceSTwp("\n");	  
+  traceSTwp(vertical); traceSTwp("entryKey=" + intToString(entry->entryKey)); traceSTwp("\n");
+  traceSTwp(vertical); traceSTwp("elementId="+ intToString(entry->elementId)); traceSTwp("\n");
 }
 
 /*!
- * \param astId  id of an AST (astract syntax tree) element
+ * 
  */
-unsigned int SymbolTable::idToKey(kc::integer astId)
+void SymbolTable::printSTElement(SymbolTableEntry* entry)
 {
-  return id2key[astId->value];
-} 
+  ///
+  STElement* e = dynamic_cast <STElement*> (entry);
+
+  traceSTwp(vertical); traceSTwp(smallHorizontal + "<STElement>"); traceSTwp("\n");	  
+  traceSTwp(vertical); traceSTwp("activityLocation="); traceSTwp("\n");
+  traceSTwp(vertical); traceSTwp("line=" + intToString(e->line)); traceSTwp("\n");
+  traceSTwp(vertical); traceSTwp("mapOfAttributes=<STAttribute>"); traceSTwp("\n");
+  
+  printSTAttribute(e);
+}  
 
 /*!
- * \param astId  id of an AST (astract syntax tree) element
+ * 
  */
-kc::integer SymbolTable::keyToId(kc::integer entryKey)
-{
-/*  /// iterator
-  std::map<unsigned int, unsigned int>::iterator id2KeyIterator;  
-  id2KeyIterator = id2key.begin();
- 
-  traceST("\t\t\tkeyToId key=" + intToString(entryKey->value) + "\n");
-  if((entryKey->value == 14) || (entryKey->value == 15) || (entryKey->value == 16)){
-  /// iteration loop over all attributes of the desired symbol table entry       
-  while(id2KeyIterator != id2key.end())
-  {  
-  	traceST("\t\t\t id=" + intToString((*id2KeyIterator).first) + " key=" + intToString((*id2KeyIterator).second) + "\n");
-    ++id2KeyIterator;
-  }
-  }
+void SymbolTable::printSTAttribute(STElement* entry) {
 
-  /// iteration loop over all attributes of the desired symbol table entry       
-  while(id2KeyIterator != id2key.end())
+  /// pointer of attribute map
+  std::map<string, STAttribute*>* mapOfAttributes;
+  mapOfAttributes = &(entry->mapOfAttributes);	
+
+  /// iterator for the embedded map
+  std::map<std::string, STAttribute*>::iterator mapOfAttributesIterator;  
+  mapOfAttributesIterator = mapOfAttributes->begin();
+
+  /// 
+  STAttribute* a;
+
+  unsigned int i=1;
+
+  traceSTwp(vertical); traceSTwp(smallHorizontal + "<STAttribute>"); traceSTwp("\n");	  
+
+  while(mapOfAttributesIterator != mapOfAttributes->end())
   {  
-    if((entryKey->value). == ((*id2KeyIterator).first))
-    {
-	  traceST("\t\t\tkeyToId id=" + intToString((*id2KeyIterator).first) + "\n");
-      return kc::mkinteger((*id2KeyIterator).first);
-    }
-    ++id2KeyIterator;
+    a = (*mapOfAttributesIterator).second;
+    traceSTwp(vertical); traceSTwp("attribute" + intToString(i)); traceSTwp("\n");
+    traceSTwp(vertical +"\t"); traceSTwp("line=" + intToString(a->line)); traceSTwp("\n");
+    traceSTwp(vertical +"\t"); traceSTwp("name=" + a->name); traceSTwp("\n");
+    traceSTwp(vertical +"\t"); traceSTwp("type=" + a->type); traceSTwp("\n");
+    traceSTwp(vertical +"\t"); traceSTwp("value=" + a->value); traceSTwp("\n");
+
+    ++mapOfAttributesIterator; ++i;
   }
-*/
-  return kc::mkinteger(-1);
-} 
+}  
+
+/*!
+ * 
+ */
+void SymbolTable::printSTEnvelope(SymbolTableEntry* entry) {
+  ///
+  STEnvelope* e = dynamic_cast <STEnvelope*> (entry);
+
+  traceSTwp(vertical); traceSTwp(smallHorizontal + "<STEnvelope>"); traceSTwp("\n");	  
+  traceSTwp(vertical); traceSTwp("hasEnventHandler=");
+  if((e->hasEventHandler == true) || (e->hasEventHandler == false)) {
+  	if(e->hasEventHandler == true) {
+  	  traceSTwp("true");	
+  	}
+  	else {
+  	  traceSTwp("false");	  		
+  	}
+  }
+  else {
+  	  traceSTwp("undefined");
+  }  	  
+  traceSTwp("\n");
+}
 
 /*!
  * \param astId
@@ -246,7 +368,7 @@ SymbolTableEntry* SymbolTable::lookup(kc::integer entryKey)
  */
 SymbolTableEntry* SymbolTable::lookup(unsigned int entryKey)
 {
-  traceST("lookup(entryKey=" + intToString((dynamic_cast <SymbolTableEntry*> (symTab[entryKey]))->entryKey) + ")\n");
+//  traceST("lookup(entryKey=" + intToString((dynamic_cast <SymbolTableEntry*> (symTab[entryKey]))->entryKey) + ")\n");
   return (dynamic_cast <SymbolTableEntry*> (symTab[entryKey])); 
 }
 
@@ -473,6 +595,26 @@ void SymbolTable::addAttribute(unsigned int entryKey, STAttribute* attribute)
     }
    } // end switch
   } // end if
+}
+
+/*!
+ * wrapper for readAttributeValue(unsigned int, string)
+ * \param entryKey  symbol table entry key
+ * \param name      name of attribute
+ */
+string SymbolTable::readAttributeValue(kc::integer entryKey, string name)
+{
+  return readAttributeValue(entryKey->value, name);	
+}
+
+/*!
+ * return value of an attribute object
+ * \param entryKey  symbol table entry key
+ * \param name      name of attribute 
+ */
+string SymbolTable::readAttributeValue(unsigned int entryKey, string name)
+{
+  return (readAttribute(entryKey, name)->value);	
 }
 
 /*!
@@ -755,6 +897,15 @@ void SymbolTable::printErrorMsg(string errorMsg)
 void SymbolTable::traceST(string traceMsg)
 {
   trace(TRACE_DEBUG, "[ST] " + traceMsg);
+}
+
+/*!
+ * trace method for the ST class without prefix [ST]
+ * \param traceMsg  message
+ */
+void SymbolTable::traceSTwp(string traceMsg)
+{
+  trace(TRACE_DEBUG, traceMsg);
 }
 
 /*!
@@ -2006,8 +2157,18 @@ STCorrelationSet::~STCorrelationSet() {}
 /********************************************
  * implementation of Element CLASS
  ********************************************/
+ 
+/*!
+ * constructor
+ */
+STElement::STElement() {
+  this->line = 0;	
+}
 
- STElement::~STElement() {}
+/*!
+ * destructor
+ */
+STElement::~STElement() {}
  
 /********************************************
  * implementation of STEnvelope CLASS

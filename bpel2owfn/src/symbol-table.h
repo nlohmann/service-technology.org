@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.21 $: 
+ * \version \$Revision: 1.22 $: 
  *
  */
 
@@ -106,6 +106,10 @@ class STElement
     /// tokens correctly
     ActivityLocationId activityLocation;
     
+    /// constructor
+    STElement();
+    
+    /// destructor
     virtual ~STElement();
 };
 
@@ -119,11 +123,17 @@ class STElement
 class SymbolTable
 {
   private:
-    /// mapping from AST id to symTab entry key  
-    map<unsigned int, unsigned int> id2key;
-
     /// a container to store ...
     map<unsigned int, SymbolTableEntry*> symTab;
+
+    ///
+    string horizontal;
+    
+    ///
+    string smallHorizontal;
+    
+    ///
+    string vertical;
 
     /// print formatted symbol table error message
 	void printErrorMsg(string errorMsg);
@@ -139,6 +149,18 @@ class SymbolTable
 	
 	/// returns valid or unvalid depending on attribute already exists or not
 	bool isDuplicate(unsigned int entryKey, STAttribute* attribute);
+
+    ///
+    void printSymbolTableEntry(SymbolTableEntry*);
+    
+    ///
+    void printSTElement(SymbolTableEntry*);    
+    
+    ///
+    void printSTAttribute(STElement*);
+
+    ///
+    void printSTEnvelope(SymbolTableEntry*);
     
   public:
     /// constructor
@@ -159,6 +181,9 @@ class SymbolTable
 	/// ST traces
 	void traceST(string traceMsg);
     
+	/// ST traces without [ST] prefix
+	void traceSTwp(string traceMsg);
+
     /// create a new entry in the symbol table and return symbol table entry key
     unsigned int insert(unsigned int elementId);
 
@@ -171,11 +196,17 @@ class SymbolTable
     /// to add an attribute to the special symbol table entry
     void addAttribute(unsigned int entryKey, STAttribute* attribute);
 
-    /// wrapper for <readAttribute(unsigned int, string)> and return value from desired attribute
+    /// wrapper for <readAttribute(unsigned int, string)> and return a pointer of attribute object from desired attribute
     STAttribute* readAttribute(kc::integer entryKey, string attributeName);
 
-    /// return value from desired attribute
+    /// return a pointer of attribute object from desired attribute
     STAttribute* readAttribute(unsigned int entryKey, string attributeName);
+    
+    /// wrapper for <readAttributeValue(unsigned int, string)> and return value of an attribute object
+    string readAttributeValue(kc::integer entryKey, string attributeName);
+    
+    /// return value of an attribute object
+    string readAttributeValue(unsigned int entryKey, string attributeName);
     
     /// create a new attribute
     STAttribute* newAttribute(kc::casestring attributeName, kc::casestring attributeValue);
@@ -192,20 +223,14 @@ class SymbolTable
     /// checked the attributes and the value of BPEL-elements
     void checkAttributes(unsigned int entryKey);
     
-    /// translated the AST id to symbol table entry key and return symbol table entry key
-    unsigned int idToKey(kc::integer astId);
-    
-    /// translated the symbol table entry key to ASt id and return AST id
-    kc::integer keyToId(kc::integer entryKey);
-    
-    /// mapping between AST Id and symbol table entries
-    void setMapping(unsigned int entryKey, kc::integer astId);
-
     /// return retranslation from elementId to BPEL-element name, e.g. K_ASSIGN->"assign"
     string translateToElementName(unsigned int elementId);
  
     /// return symbol table information string
     string getInformation(kc::integer astId, bool closeTag = false);
+    
+    ///
+    void printSymbolTable();
 };
 
 

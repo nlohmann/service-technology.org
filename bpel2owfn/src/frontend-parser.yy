@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/17 14:19:49 $
+ *          - last changed: \$Date: 2006/03/17 15:14:19 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.139 $
+ * \version \$Revision: 1.140 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -344,13 +344,12 @@ tProcess:
     { TheProcess = $$ = Process($8, $9, $10, $11, $12, $13, $14, StopInProcess(), $15);
       symMan.quitScope();
       $$->name = att.read($4, "name");
-      //symTab.traceST(string(symTab.readAttribute($3,"abstractProcess")->name));
       $$->targetNamespace = att.read($4, "targetNamespace");
       //symTab.traceST("\t\t\t\t HALLO " + string((att.read($4, "abstractProcess")->name)) + "\n");      
       $$->queryLanguage = att.read($4, "queryLanguage", $$->queryLanguage);
       $$->expressionLanguage = att.read($4, "expressionLanguage", $$->expressionLanguage);
       $$->suppressJoinFailure = att.read($4, "suppressJoinFailure", $$->suppressJoinFailure);
-      att.traceAM(string("tProcess: ") + ($$->suppressJoinFailure)->name + string("\n"));      
+//      att.traceAM(string("tProcess: ") + ($$->suppressJoinFailure)->name + string("\n"));      
       att.popSJFStack();
       $$->enableInstanceCompensation = att.read($4, "enableInstanceCompensation", $$->enableInstanceCompensation);
       $$->abstractProcess = att.read($4, "abstractProcess", $$->abstractProcess);
@@ -358,8 +357,10 @@ tProcess:
       isInFH.pop();
       isInCH.pop();
       $$->id = $3;
-//      ((STProcess*)symTab.lookup($3))->hasEventHandler = (string($14->op_name()) == "userDefinedEventHandler");
+      ((STProcess*)symTab.lookup($3))->hasEventHandler = (string($14->op_name()) == "userDefinedEventHandler");
       $$->hasEH = (string($14->op_name()) == "userDefinedEventHandler");
+      symTab.printSymbolTable();
+      symTab.traceST(symTab.readAttributeValue($3,"name") + "\n");      
     }
 ;
 
@@ -1254,8 +1255,6 @@ tInvoke:
 
         currentSymTabEntryKey = symTab.insert(K_SCOPE);
         currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
-	symTab.setMapping(currentSymTabEntryKey, scope->id);
-		
 		
         scope->name = att.read($3, "name");
         symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute(mkcasestring("name"), scope->name));
@@ -2492,7 +2491,6 @@ tOtherwise:
       currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
       currentSymTabEntryKey = symTab.insert(K_EMPTY);
       currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
-      symTab.setMapping(currentSymTabEntryKey, id);
 
       $$ = Otherwise(otherwiseActivity);
       $$->dpe = kc::mkinteger(0);
@@ -2925,7 +2923,6 @@ genSymTabEntry_Source:
 arbitraryAttributes:
   /* empty */
     { $$ = att.nextId();
-      symTab.setMapping(currentSymTabEntryKey, $$);
     }
 | X_NAME X_EQUALS X_STRING arbitraryAttributes
     { // ignore imports

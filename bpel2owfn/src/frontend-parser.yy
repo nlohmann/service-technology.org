@@ -27,18 +27,18 @@
  * This file defines and implements the grammar of BPEL using standard 
  * BNF-rules to describe the originally XML-based syntax as it is specified in
  * the BPEL4WS 1.1 specification. All terminals are passed from the lexer
- * (implemented in \ref bpel-lexic.c). Besides simple syntax-checking the
+ * (implemented in \ref bpel-lexic.cc). Besides simple syntax-checking the
  * grammar is used to build the abstract syntax tree as it is defined in
  * bpel-abstract.k and implemented in \ref bpel-abstract.cc and
  * \ref bpel-abstract.h.
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/16 15:45:13 $
+ *          - last changed: \$Date: 2006/03/17 09:28:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.136 $
+ * \version \$Revision: 1.137 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL

@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/03/17 14:43:54 $
+ *          - last changed: \$Date: 2006/03/20 13:59:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -89,6 +89,14 @@ void CFGBlock::print_dot()
     if (channel_name != "")
     {
       (*output) << "\\nchannel: " << channel_name;
+    }
+    if (! initializedVariables.empty())
+    {
+      (*output) << "\\ninitializedVariables: \\n ";
+      for (set<std::string>::iterator iter = initializedVariables.begin(); iter != initializedVariables.end(); iter++)
+      {
+	(*output) << (*iter) << "\\n";
+      }
     }
     (*output) << "\"";
     if (type == CFGSource)
@@ -226,10 +234,115 @@ bool CFGBlock::needsDPE(int hasStartingBlock, list<kc::integer>& lastTargets)
   }
 }
 
+/// resets the processed flag to false
+void CFGBlock::resetProcessedFlag(bool withLinks, bool forward)
+{
+  if (! processed)
+  {
+    return;
+  }
+  processed = false;
+  
+  if (forward && ! nextBlocks.empty())
+  {
+    for (list<CFGBlock *>::iterator iter = nextBlocks.begin(); iter != nextBlocks.end(); iter++)
+    {
+      (*iter)->resetProcessedFlag(withLinks, forward);
+    }
+    if (withLinks && type == CFGSource)
+    {
+      targets[dot_name()]->resetProcessedFlag(withLinks, forward);
+    }
+  }
+  else if (! forward && ! prevBlocks.empty())
+  {
+    for (list<CFGBlock *>::iterator iter = prevBlocks.begin(); iter != prevBlocks.end(); iter++)
+    {
+      (*iter)->resetProcessedFlag(withLinks, forward);
+    }
+    if (withLinks && type == CFGTarget)
+    {
+      sources[dot_name()]->resetProcessedFlag(withLinks, forward);
+    }
+  }
+  
+}
+
 
 void connectBlocks(CFGBlock * from, CFGBlock * to)
 {
   from->nextBlocks.push_back(to);
   to->prevBlocks.push_back(from);
+}
+
+/***************************** Program Analysis *******************************/
+
+/**
+ * Checks for uninitialized variables.
+ * This is a forward-must analysis of the data flow.
+ *
+ *
+ */
+void CFGBlock::checkForUninitializedVariables()
+{
+  if (processed)
+  {
+    return;
+  }
+  processed = true;
+  
+  bool allPrerequisites = true;
+  // check if all entries are allready processed
+  if (!prevBlocks.empty())
+  {
+    /// for a while, we assume, that the body is never executed, so we drop that set
+    list<CFGBlock *>::iterator blockBegin = prevBlocks.begin();
+    if (type == CFGWhile)
+    {
+      blockBegin++;
+    }
+    for (list<CFGBlock *>::iterator iter = blockBegin; iter != prevBlocks.end(); iter++)
+    {
+      allPrerequisites = allPrerequisites && (*iter)->processed;
+    }
+  }
+  if (type == CFGTarget)
+  {
+    allPrerequisites = allPrerequisites && sources[dot_name()]->processed;
+  }
+  if (allPrerequisites)
+  {
+    if (!prevBlocks.empty())
+    {
+      initializedVariables = (*(prevBlocks.begin()))->initializedVariables;
+      for (list<CFGBlock *>::iterator iter = prevBlocks.begin(); iter != prevBlocks.end(); iter++)
+      {
+	initializedVariables = setIntersection(initializedVariables, (*iter)->initializedVariables);
+      }
+    }
+    if (type == CFGTarget)
+    {
+      initializedVariables = setUnion(initializedVariables, sources[dot_name()]->initializedVariables);
+    }
+  }
+  else
+  {
+    processed = false;
+    return;
+  }
+
+  // adding Variables for this Block
+  if (type == CFGReceive)
+  {
+    
+  }
+  
+  if (! nextBlocks.empty())
+  {
+    for (list<CFGBlock *>::iterator iter = nextBlocks.begin(); iter != nextBlocks.end(); iter++)
+    {
+      (*iter)->checkForUninitializedVariables();
+    }
+  }  
 }
 

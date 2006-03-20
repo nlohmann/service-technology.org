@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/03/17 14:43:55 $
+ *          - last changed: \$Date: 2006/03/20 13:59:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  */
 
 #ifndef CFG_H
@@ -138,12 +138,25 @@ class CFGBlock {
 
     /// checks which blocks need DPE
     bool needsDPE(int hasStartingBlock, list<kc::integer>& lastTarget);
+
+    /// resets the processed flag to false
+    void resetProcessedFlag(bool withLinks = false, bool forward = true);
     
+
+/***************************** Program Analysis *******************************/
+
+    /// checks if variables might be uninitialized
+    void checkForUninitializedVariables();
+
   private:
     /// flag, if block was dotted
     bool dotted;
     /// flag, if block was processed by an algorithm (has to be resetted afterwards)
     bool processed;
+
+/***************************** Program Analysis *******************************/
+    /// set of initialized variables
+    set<std::string> initializedVariables;
 
     /// \todo: move to symbol table
     bool dpe;

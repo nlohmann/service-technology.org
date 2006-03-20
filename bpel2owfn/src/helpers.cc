@@ -32,13 +32,13 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/02/14 10:27:33 $
+ *          - last changed: \$Date: 2006/03/20 10:28:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.46 $
+ * \version \$Revision: 1.47 $
  */
 
 
@@ -77,9 +77,6 @@ set<Node *> setUnion(set<Node *> a, set<Node *> b)
   
   return result;
 }
-
-
-
 
 
 /*!

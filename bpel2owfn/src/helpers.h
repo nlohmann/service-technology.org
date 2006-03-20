@@ -28,17 +28,17 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes by: \$Author: nlohmann $
+ *          - last changes by: \$Author: gierds $
  *          
  * \date    
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/02/09 19:09:06 $
+ *          - last changed: \$Date: 2006/03/20 10:28:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  */
 
 
@@ -75,6 +75,57 @@ class Node;
 
 /// Returns the union of two sets of Petri net nodes.
 set<Node *> setUnion(set<Node *> a, set<Node *> b);
+
+/**
+ * Returns the union of two sets of T's.
+ *
+ * \par a the first set
+ * \par b the second set
+ */
+template <class T>
+set<T> setUnion(set<T> & a, set<T> & b)
+{
+  set<T> resultSet;
+  resultSet.insert(a.begin(), a.end());
+  resultSet.insert(b.begin(), b.end());
+
+  return resultSet;
+}
+
+/// Returns the intersection of two sets of T's.
+template <class T>
+set<T> setIntersection(set<T> & a, set<T> & b)
+{
+  std::set<T> resultSet;
+  if (! (a.empty() || b.empty()))
+  {
+    for (typename set<T>::iterator iter = a.begin(); iter != a.end(); iter++)
+    {
+      if (b.find(*iter) != b.end())
+      {
+	resultSet.insert(*iter);
+      }
+    }
+  }
+
+  return resultSet;
+}
+
+/// Returns the difference of two sets of T's.
+template <class T>
+set<T> setDifference(set<T> & a, set<T> & b)
+{
+  set<T> resultSet (a);
+  if (! (a.empty() || b.empty()))
+  {
+    for (typename set<T>::iterator iter = b.begin(); iter != b.end(); iter++)
+    {
+      resultSet.erase(*iter);
+    }
+  }
+
+  return resultSet;
+}
 
 /// Converts int to string.
 string intToString(int i);

@@ -36,13 +36,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/03/17 10:24:48 $
+ *          - last changed: \$Date: 2006/03/20 15:41:58 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.3 $
  */
 
 
@@ -214,10 +214,13 @@ void PetriNet::collapseSequences()
   {
     if (preset(*t).size() == 1 && postset(*t).size() == 1)
     {
-      string id1 = *((*(preset(*t).begin()))->history.begin());
-      string id2 = *((*(postset(*t).begin()))->history.begin());
-      placeMerge.push_back(pair < string, string >(id1, id2));
-      sequenceTransitions.push_back(*((*t)->history.begin()));
+      if ( postset(*(preset(*t).begin())).size() == 1 )
+      {
+	string id1 = *((*(preset(*t).begin()))->history.begin());
+	string id2 = *((*(postset(*t).begin()))->history.begin());
+	placeMerge.push_back(pair < string, string >(id1, id2));
+	sequenceTransitions.push_back(*((*t)->history.begin()));
+      }
     }
   }
 

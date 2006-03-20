@@ -32,13 +32,13 @@
  *          
  * \date    
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/03/20 10:28:59 $
+ *          - last changed: \$Date: 2006/03/20 12:12:46 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.25 $
+ * \version \$Revision: 1.26 $
  */
 
 
@@ -81,6 +81,7 @@ set<Node *> setUnion(set<Node *> a, set<Node *> b);
  *
  * \par a the first set
  * \par b the second set
+ * \returns the set of a united with b (a \\/ b)
  */
 template <class T>
 set<T> setUnion(set<T> & a, set<T> & b)
@@ -92,7 +93,13 @@ set<T> setUnion(set<T> & a, set<T> & b)
   return resultSet;
 }
 
-/// Returns the intersection of two sets of T's.
+/**
+ * Returns the intersection of two sets of T's.
+ *
+ * \par a the first set
+ * \par b the second set
+ * \returns the set of a intersected with b (a /\\ b)
+ */
 template <class T>
 set<T> setIntersection(set<T> & a, set<T> & b)
 {
@@ -111,7 +118,13 @@ set<T> setIntersection(set<T> & a, set<T> & b)
   return resultSet;
 }
 
-/// Returns the difference of two sets of T's.
+/**
+ * Returns the difference of two sets of T's.
+ *
+ * \par a the first set
+ * \par b the second set
+ * \returns the set of a minus b (a \\ b)
+ */
 template <class T>
 set<T> setDifference(set<T> & a, set<T> & b)
 {

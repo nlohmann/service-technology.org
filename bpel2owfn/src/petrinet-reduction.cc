@@ -36,13 +36,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/03/21 11:26:05 $
+ *          - last changed: \$Date: 2006/03/21 13:24:13 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  */
 
 
@@ -200,6 +200,13 @@ void PetriNet::mergeTwinTransitions()
 
 
 
+/*!
+ * Returns true if there is a communicating transition in the postset of the
+ * given place p.
+ *
+ * \param  p a place to check
+ * \return true, if a communicating transition was found
+ */
 bool PetriNet::communicationInPostSet(Place *p)
 {
   set<Node*> pp = postset(p);
@@ -220,6 +227,12 @@ bool PetriNet::communicationInPostSet(Place *p)
 
 /*!
  * Collapse simple sequences.
+ *
+ * A simple sequence is a transition with
+ *  - singleton preset
+ *  - singleton postset
+ *  - no communicating transition following
+ *  - preset != postset
  */
 void PetriNet::collapseSequences()
 {
@@ -232,15 +245,17 @@ void PetriNet::collapseSequences()
   // find transitions with singelton preset and postset
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
   {
-    if (preset(*t).size() == 1 && postset(*t).size() == 1)
+    if (
+	(preset(*t).size() == 1) &&
+	(postset(*t).size() == 1) &&
+	!communicationInPostSet((Place*)*(postset(*t).begin())) &&
+	(*(postset(*t).begin()) != (*preset(*t).begin()))
+       )
     {
-      if ( !communicationInPostSet((Place*)*(postset(*t).begin())) )
-      {
-	string id1 = *((*(preset(*t).begin()))->history.begin());
-	string id2 = *((*(postset(*t).begin()))->history.begin());
-	placeMerge.push_back(pair < string, string >(id1, id2));
-	sequenceTransitions.push_back(*((*t)->history.begin()));
-      }
+      string id1 = *((*(preset(*t).begin()))->history.begin());
+      string id2 = *((*(postset(*t).begin()))->history.begin());
+      placeMerge.push_back(pair < string, string >(id1, id2));
+      sequenceTransitions.push_back(*((*t)->history.begin()));
     }
   }
 

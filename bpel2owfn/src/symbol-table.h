@@ -25,7 +25,7 @@
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created:
@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.22 $: 
+ * \version \$Revision: 1.23 $: 
  *
  */
 
@@ -465,7 +465,7 @@ class STEnvelope
 
     /// true if scope had an event handler?
     bool hasEventHandler;    
-    
+
     virtual ~STEnvelope();
 };
 
@@ -541,8 +541,9 @@ class STCommunicationActivity: public STActivity
 
     // only used for communication activities
     string channelId;
-    STVariable *inputVariable;
-    STVariable *outputVariable;
+    STVariable * inputVariable;
+    STVariable * outputVariable;
+    STVariable * variable;
 };
 
 
@@ -673,33 +674,6 @@ class STPartnerLink: public STElement, public SymbolTableEntry
     bool isInPartners;
 };
 
-
-/**
- * \class	STProcess
- *
- * \brief
- * 
- * The <process> activity.
- * 
- */
-class STProcess: public STElement, public STEnvelope, public SymbolTableEntry
-{
-  public:
-    /// constructor
-    STProcess();
-    STProcess(unsigned int elementId, unsigned int entryKey);
-    
-    /// destructor
-    ~STProcess();
-    
-    /// a list of partner links declared in the process
-    list<STPartnerLink*> partnerLinks;
-
-    /// true if process is abstract (i.e. a business protocol)
-    bool abstractProcess;
-};
-
-
 /**
  * \class	STScope
  *
@@ -723,6 +697,40 @@ class STScope: public STElement, public STEnvelope, public SymbolTableEntry
 
     /// list of all enclosed links (recursively)
     list<STLink*> enclosedLinks;
+
+    /// add a new Variable with scope ID and variable pointer
+    std::string addVariable(kc::integer, STVariable *);
+
+    /// checks for a variable with a given name and returns pointer to the object
+    STVariable * checkVariable(std::string);
+    
+};
+
+
+/**
+ * \class	STProcess
+ *
+ * \brief
+ * 
+ * The <process> activity.
+ * 
+ */
+// class STProcess: public STElement, public STEnvelope, public SymbolTableEntry
+class STProcess: public STScope
+{
+  public:
+    /// constructor
+    STProcess();
+    STProcess(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STProcess();
+    
+    /// a list of partner links declared in the process
+    list<STPartnerLink*> partnerLinks;
+
+    /// true if process is abstract (i.e. a business protocol)
+    bool abstractProcess;
 };
 
 
@@ -741,6 +749,9 @@ class STVariable : public STElement, public SymbolTableEntry
         
     /// destructor
     ~STVariable();
+    
+    /// name of the variable
+    std::string name;
     
     /// true if variable is used in an activity
     bool used;

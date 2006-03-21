@@ -26,7 +26,7 @@
  *
  * \author
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $  
+ *          - last changes of: \$Author: gierds $  
  *          
  * \date
  * 
@@ -45,6 +45,8 @@
 #include "bpel-attributes.h"
 #include "bpel-syntax.h"
 #include "debug.h"
+
+extern SymbolTable symTab;
 
 /********************************************
  * implementation of SymbolTable CLASS
@@ -2173,8 +2175,11 @@ STElement::~STElement() {}
 /********************************************
  * implementation of STEnvelope CLASS
  ********************************************/
- 
- STEnvelope::~STEnvelope() {}
+
+/*!
+ * destructor
+ */
+STEnvelope::~STEnvelope() {}
  
 /********************************************
  * implementation of EventHandlers CLASS
@@ -2275,7 +2280,11 @@ STPartnerLink::~STPartnerLink() {}
  * constructor
  */
 STProcess::STProcess(unsigned int elementId, unsigned int entryKey)
- :SymbolTableEntry(elementId, entryKey) {}
+ :STScope(elementId, entryKey) 
+// :SymbolTableEntry(elementId, entryKey) 
+{
+  parentScopeId = 0;
+}
 
 /*!
  * destructor
@@ -2315,12 +2324,68 @@ STReply::~STReply() {}
 /********************************************
  * implementation of Scope CLASS
  ********************************************/
+/*!
+ * add a new Variable with scope ID and name
+ */
+std::string STScope::addVariable(kc::integer scopeId, STVariable * variable) 
+{
+  trace(TRACE_DEBUG, "[ST] Adding variable " + variable->mapOfAttributes["name"]->value + "\n");
+  if (! variables.empty())
+  {
+    for (list<STVariable *>::iterator iter = variables.begin();
+	    iter != variables.end(); 
+	    iter++)
+    {
+      if ((*iter)->mapOfAttributes["name"]->value == variable->mapOfAttributes["name"]->value)
+      {
+	yyerror(string("Two Variables with same name\nName of double Variable is \"" 
+		     + variable->mapOfAttributes["name"]->value
+		     + "\"\n").c_str());
+      }
+    }
+  }
+    
+  variables.push_back(variable);
+  return intToString(scopeId->value) + "." + variable->mapOfAttributes["name"]->value;
+}
 
+/// checks for a variable with a given name and returns pointer to the object
+STVariable * STScope::checkVariable(std::string name)
+{
+  trace(TRACE_DEBUG, "[ST] Checking variable " + name + "\n");
+  if (! variables.empty())
+  {
+    trace(TRACE_VERY_DEBUG, "[ST] Looking in Scope\n");
+    for (list<STVariable *>::iterator iter = variables.begin();
+	    iter != variables.end(); 
+	    iter++)
+    {
+      if ((*iter)->mapOfAttributes["name"]->value == name)
+      {
+	return (*iter);
+      }
+    }
+  }
+  if (parentScopeId != 0)
+  {
+    trace(TRACE_VERY_DEBUG, "[ST] Looking in parent Scope " + intToString(parentScopeId) +"\n");
+    (dynamic_cast <STScope*> (symTab.lookup(parentScopeId)))->checkVariable(name);
+  }
+  else
+  {
+    yyerror(string("Name of undefined Variable is \"" 
+		   + name + "\"\n").c_str());
+  }
+  return NULL;
+}
+ 
 /*!
  * constructor
  */
 STScope::STScope(unsigned int elementId, unsigned int entryKey)
- :SymbolTableEntry(elementId, entryKey) {}
+ :SymbolTableEntry(elementId, entryKey) 
+{
+}
 
 /*!
  * destructor

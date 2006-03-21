@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/03/21 16:46:24 $
+ *          - last changed: \$Date: 2006/03/21 22:38:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.64 $
+ * \version \$Revision: 1.65 $
  */
 %}
 
@@ -73,14 +73,14 @@ tProcess:
       activity
       )
   {
-//    casestring name;
-//    casestring targetNamespace;
-//    casestring queryLanguage = mkcasestring("http://www.w3.org/TR/1999/REC-xpath-19991116");
-//    casestring expressionLanguage = mkcasestring("http://www.w3.org/TR/1999/REC-xpath-19991116");
+//NL    casestring name;
+//NL    casestring targetNamespace;
+//NL    casestring queryLanguage = mkcasestring("http://www.w3.org/TR/1999/REC-xpath-19991116");
+//NL    casestring expressionLanguage = mkcasestring("http://www.w3.org/TR/1999/REC-xpath-19991116");
     casestring suppressJoinFailure = mkcasestring("no");
-//    casestring enableInstanceCompensation = mkcasestring("no");
-//    casestring abstractProcess = mkcasestring("no");
-//    casestring xmlns = mkcasestring("http://schemas.xmlsoap.org/ws/2003/03/business-process/");
+//NL    casestring enableInstanceCompensation = mkcasestring("no");
+//NL    casestring abstractProcess = mkcasestring("no");
+//NL    casestring xmlns = mkcasestring("http://schemas.xmlsoap.org/ws/2003/03/business-process/");
 
     integer id;
   }
@@ -137,10 +137,11 @@ tPartnerLink_list:
 tPartnerLink:
   PartnerLink()
   {
-    casestring name;
-    casestring partnerLinkType;
-    casestring myRole;
-    casestring partnerRole;
+//NL    casestring name;
+//NL    casestring partnerLinkType;
+
+    casestring myRole; /* @DR: I cannot reamove this attribute and read it with 'readAttributeValue' */
+    casestring partnerRole; /* @DR: I cannot reamove this attribute and read it with 'readAttributeValue' */
     
     integer id;
   }
@@ -158,7 +159,7 @@ tPartner_list:
 tPartner:
   Partner(tPartnerLink_list)
   {
-//    casestring name;
+//NL    casestring name;
     
     integer id;
   }
@@ -190,7 +191,7 @@ tCatch:
   Catch(activity)
   {
     casestring faultName;
-//    casestring faultVariable;
+//NL    casestring faultVariable;
 
     /// additional attribute containing the unique variable name    
     casestring variableID;
@@ -203,8 +204,8 @@ tCatchAll:
   CatchAll(activity)
 | NoCatchAll()
   {
-    casestring faultName;
-//    casestring faultVariable;
+//NL    casestring faultName;
+//NL    casestring faultVariable;
     integer id;
   }
 ;
@@ -242,10 +243,10 @@ tOnAlarm_list:
 tOnMessage:
   OnMessage(activity)
   {
-    casestring partnerLink;
-    casestring portType;
-    casestring operation;
-//    casestring variable;
+//NL    casestring partnerLink;
+//NL    casestring portType;
+//NL    casestring operation;
+//NL    casestring variable;
 
     /// additional attribute containing the unique variable name    
     casestring variableID;
@@ -329,8 +330,8 @@ tCorrelationSet_list:
 tCorrelationSet:
   CorrelationSet()
   {
-//    casestring properties;
-//    casestring name;
+//NL    casestring properties;
+//NL    casestring name;
     
     integer id;
   }
@@ -351,9 +352,9 @@ tCorrelation_list:
 tCorrelation:
   Correlation()
   {
-//    casestring set;
-//    casestring initiate = mkcasestring("no");
-//    casestring pattern;
+//NL    casestring set;
+//NL    casestring initiate = mkcasestring("no");
+//NL    casestring pattern;
     
     integer id;
   }
@@ -367,9 +368,9 @@ tCorrelation:
 tEmpty:
   Empty(standardElements)
   {
-    casestring name;
-    casestring joinCondition;
-    casestring suppressJoinFailure;
+//NL    casestring name;
+//NL    casestring joinCondition;
+//NL    casestring suppressJoinFailure;
     
     integer negativeControlFlow;
     integer id;
@@ -384,13 +385,13 @@ tEmpty:
 tInvoke:
   Invoke(standardElements tCorrelation_list)
   {
-    casestring name;
-    casestring joinCondition;
-    casestring suppressJoinFailure;    
+//NL    casestring name;
+//NL    casestring joinCondition;
+//NL    casestring suppressJoinFailure;    
 	  
-    casestring partnerLink;
-    casestring portType;
-    casestring operation;
+//NL    casestring partnerLink;
+//NL    casestring portType;
+//NL    casestring operation;
     casestring inputVariable;
     casestring outputVariable;
     
@@ -417,15 +418,15 @@ tInvoke:
 tReceive:
   Receive(standardElements tCorrelation_list)
   {
-    casestring name;
-    casestring joinCondition;
-    casestring suppressJoinFailure;    
+//NL    casestring name;
+//NL    casestring joinCondition;
+//NL    casestring suppressJoinFailure;    
 
-    casestring partnerLink;
-    casestring portType;
-    casestring operation;
-    casestring variable;
-    casestring createInstance = mkcasestring("no");
+//NL    casestring partnerLink;
+//NL    casestring portType;
+//NL    casestring operation;
+//NL    casestring variable;
+//NL    casestring createInstance = mkcasestring("no");
 
     /// additional attribute containing the unique variable name    
     casestring variableID;
@@ -446,15 +447,15 @@ tReceive:
 tReply:
   Reply(standardElements tCorrelation_list)
   {
-    casestring name;
-    casestring joinCondition;
-    casestring suppressJoinFailure;        
+//NL    casestring name;
+//NL    casestring joinCondition;
+//NL    casestring suppressJoinFailure;        
 
-    casestring partnerLink;
-    casestring portType;
-    casestring operation;
-    casestring variable;
-    casestring faultName;
+//NL    casestring partnerLink;
+//NL    casestring portType;
+//NL    casestring operation;
+//NL    casestring variable;
+//NL    casestring faultName;
 
     /// additional attribute containing the unique variable name    
     casestring variableID;
@@ -475,9 +476,9 @@ tReply:
 tAssign:
   Assign(standardElements tCopy_list)
   {
-    casestring name;
-    casestring joinCondition;
-    casestring suppressJoinFailure;
+//NL    casestring name;
+//NL    casestring joinCondition;
+//NL    casestring suppressJoinFailure;
 
     integer negativeControlFlow;
     integer id;
@@ -496,13 +497,13 @@ tFrom:
   From()
   {
     casestring variable;
-    casestring part;
-    casestring query; // only excecutable processes
-    casestring partnerLink;
-    casestring endpointReference;
-    casestring property;
-    casestring expression;
-    casestring opaque; // only abstract processes
+//NL    casestring part;
+//NL    casestring query; // only excecutable processes
+    casestring partnerLink; /* @DR: I cannot reamove this attribute and read it with 'readAttributeValue' */
+//NL    casestring endpointReference;
+//NL    casestring property;
+//NL    casestring expression;
+//NL    casestring opaque; // only abstract processes
 
     casestring literalValue = mkcasestring(""); // used in case of <from>literal</from>
 
@@ -516,10 +517,10 @@ tFrom:
 tTo:
   To()
   {
-    casestring variable;
-    casestring part;
+//NL    casestring variable;
+//NL    casestring part;
     casestring partnerLink;
-    casestring property;
+//NL    casestring property;
 
     /// additional attribute containing the unique variable name    
     casestring variableID;
@@ -536,9 +537,9 @@ tTo:
 tWait:
   Wait(standardElements)
   {
-    casestring name;
-    casestring joinCondition;
-    casestring suppressJoinFailure;
+//NL    casestring name;
+//NL    casestring joinCondition;
+//NL    casestring suppressJoinFailure;
 	  
     casestring For; // "for" is a keyword
     casestring until;
@@ -556,12 +557,12 @@ tWait:
 tThrow:
   Throw(standardElements)
   {
-    casestring name;
-    casestring joinCondition;
-    casestring suppressJoinFailure;
+//NL    casestring name;
+//NL    casestring joinCondition;
+//NL    casestring suppressJoinFailure;
 
     casestring faultName;
-//    casestring faultVariable;
+//NL    casestring faultVariable;
 
     /// additional attribute containing the unique variable name    
     casestring variableID;
@@ -579,9 +580,9 @@ tThrow:
 tCompensate:
   Compensate(standardElements)
   {
-    casestring name;
-    casestring joinCondition;
-    casestring suppressJoinFailure;
+//NL    casestring name;
+//NL    casestring joinCondition;
+//NL    casestring suppressJoinFailure;
 
     casestring scope;
 
@@ -601,9 +602,9 @@ tCompensate:
 tTerminate:
   Terminate(standardElements)
   {
-    casestring name;
-    casestring joinCondition;
-    casestring suppressJoinFailure;
+//    casestring name;
+//    casestring joinCondition;
+//    casestring suppressJoinFailure;
 
     integer negativeControlFlow;
     integer id;
@@ -618,9 +619,9 @@ tTerminate:
 tFlow:
   Flow(standardElements tLink_list activity_list)
   {
-    casestring name;
-    casestring joinCondition;
-    casestring suppressJoinFailure;
+//NL    casestring name;
+//NL    casestring joinCondition;
+//NL    casestring suppressJoinFailure;
 
     /// additional attribute for DPE
     integer dpe = mkinteger(0);
@@ -661,9 +662,9 @@ tLink:
 tSwitch:
   Switch(standardElements tCase_list tOtherwise)
   {
-    casestring name;
-    casestring joinCondition;
-    casestring suppressJoinFailure;
+//NL    casestring name;
+//NL    casestring joinCondition;
+//NL    casestring suppressJoinFailure;
 
     /// additional attribute for DPE
     integer dpe = mkinteger(0);
@@ -711,9 +712,9 @@ tWhile:
   {
     casestring condition;
 
-    casestring name;
-    casestring joinCondition;
-    casestring suppressJoinFailure;
+//NL    casestring name;
+//NL    casestring joinCondition;
+//NL    casestring suppressJoinFailure;
     
     integer negativeControlFlow;
     integer id;
@@ -728,9 +729,9 @@ tWhile:
 tSequence:
   Sequence(standardElements activity_list)
   {
-    casestring name;
-    casestring joinCondition;
-    casestring suppressJoinFailure;
+//NL    casestring name;
+//NL    casestring joinCondition;
+//NL    casestring suppressJoinFailure;
 
     integer negativeControlFlow;
     integer id;
@@ -748,11 +749,11 @@ tSequence:
 tPick:
   Pick(standardElements tOnMessage_list tOnAlarm_list)
   {
-    casestring name;
-    casestring joinCondition;
-    casestring suppressJoinFailure;
+//NL    casestring name;
+//NL    casestring joinCondition;
+//NL    casestring suppressJoinFailure;
     
-    casestring createInstance = mkcasestring("no");
+//NL    casestring createInstance = mkcasestring("no");
 
     /// additional attribute for DPE
     integer dpe = mkinteger(0);
@@ -778,11 +779,11 @@ tScope:
       activity
       )
   {
-    casestring name;
-    casestring joinCondition;
-    casestring suppressJoinFailure;
+//NL    casestring name;
+//NL    casestring joinCondition;
+//NL    casestring suppressJoinFailure;
 
-    casestring variableAccessSerializable = mkcasestring("no");
+//NL    casestring variableAccessSerializable = mkcasestring("no");
 
     integer negativeControlFlow;
     integer id;
@@ -806,7 +807,7 @@ standardElements:
   {
     integer parentId;
     casestring suppressJoinFailure; // actually a value of the parent
-    casestring joinCondition;       // actually a value of the parent
+//NL    casestring joinCondition;       // actually a value of the parent
 
     /// additional attribute for DPE
     integer dpe = mkinteger(0);
@@ -829,7 +830,7 @@ tTarget_list:
 tTarget:
   Target()
   {
-    casestring linkName;
+//NL    casestring linkName;
 
     /// additional attribute containing the unique link name
     casestring linkID;
@@ -852,8 +853,8 @@ tSource_list:
 tSource:
   Source()
   {
-    casestring linkName;
-    casestring transitionCondition = mkcasestring("true");
+//NL    casestring linkName;
+//NL    casestring transitionCondition = mkcasestring("true");
 
     /// additional attribute containing the unique link name
     casestring linkID;

@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/03/21 13:50:07 $
+ *          - last changed: \$Date: 2006/03/21 22:53:08 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.113 $
+ * \version \$Revision: 1.114 $
  */
 
 
@@ -353,10 +353,6 @@ Arc *PetriNet::newArc(Node * source, Node * target, arc_type type)
   if (source->nodeType == target->nodeType)
     throw Exception(ARC_ERROR, "Arc between two " + source->nodeTypeName() +
 	"s!\n" + *((source->history).begin()) + " and " + *((target->history).begin()), pos(__FILE__, __LINE__, __FUNCTION__));
-
-  // Verbose output every 1000 arcs.
-  if ((!F.empty()) &&(F.size() % 1000 == 0))
-    trace(TRACE_INFORMATION, "[PN]\t" + information() + "\n");
 
   // Finally add the arc to the Petri net.
   Arc *f = new Arc(source, target);

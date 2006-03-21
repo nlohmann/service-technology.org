@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/03/21 22:38:47 $
+ *          - last changed: \$Date: 2006/03/21 22:53:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.65 $
+ * \version \$Revision: 1.66 $
  */
 %}
 
@@ -392,7 +392,7 @@ tInvoke:
 //NL    casestring partnerLink;
 //NL    casestring portType;
 //NL    casestring operation;
-    casestring inputVariable;
+//NL    casestring inputVariable;
     casestring outputVariable;
     
     /// additional attributes containing the unique variable name    
@@ -519,7 +519,7 @@ tTo:
   {
 //NL    casestring variable;
 //NL    casestring part;
-    casestring partnerLink;
+    casestring partnerLink; /* @DR: I cannot reamove this attribute and read it with 'readAttributeValue' */
 //NL    casestring property;
 
     /// additional attribute containing the unique variable name    

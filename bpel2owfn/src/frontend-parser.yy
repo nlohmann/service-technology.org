@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/21 22:38:47 $
+ *          - last changed: \$Date: 2006/03/21 22:53:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.145 $
+ * \version \$Revision: 1.146 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -1307,7 +1307,7 @@ tInvoke:
 //NL	invoke->partnerLink = att.read($3, "partnerLink");
 //NL        invoke->portType = att.read($3, "portType");
 //NL        invoke->operation = att.read($3, "operation");
-        invoke->inputVariable = att.read($3, "inputVariable");
+//NL        invoke->inputVariable = att.read($3, "inputVariable");
         invoke->outputVariable = att.read($3, "outputVariable");
 	// inputVariable <=> input for invoke process !!!
         invoke->variableIDin  = symMan.checkVariable(att.read($3, "inputVariable")->name);
@@ -1377,7 +1377,7 @@ tInvoke:
 //NL        invoke->partnerLink = att.read($3, "partnerLink");
 //NL        invoke->portType = att.read($3, "portType");
 //NL        invoke->operation = att.read($3, "operation");
-        invoke->inputVariable = att.read($3, "inputVariable");
+//NL        invoke->inputVariable = att.read($3, "inputVariable");
         invoke->outputVariable = att.read($3, "outputVariable");
 	// inputVariable <=> input for invoke process !!!
         invoke->variableIDin  = symMan.checkVariable(att.read($3, "inputVariable")->name);
@@ -1445,7 +1445,7 @@ tInvoke:
 //NL      invoke->partnerLink = att.read($3, "partnerLink");
 //NL      invoke->portType = att.read($3, "portType");
 //NL      invoke->operation = att.read($3, "operation");
-      invoke->inputVariable = att.read($3, "inputVariable");
+//NL      invoke->inputVariable = att.read($3, "inputVariable");
       invoke->outputVariable = att.read($3, "outputVariable"); 
       // inputVariable <=> input for invoke process !!!
       invoke->variableIDin  = symMan.checkVariable(att.read($3, "inputVariable")->name);

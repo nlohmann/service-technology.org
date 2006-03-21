@@ -40,13 +40,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/03/21 10:27:05 $
+ *          - last changed: \$Date: 2006/03/21 13:39:18 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.66 $
+ * \version \$Revision: 1.67 $
  */
 
 
@@ -145,7 +145,7 @@ class Node
     unsigned int id;
 
     /// the name of the type
-    string nodeTypeName();
+    virtual string nodeTypeName();
 
     /// the short name of the node
     virtual string nodeShortName();
@@ -153,7 +153,7 @@ class Node
     /// the type of the node
     node_type nodeType;
 
-    /// the set of roles(i.e. the history) of the node
+    /// the set of roles (i.e. the history) of the node
     vector<string> history;
 
     /// true if first role contains role
@@ -190,6 +190,9 @@ class Transition:public Node
     /// DOT-output of the transition (used by PetriNet::dotOut())
     string dotOut();
 
+    /// the name of the type
+    string nodeTypeName();
+    
     /// the short name of the transition
     string nodeShortName();
 
@@ -229,6 +232,9 @@ class Place:public Node
 
     /// DOT-output of the place (used by PetriNet::dotOut())
     string dotOut();
+
+    /// the name of the type
+    string nodeTypeName();
 
     /// the short name of the place
     string nodeShortName();
@@ -384,6 +390,30 @@ class PetriNet
     /// Calculates the postset of a node.
     set<Node*> postset(Node* n);
 
+    /// true if place p has a communicating transition in its postset
+    bool communicationInPostSet(Place* p);
+    
+    /// remove dead nodes of the Petri net
+    void removeDeadNodes();
+
+    /// merge twin transitions
+    void mergeTwinTransitions();
+
+    /// collapse simple sequences
+    void collapseSequences();
+
+    /// Statistical output.
+    string information();
+
+    /// Removes interface places (for non-oWFN formats)
+    void removeInterface();
+  
+    /// Returns an id for new nodes.
+    unsigned int getId();
+
+    /// Returns current id.
+    unsigned int id();
+
 
     /// the list of places of the Petri net
     set<Place*> P;
@@ -400,30 +430,6 @@ class PetriNet
     /// the list of arcs of the Petri net
     set<Arc*> F;
 
-
-    /// true if place p has a communicating transition in its postset
-    bool communicationInPostSet(Place* p);
-    
-    /// remove dead nodes of the Petri net
-    void removeDeadNodes();
-
-    /// merge twin transitions
-    void mergeTwinTransitions();
-
-    /// collapse simple sequences
-    void collapseSequences();
-
-    /// Statistical output.
-    string information();
-
-    /// Removes interface places(for LoLA-output)
-    void removeInterface();
-  
-    /// Returns an id for new nodes.
-    unsigned int getId();
-
-    /// Returns current id.
-    unsigned int id();
 
     /// the id that will be assigned to the next node
     unsigned int nextId;

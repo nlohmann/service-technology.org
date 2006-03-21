@@ -29,11 +29,11 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $
+ *          - last changes of: \$Author: nlohmann $
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/03/16 15:01:34 $
+ *          - last changed: \$Date: 2006/03/21 09:20:08 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.158 $
+ * \version \$Revision: 1.159 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -1357,6 +1357,7 @@ This=userDefinedEventHandler(a,b) ->
 	TheNet->newArc(TheNet->findPlace("in." + string(ThisBranch->channelID->name)), onMessage_t2);
 	TheNet->newArc(onMessage_t2, onMessage_p2);
 	TheNet->newArc(onMessage_p5, onMessage_t2);
+	onMessage_t2->communicating = true;
 
 	Transition *onMessage_t3 = TheNet->newTransition(newPrefix + "t3");
 	TheNet->newArc(TheNet->findPlace("variable." + string(ThisBranch->variableID->name)), onMessage_t3);
@@ -1987,6 +1988,7 @@ This=Invoke(a,b) provided (This->outputVariable == mkcasestring("")) ->
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       TheNet->newArc(t2, TheNet->findPlace("out." + string(This->channelID->name)));
+      t2->communicating = true;
 
 
       // Transitions for the negative control flow.
@@ -2039,11 +2041,13 @@ This=Invoke(a,b) provided (This->outputVariable != mkcasestring("")) ->
       TheNet->newArc(t2, TheNet->findPlace("out." + string(This->channelID->name)));
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
+      t2->communicating = true;
 
       Transition *t3 = TheNet->newTransition(prefix + "t3");
       TheNet->newArc(TheNet->findPlace("in." + string(This->channelID->name)), t3);
       TheNet->newArc(p3, t3);
       TheNet->newArc(t3, p4);
+      t3->communicating = true;
 
       Transition *t4 = TheNet->newTransition(prefix + "t4");
       TheNet->newArc(p4, t4);
@@ -2103,6 +2107,7 @@ This=Receive(a,b) ->
       TheNet->newArc(TheNet->findPlace("in." + string(This->channelID->name)), t1);
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
+      t1->communicating = true;
 
       Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p2, t2);
@@ -2162,6 +2167,7 @@ This=Reply(a,b) ->
       TheNet->newArc(t2, TheNet->findPlace("out." + string(This->channelID->name)));
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
+      t2->communicating = true;
 
 
       // Transitions for the negative control flow.
@@ -3134,6 +3140,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	TheNet->newArc(TheNet->findPlace("in." + string(ThisBranch->channelID->name)), t2);
 	TheNet->newArc(TheNet->findPlace(TheActivity, ".internal.TimeStamp"), t2);
 	TheNet->newArc(t2, p3);
+	t2->communicating = true;
 
 	Transition *t3 = TheNet->newTransition(newPrefix + "t3");
 	TheNet->newArc(TheNet->findPlace("variable." + string(ThisBranch->variableID->name)), t3);

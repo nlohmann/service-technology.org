@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/03/17 10:24:48 $
+ *          - last changed: \$Date: 2006/03/21 10:27:05 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  */
 
 
@@ -83,20 +83,35 @@ string Node::nodeTypeName()
 }
 
 
+string Node::nodeShortName()
+{
+  return "";
+}
+
 
 
 
 /*!
- * \return the short name of the node, e.g. for LoLA output
+ * \return the short name of the place, e.g. for LoLA output
  */
-string Node::nodeShortName()
+string Place::nodeShortName()
 {
-  if (nodeType == PLACE)
+  if (type == INTERNAL)
     return ("p" + intToString(id));
-  if (nodeType == TRANSITION)
-    return ("t" + intToString(id));
   else
-    return NULL;
+    return history[0];
+}
+
+
+
+
+
+/*!
+ * \return the short name of the transition, e.g. for LoLA output
+ */
+string Transition::nodeShortName()
+{
+  return ("t" + intToString(id));
 }
 
 

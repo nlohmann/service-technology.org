@@ -40,13 +40,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/03/21 09:19:30 $
+ *          - last changed: \$Date: 2006/03/21 10:27:05 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.65 $
+ * \version \$Revision: 1.66 $
  */
 
 
@@ -148,7 +148,7 @@ class Node
     string nodeTypeName();
 
     /// the short name of the node
-    string nodeShortName();
+    virtual string nodeShortName();
 
     /// the type of the node
     node_type nodeType;
@@ -190,6 +190,9 @@ class Transition:public Node
     /// DOT-output of the transition (used by PetriNet::dotOut())
     string dotOut();
 
+    /// the short name of the transition
+    string nodeShortName();
+
     /// true if transition is connected with input or output place
     bool communicating;
 };
@@ -226,6 +229,9 @@ class Place:public Node
 
     /// DOT-output of the place (used by PetriNet::dotOut())
     string dotOut();
+
+    /// the short name of the place
+    string nodeShortName();
 
     /// Mark the current place.
     void mark();

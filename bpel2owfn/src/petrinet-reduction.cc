@@ -36,13 +36,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/03/21 10:27:05 $
+ *          - last changed: \$Date: 2006/03/21 11:26:05 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  */
 
 
@@ -208,13 +208,8 @@ bool PetriNet::communicationInPostSet(Place *p)
       t++)
   {
     if (((Transition*)(*t))->communicating)
-    {
-      cerr << p->nodeShortName() << " has a communicating transition in its postset" << endl;
       return true;
-    }
   }
-  
-  cerr << p->nodeShortName() << " has no communicating transition in its postset" << endl;
   
   return false;
 }
@@ -285,10 +280,21 @@ void PetriNet::simplify()
   trace(TRACE_DEBUG, "[PN]\tPetri net size before simplification: " + information() + "\n");
   trace(TRACE_INFORMATION, "Simplifying Petri net...\n");
 
-  removeDeadNodes();
-  mergeTwinTransitions();
-  collapseSequences();
-  
+  string old = information();
+  bool done = false;
+  int passes = 1;
+  while (!done)
+  {
+    removeDeadNodes();
+    mergeTwinTransitions();
+    collapseSequences();
+    
+    trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification pass " + intToString(passes++) + ": " + information() + "\n");
+
+    done = (old == information());
+    old = information();
+  }
+
   trace(TRACE_INFORMATION, "Simplifying complete.\n");
   trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification: " + information() + "\n");
 }

@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/03/21 10:27:05 $
+ *          - last changed: \$Date: 2006/03/21 11:26:05 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  */
 
 
@@ -123,8 +123,11 @@ string Transition::nodeShortName()
  */
 string PetriNet::information()
 {
-  string result = intToString(P.size()) + " places, " + intToString(T.size())
-    + " transitions, " + intToString(F.size()) + " arcs";
+  string result = "|P|=" + intToString(P.size()+P_in.size()+P_out.size());
+  result += ", |P_in|= " + intToString(P_in.size());
+  result += ", |P_out|= " + intToString(P_out.size());
+  result += ", |T|=" + intToString(T.size());
+  result += ", |F|=" + intToString(F.size());
   return result;
 }
 

@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/03/21 11:26:05 $
+ *          - last changed: \$Date: 2006/03/21 11:31:49 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  */
 
 
@@ -150,10 +150,10 @@ void PetriNet::printInformation()
   // the internal places
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
-    (*output) <<(*p)->nodeShortName() << "\tinternal";
+    (*output) << (*p)->nodeShortName() << "\tinternal";
 
-    for (vector<string>::iterator role =(*p)->history.begin(); role !=(*p)->history.end(); role++)
-      if (role ==(*p)->history.begin())
+    for (vector<string>::iterator role = (*p)->history.begin(); role != (*p)->history.end(); role++)
+      if (role == (*p)->history.begin())
 	(*output) << "\t" + *role + "\n";
       else
 	(*output) << "\t\t\t" + *role + "\n";
@@ -162,10 +162,10 @@ void PetriNet::printInformation()
   // the input places
   for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
   {
-    (*output) <<(*p)->nodeShortName() << "\tinput   ";
+    (*output) << (*p)->nodeShortName() << "\tinput   ";
 
-    for (vector<string>::iterator role =(*p)->history.begin(); role !=(*p)->history.end(); role++)
-      if (role ==(*p)->history.begin())
+    for (vector<string>::iterator role = (*p)->history.begin(); role != (*p)->history.end(); role++)
+      if (role == (*p)->history.begin())
 	(*output) << "\t" + *role + "\n";
       else
 	(*output) << "\t\t\t" + *role + "\n";
@@ -174,10 +174,10 @@ void PetriNet::printInformation()
   // the output places
   for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
   {
-    (*output) <<(*p)->nodeShortName() << "\toutput  ";
+    (*output) << (*p)->nodeShortName() << "\toutput  ";
 
-    for (vector<string>::iterator role =(*p)->history.begin(); role !=(*p)->history.end(); role++)
-      if (role ==(*p)->history.begin())
+    for (vector<string>::iterator role = (*p)->history.begin(); role != (*p)->history.end(); role++)
+      if (role == (*p)->history.begin())
 	(*output) << "\t" + *role + "\n";
       else
 	(*output) << "\t\t\t" + *role + "\n";
@@ -191,7 +191,7 @@ void PetriNet::printInformation()
   {
     (*output) << (*t)->nodeShortName() + "\t";
 
-    for (vector<string>::iterator role =(*t)->history.begin(); role !=(*t)->history.end(); role++)
+    for (vector<string>::iterator role = (*t)->history.begin(); role != (*t)->history.end(); role++)
       if (role == (*t)->history.begin())
 	(*output) << *role + "\n";
       else
@@ -326,24 +326,24 @@ void PetriNet::dotOut()
   // list the places
   (*output) << endl << " node [shape=circle];" << endl;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
-    (*output) <<(*p)->dotOut();
+    (*output) << (*p)->dotOut();
 
   if (!hasNoInterface)
   {
     for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
-      (*output) <<(*p)->dotOut();
+      (*output) << (*p)->dotOut();
     for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
-      (*output) <<(*p)->dotOut();
+      (*output) << (*p)->dotOut();
   }
 
   // list the transitions
   (*output) << endl << " node [shape=box regular=true];" << endl;
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
-    (*output) <<(*t)->dotOut();
+    (*output) << (*t)->dotOut();
 
   // list the arcs
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
-    (*output) <<(*f)->dotOut();
+    (*output) << (*f)->dotOut();
 
   (*output) << "}" << endl;
 }
@@ -374,9 +374,9 @@ void PetriNet::pnmlOut()
   // places(only internal)
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
-    (*output) << "    <place id=\"" <<(*p)->nodeShortName() << "\">" << endl;
+    (*output) << "    <place id=\"" << (*p)->nodeShortName() << "\">" << endl;
     (*output) << "      <name>" << endl;
-    (*output) << "        <text>" <<(*(*p)->history.begin()) << "</text>" << endl;
+    (*output) << "        <text>" << (*p)->history[0] << "</text>" << endl;
     (*output) << "      </name>" << endl;
     if ((*p)->marked)
     {
@@ -390,9 +390,9 @@ void PetriNet::pnmlOut()
   // transitions
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
   {
-    (*output) << "    <transition id=\"" <<(*t)->nodeShortName() << "\">" << endl;
+    (*output) << "    <transition id=\"" << (*t)->nodeShortName() << "\">" << endl;
     (*output) << "      <name>" << endl;
-    (*output) << "        <text>" <<(*(*t)->history.begin()) << "</text>" << endl;
+    (*output) << "        <text>" << (*t)->history[0] << "</text>" << endl;
     (*output) << "      </name>" << endl;
     (*output) << "    </transition>" << endl << endl;
   }
@@ -403,8 +403,8 @@ void PetriNet::pnmlOut()
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++, arcNumber++)
   {
     (*output) << "    <arc id=\"a" << arcNumber << "\" ";
-    (*output) << "source=\"" <<(*f)->source->nodeShortName() << "\" ";
-    (*output) << "target=\"" <<(*f)->source->nodeShortName() << "\" />" << endl;
+    (*output) << "source=\"" << (*f)->source->nodeShortName() << "\" ";
+    (*output) << "target=\"" << (*f)->source->nodeShortName() << "\" />" << endl;
   }
   (*output) << endl;
   (*output) << "  </net>" << endl;
@@ -433,7 +433,7 @@ void PetriNet::pepOut()
   (*output) << "PL" << endl;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
-    (*output) <<(*p)->id << "\"" <<(*p)->nodeShortName() << "\"80@40";
+    (*output) << (*p)->id << "\"" << (*p)->nodeShortName() << "\"80@40";
     if ((*p)->marked)
       (*output) << "M1";
     (*output) << "k1" << endl;
@@ -442,19 +442,19 @@ void PetriNet::pepOut()
   // transitions
   (*output) << "TR" << endl;
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
-    (*output) <<(*t)->id << "\"" <<(*t)->nodeShortName() << "\"80@40" << endl;
+    (*output) << (*t)->id << "\"" << (*t)->nodeShortName() << "\"80@40" << endl;
 
   // arcs from transitions to places
   (*output) << "TP" << endl;
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     if (((*f)->source->nodeType) == TRANSITION)
-      (*output) <<(*f)->source->id << "<" <<(*f)->target->id << endl;
+      (*output) << (*f)->source->id << "<" << (*f)->target->id << endl;
 
   // arcs from places to transitions
   (*output) << "PT" << endl;
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     if (((*f)->source->nodeType) == PLACE)
-      (*output) <<(*f)->source->id << ">" <<(*f)->target->id << endl;
+      (*output) << (*f)->source->id << ">" << (*f)->target->id << endl;
 }
 
 
@@ -476,7 +476,7 @@ void PetriNet::apnnOut()
   // places(only internal)
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
-    (*output) << "  \\place{" <<(*p)->nodeShortName() << "}{";
+    (*output) << "  \\place{" << (*p)->nodeShortName() << "}{";
     if ((*p)->marked)
       (*output) << "\\init{1}";
     (*output) << "}" << endl;
@@ -486,7 +486,7 @@ void PetriNet::apnnOut()
   // transitions
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
   {
-    (*output) << "  \\transition{" <<(*t)->nodeShortName() << "}{}" << endl;
+    (*output) << "  \\transition{" << (*t)->nodeShortName() << "}{}" << endl;
   }
   (*output) << endl;
 
@@ -495,8 +495,8 @@ void PetriNet::apnnOut()
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++, arcNumber++)
   {
     (*output) << "  \\arc{a" << arcNumber << "}{ ";
-    (*output) << "\\from{" <<(*f)->source->nodeShortName() << "} ";
-    (*output) << "\\to{" <<(*f)->target->nodeShortName() << "} }" << endl;
+    (*output) << "\\from{" << (*f)->source->nodeShortName() << "} ";
+    (*output) << "\\to{" << (*f)->target->nodeShortName() << "} }" << endl;
   }
   (*output) << endl;
 
@@ -525,7 +525,7 @@ void PetriNet::lolaOut()
   unsigned int count = 1;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); count++, p++)
   {
-    (*output) << "  " <<(*p)->nodeShortName();
+    (*output) << "  " << (*p)->nodeShortName();
     
     if (count < P.size())
       (*output) << "," << endl;
@@ -607,7 +607,7 @@ void PetriNet::owfnOut()
   unsigned int count = 1;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); count++, p++)
   {
-    (*output) << "    " <<(*p)->nodeShortName();
+    (*output) << "    " << (*p)->nodeShortName();
     
     if (count < P.size())
       (*output) << "," << endl;
@@ -620,7 +620,7 @@ void PetriNet::owfnOut()
   count = 1;
   for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); count++, p++)
   {
-    (*output) << "    " <<(*p)->nodeShortName();
+    (*output) << "    " << (*p)->nodeShortName();
     
     if (count < P_in.size())
       (*output) << "," << endl;
@@ -633,7 +633,7 @@ void PetriNet::owfnOut()
   count = 1;
   for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); count++, p++)
   {
-    (*output) << "    " <<(*p)->nodeShortName();
+    (*output) << "    " << (*p)->nodeShortName();
     
     if (count < P_out.size())
       (*output) << "," << endl;

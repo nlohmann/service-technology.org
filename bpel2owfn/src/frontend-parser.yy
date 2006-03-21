@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/21 14:36:43 $
+ *          - last changed: \$Date: 2006/03/21 14:53:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.141 $
+ * \version \$Revision: 1.142 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -126,6 +126,10 @@ SymbolTable symTab = SymbolTable();
 SymbolTableEntry* currentSymTabEntry;
 unsigned int currentSymTabEntryKey = 0;
 
+/// needed to tag handlers
+integer currentScopeId;
+STScope * currentSTScope = NULL;
+
 // manage attributes
 #include "bpel-attributes.h"
 
@@ -142,9 +146,6 @@ bool inPartners = false;
 
 /// needed to check occurrence of links within whiles
 bool inWhile = false;
-
-/// needed to tag handlers
-integer currentScopeId;
 
 /// needed to tag scopes
 map <integer, integer> parent;
@@ -334,6 +335,7 @@ tProcess:
 
       symMan.initialiseProcessScope($3);
       currentScopeId = $3;
+      currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId->value));
       isInFH.push(false);
       isInCH.push(pair<bool,int>(false,0));
       hasCompensate = 0;
@@ -944,6 +946,8 @@ tVariable:
   K_VARIABLE genSymTabEntry_Variable
   arbitraryAttributes X_NEXT X_SLASH K_VARIABLE
     { symTab.checkAttributes($2); //att.check($3, K_VARIABLE);
+      STVariable * stVar = dynamic_cast<STVariable *> (symTab.lookup(currentSymTabEntryKey));
+      // currentScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId->value));
       $$ = Variable();
       $$->id = $2;
       $$->name = att.read($3, "name");
@@ -954,7 +958,9 @@ tVariable:
 	              new csVariable($$->name->name, 
 				     $$->messageType->name, 
 				     $$->type->name, 
-				     $$->element->name)); }
+				     $$->element->name)); 
+      stVar->name = currentSTScope->addVariable(currentScopeId, stVar);
+    }
 | K_VARIABLE genSymTabEntry_Variable
   arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2); //att.check($3, K_VARIABLE);
@@ -1232,7 +1238,15 @@ tInvoke:
            || string($11->op_name()) != "implicitCompensationHandler")
       {
         //cerr << "embed in scope" << endl;
-        standardElements se =  StandardElements(NiltTarget_list(), NiltSource_list());
+        currentSymTabEntryKey = symTab.insert(K_SCOPE);
+        currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
+	parent[mkinteger(currentSymTabEntryKey)] = parent[currentScopeId];
+	currentScopeId = mkinteger(currentSymTabEntryKey);
+	
+	currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentSymTabEntryKey));
+	currentSTScope->parentScopeId = parent[currentScopeId]->value;
+
+	standardElements se =  StandardElements(NiltTarget_list(), NiltSource_list());
         tInvoke invoke = Invoke(se, $8);
         activity ai = activityInvoke(invoke);
         tFaultHandlers fh = userDefinedFaultHandler($9, $10);
@@ -1254,8 +1268,6 @@ tInvoke:
 
 	invoke->name = att.read($3, "name");
 
-        currentSymTabEntryKey = symTab.insert(K_SCOPE);
-        currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
 		
         scope->name = att.read($3, "name");
         symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute(mkcasestring("name"), scope->name));
@@ -1306,6 +1318,7 @@ tInvoke:
         scope->hasEH = false;
 
         currentScopeId = scope->parentScopeId = parent[$2];
+        currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId->value));
 
         $$ = activity(activityScope(scope));
 
@@ -1318,6 +1331,7 @@ tInvoke:
 
         //restore real scope ID
         currentScopeId = parent[$2];
+        currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId->value));
 
         tInvoke invoke = Invoke($7, $8);
 
@@ -1473,6 +1487,8 @@ tReceive:
     { symMan.checkPartnerLink(att.read($3, "partnerLink")->name); }
   standardElements tCorrelations X_SLASH K_RECEIVE
     { $$ = Receive($7, $8);
+      STReceive * symbolTableEntry = dynamic_cast<STReceive *> (symTab.lookup($2)); 
+
       $$->name = att.read($3, "name");
       $$->joinCondition = $7->joinCondition = att.read($3, "joinCondition");    
       $$->suppressJoinFailure = $7->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
@@ -1484,6 +1500,7 @@ tReceive:
       $$->variable = att.read($3, "variable");
       $$->createInstance = att.read($3, "createInstance", $$->createInstance); 
       $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
+      // symbolTableEntry->variable
       $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
 				      $$->partnerLink->name), true);
@@ -1590,6 +1607,15 @@ tReply:
   tCorrelations
   X_SLASH K_REPLY
     { $$ = Reply($6, $7);
+      STReply * stReply = NULL;
+      try
+      {
+	stReply = dynamic_cast<STReply*> (symTab.lookup($2));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
       $$->name = att.read($3, "name");
       $$->joinCondition = $6->joinCondition = att.read($3, "joinCondition");
       $$->suppressJoinFailure = $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
@@ -2762,7 +2788,10 @@ tScope:
       isInFH.push(false);
       isInCH.push(pair<bool,int>(false,hasCompensate));
       parent[$2] = currentScopeId;
-      currentScopeId = $2; }
+      currentScopeId = $2; 
+      currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId->value));
+      currentSTScope->parentScopeId = parent[$2]->value;
+    }
   standardElements 
     {
       symMan.setBlackListMode(false);
@@ -2787,6 +2816,7 @@ tScope:
       $$->negativeControlFlow = $7->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $7->parentId = $2;
       $$->parentScopeId = currentScopeId = parent[$2];
+      currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId->value));
       $$->dpe = mkinteger((symMan.needsDPE())->value);
       if ($7->hasTarget)
       {

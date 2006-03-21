@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/03/21 15:03:49 $
+ *          - last changed: \$Date: 2006/03/21 16:46:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.63 $
+ * \version \$Revision: 1.64 $
  */
 %}
 
@@ -73,14 +73,14 @@ tProcess:
       activity
       )
   {
-    casestring name;
-    casestring targetNamespace;
-    casestring queryLanguage = mkcasestring("http://www.w3.org/TR/1999/REC-xpath-19991116");
-    casestring expressionLanguage = mkcasestring("http://www.w3.org/TR/1999/REC-xpath-19991116");
+//    casestring name;
+//    casestring targetNamespace;
+//    casestring queryLanguage = mkcasestring("http://www.w3.org/TR/1999/REC-xpath-19991116");
+//    casestring expressionLanguage = mkcasestring("http://www.w3.org/TR/1999/REC-xpath-19991116");
     casestring suppressJoinFailure = mkcasestring("no");
-    casestring enableInstanceCompensation = mkcasestring("no");
-    casestring abstractProcess = mkcasestring("no");
-    casestring xmlns = mkcasestring("http://schemas.xmlsoap.org/ws/2003/03/business-process/");
+//    casestring enableInstanceCompensation = mkcasestring("no");
+//    casestring abstractProcess = mkcasestring("no");
+//    casestring xmlns = mkcasestring("http://schemas.xmlsoap.org/ws/2003/03/business-process/");
 
     integer id;
   }
@@ -158,7 +158,7 @@ tPartner_list:
 tPartner:
   Partner(tPartnerLink_list)
   {
-    casestring name;
+//    casestring name;
     
     integer id;
   }
@@ -190,7 +190,7 @@ tCatch:
   Catch(activity)
   {
     casestring faultName;
-    casestring faultVariable;
+//    casestring faultVariable;
 
     /// additional attribute containing the unique variable name    
     casestring variableID;
@@ -204,7 +204,7 @@ tCatchAll:
 | NoCatchAll()
   {
     casestring faultName;
-    casestring faultVariable;
+//    casestring faultVariable;
     integer id;
   }
 ;
@@ -245,7 +245,7 @@ tOnMessage:
     casestring partnerLink;
     casestring portType;
     casestring operation;
-    casestring variable;
+//    casestring variable;
 
     /// additional attribute containing the unique variable name    
     casestring variableID;
@@ -329,8 +329,8 @@ tCorrelationSet_list:
 tCorrelationSet:
   CorrelationSet()
   {
-    casestring properties;
-    casestring name;
+//    casestring properties;
+//    casestring name;
     
     integer id;
   }
@@ -344,16 +344,16 @@ tCorrelationSet:
 tCorrelation_list:
   list tCorrelation
   {
-    bool initiateCorrelationSet;
+//    bool initiateCorrelationSet;
   }
 ;
 
 tCorrelation:
   Correlation()
   {
-    casestring set;
-    casestring initiate = mkcasestring("no");
-    casestring pattern;
+//    casestring set;
+//    casestring initiate = mkcasestring("no");
+//    casestring pattern;
     
     integer id;
   }
@@ -561,7 +561,7 @@ tThrow:
     casestring suppressJoinFailure;
 
     casestring faultName;
-    casestring faultVariable;
+//    casestring faultVariable;
 
     /// additional attribute containing the unique variable name    
     casestring variableID;

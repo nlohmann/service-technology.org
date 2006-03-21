@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/21 15:03:49 $
+ *          - last changed: \$Date: 2006/03/21 16:46:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.143 $
+ * \version \$Revision: 1.144 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -345,23 +345,23 @@ tProcess:
   X_NEXT X_SLASH K_PROCESS X_CLOSE
     { TheProcess = $$ = Process($8, $9, $10, $11, $12, $13, $14, StopInProcess(), $15);
       symMan.quitScope();
-      $$->name = att.read($4, "name");
-      $$->targetNamespace = att.read($4, "targetNamespace");
+//NL      $$->name = att.read($4, "name");
+//NL      $$->targetNamespace = att.read($4, "targetNamespace");
       //symTab.traceST("\t\t\t\t HALLO " + string((att.read($4, "abstractProcess")->name)) + "\n");      
-      $$->queryLanguage = att.read($4, "queryLanguage", $$->queryLanguage);
-      $$->expressionLanguage = att.read($4, "expressionLanguage", $$->expressionLanguage);
+//NL      $$->queryLanguage = att.read($4, "queryLanguage", $$->queryLanguage);
+//NL      $$->expressionLanguage = att.read($4, "expressionLanguage", $$->expressionLanguage);
       $$->suppressJoinFailure = att.read($4, "suppressJoinFailure", $$->suppressJoinFailure);
 //      att.traceAM(string("tProcess: ") + ($$->suppressJoinFailure)->name + string("\n"));      
       att.popSJFStack();
-      $$->enableInstanceCompensation = att.read($4, "enableInstanceCompensation", $$->enableInstanceCompensation);
-      $$->abstractProcess = att.read($4, "abstractProcess", $$->abstractProcess);
-      $$->xmlns = att.read($4, "xmlns", $$->xmlns);
+//NL      $$->enableInstanceCompensation = att.read($4, "enableInstanceCompensation", $$->enableInstanceCompensation);
+//NL      $$->abstractProcess = att.read($4, "abstractProcess", $$->abstractProcess);
+//NL      $$->xmlns = att.read($4, "xmlns", $$->xmlns);
       isInFH.pop();
       isInCH.pop();
       $$->id = $3;
       ((STProcess*)symTab.lookup($3))->hasEventHandler = (string($14->op_name()) == "userDefinedEventHandler");
-      symTab.printSymbolTable();
-      symTab.traceST(symTab.readAttributeValue($3,"name") + "\n");      
+      symTab.printSymbolTable(); // purely debugging
+      symTab.traceST(symTab.readAttributeValue($3,"name") + "\n"); // for Niels
     }
 ;
 
@@ -594,12 +594,14 @@ tPartner:
     { symTab.checkAttributes($2);
       $$ = Partner($5);
       $$->id = $2;
-      $$->name = att.read($3, "name"); }
+//NL      $$->name = att.read($3, "name");
+    }
 | K_PARTNER genSymTabEntry_Partner arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2);
       $$ = Partner(NiltPartnerLink_list());
       $$->id = $2;      
-      $$->name = att.read($3, "name"); }
+//NL      $$->name = att.read($3, "name");
+    }
 ;
 
 genSymTabEntry_Partner:
@@ -682,7 +684,7 @@ tCatch:
       $$ = Catch($5);
       $$->id = $2;
       $$->faultName = att.read($3, "faultName");
-      $$->faultVariable = att.read($3, "faultVariable"); 
+//NL      $$->faultVariable = att.read($3, "faultVariable"); 
       $$->variableID = symMan.checkVariable(att.read($3, "faultVariable")->name, true); 
     }
 ;
@@ -868,7 +870,7 @@ tOnMessage:
       $$->portType = att.read($3, "portType");
       $$->operation = att.read($3, "operation");
       $$->variableID  = symMan.checkVariable(att.read($3, "variable")->name);
-      $$->variable = att.read($3, "variable"); 
+//NL      $$->variable = att.read($3, "variable"); 
       $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 				      $$->operation->name, 
 				      $$->partnerLink->name), true); 
@@ -1031,8 +1033,9 @@ tCorrelationSet:
     { symTab.checkAttributes($2); //att.check($3, K_CORRELATIONSET);
       $$ = CorrelationSet();
       $$->id = $2;      
-      $$->properties = att.read($3, "properties");
-      $$->name = att.read($3, "name"); }
+//NL      $$->properties = att.read($3, "properties");
+//NL      $$->name = att.read($3, "name"); }
+    }
 ;
 
 genSymTabEntry_CorrelationSet:
@@ -1056,12 +1059,14 @@ tCorrelations:
 tCorrelation_list:
   tCorrelation X_NEXT
     { $$ = ConstCorrelation_list($1, NiltCorrelation_list());
-      if ($1->initiate = mkcasestring("yes"))
-        $$->initiateCorrelationSet = true; }
+//NL      if ($1->initiate = mkcasestring("yes"))
+//NL        $$->initiateCorrelationSet = true;
+    }
 | tCorrelation X_NEXT tCorrelation_list
     { $$ = ConstCorrelation_list($1, $3);
-      if ($1->initiate = mkcasestring("yes"))
-        $$->initiateCorrelationSet = true; }
+//NL      if ($1->initiate = mkcasestring("yes"))
+//NL        $$->initiateCorrelationSet = true;
+     }
 ;
 
 tCorrelation:
@@ -1070,17 +1075,19 @@ tCorrelation:
     { symTab.checkAttributes($2);
       $$ = Correlation();
       $$->id = $2;      
-      $$->set = att.read($3, "set");
-      $$->initiate = att.read($3, "initiate", $$->initiate);
-      $$->pattern = att.read($3, "pattern"); }
+//NL      $$->set = att.read($3, "set");
+//NL      $$->initiate = att.read($3, "initiate", $$->initiate);
+//NL      $$->pattern = att.read($3, "pattern");
+    }
 | K_CORRELATION genSymTabEntry_Correlation
   arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2);
       $$ = Correlation();
       $$->id = $2;      
-      $$->set = att.read($3, "set");
-      $$->initiate = att.read($3, "initiate", $$->initiate);
-      $$->pattern = att.read($3, "pattern"); }
+//NL      $$->set = att.read($3, "set");
+//NL      $$->initiate = att.read($3, "initiate", $$->initiate);
+//NL      $$->pattern = att.read($3, "pattern");
+    }
 ;
 
 genSymTabEntry_Correlation:
@@ -1984,7 +1991,7 @@ tThrow:
       att.traceAM(string("tThrow: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();      
       $$->faultName = att.read($3, "faultName");
-      $$->faultVariable = att.read($3, "faultVariable");
+//NL      $$->faultVariable = att.read($3, "faultVariable");
       $$->variableID = symMan.checkVariable(att.read($3, "faultVariable")->name);
       if ($6->hasTarget)
       {
@@ -2020,7 +2027,7 @@ tThrow:
       att.traceAM(string("tThrow: ") + ($$->suppressJoinFailure)->name + string("\n"));
       att.popSJFStack();
       $$->faultName = att.read($3, "faultName");
-      $$->faultVariable = att.read($3, "faultVariable");
+//NL      $$->faultVariable = att.read($3, "faultVariable");
       $$->variableID = symMan.checkVariable(att.read($3, "faultVariable")->name);
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; }

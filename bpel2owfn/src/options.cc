@@ -362,6 +362,10 @@ void parse_command_line(int argc, char* argv[])
 	      {
 	        parameters[P_CYCLICWHILE] = true;
 	      }
+	      else if ( parameter == "cycliceh" )
+	      {
+	        parameters[P_CYCLICEH] = true;
+	      }
 	      else if ( parameter == "nostandardfaults" )
 	      {
 		parameters[P_NOSTANDARDFAULTS] = true;

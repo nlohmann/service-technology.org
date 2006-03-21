@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/03/21 09:20:08 $
+ *          - last changed: \$Date: 2006/03/21 09:47:28 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.159 $
+ * \version \$Revision: 1.160 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -1365,10 +1365,18 @@ This=userDefinedEventHandler(a,b) ->
 	TheNet->newArc(onMessage_p2, onMessage_t3);
 	TheNet->newArc(onMessage_t3, onMessage_p3);
 
+	
+  	// When the parameter "-p cycliceh" is set, the pattern is created as
+    	// it is depicted in Fig. 29/30. Setting this option leads to cyclic
+      	// Petri nets.
 	Transition *onMessage_t4 = TheNet->newTransition(newPrefix + "t4");
 	TheNet->newArc(onMessage_p4, onMessage_t4);
-	TheNet->newArc(onMessage_t4, onMessage_p5);
+	if (parameters[P_CYCLICEH] == true)
+	  TheNet->newArc(onMessage_t4, onMessage_p5); // loop
+	else
+	  TheNet->newArc(onMessage_t4, onMessage_p6); // abort
 
+	
 	Transition *onMessage_t5 = TheNet->newTransition(newPrefix + "t5");
 	TheNet->newArc(onMessage_p5, onMessage_t5);
 	TheNet->newArc(onMessage_t5, onMessage_p6);

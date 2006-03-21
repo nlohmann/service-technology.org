@@ -46,6 +46,7 @@ typedef enum
   P_FINISHLOOP,		///< live-lock "well-formed" systems
   P_NOSTANDARDFAULTS,	///< only user-defined faults can occur
   P_CYCLICWHILE,	///< use the original <while> pattern
+  P_CYCLICEH,		///< use the original <eventHandlers> pattern
   P_NOFHFAULTS,		///< activities inside the FH throw no faults
   P_NOVARIABLES		///< removes all variables from the model
 } possibleParameters;

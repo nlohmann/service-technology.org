@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/03/21 14:36:43 $
+ *          - last changed: \$Date: 2006/03/21 15:03:49 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.162 $
+ * \version \$Revision: 1.163 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -235,12 +235,11 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       TheNet->newArc(p33, t4);
       TheNet->newArc(t4, p39);
 
-      //cerr << This->hasEH << "\t" << myself->hasEventHandler << endl;
 
       // If the process has an event handler several places and transitions
       // have to be added to embed it. If the process lacks an event handler
       // some places can be merged.
-      if (This->hasEH) //if (myself->hasEventHandler)
+      if (myself->hasEventHandler)
       {
 	Place *p23 = TheNet->newPlace(prefix + "p23");
 	Place *p24 = TheNet->newPlace(prefix + "p24");
@@ -315,10 +314,8 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       TheNet->mergePlaces("1.internal.ch_out",           "1.internal.compensationHandler.ch_out");
 
 
-            //cerr << This->hasEH << "\t" << myself->hasEventHandler << endl;
-
       // If present, embed the event handler of the process.
-      if (This->hasEH) //if (myself->hasEventHandler)
+      if (myself->hasEventHandler)
       {
 	TheNet->mergePlaces("1.internal.p23",      "1.internal.eventHandler.initial");
 	TheNet->mergePlaces("1.internal.p24",      "1.internal.eventHandler.finish");
@@ -3394,12 +3391,11 @@ This=Scope(a,b,c,d,e,f,g) ->
       TheNet->newArc(t10, p17); // p17 is only read
       Transition *t11 = stop(p51, "final", prefix);
 
-      //cerr << This->hasEH << "\t" << myself->hasEventHandler << endl;
 
       // If the process has an event handler several places and transitions
       // have to be added to embed it. If the process lacks an event handler
       // some places can be merged.
-      if (This->hasEH) //if (myself->hasEventHandler)
+      if (myself->hasEventHandler)
       {
 	Place *p25 = TheNet->newPlace(prefix + "p25");
 	Place *p26 = TheNet->newPlace(prefix + "p26");
@@ -3499,10 +3495,9 @@ This=Scope(a,b,c,d,e,f,g) ->
       TheNet->mergePlaces(prefix + "p50",              prefix2 + "compensationHandler.ch_out");
       TheNet->mergePlaces(prefix + "compensated",      prefix2 + "compensationHandler.compensated");
 
-      //cerr << This->hasEH << "\t" << myself->hasEventHandler << endl;
 
       // If present, embed the event handler of the scope.
-      if (This->hasEH) //if (myself->hasEventHandler)
+      if (myself->hasEventHandler)
       {
 	TheNet->mergePlaces(prefix + "p25", prefix2 + "eventHandler.initial");
 	TheNet->mergePlaces(prefix + "p26", prefix2 + "eventHandler.finish");

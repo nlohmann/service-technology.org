@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/21 14:53:04 $
+ *          - last changed: \$Date: 2006/03/21 15:03:49 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.142 $
+ * \version \$Revision: 1.143 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -360,7 +360,6 @@ tProcess:
       isInCH.pop();
       $$->id = $3;
       ((STProcess*)symTab.lookup($3))->hasEventHandler = (string($14->op_name()) == "userDefinedEventHandler");
-      $$->hasEH = (string($14->op_name()) == "userDefinedEventHandler");
       symTab.printSymbolTable();
       symTab.traceST(symTab.readAttributeValue($3,"name") + "\n");      
     }
@@ -1315,7 +1314,6 @@ tInvoke:
         invoke->id = ai->id = se->parentId = symTab.nextId();
         */
         ((STScope*)symTab.lookup(currentSymTabEntryKey))->hasEventHandler = false;
-        scope->hasEH = false;
 
         currentScopeId = scope->parentScopeId = parent[$2];
         currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId->value));
@@ -2823,7 +2821,6 @@ tScope:
 	symMan.remDPEstart();
       }
       ((STScope*)symTab.lookup($2))->hasEventHandler = (string($13->op_name()) == "userDefinedEventHandler");
-      $$->hasEH = (string($13->op_name()) == "userDefinedEventHandler");
       if ($7->dpe->value > 0)
       {
         symMan.addDPEend();

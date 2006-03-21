@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/03/21 13:28:57 $
+ *          - last changed: \$Date: 2006/03/21 14:36:43 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.161 $
+ * \version \$Revision: 1.162 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -235,6 +235,7 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       TheNet->newArc(p33, t4);
       TheNet->newArc(t4, p39);
 
+      //cerr << This->hasEH << "\t" << myself->hasEventHandler << endl;
 
       // If the process has an event handler several places and transitions
       // have to be added to embed it. If the process lacks an event handler
@@ -313,6 +314,8 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       TheNet->mergePlaces("1.internal.p35",              "1.internal.compensationHandler.cleaned");
       TheNet->mergePlaces("1.internal.ch_out",           "1.internal.compensationHandler.ch_out");
 
+
+            //cerr << This->hasEH << "\t" << myself->hasEventHandler << endl;
 
       // If present, embed the event handler of the process.
       if (This->hasEH) //if (myself->hasEventHandler)
@@ -3391,6 +3394,7 @@ This=Scope(a,b,c,d,e,f,g) ->
       TheNet->newArc(t10, p17); // p17 is only read
       Transition *t11 = stop(p51, "final", prefix);
 
+      //cerr << This->hasEH << "\t" << myself->hasEventHandler << endl;
 
       // If the process has an event handler several places and transitions
       // have to be added to embed it. If the process lacks an event handler
@@ -3495,6 +3499,7 @@ This=Scope(a,b,c,d,e,f,g) ->
       TheNet->mergePlaces(prefix + "p50",              prefix2 + "compensationHandler.ch_out");
       TheNet->mergePlaces(prefix + "compensated",      prefix2 + "compensationHandler.compensated");
 
+      //cerr << This->hasEH << "\t" << myself->hasEventHandler << endl;
 
       // If present, embed the event handler of the scope.
       if (This->hasEH) //if (myself->hasEventHandler)

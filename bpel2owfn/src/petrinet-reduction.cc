@@ -36,20 +36,22 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/03/21 13:24:13 $
+ *          - last changed: \$Date: 2006/03/21 13:50:07 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  */
 
 
 
 
 
+#include <list>
 #include "petrinet.h"
+#include "debug.h"		// debugging help
 
 
 

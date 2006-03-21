@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/03/21 09:19:30 $
+ *          - last changed: \$Date: 2006/03/21 13:50:07 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.112 $
+ * \version \$Revision: 1.113 $
  */
 
 
@@ -45,6 +45,9 @@
 
 
 #include "petrinet.h"
+#include "debug.h"		// debugging help
+#include "exception.h"		// exception class
+#include "helpers.h"		// helper functions
 
 
 

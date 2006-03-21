@@ -36,13 +36,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/03/20 15:41:58 $
+ *          - last changed: \$Date: 2006/03/21 09:19:30 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  */
 
 
@@ -198,6 +198,29 @@ void PetriNet::mergeTwinTransitions()
 
 
 
+bool PetriNet::communicationInPostSet(Place *p)
+{
+  set<Node*> pp = postset(p);
+  for (set<Node*>::iterator t = pp.begin();
+      t != pp.end();
+      t++)
+  {
+    if (((Transition*)(*t))->communicating)
+    {
+      cerr << p->nodeShortName() << " has a communicating transition in its postset" << endl;
+      return true;
+    }
+  }
+  
+  cerr << p->nodeShortName() << " has no communicating transition in its postset" << endl;
+  
+  return false;
+}
+
+
+
+
+
 /*!
  * Collapse simple sequences.
  */
@@ -214,7 +237,7 @@ void PetriNet::collapseSequences()
   {
     if (preset(*t).size() == 1 && postset(*t).size() == 1)
     {
-      if ( postset(*(preset(*t).begin())).size() == 1 )
+      if ( !communicationInPostSet((Place*)*(postset(*t).begin())) )
       {
 	string id1 = *((*(preset(*t).begin()))->history.begin());
 	string id2 = *((*(postset(*t).begin()))->history.begin());
@@ -260,11 +283,10 @@ void PetriNet::simplify()
   trace(TRACE_DEBUG, "[PN]\tPetri net size before simplification: " + information() + "\n");
   trace(TRACE_INFORMATION, "Simplifying Petri net...\n");
 
-
   removeDeadNodes();
   mergeTwinTransitions();
   collapseSequences();
-
+  
   trace(TRACE_INFORMATION, "Simplifying complete.\n");
   trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification: " + information() + "\n");
 }

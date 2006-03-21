@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/03/16 09:43:39 $
+ *          - last changed: \$Date: 2006/03/21 09:19:30 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.111 $
+ * \version \$Revision: 1.112 $
  */
 
 
@@ -120,6 +120,7 @@ Transition::Transition(unsigned int myid, string role)
 {
   id = myid;
   nodeType = TRANSITION;
+  communicating = false;
 
   if (role != "")
     history.push_back(role);

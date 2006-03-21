@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/03/21 09:47:28 $
+ *          - last changed: \$Date: 2006/03/21 13:28:57 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.160 $
+ * \version \$Revision: 1.161 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -202,15 +202,15 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       Place *ch_not_faulted = TheNet->newPlace(prefix + "!CHFaulted");
 
 
-      // If the parameter "-p finishloop" is used, a transition
-      // "1.internal.finishloop" is added to livelock the net as soon as the
+      // If the parameter "-p finalloop" is used, a transition
+      // "1.internal.finalloop" is added to livelock the net as soon as the
       // final place of the process ("1.internal.final") is marked. With this
       // loop the net will only deadlock in the case ill-designed BPEL
       // processes (e.g. cyclic links). These deadlocks then can be found
       // using model checkers.
-      if (parameters[P_FINISHLOOP])
+      if (parameters[P_FINALLOOP])
       {
-        Transition *process_loop = TheNet->newTransition(prefix + "finishloop");
+        Transition *process_loop = TheNet->newTransition(prefix + "finalloop");
         TheNet->newArc(p39, process_loop, READ);
       }
 

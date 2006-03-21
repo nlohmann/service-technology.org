@@ -43,7 +43,7 @@ typedef enum
 typedef enum
 {
   P_SIMPLIFY,		///< structural reduction rules
-  P_FINISHLOOP,		///< live-lock "well-formed" systems
+  P_FINALLOOP,		///< live-lock "well-formed" systems
   P_NOSTANDARDFAULTS,	///< only user-defined faults can occur
   P_CYCLICWHILE,	///< use the original <while> pattern
   P_CYCLICEH,		///< use the original <eventHandlers> pattern

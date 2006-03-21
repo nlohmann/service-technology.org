@@ -354,9 +354,9 @@ void parse_command_line(int argc, char* argv[])
 //	      {
 //	        parameters[P_UNIQUEFAULT] = true;
 //	      }
-	      else if ( parameter == "finishloop" )
+	      else if ( parameter == "finalloop" )
 	      {
-	        parameters[P_FINISHLOOP] = true;
+	        parameters[P_FINALLOOP] = true;
 	      }
 	      else if ( parameter == "cyclicwhile" )
 	      {

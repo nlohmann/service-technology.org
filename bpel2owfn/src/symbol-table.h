@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.23 $: 
+ * \version \$Revision: 1.24 $: 
  *
  */
 
@@ -66,6 +66,7 @@ class SymbolTable;
 class SymbolTableEntry;
 class STActivity;
 class STAttribute;
+class STCatch;
 class STCommunicationActivity;
 class STCompensate;
 class STCompensationHandler;
@@ -74,8 +75,10 @@ class STElement;
 class STEnvelope;
 class STEventHandlers;
 class STFaultHandlers;
+class STFromTo;
 class STInvoke;
 class STLink;
+class STOnMessage;
 class STPartner;
 class STPartnerLink;
 class STProcess;
@@ -83,6 +86,7 @@ class STReceive;
 class STReply;
 class STScope;
 class STTerminate;
+class STThrow;
 class STVariable;
 class STWait;
 
@@ -698,11 +702,11 @@ class STScope: public STElement, public STEnvelope, public SymbolTableEntry
     /// list of all enclosed links (recursively)
     list<STLink*> enclosedLinks;
 
-    /// add a new Variable with scope ID and variable pointer
-    std::string addVariable(kc::integer, STVariable *);
+    /// add a new Variable 
+    std::string addVariable(STVariable *);
 
     /// checks for a variable with a given name and returns pointer to the object
-    STVariable * checkVariable(std::string);
+    STVariable * checkVariable(std::string, STScope * callingScope, bool isFaultVariable = false);
     
 };
 
@@ -756,6 +760,95 @@ class STVariable : public STElement, public SymbolTableEntry
     /// true if variable is used in an activity
     bool used;
 };
+
+/**
+ * \class	STCatch
+ *
+ * \brief
+ * 
+ * A catch block.
+ * 
+ */
+class STCatch: public STElement, public SymbolTableEntry
+{
+  public:
+    /// constructor
+    STCatch();
+    STCatch(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STCatch();
+
+    STVariable * faultVariable;
+};
+
+/**
+ * \class	STOnMessage
+ *
+ * \brief
+ * 
+ * An onMessage block.
+ * 
+ */
+class STOnMessage: public STElement, public SymbolTableEntry
+{
+  public:
+    /// constructor
+    STOnMessage();
+    STOnMessage(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STOnMessage();
+
+    STVariable * variable;
+};
+
+/**
+ * \class	STFromTo
+ *
+ * \brief
+ * 
+ * A template for from and to blocks.
+ * 
+ */
+class STFromTo: public STElement, public SymbolTableEntry
+{
+  public:
+    /// constructor
+    STFromTo();
+    STFromTo(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STFromTo();
+
+    STPartnerLink * partnerLink;
+    STVariable * variable;
+
+};
+
+/**
+ * \class	STThrow
+ *
+ * \brief
+ * 
+ * An onMessage block.
+ * 
+ */
+class STThrow: public STElement, public SymbolTableEntry
+{
+  public:
+    /// constructor
+    STThrow();
+    STThrow(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STThrow();
+
+    STVariable * faultVariable;
+};
+
+
+
 
 #endif
 

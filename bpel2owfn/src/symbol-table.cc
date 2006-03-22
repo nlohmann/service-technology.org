@@ -206,13 +206,12 @@ void SymbolTable::printSTElement(SymbolTableEntry* entry)
  */
 void SymbolTable::printSTAttribute(STElement* entry) {
 
-  /// pointer of attribute map
-  std::map<string, STAttribute*>* mapOfAttributes;
-  mapOfAttributes = &(entry->mapOfAttributes);	
+  /// reference to attribute map
+  std::map<string, STAttribute*> &  mapOfAttributes = entry->mapOfAttributes;	
 
   /// iterator for the embedded map
   std::map<std::string, STAttribute*>::iterator mapOfAttributesIterator;  
-  mapOfAttributesIterator = mapOfAttributes->begin();
+  mapOfAttributesIterator = mapOfAttributes.begin();
 
   /// 
   STAttribute* a;
@@ -221,7 +220,7 @@ void SymbolTable::printSTAttribute(STElement* entry) {
 
   traceSTwp(vertical); traceSTwp(smallHorizontal + "<STAttribute>"); traceSTwp("\n");	  
 
-  while(mapOfAttributesIterator != mapOfAttributes->end())
+  while(mapOfAttributesIterator != mapOfAttributes.end())
   {  
     a = (*mapOfAttributesIterator).second;
     traceSTwp(vertical); traceSTwp("attribute" + intToString(i)); traceSTwp("\n");
@@ -229,8 +228,7 @@ void SymbolTable::printSTAttribute(STElement* entry) {
     traceSTwp(vertical +"\t"); traceSTwp("name=" + a->name); traceSTwp("\n");
     traceSTwp(vertical +"\t"); traceSTwp("type=" + a->type); traceSTwp("\n");
     traceSTwp(vertical +"\t"); traceSTwp("value=" + a->value); traceSTwp("\n");
-
-    ++mapOfAttributesIterator; ++i;
+    mapOfAttributesIterator++; ++i;
   }
 }  
 
@@ -348,6 +346,11 @@ unsigned int SymbolTable::insert(unsigned int elementId)
     case K_TERMINATE:           {symTab[this->nextKey()] = new STTerminate(elementId, this->entryKey);} break;
     case K_VARIABLE:            {symTab[this->nextKey()] = new STVariable(elementId, this->entryKey);} break;
     case K_WAIT:                {symTab[this->nextKey()] = new STWait(elementId, this->entryKey);} break;
+    case K_CATCH:               {symTab[this->nextKey()] = new STCatch(elementId, this->entryKey);} break;
+    case K_ONMESSAGE:           {symTab[this->nextKey()] = new STOnMessage(elementId, this->entryKey);} break;
+    case K_FROM:                {symTab[this->nextKey()] = new STFromTo(elementId, this->entryKey);} break;
+    case K_TO:                  {symTab[this->nextKey()] = new STFromTo(elementId, this->entryKey);} break;
+    case K_THROW:               {symTab[this->nextKey()] = new STThrow(elementId, this->entryKey);} break;
     /* all other */
     default :                   {symTab[this->nextKey()] = new STActivity(elementId, this->entryKey);} break;
   }
@@ -449,15 +452,14 @@ bool SymbolTable::isValidAttributeValue(string attributeName, string attributeVa
 bool SymbolTable::isDuplicate(unsigned int entryKey, STAttribute* attribute)
 {
   /// pointer of attribute map
-  std::map<string, STAttribute*>* mapOfAttributes;
-  mapOfAttributes = &((dynamic_cast <STElement*> (symTab[entryKey]))->mapOfAttributes);	
+  std::map<string, STAttribute*>& mapOfAttributes = ((dynamic_cast <STElement*> (symTab[entryKey]))->mapOfAttributes);	
 
   /// iterator
   std::map<std::string, STAttribute*>::iterator mapOfAttributesIterator;  
-  mapOfAttributesIterator = mapOfAttributes->begin();
+  mapOfAttributesIterator = mapOfAttributes.begin();
 
   /// iteration loop over all attributes of the desired symbol table entry       
-  while(mapOfAttributesIterator != mapOfAttributes->end())
+  while(mapOfAttributesIterator != mapOfAttributes.end())
   {  
     if(attribute->name.compare((*mapOfAttributesIterator).first) == 0)
     {
@@ -589,6 +591,41 @@ void SymbolTable::addAttribute(unsigned int entryKey, STAttribute* attribute)
       break;
     }
 
+    case K_CATCH:
+    {
+//      traceST("cast to STCatch\n");
+      (dynamic_cast <STCatch*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
+      break;
+    }
+
+    case K_ONMESSAGE:
+    {
+//      traceST("cast to STOnMessage\n");
+      (dynamic_cast <STOnMessage*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
+      break;
+    }
+
+    case K_FROM:
+    {
+//      traceST("cast to STFromTo\n");
+      (dynamic_cast <STFromTo*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
+      break;
+    }
+
+    case K_TO:
+    {
+//      traceST("cast to STFromTo\n");
+      (dynamic_cast <STFromTo*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
+      break;
+    }
+
+    case K_THROW:
+    {
+//      traceST("cast to STThrow\n");
+      (dynamic_cast <STThrow*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
+      break;
+    }
+
     default:
     { /* cast to Activity */
 //      traceST("cast to STActivity\n");    	
@@ -647,7 +684,11 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
 //      traceST("cast to STCompensate\n");
       STAttribute* attribute = (dynamic_cast <STCompensate*> (symTab[entryKey]))->mapOfAttributes[name];
 
-	  if(attribute == NULL) attribute = new STAttribute(name,"");
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STCompensate*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
 
       return attribute;
     }
@@ -657,7 +698,11 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
 //      traceST("cast to STActivity Correlation\n");
       STAttribute* attribute = (dynamic_cast <STActivity*> (symTab[entryKey]))->mapOfAttributes[name];
 	  
-	  if(attribute == NULL) attribute = new STAttribute(name,"");	  
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STActivity*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
 	  
 	  /// if attribute value empty then set default value
       if(attribute->value.empty())
@@ -675,7 +720,11 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
 //      traceST("cast to STActivity Correlation\n");
       STAttribute* attribute = (dynamic_cast <STCorrelationSet*> (symTab[entryKey]))->mapOfAttributes[name];
 	  
-	  if(attribute == NULL) attribute = new STAttribute(name,"");	  
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STCorrelationSet*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
 	  
       return attribute;
     }
@@ -685,7 +734,11 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
 //      traceST("cast to STInvoke\n");
       STAttribute* attribute = (dynamic_cast <STInvoke*> (symTab[entryKey]))->mapOfAttributes[name];
 
-	  if(attribute == NULL) attribute = new STAttribute(name,"");
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STInvoke*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
 
       return attribute;
     }
@@ -695,7 +748,11 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
 //      traceST("cast to STLink\n");
       STAttribute* attribute = (dynamic_cast <STLink*> (symTab[entryKey]))->mapOfAttributes[name];
 
-	  if(attribute == NULL) attribute = new STAttribute(name,"");
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STLink*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
 
       return attribute;
     }
@@ -705,7 +762,11 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
 //      traceST("cast to STPartner\n");
       STAttribute* attribute = (dynamic_cast <STPartner*> (symTab[entryKey]))->mapOfAttributes[name];
 
-	  if(attribute == NULL) attribute = new STAttribute(name,"");
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STPartner*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
 
       return attribute;
     }
@@ -715,7 +776,11 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
 //      traceST("cast to STPartnerLink\n");
       STAttribute* attribute = (dynamic_cast <STPartnerLink*> (symTab[entryKey]))->mapOfAttributes[name];
 
-	  if(attribute == NULL) attribute = new STAttribute(name,"");
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STPartnerLink*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
 
       return attribute;
     }
@@ -725,7 +790,11 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
 //      traceST("cast to STActivity Pick\n");
       STAttribute* attribute = (dynamic_cast <STActivity*> (symTab[entryKey]))->mapOfAttributes[name];
 
-	  if(attribute == NULL) attribute = new STAttribute(name,"");
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STActivity*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
 	  
 	  /// if attribute value empty then set default value
       if(attribute->value.empty())
@@ -743,7 +812,11 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
 //      traceST("cast to STProcess\n");
       STAttribute* attribute = (dynamic_cast <STProcess*> (symTab[entryKey]))->mapOfAttributes[name];
 	  
-	  if(attribute == NULL) attribute = new STAttribute(name,"");
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STProcess*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
 	  
 	  /// if attribute value empty then set default value
       if(attribute->value.empty())
@@ -782,7 +855,11 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
 //      traceST("cast to STReceive\n");
       STAttribute* attribute = (dynamic_cast <STReceive*> (symTab[entryKey]))->mapOfAttributes[name];
 	  
-	  if(attribute == NULL) attribute = new STAttribute(name,"");	  
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STReceive*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
 	  
 	  /// if attribute value empty then set default value
       if(attribute->value.empty())
@@ -800,7 +877,11 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
 //      traceST("cast to STReply\n");
       STAttribute* attribute = (dynamic_cast <STReply*> (symTab[entryKey]))->mapOfAttributes[name];
 
-	  if(attribute == NULL) attribute = new STAttribute(name,"");
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STElement*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
 
       return attribute;
     }
@@ -810,7 +891,11 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
 //      traceST("cast to STScope\n");
       STAttribute* attribute = (dynamic_cast <STScope*> (symTab[entryKey]))->mapOfAttributes[name];
 
-	  if(attribute == NULL) attribute = new STAttribute(name,"");
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STElement*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
 	  
 	  /// if attribute value empty then set default value
       if(attribute->value.empty())
@@ -828,7 +913,11 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
 //      traceST("cast to STActivity Source\n");
       STAttribute* attribute = (dynamic_cast <STActivity*> (symTab[entryKey]))->mapOfAttributes[name];
 
-	  if(attribute == NULL) attribute = new STAttribute(name,"");
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STElement*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
 	  
 	  /// if attribute value empty then set default value
       if(attribute->value.empty())
@@ -846,7 +935,11 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
 //      traceST("cast to STTerminate\n");
       STAttribute* attribute = (dynamic_cast <STTerminate*> (symTab[entryKey]))->mapOfAttributes[name];
 
-	  if(attribute == NULL) attribute = new STAttribute(name,"");
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STElement*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
 
       return attribute;
     }
@@ -856,7 +949,11 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
 //      traceST("cast to STPartnerLink\n");
       STAttribute* attribute = (dynamic_cast <STVariable*> (symTab[entryKey]))->mapOfAttributes[name];
 
-	  if(attribute == NULL) attribute = new STAttribute(name,"");
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STElement*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
 
       return attribute;
     }
@@ -866,7 +963,81 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
 //      traceST("cast to STWait\n");
       STAttribute* attribute = (dynamic_cast <STWait*> (symTab[entryKey]))->mapOfAttributes[name];
 
-	  if(attribute == NULL) attribute = new STAttribute(name,"");
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STElement*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
+
+      return attribute;
+    }
+    
+    case K_CATCH:
+    {
+//      traceST("cast to STCatch\n");
+      STAttribute* attribute = (dynamic_cast <STCatch*> (symTab[entryKey]))->mapOfAttributes[name];
+
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STElement*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
+
+      return attribute;
+    }
+    
+    case K_ONMESSAGE:
+    {
+//      traceST("cast to STOnMessage\n");
+      STAttribute* attribute = (dynamic_cast <STOnMessage*> (symTab[entryKey]))->mapOfAttributes[name];
+
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STElement*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
+
+      return attribute;
+    }
+    
+    case K_FROM:
+    {
+//      traceST("cast to STFromTo\n");
+      STAttribute* attribute = (dynamic_cast <STFromTo*> (symTab[entryKey]))->mapOfAttributes[name];
+
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STElement*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
+
+      return attribute;
+    }
+    
+    case K_TO:
+    {
+//      traceST("cast to STFromTo\n");
+      STAttribute* attribute = (dynamic_cast <STFromTo*> (symTab[entryKey]))->mapOfAttributes[name];
+
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STElement*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
+
+      return attribute;
+    }
+    
+    case K_THROW:
+    {
+//      traceST("cast to STThrow\n");
+      STAttribute* attribute = (dynamic_cast <STThrow*> (symTab[entryKey]))->mapOfAttributes[name];
+
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STElement*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
 
       return attribute;
     }
@@ -876,7 +1047,11 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
 //      traceST("cast to STActivity\n");    	
       STAttribute* attribute = (dynamic_cast <STActivity*> (symTab[entryKey]))->mapOfAttributes[name];
 
-	  if(attribute == NULL) attribute = new STAttribute(name,"");
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STElement*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
 
       return attribute;
     }
@@ -939,8 +1114,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey, kc::casestring bpelElem
 {
   traceST("checkAttributes(" + intToString(entryKey) + ", " + string(bpelElementValue->name) + ")\n");
   /// pointer of attribute map
-  std::map<string, STAttribute*>* mapOfAttributes;
-  mapOfAttributes = &((dynamic_cast <STElement*> (symTab[entryKey]))->mapOfAttributes);	
+  std::map<string, STAttribute*>& mapOfAttributes = ((dynamic_cast <STElement*> (symTab[entryKey]))->mapOfAttributes);	
 
   //special case: <from> ... literal value ... </from>
   
@@ -949,7 +1123,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey, kc::casestring bpelElem
     std::string lit = bpelElementValue->name;
 
     /* without attributes */
-    if(mapOfAttributes->size() == 0)
+    if(mapOfAttributes.size() == 0)
     { /* literal value is empty */
       if(lit.empty())
       {
@@ -984,8 +1158,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
 {
   traceST("checkAttributes(" + intToString(entryKey) + ")" + "\n");
   /// pointer of attribute map
-  std::map<string, STAttribute*>* mapOfAttributes;
-  mapOfAttributes = &((dynamic_cast <STElement*> (symTab[entryKey]))->mapOfAttributes);	
+  std::map<string, STAttribute*>& mapOfAttributes = ((dynamic_cast <STElement*> (symTab[entryKey]))->mapOfAttributes);	
 
   /// iterator for the embedded map
   std::map<std::string, STAttribute*>::iterator mapOfAttributesIterator;  
@@ -1006,9 +1179,9 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       bool conditionFlag;
       conditionFlag = false;
         
-      mapOfAttributesIterator = mapOfAttributes->begin();
+      mapOfAttributesIterator = mapOfAttributes.begin();
         
-      while(mapOfAttributesIterator != mapOfAttributes->end())
+      while(mapOfAttributesIterator != mapOfAttributes.end())
       {  
         if(((*mapOfAttributesIterator).first) == A__CONDITION)
         {
@@ -1068,10 +1241,10 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       bool setFlag;
       setFlag = false;
        
-      mapOfAttributesIterator = mapOfAttributes->begin();
+      mapOfAttributesIterator = mapOfAttributes.begin();
       
       ///
-      while(mapOfAttributesIterator != mapOfAttributes->end())
+      while(mapOfAttributesIterator != mapOfAttributes.end())
       {  
         if(((*mapOfAttributesIterator).first) == A__SET)
         {
@@ -1095,10 +1268,10 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       bool nameFlag, propertiesFlag;
       nameFlag = propertiesFlag = false;
        
-      mapOfAttributesIterator = mapOfAttributes->begin();
+      mapOfAttributesIterator = mapOfAttributes.begin();
       
       ///
-      while(mapOfAttributesIterator != mapOfAttributes->end())
+      while(mapOfAttributesIterator != mapOfAttributes.end())
       {  
         if(((*mapOfAttributesIterator).first) == A__NAME)
         {
@@ -1162,10 +1335,10 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
         {   0,      0,     0,       0,          0,          0,         0,        1,      1    }
       };
          
-      mapOfAttributesIterator = mapOfAttributes->begin();
+      mapOfAttributesIterator = mapOfAttributes.begin();
         
         ///
-      while(mapOfAttributesIterator != mapOfAttributes->end())
+      while(mapOfAttributesIterator != mapOfAttributes.end())
       {  
         if(((*mapOfAttributesIterator).first) == A__VARIABLE)
         {
@@ -1271,10 +1444,10 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       bool partnerLinkFlag, portTypeFlag, operationFlag, inputVariableFlag, outputVariableFlag;
       partnerLinkFlag = portTypeFlag = operationFlag = inputVariableFlag = outputVariableFlag =false;
        
-      mapOfAttributesIterator = mapOfAttributes->begin();
+      mapOfAttributesIterator = mapOfAttributes.begin();
       
         ///
-      while(mapOfAttributesIterator != mapOfAttributes->end())
+      while(mapOfAttributesIterator != mapOfAttributes.end())
       {  
         if(((*mapOfAttributesIterator).first) == A__PARTNER_LINK)
         {
@@ -1338,10 +1511,10 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       bool nameFlag;
       nameFlag = false;
        
-      mapOfAttributesIterator = mapOfAttributes->begin();
+      mapOfAttributesIterator = mapOfAttributes.begin();
       
       ///
-      while(mapOfAttributesIterator != mapOfAttributes->end())
+      while(mapOfAttributesIterator != mapOfAttributes.end())
       {  
         if(((*mapOfAttributesIterator).first) == A__NAME)
         {
@@ -1366,10 +1539,10 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       bool forFlag, untilFlag;
       forFlag = untilFlag = false;
        
-      mapOfAttributesIterator = mapOfAttributes->begin();
+      mapOfAttributesIterator = mapOfAttributes.begin();
       
       ///
-      while(mapOfAttributesIterator != mapOfAttributes->end())
+      while(mapOfAttributesIterator != mapOfAttributes.end())
       {  
         if(((*mapOfAttributesIterator).first) == A__FOR)
         {
@@ -1412,10 +1585,10 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       bool partnerLinkFlag, portTypeFlag, operationFlag, variableFlag;
       partnerLinkFlag = portTypeFlag = operationFlag = variableFlag = false;
        
-      mapOfAttributesIterator = mapOfAttributes->begin();
+      mapOfAttributesIterator = mapOfAttributes.begin();
       
       ///
-      while(mapOfAttributesIterator != mapOfAttributes->end())
+      while(mapOfAttributesIterator != mapOfAttributes.end())
       {  
         if(((*mapOfAttributesIterator).first) == A__PARTNER_LINK)
         {
@@ -1466,10 +1639,10 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       bool nameFlag;
       nameFlag = false;
        
-      mapOfAttributesIterator = mapOfAttributes->begin();
+      mapOfAttributesIterator = mapOfAttributes.begin();
       
       ///
-      while(mapOfAttributesIterator != mapOfAttributes->end())
+      while(mapOfAttributesIterator != mapOfAttributes.end())
       {  
         if(((*mapOfAttributesIterator).first) == A__NAME)
         {
@@ -1509,10 +1682,10 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       bool nameFlag, partnerLinkTypeFlag;
       nameFlag = partnerLinkTypeFlag = false;
        
-      mapOfAttributesIterator = mapOfAttributes->begin();
+      mapOfAttributesIterator = mapOfAttributes.begin();
       
       ///
-      while(mapOfAttributesIterator != mapOfAttributes->end())
+      while(mapOfAttributesIterator != mapOfAttributes.end())
       {  
         if(((*mapOfAttributesIterator).first) == A__NAME)
         {
@@ -1555,10 +1728,10 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       bool nameFlag, targetNamespaceFlag;
       nameFlag = targetNamespaceFlag = false;
        
-      mapOfAttributesIterator = mapOfAttributes->begin();
+      mapOfAttributesIterator = mapOfAttributes.begin();
       
       ///
-      while(mapOfAttributesIterator != mapOfAttributes->end())
+      while(mapOfAttributesIterator != mapOfAttributes.end())
       {  
         if(((*mapOfAttributesIterator).first) == A__NAME)
         {
@@ -1592,10 +1765,10 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       bool partnerLinkFlag, portTypeFlag, operationFlag, variableFlag;
       partnerLinkFlag = portTypeFlag = operationFlag = variableFlag = false;
        
-      mapOfAttributesIterator = mapOfAttributes->begin();
+      mapOfAttributesIterator = mapOfAttributes.begin();
       
       ///
-      while(mapOfAttributesIterator != mapOfAttributes->end())
+      while(mapOfAttributesIterator != mapOfAttributes.end())
       {  
         if(((*mapOfAttributesIterator).first) == A__PARTNER_LINK)
         {
@@ -1646,10 +1819,10 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       bool partnerLinkFlag, portTypeFlag, operationFlag;
       partnerLinkFlag = portTypeFlag = operationFlag = false;
        
-      mapOfAttributesIterator = mapOfAttributes->begin();
+      mapOfAttributesIterator = mapOfAttributes.begin();
       
       ///
-      while(mapOfAttributesIterator != mapOfAttributes->end())
+      while(mapOfAttributesIterator != mapOfAttributes.end())
       {  
         if(((*mapOfAttributesIterator).first) == A__PARTNER_LINK)
         {
@@ -1705,10 +1878,10 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       bool linkNameFlag;
       linkNameFlag = false;
        
-      mapOfAttributesIterator = mapOfAttributes->begin();
+      mapOfAttributesIterator = mapOfAttributes.begin();
       
       ///
-      while(mapOfAttributesIterator != mapOfAttributes->end())
+      while(mapOfAttributesIterator != mapOfAttributes.end())
       {  
         if(((*mapOfAttributesIterator).first) == A__LINK_NAME)
         {
@@ -1740,10 +1913,10 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       bool linkNameFlag;
       linkNameFlag = false;
        
-      mapOfAttributesIterator = mapOfAttributes->begin();
+      mapOfAttributesIterator = mapOfAttributes.begin();
       
       ///
-      while(mapOfAttributesIterator != mapOfAttributes->end())
+      while(mapOfAttributesIterator != mapOfAttributes.end())
       {  
         if(((*mapOfAttributesIterator).first) == A__LINK_NAME)
         {
@@ -1775,10 +1948,10 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       bool faultNameFlag;
       faultNameFlag = false;
        
-      mapOfAttributesIterator = mapOfAttributes->begin();
+      mapOfAttributesIterator = mapOfAttributes.begin();
       
       ///
-      while(mapOfAttributesIterator != mapOfAttributes->end())
+      while(mapOfAttributesIterator != mapOfAttributes.end())
       {  
         if(((*mapOfAttributesIterator).first) == A__FAULT_NAME)
         {
@@ -1824,10 +1997,10 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
          {   1,      0,     0,       0,      1,      2    }
       };
        
-      mapOfAttributesIterator = mapOfAttributes->begin();
+      mapOfAttributesIterator = mapOfAttributes.begin();
       
       ///
-      while(mapOfAttributesIterator != mapOfAttributes->end())
+      while(mapOfAttributesIterator != mapOfAttributes.end())
       {  
         if(((*mapOfAttributesIterator).first) == A__VARIABLE)
         {
@@ -1901,10 +2074,10 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       bool nameFlag;
       nameFlag = false;
        
-      mapOfAttributesIterator = mapOfAttributes->begin();
+      mapOfAttributesIterator = mapOfAttributes.begin();
       
       ///
-      while(mapOfAttributesIterator != mapOfAttributes->end())
+      while(mapOfAttributesIterator != mapOfAttributes.end())
       {  
         if(((*mapOfAttributesIterator).first) == A__NAME)
         {
@@ -1929,10 +2102,10 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       bool forFlag, untilFlag;
       forFlag = untilFlag = false;
        
-      mapOfAttributesIterator = mapOfAttributes->begin();
+      mapOfAttributesIterator = mapOfAttributes.begin();
       
       ///
-      while(mapOfAttributesIterator != mapOfAttributes->end())
+      while(mapOfAttributesIterator != mapOfAttributes.end())
       {  
         if(((*mapOfAttributesIterator).first) == A__FOR)
         {
@@ -1975,10 +2148,10 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       bool conditionFlag;
       conditionFlag = false;
        
-      mapOfAttributesIterator = mapOfAttributes->begin();
+      mapOfAttributesIterator = mapOfAttributes.begin();
       
       ///
-      while(mapOfAttributesIterator != mapOfAttributes->end())
+      while(mapOfAttributesIterator != mapOfAttributes.end())
       {  
         if(((*mapOfAttributesIterator).first) == A__CONDITION)
         {
@@ -2327,7 +2500,7 @@ STReply::~STReply() {}
 /*!
  * add a new Variable with scope ID and name
  */
-std::string STScope::addVariable(kc::integer scopeId, STVariable * variable) 
+std::string STScope::addVariable(STVariable * variable) 
 {
   trace(TRACE_DEBUG, "[ST] Adding variable " + variable->mapOfAttributes["name"]->value + "\n");
   if (! variables.empty())
@@ -2346,12 +2519,16 @@ std::string STScope::addVariable(kc::integer scopeId, STVariable * variable)
   }
     
   variables.push_back(variable);
-  return intToString(scopeId->value) + "." + variable->mapOfAttributes["name"]->value;
+  return intToString(elementId) + "." + variable->mapOfAttributes["name"]->value;
 }
 
 /// checks for a variable with a given name and returns pointer to the object
-STVariable * STScope::checkVariable(std::string name)
+STVariable * STScope::checkVariable(std::string name, STScope * callingScope, bool isFaultVariable)
 {
+  if (name == "")
+  {
+    return NULL;
+  }
   trace(TRACE_DEBUG, "[ST] Checking variable " + name + "\n");
   if (! variables.empty())
   {
@@ -2369,14 +2546,31 @@ STVariable * STScope::checkVariable(std::string name)
   if (parentScopeId != 0)
   {
     trace(TRACE_VERY_DEBUG, "[ST] Looking in parent Scope " + intToString(parentScopeId) +"\n");
-    (dynamic_cast <STScope*> (symTab.lookup(parentScopeId)))->checkVariable(name);
+    return (dynamic_cast <STScope*> (symTab.lookup(parentScopeId)))->checkVariable(name, callingScope, isFaultVariable);
   }
-  else
+  else if (! isFaultVariable)
   {
     yyerror(string("Name of undefined Variable is \"" 
 		   + name + "\"\n").c_str());
   }
-  return NULL;
+
+  // create FaultVariable
+  trace(TRACE_DEBUG, "[ST] Adding fault variable " + name + "\n");
+  unsigned int key = symTab.insert(K_VARIABLE);
+  STVariable * stVariable = NULL;
+  try
+  {
+    stVariable = dynamic_cast<STVariable*> (symTab.lookup(key));
+  }
+  catch (bad_cast)
+  {
+    throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+  }
+  // add attributes
+  symTab.addAttribute(key, symTab.newAttribute(kc::mkcasestring("name"), kc::mkcasestring(name.c_str())));
+  callingScope->addVariable(stVariable);
+  
+  return stVariable;
 }
  
 /*!
@@ -2436,4 +2630,82 @@ STWait::STWait(unsigned int elementId, unsigned int entryKey)
  * destructor
  */
 STWait::~STWait() {}
+
+
+/********************************************
+ * implementation of Catch CLASS
+ ********************************************/
+
+/*!
+ * constructor
+ */
+STCatch::STCatch(unsigned int elementId, unsigned int entryKey)
+ :SymbolTableEntry(elementId, entryKey) 
+{
+  faultVariable = NULL;
+}
+
+/*!
+ * destructor
+ */
+STCatch::~STCatch() {}
+
+
+/********************************************
+ * implementation of OnMessage CLASS
+ ********************************************/
+
+/*!
+ * constructor
+ */
+STOnMessage::STOnMessage(unsigned int elementId, unsigned int entryKey)
+ :SymbolTableEntry(elementId, entryKey) 
+{
+  variable = NULL;
+}
+
+/*!
+ * destructor
+ */
+STOnMessage::~STOnMessage() {}
+
+
+/********************************************
+ * implementation of FromTo CLASS
+ ********************************************/
+
+/*!
+ * constructor
+ */
+STFromTo::STFromTo(unsigned int elementId, unsigned int entryKey)
+ :SymbolTableEntry(elementId, entryKey) 
+{
+  variable = NULL;
+  partnerLink = NULL;
+}
+
+/*!
+ * destructor
+ */
+STFromTo::~STFromTo() {}
+
+
+/********************************************
+ * implementation of Throw CLASS
+ ********************************************/
+
+/*!
+ * constructor
+ */
+STThrow::STThrow(unsigned int elementId, unsigned int entryKey)
+ :SymbolTableEntry(elementId, entryKey) 
+{
+  faultVariable = NULL;
+}
+
+/*!
+ * destructor
+ */
+STThrow::~STThrow() {}
+
 

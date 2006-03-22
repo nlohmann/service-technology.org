@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/21 22:53:08 $
+ *          - last changed: \$Date: 2006/03/22 16:27:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.146 $
+ * \version \$Revision: 1.147 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -265,11 +265,7 @@ int hasCompensate;
 %type <yt_integer> descent_case_list
 
 
-
 %%
-
-
-
 
 /*
   <process name="ncname" targetNamespace="uri" 
@@ -685,9 +681,24 @@ tCatch_list:
 
 tCatch:
   K_CATCH genSymTabEntry_Catch
-  arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CATCH
-    { symTab.checkAttributes($2);
-      $$ = Catch($5);
+  arbitraryAttributes X_NEXT 
+    {
+      symTab.checkAttributes($2);
+      STCatch * stCatch = NULL;
+      try
+      {
+	stCatch = dynamic_cast<STCatch*> (symTab.lookup($2));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      stCatch->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "faultVariable"), currentSTScope, true);
+    }
+  activity X_NEXT X_SLASH K_CATCH
+    { 
+
+      $$ = Catch($6);
       $$->id = $2;
       $$->faultName = att.read($3, "faultName");
 //NL      $$->faultVariable = att.read($3, "faultVariable"); 
@@ -714,7 +725,6 @@ tCatchAll:
       $$->faultName = att.read($3, "faultName");
       $$->faultVariable = att.read($3, "faultVariable");
    */
-      // $$->variableID = symMan.checkVariable(att.read($3, "faultVariable")->name, true); 
     }
 ;
 
@@ -872,6 +882,17 @@ tOnMessage:
   tCorrelations activity X_NEXT X_SLASH K_ONMESSAGE
     { $$ = OnMessage($7);
       $$->id = $2;    
+      STOnMessage * stOnMessage = NULL;
+      try
+      {
+	stOnMessage = dynamic_cast<STOnMessage *> (symTab.lookup($2));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      stOnMessage->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+
 //NL      $$->partnerLink = att.read($3, "partnerLink");
 //NL      $$->portType = att.read($3, "portType");
 //NL      $$->operation = att.read($3, "operation");
@@ -956,8 +977,16 @@ tVariable:
   K_VARIABLE genSymTabEntry_Variable
   arbitraryAttributes X_NEXT X_SLASH K_VARIABLE
     { symTab.checkAttributes($2); //att.check($3, K_VARIABLE);
-      STVariable * stVar = dynamic_cast<STVariable *> (symTab.lookup(currentSymTabEntryKey));
-      // currentScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId->value));
+      STVariable * stVar = NULL;
+      try
+      {
+	stVar = dynamic_cast<STVariable *> (symTab.lookup(currentSymTabEntryKey));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+
       $$ = Variable();
       $$->id = $2;
       $$->name = att.read($3, "name");
@@ -969,11 +998,21 @@ tVariable:
 				     $$->messageType->name, 
 				     $$->type->name, 
 				     $$->element->name)); 
-      stVar->name = currentSTScope->addVariable(currentScopeId, stVar);
+      stVar->name = currentSTScope->addVariable(stVar);
     }
 | K_VARIABLE genSymTabEntry_Variable
   arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2); //att.check($3, K_VARIABLE);
+      STVariable * stVar = NULL;
+      try
+      {
+	stVar = dynamic_cast<STVariable *> (symTab.lookup(currentSymTabEntryKey));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+
       $$ = Variable();
       $$->id = $2;
       $$->name = att.read($3, "name");
@@ -984,7 +1023,10 @@ tVariable:
 	              new csVariable($$->name->name, 
 				     $$->messageType->name, 
 				     $$->type->name, 
-				     $$->element->name)); }
+				     $$->element->name));
+
+      stVar->name = currentSTScope->addVariable(stVar);
+    }
 ;
 
 genSymTabEntry_Variable:
@@ -1264,6 +1306,18 @@ tInvoke:
 	currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentSymTabEntryKey));
 	currentSTScope->parentScopeId = parent[currentScopeId]->value;
 
+	STInvoke * stInvoke = NULL;
+	try
+	{
+	  stInvoke = dynamic_cast<STInvoke *> (symTab.lookup($2));
+	}
+	catch (bad_cast)
+	{
+	  throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+	}
+	stInvoke->inputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "inputVariable"),currentSTScope);
+	stInvoke->outputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "outputVariable"),currentSTScope);
+
 	standardElements se =  StandardElements(NiltTarget_list(), NiltSource_list());
         tInvoke invoke = Invoke(se, $8);
         activity ai = activityInvoke(invoke);
@@ -1365,7 +1419,19 @@ tInvoke:
         currentScopeId = parent[$2];
         currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId->value));
 
-        tInvoke invoke = Invoke($7, $8);
+	STInvoke * stInvoke = NULL;
+	try
+	{
+	  stInvoke = dynamic_cast<STInvoke *> (symTab.lookup($2));
+	}
+	catch (bad_cast)
+	{
+	  throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+	}
+	stInvoke->inputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "inputVariable"),currentSTScope);
+	stInvoke->outputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "outputVariable"),currentSTScope);
+
+	tInvoke invoke = Invoke($7, $8);
 
 //NL	invoke->name = att.read($3, "name");
 //NL        invoke->joinCondition = 
@@ -1436,6 +1502,19 @@ tInvoke:
     { 
       impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
       noLinks->parentId = $2;
+
+      STInvoke * stInvoke = NULL;
+      try
+      {
+	stInvoke = dynamic_cast<STInvoke *> (symTab.lookup($2));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      stInvoke->inputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "inputVariable"),currentSTScope);
+      stInvoke->outputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "outputVariable"),currentSTScope);
+
       tInvoke invoke = Invoke(noLinks, NiltCorrelation_list());
 //NL      invoke->name = att.read($3, "name");
 //NL      invoke->joinCondition = att.read($3, "joinCondition");    
@@ -1535,7 +1614,18 @@ tReceive:
     { symMan.checkPartnerLink(att.read($3, "partnerLink")->name); }
   standardElements tCorrelations X_SLASH K_RECEIVE
     { $$ = Receive($7, $8);
-      STReceive * symbolTableEntry = dynamic_cast<STReceive *> (symTab.lookup($2)); 
+      // STReceive * symbolTableEntry = dynamic_cast<STReceive *> (symTab.lookup($2)); 
+      STReceive * stReceive = NULL;
+      try
+      {
+	stReceive = dynamic_cast<STReceive *> (symTab.lookup($2));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      stReceive->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+
 
 //NL      $$->name = att.read($3, "name");
 //NL      $$->joinCondition =
@@ -1549,6 +1639,7 @@ tReceive:
 //NL      $$->operation = att.read($3, "operation");
 //NL      $$->variable = att.read($3, "variable");
 //NL      $$->createInstance = att.read($3, "createInstance", $$->createInstance); 
+      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); 
       $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
       // symbolTableEntry->variable
 //NL      $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
@@ -1567,10 +1658,7 @@ tReceive:
       }
       $$->negativeControlFlow = $7->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $7->parentId = $2; 
-      /* Is it normal that
-           "symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));"
-         is missing? */
-      }
+    }
 | K_RECEIVE genSymTabEntry_Receive
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_RECEIVE);
@@ -1588,6 +1676,18 @@ tReceive:
   X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
       noLinks->parentId = $2;
+
+      STReceive * stReceive = NULL;
+      try
+      {
+	stReceive = dynamic_cast<STReceive *> (symTab.lookup($2));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      stReceive->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+
       $$ = Receive(noLinks, NiltCorrelation_list());
 //NL      $$->name = att.read($3, "name");
 //NL      $$->joinCondition = att.read($3, "joinCondition");     
@@ -1652,6 +1752,7 @@ tReply:
   K_REPLY genSymTabEntry_Reply
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_REPLY);
+
       if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
       {
       	/// parent BPEL-element attribute value
@@ -1677,11 +1778,13 @@ tReply:
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
+      stReply->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+
 //NL      $$->name = att.read($3, "name");
 //NL      $$->joinCondition = 
 //NL      $6->joinCondition = att.read($3, "joinCondition");
 //NL      $$->suppressJoinFailure =
-      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+     $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tReply: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
       att.popSJFStack();
 //NL      $$->partnerLink = att.read($3, "partnerLink");
@@ -1689,12 +1792,13 @@ tReply:
 //NL      $$->operation = att.read($3, "operation");
 //NL      $$->variable = att.read($3, "variable");
 //NL      $$->faultName = att.read($3, "faultName");
-      $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
+       $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
+
 //NL      symMan.checkPartnerLink($$->partnerLink->name);
-      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
 //NL      $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 //NL				      $$->operation->name, 
 //NL				      $$->partnerLink->name), false);
+      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
       $$->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
 				      symTab.readAttributeValue($2, "operation"), 
 				      symTab.readAttributeValue($2, "partnerLink")), false);
@@ -1725,6 +1829,17 @@ tReply:
   X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
       noLinks->parentId = $2;
+      STReply * stReply = NULL;
+      try
+      {
+	stReply = dynamic_cast<STReply*> (symTab.lookup($2));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      stReply->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+
       $$ = Reply(noLinks, NiltCorrelation_list());
 //NL      $$->name = att.read($3, "name");
 //NL      $$->joinCondition = att.read($3, "joinCondition");    
@@ -1736,7 +1851,7 @@ tReply:
 //NL      $$->operation = att.read($3, "operation");
 //NL      $$->variable = att.read($3, "variable");
 //NL      $$->faultName = att.read($3, "faultName");
-      $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
+       $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
 //NL      symMan.checkPartnerLink($$->partnerLink->name);
       symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); 
 //NL      $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
@@ -1844,6 +1959,17 @@ tCopy:
 tFrom:
   K_FROM genSymTabEntry_From arbitraryAttributes X_NEXT X_SLASH K_FROM
     { symTab.checkAttributes($2); //att.check($3, K_FROM);
+      STFromTo * stFrom = NULL;
+      try
+      {
+	stFrom = dynamic_cast<STFromTo*> (symTab.lookup($2));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      stFrom->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+
       $$ = From();
       $$->id = $2;      
       $$->variable = att.read($3, "variable");
@@ -1858,6 +1984,17 @@ tFrom:
       symMan.checkPartnerLink($$->partnerLink->name); }
 | K_FROM genSymTabEntry_From arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_FROM
     { symTab.checkAttributes($2, $5); //att.check($3, $5, K_FROM);
+      STFromTo * stFrom = NULL;
+      try
+      {
+	stFrom = dynamic_cast<STFromTo*> (symTab.lookup($2));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      stFrom->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+
       $$ = From();
       $$->id = $2;      
       $$->variable = att.read($3, "variable");
@@ -1873,6 +2010,17 @@ tFrom:
       symMan.checkPartnerLink($$->partnerLink->name); }
 | K_FROM genSymTabEntry_From arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2); //att.check($3, K_FROM);
+      STFromTo * stFrom = NULL;
+      try
+      {
+	stFrom = dynamic_cast<STFromTo*> (symTab.lookup($2));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      stFrom->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+
       $$ = From();
       $$->id = $2;      
       $$->variable = att.read($3, "variable");
@@ -1904,6 +2052,17 @@ genSymTabEntry_From:
 tTo:
   K_TO genSymTabEntry_To arbitraryAttributes X_NEXT X_SLASH K_TO
     { symTab.checkAttributes($2); //att.check($3, K_TO);
+      STFromTo * stTo = NULL;
+      try
+      {
+	stTo = dynamic_cast<STFromTo*> (symTab.lookup($2));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      stTo->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+
       $$ = To();
       $$->id = $2;      
 //NL      $$->variable = att.read($3, "variable");
@@ -1914,6 +2073,17 @@ tTo:
       symMan.checkPartnerLink($$->partnerLink->name); }
 | K_TO genSymTabEntry_To arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2); //att.check($3, K_TO);
+      STFromTo * stTo = NULL;
+      try
+      {
+	stTo = dynamic_cast<STFromTo*> (symTab.lookup($2));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      stTo->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+
       $$ = To();
       $$->id = $2;      
 //NL      $$->variable = att.read($3, "variable");
@@ -2054,6 +2224,17 @@ tThrow:
     }   
   X_NEXT standardElements X_SLASH K_THROW
     { symTab.checkAttributes($2); //att.check($3, K_THROW);
+      STThrow * stThrow = NULL;
+      try
+      {
+	stThrow = dynamic_cast<STThrow*> (symTab.lookup($2));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      stThrow->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+
       $$ = Throw($6);
 //NL      $$->name = att.read($3, "name");
 //NL      $$->joinCondition =
@@ -2092,6 +2273,17 @@ tThrow:
   X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
       noLinks->parentId = $2;
+      STThrow * stThrow = NULL;
+      try
+      {
+	stThrow = dynamic_cast<STThrow*> (symTab.lookup($2));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      stThrow->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+
       $$ = Throw(noLinks);
 //NL      $$->name = att.read($3, "name");
 //NL      $$->joinCondition = att.read($3, "joinCondition");   
@@ -2659,7 +2851,7 @@ tWhile:
     }
   activity 
   X_NEXT X_SLASH K_WHILE
-    { symTab.checkAttributes($3); att.check($3, K_WHILE);
+    { // symTab.checkAttributes($3); att.check($3, K_WHILE);
       $$ = While($6, $8);
 //NL      $$->name = att.read($3, "name");
 //NL      $$->joinCondition =

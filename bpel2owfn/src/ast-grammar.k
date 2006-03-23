@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/03/23 16:05:35 $
+ *          - last changed: \$Date: 2006/03/23 16:30:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.70 $
+ * \version \$Revision: 1.71 $
  */
 %}
 
@@ -194,7 +194,7 @@ tCatch:
 //NL    casestring faultVariable;
 
     /// additional attribute containing the unique variable name    
-    casestring variableID;
+//NL    casestring variableID;
     
     integer id;
   }
@@ -561,7 +561,7 @@ tThrow:
 //NL    casestring joinCondition;
 //NL    casestring suppressJoinFailure;
 
-    casestring faultName;
+//NL    casestring faultName;
 //NL    casestring faultVariable;
 
     /// additional attribute containing the unique variable name    
@@ -648,7 +648,7 @@ tLink:
 //NL    casestring name;
 
     /// additional attribute containing the unique link name
-    casestring linkID;
+//NL    casestring linkID;
     
     integer id;
   }

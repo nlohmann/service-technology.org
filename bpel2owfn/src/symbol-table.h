@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.25 $: 
+ * \version \$Revision: 1.26 $: 
  *
  */
 
@@ -551,7 +551,7 @@ class STCommunicationActivity: public STActivity
     STVariable * variable;
 
     // only used by <invoke>
-    bool isSynchronousInvoke;
+    bool isAsynchronousInvoke;
 };
 
 

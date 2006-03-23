@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/03/23 14:48:36 $
+ *          - last changed: \$Date: 2006/03/23 15:07:15 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.164 $
+ * \version \$Revision: 1.165 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -1974,7 +1974,7 @@ This=Empty(a) ->
  * Fig. 11.
  */
 
-This=Invoke(a,b) provided (This->outputVariable == mkcasestring("")) ->
+This=Invoke(a,b) provided ((dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id)))->isAsynchronousInvoke) -> //(This->outputVariable == mkcasestring("")) ->
   [petrinet:
     {
       string prefix = intToString(This->id->value) + ".internal.";
@@ -2026,7 +2026,7 @@ This=Invoke(a,b) provided (This->outputVariable == mkcasestring("")) ->
  * Fig. 13.
  */
 
-This=Invoke(a,b) provided (This->outputVariable != mkcasestring("")) ->
+This=Invoke(a,b) provided (!(dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id)))->isAsynchronousInvoke) -> //This->outputVariable != mkcasestring("")) ->
   [petrinet:
     {
       header(This->id);

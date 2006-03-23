@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/23 14:48:36 $
+ *          - last changed: \$Date: 2006/03/23 15:07:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.150 $
+ * \version \$Revision: 1.151 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -1325,6 +1325,7 @@ tInvoke:
 	}
 	stInvoke->inputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "inputVariable"),currentSTScope);
 	stInvoke->outputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "outputVariable"),currentSTScope);
+        stInvoke->isAsynchronousInvoke = (stInvoke->outputVariable == NULL);
 
 	standardElements se =  StandardElements(NiltTarget_list(), NiltSource_list());
         tInvoke invoke = Invoke(se, $8);
@@ -1370,7 +1371,7 @@ tInvoke:
 //NL        invoke->portType = att.read($3, "portType");
 //NL        invoke->operation = att.read($3, "operation");
 //NL        invoke->inputVariable = att.read($3, "inputVariable");
-        invoke->outputVariable = att.read($3, "outputVariable");
+//NL        invoke->outputVariable = att.read($3, "outputVariable");
 	// inputVariable <=> input for invoke process !!!
 //NL        invoke->variableIDin  = symMan.checkVariable(att.read($3, "inputVariable")->name);
 //NL        invoke->variableIDout = symMan.checkVariable(att.read($3, "outputVariable")->name);
@@ -1440,6 +1441,7 @@ tInvoke:
 	}
 	stInvoke->inputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "inputVariable"),currentSTScope);
 	stInvoke->outputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "outputVariable"),currentSTScope);
+        stInvoke->isAsynchronousInvoke = (stInvoke->outputVariable == NULL);
 
 	tInvoke invoke = Invoke($7, $8);
 
@@ -1454,7 +1456,7 @@ tInvoke:
 //NL        invoke->portType = att.read($3, "portType");
 //NL        invoke->operation = att.read($3, "operation");
 //NL        invoke->inputVariable = att.read($3, "inputVariable");
-        invoke->outputVariable = att.read($3, "outputVariable");
+//NL        invoke->outputVariable = att.read($3, "outputVariable");
 	// inputVariable <=> input for invoke process !!!
 //NL        invoke->variableIDin  = symMan.checkVariable(att.read($3, "inputVariable")->name);
 //NL        invoke->variableIDout = symMan.checkVariable(att.read($3, "outputVariable")->name);
@@ -1526,6 +1528,8 @@ tInvoke:
       }
       stInvoke->inputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "inputVariable"),currentSTScope);
       stInvoke->outputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "outputVariable"),currentSTScope);
+      stInvoke->isAsynchronousInvoke = (stInvoke->outputVariable == NULL);
+
 
       tInvoke invoke = Invoke(noLinks, NiltCorrelation_list());
 //NL      invoke->name = att.read($3, "name");
@@ -1537,7 +1541,7 @@ tInvoke:
 //NL      invoke->portType = att.read($3, "portType");
 //NL      invoke->operation = att.read($3, "operation");
 //NL      invoke->inputVariable = att.read($3, "inputVariable");
-      invoke->outputVariable = att.read($3, "outputVariable"); 
+//NL      invoke->outputVariable = att.read($3, "outputVariable"); 
       // inputVariable <=> input for invoke process !!!
 //NL      invoke->variableIDin  = symMan.checkVariable(att.read($3, "inputVariable")->name);
 //NL      invoke->variableIDout = symMan.checkVariable(att.read($3, "outputVariable")->name);

@@ -28,18 +28,18 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/03/17 10:24:48 $
+ *          - last changed: \$Date: 2006/03/23 15:53:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.63 $
+ * \version \$Revision: 1.64 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -123,6 +123,12 @@ int main( int argc, char *argv[])
 	// do some business with CFG
 	list<kc::integer> kcl;
 	TheCFG->needsDPE(0, kcl);
+	TheCFG->resetProcessedFlag();
+
+	/// \todo (gierds) check for cyclic links, otherwise we will fail
+	// test
+	TheCFG->checkForUninitializedVariables();
+	/// end test
       }
 
       if (modus == M_CFG)

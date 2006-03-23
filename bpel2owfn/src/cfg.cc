@@ -31,19 +31,22 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/03/20 13:59:44 $
+ *          - last changed: \$Date: 2006/03/23 15:53:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
 
 #include "cfg.h"
+#include "symbol-table.h"
+
+extern SymbolTable symTab;
 
 using std::cout;
 using std::endl;
@@ -314,10 +317,22 @@ void CFGBlock::checkForUninitializedVariables()
   {
     if (!prevBlocks.empty())
     {
-      initializedVariables = (*(prevBlocks.begin()))->initializedVariables;
-      for (list<CFGBlock *>::iterator iter = prevBlocks.begin(); iter != prevBlocks.end(); iter++)
+      list<CFGBlock *>::iterator blockBegin = prevBlocks.begin();
+      if (type == CFGWhile)
       {
-	initializedVariables = setIntersection(initializedVariables, (*iter)->initializedVariables);
+	blockBegin++;
+      }
+      initializedVariables = (*blockBegin)->initializedVariables;
+      for (list<CFGBlock *>::iterator iter = blockBegin; iter != prevBlocks.end(); iter++)
+      {
+	if (type == CFGFlow && label == "Flow_end")
+	{
+	  initializedVariables = setUnion(initializedVariables, (*iter)->initializedVariables);
+	}
+	else
+	{
+	  initializedVariables = setIntersection(initializedVariables, (*iter)->initializedVariables);
+	}
       }
     }
     if (type == CFGTarget)
@@ -331,10 +346,69 @@ void CFGBlock::checkForUninitializedVariables()
     return;
   }
 
-  // adding Variables for this Block
-  if (type == CFGReceive)
+  // checking Variables for this Block
+  STVariable * stVar = NULL;
+  std::string attributeName = "variable";
+  try
   {
-    
+    switch(type)
+    {
+      case CFGReply     : stVar = (dynamic_cast<STReply*>     (symTab.lookup(id)))->variable; break;
+      case CFGFrom      : stVar = (dynamic_cast<STFromTo*>    (symTab.lookup(id)))->variable; break;
+      case CFGInvoke    : stVar = (dynamic_cast<STInvoke*>    (symTab.lookup(id)))->inputVariable; 
+			  attributeName = "inputVariable";
+			  break;
+    }
+  }
+  catch (bad_cast)
+  {
+    throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+  }
+  
+  if ((type == CFGReply || type == CFGFrom || type == CFGInvoke) && stVar != NULL)
+  {
+    std::string var = stVar->name;
+    if (var != "")
+    {
+      if (initializedVariables.find(var) == initializedVariables.end())
+      {
+	trace("[CFG] Warning: Variable \"" + symTab.readAttributeValue(id, attributeName) 
+//	      + "\" ("+ var +") (activity ID = " 
+//	      + intToString(id->value)  
+	      + "\" in line " 
+	      + intToString(symTab.readAttribute(id, attributeName)->line) 
+	      + " might be undefined!\n");
+      }
+    }
+  }
+  
+  // adding Variables for this Block
+  stVar = NULL;
+  attributeName = "variable";
+  try
+  {
+    switch(type)
+    {
+      case CFGReceive   : stVar = (dynamic_cast<STReceive*>   (symTab.lookup(id)))->variable; break;
+      case CFGTo        : stVar = (dynamic_cast<STFromTo*>    (symTab.lookup(id)))->variable; break;
+      case CFGInvoke    : stVar = (dynamic_cast<STInvoke*>    (symTab.lookup(id)))->outputVariable;
+			  attributeName = "outputVariable";
+			  break;
+      case CFGOnMessage : stVar = (dynamic_cast<STOnMessage*> (symTab.lookup(id)))->variable; break;
+    }
+  }
+  catch (bad_cast)
+  {
+    throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+  }
+  
+  if ((type == CFGReceive || type == CFGTo || type==CFGInvoke || type == CFGOnMessage) && stVar != NULL)
+  {
+    std::string var = stVar->name;
+    if (var != "")
+    {
+      initializedVariables.insert(var); 
+    }
   }
   
   if (! nextBlocks.empty())

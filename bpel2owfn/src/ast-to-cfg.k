@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/03/15 13:13:51 $
+ *          - last changed: \$Date: 2006/03/23 15:53:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  */
 %}
 
@@ -232,11 +232,16 @@ Assign(a,b) ->
 
 	  CFGBlock * last = firstBlock;
 	  int i = 1;
-	  foreach(copy; tCopy_list b)
+	  foreach(Copy(from, to); tCopy_list b)
 	  {
-	    CFGBlock * copyBlock = new CFGBlock(CFGCopy, $0->id, "Copy_" + intToString(i++));
-	    connectBlocks(last, copyBlock);
-	    last = copyBlock;
+	    //CFGBlock * copyBlock = new CFGBlock(CFGCopy, $0->id, "Copy_" + intToString(i++));
+	    //connectBlocks(last, copyBlock);
+	    //last = copyBlock;
+	    CFGBlock * fromBlock = new CFGBlock(CFGFrom, from->id, "From_" + intToString(i));
+	    CFGBlock * toBlock   = new CFGBlock(CFGTo,   to->id, "To_" + intToString(i++));
+	    connectBlocks(last,fromBlock);
+	    connectBlocks(fromBlock, toBlock);
+	    last = toBlock;
 	  } 
 	  connectBlocks(last, lastBlock);
   	}
@@ -468,12 +473,15 @@ Pick(a,b,c) ->
 	b // tOnMessage_list
 	c // tOnAlarm_list
 	{
+	  int i = 1;
 	  foreach(message=OnMessage(innerActivity); tOnMessage_list b)
 	  {
  	    CFGBlock * innerFirst = cfgMap.find(intToString(innerActivity->id->value))->second->firstBlock;
 	    CFGBlock * innerLast = cfgMap.find(intToString(innerActivity->id->value))->second->lastBlock;
+	    CFGBlock * onMessageBlock = new CFGBlock(CFGOnMessage, message->id, "OnMessage_" + intToString(i++)); 
 	  
-	    connectBlocks(firstBlock, innerFirst);
+	    connectBlocks(firstBlock, onMessageBlock);
+	    connectBlocks(onMessageBlock, innerFirst);
 	    connectBlocks(innerLast, lastBlock);
 	  } 
 	  foreach(alarm=OnAlarm(innerActivity); tOnAlarm_list c)

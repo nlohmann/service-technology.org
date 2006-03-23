@@ -26,7 +26,7 @@
  *
  * \author
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $  
+ *          - last changes of: \$Author: nlohmann $  
  *          
  * \date
  * 
@@ -47,6 +47,7 @@
 #include "debug.h"
 
 extern SymbolTable symTab;
+extern int yylineno;
 
 /********************************************
  * implementation of SymbolTable CLASS
@@ -2261,7 +2262,7 @@ STAttribute::STAttribute(string name, string value)
 {
   this->name = name;
   this->value = value;
-  this->line = 0;
+  this->line = yylineno;
 }
 
 /*!
@@ -2337,7 +2338,7 @@ STCorrelationSet::~STCorrelationSet() {}
  * constructor
  */
 STElement::STElement() {
-  this->line = 0;	
+  line = yylineno;
 }
 
 /*!

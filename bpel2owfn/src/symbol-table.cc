@@ -26,7 +26,7 @@
  *
  * \author
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $  
+ *          - last changes of: \$Author: gierds $  
  *          
  * \date
  * 
@@ -2520,7 +2520,7 @@ std::string STScope::addVariable(STVariable * variable)
   }
     
   variables.push_back(variable);
-  return intToString(elementId) + "." + variable->mapOfAttributes["name"]->value;
+  return intToString(entryKey) + "." + variable->mapOfAttributes["name"]->value;
 }
 
 /// checks for a variable with a given name and returns pointer to the object

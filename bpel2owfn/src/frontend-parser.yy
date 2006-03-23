@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/23 16:30:12 $
+ *          - last changed: \$Date: 2006/03/23 16:34:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.153 $
+ * \version \$Revision: 1.154 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -2659,8 +2659,7 @@ tLink:
       $$->id = $2;
 //NL      $$->name = att.read($3, "name"); 
 //NL      $$->linkID = symMan.addLink(new csLink($$->name->name)); }
-//NL      $$->linkID = symMan.addLink(new csLink(symTab.readAttributeValue($2, "name")));
-    }
+      symMan.addLink(new csLink(symTab.readAttributeValue($2, "name"))); }
 | K_LINK genSymTabEntry_Link
   arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2);
@@ -2668,8 +2667,7 @@ tLink:
       $$->id = $2;
 //NL      $$->name = att.read($3, "name"); 
 //NL      $$->linkID = symMan.addLink(new csLink($$->name->name)); }
-//NL      $$->linkID = symMan.addLink(new csLink(symTab.readAttributeValue($2, "name")));
-    }
+      symMan.addLink(new csLink(symTab.readAttributeValue($2, "name"))); }
 ;
 
 genSymTabEntry_Link:

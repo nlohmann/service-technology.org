@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/03/21 22:53:08 $
+ *          - last changed: \$Date: 2006/03/23 12:58:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.66 $
+ * \version \$Revision: 1.67 $
  */
 %}
 
@@ -140,8 +140,8 @@ tPartnerLink:
 //NL    casestring name;
 //NL    casestring partnerLinkType;
 
-    casestring myRole; /* @DR: I cannot reamove this attribute and read it with 'readAttributeValue' */
-    casestring partnerRole; /* @DR: I cannot reamove this attribute and read it with 'readAttributeValue' */
+//NL    casestring myRole;
+//NL    casestring partnerRole;
     
     integer id;
   }
@@ -306,10 +306,10 @@ tVariable_list:
 tVariable:
   Variable()
   {
-    casestring name;
-    casestring messageType;
-    casestring type;
-    casestring element;
+//NL    casestring name;
+//NL    casestring messageType;
+//NL    casestring type;
+//NL    casestring element;
 
     /// additional attribute containing the unique variable name    
     casestring variableID;
@@ -499,7 +499,7 @@ tFrom:
     casestring variable;
 //NL    casestring part;
 //NL    casestring query; // only excecutable processes
-    casestring partnerLink; /* @DR: I cannot reamove this attribute and read it with 'readAttributeValue' */
+//NL    casestring partnerLink;
 //NL    casestring endpointReference;
 //NL    casestring property;
 //NL    casestring expression;
@@ -519,7 +519,7 @@ tTo:
   {
 //NL    casestring variable;
 //NL    casestring part;
-    casestring partnerLink; /* @DR: I cannot reamove this attribute and read it with 'readAttributeValue' */
+//NL    casestring partnerLink;
 //NL    casestring property;
 
     /// additional attribute containing the unique variable name    
@@ -645,7 +645,7 @@ tLink_list:
 tLink:
   Link()
   {
-    casestring name;
+//NL    casestring name;
 
     /// additional attribute containing the unique link name
     casestring linkID;

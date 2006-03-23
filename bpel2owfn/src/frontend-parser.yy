@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/22 16:27:29 $
+ *          - last changed: \$Date: 2006/03/23 12:58:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.147 $
+ * \version \$Revision: 1.148 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -507,8 +507,8 @@ tPartnerLink:
       $$->id = $2;
 //NL      $$->name = att.read($3, "name");
 //NL      $$->partnerLinkType = att.read($3, "partnerLinkType");
-      $$->myRole = att.read($3, "myRole");
-      $$->partnerRole = att.read($3, "partnerRole"); 
+//NL      $$->myRole = att.read($3, "myRole");
+//NL      $$->partnerRole = att.read($3, "partnerRole"); 
       if (inPartners) {
 //NL        symMan.checkPartnerLink($$->name->name);
         symMan.checkPartnerLink(symTab.readAttributeValue($2, "name"));
@@ -518,7 +518,7 @@ tPartnerLink:
 //NL        symMan.addPartnerLink(new csPartnerLink($$->name->name, $$->partnerLinkType->name, 
 //NL	  		                        $$->myRole->name, $$->partnerRole->name)); 
         symMan.addPartnerLink(new csPartnerLink(symTab.readAttributeValue($2, "name"), symTab.readAttributeValue($2, "partnerLinkType"), 
-	  		                        $$->myRole->name, $$->partnerRole->name)); 
+	  		                        symTab.readAttributeValue($2, "myRole"), symTab.readAttributeValue($2, "partnerRole"))); 
       }
     }
 | K_PARTNERLINK genSymTabEntry_PartnerLink
@@ -534,8 +534,8 @@ tPartnerLink:
       $$->id = $2;
 //NL      $$->name = att.read($3, "name");
 //NL      $$->partnerLinkType = att.read($3, "partnerLinkType");
-      $$->myRole = att.read($3, "myRole");
-      $$->partnerRole = att.read($3, "partnerRole");
+//NL      $$->myRole = att.read($3, "myRole");
+//NL      $$->partnerRole = att.read($3, "partnerRole");
       if (inPartners) {
 //NL        symMan.checkPartnerLink($$->name->name);
         symMan.checkPartnerLink(symTab.readAttributeValue($2, "name"));
@@ -545,7 +545,7 @@ tPartnerLink:
 //NL        symMan.addPartnerLink(new csPartnerLink($$->name->name, $$->partnerLinkType->name, 
 //NL	  		                        $$->myRole->name, $$->partnerRole->name)); 
         symMan.addPartnerLink(new csPartnerLink(symTab.readAttributeValue($2, "name"), symTab.readAttributeValue($2, "partnerLinkType"), 
-	  		                        $$->myRole->name, $$->partnerRole->name)); 
+	  		                        symTab.readAttributeValue($2, "myRole"), symTab.readAttributeValue($2, "partnerRole"))); 
       }
     }
 ;
@@ -989,15 +989,20 @@ tVariable:
 
       $$ = Variable();
       $$->id = $2;
-      $$->name = att.read($3, "name");
-      $$->messageType = att.read($3, "messageType");
-      $$->type = att.read($3, "type");
-      $$->element = att.read($3, "element"); 
+//NL      $$->name = att.read($3, "name");
+//NL      $$->messageType = att.read($3, "messageType");
+//NL      $$->type = att.read($3, "type");
+//NL      $$->element = att.read($3, "element"); 
+//NL      $$->variableID = symMan.addVariable( 
+//NL	              new csVariable($$->name->name, 
+//NL				     $$->messageType->name, 
+//NL				     $$->type->name, 
+//NL				     $$->element->name)); 
       $$->variableID = symMan.addVariable( 
-	              new csVariable($$->name->name, 
-				     $$->messageType->name, 
-				     $$->type->name, 
-				     $$->element->name)); 
+	              new csVariable(symTab.readAttributeValue($2, "name"), 
+				     symTab.readAttributeValue($2, "messageType"), 
+				     symTab.readAttributeValue($2, "type"), 
+				     symTab.readAttributeValue($2, "element"))); 
       stVar->name = currentSTScope->addVariable(stVar);
     }
 | K_VARIABLE genSymTabEntry_Variable
@@ -1015,16 +1020,19 @@ tVariable:
 
       $$ = Variable();
       $$->id = $2;
-      $$->name = att.read($3, "name");
-      $$->messageType = att.read($3, "messageType");
-      $$->type = att.read($3, "type");
-      $$->element = att.read($3, "element"); 
+//NL      $$->name = att.read($3, "name");
+//NL      $$->messageType = att.read($3, "messageType");
+//NL      $$->type = att.read($3, "type");
+//NL      $$->element = att.read($3, "element"); 
+//NL	              new csVariable($$->name->name, 
+//NL				     $$->messageType->name, 
+//NL				     $$->type->name, 
+//NL				     $$->element->name)); 
       $$->variableID = symMan.addVariable( 
-	              new csVariable($$->name->name, 
-				     $$->messageType->name, 
-				     $$->type->name, 
-				     $$->element->name));
-
+	              new csVariable(symTab.readAttributeValue($2, "name"), 
+				     symTab.readAttributeValue($2, "messageType"), 
+				     symTab.readAttributeValue($2, "type"), 
+				     symTab.readAttributeValue($2, "element"))); 
       stVar->name = currentSTScope->addVariable(stVar);
     }
 ;
@@ -1975,13 +1983,14 @@ tFrom:
       $$->variable = att.read($3, "variable");
 //NL      $$->part = att.read($3, "part");
 //NL      $$->query = att.read($3, "query");
-      $$->partnerLink = att.read($3, "partnerLink");
+//NL      $$->partnerLink = att.read($3, "partnerLink");
 //NL      $$->endpointReference = att.read($3, "endpointReference");
 //NL      $$->property = att.read($3, "property");
 //NL      $$->expression = att.read($3, "expression");
 //NL      $$->opaque = att.read($3, "opaque"); 
       $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
-      symMan.checkPartnerLink($$->partnerLink->name); }
+//NL      symMan.checkPartnerLink($$->partnerLink->name);
+      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); }
 | K_FROM genSymTabEntry_From arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_FROM
     { symTab.checkAttributes($2, $5); //att.check($3, $5, K_FROM);
       STFromTo * stFrom = NULL;
@@ -2000,14 +2009,15 @@ tFrom:
       $$->variable = att.read($3, "variable");
 //NL      $$->part = att.read($3, "part");
 //NL      $$->query = att.read($3, "query");
-      $$->partnerLink = att.read($3, "partnerLink");
+//NL      $$->partnerLink = att.read($3, "partnerLink");
 //NL      $$->endpointReference = att.read($3, "endpointReference");
 //NL      $$->property = att.read($3, "property");
 //NL      $$->expression = att.read($3, "expression");
 //NL      $$->opaque = att.read($3, "opaque");
       $$->literalValue = $5;
       $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
-      symMan.checkPartnerLink($$->partnerLink->name); }
+//NL      symMan.checkPartnerLink($$->partnerLink->name);
+      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); }
 | K_FROM genSymTabEntry_From arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2); //att.check($3, K_FROM);
       STFromTo * stFrom = NULL;
@@ -2026,13 +2036,14 @@ tFrom:
       $$->variable = att.read($3, "variable");
 //NL      $$->part = att.read($3, "part");
 //NL      $$->query = att.read($3, "query");
-      $$->partnerLink = att.read($3, "partnerLink");
+//NL      $$->partnerLink = att.read($3, "partnerLink");
 //NL      $$->endpointReference = att.read($3, "endpointReference");
 //NL      $$->property = att.read($3, "property");
 //NL      $$->expression = att.read($3, "expression");
 //NL      $$->opaque = att.read($3, "opaque"); 
       $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
-      symMan.checkPartnerLink($$->partnerLink->name); }
+//NL      symMan.checkPartnerLink($$->partnerLink->name);
+      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); }
 ;
 
 genSymTabEntry_From:
@@ -2067,10 +2078,11 @@ tTo:
       $$->id = $2;      
 //NL      $$->variable = att.read($3, "variable");
 //NL      $$->part = att.read($3, "part");
-      $$->partnerLink = att.read($3, "partnerLink");
+//NL      $$->partnerLink = att.read($3, "partnerLink");
 //NL      $$->property = att.read($3, "property"); 
       $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
-      symMan.checkPartnerLink($$->partnerLink->name); }
+//NL      symMan.checkPartnerLink($$->partnerLink->name);
+      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); }
 | K_TO genSymTabEntry_To arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2); //att.check($3, K_TO);
       STFromTo * stTo = NULL;
@@ -2088,10 +2100,11 @@ tTo:
       $$->id = $2;      
 //NL      $$->variable = att.read($3, "variable");
 //NL      $$->part = att.read($3, "part");
-      $$->partnerLink = att.read($3, "partnerLink");
+//NL      $$->partnerLink = att.read($3, "partnerLink");
 //NL      $$->property = att.read($3, "property"); 
       $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
-      symMan.checkPartnerLink($$->partnerLink->name); }
+//NL      symMan.checkPartnerLink($$->partnerLink->name);
+      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); }
 ;
 
 genSymTabEntry_To:
@@ -2633,15 +2646,17 @@ tLink:
     { symTab.checkAttributes($2);
       $$ = Link();
       $$->id = $2;
-      $$->name = att.read($3, "name"); 
-      $$->linkID = symMan.addLink(new csLink($$->name->name)); }
+//NL      $$->name = att.read($3, "name"); 
+//NL      $$->linkID = symMan.addLink(new csLink($$->name->name)); }
+      $$->linkID = symMan.addLink(new csLink(symTab.readAttributeValue($2, "name"))); }
 | K_LINK genSymTabEntry_Link
   arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2);
       $$ = Link();
       $$->id = $2;
-      $$->name = att.read($3, "name"); 
-      $$->linkID = symMan.addLink(new csLink($$->name->name)); }
+//NL      $$->name = att.read($3, "name"); 
+//NL      $$->linkID = symMan.addLink(new csLink($$->name->name)); }
+      $$->linkID = symMan.addLink(new csLink(symTab.readAttributeValue($2, "name"))); }
 ;
 
 genSymTabEntry_Link:

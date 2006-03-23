@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/23 13:50:41 $
+ *          - last changed: \$Date: 2006/03/23 14:48:36 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.149 $
+ * \version \$Revision: 1.150 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -1372,9 +1372,10 @@ tInvoke:
 //NL        invoke->inputVariable = att.read($3, "inputVariable");
         invoke->outputVariable = att.read($3, "outputVariable");
 	// inputVariable <=> input for invoke process !!!
-        invoke->variableIDin  = symMan.checkVariable(att.read($3, "inputVariable")->name);
-        invoke->variableIDout = symMan.checkVariable(att.read($3, "outputVariable")->name);
-        if (string(invoke->variableIDin->name) != "")
+//NL        invoke->variableIDin  = symMan.checkVariable(att.read($3, "inputVariable")->name);
+//NL        invoke->variableIDout = symMan.checkVariable(att.read($3, "outputVariable")->name);
+//NL        if (string(invoke->variableIDin->name) != "")
+        if (symTab.readAttributeValue($2, "inputVariable") != "")
         {
 //NL          invoke->channelID = symMan.addChannel(new csChannel(invoke->portType->name, 
 //NL					  invoke->operation->name, 
@@ -1384,7 +1385,8 @@ tInvoke:
 				          symTab.readAttributeValue($2, "partnerLink")), false);
 
         }
-        if (string(invoke->variableIDout->name) != "")
+//NL        if (string(invoke->variableIDout->name) != "")
+        if (symTab.readAttributeValue($2, "outputVariable") != "")
         {
 //NL          invoke->channelID = symMan.addChannel(new csChannel(invoke->portType->name, 
 //NL					  invoke->operation->name, 
@@ -1454,9 +1456,10 @@ tInvoke:
 //NL        invoke->inputVariable = att.read($3, "inputVariable");
         invoke->outputVariable = att.read($3, "outputVariable");
 	// inputVariable <=> input for invoke process !!!
-        invoke->variableIDin  = symMan.checkVariable(att.read($3, "inputVariable")->name);
-        invoke->variableIDout = symMan.checkVariable(att.read($3, "outputVariable")->name);
-        if (string(invoke->variableIDin->name) != "")
+//NL        invoke->variableIDin  = symMan.checkVariable(att.read($3, "inputVariable")->name);
+//NL        invoke->variableIDout = symMan.checkVariable(att.read($3, "outputVariable")->name);
+//NL        if (string(invoke->variableIDin->name) != "")
+        if (symTab.readAttributeValue($2, "inputVariable") != "")
         {
 //NL          invoke->channelID = symMan.addChannel(new csChannel(invoke->portType->name, 
 //NL					  invoke->operation->name, 
@@ -1465,7 +1468,8 @@ tInvoke:
     				          symTab.readAttributeValue($2, "operation"), 
 				          symTab.readAttributeValue($2, "partnerLink")), false);
         }
-        if (string(invoke->variableIDout->name) != "")
+//NL        if (string(invoke->variableIDout->name) != "")
+        if (symTab.readAttributeValue($2, "outputVariable") != "")
         {
 //NL          invoke->channelID = symMan.addChannel(new csChannel(invoke->portType->name, 
 //NL					  invoke->operation->name, 
@@ -1535,11 +1539,12 @@ tInvoke:
 //NL      invoke->inputVariable = att.read($3, "inputVariable");
       invoke->outputVariable = att.read($3, "outputVariable"); 
       // inputVariable <=> input for invoke process !!!
-      invoke->variableIDin  = symMan.checkVariable(att.read($3, "inputVariable")->name);
-      invoke->variableIDout = symMan.checkVariable(att.read($3, "outputVariable")->name);
+//NL      invoke->variableIDin  = symMan.checkVariable(att.read($3, "inputVariable")->name);
+//NL      invoke->variableIDout = symMan.checkVariable(att.read($3, "outputVariable")->name);
 //NL      symMan.checkPartnerLink(invoke->partnerLink->name); 
       symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); 
-      if (string(invoke->variableIDin->name) != "")
+//NL      if (string(invoke->variableIDin->name) != "")
+      if (symTab.readAttributeValue($2, "inputVariable") != "")
       {
 //NL        invoke->channelID = symMan.addChannel(new csChannel(invoke->portType->name, 
 //NL					invoke->operation->name, 
@@ -1549,7 +1554,8 @@ tInvoke:
 				        symTab.readAttributeValue($2, "partnerLink")), false);
 
       }
-      if (string(invoke->variableIDout->name) != "")
+//NL      if (string(invoke->variableIDout->name) != "")
+      if (symTab.readAttributeValue($2, "outputVariable") != "")
       {
 //NL        invoke->channelID = symMan.addChannel(new csChannel(invoke->portType->name, 
 //NL					invoke->operation->name, 
@@ -1648,7 +1654,7 @@ tReceive:
 //NL      $$->variable = att.read($3, "variable");
 //NL      $$->createInstance = att.read($3, "createInstance", $$->createInstance); 
       symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); 
-      $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
+//NL      $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
       // symbolTableEntry->variable
 //NL      $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 //NL				      $$->operation->name, 
@@ -1707,7 +1713,7 @@ tReceive:
 //NL      $$->operation = att.read($3, "operation");
 //NL      $$->variable = att.read($3, "variable");
 //NL      $$->createInstance = att.read($3, "createInstance", $$->createInstance);
-      $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
+//NL      $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; 
 //NL      symMan.checkPartnerLink($$->partnerLink->name); 
@@ -1800,7 +1806,7 @@ tReply:
 //NL      $$->operation = att.read($3, "operation");
 //NL      $$->variable = att.read($3, "variable");
 //NL      $$->faultName = att.read($3, "faultName");
-       $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
+//NL       $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
 
 //NL      symMan.checkPartnerLink($$->partnerLink->name);
 //NL      $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
@@ -1859,7 +1865,7 @@ tReply:
 //NL      $$->operation = att.read($3, "operation");
 //NL      $$->variable = att.read($3, "variable");
 //NL      $$->faultName = att.read($3, "faultName");
-       $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
+//NL       $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
 //NL      symMan.checkPartnerLink($$->partnerLink->name);
       symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); 
 //NL      $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 

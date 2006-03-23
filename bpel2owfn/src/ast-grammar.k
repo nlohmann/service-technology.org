@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/03/23 12:58:54 $
+ *          - last changed: \$Date: 2006/03/23 14:48:36 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.67 $
+ * \version \$Revision: 1.68 $
  */
 %}
 
@@ -396,8 +396,8 @@ tInvoke:
     casestring outputVariable;
     
     /// additional attributes containing the unique variable name    
-    casestring variableIDin;
-    casestring variableIDout;
+//NL    casestring variableIDin;
+//NL    casestring variableIDout;
 
     /// additional attribute containing the channel name
     casestring channelID;
@@ -429,7 +429,7 @@ tReceive:
 //NL    casestring createInstance = mkcasestring("no");
 
     /// additional attribute containing the unique variable name    
-    casestring variableID;
+//NL    casestring variableID;
 
     /// additional attribute containing the channel name
     casestring channelID;
@@ -458,7 +458,7 @@ tReply:
 //NL    casestring faultName;
 
     /// additional attribute containing the unique variable name    
-    casestring variableID;
+//NL    casestring variableID;
 
     /// additional attribute containing the channel name
     casestring channelID;

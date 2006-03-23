@@ -25,7 +25,7 @@
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created:
@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.24 $: 
+ * \version \$Revision: 1.25 $: 
  *
  */
 
@@ -536,18 +536,22 @@ class STFaultHandlers: public STElement, public SymbolTableEntry
 class STCommunicationActivity: public STActivity
 {
   public:
-    /// constructor
+    // constructor
     STCommunicationActivity();
     STCommunicationActivity(unsigned int elementId, unsigned int entryKey);
     
-    /// destructor
+    // destructor
     ~STCommunicationActivity();
 
-    // only used for communication activities
     string channelId;
+
+    // variables
     STVariable * inputVariable;
     STVariable * outputVariable;
     STVariable * variable;
+
+    // only used by <invoke>
+    bool isSynchronousInvoke;
 };
 
 

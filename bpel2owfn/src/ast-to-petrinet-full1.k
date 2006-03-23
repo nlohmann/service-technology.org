@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/03/21 15:03:49 $
+ *          - last changed: \$Date: 2006/03/23 14:48:36 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.163 $
+ * \version \$Revision: 1.164 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -109,7 +109,7 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
     {
       trace(TRACE_INFORMATION, "Generating Petri net...\n");
       header(This->id, true);
-      STProcess* myself = dynamic_cast <STProcess*> (symTab.lookup(This->id));
+      STProcess* myself = dynamic_cast<STProcess*> (symTab.lookup(This->id));
 
       string prefix = intToString(This->id->value) + ".internal.";
       currentScope = prefix;
@@ -1978,6 +1978,7 @@ This=Invoke(a,b) provided (This->outputVariable == mkcasestring("")) ->
   [petrinet:
     {
       string prefix = intToString(This->id->value) + ".internal.";
+      STCommunicationActivity* myself = dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id));
       header(This->id);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
@@ -1989,7 +1990,7 @@ This=Invoke(a,b) provided (This->outputVariable == mkcasestring("")) ->
 
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1); 
-      TheNet->newArc(TheNet->findPlace("variable." + string(This->variableIDin->name)), t1, READ);
+      TheNet->newArc(TheNet->findPlace("variable." + string(myself->inputVariable->name)), t1, READ);
       TheNet->newArc(t1, p2);
 
       Transition *t2 = TheNet->newTransition(prefix + "t2");
@@ -2029,6 +2030,7 @@ This=Invoke(a,b) provided (This->outputVariable != mkcasestring("")) ->
   [petrinet:
     {
       header(This->id);
+      STCommunicationActivity* myself = dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id));
       string prefix = intToString(This->id->value) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
@@ -2042,7 +2044,7 @@ This=Invoke(a,b) provided (This->outputVariable != mkcasestring("")) ->
 
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1);
-      TheNet->newArc(TheNet->findPlace("variable." + string(This->variableIDin->name)), t1, READ);
+      TheNet->newArc(TheNet->findPlace("variable." + string(myself->inputVariable->name)), t1, READ);
       TheNet->newArc(t1, p2);
 
       Transition *t2 = TheNet->newTransition(prefix + "t2");
@@ -2060,8 +2062,8 @@ This=Invoke(a,b) provided (This->outputVariable != mkcasestring("")) ->
       Transition *t4 = TheNet->newTransition(prefix + "t4");
       TheNet->newArc(p4, t4);
       TheNet->newArc(t4, p5);
-      TheNet->newArc(TheNet->findPlace("variable." + string(This->variableIDout->name)), t4);
-      TheNet->newArc(t4, TheNet->findPlace("variable." + string(This->variableIDout->name)));
+      TheNet->newArc(TheNet->findPlace("variable." + string(myself->outputVariable->name)), t4);
+      TheNet->newArc(t4, TheNet->findPlace("variable." + string(myself->outputVariable->name)));
 
 
       // Transitions for the negative control flow.
@@ -2102,6 +2104,7 @@ This=Receive(a,b) ->
   [petrinet:
     {
       header(This->id);
+      STCommunicationActivity* myself = dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id));
       string prefix = intToString(This->id->value) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
@@ -2120,8 +2123,8 @@ This=Receive(a,b) ->
       Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
-      TheNet->newArc(TheNet->findPlace("variable." + string(This->variableID->name)), t2);
-      TheNet->newArc(t2, TheNet->findPlace("variable." + string(This->variableID->name)));
+      TheNet->newArc(TheNet->findPlace("variable." + string(myself->variable->name)), t2);
+      TheNet->newArc(t2, TheNet->findPlace("variable." + string(myself->variable->name)));
 
 
       // Transitions for the negative control flow.
@@ -2157,6 +2160,7 @@ This=Reply(a,b) ->
   [petrinet:
     {
       header(This->id);
+      STCommunicationActivity* myself = dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id));
       string prefix = intToString(This->id->value) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
@@ -2168,7 +2172,7 @@ This=Reply(a,b) ->
 
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1);
-      TheNet->newArc(TheNet->findPlace("variable." + string(This->variableID->name)), t1, READ);
+      TheNet->newArc(TheNet->findPlace("variable." + string(myself->variable->name)), t1, READ);
       TheNet->newArc(t1, p2);
 
       Transition *t2 = TheNet->newTransition(prefix + "t2");
@@ -3276,7 +3280,7 @@ This=Scope(a,b,c,d,e,f,g) ->
       string prefix = intToString(This->id->value) + ".internal.";
       currentScope = prefix;
       SymbolScope *me = symMan.getScope(this->id);
-      STScope* myself = dynamic_cast <STScope*> (symTab.lookup(This->id));
+      STScope* myself = dynamic_cast<STScope*> (symTab.lookup(This->id));
 
       // Create push-places for the children of the scope.
       for (list< SymbolScope * >::iterator child = me->children.begin(); child != me->children.end(); child++)

@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.26 $: 
+ * \version \$Revision: 1.27 $: 
  *
  */
 
@@ -828,6 +828,8 @@ class STFromTo: public STElement, public SymbolTableEntry
     STPartnerLink * partnerLink;
     STVariable * variable;
 
+    /// used as <from>literal</from>
+    string literal;
 };
 
 /**

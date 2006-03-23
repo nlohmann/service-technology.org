@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/03/23 15:07:15 $
+ *          - last changed: \$Date: 2006/03/23 16:05:36 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.165 $
+ * \version \$Revision: 1.166 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -2235,11 +2235,13 @@ This=Assign(a,b) ->
       int copyCount = 1;
       Place *lastPlace = TheNet->findPlace(prefix + "initial");
 
-      foreach (Copy(from,to); tCopy_list b)
+      foreach (copyBlock=Copy(from,to); tCopy_list b)
       {
 	string newPrefix = prefix + "copy." + intToString(copyCount) + ".";
+	STFromTo* fromST = dynamic_cast<STFromTo*> (symTab.lookup(from->id));
+	STFromTo* toST = dynamic_cast<STFromTo*> (symTab.lookup(to->id));
 
-	if (from->variable != mkcasestring(""))
+	if (fromST->variable != NULL) // mkcasestring(""))
 	{
 	  Place *p2 = TheNet->newPlace(newPrefix + "running");
 	  Place *p4 = TheNet->newPlace(newPrefix + "p4");
@@ -2247,14 +2249,14 @@ This=Assign(a,b) ->
 
 	  Transition *t1 = TheNet->newTransition(newPrefix + "t1");
 	  TheNet->newArc(lastPlace, t1);
-	  TheNet->newArc(TheNet->findPlace("variable." + string(from->variableID->name)), t1, READ);
+	  TheNet->newArc(TheNet->findPlace("variable." + string(fromST->variable->name)), t1, READ);
 	  TheNet->newArc(t1, p2);
 
 	  Transition *t2 = TheNet->newTransition(newPrefix + "t2");
 	  TheNet->newArc(p2, t2);
 	  TheNet->newArc(t2, p8);
-	  TheNet->newArc(TheNet->findPlace("variable." + string(to->variableID->name)), t2);
-	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(to->variableID->name)));
+	  TheNet->newArc(TheNet->findPlace("variable." + string(toST->variable->name)), t2);
+	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(toST->variable->name)));
 
 
 	  // Transitions for the negative control flow.
@@ -2273,8 +2275,8 @@ This=Assign(a,b) ->
 
 	  Transition *t2 = TheNet->newTransition(newPrefix + "t2");
 	  TheNet->newArc(lastPlace, t2);
-	  TheNet->newArc(TheNet->findPlace("variable." + string(to->variableID->name)), t2);
-	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(to->variableID->name)));
+	  TheNet->newArc(TheNet->findPlace("variable." + string(toST->variable->name)), t2);
+	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(toST->variable->name)));
 	  TheNet->newArc(t2, p8);
 
 
@@ -2439,7 +2441,7 @@ This=Throw(a) ->
  * compensation handler of the current scope.
  */
 
-This=Compensate(a) provided (!This->inFaultHandler && This->scope == mkcasestring("")) ->
+This=Compensate(a) provided (!This->inFaultHandler && (symTab.readAttributeValue(This->id, "scope") == "")) -> //(!This->inFaultHandler && This->scope == mkcasestring("")) ->
   [petrinet:
     {
       header(This->id);
@@ -2491,7 +2493,7 @@ This=Compensate(a) provided (!This->inFaultHandler && This->scope == mkcasestrin
  * handler of the current scope.
  */
 
-This=Compensate(a) provided (This->inFaultHandler && This->scope == mkcasestring("")) ->
+This=Compensate(a) provided (This->inFaultHandler && (symTab.readAttributeValue(This->id, "scope") == "")) ->  //(This->inFaultHandler && This->scope == mkcasestring("")) ->
   [petrinet:
     {
       header(This->id);
@@ -2543,7 +2545,7 @@ This=Compensate(a) provided (This->inFaultHandler && This->scope == mkcasestring
  * embedded to the compensation handler of the current scope.
  */
 
-This=Compensate(a) provided (!This->inFaultHandler && This->scope != mkcasestring("")) ->
+This=Compensate(a) provided (!This->inFaultHandler && (symTab.readAttributeValue(This->id, "scope") != "")) -> //(!This->inFaultHandler && This->scope != mkcasestring("")) ->
   [petrinet:
     {
       header(This->id);
@@ -2594,7 +2596,7 @@ This=Compensate(a) provided (!This->inFaultHandler && This->scope != mkcasestrin
  * the fault handler of the current scope.
  */
 
-This=Compensate(a) provided (This->inFaultHandler && This->scope != mkcasestring("")) ->
+This=Compensate(a) provided (This->inFaultHandler && (symTab.readAttributeValue(This->id, "scope") != "")) -> //(This->inFaultHandler && This->scope != mkcasestring("")) ->
   [petrinet:
     {
       header(This->id);

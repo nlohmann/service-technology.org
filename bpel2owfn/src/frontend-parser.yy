@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/23 15:07:15 $
+ *          - last changed: \$Date: 2006/03/23 16:05:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.151 $
+ * \version \$Revision: 1.152 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -1990,7 +1990,7 @@ tFrom:
 
       $$ = From();
       $$->id = $2;      
-      $$->variable = att.read($3, "variable");
+//NL      $$->variable = att.read($3, "variable");
 //NL      $$->part = att.read($3, "part");
 //NL      $$->query = att.read($3, "query");
 //NL      $$->partnerLink = att.read($3, "partnerLink");
@@ -1998,7 +1998,7 @@ tFrom:
 //NL      $$->property = att.read($3, "property");
 //NL      $$->expression = att.read($3, "expression");
 //NL      $$->opaque = att.read($3, "opaque"); 
-      $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
+//NL      $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
 //NL      symMan.checkPartnerLink($$->partnerLink->name);
       symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); }
 | K_FROM genSymTabEntry_From arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_FROM
@@ -2016,7 +2016,7 @@ tFrom:
 
       $$ = From();
       $$->id = $2;      
-      $$->variable = att.read($3, "variable");
+//NL      $$->variable = att.read($3, "variable");
 //NL      $$->part = att.read($3, "part");
 //NL      $$->query = att.read($3, "query");
 //NL      $$->partnerLink = att.read($3, "partnerLink");
@@ -2024,8 +2024,9 @@ tFrom:
 //NL      $$->property = att.read($3, "property");
 //NL      $$->expression = att.read($3, "expression");
 //NL      $$->opaque = att.read($3, "opaque");
-      $$->literalValue = $5;
-      $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
+      stFrom->literal = $5->name;
+//NL      $$->literalValue = $5;
+//NL      $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
 //NL      symMan.checkPartnerLink($$->partnerLink->name);
       symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); }
 | K_FROM genSymTabEntry_From arbitraryAttributes X_SLASH
@@ -2043,7 +2044,7 @@ tFrom:
 
       $$ = From();
       $$->id = $2;      
-      $$->variable = att.read($3, "variable");
+//NL      $$->variable = att.read($3, "variable");
 //NL      $$->part = att.read($3, "part");
 //NL      $$->query = att.read($3, "query");
 //NL      $$->partnerLink = att.read($3, "partnerLink");
@@ -2051,7 +2052,7 @@ tFrom:
 //NL      $$->property = att.read($3, "property");
 //NL      $$->expression = att.read($3, "expression");
 //NL      $$->opaque = att.read($3, "opaque"); 
-      $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
+//NL      $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
 //NL      symMan.checkPartnerLink($$->partnerLink->name);
       symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); }
 ;
@@ -2090,7 +2091,7 @@ tTo:
 //NL      $$->part = att.read($3, "part");
 //NL      $$->partnerLink = att.read($3, "partnerLink");
 //NL      $$->property = att.read($3, "property"); 
-      $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
+//NL      $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
 //NL      symMan.checkPartnerLink($$->partnerLink->name);
       symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); }
 | K_TO genSymTabEntry_To arbitraryAttributes X_SLASH
@@ -2112,7 +2113,7 @@ tTo:
 //NL      $$->part = att.read($3, "part");
 //NL      $$->partnerLink = att.read($3, "partnerLink");
 //NL      $$->property = att.read($3, "property"); 
-      $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
+//NL      $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
 //NL      symMan.checkPartnerLink($$->partnerLink->name);
       symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); }
 ;
@@ -2268,7 +2269,7 @@ tThrow:
       att.popSJFStack();      
       $$->faultName = att.read($3, "faultName");
 //NL      $$->faultVariable = att.read($3, "faultVariable");
-      $$->variableID = symMan.checkVariable(att.read($3, "faultVariable")->name);
+//NL      $$->variableID = symMan.checkVariable(att.read($3, "faultVariable")->name);
       if ($6->hasTarget)
       {
 	symMan.remDPEstart();
@@ -2315,7 +2316,7 @@ tThrow:
       att.popSJFStack();
       $$->faultName = att.read($3, "faultName");
 //NL      $$->faultVariable = att.read($3, "faultVariable");
-      $$->variableID = symMan.checkVariable(att.read($3, "faultVariable")->name);
+//NL      $$->variableID = symMan.checkVariable(att.read($3, "faultVariable")->name);
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; }
 ;
@@ -2388,7 +2389,7 @@ tCompensate:
       $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tCompensate: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
       att.popSJFStack();
-      $$->scope = att.read($3, "scope");
+//NL      $$->scope = att.read($3, "scope");
       if ($6->hasTarget)
       {
 	symMan.remDPEstart();
@@ -2445,7 +2446,7 @@ tCompensate:
 //NL      $$->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tCompensate: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
       att.popSJFStack();
-      $$->scope = att.read($3, "scope");
+//NL      $$->scope = att.read($3, "scope");
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; }
 ;

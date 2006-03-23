@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/03/23 15:07:15 $
+ *          - last changed: \$Date: 2006/03/23 16:05:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.69 $
+ * \version \$Revision: 1.70 $
  */
 %}
 
@@ -496,7 +496,7 @@ tCopy:
 tFrom:
   From()
   {
-    casestring variable;
+//NL    casestring variable;
 //NL    casestring part;
 //NL    casestring query; // only excecutable processes
 //NL    casestring partnerLink;
@@ -505,10 +505,10 @@ tFrom:
 //NL    casestring expression;
 //NL    casestring opaque; // only abstract processes
 
-    casestring literalValue = mkcasestring(""); // used in case of <from>literal</from>
+//NL    casestring literalValue = mkcasestring(""); // used in case of <from>literal</from>
 
     /// additional attribute containing the unique variable name    
-    casestring variableID;
+//NL    casestring variableID;
     
     integer id;
   }
@@ -523,7 +523,7 @@ tTo:
 //NL    casestring property;
 
     /// additional attribute containing the unique variable name    
-    casestring variableID;
+//NL    casestring variableID;
     
     integer id;
   }
@@ -565,7 +565,7 @@ tThrow:
 //NL    casestring faultVariable;
 
     /// additional attribute containing the unique variable name    
-    casestring variableID;
+//NL    casestring variableID;
 
     integer negativeControlFlow;
     integer id;
@@ -584,7 +584,7 @@ tCompensate:
 //NL    casestring joinCondition;
 //NL    casestring suppressJoinFailure;
 
-    casestring scope;
+//NL    casestring scope;
 
     /// additional attribute used to identify the correct pattern
     bool inFaultHandler = true;

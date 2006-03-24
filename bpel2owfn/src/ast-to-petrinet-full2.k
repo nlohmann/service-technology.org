@@ -49,11 +49,11 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: reinert $
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/03/24 15:02:26 $
+ *          - last changed: \$Date: 2006/03/24 15:04:42 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  */
 %}
 
@@ -1899,7 +1899,8 @@ This=StandardElements(NiltTarget_list(), a) ->
  * suppressJoinFailure="no".
  *****************************************************************************/
 
-This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure == mkcasestring("no")) ->
+This=StandardElements(a, NiltSource_list()) provided 
+(symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "no") ->
   [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 23\n");
@@ -1966,7 +1967,8 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
  * suppressJoinFailure="yes".
  *****************************************************************************/
 
-This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure == mkcasestring("yes")) ->
+This=StandardElements(a, NiltSource_list()) provided
+(symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "yes") ->
   [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 24\n");
@@ -2033,7 +2035,8 @@ This=StandardElements(a, NiltSource_list()) provided (This->suppressJoinFailure 
  * case of suppressJoinFailure="yes".
  *****************************************************************************/
 
-This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("yes")) ->
+This=StandardElements(a,b) provided 
+(symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "yes") ->
   [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 25\n");
@@ -2147,7 +2150,8 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
  * case of suppressJoinFailure="no".
  *****************************************************************************/
 
-This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("no")) ->
+This=StandardElements(a,b) provided 
+(symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "no") ->
   [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 26\n");

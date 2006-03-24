@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/24 15:02:26 $
+ *          - last changed: \$Date: 2006/03/24 15:04:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.161 $
+ * \version \$Revision: 1.162 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -313,7 +313,7 @@ tProcess:
       //symTab.traceST("\t\t\t\t HALLO " + string((att.read($4, "abstractProcess")->name)) + "\n");      
 //NL      $$->queryLanguage = att.read($4, "queryLanguage", $$->queryLanguage);
 //NL      $$->expressionLanguage = att.read($4, "expressionLanguage", $$->expressionLanguage);
-      $$->suppressJoinFailure = att.read($4, "suppressJoinFailure", $$->suppressJoinFailure);
+//DR      $$->suppressJoinFailure = att.read($4, "suppressJoinFailure", $$->suppressJoinFailure);
 //      att.traceAM(string("tProcess: ") + ($$->suppressJoinFailure)->name + string("\n"));      
       att.popSJFStack(); symTab.popSJFStack();
 //NL      $$->enableInstanceCompensation = att.read($4, "enableInstanceCompensation", $$->enableInstanceCompensation);

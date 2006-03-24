@@ -29,11 +29,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $ 
+ *          - last changes of: \$Author: reinert $ 
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/03/24 15:02:26 $
+ *          - last changed: \$Date: 2006/03/24 15:04:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.73 $
+ * \version \$Revision: 1.74 $
  */
 %}
 
@@ -77,7 +77,7 @@ tProcess:
 //NL    casestring targetNamespace;
 //NL    casestring queryLanguage = mkcasestring("http://www.w3.org/TR/1999/REC-xpath-19991116");
 //NL    casestring expressionLanguage = mkcasestring("http://www.w3.org/TR/1999/REC-xpath-19991116");
-    casestring suppressJoinFailure = mkcasestring("no");
+//DR    casestring suppressJoinFailure = mkcasestring("no");
 //NL    casestring enableInstanceCompensation = mkcasestring("no");
 //NL    casestring abstractProcess = mkcasestring("no");
 //NL    casestring xmlns = mkcasestring("http://schemas.xmlsoap.org/ws/2003/03/business-process/");

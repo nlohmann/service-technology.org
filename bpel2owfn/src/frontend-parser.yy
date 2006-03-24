@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/24 13:46:58 $
+ *          - last changed: \$Date: 2006/03/24 13:59:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.157 $
+ * \version \$Revision: 1.158 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -556,7 +556,7 @@ genSymTabEntry_Partner:
   FAULT HANDLERS
 ******************************************************************************/
 
-FaultHandlers:
+tFaultHandlers:
   /* empty */
     { currentSymTabEntryKey = symTab.insert(K_FAULTHANDLERS);
       $$ = implicitFaultHandler();

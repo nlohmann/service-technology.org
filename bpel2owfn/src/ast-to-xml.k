@@ -28,11 +28,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/03/16 15:01:34 $
+ *          - last changed: \$Date: 2006/03/24 10:42:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  */
 %}
 
@@ -56,15 +56,6 @@
 %}
 
 
-
-%{
-/*!
- * \class kc::xml_class
- * \brief Unparse rules: XML
- */
-%}
-%uview xml;
-
 /******************************************************************************/
 
 // All the includes and variables can be used during the unparsing.
@@ -72,24 +63,8 @@
 /* These lines are from bpel-unparse-xml.k */
 #include <iostream>
 #include "bpel-unparse-tools.h"
+#include "ast-printers.h"
 %}
-
-
-
-
-
-
-/******************************************************************************/
-
-// All the includes, variables and structs defined here can be used in the
-// printers below.
-%{
-#include <iostream>
-#include "options.h"
-%}
-
-/******************************************************************************/
-
 
 
 
@@ -402,16 +377,3 @@ Target() ->
 Source() ->
   [xml: { in(); } "<source dpe=\"" $0->dpe "\" ncf=\"" $0->negativeControlFlow "\" />\n"]
 ;
-
-
-
-
-
-/*****************************************************************************/
-// the printer functions
-
-/// printer-function for output on stdout
-void printer(const char *s, uview v)
-{
-  *output << s;
-}

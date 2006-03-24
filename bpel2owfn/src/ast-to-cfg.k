@@ -29,11 +29,11 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/03/23 15:53:06 $
+ *          - last changed: \$Date: 2006/03/24 10:42:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  */
 %}
 
@@ -58,7 +58,6 @@
 %}
 
 
-%uview cfg;
 
 /******************************************************************************/
 
@@ -586,5 +585,3 @@ This=StandardElements(a,b) ->
     }
   ]
 ;
-
-

@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/03/24 09:16:34 $
+ *          - last changed: \$Date: 2006/03/24 10:42:16 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.168 $
+ * \version \$Revision: 1.169 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -62,7 +62,7 @@
 %}
 
 
-%uview petrinet;
+
 
 /******************************************************************************/
 
@@ -75,6 +75,7 @@
 #include "symbol-table.h"
 #include "options.h"
 #include "bpel-unparse-tools.h"
+#include "ast-printers.h"
 
 using namespace std;
 
@@ -4063,12 +4064,3 @@ This=StandardElements(a,b) provided (This->suppressJoinFailure == mkcasestring("
     }
   ]
 ;
-
-
-/*****************************************************************************/
-// the printer functions
-
-/// "fake" printer-function
-void pseudoPrinter(const char *s, uview v)
-{
-}

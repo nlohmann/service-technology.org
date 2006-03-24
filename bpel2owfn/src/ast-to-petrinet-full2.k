@@ -27,27 +27,43 @@
  * This file defines and implements the conversion of each BPEL activity to its
  * associated Petri net pattern followed by neccessary merge operations.
  *
+ * Patterns:
+ *   - <empty>
+ *   - <invoke>
+ *   - <receive>
+ *   - <reply>
+ *   - <assign>
+ *   - <wait>
+ *   - <throw>
+ *   - <compensate>
+ *   - <terminate>
+ *   - <flow>
+ *   - <switch>
+ *   - <while>
+ *   - <sequence>
+ *   - <pick>
+ *   - <scope>
+ *   - standard elements
+ *   
+ *   
+ *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
  *          - last changes of: \$Author: nlohmann $
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/03/24 13:15:46 $
+ *          - last changed: \$Date: 2006/03/24 14:09:40 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universitï¿½t zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  * \note    This file was created using Kimwitu++ reading file
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.1 $
- *
- * \todo
- *          - (nlohmann) outsource <compensate />-elements
- *          - (nlohmann) variables in communicating actions should be optional
+ * \version \$Revision: 1.2 $
  */
 %}
 

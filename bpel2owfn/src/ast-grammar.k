@@ -29,11 +29,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $ 
+ *          - last changes of: \$Author: gierds $ 
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/03/23 16:30:12 $
+ *          - last changed: \$Date: 2006/03/24 14:49:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.71 $
+ * \version \$Revision: 1.72 $
  */
 %}
 
@@ -252,7 +252,7 @@ tOnMessage:
     casestring variableID;
 
     /// additional attribute containing the channel name
-    casestring channelID;
+//NL    casestring channelID;
 
     /// additional attribute for DPE
     integer dpe = mkinteger(0);
@@ -400,7 +400,7 @@ tInvoke:
 //NL    casestring variableIDout;
 
     /// additional attribute containing the channel name
-    casestring channelID;
+//NL    casestring channelID;
 
     /// additional attribute for DPE
     integer dpe = mkinteger(0);
@@ -432,7 +432,7 @@ tReceive:
 //NL    casestring variableID;
 
     /// additional attribute containing the channel name
-    casestring channelID;
+//NL    casestring channelID;
     
     integer negativeControlFlow;
     integer id;
@@ -461,7 +461,7 @@ tReply:
 //NL    casestring variableID;
 
     /// additional attribute containing the channel name
-    casestring channelID;
+//NL    casestring channelID;
 
     integer negativeControlFlow;
     integer id;

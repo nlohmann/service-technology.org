@@ -49,11 +49,11 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/03/24 14:09:40 $
+ *          - last changed: \$Date: 2006/03/24 14:49:28 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.3 $
  */
 %}
 
@@ -182,7 +182,7 @@ This=Invoke(a,b) provided ((dynamic_cast<STCommunicationActivity*> (symTab.looku
       Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
-      TheNet->newArc(t2, TheNet->findPlace("out." + string(This->channelID->name)));
+      TheNet->newArc(t2, TheNet->findPlace("out." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)));
       t2->communicating = true;
 
 
@@ -234,13 +234,13 @@ This=Invoke(a,b) provided (!(dynamic_cast<STCommunicationActivity*> (symTab.look
       TheNet->newArc(t1, p2);
 
       Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(t2, TheNet->findPlace("out." + string(This->channelID->name)));
+      TheNet->newArc(t2, TheNet->findPlace("out." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)));
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       t2->communicating = true;
 
       Transition *t3 = TheNet->newTransition(prefix + "t3");
-      TheNet->newArc(TheNet->findPlace("in." + string(This->channelID->name)), t3);
+      TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)), t3);
       TheNet->newArc(p3, t3);
       TheNet->newArc(t3, p4);
       t3->communicating = true;
@@ -301,7 +301,7 @@ This=Receive(a,b) ->
       Place *p6 = TheNet->newPlace(prefix + "stopped");
 
       Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(TheNet->findPlace("in." + string(This->channelID->name)), t1);
+      TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)), t1);
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       t1->communicating = true;
@@ -362,7 +362,7 @@ This=Reply(a,b) ->
       TheNet->newArc(t1, p2);
 
       Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(t2, TheNet->findPlace("out." + string(This->channelID->name)));
+      TheNet->newArc(t2, TheNet->findPlace("out." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)));
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       t2->communicating = true;
@@ -1337,7 +1337,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	Place *p10 = TheNet->newPlace(newPrefix + "p10");
 
 	Transition *t2 = TheNet->newTransition(newPrefix + "t2");
-	TheNet->newArc(TheNet->findPlace("in." + string(ThisBranch->channelID->name)), t2);
+	TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(ThisBranch->id)))->channelId)), t2);
 	TheNet->newArc(TheNet->findPlace(TheActivity, ".internal.TimeStamp"), t2);
 	TheNet->newArc(t2, p3);
 	t2->communicating = true;

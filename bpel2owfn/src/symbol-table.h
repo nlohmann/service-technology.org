@@ -25,7 +25,7 @@
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created:
@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.29 $: 
+ * \version \$Revision: 1.30 $: 
  *
  */
 
@@ -45,6 +45,7 @@
 
 #include <map>
 #include <list>
+#include <set>
 
 #include "bpel-attributes.h"
 
@@ -747,6 +748,11 @@ class STProcess: public STScope
     /// a list of partner links declared in the process
     list<STPartnerLink*> partnerLinks;
 
+    /// list of incoming channels for the process
+    set<std::string> inChannels;
+    /// list of outgoing channels for the process
+    set<std::string> outChannels;
+
     /// true if process is abstract (i.e. a business protocol)
     bool abstractProcess;
 
@@ -755,6 +761,10 @@ class STProcess: public STScope
 
     /// checks if a PartnerLink is declared in the Process
     STPartnerLink * checkPartnerLink(std::string);
+
+    /// adds a Channel to the Process
+    std::string addChannel(std::string, bool isInChannel);
+
 };
 
 
@@ -866,7 +876,7 @@ class STThrow: public STElement, public SymbolTableEntry
 };
 
 
-
+extern std::string channelName(std::string myportType, std::string myoperation, std::string mypartnerLink);
 
 #endif
 

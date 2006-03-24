@@ -29,11 +29,11 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/03/24 10:42:16 $
+ *          - last changed: \$Date: 2006/03/24 14:49:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  */
 %}
 
@@ -169,7 +169,7 @@ Invoke(a,b) ->
 	  trace(TRACE_DEBUG, "[CFG] Invoke\n");
 	  CFGBlock * block = new CFGBlock(CFGInvoke, $0->id, "Invoke");
 
-	  block->channel_name = $0->channelID->name; 
+	  block->channel_name = (dynamic_cast<STCommunicationActivity*>(symTab.lookup($0->id)))->channelId; 
 
 	  cfgMap[intToString($0->id->value)] = block; 
   	}
@@ -187,7 +187,7 @@ Receive(a,b) ->
 	  trace(TRACE_DEBUG, "[CFG] Receive\n");
 	  CFGBlock * block = new CFGBlock(CFGReceive, $0->id, "Receive"); 
 
-	  block->channel_name = $0->channelID->name; 
+	  block->channel_name = (dynamic_cast<STCommunicationActivity*>(symTab.lookup($0->id)))->channelId; 
 
 	  cfgMap[intToString($0->id->value)] = block; 
     	}
@@ -205,7 +205,7 @@ Reply(a,b) ->
 	  trace(TRACE_DEBUG, "[CFG] Reply\n");
 	  CFGBlock * block = new CFGBlock(CFGReply, $0->id, "Reply"); 
 
-	  block->channel_name = $0->channelID->name; 
+	  block->channel_name = (dynamic_cast<STCommunicationActivity*>(symTab.lookup($0->id)))->channelId; 
 
 	  cfgMap[intToString($0->id->value)] = block; 
   	}

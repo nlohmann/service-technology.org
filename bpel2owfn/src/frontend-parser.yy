@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/24 14:10:12 $
+ *          - last changed: \$Date: 2006/03/24 14:49:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.159 $
+ * \version \$Revision: 1.160 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -779,6 +779,10 @@ tOnMessage:
       }
       stOnMessage->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
       stOnMessage->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
+      stOnMessage->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
+								 symTab.readAttributeValue($2, "operation"), 
+								 symTab.readAttributeValue($2, "partnerLink")),
+								 true);
 
 //NL      $$->partnerLink = att.read($3, "partnerLink");
 //NL      $$->portType = att.read($3, "portType");
@@ -788,9 +792,9 @@ tOnMessage:
 //NL      $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 //NL				      $$->operation->name, 
 //NL				      $$->partnerLink->name), true); 
-      $$->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
-				      symTab.readAttributeValue($2, "operation"), 
-				      symTab.readAttributeValue($2, "partnerLink")), true); 
+//NL      $$->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
+//NL				      symTab.readAttributeValue($2, "operation"), 
+//NL				      symTab.readAttributeValue($2, "partnerLink")), true); 
       $$->dpe = symMan.needsDPE();
     }
 ;
@@ -1200,10 +1204,14 @@ tInvoke:
 //NL          invoke->channelID = symMan.addChannel(new csChannel(invoke->portType->name, 
 //NL					  invoke->operation->name, 
 //NL					  invoke->partnerLink->name), false);
-          invoke->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
-    				          symTab.readAttributeValue($2, "operation"), 
-				          symTab.readAttributeValue($2, "partnerLink")), false);
-
+//NL          invoke->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
+//NL    				          symTab.readAttributeValue($2, "operation"), 
+//NL				          symTab.readAttributeValue($2, "partnerLink")), false);
+//NL
+	  stInvoke->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
+								 symTab.readAttributeValue($2, "operation"), 
+								 symTab.readAttributeValue($2, "partnerLink")),
+								 false);
         }
 //NL        if (string(invoke->variableIDout->name) != "")
         if (symTab.readAttributeValue($2, "outputVariable") != "")
@@ -1211,9 +1219,13 @@ tInvoke:
 //NL          invoke->channelID = symMan.addChannel(new csChannel(invoke->portType->name, 
 //NL					  invoke->operation->name, 
 //NL					  invoke->partnerLink->name), true);
-          invoke->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
-    				          symTab.readAttributeValue($2, "operation"), 
-				          symTab.readAttributeValue($2, "partnerLink")), true);
+//NL          invoke->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
+//NL    				          symTab.readAttributeValue($2, "operation"), 
+//NL				          symTab.readAttributeValue($2, "partnerLink")), true);
+	  stInvoke->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
+								 symTab.readAttributeValue($2, "operation"), 
+								 symTab.readAttributeValue($2, "partnerLink")),
+								 true);
         }
 	scope->dpe = invoke->dpe = mkinteger(0);
         // symMan.needsDPE();
@@ -1286,9 +1298,13 @@ tInvoke:
 //NL          invoke->channelID = symMan.addChannel(new csChannel(invoke->portType->name, 
 //NL					  invoke->operation->name, 
 //NL					  invoke->partnerLink->name), false);
-          invoke->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
-    				          symTab.readAttributeValue($2, "operation"), 
-				          symTab.readAttributeValue($2, "partnerLink")), false);
+//NL          invoke->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
+//NL    				          symTab.readAttributeValue($2, "operation"), 
+//NL				          symTab.readAttributeValue($2, "partnerLink")), false);
+	  stInvoke->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
+								 symTab.readAttributeValue($2, "operation"), 
+								 symTab.readAttributeValue($2, "partnerLink")),
+								 false);
         }
 //NL        if (string(invoke->variableIDout->name) != "")
         if (symTab.readAttributeValue($2, "outputVariable") != "")
@@ -1296,9 +1312,13 @@ tInvoke:
 //NL          invoke->channelID = symMan.addChannel(new csChannel(invoke->portType->name, 
 //NL					  invoke->operation->name, 
 //NL					  invoke->partnerLink->name), true);
-          invoke->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
-    				          symTab.readAttributeValue($2, "operation"), 
-				          symTab.readAttributeValue($2, "partnerLink")), true);
+//NL          invoke->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
+//NL    				          symTab.readAttributeValue($2, "operation"), 
+//NL				          symTab.readAttributeValue($2, "partnerLink")), true);
+	  stInvoke->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
+								 symTab.readAttributeValue($2, "operation"), 
+								 symTab.readAttributeValue($2, "partnerLink")),
+								 true);
         }
         invoke->dpe = symMan.needsDPE();
         if ($7->hasTarget)
@@ -1374,10 +1394,14 @@ tInvoke:
 //NL        invoke->channelID = symMan.addChannel(new csChannel(invoke->portType->name, 
 //NL					invoke->operation->name, 
 //NL					invoke->partnerLink->name), false);
-        invoke->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
-    				        symTab.readAttributeValue($2, "operation"), 
-				        symTab.readAttributeValue($2, "partnerLink")), false);
+//NL        invoke->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
+//NL    				        symTab.readAttributeValue($2, "operation"), 
+//NL				        symTab.readAttributeValue($2, "partnerLink")), false);
 
+	  stInvoke->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
+								 symTab.readAttributeValue($2, "operation"), 
+								 symTab.readAttributeValue($2, "partnerLink")),
+								 false);
       }
 //NL      if (string(invoke->variableIDout->name) != "")
       if (symTab.readAttributeValue($2, "outputVariable") != "")
@@ -1385,9 +1409,13 @@ tInvoke:
 //NL        invoke->channelID = symMan.addChannel(new csChannel(invoke->portType->name, 
 //NL					invoke->operation->name, 
 //NL					invoke->partnerLink->name), true);
-        invoke->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
-    				        symTab.readAttributeValue($2, "operation"), 
-				        symTab.readAttributeValue($2, "partnerLink")), true);
+//NL        invoke->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
+//NL    				        symTab.readAttributeValue($2, "operation"), 
+//NL				        symTab.readAttributeValue($2, "partnerLink")), true);
+	  stInvoke->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
+								 symTab.readAttributeValue($2, "operation"), 
+								 symTab.readAttributeValue($2, "partnerLink")),
+								 true);
       }
       invoke->dpe = kc::mkinteger(0);
       invoke->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
@@ -1442,6 +1470,10 @@ tReceive:
       }
       stReceive->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
       stReceive->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
+      stReceive->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
+								 symTab.readAttributeValue($2, "operation"), 
+								 symTab.readAttributeValue($2, "partnerLink")),
+								 true);
 
 
 //NL      $$->name = att.read($3, "name");
@@ -1462,9 +1494,9 @@ tReceive:
 //NL      $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 //NL				      $$->operation->name, 
 //NL				      $$->partnerLink->name), true);
-      $$->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
-				      symTab.readAttributeValue($2, "operation"), 
-				      symTab.readAttributeValue($2, "partnerLink")), true);
+//NL      $$->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
+//NL				      symTab.readAttributeValue($2, "operation"), 
+//NL				      symTab.readAttributeValue($2, "partnerLink")), true);
       if ($7->hasTarget)
       {
 	symMan.remDPEstart();
@@ -1505,6 +1537,10 @@ tReceive:
       }
       stReceive->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
       stReceive->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
+      stReceive->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
+								 symTab.readAttributeValue($2, "operation"), 
+								 symTab.readAttributeValue($2, "partnerLink")),
+								 true);
 
       $$ = Receive(noLinks, NiltCorrelation_list());
 //NL      $$->name = att.read($3, "name");
@@ -1525,9 +1561,9 @@ tReceive:
 //NL      $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 //NL				      $$->operation->name, 
 //NL				      $$->partnerLink->name), true); 
-      $$->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
-				      symTab.readAttributeValue($2, "operation"), 
-				      symTab.readAttributeValue($2, "partnerLink")), true);
+//NL      $$->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
+//NL				      symTab.readAttributeValue($2, "operation"), 
+//NL				      symTab.readAttributeValue($2, "partnerLink")), true);
     }
 ;
 
@@ -1573,6 +1609,10 @@ tReply:
       }
       stReply->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
       stReply->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
+      stReply->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
+								 symTab.readAttributeValue($2, "operation"), 
+								 symTab.readAttributeValue($2, "partnerLink")),
+								 false);
 
 //NL      $$->name = att.read($3, "name");
 //NL      $$->joinCondition = 
@@ -1593,9 +1633,9 @@ tReply:
 //NL				      $$->operation->name, 
 //NL				      $$->partnerLink->name), false);
 //NL      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
-      $$->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
-				      symTab.readAttributeValue($2, "operation"), 
-				      symTab.readAttributeValue($2, "partnerLink")), false);
+//NL      $$->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
+//NL				      symTab.readAttributeValue($2, "operation"), 
+//NL				      symTab.readAttributeValue($2, "partnerLink")), false);
       if ($6->hasTarget)
       {
 	symMan.remDPEstart();
@@ -1634,6 +1674,10 @@ tReply:
       }
       stReply->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
       stReply->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
+      stReply->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
+								 symTab.readAttributeValue($2, "operation"), 
+								 symTab.readAttributeValue($2, "partnerLink")),
+								 false);
 
       $$ = Reply(noLinks, NiltCorrelation_list());
 //NL      $$->name = att.read($3, "name");
@@ -1652,9 +1696,9 @@ tReply:
 //NL      $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 //NL				      $$->operation->name, 
 //NL				      $$->partnerLink->name), false);
-      $$->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
-				      symTab.readAttributeValue($2, "operation"), 
-				      symTab.readAttributeValue($2, "partnerLink")), false);
+//NL      $$->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
+//NL				      symTab.readAttributeValue($2, "operation"), 
+//NL				      symTab.readAttributeValue($2, "partnerLink")), false);
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; }
 ;

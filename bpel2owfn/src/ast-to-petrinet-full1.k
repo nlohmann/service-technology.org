@@ -36,11 +36,11 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/03/24 14:09:40 $
+ *          - last changed: \$Date: 2006/03/24 14:49:28 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.171 $
+ * \version \$Revision: 1.172 $
  *
  */
 %}
@@ -89,6 +89,7 @@ extern PetriNet *TheNet;
 // introduced in bpel-syntax.y
 extern SymbolTable symTab;
 extern SymbolManager symMan;
+extern STProcess * stProcess;
 
 /// prefix of the current scope (read by the stop pattern and used to direct
 /// failures to the correct fault_in place)
@@ -124,9 +125,9 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       // Create the interface places.
       // The used lists are filled during parsing mapping each combination of
       // partnerLink, portType and operation to one input (resp. output) place.
-      for (set<string>::iterator in = symMan.inChannels.begin(); in != symMan.inChannels.end(); in++)
+      for (set<string>::iterator in = (stProcess->inChannels).begin(); in != (stProcess->inChannels).end(); in++)
 	TheNet->newPlace("in." + *in, IN);
-      for (set<string>::iterator out = symMan.outChannels.begin(); out != symMan.outChannels.end(); out++)
+      for (set<string>::iterator out = (stProcess->outChannels).begin(); out != (stProcess->outChannels).end(); out++)
 	TheNet->newPlace("out." + *out, OUT);
 
 
@@ -1359,7 +1360,7 @@ This=userDefinedEventHandler(a,b) ->
 	Place *onMessage_p12 = TheNet->newPlace(newPrefix + "p12");
 
 	Transition *onMessage_t2 = TheNet->newTransition(newPrefix + "t2");
-	TheNet->newArc(TheNet->findPlace("in." + string(ThisBranch->channelID->name)), onMessage_t2);
+	TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)), onMessage_t2);
 	TheNet->newArc(onMessage_t2, onMessage_p2);
 	TheNet->newArc(onMessage_p5, onMessage_t2);
 	onMessage_t2->communicating = true;

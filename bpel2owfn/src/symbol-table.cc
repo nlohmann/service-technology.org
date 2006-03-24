@@ -26,7 +26,7 @@
  *
  * \author
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $  
+ *          - last changes of: \$Author: gierds $  
  *          
  * \date
  * 
@@ -2576,6 +2576,26 @@ STPartnerLink * STProcess::checkPartnerLink(std::string name)
   }
 }
 
+/// adds a Channel to the Process
+std::string STProcess::addChannel(std::string channelName, bool isInChannel)
+{
+  trace(TRACE_VERY_DEBUG, "[CS] Adding channel " + channelName + "\n"); 
+  if (isInChannel)
+  {
+    trace(TRACE_VERY_DEBUG, "[CS]  --> incoming channel\n");
+    inChannels.insert(channelName);
+  }
+  else
+  {
+    trace(TRACE_VERY_DEBUG, "[CS]  --> outgoinig channel\n");
+    outChannels.insert(channelName);
+  }
+  // return unique name
+  return channelName;
+
+}
+
+
 
 /********************************************
  * implementation of Receive CLASS
@@ -2821,4 +2841,8 @@ STThrow::STThrow(unsigned int elementId, unsigned int entryKey)
  */
 STThrow::~STThrow() {}
 
+std::string channelName(std::string myportType, std::string myoperation, std::string mypartnerLink)
+{
+  return mypartnerLink + "." + myportType + "." + myoperation;
+}
 

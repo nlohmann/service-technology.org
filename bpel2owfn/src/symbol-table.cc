@@ -2465,6 +2465,57 @@ STProcess::STProcess(unsigned int elementId, unsigned int entryKey)
  */
 STProcess::~STProcess() {}
 
+/*!
+ * adds a PartnerLink to the Process
+ */
+void STProcess::addPartnerLink(STPartnerLink* pl)
+{
+  trace(TRACE_VERY_DEBUG, "[ST] Trying to add PartnerLink with name \"" + symTab.readAttributeValue(pl->entryKey, "name") + "\"\n");
+  if (! partnerLinks.empty())
+  {
+    for (list<STPartnerLink *>::iterator iter = partnerLinks.begin(); iter != partnerLinks.end(); iter++)
+    {
+      if (symTab.readAttributeValue((*iter)->entryKey, "name") == symTab.readAttributeValue(pl->entryKey, "name"))
+      {
+        yyerror(string("Two PartnerLinks with same name\nName of double PartnerLink is \"" 
+		       + symTab.readAttributeValue(pl->entryKey, "name") + "\"\n").c_str());
+      }
+    }
+  }
+
+  partnerLinks.push_back(pl);
+}
+
+/*!
+ * checks if a PartnerLink is declared in the Process
+ */
+STPartnerLink * STProcess::checkPartnerLink(std::string name)
+{
+  if (name == "")
+  {
+    return NULL;
+  }
+
+  trace("[ST] Checking for PartnerLink with name \"" + name + "\"\n");
+  list<STPartnerLink *>::iterator iter;
+  if (! partnerLinks.empty())
+  {
+    for (iter = partnerLinks.begin(); iter != partnerLinks.end(); iter++)
+    {
+      if (symTab.readAttributeValue((*iter)->entryKey, "name") == name)
+      {
+	return (*iter);
+      }
+    }
+  }
+  if (partnerLinks.empty() || iter == partnerLinks.end())
+  {
+    yyerror(string("Name of undefined PartnerLink is \"" 
+	           + name + "\"\n").c_str());
+  }
+}
+
+
 /********************************************
  * implementation of Receive CLASS
  ********************************************/
@@ -2660,7 +2711,7 @@ STCatch::~STCatch() {}
  * constructor
  */
 STOnMessage::STOnMessage(unsigned int elementId, unsigned int entryKey)
- :SymbolTableEntry(elementId, entryKey) 
+ :STCommunicationActivity(elementId, entryKey) 
 {
   variable = NULL;
 }
@@ -2679,7 +2730,7 @@ STOnMessage::~STOnMessage() {}
  * constructor
  */
 STFromTo::STFromTo(unsigned int elementId, unsigned int entryKey)
- :SymbolTableEntry(elementId, entryKey) 
+ :STCommunicationActivity(elementId, entryKey) 
 {
   variable = NULL;
   partnerLink = NULL;

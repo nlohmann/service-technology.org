@@ -25,7 +25,7 @@
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created:
@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.27 $: 
+ * \version \$Revision: 1.28 $: 
  *
  */
 
@@ -549,6 +549,7 @@ class STCommunicationActivity: public STActivity
     STVariable * inputVariable;
     STVariable * outputVariable;
     STVariable * variable;
+    STPartnerLink * partnerLink;
 
     // only used by <invoke>
     bool isAsynchronousInvoke;
@@ -739,6 +740,12 @@ class STProcess: public STScope
 
     /// true if process is abstract (i.e. a business protocol)
     bool abstractProcess;
+
+    /// adds a PartnerLink to the Process
+    void addPartnerLink(STPartnerLink*);
+
+    /// checks if a PartnerLink is declared in the Process
+    STPartnerLink * checkPartnerLink(std::string);
 };
 
 
@@ -794,7 +801,7 @@ class STCatch: public STElement, public SymbolTableEntry
  * An onMessage block.
  * 
  */
-class STOnMessage: public STElement, public SymbolTableEntry
+class STOnMessage: public STCommunicationActivity
 {
   public:
     /// constructor
@@ -804,7 +811,6 @@ class STOnMessage: public STElement, public SymbolTableEntry
     /// destructor
     ~STOnMessage();
 
-    STVariable * variable;
 };
 
 /**
@@ -815,7 +821,7 @@ class STOnMessage: public STElement, public SymbolTableEntry
  * A template for from and to blocks.
  * 
  */
-class STFromTo: public STElement, public SymbolTableEntry
+class STFromTo: public STCommunicationActivity
 {
   public:
     /// constructor
@@ -824,9 +830,6 @@ class STFromTo: public STElement, public SymbolTableEntry
     
     /// destructor
     ~STFromTo();
-
-    STPartnerLink * partnerLink;
-    STVariable * variable;
 
     /// used as <from>literal</from>
     string literal;

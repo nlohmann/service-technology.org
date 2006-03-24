@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/24 12:59:17 $
+ *          - last changed: \$Date: 2006/03/24 13:39:14 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.155 $
+ * \version \$Revision: 1.156 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -531,7 +531,7 @@ tPartnerLink:
 //NL      $$->partnerRole = att.read($3, "partnerRole"); 
       if (inPartners) {
 //NL        symMan.checkPartnerLink($$->name->name);
-        symMan.checkPartnerLink(symTab.readAttributeValue($2, "name"));
+//NL        symMan.checkPartnerLink(symTab.readAttributeValue($2, "name"));
 	stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
 	
       }
@@ -572,7 +572,7 @@ tPartnerLink:
 //NL      $$->partnerRole = att.read($3, "partnerRole");
       if (inPartners) {
 //NL        symMan.checkPartnerLink($$->name->name);
-        symMan.checkPartnerLink(symTab.readAttributeValue($2, "name"));
+//NL        symMan.checkPartnerLink(symTab.readAttributeValue($2, "name"));
       }
       else
       {
@@ -1324,7 +1324,7 @@ tInvoke:
     {
       // automatically create scope?
 //NL      symMan.checkPartnerLink(att.read($3, "partnerLink")->name);
-      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); 
+//NL      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); 
       isInFH.push(false);
       isInCH.push(pair<bool,int>(false,hasCompensate));
       parent[$2] = currentScopeId;
@@ -1586,7 +1586,7 @@ tInvoke:
 //NL      invoke->variableIDin  = symMan.checkVariable(att.read($3, "inputVariable")->name);
 //NL      invoke->variableIDout = symMan.checkVariable(att.read($3, "outputVariable")->name);
 //NL      symMan.checkPartnerLink(invoke->partnerLink->name); 
-      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); 
+//NL      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); 
 //NL      if (string(invoke->variableIDin->name) != "")
       if (symTab.readAttributeValue($2, "inputVariable") != "")
       {
@@ -1699,7 +1699,7 @@ tReceive:
 //NL      $$->operation = att.read($3, "operation");
 //NL      $$->variable = att.read($3, "variable");
 //NL      $$->createInstance = att.read($3, "createInstance", $$->createInstance); 
-      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); 
+//NL      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); 
 //NL      $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
       // symbolTableEntry->variable
 //NL      $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
@@ -1764,7 +1764,7 @@ tReceive:
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; 
 //NL      symMan.checkPartnerLink($$->partnerLink->name); 
-      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); 
+//NL      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); 
 //NL      $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 //NL				      $$->operation->name, 
 //NL				      $$->partnerLink->name), true); 
@@ -1860,7 +1860,7 @@ tReply:
 //NL      $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 //NL				      $$->operation->name, 
 //NL				      $$->partnerLink->name), false);
-      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
+//NL      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
       $$->channelID = symMan.addChannel(new csChannel(symTab.readAttributeValue($2, "portType"), 
 				      symTab.readAttributeValue($2, "operation"), 
 				      symTab.readAttributeValue($2, "partnerLink")), false);
@@ -1916,7 +1916,7 @@ tReply:
 //NL      $$->faultName = att.read($3, "faultName");
 //NL       $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
 //NL      symMan.checkPartnerLink($$->partnerLink->name);
-      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); 
+//NL      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); 
 //NL      $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 //NL				      $$->operation->name, 
 //NL				      $$->partnerLink->name), false);
@@ -2046,7 +2046,8 @@ tFrom:
 //NL      $$->opaque = att.read($3, "opaque"); 
 //NL      $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
 //NL      symMan.checkPartnerLink($$->partnerLink->name);
-      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); }
+//NL      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); 
+    }
 | K_FROM genSymTabEntry_From arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_FROM
     { symTab.checkAttributes($2, $5); //att.check($3, $5, K_FROM);
       STFromTo * stFrom = NULL;
@@ -2075,7 +2076,8 @@ tFrom:
 //NL      $$->literalValue = $5;
 //NL      $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
 //NL      symMan.checkPartnerLink($$->partnerLink->name);
-      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); }
+//NL      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); 
+    }
 | K_FROM genSymTabEntry_From arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2); //att.check($3, K_FROM);
       STFromTo * stFrom = NULL;
@@ -2102,7 +2104,8 @@ tFrom:
 //NL      $$->opaque = att.read($3, "opaque"); 
 //NL      $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
 //NL      symMan.checkPartnerLink($$->partnerLink->name);
-      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); }
+//NL      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); 
+    }
 ;
 
 genSymTabEntry_From:
@@ -2142,7 +2145,8 @@ tTo:
 //NL      $$->property = att.read($3, "property"); 
 //NL      $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
 //NL      symMan.checkPartnerLink($$->partnerLink->name);
-      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); }
+//NL      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
+    }
 | K_TO genSymTabEntry_To arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2); //att.check($3, K_TO);
       STFromTo * stTo = NULL;
@@ -2165,7 +2169,8 @@ tTo:
 //NL      $$->property = att.read($3, "property"); 
 //NL      $$->variableID = symMan.checkVariable(att.read($3, "variable")->name);
 //NL      symMan.checkPartnerLink($$->partnerLink->name);
-      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); }
+//NL      symMan.checkPartnerLink(symTab.readAttributeValue($2, "partnerLink")); 
+    }
 ;
 
 genSymTabEntry_To:

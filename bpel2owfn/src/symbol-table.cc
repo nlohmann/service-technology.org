@@ -2496,7 +2496,7 @@ STPartnerLink * STProcess::checkPartnerLink(std::string name)
     return NULL;
   }
 
-  trace("[ST] Checking for PartnerLink with name \"" + name + "\"\n");
+  trace(TRACE_VERY_DEBUG, "[ST] Checking for PartnerLink with name \"" + name + "\"\n");
   list<STPartnerLink *>::iterator iter;
   if (! partnerLinks.empty())
   {

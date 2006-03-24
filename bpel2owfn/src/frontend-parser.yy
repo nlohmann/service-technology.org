@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/24 13:59:08 $
+ *          - last changed: \$Date: 2006/03/24 14:10:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.158 $
+ * \version \$Revision: 1.159 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -315,7 +315,7 @@ tProcess:
 //NL      $$->expressionLanguage = att.read($4, "expressionLanguage", $$->expressionLanguage);
       $$->suppressJoinFailure = att.read($4, "suppressJoinFailure", $$->suppressJoinFailure);
 //      att.traceAM(string("tProcess: ") + ($$->suppressJoinFailure)->name + string("\n"));      
-      att.popSJFStack();
+      att.popSJFStack(); symTab.popSJFStack();
 //NL      $$->enableInstanceCompensation = att.read($4, "enableInstanceCompensation", $$->enableInstanceCompensation);
 //NL      $$->abstractProcess = att.read($4, "abstractProcess", $$->abstractProcess);
 //NL      $$->xmlns = att.read($4, "xmlns", $$->xmlns);
@@ -1036,7 +1036,7 @@ tEmpty:
 //NL      $$->suppressJoinFailure = 
       $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tEmpty: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
-      att.popSJFStack();
+      att.popSJFStack(); symTab.popSJFStack();
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2; 
       if ($6->hasTarget)
@@ -1070,7 +1070,7 @@ tEmpty:
 //NL      $$->joinCondition = att.read($3, "joinCondition");
 //NL      $$->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tEmpty: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
-      att.popSJFStack();
+      att.popSJFStack(); symTab.popSJFStack();
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; }
 ;
@@ -1271,7 +1271,7 @@ tInvoke:
 //NL        invoke->suppressJoinFailure = $7->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
         $7->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //        att.traceAM(string("tInvoke: ") + (invoke->suppressJoinFailure)->name + string("\n")); // deprecated
-        att.popSJFStack();
+        att.popSJFStack(); symTab.popSJFStack();
 //NL        invoke->partnerLink = att.read($3, "partnerLink");
 //NL        invoke->portType = att.read($3, "portType");
 //NL        invoke->operation = att.read($3, "operation");
@@ -1357,7 +1357,7 @@ tInvoke:
 //NL      invoke->joinCondition = att.read($3, "joinCondition");    
 //NL      invoke->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tInvoke: ") + (invoke->suppressJoinFailure)->name + string("\n")); // deprecated
-      att.popSJFStack();
+      att.popSJFStack(); symTab.popSJFStack();
 //NL      invoke->partnerLink = att.read($3, "partnerLink");
 //NL      invoke->portType = att.read($3, "portType");
 //NL      invoke->operation = att.read($3, "operation");
@@ -1450,7 +1450,7 @@ tReceive:
 //NL      $$->suppressJoinFailure = 
       $7->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tReceive: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
-      att.popSJFStack();
+      att.popSJFStack(); symTab.popSJFStack();
 //NL      $$->partnerLink = att.read($3, "partnerLink");
 //NL      $$->portType = att.read($3, "portType");
 //NL      $$->operation = att.read($3, "operation");
@@ -1511,7 +1511,7 @@ tReceive:
 //NL      $$->joinCondition = att.read($3, "joinCondition");     
 //NL      $$->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tReceive: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
-      att.popSJFStack();
+      att.popSJFStack(); symTab.popSJFStack();
 //NL      $$->partnerLink = att.read($3, "partnerLink");
 //NL      $$->portType = att.read($3, "portType");
 //NL      $$->operation = att.read($3, "operation");
@@ -1580,7 +1580,7 @@ tReply:
 //NL      $$->suppressJoinFailure =
      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tReply: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
-      att.popSJFStack();
+      att.popSJFStack(); symTab.popSJFStack();
 //NL      $$->partnerLink = att.read($3, "partnerLink");
 //NL      $$->portType = att.read($3, "portType");
 //NL      $$->operation = att.read($3, "operation");
@@ -1640,7 +1640,7 @@ tReply:
 //NL      $$->joinCondition = att.read($3, "joinCondition");    
 //NL      $$->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tReply: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
-      att.popSJFStack();
+      att.popSJFStack(); symTab.popSJFStack();
 //NL      $$->partnerLink = att.read($3, "partnerLink");
 //NL      $$->portType = att.read($3, "portType");
 //NL      $$->operation = att.read($3, "operation");
@@ -1693,7 +1693,7 @@ tAssign:
 //NL      $$->suppressJoinFailure =
       $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tAssign: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
-      att.popSJFStack();
+      att.popSJFStack(); symTab.popSJFStack();
       if ($6->hasTarget)
       {
 	symMan.remDPEstart();
@@ -1906,7 +1906,7 @@ tWait:
 //NL      $$->suppressJoinFailure =
       $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tWait: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
-      att.popSJFStack();      
+      att.popSJFStack(); symTab.popSJFStack();      
       $$->For = att.read($3, "for"); // "for" is a keyword
       $$->until = att.read($3, "until");
       if ($6->hasTarget)
@@ -1941,7 +1941,7 @@ tWait:
 //NL      $$->joinCondition = att.read($3, "joinCondition");    
 //NL      $$->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tWait: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
-      att.popSJFStack();      
+      att.popSJFStack(); symTab.popSJFStack();      
       $$->For = att.read($3, "for"); // "for" is a keyword
       $$->until = att.read($3, "until");
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
@@ -1994,7 +1994,7 @@ tThrow:
 //NL      $$->suppressJoinFailure =
       $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tThrow: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
-      att.popSJFStack();      
+      att.popSJFStack(); symTab.popSJFStack();      
 //NL      $$->faultName = att.read($3, "faultName");
 //NL      $$->faultVariable = att.read($3, "faultVariable");
 //NL      $$->variableID = symMan.checkVariable(att.read($3, "faultVariable")->name);
@@ -2041,7 +2041,7 @@ tThrow:
 //NL      $$->joinCondition = att.read($3, "joinCondition");   
 //NL      $$->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tThrow: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
-      att.popSJFStack();
+      att.popSJFStack(); symTab.popSJFStack();
 //NL      $$->faultName = att.read($3, "faultName");
 //NL      $$->faultVariable = att.read($3, "faultVariable");
 //NL      $$->variableID = symMan.checkVariable(att.read($3, "faultVariable")->name);
@@ -2106,7 +2106,7 @@ tCompensate:
 //NL      $$->suppressJoinFailure =
       $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tCompensate: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
-      att.popSJFStack();
+      att.popSJFStack(); symTab.popSJFStack();
 //NL      $$->scope = att.read($3, "scope");
       if ($6->hasTarget)
       {
@@ -2163,7 +2163,7 @@ tCompensate:
 //NL      $$->joinCondition = att.read($3, "joinCondition");     
 //NL      $$->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tCompensate: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
-      att.popSJFStack();
+      att.popSJFStack(); symTab.popSJFStack();
 //NL      $$->scope = att.read($3, "scope");
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; }
@@ -2203,7 +2203,7 @@ tTerminate:
 //NL      $$->suppressJoinFailure =
       $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tTerminate: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
-      att.popSJFStack();
+      att.popSJFStack(); symTab.popSJFStack();
       if ($6->hasTarget)
       {
 	symMan.remDPEstart();
@@ -2236,7 +2236,7 @@ tTerminate:
 //NL      $$->joinCondition = att.read($3, "joinCondition");     
 //NL      $$->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tTerminate: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
-      att.popSJFStack();
+      att.popSJFStack(); symTab.popSJFStack();
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; }
 ;
@@ -2278,7 +2278,7 @@ tFlow:
 //NL      $$->suppressJoinFailure =
       $7->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tFlow: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
-      att.popSJFStack();
+      att.popSJFStack(); symTab.popSJFStack();
       $$->dpe = mkinteger((symMan.needsDPE())->value);
       if ($7->hasTarget)
       {
@@ -2404,7 +2404,7 @@ tSwitch:
 //NL      $$->suppressJoinFailure =
       $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tSwitch: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
-      att.popSJFStack();
+      att.popSJFStack(); symTab.popSJFStack();
       symMan.remDPEstart();
       $$->dpe = symMan.needsDPE();
       if ($6->hasTarget)
@@ -2549,7 +2549,7 @@ tWhile:
 //NL      $$->suppressJoinFailure =
       $6->suppressJoinFailure = att.read($3, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tWhile: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
-      att.popSJFStack();
+      att.popSJFStack(); symTab.popSJFStack();
       $$->condition = att.read($3, "condition");
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2; 
@@ -2595,7 +2595,7 @@ tSequence:
 //NL      $$->suppressJoinFailure =
       $6->suppressJoinFailure = att.read($3, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tSequence: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
-      att.popSJFStack();
+      att.popSJFStack(); symTab.popSJFStack();
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2; 
       $$->dpe = mkinteger((symMan.needsDPE())->value);
@@ -2656,7 +2656,7 @@ tPick:
 //NL      $$->suppressJoinFailure =
       $6->suppressJoinFailure = att.read($3, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tPick: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
-      att.popSJFStack();
+      att.popSJFStack(); symTab.popSJFStack();
 //NL      $$->createInstance = att.read($3, "createInstance", $$->createInstance);
       symMan.remDPEstart();
       $$->dpe = symMan.needsDPE();
@@ -2734,7 +2734,7 @@ tScope:
 //NL      $$->suppressJoinFailure =
       $7->suppressJoinFailure = att.read($3, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
 //      att.traceAM(string("tScope: ") + ($$->suppressJoinFailure)->name + string("\n")); // deprecated
-      att.popSJFStack();
+      att.popSJFStack(); symTab.popSJFStack();
 //NL      $$->variableAccessSerializable = att.read($3, "variableAccessSerializable", $$->variableAccessSerializable);
       $$->negativeControlFlow = $7->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $7->parentId = $2;

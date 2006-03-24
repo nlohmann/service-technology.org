@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/03/23 16:30:13 $
+ *          - last changed: \$Date: 2006/03/24 09:16:34 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.167 $
+ * \version \$Revision: 1.168 $
  *
  * \todo
  *          - (nlohmann) outsource <compensate />-elements
@@ -3679,9 +3679,9 @@ This=StandardElements(NiltTarget_list(), a) ->
       // t1 for dead path elimination.
       foreach (link; tSource_list a)
       {
-	STLink *linkST = dynamic_cast<STLink*> (symTab.lookup(link->id));
-	Place *p8 = TheNet->findPlace("!link." + string(linkST->name));
-	Place *p10 = TheNet->findPlace("link." + string(linkST->name));
+//	STLink *linkST = dynamic_cast<STLink*> (symTab.lookup(link->id));
+	Place *p8 = TheNet->findPlace("!link." + string(link->linkID->name));
+	Place *p10 = TheNet->findPlace("link." + string(link->linkID->name));
 
 	TheNet->newArc(p8, t2);
 	TheNet->newArc(t2, p10);

@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/24 14:49:27 $
+ *          - last changed: \$Date: 2006/03/24 15:02:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.160 $
+ * \version \$Revision: 1.161 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -787,7 +787,7 @@ tOnMessage:
 //NL      $$->partnerLink = att.read($3, "partnerLink");
 //NL      $$->portType = att.read($3, "portType");
 //NL      $$->operation = att.read($3, "operation");
-      $$->variableID  = symMan.checkVariable(att.read($3, "variable")->name);
+//NL      $$->variableID  = symMan.checkVariable(att.read($3, "variable")->name);
 //NL      $$->variable = att.read($3, "variable"); 
 //NL      $$->channelID = symMan.addChannel(new csChannel($$->portType->name, 
 //NL				      $$->operation->name, 
@@ -872,11 +872,11 @@ tVariable:
 //NL				     $$->messageType->name, 
 //NL				     $$->type->name, 
 //NL				     $$->element->name)); 
-      $$->variableID = symMan.addVariable( 
-	              new csVariable(symTab.readAttributeValue($2, "name"), 
-				     symTab.readAttributeValue($2, "messageType"), 
-				     symTab.readAttributeValue($2, "type"), 
-				     symTab.readAttributeValue($2, "element"))); 
+//NL      $$->variableID =
+     symMan.addVariable(new csVariable(symTab.readAttributeValue($2, "name"), 
+			  	       symTab.readAttributeValue($2, "messageType"), 
+				       symTab.readAttributeValue($2, "type"), 
+				       symTab.readAttributeValue($2, "element"))); 
       stVar->name = currentSTScope->addVariable(stVar);
     }
 | K_VARIABLE genSymTabEntry_Variable
@@ -902,11 +902,11 @@ tVariable:
 //NL				     $$->messageType->name, 
 //NL				     $$->type->name, 
 //NL				     $$->element->name)); 
-      $$->variableID = symMan.addVariable( 
-	              new csVariable(symTab.readAttributeValue($2, "name"), 
-				     symTab.readAttributeValue($2, "messageType"), 
-				     symTab.readAttributeValue($2, "type"), 
-				     symTab.readAttributeValue($2, "element"))); 
+//NL      $$->variableID =
+     symMan.addVariable(new csVariable(symTab.readAttributeValue($2, "name"), 
+				       symTab.readAttributeValue($2, "messageType"), 
+				       symTab.readAttributeValue($2, "type"), 
+				       symTab.readAttributeValue($2, "element"))); 
       stVar->name = currentSTScope->addVariable(stVar);
     }
 ;

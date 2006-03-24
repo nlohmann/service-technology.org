@@ -29,11 +29,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $ 
+ *          - last changes of: \$Author: nlohmann $ 
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/03/24 14:49:27 $
+ *          - last changed: \$Date: 2006/03/24 15:02:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.72 $
+ * \version \$Revision: 1.73 $
  */
 %}
 
@@ -249,7 +249,7 @@ tOnMessage:
 //NL    casestring variable;
 
     /// additional attribute containing the unique variable name    
-    casestring variableID;
+//NL    casestring variableID;
 
     /// additional attribute containing the channel name
 //NL    casestring channelID;
@@ -312,7 +312,7 @@ tVariable:
 //NL    casestring element;
 
     /// additional attribute containing the unique variable name    
-    casestring variableID;
+//NL    casestring variableID;
     
     integer id;
   }

@@ -25,7 +25,7 @@
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date
  *          - created:
@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.28 $: 
+ * \version \$Revision: 1.29 $: 
  *
  */
 
@@ -131,6 +131,9 @@ class SymbolTable
     map<unsigned int, SymbolTableEntry*> symTab;
 
     ///
+    stack<string> suppressJoinFailureStack;
+
+    ///
     string horizontal;
     
     ///
@@ -153,6 +156,9 @@ class SymbolTable
 	
 	/// returns valid or unvalid depending on attribute already exists or not
 	bool isDuplicate(unsigned int entryKey, STAttribute* attribute);
+
+    ///
+    void checkAttributeSJF(unsigned int entryKey);
 
     ///
     void printSymbolTableEntry(SymbolTableEntry*);
@@ -232,6 +238,9 @@ class SymbolTable
  
     /// return symbol table information string
     string getInformation(kc::integer astId, bool closeTag = false);
+
+    ///
+    void popSJFStack();
     
     ///
     void printSymbolTable();

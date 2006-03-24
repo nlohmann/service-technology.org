@@ -26,7 +26,7 @@
  *
  * \author
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $  
+ *          - last changes of: \$Author: reinert $  
  *          
  * \date
  * 
@@ -710,7 +710,7 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
       {
       	if(attribute->name == A__INITIATE)
       	{
-      	  attribute->name = DV__INITIATE;
+      	  attribute->value = DV__INITIATE;
       	}
       }
       return attribute;
@@ -802,7 +802,7 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
       {
       	if(attribute->name == A__CREATE_INSTANCE)
       	{
-      	  attribute->name = DV__CREATE_INSTANCE;
+      	  attribute->value = DV__CREATE_INSTANCE;
       	}
       }
       return attribute;
@@ -824,27 +824,27 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
       {
       	if(attribute->name == A__QUERY_LANGUAGE)
       	{
-      	  attribute->name = DV__QUERY_LANGUAGE;
+      	  attribute->value = DV__QUERY_LANGUAGE;
       	}
       	else if(attribute->name == A__EXPRESSION_LANGUAGE)
       	{
-      	  attribute->name = DV__EXPRESSION_LANGUAGE;
+      	  attribute->value = DV__EXPRESSION_LANGUAGE;
       	}
       	else if(attribute->name == A__SUPPRESS_JOIN_FAILURE)
       	{
-      	  attribute->name = DV__SUPPRESS_JOIN_FAILURE;
+      	  attribute->value = DV__SUPPRESS_JOIN_FAILURE;
       	}
       	else if(attribute->name == A__ENABLE_INSTANCE_COMPENSATION)
       	{
-          attribute->name = DV__ENABLE_INSTANCE_COMPENSATION;
+          attribute->value = DV__ENABLE_INSTANCE_COMPENSATION;
       	}
       	else if(attribute->name == A__ABSTRACT_PROCESS)
       	{
-      	  attribute->name = DV__ABSTRACT_PROCESS;
+      	  attribute->value = DV__ABSTRACT_PROCESS;
       	}
       	else if(attribute->name == A__XMLNS)
       	{ 
-      	  attribute->name = DV__XMLNS;
+      	  attribute->value = DV__XMLNS;
       	}	      	
       }
 
@@ -867,7 +867,7 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
       {
       	if(attribute->name == A__CREATE_INSTANCE)
       	{
-      	  attribute->name = DV__CREATE_INSTANCE;
+      	  attribute->value = DV__CREATE_INSTANCE;
       	}
       }
       return attribute;
@@ -903,7 +903,7 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
       {
       	if(attribute->name == A__VARIABLE_ACCESS_SERIALIZABLE)
       	{
-      	  attribute->name = DV__VARIABLE_ACCESS_SERIALIZABLE;
+      	  attribute->value = DV__VARIABLE_ACCESS_SERIALIZABLE;
       	}
       }
       return attribute;
@@ -925,7 +925,7 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
       {
       	if(attribute->name == A__TRANSITION_CONDITION)
       	{
-      	  attribute->name = DV__TRANSITION_CONDITION;
+      	  attribute->value = DV__TRANSITION_CONDITION;
       	}
       }
       return attribute;
@@ -1168,8 +1168,8 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
   {
     case K_ASSIGN:
     {
-      traceST("ASSIGN\n");
-      /* no mandatory attributes */        
+      traceST("ASSIGN\n"); 
+      checkAttributeSJF(entryKey);
     }
     break;
 
@@ -1217,7 +1217,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
     case K_COMPENSATE:
     {
       traceST("COMPENSATE\n");
-      /* no mandatory attributes */        
+      checkAttributeSJF(entryKey);
     }
     break;
 
@@ -1302,7 +1302,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
     case K_EMPTY:
     {
       traceST("EMPTY\n");
-      /* */
+      checkAttributeSJF(entryKey);
     }
     break;  
 
@@ -1437,6 +1437,13 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       /* no attributes */
     }
     break;  
+
+    case K_FLOW:
+    {
+      traceST("EVENTHANDLERS\n");
+      checkAttributeSJF(entryKey);
+    }
+    break;  
  
     case K_INVOKE:
     {
@@ -1502,6 +1509,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       {
         printErrorMsg("attribute " + A__OUTPUT_VARIABLE + "=\"" + T__NCNAME + "\" is missing");        
       }*/
+      checkAttributeSJF(entryKey);
     }
     break;  
 
@@ -1718,7 +1726,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
     case K_PICK:
     {
       traceST("PICK\n");
-      /* default attribute */
+      checkAttributeSJF(entryKey);
     }
     break;      
 
@@ -1755,7 +1763,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       {
         printErrorMsg("attribute " + A__TARGET_NAMESPACE + "=\"" + T__ANYURI + "\" is missing");        
       }
-      
+      checkAttributeSJF(entryKey);
     }
     break;    
 
@@ -1810,6 +1818,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       {
         printErrorMsg("attribute " + A__VARIABLE + "=\"" + T__NCNAME + "\" is missing");        
       }
+      checkAttributeSJF(entryKey);
     }
     break;    
 
@@ -1854,21 +1863,22 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       else if(!operationFlag)
       {
         printErrorMsg("attribute " + A__OPERATION + "=\"" + T__NCNAME + "\" is missing");        
-      }      
+      }
+      checkAttributeSJF(entryKey);
     }
     break;    
 
     case K_SCOPE:
     {
       traceST("SCOPE\n");
-      /* default attribute */
+      checkAttributeSJF(entryKey);
     }
     break;
 
     case K_SEQUENCE:
     {
       traceST("SEQUENCE\n");
-      /* no mandatory attributes */      
+      checkAttributeSJF(entryKey);
     }
     break;      
 
@@ -1903,7 +1913,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
     case K_SWITCH:
     {
       traceST("SWITCH\n");
-      /* no mandatory attributes */      
+      checkAttributeSJF(entryKey);
     }
     break;      
 
@@ -1938,7 +1948,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
     case K_TERMINATE:
     {
       traceST("TERMINATE\n");
-      /* no mandatory attributes */
+      checkAttributeSJF(entryKey);
     }
     break;    
 
@@ -1966,7 +1976,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       {
         printErrorMsg("attribute " + A__FAULT_NAME + "=\"" + T__QNAME + "\" is missing");        
       }
-
+      checkAttributeSJF(entryKey);
     }
     break;    
 
@@ -2097,7 +2107,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
     break;  
 
     case K_WAIT:
-      {
+    {
       traceST("WAIT\n");
       
       bool forFlag, untilFlag;
@@ -2139,11 +2149,12 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
           printErrorMsg("both attributes " + A__FOR + "=\"" + T__DURATION_EXPR + "\"  and " + A__UNTIL + "=\"" + T__DEADLINE_EXPR + " are not allowed");                  
         }
       }
-      }
-      break;    
+      checkAttributeSJF(entryKey);
+    }
+    break;    
 
     case K_WHILE:
-      {
+    {
       traceST("WHILE\n");
 
       bool conditionFlag;
@@ -2166,14 +2177,59 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       {
         printErrorMsg("attribute " + A__CONDITION + "=\"" + T__BOOLEAN_EXPR + "\" is missing");        
       }
-  
-      
+      checkAttributeSJF(entryKey);  
     }
     break;      
-
   }
 }
 
+/*!
+ * 
+ */
+void SymbolTable::checkAttributeSJF(unsigned int entryKey)
+{
+  traceST("checkAttributeSJF(" + intToString(entryKey) + ")\n");
+
+  /// pointer of attribute map
+  std::map<string, STAttribute*>& mapOfAttributes = ((dynamic_cast <STElement*> (symTab[entryKey]))->mapOfAttributes);	
+  /// iterator for the embedded map
+  std::map<std::string, STAttribute*>::iterator mapOfAttributesIterator;  
+  mapOfAttributesIterator = mapOfAttributes.begin();
+
+  bool suppressJoinFailureFlag = false;
+      
+  ///
+  while(mapOfAttributesIterator != mapOfAttributes.end())
+  {  
+    if(((*mapOfAttributesIterator).first) == A__SUPPRESS_JOIN_FAILURE)
+    {
+      suppressJoinFailureFlag = true;
+      traceST((*mapOfAttributesIterator).first + "\n");
+    }
+      ++mapOfAttributesIterator;
+  }
+      
+  if(!suppressJoinFailureFlag)
+  {
+     if(readAttributeValue(entryKey, "suppressJoinFailure").empty())
+     {  
+       /// parent BPEL-element attribute value
+       readAttribute(entryKey, "suppressJoinFailure")->value = this->suppressJoinFailureStack.top();
+     }
+  }
+
+  this->suppressJoinFailureStack.push(readAttributeValue(entryKey, "suppressJoinFailure"));
+
+  traceST("SJF\t" + this->suppressJoinFailureStack.top());	
+} 
+
+/*!
+ * 
+ */
+void SymbolTable::popSJFStack()
+{
+  //this->suppressJoinFailureStack.pop();
+}
 
 
 /********************************************
@@ -2262,7 +2318,12 @@ STAttribute::STAttribute(string name, string value)
 {
   this->name = name;
   this->value = value;
-  this->line = yylineno;
+  if(value.empty()) {
+  	this->line = 0;
+  }
+  else {
+  	this->line = yylineno;
+  }
 }
 
 /*!

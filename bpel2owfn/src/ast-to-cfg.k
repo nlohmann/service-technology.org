@@ -29,11 +29,11 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/03/24 14:49:28 $
+ *          - last changed: \$Date: 2006/03/28 09:44:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  */
 %}
 
@@ -254,7 +254,18 @@ Assign(a,b) ->
   WAIT
 ******************************************************************************/
 
-Wait(a) ->
+WaitFor(a) ->
+  [cfg: { 
+	  trace(TRACE_DEBUG, "[CFG] Wait\n");
+	  CFGBlock * block = new CFGBlock(CFGWait, $0->id, "Wait"); 
+
+	  cfgMap[intToString($0->id->value)] = block; 
+  	} 
+	a // standard elements
+  ]
+;
+
+WaitUntil(a) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Wait\n");
 	  CFGBlock * block = new CFGBlock(CFGWait, $0->id, "Wait"); 

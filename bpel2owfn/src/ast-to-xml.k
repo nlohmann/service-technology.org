@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/03/24 10:42:17 $
+ *          - last changed: \$Date: 2006/03/28 09:44:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  */
 %}
 
@@ -252,7 +252,11 @@ To() ->
   WAIT
 ******************************************************************************/
 
-Wait(a) ->
+WaitFor(a) ->
+  [xml: { inup(); } "<wait id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a { indown(); } "</wait>\n"]
+;
+
+WaitUntil(a) ->
   [xml: { inup(); } "<wait id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a { indown(); } "</wait>\n"]
 ;
 

@@ -17,8 +17,8 @@
 @b{About this document:}
 
 This manual describes the installation of @acronym{BPEL2oWFN}, version
-@value{VERSION}, a tool translating business processes described in
-@acronym{BPEL} to open workflow nets (@acronym{oWFN}), last updated
+@value{VERSION}, a tool translating a web service described in
+@acronym{BPEL} into open workflow net (@acronym{oWFN}), last updated
 @value{UPDATED}. Once @acronym{BPEL2oWFN} is installed please read the User's
 Manual which is part of the distribution or can be downloaded from the website
 of @acronym{BPEL2oWFN}
@@ -56,8 +56,8 @@ Bundesministerium f@"ur Bildung und Forschung. See
 Copyright @copyright{} 2005, 2006 Niels Lohmann, Christian Gierds and Dennis
 Reinert.
 
-This file is part of @acronym{BPEL2oWFN}, a tool translating business processes
-described in @acronym{BPEL} to open workflow nets (@acronym{oWFN}).
+This file is part of @acronym{BPEL2oWFN}, a tool translating a web service
+described into @acronym{BPEL} to an open workflow net (@acronym{oWFN}).
 
 @acronym{BPEL2oWFN} is free software; you can redistribute it and/or modify it
 under the terms of the @acronym{GNU} General Public License as published by the
@@ -87,7 +87,7 @@ Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 @title @acronym{BPEL2oWFN}
 @end ifnottex
 
-@subtitle Translating @acronym{BPEL} Processes to Open Workflow Nets
+@subtitle Translating @acronym{BPEL} Processes into Open Workflow Nets
 @subtitle @acronym{BPEL2oWFN} Version @value{VERSION}, @value{UPDATED}
 @vskip 4pt
 @subtitle Installation Manual
@@ -331,11 +331,8 @@ should announce
 
 @cartouche
 @smallexample
-PASS: test1
-PASS: test2
-PASS: test3
 ==================
-All 3 tests passed
+All 4 tests passed
 ==================
 @end smallexample
 @end cartouche
@@ -396,10 +393,10 @@ ignored --- these warnings mostly occur in generated files from Flex, Bison or
 Kimwitu++ and are outside of our scope.
 
 The compilation of @acronym{BPEL2oWFN} was tested on several operating systems
-such as Microsoft Windows (running Cygwin), Linux, Apple MacOS X and Sun OS.
-Anyway, if the compilation fails please make sure you use the most recent
-(stable) versions of the @acronym{GNU} Compiler Collection, Flex, Bison and
-Kimwitu++. If this does not help please send us an electronic mail to
+such as Microsoft Windows (running Cygwin), @acronym{GNU}/Linux, Apple Mac OS X
+and Sun Solaris. Anyway, if the compilation fails please make sure you use the
+most recent (stable) versions of the @acronym{GNU} Compiler Collection, Flex,
+Bison and Kimwitu++. If this does not help please send us an electronic mail to
 @email{nlohmann@@informatik.hu-berlin.de}. Include the version number of your
 distribution (version @value{VERSION} of @value{UPDATED}). Also include in your
 message the output that the make process produced. We will try to answer your
@@ -478,7 +475,7 @@ by Vern Paxon. Copyright @copyright{} 1990 The Regents of the University of
 California. All rights reserved. Flex is available under
 @url{http://www.gnu.org/software/flex/flex.html}.
 
-@item @b{Bison}, The YACC-compatible Parser Generator
+@item @b{Bison}, The @acronym{YACC}-compatible Parser Generator
 Bison is needed to generate the parser of @acronym{BPEL2oWFN}. Bison was
 written by Robert Corbett und Richard Stallman. Copyright @copyright{} 1992,
 1998, 1999, 2003, 2004, 2005 Free Software Foundation, Inc. Bison is available
@@ -540,7 +537,7 @@ building @acronym{BPEL2oWFN}:
 @item Cygwin with cygwin.dll version 1.5.19-4
 @item @acronym{GNU} Compiler Collection 3.4.4
 @item Flex version 2.5.4
-@item @acronym{GNU} Bison version 1.875b
+@item @acronym{GNU} Bison version 2.1
 @item Kimwitu++ version 2.3.8
 @end itemize
 
@@ -566,7 +563,9 @@ BEGIN OF ChangeLog file for BPEL2oWFN Version @value{VERSION}
 
 Most recent version at the end of this section.
 
-@b{Version 1.0 (16 January 2006)}
+
+
+@unnumberedsubsec Version 1.0 (16 January 2006)
 @itemize --
 @item input:
 @itemize
@@ -589,7 +588,9 @@ July 2005.
 @end itemize
 @end itemize
 
-@b{Version 1.1 (24 February 2006)}
+
+
+@unnumberedsubsec Version 1.1 (24 February 2006)
 @itemize --
 @item new output formats:
 @itemize
@@ -633,9 +634,49 @@ extensibility.
 @item fixed bugs:
 @itemize
 @item The generation of all possible types of the @code{<invoke>} activity
-(synchronous, asynchronous, with and without implicit scope) is overworked and
-does produce errorenous nets.
+(synchronous, asynchronous, with and without implicit scope) is overworked.
 @end itemize
+@end itemize
+
+
+
+@unnumberedsubsec Version 1.2 (March 2006)
+@itemize --
+
+@item overworked patterns:
+@itemize 
+@item more parameterized versions of the Stahl-semantics (see version 1.1):
+@itemize
+@item acyclic models (also acyclic event handlers)
+@item models without variables
+@item models without standard faults occuring while handling a fault
+@end itemize
+For more information please refer to the User's Manual.
+@end itemize
+
+
+@item static analysis:
+@itemize 
+@item A control flow graph can be built and used to detect the use of uninitialized
+variables.
+@end itemize
+
+@item miscellaneous:
+@itemize
+@item The command-line parameter @samp{-p finishloop} is renamed to @samp{-p finalloop}.
+@item Structural reduction rules remove all structural dead nodes of the generated Petri
+net model.
+@end itemize
+
+
+@item fixed bugs:
+@itemize 
+@item Pattern of asynchronous @code{<invoke>} activity does no longer receive messages.
+@item Structural reduction rules no longer change the semantics of the @code{<switch>}
+activity.
+@item Structural reduction rules no longer remove the loop transition for deadlock search.
+@end itemize
+
 
 @end itemize
 

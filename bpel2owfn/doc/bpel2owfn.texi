@@ -15,8 +15,8 @@
 @b{About this document:}
 
 This manual is for @acronym{BPEL2oWFN}, Version @value{VERSION}, a
-tool translating business processes described in @acronym{BPEL} to
-open workflow nets (@acronym{oWFN}), last updated @value{UPDATED}.
+tool translating a web service described in @acronym{BPEL} into
+an open workflow net (@acronym{oWFN}), last updated @value{UPDATED}.
 This manual does not explain how to setup or install
 @acronym{BPEL2oWFN}. For this information please read the
 Installation Manual which is part of the distribution or can be
@@ -61,7 +61,7 @@ funded by the Bundesministerium f@"ur Bildung und Forschung. See
 @title @acronym{BPEL2oWFN}
 @end ifnottex
 
-@subtitle Translating @acronym{BPEL} Processes to Open Workflow Nets
+@subtitle Translating @acronym{BPEL} Processes into Open Workflow Nets
 @subtitle @acronym{BPEL2oWFN} Version @value{VERSION}, @value{UPDATED}
 @vskip 4pt
 @subtitle User's Manual

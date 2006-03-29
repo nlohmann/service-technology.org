@@ -352,6 +352,7 @@ unsigned int SymbolTable::insert(unsigned int elementId)
     case K_FROM:                {symTab[this->nextKey()] = new STFromTo(elementId, this->entryKey);} break;
     case K_TO:                  {symTab[this->nextKey()] = new STFromTo(elementId, this->entryKey);} break;
     case K_THROW:               {symTab[this->nextKey()] = new STThrow(elementId, this->entryKey);} break;
+    case K_FLOW:		{symTab[this->nextKey()] = new STFlow(elementId, this->entryKey);} break;
     /* all other */
     default :                   {symTab[this->nextKey()] = new STActivity(elementId, this->entryKey);} break;
   }
@@ -2256,6 +2257,12 @@ SymbolTableEntry::SymbolTableEntry(unsigned int elementId, unsigned int entryKey
 
 
 /*!
+ * constructor
+ */
+SymbolTableEntry::SymbolTableEntry() {}
+
+
+/*!
  * destructor
  */
 SymbolTableEntry::~SymbolTableEntry() {}
@@ -2301,6 +2308,11 @@ unsigned int SymbolTableEntry::getEntryKey()
  */
 STActivity::STActivity(unsigned int elementId, unsigned int entryKey)
  :SymbolTableEntry(elementId, entryKey) {}
+
+/*!
+ * constructor
+ */
+STActivity::STActivity() {}
 
 /*!
  * destructor
@@ -2469,7 +2481,12 @@ STInvoke::~STInvoke() {}
  * constructor
  */
 STLink::STLink(unsigned int elementId, unsigned int entryKey)
- :SymbolTableEntry(elementId, entryKey) {}
+ :SymbolTableEntry(elementId, entryKey) 
+{
+  sourceId = 0;
+  targetId = 0;
+  parentId = 0;
+}
 
 /*!
  * destructor
@@ -2652,7 +2669,9 @@ std::string STScope::addVariable(STVariable * variable)
   }
     
   variables.push_back(variable);
-  return intToString(entryKey) + "." + variable->mapOfAttributes["name"]->value;
+  std::string uniqueId = intToString(entryKey) + "." + variable->mapOfAttributes["name"]->value;
+  symTab.variables.push_back(uniqueId);
+  return uniqueId;
 }
 
 /// checks for a variable with a given name and returns pointer to the object
@@ -2840,6 +2859,72 @@ STThrow::STThrow(unsigned int elementId, unsigned int entryKey)
  * destructor
  */
 STThrow::~STThrow() {}
+
+
+/********************************************
+ * implementation of Flow CLASS
+ ********************************************/
+
+/*!
+ * constructor
+ */
+STFlow::STFlow(unsigned int elementId, unsigned int entryKey)
+ :STActivity(elementId, entryKey) 
+{
+  parentFlowId = 0;
+}
+
+/*!
+ * constructor
+ */
+STFlow::STFlow()
+{
+  parentFlowId = 0;
+}
+
+/*!
+ * destructor
+ */
+STFlow::~STFlow() {}
+
+/*!
+ * adds a Link to the Flow
+ */
+std::string STFlow::addLink(STLink* link)
+{
+  trace(TRACE_VERY_DEBUG, "[ST] Trying to add Link with name \"" + symTab.readAttributeValue(link->entryKey, "name") + "\"\n");
+
+  if (! linkList.empty())
+  {
+    for (list<STLink *>::iterator iter = linkList.begin(); iter != linkList.end(); iter++)
+    {
+      if (symTab.readAttributeValue((*iter)->entryKey, "name") == symTab.readAttributeValue(link->entryKey, "name"))
+      {
+        yyerror(string("Two Links with same name\nName of double Link is \"" + 
+			link->name + "\"\n").c_str());
+      }
+    }
+  }
+  
+  linkList.push_back(link);
+  return intToString(entryKey) + "." + symTab.readAttributeValue(link->entryKey, "name");
+}
+
+/*!
+ * checks if a Link is declared in the Flow
+ */
+STLink * STFlow::checkLink(std::string name)
+{
+  if (name == "")
+  {
+    return NULL;
+  }
+
+  trace(TRACE_VERY_DEBUG, "[ST] Checking for PartnerLink with name \"" + name + "\"\n");
+}
+
+
+
 
 std::string channelName(std::string myportType, std::string myoperation, std::string mypartnerLink)
 {

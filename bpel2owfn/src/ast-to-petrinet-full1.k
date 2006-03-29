@@ -36,11 +36,11 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/03/24 15:02:26 $
+ *          - last changed: \$Date: 2006/03/29 10:01:06 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.173 $
+ * \version \$Revision: 1.174 $
  *
  */
 %}
@@ -150,7 +150,7 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
 
 
       // Create variable places and initially mark them.
-      for (list<string>::iterator variable = symMan.variables.begin(); variable != symMan.variables.end(); variable++)
+      for (list<string>::iterator variable = symTab.variables.begin(); variable != symTab.variables.end(); variable++)
       {
 	Place *v = TheNet->newPlace("variable." + *variable);
 	v->mark();

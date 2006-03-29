@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.30 $: 
+ * \version \$Revision: 1.31 $: 
  *
  */
 
@@ -76,6 +76,7 @@ class STElement;
 class STEnvelope;
 class STEventHandlers;
 class STFaultHandlers;
+class STFlow;
 class STFromTo;
 class STInvoke;
 class STLink;
@@ -245,6 +246,11 @@ class SymbolTable
     
     ///
     void printSymbolTable();
+
+    /***** some additional variables for easier access *****/
+
+    /// list of all used variable names (for place creation)
+    list<std::string> variables;
 };
 
 
@@ -297,7 +303,7 @@ class STActivity: public STElement, public SymbolTableEntry
     STActivity(unsigned int elementId, unsigned int entryKey);
     
     /// destructor
-    ~STActivity();
+    virtual ~STActivity();
 
     /// true if activity is source of a link
     bool isSourceOfLink;
@@ -873,6 +879,32 @@ class STThrow: public STElement, public SymbolTableEntry
     ~STThrow();
 
     STVariable * faultVariable;
+};
+
+/**
+ * \class	STFlow
+ *
+ * \brief
+ * 
+ * The Flow activity.
+ * 
+ */
+class STFlow: public STActivity
+{
+  public:
+    /// constructor
+    STFlow();
+    STFlow(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    ~STFlow();
+
+    list<STLink*> linkList;
+    unsigned int parentFlowId;
+
+    std::string addLink(STLink *);
+
+    STLink * checkLink(std::string); 
 };
 
 

@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/28 09:44:59 $
+ *          - last changed: \$Date: 2006/03/29 10:01:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.164 $
+ * \version \$Revision: 1.165 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -128,7 +128,11 @@ unsigned int currentSymTabEntryKey = 0;
 
 /// needed to tag handlers
 integer currentScopeId;
+/// pointer to the current surrounding Scope symbol table entry
 STScope * currentSTScope = NULL;
+/// pointer to the current surrounding Flow symbol table entry
+STFlow * currentSTFlow = NULL;
+/// pointer to the Process symbol table entry
 STProcess * stProcess = NULL;
 
 // manage attributes
@@ -436,15 +440,10 @@ tPartnerLink:
       $$ = PartnerLink();
       $$->id = $2;
       if (inPartners) {
-//NL        symMan.checkPartnerLink($$->name->name);
-//NL        symMan.checkPartnerLink(symTab.readAttributeValue($2, "name"));
-	stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
-	
+	stProcess->checkPartnerLink(symTab.readAttributeValue($2, "name"));
       }
       else
       {
-        symMan.addPartnerLink(new csPartnerLink(symTab.readAttributeValue($2, "name"), symTab.readAttributeValue($2, "partnerLinkType"), 
-	  		                        symTab.readAttributeValue($2, "myRole"), symTab.readAttributeValue($2, "partnerRole"))); 
 	// cast to STProcess should always happen, since PartnerLinks can only be declared there
 	(dynamic_cast<STProcess*>(currentSTScope))->addPartnerLink(stPartnerLink);
       }
@@ -471,13 +470,10 @@ tPartnerLink:
       $$ = PartnerLink();
       $$->id = $2;
       if (inPartners) {
-//NL        symMan.checkPartnerLink($$->name->name);
-//NL        symMan.checkPartnerLink(symTab.readAttributeValue($2, "name"));
+	stProcess->checkPartnerLink(symTab.readAttributeValue($2, "name"));
       }
       else
       {
-        symMan.addPartnerLink(new csPartnerLink(symTab.readAttributeValue($2, "name"), symTab.readAttributeValue($2, "partnerLinkType"), 
-	  		                        symTab.readAttributeValue($2, "myRole"), symTab.readAttributeValue($2, "partnerRole"))); 
 	// cast to STProcess should always happen, since PartnerLinks can only be declared there
 	(dynamic_cast<STProcess*>(currentSTScope))->addPartnerLink(stPartnerLink);
       }
@@ -1973,10 +1969,43 @@ tFlow:
     }   
   X_NEXT
     {
+      STFlow * stFlow = NULL;
+      try
+      {
+	stFlow = dynamic_cast<STFlow *> (symTab.lookup($2));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      if (currentSTFlow != NULL)
+      {
+	stFlow->parentFlowId = currentSTFlow->entryKey;
+      }
+      currentSTFlow = stFlow;
       symMan.newFlowScope($2);
     } 
   standardElements tLinks activity_list X_SLASH K_FLOW
     { $$ = Flow($7, $8, $9);
+
+      STFlow * stFlow = NULL;
+      try
+      {
+	stFlow = dynamic_cast<STFlow *> (symTab.lookup($2));
+	if (currentSTFlow->parentFlowId != 0)
+	{
+	  currentSTFlow = dynamic_cast<STFlow *> (symTab.lookup(currentSTFlow->parentFlowId));
+	}
+	else
+	{
+	  currentSTFlow = NULL;
+	}
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+
       $7->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
       att.popSJFStack(); symTab.popSJFStack();
       $$->dpe = mkinteger((symMan.needsDPE())->value);
@@ -2049,14 +2078,40 @@ tLink:
   arbitraryAttributes X_NEXT X_SLASH K_LINK
     { symTab.checkAttributes($2);
       $$ = Link();
+
+      STLink * stLink = NULL;
+      try
+      {
+	stLink = dynamic_cast<STLink *> (symTab.lookup($2));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      stLink->name = currentSTFlow->addLink(stLink);
+
       $$->id = $2;
-      symMan.addLink(new csLink(symTab.readAttributeValue($2, "name"))); }
+      symMan.addLink(new csLink(symTab.readAttributeValue($2, "name"))); 
+    }
 | K_LINK genSymTabEntry_Link
   arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2);
       $$ = Link();
+
+      STLink * stLink = NULL;
+      try
+      {
+	stLink = dynamic_cast<STLink *> (symTab.lookup($2));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      stLink->name = currentSTFlow->addLink(stLink);
+
       $$->id = $2;
-      symMan.addLink(new csLink(symTab.readAttributeValue($2, "name"))); }
+      symMan.addLink(new csLink(symTab.readAttributeValue($2, "name"))); 
+    }
 ;
 
 genSymTabEntry_Link:

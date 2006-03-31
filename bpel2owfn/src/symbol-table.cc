@@ -2761,6 +2761,9 @@ STVariable * STScope::checkVariable(std::string name, STScope * callingScope, bo
  */
 void STScope::addLink(STLink * link)
 {
+  trace(TRACE_VERY_DEBUG, "[ST] Adding " + link->name
+ 	                + " to list of inner links for Scope " 
+			+ intToString(entryKey) + "\n");
   enclosedLinks.push_back(link);
   if (parentScopeId != 0)
   {
@@ -3017,7 +3020,48 @@ STLink * STFlow::checkLink(std::string name, unsigned int id, bool isSource)
   return NULL;
 }
 
+/*!
+ * checks if all the Flow's Links are used exactly one time as a Source and Target (resp.)
+ */
+void STFlow::checkLinkUsage()
+{
+  bool problems = false;
+  if (!links.empty())
+  {
+    for (list<STLink *>::iterator iter = links.begin(); iter != links.end(); iter++)
+    {
+      if (!((*iter)->sourceId > 0 && (*iter)->targetId > 0))
+      {
+	problems = true;
+        if ( (*iter)->sourceId > 0 )
+	{
+          trace("The Link " + symTab.readAttributeValue((*iter)->entryKey, "name") + " defined in line " 
+		  + intToString(symTab.readAttribute((*iter)->entryKey, "name")->line) + " was used as source,"
+		  + " but never as a target!\n");
+	}
+	else if ( (*iter)->targetId > 0 )
+	{
+          trace("The Link " + symTab.readAttributeValue((*iter)->entryKey, "name") + " defined in line " 
+		  + intToString(symTab.readAttribute((*iter)->entryKey, "name")->line) + " was used as target,"
+		  + " but never as a source!\n");
+	}
+	else
+	{
+          trace("The Link " + symTab.readAttributeValue((*iter)->entryKey, "name") + " defined in line " 
+		  + intToString(symTab.readAttribute((*iter)->entryKey, "name")->line) + " has never been used!\n");
+	}
+      }
+      if (problems)
+      {
+	yyerror (string("The Flow finished in line " + intToString(0)
+		      + " has problems with the used links! (see above)\n"
+		     ).c_str());
+      }
+    }
+  }
+}
 
+  
 /********************************************
  * implementation of SourceTarget CLASS
  ********************************************/

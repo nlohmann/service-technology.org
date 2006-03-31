@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/29 10:01:05 $
+ *          - last changed: \$Date: 2006/03/31 13:05:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.165 $
+ * \version \$Revision: 1.166 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -2005,6 +2005,7 @@ tFlow:
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
+      stFlow->checkLinkUsage();
 
       $7->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
       att.popSJFStack(); symTab.popSJFStack();
@@ -2519,6 +2520,18 @@ tTarget:
     { symTab.checkAttributes($2); //att.check($3, K_TARGET);
       $$ = Target();
       $$->id = $2;      
+
+      STSourceTarget * stTarget = NULL;
+      try
+      {
+	stTarget = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      stTarget->link = currentSTFlow->checkLink(symTab.readAttributeValue($2, "linkName"), $2->value, false);
+      
       $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), false);
 }
@@ -2527,6 +2540,18 @@ tTarget:
     { symTab.checkAttributes($2); //att.check($3, K_TARGET);
       $$ = Target();
       $$->id = $2;      
+
+      STSourceTarget * stTarget = NULL;
+      try
+      {
+	stTarget = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      stTarget->link = currentSTFlow->checkLink(symTab.readAttributeValue($2, "linkName"), $2->value, false);
+
       $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), false);
 }
@@ -2555,6 +2580,19 @@ tSource:
     { symTab.checkAttributes($2); //att.check($3, K_SOURCE);
       $$ = Source();
       $$->id = $2;      
+
+      STSourceTarget * stSource = NULL;
+      try
+      {
+	stSource = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      stSource->link = currentSTFlow->checkLink(symTab.readAttributeValue($2, "linkName"), $2->value, true);
+      currentSTScope->addLink(stSource->link);
+
       $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), true); 
       symMan.addDPEend();
       $$->dpe = symMan.needsDPE();
@@ -2566,6 +2604,19 @@ tSource:
     { symTab.checkAttributes($2); //att.check($3, K_SOURCE);
       $$ = Source();
       $$->id = $2;      
+
+      STSourceTarget * stSource = NULL;
+      try
+      {
+	stSource = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      stSource->link = currentSTFlow->checkLink(symTab.readAttributeValue($2, "linkName"), $2->value, true);
+      currentSTScope->addLink(stSource->link);
+
       $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), true);
       symMan.addDPEend();
       $$->dpe = symMan.needsDPE();

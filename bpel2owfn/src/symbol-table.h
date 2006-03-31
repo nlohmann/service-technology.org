@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.32 $: 
+ * \version \$Revision: 1.33 $: 
  *
  */
 
@@ -907,6 +907,7 @@ class STFlow: public STActivity
     std::string addLink(STLink *);
 
     STLink * checkLink(std::string, unsigned int, bool); 
+    void checkLinkUsage();
 };
 
 /**

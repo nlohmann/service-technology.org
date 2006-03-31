@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.35 $: 
+ * \version \$Revision: 1.36 $: 
  *
  */
 
@@ -136,13 +136,13 @@ class SymbolTable
     /// suppressJoinFailure attribute auxiliary storage
     stack<string> suppressJoinFailureStack;
 
-    ///
+    /// is a part of the ST standard output design (pattern of horizontal line)
     string horizontal;
-    
-    ///
+
+    /// is a part of the ST standard output design (pattern of small horizontal line)
     string smallHorizontal;
-    
-    ///
+
+    /// is a part of the ST standard output design (pattern of vertical line)
     string vertical;
 
     /// print formatted symbol table error message
@@ -210,7 +210,7 @@ class SymbolTable
     /// return entry of symbol table
     SymbolTableEntry* lookup(unsigned int entryKey);
 
-    /// to add an attribute to the special symbol table entry
+    /// to add an attribute object to an existend symbol table entry, but before it makes a duplicate and domain check
     void addAttribute(unsigned int entryKey, STAttribute* attribute);
 
     /// wrapper for <readAttribute(unsigned int, string)> and return a pointer of attribute object from desired attribute
@@ -234,10 +234,10 @@ class SymbolTable
     /// wrapper for checkAttributes(unsigned int entryKey)
     void checkAttributes(kc::integer entryKey);
 	
-    /// checked the attributes and the value of BPEL-elements
+    /// checked the presence of valid and necessary attribute combinations of BPEL-elements
     void checkAttributes(unsigned int entryKey, kc::casestring bpelElementValue);
 
-    /// checked the attributes and the value of BPEL-elements
+    /// checked the presence of valid and necessary attribute combinations of BPEL-elements
     void checkAttributes(unsigned int entryKey);
     
     /// return retranslation from elementId to BPEL-element name, e.g. K_ASSIGN->"assign"

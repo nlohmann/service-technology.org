@@ -474,7 +474,8 @@ bool SymbolTable::isDuplicate(unsigned int entryKey, STAttribute* attribute)
 
 
 /*!
- * add an attribute object to an existend symbol table entry
+ * to add an attribute object to an existend symbol table entry,
+ * but before it makes a duplicate and domain check
  * \param entryKey  symbol table entry Key
  * \param attribute attribute object
  */
@@ -1136,7 +1137,7 @@ void SymbolTable::checkAttributes(kc::integer entryKey)
 }
 
 /*!
- * checked the attributes and the value of BPEL-elements
+ * checked the presence of valid and necessary attribute combinations of BPEL-elements
  * \param entryKey  symbol table entry key
  * \param bpelElementValue  content of the BPEL-XML-element (e.g. <from> ... content ... </from>)
  */
@@ -1181,7 +1182,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey, kc::casestring bpelElem
 }
 
 /*!
- * checked the attributes of BPEL-elements
+ * checked the presence of valid and necessary attribute combinations of BPEL-elements
  * \param entryKey  symbol table entry key
  */
 void SymbolTable::checkAttributes(unsigned int entryKey)

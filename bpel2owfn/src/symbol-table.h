@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.31 $: 
+ * \version \$Revision: 1.32 $: 
  *
  */
 
@@ -87,6 +87,7 @@ class STProcess;
 class STReceive;
 class STReply;
 class STScope;
+class STSourceTarget;
 class STTerminate;
 class STThrow;
 class STVariable;
@@ -179,7 +180,7 @@ class SymbolTable
     SymbolTable();
     
     /// destructor
-    ~SymbolTable();
+    virtual ~SymbolTable();
     
     /// current entry key
     unsigned int entryKey;
@@ -326,7 +327,7 @@ class STTerminate: public STActivity
     STTerminate(unsigned int elementId, unsigned int entryKey);
     
     /// destructor
-    ~STTerminate();
+    virtual ~STTerminate();
 
     // only used for <terminate> activity
     bool isFirstTerminate;
@@ -347,7 +348,7 @@ class STCompensate: public STActivity
     STCompensate(unsigned int elementId, unsigned int entryKey);
     
     /// destructor
-    ~STCompensate();
+    virtual ~STCompensate();
 
     // only used for <compensate> activity
     bool isInFaultHandler;
@@ -370,7 +371,7 @@ class STWait: public STActivity
     STWait(unsigned int elementId, unsigned int entryKey);
     
     /// destructor
-    ~STWait();
+    virtual ~STWait();
 
     // only used for <wait> activity
     /// true if <wait> has a "until" attribute
@@ -391,7 +392,7 @@ class STAttribute
     STAttribute(string name, string value);
     
     /// destructor
-    ~STAttribute();
+    virtual ~STAttribute();
   
     /// name of attribute
     string name;
@@ -423,7 +424,7 @@ class STCompensationHandler: public STElement, public SymbolTableEntry
     STCompensationHandler(unsigned int elementId, unsigned int entryKey);
     
     /// destructor
-    ~STCompensationHandler();
+    virtual ~STCompensationHandler();
 
     /// true if compensation handler encloses an <compensate/> activity
     bool hasCompensateWithoutScope;
@@ -451,7 +452,7 @@ class STCorrelationSet: public STElement, public SymbolTableEntry
     STCorrelationSet(unsigned int elementId, unsigned int entryKey);
     
     /// destructor
-    ~STCorrelationSet();
+    virtual ~STCorrelationSet();
 };
 
 
@@ -506,7 +507,7 @@ class STEventHandlers: public STElement, public SymbolTableEntry
     STEventHandlers(unsigned int elementId, unsigned int entryKey);
     
     /// destructor
-    ~STEventHandlers();
+    virtual ~STEventHandlers();
 };
 
 
@@ -526,7 +527,7 @@ class STFaultHandlers: public STElement, public SymbolTableEntry
     STFaultHandlers(unsigned int elementId, unsigned int entryKey);
     
     /// destructor
-    ~STFaultHandlers();
+    virtual ~STFaultHandlers();
 
     /// true if fault handler has an <catchAll> branch
     bool hasCatchAll;
@@ -557,7 +558,7 @@ class STCommunicationActivity: public STActivity
     STCommunicationActivity(unsigned int elementId, unsigned int entryKey);
     
     // destructor
-    ~STCommunicationActivity();
+    virtual ~STCommunicationActivity();
 
     string channelId;
 
@@ -586,7 +587,7 @@ class STInvoke: public STCommunicationActivity
     STInvoke(unsigned int elementId, unsigned int entryKey);
     
     /// destructor
-    ~STInvoke();
+    virtual ~STInvoke();
 
     // only used for <invoke> activity
     /// true if <invoke> has both input and output variable
@@ -609,7 +610,7 @@ class STReceive: public STCommunicationActivity
     STReceive(unsigned int elementId, unsigned int entryKey);
     
     /// destructor
-    ~STReceive();
+    virtual ~STReceive();
 };
 
 /**
@@ -626,7 +627,7 @@ class STReply: public STCommunicationActivity
     STReply(unsigned int elementId, unsigned int entryKey);
     
     /// destructor
-    ~STReply();
+    virtual ~STReply();
 };
 
 
@@ -645,7 +646,7 @@ class STLink: public STElement, public SymbolTableEntry
     STLink(unsigned int elementId, unsigned int entryKey);
         
     /// destructor
-    ~STLink();
+    virtual ~STLink();
 
     /// the name of the link
     string name;
@@ -675,7 +676,7 @@ class STPartner: public STElement, public SymbolTableEntry
     STPartner(unsigned int elementId, unsigned int entryKey);
     
     /// destructor
-    ~STPartner();
+    virtual ~STPartner();
 };
 
 
@@ -693,7 +694,7 @@ class STPartnerLink: public STElement, public SymbolTableEntry
     STPartnerLink(unsigned int elementId, unsigned int entryKey);
     
     /// destructor
-    ~STPartnerLink();
+    virtual ~STPartnerLink();
     
     /// is partnerLink group by <partners> or not
     bool isInPartners;
@@ -715,7 +716,7 @@ class STScope: public STElement, public STEnvelope, public SymbolTableEntry
     STScope(unsigned int elementId, unsigned int entryKey);
     
     /// destructor
-    ~STScope();
+    virtual ~STScope();
 
     /// additional attribute used for inter-scope communication (push-places)
     unsigned int parentScopeId;
@@ -728,7 +729,8 @@ class STScope: public STElement, public STEnvelope, public SymbolTableEntry
 
     /// checks for a variable with a given name and returns pointer to the object
     STVariable * checkVariable(std::string, STScope * callingScope, bool isFaultVariable = false);
-    
+   
+    void addLink(STLink *); 
 };
 
 
@@ -749,7 +751,7 @@ class STProcess: public STScope
     STProcess(unsigned int elementId, unsigned int entryKey);
     
     /// destructor
-    ~STProcess();
+    virtual ~STProcess();
     
     /// a list of partner links declared in the process
     list<STPartnerLink*> partnerLinks;
@@ -788,7 +790,7 @@ class STVariable : public STElement, public SymbolTableEntry
     STVariable(unsigned int elementId, unsigned int entryKey);
         
     /// destructor
-    ~STVariable();
+    virtual ~STVariable();
     
     /// name of the variable
     std::string name;
@@ -813,7 +815,7 @@ class STCatch: public STElement, public SymbolTableEntry
     STCatch(unsigned int elementId, unsigned int entryKey);
     
     /// destructor
-    ~STCatch();
+    virtual ~STCatch();
 
     STVariable * faultVariable;
 };
@@ -834,7 +836,7 @@ class STOnMessage: public STCommunicationActivity
     STOnMessage(unsigned int elementId, unsigned int entryKey);
     
     /// destructor
-    ~STOnMessage();
+    virtual ~STOnMessage();
 
 };
 
@@ -854,7 +856,7 @@ class STFromTo: public STCommunicationActivity
     STFromTo(unsigned int elementId, unsigned int entryKey);
     
     /// destructor
-    ~STFromTo();
+    virtual ~STFromTo();
 
     /// used as <from>literal</from>
     string literal;
@@ -876,7 +878,7 @@ class STThrow: public STElement, public SymbolTableEntry
     STThrow(unsigned int elementId, unsigned int entryKey);
     
     /// destructor
-    ~STThrow();
+    virtual ~STThrow();
 
     STVariable * faultVariable;
 };
@@ -897,14 +899,36 @@ class STFlow: public STActivity
     STFlow(unsigned int elementId, unsigned int entryKey);
     
     /// destructor
-    ~STFlow();
+    virtual ~STFlow();
 
-    list<STLink*> linkList;
+    list<STLink*> links;
     unsigned int parentFlowId;
 
     std::string addLink(STLink *);
 
-    STLink * checkLink(std::string); 
+    STLink * checkLink(std::string, unsigned int, bool); 
+};
+
+/**
+ * \class	STSourceTarget
+ *
+ * \brief
+ * 
+ * A template for from and to blocks.
+ * 
+ */
+class STSourceTarget: public STElement, public SymbolTableEntry
+{
+  public:
+    /// constructor
+    STSourceTarget();
+    STSourceTarget(unsigned int elementId, unsigned int entryKey);
+    
+    /// destructor
+    virtual ~STSourceTarget();
+
+    /// the connected link
+    STLink * link;
 };
 
 

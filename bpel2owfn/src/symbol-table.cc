@@ -353,6 +353,8 @@ unsigned int SymbolTable::insert(unsigned int elementId)
     case K_TO:                  {symTab[this->nextKey()] = new STFromTo(elementId, this->entryKey);} break;
     case K_THROW:               {symTab[this->nextKey()] = new STThrow(elementId, this->entryKey);} break;
     case K_FLOW:		{symTab[this->nextKey()] = new STFlow(elementId, this->entryKey);} break;
+    case K_SOURCE:              {symTab[this->nextKey()] = new STSourceTarget(elementId, this->entryKey);} break;
+    case K_TARGET:              {symTab[this->nextKey()] = new STSourceTarget(elementId, this->entryKey);} break;
     /* all other */
     default :                   {symTab[this->nextKey()] = new STActivity(elementId, this->entryKey);} break;
   }
@@ -625,6 +627,20 @@ void SymbolTable::addAttribute(unsigned int entryKey, STAttribute* attribute)
     {
 //      traceST("cast to STThrow\n");
       (dynamic_cast <STThrow*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
+      break;
+    }
+
+    case K_SOURCE:
+    {
+//      traceST("cast to STSourceTarget\n");
+      (dynamic_cast <STSourceTarget*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
+      break;
+    }
+
+    case K_TARGET:
+    {
+//      traceST("cast to STSourceTarget\n");
+      (dynamic_cast <STSourceTarget*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
       break;
     }
 
@@ -913,7 +929,7 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
     case K_SOURCE:
     {
 //      traceST("cast to STActivity Source\n");
-      STAttribute* attribute = (dynamic_cast <STActivity*> (symTab[entryKey]))->mapOfAttributes[name];
+      STAttribute* attribute = (dynamic_cast <STSourceTarget*> (symTab[entryKey]))->mapOfAttributes[name];
 
 	  if(attribute == NULL)
 	  {
@@ -1034,6 +1050,20 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
     {
 //      traceST("cast to STThrow\n");
       STAttribute* attribute = (dynamic_cast <STThrow*> (symTab[entryKey]))->mapOfAttributes[name];
+
+	  if(attribute == NULL)
+	  {
+	    attribute = new STAttribute(name,"");
+	    (dynamic_cast <STElement*> (symTab[entryKey]))->mapOfAttributes[name] = attribute;
+	  }
+
+      return attribute;
+    }
+    
+    case K_TARGET:
+    {
+//      traceST("cast to STSourceTarget\n");
+      STAttribute* attribute = (dynamic_cast <STSourceTarget*> (symTab[entryKey]))->mapOfAttributes[name];
 
 	  if(attribute == NULL)
 	  {
@@ -2647,6 +2677,7 @@ STReply::~STReply() {}
 /********************************************
  * implementation of Scope CLASS
  ********************************************/
+
 /*!
  * add a new Variable with scope ID and name
  */
@@ -2724,7 +2755,19 @@ STVariable * STScope::checkVariable(std::string name, STScope * callingScope, bo
   
   return stVariable;
 }
- 
+
+/*!
+ * adds a Link to the enclosedLinks list
+ */
+void STScope::addLink(STLink * link)
+{
+  enclosedLinks.push_back(link);
+  if (parentScopeId != 0)
+  {
+    (dynamic_cast<STScope *> (symTab.lookup(parentScopeId)))->addLink(link);
+  }
+}
+
 /*!
  * constructor
  */
@@ -2894,9 +2937,9 @@ std::string STFlow::addLink(STLink* link)
 {
   trace(TRACE_VERY_DEBUG, "[ST] Trying to add Link with name \"" + symTab.readAttributeValue(link->entryKey, "name") + "\"\n");
 
-  if (! linkList.empty())
+  if (! links.empty())
   {
-    for (list<STLink *>::iterator iter = linkList.begin(); iter != linkList.end(); iter++)
+    for (list<STLink *>::iterator iter = links.begin(); iter != links.end(); iter++)
     {
       if (symTab.readAttributeValue((*iter)->entryKey, "name") == symTab.readAttributeValue(link->entryKey, "name"))
       {
@@ -2906,22 +2949,92 @@ std::string STFlow::addLink(STLink* link)
     }
   }
   
-  linkList.push_back(link);
+  links.push_back(link);
   return intToString(entryKey) + "." + symTab.readAttributeValue(link->entryKey, "name");
 }
 
 /*!
  * checks if a Link is declared in the Flow
  */
-STLink * STFlow::checkLink(std::string name)
+STLink * STFlow::checkLink(std::string name, unsigned int id, bool isSource)
 {
   if (name == "")
   {
     return NULL;
   }
 
-  trace(TRACE_VERY_DEBUG, "[ST] Checking for PartnerLink with name \"" + name + "\"\n");
+  trace(TRACE_VERY_DEBUG, "[ST] Checking for Link with name \"" + name + "\"\n");
+
+  if (! links.empty())
+  {
+    trace(TRACE_VERY_DEBUG, "[ST] Looking in Flow\n");
+    for (list<STLink *>::iterator iter = links.begin();
+	    iter != links.end(); 
+	    iter++)
+    {
+      if (symTab.readAttributeValue((*iter)->entryKey, "name") == name)
+      {
+	if (isSource)
+	{
+	  if ((*iter)->sourceId == 0)
+	  {
+	    (*iter)->sourceId = id;
+	  }	    
+	  else
+	  {
+            yyerror(string("Link \"" + name 
+			   + "\" was already used as source\n").c_str());
+	  }
+	}
+	else
+	{
+	  if ((*iter)->targetId == 0)
+	  {
+	    /// \todo: change source and target ID to real ID!
+	    (*iter)->targetId = id;
+	  }	    
+	  else
+	  {
+            yyerror(string("Link \"" + name 
+			   + "\" was already used as target\n").c_str());
+	  }
+	}
+	return (*iter);
+      }
+    }
+  }
+  if (parentFlowId != 0)
+  {
+    trace(TRACE_VERY_DEBUG, "[ST] Looking in parent Flow " + intToString(parentFlowId) +"\n");
+    return (dynamic_cast <STFlow*> (symTab.lookup(parentFlowId)))->checkLink(name, id, isSource);
+  }
+  else
+  {
+    yyerror(string("Name of undefined Link is \"" 
+		   + name + "\"\n").c_str());
+  }
+
+  return NULL;
 }
+
+
+/********************************************
+ * implementation of SourceTarget CLASS
+ ********************************************/
+
+/*!
+ * constructor
+ */
+STSourceTarget::STSourceTarget(unsigned int elementId, unsigned int entryKey)
+ :SymbolTableEntry(elementId, entryKey) 
+{
+  link = NULL;
+}
+
+/*!
+ * destructor
+ */
+STSourceTarget::~STSourceTarget() {}
 
 
 

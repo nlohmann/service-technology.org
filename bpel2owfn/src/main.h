@@ -25,18 +25,18 @@
  *
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2006/03/24 13:42:17 $
+ *          - last changed: \$Date: 2006/03/31 14:56:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  *          - 2005-11-09 (gierds) Initial version.
  *          - 2005-11-15 (gierds) Added Exception class.
  *          - 2005-11-16 (gierds) Use of error() and cleanup() as defined in helpers.cc
@@ -59,10 +59,6 @@
 #include "exception.h"		// exception handling
 #include "check-symbols.h"	// scope handling and checking
 
-// from check-symbols
-extern SymbolScope * processScope;
-
-
 /* defined by Bison */
 extern int yyparse();
 extern int yydebug;
@@ -79,3 +75,4 @@ extern SymbolManager symMan;
 
 
 #endif
+

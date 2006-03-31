@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/31 13:05:08 $
+ *          - last changed: \$Date: 2006/03/31 14:56:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.166 $
+ * \version \$Revision: 1.167 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -300,7 +300,7 @@ tProcess:
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
     
-      symMan.initialiseProcessScope($3);
+//CG      symMan.initialiseProcessScope($3);
       currentScopeId = $3;
       currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId->value));
       isInFH.push(false);
@@ -311,7 +311,7 @@ tProcess:
   activity
   X_NEXT X_SLASH K_PROCESS X_CLOSE
     { TheProcess = $$ = Process($8, $9, $10, $11, $12, $13, $14, StopInProcess(), $15);
-      symMan.quitScope();
+//CG      symMan.quitScope();
       //symTab.traceST("\t\t\t\t HALLO " + string((att.read($4, "abstractProcess")->name)) + "\n");      
 //      att.traceAM(string("tProcess: ") + ($$->suppressJoinFailure)->name + string("\n"));      
       att.popSJFStack(); symTab.popSJFStack();
@@ -734,7 +734,7 @@ tOnMessage:
   arbitraryAttributes X_NEXT
     { symTab.checkAttributes($2); //att.check($3, K_ONMESSAGE);
       
-//      symMan.checkPartnerLink(att.read($3, "partnerLink")->name);
+//CG//      symMan.checkPartnerLink(att.read($3, "partnerLink")->name);
       symMan.resetDPEend();
     }
   tCorrelations activity X_NEXT X_SLASH K_ONMESSAGE
@@ -1044,6 +1044,7 @@ tInvoke:
 	
 	currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentSymTabEntryKey));
 	currentSTScope->parentScopeId = parent[currentScopeId]->value;
+	(dynamic_cast<STScope *> (symTab.lookup(currentSTScope->parentScopeId)))->childScopes.push_back(currentSTScope);
 
 	STInvoke * stInvoke = NULL;
 	try
@@ -1076,8 +1077,8 @@ tInvoke:
         $11->parentScopeId = scope->id;
         eh->parentScopeId = scope->id;
 
-        symMan.newScopeScope(scope->id);
-        symMan.quitScope();
+//CG        symMan.newScopeScope(scope->id);
+//CG        symMan.quitScope();
 
         symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute(mkcasestring("name"), att.read($3, "name")));
         symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute(mkcasestring("joinCondition"), att.read($3, "joinCondition")));
@@ -1983,7 +1984,7 @@ tFlow:
 	stFlow->parentFlowId = currentSTFlow->entryKey;
       }
       currentSTFlow = stFlow;
-      symMan.newFlowScope($2);
+//CG      symMan.newFlowScope($2);
     } 
   standardElements tLinks activity_list X_SLASH K_FLOW
     { $$ = Flow($7, $8, $9);
@@ -2024,8 +2025,9 @@ tFlow:
       }
       $$->negativeControlFlow = $7->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $7->parentId = $2;
-      symMan.checkLinks();
-      symMan.quitScope(); }
+//CG      symMan.checkLinks();
+//CG      symMan.quitScope(); 
+    }
 ;
 
 genSymTabEntry_Flow:
@@ -2092,7 +2094,7 @@ tLink:
       stLink->name = currentSTFlow->addLink(stLink);
 
       $$->id = $2;
-      symMan.addLink(new csLink(symTab.readAttributeValue($2, "name"))); 
+//CG      symMan.addLink(new csLink(symTab.readAttributeValue($2, "name"))); 
     }
 | K_LINK genSymTabEntry_Link
   arbitraryAttributes X_SLASH
@@ -2111,7 +2113,7 @@ tLink:
       stLink->name = currentSTFlow->addLink(stLink);
 
       $$->id = $2;
-      symMan.addLink(new csLink(symTab.readAttributeValue($2, "name"))); 
+//CG      symMan.addLink(new csLink(symTab.readAttributeValue($2, "name"))); 
     }
 ;
 
@@ -2434,18 +2436,22 @@ tScope:
       }
     }  
   X_NEXT
-    { symMan.newScopeScope($2);
-      symMan.setBlackListMode(true);
+    { 
+//CG      symMan.newScopeScope($2);
+//CG      symMan.setBlackListMode(true);
       isInFH.push(false);
       isInCH.push(pair<bool,int>(false,hasCompensate));
       parent[$2] = currentScopeId;
       currentScopeId = $2; 
-      currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId->value));
-      currentSTScope->parentScopeId = parent[$2]->value;
     }
   standardElements 
     {
-      symMan.setBlackListMode(false);
+//CG      symMan.setBlackListMode(false);
+      // should come after standardElements in order to prevent links from 
+      // being added to enclosedLinks list of this scope
+      currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId->value));
+      currentSTScope->parentScopeId = parent[$2]->value;
+      (dynamic_cast<STScope *> (symTab.lookup(currentSTScope->parentScopeId)))->childScopes.push_back(currentSTScope);
     }
   tVariables 
   tCorrelationSets 
@@ -2478,7 +2484,8 @@ tScope:
       {
 	$7->dpe = mkinteger(1);
       }
-      symMan.quitScope(); }
+//CG      symMan.quitScope(); 
+    }
 ;
 
 genSymTabEntry_Scope:
@@ -2533,7 +2540,7 @@ tTarget:
       stTarget->link = currentSTFlow->checkLink(symTab.readAttributeValue($2, "linkName"), $2->value, false);
       
       $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), false);
+//CG      $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), false);
 }
 | K_TARGET genSymTabEntry_Target
   arbitraryAttributes X_SLASH
@@ -2553,7 +2560,7 @@ tTarget:
       stTarget->link = currentSTFlow->checkLink(symTab.readAttributeValue($2, "linkName"), $2->value, false);
 
       $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), false);
+//CG      $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), false);
 }
 ;
 
@@ -2593,7 +2600,7 @@ tSource:
       stSource->link = currentSTFlow->checkLink(symTab.readAttributeValue($2, "linkName"), $2->value, true);
       currentSTScope->addLink(stSource->link);
 
-      $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), true); 
+//CG      $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), true); 
       symMan.addDPEend();
       $$->dpe = symMan.needsDPE();
       symMan.remDPEend();
@@ -2617,7 +2624,7 @@ tSource:
       stSource->link = currentSTFlow->checkLink(symTab.readAttributeValue($2, "linkName"), $2->value, true);
       currentSTScope->addLink(stSource->link);
 
-      $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), true);
+//CG      $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), true);
       symMan.addDPEend();
       $$->dpe = symMan.needsDPE();
       symMan.remDPEend();

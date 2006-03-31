@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.33 $: 
+ * \version \$Revision: 1.34 $: 
  *
  */
 
@@ -191,11 +191,11 @@ class SymbolTable
     /// increases the id (used ST key generator -> nextKey())
     kc::integer nextId();
 
-	/// ST traces
-	void traceST(string traceMsg);
+    /// ST traces
+    void traceST(string traceMsg);
     
-	/// ST traces without [ST] prefix
-	void traceSTwp(string traceMsg);
+    /// ST traces without [ST] prefix
+    void traceSTwp(string traceMsg);
 
     /// create a new entry in the symbol table and return symbol table entry key
     unsigned int insert(unsigned int elementId);
@@ -225,13 +225,13 @@ class SymbolTable
     STAttribute* newAttribute(kc::casestring attributeName, kc::casestring attributeValue);
     
     /// wrapper for checkAttributes(unsigned int entryKey, kc::casestring bpelElementValue)
-	void checkAttributes(kc::integer entryKey, kc::casestring bpelElementValue);
+    void checkAttributes(kc::integer entryKey, kc::casestring bpelElementValue);
 
     /// wrapper for checkAttributes(unsigned int entryKey)
     void checkAttributes(kc::integer entryKey);
 	
-	/// checked the attributes and the value of BPEL-elements
-	void checkAttributes(unsigned int entryKey, kc::casestring bpelElementValue);
+    /// checked the attributes and the value of BPEL-elements
+    void checkAttributes(unsigned int entryKey, kc::casestring bpelElementValue);
 
     /// checked the attributes and the value of BPEL-elements
     void checkAttributes(unsigned int entryKey);
@@ -721,6 +721,9 @@ class STScope: public STElement, public STEnvelope, public SymbolTableEntry
     /// additional attribute used for inter-scope communication (push-places)
     unsigned int parentScopeId;
 
+    /// list of all "direct" child scopes
+    list<STScope *> childScopes;
+
     /// list of all enclosed links (recursively)
     list<STLink*> enclosedLinks;
 
@@ -730,6 +733,7 @@ class STScope: public STElement, public STEnvelope, public SymbolTableEntry
     /// checks for a variable with a given name and returns pointer to the object
     STVariable * checkVariable(std::string, STScope * callingScope, bool isFaultVariable = false);
    
+    /// adds a link to the enclosedLinks list
     void addLink(STLink *); 
 };
 

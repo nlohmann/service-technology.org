@@ -49,11 +49,11 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/03/28 09:44:59 $
+ *          - last changed: \$Date: 2006/03/31 14:56:53 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  */
 %}
 
@@ -100,7 +100,6 @@ extern PetriNet *TheNet;
 
 // introduced in bpel-syntax.y
 extern SymbolTable symTab;
-extern SymbolManager symMan;
 
 /// prefix of the current scope (read by the stop pattern and used to direct
 /// failures to the correct fault_in place)
@@ -1467,14 +1466,13 @@ This=Scope(a,b,c,d,e,f,g) ->
       header(This->id, true);
       string prefix = intToString(This->id->value) + ".internal.";
       currentScope = prefix;
-      SymbolScope *me = symMan.getScope(this->id);
       STScope* myself = dynamic_cast<STScope*> (symTab.lookup(This->id));
 
       // Create push-places for the children of the scope.
-      for (list< SymbolScope * >::iterator child = me->children.begin(); child != me->children.end(); child++)
+      for (list< STScope * >::iterator child = myself->childScopes.begin(); child != myself->childScopes.end(); child++)
       {
-	Place *push_child    = TheNet->newPlace( intToString((*child)->id->value) + ".push");
-	Place *notPush_child = TheNet->newPlace( intToString((*child)->id->value) + ".!push");
+	Place *push_child    = TheNet->newPlace( intToString((*child)->entryKey) + ".push");
+	Place *notPush_child = TheNet->newPlace( intToString((*child)->entryKey) + ".!push");
       }
 
 
@@ -1650,8 +1648,8 @@ This=Scope(a,b,c,d,e,f,g) ->
       // After the patterns of the inner activity of the process are generated
       // the push places of the child scopes are available and have to be
       // connected with the transition t2 of the process.
-      for (list<SymbolScope*>::iterator child = me->children.begin(); child != me->children.end(); child++)
-	TheNet->newArc(t2, TheNet->findPlace( intToString((*child)->id->value) + ".!push" ));
+      for (list<STScope*>::iterator child = myself->childScopes.begin(); child != myself->childScopes.end(); child++)
+	TheNet->newArc(t2, TheNet->findPlace( intToString((*child)->entryKey) + ".!push" ));
 
       string prefix2 = intToString(This->id->value) + ".internal.";
 
@@ -1748,13 +1746,13 @@ This=Scope(a,b,c,d,e,f,g) ->
 
 
       // Setting all enclosed links to false in case of an error.
-      for (list<string>::iterator link = ((ScopeScope *)me)->innerLinks.begin(); link != ((ScopeScope *)me)->innerLinks.end(); link++)
+      for (list<STLink *>::iterator link = myself->enclosedLinks.begin(); link != myself->enclosedLinks.end(); link++)
       {
-	Place *p61 = TheNet->newPlace(prefix + "p61.link." + *link);
-	Place *p62 = TheNet->findPlace("link." + *link);
-	Place *p63 = TheNet->findPlace("!link." + *link);
-	Transition *t14 = TheNet->newTransition(prefix + "t14.link." + *link);
-	Transition *t15 = TheNet->newTransition(prefix + "t15.link." + *link);
+	Place *p61 = TheNet->newPlace(prefix + "p61.link." + (*link)->name);
+	Place *p62 = TheNet->findPlace("link." + (*link)->name);
+	Place *p63 = TheNet->findPlace("!link." + (*link)->name);
+	Transition *t14 = TheNet->newTransition(prefix + "t14.link." + (*link)->name);
+	Transition *t15 = TheNet->newTransition(prefix + "t15.link." + (*link)->name);
 	TheNet->newArc(p61, t14);
 	TheNet->newArc(t14, p62);
 	TheNet->newArc(p63, t14);
@@ -1865,9 +1863,9 @@ This=StandardElements(NiltTarget_list(), a) ->
       // t1 for dead path elimination.
       foreach (link; tSource_list a)
       {
-//	STLink *linkST = dynamic_cast<STLink*> (symTab.lookup(link->id));
-	Place *p8 = TheNet->findPlace("!link." + string(link->linkID->name));
-	Place *p10 = TheNet->findPlace("link." + string(link->linkID->name));
+	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
+	Place *p8 = TheNet->findPlace("!link." + string(linkST->name));
+	Place *p10 = TheNet->findPlace("link." + string(linkST->name));
 
 	TheNet->newArc(p8, t2);
 	TheNet->newArc(t2, p10);
@@ -1929,8 +1927,9 @@ This=StandardElements(a, NiltSource_list()) provided
       // Connect the target links with transitions t1 and t2.
       foreach (link; tTarget_list a)
       {
-	Place *p1 = TheNet->findPlace("!link." + string(link->linkID->name));
-	Place *p3 = TheNet->findPlace("link." + string(link->linkID->name));
+	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
+	Place *p1 = TheNet->findPlace("!link." + string(linkST->name));
+	Place *p3 = TheNet->findPlace("link." + string(linkST->name));
 	TheNet->newArc(t1, p1);
 	TheNet->newArc(p3, t1);
 	TheNet->newArc(t2, p1);
@@ -1997,8 +1996,9 @@ This=StandardElements(a, NiltSource_list()) provided
       // Connect the target links with transitions t1 and t2.
       foreach (link; tTarget_list a)
       {
-	Place *p1 = TheNet->findPlace("!link." + string(link->linkID->name));
-	Place *p3 = TheNet->findPlace("link." + string(link->linkID->name));
+	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
+	Place *p1 = TheNet->findPlace("!link." + string(linkST->name));
+	Place *p3 = TheNet->findPlace("link." + string(linkST->name));
 	TheNet->newArc(t1, p1);
 	TheNet->newArc(p3, t1);
 	TheNet->newArc(t2, p1);
@@ -2091,8 +2091,9 @@ This=StandardElements(a,b) provided
       // Connect each target links with t2 and t5.
       foreach (link; tTarget_list a)
       {
-	Place *p1 = TheNet->findPlace("!link." + string(link->linkID->name));
-	Place *p3 = TheNet->findPlace("link." + string(link->linkID->name));
+	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
+	Place *p1 = TheNet->findPlace("!link." + string(linkST->name));
+	Place *p3 = TheNet->findPlace("link." + string(linkST->name));
         TheNet->newArc(t2, p1);
 	TheNet->newArc(p3, t2);
         TheNet->newArc(t5, p1);
@@ -2104,8 +2105,9 @@ This=StandardElements(a,b) provided
       // transition t1 for dead path elimination.
       foreach (link; tSource_list b)
       {
-	Place *p5 = TheNet->findPlace("!link." + string(link->linkID->name));
-	Place *p7 = TheNet->findPlace("link." + string(link->linkID->name));
+	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
+	Place *p5 = TheNet->findPlace("!link." + string(linkST->name));
+	Place *p7 = TheNet->findPlace("link." + string(linkST->name));
 
         TheNet->newArc(p5, t3);
         TheNet->newArc(t3, p7);
@@ -2206,8 +2208,9 @@ This=StandardElements(a,b) provided
       // Connect each target links with t2 and t5.
       foreach (link; tTarget_list a)
       {
-	Place *p1 = TheNet->findPlace("!link." + string(link->linkID->name));
-	Place *p3 = TheNet->findPlace("link." + string(link->linkID->name));
+	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
+	Place *p1 = TheNet->findPlace("!link." + string(linkST->name));
+	Place *p3 = TheNet->findPlace("link." + string(linkST->name));
         TheNet->newArc(t2, p1);
 	TheNet->newArc(p3, t2);
 	TheNet->newArc(t5, p1);
@@ -2219,8 +2222,9 @@ This=StandardElements(a,b) provided
       // transition t1 for dead path elimination.
       foreach (link; tSource_list b)
       {
-	Place *p5 = TheNet->findPlace("!link." + string(link->linkID->name));
-	Place *p7 = TheNet->findPlace("link." + string(link->linkID->name));
+	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
+	Place *p5 = TheNet->findPlace("!link." + string(linkST->name));
+	Place *p7 = TheNet->findPlace("link." + string(linkST->name));
 
 	TheNet->newArc(p5, t3);
         TheNet->newArc(t3, p7);

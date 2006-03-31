@@ -19,13 +19,13 @@
 \****************************************************************************/ 
 
 /*!
- * \file symbol-table.h
+ * \file    symbol-table.h
  *
  * \brief   Central storage for all parsed BPEL activities and whose datas.
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date
  *          - created:
@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.34 $: 
+ * \version \$Revision: 1.35 $: 
  *
  */
 
@@ -133,7 +133,7 @@ class SymbolTable
     /// a container to store ...
     map<unsigned int, SymbolTableEntry*> symTab;
 
-    ///
+    /// suppressJoinFailure attribute auxiliary storage
     stack<string> suppressJoinFailureStack;
 
     ///
@@ -160,19 +160,23 @@ class SymbolTable
 	/// returns valid or unvalid depending on attribute already exists or not
 	bool isDuplicate(unsigned int entryKey, STAttribute* attribute);
 
-    ///
+    /*! checked the presence of suppressJoinFailure (SJF) attribute
+     * in the set of all attributes of the current ST entry and
+     * create a new entry at absence of the SJF attribute with the
+     * SJF value of the parent BPEL element
+     */
     void checkAttributeSJF(unsigned int entryKey);
 
-    ///
+    /// formatted output of a symbol table entry
     void printSymbolTableEntry(SymbolTableEntry*);
     
-    ///
+    /// formatted output of a symbol table entry
     void printSTElement(SymbolTableEntry*);    
     
-    ///
+    /// formatted output of a symbol table entry
     void printSTAttribute(STElement*);
 
-    ///
+    /// formatted output of a symbol table entry
     void printSTEnvelope(SymbolTableEntry*);
     
   public:
@@ -242,10 +246,10 @@ class SymbolTable
     /// return symbol table information string
     string getInformation(kc::integer astId, bool closeTag = false);
 
-    ///
+    /// to clear the value of the current BPEL element of the suppressJoinFailure auxiliary storage
     void popSJFStack();
     
-    ///
+    /// formatted output of the ST
     void printSymbolTable();
 
     /***** some additional variables for easier access *****/

@@ -115,14 +115,14 @@ funded by the Bundesministerium f@"ur Bildung und Forschung. See
 
 @acronym{BPEL2oWFN} is a compiler translating a business processes expressed in
 @acronym{BPEL, Business Process Execution Language for Web Services}
-[ACD@math{^+}03] to an @acronym{oWFN, open Workflow Net} [MRS05].
+[ACD@math{^+}03] into an @acronym{oWFN, open Workflow Net} [MRS05].
 This @acronym{oWFN} can be used to:
 
 @itemize
-@item check controllability [Mar03, Wei04],
-@item generate the operating guidelines [MRS05],
+@item check controllability [Mar03, Wei04] with Fiona [Fiona],
+@item generate the operating guidelines [MRS05] with Fiona [Fiona],
 @item check for deadlocks, or
-@item check any temporal logic formula with the model checking tools.
+@item check any temporal logic formula with several model checking tools [LoLA, MCK].
 @end itemize
 
 @acronym{BPEL2oWFN} uses static analysis to make the generated @acronym{oWFN}
@@ -194,13 +194,13 @@ syntax tree generated while parsing the @acronym{BPEL} process: any
 unnecessary information (e.g.@: indention, brackets or other
 ``syntax-supporting'' elements) is omitted. It is the central data
 structure of @acronym{BPEL2oWFN}. The nodes of the @acronym{AST} are
-annotated during the analysis steps. These annotations are used to
-select the most compact Petri net pattern from the pattern database
-to check a given property.
+annotated with pointers to symbol table entries during the analysis steps.
+These annotations are used to select the most compact Petri net pattern
+from the pattern database to check a given property.
 
 
-@anchor{Pattern Database}
-@subsection Pattern Database
+@anchor{Pattern Repository}
+@subsection Pattern Repository
 
 The idea of flexible model generation is to find the most compact
 model to check a given property. The patterns of the Petri net
@@ -209,7 +209,7 @@ However when the context is known some behavior modeled in the
 patterns (i.e.@: some of the nodes) can be safely removed without
 changing its semantics. @acronym{BPEL2oWFN} is designed to hold
 several sets of Petri net patterns each suitable in certain
-contexts. These patterns are collected in a pattern database.
+contexts. These patterns are collected in a pattern repository.
 
 
 @anchor{Petri Net Class}
@@ -224,6 +224,17 @@ formats, structural simplification rules (optimized to preserve certain
 properties such as deadlock freedom or liveness) or abstractions
 (e.g.@: abstraction from variables, abstraction from external behavior).
 
+
+@anchor{Control Flow Graph}
+@subsection Control Flow Graph
+
+Beside the dynamic analysis of the generated Petri net model with Fiona
+or classical model checking tools, @acronym{BPEL2oWFN} prototypically
+implements a control flow graph (@acronym{CFG}) (c.f.@: [Hei03]). This @acronym{CFG} can
+be used to check most of the constraints of the specification statically,
+i.e.@: without actually deploying and running the BPEL process. For example,
+the @acronym{CFG} can be used to check if each variable is initialized by an
+incoming message or an @code{<assign>} activity.
 
 
 
@@ -245,7 +256,7 @@ net is written to a file named @file{inputfile.owfn}, because of the option
 @samp{-o}. For more examples, see @ref{Examples}.
 
 @acronym{BPEL2oWFN} can be called without any parameter. In this case, it acts
-as a parser for @acronym{BPEL}, that reads its input from the standard input
+as a simple parser for @acronym{BPEL}, that reads its input from the standard input
 (@code{stdin}).
 
 
@@ -319,11 +330,11 @@ parsing the input file to standard output. This option is mostly
 used for debugging reasons since it shows the implicit transformations
 and the phylum names used when generating the Petri net.
 
-@c @item cfg
-@c For control flow analysis (a form of static analysis) a @acronym{CFG, Control
-@c Flow Graph} is generated. It might be printed in graphical (Dot)
-@c representation. This option is in an early alpha-stage and is not used for any
-@c analysis steps yet. For more information, see @ref{Future Work}.
+@item cfg
+For control flow analysis (a form of static analysis) a @acronym{CFG, Control
+Flow Graph} is generated. It can be printed in graphical (dot)
+representation. This option is in an early beta-stage and can only check
+for uninitialzed variables yet. For more information, see @ref{Future Work}.
 
 @item petrinet
 Generates a Petri net representing the semantics of the given
@@ -352,22 +363,36 @@ Functions} for more details.
 @itemx -p @var{par}
 
 @table @samp
-@item simplify
-Structurally simplify the generated Petri net.
-
-@item finishloop
-Add an extra loop transition to the final place of the generated Petri net to
-live-lock the system in order to find deadlocks.
-
-@item nostandardfaults
-When the parameter is set, only used-defined faults using the @code{<throw>}
-activity can occur.
+@item cycliceh
+When the parameter is set, the pattern for the message event handler is
+cyclic as depicted in Fig. 30/31 of [Sta05]. If the parameter is not set
+(standard case), the pattern is acyclic: the activity embedded in the
+event handler is executed at most once, depended on the incoming messages.
 
 @item cyclicwhile
 When the parameter is set, the pattern for the @code{<while>} activity is
 cyclic as depicted in Fig. 18 of [Sta05]. If the parameter is not set
 (standard case), the pattern is acyclic: the activity embedded in the
 @code{<while>} activity is at most executed once, chosen non-deterministically.
+
+@item finalloop
+Add an extra loop transition to the final place of the generated Petri net to
+live-lock the system in order to find deadlocks.
+
+@item nofhfaults
+With this parameter, standard faults may not occure in activities directly nested
+in a fault handler.
+
+@item nostandardfaults
+When the parameter is set, only used-defined faults using the @code{<throw>}
+activity can occur.
+
+@item novariables
+Removes places of the generated Petri net modelling variables as well as the
+place modelling the system clock.
+
+@item simplify
+Structurally simplify the generated Petri net.
 @end table
 @end table
 
@@ -395,9 +420,9 @@ Create a Petri net in @acronym{APNN, Abstract Petri Net Notation}. Implies the
 mode @samp{petrinet}.
 
 @item dot
-Create a Dot representation of the structure generated in the current mode
-which can be any kind of Petri net (mode @samp{petrinet}).@c  or the control flow
-@c graph (mode @samp{cfg}).
+Create a dot representation of the structure generated in the current mode
+which can be any kind of Petri net (mode @samp{petrinet} or the control flow
+graph (mode @samp{cfg}).
 
 @item info
 Create an additional information file. Implies the mode @samp{petrinet}.
@@ -406,7 +431,7 @@ Create an additional information file. Implies the mode @samp{petrinet}.
 Create a @acronym{LoLA} place/transition net. Implies the mode @code{petrinet}.
 
 @item owfn
-Create a low-level @acronym{oWFN} in @acronym{LoLA} file format. Implies the
+Create a low-level @acronym{oWFN} in Fiona file format. Implies the
 mode @samp{petrinet}.
 
 @item pep
@@ -631,13 +656,19 @@ A (low-level) place/transition net as described in [LoLA].
 The first entry of the history of each node is added as a comment.
 
 
-@item @acronym{oWFN} in @acronym{LoLA} format
+@item @acronym{oWFN} in Fiona format
 
 An open workflow net is a Petri net with an @i{interface}, i.e.@: two sets of
 places: @i{input places} and @i{output places}. Additionally an open workflow
 net has a set of final markings. To represent @acronym{oWFN}s
 the @acronym{LoLA} format was extended to implement this categorization.
 
+
+@item Petri Net Markup Language (@acronym{PNML})
+A (low-level) place/transition net in Petri Net Markup Language as described
+in [WK02]. An @samp{@var{arcname}} value is just added to meet the
+syntactic requirements and is just an enumeration of the arcs (@samp{a1},
+@samp{a2}, @dots{}).
 
 @item Abstract Petri Net Notation (@acronym{APNN})
 
@@ -756,7 +787,7 @@ the graphical representation of a `real world' process would not be suitable to
 process, read or understand. That is why the Dot output shall be seen as a
 means to debug small patterns.} the implemented Petri net patterns
 @acronym{BPEL2oWFN} implements a graph representation of the generate Petri
-net.
+net. Furthermore, the @acronym{CFG} can be printed as dot output.
 
 
 
@@ -860,6 +891,11 @@ have a smaller state space and allow the analysis for controllability
 which is impossible without the assumption that messages can always be
 sent faultlessly.
 
+In order not to suppress standard faults at all, the command-line parameter
+@samp{--parameter=nofhfaults} can be used to allow standard faults outside
+fault handlers, i.e.@: to create models that allow the occurrence of one
+standard fault in each scope yet disallow to occurrence of further faults.
+
 @item @b{1-safety}. The new modeling of the fault management yields
 to 1-safe Petri nets (i.e.@: any reachable state of the Petri net
 model puts at most one token on each place of the net).
@@ -900,11 +936,14 @@ The ``original'' behavior can be restored with the command-line parameter
 @item @b{Event handlers}. There is one pattern for both alarm and
 message event handlers (i.e.@: Fig.@: 29 and Fig.@: 30 are merged). When
 no event handler is specified, an ``implicit'' event handler is
-installed which is just a stub and does not change the semantics.
+installed which is just a stub and does not change the semantics. The
+message event handlers are acyclic by default to create acyclic Petri net
+models. However, the ``original'' behavior can be restored with the
+command-line parameter @samp{--parameter=cycliceh}.
 
-@item @b{Deadlocks}. A transition named @samp{1.internal.finishloop}
+@item @b{Deadlocks}. A transition named @samp{1.internal.finalloop}
 can be added to livelock the process upon completion using the command-line
-parameter @samp{--parameter=finishloop}. This leads to
+parameter @samp{--parameter=finalloop}. This leads to
 deadlock-free Petri nets in case of processes with ``reasonable''
 control flow and helps to find unwanted deadlocks occurring due
 wrong modeling. If, for example, the links of a process model are
@@ -914,7 +953,7 @@ In future versions of @acronym{BPEL2oWFN} these found deadlocks
 shall be mapped back into the @acronym{BPEL} code to highlight the
 ``unreasonable'' activities (i.e.@: a cycle-closing link).
 
-@item @b{Unfoldings}. Due to the abstraction (high-level to
+@item @b{Unfoldings of high-level places}. Due to the abstraction (high-level to
 low-level) of the patterns some places were unfolded: the place
 @samp{compScope} of Fig.@: 42--44 usually holding a token with a name
 of a scope is unfolded to @samp{compScope.@var{scopename}} and only
@@ -956,7 +995,8 @@ removed.
 @end itemize
 
 These structural reduction rules are implemented in the command-line option
-@samp{--parameter=simplify}, see @ref{Invoking BPEL2oWFN}).
+@samp{--parameter=simplify}, see @ref{Invoking BPEL2oWFN}). To acheive a
+better reduction, combine the parameter with @samp{--parameter=novarialbles}.
 
 
 
@@ -975,7 +1015,7 @@ and arc types were ``converted'' to low-level constructs: all
 transition guards and arc inscriptions were removed (decisions are
 now made non-deterministically) and read arcs are ``unfolded'' to
 loops. Due to a new fault management (see @ref{Changes and
-Modulation}) the semantics does not contain any reset arcs.
+Modulation}) the patterns do not contain any reset arcs and is 1-safe.
 @end itemize
 
 
@@ -991,7 +1031,8 @@ acyclic link structure):
 
 @item the variable places (@samp{variable.@var{variablename}}), and
 
-@item the clock (@samp{1.internal.clock}).
+@item the clock (@samp{1.internal.clock}) if the process embeds an
+alarm event handler or a @code{<wait>} activity.
 @end itemize
 
 
@@ -1003,17 +1044,17 @@ acyclic link structure):
 
 
 
-@section Limitations
-
-The current version of @acronym{BPEL2oWFN} underlies several limitations:
-
-@itemize
-@item The pattern database consists of only one collection of patterns
-(i.e.@: the semantics of [Sta05], see @cite{Petri Net Patterns}). However,
-the patterns are parametrized: using the command-line arguments
-@samp{--parameter=nostandardfaults} and/or @samp{--parameter=cyclicwhile}
-yield to different models using the same ``base'' semantics.
-@end itemize
+@c @section Limitations
+@c 
+@c The current version of @acronym{BPEL2oWFN} underlies several limitations:
+@c 
+@c @itemize
+@c @item The pattern database consists of only one collection of patterns
+@c (i.e.@: the semantics of [Sta05], see @cite{Petri Net Patterns}). However,
+@c the patterns are parametrized: using the command-line arguments
+@c @samp{--parameter=nostandardfaults} and/or @samp{--parameter=cyclicwhile}
+@c yield to different models using the same ``base'' semantics.
+@c @end itemize
 
 
 
@@ -1034,11 +1075,11 @@ protocols) might throw an exception or even crash.
 @code{receive}, @code{reply}) should be defined with (input/output)
 variables.
 
-@item @b{Problem:} The implementation of the structural reduction
-rules might crash when applied to @acronym{BPEL} processes that
-created Petri nets with a large number of nodes.
-
-@b{Solution:} Avoid using the @samp{--parameter=simplify} mode in this case.
+@c @item @b{Problem:} The implementation of the structural reduction
+@c rules might crash when applied to @acronym{BPEL} processes that
+@c created Petri nets with a large number of nodes.
+@c 
+@c @b{Solution:} Avoid using the @samp{--parameter=simplify} mode in this case.
 
 @item @b{Problem:} The parser of @acronym{BPEL2oWFN} is not capable
 of skipping @acronym{XML} elements originating other namespaces than
@@ -1110,12 +1151,12 @@ For future releases of @acronym{BPEL2oWFN} the following features are planned:
 
 @itemize
 
-@item @b{Flexible model generation}. Originally, @acronym{BPEL2oWFN}
-was designed to support flexible model generation, i.e.@: finding the
-most abstract (thus smallest) model capable to check a given
-property. With static analysis we hope to generate the smallest
-Petri net possible to check properties like deadlock-freedom or
-controllability.
+@c @item @b{Flexible model generation}. Originally, @acronym{BPEL2oWFN}
+@c was designed to support flexible model generation, i.e.@: finding the
+@c most abstract (thus smallest) model capable to check a given
+@c property. With static analysis we hope to generate the smallest
+@c Petri net possible to check properties like deadlock-freedom or
+@c controllability.
 
 @item @b{Add data aspects}. In the implemented patterns we abstract
 from data and do not evaluate join or transition conditions. Instead all
@@ -1131,13 +1172,13 @@ implemented prototypic) is the base for more sophisticated analysis,
 e.g.@: finding unreachable activities, uninitialized variables or
 other problems that can occur during runtime.
 
-@item @b{More Petri net patterns}. Being feature-complete the Petri
-nets generated from the Petri net semantics of [Sta05] consist of a
-large number of nodes and might be to large to be analyzed by model
-checkers. The elaboration of different petri net patterns
-specialized for certain purposes (e.g.@: omitting the negative control
-flow) does not only help to find smaller models, but is also a
-prerequisite for flexible model generation.
+@c @item @b{More Petri net patterns}. Being feature-complete the Petri
+@c nets generated from the Petri net semantics of [Sta05] consist of a
+@c large number of nodes and might be to large to be analyzed by model
+@c checkers. The elaboration of different petri net patterns
+@c specialized for certain purposes (e.g.@: omitting the negative control
+@c flow) does not only help to find smaller models, but is also a
+@c prerequisite for flexible model generation.
 
 @item @b{Detailed info-files}. The generated info-files currently just
 list the nodes of the generated net. To help the retranslation of Petri
@@ -1177,6 +1218,9 @@ Siebel Systems. May 2003.
 Falko Bause, Peter Kemper, and Pieter Kritzinger. @b{Abstract Petri Net
 Notation}. @i{Petri Net Newsletter} 49:9-27, October 1995.
 @footnote{@url{http://ls4-www.informatik.uni-dortmund.de/QM/MA/fb/publication_ps_files/APNN.ps.gz}}
+
+@item [Fiona]
+Peter Massuthe and Daniela Weinberg. @b{Fiona}.@footnote{Soon available at @url{http://www.informatik.hu-berlin.de/top/tools4bpel/fiona}}
 
 @item [Hei03]
 Thomas Heidinger. @b{Statische Analyse von BPEL4WS-Prozessmodellen} @i{(in German)}.
@@ -1230,6 +1274,12 @@ Informatik-Berichte 188, Humboldt-Universit@"at zu Berlin, July 2005.
 Daniela Weinberg. @b{Analyse der Bedienbarkeit}. Diplomarbeit,
 Humboldt-Universit@"at zu Berlin, October 2004.
 @footnote{@url{http://www.informatik.hu-berlin.de/top/download/publications/weinberg04.pdf}}
+
+@item [WK02]
+Michael Weber and Ekkart Kindler. @b{The Petri Net Markup Language}. In: Hartmut Ehrig,
+Wolfgang Reisig, Grzegorz Rozenberg, Herbert Weber, editors: @i{Petri Net Technology for
+Communication-Based Systems: Advances in Petri Nets}, pp. 124-144, Springer Verlag
+(@acronym{LNCS} 2472), January 2003.@footnote{@url{http://www.informatik.hu-berlin.de/top/pnml/download/about/PNML_LNCS.pdf}}
 
 @end table
 

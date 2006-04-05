@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/03/23 15:53:07 $
+ *          - last changed: \$Date: 2006/04/05 09:38:18 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  */
 
 #ifndef CFG_H
@@ -167,8 +167,10 @@ class CFGBlock {
 	  
 };
 
+/// wrapper for dot printing (prints all the graph data)
 void cfgDot(CFGBlock *);
 
+/// connects two blocks
 void connectBlocks(CFGBlock *, CFGBlock *);
 
 #endif

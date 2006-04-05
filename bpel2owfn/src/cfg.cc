@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/03/23 15:53:06 $
+ *          - last changed: \$Date: 2006/04/05 09:38:18 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -46,14 +46,17 @@
 #include "cfg.h"
 #include "symbol-table.h"
 
-extern SymbolTable symTab;
+extern SymbolTable symTab; // needed for access to the Symbol Table
 
-using std::cout;
-using std::endl;
+/// mapping of Link names to Source blocks
+map<std::string, CFGBlock*> sources; 
+/// mapping of Link names to Target blocks
+map<std::string, CFGBlock*> targets; 
 
-map<std::string, CFGBlock*> sources;
-map<std::string, CFGBlock*> targets;
-
+/**
+ * Constructor for a CFG block.
+ *
+ */
 CFGBlock::CFGBlock()
 {
   firstBlock = this;
@@ -64,6 +67,14 @@ CFGBlock::CFGBlock()
   
 }
 
+/**
+ * Constructor for a CFG block.
+ *
+ * \param pType	  the type of the block (like CFGEmpty, CFGInvoke etc.)
+ * \param pId	  the ID of the block in the SymbolTable
+ * \param pLabel  a label for identifing the block (e.g. start vs. end block of a flow)
+ *
+ */
 CFGBlock::CFGBlock(CFGBlockType pType, kc::integer pId = kc::mkinteger(0), std::string pLabel = "")
 {
   firstBlock = this;
@@ -76,11 +87,19 @@ CFGBlock::CFGBlock(CFGBlockType pType, kc::integer pId = kc::mkinteger(0), std::
   dpe = false;
 }
 
+/**
+ * Destructor
+ *
+ */
 CFGBlock::~CFGBlock()
 {
 
 }
 
+/**
+ * Prints dot-style information about the block and creates arcs to its successors.
+ *
+ */
 void CFGBlock::print_dot()
 {
   if (!dotted)
@@ -137,6 +156,12 @@ void CFGBlock::print_dot()
   }
 }
 
+/**
+ * Returns a unique name for dot
+ *
+ * \return the dot name
+ *
+ */
 std::string CFGBlock::dot_name()
 {
   if (type == CFGSource || type == CFGTarget)
@@ -149,6 +174,9 @@ std::string CFGBlock::dot_name()
   }
 }
 
+/**
+ * Initializes the dot output by printing the graph information.
+ */
 void cfgDot(CFGBlock * block)
 {
   (*output) << "digraph{" << endl;
@@ -164,6 +192,14 @@ void cfgDot(CFGBlock * block)
 
 }
 
+/**
+ * Checks if a block needs DPE.
+ *
+ * \param hasStartingBlock  true iff a Switch or Pick was seen.
+ * \param lastTargets	    a list of all seen Targets
+ * \return		    true iff DPE is needed
+ *
+ */
 bool CFGBlock::needsDPE(int hasStartingBlock, list<kc::integer>& lastTargets)
 {
  
@@ -271,7 +307,12 @@ void CFGBlock::resetProcessedFlag(bool withLinks, bool forward)
   
 }
 
-
+/**
+ * Connects two blocks.
+ *
+ * \param from	the first block
+ * \param to	the second block
+ */
 void connectBlocks(CFGBlock * from, CFGBlock * to)
 {
   from->nextBlocks.push_back(to);

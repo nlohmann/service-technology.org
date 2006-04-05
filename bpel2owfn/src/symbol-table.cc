@@ -299,6 +299,7 @@ string SymbolTable::translateToElementName(unsigned int elementId)
     case K_LINK:	return "link";
     case K_ONALARM:	return "onAlarm";
     case K_ONMESSAGE:	return "onMessage";
+    case K_OTHERWISE:	return "otherwise";
     case K_PARTNER:	return "partner";
     case K_PARTNERLINK:	return "partnerLink";
     case K_PICK:	return "pick";

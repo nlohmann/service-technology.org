@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/04/05 12:11:57 $
+ *          - last changed: \$Date: 2006/04/05 16:00:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.168 $
+ * \version \$Revision: 1.169 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -2234,21 +2234,20 @@ tOtherwise:
   /* If the otherwise branch is not explicitly specified, then an otherwise
      branch with an empty activity is deemed to be present. */
     { // creaty empty activit with id, without links etc.
-      integer id = symTab.nextId();
+      int otherwiseId = currentSymTabEntryKey = symTab.insert(K_OTHERWISE);
+      currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
+      int emptyId = currentSymTabEntryKey = symTab.insert(K_EMPTY);
+      currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
+
       impl_standardElements_StandardElements* noLinks = StandardElements(NiltTarget_list(),NiltSource_list());
 //      noLinks->dpe = kc::mkinteger(0);
-      noLinks->parentId = id;
+      noLinks->parentId = kc::mkinteger(emptyId);
       impl_tEmpty_Empty* implicitEmpty = Empty(noLinks);
-      implicitEmpty->id = id;
+      implicitEmpty->id = kc::mkinteger(emptyId);
       implicitEmpty->negativeControlFlow = noLinks->negativeControlFlow = mkinteger(0);
 //      implicitEmpty->dpe = mkinteger(0);
       impl_activity *otherwiseActivity = activityEmpty(implicitEmpty);
-      otherwiseActivity->id = id;
-
-      currentSymTabEntryKey = symTab.insert(K_OTHERWISE);
-      currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
-      currentSymTabEntryKey = symTab.insert(K_EMPTY);
-      currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
+      otherwiseActivity->id = kc::mkinteger(emptyId);
 
       $$ = Otherwise(otherwiseActivity);
       $$->dpe = kc::mkinteger(0);

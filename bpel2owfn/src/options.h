@@ -54,6 +54,9 @@ typedef enum
 
 // some file names and pointers (in options.cc)
 
+extern void parse_command_line(int argc, char* argv[]);
+
+
 /// Filename of input file
 extern std::string filename;
 /// Filename of input file

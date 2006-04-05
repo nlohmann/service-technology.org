@@ -32,13 +32,13 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/03/20 10:28:59 $
+ *          - last changed: \$Date: 2006/04/05 12:11:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.47 $
+ * \version \$Revision: 1.48 $
  */
 
 
@@ -46,8 +46,11 @@
 
 
 #include "helpers.h"
-#include "check-symbols.h"
-#include "bpel-attributes.h"
+#include "options.h"
+#include "debug.h"
+#include "petrinet.h"
+// #include "check-symbols.h"
+// #include "bpel-attributes.h"
 
 
 
@@ -77,7 +80,6 @@ set<Node *> setUnion(set<Node *> a, set<Node *> b)
   
   return result;
 }
-
 
 /*!
  * \param i standard C int

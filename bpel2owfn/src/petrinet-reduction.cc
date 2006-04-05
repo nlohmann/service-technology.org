@@ -36,13 +36,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/03/31 14:56:53 $
+ *          - last changed: \$Date: 2006/04/05 12:11:58 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  */
 
 
@@ -53,7 +53,7 @@
 #include "petrinet.h"
 #include "debug.h"		// debugging help
 #include "symbol-table.h"
-
+#include "helpers.h"
 
 
 

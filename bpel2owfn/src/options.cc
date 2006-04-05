@@ -5,6 +5,9 @@
 #include "bpel2owfn.h"
 #include "options.h"
 #include "debug.h"
+#include "exception.h"
+
+using namespace std;
 
 // some file names and pointers
 
@@ -33,7 +36,7 @@ map<possibleOptions,    bool> options;
 map<possibleParameters, bool> parameters;
 map<possibleFormats,    bool> formats;
 // suffixes are defined in parse_command_line();
-map<possibleFormats,  string> suffixes;
+map<possibleFormats, std::string> suffixes;
 
 // long options
 static struct option longopts[] =

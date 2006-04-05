@@ -27,17 +27,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/03/21 22:53:08 $
+ *          - last changed: \$Date: 2006/04/05 12:11:58 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.114 $
+ * \version \$Revision: 1.115 $
  */
 
 
@@ -57,7 +57,7 @@
  * External variables
  *****************************************************************************/
 
-extern SymbolManager symMan;	// defined in bpel-syntax.yy
+//extern SymbolManager symMan;	// defined in bpel-syntax.yy
 
 
 

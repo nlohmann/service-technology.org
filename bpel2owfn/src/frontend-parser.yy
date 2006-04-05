@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/03/31 14:56:53 $
+ *          - last changed: \$Date: 2006/04/05 12:11:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.167 $
+ * \version \$Revision: 1.168 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -105,6 +105,8 @@
 #include "bpel-kc-yystype.h" // data types for tokens and non-terminals
 
 #include <map>
+#include "exception.h"
+#include "helpers.h"
 
 // from flex
 extern char* yytext;

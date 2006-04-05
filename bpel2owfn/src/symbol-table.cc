@@ -26,7 +26,7 @@
  *
  * \author
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $  
+ *          - last changes of: \$Author: gierds $  
  *          
  * \date
  * 
@@ -43,6 +43,7 @@
 #include "bpel-attributes.h"
 #include "bpel-syntax.h"
 #include "debug.h"
+#include "helpers.h"
 
 extern SymbolTable symTab;
 extern int yylineno;

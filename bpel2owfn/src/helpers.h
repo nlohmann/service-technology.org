@@ -32,13 +32,13 @@
  *          
  * \date    
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/03/20 12:12:46 $
+ *          - last changed: \$Date: 2006/04/05 12:11:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
  */
 
 
@@ -58,11 +58,10 @@
 
 #include <set>
 #include <string>
-#include "petrinet.h"
+// #include "petrinet.h"
 #include "exception.h"	// exception handling
-#include "check-symbols.h"
+// #include "check-symbols.h"
 #include "bpel2owfn.h"
-#include "options.h"
 
 using namespace std;
 
@@ -153,7 +152,7 @@ void print_help();
 void print_version(std::string name);
 
 /// Evaluates command line arguments
-void parse_command_line(int argc, char * argv[]);
+// void parse_command_line(int argc, char * argv[]);
 
 /// Calls #cleanup(), then exits
 void error();

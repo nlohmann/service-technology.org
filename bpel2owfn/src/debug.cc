@@ -29,17 +29,19 @@
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2006/02/03 09:14:24 $
+ *          - last changed: \$Date: 2006/04/05 12:11:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  */
 
 #include "debug.h"
+#include "options.h"
+#include "helpers.h"
 
 /// debug level
 trace_level debug_level = TRACE_ALWAYS;

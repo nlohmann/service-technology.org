@@ -1,4 +1,4 @@
-BEGIN OF INSTALL file for BPEL2oWFN Version 1.1
+BEGIN OF INSTALL file for BPEL2oWFN Version 1.2
 
 Setup and Installation
 **********************
@@ -15,11 +15,11 @@ follow these steps:
 
   1. Unpack the source tarball by entering(1)
 
-          gunzip bpel2owfn-1.1.tar.gz
-          tar xf bpel2owfn-1.1.tar
+          gunzip bpel2owfn-1.2.tar.gz
+          tar xf bpel2owfn-1.2.tar
 
   2. Enter that directory:
-          cd bpel2owfn-1.1
+          cd bpel2owfn-1.2
 
   3. Run the configure shell script which attempts to guess correct
      values for various system-dependent variables used during
@@ -84,11 +84,8 @@ follow these steps:
      to self-test the created binary. After many lines of output `make
      check' should announce
 
-          PASS: test1
-          PASS: test2
-          PASS: test3
           ==================
-          All 3 tests passed
+          All 4 tests passed
           ==================
 
      or, if anything went wrong, prints error message and requests to
@@ -99,7 +96,7 @@ Installation
 
 After successful compilation and self tests an executable file
 `bpel2owfn' (or `bpel2owfn.exe' on systems running Microsoft Windows)
-is created in the directory `bpel2owfn-1.1/src' of the distribution.
+is created in the directory `bpel2owfn-1.2/src' of the distribution.
 This file has no dependencies to other files of the distribution and
 can be copied to any directory.
 
@@ -131,14 +128,14 @@ ignored -- these warnings mostly occur in generated files from Flex,
 Bison or Kimwitu++ and are outside of our scope.
 
 The compilation of BPEL2oWFN was tested on several operating systems
-such as Microsoft Windows (running Cygwin), Linux, Apple MacOS X and
-Sun OS.  Anyway, if the compilation fails please make sure you use the
-most recent (stable) versions of the GNU Compiler Collection, Flex,
-Bison and Kimwitu++. If this does not help please send us an electronic
-mail to <nlohmann@informatik.hu-berlin.de>. Include the version number
-of your distribution (version 1.1 of 24 February 2006). Also include in
-your message the output that the make process produced. We will try to
-answer your mail within a week.
+such as Microsoft Windows (running Cygwin), GNU/Linux, Apple Mac OS X
+and Sun Solaris. Anyway, if the compilation fails please make sure you
+use the most recent (stable) versions of the GNU Compiler Collection,
+Flex, Bison and Kimwitu++. If this does not help please send us an
+electronic mail to <nlohmann@informatik.hu-berlin.de>. Include the
+version number of your distribution (version 1.2 of 5 April 2006). Also
+include in your message the output that the make process produced. We
+will try to answer your mail within a week.
 
 If you are not interested in compiling BPEL2oWFN yourself you can
 alternatively download executable binaries for several operating
@@ -153,7 +150,7 @@ The generated Makefiles serve different targets:
 `all'
      Compile BPEL2oWFN and create an executable binary `bpel2owfn' (or
      `bpel2owfn.exe' on systems running Microsoft Windows) in the
-     directory `bpel2owfn-1.1/src'.
+     directory `bpel2owfn-1.2/src'.
 
 `dvi'
 `html'
@@ -161,7 +158,7 @@ The generated Makefiles serve different targets:
 `ps'
      Generate documentation files in the given format which can be DVI,
      HTML, PDF or PostScript. The documentation is generated in the
-     directory `bpel2owfn-1.1/doc' and is named `bpel2owfn.FORMAT'
+     directory `bpel2owfn-1.2/doc' and is named `bpel2owfn.FORMAT'
      (User's Manual).
 
 `clean'
@@ -256,8 +253,8 @@ Graphviz, the Graph Visualization Software
 Reference System
 ================
 
-As of February 2006, we use the following system developing and
-building BPEL2oWFN:
+As of April 2006, we use the following system developing and building
+BPEL2oWFN:
 
    * Intel Pentium M processor, 1.60 GHz
 
@@ -271,7 +268,7 @@ building BPEL2oWFN:
 
    * Flex version 2.5.4
 
-   * GNU Bison version 1.875b
+   * GNU Bison version 2.1
 
    * Kimwitu++ version 2.3.8
 
@@ -283,8 +280,8 @@ but as a help if you fail to compile the sources.
 Copyright (C) 2005, 2006 Niels Lohmann, Christian Gierds and Dennis
 Reinert.
 
-This file is part of BPEL2oWFN, a tool translating business processes
-described in BPEL to open workflow nets (oWFN).
+This file is part of BPEL2oWFN, a tool translating a web service
+described into BPEL to an open workflow net (oWFN).
 
 BPEL2oWFN is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
@@ -300,4 +297,4 @@ You should have received a copy of the GNU General Public License along
 with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 
-END OF INSTALL file for BPEL2oWFN Version 1.1
+END OF INSTALL file for BPEL2oWFN Version 1.2

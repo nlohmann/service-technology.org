@@ -1,4 +1,4 @@
-BEGIN OF AUTHORS file for BPEL2oWFN Version 1.1
+BEGIN OF AUTHORS file for BPEL2oWFN Version 1.2
 
 Authors and Acknowledgements
 ****************************
@@ -57,8 +57,8 @@ Fax
 Copyright (C) 2005, 2006 Niels Lohmann, Christian Gierds and Dennis
 Reinert.
 
-This file is part of BPEL2oWFN, a tool translating business processes
-described in BPEL to open workflow nets (oWFN).
+This file is part of BPEL2oWFN, a tool translating a web service
+described into BPEL to an open workflow net (oWFN).
 
 BPEL2oWFN is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
@@ -74,4 +74,4 @@ You should have received a copy of the GNU General Public License along
 with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 
-END OF AUTHORS file for BPEL2oWFN Version 1.1
+END OF AUTHORS file for BPEL2oWFN Version 1.2

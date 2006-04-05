@@ -1,4 +1,4 @@
-Version 1.1 (24 February 2006)
+Version 1.2 (5 April 2006)
    - input:
         * BPEL process compliant to the specificiation BPEL4WS version
           1.1, May 2003.
@@ -10,11 +10,11 @@ Version 1.1 (24 February 2006)
            * Abstract Petri Net Notation (APPN)
            * Petri Net Markup Language (PNML)
 
-        * 1-safe open workflow net
+        * 1-safe open workflow net in Fiona format
 
         * Dot representation of the generated Petri net
 
-        * Control Flow Graph (experimental)
+        * Control Flow Graph (beta statge)
 
    - implemented patterns:
         * Christian Stahl. A Petri Net Semantics for BPEL.
@@ -22,4 +22,5 @@ Version 1.1 (24 February 2006)
           July 2005.
 
         * Variations of the Stahl-semantics (acyclic while patterns,
+          acyclic message event handlers, optional variables,
           livelocked systems, various fault models).

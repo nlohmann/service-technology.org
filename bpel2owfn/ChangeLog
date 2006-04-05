@@ -1,4 +1,4 @@
-BEGIN OF ChangeLog file for BPEL2oWFN Version 1.1
+BEGIN OF ChangeLog file for BPEL2oWFN Version 1.2
 
 Change Log
 **********
@@ -6,6 +6,8 @@ Change Log
 Most recent version at the end of this section.
 
 Version 1.0 (16 January 2006)
+-----------------------------
+
    - input:
         * BPEL process compliant to the specificiation BPEL4WS version
           1.1, May 2003.
@@ -23,6 +25,8 @@ Version 1.0 (16 January 2006)
           July 2005.
 
 Version 1.1 (24 February 2006)
+------------------------------
+
    - new output formats:
         * APNN (Abstract Petri Net Notation) Petri net
 
@@ -65,8 +69,42 @@ Version 1.1 (24 February 2006)
    - fixed bugs:
         * The generation of all possible types of the `<invoke>'
           activity (synchronous, asynchronous, with and without
-          implicit scope) is overworked and does produce errorenous
-          nets.
+          implicit scope) is overworked.
+
+Version 1.2 (5 April 2006)
+--------------------------
+
+   - overworked patterns:
+        * more parameterized versions of the Stahl-semantics (see
+          version 1.1):
+             * acyclic models (also acyclic event handlers)
+
+             * models without variables
+
+             * models without standard faults occuring while handling a
+               fault
+          For more information please refer to the User's Manual.
+
+   - static analysis:
+        * A control flow graph can be built and used to detect the use
+          of uninitialized variables.
+
+   - miscellaneous:
+        * The command-line parameter `-p finishloop' is renamed to `-p
+          finalloop'.
+
+        * Structural reduction rules remove all structural dead nodes
+          of the generated Petri net model.
+
+   - fixed bugs:
+        * Pattern of asynchronous `<invoke>' activity does no longer
+          receive messages.
+
+        * Structural reduction rules no longer change the semantics of
+          the `<switch>' activity.
+
+        * Structural reduction rules no longer remove the loop
+          transition for deadlock search.
 
 
 ----------------------------------------------------------------------
@@ -74,8 +112,8 @@ Version 1.1 (24 February 2006)
 Copyright (C) 2005, 2006 Niels Lohmann, Christian Gierds and Dennis
 Reinert.
 
-This file is part of BPEL2oWFN, a tool translating business processes
-described in BPEL to open workflow nets (oWFN).
+This file is part of BPEL2oWFN, a tool translating a web service
+described into BPEL to an open workflow net (oWFN).
 
 BPEL2oWFN is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
@@ -91,4 +129,4 @@ You should have received a copy of the GNU General Public License along
 with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 
-END OF ChangeLog file for BPEL2oWFN Version 1.1
+END OF ChangeLog file for BPEL2oWFN Version 1.2

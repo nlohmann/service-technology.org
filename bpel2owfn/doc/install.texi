@@ -640,7 +640,7 @@ extensibility.
 
 
 
-@unnumberedsubsec Version 1.2 (5 April 2006)
+@unnumberedsubsec Version 1.2 (6 April 2006)
 @itemize --
 
 @item overworked patterns:

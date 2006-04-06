@@ -23,6 +23,7 @@ Installation Manual which is part of the distribution or can be
 downloaded from the website of @acronym{BPEL2oWFN}
 (@url{http://www.informatik.hu-berlin.de/top/tools4bpel/bpel2owfn}).
 
+
 @vskip 20pt
 
 Copyright @copyright{} 2005, 2006 Niels Lohmann

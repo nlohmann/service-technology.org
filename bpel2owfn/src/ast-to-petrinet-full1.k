@@ -36,11 +36,11 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/03/31 14:56:53 $
+ *          - last changed: \$Date: 2006/04/06 08:39:51 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.175 $
+ * \version \$Revision: 1.176 $
  *
  */
 %}
@@ -1303,7 +1303,7 @@ This=userDefinedEventHandler(a,b) ->
       Place *p22 = TheNet->newPlace(prefix + "stop");
       Place *p23 = TheNet->newPlace(prefix + "stopped");
 
-      Transition *t5 = TheNet->newTransition(prefix + "t5");
+      Transition *t5 = TheNet->newTransition(prefix + "t5"); // t6 in MEH
       TheNet->newArc(p6, t5);
       TheNet->newArc(t5, p17);
       TheNet->newArc(TheNet->findPlace("1.internal.clock"), t5, READ);
@@ -1312,15 +1312,15 @@ This=userDefinedEventHandler(a,b) ->
       TheNet->newArc(t7, p8);
       TheNet->newArc(p18, t7);
 
-      Transition *t11 = TheNet->newTransition(prefix + "t11");
-      TheNet->newArc(p13, t11);
-      TheNet->newArc(p17, t11);
-      TheNet->newArc(t11, p18);
+      Transition *t11 = TheNet->newTransition(prefix + "t11"); // t13 in MEH
+      TheNet->newArc(p13, t11); // finish
+      TheNet->newArc(p17, t11); // running
+      TheNet->newArc(t11, p18); // finishing
 
-      Transition *t16 = TheNet->newTransition(prefix + "allStopped");
+      Transition *t16 = TheNet->newTransition(prefix + "allStopped"); // t24 in MEH (allStopped)
       TheNet->newArc(t16, p23);
 
-      Transition *t17 = TheNet->newTransition(prefix + "normalStop");
+      Transition *t17 = TheNet->newTransition(prefix + "stop+finish"); // t18 in MEH (stop+finish)
       TheNet->newArc(p18, t17);
       TheNet->newArc(p22, t17);
 
@@ -1329,7 +1329,7 @@ This=userDefinedEventHandler(a,b) ->
       TheNet->newArc(p22, t18);
       TheNet->newArc(t18, p23);
 
-      Transition *t19 = TheNet->newTransition(prefix + "stop+finish");
+      Transition *t19 = TheNet->newTransition(prefix + "normalStop"); // t27 in MEH (normalStop)
       TheNet->newArc(p17, t19);
       TheNet->newArc(p22, t19);
 
@@ -1376,10 +1376,20 @@ This=userDefinedEventHandler(a,b) ->
       	// Petri nets.
 	Transition *onMessage_t4 = TheNet->newTransition(newPrefix + "t4");
 	TheNet->newArc(onMessage_p4, onMessage_t4);
+	Transition *onMessage_t12 = TheNet->newTransition(newPrefix + "t12");
+	TheNet->newArc(onMessage_p11, onMessage_t12);
+	TheNet->newArc(onMessage_t12, onMessage_p12);
+	
 	if (parameters[P_CYCLICEH] == true)
+	{
 	  TheNet->newArc(onMessage_t4, onMessage_p5); // loop
+	  TheNet->newArc(onMessage_p5, onMessage_t12);
+	}
 	else
+	{
 	  TheNet->newArc(onMessage_t4, onMessage_p6); // abort
+	  TheNet->newArc(onMessage_p6, onMessage_t12);
+	}
 
 	
 	Transition *onMessage_t5 = TheNet->newTransition(newPrefix + "t5");
@@ -1407,10 +1417,6 @@ This=userDefinedEventHandler(a,b) ->
 	TheNet->newArc(onMessage_p11, onMessage_t11);
 	TheNet->newArc(onMessage_t11, onMessage_p12);
 
-	Transition *onMessage_t12 = TheNet->newTransition(newPrefix + "t12");
-	TheNet->newArc(onMessage_p5, onMessage_t12);
-	TheNet->newArc(onMessage_p11, onMessage_t12);
-	TheNet->newArc(onMessage_t12, onMessage_p12);
 
 	if (parameters[P_NOSTANDARDFAULTS] == false)
 	  Transition *t1 = throwFault(onMessage_p2, onMessage_p1, "p2", prefix, mkinteger(0));

@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/03/31 14:56:53 $
+ *          - last changed: \$Date: 2006/04/06 13:48:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.66 $
+ * \version \$Revision: 1.67 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -121,12 +121,18 @@ int main( int argc, char *argv[])
       {
         trace(TRACE_INFORMATION, "-> Unparsing AST to CFG ...\n");
         TheProcess->unparse(kc::pseudoPrinter, kc::cfg);
+	trace(TRACE_DEBUG, "[CFG] checking for DPE\n");
 	// do some business with CFG
 	list<kc::integer> kcl;
 	TheCFG->needsDPE(0, kcl);
 	TheCFG->resetProcessedFlag();
 
+	trace(TRACE_DEBUG, "[CFG] checking for cyclic links\n");
 	/// \todo (gierds) check for cyclic links, otherwise we will fail
+	TheCFG->checkForCyclicLinks();
+	TheCFG->resetProcessedFlag(true);
+
+	trace(TRACE_DEBUG, "[CFG] checking for uninitialized variables\n");
 	// test
 	TheCFG->checkForUninitializedVariables();
 	/// end test

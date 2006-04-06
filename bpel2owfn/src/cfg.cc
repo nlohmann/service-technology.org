@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/04/05 12:11:57 $
+ *          - last changed: \$Date: 2006/04/06 13:48:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -462,4 +462,48 @@ void CFGBlock::checkForUninitializedVariables()
     }
   }  
 }
+
+
+/// checks for cyclic links
+void CFGBlock::checkForCyclicLinks()
+{
+  if (!processed)
+  {
+    processed = true;
+    std::string linkname = "";
+
+    if (type == CFGTarget || type == CFGSource)
+    {
+      linkname = (dynamic_cast<STSourceTarget*>(symTab.lookup(id)))->link->name;
+    }
+
+    
+    if (type == CFGSource)
+    {
+      if (!targetsSeen.empty() && targetsSeen.find(linkname) != targetsSeen.end())
+      {
+        trace("[CFG] WARNING: Cyclic Links detected!\n");
+        trace("[CFG]          Process will most likely run into deadlock.\n");
+	return;
+      }
+      CFGBlock * targ = targets[dot_name()];
+      targ->targetsSeen = setUnion(targ->targetsSeen, targetsSeen);
+      targ->checkForCyclicLinks();
+    }
+    else if (type == CFGTarget)
+    {
+      targetsSeen.insert(linkname);
+    }
+
+    if (!nextBlocks.empty())
+    {
+      for (list<CFGBlock*>::iterator iter = nextBlocks.begin(); iter != nextBlocks.end(); iter++)
+      {
+        (*iter)->targetsSeen = setUnion((*iter)->targetsSeen, targetsSeen);
+	(*iter)->checkForCyclicLinks();
+      }
+    }
+  }
+}
+
 

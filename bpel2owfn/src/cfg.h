@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/04/05 09:38:18 $
+ *          - last changed: \$Date: 2006/04/06 13:48:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  */
 
 #ifndef CFG_H
@@ -151,6 +151,9 @@ class CFGBlock {
     /// checks if variables might be uninitialized
     void checkForUninitializedVariables();
 
+    /// checks for cyclic links
+    void checkForCyclicLinks();
+
   private:
     /// flag, if block was dotted
     bool dotted;
@@ -160,6 +163,9 @@ class CFGBlock {
 /***************************** Program Analysis *******************************/
     /// set of initialized variables
     set<std::string> initializedVariables;
+
+    /// set of targets seen so far
+    set<std::string> targetsSeen;
 
     /// \todo: move to symbol table
     bool dpe;

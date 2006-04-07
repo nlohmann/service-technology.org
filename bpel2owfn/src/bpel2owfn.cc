@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/04/06 13:48:39 $
+ *          - last changed: \$Date: 2006/04/07 09:26:01 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.67 $
+ * \version \$Revision: 1.68 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -117,7 +117,7 @@ int main( int argc, char *argv[])
       }
      
       // create CFG
-      if (modus == M_CFG || modus == M_PETRINET)
+      if (modus == M_CFG) //  || modus == M_PETRINET
       {
         trace(TRACE_INFORMATION, "-> Unparsing AST to CFG ...\n");
         TheProcess->unparse(kc::pseudoPrinter, kc::cfg);

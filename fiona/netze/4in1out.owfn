@@ -1,0 +1,90 @@
+{ owfn by DW "4 in, 1 out"}
+
+PLACE
+INTERNAL
+  p1,
+  p2,
+  p3,
+  p4,
+  p5,
+  p6,
+  p7,
+  p8,
+  p9,
+  p10;
+
+INPUT
+  a,
+  b,
+  c;
+
+OUTPUT
+  d,
+  e,
+  f,
+  g;
+
+INITIALMARKING
+  p1:	1
+ ;
+
+FINALMARKING
+  p10:	1
+ ;
+
+TRANSITION t1	 { tau1 }
+CONSUME
+  p1:	1;
+PRODUCE
+  p2 : 1,
+  p3: 1,
+  p4 : 1;
+
+TRANSITION t2	 { ?a }
+CONSUME
+  p2:	1,
+  a: 1;
+PRODUCE
+  p5 : 1;
+
+TRANSITION t3	 { ?b }
+CONSUME
+  p3:	1,
+  b: 1;
+PRODUCE
+  p6: 1;
+
+TRANSITION t4	 { ?c }
+CONSUME
+  p4:	1,
+  c: 1;
+PRODUCE
+  p7: 1;
+
+TRANSITION t5	 { !d }
+CONSUME
+  p5:	1;
+PRODUCE
+  d:	1,
+  p8: 1;
+ 
+TRANSITION t6	 { !e }
+CONSUME
+  p6:	1;
+PRODUCE
+  p8: 1,
+  e : 1;
+
+TRANSITION t7	 { !f }
+CONSUME
+  p7:	1;
+PRODUCE
+  p9: 1,
+  f : 1;
+
+TRANSITION t8	 { !g }
+CONSUME
+  p8:	1;
+PRODUCE
+  p10: 1,
+  g : 1;

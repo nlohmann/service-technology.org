@@ -1,0 +1,63 @@
+BEGIN OF AUTHORS file for Fiona Version 1.0
+
+Authors and Acknowledgements
+****************************
+
+Authors
+=======
+
+Fiona was written by:
+   * Peter Massuthe (Humboldt-Universita"t zu Berlin)
+
+   * Daniela Weinberg (Humboldt-Universita"t zu Berlin)
+
+
+Acknowledgements
+================
+
+We would like to thank:
+   * Karsten Wolf (Universita"t Rostock) for his support
+
+Fiona is part of the Tools4BPEL project funded by the German
+Bundesministerium fu"r Bildung und Forschung (BMBF).
+
+Contact
+=======
+
+Peter Massuthe and Daniela Weinberg
+
+Humboldt-Universita"t zu Berlin
+Institut fu"r Informatik
+Unter den Linden 6
+10099 Berlin, Germany
+
+Homepage
+     `http://www.informatik.hu-berlin.de/top/mitarbeiter/massuthe'
+     `http://www.informatik.hu-berlin.de/top/mitarbeiter/weinberg'
+
+E-mail
+     <massuthe@informatik.hu-berlin.de>
+     <weinberg@informatik.hu-berlin.de>
+
+----------------------------------------------------------------------
+
+Copyright (C) 2005, 2006 Peter Massuthe and Daniela Weinberg.
+
+This file is part of Fiona, a tool translating business processes
+described in BPEL to open workflow nets (oWFN).
+
+Fiona is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at your
+option) any later version.
+
+Fiona is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Fiona; if not, write to the Free Software Foundation, Inc., 51
+Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+
+END OF AUTHORS file for Fiona Version 1.0

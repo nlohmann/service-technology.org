@@ -1,0 +1,41 @@
+{ depth 1, n states in first node }
+
+PLACE
+INTERNAL
+  p0,  { initial }
+  p1,
+  p2,
+  p3,
+  p4;
+
+OUTPUT
+  a;
+
+INITIALMARKING
+  p0:  1,
+  p1:  1000;
+
+FINALMARKING
+  p4:   1;
+
+TRANSITION t1    { abraeumen1 }
+CONSUME
+  p0:   1;
+PRODUCE
+  p2:   1;
+
+TRANSITION t2    { abraeumen2 }
+CONSUME
+  p1:   1;
+PRODUCE
+  p3:   1;
+
+TRANSITION t3    { !a }
+CONSUME
+  p2:   1,
+  p3:   1000;
+PRODUCE
+  a:   1,
+  p4:  1;
+
+{ END OF FILE }

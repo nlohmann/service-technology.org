@@ -1,0 +1,1151 @@
+{ oWFN created by BPEL2oWFN 1.1 reading loan.bpel }
+
+PLACE
+  INTERNAL
+    p6, 		 { link.11.receive-to-assess }
+    p7, 		 { !link.11.receive-to-assess }
+    p8, 		 { link.11.receive-to-approval }
+    p9, 		 { !link.11.receive-to-approval }
+    p10, 		 { link.11.approval-to-reply }
+    p11, 		 { !link.11.approval-to-reply }
+    p12, 		 { link.11.assess-to-setMessage }
+    p13, 		 { !link.11.assess-to-setMessage }
+    p14, 		 { link.11.setMessage-to-reply }
+    p15, 		 { !link.11.setMessage-to-reply }
+    p16, 		 { link.11.assess-to-approval }
+    p17, 		 { !link.11.assess-to-approval }
+    p18, 		 { variable.1.request }
+    p19, 		 { variable.1.risk }
+    p20, 		 { variable.1.approval }
+    p21, 		 { variable.1.error }
+    p22, 		 { 1.internal.clock }
+    p23, 		 { 1.internal.initial }
+    p396, 		 { 1.internal.Active }
+    p30, 		 { 1.internal.!Compensated }
+    p392, 		 { 1.internal.Faulted }
+    p400, 		 { 1.internal.!Faulted }
+    p401, 		 { 1.internal.rethrow }
+    p37, 		 { 1.internal.!Terminated }
+    p38, 		 { 1.internal.Terminated }
+    p393, 		 { 1.internal.upperFH }
+    p62, 		 { 1.internal.stop.p2 }
+    p399, 		 { 1.internal.upperTerminate }
+    p410, 		 { 1.internal.!FHFaulted }
+    p411, 		 { 1.internal.CHFaulted }
+    p412, 		 { 1.internal.!CHFaulted }
+    p408, 		 { 1.internal.p36 }
+    p63, 		 { 1.internal.stop.p3 }
+    p64, 		 { 1.internal.stop.p4 }
+    p66, 		 { 1.internal.stop.p6 }
+    p71, 		 { 1.internal.stop.p11 }
+    p414, 		 { 1.internal.p20 }
+    p78, 		 { 1.internal.stop.p19 }
+    p86, 		 { 1.internal.stop.fh_fault_in }
+    p413, 		 { 1.internal.p19 }
+    p89, 		 { 1.internal.stop.ch_fault_in }
+    p395, 		 { 1.internal.faultSave }
+    p397, 		 { 1.internal.!Active }
+    p409, 		 { 1.internal.FHFaulted }
+    p403, 		 { 1.internal.Compensated }
+    p108, 		 { 1.internal.faultHandler.p14 }
+    p391, 		 { 1.internal.ch_out }
+    p161, 		 { 1.internal.faultHandler.p12 }
+    p137, 		 { 10.internal.running }
+    p119, 		 { 1.internal.faultHandler.compensate.running }
+    p139, 		 { 10.internal.p4 }
+    p155, 		 { 10.final }
+    p130, 		 { 1.internal.faultHandler.p8 }
+    p131, 		 { 1.internal.faultHandler.p9 }
+    p160, 		 { 1.internal.faultHandler.p11 }
+    p404, 		 { 1.internal.!Ended }
+    p149, 		 { 10.negLink }
+    p388, 		 { 1.internal.scopeCompensated }
+    p154, 		 { 10.initial }
+    p402, 		 { 1.internal.Ended }
+    p162, 		 { 1.internal.compensationHandler.p1 }
+    p163, 		 { 1.internal.compensationHandler.ch_in }
+    p384, 		 { 1.internal.Completed }
+    p166, 		 { 1.internal.compensationHandler.!Compensated }
+    p394, 		 { 1.internal.fault }
+    p168, 		 { 1.internal.compensationHandler.compensated }
+    p169, 		 { 1.internal.compensationHandler.comp }
+    p172, 		 { 1.internal.compensationHandler.ch_call }
+    p173, 		 { 1.internal.compensationHandler.fh_call }
+    p385, 		 { 1.internal.!Completed }
+    p407, 		 { 1.internal.p35 }
+    p398, 		 { 1.internal.final }
+    p415, 		 { 1.internal.p21 }
+    p193, 		 { 11.internal.running }
+    p238, 		 { 19.p4 }
+    p214, 		 { 19.internal.running }
+    p216, 		 { 19.internal.p4 }
+    p208, 		 { 11.negLink }
+    p244, 		 { 22.internal.running2 }
+    p242, 		 { 22.internal.running1 }
+    p226, 		 { 19.negLink }
+    p239, 		 { 19.stop }
+    p228, 		 { 19.p3 }
+    p230, 		 { 19.final }
+    p240, 		 { 19.stopped }
+    p237, 		 { 19.initial }
+    p243, 		 { 22.internal.p3 }
+    p246, 		 { 22.internal.p6 }
+    p313, 		 { 31.internal.p3 }
+    p303, 		 { 26.stop }
+    p261, 		 { 22.negLink }
+    p262, 		 { 22.p10 }
+    p278, 		 { 22.stop }
+    p265, 		 { 22.final }
+    p279, 		 { 22.stopped }
+    p268, 		 { 22.initial }
+    p305, 		 { 26.internal.copy.1.p4 }
+    p276, 		 { 22.p11 }
+    p277, 		 { 22.p12 }
+    p286, 		 { 26.negLink }
+    p287, 		 { 26.p10 }
+    p314, 		 { 31.internal.running2 }
+    p290, 		 { 26.final }
+    p293, 		 { 26.initial }
+    p301, 		 { 26.p11 }
+    p304, 		 { 26.stopped }
+    p310, 		 { 26.p12 }
+    p312, 		 { 31.internal.running1 }
+    p349, 		 { 31.stopped }
+    p316, 		 { 31.internal.p6 }
+    p375, 		 { 35.stopped }
+    p416, 		 { 1.internal.p22 }
+    p351, 		 { 35.internal.running }
+    p331, 		 { 31.negLink }
+    p332, 		 { 31.p10 }
+    p348, 		 { 31.stop }
+    p335, 		 { 31.final }
+    p353, 		 { 35.internal.p4 }
+    p338, 		 { 31.initial }
+    p374, 		 { 35.stop }
+    p346, 		 { 31.p11 }
+    p347, 		 { 31.p12 }
+    p363, 		 { 35.negLink }
+    p366, 		 { 35.initial }
+    p372, 		 { 35.p6 }
+    p373, 		 { 35.final }
+    p387; 		 { 1.internal.p41 }
+
+  INPUT
+    p1, 		 { in.assessor.lns:riskAssessmentPT.check }
+    p2, 		 { in.customer.lns:loanServicePT.request }
+    p0; 		 { in.approver.lns:loanApprovalPT.approve }
+
+  OUTPUT
+    p3, 		 { out.approver.lns:loanApprovalPT.approve }
+    p4, 		 { out.assessor.lns:riskAssessmentPT.check }
+    p5; 		 { out.customer.lns:loanServicePT.request }
+
+
+INITIALMARKING
+  p23:	1,	 { initial marking of the process }
+  p18:	1,	 { initial marking of variable1.request }
+  p19:	1,	 { initial marking of variable1.risk }
+  p20:	1,	 { initial marking of variable1.approval }
+  p21:	1,	 { initial marking of variable1.error }
+  p22:	1	 { initial marking of the clock }
+;
+
+FINALMARKING
+  p398:	1	 { final marking of the process }
+;
+
+
+TRANSITION t57	 { 1.internal.t2 }
+CONSUME
+  p23:	1;
+PRODUCE
+  p7:	1,
+  p9:	1,
+  p11:	1,
+  p13:	1,
+  p15:	1,
+  p17:	1,
+  p396:	1,
+  p30:	1,
+  p400:	1,
+  p37:	1,
+  p410:	1,
+  p413:	1,
+  p404:	1,
+  p385:	1;
+
+TRANSITION t58	 { 1.internal.t4 }
+CONSUME
+  p396:	1,
+  p414:	1,
+  p385:	1;
+PRODUCE
+  p397:	1,
+  p384:	1,
+  p398:	1;
+
+TRANSITION t90	 { 1.internal.stop.t1 }
+CONSUME
+  p392:	1,
+  p86:	1;
+PRODUCE
+  p392:	1,
+  p401:	1;
+
+TRANSITION t91	 { 1.internal.stop.t2 }
+CONSUME
+  p62:	1;
+PRODUCE
+  p63:	1,
+  p415:	1;
+
+TRANSITION t92	 { 1.internal.stop.t3 }
+CONSUME
+  p63:	1,
+  p416:	1;
+PRODUCE
+  p64:	1;
+
+TRANSITION t93	 { 1.internal.stop.t4 }
+CONSUME
+  p393:	1;
+PRODUCE
+  p62:	1,
+  p66:	1;
+
+TRANSITION t94	 { 1.internal.stop.t5 }
+CONSUME
+  p400:	1,
+  p64:	1,
+  p66:	1;
+PRODUCE
+  p392:	1,
+  p395:	1,
+  p394:	1;
+
+TRANSITION t95	 { 1.internal.stop.t6 }
+CONSUME
+  p396:	1,
+  p399:	1;
+PRODUCE
+  p62:	1,
+  p71:	1,
+  p397:	1;
+
+TRANSITION t96	 { 1.internal.stop.t7 }
+CONSUME
+  p64:	1,
+  p71:	1,
+  p404:	1;
+PRODUCE
+  p402:	1,
+  p398:	1;
+
+TRANSITION t97	 { 1.internal.stop.t8 }
+CONSUME
+  p399:	1,
+  p397:	1;
+PRODUCE
+  p397:	1;
+
+TRANSITION t98	 { 1.internal.stop.t10 }
+CONSUME
+  p89:	1,
+  p403:	1,
+  p404:	1;
+PRODUCE
+  p78:	1,
+  p403:	1,
+  p407:	1;
+
+TRANSITION t99	 { 1.internal.stop.t12 }
+CONSUME
+  p408:	1,
+  p78:	1;
+PRODUCE
+  p402:	1,
+  p398:	1;
+
+TRANSITION t113	 { 1.internal.faultHandler.t7 }
+CONSUME
+  p401:	1,
+  p395:	1;
+PRODUCE
+  p108:	1,
+  p160:	1;
+
+TRANSITION t114	 { 1.internal.faultHandler.t8 }
+CONSUME
+  p108:	1,
+  p161:	1,
+  p404:	1;
+PRODUCE
+  p402:	1,
+  p398:	1;
+
+TRANSITION t115	 { 1.internal.faultHandler.t9 }
+CONSUME
+  p401:	1,
+  p402:	1;
+PRODUCE
+  p402:	1;
+
+TRANSITION t116	 { 1.internal.faultHandler.t5 }
+CONSUME
+  p395:	1,
+  p394:	1;
+PRODUCE
+  p395:	1,
+  p130:	1;
+
+TRANSITION t117	 { 1.internal.faultHandler.t6 }
+CONSUME
+  p395:	1,
+  p131:	1,
+  p404:	1;
+PRODUCE
+  p402:	1,
+  p398:	1;
+
+TRANSITION t125	 { 1.internal.faultHandler.compensate.t1 }
+CONSUME
+  p130:	1;
+PRODUCE
+  p119:	1,
+  p387:	1;
+
+TRANSITION t126	 { 1.internal.faultHandler.compensate.t2 }
+CONSUME
+  p391:	1,
+  p119:	1;
+PRODUCE
+  p131:	1;
+
+TRANSITION t127	 { 1.internal.faultHandler.compensate.t3 }
+CONSUME
+  p130:	1,
+  p160:	1;
+PRODUCE
+  p161:	1;
+
+TRANSITION t128	 { 1.internal.faultHandler.compensate.t4 }
+CONSUME
+  p119:	1,
+  p160:	1;
+PRODUCE
+  p161:	1;
+
+TRANSITION t158	 { 1.internal.faultHandler.t1.internal.lns:loanProcessFault }
+CONSUME
+  p395:	1,
+  p394:	1;
+PRODUCE
+  p395:	1,
+  p154:	1;
+
+TRANSITION t129	 { 1.internal.faultHandler.compensate.t5 }
+CONSUME
+  p119:	1,
+  p131:	1;
+PRODUCE
+  p161:	1;
+
+TRANSITION t142	 { 10.internal.t1 }
+CONSUME
+  p21:	1,
+  p154:	1;
+PRODUCE
+  p21:	1,
+  p137:	1;
+
+TRANSITION t143	 { 10.internal.t2 }
+CONSUME
+  p137:	1;
+PRODUCE
+  p5:	1,
+  p155:	1;
+
+TRANSITION t144	 { 10.internal.throwFault.running }
+CONSUME
+  p410:	1,
+  p137:	1;
+PRODUCE
+  p86:	1,
+  p409:	1,
+  p139:	1;
+
+TRANSITION t145	 { 10.internal.stoppedAt.initial }
+CONSUME
+  p160:	1,
+  p154:	1;
+PRODUCE
+  p161:	1;
+
+TRANSITION t146	 { 10.internal.stoppedAt.running }
+CONSUME
+  p137:	1,
+  p160:	1;
+PRODUCE
+  p161:	1;
+
+TRANSITION t147	 { 10.internal.stoppedAt.final }
+CONSUME
+  p155:	1,
+  p160:	1;
+PRODUCE
+  p161:	1;
+
+TRANSITION t159	 { 1.internal.faultHandler.t2.lns:loanProcessFault }
+CONSUME
+  p395:	1,
+  p155:	1;
+PRODUCE
+  p398:	1;
+
+TRANSITION t148	 { 10.internal.stoppedAt.p4 }
+CONSUME
+  p139:	1,
+  p160:	1;
+PRODUCE
+  p161:	1;
+
+TRANSITION t177	 { 1.internal.compensationHandler.throwFault.ch_in }
+CONSUME
+  p412:	1,
+  p403:	1,
+  p163:	1;
+PRODUCE
+  p411:	1,
+  p89:	1,
+  p403:	1,
+  p162:	1;
+
+TRANSITION t178	 { 1.internal.compensationHandler.t2 }
+CONSUME
+  p163:	1,
+  p166:	1,
+  p385:	1;
+PRODUCE
+  p166:	1,
+  p168:	1,
+  p385:	1;
+
+TRANSITION t179	 { 1.internal.compensationHandler.t3 }
+CONSUME
+  p162:	1,
+  p416:	1;
+PRODUCE
+  p407:	1;
+
+TRANSITION t180	 { 1.internal.compensationHandler.t4 }
+CONSUME
+  p163:	1,
+  p384:	1,
+  p166:	1;
+PRODUCE
+  p403:	1,
+  p384:	1,
+  p169:	1,
+  p172:	1;
+
+TRANSITION t181	 { 1.internal.compensationHandler.t6 }
+CONSUME
+  p387:	1;
+PRODUCE
+  p169:	1,
+  p173:	1;
+
+TRANSITION t182	 { 1.internal.compensationHandler.t7 }
+CONSUME
+  p169:	1,
+  p172:	1;
+PRODUCE
+  p168:	1;
+
+TRANSITION t183	 { 1.internal.compensationHandler.t8 }
+CONSUME
+  p169:	1,
+  p173:	1;
+PRODUCE
+  p391:	1;
+
+TRANSITION t184	 { 1.internal.compensationHandler.t9 }
+CONSUME
+  p388:	1,
+  p173:	1;
+PRODUCE
+  p169:	1,
+  p173:	1;
+
+TRANSITION t185	 { 1.internal.compensationHandler.t10 }
+CONSUME
+  p388:	1,
+  p172:	1;
+PRODUCE
+  p169:	1,
+  p172:	1;
+
+TRANSITION t186	 { 1.internal.compensationHandler.t11 }
+CONSUME
+  p172:	1,
+  p416:	1;
+PRODUCE
+  p407:	1;
+
+TRANSITION t187	 { 1.internal.compensationHandler.t12 }
+CONSUME
+  p173:	1,
+  p416:	1;
+PRODUCE
+  p407:	1;
+
+TRANSITION t188	 { 1.internal.compensationHandler.t15 }
+CONSUME
+  p168:	1,
+  p416:	1;
+PRODUCE
+  p407:	1;
+
+TRANSITION t189	 { 1.internal.compensationHandler.t16 }
+CONSUME
+  p391:	1,
+  p416:	1;
+PRODUCE
+  p407:	1;
+
+TRANSITION t196	 { 11.internal.t1 }
+CONSUME
+  p208:	1;
+PRODUCE
+  p226:	1,
+  p261:	1,
+  p286:	1,
+  p331:	1,
+  p363:	1;
+
+TRANSITION t197	 { 11.internal.t2 }
+CONSUME
+  p413:	1;
+PRODUCE
+  p193:	1,
+  p237:	1,
+  p268:	1,
+  p293:	1,
+  p338:	1,
+  p366:	1;
+
+TRANSITION t198	 { 11.internal.t3 }
+CONSUME
+  p193:	1,
+  p230:	1,
+  p265:	1,
+  p290:	1,
+  p335:	1,
+  p373:	1;
+PRODUCE
+  p414:	1;
+
+TRANSITION t199	 { 11.internal.t5 }
+CONSUME
+  p415:	1,
+  p193:	1;
+PRODUCE
+  p239:	1,
+  p303:	1,
+  p278:	1,
+  p348:	1,
+  p374:	1;
+
+TRANSITION t200	 { 11.internal.innerStopped }
+CONSUME
+  p240:	1,
+  p279:	1,
+  p304:	1,
+  p349:	1,
+  p375:	1;
+PRODUCE
+  p416:	1;
+
+TRANSITION t201	 { 11.internal.stoppedAt.initial }
+CONSUME
+  p413:	1,
+  p415:	1;
+PRODUCE
+  p416:	1;
+
+TRANSITION t202	 { 11.internal.stoppedAt.final }
+CONSUME
+  p414:	1,
+  p415:	1;
+PRODUCE
+  p416:	1;
+
+TRANSITION t219	 { 19.internal.t1 }
+CONSUME
+  p2:	1,
+  p237:	1;
+PRODUCE
+  p214:	1;
+
+TRANSITION t220	 { 19.internal.t2 }
+CONSUME
+  p18:	1,
+  p214:	1;
+PRODUCE
+  p18:	1,
+  p238:	1;
+
+TRANSITION t221	 { 19.internal.throwFault.running }
+CONSUME
+  p396:	1,
+  p214:	1;
+PRODUCE
+  p393:	1,
+  p397:	1,
+  p216:	1;
+
+TRANSITION t222	 { 19.internal.stoppedAt.initial }
+CONSUME
+  p239:	1,
+  p237:	1;
+PRODUCE
+  p240:	1;
+
+TRANSITION t223	 { 19.internal.stoppedAt.running }
+CONSUME
+  p214:	1,
+  p239:	1;
+PRODUCE
+  p240:	1;
+
+TRANSITION t224	 { 19.internal.stoppedAt.final }
+CONSUME
+  p238:	1,
+  p239:	1;
+PRODUCE
+  p240:	1;
+
+TRANSITION t225	 { 19.internal.stoppedAt.p4 }
+CONSUME
+  p216:	1,
+  p239:	1;
+PRODUCE
+  p240:	1;
+
+TRANSITION t233	 { 19.t1 }
+CONSUME
+  p7:	1,
+  p9:	1,
+  p226:	1;
+PRODUCE
+  p6:	1,
+  p8:	1,
+  p228:	1;
+
+TRANSITION t234	 { 19.t2 }
+CONSUME
+  p7:	1,
+  p9:	1,
+  p238:	1;
+PRODUCE
+  p6:	1,
+  p8:	1,
+  p230:	1;
+
+TRANSITION t235	 { 19.t3 }
+CONSUME
+  p6:	1,
+  p8:	1,
+  p238:	1;
+PRODUCE
+  p6:	1,
+  p8:	1,
+  p230:	1;
+
+TRANSITION t236	 { 19.stoppedAt.final }
+CONSUME
+  p239:	1,
+  p230:	1;
+PRODUCE
+  p240:	1;
+
+TRANSITION t249	 { 22.internal.t1 }
+CONSUME
+  p18:	1,
+  p276:	1;
+PRODUCE
+  p18:	1,
+  p242:	1;
+
+TRANSITION t250	 { 22.internal.t2 }
+CONSUME
+  p242:	1;
+PRODUCE
+  p4:	1,
+  p243:	1;
+
+TRANSITION t251	 { 22.internal.t3 }
+CONSUME
+  p1:	1,
+  p243:	1;
+PRODUCE
+  p244:	1;
+
+TRANSITION t252	 { 22.internal.t4 }
+CONSUME
+  p19:	1,
+  p244:	1;
+PRODUCE
+  p19:	1,
+  p277:	1;
+
+TRANSITION t253	 { 22.internal.throwFault.running2 }
+CONSUME
+  p396:	1,
+  p244:	1;
+PRODUCE
+  p393:	1,
+  p397:	1,
+  p246:	1;
+
+TRANSITION t254	 { 22.internal.throwFault.running1 }
+CONSUME
+  p396:	1,
+  p242:	1;
+PRODUCE
+  p393:	1,
+  p397:	1,
+  p246:	1;
+
+TRANSITION t255	 { 22.internal.stoppedAt.initial }
+CONSUME
+  p278:	1,
+  p276:	1;
+PRODUCE
+  p279:	1;
+
+TRANSITION t256	 { 22.internal.stoppedAt.running1 }
+CONSUME
+  p242:	1,
+  p278:	1;
+PRODUCE
+  p279:	1;
+
+TRANSITION t257	 { 22.internal.stoppedAt.p3 }
+CONSUME
+  p243:	1,
+  p278:	1;
+PRODUCE
+  p279:	1;
+
+TRANSITION t258	 { 22.internal.stoppedAt.running2 }
+CONSUME
+  p244:	1,
+  p278:	1;
+PRODUCE
+  p279:	1;
+
+TRANSITION t259	 { 22.internal.stoppedAt.final }
+CONSUME
+  p278:	1,
+  p277:	1;
+PRODUCE
+  p279:	1;
+
+TRANSITION t260	 { 22.internal.stoppedAt.p6 }
+CONSUME
+  p246:	1,
+  p278:	1;
+PRODUCE
+  p279:	1;
+
+TRANSITION t269	 { 22.t1 }
+CONSUME
+  p13:	1,
+  p17:	1,
+  p261:	1;
+PRODUCE
+  p12:	1,
+  p16:	1,
+  p262:	1;
+
+TRANSITION t270	 { 22.t2 }
+CONSUME
+  p6:	1,
+  p268:	1;
+PRODUCE
+  p7:	1,
+  p276:	1;
+
+TRANSITION t271	 { 22.t3 }
+CONSUME
+  p13:	1,
+  p17:	1,
+  p277:	1;
+PRODUCE
+  p12:	1,
+  p16:	1,
+  p265:	1;
+
+TRANSITION t272	 { 22.t4 }
+CONSUME
+  p12:	1,
+  p16:	1,
+  p277:	1;
+PRODUCE
+  p12:	1,
+  p16:	1,
+  p265:	1;
+
+TRANSITION t273	 { 22.t5 }
+CONSUME
+  p6:	1,
+  p13:	1,
+  p17:	1,
+  p268:	1;
+PRODUCE
+  p7:	1,
+  p12:	1,
+  p16:	1,
+  p262:	1,
+  p265:	1;
+
+TRANSITION t274	 { 22.stoppedAt.initial }
+CONSUME
+  p278:	1,
+  p268:	1;
+PRODUCE
+  p279:	1;
+
+TRANSITION t275	 { 22.stoppedAt.final }
+CONSUME
+  p278:	1,
+  p265:	1;
+PRODUCE
+  p279:	1;
+
+TRANSITION t284	 { 26.internal.stoppedAt.initial }
+CONSUME
+  p303:	1,
+  p301:	1;
+PRODUCE
+  p304:	1;
+
+TRANSITION t285	 { 26.internal.stoppedAt.final }
+CONSUME
+  p303:	1,
+  p310:	1;
+PRODUCE
+  p304:	1;
+
+TRANSITION t294	 { 26.t1 }
+CONSUME
+  p15:	1,
+  p286:	1;
+PRODUCE
+  p14:	1,
+  p287:	1;
+
+TRANSITION t295	 { 26.t2 }
+CONSUME
+  p12:	1,
+  p293:	1;
+PRODUCE
+  p13:	1,
+  p301:	1;
+
+TRANSITION t296	 { 26.t3 }
+CONSUME
+  p15:	1,
+  p310:	1;
+PRODUCE
+  p14:	1,
+  p290:	1;
+
+TRANSITION t297	 { 26.t4 }
+CONSUME
+  p14:	1,
+  p310:	1;
+PRODUCE
+  p14:	1,
+  p290:	1;
+
+TRANSITION t298	 { 26.t5 }
+CONSUME
+  p12:	1,
+  p15:	1,
+  p293:	1;
+PRODUCE
+  p13:	1,
+  p14:	1,
+  p287:	1,
+  p290:	1;
+
+TRANSITION t299	 { 26.stoppedAt.initial }
+CONSUME
+  p303:	1,
+  p293:	1;
+PRODUCE
+  p304:	1;
+
+TRANSITION t307	 { 26.internal.copy.1.t2 }
+CONSUME
+  p20:	1,
+  p301:	1;
+PRODUCE
+  p20:	1,
+  p310:	1;
+
+TRANSITION t300	 { 26.stoppedAt.final }
+CONSUME
+  p303:	1,
+  p290:	1;
+PRODUCE
+  p304:	1;
+
+TRANSITION t308	 { 26.internal.copy.1.throwFault.initial }
+CONSUME
+  p396:	1,
+  p301:	1;
+PRODUCE
+  p393:	1,
+  p397:	1,
+  p305:	1;
+
+TRANSITION t309	 { 26.internal.stoppedAt.p4at1 }
+CONSUME
+  p303:	1,
+  p305:	1;
+PRODUCE
+  p304:	1;
+
+TRANSITION t319	 { 31.internal.t1 }
+CONSUME
+  p18:	1,
+  p346:	1;
+PRODUCE
+  p18:	1,
+  p312:	1;
+
+TRANSITION t320	 { 31.internal.t2 }
+CONSUME
+  p312:	1;
+PRODUCE
+  p3:	1,
+  p313:	1;
+
+TRANSITION t321	 { 31.internal.t3 }
+CONSUME
+  p0:	1,
+  p313:	1;
+PRODUCE
+  p314:	1;
+
+TRANSITION t322	 { 31.internal.t4 }
+CONSUME
+  p20:	1,
+  p314:	1;
+PRODUCE
+  p20:	1,
+  p347:	1;
+
+TRANSITION t323	 { 31.internal.throwFault.running2 }
+CONSUME
+  p396:	1,
+  p314:	1;
+PRODUCE
+  p393:	1,
+  p397:	1,
+  p316:	1;
+
+TRANSITION t324	 { 31.internal.throwFault.running1 }
+CONSUME
+  p396:	1,
+  p312:	1;
+PRODUCE
+  p393:	1,
+  p397:	1,
+  p316:	1;
+
+TRANSITION t325	 { 31.internal.stoppedAt.initial }
+CONSUME
+  p348:	1,
+  p346:	1;
+PRODUCE
+  p349:	1;
+
+TRANSITION t326	 { 31.internal.stoppedAt.running1 }
+CONSUME
+  p312:	1,
+  p348:	1;
+PRODUCE
+  p349:	1;
+
+TRANSITION t327	 { 31.internal.stoppedAt.p3 }
+CONSUME
+  p313:	1,
+  p348:	1;
+PRODUCE
+  p349:	1;
+
+TRANSITION t328	 { 31.internal.stoppedAt.running2 }
+CONSUME
+  p314:	1,
+  p348:	1;
+PRODUCE
+  p349:	1;
+
+TRANSITION t329	 { 31.internal.stoppedAt.final }
+CONSUME
+  p348:	1,
+  p347:	1;
+PRODUCE
+  p349:	1;
+
+TRANSITION t330	 { 31.internal.stoppedAt.p6 }
+CONSUME
+  p316:	1,
+  p348:	1;
+PRODUCE
+  p349:	1;
+
+TRANSITION t339	 { 31.t1 }
+CONSUME
+  p11:	1,
+  p331:	1;
+PRODUCE
+  p10:	1,
+  p332:	1;
+
+TRANSITION t340	 { 31.t2 }
+CONSUME
+  p8:	1,
+  p16:	1,
+  p338:	1;
+PRODUCE
+  p9:	1,
+  p17:	1,
+  p346:	1;
+
+TRANSITION t341	 { 31.t3 }
+CONSUME
+  p11:	1,
+  p347:	1;
+PRODUCE
+  p10:	1,
+  p335:	1;
+
+TRANSITION t342	 { 31.t4 }
+CONSUME
+  p10:	1,
+  p347:	1;
+PRODUCE
+  p10:	1,
+  p335:	1;
+
+TRANSITION t343	 { 31.t5 }
+CONSUME
+  p8:	1,
+  p11:	1,
+  p16:	1,
+  p338:	1;
+PRODUCE
+  p9:	1,
+  p10:	1,
+  p17:	1,
+  p332:	1,
+  p335:	1;
+
+TRANSITION t344	 { 31.stoppedAt.initial }
+CONSUME
+  p348:	1,
+  p338:	1;
+PRODUCE
+  p349:	1;
+
+TRANSITION t345	 { 31.stoppedAt.final }
+CONSUME
+  p348:	1,
+  p335:	1;
+PRODUCE
+  p349:	1;
+
+TRANSITION t356	 { 35.internal.t1 }
+CONSUME
+  p20:	1,
+  p372:	1;
+PRODUCE
+  p20:	1,
+  p351:	1;
+
+TRANSITION t357	 { 35.internal.t2 }
+CONSUME
+  p351:	1;
+PRODUCE
+  p5:	1,
+  p373:	1;
+
+TRANSITION t358	 { 35.internal.throwFault.running }
+CONSUME
+  p396:	1,
+  p351:	1;
+PRODUCE
+  p393:	1,
+  p397:	1,
+  p353:	1;
+
+TRANSITION t359	 { 35.internal.stoppedAt.initial }
+CONSUME
+  p374:	1,
+  p372:	1;
+PRODUCE
+  p375:	1;
+
+TRANSITION t360	 { 35.internal.stoppedAt.running }
+CONSUME
+  p351:	1,
+  p374:	1;
+PRODUCE
+  p375:	1;
+
+TRANSITION t361	 { 35.internal.stoppedAt.final }
+CONSUME
+  p374:	1,
+  p373:	1;
+PRODUCE
+  p375:	1;
+
+TRANSITION t362	 { 35.internal.stoppedAt.p4 }
+CONSUME
+  p353:	1,
+  p374:	1;
+PRODUCE
+  p375:	1;
+
+TRANSITION t369	 { 35.t1 }
+CONSUME
+  p10:	1,
+  p14:	1,
+  p366:	1;
+PRODUCE
+  p11:	1,
+  p15:	1,
+  p372:	1;
+
+TRANSITION t370	 { 35.t2 }
+CONSUME
+  p10:	1,
+  p14:	1,
+  p366:	1;
+PRODUCE
+  p363:	1,
+  p373:	1;
+
+TRANSITION t371	 { 35.stoppedAt.initial }
+CONSUME
+  p374:	1,
+  p366:	1;
+PRODUCE
+  p375:	1;
+
+{ END OF FILE }

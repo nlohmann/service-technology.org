@@ -34,8 +34,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006-04-07 09:32:41 $ by $Author: weinberg $.
-# Version $Revision: 1.2 $
+# File last changed $Date: 2006-04-07 11:15:23 $ by $Author: weinberg $.
+# Version $Revision: 1.3 $
 
 srcdir = .
 top_srcdir = ..

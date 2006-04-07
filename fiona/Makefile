@@ -34,8 +34,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006-04-07 06:53:32 $ by $Author: weinberg $.
-# Version $Revision: 1.1 $
+# File last changed $Date: 2006-04-07 11:15:23 $ by $Author: weinberg $.
+# Version $Revision: 1.2 $
 srcdir = .
 top_srcdir = .
 
@@ -92,13 +92,13 @@ DIST_ARCHIVES = $(distdir).tar.gz
 GZIP_ENV = --best
 distuninstallcheck_listfiles = find . -type f -print
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /cygdrive/d/Daten/Projekte/tools4owfnWork/missing --run aclocal-1.9
+ACLOCAL = ${SHELL} /cygdrive/d/Daten/Projekte/eclipse/workspace/fiona/missing --run aclocal-1.9
 AMDEP_FALSE = #
 AMDEP_TRUE = 
-AMTAR = ${SHELL} /cygdrive/d/Daten/Projekte/tools4owfnWork/missing --run tar
-AUTOCONF = ${SHELL} /cygdrive/d/Daten/Projekte/tools4owfnWork/missing --run autoconf
-AUTOHEADER = ${SHELL} /cygdrive/d/Daten/Projekte/tools4owfnWork/missing --run autoheader
-AUTOMAKE = ${SHELL} /cygdrive/d/Daten/Projekte/tools4owfnWork/missing --run automake-1.9
+AMTAR = ${SHELL} /cygdrive/d/Daten/Projekte/eclipse/workspace/fiona/missing --run tar
+AUTOCONF = ${SHELL} /cygdrive/d/Daten/Projekte/eclipse/workspace/fiona/missing --run autoconf
+AUTOHEADER = ${SHELL} /cygdrive/d/Daten/Projekte/eclipse/workspace/fiona/missing --run autoheader
+AUTOMAKE = ${SHELL} /cygdrive/d/Daten/Projekte/eclipse/workspace/fiona/missing --run automake-1.9
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -125,7 +125,7 @@ LEX_OUTPUT_ROOT = lex.yy
 LIBOBJS = 
 LIBS = 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /cygdrive/d/Daten/Projekte/tools4owfnWork/missing --run makeinfo
+MAKEINFO = ${SHELL} /cygdrive/d/Daten/Projekte/eclipse/workspace/fiona/missing --run makeinfo
 OBJEXT = o
 PACKAGE = fiona
 PACKAGE_BUGREPORT = weinberg@informatik.hu-berlin.de
@@ -158,7 +158,7 @@ exec_prefix = ${prefix}
 host_alias = 
 includedir = ${prefix}/include
 infodir = ${prefix}/info
-install_sh = /cygdrive/d/Daten/Projekte/tools4owfnWork/install-sh
+install_sh = /cygdrive/d/Daten/Projekte/eclipse/workspace/fiona/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localstatedir = ${prefix}/var
@@ -616,8 +616,8 @@ hu-prepare: maintainer-clean
 binarydistreadme:
 	@echo -e Copyright \(C\) 2005, 2006 Peter Massuthe and Daniela Weinberg > BINARYREADME
 	@echo >> BINARYREADME
-	@echo -e This is a binary distribution of Fiona, a tool to analyze >> BINARYREADME
-	@echo -e processes described as an open workflow net \(oWFN\). The sources >> BINARYREADME
+	@echo -e This is a binary distribution of Fiona, a tool translating business >> BINARYREADME
+	@echo -e processes described in BPEL to open workflow nets \(oWFN\). The sources >> BINARYREADME
 	@echo -e of Fiona can be downloaded from the website of Fiona >> BINARYREADME
 	@echo -e \(http://www.informatik.hu-berlin.de/top/tools4bpel/Fiona\). >> BINARYREADME
 	@echo >> BINARYREADME

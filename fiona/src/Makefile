@@ -34,8 +34,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006-04-07 06:53:46 $ by $Author: weinberg $.
-# Version $Revision: 1.1 $
+# File last changed $Date: 2006-04-07 09:32:41 $ by $Author: weinberg $.
+# Version $Revision: 1.2 $
 
 srcdir = .
 top_srcdir = ..
@@ -102,13 +102,13 @@ DIST_SOURCES = $(fiona_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /cygdrive/d/Daten/Projekte/tools4owfnWork/missing --run aclocal-1.9
+ACLOCAL = ${SHELL} /cygdrive/d/Daten/Projekte/eclipse/workspace/fiona/missing --run aclocal-1.9
 AMDEP_FALSE = #
 AMDEP_TRUE = 
-AMTAR = ${SHELL} /cygdrive/d/Daten/Projekte/tools4owfnWork/missing --run tar
-AUTOCONF = ${SHELL} /cygdrive/d/Daten/Projekte/tools4owfnWork/missing --run autoconf
-AUTOHEADER = ${SHELL} /cygdrive/d/Daten/Projekte/tools4owfnWork/missing --run autoheader
-AUTOMAKE = ${SHELL} /cygdrive/d/Daten/Projekte/tools4owfnWork/missing --run automake-1.9
+AMTAR = ${SHELL} /cygdrive/d/Daten/Projekte/eclipse/workspace/fiona/missing --run tar
+AUTOCONF = ${SHELL} /cygdrive/d/Daten/Projekte/eclipse/workspace/fiona/missing --run autoconf
+AUTOHEADER = ${SHELL} /cygdrive/d/Daten/Projekte/eclipse/workspace/fiona/missing --run autoheader
+AUTOMAKE = ${SHELL} /cygdrive/d/Daten/Projekte/eclipse/workspace/fiona/missing --run automake-1.9
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -135,7 +135,7 @@ LEX_OUTPUT_ROOT = lex.yy
 LIBOBJS = 
 LIBS = 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /cygdrive/d/Daten/Projekte/tools4owfnWork/missing --run makeinfo
+MAKEINFO = ${SHELL} /cygdrive/d/Daten/Projekte/eclipse/workspace/fiona/missing --run makeinfo
 OBJEXT = o
 PACKAGE = fiona
 PACKAGE_BUGREPORT = weinberg@informatik.hu-berlin.de
@@ -168,7 +168,7 @@ exec_prefix = ${prefix}
 host_alias = 
 includedir = ${prefix}/include
 infodir = ${prefix}/info
-install_sh = /cygdrive/d/Daten/Projekte/tools4owfnWork/install-sh
+install_sh = /cygdrive/d/Daten/Projekte/eclipse/workspace/fiona/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localstatedir = ${prefix}/var

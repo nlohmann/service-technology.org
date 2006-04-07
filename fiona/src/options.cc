@@ -5,6 +5,7 @@
 #include "options.h"
 #include "debug.h"
 #include "exception.h"
+#include "fiona.h"
 
 // some file names and pointers
 
@@ -91,7 +92,8 @@ void print_help() {
 
 // Prints some version information
 void print_version(std::string name) {
-  trace("Fiona\n");
+  trace(std::string(PACKAGE_STRING) + " -- ");
+  trace("Functional Interaction Analysis of open Workflow Nets\n");
   trace("\n");
   trace("Copyright (C) 2005, 2006 Peter Massuthe and Daniela Weinberg\n");
   trace("This is free software; see the source for copying conditions. There is NO\n");

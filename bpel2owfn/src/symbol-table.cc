@@ -26,7 +26,7 @@
  *
  * \author
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $  
+ *          - last changes of: \$Author: reinert $  
  *          
  * \date
  * 
@@ -1106,7 +1106,7 @@ void SymbolTable::printErrorMsg(string errorMsg)
  */
 void SymbolTable::traceST(string traceMsg)
 {
-  trace(TRACE_DEBUG, "[ST] " + traceMsg);
+  trace(TRACE_VERY_DEBUG, "[ST] " + traceMsg);
 }
 
 /*!
@@ -1115,7 +1115,7 @@ void SymbolTable::traceST(string traceMsg)
  */
 void SymbolTable::traceSTwp(string traceMsg)
 {
-  trace(TRACE_DEBUG, traceMsg);
+  trace(TRACE_VERY_DEBUG, traceMsg);
 }
 
 /*!

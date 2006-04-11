@@ -18,3 +18,34 @@
  * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
 \*****************************************************************************/
 
+/**
+ * \file tarjan.h
+ *
+ * \brief Interface for invoking Tarjan's algorithm on a Petri net
+ * 
+ * \author  
+ *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
+ *          - last changes of: \$Author: gierds $
+ *          
+ * \date
+ *          - created: 2006-04-11
+ *          - last changed: \$Date: 2006/04/11 13:23:00 $
+ * 
+ * \note    This file is part of the tool BPEL2oWFN and was created during the
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
+ *          for details.
+ *
+ * \version \$Revision: 1.2 $
+ */
+
+#ifndef TARJAN_H
+#define TARJAN_H
+
+#include "petrinet.h"
+
+extern void tarjan(Node *);
+
+
+#endif
+

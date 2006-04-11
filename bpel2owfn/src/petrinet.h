@@ -36,17 +36,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/03/24 13:42:17 $
+ *          - last changed: \$Date: 2006/04/11 13:23:00 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.69 $
+ * \version \$Revision: 1.70 $
  */
 
 
@@ -137,6 +137,9 @@ class Node
     /// the id of the node
     unsigned int id;
 
+    /// flag if Node is member of a SCC
+    bool inSCC;
+    
     /// the name of the type
     virtual string nodeTypeName();
 
@@ -348,6 +351,12 @@ class PetriNet
     /// Finds transition given a role.
     Transition* findTransition(string role);
 
+    /// Calculates the preset of a node.
+    set<Node*> preset(Node* n);
+
+    /// Calculates the postset of a node.
+    set<Node*> postset(Node* n);
+
     /// Simplifies the Petri net.
     void simplify();
 
@@ -376,12 +385,6 @@ class PetriNet
 
     /// Removes all ingoing and outgoing arcs of a node.
     void detachNode(Node* n);
-
-    /// Calculates the preset of a node.
-    set<Node*> preset(Node* n);
-
-    /// Calculates the postset of a node.
-    set<Node*> postset(Node* n);
 
     /// true if place p has a communicating transition in its postset
     bool communicationInPostSet(Place* p);

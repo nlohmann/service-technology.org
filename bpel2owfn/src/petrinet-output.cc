@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/04/05 12:11:58 $
+ *          - last changed: \$Date: 2006/04/11 13:22:59 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  */
 
 
@@ -239,7 +239,13 @@ void PetriNet::printInformation()
 */
 string Arc::dotOut()
 {
-  return " " + intToString(source->id) + " -> " + intToString(target->id) + ";\n";
+  string result = " " + intToString(source->id) + " -> " + intToString(target->id); 
+  if (source->inSCC && target->inSCC)
+    result += "[ style=bold color=yellow ]";
+
+  result += ";\n";
+
+  return result;
 }
 
 
@@ -263,7 +269,10 @@ string Transition::dotOut()
     result += " style=filled fillcolor=lightskyblue2";
   else if (firstMemberAs("internal.faultHandler."))
     result += " style=filled fillcolor=pink";
-
+  
+  if (inSCC)
+    result += " style=bold fillcolor=yellow";
+  
   result += "];\n";
   return result;
 }
@@ -319,6 +328,9 @@ string Place::dotOut()
     result += " style=filled fillcolor=green";
   else if (firstMemberIs("1.internal.clock"))
     result += " style=filled fillcolor=seagreen";
+
+  if (inSCC)
+    result += " style=bold fillcolor=yellow";
 
   result += "];\n";
   return result;

@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/04/07 09:26:01 $
+ *          - last changed: \$Date: 2006/04/11 13:22:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.68 $
+ * \version \$Revision: 1.69 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -54,6 +54,7 @@
 #include "main.h"
 #include "options.h"
 #include "ast-printers.h"
+#include "tarjan.h"
 
 
 /// The Petri Net
@@ -180,6 +181,9 @@ int main( int argc, char *argv[])
  	  trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
           TheNet->simplify();
         }    
+
+	tarjan(TheNet->findPlace("1.internal.initial"));
+	
         // create LoLA output ?
         if ( formats[F_LOLA] )
         {

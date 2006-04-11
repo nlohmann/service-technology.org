@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/04/05 12:11:58 $
+ *          - last changed: \$Date: 2006/04/11 13:22:59 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.115 $
+ * \version \$Revision: 1.116 $
  */
 
 
@@ -124,6 +124,7 @@ Transition::Transition(unsigned int myid, string role)
   id = myid;
   nodeType = TRANSITION;
   communicating = false;
+  inSCC = false;
 
   if (role != "")
     history.push_back(role);
@@ -151,6 +152,7 @@ Place::Place(unsigned int myid, string role, place_type mytype)
   id = myid;
   nodeType = PLACE;
   marked = false;
+  inSCC = false;
 
   if (role != "")
     history.push_back(role);

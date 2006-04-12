@@ -36,13 +36,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/04/05 12:11:58 $
+ *          - last changed: \$Date: 2006/04/12 16:21:33 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  */
 
 
@@ -180,11 +180,21 @@ void PetriNet::mergeTwinTransitions()
   trace(TRACE_VERY_DEBUG, "[PN]\tSearching for transitions with same preset and postset...\n");
   // find transitions with same preset and postset
   for (set<Transition *>::iterator t1 = T.begin(); t1 != T.end(); t1++)
-    for (set<Transition *>::iterator t2 = t1; t2 != T.end(); t2++)
-      if (*t1 != *t2)
-	if ((preset(*t1) == preset(*t2)) && (postset(*t1) == postset(*t2)))
-	  transitionPairs.push_back(pair<string, string>(*((*t1)->history.begin()), *((*t2)->history.begin())));
+  {
+    set<Node*> postSet = postset(*t1);
+    set<Node*> preSet  = preset(*t1);
 
+    for (set<Node *>:: iterator prePlace = preSet.begin(); prePlace != preSet.end(); prePlace++)
+    {
+      set<Node *> pPostSet = postset(*prePlace);
+      for (set<Node *>::iterator t2 = pPostSet.begin(); t2 != pPostSet.end(); t2++)
+	if (*t1 != *t2)
+	  if ((preSet == preset(*t2)) && (postSet == postset(*t2)))
+	    transitionPairs.push_back(pair<string, string>(*((*t1)->history.begin()), *((*t2)->history.begin())));
+    } 
+      
+  }
+  
   trace(TRACE_VERY_DEBUG, "[PN]\tFound " + intToString(transitionPairs.size()) + " transitions with same preset and postset...\n");
 
   // merge the found transitions
@@ -304,7 +314,7 @@ void PetriNet::simplify()
   {
     removeDeadNodes();
     mergeTwinTransitions();
-    collapseSequences();
+    // collapseSequences();
     
     trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification pass " + intToString(passes++) + ": " + information() + "\n");
 

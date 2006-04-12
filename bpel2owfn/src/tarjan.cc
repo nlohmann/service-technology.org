@@ -29,19 +29,20 @@
  *          
  * \date
  *          - created: 2006-04-11
- *          - last changed: \$Date: 2006/04/11 13:23:00 $
+ *          - last changed: \$Date: 2006/04/12 15:32:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.3 $
  */
 
 #include "tarjan.h"
 #include "debug.h"
 #include "helpers.h"
+#include "options.h"
 #include <deque>
 #include <list>
 #include <algorithm>
@@ -99,10 +100,17 @@ void tarjan(Node * node)
     {
       trace(TRACE_ALWAYS, "Warning: Found strongly connected component in the Petri net\n");
       trace(TRACE_ALWAYS, "         Reachability graph might be cyclic.\n");
-      cerr << "         Size: " << scc.size() << endl;
+      // cerr << "         Size: " << scc.size() << endl;
       for (list<Node*>::iterator iter = scc.begin(); iter != scc.end(); iter++)
       {
 	trace(TRACE_DEBUG, (*iter)->nodeShortName() + "\n");
+/*
+        for (vector<string>::iterator role = (*iter)->history.begin(); role != (*iter)->history.end(); role++)
+	  if (role == (*iter)->history.begin())
+	    (*output) << "\t" + *role + "\n";
+	  else
+	    (*output) << "\t\t\t" + *role + "\n";
+*/
 	(*iter)->inSCC = true;
       }
     }

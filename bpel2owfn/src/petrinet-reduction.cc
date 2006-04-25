@@ -36,13 +36,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/04/12 16:21:33 $
+ *          - last changed: \$Date: 2006/04/25 11:56:55 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  */
 
 
@@ -251,37 +251,43 @@ void PetriNet::collapseSequences()
   trace(TRACE_VERY_DEBUG, "[PN]\tCollapsing simple sequences\n");
 
   // a pair to store places to be merged
-  vector<string> sequenceTransitions;
-  vector<pair<string, string> >placeMerge;
+  list<string> sequenceTransitions;
+  list<pair<string, string> >placeMerge;
 
   // find transitions with singelton preset and postset
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
   {
+    set<Node *> postSet = postset(*t);
+    set<Node *> preSet  = preset (*t);
+    Place * prePlace = (Place*) *(preSet.begin());
+    Place * postPlace = (Place*) *(postSet.begin());
     if (
-	(preset(*t).size() == 1) &&
-	(postset(*t).size() == 1) &&
-	!communicationInPostSet((Place*)*(postset(*t).begin())) &&
-	(*(postset(*t).begin()) != (*preset(*t).begin()))
+	(preSet.size() == 1) &&
+	(postSet.size() == 1) &&
+//	!communicationInPostSet((Place*)*(postSet.begin())) &&
+	(prePlace != postPlace) &&
+	(postset(prePlace).size() == 1) 
        )
     {
-      string id1 = *((*(preset(*t).begin()))->history.begin());
-      string id2 = *((*(postset(*t).begin()))->history.begin());
+      string id1 = *((*(preSet.begin()))->history.begin());
+      string id2 = *((*(postSet.begin()))->history.begin());
       placeMerge.push_back(pair < string, string >(id1, id2));
       sequenceTransitions.push_back(*((*t)->history.begin()));
     }
   }
 
-  // merge preset and postset
-  for (unsigned int i = 0; i < placeMerge.size(); i++)
-    mergePlaces(placeMerge[i].first, placeMerge[i].second);
-
   // remove "sequence"-transtions
-  for (unsigned int i = 0; i < sequenceTransitions.size(); i++)
+  for (list< string >::iterator i = sequenceTransitions.begin(); i != sequenceTransitions.end(); i++)
   {
-    Transition *sequenceTransition = findTransition(sequenceTransitions[i]);
+    Transition *sequenceTransition = findTransition(*i);
     if (sequenceTransition != NULL)
       removeTransition(sequenceTransition);
   }  
+
+  // merge preset and postset
+  for (list< pair<string, string> >::iterator i = placeMerge.begin(); i != placeMerge.end(); i++)
+    mergePlaces(i->first, i->second);
+
 }
 
 
@@ -314,7 +320,7 @@ void PetriNet::simplify()
   {
     removeDeadNodes();
     mergeTwinTransitions();
-    // collapseSequences();
+    collapseSequences();
     
     trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification pass " + intToString(passes++) + ": " + information() + "\n");
 

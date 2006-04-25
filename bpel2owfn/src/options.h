@@ -48,7 +48,8 @@ typedef enum
   P_CYCLICWHILE,	///< use the original <while> pattern
   P_CYCLICEH,		///< use the original <eventHandlers> pattern
   P_NOFHFAULTS,		///< activities inside the FH throw no faults
-  P_NOVARIABLES		///< removes all variables from the model
+  P_NOVARIABLES,	///< removes all variables from the model
+  P_NANO		///< creates the smalles possible net (like Axel's nets)
 } possibleParameters;
 
 

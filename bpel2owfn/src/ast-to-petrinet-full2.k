@@ -49,11 +49,11 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/03/31 14:56:53 $
+ *          - last changed: \$Date: 2006/04/25 11:50:09 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  */
 %}
 
@@ -189,6 +189,7 @@ This=Invoke(a,b) provided ((dynamic_cast<STCommunicationActivity*> (symTab.looku
       if (parameters[P_NOSTANDARDFAULTS] == false)
 	Transition *t3 = throwFault(p2, p4, "running", prefix, This->negativeControlFlow);
 
+      
       Transition *t4 = stop(p1, "initial", prefix);
       Transition *t5 = stop(p2, "running", prefix);
       Transition *t6 = stop(p4, "p4", prefix);
@@ -1920,6 +1921,11 @@ This=StandardElements(a, NiltSource_list()) provided
       // Transitions for the negative control flow.
       Transition *t2 = throwFault(p8, p11, "initial", prefix, This->negativeControlFlow);
 
+      // initialize the transition t2 (which is not initialized if "nano" is
+      // used as parameter
+      if (parameters[P_NANO])
+	t2 = TheNet->newTransition(prefix + "t2");
+
       Transition *t3 = stop(p8, "initial", prefix);
       Transition *t4 = stop(p11, "p11", prefix);
 
@@ -2184,6 +2190,11 @@ This=StandardElements(a,b) provided
       // Transitions for the negative control flow.
       Transition *t5 = throwFault(p16, p17, "initial", prefix, This->negativeControlFlow);
 
+      // initialize the transition t5 (which is not initialized if "nano" is
+      // used as parameter
+      if (parameters[P_NANO])
+	t5 = TheNet->newTransition(prefix + "t5");
+      
       Transition *t6 = stop(p16, "initial", prefix);
       Transition *t7 = stop(p17, "p17", prefix);
       Transition *t8 = stop(p13, "final", prefix);

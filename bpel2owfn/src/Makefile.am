@@ -18,14 +18,14 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/04/25 12:37:02 $ by $Author: nlohmann $.
-# Version $Revision: 1.20 $
+# File last changed $Date: 2006/04/25 14:12:23 $ by $Author: nlohmann $.
+# Version $Revision: 1.21 $
 
 bin_PROGRAMS = bpel2owfn
 
 # define flags for Bison and Kimwitu++
 KCFLAGS = --yystype --no-printdot --file-prefix=bpel-kc- --suffix=cc
-AM_YFLAGS = --defines --yacc #--no-lines
+#AM_YFLAGS = --defines --yacc #--no-lines
 
 # generated Flex and Bison sources
 YYSOURCES = bpel-syntax.h bpel-syntax.cc bpel-lexic.cc

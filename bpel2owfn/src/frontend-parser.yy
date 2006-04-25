@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/04/05 16:00:30 $
+ *          - last changed: \$Date: 2006/04/25 14:12:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.169 $
+ * \version \$Revision: 1.170 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -63,6 +63,10 @@
  * See \ref bpel-syntax.c for more information.
  */
 %}
+
+
+%defines
+%yacc
 
 // the terminal symbols (tokens)
 %token K_ASSIGN K_CASE K_CATCH K_CATCHALL K_COMPENSATE K_COMPENSATIONHANDLER

@@ -27,17 +27,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/04/11 13:22:59 $
+ *          - last changed: \$Date: 2006/04/25 13:48:54 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.116 $
+ * \version \$Revision: 1.117 $
  */
 
 
@@ -554,6 +554,9 @@ void PetriNet::mergePlaces(Place * p1, Place * p2)
 
   Node *p12 = newPlace();
 
+  if (p1->marked || p2->marked)
+    ((Place*)p12)->mark();
+  
   for (vector<string>::iterator role = p1->history.begin(); role != p1->history.end(); role++)
   {
     p12->history.push_back(*role);

@@ -364,8 +364,6 @@ void parse_command_line(int argc, char* argv[])
 	      else if ( parameter == "nano" )
 	      {
 	        parameters[P_NANO] = true;
-		parameters[P_NOVARIABLES] = true;
-		parameters[P_NOSTANDARDFAULTS] = true;
 	      }
 	      else if ( parameter == "cyclicwhile" )
 	      {

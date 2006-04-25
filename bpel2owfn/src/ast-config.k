@@ -29,6 +29,7 @@
 %}
 
 %uview petrinet;
+%uview petrinetsmall;
 %uview xml;
 %uview cfg;
 

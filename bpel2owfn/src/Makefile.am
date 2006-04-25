@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/04/11 08:37:59 $ by $Author: gierds $.
-# Version $Revision: 1.19 $
+# File last changed $Date: 2006/04/25 12:37:02 $ by $Author: nlohmann $.
+# Version $Revision: 1.20 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -33,7 +33,7 @@ YYSOURCES = bpel-syntax.h bpel-syntax.cc bpel-lexic.cc
 # everything about the Kimwitu++ sources
 KCDUMMY = bpel-kc-dummy.cc
 KCFILES = bpel-abstract.k bpel-unparse-petri.k bpel-unparse-petri2.k bpel-unparse-xml.k \
-	  bpel-unparse-cfg.k ast-printers.k
+	  bpel-unparse-cfg.k ast-printers.k bpel-unparse-petri-small.k 
 KCGENERATED = bpel-kc-csgiok bpel-kc-k bpel-kc-rk bpel-kc-unpk
 KCSOURCES = $(KCFILES:.k=.cc) \
 	    $(KCFILES:.k=.h) \

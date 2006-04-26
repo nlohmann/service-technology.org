@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/04/26 08:58:23 $
+ *          - last changed: \$Date: 2006/04/26 09:34:23 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  *
  */
 %}
@@ -1545,7 +1545,6 @@ This=StandardElements(NiltTarget_list(), a) ->
       string newPrefix = intToString(This->parentId->value) + ".internal";
 
       Place *p2 = TheNet->newPlace(prefix + "initial");
-      Place *p3 = TheNet->newPlace(prefix + "p3");
       Place *p4 = TheNet->newPlace(prefix + "p4");
       Place *p5 = TheNet->newPlace(prefix + "final");
 

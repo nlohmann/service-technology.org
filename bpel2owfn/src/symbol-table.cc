@@ -26,7 +26,7 @@
  *
  * \author
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $  
+ *          - last changes of: \$Author: gierds $  
  *          
  * \date
  * 
@@ -44,9 +44,12 @@
 #include "bpel-syntax.h"
 #include "debug.h"
 #include "helpers.h"
+#include <map>
 
 extern SymbolTable symTab;
 extern int yylineno;
+
+map< string, string > channelShortNames;
 
 /********************************************
  * implementation of SymbolTable CLASS
@@ -3094,6 +3097,21 @@ STSourceTarget::~STSourceTarget() {}
 
 std::string channelName(std::string myportType, std::string myoperation, std::string mypartnerLink)
 {
-  return mypartnerLink + "." + myportType + "." + myoperation;
+  string longName = mypartnerLink + "." + myportType + "." + myoperation;
+  string result = "";
+  if ( channelShortNames[myoperation] == "" || channelShortNames[myoperation] == longName )
+  {
+    channelShortNames[myoperation] = longName;
+    result = myoperation;
+  }
+  else
+  {
+    int i = 1;
+    while (( channelShortNames[myoperation + "_" + intToString(i++)] != "" ));
+    channelShortNames[myoperation + "_" + intToString(i)] = longName;
+    result = myoperation + "_" + intToString(i);
+  }
+  return result;
+  // return mypartnerLink + "." + myportType + "." + myoperation;
 }
 

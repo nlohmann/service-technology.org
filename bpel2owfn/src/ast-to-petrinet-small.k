@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/04/25 13:48:53 $
+ *          - last changed: \$Date: 2006/04/26 08:58:23 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.3 $
  *
  */
 %}
@@ -930,7 +930,6 @@ This=activityWhile(TheWhile=While(a,b)) ->
       Place *p3 = TheNet->newPlace(prefix + "final");
       Place *p4 = TheNet->newPlace(prefix + "p4");
       Place *p5 = TheNet->newPlace(prefix + "p5");
-      Place *p6 = TheNet->newPlace(prefix + "p6");
 
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p2, t1);
@@ -1060,13 +1059,6 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 
       Place *p5 = TheNet->newPlace(prefix + "final");
       Place *p6 = TheNet->newPlace(prefix + "initial");
-      Place *p7 = TheNet->newPlace(prefix + "TimeStamp");
-
-      Transition *t5 = TheNet->newTransition(prefix + "t5");
-      TheNet->newArc(TheNet->findPlace("1.internal.clock"), t5, READ);
-      TheNet->newArc(p6, t5);
-      TheNet->newArc(t5, p7);
-
 
       // If needed, transition t1 and a place negLink is created.
       Transition *t1 = NULL;
@@ -1089,19 +1081,17 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	string message = intToString(onMessageCount++);
 	string newPrefix = prefix + "onMessage" + message + ".";
 
-	Place *p3 = TheNet->newPlace(newPrefix + "p3");
+//	Place *p3 = TheNet->newPlace(newPrefix + "p3");
 
 	Transition *t2 = TheNet->newTransition(newPrefix + "t2");
 	TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(ThisBranch->id)))->channelId)), t2);
-	TheNet->newArc(TheNet->findPlace(TheActivity, ".internal.TimeStamp"), t2);
-	TheNet->newArc(t2, p3);
+	TheNet->newArc(TheNet->findPlace(TheActivity, ".initial"), t2);
+	TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
 	t2->communicating = true;
 
-	Transition *t3 = TheNet->newTransition(newPrefix + "t3");
-	TheNet->newArc(TheNet->findPlace("variable." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(ThisBranch->id)))->variable->name)), t3);
-  	TheNet->newArc(t3, TheNet->findPlace("variable." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(ThisBranch->id)))->variable->name)));
-	TheNet->newArc(p3, t3);
-	TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
+//	Transition *t3 = TheNet->newTransition(newPrefix + "t3");
+//	TheNet->newArc(p3, t3);
+//	TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
 
 
 	// Embed the inner activity.
@@ -1119,14 +1109,8 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	string newPrefix = prefix + "onAlarm" + intToString(onAlarmCount++) + ".";
 	string onAlarmGuard;
 
-	if (onAlarmBranch->For != mkcasestring(""))
-	  onAlarmGuard = "x + " + string(onAlarmBranch->For->name) + " \\<= y"; // "<=" is escaped
-	else
-	  onAlarmGuard = string(onAlarmBranch->until->name) + " \\<= y"; // "<=" is escaped
-
 	Transition *t6 = TheNet->newTransition(newPrefix + "t6");
-	TheNet->newArc(TheNet->findPlace("1.internal.clock"), t6, READ);
-	TheNet->newArc(TheNet->findPlace(TheActivity, ".internal.TimeStamp"), t6);
+	TheNet->newArc(TheNet->findPlace(TheActivity, ".initial"), t6);
 	TheNet->newArc(t6, TheNet->findPlace(innerActivity, ".initial"));
 
 

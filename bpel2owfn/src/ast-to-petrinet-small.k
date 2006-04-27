@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/04/26 09:34:23 $
+ *          - last changed: \$Date: 2006/04/27 08:20:21 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  *
  */
 %}
@@ -781,12 +781,6 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
 
       Place *p4 =  TheNet->newPlace(prefix + "final");
       Place *p5 =  TheNet->newPlace(prefix + "initial");
-      Place *p6 =  TheNet->newPlace(prefix + "running");
-
-      Transition *t3 = TheNet->newTransition(prefix + "t3");
-      TheNet->newArc(p5, t3);
-      TheNet->newArc(t3, p6);
-
 
 
       // Dead Path Elimination
@@ -806,58 +800,23 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
       Transition *last;
       foreach (caseBranch=Case(innerActivity); tCase_list b)
       {
-	string condition = caseBranch->condition->name;
-	string caseNumber = intToString(currentCase);
+	string caseNumber = intToString(currentCase++);
 
 	trace(TRACE_VERY_DEBUG, "[PNU]\tEmbedding case branch " + caseNumber + "...\n");
 
-
-	Transition *t2 = NULL;
-	Transition *t4 = NULL;
-
-	if (currentCase == 1)
-	{
-	  // two transitions: guard fulfilled or not
-	  t2 = TheNet->newTransition(prefix + "t2.case1");
-	  t4 = TheNet->newTransition(prefix + "t4.case1");
-
-	  // arcs connecting "running"-place
-	  TheNet->newArc(TheNet->findPlace(This, ".internal.running"), t2);
-	  TheNet->newArc(TheNet->findPlace(This, ".internal.running"), t4);
-
-	  last = t4;
-	}
-	else
-	{
-	  // two transitions: guard fulfilled or not
-	  t2 = TheNet->newTransition(prefix + "t2.case" + caseNumber);
-	  t4 = TheNet->newTransition(prefix + "t4.case" + caseNumber);
-
-	  // "running"-place and connecting arcs
-	  Place *running =  TheNet->newPlace(prefix + "running.case" + caseNumber);
-	  TheNet->newArc(last, running);
-	  TheNet->newArc(running, t2);
-	  TheNet->newArc(running, t4);
-
-	  last = t4;
-	}
+	Transition* t2 = TheNet->newTransition(prefix + "t2.case" + caseNumber);
+	TheNet->newArc(TheNet->findPlace(This, ".initial"), t2);
 
 	// Embed the inner activity.
 	TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
 	TheNet->mergePlaces(This, ".internal.final",   innerActivity, ".final");
-
-	currentCase++;
       }
 
 
       trace(TRACE_VERY_DEBUG, "[PNU]\tEmbedding otherwise branch...\n");
       // The <otherwise> branch.
       Transition *t2 = TheNet->newTransition(prefix + "t2.otherwise");
-
-      // "running"-place and connecting arcs
-      Place *running = TheNet->newPlace(prefix + "running.otherwise");
-      TheNet->newArc(running, t2);
-      TheNet->newArc(last, running);
+      TheNet->newArc(TheNet->findPlace(This, ".initial"), t2);
 
       // embed inner activity
       TheNet->newArc(t2, TheNet->findPlace(c, ".initial"));

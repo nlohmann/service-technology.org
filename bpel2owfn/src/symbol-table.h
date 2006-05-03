@@ -25,7 +25,7 @@
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created:
@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.36 $: 
+ * \version \$Revision: 1.37 $: 
  *
  */
 
@@ -675,6 +675,7 @@ class STLink: public STElement, public SymbolTableEntry
 class STPartner: public STElement, public SymbolTableEntry
 {
   public:
+    
     /// constructor
     STPartner();
     STPartner(unsigned int elementId, unsigned int entryKey);
@@ -693,6 +694,9 @@ class STPartner: public STElement, public SymbolTableEntry
 class STPartnerLink: public STElement, public SymbolTableEntry
 {
   public:
+    /// set of all Partners where this PartnerLink is included (should be at most one)
+    set<STPartner *> partners;
+
     /// constructor
     STPartnerLink();
     STPartnerLink(unsigned int elementId, unsigned int entryKey);

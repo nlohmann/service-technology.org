@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/04/25 14:12:23 $
+ *          - last changed: \$Date: 2006/05/03 12:40:42 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.170 $
+ * \version \$Revision: 1.171 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -140,6 +140,8 @@ STScope * currentSTScope = NULL;
 STFlow * currentSTFlow = NULL;
 /// pointer to the Process symbol table entry
 STProcess * stProcess = NULL;
+///
+STPartner * currentPartner = NULL;
 
 // manage attributes
 #include "bpel-attributes.h"
@@ -446,7 +448,12 @@ tPartnerLink:
       $$ = PartnerLink();
       $$->id = $2;
       if (inPartners) {
-	stProcess->checkPartnerLink(symTab.readAttributeValue($2, "name"));
+	STPartnerLink * definedPL = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "name"));
+	definedPL->partners.insert(currentPartner);
+	if (definedPL->partners.size() > 1)
+	{
+	  trace("WARNING: Overlapping Partners\n");
+	}
       }
       else
       {
@@ -476,7 +483,20 @@ tPartnerLink:
       $$ = PartnerLink();
       $$->id = $2;
       if (inPartners) {
-	stProcess->checkPartnerLink(symTab.readAttributeValue($2, "name"));
+	STPartnerLink * definedPL = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "name"));
+	definedPL->partners.insert(currentPartner);
+	if (definedPL->partners.size() > 1)
+	{
+	  trace("WARNING: Overlapping Partner definitions!\n");
+	  trace("         PartnerLink \"" + symTab.readAttributeValue($2, "name")+ "\" ");
+	  trace("(line " + intToString(stPartnerLink->line) + ")\n");
+	  trace("         was used multiple times in a Partner definition: \n");
+	  for(set<STPartner *>::iterator iter = definedPL->partners.begin(); iter != definedPL->partners.end(); iter++)
+	  {
+	    trace("          * Partner \"" + symTab.readAttributeValue((*iter)->entryKey, "name") + "\"");
+	    trace(" (line " + intToString(dynamic_cast<STElement*>(symTab.lookup((*iter)->entryKey))->line) + ")\n");
+	  }
+	}
       }
       else
       {
@@ -514,9 +534,23 @@ tPartner_list:
 ;
 
 tPartner:
-  K_PARTNER genSymTabEntry_Partner arbitraryAttributes X_NEXT tPartnerLink_list X_SLASH K_PARTNER
+  K_PARTNER genSymTabEntry_Partner 
+  arbitraryAttributes X_NEXT 
+    {
+      STPartner * stPartner = NULL;
+      try
+      {
+	stPartner = dynamic_cast<STPartner*> (symTab.lookup($2));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      currentPartner = stPartner;
+    }
+  tPartnerLink_list X_SLASH K_PARTNER
     { symTab.checkAttributes($2);
-      $$ = Partner($5);
+      $$ = Partner($6);
       $$->id = $2;
     }
 | K_PARTNER genSymTabEntry_Partner arbitraryAttributes X_SLASH

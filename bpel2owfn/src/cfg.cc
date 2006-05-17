@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/04/06 13:48:39 $
+ *          - last changed: \$Date: 2006/05/17 11:57:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -120,6 +120,14 @@ void CFGBlock::print_dot()
       for (set<std::string>::iterator iter = initializedVariables.begin(); iter != initializedVariables.end(); iter++)
       {
 	(*output) << (*iter) << "\\n";
+      }
+    }
+    if (! receives.empty())
+    {
+      (*output) << "\\nreceives: \\n ";
+      for (set< pair< std::string, long > >::iterator iter = receives.begin(); iter != receives.end(); iter++)
+      {
+	(*output) << iter->first << "," << iter->second << "\\n";
       }
     }
     (*output) << "\"";
@@ -504,6 +512,110 @@ void CFGBlock::checkForCyclicLinks()
       }
     }
   }
+}
+
+/// checks for conflicting receives
+void CFGBlock::checkForConflictingReceive()
+{
+  if (processed)
+  {
+    return;
+  }
+
+  processed = true;
+  
+  bool allPrerequisites = true;
+  // check if all entries are allready processed
+  if (!nextBlocks.empty())
+  {
+    /// for a while, we assume, that the body is never executed, so we drop that set
+    list<CFGBlock *>::iterator blockBegin = nextBlocks.begin();
+    if (type == CFGWhile)
+    {
+      blockBegin++;
+    }
+    for (list<CFGBlock *>::iterator iter = blockBegin; iter != nextBlocks.end(); iter++)
+    {
+      allPrerequisites = allPrerequisites && (*iter)->processed;
+    }
+  }
+  if (type == CFGSource)
+  {
+    allPrerequisites = allPrerequisites && targets[dot_name()]->processed;
+  }
+  if (allPrerequisites)
+  {
+    if (!nextBlocks.empty())
+    {
+      list<CFGBlock *>::iterator blockBegin = nextBlocks.begin();
+      if (type == CFGWhile)
+      {
+	blockBegin++;
+      }
+      receives = (*blockBegin)->receives;
+      for (list<CFGBlock *>::iterator iter = blockBegin; iter != nextBlocks.end(); iter++)
+      {
+	// the actual check for duplicate receives but only for flows
+	if (type == CFGFlow && label == "Flow_begin")
+	{
+	  for (set< pair< std::string, long> >::iterator elemA = (*iter)->receives.begin(); elemA != (*iter)->receives.end(); elemA++)
+	  {
+	    for (set< pair< std::string, long> >::iterator elemB = receives.begin(); elemB != receives.end(); elemB++)
+	    {
+	      if(elemA->first == elemB->first && elemA->second != elemB->second && receives.find(*elemA) == receives.end())
+	      {
+		trace("[CFG] WARNING: There are conflicting receives!\n");
+		trace("               Please check lines " + intToString((dynamic_cast<STElement*>(symTab.lookup(elemA->second)))->line));
+		trace(                " and " + intToString((dynamic_cast<STElement*>(symTab.lookup(elemB->second)))->line) + "\n");
+		cerr << "               " << elemA->first << " (" << elemA->second << ") vs. " << elemB->first << " (" << elemB->second << ")" << endl;
+	      }
+	    }
+	  }
+	}
+	// 
+	receives = setUnion(receives, (*iter)->receives);
+      }
+    }
+    if (type == CFGSource)
+    {
+      for (set< pair< std::string, long> >::iterator elemA = targets[dot_name()]->receives.begin(); elemA != targets[dot_name()]->receives.end(); elemA++)
+      {
+	for (set< pair< std::string, long> >::iterator elemB = receives.begin(); elemB != receives.end(); elemB++)
+	{
+	  if(elemA->first == elemB->first && elemA->second != elemB->second && receives.find(*elemA) == receives.end())
+	  {
+	      trace("[CFG] WARNING: There are conflicting receives!\n");
+	      trace("               Please check lines " + intToString((dynamic_cast<STElement*>(symTab.lookup(elemA->second)))->line));
+	      trace(                " and " + intToString((dynamic_cast<STElement*>(symTab.lookup(elemB->second)))->line) + "\n");
+	      cerr << "               " << elemA->first << " (" << elemA->second << ") vs. " << elemB->first << " (" << elemB->second << ")" << endl;
+	  }
+	}
+      }
+      receives = setUnion(receives, targets[dot_name()]->receives);
+    }
+    if (type == CFGReceive)
+    {
+      receives.insert(pair<std::string, long>( (dynamic_cast<STReceive*>(symTab.lookup(id)))->channelId, id->value));
+    }
+    if (!prevBlocks.empty())
+    {
+      /// for a while, we assume, that the body is never executed, so we drop that set
+      for (list<CFGBlock *>::iterator iter = prevBlocks.begin(); iter != prevBlocks.end(); iter++)
+      {
+        (*iter)->checkForConflictingReceive();
+      }
+    }
+    if (type == CFGTarget)
+    {
+      sources[dot_name()]->checkForConflictingReceive();
+    }
+  }
+  else
+  {
+    processed = false;
+    return;
+  }
+
 }
 
 

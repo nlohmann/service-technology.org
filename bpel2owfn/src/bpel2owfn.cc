@@ -28,18 +28,18 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/04/25 12:42:38 $
+ *          - last changed: \$Date: 2006/05/17 11:57:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.71 $
+ * \version \$Revision: 1.72 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -136,7 +136,11 @@ int main( int argc, char *argv[])
 	trace(TRACE_DEBUG, "[CFG] checking for uninitialized variables\n");
 	// test
 	TheCFG->checkForUninitializedVariables();
+	TheCFG->resetProcessedFlag();
 	/// end test
+	
+	TheCFG->lastBlock->checkForConflictingReceive();
+	TheCFG->resetProcessedFlag(true, false);
       }
 
       if (modus == M_CFG)

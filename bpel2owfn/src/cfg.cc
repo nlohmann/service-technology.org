@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/05/17 11:57:58 $
+ *          - last changed: \$Date: 2006/05/24 14:44:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -441,6 +441,9 @@ void CFGBlock::checkForUninitializedVariables()
     switch(type)
     {
       case CFGReceive   : stVar = (dynamic_cast<STReceive*>   (symTab.lookup(id)))->variable; break;
+      case CFGCatch     : stVar = (dynamic_cast<STCatch*>     (symTab.lookup(id)))->faultVariable; 
+			  attributeName = "faultVariable"; 
+			  break;
       case CFGTo        : stVar = (dynamic_cast<STFromTo*>    (symTab.lookup(id)))->variable; break;
       case CFGInvoke    : stVar = (dynamic_cast<STInvoke*>    (symTab.lookup(id)))->outputVariable;
 			  attributeName = "outputVariable";
@@ -453,7 +456,7 @@ void CFGBlock::checkForUninitializedVariables()
     throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
   }
   
-  if ((type == CFGReceive || type == CFGTo || type==CFGInvoke || type == CFGOnMessage) && stVar != NULL)
+  if ((type == CFGReceive || type == CFGCatch || type == CFGTo || type==CFGInvoke || type == CFGOnMessage) && stVar != NULL)
   {
     std::string var = stVar->name;
     if (var != "")

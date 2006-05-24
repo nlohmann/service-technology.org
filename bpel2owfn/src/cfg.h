@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/05/17 11:57:58 $
+ *          - last changed: \$Date: 2006/05/24 14:44:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  */
 
 #ifndef CFG_H
@@ -60,6 +60,11 @@ extern std::string filename;
 typedef enum
 {
   CFGProcess = 1,
+  CFGFaultHandler,
+  CFGCatch,
+  CFGCatchAll,
+  CFGCompensationHandler,
+  CFGEventHandler,
   CFGEmpty,
   CFGInvoke,
   CFGReceive,

@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/04/07 09:43:53 $
+ *          - last changed: \$Date: 2006/05/24 14:44:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  */
 %}
 
@@ -94,10 +94,37 @@ Process(a,b,c,d,e,f,g,h,i) ->
 	  TheCFG = firstBlock;
 	  cfgMap[intToString($0->id->value)] = TheCFG; 
 	}
+	e //faultHandler
+	{
+	  CFGBlock * fhFirst = cfgMap.find(intToString(e->id->value))->second->firstBlock;
+	  CFGBlock * fhLast  = cfgMap.find(intToString(e->id->value))->second->lastBlock;
+
+	  connectBlocks(firstBlock, fhFirst);
+	  connectBlocks(fhLast, lastBlock);
+
+	}
+	f //compensationHandler
+	{
+	  CFGBlock * chFirst = cfgMap.find(intToString(f->id->value))->second->firstBlock;
+	  CFGBlock * chLast  = cfgMap.find(intToString(f->id->value))->second->lastBlock;
+
+	  connectBlocks(firstBlock, chFirst);
+	  connectBlocks(chLast, lastBlock);
+
+	}
+	g //eventHandler
+	{
+	  CFGBlock * ehFirst = cfgMap.find(intToString(g->id->value))->second->firstBlock;
+	  CFGBlock * ehLast  = cfgMap.find(intToString(g->id->value))->second->lastBlock;
+
+	  connectBlocks(firstBlock, ehFirst);
+	  connectBlocks(ehLast, lastBlock);
+
+	}
         i //activity
 	{
 	  CFGBlock * innerFirst = cfgMap.find(intToString(i->id->value))->second->firstBlock;
-	  CFGBlock * innerLast = cfgMap.find(intToString(i->id->value))->second->lastBlock;
+	  CFGBlock * innerLast  = cfgMap.find(intToString(i->id->value))->second->lastBlock;
 	  
 	  connectBlocks(firstBlock, innerFirst);
 	  connectBlocks(innerLast, lastBlock);
@@ -119,15 +146,167 @@ Process(a,b,c,d,e,f,g,h,i) ->
   FAULT HANDLERS
 ******************************************************************************/
 
+This=userDefinedFaultHandler(a,catchAll = CatchAll(b)) ->
+  [cfg: {
+	  trace(TRACE_DEBUG, "[CFG] FaultHandler (user defined)\n");
+	  CFGBlock * firstBlock = new CFGBlock(CFGFaultHandler, $0->id, "FaultHandler_begin"); 
+	  CFGBlock * lastBlock  = new CFGBlock(CFGFaultHandler, $0->id, "FaultHandler_end"); 
+	  cfgMap[intToString($0->id->value)] = firstBlock;
+
+	  firstBlock->firstBlock = lastBlock->firstBlock = firstBlock;
+	  firstBlock->lastBlock  = lastBlock->lastBlock  = lastBlock;
+	}
+	a //catch
+	{
+	  foreach(Catch(catchBlock); tCatch_list a)
+	  {
+	    CFGBlock * catchIt = new CFGBlock(CFGCatch, $0->id, "Catch");
+ 	    CFGBlock * innerFirst = cfgMap.find(intToString(catchBlock->id->value))->second->firstBlock;
+	    CFGBlock * innerLast  = cfgMap.find(intToString(catchBlock->id->value))->second->lastBlock;
+	  
+	    connectBlocks(firstBlock, catchIt);
+	    connectBlocks(catchIt, innerFirst);
+	    connectBlocks(innerLast, lastBlock);
+	  }
+	}
+	b // catchAll activity
+	{
+	  CFGBlock * catchAllBlock = new CFGBlock(CFGCatchAll, catchAll->id, "CatchAll");
+	  CFGBlock * innerFirst = cfgMap.find(intToString(b->id->value))->second->firstBlock;
+	  CFGBlock * innerLast  = cfgMap.find(intToString(b->id->value))->second->lastBlock;
+	  
+	  connectBlocks(firstBlock, catchAllBlock);
+	  connectBlocks(catchAllBlock, innerFirst);
+	  connectBlocks(innerLast, lastBlock);
+	}
+  ];
+
+This=userDefinedFaultHandler(a,NoCatchAll()) ->
+  [cfg: {
+	  trace(TRACE_DEBUG, "[CFG] FaultHandler (user defined, no catchAll)\n");
+	  CFGBlock * firstBlock = new CFGBlock(CFGFaultHandler, $0->id, "FaultHandler_begin"); 
+	  CFGBlock * lastBlock  = new CFGBlock(CFGFaultHandler, $0->id, "FaultHandler_end"); 
+	  cfgMap[intToString($0->id->value)] = firstBlock;
+
+	  firstBlock->firstBlock = lastBlock->firstBlock = firstBlock;
+	  firstBlock->lastBlock  = lastBlock->lastBlock  = lastBlock;
+	}
+	a //catch
+	{
+	  foreach(Catch(catchBlock); tCatch_list a)
+	  {
+	    CFGBlock * catchIt = new CFGBlock(CFGCatch, $0->id, "Catch");
+ 	    CFGBlock * innerFirst = cfgMap.find(intToString(catchBlock->id->value))->second->firstBlock;
+	    CFGBlock * innerLast  = cfgMap.find(intToString(catchBlock->id->value))->second->lastBlock;
+	  
+	    connectBlocks(firstBlock, catchIt);
+	    connectBlocks(catchIt, innerFirst);
+	    connectBlocks(innerLast, lastBlock);
+	  }
+	}
+  ];
+
+implicitFaultHandler() ->
+  [cfg: {
+	  trace(TRACE_DEBUG, "[CFG] FaultHandler (implicit)\n");
+	  CFGBlock * block = new CFGBlock(CFGFaultHandler, $0->id, "implicitFaultHandler"); 
+	  cfgMap[intToString($0->id->value)] = block;
+	}
+  ];
+
 
 /******************************************************************************
   EVENT HANDLERS
 ******************************************************************************/
 
+userDefinedEventHandler(a,b) ->
+  [cfg: { 
+	  trace(TRACE_DEBUG, "[CFG] EventHandler (user defined)\n");
+	  CFGBlock * firstBlock = new CFGBlock(CFGPick, $0->id, "EventHandler_begin"); 
+	  CFGBlock * lastBlock = new CFGBlock(CFGPick, $0->id, "EventHandler_end");
+
+	  firstBlock->firstBlock = lastBlock->firstBlock = firstBlock;
+	  firstBlock->lastBlock  = lastBlock->lastBlock  = lastBlock;
+	  
+	  cfgMap[intToString($0->id->value)] = firstBlock; 
+	}
+	a // tOnMessage_list
+	b // tOnAlarm_list
+	{
+	  int i = 1;
+	  foreach(message=OnMessage(innerActivity); tOnMessage_list a)
+	  {
+ 	    CFGBlock * innerFirst = cfgMap.find(intToString(innerActivity->id->value))->second->firstBlock;
+	    CFGBlock * innerLast = cfgMap.find(intToString(innerActivity->id->value))->second->lastBlock;
+	    CFGBlock * onMessageBlock = new CFGBlock(CFGOnMessage, message->id, "OnMessage_" + intToString(i++)); 
+	  
+	    connectBlocks(firstBlock, onMessageBlock);
+	    connectBlocks(onMessageBlock, innerFirst);
+	    connectBlocks(innerLast, lastBlock);
+	  } 
+	  foreach(alarm=OnAlarm(innerActivity); tOnAlarm_list b)
+	  {
+ 	    CFGBlock * innerFirst = cfgMap.find(intToString(innerActivity->id->value))->second->firstBlock;
+	    CFGBlock * innerLast = cfgMap.find(intToString(innerActivity->id->value))->second->lastBlock;
+	  
+	    connectBlocks(firstBlock, innerFirst);
+	    connectBlocks(innerLast, lastBlock);
+	  } 
+  	}
+  ]
+;
+
+implicitEventHandler() ->
+  [cfg: {
+	  trace(TRACE_DEBUG, "[CFG] EventHandler (implicit)\n");
+	  CFGBlock * block = new CFGBlock(CFGEventHandler, $0->id, "implicitEventHandler"); 
+	  cfgMap[intToString($0->id->value)] = block;
+	}
+  ];
+
 
 /******************************************************************************
   COMPENSATION HANDLERS
 ******************************************************************************/
+
+userDefinedCompensationHandler(a) ->
+  [cfg: {
+	  trace(TRACE_DEBUG, "[CFG] CompensationHandler (user defined)\n");
+	  CFGBlock * firstBlock = new CFGBlock(CFGCompensationHandler, $0->id, "CompensationHandler_begin"); 
+	  CFGBlock * lastBlock  = new CFGBlock(CFGCompensationHandler, $0->id, "CompensationHandler_end"); 
+	  cfgMap[intToString($0->id->value)] = firstBlock;
+
+	  firstBlock->firstBlock = lastBlock->firstBlock = firstBlock;
+	  firstBlock->lastBlock  = lastBlock->lastBlock  = lastBlock;
+	}
+	a // inner activity
+	{
+	  CFGBlock * innerFirst = cfgMap.find(intToString(a->id->value))->second->firstBlock;
+	  CFGBlock * innerLast  = cfgMap.find(intToString(a->id->value))->second->lastBlock;
+	  
+	  connectBlocks(firstBlock, innerFirst);
+	  connectBlocks(innerLast, lastBlock);
+	}
+
+  ];
+
+implicitCompensationHandler() ->
+  [cfg: {
+	  trace(TRACE_DEBUG, "[CFG] CompensationHandler (implicit)\n");
+	  CFGBlock * block = new CFGBlock(CFGCompensationHandler, $0->id, "implicitCompensationHandler"); 
+	  cfgMap[intToString($0->id->value)] = block;
+	}
+
+  ];
+
+processCompensationHandler() ->
+  [cfg: {
+	  trace(TRACE_DEBUG, "[CFG] CompensationHandler (Process)\n");
+	  CFGBlock * block = new CFGBlock(CFGCompensationHandler, $0->id, "processCompensationHandler"); 
+	  cfgMap[intToString($0->id->value)] = block;
+	}
+
+  ];
 
 
 /******************************************************************************
@@ -522,6 +701,33 @@ Scope(a,b,c,d,e,f,g) ->
 	  firstBlock->lastBlock  = lastBlock->lastBlock  = lastBlock;
 	  
 	  cfgMap[intToString($0->id->value)] = firstBlock; 
+	}
+	c //faultHandler
+	{
+	  CFGBlock * fhFirst = cfgMap.find(intToString(c->id->value))->second->firstBlock;
+	  CFGBlock * fhLast  = cfgMap.find(intToString(c->id->value))->second->lastBlock;
+
+	  connectBlocks(firstBlock, fhFirst);
+	  connectBlocks(fhLast, lastBlock);
+
+	}
+	d //compensationHandler
+	{
+	  CFGBlock * chFirst = cfgMap.find(intToString(d->id->value))->second->firstBlock;
+	  CFGBlock * chLast  = cfgMap.find(intToString(d->id->value))->second->lastBlock;
+
+	  connectBlocks(firstBlock, chFirst);
+	  connectBlocks(chLast, lastBlock);
+
+	}
+	e //compensationHandler
+	{
+	  CFGBlock * ehFirst = cfgMap.find(intToString(e->id->value))->second->firstBlock;
+	  CFGBlock * ehLast  = cfgMap.find(intToString(e->id->value))->second->lastBlock;
+
+	  connectBlocks(firstBlock, ehFirst);
+	  connectBlocks(ehLast, lastBlock);
+
 	}
 	g // activity
 	{

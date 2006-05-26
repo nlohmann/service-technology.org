@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/05/24 14:44:55 $
+ *          - last changed: \$Date: 2006/05/26 13:14:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  */
 
 #ifndef CFG_H
@@ -84,6 +84,7 @@ typedef enum
   CFGWhile,
   CFGSequence,
   CFGPick,
+  CFGOnAlarm,
   CFGOnMessage,
   CFGScope,
   CFGTarget,

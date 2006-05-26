@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/05/24 14:44:55 $
+ *          - last changed: \$Date: 2006/05/26 13:14:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -573,6 +573,22 @@ void CFGBlock::checkForConflictingReceive()
 		cerr << "               " << elemA->first << " (" << elemA->second << ") vs. " << elemB->first << " (" << elemB->second << ")" << endl;
 	      }
 	    }
+	  }
+	}
+	if ((*iter)->type == CFGOnMessage)
+	{
+	  list<CFGBlock *>::iterator iter2 = iter;
+	  ++iter2;
+          for (list<CFGBlock *>::iterator otherBlock = iter2; otherBlock != nextBlocks.end(); otherBlock++)
+	  {
+	    if ((*otherBlock)->type == CFGOnMessage && (*iter)->channel_name == (*otherBlock)->channel_name) 
+	    {
+	      trace("[CFG] WARNING: There are conflicting onMessage conditions!\n");
+	      trace("               Please check lines " + intToString((dynamic_cast<STElement*>(symTab.lookup((*iter)->id)))->line));
+	      trace(                " and " + intToString((dynamic_cast<STElement*>(symTab.lookup((*otherBlock)->id)))->line) + "\n");
+	      cerr << "               " << (*iter)->channel_name << " (" << (*iter)->id->value << ") vs. " << (*otherBlock)->channel_name << " (" << (*otherBlock)->id->value << ")" << endl;
+	    }
+	    receives.insert(pair<std::string, long>( (dynamic_cast<STOnMessage*>(symTab.lookup((*iter)->id)))->channelId, (*iter)->id->value));
 	  }
 	}
 	// 

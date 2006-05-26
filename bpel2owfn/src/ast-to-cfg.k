@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/05/24 14:44:55 $
+ *          - last changed: \$Date: 2006/05/26 13:14:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  */
 %}
 
@@ -228,6 +228,14 @@ userDefinedEventHandler(a,b) ->
 	  firstBlock->firstBlock = lastBlock->firstBlock = firstBlock;
 	  firstBlock->lastBlock  = lastBlock->lastBlock  = lastBlock;
 	  
+	  /*
+	  CFGBlock * onAlarmBlock = new CFGBlock(CFGPick, $0->id, "EventHandler_onAlarm"); 
+	  CFGBlock * onMessageBlock = new CFGBlock(CFGPick, $0->id, "EventHandler_onMessage");
+
+	  connectBlocks(firstBlock, onAlarmBlock);
+	  connectBlocks(firstBlock, onMessageBlock);
+	  */
+
 	  cfgMap[intToString($0->id->value)] = firstBlock; 
 	}
 	a // tOnMessage_list
@@ -243,13 +251,16 @@ userDefinedEventHandler(a,b) ->
 	    connectBlocks(firstBlock, onMessageBlock);
 	    connectBlocks(onMessageBlock, innerFirst);
 	    connectBlocks(innerLast, lastBlock);
-	  } 
+	  }
+	  i = 1; 
 	  foreach(alarm=OnAlarm(innerActivity); tOnAlarm_list b)
 	  {
  	    CFGBlock * innerFirst = cfgMap.find(intToString(innerActivity->id->value))->second->firstBlock;
 	    CFGBlock * innerLast = cfgMap.find(intToString(innerActivity->id->value))->second->lastBlock;
+	    CFGBlock * onAlarmBlock = new CFGBlock(CFGOnAlarm, alarm->id, "OnAlarm_" + intToString(i++)); 
 	  
-	    connectBlocks(firstBlock, innerFirst);
+	    connectBlocks(firstBlock, onAlarmBlock);
+	    connectBlocks(onAlarmBlock, innerFirst);
 	    connectBlocks(innerLast, lastBlock);
 	  } 
   	}
@@ -668,20 +679,24 @@ Pick(a,b,c) ->
  	    CFGBlock * innerFirst = cfgMap.find(intToString(innerActivity->id->value))->second->firstBlock;
 	    CFGBlock * innerLast = cfgMap.find(intToString(innerActivity->id->value))->second->lastBlock;
 	    CFGBlock * onMessageBlock = new CFGBlock(CFGOnMessage, message->id, "OnMessage_" + intToString(i++)); 
+	    onMessageBlock->channel_name = (dynamic_cast<STCommunicationActivity*>(symTab.lookup($0->id)))->channelId; 
 	  
 	    connectBlocks(firstBlock, onMessageBlock);
 	    connectBlocks(onMessageBlock, innerFirst);
 	    connectBlocks(innerLast, lastBlock);
 	  } 
+	  i = 1; 
 	  foreach(alarm=OnAlarm(innerActivity); tOnAlarm_list c)
 	  {
  	    CFGBlock * innerFirst = cfgMap.find(intToString(innerActivity->id->value))->second->firstBlock;
 	    CFGBlock * innerLast = cfgMap.find(intToString(innerActivity->id->value))->second->lastBlock;
+	    CFGBlock * onAlarmBlock = new CFGBlock(CFGOnAlarm, alarm->id, "OnAlarm_" + intToString(i++)); 
 	  
-	    connectBlocks(firstBlock, innerFirst);
+	    connectBlocks(firstBlock, onAlarmBlock);
+	    connectBlocks(onAlarmBlock, innerFirst);
 	    connectBlocks(innerLast, lastBlock);
 	  } 
-  	}
+	}
 	a // standard elements
   ]
 ;

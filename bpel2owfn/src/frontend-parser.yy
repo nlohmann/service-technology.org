@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/05/03 12:40:42 $
+ *          - last changed: \$Date: 2006/05/29 11:04:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.171 $
+ * \version \$Revision: 1.172 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -76,7 +76,8 @@
 %token K_PARTNERLINKS K_PARTNERS K_PICK K_PROCESS K_RECEIVE K_REPLY K_SCOPE
 %token K_SEQUENCE K_SOURCE K_SWITCH K_TARGET K_TERMINATE K_THROW K_TO
 %token K_VARIABLE K_VARIABLES K_WAIT K_WHILE
-%token X_OPEN X_SLASH X_CLOSE X_NEXT X_EQUALS
+%token X_OPEN X_SLASH X_CLOSE X_NEXT X_EQUALS QUOTE
+%token K_JOINCONDITION K_GETLINKSTATUS RBRACKET LBRACKET APOSTROPHE K_AND K_OR
 %token <yt_casestring> X_NAME
 %token <yt_casestring> X_STRING
 
@@ -175,6 +176,9 @@ stack<bool> isInFH;
 stack< pair<bool,int> > isInCH;
 int hasCompensate;
 
+
+/// a pointer to the current join condition
+impl_joinCondition* currentJoinCondition = standardJoinCondition();
 %}
 
 
@@ -239,6 +243,9 @@ int hasCompensate;
 %type <yt_tVariable> tVariable
 %type <yt_tWait> tWait
 %type <yt_tWhile> tWhile
+
+%type <yt_expression> booleanLinkCondition
+
 %type <yt_integer> genSymTabEntry_Process
 %type <yt_integer> genSymTabEntry_PartnerLink
 %type <yt_integer> genSymTabEntry_Partner
@@ -1022,7 +1029,7 @@ tEmpty:
       }
     }   
   X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       noLinks->parentId = $2;
       $$ = Empty(noLinks);
       att.popSJFStack(); symTab.popSJFStack();
@@ -1100,7 +1107,7 @@ tInvoke:
 	stInvoke->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
         stInvoke->isAsynchronousInvoke = (stInvoke->outputVariable == NULL);
 
-	standardElements se =  StandardElements(NiltTarget_list(), NiltSource_list());
+	standardElements se =  StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
         tInvoke invoke = Invoke(se, $8);
         activity ai = activityInvoke(invoke);
         tFaultHandlers fh = userDefinedFaultHandler($9, $10);
@@ -1241,7 +1248,7 @@ tInvoke:
     }   
   X_SLASH
     { 
-      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       noLinks->parentId = $2;
 
       STInvoke * stInvoke = NULL;
@@ -1364,7 +1371,7 @@ tReceive:
       }
     }   
   X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       noLinks->parentId = $2;
 
       STReceive * stReceive = NULL;
@@ -1464,7 +1471,7 @@ tReply:
       }
     }   
   X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       noLinks->parentId = $2;
       STReply * stReply = NULL;
       try
@@ -1711,7 +1718,7 @@ tWait:
       }
     }   
   X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       noLinks->parentId = $2;
 
       if ( symTab.readAttributeValue($2, "for") != "" )
@@ -1792,7 +1799,7 @@ tThrow:
       }
     }   
   X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       noLinks->parentId = $2;
       STThrow * stThrow = NULL;
       try
@@ -1912,7 +1919,7 @@ tCompensate:
       }
     }   
   X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       noLinks->parentId = $2;
       $$ = Compensate(noLinks);
       att.popSJFStack(); symTab.popSJFStack();
@@ -1975,7 +1982,7 @@ tTerminate:
       }
     }   
   X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list());
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       noLinks->parentId = $2;
       $$ = Terminate(noLinks);
       att.popSJFStack(); symTab.popSJFStack();
@@ -2277,7 +2284,7 @@ tOtherwise:
       int emptyId = currentSymTabEntryKey = symTab.insert(K_EMPTY);
       currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
 
-      impl_standardElements_StandardElements* noLinks = StandardElements(NiltTarget_list(),NiltSource_list());
+      impl_standardElements_StandardElements* noLinks = StandardElements(NiltTarget_list(),NiltSource_list(), standardJoinCondition());
 //      noLinks->dpe = kc::mkinteger(0);
       noLinks->parentId = kc::mkinteger(emptyId);
       impl_tEmpty_Empty* implicitEmpty = Empty(noLinks);
@@ -2540,7 +2547,8 @@ genSymTabEntry_Scope:
 
 standardElements:
   tTarget_list tSource_list
-    { $$ = StandardElements($1, $2); 
+    { $$ = StandardElements($1, $2, currentJoinCondition);
+      currentJoinCondition = standardJoinCondition();
       $$->dpe = $2->dpe;
       $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       if ($1->length() > 0)
@@ -2681,16 +2689,32 @@ genSymTabEntry_Source:
 
 arbitraryAttributes:
   /* empty */
-    { $$ = att.nextId();
-    }
+    { $$ = att.nextId(); }
+| joinCondition arbitraryAttributes
+    { $$ = $2; }
 | X_NAME X_EQUALS X_STRING
-    {
-      if(currentSymTabEntryKey > 0)
-        symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute($1, $3));
-    }
+    { if(currentSymTabEntryKey > 0)
+        symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute($1, $3)); }
   arbitraryAttributes
-    {
-      att.define($1, $3);
-      $$ = $5;
-    }
+    { att.define($1, $3);
+      $$ = $5; }
+;
+
+
+joinCondition:
+  K_JOINCONDITION X_EQUALS booleanLinkCondition
+    { currentJoinCondition = userDefinedJoinCondition($3);
+      currentJoinCondition->print(); }
+| K_JOINCONDITION X_EQUALS X_STRING
+    { cerr << "ignoring given join condition: \"" << $3->name << "\"" << endl; }
+;
+
+
+booleanLinkCondition:
+  K_GETLINKSTATUS LBRACKET APOSTROPHE X_NAME APOSTROPHE RBRACKET
+    { $$ = Term($4); }
+| LBRACKET booleanLinkCondition K_AND booleanLinkCondition RBRACKET
+    { $$ = Conjunction($2, $4); }
+| LBRACKET booleanLinkCondition K_OR booleanLinkCondition RBRACKET
+    { $$ = Disjunction($2, $4); }
 ;

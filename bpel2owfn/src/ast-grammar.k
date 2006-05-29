@@ -29,11 +29,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $ 
+ *          - last changes of: \$Author: nlohmann $ 
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/03/31 14:56:52 $
+ *          - last changed: \$Date: 2006/05/29 11:04:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.77 $
+ * \version \$Revision: 1.78 $
  */
 %}
 
@@ -611,7 +611,7 @@ tScope:
 ******************************************************************************/
 
 standardElements:
-  StandardElements(tTarget_list tSource_list)
+  StandardElements(tTarget_list tSource_list joinCondition)
   {
     integer parentId;
     casestring suppressJoinFailure; // actually a value of the parent
@@ -637,9 +637,6 @@ tTarget_list:
 tTarget:
   Target()
   {
-//CG    /// additional attribute containing the unique link name
-//CG    casestring linkID;
-
     /// used here to create the patterns
     integer negativeControlFlow;
     
@@ -658,9 +655,6 @@ tSource_list:
 tSource:
   Source()
   {
-//CG    /// additional attribute containing the unique link name
-//CG    casestring linkID;
-
     /// additional attribute for DPE
     integer dpe = mkinteger(0);
 
@@ -669,4 +663,17 @@ tSource:
     
     integer id;
   }
+;
+
+
+joinCondition:
+  standardJoinCondition()
+| userDefinedJoinCondition(expression)
+;
+
+
+expression:
+  Term(casestring)
+| Conjunction(expression expression)
+| Disjunction(expression expression)
 ;

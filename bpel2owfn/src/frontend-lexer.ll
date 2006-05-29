@@ -39,7 +39,7 @@
  *          
  * \date
  *          - created 2005-11-10
- *          - last changed: \$Date: 2006/02/09 19:09:05 $
+ *          - last changed: \$Date: 2006/05/29 11:04:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -48,7 +48,7 @@
  * \note    This file was created using Flex reading file bpel-lexic.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
  *
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -105,7 +105,8 @@ namestart		[A-Za-z\200-\377_]
 namechar		[A-Za-z\200-\377_0-9.\-:]
 name			{namestart}{namechar}*
 esc			"&#"[0-9]+";"|"&#x"[0-9a-fA-F]+";"
-string			\"([^"]|{esc})*\"
+quote			\"
+string			{quote}([^"]|{esc})*{quote}
 comment			([^-]|"-"[^-])*
 xmlheader		([^?]|"-"[^?])*
 bpwsns			"bpws:"|"bpel:"
@@ -130,6 +131,16 @@ bpwsns			"bpws:"|"bpel:"
 "?xml"				{ currentView = YY_START; BEGIN(XMLHEADER); }
 <XMLHEADER>{xmlheader}		{ /* skip */ }
 <XMLHEADER>"?>"[ \t\r\n]*"<"	{ BEGIN(currentView); }
+
+
+ /* everything needed to evaluate join conditons (must be above the attributes section) */
+<ATTRIBUTE>"joinCondition"		{ return K_JOINCONDITION; }
+<ATTRIBUTE>"getLinkStatus"		{ return K_GETLINKSTATUS; }
+<ATTRIBUTE>"and"			{ return K_AND; }
+<ATTRIBUTE>"or"				{ return K_OR; }
+<ATTRIBUTE>"("				{ return LBRACKET; }
+<ATTRIBUTE>")"				{ return RBRACKET; }
+<ATTRIBUTE>"'"				{ return APOSTROPHE; }
 
 
  /* attributes */

@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/04/27 08:20:21 $
+ *          - last changed: \$Date: 2006/05/29 11:04:41 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  *
  */
 %}
@@ -1462,7 +1462,7 @@ This=Scope(a,b,c,d,e,f,g) ->
   STANDARD ELEMENTS
 ******************************************************************************/
 
-This=StandardElements(NiltTarget_list(), NiltSource_list()) ->
+This=StandardElements(NiltTarget_list(), NiltSource_list(), jc) ->
   [petrinetsmall:
     {
       string prefix = intToString(This->parentId->value) + ".";
@@ -1496,7 +1496,7 @@ This=StandardElements(NiltTarget_list(), NiltSource_list()) ->
  * Figure 22: Pattern for an activity that is source of links.
  *****************************************************************************/
 
-This=StandardElements(NiltTarget_list(), a) ->
+This=StandardElements(NiltTarget_list(), a, jc) ->
   [petrinetsmall:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 22\n");
@@ -1571,7 +1571,7 @@ This=StandardElements(NiltTarget_list(), a) ->
  * suppressJoinFailure="no".
  *****************************************************************************/
 
-This=StandardElements(a, NiltSource_list()) provided 
+This=StandardElements(a, NiltSource_list(), jc) provided 
 (symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "no") ->
   [petrinetsmall:
     {
@@ -1590,7 +1590,7 @@ This=StandardElements(a, NiltSource_list()) provided
  * suppressJoinFailure="yes".
  *****************************************************************************/
 
-This=StandardElements(a, NiltSource_list()) provided
+This=StandardElements(a, NiltSource_list(), jc) provided
 (symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "yes") ->
   [petrinetsmall:
     {
@@ -1651,7 +1651,7 @@ This=StandardElements(a, NiltSource_list()) provided
  * case of suppressJoinFailure="yes".
  *****************************************************************************/
 
-This=StandardElements(a,b) provided 
+This=StandardElements(a,b, jc) provided 
 (symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "yes") ->
   [petrinetsmall:
     {
@@ -1759,7 +1759,7 @@ This=StandardElements(a,b) provided
  * case of suppressJoinFailure="no".
  *****************************************************************************/
 
-This=StandardElements(a,b) provided 
+This=StandardElements(a,b, jc) provided 
 (symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "no") ->
   [petrinetsmall:
     {

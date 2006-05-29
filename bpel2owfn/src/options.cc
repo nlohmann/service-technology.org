@@ -365,6 +365,10 @@ void parse_command_line(int argc, char* argv[])
 	      {
 	        parameters[P_NANO] = true;
 	      }
+	      else if ( parameter == "newlinks" )
+	      {
+	        parameters[P_NEWLINKS] = true;
+	      }
 	      else if ( parameter == "cyclicwhile" )
 	      {
 	        parameters[P_CYCLICWHILE] = true;

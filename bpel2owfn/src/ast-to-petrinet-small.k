@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/05/29 11:04:41 $
+ *          - last changed: \$Date: 2006/05/29 14:31:32 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  *
  */
 %}
@@ -72,6 +72,7 @@
 #include "options.h"
 #include "bpel-unparse-tools.h"
 #include "ast-printers.h"
+#include <cmath>
 
 using namespace std;
 
@@ -127,8 +128,17 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       // whole process -- also links defined in a deeper hierarchy.
       for (list<STLink*>::iterator link = myself->enclosedLinks.begin(); link != myself->enclosedLinks.end(); link++)
       {
-	TheNet->newPlace("link." + (*link)->name);
-	TheNet->newPlace("!link." + (*link)->name);
+        // Choose the link patterns.
+        if (parameters[P_NEWLINKS])
+        {
+	  TheNet->newPlace("linkT." + (*link)->name);
+	  TheNet->newPlace("linkF." + (*link)->name);
+        }
+        else
+        {        
+	  TheNet->newPlace("link." + (*link)->name);
+	  TheNet->newPlace("!link." + (*link)->name);
+        }
       }
 
 
@@ -1496,6 +1506,37 @@ This=StandardElements(NiltTarget_list(), NiltSource_list(), jc) ->
  * Figure 22: Pattern for an activity that is source of links.
  *****************************************************************************/
 
+This=StandardElements(NiltTarget_list(), a, jc) provided (parameters[P_NEWLINKS]) ->
+  [petrinetsmall:
+    {
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 22 (new)\n");
+      string prefix = intToString(This->parentId->value) + ".";
+      string newPrefix = intToString(This->parentId->value) + ".internal";
+
+      Place *p1 = TheNet->newPlace(prefix + "initial");
+      Place *p2 = TheNet->newPlace(prefix + "done");
+      Place *p3 = TheNet->newPlace(prefix + "final");
+
+      Transition *t1 = TheNet->newTransition(prefix + "setLinks");
+      TheNet->newArc(p2, t1);
+      TheNet->newArc(t1, p3);
+
+      // Set the outgoing links (standard transition condition expected).
+      foreach (link; tSource_list a)
+      {
+	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
+	Place *p4 = TheNet->findPlace("linkT." + string(linkST->name));
+        TheNet->newArc(t1, p4);
+      }
+
+      // Embed the inner activity.
+      TheNet->mergePlaces(p1, TheNet->findPlace(newPrefix + ".initial"));
+      TheNet->mergePlaces(p2, TheNet->findPlace(newPrefix + ".final"));
+    }
+  ]
+;
+
+
 This=StandardElements(NiltTarget_list(), a, jc) ->
   [petrinetsmall:
     {
@@ -1591,6 +1632,88 @@ This=StandardElements(a, NiltSource_list(), jc) provided
  *****************************************************************************/
 
 This=StandardElements(a, NiltSource_list(), jc) provided
+((symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "yes") && parameters[P_NEWLINKS]) ->
+  [petrinetsmall:
+    {
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 24 (new)\n");
+      string prefix = intToString(This->parentId->value) + ".";
+      string newPrefix = intToString(This->parentId->value) + ".internal";
+
+      Place *p1 = TheNet->newPlace(prefix + "initial");
+      Place *p2 = TheNet->newPlace(prefix + "final");
+      Place *p3 = TheNet->newPlace(prefix + "joinTrue");
+      Place *p4 = TheNet->newPlace(prefix + "joinFalse");
+      Place *p5 = TheNet->newPlace(prefix + "begin");
+
+      Transition *t1 = TheNet->newTransition(prefix + "t1");
+      TheNet->newArc(p1, t1);
+      TheNet->newArc(p3, t1);
+      TheNet->newArc(t1, p5);
+
+      Transition *t2 = TheNet->newTransition(prefix + "skip");
+      TheNet->newArc(p1, t2);
+      TheNet->newArc(p4, t2);
+      TheNet->newArc(t2, p2);
+
+
+      // evaluate the join condition
+      if (string(jc->op_name()) == "standardJoinCondition")
+      {
+        // containers for the join transitions and the incoming links
+        map<unsigned int, Transition*> joinTransitions;
+        map<unsigned int, Place*> trueLinks;
+        map<unsigned int, Place*> falseLinks;
+
+
+        // fill link containers
+        int linkCount = 0;
+	foreach (link; tTarget_list a)
+	{
+	  STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
+	  Place *linkT = TheNet->findPlace("linkT." + string(linkST->name));
+	  Place *linkF = TheNet->findPlace("linkF." + string(linkST->name));
+
+          trueLinks[linkCount] = linkT;
+          falseLinks[linkCount] = linkF;
+
+          linkCount++;
+	}
+
+
+        // fill transition container and create OR-join
+        unsigned int transitionNumber = (unsigned int)pow(2.0, a->length());
+        for (unsigned int i = 0; i < transitionNumber; i++)
+        {
+          joinTransitions[i] = TheNet->newTransition(prefix + "join" + intToString(i));
+
+          for (unsigned int j = 0; j < linkCount; j++)
+          {
+            if (((i >> j) % 2) == 0) // this rather cryptic expression correctly connects the links
+              TheNet->newArc(trueLinks[j], joinTransitions[i]);
+            else
+              TheNet->newArc(falseLinks[j], joinTransitions[i]);
+          }
+
+          // only one transition makes the join fail
+          if (i == transitionNumber-1)
+            TheNet->newArc(joinTransitions[i], p4);
+          else
+            TheNet->newArc(joinTransitions[i], p3);
+        }
+      }
+      else
+        cerr << "user-defined join conditions are not yet supported!" << endl;
+
+
+      // Embed the inner activity.
+      TheNet->mergePlaces(p5, TheNet->findPlace(newPrefix + ".initial"));
+      TheNet->mergePlaces(p2, TheNet->findPlace(newPrefix + ".final"));
+    }
+  ]
+;
+
+
+This=StandardElements(a, NiltSource_list(), jc) provided
 (symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "yes") ->
   [petrinetsmall:
     {
@@ -1650,6 +1773,18 @@ This=StandardElements(a, NiltSource_list(), jc) provided
  * Figure 25: Pattern for an activity that is source and target of links in
  * case of suppressJoinFailure="yes".
  *****************************************************************************/
+
+This=StandardElements(a,b, jc) provided 
+((symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "yes") && parameters[P_NEWLINKS]) ->
+  [petrinetsmall:
+    {
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 25 (new)\n");
+      string prefix = intToString(This->parentId->value) + ".";
+      string newPrefix = intToString(This->parentId->value) + ".internal";
+    }
+  ]
+;
+
 
 This=StandardElements(a,b, jc) provided 
 (symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "yes") ->

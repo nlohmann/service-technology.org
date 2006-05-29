@@ -39,17 +39,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/04/11 13:22:59 $
+ *          - last changed: \$Date: 2006/05/29 14:31:33 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  */
 
 
@@ -300,6 +300,8 @@ string Place::dotOut()
   else if (firstMemberAs("internal.faultHandler."))
     result += " style=filled fillcolor=pink";
   else if (firstMemberIs("link.") || firstMemberIs("!link."))
+    result += " style=filled fillcolor=yellow";
+  else if (firstMemberIs("linkT.") || firstMemberIs("linkF.") || firstMemberIs("linkU."))
     result += " style=filled fillcolor=yellow";
   else if (firstMemberIs("variable."))
     result += " style=filled fillcolor=cyan shape=ellipse";

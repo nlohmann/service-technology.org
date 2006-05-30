@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/05/26 13:14:35 $
+ *          - last changed: \$Date: 2006/05/30 12:58:42 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -615,6 +615,12 @@ void CFGBlock::checkForConflictingReceive()
     if (type == CFGReceive)
     {
       receives.insert(pair<std::string, long>( (dynamic_cast<STReceive*>(symTab.lookup(id)))->channelId, id->value));
+    }
+    if (type == CFGInvoke)
+    {
+      if( (dynamic_cast<STInvoke*> (symTab.lookup(id)))->outputVariable != NULL) {
+	receives.insert(pair<std::string, long>( (dynamic_cast<STInvoke*>(symTab.lookup(id)))->channelId, id->value));
+      }
     }
     if (!prevBlocks.empty())
     {

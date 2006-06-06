@@ -28,7 +28,7 @@ struct compareChars {
 }; // compareVertices 
 
 
-typedef std::set<graphEdge*> clauseSet;
+typedef std::set<graphEdge *> clauseSet;
 typedef std::set<char *, compareChars> clauseSetLabel;
 
 

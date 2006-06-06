@@ -208,7 +208,7 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
             if (type == sending) {
                 if (strcmp(PN->Places[PN->inputPlacesArray[label]]->name, "in.client.onlineshop.abort") == 0) {
                     for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
-                        toAdd->eventsUsed[i]++;
+                         found->eventsUsed[i]++;
                     }
                 }
             }

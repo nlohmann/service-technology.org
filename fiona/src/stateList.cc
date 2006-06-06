@@ -34,6 +34,7 @@ reachGraphState::reachGraphState(bool isMinimal, State * s) :
 //! \fn reachGraphState::~reachGraphState()
 //! \brief destructor
 reachGraphState::~reachGraphState() {
+
 }
 
 //! \fn bool reachGraphState::isMinimal()
@@ -146,6 +147,11 @@ stateList::stateList() {
 //! \fn stateList::~stateList()
 //! \brief destructor
 stateList::~stateList() {
+	reachGraphStateSet::iterator iter;
+	
+	for (iter = setOfReachGraphStates.begin(); iter != setOfReachGraphStates.end(); iter++) {
+		delete *iter;	
+	}	
 }
 
 //! \fn bool stateList::addElement(State * s, stateType _type, bool isMinimal, char * label)

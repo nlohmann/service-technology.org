@@ -42,6 +42,7 @@ vertex::vertex() :
 //! \fn vertex::~vertex()
 //! \brief destructor
 vertex::~vertex () {
+	
 	if (successorNodes != NULL) {
 		delete successorNodes;
 	}

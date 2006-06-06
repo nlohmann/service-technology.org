@@ -19,6 +19,9 @@ graphEdge::graphEdge(vertex * nodeP, char * labelP, edgeType typeP) {
 //! \brief destructor
 graphEdge::~graphEdge() {
 	delete label;
+	if (nextElement != NULL) {
+		delete nextElement;	
+	}
 }
 
 //! \fn void graphEdge::setNextElement(graphEdge * element)

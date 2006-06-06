@@ -32,13 +32,13 @@
  *
  * \date
  *          - created: 2006/02/08
- *          - last changed: \$Date: 2006/02/14 15:34:33 $
+ *          - last changed: \$Date: 2006/06/06 16:06:41 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  */
 
 
@@ -84,6 +84,7 @@ void header(kc::integer id, bool indent = false);
 void footer(kc::integer id, bool indent = false);
 
 
+void dpeLinks(Transition* t, kc::integer id);
 
 
 

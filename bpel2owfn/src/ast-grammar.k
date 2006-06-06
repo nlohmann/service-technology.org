@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/05/29 11:04:40 $
+ *          - last changed: \$Date: 2006/06/06 16:06:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.78 $
+ * \version \$Revision: 1.79 $
  */
 %}
 
@@ -528,6 +528,7 @@ tOtherwise:
   {
     /// additional attribute for DPE
     integer dpe = mkinteger(0);
+    integer id;
   }
 ;
 

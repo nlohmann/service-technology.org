@@ -26,7 +26,7 @@
  *
  * \author
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $  
+ *          - last changes of: \$Author: nlohmann $  
  *          
  * \date
  * 
@@ -116,60 +116,30 @@ void SymbolTable::printSymbolTable()
 
     switch(currentEntry->elementId)
     {
-      case K_COMPENSATE:
-      {
-      } break;
-      case K_COMPENSATIONHANDLER:
-      {
-      } break;
-      case K_CORRELATIONSET:
-      {
-      } break;
-      case K_EVENTHANDLERS:
-      {
-      } break;
-      case K_FAULTHANDLERS:
-      {
-      } break;
-      case K_INVOKE:
-      {
-      } break;
-      case K_LINK:
-      {
-      } break;
-      case K_PARTNER:
-      {
-      } break;
-      case K_PARTNERLINK:
-      {
-      } break;
+      case K_COMPENSATE:		{ } break;
+      case K_COMPENSATIONHANDLER:	{ } break;
+      case K_CORRELATIONSET:		{ } break;
+      case K_EVENTHANDLERS:		{ } break;
+      case K_FAULTHANDLERS:		{ } break;
+      case K_INVOKE:			{ } break;
+      case K_LINK:			{ } break;
+      case K_PARTNER:			{ } break;
+      case K_PARTNERLINK:		{ } break;
       case K_PROCESS:
       {
       	printSTEnvelope(currentEntry);
       } break;
-      case K_RECEIVE:
-      {
-      } break;
-      case K_REPLY:
-      {
-      } break;
+      case K_RECEIVE:			{ } break;
+      case K_REPLY:			{ } break;
       case K_SCOPE:
       {
       	printSTEnvelope(currentEntry);
       } break;
-      case K_TERMINATE:
-      {
-      } break;
-      case K_VARIABLE:
-      {
-      } break;
-      case K_WAIT:
-      {
-      } break;
+      case K_TERMINATE:			{ } break;
+      case K_VARIABLE:			{ } break;
+      case K_WAIT:			{ } break;
       /* all other */
-      default :
-      {
-      } break;
+      default :				{ } break;
     }
     traceSTwp(horizontal); traceSTwp("\n"); 
     traceSTwp("\n");        
@@ -334,6 +304,7 @@ unsigned int SymbolTable::insert(unsigned int elementId)
   traceST("insert(" + translateToElementName(elementId) + ")\n");
   switch(elementId)
   {
+    case K_CASE:                {symTab[this->nextKey()] = new STCaseBranch(elementId, this->entryKey);} break;
     case K_COMPENSATE:          {symTab[this->nextKey()] = new STCompensate(elementId, this->entryKey);} break;
     case K_COMPENSATIONHANDLER: {symTab[this->nextKey()] = new STCompensationHandler(elementId, this->entryKey);} break;
     case K_CORRELATIONSET:      {symTab[this->nextKey()] = new STCorrelationSet(elementId, this->entryKey);} break;
@@ -352,6 +323,7 @@ unsigned int SymbolTable::insert(unsigned int elementId)
     case K_WAIT:                {symTab[this->nextKey()] = new STWait(elementId, this->entryKey);} break;
     case K_CATCH:               {symTab[this->nextKey()] = new STCatch(elementId, this->entryKey);} break;
     case K_ONMESSAGE:           {symTab[this->nextKey()] = new STOnMessage(elementId, this->entryKey);} break;
+    case K_OTHERWISE:           {symTab[this->nextKey()] = new STCaseBranch(elementId, this->entryKey);} break;
     case K_FROM:                {symTab[this->nextKey()] = new STFromTo(elementId, this->entryKey);} break;
     case K_TO:                  {symTab[this->nextKey()] = new STFromTo(elementId, this->entryKey);} break;
     case K_THROW:               {symTab[this->nextKey()] = new STThrow(elementId, this->entryKey);} break;
@@ -3072,6 +3044,51 @@ void STFlow::checkLinkUsage()
     }
   }
 }
+
+
+
+
+
+/********************************************
+ * implementation of CaseBranch CLASS
+ ********************************************/
+
+/*!
+ * constructor
+ */
+STCaseBranch::STCaseBranch(unsigned int elementId, unsigned int entryKey)
+ :STActivity(elementId, entryKey) {}
+
+/*!
+ * constructor
+ */
+STCaseBranch::STCaseBranch() {}
+
+/*!
+ * destructor
+ */
+STCaseBranch::~STCaseBranch() {}
+
+
+/*!
+ * Collects all source links having an id between firstId and lastId. This
+ * collection is used for dead path elimination.
+ */
+void STCaseBranch::processLinks(unsigned int firstId, unsigned int lastId)
+{
+  for (int id = firstId+1; id <= lastId; id++)
+  {
+    STSourceTarget* sourceLink = NULL;
+    if ( typeid(*(symTab.lookup(id))).name() == typeid(STSourceTarget).name())
+    {
+      sourceLink = dynamic_cast<STSourceTarget *> (symTab.lookup(id));
+      if (sourceLink->isSource)
+	enclosedTargetLinks.insert(sourceLink->link);
+    }
+  }
+}
+
+
 
   
 /********************************************

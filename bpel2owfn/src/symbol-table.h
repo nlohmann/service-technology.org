@@ -25,7 +25,7 @@
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created:
@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.37 $: 
+ * \version \$Revision: 1.38 $: 
  *
  */
 
@@ -67,6 +67,7 @@ class SymbolTable;
 class SymbolTableEntry;
 class STActivity;
 class STAttribute;
+class STCaseBranch;
 class STCatch;
 class STCommunicationActivity;
 class STCompensate;
@@ -922,6 +923,37 @@ class STFlow: public STActivity
     void checkLinkUsage();
 };
 
+
+
+
+
+
+/**
+ * \class STCaseBranch
+ *
+ * A class for <case> and <otherwise> branches. Basically just added to
+ * collect reachable target links for dead path elimination.
+ */
+class STCaseBranch: public STActivity
+{
+  public:
+    /// constructor
+    STCaseBranch();
+    STCaseBranch(unsigned int elementId, unsigned int entryKey);
+
+    void processLinks(unsigned int firstId, unsigned int lastId);
+    
+    /// destructor
+    virtual ~STCaseBranch();
+
+    std::set<STLink*> enclosedTargetLinks;
+};
+
+
+
+
+
+
 /**
  * \class	STSourceTarget
  *
@@ -942,6 +974,8 @@ class STSourceTarget: public STElement, public SymbolTableEntry
 
     /// the connected link
     STLink * link;
+
+    bool isSource;
 };
 
 

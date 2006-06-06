@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/05/29 11:04:40 $
+ *          - last changed: \$Date: 2006/06/06 16:06:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.172 $
+ * \version \$Revision: 1.173 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -2265,7 +2265,26 @@ tCase:
       $$->id = $2;    
       $$->condition = att.read($3, "condition"); 
       $$->dpe = mkinteger((symMan.needsDPE())->value);
-      
+
+/*      cerr << "I am a case branch." << endl;
+      cerr << "my id is: " << $$->id->value << endl;
+      cerr << "the id of the inner activity is: " << $6->id->value << endl;
+      cerr << "the highest seen id so far is: " << currentSymTabEntryKey << endl;
+      cerr << "all source links with ids between " << $6->id->value << " and " << currentSymTabEntryKey << " are interesting" << endl;
+      cerr << endl;*/
+
+      STCaseBranch* branch = NULL;
+      try
+      {
+	branch = dynamic_cast<STCaseBranch *> (symTab.lookup($$->id->value));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      branch->processLinks($6->id->value, currentSymTabEntryKey);
+
+
     }
 ;
 
@@ -2303,8 +2322,30 @@ tOtherwise:
       symMan.resetDPEend();
     }
   activity X_NEXT X_SLASH K_OTHERWISE X_NEXT
-    { $$ = Otherwise($4); 
+    { $$ = Otherwise($4);
+      currentSymTabEntryKey = symTab.insert(K_OTHERWISE);
+      $$->id = mkinteger(currentSymTabEntryKey);
       $$->dpe = symMan.needsDPE();
+
+      STCaseBranch* branch = NULL;
+      try
+      {
+	branch = dynamic_cast<STCaseBranch *> (symTab.lookup($$->id->value));
+      }
+      catch (bad_cast)
+      {
+	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      branch->processLinks($4->id->value, currentSymTabEntryKey);
+
+/*
+      cerr << "I am an otherwise branch." << endl;
+      cerr << "my id is: " << $$->id->value << endl;
+      cerr << "the id of the inner activity is: " << $4->id->value << endl;
+      cerr << "the highest seen id so far is: " << currentSymTabEntryKey << endl;
+      cerr << "all source links with ids between " << $4->id->value << " and " << currentSymTabEntryKey << " are interesting" << endl;
+      cerr << endl;
+*/
     }
 ;
 
@@ -2585,6 +2626,7 @@ tTarget:
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
       stTarget->link = currentSTFlow->checkLink(symTab.readAttributeValue($2, "linkName"), $2->value, false);
+      stTarget->isSource = false;
       
       $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
 //CG      $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), false);
@@ -2605,6 +2647,7 @@ tTarget:
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
       stTarget->link = currentSTFlow->checkLink(symTab.readAttributeValue($2, "linkName"), $2->value, false);
+      stTarget->isSource = false;
 
       $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
 //CG      $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), false);
@@ -2645,6 +2688,7 @@ tSource:
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
       stSource->link = currentSTFlow->checkLink(symTab.readAttributeValue($2, "linkName"), $2->value, true);
+      stSource->isSource = true;
       currentSTScope->addLink(stSource->link);
 
 //CG      $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), true); 
@@ -2669,6 +2713,7 @@ tSource:
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
       stSource->link = currentSTFlow->checkLink(symTab.readAttributeValue($2, "linkName"), $2->value, true);
+      stSource->isSource = true;
       currentSTScope->addLink(stSource->link);
 
 //CG      $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), true);

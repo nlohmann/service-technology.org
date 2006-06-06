@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/05/29 14:31:32 $
+ *          - last changed: \$Date: 2006/06/06 16:06:40 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  *
  */
 %}
@@ -128,17 +128,8 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       // whole process -- also links defined in a deeper hierarchy.
       for (list<STLink*>::iterator link = myself->enclosedLinks.begin(); link != myself->enclosedLinks.end(); link++)
       {
-        // Choose the link patterns.
-        if (parameters[P_NEWLINKS])
-        {
-	  TheNet->newPlace("linkT." + (*link)->name);
-	  TheNet->newPlace("linkF." + (*link)->name);
-        }
-        else
-        {        
-	  TheNet->newPlace("link." + (*link)->name);
-	  TheNet->newPlace("!link." + (*link)->name);
-        }
+	TheNet->newPlace("link." + (*link)->name);
+	TheNet->newPlace("!link." + (*link)->name);
       }
 
 
@@ -740,28 +731,12 @@ This=Flow(a,b,c) ->
 
       Transition *t3 = TheNet->newTransition(prefix + "t3");
       TheNet->newArc(t3, p8);
-
-
-      // Dead-Path-Elimination.
-      Transition *t1 = NULL;
-      if (This->dpe->value > 0)
-      {
-	Place *p1  = TheNet->newPlace(prefix + "negLink");
-	t1 = TheNet->newTransition(prefix + "t1");
-	TheNet->newArc(p1, t1);
-      }
     }
     a // standardElements
     c // inner activities
     {
       foreach (innerActivity; activity_list c)
       {
-        string newPrefix = intToString(innerActivity->id->value);
-        // Embed the inner activity.
-	if (This->dpe->value > 0 && TheNet->findPlace(newPrefix + ".negLink") != NULL)
-	{
-	  TheNet->newArc(t1, TheNet->findPlace(newPrefix + ".negLink"));
-	}
 	TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
 	TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t3);
       }
@@ -783,7 +758,7 @@ This=Flow(a,b,c) ->
  * parsing an empty otherwise branch was added if it was not specified.
  */
 
-This=activitySwitch(Switch(a,b,Otherwise(c))) ->
+This=activitySwitch(Switch(a,b,otherwiseBranch=Otherwise(c))) ->
   [petrinetsmall:
     {
       header(This->id, true);
@@ -791,23 +766,12 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
 
       Place *p4 =  TheNet->newPlace(prefix + "final");
       Place *p5 =  TheNet->newPlace(prefix + "initial");
-
-
-      // Dead Path Elimination
-      Transition *t1 = NULL;
-      if (This->dpe->value > 0)
-      {
-	t1 = TheNet->newTransition(prefix + "t1");
-	Place *p1 = TheNet->newPlace(prefix + "negLink");
-	TheNet->newArc(p1, t1);
-      }
     }
     a // standardElements
     b // case braches
     c // otherwise branch
     {
       int currentCase = 1;
-      Transition *last;
       foreach (caseBranch=Case(innerActivity); tCase_list b)
       {
 	string caseNumber = intToString(currentCase++);
@@ -816,6 +780,7 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
 
 	Transition* t2 = TheNet->newTransition(prefix + "t2.case" + caseNumber);
 	TheNet->newArc(TheNet->findPlace(This, ".initial"), t2);
+
 
 	// Embed the inner activity.
 	TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
@@ -828,39 +793,26 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
       Transition *t2 = TheNet->newTransition(prefix + "t2.otherwise");
       TheNet->newArc(TheNet->findPlace(This, ".initial"), t2);
 
+
       // embed inner activity
       TheNet->newArc(t2, TheNet->findPlace(c, ".initial"));
       TheNet->mergePlaces(This, ".internal.final",   c, ".final");
 
 
       // Create the arcs for the Dead Path elimination: each chosen activity
-      // (i.e. firing of the respective t2-transition) has to be connected with
-      // the negLink places of all other cases' activities as well as to the
-      // activity in the otherwise branch. Of course, the arcs are only added
-      // if the negLink place is existing (i.e. a source link can be reached
-      // after all.
+      // (i.e. firing of the respective t2-transition) has set the links of all
+      // other branches to false.
       currentCase = 1;
       foreach (thisCaseBranch=Case(innerActivity1); tCase_list b)
       {
-	foreach (otherCaseBranch=Case(innerActivity2); tCase_list b)
+        foreach (otherCaseBranch=Case(innerActivity2); tCase_list b)
 	{
-	  if ((innerActivity1 != innerActivity2) && (otherCaseBranch->dpe->value > 0))
-	    TheNet->newArc(TheNet->findTransition(prefix + "t2.case" + intToString(currentCase)), TheNet->findPlace(innerActivity2, ".negLink"));
-
-	  if (c->dpe->value > 0)
-	    TheNet->newArc(TheNet->findTransition(prefix + "t2.case" + intToString(currentCase)), TheNet->findPlace(c, ".negLink"));
-	}
-
-	if (thisCaseBranch->dpe->value > 0)
-	{
-	  TheNet->newArc(TheNet->findTransition(prefix + "t2.otherwise"), TheNet->findPlace(innerActivity1, ".negLink"));
-	}
-	  
-
-	currentCase++;
-
-	if ((This->dpe->value > 0) && (thisCaseBranch->dpe->value > 0))
-	  TheNet->newArc(t1, TheNet->findPlace(innerActivity1, ".negLink"));
+	  if (innerActivity1 != innerActivity2)
+            dpeLinks(TheNet->findTransition(prefix + "t2.case" + intToString(currentCase)), otherCaseBranch->id); // case -> case'
+    	}
+        dpeLinks(TheNet->findTransition(prefix + "t2.case" + intToString(currentCase)), otherwiseBranch->id); // case -> otherwise
+        dpeLinks(TheNet->findTransition(prefix + "t2.otherwise"), thisCaseBranch->id); // otherwise -> case
+  	currentCase++;
       }
 
       footer(This->id, true);
@@ -966,16 +918,6 @@ This=activitySequence(Sequence(a,b)) ->
 
       Place *p2  = TheNet->newPlace(prefix + "initial");
       Place *p9  = TheNet->newPlace(prefix + "final");
-
-      // If needed, transition t1 and a place negLink is created.
-      Transition *t1 = NULL;
-      if (This->dpe->value > 0)
-      {
-	Place *p1  = TheNet->newPlace(prefix + "negLink");
-  	t1 = TheNet->newTransition(prefix + "t1");
-	TheNet->newArc(p1, t1);
-      }
-
     }
     a // standardElements for this activity
     b // inner activities
@@ -992,12 +934,6 @@ This=activitySequence(Sequence(a,b)) ->
 
 	if (activityCount == b->length())
 	  TheNet->mergePlaces(This, ".internal.final", innerActivity, ".final");
-
-	// If an inner activity has a place negLink, it is connected to the transition
-	// t1.
-        string newPrefix = intToString(innerActivity->id->value);
-	if (This->dpe->value > 0 && TheNet->findPlace(newPrefix + ".negLink") != NULL)
-	  TheNet->newArc(t1, TheNet->findPlace(newPrefix + ".negLink"));
 
 	lastActivity = innerActivity;
 	activityCount++;
@@ -1525,7 +1461,7 @@ This=StandardElements(NiltTarget_list(), a, jc) provided (parameters[P_NEWLINKS]
       foreach (link; tSource_list a)
       {
 	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
-	Place *p4 = TheNet->findPlace("linkT." + string(linkST->name));
+	Place *p4 = TheNet->findPlace("link." + string(linkST->name));
         TheNet->newArc(t1, p4);
       }
 
@@ -1670,8 +1606,8 @@ This=StandardElements(a, NiltSource_list(), jc) provided
 	foreach (link; tTarget_list a)
 	{
 	  STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
-	  Place *linkT = TheNet->findPlace("linkT." + string(linkST->name));
-	  Place *linkF = TheNet->findPlace("linkF." + string(linkST->name));
+	  Place *linkT = TheNet->findPlace("link." + string(linkST->name));
+	  Place *linkF = TheNet->findPlace("!link." + string(linkST->name));
 
           trueLinks[linkCount] = linkT;
           falseLinks[linkCount] = linkF;

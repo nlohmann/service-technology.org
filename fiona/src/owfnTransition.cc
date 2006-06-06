@@ -19,13 +19,14 @@
 //#include <set>
 
 
-owfnTransition::owfnTransition(char * name) : Node(name) {
+owfnTransition::owfnTransition(char * name) : Node(name), quasiEnabledNr(0), enabledNr(0), NextEnabled(NULL), PrevEnabled(NULL), NextQuasiEnabled(NULL), PrevQuasiEnabled(NULL), quasiEnabled(false), enabled(false) {
 /*  *cnt += 1;
   if(!(*cnt % REPORTFREQUENCY))
   {
 	cerr << "\n" << cnt << "transitions parsed\n";
   }*/
-	enabled = false;
+	NrOfArriving = 0;
+	NrOfLeaving = 0;
 }
 
 owfnTransition::~owfnTransition() {

@@ -17,7 +17,7 @@ using namespace std;
 
 //! \fn oWFN::oWFN()
 //! \brief constructor
-oWFN::oWFN() : arcCnt(0), placeHashValue(0), placeCnt(0), placeInputCnt(0), placeOutputCnt(0), transCnt(0), transNrEnabled(0), BitVectorSize(0), currentState(0) {
+oWFN::oWFN() : arcCnt(0), placeHashValue(0), placeCnt(0), placeInputCnt(0), placeOutputCnt(0), transCnt(0), transNrEnabled(0), BitVectorSize(0), currentState(0), startOfEnabledList(NULL), startOfQuasiEnabledList(NULL), FinalCondition(NULL) {
 	startOfEnabledList = (owfnTransition *) 0;
 
 	unsigned int i;

@@ -67,7 +67,9 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	// iterate over all elements of inputSet
 	while (i < PN->placeInputCnt) { // && (currentNode->getColor() != RED)) {
 		trace(TRACE_5, "iterating over inputSet\n");
-		if (currentNode->eventsUsed[i] == 0) {
+
+		// hack until static analysis gives enough information
+		if (currentNode->eventsUsed[i] < 3) { //== 0) {
 			
 			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
 			currentVertex = currentNode;
@@ -85,15 +87,17 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 
 				actualDepth--;
 			}
-		}
-		i++;	
+		} // end of hack
+		i++;
 	}
 
 	i = 0;
 		
 	while (i < PN->placeOutputCnt) { // && (currentNode->getColor() != RED)) {
 		trace(TRACE_5, "iterating over outputSet\n");
-		if (currentNode->eventsUsed[i + PN->placeInputCnt] == 0) {
+
+		// hack until static analysis gives enough information
+		if (currentNode->eventsUsed[i + PN->placeInputCnt] < 3) { //== 0) {
 				
 			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
 			currentVertex = currentNode;
@@ -111,7 +115,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 
 				actualDepth--;
 			}
-		}
+		} // end of hack
 		i++;	
 	}
 
@@ -197,6 +201,8 @@ bool operatingGuidelines::terminateBuildingGraph(vertex * node) {
 	
 	trace(TRACE_5, "node analysed\n");
 	
+	// do not change termination | here, but set commDepth in main.cc
+	//                           v       to desired value
 	if (actualDepth > PN->getCommDepth()) {	// we have reached the maximal communication depth
 		if (node->getColor() != BLUE) {
 			node->setColor(RED);

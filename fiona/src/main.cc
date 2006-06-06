@@ -153,6 +153,9 @@ int main(int argc, char ** argv) {
 	trace(TRACE_0, "places: " + intToString(PN->getPlaceCnt()));
 	trace(TRACE_0, " (including " + intToString(PN->getInputPlaceCnt()) + " input places, " + intToString(PN->getOutputPlaceCnt()) + " output places)\n");
 	trace(TRACE_0, "transitions: " + intToString(PN->getTransitionCnt()) + "\n");
+	
+	PN->commDepth = 9;
+	
 	trace(TRACE_0, "communication depth: " + intToString(PN->getCommDepth()) + "\n");
 	
 	

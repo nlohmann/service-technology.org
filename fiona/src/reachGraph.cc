@@ -136,6 +136,7 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
         }
 
         if (found == NULL) {
+//            cout << "with event " << label << " (type " << type << " ):" << endl;
             trace(TRACE_1, "\n\t new successor node computed:");
             toAdd->setNumber(numberOfVertices++);
 
@@ -250,6 +251,7 @@ int reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType ty
 
         if (found == NULL) {
 
+//            cout << "with event " << label << " (type " << type << " ):" << endl;
             trace(TRACE_1, "\n\t new successor node computed:");
 
             toAdd->setNumber(numberOfVertices++);

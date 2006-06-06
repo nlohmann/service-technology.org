@@ -254,43 +254,43 @@ string SymbolTable::translateToElementName(unsigned int elementId)
   //traceST("translateToElementName:\n");
   switch(elementId)
   {
-    case K_ASSIGN:	return "assign";
-    case K_CASE:	return "case";
-    case K_CATCH:	return "catch";
-    case K_CATCHALL:	return "catchAll";
-    case K_COPY:	return "copy";
-    case K_COMPENSATE:	return "compensate";
+    case K_ASSIGN:		return "assign";
+    case K_CASE:		return "case";
+    case K_CATCH:		return "catch";
+    case K_CATCHALL:		return "catchAll";
+    case K_COPY:		return "copy";
+    case K_COMPENSATE:		return "compensate";
     case K_COMPENSATIONHANDLER:	return "compensationHandler";    
-    case K_CORRELATION:	return "correlation";
-    case K_CORRELATIONSET: return "correlationSet";
-    case K_EMPTY:	return "empty";
+    case K_CORRELATION:		return "correlation";
+    case K_CORRELATIONSET: 	return "correlationSet";
+    case K_EMPTY:		return "empty";
     case K_EVENTHANDLERS:	return "eventHandlers";
     case K_FAULTHANDLERS:	return "faultHandlers";            
-    case K_FROM:    return "from";
-    case K_FLOW:	return "flow";
-    case K_INVOKE:	return "invoke";
-    case K_LINK:	return "link";
-    case K_ONALARM:	return "onAlarm";
-    case K_ONMESSAGE:	return "onMessage";
-    case K_OTHERWISE:	return "otherwise";
-    case K_PARTNER:	return "partner";
-    case K_PARTNERLINK:	return "partnerLink";
-    case K_PICK:	return "pick";
-    case K_PROCESS:	return "process";
-    case K_RECEIVE:	return "receive";
-    case K_REPLY:	return "reply";
-    case K_SCOPE:	return "scope";
-    case K_SEQUENCE:	return "sequence";
-    case K_SOURCE:	return "source";
-    case K_SWITCH:	return "switch";
-    case K_TARGET:	return "target";
-    case K_TERMINATE:	return "terminate";
-    case K_THROW:	return "throw";
-    case K_TO:	return "to";    
-    case K_VARIABLE:	return "variable";
-    case K_WAIT:	return "wait";
-    case K_WHILE:	return "while";
-    default:		return "unknown";
+    case K_FROM:	    	return "from";
+    case K_FLOW:		return "flow";
+    case K_INVOKE:		return "invoke";
+    case K_LINK:		return "link";
+    case K_ONALARM:		return "onAlarm";
+    case K_ONMESSAGE:		return "onMessage";
+    case K_OTHERWISE:		return "otherwise";
+    case K_PARTNER:		return "partner";
+    case K_PARTNERLINK:		return "partnerLink";
+    case K_PICK:		return "pick";
+    case K_PROCESS:		return "process";
+    case K_RECEIVE:		return "receive";
+    case K_REPLY:		return "reply";
+    case K_SCOPE:		return "scope";
+    case K_SEQUENCE:		return "sequence";
+    case K_SOURCE:		return "source";
+    case K_SWITCH:		return "switch";
+    case K_TARGET:		return "target";
+    case K_TERMINATE:		return "terminate";
+    case K_THROW:		return "throw";
+    case K_TO:			return "to";    
+    case K_VARIABLE:		return "variable";
+    case K_WAIT:		return "wait";
+    case K_WHILE:		return "while";
+    default:			return "unknown";
   }
 } 
 
@@ -322,7 +322,8 @@ unsigned int SymbolTable::insert(unsigned int elementId)
     case K_VARIABLE:            {symTab[this->nextKey()] = new STVariable(elementId, this->entryKey);} break;
     case K_WAIT:                {symTab[this->nextKey()] = new STWait(elementId, this->entryKey);} break;
     case K_CATCH:               {symTab[this->nextKey()] = new STCatch(elementId, this->entryKey);} break;
-    case K_ONMESSAGE:           {symTab[this->nextKey()] = new STOnMessage(elementId, this->entryKey);} break;
+    case K_ONALARM:             {symTab[this->nextKey()] = new STCaseBranch(elementId, this->entryKey);} break;
+    case K_ONMESSAGE:           {symTab[this->nextKey()] = new STCaseBranch(elementId, this->entryKey);} break; // was: STOnMessage
     case K_OTHERWISE:           {symTab[this->nextKey()] = new STCaseBranch(elementId, this->entryKey);} break;
     case K_FROM:                {symTab[this->nextKey()] = new STFromTo(elementId, this->entryKey);} break;
     case K_TO:                  {symTab[this->nextKey()] = new STFromTo(elementId, this->entryKey);} break;
@@ -581,7 +582,7 @@ void SymbolTable::addAttribute(unsigned int entryKey, STAttribute* attribute)
     case K_ONMESSAGE:
     {
 //      traceST("cast to STOnMessage\n");
-      (dynamic_cast <STOnMessage*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute;
+      (dynamic_cast <STCaseBranch*> (symTab[entryKey]))->mapOfAttributes[attribute->name] = attribute; // was: STOnMessage
       break;
     }
 
@@ -983,7 +984,7 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
     case K_ONMESSAGE:
     {
 //      traceST("cast to STOnMessage\n");
-      STAttribute* attribute = (dynamic_cast <STOnMessage*> (symTab[entryKey]))->mapOfAttributes[name];
+      STAttribute* attribute = (dynamic_cast <STCaseBranch*> (symTab[entryKey]))->mapOfAttributes[name]; // was: STOnMessage
 
 	  if(attribute == NULL)
 	  {
@@ -3057,12 +3058,8 @@ void STFlow::checkLinkUsage()
  * constructor
  */
 STCaseBranch::STCaseBranch(unsigned int elementId, unsigned int entryKey)
- :STActivity(elementId, entryKey) {}
+ :STCommunicationActivity(elementId, entryKey) {}
 
-/*!
- * constructor
- */
-STCaseBranch::STCaseBranch() {}
 
 /*!
  * destructor
@@ -3083,7 +3080,7 @@ void STCaseBranch::processLinks(unsigned int firstId, unsigned int lastId)
     {
       sourceLink = dynamic_cast<STSourceTarget *> (symTab.lookup(id));
       if (sourceLink->isSource)
-	enclosedTargetLinks.insert(sourceLink->link);
+	enclosedSourceLinks.insert(sourceLink->link);
     }
   }
 }

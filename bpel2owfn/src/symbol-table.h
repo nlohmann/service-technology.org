@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.38 $: 
+ * \version \$Revision: 1.39 $: 
  *
  */
 
@@ -934,11 +934,10 @@ class STFlow: public STActivity
  * A class for <case> and <otherwise> branches. Basically just added to
  * collect reachable target links for dead path elimination.
  */
-class STCaseBranch: public STActivity
+class STCaseBranch: public STCommunicationActivity
 {
   public:
     /// constructor
-    STCaseBranch();
     STCaseBranch(unsigned int elementId, unsigned int entryKey);
 
     void processLinks(unsigned int firstId, unsigned int lastId);
@@ -946,7 +945,7 @@ class STCaseBranch: public STActivity
     /// destructor
     virtual ~STCaseBranch();
 
-    std::set<STLink*> enclosedTargetLinks;
+    std::set<STLink*> enclosedSourceLinks;
 };
 
 

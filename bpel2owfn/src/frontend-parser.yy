@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/06/06 16:06:40 $
+ *          - last changed: \$Date: 2006/06/06 19:04:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.173 $
+ * \version \$Revision: 1.174 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -787,10 +787,10 @@ tOnMessage:
   tCorrelations activity X_NEXT X_SLASH K_ONMESSAGE
     { $$ = OnMessage($7);
       $$->id = $2;    
-      STOnMessage * stOnMessage = NULL;
+      STCaseBranch * stOnMessage = NULL; // was: STOnMessage
       try
       {
-	stOnMessage = dynamic_cast<STOnMessage *> (symTab.lookup($2));
+	stOnMessage = dynamic_cast<STCaseBranch *> (symTab.lookup($2));  // was: STOnMessage
       }
       catch (bad_cast)
       {
@@ -803,6 +803,10 @@ tOnMessage:
 								 symTab.readAttributeValue($2, "partnerLink")),
 								 true);
       $$->dpe = symMan.needsDPE();
+
+      // collect source links for new DPE
+      STCaseBranch* branch = dynamic_cast<STCaseBranch *> (symTab.lookup($$->id->value));
+      branch->processLinks($7->id->value, currentSymTabEntryKey);
     }
 ;
 
@@ -826,6 +830,10 @@ tOnAlarm:
       $$->For = att.read($3, "for");  // "for" is a keyword
       $$->until = att.read($3, "until");
       $$->dpe = symMan.needsDPE();
+
+      // collect source links for new DPE
+      STCaseBranch* branch = dynamic_cast<STCaseBranch *> (symTab.lookup($$->id->value));
+      branch->processLinks($6->id->value, currentSymTabEntryKey);
     }
 ;
 
@@ -2266,25 +2274,9 @@ tCase:
       $$->condition = att.read($3, "condition"); 
       $$->dpe = mkinteger((symMan.needsDPE())->value);
 
-/*      cerr << "I am a case branch." << endl;
-      cerr << "my id is: " << $$->id->value << endl;
-      cerr << "the id of the inner activity is: " << $6->id->value << endl;
-      cerr << "the highest seen id so far is: " << currentSymTabEntryKey << endl;
-      cerr << "all source links with ids between " << $6->id->value << " and " << currentSymTabEntryKey << " are interesting" << endl;
-      cerr << endl;*/
-
-      STCaseBranch* branch = NULL;
-      try
-      {
-	branch = dynamic_cast<STCaseBranch *> (symTab.lookup($$->id->value));
-      }
-      catch (bad_cast)
-      {
-	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
-      }
+      // collect source links for new DPE
+      STCaseBranch* branch = dynamic_cast<STCaseBranch *> (symTab.lookup($$->id->value));
       branch->processLinks($6->id->value, currentSymTabEntryKey);
-
-
     }
 ;
 
@@ -2327,25 +2319,9 @@ tOtherwise:
       $$->id = mkinteger(currentSymTabEntryKey);
       $$->dpe = symMan.needsDPE();
 
-      STCaseBranch* branch = NULL;
-      try
-      {
-	branch = dynamic_cast<STCaseBranch *> (symTab.lookup($$->id->value));
-      }
-      catch (bad_cast)
-      {
-	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
-      }
+      // collect source links for new DPE
+      STCaseBranch* branch = dynamic_cast<STCaseBranch *> (symTab.lookup($$->id->value));
       branch->processLinks($4->id->value, currentSymTabEntryKey);
-
-/*
-      cerr << "I am an otherwise branch." << endl;
-      cerr << "my id is: " << $$->id->value << endl;
-      cerr << "the id of the inner activity is: " << $4->id->value << endl;
-      cerr << "the highest seen id so far is: " << currentSymTabEntryKey << endl;
-      cerr << "all source links with ids between " << $4->id->value << " and " << currentSymTabEntryKey << " are interesting" << endl;
-      cerr << endl;
-*/
     }
 ;
 

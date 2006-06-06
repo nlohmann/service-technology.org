@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/06/06 16:06:40 $
+ *          - last changed: \$Date: 2006/06/06 19:04:40 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  *
  */
 %}
@@ -964,15 +964,6 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 
       Place *p5 = TheNet->newPlace(prefix + "final");
       Place *p6 = TheNet->newPlace(prefix + "initial");
-
-      // If needed, transition t1 and a place negLink is created.
-      Transition *t1 = NULL;
-      if (This->dpe->value > 0)
-      {
-	t1 = TheNet->newTransition(prefix + "t1");
-	Place *p1 = TheNet->newPlace(prefix + "negLink");
-	TheNet->newArc(p1, t1);
-      }
     }
     a // standardElements
     b // onMessage branches
@@ -986,17 +977,11 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	string message = intToString(onMessageCount++);
 	string newPrefix = prefix + "onMessage" + message + ".";
 
-//	Place *p3 = TheNet->newPlace(newPrefix + "p3");
-
 	Transition *t2 = TheNet->newTransition(newPrefix + "t2");
 	TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(ThisBranch->id)))->channelId)), t2);
 	TheNet->newArc(TheNet->findPlace(TheActivity, ".initial"), t2);
 	TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
 	t2->communicating = true;
-
-//	Transition *t3 = TheNet->newTransition(newPrefix + "t3");
-//	TheNet->newArc(p3, t3);
-//	TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
 
 
 	// Embed the inner activity.
@@ -1027,52 +1012,42 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 
 
       // Create the arcs for the Dead Path elimination: each chosen activity
-      // (i.e. firing of the respective t2-transition) has to be connected with
-      // the negLink places of all other <onAlarm> or <onMessage> activities.
-      // Of course, the arcs are only added if the negLink place is existing
-      // (i.e. a source link can be reached after all.
+      // (i.e. firing of the respective t2/t6-transition) has set the links of
+      // all other branches to false.
       int currentMessage = 1;
       foreach (thisonmessage=OnMessage(innerActivity1); tOnMessage_list b)
       {
 	foreach (otheronmessage=OnMessage(innerActivity2); tOnMessage_list b)
 	{
-	  if ((innerActivity1 != innerActivity2) && (otheronmessage->dpe->value > 0))
-	    TheNet->newArc(TheNet->findTransition(prefix + "onMessage" + intToString(currentMessage) + ".t3"), TheNet->findPlace(innerActivity2, ".negLink"));
+	  if ((innerActivity1 != innerActivity2))
+            dpeLinks(TheNet->findTransition(prefix + "onMessage" + intToString(currentMessage) + ".t2"), otheronmessage->id); // onMessage -> onMessage'
 	}
 
 	foreach (thisonalarm=OnAlarm(innerActivity2); tOnAlarm_list c)
 	{
-	  if (thisonalarm->dpe->value > 0)
-	    TheNet->newArc(TheNet->findTransition(prefix + "onMessage" + intToString(currentMessage) + ".t3"), TheNet->findPlace(innerActivity2, ".negLink"));
+          dpeLinks(TheNet->findTransition(prefix + "onMessage" + intToString(currentMessage) + ".t2"), thisonalarm->id); // onMessage -> onAlarm
 	}
 
 	currentMessage++;
-
-	if ((thisonmessage->dpe->value > 0) && (This->dpe->value > 0))
-	  TheNet->newArc(t1, TheNet->findPlace(innerActivity1, ".negLink"));
       }
 
-      
       int currentAlarm = 1;
       foreach (thisonalarm=OnAlarm(innerActivity1); tOnAlarm_list c)
       {
 	foreach (otheronalarm=OnAlarm(innerActivity2); tOnAlarm_list c)
 	{
-	  if ((innerActivity1 != innerActivity2) && (otheronalarm->dpe->value > 0))
-	    TheNet->newArc(TheNet->findTransition(prefix + "onAlarm" + intToString(currentAlarm) + ".t6"), TheNet->findPlace(innerActivity2, ".negLink"));
+	  if ((innerActivity1 != innerActivity2))
+            dpeLinks(TheNet->findTransition(prefix + "onAlarm" + intToString(currentAlarm) + ".t6"), otheronalarm->id); // onAlarm -> onAlarm'
 	}
 
 	foreach (thisonmessage=OnMessage(innerActivity2); tOnMessage_list b)
 	{
-	  if (thisonmessage->dpe->value > 0)
-	    TheNet->newArc(TheNet->findTransition(prefix + "onAlarm" + intToString(currentAlarm) + ".t6"), TheNet->findPlace(innerActivity2, ".negLink"));
+          dpeLinks(TheNet->findTransition(prefix + "onAlarm" + intToString(currentAlarm) + ".t6"), thisonmessage->id); // onAlarm -> onMessage
 	}
 
 	currentAlarm++;
-
-	if ((thisonalarm->dpe->value > 0) && (This->dpe->value > 0))
-	  TheNet->newArc(t1, TheNet->findPlace(innerActivity1, ".negLink"));
       }
+
 
       footer(This->id, true);
     }

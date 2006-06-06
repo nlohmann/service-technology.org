@@ -32,13 +32,13 @@
  *
  * \date
  *          - created: 2006/02/08
- *          - last changed: \$Date: 2006/06/06 16:25:49 $
+ *          - last changed: \$Date: 2006/06/06 19:04:40 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.1 $
+ * \version \$Revision: 1.2 $
  */
 
 
@@ -288,8 +288,8 @@ void dpeLinks(Transition* t, kc::integer id)
 {
   STCaseBranch *branch = dynamic_cast<STCaseBranch*>(symTab.lookup(id));
   
-  for (set<STLink*>::iterator link = branch->enclosedTargetLinks.begin();
-      link != branch->enclosedTargetLinks.end();
+  for (set<STLink*>::iterator link = branch->enclosedSourceLinks.begin();
+      link != branch->enclosedSourceLinks.end();
       link++)
   {
     TheNet->newArc(t, TheNet->findPlace("!link." + (*link)->name));

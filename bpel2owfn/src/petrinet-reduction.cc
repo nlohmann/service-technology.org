@@ -32,17 +32,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/04/25 11:56:55 $
+ *          - last changed: \$Date: 2006/06/06 20:37:18 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
  */
 
 
@@ -226,7 +226,7 @@ bool PetriNet::communicationInPostSet(Place *p)
       t != pp.end();
       t++)
   {
-    if (((Transition*)(*t))->communicating)
+    if (((Transition*)(*t))->type != INTERNAL)
       return true;
   }
   

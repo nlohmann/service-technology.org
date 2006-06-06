@@ -53,7 +53,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/05/29 11:04:41 $
+ *          - last changed: \$Date: 2006/06/06 20:37:18 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  */
 %}
 
@@ -182,7 +182,7 @@ This=Invoke(a,b) provided ((dynamic_cast<STCommunicationActivity*> (symTab.looku
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       TheNet->newArc(t2, TheNet->findPlace("out." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)));
-      t2->communicating = true;
+      t2->type = OUT;
 
 
       // Transitions for the negative control flow.
@@ -236,13 +236,13 @@ This=Invoke(a,b) provided (!(dynamic_cast<STCommunicationActivity*> (symTab.look
       TheNet->newArc(t2, TheNet->findPlace("out." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)));
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
-      t2->communicating = true;
+      t2->type = OUT;
 
       Transition *t3 = TheNet->newTransition(prefix + "t3");
       TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)), t3);
       TheNet->newArc(p3, t3);
       TheNet->newArc(t3, p4);
-      t3->communicating = true;
+      t3->type = IN;
 
       Transition *t4 = TheNet->newTransition(prefix + "t4");
       TheNet->newArc(p4, t4);
@@ -303,7 +303,7 @@ This=Receive(a,b) ->
       TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)), t1);
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
-      t1->communicating = true;
+      t1->type = IN;
 
       Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p2, t2);
@@ -364,7 +364,7 @@ This=Reply(a,b) ->
       TheNet->newArc(t2, TheNet->findPlace("out." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)));
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
-      t2->communicating = true;
+      t2->type = OUT;
 
 
       // Transitions for the negative control flow.
@@ -1338,7 +1338,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(ThisBranch->id)))->channelId)), t2);
 	TheNet->newArc(TheNet->findPlace(TheActivity, ".internal.TimeStamp"), t2);
 	TheNet->newArc(t2, p3);
-	t2->communicating = true;
+	t2->type = IN;
 
 	Transition *t3 = TheNet->newTransition(newPrefix + "t3");
 	TheNet->newArc(TheNet->findPlace("variable." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(ThisBranch->id)))->variable->name)), t3);

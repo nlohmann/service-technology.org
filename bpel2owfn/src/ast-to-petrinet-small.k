@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/06/06 19:30:09 $
+ *          - last changed: \$Date: 2006/06/06 20:37:17 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  *
  */
 %}
@@ -247,7 +247,7 @@ This=userDefinedEventHandler(a,b) ->
 	TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(ThisBranch->id)))->channelId)), onMessage_t2);
 	TheNet->newArc(onMessage_t2, onMessage_p2);
 	TheNet->newArc(onMessage_p5, onMessage_t2);
-	onMessage_t2->communicating = true;
+	onMessage_t2->type = IN;
 
 	Transition *onMessage_t3 = TheNet->newTransition(newPrefix + "t3");
 	TheNet->newArc(TheNet->findPlace("variable." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(ThisBranch->id)))->variable->name)), onMessage_t3);
@@ -461,7 +461,7 @@ This=Invoke(a,b) provided ((dynamic_cast<STCommunicationActivity*> (symTab.looku
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       TheNet->newArc(t1, TheNet->findPlace("out." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)));
-      t1->communicating = true;
+      t1->type = OUT;
     }
     a // standardElements
     {
@@ -491,13 +491,13 @@ This=Invoke(a,b) provided (!(dynamic_cast<STCommunicationActivity*> (symTab.look
       TheNet->newArc(t1, TheNet->findPlace("out." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)));
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
-      t1->communicating = true;
+      t1->type = OUT;
 
       Transition *t2 = TheNet->newTransition(prefix + "t3");
       TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)), t2);
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
-      t2->communicating = true;
+      t2->type = IN;
     }
     a // standardElements
     {
@@ -528,7 +528,7 @@ This=Receive(a,b) ->
       TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)), t1);
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
-      t1->communicating = true;
+      t1->type = IN;
     }
     a // standardElements
     {
@@ -559,7 +559,7 @@ This=Reply(a,b) ->
       TheNet->newArc(t1, TheNet->findPlace("out." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)));
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
-      t1->communicating = true;
+      t1->type = OUT;
     }
     a // standardElements
     {
@@ -981,7 +981,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(ThisBranch->id)))->channelId)), t2);
 	TheNet->newArc(TheNet->findPlace(TheActivity, ".initial"), t2);
 	TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
-	t2->communicating = true;
+	t2->type = IN;
 
 
 	// Embed the inner activity.

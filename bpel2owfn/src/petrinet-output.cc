@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/06/06 20:03:46 $
+ *          - last changed: \$Date: 2006/06/06 20:37:18 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
  */
 
 
@@ -273,8 +273,11 @@ string Transition::dotOut()
   if (inSCC)
     result += " style=bold fillcolor=yellow";
 
-  if (communicating)
+  if (type == IN)
     result += " style=filled fillcolor=gold";
+
+  if (type == OUT)
+    result += " style=filled fillcolor=yellow";
 
   
   result += "];\n";
@@ -303,10 +306,14 @@ string Place::dotOut()
   else if (firstMemberAs("internal.faultHandler."))
     result += " style=filled fillcolor=pink";
 */
-  if (firstMemberIs("in.") || firstMemberIs("out."))
+  if (firstMemberIs("in."))
     result += " style=filled fillcolor=gold shape=ellipse";
-  else if (firstMemberIs("link.") || firstMemberIs("!link."))
-    result += " style=filled fillcolor=yellow";
+  else if (firstMemberIs("out."))
+    result += " style=filled fillcolor=yellow shape=ellipse";
+  else if (firstMemberIs("link."))
+    result += " style=filled fillcolor=cornflowerblue";
+  else if (firstMemberIs("!link."))
+    result += " style=filled fillcolor=deeppink";
   else if (firstMemberIs("variable."))
     result += " style=filled fillcolor=cyan";
   /*  else if (firstMemberAs("internal.Active")

@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/04/06 08:39:51 $
+ *          - last changed: \$Date: 2006/06/06 20:37:17 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.176 $
+ * \version \$Revision: 1.177 $
  *
  */
 %}
@@ -1362,7 +1362,7 @@ This=userDefinedEventHandler(a,b) ->
 	TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(ThisBranch->id)))->channelId)), onMessage_t2);
 	TheNet->newArc(onMessage_t2, onMessage_p2);
 	TheNet->newArc(onMessage_p5, onMessage_t2);
-	onMessage_t2->communicating = true;
+	onMessage_t2->type = IN;
 
 	Transition *onMessage_t3 = TheNet->newTransition(newPrefix + "t3");
 	TheNet->newArc(TheNet->findPlace("variable." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(ThisBranch->id)))->variable->name)), onMessage_t3);

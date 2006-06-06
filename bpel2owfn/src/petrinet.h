@@ -36,17 +36,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/04/11 13:23:00 $
+ *          - last changed: \$Date: 2006/06/06 20:37:18 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.70 $
+ * \version \$Revision: 1.71 $
  */
 
 
@@ -81,13 +81,13 @@ using namespace std;
  * Data structures
  *****************************************************************************/
 
-/// Enumeration of the possible types of a place.
+/// Enumeration of the possible types of a place or transition.
 typedef enum
 {
-  INTERNAL,			///< low-level place(standard)
-  IN,				///< input place of an open workflow net (oWFN)
-  OUT				///< output place of an open workflow net (oWFN)
-} place_type;
+  INTERNAL,			///< non-communicating
+  IN,				///< input of an open workflow net (oWFN)
+  OUT				///< output of an open workflow net (oWFN)
+} communication_type;
 
 
 
@@ -157,6 +157,9 @@ class Node
 
     /// true if first role begins with role
     bool firstMemberIs(string role);
+    
+    /// type of node as defined in #communication_type
+    communication_type type;
 };
 
 
@@ -192,8 +195,8 @@ class Transition:public Node
     /// the short name of the transition
     string nodeShortName();
 
-    /// true if transition is connected with input or output place
-    bool communicating;
+//    /// != 0 if transition is connected with input or output place
+//    communication_type communicating;
 };
 
 
@@ -220,11 +223,11 @@ class Transition:public Node
 class Place:public Node
 {
   public:
-    /// type of the place(as defined in #place_type)
-    place_type type;
+//    /// type of the place(as defined in #place_type)
+//    communication_type type;
 
     /// constructor which creates a place and adds a first role to the history
-    Place(unsigned int id, string role, place_type type);
+    Place(unsigned int id, string role, communication_type type);
 
     /// DOT-output of the place (used by PetriNet::dotOut())
     string dotOut();
@@ -300,7 +303,7 @@ class PetriNet
 {
   public:
     /// Adds a place with a given role and type.
-    Place* newPlace(string role, place_type type = INTERNAL);
+    Place* newPlace(string role, communication_type type = INTERNAL);
   
     /// Adds a transition with a given role.
     Transition*newTransition(string role);

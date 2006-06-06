@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/04/25 13:48:54 $
+ *          - last changed: \$Date: 2006/06/06 20:37:18 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.117 $
+ * \version \$Revision: 1.118 $
  */
 
 
@@ -123,7 +123,7 @@ Transition::Transition(unsigned int myid, string role)
 {
   id = myid;
   nodeType = TRANSITION;
-  communicating = false;
+  type = INTERNAL;
   inSCC = false;
 
   if (role != "")
@@ -144,9 +144,9 @@ Transition::Transition(unsigned int myid, string role)
 /*!
  * \param myid   the internal id of the place
  * \param role   the first role of the place
- * \param mytype the type of the place(as defined in #place_type)
+ * \param mytype the type of the place (as defined in #communication_type)
  */
-Place::Place(unsigned int myid, string role, place_type mytype)
+Place::Place(unsigned int myid, string role, communication_type mytype)
 {
   type = mytype;
   id = myid;
@@ -210,10 +210,10 @@ Place *PetriNet::newPlace()
  * functions.
  *
  * \param role   the initial role of the place
- * \param mytype the type of the place(as defined in #place_type)
+ * \param mytype the type of the place (as defined in #communication_type)
  * \return pointer of the created place
  */
-Place *PetriNet::newPlace(string role, place_type mytype)
+Place *PetriNet::newPlace(string role, communication_type mytype)
 {
   trace(TRACE_VERY_DEBUG, "[PN]\tCreating place p" + intToString(id()) + " (" + role + ") ...\n");
 

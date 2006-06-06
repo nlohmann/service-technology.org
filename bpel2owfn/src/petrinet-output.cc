@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/05/29 14:31:33 $
+ *          - last changed: \$Date: 2006/06/06 20:03:46 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  */
 
 
@@ -261,17 +261,21 @@ string Transition::dotOut()
   string result;
   result += " " + intToString(id) + "\t[label=\"" + nodeShortName() + "\"";
 
-  if (firstMemberAs("internal.eventHandler."))
-    result += " style=filled fillcolor=plum";
-  else if (firstMemberAs("internal.compensationHandler."))
-    result += " style=filled fillcolor=aquamarine";
-  else if (firstMemberAs("internal.stop."))
-    result += " style=filled fillcolor=lightskyblue2";
-  else if (firstMemberAs("internal.faultHandler."))
-    result += " style=filled fillcolor=pink";
+//  if (firstMemberAs("internal.eventHandler."))
+//    result += " style=filled fillcolor=plum";
+//  else if (firstMemberAs("internal.compensationHandler."))
+//    result += " style=filled fillcolor=aquamarine";
+//  else if (firstMemberAs("internal.stop."))
+//    result += " style=filled fillcolor=lightskyblue2";
+//  else if (firstMemberAs("internal.faultHandler."))
+//    result += " style=filled fillcolor=pink";
   
   if (inSCC)
     result += " style=bold fillcolor=yellow";
+
+  if (communicating)
+    result += " style=filled fillcolor=gold";
+
   
   result += "];\n";
   return result;
@@ -287,11 +291,10 @@ string Transition::dotOut()
 */
 string Place::dotOut()
 {
-  string
-    result;
+  string result;
   result += " " + intToString(id) + "\t[label=\"" + nodeShortName() + "\"";
 
-  if (firstMemberAs("eventHandler."))
+/*  if (firstMemberAs("eventHandler."))
     result += " style=filled fillcolor=plum";
   else if (firstMemberAs("internal.compensationHandler."))
     result += " style=filled fillcolor=aquamarine";
@@ -299,15 +302,14 @@ string Place::dotOut()
     result += " style=filled fillcolor=lightskyblue2";
   else if (firstMemberAs("internal.faultHandler."))
     result += " style=filled fillcolor=pink";
+*/
+  if (firstMemberIs("in.") || firstMemberIs("out."))
+    result += " style=filled fillcolor=gold shape=ellipse";
   else if (firstMemberIs("link.") || firstMemberIs("!link."))
     result += " style=filled fillcolor=yellow";
-  else if (firstMemberIs("linkT.") || firstMemberIs("linkF.") || firstMemberIs("linkU."))
-    result += " style=filled fillcolor=yellow";
   else if (firstMemberIs("variable."))
-    result += " style=filled fillcolor=cyan shape=ellipse";
-  else if (firstMemberIs("in.") || firstMemberIs("out."))
-    result += " style=filled fillcolor=gold shape=ellipse";
-  else if (firstMemberAs("internal.Active")
+    result += " style=filled fillcolor=cyan";
+  /*  else if (firstMemberAs("internal.Active")
 	   || firstMemberAs("internal.!Active"))
     result += " style=filled fillcolor=yellowgreen";
   else if (firstMemberAs("internal.Completed")
@@ -324,7 +326,7 @@ string Place::dotOut()
     result += " style=filled fillcolor=yellowgreen";
   else if (firstMemberAs("internal.Terminated")
 	   || firstMemberAs("internal.!Terminated"))
-    result += " style=filled fillcolor=yellowgreen";
+    result += " style=filled fillcolor=yellowgreen";*/
   else if (firstMemberIs("1.internal.initial")
 	   || firstMemberIs("1.internal.final"))
     result += " style=filled fillcolor=green";

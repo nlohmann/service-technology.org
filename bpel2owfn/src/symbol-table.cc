@@ -44,6 +44,7 @@
 #include "bpel-syntax.h"
 #include "debug.h"
 #include "helpers.h"
+#include "options.h"
 #include <map>
 
 extern SymbolTable symTab;
@@ -2341,6 +2342,9 @@ STActivity::~STActivity() {}
  */
 void STActivity::processLinks(unsigned int firstId, unsigned int lastId)
 {
+  if (!parameters[P_NEWLINKS])
+    return;
+
 //  cerr << "void STActivity::processLinks(" << firstId << ", " << lastId << ")" << endl;
   for (int id = firstId+1; id <= lastId; id++)
   {

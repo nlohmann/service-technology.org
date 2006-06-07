@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/06/06 20:37:18 $
+ *          - last changed: \$Date: 2006/06/07 13:08:15 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  */
 
 
@@ -138,6 +138,18 @@ string Place::nodeShortName()
 string Transition::nodeShortName()
 {
   return ("t" + intToString(id));
+}
+
+
+
+/*!
+ * \return the (nice) name of the transition for DOT output
+ */
+string Transition::nodeName()
+{
+  string result = history[0];
+  result = result.substr(result.find_last_of(".")+1,result.length());
+  return result;
 }
 
 
@@ -259,7 +271,15 @@ string Arc::dotOut()
 string Transition::dotOut()
 {
   string result;
-  result += " " + intToString(id) + "\t[label=\"" + nodeShortName() + "\"";
+  result += " " + intToString(id) + "\t[label=\"" + nodeShortName();
+ 
+  if (parameters[P_NANO])
+  {
+    result += "\\n";
+    result += nodeName();
+  }
+
+  result += "\"";
 
 //  if (firstMemberAs("internal.eventHandler."))
 //    result += " style=filled fillcolor=plum";

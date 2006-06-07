@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/06/07 12:44:18 $
+ *          - last changed: \$Date: 2006/06/07 15:20:16 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  *
  */
 %}
@@ -957,9 +957,8 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
       {
 	trace(TRACE_DEBUG, "[PNU]\t\t<onMessage>\n");
 	string message = intToString(onMessageCount++);
-	string newPrefix = prefix + "onMessage" + message + ".";
 
-	Transition *t2 = TheNet->newTransition(newPrefix + "t2");
+	Transition *t2 = TheNet->newTransition(prefix + "pickM" + message);
 	TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(ThisBranch->id)))->channelId)), t2);
 	TheNet->newArc(TheNet->findPlace(TheActivity, ".initial"), t2);
 	TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
@@ -978,10 +977,9 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
       foreach (onAlarmBranch=OnAlarm(innerActivity); tOnAlarm_list c)
       {
 	trace(TRACE_DEBUG, "[PNU]\t\t<onAlarm>\n");
-	string newPrefix = prefix + "onAlarm" + intToString(onAlarmCount++) + ".";
-	string onAlarmGuard;
+        string alarm = intToString(onAlarmCount++);
 
-	Transition *t6 = TheNet->newTransition(newPrefix + "t6");
+	Transition *t6 = TheNet->newTransition(prefix + "pickA" + alarm);
 	TheNet->newArc(TheNet->findPlace(TheActivity, ".initial"), t6);
 	TheNet->newArc(t6, TheNet->findPlace(innerActivity, ".initial"));
 
@@ -1002,12 +1000,12 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	foreach (otheronmessage=OnMessage(innerActivity2); tOnMessage_list b)
 	{
 	  if ((innerActivity1 != innerActivity2))
-            dpeLinks(TheNet->findTransition(prefix + "onMessage" + intToString(currentMessage) + ".t2"), otheronmessage->id); // onMessage -> onMessage'
+            dpeLinks(TheNet->findTransition(prefix + "pickM" + intToString(currentMessage)), otheronmessage->id); // onMessage -> onMessage'
 	}
 
 	foreach (thisonalarm=OnAlarm(innerActivity2); tOnAlarm_list c)
 	{
-          dpeLinks(TheNet->findTransition(prefix + "onMessage" + intToString(currentMessage) + ".t2"), thisonalarm->id); // onMessage -> onAlarm
+          dpeLinks(TheNet->findTransition(prefix + "pickM" + intToString(currentMessage)), thisonalarm->id); // onMessage -> onAlarm
 	}
 
 	currentMessage++;
@@ -1019,17 +1017,16 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	foreach (otheronalarm=OnAlarm(innerActivity2); tOnAlarm_list c)
 	{
 	  if ((innerActivity1 != innerActivity2))
-            dpeLinks(TheNet->findTransition(prefix + "onAlarm" + intToString(currentAlarm) + ".t6"), otheronalarm->id); // onAlarm -> onAlarm'
+            dpeLinks(TheNet->findTransition(prefix + "pickA" + intToString(currentAlarm)), otheronalarm->id); // onAlarm -> onAlarm'
 	}
 
 	foreach (thisonmessage=OnMessage(innerActivity2); tOnMessage_list b)
 	{
-          dpeLinks(TheNet->findTransition(prefix + "onAlarm" + intToString(currentAlarm) + ".t6"), thisonmessage->id); // onAlarm -> onMessage
+          dpeLinks(TheNet->findTransition(prefix + "pickA" + intToString(currentAlarm)), thisonmessage->id); // onAlarm -> onMessage
 	}
 
 	currentAlarm++;
       }
-
 
       footer(This->id, true);
     }
@@ -1453,7 +1450,7 @@ This=StandardElements(a, NiltSource_list(), jc) provided
       Place *p4 = TheNet->newPlace(prefix + "joinFalse");
       Place *p5 = TheNet->newPlace(prefix + "begin");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
+      Transition *t1 = TheNet->newTransition(prefix + "start");
       TheNet->newArc(p1, t1);
       TheNet->newArc(p3, t1);
       TheNet->newArc(t1, p5);
@@ -1548,7 +1545,7 @@ This=StandardElements(a,b, jc) provided
       Place *p5 = TheNet->newPlace(prefix + "joinFalse");
       Place *p6 = TheNet->newPlace(prefix + "joinTrue");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
+      Transition *t1 = TheNet->newTransition(prefix + "start");
       TheNet->newArc(p1, t1);
       TheNet->newArc(p6, t1);
       TheNet->newArc(t1, p2);

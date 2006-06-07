@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/06/07 08:57:30 $
+ *          - last changed: \$Date: 2006/06/07 12:44:18 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  *
  */
 %}
@@ -83,10 +83,6 @@ extern PetriNet *TheNet;
 extern SymbolTable symTab;
 //CG extern SymbolManager symMan;
 extern STProcess * stProcess;
-
-/// prefix of the current scope (read by the stop pattern and used to direct
-/// failures to the correct fault_in place)
-//string currentScope;
 
 %}
 
@@ -143,10 +139,6 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
 //      g // Event Handler
       i // innerActivity
     {
-      // Initialize the link places of the process.
-//      for (list<STLink*>::iterator link = myself->enclosedLinks.begin(); link != myself->enclosedLinks.end(); link++)
-//	TheNet->newArc(t2, TheNet->findPlace("!link." + (*link)->name));
-
       // Embed the inner activity of the process.
       TheNet->mergePlaces(TheNet->findPlace("1.internal.initial"), TheNet->findPlace(i, ".initial"));
       TheNet->mergePlaces(TheNet->findPlace("1.internal.final"), TheNet->findPlace(i, ".final"));
@@ -426,7 +418,7 @@ This=Empty(a) ->
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
+      Transition *t1 = TheNet->newTransition(prefix + "empty");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
     }
@@ -457,7 +449,7 @@ This=Invoke(a,b) provided ((dynamic_cast<STCommunicationActivity*> (symTab.looku
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t2");
+      Transition *t1 = TheNet->newTransition(prefix + "invoke");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       TheNet->newArc(t1, TheNet->findPlace("out." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)));
@@ -487,13 +479,13 @@ This=Invoke(a,b) provided (!(dynamic_cast<STCommunicationActivity*> (symTab.look
       Place *p2 = TheNet->newPlace(prefix + "running");
       Place *p3 = TheNet->newPlace(prefix + "final");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t2");
+      Transition *t1 = TheNet->newTransition(prefix + "invokeSend");
       TheNet->newArc(t1, TheNet->findPlace("out." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)));
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       t1->type = OUT;
 
-      Transition *t2 = TheNet->newTransition(prefix + "t3");
+      Transition *t2 = TheNet->newTransition(prefix + "invokeReceive");
       TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)), t2);
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
@@ -524,7 +516,7 @@ This=Receive(a,b) ->
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
+      Transition *t1 = TheNet->newTransition(prefix + "receive");
       TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)), t1);
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
@@ -555,7 +547,7 @@ This=Reply(a,b) ->
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
+      Transition *t1 = TheNet->newTransition(prefix + "reply");
       TheNet->newArc(t1, TheNet->findPlace("out." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)));
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
@@ -585,7 +577,7 @@ This=Assign(a,b) ->
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1"); // dummy transition
+      Transition *t1 = TheNet->newTransition(prefix + "assign"); // dummy transition
 
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
@@ -615,7 +607,7 @@ This=WaitUntil(a) ->
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
+      Transition *t1 = TheNet->newTransition(prefix + "wait");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
     }
@@ -639,7 +631,7 @@ This=WaitFor(a) ->
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
+      Transition *t1 = TheNet->newTransition(prefix + "wait");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
     }
@@ -723,22 +715,22 @@ This=Flow(a,b,c) ->
       header(This->id, true);
       string prefix = intToString(This->id->value) + ".internal.";
 
-      Place *p7  = TheNet->newPlace(prefix + "initial");
-      Place *p8  = TheNet->newPlace(prefix + "final");
+      Place *p1  = TheNet->newPlace(prefix + "initial");
+      Place *p2  = TheNet->newPlace(prefix + "final");
 
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(p7, t2);
+      Transition *t1 = TheNet->newTransition(prefix + "split");
+      TheNet->newArc(p1, t1);
 
-      Transition *t3 = TheNet->newTransition(prefix + "t3");
-      TheNet->newArc(t3, p8);
+      Transition *t2 = TheNet->newTransition(prefix + "join");
+      TheNet->newArc(t2, p2);
     }
     a // standardElements
     c // inner activities
     {
       foreach (innerActivity; activity_list c)
       {
-	TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
-	TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t3);
+	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
+	TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t2);
       }
       footer(This->id, true);
     }
@@ -764,8 +756,8 @@ This=activitySwitch(Switch(a,b,otherwiseBranch=Otherwise(c))) ->
       header(This->id, true);
       string prefix = intToString(This->id->value) + ".internal.";
 
-      Place *p4 =  TheNet->newPlace(prefix + "final");
-      Place *p5 =  TheNet->newPlace(prefix + "initial");
+      Place *p1 =  TheNet->newPlace(prefix + "final");
+      Place *p2 =  TheNet->newPlace(prefix + "initial");
     }
     a // standardElements
     b // case braches
@@ -778,24 +770,24 @@ This=activitySwitch(Switch(a,b,otherwiseBranch=Otherwise(c))) ->
 
 	trace(TRACE_VERY_DEBUG, "[PNU]\tEmbedding case branch " + caseNumber + "...\n");
 
-	Transition* t2 = TheNet->newTransition(prefix + "t2.case" + caseNumber);
-	TheNet->newArc(TheNet->findPlace(This, ".initial"), t2);
+	Transition* t1 = TheNet->newTransition(prefix + "case" + caseNumber);
+	TheNet->newArc(TheNet->findPlace(This, ".initial"), t1);
 
 
 	// Embed the inner activity.
-	TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
-	TheNet->mergePlaces(This, ".internal.final",   innerActivity, ".final");
+	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
+	TheNet->mergePlaces(This, ".internal.final", innerActivity, ".final");
       }
 
 
       trace(TRACE_VERY_DEBUG, "[PNU]\tEmbedding otherwise branch...\n");
       // The <otherwise> branch.
-      Transition *t2 = TheNet->newTransition(prefix + "t2.otherwise");
-      TheNet->newArc(TheNet->findPlace(This, ".initial"), t2);
+      Transition *t1 = TheNet->newTransition(prefix + "caseo");
+      TheNet->newArc(TheNet->findPlace(This, ".initial"), t1);
 
 
       // embed inner activity
-      TheNet->newArc(t2, TheNet->findPlace(c, ".initial"));
+      TheNet->newArc(t1, TheNet->findPlace(c, ".initial"));
       TheNet->mergePlaces(This, ".internal.final",   c, ".final");
 
 
@@ -808,10 +800,10 @@ This=activitySwitch(Switch(a,b,otherwiseBranch=Otherwise(c))) ->
         foreach (otherCaseBranch=Case(innerActivity2); tCase_list b)
 	{
 	  if (innerActivity1 != innerActivity2)
-            dpeLinks(TheNet->findTransition(prefix + "t2.case" + intToString(currentCase)), otherCaseBranch->id); // case -> case'
+            dpeLinks(TheNet->findTransition(prefix + "case" + intToString(currentCase)), otherCaseBranch->id); // case -> case'
     	}
-        dpeLinks(TheNet->findTransition(prefix + "t2.case" + intToString(currentCase)), otherwiseBranch->id); // case -> otherwise
-        dpeLinks(TheNet->findTransition(prefix + "t2.otherwise"), thisCaseBranch->id); // otherwise -> case
+        dpeLinks(TheNet->findTransition(prefix + "case" + intToString(currentCase)), otherwiseBranch->id); // case -> otherwise
+        dpeLinks(TheNet->findTransition(prefix + "caseo"), thisCaseBranch->id); // otherwise -> case
   	currentCase++;
       }
 
@@ -849,21 +841,15 @@ This=activityWhile(TheWhile=While(a,b)) ->
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
       Place *p3 = TheNet->newPlace(prefix + "final");
-      Place *p4 = TheNet->newPlace(prefix + "p4");
-      Place *p5 = TheNet->newPlace(prefix + "p5");
+      Place *p4 = TheNet->newPlace(prefix + "done");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(p2, t1);
-      TheNet->newArc(t1, p3);
+      Transition *t1 = TheNet->newTransition(prefix + "choose");
+      TheNet->newArc(p1, t1);
+      TheNet->newArc(t1, p2);
 
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
+      Transition *t2 = TheNet->newTransition(prefix + "skip");
       TheNet->newArc(p1, t2);
-      TheNet->newArc(t2, p2);
-
-      Transition *t3 = TheNet->newTransition(prefix + "t3");
-      TheNet->newArc(p2, t3);
-      TheNet->newArc(t3, p4);
-
+      TheNet->newArc(t2, p3);
 
       // When the parameter "-p cyclicwhile" is set, the pattern is created as
       // it is depicted in Fig. 18. Setting this option might lead to not
@@ -871,27 +857,23 @@ This=activityWhile(TheWhile=While(a,b)) ->
       // initialized more than once.
       if (parameters[P_CYCLICWHILE] == true)
       {
-	Transition *t4 = TheNet->newTransition(prefix + "t4");
-	TheNet->newArc(t4, p1);
-	TheNet->newArc(p5, t4);
+	Transition *t3 = TheNet->newTransition(prefix + "loop");
+	TheNet->newArc(p4, t3);
+	TheNet->newArc(t3, p1);
       }
-
+      else
+      {
+	Transition *t3 = TheNet->newTransition(prefix + "finish");
+	TheNet->newArc(p4, t3);
+	TheNet->newArc(t3, p3);
+      }
     }
     a // standardElements
     b // innerActivity
     {
       // Embed the inner activity.
-      TheNet->mergePlaces(This, ".internal.p4",      b, ".initial");
-      TheNet->mergePlaces(This, ".internal.p5",      b, ".final");
-
-
-      // When the parameter "-p cyclicwhile" is not set, the created pattern
-      // differs from the original pattern depicted in Fig. 18: instead of
-      // executing the inner activity each time the given condition holds, it
-      // is executed at most once to avoid problems with links embedded in the
-      // inner activity.
-      if (parameters[P_CYCLICWHILE] == false)
-	TheNet->mergePlaces(This, ".internal.p5", This, ".internal.final");
+      TheNet->mergePlaces(This, ".internal.running",      b, ".initial");
+      TheNet->mergePlaces(This, ".internal.done",      b, ".final");
 
       footer(This->id, true);
     }

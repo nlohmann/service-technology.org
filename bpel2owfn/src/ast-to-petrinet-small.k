@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/06/07 08:48:35 $
+ *          - last changed: \$Date: 2006/06/07 08:57:30 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  *
  */
 %}
@@ -1399,7 +1399,7 @@ This=StandardElements(NiltTarget_list(), NiltSource_list(), jc) ->
  * Figure 22: Pattern for an activity that is source of links.
  *****************************************************************************/
 
-This=StandardElements(NiltTarget_list(), a, jc) provided (parameters[P_NEWLINKS]) ->
+This=StandardElements(NiltTarget_list(), a, jc) ->
   [petrinetsmall:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 22 (new)\n");
@@ -1426,47 +1426,6 @@ This=StandardElements(NiltTarget_list(), a, jc) provided (parameters[P_NEWLINKS]
       TheNet->mergePlaces(p1, TheNet->findPlace(newPrefix + ".initial"));
       TheNet->mergePlaces(p2, TheNet->findPlace(newPrefix + ".final"));
     }
-  ]
-;
-
-
-This=StandardElements(NiltTarget_list(), a, jc) ->
-  [petrinetsmall:
-    {
-      trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 22\n");
-      string prefix = intToString(This->parentId->value) + ".";
-      string newPrefix = intToString(This->parentId->value) + ".internal";
-
-      Place *p2 = TheNet->newPlace(prefix + "initial");
-      Place *p4 = TheNet->newPlace(prefix + "p4");
-      Place *p5 = TheNet->newPlace(prefix + "final");
-
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(p4, t2);
-      TheNet->newArc(t2, p5);
-
-      Transition *t3 = TheNet->newTransition(prefix + "t3");
-      TheNet->newArc(p4, t3);
-      TheNet->newArc(t3, p5);
-
-
-      // Connect all source link places with t2
-      foreach (link; tSource_list a)
-      {
-	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
-	Place *p8 = TheNet->findPlace("!link." + string(linkST->name));
-	Place *p10 = TheNet->findPlace("link." + string(linkST->name));
-
-	TheNet->newArc(p8, t2);
-	TheNet->newArc(t2, p10);
-	TheNet->newArc(p10, t3, READ);
-      }
-
-
-      // Embed the inner activity.
-      TheNet->mergePlaces(p2, TheNet->findPlace(newPrefix + ".initial"));
-      TheNet->mergePlaces(p4, TheNet->findPlace(newPrefix + ".final"));
-   }
   ]
 ;
 
@@ -1499,7 +1458,7 @@ This=StandardElements(a, NiltSource_list(), jc) provided
  *****************************************************************************/
 
 This=StandardElements(a, NiltSource_list(), jc) provided
-((symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "yes") && parameters[P_NEWLINKS]) ->
+(symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "yes") ->
   [petrinetsmall:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 24 (new)\n");
@@ -1521,7 +1480,6 @@ This=StandardElements(a, NiltSource_list(), jc) provided
       TheNet->newArc(p1, t2);
       TheNet->newArc(p4, t2);
       TheNet->newArc(t2, p2);
-
 
       // sets enclosed source links to false
       dpeLinks(t2, parentId);
@@ -1584,47 +1542,6 @@ This=StandardElements(a, NiltSource_list(), jc) provided
 ;
 
 
-This=StandardElements(a, NiltSource_list(), jc) provided
-(symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "yes") ->
-  [petrinetsmall:
-    {
-      trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 24\n");
-      string prefix = intToString(This->parentId->value) + ".";
-      string newPrefix = intToString(This->parentId->value) + ".internal";
-
-      Place *p6  = TheNet->newPlace(prefix + "p6");
-      Place *p7  = TheNet->newPlace(prefix + "final");
-      Place *p8  = TheNet->newPlace(prefix + "initial");
-
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(t1, p6);
-      TheNet->newArc(p8, t1);
-
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(p8, t2);
-      TheNet->newArc(t2, p7);
-
-
-      // Connect the target links with transitions t1 and t2.
-      foreach (link; tTarget_list a)
-      {
-	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
-	Place *p1 = TheNet->findPlace("!link." + string(linkST->name));
-	Place *p3 = TheNet->findPlace("link." + string(linkST->name));
-	TheNet->newArc(t1, p1);
-	TheNet->newArc(p3, t1);
-	TheNet->newArc(t2, p1);
-	TheNet->newArc(p3, t2);
-      }
-
-
-      // Embed the inner activity.
-      TheNet->mergePlaces(p6, TheNet->findPlace(newPrefix + ".initial"));
-      TheNet->mergePlaces(p7, TheNet->findPlace(newPrefix + ".final"));
-    }
-  ]
-;
-
 
 
 
@@ -1635,7 +1552,7 @@ This=StandardElements(a, NiltSource_list(), jc) provided
  *****************************************************************************/
 
 This=StandardElements(a,b, jc) provided 
-((symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "yes") && parameters[P_NEWLINKS]) ->
+(symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "yes") ->
   [petrinetsmall:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 25 (new)\n");
@@ -1662,24 +1579,18 @@ This=StandardElements(a,b, jc) provided
       // sets enclosed source links to false
       dpeLinks(t2, parentId);
 
-
       Transition *t3 = TheNet->newTransition(prefix + "setLinks");
       TheNet->newArc(p3, t3);
       TheNet->newArc(t3, p4);
 
       
+      // Set the outgoing links (standard transition condition expected).
       foreach (link; tSource_list b)
       {
-        // Set the outgoing links (standard transition condition expected).
 	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
 	Place *p7 = TheNet->findPlace("link." + string(linkST->name));
         TheNet->newArc(t3, p7);
-
-        // If skipped, set links to false // TODO DPE!
-//        Place *p8 = TheNet->findPlace("!link." + string(linkST->name));
-//        TheNet->newArc(t2, p8);
       }
-
 
 
       // evaluate the join condition
@@ -1738,76 +1649,6 @@ This=StandardElements(a,b, jc) provided
     }
   ]
 ;
-
-
-
-
-
-This=StandardElements(a,b, jc) provided 
-(symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "yes") ->
-  [petrinetsmall:
-    {
-      trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 25\n");
-      string prefix = intToString(This->parentId->value) + ".";
-      string newPrefix = intToString(This->parentId->value) + ".internal";
-
-      Place *p11 = TheNet->newPlace(prefix + "p11");
-      Place *p12 = TheNet->newPlace(prefix + "p12");
-      Place *p13 = TheNet->newPlace(prefix + "final");
-      Place *p16 = TheNet->newPlace(prefix + "initial");
-
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(t2, p11);
-      TheNet->newArc(p16, t2);
-
-      Transition *t3 = TheNet->newTransition(prefix + "t3");
-      TheNet->newArc(p12, t3);
-      TheNet->newArc(t3, p13);
-
-      Transition *t4 = TheNet->newTransition(prefix + "t4");
-      TheNet->newArc(p12, t4);
-      TheNet->newArc(t4, p13);
-
-      Transition *t5 = TheNet->newTransition(prefix + "t5");
-      TheNet->newArc(t5, p13);
-      TheNet->newArc(p16, t5);
-
-
-      // Connect each target links with t2 and t5.
-      foreach (link; tTarget_list a)
-      {
-	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
-	Place *p1 = TheNet->findPlace("!link." + string(linkST->name));
-	Place *p3 = TheNet->findPlace("link." + string(linkST->name));
-        TheNet->newArc(t2, p1);
-	TheNet->newArc(p3, t2);
-        TheNet->newArc(t5, p1);
-	TheNet->newArc(p3, t5);
-      }
-
-
-      // Connect all source link places with t3 and t4
-      foreach (link; tSource_list b)
-      {
-	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
-	Place *p5 = TheNet->findPlace("!link." + string(linkST->name));
-	Place *p7 = TheNet->findPlace("link." + string(linkST->name));
-
-        TheNet->newArc(p5, t3);
-        TheNet->newArc(t3, p7);
-        TheNet->newArc(p5, t5);
-        TheNet->newArc(t5, p7);
-	TheNet->newArc(p7, t4, READ);
-      }
-
-
-      // Embed the inner activity.
-      TheNet->mergePlaces(p11, TheNet->findPlace(newPrefix + ".initial"));
-      TheNet->mergePlaces(p12, TheNet->findPlace(newPrefix + ".final"));
-    }
-  ]
-;
-
 
 
 

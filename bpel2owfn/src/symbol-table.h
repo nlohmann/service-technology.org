@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.39 $: 
+ * \version \$Revision: 1.40 $: 
  *
  */
 
@@ -67,7 +67,7 @@ class SymbolTable;
 class SymbolTableEntry;
 class STActivity;
 class STAttribute;
-class STCaseBranch;
+//class STCaseBranch;
 class STCatch;
 class STCommunicationActivity;
 class STCompensate;
@@ -316,6 +316,12 @@ class STActivity: public STElement, public SymbolTableEntry
 
     /// true if activity is target of a link
     bool isTargetOfLink;
+
+    /// list of enclosed source links for DPE
+    std::set<STLink*> enclosedSourceLinks;
+
+    /// collect enclosed links
+    void processLinks(unsigned int firstId, unsigned int lastId);
 };
 
 /**
@@ -933,7 +939,7 @@ class STFlow: public STActivity
  *
  * A class for <case> and <otherwise> branches. Basically just added to
  * collect reachable target links for dead path elimination.
- */
+ *
 class STCaseBranch: public STCommunicationActivity
 {
   public:
@@ -947,7 +953,7 @@ class STCaseBranch: public STCommunicationActivity
 
     std::set<STLink*> enclosedSourceLinks;
 };
-
+*/
 
 
 

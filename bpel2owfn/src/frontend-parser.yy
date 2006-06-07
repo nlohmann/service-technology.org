@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/06/06 19:04:39 $
+ *          - last changed: \$Date: 2006/06/07 08:17:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.174 $
+ * \version \$Revision: 1.175 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -787,10 +787,10 @@ tOnMessage:
   tCorrelations activity X_NEXT X_SLASH K_ONMESSAGE
     { $$ = OnMessage($7);
       $$->id = $2;    
-      STCaseBranch * stOnMessage = NULL; // was: STOnMessage
+      STOnMessage * stOnMessage = NULL;
       try
       {
-	stOnMessage = dynamic_cast<STCaseBranch *> (symTab.lookup($2));  // was: STOnMessage
+	stOnMessage = dynamic_cast<STOnMessage *> (symTab.lookup($2));
       }
       catch (bad_cast)
       {
@@ -805,8 +805,8 @@ tOnMessage:
       $$->dpe = symMan.needsDPE();
 
       // collect source links for new DPE
-      STCaseBranch* branch = dynamic_cast<STCaseBranch *> (symTab.lookup($$->id->value));
-      branch->processLinks($7->id->value, currentSymTabEntryKey);
+//      STCaseBranch* branch = dynamic_cast<STCaseBranch *> (symTab.lookup($$->id->value));
+      stOnMessage->processLinks($7->id->value, currentSymTabEntryKey);
     }
 ;
 
@@ -832,7 +832,7 @@ tOnAlarm:
       $$->dpe = symMan.needsDPE();
 
       // collect source links for new DPE
-      STCaseBranch* branch = dynamic_cast<STCaseBranch *> (symTab.lookup($$->id->value));
+      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
       branch->processLinks($6->id->value, currentSymTabEntryKey);
     }
 ;
@@ -2275,7 +2275,7 @@ tCase:
       $$->dpe = mkinteger((symMan.needsDPE())->value);
 
       // collect source links for new DPE
-      STCaseBranch* branch = dynamic_cast<STCaseBranch *> (symTab.lookup($$->id->value));
+      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
       branch->processLinks($6->id->value, currentSymTabEntryKey);
     }
 ;
@@ -2320,7 +2320,7 @@ tOtherwise:
       $$->dpe = symMan.needsDPE();
 
       // collect source links for new DPE
-      STCaseBranch* branch = dynamic_cast<STCaseBranch *> (symTab.lookup($$->id->value));
+      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
       branch->processLinks($4->id->value, currentSymTabEntryKey);
     }
 ;

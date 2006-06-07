@@ -32,13 +32,13 @@
  *
  * \date
  *          - created: 2006/02/08
- *          - last changed: \$Date: 2006/06/07 08:00:34 $
+ *          - last changed: \$Date: 2006/06/07 08:17:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  */
 
 
@@ -286,7 +286,7 @@ void footer(kc::integer id, bool myindent)
  */
 void dpeLinks(Transition* t, kc::integer id)
 {
-  STCaseBranch *branch = dynamic_cast<STCaseBranch*>(symTab.lookup(id));
+  STActivity *branch = dynamic_cast<STActivity*>(symTab.lookup(id));
   
   for (set<STLink*>::iterator link = branch->enclosedSourceLinks.begin();
       link != branch->enclosedSourceLinks.end();

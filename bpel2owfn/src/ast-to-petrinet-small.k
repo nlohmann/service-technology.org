@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/06/07 08:00:34 $
+ *          - last changed: \$Date: 2006/06/07 08:48:35 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
  *
  */
 %}
@@ -1523,6 +1523,10 @@ This=StandardElements(a, NiltSource_list(), jc) provided
       TheNet->newArc(t2, p2);
 
 
+      // sets enclosed source links to false
+      dpeLinks(t2, parentId);
+
+
       // evaluate the join condition
       if (string(jc->op_name()) == "standardJoinCondition")
       {
@@ -1655,6 +1659,10 @@ This=StandardElements(a,b, jc) provided
       TheNet->newArc(p5, t2);
       TheNet->newArc(t2, p4);
 
+      // sets enclosed source links to false
+      dpeLinks(t2, parentId);
+
+
       Transition *t3 = TheNet->newTransition(prefix + "setLinks");
       TheNet->newArc(p3, t3);
       TheNet->newArc(t3, p4);
@@ -1668,8 +1676,8 @@ This=StandardElements(a,b, jc) provided
         TheNet->newArc(t3, p7);
 
         // If skipped, set links to false // TODO DPE!
-        Place *p8 = TheNet->findPlace("!link." + string(linkST->name));
-        TheNet->newArc(t2, p8);
+//        Place *p8 = TheNet->findPlace("!link." + string(linkST->name));
+//        TheNet->newArc(t2, p8);
       }
 
 

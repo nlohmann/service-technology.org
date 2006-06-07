@@ -2351,8 +2351,6 @@ void STActivity::processLinks(unsigned int firstId, unsigned int lastId)
 	enclosedSourceLinks.insert(sourceLink->link);
     }
   }
-
-  cerr << "I found " << enclosedSourceLinks.size() << " source links" << endl;
 }
 
  

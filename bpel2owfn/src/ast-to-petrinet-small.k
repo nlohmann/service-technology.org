@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/06/06 20:37:17 $
+ *          - last changed: \$Date: 2006/06/07 08:00:34 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  *
  */
 %}
@@ -1638,10 +1638,101 @@ This=StandardElements(a,b, jc) provided
       string prefix = intToString(This->parentId->value) + ".";
       string newPrefix = intToString(This->parentId->value) + ".internal";
 
-      cerr << "TODO" << endl;
+      Place *p1 = TheNet->newPlace(prefix + "initial");
+      Place *p2 = TheNet->newPlace(prefix + "begin");
+      Place *p3 = TheNet->newPlace(prefix + "done");
+      Place *p4 = TheNet->newPlace(prefix + "final");
+      Place *p5 = TheNet->newPlace(prefix + "joinFalse");
+      Place *p6 = TheNet->newPlace(prefix + "joinTrue");
+
+      Transition *t1 = TheNet->newTransition(prefix + "t1");
+      TheNet->newArc(p1, t1);
+      TheNet->newArc(p6, t1);
+      TheNet->newArc(t1, p2);
+
+      Transition *t2 = TheNet->newTransition(prefix + "skip");
+      TheNet->newArc(p1, t2);
+      TheNet->newArc(p5, t2);
+      TheNet->newArc(t2, p4);
+
+      Transition *t3 = TheNet->newTransition(prefix + "setLinks");
+      TheNet->newArc(p3, t3);
+      TheNet->newArc(t3, p4);
+
+      
+      foreach (link; tSource_list b)
+      {
+        // Set the outgoing links (standard transition condition expected).
+	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
+	Place *p7 = TheNet->findPlace("link." + string(linkST->name));
+        TheNet->newArc(t3, p7);
+
+        // If skipped, set links to false // TODO DPE!
+        Place *p8 = TheNet->findPlace("!link." + string(linkST->name));
+        TheNet->newArc(t2, p8);
+      }
+
+
+
+      // evaluate the join condition
+      if (string(jc->op_name()) == "standardJoinCondition")
+      {
+        // containers for the join transitions and the incoming links
+        map<unsigned int, Transition*> joinTransitions;
+        map<unsigned int, Place*> trueLinks;
+        map<unsigned int, Place*> falseLinks;
+
+
+        // fill link containers
+        int linkCount = 0;
+	foreach (link; tTarget_list a)
+	{
+	  STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
+	  Place *linkT = TheNet->findPlace("link." + string(linkST->name));
+	  Place *linkF = TheNet->findPlace("!link." + string(linkST->name));
+
+          trueLinks[linkCount] = linkT;
+          falseLinks[linkCount] = linkF;
+
+          linkCount++;
+	}
+
+
+        // fill transition container and create OR-join
+        unsigned int transitionNumber = (unsigned int)pow(2.0, a->length());
+        for (unsigned int i = 0; i < transitionNumber; i++)
+        {
+          joinTransitions[i] = TheNet->newTransition(prefix + "join" + intToString(i));
+
+          for (unsigned int j = 0; j < linkCount; j++)
+          {
+            if (((i >> j) % 2) == 0) // this rather cryptic expression correctly connects the links
+              TheNet->newArc(trueLinks[j], joinTransitions[i]);
+            else
+              TheNet->newArc(falseLinks[j], joinTransitions[i]);
+          }
+
+          // only one transition makes the join fail
+          if (i == transitionNumber-1)
+            TheNet->newArc(joinTransitions[i], p5);
+          else
+            TheNet->newArc(joinTransitions[i], p6);
+        }
+      }
+      else
+        cerr << "user-defined join conditions are not yet supported!" << endl;
+
+
+
+      // Embed the inner activity.
+      TheNet->mergePlaces(p2, TheNet->findPlace(newPrefix + ".initial"));
+      TheNet->mergePlaces(p3, TheNet->findPlace(newPrefix + ".final"));
     }
   ]
 ;
+
+
+
 
 
 This=StandardElements(a,b, jc) provided 

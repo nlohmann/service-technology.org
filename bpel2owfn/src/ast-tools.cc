@@ -32,19 +32,19 @@
  *
  * \date
  *          - created: 2006/02/08
- *          - last changed: \$Date: 2006/06/06 19:04:40 $
+ *          - last changed: \$Date: 2006/06/07 08:00:34 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.3 $
  */
 
 
 
 
-
+#include <cmath>
 #include "bpel-unparse-tools.h"
 #include "options.h"
 
@@ -231,7 +231,7 @@ Transition *stop(Place *p, string p_name, string prefix)
 
 
 
-/*
+/**
  * Returns a string used for identation.
  */
 string inString()
@@ -248,7 +248,7 @@ string inString()
 
 
 
-/*
+/**
  * Prints a debug trace message containing the (opening) tag name of the
  * activity of the given id. If myindent is set to true, the enclosed
  * elements are indented.
@@ -265,7 +265,7 @@ void header(kc::integer id, bool myindent)
 
 
 
-/*
+/**
  * Prints a debug trace message containing the (closing) tag name of the
  * activity of the given id. If myindent is set to true, the indentation is
  * reduced.
@@ -281,7 +281,7 @@ void footer(kc::integer id, bool myindent)
 
 
 
-/*
+/**
  * Creates arcs to set links on dead paths to false.
  */
 void dpeLinks(Transition* t, kc::integer id)
@@ -295,6 +295,8 @@ void dpeLinks(Transition* t, kc::integer id)
     TheNet->newArc(t, TheNet->findPlace("!link." + (*link)->name));
   }
 }
+
+
 
 
 /******************************************************************************

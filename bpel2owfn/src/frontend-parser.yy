@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/06/07 08:35:19 $
+ *          - last changed: \$Date: 2006/06/07 10:57:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.176 $
+ * \version \$Revision: 1.177 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -360,14 +360,12 @@ activity:
       $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
+      cerr << "empty" << endl;
       STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
-      branch->processLinks($$->id->value, currentSymTabEntryKey); }
+      branch->processLinks($$->id->value, currentSymTabEntryKey);
+      cerr << "empty end" << endl; }
 | tInvoke
-    { $$ = $1;
-
-      // collect source links for new DPE
-      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
-      branch->processLinks($$->id->value, currentSymTabEntryKey); }
+    { $$ = $1; }
 /*
 | tInvoke
     { $$ = activityInvoke($1); $$->id = $1->id; 
@@ -421,8 +419,10 @@ activity:
       $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
+      cerr << "flow" << endl;
       STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
-      branch->processLinks($$->id->value, currentSymTabEntryKey); }
+      branch->processLinks($$->id->value, currentSymTabEntryKey);
+      cerr << "flow end" << endl; }
 | tSwitch
     { $$ = activitySwitch($1); $$->id = $1->id; 
       $$->dpe = $1->dpe;
@@ -863,7 +863,6 @@ tOnMessage:
       $$->dpe = symMan.needsDPE();
 
       // collect source links for new DPE
-//      STCaseBranch* branch = dynamic_cast<STCaseBranch *> (symTab.lookup($$->id->value));
       stOnMessage->processLinks($7->id->value, currentSymTabEntryKey);
     }
 ;
@@ -1238,6 +1237,14 @@ tInvoke:
 
         $$->id = scope->id;
         $$->negativeControlFlow = scope->negativeControlFlow;
+
+
+      // collect source links for new DPE
+      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      cerr << "did sometihng1" << endl;
+      branch->processLinks($$->id->value, currentSymTabEntryKey);
+
+
       }
       else
       { 
@@ -1295,6 +1302,13 @@ tInvoke:
         $$ = activity(activityInvoke(invoke));
         $$->id = invoke->id;
         $$->negativeControlFlow = invoke->negativeControlFlow;
+
+
+	// collect source links for new DPE
+	STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($2->value));
+	cerr << "invoke 2" << endl;
+	branch->processLinks($2->value, currentSymTabEntryKey);
+        cerr << "post invoke 2" << endl;
       }    
     }
 | K_INVOKE genSymTabEntry_Invoke 
@@ -1356,6 +1370,11 @@ tInvoke:
       $$ = activity(activityInvoke(invoke));
       $$->id = invoke->id;
       $$->negativeControlFlow = invoke->negativeControlFlow;
+
+      // collect source links for new DPE
+      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      cerr << "did sometihng3" << endl;
+      branch->processLinks($$->id->value, currentSymTabEntryKey);
 }
 ;
 

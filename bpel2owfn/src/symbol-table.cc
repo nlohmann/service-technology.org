@@ -2341,12 +2341,12 @@ STActivity::~STActivity() {}
  */
 void STActivity::processLinks(unsigned int firstId, unsigned int lastId)
 {
+//  cerr << "void STActivity::processLinks(" << firstId << ", " << lastId << ")" << endl;
   for (int id = firstId+1; id <= lastId; id++)
   {
-    STSourceTarget* sourceLink = NULL;
-    if ( typeid(*(symTab.lookup(id))).name() == typeid(STSourceTarget).name())
+    if ( (symTab.lookup(id) != NULL) && (typeid(*(symTab.lookup(id))).name() == typeid(STSourceTarget).name()) )
     {
-      sourceLink = dynamic_cast<STSourceTarget *> (symTab.lookup(id));
+      STSourceTarget* sourceLink = dynamic_cast<STSourceTarget *> (symTab.lookup(id));
       if (sourceLink->isSource)
 	enclosedSourceLinks.insert(sourceLink->link);
     }

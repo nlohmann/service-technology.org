@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/06/07 08:17:48 $
+ *          - last changed: \$Date: 2006/06/07 08:35:19 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.175 $
+ * \version \$Revision: 1.176 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -243,9 +243,7 @@ impl_joinCondition* currentJoinCondition = standardJoinCondition();
 %type <yt_tVariable> tVariable
 %type <yt_tWait> tWait
 %type <yt_tWhile> tWhile
-
 %type <yt_expression> booleanLinkCondition
-
 %type <yt_integer> genSymTabEntry_Process
 %type <yt_integer> genSymTabEntry_PartnerLink
 %type <yt_integer> genSymTabEntry_Partner
@@ -359,9 +357,17 @@ imports:
 activity:
   tEmpty
     { $$ = activityEmpty($1); $$->id = $1->id; 
-      $$->negativeControlFlow = $1->negativeControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow;
+
+      // collect source links for new DPE
+      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tInvoke
-    { $$ = $1;  }
+    { $$ = $1;
+
+      // collect source links for new DPE
+      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      branch->processLinks($$->id->value, currentSymTabEntryKey); }
 /*
 | tInvoke
     { $$ = activityInvoke($1); $$->id = $1->id; 
@@ -369,48 +375,100 @@ activity:
 */
 | tReceive
     { $$ = activityReceive($1); $$->id = $1->id; 
-      $$->negativeControlFlow = $1->negativeControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow;
+
+      // collect source links for new DPE
+      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tReply
     { $$ = activityReply($1); $$->id = $1->id; 
-      $$->negativeControlFlow = $1->negativeControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow;
+
+      // collect source links for new DPE
+      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tAssign
     { $$ = activityAssign($1); $$->id = $1->id; 
-      $$->negativeControlFlow = $1->negativeControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow;
+
+      // collect source links for new DPE
+      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tWait
     { $$ = activityWait($1); $$->id = $1->id; 
-      $$->negativeControlFlow = $1->negativeControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow;
+
+      // collect source links for new DPE
+      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tThrow
     { $$ = activityThrow($1); $$->id = $1->id; 
-      $$->negativeControlFlow = $1->negativeControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow;
+
+      // collect source links for new DPE
+      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tTerminate
     { $$ = activityTerminate($1); $$->id = $1->id; 
-      $$->negativeControlFlow = $1->negativeControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow;
+
+      // collect source links for new DPE
+      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tFlow
     { $$ = activityFlow($1); $$->id = $1->id; 
       $$->dpe = $1->dpe ;
-      $$->negativeControlFlow = $1->negativeControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow;
+
+      // collect source links for new DPE
+      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tSwitch
     { $$ = activitySwitch($1); $$->id = $1->id; 
       $$->dpe = $1->dpe;
-      $$->negativeControlFlow = $1->negativeControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow;
+
+      // collect source links for new DPE
+      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tWhile
     { $$ = activityWhile($1); $$->id = $1->id; 
-      $$->negativeControlFlow = $1->negativeControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow;
+
+      // collect source links for new DPE
+      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tSequence
     { $$ = activitySequence($1); $$->id = $1->id; 
       $$->dpe = $1->dpe;
-      $$->negativeControlFlow = $1->negativeControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow;
+
+      // collect source links for new DPE
+      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tPick
     { $$ = activityPick($1); $$->id = $1->id; 
       $$->dpe = $1->dpe;
-      $$->negativeControlFlow = $1->negativeControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow;
+
+      // collect source links for new DPE
+      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tScope
     { $$ = activityScope($1); $$->id = $1->id; 
       $$->dpe = $1->dpe;
-      $$->negativeControlFlow = $1->negativeControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow;
+
+      // collect source links for new DPE
+      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tCompensate
     { $$ = activityCompensate($1); $$->id = $1->id; 
-      $$->negativeControlFlow = $1->negativeControlFlow; }
+      $$->negativeControlFlow = $1->negativeControlFlow;
+
+      // collect source links for new DPE
+      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      branch->processLinks($$->id->value, currentSymTabEntryKey); }
 ;
 
 

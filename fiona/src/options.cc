@@ -10,6 +10,8 @@
 // some file names and pointers
 
 char * netfile;
+int commDepth_manual;
+int events_manual;
 
 /// Filename of input file
 std::string filename = "<STDIN>";
@@ -45,11 +47,13 @@ static struct option longopts[] =
   { "show",      	 optional_argument, 	NULL, 's' },
   { "calcallstates", no_argument, 			NULL, 'a' },
   { "reduceIG",   	 no_argument,	    	NULL, 'r' },
+  { "commDepth",   	 required_argument,    	NULL, 'c' },
+  { "eventsmaximum", required_argument,    	NULL, 'e' },
   NULL
 };
 
 
-const char * par_string = "hvd:n:t:s:ar";
+const char * par_string = "hvd:n:t:s:arc:e:";
 
 // --------------------- functions for command line evaluation ------------------------
 // Prints an overview of all commandline arguments.
@@ -58,31 +62,35 @@ void print_help() {
   trace("\n");
   trace("Options: \n");
   trace("\n");
-  trace(" -h | --help             - print this information and exit\n");
-  trace(" -v | --version          - print version information and exit\n");
-  trace(" -d | --debug=<level>    - set debug <level>:\n");
-  trace("                             1 - show nodes and dfs information\n");
-  trace("                             2 - show considered events\n");
-  trace("                             3 - show states information\n");
-  trace("                             4 - yet to be defined ;)\n");
-  trace("                             5 - show detailed information on everything\n");
+  trace(" -h | --help                  - print this information and exit\n");
+  trace(" -v | --version               - print version information and exit\n");
+  trace(" -d | --debug=<level>         - set debug <level>:\n");
+  trace("                                   1 - show nodes and dfs information\n");
+  trace("                                   2 - show considered events\n");
+  trace("                                   3 - show states information\n");
+  trace("                                   4 - yet to be defined ;)\n");
+  trace("                                   5 - show detailed information on everything\n");
   trace("\n");
-  trace(" -n | --net=<filename>   - read input owfn from <filename>\n");
+  trace(" -n | --net=<filename>        - read input owfn from <filename>\n");
   trace("\n");
-  trace(" -t | --graphtype=<type> - select the graph <type> to be calculated:\n");
-  trace("                             OG - operating guideline\n");
-  trace("                             IG - interaction graph (default)\n");
+  trace(" -t | --graphtype=<type>      - select the graph <type> to be calculated:\n");
+  trace("                                   OG - operating guideline\n");
+  trace("                                   IG - interaction graph (default)\n");
   trace("\n");
-  trace(" -a | --calcallstates    - calculate all states of each node\n");
+  trace(" -c | --commDepth=<level>     - set communication depth to <level>\n");
+  trace("                                   (only relevant for OG)\n");
   trace("\n");
-  trace(" -r | --reduceIG         - use reduction rules for IG\n");
+  trace(" -e | --eventsmaximum=<level> - set event to occur at most <level> times\n");
+  trace("                                   (only relevant for OG)\n");
   trace("\n");
-  trace(" -s | --show=<parameter> - different display options <parameter>:\n");
-  trace("                             allnodes  - show nodes of all colors\n");
-  trace("                             blue      - show blue nodes only (default)\n");
-  trace("                             nored     - show blue and black nodes\n");
-  trace("                             empty     - show empty node\n");
-  trace("                             allstates - show all calculated states per node\n");
+  trace(" -r | --reduceIG              - use reduction rules for IG\n");
+  trace("\n");
+  trace(" -s | --show=<parameter>      - different display options <parameter>:\n");
+  trace("                                   allnodes  - show nodes of all colors\n");
+  trace("                                   blue      - show blue nodes only (default)\n");
+  trace("                                   nored     - show blue and black nodes\n");
+  trace("                                   empty     - show empty node\n");
+  trace("                                   allstates - show all calculated states per node\n");
   trace("\n");
   trace("\n");
   trace("For more information see:\n");
@@ -107,6 +115,18 @@ void parse_command_line(int argc, char* argv[]) {
   	// the program name on the commandline
   	string progname = string(argv[0]);
 
+	// initialize options
+	options[O_HELP] = false;
+	options[O_VERSION] = false;
+	options[O_DEBUG] = false;
+	options[O_GRAPH_TYPE] = false;
+	options[O_SHOW_NODES] = false;
+	options[O_CALC_ALL_STATES] = false;
+	options[O_CALC_REDUCED_IG] = false;
+	options[O_OWFN_NAME] = false;
+	options[O_COMM_DEPTH] = false;
+	options[O_EVENT_USE_MAX] = false;
+
 	// initialize parameters
 	parameters[P_IG] = true;
 	parameters[P_OG] = false;
@@ -121,7 +141,6 @@ void parse_command_line(int argc, char* argv[]) {
   	// evaluate options and set parameters
   	int optc = 0;
   	while ((optc = getopt_long (argc, argv, par_string, longopts, (int *) 0)) != EOF) {
-	    string parameter = "";
 	    switch (optc) {
 			case 'h':
 		      	options[O_HELP] = true;
@@ -131,14 +150,13 @@ void parse_command_line(int argc, char* argv[]) {
 				break;
 	      	case 'd':
 		      	options[O_DEBUG] = true;
-		      	parameter = string(optarg);
-	 			if ( parameter == "1" ) {
+	 			if ( string(optarg) == "1" ) {
 					debug_level = TRACE_1;
-		      	} else if ( parameter == "2" ) {
+		      	} else if ( string(optarg) == "2" ) {
 					debug_level = TRACE_2;
-		      	} else if ( parameter == "3" ) {
+		      	} else if ( string(optarg) == "3" ) {
 					debug_level = TRACE_3;
-		      	} else if ( parameter == "5" ) {
+		      	} else if ( string(optarg) == "5" ) {
 					debug_level = TRACE_5;
 		      	} else {
 					throw Exception(OPTION_MISMATCH,
@@ -170,6 +188,26 @@ void parse_command_line(int argc, char* argv[]) {
 						"Type " + progname + " -h for more information.\n");
 			    }
 			  	break;
+	      	case 'c':
+		      	if (optarg != NULL) {
+		        	options[O_COMM_DEPTH] = true;
+		        	commDepth_manual = atoi(optarg);
+		      	} else {
+					throw Exception(OPTION_MISMATCH,
+						"Please enter valid communication depth\n",
+						"Type " + progname + " -h for more information.\n");
+			    }
+	          	break;
+	      	case 'e':
+		      	if (optarg != NULL) {
+		        	options[O_EVENT_USE_MAX] = true;
+		        	events_manual = atoi(optarg);
+		      	} else {
+					throw Exception(OPTION_MISMATCH,
+						"Please enter valid maximal number for using events\n",
+						"Type " + progname + " -h for more information.\n");
+			    }
+	          	break;
 	      	case 's':
 	      		options[O_SHOW_NODES] = true;
 	      		if (string(optarg) == "blue") {

@@ -165,14 +165,14 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
             toAdd->eventsUsed[offset + label]++;
 
 			// \begin{hack} for online shop example
-            if (type == sending) {
+/*            if (type == sending) {
                 if (strcmp(PN->Places[PN->inputPlacesArray[label]]->name, "in.client.onlineshop.abort") == 0) {
                     for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
                         toAdd->eventsUsed[i]++;
                     }
                 }
             }
-			// \end{hack}
+*/			// \end{hack}
 
             currentVertex = toAdd;
             numberOfEdges++;
@@ -205,14 +205,14 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
             found->eventsUsed[offset + label]++;
 
 			// \begin{hack} for online shop example
-            if (type == sending) {
+/*            if (type == sending) {
                 if (strcmp(PN->Places[PN->inputPlacesArray[label]]->name, "in.client.onlineshop.abort") == 0) {
                     for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
                          found->eventsUsed[i]++;
                     }
                 }
             }
-            // \end{hack}
+*/            // \end{hack}
 
             delete toAdd;
             return 0;

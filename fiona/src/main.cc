@@ -154,10 +154,12 @@ int main(int argc, char ** argv) {
 	trace(TRACE_0, " (including " + intToString(PN->getInputPlaceCnt()) + " input places, " + intToString(PN->getOutputPlaceCnt()) + " output places)\n");
 	trace(TRACE_0, "transitions: " + intToString(PN->getTransitionCnt()) + "\n");
 	
-        PN->commDepth = 9;
-	
-	trace(TRACE_0, "communication depth: " + intToString(PN->getCommDepth()) + "\n");
-	
+    if (options[O_COMM_DEPTH] == true) {
+        PN->commDepth = commDepth_manual;
+		trace(TRACE_0, "communication depth (manual): " + intToString(PN->getCommDepth()) + "\n");
+    } else {
+		trace(TRACE_0, "communication depth: " + intToString(PN->getCommDepth()) + "\n");
+    }
 	
 	time_t seconds, seconds2;
 
@@ -176,9 +178,9 @@ int main(int argc, char ** argv) {
 		
 		trace(TRACE_0, "net is controllable: ");
 		if (graph->getRoot()->getColor() == BLUE) {
-			trace(TRACE_0, "yes\n");
+			trace(TRACE_0, "YES\n");
 		} else {
-			trace(TRACE_0, "no\n");
+			trace(TRACE_0, "NO\n");
 		}
 		trace(TRACE_0, "number of states calculated: " + intToString(State::card) + "\n");
 		trace(TRACE_0, "OG: number of nodes: " + intToString(graph->getNumberOfVertices()) + "\n");

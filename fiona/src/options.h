@@ -14,7 +14,9 @@ typedef enum
 	O_SHOW_NODES,	//!<
 	O_CALC_ALL_STATES,
 	O_CALC_REDUCED_IG,
-	O_OWFN_NAME	
+	O_OWFN_NAME,
+	O_COMM_DEPTH,
+	O_EVENT_USE_MAX
 } possibleOptions;
 
 typedef enum
@@ -27,7 +29,7 @@ typedef enum
 	P_SHOW_EMPTY_NODE,
 	P_SHOW_STATES_PER_NODE,
 	P_CALC_ALL_STATES,
-	P_CALC_REDUCED_IG		
+	P_CALC_REDUCED_IG
 } possibleParameters;
 
 
@@ -40,6 +42,8 @@ extern std::map<possibleOptions,    bool> options;
 extern std::map<possibleParameters, bool> parameters;
 
 extern char * netfile;
+extern int commDepth_manual;
+extern int events_manual;
 
 /// pointer to input stream
 extern std::istream * input;

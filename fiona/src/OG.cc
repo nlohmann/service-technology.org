@@ -68,8 +68,18 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	while (i < PN->placeInputCnt) { // && (currentNode->getColor() != RED)) {
 		trace(TRACE_5, "iterating over inputSet\n");
 
-		// hack until static analysis gives enough information
-		if (currentNode->eventsUsed[i] < 3) { //== 0) {
+
+		// hack per command line option until static analysis gives enough information
+	    if (options[O_EVENT_USE_MAX] == false) {
+	    	// no information means that every event can happen <commDepth> often
+		    if (options[O_COMM_DEPTH] == true) {
+		    	events_manual = commDepth_manual;
+		    } else {
+		    	events_manual = PN->commDepth;
+		    }
+	    }
+	    
+		if (currentNode->eventsUsed[i] < events_manual){
 			
 			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
 			currentVertex = currentNode;
@@ -93,11 +103,21 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 
 	i = 0;
 		
+	// iterate over all elements of outputSet
 	while (i < PN->placeOutputCnt) { // && (currentNode->getColor() != RED)) {
 		trace(TRACE_5, "iterating over outputSet\n");
 
-		// hack until static analysis gives enough information
-		if (currentNode->eventsUsed[i + PN->placeInputCnt] < 3) { //== 0) {
+		// hack per command line option until static analysis gives enough information
+	    if (options[O_EVENT_USE_MAX] == false) {
+	    	// no information means that every event can happen <commDepth> often
+		    if (options[O_COMM_DEPTH] == true) {
+		    	events_manual = commDepth_manual;
+		    } else {
+		    	events_manual = PN->commDepth;
+		    }
+	    }
+	    
+		if (currentNode->eventsUsed[i + PN->placeInputCnt] < events_manual) {
 				
 			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
 			currentVertex = currentNode;

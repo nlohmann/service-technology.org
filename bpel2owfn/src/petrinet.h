@@ -40,13 +40,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/07 13:08:15 $
+ *          - last changed: \$Date: 2006/06/08 07:54:19 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.72 $
+ * \version \$Revision: 1.73 $
  */
 
 
@@ -160,6 +160,9 @@ class Node
     
     /// type of node as defined in #communication_type
     communication_type type;
+
+    /// the name of the node
+    string nodeName();    
 };
 
 
@@ -194,9 +197,6 @@ class Transition:public Node
     
     /// the short name of the transition
     string nodeShortName();
-
-    /// the name of the transition
-    string nodeName();
 };
 
 

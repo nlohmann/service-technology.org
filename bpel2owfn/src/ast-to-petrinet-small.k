@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/06/07 16:30:01 $
+ *          - last changed: \$Date: 2006/06/08 07:54:19 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
  *
  */
 %}
@@ -669,11 +669,11 @@ This=activityWhile(TheWhile=While(a,b)) ->
       Place *p3 = TheNet->newPlace(prefix + "final");
       Place *p4 = TheNet->newPlace(prefix + "done");
 
-      Transition *t1 = TheNet->newTransition(prefix + "choose");
+      Transition *t1 = TheNet->newTransition(prefix + "enter");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
 
-      Transition *t2 = TheNet->newTransition(prefix + "skip");
+      Transition *t2 = TheNet->newTransition(prefix + "leave");
       TheNet->newArc(p1, t2);
       TheNet->newArc(t2, p3);
 

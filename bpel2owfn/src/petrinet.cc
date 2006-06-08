@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/06/06 20:37:18 $
+ *          - last changed: \$Date: 2006/06/08 15:39:43 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.118 $
+ * \version \$Revision: 1.119 $
  */
 
 
@@ -481,6 +481,7 @@ void PetriNet::removeArc(Arc * f)
  * \param t1 first transition
  * \param t2 second transition
  *
+ * \todo support for communication transitions
  */
 void PetriNet::mergeTransitions(Transition * t1, Transition * t2)
 {

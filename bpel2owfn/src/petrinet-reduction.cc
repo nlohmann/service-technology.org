@@ -36,13 +36,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/06/06 20:37:18 $
+ *          - last changed: \$Date: 2006/06/08 15:39:43 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  */
 
 
@@ -54,6 +54,7 @@
 #include "debug.h"		// debugging help
 #include "symbol-table.h"
 #include "helpers.h"
+#include "options.h"
 
 
 
@@ -295,6 +296,42 @@ void PetriNet::collapseSequences()
 
 
 /*!
+ * \todo comment me
+ * \todo support for communication transitions
+ */
+void PetriNet::optimizeSetLinkTransitions()
+{
+  set<pair<Transition*, Transition*> > transitionPairs;
+
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+  {
+    if ((*t)->nodeName() == "setLinks")
+    {
+      Place *p = (Place*)(*(preset(*t).begin()));
+      Transition *t2 = (Transition*)(*(preset(p).begin()));
+
+      pair<Transition*, Transition*> temp;
+      temp.first = t2;
+      temp.second = *t;
+      transitionPairs.insert(temp);
+
+      removePlace(p);
+    }
+  }
+
+  for (set<pair<Transition*, Transition*> >::iterator it = transitionPairs.begin();
+      it != transitionPairs.end(); it++)
+  {
+    mergeTransitions( (*it).first, (*it).second );
+  }
+}
+
+
+
+
+
+
+/*!
  * Implements some simple structural reduction rules for Petri nets:
  *
  * - Structural dead nodes are removed.
@@ -327,6 +364,9 @@ void PetriNet::simplify()
     done = (old == information());
     old = information();
   }
+
+//  if (parameters[P_NEWLINKS])
+//    optimizeSetLinkTransitions();
 
   trace(TRACE_INFORMATION, "Simplifying complete.\n");
   trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification: " + information() + "\n");

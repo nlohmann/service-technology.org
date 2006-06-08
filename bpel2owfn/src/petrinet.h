@@ -40,13 +40,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/08 07:54:19 $
+ *          - last changed: \$Date: 2006/06/08 15:39:43 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.73 $
+ * \version \$Revision: 1.74 $
  */
 
 
@@ -397,6 +397,9 @@ class PetriNet
 
     /// merge twin transitions
     void mergeTwinTransitions();
+
+    /// merge transitions setting links (new link model)
+    void optimizeSetLinkTransitions();
 
     /// collapse simple sequences
     void collapseSequences();

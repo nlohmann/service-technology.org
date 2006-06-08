@@ -25,7 +25,7 @@
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created:
@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.40 $: 
+ * \version \$Revision: 1.41 $: 
  *
  */
 
@@ -114,6 +114,12 @@ class STElement
     /// tokens correctly
     ActivityLocationId activityLocation;
     
+    /// list of enclosed source links for DPE
+    std::set<STLink*> enclosedSourceLinks;
+
+    /// collect enclosed links
+    void processLinks(unsigned int firstId, unsigned int lastId);
+
     /// constructor
     STElement();
     
@@ -317,11 +323,6 @@ class STActivity: public STElement, public SymbolTableEntry
     /// true if activity is target of a link
     bool isTargetOfLink;
 
-    /// list of enclosed source links for DPE
-    std::set<STLink*> enclosedSourceLinks;
-
-    /// collect enclosed links
-    void processLinks(unsigned int firstId, unsigned int lastId);
 };
 
 /**

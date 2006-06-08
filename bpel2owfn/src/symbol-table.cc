@@ -26,7 +26,7 @@
  *
  * \author
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $  
+ *          - last changes of: \$Author: gierds $  
  *          
  * \date
  * 
@@ -109,41 +109,43 @@ void SymbolTable::printSymbolTable()
   while(symTabIterator != symTab.end())
   {  
   	SymbolTableEntry* currentEntry = lookup((*symTabIterator).first);
+    if ( currentEntry != NULL)
+    {    
+      traceSTwp(horizontal); traceSTwp("\n");
     
-    traceSTwp(horizontal); traceSTwp("\n");
-    
-  	printSymbolTableEntry(currentEntry);
-  	printSTElement(currentEntry);
+      printSymbolTableEntry(currentEntry);
+      printSTElement(currentEntry);
 
-    switch(currentEntry->elementId)
-    {
-      case K_COMPENSATE:		{ } break;
-      case K_COMPENSATIONHANDLER:	{ } break;
-      case K_CORRELATIONSET:		{ } break;
-      case K_EVENTHANDLERS:		{ } break;
-      case K_FAULTHANDLERS:		{ } break;
-      case K_INVOKE:			{ } break;
-      case K_LINK:			{ } break;
-      case K_PARTNER:			{ } break;
-      case K_PARTNERLINK:		{ } break;
-      case K_PROCESS:
+      switch(currentEntry->elementId)
       {
-      	printSTEnvelope(currentEntry);
-      } break;
-      case K_RECEIVE:			{ } break;
-      case K_REPLY:			{ } break;
-      case K_SCOPE:
-      {
-      	printSTEnvelope(currentEntry);
-      } break;
-      case K_TERMINATE:			{ } break;
-      case K_VARIABLE:			{ } break;
-      case K_WAIT:			{ } break;
-      /* all other */
-      default :				{ } break;
+	case K_COMPENSATE:		{ } break;
+	case K_COMPENSATIONHANDLER:	{ } break;
+	case K_CORRELATIONSET:		{ } break;
+	case K_EVENTHANDLERS:		{ } break;
+	case K_FAULTHANDLERS:		{ } break;
+	case K_INVOKE:			{ } break;
+	case K_LINK:			{ } break;
+	case K_PARTNER:			{ } break;
+	case K_PARTNERLINK:		{ } break;
+	case K_PROCESS:
+	{
+	  printSTEnvelope(currentEntry);
+	} break;
+	case K_RECEIVE:			{ } break;
+	case K_REPLY:			{ } break;
+	case K_SCOPE:
+	{
+	  printSTEnvelope(currentEntry);
+	} break;
+	case K_TERMINATE:		{ } break;
+	case K_VARIABLE:		{ } break;
+	case K_WAIT:			{ } break;
+	/* all other */
+	default :				{ } break;
+      }
+      traceSTwp(horizontal); traceSTwp("\n"); 
+      traceSTwp("\n");        
     }
-    traceSTwp(horizontal); traceSTwp("\n"); 
-    traceSTwp("\n");        
     ++symTabIterator;
   }
 } 
@@ -152,7 +154,7 @@ void SymbolTable::printSymbolTable()
  * 
  */
 void SymbolTable::printSymbolTableEntry(SymbolTableEntry* entry)
-{ 
+{
   traceSTwp(vertical); traceSTwp(translateToElementName(entry->elementId)); traceSTwp("\n");	
   traceSTwp(vertical); traceSTwp(smallHorizontal + "<SymbolTableEntry>"); traceSTwp("\n");	  
   traceSTwp(vertical); traceSTwp("entryKey=" + intToString(entry->entryKey)); traceSTwp("\n");
@@ -303,6 +305,8 @@ string SymbolTable::translateToElementName(unsigned int elementId)
 unsigned int SymbolTable::insert(unsigned int elementId)
 {
   traceST("insert(" + translateToElementName(elementId) + ")\n");
+  traceST(intToString(this->entryKey) + "\n");
+  traceST(intToString(yylineno) + "\n");
   switch(elementId)
   {
 //    case K_CASE:                {symTab[this->nextKey()] = new STCaseBranch(elementId, this->entryKey);} break;
@@ -2335,28 +2339,6 @@ STActivity::STActivity() {}
  */
 STActivity::~STActivity() {}
 
-
-/*!
- * Collects all source links having an id between firstId and lastId. This
- * collection is used for dead path elimination.
- */
-void STActivity::processLinks(unsigned int firstId, unsigned int lastId)
-{
-  if (!parameters[P_NEWLINKS])
-    return;
-
-//  cerr << "void STActivity::processLinks(" << firstId << ", " << lastId << ")" << endl;
-  for (int id = firstId+1; id <= lastId; id++)
-  {
-    if ( (symTab.lookup(id) != NULL) && (typeid(*(symTab.lookup(id))).name() == typeid(STSourceTarget).name()) )
-    {
-      STSourceTarget* sourceLink = dynamic_cast<STSourceTarget *> (symTab.lookup(id));
-      if (sourceLink->isSource)
-	enclosedSourceLinks.insert(sourceLink->link);
-    }
-  }
-}
-
  
 /********************************************
  * implementation of STAttribute CLASS
@@ -2446,6 +2428,32 @@ STCorrelationSet::~STCorrelationSet() {}
  * implementation of Element CLASS
  ********************************************/
  
+
+/*!
+ * Collects all source links having an id between firstId and lastId. This
+ * collection is used for dead path elimination.
+ */
+void STElement::processLinks(unsigned int firstId, unsigned int lastId)
+{
+  if (!parameters[P_NEWLINKS])
+    return;
+
+  for (int id = firstId+1; id <= lastId; id++)
+  { 
+    if  (symTab.lookup(id) != NULL){
+
+      if (typeid(*(symTab.lookup(id))) == typeid(STSourceTarget)) 
+    {
+      STSourceTarget* sourceLink = dynamic_cast<STSourceTarget *> (symTab.lookup(id));
+      if (sourceLink != NULL && sourceLink->isSource)
+      {
+	enclosedSourceLinks.insert(sourceLink->link);
+      }
+    }
+    }
+  }
+}
+
 /*!
  * constructor
  */
@@ -2750,11 +2758,8 @@ STVariable * STScope::checkVariable(std::string name, STScope * callingScope, bo
   trace(TRACE_DEBUG, "[ST] Adding fault variable " + name + "\n");
   unsigned int key = symTab.insert(K_VARIABLE);
   STVariable * stVariable = NULL;
-  try
-  {
-    stVariable = dynamic_cast<STVariable*> (symTab.lookup(key));
-  }
-  catch (bad_cast)
+  stVariable = dynamic_cast<STVariable*> (symTab.lookup(key));
+  if (stVariable == NULL)
   {
     throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
   }
@@ -3044,27 +3049,26 @@ void STFlow::checkLinkUsage()
 	problems = true;
         if ( (*iter)->sourceId > 0 )
 	{
-          trace("The Link " + symTab.readAttributeValue((*iter)->entryKey, "name") + " defined in line " 
-		  + intToString(symTab.readAttribute((*iter)->entryKey, "name")->line) + " was used as source,"
-		  + " but never as a target!\n");
+          trace("ERROR: The Link " + symTab.readAttributeValue((*iter)->entryKey, "name") + " defined in line " 
+		  + intToString(symTab.readAttribute((*iter)->entryKey, "name")->line) + "\n");
+	  trace("       was used as source, but never as a target!\n\n");
 	}
 	else if ( (*iter)->targetId > 0 )
 	{
-          trace("The Link " + symTab.readAttributeValue((*iter)->entryKey, "name") + " defined in line " 
-		  + intToString(symTab.readAttribute((*iter)->entryKey, "name")->line) + " was used as target,"
-		  + " but never as a source!\n");
+          trace("ERROR: The Link " + symTab.readAttributeValue((*iter)->entryKey, "name") + " defined in line " 
+		  + intToString(symTab.readAttribute((*iter)->entryKey, "name")->line) + "\n");
+	  trace("       was used as target, but never as a source!\n\n");
 	}
 	else
 	{
-          trace("The Link " + symTab.readAttributeValue((*iter)->entryKey, "name") + " defined in line " 
-		  + intToString(symTab.readAttribute((*iter)->entryKey, "name")->line) + " has never been used!\n");
+          trace("ERROR: The Link " + symTab.readAttributeValue((*iter)->entryKey, "name") + " defined in line " 
+		  + intToString(symTab.readAttribute((*iter)->entryKey, "name")->line) + "\n");
+	  trace("       has never been used!\n\n");
 	}
       }
       if (problems)
       {
-	yyerror (string("The Flow finished in line " + intToString(0)
-		      + " has problems with the used links! (see above)\n"
-		     ).c_str());
+	error ();
       }
     }
   }

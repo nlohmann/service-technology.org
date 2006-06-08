@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/06/07 10:58:40 $
+ *          - last changed: \$Date: 2006/06/08 13:39:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.178 $
+ * \version \$Revision: 1.179 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -304,11 +304,8 @@ tProcess:
       	att.pushSJFStack($4, att.read($4, "suppressJoinFailure"));      
       }      
 
-      try
-      {
-	stProcess = dynamic_cast<STProcess*> (symTab.lookup($3));
-      }
-      catch (bad_cast)
+      stProcess = dynamic_cast<STProcess*> (symTab.lookup($3));
+      if (stProcess == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -360,7 +357,7 @@ activity:
       $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
-      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tInvoke
     { $$ = $1; }
@@ -374,42 +371,42 @@ activity:
       $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
-      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tReply
     { $$ = activityReply($1); $$->id = $1->id; 
       $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
-      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tAssign
     { $$ = activityAssign($1); $$->id = $1->id; 
       $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
-      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tWait
     { $$ = activityWait($1); $$->id = $1->id; 
       $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
-      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tThrow
     { $$ = activityThrow($1); $$->id = $1->id; 
       $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
-      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tTerminate
     { $$ = activityTerminate($1); $$->id = $1->id; 
       $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
-      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tFlow
     { $$ = activityFlow($1); $$->id = $1->id; 
@@ -417,7 +414,7 @@ activity:
       $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
-      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tSwitch
     { $$ = activitySwitch($1); $$->id = $1->id; 
@@ -425,14 +422,14 @@ activity:
       $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
-      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tWhile
     { $$ = activityWhile($1); $$->id = $1->id; 
       $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
-      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tSequence
     { $$ = activitySequence($1); $$->id = $1->id; 
@@ -440,7 +437,7 @@ activity:
       $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
-      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tPick
     { $$ = activityPick($1); $$->id = $1->id; 
@@ -448,7 +445,7 @@ activity:
       $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
-      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tScope
     { $$ = activityScope($1); $$->id = $1->id; 
@@ -456,14 +453,15 @@ activity:
       $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
-      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
-      branch->processLinks($$->id->value, currentSymTabEntryKey); }
+      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
+      branch->processLinks($$->id->value, currentSymTabEntryKey); 
+    }
 | tCompensate
     { $$ = activityCompensate($1); $$->id = $1->id; 
       $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
-      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 ;
 
@@ -491,11 +489,8 @@ tPartnerLink:
     arbitraryAttributes X_NEXT X_SLASH K_PARTNERLINK
     { 
       STPartnerLink * stPartnerLink = NULL;
-      try
-      {
-	stPartnerLink = dynamic_cast<STPartnerLink*> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stPartnerLink = dynamic_cast<STPartnerLink*> (symTab.lookup($2));
+      if (stPartnerLink == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -526,11 +521,8 @@ tPartnerLink:
     arbitraryAttributes X_SLASH
     { 
       STPartnerLink * stPartnerLink = NULL;
-      try
-      {
-	stPartnerLink = dynamic_cast<STPartnerLink*> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stPartnerLink = dynamic_cast<STPartnerLink*> (symTab.lookup($2));
+      if (stPartnerLink == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -599,11 +591,8 @@ tPartner:
   arbitraryAttributes X_NEXT 
     {
       STPartner * stPartner = NULL;
-      try
-      {
-	stPartner = dynamic_cast<STPartner*> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stPartner = dynamic_cast<STPartner*> (symTab.lookup($2));
+      if (stPartner == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -679,11 +668,8 @@ tCatch:
     {
       symTab.checkAttributes($2);
       STCatch * stCatch = NULL;
-      try
-      {
-	stCatch = dynamic_cast<STCatch*> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stCatch = dynamic_cast<STCatch*> (symTab.lookup($2));
+      if (stCatch == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -842,11 +828,8 @@ tOnMessage:
     { $$ = OnMessage($7);
       $$->id = $2;    
       STOnMessage * stOnMessage = NULL;
-      try
-      {
-	stOnMessage = dynamic_cast<STOnMessage *> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stOnMessage = dynamic_cast<STOnMessage *> (symTab.lookup($2));
+      if (stOnMessage == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -885,7 +868,7 @@ tOnAlarm:
       $$->dpe = symMan.needsDPE();
 
       // collect source links for new DPE
-      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($6->id->value, currentSymTabEntryKey);
     }
 ;
@@ -920,11 +903,8 @@ tVariable:
   arbitraryAttributes X_NEXT X_SLASH K_VARIABLE
     { symTab.checkAttributes($2); //att.check($3, K_VARIABLE);
       STVariable * stVar = NULL;
-      try
-      {
-	stVar = dynamic_cast<STVariable *> (symTab.lookup(currentSymTabEntryKey));
-      }
-      catch (bad_cast)
+      stVar = dynamic_cast<STVariable *> (symTab.lookup(currentSymTabEntryKey));
+      if (stVar == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -937,11 +917,8 @@ tVariable:
   arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2); //att.check($3, K_VARIABLE);
       STVariable * stVar = NULL;
-      try
-      {
-	stVar = dynamic_cast<STVariable *> (symTab.lookup(currentSymTabEntryKey));
-      }
-      catch (bad_cast)
+      stVar = dynamic_cast<STVariable *> (symTab.lookup(currentSymTabEntryKey));
+      if (stVar == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -1155,11 +1132,8 @@ tInvoke:
 	(dynamic_cast<STScope *> (symTab.lookup(currentSTScope->parentScopeId)))->childScopes.push_back(currentSTScope);
 
 	STInvoke * stInvoke = NULL;
-	try
-	{
-	  stInvoke = dynamic_cast<STInvoke *> (symTab.lookup($2));
-	}
-	catch (bad_cast)
+	stInvoke = dynamic_cast<STInvoke *> (symTab.lookup($2));
+        if (stInvoke == NULL)
 	{
 	  throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
 	}
@@ -1236,8 +1210,7 @@ tInvoke:
 
 
       // collect source links for new DPE
-      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
-      cerr << "did sometihng1" << endl;
+      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey);
 
 
@@ -1251,11 +1224,8 @@ tInvoke:
         currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId->value));
 
 	STInvoke * stInvoke = NULL;
-	try
-	{
-	  stInvoke = dynamic_cast<STInvoke *> (symTab.lookup($2));
-	}
-	catch (bad_cast)
+	stInvoke = dynamic_cast<STInvoke *> (symTab.lookup($2));
+        if (stInvoke == NULL)
 	{
 	  throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
 	}
@@ -1301,10 +1271,8 @@ tInvoke:
 
 
 	// collect source links for new DPE
-	STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($2->value));
-	cerr << "invoke 2" << endl;
+      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
 	branch->processLinks($2->value, currentSymTabEntryKey);
-        cerr << "post invoke 2" << endl;
       }    
     }
 | K_INVOKE genSymTabEntry_Invoke 
@@ -1328,11 +1296,8 @@ tInvoke:
       noLinks->parentId = $2;
 
       STInvoke * stInvoke = NULL;
-      try
-      {
-	stInvoke = dynamic_cast<STInvoke *> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stInvoke = dynamic_cast<STInvoke *> (symTab.lookup($2));
+      if (stInvoke == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -1368,8 +1333,7 @@ tInvoke:
       $$->negativeControlFlow = invoke->negativeControlFlow;
 
       // collect source links for new DPE
-      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
-      cerr << "did sometihng3" << endl;
+      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey);
 }
 ;
@@ -1407,11 +1371,8 @@ tReceive:
     { $$ = Receive($7, $8);
       // STReceive * symbolTableEntry = dynamic_cast<STReceive *> (symTab.lookup($2)); 
       STReceive * stReceive = NULL;
-      try
-      {
-	stReceive = dynamic_cast<STReceive *> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stReceive = dynamic_cast<STReceive *> (symTab.lookup($2));
+      if (stReceive == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -1456,11 +1417,8 @@ tReceive:
       noLinks->parentId = $2;
 
       STReceive * stReceive = NULL;
-      try
-      {
-	stReceive = dynamic_cast<STReceive *> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stReceive = dynamic_cast<STReceive *> (symTab.lookup($2));
+      if (stReceive == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -1510,11 +1468,8 @@ tReply:
   X_SLASH K_REPLY
     { $$ = Reply($6, $7);
       STReply * stReply = NULL;
-      try
-      {
-	stReply = dynamic_cast<STReply*> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stReply = dynamic_cast<STReply*> (symTab.lookup($2));
+      if (stReply == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -1555,11 +1510,8 @@ tReply:
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       noLinks->parentId = $2;
       STReply * stReply = NULL;
-      try
-      {
-	stReply = dynamic_cast<STReply*> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stReply = dynamic_cast<STReply*> (symTab.lookup($2));
+      if (stReply == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -1642,11 +1594,8 @@ tFrom:
   K_FROM genSymTabEntry_From arbitraryAttributes X_NEXT X_SLASH K_FROM
     { symTab.checkAttributes($2); //att.check($3, K_FROM);
       STFromTo * stFrom = NULL;
-      try
-      {
-	stFrom = dynamic_cast<STFromTo*> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stFrom = dynamic_cast<STFromTo*> (symTab.lookup($2));
+      if (stFrom == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -1659,11 +1608,8 @@ tFrom:
 | K_FROM genSymTabEntry_From arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_FROM
     { symTab.checkAttributes($2, $5); //att.check($3, $5, K_FROM);
       STFromTo * stFrom = NULL;
-      try
-      {
-	stFrom = dynamic_cast<STFromTo*> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stFrom = dynamic_cast<STFromTo*> (symTab.lookup($2));
+      if (stFrom == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -1677,11 +1623,8 @@ tFrom:
 | K_FROM genSymTabEntry_From arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2); //att.check($3, K_FROM);
       STFromTo * stFrom = NULL;
-      try
-      {
-	stFrom = dynamic_cast<STFromTo*> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stFrom = dynamic_cast<STFromTo*> (symTab.lookup($2));
+      if (stFrom == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -1703,11 +1646,8 @@ tTo:
   K_TO genSymTabEntry_To arbitraryAttributes X_NEXT X_SLASH K_TO
     { symTab.checkAttributes($2); //att.check($3, K_TO);
       STFromTo * stTo = NULL;
-      try
-      {
-	stTo = dynamic_cast<STFromTo*> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stTo = dynamic_cast<STFromTo*> (symTab.lookup($2));
+      if (stTo == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -1720,11 +1660,8 @@ tTo:
 | K_TO genSymTabEntry_To arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2); //att.check($3, K_TO);
       STFromTo * stTo = NULL;
-      try
-      {
-	stTo = dynamic_cast<STFromTo*> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stTo = dynamic_cast<STFromTo*> (symTab.lookup($2));
+      if (stTo == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -1842,11 +1779,8 @@ tThrow:
   X_NEXT standardElements X_SLASH K_THROW
     { symTab.checkAttributes($2); //att.check($3, K_THROW);
       STThrow * stThrow = NULL;
-      try
-      {
-	stThrow = dynamic_cast<STThrow*> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stThrow = dynamic_cast<STThrow*> (symTab.lookup($2));
+      if (stThrow == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -1883,11 +1817,8 @@ tThrow:
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       noLinks->parentId = $2;
       STThrow * stThrow = NULL;
-      try
-      {
-	stThrow = dynamic_cast<STThrow*> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stThrow = dynamic_cast<STThrow*> (symTab.lookup($2));
+      if (stThrow == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -2099,11 +2030,8 @@ tFlow:
   X_NEXT
     {
       STFlow * stFlow = NULL;
-      try
-      {
-	stFlow = dynamic_cast<STFlow *> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stFlow = dynamic_cast<STFlow *> (symTab.lookup($2));
+      if (stFlow == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -2118,21 +2046,18 @@ tFlow:
     { $$ = Flow($7, $8, $9);
 
       STFlow * stFlow = NULL;
-      try
-      {
-	stFlow = dynamic_cast<STFlow *> (symTab.lookup($2));
-	if (currentSTFlow->parentFlowId != 0)
-	{
-	  currentSTFlow = dynamic_cast<STFlow *> (symTab.lookup(currentSTFlow->parentFlowId));
-	}
-	else
-	{
-	  currentSTFlow = NULL;
-	}
-      }
-      catch (bad_cast)
+      stFlow = dynamic_cast<STFlow *> (symTab.lookup($2));
+      if (stFlow == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+      }
+      if (currentSTFlow->parentFlowId != 0)
+      {
+	currentSTFlow = dynamic_cast<STFlow *> (symTab.lookup(currentSTFlow->parentFlowId));
+      }
+      else
+      {
+	currentSTFlow = NULL;
       }
       stFlow->checkLinkUsage();
 
@@ -2211,11 +2136,8 @@ tLink:
       $$ = Link();
 
       STLink * stLink = NULL;
-      try
-      {
-	stLink = dynamic_cast<STLink *> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stLink = dynamic_cast<STLink *> (symTab.lookup($2));
+      if (stLink == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -2230,11 +2152,8 @@ tLink:
       $$ = Link();
 
       STLink * stLink = NULL;
-      try
-      {
-	stLink = dynamic_cast<STLink *> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stLink = dynamic_cast<STLink *> (symTab.lookup($2));
+      if (stLink == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -2348,7 +2267,7 @@ tCase:
       $$->dpe = mkinteger((symMan.needsDPE())->value);
 
       // collect source links for new DPE
-      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($6->id->value, currentSymTabEntryKey);
     }
 ;
@@ -2393,7 +2312,7 @@ tOtherwise:
       $$->dpe = symMan.needsDPE();
 
       // collect source links for new DPE
-      STActivity* branch = dynamic_cast<STActivity *> (symTab.lookup($$->id->value));
+      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($4->id->value, currentSymTabEntryKey);
     }
 ;
@@ -2620,7 +2539,6 @@ tScope:
       {
 	$7->dpe = mkinteger(1);
       }
-//CG      symMan.quitScope(); 
     }
 ;
 
@@ -2666,11 +2584,8 @@ tTarget:
       $$->id = $2;      
 
       STSourceTarget * stTarget = NULL;
-      try
-      {
-	stTarget = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stTarget = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
+      if (stTarget == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -2687,11 +2602,8 @@ tTarget:
       $$->id = $2;      
 
       STSourceTarget * stTarget = NULL;
-      try
-      {
-	stTarget = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stTarget = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
+      if (stTarget == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -2728,11 +2640,8 @@ tSource:
       $$->id = $2;      
 
       STSourceTarget * stSource = NULL;
-      try
-      {
-	stSource = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stSource = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
+      if (stSource == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
@@ -2753,11 +2662,8 @@ tSource:
       $$->id = $2;      
 
       STSourceTarget * stSource = NULL;
-      try
-      {
-	stSource = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
-      }
-      catch (bad_cast)
+      stSource = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
+      if (stSource == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }

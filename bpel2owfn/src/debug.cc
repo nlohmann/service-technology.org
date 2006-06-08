@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2006/04/05 12:11:58 $
+ *          - last changed: \$Date: 2006/06/08 13:39:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  */
 
 #include "debug.h"
@@ -145,3 +145,5 @@ int yyerror(const char* msg)
   error();
   return 1;
 }
+
+

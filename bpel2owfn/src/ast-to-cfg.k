@@ -29,11 +29,11 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/05/29 11:04:40 $
+ *          - last changed: \$Date: 2006/06/09 13:39:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  */
 %}
 
@@ -84,6 +84,9 @@ map <std::string, CFGBlock *> cfgMap;
 
 Process(a,b,c,d,e,f,g,h,i) ->
   [cfg: {
+	  cfgMap = map <std::string, CFGBlock *>();
+	  sources = map<std::string, CFGBlock *>();
+          targets = map<std::string, CFGBlock *>();
 	  trace(TRACE_DEBUG, "[CFG] Process\n");
 	  CFGBlock * firstBlock = new CFGBlock(CFGProcess, $0->id, "Process_begin"); 
 	  CFGBlock * lastBlock = new CFGBlock(CFGProcess, $0->id, "Process_end");
@@ -272,6 +275,7 @@ implicitEventHandler() ->
 	  trace(TRACE_DEBUG, "[CFG] EventHandler (implicit)\n");
 	  CFGBlock * block = new CFGBlock(CFGEventHandler, $0->id, "implicitEventHandler"); 
 	  cfgMap[intToString($0->id->value)] = block;
+	  trace(TRACE_DEBUG, "[CFG] ~EventHandler (implicit)\n");
 	}
   ];
 

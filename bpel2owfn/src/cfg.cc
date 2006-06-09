@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/05/30 12:58:42 $
+ *          - last changed: \$Date: 2006/06/09 13:39:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.19 $
+ * \version \$Revision: 1.20 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -423,12 +423,12 @@ void CFGBlock::checkForUninitializedVariables()
     {
       if (initializedVariables.find(var) == initializedVariables.end())
       {
-	trace("[CFG] Warning: Variable \"" + symTab.readAttributeValue(id, attributeName) 
+	trace("[CFG] WARNING: Variable \"" + symTab.readAttributeValue(id, attributeName) 
 //	      + "\" ("+ var +") (activity ID = " 
 //	      + intToString(id->value)  
 	      + "\" in line " 
 	      + intToString(symTab.readAttribute(id, attributeName)->line) 
-	      + " might be undefined!\n");
+	      + " might be undefined!\n\n");
       }
     }
   }
@@ -494,7 +494,7 @@ void CFGBlock::checkForCyclicLinks()
       if (!targetsSeen.empty() && targetsSeen.find(linkname) != targetsSeen.end())
       {
         trace("[CFG] WARNING: Cyclic Links detected!\n");
-        trace("[CFG]          Process will most likely run into deadlock.\n");
+        trace("[CFG]          Process will most likely run into deadlock.\n\n");
 	return;
       }
       CFGBlock * targ = targets[dot_name()];
@@ -571,6 +571,7 @@ void CFGBlock::checkForConflictingReceive()
 		trace("               Please check lines " + intToString((dynamic_cast<STElement*>(symTab.lookup(elemA->second)))->line));
 		trace(                " and " + intToString((dynamic_cast<STElement*>(symTab.lookup(elemB->second)))->line) + "\n");
 		cerr << "               " << elemA->first << " (" << elemA->second << ") vs. " << elemB->first << " (" << elemB->second << ")" << endl;
+		trace("\n");
 	      }
 	    }
 	  }
@@ -587,6 +588,7 @@ void CFGBlock::checkForConflictingReceive()
 	      trace("               Please check lines " + intToString((dynamic_cast<STElement*>(symTab.lookup((*iter)->id)))->line));
 	      trace(                " and " + intToString((dynamic_cast<STElement*>(symTab.lookup((*otherBlock)->id)))->line) + "\n");
 	      cerr << "               " << (*iter)->channel_name << " (" << (*iter)->id->value << ") vs. " << (*otherBlock)->channel_name << " (" << (*otherBlock)->id->value << ")" << endl;
+		trace("\n");
 	    }
 	    receives.insert(pair<std::string, long>( (dynamic_cast<STOnMessage*>(symTab.lookup((*iter)->id)))->channelId, (*iter)->id->value));
 	  }
@@ -607,6 +609,7 @@ void CFGBlock::checkForConflictingReceive()
 	      trace("               Please check lines " + intToString((dynamic_cast<STElement*>(symTab.lookup(elemA->second)))->line));
 	      trace(                " and " + intToString((dynamic_cast<STElement*>(symTab.lookup(elemB->second)))->line) + "\n");
 	      cerr << "               " << elemA->first << " (" << elemA->second << ") vs. " << elemB->first << " (" << elemB->second << ")" << endl;
+		trace("\n");
 	  }
 	}
       }

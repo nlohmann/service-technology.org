@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/05/17 11:57:59 $
+ *          - last changed: \$Date: 2006/06/09 13:39:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.72 $
+ * \version \$Revision: 1.73 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -56,70 +56,23 @@
 #include "ast-printers.h"
 #include "tarjan.h"
 
+/// additional FILE pointer for second input file
+FILE * yyin2 = yyin;
 
 /// The Petri Net
 PetriNet *TheNet = new PetriNet();
+PetriNet *TheNet2 = NULL;
 
 /// The CFG
 CFGBlock * TheCFG = NULL;
 
-
-/**
- * Entry point for BPEL2oWFN.
- * Controls the behaviour of input and output.
- *
- * \param argc	number of command line arguments
- * \param argv	array with command line arguments
- *
- * \returns Error code (0 if everything went well)
- */
-int main( int argc, char *argv[])
+void cfg()
 {
-	
-  try
-  {
-    /***
-     * Reading command line arguments and triggering appropriate behaviour.
-     * In case of false parameters call command line help function and exit.
-     */
-    parse_command_line(argc, argv);
-  	
-    trace(TRACE_INFORMATION, "Parsing ...\n");
-  
-    // invoke Bison parser
-    int error = yyparse();
 
-    if (!error)
-    {
-      trace(TRACE_INFORMATION, "Parsing complete.\n");
-      
-      if (modus == M_AST)
-      {
-	trace(TRACE_INFORMATION, "-> Printing AST ...\n");
-        TheProcess->print();
-      }
-        
-      if (modus == M_PRETTY)
-      {
-	if (formats[F_XML])
-	{
-	  if (output_filename != "")
-	  {
- 	    output = openOutput(output_filename + "." + suffixes[F_XML]);
-	  }
- 	  trace(TRACE_INFORMATION, "-> Printing \"pretty\" XML ...\n");
-          TheProcess->unparse(kc::printer, kc::xml);
-	  if (output_filename != "")
-	  {
-	    closeOutput(output);
-	    output = NULL;
-	  }
-	}
-      }
-     
       // create CFG
       if (modus == M_CFG) //  || modus == M_PETRINET
       {
+	TheCFG = NULL;
         trace(TRACE_INFORMATION, "-> Unparsing AST to CFG ...\n");
         TheProcess->unparse(kc::pseudoPrinter, kc::cfg);
 	trace(TRACE_DEBUG, "[CFG] checking for DPE\n");
@@ -167,8 +120,11 @@ int main( int argc, char *argv[])
       {
 	delete(TheCFG);
       }
+}
 
-      if (modus == M_PETRINET)
+void petrinet_unparse()
+{
+      if(modus == M_PETRINET)
       {
         trace(TRACE_INFORMATION, "-> Unparsing AST to Petri net ...\n");
 
@@ -176,6 +132,98 @@ int main( int argc, char *argv[])
 	  TheProcess->unparse(kc::pseudoPrinter, kc::petrinet);
 	else
 	  TheProcess->unparse(kc::pseudoPrinter, kc::petrinetsmall);
+      }
+}
+
+/**
+ * Entry point for BPEL2oWFN.
+ * Controls the behaviour of input and output.
+ *
+ * \param argc	number of command line arguments
+ * \param argv	array with command line arguments
+ *
+ * \returns Error code (0 if everything went well)
+ */
+int main( int argc, char *argv[])
+{
+	
+  try
+  {
+    /***
+     * Reading command line arguments and triggering appropriate behaviour.
+     * In case of false parameters call command line help function and exit.
+     */
+    parse_command_line(argc, argv);
+  	
+    trace(TRACE_INFORMATION, "Parsing ...\n");
+  
+    // invoke Bison parser
+    int error = yyparse();
+
+    if (options[O_SECONDINPUT] && !error)
+    {
+      trace(TRACE_INFORMATION, "Parsing complete.\n");
+
+      if ( filename != "<STDIN>" && yyin != NULL)
+      {
+	trace(TRACE_INFORMATION," + Closing input file: " + filename + "\n");
+        fclose(yyin);
+      }
+ 
+      cfg();
+
+      petrinet_unparse();
+      
+      TheNet2 = TheNet;
+      TheNet = new PetriNet();
+      TheProcess = NULL;
+
+      filename = filename2;
+      yyin = yyin2;
+
+      error = yyparse();
+    }
+
+    if (!error)
+    {
+      trace(TRACE_INFORMATION, "Parsing complete.\n");
+      
+      if (modus == M_AST)
+      {
+	trace(TRACE_INFORMATION, "-> Printing AST ...\n");
+        TheProcess->print();
+      }
+        
+      if (modus == M_PRETTY)
+      {
+	if (formats[F_XML])
+	{
+	  if (output_filename != "")
+	  {
+ 	    output = openOutput(output_filename + "." + suffixes[F_XML]);
+	  }
+ 	  trace(TRACE_INFORMATION, "-> Printing \"pretty\" XML ...\n");
+          TheProcess->unparse(kc::printer, kc::xml);
+	  if (output_filename != "")
+	  {
+	    closeOutput(output);
+	    output = NULL;
+	  }
+	}
+      }
+     
+      cfg();
+
+      petrinet_unparse();
+
+      if (modus == M_PETRINET)
+      {
+        if (options[O_SECONDINPUT])
+        {
+	  // combine the two nets
+	
+	}
+
 
         // remove variables?
  	if ( parameters[P_NOVARIABLES] )

@@ -1078,7 +1078,8 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
  */
 void SymbolTable::printErrorMsg(string errorMsg)
 {
-  yyerror(string("[SymbolTable]: " + errorMsg + "\n").c_str());
+  trace("[SymbolTable]: " + errorMsg + "\n");
+  error();
 }
 
 /*!
@@ -2602,8 +2603,13 @@ void STProcess::addPartnerLink(STPartnerLink* pl)
     {
       if (symTab.readAttributeValue((*iter)->entryKey, "name") == symTab.readAttributeValue(pl->entryKey, "name"))
       {
-        yyerror(string("Two PartnerLinks with same name\nName of double PartnerLink is \"" 
-		       + symTab.readAttributeValue(pl->entryKey, "name") + "\"\n").c_str());
+	trace("\n");
+        trace("ERROR: Two PartnerLinks with same name.\n");
+	trace("       Name of double PartnerLink is \"" 
+		       + symTab.readAttributeValue(pl->entryKey, "name") + "\"\n");
+	trace("       See lines " + intToString(symTab.readAttribute((*iter)->entryKey, "name")->line) 
+	      + " and " + intToString(symTab.readAttribute(pl->entryKey, "name")->line) + ".\n\n");
+	error();
       }
     }
   }
@@ -2635,8 +2641,10 @@ STPartnerLink * STProcess::checkPartnerLink(std::string name)
   }
   if (partnerLinks.empty() || iter == partnerLinks.end())
   {
-    yyerror(string("Name of undefined PartnerLink is \"" 
-	           + name + "\"\n").c_str());
+    trace("\n");
+    trace("ERROR: Name of undefined PartnerLink is \"" 
+	           + name + "\"\n\n");
+    error();
   }
 }
 
@@ -2709,9 +2717,14 @@ std::string STScope::addVariable(STVariable * variable)
     {
       if ((*iter)->mapOfAttributes["name"]->value == variable->mapOfAttributes["name"]->value)
       {
-	yyerror(string("Two Variables with same name\nName of double Variable is \"" 
+	trace("\n");
+	trace("ERROR: Two Variables with same name.\n");
+	trace("       Name of double Variable is \"" 
 		     + variable->mapOfAttributes["name"]->value
-		     + "\"\n").c_str());
+		     + "\".\n");
+	trace("       See lines " + intToString(symTab.readAttribute((*iter)->entryKey, "name")->line) 
+	      + " and " + intToString(symTab.readAttribute(variable->entryKey, "name")->line) + ".\n\n");
+	error();
       }
     }
   }
@@ -2750,8 +2763,13 @@ STVariable * STScope::checkVariable(std::string name, STScope * callingScope, bo
   }
   else if (! isFaultVariable)
   {
-    yyerror(string("Name of undefined Variable is \"" 
-		   + name + "\"\n").c_str());
+    trace("\n");
+    trace("ERROR: Undefined Variable found.\n");
+    trace("       Name of undefined Variable is \"" 
+		   + name + "\".\n");
+    /// \todo change function (parameter vor STElement, so we have a line number)
+    // trace("       See line " + intToString(symTab.readAttribute()) + ".\n\n");
+    error();
   }
 
   // create FaultVariable
@@ -2960,8 +2978,13 @@ std::string STFlow::addLink(STLink* link)
     {
       if (symTab.readAttributeValue((*iter)->entryKey, "name") == symTab.readAttributeValue(link->entryKey, "name"))
       {
-        yyerror(string("Two Links with same name\nName of double Link is \"" + 
-			link->name + "\"\n").c_str());
+	trace("\n");
+        trace("ERROR: Two Links with same name.\n");
+	trace("       Name of double Link is \"" + 
+			symTab.readAttributeValue(link->entryKey,"name") + "\".\n");
+	trace("       See lines " + intToString(symTab.readAttribute((*iter)->entryKey, "name")->line)
+	      + " and " + intToString(symTab.readAttribute(link->entryKey, "name")->line) + ".\n\n");
+	error();
       }
     }
   }
@@ -2999,8 +3022,9 @@ STLink * STFlow::checkLink(std::string name, unsigned int id, bool isSource)
 	  }	    
 	  else
 	  {
-            yyerror(string("Link \"" + name 
-			   + "\" was already used as source\n").c_str());
+            trace("ERROR: Link \"" + name 
+			   + "\" was already used as source\n\n");
+	    error();
 	  }
 	}
 	else
@@ -3012,8 +3036,8 @@ STLink * STFlow::checkLink(std::string name, unsigned int id, bool isSource)
 	  }	    
 	  else
 	  {
-            yyerror(string("Link \"" + name 
-			   + "\" was already used as target\n").c_str());
+            trace("ERROR: Link \"" + name 
+			   + "\" was already used as target\n\n");
 	  }
 	}
 	return (*iter);
@@ -3027,8 +3051,9 @@ STLink * STFlow::checkLink(std::string name, unsigned int id, bool isSource)
   }
   else
   {
-    yyerror(string("Name of undefined Link is \"" 
-		   + name + "\"\n").c_str());
+    trace("ERROR: Name of undefined Link is \"" 
+		   + name + "\"\n\n");
+    error();
   }
 
   return NULL;
@@ -3049,19 +3074,24 @@ void STFlow::checkLinkUsage()
 	problems = true;
         if ( (*iter)->sourceId > 0 )
 	{
-          trace("ERROR: The Link " + symTab.readAttributeValue((*iter)->entryKey, "name") + " defined in line " 
+	  trace("\n");
+          trace("ERROR: The Link \"" + symTab.readAttributeValue((*iter)->entryKey, "name") + "\" defined in line " 
 		  + intToString(symTab.readAttribute((*iter)->entryKey, "name")->line) + "\n");
-	  trace("       was used as source, but never as a target!\n\n");
+	  trace("       was used as source (line " + 
+	        intToString(symTab.readAttribute((*iter)->sourceId, "linkName")->line) + "), but never as a target!\n\n");
 	}
 	else if ( (*iter)->targetId > 0 )
 	{
-          trace("ERROR: The Link " + symTab.readAttributeValue((*iter)->entryKey, "name") + " defined in line " 
+	  trace("\n");
+          trace("ERROR: The Link \"" + symTab.readAttributeValue((*iter)->entryKey, "name") + "\" defined in line " 
 		  + intToString(symTab.readAttribute((*iter)->entryKey, "name")->line) + "\n");
-	  trace("       was used as target, but never as a source!\n\n");
+	  trace("       was used as target (line " + 
+	        intToString(symTab.readAttribute((*iter)->targetId, "linkName")->line) + "), but never as a source!\n\n");
 	}
 	else
 	{
-          trace("ERROR: The Link " + symTab.readAttributeValue((*iter)->entryKey, "name") + " defined in line " 
+	  trace("\n");
+          trace("ERROR: The Link \"" + symTab.readAttributeValue((*iter)->entryKey, "name") + "\" defined in line " 
 		  + intToString(symTab.readAttribute((*iter)->entryKey, "name")->line) + "\n");
 	  trace("       has never been used!\n\n");
 	}

@@ -14,10 +14,16 @@ using namespace std;
 /// Filename of input file
 std::string filename = "<STDIN>";
 /// Filename of input file
+std::string filename1 = "<STDIN>";
+/// Filename of second input file
+std::string filename2 = "<STDIN>";
+/// Filename of output file
 std::string output_filename = "";
 
 /// pointer to input stream
 std::istream * input = &std::cin;
+/// pointer to input stream
+std::istream * input2 = &std::cin;
 /// pointer to output stream
 std::ostream * output = &std::cout;
 /// pointer to log stream
@@ -41,22 +47,24 @@ map<possibleFormats, std::string> suffixes;
 // long options
 static struct option longopts[] =
 {
-  { "help",       no_argument,       NULL, 'h' },
-  { "version",    no_argument,       NULL, 'v' },
-  { "mode",       required_argument, NULL, 'm' },
-  { "log",        optional_argument, NULL, 'l' },
-  { "input",      required_argument, NULL, 'i' },
-  { "inputfile",  required_argument, NULL, 'i' },
-  { "output",     optional_argument, NULL, 'o' },
-  { "outputfile", optional_argument, NULL, 'o' },
-  { "format",     required_argument, NULL, 'f' },
-  { "parameter",  required_argument, NULL, 'p' },
-  { "bpel2pn",    no_argument,	     NULL, 'b' },
-  { "debug",      required_argument, NULL, 'd' },
+  { "help",		no_argument,       NULL, 'h' },
+  { "version",		no_argument,       NULL, 'v' },
+  { "mode",		required_argument, NULL, 'm' },
+  { "log",		optional_argument, NULL, 'l' },
+  { "input",		required_argument, NULL, 'i' },
+  { "inputfile",	required_argument, NULL, 'i' },
+  { "secondinput",	required_argument, NULL, 's' },
+  { "secondinputfile",	required_argument, NULL, 's' },
+  { "output",		optional_argument, NULL, 'o' },
+  { "outputfile",	optional_argument, NULL, 'o' },
+  { "format",		required_argument, NULL, 'f' },
+  { "parameter",	required_argument, NULL, 'p' },
+  { "bpel2pn",		no_argument,	   NULL, 'b' },
+  { "debug",		required_argument, NULL, 'd' },
   NULL
 };
 
-const char * par_string = "hvm:li:of:p:bd:";
+const char * par_string = "hvm:li:s:of:p:bd:";
 
 // --------------------- functions for command line evaluation ------------------------
 /**
@@ -82,8 +90,9 @@ void print_help()
   trace("                          (see documentation for further information)\n");
   trace(" -b | --bpel2pn         - implies \"-flola -finfo -o\"\n");
   trace("\n");
-  trace(" -i | --input=<file>    - read input from <file>\n");
-  trace(" -o | --output=<prefix> - write output to <prefix>.X\n");
+  trace(" -i | --input=<file>       - read input from <file>\n");
+  trace(" -s | --secondinput=<file> - read input from <file>\n");
+  trace(" -o | --output=<prefix>    - write output to <prefix>.X\n");
   trace("\n");
   trace(" -f | --format          - select output formats (as far as supported for mode):\n");
   trace("                          lola, owfn, dot, pep, apnn, info, pnml, txt, xml\n");
@@ -231,7 +240,16 @@ void parse_command_line(int argc, char* argv[])
 		trace(TRACE_WARNINGS, "Multiple input options are given, only last one is used!\n");
 	      }
 	      options[O_INPUT] = true;
-	      filename = string(optarg);
+	      filename1 = string(optarg);
+	      filename = filename1;
+              break;
+      case 's':
+	      if (options[O_SECONDINPUT])
+	      {
+		trace(TRACE_WARNINGS, "Multiple second input options are given, only last one is used!\n");
+	      }
+	      options[O_SECONDINPUT] = true;
+	      filename2 = string(optarg);
               break;
       case 'o':
 	      if (options[O_OUTPUT])
@@ -456,9 +474,17 @@ void parse_command_line(int argc, char* argv[])
   // if input file is given, bind it to yyin
   if (options[O_INPUT])
   {
-    if (!(yyin = fopen(filename.c_str(), "r")))
+    if (!(yyin = fopen(filename1.c_str(), "r")))
     {
-      throw Exception(FILE_NOT_FOUND, "File '" + filename + "' not found.\n");
+      throw Exception(FILE_NOT_FOUND, "File '" + filename1 + "' not found.\n");
+    }
+  }
+
+  if (options[O_SECONDINPUT])
+  {
+    if (!(yyin2 = fopen(filename2.c_str(), "r")))
+    {
+      throw Exception(FILE_NOT_FOUND, "File '" + filename2 + "' not found.\n");
     }
   }
 

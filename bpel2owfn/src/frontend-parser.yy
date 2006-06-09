@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/06/08 13:39:27 $
+ *          - last changed: \$Date: 2006/06/09 13:39:25 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.179 $
+ * \version \$Revision: 1.180 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -290,28 +290,46 @@ impl_joinCondition* currentJoinCondition = standardJoinCondition();
 ******************************************************************************/
 
 tProcess:
+    {
+      // initialisation
+      symTab = SymbolTable();
+      currentSymTabEntryKey = 0;
+      currentSTScope = NULL;
+      currentSTFlow = NULL;
+      stProcess = NULL;
+      currentPartner = NULL;
+      att = attributeManager();
+      symMan = SymbolManager();
+      inPartners = false;
+      inWhile = false;
+      parent = map<integer, integer>();
+      hasCatchAll = false;
+      isInFH = stack<bool>();
+      //stack< pair<bool,int> > isInCH;
+      currentJoinCondition = standardJoinCondition();
+    }
   X_OPEN K_PROCESS genSymTabEntry_Process
   arbitraryAttributes
-    { symTab.checkAttributes($3); //att.check($4, K_PROCESS);
-      if(att.isAttributeValueEmpty($4, "suppressJoinFailure"))
+    { symTab.checkAttributes($4); //att.check($4, K_PROCESS);
+      if(att.isAttributeValueEmpty($5, "suppressJoinFailure"))
       {
       	/// default attribute value
-      	att.pushSJFStack($4, mkcasestring("no"));
+      	att.pushSJFStack($5, mkcasestring("no"));
       }
       else
       {
         /// current BPEL-element attribute value
-      	att.pushSJFStack($4, att.read($4, "suppressJoinFailure"));      
+      	att.pushSJFStack($5, att.read($5, "suppressJoinFailure"));      
       }      
 
-      stProcess = dynamic_cast<STProcess*> (symTab.lookup($3));
+      stProcess = dynamic_cast<STProcess*> (symTab.lookup($4));
       if (stProcess == NULL)
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
     
 //CG      symMan.initialiseProcessScope($3);
-      currentScopeId = $3;
+      currentScopeId = $4;
       currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId->value));
       isInFH.push(false);
       isInCH.push(pair<bool,int>(false,0));
@@ -320,17 +338,17 @@ tProcess:
   X_NEXT imports tPartnerLinks tPartners tVariables tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers
   activity
   X_NEXT X_SLASH K_PROCESS X_CLOSE
-    { TheProcess = $$ = Process($8, $9, $10, $11, $12, $13, $14, StopInProcess(), $15);
+    { TheProcess = $$ = Process($9, $10, $11, $12, $13, $14, $15, StopInProcess(), $16);
 //CG      symMan.quitScope();
       //symTab.traceST("\t\t\t\t HALLO " + string((att.read($4, "abstractProcess")->name)) + "\n");      
 //      att.traceAM(string("tProcess: ") + ($$->suppressJoinFailure)->name + string("\n"));      
       att.popSJFStack(); symTab.popSJFStack();
       isInFH.pop();
       isInCH.pop();
-      $$->id = $3;
-      ((STProcess*)symTab.lookup($3))->hasEventHandler = (string($14->op_name()) == "userDefinedEventHandler");
+      $$->id = $4;
+      ((STProcess*)symTab.lookup($4))->hasEventHandler = (string($15->op_name()) == "userDefinedEventHandler");
       symTab.printSymbolTable(); // purely debugging
-      symTab.traceST(symTab.readAttributeValue($3,"name") + "\n"); // for Niels
+      symTab.traceST(symTab.readAttributeValue($4,"name") + "\n"); // for Niels
     }
 ;
 
@@ -1148,6 +1166,7 @@ tInvoke:
         tFaultHandlers fh = userDefinedFaultHandler($9, $10);
         fh->hasCatchAll = hasCatchAll;
         tEventHandlers eh = implicitEventHandler();
+	eh->id = mkinteger(symTab.insert(K_EVENTHANDLERS));      
         tScope scope = Scope($7, NiltVariable_list(), fh, $11, eh, StopInScope(), ai);
 
         scope->id = $7->parentId = currentScopeId; 

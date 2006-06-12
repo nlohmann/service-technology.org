@@ -15,7 +15,7 @@ vertex::vertex(int numberEvents) :
 			   color(BLACK),
 			   successorNodes(NULL),
 			   states(NULL),
-			   predecessorNodes(NULL),
+		//	   predecessorNodes(NULL),
 			   numberOfVertex(0) {
 
 	eventsUsed = new int [numberEvents];
@@ -32,7 +32,7 @@ vertex::vertex() :
                color(BLACK),
                successorNodes(NULL),
                states(NULL),
-               predecessorNodes(NULL),
+       //        predecessorNodes(NULL),
                numberOfVertex(0) {
                	
 	eventsToBeSeen = 0;
@@ -49,9 +49,9 @@ vertex::~vertex () {
 	if (states != NULL) {
 		delete states;
 	}
-	if (predecessorNodes != NULL) {
-		delete predecessorNodes;
-	}
+//	if (predecessorNodes != NULL) {
+//		delete predecessorNodes;
+//	}
 	if (eventsUsed != NULL) {
 		delete[] eventsUsed;
 	}
@@ -117,9 +117,9 @@ successorNodeList * vertex::getSuccessorNodes() {
 //! \fn successorNodeList * vertex::getPredecessorNodes()
 //! \return pointer to the predecessor node list
 //! \brief returns a pointer to the predecessor node list
-successorNodeList * vertex::getPredecessorNodes() {
-	return predecessorNodes;
-}
+//successorNodeList * vertex::getPredecessorNodes() {
+//	return predecessorNodes;
+//}
 
 //! \fn void vertex::resetIteratingSuccNodes()
 //! \brief resets the iteration process of the successor node list
@@ -133,12 +133,12 @@ void vertex::resetIteratingSuccNodes() {
 //! \param edge pointer to the edge which is to point to the predecessor node
 //! \brief adds the node v to the list of predecessor nodes of this node using the edge
 //! given by the parameters
-void vertex::addPredecessorNode(graphEdge * edge) {
-	if (predecessorNodes == NULL) {
-		predecessorNodes = new successorNodeList();	
-	}	
-	predecessorNodes->addNextNode(edge);
-}
+//void vertex::addPredecessorNode(graphEdge * edge) {
+//	if (predecessorNodes == NULL) {
+//		predecessorNodes = new successorNodeList();	
+//	}	
+//	predecessorNodes->addNextNode(edge);
+//}
 
 //! \fn void vertex::setColor(vertexColor c)
 //! \param c color of vertex

@@ -24,10 +24,8 @@ class successorNodeList {
 
 private:    
     graphEdge * firstElement;		//!< pointer to the first element of the list
-    graphEdge * lastElement;		//!< pointer to the last element of the list
     graphEdge * nextElement;		//!< pointer to the next element in the list while iterating through the list
     
-    int count;			/*!< number of elements in list */
     bool end;			/*!< we have reached the end of the iterating process, or not */
     
 public:
@@ -41,7 +39,6 @@ public:
     int elementCount();
     
     graphEdge * getFirstElement();
-    graphEdge * getLastElement();
     graphEdge * findElement(vertex * node);
     
     void resetIterating();

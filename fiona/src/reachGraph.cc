@@ -28,7 +28,8 @@ reachGraph::reachGraph(oWFN * _PN) :
 	numberOfEdges(0),
 	actualDepth(0),
 	numberBlueNodes(0),
-	numberBlueEdges(0) {
+	numberBlueEdges(0),
+	numberOfStatesAllNodes(0) {
     
     PN = _PN;
 
@@ -83,6 +84,8 @@ void reachGraph::calculateRootNode() {
     root = v;
     numberOfVertices++;
     currentVertex = root;
+
+   	numberOfStatesAllNodes += root->getStateList()->elementCount();
 
     trace(TRACE_5, "void reachGraph::calculateRootNode(): end\n");
 }
@@ -151,8 +154,8 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
                 }
             }
 
-            graphEdge * edgePred = new graphEdge(currentVertex, edgeLabel, type);
-            toAdd->addPredecessorNode(edgePred);
+//            graphEdge * edgePred = new graphEdge(currentVertex, edgeLabel, type);
+//            toAdd->addPredecessorNode(edgePred);
 
             for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
                 toAdd->eventsUsed[i] = currentVertex->eventsUsed[i];
@@ -179,6 +182,8 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
 
             setOfVertices.insert(toAdd);
 
+           	numberOfStatesAllNodes += toAdd->getStateList()->elementCount();
+
             return 1;
         } else {
             trace(TRACE_1, "\t computed successor node already known: " + intToString(found->getNumber()) + "\n");
@@ -194,8 +199,8 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
                 }
             }
 
-            graphEdge * edgePred = new graphEdge(currentVertex, edgeLabel, type);
-            found->addPredecessorNode(edgePred);
+//            graphEdge * edgePred = new graphEdge(currentVertex, edgeLabel, type);
+//            found->addPredecessorNode(edgePred);
             numberOfEdges++;
 
 			if (type == receiving) {
@@ -223,6 +228,7 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
 
 // for IG
 int reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) {
+	trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : start\n");
 
     if (numberOfVertices == 0) {                // graph contains no nodes at all
         root = toAdd;                           // the given node becomes the root node
@@ -261,20 +267,28 @@ int reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType ty
 
             reachGraphStateSet::iterator iter;                      // iterator over the stateList's elements
 
-            for (iter = currentVertex->getStateList()->setOfReachGraphStates.begin(); iter != currentVertex->getStateList()->setOfReachGraphStates.end(); iter++) {
+            for (iter = currentVertex->getStateList()->setOfReachGraphStates.begin(); 
+            			iter != currentVertex->getStateList()->setOfReachGraphStates.end(); 
+            			iter++) {
+            				
                 if ((*iter)->state->type == DEADLOCK || (*iter)->state->type == FINALSTATE) {
                     (*iter)->setEdge(edgeSucc);
                 }
             }
+//            graphEdge * edgePred = new graphEdge(currentVertex, label, type);
+//            toAdd->addPredecessorNode(edgePred);
 
-            graphEdge * edgePred = new graphEdge(currentVertex, label, type);
-            toAdd->addPredecessorNode(edgePred);
+cout << "added pred" << endl;
 
             currentVertex = toAdd;
             numberOfEdges++;
 
             setOfVertices.insert(toAdd);
 
+           	numberOfStatesAllNodes += toAdd->getStateList()->elementCount();
+
+			trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : end\n");
+           	
             return 1;
         } else {
             trace(TRACE_1, "\t successor node already known: " + intToString(found->getNumber()) + "\n");
@@ -290,11 +304,14 @@ int reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType ty
                 }
             }
 
-            graphEdge * edgePred = new graphEdge(currentVertex, label, type);
-            found->addPredecessorNode(edgePred);
+//            graphEdge * edgePred = new graphEdge(currentVertex, label, type);
+//            found->addPredecessorNode(edgePred);
             numberOfEdges++;
 
             delete toAdd;
+
+			trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : end\n");
+
             return 0;
         }
     }
@@ -333,6 +350,7 @@ stateList * reachGraph::calculateSuccStatesInput(unsigned int input, vertex * no
 //! \param node the node for which the successor states are to be calculated
 //! \brief calculates the set of successor states in case of an input message
 stateList * reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node) {
+	trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node) : start\n");
 
 	stateList * newStateList = new stateList();		// the new list of states for the next node
 
@@ -347,6 +365,8 @@ stateList * reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex *
             PN->calculateReachableStates(newStateList, (*iter)->isMinimal());		// calc the reachable states from that marking
         }
     }
+	trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node) : end\n");
+
     return newStateList;							// return the new state list
 }
 
@@ -355,6 +375,7 @@ stateList * reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex *
 //! \param node the node for which the successor states are to be calculated
 //! \brief calculates the set of successor states in case of an output message
 stateList * reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node) {
+	trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node) : start\n");
 
     stateList * newStateList = new stateList();     // the new list of states for the next node
 
@@ -372,6 +393,7 @@ stateList * reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * 
             }
         }
     }
+	trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node) : end\n");
     return newStateList;                            // return the new state list
 }
 
@@ -380,6 +402,7 @@ stateList * reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * 
 //! \param node the node for which the successor states are to be calculated
 //! \brief calculates the set of successor states in case of an output message
 stateList * reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node) {
+	trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node) : start\n");
 
     stateList * newStateList = new stateList();     // the new list of states for the next node
 
@@ -397,6 +420,7 @@ stateList * reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex
             }
         }
 	}
+	trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node) : end\n");
 
     return newStateList;                            // return the new state list
 }
@@ -415,7 +439,7 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
     if (parameters[P_SHOW_ALL_NODES]
             || (parameters[P_SHOW_NO_RED_NODES] && (v->getColor() != RED))
             || (parameters[P_SHOW_BLUE_NODES_ONLY] && (v->getColor() == BLUE))
-            || (v->getPredecessorNodes() == NULL)) {
+            || (v == root)) {
 	
 	    if (parameters[P_SHOW_EMPTY_NODE]
 	        || v->getStateList()->setOfReachGraphStates.size() != 0) {
@@ -565,6 +589,8 @@ void reachGraph::printDotFile() {
         dotFile.close();
         trace(TRACE_0, "    number of blue nodes: " + intToString(numberBlueNodes) + "\n");
         trace(TRACE_0, "    number of blue edges: " + intToString(numberBlueEdges) + "\n");
+        trace(TRACE_0, "    number of states stored in nodes: " + intToString(numberOfStatesAllNodes) + "\n");
+        
 
         if (numberOfVertices < 900) {
             trace(TRACE_0, "creating the dot file of the graph...\n");

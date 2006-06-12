@@ -186,7 +186,7 @@ int main(int argc, char ** argv) {
 		trace(TRACE_0, "OG: number of nodes: " + intToString(graph->getNumberOfVertices()) + "\n");
 		trace(TRACE_0, "    number of edges: " + intToString(graph->getNumberOfEdges()) + "\n");
 
-		graph->printDotFile();		
+	//	graph->printDotFile();		
 
 	} else {
 		// interaction graph is built

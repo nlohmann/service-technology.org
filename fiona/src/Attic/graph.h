@@ -32,12 +32,10 @@ public:
   State ** succ; 					// successor states in graph
   State * parent; 					// state responsible for first generation
   stateType type;					// type of state (Deadlock, Final, Transient)
-  
-  unsigned int index;				// index in state stack
-  unsigned int dfs,min; 			// TARJAN's values
+
 };
 
-inline State::State() : type(TRANS), current(0), CardFireList(0), placeHashValue(0), index(0)
+inline State::State() : type(TRANS), current(0), CardFireList(0), placeHashValue(0)
 {
 	card++;
 }

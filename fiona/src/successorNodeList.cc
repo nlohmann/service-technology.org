@@ -3,12 +3,16 @@
 #include "vertex.h"
 #include "enums.h"
 #include <string>
+#include <iostream>
 
 using namespace std;
 
 //! \fn successorNodeList::successorNodeList()
 //! \brief constructor 
-successorNodeList::successorNodeList() : firstElement(NULL), lastElement(NULL), nextElement(NULL), count(0){
+successorNodeList::successorNodeList() : 
+	firstElement(NULL), 
+	nextElement(NULL) 
+{
 	end = false;		
 }
 
@@ -38,17 +42,23 @@ bool successorNodeList::addNextNode(graphEdge * transition){
 /* TODO: return true if everythings okay, false otherwise */
 	
 	//graphEdge * transition = new graphEdge(node, label, type);
-
-	if (lastElement != NULL) {
-		lastElement->setNextElement(transition);
-	} else {
-		if (firstElement == NULL) {
-			firstElement = transition;
-			lastElement = transition;	
-		} 
+	if (firstElement == NULL) {
+		firstElement = transition;
+		return true;	
 	}
-	lastElement = transition;	
-	count++;
+
+	graphEdge * tmpEdge;
+	
+	tmpEdge = firstElement;
+	
+	while (tmpEdge) {
+		if (tmpEdge->getNextElement() != NULL) {
+			tmpEdge = tmpEdge->getNextElement();	
+		} else {
+			tmpEdge->setNextElement(transition);
+			return true;
+		}
+	}
 	
 	/* not good ;-) - to be changed */
 	return true;
@@ -58,6 +68,18 @@ bool successorNodeList::addNextNode(graphEdge * transition){
 //! \return the number of elements in the list
 //! \brief returns the number of elements in the list
 int successorNodeList::elementCount() {
+	int count = 0;
+	
+	graphEdge * tmpEdge = firstElement;
+	
+	while (tmpEdge) {
+		count++;
+		if (tmpEdge->getNextElement() != NULL) {
+			tmpEdge = tmpEdge->getNextElement();	
+		} 
+	}
+	
+	
 	return count;
 }
 
@@ -66,13 +88,6 @@ int successorNodeList::elementCount() {
 //! \brief returns the first element of the list
 graphEdge * successorNodeList::getFirstElement(){
 	return firstElement;
-}
-
-//! \fn graphEdge * successorNodeList::getLastElement()
-//! \return the last element of the list
-//! \brief returns the last element of the list
-graphEdge * successorNodeList::getLastElement(){
-	return lastElement;
 }
 
 //! \fn graphEdge * successorNodeList::findElement(vertex * node)

@@ -33,7 +33,7 @@ protected:
 											//!< including the edge between them
 	stateList * states;						//!< list of states of this node
 
-    successorNodeList * predecessorNodes;	//!< list of vertices that point to this vertex
+ //   successorNodeList * predecessorNodes;	//!< list of vertices that point to this vertex
 
     unsigned int numberOfVertex;					//!< number of this vertex in the graph
     
@@ -52,14 +52,14 @@ public:
     void addSuccessorNode(graphEdge *);
     graphEdge * getNextEdge();
     successorNodeList * getSuccessorNodes();
-    successorNodeList * getPredecessorNodes();
+ //   successorNodeList * getPredecessorNodes();
     
     void resetIteratingSuccNodes();
     
     stateList * getStateList();
     
    // void addPredecessorNode(vertex *, char *, edgeType);  
-    void addPredecessorNode(graphEdge *);  
+//    void addPredecessorNode(graphEdge *);  
     void setColor(vertexColor c);
     vertexColor getColor();
     int getNumberOfDeadlocks();

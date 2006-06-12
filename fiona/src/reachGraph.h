@@ -78,6 +78,8 @@ protected:
    int actualDepth; //!< actual depth in graph
 
    vertexSet setOfVertices;
+   
+   unsigned int numberOfStatesAllNodes;
 
 public:
     reachGraph (oWFN *);

@@ -310,7 +310,9 @@ void oWFN::calculateReachableStates(stateList * listOfStates, bool minimal) {
  	 	CurrentState = binInsert(this);
   		CurrentState->firelist = firelist();
   		CurrentState->CardFireList = CardFireList;
-  		CurrentState->quasiFirelist = quasiFirelist();
+  		if (parameters[P_IG]) {
+	  		CurrentState->quasiFirelist = quasiFirelist();
+  		}
   		CurrentState->myMarking = copyCurrentMarking();
   		CurrentState->current = 0;
   		CurrentState->parent = (State *) 0;
@@ -361,14 +363,15 @@ void oWFN::calculateReachableStates(stateList * listOfStates, bool minimal) {
       			
 	      		NewState->firelist = firelist();
 	      		NewState->CardFireList = CardFireList;
-	      		NewState->quasiFirelist = quasiFirelist();
+	      		if (parameters[P_IG]) {
+		      		NewState->quasiFirelist = quasiFirelist();
+	      		}
 	      		NewState->current = 0;
 	      		NewState->myMarking = copyCurrentMarking();
 	      		NewState->parent = CurrentState;
 	      		NewState->succ =  new State * [CardFireList+1];
 	      		NewState->placeHashValue = placeHashValue;
 	      		NewState->type = typeOfState();
-	      		NewState->index = CurrentState->index + 1;
 	      		
 	      		CurrentState->succ[CurrentState -> current] = NewState;
 	      		CurrentState = NewState;
@@ -413,7 +416,9 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
  	 	CurrentState = binInsert(this);
   		CurrentState->firelist = firelist();
   		CurrentState->CardFireList = CardFireList;
-  		CurrentState->quasiFirelist = quasiFirelist();
+  		if (parameters[P_IG]) {
+	  		CurrentState->quasiFirelist = quasiFirelist();
+  		}
   		CurrentState->myMarking = copyCurrentMarking();
   		CurrentState->current = 0;
   		CurrentState->parent = (State *) 0;
@@ -473,14 +478,15 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
       			NewState = binInsert(this);
       			NewState->firelist = firelist();
 	      		NewState->CardFireList = CardFireList;
-	      		NewState->quasiFirelist = quasiFirelist();
+	      		if (parameters[P_IG]) {
+		      		NewState->quasiFirelist = quasiFirelist();
+	      		}
 	      		NewState->current = 0;
 	      		NewState->myMarking = copyCurrentMarking();
 	      		NewState->parent = CurrentState;
 	      		NewState->succ =  new State * [CardFireList+1];
 	      		NewState->placeHashValue = placeHashValue;
 	      		NewState->type = typeOfState();
-	      		NewState->index = CurrentState->index + 1;
 	      		
 	      		CurrentState->succ[CurrentState -> current] = NewState;
 	      		CurrentState = NewState;

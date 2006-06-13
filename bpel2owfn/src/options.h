@@ -50,7 +50,7 @@ typedef enum
   P_CYCLICEH,		///< use the original <eventHandlers> pattern
   P_NOFHFAULTS,		///< activities inside the FH throw no faults
   P_NOVARIABLES,	///< removes all variables from the model
-  P_NANO,		///< creates the smalles possible net (like Axel's nets)
+  P_COMMUNICATIONONLY,	///< creates the smallest possible net
   P_NEWLINKS		///< enables the new link concept
 } possibleParameters;
 

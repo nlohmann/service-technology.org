@@ -28,18 +28,18 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/09 13:39:26 $
+ *          - last changed: \$Date: 2006/06/13 13:20:01 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.73 $
+ * \version \$Revision: 1.74 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -54,7 +54,6 @@
 #include "main.h"
 #include "options.h"
 #include "ast-printers.h"
-#include "tarjan.h"
 
 /// additional FILE pointer for second input file
 FILE * yyin2 = yyin;
@@ -128,7 +127,7 @@ void petrinet_unparse()
       {
         trace(TRACE_INFORMATION, "-> Unparsing AST to Petri net ...\n");
 
-	if (parameters[P_NANO] == false)
+	if (parameters[P_COMMUNICATIONONLY] == false)
 	  TheProcess->unparse(kc::pseudoPrinter, kc::petrinet);
 	else
 	  TheProcess->unparse(kc::pseudoPrinter, kc::petrinetsmall);

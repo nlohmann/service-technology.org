@@ -379,9 +379,9 @@ void parse_command_line(int argc, char* argv[])
 	      {
 	        parameters[P_FINALLOOP] = true;
 	      }
-	      else if ( parameter == "nano" )
+	      else if ( parameter == "communicationonly" )
 	      {
-	        parameters[P_NANO] = true;
+	        parameters[P_COMMUNICATIONONLY] = true;
 	      }
 	      else if ( parameter == "newlinks" )
 	      {

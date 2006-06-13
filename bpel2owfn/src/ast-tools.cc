@@ -32,13 +32,13 @@
  *
  * \date
  *          - created: 2006/02/08
- *          - last changed: \$Date: 2006/06/07 08:17:48 $
+ *          - last changed: \$Date: 2006/06/13 13:20:01 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  */
 
 
@@ -119,7 +119,7 @@ Transition *throwFault(Place *p1, Place *p2,
     kc::integer negativeControlFlow, bool preventFurtherFaults)
 {
   // no fault transitions in case of "nano" parameter
-  if (parameters[P_NANO])
+  if (parameters[P_COMMUNICATIONONLY])
     return NULL;
   
   switch (negativeControlFlow->value)
@@ -216,7 +216,7 @@ Transition *throwFault(Place *p1, Place *p2,
 Transition *stop(Place *p, string p_name, string prefix)
 {
   // no stop transitions in case of "nano" parameter
-  if (parameters[P_NANO])
+  if (parameters[P_COMMUNICATIONONLY])
     return NULL;
   
   Transition *stopTransition = TheNet->newTransition(prefix + "stoppedAt." + p_name);

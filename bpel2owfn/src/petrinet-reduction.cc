@@ -36,13 +36,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/06/08 15:39:43 $
+ *          - last changed: \$Date: 2006/06/13 16:33:55 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  */
 
 
@@ -294,35 +294,46 @@ void PetriNet::collapseSequences()
 
 
 
+/*****
+ * NEW REDUCTION RULE
+ *****/
 
-/*!
- * \todo comment me
- * \todo support for communication transitions
- */
-void PetriNet::optimizeSetLinkTransitions()
+
+
+
+void PetriNet::collapseTransitionSequences()
 {
-  set<pair<Transition*, Transition*> > transitionPairs;
+  set<pair<string, string> > transitionPairs;
+  set<Place*> uselessPlaces;
 
-  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+  for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
   {
-    if ((*t)->nodeName() == "setLinks")
+    if ((postset(*p).size() == 1) && (preset(*p).size() == 1))
     {
-      Place *p = (Place*)(*(preset(*t).begin()));
-      Transition *t2 = (Transition*)(*(preset(p).begin()));
+      Transition *t1 = (Transition*)(*(preset(*p).begin()));
+      Transition *t2 = (Transition*)(*(postset(*p).begin()));
 
-      pair<Transition*, Transition*> temp;
-      temp.first = t2;
-      temp.second = *t;
+      if (preset(t2).size() > 1)
+	continue;
+
+      pair<string, string> temp;
+      temp.first = *(t1->history.begin());
+      temp.second = *(t2->history.begin());
+
       transitionPairs.insert(temp);
-
-      removePlace(p);
+      uselessPlaces.insert(*p);
     }
   }
 
-  for (set<pair<Transition*, Transition*> >::iterator it = transitionPairs.begin();
+
+  for (set<pair<string, string> >::iterator it = transitionPairs.begin();
       it != transitionPairs.end(); it++)
   {
-    mergeTransitions( (*it).first, (*it).second );
+    Transition *t1 = findTransition((*it).first);
+    Transition *t2 = findTransition((*it).second);
+
+    if (t1 != NULL && t2 != NULL)
+      mergeTransitions(t1, t2);
   }
 }
 
@@ -358,15 +369,15 @@ void PetriNet::simplify()
     removeDeadNodes();
     mergeTwinTransitions();
     collapseSequences();
-    
+
+//  if (parameters[P_NEWLINKS])
+//    collapseTransitionSequences();
+
     trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification pass " + intToString(passes++) + ": " + information() + "\n");
 
     done = (old == information());
     old = information();
   }
-
-//  if (parameters[P_NEWLINKS])
-//    optimizeSetLinkTransitions();
 
   trace(TRACE_INFORMATION, "Simplifying complete.\n");
   trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification: " + information() + "\n");

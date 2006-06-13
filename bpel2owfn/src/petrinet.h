@@ -36,17 +36,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/13 15:16:26 $
+ *          - last changed: \$Date: 2006/06/13 16:33:55 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.75 $
+ * \version \$Revision: 1.76 $
  */
 
 
@@ -404,8 +404,10 @@ class PetriNet
     /// merge twin transitions
     void mergeTwinTransitions();
 
-    /// merge transitions setting links (new link model)
-    void optimizeSetLinkTransitions();
+
+    void collapseTransitionSequences();
+
+
 
     /// collapse simple sequences
     void collapseSequences();

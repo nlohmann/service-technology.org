@@ -27,17 +27,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/06/13 15:16:26 $
+ *          - last changed: \$Date: 2006/06/13 16:33:55 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.120 $
+ * \version \$Revision: 1.121 $
  */
 
 
@@ -480,8 +480,6 @@ void PetriNet::removeArc(Arc * f)
  *
  * \param t1 first transition
  * \param t2 second transition
- *
- * \todo support for communication transitions
  */
 void PetriNet::mergeTransitions(Transition * t1, Transition * t2)
 {
@@ -490,7 +488,18 @@ void PetriNet::mergeTransitions(Transition * t1, Transition * t2)
 
   trace(TRACE_VERY_DEBUG, "[PN]\tMerging transitions " + intToString(t1->id) + " and " + intToString(t2->id) + "...\n");
 
+
+//  if (t1->type != INTERNAL && t2->type != INTERNAL)
+//    throw Exception(MERGING_ERROR, "Cannot merge communication transition!\n", pos(__FILE__, __LINE__, __FUNCTION__));
+  
+
   Node *t12 = newTransition();
+  if (t1->type != INTERNAL)
+    t12->type = t1->type;
+
+  if (t2->type != INTERNAL)
+    t12->type = t2->type;
+
 
   for (vector<string>::iterator role = t1->history.begin(); role != t1->history.end(); role++)
   {
@@ -515,6 +524,19 @@ void PetriNet::mergeTransitions(Transition * t1, Transition * t2)
 
   removeTransition(t1);
   removeTransition(t2);
+
+  
+  // check if the merge has created loop-places
+  set<Place *> uselessPlaces;
+  for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
+  {
+    if ((preset(*p).size() == 1) && (postset(*p).size() == 1) && (preset(*p) == postset(*p)))
+      uselessPlaces.insert(*p);
+  }
+  for (set<Place*>::iterator p = uselessPlaces.begin(); p != uselessPlaces.end(); p++)
+    removePlace(*p);
+
+
 
   trace(TRACE_VERY_DEBUG, "[PN]\tMerging done.\n");
 }

@@ -27,17 +27,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/06/13 16:33:55 $
+ *          - last changed: \$Date: 2006/06/13 16:37:01 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.121 $
+ * \version \$Revision: 1.122 $
  */
 
 
@@ -842,7 +842,9 @@ void PetriNet::connectNet(PetriNet * net)
     if (oPlace != P_out.end())
     {
       (*place)->type = INTERNAL;
+      (*place)->history[0] = (*place)->nodeName();
       (*oPlace)->type = INTERNAL;
+      (*oPlace)->history[0] = (*oPlace)->nodeName();
       mergePlaces(*place,*oPlace);
       P_out.erase(*oPlace);
     }

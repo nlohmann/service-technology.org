@@ -28,18 +28,18 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/13 13:20:01 $
+ *          - last changed: \$Date: 2006/06/13 15:16:25 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.74 $
+ * \version \$Revision: 1.75 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -219,7 +219,14 @@ int main( int argc, char *argv[])
       {
         if (options[O_SECONDINPUT])
         {
+	  TheNet2->addPrefix("A.");
+	  TheNet->addPrefix("B.");
+	  
+	  TheNet2->connectNet(TheNet);
+
+	  TheNet = TheNet2;
 	  // combine the two nets
+
 	
 	}
 
@@ -237,8 +244,21 @@ int main( int argc, char *argv[])
           TheNet->simplify();
         }    
 
-	// tarjan(TheNet->findPlace("1.internal.initial"));
-	
+        // create oWFN output ?
+        if ( formats[F_OWFN] )
+        {
+	  if (output_filename != "")
+	  {
+ 	    output = openOutput(output_filename + "." + suffixes[F_OWFN]);
+	  }
+ 	  trace(TRACE_INFORMATION, "-> Printing Petri net for oWFN ...\n");
+          TheNet->owfnOut();
+	  if (output_filename != "")
+	  {
+	    closeOutput(output);
+	    output = NULL;
+	  }
+        }
         // create LoLA output ?
         if ( formats[F_LOLA] )
         {
@@ -293,21 +313,6 @@ int main( int argc, char *argv[])
 	  }
  	  trace(TRACE_INFORMATION, "-> Printing Petri net for APNN ...\n");
           TheNet->apnnOut();
-	  if (output_filename != "")
-	  {
-	    closeOutput(output);
-	    output = NULL;
-	  }
-        }
-        // create oWFN output ?
-        if ( formats[F_OWFN] )
-        {
-	  if (output_filename != "")
-	  {
- 	    output = openOutput(output_filename + "." + suffixes[F_OWFN]);
-	  }
- 	  trace(TRACE_INFORMATION, "-> Printing Petri net for oWFN ...\n");
-          TheNet->owfnOut();
 	  if (output_filename != "")
 	  {
 	    closeOutput(output);

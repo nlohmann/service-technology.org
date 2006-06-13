@@ -36,17 +36,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/08 15:39:43 $
+ *          - last changed: \$Date: 2006/06/13 15:16:26 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.74 $
+ * \version \$Revision: 1.75 $
  */
 
 
@@ -365,6 +365,12 @@ class PetriNet
 
     /// Removes all variable places.
     void removeVariables();
+
+    /// Adds a prefix to the name of all nodes of the net
+    void addPrefix(string prefix);
+
+    /// Connects a second oWFN
+    void connectNet(PetriNet * net);
   
     /// Constructor to create an empty Petri net.
     PetriNet();

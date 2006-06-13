@@ -27,17 +27,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/06/08 15:39:43 $
+ *          - last changed: \$Date: 2006/06/13 15:16:26 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.119 $
+ * \version \$Revision: 1.120 $
  */
 
 
@@ -747,3 +747,89 @@ unsigned int PetriNet::id()
 {
   return nextId;
 }
+
+/*!
+ *  Adds a prefix to all nodes of the Petri net
+ *
+ *  \param prefix The prefix to add.
+ *
+ */
+void PetriNet::addPrefix(string prefix)
+{
+
+  for (set< Place * >::iterator place = P.begin(); place != P.end(); place ++)
+  {
+    for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
+    {
+      *name = prefix + *name;
+    }
+  }
+  for (set< Transition * >::iterator transition = T.begin(); transition != T.end(); transition ++)
+  {
+    for(vector< string >::iterator name = (*transition)->history.begin(); name != (*transition)->history.end(); name++)
+    {
+      *name = prefix + *name;
+    }
+  }
+}
+
+void PetriNet::connectNet(PetriNet * net)
+{
+
+  for (set< Place * >::iterator place = net->P.begin(); place != net->P.end(); place ++)
+  {
+    (*place)->id = getId();
+    P.insert(*place);
+  }
+  for (set< Transition * >::iterator transition = net->T.begin(); transition != net->T.end(); transition ++)
+  {
+    (*transition)->id = getId();
+    T.insert(*transition);
+  }
+  for (set< Arc * >::iterator arc = net->F.begin(); arc != net->F.end(); arc ++)
+  {
+    F.insert(*arc);
+  }
+  for (set< Place * >::iterator place = net->P_in.begin(); place != net->P_in.end(); place ++)
+  {
+    (*place)->id = getId();
+    P_in.insert(*place);
+  }
+  for (set< Place * >::iterator place = net->P_out.begin(); place != net->P_out.end(); place ++)
+  {
+    (*place)->id = getId();
+    P_out.insert(*place);
+  }
+  // merge input and output places
+  set< Place * > newP_in;
+  for (set< Place * >::iterator place = P_in.begin(); place != P_in.end(); place ++)
+  {
+    set< Place * >::iterator oPlace = P_out.begin();
+    bool finished = false;
+    while ( ! finished && oPlace != P_out.end())
+    {
+      if ((*oPlace)->nodeName() != (*place)->nodeName())
+      {
+	oPlace++;
+      }
+      else
+      {
+	finished = true;
+      }
+    }
+    if (oPlace != P_out.end())
+    {
+      (*place)->type = INTERNAL;
+      (*oPlace)->type = INTERNAL;
+      mergePlaces(*place,*oPlace);
+      P_out.erase(*oPlace);
+    }
+    else
+    {
+      newP_in.insert(*place);
+    }
+  }
+  P_in = newP_in;
+  
+}
+

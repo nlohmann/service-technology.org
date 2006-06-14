@@ -36,17 +36,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/14 11:52:11 $
+ *          - last changed: \$Date: 2006/06/14 12:17:50 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.79 $
+ * \version \$Revision: 1.80 $
  */
 
 
@@ -373,6 +373,9 @@ class PetriNet
 
     /// Connects a second oWFN
     void connectNet(PetriNet * net);
+
+    /// moves channel places to the list of internal places
+    void makeChannelsInternal();
   
     /// Constructor to create an empty Petri net.
     PetriNet();

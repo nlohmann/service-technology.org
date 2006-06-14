@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/13 15:16:25 $
+ *          - last changed: \$Date: 2006/06/14 12:17:50 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.75 $
+ * \version \$Revision: 1.76 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -266,12 +266,33 @@ int main( int argc, char *argv[])
 	  {
  	    output = openOutput(output_filename + "." + suffixes[F_LOLA]);
 	  }
+
+	  if (options[O_SECONDINPUT])
+	  {
+	    TheNet->makeChannelsInternal();
+	  }
  	  trace(TRACE_INFORMATION, "-> Printing Petri net for LoLA ...\n");
           TheNet->lolaOut();
 	  if (output_filename != "")
 	  {
 	    closeOutput(output);
 	    output = NULL;
+	  }
+
+	  if (options[O_SECONDINPUT])
+	  {
+	    if (output_filename != "")
+	    {
+	      output = openOutput(output_filename + ".task");
+	    }
+	    (*output) << "FORMULA ALLPATH ALWAYS EXPATH EVENTUALLY (" 
+		      << TheNet->findPlace("A.1.internal.final")->nodeShortName() << " > 0 AND "
+		      << TheNet->findPlace("B.1.internal.final")->nodeShortName() << " > 0)";
+	    if (output_filename != "")
+	    {
+	      closeOutput(output);
+	      output = NULL;
+	    }
 	  }
         }
         // create PNML output ?

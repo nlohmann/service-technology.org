@@ -39,17 +39,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/06/14 11:26:31 $
+ *          - last changed: \$Date: 2006/06/14 12:17:50 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
  */
 
 
@@ -303,20 +303,20 @@ string Place::dotOut()
   result += " " + intToString(id) + "\t[label=\"" + nodeShortName() + "\"";
 
 
-  if (firstMemberIs("in."))
+  if (firstMemberIs(".in."))
     result += " style=filled fillcolor=gold shape=ellipse";
-  else if (firstMemberIs("out."))
+  else if (firstMemberIs(".out."))
     result += " style=filled fillcolor=yellow shape=ellipse";
-  else if (firstMemberIs("link."))
+  else if (firstMemberIs(".link."))
     result += " style=filled fillcolor=cornflowerblue";
-  else if (firstMemberIs("!link."))
+  else if (firstMemberIs(".!link."))
     result += " style=filled fillcolor=deeppink";
-  else if (firstMemberIs("variable."))
+  else if (firstMemberIs(".variable."))
     result += " style=filled fillcolor=cyan";
-  else if (historyContains("1.internal.initial")
-	   || historyContains("1.internal.final"))
+  else if (firstMemberIs(".1.internal.initial")
+	   || firstMemberIs(".1.internal.final"))
     result += " style=filled fillcolor=green";
-  else if (historyContains("1.internal.clock"))
+  else if (firstMemberIs(".1.internal.clock"))
     result += " style=filled fillcolor=seagreen";
 
   result += "];\n";
@@ -707,7 +707,15 @@ void PetriNet::owfnOut()
 
   // final marking
   (*output) << "FINALMARKING" << endl;
-  (*output) << "  " << findPlace("1.internal.final")->nodeShortName() << ":\t1" << endl;
+  if (options[O_SECONDINPUT])
+  {
+    (*output) << "  " << findPlace("A.1.internal.final")->nodeShortName() << ":\t1," << endl;
+    (*output) << "  " << findPlace("B.1.internal.final")->nodeShortName() << ":\t1" << endl;
+  }
+  else
+  {
+    (*output) << "  " << findPlace("1.internal.final")->nodeShortName() << ":\t1" << endl;
+  }
   (*output) << ";" << endl << endl << endl;
 
 

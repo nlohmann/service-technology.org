@@ -27,17 +27,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/06/13 16:37:01 $
+ *          - last changed: \$Date: 2006/06/14 08:26:04 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.122 $
+ * \version \$Revision: 1.123 $
  */
 
 
@@ -406,11 +406,12 @@ void PetriNet::detachNode(Node * n)
  */
 void PetriNet::removePlace(Place * p)
 {
+  if (p == NULL)
+    return;
+
   trace(TRACE_VERY_DEBUG, "[PN]\tRemoving place " + intToString(p->id) + "...\n");
   
-  
   detachNode(p);
-
 
   // Remove the roles of the place p, i.e. set the mappings to the NULL
   // pointer.  
@@ -440,6 +441,9 @@ void PetriNet::removePlace(Place * p)
  */
 void PetriNet::removeTransition(Transition * t)
 {
+  if (t == NULL)
+    return;
+
   trace(TRACE_VERY_DEBUG, "[PN]\tRemoving transition " + intToString(t->id) + "...\n");
 
   detachNode(t);
@@ -456,6 +460,9 @@ void PetriNet::removeTransition(Transition * t)
  */
 void PetriNet::removeArc(Arc * f)
 {
+  if (f == NULL)
+    return;
+
   trace(TRACE_VERY_DEBUG, "[PN]\tRemoving arc (" + intToString(f->source->id) + "," + intToString(f->target->id) + ")...\n");
 
   F.erase(f);
@@ -525,19 +532,6 @@ void PetriNet::mergeTransitions(Transition * t1, Transition * t2)
   removeTransition(t1);
   removeTransition(t2);
 
-  
-  // check if the merge has created loop-places
-  set<Place *> uselessPlaces;
-  for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
-  {
-    if ((preset(*p).size() == 1) && (postset(*p).size() == 1) && (preset(*p) == postset(*p)))
-      uselessPlaces.insert(*p);
-  }
-  for (set<Place*>::iterator p = uselessPlaces.begin(); p != uselessPlaces.end(); p++)
-    removePlace(*p);
-
-
-
   trace(TRACE_VERY_DEBUG, "[PN]\tMerging done.\n");
 }
 
@@ -603,6 +597,7 @@ void PetriNet::mergePlaces(Place * p1, Place * p2)
 
   removePlace(p1);
   removePlace(p2);
+
   trace(TRACE_VERY_DEBUG, "[PN]\tMerging done.\n");
 }
 

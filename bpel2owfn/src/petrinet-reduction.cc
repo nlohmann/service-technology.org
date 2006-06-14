@@ -36,13 +36,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/06/13 16:33:55 $
+ *          - last changed: \$Date: 2006/06/14 08:26:04 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  */
 
 
@@ -70,15 +70,15 @@ void PetriNet::removeInterface()
 {
   trace(TRACE_DEBUG, "[PN]\tRemoving interface places.\n");
 
-  list<Place *> killList;
+  list<Place*> killList;
 
-  for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
+  for (set<Place*>::iterator p = P_in.begin(); p != P_in.end(); p++)
     killList.push_back(*p);
 
-  for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
+  for (set<Place*>::iterator p = P_out.begin(); p != P_out.end(); p++)
     killList.push_back(*p);
 
-  for (list<Place *>::iterator it = killList.begin(); it != killList.end(); it++)
+  for (list<Place*>::iterator it = killList.begin(); it != killList.end(); it++)
     removePlace(*it);
 
   hasNoInterface = true;
@@ -180,7 +180,7 @@ void PetriNet::mergeTwinTransitions()
 
   trace(TRACE_VERY_DEBUG, "[PN]\tSearching for transitions with same preset and postset...\n");
   // find transitions with same preset and postset
-  for (set<Transition *>::iterator t1 = T.begin(); t1 != T.end(); t1++)
+  for (set<Transition*>::iterator t1 = T.begin(); t1 != T.end(); t1++)
   {
     set<Node*> postSet = postset(*t1);
     set<Node*> preSet  = preset(*t1);
@@ -201,8 +201,8 @@ void PetriNet::mergeTwinTransitions()
   // merge the found transitions
   for (unsigned int i = 0; i < transitionPairs.size(); i++)
   {
-    Transition *t1 = findTransition(transitionPairs[i].first);
-    Transition *t2 = findTransition(transitionPairs[i].second);
+    Transition* t1 = findTransition(transitionPairs[i].first);
+    Transition* t2 = findTransition(transitionPairs[i].second);
 
     if ((t1 != NULL) && (t2 != NULL) && (t1 != t2))
       mergeTransitions(t1, t2);
@@ -220,7 +220,7 @@ void PetriNet::mergeTwinTransitions()
  * \param  p a place to check
  * \return true, if a communicating transition was found
  */
-bool PetriNet::communicationInPostSet(Place *p)
+bool PetriNet::communicationInPostSet(Place* p)
 {
   set<Node*> pp = postset(p);
   for (set<Node*>::iterator t = pp.begin();
@@ -239,101 +239,110 @@ bool PetriNet::communicationInPostSet(Place *p)
 
 
 /*!
- * Collapse simple sequences.
+ * \brief Fusion of series places (RA1):
  *
- * A simple sequence is a transition with
- *  - singleton preset
- *  - singleton postset
- *  - no communicating transition following
- *  - preset != postset
+ * If there exists a transition with singleton preset and postset
+ * (precondition 1) that are distinct (precondition 2) and where the place in
+ * the preset has no other outgoing arcs (precondition 3), then the places
+ * can be merged and the transition can be removed.
  */
-void PetriNet::collapseSequences()
+void PetriNet::fusionOfSeriesPlaces()
 {
-  trace(TRACE_VERY_DEBUG, "[PN]\tCollapsing simple sequences\n");
+  set<string> uselessTransitions;
+  set<pair<string, string> > placePairs;
 
-  // a pair to store places to be merged
-  list<string> sequenceTransitions;
-  list<pair<string, string> >placeMerge;
 
-  // find transitions with singelton preset and postset
-  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+  // iterate the transtions
+  for (set<Transition*>::iterator t = T.begin(); t != T.end(); t++)
   {
-    set<Node *> postSet = postset(*t);
-    set<Node *> preSet  = preset (*t);
-    Place * prePlace = (Place*) *(preSet.begin());
-    Place * postPlace = (Place*) *(postSet.begin());
-    if (
-	(preSet.size() == 1) &&
-	(postSet.size() == 1) &&
-//	!communicationInPostSet((Place*)*(postSet.begin())) &&
-	(prePlace != postPlace) &&
-	(postset(prePlace).size() == 1) 
-       )
+    set<Node*> postSet = postset(*t);
+    set<Node*> preSet  = preset (*t);
+    Place* prePlace = (Place*) *(preSet.begin());
+    Place* postPlace = (Place*) *(postSet.begin());
+
+    if ((preSet.size() == 1) &&	(postSet.size() == 1) && // precondition 1
+	(prePlace != postPlace) &&			 // precondition 2
+	(postset(prePlace).size() == 1) )		 // precondition 3
     {
       string id1 = *((*(preSet.begin()))->history.begin());
       string id2 = *((*(postSet.begin()))->history.begin());
-      placeMerge.push_back(pair < string, string >(id1, id2));
-      sequenceTransitions.push_back(*((*t)->history.begin()));
+      placePairs.insert(pair<string, string>(id1, id2));
+      uselessTransitions.insert(*((*t)->history.begin()));
     }
   }
 
-  // remove "sequence"-transtions
-  for (list< string >::iterator i = sequenceTransitions.begin(); i != sequenceTransitions.end(); i++)
+
+  // remove useless transtions
+  for (set<string>::iterator label = uselessTransitions.begin();
+      label != uselessTransitions.end(); label++)
   {
-    Transition *sequenceTransition = findTransition(*i);
-    if (sequenceTransition != NULL)
-      removeTransition(sequenceTransition);
+    Transition* uselessTransition = findTransition(*label);
+    if (uselessTransition != NULL)
+      removeTransition(uselessTransition);
   }  
 
-  // merge preset and postset
-  for (list< pair<string, string> >::iterator i = placeMerge.begin(); i != placeMerge.end(); i++)
-    mergePlaces(i->first, i->second);
 
+  // merge place pairs
+  for (set<pair<string, string> >::iterator placePair = placePairs.begin();
+      placePair != placePairs.end(); placePair++)
+  {
+    mergePlaces(placePair->first, placePair->second);
+  }
 }
 
 
 
 
-/*****
- * NEW REDUCTION RULE
- *****/
 
-
-
-
-void PetriNet::collapseTransitionSequences()
+/*!
+ * \brief Fusion of series transition (RA2):
+ *
+ * If there exists a place with singleton preset and postset (precondition 1)
+ * and if the transition in its postset has no other incoming arcs
+ * (precondition 2), then the preset and the postset can be merged and the
+ * place can be removed.
+ */
+void PetriNet::fusionOfSeriesTransitions()
 {
+  set<string> uselessPlaces;
   set<pair<string, string> > transitionPairs;
-  set<Place*> uselessPlaces;
 
+
+  // iterate the places
   for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
   {
-    if ((postset(*p).size() == 1) && (preset(*p).size() == 1))
+    if ((postset(*p).size() == 1) && (preset(*p).size() == 1)) // precondition 1
     {
-      Transition *t1 = (Transition*)(*(preset(*p).begin()));
-      Transition *t2 = (Transition*)(*(postset(*p).begin()));
+      Transition* t1 = (Transition*)(*(preset(*p).begin()));
+      Transition* t2 = (Transition*)(*(postset(*p).begin()));
 
-      if (preset(t2).size() > 1)
-	continue;
-
-      pair<string, string> temp;
-      temp.first = *(t1->history.begin());
-      temp.second = *(t2->history.begin());
-
-      transitionPairs.insert(temp);
-      uselessPlaces.insert(*p);
+      if (preset(t2).size() == 1) // precondition 2
+      {
+	string id1 = *(t1->history.begin());
+	string id2 = *(t2->history.begin());
+	transitionPairs.insert(pair<string, string>(id1, id2));
+	uselessPlaces.insert(*((*p)->history.begin()));
+      }
     }
   }
 
 
-  for (set<pair<string, string> >::iterator it = transitionPairs.begin();
-      it != transitionPairs.end(); it++)
+  // remove useless places
+  for (set<string>::iterator label = uselessPlaces.begin();
+      label != uselessPlaces.end(); label++)
   {
-    Transition *t1 = findTransition((*it).first);
-    Transition *t2 = findTransition((*it).second);
+    Place* uselessPlace = findPlace(*label);
+    removePlace(uselessPlace);
+  }
 
-    if (t1 != NULL && t2 != NULL)
-      mergeTransitions(t1, t2);
+
+  // merge transition pairs
+  for (set<pair<string, string> >::iterator transitionPair = transitionPairs.begin();
+      transitionPair != transitionPairs.end(); transitionPair++)
+  {
+    Transition* t1 = findTransition(transitionPair->first);
+    Transition* t2 = findTransition(transitionPair->second);
+    mergeTransitions(t1, t2);
   }
 }
 
@@ -343,7 +352,7 @@ void PetriNet::collapseTransitionSequences()
 
 
 /*!
- * Implements some simple structural reduction rules for Petri nets:
+ * Calls some simple structural reduction rules for Petri nets:
  *
  * - Structural dead nodes are removed.
  * - If two transitions t1 and t2 have the same preset and postset, one of them
@@ -368,10 +377,9 @@ void PetriNet::simplify()
   {
     removeDeadNodes();
     mergeTwinTransitions();
-    collapseSequences();
 
-//  if (parameters[P_NEWLINKS])
-//    collapseTransitionSequences();
+    fusionOfSeriesPlaces();
+    fusionOfSeriesTransitions();
 
     trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification pass " + intToString(passes++) + ": " + information() + "\n");
 

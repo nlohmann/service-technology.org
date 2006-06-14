@@ -40,13 +40,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/13 16:33:55 $
+ *          - last changed: \$Date: 2006/06/14 08:26:04 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.76 $
+ * \version \$Revision: 1.77 $
  */
 
 
@@ -405,12 +405,12 @@ class PetriNet
     void mergeTwinTransitions();
 
 
-    void collapseTransitionSequences();
+    /// fusion of series places (RA1)
+    void fusionOfSeriesPlaces();
 
+    /// fusion of series transitions (RA2)
+    void fusionOfSeriesTransitions();
 
-
-    /// collapse simple sequences
-    void collapseSequences();
 
     /// Statistical output.
     string information();

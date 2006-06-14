@@ -40,13 +40,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/14 08:26:04 $
+ *          - last changed: \$Date: 2006/06/14 11:26:31 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.77 $
+ * \version \$Revision: 1.78 $
  */
 
 
@@ -137,9 +137,6 @@ class Node
     /// the id of the node
     unsigned int id;
 
-    /// flag if Node is member of a SCC
-    bool inSCC;
-    
     /// the name of the type
     virtual string nodeTypeName();
 
@@ -158,6 +155,9 @@ class Node
     /// true if first role begins with role
     bool firstMemberIs(string role);
     
+    /// true if history contains role
+    bool historyContains(string role);
+
     /// type of node as defined in #communication_type
     communication_type type;
 
@@ -395,15 +395,15 @@ class PetriNet
     /// Removes all ingoing and outgoing arcs of a node.
     void detachNode(Node* n);
 
-    /// true if place p has a communicating transition in its postset
-    bool communicationInPostSet(Place* p);
-    
+
     /// remove dead nodes of the Petri net
     void removeDeadNodes();
 
-    /// merge twin transitions
-    void mergeTwinTransitions();
-
+    /// elimination of identical places (RB1)
+    void elminiationOfIdenticalPlaces();
+    
+    /// elimination of identical transitions (RB2)
+    void elminiationOfIdenticalTransitions();
 
     /// fusion of series places (RA1)
     void fusionOfSeriesPlaces();

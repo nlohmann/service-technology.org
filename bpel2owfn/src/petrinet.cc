@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/06/14 08:26:04 $
+ *          - last changed: \$Date: 2006/06/14 11:26:31 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.123 $
+ * \version \$Revision: 1.124 $
  */
 
 
@@ -95,6 +95,24 @@ bool Node::firstMemberIs(string role)
 
 
 
+/*!
+ * \param role a role of a node
+ * \return true, if the node's history contains the given role
+ */
+bool Node::historyContains(string role)
+{
+  for (int i = 0; i < history.size(); i++)
+  {
+    if (history[i] == role)
+      return true;
+  }
+
+  return false;
+}
+
+
+
+
 /*****************************************************************************/
 
 
@@ -124,7 +142,6 @@ Transition::Transition(unsigned int myid, string role)
   id = myid;
   nodeType = TRANSITION;
   type = INTERNAL;
-  inSCC = false;
 
   if (role != "")
     history.push_back(role);
@@ -152,7 +169,6 @@ Place::Place(unsigned int myid, string role, communication_type mytype)
   id = myid;
   nodeType = PLACE;
   marked = false;
-  inSCC = false;
 
   if (role != "")
     history.push_back(role);

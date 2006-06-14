@@ -213,13 +213,15 @@ void  operatingGuidelines::getActivatedOutputEvents(vertex * node) {
 bool operatingGuidelines::terminateBuildingGraph(vertex * node) {
 	trace(TRACE_5, "bool operatingGuidelines::terminateBuildingGraph(vertex * node): start\n");
 	
-	if (analyseNode(node, false) == TERMINATE) {
-		trace(TRACE_5, "node analysed\n");
-		trace(TRACE_5, "bool operatingGuidelines::terminateBuildingGraph(vertex * node): end\n");
-		return true;
-	}
-	
-	trace(TRACE_5, "node analysed\n");
+    analyseNode(node, false);
+
+//	if (analyseNode(node, false) == TERMINATE) {
+//		trace(TRACE_5, "node analysed\n");
+//		trace(TRACE_5, "bool operatingGuidelines::terminateBuildingGraph(vertex * node): end\n");
+//		return true;
+//	}
+//	
+//	trace(TRACE_5, "node analysed\n");
 	
 	// do not change termination | here, but set commDepth in main.cc
 	//                           v       to desired value

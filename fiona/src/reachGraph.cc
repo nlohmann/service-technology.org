@@ -24,13 +24,13 @@ using namespace std;
 //! \param _PN
 //! \brief constructor
 reachGraph::reachGraph(oWFN * _PN) :
-	numberOfVertices(0),
-	numberOfEdges(0),
-	actualDepth(0),
-	numberBlueNodes(0),
-	numberBlueEdges(0),
-	numberOfStatesAllNodes(0) {
-    
+    numberOfVertices(0),
+    numberOfEdges(0),
+    actualDepth(0),
+    numberBlueNodes(0),
+    numberBlueEdges(0),
+    numberOfStatesAllNodes(0) {
+
     PN = _PN;
 
     // get the root node
@@ -85,7 +85,7 @@ void reachGraph::calculateRootNode() {
     numberOfVertices++;
     currentVertex = root;
 
-   	numberOfStatesAllNodes += root->getStateList()->elementCount();
+    numberOfStatesAllNodes += root->getStateList()->elementCount();
 
     trace(TRACE_5, "void reachGraph::calculateRootNode(): end\n");
 }
@@ -121,7 +121,7 @@ vertex * reachGraph::findVertexInSet(vertex * toAdd) {
 // for OG
 int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
 
-	int offset = 0;
+    int offset = 0;
 
     if (numberOfVertices == 0) {                // graph contains no nodes at all
         root = toAdd;                           // the given node becomes the root node
@@ -146,7 +146,7 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
             graphEdge * edgeSucc = new graphEdge(toAdd, edgeLabel, type);
             currentVertex->addSuccessorNode(edgeSucc);
 
-            reachGraphStateSet::iterator iter;		// iterator over the stateList's elements
+            reachGraphStateSet::iterator iter;      // iterator over the stateList's elements
 
             for (iter = currentVertex->getStateList()->setOfReachGraphStates.begin(); iter != currentVertex->getStateList()->setOfReachGraphStates.end(); iter++) {
                 if ((*iter)->state->type == DEADLOCK || (*iter)->state->type == FINALSTATE) {
@@ -167,7 +167,7 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
 
             toAdd->eventsUsed[offset + label]++;
 
-			// \begin{hack} for online shop example
+            // \begin{hack} for online shop example
 /*            if (type == sending) {
                 if (strcmp(PN->Places[PN->inputPlacesArray[label]]->name, "in.client.onlineshop.abort") == 0) {
                     for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
@@ -175,14 +175,14 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
                     }
                 }
             }
-*/			// \end{hack}
+*/          // \end{hack}
 
             currentVertex = toAdd;
             numberOfEdges++;
 
             setOfVertices.insert(toAdd);
 
-           	numberOfStatesAllNodes += toAdd->getStateList()->elementCount();
+            numberOfStatesAllNodes += toAdd->getStateList()->elementCount();
 
             return 1;
         } else {
@@ -203,13 +203,13 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
 //            found->addPredecessorNode(edgePred);
             numberOfEdges++;
 
-			if (type == receiving) {
+            if (type == receiving) {
                 offset = PN->placeInputCnt;
             }
 
             found->eventsUsed[offset + label]++;
 
-			// \begin{hack} for online shop example
+            // \begin{hack} for online shop example
 /*            if (type == sending) {
                 if (strcmp(PN->Places[PN->inputPlacesArray[label]]->name, "in.client.onlineshop.abort") == 0) {
                     for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
@@ -228,7 +228,7 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
 
 // for IG
 int reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) {
-	trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : start\n");
+    trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : start\n");
 
     if (numberOfVertices == 0) {                // graph contains no nodes at all
         root = toAdd;                           // the given node becomes the root node
@@ -267,10 +267,10 @@ int reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType ty
 
             reachGraphStateSet::iterator iter;                      // iterator over the stateList's elements
 
-            for (iter = currentVertex->getStateList()->setOfReachGraphStates.begin(); 
-            			iter != currentVertex->getStateList()->setOfReachGraphStates.end(); 
-            			iter++) {
-            				
+            for (iter = currentVertex->getStateList()->setOfReachGraphStates.begin();
+                        iter != currentVertex->getStateList()->setOfReachGraphStates.end();
+                        iter++) {
+
                 if ((*iter)->state->type == DEADLOCK || (*iter)->state->type == FINALSTATE) {
                     (*iter)->setEdge(edgeSucc);
                 }
@@ -285,10 +285,10 @@ cout << "added pred" << endl;
 
             setOfVertices.insert(toAdd);
 
-           	numberOfStatesAllNodes += toAdd->getStateList()->elementCount();
+            numberOfStatesAllNodes += toAdd->getStateList()->elementCount();
 
-			trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : end\n");
-           	
+            trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : end\n");
+
             return 1;
         } else {
             trace(TRACE_1, "\t successor node already known: " + intToString(found->getNumber()) + "\n");
@@ -296,7 +296,7 @@ cout << "added pred" << endl;
             graphEdge * edgeSucc = new graphEdge(found, label, type);
             currentVertex->addSuccessorNode(edgeSucc);
 
-            reachGraphStateSet::iterator iter;		// iterator over the stateList's elements
+            reachGraphStateSet::iterator iter;      // iterator over the stateList's elements
 
             for (iter = currentVertex->getStateList()->setOfReachGraphStates.begin(); iter != currentVertex->getStateList()->setOfReachGraphStates.end(); iter++) {
                 if ((*iter)->state->type == DEADLOCK || (*iter)->state->type == FINALSTATE) {
@@ -310,7 +310,7 @@ cout << "added pred" << endl;
 
             delete toAdd;
 
-			trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : end\n");
+            trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : end\n");
 
             return 0;
         }
@@ -324,24 +324,24 @@ cout << "added pred" << endl;
 //! \brief calculates the set of successor states in case of an input message
 stateList * reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) {
 
-	trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : start\n");
-	stateList * newStateList = new stateList();		// the new list of states for the next node
+    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : start\n");
+    stateList * newStateList = new stateList();     // the new list of states for the next node
 
-	reachGraphStateSet::iterator iter;				// iterator over the stateList's elements
+    reachGraphStateSet::iterator iter;              // iterator over the stateList's elements
 
-	for (iter = node->getStateList()->setOfReachGraphStates.begin();
-		 iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
+    for (iter = node->getStateList()->setOfReachGraphStates.begin();
+         iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
 
-		PN->setCurrentMarkingFromState((*iter));	// set the net to the marking of the state being considered
-		PN->addInputMessage(input);					// add the input message to the current marking
+        PN->setCurrentMarkingFromState((*iter));    // set the net to the marking of the state being considered
+        PN->addInputMessage(input);                 // add the input message to the current marking
         if (parameters[P_CALC_ALL_STATES]) {
-            PN->calculateReachableStatesFull(newStateList, (*iter)->isMinimal());	// calc the reachable states from that marking
+            PN->calculateReachableStatesFull(newStateList, (*iter)->isMinimal());   // calc the reachable states from that marking
         } else {
-            PN->calculateReachableStates(newStateList, (*iter)->isMinimal());		// calc the reachable states from that marking
+            PN->calculateReachableStates(newStateList, (*iter)->isMinimal());       // calc the reachable states from that marking
         }
     }
-	trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
-	return newStateList;							// return the new state list
+    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
+    return newStateList;                            // return the new state list
 }
 
 
@@ -350,24 +350,24 @@ stateList * reachGraph::calculateSuccStatesInput(unsigned int input, vertex * no
 //! \param node the node for which the successor states are to be calculated
 //! \brief calculates the set of successor states in case of an input message
 stateList * reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node) {
-	trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node) : start\n");
+    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node) : start\n");
 
-	stateList * newStateList = new stateList();		// the new list of states for the next node
+    stateList * newStateList = new stateList();     // the new list of states for the next node
 
-    reachGraphStateSet::iterator iter;				// iterator over the stateList's elements
+    reachGraphStateSet::iterator iter;              // iterator over the stateList's elements
 
     for (iter = node->getStateList()->setOfReachGraphStates.begin(); iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
-		PN->setCurrentMarkingFromState((*iter));	// set the net to the marking of the state being considered
-        PN->addInputMessage(input);					// add the input message to the current marking
+        PN->setCurrentMarkingFromState((*iter));    // set the net to the marking of the state being considered
+        PN->addInputMessage(input);                 // add the input message to the current marking
         if (parameters[P_CALC_ALL_STATES]) {
-            PN->calculateReachableStatesFull(newStateList, (*iter)->isMinimal());	// calc the reachable states from that marking
+            PN->calculateReachableStatesFull(newStateList, (*iter)->isMinimal());   // calc the reachable states from that marking
         } else {
-            PN->calculateReachableStates(newStateList, (*iter)->isMinimal());		// calc the reachable states from that marking
+            PN->calculateReachableStates(newStateList, (*iter)->isMinimal());       // calc the reachable states from that marking
         }
     }
-	trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node) : end\n");
+    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node) : end\n");
 
-    return newStateList;							// return the new state list
+    return newStateList;                            // return the new state list
 }
 
 //! \fn stateList * reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node)
@@ -375,7 +375,7 @@ stateList * reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex *
 //! \param node the node for which the successor states are to be calculated
 //! \brief calculates the set of successor states in case of an output message
 stateList * reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node) {
-	trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node) : start\n");
+    trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node) : start\n");
 
     stateList * newStateList = new stateList();     // the new list of states for the next node
 
@@ -393,7 +393,7 @@ stateList * reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * 
             }
         }
     }
-	trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node) : end\n");
+    trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node) : end\n");
     return newStateList;                            // return the new state list
 }
 
@@ -402,7 +402,7 @@ stateList * reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * 
 //! \param node the node for which the successor states are to be calculated
 //! \brief calculates the set of successor states in case of an output message
 stateList * reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node) {
-	trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node) : start\n");
+    trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node) : start\n");
 
     stateList * newStateList = new stateList();     // the new list of states for the next node
 
@@ -419,8 +419,8 @@ stateList * reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex
                 PN->calculateReachableStates(newStateList, true);   // calc the reachable states from that marking
             }
         }
-	}
-	trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node) : end\n");
+    }
+    trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node) : end\n");
 
     return newStateList;                            // return the new state list
 }
@@ -440,109 +440,109 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
             || (parameters[P_SHOW_NO_RED_NODES] && (v->getColor() != RED))
             || (parameters[P_SHOW_BLUE_NODES_ONLY] && (v->getColor() == BLUE))
             || (v == root)) {
-	
-	    if (parameters[P_SHOW_EMPTY_NODE]
-	        || v->getStateList()->setOfReachGraphStates.size() != 0) {
-	
-		    os << "p" << v->getNumber() << " [label=\"# " << v->getNumber() << "\\n";
-		
-		    string CNF = "<";
-		    bool mult = false;  // more than one clause -> true
-		
-			reachGraphStateSet::iterator iter;                      // iterator over the stateList's elements
-		
-	        for (iter = v->getStateList()->setOfReachGraphStates.begin(); iter != v->getStateList()->setOfReachGraphStates.end(); iter++) {
-	
-	            if (parameters[P_SHOW_STATES_PER_NODE]) {
-	                os << "[" << PN->printMarking((*iter)->state->myMarking) << "]\\n";
-	            }
-//				os << "(";
-				if (v->getColor() != RED) {
-					switch ((*iter)->state->type) {
-						case DEADLOCK:  if (mult) {
-	                                        CNF += " * ";
-	                                    }
-	                                    //os << "DL";
-	                                    CNF += "("; CNF += (*iter)->getClause(); CNF += ")"; mult=true;
-	                                    break;
-	                    case FINALSTATE: if (mult) {
-	                                    	CNF += " * ";
-	                                	}
-//										os << "FS";
-	                                	CNF += "(true)"; mult=true;
-	                                	break;
-	                    default:		
-//										os << "TR";
-//										CNF += "true";
-	                            		break;
-	                };
-				} //else {
-//					switch ((*iter)->state->type) {
-//						case DEADLOCK:  os << "DL"; break;
-//						case FINALSTATE: os << "FS"; break;
-//						default: os << "TR"; break;
-//					};
-//				}
-//				os << ", " << (*iter)->isMinimal();
-//				os << ") " << (*iter)->state->index << "\\n";
-			}
-		
-		    if (parameters[P_OG]) {
-			    if (v->getColor() == RED) {
-					CNF += "(false)";
-			    } else {
-			        if (v->getStateList()->setOfReachGraphStates.size() == 0) {
-			            CNF += "(true)";
-			        }
-			    }
-			    CNF += ">";
-				os << CNF;
-		    }
-		
-		    os << "\", fontcolor=black, color=";
-		
-		    switch(v->getColor()) {
-		        case BLUE: os << "blue"; break;
-		        case RED: os << "red, style=dashed"; break;
-		        default: os << "black"; break;
-		    }
-		    os << "];\n";
-		
-		    v->resetIteratingSuccNodes();
-		    visitedNodes[v->getNumber()] = 1;
-		    graphEdge * element;
-		    string label;
-		
-		    while ((element = v->getNextEdge()) != NULL) {
-		        vertex * vNext = element->getNode();
-		
-			    if (parameters[P_SHOW_ALL_NODES]
-			            || (parameters[P_SHOW_NO_RED_NODES] && vNext->getColor() != RED)
-			            || (parameters[P_SHOW_BLUE_NODES_ONLY] && vNext->getColor() == BLUE)) {
-			
-				    if (parameters[P_SHOW_EMPTY_NODE] || vNext->getStateList()->setOfReachGraphStates.size() != 0) {
-				
-				        if (vNext != NULL) {
-				            if (element->getType() == receiving) {
-				                label = "?";
-				            } else {
-				                label = "!";
-				            }
-				            os << "p" << v->getNumber() << "->" << "p" << vNext->getNumber() << " [label=\"" << label << element->getLabel() << "\", fontcolor=black, color=";
-				            switch (vNext->getColor()) {
-				                case RED: os << "red"; break;
-				                case BLUE: os << "blue"; numberBlueEdges++; break;
-				                default: os << "black"; break;
-				            }
-				            os << "];\n";
-				            if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
-				                printGraphToDot(vNext, os, visitedNodes);
-				            }
-				        }
-				    }
-			    }
-		    } // while
-	    }
+
+        if (parameters[P_SHOW_EMPTY_NODE]
+            || v->getStateList()->setOfReachGraphStates.size() != 0) {
+
+            os << "p" << v->getNumber() << " [label=\"# " << v->getNumber() << "\\n";
+
+            string CNF = "<";
+            bool mult = false;  // more than one clause -> true
+
+            reachGraphStateSet::iterator iter;                      // iterator over the stateList's elements
+
+            for (iter = v->getStateList()->setOfReachGraphStates.begin(); iter != v->getStateList()->setOfReachGraphStates.end(); iter++) {
+
+                if (parameters[P_SHOW_STATES_PER_NODE]) {
+                    os << "[" << PN->printMarking((*iter)->state->myMarking) << "]\\n";
+                }
+//              os << "(";
+                if (v->getColor() != RED) {
+                    switch ((*iter)->state->type) {
+                        case DEADLOCK:  if (mult) {
+                                            CNF += " * ";
+                                        }
+                                        os << "DL";
+                                        CNF += "("; CNF += (*iter)->getClause(); CNF += ")"; mult=true;
+                                        break;
+                        case FINALSTATE: if (mult) {
+                                            CNF += " * ";
+                                        }
+                                        os << "FS";
+                                        CNF += "(true)"; mult=true;
+                                        break;
+                        default:
+//                                      os << "TR";
+//                                      CNF += "true";
+                                        break;
+                    };
+                } //else {
+//                  switch ((*iter)->state->type) {
+//                      case DEADLOCK:  os << "DL"; break;
+//                      case FINALSTATE: os << "FS"; break;
+//                      default: os << "TR"; break;
+//                  };
+//              }
+//              os << ", " << (*iter)->isMinimal();
+//              os << ") " << (*iter)->state->index << "\\n";
+            }
+
+            if (parameters[P_OG]) {
+                if (v->getColor() == RED) {
+                    CNF += "(false)";
+                } else {
+                    if (v->getStateList()->setOfReachGraphStates.size() == 0) {
+                        CNF += "(true)";
+                    }
+                }
+                CNF += ">";
+                os << CNF;
+            }
+
+            os << "\", fontcolor=black, color=";
+
+            switch(v->getColor()) {
+                case BLUE: os << "blue"; break;
+                case RED: os << "red, style=dashed"; break;
+                default: os << "black"; break;
+            }
+            os << "];\n";
+
+            v->resetIteratingSuccNodes();
+            visitedNodes[v->getNumber()] = 1;
+            graphEdge * element;
+            string label;
+
+            while ((element = v->getNextEdge()) != NULL) {
+                vertex * vNext = element->getNode();
+
+                if (parameters[P_SHOW_ALL_NODES]
+                        || (parameters[P_SHOW_NO_RED_NODES] && vNext->getColor() != RED)
+                        || (parameters[P_SHOW_BLUE_NODES_ONLY] && vNext->getColor() == BLUE)) {
+
+                    if (parameters[P_SHOW_EMPTY_NODE] || vNext->getStateList()->setOfReachGraphStates.size() != 0) {
+
+                        if (vNext != NULL) {
+                            if (element->getType() == receiving) {
+                                label = "?";
+                            } else {
+                                label = "!";
+                            }
+                            os << "p" << v->getNumber() << "->" << "p" << vNext->getNumber() << " [label=\"" << label << element->getLabel() << "\", fontcolor=black, color=";
+                            switch (vNext->getColor()) {
+                                case RED: os << "red"; break;
+                                case BLUE: os << "blue"; numberBlueEdges++; break;
+                                default: os << "black"; break;
+                            }
+                            os << "];\n";
+                            if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
+                                printGraphToDot(vNext, os, visitedNodes);
+                            }
+                        }
+                    }
+                }
+            } // while
+        }
     }
 }
 
@@ -582,7 +582,7 @@ void reachGraph::printDotFile() {
         dotFile << "node [fontname=\"Helvetica\" fontsize=10];\n";
         dotFile << "edge [fontname=\"Helvetica\" fontsize=10];\n";
 
-		numberBlueNodes = 0;
+        numberBlueNodes = 0;
 
         printGraphToDot(tmp, dotFile, visitedNodes);
         dotFile << "}";
@@ -590,7 +590,7 @@ void reachGraph::printDotFile() {
         trace(TRACE_0, "    number of blue nodes: " + intToString(numberBlueNodes) + "\n");
         trace(TRACE_0, "    number of blue edges: " + intToString(numberBlueEdges) + "\n");
         trace(TRACE_0, "    number of states stored in nodes: " + intToString(numberOfStatesAllNodes) + "\n");
-        
+
 
         if (numberOfVertices < 900) {
             trace(TRACE_0, "creating the dot file of the graph...\n");
@@ -641,77 +641,77 @@ bool reachGraph::stateActivatesOutputEvents(reachGraphState * s) {
 //! \brief analyses the node and sets its color, if the node gets to be red, then TERMINATE is returned
 analysisResult reachGraph::analyseNode(vertex * node, bool finalAnalysis) {
 
-	trace(TRACE_2, "\t\t\t analysing node ");
-	trace(TRACE_2, intToString(node->getNumber()) + ": ");
+    trace(TRACE_2, "\t\t\t analysing node ");
+    trace(TRACE_2, intToString(node->getNumber()) + ": ");
 
-    if (node->getColor() != RED) {			// red nodes stay red forever
+    if (node->getColor() != RED) {          // red nodes stay red forever
         if (node->getStateList()->setOfReachGraphStates.size() == 0) {
-        	// we analyse an empty node; it becomes blue
+            // we analyse an empty node; it becomes blue
             if (node->getColor() != BLUE) {
                 numberBlueNodes++;
             }
             node->setColor(BLUE);
-			trace(TRACE_2, "node analysed blue (empty node)");
-			trace(TRACE_2, "\t ...terminate\n");
+            trace(TRACE_2, "node analysed blue (empty node)");
+            trace(TRACE_2, "\t ...terminate\n");
             return TERMINATE;
         } else {
-        	// we analyse a non-empty node
+            // we analyse a non-empty node
 
-            vertexColor c = BLACK;						// the color of the current node            
-            vertexColor cTmp = BLACK;					// the color of a state of the current node
+            vertexColor c = BLACK;                      // the color of the current node
+            vertexColor cTmp = BLACK;                   // the color of a state of the current node
             string clause;
             bool finalState = false;
 
-            reachGraphStateSet::iterator iter;			// iterator over the stateList's elements
+            reachGraphStateSet::iterator iter;          // iterator over the stateList's elements
 
-			// iterate over all states and determine color for each state
+            // iterate over all states and determine color for each state
             for (iter = node->getStateList()->setOfReachGraphStates.begin(); iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
 
                 // we just consider the maximal states only
                 if ((*iter)->state->type == DEADLOCK || (*iter)->state->type == FINALSTATE) {
                     if ((*iter)->state->type == FINALSTATE) {
-                        c = BLUE;					// final states potentially make node blue
+                        c = BLUE;                   // final states potentially make node blue
                         finalState = true;
                     } else {
-                    	// state is a deadlock
+                        // state is a deadlock
                         finalState = false;
                         if (node->eventsToBeSeen == 0 || finalAnalysis) {
                             cTmp = (*iter)->calcColor();
-				            switch (cTmp) {
-			                case RED:	// found a red state; so node becomes red
-			                	if (node->getColor() == BLACK) {
-	                            	// node was black
-	                            	trace(TRACE_2, "node analysed red \t");
-	                            	node->setColor(RED);
-			                	} else if (node->getColor() == RED) {
-			                		// this should not be the case!
-			                		trace(TRACE_2, "analyseNode called when node already red!!!");
-			                	} else if (node->getColor() == BLUE) {
-			                		// this should not be the case!
-                                	trace(TRACE_2, "analyseNode called when node already blue!!!");
-                                	numberBlueNodes--;
-                            	}
-                            	trace(TRACE_2, "\t\t ...terminate\n");
-                            	return TERMINATE;
-								break;
-			                case BLUE:	// found a blue state (i.e. deadlock is resolved)
-								c = BLUE;
-			                	break;
-			                case BLACK:	// no definite result of state analysis
+                            switch (cTmp) {
+                            case RED:   // found a red state; so node becomes red
+                                if (node->getColor() == BLACK) {
+                                    // node was black
+                                    trace(TRACE_2, "node analysed red \t");
+                                    node->setColor(RED);
+                                } else if (node->getColor() == RED) {
+                                    // this should not be the case!
+                                    trace(TRACE_2, "analyseNode called when node already red!!!");
+                                } else if (node->getColor() == BLUE) {
+                                    // this should not be the case!
+                                    trace(TRACE_2, "analyseNode called when node already blue!!!");
+                                    numberBlueNodes--;
+                                }
+                                trace(TRACE_2, "\t\t ...terminate\n");
+                                return TERMINATE;
+                                break;
+                            case BLUE:  // found a blue state (i.e. deadlock is resolved)
+                                c = BLUE;
+                                break;
+                            case BLACK: // no definite result of state analysis
                                 if (finalAnalysis) {
                                     node->setColor(RED);
-	                            	trace(TRACE_2, "node analysed red (final analysis)");
-	                                trace(TRACE_2, "\t ...terminate\n");
-	                            	return TERMINATE; 			// <---------------------???
+                                    trace(TRACE_2, "node analysed red (final analysis)");
+                                    trace(TRACE_2, "\t ...terminate\n");
+                                    return TERMINATE;           // <---------------------???
                                 } else {
                                     node->setColor(BLACK);
-	                            	trace(TRACE_2, "node still indefinite \t\t ...continue\n");
-	                            	return CONTINUE;
+                                    trace(TRACE_2, "node still indefinite \t\t ...continue\n");
+                                    return CONTINUE;
                                 }
                                 break;
-				            }
+                            }
                         } else {
-                        	// still events left to resolve deadlocks...
+                            // still events left to resolve deadlocks...
                             node->setColor(BLACK);
                             trace(TRACE_2, "node still indefinite \t\t ...continue\n");
                             return CONTINUE;
@@ -720,27 +720,27 @@ analysisResult reachGraph::analyseNode(vertex * node, bool finalAnalysis) {
                 }
             }
             // all states considered
-            
+
             if (node->getColor() != BLUE && c == BLUE) {
                 numberBlueNodes++;
             } else if (node->getColor() == BLUE && c != BLUE) {
                 numberBlueNodes--;
             }
 
-            trace(TRACE_2, "all states checked, node becomes ");     	
+            trace(TRACE_2, "all states checked, node becomes ");
             if (c == BLACK)
-            	trace(TRACE_2, "black");
+                trace(TRACE_2, "black");
             else if (c == RED)
-            	trace(TRACE_2, "red");
+                trace(TRACE_2, "red");
             else if (c == BLUE)
-            	trace(TRACE_2, "blue");
-            
+                trace(TRACE_2, "blue");
+
             node->setColor(c);
             if (finalState) {
-            	trace(TRACE_2, " ...terminate\n");
+                trace(TRACE_2, " ...terminate\n");
                 return TERMINATE;
             } else {
-            	trace(TRACE_2, " ...continue\n");
+                trace(TRACE_2, " ...continue\n");
                 return CONTINUE;
             }
         }

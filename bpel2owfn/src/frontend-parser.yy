@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/06/13 16:37:01 $
+ *          - last changed: \$Date: 2006/06/14 14:34:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.181 $
+ * \version \$Revision: 1.182 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -122,6 +122,8 @@ extern int yylineno;
 
 // defined in "debug.h"
 extern int yyerror(const char *);
+
+extern map< string, string > channelShortNames;
 
 
 using namespace kc;
@@ -310,6 +312,7 @@ tProcess:
       //stack< pair<bool,int> > isInCH;
       currentJoinCondition = standardJoinCondition();
       yylineno = 1;
+      channelShortNames = map< string, string >();
     }
   X_OPEN K_PROCESS genSymTabEntry_Process
   arbitraryAttributes

@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/06/08 07:54:19 $
+ *          - last changed: \$Date: 2006/06/14 15:13:29 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  *
  */
 %}
@@ -1217,6 +1217,13 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
 	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
 	Place *p4 = TheNet->findPlace("link." + string(linkST->name));
         TheNet->newArc(t1, p4);
+
+        string givenTransitionCondition = symTab.readAttributeValue(link->id, "transitionCondition");
+        if (givenTransitionCondition != "true")
+        {
+          cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
+          cerr << "Using standard transition \"true\" instead." << endl << endl;
+        }
       }
 
       // Embed the inner activity.
@@ -1387,6 +1394,13 @@ This=StandardElements(a,b, jc) provided
 	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
 	Place *p7 = TheNet->findPlace("link." + string(linkST->name));
         TheNet->newArc(t3, p7);
+
+        string givenTransitionCondition = symTab.readAttributeValue(link->id, "transitionCondition");
+        if (givenTransitionCondition != "true")
+        {
+          cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
+          cerr << "Using standard transition \"true\" instead." << endl << endl;
+        }
       }
 
 

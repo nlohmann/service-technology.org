@@ -496,7 +496,7 @@ void parse_command_line(int argc, char* argv[])
   // set output file name if non is already chosen
   if ((options[O_OUTPUT] || options[O_LOG]) && (output_filename == ""))
   {
-    int pos = filename.rfind(".bpel", filename.length());
+    unsigned int pos = filename.rfind(".bpel", filename.length());
     if (pos == (filename.length() - 5))
     {
       output_filename = filename.substr(0, pos);
@@ -507,7 +507,7 @@ void parse_command_line(int argc, char* argv[])
   {
     if (log_filename == "")
     {
-      int pos = filename.rfind(".bpel", filename.length());
+      unsigned int pos = filename.rfind(".bpel", filename.length());
       if (pos == (filename.length() - 5))
       {
         log_filename = filename.substr(0, pos) + ".log";
@@ -521,7 +521,7 @@ void parse_command_line(int argc, char* argv[])
   {
     int counter = 0;
 
-    for ( int i = 0; i < (sizeof(format) / sizeof(possibleFormats)); i++)
+    for ( unsigned int i = 0; i < (sizeof(format) / sizeof(possibleFormats)); i++)
     {
       if ( validFormats[pair<possibleModi, possibleFormats>(modus,format[i])] && formats[format[i]] )
       {
@@ -566,7 +566,7 @@ void parse_command_line(int argc, char* argv[])
   {
     trace(TRACE_INFORMATION, " - output files will be named \"" + output_filename + ".X\"\n");
   }
-  for ( int i = 0; i < (sizeof(format) / sizeof(possibleFormats)); i++)
+  for ( unsigned int i = 0; i < (sizeof(format) / sizeof(possibleFormats)); i++)
   {
     if ( formats[format[i]] )
     {

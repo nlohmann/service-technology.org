@@ -40,13 +40,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/14 11:26:31 $
+ *          - last changed: \$Date: 2006/06/14 11:52:11 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.78 $
+ * \version \$Revision: 1.79 $
  */
 
 
@@ -162,7 +162,9 @@ class Node
     communication_type type;
 
     /// the name of the node
-    string nodeName();    
+    string nodeName();
+
+    virtual ~Node();
 };
 
 

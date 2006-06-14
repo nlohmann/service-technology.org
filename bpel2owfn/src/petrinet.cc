@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/06/14 11:26:31 $
+ *          - last changed: \$Date: 2006/06/14 11:52:11 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.124 $
+ * \version \$Revision: 1.125 $
  */
 
 
@@ -101,13 +101,20 @@ bool Node::firstMemberIs(string role)
  */
 bool Node::historyContains(string role)
 {
-  for (int i = 0; i < history.size(); i++)
+  for (unsigned int i = 0; i < history.size(); i++)
   {
     if (history[i] == role)
       return true;
   }
 
   return false;
+}
+
+
+
+
+Node::~Node()
+{
 }
 
 

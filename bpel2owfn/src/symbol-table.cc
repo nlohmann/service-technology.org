@@ -26,7 +26,7 @@
  *
  * \author
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $  
+ *          - last changes of: \$Author: nlohmann $  
  *          
  * \date
  * 
@@ -2439,7 +2439,7 @@ void STElement::processLinks(unsigned int firstId, unsigned int lastId)
   if (!parameters[P_NEWLINKS])
     return;
 
-  for (int id = firstId+1; id <= lastId; id++)
+  for (unsigned int id = firstId+1; id <= lastId; id++)
   { 
     if  (symTab.lookup(id) != NULL){
 

@@ -20,8 +20,10 @@ using namespace std;
 
 class vertex;
 
+
 class graphEdge {
-		
+
+
 private:
     vertex * node;				/*!< pointer to the node this arc is pointing to */
     char * label;				/*!< label of the arc (usually the name of the event) */

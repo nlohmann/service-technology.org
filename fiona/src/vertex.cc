@@ -12,32 +12,34 @@
 //! \fn vertex::vertex()
 //! \brief constructor for OG nodes
 vertex::vertex(int numberEvents) :
-			   color(BLACK),
-			   successorNodes(NULL),
-			   states(NULL),
-		//	   predecessorNodes(NULL),
-			   numberOfVertex(0) {
+				color(BLACK),
+				successorNodes(NULL),
+				states(NULL),
+//				predecessorNodes(NULL),
+				numberOfVertex(0) {
 
-	eventsUsed = new int [numberEvents];
-
-	for (int i = 0; i < numberEvents; i++) {
-		eventsUsed[i] = 0;
-	}
-	eventsToBeSeen = numberEvents;
+				eventsUsed = new int [numberEvents];
+				for (int i = 0; i < numberEvents; i++) {
+					eventsUsed[i] = 0;
+				}
+				
+				eventsToBeSeen = numberEvents;
 }
+
 
 //! \fn vertex::vertex()
 //! \brief constructor for IG nodes
 vertex::vertex() :
-               color(BLACK),
-               successorNodes(NULL),
-               states(NULL),
-       //        predecessorNodes(NULL),
-               numberOfVertex(0) {
+				color(BLACK),
+				successorNodes(NULL),
+				states(NULL),
+//				predecessorNodes(NULL),
+				numberOfVertex(0) {
                	
-	eventsToBeSeen = 0;
-	eventsUsed = NULL;
+				eventsUsed = NULL;
+				eventsToBeSeen = 0;
 }
+
 
 //! \fn vertex::~vertex()
 //! \brief destructor
@@ -56,13 +58,15 @@ vertex::~vertex () {
 		delete[] eventsUsed;
 	}
 }
-	
+
+
 //! \fn unsigned int vertex::getNumber()
 //! \return number of this node
 //! \brief returns the number of this node
 unsigned int vertex::getNumber() {
     return numberOfVertex;
 }
+
 
 //! \fn void vertex::setNumber(unsigned int _number)
 //! \param _number number of this node in the graph
@@ -71,6 +75,7 @@ void vertex::setNumber(unsigned int _number) {
 	numberOfVertex = _number;
 }
 
+
 //! \fn void vertex::setStateList(stateList * list)
 //! \param list list of states 
 //! \brief sets the vertex state list to the given list
@@ -78,11 +83,13 @@ void vertex::setStateList(stateList * list) {
 	states = list;								
 }
 
+
 //! \fn stateList * vertex::getStateList()
 //! \brief returns the states of the node
 stateList * vertex::getStateList() {
 	return states;
 }
+
 
 //! \fn void vertex::addSuccessorNode(graphEdge * edge) 
 //! \param edge pointer to the edge which is to point to the successor node
@@ -91,10 +98,11 @@ stateList * vertex::getStateList() {
 void vertex::addSuccessorNode(graphEdge * edge) {
 	if (successorNodes == NULL) {
 		successorNodes = new successorNodeList();	
-	}	
+	}
 	successorNodes->addNextNode(edge);
 	eventsToBeSeen--;
 }
+
 
 //! \fn graphEdge * vertex::getNextEdge()
 //! \return pointer to the next edge of the successor node list
@@ -107,6 +115,7 @@ graphEdge * vertex::getNextEdge() {
 	}
 }
 
+
 //! \fn successorNodeList * vertex::getSuccessorNodes()
 //! \return pointer to the successor node list
 //! \brief returns a pointer to the successor node list
@@ -114,12 +123,14 @@ successorNodeList * vertex::getSuccessorNodes() {
 	return successorNodes;
 }
 
+
 //! \fn successorNodeList * vertex::getPredecessorNodes()
 //! \return pointer to the predecessor node list
 //! \brief returns a pointer to the predecessor node list
 //successorNodeList * vertex::getPredecessorNodes() {
 //	return predecessorNodes;
 //}
+
 
 //! \fn void vertex::resetIteratingSuccNodes()
 //! \brief resets the iteration process of the successor node list
@@ -140,12 +151,14 @@ void vertex::resetIteratingSuccNodes() {
 //	predecessorNodes->addNextNode(edge);
 //}
 
+
 //! \fn void vertex::setColor(vertexColor c)
 //! \param c color of vertex
 //! \brief sets the color of the vertex to the given color
 void vertex::setColor(vertexColor c) {
 	color = c;
 }
+
 
 //! \fn vertexColor vertex::getColor()
 //! \brief returns the color of the vertex

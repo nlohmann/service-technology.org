@@ -27,17 +27,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/06/14 12:17:50 $
+ *          - last changed: \$Date: 2006/06/15 06:54:44 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.126 $
+ * \version \$Revision: 1.127 $
  */
 
 
@@ -470,6 +470,13 @@ void PetriNet::removeTransition(Transition * t)
   trace(TRACE_VERY_DEBUG, "[PN]\tRemoving transition " + intToString(t->id) + "...\n");
 
   detachNode(t);
+
+  // Remove the roles of the transition  t, i.e. set the mappings to the NULL
+  // pointer.  
+  for (vector<string>::iterator role = t->history.begin(); role != t->history.end(); role++)
+    if (roleMap[*role] == t)
+      roleMap[*role] = NULL;
+
   T.erase(t);
   delete t;
 }
@@ -513,6 +520,9 @@ void PetriNet::removeArc(Arc * f)
  */
 void PetriNet::mergeTransitions(Transition * t1, Transition * t2)
 {
+  if (t1 == t2)
+    return;
+
   if (t1 == NULL || t2 == NULL)
     throw Exception(MERGING_ERROR, "One of the transitions is null!\n", pos(__FILE__, __LINE__, __FUNCTION__));
 
@@ -547,10 +557,10 @@ void PetriNet::mergeTransitions(Transition * t1, Transition * t2)
   set<Node *> post12 = setUnion(postset(t1), postset(t2));
 
   for (set<Node *>::iterator n = pre12.begin(); n != pre12.end(); n++)
-    newArc((*n), t12);
+    newArc((Place*)(*n), t12);
 
   for (set<Node *>::iterator n = post12.begin(); n != post12.end(); n++)
-    newArc(t12,(*n));
+    newArc(t12,(Place*)(*n));
 
   removeTransition(t1);
   removeTransition(t2);

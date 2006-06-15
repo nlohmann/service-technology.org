@@ -121,7 +121,9 @@ vertex * reachGraph::findVertexInSet(vertex * toAdd) {
 // for OG
 int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
 
-    int offset = 0;
+	trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type): start\n");
+
+	int offset = 0;
 
     if (numberOfVertices == 0) {                // graph contains no nodes at all
         root = toAdd;                           // the given node becomes the root node
@@ -182,11 +184,13 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
 
             setOfVertices.insert(toAdd);
 
-            numberOfStatesAllNodes += toAdd->getStateList()->elementCount();
+           	numberOfStatesAllNodes += toAdd->getStateList()->elementCount();
+	
+			trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type): end\n");
 
             return 1;
         } else {
-            trace(TRACE_1, "\t computed successor node already known: " + intToString(found->getNumber()) + "\n");
+            trace(TRACE_5, "\t computed successor node already known: " + intToString(found->getNumber()) + "\n");
 
             graphEdge * edgeSucc = new graphEdge(found, edgeLabel, type);
             currentVertex->addSuccessorNode(edgeSucc);
@@ -220,6 +224,9 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
 */            // \end{hack}
 
             delete toAdd;
+
+			trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type): end\n");
+
             return 0;
         }
     }
@@ -433,6 +440,10 @@ stateList * reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex
 //! \brief breadthsearch through the graph printing each node and edge to the output stream
 void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
 
+	if (v == NULL) {
+		return ;
+	}
+
     if (v->getColor() == BLUE) {
         numberBlueNodes++;
     }
@@ -544,6 +555,7 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
                 }
             } // while
         }
+
     }
 }
 

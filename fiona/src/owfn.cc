@@ -252,8 +252,10 @@ void oWFN::addStateToList(stateList * list, State * NewState, bool minimal) {
 }
 
 void oWFN::addSuccStatesToList(stateList * list, State * NewState) {
-	for(int i = 0; i < NewState->CardFireList; i++) {
-		addStateToList(list, NewState->succ[i]);
+	if (NewState != NULL) {
+		for(int i = 0; i < NewState->CardFireList; i++) {
+			addStateToList(list, NewState->succ[i]);
+		}
 	}
 }
 
@@ -276,8 +278,10 @@ void oWFN::addStateToList(stateList * list, State * currentState) {
 			return ;
 		}
 	
-	for(int i = 0; i < currentState->CardFireList; i++) {
-		addStateToList(list, currentState->succ[i]);
+	if (currentState != NULL) {
+		for(int i = 0; i < currentState->CardFireList; i++) {
+			addStateToList(list, currentState->succ[i]);
+		}
 	}
 }
 
@@ -778,13 +782,8 @@ int oWFN::setCurrentMarkingFromState(reachGraphState * s) {
 	placeHashValue = s->state->placeHashValue;
 	copyMarkingToCurrentMarking(s->state->myMarking);
 	
-	cout << "wir    : " << printMarking(s->state->myMarking) << endl;
-
 	unsigned int * markingvonkarsten = new unsigned int [placeCnt];
 	s->state->decode(markingvonkarsten, this);
-
-	cout << "karsten: " << printMarking(markingvonkarsten) << endl;
-	
 }
 
 

@@ -339,7 +339,7 @@ inline State * binInsert(binDecision ** Bucket, oWFN * PN)
 	{
 		// empty hash bucket --> create first entry
 
-	        NonEmptyHash++;
+	    NonEmptyHash++;
 		*Bucket = new binDecision(-1, PN->BitVectorSize);
 		// 3. remaining places
 		vby = vbi = 0;
@@ -350,6 +350,7 @@ inline State * binInsert(binDecision ** Bucket, oWFN * PN)
 			vbi =  (vbi + PN->Places[bin_p] -> nrbits) % 8;
 		}
 
+		(*Bucket)-> prev = (binDecision *) 0;
 		(*Bucket)->state = new State;
 		(*Bucket)->state -> my_entry = * Bucket;
 		return (*Bucket)->state;
@@ -365,6 +366,9 @@ inline State * binInsert(binDecision ** Bucket, oWFN * PN)
 		newd -> nextold = fromdec -> nextold;
 		fromdec -> nextold = newd;
 	}
+	
+	newd -> prev = fromdec;
+	
 	// fill vector
 	// 1. remaining   bin_byte
 	if(bin_d < 7)
@@ -397,10 +401,7 @@ inline State * binInsert(binDecision ** Bucket, oWFN * PN)
 	}
 
         newd->state = new State;
-        
         newd->state->my_entry = newd;
-        
-        cout << "newd: " << newd << endl;
         
 		return newd -> state;
 	

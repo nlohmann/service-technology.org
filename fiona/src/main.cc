@@ -58,6 +58,10 @@ char * reserve;
 
 unsigned int NonEmptyHash;
 
+
+unsigned int numberDeletedVertices;
+
+
 extern unsigned int State::card;
 
 inline void garbagecollection() {
@@ -116,6 +120,8 @@ int main(int argc, char ** argv) {
 
   garbagefound = 0;
   State::card = 0;          // number of states
+
+	numberDeletedVertices = 0;
 
   // 0. eigenen New-Handler installieren
   try {
@@ -223,6 +229,8 @@ int main(int argc, char ** argv) {
 
     }
 
+	cout << "numberDeletedVertices: " << numberDeletedVertices << endl;
+
     trace(TRACE_0, "--------------------------------------------------------------\n");
 
     try {
@@ -238,4 +246,5 @@ int main(int argc, char ** argv) {
         cerr << mess;
         _exit(2);
     }
+
 }

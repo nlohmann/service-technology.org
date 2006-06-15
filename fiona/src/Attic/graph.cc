@@ -39,7 +39,7 @@ unsigned int MinBookmark; // MIN number of the first closed marking
 // decodes state and returns the corresponding marking
 void State::decode(unsigned int * v, oWFN * PN) {
 	
-	trace(TRACE_0, "void State::decode(int * v, oWFN * PN):start\n");
+	trace(TRACE_5, "void State::decode(int * v, oWFN * PN):start\n");
 	
 	long int cutplace;
 	int currentbyte;
@@ -66,7 +66,6 @@ void State::decode(unsigned int * v, oWFN * PN) {
 	cutplace = cutplace >> (7-(clast -cfirst));	
 	cutplace = cutplace << (7-(clast -cfirst));	
 
-	cout << "vor while" << endl;
 
 	while(1)
 	{
@@ -82,7 +81,6 @@ void State::decode(unsigned int * v, oWFN * PN) {
 			cutplace = cutplace >> (clast - plast);	
 		}
 
-cout << "vor eintragen" << endl;
 
 		// eintragen
 		if(plast > clast)
@@ -94,15 +92,16 @@ cout << "vor eintragen" << endl;
 			v[currentplacenr] = cutplace;
 		}
 		
-cout << "nach eintragen" << endl;
 		
 		if(cfirst == pfirst) {
-cout << "cfirst == pfirst" << endl;
 			if(currentplacenr == 0) {
 				return;
 			}
 			// new place, new byte
+			
+	
 			currentplacenr--;
+
 			pfirst = PN->Places[currentplacenr]->startbit;
 			plast = pfirst + PN->Places[currentplacenr]->nrbits - 1;
 
@@ -112,7 +111,7 @@ cout << "cfirst == pfirst" << endl;
 				currentbindec = currentbindec -> prev;
 				currentvector = currentbindec -> vector;
 				vectorsfirstbit = currentbindec -> bitnr + 1;
-				currentbyte = (cfirst -1 - vectorsfirstbit) / 8;
+				currentbyte = (cfirst - 1 - vectorsfirstbit) / 8;
 				clast = cfirst - 1;
 				cfirst = vectorsfirstbit + 8 * currentbyte;
 				cutplace =	currentvector[currentbyte];
@@ -132,7 +131,6 @@ cout << "cfirst == pfirst" << endl;
 		
 		if(cfirst < pfirst) {
 			
-cout << "cfirst < pfirst" << endl;
 
 			// new place
 			currentplacenr--;
@@ -142,7 +140,6 @@ cout << "cfirst < pfirst" << endl;
 			continue;
 		}
 		
-cout << "cfirst > pfirst" << endl;
 		//(cfirst > pfirst --> new byte)
 		if(currentbyte == 0)
 		{
@@ -167,6 +164,6 @@ cout << "cfirst > pfirst" << endl;
 		}
 	}
 
-	trace(TRACE_0, "void State::decode(int * v, oWFN * PN):end\n");
+	trace(TRACE_5, "void State::decode(int * v, oWFN * PN):end\n");
 }
 

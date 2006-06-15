@@ -68,7 +68,6 @@ protected:
    vertex * root;                   //!< the root node of the graph
 
    int numberOfVertices;            //!< the number of vertices of the graph
-   int numberOfEdges;               //!< the number of edges of the graph
 
    unsigned int numberBlueNodes;    //!< number of blue nodes in the graph
    unsigned int numberBlueEdges;    //!< number of blue edges in the graph
@@ -77,13 +76,17 @@ protected:
 
    int actualDepth; //!< actual depth in graph
 
-   vertexSet setOfVertices;
-   
+  
    unsigned int numberOfStatesAllNodes;
 
 public:
     reachGraph (oWFN *);
     ~reachGraph ();
+
+   int numberOfEdges;               //!< the number of edges of the graph
+
+
+   vertexSet setOfVertices;
 
     void calculateRootNode();
 

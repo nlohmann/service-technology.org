@@ -54,14 +54,17 @@ vertexColor reachGraphState::calcColor() {
     }
 
     for (clauseSet::iterator iter = clause1.begin(); iter != clause1.end(); iter++) {
-        if ((*iter)->getNode()->getColor() == BLUE) {
-            return BLUE;
-        }
-        if ((*iter)->getNode()->getColor() == RED) {
-        //  cout << "erase clause" << endl;
-        //  clause1.erase(*iter);
-        }
+        if ((*iter)->getNode() != NULL) {
+	        if ((*iter)->getNode()->getColor() == BLUE) {
+	            return BLUE;
+	        }
+	        if ((*iter)->getNode()->getColor() == RED) {
+	        //  cout << "erase clause" << endl;
+	        //  clause1.erase(*iter);
+	        }
+        } 
     }
+    
     return RED;
 }
 

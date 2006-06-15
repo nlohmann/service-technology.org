@@ -1,5 +1,8 @@
 #include "graph.h"
 #include "successorNodeList.h"
+#include "OG.h"
+#include "main.h"
+
 //#include "enums.h"
 //#include "vertex.h"
 //#include "stateList.h"
@@ -44,7 +47,6 @@ vertex::vertex() :
 //! \fn vertex::~vertex()
 //! \brief destructor
 vertex::~vertex () {
-	
 	if (successorNodes != NULL) {
 		delete successorNodes;
 	}
@@ -57,6 +59,8 @@ vertex::~vertex () {
 	if (eventsUsed != NULL) {
 		delete[] eventsUsed;
 	}
+	
+	numberDeletedVertices++;
 }
 
 
@@ -166,6 +170,44 @@ vertexColor vertex::getColor() {
 	return color;
 }
 
+//! \fn void vertex::deleteRedSuccessorNodes() 
+//! \brief deletes all the edges that point to a not existing node
+void vertex::deleteRedSuccessorNodes(operatingGuidelines * OG) {
+	if (successorNodes) {
+		graphEdge * edgeTmp1 = successorNodes->getFirstElement();
+		graphEdge * edgeTmpBefore = NULL;
+		
+		while (edgeTmp1) {
+			if (edgeTmp1->getNode() != NULL && edgeTmp1->getNode()->getColor() == RED) {
+				if (edgeTmpBefore == NULL) {
+					successorNodes->setFirstElement(edgeTmp1->getNextElement());
+				} else {
+					edgeTmpBefore->setNextElement(edgeTmp1->getNextElement());
+				}
+				
+				OG->setOfVertices.erase(edgeTmp1->getNode());
+				
+				reachGraphStateSet::iterator iter;			// iterator over the stateList's elements
+
+				// iterate over all states and determine color for each state
+            	for (iter = states->setOfReachGraphStates.begin(); 
+            			iter != states->setOfReachGraphStates.end(); iter++) {
+            		 // we just consider the maximal states only
+                	if ((*iter)->state->type == DEADLOCK || (*iter)->state->type == FINALSTATE) {
+            		    (*iter)->clause1.erase(edgeTmp1);
+                	}
+            	}
+								
+				delete edgeTmp1->getNode();	// delete red node
+				delete edgeTmp1;			// delete edge pointing to that red node
+				OG->numberOfEdges--;
+			}
+			
+			edgeTmpBefore = edgeTmp1;
+			edgeTmp1 = edgeTmp1->getNextElement();	
+		}
+	}
+}
 
 //! \fn vertexColor vertex::getNumberOfDeadlocks()
 //! \brief returns the number of deadlocks

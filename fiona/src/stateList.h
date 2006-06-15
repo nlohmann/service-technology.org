@@ -37,16 +37,16 @@ class reachGraphState {
 protected:
 	bool isMin;							//!< state is minimal or not
 	
-	clauseSet clause1;
 	clauseSetLabel clauseLabel;
-	
+		
 public:
 	reachGraphState(bool);
 	reachGraphState(bool, State *);
 	~reachGraphState();
 	
 	State * state;				//!< pointer to Karsten's state structure
-
+	clauseSet clause1;
+	
 	bool isMinimal() ;	
 	vertexColor calcColor();
 	

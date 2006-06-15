@@ -7,6 +7,7 @@
 
 #include "options.h"
 #include "debug.h"
+#include "successorNodeList.h"
 
 //#include <iostream>
 
@@ -26,6 +27,7 @@ operatingGuidelines::~operatingGuidelines() {
 //! \brief builds the graph starting with the root node
 void operatingGuidelines::buildGraph() {
 	buildGraph(root);
+	root->deleteRedSuccessorNodes(this);
 }
 
 
@@ -51,6 +53,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	
 	if (terminateBuildingGraph(currentNode)) {
 		string color;
+		
 		if (currentNode->getColor() == RED) {
 			color = "RED";
 		} else if (currentNode->getColor() == BLUE) {
@@ -58,7 +61,15 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 		} else {
 			color = "BLACK";
 		}
-		trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + " (leaf)\n");	
+
+		trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + " (leaf)\n");		
+	
+//		if (currentNode->getColor() == RED) {
+//			setOfVertices.erase(currentNode);
+//			delete currentNode;
+//			trace(TRACE_1, "\t\t\t\t so it was deleted\n");
+//		}
+			
 		return;
 	}
 	
@@ -91,7 +102,22 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 
 			if (AddVertex (v, i, sending)) {
 				buildGraph(v);				// going down with sending event...
+
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
+
+			//	currentNode->deleteRedSuccessorNodes(this);
+				
+//				if (currentNode->getSuccessorNodes() != NULL) {
+//					graphEdge * edgeTmp = currentNode->getSuccessorNodes()->getFirstElement();
+//				
+//					while (edgeTmp) {
+//					//	cout << "successor: " << edgeTmp->getNode()->getNumber() << endl;
+//						edgeTmp = edgeTmp->getNextElement();
+//					}				
+//				} else {
+//					//cout << "no successors!" << endl;	
+//				}
+				
 				analyseNode(currentNode, false);
 				trace(TRACE_5, "node analysed\n");
 
@@ -129,7 +155,10 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 			
 			if (AddVertex (v, i, receiving)) {
 				buildGraph(v);				// going down with receiving event...
+
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
+
+		//		currentNode->deleteRedSuccessorNodes(this);
 				analyseNode(currentNode, false);
 				trace(TRACE_5, "node analysed\n");
 
@@ -152,6 +181,12 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	}
 
 	trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + "\n");
+//
+//	if (currentNode->getColor() == RED) {
+//		trace(TRACE_1, "\t\t\t\t so it was deleted\n");
+//		setOfVertices.erase(currentNode);		
+//		delete currentNode;
+//	}
 }
 
 

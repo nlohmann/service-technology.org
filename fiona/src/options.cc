@@ -224,6 +224,7 @@ void parse_command_line(int argc, char* argv[]) {
 	      			parameters[P_SHOW_STATES_PER_NODE] = true;
 	      		} else if (string(optarg) == "allnodes") {
 	      			parameters[P_SHOW_ALL_NODES] = true;
+	      			parameters[P_SHOW_EMPTY_NODE] = true;
 	      			parameters[P_SHOW_NO_RED_NODES] = false;
 	      			parameters[P_SHOW_BLUE_NODES_ONLY] = false;
 	      		} else {

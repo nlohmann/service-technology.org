@@ -38,5 +38,6 @@ public:
 	char * getLabel();
 	edgeType getType();
 	vertex * getNode();
+	void setNode(vertex *);
 };
 #endif //GRAPHEDGE_H

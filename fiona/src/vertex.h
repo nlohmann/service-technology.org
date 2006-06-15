@@ -23,6 +23,7 @@ using namespace std;
 class graphEdge;
 class stateList;
 class successorNodeList;
+class operatingGuidelines;
 
 
 class vertex {
@@ -59,6 +60,8 @@ public:
     
     void resetIteratingSuccNodes();
     
+    
+    void deleteRedSuccessorNodes(operatingGuidelines * );
     
    // void addPredecessorNode(vertex *, char *, edgeType);  
 //    void addPredecessorNode(graphEdge *);  

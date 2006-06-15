@@ -42,4 +42,7 @@ typedef enum {TRANS, DEADLOCK, FINALSTATE, NN} stateType;   //!< TRANS == Transi
 // extern int yyparse();
 extern void readnet();
 
+
+extern unsigned int numberDeletedVertices;
+
 #endif /*MAIN_H*/

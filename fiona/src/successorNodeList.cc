@@ -31,7 +31,9 @@ void successorNodeList::deleteList(graphEdge * element) {
 	} else {
 		deleteList(element->getNextElement());
 	}
-	delete element;
+	if (element != NULL) {
+		delete element;
+	}
 }
 
 //! \fn bool successorNodeList::addNextNode(graphEdge * transition)
@@ -81,6 +83,13 @@ int successorNodeList::elementCount() {
 	
 	
 	return count;
+}
+
+//! \fn void successorNodeList::setFirstElement(graphEdge * _edge)
+//! \param _edge the new first element
+//! \brief sets the first element of the list to _edge
+void successorNodeList::setFirstElement(graphEdge * _edge) {
+	firstElement = _edge;
 }
 
 //! \fn graphEdge * successorNodeList::getFirstElement()

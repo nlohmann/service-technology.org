@@ -38,6 +38,7 @@ public:
     bool addNextNode(graphEdge *);
     int elementCount();
     
+    void setFirstElement(graphEdge *);
     graphEdge * getFirstElement();
     graphEdge * findElement(vertex * node);
     

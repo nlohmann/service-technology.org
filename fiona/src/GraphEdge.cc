@@ -18,10 +18,14 @@ graphEdge::graphEdge(vertex * nodeP, char * labelP, edgeType typeP) {
 //! \fn graphEdge::~graphEdge()
 //! \brief destructor
 graphEdge::~graphEdge() {
-	delete label;
-	if (nextElement != NULL) {
-		delete nextElement;	
-	}
+	
+//	if (label) {
+//		delete label;
+//	}
+	
+	//if (node != NULL && node->getColor() == RED) {
+	//	delete node;	
+	//}
 }
 
 //! \fn void graphEdge::setNextElement(graphEdge * element)
@@ -29,6 +33,13 @@ graphEdge::~graphEdge() {
 //! \brief sets the pointer of the nextelement of this edge to the edge given by the parameter
 void graphEdge::setNextElement(graphEdge * element) {
  	nextElement = element;	
+}
+
+//! \fn void graphEdge::setNode(vertex * _node)
+//! \param _node
+//! \brief sets the pointer of the node to the node given by the parameter
+void graphEdge::setNode(vertex * _node) {
+ 	node = _node;	
 }
 
 //! \fn  graphEdge * graphEdge::getNextElement()

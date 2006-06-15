@@ -17,8 +17,7 @@ class oWFN;
 
 // State objects are nodes in the state graph.
 
-class State
-{
+class State {
 public:
   State();
   ~State();
@@ -27,11 +26,13 @@ public:
   owfnTransition ** firelist; 		// Transitions to be fired
   owfnTransition ** quasiFirelist; 	// Transitions that are quasi enabled
   unsigned int current; 			// Nr of last already fired element of firelist
-  unsigned int * myMarking; 			// current marking at that state
+  unsigned int * myMarking; 		// current marking at that state
+  binDecision * my_entry;           // entry in binary decission tree that represents marking
   unsigned int placeHashValue;		// hashValue of that state (necessary for binDecision)
   State ** succ; 					// successor states in graph
   State * parent; 					// state responsible for first generation
   stateType type;					// type of state (Deadlock, Final, Transient)
+  void decode(unsigned int * vec, oWFN * PN);      // decode state into given marking vector
 
 };
 
@@ -350,6 +351,7 @@ inline State * binInsert(binDecision ** Bucket, oWFN * PN)
 		}
 
 		(*Bucket)->state = new State;
+		(*Bucket)->state -> my_entry = * Bucket;
 		return (*Bucket)->state;
 	}
 	newd = new binDecision(bin_b + bin_d, PN->BitVectorSize);
@@ -394,7 +396,12 @@ inline State * binInsert(binDecision ** Bucket, oWFN * PN)
 		vbi =  (vbi + PN->Places[bin_p] -> nrbits) % 8;
 	}
 
-        newd-> state = new State;
+        newd->state = new State;
+        
+        newd->state->my_entry = newd;
+        
+        cout << "newd: " << newd << endl;
+        
 		return newd -> state;
 	
 }

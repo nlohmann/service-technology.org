@@ -41,6 +41,7 @@ class owfnPlace : public Node {
 	  	unsigned int references; // we remove isolated places 
 	  	int capacity;   // maximum capacity
 	  	int nrbits;     // nr of bits required for storing its marking (= log capacity)
+		int startbit;   // first bit representing this place in bit vector
 		placeType getType();
 		unsigned int cardprop; // number of propositions in final condition that mention this place
 		formula ** proposition; // array of propositions in final condition that mention this place

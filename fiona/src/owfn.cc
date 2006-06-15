@@ -17,7 +17,11 @@ using namespace std;
 
 //! \fn oWFN::oWFN()
 //! \brief constructor
-oWFN::oWFN() : arcCnt(0), placeHashValue(0), placeCnt(0), placeInputCnt(0), placeOutputCnt(0), transCnt(0), transNrEnabled(0), BitVectorSize(0), currentState(0), startOfEnabledList(NULL), startOfQuasiEnabledList(NULL), FinalCondition(NULL) {
+oWFN::oWFN() : arcCnt(0), placeHashValue(0), placeCnt(0),
+               placeInputCnt(0), placeOutputCnt(0), transCnt(0),
+               transNrEnabled(0), BitVectorSize(0), currentState(0),
+               startOfEnabledList(NULL), startOfQuasiEnabledList(NULL),
+               FinalCondition(NULL) {
 	startOfEnabledList = (owfnTransition *) 0;
 
 	unsigned int i;
@@ -147,7 +151,14 @@ void oWFN::initialize() {
 			outputPlacesArray[ko++] = i;
 		}	
 	}
-	trace(TRACE_5, "oWFN initialized\n");	
+	
+	for(i = 0, BitVectorSize = 0; i < placeCnt; i++) {
+        Places[i]->startbit = BitVectorSize;
+        BitVectorSize += Places[i]->nrbits;
+  	}
+	
+	trace(TRACE_5, "oWFN initialized\n");
+	
 }
 
 
@@ -766,6 +777,14 @@ int oWFN::setCurrentMarkingFromState(reachGraphState * s) {
 	copyMarkingToCurrentMarking(s->state->myMarking);	
 	placeHashValue = s->state->placeHashValue;
 	copyMarkingToCurrentMarking(s->state->myMarking);
+	
+	cout << "wir    : " << printMarking(s->state->myMarking) << endl;
+
+	unsigned int * markingvonkarsten = new unsigned int [placeCnt];
+	s->state->decode(markingvonkarsten, this);
+
+	cout << "karsten: " << printMarking(markingvonkarsten) << endl;
+	
 }
 
 

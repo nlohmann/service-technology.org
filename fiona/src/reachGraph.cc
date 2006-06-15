@@ -333,6 +333,7 @@ stateList * reachGraph::calculateSuccStatesInput(unsigned int input, vertex * no
          iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
 
         PN->setCurrentMarkingFromState((*iter));    // set the net to the marking of the state being considered
+
         PN->addInputMessage(input);                 // add the input message to the current marking
         if (parameters[P_CALC_ALL_STATES]) {
             PN->calculateReachableStatesFull(newStateList, (*iter)->isMinimal());   // calc the reachable states from that marking

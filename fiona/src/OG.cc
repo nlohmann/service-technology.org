@@ -27,7 +27,7 @@ operatingGuidelines::~operatingGuidelines() {
 //! \brief builds the graph starting with the root node
 void operatingGuidelines::buildGraph() {
 	buildGraph(root);
-	root->deleteRedSuccessorNodes(this);
+//	root->deleteRedSuccessorNodes(this);
 }
 
 
@@ -194,6 +194,8 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 //! \param node the node for which the activated input events are calculated
 //! \brief calculates all activated input events (messages) of the current node for the annotation
 void operatingGuidelines::getInputEvents(vertex * node) {
+	
+	trace(TRACE_5, "operatingGuidelines::getInputEvents(vertex * node): start\n");
 	reachGraphStateSet::iterator iter;			// iterator over the stateList's elements
 	
 	for (int i = 0; i < PN->placeInputCnt; i++) {
@@ -206,6 +208,7 @@ void operatingGuidelines::getInputEvents(vertex * node) {
 			}
 		}			
 	}
+	trace(TRACE_5, "operatingGuidelines::getInputEvents(vertex * node): end\n");
 }
 
 
@@ -213,12 +216,12 @@ void operatingGuidelines::getInputEvents(vertex * node) {
 //! \param node the node for which the activated output events are calculated
 //! \brief calculates all activated output events (messages) of the current node for the annotation
 void  operatingGuidelines::getActivatedOutputEvents(vertex * node) {
-
+	trace(TRACE_5, "operatingGuidelines::getActivatedOutputEvents(vertex * node): start\n");
 	int i;
 	
 	reachGraphStateSet::iterator iter;			// iterator over the stateList's elements
 	
-	unsigned int * marking;
+	unsigned int * myMarking = new unsigned int [PN->getPlaceCnt()];
 	
 	// iterate over all states of the node
 	for (iter = node->getStateList()->setOfReachGraphStates.begin();
@@ -228,16 +231,19 @@ void  operatingGuidelines::getActivatedOutputEvents(vertex * node) {
 		if ((*iter)->state->type == DEADLOCK  || (*iter)->state->type == FINALSTATE)  {
 			int i;
 			int k = 0;
-			marking = (*iter)->state->myMarking;
+			//marking = (*iter)->state->myMarking;
 			
+			(*iter)->state->decode(myMarking, PN);
+						
 			for (i = 0; i < PN->placeOutputCnt; i++) {
 				
-				if (marking[PN->outputPlacesArray[i]] > 0) {
+				if (myMarking[PN->outputPlacesArray[i]] > 0) {
 					(*iter)->addClauseElement(PN->Places[PN->outputPlacesArray[i]]->name);	
 				}	
 			}
 		}
 	}
+	trace(TRACE_5, "operatingGuidelines::getActivatedOutputEvents(vertex * node): end\n");
 }
 
 

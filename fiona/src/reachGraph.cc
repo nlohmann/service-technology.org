@@ -339,7 +339,10 @@ stateList * reachGraph::calculateSuccStatesInput(unsigned int input, vertex * no
     for (iter = node->getStateList()->setOfReachGraphStates.begin();
          iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
 
-        PN->setCurrentMarkingFromState((*iter));    // set the net to the marking of the state being considered
+        
+      //  PN->setCurrentMarkingFromState((*iter));    // set the net to the marking of the state being considered
+
+		(*iter)->state->decode(PN->CurrentMarking, PN);
 
         PN->addInputMessage(input);                 // add the input message to the current marking
         if (parameters[P_CALC_ALL_STATES]) {
@@ -365,7 +368,10 @@ stateList * reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex *
     reachGraphStateSet::iterator iter;              // iterator over the stateList's elements
 
     for (iter = node->getStateList()->setOfReachGraphStates.begin(); iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
-        PN->setCurrentMarkingFromState((*iter));    // set the net to the marking of the state being considered
+//        PN->setCurrentMarkingFromState((*iter));    // set the net to the marking of the state being considered
+        
+        (*iter)->state->decode(PN->CurrentMarking, PN);
+        
         PN->addInputMessage(input);                 // add the input message to the current marking
         if (parameters[P_CALC_ALL_STATES]) {
             PN->calculateReachableStatesFull(newStateList, (*iter)->isMinimal());   // calc the reachable states from that marking
@@ -391,7 +397,10 @@ stateList * reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * 
 
     for (iter = node->getStateList()->setOfReachGraphStates.begin(); iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
 
-        PN->setCurrentMarkingFromState(*iter);      // set the net to the marking of the state being considered
+//        PN->setCurrentMarkingFromState(*iter);      // set the net to the marking of the state being considered
+        
+        (*iter)->state->decode(PN->CurrentMarking, PN);
+        
         if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
             // if there is a state for which an output event was activated, catch that state
             if (parameters[P_CALC_ALL_STATES]) {
@@ -418,7 +427,10 @@ stateList * reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex
 
     for (iter = node->getStateList()->setOfReachGraphStates.begin(); iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
 
-        PN->setCurrentMarkingFromState(*iter);      // set the net to the marking of the state being considered
+//        PN->setCurrentMarkingFromState(*iter);      // set the net to the marking of the state being considered
+        
+        (*iter)->state->decode(PN->CurrentMarking, PN);
+        
         if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
             // if there is a state for which an output event was activated, catch that state
             if (parameters[P_CALC_ALL_STATES]) {
@@ -466,7 +478,9 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
             for (iter = v->getStateList()->setOfReachGraphStates.begin(); iter != v->getStateList()->setOfReachGraphStates.end(); iter++) {
 
                 if (parameters[P_SHOW_STATES_PER_NODE]) {
-                    os << "[" << PN->printMarking((*iter)->state->myMarking) << "]\\n";
+                	unsigned int * myMarking = new unsigned int [PN->getPlaceCnt()];
+                	(*iter)->state->decode(myMarking, PN);
+                    os << "[" << PN->printMarking(myMarking) << "]" << (*iter)->state << "\\n";
                 }
 //              os << "(";
                 if (v->getColor() != RED) {
@@ -637,11 +651,13 @@ void reachGraph::printDotFile() {
 //! \brief returns true, if the given state activates at least one output event
 bool reachGraph::stateActivatesOutputEvents(reachGraphState * s) {
     int i;
-    unsigned int * marking = s->state->myMarking;
+    unsigned int * myMarking;
+    
+    s->state->decode(myMarking, PN);
 
     for (i = 0; i < PN->getPlaceCnt(); i++) {
 
-        if (PN->Places[i]->getType() == OUTPUT && marking[i] > 0) {
+        if (PN->Places[i]->getType() == OUTPUT && myMarking[i] > 0) {
             return true;
         }
     }

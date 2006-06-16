@@ -275,11 +275,13 @@ setOfMessages interactionGraph::getActivatedInputEvents(vertex * node) {
 	for (iter = node->getStateList()->setOfReachGraphStates.begin(); iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
 
 #ifdef DEBUG
-	cout << "\t state " << PN->printMarking((*iter)->state->myMarking) << " activates the input events: " << endl;
+	//cout << "\t state " << PN->printMarking((*iter)->state->myMarking) << " activates the input events: " << endl;
 #endif		
 		if ((*iter)->state->type == DEADLOCK || (*iter)->state->type == FINALSTATE)  {				// we just consider the maximal states only
 			i = 0;
-			PN->setCurrentMarkingFromState((*iter));
+//			PN->setCurrentMarkingFromState((*iter));
+			
+			(*iter)->state->decode(PN->CurrentMarking, PN);
 			while ((*iter)->state->quasiFirelist && (*iter)->state->quasiFirelist[i]) {
 				
 				for (std::set<unsigned int>::iterator index = (*iter)->state->quasiFirelist[i]->messageSet.begin();
@@ -325,10 +327,11 @@ setOfMessages interactionGraph::getActivatedOutputEvents(vertex * node) {
 #endif		
 			int i;
 			int k = 0;
-			marking = (*iter)->state->myMarking;
+			
+			(*iter)->state->decode(marking, PN);
+//			marking = (*iter)->state->myMarking;
 			
 			for (i = 0; i < PN->getPlaceCnt(); i++) {
-				
 				if (PN->Places[i]->getType() == OUTPUT && marking[i] > 0) {
 					
 #ifdef DEBUG
@@ -386,7 +389,8 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node) {
 			
 			messageMultiSet outputMessages;		// multiset of all input messages of the current state
 			
-			marking = (*iter)->state->myMarking;
+			(*iter)->state->decode(marking, PN);
+//			marking = (*iter)->state->myMarking;
 			
 			for (i = 0; i < PN->getPlaceCnt(); i++) {
 				
@@ -507,11 +511,13 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 	for (iter = node->getStateList()->setOfReachGraphStates.begin(); iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
 
 #ifdef DEBUG
-	cout << "\t state " << PN->printMarking((*iter)->state->myMarking) << " activates the input events: " << endl;
+	//cout << "\t state " << PN->printMarking((*iter)->state->myMarking) << " activates the input events: " << endl;
 #endif		
 		if ((*iter)->state->type == DEADLOCK || (*iter)->state->type == FINALSTATE)  {				// we just consider the maximal states only
 			i = 0;
-			PN->setCurrentMarkingFromState((*iter));
+//			PN->setCurrentMarkingFromState((*iter));
+			
+			(*iter)->state->decode(PN->CurrentMarking, PN);
 			while (!stateActivatesOutputEvents(*iter) && (*iter)->state->quasiFirelist && (*iter)->state->quasiFirelist[i]) {
 				
 				for (std::set<unsigned int>::iterator index = (*iter)->state->quasiFirelist[i]->messageSet.begin();
@@ -573,7 +579,8 @@ stateList * interactionGraph::calculateSuccStatesOutputSet(messageMultiSet outpu
 	for (iter = node->getStateList()->setOfReachGraphStates.begin(); iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
 	
 	
-		PN->setCurrentMarkingFromState(*iter);		// set the net to the marking of the state being considered
+//		PN->setCurrentMarkingFromState(*iter);		// set the net to the marking of the state being considered
+		(*iter)->state->decode(PN->CurrentMarking, PN);
 		if (PN->removeOutputMessage(output)) {	// remove the output message from the current marking
 			// if there is a state for which an output event was activated, catch that state
 			if (parameters[P_CALC_ALL_STATES]) {
@@ -606,7 +613,10 @@ stateList * interactionGraph::calculateSuccStatesInputReduced(messageMultiSet in
 	cout << "add input message " << input << " to state " << (*iter) << endl;
 #endif
 		if ((*iter)->isMinimal()) {	// if state is representative for this node
-			PN->setCurrentMarkingFromState(*iter);		// set the net to the marking of the state being considered
+//			PN->setCurrentMarkingFromState(*iter);		// set the net to the marking of the state being considered
+
+			(*iter)->state->decode(PN->CurrentMarking, PN);
+
 			PN->addInputMessage(input);					// add the input message to the current marking
 			if (parameters[P_CALC_ALL_STATES]) {
 				PN->calculateReachableStatesFull(newStateList, (*iter)->isMinimal());	// calc the reachable states from that marking

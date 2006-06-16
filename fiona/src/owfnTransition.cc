@@ -13,8 +13,9 @@
 #include "owfn.h"
 //#include "owfnPlace.h"
 //#include "dimensions.h"
-//#include "main.h"
+#include "main.h"
 #include "debug.h"
+#include "graph.h"
 
 //#include <set>
 
@@ -249,7 +250,9 @@ void owfnTransition::fire(oWFN * PN) {
   for(p = DecrPlaces, i = Decr; * p < UINT_MAX; p++,i++)
     {
       if (PN->CurrentMarking[*p] < *i) {
-      		cerr << "capacity of place " << PN->Places[*p]->name << " is: " << PN->CurrentMarking[*p] << " but transition " << this->name << " consumes: " << *i << endl;
+      		PN->printmarking();
+      		cerr << "marking of place " << PN->Places[*p]->name << " is: " << PN->CurrentMarking[*p] << " but transition " << this->name << " consumes: " << *i << endl;
+			cerr << "number of states calculated so far: " << State::card << endl;
 		_exit(4);
       } else {
 			PN->CurrentMarking[*p] -= * i;

@@ -41,6 +41,10 @@ void State::decode(unsigned int * v, oWFN * PN) {
 	
 	trace(TRACE_5, "void State::decode(int * v, oWFN * PN):start\n");
 	
+//	cout << "PN->Places: " << PN->Places << endl;
+
+//	cout << "decode for state: " << this << endl;
+	
 	long int cutplace;
 	int currentbyte;
 	binDecision * currentbindec;
@@ -66,35 +70,54 @@ void State::decode(unsigned int * v, oWFN * PN) {
 	cutplace = cutplace >> (7-(clast -cfirst));	
 	cutplace = cutplace << (7-(clast -cfirst));	
 
+//cout << "vor while" << endl;
 
 	while(1)
 	{
+//		cout << "currentplacenr: " << currentplacenr << endl;
+//		cout << "currentbyte: " << currentbyte << endl;
+//		cout << "v: " << v << endl;
+//		cout << "v[currentplacenr]: " << v[currentplacenr] << endl;
+//		
+//		cout << "PN->CurrentMarking: " << PN->CurrentMarking << endl;
+		
 		//vorn abschneiden
-		if(cfirst < pfirst)
-		{
+		if(cfirst < pfirst)	{
+		//	cout << "cfirst < pfirst" << endl;
 			cutplace &= (1 << (cfirst + 8 - pfirst)) - 1;
 		}
 		cutplace = cutplace >> (7 - (clast - cfirst));
 		// hinten abschneiden
-		if(clast > plast)
-		{
+		
+		if(clast > plast) {
+		//	cout << "clast > plast" << endl;
 			cutplace = cutplace >> (clast - plast);	
 		}
 
-
+		
 		// eintragen
-		if(plast > clast)
-		{
-			v[currentplacenr] += cutplace << (plast - clast); 
+		if(plast > clast) {
+		//	cout << "plast > clast" << endl;
+			PN->CurrentMarking[currentplacenr] += cutplace << (plast - clast); 
 		}
 		else
 		{
-			v[currentplacenr] = cutplace;
+			PN->CurrentMarking[currentplacenr] = cutplace;
 		}
 		
 		
 		if(cfirst == pfirst) {
+		//	cout << "cfirst == pfirst" << endl;
 			if(currentplacenr == 0) {
+		//		cout << "return" << endl;
+				trace(TRACE_5, "void State::decode(int * v, oWFN * PN):end\n");
+				
+				PN->initializeTransitions();
+				PN->placeHashValue = placeHashValue;
+				PN->initializeTransitions();
+				
+			//	cout << "\t got marking: " << endl;
+		//		PN->printmarking();
 				return;
 			}
 			// new place, new byte
@@ -102,12 +125,20 @@ void State::decode(unsigned int * v, oWFN * PN) {
 	
 			currentplacenr--;
 
+//			cout << "PN: " << PN << endl;
+//			cout << "PN->Places: " << PN->Places << endl;
+//			cout << "PN->Places[currentplacenr]: " << PN->Places[currentplacenr] << endl;
+//			cout << "PN->Places[currentplacenr]->startbit: " << PN->Places[currentplacenr]->startbit << endl;
+
 			pfirst = PN->Places[currentplacenr]->startbit;
 			plast = pfirst + PN->Places[currentplacenr]->nrbits - 1;
 
 			if(currentbyte == 0)
 			{
+	//			cout << "currentbyte == 0 (oben)" << endl;
 				// new vector
+	//			cout << "currentbindec -> prev: " << endl;
+		//		cout << currentbindec -> prev << endl;
 				currentbindec = currentbindec -> prev;
 				currentvector = currentbindec -> vector;
 				vectorsfirstbit = currentbindec -> bitnr + 1;
@@ -121,16 +152,20 @@ void State::decode(unsigned int * v, oWFN * PN) {
 			}
 			else
 			{
+		//		cout << "currentbyte != 0 (oben)" << endl;
 				currentbyte--;
 				cfirst -= 8;
 				clast = cfirst + 7;
+		//		cout << "currentvector: " << currentvector << endl;
+		//		cout << "currentvector[currentbyte]: " << currentvector[currentbyte] << endl;
 				cutplace = currentvector[currentbyte];
 			}
 			continue;
 		}
 		
+		
 		if(cfirst < pfirst) {
-			
+		//	cout << "cfirst < pfirst" << endl;
 
 			// new place
 			currentplacenr--;
@@ -141,8 +176,8 @@ void State::decode(unsigned int * v, oWFN * PN) {
 		}
 		
 		//(cfirst > pfirst --> new byte)
-		if(currentbyte == 0)
-		{
+		if(currentbyte == 0) {
+		//	cout << "currentbyte == 0 (unten) " << endl;
 			// new vector
 			currentbindec = currentbindec -> prev;
 			currentvector = currentbindec -> vector;
@@ -154,9 +189,8 @@ void State::decode(unsigned int * v, oWFN * PN) {
 			cutplace = cutplace ^ (1 << ( 7 - (clast -cfirst)));
 			cutplace = cutplace >> (7-(clast -cfirst));	
 			cutplace = cutplace << (7-(clast -cfirst));	
-		}
-		else
-		{
+		} else {
+		//	cout << "currentbyte != 0 (unten)" << endl;
 			currentbyte--;
 			cfirst -= 8;
 			clast = cfirst + 7;
@@ -164,6 +198,12 @@ void State::decode(unsigned int * v, oWFN * PN) {
 		}
 	}
 
+	PN->initializeTransitions();
+	PN->placeHashValue = placeHashValue;
+	PN->initializeTransitions();
+	
+//	cout << "\t got marking: " << endl;
+//	PN->printmarking();
 	trace(TRACE_5, "void State::decode(int * v, oWFN * PN):end\n");
 }
 

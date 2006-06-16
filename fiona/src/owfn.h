@@ -43,8 +43,6 @@ class oWFN  {
 		owfnTransition ** firelist();
 		owfnTransition ** quasiFirelist();
 		
-		void initializeTransitions();		//!< calls the check_enabled function for all transitions
-
 	public:
 		oWFN();
 		~oWFN();
@@ -58,6 +56,7 @@ class oWFN  {
 
 		unsigned int commDepth;				//!< depth of operating guideline
 											// wird in readnet.y gesetzt
+		void initializeTransitions();		//!< calls the check_enabled function for all transitions
 
 		unsigned int getPlaceCnt();			//!< number of all places
 		unsigned int placeInputCnt;			//!< number of input places
@@ -99,9 +98,9 @@ class oWFN  {
 		
 		State * calculateNextSate();
 		
-		int setCurrentMarkingFromState(reachGraphState *);// extracts the marking of the given state
+	//	int setCurrentMarkingFromState(reachGraphState *);// extracts the marking of the given state
 		unsigned int * copyCurrentMarking();
-		void copyMarkingToCurrentMarking(unsigned int * copy);
+	//	void copyMarkingToCurrentMarking(unsigned int * copy);
 		void calculateReachableStates(stateList *, bool);
 		void calculateReachableStatesFull(stateList *, bool);
 		

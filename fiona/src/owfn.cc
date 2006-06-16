@@ -262,9 +262,13 @@ void oWFN::addSuccStatesToList(stateList * list, State * NewState) {
 
 void oWFN::addStateToList(stateList * list, State * currentState) {
 		bool minimal = false;
+		
+		unsigned int * myMarking;
+		
+		currentState->decode(myMarking, this); 
 	
 		for (int z = 0; z < placeCnt; z++) {
-			if (Places[z]->getType() == OUTPUT && currentState->myMarking[z] > 0) {
+			if (Places[z]->getType() == OUTPUT && myMarking[z] > 0) {
 				minimal = true;
 				break;
 			}
@@ -295,14 +299,14 @@ unsigned int * oWFN::copyCurrentMarking() {
 	return copy;
 }
 
-void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
-
-	for (int i = 0; i < getPlaceCnt(); i++) {
-		CurrentMarking[i] = copy[i];
-	}	
-	
-	initializeTransitions();
-}
+//void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
+//
+//	for (int i = 0; i < getPlaceCnt(); i++) {
+//		CurrentMarking[i] = copy[i];
+//	}	
+//	
+//	initializeTransitions();
+//}
 
 
 //! \fn void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal)
@@ -328,7 +332,7 @@ void oWFN::calculateReachableStates(stateList * listOfStates, bool minimal) {
   		if (parameters[P_IG]) {
 	  		CurrentState->quasiFirelist = quasiFirelist();
   		}
-  		CurrentState->myMarking = copyCurrentMarking();
+  	//	CurrentState->myMarking = copyCurrentMarking();
   		CurrentState->current = 0;
   		CurrentState->parent = (State *) 0;
   		CurrentState->succ = new State * [CardFireList+1];
@@ -353,7 +357,8 @@ void oWFN::calculateReachableStates(stateList * listOfStates, bool minimal) {
 		if (CurrentState->current < CurrentState->CardFireList) {
 			//&& CurrentState->firelist[CurrentState->current] != NULL)
 
-			copyMarkingToCurrentMarking(CurrentState->myMarking);
+		//	copyMarkingToCurrentMarking(CurrentState->myMarking);
+			CurrentState->decode(CurrentMarking, this);
 			placeHashValue = CurrentState->placeHashValue;
 
 			// there is a next state that needs to be explored
@@ -382,7 +387,7 @@ void oWFN::calculateReachableStates(stateList * listOfStates, bool minimal) {
 		      		NewState->quasiFirelist = quasiFirelist();
 	      		}
 	      		NewState->current = 0;
-	      		NewState->myMarking = copyCurrentMarking();
+	      	//	NewState->myMarking = copyCurrentMarking();
 	      		NewState->parent = CurrentState;
 	      		NewState->succ =  new State * [CardFireList+1];
 	      		NewState->placeHashValue = placeHashValue;
@@ -402,7 +407,8 @@ void oWFN::calculateReachableStates(stateList * listOfStates, bool minimal) {
 
 	  		if(CurrentState) {			// there is a father to further examine
 	  			placeHashValue = CurrentState->placeHashValue;
-	      		copyMarkingToCurrentMarking(CurrentState->myMarking);
+	      		//copyMarkingToCurrentMarking(CurrentState->myMarking);
+	      		CurrentState->decode(CurrentMarking, this);
 	      		CurrentState->current++;
 	    	}
 		}
@@ -452,6 +458,10 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
 	// building EG in a node
   	while(CurrentState) {
  
+ 	//	cout << "(calcReach) state: " << CurrentState << " has marking: " << endl;
+ 	//	printmarking();
+ 	//	cout << "\t myMarking: " << printMarking(CurrentState->myMarking) << endl;
+ 
  		trace(TRACE_5, "building EG in a node\n"); 		
 		if ((listOfStates->elementCount() % 1000) == 0) {
 			trace(TRACE_2, "\t current state count: " + intToString(listOfStates->elementCount()) + "\n");
@@ -462,10 +472,11 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
 			//&& CurrentState->firelist[CurrentState->current] != NULL)
 
 			trace(TRACE_5, "copying marking\n");
-			copyMarkingToCurrentMarking(CurrentState->myMarking);
+		//	copyMarkingToCurrentMarking(CurrentState->myMarking);
+			CurrentState->decode(CurrentMarking, this);
 			trace(TRACE_5, "marking copied\n");
 			
-			placeHashValue = CurrentState->placeHashValue;
+		//	placeHashValue = CurrentState->placeHashValue;
 
 			// there is a next state that needs to be explored
 	  		
@@ -515,8 +526,9 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
 	  		CurrentState = CurrentState->parent;
 
 	  		if(CurrentState) {			// there is a father to further examine
-	  			placeHashValue = CurrentState->placeHashValue;
-	      		copyMarkingToCurrentMarking(CurrentState->myMarking);
+	  		//	placeHashValue = CurrentState->placeHashValue;
+	      	//	copyMarkingToCurrentMarking(CurrentState->myMarking);
+	      		CurrentState->decode(CurrentMarking, this);
 	      		CurrentState->current++;
 	    	}
 		}
@@ -774,17 +786,19 @@ void oWFN::addPlace(unsigned int i, owfnPlace * place) {
 //! \fn int oWFN::setCurrentMarkingFromState(reachGraphState * s)
 //! \param s state to be explored
 //! \brief extracts from the give state the marking and sets the currentmarking appropriatly
-int oWFN::setCurrentMarkingFromState(reachGraphState * s) {
-
-	trace(TRACE_5, "oWFN::setCurrentMarkingFromState(reachGraphState * state): start\n");
-
-	copyMarkingToCurrentMarking(s->state->myMarking);	
-	placeHashValue = s->state->placeHashValue;
-	copyMarkingToCurrentMarking(s->state->myMarking);
-	
-	unsigned int * markingvonkarsten = new unsigned int [placeCnt];
-	s->state->decode(markingvonkarsten, this);
-}
+//int oWFN::setCurrentMarkingFromState(reachGraphState * s) {
+//
+//	trace(TRACE_5, "oWFN::setCurrentMarkingFromState(reachGraphState * state): start\n");
+//
+////	copyMarkingToCurrentMarking(s->state->myMarking);
+//	
+////	placeHashValue = s->state->placeHashValue;
+//	
+////	copyMarkingToCurrentMarking(s->state->myMarking);
+//	
+////	unsigned int * markingvonkarsten = new unsigned int [placeCnt];
+//	s->state->decode(CurrentMarking, this);
+//}
 
 
 void oWFN::RemoveGraph() {

@@ -208,10 +208,14 @@ inline void trace()
       
 inline State * binSearch(binDecision * Bucket, oWFN * PN)
 {
+	
+//	cout << "search for marking " << PN->printMarking(PN->CurrentMarking) << endl;
+	
 	bin_dir = 0;
 	// search the state given in CurrentMarking in the binHashTable
 	if(!( fromdec = Bucket)) 
 	{
+//		cout << "\t not found!" << endl;
 		return (State *) 0;
 	}
 	
@@ -253,6 +257,7 @@ inline State * binSearch(binDecision * Bucket, oWFN * PN)
 		// case 0: length of vector reached without difference = state found
 		if(bin_b + bin_d >= PN->BitVectorSize)
 		{
+	//		cout << "\t state found at address: " << vectordec -> state << endl;
 			return vectordec -> state;
 		}
 checkagain:     if(todec)
@@ -262,6 +267,7 @@ checkagain:     if(todec)
 		// case 1: no difference or difference before "to" branch = state not found
 				if(bin_d < 8)
 				{
+	//				cout << "\t not found!" << endl;
 					return (State *) 0;
 				}
 				else
@@ -309,6 +315,7 @@ checkagain:     if(todec)
 		// case 4: no difference or state not found
 			if(bin_d < 8)
 			{
+		//		cout << "\t not found!" << endl;
 				return (State *) 0;
 			}
 			else
@@ -322,6 +329,8 @@ checkagain:     if(todec)
 			
 		}
 	}
+	
+//	cout << "\t state found at address: ???" << endl;
 }
 
 inline State * binInsert(binDecision ** Bucket, oWFN * PN)
@@ -331,6 +340,8 @@ inline State * binInsert(binDecision ** Bucket, oWFN * PN)
 #ifdef DEBUG
 	cout << "binInsert(binDecision ** Bucket, oWFN * PN): start" << endl;
 #endif
+
+//	cout << "binInsert: inserting " << PN->printMarking(PN->CurrentMarking) << endl;
 
 	binDecision * newd;
 	int vby, vbi;
@@ -353,6 +364,9 @@ inline State * binInsert(binDecision ** Bucket, oWFN * PN)
 		(*Bucket)-> prev = (binDecision *) 0;
 		(*Bucket)->state = new State;
 		(*Bucket)->state -> my_entry = * Bucket;
+		
+	//	cout << "\t at address: " << (*Bucket)->state << endl;
+		
 		return (*Bucket)->state;
 	}
 	newd = new binDecision(bin_b + bin_d, PN->BitVectorSize);
@@ -403,6 +417,7 @@ inline State * binInsert(binDecision ** Bucket, oWFN * PN)
         newd->state = new State;
         newd->state->my_entry = newd;
         
+   //     cout << "\t at address: " << newd->state << endl;
 		return newd -> state;
 	
 }

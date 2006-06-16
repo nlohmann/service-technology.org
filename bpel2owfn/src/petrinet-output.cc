@@ -39,17 +39,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/06/14 12:17:50 $
+ *          - last changed: \$Date: 2006/06/16 14:24:35 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  */
 
 
@@ -303,20 +303,20 @@ string Place::dotOut()
   result += " " + intToString(id) + "\t[label=\"" + nodeShortName() + "\"";
 
 
-  if (firstMemberIs(".in."))
+  if (firstMemberIs("in."))
     result += " style=filled fillcolor=gold shape=ellipse";
-  else if (firstMemberIs(".out."))
+  else if (firstMemberIs("out."))
     result += " style=filled fillcolor=yellow shape=ellipse";
-  else if (firstMemberIs(".link."))
-    result += " style=filled fillcolor=cornflowerblue";
-  else if (firstMemberIs(".!link."))
+  else if (firstMemberIs("!link."))
     result += " style=filled fillcolor=deeppink";
-  else if (firstMemberIs(".variable."))
+  else if (firstMemberIs("link."))
+    result += " style=filled fillcolor=cornflowerblue";
+  else if (firstMemberIs("variable."))
     result += " style=filled fillcolor=cyan";
-  else if (firstMemberIs(".1.internal.initial")
-	   || firstMemberIs(".1.internal.final"))
+  else if (firstMemberIs("1.internal.initial")
+	   || firstMemberIs("1.internal.final"))
     result += " style=filled fillcolor=green";
-  else if (firstMemberIs(".1.internal.clock"))
+  else if (firstMemberIs("1.internal.clock"))
     result += " style=filled fillcolor=seagreen";
 
   result += "];\n";

@@ -36,13 +36,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/06/19 08:55:11 $
+ *          - last changed: \$Date: 2006/06/19 12:33:32 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  */
 
 
@@ -440,7 +440,7 @@ bool PetriNet::communicationInPostSet(Place *p)
       t != pp.end();
       t++)
   {
-    if (((Transition*)(*t))->type != INTERNAL)
+    if ((*t)->type != INTERNAL)
       return true;
   }
   
@@ -495,37 +495,6 @@ void PetriNet::collapseSequences()
   }  
 }
 
-
-
-/*!
- * Merges twin transitions.
- */
-void PetriNet::mergeTwinTransitions()
-{
-  // a pair to store transitions to be merged
-  vector<pair<string, string> > transitionPairs;
-
-  trace(TRACE_VERY_DEBUG, "[PN]\tSearching for transitions with same preset and postset...\n");
-  // find transitions with same preset and postset
-  for (set<Transition *>::iterator t1 = T.begin(); t1 != T.end(); t1++)
-    for (set<Transition *>::iterator t2 = t1; t2 != T.end(); t2++)
-      if (*t1 != *t2)
-	if ((preset(*t1) == preset(*t2)) && (postset(*t1) == postset(*t2)))
-	  transitionPairs.push_back(pair<string, string>(*((*t1)->history.begin()), *((*t2)->history.begin())));
-
-  trace(TRACE_VERY_DEBUG, "[PN]\tFound " + intToString(transitionPairs.size()) + " transitions with same preset and postset...\n");
-
-  // merge the found transitions
-  for (unsigned int i = 0; i < transitionPairs.size(); i++)
-  {
-    Transition *t1 = findTransition(transitionPairs[i].first);
-    Transition *t2 = findTransition(transitionPairs[i].second);
-
-    if ((t1 != NULL) && (t2 != NULL) && (t1 != t2))
-      mergeTransitions(t1, t2);
-  }
-}
-
 /*---------------------------------------------------------------------------*/
 
 
@@ -567,14 +536,12 @@ void PetriNet::simplify()
     removeDeadNodes();
 
     removeUnusedStatusPlaces();
-
     elminiationOfIdenticalPlaces();		// RB1
     elminiationOfIdenticalTransitions();	// RB2
     fusionOfSeriesPlaces();			// RA1
-    fusionOfSeriesTransitions();		// RA2
+//    fusionOfSeriesTransitions();		// RA2
 
-/*    mergeTwinTransitions();
-    collapseSequences();*/
+    collapseSequences();
 
     trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification pass " + intToString(passes++) + ": " + information() + "\n");
 

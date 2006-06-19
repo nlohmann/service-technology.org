@@ -40,13 +40,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/19 08:55:11 $
+ *          - last changed: \$Date: 2006/06/19 12:33:32 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.81 $
+ * \version \$Revision: 1.82 $
  */
 
 
@@ -418,9 +418,9 @@ class PetriNet
 
 
     // old functions
-    void mergeTwinTransitions();
-    void collapseSequences();
+//    void mergeTwinTransitions();
     bool communicationInPostSet(Place* p);
+    void collapseSequences();
 
 
     /// Statistical output.

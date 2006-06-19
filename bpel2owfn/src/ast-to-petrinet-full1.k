@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/06/06 20:37:17 $
+ *          - last changed: \$Date: 2006/06/19 12:33:32 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.177 $
+ * \version \$Revision: 1.178 $
  *
  */
 %}
@@ -1370,28 +1370,18 @@ This=userDefinedEventHandler(a,b) ->
 	TheNet->newArc(onMessage_p2, onMessage_t3);
 	TheNet->newArc(onMessage_t3, onMessage_p3);
 
-	
+
   	// When the parameter "-p cycliceh" is set, the pattern is created as
     	// it is depicted in Fig. 29/30. Setting this option leads to cyclic
       	// Petri nets.
 	Transition *onMessage_t4 = TheNet->newTransition(newPrefix + "t4");
 	TheNet->newArc(onMessage_p4, onMessage_t4);
-	Transition *onMessage_t12 = TheNet->newTransition(newPrefix + "t12");
-	TheNet->newArc(onMessage_p11, onMessage_t12);
-	TheNet->newArc(onMessage_t12, onMessage_p12);
-	
 	if (parameters[P_CYCLICEH] == true)
-	{
 	  TheNet->newArc(onMessage_t4, onMessage_p5); // loop
-	  TheNet->newArc(onMessage_p5, onMessage_t12);
-	}
 	else
-	{
 	  TheNet->newArc(onMessage_t4, onMessage_p6); // abort
-	  TheNet->newArc(onMessage_p6, onMessage_t12);
-	}
 
-	
+
 	Transition *onMessage_t5 = TheNet->newTransition(newPrefix + "t5");
 	TheNet->newArc(onMessage_p5, onMessage_t5);
 	TheNet->newArc(onMessage_t5, onMessage_p6);
@@ -1416,6 +1406,11 @@ This=userDefinedEventHandler(a,b) ->
 	TheNet->newArc(onMessage_p2, onMessage_t11);
 	TheNet->newArc(onMessage_p11, onMessage_t11);
 	TheNet->newArc(onMessage_t11, onMessage_p12);
+
+	Transition *onMessage_t12 = TheNet->newTransition(newPrefix + "t12");
+	TheNet->newArc(onMessage_p5, onMessage_t12);
+	TheNet->newArc(onMessage_p11, onMessage_t12);
+	TheNet->newArc(onMessage_t12, onMessage_p12);
 
 
 	if (parameters[P_NOSTANDARDFAULTS] == false)

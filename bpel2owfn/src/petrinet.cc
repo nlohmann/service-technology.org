@@ -27,17 +27,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/06/15 06:54:44 $
+ *          - last changed: \$Date: 2006/06/19 08:44:44 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.127 $
+ * \version \$Revision: 1.128 $
  */
 
 
@@ -850,28 +850,15 @@ void PetriNet::connectNet(PetriNet * net)
   {
     F.insert(*arc);
   }
+  set< Place * > additionalP_in;
+  set< Place * > additionalP_out;
   for (set< Place * >::iterator place = net->P_in.begin(); place != net->P_in.end(); place ++)
   {
     (*place)->id = getId();
-    P_in.insert(*place);
     for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
     {
       roleMap[*name] = *place;
     }
-  }
-  for (set< Place * >::iterator place = net->P_out.begin(); place != net->P_out.end(); place ++)
-  {
-    (*place)->id = getId();
-    P_out.insert(*place);
-    for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
-    {
-      roleMap[*name] = *place;
-    }
-  }
-  // merge input and output places
-  set< Place * > newP_in;
-  for (set< Place * >::iterator place = P_in.begin(); place != P_in.end(); place ++)
-  {
     set< Place * >::iterator oPlace = P_out.begin();
     bool finished = false;
     while ( ! finished && oPlace != P_out.end())
@@ -896,10 +883,45 @@ void PetriNet::connectNet(PetriNet * net)
     }
     else
     {
-      newP_in.insert(*place);
+      additionalP_in.insert(*place);
     }
   }
-  P_in = newP_in;
+  for (set< Place * >::iterator place = net->P_out.begin(); place != net->P_out.end(); place ++)
+  {
+    (*place)->id = getId();
+    for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
+    {
+      roleMap[*name] = *place;
+    }
+    set< Place * >::iterator iPlace = P_in.begin();
+    bool finished = false;
+    while ( ! finished && iPlace != P_in.end())
+    {
+      if ((*iPlace)->nodeName() != (*place)->nodeName())
+      {
+	iPlace++;
+      }
+      else
+      {
+	finished = true;
+      }
+    }
+    if (iPlace != P_in.end())
+    {
+      (*place)->type = INTERNAL;
+      (*place)->history[0] = (*place)->nodeName();
+      (*iPlace)->type = INTERNAL;
+      (*iPlace)->history[0] = (*iPlace)->nodeName();
+      mergePlaces(*place,*iPlace);
+      P_in.erase(*iPlace);
+    }
+    else
+    {
+      additionalP_out.insert(*place);
+    }
+  }
+  P_in = setUnion(P_in, additionalP_in);
+  P_out = setUnion(P_out, additionalP_out);
   
 }
 

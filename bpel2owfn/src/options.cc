@@ -13,17 +13,12 @@ using namespace std;
 
 /// Filename of input file
 std::string filename = "<STDIN>";
-/// Filename of input file
-std::string filename1 = "<STDIN>";
-/// Filename of second input file
-std::string filename2 = "<STDIN>";
+list <std::string> inputfiles;
 /// Filename of output file
 std::string output_filename = "";
 
 /// pointer to input stream
 std::istream * input = &std::cin;
-/// pointer to input stream
-std::istream * input2 = &std::cin;
 /// pointer to output stream
 std::ostream * output = &std::cout;
 /// pointer to log stream
@@ -53,8 +48,6 @@ static struct option longopts[] =
   { "log",		optional_argument, NULL, 'l' },
   { "input",		required_argument, NULL, 'i' },
   { "inputfile",	required_argument, NULL, 'i' },
-  { "secondinput",	required_argument, NULL, 's' },
-  { "secondinputfile",	required_argument, NULL, 's' },
   { "output",		optional_argument, NULL, 'o' },
   { "outputfile",	optional_argument, NULL, 'o' },
   { "format",		required_argument, NULL, 'f' },
@@ -64,7 +57,7 @@ static struct option longopts[] =
   NULL
 };
 
-const char * par_string = "hvm:li:s:of:p:bd:";
+const char * par_string = "hvm:li:of:p:bd:";
 
 // --------------------- functions for command line evaluation ------------------------
 /**
@@ -84,7 +77,7 @@ void print_help()
   trace(" -v | --version         - print version information and exit\n");
   trace("\n");
   trace(" -m | --mode=<modus>    - select one of the following modes:\n");
-  trace("                          ast, pretty, petrinet, cfg\n");
+  trace("                          petrinet, consistency, ast, pretty, cfg\n");
   trace(" -p | --parameter=<par> - select additional parameters like:\n");
   trace("                          simplify, nointerface, acyclicwhile etc.\n");
   trace("                          (see documentation for further information)\n");
@@ -157,6 +150,14 @@ void parse_command_line(int argc, char* argv[])
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_INFO)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_PNML)] = true;
 
+  validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_LOLA)] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_OWFN)] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_DOT )] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_PEP )] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_APNN)] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_INFO)] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_PNML)] = true;
+
   validFormats[pair<possibleModi,possibleFormats>(M_CFG,F_DOT)] = true;
 
   // the programme's name on the commandline
@@ -194,6 +195,9 @@ void parse_command_line(int argc, char* argv[])
 	      }
 	      else if (parameter == "petrinet") {
 		modus = M_PETRINET;
+	      }
+	      else if (parameter == "consistency") {
+		modus = M_CONSISTENCY;
 	      }
 	      else if (parameter == "cfg") {
 		modus = M_CFG;
@@ -237,19 +241,11 @@ void parse_command_line(int argc, char* argv[])
       case 'i':
 	      if (options[O_INPUT])
 	      {
-		trace(TRACE_WARNINGS, "Multiple input options are given, only last one is used!\n");
+		// trace(TRACE_WARNINGS, "Multiple input options are given, only last one is used!\n");
 	      }
 	      options[O_INPUT] = true;
-	      filename1 = string(optarg);
-	      filename = filename1;
-              break;
-      case 's':
-	      if (options[O_SECONDINPUT])
-	      {
-		trace(TRACE_WARNINGS, "Multiple second input options are given, only last one is used!\n");
-	      }
-	      options[O_SECONDINPUT] = true;
-	      filename2 = string(optarg);
+	      filename = string(optarg);
+	      inputfiles.push_back(filename);
               break;
       case 'o':
 	      if (options[O_OUTPUT])
@@ -268,7 +264,8 @@ void parse_command_line(int argc, char* argv[])
 	      if (parameter == suffixes[F_LOLA])
 	      {
 		formats[F_LOLA] = true;
- 	        if (options[O_MODE] && modus != M_PETRINET)
+/*
+  	        if (options[O_MODE] && modus != M_PETRINET)
 	        {
 		  throw Exception(OPTION_MISMATCH, 
 				  "Choose only one mode\n",
@@ -276,10 +273,12 @@ void parse_command_line(int argc, char* argv[])
 	        }
 	    	modus = M_PETRINET;
 	        options[O_MODE] = true;
+*/
 	      }
 	      else if (parameter == suffixes[F_OWFN])
 	      {
 		formats[F_OWFN] = true;
+/*
  	        if (options[O_MODE] && modus != M_PETRINET)
 	        {
 		  throw Exception(OPTION_MISMATCH, 
@@ -288,6 +287,7 @@ void parse_command_line(int argc, char* argv[])
 	        }
 	    	modus = M_PETRINET;
 	        options[O_MODE] = true;
+*/
 	      }
 	      else if (parameter == suffixes[F_DOT])
 	      {
@@ -296,6 +296,7 @@ void parse_command_line(int argc, char* argv[])
 	      else if (parameter == "pep")
 	      {
 		formats[F_PEP] = true;
+/*
  	        if (options[O_MODE] && modus != M_PETRINET)
 	        {
 		  throw Exception(OPTION_MISMATCH, 
@@ -304,10 +305,12 @@ void parse_command_line(int argc, char* argv[])
 	        }
 	    	modus = M_PETRINET;
 	        options[O_MODE] = true;
+*/
 	      }
 	      else if (parameter == suffixes[F_APNN])
 	      {
 		formats[F_APNN] = true;
+/*
  	        if (options[O_MODE] && modus != M_PETRINET)
 	        {
 		  throw Exception(OPTION_MISMATCH, 
@@ -316,6 +319,7 @@ void parse_command_line(int argc, char* argv[])
 	        }
 	    	modus = M_PETRINET;
 	        options[O_MODE] = true;
+*/
 	      }
 	      else if (parameter == suffixes[F_INFO])
 	      {
@@ -324,6 +328,7 @@ void parse_command_line(int argc, char* argv[])
 	      else if (parameter == suffixes[F_PNML])
 	      {
 		formats[F_PNML] = true;
+/*
  	        if (options[O_MODE] && modus != M_PETRINET)
 	        {
 		  throw Exception(OPTION_MISMATCH, 
@@ -332,6 +337,7 @@ void parse_command_line(int argc, char* argv[])
 	        }
 	    	modus = M_PETRINET;
 	        options[O_MODE] = true;
+*/
 	      }
 	      else if (parameter == suffixes[F_TXT])
 	      {
@@ -474,17 +480,25 @@ void parse_command_line(int argc, char* argv[])
   // if input file is given, bind it to yyin
   if (options[O_INPUT])
   {
-    if (!(yyin = fopen(filename1.c_str(), "r")))
+    if (modus != M_CONSISTENCY && inputfiles.size() > 1)
     {
-      throw Exception(FILE_NOT_FOUND, "File '" + filename1 + "' not found.\n");
+      trace(TRACE_WARNINGS, "Multiple input options are given, only first one is used!\n");
     }
-  }
-
-  if (options[O_SECONDINPUT])
-  {
-    if (!(yyin2 = fopen(filename2.c_str(), "r")))
+    list< std::string >::iterator file = inputfiles.begin();
+    FILE * fin = NULL;
+    if (!(fin = fopen(file->c_str(), "r")))
     {
-      throw Exception(FILE_NOT_FOUND, "File '" + filename2 + "' not found.\n");
+      throw Exception(FILE_NOT_FOUND, "File '" + *file + "' not found.\n");
+    }
+    fclose(fin);
+    file++;
+    while(modus == M_CONSISTENCY && file != inputfiles.end())
+    {
+      if (!(fopen(file->c_str(), "r")))
+      {
+	throw Exception(FILE_NOT_FOUND, "File '" + *file + "' not found.\n");
+      }
+      file++;
     }
   }
 
@@ -496,10 +510,22 @@ void parse_command_line(int argc, char* argv[])
   // set output file name if non is already chosen
   if ((options[O_OUTPUT] || options[O_LOG]) && (output_filename == ""))
   {
-    unsigned int pos = filename.rfind(".bpel", filename.length());
-    if (pos == (filename.length() - 5))
+    list< std::string >::iterator file = inputfiles.begin();
+    unsigned int pos = file->rfind(".bpel", file->length());
+    if (pos == (file->length() - 5))
     {
-      output_filename = filename.substr(0, pos);
+      output_filename = file->substr(0, pos);
+    }
+    file++;
+    while(modus == M_CONSISTENCY && file != inputfiles.end())
+    {
+      unsigned int pos = file->rfind(".bpel", file->length());
+      unsigned int pos2 = file->rfind("/", file->length());
+      if (pos == (file->length() - 5))
+      {
+	output_filename += "_" + file->substr(pos2 + 1, pos - pos2 - 1);
+      }
+      file++;
     }
   }
 	  
@@ -507,11 +533,7 @@ void parse_command_line(int argc, char* argv[])
   {
     if (log_filename == "")
     {
-      unsigned int pos = filename.rfind(".bpel", filename.length());
-      if (pos == (filename.length() - 5))
-      {
-        log_filename = filename.substr(0, pos) + ".log";
-      }
+      log_filename = output_filename + ".log";
     }
     log_output = openOutput(log_filename);
   }

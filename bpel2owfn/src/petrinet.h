@@ -36,17 +36,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/19 12:33:32 $
+ *          - last changed: \$Date: 2006/06/19 13:06:33 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.82 $
+ * \version \$Revision: 1.83 $
  */
 
 
@@ -163,6 +163,9 @@ class Node
 
     /// the name of the node
     string nodeName();
+
+    /// an additional prefix for the name in order to distinguish nodes of different nets
+    std::string prefix;
 
     virtual ~Node();
 };
@@ -460,6 +463,7 @@ class PetriNet
 
     /// Mapping of roles to nodes of the Petri net.
     map<string, Node*> roleMap;
+
 };
 
 #endif

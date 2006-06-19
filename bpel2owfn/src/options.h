@@ -2,6 +2,7 @@
 #define OPTIONS_H
 
 #include <map>
+#include <list>
 #include <cstdio>
 #include "getopt.h"
 
@@ -10,7 +11,6 @@ typedef enum
    O_HELP,
    O_VERSION,
    O_INPUT,
-   O_SECONDINPUT,
    O_OUTPUT,
    O_MODE,
    O_BPEL2PN,
@@ -25,6 +25,7 @@ typedef enum
   M_AST = 1,
   M_PRETTY,
   M_PETRINET,
+  M_CONSISTENCY,
   M_CFG
 } possibleModi;
 
@@ -63,9 +64,7 @@ extern void parse_command_line(int argc, char* argv[]);
 /// Filename of input file
 extern std::string filename;
 /// Filename of first input file
-extern std::string filename1;
-/// Filename of second input file
-extern std::string filename2;
+extern std::list <std::string> inputfiles;
 /// Filename of input file
 extern std::string output_filename;
 /// Filename of log file
@@ -97,7 +96,6 @@ extern int yydebug;
 /* defined by flex */
 extern int yy_flex_debug;
 extern FILE *yyin;
-extern FILE *yyin2;
 
 // returns an open file pointer
 extern std::ostream * openOutput(std::string name);

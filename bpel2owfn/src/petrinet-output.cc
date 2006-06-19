@@ -39,17 +39,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/06/16 14:24:35 $
+ *          - last changed: \$Date: 2006/06/19 13:06:33 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.19 $
+ * \version \$Revision: 1.20 $
  */
 
 
@@ -123,6 +123,7 @@ string Node::nodeName()
 {
   string result = history[0];
   result = result.substr(result.find_last_of(".")+1,result.length());
+  result = prefix + result;
   return result;
 }
 
@@ -194,9 +195,9 @@ void PetriNet::printInformation()
 
     for (vector<string>::iterator role = (*p)->history.begin(); role != (*p)->history.end(); role++)
       if (role == (*p)->history.begin())
-	(*output) << "\t" + *role + "\n";
+	(*output) << "\t" + (*p)->prefix + *role + "\n";
       else
-	(*output) << "\t\t\t" + *role + "\n";
+	(*output) << "\t\t\t" + (*p)->prefix + *role + "\n";
   }
 
   // the input places
@@ -206,9 +207,9 @@ void PetriNet::printInformation()
 
     for (vector<string>::iterator role = (*p)->history.begin(); role != (*p)->history.end(); role++)
       if (role == (*p)->history.begin())
-	(*output) << "\t" + *role + "\n";
+	(*output) << "\t" + (*p)->prefix + *role + "\n";
       else
-	(*output) << "\t\t\t" + *role + "\n";
+	(*output) << "\t\t\t" + (*p)->prefix + *role + "\n";
   }
 
   // the output places
@@ -218,9 +219,9 @@ void PetriNet::printInformation()
 
     for (vector<string>::iterator role = (*p)->history.begin(); role != (*p)->history.end(); role++)
       if (role == (*p)->history.begin())
-	(*output) << "\t" + *role + "\n";
+	(*output) << "\t" + (*p)->prefix + *role + "\n";
       else
-	(*output) << "\t\t\t" + *role + "\n";
+	(*output) << "\t\t\t" + (*p)->prefix + *role + "\n";
   }
 
   // the transitions
@@ -233,9 +234,9 @@ void PetriNet::printInformation()
 
     for (vector<string>::iterator role = (*t)->history.begin(); role != (*t)->history.end(); role++)
       if (role == (*t)->history.begin())
-	(*output) << *role + "\n";
+	(*output) << (*t)->prefix + *role + "\n";
       else
-	(*output) << "\t" + *role + "\n";
+	(*output) << "\t" + (*t)->prefix + *role + "\n";
   }
 }
 
@@ -707,16 +708,18 @@ void PetriNet::owfnOut()
 
   // final marking
   (*output) << "FINALMARKING" << endl;
-  if (options[O_SECONDINPUT])
+  count = 1;
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
-    (*output) << "  " << findPlace("A.1.internal.final")->nodeShortName() << ":\t1," << endl;
-    (*output) << "  " << findPlace("B.1.internal.final")->nodeShortName() << ":\t1" << endl;
+    if ((*p)->nodeName() == ((*p)->prefix + "1.internal.final") )
+    {
+      if (count++ != 1)
+	(*output) << "," << endl;
+      
+      (*output) << "  " << (*p)->nodeShortName() << ":\t1";
+    }
   }
-  else
-  {
-    (*output) << "  " << findPlace("1.internal.final")->nodeShortName() << ":\t1" << endl;
-  }
-  (*output) << ";" << endl << endl << endl;
+  (*output) << endl << ";" << endl << endl << endl;
 
 
   // transitions

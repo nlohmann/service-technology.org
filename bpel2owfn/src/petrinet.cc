@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/06/19 08:44:44 $
+ *          - last changed: \$Date: 2006/06/19 13:06:33 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.128 $
+ * \version \$Revision: 1.129 $
  */
 
 
@@ -88,7 +88,7 @@ bool Node::firstMemberAs(string role)
 bool Node::firstMemberIs(string role)
 {
   string firstEntry =(*history.begin());
-  return (firstEntry.find(role, 0) != string::npos);
+  return (firstEntry.find(role, 0) == 0);
 }
 
 
@@ -809,18 +809,19 @@ void PetriNet::addPrefix(string prefix)
 
   for (set< Place * >::iterator place = P.begin(); place != P.end(); place ++)
   {
+    (*place)->prefix = prefix;
     for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
     {
-      *name = prefix + *name;
-      roleMap[*name] = *place;
+      if (*place == NULL)
+      roleMap[(prefix + *name)] = *place;
     }
   }
   for (set< Transition * >::iterator transition = T.begin(); transition != T.end(); transition ++)
   {
+    (*transition)->prefix = prefix;
     for(vector< string >::iterator name = (*transition)->history.begin(); name != (*transition)->history.end(); name++)
     {
-      *name = prefix + *name;
-      roleMap[*name] = *transition;
+      roleMap[prefix + *name] = *transition;
     }
   }
 }
@@ -834,7 +835,7 @@ void PetriNet::connectNet(PetriNet * net)
     P.insert(*place);
     for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
     {
-      roleMap[*name] = *place;
+      roleMap[((*place)->prefix + *name)] = *place;
     }
   }
   for (set< Transition * >::iterator transition = net->T.begin(); transition != net->T.end(); transition ++)
@@ -843,7 +844,7 @@ void PetriNet::connectNet(PetriNet * net)
     T.insert(*transition);
     for(vector< string >::iterator name = (*transition)->history.begin(); name != (*transition)->history.end(); name++)
     {
-      roleMap[*name] = *transition;
+      roleMap[(*transition)->prefix + *name] = *transition;
     }
   }
   for (set< Arc * >::iterator arc = net->F.begin(); arc != net->F.end(); arc ++)
@@ -857,7 +858,7 @@ void PetriNet::connectNet(PetriNet * net)
     (*place)->id = getId();
     for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
     {
-      roleMap[*name] = *place;
+      roleMap[(*place)->prefix + *name] = *place;
     }
     set< Place * >::iterator oPlace = P_out.begin();
     bool finished = false;
@@ -891,7 +892,7 @@ void PetriNet::connectNet(PetriNet * net)
     (*place)->id = getId();
     for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
     {
-      roleMap[*name] = *place;
+      roleMap[(*place)->prefix + *name] = *place;
     }
     set< Place * >::iterator iPlace = P_in.begin();
     bool finished = false;

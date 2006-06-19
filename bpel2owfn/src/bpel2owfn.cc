@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/14 12:17:50 $
+ *          - last changed: \$Date: 2006/06/19 13:06:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.76 $
+ * \version \$Revision: 1.77 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -55,12 +55,8 @@
 #include "options.h"
 #include "ast-printers.h"
 
-/// additional FILE pointer for second input file
-FILE * yyin2 = yyin;
-
 /// The Petri Net
 PetriNet *TheNet = new PetriNet();
-PetriNet *TheNet2 = NULL;
 
 /// The CFG
 CFGBlock * TheCFG = NULL;
@@ -123,7 +119,7 @@ void cfg()
 
 void petrinet_unparse()
 {
-      if(modus == M_PETRINET)
+ //     if(modus == M_PETRINET)
       {
         trace(TRACE_INFORMATION, "-> Unparsing AST to Petri net ...\n");
 
@@ -153,56 +149,164 @@ int main( int argc, char *argv[])
      * In case of false parameters call command line help function and exit.
      */
     parse_command_line(argc, argv);
-  	
-    trace(TRACE_INFORMATION, "Parsing ...\n");
   
-    // invoke Bison parser
-    int error = yyparse();
-
-    if (options[O_SECONDINPUT] && !error)
-    {
-      trace(TRACE_INFORMATION, "Parsing complete.\n");
-
-      if ( filename != "<STDIN>" && yyin != NULL)
+    PetriNet * TheNet2 = new PetriNet();
+    list< std::string >::iterator file = inputfiles.begin();
+    do {
+      if (inputfiles.size() >= 1)
       {
-	trace(TRACE_INFORMATION," + Closing input file: " + filename + "\n");
-        fclose(yyin);
+	filename = *file;
+	if (!(yyin = fopen(filename.c_str(), "r")))
+	{
+	  throw Exception(FILE_NOT_FOUND, "File '" + filename + "' not found.\n");
+	}
       }
+      trace(TRACE_INFORMATION, "Parsing " + filename + " ...\n");
+  
+      // invoke Bison parser
+      int error = yyparse();
+
+      if (!error)
+      {
+	trace(TRACE_INFORMATION, "Parsing complete.\n");
+
+	if ( filename != "<STDIN>" && yyin != NULL)
+	{
+	  trace(TRACE_INFORMATION," + Closing input file: " + filename + "\n");
+	  fclose(yyin);
+	}
  
-      cfg();
+	cfg();
 
-      petrinet_unparse();
-      
-      TheNet2 = TheNet;
-      TheNet = new PetriNet();
-      TheProcess = NULL;
+	if (modus == M_PETRINET || modus == M_CONSISTENCY)
+	{
+	  petrinet_unparse();
+    
+	  if (modus == M_CONSISTENCY)
+	  {
+            unsigned int pos = file->rfind(".bpel", file->length());
+	    unsigned int pos2 = file->rfind("/", file->length());
+	    std::string prefix = "";
+	    if (pos == (file->length() - 5))
+	    {
+	      prefix = file->substr(pos2 + 1, pos - pos2 - 1) + "_";
+	    }
+	    TheNet->addPrefix(prefix);
 
-      filename = filename2;
-      yyin = yyin2;
+	    TheNet2->connectNet(TheNet);
+	    TheNet = new PetriNet();
+	    TheProcess = NULL;
+	  }
+	}
 
-      error = yyparse();
-    }
-
-    if (!error)
-    {
-      trace(TRACE_INFORMATION, "Parsing complete.\n");
-      
-      if (modus == M_AST)
-      {
-	trace(TRACE_INFORMATION, "-> Printing AST ...\n");
-        TheProcess->print();
       }
-        
-      if (modus == M_PRETTY)
+      else
       {
-	if (formats[F_XML])
+	cleanup();  
+
+	return error;
+
+      }
+      file++;
+    } while (modus == M_CONSISTENCY && file != inputfiles.end());
+
+    TheNet = TheNet2;
+
+    if (modus == M_AST)
+    {
+      trace(TRACE_INFORMATION, "-> Printing AST ...\n");
+      TheProcess->print();
+    }
+        
+    if (modus == M_PRETTY)
+    {
+      if (formats[F_XML])
+      {
+        if (output_filename != "")
+        {
+          output = openOutput(output_filename + "." + suffixes[F_XML]);
+        }
+        trace(TRACE_INFORMATION, "-> Printing \"pretty\" XML ...\n");
+        TheProcess->unparse(kc::printer, kc::xml);
+        if (output_filename != "")
+        {
+          closeOutput(output);
+          output = NULL;
+        }
+      }
+    }
+     
+    if (modus == M_PETRINET || modus == M_CONSISTENCY)
+    {
+
+      // remove variables?
+      if ( parameters[P_NOVARIABLES] )
+      {
+ 	trace(TRACE_INFORMATION, "-> Remove variable places from Petri Net ...\n");
+        TheNet->removeVariables();
+      }    
+      // simplify net ?
+      if ( parameters[P_SIMPLIFY] )
+      {
+ 	trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
+        TheNet->simplify();
+      }    
+
+      // create oWFN output ?
+      if ( formats[F_OWFN] )
+      {
+        if (output_filename != "")
+	{
+          output = openOutput(output_filename + "." + suffixes[F_OWFN]);
+    	}
+ 	trace(TRACE_INFORMATION, "-> Printing Petri net for oWFN ...\n");
+        TheNet->owfnOut();
+	if (output_filename != "")
+	{
+	  closeOutput(output);
+	  output = NULL;
+	}
+      }
+      // create LoLA output ?
+      if ( formats[F_LOLA] )
+      {
+	if (output_filename != "")
+	{
+ 	  output = openOutput(output_filename + "." + suffixes[F_LOLA]);
+	}
+
+	// TheNet->makeChannelsInternal();
+
+	trace(TRACE_INFORMATION, "-> Printing Petri net for LoLA ...\n");
+        TheNet->lolaOut();
+	if (output_filename != "")
+	{
+	  closeOutput(output);
+	  output = NULL;
+	}
+
+	if (modus == M_CONSISTENCY)
 	{
 	  if (output_filename != "")
 	  {
- 	    output = openOutput(output_filename + "." + suffixes[F_XML]);
+	    output = openOutput(output_filename + ".task");
 	  }
- 	  trace(TRACE_INFORMATION, "-> Printing \"pretty\" XML ...\n");
-          TheProcess->unparse(kc::printer, kc::xml);
+	  std::string andStr = "";
+	  (*output) << "FORMULA ALLPATH ALWAYS EXPATH EVENTUALLY (";
+	  for (list< std::string >::iterator file = inputfiles.begin(); file != inputfiles.end(); file++)
+	  {
+            unsigned int pos = file->rfind(".bpel", file->length());
+	    unsigned int pos2 = file->rfind("/", file->length());
+	    std::string prefix = "";
+	    if (pos == (file->length() - 5))
+	    {
+	      prefix = file->substr(pos2 + 1, pos - pos2 - 1) + "_";
+	    }
+	    (*output) << andStr << TheNet->findPlace(prefix + "1.internal.final")->nodeShortName() << " > 0";
+	    andStr = " AND ";
+	  }
+
+	  (*output) << ")";
 	  if (output_filename != "")
 	  {
 	    closeOutput(output);
@@ -210,174 +314,84 @@ int main( int argc, char *argv[])
 	  }
 	}
       }
-     
-      cfg();
-
-      petrinet_unparse();
-
-      if (modus == M_PETRINET)
+      // create PNML output ?
+      if ( formats[F_PNML] )
       {
-        if (options[O_SECONDINPUT])
-        {
-	  TheNet2->addPrefix("A.");
-	  TheNet->addPrefix("B.");
-	  
-	  TheNet2->connectNet(TheNet);
-
-	  TheNet = TheNet2;
-	  // combine the two nets
-
-	
+	if (output_filename != "")
+	{
+ 	  output = openOutput(output_filename + "." + suffixes[F_PNML]);
 	}
-
-
-        // remove variables?
- 	if ( parameters[P_NOVARIABLES] )
-        {
- 	  trace(TRACE_INFORMATION, "-> Remove variable places from Petri Net ...\n");
-          TheNet->removeVariables();
-        }    
-	// simplify net ?
- 	if ( parameters[P_SIMPLIFY] )
-        {
- 	  trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
-          TheNet->simplify();
-        }    
-
-        // create oWFN output ?
-        if ( formats[F_OWFN] )
-        {
-	  if (output_filename != "")
-	  {
- 	    output = openOutput(output_filename + "." + suffixes[F_OWFN]);
-	  }
- 	  trace(TRACE_INFORMATION, "-> Printing Petri net for oWFN ...\n");
-          TheNet->owfnOut();
-	  if (output_filename != "")
-	  {
-	    closeOutput(output);
-	    output = NULL;
-	  }
-        }
-        // create LoLA output ?
-        if ( formats[F_LOLA] )
-        {
-	  if (output_filename != "")
-	  {
- 	    output = openOutput(output_filename + "." + suffixes[F_LOLA]);
-	  }
-
-	  if (options[O_SECONDINPUT])
-	  {
-	    TheNet->makeChannelsInternal();
-	  }
- 	  trace(TRACE_INFORMATION, "-> Printing Petri net for LoLA ...\n");
-          TheNet->lolaOut();
-	  if (output_filename != "")
-	  {
-	    closeOutput(output);
-	    output = NULL;
-	  }
-
-	  if (options[O_SECONDINPUT])
-	  {
-	    if (output_filename != "")
-	    {
-	      output = openOutput(output_filename + ".task");
-	    }
-	    (*output) << "FORMULA ALLPATH ALWAYS EXPATH EVENTUALLY (" 
-		      << TheNet->findPlace("A.1.internal.final")->nodeShortName() << " > 0 AND "
-		      << TheNet->findPlace("B.1.internal.final")->nodeShortName() << " > 0)";
-	    if (output_filename != "")
-	    {
-	      closeOutput(output);
-	      output = NULL;
-	    }
-	  }
-        }
-        // create PNML output ?
-        if ( formats[F_PNML] )
-        {
-	  if (output_filename != "")
-	  {
- 	    output = openOutput(output_filename + "." + suffixes[F_PNML]);
-	  }
- 	  trace(TRACE_INFORMATION, "-> Printing Petri net for PNML ...\n");
-          TheNet->pnmlOut();
-	  if (output_filename != "")
-	  {
-	    closeOutput(output);
-	    output = NULL;
-	  }
-        }
-        // create PEP output ?
-        if ( formats[F_PEP] )
-        {
-	  if (output_filename != "")
-	  {
- 	    output = openOutput(output_filename + "." + suffixes[F_PEP]);
-	  }
- 	  trace(TRACE_INFORMATION, "-> Printing Petri net for PEP ...\n");
-          TheNet->pepOut();
-	  if (output_filename != "")
-	  {
-	    closeOutput(output);
-	    output = NULL;
-	  }
-        }
-        // create APNN output ?
-        if ( formats[F_APNN] )
-        {
-	  if (output_filename != "")
-	  {
- 	    output = openOutput(output_filename + "." + suffixes[F_APNN]);
-	  }
- 	  trace(TRACE_INFORMATION, "-> Printing Petri net for APNN ...\n");
-          TheNet->apnnOut();
-	  if (output_filename != "")
-	  {
-	    closeOutput(output);
-	    output = NULL;
-	  }
-        }
-        // create dot output ?
-        if ( formats[F_DOT] )
-        {
-	  if (output_filename != "")
-	  {
- 	    output = openOutput(output_filename + "." + suffixes[F_DOT]);
-	  }
- 	  trace(TRACE_INFORMATION, "-> Printing Petri net for dot ...\n");
-          TheNet->dotOut();
-	  if (output_filename != "")
-	  {
-	    closeOutput(output);
-	    output = NULL;
-	  }
-        }
-        // create info file ?
-        if ( formats[F_INFO] )
-        {	
-	  if (output_filename != "")
-	  {
- 	    output = openOutput(output_filename + "." + suffixes[F_INFO]);
-	  }
- 	  trace(TRACE_INFORMATION, "-> Printing Petri net information ...\n");
-          TheNet->printInformation();
-	  if (output_filename != "")
-	  {
-	    closeOutput(output);
-	    output = NULL;
-	  }
-        }
-
+ 	trace(TRACE_INFORMATION, "-> Printing Petri net for PNML ...\n");
+        TheNet->pnmlOut();
+	if (output_filename != "")
+	{
+	  closeOutput(output);
+	  output = NULL;
+	}
+      }
+      // create PEP output ?
+      if ( formats[F_PEP] )
+      {
+	if (output_filename != "")
+	{
+ 	  output = openOutput(output_filename + "." + suffixes[F_PEP]);
+	}
+ 	trace(TRACE_INFORMATION, "-> Printing Petri net for PEP ...\n");
+        TheNet->pepOut();
+	if (output_filename != "")
+	{
+	  closeOutput(output);
+	  output = NULL;
+	}
+      }
+      // create APNN output ?
+      if ( formats[F_APNN] )
+      {
+	if (output_filename != "")
+	{
+ 	  output = openOutput(output_filename + "." + suffixes[F_APNN]);
+	}
+ 	trace(TRACE_INFORMATION, "-> Printing Petri net for APNN ...\n");
+        TheNet->apnnOut();
+	if (output_filename != "")
+	{
+	  closeOutput(output);
+	  output = NULL;
+	}
+      }
+      // create dot output ?
+      if ( formats[F_DOT] )
+      {
+	if (output_filename != "")
+	{
+ 	  output = openOutput(output_filename + "." + suffixes[F_DOT]);
+	}
+ 	trace(TRACE_INFORMATION, "-> Printing Petri net for dot ...\n");
+        TheNet->dotOut();
+	if (output_filename != "")
+	{
+	  closeOutput(output);
+	  output = NULL;
+	}
+      }
+      // create info file ?
+      if ( formats[F_INFO] )
+      {	
+	if (output_filename != "")
+	{
+ 	  output = openOutput(output_filename + "." + suffixes[F_INFO]);
+	}
+ 	trace(TRACE_INFORMATION, "-> Printing Petri net information ...\n");
+        TheNet->printInformation();
+	if (output_filename != "")
+	{
+	  closeOutput(output);
+	  output = NULL;
+	}
       }
 
     }
 
-    cleanup();  
-
-    return error;
   }
   catch (Exception& e)
   {

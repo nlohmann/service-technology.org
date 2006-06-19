@@ -5,7 +5,7 @@
  *                                                                           *
  * BPEL2oWFN is free software; you can redistribute it and/or modify it      *
  * under the terms of the GNU General Public License as published by the     *
- * Free Software Foundation; either version 2 of the License, or(at your    *
+ * Free Software Foundation; either version 2 of the License, or (at your    *
  * option) any later version.                                                *
  *                                                                           *
  * BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT  *
@@ -36,13 +36,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/06/14 11:26:31 $
+ *          - last changed: \$Date: 2006/06/19 08:55:11 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
  */
 
 
@@ -111,6 +111,26 @@ void PetriNet::removeVariables()
 /******************************************************************************
  * Functions to structurally simplify the Petri net model
  *****************************************************************************/
+
+
+void PetriNet::removeUnusedStatusPlaces()
+{
+  list<Place*> unusedPlaces;
+
+  for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
+  {
+    if (postset(*p).empty() && (*p)->history[0] != "1.internal.final")
+      unusedPlaces.push_back(*p);
+  }
+
+  // remove unused places
+  for (list<Place*>::iterator p = unusedPlaces.begin(); p != unusedPlaces.end(); p++)
+    if (P.find(*p) != P.end())
+      removePlace(*p);
+}
+
+
+
 
 
 /*!
@@ -396,6 +416,127 @@ void PetriNet::fusionOfSeriesTransitions()
 
 
 
+
+
+
+
+
+
+/*-----------------------------------------------------------------------------
+ * old structural reduction rules
+ *---------------------------------------------------------------------------*/
+
+/*!
+ * Returns true if there is a communicating transition in the postset of the
+ * given place p.
+ *
+ * \param  p a place to check
+ * \return true, if a communicating transition was found
+ */
+bool PetriNet::communicationInPostSet(Place *p)
+{
+  set<Node*> pp = postset(p);
+  for (set<Node*>::iterator t = pp.begin();
+      t != pp.end();
+      t++)
+  {
+    if (((Transition*)(*t))->type != INTERNAL)
+      return true;
+  }
+  
+  return false;
+}
+
+
+/*!
+ * Collapse simple sequences.
+ *
+ * A simple sequence is a transition with
+ *  - singleton preset
+ *  - singleton postset
+ *  - no communicating transition following
+ *  - preset != postset
+ */
+void PetriNet::collapseSequences()
+{
+  trace(TRACE_VERY_DEBUG, "[PN]\tCollapsing simple sequences\n");
+
+  // a pair to store places to be merged
+  vector<string> sequenceTransitions;
+  vector<pair<string, string> >placeMerge;
+
+  // find transitions with singelton preset and postset
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+  {
+    if (
+	(preset(*t).size() == 1) &&
+	(postset(*t).size() == 1) &&
+	!communicationInPostSet((Place*)*(postset(*t).begin())) &&
+	(*(postset(*t).begin()) != (*preset(*t).begin()))
+       )
+    {
+      string id1 = *((*(preset(*t).begin()))->history.begin());
+      string id2 = *((*(postset(*t).begin()))->history.begin());
+      placeMerge.push_back(pair < string, string >(id1, id2));
+      sequenceTransitions.push_back(*((*t)->history.begin()));
+    }
+  }
+
+  // merge preset and postset
+  for (unsigned int i = 0; i < placeMerge.size(); i++)
+    mergePlaces(placeMerge[i].first, placeMerge[i].second);
+
+  // remove "sequence"-transtions
+  for (unsigned int i = 0; i < sequenceTransitions.size(); i++)
+  {
+    Transition *sequenceTransition = findTransition(sequenceTransitions[i]);
+    if (sequenceTransition != NULL)
+      removeTransition(sequenceTransition);
+  }  
+}
+
+
+
+/*!
+ * Merges twin transitions.
+ */
+void PetriNet::mergeTwinTransitions()
+{
+  // a pair to store transitions to be merged
+  vector<pair<string, string> > transitionPairs;
+
+  trace(TRACE_VERY_DEBUG, "[PN]\tSearching for transitions with same preset and postset...\n");
+  // find transitions with same preset and postset
+  for (set<Transition *>::iterator t1 = T.begin(); t1 != T.end(); t1++)
+    for (set<Transition *>::iterator t2 = t1; t2 != T.end(); t2++)
+      if (*t1 != *t2)
+	if ((preset(*t1) == preset(*t2)) && (postset(*t1) == postset(*t2)))
+	  transitionPairs.push_back(pair<string, string>(*((*t1)->history.begin()), *((*t2)->history.begin())));
+
+  trace(TRACE_VERY_DEBUG, "[PN]\tFound " + intToString(transitionPairs.size()) + " transitions with same preset and postset...\n");
+
+  // merge the found transitions
+  for (unsigned int i = 0; i < transitionPairs.size(); i++)
+  {
+    Transition *t1 = findTransition(transitionPairs[i].first);
+    Transition *t2 = findTransition(transitionPairs[i].second);
+
+    if ((t1 != NULL) && (t2 != NULL) && (t1 != t2))
+      mergeTransitions(t1, t2);
+  }
+}
+
+/*---------------------------------------------------------------------------*/
+
+
+
+
+
+
+
+
+
+
 /*!
  * Calls some simple structural reduction rules for Petri nets:
  *
@@ -425,10 +566,15 @@ void PetriNet::simplify()
   {
     removeDeadNodes();
 
+    removeUnusedStatusPlaces();
+
     elminiationOfIdenticalPlaces();		// RB1
     elminiationOfIdenticalTransitions();	// RB2
     fusionOfSeriesPlaces();			// RA1
     fusionOfSeriesTransitions();		// RA2
+
+/*    mergeTwinTransitions();
+    collapseSequences();*/
 
     trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification pass " + intToString(passes++) + ": " + information() + "\n");
 

@@ -36,17 +36,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/14 12:17:50 $
+ *          - last changed: \$Date: 2006/06/19 08:55:11 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.80 $
+ * \version \$Revision: 1.81 $
  */
 
 
@@ -225,9 +225,6 @@ class Transition:public Node
 class Place:public Node
 {
   public:
-//    /// type of the place(as defined in #place_type)
-//    communication_type type;
-
     /// constructor which creates a place and adds a first role to the history
     Place(unsigned int id, string role, communication_type type);
 
@@ -401,6 +398,9 @@ class PetriNet
     void detachNode(Node* n);
 
 
+    /// remove unused status places
+    void removeUnusedStatusPlaces();
+
     /// remove dead nodes of the Petri net
     void removeDeadNodes();
 
@@ -415,6 +415,12 @@ class PetriNet
 
     /// fusion of series transitions (RA2)
     void fusionOfSeriesTransitions();
+
+
+    // old functions
+    void mergeTwinTransitions();
+    void collapseSequences();
+    bool communicationInPostSet(Place* p);
 
 
     /// Statistical output.

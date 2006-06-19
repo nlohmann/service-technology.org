@@ -25,10 +25,10 @@
  * 	  symbols within a BPEL process.
  *
  * \author  
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
- *          - last changed: \$Date: 2006/03/31 14:56:53 $
+ *          - last changed: \$Date: 2006/06/19 14:51:42 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
@@ -118,7 +118,7 @@ kc::integer SymbolManager::needsDPE()
   // if we have possible starts and ends, we need a negLink and return 1
   if ( (dpePossibleEnds > 0) && (dpePossibleStarts > 0))
   {
-    trace(TRACE_DEBUG, "[CS] DPE: negLink needed\n");
+    trace(TRACE_VERY_DEBUG, "[CS] DPE: negLink needed\n");
     trace(TRACE_VERY_DEBUG, "[CS] DPE: possible starts: " 
 		           + intToString(dpePossibleStarts) + "\n"
 		           + "          possible ends: " 
@@ -127,7 +127,7 @@ kc::integer SymbolManager::needsDPE()
     return kc::mkinteger(1);
   }
   // no need for a negLink, so return 0
-  trace(TRACE_DEBUG, "[CS] DPE: no negLink needed\n");
+  trace(TRACE_VERY_DEBUG, "[CS] DPE: no negLink needed\n");
   trace(TRACE_VERY_DEBUG, "[CS] DPE: possible starts: " 
 		         + intToString(dpePossibleStarts) + "\n"
 		         + "          possible ends: " 

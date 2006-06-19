@@ -2708,7 +2708,7 @@ STReply::~STReply() {}
  */
 std::string STScope::addVariable(STVariable * variable) 
 {
-  trace(TRACE_DEBUG, "[ST] Adding variable " + variable->mapOfAttributes["name"]->value + "\n");
+  trace(TRACE_VERY_DEBUG, "[ST] Adding variable " + variable->mapOfAttributes["name"]->value + "\n");
   if (! variables.empty())
   {
     for (list<STVariable *>::iterator iter = variables.begin();
@@ -2742,7 +2742,7 @@ STVariable * STScope::checkVariable(std::string name, STScope * callingScope, bo
   {
     return NULL;
   }
-  trace(TRACE_DEBUG, "[ST] Checking variable " + name + "\n");
+  trace(TRACE_VERY_DEBUG, "[ST] Checking variable " + name + "\n");
   if (! variables.empty())
   {
     trace(TRACE_VERY_DEBUG, "[ST] Looking in Scope\n");
@@ -2773,7 +2773,7 @@ STVariable * STScope::checkVariable(std::string name, STScope * callingScope, bo
   }
 
   // create FaultVariable
-  trace(TRACE_DEBUG, "[ST] Adding fault variable " + name + "\n");
+  trace(TRACE_VERY_DEBUG, "[ST] Adding fault variable " + name + "\n");
   unsigned int key = symTab.insert(K_VARIABLE);
   STVariable * stVariable = NULL;
   stVariable = dynamic_cast<STVariable*> (symTab.lookup(key));

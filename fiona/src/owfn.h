@@ -114,6 +114,7 @@ class oWFN  {
 		bool isMaximal();					// returns true if the state is maximal
 		bool isMinimal();					// returns true if the state is minimal
 		char * printMarking(unsigned int *); // creates the label of the given marking
+		char * printCurrentMarkingForDot();  // creates the label of the current marking
 		bool isFinalMarking(unsigned int *);	// is the given marking == final marking of the net?
 		bool isFinal();	// does current marking satisfy final condition/final marking of the net?
 

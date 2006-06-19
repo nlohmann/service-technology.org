@@ -131,9 +131,9 @@ void oWFN::initialize() {
 		Transitions[i]->check_enabled(this);
   	}	
   	
-  	for(i = 0, BitVectorSize = 0; i < placeCnt; i++) {
-        BitVectorSize += Places[i]->nrbits;
-  	}
+//  	for(i = 0, BitVectorSize = 0; i < placeCnt; i++) {
+//        BitVectorSize += Places[i]->nrbits;
+//  	}
   		
 	unsigned int ki = 0;
 	unsigned int ko = 0;
@@ -265,7 +265,7 @@ void oWFN::addStateToList(stateList * list, State * currentState) {
 		
 		unsigned int * myMarking;
 		
-		currentState->decode(myMarking, this); 
+		currentState->decode(this); 
 	
 		for (int z = 0; z < placeCnt; z++) {
 			if (Places[z]->getType() == OUTPUT && myMarking[z] > 0) {
@@ -358,7 +358,7 @@ void oWFN::calculateReachableStates(stateList * listOfStates, bool minimal) {
 			//&& CurrentState->firelist[CurrentState->current] != NULL)
 
 		//	copyMarkingToCurrentMarking(CurrentState->myMarking);
-			CurrentState->decode(CurrentMarking, this);
+			CurrentState->decode(this);
 			placeHashValue = CurrentState->placeHashValue;
 
 			// there is a next state that needs to be explored
@@ -408,7 +408,7 @@ void oWFN::calculateReachableStates(stateList * listOfStates, bool minimal) {
 	  		if(CurrentState) {			// there is a father to further examine
 	  			placeHashValue = CurrentState->placeHashValue;
 	      		//copyMarkingToCurrentMarking(CurrentState->myMarking);
-	      		CurrentState->decode(CurrentMarking, this);
+	      		CurrentState->decode(this);
 	      		CurrentState->current++;
 	    	}
 		}
@@ -473,7 +473,7 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
 
 			trace(TRACE_5, "copying marking\n");
 		//	copyMarkingToCurrentMarking(CurrentState->myMarking);
-			CurrentState->decode(CurrentMarking, this);
+			CurrentState->decode(this);
 			trace(TRACE_5, "marking copied\n");
 			
 		//	placeHashValue = CurrentState->placeHashValue;
@@ -528,7 +528,7 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
 	  		if(CurrentState) {			// there is a father to further examine
 	  		//	placeHashValue = CurrentState->placeHashValue;
 	      	//	copyMarkingToCurrentMarking(CurrentState->myMarking);
-	      		CurrentState->decode(CurrentMarking, this);
+	      		CurrentState->decode(this);
 	      		CurrentState->current++;
 	    	}
 		}
@@ -660,6 +660,41 @@ char * oWFN::printMarking(unsigned int * marking) {
 				comma = true;
 			} else {
 				for (int k = 0; k < marking[i]; k++) {
+					if (comma) {
+						strcat(buffer, ", ");
+					}
+					strcat(buffer, Places[i]->name);
+					comma = true;
+				}
+			}
+		}
+		return buffer;
+	} catch(bad_alloc) {
+		char mess[] = "\n! oWFN::printMarking failed !\n";
+		//write(2,mess,sizeof(mess));
+		cerr << mess;
+		_exit(2);
+	}
+
+}
+
+char * oWFN::printCurrentMarkingForDot() {
+	bool comma = false;
+
+	try {
+		char * buffer = new char[256];
+		strcpy(buffer, "");
+		for (int i = 0; i < placeCnt; i++) {
+			if (CurrentMarking[i] > 5) {
+				if (comma) {
+					strcat(buffer, ", ");
+				}
+				strcat(buffer, Places[i]->name);
+				strcat(buffer, ":");
+				sprintf(buffer, "%s%d", buffer, CurrentMarking[i]);
+				comma = true;
+			} else {
+				for (int k = 0; k < CurrentMarking[i]; k++) {
 					if (comma) {
 						strcat(buffer, ", ");
 					}

@@ -32,7 +32,7 @@ public:
   State ** succ; 					// successor states in graph
   State * parent; 					// state responsible for first generation
   stateType type;					// type of state (Deadlock, Final, Transient)
-  void decode(unsigned int * vec, oWFN * PN);      // decode state into given marking vector
+  void decode(oWFN *);      // decode state into given marking vector
 
 };
 

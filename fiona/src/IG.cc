@@ -281,7 +281,7 @@ setOfMessages interactionGraph::getActivatedInputEvents(vertex * node) {
 			i = 0;
 //			PN->setCurrentMarkingFromState((*iter));
 			
-			(*iter)->state->decode(PN->CurrentMarking, PN);
+			(*iter)->state->decode(PN);
 			while ((*iter)->state->quasiFirelist && (*iter)->state->quasiFirelist[i]) {
 				
 				for (std::set<unsigned int>::iterator index = (*iter)->state->quasiFirelist[i]->messageSet.begin();
@@ -328,7 +328,7 @@ setOfMessages interactionGraph::getActivatedOutputEvents(vertex * node) {
 			int i;
 			int k = 0;
 			
-			(*iter)->state->decode(marking, PN);
+			(*iter)->state->decode(PN);
 //			marking = (*iter)->state->myMarking;
 			
 			for (i = 0; i < PN->getPlaceCnt(); i++) {
@@ -389,7 +389,7 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node) {
 			
 			messageMultiSet outputMessages;		// multiset of all input messages of the current state
 			
-			(*iter)->state->decode(marking, PN);
+			(*iter)->state->decode(PN);
 //			marking = (*iter)->state->myMarking;
 			
 			for (i = 0; i < PN->getPlaceCnt(); i++) {
@@ -517,7 +517,7 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 			i = 0;
 //			PN->setCurrentMarkingFromState((*iter));
 			
-			(*iter)->state->decode(PN->CurrentMarking, PN);
+			(*iter)->state->decode(PN);
 			while (!stateActivatesOutputEvents(*iter) && (*iter)->state->quasiFirelist && (*iter)->state->quasiFirelist[i]) {
 				
 				for (std::set<unsigned int>::iterator index = (*iter)->state->quasiFirelist[i]->messageSet.begin();
@@ -580,7 +580,7 @@ stateList * interactionGraph::calculateSuccStatesOutputSet(messageMultiSet outpu
 	
 	
 //		PN->setCurrentMarkingFromState(*iter);		// set the net to the marking of the state being considered
-		(*iter)->state->decode(PN->CurrentMarking, PN);
+		(*iter)->state->decode(PN);
 		if (PN->removeOutputMessage(output)) {	// remove the output message from the current marking
 			// if there is a state for which an output event was activated, catch that state
 			if (parameters[P_CALC_ALL_STATES]) {
@@ -615,7 +615,7 @@ stateList * interactionGraph::calculateSuccStatesInputReduced(messageMultiSet in
 		if ((*iter)->isMinimal()) {	// if state is representative for this node
 //			PN->setCurrentMarkingFromState(*iter);		// set the net to the marking of the state being considered
 
-			(*iter)->state->decode(PN->CurrentMarking, PN);
+			(*iter)->state->decode(PN);
 
 			PN->addInputMessage(input);					// add the input message to the current marking
 			if (parameters[P_CALC_ALL_STATES]) {

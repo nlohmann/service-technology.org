@@ -342,7 +342,7 @@ stateList * reachGraph::calculateSuccStatesInput(unsigned int input, vertex * no
         
       //  PN->setCurrentMarkingFromState((*iter));    // set the net to the marking of the state being considered
 
-		(*iter)->state->decode(PN->CurrentMarking, PN);
+		(*iter)->state->decode(PN);
 
         PN->addInputMessage(input);                 // add the input message to the current marking
         if (parameters[P_CALC_ALL_STATES]) {
@@ -370,7 +370,7 @@ stateList * reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex *
     for (iter = node->getStateList()->setOfReachGraphStates.begin(); iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
 //        PN->setCurrentMarkingFromState((*iter));    // set the net to the marking of the state being considered
         
-        (*iter)->state->decode(PN->CurrentMarking, PN);
+        (*iter)->state->decode(PN);
         
         PN->addInputMessage(input);                 // add the input message to the current marking
         if (parameters[P_CALC_ALL_STATES]) {
@@ -399,7 +399,7 @@ stateList * reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * 
 
 //        PN->setCurrentMarkingFromState(*iter);      // set the net to the marking of the state being considered
         
-        (*iter)->state->decode(PN->CurrentMarking, PN);
+        (*iter)->state->decode(PN);
         
         if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
             // if there is a state for which an output event was activated, catch that state
@@ -429,7 +429,7 @@ stateList * reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex
 
 //        PN->setCurrentMarkingFromState(*iter);      // set the net to the marking of the state being considered
         
-        (*iter)->state->decode(PN->CurrentMarking, PN);
+        (*iter)->state->decode(PN);
         
         if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
             // if there is a state for which an output event was activated, catch that state
@@ -479,8 +479,8 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
 
                 if (parameters[P_SHOW_STATES_PER_NODE]) {
                 	unsigned int * myMarking = new unsigned int [PN->getPlaceCnt()];
-                	(*iter)->state->decode(myMarking, PN);
-                    os << "[" << PN->printMarking(myMarking) << "]" << (*iter)->state << "\\n";
+                	(*iter)->state->decode(PN);
+                    os << "[" << PN->printCurrentMarkingForDot() << "]" << (*iter)->state << "\\n";
                 }
 //              os << "(";
                 if (v->getColor() != RED) {
@@ -653,7 +653,7 @@ bool reachGraph::stateActivatesOutputEvents(reachGraphState * s) {
     int i;
     unsigned int * myMarking;
     
-    s->state->decode(myMarking, PN);
+    s->state->decode(PN);
 
     for (i = 0; i < PN->getPlaceCnt(); i++) {
 

@@ -37,13 +37,24 @@ unsigned int MinBookmark; // MIN number of the first closed marking
 
 
 // decodes state and returns the corresponding marking
-void State::decode(unsigned int * v, oWFN * PN) {
+void State::decode(oWFN * PN) {
 	
 	trace(TRACE_5, "void State::decode(int * v, oWFN * PN):start\n");
 	
 //	cout << "PN->Places: " << PN->Places << endl;
 
-//	cout << "decode for state: " << this << endl;
+	cout << "decode for state: " << this << endl;
+	cout << "\t with myMarking: " << PN->printMarking(this->myMarking) << endl;
+	
+//	for (int i = 0; i < PN->getPlaceCnt(); i++) {
+//		PN->CurrentMarking[i] = myMarking[i];	
+//	}
+//	
+//				PN->placeHashValue = placeHashValue;
+//				PN->initializeTransitions();
+//	
+//	
+//	return;
 	
 	long int cutplace;
 	int currentbyte;
@@ -69,6 +80,7 @@ void State::decode(unsigned int * v, oWFN * PN) {
 	clast = PN->BitVectorSize - 1;
 	cutplace = cutplace >> (7-(clast -cfirst));	
 	cutplace = cutplace << (7-(clast -cfirst));	
+
 
 //cout << "vor while" << endl;
 
@@ -112,12 +124,16 @@ void State::decode(unsigned int * v, oWFN * PN) {
 		//		cout << "return" << endl;
 				trace(TRACE_5, "void State::decode(int * v, oWFN * PN):end\n");
 				
-				PN->initializeTransitions();
+			//	PN->initializeTransitions();
 				PN->placeHashValue = placeHashValue;
 				PN->initializeTransitions();
+
+		cout << "currentplacenr: " << currentplacenr << endl;
+		cout << "currentbyte: " << currentbyte << endl;
 				
-			//	cout << "\t got marking: " << endl;
-		//		PN->printmarking();
+				cout << "\t got marking: " << endl;
+				PN->printmarking();
+
 				return;
 			}
 			// new place, new byte
@@ -198,12 +214,16 @@ void State::decode(unsigned int * v, oWFN * PN) {
 		}
 	}
 
-	PN->initializeTransitions();
+//	PN->initializeTransitions();
 	PN->placeHashValue = placeHashValue;
 	PN->initializeTransitions();
+
+
+		cout << "currentplacenr: " << currentplacenr << endl;
+		cout << "currentbyte: " << currentbyte << endl;
 	
-//	cout << "\t got marking: " << endl;
-//	PN->printmarking();
+	cout << "\t got marking: " << endl;
+	PN->printmarking();
 	trace(TRACE_5, "void State::decode(int * v, oWFN * PN):end\n");
 }
 

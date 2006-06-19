@@ -233,7 +233,7 @@ void  operatingGuidelines::getActivatedOutputEvents(vertex * node) {
 			int k = 0;
 			//marking = (*iter)->state->myMarking;
 			
-			(*iter)->state->decode(myMarking, PN);
+			(*iter)->state->decode(PN);
 						
 			for (i = 0; i < PN->placeOutputCnt; i++) {
 				

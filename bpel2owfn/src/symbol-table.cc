@@ -26,7 +26,7 @@
  *
  * \author
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $  
+ *          - last changes of: \$Author: gierds $  
  *          
  * \date
  * 
@@ -2736,7 +2736,7 @@ std::string STScope::addVariable(STVariable * variable)
 }
 
 /// checks for a variable with a given name and returns pointer to the object
-STVariable * STScope::checkVariable(std::string name, STScope * callingScope, bool isFaultVariable)
+STVariable * STScope::checkVariable(std::string name, int line, STScope * callingScope, bool isFaultVariable)
 {
   if (name == "")
   {
@@ -2759,7 +2759,7 @@ STVariable * STScope::checkVariable(std::string name, STScope * callingScope, bo
   if (parentScopeId != 0)
   {
     trace(TRACE_VERY_DEBUG, "[ST] Looking in parent Scope " + intToString(parentScopeId) +"\n");
-    return (dynamic_cast <STScope*> (symTab.lookup(parentScopeId)))->checkVariable(name, callingScope, isFaultVariable);
+    return (dynamic_cast <STScope*> (symTab.lookup(parentScopeId)))->checkVariable(name, line, callingScope, isFaultVariable);
   }
   else if (! isFaultVariable)
   {
@@ -2767,8 +2767,7 @@ STVariable * STScope::checkVariable(std::string name, STScope * callingScope, bo
     trace("ERROR: Undefined Variable found.\n");
     trace("       Name of undefined Variable is \"" 
 		   + name + "\".\n");
-    /// \todo change function (parameter vor STElement, so we have a line number)
-    // trace("       See line " + intToString(symTab.readAttribute()) + ".\n\n");
+    trace("       See line " + intToString(line) + ".\n\n");
     error();
   }
 

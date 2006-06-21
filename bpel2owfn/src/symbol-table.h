@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.41 $: 
+ * \version \$Revision: 1.42 $: 
  *
  */
 
@@ -747,7 +747,7 @@ class STScope: public STElement, public STEnvelope, public SymbolTableEntry
     std::string addVariable(STVariable *);
 
     /// checks for a variable with a given name and returns pointer to the object
-    STVariable * checkVariable(std::string, STScope * callingScope, bool isFaultVariable = false);
+    STVariable * checkVariable(std::string, int line, STScope * callingScope, bool isFaultVariable = false);
    
     /// adds a link to the enclosedLinks list
     void addLink(STLink *); 

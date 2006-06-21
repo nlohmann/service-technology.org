@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/06/14 14:34:24 $
+ *          - last changed: \$Date: 2006/06/21 11:32:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.182 $
+ * \version \$Revision: 1.183 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -697,7 +697,7 @@ tCatch:
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
-      stCatch->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "faultVariable"), currentSTScope, true);
+      stCatch->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "faultVariable"), symTab.readAttribute($2, "faultVariable")->line, currentSTScope, true);
     }
   activity X_NEXT X_SLASH K_CATCH
     { 
@@ -857,7 +857,7 @@ tOnMessage:
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
-      stOnMessage->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+      stOnMessage->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line, currentSTScope);
       stOnMessage->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
       stOnMessage->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
 								 symTab.readAttributeValue($2, "operation"), 
@@ -1161,8 +1161,8 @@ tInvoke:
 	{
 	  throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
 	}
-	stInvoke->inputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "inputVariable"),currentSTScope);
-	stInvoke->outputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "outputVariable"),currentSTScope);
+	stInvoke->inputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "inputVariable"), symTab.readAttribute($2, "inputVariable")->line, currentSTScope);
+	stInvoke->outputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "outputVariable"), symTab.readAttribute($2, "outputVariable")->line, currentSTScope);
 	stInvoke->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
         stInvoke->isAsynchronousInvoke = (stInvoke->outputVariable == NULL);
 
@@ -1254,8 +1254,8 @@ tInvoke:
 	{
 	  throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
 	}
-	stInvoke->inputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "inputVariable"),currentSTScope);
-	stInvoke->outputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "outputVariable"),currentSTScope);
+	stInvoke->inputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "inputVariable"), symTab.readAttribute($2, "inputVariable")->line,currentSTScope);
+	stInvoke->outputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "outputVariable"), symTab.readAttribute($2, "outputVariable")->line,currentSTScope);
 	stInvoke->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
         stInvoke->isAsynchronousInvoke = (stInvoke->outputVariable == NULL);
 
@@ -1326,8 +1326,8 @@ tInvoke:
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
-      stInvoke->inputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "inputVariable"),currentSTScope);
-      stInvoke->outputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "outputVariable"),currentSTScope);
+      stInvoke->inputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "inputVariable"), symTab.readAttribute($2, "inputVariable")->line,currentSTScope);
+      stInvoke->outputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "outputVariable"), symTab.readAttribute($2, "outputVariable")->line,currentSTScope);
       stInvoke->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
       stInvoke->isAsynchronousInvoke = (stInvoke->outputVariable == NULL);
 
@@ -1401,7 +1401,7 @@ tReceive:
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
-      stReceive->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+      stReceive->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stReceive->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
       stReceive->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
 								 symTab.readAttributeValue($2, "operation"), 
@@ -1447,7 +1447,7 @@ tReceive:
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
-      stReceive->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+      stReceive->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stReceive->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
       stReceive->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
 								 symTab.readAttributeValue($2, "operation"), 
@@ -1498,7 +1498,7 @@ tReply:
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
-      stReply->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+      stReply->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stReply->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
       stReply->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
 								 symTab.readAttributeValue($2, "operation"), 
@@ -1540,7 +1540,7 @@ tReply:
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
-      stReply->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+      stReply->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stReply->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
       stReply->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
 								 symTab.readAttributeValue($2, "operation"), 
@@ -1624,7 +1624,7 @@ tFrom:
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
-      stFrom->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+      stFrom->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stFrom->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
 
       $$ = From();
@@ -1638,7 +1638,7 @@ tFrom:
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
-      stFrom->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+      stFrom->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stFrom->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
 
       $$ = From();
@@ -1653,7 +1653,7 @@ tFrom:
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
-      stFrom->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+      stFrom->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stFrom->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
 
       $$ = From();
@@ -1676,7 +1676,7 @@ tTo:
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
-      stTo->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+      stTo->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stTo->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
 
       $$ = To();
@@ -1690,7 +1690,7 @@ tTo:
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
-      stTo->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+      stTo->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stTo->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
 
       $$ = To();
@@ -1809,7 +1809,7 @@ tThrow:
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
-      stThrow->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+      stThrow->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
 
       $$ = Throw($6);
       $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
@@ -1847,7 +1847,7 @@ tThrow:
       {
 	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
       }
-      stThrow->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"),currentSTScope);
+      stThrow->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
 
       $$ = Throw(noLinks);
       att.popSJFStack(); symTab.popSJFStack();

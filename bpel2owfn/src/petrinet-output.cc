@@ -39,17 +39,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/06/19 13:06:33 $
+ *          - last changed: \$Date: 2006/06/21 12:00:35 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  */
 
 
@@ -711,7 +711,7 @@ void PetriNet::owfnOut()
   count = 1;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
-    if ((*p)->nodeName() == ((*p)->prefix + "1.internal.final") )
+    if ((*p)->history[0] == ((*p)->prefix + "1.internal.final") ) // was: ((*p)->nodeName() == ((*p)->prefix + "1.internal.final") )
     {
       if (count++ != 1)
 	(*output) << "," << endl;

@@ -389,7 +389,7 @@ void SymbolTable::checkAttributeValueYesNo(string attributeName, string attribut
 {
   if((attributeValue != (string)"yes") && (attributeValue != (string)"no"))
   {
-    printErrorMsg("wrong value of " + attributeName + " attribute");
+    printErrorMsg("wrong value of " + attributeName + " attribute", (dynamic_cast< STElement *>(lookup(entryKey)))->line );
   }
 }
 
@@ -470,7 +470,7 @@ void SymbolTable::addAttribute(unsigned int entryKey, STAttribute* attribute)
   if(isDuplicate(entryKey, attribute))
   {
     //traceST("DUPLIKAT GEFUNDEN\n" + string(attribute->name) + "=" + string(attribute->value) + "\n");
-    printErrorMsg("attribute <" + (string)attribute->name + "> already exist");
+    printErrorMsg("attribute <" + (string)attribute->name + "> already exist", attribute->line );
   }
   // domain check
   else if(isValidAttributeValue(attribute->name, attribute->value))  
@@ -1076,9 +1076,13 @@ STAttribute* SymbolTable::readAttribute(unsigned int entryKey, string name)
  * print formatted symbol table error message
  * \param errorMsg  message
  */
-void SymbolTable::printErrorMsg(string errorMsg)
+void SymbolTable::printErrorMsg(string errorMsg, int line)
 {
   trace("[SymbolTable]: " + errorMsg + "\n");
+  if (line != 0)
+  {
+    trace("               See line " + intToString(line) + "\n");
+  }
   error();
 }
 
@@ -1142,7 +1146,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey, kc::casestring bpelElem
     { /* literal value is empty */
       if(lit.empty())
       {
-        printErrorMsg("from clause is wrong");
+        printErrorMsg("from clause is wrong", (dynamic_cast< STElement *>(lookup(entryKey)))->line );
       }
     }
     /* with attributes */
@@ -1155,7 +1159,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey, kc::casestring bpelElem
       }
       else
       {
-        printErrorMsg("from clause is wrong");        
+        printErrorMsg("from clause is wrong", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
     }
   }
@@ -1208,7 +1212,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       
       if(!conditionFlag)
       {
-        printErrorMsg("attribute " + A__CONDITION + "=\"" + T__BOOLEAN_EXPR + "\" is missing");          
+        printErrorMsg("attribute " + A__CONDITION + "=\"" + T__BOOLEAN_EXPR + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );          
       }        
       
     }
@@ -1271,7 +1275,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       
       if(!setFlag)
       {
-        printErrorMsg("attribute " + A__SET + "=\"" + T__NCNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__SET + "=\"" + T__NCNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
     }
     break;    
@@ -1303,11 +1307,11 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       
       if(!nameFlag)
       {
-        printErrorMsg("attribute " + A__NAME + "=\"" + T__NCNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__NAME + "=\"" + T__NCNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
       else if(!propertiesFlag)
       {
-        printErrorMsg("attribute " + A__PROPERTIES + "=\"" + T__QNAME_LIST + "\" is missing");        
+        printErrorMsg("attribute " + A__PROPERTIES + "=\"" + T__QNAME_LIST + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
       
     }
@@ -1433,7 +1437,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
         
       if(!validFrom)
       {
-        printErrorMsg("attribute combination within the from clause is wrong");          
+        printErrorMsg("attribute combination within the from clause is wrong", (dynamic_cast< STElement *>(lookup(entryKey)))->line );          
       }        
     }
     break;    
@@ -1503,25 +1507,25 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       
       if(!partnerLinkFlag)
       {
-      printErrorMsg("attribute " + A__PARTNER_LINK + "=\"" + T__NCNAME + "\" is missing");      
+      printErrorMsg("attribute " + A__PARTNER_LINK + "=\"" + T__NCNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );      
       }
       else if(!portTypeFlag)
       {
-        printErrorMsg("attribute " + A__PORT_TYPE + "=\"" + T__QNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__PORT_TYPE + "=\"" + T__QNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
       else if(!operationFlag)
       {
-        printErrorMsg("attribute " + A__OPERATION + "=\"" + T__NCNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__OPERATION + "=\"" + T__NCNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }            
       else if(!inputVariableFlag)
       {
-        printErrorMsg("attribute " + A__INPUT_VARIABLE + "=\"" + T__NCNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__INPUT_VARIABLE + "=\"" + T__NCNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
       /* optional */
       /*
       else if(!outputVariableFlag)
       {
-        printErrorMsg("attribute " + A__OUTPUT_VARIABLE + "=\"" + T__NCNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__OUTPUT_VARIABLE + "=\"" + T__NCNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }*/
       checkAttributeSJF(entryKey);
     }
@@ -1549,7 +1553,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       
       if(!nameFlag)
       {
-        printErrorMsg("attribute " + A__NAME + "=\"" + T__NCNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__NAME + "=\"" + T__NCNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
 
     }
@@ -1590,12 +1594,12 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
         // no attribute
         if(!forFlag && !untilFlag)
         {
-          printErrorMsg("attribute " + A__FOR + "=\"" + T__DURATION_EXPR + "\"  or " + A__UNTIL + "=\"" + T__DEADLINE_EXPR + " is missing");          
+          printErrorMsg("attribute " + A__FOR + "=\"" + T__DURATION_EXPR + "\"  or " + A__UNTIL + "=\"" + T__DEADLINE_EXPR + " is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );          
         }
         // to much attributes, only one is allowed
         else
         {
-          printErrorMsg("both attributes " + A__FOR + "=\"" + T__DURATION_EXPR + "\"  and " + A__UNTIL + "=\"" + T__DEADLINE_EXPR + " are not allowed");                  
+          printErrorMsg("both attributes " + A__FOR + "=\"" + T__DURATION_EXPR + "\"  and " + A__UNTIL + "=\"" + T__DEADLINE_EXPR + " are not allowed", (dynamic_cast< STElement *>(lookup(entryKey)))->line );                  
         }
       }
     }
@@ -1638,19 +1642,19 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       
       if(!partnerLinkFlag)
       {
-        printErrorMsg("attribute " + A__PARTNER_LINK + "=\"" + T__NCNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__PARTNER_LINK + "=\"" + T__NCNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
       else if(!portTypeFlag)
       {
-        printErrorMsg("attribute " + A__PORT_TYPE + "=\"" + T__QNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__PORT_TYPE + "=\"" + T__QNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
       else if(!operationFlag)
       {
-        printErrorMsg("attribute " + A__OPERATION + "=\"" + T__NCNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__OPERATION + "=\"" + T__NCNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
       else if(!variableFlag)
       {
-        printErrorMsg("attribute " + A__VARIABLE + "=\"" + T__NCNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__VARIABLE + "=\"" + T__NCNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
     }
     break;
@@ -1677,7 +1681,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       
       if(!nameFlag)
       {
-        printErrorMsg("attribute " + A__NAME + "=\"" + T__NCNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__NAME + "=\"" + T__NCNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
     }
     break;    
@@ -1726,12 +1730,12 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       // important for both cases
       if(!nameFlag)
       {
-        printErrorMsg("attribute " + A__NAME + "=\"" + T__NCNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__NAME + "=\"" + T__NCNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
       // important for case 1
       else if((((STPartnerLink*)symTab[entryKey])->isInPartners == false) && !partnerLinkTypeFlag)
       {
-        printErrorMsg("attribute " + A__PARTNER_LINK_TYPE + "=\"" + T__QNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__PARTNER_LINK_TYPE + "=\"" + T__QNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
       
     }
@@ -1771,11 +1775,11 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       
       if(!nameFlag)
       {
-        printErrorMsg("attribute " + A__NAME + "=\"" + T__NCNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__NAME + "=\"" + T__NCNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
       else if(!targetNamespaceFlag)
       {
-        printErrorMsg("attribute " + A__TARGET_NAMESPACE + "=\"" + T__ANYURI + "\" is missing");        
+        printErrorMsg("attribute " + A__TARGET_NAMESPACE + "=\"" + T__ANYURI + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
       checkAttributeSJF(entryKey);
     }
@@ -1818,19 +1822,19 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       
       if(!partnerLinkFlag)
       {
-        printErrorMsg("attribute " + A__PARTNER_LINK + "=\"" + T__NCNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__PARTNER_LINK + "=\"" + T__NCNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
       else if(!portTypeFlag)
       {
-        printErrorMsg("attribute " + A__PORT_TYPE + "=\"" + T__QNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__PORT_TYPE + "=\"" + T__QNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
       else if(!operationFlag)
       {
-        printErrorMsg("attribute " + A__OPERATION + "=\"" + T__NCNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__OPERATION + "=\"" + T__NCNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
       else if(!variableFlag)
       {
-        printErrorMsg("attribute " + A__VARIABLE + "=\"" + T__NCNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__VARIABLE + "=\"" + T__NCNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
       checkAttributeSJF(entryKey);
     }
@@ -1868,15 +1872,15 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       
       if(!partnerLinkFlag)
       {
-        printErrorMsg("attribute " + A__PARTNER_LINK + "=\"" + T__NCNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__PARTNER_LINK + "=\"" + T__NCNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
       else if(!portTypeFlag)
       {
-        printErrorMsg("attribute " + A__PORT_TYPE + "=\"" + T__QNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__PORT_TYPE + "=\"" + T__QNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
       else if(!operationFlag)
       {
-        printErrorMsg("attribute " + A__OPERATION + "=\"" + T__NCNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__OPERATION + "=\"" + T__NCNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
       checkAttributeSJF(entryKey);
     }
@@ -1918,7 +1922,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       
       if(!linkNameFlag)
       {
-        printErrorMsg("attribute " + A__LINK_NAME + "=\"" + T__NCNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__LINK_NAME + "=\"" + T__NCNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
 
     }
@@ -1953,7 +1957,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       
       if(!linkNameFlag)
       {
-        printErrorMsg("attribute " + A__LINK_NAME + "=\"" + T__NCNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__LINK_NAME + "=\"" + T__NCNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
 
     }
@@ -1988,7 +1992,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       
       if(!faultNameFlag)
       {
-        printErrorMsg("attribute " + A__FAULT_NAME + "=\"" + T__QNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__FAULT_NAME + "=\"" + T__QNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
       checkAttributeSJF(entryKey);
     }
@@ -2087,7 +2091,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       
       if(!validTo)
       {
-        printErrorMsg("attribute combination within the to clause is wrong");        
+        printErrorMsg("attribute combination within the to clause is wrong", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }      
       }
       break;    
@@ -2114,7 +2118,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       
       if(!nameFlag)
       {
-        printErrorMsg("attribute " + A__NAME + "=\"" + T__NCNAME + "\" is missing");        
+        printErrorMsg("attribute " + A__NAME + "=\"" + T__NCNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
 
     }
@@ -2155,12 +2159,12 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
         // no attribute
         if(!forFlag && !untilFlag)
         {
-          printErrorMsg("attribute " + A__FOR + "=\"" + T__DURATION_EXPR + "\"  or " + A__UNTIL + "=\"" + T__DEADLINE_EXPR + " is missing");          
+          printErrorMsg("attribute " + A__FOR + "=\"" + T__DURATION_EXPR + "\"  or " + A__UNTIL + "=\"" + T__DEADLINE_EXPR + " is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );          
         }
         // to much attributes, only one is allowed
         else
         {
-          printErrorMsg("both attributes " + A__FOR + "=\"" + T__DURATION_EXPR + "\"  and " + A__UNTIL + "=\"" + T__DEADLINE_EXPR + " are not allowed");                  
+          printErrorMsg("both attributes " + A__FOR + "=\"" + T__DURATION_EXPR + "\"  and " + A__UNTIL + "=\"" + T__DEADLINE_EXPR + " are not allowed", (dynamic_cast< STElement *>(lookup(entryKey)))->line );                  
         }
       }
       checkAttributeSJF(entryKey);
@@ -2189,7 +2193,7 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
       
       if(!conditionFlag)
       {
-        printErrorMsg("attribute " + A__CONDITION + "=\"" + T__BOOLEAN_EXPR + "\" is missing");        
+        printErrorMsg("attribute " + A__CONDITION + "=\"" + T__BOOLEAN_EXPR + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
       checkAttributeSJF(entryKey);  
     }

@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.42 $: 
+ * \version \$Revision: 1.43 $: 
  *
  */
 
@@ -153,7 +153,7 @@ class SymbolTable
     string vertical;
 
     /// print formatted symbol table error message
-	void printErrorMsg(string errorMsg);
+	void printErrorMsg(string errorMsg, int line = 0);
     
     /// return the key of the last insert element
     unsigned int getCurrentEntryKey();

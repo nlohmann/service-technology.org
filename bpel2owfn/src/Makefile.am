@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/06/14 12:17:50 $ by $Author: gierds $.
-# Version $Revision: 1.23 $
+# File last changed $Date: 2006/06/22 13:43:53 $ by $Author: gierds $.
+# Version $Revision: 1.24 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -27,8 +27,8 @@ bin_PROGRAMS = bpel2owfn
 KCFLAGS = --yystype --no-printdot --file-prefix=bpel-kc- --suffix=cc
 #AM_YFLAGS = --defines --yacc #--no-lines
 
-AM_CXXFLAGS=-g -pedantic 
-AM_CFLAGS=-g -pedantic
+AM_CXXFLAGS= # -g -pedantic 
+AM_CFLAGS=   # -g -pedantic
 
 # generated Flex and Bison sources
 YYSOURCES = bpel-syntax.h bpel-syntax.cc bpel-lexic.cc

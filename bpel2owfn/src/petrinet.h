@@ -36,17 +36,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/19 13:06:33 $
+ *          - last changed: \$Date: 2006/06/22 20:23:15 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.83 $
+ * \version \$Revision: 1.84 $
  */
 
 
@@ -376,7 +376,10 @@ class PetriNet
 
     /// moves channel places to the list of internal places
     void makeChannelsInternal();
-  
+
+    /// Statistical output.
+    string information();
+    
     /// Constructor to create an empty Petri net.
     PetriNet();
 
@@ -425,9 +428,6 @@ class PetriNet
     bool communicationInPostSet(Place* p);
     void collapseSequences();
 
-
-    /// Statistical output.
-    string information();
 
     /// Removes interface places (for non-oWFN formats)
     void removeInterface();

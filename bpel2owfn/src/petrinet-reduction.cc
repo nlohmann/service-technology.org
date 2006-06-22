@@ -32,17 +32,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/06/19 12:33:32 $
+ *          - last changed: \$Date: 2006/06/22 15:04:04 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.19 $
+ * \version \$Revision: 1.20 $
  */
 
 
@@ -539,9 +539,9 @@ void PetriNet::simplify()
     elminiationOfIdenticalPlaces();		// RB1
     elminiationOfIdenticalTransitions();	// RB2
     fusionOfSeriesPlaces();			// RA1
-//    fusionOfSeriesTransitions();		// RA2
+    fusionOfSeriesTransitions();		// RA2
 
-    collapseSequences();
+//    collapseSequences();
 
     trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification pass " + intToString(passes++) + ": " + information() + "\n");
 

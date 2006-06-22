@@ -15,29 +15,30 @@
 #include "enums.h"
 #include <string>
 #include <set>		// set
+//#include "mynew.h"
 
 using namespace std;
 
 class State;
 class graphEdge;
 
-struct compareChars {
-  bool operator() (char const * left, char const * right) {
-    return (strcmp(left, right) < 0);
-  }
-}; // compareVertices 
-
-
-typedef std::set<graphEdge *> clauseSet;
-typedef std::set<char *, compareChars> clauseSetLabel;
+class clause {
+public:
+	clause(graphEdge *);
+	~clause();	
+	
+	graphEdge * edge;
+	clause * nextElement; 
+	
+	void setEdge(graphEdge *);
+};
 
 
 class reachGraphState {
 	
 protected:
 	bool isMin;							//!< state is minimal or not
-	
-	clauseSetLabel clauseLabel;
+	clause * firstElement;
 		
 public:
 	reachGraphState(bool);
@@ -45,12 +46,11 @@ public:
 	~reachGraphState();
 	
 	State * state;				//!< pointer to Karsten's state structure
-	clauseSet clause1;
-	
+
 	bool isMinimal() ;	
 	vertexColor calcColor();
 	
-	void addClauseElement(graphEdge *);
+//	void addClauseElement(graphEdge *);
 	void addClauseElement(char *);
 	
 	string getClause();
@@ -86,7 +86,6 @@ typedef std::set<reachGraphState*, Object_Compare> reachGraphStateSet;
 class stateList {
 	
 private:
-//	unsigned long checkSum;		//!< hash value of all the states in the list
     	
 public:
 	stateList();

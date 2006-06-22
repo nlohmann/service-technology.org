@@ -16,6 +16,7 @@
 #include <map>
 
 #include "enums.h"
+//#include "mynew.h"
 
 
 using namespace std;
@@ -23,11 +24,10 @@ using namespace std;
 class graphEdge;
 class stateList;
 class successorNodeList;
-class operatingGuidelines;
 
 
-class vertex {
-
+class vertex
+{
 protected:
 	vertexColor color; 						//!< color of vertex
 	successorNodeList * successorNodes;		//!< list of all the nodes succeeding this one 
@@ -48,10 +48,7 @@ public:
 	
     unsigned int getNumber();
     void setNumber(unsigned int);
-
-    stateList * getStateList();
     void setStateList(stateList *);
-
     // void addSuccessorNode(vertex *, char *, edgeType);
     void addSuccessorNode(graphEdge *);
     graphEdge * getNextEdge();
@@ -60,8 +57,7 @@ public:
     
     void resetIteratingSuccNodes();
     
-    
-    void deleteRedSuccessorNodes(operatingGuidelines * );
+    stateList * getStateList();
     
    // void addPredecessorNode(vertex *, char *, edgeType);  
 //    void addPredecessorNode(graphEdge *);  

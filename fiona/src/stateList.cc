@@ -9,8 +9,29 @@
 #include "main.h"
 #include "enums.h"
 #include "debug.h"
+//#include "mynew.h"
 
 using namespace std;
+
+
+clause::clause(graphEdge * _edge) : edge(_edge), nextElement(NULL)  {
+	
+}
+
+clause::~clause() {
+	if (edge->getNode() == NULL) {
+		delete edge;	
+	}
+}
+
+void clause::setEdge(graphEdge * _edge) {
+	if (edge != NULL) {
+		if (edge->getNode() == NULL) {  // in case we have stored a "fake" edge, we delete that one
+			delete edge;	
+		} 
+		edge = _edge;					// set the edge stored to the one given
+	}	
+}
 
 //! \fn reachGraphState::reachGraphState(char * _label, stateType _type, bool isMinimal)
 //! \param _label the label/ name of the state
@@ -18,7 +39,8 @@ using namespace std;
 //! \param isMinimal the state is a minimal state or not
 //! \brief constructor
 reachGraphState::reachGraphState(bool isMinimal) :
-                state(NULL), isMin(isMinimal) {
+                state(NULL), isMin(isMinimal), firstElement(NULL) {
+     	
 }
 
 //! \fn reachGraphState::reachGraphState(char * _label, stateType _type, bool isMinimal, State * s)
@@ -28,7 +50,7 @@ reachGraphState::reachGraphState(bool isMinimal) :
 //! \param s pointer to Karsten's state
 //! \brief constructor
 reachGraphState::reachGraphState(bool isMinimal, State * s) :
-        state(s), isMin(isMinimal) {
+        state(s), isMin(isMinimal), firstElement(NULL) {
 }
 
 //! \fn reachGraphState::~reachGraphState()
@@ -49,76 +71,113 @@ bool reachGraphState::isMinimal() {
 //! \brief returns true, if the state is a bad state (it is red ;-)), false otherwise
 //! a state is red, if all events it activates lead to bad nodes
 vertexColor reachGraphState::calcColor() {
-    if (clause1.size() == 0) {
-        return BLACK;
-    }
 
-    for (clauseSet::iterator iter = clause1.begin(); iter != clause1.end(); iter++) {
-        if ((*iter)->getNode() != NULL) {
-	        if ((*iter)->getNode()->getColor() == BLUE) {
-	            return BLUE;
-	        }
-	        if ((*iter)->getNode()->getColor() == RED) {
-	        //  cout << "erase clause" << endl;
-	        //  clause1.erase(*iter);
-	        }
+	if (firstElement == NULL) {		// since theres is no clause we can't conclude anything
+		return BLACK;	
+	}
+
+	clause * cl = firstElement;
+	clause * clPrev = NULL;
+	bool indefinite = false;
+	
+	while (cl) {					// check the clause stored
+		if (cl->edge->getNode() != NULL && cl->edge->getNode()->getColor() == BLUE) {
+            return BLUE;
         } 
-    }
-    
-    return RED;
-}
-
-//! \fn void reachGraphState::addClauseElement(graphEdge * edge)
-//! \param edge the edge to be added to the clause list of this state
-//! \brief adds the given edge to the clause list of this state
-void reachGraphState::addClauseElement(graphEdge * edge) {
-    clause1.insert(edge);
+        if (cl->edge->getNode() == NULL || cl->edge->getNode()->getColor() == BLACK) {
+            indefinite = true;
+        }
+        
+//        if (cl->edge->getNode() != NULL && cl->edge->getNode()->getColor() == RED) {
+//            // delete that literal in the clause since it points to a red node
+//            if (clPrev != NULL) {
+//            	clPrev->nextElement = cl->nextElement;
+//            } else if (clPrev == NULL) {
+//            	firstElement = cl->nextElement;
+//            }
+//            cl = cl->nextElement;
+//            delete cl;	
+//            continue ;
+//        } 
+       
+        clPrev = cl;			// remember this literal
+		cl = cl->nextElement;	
+	}
+	if (indefinite) {
+		return BLACK;
+	} else {
+	    return RED;
+	}
 }
 
 //! \fn void reachGraphState::addClauseElement(char * clauseLabel)
 //! \param clauseLabel the label to be added to the clause list of this state
 //! \brief adds the given label to the clause list of this state
 void reachGraphState::addClauseElement(char * label) {
-    clauseLabel.insert(label);
+  //  clauseLabel.insert(label);
+	clause * cl = firstElement;
+	
+	graphEdge * newEdge = new graphEdge(NULL, label, sending);
+	
+	if (firstElement == NULL) {
+		firstElement = new clause(newEdge);	// create a new clause literal	
+	} else {
+		while (cl->nextElement) {		// get the last literal of the clause
+			cl = cl->nextElement;	
+		}	  
+		cl->nextElement = new clause(newEdge);	// create a new clause literal	
+	} 
 }
 
 //! \fn string reachGraphState::getClause()
 //! \return the clause as a string
 //! \brief returns the clause as a string
 string reachGraphState::getClause() {
-    string clause = "";
+    string clauseString = "";
     bool comma = false;
 
-    if (clause1.size() == 0) {
-        return "NULL";
-    }
+	if (firstElement == NULL) {		// since theres is no clause we can't conclude anything
+		return "NULL";	
+	}
 
-    for (clauseSet::iterator iter = clause1.begin(); iter != clause1.end(); iter++) {
-        if ((*iter)->getNode()->getColor() != RED && (*iter)->getNode()->getStateList()->setOfReachGraphStates.size() > 0) {
+	clause * cl = firstElement;
+
+    while (cl) {
+        if (cl->edge->getNode() != NULL && cl->edge->getNode()->getColor() != RED && 
+        			cl->edge->getNode()->getStateList()->setOfReachGraphStates.size() > 0) {
             if (comma) {
-                clause += "+";
+                clauseString += "+";
             }
-            if ((*iter)->getType() == sending) {
-                clause += "!";
+            if (cl->edge->getType() == sending) {
+                clauseString += "!";
             } else {
-                clause += "?";
+                clauseString += "?";
             }
-            clause += (*iter)->getLabel();
+            clauseString += cl->edge->getLabel();
             comma = true;
-        }
+        }    	
+    	cl = cl->nextElement;	
     }
-    return clause;
+    
+    return clauseString;
 }
 
 //! \fn void reachGraphState::setEdge(graphEdge * edge)
 //! \param edge
 //! \brief sets the the clause's edge to the given edge
 void reachGraphState::setEdge(graphEdge * edge) {
-    clauseSetLabel::iterator iter = clauseLabel.find(edge->getLabel());
+  //  clauseSetLabel::iterator iter = clauseLabel.find(edge->getLabel());
 
-    if (iter != clauseLabel.end()) {
-        clause1.insert(edge);
-    }
+ 	clause * cl = firstElement;
+ 	
+ 	while (cl) {
+		if  (strcmp(cl->edge->getLabel(), edge->getLabel()) == 0) {
+			// we have found a pseudo edge with that label, so store the correct edge right here
+			cl->setEdge(edge);				
+			return;
+		}
+ 		cl = cl->nextElement;	
+ 	}
 }
 
 

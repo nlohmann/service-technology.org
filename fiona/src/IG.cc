@@ -262,9 +262,9 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 //! \param node the node for which the activated input events are calculated
 //! \brief creates a list of all activated input events (messages) of the current node
 setOfMessages interactionGraph::getActivatedInputEvents(vertex * node) {
-#ifdef DEBUG
-	cout << "interactionGraph::getActivatedInputEvents(vertex * node): start" << endl;
-#endif
+
+	trace(TRACE_5, "interactionGraph::getActivatedInputEvents(vertex * node): start\n");
+
 
 	int i;
 
@@ -300,6 +300,8 @@ setOfMessages interactionGraph::getActivatedInputEvents(vertex * node) {
 		}
 	}
 	
+	trace(TRACE_5, "interactionGraph::getActivatedInputEvents(vertex * node): end\n");
+	
    	return inputMessages;
 }
 
@@ -307,9 +309,9 @@ setOfMessages interactionGraph::getActivatedInputEvents(vertex * node) {
 //! \param node the node for which the activated output events are calculated
 //! \brief creates a list of all output messages of the current node
 setOfMessages interactionGraph::getActivatedOutputEvents(vertex * node) {
-#ifdef DEBUG
-	cout << "interactionGraph::getActivatedOutputEvents(vertex * node): start" << endl;
-#endif
+
+	trace(TRACE_5, "interactionGraph::getActivatedOutputEvents(vertex * node): start\n");
+
 
 	int i;
 	
@@ -317,14 +319,12 @@ setOfMessages interactionGraph::getActivatedOutputEvents(vertex * node) {
 	
 	reachGraphStateSet::iterator iter;	
 	
-	unsigned int * marking;
-	
 	for (iter = node->getStateList()->setOfReachGraphStates.begin(); iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
 	
 		if ((*iter)->state->type == DEADLOCK || (*iter)->state->type == FINALSTATE)  {				// we just consider the maximal states only
-#ifdef DEBUG
-	cout << "\t state "<< *(*iter) << " activates the output events: " << endl;
-#endif		
+
+//			trace(TRACE_5, "\t state "<< *(*iter) << " activates the output events: " << endl;
+	
 			int i;
 			int k = 0;
 			
@@ -332,7 +332,7 @@ setOfMessages interactionGraph::getActivatedOutputEvents(vertex * node) {
 //			marking = (*iter)->state->myMarking;
 			
 			for (i = 0; i < PN->getPlaceCnt(); i++) {
-				if (PN->Places[i]->getType() == OUTPUT && marking[i] > 0) {
+				if (PN->Places[i]->getType() == OUTPUT && PN->CurrentMarking[i] > 0) {
 					
 #ifdef DEBUG
 	cout << "\t\t" << PN->Places[i]->name << endl;
@@ -348,6 +348,7 @@ setOfMessages interactionGraph::getActivatedOutputEvents(vertex * node) {
 		}
 	}
 	
+	trace(TRACE_5, "interactionGraph::getActivatedOutputEvents(vertex * node): end\n");	
    	return outputMessages;		
 }
 
@@ -373,7 +374,6 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node) {
 
 	reachGraphStateSet::iterator iter;		
 	
-	unsigned int * marking;
 	bool found = false;
 	bool skip = false;
 	
@@ -394,8 +394,8 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node) {
 			
 			for (i = 0; i < PN->getPlaceCnt(); i++) {
 				
-				if (PN->Places[i]->getType() == OUTPUT && marking[i] > 0) {	
-					for (int z = 0; z < marking[i]; z++) {			
+				if (PN->Places[i]->getType() == OUTPUT && PN->CurrentMarking[i] > 0) {	
+					for (int z = 0; z < PN->CurrentMarking[i]; z++) {			
 						outputMessages.insert(i);
 					}
 					
@@ -498,9 +498,8 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node) {
 //! \brief creates a list of all activated input events (messages) of the current node with respect to the
 //! receiving before sending rule
 setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
-#ifdef DEBUG
-	cout << "interactionGraph::receivingBeforeSending(vertex * node): start" << endl;
-#endif
+
+	trace(TRACE_5, "interactionGraph::receivingBeforeSending(vertex * node): start\n");
 
 	int i;
 
@@ -508,7 +507,8 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 	
 	setOfMessages inputMessages;	// list of all input messages of the current node
 	
-	for (iter = node->getStateList()->setOfReachGraphStates.begin(); iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
+	for (iter = node->getStateList()->setOfReachGraphStates.begin(); 
+					iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
 
 #ifdef DEBUG
 	//cout << "\t state " << PN->printMarking((*iter)->state->myMarking) << " activates the input events: " << endl;
@@ -518,7 +518,9 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 //			PN->setCurrentMarkingFromState((*iter));
 			
 			(*iter)->state->decode(PN);
-			while (!stateActivatesOutputEvents(*iter) && (*iter)->state->quasiFirelist && (*iter)->state->quasiFirelist[i]) {
+			while (!stateActivatesOutputEvents(*iter) && 
+						(*iter)->state->quasiFirelist && 
+						(*iter)->state->quasiFirelist[i]) {
 				
 				for (std::set<unsigned int>::iterator index = (*iter)->state->quasiFirelist[i]->messageSet.begin();
 							index != (*iter)->state->quasiFirelist[i]->messageSet.end();
@@ -535,7 +537,9 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 			}
 		}
 	}
-	
+
+	trace(TRACE_5, "number of input events: " + intToString(inputMessages.size()) + "\n" );
+	trace(TRACE_5, "interactionGraph::receivingBeforeSending(vertex * node): end\n");
    	return inputMessages;							// return the new state list	
 }
 

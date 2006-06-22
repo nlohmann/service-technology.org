@@ -221,8 +221,6 @@ void  operatingGuidelines::getActivatedOutputEvents(vertex * node) {
 	
 	reachGraphStateSet::iterator iter;			// iterator over the stateList's elements
 	
-	unsigned int * myMarking = new unsigned int [PN->getPlaceCnt()];
-	
 	// iterate over all states of the node
 	for (iter = node->getStateList()->setOfReachGraphStates.begin();
          iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
@@ -231,13 +229,12 @@ void  operatingGuidelines::getActivatedOutputEvents(vertex * node) {
 		if ((*iter)->state->type == DEADLOCK  || (*iter)->state->type == FINALSTATE)  {
 			int i;
 			int k = 0;
-			//marking = (*iter)->state->myMarking;
 			
 			(*iter)->state->decode(PN);
 						
 			for (i = 0; i < PN->placeOutputCnt; i++) {
 				
-				if (myMarking[PN->outputPlacesArray[i]] > 0) {
+				if (PN->CurrentMarking[PN->outputPlacesArray[i]] > 0) {
 					(*iter)->addClauseElement(PN->Places[PN->outputPlacesArray[i]]->name);	
 				}	
 			}

@@ -285,8 +285,6 @@ int reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType ty
 //            graphEdge * edgePred = new graphEdge(currentVertex, label, type);
 //            toAdd->addPredecessorNode(edgePred);
 
-cout << "added pred" << endl;
-
             currentVertex = toAdd;
             numberOfEdges++;
 
@@ -481,7 +479,7 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
                 	unsigned int * myMarking = new unsigned int [PN->getPlaceCnt()];
                 	(*iter)->state->decode(PN);
                 	
-                    os << "[" << PN->printCurrentMarkingForDot() << "]" << (*iter)->state << "\\n";
+                    os << "[" << PN->printCurrentMarkingForDot() << "]"; // << (*iter)->state;
                 }
 //              os << "(";
                 if (v->getColor() != RED) {
@@ -489,13 +487,17 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
                         case DEADLOCK:  if (mult) {
                                             CNF += " * ";
                                         }
-                                        os << "DL";
+                                        if (parameters[P_SHOW_STATES_PER_NODE]) {
+	                                        os << " DL";
+                                        }
                                         CNF += "("; CNF += (*iter)->getClause(); CNF += ")"; mult=true;
                                         break;
                         case FINALSTATE: if (mult) {
                                             CNF += " * ";
                                         }
-                                        os << "FS";
+                                        if (parameters[P_SHOW_STATES_PER_NODE]) {
+	                                        os << " FS";
+                                        }
                                         CNF += "(true)"; mult=true;
                                         break;
                         default:
@@ -512,6 +514,9 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
 //              }
 //              os << ", " << (*iter)->isMinimal();
 //              os << ") " << (*iter)->state->index << "\\n";
+				if (parameters[P_SHOW_STATES_PER_NODE]) {
+	                os << "\\n";
+	            }
             }
 
             if (parameters[P_OG]) {
@@ -652,13 +657,12 @@ void reachGraph::printDotFile() {
 //! \brief returns true, if the given state activates at least one output event
 bool reachGraph::stateActivatesOutputEvents(reachGraphState * s) {
     int i;
-    unsigned int * myMarking;
-    
+   
     s->state->decode(PN);
     
     for (i = 0; i < PN->getPlaceCnt(); i++) {
 
-        if (PN->Places[i]->getType() == OUTPUT && myMarking[i] > 0) {
+        if (PN->Places[i]->getType() == OUTPUT && PN->CurrentMarking[i] > 0) {
             return true;
         }
     }

@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/21 08:54:18 $
+ *          - last changed: \$Date: 2006/06/22 09:24:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.78 $
+ * \version \$Revision: 1.79 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -294,8 +294,9 @@ int main( int argc, char *argv[])
 	  {
 	    output = openOutput(output_filename + ".task");
 	  }
+	  std::string comment = "{ AG EF (";
+	  std::string formula = "FORMULA\n  ALLPATH ALWAYS EXPATH EVENTUALLY (";
 	  std::string andStr = "";
-	  (*output) << "FORMULA ALLPATH ALWAYS EXPATH EVENTUALLY (";
 	  for (list< std::string >::iterator file = inputfiles.begin(); file != inputfiles.end(); file++)
 	  {
             unsigned int pos = file->rfind(".bpel", file->length());
@@ -305,11 +306,15 @@ int main( int argc, char *argv[])
 	    {
 	      prefix = file->substr(pos2 + 1, pos - pos2 - 1) + "_";
 	    }
-	    (*output) << andStr << TheNet->findPlace(prefix + "1.internal.final")->nodeShortName() << " > 0";
+	    comment += andStr + prefix + "1.internal.final";
+	    formula += andStr + TheNet->findPlace(prefix + "1.internal.final")->nodeShortName() + " > 0";
 	    andStr = " AND ";
 	  }
-
-	  (*output) << ")";
+	  
+	  comment += ") }";
+	  formula += ")";
+	  (*output) << comment << endl << endl;
+	  (*output) << formula << endl << endl;
 	  if (output_filename != "")
 	  {
 	    closeOutput(output);

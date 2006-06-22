@@ -381,7 +381,7 @@ inline State * binInsert(binDecision ** Bucket, oWFN * PN)
 		fromdec -> nextold = newd;
 	}
 	
-	newd -> prev = fromdec;
+	newd -> prev = vectordec;
 	
 	// fill vector
 	// 1. remaining   bin_byte

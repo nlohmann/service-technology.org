@@ -263,12 +263,13 @@ void oWFN::addSuccStatesToList(stateList * list, State * NewState) {
 void oWFN::addStateToList(stateList * list, State * currentState) {
 		bool minimal = false;
 		
-		unsigned int * myMarking;
+//		unsigned int * myMarking;
 		
-		currentState->decode(this); 
-	
+		currentState->decode(this);
+			
 		for (int z = 0; z < placeCnt; z++) {
-			if (Places[z]->getType() == OUTPUT && myMarking[z] > 0) {
+//			if (Places[z]->getType() == OUTPUT && myMarking[z] > 0) {
+			if (Places[z]->getType() == OUTPUT && CurrentMarking[z] > 0) {
 				minimal = true;
 				break;
 			}
@@ -289,15 +290,15 @@ void oWFN::addStateToList(stateList * list, State * currentState) {
 	}
 }
 
-unsigned int * oWFN::copyCurrentMarking() {
-	unsigned int * copy = new unsigned int [getPlaceCnt()];
-
-	for (int i = 0; i < getPlaceCnt(); i++) {
-		copy[i] = CurrentMarking[i];
-	
-	}	
-	return copy;
-}
+//unsigned int * oWFN::copyCurrentMarking() {
+//	unsigned int * copy = new unsigned int [getPlaceCnt()];
+//
+//	for (int i = 0; i < getPlaceCnt(); i++) {
+//		copy[i] = CurrentMarking[i];
+//	
+//	}	
+//	return copy;
+//}
 
 //void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
 //
@@ -359,7 +360,8 @@ void oWFN::calculateReachableStates(stateList * listOfStates, bool minimal) {
 
 		//	copyMarkingToCurrentMarking(CurrentState->myMarking);
 			CurrentState->decode(this);
-			placeHashValue = CurrentState->placeHashValue;
+
+//			placeHashValue = CurrentState->placeHashValue;
 
 			// there is a next state that needs to be explored
 	  		CurrentState->firelist[CurrentState->current]->fire(this);
@@ -409,6 +411,7 @@ void oWFN::calculateReachableStates(stateList * listOfStates, bool minimal) {
 	  			placeHashValue = CurrentState->placeHashValue;
 	      		//copyMarkingToCurrentMarking(CurrentState->myMarking);
 	      		CurrentState->decode(this);
+	      		
 	      		CurrentState->current++;
 	    	}
 		}
@@ -440,7 +443,9 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
   		if (parameters[P_IG]) {
 	  		CurrentState->quasiFirelist = quasiFirelist();
   		}
-  		CurrentState->myMarking = copyCurrentMarking();
+
+//  	CurrentState->myMarking = copyCurrentMarking();
+  		
   		CurrentState->current = 0;
   		CurrentState->parent = (State *) 0;
   		CurrentState->succ = new State * [CardFireList+1];
@@ -474,6 +479,7 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
 			trace(TRACE_5, "copying marking\n");
 		//	copyMarkingToCurrentMarking(CurrentState->myMarking);
 			CurrentState->decode(this);
+
 			trace(TRACE_5, "marking copied\n");
 			
 		//	placeHashValue = CurrentState->placeHashValue;
@@ -508,7 +514,7 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
 		      		NewState->quasiFirelist = quasiFirelist();
 	      		}
 	      		NewState->current = 0;
-	      		NewState->myMarking = copyCurrentMarking();
+//	      		NewState->myMarking = copyCurrentMarking();
 	      		NewState->parent = CurrentState;
 	      		NewState->succ =  new State * [CardFireList+1];
 	      		NewState->placeHashValue = placeHashValue;
@@ -529,6 +535,7 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
 	  		//	placeHashValue = CurrentState->placeHashValue;
 	      	//	copyMarkingToCurrentMarking(CurrentState->myMarking);
 	      		CurrentState->decode(this);
+
 	      		CurrentState->current++;
 	    	}
 		}
@@ -755,13 +762,13 @@ void oWFN::printstate(char * c, unsigned int * st) {
 
 
 void oWFN::print_binDec(int h) {
-	int i;
-	for(i=0;i< placeCnt;i++)
-	{
+
+	for(int i=0; i < placeCnt; i++) {
 		cout << Places[i] -> name << ": " << Places[i] -> nrbits;
 	}
 	cout << endl;
-	print_binDec(binHashTable[h],0);
+	
+	print_binDec(binHashTable[h], 0);
 }
 	
 	
@@ -769,7 +776,7 @@ void oWFN::print_binDec(binDecision * d, int indent) {
 	int i;
 	// print bin decision table at hash entry h
 
-	for(i=0;i<indent;i++) cout << ".";
+	for(i=0; i<indent; i++) cout << ".";
 	
 	if(!d) {
 		cout << " nil " << endl;
@@ -781,12 +788,12 @@ void oWFN::print_binDec(binDecision * d, int indent) {
 		cout << (unsigned int) (d -> vector)[i/8] << " " ;
 	}
 
-	for(i=0;i<BitVectorSize - (d -> bitnr+1);i++) {
+	for(i=0; i<BitVectorSize - (d -> bitnr+1); i++) {
 		cout << (((d->vector)[i/8] >> (7-i%8))%2);
 	}
 	cout << endl;
-	print_binDec(d -> nextold,indent+1);
-	print_binDec(d -> nextnew,indent+1);
+	print_binDec(d -> nextold, indent+1);
+	print_binDec(d -> nextnew, indent+1);
 }
 
 

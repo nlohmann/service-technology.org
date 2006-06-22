@@ -193,7 +193,7 @@ int main(int argc, char ** argv) {
         trace(TRACE_0, "    number of edges: " + intToString(graph->getNumberOfEdges()) + "\n");
 
         graph->printDotFile();
-
+	
     } else {
         // interaction graph is built
 

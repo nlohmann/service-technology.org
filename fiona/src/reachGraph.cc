@@ -170,14 +170,14 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
             toAdd->eventsUsed[offset + label]++;
 
             // \begin{hack} for online shop example
-/*            if (type == sending) {
-                if (strcmp(PN->Places[PN->inputPlacesArray[label]]->name, "in.client.onlineshop.abort") == 0) {
+            if (type == sending) {
+                if (strcmp(PN->Places[PN->inputPlacesArray[label]]->name, "in.abort") == 0) {
                     for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
                         toAdd->eventsUsed[i]++;
                     }
                 }
             }
-*/          // \end{hack}
+			// \end{hack}
 
             currentVertex = toAdd;
             numberOfEdges++;
@@ -214,14 +214,14 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
             found->eventsUsed[offset + label]++;
 
             // \begin{hack} for online shop example
-/*            if (type == sending) {
-                if (strcmp(PN->Places[PN->inputPlacesArray[label]]->name, "in.client.onlineshop.abort") == 0) {
+            if (type == sending) {
+                if (strcmp(PN->Places[PN->inputPlacesArray[label]]->name, "in.abort") == 0) {
                     for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
                          found->eventsUsed[i]++;
                     }
                 }
             }
-*/            // \end{hack}
+            // \end{hack}
 
             delete toAdd;
 
@@ -480,6 +480,7 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
                 if (parameters[P_SHOW_STATES_PER_NODE]) {
                 	unsigned int * myMarking = new unsigned int [PN->getPlaceCnt()];
                 	(*iter)->state->decode(PN);
+                	
                     os << "[" << PN->printCurrentMarkingForDot() << "]" << (*iter)->state << "\\n";
                 }
 //              os << "(";
@@ -654,7 +655,7 @@ bool reachGraph::stateActivatesOutputEvents(reachGraphState * s) {
     unsigned int * myMarking;
     
     s->state->decode(PN);
-
+    
     for (i = 0; i < PN->getPlaceCnt(); i++) {
 
         if (PN->Places[i]->getType() == OUTPUT && myMarking[i] > 0) {

@@ -36,164 +36,142 @@ unsigned int MinBookmark; // MIN number of the first closed marking
                           // in the currently or last recently processed TSCC
 
 
-// decodes state and returns the corresponding marking
+// decodes State in bintree and returns the corresponding marking
 void State::decode(oWFN * PN) {
 	
 	trace(TRACE_5, "void State::decode(int * v, oWFN * PN):start\n");
-	
-//	cout << "PN->Places: " << PN->Places << endl;
-
-	cout << "decode for state: " << this << endl;
-	cout << "\t with myMarking: " << PN->printMarking(this->myMarking) << endl;
-	
+		
 //	for (int i = 0; i < PN->getPlaceCnt(); i++) {
-//		PN->CurrentMarking[i] = myMarking[i];	
+//		cout << PN->Places[i]->name << " (" << PN->Places[i]->nrbits << ")" << endl;
 //	}
-//	
-//				PN->placeHashValue = placeHashValue;
-//				PN->initializeTransitions();
-//	
-//	
-//	return;
-	
-	long int cutplace;
-	int currentbyte;
-	binDecision * currentbindec;
-	unsigned char * currentvector;
-	int byteincurrentvector;
-	int currentplacenr;
-	int vectorsfirstbit;
-	int pfirst;
-	int plast;
-	int cfirst;
-	int clast;
 
-	currentplacenr = PN -> getPlaceCnt() - 1;
-	currentbindec = my_entry;
-	currentvector = my_entry -> vector;
-	vectorsfirstbit = my_entry -> bitnr + 1;   // bit of decision not represented in vector
-	currentbyte = ((PN->BitVectorSize-1) - vectorsfirstbit)/8 ;
-	pfirst = PN->Places[currentplacenr]->startbit;
-	plast = pfirst + PN->Places[currentplacenr]->nrbits - 1;
-	cutplace = currentvector[currentbyte];
-	cfirst = vectorsfirstbit + 8*currentbyte;
-	clast = PN->BitVectorSize - 1;
-	cutplace = cutplace >> (7-(clast -cfirst));	
-	cutplace = cutplace << (7-(clast -cfirst));	
+    binDecision * currentbindec;                // the considered part of bintree
+    currentbindec = my_entry;
 
+    unsigned char * currentvector;              // the corresponding bitvector
+    currentvector = my_entry -> vector;
 
-//cout << "vor while" << endl;
+    int vectorsfirstbit;                        // offset where first bit of currentvector starts
+    vectorsfirstbit = my_entry -> bitnr + 1;    // bit of decision not represented in vector
 
-	while(1)
-	{
-//		cout << "currentplacenr: " << currentplacenr << endl;
-//		cout << "currentbyte: " << currentbyte << endl;
-//		cout << "v: " << v << endl;
-//		cout << "v[currentplacenr]: " << v[currentplacenr] << endl;
-//		
-//		cout << "PN->CurrentMarking: " << PN->CurrentMarking << endl;
-		
-		//vorn abschneiden
-		if(cfirst < pfirst)	{
-		//	cout << "cfirst < pfirst" << endl;
-			cutplace &= (1 << (cfirst + 8 - pfirst)) - 1;
-		}
+    int currentplacenr;                         // iterates through all places of the oWFN
+    currentplacenr = PN -> getPlaceCnt() - 1;   // starting with the last one
+
+    int pfirst;                                 // first bit of current place in bintree
+    pfirst = PN->Places[currentplacenr]->startbit;
+
+    int plast;                                  // last  bit of place in bintree
+    plast = pfirst + PN->Places[currentplacenr]->nrbits - 1;
+
+    int currentbyte;                            // current byte in currentvector of bintree
+    currentbyte = ((PN->BitVectorSize-1) - vectorsfirstbit)/8 ;
+        
+    
+    int cfirst;                                 // first bit of current byte in currentvector of bintree
+    cfirst = vectorsfirstbit + 8*currentbyte;
+
+    int clast;                                  // last  bit of current byte in currentvector of bintree
+    clast = PN->BitVectorSize - 1;
+
+    long int cutplace;                          // the value decoded for the current place
+    cutplace = currentvector[currentbyte];
+
+    // wenn currentbyte nicht ganz ausgefüllt (clast - cfirst != 7), dann rechts nullen
+    cutplace = cutplace >> (7-(clast -cfirst));
+    cutplace = cutplace << (7-(clast -cfirst));
+
+	while(1) {		
+        if(cfirst < pfirst) {
+            // vorn abschneiden = verunden mit 00011111 wenn differenz 3
+            cutplace &= (1 << (cfirst + 8 - pfirst)) - 1;
+        }
+
+		// wenn currentbyte nicht ganz ausgefüllt (clast - cfirst != 7), dann rechts ausrichten
 		cutplace = cutplace >> (7 - (clast - cfirst));
-		// hinten abschneiden
-		
-		if(clast > plast) {
-		//	cout << "clast > plast" << endl;
-			cutplace = cutplace >> (clast - plast);	
-		}
 
-		
+        if(clast > plast) {
+            // noch hinten abschneiden
+            cutplace = cutplace >> (clast - plast);
+        }
+
+
 		// eintragen
 		if(plast > clast) {
-		//	cout << "plast > clast" << endl;
-			PN->CurrentMarking[currentplacenr] += cutplace << (plast - clast); 
-		}
-		else
-		{
+            // always preceded by the else-branch at prior currentbyte
+			PN->CurrentMarking[currentplacenr] += cutplace << (plast - clast); 		
+		} else {
 			PN->CurrentMarking[currentplacenr] = cutplace;
 		}
-		
-		
+
+
+		// erster Fall: neuer Platz und neues Byte
 		if(cfirst == pfirst) {
-		//	cout << "cfirst == pfirst" << endl;
 			if(currentplacenr == 0) {
-		//		cout << "return" << endl;
-				trace(TRACE_5, "void State::decode(int * v, oWFN * PN):end\n");
-				
-			//	PN->initializeTransitions();
+				// all places decoded - finishing
 				PN->placeHashValue = placeHashValue;
 				PN->initializeTransitions();
 
-		cout << "currentplacenr: " << currentplacenr << endl;
-		cout << "currentbyte: " << currentbyte << endl;
+				trace(TRACE_5, "void State::decode(int * v, oWFN * PN):end\n");
 				
-				cout << "\t got marking: " << endl;
-				PN->printmarking();
-
 				return;
-			}
-			// new place, new byte
+			}		
 			
-	
+			// take new place
 			currentplacenr--;
-
-//			cout << "PN: " << PN << endl;
-//			cout << "PN->Places: " << PN->Places << endl;
-//			cout << "PN->Places[currentplacenr]: " << PN->Places[currentplacenr] << endl;
-//			cout << "PN->Places[currentplacenr]->startbit: " << PN->Places[currentplacenr]->startbit << endl;
 
 			pfirst = PN->Places[currentplacenr]->startbit;
 			plast = pfirst + PN->Places[currentplacenr]->nrbits - 1;
 
-			if(currentbyte == 0)
-			{
-	//			cout << "currentbyte == 0 (oben)" << endl;
-				// new vector
-	//			cout << "currentbindec -> prev: " << endl;
-		//		cout << currentbindec -> prev << endl;
+			if(currentbyte == 0) {
+				// go to predecessing vector in bintree
 				currentbindec = currentbindec -> prev;
 				currentvector = currentbindec -> vector;
 				vectorsfirstbit = currentbindec -> bitnr + 1;
 				currentbyte = (cfirst - 1 - vectorsfirstbit) / 8;
 				clast = cfirst - 1;
 				cfirst = vectorsfirstbit + 8 * currentbyte;
+				
+//				cout << "\t\tnew place " << PN->Places[currentplacenr]->name << " in new byte " << currentbyte << endl;
+//				cout << "\t\t\t(bindecision changed)" << endl;
+				
 				cutplace =	currentvector[currentbyte];
+				// bit of decision not represented in vector -> so XOR with 1
 				cutplace = cutplace ^ (1 << ( 7 - (clast -cfirst)));
-				cutplace = cutplace >> (7-(clast -cfirst));	
-				cutplace = cutplace << (7-(clast -cfirst));	
-			}
-			else
-			{
-		//		cout << "currentbyte != 0 (oben)" << endl;
+				// wenn currentbyte nicht ganz ausgefüllt (clast - cfirst != 7), dann rechts nullen
+				cutplace = cutplace >> (7-(clast -cfirst));
+				cutplace = cutplace << (7-(clast -cfirst));
+			} else {
+				// go to predecessing byte in current vector
 				currentbyte--;
 				cfirst -= 8;
 				clast = cfirst + 7;
-		//		cout << "currentvector: " << currentvector << endl;
-		//		cout << "currentvector[currentbyte]: " << currentvector[currentbyte] << endl;
+
+//				cout << "\t\tnew place " << PN->Places[currentplacenr]->name << " in new byte " << currentbyte << endl;
+//				cout << "\t\t\t(in same bindecision)" << endl;
+
 				cutplace = currentvector[currentbyte];
 			}
+			
 			continue;
 		}
 		
-		
+		// zweiter Fall: neuer Platz, gleiches Byte
 		if(cfirst < pfirst) {
-		//	cout << "cfirst < pfirst" << endl;
-
-			// new place
 			currentplacenr--;
+			
 			pfirst = PN->Places[currentplacenr]->startbit;
 			plast = pfirst + PN->Places[currentplacenr]->nrbits - 1;
+
+//			cout << "\t\tnew place " << PN->Places[currentplacenr]->name << " in same byte " << currentbyte << endl;
+			
 			cutplace = currentvector[currentbyte];
+			
 			continue;
 		}
 		
-		//(cfirst > pfirst --> new byte)
+		// hier implizit pfirst < cfirst, also
+		// dritter Fall: gleicher Platz in neuem Byte
 		if(currentbyte == 0) {
-		//	cout << "currentbyte == 0 (unten) " << endl;
 			// new vector
 			currentbindec = currentbindec -> prev;
 			currentvector = currentbindec -> vector;
@@ -201,29 +179,31 @@ void State::decode(oWFN * PN) {
 			currentbyte = (cfirst - 1 - vectorsfirstbit) / 8;
 			clast = cfirst - 1;
 			cfirst = vectorsfirstbit + 8 * currentbyte;
+
+//			cout << "\t\tsame place " << PN->Places[currentplacenr]->name << " in new byte " << currentbyte << endl;
+//			cout << "\t\t\t(bindecision changed)" << endl;
+
 			cutplace =	currentvector[currentbyte];
+			// bit of decision not represented in vector -> so XOR with 1
 			cutplace = cutplace ^ (1 << ( 7 - (clast -cfirst)));
+			// wenn currentbyte nicht ganz ausgefüllt (clast - cfirst != 7), dann rechts nullen
 			cutplace = cutplace >> (7-(clast -cfirst));	
 			cutplace = cutplace << (7-(clast -cfirst));	
 		} else {
-		//	cout << "currentbyte != 0 (unten)" << endl;
 			currentbyte--;
 			cfirst -= 8;
 			clast = cfirst + 7;
+
+//			cout << "\t\tsame place " << PN->Places[currentplacenr]->name << " in new byte " << currentbyte << endl;
+//			cout << "\t\t\t(in same bindecision)" << endl;
+
 			cutplace = currentvector[currentbyte];
 		}
 	}
 
-//	PN->initializeTransitions();
-	PN->placeHashValue = placeHashValue;
-	PN->initializeTransitions();
-
-
-		cout << "currentplacenr: " << currentplacenr << endl;
-		cout << "currentbyte: " << currentbyte << endl;
+	cerr << "this line is not reachable" << endl;
+	cerr << "if this happens please contact the authors" << endl;	
+	cerr << "\tvoid State::decode(oWFN * PN) in graph.cc" << endl;
 	
-	cout << "\t got marking: " << endl;
-	PN->printmarking();
-	trace(TRACE_5, "void State::decode(int * v, oWFN * PN):end\n");
 }
 

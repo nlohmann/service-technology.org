@@ -28,18 +28,18 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/22 20:23:15 $
+ *          - last changed: \$Date: 2006/06/22 20:51:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.80 $
+ * \version \$Revision: 1.81 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -278,7 +278,10 @@ int main( int argc, char *argv[])
  	  output = openOutput(output_filename + "." + suffixes[F_LOLA]);
 	}
 
-	// TheNet->makeChannelsInternal();
+	if (modus == M_CONSISTENCY)
+	{
+	  TheNet->makeChannelsInternal();
+	}
 
 	trace(TRACE_INFORMATION, "-> Printing Petri net for LoLA ...\n");
         TheNet->lolaOut();

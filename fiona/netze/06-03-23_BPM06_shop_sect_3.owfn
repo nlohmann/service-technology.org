@@ -59,16 +59,16 @@ PLACE
 ;
 
   INPUT
-    in.client.onlineshop.abort,
-    in.client.onlineshop.login,
-    in.client.onlineshop.order,
-    in.client.onlineshop.terms
+    in.abort,
+    in.login,
+    in.order,
+    in.terms
 ;
 
   OUTPUT
-    out.client.onlineshop.confirm,
-    out.client.onlineshop.deliver,
-    out.client.onlineshop.invoice
+    out.confirm,
+    out.deliver,
+    out.invoice
 ;
 
 INITIALMARKING
@@ -255,7 +255,7 @@ PRODUCE
 
 TRANSITION t198
 CONSUME
-  in.client.onlineshop.abort:	1,
+  in.abort:	1,
   p192:	1;
 PRODUCE
   p553:	1;
@@ -290,7 +290,7 @@ PRODUCE
 
 TRANSITION t229
 CONSUME
-  in.client.onlineshop.login:	1,
+  in.login:	1,
   p540:	1;
 PRODUCE
   p561:	1;
@@ -311,7 +311,7 @@ PRODUCE
 
 TRANSITION t279
 CONSUME
-  in.client.onlineshop.order:	1,
+  in.order:	1,
   p313:	1;
 PRODUCE
   p557:	1;
@@ -333,7 +333,7 @@ TRANSITION t300
 CONSUME
   p294:	1;
 PRODUCE
-  out.client.onlineshop.invoice:	1,
+  out.invoice:	1,
   p494:	1;
 
 TRANSITION t569
@@ -383,7 +383,7 @@ PRODUCE
 
 TRANSITION t357
 CONSUME
-  in.client.onlineshop.order:	1,
+  in.order:	1,
   p391:	1;
 PRODUCE
   p559:	1;
@@ -405,7 +405,7 @@ TRANSITION t378
 CONSUME
   p372:	1;
 PRODUCE
-  out.client.onlineshop.confirm:	1,
+  out.confirm:	1,
   p395:	1;
 
 TRANSITION t380
@@ -424,7 +424,7 @@ PRODUCE
 
 TRANSITION t416
 CONSUME
-  in.client.onlineshop.terms:	1,
+  in.terms:	1,
   p450:	1;
 PRODUCE
   p560:	1;
@@ -446,7 +446,7 @@ TRANSITION t437
 CONSUME
   p431:	1;
 PRODUCE
-  out.client.onlineshop.invoice:	1,
+  out.invoice:	1,
   p454:	1;
 
 TRANSITION t566
@@ -486,7 +486,7 @@ TRANSITION t475
 CONSUME
   p469:	1;
 PRODUCE
-  out.client.onlineshop.deliver:	1,
+  out.deliver:	1,
   p541:	1;
 
 TRANSITION t477

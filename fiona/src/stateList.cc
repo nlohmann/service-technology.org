@@ -72,6 +72,8 @@ bool reachGraphState::isMinimal() {
 //! a state is red, if all events it activates lead to bad nodes
 vertexColor reachGraphState::calcColor() {
 
+	trace(TRACE_5, "reachGraphState::calcColor(): start\n");
+
 	if (firstElement == NULL) {		// since theres is no clause we can't conclude anything
 		return BLACK;	
 	}
@@ -82,27 +84,33 @@ vertexColor reachGraphState::calcColor() {
 	
 	while (cl) {					// check the clause stored
 		if (cl->edge->getNode() != NULL && cl->edge->getNode()->getColor() == BLUE) {
+			trace(TRACE_5, "reachGraphState::calcColor(): end\n");
             return BLUE;
         } 
         if (cl->edge->getNode() == NULL || cl->edge->getNode()->getColor() == BLACK) {
             indefinite = true;
+        } else {
+	        if (cl->edge->getNode() != NULL && cl->edge->getNode()->getColor() == RED) {
+	            // delete that literal in the clause since it points to a red node
+	            if (clPrev != NULL) {
+	            	clPrev->nextElement = cl->nextElement;
+	            } else if (firstElement == cl) {
+	            	firstElement = cl->nextElement;
+	            }
+	            
+	            clause * clTemp = cl->nextElement;	// remember the next literal in list
+          
+	            delete cl;							// delete clause
+	            cl = clTemp;						// get the remembered literal
+	            continue ;
+	        } 
         }
-        
-//        if (cl->edge->getNode() != NULL && cl->edge->getNode()->getColor() == RED) {
-//            // delete that literal in the clause since it points to a red node
-//            if (clPrev != NULL) {
-//            	clPrev->nextElement = cl->nextElement;
-//            } else if (clPrev == NULL) {
-//            	firstElement = cl->nextElement;
-//            }
-//            cl = cl->nextElement;
-//            delete cl;	
-//            continue ;
-//        } 
-       
         clPrev = cl;			// remember this literal
 		cl = cl->nextElement;	
 	}
+	
+	trace(TRACE_5, "reachGraphState::calcColor(): end\n");
+	
 	if (indefinite) {
 		return BLACK;
 	} else {

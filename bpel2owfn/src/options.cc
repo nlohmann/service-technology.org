@@ -193,7 +193,7 @@ void parse_command_line(int argc, char* argv[])
 		formats[F_XML] = true;
 		options[O_FORMAT] = true;
 	      }
-	      else if (parameter == "petrinet") {
+	      else if (parameter == "petrinet" || parameter == "pn") {
 		modus = M_PETRINET;
 	      }
 	      else if (parameter == "consistency") {

@@ -28,18 +28,18 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/23 07:29:39 $
+ *          - last changed: \$Date: 2006/06/23 08:45:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.82 $
+ * \version \$Revision: 1.83 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -389,6 +389,10 @@ int main( int argc, char *argv[])
 	{
 	  closeOutput(output);
 	  output = NULL;
+	  std::string systemcall = "dot -q -Tpng -o" + output_filename + ".png " + output_filename + "." + suffixes[F_DOT];
+	  trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");
+	  trace(TRACE_INFORMATION, systemcall);
+	  system(systemcall.c_str());
 	}
       }
       // create info file ?

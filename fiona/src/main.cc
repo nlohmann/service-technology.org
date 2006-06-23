@@ -130,7 +130,7 @@ int main(int argc, char ** argv) {
 
     parse_command_line(argc, argv);         //!< evaluate command line options
 
-    trace(TRACE_0, "--------------------------------------------------------------\n");
+    trace(TRACE_0, "\n--------------------------------------------------------------\n");
 
     // get the net!
     try {
@@ -145,7 +145,8 @@ int main(int argc, char ** argv) {
 
     try {
         readnet();
-        PN->removeisolated();
+//        PN->removeisolated();
+
     } catch(bad_alloc) {
         char mess [] = "\nnot enough space to store net\n";
         //write(2,mess,sizeof(mess));
@@ -182,11 +183,11 @@ int main(int argc, char ** argv) {
 
         cout << difftime(seconds2,seconds) << " s consumed for building graph" << endl;
 
-        trace(TRACE_0, "net is controllable: ");
+        trace(TRACE_0, "\nnet is controllable: ");
         if (graph->getRoot()->getColor() == BLUE) {
-            trace(TRACE_0, "YES\n");
+            trace(TRACE_0, "YES\n\n");
         } else {
-            trace(TRACE_0, "NO\n");
+            trace(TRACE_0, "NO\n\n");
         }
         trace(TRACE_0, "number of states calculated: " + intToString(State::card) + "\n");
         trace(TRACE_0, "OG: number of nodes: " + intToString(graph->getNumberOfVertices()) + "\n");
@@ -215,11 +216,11 @@ int main(int argc, char ** argv) {
 
         cout << difftime(seconds2,seconds) << " s consumed for building graph" << endl;
 
-        trace(TRACE_0, "net is controllable: ");
+        trace(TRACE_0, "\nnet is controllable: ");
         if (graph->getRoot()->getColor() == BLUE) {
-            trace(TRACE_0, "yes\n");
+            trace(TRACE_0, "YES\n\n");
         } else {
-            trace(TRACE_0, "no\n");
+            trace(TRACE_0, "NO\n\n");
         }
         trace(TRACE_0, "number of states calculated: " + intToString(State::card) + "\n");
         trace(TRACE_0, "IG: number of nodes: " + intToString(graph->getNumberOfVertices()) + "\n");
@@ -231,7 +232,7 @@ int main(int argc, char ** argv) {
 
 	cout << "numberDeletedVertices: " << numberDeletedVertices << endl;
 
-    trace(TRACE_0, "--------------------------------------------------------------\n");
+    trace(TRACE_0, "--------------------------------------------------------------\n\n");
 
     try {
         return  0; //1 - PN->depth_first();

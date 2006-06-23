@@ -16,7 +16,8 @@ typedef enum
 	O_CALC_REDUCED_IG,
 	O_OWFN_NAME,
 	O_COMM_DEPTH,
-	O_EVENT_USE_MAX
+	O_EVENT_USE_MAX,
+	O_BDD
 } possibleOptions;
 
 typedef enum
@@ -44,6 +45,8 @@ extern std::map<possibleParameters, bool> parameters;
 extern char * netfile;
 extern int commDepth_manual;
 extern int events_manual;
+extern int bdd_reordermethod;
+
 
 /// pointer to input stream
 extern std::istream * input;

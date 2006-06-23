@@ -12,6 +12,7 @@
 char * netfile;
 int commDepth_manual;
 int events_manual;
+int bdd_reordermethod;
 
 /// Filename of input file
 std::string filename = "<STDIN>";
@@ -49,11 +50,12 @@ static struct option longopts[] =
   { "reduceIG",   	 no_argument,	    	NULL, 'r' },
   { "commDepth",   	 required_argument,    	NULL, 'c' },
   { "eventsmaximum", required_argument,    	NULL, 'e' },
+  { "BDD",			 optional_argument,    	NULL, 'b' },
   NULL
 };
 
 
-const char * par_string = "hvd:n:t:s:arc:e:";
+const char * par_string = "hvd:n:t:s:arc:e:b:";
 
 // --------------------- functions for command line evaluation ------------------------
 // Prints an overview of all commandline arguments.
@@ -92,6 +94,14 @@ void print_help() {
   trace("                                   empty     - show empty node\n");
   trace("                                   allstates - show all calculated states per node\n");
   trace("\n");
+  trace(" -b | --BDD=<reordering>      - enable BDD construction (only relevant for OG)\n");
+  trace("                                optional argument <reordering> specifies reodering method:\n");
+  trace("                                   1 - ... (default)\n");
+  trace("                                   2 - ...\n");
+  trace("                                   3 - ...\n");
+  trace("                                   4 - ...\n");
+  trace("                                   5 - ...\n");
+  trace("\n");
   trace("\n");
   trace("For more information see:\n");
   trace("  http://www.informatik.hu-berlin.de/top/tools4bpel/fiona\n");
@@ -126,6 +136,7 @@ void parse_command_line(int argc, char* argv[]) {
 	options[O_OWFN_NAME] = false;
 	options[O_COMM_DEPTH] = false;
 	options[O_EVENT_USE_MAX] = false;
+	options[O_BDD] = false;
 
 	// initialize parameters
 	parameters[P_IG] = true;
@@ -137,6 +148,7 @@ void parse_command_line(int argc, char* argv[]) {
 	parameters[P_SHOW_STATES_PER_NODE] = false;
 	parameters[P_CALC_ALL_STATES] = false;
 	parameters[P_CALC_REDUCED_IG] = false;
+	bdd_reordermethod = 1;
 	
   	// evaluate options and set parameters
   	int optc = 0;
@@ -156,6 +168,8 @@ void parse_command_line(int argc, char* argv[]) {
 					debug_level = TRACE_2;
 		      	} else if ( string(optarg) == "3" ) {
 					debug_level = TRACE_3;
+		      	} else if ( string(optarg) == "4" ) {
+					debug_level = TRACE_4;
 		      	} else if ( string(optarg) == "5" ) {
 					debug_level = TRACE_5;
 		      	} else {
@@ -241,6 +255,24 @@ void parse_command_line(int argc, char* argv[]) {
 		      	options[O_CALC_REDUCED_IG] = true;
 		      	parameters[P_CALC_REDUCED_IG] = true;
 	          	break;
+	      	case 'b':
+		      	options[O_BDD] = true;
+	 			if ( string(optarg) == "1" ) {
+					bdd_reordermethod = 1;
+		      	} else if ( string(optarg) == "2" ) {
+					bdd_reordermethod = 2;
+		      	} else if ( string(optarg) == "3" ) {
+					bdd_reordermethod = 3;
+		      	} else if ( string(optarg) == "4" ) {
+					bdd_reordermethod = 4;
+		      	} else if ( string(optarg) == "5" ) {
+					bdd_reordermethod = 5;
+		      	} else {
+					throw Exception(OPTION_MISMATCH,
+						"Unrecognised debug mode!\n",
+						"Type " + progname + " -h for more information.\n");
+			    }
+		      	break;
 	      	default:
 		     	throw Exception(OPTION_MISMATCH,
 				     "Unknown option!\n",

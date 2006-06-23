@@ -28,18 +28,18 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/22 20:51:33 $
+ *          - last changed: \$Date: 2006/06/23 07:29:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.81 $
+ * \version \$Revision: 1.82 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -191,6 +191,12 @@ int main( int argc, char *argv[])
 	    {
 	      prefix = file->substr(pos2 + 1, pos - pos2 - 1) + "_";
 	    }
+	    if ( parameters[P_SIMPLIFY] )
+	    {
+	      trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
+	      TheNet->simplify();
+	    }
+
 	    TheNet->addPrefix(prefix);
 
 	    TheNet2->connectNet(TheNet);

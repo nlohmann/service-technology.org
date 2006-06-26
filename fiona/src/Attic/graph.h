@@ -9,6 +9,10 @@
 #include "debug.h"
 #include <iostream>
 
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
+
 using namespace std;
 
 // depository and search structures for reachability graph

@@ -9,6 +9,9 @@
 //#include <stddef.h>
 //#include <iostream>
 
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
 
 //! \fn vertex::vertex()
 //! \brief constructor for OG nodes

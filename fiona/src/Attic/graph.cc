@@ -5,6 +5,10 @@
 #include<string.h>
 #include<stdio.h>
 
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
+
 using namespace std;
 
 unsigned int currentdfsnum = 1;

@@ -13,6 +13,10 @@
 //#include <string>
 
 
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
+
 //! \fn interactionGraph::interactionGraph(oWFN * _PN) 
 //! \param _PN
 //! \brief constructor

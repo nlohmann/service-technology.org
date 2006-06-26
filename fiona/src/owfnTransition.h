@@ -14,6 +14,10 @@
 #include "petriNetNode.h"
 #include <set>
 
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
+
 class oWFN;
 
 class owfnTransition : public Node {

@@ -12,6 +12,11 @@
 
 //#include <string>
 
+
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
+
 using namespace std;
 
 
@@ -478,7 +483,7 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
 
 			trace(TRACE_5, "copying marking\n");
 		//	copyMarkingToCurrentMarking(CurrentState->myMarking);
-			CurrentState->decode(this);
+		//	CurrentState->decode(this);
 
 			trace(TRACE_5, "marking copied\n");
 			
@@ -505,6 +510,8 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
 
 		   		CurrentState -> succ[CurrentState -> current] = NewState;
 	     		(CurrentState->current)++;
+	     		
+	     		CurrentState->decode(this);
 	    	} else {
 				trace(TRACE_5, "Current marking new\n");
       			NewState = binInsert(this);

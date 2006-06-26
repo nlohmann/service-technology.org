@@ -7,6 +7,10 @@
 #include "exception.h"
 #include "fiona.h"
 
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
+
 // some file names and pointers
 
 char * netfile;

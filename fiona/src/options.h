@@ -5,6 +5,10 @@
 #include <cstdio>
 #include "getopt.h"
 
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
+
 typedef enum
 {
    	O_HELP,

@@ -16,8 +16,10 @@
 #include <map>
 
 #include "enums.h"
-//#include "mynew.h"
 
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
 
 using namespace std;
 

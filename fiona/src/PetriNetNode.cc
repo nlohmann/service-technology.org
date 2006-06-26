@@ -1,5 +1,9 @@
 #include "petriNetNode.h"
 
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
+
 inline void Node::NewArriving(Arc & a)
 {
   Arc ** Old = ArrivingArcs;

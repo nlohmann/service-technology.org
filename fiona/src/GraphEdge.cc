@@ -2,6 +2,10 @@
 #include <string>
 #include "vertex.h"
 #include "enums.h"
+
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
  
 //! \fn  graphEdge::graphEdge(vertex * nodeP, char * labelP, edgeType typeP) 
 //! \param nodeP pointer to the node this edge is pointing to
@@ -22,7 +26,7 @@ graphEdge::~graphEdge() {
 //	if (label) {
 //		delete label;
 //	}
-	
+
 	//if (node != NULL && node->getColor() == RED) {
 	//	delete node;	
 	//}

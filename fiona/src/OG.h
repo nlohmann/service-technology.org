@@ -11,6 +11,10 @@
 #define OG_H_
 
 #include "reachGraph.h"
+
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
 //#include <map>
 
 class oWFN;

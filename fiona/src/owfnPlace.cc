@@ -12,6 +12,10 @@
 #include "dimensions.h"
 #include "owfnPlace.h"
 
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
+
 //! \fn owfnPlace::owfnPlace(char * name, placeType _type, oWFN * _net)
 //! \param name
 //! \param _type

@@ -15,6 +15,10 @@
 
 //#define NO_STATES_PER_NODE
 
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
+
 extern char * lownetfile;
 extern char * pnmlfile;
 extern char * analysefile;

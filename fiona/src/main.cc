@@ -24,6 +24,11 @@
 #include<unistd.h>
 #include<new>
 
+#ifdef LOG_NEW
+#include "mynew.h"
+#include "newlogger.h"
+#endif
+
 using namespace std;
 
 
@@ -233,6 +238,10 @@ int main(int argc, char ** argv) {
 	cout << "numberDeletedVertices: " << numberDeletedVertices << endl;
 
     trace(TRACE_0, "--------------------------------------------------------------\n\n");
+
+#ifdef LOG_NEW
+NewLogger::printall();
+#endif
 
     try {
         return  0; //1 - PN->depth_first();

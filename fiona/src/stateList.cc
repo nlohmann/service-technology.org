@@ -9,7 +9,10 @@
 #include "main.h"
 #include "enums.h"
 #include "debug.h"
-//#include "mynew.h"
+
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
 
 using namespace std;
 

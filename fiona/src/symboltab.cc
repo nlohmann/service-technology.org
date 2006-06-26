@@ -3,6 +3,10 @@
 #include "owfnPlace.h"
 #include "owfnTransition.h"
 
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
+
 SymbolTab * PlaceTable, * TransitionTable;
 extern SymbolTab * GlobalTable;
 

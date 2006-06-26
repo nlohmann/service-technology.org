@@ -14,6 +14,10 @@
 #include "petriNetNode.h"
 #include "formula.h"
 
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
+
 class oWFN;
 class formula;
 

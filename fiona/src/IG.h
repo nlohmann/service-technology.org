@@ -12,6 +12,10 @@
 
 #include "reachGraph.h"
 
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
+
 class oWFN;
 
 class interactionGraph : public reachGraph {

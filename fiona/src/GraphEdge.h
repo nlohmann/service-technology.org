@@ -15,6 +15,10 @@
 #include <stddef.h>
 #include <string>
 
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
+
 using namespace std;
 
 

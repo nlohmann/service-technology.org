@@ -9,6 +9,10 @@
 #include "debug.h"
 #include "successorNodeList.h"
 
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
+
 //#include <iostream>
 
 

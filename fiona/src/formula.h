@@ -6,6 +6,10 @@
 
 #include"dimensions.h"
 
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
+
 using namespace std;
 
 typedef enum

@@ -28,14 +28,14 @@
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2006-04-07 06:53:46 $
+ *          - last changed: \$Date: 2006-06-26 13:38:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.1 $
+ * \version \$Revision: 1.2 $
  */
 
 #ifndef DEBUG_H
@@ -45,6 +45,10 @@
 #include <iostream>
 #include <fstream>
 #include <exception>
+
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
 
 typedef enum
 {

@@ -17,6 +17,10 @@
 #include "debug.h"
 #include "graph.h"
 
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
+
 //#include <set>
 
 

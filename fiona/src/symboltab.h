@@ -6,6 +6,10 @@
 #include "owfnPlace.h"
 #include "owfnTransition.h"
 
+#ifdef LOG_NEW
+#include "mynew.h"
+#endif
+
 class Symbol;
 
 class SymbolTab

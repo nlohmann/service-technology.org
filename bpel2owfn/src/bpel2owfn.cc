@@ -28,18 +28,18 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/23 09:10:43 $
+ *          - last changed: \$Date: 2006/06/27 16:34:46 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.85 $
+ * \version \$Revision: 1.86 $
  *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
  *            Added option to created (abstracted) low level nets.
  *            Added option for LoLA output.
@@ -261,9 +261,6 @@ int main( int argc, char *argv[])
         TheNet->simplify();
       }    
 
-      // a hack for Turku: show that our tool exists
-      trace(TheNet->information() + "\n");
-
       // create oWFN output ?
       if ( formats[F_OWFN] )
       {
@@ -414,9 +411,9 @@ int main( int argc, char *argv[])
 	}
       }
 
-
+      // a hack for Turku: show that our tool exists
+      trace(TheNet->information() + "\n");
     }
-
   }
   catch (Exception& e)
   {

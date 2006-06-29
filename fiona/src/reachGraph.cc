@@ -472,7 +472,8 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
 
             os << "p" << v->getNumber() << " [label=\"# " << v->getNumber() << "\\n";
 
-            string CNF = "<";
+//            string CNF = "<";
+            string CNF = "";
             bool mult = false;  // more than one clause -> true
 
             reachGraphStateSet::iterator iter;                      // iterator over the stateList's elements
@@ -492,7 +493,7 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
                                             CNF += " * ";
                                         }
                                         if (parameters[P_SHOW_STATES_PER_NODE]) {
-	                                        os << " DL";
+	                                        os << " (DL)";
                                         }
                                         CNF += "("; CNF += (*iter)->getClause(); CNF += ")"; mult=true;
                                         break;
@@ -500,7 +501,7 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
                                             CNF += " * ";
                                         }
                                         if (parameters[P_SHOW_STATES_PER_NODE]) {
-	                                        os << " FS";
+	                                        os << " (FS)";
                                         }
                                         CNF += "(true)"; mult=true;
                                         break;
@@ -531,7 +532,7 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
                         CNF += "(true)";
                     }
                 }
-                CNF += ">";
+//                CNF += ">";
                 os << CNF;
             }
 
@@ -630,7 +631,7 @@ void reachGraph::printDotFile() {
 
 
         if (numberOfVertices < 900) {
-            trace(TRACE_0, "creating the dot file of the graph...\n");
+            trace(TRACE_0, "\ncreating the dot file of the graph...\n");
             if (parameters[P_OG]) {
                 if (parameters[P_CALC_ALL_STATES]) {
                     sprintf(buffer, "dot -Tpng %s.a.OG.out -o %s.a.OG.png", netfile, netfile);

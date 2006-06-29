@@ -115,7 +115,7 @@ void print_help() {
 // Prints some version information
 void print_version(std::string name) {
   trace(std::string(PACKAGE_STRING) + " -- ");
-  trace("Functional Interaction Analysis of open Workflow Nets\n");
+  trace("Functional InteractiON Analysis of open workflow nets\n");
   trace("\n");
   trace("Copyright (C) 2005, 2006 Peter Massuthe and Daniela Weinberg\n");
   trace("This is free software; see the source for copying conditions. There is NO\n");
@@ -135,11 +135,13 @@ void parse_command_line(int argc, char* argv[]) {
 	options[O_DEBUG] = false;
 	options[O_GRAPH_TYPE] = false;
 	options[O_SHOW_NODES] = false;
-	options[O_CALC_ALL_STATES] = false;
+//	options[O_CALC_ALL_STATES] = false;   // standard: man muss -a angeben, um voll
+	options[O_CALC_ALL_STATES] = true;
 	options[O_CALC_REDUCED_IG] = false;
 	options[O_OWFN_NAME] = false;
 	options[O_COMM_DEPTH] = false;
-	options[O_EVENT_USE_MAX] = false;
+//	options[O_EVENT_USE_MAX] = false;
+	options[O_EVENT_USE_MAX] = true;
 	options[O_BDD] = false;
 
 	// initialize parameters
@@ -150,9 +152,12 @@ void parse_command_line(int argc, char* argv[]) {
 	parameters[P_SHOW_NO_RED_NODES] = true;
 	parameters[P_SHOW_EMPTY_NODE] = false;
 	parameters[P_SHOW_STATES_PER_NODE] = false;
-	parameters[P_CALC_ALL_STATES] = false;
+//	parameters[P_CALC_ALL_STATES] = false;   // standard: man muss -a angeben, um voll
+	parameters[P_CALC_ALL_STATES] = true;
 	parameters[P_CALC_REDUCED_IG] = false;
 	bdd_reordermethod = 1;
+//	events_manual = 0;
+	events_manual = 1;
 	
   	// evaluate options and set parameters
   	int optc = 0;
@@ -295,6 +300,11 @@ void parse_command_line(int argc, char* argv[]) {
   	if (options[O_VERSION]) {
     	print_version("");
     	exit(0);
+  	}
+
+  	if (options[O_OWFN_NAME] == false) {
+  		trace(TRACE_0, "missing parameter -n\n");
+  		exit(0);
   	}
 }
 

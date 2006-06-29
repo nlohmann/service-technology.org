@@ -150,7 +150,7 @@ int main(int argc, char ** argv) {
 
     try {
         readnet();
-//        PN->removeisolated();
+        PN->removeisolated();
 
     } catch(bad_alloc) {
         char mess [] = "\nnot enough space to store net\n";
@@ -162,6 +162,15 @@ int main(int argc, char ** argv) {
     delete TransitionTable;
 
     // report the net
+
+	unsigned int * copy = new unsigned int [PN->getPlaceCnt()];
+
+	for (int i = 0; i < PN->getPlaceCnt(); i++) {
+		copy[i] = PN->CurrentMarking[i];
+	
+	}
+
+    
     trace(TRACE_0, "places: " + intToString(PN->getPlaceCnt()));
     trace(TRACE_0, " (including " + intToString(PN->getInputPlaceCnt()) + " input places, " + intToString(PN->getOutputPlaceCnt()) + " output places)\n");
     trace(TRACE_0, "transitions: " + intToString(PN->getTransitionCnt()) + "\n");
@@ -197,6 +206,7 @@ int main(int argc, char ** argv) {
         trace(TRACE_0, "number of states calculated: " + intToString(State::card) + "\n");
         trace(TRACE_0, "OG: number of nodes: " + intToString(graph->getNumberOfVertices()) + "\n");
         trace(TRACE_0, "    number of edges: " + intToString(graph->getNumberOfEdges()) + "\n");
+		trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
 
         graph->printDotFile();
 	
@@ -230,12 +240,14 @@ int main(int argc, char ** argv) {
         trace(TRACE_0, "number of states calculated: " + intToString(State::card) + "\n");
         trace(TRACE_0, "IG: number of nodes: " + intToString(graph->getNumberOfVertices()) + "\n");
         trace(TRACE_0, "    number of edges: " + intToString(graph->getNumberOfEdges()) + "\n");
+		trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
 
         graph->printDotFile();
-
     }
 
-	cout << "numberDeletedVertices: " << numberDeletedVertices << endl;
+//	cout << "\ncomputation finished\n\t\t\t...please hit any key" << endl;
+//	getchar();
+
 
     trace(TRACE_0, "--------------------------------------------------------------\n\n");
 

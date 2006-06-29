@@ -227,11 +227,9 @@ stateList::~stateList() {
 	}	
 }
 
-//! \fn bool stateList::addElement(State * s, stateType _type, bool isMinimal, char * label)
+//! \fn bool stateList::addElement(State * s, bool isMinimal)
 //! \param s pointer to the state (Karsten) to be added to the list
-//! \param _type
 //! \param isMinimal
-//! \param label
 //! \brief adds a state (Karsten) to the set of states of a node
 bool stateList::addElement(State * s, bool isMinimal) {
 
@@ -240,8 +238,13 @@ bool stateList::addElement(State * s, bool isMinimal) {
     reachGraphState *state = new reachGraphState(isMinimal, s);
     pair<reachGraphStateSet::iterator, bool> result = setOfReachGraphStates.insert(state);
 
-    return result.second;       // returns whether the element got inserted (yes) or not (no)
+	if (result.second == false) {
+		delete state;
+	}
+	
+    return result.second;   // returns whether the element got inserted (true) or not (false)
 }
+
 
 bool stateList::findElement(State * s, bool isMinimal) {
     reachGraphState *state = new reachGraphState(isMinimal, s);
@@ -252,6 +255,7 @@ bool stateList::findElement(State * s, bool isMinimal) {
 
     return (iter != setOfReachGraphStates.end());
 }
+
 
 //! \fn int stateList::elementCount()
 //! \return number of elements of the list

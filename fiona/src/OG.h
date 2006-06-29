@@ -33,7 +33,7 @@ class operatingGuidelines : public reachGraph {
     	void getActivatedOutputEvents(vertex *);
     	 
     	bool terminateBuildingGraph(vertex * );
-	
+		void convertToBdd();
 };
 
 

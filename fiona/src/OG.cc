@@ -8,6 +8,7 @@
 #include "options.h"
 #include "debug.h"
 #include "successorNodeList.h"
+#include "BddRepresentation.h" 
 
 #ifdef LOG_NEW
 #include "mynew.h"
@@ -125,7 +126,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 				analyseNode(currentNode, false);
 				trace(TRACE_5, "node analysed\n");
 
-				actualDepth--;
+				actualDepth--; 
 			}
 		} // end of hack
 		i++;
@@ -180,6 +181,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 		color = "RED";
 	} else if (currentNode->getColor() == BLUE) {
 		color = "BLUE";
+		
 	} else {
 		color = "BLACK";
 	}
@@ -276,4 +278,21 @@ bool operatingGuidelines::terminateBuildingGraph(vertex * node) {
 	}
 	trace(TRACE_5, "bool operatingGuidelines::terminateBuildingGraph(vertex * node): end (returning false)\n");
 	return false;
+}
+
+void operatingGuidelines::convertToBdd() {
+	
+	vertex * tmp = root;
+    bool visitedNodes[numberOfVertices];
+
+    for (int i = 0; i < numberOfVertices; i++) {
+        visitedNodes[i] = 0;
+    }
+   
+    unsigned int nbrLabels = PN->placeInputCnt + PN->placeOutputCnt;
+    BddRepresentation * bdd = new BddRepresentation(root, nbrLabels, (Cudd_ReorderingType)bdd_reordermethod); 
+    bdd->generateRepresentation(tmp, visitedNodes);
+    bdd->reorder((Cudd_ReorderingType)bdd_reordermethod);
+    //bdd->print(); 
+    bdd->printDotFile();
 }

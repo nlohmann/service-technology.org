@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include <map>
+#include <stdlib.h>
 
 #include "options.h"
 #include "debug.h"
@@ -100,11 +101,28 @@ void print_help() {
   trace("\n");
   trace(" -b | --BDD=<reordering>      - enable BDD construction (only relevant for OG)\n");
   trace("                                optional argument <reordering> specifies reodering method:\n");
-  trace("                                   1 - ... (default)\n");
-  trace("                                   2 - ...\n");
-  trace("                                   3 - ...\n");
-  trace("                                   4 - ...\n");
-  trace("                                   5 - ...\n");
+  trace("                                   0 - CUDD_REORDER_SAME (default)\n");
+  trace("                                   1 - CUDD_REORDER_NONE\n");
+  trace("                                   2 - CUDD_REORDER_RANDOM\n");
+  trace("                                   3 - CUDD_REORDER_RANDOM_PIVOT\n");
+  trace("                                   4 - CUDD_REORDER_SIFT\n");
+  trace("                                   5 - CUDD_REORDER_SIFT_CONVERGE\n");
+  trace("                                   6 - CUDD_REORDER_SYMM_SIFT\n");
+  trace("                                   7 - CUDD_REORDER_SYMM_SIFT_CONV\n");
+  trace("                                   8 - CUDD_REORDER_WINDOW2\n");
+  trace("                                   9 - CUDD_REORDER_WINDOW3\n");
+  trace("                                   10 - CUDD_REORDER_WINDOW4\n");
+  trace("                                   11 - CUDD_REORDER_WINDOW2_CONV\n");
+  trace("                                   12 - CUDD_REORDER_WINDOW3_CONV\n");
+  trace("                                   13 - CUDD_REORDER_WINDOW4_CONV\n");
+  trace("                                   14 - CUDD_REORDER_GROUP_SIFT\n");
+  trace("                                   15 - CUDD_REORDER_GROUP_SIFT_CONV\n");
+  trace("                                   16 - CUDD_REORDER_ANNEALING\n");
+  trace("                                   17 - CUDD_REORDER_GENETIC\n");
+  trace("                                   18 - CUDD_REORDER_LINEAR\n");
+  trace("                                   19 - CUDD_REORDER_LINEAR_CONVERGE\n");
+  trace("                                   20 - CUDD_REORDER_LAZY_SIFT\n");
+  trace("                                   21 - CUDD_REORDER_EXACT\n");
   trace("\n");
   trace("\n");
   trace("For more information see:\n");
@@ -266,27 +284,25 @@ void parse_command_line(int argc, char* argv[]) {
 	          	break;
 	      	case 'b':
 		      	options[O_BDD] = true;
-	 			if ( string(optarg) == "1" ) {
-					bdd_reordermethod = 1;
-		      	} else if ( string(optarg) == "2" ) {
-					bdd_reordermethod = 2;
-		      	} else if ( string(optarg) == "3" ) {
-					bdd_reordermethod = 3;
-		      	} else if ( string(optarg) == "4" ) {
-					bdd_reordermethod = 4;
-		      	} else if ( string(optarg) == "5" ) {
-					bdd_reordermethod = 5;
-		      	} else {
-					throw Exception(OPTION_MISMATCH,
-						"Unrecognised debug mode!\n",
-						"Type " + progname + " -h for more information.\n");
-			    }
+		      	if (string(optarg) != ""){
+		      		int i = atoi(optarg);
+		      		if (i >= 0 && i <= 21){
+		      			bdd_reordermethod = i;
+		      		}else{
+		      			throw Exception(OPTION_MISMATCH,
+				     	"Unknown option!\n",
+				     	"Type " + progname + " -h for more information.\n");
+		      		}
+		      	}else{
+		      		bdd_reordermethod = 0;
+		      	}
 		      	break;
 	      	default:
 		     	throw Exception(OPTION_MISMATCH,
 				     "Unknown option!\n",
 				     "Type " + progname + " -h for more information.\n");
 				break;
+				
 		}
 	}
 

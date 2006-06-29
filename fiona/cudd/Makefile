@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1 2006-06-29 09:20:50 massuthe Exp $
+# $Id: Makefile,v 1.2 2006-06-29 09:26:45 massuthe Exp $
 #
 # Makefile for the CUDD distribution kit 
 #---------------------------------------------------------------------------
@@ -62,7 +62,7 @@ ICFLAGS	= -g -O6
 #  Linux
 #
 # Gcc 2.8.1 or higher on i686.
-XCFLAGS	= -mcpu=pentiumpro -malign-double -DHAVE_IEEE_754 -DBSD
+#XCFLAGS	= -mcpu=pentiumpro -malign-double -DHAVE_IEEE_754 -DBSD
 # Gcc 3.2.2 or higher on i686.
 #XCFLAGS	= -mcpu=pentium4 -malign-double -DHAVE_IEEE_754 -DBSD
 # Icc on i686.
@@ -150,7 +150,7 @@ XCFLAGS	= -mcpu=pentiumpro -malign-double -DHAVE_IEEE_754 -DBSD
 # available memory (expressed in bytes).
 # Recent versions of cygwin have getrlimit, but the datasize limit
 # cannot be set.
-#XCFLAGS	= -mcpu=pentiumpro -malign-double -DHAVE_IEEE_754 -DHAVE_GETRLIMIT=0 -DRLIMIT_DATA_DEFAULT=67108864
+XCFLAGS	= -mcpu=pentiumpro -malign-double -DHAVE_IEEE_754 -DHAVE_GETRLIMIT=0 -DRLIMIT_DATA_DEFAULT=67108864
 
 
 # Define the level of self-checking and verbosity of the CUDD package.

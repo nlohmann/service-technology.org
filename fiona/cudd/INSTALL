@@ -1,0 +1,18 @@
+Für nicht-Linuxnutzer muss das Makefile angepasst werden, bevor das BDD-Paket CUDD
+kompiliert werden kann: Das Makefile im Editor öffnen und im Abschnitt Linux die Zeile 
+"XCFLAGS= -mcpu=pentiumpro -malign-double -DHAVE_IEEE_754 -DBSD" auskommentieren 
+und im richtigen Abschnitt (für Windowsnutzer: Windows95/98/NT/XP with Cygwin tools)
+bei der entsprechende Zeile "XCFLAGS .... " das # entfernen. 
+
+Anschließend das Paket durch Eingabe von:
+make 
+make testobj
+
+compilieren. 
+
+Weitere Informationen sind zu finden in der README-Datei oder im Internet:
+http://vlsi.colorado.edu/~fabio/CUDD
+
+Das CUDD-Paket kann auch hier herunter geladen werden:
+ftp://vlsi.colorado.edu/pub/cudd-2.4.1.tar.gz
+

@@ -4,8 +4,8 @@
 #include <string>
 
 #include "BddRepresentation.h" 
-#include "statelist.h"
-#include "graphedge.h"
+#include "stateList.h"
+#include "graphEdge.h"
 
 #include "options.h"
 #include "debug.h"

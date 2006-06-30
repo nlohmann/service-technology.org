@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include "math.h"
 
 #include "BddRepresentation.h" 
 #include "stateList.h"
@@ -260,7 +261,7 @@ int BddRepresentation::nbrBits(unsigned int i){
         case(0): return(0);
         case(1): return(1);
         default:{
-            const int max = (int)ceil(log2((double)(i+1)));
+            const int max = (int)ceil(log((double)(i+1))/log((double)2));
             return (max);
         }
     }

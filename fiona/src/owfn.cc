@@ -432,6 +432,8 @@ void oWFN::calculateReachableStates(stateList * listOfStates, bool minimal) {
 //! as parameter (== vertex of reachGraph)
 void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) {
 
+	// calculates the EG starting at the current marking
+	
 	trace(TRACE_5, "start of function oWFN::calculateReachableStatesFull\n");
 
 	State * CurrentState;
@@ -440,66 +442,45 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
   	stateType type;
 	CurrentState = binSearch(this);
 	
-	if (CurrentState == NULL) {
-//		trace(TRACE_5, "add new state to list of states...\n");
- 	 	CurrentState = binInsert(this);
-  		CurrentState->firelist = firelist();
-  		CurrentState->CardFireList = CardFireList;
-  		if (parameters[P_IG]) {
-	  		CurrentState->quasiFirelist = quasiFirelist();
-  		}
-
-//  	CurrentState->myMarking = copyCurrentMarking();
-  		
-  		CurrentState->current = 0;
-  		CurrentState->parent = (State *) 0;
-  		CurrentState->succ = new State * [CardFireList+1];
-  		CurrentState->placeHashValue = placeHashValue;
-		CurrentState->type = typeOfState();
-		listOfStates->addElement(CurrentState, minimal);
-	} else {
-//		trace(TRACE_5, "add known state (with successors) to list of states...\n");
+	if (CurrentState != NULL) {
+		// marking already has a state -> put it (and all its successors) into the node
 		if (listOfStates->addElement(CurrentState, minimal)) {
 			addSuccStatesToList(listOfStates, CurrentState);
 		}
+		trace(TRACE_5, "end of function oWFN::calculateReachableStatesFull\n");
+		return;
 	}
-//	trace(TRACE_5, "...done\n");
-  	
+	
+	// the other case:
+	// we have a marking which has not yet a state object assigned to it
+ 	CurrentState = binInsert(this);
+	CurrentState->firelist = firelist();
+	CurrentState->CardFireList = CardFireList;
+	if (parameters[P_IG]) {
+  		CurrentState->quasiFirelist = quasiFirelist();
+	}
+
+	CurrentState->current = 0;
+	CurrentState->parent = (State *) 0;
+	CurrentState->succ = new State * [CardFireList+1];
+	CurrentState->placeHashValue = placeHashValue;
+	CurrentState->type = typeOfState();
+	listOfStates->addElement(CurrentState, minimal);
+	  	
 	// building EG in a node
   	while(CurrentState) {
  
- 	//	cout << "(calcReach) state: " << CurrentState << " has marking: " << endl;
- 	//	printmarking();
- 	//	cout << "\t myMarking: " << printMarking(CurrentState->myMarking) << endl;
- 
- 		trace(TRACE_5, "building EG in a node\n"); 		
 		if ((listOfStates->elementCount() % 1000) == 0) {
 			trace(TRACE_2, "\t current state count: " + intToString(listOfStates->elementCount()) + "\n");
 		}
 	  	
 		// no more transition to fire from current state?
 		if (CurrentState->current < CurrentState->CardFireList) {
-			//&& CurrentState->firelist[CurrentState->current] != NULL)
-
-			trace(TRACE_5, "copying marking\n");
-		//	copyMarkingToCurrentMarking(CurrentState->myMarking);
-		//	CurrentState->decode(this);
-
-			trace(TRACE_5, "marking copied\n");
-			
-		//	placeHashValue = CurrentState->placeHashValue;
-
 			// there is a next state that needs to be explored
 	  		
-	  		trace(TRACE_5, "fire transition\n");
 			CurrentState->firelist[CurrentState->current]->fire(this);
-			trace(TRACE_5, "transition fired\n");
-			
 			minimal = isMinimal();
-
-	  		trace(TRACE_5, "searching marking\n");
 			NewState = binSearch(this);
-	  		trace(TRACE_5, "marking searched\n");
 			
 	  		if(NewState != NULL) {
 		  		// Current marking already in bintree 
@@ -521,7 +502,6 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
 		      		NewState->quasiFirelist = quasiFirelist();
 	      		}
 	      		NewState->current = 0;
-//	      		NewState->myMarking = copyCurrentMarking();
 	      		NewState->parent = CurrentState;
 	      		NewState->succ =  new State * [CardFireList+1];
 	      		NewState->placeHashValue = placeHashValue;
@@ -539,10 +519,7 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
 	  		CurrentState = CurrentState->parent;
 
 	  		if(CurrentState) {			// there is a father to further examine
-	  		//	placeHashValue = CurrentState->placeHashValue;
-	      	//	copyMarkingToCurrentMarking(CurrentState->myMarking);
 	      		CurrentState->decode(this);
-
 	      		CurrentState->current++;
 	    	}
 		}

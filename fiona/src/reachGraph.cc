@@ -625,7 +625,7 @@ void reachGraph::printDotFile() {
         printGraphToDot(tmp, dotFile, visitedNodes);
         dotFile << "}";
         dotFile.close();
-        trace(TRACE_0, "    number of blue nodes: " + intToString(numberBlueNodes) + "\n");
+        trace(TRACE_0, "\n    number of blue nodes: " + intToString(numberBlueNodes) + "\n");
         trace(TRACE_0, "    number of blue edges: " + intToString(numberBlueEdges) + "\n");
         trace(TRACE_0, "    number of states stored in nodes: " + intToString(numberOfStatesAllNodes) + "\n");
 

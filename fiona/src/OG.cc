@@ -80,11 +80,13 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	
 	int i = 0;
 		
+	trace(TRACE_5, "iterating over inputSet\n");
 	// iterate over all elements of inputSet
 	while (i < PN->placeInputCnt) { // && (currentNode->getColor() != RED)) {
-		trace(TRACE_5, "iterating over inputSet\n");
 
-
+		trace(TRACE_3, "\t\t\t\t    sending event: !");
+		trace(TRACE_3, string(PN->Places[PN->inputPlacesArray[i]]->name) + "\n");
+		
 		// hack per command line option until static analysis gives enough information
 	    if (options[O_EVENT_USE_MAX] == false) {
 	    	// no information means that every event can happen <commDepth> often
@@ -134,10 +136,13 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 
 	i = 0;
 		
+	trace(TRACE_5, "iterating over outputSet\n");
 	// iterate over all elements of outputSet
 	while (i < PN->placeOutputCnt) { // && (currentNode->getColor() != RED)) {
-		trace(TRACE_5, "iterating over outputSet\n");
 
+		trace(TRACE_3, "\t\t\t\t  receiving event: ?");
+		trace(TRACE_3, string(PN->Places[PN->outputPlacesArray[i]]->name) + "\n");
+		
 		// hack per command line option until static analysis gives enough information
 	    if (options[O_EVENT_USE_MAX] == false) {
 	    	// no information means that every event can happen <commDepth> often

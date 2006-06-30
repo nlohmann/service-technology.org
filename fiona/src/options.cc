@@ -67,14 +67,14 @@ const char * par_string = "hvd:n:t:s:arc:e:b:";
 void print_help() {
   trace("\n");
   trace("\n");
-  trace("Options: \n");
+  trace("Options: (if an option is skipped, the default settings are denoted)\n");
   trace("\n");
   trace(" -h | --help                  - print this information and exit\n");
   trace(" -v | --version               - print version information and exit\n");
   trace(" -d | --debug=<level>         - set debug <level>:\n");
   trace("                                   1 - show nodes and dfs information\n");
-  trace("                                   2 - show considered events\n");
-  trace("                                   3 - show states information\n");
+  trace("                                   2 - show analyse information (i.e. colors)\n");
+  trace("                                   3 - show information on events and states\n");
   trace("                                   4 - yet to be defined ;)\n");
   trace("                                   5 - show detailed information on everything\n");
   trace("\n");
@@ -101,16 +101,16 @@ void print_help() {
   trace("\n");
   trace(" -b | --BDD=<reordering>      - enable BDD construction (only relevant for OG)\n");
   trace("                                optional argument <reordering> specifies reodering method:\n");
-  trace("                                   0 - CUDD_REORDER_SAME (default)\n");
-  trace("                                   1 - CUDD_REORDER_NONE\n");
-  trace("                                   2 - CUDD_REORDER_RANDOM\n");
-  trace("                                   3 - CUDD_REORDER_RANDOM_PIVOT\n");
-  trace("                                   4 - CUDD_REORDER_SIFT\n");
-  trace("                                   5 - CUDD_REORDER_SIFT_CONVERGE\n");
-  trace("                                   6 - CUDD_REORDER_SYMM_SIFT\n");
-  trace("                                   7 - CUDD_REORDER_SYMM_SIFT_CONV\n");
-  trace("                                   8 - CUDD_REORDER_WINDOW2\n");
-  trace("                                   9 - CUDD_REORDER_WINDOW3\n");
+  trace("                                    0 - CUDD_REORDER_SAME\n");
+  trace("                                    1 - CUDD_REORDER_NONE\n");
+  trace("                                    2 - CUDD_REORDER_RANDOM\n");
+  trace("                                    3 - CUDD_REORDER_RANDOM_PIVOT\n");
+  trace("                                    4 - CUDD_REORDER_SIFT\n");
+  trace("                                    5 - CUDD_REORDER_SIFT_CONVERGE\n");
+  trace("                                    6 - CUDD_REORDER_SYMM_SIFT\n");
+  trace("                                    7 - CUDD_REORDER_SYMM_SIFT_CONV\n");
+  trace("                                    8 - CUDD_REORDER_WINDOW2\n");
+  trace("                                    9 - CUDD_REORDER_WINDOW3\n");
   trace("                                   10 - CUDD_REORDER_WINDOW4\n");
   trace("                                   11 - CUDD_REORDER_WINDOW2_CONV\n");
   trace("                                   12 - CUDD_REORDER_WINDOW3_CONV\n");
@@ -284,16 +284,16 @@ void parse_command_line(int argc, char* argv[]) {
 	          	break;
 	      	case 'b':
 		      	options[O_BDD] = true;
-		      	if (string(optarg) != ""){
+		      	if (optarg) {
 		      		int i = atoi(optarg);
 		      		if (i >= 0 && i <= 21){
 		      			bdd_reordermethod = i;
-		      		}else{
+		      		} else {
 		      			throw Exception(OPTION_MISMATCH,
 				     	"Unknown option!\n",
 				     	"Type " + progname + " -h for more information.\n");
 		      		}
-		      	}else{
+		      	} else {
 		      		bdd_reordermethod = 0;
 		      	}
 		      	break;

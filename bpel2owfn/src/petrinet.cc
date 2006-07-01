@@ -27,17 +27,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/06/19 13:06:33 $
+ *          - last changed: \$Date: 2006/07/01 21:58:08 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.129 $
+ * \version \$Revision: 1.130 $
  */
 
 
@@ -46,18 +46,8 @@
 
 #include "petrinet.h"
 #include "debug.h"		// debugging help
-#include "exception.h"		// exception class
 #include "helpers.h"		// helper functions
-
-
-
-
-
-/******************************************************************************
- * External variables
- *****************************************************************************/
-
-//extern SymbolManager symMan;	// defined in bpel-syntax.yy
+#include <assert.h>
 
 
 
@@ -73,7 +63,7 @@
  */
 bool Node::firstMemberAs(string role)
 {
-  string firstEntry =(*history.begin());
+  string firstEntry = (*history.begin());
   return (firstEntry.find(role, 0) == firstEntry.find_first_of(".") + 1);
 }
 
@@ -87,7 +77,7 @@ bool Node::firstMemberAs(string role)
  */
 bool Node::firstMemberIs(string role)
 {
-  string firstEntry =(*history.begin());
+  string firstEntry = (*history.begin());
   return (firstEntry.find(role, 0) == 0);
 }
 
@@ -102,10 +92,8 @@ bool Node::firstMemberIs(string role)
 bool Node::historyContains(string role)
 {
   for (unsigned int i = 0; i < history.size(); i++)
-  {
     if (history[i] == role)
       return true;
-  }
 
   return false;
 }
@@ -113,9 +101,12 @@ bool Node::historyContains(string role)
 
 
 
+
 Node::~Node()
 {
+  trace(TRACE_VERY_DEBUG, "Removing node " + intToString(id) + "...");
 }
+
 
 
 
@@ -127,8 +118,11 @@ Node::~Node()
  * \param mysource      the source-node of the arc
  * \param mytarget      the target-node of the arc
  */
-Arc::Arc(Node * mysource, Node * mytarget)
+Arc::Arc(Node *mysource, Node *mytarget)
 {
+  assert(mysource != NULL);
+  assert(mytarget != NULL);
+
   source = mysource;
   target = mytarget;
 }
@@ -153,10 +147,6 @@ Transition::Transition(unsigned int myid, string role)
   if (role != "")
     history.push_back(role);
 }
-
-
-
-
 
 
 
@@ -192,11 +182,6 @@ void Place::mark()
 {
   marked = true;
 }
-
-
-
-
-
 
 
 
@@ -241,6 +226,7 @@ Place *PetriNet::newPlace(string role, communication_type mytype)
   trace(TRACE_VERY_DEBUG, "[PN]\tCreating place p" + intToString(id()) + " (" + role + ") ...\n");
 
   Place *p = new Place(getId(), role, mytype);
+  assert(p != NULL);
 
   // Decide in which set of places the place has to be inserted.
   switch(mytype)
@@ -253,12 +239,13 @@ Place *PetriNet::newPlace(string role, communication_type mytype)
   // Test if the place is already defined.
   if (role != "")
   {
-    if (roleMap[role] != NULL)
+    assert(roleMap[role] == NULL);
+/*    if (roleMap[role] != NULL)
     {
       throw Exception(DOUBLE_NODE, "Place with role '" + role + "' already defined.\n", pos(__FILE__, __LINE__, __FUNCTION__));
     }
-    else
-      roleMap[role] = p;
+    else*/
+    roleMap[role] = p;
   }
 
   return p;
@@ -296,17 +283,20 @@ Transition *PetriNet::newTransition(string role)
   trace(TRACE_VERY_DEBUG, "[PN]\tCreating transition t" + intToString(id()) + " (" + role + ") ...\n");
 
   Transition *t = new Transition(getId(), role);
+  assert(t != NULL);
+
   T.insert(t);
 
   // Test if the transition is already defined.
   if (role != "")
   {
-    if (roleMap[role] != NULL)
+    assert(roleMap[role] == NULL);
+/*    if (roleMap[role] != NULL)
     {
       throw Exception(DOUBLE_NODE, "Transition with role '" + role + "' already defined.\n", pos(__FILE__, __LINE__, __FUNCTION__));
     }
-    else
-      roleMap[role] = t;
+    else*/
+    roleMap[role] = t;
   }
 
   return t;
@@ -326,9 +316,12 @@ Transition *PetriNet::newTransition(string role)
  * \param type        type of the arc(as defined in #arc_type)
  * \return pointer of the created arc
  */
-Arc *PetriNet::newArc(Node * source, Node * target, arc_type type)
+Arc *PetriNet::newArc(Node *source, Node *target, arc_type type)
 {
+  assert(source != NULL);
+  assert(target != NULL);
 
+  /*
   // Tests if the source node is a NULL pointer, i.e. the node was not found
   // and the arc cannot be added.
   if ((Place *) source == NULL ||(Transition *) source == NULL)
@@ -349,7 +342,9 @@ Arc *PetriNet::newArc(Node * source, Node * target, arc_type type)
 
     throw Exception(ARC_ERROR, "Source of arc to " + name + " (" + role + ") not found!\n", pos(__FILE__, __LINE__, __FUNCTION__));
   }
+  */
 
+  /*
   // Tests if the target node is a NULL pointer, i.e. the node was not found
   // and the arc cannot be added.
   if ((Place *) target == NULL ||(Transition *) target == NULL)
@@ -369,24 +364,34 @@ Arc *PetriNet::newArc(Node * source, Node * target, arc_type type)
 
     throw Exception(ARC_ERROR, "Target of arc from " + name + " (" + role + ") not found!\n", pos(__FILE__, __LINE__, __FUNCTION__));
   }
+  */
 
   // Now we can be sure both nodes exist.
   trace(TRACE_VERY_DEBUG, "[PN]\tCreating arc (" + intToString(source->id) + "," + intToString(target->id) + ")...\n");
 
+
+  assert(source->nodeType != target->nodeType);
+
+  /*
   // Tests if the two nodes are of different types, i.e. we only draw arcs
   // between places and transitions.
   if (source->nodeType == target->nodeType)
     throw Exception(ARC_ERROR, "Arc between two " + source->nodeTypeName() +
 	"s!\n" + *((source->history).begin()) + " and " + *((target->history).begin()), pos(__FILE__, __LINE__, __FUNCTION__));
+	*/
 
   // Finally add the arc to the Petri net.
   Arc *f = new Arc(source, target);
+  assert(f != NULL);
+
   F.insert(f);
 
   // Add a second arc to close a loop if the arc is a read arc.
   if (type == READ)
   {
     Arc *f2 = new Arc(target, source);
+    assert(f2 != NULL);
+
     F.insert(f2);
   }
 
@@ -405,14 +410,16 @@ Arc *PetriNet::newArc(Node * source, Node * target, arc_type type)
  *
  * \param n node to be detached
  */
-void PetriNet::detachNode(Node * n)
+void PetriNet::detachNode(Node *n)
 {
+  assert(n != NULL);
+
   trace(TRACE_VERY_DEBUG, "[PN]\tDetaching node " + intToString(n->id) + "...\n");
 
-  vector<Arc *> removeList;
+  vector<Arc*> removeList;
 
-  for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
-    if (((*f)->source == n) ||((*f)->target == n))
+  for (set<Arc*>::iterator f = F.begin(); f != F.end(); f++)
+    if (((*f)->source == n) || ((*f)->target == n))
       removeList.push_back(*f);
 
   for (unsigned int i = 0; i < removeList.size(); i++)
@@ -427,7 +434,7 @@ void PetriNet::detachNode(Node * n)
  * Removes a place and all arcs connected with it.
  * \param p place to be removed
  */
-void PetriNet::removePlace(Place * p)
+void PetriNet::removePlace(Place *p)
 {
   if (p == NULL)
     return;
@@ -462,7 +469,7 @@ void PetriNet::removePlace(Place * p)
  * Removes a transition and all arcs connected with it.
  * \param t transition to be removed
  */
-void PetriNet::removeTransition(Transition * t)
+void PetriNet::removeTransition(Transition *t)
 {
   if (t == NULL)
     return;
@@ -488,7 +495,7 @@ void PetriNet::removeTransition(Transition * t)
 /*!
  * \param f arc to be removed
  */
-void PetriNet::removeArc(Arc * f)
+void PetriNet::removeArc(Arc *f)
 {
   if (f == NULL)
     return;
@@ -518,13 +525,18 @@ void PetriNet::removeArc(Arc * f)
  * \param t1 first transition
  * \param t2 second transition
  */
-void PetriNet::mergeTransitions(Transition * t1, Transition * t2)
+void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 {
   if (t1 == t2)
     return;
 
+  assert(t1 != NULL);
+  assert(t2 != NULL);
+
+  /*
   if (t1 == NULL || t2 == NULL)
     throw Exception(MERGING_ERROR, "One of the transitions is null!\n", pos(__FILE__, __LINE__, __FUNCTION__));
+    */
 
   trace(TRACE_VERY_DEBUG, "[PN]\tMerging transitions " + intToString(t1->id) + " and " + intToString(t2->id) + "...\n");
 
@@ -587,7 +599,7 @@ void PetriNet::mergeTransitions(Transition * t1, Transition * t2)
  * \todo
  *       -(nlohmann) Make use of P_in and P_out
  */
-void PetriNet::mergePlaces(Place * p1, Place * p2)
+void PetriNet::mergePlaces(Place *p1, Place *p2)
 {
   if (p1 == p2)
     return;
@@ -595,14 +607,20 @@ void PetriNet::mergePlaces(Place * p1, Place * p2)
   if (p1 == NULL || p2 == NULL)
     return;
 
+  assert(p1->type == INTERNAL);
+  assert(p2->type == INTERNAL);
+
+  /*
   if (p1->type != INTERNAL || p2->type != INTERNAL)
     throw Exception(MERGING_ERROR, (string)"Merging of interface places not supported!\n" + "place " +
 	p1->nodeShortName() + "(type " + intToString(p2->type) + ") and " +
 	p2->nodeShortName() + "(type " + intToString(p2->type) + ")", pos(__FILE__, __LINE__, __FUNCTION__));
+	*/
 
   trace(TRACE_VERY_DEBUG, "[PN]\tMerging places " + intToString(p1->id) + " and " + intToString(p2->id) + "...\n");
 
   Node *p12 = newPlace();
+  assert(p12 != NULL);
 
   if (p1->marked || p2->marked)
     ((Place*)p12)->mark();
@@ -663,9 +681,12 @@ void PetriNet::mergePlaces(string role1, string role2)
  *              with a period: .empty
  * \param role2 string describing the role of the second place
  */
-void PetriNet::mergePlaces(kc::impl_activity * act1, string role1,
-                           kc::impl_activity * act2, string role2)
+void PetriNet::mergePlaces(kc::impl_activity *act1, string role1,
+                           kc::impl_activity *act2, string role2)
 {
+  assert(act1 != NULL);
+  assert(act2 != NULL);
+
   mergePlaces(intToString(act1->id->value) + role1,
 	      intToString(act2->id->value) + role2);
 }
@@ -681,8 +702,10 @@ void PetriNet::mergePlaces(kc::impl_activity * act1, string role1,
  * \param n a node of the Petri net
  * \result the preset of node n
  */
-set<Node *> PetriNet::preset(Node * n)
+set<Node *> PetriNet::preset(Node *n)
 {
+  assert(n != NULL);
+
   set<Node *> result;
 
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
@@ -700,8 +723,10 @@ set<Node *> PetriNet::preset(Node * n)
  * \param n a node of the Petri net
  * \result the postset of node n
  */
-set<Node *> PetriNet::postset(Node * n)
+set<Node *> PetriNet::postset(Node *n)
 {
+  assert(n != NULL);
+
   set<Node *> result;
 
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
@@ -726,7 +751,7 @@ set<Node *> PetriNet::postset(Node * n)
  */
 Place *PetriNet::findPlace(string role)
 {
-  Place *result =(Place *) roleMap[role];
+  Place *result = (Place *) roleMap[role];
 
   if (result == NULL)
     trace(TRACE_DEBUG, "[PN]\tPlace with role \"" + role + "\" not found.\n");
@@ -745,8 +770,10 @@ Place *PetriNet::findPlace(string role)
  * \param  role the demanded role
  * \return a pointer to the place or a NULL pointer if the place was not found.
  */
-Place *PetriNet::findPlace(kc::impl_activity * activity, string role)
+Place *PetriNet::findPlace(kc::impl_activity *activity, string role)
 {
+  assert(activity != NULL);
+
   return findPlace(intToString(activity->id->value) + role);
 }
 
@@ -763,7 +790,7 @@ Place *PetriNet::findPlace(kc::impl_activity * activity, string role)
  */
 Transition *PetriNet::findTransition(string role)
 {
-  Transition *result =(Transition *) roleMap[role];
+  Transition *result = (Transition *) roleMap[role];
 
   if (result == NULL)
     trace(TRACE_DEBUG, "[PN]\tTransition with role \"" + role + "\" not found.\n");
@@ -789,7 +816,6 @@ unsigned int PetriNet::getId()
 
 
 
-
 /*!
  * \return id for last added node
  */
@@ -798,61 +824,67 @@ unsigned int PetriNet::id()
   return nextId;
 }
 
+
+
+
+
 /*!
  *  Adds a prefix to all nodes of the Petri net
  *
  *  \param prefix The prefix to add.
- *
  */
 void PetriNet::addPrefix(string prefix)
 {
-
   for (set< Place * >::iterator place = P.begin(); place != P.end(); place ++)
   {
     (*place)->prefix = prefix;
+
     for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
     {
       if (*place == NULL)
-      roleMap[(prefix + *name)] = *place;
+	roleMap[(prefix + *name)] = *place;
     }
   }
+
   for (set< Transition * >::iterator transition = T.begin(); transition != T.end(); transition ++)
   {
     (*transition)->prefix = prefix;
+
     for(vector< string >::iterator name = (*transition)->history.begin(); name != (*transition)->history.end(); name++)
-    {
       roleMap[prefix + *name] = *transition;
-    }
   }
 }
 
+
+
+
+
 void PetriNet::connectNet(PetriNet * net)
 {
-
   for (set< Place * >::iterator place = net->P.begin(); place != net->P.end(); place ++)
   {
     (*place)->id = getId();
     P.insert(*place);
+
     for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
-    {
       roleMap[((*place)->prefix + *name)] = *place;
-    }
   }
+
   for (set< Transition * >::iterator transition = net->T.begin(); transition != net->T.end(); transition ++)
   {
     (*transition)->id = getId();
     T.insert(*transition);
+
     for(vector< string >::iterator name = (*transition)->history.begin(); name != (*transition)->history.end(); name++)
-    {
       roleMap[(*transition)->prefix + *name] = *transition;
-    }
   }
+
   for (set< Arc * >::iterator arc = net->F.begin(); arc != net->F.end(); arc ++)
-  {
     F.insert(*arc);
-  }
+
   set< Place * > additionalP_in;
   set< Place * > additionalP_out;
+
   for (set< Place * >::iterator place = net->P_in.begin(); place != net->P_in.end(); place ++)
   {
     (*place)->id = getId();
@@ -865,14 +897,11 @@ void PetriNet::connectNet(PetriNet * net)
     while ( ! finished && oPlace != P_out.end())
     {
       if ((*oPlace)->nodeName() != (*place)->nodeName())
-      {
 	oPlace++;
-      }
       else
-      {
 	finished = true;
-      }
     }
+
     if (oPlace != P_out.end())
     {
       (*place)->type = INTERNAL;
@@ -883,10 +912,9 @@ void PetriNet::connectNet(PetriNet * net)
       P_out.erase(*oPlace);
     }
     else
-    {
       additionalP_in.insert(*place);
-    }
   }
+
   for (set< Place * >::iterator place = net->P_out.begin(); place != net->P_out.end(); place ++)
   {
     (*place)->id = getId();
@@ -896,16 +924,12 @@ void PetriNet::connectNet(PetriNet * net)
     }
     set< Place * >::iterator iPlace = P_in.begin();
     bool finished = false;
-    while ( ! finished && iPlace != P_in.end())
+    while (!finished && (iPlace != P_in.end()))
     {
       if ((*iPlace)->nodeName() != (*place)->nodeName())
-      {
 	iPlace++;
-      }
       else
-      {
 	finished = true;
-      }
     }
     if (iPlace != P_in.end())
     {
@@ -917,27 +941,30 @@ void PetriNet::connectNet(PetriNet * net)
       P_in.erase(*iPlace);
     }
     else
-    {
       additionalP_out.insert(*place);
-    }
   }
+
   P_in = setUnion(P_in, additionalP_in);
-  P_out = setUnion(P_out, additionalP_out);
-  
+  P_out = setUnion(P_out, additionalP_out); 
 }
 
+
+
+
+
+/*!
+ * Converts input and output places (channels) to internal places.
+ */
 void PetriNet::makeChannelsInternal()
 {
-  for (set< Place * >::iterator place = P_in.begin(); place != P_in.end(); place ++)
-  {
+  // copy input and output places to the set of internal places
+  for (set<Place *>::iterator place = P_in.begin(); place != P_in.end(); place ++)
     P.insert(*place);
-  }
-  P_in = set< Place * >();
-  for (set< Place * >::iterator place = P_out.begin(); place != P_out.end(); place ++)
-  {
+
+  for (set<Place *>::iterator place = P_out.begin(); place != P_out.end(); place ++)
     P.insert(*place);
-  }
-  P_out = set< Place * >();
+
+  // empty the set of input and output places
+  P_in.clear();
+  P_out.clear();
 }
-
-

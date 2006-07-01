@@ -27,18 +27,18 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/06/09 13:39:26 $
+ *          - last changed: \$Date: 2006/07/01 21:58:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -47,6 +47,13 @@
 #include "symbol-table.h"
 #include "options.h"
 #include "debug.h"
+#include "ast-printers.h"
+#include <assert.h>
+
+
+/// The CFG
+CFGBlock * TheCFG = NULL;
+
 
 extern SymbolTable symTab; // needed for access to the Symbol Table
 
@@ -647,3 +654,59 @@ void CFGBlock::checkForConflictingReceive()
 }
 
 
+
+
+
+
+
+
+void cfg()
+{
+  extern kc::tProcess TheProcess;
+
+  assert(modus == M_CFG);
+
+  TheCFG = NULL;
+  trace(TRACE_INFORMATION, "-> Unparsing AST to CFG ...\n");
+  TheProcess->unparse(kc::pseudoPrinter, kc::cfg);
+  
+  trace(TRACE_DEBUG, "[CFG] checking for DPE\n");
+  // do some business with CFG
+  list<kc::integer> kcl;
+  TheCFG->needsDPE(0, kcl);
+  TheCFG->resetProcessedFlag();
+
+  trace(TRACE_DEBUG, "[CFG] checking for cyclic links\n");
+  /// \todo (gierds) check for cyclic links, otherwise we will fail
+  TheCFG->checkForCyclicLinks();
+  TheCFG->resetProcessedFlag(true);
+
+  trace(TRACE_DEBUG, "[CFG] checking for uninitialized variables\n");
+  // test
+  TheCFG->checkForUninitializedVariables();
+  TheCFG->resetProcessedFlag();
+  // end test
+
+  TheCFG->lastBlock->checkForConflictingReceive();
+  TheCFG->resetProcessedFlag(true, false);
+
+  
+  if (formats[F_DOT])
+  {
+    if (output_filename != "")
+      output = openOutput(output_filename + ".cfg." + suffixes[F_DOT]);
+    
+    trace(TRACE_INFORMATION, "-> Printing CFG in dot ...\n");
+    
+    // output CFG;
+    cfgDot(TheCFG);
+    
+    if (output_filename != "")
+    {
+      closeOutput(output);
+      output = NULL;
+    }
+  }
+  
+  delete(TheCFG);
+}

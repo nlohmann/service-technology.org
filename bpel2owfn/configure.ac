@@ -18,29 +18,54 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/04/06 11:43:33 $ by $Author: nlohmann $.
-# Version $Revision: 1.11 $
+# File last changed $Date: 2006/07/01 21:57:56 $ by $Author: nlohmann $.
+# Version $Revision: 1.12 $
 
 # Process this file with autoconf to produce a configure script.
-AC_INIT(BPEL2oWFN, 1.3, nlohmann@informatik.hu-berlin.de, bpel2owfn)
-AC_REVISION($Revision: 1.11 $)
+AC_PREREQ(2.59)
+AC_INIT([BPEL2oWFN],[1.3],[nlohmann@informatik.hu-berlin.de],[bpel2owfn])
+AC_REVISION($Revision: 1.12 $)
+AM_INIT_AUTOMAKE
 
+
+# Set directories.
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/bpel2owfn.h)
 
-AM_INIT_AUTOMAKE
 
+# The next line has to be un-commented to improve performance.
+# AC_DEFINE(NDEBUG,1,[The release version does not need assert-calls.])
+
+
+# Checks for C/C++ details.
 AC_LANG([C++])
+AC_C_INLINE
 AC_PROG_CXX
 AC_PROG_CC
+AC_PROG_MAKE_SET
 AC_PROG_INSTALL
+AC_TYPE_SIZE_T
 
 
-# check for getopt
-# AC_CHECK_HEADER(getopt.h)
+# Checks for header files and functions.
+AC_HEADER_STDC
+AC_CHECK_HEADERS([libintl.h stdlib.h string.h strings.h unistd.h stddef.h])
+AC_CHECK_FUNCS([pow])
+AC_FUNC_REALLOC
 
 
-# check if the compiler generators are there
+# Checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_STDBOOL
+AC_C_CONST
+
+
+# Checks for library functions.
+AC_FUNC_ERROR_AT_LINE
+AC_FUNC_MALLOC
+AC_CHECK_FUNCS([memset])
+
+
+# Check if the compiler generators are there
 AC_PROG_LEX
 if test "$LEX" != "flex"; then
  AC_MSG_WARN([Flex was not found.])
@@ -57,11 +82,15 @@ if test "$KC" = "not found"; then
 fi
 
 
-# no optimization flag here as it takes too much time
+# Add parameter to debug.
 CXXFLAGS=-g
 
-AC_OUTPUT(Makefile \
+
+# Set files to generate.
+AC_CONFIG_FILES([Makefile \
 	  doc/Makefile \
 	  src/Makefile \
 	  tests/Makefile
-	  )
+	  ])
+
+AC_OUTPUT

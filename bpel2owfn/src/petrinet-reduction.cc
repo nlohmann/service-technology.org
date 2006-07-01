@@ -32,17 +32,17 @@
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/06/22 15:04:04 $
+ *          - last changed: \$Date: 2006/07/01 21:58:08 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  */
 
 
@@ -164,6 +164,8 @@ void PetriNet::removeDeadNodes()
     {
       // p is a dead place
       Place* p = tempPlaces.back();
+      assert(p != NULL);
+
       tempPlaces.pop_back();
       set<Node*> ps = postset(p);
 
@@ -181,6 +183,7 @@ void PetriNet::removeDeadNodes()
     for (list<Place*>::iterator p = deadPlaces.begin(); p != deadPlaces.end(); p++)
       if (P.find(*p) != P.end())
 	removePlace(*p);
+
     for (list<Transition*>::iterator t = deadTransitions.begin(); t != deadTransitions.end(); t++)
       if (T. find(*t) != T.end())
 	removeTransition(*t);

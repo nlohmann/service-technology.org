@@ -32,13 +32,13 @@
  *
  * \date
  *          - created: 2006/02/08
- *          - last changed: \$Date: 2006/06/13 13:20:01 $
+ *          - last changed: \$Date: 2006/07/01 21:58:08 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  */
 
 
@@ -47,6 +47,7 @@
 #include <cmath>
 #include "bpel-unparse-tools.h"
 #include "options.h"
+#include <assert.h>
 
 
 
@@ -118,6 +119,9 @@ Transition *throwFault(Place *p1, Place *p2,
     string p1name, string prefix,
     kc::integer negativeControlFlow, bool preventFurtherFaults)
 {
+  assert(p1 != NULL);
+  assert(p2 != NULL);
+
   // no fault transitions in case of "nano" parameter
   if (parameters[P_COMMUNICATIONONLY])
     return NULL;
@@ -215,6 +219,8 @@ Transition *throwFault(Place *p1, Place *p2,
  */
 Transition *stop(Place *p, string p_name, string prefix)
 {
+  assert(p != NULL);
+
   // no stop transitions in case of "nano" parameter
   if (parameters[P_COMMUNICATIONONLY])
     return NULL;
@@ -284,9 +290,12 @@ void footer(kc::integer id, bool myindent)
 /**
  * Creates arcs to set links on dead paths to false.
  */
-void dpeLinks(Transition* t, kc::integer id)
+void dpeLinks(Transition *t, kc::integer id)
 {
+  assert(t != NULL);
+
   STActivity *branch = dynamic_cast<STActivity*>(symTab.lookup(id));
+  assert(branch != NULL);
   
   for (set<STLink*>::iterator link = branch->enclosedSourceLinks.begin();
       link != branch->enclosedSourceLinks.end();

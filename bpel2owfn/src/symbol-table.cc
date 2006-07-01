@@ -26,7 +26,7 @@
  *
  * \author
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $  
+ *          - last changes of: \$Author: nlohmann $  
  *          
  * \date
  * 
@@ -46,6 +46,7 @@
 #include "helpers.h"
 #include "options.h"
 #include <map>
+#include <assert.h>
 
 extern SymbolTable symTab;
 extern int yylineno;
@@ -343,6 +344,10 @@ unsigned int SymbolTable::insert(unsigned int elementId)
   return this->entryKey;
 }
 
+
+
+
+
 /*!
  * return symbol table entry
  * \param entryKey  symbol table entry key
@@ -352,6 +357,11 @@ SymbolTableEntry* SymbolTable::lookup(kc::integer entryKey)
   return lookup(entryKey->value);
 }
 
+
+
+
+
+
 /*!
  * return symbol table entry
  * \param entryKey  symbol table entry key
@@ -359,8 +369,17 @@ SymbolTableEntry* SymbolTable::lookup(kc::integer entryKey)
 SymbolTableEntry* SymbolTable::lookup(unsigned int entryKey)
 {
 //  traceST("lookup(entryKey=" + intToString((dynamic_cast <SymbolTableEntry*> (symTab[entryKey]))->entryKey) + ")\n");
-  return (dynamic_cast <SymbolTableEntry*> (symTab[entryKey])); 
+  SymbolTableEntry* result = dynamic_cast <SymbolTableEntry*> (symTab[entryKey]);
+  assert(result != NULL);
+
+  return result;
+//  return (dynamic_cast <SymbolTableEntry*> (symTab[entryKey])); 
 }
+
+
+
+
+
 
 /*!
  * return

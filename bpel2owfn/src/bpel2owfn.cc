@@ -32,103 +32,44 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/27 16:34:46 $
+ *          - last changed: \$Date: 2006/07/01 21:58:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.86 $
- *          - 2005-11-15 (gierds) Moved command line evaluation to helpers.cc.
- *            Added option to created (abstracted) low level nets.
- *            Added option for LoLA output.
- *          - 2005-11-15 (nlohmann) Call Exception::info() to signal error.
- *          - 2005-11-16 (gierds) Use of error() and cleanup() as defined in 
- *            helpers.cc
- *          - 2005-12-13 (gierds) Added variables in order to handle creation
- *            of oWFNs.  
+ * \version \$Revision: 1.87 $
  *
  */
+
 
 #include "main.h"
 #include "options.h"
 #include "ast-printers.h"
+#include <assert.h>
 
 /// The Petri Net
 PetriNet *TheNet = new PetriNet();
 
-/// The CFG
-CFGBlock * TheCFG = NULL;
 
-void cfg()
-{
 
-      // create CFG
-      if (modus == M_CFG) //  || modus == M_PETRINET
-      {
-	TheCFG = NULL;
-        trace(TRACE_INFORMATION, "-> Unparsing AST to CFG ...\n");
-        TheProcess->unparse(kc::pseudoPrinter, kc::cfg);
-	trace(TRACE_DEBUG, "[CFG] checking for DPE\n");
-	// do some business with CFG
-	list<kc::integer> kcl;
-	TheCFG->needsDPE(0, kcl);
-	TheCFG->resetProcessedFlag();
 
-	trace(TRACE_DEBUG, "[CFG] checking for cyclic links\n");
-	/// \todo (gierds) check for cyclic links, otherwise we will fail
-	TheCFG->checkForCyclicLinks();
-	TheCFG->resetProcessedFlag(true);
 
-	trace(TRACE_DEBUG, "[CFG] checking for uninitialized variables\n");
-	// test
-	TheCFG->checkForUninitializedVariables();
-	TheCFG->resetProcessedFlag();
-	/// end test
-	
-	TheCFG->lastBlock->checkForConflictingReceive();
-	TheCFG->resetProcessedFlag(true, false);
-      }
-
-      if (modus == M_CFG)
-      {
-	if (formats[F_DOT])
-	{
-	  if (output_filename != "")
-	  {
- 	    output = openOutput(output_filename + ".cfg." + suffixes[F_DOT]);
-	  }
- 	  trace(TRACE_INFORMATION, "-> Printing CFG in dot ...\n");
-          // output CFG;
-  	  cfgDot(TheCFG);
-	  if (output_filename != "")
-	  {
-	    closeOutput(output);
-	    output = NULL;
-	  }
-	}
-      }
-
-      // delete CFG
-      if (modus == M_CFG || modus == M_PETRINET)
-      {
-	delete(TheCFG);
-      }
-}
 
 void petrinet_unparse()
 {
- //     if(modus == M_PETRINET)
-      {
-        trace(TRACE_INFORMATION, "-> Unparsing AST to Petri net ...\n");
-
-	if (parameters[P_COMMUNICATIONONLY] == false)
-	  TheProcess->unparse(kc::pseudoPrinter, kc::petrinet);
-	else
-	  TheProcess->unparse(kc::pseudoPrinter, kc::petrinetsmall);
-      }
+  trace(TRACE_INFORMATION, "-> Unparsing AST to Petri net ...\n");
+  
+  if (parameters[P_COMMUNICATIONONLY] == false)
+    TheProcess->unparse(kc::pseudoPrinter, kc::petrinet);
+  else
+    TheProcess->unparse(kc::pseudoPrinter, kc::petrinetsmall);
 }
+
+
+
+
 
 /**
  * Entry point for BPEL2oWFN.
@@ -141,7 +82,6 @@ void petrinet_unparse()
  */
 int main( int argc, char *argv[])
 {
-	
   try
   {
     /***
@@ -150,8 +90,11 @@ int main( int argc, char *argv[])
      */
     parse_command_line(argc, argv);
   
-    PetriNet * TheNet2 = new PetriNet();
+    PetriNet *TheNet2 = new PetriNet();
+    assert(TheNet2 != NULL);
+
     list< std::string >::iterator file = inputfiles.begin();
+
     do {
       if (inputfiles.size() >= 1)
       {
@@ -176,7 +119,10 @@ int main( int argc, char *argv[])
 	  fclose(yyin);
 	}
  
-	cfg();
+
+	if (modus == M_CFG)
+	  cfg();
+
 
 	if (modus == M_PETRINET || modus == M_CONSISTENCY)
 	{
@@ -200,7 +146,10 @@ int main( int argc, char *argv[])
 	    TheNet->addPrefix(prefix);
 
 	    TheNet2->connectNet(TheNet);
+
 	    TheNet = new PetriNet();
+	    assert(TheNet != NULL);
+
 	    TheProcess = NULL;
 	  }
 	}
@@ -209,24 +158,29 @@ int main( int argc, char *argv[])
       else
       {
 	cleanup();  
-
 	return error;
-
       }
+
       file++;
     } while (modus == M_CONSISTENCY && file != inputfiles.end());
+
+
 
     if (modus == M_CONSISTENCY)
     {
       TheNet = TheNet2;
     }
 
+
+
     if (modus == M_AST)
     {
       trace(TRACE_INFORMATION, "-> Printing AST ...\n");
       TheProcess->print();
     }
-        
+
+
+
     if (modus == M_PRETTY)
     {
       if (formats[F_XML])
@@ -244,7 +198,9 @@ int main( int argc, char *argv[])
         }
       }
     }
-     
+
+
+
     if (modus == M_PETRINET || modus == M_CONSISTENCY)
     {
 

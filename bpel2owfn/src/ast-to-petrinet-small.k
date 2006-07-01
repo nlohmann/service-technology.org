@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/06/14 15:13:29 $
+ *          - last changed: \$Date: 2006/07/01 21:58:07 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.19 $
+ * \version \$Revision: 1.20 $
  *
  */
 %}
@@ -73,6 +73,7 @@
 #include "bpel-unparse-tools.h"
 #include "ast-printers.h"
 #include <cmath>
+#include <assert.h>
 
 using namespace std;
 
@@ -104,7 +105,9 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
     {
       trace(TRACE_INFORMATION, "Generating Petri net...\n");
       header(This->id, true);
+
       STProcess* myself = dynamic_cast<STProcess*> (symTab.lookup(This->id));
+      assert(myself != NULL);
 
       string prefix = intToString(This->id->value) + ".internal.";
       currentScope = prefix;

@@ -34,11 +34,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/06/21 11:32:57 $
+ *          - last changed: \$Date: 2006/07/01 21:58:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.183 $
+ * \version \$Revision: 1.184 $
  * 
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -60,7 +60,7 @@
  * \file bpel-syntax.h
  * \brief BPEL grammar (interface)
  *
- * See \ref bpel-syntax.c for more information.
+ * See \ref bpel-syntax.cc for more information.
  */
 %}
 

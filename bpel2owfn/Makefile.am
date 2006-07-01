@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/03/21 11:36:47 $ by $Author: nlohmann $.
-# Version $Revision: 1.15 $
+# File last changed $Date: 2006/07/01 21:57:56 $ by $Author: nlohmann $.
+# Version $Revision: 1.16 $
 
 SUBDIRS = src doc tests
 
@@ -57,7 +57,7 @@ hu-prepare: maintainer-clean
 	@echo   aclocal
 	@echo   autoconf
 	@echo   autoheader
-	@echo   automake -a -c
+	@echo   automake -ac
 	@echo
 
 # a README file for a binary distribution

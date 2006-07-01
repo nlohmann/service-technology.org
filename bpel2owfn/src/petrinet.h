@@ -1,5 +1,5 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinertf     *
+ * Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert      *
  *                                                                           *
  * This file is part of BPEL2oWFN.                                           *
  *                                                                           *
@@ -40,13 +40,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/06/22 20:23:15 $
+ *          - last changed: \$Date: 2006/07/01 21:58:08 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.84 $
+ * \version \$Revision: 1.85 $
  */
 
 
@@ -84,7 +84,7 @@ using namespace std;
 /// Enumeration of the possible types of a place or transition.
 typedef enum
 {
-  INTERNAL,			///< non-communicating
+  INTERNAL,			///< non-communicating (standard)
   IN,				///< input of an open workflow net (oWFN)
   OUT				///< output of an open workflow net (oWFN)
 } communication_type;
@@ -96,7 +96,7 @@ typedef enum
 /// Enumeration of the possible types of an arc.
 typedef enum
 {
-  STANDARD,			///< low-level arc (standard)
+  STANDARD,			///< standard arc
   READ				///< read arc
 } arc_type;
 
@@ -165,7 +165,7 @@ class Node
     string nodeName();
 
     /// an additional prefix for the name in order to distinguish nodes of different nets
-    std::string prefix;
+    string prefix;
 
     virtual ~Node();
 };
@@ -269,13 +269,13 @@ class Arc
 {
   public:
     /// source node of the arc
-    Node* source;
+    Node *source;
   
     /// target node of the arc
-    Node*target;
+    Node *target;
   
     /// Constructor to create an arc of certain type.
-    Arc(Node* source, Node* target);
+    Arc(Node *source, Node *target);
   
     /// DOT-output of the arc (used by PetriNet::dotOut())
     string dotOut();
@@ -311,10 +311,11 @@ class PetriNet
     Transition*newTransition(string role);
   
     /// Adds an arc given source and target node, and arc type.
-    Arc*newArc(Node* source, Node* target, arc_type type = STANDARD);
+    Arc *newArc(Node *source, Node *target, arc_type type = STANDARD);
 
     /// Information about the net including histories of all nodes.
     void printInformation();
+
 
     /// DOT (Graphviz) output.
     void dotOut();
@@ -334,33 +335,35 @@ class PetriNet
     /// oWFN-output.
     void owfnOut();
 
+
     /// Merges places given two places.
-    void mergePlaces(Place* p1, Place* p2);
+    void mergePlaces(Place *p1, Place *p2);
 
     /// Merges places given two roles.
     void mergePlaces(string role1, string role2);
 
     /// Merges places given two activities with roles.
-    void mergePlaces(kc::impl_activity* act1, string role1,
-		     kc::impl_activity* act2, string role2);
+    void mergePlaces(kc::impl_activity *act1, string role1,
+		     kc::impl_activity *act2, string role2);
 
     /// Merges transitions given two transitions.
-    void mergeTransitions(Transition* t1, Transition* t2);
+    void mergeTransitions(Transition *t1, Transition *t2);
+
 
     /// Finds place given a role.
     Place* findPlace(string role);
 
     /// Finds place given an activity with a role.
-    Place* findPlace(kc::impl_activity* activity, string role);
+    Place* findPlace(kc::impl_activity *activity, string role);
 
     /// Finds transition given a role.
     Transition* findTransition(string role);
 
     /// Calculates the preset of a node.
-    set<Node*> preset(Node* n);
+    set<Node*> preset(Node *n);
 
     /// Calculates the postset of a node.
-    set<Node*> postset(Node* n);
+    set<Node*> postset(Node *n);
 
     /// Simplifies the Petri net.
     void simplify();
@@ -372,7 +375,7 @@ class PetriNet
     void addPrefix(string prefix);
 
     /// Connects a second oWFN
-    void connectNet(PetriNet * net);
+    void connectNet(PetriNet *net);
 
     /// moves channel places to the list of internal places
     void makeChannelsInternal();
@@ -389,19 +392,19 @@ class PetriNet
     Place* newPlace();
 
     /// Removes a place from the net.
-    void removePlace(Place* p);
+    void removePlace(Place *p);
 
     /// Adds a transition without an initial role.
     Transition* newTransition();
 
     /// Removes a transition from the net.
-    void removeTransition(Transition* t);
+    void removeTransition(Transition *t);
 
     /// Removes an arc from the net.
-    void removeArc(Arc* f);
+    void removeArc(Arc *f);
 
     /// Removes all ingoing and outgoing arcs of a node.
-    void detachNode(Node* n);
+    void detachNode(Node *n);
 
 
     /// remove unused status places
@@ -424,8 +427,7 @@ class PetriNet
 
 
     // old functions
-//    void mergeTwinTransitions();
-    bool communicationInPostSet(Place* p);
+    bool communicationInPostSet(Place *p);
     void collapseSequences();
 
 
@@ -440,19 +442,19 @@ class PetriNet
 
 
     /// the list of places of the Petri net
-    set<Place*> P;
+    set<Place *> P;
 
     /// the list of input places of the oWFN
-    set<Place*> P_in;
+    set<Place *> P_in;
 
     /// the list of output places of the oWFN
-    set<Place*> P_out;
+    set<Place *> P_out;
 
     /// the list of transitions of the Petri net
-    set<Transition*> T;
+    set<Transition *> T;
 
     /// the list of arcs of the Petri net
-    set<Arc*> F;
+    set<Arc *> F;
 
 
     /// the id that will be assigned to the next node
@@ -462,8 +464,7 @@ class PetriNet
     bool hasNoInterface;
 
     /// Mapping of roles to nodes of the Petri net.
-    map<string, Node*> roleMap;
-
+    map<string, Node *> roleMap;
 };
 
 #endif

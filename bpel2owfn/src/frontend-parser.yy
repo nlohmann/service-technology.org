@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/07/02 17:39:35 $
+ *          - last changed: \$Date: 2006/07/02 17:54:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.185 $
+ * \version \$Revision: 1.186 $
  * 
  */
 %}
@@ -111,6 +111,7 @@
 #include "exception.h"
 #include "helpers.h"
 #include "ast-details.h"
+#include <assert.h>
 
 // from flex
 extern char* yytext;

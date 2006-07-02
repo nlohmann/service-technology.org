@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/06/22 13:43:53 $ by $Author: gierds $.
-# Version $Revision: 1.24 $
+# File last changed $Date: 2006/07/02 17:39:35 $ by $Author: nlohmann $.
+# Version $Revision: 1.25 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -35,8 +35,9 @@ YYSOURCES = bpel-syntax.h bpel-syntax.cc bpel-lexic.cc
 
 # everything about the Kimwitu++ sources
 KCDUMMY = bpel-kc-dummy.cc
-KCFILES = bpel-abstract.k bpel-unparse-petri.k bpel-unparse-petri2.k bpel-unparse-xml.k \
-	  bpel-unparse-cfg.k ast-printers.k bpel-unparse-petri-small.k 
+KCFILES = bpel-abstract.k bpel-unparse-petri.k bpel-unparse-petri2.k \
+	  bpel-unparse-xml.k  bpel-unparse-cfg.k ast-printers.k \
+	  bpel-unparse-petri-small.k bpel-unparse-ast.k
 KCGENERATED = bpel-kc-csgiok bpel-kc-k bpel-kc-rk bpel-kc-unpk
 KCSOURCES = $(KCFILES:.k=.cc) \
 	    $(KCFILES:.k=.h) \
@@ -65,7 +66,8 @@ bpel2owfn_SOURCES = $(KCDUMMY)\
 		    petrinet.cc petrinet-output.cc petrinet-reduction.cc\
 		    cfg.cc cfg.h\
 		    options.cc options.h\
-		    getopt.h getopt.c getopt1.c
+		    getopt.h getopt.c getopt1.c\
+		    ast-details.cc ast-details.h
 
 
 # dependencies of the Kimwitu++ files

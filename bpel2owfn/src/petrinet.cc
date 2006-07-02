@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/07/01 21:58:08 $
+ *          - last changed: \$Date: 2006/07/02 17:39:36 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.130 $
+ * \version \$Revision: 1.131 $
  */
 
 
@@ -967,4 +967,27 @@ void PetriNet::makeChannelsInternal()
   // empty the set of input and output places
   P_in.clear();
   P_out.clear();
+}
+
+
+
+
+
+/*!
+ * Re-enumerates the nodes of the Petri net to have places numbered p1, p2, ...
+ * and transitions t1, t2, ... .
+ */
+void PetriNet::reenumerate()
+{
+  int currentId = 1;
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+    (*p)->id = currentId++;
+  for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
+    (*p)->id = currentId++;
+  for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
+    (*p)->id = currentId++;
+
+  currentId = 1;
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+    (*t)->id = currentId++;
 }

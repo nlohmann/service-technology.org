@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/07/01 21:58:08 $
+ *          - last changed: \$Date: 2006/07/02 17:39:36 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
  */
 
 
@@ -254,7 +254,11 @@ void PetriNet::printInformation()
 */
 string Arc::dotOut()
 {
-  string result = " " + intToString(source->id) + " -> " + intToString(target->id); 
+  string result = " ";
+  if (source->nodeType == PLACE)
+    result += "p" + intToString(source->id) + " -> t" + intToString(target->id);
+  else
+    result += "t" + intToString(source->id) + " -> p" + intToString(target->id);
   result += ";\n";
 
   return result;
@@ -271,7 +275,7 @@ string Arc::dotOut()
 string Transition::dotOut()
 {
   string result;
-  result += " " + intToString(id) + "\t[label=\"" + nodeShortName();
+  result += " t" + intToString(id) + "\t[label=\"" + nodeShortName();
  
   if (parameters[P_COMMUNICATIONONLY])
   {
@@ -301,7 +305,7 @@ string Transition::dotOut()
 string Place::dotOut()
 {
   string result;
-  result += " " + intToString(id) + "\t[label=\"" + nodeShortName() + "\"";
+  result += " p" + intToString(id) + "\t[label=\"" + nodeShortName() + "\"";
 
 
   if (firstMemberIs("in."))

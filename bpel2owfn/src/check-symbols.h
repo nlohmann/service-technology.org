@@ -25,23 +25,17 @@
  * 	  symbols within a BPEL process.
  *
  * \author  
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
- *          - last changed: \$Date: 2006/03/31 14:56:53 $
+ *          - last changed: \$Date: 2006/07/02 17:39:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.23 $
- *          - 2005-11-22 (gierds) Initial version.
- *          - 2005-11-24 (gierds) Put all funcionality into a class #SymbolManager
- *          - 2005-11-29 (gierds) Added checking of variables.
- *          - 2005-12-01 (gierds) Added checking of links.
- *          - 2005-12-08 (gierds) Added channels in SymbolManager
- *
+ * \version \$Revision: 1.24 $
  */
 
 #ifndef CHECK_SYMBOLS_H

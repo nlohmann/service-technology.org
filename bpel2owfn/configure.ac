@@ -18,13 +18,13 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/07/01 21:57:56 $ by $Author: nlohmann $.
-# Version $Revision: 1.12 $
+# File last changed $Date: 2006/07/02 17:39:24 $ by $Author: nlohmann $.
+# Version $Revision: 1.13 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT([BPEL2oWFN],[1.3],[nlohmann@informatik.hu-berlin.de],[bpel2owfn])
-AC_REVISION($Revision: 1.12 $)
+AC_REVISION($Revision: 1.13 $)
 AM_INIT_AUTOMAKE
 
 
@@ -79,6 +79,11 @@ fi
 AC_CHECK_PROG(KC, kc++, kc++, not found)
 if test "$KC" = "not found"; then
  AC_MSG_WARN([Kimwitu++ was not found.])
+fi
+
+AC_CHECK_PROG(DOT, dot, dot, not found)
+if test "$DOT" = "not found"; then
+ AC_MSG_WARN([Graphviz dot was not found.])
 fi
 
 

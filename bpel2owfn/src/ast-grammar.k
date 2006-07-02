@@ -33,16 +33,16 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/06/06 16:06:40 $
+ *          - last changed: \$Date: 2006/07/02 17:39:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universitï¿½t zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.79 $
+ * \version \$Revision: 1.80 $
  */
 %}
 
@@ -155,7 +155,7 @@ tPartner:
 
 tFaultHandlers:
   userDefinedFaultHandler(tCatch_list tCatchAll)
-| implicitFaultHandler()	
+| implicitFaultHandler()
   {
     bool inProcess;
     integer parentScopeId;

@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/07/01 21:58:08 $
+ *          - last changed: \$Date: 2006/07/02 17:39:36 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.87 $
+ * \version \$Revision: 1.88 $
  *
  */
 
@@ -120,8 +120,11 @@ int main( int argc, char *argv[])
 	}
  
 
+//	TheProcess->unparse(kc::printer, kc::postprocessing);
+
 	if (modus == M_CFG)
 	  cfg();
+
 
 
 	if (modus == M_PETRINET || modus == M_CONSISTENCY)
@@ -215,7 +218,10 @@ int main( int argc, char *argv[])
       {
  	trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
         TheNet->simplify();
-      }    
+      }
+
+      // now the net will not change any more (hopefully...)
+      TheNet->reenumerate(); 
 
       // create oWFN output ?
       if ( formats[F_OWFN] )

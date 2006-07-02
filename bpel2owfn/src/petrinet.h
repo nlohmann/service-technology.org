@@ -40,13 +40,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/07/01 21:58:08 $
+ *          - last changed: \$Date: 2006/07/02 17:39:36 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.85 $
+ * \version \$Revision: 1.86 $
  */
 
 
@@ -380,6 +380,9 @@ class PetriNet
     /// moves channel places to the list of internal places
     void makeChannelsInternal();
 
+    /// re-enumerates the nodes
+    void reenumerate();
+
     /// Statistical output.
     string information();
     
@@ -430,7 +433,7 @@ class PetriNet
     bool communicationInPostSet(Place *p);
     void collapseSequences();
 
-
+    
     /// Removes interface places (for non-oWFN formats)
     void removeInterface();
   

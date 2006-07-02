@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/07/01 21:58:07 $
+ *          - last changed: \$Date: 2006/07/02 17:39:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,10 +47,8 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.184 $
+ * \version \$Revision: 1.185 $
  * 
- * \todo
- *          - add rules to ignored everything non-BPEL
  */
 %}
 
@@ -112,6 +110,7 @@
 #include <map>
 #include "exception.h"
 #include "helpers.h"
+#include "ast-details.h"
 
 // from flex
 extern char* yytext;
@@ -183,6 +182,12 @@ int hasCompensate;
 
 /// a pointer to the current join condition
 impl_joinCondition* currentJoinCondition = standardJoinCondition();
+
+
+// Niels' stuff
+map<unsigned int, ASTE*> ASTEmap; ///< the map of all AST elements
+map<unsigned int, map<string, string> > temporaryAttributeMap; ///< a temporary mapping of attributs
+
 %}
 
 
@@ -326,7 +331,7 @@ tProcess:
       {
         /// current BPEL-element attribute value
       	att.pushSJFStack($5, att.read($5, "suppressJoinFailure"));      
-      }      
+      }
 
       stProcess = dynamic_cast<STProcess*> (symTab.lookup($4));
       if (stProcess == NULL)
@@ -353,8 +358,11 @@ tProcess:
       isInCH.pop();
       $$->id = $4;
       ((STProcess*)symTab.lookup($4))->hasEventHandler = (string($15->op_name()) == "userDefinedEventHandler");
-      symTab.printSymbolTable(); // purely debugging
-      symTab.traceST(symTab.readAttributeValue($4,"name") + "\n"); // for Niels
+//      symTab.printSymbolTable(); // purely debugging
+//      symTab.traceST(symTab.readAttributeValue($4,"name") + "\n"); // for Niels
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_PROCESS);
     }
 ;
 
@@ -540,6 +548,9 @@ tPartnerLink:
 	// cast to STProcess should always happen, since PartnerLinks can only be declared there
 	(dynamic_cast<STProcess*>(currentSTScope))->addPartnerLink(stPartnerLink);
       }
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_PARTNERLINK);
     }
 | K_PARTNERLINK genSymTabEntry_PartnerLink
     arbitraryAttributes X_SLASH
@@ -580,6 +591,9 @@ tPartnerLink:
 	// cast to STProcess should always happen, since PartnerLinks can only be declared there
 	(dynamic_cast<STProcess*>(currentSTScope))->addPartnerLink(stPartnerLink);
       }
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_PARTNERLINK);
     }
 ;
 
@@ -652,6 +666,9 @@ tFaultHandlers:
       $$->inProcess = (currentScopeId->value == 1);
       $$->parentScopeId = currentScopeId; 
       $$->hasCatchAll = false;
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_FAULTHANDLERS);
     }
 | K_FAULTHANDLERS genSymTabEntry_FaultHandlers X_NEXT 
     {
@@ -670,6 +687,9 @@ tFaultHandlers:
       isInFH.pop();
       hasCompensate = 0;
       symMan.endDPEinWhile();
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_FAULTHANDLERS);
     }
 ;
 
@@ -797,7 +817,11 @@ tEventHandlers:
     { currentSymTabEntryKey = symTab.insert(K_EVENTHANDLERS);
       $$ = implicitEventHandler();
       $$->id = mkinteger(currentSymTabEntryKey);      
-      $$->parentScopeId = currentScopeId; }
+      $$->parentScopeId = currentScopeId;
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_EVENTHANDLERS);
+}
 | K_EVENTHANDLERS genSymTabEntry_EventHandlers X_NEXT 
     {
       symMan.startDPEinWhile();
@@ -809,6 +833,9 @@ tEventHandlers:
       $$->id = $2;    
       $$->parentScopeId = currentScopeId; 
       symMan.endDPEinWhile();
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_EVENTHANDLERS);
     }
 ;
 
@@ -936,6 +963,10 @@ tVariable:
       $$ = Variable();
       $$->id = $2;
       stVar->name = currentSTScope->addVariable(stVar);
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_VARIABLE);
+
     }
 | K_VARIABLE genSymTabEntry_Variable
   arbitraryAttributes X_SLASH
@@ -950,6 +981,10 @@ tVariable:
       $$ = Variable();
       $$->id = $2;
       stVar->name = currentSTScope->addVariable(stVar);
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_VARIABLE);
+
     }
 ;
 
@@ -1075,6 +1110,10 @@ tEmpty:
       {
         symMan.addDPEend();
       }
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_EMPTY);
+
     }
 | K_EMPTY genSymTabEntry_Empty
   arbitraryAttributes 
@@ -1096,7 +1135,12 @@ tEmpty:
       $$ = Empty(noLinks);
       att.popSJFStack(); symTab.popSJFStack();
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $2; }
+      $$->id = $2; 
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_EMPTY);
+
+}
 ;
 
 genSymTabEntry_Empty:
@@ -1422,7 +1466,12 @@ tReceive:
       }
       $$->negativeControlFlow = $7->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $7->parentId = $2; 
-    }
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_RECEIVE);
+
+
+}
 | K_RECEIVE genSymTabEntry_Receive
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_RECEIVE);
@@ -1458,7 +1507,11 @@ tReceive:
       att.popSJFStack(); symTab.popSJFStack();
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; 
-    }
+
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_RECEIVE);
+}
 ;
 
 genSymTabEntry_Receive:
@@ -1516,7 +1569,13 @@ tReply:
         symMan.addDPEend();
       }
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $2; }
+      $$->id = $6->parentId = $2;
+
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_REPLY);
+
+}
 | K_REPLY genSymTabEntry_Reply
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_REPLY);
@@ -1550,7 +1609,11 @@ tReply:
       $$ = Reply(noLinks, NiltCorrelation_list());
       att.popSJFStack(); symTab.popSJFStack();
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $2; }
+      $$->id = $2;
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_REPLY);
+}
 ;
 
 genSymTabEntry_Reply:
@@ -1592,7 +1655,12 @@ tAssign:
         symMan.addDPEend();
       }
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $2; }
+      $$->id = $6->parentId = $2;
+
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_ASSIGN);
+}
 ;
 
 genSymTabEntry_Assign:
@@ -1743,7 +1811,12 @@ tWait:
         symMan.addDPEend();
       }
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $2; }
+      $$->id = $6->parentId = $2;
+
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_WAIT);
+}
 | K_WAIT genSymTabEntry_Wait
   arbitraryAttributes
     {
@@ -1772,7 +1845,12 @@ tWait:
       att.popSJFStack(); symTab.popSJFStack();      
 
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $2; }
+      $$->id = $2;
+
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_WAIT);
+}
 ;
 
 genSymTabEntry_Wait:
@@ -1823,7 +1901,13 @@ tThrow:
         symMan.addDPEend();
       }
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $2; }
+      $$->id = $6->parentId = $2;
+
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_THROW);
+
+}
 | K_THROW genSymTabEntry_Throw
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_THROW);
@@ -1852,7 +1936,13 @@ tThrow:
       $$ = Throw(noLinks);
       att.popSJFStack(); symTab.popSJFStack();
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $2; }
+      $$->id = $2;
+
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_THROW);
+
+}
 ;
 
 genSymTabEntry_Throw:
@@ -1917,7 +2007,13 @@ tCompensate:
         symMan.addDPEend();
       }
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $2; }
+      $$->id = $6->parentId = $2;
+
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_COMPENSATE);
+
+}
 | K_COMPENSATE genSymTabEntry_Compensate
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_COMPENSATE);
@@ -1961,7 +2057,12 @@ tCompensate:
       $$ = Compensate(noLinks);
       att.popSJFStack(); symTab.popSJFStack();
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $2; }
+      $$->id = $2;
+
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_COMPENSATE);
+}
 ;
 
 genSymTabEntry_Compensate:
@@ -2003,7 +2104,11 @@ tTerminate:
         symMan.addDPEend();
       }
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $2; }
+      $$->id = $6->parentId = $2;
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_TERMINATE);
+}
 | K_TERMINATE genSymTabEntry_Terminate
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_TERMINATE);
@@ -2024,7 +2129,11 @@ tTerminate:
       $$ = Terminate(noLinks);
       att.popSJFStack(); symTab.popSJFStack();
       $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $2; }
+      $$->id = $2;
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_TERMINATE);
+}
 ;
 
 genSymTabEntry_Terminate:
@@ -2105,6 +2214,11 @@ tFlow:
       $$->id = $7->parentId = $2;
 //CG      symMan.checkLinks();
 //CG      symMan.quitScope(); 
+
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_FLOW);
+
     }
 ;
 
@@ -2170,6 +2284,10 @@ tLink:
 
       $$->id = $2;
 //CG      symMan.addLink(new csLink(symTab.readAttributeValue($2, "name"))); 
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_LINK);
+
     }
 | K_LINK genSymTabEntry_Link
   arbitraryAttributes X_SLASH
@@ -2186,7 +2304,11 @@ tLink:
 
       $$->id = $2;
 //CG      symMan.addLink(new csLink(symTab.readAttributeValue($2, "name"))); 
-    }
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_LINK);
+
+}
 ;
 
 genSymTabEntry_Link:
@@ -2242,7 +2364,11 @@ tSwitch:
       }
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2;
-    }
+
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_SWITCH);
+}
 ;
 
 genSymTabEntry_Switch:
@@ -2294,6 +2420,10 @@ tCase:
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($6->id->value, currentSymTabEntryKey);
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_CASE);
+
     }
 ;
 
@@ -2324,6 +2454,10 @@ tOtherwise:
 
       $$ = Otherwise(otherwiseActivity);
       $$->dpe = kc::mkinteger(0);
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_OTHERWISE);
+
     }
 | K_OTHERWISE X_NEXT 
     {
@@ -2339,6 +2473,10 @@ tOtherwise:
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($4->id->value, currentSymTabEntryKey);
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_OTHERWISE);
+
     }
 ;
 
@@ -2377,6 +2515,12 @@ tWhile:
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2; 
       symMan.endDPEinWhile();
+
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_WHILE);
+
+
     }
 ;
 
@@ -2429,6 +2573,11 @@ tSequence:
       {
 	$6->dpe = mkinteger(1);
       }
+
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_SEQUENCE);
+
     }
 ;
 
@@ -2486,6 +2635,11 @@ tPick:
       }
       $$->id = $6->parentId = $2;
       $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_PICK);
+
     }
 ;
 
@@ -2564,6 +2718,10 @@ tScope:
       {
 	$7->dpe = mkinteger(1);
       }
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_SCOPE);
+
     }
 ;
 
@@ -2594,11 +2752,9 @@ standardElements:
 
 tTarget_list:
   /* empty */
-    { $$ = NiltTarget_list(); 
-    }
+    { $$ = NiltTarget_list(); }
 | tTarget X_NEXT tTarget_list
-    { $$ = ConstTarget_list($1, $3); 
-    }
+    { $$ = ConstTarget_list($1, $3); }
 ;
 
 tTarget:
@@ -2619,6 +2775,10 @@ tTarget:
       
       $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
 //CG      $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), false);
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_TARGET);
+
 }
 | K_TARGET genSymTabEntry_Target
   arbitraryAttributes X_SLASH
@@ -2637,6 +2797,10 @@ tTarget:
 
       $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
 //CG      $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), false);
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_TARGET);
+
 }
 ;
 
@@ -2679,6 +2843,10 @@ tSource:
       $$->dpe = symMan.needsDPE();
       symMan.remDPEend();
       $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_SOURCE);
+
     }
 | K_SOURCE genSymTabEntry_Source
   arbitraryAttributes X_SLASH
@@ -2701,6 +2869,9 @@ tSource:
       $$->dpe = symMan.needsDPE();
       symMan.remDPEend();
       $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_SOURCE);
     }
 ;
 
@@ -2722,7 +2893,9 @@ arbitraryAttributes:
         symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute($1, $3)); }
   arbitraryAttributes
     { att.define($1, $3);
-      $$ = $5; }
+      $$ = $5;
+      temporaryAttributeMap[currentSymTabEntryKey][$1->name] = $3->name;
+}
 ;
 
 

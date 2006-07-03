@@ -53,7 +53,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/06/06 20:37:18 $
+ *          - last changed: \$Date: 2006/07/03 13:16:17 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
  */
 %}
 
@@ -1137,7 +1137,7 @@ This=activityWhile(TheWhile=While(a,b)) ->
     {
       header(This->id, true);
       string prefix = intToString(TheWhile->id->value) + ".internal.";
-      string condition = string(TheWhile->condition->name);
+//      string condition = string(TheWhile->condition->name);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");

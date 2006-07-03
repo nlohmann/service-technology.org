@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/07/02 17:39:36 $
+ *          - last changed: \$Date: 2006/07/03 13:16:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.1 $
+ * \version \$Revision: 1.2 $
  */
 
 #include "ast-details.h"
@@ -58,10 +58,13 @@ ASTE::ASTE(kc::impl_abstract_phylum *mynode, int mytype)
     case(K_ASSIGN):		id = ((kc::impl_tAssign*)mynode)->id->value; break;
     case(K_CASE):		id = ((kc::impl_tCase*)mynode)->id->value; break;
     case(K_COMPENSATE):		id = ((kc::impl_tCompensate*)mynode)->id->value; break;
+    case(K_COMPENSATIONHANDLER):id = ((kc::impl_tCompensationHandler*)mynode)->id->value; break;
     case(K_EMPTY):		id = ((kc::impl_tEmpty*)mynode)->id->value; break;
     case(K_EVENTHANDLERS):	id = ((kc::impl_tEventHandlers*)mynode)->id->value; break;
     case(K_FAULTHANDLERS):	id = ((kc::impl_tFaultHandlers*)mynode)->id->value; break;
+    case(K_FROM):		id = ((kc::impl_tFrom*)mynode)->id->value; break;
     case(K_FLOW):		id = ((kc::impl_tFlow*)mynode)->id->value; break;
+    case(K_INVOKE):		id = ((kc::impl_tInvoke*)mynode)->id->value; break;
     case(K_LINK):		id = ((kc::impl_tLink*)mynode)->id->value; break;
     case(K_OTHERWISE):		id = ((kc::impl_tOtherwise*)mynode)->id->value; break;
     case(K_PICK):		id = ((kc::impl_tPick*)mynode)->id->value; break;
@@ -76,6 +79,7 @@ ASTE::ASTE(kc::impl_abstract_phylum *mynode, int mytype)
     case(K_TERMINATE):		id = ((kc::impl_tTerminate*)mynode)->id->value; break;
     case(K_TARGET):		id = ((kc::impl_tTarget*)mynode)->id->value; break;
     case(K_THROW):		id = ((kc::impl_tThrow*)mynode)->id->value; break;
+    case(K_TO):			id = ((kc::impl_tTo*)mynode)->id->value; break;
     case(K_VARIABLE):		id = ((kc::impl_tVariable*)mynode)->id->value; break;
     case(K_WHILE):		id = ((kc::impl_tWhile*)mynode)->id->value; break;
     default:			id = 0;

@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/07/02 17:39:36 $
+ *          - last changed: \$Date: 2006/07/03 13:16:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.1 $
+ * \version \$Revision: 1.2 $
  */
 
 #ifndef AST_DETAILS_H
@@ -60,6 +60,9 @@ class ASTE
   public:
     map<string, string> attributes;
     unsigned int parentScopeId;
+    unsigned int parentActivityId;
+    bool suppressJF;
+
     ASTE(kc::impl_abstract_phylum *mynode, int mytype);
 };
 

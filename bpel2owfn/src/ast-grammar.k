@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/07/02 17:39:35 $
+ *          - last changed: \$Date: 2006/07/03 13:16:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.80 $
+ * \version \$Revision: 1.81 $
  */
 %}
 
@@ -74,6 +74,8 @@ tProcess:
       )
   {
     integer id;
+
+    bool suppressJF = false;
   }
 ;
 
@@ -387,6 +389,16 @@ tFrom:
   From()
   {
     integer id;
+
+    // attributes
+    casestring variable = mkcasestring("");
+    casestring part = mkcasestring("");
+    casestring partnerLink = mkcasestring("");
+    casestring endpointReference = mkcasestring("");
+    casestring property = mkcasestring("");
+    casestring expression = mkcasestring("");
+
+    casestring literal = mkcasestring("");
   }
 ;
 
@@ -394,6 +406,12 @@ tTo:
   To()
   {
     integer id;
+
+    // attributes
+    casestring variable = mkcasestring("");
+    casestring part = mkcasestring("");
+    casestring partnerLink = mkcasestring("");
+    casestring property = mkcasestring("");
   }
 ;
 
@@ -540,7 +558,7 @@ tOtherwise:
 tWhile:
   While(standardElements activity)
   {
-    casestring condition;
+//    casestring condition;
     integer negativeControlFlow;
     integer id;
   }

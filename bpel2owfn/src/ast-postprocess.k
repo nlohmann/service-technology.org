@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/07/02 17:39:36 $
+ *          - last changed: \$Date: 2006/07/03 13:16:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.1 $
+ * \version \$Revision: 1.2 $
  */
 %}
 
@@ -88,7 +88,26 @@ Process(a,b,c,d,e,f,g,h,i) ->
 
       cerr << "read process: " << ASTEmap[myid]->attributes["name"] << endl;
 
+      if (ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
+      {
+        $0->suppressJF = true;
+        ASTEmap[myid]->suppressJF = true;
+        cerr << "suppressJoinFailure = \"yes\"" << endl;
+      }
+
       ASTEmap[myid]->parentScopeId = myid;
+      ASTEmap[myid]->parentActivityId = myid;
+
+      // distribute the process' id to the enclosed FH/CH/EH/activity
+      assert(ASTEmap[e->id->value] != NULL);
+      ASTEmap[e->id->value]->parentActivityId = myid;
+      assert(ASTEmap[f->id->value] != NULL);
+      ASTEmap[f->id->value]->parentActivityId = myid;
+      assert(ASTEmap[g->id->value] != NULL);
+      ASTEmap[g->id->value]->parentActivityId = myid;
+      assert(ASTEmap[i->id->value] != NULL);
+      ASTEmap[i->id->value]->parentActivityId = myid;
+
       PPcurrentScope = myid;
     }
     a b c d e f g h i
@@ -262,13 +281,16 @@ Correlation() ->
 ******************************************************************************/
 
 Empty(a) ->
-  [postprocessing: a
+  [postprocessing:
     {
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
+      cerr << "<empty>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
     }
+    a
   ]
 ;
 
@@ -278,7 +300,17 @@ Empty(a) ->
 ******************************************************************************/
 
 Invoke(a,b) ->
-  [postprocessing: a b]
+  [postprocessing:
+    {
+      int myid = $0->id->value;
+      assert(ASTEmap[myid] != NULL);
+
+      cerr << "<invoke>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+    }
+    a b
+  ]
 ;
 
 
@@ -287,13 +319,16 @@ Invoke(a,b) ->
 ******************************************************************************/
 
 Receive(a,b) ->
-  [postprocessing: a b
+  [postprocessing:
     {
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
+      cerr << "<receive>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
     }
+    a b
   ]
 ;
 
@@ -303,13 +338,16 @@ Receive(a,b) ->
 ******************************************************************************/
 
 Reply(a,b) ->
-  [postprocessing: a b
+  [postprocessing:
     {
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
+      cerr << "<reply>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
     }
+    a b
   ]
 ;
 
@@ -319,13 +357,16 @@ Reply(a,b) ->
 ******************************************************************************/
 
 Assign(a,b) ->
-  [postprocessing: a b
+  [postprocessing:
     {
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
+      cerr << "<assign>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
     }
+    a b
   ]
 ;
 
@@ -334,7 +375,20 @@ Copy(a,b) ->
 ;
 
 From() ->
-  [postprocessing: ]
+  [postprocessing:
+    {
+      int myid = $0->id->value;
+      assert(ASTEmap[myid] != NULL);
+
+      // copy attributes to AST
+      $0->variable = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
+      $0->part = mkcasestring(ASTEmap[myid]->attributes["part"].c_str());
+      $0->partnerLink = mkcasestring(ASTEmap[myid]->attributes["partnerLink"].c_str());
+      $0->endpointReference = mkcasestring(ASTEmap[myid]->attributes["endpointReference"].c_str());
+      $0->property = mkcasestring(ASTEmap[myid]->attributes["property"].c_str());
+      $0->expression = mkcasestring(ASTEmap[myid]->attributes["expression"].c_str());
+    }
+  ]
 ;
 
 To() ->
@@ -347,24 +401,30 @@ To() ->
 ******************************************************************************/
 
 WaitFor(a) ->
-  [postprocessing: a
+  [postprocessing:
     {
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
+      cerr << "<wait>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
     }
+    a
   ]
 ;
 
 WaitUntil(a) ->
-  [postprocessing: a
+  [postprocessing:
     {
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
+      cerr << "<wait>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
     }
+    a
   ]
 ;
 
@@ -374,13 +434,16 @@ WaitUntil(a) ->
 ******************************************************************************/
 
 Throw(a) ->
-  [postprocessing: a
+  [postprocessing:
     {
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
+      cerr << "<throw>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
     }
+    a
   ]
 ;
 
@@ -390,13 +453,16 @@ Throw(a) ->
 ******************************************************************************/
 
 Compensate(a) ->
-  [postprocessing: a
+  [postprocessing:
     {
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
+      cerr << "<compensate>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
     }
+    a
   ]
 ;
 
@@ -406,13 +472,16 @@ Compensate(a) ->
 ******************************************************************************/
 
 Terminate(a) ->
-  [postprocessing: a
+  [postprocessing:
     {
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
+      cerr << "<terminate>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
     }
+    a
   ]
 ;
 
@@ -429,8 +498,18 @@ Flow(a,b,c) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       PPcurrentFlow = myid; //TODO reset
+
+      cerr << "<flow>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+
+      // distribute the flow's id to the enclosed activities
+      foreach(innerActivity; activity_list c)
+      {
+        assert(ASTEmap[innerActivity->id->value] != NULL);
+        ASTEmap[innerActivity->id->value]->parentActivityId = myid;
+      }
     }
-  a b c]
+    a b c
+  ]
 ;
 
 Link() ->
@@ -451,36 +530,50 @@ Link() ->
   SWITCH
 ******************************************************************************/
 
-Switch(a,b,c) ->
-  [postprocessing: a b c
+Switch(a,b,c=Otherwise(d)) ->
+  [postprocessing:
     {
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
+
+      cerr << "<switch>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+
+      // distribute the switch's id to the enclosed activities
+      foreach(branch=Case(innerActivity); tCase_list b)
+      {
+        assert(ASTEmap[innerActivity->id->value] != NULL);
+        ASTEmap[innerActivity->id->value]->parentActivityId = myid;
+      }
+      assert(ASTEmap[d->id->value] != NULL);
+      ASTEmap[d->id->value]->parentActivityId = myid;
     }
+    a b c
   ]
 ;
 
 Case(a) ->
-  [postprocessing: a
+  [postprocessing:
     {
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
     }
+    a
   ]
 ;
 
 Otherwise(a) ->
-  [postprocessing: a
+  [postprocessing:
     {
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
     }
+    a
   ]
 ;
 
@@ -490,13 +583,20 @@ Otherwise(a) ->
 ******************************************************************************/
 
 While(a,b) ->
-  [postprocessing: a b
+  [postprocessing:
     {
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
+
+      cerr << "<while>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+
+      // distribute the while's id to the enclosed activity
+      assert(ASTEmap[b->id->value] != NULL);
+      ASTEmap[b->id->value]->parentActivityId = myid;
     }
+    a b
   ]
 ;
 
@@ -506,13 +606,23 @@ While(a,b) ->
 ******************************************************************************/
 
 Sequence(a,b) ->
-  [postprocessing: a b
+  [postprocessing:
     {
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
+
+      cerr << "<sequence>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+
+      // distribute the sequence's id to the enclosed activities
+      foreach(innerActivity; activity_list b)
+      {
+        assert(ASTEmap[innerActivity->id->value] != NULL);
+        ASTEmap[innerActivity->id->value]->parentActivityId = myid;
+      }
     }
+    a b
   ]
 ;
 
@@ -522,13 +632,28 @@ Sequence(a,b) ->
 ******************************************************************************/
 
 Pick(a,b,c) ->
-  [postprocessing: a b c
+  [postprocessing:
     {
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
+
+      cerr << "<pick>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+
+      // distribute the pick's id to the enclosed activities
+      foreach(branch=OnMessage(innerActivity); tOnMessage_list b)
+      {
+        assert(ASTEmap[innerActivity->id->value] != NULL);
+        ASTEmap[innerActivity->id->value]->parentActivityId = myid;
+      }
+      foreach(branch=OnAlarm(innerActivity); tOnAlarm_list c)
+      {
+        assert(ASTEmap[innerActivity->id->value] != NULL);
+        ASTEmap[innerActivity->id->value]->parentActivityId = myid;
+      }
     }
+    a b c
   ]
 ;
 
@@ -545,6 +670,12 @@ Scope(a,b,c,d,e,f,g) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       PPcurrentScope = myid;
+
+      cerr << "<scope>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+
+      // distribute the scope's id to the enclosed activity
+      assert(ASTEmap[g->id->value] != NULL);
+      ASTEmap[g->id->value]->parentActivityId = myid;
     }
     a b c d e f g
     {

@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/07/01 21:58:08 $
+ *          - last changed: \$Date: 2006/07/04 12:45:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -416,6 +416,7 @@ void CFGBlock::checkForUninitializedVariables()
       case CFGInvoke    : stVar = (dynamic_cast<STInvoke*>    (symTab.lookup(id)))->inputVariable; 
 			  attributeName = "inputVariable";
 			  break;
+      default: /* should not happen (thinks Niels) */;
     }
   }
   catch (bad_cast)
@@ -456,6 +457,7 @@ void CFGBlock::checkForUninitializedVariables()
 			  attributeName = "outputVariable";
 			  break;
       case CFGOnMessage : stVar = (dynamic_cast<STOnMessage*> (symTab.lookup(id)))->variable; break;
+      default: /* should not happen (thinks Niels) */;
     }
   }
   catch (bad_cast)

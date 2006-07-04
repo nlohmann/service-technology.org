@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/07/03 13:16:17 $
+ *          - last changed: \$Date: 2006/07/04 12:45:46 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.187 $
+ * \version \$Revision: 1.188 $
  * 
  */
 %}
@@ -726,6 +726,9 @@ tCatch:
       $$ = Catch($6);
       $$->id = $2;
       $$->faultName = att.read($3, "faultName");
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_CATCH);
     }
 ;
 
@@ -744,6 +747,10 @@ tCatchAll:
     { hasCatchAll = true;
       $$ = CatchAll($5);
       $$->id = $2;      
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_CATCHALL);
+
    /* DR
       $$->faultName = att.read($3, "faultName");
       $$->faultVariable = att.read($3, "faultVariable");
@@ -2481,7 +2488,8 @@ tOtherwise:
   /* If the otherwise branch is not explicitly specified, then an otherwise
      branch with an empty activity is deemed to be present. */
     { // creaty empty activit with id, without links etc.
-      int otherwiseId = currentSymTabEntryKey = symTab.insert(K_OTHERWISE);
+      //int otherwiseId =
+      currentSymTabEntryKey = symTab.insert(K_OTHERWISE);
       currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 
       int emptyId = currentSymTabEntryKey = symTab.insert(K_EMPTY);
       currentSymTabEntry = symTab.lookup(currentSymTabEntryKey); 

@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/07/03 13:16:17 $
+ *          - last changed: \$Date: 2006/07/04 12:45:46 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.3 $
  */
 
 #ifndef AST_DETAILS_H
@@ -50,6 +50,16 @@
 
 using namespace std;
 
+
+
+typedef enum
+{
+  POSITIVECF = 0,	///< positive control flow
+  FHCF = 1,		///< control flow in fault handler
+  CHCF = 2		///< control flow in compensation handler
+} controlFlowType;
+
+
 class ASTE
 {
   private:
@@ -62,6 +72,7 @@ class ASTE
     unsigned int parentScopeId;
     unsigned int parentActivityId;
     bool suppressJF;
+    controlFlowType controlFlow;
 
     ASTE(kc::impl_abstract_phylum *mynode, int mytype);
 };

@@ -53,7 +53,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/07/03 13:16:17 $
+ *          - last changed: \$Date: 2006/07/05 08:57:11 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  */
 %}
 
@@ -969,7 +969,7 @@ This=Flow(a,b,c) ->
  * parsing an empty otherwise branch was added if it was not specified.
  */
 
-This=activitySwitch(Switch(a,b,Otherwise(c))) ->
+This=activitySwitch(TheSwitch=Switch(a,b,Otherwise(c))) ->
   [petrinet:
     {
       header(This->id, true);
@@ -989,7 +989,7 @@ This=activitySwitch(Switch(a,b,Otherwise(c))) ->
 
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
-	Transition *t7 = throwFault(p6, p10, "running", prefix, This->negativeControlFlow);
+	Transition *t7 = throwFault(p6, p10, "running", prefix, TheSwitch->negativeControlFlow);
 
       Transition *t8  = stop(p5, "initial", prefix);
       Transition *t9  = stop(p6, "running", prefix);
@@ -1175,7 +1175,7 @@ This=activityWhile(TheWhile=While(a,b)) ->
 
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
-	Transition *t5 = throwFault(p2, p6, "running", prefix, This->negativeControlFlow);
+	Transition *t5 = throwFault(p2, p6, "running", prefix, TheWhile->negativeControlFlow);
 
       Transition *t6 = stop(p1, "initial", prefix);
       Transition *t7 = stop(p2, "running", prefix);

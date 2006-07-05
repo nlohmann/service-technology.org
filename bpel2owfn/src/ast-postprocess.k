@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/07/04 12:45:47 $
+ *          - last changed: \$Date: 2006/07/05 08:57:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  */
 %}
 
@@ -86,17 +86,17 @@ Process(a,b,c,d,e,f,g,h,i) ->
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
-      cerr << "read process: " << ASTEmap[myid]->attributes["name"] << endl;
+      // cerr << "read process: " << ASTEmap[myid]->attributes["name"] << endl;
 
       // set suppressJoinFailure-attribute
       if (ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
       {
         $0->suppressJF = true;
         ASTEmap[myid]->suppressJF = true;
-        cerr << "suppressJoinFailure = \"yes\"" << endl;
+        // cerr << "suppressJoinFailure = \"yes\"" << endl;
       }
       else
-        cerr << "suppressJoinFailure = \"no\"" << endl;
+        // cerr << "suppressJoinFailure = \"no\"" << endl;
 
       ASTEmap[myid]->parentScopeId = myid;
       ASTEmap[myid]->parentActivityId = myid;
@@ -128,7 +128,7 @@ PartnerLink() ->
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
-      cerr << "read partner link: " << ASTEmap[myid]->attributes["name"] << endl;
+      // cerr << "read partner link: " << ASTEmap[myid]->attributes["name"] << endl;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
     }
@@ -157,7 +157,7 @@ userDefinedFaultHandler(a,b) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
-      cerr << "<faultHandlers>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+      // cerr << "<faultHandlers>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
 
       // distribute the fault handlers's id to the enclosed catch/catchAll branches
       // also mark the activities as "inside fault handlers"
@@ -187,7 +187,7 @@ implicitFaultHandler() ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
-      cerr << "<faultHandlers>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+      // cerr << "<faultHandlers>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
 
       // these 3 asserts show that the AST can be annotated right here
       assert($0->hasCatchAll == false);
@@ -265,7 +265,7 @@ userDefinedCompensationHandler(a) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
-      cerr << "<compensationHandler>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+      // cerr << "<compensationHandler>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
 
       // distribute the compensation handlers's id to the enclosed activity
       // also mark the activities as "inside compensation handlers"
@@ -288,7 +288,7 @@ Variable() ->
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
-      cerr << "read variable: " << PPcurrentScope << "." << ASTEmap[myid]->attributes["name"] << endl;
+      // cerr << "\tread variable: " << PPcurrentScope << "." << ASTEmap[myid]->attributes["name"] << endl;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
     }
@@ -337,9 +337,11 @@ Empty(a) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      cerr << "<empty>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+      // cerr << "<empty>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
+
+      $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
     }
     a
   ]
@@ -369,10 +371,12 @@ Invoke(a,b) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      cerr << "<invoke>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+      // cerr << "<invoke>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+      
+      $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
+      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
     }
     a b
   ]
@@ -402,10 +406,12 @@ Receive(a,b) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      cerr << "<receive>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+      // cerr << "<receive>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+
+      $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
+      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
     }
     a b
   ]
@@ -435,10 +441,12 @@ Reply(a,b) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      cerr << "<reply>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+      // cerr << "<reply>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+
+      $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
+      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
     }
     a b
   ]
@@ -468,10 +476,12 @@ Assign(a,b) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      cerr << "<assign>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+      // cerr << "<assign>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+
+      $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
+      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
     }
     a b
   ]
@@ -526,10 +536,12 @@ WaitFor(a) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      cerr << "<wait>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+      // cerr << "<wait>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+
+      $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
+      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
     }
     a
   ]
@@ -554,10 +566,12 @@ WaitUntil(a) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      cerr << "<wait>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+      // cerr << "<wait>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+
+      $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
+      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
     }
     a
   ]
@@ -587,10 +601,12 @@ Throw(a) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      cerr << "<throw>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+      // cerr << "<throw>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+
+      $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
+      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
     }
     a
   ]
@@ -620,10 +636,12 @@ Compensate(a) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      cerr << "<compensate>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+      // cerr << "<compensate>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+
+      $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
+      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
     }
     a
   ]
@@ -653,10 +671,12 @@ Terminate(a) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      cerr << "<terminate>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+      // cerr << "<terminate>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+
+      $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
+      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
     }
     a
   ]
@@ -689,7 +709,7 @@ Flow(a,b,c) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      cerr << "<flow>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+      // cerr << "<flow>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
 
       // distribute the flow's id to the enclosed activities
       // also distribute the control flow type
@@ -700,7 +720,8 @@ Flow(a,b,c) ->
         ASTEmap[innerActivity->id->value]->controlFlow = ASTEmap[myid]->controlFlow;
       }
 
-      assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+      $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
     }
     a b c
   ]
@@ -712,7 +733,7 @@ Link() ->
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
-      cerr << "read link: " << PPcurrentFlow << "." << ASTEmap[myid]->attributes["name"] << endl;
+      // cerr << "\tread link: " << PPcurrentFlow << "." << ASTEmap[myid]->attributes["name"] << endl;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
     }
@@ -745,7 +766,7 @@ Switch(a,b,c=Otherwise(d)) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      cerr << "<switch>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+      // cerr << "<switch>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
 
       // distribute the switch's id to the enclosed activities
       // also distribute the control flow
@@ -759,7 +780,8 @@ Switch(a,b,c=Otherwise(d)) ->
       ASTEmap[d->id->value]->parentActivityId = myid;
       ASTEmap[d->id->value]->controlFlow = ASTEmap[myid]->controlFlow;
 
-      assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+      $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
     }
     a b c
   ]
@@ -815,14 +837,15 @@ While(a,b) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      cerr << "<while>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+      // cerr << "<while>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
 
       // distribute the while's id to the enclosed activity
       assert(ASTEmap[b->id->value] != NULL);
       ASTEmap[b->id->value]->parentActivityId = myid;
       ASTEmap[b->id->value]->controlFlow = ASTEmap[myid]->controlFlow;
 
-      assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+      $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
     }
     a b
   ]
@@ -854,7 +877,7 @@ Sequence(a,b) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      cerr << "<sequence>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+      // cerr << "<sequence>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
 
       // distribute the sequence's id to the enclosed activities
       foreach(innerActivity; activity_list b)
@@ -864,7 +887,8 @@ Sequence(a,b) ->
         ASTEmap[innerActivity->id->value]->controlFlow = ASTEmap[myid]->controlFlow;
       }
 
-      assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+      $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
     }
     a b
   ]
@@ -896,7 +920,7 @@ Pick(a,b,c) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      cerr << "<pick>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+      // cerr << "<pick>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
 
       // distribute the pick's id to the enclosed activities
       foreach(branch=OnMessage(innerActivity); tOnMessage_list b)
@@ -912,7 +936,8 @@ Pick(a,b,c) ->
         ASTEmap[innerActivity->id->value]->controlFlow = ASTEmap[myid]->controlFlow;
       }
 
-      assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+      $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
     }
     a b c
   ]
@@ -945,13 +970,14 @@ Scope(a,b,c,d,e,f,g) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      cerr << "<scope>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+      // cerr << "<scope>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
 
       // distribute the scope's id to the enclosed activity
       assert(ASTEmap[g->id->value] != NULL);
       ASTEmap[g->id->value]->parentActivityId = myid;
 
-      assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+      $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
     }
     a b c d e f g
     {
@@ -966,13 +992,39 @@ Scope(a,b,c,d,e,f,g) ->
   STANDARD ELEMENTS
 ******************************************************************************/
 
+StandardElements(a,b,c) ->
+  [postprocessing:
+    {
+      $0->negativeControlFlow = mkinteger(ASTEmap[$0->parentId->value]->controlFlow);
+
+      foreach(targetLink; tTarget_list a)
+      {
+        assert(ASTEmap[targetLink->id->value] != NULL);
+        ASTEmap[targetLink->id->value]->controlFlow = ASTEmap[$0->parentId->value]->controlFlow;
+        targetLink->negativeControlFlow = mkinteger(ASTEmap[$0->parentId->value]->controlFlow);
+        ASTEmap[targetLink->id->value]->parentActivityId = $0->parentId->value;
+      }
+
+      foreach(sourceLink; tSource_list b)
+      {
+        assert(ASTEmap[sourceLink->id->value] != NULL);
+        ASTEmap[sourceLink->id->value]->controlFlow = ASTEmap[$0->parentId->value]->controlFlow;
+        sourceLink->negativeControlFlow = mkinteger(ASTEmap[$0->parentId->value]->controlFlow);
+        ASTEmap[sourceLink->id->value]->parentActivityId = $0->parentId->value;
+      }
+    }
+    a b c
+  ]
+;
+
 Target() ->
   [postprocessing:
     {
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
-      cerr << "read target link: " << ASTEmap[myid]->attributes["linkName"] << endl;
+      // cerr << "<target>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+      // cerr << "\tread target link: " << ASTEmap[myid]->attributes["linkName"] << endl;
     }
   ]
 ;
@@ -983,7 +1035,8 @@ Source() ->
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
-      cerr << "read source link: " << ASTEmap[myid]->attributes["linkName"] << endl;
+      // cerr << "<source>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
+      // cerr << "\tread source link: " << ASTEmap[myid]->attributes["linkName"] << endl;
     }
   ]
 ;

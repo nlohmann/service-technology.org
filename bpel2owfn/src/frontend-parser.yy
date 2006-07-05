@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/07/04 12:45:46 $
+ *          - last changed: \$Date: 2006/07/05 08:57:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.188 $
+ * \version \$Revision: 1.189 $
  * 
  */
 %}
@@ -387,7 +387,7 @@ imports:
 activity:
   tEmpty
     { $$ = activityEmpty($1); $$->id = $1->id; 
-      $$->negativeControlFlow = $1->negativeControlFlow;
+//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
@@ -401,42 +401,42 @@ activity:
 */
 | tReceive
     { $$ = activityReceive($1); $$->id = $1->id; 
-      $$->negativeControlFlow = $1->negativeControlFlow;
+//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tReply
     { $$ = activityReply($1); $$->id = $1->id; 
-      $$->negativeControlFlow = $1->negativeControlFlow;
+//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tAssign
     { $$ = activityAssign($1); $$->id = $1->id; 
-      $$->negativeControlFlow = $1->negativeControlFlow;
+//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tWait
     { $$ = activityWait($1); $$->id = $1->id; 
-      $$->negativeControlFlow = $1->negativeControlFlow;
+//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tThrow
     { $$ = activityThrow($1); $$->id = $1->id; 
-      $$->negativeControlFlow = $1->negativeControlFlow;
+//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tTerminate
     { $$ = activityTerminate($1); $$->id = $1->id; 
-      $$->negativeControlFlow = $1->negativeControlFlow;
+//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
@@ -444,7 +444,7 @@ activity:
 | tFlow
     { $$ = activityFlow($1); $$->id = $1->id; 
       $$->dpe = $1->dpe ;
-      $$->negativeControlFlow = $1->negativeControlFlow;
+//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
@@ -452,14 +452,14 @@ activity:
 | tSwitch
     { $$ = activitySwitch($1); $$->id = $1->id; 
       $$->dpe = $1->dpe;
-      $$->negativeControlFlow = $1->negativeControlFlow;
+//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tWhile
     { $$ = activityWhile($1); $$->id = $1->id; 
-      $$->negativeControlFlow = $1->negativeControlFlow;
+//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
@@ -467,7 +467,7 @@ activity:
 | tSequence
     { $$ = activitySequence($1); $$->id = $1->id; 
       $$->dpe = $1->dpe;
-      $$->negativeControlFlow = $1->negativeControlFlow;
+//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
@@ -475,7 +475,7 @@ activity:
 | tPick
     { $$ = activityPick($1); $$->id = $1->id; 
       $$->dpe = $1->dpe;
-      $$->negativeControlFlow = $1->negativeControlFlow;
+//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
@@ -483,7 +483,7 @@ activity:
 | tScope
     { $$ = activityScope($1); $$->id = $1->id; 
       $$->dpe = $1->dpe;
-      $$->negativeControlFlow = $1->negativeControlFlow;
+//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
@@ -491,7 +491,7 @@ activity:
     }
 | tCompensate
     { $$ = activityCompensate($1); $$->id = $1->id; 
-      $$->negativeControlFlow = $1->negativeControlFlow;
+//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
@@ -1115,7 +1115,7 @@ tEmpty:
       att.traceAM(string("tEmpty: ") + (att.read($3, "suppressJoinFailure"))->name + string("\n"));
       $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
       att.popSJFStack(); symTab.popSJFStack();
-      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2; 
       if ($6->hasTarget)
       {
@@ -1149,7 +1149,7 @@ tEmpty:
       noLinks->parentId = $2;
       $$ = Empty(noLinks);
       att.popSJFStack(); symTab.popSJFStack();
-      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; 
 
       assert(ASTEmap[$$->id->value] == NULL);
@@ -1280,8 +1280,8 @@ tInvoke:
         {
           symMan.addDPEend();
         }
-        scope->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-        invoke->negativeControlFlow = mkinteger(0);
+//NL        scope->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL        invoke->negativeControlFlow = mkinteger(0);
         /*
         scope->id = $7->parentId = $2; 
         invoke->id = ai->id = se->parentId = symTab.nextId();
@@ -1294,7 +1294,7 @@ tInvoke:
         $$ = activity(activityScope(scope));
 
         $$->id = scope->id;
-        $$->negativeControlFlow = scope->negativeControlFlow;
+//NL        $$->negativeControlFlow = scope->negativeControlFlow;
 
         assert(ASTEmap[$$->id->value] == NULL);
         ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)invoke, K_SCOPE);
@@ -1353,12 +1353,12 @@ tInvoke:
         {
           symMan.addDPEend();
         }
-        invoke->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL        invoke->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
         invoke->id = $7->parentId = $2; 
 
         $$ = activity(activityInvoke(invoke));
         $$->id = invoke->id;
-        $$->negativeControlFlow = invoke->negativeControlFlow;
+//NL        $$->negativeControlFlow = invoke->negativeControlFlow;
 
 
         assert(ASTEmap[invoke->id->value] == NULL);
@@ -1420,12 +1420,12 @@ tInvoke:
 								 true);
       }
       invoke->dpe = kc::mkinteger(0);
-      invoke->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      invoke->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       invoke->id = $2; 
 
       $$ = activity(activityInvoke(invoke));
       $$->id = invoke->id;
-      $$->negativeControlFlow = invoke->negativeControlFlow;
+//NL      $$->negativeControlFlow = invoke->negativeControlFlow;
 
       assert(ASTEmap[invoke->id->value] == NULL);
       ASTEmap[invoke->id->value] = new ASTE((kc::impl_activity*)invoke, K_INVOKE);
@@ -1494,7 +1494,7 @@ tReceive:
       {
         symMan.addDPEend();
       }
-      $$->negativeControlFlow = $7->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = $7->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $7->parentId = $2; 
 
       assert(ASTEmap[$$->id->value] == NULL);
@@ -1535,7 +1535,7 @@ tReceive:
 
       $$ = Receive(noLinks, NiltCorrelation_list());
       att.popSJFStack(); symTab.popSJFStack();
-      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; 
 
 
@@ -1598,7 +1598,7 @@ tReply:
       {
         symMan.addDPEend();
       }
-      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2;
 
 
@@ -1638,7 +1638,7 @@ tReply:
 
       $$ = Reply(noLinks, NiltCorrelation_list());
       att.popSJFStack(); symTab.popSJFStack();
-      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2;
 
       assert(ASTEmap[$$->id->value] == NULL);
@@ -1684,7 +1684,7 @@ tAssign:
       {
         symMan.addDPEend();
       }
-      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2;
 
 
@@ -1862,7 +1862,7 @@ tWait:
       {
         symMan.addDPEend();
       }
-      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2;
 
 
@@ -1896,7 +1896,7 @@ tWait:
 
       att.popSJFStack(); symTab.popSJFStack();      
 
-      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2;
 
 
@@ -1952,7 +1952,7 @@ tThrow:
       {
         symMan.addDPEend();
       }
-      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2;
 
 
@@ -1987,7 +1987,7 @@ tThrow:
 
       $$ = Throw(noLinks);
       att.popSJFStack(); symTab.popSJFStack();
-      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2;
 
 
@@ -2057,7 +2057,7 @@ tCompensate:
       {
         symMan.addDPEend();
       }
-      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2;
 
 
@@ -2107,7 +2107,7 @@ tCompensate:
       noLinks->parentId = $2;
       $$ = Compensate(noLinks);
       att.popSJFStack(); symTab.popSJFStack();
-      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2;
 
 
@@ -2154,7 +2154,7 @@ tTerminate:
       {
         symMan.addDPEend();
       }
-      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2;
 
       assert(ASTEmap[$$->id->value] == NULL);
@@ -2179,7 +2179,7 @@ tTerminate:
       noLinks->parentId = $2;
       $$ = Terminate(noLinks);
       att.popSJFStack(); symTab.popSJFStack();
-      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2;
 
       assert(ASTEmap[$$->id->value] == NULL);
@@ -2261,7 +2261,7 @@ tFlow:
       {
 	$7->dpe = mkinteger(1);
       }
-      $$->negativeControlFlow = $7->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = $7->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $7->parentId = $2;
 //CG      symMan.checkLinks();
 //CG      symMan.quitScope(); 
@@ -2413,7 +2413,7 @@ tSwitch:
       {
 	$6->dpe = mkinteger(1);
       }
-      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2;
 
 
@@ -2499,7 +2499,7 @@ tOtherwise:
       noLinks->parentId = kc::mkinteger(emptyId);
       impl_tEmpty_Empty* implicitEmpty = Empty(noLinks);
       implicitEmpty->id = kc::mkinteger(emptyId);
-      implicitEmpty->negativeControlFlow = noLinks->negativeControlFlow = mkinteger(0);
+//NL      implicitEmpty->negativeControlFlow = noLinks->negativeControlFlow = mkinteger(0);
 //      implicitEmpty->dpe = mkinteger(0);
       impl_activity *otherwiseActivity = activityEmpty(implicitEmpty);
       otherwiseActivity->id = kc::mkinteger(emptyId);
@@ -2564,7 +2564,7 @@ tWhile:
       $6->suppressJoinFailure = att.read($3, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
       att.popSJFStack(); symTab.popSJFStack();
 //      $$->condition = att.read($3, "condition");
-      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2; 
       symMan.endDPEinWhile();
 
@@ -2610,7 +2610,7 @@ tSequence:
     { $$ = Sequence($6, $7);
       $6->suppressJoinFailure = att.read($3, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
       att.popSJFStack(); symTab.popSJFStack();
-      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2; 
       $$->dpe = mkinteger((symMan.needsDPE())->value);
       if ($6->hasTarget)
@@ -2686,7 +2686,7 @@ tPick:
 	$6->dpe = mkinteger(1);
       }
       $$->id = $6->parentId = $2;
-      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
 
 
       assert(ASTEmap[$$->id->value] == NULL);
@@ -2752,7 +2752,7 @@ tScope:
       $$ = Scope($7, $9, $11, $12, $13, StopInScope(), $14);
       $7->suppressJoinFailure = att.read($3, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
       att.popSJFStack(); symTab.popSJFStack();
-      $$->negativeControlFlow = $7->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = $7->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $7->parentId = $2;
       $$->parentScopeId = currentScopeId = parent[$2];
       currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId->value));
@@ -2793,7 +2793,7 @@ standardElements:
     { $$ = StandardElements($1, $2, currentJoinCondition);
       currentJoinCondition = standardJoinCondition();
       $$->dpe = $2->dpe;
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       if ($1->length() > 0)
       {
 	symMan.addDPEstart();
@@ -2825,7 +2825,7 @@ tTarget:
       stTarget->link = currentSTFlow->checkLink(symTab.readAttributeValue($2, "linkName"), $2->value, false);
       stTarget->isSource = false;
       
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
 //CG      $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), false);
 
       assert(ASTEmap[$$->id->value] == NULL);
@@ -2847,7 +2847,7 @@ tTarget:
       stTarget->link = currentSTFlow->checkLink(symTab.readAttributeValue($2, "linkName"), $2->value, false);
       stTarget->isSource = false;
 
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
 //CG      $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), false);
 
       assert(ASTEmap[$$->id->value] == NULL);
@@ -2894,7 +2894,7 @@ tSource:
       symMan.addDPEend();
       $$->dpe = symMan.needsDPE();
       symMan.remDPEend();
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_SOURCE);
@@ -2920,7 +2920,7 @@ tSource:
       symMan.addDPEend();
       $$->dpe = symMan.needsDPE();
       symMan.remDPEend();
-      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+//NL      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_SOURCE);

@@ -18,13 +18,13 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/07/02 17:39:24 $ by $Author: nlohmann $.
-# Version $Revision: 1.13 $
+# File last changed $Date: 2006/07/05 08:56:59 $ by $Author: nlohmann $.
+# Version $Revision: 1.14 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT([BPEL2oWFN],[1.3],[nlohmann@informatik.hu-berlin.de],[bpel2owfn])
-AC_REVISION($Revision: 1.13 $)
+AC_REVISION($Revision: 1.14 $)
 AM_INIT_AUTOMAKE
 
 
@@ -87,8 +87,9 @@ if test "$DOT" = "not found"; then
 fi
 
 
-# Add parameter to debug.
-CXXFLAGS=-g
+# Add this parameters to debug.
+#CXXFLAGS="-g -Wall"
+CXXFLAGS=""
 
 
 # Set files to generate.

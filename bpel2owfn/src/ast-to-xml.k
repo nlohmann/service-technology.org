@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/03/28 09:44:59 $
+ *          - last changed: \$Date: 2006/07/05 08:57:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.33 $
+ * \version \$Revision: 1.34 $
  */
 %}
 
@@ -336,7 +336,8 @@ While(a,b) ->
   SEQUENCE
 ******************************************************************************/
 
-activitySequence(Sequence(a,b)) ->
+//activitySequence(Sequence(a,b)) ->
+Sequence(a,b) ->
   [xml: { inup(); } "<sequence id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\" dpe=\"" $0->dpe "\">\n" a b { indown(); } "</sequence>\n"]
 ;
 

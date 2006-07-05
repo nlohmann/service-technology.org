@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/07/04 12:45:46 $
+ *          - last changed: \$Date: 2006/07/05 08:57:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.82 $
+ * \version \$Revision: 1.83 $
  */
 %}
 
@@ -122,7 +122,7 @@ activity:
      * 1 = control flow in fault handler
      * 2 = control flow in compensation handler
      */
-    integer negativeControlFlow;
+//    integer negativeControlFlow;
     
     integer dpe = mkinteger(0);
   }

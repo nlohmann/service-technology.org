@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/07/04 12:45:46 $
+ *          - last changed: \$Date: 2006/07/05 08:57:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  */
 
 #include "ast-details.h"
@@ -95,6 +95,6 @@ ASTE::ASTE(kc::impl_abstract_phylum *mynode, int mytype)
   suppressJF = false; // required initialization!
   controlFlow = POSITIVECF;
 
-  cerr << mynode->op_name() << " (" << mynode->phylum_name() << ", id=" << id << ", ";
-  cerr << attributes.size() << " attributes" << ")" << endl;
+//  cerr << mynode->op_name() << " (" << mynode->phylum_name() << ", id=" << id << ", ";
+//  cerr << attributes.size() << " attributes" << ")" << endl;
 }

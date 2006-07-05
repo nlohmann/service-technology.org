@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/07/01 21:57:56 $ by $Author: nlohmann $.
-# Version $Revision: 1.16 $
+# File last changed $Date: 2006/07/05 08:56:59 $ by $Author: nlohmann $.
+# Version $Revision: 1.17 $
 
 SUBDIRS = src doc tests
 
@@ -86,7 +86,7 @@ binarydistreadme:
 
 # target to create an executable that is independet of Cygwin
 pure-windows-executable:
-	make hu-binarydist OS=win32 CXXFLAGS="-g -mno-cygwin -U _WIN32" CFLAGS="-g -mno-cygwin -U _WIN32" 
+	make hu-binarydist OS=win32 CXXFLAGS="-mno-cygwin -U _WIN32" CFLAGS="-mno-cygwin -U _WIN32" 
 
 # name of the directory/archive for a binary distribution
 #WIN32DISTDIR = $(distdir)-win32

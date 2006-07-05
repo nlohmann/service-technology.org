@@ -25,18 +25,18 @@
  * 
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/02/14 13:53:51 $
+ *          - last changed: \$Date: 2006/07/05 12:36:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.35 $
+ * \version \$Revision: 1.36 $
  *
  * \todo
  *       - (reinert) Comment this file and its classes.
@@ -1056,39 +1056,39 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
   }
 }
 
-/*!
- * \param elementId 
- * \param attributeValue
- */
-void attributeManager::pushSJFStack(kc::integer elementId, kc::casestring attributeValue)
-{
-  this->SJFStack.push(new SJFStackElement(elementId, attributeValue));
-}
+//NL/*!
+//NL * \param elementId 
+//NL * \param attributeValue
+//NL */
+//NLvoid attributeManager::pushSJFStack(kc::integer elementId, kc::casestring attributeValue)
+//NL{
+//NL  this->SJFStack.push(new SJFStackElement(elementId, attributeValue));
+//NL}
 
-/*!
- * 
- */
-void attributeManager::popSJFStack()
-{
-  this->SJFStack.pop();
-}
+//NL/*!
+//NL * 
+//NL */
+//NLvoid attributeManager::popSJFStack()
+//NL{
+//NL  this->SJFStack.pop();
+//NL}
 
 
-/*!
- * 
- */
-SJFStackElement attributeManager::topSJFStack()
-{
-  return *(this->SJFStack.top());
-}
+//NL/*!
+//NL * 
+//NL */
+//NLSJFStackElement attributeManager::topSJFStack()
+//NL{
+//NL  return *(this->SJFStack.top());
+//NL}
 
-/*!
- * 
- */
-bool attributeManager::emptySJFStack()
-{
-  return this->SJFStack.empty();
-}
+//NL/*!
+//NL * 
+//NL */
+//NLbool attributeManager::emptySJFStack()
+//NL{
+//NL  return this->SJFStack.empty();
+//NL}
 
 /********************************************
  * implementation of SJFStackElement CLASS

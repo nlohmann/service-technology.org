@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/07/05 08:57:11 $
+ *          - last changed: \$Date: 2006/07/05 12:36:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  */
 %}
 
@@ -86,20 +86,19 @@ Process(a,b,c,d,e,f,g,h,i) ->
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
-      // cerr << "read process: " << ASTEmap[myid]->attributes["name"] << endl;
-
       // set suppressJoinFailure-attribute
       if (ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
       {
         $0->suppressJF = true;
         ASTEmap[myid]->suppressJF = true;
-        // cerr << "suppressJoinFailure = \"yes\"" << endl;
       }
-      else
-        // cerr << "suppressJoinFailure = \"no\"" << endl;
+
+
 
       ASTEmap[myid]->parentScopeId = myid;
       ASTEmap[myid]->parentActivityId = myid;
+
+
 
       // distribute the process' id to the enclosed FH/CH/EH/activity
       assert(ASTEmap[e->id->value] != NULL);

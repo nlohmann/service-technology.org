@@ -129,8 +129,8 @@ class attributeManager
     /// <bpel-element-id, <attribute name, attribute value>>
     std::map<unsigned int, std::map<std::string, std::string> > scannerResult;
 	
-	///
-	std::stack<SJFStackElement*> SJFStack;
+//NL	///
+//NL	std::stack<SJFStackElement*> SJFStack;
 	
 	/// print formatted attribute manager error message
 	void printErrorMsg(std::string errorMsg);
@@ -154,17 +154,17 @@ class attributeManager
 	///
 	bool isAttributeValueEmpty(kc::integer elementId, std::string attributeName);
 	
-	///
-	void pushSJFStack(kc::integer elementId, kc::casestring attributeValue);
+//NL	///
+//NL	void pushSJFStack(kc::integer elementId, kc::casestring attributeValue);
 	
-	///
-	void popSJFStack();
+//NL	///
+//NL	void popSJFStack();
 	
-	///
-	SJFStackElement topSJFStack();
+//NL	///
+//NL	SJFStackElement topSJFStack();
 	
-	///
-	bool emptySJFStack();
+//NL	///
+//NL	bool emptySJFStack();
 	
 	/// AM traces
 	void traceAM(std::string traceMsg);

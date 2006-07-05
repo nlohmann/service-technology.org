@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/07/05 08:57:10 $
+ *          - last changed: \$Date: 2006/07/05 12:36:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.189 $
+ * \version \$Revision: 1.190 $
  * 
  */
 %}
@@ -323,16 +323,16 @@ tProcess:
   X_OPEN K_PROCESS genSymTabEntry_Process
   arbitraryAttributes
     { symTab.checkAttributes($4); //att.check($4, K_PROCESS);
-      if(att.isAttributeValueEmpty($5, "suppressJoinFailure"))
-      {
-      	/// default attribute value
-      	att.pushSJFStack($5, mkcasestring("no"));
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($5, att.read($5, "suppressJoinFailure"));      
-      }
+//NL      if(att.isAttributeValueEmpty($5, "suppressJoinFailure"))
+//NL      {
+//NL      	/// default attribute value
+//NL      	att.pushSJFStack($5, mkcasestring("no"));
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($5, att.read($5, "suppressJoinFailure"));      
+//NL      }
 
       stProcess = dynamic_cast<STProcess*> (symTab.lookup($4));
       if (stProcess == NULL)
@@ -354,7 +354,7 @@ tProcess:
 //CG      symMan.quitScope();
       //symTab.traceST("\t\t\t\t HALLO " + string((att.read($4, "abstractProcess")->name)) + "\n");      
 //      att.traceAM(string("tProcess: ") + ($$->suppressJoinFailure)->name + string("\n"));      
-      att.popSJFStack(); symTab.popSJFStack();
+//NL      att.popSJFStack(); symTab.popSJFStack();
       isInFH.pop();
       isInCH.pop();
       $$->id = $4;
@@ -1098,57 +1098,56 @@ genSymTabEntry_Correlation:
 tEmpty:
   K_EMPTY genSymTabEntry_Empty  
   arbitraryAttributes 
-    { symTab.checkAttributes($2); //att.check($3, K_EMPTY);
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
-    }   
+//NL    { symTab.checkAttributes($2); //att.check($3, K_EMPTY);
+//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
+//NL    }   
   X_NEXT standardElements X_SLASH K_EMPTY
-    { $$ = Empty($6);
-      att.traceAM(string("tEmpty: ") + (att.read($3, "suppressJoinFailure"))->name + string("\n"));
-      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
-      att.popSJFStack(); symTab.popSJFStack();
+    { $$ = Empty($5);
+//NL      att.traceAM(string("tEmpty: ") + (att.read($3, "suppressJoinFailure"))->name + string("\n"));
+//NL      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+//NL      att.popSJFStack(); symTab.popSJFStack();
 //NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $2; 
-      if ($6->hasTarget)
+      $$->id = $5->parentId = $2; 
+      if ($5->hasTarget)
       {
 	symMan.remDPEstart();
       }
-      if ($6->dpe->value > 0)
+      if ($5->dpe->value > 0)
       {
         symMan.addDPEend();
       }
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_EMPTY);
-
     }
 | K_EMPTY genSymTabEntry_Empty
   arbitraryAttributes 
-    { symTab.checkAttributes($2); //att.check($3, K_EMPTY);
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
-    }   
+//NL    { symTab.checkAttributes($2); //att.check($3, K_EMPTY);
+//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
+//NL    }   
   X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       noLinks->parentId = $2;
       $$ = Empty(noLinks);
-      att.popSJFStack(); symTab.popSJFStack();
+//NL      att.popSJFStack(); symTab.popSJFStack();
 //NL      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; 
 
@@ -1173,16 +1172,16 @@ tInvoke:
   K_INVOKE genSymTabEntry_Invoke 
   arbitraryAttributes 
     { symTab.checkAttributes($2); //att.check($3, K_INVOKE);
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
+//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
     }   
   X_NEXT
     {
@@ -1252,9 +1251,9 @@ tInvoke:
 
         symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute(mkcasestring("name"), att.read($3, "name")));
         symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute(mkcasestring("joinCondition"), att.read($3, "joinCondition")));
-        $7->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
-        symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute(mkcasestring("suppressJoinFailure"), $7->suppressJoinFailure));
-	att.popSJFStack();
+//NL        $7->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+//NL        symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute(mkcasestring("suppressJoinFailure"), $7->suppressJoinFailure));
+//NL	att.popSJFStack();
 	// inputVariable <=> input for invoke process !!!
         if (symTab.readAttributeValue($2, "inputVariable") != "")
         {
@@ -1327,8 +1326,8 @@ tInvoke:
 
 	tInvoke invoke = Invoke($7, $8);
 
-        $7->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
-        att.popSJFStack(); symTab.popSJFStack();
+//NL        $7->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+//NL        att.popSJFStack(); symTab.popSJFStack();
 	// inputVariable <=> input for invoke process !!!
         if (symTab.readAttributeValue($2, "inputVariable") != "")
         {
@@ -1374,16 +1373,16 @@ tInvoke:
   arbitraryAttributes 
     { 
       symTab.checkAttributes($2); //att.check($3, K_INVOKE);
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
+//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
     }   
   X_SLASH
     { 
@@ -1403,7 +1402,7 @@ tInvoke:
 
 
       tInvoke invoke = Invoke(noLinks, NiltCorrelation_list());
-      att.popSJFStack(); symTab.popSJFStack();
+//NL      att.popSJFStack(); symTab.popSJFStack();
       // inputVariable <=> input for invoke process !!!
       if (symTab.readAttributeValue($2, "inputVariable") != "")
       {
@@ -1452,16 +1451,16 @@ tReceive:
   K_RECEIVE genSymTabEntry_Receive
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_RECEIVE);
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
+//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
     }   
   X_NEXT
     {
@@ -1483,8 +1482,8 @@ tReceive:
 								 true);
 
 
-      $7->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
-      att.popSJFStack(); symTab.popSJFStack();
+//NL      $7->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+//NL      att.popSJFStack(); symTab.popSJFStack();
       // symbolTableEntry->variable
       if ($7->hasTarget)
       {
@@ -1505,16 +1504,16 @@ tReceive:
 | K_RECEIVE genSymTabEntry_Receive
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_RECEIVE);
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
+//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
     }   
   X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
@@ -1534,7 +1533,7 @@ tReceive:
 								 true);
 
       $$ = Receive(noLinks, NiltCorrelation_list());
-      att.popSJFStack(); symTab.popSJFStack();
+//NL      att.popSJFStack(); symTab.popSJFStack();
 //NL      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2; 
 
@@ -1559,16 +1558,16 @@ tReply:
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_REPLY);
 
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
+//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
     }   
   X_NEXT 
   standardElements 
@@ -1588,8 +1587,8 @@ tReply:
 								 symTab.readAttributeValue($2, "partnerLink")),
 								 false);
 
-     $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
-      att.popSJFStack(); symTab.popSJFStack();
+//NL     $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+//NL      att.popSJFStack(); symTab.popSJFStack();
       if ($6->hasTarget)
       {
 	symMan.remDPEstart();
@@ -1609,16 +1608,16 @@ tReply:
 | K_REPLY genSymTabEntry_Reply
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_REPLY);
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
+//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
     }   
   X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
@@ -1637,7 +1636,7 @@ tReply:
 								 false);
 
       $$ = Reply(noLinks, NiltCorrelation_list());
-      att.popSJFStack(); symTab.popSJFStack();
+//NL      att.popSJFStack(); symTab.popSJFStack();
 //NL      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2;
 
@@ -1661,21 +1660,21 @@ tAssign:
   K_ASSIGN genSymTabEntry_Assign
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_ASSIGN);
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
+//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
     }   
   X_NEXT standardElements tCopy_list  X_SLASH K_ASSIGN
     { $$ = Assign($6, $7);
-      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
-      att.popSJFStack(); symTab.popSJFStack();
+//NL      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+//NL      att.popSJFStack(); symTab.popSJFStack();
       if ($6->hasTarget)
       {
 	symMan.remDPEstart();
@@ -1833,16 +1832,16 @@ tWait:
   K_WAIT genSymTabEntry_Wait
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_WAIT);
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
+//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
     }   
   X_NEXT standardElements X_SLASH K_WAIT
     {
@@ -1851,8 +1850,8 @@ tWait:
       else
         $$ = WaitUntil($6);
 
-      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
-      att.popSJFStack(); symTab.popSJFStack();      
+//NL      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+//NL      att.popSJFStack(); symTab.popSJFStack();      
 
       if ($6->hasTarget)
       {
@@ -1874,16 +1873,16 @@ tWait:
     {
       symTab.checkAttributes($2); //att.check($3, K_WAIT);
 
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
+//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
     }   
   X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
@@ -1894,7 +1893,7 @@ tWait:
       else
         $$ = WaitUntil(noLinks);
 
-      att.popSJFStack(); symTab.popSJFStack();      
+//NL      att.popSJFStack(); symTab.popSJFStack();      
 
 //NL      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2;
@@ -1920,16 +1919,16 @@ tThrow:
   K_THROW genSymTabEntry_Throw
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_THROW);
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
+//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
     }   
   X_NEXT standardElements X_SLASH K_THROW
     { symTab.checkAttributes($2); //att.check($3, K_THROW);
@@ -1942,8 +1941,8 @@ tThrow:
       stThrow->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
 
       $$ = Throw($6);
-      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
-      att.popSJFStack(); symTab.popSJFStack();      
+//NL      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+//NL      att.popSJFStack(); symTab.popSJFStack();      
       if ($6->hasTarget)
       {
 	symMan.remDPEstart();
@@ -1963,16 +1962,16 @@ tThrow:
 | K_THROW genSymTabEntry_Throw
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_THROW);
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
+//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
     }   
   X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
@@ -1986,7 +1985,7 @@ tThrow:
       stThrow->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
 
       $$ = Throw(noLinks);
-      att.popSJFStack(); symTab.popSJFStack();
+//NL      att.popSJFStack(); symTab.popSJFStack();
 //NL      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2;
 
@@ -2034,21 +2033,21 @@ tCompensate:
         hasCompensate = 2;
       }
 
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
+//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
     }   
   X_NEXT standardElements X_SLASH K_COMPENSATE
     { $$ = Compensate($6);
-      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
-      att.popSJFStack(); symTab.popSJFStack();
+//NL      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+//NL      att.popSJFStack(); symTab.popSJFStack();
       if ($6->hasTarget)
       {
 	symMan.remDPEstart();
@@ -2091,22 +2090,22 @@ tCompensate:
         hasCompensate = 2;
       }
 
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
+//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
     }   
   X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       noLinks->parentId = $2;
       $$ = Compensate(noLinks);
-      att.popSJFStack(); symTab.popSJFStack();
+//NL      att.popSJFStack(); symTab.popSJFStack();
 //NL      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2;
 
@@ -2131,21 +2130,21 @@ tTerminate:
   K_TERMINATE genSymTabEntry_Terminate
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_TERMINATE);
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
+//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
     }   
   X_NEXT standardElements X_SLASH K_TERMINATE
     { $$ = Terminate($6);
-      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
-      att.popSJFStack(); symTab.popSJFStack();
+//NL      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+//NL      att.popSJFStack(); symTab.popSJFStack();
       if ($6->hasTarget)
       {
 	symMan.remDPEstart();
@@ -2163,22 +2162,22 @@ tTerminate:
 | K_TERMINATE genSymTabEntry_Terminate
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_TERMINATE);
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
+//NL     if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
     }   
   X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       noLinks->parentId = $2;
       $$ = Terminate(noLinks);
-      att.popSJFStack(); symTab.popSJFStack();
+//NL      att.popSJFStack(); symTab.popSJFStack();
 //NL      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2;
 
@@ -2201,16 +2200,16 @@ tFlow:
   K_FLOW genSymTabEntry_Flow
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_FLOW);
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
+//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
     }   
   X_NEXT
     {
@@ -2246,8 +2245,8 @@ tFlow:
       }
       stFlow->checkLinkUsage();
 
-      $7->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
-      att.popSJFStack(); symTab.popSJFStack();
+//NL      $7->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+//NL      att.popSJFStack(); symTab.popSJFStack();
       $$->dpe = mkinteger((symMan.needsDPE())->value);
       if ($7->hasTarget)
       {
@@ -2377,16 +2376,16 @@ tSwitch:
   K_SWITCH genSymTabEntry_Switch
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_SWITCH);
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
+//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
     } 
   X_NEXT 
   standardElements 
@@ -2397,8 +2396,8 @@ tSwitch:
   tOtherwise 
   X_SLASH K_SWITCH
     { $$ = Switch($6, $8, $9);
-      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
-      att.popSJFStack(); symTab.popSJFStack();
+//NL      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
+//NL      att.popSJFStack(); symTab.popSJFStack();
       symMan.remDPEstart();
       $$->dpe = symMan.needsDPE();
       if ($6->hasTarget)
@@ -2541,16 +2540,16 @@ tWhile:
   K_WHILE genSymTabEntry_While
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_WHILE);
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
+//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
     }    
   X_NEXT 
   standardElements 
@@ -2561,8 +2560,8 @@ tWhile:
   X_NEXT X_SLASH K_WHILE
     { // symTab.checkAttributes($3); att.check($3, K_WHILE);
       $$ = While($6, $8);
-      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
-      att.popSJFStack(); symTab.popSJFStack();
+//NL      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
+//NL      att.popSJFStack(); symTab.popSJFStack();
 //      $$->condition = att.read($3, "condition");
 //NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2; 
@@ -2591,16 +2590,16 @@ tSequence:
   K_SEQUENCE genSymTabEntry_Sequence
   arbitraryAttributes 
     { symTab.checkAttributes($2); //att.check($3, K_SEQUENCE);
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
+//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
     }
   X_NEXT 
   standardElements 
@@ -2608,8 +2607,8 @@ tSequence:
   X_SLASH 
   K_SEQUENCE
     { $$ = Sequence($6, $7);
-      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
-      att.popSJFStack(); symTab.popSJFStack();
+//NL      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
+//NL      att.popSJFStack(); symTab.popSJFStack();
 //NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $6->parentId = $2; 
       $$->dpe = mkinteger((symMan.needsDPE())->value);
@@ -2648,16 +2647,16 @@ tPick:
   K_PICK genSymTabEntry_Pick
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_PICK);
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
+//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
     }
   X_NEXT 
   standardElements 
@@ -2669,8 +2668,8 @@ tPick:
   tOnAlarm_list 
   X_SLASH K_PICK
     { $$ = Pick($6, ConstOnMessage_list($8, $10), $11);
-      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
-      att.popSJFStack(); symTab.popSJFStack();
+//NL      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
+//NL      att.popSJFStack(); symTab.popSJFStack();
       symMan.remDPEstart();
       $$->dpe = symMan.needsDPE();
       if ($6->hasTarget)
@@ -2710,16 +2709,16 @@ tScope:
   K_SCOPE genSymTabEntry_Scope
   arbitraryAttributes
     { symTab.checkAttributes($2); //att.check($3, K_SCOPE);
-      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-      {
-      	/// parent BPEL-element attribute value
-      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-      }
-      else
-      {
-        /// current BPEL-element attribute value
-      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-      }
+//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
+//NL      {
+//NL      	/// parent BPEL-element attribute value
+//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
+//NL      }
+//NL      else
+//NL      {
+//NL        /// current BPEL-element attribute value
+//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
+//NL      }
     }  
   X_NEXT
     { 
@@ -2750,8 +2749,8 @@ tScope:
       hasCompensate = isInCH.top().second;
       isInCH.pop();
       $$ = Scope($7, $9, $11, $12, $13, StopInScope(), $14);
-      $7->suppressJoinFailure = att.read($3, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
-      att.popSJFStack(); symTab.popSJFStack();
+//NL      $7->suppressJoinFailure = att.read($3, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
+//NL      att.popSJFStack(); symTab.popSJFStack();
 //NL      $$->negativeControlFlow = $7->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $7->parentId = $2;
       $$->parentScopeId = currentScopeId = parent[$2];

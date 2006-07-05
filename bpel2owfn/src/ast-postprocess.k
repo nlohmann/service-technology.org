@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/07/05 12:36:12 $
+ *          - last changed: \$Date: 2006/07/05 15:42:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  */
 %}
 
@@ -995,6 +995,7 @@ StandardElements(a,b,c) ->
   [postprocessing:
     {
       $0->negativeControlFlow = mkinteger(ASTEmap[$0->parentId->value]->controlFlow);
+      $0->suppressJF = ASTEmap[$0->parentId->value]->suppressJF;
 
       foreach(targetLink; tTarget_list a)
       {

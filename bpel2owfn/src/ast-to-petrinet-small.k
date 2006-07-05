@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/07/03 13:16:17 $
+ *          - last changed: \$Date: 2006/07/05 15:42:44 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  *
  */
 %}
@@ -1245,8 +1245,9 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
  * suppressJoinFailure="no".
  *****************************************************************************/
 
-This=StandardElements(a, NiltSource_list(), jc) provided 
-(symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "no") ->
+This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF)
+//(symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "no") ->
+ ->
   [petrinetsmall:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 23\n");
@@ -1264,8 +1265,9 @@ This=StandardElements(a, NiltSource_list(), jc) provided
  * suppressJoinFailure="yes".
  *****************************************************************************/
 
-This=StandardElements(a, NiltSource_list(), jc) provided
-(symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "yes") ->
+This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF)
+//(symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "yes")
+ ->
   [petrinetsmall:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 24 (new)\n");
@@ -1358,8 +1360,9 @@ This=StandardElements(a, NiltSource_list(), jc) provided
  * case of suppressJoinFailure="yes".
  *****************************************************************************/
 
-This=StandardElements(a,b, jc) provided 
-(symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "yes") ->
+This=StandardElements(a,b, jc) provided (This->suppressJF)
+//(symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "yes") ->
+ ->
   [petrinetsmall:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 25 (new)\n");
@@ -1473,8 +1476,9 @@ This=StandardElements(a,b, jc) provided
  * case of suppressJoinFailure="no".
  *****************************************************************************/
 
-This=StandardElements(a,b, jc) provided 
-(symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "no") ->
+This=StandardElements(a,b, jc) provided (!This->suppressJF) 
+//(symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "no") ->
+ ->
   [petrinetsmall:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 26\n");

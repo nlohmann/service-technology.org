@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/07/05 08:57:10 $
+ *          - last changed: \$Date: 2006/07/05 15:42:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  */
 
 #include "ast-details.h"
@@ -83,6 +83,7 @@ ASTE::ASTE(kc::impl_abstract_phylum *mynode, int mytype)
     case(K_THROW):		id = ((kc::impl_tThrow*)mynode)->id->value; break;
     case(K_TO):			id = ((kc::impl_tTo*)mynode)->id->value; break;
     case(K_VARIABLE):		id = ((kc::impl_tVariable*)mynode)->id->value; break;
+    case(K_WAIT):		id = ((kc::impl_tWait*)mynode)->id->value; break;
     case(K_WHILE):		id = ((kc::impl_tWhile*)mynode)->id->value; break;
     default:			id = 0;
   }

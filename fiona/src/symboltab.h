@@ -24,7 +24,7 @@ class SymbolTab
 	unsigned int size;
 };
 
-extern SymbolTab * PlaceTable, * TransitionTable;
+extern SymbolTab * PlaceTable, * TransitionTable, * InterfaceTable;
 	
 typedef enum {pl,tr} kinds;
 class Symbol
@@ -43,6 +43,14 @@ public:
 	owfnPlace * place;
         PlSymbol(owfnPlace *); // LL- places
         PlSymbol(char *); // HL-places
+};
+
+class ISymbol: public Symbol
+{
+public:
+	owfnPlace * place; 		  // interface places
+        ISymbol(owfnPlace *); // LL- places
+        ISymbol(char *); 	  // HL-places
 };
 
 class TrSymbol: public Symbol

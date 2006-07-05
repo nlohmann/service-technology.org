@@ -11,7 +11,7 @@
 #include "debug.h"
 
 
-#include <cstdlib>
+#include <cstdlib> 
 #include <time.h>
 
 #include "main.h"
@@ -160,8 +160,8 @@ int main(int argc, char ** argv) {
         cerr << mess;
         _exit(2);
     }
-    //delete PlaceTable;
-    //delete TransitionTable;
+    delete PlaceTable;
+    delete TransitionTable;
 
     // report the net
 
@@ -209,12 +209,12 @@ int main(int argc, char ** argv) {
         trace(TRACE_0, "OG: number of nodes: " + intToString(graph->getNumberOfVertices()) + "\n");
         trace(TRACE_0, "    number of edges: " + intToString(graph->getNumberOfEdges()) + "\n");
 		trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
-
+        
+        graph->printDotFile();
+        
         if (options[O_BDD] == true){
         	graph->convertToBdd();
         }
-        
-        graph->printDotFile();
 
     } else {
         // interaction graph is built
@@ -254,8 +254,8 @@ int main(int argc, char ** argv) {
 //	cout << "\ncomputation finished\n\t\t\t...please hit any key" << endl;
 //	getchar();
 	
-	delete PlaceTable;
-    delete TransitionTable;
+	//delete PlaceTable;
+    //delete TransitionTable;
 	
     trace(TRACE_0, "--------------------------------------------------------------\n\n");
 

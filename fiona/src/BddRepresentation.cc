@@ -7,6 +7,8 @@
 #include "BddRepresentation.h" 
 #include "stateList.h"
 #include "graphEdge.h"
+#include "symboltab.h"
+#include "owfn.h"
 
 #include "options.h"
 #include "debug.h"
@@ -36,7 +38,26 @@ BddRepresentation::BddRepresentation(vertex * root, int nbrLabels, Cudd_Reorderi
     bddAnn = Cudd_Not(Cudd_ReadOne(mgrAnn)); //BDDannotation
     Cudd_Ref(bddAnn);
      
-    nodeMap.insert(make_pair(root->getNumber(), 0));    
+    nodeMap.insert(make_pair(root->getNumber(), 0));
+    
+    InterfaceTable = new SymbolTab(PN->placeInputCnt + PN->placeOutputCnt);
+    unsigned int i = 0;
+    
+    //add interface places to InterfaceTable
+    owfnPlace * P;
+    ISymbol * IPS; //Interface-Place-Symbol
+    for (i = 0; i < PN->placeInputCnt; ++i){
+    	P = new owfnPlace(PN->Places[PN->inputPlacesArray[i]]->name, PN->Places[PN->inputPlacesArray[i]]->getType(), PN);    	
+    	P->index = PN->Places[PN->inputPlacesArray[i]]->index;
+    	IPS = new ISymbol(P);
+    }
+    
+    for (i = 0; i < PN->placeOutputCnt; ++i){
+		P = new owfnPlace(PN->Places[PN->outputPlacesArray[i]]->name, PN->Places[PN->outputPlacesArray[i]]->getType(), PN);
+    	P->index = PN->Places[PN->outputPlacesArray[i]]->index;
+    	IPS = new ISymbol(P);
+    }
+        
 }
 
 //! \fn BddRepresentation::~BddRepresentation()()
@@ -58,6 +79,7 @@ BddRepresentation::~BddRepresentation(){
 //! \fn void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[])
 //! \brief generate BDD representation
 void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
+	v->resetIteratingSuccNodes();
 	if (v->getColor() == BLUE) {	
 		if (v->getStateList()->setOfReachGraphStates.size() != 0){
 			visitedNodes[v->getNumber()] = 1;
@@ -107,8 +129,8 @@ void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
 //! \fn DdNode*  BddRepresentation::labelToBddMp(char* label)
 //! \brief returns the BDD of a label (given as integer)
 DdNode*  BddRepresentation::labelToBddMp(char* label){
-	Symbol * s = PlaceTable->lookup(label);
-    unsigned int number = ((PlSymbol*)s)->place->index;
+	Symbol * s = InterfaceTable->lookup(label);
+    unsigned int number = ((ISymbol*)s)->place->index;
 	
 	BitVector* assignment = numberToBin(number, maxLabelBits);
 		

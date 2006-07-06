@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/07/06 15:49:05 $
+ *          - last changed: \$Date: 2006/07/06 16:17:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.198 $
+ * \version \$Revision: 1.199 $
  * 
  */
 %}
@@ -332,7 +332,6 @@ tProcess:
 
       isInFH.pop();
       isInCH.pop();
-//      ((STProcess*)symTab.lookup($4))->hasEventHandler = (string($15->op_name()) == "userDefinedEventHandler");
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_PROCESS);
@@ -1145,7 +1144,6 @@ tInvoke:
         scope->id = $7->parentId = $2; 
         invoke->id = ai->id = se->parentId = symTab.nextId();
         */
-//        ((STScope*)symTab.lookup(currentSymTabEntryKey))->hasEventHandler = false;
 
         currentScopeId = scope->parentScopeId = parent[$2];
         currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId->value));
@@ -2172,8 +2170,6 @@ tScope:
 
       if ($6->hasTarget)
 	symMan.remDPEstart();
-
-//      ((STScope*)symTab.lookup($2))->hasEventHandler = (string($13->op_name()) == "userDefinedEventHandler");
 
       if ($6->dpe->value > 0)
         symMan.addDPEend();

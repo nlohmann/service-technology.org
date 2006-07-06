@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/07/05 15:42:44 $
+ *          - last changed: \$Date: 2006/07/06 09:11:50 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.191 $
+ * \version \$Revision: 1.192 $
  * 
  */
 %}
@@ -315,34 +315,20 @@ tProcess:
       parent = map<integer, integer>();
       hasCatchAll = false;
       isInFH = stack<bool>();
-      //stack< pair<bool,int> > isInCH;
       currentJoinCondition = standardJoinCondition();
       yylineno = 1;
       channelShortNames = map< string, string >();
     }
   X_OPEN K_PROCESS genSymTabEntry_Process
   arbitraryAttributes
-    { symTab.checkAttributes($4); //att.check($4, K_PROCESS);
-//NL      if(att.isAttributeValueEmpty($5, "suppressJoinFailure"))
-//NL      {
-//NL      	/// default attribute value
-//NL      	att.pushSJFStack($5, mkcasestring("no"));
-//NL      }
-//NL      else
-//NL      {
-//NL        /// current BPEL-element attribute value
-//NL      	att.pushSJFStack($5, att.read($5, "suppressJoinFailure"));      
-//NL      }
-
+    {
       stProcess = dynamic_cast<STProcess*> (symTab.lookup($4));
-      if (stProcess == NULL)
-      {
-	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
-      }
-    
-//CG      symMan.initialiseProcessScope($3);
+      assert (stProcess != NULL);
+
       currentScopeId = $4;
       currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId->value));
+      assert (currentSTScope != NULL);
+
       isInFH.push(false);
       isInCH.push(pair<bool,int>(false,0));
       hasCompensate = 0;
@@ -350,17 +336,13 @@ tProcess:
   X_NEXT imports tPartnerLinks tPartners tVariables tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers
   activity
   X_NEXT X_SLASH K_PROCESS X_CLOSE
-    { TheProcess = $$ = Process($9, $10, $11, $12, $13, $14, $15, StopInProcess(), $16);
-//CG      symMan.quitScope();
-      //symTab.traceST("\t\t\t\t HALLO " + string((att.read($4, "abstractProcess")->name)) + "\n");      
-//      att.traceAM(string("tProcess: ") + ($$->suppressJoinFailure)->name + string("\n"));      
-//NL      att.popSJFStack(); symTab.popSJFStack();
+    {
+      TheProcess = $$ = Process($9, $10, $11, $12, $13, $14, $15, StopInProcess(), $16);
+      $$->id = $4;
+
       isInFH.pop();
       isInCH.pop();
-      $$->id = $4;
       ((STProcess*)symTab.lookup($4))->hasEventHandler = (string($15->op_name()) == "userDefinedEventHandler");
-//      symTab.printSymbolTable(); // purely debugging
-//      symTab.traceST(symTab.readAttributeValue($4,"name") + "\n"); // for Niels
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_PROCESS);
@@ -387,56 +369,44 @@ imports:
 activity:
   tEmpty
     { $$ = activityEmpty($1); $$->id = $1->id; 
-//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tInvoke
     { $$ = $1; }
-/*
-| tInvoke
-    { $$ = activityInvoke($1); $$->id = $1->id; 
-      $$->negativeControlFlow = $1->negativeControlFlow; }
-*/
 | tReceive
     { $$ = activityReceive($1); $$->id = $1->id; 
-//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tReply
     { $$ = activityReply($1); $$->id = $1->id; 
-//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tAssign
     { $$ = activityAssign($1); $$->id = $1->id; 
-//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tWait
     { $$ = activityWait($1); $$->id = $1->id; 
-//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tThrow
     { $$ = activityThrow($1); $$->id = $1->id; 
-//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tTerminate
     { $$ = activityTerminate($1); $$->id = $1->id; 
-//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
@@ -444,7 +414,6 @@ activity:
 | tFlow
     { $$ = activityFlow($1); $$->id = $1->id; 
       $$->dpe = $1->dpe ;
-//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
@@ -452,14 +421,12 @@ activity:
 | tSwitch
     { $$ = activitySwitch($1); $$->id = $1->id; 
       $$->dpe = $1->dpe;
-//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       branch->processLinks($$->id->value, currentSymTabEntryKey); }
 | tWhile
     { $$ = activityWhile($1); $$->id = $1->id; 
-//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
@@ -467,7 +434,6 @@ activity:
 | tSequence
     { $$ = activitySequence($1); $$->id = $1->id; 
       $$->dpe = $1->dpe;
-//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
@@ -475,7 +441,6 @@ activity:
 | tPick
     { $$ = activityPick($1); $$->id = $1->id; 
       $$->dpe = $1->dpe;
-//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
@@ -483,7 +448,6 @@ activity:
 | tScope
     { $$ = activityScope($1); $$->id = $1->id; 
       $$->dpe = $1->dpe;
-//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
@@ -491,7 +455,6 @@ activity:
     }
 | tCompensate
     { $$ = activityCompensate($1); $$->id = $1->id; 
-//NL      $$->negativeControlFlow = $1->negativeControlFlow;
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
@@ -750,11 +713,6 @@ tCatchAll:
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_CATCHALL);
-
-   /* DR
-      $$->faultName = att.read($3, "faultName");
-      $$->faultVariable = att.read($3, "faultVariable");
-   */
     }
 ;
 
@@ -885,11 +843,8 @@ tOnAlarm_list:
 tOnMessage:
   K_ONMESSAGE genSymTabEntry_OnMessage
   arbitraryAttributes X_NEXT
-    { symTab.checkAttributes($2); //att.check($3, K_ONMESSAGE);
-      
-//CG//      symMan.checkPartnerLink(att.read($3, "partnerLink")->name);
-      symMan.resetDPEend();
-    }
+    { symTab.checkAttributes($2);
+      symMan.resetDPEend(); }
   tCorrelations activity X_NEXT X_SLASH K_ONMESSAGE
     { $$ = OnMessage($7);
       $$->id = $2;    
@@ -1471,32 +1426,12 @@ genSymTabEntry_Receive:
 ******************************************************************************/
 
 tReply:
-  K_REPLY genSymTabEntry_Reply
-  arbitraryAttributes
-    { symTab.checkAttributes($2); //att.check($3, K_REPLY);
+  K_REPLY genSymTabEntry_Reply arbitraryAttributes X_NEXT 
+  standardElements tCorrelations X_SLASH K_REPLY
+    {
+      STReply *stReply = dynamic_cast<STReply*> (symTab.lookup($2));
+      assert(stReply != NULL);
 
-//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-//NL      {
-//NL      	/// parent BPEL-element attribute value
-//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-//NL      }
-//NL      else
-//NL      {
-//NL        /// current BPEL-element attribute value
-//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-//NL      }
-    }   
-  X_NEXT 
-  standardElements 
-  tCorrelations
-  X_SLASH K_REPLY
-    { $$ = Reply($6, $7);
-      STReply * stReply = NULL;
-      stReply = dynamic_cast<STReply*> (symTab.lookup($2));
-      if (stReply == NULL)
-      {
-	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
-      }
       stReply->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stReply->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
       stReply->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
@@ -1504,47 +1439,25 @@ tReply:
 								 symTab.readAttributeValue($2, "partnerLink")),
 								 false);
 
-//NL     $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
-//NL      att.popSJFStack(); symTab.popSJFStack();
-      if ($6->hasTarget)
-      {
+      if ($5->hasTarget)
 	symMan.remDPEstart();
-      }
-      if ($6->dpe->value > 0)
-      {
+      if ($5->dpe->value > 0)
         symMan.addDPEend();
-      }
-//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $2;
 
+      $$ = Reply($5, $6);
+      $$->id = $5->parentId = $2;
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_REPLY);
-
-}
-| K_REPLY genSymTabEntry_Reply
-  arbitraryAttributes
-    { symTab.checkAttributes($2); //att.check($3, K_REPLY);
-//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-//NL      {
-//NL      	/// parent BPEL-element attribute value
-//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-//NL      }
-//NL      else
-//NL      {
-//NL        /// current BPEL-element attribute value
-//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-//NL      }
-    }   
-  X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
+    }
+| K_REPLY genSymTabEntry_Reply arbitraryAttributes X_SLASH
+    {
+      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       noLinks->parentId = $2;
-      STReply * stReply = NULL;
-      stReply = dynamic_cast<STReply*> (symTab.lookup($2));
-      if (stReply == NULL)
-      {
-	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
-      }
+
+      STReply *stReply = dynamic_cast<STReply*> (symTab.lookup($2));
+      assert (stReply != NULL);
+
       stReply->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stReply->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
       stReply->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
@@ -1553,19 +1466,16 @@ tReply:
 								 false);
 
       $$ = Reply(noLinks, NiltCorrelation_list());
-//NL      att.popSJFStack(); symTab.popSJFStack();
-//NL      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2;
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_REPLY);
-}
+    }
 ;
 
 genSymTabEntry_Reply:
-  { currentSymTabEntryKey = symTab.insert(K_REPLY);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_REPLY);
+        $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 
@@ -1574,45 +1484,25 @@ genSymTabEntry_Reply:
 ******************************************************************************/
 
 tAssign:
-  K_ASSIGN genSymTabEntry_Assign
-  arbitraryAttributes
-    { symTab.checkAttributes($2); //att.check($3, K_ASSIGN);
-//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-//NL      {
-//NL      	/// parent BPEL-element attribute value
-//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-//NL      }
-//NL      else
-//NL      {
-//NL        /// current BPEL-element attribute value
-//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-//NL      }
-    }   
-  X_NEXT standardElements tCopy_list  X_SLASH K_ASSIGN
-    { $$ = Assign($6, $7);
-//NL      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
-//NL      att.popSJFStack(); symTab.popSJFStack();
-      if ($6->hasTarget)
-      {
+  K_ASSIGN genSymTabEntry_Assign arbitraryAttributes X_NEXT
+  standardElements tCopy_list  X_SLASH K_ASSIGN
+    {
+      if ($5->hasTarget)
 	symMan.remDPEstart();
-      }
-      if ($6->dpe->value > 0)
-      {
+      if ($5->dpe->value > 0)
         symMan.addDPEend();
-      }
-//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $2;
 
+      $$ = Assign($5, $6);
+      $$->id = $5->parentId = $2;
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_ASSIGN);
-}
+    }
 ;
 
 genSymTabEntry_Assign:
-  { currentSymTabEntryKey = symTab.insert(K_ASSIGN);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_ASSIGN);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 tCopy_list:
@@ -1630,34 +1520,27 @@ tCopy:
 
 tFrom:
   K_FROM genSymTabEntry_From arbitraryAttributes X_NEXT X_SLASH K_FROM
-    { symTab.checkAttributes($2); //att.check($3, K_FROM);
-      STFromTo * stFrom = NULL;
-      stFrom = dynamic_cast<STFromTo*> (symTab.lookup($2));
-      if (stFrom == NULL)
-      {
-	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
-      }
+    {
+      STFromTo *stFrom = dynamic_cast<STFromTo*> (symTab.lookup($2));
+      assert (stFrom != NULL);
+
       stFrom->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stFrom->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
 
-      /********************************************************************/
       $$ = From();
       $$->id = $2;
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_FROM);
-
     }
 | K_FROM genSymTabEntry_From arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_FROM
-    { symTab.checkAttributes($2, $5); //att.check($3, $5, K_FROM);
-      STFromTo * stFrom = NULL;
-      stFrom = dynamic_cast<STFromTo*> (symTab.lookup($2));
-      if (stFrom == NULL)
-      {
-	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
-      }
+    {
+      STFromTo *stFrom = dynamic_cast<STFromTo*> (symTab.lookup($2));
+      assert (stFrom != NULL);
+
       stFrom->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stFrom->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
+      stFrom->literal = $5->name;
 
       $$ = From();
       $$->id = $2;      
@@ -1665,22 +1548,15 @@ tFrom:
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_FROM);
-
-
-      stFrom->literal = $5->name;
     }
 | K_FROM genSymTabEntry_From arbitraryAttributes X_SLASH
-    { symTab.checkAttributes($2); //att.check($3, K_FROM);
-      STFromTo * stFrom = NULL;
-      stFrom = dynamic_cast<STFromTo*> (symTab.lookup($2));
-      if (stFrom == NULL)
-      {
-	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
-      }
+    {
+      STFromTo *stFrom = dynamic_cast<STFromTo*> (symTab.lookup($2));
+      assert (stFrom != NULL);
+
       stFrom->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stFrom->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
 
-      /********************************************************************/
       $$ = From();
       $$->id = $2;      
 
@@ -1690,24 +1566,19 @@ tFrom:
 ;
 
 genSymTabEntry_From:
-  { currentSymTabEntryKey = symTab.insert(K_FROM);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_FROM);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 tTo:
   K_TO genSymTabEntry_To arbitraryAttributes X_NEXT X_SLASH K_TO
-    { symTab.checkAttributes($2); //att.check($3, K_TO);
-      STFromTo * stTo = NULL;
-      stTo = dynamic_cast<STFromTo*> (symTab.lookup($2));
-      if (stTo == NULL)
-      {
-	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
-      }
+    {
+      STFromTo *stTo = dynamic_cast<STFromTo*> (symTab.lookup($2));
+      assert(stTo != NULL);
+
       stTo->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stTo->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
 
-      /********************************************************************/
       $$ = To();
       $$->id = $2;
 
@@ -1715,17 +1586,13 @@ tTo:
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_TO);
     }
 | K_TO genSymTabEntry_To arbitraryAttributes X_SLASH
-    { symTab.checkAttributes($2); //att.check($3, K_TO);
-      STFromTo * stTo = NULL;
-      stTo = dynamic_cast<STFromTo*> (symTab.lookup($2));
-      if (stTo == NULL)
-      {
-	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
-      }
+    {
+      STFromTo *stTo = dynamic_cast<STFromTo*> (symTab.lookup($2));
+      assert (stTo != NULL);
+
       stTo->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stTo->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
 
-      /********************************************************************/
       $$ = To();
       $$->id = $2;
 
@@ -1735,9 +1602,8 @@ tTo:
 ;
 
 genSymTabEntry_To:
-  { currentSymTabEntryKey = symTab.insert(K_TO);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_TO);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 
@@ -1746,63 +1612,27 @@ genSymTabEntry_To:
 ******************************************************************************/
 
 tWait:
-  K_WAIT genSymTabEntry_Wait
-  arbitraryAttributes
-    { symTab.checkAttributes($2); //att.check($3, K_WAIT);
-//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-//NL      {
-//NL      	/// parent BPEL-element attribute value
-//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-//NL      }
-//NL      else
-//NL      {
-//NL        /// current BPEL-element attribute value
-//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-//NL      }
-    }   
-  X_NEXT standardElements X_SLASH K_WAIT
+  K_WAIT genSymTabEntry_Wait arbitraryAttributes X_NEXT
+  standardElements X_SLASH K_WAIT
     {
-      if ( symTab.readAttributeValue($2, "for") != "" )
-        $$ = WaitFor($6);
-      else
-        $$ = WaitUntil($6);
-
-//NL      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
-//NL      att.popSJFStack(); symTab.popSJFStack();      
-
-      if ($6->hasTarget)
-      {
+      if ($5->hasTarget)
 	symMan.remDPEstart();
-      }
-      if ($6->dpe->value > 0)
-      {
+      if ($5->dpe->value > 0)
         symMan.addDPEend();
-      }
-//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $2;
 
+      if ( symTab.readAttributeValue($2, "for") != "" )
+        $$ = WaitFor($5);
+      else
+        $$ = WaitUntil($5);
+
+      $$->id = $5->parentId = $2;
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_WAIT);
-}
-| K_WAIT genSymTabEntry_Wait
-  arbitraryAttributes
+    }
+| K_WAIT genSymTabEntry_Wait arbitraryAttributes X_SLASH
     {
-      symTab.checkAttributes($2); //att.check($3, K_WAIT);
-
-//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-//NL      {
-//NL      	/// parent BPEL-element attribute value
-//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-//NL      }
-//NL      else
-//NL      {
-//NL        /// current BPEL-element attribute value
-//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-//NL      }
-    }   
-  X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
+      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       noLinks->parentId = $2;
 
       if ( symTab.readAttributeValue($2, "for") != "" )
@@ -1810,21 +1640,16 @@ tWait:
       else
         $$ = WaitUntil(noLinks);
 
-//NL      att.popSJFStack(); symTab.popSJFStack();      
-
-//NL      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2;
-
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_WAIT);
-}
+    }
 ;
 
 genSymTabEntry_Wait:
-  { currentSymTabEntryKey = symTab.insert(K_WAIT);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_WAIT);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 
@@ -1833,89 +1658,47 @@ genSymTabEntry_Wait:
 ******************************************************************************/
 
 tThrow:
-  K_THROW genSymTabEntry_Throw
-  arbitraryAttributes
-    { symTab.checkAttributes($2); //att.check($3, K_THROW);
-//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-//NL      {
-//NL      	/// parent BPEL-element attribute value
-//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-//NL      }
-//NL      else
-//NL      {
-//NL        /// current BPEL-element attribute value
-//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-//NL      }
-    }   
-  X_NEXT standardElements X_SLASH K_THROW
-    { symTab.checkAttributes($2); //att.check($3, K_THROW);
-      STThrow * stThrow = NULL;
-      stThrow = dynamic_cast<STThrow*> (symTab.lookup($2));
-      if (stThrow == NULL)
-      {
-	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
-      }
+  K_THROW genSymTabEntry_Throw arbitraryAttributes X_NEXT
+  standardElements X_SLASH K_THROW
+    {
+      STThrow *stThrow = dynamic_cast<STThrow*> (symTab.lookup($2));
+      assert (stThrow != NULL);
+
       stThrow->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
 
-      $$ = Throw($6);
-//NL      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
-//NL      att.popSJFStack(); symTab.popSJFStack();      
-      if ($6->hasTarget)
-      {
-	symMan.remDPEstart();
-      }
-      if ($6->dpe->value > 0)
-      {
-        symMan.addDPEend();
-      }
-//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $2;
+      $$ = Throw($5);
 
+      if ($5->hasTarget)
+	symMan.remDPEstart();
+      if ($5->dpe->value > 0)
+        symMan.addDPEend();
+
+      $$->id = $5->parentId = $2;
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_THROW);
-
-}
-| K_THROW genSymTabEntry_Throw
-  arbitraryAttributes
-    { symTab.checkAttributes($2); //att.check($3, K_THROW);
-//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-//NL      {
-//NL      	/// parent BPEL-element attribute value
-//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-//NL      }
-//NL      else
-//NL      {
-//NL        /// current BPEL-element attribute value
-//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-//NL      }
-    }   
-  X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
+    }
+| K_THROW genSymTabEntry_Throw arbitraryAttributes X_SLASH
+    {
+      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       noLinks->parentId = $2;
-      STThrow * stThrow = NULL;
-      stThrow = dynamic_cast<STThrow*> (symTab.lookup($2));
-      if (stThrow == NULL)
-      {
-	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
-      }
+
+      STThrow *stThrow = dynamic_cast<STThrow*> (symTab.lookup($2));
+      assert (stThrow != NULL);
+
       stThrow->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
 
       $$ = Throw(noLinks);
-//NL      att.popSJFStack(); symTab.popSJFStack();
-//NL      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2;
-
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_THROW);
-}
+    }
 ;
 
 genSymTabEntry_Throw:
-  { currentSymTabEntryKey = symTab.insert(K_THROW);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_THROW);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 
@@ -2044,69 +1827,36 @@ genSymTabEntry_Compensate:
 ******************************************************************************/
 
 tTerminate:
-  K_TERMINATE genSymTabEntry_Terminate
-  arbitraryAttributes
-    { symTab.checkAttributes($2); //att.check($3, K_TERMINATE);
-//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-//NL      {
-//NL      	/// parent BPEL-element attribute value
-//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-//NL      }
-//NL      else
-//NL      {
-//NL        /// current BPEL-element attribute value
-//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-//NL      }
-    }   
-  X_NEXT standardElements X_SLASH K_TERMINATE
-    { $$ = Terminate($6);
-//NL      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
-//NL      att.popSJFStack(); symTab.popSJFStack();
-      if ($6->hasTarget)
-      {
+  K_TERMINATE genSymTabEntry_Terminate arbitraryAttributes X_NEXT
+  standardElements X_SLASH K_TERMINATE
+    {
+      $$ = Terminate($5);
+      $$->id = $5->parentId = $2;
+
+      if ($5->hasTarget)
 	symMan.remDPEstart();
-      }
-      if ($6->dpe->value > 0)
-      {
+      if ($5->dpe->value > 0)
         symMan.addDPEend();
-      }
-//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $2;
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_TERMINATE);
-}
-| K_TERMINATE genSymTabEntry_Terminate
-  arbitraryAttributes
-    { symTab.checkAttributes($2); //att.check($3, K_TERMINATE);
-//NL     if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-//NL      {
-//NL      	/// parent BPEL-element attribute value
-//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-//NL      }
-//NL      else
-//NL      {
-//NL        /// current BPEL-element attribute value
-//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-//NL      }
-    }   
-  X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
+    }
+| K_TERMINATE genSymTabEntry_Terminate arbitraryAttributes X_SLASH
+    {
+      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       noLinks->parentId = $2;
+
       $$ = Terminate(noLinks);
-//NL      att.popSJFStack(); symTab.popSJFStack();
-//NL      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$->id = $2;
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_TERMINATE);
-}
+    }
 ;
 
 genSymTabEntry_Terminate:
-  { currentSymTabEntryKey = symTab.insert(K_TERMINATE);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_TERMINATE);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 /******************************************************************************
@@ -2116,109 +1866,74 @@ genSymTabEntry_Terminate:
 tFlow:
   K_FLOW genSymTabEntry_Flow
   arbitraryAttributes
-    { symTab.checkAttributes($2); //att.check($3, K_FLOW);
-//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-//NL      {
-//NL      	/// parent BPEL-element attribute value
-//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-//NL      }
-//NL      else
-//NL      {
-//NL        /// current BPEL-element attribute value
-//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-//NL      }
-    }   
   X_NEXT
     {
-      STFlow * stFlow = NULL;
-      stFlow = dynamic_cast<STFlow *> (symTab.lookup($2));
-      if (stFlow == NULL)
-      {
-	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
-      }
+      STFlow *stFlow = dynamic_cast<STFlow *> (symTab.lookup($2));
+      assert (stFlow != NULL);
+
       if (currentSTFlow != NULL)
-      {
 	stFlow->parentFlowId = currentSTFlow->entryKey;
-      }
+
       currentSTFlow = stFlow;
-//CG      symMan.newFlowScope($2);
     } 
   standardElements tLinks activity_list X_SLASH K_FLOW
-    { $$ = Flow($7, $8, $9);
+    {
+      $$ = Flow($6, $7, $8);
 
-      STFlow * stFlow = NULL;
-      stFlow = dynamic_cast<STFlow *> (symTab.lookup($2));
-      if (stFlow == NULL)
-      {
-	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
-      }
+      STFlow *stFlow = dynamic_cast<STFlow *> (symTab.lookup($2));
+      assert (stFlow);
+
       if (currentSTFlow->parentFlowId != 0)
-      {
 	currentSTFlow = dynamic_cast<STFlow *> (symTab.lookup(currentSTFlow->parentFlowId));
-      }
       else
-      {
 	currentSTFlow = NULL;
-      }
+
       stFlow->checkLinkUsage();
 
-//NL      $7->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
-//NL      att.popSJFStack(); symTab.popSJFStack();
       $$->dpe = mkinteger((symMan.needsDPE())->value);
-      if ($7->hasTarget)
-      {
+      if ($6->hasTarget)
 	symMan.remDPEstart();
-      }
-      if ($7->dpe->value > 0)
-      {
+      if ($6->dpe->value > 0)
         symMan.addDPEend();
-      }
       if ($$->dpe->value > 0)
-      {
-	$7->dpe = mkinteger(1);
-      }
-//NL      $$->negativeControlFlow = $7->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $7->parentId = $2;
-//CG      symMan.checkLinks();
-//CG      symMan.quitScope(); 
+	$6->dpe = mkinteger(1);
 
+      $$->id = $6->parentId = $2;
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_FLOW);
-
     }
 ;
 
 genSymTabEntry_Flow:
-  { currentSymTabEntryKey = symTab.insert(K_FLOW);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_FLOW);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 activity_list:
   descent_activity_list activity X_NEXT
-    { $$ = Consactivity_list($2, Nilactivity_list()); 
+    {
+      $$ = Consactivity_list($2, Nilactivity_list()); 
+
       for(int i = 0; i < $1->value; ++i)
-      { 
 	symMan.addDPEend();
-      }
+
       $$->dpe = $2->dpe;
     }
 | descent_activity_list activity X_NEXT activity_list
-    { $$ = Consactivity_list($2, $4); 
+    {
+      $$ = Consactivity_list($2, $4); 
+
       for(int i = 0; i < $1->value; ++i)
-      { 
 	symMan.addDPEend();
-      }
+
       $$->dpe = mkinteger($2->dpe->value + $4->dpe->value);
     }
 ;
 
 descent_activity_list:
-    {
-      $$ = symMan.needsDPE();
-      symMan.resetDPEend();
-    }
+    { $$ = symMan.needsDPE();
+      symMan.resetDPEend(); }
 ;
 
 tLinks:
@@ -2236,52 +1951,37 @@ tLink_list:
 ;
 
 tLink:
-  K_LINK genSymTabEntry_Link
-  arbitraryAttributes X_NEXT X_SLASH K_LINK
-    { symTab.checkAttributes($2);
+  K_LINK genSymTabEntry_Link arbitraryAttributes X_NEXT X_SLASH K_LINK
+    {
       $$ = Link();
-
-      STLink * stLink = NULL;
-      stLink = dynamic_cast<STLink *> (symTab.lookup($2));
-      if (stLink == NULL)
-      {
-	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
-      }
-      stLink->name = currentSTFlow->addLink(stLink);
-
       $$->id = $2;
-//CG      symMan.addLink(new csLink(symTab.readAttributeValue($2, "name"))); 
+
+      STLink *stLink = dynamic_cast<STLink *> (symTab.lookup($2));
+      assert (stLink != NULL);
+
+      stLink->name = currentSTFlow->addLink(stLink);
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_LINK);
-
     }
-| K_LINK genSymTabEntry_Link
-  arbitraryAttributes X_SLASH
-    { symTab.checkAttributes($2);
+| K_LINK genSymTabEntry_Link arbitraryAttributes X_SLASH
+    {
       $$ = Link();
-
-      STLink * stLink = NULL;
-      stLink = dynamic_cast<STLink *> (symTab.lookup($2));
-      if (stLink == NULL)
-      {
-	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
-      }
-      stLink->name = currentSTFlow->addLink(stLink);
-
       $$->id = $2;
-//CG      symMan.addLink(new csLink(symTab.readAttributeValue($2, "name"))); 
+
+      STLink *stLink = dynamic_cast<STLink *> (symTab.lookup($2));
+      assert (stLink != NULL);
+
+      stLink->name = currentSTFlow->addLink(stLink);
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_LINK);
-
-}
+    }
 ;
 
 genSymTabEntry_Link:
-  { currentSymTabEntryKey = symTab.insert(K_LINK);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_LINK);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 
@@ -2292,112 +1992,89 @@ genSymTabEntry_Link:
 tSwitch:
   K_SWITCH genSymTabEntry_Switch
   arbitraryAttributes
-    { symTab.checkAttributes($2); //att.check($3, K_SWITCH);
-//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-//NL      {
-//NL      	/// parent BPEL-element attribute value
-//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-//NL      }
-//NL      else
-//NL      {
-//NL        /// current BPEL-element attribute value
-//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-//NL      }
-    } 
   X_NEXT 
   standardElements 
-    {
-      symMan.addDPEstart();
-    }
+    { symMan.addDPEstart(); }
   tCase_list 
   tOtherwise 
   X_SLASH K_SWITCH
-    { $$ = Switch($6, $8, $9);
-//NL      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
-//NL      att.popSJFStack(); symTab.popSJFStack();
+    {
+      $$ = Switch($5, $7, $8);
+      $$->id = $5->parentId = $2;
+
       symMan.remDPEstart();
       $$->dpe = symMan.needsDPE();
-      if ($6->hasTarget)
-      {
+      
+      if ($5->hasTarget)
 	symMan.remDPEstart();
-      }
-      if ($6->dpe->value > 0)
-      {
-        symMan.addDPEend();
-      }
-      if ($$->dpe->value > 0)
-      {
-	$6->dpe = mkinteger(1);
-      }
-//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $2;
 
+      if ($5->dpe->value > 0)
+        symMan.addDPEend();
+
+      if ($$->dpe->value > 0)
+	$5->dpe = mkinteger(1);
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_SWITCH);
-}
+    }
 ;
 
 genSymTabEntry_Switch:
-  { currentSymTabEntryKey = symTab.insert(K_SWITCH);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_SWITCH);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 tCase_list:
   descent_case_list tCase X_NEXT
-    { $$ = ConstCase_list($2, NiltCase_list()); 
+    {
+      $$ = ConstCase_list($2, NiltCase_list()); 
+
       for(int i = 0; i < $1->value; ++i)
-      { 
 	symMan.addDPEend();
-      }
+
       $$->dpe = $2->dpe;
     }
 | descent_case_list tCase X_NEXT tCase_list
-    { $$ = ConstCase_list($2, $4); 
+    {
+      $$ = ConstCase_list($2, $4); 
+
       for(int i = 0; i < $1->value; ++i)
-      { 
 	symMan.addDPEend();
-      }
+
       $$->dpe = mkinteger($2->dpe->value + $4->dpe->value);
     }
 ;
 
 descent_case_list:
-    {
-      $$ = symMan.needsDPE();
-      symMan.resetDPEend();
-    }
+    { $$ = symMan.needsDPE();
+      symMan.resetDPEend(); }
 ;
 
 tCase:
   K_CASE genSymTabEntry_Case
   arbitraryAttributes X_NEXT 
-    { symTab.checkAttributes($2); //att.check($3, K_CASE);
-      // since we descend, set DPE ends to 0
-      // symMan.resetDPEend();
-    }
+    {}
   activity 
   X_NEXT X_SLASH K_CASE
-    { $$ = Case($6);
+    {
+      $$ = Case($6);
       $$->id = $2;    
-      $$->condition = att.read($3, "condition"); 
       $$->dpe = mkinteger((symMan.needsDPE())->value);
 
       // collect source links for new DPE
-      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
+      STElement *branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
+      assert (branch != NULL);
+
       branch->processLinks($6->id->value, currentSymTabEntryKey);
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_CASE);
-
     }
 ;
 
 genSymTabEntry_Case:
-  { currentSymTabEntryKey = symTab.insert(K_CASE);
-	$$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_CASE);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 tOtherwise:
@@ -2428,23 +2105,23 @@ tOtherwise:
 
     }
 | K_OTHERWISE X_NEXT 
-    {
-      // since we descend, set DPE ends to 0
-      symMan.resetDPEend();
-    }
+    { symMan.resetDPEend(); }
   activity X_NEXT X_SLASH K_OTHERWISE X_NEXT
-    { $$ = Otherwise($4);
+    {
       currentSymTabEntryKey = symTab.insert(K_OTHERWISE);
+
+      $$ = Otherwise($4);
       $$->id = mkinteger(currentSymTabEntryKey);
       $$->dpe = symMan.needsDPE();
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
+      assert (branch != NULL);
+
       branch->processLinks($4->id->value, currentSymTabEntryKey);
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_OTHERWISE);
-
     }
 ;
 
@@ -2454,48 +2131,24 @@ tOtherwise:
 ******************************************************************************/
 
 tWhile:
-  K_WHILE genSymTabEntry_While
-  arbitraryAttributes
-    { symTab.checkAttributes($2); //att.check($3, K_WHILE);
-//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-//NL      {
-//NL      	/// parent BPEL-element attribute value
-//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-//NL      }
-//NL      else
-//NL      {
-//NL        /// current BPEL-element attribute value
-//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-//NL      }
-    }    
-  X_NEXT 
+  K_WHILE genSymTabEntry_While arbitraryAttributes X_NEXT 
   standardElements 
-    { 
-      symMan.startDPEinWhile();
-    }
-  activity 
-  X_NEXT X_SLASH K_WHILE
-    { // symTab.checkAttributes($3); att.check($3, K_WHILE);
-      $$ = While($6, $8);
-//NL      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
-//NL      att.popSJFStack(); symTab.popSJFStack();
-//      $$->condition = att.read($3, "condition");
-//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $2; 
-      symMan.endDPEinWhile();
+    { symMan.startDPEinWhile(); }
+  activity X_NEXT X_SLASH K_WHILE
+    {
+      $$ = While($5, $7);
+      $$->id = $5->parentId = $2; 
 
+      symMan.endDPEinWhile();
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_WHILE);
-
-
     }
 ;
 
 genSymTabEntry_While:
-  { currentSymTabEntryKey = symTab.insert(K_WHILE);
-	$$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_WHILE);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 
@@ -2504,55 +2157,30 @@ genSymTabEntry_While:
 ******************************************************************************/
 
 tSequence:
-  K_SEQUENCE genSymTabEntry_Sequence
-  arbitraryAttributes 
-    { symTab.checkAttributes($2); //att.check($3, K_SEQUENCE);
-//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-//NL      {
-//NL      	/// parent BPEL-element attribute value
-//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-//NL      }
-//NL      else
-//NL      {
-//NL        /// current BPEL-element attribute value
-//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-//NL      }
-    }
-  X_NEXT 
-  standardElements 
-  activity_list 
-  X_SLASH 
-  K_SEQUENCE
-    { $$ = Sequence($6, $7);
-//NL      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
-//NL      att.popSJFStack(); symTab.popSJFStack();
-//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $2; 
+  K_SEQUENCE genSymTabEntry_Sequence arbitraryAttributes X_NEXT 
+  standardElements activity_list X_SLASH K_SEQUENCE
+    {
+      $$ = Sequence($5, $6);
+      $$->id = $5->parentId = $2; 
       $$->dpe = mkinteger((symMan.needsDPE())->value);
-      if ($6->hasTarget)
-      {
-	symMan.remDPEstart();
-      }
-      if ($6->dpe->value > 0)
-      {
-        symMan.addDPEend();
-      }
-      if ($$->dpe->value > 0)
-      {
-	$6->dpe = mkinteger(1);
-      }
 
+      if ($5->hasTarget)
+	symMan.remDPEstart();
+
+      if ($5->dpe->value > 0)
+        symMan.addDPEend();
+
+      if ($$->dpe->value > 0)
+	$6->dpe = mkinteger(1);
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_SEQUENCE);
-
     }
 ;
 
 genSymTabEntry_Sequence:
-  { currentSymTabEntryKey = symTab.insert(K_SEQUENCE);
-	$$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_SEQUENCE);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 
@@ -2561,60 +2189,36 @@ genSymTabEntry_Sequence:
 ******************************************************************************/
 
 tPick:
-  K_PICK genSymTabEntry_Pick
-  arbitraryAttributes
-    { symTab.checkAttributes($2); //att.check($3, K_PICK);
-//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-//NL      {
-//NL      	/// parent BPEL-element attribute value
-//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-//NL      }
-//NL      else
-//NL      {
-//NL        /// current BPEL-element attribute value
-//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-//NL      }
-    }
-  X_NEXT 
+  K_PICK genSymTabEntry_Pick arbitraryAttributes X_NEXT 
   standardElements 
+    { symMan.addDPEstart(); }
+  tOnMessage X_NEXT tOnMessage_list tOnAlarm_list X_SLASH K_PICK
     {
-      symMan.addDPEstart();
-    }
-  tOnMessage X_NEXT 
-  tOnMessage_list 
-  tOnAlarm_list 
-  X_SLASH K_PICK
-    { $$ = Pick($6, ConstOnMessage_list($8, $10), $11);
-//NL      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
-//NL      att.popSJFStack(); symTab.popSJFStack();
-      symMan.remDPEstart();
-      $$->dpe = symMan.needsDPE();
-      if ($6->hasTarget)
-      {
-	symMan.remDPEstart();
-      }
-      if ($6->dpe->value > 0)
-      {
-        symMan.addDPEend();
-      }
-      if ($$->dpe->value > 0)
-      {
-	$6->dpe = mkinteger(1);
-      }
-      $$->id = $6->parentId = $2;
-//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$ = Pick($5, ConstOnMessage_list($7, $9), $10);
 
+      symMan.remDPEstart();
+
+      $$->dpe = symMan.needsDPE();
+
+      if ($5->hasTarget)
+	symMan.remDPEstart();
+
+      if ($5->dpe->value > 0)
+        symMan.addDPEend();
+
+      if ($$->dpe->value > 0)
+	$5->dpe = mkinteger(1);
+
+      $$->id = $5->parentId = $2;
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_PICK);
-
     }
 ;
 
 genSymTabEntry_Pick:
-  { currentSymTabEntryKey = symTab.insert(K_PICK);
-	$$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_PICK);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 
@@ -2623,24 +2227,8 @@ genSymTabEntry_Pick:
 ******************************************************************************/
 
 tScope:
-  K_SCOPE genSymTabEntry_Scope
-  arbitraryAttributes
-    { symTab.checkAttributes($2); //att.check($3, K_SCOPE);
-//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-//NL      {
-//NL      	/// parent BPEL-element attribute value
-//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-//NL      }
-//NL      else
-//NL      {
-//NL        /// current BPEL-element attribute value
-//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-//NL      }
-    }  
-  X_NEXT
+  K_SCOPE genSymTabEntry_Scope arbitraryAttributes X_NEXT
     { 
-//CG      symMan.newScopeScope($2);
-//CG      symMan.setBlackListMode(true);
       isInFH.push(false);
       isInCH.push(pair<bool,int>(false,hasCompensate));
       parent[$2] = currentScopeId;
@@ -2648,10 +2236,9 @@ tScope:
     }
   standardElements 
     {
-//CG      symMan.setBlackListMode(false);
-      // should come after standardElements in order to prevent links from 
-      // being added to enclosedLinks list of this scope
       currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId->value));
+      assert(currentSTScope != NULL);
+
       currentSTScope->parentScopeId = parent[$2]->value;
       (dynamic_cast<STScope *> (symTab.lookup(currentSTScope->parentScopeId)))->childScopes.push_back(currentSTScope);
     }
@@ -2662,41 +2249,39 @@ tScope:
   tEventHandlers 
   activity 
   X_NEXT X_SLASH K_SCOPE
-    { isInFH.pop();
+    {
+      isInFH.pop();
       hasCompensate = isInCH.top().second;
       isInCH.pop();
-      $$ = Scope($7, $9, $11, $12, $13, StopInScope(), $14);
-//NL      $7->suppressJoinFailure = att.read($3, "suppressJoinFailure", (att.topSJFStack()).getSJFValue());
-//NL      att.popSJFStack(); symTab.popSJFStack();
-//NL      $$->negativeControlFlow = $7->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $7->parentId = $2;
+
+      $$ = Scope($6, $8, $10, $11, $12, StopInScope(), $13);
+      $$->id = $6->parentId = $2;
       $$->parentScopeId = currentScopeId = parent[$2];
+
       currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId->value));
+      assert(currentSTScope != NULL);
+
       $$->dpe = mkinteger((symMan.needsDPE())->value);
-      if ($7->hasTarget)
-      {
+
+      if ($6->hasTarget)
 	symMan.remDPEstart();
-      }
+
       ((STScope*)symTab.lookup($2))->hasEventHandler = (string($13->op_name()) == "userDefinedEventHandler");
-      if ($7->dpe->value > 0)
-      {
+
+      if ($6->dpe->value > 0)
         symMan.addDPEend();
-      }
+
       if ($$->dpe->value > 0)
-      {
-	$7->dpe = mkinteger(1);
-      }
+	$6->dpe = mkinteger(1);
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_SCOPE);
-
     }
 ;
 
 genSymTabEntry_Scope:
-  { currentSymTabEntryKey = symTab.insert(K_SCOPE);
-	$$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_SCOPE);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 
@@ -2706,10 +2291,12 @@ genSymTabEntry_Scope:
 
 standardElements:
   tTarget_list tSource_list
-    { $$ = StandardElements($1, $2, currentJoinCondition);
+    {
+      $$ = StandardElements($1, $2, currentJoinCondition);
       currentJoinCondition = standardJoinCondition();
+
       $$->dpe = $2->dpe;
-//NL      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+
       if ($1->length() > 0)
       {
 	symMan.addDPEstart();
@@ -2726,117 +2313,86 @@ tTarget_list:
 ;
 
 tTarget:
-  K_TARGET genSymTabEntry_Target
-  arbitraryAttributes X_NEXT X_SLASH K_TARGET
-    { symTab.checkAttributes($2); //att.check($3, K_TARGET);
+  K_TARGET genSymTabEntry_Target arbitraryAttributes X_NEXT X_SLASH K_TARGET
+    {
       $$ = Target();
       $$->id = $2;      
 
-      STSourceTarget * stTarget = NULL;
-      stTarget = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
-      if (stTarget == NULL)
-      {
-	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
-      }
+      STSourceTarget *stTarget = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
+      assert (stTarget != NULL);
+
       stTarget->link = currentSTFlow->checkLink(symTab.readAttributeValue($2, "linkName"), $2->value, false);
       stTarget->isSource = false;
       
-//NL      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-//CG      $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), false);
-
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_TARGET);
-
-}
-| K_TARGET genSymTabEntry_Target
-  arbitraryAttributes X_SLASH
-    { symTab.checkAttributes($2); //att.check($3, K_TARGET);
+    }
+| K_TARGET genSymTabEntry_Target arbitraryAttributes X_SLASH
+    {
       $$ = Target();
       $$->id = $2;      
 
-      STSourceTarget * stTarget = NULL;
-      stTarget = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
-      if (stTarget == NULL)
-      {
-	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
-      }
+      STSourceTarget *stTarget = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
+      assert (stTarget != NULL);
+
       stTarget->link = currentSTFlow->checkLink(symTab.readAttributeValue($2, "linkName"), $2->value, false);
       stTarget->isSource = false;
 
-//NL      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-//CG      $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), false);
-
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_TARGET);
-
-}
+    }
 ;
 
 genSymTabEntry_Target:
-  { currentSymTabEntryKey = symTab.insert(K_TARGET);
-	$$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_TARGET);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 tSource_list:
   /* empty */
     { $$ = NiltSource_list(); 
-      $$->dpe = kc::mkinteger(0);
-    }
+      $$->dpe = kc::mkinteger(0); }
 | tSource X_NEXT tSource_list
     { $$ = ConstSource_list($1, $3);
-      $$->dpe = kc::mkinteger($1->dpe->value + $3->dpe->value);
-    }
+      $$->dpe = kc::mkinteger($1->dpe->value + $3->dpe->value); }
 ;
 
 tSource:
-  K_SOURCE genSymTabEntry_Source
-  arbitraryAttributes X_NEXT X_SLASH K_SOURCE
-    { symTab.checkAttributes($2); //att.check($3, K_SOURCE);
+  K_SOURCE genSymTabEntry_Source arbitraryAttributes X_NEXT X_SLASH K_SOURCE
+    {
       $$ = Source();
       $$->id = $2;      
 
-      STSourceTarget * stSource = NULL;
-      stSource = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
-      if (stSource == NULL)
-      {
-	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
-      }
+      STSourceTarget *stSource = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
+      assert (stSource != NULL);
+
       stSource->link = currentSTFlow->checkLink(symTab.readAttributeValue($2, "linkName"), $2->value, true);
       stSource->isSource = true;
       currentSTScope->addLink(stSource->link);
 
-//CG      $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), true); 
       symMan.addDPEend();
       $$->dpe = symMan.needsDPE();
       symMan.remDPEend();
-//NL      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_SOURCE);
-
     }
 | K_SOURCE genSymTabEntry_Source
   arbitraryAttributes X_SLASH
-    { symTab.checkAttributes($2); //att.check($3, K_SOURCE);
+    {
       $$ = Source();
       $$->id = $2;      
 
-      STSourceTarget * stSource = NULL;
-      stSource = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
-      if (stSource == NULL)
-      {
-	throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
-      }
+      STSourceTarget *stSource = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
+      assert (stSource != NULL);
+
       stSource->link = currentSTFlow->checkLink(symTab.readAttributeValue($2, "linkName"), $2->value, true);
       stSource->isSource = true;
       currentSTScope->addLink(stSource->link);
 
-//CG      $$->linkID = symMan.checkLink(symTab.readAttributeValue($2, "linkName"), true);
       symMan.addDPEend();
       $$->dpe = symMan.needsDPE();
       symMan.remDPEend();
-//NL      $$->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_SOURCE);
@@ -2844,9 +2400,8 @@ tSource:
 ;
 
 genSymTabEntry_Source:
-  { currentSymTabEntryKey = symTab.insert(K_SOURCE);
-	$$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_SOURCE);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 /*---------------------------------------------------------------------------*/
@@ -2863,7 +2418,7 @@ arbitraryAttributes:
     { att.define($1, $3);
       $$ = $5;
       temporaryAttributeMap[currentSymTabEntryKey][$1->name] = $3->name;
-}
+    }
 ;
 
 

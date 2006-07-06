@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/07/06 11:46:47 $
+ *          - last changed: \$Date: 2006/07/06 11:53:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.85 $
+ * \version \$Revision: 1.86 $
  */
 %}
 
@@ -113,7 +113,7 @@ activity:
 | activityScope(tScope)
 | activityCompensate(tCompensate)
   {
-//    integer id;
+    integer id;
     integer dpe = mkinteger(0);
   }
 ;
@@ -380,7 +380,7 @@ tReceive:
     bool suppressJF = false;
 
     casestring A_name = mkcasestring("");
-    casestring A_joinCondition = mkcasestring("")
+    casestring A_joinCondition = mkcasestring("");
     casestring A_suppressJoinFailure = mkcasestring("");
     casestring A_partnerLink = mkcasestring("");
     casestring A_portType = mkcasestring("");
@@ -568,6 +568,9 @@ tFlow:
 
 activity_list:
   list activity 
+  {
+    integer dpe = mkinteger(0);
+  }
 ;
 
 tLink_list:

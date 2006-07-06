@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.2 2006-06-29 09:26:45 massuthe Exp $
+# $Id: Makefile,v 1.3 2006-07-06 13:37:20 bretschn Exp $
 #
 # Makefile for the CUDD distribution kit 
 #---------------------------------------------------------------------------
@@ -75,8 +75,12 @@ ICFLAGS	= -g -O6
 #==========================
 #  Solaris
 #
+# For 64bit compilation add -m64 to flags below.
+#
 # For Solaris, BSD should not be replaced by UNIX100.
 #XCFLAGS	= -DHAVE_IEEE_754 -DUNIX100 -DEPD_BIG_ENDIAN
+# Same for 64bit.
+#XCFLAGS	= -m64 -DHAVE_IEEE_754 -DUNIX100 -DEPD_BIG_ENDIAN
 # Gcc 2.8.1 or higher on Ultrasparc.
 #XCFLAGS	= -mcpu=ultrasparc -DHAVE_IEEE_754 -DUNIX100 -DEPD_BIG_ENDIAN
 # For Solaris 2.5 and higher, optimized code with /usr/bin/cc or CC.

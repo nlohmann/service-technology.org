@@ -18,12 +18,12 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006-04-07 11:15:23 $ by $Author: weinberg $.
-# Version $Revision: 1.3 $
+# File last changed $Date: 2006-07-06 13:37:10 $ by $Author: bretschn $.
+# Version $Revision: 1.4 $
 
 # Process this file with autoconf to produce a configure script.
 AC_INIT(Fiona, 1.0, weinberg@informatik.hu-berlin.de, fiona)
-AC_REVISION($Revision: 1.3 $)
+AC_REVISION($Revision: 1.4 $)
 
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/fiona.h)
@@ -51,9 +51,22 @@ if test "$YACC" = "not found"; then
  AC_MSG_WARN([Bison was not found.])
 fi
 
+# Check for --enable-64bit parameter to enable 64bit compilation
+AC_ARG_ENABLE(64bit,
+  [  --enable-64bit  build for 64bit architecture [default=no]],
+  enable_64bit="yes", enable_64bit="no")
+AM_CONDITIONAL(ENABLE_64BIT, test "$enable_64bit" = "yes")
+
 # no optimization flag here as it takes too much time
 CXXFLAGS=-g
 
 AC_OUTPUT(Makefile \
 	  src/Makefile 
 	  )
+
+# Print summary of compile settings
+echo
+echo "--------- compile settings ---------"
+echo "compile for 64bit...: $enable_64bit"
+echo "------------------------------------"
+echo

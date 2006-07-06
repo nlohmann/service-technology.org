@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006-06-30 12:50:00 $ by $Author: kaschner $.
-# Version $Revision: 1.4 $
+# File last changed $Date: 2006-07-06 13:37:30 $ by $Author: bretschn $.
+# Version $Revision: 1.5 $
 
 bin_PROGRAMS = fiona
 
@@ -54,8 +54,19 @@ MAINTAINERCLEANFILES = $(YYSOURCES)
 # set the include path found by configure
 INCLUDES = -I$(srcdir)/../cudd/include $(all_includes)
 
+# Set 64bit compile and link flags if 64bit was configured
+if ENABLE_64BIT
+LINK_COMPILE_64BIT_FLAG = -m64
+else
+LINK_COMPILE_64BIT_FLAG =
+endif
+
+# Collect all compile flags
+fiona_CXXFLAGS = ${LINK_COMPILE_64BIT_FLAG}
+fiona_CFLAGS = ${LINK_COMPILE_64BIT_FLAG}
+
 # the library search path.
-fiona_LDFLAGS = $(all_libraries) 
+fiona_LDFLAGS = ${LINK_COMPILE_64BIT_FLAG} $(all_libraries) 
 
 fiona_LDADD = $(srcdir)/../cudd/obj/libobj.a \
 	$(srcdir)/../cudd/dddmp/libdddmp.a $(srcdir)/../cudd/cudd/libcudd.a \

@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/07/06 14:52:24 $
+ *          - last changed: \$Date: 2006/07/06 15:15:36 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.196 $
+ * \version \$Revision: 1.197 $
  * 
  */
 %}
@@ -824,9 +824,8 @@ tOnMessage:
 ;
 
 genSymTabEntry_OnMessage:
-  { currentSymTabEntryKey = symTab.insert(K_ONMESSAGE);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_ONMESSAGE);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 
@@ -847,9 +846,8 @@ tOnAlarm:
 ;
 
 genSymTabEntry_OnAlarm:
-  { currentSymTabEntryKey = symTab.insert(K_ONALARM);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_ONALARM);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 
@@ -901,9 +899,8 @@ tVariable:
 ;
 
 genSymTabEntry_Variable:
-  { currentSymTabEntryKey = symTab.insert(K_VARIABLE);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_VARIABLE);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 
@@ -1004,7 +1001,7 @@ tEmpty:
   X_NEXT standardElements X_SLASH K_EMPTY
     {
       $$ = Empty($5);
-      $$->id = $5->parentId = $2; 
+      $$->id = $2; 
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_EMPTY);
@@ -1017,7 +1014,6 @@ tEmpty:
 | K_EMPTY genSymTabEntry_Empty arbitraryAttributes X_SLASH
     {
       impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      noLinks->parentId = $2;
 
       $$ = Empty(noLinks);
       $$->id = $2; 
@@ -1038,8 +1034,7 @@ genSymTabEntry_Empty:
 ******************************************************************************/
 
 tInvoke:
-  K_INVOKE genSymTabEntry_Invoke 
-  arbitraryAttributes 
+  K_INVOKE genSymTabEntry_Invoke arbitraryAttributes 
     { //symTab.checkAttributes($2); //att.check($3, K_INVOKE);
 //NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
 //NL      {
@@ -1098,8 +1093,8 @@ tInvoke:
 	eh->id = mkinteger(symTab.insert(K_EVENTHANDLERS));      
         tScope scope = Scope($7, NiltVariable_list(), fh, $11, eh, StopInScope(), ai);
 
-        scope->id = $7->parentId = currentScopeId; 
-        invoke->id = ai->id = se->parentId = $2;
+        scope->id = currentScopeId; 
+        invoke->id = ai->id = $2;
 
         assert(ASTEmap[invoke->id->value] == NULL);
         ASTEmap[invoke->id->value] = new ASTE((kc::impl_activity*)invoke, K_INVOKE);
@@ -1213,7 +1208,7 @@ tInvoke:
           symMan.addDPEend();
         }
 //NL        invoke->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-        invoke->id = $7->parentId = $2; 
+        invoke->id = $2; 
 
         $$ = activity(activityInvoke(invoke));
         $$->id = invoke->id;
@@ -1248,7 +1243,6 @@ tInvoke:
   X_SLASH
     { 
       impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      noLinks->parentId = $2;
 
       STInvoke *stInvoke = dynamic_cast<STInvoke *> (symTab.lookup($2));
       assert (stInvoke != NULL);
@@ -1318,7 +1312,7 @@ tReceive:
 								 true);
 
       $$ = Receive($5, $6);
-      $$->id = $5->parentId = $2; 
+      $$->id = $2; 
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_RECEIVE);
@@ -1328,11 +1322,9 @@ tReceive:
       if ($5->dpe->value > 0)
         symMan.addDPEend();
     }
-| K_RECEIVE genSymTabEntry_Receive
-  arbitraryAttributes
-  X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      noLinks->parentId = $2;
+| K_RECEIVE genSymTabEntry_Receive arbitraryAttributes X_SLASH
+    {
+      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
 
       STReceive *stReceive = dynamic_cast<STReceive *> (symTab.lookup($2));
       assert(stReceive != NULL);
@@ -1348,7 +1340,7 @@ tReceive:
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_RECEIVE);
-}
+    }
 ;
 
 genSymTabEntry_Receive:
@@ -1380,7 +1372,7 @@ tReply:
         symMan.addDPEend();
 
       $$ = Reply($5, $6);
-      $$->id = $5->parentId = $2;
+      $$->id = $2;
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_REPLY);
@@ -1388,7 +1380,6 @@ tReply:
 | K_REPLY genSymTabEntry_Reply arbitraryAttributes X_SLASH
     {
       impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      noLinks->parentId = $2;
 
       STReply *stReply = dynamic_cast<STReply*> (symTab.lookup($2));
       assert (stReply != NULL);
@@ -1427,7 +1418,7 @@ tAssign:
         symMan.addDPEend();
 
       $$ = Assign($5, $6);
-      $$->id = $5->parentId = $2;
+      $$->id = $2;
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_ASSIGN);
@@ -1554,7 +1545,7 @@ tWait:
       else
         $$ = WaitUntil($5);
 
-      $$->id = $5->parentId = $2;
+      $$->id = $2;
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_WAIT);
@@ -1562,7 +1553,6 @@ tWait:
 | K_WAIT genSymTabEntry_Wait arbitraryAttributes X_SLASH
     {
       impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      noLinks->parentId = $2;
 
       if ( symTab.readAttributeValue($2, "for") != "" )
         $$ = WaitFor(noLinks);
@@ -1600,7 +1590,7 @@ tThrow:
         symMan.addDPEend();
 
       $$ = Throw($5);
-      $$->id = $5->parentId = $2;
+      $$->id = $2;
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_THROW);
@@ -1608,7 +1598,6 @@ tThrow:
 | K_THROW genSymTabEntry_Throw arbitraryAttributes X_SLASH
     {
       impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      noLinks->parentId = $2;
 
       STThrow *stThrow = dynamic_cast<STThrow*> (symTab.lookup($2));
       assert (stThrow != NULL);
@@ -1682,7 +1671,7 @@ tCompensate:
 //NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
 
       $$ = Compensate($6);
-      $$->id = $6->parentId = $2;
+      $$->id = $2;
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_COMPENSATE);
@@ -1726,7 +1715,6 @@ tCompensate:
   X_SLASH
     {
       impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      noLinks->parentId = $2;
 
 //NL      att.popSJFStack(); symTab.popSJFStack();
 //NL      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
@@ -1754,7 +1742,7 @@ tTerminate:
   standardElements X_SLASH K_TERMINATE
     {
       $$ = Terminate($5);
-      $$->id = $5->parentId = $2;
+      $$->id = $2;
 
       if ($5->hasTarget)
 	symMan.remDPEstart();
@@ -1767,7 +1755,6 @@ tTerminate:
 | K_TERMINATE genSymTabEntry_Terminate arbitraryAttributes X_SLASH
     {
       impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      noLinks->parentId = $2;
 
       $$ = Terminate(noLinks);
       $$->id = $2;
@@ -1821,7 +1808,7 @@ tFlow:
       if ($$->dpe->value > 0)
 	$6->dpe = mkinteger(1);
 
-      $$->id = $6->parentId = $2;
+      $$->id = $2;
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_FLOW);
@@ -1921,7 +1908,7 @@ tSwitch:
   X_SLASH K_SWITCH
     {
       $$ = Switch($5, $7, $8);
-      $$->id = $5->parentId = $2;
+      $$->id = $2;
 
       symMan.remDPEstart();
       $$->dpe = symMan.needsDPE();
@@ -2009,7 +1996,7 @@ tOtherwise:
 
       impl_standardElements_StandardElements* noLinks = StandardElements(NiltTarget_list(),NiltSource_list(), standardJoinCondition());
 //      noLinks->dpe = kc::mkinteger(0);
-      noLinks->parentId = kc::mkinteger(emptyId);
+//      noLinks->parentId = kc::mkinteger(emptyId);
       impl_tEmpty_Empty* implicitEmpty = Empty(noLinks);
       implicitEmpty->id = kc::mkinteger(emptyId);
 //NL      implicitEmpty->negativeControlFlow = noLinks->negativeControlFlow = mkinteger(0);
@@ -2057,7 +2044,7 @@ tWhile:
   activity X_NEXT X_SLASH K_WHILE
     {
       $$ = While($5, $7);
-      $$->id = $5->parentId = $2; 
+      $$->id = $2; 
 
       symMan.endDPEinWhile();
 
@@ -2081,7 +2068,7 @@ tSequence:
   standardElements activity_list X_SLASH K_SEQUENCE
     {
       $$ = Sequence($5, $6);
-      $$->id = $5->parentId = $2;
+      $$->id = $2;
 
       $$->dpe = mkinteger((symMan.needsDPE())->value);
 
@@ -2116,6 +2103,7 @@ tPick:
   tOnMessage X_NEXT tOnMessage_list tOnAlarm_list X_SLASH K_PICK
     {
       $$ = Pick($5, ConstOnMessage_list($7, $9), $10);
+      $$->id = $2;
 
       symMan.remDPEstart();
 
@@ -2129,8 +2117,6 @@ tPick:
 
       if ($$->dpe->value > 0)
 	$5->dpe = mkinteger(1);
-
-      $$->id = $5->parentId = $2;
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_PICK);
@@ -2176,7 +2162,7 @@ tScope:
       isInCH.pop();
 
       $$ = Scope($6, $8, $10, $11, $12, StopInScope(), $13);
-      $$->id = $6->parentId = $2;
+      $$->id = $2;
       $$->parentScopeId = currentScopeId = parent[$2];
 
       currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId->value));

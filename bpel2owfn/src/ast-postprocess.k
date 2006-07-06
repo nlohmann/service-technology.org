@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/07/06 14:20:00 $
+ *          - last changed: \$Date: 2006/07/06 15:15:36 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  */
 %}
 
@@ -386,6 +386,9 @@ Empty(a) ->
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      a->parentId = mkinteger(myid);
+
       // copy attributes to AST
       $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
       $0->A_joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
@@ -420,6 +423,9 @@ Invoke(a,b) ->
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      a->parentId = mkinteger(myid);
+
       // copy attributes to AST
       $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
       $0->A_joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
@@ -444,6 +450,7 @@ Invoke(a,b) ->
       
       $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
       // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+//      assert(a->parentId->value == myid);
     }
     a b
   ]
@@ -459,6 +466,9 @@ Receive(a,b) ->
     {
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
+
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      a->parentId = mkinteger(myid);
 
       // copy attributes to AST
       $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
@@ -484,6 +494,7 @@ Receive(a,b) ->
 
       $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
       // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+//      assert(a->parentId->value == myid);
     }
     a b
   ]
@@ -499,6 +510,9 @@ Reply(a,b) ->
     {
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
+
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      a->parentId = mkinteger(myid);
 
       // copy attributes to AST
       $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
@@ -524,6 +538,7 @@ Reply(a,b) ->
 
       $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
       // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+//      assert(a->parentId->value == myid);
     }
     a b
   ]
@@ -539,6 +554,9 @@ Assign(a,b) ->
     {
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
+
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      a->parentId = mkinteger(myid);
 
       // copy attributes to AST
       $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
@@ -559,6 +577,7 @@ Assign(a,b) ->
 
       $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
       // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+//      assert(a->parentId->value == myid);
     }
     a b
   ]
@@ -612,6 +631,9 @@ WaitFor(a) ->
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      a->parentId = mkinteger(myid);
+
       // copy attributes to AST
       $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
       $0->A_joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
@@ -632,6 +654,7 @@ WaitFor(a) ->
 
       $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
       // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+//      assert(a->parentId->value == myid);
     }
     a
   ]
@@ -642,6 +665,9 @@ WaitUntil(a) ->
     {
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
+
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      a->parentId = mkinteger(myid);
 
       // copy attributes to AST
       $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
@@ -663,6 +689,7 @@ WaitUntil(a) ->
 
       $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
       // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+//      assert(a->parentId->value == myid);
     }
     a
   ]
@@ -678,6 +705,9 @@ Throw(a) ->
     {
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
+
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      a->parentId = mkinteger(myid);
 
       // copy attributes to AST
       $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
@@ -700,6 +730,7 @@ Throw(a) ->
 
       $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
       // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
+//      assert(a->parentId->value == myid);
     }
     a
   ]
@@ -715,6 +746,9 @@ Compensate(a) ->
     {
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
+
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      a->parentId = mkinteger(myid);
 
       // copy attributes to AST
       $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
@@ -752,6 +786,9 @@ Terminate(a) ->
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      a->parentId = mkinteger(myid);
+
       // copy attributes to AST
       $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
       $0->A_joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
@@ -788,6 +825,7 @@ Flow(a,b,c) ->
       assert(ASTEmap[myid] != NULL);
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      a->parentId = mkinteger(myid);
       PPcurrentFlow = myid; //TODO reset
 
       // copy attributes to AST
@@ -849,6 +887,7 @@ Switch(a,b,c=Otherwise(d)) ->
       assert(ASTEmap[myid] != NULL);
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      a->parentId = mkinteger(myid);
 
       // copy attributes to AST
       $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
@@ -923,6 +962,7 @@ While(a,b) ->
       assert(ASTEmap[myid] != NULL);
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      a->parentId = mkinteger(myid);
 
       // copy attributes to AST
       $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
@@ -964,6 +1004,7 @@ Sequence(a,b) ->
       assert(ASTEmap[myid] != NULL);
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      a->parentId = mkinteger(myid);
 
       // copy attributes to AST
       $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
@@ -1039,6 +1080,7 @@ Pick(a,b,c) ->
 
       // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
       $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
+      assert(a->parentId->value == myid);
     }
     a b c
   ]
@@ -1080,6 +1122,7 @@ Scope(a,b,c,d,e,f,g) ->
 
       // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow->value);
       $0->negativeControlFlow = mkinteger(ASTEmap[myid]->controlFlow);
+      assert(a->parentId->value == myid);
     }
     a b c d e f g
     {

@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/07/06 11:48:52 $
+ *          - last changed: \$Date: 2006/07/06 13:18:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  */
 %}
 
@@ -165,6 +165,8 @@ userDefinedFaultHandler(a,b) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
+      $0->hasCatchAll = (b->op_name() == "CatchAll");
+
       // cerr << "<faultHandlers>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
 
       // distribute the fault handlers's id to the enclosed catch/catchAll branches
@@ -179,7 +181,7 @@ userDefinedFaultHandler(a,b) ->
 //      ASTEmap[b->id->value]->parentActivityId = myid;
 
       // these 3 asserts show that the AST can be annotated right here
-      assert($0->hasCatchAll == (b->op_name() == "CatchAll"));
+//      assert($0->hasCatchAll == (b->op_name() == "CatchAll"));
       assert($0->parentScopeId->value == ASTEmap[myid]->parentScopeId);
       assert($0->inProcess == (ASTEmap[myid]->parentScopeId == 1));
     }
@@ -195,10 +197,12 @@ implicitFaultHandler() ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
+      $0->hasCatchAll = false;
+
       // cerr << "<faultHandlers>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
 
       // these 3 asserts show that the AST can be annotated right here
-      assert($0->hasCatchAll == false);
+//      assert($0->hasCatchAll == false);
       assert($0->parentScopeId->value == ASTEmap[myid]->parentScopeId);
       assert($0->inProcess == (ASTEmap[myid]->parentScopeId == 1));
     }

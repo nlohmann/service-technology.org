@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/07/06 11:46:48 $
+ *          - last changed: \$Date: 2006/07/06 13:18:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.193 $
+ * \version \$Revision: 1.194 $
  * 
  */
 %}
@@ -170,9 +170,6 @@ map <integer, integer> parent;
 
 /// the root of the abstract syntax tree
 tProcess TheProcess;
-
-/// needed to find out if a FH has a <catchAll> element
-bool hasCatchAll = false;
 
 /// stack for checking for FaultHandler
 stack<bool> isInFH;
@@ -313,7 +310,6 @@ tProcess:
       inPartners = false;
       inWhile = false;
       parent = map<integer, integer>();
-      hasCatchAll = false;
       isInFH = stack<bool>();
       currentJoinCondition = standardJoinCondition();
       yylineno = 1;
@@ -350,9 +346,8 @@ tProcess:
 ;
 
 genSymTabEntry_Process:
-  { currentSymTabEntryKey = symTab.insert(K_PROCESS);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_PROCESS);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 /* import other namespaces */
@@ -629,7 +624,6 @@ tFaultHandlers:
       $$->id = mkinteger(currentSymTabEntryKey);
       $$->inProcess = (currentScopeId->value == 1);
       $$->parentScopeId = currentScopeId; 
-      $$->hasCatchAll = false;
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_FAULTHANDLERS);
@@ -647,7 +641,7 @@ tFaultHandlers:
       $$->id = $2;
       $$->inProcess = (currentScopeId->value == 1);
       $$->parentScopeId = currentScopeId;
-      $$->hasCatchAll = hasCatchAll;
+
       isInFH.pop();
       hasCompensate = 0;
       symMan.endDPEinWhile();
@@ -702,11 +696,10 @@ genSymTabEntry_Catch:
 
 tCatchAll:
   /* empty */
-    { hasCatchAll = false;
-      $$ = NoCatchAll(); }
+    { $$ = NoCatchAll(); }
 | K_CATCHALL genSymTabEntry_CatchAll
   arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CATCHALL X_NEXT
-    { hasCatchAll = true;
+    {
       $$ = CatchAll($5);
       $$->id = $2;      
 
@@ -985,13 +978,19 @@ tCorrelationSet:
   arbitraryAttributes X_NEXT X_SLASH K_CORRELATIONSET
     { symTab.checkAttributes($2); //att.check($3, K_CORRELATIONSET);
       $$ = CorrelationSet();
-      $$->id = $2;      
+      $$->id = $2;
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_CORRELATIONSET);
     }
 | K_CORRELATIONSET genSymTabEntry_CorrelationSet
   arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2); //att.check($3, K_CORRELATIONSET);
       $$ = CorrelationSet();
-      $$->id = $2;      
+      $$->id = $2;
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_CORRELATIONSET);
     }
 ;
 
@@ -1015,8 +1014,7 @@ tCorrelations:
 
 tCorrelation_list:
   tCorrelation X_NEXT
-    { $$ = ConstCorrelation_list($1, NiltCorrelation_list());
-    }
+    { $$ = ConstCorrelation_list($1, NiltCorrelation_list()); }
 | tCorrelation X_NEXT tCorrelation_list
     { $$ = ConstCorrelation_list($1, $3); }
 ;
@@ -1027,12 +1025,18 @@ tCorrelation:
     { symTab.checkAttributes($2);
       $$ = Correlation();
       $$->id = $2;      
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_CORRELATION);
     }
 | K_CORRELATION genSymTabEntry_Correlation
   arbitraryAttributes X_SLASH
     { symTab.checkAttributes($2);
       $$ = Correlation();
       $$->id = $2;      
+
+      assert(ASTEmap[$$->id->value] == NULL);
+      ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_CORRELATION);
     }
 ;
 
@@ -1144,7 +1148,6 @@ tInvoke:
         tInvoke invoke = Invoke(se, $8);
         activity ai = activityInvoke(invoke);
         tFaultHandlers fh = userDefinedFaultHandler($9, $10);
-        fh->hasCatchAll = hasCatchAll;
         tEventHandlers eh = implicitEventHandler();
 	eh->id = mkinteger(symTab.insert(K_EVENTHANDLERS));      
         tScope scope = Scope($7, NiltVariable_list(), fh, $11, eh, StopInScope(), ai);

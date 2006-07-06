@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/07/05 15:42:43 $
+ *          - last changed: \$Date: 2006/07/06 13:18:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  */
 
 #include "ast-details.h"
@@ -61,6 +61,8 @@ ASTE::ASTE(kc::impl_abstract_phylum *mynode, int mytype)
     case(K_CATCHALL):		id = ((kc::impl_tCatchAll*)mynode)->id->value; break;
     case(K_COMPENSATE):		id = ((kc::impl_tCompensate*)mynode)->id->value; break;
     case(K_COMPENSATIONHANDLER):id = ((kc::impl_tCompensationHandler*)mynode)->id->value; break;
+    case(K_CORRELATION):	id = ((kc::impl_tCorrelation*)mynode)->id->value; break;
+    case(K_CORRELATIONSET):	id = ((kc::impl_tCorrelationSet*)mynode)->id->value; break;
     case(K_EMPTY):		id = ((kc::impl_tEmpty*)mynode)->id->value; break;
     case(K_EVENTHANDLERS):	id = ((kc::impl_tEventHandlers*)mynode)->id->value; break;
     case(K_FAULTHANDLERS):	id = ((kc::impl_tFaultHandlers*)mynode)->id->value; break;

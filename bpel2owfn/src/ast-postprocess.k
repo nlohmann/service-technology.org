@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/07/05 15:42:44 $
+ *          - last changed: \$Date: 2006/07/06 11:46:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  */
 %}
 
@@ -94,10 +94,19 @@ Process(a,b,c,d,e,f,g,h,i) ->
       }
 
 
+      // copy attributes to AST
+      $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
+      $0->A_targetNamespace = mkcasestring(ASTEmap[myid]->attributes["targetNamespace"].c_str());
+      $0->A_queryLanguage = mkcasestring(ASTEmap[myid]->attributes["queryLanguage"].c_str());
+      $0->A_expressionLanguage = mkcasestring(ASTEmap[myid]->attributes["expressionLanguage"].c_str());
+      $0->A_suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_enableInstanceCompensation = mkcasestring(ASTEmap[myid]->attributes["enableInstanceCompensation"].c_str());
+      $0->A_abstractProcess = mkcasestring(ASTEmap[myid]->attributes["abstractProcess"].c_str());
+      $0->A_xmlns = mkcasestring(ASTEmap[myid]->attributes["xmlns"].c_str());
+
 
       ASTEmap[myid]->parentScopeId = myid;
       ASTEmap[myid]->parentActivityId = myid;
-
 
 
       // distribute the process' id to the enclosed FH/CH/EH/activity
@@ -166,7 +175,7 @@ userDefinedFaultHandler(a,b) ->
         ASTEmap[innerActivity->id->value]->parentActivityId = myid;
         ASTEmap[innerActivity->id->value]->controlFlow = FHCF;
       }
-//      assert(ASTEmap[b->id->value] != NULL);
+//      assert(ASTEmap[b->id->value] != NULL); /TODO!
 //      ASTEmap[b->id->value]->parentActivityId = myid;
 
       // these 3 asserts show that the AST can be annotated right here
@@ -199,6 +208,14 @@ implicitFaultHandler() ->
 
 Catch(a) ->
   [postprocessing:
+    {
+      int myid = $0->id->value;
+      assert(ASTEmap[myid] != NULL);
+
+      // copy attributes to AST
+      $0->A_faultName = mkcasestring(ASTEmap[myid]->attributes["faultName"].c_str());
+      $0->A_faultVariable = mkcasestring(ASTEmap[myid]->attributes["faultVariable"].c_str());
+    }
     a
   ]
 ;
@@ -206,6 +223,10 @@ Catch(a) ->
 CatchAll(a) ->
   [postprocessing:
     a
+    {
+      int myid = $0->id->value;
+      assert(ASTEmap[myid] != NULL);
+    }
   ]
 ;
 
@@ -244,7 +265,19 @@ userDefinedEventHandler(a,b) ->
 ;
 
 OnMessage(a) ->
-  [postprocessing: a]
+  [postprocessing:
+    {
+      int myid = $0->id->value;
+      assert(ASTEmap[myid] != NULL);
+
+      // copy attributes to AST
+      $0->A_partnerLink = mkcasestring(ASTEmap[myid]->attributes["partnerLink"].c_str());
+      $0->A_portType = mkcasestring(ASTEmap[myid]->attributes["portType"].c_str());
+      $0->A_operation = mkcasestring(ASTEmap[myid]->attributes["operation"].c_str());
+      $0->A_variable = mkcasestring(ASTEmap[myid]->attributes["variable"].c_str());
+    }
+    a
+  ]
 ;
 
 OnAlarm(a) ->
@@ -300,7 +333,16 @@ Variable() ->
 ******************************************************************************/
 
 CorrelationSet() ->
-  [postprocessing: ]
+  [postprocessing:
+    {
+      int myid = $0->id->value;
+      assert(ASTEmap[myid] != NULL);
+
+      // copy attributes to AST
+      $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
+      $0->A_properties = mkcasestring(ASTEmap[myid]->attributes["properties"].c_str());
+     }
+  ]
 ;
 
 
@@ -309,7 +351,16 @@ CorrelationSet() ->
 ******************************************************************************/
 
 Correlation() ->
-  [postprocessing: ]
+  [postprocessing:
+    {
+      int myid = $0->id->value;
+      assert(ASTEmap[myid] != NULL);
+
+      // copy attributes to AST
+      $0->A_set = mkcasestring(ASTEmap[myid]->attributes["set"].c_str());
+      $0->A_initiate = mkcasestring(ASTEmap[myid]->attributes["initiate"].c_str());
+     }
+  ]
 ;
 
 
@@ -324,9 +375,9 @@ Empty(a) ->
       assert(ASTEmap[myid] != NULL);
 
       // copy attributes to AST
-      $0->name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
-      $0->joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
-      $0->suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
+      $0->A_joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
+      $0->A_suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -358,9 +409,14 @@ Invoke(a,b) ->
       assert(ASTEmap[myid] != NULL);
 
       // copy attributes to AST
-      $0->name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
-      $0->joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
-      $0->suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
+      $0->A_joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
+      $0->A_suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_partnerLink = mkcasestring(ASTEmap[myid]->attributes["partnerLink"].c_str());
+      $0->A_portType = mkcasestring(ASTEmap[myid]->attributes["portType"].c_str());
+      $0->A_operation = mkcasestring(ASTEmap[myid]->attributes["operation"].c_str());
+      $0->A_inputVariable = mkcasestring(ASTEmap[myid]->attributes["inputVariable"].c_str());
+      $0->A_outputVariable = mkcasestring(ASTEmap[myid]->attributes["outputVariable"].c_str());
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -393,9 +449,14 @@ Receive(a,b) ->
       assert(ASTEmap[myid] != NULL);
 
       // copy attributes to AST
-      $0->name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
-      $0->joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
-      $0->suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
+      $0->A_joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
+      $0->A_suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_partnerLink = mkcasestring(ASTEmap[myid]->attributes["partnerLink"].c_str());
+      $0->A_portType = mkcasestring(ASTEmap[myid]->attributes["portType"].c_str());
+      $0->A_operation = mkcasestring(ASTEmap[myid]->attributes["operation"].c_str());
+      $0->A_variable = mkcasestring(ASTEmap[myid]->attributes["variable"].c_str());
+      $0->A_createInstance = mkcasestring(ASTEmap[myid]->attributes["createInstance"].c_str());
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -428,9 +489,14 @@ Reply(a,b) ->
       assert(ASTEmap[myid] != NULL);
 
       // copy attributes to AST
-      $0->name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
-      $0->joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
-      $0->suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
+      $0->A_joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
+      $0->A_suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_partnerLink = mkcasestring(ASTEmap[myid]->attributes["partnerLink"].c_str());
+      $0->A_portType = mkcasestring(ASTEmap[myid]->attributes["portType"].c_str());
+      $0->A_operation = mkcasestring(ASTEmap[myid]->attributes["operation"].c_str());
+      $0->A_variable = mkcasestring(ASTEmap[myid]->attributes["variable"].c_str());
+      $0->A_faultName = mkcasestring(ASTEmap[myid]->attributes["faultName"].c_str());
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -463,9 +529,9 @@ Assign(a,b) ->
       assert(ASTEmap[myid] != NULL);
 
       // copy attributes to AST
-      $0->name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
-      $0->joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
-      $0->suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
+      $0->A_joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
+      $0->A_suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -497,18 +563,30 @@ From() ->
       assert(ASTEmap[myid] != NULL);
 
       // copy attributes to AST
-      $0->variable = mkcasestring(ASTEmap[myid]->attributes["variable"].c_str());
-      $0->part = mkcasestring(ASTEmap[myid]->attributes["part"].c_str());
-      $0->partnerLink = mkcasestring(ASTEmap[myid]->attributes["partnerLink"].c_str());
-      $0->endpointReference = mkcasestring(ASTEmap[myid]->attributes["endpointReference"].c_str());
-      $0->property = mkcasestring(ASTEmap[myid]->attributes["property"].c_str());
-      $0->expression = mkcasestring(ASTEmap[myid]->attributes["expression"].c_str());
+      $0->A_variable = mkcasestring(ASTEmap[myid]->attributes["variable"].c_str());
+      $0->A_part = mkcasestring(ASTEmap[myid]->attributes["part"].c_str());
+      $0->A_partnerLink = mkcasestring(ASTEmap[myid]->attributes["partnerLink"].c_str());
+      $0->A_endpointReference = mkcasestring(ASTEmap[myid]->attributes["endpointReference"].c_str());
+      $0->A_property = mkcasestring(ASTEmap[myid]->attributes["property"].c_str());
+      $0->A_expression = mkcasestring(ASTEmap[myid]->attributes["expression"].c_str());
     }
   ]
 ;
 
 To() ->
-  [postprocessing: ]
+  [postprocessing:
+    {
+      int myid = $0->id->value;
+      assert(ASTEmap[myid] != NULL);
+
+      // copy attributes to AST
+      $0->A_variable = mkcasestring(ASTEmap[myid]->attributes["variable"].c_str());
+      $0->A_part = mkcasestring(ASTEmap[myid]->attributes["part"].c_str());
+      $0->A_partnerLink = mkcasestring(ASTEmap[myid]->attributes["partnerLink"].c_str());
+      $0->A_property = mkcasestring(ASTEmap[myid]->attributes["property"].c_str());
+    }
+  ]
+;
 ;
 
 
@@ -523,9 +601,10 @@ WaitFor(a) ->
       assert(ASTEmap[myid] != NULL);
 
       // copy attributes to AST
-      $0->name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
-      $0->joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
-      $0->suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
+      $0->A_joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
+      $0->A_suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_for = mkcasestring(ASTEmap[myid]->attributes["for"].c_str());
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -553,9 +632,10 @@ WaitUntil(a) ->
       assert(ASTEmap[myid] != NULL);
 
       // copy attributes to AST
-      $0->name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
-      $0->joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
-      $0->suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
+      $0->A_joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
+      $0->A_suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_until = mkcasestring(ASTEmap[myid]->attributes["until"].c_str());
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -588,9 +668,11 @@ Throw(a) ->
       assert(ASTEmap[myid] != NULL);
 
       // copy attributes to AST
-      $0->name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
-      $0->joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
-      $0->suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
+      $0->A_joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
+      $0->A_suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_faultName = mkcasestring(ASTEmap[myid]->attributes["faultName"].c_str());
+      $0->A_faultVariable = mkcasestring(ASTEmap[myid]->attributes["faultVariable"].c_str());
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -623,9 +705,10 @@ Compensate(a) ->
       assert(ASTEmap[myid] != NULL);
 
       // copy attributes to AST
-      $0->name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
-      $0->joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
-      $0->suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
+      $0->A_joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
+      $0->A_suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_scope = mkcasestring(ASTEmap[myid]->attributes["scope"].c_str());
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -658,9 +741,9 @@ Terminate(a) ->
       assert(ASTEmap[myid] != NULL);
 
       // copy attributes to AST
-      $0->name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
-      $0->joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
-      $0->suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
+      $0->A_joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
+      $0->A_suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -696,9 +779,9 @@ Flow(a,b,c) ->
       PPcurrentFlow = myid; //TODO reset
 
       // copy attributes to AST
-      $0->name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
-      $0->joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
-      $0->suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
+      $0->A_joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
+      $0->A_suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -732,6 +815,9 @@ Link() ->
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
+      // copy attributes to AST
+      $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
+
       // cerr << "\tread link: " << PPcurrentFlow << "." << ASTEmap[myid]->attributes["name"] << endl;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
@@ -753,9 +839,9 @@ Switch(a,b,c=Otherwise(d)) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       // copy attributes to AST
-      $0->name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
-      $0->joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
-      $0->suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
+      $0->A_joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
+      $0->A_suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -792,6 +878,9 @@ Case(a) ->
       int myid = $0->id->value;
       assert(ASTEmap[myid] != NULL);
 
+      // copy attributes to AST
+      $0->A_condition = mkcasestring(ASTEmap[myid]->attributes["condition"].c_str());
+
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
     }
     a
@@ -824,9 +913,10 @@ While(a,b) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       // copy attributes to AST
-      $0->name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
-      $0->joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
-      $0->suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
+      $0->A_joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
+      $0->A_suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_condition = mkcasestring(ASTEmap[myid]->attributes["condition"].c_str());
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -864,9 +954,9 @@ Sequence(a,b) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       // copy attributes to AST
-      $0->name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
-      $0->joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
-      $0->suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
+      $0->A_joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
+      $0->A_suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -907,9 +997,9 @@ Pick(a,b,c) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       // copy attributes to AST
-      $0->name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
-      $0->joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
-      $0->suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
+      $0->A_joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
+      $0->A_suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -957,9 +1047,10 @@ Scope(a,b,c,d,e,f,g) ->
       PPcurrentScope = myid;
 
       // copy attributes to AST
-      $0->name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
-      $0->joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
-      $0->suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
+      $0->A_joinCondition = mkcasestring(ASTEmap[myid]->attributes["joinCondition"].c_str());
+      $0->A_suppressJoinFailure = mkcasestring(ASTEmap[myid]->attributes["suppressJoinFailure"].c_str());
+      $0->A_variableAccessSerializable = mkcasestring(ASTEmap[myid]->attributes["variableAccessSerializable"].c_str());
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);

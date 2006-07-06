@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/06/22 12:08:55 $
+ *          - last changed: \$Date: 2006/07/06 11:46:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.179 $
+ * \version \$Revision: 1.180 $
  *
  */
 %}
@@ -763,7 +763,7 @@ This=userDefinedFaultHandler(a,b) provided (This->inProcess) ->
     {
       foreach (catchBranch=Catch(innerActivity); tCatch_list a)
       {
-	string faultToCatch = catchBranch->faultName->name;
+	string faultToCatch = catchBranch->A_faultName->name;
 	Transition *t1 = TheNet->newTransition(prefix + "t1.internal." + faultToCatch);
 	Transition *t2 = TheNet->newTransition(prefix + "t2." + faultToCatch);
 
@@ -1091,7 +1091,7 @@ This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
     {
       foreach (catchBranch=Catch(innerActivity); tCatch_list a)
       {
-	string faultToCatch = catchBranch->faultName->name;
+	string faultToCatch = catchBranch->A_faultName->name;
 
 	Transition *t1 = TheNet->newTransition(prefix + "t1.internal." + faultToCatch);
 	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
@@ -1445,13 +1445,7 @@ This=userDefinedEventHandler(a,b) ->
       int onAlarmCount = 1;
       foreach (onAlarmBranch=OnAlarm(innerActivity); tOnAlarm_list b)
       {
-	string onAlarmGuard;
 	string newPrefix = prefix + "onAlarm" + intToString(onAlarmCount) + ".";
-
-	if (onAlarmBranch->For != mkcasestring(""))
-	  onAlarmGuard = "x + " + string(onAlarmBranch->For->name) + " \\<= y"; // "<=" is escaped
-	else
-	  onAlarmGuard = string(onAlarmBranch->until->name) + " \\<= y"; // "<=" is escaped
 
 	Place *onAlarm_p1  = TheNet->newPlace(newPrefix + "p1");
 	Place *onAlarm_p2  = TheNet->newPlace(newPrefix + "p2");

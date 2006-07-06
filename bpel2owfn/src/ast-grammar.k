@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/07/05 15:42:44 $
+ *          - last changed: \$Date: 2006/07/06 11:46:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.84 $
+ * \version \$Revision: 1.85 $
  */
 %}
 
@@ -74,18 +74,16 @@ tProcess:
       )
   {
     integer id;
+    bool suppressJF = false;
 
-    // attributes
-    casestring name = mkcasestring("");
-    casestring targetNamespace = mkcasestring("");
-    casestring queryLanguage = mkcasestring("");
-    casestring expressionLanguage = mkcasestring("");
-    casestring suppressJoinFailure = mkcasestring("");
-    casestring enableInstanceCompensation = mkcasestring("");
-    casestring abstractProcess = mkcasestring("");
-    casestring xmlns = mkcasestring("");
-
-    bool suppressJF = false; // required initialization!
+    casestring A_name = mkcasestring("");
+    casestring A_targetNamespace = mkcasestring("");
+    casestring A_queryLanguage = mkcasestring("");
+    casestring A_expressionLanguage = mkcasestring("");
+    casestring A_suppressJoinFailure = mkcasestring("");
+    casestring A_enableInstanceCompensation = mkcasestring("");
+    casestring A_abstractProcess = mkcasestring("");
+    casestring A_xmlns = mkcasestring("");
   }
 ;
 
@@ -115,15 +113,7 @@ activity:
 | activityScope(tScope)
 | activityCompensate(tCompensate)
   {
-    integer id;
-
-    /** 
-     * 0 = positive control flow
-     * 1 = control flow in fault handler
-     * 2 = control flow in compensation handler
-     */
-//    integer negativeControlFlow;
-    
+//    integer id;
     integer dpe = mkinteger(0);
   }
 ;
@@ -142,11 +132,10 @@ tPartnerLink:
   {
     integer id;
 
-    // attributes
-    casestring name = mkcasestring("");
-    casestring partnerLinkType = mkcasestring("");
-    casestring myRole = mkcasestring("");
-    casestring partnerRole = mkcasestring("");
+    casestring A_name = mkcasestring("");
+    casestring A_partnerLinkType = mkcasestring("");
+    casestring A_myRole = mkcasestring("");
+    casestring A_partnerRole = mkcasestring("");
   }
 ;
 
@@ -164,8 +153,7 @@ tPartner:
   {
     integer id;
 
-    // attribute
-    casestring name = mkcasestring("");
+    casestring A_name = mkcasestring("");
   }
 ;
 
@@ -178,12 +166,11 @@ tFaultHandlers:
   userDefinedFaultHandler(tCatch_list tCatchAll)
 | implicitFaultHandler()
   {
+    integer id;
+
     bool inProcess;
     integer parentScopeId;
-
-    // needed to compact pattern
     bool hasCatchAll; 
-    integer id;
   }  
 ;
 
@@ -196,9 +183,8 @@ tCatch:
   {
     integer id;
 
-    // attributes
-    casestring faultName = mkcasestring("");
-    casestring faultVariable = mkcasestring("");
+    casestring A_faultName = mkcasestring("");
+    casestring A_faultVariable = mkcasestring("");
   }
 ;
 
@@ -219,15 +205,14 @@ tEventHandlers:
   implicitEventHandler()
 | userDefinedEventHandler(tOnMessage_list tOnAlarm_list)
   {
-    integer parentScopeId;
     integer id;
+    integer parentScopeId;
   }
 ;
 
 tOnMessage_list:
   list tOnMessage
   {
-    /// additional attribute for DPE
     integer dpe = mkinteger(0);
   }
 ;
@@ -235,7 +220,6 @@ tOnMessage_list:
 tOnAlarm_list:
   list tOnAlarm
   {
-    /// additional attribute for DPE
     integer dpe = mkinteger(0);
   }
 ;
@@ -243,30 +227,24 @@ tOnAlarm_list:
 tOnMessage:
   OnMessage(activity)
   {
-    /// additional attribute for DPE
-    integer dpe = mkinteger(0);
-    
     integer id;
+    integer dpe = mkinteger(0);
 
-    // attributes
-    casestring partnerLink = mkcasestring("");
-    casestring portType = mkcasestring("");
-    casestring operation = mkcasestring("");
-    casestring variable = mkcasestring("");
+    casestring A_partnerLink = mkcasestring("");
+    casestring A_portType = mkcasestring("");
+    casestring A_operation = mkcasestring("");
+    casestring A_variable = mkcasestring("");
   }
 ;
 
 tOnAlarm:
   OnAlarm(activity)
   {
-    /// additional attribute for DPE
+    integer id;
     integer dpe = mkinteger(0);
     
-    integer id;
-
-    // attributes
-    casestring For = mkcasestring("");
-    casestring until = mkcasestring("");
+    casestring A_for = mkcasestring("");
+    casestring A_until = mkcasestring("");
   } 
 ;
 
@@ -280,14 +258,11 @@ tCompensationHandler:
 | userDefinedCompensationHandler(activity)
 | processCompensationHandler()
   {
-    integer parentScopeId;
-
-    /// handler contains <compensate/> (i.e. pattern in Fig. 43)
-    bool compensateWithoutScope = false;
-
-    /// handler contains <compensate scope="A"/> (i.e. pattern Fig. 44)
-    bool compensateWithScope = false;
     integer id;
+
+    integer parentScopeId;
+    bool compensateWithoutScope = false;
+    bool compensateWithScope = false;
   }
 ;
 
@@ -304,11 +279,10 @@ tVariable:
   {
     integer id;
 
-    // attributes
-    casestring name = mkcasestring("");
-    casestring messageType = mkcasestring("");
-    casestring type = mkcasestring("");
-    casestring element = mkcasestring("");
+    casestring A_name = mkcasestring("");
+    casestring A_messageType = mkcasestring("");
+    casestring A_type = mkcasestring("");
+    casestring A_element = mkcasestring("");
   }
 ;
 
@@ -326,9 +300,8 @@ tCorrelationSet:
   {
     integer id;
 
-    // attributes
-    casestring name = mkcasestring("");
-    casestring properties = mkcasestring("");
+    casestring A_name = mkcasestring("");
+    casestring A_properties = mkcasestring("");
   }
 ;
 
@@ -346,10 +319,9 @@ tCorrelation:
   {
     integer id;
 
-    // attributes
-    casestring set = mkcasestring("");
-    casestring initiate = mkcasestring("");
-    casestring pattern = mkcasestring("");
+    casestring A_set = mkcasestring("");
+    casestring A_initiate = mkcasestring("");
+    casestring A_pattern = mkcasestring("");
   }
 ;
 
@@ -361,15 +333,13 @@ tCorrelation:
 tEmpty:
   Empty(standardElements)
   {
-    integer negativeControlFlow;
     integer id;
+    integer negativeControlFlow;
+    bool suppressJF = false;
 
-    // attributes
-    casestring name = mkcasestring("");
-    casestring joinCondition = mkcasestring("");
-    casestring suppressJoinFailure = mkcasestring("");
-
-    bool suppressJF = false; // required initialization!
+    casestring A_name = mkcasestring("");
+    casestring A_joinCondition = mkcasestring("");
+    casestring A_suppressJoinFailure = mkcasestring("");
   }
 ;
 
@@ -381,23 +351,19 @@ tEmpty:
 tInvoke:
   Invoke(standardElements tCorrelation_list)
   {
-    /// additional attribute for DPE
-    integer dpe = mkinteger(0);
-
-    integer negativeControlFlow;
     integer id;
+    integer dpe = mkinteger(0);
+    integer negativeControlFlow;
+    bool suppressJF = false;
 
-    // attributes
-    casestring name = mkcasestring("");
-    casestring joinCondition = mkcasestring("");
-    casestring suppressJoinFailure = mkcasestring("");
-    casestring partnerLink = mkcasestring("");
-    casestring portType = mkcasestring("");
-    casestring operation = mkcasestring("");
-    casestring inputVariable = mkcasestring("");
-    casestring outputVariable = mkcasestring("");    
-
-    bool suppressJF = false; // required initialization!
+    casestring A_name = mkcasestring("");
+    casestring A_joinCondition = mkcasestring("");
+    casestring A_suppressJoinFailure = mkcasestring("");
+    casestring A_partnerLink = mkcasestring("");
+    casestring A_portType = mkcasestring("");
+    casestring A_operation = mkcasestring("");
+    casestring A_inputVariable = mkcasestring("");
+    casestring A_outputVariable = mkcasestring("");    
   }
 ;
 
@@ -409,20 +375,18 @@ tInvoke:
 tReceive:
   Receive(standardElements tCorrelation_list)
   {
-    integer negativeControlFlow;
     integer id;
+    integer negativeControlFlow;
+    bool suppressJF = false;
 
-    // attributes
-    casestring name = mkcasestring("");
-    casestring joinCondition = mkcasestring("");
-    casestring suppressJoinFailure = mkcasestring("");
-    casestring partnerLink = mkcasestring("");
-    casestring portType = mkcasestring("");
-    casestring operation = mkcasestring("");
-    casestring variable = mkcasestring("");
-    casestring createInstance = mkcasestring("");
-
-    bool suppressJF = false; // required initialization!
+    casestring A_name = mkcasestring("");
+    casestring A_joinCondition = mkcasestring("")
+    casestring A_suppressJoinFailure = mkcasestring("");
+    casestring A_partnerLink = mkcasestring("");
+    casestring A_portType = mkcasestring("");
+    casestring A_operation = mkcasestring("");
+    casestring A_variable = mkcasestring("");
+    casestring A_createInstance = mkcasestring("");
   }
 ;
 
@@ -434,20 +398,18 @@ tReceive:
 tReply:
   Reply(standardElements tCorrelation_list)
   {
-    integer negativeControlFlow;
     integer id;
+    integer negativeControlFlow;
+    bool suppressJF = false;
 
-    // attributes
-    casestring name = mkcasestring("");
-    casestring joinCondition = mkcasestring("");
-    casestring suppressJoinFailure = mkcasestring("");
-    casestring partnerLink = mkcasestring("");
-    casestring portType = mkcasestring("");
-    casestring operation = mkcasestring("");
-    casestring variable = mkcasestring("");
-    casestring faultName = mkcasestring("");
-
-    bool suppressJF = false; // required initialization!
+    casestring A_name = mkcasestring("");
+    casestring A_joinCondition = mkcasestring("");
+    casestring A_suppressJoinFailure = mkcasestring("");
+    casestring A_partnerLink = mkcasestring("");
+    casestring A_portType = mkcasestring("");
+    casestring A_operation = mkcasestring("");
+    casestring A_variable = mkcasestring("");
+    casestring A_faultName = mkcasestring("");
   }
 ;
 
@@ -459,15 +421,13 @@ tReply:
 tAssign:
   Assign(standardElements tCopy_list)
   {
-    integer negativeControlFlow;
     integer id;
+    integer negativeControlFlow;
+    bool suppressJF = false;
 
-    // attributes
-    casestring name = mkcasestring("");
-    casestring joinCondition = mkcasestring("");
-    casestring suppressJoinFailure = mkcasestring("");
-
-    bool suppressJF = false; // required initialization!
+    casestring A_name = mkcasestring("");
+    casestring A_joinCondition = mkcasestring("");
+    casestring A_suppressJoinFailure = mkcasestring("");
   }
 ;
 
@@ -484,18 +444,14 @@ tFrom:
   {
     integer id;
 
-    // attributes
-    casestring name = mkcasestring("");
-    casestring joinCondition = mkcasestring("");
-    casestring suppressJoinFailure = mkcasestring("");
-    casestring variable = mkcasestring("");
-    casestring part = mkcasestring("");
-    casestring partnerLink = mkcasestring("");
-    casestring endpointReference = mkcasestring("");
-    casestring property = mkcasestring("");
-    casestring expression = mkcasestring("");
-
     casestring literal = mkcasestring("");
+
+    casestring A_variable = mkcasestring("");
+    casestring A_part = mkcasestring("");
+    casestring A_partnerLink = mkcasestring("");
+    casestring A_endpointReference = mkcasestring("");
+    casestring A_property = mkcasestring("");
+    casestring A_expression = mkcasestring("");
   }
 ;
 
@@ -504,14 +460,10 @@ tTo:
   {
     integer id;
 
-    // attributes
-    casestring name = mkcasestring("");
-    casestring joinCondition = mkcasestring("");
-    casestring suppressJoinFailure = mkcasestring("");
-    casestring variable = mkcasestring("");
-    casestring part = mkcasestring("");
-    casestring partnerLink = mkcasestring("");
-    casestring property = mkcasestring("");
+    casestring A_variable = mkcasestring("");
+    casestring A_part = mkcasestring("");
+    casestring A_partnerLink = mkcasestring("");
+    casestring A_property = mkcasestring("");
   }
 ;
 
@@ -524,17 +476,15 @@ tWait:
   WaitFor(standardElements)
 | WaitUntil(standardElements)
   {
-    integer negativeControlFlow;
     integer id;
+    integer negativeControlFlow;
+    bool suppressJF = false;
 
-    // attributes
-    casestring name = mkcasestring("");
-    casestring joinCondition = mkcasestring("");
-    casestring suppressJoinFailure = mkcasestring("");
-    casestring For = mkcasestring("");
-    casestring until = mkcasestring("");
-
-    bool suppressJF = false; // required initialization!
+    casestring A_name = mkcasestring("");
+    casestring A_joinCondition = mkcasestring("");
+    casestring A_suppressJoinFailure = mkcasestring("");
+    casestring A_for = mkcasestring("");
+    casestring A_until = mkcasestring("");
   }
 ;
 
@@ -546,17 +496,15 @@ tWait:
 tThrow:
   Throw(standardElements)
   {
-    integer negativeControlFlow;
     integer id;
+    integer negativeControlFlow;
+    bool suppressJF = false;
 
-    // attributes
-    casestring name = mkcasestring("");
-    casestring joinCondition = mkcasestring("");
-    casestring suppressJoinFailure = mkcasestring("");
-    casestring faultName = mkcasestring("");
-    casestring faultVariable = mkcasestring("");
-
-    bool suppressJF = false; // required initialization!
+    casestring A_name = mkcasestring("");
+    casestring A_joinCondition = mkcasestring("");
+    casestring A_suppressJoinFailure = mkcasestring("");
+    casestring A_faultName = mkcasestring("");
+    casestring A_faultVariable = mkcasestring("");
   }
 ;
 
@@ -568,18 +516,16 @@ tThrow:
 tCompensate:
   Compensate(standardElements)
   {
-    /// additional attribute used to identify the correct pattern
+    integer id;
+    integer negativeControlFlow;
+    bool suppressJF = false;
+
     bool inFaultHandler = true;
     
-    integer negativeControlFlow;
-    integer id;
-
-    // attributes
-    casestring name = mkcasestring("");
-    casestring joinCondition = mkcasestring("");
-    casestring suppressJoinFailure = mkcasestring("");
-
-    bool suppressJF = false; // required initialization!
+    casestring A_name = mkcasestring("");
+    casestring A_joinCondition = mkcasestring("");
+    casestring A_suppressJoinFailure = mkcasestring("");
+    casestring A_scope = mkcasestring("");
   }
 ;
 
@@ -591,15 +537,13 @@ tCompensate:
 tTerminate:
   Terminate(standardElements)
   {
-    integer negativeControlFlow;
     integer id;
+    integer negativeControlFlow;
+    bool suppressJF = false;
 
-    // attributes
-    casestring name = mkcasestring("");
-    casestring joinCondition = mkcasestring("");
-    casestring suppressJoinFailure = mkcasestring("");
-
-    bool suppressJF = false; // required initialization!
+    casestring A_name = mkcasestring("");
+    casestring A_joinCondition = mkcasestring("");
+    casestring A_suppressJoinFailure = mkcasestring("");
   }
 ;
 
@@ -611,26 +555,19 @@ tTerminate:
 tFlow:
   Flow(standardElements tLink_list activity_list)
   {
-    /// additional attribute for DPE
-    integer dpe = mkinteger(0);
-
-    integer negativeControlFlow;
     integer id;
+    integer dpe = mkinteger(0);
+    integer negativeControlFlow;
+    bool suppressJF = false;
 
-    // attributes
-    casestring name = mkcasestring("");
-    casestring joinCondition = mkcasestring("");
-    casestring suppressJoinFailure = mkcasestring("");
-
-    bool suppressJF = false; // required initialization!
+    casestring A_name = mkcasestring("");
+    casestring A_joinCondition = mkcasestring("");
+    casestring A_suppressJoinFailure = mkcasestring("");
   }
 ;
 
 activity_list:
   list activity 
-  {
-    integer dpe = mkinteger(0);
-  }
 ;
 
 tLink_list:
@@ -642,8 +579,7 @@ tLink:
   {
     integer id;
 
-    // attribute
-    casestring name = mkcasestring("");
+    casestring A_name = mkcasestring("");
   }
 ;
 
@@ -655,25 +591,20 @@ tLink:
 tSwitch:
   Switch(standardElements tCase_list tOtherwise)
   {
-    /// additional attribute for DPE
-    integer dpe = mkinteger(0);
-
-    integer negativeControlFlow;
     integer id;
+    integer dpe = mkinteger(0);
+    integer negativeControlFlow;
+    bool suppressJF = false;
 
-    // attributes
-    casestring name = mkcasestring("");
-    casestring joinCondition = mkcasestring("");
-    casestring suppressJoinFailure = mkcasestring("");
-
-    bool suppressJF = false; // required initialization!
+    casestring A_name = mkcasestring("");
+    casestring A_joinCondition = mkcasestring("");
+    casestring A_suppressJoinFailure = mkcasestring("");
   }
 ;
 
 tCase_list:
   list tCase
   {
-    /// additional attribute for DPE
     integer dpe = mkinteger(0);
   }
 ;
@@ -681,22 +612,18 @@ tCase_list:
 tCase:
   Case(activity)
   {
-    /// additional attribute for DPE
+    integer id;
     integer dpe = mkinteger(0);
     
-    integer id;
-
-    // attribute
-    casestring condition = mkcasestring("");
+    casestring A_condition = mkcasestring("");
   }
 ;
 
 tOtherwise:
   Otherwise(activity)
   {
-    /// additional attribute for DPE
-    integer dpe = mkinteger(0);
     integer id;
+    integer dpe = mkinteger(0);
   }
 ;
 
@@ -708,16 +635,14 @@ tOtherwise:
 tWhile:
   While(standardElements activity)
   {
-    integer negativeControlFlow;
     integer id;
+    integer negativeControlFlow;
+    bool suppressJF = false;
 
-    // attributes
-    casestring name = mkcasestring("");
-    casestring joinCondition = mkcasestring("");
-    casestring suppressJoinFailure = mkcasestring("");
-    casestring condition = mkcasestring("");
-
-    bool suppressJF = false; // required initialization!
+    casestring A_name = mkcasestring("");
+    casestring A_joinCondition = mkcasestring("");
+    casestring A_suppressJoinFailure = mkcasestring("");
+    casestring A_condition = mkcasestring("");
   }
 ;
 
@@ -729,18 +654,14 @@ tWhile:
 tSequence:
   Sequence(standardElements activity_list)
   {
-    integer negativeControlFlow;
     integer id;
-
-    /// additional attribute for DPE
     integer dpe = mkinteger(0);
+    integer negativeControlFlow;
+    bool suppressJF = false;
 
-    // attributes
-    casestring name = mkcasestring("");
-    casestring joinCondition = mkcasestring("");
-    casestring suppressJoinFailure = mkcasestring("");
-
-    bool suppressJF = false; // required initialization!
+    casestring A_name = mkcasestring("");
+    casestring A_joinCondition = mkcasestring("");
+    casestring A_suppressJoinFailure = mkcasestring("");
   }
 ;
 
@@ -752,19 +673,15 @@ tSequence:
 tPick:
   Pick(standardElements tOnMessage_list tOnAlarm_list)
   {
-    /// additional attribute for DPE
-    integer dpe = mkinteger(0);
-
-    integer negativeControlFlow;
     integer id;
+    integer dpe = mkinteger(0);
+    integer negativeControlFlow;
+    bool suppressJF = false;
 
-    // attributes
-    casestring name = mkcasestring("");
-    casestring joinCondition = mkcasestring("");
-    casestring suppressJoinFailure = mkcasestring("");
-    casestring createInstance = mkcasestring("");
-
-    bool suppressJF = false; // required initialization!
+    casestring A_name = mkcasestring("");
+    casestring A_joinCondition = mkcasestring("");
+    casestring A_suppressJoinFailure = mkcasestring("");
+    casestring A_createInstance = mkcasestring("");
   }
 ;
 
@@ -784,22 +701,17 @@ tScope:
       activity
       )
   {
-    integer negativeControlFlow;
     integer id;
+    integer dpe = mkinteger(0);
+    integer negativeControlFlow;
+    bool suppressJF = false;
 
-    /// additional attribute used for inter-scope communication (push-places)
     integer parentScopeId;
 
-    /// additional attribute for DPE
-    integer dpe = mkinteger(0);
-
-    // attributes
-    casestring name = mkcasestring("");
-    casestring joinCondition = mkcasestring("");
-    casestring suppressJoinFailure = mkcasestring("");
-    casestring variableAccessSerializable = mkcasestring("");
-
-    bool suppressJF = false; // required initialization!
+    casestring A_name = mkcasestring("");
+    casestring A_joinCondition = mkcasestring("");
+    casestring A_suppressJoinFailure = mkcasestring("");
+    casestring A_variableAccessSerializable = mkcasestring("");
   }
 ;
 
@@ -812,16 +724,11 @@ tScope:
 standardElements:
   StandardElements(tTarget_list tSource_list joinCondition)
   {
-    integer parentId;
-    casestring suppressJoinFailure = mkcasestring(""); // actually a value of the parent
-
-    /// additional attribute for DPE
     integer dpe = mkinteger(0);
-
-    /// used here to create the patterns
     integer negativeControlFlow;
+    bool suppressJF = false;
 
-    bool suppressJF = false; // required initialization!
+    integer parentId;
     bool hasTarget = false;
   }
 ;
@@ -836,20 +743,16 @@ tTarget_list:
 tTarget:
   Target()
   {
-    /// used here to create the patterns
+    integer id;
     integer negativeControlFlow;
     
-    integer id;
-
-    // attributes
-    casestring linkName = mkcasestring("");
+    casestring A_linkName = mkcasestring("");
   }
 ;
 
 tSource_list:
   list tSource
   {
-    /// additional attribute for DPE
     integer dpe = mkinteger(0);
   }
 ;
@@ -857,18 +760,13 @@ tSource_list:
 tSource:
   Source()
   {
-    /// additional attribute for DPE
+    integer id;
     integer dpe = mkinteger(0);
-
-    /// used here to create the patterns
     integer negativeControlFlow;
 
-    integer id;
-
-    // attributes
-    casestring linkName = mkcasestring("");
-    casestring transitionCondition = mkcasestring("");
-    casestring variableAccessSerializable = mkcasestring("");
+    casestring A_linkName = mkcasestring("");
+    casestring A_transitionCondition = mkcasestring("");
+    casestring A_variableAccessSerializable = mkcasestring("");
   }
 ;
 

@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/07/06 09:11:50 $
+ *          - last changed: \$Date: 2006/07/06 11:46:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.192 $
+ * \version \$Revision: 1.193 $
  * 
  */
 %}
@@ -688,7 +688,6 @@ tCatch:
 
       $$ = Catch($6);
       $$->id = $2;
-      $$->faultName = att.read($3, "faultName");
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_CATCH);
@@ -884,8 +883,6 @@ tOnAlarm:
   activity X_NEXT X_SLASH K_ONALARM 
     { $$ = OnAlarm($6);
       $$->id = $2;
-      $$->For = att.read($3, "for");  // "for" is a keyword
-      $$->until = att.read($3, "until");
       $$->dpe = symMan.needsDPE();
 
       // collect source links for new DPE
@@ -1090,7 +1087,7 @@ genSymTabEntry_Empty:
 tInvoke:
   K_INVOKE genSymTabEntry_Invoke 
   arbitraryAttributes 
-    { symTab.checkAttributes($2); //att.check($3, K_INVOKE);
+    { //symTab.checkAttributes($2); //att.check($3, K_INVOKE);
 //NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
 //NL      {
 //NL      	/// parent BPEL-element attribute value
@@ -1291,7 +1288,7 @@ tInvoke:
 | K_INVOKE genSymTabEntry_Invoke 
   arbitraryAttributes 
     { 
-      symTab.checkAttributes($2); //att.check($3, K_INVOKE);
+      //symTab.checkAttributes($2); //att.check($3, K_INVOKE);
 //NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
 //NL      {
 //NL      	/// parent BPEL-element attribute value

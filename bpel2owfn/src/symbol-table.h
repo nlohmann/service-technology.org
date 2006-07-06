@@ -25,7 +25,7 @@
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created:
@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.43 $: 
+ * \version \$Revision: 1.44 $: 
  *
  */
 
@@ -713,7 +713,7 @@ class STPartnerLink: public STElement, public SymbolTableEntry
     virtual ~STPartnerLink();
     
     /// is partnerLink group by <partners> or not
-    bool isInPartners;
+//    bool isInPartners;
 };
 
 /**

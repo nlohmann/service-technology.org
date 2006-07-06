@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/07/06 13:18:06 $
+ *          - last changed: \$Date: 2006/07/06 14:20:00 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  */
 %}
 
@@ -149,7 +149,15 @@ PartnerLink() ->
 ******************************************************************************/
 
 Partner(a) ->
-  [postprocessing: a]
+  [postprocessing:
+    {
+      foreach(partner; tPartnerLink_list a)
+      {
+        partner->inPartners = true;
+      }
+    }
+    a
+  ]
 ;
 
 

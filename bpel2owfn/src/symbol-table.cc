@@ -1752,11 +1752,11 @@ void SymbolTable::checkAttributes(unsigned int entryKey)
         printErrorMsg("attribute " + A__NAME + "=\"" + T__NCNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
       // important for case 1
-      else if((((STPartnerLink*)symTab[entryKey])->isInPartners == false) && !partnerLinkTypeFlag)
+/*      else if((((STPartnerLink*)symTab[entryKey])->isInPartners == false) && !partnerLinkTypeFlag)
       {
         printErrorMsg("attribute " + A__PARTNER_LINK_TYPE + "=\"" + T__QNAME + "\" is missing", (dynamic_cast< STElement *>(lookup(entryKey)))->line );        
       }
-      
+  */    
     }
     break;    
       

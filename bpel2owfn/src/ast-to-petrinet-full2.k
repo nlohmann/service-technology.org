@@ -53,7 +53,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/07/05 15:42:44 $
+ *          - last changed: \$Date: 2006/07/06 15:49:05 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  */
 %}
 
@@ -1578,7 +1578,8 @@ This=Scope(a,b,c,d,e,f,g) ->
       // If the process has an event handler several places and transitions
       // have to be added to embed it. If the process lacks an event handler
       // some places can be merged.
-      if (myself->hasEventHandler)
+//      if (myself->hasEventHandler)
+      if (This->hasEH)
       {
 	Place *p25 = TheNet->newPlace(prefix + "p25");
 	Place *p26 = TheNet->newPlace(prefix + "p26");
@@ -1680,7 +1681,8 @@ This=Scope(a,b,c,d,e,f,g) ->
 
 
       // If present, embed the event handler of the scope.
-      if (myself->hasEventHandler)
+//      if (myself->hasEventHandler)
+      if (This->hasEH)
       {
 	TheNet->mergePlaces(prefix + "p25", prefix2 + "eventHandler.initial");
 	TheNet->mergePlaces(prefix + "p26", prefix2 + "eventHandler.finish");

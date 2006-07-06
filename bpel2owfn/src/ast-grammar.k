@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/07/06 14:19:59 $
+ *          - last changed: \$Date: 2006/07/06 15:49:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.88 $
+ * \version \$Revision: 1.89 $
  */
 %}
 
@@ -75,6 +75,7 @@ tProcess:
   {
     integer id;
     bool suppressJF = false;
+    bool hasEH = false;
 
     casestring A_name = mkcasestring("");
     casestring A_targetNamespace = mkcasestring("");
@@ -710,6 +711,7 @@ tScope:
     integer dpe = mkinteger(0);
     integer negativeControlFlow;
     bool suppressJF = false;
+    bool hasEH = false;
 
     integer parentScopeId;
 

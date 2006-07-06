@@ -218,7 +218,7 @@ void SymbolTable::printSTEnvelope(SymbolTableEntry* entry) {
 
   traceSTwp(vertical); traceSTwp(smallHorizontal + "<STEnvelope>"); traceSTwp("\n");	  
   traceSTwp(vertical); traceSTwp("hasEnventHandler=");
-  if((e->hasEventHandler == true) || (e->hasEventHandler == false)) {
+/*  if((e->hasEventHandler == true) || (e->hasEventHandler == false)) {
   	if(e->hasEventHandler == true) {
   	  traceSTwp("true");	
   	}
@@ -230,6 +230,7 @@ void SymbolTable::printSTEnvelope(SymbolTableEntry* entry) {
   	  traceSTwp("undefined");
   }  	  
   traceSTwp("\n");
+  */
 }
 
 /*!

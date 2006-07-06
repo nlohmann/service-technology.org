@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.44 $: 
+ * \version \$Revision: 1.45 $: 
  *
  */
 
@@ -497,7 +497,7 @@ class STEnvelope
     STEventHandlers* eventHandler;
 
     /// true if scope had an event handler?
-    bool hasEventHandler;    
+//    bool hasEventHandler;    
 
     virtual ~STEnvelope();
 };

@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/07/06 15:15:36 $
+ *          - last changed: \$Date: 2006/07/06 15:49:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  */
 %}
 
@@ -57,10 +57,11 @@
 %{ KC_UNPARSE
 /* These lines are from bpel-unparse-ast.k */
 #include <iostream>
+#include <map>
 #include "bpel-unparse-tools.h"
 #include "ast-printers.h"
-#include <map>
 #include "ast-details.h"
+#include "symbol-table.h"
 
 using namespace std;
 
@@ -93,6 +94,9 @@ Process(a,b,c,d,e,f,g,h,i) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
+      $0->hasEH = (string(g->op_name()) == "userDefinedEventHandler");
+//      STProcess* myself = dynamic_cast<STProcess*> (symTab.lookup($0->id));
+//      assert($0->hasEH == myself->hasEventHandler);
 
       // copy attributes to AST
       $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());
@@ -1099,6 +1103,10 @@ Scope(a,b,c,d,e,f,g) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       PPcurrentScope = myid;
+
+      $0->hasEH = (string(e->op_name()) == "userDefinedEventHandler");
+//      STScope* myself = dynamic_cast<STScope*> (symTab.lookup($0->id));
+//      assert($0->hasEH == myself->hasEventHandler);
 
       // copy attributes to AST
       $0->A_name = mkcasestring(ASTEmap[myid]->attributes["name"].c_str());

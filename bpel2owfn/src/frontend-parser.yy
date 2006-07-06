@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/07/06 14:19:59 $
+ *          - last changed: \$Date: 2006/07/06 14:52:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.195 $
+ * \version \$Revision: 1.196 $
  * 
  */
 %}
@@ -580,15 +580,9 @@ tPartner_list:
 ;
 
 tPartner:
-  K_PARTNER genSymTabEntry_Partner arbitraryAttributes X_NEXT 
+  K_PARTNER genSymTabEntry_Partner arbitraryAttributes X_NEXT tPartnerLink_list X_SLASH K_PARTNER
     {
-//      STPartner *stPartner = dynamic_cast<STPartner*> (symTab.lookup($2));
-//      assert (stPartner != NULL);
-//      currentPartner = stPartner;
-    }
-  tPartnerLink_list X_SLASH K_PARTNER
-    {
-      $$ = Partner($6);
+      $$ = Partner($5);
       $$->id = $2;
     }
 | K_PARTNER genSymTabEntry_Partner arbitraryAttributes X_SLASH
@@ -599,9 +593,8 @@ tPartner:
 ;
 
 genSymTabEntry_Partner:
-  { currentSymTabEntryKey = symTab.insert(K_PARTNER);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_PARTNER);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 /******************************************************************************
@@ -643,9 +636,8 @@ tFaultHandlers:
 ;
 
 genSymTabEntry_FaultHandlers:
-  { currentSymTabEntryKey = symTab.insert(K_FAULTHANDLERS);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_FAULTHANDLERS);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 tCatch_list:
@@ -659,15 +651,12 @@ tCatch:
   K_CATCH genSymTabEntry_Catch
   arbitraryAttributes X_NEXT 
     {
-      // symTab.checkAttributes($2);
       STCatch *stCatch = dynamic_cast<STCatch*> (symTab.lookup($2));
       assert (stCatch != NULL);
-
       stCatch->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "faultVariable"), symTab.readAttribute($2, "faultVariable")->line, currentSTScope, true);
     }
   activity X_NEXT X_SLASH K_CATCH
     { 
-
       $$ = Catch($6);
       $$->id = $2;
 
@@ -677,16 +666,15 @@ tCatch:
 ;
 
 genSymTabEntry_Catch:
-  { currentSymTabEntryKey = symTab.insert(K_CATCH);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_CATCH);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 tCatchAll:
   /* empty */
     { $$ = NoCatchAll(); }
-| K_CATCHALL genSymTabEntry_CatchAll
-  arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CATCHALL X_NEXT
+| K_CATCHALL genSymTabEntry_CatchAll arbitraryAttributes X_NEXT
+  activity X_NEXT X_SLASH K_CATCHALL X_NEXT
     {
       $$ = CatchAll($5);
       $$->id = $2;      
@@ -697,9 +685,8 @@ tCatchAll:
 ;
 
 genSymTabEntry_CatchAll:
-  { currentSymTabEntryKey = symTab.insert(K_CATCHALL);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_CATCHALL);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 /******************************************************************************
@@ -756,9 +743,8 @@ tCompensationHandler:
 ;
 
 genSymTabEntry_CompensationHandler:
-  { currentSymTabEntryKey = symTab.insert(K_COMPENSATIONHANDLER);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_COMPENSATIONHANDLER);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 /******************************************************************************
@@ -776,9 +762,7 @@ tEventHandlers:
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_EVENTHANDLERS);
 }
 | K_EVENTHANDLERS genSymTabEntry_EventHandlers X_NEXT 
-    {
-      symMan.startDPEinWhile();
-    }
+    { symMan.startDPEinWhile(); }
   tOnMessage_list 
   tOnAlarm_list 
   X_SLASH K_EVENTHANDLERS X_NEXT
@@ -801,23 +785,19 @@ genSymTabEntry_EventHandlers:
 tOnMessage_list:
   /* empty */
     { $$ = NiltOnMessage_list(); 
-      $$->dpe = kc::mkinteger(0);
-    }
+      $$->dpe = kc::mkinteger(0); }
 | tOnMessage X_NEXT tOnMessage_list
     { $$ = ConstOnMessage_list($1, $3); 
-      $$->dpe = kc::mkinteger($1->dpe->value + $3->dpe->value);
-    }
+      $$->dpe = kc::mkinteger($1->dpe->value + $3->dpe->value); }
 ;
 
 tOnAlarm_list:
   /* empty */
     { $$ = NiltOnAlarm_list(); 
-      $$->dpe = kc::mkinteger(0);
-    }
+      $$->dpe = kc::mkinteger(0); }
 | tOnAlarm X_NEXT tOnAlarm_list
     { $$ = ConstOnAlarm_list($1, $3); 
-      $$->dpe = kc::mkinteger($1->dpe->value + $3->dpe->value);
-    }
+      $$->dpe = kc::mkinteger($1->dpe->value + $3->dpe->value); }
 ;
 
 tOnMessage:
@@ -826,22 +806,20 @@ tOnMessage:
     { // symTab.checkAttributes($2);
       symMan.resetDPEend(); }
   tCorrelations activity X_NEXT X_SLASH K_ONMESSAGE
-    { $$ = OnMessage($7);
-      $$->id = $2;    
-
+    {
       STOnMessage *stOnMessage = dynamic_cast<STOnMessage *> (symTab.lookup($2));
       assert(stOnMessage != NULL);
-
       stOnMessage->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line, currentSTScope);
       stOnMessage->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
       stOnMessage->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
 								 symTab.readAttributeValue($2, "operation"), 
 								 symTab.readAttributeValue($2, "partnerLink")),
 								 true);
-      $$->dpe = symMan.needsDPE();
-
-      // collect source links for new DPE
       stOnMessage->processLinks($7->id->value, currentSymTabEntryKey);
+
+      $$ = OnMessage($7);
+      $$->id = $2;
+      $$->dpe = symMan.needsDPE();
     }
 ;
 
@@ -855,10 +833,7 @@ genSymTabEntry_OnMessage:
 tOnAlarm:
   K_ONALARM genSymTabEntry_OnAlarm
   arbitraryAttributes X_NEXT 
-    { // symTab.checkAttributes($2); //att.check($3, K_ONALARM);
-      
-      symMan.resetDPEend();
-    }
+    { symMan.resetDPEend(); }
   activity X_NEXT X_SLASH K_ONALARM 
     { $$ = OnAlarm($6);
       $$->id = $2;
@@ -866,6 +841,7 @@ tOnAlarm:
 
       // collect source links for new DPE
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
+      assert(branch != NULL);
       branch->processLinks($6->id->value, currentSymTabEntryKey);
     }
 ;
@@ -901,10 +877,10 @@ tVariable:
     {
       STVariable *stVar = dynamic_cast<STVariable *> (symTab.lookup(currentSymTabEntryKey));
       assert(stVar != NULL);
+      stVar->name = currentSTScope->addVariable(stVar);
 
       $$ = Variable();
       $$->id = $2;
-      stVar->name = currentSTScope->addVariable(stVar);
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_VARIABLE);
@@ -914,10 +890,10 @@ tVariable:
     {
       STVariable *stVar = dynamic_cast<STVariable *> (symTab.lookup(currentSymTabEntryKey));
       assert (stVar != NULL);
+      stVar->name = currentSTScope->addVariable(stVar);
 
       $$ = Variable();
       $$->id = $2;
-      stVar->name = currentSTScope->addVariable(stVar);
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_VARIABLE);
@@ -952,7 +928,7 @@ tCorrelationSet_list:
 tCorrelationSet:
   K_CORRELATIONSET genSymTabEntry_CorrelationSet
   arbitraryAttributes X_NEXT X_SLASH K_CORRELATIONSET
-    { // symTab.checkAttributes($2); //att.check($3, K_CORRELATIONSET);
+    {
       $$ = CorrelationSet();
       $$->id = $2;
 
@@ -961,7 +937,7 @@ tCorrelationSet:
     }
 | K_CORRELATIONSET genSymTabEntry_CorrelationSet
   arbitraryAttributes X_SLASH
-    { // symTab.checkAttributes($2); //att.check($3, K_CORRELATIONSET);
+    {
       $$ = CorrelationSet();
       $$->id = $2;
 
@@ -971,9 +947,8 @@ tCorrelationSet:
 ;
 
 genSymTabEntry_CorrelationSet:
-  { currentSymTabEntryKey = symTab.insert(K_CORRELATIONSET);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_CORRELATIONSET);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 
@@ -996,18 +971,16 @@ tCorrelation_list:
 ;
 
 tCorrelation:
-  K_CORRELATION genSymTabEntry_Correlation
-  arbitraryAttributes X_NEXT X_SLASH K_CORRELATION
-    { // symTab.checkAttributes($2);
+  K_CORRELATION genSymTabEntry_Correlation arbitraryAttributes X_NEXT X_SLASH K_CORRELATION
+    {
       $$ = Correlation();
       $$->id = $2;      
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_CORRELATION);
     }
-| K_CORRELATION genSymTabEntry_Correlation
-  arbitraryAttributes X_SLASH
-    { // symTab.checkAttributes($2);
+| K_CORRELATION genSymTabEntry_Correlation arbitraryAttributes X_SLASH
+    {
       $$ = Correlation();
       $$->id = $2;      
 
@@ -1106,12 +1079,12 @@ tInvoke:
 	currentScopeId = mkinteger(currentSymTabEntryKey);
 	
 	currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentSymTabEntryKey));
+        assert (currentSTScope != NULL);
 	currentSTScope->parentScopeId = parent[currentScopeId]->value;
 	(dynamic_cast<STScope *> (symTab.lookup(currentSTScope->parentScopeId)))->childScopes.push_back(currentSTScope);
 
 	STInvoke *stInvoke = dynamic_cast<STInvoke *> (symTab.lookup($2));
         assert (stInvoke != NULL);
-
 	stInvoke->inputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "inputVariable"), symTab.readAttribute($2, "inputVariable")->line, currentSTScope);
 	stInvoke->outputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "outputVariable"), symTab.readAttribute($2, "outputVariable")->line, currentSTScope);
 	stInvoke->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
@@ -1181,9 +1154,9 @@ tInvoke:
 
         currentScopeId = scope->parentScopeId = parent[$2];
         currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId->value));
+        assert(currentSTScope != NULL);
 
         $$ = activity(activityScope(scope));
-
         $$->id = scope->id;
 //NL        $$->negativeControlFlow = scope->negativeControlFlow;
 
@@ -1191,11 +1164,10 @@ tInvoke:
         ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)invoke, K_SCOPE);
 
 
-      // collect source links for new DPE
-      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
-      branch->processLinks($$->id->value, currentSymTabEntryKey);
-
-
+        // collect source links for new DPE
+        STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
+        assert(branch != NULL);
+        branch->processLinks($$->id->value, currentSymTabEntryKey);
       }
       else
       { 
@@ -1207,7 +1179,6 @@ tInvoke:
 
 	STInvoke *stInvoke = dynamic_cast<STInvoke *> (symTab.lookup($2));
         assert(stInvoke != NULL);
-
 	stInvoke->inputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "inputVariable"), symTab.readAttribute($2, "inputVariable")->line,currentSTScope);
 	stInvoke->outputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "outputVariable"), symTab.readAttribute($2, "outputVariable")->line,currentSTScope);
 	stInvoke->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
@@ -1254,7 +1225,8 @@ tInvoke:
 
 
 	// collect source links for new DPE
-      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
+        STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
+        assert (branch != NULL);
 	branch->processLinks($2->value, currentSymTabEntryKey);
       }    
     }
@@ -1280,7 +1252,6 @@ tInvoke:
 
       STInvoke *stInvoke = dynamic_cast<STInvoke *> (symTab.lookup($2));
       assert (stInvoke != NULL);
-
       stInvoke->inputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "inputVariable"), symTab.readAttribute($2, "inputVariable")->line,currentSTScope);
       stInvoke->outputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "outputVariable"), symTab.readAttribute($2, "outputVariable")->line,currentSTScope);
       stInvoke->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
@@ -1339,7 +1310,6 @@ tReceive:
     { 
       STReceive *stReceive = dynamic_cast<STReceive *> (symTab.lookup($2));
       assert(stReceive != NULL);
-
       stReceive->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stReceive->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
       stReceive->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
@@ -1366,7 +1336,6 @@ tReceive:
 
       STReceive *stReceive = dynamic_cast<STReceive *> (symTab.lookup($2));
       assert(stReceive != NULL);
-
       stReceive->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stReceive->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
       stReceive->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
@@ -1398,7 +1367,6 @@ tReply:
     {
       STReply *stReply = dynamic_cast<STReply*> (symTab.lookup($2));
       assert(stReply != NULL);
-
       stReply->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stReply->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
       stReply->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
@@ -1424,7 +1392,6 @@ tReply:
 
       STReply *stReply = dynamic_cast<STReply*> (symTab.lookup($2));
       assert (stReply != NULL);
-
       stReply->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stReply->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
       stReply->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2, "portType"), 
@@ -1490,7 +1457,6 @@ tFrom:
     {
       STFromTo *stFrom = dynamic_cast<STFromTo*> (symTab.lookup($2));
       assert (stFrom != NULL);
-
       stFrom->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stFrom->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
 
@@ -1504,7 +1470,6 @@ tFrom:
     {
       STFromTo *stFrom = dynamic_cast<STFromTo*> (symTab.lookup($2));
       assert (stFrom != NULL);
-
       stFrom->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stFrom->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
       stFrom->literal = $5->name;
@@ -1520,7 +1485,6 @@ tFrom:
     {
       STFromTo *stFrom = dynamic_cast<STFromTo*> (symTab.lookup($2));
       assert (stFrom != NULL);
-
       stFrom->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stFrom->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
 
@@ -1542,7 +1506,6 @@ tTo:
     {
       STFromTo *stTo = dynamic_cast<STFromTo*> (symTab.lookup($2));
       assert(stTo != NULL);
-
       stTo->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stTo->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
 
@@ -1556,7 +1519,6 @@ tTo:
     {
       STFromTo *stTo = dynamic_cast<STFromTo*> (symTab.lookup($2));
       assert (stTo != NULL);
-
       stTo->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
       stTo->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2, "partnerLink"));
 
@@ -1630,16 +1592,14 @@ tThrow:
     {
       STThrow *stThrow = dynamic_cast<STThrow*> (symTab.lookup($2));
       assert (stThrow != NULL);
-
       stThrow->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
-
-      $$ = Throw($5);
 
       if ($5->hasTarget)
 	symMan.remDPEstart();
       if ($5->dpe->value > 0)
         symMan.addDPEend();
 
+      $$ = Throw($5);
       $$->id = $5->parentId = $2;
 
       assert(ASTEmap[$$->id->value] == NULL);
@@ -1652,7 +1612,6 @@ tThrow:
 
       STThrow *stThrow = dynamic_cast<STThrow*> (symTab.lookup($2));
       assert (stThrow != NULL);
-
       stThrow->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2, "variable"), symTab.readAttribute($2, "variable")->line,currentSTScope);
 
       $$ = Throw(noLinks);
@@ -1677,7 +1636,7 @@ tCompensate:
   K_COMPENSATE genSymTabEntry_Compensate
   arbitraryAttributes
     { // symTab.checkAttributes($2); //att.check($3, K_COMPENSATE);
-
+/*
       // compensate only is allowed within Compensation- or FaultHandler
       if ( ! (isInCH.top().first || isInFH.top()) )
       {
@@ -1699,7 +1658,7 @@ tCompensate:
         }
         hasCompensate = 2;
       }
-
+*/
 //NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
 //NL      {
 //NL      	/// parent BPEL-element attribute value
@@ -1712,29 +1671,25 @@ tCompensate:
 //NL      }
     }   
   X_NEXT standardElements X_SLASH K_COMPENSATE
-    { $$ = Compensate($6);
+    {
 //NL      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //NL      att.popSJFStack(); symTab.popSJFStack();
       if ($6->hasTarget)
-      {
 	symMan.remDPEstart();
-      }
       if ($6->dpe->value > 0)
-      {
         symMan.addDPEend();
-      }
-//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-      $$->id = $6->parentId = $2;
 
+//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+
+      $$ = Compensate($6);
+      $$->id = $6->parentId = $2;
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_COMPENSATE);
-
-}
-| K_COMPENSATE genSymTabEntry_Compensate
-  arbitraryAttributes
+    }
+| K_COMPENSATE genSymTabEntry_Compensate arbitraryAttributes
     { // symTab.checkAttributes($2); //att.check($3, K_COMPENSATE);
-
+/*
       // compensate only is allowed within Compensation- or FaultHandler
       if ( ! (isInCH.top().first || isInFH.top()) )
       {
@@ -1756,7 +1711,7 @@ tCompensate:
         }
         hasCompensate = 2;
       }
-
+*/
 //NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
 //NL      {
 //NL      	/// parent BPEL-element attribute value
@@ -1769,17 +1724,18 @@ tCompensate:
 //NL      }
     }   
   X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
+    {
+      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       noLinks->parentId = $2;
-      $$ = Compensate(noLinks);
+
 //NL      att.popSJFStack(); symTab.popSJFStack();
 //NL      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
+      $$ = Compensate(noLinks);
       $$->id = $2;
-
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_COMPENSATE);
-}
+    }
 ;
 
 genSymTabEntry_Compensate:
@@ -1925,7 +1881,6 @@ tLink:
 
       STLink *stLink = dynamic_cast<STLink *> (symTab.lookup($2));
       assert (stLink != NULL);
-
       stLink->name = currentSTFlow->addLink(stLink);
 
       assert(ASTEmap[$$->id->value] == NULL);
@@ -1938,7 +1893,6 @@ tLink:
 
       STLink *stLink = dynamic_cast<STLink *> (symTab.lookup($2));
       assert (stLink != NULL);
-
       stLink->name = currentSTFlow->addLink(stLink);
 
       assert(ASTEmap[$$->id->value] == NULL);
@@ -2031,7 +1985,6 @@ tCase:
       // collect source links for new DPE
       STElement *branch = dynamic_cast<STElement *> (symTab.lookup($$->id->value));
       assert (branch != NULL);
-
       branch->processLinks($6->id->value, currentSymTabEntryKey);
 
       assert(ASTEmap[$$->id->value] == NULL);
@@ -2128,7 +2081,8 @@ tSequence:
   standardElements activity_list X_SLASH K_SEQUENCE
     {
       $$ = Sequence($5, $6);
-      $$->id = $5->parentId = $2; 
+      $$->id = $5->parentId = $2;
+
       $$->dpe = mkinteger((symMan.needsDPE())->value);
 
       if ($5->hasTarget)
@@ -2287,7 +2241,6 @@ tTarget:
 
       STSourceTarget *stTarget = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
       assert (stTarget != NULL);
-
       stTarget->link = currentSTFlow->checkLink(symTab.readAttributeValue($2, "linkName"), $2->value, false);
       stTarget->isSource = false;
       
@@ -2301,7 +2254,6 @@ tTarget:
 
       STSourceTarget *stTarget = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
       assert (stTarget != NULL);
-
       stTarget->link = currentSTFlow->checkLink(symTab.readAttributeValue($2, "linkName"), $2->value, false);
       stTarget->isSource = false;
 
@@ -2327,12 +2279,8 @@ tSource_list:
 tSource:
   K_SOURCE genSymTabEntry_Source arbitraryAttributes X_NEXT X_SLASH K_SOURCE
     {
-      $$ = Source();
-      $$->id = $2;      
-
       STSourceTarget *stSource = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
       assert (stSource != NULL);
-
       stSource->link = currentSTFlow->checkLink(symTab.readAttributeValue($2, "linkName"), $2->value, true);
       stSource->isSource = true;
       currentSTScope->addLink(stSource->link);
@@ -2340,6 +2288,9 @@ tSource:
       symMan.addDPEend();
       $$->dpe = symMan.needsDPE();
       symMan.remDPEend();
+
+      $$ = Source();
+      $$->id = $2;      
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_SOURCE);
@@ -2347,12 +2298,8 @@ tSource:
 | K_SOURCE genSymTabEntry_Source
   arbitraryAttributes X_SLASH
     {
-      $$ = Source();
-      $$->id = $2;      
-
       STSourceTarget *stSource = dynamic_cast<STSourceTarget *> (symTab.lookup($2));
       assert (stSource != NULL);
-
       stSource->link = currentSTFlow->checkLink(symTab.readAttributeValue($2, "linkName"), $2->value, true);
       stSource->isSource = true;
       currentSTScope->addLink(stSource->link);
@@ -2360,6 +2307,9 @@ tSource:
       symMan.addDPEend();
       $$->dpe = symMan.needsDPE();
       symMan.remDPEend();
+
+      $$ = Source();
+      $$->id = $2;      
 
       assert(ASTEmap[$$->id->value] == NULL);
       ASTEmap[$$->id->value] = new ASTE((kc::impl_activity*)$$, K_SOURCE);

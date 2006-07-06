@@ -18,10 +18,11 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/07/05 08:57:21 $ by $Author: nlohmann $.
-# Version $Revision: 1.6 $
+# File last changed $Date: 2006/07/06 14:52:34 $ by $Author: nlohmann $.
+# Version $Revision: 1.7 $
 
-TESTS = test1 test2 test3 #test4
+TESTS = test2 test3
+#TESTS = test1 test2 test3 test4
 
 TESTSUITE = syntax_test_suite/run_root_suite \
 	    syntax_test_suite/process/run_test_suite \

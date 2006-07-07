@@ -122,6 +122,96 @@ vertex * reachGraph::findVertexInSet(vertex * toAdd) {
 //! if we actually found a node matching the new one, we just create an edge between the current node
 //! and the node we have just found, the found one gets the current node as a predecessor node
 
+// for IG
+int reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) {
+    trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : start\n");
+
+    if (numberOfVertices == 0) {                // graph contains no nodes at all
+        root = toAdd;                           // the given node becomes the root node
+        currentVertex = root;
+        numberOfVertices++;
+
+        setOfVertices.insert(toAdd);
+    } else {
+        vertex * found = findVertexInSet(toAdd); //findVertex(toAdd);
+
+        char * label = new char[256];
+        char * actualMessage;
+        bool comma = false;
+
+        strcpy(label, "");
+
+        for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
+            if (comma) {
+                strcat(label, ", ");
+            }
+            actualMessage = new char[strlen(PN->Places[*iter]->name)];
+            strcpy(actualMessage, PN->Places[*iter]->name);
+            strcat(label, actualMessage);
+            comma = true;
+        }
+
+        if (found == NULL) {
+
+//            cout << "with event " << label << " (type " << type << " ):" << endl;
+            trace(TRACE_1, "\n\t new successor node computed:");
+
+            toAdd->setNumber(numberOfVertices++);
+
+            graphEdge * edgeSucc = new graphEdge(toAdd, label, type);
+            currentVertex->addSuccessorNode(edgeSucc);
+
+            reachGraphStateSet::iterator iter;                      // iterator over the stateList's elements
+
+            for (iter = currentVertex->getStateList()->setOfReachGraphStates.begin();
+                        iter != currentVertex->getStateList()->setOfReachGraphStates.end();
+                        iter++) {
+
+                if ((*iter)->state->type == DEADLOCK || (*iter)->state->type == FINALSTATE) {
+                    (*iter)->setEdge(edgeSucc);
+                }
+            }
+//            graphEdge * edgePred = new graphEdge(currentVertex, label, type);
+//            toAdd->addPredecessorNode(edgePred);
+
+            currentVertex = toAdd;
+            numberOfEdges++;
+
+            setOfVertices.insert(toAdd);
+
+            numberOfStatesAllNodes += toAdd->getStateList()->elementCount();
+
+            trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : end\n");
+
+            return 1;
+        } else {
+            trace(TRACE_1, "\t successor node already known: " + intToString(found->getNumber()) + "\n");
+
+            graphEdge * edgeSucc = new graphEdge(found, label, type);
+            currentVertex->addSuccessorNode(edgeSucc);
+
+            reachGraphStateSet::iterator iter;      // iterator over the stateList's elements
+
+            for (iter = currentVertex->getStateList()->setOfReachGraphStates.begin(); iter != currentVertex->getStateList()->setOfReachGraphStates.end(); iter++) {
+                if ((*iter)->state->type == DEADLOCK || (*iter)->state->type == FINALSTATE) {
+                    (*iter)->setEdge(edgeSucc);
+                }
+            }
+
+//            graphEdge * edgePred = new graphEdge(currentVertex, label, type);
+//            found->addPredecessorNode(edgePred);
+            numberOfEdges++;
+
+            delete toAdd;
+
+            trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : end\n");
+
+            return 0;
+        }
+    }
+}
+
+
 // for OG
 int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
 
@@ -144,7 +234,8 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
             edgeLabel = PN->Places[PN->outputPlacesArray[label]]->name;
         }
 
-        if (found == NULL) {
+        if (options[O_BDD] == true || found == NULL) {
+
 //            cout << "with event " << label << " (type " << type << " ):" << endl;
             trace(TRACE_1, "\n\t new successor node computed:");
             toAdd->setNumber(numberOfVertices++);
@@ -230,96 +321,6 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
             delete toAdd;
 
 			trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type): end\n");
-
-            return 0;
-        }
-    }
-}
-
-
-// for IG
-int reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) {
-    trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : start\n");
-
-    if (numberOfVertices == 0) {                // graph contains no nodes at all
-        root = toAdd;                           // the given node becomes the root node
-        currentVertex = root;
-        numberOfVertices++;
-
-        setOfVertices.insert(toAdd);
-    } else {
-        vertex * found = findVertexInSet(toAdd); //findVertex(toAdd);
-
-        char * label = new char[256];
-        char * actualMessage;
-        bool comma = false;
-
-        strcpy(label, "");
-
-        for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
-            if (comma) {
-                strcat(label, ", ");
-            }
-            actualMessage = new char[strlen(PN->Places[*iter]->name)];
-            strcpy(actualMessage, PN->Places[*iter]->name);
-            strcat(label, actualMessage);
-            comma = true;
-        }
-
-        if (found == NULL) {
-
-//            cout << "with event " << label << " (type " << type << " ):" << endl;
-            trace(TRACE_1, "\n\t new successor node computed:");
-
-            toAdd->setNumber(numberOfVertices++);
-
-            graphEdge * edgeSucc = new graphEdge(toAdd, label, type);
-            currentVertex->addSuccessorNode(edgeSucc);
-
-            reachGraphStateSet::iterator iter;                      // iterator over the stateList's elements
-
-            for (iter = currentVertex->getStateList()->setOfReachGraphStates.begin();
-                        iter != currentVertex->getStateList()->setOfReachGraphStates.end();
-                        iter++) {
-
-                if ((*iter)->state->type == DEADLOCK || (*iter)->state->type == FINALSTATE) {
-                    (*iter)->setEdge(edgeSucc);
-                }
-            }
-//            graphEdge * edgePred = new graphEdge(currentVertex, label, type);
-//            toAdd->addPredecessorNode(edgePred);
-
-            currentVertex = toAdd;
-            numberOfEdges++;
-
-            setOfVertices.insert(toAdd);
-
-            numberOfStatesAllNodes += toAdd->getStateList()->elementCount();
-
-            trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : end\n");
-
-            return 1;
-        } else {
-            trace(TRACE_1, "\t successor node already known: " + intToString(found->getNumber()) + "\n");
-
-            graphEdge * edgeSucc = new graphEdge(found, label, type);
-            currentVertex->addSuccessorNode(edgeSucc);
-
-            reachGraphStateSet::iterator iter;      // iterator over the stateList's elements
-
-            for (iter = currentVertex->getStateList()->setOfReachGraphStates.begin(); iter != currentVertex->getStateList()->setOfReachGraphStates.end(); iter++) {
-                if ((*iter)->state->type == DEADLOCK || (*iter)->state->type == FINALSTATE) {
-                    (*iter)->setEdge(edgeSucc);
-                }
-            }
-
-//            graphEdge * edgePred = new graphEdge(currentVertex, label, type);
-//            found->addPredecessorNode(edgePred);
-            numberOfEdges++;
-
-            delete toAdd;
-
-            trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : end\n");
 
             return 0;
         }
@@ -484,7 +485,8 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
                 	unsigned int * myMarking = new unsigned int [PN->getPlaceCnt()];
                 	(*iter)->state->decode(PN);
                 	
-                    os << "[" << PN->printCurrentMarkingForDot() << "]"; // << (*iter)->state;
+                    os << "[" << PN->printCurrentMarkingForDot() << "]";
+//                    os << "[" << PN->printCurrentMarkingForDot() << "]" << "(" << (*iter)->state << ")";
                 }
 //              os << "(";
                 if (v->getColor() != RED) {

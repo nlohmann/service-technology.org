@@ -442,7 +442,7 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
   	stateType type;
 	CurrentState = binSearch(this);
 	
-	if (CurrentState != NULL) {
+	if (options[O_BDD] == false && CurrentState != NULL) {
 		// marking already has a state -> put it (and all its successors) into the node
 		if (listOfStates->addElement(CurrentState, minimal)) {
 			addSuccStatesToList(listOfStates, CurrentState);
@@ -453,7 +453,10 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
 	
 	// the other case:
 	// we have a marking which has not yet a state object assigned to it
- 	CurrentState = binInsert(this);
+	if (CurrentState == NULL) {
+		CurrentState = binInsert(this);
+	}
+	
 	CurrentState->firelist = firelist();
 	CurrentState->CardFireList = CardFireList;
 	if (parameters[P_IG]) {

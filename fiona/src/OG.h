@@ -11,6 +11,7 @@
 #define OG_H_
 
 #include "reachGraph.h"
+#include "BddRepresentation.h" 
 
 #ifdef LOG_NEW
 #include "mynew.h"
@@ -34,6 +35,8 @@ class operatingGuidelines : public reachGraph {
     	 
     	bool terminateBuildingGraph(vertex * );
 		void convertToBdd();
+		
+		BddRepresentation * bdd;
 };
 
 

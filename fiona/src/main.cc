@@ -210,10 +210,15 @@ int main(int argc, char ** argv) {
         trace(TRACE_0, "    number of edges: " + intToString(graph->getNumberOfEdges()) + "\n");
 		trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
         
-        graph->printDotFile();
+        if (options[O_BDD] == false){
+        	graph->printDotFile();
+        	//graph->convertToBdd();
+        }
         
         if (options[O_BDD] == true){
-        	graph->convertToBdd();
+        	graph->bdd->reorder((Cudd_ReorderingType)bdd_reordermethod);
+        	graph->bdd->printDotFile();
+        	//graph->bdd->print();
         }
 
     } else {

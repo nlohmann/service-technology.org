@@ -18,11 +18,12 @@ typedef vector<bool>    BitVector;
 
 class BddRepresentation{
 	public:
-		BddRepresentation(vertex * v, int numberOfLabels, Cudd_ReorderingType heuristic = CUDD_REORDER_SAME);
+		BddRepresentation(vertex * v, int numberOfLabels, Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
 		~BddRepresentation();
 		
+		void BddRepresentation::addOrDeleteLeavingEdges(vertex* v);
 		void generateRepresentation(vertex* v, bool visitedNodes[]);
-		void reorder(Cudd_ReorderingType heuristic = CUDD_REORDER_SAME);
+		void reorder(Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
 		void print();
 		void printDotFile(char** names= NULL);
 		

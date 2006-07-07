@@ -21,11 +21,16 @@
 //! \param _PN
 //! \brief constructor
 operatingGuidelines::operatingGuidelines(oWFN * _PN) : reachGraph(_PN) {
+		//if (options[O_BDD] == true){
+		unsigned int nbrLabels = PN->placeInputCnt + PN->placeOutputCnt;
+		bdd = new BddRepresentation(root, nbrLabels, (Cudd_ReorderingType)bdd_reordermethod);
+	//}
 }
 
 //! \fn operatingGuidelines::~operatingGuidelines() 
 //! \brief destructor !to be implemented!
 operatingGuidelines::~operatingGuidelines() {
+	delete bdd;
 }
 
 //! \fn void operatingGuidelines::buildGraph()
@@ -192,6 +197,28 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	}
 
 	trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + "\n");
+
+	if (options[O_BDD] == true){
+		bdd->addOrDeleteLeavingEdges(currentNode);
+		
+		currentNode->resetIteratingSuccNodes();
+		
+		if (currentNode->getStateList()->setOfReachGraphStates.size() != 0){
+			 
+			graphEdge* element;
+			//cout << "currentNode: " << currentNode->getNumber() << "\tdelete node: ";
+			while((element = currentNode->getNextEdge()) != NULL){
+				vertex* vNext = element->getNode();
+				//cout << vNext->getNumber()<< "  ";
+				setOfVertices.erase(vNext); 
+				delete vNext; 
+			}
+			//cout << endl;
+		}
+		
+	}
+
+
 //
 //	if (currentNode->getColor() == RED) {
 //		trace(TRACE_1, "\t\t\t\t so it was deleted\n");
@@ -295,9 +322,9 @@ void operatingGuidelines::convertToBdd() {
     }
    
     unsigned int nbrLabels = PN->placeInputCnt + PN->placeOutputCnt;
-    BddRepresentation * bdd = new BddRepresentation(root, nbrLabels, (Cudd_ReorderingType)bdd_reordermethod); 
+    BddRepresentation * bdd = new BddRepresentation(root, nbrLabels); 
     bdd->generateRepresentation(tmp, visitedNodes);
-    bdd->reorder((Cudd_ReorderingType)bdd_reordermethod);
+    bdd->reorder();
     //bdd->print(); 
     bdd->printDotFile();
 }

@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/07/06 15:49:05 $
+ *          - last changed: \$Date: 2006/07/08 12:15:52 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.181 $
+ * \version \$Revision: 1.182 $
  *
  */
 %}
@@ -117,7 +117,7 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       header(This->id, true);
       STProcess* myself = dynamic_cast<STProcess*> (symTab.lookup(This->id));
 
-      string prefix = intToString(This->id->value) + ".internal.";
+      string prefix = intToString(This->id) + ".internal.";
       currentScope = prefix;
 
 
@@ -765,7 +765,7 @@ This=userDefinedFaultHandler(a,b) provided (This->inProcess) ->
     {
       foreach (catchBranch=Catch(innerActivity); tCatch_list a)
       {
-	string faultToCatch = catchBranch->A_faultName->name;
+	string faultToCatch = catchBranch->A_faultName;
 	Transition *t1 = TheNet->newTransition(prefix + "t1.internal." + faultToCatch);
 	Transition *t2 = TheNet->newTransition(prefix + "t2." + faultToCatch);
 
@@ -920,7 +920,7 @@ This=implicitFaultHandler() provided (This->inProcess) ->
 This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
   [petrinet:
     {
-      string prefix = intToString(This->parentScopeId->value) + ".internal.faultHandler.";
+      string prefix = intToString(This->parentScopeId) + ".internal.faultHandler.";
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<userDefinedFaultHandlerInsideScope scope=\"" + currentScope + "\">\n");
 
       Place *p3 =  TheNet->newPlace(prefix + "out");
@@ -1093,7 +1093,7 @@ This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
     {
       foreach (catchBranch=Catch(innerActivity); tCatch_list a)
       {
-	string faultToCatch = catchBranch->A_faultName->name;
+	string faultToCatch = catchBranch->A_faultName;
 
 	Transition *t1 = TheNet->newTransition(prefix + "t1.internal." + faultToCatch);
 	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
@@ -1152,7 +1152,7 @@ This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
 This=implicitFaultHandler() provided (!This->inProcess) ->
   [petrinet:
     {
-      string prefix = intToString(This->parentScopeId->value) + ".internal.faultHandler.";
+      string prefix = intToString(This->parentScopeId) + ".internal.faultHandler.";
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<implicitFaultHandlerInsideScope scope=\"" + currentScope + "\">\n");
 
       Place *p1 =  TheNet->newPlace(prefix + "ft");
@@ -1296,7 +1296,7 @@ This=userDefinedEventHandler(a,b) ->
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<eventHandler scope=\"" + currentScope + "\">\n");
 
-      string prefix = intToString(This->parentScopeId->value) + ".internal.eventHandler.";
+      string prefix = intToString(This->parentScopeId) + ".internal.eventHandler.";
       Place *p6  = TheNet->newPlace(prefix + "initial");
       Place *p8  = TheNet->newPlace(prefix + "final");
       Place *p13 = TheNet->newPlace(prefix + "finish");
@@ -1424,7 +1424,7 @@ This=userDefinedEventHandler(a,b) ->
 
 
 	if (parameters[P_NOSTANDARDFAULTS] == false)
-	  Transition *t1 = throwFault(onMessage_p2, onMessage_p1, "p2", prefix, mkinteger(0));
+	  Transition *t1 = throwFault(onMessage_p2, onMessage_p1, "p2", prefix, 0);
 
 	// arcs from the EH
 	TheNet->newArc(t11, onMessage_p7); // t11 in AEH is t13 in MEH
@@ -1531,7 +1531,7 @@ This=userDefinedEventHandler(a,b) ->
 This=implicitCompensationHandler() ->
   [petrinet:
     {
-      string prefix = intToString(This->parentScopeId->value) + ".internal.compensationHandler.";
+      string prefix = intToString(This->parentScopeId) + ".internal.compensationHandler.";
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<implicitCompensationHandler scope=\"" + currentScope + "\">\n");
 
       Place *p2  = TheNet->newPlace(prefix + "ch_in");
@@ -1556,7 +1556,7 @@ This=implicitCompensationHandler() ->
       {
 	Place *p1  = TheNet->newPlace(prefix + "p1");
 
-	Transition *t1 = throwFault(p2, p1, "ch_in", prefix, mkinteger(2));
+	Transition *t1 = throwFault(p2, p1, "ch_in", prefix, 2);
 	TheNet->newArc(p3, t1, READ);
 
 	Transition *t3 = TheNet->newTransition(prefix + "t3");
@@ -1662,7 +1662,7 @@ This=implicitCompensationHandler() ->
 This=userDefinedCompensationHandler(innerActivity) ->
   [petrinet:
     {
-      string prefix = intToString(This->parentScopeId->value) + ".internal.compensationHandler.";
+      string prefix = intToString(This->parentScopeId) + ".internal.compensationHandler.";
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<userDefinedCompensationHandler scope=\"" + currentScope + "\">\n");
       STScope * parentScope = dynamic_cast<STScope *>(symTab.lookup(This->parentScopeId));
 
@@ -1689,7 +1689,7 @@ This=userDefinedCompensationHandler(innerActivity) ->
       {
 	Place *p1  = TheNet->newPlace(prefix + "p1");
 
-	Transition *t1 = throwFault(p2, p1, "ch_in", prefix, mkinteger(2));
+	Transition *t1 = throwFault(p2, p1, "ch_in", prefix, 2);
 	TheNet->newArc(p3, t1, READ);
 
 	Transition *t3 = TheNet->newTransition(prefix + "t3");
@@ -1830,7 +1830,7 @@ This=userDefinedCompensationHandler(innerActivity) ->
 This=processCompensationHandler() ->
   [petrinet:
     {
-      string prefix = intToString(This->parentScopeId->value) + ".internal.compensationHandler.";
+      string prefix = intToString(This->parentScopeId) + ".internal.compensationHandler.";
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<processCompensationHandler>\n");
 
       Place *p2  = TheNet->newPlace(prefix + "ch_in");

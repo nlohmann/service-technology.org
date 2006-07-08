@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/07/02 17:39:36 $
+ *          - last changed: \$Date: 2006/07/08 12:15:53 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.131 $
+ * \version \$Revision: 1.132 $
  */
 
 
@@ -687,8 +687,8 @@ void PetriNet::mergePlaces(kc::impl_activity *act1, string role1,
   assert(act1 != NULL);
   assert(act2 != NULL);
 
-  mergePlaces(intToString(act1->id->value) + role1,
-	      intToString(act2->id->value) + role2);
+  mergePlaces(intToString(act1->id) + role1,
+	      intToString(act2->id) + role2);
 }
 
 
@@ -774,7 +774,7 @@ Place *PetriNet::findPlace(kc::impl_activity *activity, string role)
 {
   assert(activity != NULL);
 
-  return findPlace(intToString(activity->id->value) + role);
+  return findPlace(intToString(activity->id) + role);
 }
 
 

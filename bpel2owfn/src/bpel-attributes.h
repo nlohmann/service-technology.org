@@ -102,21 +102,21 @@ class SJFStackElement
   private:
 	
 	///
-	kc::integer elementId;
+	int elementId;
 	
 	///
 	kc::casestring sjfValue;
   
   public:
 	/// constructor
-	SJFStackElement(kc::integer elementId, kc::casestring value) {setElementId(elementId); setSJFValue(value);}
+	SJFStackElement(int elementId, kc::casestring value) {setElementId(elementId); setSJFValue(value);}
 	
 	///
-	void setElementId(kc::integer elementId);
+	void setElementId(int elementId);
 	void setSJFValue(kc::casestring value);
 	
 	///
-	kc::integer getElementId();
+	int getElementId();
 	kc::casestring getSJFValue();
 
 };
@@ -152,7 +152,7 @@ class attributeManager
     unsigned int nodeId;
 	
 	///
-	bool isAttributeValueEmpty(kc::integer elementId, std::string attributeName);
+	bool isAttributeValueEmpty(int elementId, std::string attributeName);
 	
 //NL	///
 //NL	void pushSJFStack(kc::integer elementId, kc::casestring attributeValue);
@@ -170,22 +170,22 @@ class attributeManager
 	void traceAM(std::string traceMsg);
 
     /// returns the value of an attribute
-    kc::casestring read(kc::integer elementId, std::string attributeName);
+    kc::casestring read(int elementId, std::string attributeName);
     
     /// returns the value of an attribute
-    kc::casestring read(kc::integer elementId, std::string attributeName, kc::casestring defaultValue);    
+    kc::casestring read(int elementId, std::string attributeName, kc::casestring defaultValue);    
 
     /// increases the id
-    kc::integer nextId();
+    int nextId();
 
     /// defines an attribute
     void define(kc::casestring attributeName, kc::casestring attributeValue);
 
     /// checked the attributes of BPEL-elements
-    void check(kc::integer elementId, unsigned int elementType);
+    void check(int elementId, unsigned int elementType);
     
     /// checked the attributes and the value of BPEL-elements
-    void check(kc::integer elementId, kc::casestring elementValue, unsigned int elementType);
+    void check(int elementId, kc::casestring elementValue, unsigned int elementType);
 };
 
 

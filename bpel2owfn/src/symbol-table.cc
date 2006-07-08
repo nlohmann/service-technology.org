@@ -86,9 +86,9 @@ unsigned int SymbolTable::nextKey()
 /*!
  * 
  */
-kc::integer SymbolTable::nextId()
+int SymbolTable::nextId()
 {
-  return kc::mkinteger(nextKey());
+  return nextKey();
 }
 
 /*!
@@ -237,7 +237,7 @@ void SymbolTable::printSTEnvelope(SymbolTableEntry* entry) {
  * \param astId
  * \param closeTag 
  */
-string SymbolTable::getInformation(kc::integer astId, bool closeTag)
+string SymbolTable::getInformation(int astId, bool closeTag)
 {
   string result = "<";
   
@@ -245,7 +245,7 @@ string SymbolTable::getInformation(kc::integer astId, bool closeTag)
     result += "/";
   
   result += translateToElementName((lookup(astId))->getElementId());
-  result += " id=\"" + intToString(astId->value) + "\">";
+  result += " id=\"" + intToString(astId) + "\">";
   
   return result;
 }
@@ -353,10 +353,10 @@ unsigned int SymbolTable::insert(unsigned int elementId)
  * return symbol table entry
  * \param entryKey  symbol table entry key
  */
-SymbolTableEntry* SymbolTable::lookup(kc::integer entryKey)
-{
-  return lookup(entryKey->value);
-}
+//SymbolTableEntry* SymbolTable::lookup(kc::integer entryKey)
+//{
+//  return lookup(entryKey->value);
+//}
 
 
 
@@ -661,10 +661,10 @@ void SymbolTable::addAttribute(unsigned int entryKey, STAttribute* attribute)
  * \param entryKey  symbol table entry key
  * \param name      name of attribute
  */
-string SymbolTable::readAttributeValue(kc::integer entryKey, string name)
-{
-  return readAttributeValue(entryKey->value, name);	
-}
+//string SymbolTable::readAttributeValue(kc::integer entryKey, string name)
+//{
+//  return readAttributeValue(entryKey->value, name);	
+//}
 
 /*!
  * return value of an attribute object
@@ -681,10 +681,10 @@ string SymbolTable::readAttributeValue(unsigned int entryKey, string name)
  * \param entryKey  symbol table entry key
  * \param name      name of attribute
  */
-STAttribute* SymbolTable::readAttribute(kc::integer entryKey, string name)
-{
-  return readAttribute(entryKey->value, name);
-}
+//STAttribute* SymbolTable::readAttribute(int entryKey, string name)
+//{
+//  return readAttribute(entryKey, name);
+//}
 
 /*!
  * return a pointer of an attribute object,
@@ -1129,20 +1129,20 @@ void SymbolTable::traceSTwp(string traceMsg)
  * \param entryKey  symbol table entry key
  * \param bpelElementValue  content of the BPEL-XML-element (e.g. <from> ... content ... </from>)
  */
-void SymbolTable::checkAttributes(kc::integer entryKey, kc::casestring bpelElementValue)
-{
-  checkAttributes(entryKey->value, bpelElementValue);
-}
+//void SymbolTable::checkAttributes(int entryKey, kc::casestring bpelElementValue)
+//{
+//  checkAttributes(entryKey, bpelElementValue);
+//}
 
 
 /*!
  * wrapper for checkAttributes(unsigned int entryKey)
  * \param entryKey  symbol table entry key
  */
-void SymbolTable::checkAttributes(kc::integer entryKey)
-{
-  checkAttributes(entryKey->value);
-}
+//void SymbolTable::checkAttributes(int entryKey)
+//{
+//  checkAttributes(entryKey);
+//}
 
 /*!
  * checked the presence of valid and necessary attribute combinations of BPEL-elements

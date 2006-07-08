@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/07/04 12:45:47 $
+ *          - last changed: \$Date: 2006/07/08 12:15:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -84,7 +84,7 @@ CFGBlock::CFGBlock()
  * \param pLabel  a label for identifing the block (e.g. start vs. end block of a flow)
  *
  */
-CFGBlock::CFGBlock(CFGBlockType pType, kc::integer pId = kc::mkinteger(0), std::string pLabel = "")
+CFGBlock::CFGBlock(CFGBlockType pType, int pId = 0, std::string pLabel = "")
 {
   firstBlock = this;
   lastBlock  = this;
@@ -116,7 +116,7 @@ void CFGBlock::print_dot()
     dotted = true;
 
     (*output) << "  // " << dot_name() << endl;
-    (*output) << "  \"" << dot_name() << "\" [ label=\"" << label << " (" << id->value <<")";
+    (*output) << "  \"" << dot_name() << "\" [ label=\"" << label << " (" << id <<")";
     if (channel_name != "")
     {
       (*output) << "\\nchannel: " << channel_name;
@@ -187,7 +187,7 @@ std::string CFGBlock::dot_name()
   }
   else
   {
-    return label + "_" + intToString(id->value);
+    return label + "_" + intToString(id);
   }
 }
 
@@ -217,7 +217,7 @@ void cfgDot(CFGBlock * block)
  * \return		    true iff DPE is needed
  *
  */
-bool CFGBlock::needsDPE(int hasStartingBlock, list<kc::integer>& lastTargets)
+bool CFGBlock::needsDPE(int hasStartingBlock, list<int> lastTargets)
 {
  
   if (processed)
@@ -227,11 +227,11 @@ bool CFGBlock::needsDPE(int hasStartingBlock, list<kc::integer>& lastTargets)
   
   bool childrenDPE = false;
   int newStartingBlockNumber = hasStartingBlock;
-  list<kc::integer> localTargetList;
+  list<int> localTargetList;
 
   if (!lastTargets.empty())
   {
-    for (list<kc::integer>::iterator iter = lastTargets.begin(); iter != lastTargets.end(); iter++)
+    for (list<int>::iterator iter = lastTargets.begin(); iter != lastTargets.end(); iter++)
     {
       localTargetList.push_back(*iter);
     }
@@ -265,7 +265,7 @@ bool CFGBlock::needsDPE(int hasStartingBlock, list<kc::integer>& lastTargets)
 			break;
       default :		if (! localTargetList.empty())
 			{
-			  while ( ! localTargetList.empty() && (*(--localTargetList.end()))->value > id->value)
+			  while ( ! localTargetList.empty() && (*(--localTargetList.end())) > id)
 			  {
 			    localTargetList.remove( *(--localTargetList.end()) );
 			  }
@@ -596,10 +596,10 @@ void CFGBlock::checkForConflictingReceive()
 	      trace("[CFG] WARNING: There are conflicting onMessage conditions!\n");
 	      trace("               Please check lines " + intToString((dynamic_cast<STElement*>(symTab.lookup((*iter)->id)))->line));
 	      trace(                " and " + intToString((dynamic_cast<STElement*>(symTab.lookup((*otherBlock)->id)))->line) + "\n");
-	      cerr << "               " << (*iter)->channel_name << " (" << (*iter)->id->value << ") vs. " << (*otherBlock)->channel_name << " (" << (*otherBlock)->id->value << ")" << endl;
+	      cerr << "               " << (*iter)->channel_name << " (" << (*iter)->id << ") vs. " << (*otherBlock)->channel_name << " (" << (*otherBlock)->id << ")" << endl;
 		trace("\n");
 	    }
-	    receives.insert(pair<std::string, long>( (dynamic_cast<STOnMessage*>(symTab.lookup((*iter)->id)))->channelId, (*iter)->id->value));
+	    receives.insert(pair<std::string, long>( (dynamic_cast<STOnMessage*>(symTab.lookup((*iter)->id)))->channelId, (*iter)->id));
 	  }
 	}
 	// 
@@ -626,12 +626,12 @@ void CFGBlock::checkForConflictingReceive()
     }
     if (type == CFGReceive)
     {
-      receives.insert(pair<std::string, long>( (dynamic_cast<STReceive*>(symTab.lookup(id)))->channelId, id->value));
+      receives.insert(pair<std::string, long>( (dynamic_cast<STReceive*>(symTab.lookup(id)))->channelId, id));
     }
     if (type == CFGInvoke)
     {
       if( (dynamic_cast<STInvoke*> (symTab.lookup(id)))->outputVariable != NULL) {
-	receives.insert(pair<std::string, long>( (dynamic_cast<STInvoke*>(symTab.lookup(id)))->channelId, id->value));
+	receives.insert(pair<std::string, long>( (dynamic_cast<STInvoke*>(symTab.lookup(id)))->channelId, id));
       }
     }
     if (!prevBlocks.empty())
@@ -662,7 +662,7 @@ void CFGBlock::checkForConflictingReceive()
 
 
 
-void cfg()
+void processCFG()
 {
   extern kc::tProcess TheProcess;
 
@@ -674,7 +674,7 @@ void cfg()
   
   trace(TRACE_DEBUG, "[CFG] checking for DPE\n");
   // do some business with CFG
-  list<kc::integer> kcl;
+  list<int> kcl;
   TheCFG->needsDPE(0, kcl);
   TheCFG->resetProcessedFlag();
 

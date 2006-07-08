@@ -32,13 +32,13 @@
  *
  * \date
  *          - created: 2006/02/08
- *          - last changed: \$Date: 2006/06/07 08:00:34 $
+ *          - last changed: \$Date: 2006/07/08 12:15:53 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  */
 
 
@@ -76,16 +76,16 @@ using namespace std;
 
 Transition *throwFault(Place *p1, Place *p2,
     string p1name, string prefix,
-    kc::integer negativeControlFlow, bool preventFurtherFaults = true);
+    int negativeControlFlow, bool preventFurtherFaults = true);
 
 Transition *stop(Place *p, string p_name, string prefix);
 
 string inString();
-void header(kc::integer id, bool indent = false);
-void footer(kc::integer id, bool indent = false);
+void header(int id, bool indent = false);
+void footer(int id, bool indent = false);
 
 
-void dpeLinks(Transition* t, kc::integer id);
+void dpeLinks(Transition* t, int id);
 
 
 /******************************************************************************

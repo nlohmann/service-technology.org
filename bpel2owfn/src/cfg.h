@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/07/01 21:58:08 $
+ *          - last changed: \$Date: 2006/07/08 12:15:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  */
 
 #ifndef CFG_H
@@ -120,18 +120,18 @@ class CFGBlock {
     /// type of the block
     CFGBlockType type;
     /// ID of the block
-    kc::integer id;
+    int id;
     /// label of the block
     std::string label;
 
     /// constructor
     CFGBlock();
     /// constructor
-    CFGBlock(CFGBlockType, kc::integer, std::string);
+    CFGBlock(CFGBlockType, int, std::string);
     /// generic constructor
     CFGBlock(std::string id);
     /// generic constructor
-    CFGBlock(kc::integer id);
+    CFGBlock(int id);
     /// generic destructor
     virtual ~CFGBlock();
     
@@ -146,7 +146,7 @@ class CFGBlock {
     std::string channel_name;
 
     /// checks which blocks need DPE
-    bool needsDPE(int hasStartingBlock, list<kc::integer>& lastTarget);
+    bool needsDPE(int hasStartingBlock, list<int> lastTarget);
 
     /// resets the processed flag to false
     void resetProcessedFlag(bool withLinks = false, bool forward = true);
@@ -192,7 +192,7 @@ void cfgDot(CFGBlock *);
 void connectBlocks(CFGBlock *, CFGBlock *);
 
 
-void cfg();
+void processCFG();
 
 #endif
 

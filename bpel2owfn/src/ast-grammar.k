@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/07/06 15:49:05 $
+ *          - last changed: \$Date: 2006/07/08 12:15:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.89 $
+ * \version \$Revision: 1.90 $
  */
 %}
 
@@ -57,6 +57,12 @@
 %}
 
 
+%{ KC_TYPES_HEADER
+
+#include <string>
+using std::string;
+
+%}
 
 
 
@@ -73,18 +79,18 @@ tProcess:
       activity
       )
   {
-    integer id;
+    int id;
     bool suppressJF = false;
     bool hasEH = false;
 
-    casestring A_name = mkcasestring("");
-    casestring A_targetNamespace = mkcasestring("");
-    casestring A_queryLanguage = mkcasestring("");
-    casestring A_expressionLanguage = mkcasestring("");
-    casestring A_suppressJoinFailure = mkcasestring("");
-    casestring A_enableInstanceCompensation = mkcasestring("");
-    casestring A_abstractProcess = mkcasestring("");
-    casestring A_xmlns = mkcasestring("");
+    string A_name;
+    string A_targetNamespace;
+    string A_queryLanguage;
+    string A_expressionLanguage;
+    string A_suppressJoinFailure;
+    string A_enableInstanceCompensation;
+    string A_abstractProcess;
+    string A_xmlns;
   }
 ;
 
@@ -114,8 +120,8 @@ activity:
 | activityScope(tScope)
 | activityCompensate(tCompensate)
   {
-    integer id;
-    integer dpe = mkinteger(0);
+    int id;
+    int dpe = 0;
   }
 ;
 
@@ -131,14 +137,14 @@ tPartnerLink_list:
 tPartnerLink:
   PartnerLink()
   {
-    integer id;
+    int id;
 
     bool inPartners = false;
 
-    casestring A_name = mkcasestring("");
-    casestring A_partnerLinkType = mkcasestring("");
-    casestring A_myRole = mkcasestring("");
-    casestring A_partnerRole = mkcasestring("");
+    string A_name;
+    string A_partnerLinkType;
+    string A_myRole;
+    string A_partnerRole;
   }
 ;
 
@@ -154,9 +160,9 @@ tPartner_list:
 tPartner:
   Partner(tPartnerLink_list)
   {
-    integer id;
+    int id;
 
-    casestring A_name = mkcasestring("");
+    string A_name;
   }
 ;
 
@@ -169,10 +175,10 @@ tFaultHandlers:
   userDefinedFaultHandler(tCatch_list tCatchAll)
 | implicitFaultHandler()
   {
-    integer id;
+    int id;
 
     bool inProcess;
-    integer parentScopeId;
+    int parentScopeId;
     bool hasCatchAll; 
   }  
 ;
@@ -184,10 +190,10 @@ tCatch_list:
 tCatch:
   Catch(activity)
   {
-    integer id;
+    int id;
 
-    casestring A_faultName = mkcasestring("");
-    casestring A_faultVariable = mkcasestring("");
+    string A_faultName;
+    string A_faultVariable;
   }
 ;
 
@@ -195,7 +201,7 @@ tCatchAll:
   CatchAll(activity)
 | NoCatchAll()
   {
-    integer id;
+    int id;
   }
 ;
 
@@ -208,46 +214,46 @@ tEventHandlers:
   implicitEventHandler()
 | userDefinedEventHandler(tOnMessage_list tOnAlarm_list)
   {
-    integer id;
-    integer parentScopeId;
+    int id;
+    int parentScopeId;
   }
 ;
 
 tOnMessage_list:
   list tOnMessage
   {
-    integer dpe = mkinteger(0);
+    int dpe = 0;
   }
 ;
 
 tOnAlarm_list:
   list tOnAlarm
   {
-    integer dpe = mkinteger(0);
+    int dpe = 0;
   }
 ;
 
 tOnMessage:
   OnMessage(activity)
   {
-    integer id;
-    integer dpe = mkinteger(0);
+    int id;
+    int dpe = 0;
 
-    casestring A_partnerLink = mkcasestring("");
-    casestring A_portType = mkcasestring("");
-    casestring A_operation = mkcasestring("");
-    casestring A_variable = mkcasestring("");
+    string A_partnerLink;
+    string A_portType;
+    string A_operation;
+    string A_variable;
   }
 ;
 
 tOnAlarm:
   OnAlarm(activity)
   {
-    integer id;
-    integer dpe = mkinteger(0);
+    int id;
+    int dpe = 0;
     
-    casestring A_for = mkcasestring("");
-    casestring A_until = mkcasestring("");
+    string A_for;
+    string A_until;
   } 
 ;
 
@@ -261,9 +267,9 @@ tCompensationHandler:
 | userDefinedCompensationHandler(activity)
 | processCompensationHandler()
   {
-    integer id;
+    int id;
 
-    integer parentScopeId;
+    int parentScopeId;
     bool compensateWithoutScope = false;
     bool compensateWithScope = false;
   }
@@ -280,12 +286,12 @@ tVariable_list:
 tVariable:
   Variable()
   {
-    integer id;
+    int id;
 
-    casestring A_name = mkcasestring("");
-    casestring A_messageType = mkcasestring("");
-    casestring A_type = mkcasestring("");
-    casestring A_element = mkcasestring("");
+    string A_name;
+    string A_messageType;
+    string A_type;
+    string A_element;
   }
 ;
 
@@ -301,10 +307,10 @@ tCorrelationSet_list:
 tCorrelationSet:
   CorrelationSet()
   {
-    integer id;
+    int id;
 
-    casestring A_name = mkcasestring("");
-    casestring A_properties = mkcasestring("");
+    string A_name;
+    string A_properties;
   }
 ;
 
@@ -320,11 +326,11 @@ tCorrelation_list:
 tCorrelation:
   Correlation()
   {
-    integer id;
+    int id;
 
-    casestring A_set = mkcasestring("");
-    casestring A_initiate = mkcasestring("");
-    casestring A_pattern = mkcasestring("");
+    string A_set;
+    string A_initiate;
+    string A_pattern;
   }
 ;
 
@@ -336,13 +342,13 @@ tCorrelation:
 tEmpty:
   Empty(standardElements)
   {
-    integer id;
-    integer negativeControlFlow;
+    int id;
+    int negativeControlFlow;
     bool suppressJF = false;
 
-    casestring A_name = mkcasestring("");
-    casestring A_joinCondition = mkcasestring("");
-    casestring A_suppressJoinFailure = mkcasestring("");
+    string A_name;
+    string A_joinCondition;
+    string A_suppressJoinFailure;
   }
 ;
 
@@ -354,19 +360,19 @@ tEmpty:
 tInvoke:
   Invoke(standardElements tCorrelation_list)
   {
-    integer id;
-    integer dpe = mkinteger(0);
-    integer negativeControlFlow;
+    int id;
+    int dpe = 0;
+    int negativeControlFlow;
     bool suppressJF = false;
 
-    casestring A_name = mkcasestring("");
-    casestring A_joinCondition = mkcasestring("");
-    casestring A_suppressJoinFailure = mkcasestring("");
-    casestring A_partnerLink = mkcasestring("");
-    casestring A_portType = mkcasestring("");
-    casestring A_operation = mkcasestring("");
-    casestring A_inputVariable = mkcasestring("");
-    casestring A_outputVariable = mkcasestring("");    
+    string A_name;
+    string A_joinCondition;
+    string A_suppressJoinFailure;
+    string A_partnerLink;
+    string A_portType;
+    string A_operation;
+    string A_inputVariable;
+    string A_outputVariable;    
   }
 ;
 
@@ -378,18 +384,18 @@ tInvoke:
 tReceive:
   Receive(standardElements tCorrelation_list)
   {
-    integer id;
-    integer negativeControlFlow;
+    int id;
+    int negativeControlFlow;
     bool suppressJF = false;
 
-    casestring A_name = mkcasestring("");
-    casestring A_joinCondition = mkcasestring("");
-    casestring A_suppressJoinFailure = mkcasestring("");
-    casestring A_partnerLink = mkcasestring("");
-    casestring A_portType = mkcasestring("");
-    casestring A_operation = mkcasestring("");
-    casestring A_variable = mkcasestring("");
-    casestring A_createInstance = mkcasestring("");
+    string A_name;
+    string A_joinCondition;
+    string A_suppressJoinFailure;
+    string A_partnerLink;
+    string A_portType;
+    string A_operation;
+    string A_variable;
+    string A_createInstance;
   }
 ;
 
@@ -401,18 +407,18 @@ tReceive:
 tReply:
   Reply(standardElements tCorrelation_list)
   {
-    integer id;
-    integer negativeControlFlow;
+    int id;
+    int negativeControlFlow;
     bool suppressJF = false;
 
-    casestring A_name = mkcasestring("");
-    casestring A_joinCondition = mkcasestring("");
-    casestring A_suppressJoinFailure = mkcasestring("");
-    casestring A_partnerLink = mkcasestring("");
-    casestring A_portType = mkcasestring("");
-    casestring A_operation = mkcasestring("");
-    casestring A_variable = mkcasestring("");
-    casestring A_faultName = mkcasestring("");
+    string A_name;
+    string A_joinCondition;
+    string A_suppressJoinFailure;
+    string A_partnerLink;
+    string A_portType;
+    string A_operation;
+    string A_variable;
+    string A_faultName;
   }
 ;
 
@@ -424,13 +430,13 @@ tReply:
 tAssign:
   Assign(standardElements tCopy_list)
   {
-    integer id;
-    integer negativeControlFlow;
+    int id;
+    int negativeControlFlow;
     bool suppressJF = false;
 
-    casestring A_name = mkcasestring("");
-    casestring A_joinCondition = mkcasestring("");
-    casestring A_suppressJoinFailure = mkcasestring("");
+    string A_name;
+    string A_joinCondition;
+    string A_suppressJoinFailure;
   }
 ;
 
@@ -445,28 +451,28 @@ tCopy:
 tFrom:
   From()
   {
-    integer id;
+    int id;
 
-    casestring literal = mkcasestring("");
+    string literal;
 
-    casestring A_variable = mkcasestring("");
-    casestring A_part = mkcasestring("");
-    casestring A_partnerLink = mkcasestring("");
-    casestring A_endpointReference = mkcasestring("");
-    casestring A_property = mkcasestring("");
-    casestring A_expression = mkcasestring("");
+    string A_variable;
+    string A_part;
+    string A_partnerLink;
+    string A_endpointReference;
+    string A_property;
+    string A_expression;
   }
 ;
 
 tTo:
   To()
   {
-    integer id;
+    int id;
 
-    casestring A_variable = mkcasestring("");
-    casestring A_part = mkcasestring("");
-    casestring A_partnerLink = mkcasestring("");
-    casestring A_property = mkcasestring("");
+    string A_variable;
+    string A_part;
+    string A_partnerLink;
+    string A_property;
   }
 ;
 
@@ -479,15 +485,15 @@ tWait:
   WaitFor(standardElements)
 | WaitUntil(standardElements)
   {
-    integer id;
-    integer negativeControlFlow;
+    int id;
+    int negativeControlFlow;
     bool suppressJF = false;
 
-    casestring A_name = mkcasestring("");
-    casestring A_joinCondition = mkcasestring("");
-    casestring A_suppressJoinFailure = mkcasestring("");
-    casestring A_for = mkcasestring("");
-    casestring A_until = mkcasestring("");
+    string A_name;
+    string A_joinCondition;
+    string A_suppressJoinFailure;
+    string A_for;
+    string A_until;
   }
 ;
 
@@ -499,15 +505,15 @@ tWait:
 tThrow:
   Throw(standardElements)
   {
-    integer id;
-    integer negativeControlFlow;
+    int id;
+    int negativeControlFlow;
     bool suppressJF = false;
 
-    casestring A_name = mkcasestring("");
-    casestring A_joinCondition = mkcasestring("");
-    casestring A_suppressJoinFailure = mkcasestring("");
-    casestring A_faultName = mkcasestring("");
-    casestring A_faultVariable = mkcasestring("");
+    string A_name;
+    string A_joinCondition;
+    string A_suppressJoinFailure;
+    string A_faultName;
+    string A_faultVariable;
   }
 ;
 
@@ -519,16 +525,16 @@ tThrow:
 tCompensate:
   Compensate(standardElements)
   {
-    integer id;
-    integer negativeControlFlow;
+    int id;
+    int negativeControlFlow;
     bool suppressJF = false;
 
     bool inFaultHandler = true;
     
-    casestring A_name = mkcasestring("");
-    casestring A_joinCondition = mkcasestring("");
-    casestring A_suppressJoinFailure = mkcasestring("");
-    casestring A_scope = mkcasestring("");
+    string A_name;
+    string A_joinCondition;
+    string A_suppressJoinFailure;
+    string A_scope;
   }
 ;
 
@@ -540,13 +546,13 @@ tCompensate:
 tTerminate:
   Terminate(standardElements)
   {
-    integer id;
-    integer negativeControlFlow;
+    int id;
+    int negativeControlFlow;
     bool suppressJF = false;
 
-    casestring A_name = mkcasestring("");
-    casestring A_joinCondition = mkcasestring("");
-    casestring A_suppressJoinFailure = mkcasestring("");
+    string A_name;
+    string A_joinCondition;
+    string A_suppressJoinFailure;
   }
 ;
 
@@ -558,21 +564,21 @@ tTerminate:
 tFlow:
   Flow(standardElements tLink_list activity_list)
   {
-    integer id;
-    integer dpe = mkinteger(0);
-    integer negativeControlFlow;
+    int id;
+    int dpe = 0;
+    int negativeControlFlow;
     bool suppressJF = false;
 
-    casestring A_name = mkcasestring("");
-    casestring A_joinCondition = mkcasestring("");
-    casestring A_suppressJoinFailure = mkcasestring("");
+    string A_name;
+    string A_joinCondition;
+    string A_suppressJoinFailure;
   }
 ;
 
 activity_list:
   list activity 
   {
-    integer dpe = mkinteger(0);
+    int dpe = 0;
   }
 ;
 
@@ -583,9 +589,9 @@ tLink_list:
 tLink:
   Link()
   {
-    integer id;
+    int id;
 
-    casestring A_name = mkcasestring("");
+    string A_name;
   }
 ;
 
@@ -597,39 +603,39 @@ tLink:
 tSwitch:
   Switch(standardElements tCase_list tOtherwise)
   {
-    integer id;
-    integer dpe = mkinteger(0);
-    integer negativeControlFlow;
+    int id;
+    int dpe = 0;
+    int negativeControlFlow;
     bool suppressJF = false;
 
-    casestring A_name = mkcasestring("");
-    casestring A_joinCondition = mkcasestring("");
-    casestring A_suppressJoinFailure = mkcasestring("");
+    string A_name;
+    string A_joinCondition;
+    string A_suppressJoinFailure;
   }
 ;
 
 tCase_list:
   list tCase
   {
-    integer dpe = mkinteger(0);
+    int dpe = 0;
   }
 ;
 
 tCase:
   Case(activity)
   {
-    integer id;
-    integer dpe = mkinteger(0);
+    int id;
+    int dpe = 0;
     
-    casestring A_condition = mkcasestring("");
+    string A_condition;
   }
 ;
 
 tOtherwise:
   Otherwise(activity)
   {
-    integer id;
-    integer dpe = mkinteger(0);
+    int id;
+    int dpe = 0;
   }
 ;
 
@@ -641,14 +647,14 @@ tOtherwise:
 tWhile:
   While(standardElements activity)
   {
-    integer id;
-    integer negativeControlFlow;
+    int id;
+    int negativeControlFlow;
     bool suppressJF = false;
 
-    casestring A_name = mkcasestring("");
-    casestring A_joinCondition = mkcasestring("");
-    casestring A_suppressJoinFailure = mkcasestring("");
-    casestring A_condition = mkcasestring("");
+    string A_name;
+    string A_joinCondition;
+    string A_suppressJoinFailure;
+    string A_condition;
   }
 ;
 
@@ -660,14 +666,14 @@ tWhile:
 tSequence:
   Sequence(standardElements activity_list)
   {
-    integer id;
-    integer dpe = mkinteger(0);
-    integer negativeControlFlow;
+    int id;
+    int dpe = 0;
+    int negativeControlFlow;
     bool suppressJF = false;
 
-    casestring A_name = mkcasestring("");
-    casestring A_joinCondition = mkcasestring("");
-    casestring A_suppressJoinFailure = mkcasestring("");
+    string A_name;
+    string A_joinCondition;
+    string A_suppressJoinFailure;
   }
 ;
 
@@ -679,15 +685,15 @@ tSequence:
 tPick:
   Pick(standardElements tOnMessage_list tOnAlarm_list)
   {
-    integer id;
-    integer dpe = mkinteger(0);
-    integer negativeControlFlow;
+    int id;
+    int dpe = 0;
+    int negativeControlFlow;
     bool suppressJF = false;
 
-    casestring A_name = mkcasestring("");
-    casestring A_joinCondition = mkcasestring("");
-    casestring A_suppressJoinFailure = mkcasestring("");
-    casestring A_createInstance = mkcasestring("");
+    string A_name;
+    string A_joinCondition;
+    string A_suppressJoinFailure;
+    string A_createInstance;
   }
 ;
 
@@ -707,18 +713,18 @@ tScope:
       activity
       )
   {
-    integer id;
-    integer dpe = mkinteger(0);
-    integer negativeControlFlow;
+    int id;
+    int dpe = 0;
+    int negativeControlFlow;
     bool suppressJF = false;
     bool hasEH = false;
 
-    integer parentScopeId;
+    int parentScopeId;
 
-    casestring A_name = mkcasestring("");
-    casestring A_joinCondition = mkcasestring("");
-    casestring A_suppressJoinFailure = mkcasestring("");
-    casestring A_variableAccessSerializable = mkcasestring("");
+    string A_name;
+    string A_joinCondition;
+    string A_suppressJoinFailure;
+    string A_variableAccessSerializable;
   }
 ;
 
@@ -731,11 +737,11 @@ tScope:
 standardElements:
   StandardElements(tTarget_list tSource_list joinCondition)
   {
-    integer dpe = mkinteger(0);
-    integer negativeControlFlow;
+    int dpe = 0;
+    int negativeControlFlow;
     bool suppressJF = false;
 
-    integer parentId;
+    int parentId;
     bool hasTarget = false;
   }
 ;
@@ -750,30 +756,30 @@ tTarget_list:
 tTarget:
   Target()
   {
-    integer id;
-    integer negativeControlFlow;
+    int id;
+    int negativeControlFlow;
     
-    casestring A_linkName = mkcasestring("");
+    string A_linkName;
   }
 ;
 
 tSource_list:
   list tSource
   {
-    integer dpe = mkinteger(0);
+    int dpe = 0;
   }
 ;
 
 tSource:
   Source()
   {
-    integer id;
-    integer dpe = mkinteger(0);
-    integer negativeControlFlow;
+    int id;
+    int dpe = 0;
+    int negativeControlFlow;
 
-    casestring A_linkName = mkcasestring("");
-    casestring A_transitionCondition = mkcasestring("");
-    casestring A_variableAccessSerializable = mkcasestring("");
+    string A_linkName;
+    string A_transitionCondition;
+    string A_variableAccessSerializable;
   }
 ;
 

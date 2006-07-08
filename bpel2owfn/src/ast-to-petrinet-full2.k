@@ -53,7 +53,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/07/06 15:49:05 $
+ *          - last changed: \$Date: 2006/07/08 12:15:53 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  */
 %}
 
@@ -121,7 +121,7 @@ extern string currentScope;
 This=Empty(a) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".internal.";
+      string prefix = intToString(This->id) + ".internal.";
       header(This->id);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
@@ -162,7 +162,7 @@ This=Empty(a) ->
 This=Invoke(a,b) provided ((dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id)))->isAsynchronousInvoke) -> //(This->outputVariable == mkcasestring("")) ->
   [petrinet:
     {
-      string prefix = intToString(This->id->value) + ".internal.";
+      string prefix = intToString(This->id) + ".internal.";
       STCommunicationActivity* myself = dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id));
       header(This->id);
 
@@ -216,7 +216,7 @@ This=Invoke(a,b) provided (!(dynamic_cast<STCommunicationActivity*> (symTab.look
     {
       header(This->id);
       STCommunicationActivity* myself = dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id));
-      string prefix = intToString(This->id->value) + ".internal.";
+      string prefix = intToString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running1");
@@ -290,7 +290,7 @@ This=Receive(a,b) ->
     {
       header(This->id);
       STCommunicationActivity* myself = dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id));
-      string prefix = intToString(This->id->value) + ".internal.";
+      string prefix = intToString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -346,7 +346,7 @@ This=Reply(a,b) ->
     {
       header(This->id);
       STCommunicationActivity* myself = dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id));
-      string prefix = intToString(This->id->value) + ".internal.";
+      string prefix = intToString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -405,7 +405,7 @@ This=Assign(a,b) ->
   [petrinet:
     {
       header(This->id);
-      string prefix = intToString(This->id->value) + ".internal.";
+      string prefix = intToString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p3 = TheNet->newPlace(prefix + "final");
@@ -501,7 +501,7 @@ This=WaitUntil(a) ->
   [petrinet:
     {
       header(This->id);
-      string prefix = intToString(This->id->value) + ".internal.";
+      string prefix = intToString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -537,7 +537,7 @@ This=WaitFor(a) ->
   [petrinet:
     {
       header(This->id);
-      string prefix = intToString(This->id->value) + ".internal.";
+      string prefix = intToString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "TimeStamp");
@@ -584,7 +584,7 @@ This=Throw(a) ->
   [petrinet:
     {
       header(This->id);
-      string prefix = intToString(This->id->value) + ".internal.";
+      string prefix = intToString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "p2");
@@ -630,7 +630,7 @@ This=Compensate(a) provided (!This->inFaultHandler && (symTab.readAttributeValue
   [petrinet:
     {
       header(This->id);
-      string prefix = intToString(This->id->value) + ".internal.";
+      string prefix = intToString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -682,7 +682,7 @@ This=Compensate(a) provided (This->inFaultHandler && (symTab.readAttributeValue(
   [petrinet:
     {
       header(This->id);
-      string prefix = intToString(This->id->value) + ".internal.";
+      string prefix = intToString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -734,7 +734,7 @@ This=Compensate(a) provided (!This->inFaultHandler && (symTab.readAttributeValue
   [petrinet:
     {
       header(This->id);
-      string prefix = intToString(This->id->value) + ".internal.";
+      string prefix = intToString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -785,7 +785,7 @@ This=Compensate(a) provided (This->inFaultHandler && (symTab.readAttributeValue(
   [petrinet:
     {
       header(This->id);
-      string prefix = intToString(This->id->value) + ".internal.";
+      string prefix = intToString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -840,7 +840,7 @@ This=Terminate(a) ->
   [petrinet:
     {
       header(This->id);
-      string prefix = intToString(This->id->value) + ".internal.";
+      string prefix = intToString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -897,7 +897,7 @@ This=Flow(a,b,c) ->
   [petrinet:
     {
       header(This->id, true);
-      string prefix = intToString(This->id->value) + ".internal.";
+      string prefix = intToString(This->id) + ".internal.";
 
       Place *p7  = TheNet->newPlace(prefix + "initial");
       Place *p8  = TheNet->newPlace(prefix + "final");
@@ -928,7 +928,7 @@ This=Flow(a,b,c) ->
 
       // Dead-Path-Elimination.
       Transition *t1 = NULL;
-      if (This->dpe->value > 0)
+      if (This->dpe > 0)
       {
 	Place *p1  = TheNet->newPlace(prefix + "negLink");
 	t1 = TheNet->newTransition(prefix + "t1");
@@ -940,9 +940,9 @@ This=Flow(a,b,c) ->
     {
       foreach (innerActivity; activity_list c)
       {
-        string newPrefix = intToString(innerActivity->id->value);
+        string newPrefix = intToString(innerActivity->id);
         // Embed the inner activity.
-	if (This->dpe->value > 0 && TheNet->findPlace(newPrefix + ".negLink") != NULL)
+	if (This->dpe > 0 && TheNet->findPlace(newPrefix + ".negLink") != NULL)
 	{
 	  TheNet->newArc(t1, TheNet->findPlace(newPrefix + ".negLink"));
 	}
@@ -973,7 +973,7 @@ This=activitySwitch(TheSwitch=Switch(a,b,Otherwise(c))) ->
   [petrinet:
     {
       header(This->id, true);
-      string prefix = intToString(This->id->value) + ".internal.";
+      string prefix = intToString(This->id) + ".internal.";
 
       Place *p4 =  TheNet->newPlace(prefix + "final");
       Place *p5 =  TheNet->newPlace(prefix + "initial");
@@ -998,7 +998,7 @@ This=activitySwitch(TheSwitch=Switch(a,b,Otherwise(c))) ->
 
       // Dead Path Elimination
       Transition *t1 = NULL;
-      if (This->dpe->value > 0)
+      if (This->dpe > 0)
       {
 	t1 = TheNet->newTransition(prefix + "t1");
 	Place *p1 = TheNet->newPlace(prefix + "negLink");
@@ -1089,14 +1089,14 @@ This=activitySwitch(TheSwitch=Switch(a,b,Otherwise(c))) ->
       {
 	foreach (otherCaseBranch=Case(innerActivity2); tCase_list b)
 	{
-	  if ((innerActivity1 != innerActivity2) && (otherCaseBranch->dpe->value > 0))
+	  if ((innerActivity1 != innerActivity2) && (otherCaseBranch->dpe > 0))
 	    TheNet->newArc(TheNet->findTransition(prefix + "t2.case" + intToString(currentCase)), TheNet->findPlace(innerActivity2, ".negLink"));
 
-	  if (c->dpe->value > 0)
+	  if (c->dpe > 0)
 	    TheNet->newArc(TheNet->findTransition(prefix + "t2.case" + intToString(currentCase)), TheNet->findPlace(c, ".negLink"));
 	}
 
-	if (thisCaseBranch->dpe->value > 0)
+	if (thisCaseBranch->dpe > 0)
 	{
 	  TheNet->newArc(TheNet->findTransition(prefix + "t2.otherwise"), TheNet->findPlace(innerActivity1, ".negLink"));
 	}
@@ -1104,7 +1104,7 @@ This=activitySwitch(TheSwitch=Switch(a,b,Otherwise(c))) ->
 
 	currentCase++;
 
-	if ((This->dpe->value > 0) && (thisCaseBranch->dpe->value > 0))
+	if ((This->dpe > 0) && (thisCaseBranch->dpe > 0))
 	  TheNet->newArc(t1, TheNet->findPlace(innerActivity1, ".negLink"));
       }
 
@@ -1136,7 +1136,7 @@ This=activityWhile(TheWhile=While(a,b)) ->
   [petrinet:
     {
       header(This->id, true);
-      string prefix = intToString(TheWhile->id->value) + ".internal.";
+      string prefix = intToString(TheWhile->id) + ".internal.";
 //      string condition = string(TheWhile->condition->name);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
@@ -1221,7 +1221,7 @@ This=activitySequence(Sequence(a,b)) ->
   [petrinet:
     {
       header(This->id, true);
-      string prefix = intToString(This->id->value) + ".internal.";
+      string prefix = intToString(This->id) + ".internal.";
 
       Place *p2  = TheNet->newPlace(prefix + "initial");
       Place *p9  = TheNet->newPlace(prefix + "final");
@@ -1231,7 +1231,7 @@ This=activitySequence(Sequence(a,b)) ->
 
       // If needed, transition t1 and a place negLink is created.
       Transition *t1 = NULL;
-      if (This->dpe->value > 0)
+      if (This->dpe > 0)
       {
 	Place *p1  = TheNet->newPlace(prefix + "negLink");
   	t1 = TheNet->newTransition(prefix + "t1");
@@ -1257,8 +1257,8 @@ This=activitySequence(Sequence(a,b)) ->
 
 	// If an inner activity has a place negLink, it is connected to the transition
 	// t1.
-        string newPrefix = intToString(innerActivity->id->value);
-	if (This->dpe->value > 0 && TheNet->findPlace(newPrefix + ".negLink") != NULL)
+        string newPrefix = intToString(innerActivity->id);
+	if (This->dpe > 0 && TheNet->findPlace(newPrefix + ".negLink") != NULL)
 	  TheNet->newArc(t1, TheNet->findPlace(newPrefix + ".negLink"));
 
 
@@ -1290,7 +1290,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
   [petrinet:
     {
       header(This->id, true);
-      string prefix = intToString(This->id->value) + ".internal.";
+      string prefix = intToString(This->id) + ".internal.";
 
       Place *p5 = TheNet->newPlace(prefix + "final");
       Place *p6 = TheNet->newPlace(prefix + "initial");
@@ -1307,7 +1307,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 
       // If needed, transition t1 and a place negLink is created.
       Transition *t1 = NULL;
-      if (This->dpe->value > 0)
+      if (This->dpe > 0)
       {
 	t1 = TheNet->newTransition(prefix + "t1");
 	Place *p1 = TheNet->newPlace(prefix + "negLink");
@@ -1396,19 +1396,19 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
       {
 	foreach (otheronmessage=OnMessage(innerActivity2); tOnMessage_list b)
 	{
-	  if ((innerActivity1 != innerActivity2) && (otheronmessage->dpe->value > 0))
+	  if ((innerActivity1 != innerActivity2) && (otheronmessage->dpe > 0))
 	    TheNet->newArc(TheNet->findTransition(prefix + "onMessage" + intToString(currentMessage) + ".t3"), TheNet->findPlace(innerActivity2, ".negLink"));
 	}
 
 	foreach (thisonalarm=OnAlarm(innerActivity2); tOnAlarm_list c)
 	{
-	  if (thisonalarm->dpe->value > 0)
+	  if (thisonalarm->dpe > 0)
 	    TheNet->newArc(TheNet->findTransition(prefix + "onMessage" + intToString(currentMessage) + ".t3"), TheNet->findPlace(innerActivity2, ".negLink"));
 	}
 
 	currentMessage++;
 
-	if ((thisonmessage->dpe->value > 0) && (This->dpe->value > 0))
+	if ((thisonmessage->dpe > 0) && (This->dpe > 0))
 	  TheNet->newArc(t1, TheNet->findPlace(innerActivity1, ".negLink"));
       }
 
@@ -1418,19 +1418,19 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
       {
 	foreach (otheronalarm=OnAlarm(innerActivity2); tOnAlarm_list c)
 	{
-	  if ((innerActivity1 != innerActivity2) && (otheronalarm->dpe->value > 0))
+	  if ((innerActivity1 != innerActivity2) && (otheronalarm->dpe > 0))
 	    TheNet->newArc(TheNet->findTransition(prefix + "onAlarm" + intToString(currentAlarm) + ".t6"), TheNet->findPlace(innerActivity2, ".negLink"));
 	}
 
 	foreach (thisonmessage=OnMessage(innerActivity2); tOnMessage_list b)
 	{
-	  if (thisonmessage->dpe->value > 0)
+	  if (thisonmessage->dpe > 0)
 	    TheNet->newArc(TheNet->findTransition(prefix + "onAlarm" + intToString(currentAlarm) + ".t6"), TheNet->findPlace(innerActivity2, ".negLink"));
 	}
 
 	currentAlarm++;
 
-	if ((thisonalarm->dpe->value > 0) && (This->dpe->value > 0))
+	if ((thisonalarm->dpe > 0) && (This->dpe > 0))
 	  TheNet->newArc(t1, TheNet->findPlace(innerActivity1, ".negLink"));
       }
 
@@ -1457,7 +1457,7 @@ This=Scope(a,b,c,d,e,f,g) ->
   [petrinet:
     {
       header(This->id, true);
-      string prefix = intToString(This->id->value) + ".internal.";
+      string prefix = intToString(This->id) + ".internal.";
       currentScope = prefix;
       STScope* myself = dynamic_cast<STScope*> (symTab.lookup(This->id));
 
@@ -1470,7 +1470,7 @@ This=Scope(a,b,c,d,e,f,g) ->
 
 
       // Create the internal places of the scope pattern.
-      if (This->dpe->value > 0)
+      if (This->dpe > 0)
       {
 	Place *p1  = TheNet->newPlace(prefix + "negLink");
       }
@@ -1545,8 +1545,8 @@ This=Scope(a,b,c,d,e,f,g) ->
       TheNet->newArc(p11, t4);
       TheNet->newArc(t4, p12);
       TheNet->newArc(t4, p14);
-      TheNet->newArc(TheNet->findPlace(intToString(This->id->value) + ".!push"), t4);
-      TheNet->newArc(t4, TheNet->findPlace(intToString(This->id->value) + ".push"));
+      TheNet->newArc(TheNet->findPlace(intToString(This->id) + ".!push"), t4);
+      TheNet->newArc(t4, TheNet->findPlace(intToString(This->id) + ".push"));
       TheNet->newArc(p35, t4);
       TheNet->newArc(t4, p51);
 
@@ -1617,20 +1617,20 @@ This=Scope(a,b,c,d,e,f,g) ->
       // New transitions to pass fault to parent.
       Transition *t12 = TheNet->newTransition(prefix + "passFaultUp");
       TheNet->newArc(p48, t12);
-      TheNet->newArc(TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.Active"), t12);
-      TheNet->newArc(t12, TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.!Active")); //newer fault management
-      TheNet->newArc(t12, TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.stop.fault_in"));
+      TheNet->newArc(TheNet->findPlace(intToString(This->parentScopeId) + ".internal.Active"), t12);
+      TheNet->newArc(t12, TheNet->findPlace(intToString(This->parentScopeId) + ".internal.!Active")); //newer fault management
+      TheNet->newArc(t12, TheNet->findPlace(intToString(This->parentScopeId) + ".internal.stop.fault_in"));
 
       Transition *t13 = TheNet->newTransition(prefix + "ignoreFault");
       TheNet->newArc(p48, t13);
-      TheNet->newArc(TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.!Active"), t13, READ);
+      TheNet->newArc(TheNet->findPlace(intToString(This->parentScopeId) + ".internal.!Active"), t13, READ);
 
 
       // Merge places with parent scope.
-      TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId->value) +
-	    ".internal.compensationHandler.compScope." + intToString(This->id->value)), p3); // was "....internal.compScope."
-      TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.scopeCompensated"), p56);
-      TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId->value) + ".internal.upperTerminate"), p46);
+      TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId) +
+	    ".internal.compensationHandler.compScope." + intToString(This->id)), p3); // was "....internal.compScope."
+      TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId) + ".internal.scopeCompensated"), p56);
+      TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId) + ".internal.upperTerminate"), p46);
     }
     f // Stop Pattern
     a // standardElements
@@ -1645,7 +1645,7 @@ This=Scope(a,b,c,d,e,f,g) ->
       for (list<STScope*>::iterator child = myself->childScopes.begin(); child != myself->childScopes.end(); child++)
 	TheNet->newArc(t2, TheNet->findPlace( intToString((*child)->entryKey) + ".!push" ));
 
-      string prefix2 = intToString(This->id->value) + ".internal.";
+      string prefix2 = intToString(This->id) + ".internal.";
 
 
       // Embed the fault handler of the scope.
@@ -1725,7 +1725,7 @@ This=Scope(a,b,c,d,e,f,g) ->
 
 
       // Embed the inner activity of the scope.
-      if (This->dpe->value > 0)
+      if (This->dpe > 0)
       {
         TheNet->mergePlaces(TheNet->findPlace(prefix + "negLink"), TheNet->findPlace(g, ".negLink"));
       }
@@ -1756,7 +1756,7 @@ This=Scope(a,b,c,d,e,f,g) ->
 	TheNet->newArc(p62, t15, READ);
       }
 
-      currentScope = intToString(This->parentScopeId->value) + ".internal.";
+      currentScope = intToString(This->parentScopeId) + ".internal.";
       footer(This->id, true);
     }
   ]
@@ -1773,8 +1773,8 @@ This=Scope(a,b,c,d,e,f,g) ->
 This=StandardElements(NiltTarget_list(), NiltSource_list(), jc) ->
   [petrinet:
     {
-      string prefix = intToString(This->parentId->value) + ".";
-      string newPrefix = intToString(This->parentId->value) + ".internal";
+      string prefix = intToString(This->parentId) + ".";
+      string newPrefix = intToString(This->parentId) + ".internal";
 
       Place *p2 = TheNet->newPlace(prefix + "initial");
       Place *p3 = TheNet->newPlace(prefix + "final");
@@ -1784,7 +1784,7 @@ This=StandardElements(NiltTarget_list(), NiltSource_list(), jc) ->
 
       // If the inner activity has a place negLink, connect merge this place
       // with a new created one.
-      if (This->dpe->value > 0)
+      if (This->dpe > 0)
       {
 	Place *p1 = TheNet->newPlace(prefix + "negLink");
 	TheNet->mergePlaces(p1, TheNet->findPlace(newPrefix + ".negLink"));
@@ -1812,8 +1812,8 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
   [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 22\n");
-      string prefix = intToString(This->parentId->value) + ".";
-      string newPrefix = intToString(This->parentId->value) + ".internal";
+      string prefix = intToString(This->parentId) + ".";
+      string newPrefix = intToString(This->parentId) + ".internal";
 
       Place *p2 = TheNet->newPlace(prefix + "initial");
 //      Place *p3 = TheNet->newPlace(prefix + "p3");
@@ -1839,7 +1839,7 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
       // with the negLink place of the inner activity if existing for dead path
       // elimination.
       Transition *t1 = NULL;
-      if (This->dpe->value > 0)
+      if (This->dpe > 0)
       {
         Place *p1 = TheNet->newPlace(prefix + "negLink");
 	t1 = TheNet->newTransition(prefix + "t1");
@@ -1866,7 +1866,7 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
 	TheNet->newArc(t2, p10);
 	TheNet->newArc(p10, t3, READ);
 
-	if (This->dpe->value > 0)
+	if (This->dpe > 0)
 	{
 	  TheNet->newArc(t1, p10);
 	  TheNet->newArc(p8, t1);
@@ -1898,8 +1898,8 @@ This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF)
   [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 23\n");
-      string prefix = intToString(This->parentId->value) + ".";
-      string newPrefix = intToString(This->parentId->value) + ".internal";
+      string prefix = intToString(This->parentId) + ".";
+      string newPrefix = intToString(This->parentId) + ".internal";
 
       Place *p6  = TheNet->newPlace(prefix + "p6");
       Place *p7  = TheNet->newPlace(prefix + "final");
@@ -1968,8 +1968,8 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF)
   [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 24\n");
-      string prefix = intToString(This->parentId->value) + ".";
-      string newPrefix = intToString(This->parentId->value) + ".internal";
+      string prefix = intToString(This->parentId) + ".";
+      string newPrefix = intToString(This->parentId) + ".internal";
 
       Place *p6  = TheNet->newPlace(prefix + "p6");
       Place *p7  = TheNet->newPlace(prefix + "final");
@@ -2038,8 +2038,8 @@ This=StandardElements(a,b, jc) provided (This->suppressJF)
   [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 25\n");
-      string prefix = intToString(This->parentId->value) + ".";
-      string newPrefix = intToString(This->parentId->value) + ".internal";
+      string prefix = intToString(This->parentId) + ".";
+      string newPrefix = intToString(This->parentId) + ".internal";
 
       Place *p11 = TheNet->newPlace(prefix + "p11");
       Place *p12 = TheNet->newPlace(prefix + "p12");
@@ -2073,7 +2073,7 @@ This=StandardElements(a,b, jc) provided (This->suppressJF)
       // If needed, transition t1 is created and connected with the negLink
       // place of the inner activity if existing for dead path elimination.
       Transition *t1 = NULL;
-      if (This->dpe->value > 0)
+      if (This->dpe > 0)
       {
 	Place *p9  = TheNet->newPlace(prefix + "negLink");
 
@@ -2112,7 +2112,7 @@ This=StandardElements(a,b, jc) provided (This->suppressJF)
         TheNet->newArc(p5, t5);
         TheNet->newArc(t5, p7);
 	TheNet->newArc(p7, t4, READ);
-	if (This->dpe->value > 0)
+	if (This->dpe > 0)
 	{
 	  TheNet->newArc(p5, t1);
 	  TheNet->newArc(t1, p7);
@@ -2126,7 +2126,7 @@ This=StandardElements(a,b, jc) provided (This->suppressJF)
       if (p10 != NULL)
       {
 	TheNet->newArc(t5, p10);
-	if (This->dpe->value > 0)
+	if (This->dpe > 0)
 	  TheNet->mergePlaces(p10, TheNet->findPlace(newPrefix + ".negLink"));
       }
 
@@ -2156,8 +2156,8 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF)
   [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 26\n");
-      string prefix = intToString(This->parentId->value) + ".";
-      string newPrefix = intToString(This->parentId->value) + ".internal";
+      string prefix = intToString(This->parentId) + ".";
+      string newPrefix = intToString(This->parentId) + ".internal";
 
       Place *p11 = TheNet->newPlace(prefix + "p11");
       Place *p12 = TheNet->newPlace(prefix + "p12");
@@ -2191,7 +2191,7 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF)
       // If needed, transition t1 is created and connected with the negLink
       // place of the inner activity if existing for dead path elimination.
       Transition *t1 = NULL;
-      if (This->dpe->value > 0)
+      if (This->dpe > 0)
       {
 	Place *p9  = TheNet->newPlace(prefix + "negLink");
 
@@ -2229,7 +2229,7 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF)
         TheNet->newArc(t3, p7);
 	TheNet->newArc(p7, t4, READ);
 
-	if (This->dpe->value > 0)
+	if (This->dpe > 0)
 	{
 	  TheNet->newArc(p5, t1);
 	  TheNet->newArc(t1, p7);
@@ -2243,7 +2243,7 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF)
       if (p10 != NULL)
       {
 	TheNet->newArc(t5, p10);
-	if (This->dpe->value > 0)
+	if (This->dpe > 0)
 	  TheNet->mergePlaces(p10, TheNet->findPlace(newPrefix + ".negLink"));
       }
 

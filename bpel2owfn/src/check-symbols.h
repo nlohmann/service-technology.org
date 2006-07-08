@@ -28,14 +28,14 @@
  *          - last changes of: \$Author: nlohmann $
  *          
  * \date
- *          - last changed: \$Date: 2006/07/02 17:39:35 $
+ *          - last changed: \$Date: 2006/07/08 12:15:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  */
 
 #ifndef CHECK_SYMBOLS_H
@@ -100,7 +100,7 @@ class SymbolManager
     /// links are not allowed to cross while borders, so special treatment
     void endDPEinWhile();
     /// checks if weed need a negLink under current conditions
-    kc::integer needsDPE();
+    int needsDPE();
 };
 
 #endif

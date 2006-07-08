@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/07/06 13:18:06 $
+ *          - last changed: \$Date: 2006/07/08 12:15:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  */
 
 #include "ast-details.h"
@@ -55,38 +55,38 @@ ASTE::ASTE(kc::impl_abstract_phylum *mynode, int mytype)
 
   switch (mytype)
   {
-    case(K_ASSIGN):		id = ((kc::impl_tAssign*)mynode)->id->value; break;
-    case(K_CASE):		id = ((kc::impl_tCase*)mynode)->id->value; break;
-    case(K_CATCH):		id = ((kc::impl_tCatch*)mynode)->id->value; break;
-    case(K_CATCHALL):		id = ((kc::impl_tCatchAll*)mynode)->id->value; break;
-    case(K_COMPENSATE):		id = ((kc::impl_tCompensate*)mynode)->id->value; break;
-    case(K_COMPENSATIONHANDLER):id = ((kc::impl_tCompensationHandler*)mynode)->id->value; break;
-    case(K_CORRELATION):	id = ((kc::impl_tCorrelation*)mynode)->id->value; break;
-    case(K_CORRELATIONSET):	id = ((kc::impl_tCorrelationSet*)mynode)->id->value; break;
-    case(K_EMPTY):		id = ((kc::impl_tEmpty*)mynode)->id->value; break;
-    case(K_EVENTHANDLERS):	id = ((kc::impl_tEventHandlers*)mynode)->id->value; break;
-    case(K_FAULTHANDLERS):	id = ((kc::impl_tFaultHandlers*)mynode)->id->value; break;
-    case(K_FROM):		id = ((kc::impl_tFrom*)mynode)->id->value; break;
-    case(K_FLOW):		id = ((kc::impl_tFlow*)mynode)->id->value; break;
-    case(K_INVOKE):		id = ((kc::impl_tInvoke*)mynode)->id->value; break;
-    case(K_LINK):		id = ((kc::impl_tLink*)mynode)->id->value; break;
-    case(K_OTHERWISE):		id = ((kc::impl_tOtherwise*)mynode)->id->value; break;
-    case(K_PICK):		id = ((kc::impl_tPick*)mynode)->id->value; break;
-    case(K_PARTNERLINK):	id = ((kc::impl_tPartnerLink*)mynode)->id->value; break;
-    case(K_PROCESS):		id = ((kc::impl_tProcess*)mynode)->id->value; break;
-    case(K_RECEIVE):		id = ((kc::impl_tReceive*)mynode)->id->value; break;
-    case(K_REPLY):		id = ((kc::impl_tReply*)mynode)->id->value; break;
-    case(K_SCOPE):		id = ((kc::impl_tScope*)mynode)->id->value; break;
-    case(K_SOURCE):		id = ((kc::impl_tSource*)mynode)->id->value; break;
-    case(K_SEQUENCE):		id = ((kc::impl_tSequence*)mynode)->id->value; break;
-    case(K_SWITCH):		id = ((kc::impl_tSwitch*)mynode)->id->value; break;
-    case(K_TERMINATE):		id = ((kc::impl_tTerminate*)mynode)->id->value; break;
-    case(K_TARGET):		id = ((kc::impl_tTarget*)mynode)->id->value; break;
-    case(K_THROW):		id = ((kc::impl_tThrow*)mynode)->id->value; break;
-    case(K_TO):			id = ((kc::impl_tTo*)mynode)->id->value; break;
-    case(K_VARIABLE):		id = ((kc::impl_tVariable*)mynode)->id->value; break;
-    case(K_WAIT):		id = ((kc::impl_tWait*)mynode)->id->value; break;
-    case(K_WHILE):		id = ((kc::impl_tWhile*)mynode)->id->value; break;
+    case(K_ASSIGN):		id = ((kc::impl_tAssign*)mynode)->id; break;
+    case(K_CASE):		id = ((kc::impl_tCase*)mynode)->id; break;
+    case(K_CATCH):		id = ((kc::impl_tCatch*)mynode)->id; break;
+    case(K_CATCHALL):		id = ((kc::impl_tCatchAll*)mynode)->id; break;
+    case(K_COMPENSATE):		id = ((kc::impl_tCompensate*)mynode)->id; break;
+    case(K_COMPENSATIONHANDLER):id = ((kc::impl_tCompensationHandler*)mynode)->id; break;
+    case(K_CORRELATION):	id = ((kc::impl_tCorrelation*)mynode)->id; break;
+    case(K_CORRELATIONSET):	id = ((kc::impl_tCorrelationSet*)mynode)->id; break;
+    case(K_EMPTY):		id = ((kc::impl_tEmpty*)mynode)->id; break;
+    case(K_EVENTHANDLERS):	id = ((kc::impl_tEventHandlers*)mynode)->id; break;
+    case(K_FAULTHANDLERS):	id = ((kc::impl_tFaultHandlers*)mynode)->id; break;
+    case(K_FROM):		id = ((kc::impl_tFrom*)mynode)->id; break;
+    case(K_FLOW):		id = ((kc::impl_tFlow*)mynode)->id; break;
+    case(K_INVOKE):		id = ((kc::impl_tInvoke*)mynode)->id; break;
+    case(K_LINK):		id = ((kc::impl_tLink*)mynode)->id; break;
+    case(K_OTHERWISE):		id = ((kc::impl_tOtherwise*)mynode)->id; break;
+    case(K_PICK):		id = ((kc::impl_tPick*)mynode)->id; break;
+    case(K_PARTNERLINK):	id = ((kc::impl_tPartnerLink*)mynode)->id; break;
+    case(K_PROCESS):		id = ((kc::impl_tProcess*)mynode)->id; break;
+    case(K_RECEIVE):		id = ((kc::impl_tReceive*)mynode)->id; break;
+    case(K_REPLY):		id = ((kc::impl_tReply*)mynode)->id; break;
+    case(K_SCOPE):		id = ((kc::impl_tScope*)mynode)->id; break;
+    case(K_SOURCE):		id = ((kc::impl_tSource*)mynode)->id; break;
+    case(K_SEQUENCE):		id = ((kc::impl_tSequence*)mynode)->id; break;
+    case(K_SWITCH):		id = ((kc::impl_tSwitch*)mynode)->id; break;
+    case(K_TERMINATE):		id = ((kc::impl_tTerminate*)mynode)->id; break;
+    case(K_TARGET):		id = ((kc::impl_tTarget*)mynode)->id; break;
+    case(K_THROW):		id = ((kc::impl_tThrow*)mynode)->id; break;
+    case(K_TO):			id = ((kc::impl_tTo*)mynode)->id; break;
+    case(K_VARIABLE):		id = ((kc::impl_tVariable*)mynode)->id; break;
+    case(K_WAIT):		id = ((kc::impl_tWait*)mynode)->id; break;
+    case(K_WHILE):		id = ((kc::impl_tWhile*)mynode)->id; break;
     default:			id = 0;
   }
 

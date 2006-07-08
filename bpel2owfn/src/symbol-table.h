@@ -36,7 +36,7 @@
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.45 $: 
+ * \version \$Revision: 1.46 $: 
  *
  */
 
@@ -200,7 +200,7 @@ class SymbolTable
     unsigned int nextKey();
 
     /// increases the id (used ST key generator -> nextKey())
-    kc::integer nextId();
+    int nextId();
 
     /// ST traces
     void traceST(string traceMsg);
@@ -211,8 +211,8 @@ class SymbolTable
     /// create a new entry in the symbol table and return symbol table entry key
     unsigned int insert(unsigned int elementId);
 
-    /// wrapper for <lookup(unsigned int)> and return entry of symbol table
-    SymbolTableEntry* lookup(kc::integer entryKey);
+//    /// wrapper for <lookup(unsigned int)> and return entry of symbol table
+//    SymbolTableEntry* lookup(kc::integer entryKey);
 
     /// return entry of symbol table
     SymbolTableEntry* lookup(unsigned int entryKey);
@@ -220,14 +220,14 @@ class SymbolTable
     /// to add an attribute object to an existend symbol table entry, but before it makes a duplicate and domain check
     void addAttribute(unsigned int entryKey, STAttribute* attribute);
 
-    /// wrapper for <readAttribute(unsigned int, string)> and return a pointer of attribute object from desired attribute
-    STAttribute* readAttribute(kc::integer entryKey, string attributeName);
+//    /// wrapper for <readAttribute(unsigned int, string)> and return a pointer of attribute object from desired attribute
+//    STAttribute* readAttribute(kc::integer entryKey, string attributeName);
 
     /// return a pointer of attribute object from desired attribute
     STAttribute* readAttribute(unsigned int entryKey, string attributeName);
     
-    /// wrapper for <readAttributeValue(unsigned int, string)> and return value of an attribute object
-    string readAttributeValue(kc::integer entryKey, string attributeName);
+//    /// wrapper for <readAttributeValue(unsigned int, string)> and return value of an attribute object
+//    string readAttributeValue(kc::integer entryKey, string attributeName);
     
     /// return value of an attribute object
     string readAttributeValue(unsigned int entryKey, string attributeName);
@@ -235,11 +235,11 @@ class SymbolTable
     /// create a new attribute
     STAttribute* newAttribute(kc::casestring attributeName, kc::casestring attributeValue);
     
-    /// wrapper for checkAttributes(unsigned int entryKey, kc::casestring bpelElementValue)
-    void checkAttributes(kc::integer entryKey, kc::casestring bpelElementValue);
+//    /// wrapper for checkAttributes(unsigned int entryKey, kc::casestring bpelElementValue)
+//    void checkAttributes(kc::integer entryKey, kc::casestring bpelElementValue);
 
-    /// wrapper for checkAttributes(unsigned int entryKey)
-    void checkAttributes(kc::integer entryKey);
+//    /// wrapper for checkAttributes(unsigned int entryKey)
+//    void checkAttributes(kc::integer entryKey);
 	
     /// checked the presence of valid and necessary attribute combinations of BPEL-elements
     void checkAttributes(unsigned int entryKey, kc::casestring bpelElementValue);
@@ -251,7 +251,7 @@ class SymbolTable
     string translateToElementName(unsigned int elementId);
  
     /// return symbol table information string
-    string getInformation(kc::integer astId, bool closeTag = false);
+    string getInformation(int astId, bool closeTag = false);
 
     /// to clear the value of the current BPEL element of the suppressJoinFailure auxiliary storage
     void popSJFStack();

@@ -28,7 +28,7 @@
  *          - last changes of: \$Author: nlohmann $
  *          
  * \date
- *          - last changed: \$Date: 2006/06/19 14:51:42 $
+ *          - last changed: \$Date: 2006/07/08 12:15:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit&auml;t zu Berlin. See
@@ -113,7 +113,7 @@ void SymbolManager::endDPEinWhile()
 }
 
 /// checks if weed need a negLink under current conditions
-kc::integer SymbolManager::needsDPE()
+int SymbolManager::needsDPE()
 {
   // if we have possible starts and ends, we need a negLink and return 1
   if ( (dpePossibleEnds > 0) && (dpePossibleStarts > 0))
@@ -124,7 +124,7 @@ kc::integer SymbolManager::needsDPE()
 		           + "          possible ends: " 
 			   + intToString(dpePossibleEnds)
 			   + "\n");
-    return kc::mkinteger(1);
+    return 1;
   }
   // no need for a negLink, so return 0
   trace(TRACE_VERY_DEBUG, "[CS] DPE: no negLink needed\n");
@@ -132,6 +132,6 @@ kc::integer SymbolManager::needsDPE()
 		         + intToString(dpePossibleStarts) + "\n"
 		         + "          possible ends: " 
 			 + intToString(dpePossibleEnds) + "\n");
-  return kc::mkinteger(0);
+  return 0;
 }
 

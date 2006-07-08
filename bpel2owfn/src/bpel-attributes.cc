@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/07/05 12:36:11 $
+ *          - last changed: \$Date: 2006/07/08 12:15:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.36 $
+ * \version \$Revision: 1.37 $
  *
  * \todo
  *       - (reinert) Comment this file and its classes.
@@ -66,9 +66,9 @@ attributeManager::attributeManager()
  * \param elementId
  * \param attributeName
  */
-bool attributeManager::isAttributeValueEmpty(kc::integer elementId, std::string attributeName)
+bool attributeManager::isAttributeValueEmpty(int elementId, std::string attributeName)
 {
-  if(scannerResult[elementId->value][attributeName].empty())
+  if(scannerResult[elementId][attributeName].empty())
   {
     return true;
   }
@@ -80,7 +80,7 @@ bool attributeManager::isAttributeValueEmpty(kc::integer elementId, std::string 
  * \param elementId key to identification the BPEL-element in the AM array
  * \param attributeName key to attribute value
  */
-kc::casestring attributeManager::read(kc::integer elementId, std::string attributeName)
+kc::casestring attributeManager::read(int elementId, std::string attributeName)
 {
   std::string result;
   
@@ -91,7 +91,7 @@ kc::casestring attributeManager::read(kc::integer elementId, std::string attribu
   }
   else
   {
-    result = scannerResult[elementId->value][attributeName];
+    result = scannerResult[elementId][attributeName];
   }
 
   return kc::mkcasestring(result.c_str());
@@ -103,7 +103,7 @@ kc::casestring attributeManager::read(kc::integer elementId, std::string attribu
  * \param attributeName key to attribute value
  * \param defaultValue
  */
-kc::casestring attributeManager::read(kc::integer elementId, std::string attributeName, kc::casestring defaultValue)
+kc::casestring attributeManager::read(int elementId, std::string attributeName, kc::casestring defaultValue)
 {
   std::string result;
   
@@ -113,7 +113,7 @@ kc::casestring attributeManager::read(kc::integer elementId, std::string attribu
   }
   else
   {
-    result = scannerResult[elementId->value][attributeName];
+    result = scannerResult[elementId][attributeName];
     return kc::mkcasestring(result.c_str());
   }
 }
@@ -121,10 +121,9 @@ kc::casestring attributeManager::read(kc::integer elementId, std::string attribu
 /*!
  * increase the elementId of the AM array 
  */
-kc::integer attributeManager::nextId()
+int attributeManager::nextId()
 {
-  this->nodeId++;
-  return kc::mkinteger(this->nodeId);
+  return nodeId++;
 }
 
 /*!
@@ -244,14 +243,14 @@ void attributeManager::traceAM(std::string traceMsg)
  * \param elementValue
  * \param elementType
  */
-void attributeManager::check(kc::integer elementId, kc::casestring elementValue, unsigned int elementType)
+void attributeManager::check(int elementId, kc::casestring elementValue, unsigned int elementType)
 {
   if(elementType == K_FROM)
   {
     std::string lit = elementValue->name;
 
     /* without attributes */
-    if(scannerResult[elementId->value].size() == 0)
+    if(scannerResult[elementId].size() == 0)
     { /* literal value is empty */
       if(lit.empty())
       {
@@ -283,10 +282,10 @@ void attributeManager::check(kc::integer elementId, kc::casestring elementValue,
  * \param elementId
  * \param elementType
  */
-void attributeManager::check(kc::integer elementId, unsigned int elementType)
+void attributeManager::check(int elementId, unsigned int elementType)
 {
   // "cast" Kimwitu++ to C++
-  unsigned int elementIdInt = elementId->value; 
+  unsigned int elementIdInt = elementId; 
   /// iterator for the embedded map
   std::map<std::string, string>::iterator scannerResultDataIterator;
   
@@ -1097,7 +1096,7 @@ void attributeManager::check(kc::integer elementId, unsigned int elementType)
 /*!
  * \param val
  */
-void SJFStackElement::setElementId(kc::integer val)
+void SJFStackElement::setElementId(int val)
 {
   this->elementId = val;
 }
@@ -1113,7 +1112,7 @@ void SJFStackElement::setSJFValue(kc::casestring val)
 /*!
  * 
  */
-kc::integer SJFStackElement::getElementId()
+int SJFStackElement::getElementId()
 {
   return this->elementId;  
 }

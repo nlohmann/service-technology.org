@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/07/06 11:46:48 $
+ *          - last changed: \$Date: 2006/07/08 12:15:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.90 $
+ * \version \$Revision: 1.91 $
  *
  */
 
@@ -124,7 +124,7 @@ int main( int argc, char *argv[])
 	trace(TRACE_INFORMATION, "Postprocessing complete...\n");
 
 	if (modus == M_CFG)
-	  cfg();
+	  processCFG();
 
 
 

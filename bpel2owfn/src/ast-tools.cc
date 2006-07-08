@@ -32,13 +32,13 @@
  *
  * \date
  *          - created: 2006/02/08
- *          - last changed: \$Date: 2006/07/04 12:45:47 $
+ *          - last changed: \$Date: 2006/07/08 12:15:53 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  */
 
 
@@ -117,7 +117,7 @@ unsigned int indentStep = 4;
 */
 Transition *throwFault(Place *p1, Place *p2,
     string p1name, string prefix,
-    kc::integer negativeControlFlow, bool preventFurtherFaults)
+    int negativeControlFlow, bool preventFurtherFaults)
 {
   assert(p1 != NULL);
   assert(p2 != NULL);
@@ -126,7 +126,7 @@ Transition *throwFault(Place *p1, Place *p2,
   if (parameters[P_COMMUNICATIONONLY])
     return NULL;
   
-  switch (negativeControlFlow->value)
+  switch (negativeControlFlow)
   {
     case(0): // activity in scope or process
     {
@@ -259,7 +259,7 @@ string inString()
  * activity of the given id. If myindent is set to true, the enclosed
  * elements are indented.
  */
-void header(kc::integer id, bool myindent)
+void header(int id, bool myindent)
 {
   trace(TRACE_DEBUG, "[PNU]" + inString() + symTab.getInformation(id) + "\n");
 
@@ -276,7 +276,7 @@ void header(kc::integer id, bool myindent)
  * activity of the given id. If myindent is set to true, the indentation is
  * reduced.
  */
-void footer(kc::integer id, bool myindent)
+void footer(int id, bool myindent)
 {
   if (myindent)
     indent -= indentStep;
@@ -290,7 +290,7 @@ void footer(kc::integer id, bool myindent)
 /**
  * Creates arcs to set links on dead paths to false.
  */
-void dpeLinks(Transition *t, kc::integer id)
+void dpeLinks(Transition *t, int id)
 {
   assert(t != NULL);
 

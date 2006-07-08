@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/07/08 12:15:52 $
+ *          - last changed: \$Date: 2006/07/08 16:31:14 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  */
 %}
 
@@ -67,6 +67,7 @@ using namespace std;
 
 extern map<unsigned int, ASTE*> ASTEmap;
 
+map<string, int> linkIdMap;
 
 unsigned int PPcurrentFlow = 0;
 unsigned int PPcurrentScope = 0;
@@ -95,8 +96,6 @@ Process(a,b,c,d,e,f,g,h,i) ->
       }
 
       $0->hasEH = (string(g->op_name()) == "userDefinedEventHandler");
-//      STProcess* myself = dynamic_cast<STProcess*> (symTab.lookup($0->id));
-//      assert($0->hasEH == myself->hasEventHandler);
 
       // copy attributes to AST
       $0->A_name = ASTEmap[myid]->attributes["name"];
@@ -126,6 +125,13 @@ Process(a,b,c,d,e,f,g,h,i) ->
       PPcurrentScope = myid;
     }
     a b c d e f g h i
+    {
+      // collect enclosed source links
+      assert(ASTEmap[i->id] != NULL);
+      ASTEmap[myid]->enclosedSourceLinks = ASTEmap[i->id]->enclosedSourceLinks;
+
+//      cerr << myid << " has " << ASTEmap[myid]->enclosedSourceLinks.size() << " indirectly enclosed source links" << endl;
+    }
   ]
 ;
 
@@ -139,8 +145,6 @@ PartnerLink() ->
     {
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
-
-      // cerr << "read partner link: " << ASTEmap[myid]->attributes["name"] << endl;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
     }
@@ -179,8 +183,6 @@ userDefinedFaultHandler(a,b) ->
 
       $0->hasCatchAll = (b->op_name() == "CatchAll");
 
-      // cerr << "<faultHandlers>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
-
       // distribute the fault handlers's id to the enclosed catch/catchAll branches
       // also mark the activities as "inside fault handlers"
       foreach(branch=Catch(innerActivity); tCatch_list a)
@@ -192,8 +194,7 @@ userDefinedFaultHandler(a,b) ->
 //      assert(ASTEmap[b->id] != NULL); /TODO!
 //      ASTEmap[b->id]->parentActivityId = myid;
 
-      // these 3 asserts show that the AST can be annotated right here
-//      assert($0->hasCatchAll == (b->op_name() == "CatchAll"));
+      // these 2 asserts show that the AST can be annotated right here
       assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);
       assert($0->inProcess == (ASTEmap[myid]->parentScopeId == 1));
     }
@@ -211,10 +212,7 @@ implicitFaultHandler() ->
 
       $0->hasCatchAll = false;
 
-      // cerr << "<faultHandlers>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
-
-      // these 3 asserts show that the AST can be annotated right here
-//      assert($0->hasCatchAll == false);
+      // these 2 asserts show that the AST can be annotated right here
       assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);
       assert($0->inProcess == (ASTEmap[myid]->parentScopeId == 1));
     }
@@ -313,8 +311,6 @@ userDefinedCompensationHandler(a) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
-      // cerr << "<compensationHandler>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
-
       // distribute the compensation handlers's id to the enclosed activity
       // also mark the activities as "inside compensation handlers"
       assert(ASTEmap[a->id] != NULL);
@@ -335,8 +331,6 @@ Variable() ->
     {
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
-
-      // cerr << "\tread variable: " << PPcurrentScope << "." << ASTEmap[myid]->attributes["name"] << endl;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
     }
@@ -406,8 +400,6 @@ Empty(a) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      // cerr << "<empty>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
@@ -448,13 +440,9 @@ Invoke(a,b) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      // cerr << "<invoke>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
-      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow);
-//      assert(a->parentId == myid);
     }
     a b
   ]
@@ -492,13 +480,9 @@ Receive(a,b) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      // cerr << "<receive>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
-      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow);
-//      assert(a->parentId == myid);
     }
     a b
   ]
@@ -536,13 +520,10 @@ Reply(a,b) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      // cerr << "<reply>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
-      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow);
-//      assert(a->parentId == myid);
     }
     a b
   ]
@@ -575,13 +556,9 @@ Assign(a,b) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      // cerr << "<assign>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
-      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow);
-//      assert(a->parentId == myid);
     }
     a b
   ]
@@ -652,13 +629,9 @@ WaitFor(a) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      // cerr << "<wait>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
-      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow);
-//      assert(a->parentId == myid);
     }
     a
   ]
@@ -687,13 +660,9 @@ WaitUntil(a) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      // cerr << "<wait>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
-      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow);
-//      assert(a->parentId == myid);
     }
     a
   ]
@@ -728,13 +697,9 @@ Throw(a) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      // cerr << "<throw>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
-      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow);
-//      assert(a->parentId == myid);
     }
     a
   ]
@@ -768,12 +733,9 @@ Compensate(a) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      // cerr << "<compensate>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
-      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow);
     }
     a
   ]
@@ -806,12 +768,9 @@ Terminate(a) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      // cerr << "<terminate>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
-      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow);
     }
     a
   ]
@@ -845,8 +804,6 @@ Flow(a,b,c) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      // cerr << "<flow>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
-
       // distribute the flow's id to the enclosed activities
       // also distribute the control flow type
       foreach(innerActivity; activity_list c)
@@ -855,11 +812,24 @@ Flow(a,b,c) ->
         ASTEmap[innerActivity->id]->parentActivityId = myid;
         ASTEmap[innerActivity->id]->controlFlow = ASTEmap[myid]->controlFlow;
       }
+      foreach(link; tLink_list b)
+      {
+        assert(ASTEmap[link->id] != NULL);
+        ASTEmap[link->id]->parentActivityId = myid;
+      }
 
-      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow);
+
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
     }
     a b c
+    {
+      // collect enclosed source links
+      foreach(innerActivity; activity_list c)
+      {
+        assert(ASTEmap[innerActivity->id] != NULL);
+        ASTEmap[myid]->enclosedSourceLinks.splice(ASTEmap[myid]->enclosedSourceLinks.end(), ASTEmap[innerActivity->id]->enclosedSourceLinks);
+      }
+    }
   ]
 ;
 
@@ -872,7 +842,10 @@ Link() ->
       // copy attributes to AST
       $0->A_name = ASTEmap[myid]->attributes["name"];
 
-      // cerr << "\tread link: " << PPcurrentFlow << "." << ASTEmap[myid]->attributes["name"] << endl;
+      /* here we can check whether this link was not defined before */
+      linkIdMap[$0->A_name] = myid;
+
+      // cerr << "defined a link " << $0->A_name << " (" << myid << ")" << endl;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
     }
@@ -906,8 +879,6 @@ Switch(a,b,c=Otherwise(d)) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      // cerr << "<switch>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
-
       // distribute the switch's id to the enclosed activities
       // also distribute the control flow
       foreach(branch=Case(innerActivity); tCase_list b)
@@ -920,10 +891,19 @@ Switch(a,b,c=Otherwise(d)) ->
       ASTEmap[d->id]->parentActivityId = myid;
       ASTEmap[d->id]->controlFlow = ASTEmap[myid]->controlFlow;
 
-      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow);
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
     }
     a b c
+    {
+      // collect enclosed source links
+      foreach(branch=Case(innerActivity); tCase_list b)
+      {
+        assert(ASTEmap[innerActivity->id] != NULL);
+        ASTEmap[myid]->enclosedSourceLinks.splice(ASTEmap[myid]->enclosedSourceLinks.end(), ASTEmap[innerActivity->id]->enclosedSourceLinks);
+      }
+      assert(ASTEmap[d->id] != NULL);
+      ASTEmap[myid]->enclosedSourceLinks.splice(ASTEmap[myid]->enclosedSourceLinks.end(), ASTEmap[d->id]->enclosedSourceLinks);
+    }
   ]
 ;
 
@@ -982,17 +962,19 @@ While(a,b) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      // cerr << "<while>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
-
       // distribute the while's id to the enclosed activity
       assert(ASTEmap[b->id] != NULL);
       ASTEmap[b->id]->parentActivityId = myid;
       ASTEmap[b->id]->controlFlow = ASTEmap[myid]->controlFlow;
 
-      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow);
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
     }
     a b
+    {
+      // collect enclosed source links
+      assert(ASTEmap[b->id] != NULL);
+      ASTEmap[myid]->enclosedSourceLinks.splice(ASTEmap[myid]->enclosedSourceLinks.end(), ASTEmap[b->id]->enclosedSourceLinks);
+    }
   ]
 ;
 
@@ -1023,8 +1005,6 @@ Sequence(a,b) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      // cerr << "<sequence>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
-
       // distribute the sequence's id to the enclosed activities
       foreach(innerActivity; activity_list b)
       {
@@ -1033,10 +1013,17 @@ Sequence(a,b) ->
         ASTEmap[innerActivity->id]->controlFlow = ASTEmap[myid]->controlFlow;
       }
 
-      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow);
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
     }
     a b
+    {
+      // collect enclosed source links
+      foreach(innerActivity; activity_list b)
+      {
+        assert(ASTEmap[innerActivity->id] != NULL);
+        ASTEmap[myid]->enclosedSourceLinks.splice(ASTEmap[myid]->enclosedSourceLinks.end(), ASTEmap[innerActivity->id]->enclosedSourceLinks);
+      }
+    }
   ]
 ;
 
@@ -1066,8 +1053,6 @@ Pick(a,b,c) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      // cerr << "<pick>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
-
       // distribute the pick's id to the enclosed activities
       foreach(branch=OnMessage(innerActivity); tOnMessage_list b)
       {
@@ -1082,11 +1067,22 @@ Pick(a,b,c) ->
         ASTEmap[innerActivity->id]->controlFlow = ASTEmap[myid]->controlFlow;
       }
 
-      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow);
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
-      assert(a->parentId == myid);
     }
     a b c
+    {
+      // collect enclosed source links
+      foreach(branch=OnMessage(innerActivity); tOnMessage_list b)
+      {
+        assert(ASTEmap[innerActivity->id] != NULL);
+        ASTEmap[myid]->enclosedSourceLinks.splice(ASTEmap[myid]->enclosedSourceLinks.end(), ASTEmap[innerActivity->id]->enclosedSourceLinks);
+      }
+      foreach(branch=OnAlarm(innerActivity); tOnAlarm_list c)
+      {
+        assert(ASTEmap[innerActivity->id] != NULL);
+        ASTEmap[myid]->enclosedSourceLinks.splice(ASTEmap[myid]->enclosedSourceLinks.end(), ASTEmap[innerActivity->id]->enclosedSourceLinks);
+      }
+    }
   ]
 ;
 
@@ -1103,10 +1099,9 @@ Scope(a,b,c,d,e,f,g) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       PPcurrentScope = myid;
+      a->parentId = myid;
 
       $0->hasEH = (string(e->op_name()) == "userDefinedEventHandler");
-//      STScope* myself = dynamic_cast<STScope*> (symTab.lookup($0->id));
-//      assert($0->hasEH == myself->hasEventHandler);
 
       // copy attributes to AST
       $0->A_name = ASTEmap[myid]->attributes["name"];
@@ -1122,20 +1117,21 @@ Scope(a,b,c,d,e,f,g) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
-      // cerr << "<scope>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
-
       // distribute the scope's id to the enclosed activity
       assert(ASTEmap[g->id] != NULL);
       ASTEmap[g->id]->parentActivityId = myid;
 
-      // assert(ASTEmap[myid]->controlFlow == $0->negativeControlFlow);
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
-      assert(a->parentId == myid);
     }
     a b c d e f g
     {
       PPcurrentScope = ASTEmap[myid]->parentScopeId;
       assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);
+
+
+      // collect enclosed source links
+      assert(ASTEmap[g->id] != NULL);
+      ASTEmap[myid]->enclosedSourceLinks.splice(ASTEmap[myid]->enclosedSourceLinks.end(), ASTEmap[g->id]->enclosedSourceLinks);
     }
   ]
 ;
@@ -1168,6 +1164,9 @@ StandardElements(a,b,c) ->
       }
     }
     a b c
+    {
+      /* here we can check whether each link was used as source and target */
+    }
   ]
 ;
 
@@ -1177,8 +1176,17 @@ Target() ->
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
 
-      // cerr << "<target>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
-      // cerr << "\tread target link: " << ASTEmap[myid]->attributes["linkName"] << endl;
+      // find the id of the link used as target here
+      int linkId = linkIdMap[ASTEmap[myid]->attributes["linkName"]];
+      /* here we can check whether this link was defined before */
+
+      // remember that that link was used as a target
+      assert(ASTEmap[linkId] != NULL);
+      kc::impl_tLink *theLink = (kc::impl_tLink*)(ASTEmap[linkId]->node);
+      assert(theLink != NULL);
+      assert(theLink->id == linkId);
+      /* here we can check whether this link was not used as target before */
+      theLink->usedAsTarget = true;
     }
   ]
 ;
@@ -1189,9 +1197,26 @@ Source() ->
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
 
-      // cerr << "<source>: " << myid << "@" << ASTEmap[myid]->parentActivityId << endl;
-      // cerr << "\tread source link: " << ASTEmap[myid]->attributes["linkName"] << endl;
+      // find the id of the link used as source here
+      int linkId = linkIdMap[ASTEmap[myid]->attributes["linkName"]];
+      /* here we can check whether this link was defined before */
+
+
+      // remember that that link was used as a source
+      assert(ASTEmap[linkId] != NULL);
+      kc::impl_tLink *theLink = (kc::impl_tLink*)(ASTEmap[linkId]->node);
+      assert(theLink != NULL);
+      assert(theLink->id == linkId);
+      /* here we can check whether this link was not used as target before */
+      theLink->usedAsSource = true;
+
+
+      // cerr << ASTEmap[myid]->parentActivityId << " has a source link (" << linkId << ")" << endl;
+
+
+      // add that link to the parent activity
+      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
+      ASTEmap[ASTEmap[myid]->parentActivityId]->enclosedSourceLinks.push_back(linkId);
     }
   ]
 ;
-

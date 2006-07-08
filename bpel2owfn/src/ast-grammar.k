@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/07/08 12:15:52 $
+ *          - last changed: \$Date: 2006/07/08 16:31:14 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.90 $
+ * \version \$Revision: 1.91 $
  */
 %}
 
@@ -79,7 +79,7 @@ tProcess:
       activity
       )
   {
-    int id;
+    int id = 0;
     bool suppressJF = false;
     bool hasEH = false;
 
@@ -120,7 +120,7 @@ activity:
 | activityScope(tScope)
 | activityCompensate(tCompensate)
   {
-    int id;
+    int id = 0;
     int dpe = 0;
   }
 ;
@@ -137,7 +137,7 @@ tPartnerLink_list:
 tPartnerLink:
   PartnerLink()
   {
-    int id;
+    int id = 0;
 
     bool inPartners = false;
 
@@ -160,7 +160,7 @@ tPartner_list:
 tPartner:
   Partner(tPartnerLink_list)
   {
-    int id;
+    int id = 0;
 
     string A_name;
   }
@@ -175,7 +175,7 @@ tFaultHandlers:
   userDefinedFaultHandler(tCatch_list tCatchAll)
 | implicitFaultHandler()
   {
-    int id;
+    int id = 0;
 
     bool inProcess;
     int parentScopeId;
@@ -190,7 +190,7 @@ tCatch_list:
 tCatch:
   Catch(activity)
   {
-    int id;
+    int id = 0;
 
     string A_faultName;
     string A_faultVariable;
@@ -201,7 +201,7 @@ tCatchAll:
   CatchAll(activity)
 | NoCatchAll()
   {
-    int id;
+    int id = 0;
   }
 ;
 
@@ -214,7 +214,7 @@ tEventHandlers:
   implicitEventHandler()
 | userDefinedEventHandler(tOnMessage_list tOnAlarm_list)
   {
-    int id;
+    int id = 0;
     int parentScopeId;
   }
 ;
@@ -236,7 +236,7 @@ tOnAlarm_list:
 tOnMessage:
   OnMessage(activity)
   {
-    int id;
+    int id = 0;
     int dpe = 0;
 
     string A_partnerLink;
@@ -249,7 +249,7 @@ tOnMessage:
 tOnAlarm:
   OnAlarm(activity)
   {
-    int id;
+    int id = 0;
     int dpe = 0;
     
     string A_for;
@@ -267,7 +267,7 @@ tCompensationHandler:
 | userDefinedCompensationHandler(activity)
 | processCompensationHandler()
   {
-    int id;
+    int id = 0;
 
     int parentScopeId;
     bool compensateWithoutScope = false;
@@ -286,7 +286,7 @@ tVariable_list:
 tVariable:
   Variable()
   {
-    int id;
+    int id = 0;
 
     string A_name;
     string A_messageType;
@@ -307,7 +307,7 @@ tCorrelationSet_list:
 tCorrelationSet:
   CorrelationSet()
   {
-    int id;
+    int id = 0;
 
     string A_name;
     string A_properties;
@@ -326,7 +326,7 @@ tCorrelation_list:
 tCorrelation:
   Correlation()
   {
-    int id;
+    int id = 0;
 
     string A_set;
     string A_initiate;
@@ -342,8 +342,8 @@ tCorrelation:
 tEmpty:
   Empty(standardElements)
   {
-    int id;
-    int negativeControlFlow;
+    int id = 0;
+    int negativeControlFlow = 0;
     bool suppressJF = false;
 
     string A_name;
@@ -360,9 +360,9 @@ tEmpty:
 tInvoke:
   Invoke(standardElements tCorrelation_list)
   {
-    int id;
+    int id = 0;
     int dpe = 0;
-    int negativeControlFlow;
+    int negativeControlFlow = 0;
     bool suppressJF = false;
 
     string A_name;
@@ -384,8 +384,8 @@ tInvoke:
 tReceive:
   Receive(standardElements tCorrelation_list)
   {
-    int id;
-    int negativeControlFlow;
+    int id = 0;
+    int negativeControlFlow = 0;
     bool suppressJF = false;
 
     string A_name;
@@ -407,8 +407,8 @@ tReceive:
 tReply:
   Reply(standardElements tCorrelation_list)
   {
-    int id;
-    int negativeControlFlow;
+    int id = 0;
+    int negativeControlFlow = 0;
     bool suppressJF = false;
 
     string A_name;
@@ -430,8 +430,8 @@ tReply:
 tAssign:
   Assign(standardElements tCopy_list)
   {
-    int id;
-    int negativeControlFlow;
+    int id = 0;
+    int negativeControlFlow = 0;
     bool suppressJF = false;
 
     string A_name;
@@ -451,7 +451,7 @@ tCopy:
 tFrom:
   From()
   {
-    int id;
+    int id = 0;
 
     string literal;
 
@@ -467,7 +467,7 @@ tFrom:
 tTo:
   To()
   {
-    int id;
+    int id = 0;
 
     string A_variable;
     string A_part;
@@ -485,8 +485,8 @@ tWait:
   WaitFor(standardElements)
 | WaitUntil(standardElements)
   {
-    int id;
-    int negativeControlFlow;
+    int id = 0;
+    int negativeControlFlow = 0;
     bool suppressJF = false;
 
     string A_name;
@@ -505,8 +505,8 @@ tWait:
 tThrow:
   Throw(standardElements)
   {
-    int id;
-    int negativeControlFlow;
+    int id = 0;
+    int negativeControlFlow = 0;
     bool suppressJF = false;
 
     string A_name;
@@ -525,8 +525,8 @@ tThrow:
 tCompensate:
   Compensate(standardElements)
   {
-    int id;
-    int negativeControlFlow;
+    int id = 0;
+    int negativeControlFlow = 0;
     bool suppressJF = false;
 
     bool inFaultHandler = true;
@@ -546,8 +546,8 @@ tCompensate:
 tTerminate:
   Terminate(standardElements)
   {
-    int id;
-    int negativeControlFlow;
+    int id = 0;
+    int negativeControlFlow = 0;
     bool suppressJF = false;
 
     string A_name;
@@ -564,9 +564,9 @@ tTerminate:
 tFlow:
   Flow(standardElements tLink_list activity_list)
   {
-    int id;
+    int id = 0;
     int dpe = 0;
-    int negativeControlFlow;
+    int negativeControlFlow = 0;
     bool suppressJF = false;
 
     string A_name;
@@ -589,9 +589,12 @@ tLink_list:
 tLink:
   Link()
   {
-    int id;
+    int id = 0;
 
     string A_name;
+
+    bool usedAsSource = false;
+    bool usedAsTarget = false;
   }
 ;
 
@@ -603,9 +606,9 @@ tLink:
 tSwitch:
   Switch(standardElements tCase_list tOtherwise)
   {
-    int id;
+    int id = 0;
     int dpe = 0;
-    int negativeControlFlow;
+    int negativeControlFlow = 0;
     bool suppressJF = false;
 
     string A_name;
@@ -624,7 +627,7 @@ tCase_list:
 tCase:
   Case(activity)
   {
-    int id;
+    int id = 0;
     int dpe = 0;
     
     string A_condition;
@@ -634,7 +637,7 @@ tCase:
 tOtherwise:
   Otherwise(activity)
   {
-    int id;
+    int id = 0;
     int dpe = 0;
   }
 ;
@@ -647,8 +650,8 @@ tOtherwise:
 tWhile:
   While(standardElements activity)
   {
-    int id;
-    int negativeControlFlow;
+    int id = 0;
+    int negativeControlFlow = 0;
     bool suppressJF = false;
 
     string A_name;
@@ -666,9 +669,9 @@ tWhile:
 tSequence:
   Sequence(standardElements activity_list)
   {
-    int id;
+    int id = 0;
     int dpe = 0;
-    int negativeControlFlow;
+    int negativeControlFlow = 0;
     bool suppressJF = false;
 
     string A_name;
@@ -685,9 +688,9 @@ tSequence:
 tPick:
   Pick(standardElements tOnMessage_list tOnAlarm_list)
   {
-    int id;
+    int id = 0;
     int dpe = 0;
-    int negativeControlFlow;
+    int negativeControlFlow = 0;
     bool suppressJF = false;
 
     string A_name;
@@ -713,9 +716,9 @@ tScope:
       activity
       )
   {
-    int id;
+    int id = 0;
     int dpe = 0;
-    int negativeControlFlow;
+    int negativeControlFlow = 0;
     bool suppressJF = false;
     bool hasEH = false;
 
@@ -738,7 +741,7 @@ standardElements:
   StandardElements(tTarget_list tSource_list joinCondition)
   {
     int dpe = 0;
-    int negativeControlFlow;
+    int negativeControlFlow = 0;
     bool suppressJF = false;
 
     int parentId;
@@ -756,8 +759,8 @@ tTarget_list:
 tTarget:
   Target()
   {
-    int id;
-    int negativeControlFlow;
+    int id = 0;
+    int negativeControlFlow = 0;
     
     string A_linkName;
   }
@@ -773,9 +776,9 @@ tSource_list:
 tSource:
   Source()
   {
-    int id;
+    int id = 0;
     int dpe = 0;
-    int negativeControlFlow;
+    int negativeControlFlow = 0;
 
     string A_linkName;
     string A_transitionCondition;

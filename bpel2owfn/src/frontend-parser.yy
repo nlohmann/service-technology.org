@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/07/08 12:15:52 $
+ *          - last changed: \$Date: 2006/07/08 16:31:14 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.200 $
+ * \version \$Revision: 1.201 $
  * 
  */
 %}
@@ -356,97 +356,40 @@ imports:
 
 activity:
   tEmpty
-    { $$ = activityEmpty($1); $$->id = $1->id; 
-
-      // collect source links for new DPE
-      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id));
-      branch->processLinks($$->id, currentSymTabEntryKey); }
+    { $$ = activityEmpty($1); $$->id = $1->id; }
 | tInvoke
     { $$ = $1; }
 | tReceive
-    { $$ = activityReceive($1); $$->id = $1->id; 
-
-      // collect source links for new DPE
-      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id));
-      branch->processLinks($$->id, currentSymTabEntryKey); }
+    { $$ = activityReceive($1); $$->id = $1->id; }
 | tReply
-    { $$ = activityReply($1); $$->id = $1->id; 
-
-      // collect source links for new DPE
-      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id));
-      branch->processLinks($$->id, currentSymTabEntryKey); }
+    { $$ = activityReply($1); $$->id = $1->id; }
 | tAssign
-    { $$ = activityAssign($1); $$->id = $1->id; 
-
-      // collect source links for new DPE
-      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id));
-      branch->processLinks($$->id, currentSymTabEntryKey); }
+    { $$ = activityAssign($1); $$->id = $1->id; }
 | tWait
-    { $$ = activityWait($1); $$->id = $1->id; 
-
-      // collect source links for new DPE
-      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id));
-      branch->processLinks($$->id, currentSymTabEntryKey); }
+    { $$ = activityWait($1); $$->id = $1->id; }
 | tThrow
-    { $$ = activityThrow($1); $$->id = $1->id; 
-
-      // collect source links for new DPE
-      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id));
-      branch->processLinks($$->id, currentSymTabEntryKey); }
+    { $$ = activityThrow($1); $$->id = $1->id; }
 | tTerminate
-    { $$ = activityTerminate($1); $$->id = $1->id; 
-
-      // collect source links for new DPE
-      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id));
-      branch->processLinks($$->id, currentSymTabEntryKey); }
+    { $$ = activityTerminate($1); $$->id = $1->id; }
 | tFlow
     { $$ = activityFlow($1); $$->id = $1->id; 
-      $$->dpe = $1->dpe ;
-
-      // collect source links for new DPE
-      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id));
-      branch->processLinks($$->id, currentSymTabEntryKey); }
+      $$->dpe = $1->dpe ; }
 | tSwitch
     { $$ = activitySwitch($1); $$->id = $1->id; 
-      $$->dpe = $1->dpe;
-
-      // collect source links for new DPE
-      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id));
-      branch->processLinks($$->id, currentSymTabEntryKey); }
+      $$->dpe = $1->dpe; }
 | tWhile
-    { $$ = activityWhile($1); $$->id = $1->id; 
-
-      // collect source links for new DPE
-      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id));
-      branch->processLinks($$->id, currentSymTabEntryKey); }
+    { $$ = activityWhile($1); $$->id = $1->id; }
 | tSequence
     { $$ = activitySequence($1); $$->id = $1->id; 
-      $$->dpe = $1->dpe;
-
-      // collect source links for new DPE
-      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id));
-      branch->processLinks($$->id, currentSymTabEntryKey); }
+      $$->dpe = $1->dpe; }
 | tPick
     { $$ = activityPick($1); $$->id = $1->id; 
-      $$->dpe = $1->dpe;
-
-      // collect source links for new DPE
-      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id));
-      branch->processLinks($$->id, currentSymTabEntryKey); }
+      $$->dpe = $1->dpe; }
 | tScope
     { $$ = activityScope($1); $$->id = $1->id; 
-      $$->dpe = $1->dpe;
-
-      // collect source links for new DPE
-      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id));
-      branch->processLinks($$->id, currentSymTabEntryKey); 
-    }
+      $$->dpe = $1->dpe; }
 | tCompensate
-    { $$ = activityCompensate($1); $$->id = $1->id; 
-
-      // collect source links for new DPE
-      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id));
-      branch->processLinks($$->id, currentSymTabEntryKey); }
+    { $$ = activityCompensate($1); $$->id = $1->id; }
 ;
 
 
@@ -474,34 +417,11 @@ tPartnerLink:
     { 
       STPartnerLink *stPartnerLink = dynamic_cast<STPartnerLink*> (symTab.lookup($2->value));
       assert(stPartnerLink != NULL);
-/*
-      if(inPartners) {
-        stPartnerLink->isInPartners = true;
-      }
-      else {
-        stPartnerLink->isInPartners = false;      
-      }
-*/
-      // symTab.checkAttributes($2);
-      $$ = PartnerLink();
-      $$->id = $2->value;
-/*
-      if (inPartners) {
-	STPartnerLink * definedPL = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "name"));
-	definedPL->partners.insert(currentPartner);
-	if (definedPL->partners.size() > 1)
-	{
-	  trace("WARNING: Overlapping Partners\n");
-	}
-      }
-      else
-      {
-	// cast to STProcess should always happen, since PartnerLinks can only be declared there
-	(dynamic_cast<STProcess*>(currentSTScope))->addPartnerLink(stPartnerLink);
-      }
-*/
 
       (dynamic_cast<STProcess*>(currentSTScope))->addPartnerLink(stPartnerLink);
+
+      $$ = PartnerLink();
+      $$->id = $2->value;
 
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_PARTNERLINK);
@@ -511,43 +431,11 @@ tPartnerLink:
     { 
       STPartnerLink *stPartnerLink = dynamic_cast<STPartnerLink*> (symTab.lookup($2->value));
       assert(stPartnerLink != NULL);
-/*
-      if(inPartners) {
-        stPartnerLink->isInPartners = true;
-      }
-      else {
-        stPartnerLink->isInPartners = false;      
-      }
-*/
-      // symTab.checkAttributes($2);
-      $$ = PartnerLink();
-      $$->id = $2->value;
-
-/*
-      if (inPartners) {
-	STPartnerLink * definedPL = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "name"));
-	definedPL->partners.insert(currentPartner);
-	if (definedPL->partners.size() > 1)
-	{
-	  trace("WARNING: Overlapping Partner definitions!\n");
-	  trace("         PartnerLink \"" + symTab.readAttributeValue($2->value, "name")+ "\" ");
-	  trace("(line " + intToString(stPartnerLink->line) + ")\n");
-	  trace("         was used multiple times in a Partner definition: \n");
-	  for(set<STPartner *>::iterator iter = definedPL->partners.begin(); iter != definedPL->partners.end(); iter++)
-	  {
-	    trace("          * Partner \"" + symTab.readAttributeValue((*iter)->entryKey, "name") + "\"");
-	    trace(" (line " + intToString(dynamic_cast<STElement*>(symTab.lookup((*iter)->entryKey))->line) + ")\n");
-	  }
-	}
-      }
-      else
-      {
-	// cast to STProcess should always happen, since PartnerLinks can only be declared there
-	(dynamic_cast<STProcess*>(currentSTScope))->addPartnerLink(stPartnerLink);
-      }
-*/
 
       (dynamic_cast<STProcess*>(currentSTScope))->addPartnerLink(stPartnerLink);
+
+      $$ = PartnerLink();
+      $$->id = $2->value;
 
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_PARTNERLINK);
@@ -801,8 +689,7 @@ tOnAlarm_list:
 tOnMessage:
   K_ONMESSAGE genSymTabEntry_OnMessage
   arbitraryAttributes X_NEXT
-    { // symTab.checkAttributes($2);
-      symMan.resetDPEend(); }
+    { symMan.resetDPEend(); }
   tCorrelations activity X_NEXT X_SLASH K_ONMESSAGE
     {
       STOnMessage *stOnMessage = dynamic_cast<STOnMessage *> (symTab.lookup($2->value));
@@ -1619,102 +1506,24 @@ genSymTabEntry_Throw:
 ******************************************************************************/
 
 tCompensate:
-  K_COMPENSATE genSymTabEntry_Compensate
-  arbitraryAttributes
-    { // symTab.checkAttributes($2); //att.check($3, K_COMPENSATE);
-/*
-      // compensate only is allowed within Compensation- or FaultHandler
-      if ( ! (isInCH.top().first || isInFH.top()) )
-      {
-        yyerror(string("The activity <compensate> is only allowed with in a Compensation of FaultHandler.\n").c_str());
-      }
-      if(string(att.read($3, "scope")->name) == "")
-      {
-        if ( hasCompensate > 0)
-        {
-          yyerror(string("You may only define one <compensate> if you're using it without attributes.\n").c_str());
-        }
-        hasCompensate = 1;
-      }
-      else
-      {
-        if ( hasCompensate == 1)
-        {
-          yyerror(string("You may only define one <compensate> if you're using it without attributes.\n").c_str());
-        }
-        hasCompensate = 2;
-      }
-*/
-//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-//NL      {
-//NL      	/// parent BPEL-element attribute value
-//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-//NL      }
-//NL      else
-//NL      {
-//NL        /// current BPEL-element attribute value
-//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-//NL      }
-    }   
-  X_NEXT standardElements X_SLASH K_COMPENSATE
+  K_COMPENSATE genSymTabEntry_Compensate arbitraryAttributes X_NEXT
+  standardElements X_SLASH K_COMPENSATE
     {
-//NL      $6->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
-//NL      att.popSJFStack(); symTab.popSJFStack();
-      if ($6->hasTarget)
+      if ($5->hasTarget)
 	symMan.remDPEstart();
-      if ($6->dpe > 0)
+      if ($5->dpe > 0)
         symMan.addDPEend();
 
-//NL      $$->negativeControlFlow = $6->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
-
-      $$ = Compensate($6);
+      $$ = Compensate($5);
       $$->id = $2->value;
 
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_COMPENSATE);
     }
-| K_COMPENSATE genSymTabEntry_Compensate arbitraryAttributes
-    { // symTab.checkAttributes($2); //att.check($3, K_COMPENSATE);
-/*
-      // compensate only is allowed within Compensation- or FaultHandler
-      if ( ! (isInCH.top().first || isInFH.top()) )
-      {
-        yyerror(string("The activity <compensate> is only allowed with in a Compensation of FaultHandler.\n").c_str());
-      }
-      if(string(att.read($3, "scope")->name) == "")
-      {
-        if ( hasCompensate > 0)
-        {
-          yyerror(string("You may only define one <compensate> if you're using it without attributes.\n").c_str());
-        }
-        hasCompensate = 1;
-      }
-      else
-      {
-        if ( hasCompensate == 1)
-        {
-          yyerror(string("You may only define one <compensate> if you're using it without attributes.\n").c_str());
-        }
-        hasCompensate = 2;
-      }
-*/
-//NL      if(att.isAttributeValueEmpty($3, "suppressJoinFailure"))
-//NL      {
-//NL      	/// parent BPEL-element attribute value
-//NL      	att.pushSJFStack($3, (att.topSJFStack()).getSJFValue());
-//NL      }
-//NL      else
-//NL      {
-//NL        /// current BPEL-element attribute value
-//NL      	att.pushSJFStack($3, att.read($3, "suppressJoinFailure"));      
-//NL      }
-    }   
-  X_SLASH
+| K_COMPENSATE genSymTabEntry_Compensate arbitraryAttributes X_SLASH
     {
       impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
 
-//NL      att.popSJFStack(); symTab.popSJFStack();
-//NL      $$->negativeControlFlow = noLinks->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       $$ = Compensate(noLinks);
       $$->id = $2->value;
 
@@ -1724,9 +1533,8 @@ tCompensate:
 ;
 
 genSymTabEntry_Compensate:
-  { currentSymTabEntryKey = symTab.insert(K_COMPENSATE);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_COMPENSATE);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 

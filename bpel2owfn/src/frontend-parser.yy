@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/07/08 16:31:14 $
+ *          - last changed: \$Date: 2006/07/10 08:10:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.201 $
+ * \version \$Revision: 1.202 $
  * 
  */
 %}
@@ -412,8 +412,7 @@ tPartnerLink_list:
 ;
 
 tPartnerLink:
-  K_PARTNERLINK genSymTabEntry_PartnerLink
-    arbitraryAttributes X_NEXT X_SLASH K_PARTNERLINK
+  K_PARTNERLINK genSymTabEntry_PartnerLink arbitraryAttributes X_NEXT X_SLASH K_PARTNERLINK
     { 
       STPartnerLink *stPartnerLink = dynamic_cast<STPartnerLink*> (symTab.lookup($2->value));
       assert(stPartnerLink != NULL);
@@ -426,8 +425,7 @@ tPartnerLink:
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_PARTNERLINK);
     }
-| K_PARTNERLINK genSymTabEntry_PartnerLink
-    arbitraryAttributes X_SLASH
+| K_PARTNERLINK genSymTabEntry_PartnerLink arbitraryAttributes X_SLASH
     { 
       STPartnerLink *stPartnerLink = dynamic_cast<STPartnerLink*> (symTab.lookup($2->value));
       assert(stPartnerLink != NULL);
@@ -443,9 +441,8 @@ tPartnerLink:
 ;
 
 genSymTabEntry_PartnerLink:
-  { currentSymTabEntryKey = symTab.insert(K_PARTNERLINK);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_PARTNERLINK);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 /******************************************************************************
@@ -505,9 +502,7 @@ tFaultHandlers:
       isInFH.push(true);
       hasCompensate = 0;
     }
-  tCatch_list  
-  tCatchAll 
-  X_SLASH K_FAULTHANDLERS X_NEXT
+  tCatch_list tCatchAll X_SLASH K_FAULTHANDLERS X_NEXT
     { $$ = userDefinedFaultHandler($5, $6);
       $$->id = $2->value;
       $$->inProcess = (currentScopeId == 1);
@@ -705,6 +700,9 @@ tOnMessage:
       $$ = OnMessage($7);
       $$->id = $2->value;
       $$->dpe = symMan.needsDPE();
+
+      assert(ASTEmap[$$->id] == NULL);
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_ONMESSAGE);
     }
 ;
 
@@ -727,6 +725,9 @@ tOnAlarm:
       STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id));
       assert(branch != NULL);
       branch->processLinks($6->id, currentSymTabEntryKey);
+
+      assert(ASTEmap[$$->id] == NULL);
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_ONALARM);
     }
 ;
 
@@ -1703,14 +1704,10 @@ genSymTabEntry_Link:
 ******************************************************************************/
 
 tSwitch:
-  K_SWITCH genSymTabEntry_Switch
-  arbitraryAttributes
-  X_NEXT 
+  K_SWITCH genSymTabEntry_Switch arbitraryAttributes X_NEXT 
   standardElements 
     { symMan.addDPEstart(); }
-  tCase_list 
-  tOtherwise 
-  X_SLASH K_SWITCH
+  tCase_list tOtherwise X_SLASH K_SWITCH
     {
       $$ = Switch($5, $7, $8);
       $$->id = $2->value;

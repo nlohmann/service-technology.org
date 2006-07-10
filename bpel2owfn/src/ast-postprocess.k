@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/07/08 16:31:14 $
+ *          - last changed: \$Date: 2006/07/10 08:10:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  */
 %}
 
@@ -69,7 +69,6 @@ extern map<unsigned int, ASTE*> ASTEmap;
 
 map<string, int> linkIdMap;
 
-unsigned int PPcurrentFlow = 0;
 unsigned int PPcurrentScope = 0;
 %}
 
@@ -106,6 +105,7 @@ Process(a,b,c,d,e,f,g,h,i) ->
       $0->A_enableInstanceCompensation = ASTEmap[myid]->attributes["enableInstanceCompensation"];
       $0->A_abstractProcess = ASTEmap[myid]->attributes["abstractProcess"];
       $0->A_xmlns = ASTEmap[myid]->attributes["xmlns"];
+      /* here we can check the attributes */
 
 
       ASTEmap[myid]->parentScopeId = myid;
@@ -229,6 +229,7 @@ Catch(a) ->
       // copy attributes to AST
       $0->A_faultName = ASTEmap[myid]->attributes["faultName"];
       $0->A_faultVariable = ASTEmap[myid]->attributes["faultVariable"];
+      /* here we can check the attributes */
     }
     a
   ]
@@ -272,7 +273,21 @@ userDefinedEventHandler(a,b) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       // this assert shows that the AST can be annotated right here
-      assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);    
+      assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);
+
+      // distribute the event handlers's id to the enclosed activities
+      foreach(branch=OnMessage(innerActivity); tOnMessage_list a)
+      {
+        assert(ASTEmap[innerActivity->id] != NULL);
+        ASTEmap[innerActivity->id]->parentActivityId = myid;
+        ASTEmap[innerActivity->id]->controlFlow = ASTEmap[myid]->controlFlow;
+      }
+      foreach(branch=OnAlarm(innerActivity); tOnAlarm_list b)
+      {
+        assert(ASTEmap[innerActivity->id] != NULL);
+        ASTEmap[innerActivity->id]->parentActivityId = myid;
+        ASTEmap[innerActivity->id]->controlFlow = ASTEmap[myid]->controlFlow;
+      }
     }
     a b
   ]
@@ -289,6 +304,7 @@ OnMessage(a) ->
       $0->A_portType = ASTEmap[myid]->attributes["portType"];
       $0->A_operation = ASTEmap[myid]->attributes["operation"];
       $0->A_variable = ASTEmap[myid]->attributes["variable"];
+      /* here we can check the attributes */
     }
     a
   ]
@@ -351,6 +367,7 @@ CorrelationSet() ->
       // copy attributes to AST
       $0->A_name = ASTEmap[myid]->attributes["name"];
       $0->A_properties = ASTEmap[myid]->attributes["properties"];
+      /* here we can check the attributes */
      }
   ]
 ;
@@ -369,6 +386,7 @@ Correlation() ->
       // copy attributes to AST
       $0->A_set = ASTEmap[myid]->attributes["set"];
       $0->A_initiate = ASTEmap[myid]->attributes["initiate"];
+      /* here we can check the attributes */
      }
   ]
 ;
@@ -381,9 +399,9 @@ Correlation() ->
 Empty(a) ->
   [postprocessing:
     {
+      // manage identifiers
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
@@ -391,6 +409,7 @@ Empty(a) ->
       $0->A_name = ASTEmap[myid]->attributes["name"];
       $0->A_joinCondition = ASTEmap[myid]->attributes["joinCondition"];
       $0->A_suppressJoinFailure = ASTEmap[myid]->attributes["suppressJoinFailure"];
+      /* here we can check the attributes */
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -399,8 +418,6 @@ Empty(a) ->
         $0->suppressJF = true;
         ASTEmap[myid]->suppressJF = true;
       }
-
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
     }
@@ -416,9 +433,9 @@ Empty(a) ->
 Invoke(a,b) ->
   [postprocessing:
     {
+      // manage identifiers
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
@@ -431,6 +448,7 @@ Invoke(a,b) ->
       $0->A_operation = ASTEmap[myid]->attributes["operation"];
       $0->A_inputVariable = ASTEmap[myid]->attributes["inputVariable"];
       $0->A_outputVariable = ASTEmap[myid]->attributes["outputVariable"];
+      /* here we can check the attributes */
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -439,8 +457,6 @@ Invoke(a,b) ->
         $0->suppressJF = true;
         ASTEmap[myid]->suppressJF = true;
       }
-
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
       
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
     }
@@ -456,9 +472,9 @@ Invoke(a,b) ->
 Receive(a,b) ->
   [postprocessing:
     {
+      // manage identifiers
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
@@ -471,6 +487,7 @@ Receive(a,b) ->
       $0->A_operation = ASTEmap[myid]->attributes["operation"];
       $0->A_variable = ASTEmap[myid]->attributes["variable"];
       $0->A_createInstance = ASTEmap[myid]->attributes["createInstance"];
+      /* here we can check the attributes */
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -479,8 +496,6 @@ Receive(a,b) ->
         $0->suppressJF = true;
         ASTEmap[myid]->suppressJF = true;
       }
-
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
     }
@@ -496,9 +511,9 @@ Receive(a,b) ->
 Reply(a,b) ->
   [postprocessing:
     {
+      // manage identifiers
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
@@ -511,6 +526,7 @@ Reply(a,b) ->
       $0->A_operation = ASTEmap[myid]->attributes["operation"];
       $0->A_variable = ASTEmap[myid]->attributes["variable"];
       $0->A_faultName = ASTEmap[myid]->attributes["faultName"];
+      /* here we can check the attributes */
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -519,9 +535,6 @@ Reply(a,b) ->
         $0->suppressJF = true;
         ASTEmap[myid]->suppressJF = true;
       }
-
-
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
     }
@@ -537,9 +550,9 @@ Reply(a,b) ->
 Assign(a,b) ->
   [postprocessing:
     {
+      // manage identifiers
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
@@ -547,6 +560,7 @@ Assign(a,b) ->
       $0->A_name = ASTEmap[myid]->attributes["name"];
       $0->A_joinCondition = ASTEmap[myid]->attributes["joinCondition"];
       $0->A_suppressJoinFailure = ASTEmap[myid]->attributes["suppressJoinFailure"];
+      /* here we can check the attributes */
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -555,8 +569,6 @@ Assign(a,b) ->
         $0->suppressJF = true;
         ASTEmap[myid]->suppressJF = true;
       }
-
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
     }
@@ -581,6 +593,7 @@ From() ->
       $0->A_endpointReference = ASTEmap[myid]->attributes["endpointReference"];
       $0->A_property = ASTEmap[myid]->attributes["property"];
       $0->A_expression = ASTEmap[myid]->attributes["expression"];
+      /* here we can check the attributes */
     }
   ]
 ;
@@ -596,6 +609,7 @@ To() ->
       $0->A_part = ASTEmap[myid]->attributes["part"];
       $0->A_partnerLink = ASTEmap[myid]->attributes["partnerLink"];
       $0->A_property = ASTEmap[myid]->attributes["property"];
+      /* here we can check the attributes */
     }
   ]
 ;
@@ -609,9 +623,9 @@ To() ->
 WaitFor(a) ->
   [postprocessing:
     {
+      // manage identifiers
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
@@ -620,6 +634,7 @@ WaitFor(a) ->
       $0->A_joinCondition = ASTEmap[myid]->attributes["joinCondition"];
       $0->A_suppressJoinFailure = ASTEmap[myid]->attributes["suppressJoinFailure"];
       $0->A_for = ASTEmap[myid]->attributes["for"];
+      /* here we can check the attributes */
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -628,8 +643,6 @@ WaitFor(a) ->
         $0->suppressJF = true;
         ASTEmap[myid]->suppressJF = true;
       }
-
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
     }
@@ -640,9 +653,9 @@ WaitFor(a) ->
 WaitUntil(a) ->
   [postprocessing:
     {
+      // manage identifiers
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
@@ -651,6 +664,7 @@ WaitUntil(a) ->
       $0->A_joinCondition = ASTEmap[myid]->attributes["joinCondition"];
       $0->A_suppressJoinFailure = ASTEmap[myid]->attributes["suppressJoinFailure"];
       $0->A_until = ASTEmap[myid]->attributes["until"];
+      /* here we can check the attributes */
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -659,8 +673,6 @@ WaitUntil(a) ->
         $0->suppressJF = true;
         ASTEmap[myid]->suppressJF = true;
       }
-
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
     }
@@ -676,9 +688,9 @@ WaitUntil(a) ->
 Throw(a) ->
   [postprocessing:
     {
+      // manage identifiers
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
@@ -688,6 +700,7 @@ Throw(a) ->
       $0->A_suppressJoinFailure = ASTEmap[myid]->attributes["suppressJoinFailure"];
       $0->A_faultName = ASTEmap[myid]->attributes["faultName"];
       $0->A_faultVariable = ASTEmap[myid]->attributes["faultVariable"];
+      /* here we can check the attributes */
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -696,8 +709,6 @@ Throw(a) ->
         $0->suppressJF = true;
         ASTEmap[myid]->suppressJF = true;
       }
-
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
     }
@@ -713,9 +724,9 @@ Throw(a) ->
 Compensate(a) ->
   [postprocessing:
     {
+      // manage identifiers
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
@@ -724,6 +735,7 @@ Compensate(a) ->
       $0->A_joinCondition = ASTEmap[myid]->attributes["joinCondition"];
       $0->A_suppressJoinFailure = ASTEmap[myid]->attributes["suppressJoinFailure"];
       $0->A_scope = ASTEmap[myid]->attributes["scope"];
+      /* here we can check the attributes */
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -732,8 +744,6 @@ Compensate(a) ->
         $0->suppressJF = true;
         ASTEmap[myid]->suppressJF = true;
       }
-
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
     }
@@ -749,9 +759,9 @@ Compensate(a) ->
 Terminate(a) ->
   [postprocessing:
     {
+      // manage identifiers
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
@@ -759,6 +769,7 @@ Terminate(a) ->
       $0->A_name = ASTEmap[myid]->attributes["name"];
       $0->A_joinCondition = ASTEmap[myid]->attributes["joinCondition"];
       $0->A_suppressJoinFailure = ASTEmap[myid]->attributes["suppressJoinFailure"];
+      /* here we can check the attributes */
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -767,8 +778,6 @@ Terminate(a) ->
         $0->suppressJF = true;
         ASTEmap[myid]->suppressJF = true;
       }
-
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
     }
@@ -784,17 +793,17 @@ Terminate(a) ->
 Flow(a,b,c) ->
   [postprocessing:
     {
+      // manage identifiers
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
-      PPcurrentFlow = myid; //TODO reset
 
       // copy attributes to AST
       $0->A_name = ASTEmap[myid]->attributes["name"];
       $0->A_joinCondition = ASTEmap[myid]->attributes["joinCondition"];
       $0->A_suppressJoinFailure = ASTEmap[myid]->attributes["suppressJoinFailure"];
+      /* here we can check the attributes */
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -818,7 +827,6 @@ Flow(a,b,c) ->
         ASTEmap[link->id]->parentActivityId = myid;
       }
 
-
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
     }
     a b c
@@ -841,6 +849,7 @@ Link() ->
 
       // copy attributes to AST
       $0->A_name = ASTEmap[myid]->attributes["name"];
+      /* here we can check the attributes */
 
       /* here we can check whether this link was not defined before */
       linkIdMap[$0->A_name] = myid;
@@ -860,9 +869,9 @@ Link() ->
 Switch(a,b,c=Otherwise(d)) ->
   [postprocessing:
     {
+      // manage identifiers
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
@@ -870,6 +879,7 @@ Switch(a,b,c=Otherwise(d)) ->
       $0->A_name = ASTEmap[myid]->attributes["name"];
       $0->A_joinCondition = ASTEmap[myid]->attributes["joinCondition"];
       $0->A_suppressJoinFailure = ASTEmap[myid]->attributes["suppressJoinFailure"];
+      /* here we can check the attributes */
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -915,6 +925,7 @@ Case(a) ->
 
       // copy attributes to AST
       $0->A_condition = ASTEmap[myid]->attributes["condition"];
+      /* here we can check the attributes */
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
     }
@@ -942,9 +953,9 @@ Otherwise(a) ->
 While(a,b) ->
   [postprocessing:
     {
+      // manage identifiers
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
@@ -953,6 +964,7 @@ While(a,b) ->
       $0->A_joinCondition = ASTEmap[myid]->attributes["joinCondition"];
       $0->A_suppressJoinFailure = ASTEmap[myid]->attributes["suppressJoinFailure"];
       $0->A_condition = ASTEmap[myid]->attributes["condition"];
+      /* here we can check the attributes */
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -986,9 +998,9 @@ While(a,b) ->
 Sequence(a,b) ->
   [postprocessing:
     {
+      // manage identifiers
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
@@ -996,6 +1008,7 @@ Sequence(a,b) ->
       $0->A_name = ASTEmap[myid]->attributes["name"];
       $0->A_joinCondition = ASTEmap[myid]->attributes["joinCondition"];
       $0->A_suppressJoinFailure = ASTEmap[myid]->attributes["suppressJoinFailure"];
+      /* here we can check the attributes */
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -1035,15 +1048,16 @@ Sequence(a,b) ->
 Pick(a,b,c) ->
   [postprocessing:
     {
+      // manage identifiers
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       // copy attributes to AST
       $0->A_name = ASTEmap[myid]->attributes["name"];
       $0->A_joinCondition = ASTEmap[myid]->attributes["joinCondition"];
       $0->A_suppressJoinFailure = ASTEmap[myid]->attributes["suppressJoinFailure"];
+      /* here we can check the attributes */
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -1094,9 +1108,9 @@ Pick(a,b,c) ->
 Scope(a,b,c,d,e,f,g) ->
   [postprocessing:
     {
+      // manage identifiers
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       PPcurrentScope = myid;
       a->parentId = myid;
@@ -1108,6 +1122,7 @@ Scope(a,b,c,d,e,f,g) ->
       $0->A_joinCondition = ASTEmap[myid]->attributes["joinCondition"];
       $0->A_suppressJoinFailure = ASTEmap[myid]->attributes["suppressJoinFailure"];
       $0->A_variableAccessSerializable = ASTEmap[myid]->attributes["variableAccessSerializable"];
+      /* here we can check the attributes */
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);

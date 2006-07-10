@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/07/08 12:15:51 $
+ *          - last changed: \$Date: 2006/07/10 08:10:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  */
 
 #include "ast-details.h"
@@ -70,6 +70,8 @@ ASTE::ASTE(kc::impl_abstract_phylum *mynode, int mytype)
     case(K_FLOW):		id = ((kc::impl_tFlow*)mynode)->id; break;
     case(K_INVOKE):		id = ((kc::impl_tInvoke*)mynode)->id; break;
     case(K_LINK):		id = ((kc::impl_tLink*)mynode)->id; break;
+    case(K_ONALARM):		id = ((kc::impl_tOnAlarm*)mynode)->id; break;
+    case(K_ONMESSAGE):		id = ((kc::impl_tOnMessage*)mynode)->id; break;
     case(K_OTHERWISE):		id = ((kc::impl_tOtherwise*)mynode)->id; break;
     case(K_PICK):		id = ((kc::impl_tPick*)mynode)->id; break;
     case(K_PARTNERLINK):	id = ((kc::impl_tPartnerLink*)mynode)->id; break;
@@ -97,7 +99,4 @@ ASTE::ASTE(kc::impl_abstract_phylum *mynode, int mytype)
   attributes = temporaryAttributeMap[id];
   suppressJF = false; // required initialization!
   controlFlow = POSITIVECF;
-
-//  cerr << mynode->op_name() << " (" << mynode->phylum_name() << ", id=" << id << ", ";
-//  cerr << attributes.size() << " attributes" << ")" << endl;
 }

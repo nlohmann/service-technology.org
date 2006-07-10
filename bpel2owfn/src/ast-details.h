@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/07/08 16:31:14 $
+ *          - last changed: \$Date: 2006/07/10 08:10:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  */
 
 #ifndef AST_DETAILS_H
@@ -62,18 +62,35 @@ typedef enum
 class ASTE
 {
   private:
+    /// the id of the AST extension
     unsigned int id;
+
+    /// the type of the node, identified by the keywords as parsed by Flex
     int type;
 
   public:
+    /// a pointer to the node in the abstract syntax tree
     kc::impl_abstract_phylum *node;
+
+    /// the parsed attributes
     map<string, string> attributes;
+
+    /// the identifiers of all (recursively) enclosed source links
     list<int> enclosedSourceLinks;
+
+    /// the identifier of the parent scope
     unsigned int parentScopeId;
+
+    /// the identifier of the parent activity
     unsigned int parentActivityId;
+
+    /// true if join failures are suppressed
     bool suppressJF;
+
+    /// the kind of control flow the activity is embedded in
     controlFlowType controlFlow;
 
+    /// constructor
     ASTE(kc::impl_abstract_phylum *mynode, int mytype);
 };
 

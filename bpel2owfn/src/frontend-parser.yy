@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/07/10 09:18:16 $
+ *          - last changed: \$Date: 2006/07/10 09:52:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.204 $
+ * \version \$Revision: 1.205 $
  * 
  */
 %}
@@ -276,9 +276,6 @@ map<unsigned int, map<string, string> > temporaryAttributeMap; ///< a temporary 
 %type <yt_integer> genSymTabEntry_Target
 %type <yt_integer> genSymTabEntry_Source
 
-%type <yt_integer> descent_activity_list
-%type <yt_integer> descent_case_list
-
 
 %%
 
@@ -336,41 +333,21 @@ imports:
 
 
 activity:
-  tEmpty
-    { $$ = activityEmpty($1); $$->id = $1->id; }
-| tInvoke
-    { $$ = $1; }
-| tReceive
-    { $$ = activityReceive($1); $$->id = $1->id; }
-| tReply
-    { $$ = activityReply($1); $$->id = $1->id; }
-| tAssign
-    { $$ = activityAssign($1); $$->id = $1->id; }
-| tWait
-    { $$ = activityWait($1); $$->id = $1->id; }
-| tThrow
-    { $$ = activityThrow($1); $$->id = $1->id; }
-| tTerminate
-    { $$ = activityTerminate($1); $$->id = $1->id; }
-| tFlow
-    { $$ = activityFlow($1); $$->id = $1->id; 
-      $$->dpe = $1->dpe ; }
-| tSwitch
-    { $$ = activitySwitch($1); $$->id = $1->id; 
-      $$->dpe = $1->dpe; }
-| tWhile
-    { $$ = activityWhile($1); $$->id = $1->id; }
-| tSequence
-    { $$ = activitySequence($1); $$->id = $1->id; 
-      $$->dpe = $1->dpe; }
-| tPick
-    { $$ = activityPick($1); $$->id = $1->id; 
-      $$->dpe = $1->dpe; }
-| tScope
-    { $$ = activityScope($1); $$->id = $1->id; 
-      $$->dpe = $1->dpe; }
-| tCompensate
-    { $$ = activityCompensate($1); $$->id = $1->id; }
+  tEmpty	{ $$ = activityEmpty($1); $$->id = $1->id; }
+| tInvoke	{ $$ = $1; }
+| tReceive	{ $$ = activityReceive($1); $$->id = $1->id; }
+| tReply	{ $$ = activityReply($1); $$->id = $1->id; }
+| tAssign	{ $$ = activityAssign($1); $$->id = $1->id; }
+| tWait		{ $$ = activityWait($1); $$->id = $1->id; }
+| tThrow	{ $$ = activityThrow($1); $$->id = $1->id; }
+| tTerminate	{ $$ = activityTerminate($1); $$->id = $1->id; }
+| tFlow		{ $$ = activityFlow($1); $$->id = $1->id; }
+| tSwitch	{ $$ = activitySwitch($1); $$->id = $1->id; }
+| tWhile	{ $$ = activityWhile($1); $$->id = $1->id; }
+| tSequence	{ $$ = activitySequence($1); $$->id = $1->id; }
+| tPick		{ $$ = activityPick($1); $$->id = $1->id; }
+| tScope	{ $$ = activityScope($1); $$->id = $1->id; }
+| tCompensate	{ $$ = activityCompensate($1); $$->id = $1->id; }
 ;
 
 
@@ -397,12 +374,10 @@ tPartnerLink:
     { 
       STPartnerLink *stPartnerLink = dynamic_cast<STPartnerLink*> (symTab.lookup($2->value));
       assert(stPartnerLink != NULL);
-
       (dynamic_cast<STProcess*>(currentSTScope))->addPartnerLink(stPartnerLink);
 
       $$ = PartnerLink();
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_PARTNERLINK);
     }
@@ -410,12 +385,10 @@ tPartnerLink:
     { 
       STPartnerLink *stPartnerLink = dynamic_cast<STPartnerLink*> (symTab.lookup($2->value));
       assert(stPartnerLink != NULL);
-
       (dynamic_cast<STProcess*>(currentSTScope))->addPartnerLink(stPartnerLink);
 
       $$ = PartnerLink();
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_PARTNERLINK);
     }
@@ -468,24 +441,19 @@ genSymTabEntry_Partner:
 
 tFaultHandlers:
   /* empty */
-    { currentSymTabEntryKey = symTab.insert(K_FAULTHANDLERS);
+    {
+      currentSymTabEntryKey = symTab.insert(K_FAULTHANDLERS);
       $$ = implicitFaultHandler();
       $$->id = currentSymTabEntryKey;
       $$->inProcess = (currentScopeId == 1);
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FAULTHANDLERS);
     }
 | K_FAULTHANDLERS genSymTabEntry_FaultHandlers X_NEXT 
-    {
-      symMan.startDPEinWhile();
-    }
   tCatch_list tCatchAll X_SLASH K_FAULTHANDLERS X_NEXT
-    { $$ = userDefinedFaultHandler($5, $6);
+    { $$ = userDefinedFaultHandler($4, $5);
       $$->id = $2->value;
       $$->inProcess = (currentScopeId == 1);
-
-      symMan.endDPEinWhile();
 
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FAULTHANDLERS);
@@ -516,7 +484,6 @@ tCatch:
     { 
       $$ = Catch($6);
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CATCH);
     }
@@ -535,7 +502,6 @@ tCatchAll:
     {
       $$ = CatchAll($5);
       $$->id = $2->value;      
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CATCHALL);
     }
@@ -563,10 +529,11 @@ tCompensationHandler:
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_COMPENSATIONHANDLER);
     }
 | K_COMPENSATIONHANDLER genSymTabEntry_CompensationHandler X_NEXT 
-    { symMan.startDPEinWhile(); }
+    {  }
   activity 
   X_NEXT X_SLASH K_COMPENSATIONHANDLER X_NEXT
-    { if (currentScopeId == 1)
+    {
+      if (currentScopeId == 1)
       {
         $$ = processCompensationHandler();
         cerr << "The compensationHandler of the process will be ignored as it can never be called." << endl;
@@ -575,8 +542,6 @@ tCompensationHandler:
         $$ = userDefinedCompensationHandler($5);
 
       $$->id = $2->value;
-      symMan.endDPEinWhile();
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_COMPENSATIONHANDLER);
     }
@@ -593,22 +558,18 @@ genSymTabEntry_CompensationHandler:
 
 tEventHandlers:
   /* empty */
-    { currentSymTabEntryKey = symTab.insert(K_EVENTHANDLERS);
+    {
+      currentSymTabEntryKey = symTab.insert(K_EVENTHANDLERS);
       $$ = implicitEventHandler();
       $$->id = currentSymTabEntryKey;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_EVENTHANDLERS);
-}
+    }
 | K_EVENTHANDLERS genSymTabEntry_EventHandlers X_NEXT 
-    { symMan.startDPEinWhile(); }
-  tOnMessage_list 
-  tOnAlarm_list 
-  X_SLASH K_EVENTHANDLERS X_NEXT
-    { $$ = userDefinedEventHandler($5, $6);
-      $$->id = $2->value;    
-      symMan.endDPEinWhile();
-
+  tOnMessage_list tOnAlarm_list X_SLASH K_EVENTHANDLERS X_NEXT
+    {
+      $$ = userDefinedEventHandler($4, $5);
+      $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_EVENTHANDLERS);
     }
@@ -621,26 +582,20 @@ genSymTabEntry_EventHandlers:
 
 tOnMessage_list:
   /* empty */
-    { $$ = NiltOnMessage_list(); 
-      $$->dpe = 0; }
+    { $$ = NiltOnMessage_list(); }
 | tOnMessage X_NEXT tOnMessage_list
-    { $$ = ConstOnMessage_list($1, $3); 
-      $$->dpe = $1->dpe + $3->dpe; }
+    { $$ = ConstOnMessage_list($1, $3); }
 ;
 
 tOnAlarm_list:
   /* empty */
-    { $$ = NiltOnAlarm_list(); 
-      $$->dpe = 0; }
+    { $$ = NiltOnAlarm_list(); }
 | tOnAlarm X_NEXT tOnAlarm_list
-    { $$ = ConstOnAlarm_list($1, $3); 
-      $$->dpe = $1->dpe + $3->dpe; }
+    { $$ = ConstOnAlarm_list($1, $3); }
 ;
 
 tOnMessage:
-  K_ONMESSAGE genSymTabEntry_OnMessage
-  arbitraryAttributes X_NEXT
-    { symMan.resetDPEend(); }
+  K_ONMESSAGE genSymTabEntry_OnMessage arbitraryAttributes X_NEXT
   tCorrelations activity X_NEXT X_SLASH K_ONMESSAGE
     {
       STOnMessage *stOnMessage = dynamic_cast<STOnMessage *> (symTab.lookup($2->value));
@@ -652,10 +607,8 @@ tOnMessage:
 								 symTab.readAttributeValue($2->value, "partnerLink")),
 								 true);
 
-      $$ = OnMessage($7);
+      $$ = OnMessage($6);
       $$->id = $2->value;
-      $$->dpe = symMan.needsDPE();
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_ONMESSAGE);
     }
@@ -668,14 +621,11 @@ genSymTabEntry_OnMessage:
 
 
 tOnAlarm:
-  K_ONALARM genSymTabEntry_OnAlarm
-  arbitraryAttributes X_NEXT 
-    { symMan.resetDPEend(); }
+  K_ONALARM genSymTabEntry_OnAlarm arbitraryAttributes X_NEXT 
   activity X_NEXT X_SLASH K_ONALARM 
-    { $$ = OnAlarm($6);
+    {
+      $$ = OnAlarm($5);
       $$->id = $2->value;
-      $$->dpe = symMan.needsDPE();
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_ONALARM);
     }
@@ -706,8 +656,7 @@ tVariable_list:
 ;
 
 tVariable:
-  K_VARIABLE genSymTabEntry_Variable
-  arbitraryAttributes X_NEXT X_SLASH K_VARIABLE
+  K_VARIABLE genSymTabEntry_Variable arbitraryAttributes X_NEXT X_SLASH K_VARIABLE
     {
       STVariable *stVar = dynamic_cast<STVariable *> (symTab.lookup(currentSymTabEntryKey));
       assert(stVar != NULL);
@@ -715,12 +664,10 @@ tVariable:
 
       $$ = Variable();
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_VARIABLE);
     }
-| K_VARIABLE genSymTabEntry_Variable
-  arbitraryAttributes X_SLASH
+| K_VARIABLE genSymTabEntry_Variable arbitraryAttributes X_SLASH
     {
       STVariable *stVar = dynamic_cast<STVariable *> (symTab.lookup(currentSymTabEntryKey));
       assert (stVar != NULL);
@@ -728,7 +675,6 @@ tVariable:
 
       $$ = Variable();
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_VARIABLE);
     }
@@ -759,21 +705,18 @@ tCorrelationSet_list:
 ;
 
 tCorrelationSet:
-  K_CORRELATIONSET genSymTabEntry_CorrelationSet
-  arbitraryAttributes X_NEXT X_SLASH K_CORRELATIONSET
+  K_CORRELATIONSET genSymTabEntry_CorrelationSet arbitraryAttributes X_NEXT
+  X_SLASH K_CORRELATIONSET
     {
       $$ = CorrelationSet();
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CORRELATIONSET);
     }
-| K_CORRELATIONSET genSymTabEntry_CorrelationSet
-  arbitraryAttributes X_SLASH
+| K_CORRELATIONSET genSymTabEntry_CorrelationSet arbitraryAttributes X_SLASH
     {
       $$ = CorrelationSet();
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CORRELATIONSET);
     }
@@ -804,19 +747,18 @@ tCorrelation_list:
 ;
 
 tCorrelation:
-  K_CORRELATION genSymTabEntry_Correlation arbitraryAttributes X_NEXT X_SLASH K_CORRELATION
+  K_CORRELATION genSymTabEntry_Correlation arbitraryAttributes X_NEXT
+  X_SLASH K_CORRELATION
     {
       $$ = Correlation();
       $$->id = $2->value;      
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CORRELATION);
     }
 | K_CORRELATION genSymTabEntry_Correlation arbitraryAttributes X_SLASH
     {
       $$ = Correlation();
-      $$->id = $2->value;      
-
+      $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CORRELATION);
     }
@@ -833,19 +775,13 @@ genSymTabEntry_Correlation:
 ******************************************************************************/
 
 tEmpty:
-  K_EMPTY genSymTabEntry_Empty arbitraryAttributes
-  X_NEXT standardElements X_SLASH K_EMPTY
+  K_EMPTY genSymTabEntry_Empty arbitraryAttributes X_NEXT
+  standardElements X_SLASH K_EMPTY
     {
       $$ = Empty($5);
       $$->id = $2->value; 
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_EMPTY);
-
-      if ($5->hasTarget)
-	symMan.remDPEstart();
-      if ($5->dpe > 0)
-        symMan.addDPEend();
     }
 | K_EMPTY genSymTabEntry_Empty arbitraryAttributes X_SLASH
     {
@@ -853,7 +789,6 @@ tEmpty:
 
       $$ = Empty(noLinks);
       $$->id = $2->value; 
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_EMPTY);
     }
@@ -960,6 +895,7 @@ tInvoke:
 								 symTab.readAttributeValue($2->value, "partnerLink")),
 								 true);
         }
+/*
 	scope->dpe = invoke->dpe = 0;
         // symMan.needsDPE();
         if ($7->hasTarget)
@@ -970,6 +906,7 @@ tInvoke:
         {
           symMan.addDPEend();
         }
+*/
 //NL        scope->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
 //NL        invoke->negativeControlFlow = mkinteger(0);
         /*
@@ -1022,6 +959,7 @@ tInvoke:
 								 symTab.readAttributeValue($2->value, "partnerLink")),
 								 true);
         }
+/*
         invoke->dpe = symMan.needsDPE();
         if ($7->hasTarget)
         {
@@ -1031,6 +969,7 @@ tInvoke:
         {
           symMan.addDPEend();
         }
+*/
 //NL        invoke->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
         invoke->id = $2->value; 
 
@@ -1087,7 +1026,7 @@ tInvoke:
 								 symTab.readAttributeValue($2->value, "partnerLink")),
 								 true);
       }
-      invoke->dpe = 0;
+//      invoke->dpe = 0;
 //NL      invoke->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       invoke->id = $2->value; 
 
@@ -1101,9 +1040,8 @@ tInvoke:
 ;
 
 genSymTabEntry_Invoke:
-  { currentSymTabEntryKey = symTab.insert(K_INVOKE);
-    $$ = mkinteger(currentSymTabEntryKey);
-  }
+    { currentSymTabEntryKey = symTab.insert(K_INVOKE);
+      $$ = mkinteger(currentSymTabEntryKey); }
 ;
 
 
@@ -1126,14 +1064,8 @@ tReceive:
 
       $$ = Receive($5, $6);
       $$->id = $2->value; 
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_RECEIVE);
-
-      if ($5->hasTarget)
-	symMan.remDPEstart();
-      if ($5->dpe > 0)
-        symMan.addDPEend();
     }
 | K_RECEIVE genSymTabEntry_Receive arbitraryAttributes X_SLASH
     {
@@ -1150,7 +1082,6 @@ tReceive:
 
       $$ = Receive(noLinks, NiltCorrelation_list());
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_RECEIVE);
     }
@@ -1179,14 +1110,8 @@ tReply:
 								 symTab.readAttributeValue($2->value, "partnerLink")),
 								 false);
 
-      if ($5->hasTarget)
-	symMan.remDPEstart();
-      if ($5->dpe > 0)
-        symMan.addDPEend();
-
       $$ = Reply($5, $6);
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_REPLY);
     }
@@ -1205,7 +1130,6 @@ tReply:
 
       $$ = Reply(noLinks, NiltCorrelation_list());
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_REPLY);
     }
@@ -1225,14 +1149,8 @@ tAssign:
   K_ASSIGN genSymTabEntry_Assign arbitraryAttributes X_NEXT
   standardElements tCopy_list  X_SLASH K_ASSIGN
     {
-      if ($5->hasTarget)
-	symMan.remDPEstart();
-      if ($5->dpe > 0)
-        symMan.addDPEend();
-
       $$ = Assign($5, $6);
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_ASSIGN);
     }
@@ -1266,7 +1184,6 @@ tFrom:
 
       $$ = From();
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FROM);
     }
@@ -1281,7 +1198,6 @@ tFrom:
       $$ = From();
       $$->id = $2->value;      
       $$->literal = $5->name;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FROM);
     }
@@ -1294,7 +1210,6 @@ tFrom:
 
       $$ = From();
       $$->id = $2->value;      
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FROM);
     }
@@ -1315,7 +1230,6 @@ tTo:
 
       $$ = To();
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TO);
     }
@@ -1328,7 +1242,6 @@ tTo:
 
       $$ = To();
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TO);
     }
@@ -1348,18 +1261,12 @@ tWait:
   K_WAIT genSymTabEntry_Wait arbitraryAttributes X_NEXT
   standardElements X_SLASH K_WAIT
     {
-      if ($5->hasTarget)
-	symMan.remDPEstart();
-      if ($5->dpe > 0)
-        symMan.addDPEend();
-
       if ( symTab.readAttributeValue($2->value, "for") != "" )
         $$ = WaitFor($5);
       else
         $$ = WaitUntil($5);
 
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_WAIT);
     }
@@ -1373,7 +1280,6 @@ tWait:
         $$ = WaitUntil(noLinks);
 
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_WAIT);
     }
@@ -1397,14 +1303,8 @@ tThrow:
       assert (stThrow != NULL);
       stThrow->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
 
-      if ($5->hasTarget)
-	symMan.remDPEstart();
-      if ($5->dpe > 0)
-        symMan.addDPEend();
-
       $$ = Throw($5);
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_THROW);
     }
@@ -1418,7 +1318,6 @@ tThrow:
 
       $$ = Throw(noLinks);
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_THROW);
     }
@@ -1438,14 +1337,8 @@ tCompensate:
   K_COMPENSATE genSymTabEntry_Compensate arbitraryAttributes X_NEXT
   standardElements X_SLASH K_COMPENSATE
     {
-      if ($5->hasTarget)
-	symMan.remDPEstart();
-      if ($5->dpe > 0)
-        symMan.addDPEend();
-
       $$ = Compensate($5);
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_COMPENSATE);
     }
@@ -1455,7 +1348,6 @@ tCompensate:
 
       $$ = Compensate(noLinks);
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_COMPENSATE);
     }
@@ -1477,12 +1369,6 @@ tTerminate:
     {
       $$ = Terminate($5);
       $$->id = $2->value;
-
-      if ($5->hasTarget)
-	symMan.remDPEstart();
-      if ($5->dpe > 0)
-        symMan.addDPEend();
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TERMINATE);
     }
@@ -1492,7 +1378,6 @@ tTerminate:
 
       $$ = Terminate(noLinks);
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TERMINATE);
     }
@@ -1522,8 +1407,6 @@ tFlow:
     } 
   standardElements tLinks activity_list X_SLASH K_FLOW
     {
-      $$ = Flow($6, $7, $8);
-
       STFlow *stFlow = dynamic_cast<STFlow *> (symTab.lookup($2->value));
       assert (stFlow);
 
@@ -1534,16 +1417,8 @@ tFlow:
 
       stFlow->checkLinkUsage();
 
-      $$->dpe = symMan.needsDPE();
-      if ($6->hasTarget)
-	symMan.remDPEstart();
-      if ($6->dpe > 0)
-        symMan.addDPEend();
-      if ($$->dpe > 0)
-	$6->dpe = 1;
-
+      $$ = Flow($6, $7, $8);
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FLOW);
     }
@@ -1555,29 +1430,10 @@ genSymTabEntry_Flow:
 ;
 
 activity_list:
-  descent_activity_list activity X_NEXT
-    {
-      $$ = Consactivity_list($2, Nilactivity_list()); 
-
-      for(int i = 0; i < $1->value; ++i)
-	symMan.addDPEend();
-
-      $$->dpe = $2->dpe;
-    }
-| descent_activity_list activity X_NEXT activity_list
-    {
-      $$ = Consactivity_list($2, $4); 
-
-      for(int i = 0; i < $1->value; ++i)
-	symMan.addDPEend();
-
-      $$->dpe = $2->dpe + $4->dpe;
-    }
-;
-
-descent_activity_list:
-    { $$ = mkinteger(symMan.needsDPE());
-      symMan.resetDPEend(); }
+  activity X_NEXT
+    { $$ = Consactivity_list($1, Nilactivity_list()); }
+| activity X_NEXT activity_list
+    { $$ = Consactivity_list($1, $3); }
 ;
 
 tLinks:
@@ -1633,25 +1489,10 @@ genSymTabEntry_Link:
 
 tSwitch:
   K_SWITCH genSymTabEntry_Switch arbitraryAttributes X_NEXT 
-  standardElements 
-    { symMan.addDPEstart(); }
-  tCase_list tOtherwise X_SLASH K_SWITCH
+  standardElements tCase_list tOtherwise X_SLASH K_SWITCH
     {
-      $$ = Switch($5, $7, $8);
+      $$ = Switch($5, $6, $7);
       $$->id = $2->value;
-
-      symMan.remDPEstart();
-      $$->dpe = symMan.needsDPE();
-      
-      if ($5->hasTarget)
-	symMan.remDPEstart();
-
-      if ($5->dpe > 0)
-        symMan.addDPEend();
-
-      if ($$->dpe > 0)
-	$5->dpe = 1;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_SWITCH);
     }
@@ -1663,42 +1504,18 @@ genSymTabEntry_Switch:
 ;
 
 tCase_list:
-  descent_case_list tCase X_NEXT
-    {
-      $$ = ConstCase_list($2, NiltCase_list()); 
-
-      for(int i = 0; i < $1->value; ++i)
-	symMan.addDPEend();
-
-      $$->dpe = $2->dpe;
-    }
-| descent_case_list tCase X_NEXT tCase_list
-    {
-      $$ = ConstCase_list($2, $4); 
-
-      for(int i = 0; i < $1->value; ++i)
-	symMan.addDPEend();
-
-      $$->dpe = $2->dpe + $4->dpe;
-    }
-;
-
-descent_case_list:
-    { $$ = mkinteger(symMan.needsDPE());
-      symMan.resetDPEend(); }
+  tCase X_NEXT
+    { $$ = ConstCase_list($1, NiltCase_list()); }
+| tCase X_NEXT tCase_list
+    { $$ = ConstCase_list($1, $3); }
 ;
 
 tCase:
-  K_CASE genSymTabEntry_Case
-  arbitraryAttributes X_NEXT 
-    {}
-  activity 
-  X_NEXT X_SLASH K_CASE
+  K_CASE genSymTabEntry_Case arbitraryAttributes X_NEXT 
+  activity X_NEXT X_SLASH K_CASE
     {
-      $$ = Case($6);
+      $$ = Case($5);
       $$->id = $2->value;    
-      $$->dpe = symMan.needsDPE();
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CASE);
     }
@@ -1730,22 +1547,17 @@ tOtherwise:
       otherwiseActivity->id = emptyId;
 
       $$ = Otherwise(otherwiseActivity);
-      $$->dpe = 0;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_OTHERWISE);
-
     }
 | K_OTHERWISE X_NEXT 
-    { symMan.resetDPEend(); }
+    { }
   activity X_NEXT X_SLASH K_OTHERWISE X_NEXT
     {
       currentSymTabEntryKey = symTab.insert(K_OTHERWISE);
 
       $$ = Otherwise($4);
       $$->id = currentSymTabEntryKey;
-      $$->dpe = symMan.needsDPE();
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_OTHERWISE);
     }
@@ -1758,15 +1570,10 @@ tOtherwise:
 
 tWhile:
   K_WHILE genSymTabEntry_While arbitraryAttributes X_NEXT 
-  standardElements 
-    { symMan.startDPEinWhile(); }
-  activity X_NEXT X_SLASH K_WHILE
+  standardElements activity X_NEXT X_SLASH K_WHILE
     {
-      $$ = While($5, $7);
+      $$ = While($5, $6);
       $$->id = $2->value; 
-
-      symMan.endDPEinWhile();
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_WHILE);
     }
@@ -1788,18 +1595,6 @@ tSequence:
     {
       $$ = Sequence($5, $6);
       $$->id = $2->value;
-
-      $$->dpe = symMan.needsDPE();
-
-      if ($5->hasTarget)
-	symMan.remDPEstart();
-
-      if ($5->dpe > 0)
-        symMan.addDPEend();
-
-      if ($$->dpe > 0)
-	$6->dpe = 1;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_SEQUENCE);
     }
@@ -1817,26 +1612,10 @@ genSymTabEntry_Sequence:
 
 tPick:
   K_PICK genSymTabEntry_Pick arbitraryAttributes X_NEXT 
-  standardElements 
-    { symMan.addDPEstart(); }
-  tOnMessage X_NEXT tOnMessage_list tOnAlarm_list X_SLASH K_PICK
+  standardElements tOnMessage X_NEXT tOnMessage_list tOnAlarm_list X_SLASH K_PICK
     {
-      $$ = Pick($5, ConstOnMessage_list($7, $9), $10);
+      $$ = Pick($5, ConstOnMessage_list($6, $8), $9);
       $$->id = $2->value;
-
-      symMan.remDPEstart();
-
-      $$->dpe = symMan.needsDPE();
-
-      if ($5->hasTarget)
-	symMan.remDPEstart();
-
-      if ($5->dpe > 0)
-        symMan.addDPEend();
-
-      if ($$->dpe > 0)
-	$5->dpe = 1;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_PICK);
     }
@@ -1877,21 +1656,6 @@ tScope:
       $$ = Scope($6, $8, $10, $11, $12, StopInScope(), $13);
       $$->id = $2->value;
       currentScopeId = parent[$2->value];
-
-      currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId));
-      assert(currentSTScope != NULL);
-
-      $$->dpe = symMan.needsDPE();
-
-      if ($6->hasTarget)
-	symMan.remDPEstart();
-
-      if ($6->dpe > 0)
-        symMan.addDPEend();
-
-      if ($$->dpe > 0)
-	$6->dpe = 1;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_SCOPE);
     }
@@ -1912,14 +1676,6 @@ standardElements:
     {
       $$ = StandardElements($1, $2, currentJoinCondition);
       currentJoinCondition = standardJoinCondition();
-
-      $$->dpe = $2->dpe;
-
-      if ($1->length() > 0)
-      {
-	symMan.addDPEstart();
-	$$->hasTarget = true;
-      }
     }
 ;
 
@@ -1933,27 +1689,25 @@ tTarget_list:
 tTarget:
   K_TARGET genSymTabEntry_Target arbitraryAttributes X_NEXT X_SLASH K_TARGET
     {
-      $$ = Target();
-      $$->id = $2->value;      
-
       STSourceTarget *stTarget = dynamic_cast<STSourceTarget *> (symTab.lookup($2->value));
       assert (stTarget != NULL);
       stTarget->link = currentSTFlow->checkLink(symTab.readAttributeValue($2->value, "linkName"), $2->value, false);
       stTarget->isSource = false;
       
+      $$ = Target();
+      $$->id = $2->value;      
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TARGET);
     }
 | K_TARGET genSymTabEntry_Target arbitraryAttributes X_SLASH
     {
-      $$ = Target();
-      $$->id = $2->value;      
-
       STSourceTarget *stTarget = dynamic_cast<STSourceTarget *> (symTab.lookup($2->value));
       assert (stTarget != NULL);
       stTarget->link = currentSTFlow->checkLink(symTab.readAttributeValue($2->value, "linkName"), $2->value, false);
       stTarget->isSource = false;
 
+      $$ = Target();
+      $$->id = $2->value;      
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TARGET);
     }
@@ -1966,11 +1720,9 @@ genSymTabEntry_Target:
 
 tSource_list:
   /* empty */
-    { $$ = NiltSource_list(); 
-      $$->dpe = 0; }
+    { $$ = NiltSource_list(); }
 | tSource X_NEXT tSource_list
-    { $$ = ConstSource_list($1, $3);
-      $$->dpe = $1->dpe + $3->dpe; }
+    { $$ = ConstSource_list($1, $3); }
 ;
 
 tSource:
@@ -1982,13 +1734,8 @@ tSource:
       stSource->isSource = true;
       currentSTScope->addLink(stSource->link);
 
-      symMan.addDPEend();
-      $$->dpe = symMan.needsDPE();
-      symMan.remDPEend();
-
       $$ = Source();
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_SOURCE);
     }
@@ -2001,13 +1748,8 @@ tSource:
       stSource->isSource = true;
       currentSTScope->addLink(stSource->link);
 
-      symMan.addDPEend();
-      $$->dpe = symMan.needsDPE();
-      symMan.remDPEend();
-
       $$ = Source();
       $$->id = $2->value;
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_SOURCE);
     }

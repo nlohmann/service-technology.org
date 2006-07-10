@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/07/10 08:10:56 $
+ *          - last changed: \$Date: 2006/07/10 13:21:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  */
 
 #ifndef AST_DETAILS_H
@@ -93,6 +93,8 @@ class ASTE
     /// constructor
     ASTE(kc::impl_abstract_phylum *mynode, int mytype);
 };
+
+
 
 
 

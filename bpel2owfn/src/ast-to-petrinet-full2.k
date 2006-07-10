@@ -53,7 +53,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/07/08 12:15:53 $
+ *          - last changed: \$Date: 2006/07/10 13:21:05 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
  */
 %}
 
@@ -159,11 +159,11 @@ This=Empty(a) ->
  * Fig. 11.
  */
 
-This=Invoke(a,b) provided ((dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id)))->isAsynchronousInvoke) -> //(This->outputVariable == mkcasestring("")) ->
+This=Invoke(a,b) provided (This->outputVariableName == "") -> //TODO ((dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id)))->isAsynchronousInvoke) -> //(This->outputVariable == mkcasestring("")) ->
   [petrinet:
     {
       string prefix = intToString(This->id) + ".internal.";
-      STCommunicationActivity* myself = dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id));
+//      STCommunicationActivity* myself = dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id));
       header(This->id);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
@@ -175,13 +175,15 @@ This=Invoke(a,b) provided ((dynamic_cast<STCommunicationActivity*> (symTab.looku
 
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1); 
-      TheNet->newArc(TheNet->findPlace("variable." + string(myself->inputVariable->name)), t1, READ);
+//      TheNet->newArc(TheNet->findPlace("variable." + string(myself->inputVariable->name)), t1, READ);
+      TheNet->newArc(TheNet->findPlace("variable." + This->inputVariableName), t1, READ);
       TheNet->newArc(t1, p2);
 
       Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
-      TheNet->newArc(t2, TheNet->findPlace("out." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)));
+//      TheNet->newArc(t2, TheNet->findPlace("out." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)));
+      TheNet->newArc(t2, TheNet->findPlace("out." + This->channelName));
       t2->type = OUT;
 
 
@@ -211,11 +213,11 @@ This=Invoke(a,b) provided ((dynamic_cast<STCommunicationActivity*> (symTab.looku
  * Fig. 13.
  */
 
-This=Invoke(a,b) provided (!(dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id)))->isAsynchronousInvoke) -> //This->outputVariable != mkcasestring("")) ->
+This=Invoke(a,b) provided (This->outputVariableName != "") -> //TODO (!(dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id)))->isAsynchronousInvoke) -> //This->outputVariable != mkcasestring("")) ->
   [petrinet:
     {
       header(This->id);
-      STCommunicationActivity* myself = dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id));
+//      STCommunicationActivity* myself = dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id));
       string prefix = intToString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
@@ -229,17 +231,20 @@ This=Invoke(a,b) provided (!(dynamic_cast<STCommunicationActivity*> (symTab.look
 
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1);
-      TheNet->newArc(TheNet->findPlace("variable." + string(myself->inputVariable->name)), t1, READ);
+//      TheNet->newArc(TheNet->findPlace("variable." + string(myself->inputVariable->name)), t1, READ);
+      TheNet->newArc(TheNet->findPlace("variable." + This->inputVariableName), t1, READ);
       TheNet->newArc(t1, p2);
 
       Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(t2, TheNet->findPlace("out." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)));
+//      TheNet->newArc(t2, TheNet->findPlace("out." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)));
+      TheNet->newArc(t2, TheNet->findPlace("out." + This->channelName));
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       t2->type = OUT;
 
       Transition *t3 = TheNet->newTransition(prefix + "t3");
-      TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)), t3);
+//      TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)), t3);
+      TheNet->newArc(TheNet->findPlace("in." + This->channelName), t3);
       TheNet->newArc(p3, t3);
       TheNet->newArc(t3, p4);
       t3->type = IN;
@@ -247,8 +252,10 @@ This=Invoke(a,b) provided (!(dynamic_cast<STCommunicationActivity*> (symTab.look
       Transition *t4 = TheNet->newTransition(prefix + "t4");
       TheNet->newArc(p4, t4);
       TheNet->newArc(t4, p5);
-      TheNet->newArc(TheNet->findPlace("variable." + string(myself->outputVariable->name)), t4);
-      TheNet->newArc(t4, TheNet->findPlace("variable." + string(myself->outputVariable->name)));
+//      TheNet->newArc(TheNet->findPlace("variable." + string(myself->outputVariable->name)), t4);
+//      TheNet->newArc(t4, TheNet->findPlace("variable." + string(myself->outputVariable->name)));
+      TheNet->newArc(TheNet->findPlace("variable." + This->outputVariableName), t4);
+      TheNet->newArc(t4, TheNet->findPlace("variable." + This->outputVariableName));
 
 
       // Transitions for the negative control flow.
@@ -289,7 +296,7 @@ This=Receive(a,b) ->
   [petrinet:
     {
       header(This->id);
-      STCommunicationActivity* myself = dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id));
+//      STCommunicationActivity* myself = dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id));
       string prefix = intToString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
@@ -300,7 +307,8 @@ This=Receive(a,b) ->
       Place *p6 = TheNet->newPlace(prefix + "stopped");
 
       Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)), t1);
+//      TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)), t1);
+      TheNet->newArc(TheNet->findPlace("in." + This->channelName), t1);
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       t1->type = IN;
@@ -308,8 +316,10 @@ This=Receive(a,b) ->
       Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
-      TheNet->newArc(TheNet->findPlace("variable." + string(myself->variable->name)), t2);
-      TheNet->newArc(t2, TheNet->findPlace("variable." + string(myself->variable->name)));
+//      TheNet->newArc(TheNet->findPlace("variable." + string(myself->variable->name)), t2);
+//      TheNet->newArc(t2, TheNet->findPlace("variable." + string(myself->variable->name)));
+      TheNet->newArc(TheNet->findPlace("variable." + This->variableName), t2);
+      TheNet->newArc(t2, TheNet->findPlace("variable." + This->variableName));
 
 
       // Transitions for the negative control flow.
@@ -345,7 +355,7 @@ This=Reply(a,b) ->
   [petrinet:
     {
       header(This->id);
-      STCommunicationActivity* myself = dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id));
+//      STCommunicationActivity* myself = dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id));
       string prefix = intToString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
@@ -357,11 +367,13 @@ This=Reply(a,b) ->
 
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1);
-      TheNet->newArc(TheNet->findPlace("variable." + string(myself->variable->name)), t1, READ);
+//      TheNet->newArc(TheNet->findPlace("variable." + string(myself->variable->name)), t1, READ);
+      TheNet->newArc(TheNet->findPlace("variable." + This->variableName), t1, READ);
       TheNet->newArc(t1, p2);
 
       Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(t2, TheNet->findPlace("out." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)));
+//      TheNet->newArc(t2, TheNet->findPlace("out." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)));
+      TheNet->newArc(t2, TheNet->findPlace("out." + This->channelName));
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       t2->type = OUT;
@@ -423,10 +435,10 @@ This=Assign(a,b) ->
       foreach (copyBlock=Copy(from,to); tCopy_list b)
       {
 	string newPrefix = prefix + "copy." + intToString(copyCount) + ".";
-	STFromTo* fromST = dynamic_cast<STFromTo*> (symTab.lookup(from->id));
-	STFromTo* toST = dynamic_cast<STFromTo*> (symTab.lookup(to->id));
+//	STFromTo* fromST = dynamic_cast<STFromTo*> (symTab.lookup(from->id));
+//	STFromTo* toST = dynamic_cast<STFromTo*> (symTab.lookup(to->id));
 
-	if (fromST->variable != NULL) // mkcasestring(""))
+	if (from->variableName != "") //(fromST->variable != NULL) // mkcasestring(""))
 	{
 	  Place *p2 = TheNet->newPlace(newPrefix + "running");
 	  Place *p4 = TheNet->newPlace(newPrefix + "p4");
@@ -434,14 +446,17 @@ This=Assign(a,b) ->
 
 	  Transition *t1 = TheNet->newTransition(newPrefix + "t1");
 	  TheNet->newArc(lastPlace, t1);
-	  TheNet->newArc(TheNet->findPlace("variable." + string(fromST->variable->name)), t1, READ);
+//	  TheNet->newArc(TheNet->findPlace("variable." + string(fromST->variable->name)), t1, READ);
+	  TheNet->newArc(TheNet->findPlace("variable." + from->variableName), t1, READ);
 	  TheNet->newArc(t1, p2);
 
 	  Transition *t2 = TheNet->newTransition(newPrefix + "t2");
 	  TheNet->newArc(p2, t2);
 	  TheNet->newArc(t2, p8);
-	  TheNet->newArc(TheNet->findPlace("variable." + string(toST->variable->name)), t2);
-	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(toST->variable->name)));
+//	  TheNet->newArc(TheNet->findPlace("variable." + string(toST->variable->name)), t2);
+//	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(toST->variable->name)));
+	  TheNet->newArc(TheNet->findPlace("variable." + to->variableName), t2);
+	  TheNet->newArc(t2, TheNet->findPlace("variable." + to->variableName));
 
 
 	  // Transitions for the negative control flow.
@@ -460,8 +475,10 @@ This=Assign(a,b) ->
 
 	  Transition *t2 = TheNet->newTransition(newPrefix + "t2");
 	  TheNet->newArc(lastPlace, t2);
-	  TheNet->newArc(TheNet->findPlace("variable." + string(toST->variable->name)), t2);
-	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(toST->variable->name)));
+//	  TheNet->newArc(TheNet->findPlace("variable." + string(toST->variable->name)), t2);
+//	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(toST->variable->name)));
+	  TheNet->newArc(TheNet->findPlace("variable." + to->variableName), t2);
+	  TheNet->newArc(t2, TheNet->findPlace("variable." + to->variableName));
 	  TheNet->newArc(t2, p8);
 
 
@@ -1635,7 +1652,7 @@ This=Scope(a,b,c,d,e,f,g) ->
     f // Stop Pattern
     a // standardElements
     c // Fault Handler
-    d // Compensation Handler
+//TODO    d // Compensation Handler
     e // Event Handler
     g // innerActivity
     {

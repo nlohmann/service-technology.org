@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/07/10 09:52:13 $
+ *          - last changed: \$Date: 2006/07/10 13:21:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.205 $
+ * \version \$Revision: 1.206 $
  * 
  */
 %}
@@ -372,9 +372,9 @@ tPartnerLink_list:
 tPartnerLink:
   K_PARTNERLINK genSymTabEntry_PartnerLink arbitraryAttributes X_NEXT X_SLASH K_PARTNERLINK
     { 
-      STPartnerLink *stPartnerLink = dynamic_cast<STPartnerLink*> (symTab.lookup($2->value));
-      assert(stPartnerLink != NULL);
-      (dynamic_cast<STProcess*>(currentSTScope))->addPartnerLink(stPartnerLink);
+//      STPartnerLink *stPartnerLink = dynamic_cast<STPartnerLink*> (symTab.lookup($2->value));
+//      assert(stPartnerLink != NULL);
+//      (dynamic_cast<STProcess*>(currentSTScope))->addPartnerLink(stPartnerLink);
 
       $$ = PartnerLink();
       $$->id = $2->value;
@@ -383,9 +383,9 @@ tPartnerLink:
     }
 | K_PARTNERLINK genSymTabEntry_PartnerLink arbitraryAttributes X_SLASH
     { 
-      STPartnerLink *stPartnerLink = dynamic_cast<STPartnerLink*> (symTab.lookup($2->value));
-      assert(stPartnerLink != NULL);
-      (dynamic_cast<STProcess*>(currentSTScope))->addPartnerLink(stPartnerLink);
+//      STPartnerLink *stPartnerLink = dynamic_cast<STPartnerLink*> (symTab.lookup($2->value));
+//      assert(stPartnerLink != NULL);
+//      (dynamic_cast<STProcess*>(currentSTScope))->addPartnerLink(stPartnerLink);
 
       $$ = PartnerLink();
       $$->id = $2->value;
@@ -478,7 +478,7 @@ tCatch:
     {
       STCatch *stCatch = dynamic_cast<STCatch*> (symTab.lookup($2->value));
       assert (stCatch != NULL);
-      stCatch->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "faultVariable"), symTab.readAttribute($2->value, "faultVariable")->line, currentSTScope, true);
+//      stCatch->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "faultVariable"), symTab.readAttribute($2->value, "faultVariable")->line, currentSTScope, true);
     }
   activity X_NEXT X_SLASH K_CATCH
     { 
@@ -600,12 +600,12 @@ tOnMessage:
     {
       STOnMessage *stOnMessage = dynamic_cast<STOnMessage *> (symTab.lookup($2->value));
       assert(stOnMessage != NULL);
-      stOnMessage->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line, currentSTScope);
-      stOnMessage->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
-      stOnMessage->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2->value, "portType"), 
-								 symTab.readAttributeValue($2->value, "operation"), 
-								 symTab.readAttributeValue($2->value, "partnerLink")),
-								 true);
+//      stOnMessage->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line, currentSTScope);
+//      stOnMessage->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
+//      stOnMessage->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2->value, "portType"), 
+//								 symTab.readAttributeValue($2->value, "operation"), 
+//								 symTab.readAttributeValue($2->value, "partnerLink")),
+//								 true);
 
       $$ = OnMessage($6);
       $$->id = $2->value;
@@ -658,9 +658,9 @@ tVariable_list:
 tVariable:
   K_VARIABLE genSymTabEntry_Variable arbitraryAttributes X_NEXT X_SLASH K_VARIABLE
     {
-      STVariable *stVar = dynamic_cast<STVariable *> (symTab.lookup(currentSymTabEntryKey));
-      assert(stVar != NULL);
-      stVar->name = currentSTScope->addVariable(stVar);
+//      STVariable *stVar = dynamic_cast<STVariable *> (symTab.lookup(currentSymTabEntryKey));
+//      assert(stVar != NULL);
+//      stVar->name = currentSTScope->addVariable(stVar);
 
       $$ = Variable();
       $$->id = $2->value;
@@ -669,9 +669,9 @@ tVariable:
     }
 | K_VARIABLE genSymTabEntry_Variable arbitraryAttributes X_SLASH
     {
-      STVariable *stVar = dynamic_cast<STVariable *> (symTab.lookup(currentSymTabEntryKey));
-      assert (stVar != NULL);
-      stVar->name = currentSTScope->addVariable(stVar);
+//      STVariable *stVar = dynamic_cast<STVariable *> (symTab.lookup(currentSymTabEntryKey));
+//      assert (stVar != NULL);
+//      stVar->name = currentSTScope->addVariable(stVar);
 
       $$ = Variable();
       $$->id = $2->value;
@@ -846,9 +846,9 @@ tInvoke:
 
 	STInvoke *stInvoke = dynamic_cast<STInvoke *> (symTab.lookup($2->value));
         assert (stInvoke != NULL);
-	stInvoke->inputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "inputVariable"), symTab.readAttribute($2->value, "inputVariable")->line, currentSTScope);
-	stInvoke->outputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "outputVariable"), symTab.readAttribute($2->value, "outputVariable")->line, currentSTScope);
-	stInvoke->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
+//	stInvoke->inputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "inputVariable"), symTab.readAttribute($2->value, "inputVariable")->line, currentSTScope);
+//	stInvoke->outputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "outputVariable"), symTab.readAttribute($2->value, "outputVariable")->line, currentSTScope);
+//	stInvoke->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
         stInvoke->isAsynchronousInvoke = (stInvoke->outputVariable == NULL);
 
 	standardElements se =  StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
@@ -881,6 +881,7 @@ tInvoke:
 //NL        symTab.addAttribute(currentSymTabEntryKey, symTab.newAttribute(mkcasestring("suppressJoinFailure"), $7->suppressJoinFailure));
 //NL	att.popSJFStack();
 	// inputVariable <=> input for invoke process !!!
+/*
         if (symTab.readAttributeValue($2->value, "inputVariable") != "")
         {
 	  stInvoke->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2->value, "portType"), 
@@ -895,6 +896,7 @@ tInvoke:
 								 symTab.readAttributeValue($2->value, "partnerLink")),
 								 true);
         }
+*/
 /*
 	scope->dpe = invoke->dpe = 0;
         // symMan.needsDPE();
@@ -935,9 +937,9 @@ tInvoke:
 
 	STInvoke *stInvoke = dynamic_cast<STInvoke *> (symTab.lookup($2->value));
         assert(stInvoke != NULL);
-	stInvoke->inputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "inputVariable"), symTab.readAttribute($2->value, "inputVariable")->line,currentSTScope);
-	stInvoke->outputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "outputVariable"), symTab.readAttribute($2->value, "outputVariable")->line,currentSTScope);
-	stInvoke->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
+//	stInvoke->inputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "inputVariable"), symTab.readAttribute($2->value, "inputVariable")->line,currentSTScope);
+//	stInvoke->outputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "outputVariable"), symTab.readAttribute($2->value, "outputVariable")->line,currentSTScope);
+//	stInvoke->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
         stInvoke->isAsynchronousInvoke = (stInvoke->outputVariable == NULL);
 
 	tInvoke invoke = Invoke($7, $8);
@@ -945,6 +947,7 @@ tInvoke:
 //NL        $7->suppressJoinFailure = att.read($3, "suppressJoinFailure",  (att.topSJFStack()).getSJFValue());
 //NL        att.popSJFStack(); symTab.popSJFStack();
 	// inputVariable <=> input for invoke process !!!
+/*
         if (symTab.readAttributeValue($2->value, "inputVariable") != "")
         {
 	  stInvoke->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2->value, "portType"), 
@@ -959,6 +962,7 @@ tInvoke:
 								 symTab.readAttributeValue($2->value, "partnerLink")),
 								 true);
         }
+*/
 /*
         invoke->dpe = symMan.needsDPE();
         if ($7->hasTarget)
@@ -1003,15 +1007,16 @@ tInvoke:
 
       STInvoke *stInvoke = dynamic_cast<STInvoke *> (symTab.lookup($2->value));
       assert (stInvoke != NULL);
-      stInvoke->inputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "inputVariable"), symTab.readAttribute($2->value, "inputVariable")->line,currentSTScope);
-      stInvoke->outputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "outputVariable"), symTab.readAttribute($2->value, "outputVariable")->line,currentSTScope);
-      stInvoke->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
+//      stInvoke->inputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "inputVariable"), symTab.readAttribute($2->value, "inputVariable")->line,currentSTScope);
+//      stInvoke->outputVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "outputVariable"), symTab.readAttribute($2->value, "outputVariable")->line,currentSTScope);
+//      stInvoke->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
       stInvoke->isAsynchronousInvoke = (stInvoke->outputVariable == NULL);
 
 
       tInvoke invoke = Invoke(noLinks, NiltCorrelation_list());
 //NL      att.popSJFStack(); symTab.popSJFStack();
       // inputVariable <=> input for invoke process !!!
+/*
       if (symTab.readAttributeValue($2->value, "inputVariable") != "")
       {
 	  stInvoke->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2->value, "portType"), 
@@ -1026,6 +1031,7 @@ tInvoke:
 								 symTab.readAttributeValue($2->value, "partnerLink")),
 								 true);
       }
+*/
 //      invoke->dpe = 0;
 //NL      invoke->negativeControlFlow = mkinteger( ((int) isInFH.top()) + 2*((int) isInCH.top().first));
       invoke->id = $2->value; 
@@ -1055,12 +1061,12 @@ tReceive:
     { 
       STReceive *stReceive = dynamic_cast<STReceive *> (symTab.lookup($2->value));
       assert(stReceive != NULL);
-      stReceive->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
-      stReceive->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
-      stReceive->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2->value, "portType"), 
-								 symTab.readAttributeValue($2->value, "operation"), 
-								 symTab.readAttributeValue($2->value, "partnerLink")),
-								 true);
+//      stReceive->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
+//      stReceive->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
+//      stReceive->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2->value, "portType"), 
+//								 symTab.readAttributeValue($2->value, "operation"), 
+//								 symTab.readAttributeValue($2->value, "partnerLink")),
+//								 true);
 
       $$ = Receive($5, $6);
       $$->id = $2->value; 
@@ -1073,12 +1079,12 @@ tReceive:
 
       STReceive *stReceive = dynamic_cast<STReceive *> (symTab.lookup($2->value));
       assert(stReceive != NULL);
-      stReceive->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
-      stReceive->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
-      stReceive->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2->value, "portType"), 
-								 symTab.readAttributeValue($2->value, "operation"), 
-								 symTab.readAttributeValue($2->value, "partnerLink")),
-								 true);
+//      stReceive->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
+//      stReceive->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
+//      stReceive->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2->value, "portType"), 
+//								 symTab.readAttributeValue($2->value, "operation"), 
+//								 symTab.readAttributeValue($2->value, "partnerLink")),
+//								 true);
 
       $$ = Receive(noLinks, NiltCorrelation_list());
       $$->id = $2->value;
@@ -1103,12 +1109,12 @@ tReply:
     {
       STReply *stReply = dynamic_cast<STReply*> (symTab.lookup($2->value));
       assert(stReply != NULL);
-      stReply->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
-      stReply->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
-      stReply->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2->value, "portType"), 
-								 symTab.readAttributeValue($2->value, "operation"), 
-								 symTab.readAttributeValue($2->value, "partnerLink")),
-								 false);
+//      stReply->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
+//      stReply->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
+//      stReply->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2->value, "portType"), 
+//								 symTab.readAttributeValue($2->value, "operation"), 
+//								 symTab.readAttributeValue($2->value, "partnerLink")),
+//								 false);
 
       $$ = Reply($5, $6);
       $$->id = $2->value;
@@ -1121,12 +1127,12 @@ tReply:
 
       STReply *stReply = dynamic_cast<STReply*> (symTab.lookup($2->value));
       assert (stReply != NULL);
-      stReply->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
-      stReply->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
-      stReply->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2->value, "portType"), 
-								 symTab.readAttributeValue($2->value, "operation"), 
-								 symTab.readAttributeValue($2->value, "partnerLink")),
-								 false);
+//      stReply->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
+//      stReply->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
+//      stReply->channelId = stProcess->addChannel(channelName(symTab.readAttributeValue($2->value, "portType"), 
+//								 symTab.readAttributeValue($2->value, "operation"), 
+//								 symTab.readAttributeValue($2->value, "partnerLink")),
+//								 false);
 
       $$ = Reply(noLinks, NiltCorrelation_list());
       $$->id = $2->value;
@@ -1179,8 +1185,8 @@ tFrom:
     {
       STFromTo *stFrom = dynamic_cast<STFromTo*> (symTab.lookup($2->value));
       assert (stFrom != NULL);
-      stFrom->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
-      stFrom->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
+//      stFrom->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
+//      stFrom->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
 
       $$ = From();
       $$->id = $2->value;
@@ -1191,8 +1197,8 @@ tFrom:
     {
       STFromTo *stFrom = dynamic_cast<STFromTo*> (symTab.lookup($2->value));
       assert (stFrom != NULL);
-      stFrom->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
-      stFrom->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
+//      stFrom->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
+//      stFrom->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
       stFrom->literal = $5->name;
 
       $$ = From();
@@ -1205,8 +1211,8 @@ tFrom:
     {
       STFromTo *stFrom = dynamic_cast<STFromTo*> (symTab.lookup($2->value));
       assert (stFrom != NULL);
-      stFrom->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
-      stFrom->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
+//      stFrom->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
+//      stFrom->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
 
       $$ = From();
       $$->id = $2->value;      
@@ -1225,8 +1231,8 @@ tTo:
     {
       STFromTo *stTo = dynamic_cast<STFromTo*> (symTab.lookup($2->value));
       assert(stTo != NULL);
-      stTo->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
-      stTo->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
+//      stTo->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
+//      stTo->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
 
       $$ = To();
       $$->id = $2->value;
@@ -1237,8 +1243,8 @@ tTo:
     {
       STFromTo *stTo = dynamic_cast<STFromTo*> (symTab.lookup($2->value));
       assert (stTo != NULL);
-      stTo->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
-      stTo->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
+//      stTo->variable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
+//      stTo->partnerLink = stProcess->checkPartnerLink(symTab.readAttributeValue($2->value, "partnerLink"));
 
       $$ = To();
       $$->id = $2->value;
@@ -1301,7 +1307,7 @@ tThrow:
     {
       STThrow *stThrow = dynamic_cast<STThrow*> (symTab.lookup($2->value));
       assert (stThrow != NULL);
-      stThrow->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
+//      stThrow->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
 
       $$ = Throw($5);
       $$->id = $2->value;
@@ -1314,7 +1320,7 @@ tThrow:
 
       STThrow *stThrow = dynamic_cast<STThrow*> (symTab.lookup($2->value));
       assert (stThrow != NULL);
-      stThrow->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
+//      stThrow->faultVariable = currentSTScope->checkVariable(symTab.readAttributeValue($2->value, "variable"), symTab.readAttribute($2->value, "variable")->line,currentSTScope);
 
       $$ = Throw(noLinks);
       $$->id = $2->value;

@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/07/10 09:06:17 $
+ *          - last changed: \$Date: 2006/07/10 13:21:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  */
 %}
 
@@ -57,6 +57,7 @@
 %{ KC_UNPARSE
 #include <iostream>
 #include <map>
+#include <set>
 #include "bpel-unparse-tools.h"
 #include "ast-printers.h"
 #include "ast-details.h"
@@ -65,6 +66,13 @@
 using namespace std;
 
 extern map<unsigned int, ASTE*> ASTEmap;
+
+// global sets
+set<string> ASTE_inputChannels;
+set<string> ASTE_outputChannels;
+set<string> ASTE_variables;
+set<string> ASTE_links;
+
 
 map<string, int> linkIdMap;
 
@@ -263,14 +271,11 @@ CatchAll(a) ->
 implicitEventHandler() ->
   [postprocessing:
     {
+      // manage identifiers
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       $0->parentScopeId = PPcurrentScope;
-
-//      // this assert shows that the AST can be annotated right here
-//      assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);    
     }  
   ]
 ;
@@ -278,14 +283,11 @@ implicitEventHandler() ->
 userDefinedEventHandler(a,b) ->
   [postprocessing:
     {
+      // manage identifiers
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       $0->parentScopeId = PPcurrentScope;
-
-//      // this assert shows that the AST can be annotated right here
-//      assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);
 
       // distribute the event handlers's id to the enclosed activities
       foreach(branch=OnMessage(innerActivity); tOnMessage_list a)
@@ -317,6 +319,14 @@ OnMessage(a) ->
       $0->A_operation = ASTEmap[myid]->attributes["operation"];
       $0->A_variable = ASTEmap[myid]->attributes["variable"];
       /* here we can check the attributes */
+
+      // create a channel
+//      $0->channelName = $0->A_partnerLink + "." + $0->A_portType + "." + $0->A_operation;
+      $0->channelName = $0->A_operation; //TODO
+      ASTE_inputChannels.insert($0->channelName);
+
+
+      $0->variableName = $0->A_variable;
     }
     a
   ]
@@ -334,14 +344,11 @@ OnAlarm(a) ->
 userDefinedCompensationHandler(a) ->
   [postprocessing:
     {
+      // manage identifiers
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
-
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       $0->parentScopeId = PPcurrentScope;
-
-//      // this assert shows that the AST can be annotated right here
-//      assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);
 
       // distribute the compensation handlers's id to the enclosed activity
       // also mark the activities as "inside compensation handlers"
@@ -363,6 +370,18 @@ Variable() ->
     {
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
+
+      // copy attributes to AST
+      $0->A_name = ASTEmap[myid]->attributes["name"];
+      $0->A_messageType = ASTEmap[myid]->attributes["messageType"];
+      $0->A_type = ASTEmap[myid]->attributes["type"];
+      $0->A_element = ASTEmap[myid]->attributes["element"];
+      /* here we can check the attributes */
+
+      // register this variable
+      assert($0->A_name != "");
+      /* here we can check whether this variable was not defined before */
+      ASTE_variables.insert($0->A_name);
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
     }
@@ -475,6 +494,16 @@ Invoke(a,b) ->
       }
       
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
+
+      // create a channel
+//      $0->channelName = $0->A_partnerLink + "." + $0->A_portType + "." + $0->A_operation;
+      $0->channelName = $0->A_operation; //TODO
+      ASTE_outputChannels.insert($0->channelName);
+      if ($0->A_inputVariable != "") // TODO!
+        ASTE_inputChannels.insert($0->channelName);
+
+      $0->inputVariableName = $0->A_inputVariable;
+      $0->outputVariableName = $0->A_outputVariable;
     }
     a b
   ]
@@ -514,6 +543,13 @@ Receive(a,b) ->
       }
 
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
+
+      // create a channel
+//      $0->channelName = $0->A_partnerLink + "." + $0->A_portType + "." + $0->A_operation;
+      $0->channelName = $0->A_operation; //TODO
+      ASTE_inputChannels.insert($0->channelName);
+
+      $0->variableName = $0->A_variable;
     }
     a b
   ]
@@ -553,6 +589,14 @@ Reply(a,b) ->
       }
 
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
+
+      // create a channel
+//      $0->channelName = $0->A_partnerLink + "." + $0->A_portType + "." + $0->A_operation;
+      $0->channelName = $0->A_operation; //TODO
+      ASTE_outputChannels.insert($0->channelName);
+
+
+      $0->variableName = $0->A_variable;
     }
     a b
   ]
@@ -610,6 +654,8 @@ From() ->
       $0->A_property = ASTEmap[myid]->attributes["property"];
       $0->A_expression = ASTEmap[myid]->attributes["expression"];
       /* here we can check the attributes */
+
+      $0->variableName = $0->A_variable;
     }
   ]
 ;
@@ -626,6 +672,8 @@ To() ->
       $0->A_partnerLink = ASTEmap[myid]->attributes["partnerLink"];
       $0->A_property = ASTEmap[myid]->attributes["property"];
       /* here we can check the attributes */
+
+      $0->variableName = $0->A_variable;
     }
   ]
 ;
@@ -880,6 +928,8 @@ Link() ->
       // cerr << "defined a link " << $0->A_name << " (" << myid << ")" << endl;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
+
+      ASTE_links.insert($0->A_name);
     }
   ]
 ;
@@ -1075,6 +1125,7 @@ Pick(a,b,c) ->
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      a->parentId = myid;
 
       // copy attributes to AST
       $0->A_name = ASTEmap[myid]->attributes["name"];
@@ -1187,6 +1238,7 @@ Scope(a,b,c,d,e,f,g) ->
 StandardElements(a,b,c) ->
   [postprocessing:
     {
+      assert(ASTEmap[$0->parentId] != NULL);
       $0->negativeControlFlow = ASTEmap[$0->parentId]->controlFlow;
       $0->suppressJF = ASTEmap[$0->parentId]->suppressJF;
 
@@ -1223,6 +1275,12 @@ Target() ->
       int linkId = linkIdMap[ASTEmap[myid]->attributes["linkName"]];
       /* here we can check whether this link was defined before */
 
+
+      // copy attributes to AST
+      $0->A_linkName = ASTEmap[myid]->attributes["linkName"];
+      /* here we can check the attributes */
+
+
       // remember that that link was used as a target
       assert(ASTEmap[linkId] != NULL);
       kc::impl_tLink *theLink = (kc::impl_tLink*)(ASTEmap[linkId]->node);
@@ -1230,6 +1288,8 @@ Target() ->
       assert(theLink->id == linkId);
       /* here we can check whether this link was not used as target before */
       theLink->usedAsTarget = true;
+
+      $0->linkName = $0->A_linkName;
     }
   ]
 ;
@@ -1243,6 +1303,13 @@ Source() ->
       // find the id of the link used as source here
       int linkId = linkIdMap[ASTEmap[myid]->attributes["linkName"]];
       /* here we can check whether this link was defined before */
+
+
+      // copy attributes to AST
+      $0->A_linkName = ASTEmap[myid]->attributes["linkName"];
+      $0->A_transitionCondition = ASTEmap[myid]->attributes["transitionCondition"];
+      $0->A_variableAccessSerializable = ASTEmap[myid]->attributes["variableAccessSerializable"];
+      /* here we can check the attributes */
 
 
       // remember that that link was used as a source
@@ -1260,6 +1327,8 @@ Source() ->
       // add that link to the parent activity
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[ASTEmap[myid]->parentActivityId]->enclosedSourceLinks.push_back(linkId);
+
+      $0->linkName = $0->A_linkName;
     }
   ]
 ;

@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/07/10 09:06:17 $
+ *          - last changed: \$Date: 2006/07/10 13:21:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.92 $
+ * \version \$Revision: 1.93 $
  */
 %}
 
@@ -194,6 +194,8 @@ tCatch:
 
     string A_faultName;
     string A_faultVariable;
+
+    string variableName;
   }
 ;
 
@@ -243,6 +245,9 @@ tOnMessage:
     string A_portType;
     string A_operation;
     string A_variable;
+
+    string channelName;
+    string variableName;
   }
 ;
 
@@ -373,6 +378,10 @@ tInvoke:
     string A_operation;
     string A_inputVariable;
     string A_outputVariable;    
+
+    string channelName;
+    string inputVariableName;
+    string outputVariableName;
   }
 ;
 
@@ -396,6 +405,9 @@ tReceive:
     string A_operation;
     string A_variable;
     string A_createInstance;
+
+    string channelName;
+    string variableName;
   }
 ;
 
@@ -419,6 +431,9 @@ tReply:
     string A_operation;
     string A_variable;
     string A_faultName;
+
+    string channelName;
+    string variableName;
   }
 ;
 
@@ -461,6 +476,8 @@ tFrom:
     string A_endpointReference;
     string A_property;
     string A_expression;
+
+    string variableName;
   }
 ;
 
@@ -473,6 +490,8 @@ tTo:
     string A_part;
     string A_partnerLink;
     string A_property;
+
+    string variableName;
   }
 ;
 
@@ -514,6 +533,8 @@ tThrow:
     string A_suppressJoinFailure;
     string A_faultName;
     string A_faultVariable;
+
+    string variableName;
   }
 ;
 
@@ -763,6 +784,8 @@ tTarget:
     int negativeControlFlow = 0;
     
     string A_linkName;
+    
+    string linkName;
   }
 ;
 
@@ -783,6 +806,8 @@ tSource:
     string A_linkName;
     string A_transitionCondition;
     string A_variableAccessSerializable;
+
+    string linkName;
   }
 ;
 

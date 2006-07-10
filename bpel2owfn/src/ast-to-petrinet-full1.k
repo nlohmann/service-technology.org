@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/07/10 09:06:18 $
+ *          - last changed: \$Date: 2006/07/10 13:21:05 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.183 $
+ * \version \$Revision: 1.184 $
  *
  */
 %}
@@ -124,10 +124,16 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       // Create the interface places.
       // The used lists are filled during parsing mapping each combination of
       // partnerLink, portType and operation to one input (resp. output) place.
-      for (set<string>::iterator in = (myself->inChannels).begin(); in != (myself->inChannels).end(); in++)
+/*      for (set<string>::iterator in = (myself->inChannels).begin(); in != (myself->inChannels).end(); in++)
 	TheNet->newPlace("in." + *in, IN);
       for (set<string>::iterator out = (myself->outChannels).begin(); out != (myself->outChannels).end(); out++)
+	TheNet->newPlace("out." + *out, OUT);*/
+
+      for (set<string>::iterator in = ASTE_inputChannels.begin(); in != ASTE_inputChannels.end(); in++)
+	TheNet->newPlace("in." + *in, IN);
+      for (set<string>::iterator out = ASTE_outputChannels.begin(); out != ASTE_outputChannels.end(); out++)
 	TheNet->newPlace("out." + *out, OUT);
+
 
 
       // Create push-places for the children of the process.
@@ -149,12 +155,16 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
 
 
       // Create variable places and initially mark them.
-      for (list<string>::iterator variable = symTab.variables.begin(); variable != symTab.variables.end(); variable++)
+/*      for (list<string>::iterator variable = symTab.variables.begin(); variable != symTab.variables.end(); variable++)
+      {
+	Place *v = TheNet->newPlace("variable." + *variable);
+	v->mark();
+      }*/
+      for (set<string>::iterator variable = ASTE_variables.begin(); variable != ASTE_variables.end(); variable++)
       {
 	Place *v = TheNet->newPlace("variable." + *variable);
 	v->mark();
       }
-
 
       // Create a place for the global clock and mark it.
       Place *clock = TheNet->newPlace(prefix + "clock");
@@ -282,7 +292,7 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
     }
       h // Stop Pattern
       e // FaultHandler
-      f // Compensation Handler
+//TODO      f // Compensation Handler
       g // Event Handler
       i // innerActivity
     {

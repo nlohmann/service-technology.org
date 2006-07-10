@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/07/10 13:21:04 $
+ *          - last changed: \$Date: 2006/07/10 15:37:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
  */
 %}
 
@@ -210,10 +210,11 @@ userDefinedFaultHandler(a,b) ->
 //      ASTEmap[b->id]->parentActivityId = myid;
 
       $0->parentScopeId = PPcurrentScope;
+      $0->inProcess = (ASTEmap[myid]->parentScopeId == 1);
 
       // these 2 asserts show that the AST can be annotated right here
 //      assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);
-      assert($0->inProcess == (ASTEmap[myid]->parentScopeId == 1));
+//      assert($0->inProcess == (ASTEmap[myid]->parentScopeId == 1));
     }
     a b
   ]
@@ -379,7 +380,7 @@ Variable() ->
       /* here we can check the attributes */
 
       // register this variable
-      assert($0->A_name != "");
+//TODO      assert($0->A_name != "");
       /* here we can check whether this variable was not defined before */
       ASTE_variables.insert($0->A_name);
 
@@ -504,6 +505,9 @@ Invoke(a,b) ->
 
       $0->inputVariableName = $0->A_inputVariable;
       $0->outputVariableName = $0->A_outputVariable;
+
+      // switch to discriminate asynchronous and synchronous invokes
+      $0->isAsynchronousInvoke = ($0->A_inputVariable == "");
     }
     a b
   ]
@@ -684,7 +688,7 @@ To() ->
   WAIT
 ******************************************************************************/
 
-WaitFor(a) ->
+Wait(a) ->
   [postprocessing:
     {
       // manage identifiers
@@ -709,36 +713,9 @@ WaitFor(a) ->
       }
 
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
-    }
-    a
-  ]
-;
 
-WaitUntil(a) ->
-  [postprocessing:
-    {
-      // manage identifiers
-      int myid = $0->id;
-      assert(ASTEmap[myid] != NULL);
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      a->parentId = myid;
-
-      // copy attributes to AST
-      $0->A_name = ASTEmap[myid]->attributes["name"];
-      $0->A_joinCondition = ASTEmap[myid]->attributes["joinCondition"];
-      $0->A_suppressJoinFailure = ASTEmap[myid]->attributes["suppressJoinFailure"];
-      $0->A_until = ASTEmap[myid]->attributes["until"];
-      /* here we can check the attributes */
-
-      // set or inherit suppressJoinFailure-attribute
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-      {
-        $0->suppressJF = true;
-        ASTEmap[myid]->suppressJF = true;
-      }
-
-      $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
+      // switch to discriminate waitFor and waitUntil
+      $0->isWaitFor = ($0->A_for != "");
     }
     a
   ]

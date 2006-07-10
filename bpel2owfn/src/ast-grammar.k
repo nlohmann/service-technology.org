@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/07/10 13:21:04 $
+ *          - last changed: \$Date: 2006/07/10 15:37:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.93 $
+ * \version \$Revision: 1.94 $
  */
 %}
 
@@ -370,6 +370,8 @@ tInvoke:
     int negativeControlFlow = 0;
     bool suppressJF = false;
 
+    bool isAsynchronousInvoke = false;
+
     string A_name;
     string A_joinCondition;
     string A_suppressJoinFailure;
@@ -501,12 +503,13 @@ tTo:
 ******************************************************************************/
 
 tWait:
-  WaitFor(standardElements)
-| WaitUntil(standardElements)
+  Wait(standardElements)
   {
     int id = 0;
     int negativeControlFlow = 0;
     bool suppressJF = false;
+
+    bool isWaitFor = false;
 
     string A_name;
     string A_joinCondition;

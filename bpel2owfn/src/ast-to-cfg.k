@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/07/08 12:15:52 $
+ *          - last changed: \$Date: 2006/07/10 15:37:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  */
 %}
 
@@ -448,18 +448,7 @@ Assign(a,b) ->
   WAIT
 ******************************************************************************/
 
-WaitFor(a) ->
-  [cfg: { 
-	  trace(TRACE_DEBUG, "[CFG] Wait\n");
-	  CFGBlock * block = new CFGBlock(CFGWait, $0->id, "Wait"); 
-
-	  cfgMap[intToString($0->id)] = block; 
-  	} 
-	a // standard elements
-  ]
-;
-
-WaitUntil(a) ->
+Wait(a) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Wait\n");
 	  CFGBlock * block = new CFGBlock(CFGWait, $0->id, "Wait"); 

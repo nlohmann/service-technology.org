@@ -32,13 +32,13 @@
  *
  * \date
  *          - created: 2006/02/08
- *          - last changed: \$Date: 2006/07/08 12:15:53 $
+ *          - last changed: \$Date: 2006/07/10 15:37:16 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  */
 
 
@@ -47,6 +47,7 @@
 #include <cmath>
 #include "bpel-unparse-tools.h"
 #include "options.h"
+#include "helpers.h"
 #include <assert.h>
 
 
@@ -261,7 +262,8 @@ string inString()
  */
 void header(int id, bool myindent)
 {
-  trace(TRACE_DEBUG, "[PNU]" + inString() + symTab.getInformation(id) + "\n");
+//  trace(TRACE_DEBUG, "[PNU]" + inString() + symTab.getInformation(id) + "\n");
+  trace(TRACE_DEBUG, "[PNU]" + inString() + "<id=" + intToString(id) + ">\n");
 
   if (myindent)
     indent += indentStep;
@@ -281,7 +283,8 @@ void footer(int id, bool myindent)
   if (myindent)
     indent -= indentStep;
 
-  trace(TRACE_DEBUG, "[PNU]" + inString() + symTab.getInformation(id, true) + "\n");
+//  trace(TRACE_DEBUG, "[PNU]" + inString() + symTab.getInformation(id, true) + "\n");
+  trace(TRACE_DEBUG, "[PNU]" + inString() + "</id=" + intToString(id) + ">\n");
 }
 
 

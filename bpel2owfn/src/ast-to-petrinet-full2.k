@@ -53,7 +53,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/07/10 13:21:05 $
+ *          - last changed: \$Date: 2006/07/10 15:37:16 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  */
 %}
 
@@ -514,7 +514,7 @@ This=Assign(a,b) ->
  * The <wait until=""> activity as depicted in Fig. 4.
  */
 
-This=WaitUntil(a) ->
+This=Wait(a) provided (!This->isWaitFor)->
   [petrinet:
     {
       header(This->id);
@@ -550,7 +550,7 @@ This=WaitUntil(a) ->
  * The <wait for=""> activity as depicted in Fig. 5.
  */
 
-This=WaitFor(a) ->
+This=Wait(a) provided (This->isWaitFor)->
   [petrinet:
     {
       header(This->id);
@@ -1873,11 +1873,13 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
 
       // Connect all source link places with t2 and, if needed, with transition
       // t1 for dead path elimination.
-      foreach (link; tSource_list a)
+      foreach (source; tSource_list a)
       {
-	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
-	Place *p8 = TheNet->findPlace("!link." + string(linkST->name));
-	Place *p10 = TheNet->findPlace("link." + string(linkST->name));
+//	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
+//	Place *p8 = TheNet->findPlace("!link." + string(linkST->name));
+//	Place *p10 = TheNet->findPlace("link." + string(linkST->name));
+	Place *p8 = TheNet->findPlace("!link." + source->linkName);
+	Place *p10 = TheNet->findPlace("link." + source->linkName);
 
 	TheNet->newArc(p8, t2);
 	TheNet->newArc(t2, p10);

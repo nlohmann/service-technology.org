@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/07/10 08:10:56 $
+ *          - last changed: \$Date: 2006/07/10 09:06:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  */
 %}
 
@@ -55,7 +55,6 @@
 
 // All the includes and variables can be used during the unparsing.
 %{ KC_UNPARSE
-/* These lines are from bpel-unparse-ast.k */
 #include <iostream>
 #include <map>
 #include "bpel-unparse-tools.h"
@@ -68,6 +67,8 @@ using namespace std;
 extern map<unsigned int, ASTE*> ASTEmap;
 
 map<string, int> linkIdMap;
+
+map<int, int> PPhasCompensateMap;
 
 unsigned int PPcurrentScope = 0;
 %}
@@ -129,6 +130,12 @@ Process(a,b,c,d,e,f,g,h,i) ->
       // collect enclosed source links
       assert(ASTEmap[i->id] != NULL);
       ASTEmap[myid]->enclosedSourceLinks = ASTEmap[i->id]->enclosedSourceLinks;
+
+      // add an attribute to the compensation handler
+      if(PPhasCompensateMap[myid] == 1)
+        f->hasCompensateWithoutScope = true;
+      if(PPhasCompensateMap[myid] == 2)
+        f->hasCompensateWithScope = true;
 
 //      cerr << myid << " has " << ASTEmap[myid]->enclosedSourceLinks.size() << " indirectly enclosed source links" << endl;
     }
@@ -194,8 +201,10 @@ userDefinedFaultHandler(a,b) ->
 //      assert(ASTEmap[b->id] != NULL); /TODO!
 //      ASTEmap[b->id]->parentActivityId = myid;
 
+      $0->parentScopeId = PPcurrentScope;
+
       // these 2 asserts show that the AST can be annotated right here
-      assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);
+//      assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);
       assert($0->inProcess == (ASTEmap[myid]->parentScopeId == 1));
     }
     a b
@@ -211,9 +220,10 @@ implicitFaultHandler() ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       $0->hasCatchAll = false;
+      $0->parentScopeId = PPcurrentScope;
 
       // these 2 asserts show that the AST can be annotated right here
-      assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);
+//      assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);
       assert($0->inProcess == (ASTEmap[myid]->parentScopeId == 1));
     }
   ]
@@ -257,9 +267,10 @@ implicitEventHandler() ->
       assert(ASTEmap[myid] != NULL);
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      $0->parentScopeId = PPcurrentScope;
 
-      // this assert shows that the AST can be annotated right here
-      assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);    
+//      // this assert shows that the AST can be annotated right here
+//      assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);    
     }  
   ]
 ;
@@ -271,9 +282,10 @@ userDefinedEventHandler(a,b) ->
       assert(ASTEmap[myid] != NULL);
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      $0->parentScopeId = PPcurrentScope;
 
-      // this assert shows that the AST can be annotated right here
-      assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);
+//      // this assert shows that the AST can be annotated right here
+//      assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);
 
       // distribute the event handlers's id to the enclosed activities
       foreach(branch=OnMessage(innerActivity); tOnMessage_list a)
@@ -326,6 +338,10 @@ userDefinedCompensationHandler(a) ->
       assert(ASTEmap[myid] != NULL);
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      $0->parentScopeId = PPcurrentScope;
+
+//      // this assert shows that the AST can be annotated right here
+//      assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);
 
       // distribute the compensation handlers's id to the enclosed activity
       // also mark the activities as "inside compensation handlers"
@@ -745,6 +761,13 @@ Compensate(a) ->
         ASTEmap[myid]->suppressJF = true;
       }
 
+      // register this compensate at the current scope
+      /* here we can check whether it is the only compensate activity */
+      if ($0->A_scope == "")
+        PPhasCompensateMap[PPcurrentScope] = 1;
+      else
+        PPhasCompensateMap[PPcurrentScope] = 2;
+
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
     }
     a
@@ -1143,6 +1166,11 @@ Scope(a,b,c,d,e,f,g) ->
       PPcurrentScope = ASTEmap[myid]->parentScopeId;
       assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);
 
+      // add an attribute to the compensation handler
+      if(PPhasCompensateMap[myid] == 1)
+        d->hasCompensateWithoutScope = true;
+      if(PPhasCompensateMap[myid] == 2)
+        d->hasCompensateWithScope = true;
 
       // collect enclosed source links
       assert(ASTEmap[g->id] != NULL);

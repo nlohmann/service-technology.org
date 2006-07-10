@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/07/08 16:31:14 $
+ *          - last changed: \$Date: 2006/07/10 09:06:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.91 $
+ * \version \$Revision: 1.92 $
  */
 %}
 
@@ -270,8 +270,8 @@ tCompensationHandler:
     int id = 0;
 
     int parentScopeId;
-    bool compensateWithoutScope = false;
-    bool compensateWithScope = false;
+    bool hasCompensateWithoutScope = false;
+    bool hasCompensateWithScope = false;
   }
 ;
 

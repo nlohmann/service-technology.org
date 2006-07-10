@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/07/10 08:10:56 $
+ *          - last changed: \$Date: 2006/07/10 09:06:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.202 $
+ * \version \$Revision: 1.203 $
  * 
  */
 %}
@@ -167,9 +167,6 @@ tProcess TheProcess;
 
 /// stack for checking for FaultHandler
 stack<bool> isInFH;
-/// stack for checking for CompensationHandler
-stack< pair<bool,int> > isInCH;
-int hasCompensate;
 
 
 /// a pointer to the current join condition
@@ -306,7 +303,6 @@ tProcess:
       parent = map<int, int>();
       isInFH = stack<bool>();
       currentJoinCondition = standardJoinCondition();
-      yylineno = 1;
       channelShortNames = map< string, string >();
     }
   X_OPEN K_PROCESS genSymTabEntry_Process
@@ -320,8 +316,6 @@ tProcess:
       assert (currentSTScope != NULL);
 
       isInFH.push(false);
-      isInCH.push(pair<bool,int>(false,0));
-      hasCompensate = 0;
    }
   X_NEXT imports tPartnerLinks tPartners tVariables tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers
   activity
@@ -331,7 +325,6 @@ tProcess:
       $$->id = $4->value;
 
       isInFH.pop();
-      isInCH.pop();
 
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_PROCESS);
@@ -491,7 +484,7 @@ tFaultHandlers:
       $$ = implicitFaultHandler();
       $$->id = currentSymTabEntryKey;
       $$->inProcess = (currentScopeId == 1);
-      $$->parentScopeId = currentScopeId; 
+//      $$->parentScopeId = currentScopeId; 
 
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FAULTHANDLERS);
@@ -500,16 +493,14 @@ tFaultHandlers:
     {
       symMan.startDPEinWhile();
       isInFH.push(true);
-      hasCompensate = 0;
     }
   tCatch_list tCatchAll X_SLASH K_FAULTHANDLERS X_NEXT
     { $$ = userDefinedFaultHandler($5, $6);
       $$->id = $2->value;
       $$->inProcess = (currentScopeId == 1);
-      $$->parentScopeId = currentScopeId;
+//      $$->parentScopeId = currentScopeId;
 
       isInFH.pop();
-      hasCompensate = 0;
       symMan.endDPEinWhile();
 
       assert(ASTEmap[$$->id] == NULL);
@@ -583,40 +574,25 @@ tCompensationHandler:
       else
         $$ = implicitCompensationHandler();
       $$->id = currentSymTabEntryKey;              
-      $$->parentScopeId = currentScopeId;
+//      $$->parentScopeId = currentScopeId;
 
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_COMPENSATIONHANDLER);
     }
 | K_COMPENSATIONHANDLER genSymTabEntry_CompensationHandler X_NEXT 
-    {
-      symMan.startDPEinWhile();
-      isInCH.push(pair<bool,int>(true,hasCompensate));
-      hasCompensate = 0;
-    }
+    { symMan.startDPEinWhile(); }
   activity 
   X_NEXT X_SLASH K_COMPENSATIONHANDLER X_NEXT
     { if (currentScopeId == 1)
+      {
         $$ = processCompensationHandler();
+        cerr << "The compensationHandler of the process will be ignored as it can never be called." << endl;
+      }
       else
         $$ = userDefinedCompensationHandler($5);
 
-      switch ( hasCompensate ) {
-        case 1 : $$->compensateWithoutScope = true;
-                 $$->compensateWithScope = false;
-                 break;
-        case 2 : $$->compensateWithoutScope = false;
-                 $$->compensateWithScope = true;
-                 break;
-        default: $$->compensateWithoutScope = false;
-                 $$->compensateWithScope = false;
-                 break;
-      }
-      hasCompensate = isInCH.top().second;
-      isInCH.pop();
-      
       $$->id = $2->value;
-      $$->parentScopeId = currentScopeId; 
+//      $$->parentScopeId = currentScopeId; 
       symMan.endDPEinWhile();
 
       assert(ASTEmap[$$->id] == NULL);
@@ -637,8 +613,8 @@ tEventHandlers:
   /* empty */
     { currentSymTabEntryKey = symTab.insert(K_EVENTHANDLERS);
       $$ = implicitEventHandler();
-      $$->id = currentSymTabEntryKey;      
-      $$->parentScopeId = currentScopeId;
+      $$->id = currentSymTabEntryKey;
+//      $$->parentScopeId = currentScopeId;
 
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_EVENTHANDLERS);
@@ -650,7 +626,7 @@ tEventHandlers:
   X_SLASH K_EVENTHANDLERS X_NEXT
     { $$ = userDefinedEventHandler($5, $6);
       $$->id = $2->value;    
-      $$->parentScopeId = currentScopeId; 
+//      $$->parentScopeId = currentScopeId; 
       symMan.endDPEinWhile();
 
       assert(ASTEmap[$$->id] == NULL);
@@ -695,7 +671,6 @@ tOnMessage:
 								 symTab.readAttributeValue($2->value, "operation"), 
 								 symTab.readAttributeValue($2->value, "partnerLink")),
 								 true);
-      stOnMessage->processLinks($7->id, currentSymTabEntryKey);
 
       $$ = OnMessage($7);
       $$->id = $2->value;
@@ -720,11 +695,6 @@ tOnAlarm:
     { $$ = OnAlarm($6);
       $$->id = $2->value;
       $$->dpe = symMan.needsDPE();
-
-      // collect source links for new DPE
-      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id));
-      assert(branch != NULL);
-      branch->processLinks($6->id, currentSymTabEntryKey);
 
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_ONALARM);
@@ -937,7 +907,6 @@ tInvoke:
     {
       // automatically create scope?
       isInFH.push(false);
-      isInCH.push(pair<bool,int>(false,hasCompensate));
       parent[$2->value] = currentScopeId;
       int qad_id = symTab.nextId();
       parent[qad_id] = currentScopeId;
@@ -947,8 +916,6 @@ tInvoke:
   tCorrelations tCatch_list  tCatchAll tCompensationHandler X_SLASH K_INVOKE
     { 
       isInFH.pop();
-      hasCompensate = isInCH.top().second;
-      isInCH.pop();
       if ($9->length() > 0 
            || (string($10->op_name()) != "NoCatchAll") 
            || string($11->op_name()) != "implicitCompensationHandler")
@@ -1042,12 +1009,6 @@ tInvoke:
 
         assert(ASTEmap[$$->id] == NULL);
         ASTEmap[$$->id] = new ASTE((kc::impl_activity*)invoke, K_SCOPE);
-
-
-        // collect source links for new DPE
-        STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id));
-        assert(branch != NULL);
-        branch->processLinks($$->id, currentSymTabEntryKey);
       }
       else
       { 
@@ -1102,12 +1063,6 @@ tInvoke:
 
         assert(ASTEmap[invoke->id] == NULL);
         ASTEmap[invoke->id] = new ASTE((kc::impl_activity*)invoke, K_INVOKE);
-
-
-	// collect source links for new DPE
-        STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id));
-        assert (branch != NULL);
-	branch->processLinks($2->value, currentSymTabEntryKey);
       }    
     }
 | K_INVOKE genSymTabEntry_Invoke 
@@ -1164,11 +1119,6 @@ tInvoke:
 
       assert(ASTEmap[invoke->id] == NULL);
       ASTEmap[invoke->id] = new ASTE((kc::impl_activity*)invoke, K_INVOKE);
-
-
-      // collect source links for new DPE
-      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id));
-      branch->processLinks($$->id, currentSymTabEntryKey);
 }
 ;
 
@@ -1771,11 +1721,6 @@ tCase:
       $$->id = $2->value;    
       $$->dpe = symMan.needsDPE();
 
-      // collect source links for new DPE
-      STElement *branch = dynamic_cast<STElement *> (symTab.lookup($$->id));
-      assert (branch != NULL);
-      branch->processLinks($6->id, currentSymTabEntryKey);
-
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CASE);
     }
@@ -1822,12 +1767,6 @@ tOtherwise:
       $$ = Otherwise($4);
       $$->id = currentSymTabEntryKey;
       $$->dpe = symMan.needsDPE();
-
-      // collect source links for new DPE
-      STElement* branch = dynamic_cast<STElement *> (symTab.lookup($$->id));
-      assert (branch != NULL);
-
-      branch->processLinks($4->id, currentSymTabEntryKey);
 
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_OTHERWISE);
@@ -1939,7 +1878,6 @@ tScope:
   K_SCOPE genSymTabEntry_Scope arbitraryAttributes X_NEXT
     { 
       isInFH.push(false);
-      isInCH.push(pair<bool,int>(false,hasCompensate));
       parent[$2->value] = currentScopeId;
       currentScopeId = $2->value; 
     }
@@ -1960,12 +1898,11 @@ tScope:
   X_NEXT X_SLASH K_SCOPE
     {
       isInFH.pop();
-      hasCompensate = isInCH.top().second;
-      isInCH.pop();
 
       $$ = Scope($6, $8, $10, $11, $12, StopInScope(), $13);
       $$->id = $2->value;
-      $$->parentScopeId = currentScopeId = parent[$2->value];
+//      $$->parentScopeId = currentScopeId = parent[$2->value];
+      currentScopeId = parent[$2->value];
 
       currentSTScope = dynamic_cast<STScope *> (symTab.lookup(currentScopeId));
       assert(currentSTScope != NULL);

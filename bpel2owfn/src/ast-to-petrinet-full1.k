@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/07/08 12:15:52 $
+ *          - last changed: \$Date: 2006/07/10 09:06:18 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.182 $
+ * \version \$Revision: 1.183 $
  *
  */
 %}
@@ -1749,7 +1749,7 @@ This=userDefinedCompensationHandler(innerActivity) ->
 
       // Above is the standard case as depicted in Fig. 45. Below are the other
       // cases as depicted in Fig. 43 and Fig. 44.
-      if (This->compensateWithoutScope)
+      if (This->hasCompensateWithoutScope)
       {
 	// The Pattern of Fig. 43 (with <compensate />).
 	Place *p10 = TheNet->newPlace(prefix + "p10");
@@ -1774,7 +1774,7 @@ This=userDefinedCompensationHandler(innerActivity) ->
 	TheNet->newArc(p15, t11);
 	TheNet->newArc(p24, t11);
       }
-      if (This->compensateWithScope)
+      if (This->hasCompensateWithScope)
       {
 	// Pattern of Fig. 44 (with <compensate scope="C"/>).
 	Place *p10 = TheNet->newPlace(prefix + "p10");

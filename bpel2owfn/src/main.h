@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2006/07/01 21:58:08 $
+ *          - last changed: \$Date: 2006/07/11 20:55:14 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  */
 
 #ifndef MAIN_H
@@ -53,7 +53,7 @@
 #include "cfg.h"		// Control Flow Graph
 #include "debug.h"		// debugging help
 #include "exception.h"		// exception handling
-#include "check-symbols.h"	// scope handling and checking
+//#include "check-symbols.h"	// scope handling and checking
 
 /* defined by Bison */
 extern int yyparse();
@@ -67,7 +67,7 @@ extern FILE *yyin;        ///< pointer to the input file
 
 
 // from check-symbols
-extern SymbolManager symMan;
+//extern SymbolManager symMan;
 
 
 #endif

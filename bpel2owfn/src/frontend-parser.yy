@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/07/11 06:53:04 $
+ *          - last changed: \$Date: 2006/07/11 20:47:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.209 $
+ * \version \$Revision: 1.210 $
  * 
  */
 %}
@@ -128,8 +128,8 @@ extern int yylineno;
 extern int yyerror(const char *);
 
 
-/// an instance of the symbol table
-SymbolTable symTab = SymbolTable();
+/// an instance of the symboltable
+//SymbolTable symTab = SymbolTable();
 
 
 /// the root of the abstract syntax tree
@@ -224,7 +224,7 @@ unsigned int ASTEid = 1;
 tProcess:
     {
       // initialisation (for multiple input files)
-      symTab = SymbolTable();
+//      symTab = SymbolTable();
       yylineno = 0;
       ASTEid = 1;
       currentJoinCondition = standardJoinCondition();

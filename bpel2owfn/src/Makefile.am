@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/07/02 17:39:35 $ by $Author: nlohmann $.
-# Version $Revision: 1.25 $
+# File last changed $Date: 2006/07/11 20:47:51 $ by $Author: nlohmann $.
+# Version $Revision: 1.26 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -54,10 +54,7 @@ bpel2owfn_SOURCES = $(KCDUMMY)\
 		    $(KCSOURCES)\
 		    bpel-syntax.yy bpel-syntax.h\
 		    bpel-lexic.ll\
-		    bpel-attributes.cc bpel-attributes.h\
 		    bpel-unparse-tools.cc bpel-unparse-tools.h\
-		    symbol-table.cc symbol-table.h\
-		    check-symbols.cc check-symbols.h\
 		    debug.cc debug.h\
 		    exception.cc exception.h\
 		    helpers.cc helpers.h\

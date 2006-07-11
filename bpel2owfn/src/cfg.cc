@@ -31,20 +31,20 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/07/08 12:15:53 $
+ *          - last changed: \$Date: 2006/07/11 20:47:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.23 $
+ * \version \$Revision: 1.24 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
 
 #include "cfg.h"
-#include "symbol-table.h"
+//#include "symbol-table.h"
 #include "options.h"
 #include "debug.h"
 #include "ast-printers.h"
@@ -55,7 +55,7 @@
 CFGBlock * TheCFG = NULL;
 
 
-extern SymbolTable symTab; // needed for access to the Symbol Table
+//extern SymbolTable symTab; // needed for access to the Symbol Table
 
 /// mapping of Link names to Source blocks
 map<std::string, CFGBlock*> sources; 
@@ -344,8 +344,9 @@ void connectBlocks(CFGBlock * from, CFGBlock * to)
  *
  *
  */
-void CFGBlock::checkForUninitializedVariables()
+/*	void CFGBlock::checkForUninitializedVariables()
 {
+
   if (processed)
   {
     return;
@@ -416,7 +417,7 @@ void CFGBlock::checkForUninitializedVariables()
       case CFGInvoke    : stVar = (dynamic_cast<STInvoke*>    (symTab.lookup(id)))->inputVariable; 
 			  attributeName = "inputVariable";
 			  break;
-      default: /* should not happen (thinks Niels) */;
+      default: // should not happen (thinks Niels)
     }
   }
   catch (bad_cast)
@@ -457,7 +458,7 @@ void CFGBlock::checkForUninitializedVariables()
 			  attributeName = "outputVariable";
 			  break;
       case CFGOnMessage : stVar = (dynamic_cast<STOnMessage*> (symTab.lookup(id)))->variable; break;
-      default: /* should not happen (thinks Niels) */;
+      default: // should not happen (thinks Niels)
     }
   }
   catch (bad_cast)
@@ -481,8 +482,10 @@ void CFGBlock::checkForUninitializedVariables()
       (*iter)->checkForUninitializedVariables();
     }
   }  
-}
+}*/
 
+
+/*
 
 /// checks for cyclic links
 void CFGBlock::checkForCyclicLinks()
@@ -525,7 +528,9 @@ void CFGBlock::checkForCyclicLinks()
     }
   }
 }
+*/
 
+/*
 /// checks for conflicting receives
 void CFGBlock::checkForConflictingReceive()
 {
@@ -655,7 +660,7 @@ void CFGBlock::checkForConflictingReceive()
 
 }
 
-
+*/
 
 
 
@@ -680,16 +685,16 @@ void processCFG()
 
   trace(TRACE_DEBUG, "[CFG] checking for cyclic links\n");
   /// \todo (gierds) check for cyclic links, otherwise we will fail
-  TheCFG->checkForCyclicLinks();
+//  TheCFG->checkForCyclicLinks();
   TheCFG->resetProcessedFlag(true);
 
   trace(TRACE_DEBUG, "[CFG] checking for uninitialized variables\n");
   // test
-  TheCFG->checkForUninitializedVariables();
+//  TheCFG->checkForUninitializedVariables();
   TheCFG->resetProcessedFlag();
   // end test
 
-  TheCFG->lastBlock->checkForConflictingReceive();
+//  TheCFG->lastBlock->checkForConflictingReceive();
   TheCFG->resetProcessedFlag(true, false);
 
   

@@ -36,13 +36,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/07/02 17:56:28 $
+ *          - last changed: \$Date: 2006/07/11 20:47:51 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
  */
 
 
@@ -51,11 +51,14 @@
 
 #include <list>
 #include <assert.h>
+#include <set>
 #include "petrinet.h"
 #include "debug.h"		// debugging help
-#include "symbol-table.h"
+//#include "symbol-table.h"
 #include "helpers.h"
 #include "options.h"
+
+extern set<string> ASTE_variables;
 
 
 
@@ -94,10 +97,11 @@ void PetriNet::removeInterface()
  */
 void PetriNet::removeVariables()
 {
-  extern SymbolTable symTab;
+//  extern SymbolTable symTab;
   
-  for (list<string>::iterator variable = symTab.variables.begin();
-      variable != symTab.variables.end(); variable++)
+//  for (list<string>::iterator variable = symTab.variables.begin();
+  for (set<string>::iterator variable = ASTE_variables.begin();
+      variable != ASTE_variables.end(); variable++)
   {
     removePlace( findPlace("variable." + *variable) );
   }

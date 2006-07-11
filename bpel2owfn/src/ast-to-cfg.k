@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/07/10 15:37:16 $
+ *          - last changed: \$Date: 2006/07/11 06:53:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.19 $
+ * \version \$Revision: 1.20 $
  */
 %}
 
@@ -314,14 +314,6 @@ implicitCompensationHandler() ->
 
   ];
 
-processCompensationHandler() ->
-  [cfg: {
-	  trace(TRACE_DEBUG, "[CFG] CompensationHandler (Process)\n");
-	  CFGBlock * block = new CFGBlock(CFGCompensationHandler, $0->id, "processCompensationHandler"); 
-	  cfgMap[intToString($0->id)] = block;
-	}
-
-  ];
 
 
 /******************************************************************************

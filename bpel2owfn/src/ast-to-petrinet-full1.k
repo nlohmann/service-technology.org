@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/07/10 13:21:05 $
+ *          - last changed: \$Date: 2006/07/11 06:53:04 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.184 $
+ * \version \$Revision: 1.185 $
  *
  */
 %}
@@ -1538,7 +1538,7 @@ This=userDefinedEventHandler(a,b) ->
  * Implicit compensation handler as it is depicted in Fig. 42.
  */
 
-This=implicitCompensationHandler() ->
+This=implicitCompensationHandler() provided (!This->inProcess) ->
   [petrinet:
     {
       string prefix = intToString(This->parentScopeId) + ".internal.compensationHandler.";
@@ -1669,7 +1669,7 @@ This=implicitCompensationHandler() ->
  * that this pattern combines the four different compensation handler patterns.
  */
 
-This=userDefinedCompensationHandler(innerActivity) ->
+This=userDefinedCompensationHandler(innerActivity) provided (!This->inProcess) ->
   [petrinet:
     {
       string prefix = intToString(This->parentScopeId) + ".internal.compensationHandler.";
@@ -1837,7 +1837,101 @@ This=userDefinedCompensationHandler(innerActivity) ->
  * will never be called from a surrounding scope, the whole "left" part of the
  * pattern depicted in Fig. 42 is not necessary.
  */
-This=processCompensationHandler() ->
+This=implicitCompensationHandler() provided (This->inProcess) ->
+  [petrinet:
+    {
+      string prefix = intToString(This->parentScopeId) + ".internal.compensationHandler.";
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "<processCompensationHandler>\n");
+
+      Place *p2  = TheNet->newPlace(prefix + "ch_in");
+      Place *p3  = TheNet->newPlace(prefix + "Compensated");
+      Place *p4  = TheNet->newPlace(prefix + "!Completed");
+      Place *p5  = TheNet->newPlace(prefix + "!Compensated");
+      Place *p6  = TheNet->newPlace(prefix + "Completed");
+      Place *p9  = TheNet->newPlace(prefix + "compensated");
+      Place *p11 = TheNet->newPlace(prefix + "comp");
+      Place *p13 = TheNet->newPlace(prefix + "cleaned");
+      Place *p14 = TheNet->newPlace(prefix + "fh");
+      Place *p15 = TheNet->newPlace(prefix + "ch_call");
+      Place *p16 = TheNet->newPlace(prefix + "fh_call");
+      Place *p17 = TheNet->newPlace(prefix + "ch_out");
+      Place *p18 = TheNet->newPlace(prefix + "scopeCompensated");
+      Place *p24 = TheNet->newPlace(prefix + "clean");
+
+      Transition *t6 = TheNet->newTransition(prefix + "t6");
+      TheNet->newArc(p14, t6);
+      TheNet->newArc(t6, p11);
+      TheNet->newArc(t6, p16);
+
+      Transition *t7 = TheNet->newTransition(prefix + "t7");
+      TheNet->newArc(t7, p9);
+      TheNet->newArc(p11, t7);
+      TheNet->newArc(p15, t7);
+
+      Transition *t8 = TheNet->newTransition(prefix + "t8");
+      TheNet->newArc(p11, t8);
+      TheNet->newArc(p16, t8);
+      TheNet->newArc(t8, p17);
+
+      Transition *t9 = TheNet->newTransition(prefix + "t9");
+      TheNet->newArc(t9, p11);
+      TheNet->newArc(p16, t9, READ);
+      TheNet->newArc(p18, t9);
+
+      Transition *t10 = TheNet->newTransition(prefix + "t10");
+      TheNet->newArc(t10, p11);
+      TheNet->newArc(p15, t10, READ);
+      TheNet->newArc(p18, t10);
+
+      Transition *t11 = TheNet->newTransition(prefix + "t11");
+      TheNet->newArc(t11, p13);
+      TheNet->newArc(p15, t11);
+      TheNet->newArc(p24, t11);
+
+      Transition *t12 = TheNet->newTransition(prefix + "t12");
+      TheNet->newArc(t12, p13);
+      TheNet->newArc(p16, t12);
+      TheNet->newArc(p24, t12);
+
+      Transition *t15 = TheNet->newTransition(prefix + "t15");
+      TheNet->newArc(p9, t15);
+      TheNet->newArc(t15, p13);
+      TheNet->newArc(p24, t15);
+
+      Transition *t16 = TheNet->newTransition(prefix + "t16");
+      TheNet->newArc(t16, p13);
+      TheNet->newArc(p17, t16);
+      TheNet->newArc(p24, t16);
+
+
+      // Generate transitions t13 for the child scopes. This transition was
+      // guarded in the original semantics and has to be unfolded for the
+      // low-level representation. Therefore, each child gets its own place
+      // "compScope".
+      STScope * parentScope = dynamic_cast<STScope *>(symTab.lookup(This->parentScopeId));
+      for (list< STScope * >::iterator child = parentScope->childScopes.begin(); child != parentScope->childScopes.end(); child++)
+      {
+	Place *p19_new = TheNet->newPlace(prefix + "compScope." + intToString((*child)->entryKey));
+	Place *p20 = TheNet->findPlace(intToString((*child)->entryKey) + ".!push");
+	Place *p21 = TheNet->findPlace(intToString((*child)->entryKey) + ".push");
+	Transition *t13 = TheNet->newTransition(prefix + "t13." + intToString((*child)->entryKey));
+	TheNet->newArc(p20, t7);
+	TheNet->newArc(p20, t8);
+	TheNet->newArc(p11, t13);
+	TheNet->newArc(t13, p19_new);
+	TheNet->newArc(t13, p20);
+	TheNet->newArc(p21, t13);
+      }
+
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "</processCompensationHandler>\n");
+    }
+  ]
+;
+
+
+
+/* this pattern is just a copy from the pattern above */
+This=userDefinedCompensationHandler(a) provided (This->inProcess) ->
   [petrinet:
     {
       string prefix = intToString(This->parentScopeId) + ".internal.compensationHandler.";

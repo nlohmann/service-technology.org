@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/07/10 17:02:50 $
+ *          - last changed: \$Date: 2006/07/11 06:53:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.208 $
+ * \version \$Revision: 1.209 $
  * 
  */
 %}
@@ -223,15 +223,14 @@ unsigned int ASTEid = 1;
 
 tProcess:
     {
-      // initialisation
+      // initialisation (for multiple input files)
       symTab = SymbolTable();
       yylineno = 0;
       ASTEid = 1;
       currentJoinCondition = standardJoinCondition();
     }
-  X_OPEN K_PROCESS 
-  arbitraryAttributes
-  X_NEXT imports tPartnerLinks tPartners tVariables tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers activity
+  X_OPEN K_PROCESS arbitraryAttributes X_NEXT imports
+  tPartnerLinks tPartners tVariables tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers activity
   X_NEXT X_SLASH K_PROCESS X_CLOSE
     {
       TheProcess = $$ = Process($7, $8, $9, $10, $11, $12, $13, StopInProcess(), $14);
@@ -395,25 +394,14 @@ tCatchAll:
 tCompensationHandler:
   /* empty */
     {
-//TODO      if (currentScopeId == 1)
-//TODO        $$ = processCompensationHandler();
-//TODO      else
-        $$ = implicitCompensationHandler();
-      $$->id = ASTEid++; //currentSymTabEntryKey;              
-
+      $$ = implicitCompensationHandler();
+      $$->id = ASTEid++;
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_COMPENSATIONHANDLER);
     }
 | K_COMPENSATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_COMPENSATIONHANDLER X_NEXT
     {
-//TODO      if (currentScopeId == 1)
-//TODO      {
-//TODO        $$ = processCompensationHandler();
-//TODO        cerr << "The compensationHandler of the process will be ignored as it can never be called." << endl;
-//TODO      }
-//TODO      else
-        $$ = userDefinedCompensationHandler($3);
-
+      $$ = userDefinedCompensationHandler($3);
       $$->id = ASTEid++;
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_COMPENSATIONHANDLER);
@@ -934,7 +922,6 @@ tOtherwise:
       impl_standardElements_StandardElements* noLinks = StandardElements(NiltTarget_list(),NiltSource_list(), standardJoinCondition());
       impl_tEmpty_Empty* implicitEmpty = Empty(noLinks);
       implicitEmpty->id = ASTEid++;
-
       impl_activity *otherwiseActivity = activityEmpty(implicitEmpty);
       otherwiseActivity->id = ASTEid++;
 

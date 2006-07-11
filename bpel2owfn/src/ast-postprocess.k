@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/07/10 15:37:16 $
+ *          - last changed: \$Date: 2006/07/11 06:53:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  */
 %}
 
@@ -121,6 +121,10 @@ Process(a,b,c,d,e,f,g,h,i) ->
       ASTEmap[myid]->parentActivityId = myid;
 
 
+      // tag the (useless) compensation handler
+      f->inProcess = true;
+
+
       // distribute the process' id to the enclosed FH/CH/EH/activity
       assert(ASTEmap[e->id] != NULL);
       ASTEmap[e->id]->parentActivityId = myid;
@@ -197,6 +201,8 @@ userDefinedFaultHandler(a,b) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       $0->hasCatchAll = (b->op_name() == "CatchAll");
+      $0->parentScopeId = PPcurrentScope;
+      $0->inProcess = (ASTEmap[myid]->parentScopeId == 1);
 
       // distribute the fault handlers's id to the enclosed catch/catchAll branches
       // also mark the activities as "inside fault handlers"
@@ -208,13 +214,6 @@ userDefinedFaultHandler(a,b) ->
       }
 //      assert(ASTEmap[b->id] != NULL); /TODO!
 //      ASTEmap[b->id]->parentActivityId = myid;
-
-      $0->parentScopeId = PPcurrentScope;
-      $0->inProcess = (ASTEmap[myid]->parentScopeId == 1);
-
-      // these 2 asserts show that the AST can be annotated right here
-//      assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);
-//      assert($0->inProcess == (ASTEmap[myid]->parentScopeId == 1));
     }
     a b
   ]
@@ -230,10 +229,7 @@ implicitFaultHandler() ->
 
       $0->hasCatchAll = false;
       $0->parentScopeId = PPcurrentScope;
-
-      // these 2 asserts show that the AST can be annotated right here
-//      assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);
-      assert($0->inProcess == (ASTEmap[myid]->parentScopeId == 1));
+      $0->inProcess = (ASTEmap[myid]->parentScopeId == 1);
     }
   ]
 ;
@@ -486,6 +482,9 @@ Invoke(a,b) ->
       $0->A_outputVariable = ASTEmap[myid]->attributes["outputVariable"];
       /* here we can check the attributes */
 
+      // switch to discriminate asynchronous and synchronous invokes
+      $0->isAsynchronousInvoke = ($0->A_inputVariable == "");
+
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
@@ -500,14 +499,11 @@ Invoke(a,b) ->
 //      $0->channelName = $0->A_partnerLink + "." + $0->A_portType + "." + $0->A_operation;
       $0->channelName = $0->A_operation; //TODO
       ASTE_outputChannels.insert($0->channelName);
-      if ($0->A_inputVariable != "") // TODO!
+      if ($0->isAsynchronousInvoke)
         ASTE_inputChannels.insert($0->channelName);
 
       $0->inputVariableName = $0->A_inputVariable;
       $0->outputVariableName = $0->A_outputVariable;
-
-      // switch to discriminate asynchronous and synchronous invokes
-      $0->isAsynchronousInvoke = ($0->A_inputVariable == "");
     }
     a b
   ]

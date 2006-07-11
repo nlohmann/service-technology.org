@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/07/11 20:55:13 $
+ *          - last changed: \$Date: 2006/07/11 21:17:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.211 $
+ * \version \$Revision: 1.212 $
  * 
  */
 %}
@@ -106,6 +106,7 @@
 
 #include <assert.h>
 #include <map>
+#include <iostream> // for cerr
 
 #include "bpel-kc-k.h" // phylum definitions
 #include "bpel-kc-yystype.h" // data types for tokens and non-terminals

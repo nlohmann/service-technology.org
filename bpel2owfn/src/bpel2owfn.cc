@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/07/08 12:15:53 $
+ *          - last changed: \$Date: 2006/07/11 21:17:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.91 $
+ * \version \$Revision: 1.92 $
  *
  */
 
@@ -82,8 +82,8 @@ void petrinet_unparse()
  */
 int main( int argc, char *argv[])
 {
-  try
-  {
+//  try
+//  {
     /***
      * Reading command line arguments and triggering appropriate behaviour.
      * In case of false parameters call command line help function and exit.
@@ -101,7 +101,8 @@ int main( int argc, char *argv[])
 	filename = *file;
 	if (!(yyin = fopen(filename.c_str(), "r")))
 	{
-	  throw Exception(FILE_NOT_FOUND, "File '" + filename + "' not found.\n");
+		/* TODO generate message: file not found */
+//	  throw Exception(FILE_NOT_FOUND, "File '" + filename + "' not found.\n");
 	}
       }
       trace(TRACE_INFORMATION, "Parsing " + filename + " ...\n");
@@ -377,19 +378,19 @@ int main( int argc, char *argv[])
       // a hack for Turku: show that our tool exists
       trace(TheNet->information() + "\n");
     }
-  }
-  catch (Exception& e)
-  {
-    // output info file ?
-    if ( formats[F_INFO] )
-    {
-      output = log_output;
-      // just print to std::out
-      TheNet->printInformation();
-      output = NULL;
-    }
-    error(e);
-  }
+//  }
+//  catch (Exception& e)
+//  {
+//    // output info file ?
+//    if ( formats[F_INFO] )
+//    {
+//      output = log_output;
+//      // just print to std::out
+//      TheNet->printInformation();
+//      output = NULL;
+//    }
+//    error(e);
+//  }
 
   return 0;  
 }

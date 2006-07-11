@@ -28,17 +28,17 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/04/05 12:11:58 $
+ *          - last changed: \$Date: 2006/07/11 21:17:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.48 $
+ * \version \$Revision: 1.49 $
  */
 
 
@@ -143,7 +143,7 @@ void error()
  * \param e The exception that triggered this function call. 
  * 
  */
-void error(Exception e)
+/*void error(Exception e)
 {
   trace("\nAn error has occured while parsing \"" + filename + "\"!\n\n");
   // output information about the exception
@@ -159,7 +159,7 @@ void error(Exception e)
   // stop execution
   exit(e.id);
 }
-
+*/
 
 
 

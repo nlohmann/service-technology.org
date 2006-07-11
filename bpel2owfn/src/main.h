@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2006/07/11 20:55:14 $
+ *          - last changed: \$Date: 2006/07/11 21:17:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  */
 
 #ifndef MAIN_H
@@ -52,7 +52,7 @@
 #include "petrinet.h"           // Petri Net support
 #include "cfg.h"		// Control Flow Graph
 #include "debug.h"		// debugging help
-#include "exception.h"		// exception handling
+//#include "exception.h"		// exception handling
 //#include "check-symbols.h"	// scope handling and checking
 
 /* defined by Bison */

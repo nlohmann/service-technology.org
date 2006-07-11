@@ -5,7 +5,7 @@
 #include "bpel2owfn.h"
 #include "options.h"
 #include "debug.h"
-#include "exception.h"
+//#include "exception.h"
 
 using namespace std;
 
@@ -204,24 +204,21 @@ void parse_command_line(int argc, char* argv[])
 	      }
 	      else
 	      {
-		throw Exception(OPTION_MISMATCH, 
-				"Unknown mode \"" + parameter +"\".\n",
-				"Type " + progname + " -h for more information.\n");
+//		throw Exception(OPTION_MISMATCH, 
+                trace(TRACE_ALWAYS, "Unknown mode \"" + parameter+ "\n");
 	      }
 	      if (options[O_MODE] && modus != old_modus)
 	      {
-		throw Exception(OPTION_MISMATCH, 
-				"Choose only one mode!\n",
-				"Type " + progname + " -h for more information.\n");
+//		throw Exception(OPTION_MISMATCH, 
+                trace(TRACE_ALWAYS, "Choose only one mode!\n");
 	      }
 	      options[O_MODE] = true;
 	      break;
       case 'b':
  	      if (options[O_MODE] && modus != M_PETRINET)
 	      {
-	        throw Exception(OPTION_MISMATCH,
-				"Choose only one mode\n",
-				"Type " + progname + " -h for more information.\n");
+//	        throw Exception(OPTION_MISMATCH,
+                trace("Choose only one mode\n");
 	      }
 	      formats[F_LOLA] = true;
 	      formats[F_INFO] = true;
@@ -348,18 +345,16 @@ void parse_command_line(int argc, char* argv[])
 		formats[F_XML] = true;
  	        if (options[O_MODE] && modus != M_PRETTY)
 	        {
-		  throw Exception(OPTION_MISMATCH, 
-				  "Choose only one mode\n",
-				  "Type " + progname + " -h for more information.\n");
+//		  throw Exception(OPTION_MISMATCH, 
+                  trace(TRACE_ALWAYS, "Choose only one mode\n");
 	        }
 	    	modus = M_PRETTY;
 	        options[O_MODE] = true;
 	      }
 	      else
 	      {
-		throw Exception(OPTION_MISMATCH, 
-				"Unknown format \"" + parameter +"\".\n",
-				"Type " + progname + " -h for more information.\n");
+//		throw Exception(OPTION_MISMATCH, 
+		trace(TRACE_ALWAYS, "Unknown format \"" + parameter +"\".\n");
 	      }
 	      break;
       case 'p':
@@ -415,9 +410,8 @@ void parse_command_line(int argc, char* argv[])
 	      }
 	      else
 	      {
-		throw Exception(OPTION_MISMATCH, 
-				"Unknown parameter \"" + parameter +"\".\n",
-				"Type " + progname + " -h for more information.\n");
+//		throw Exception(OPTION_MISMATCH, 
+		trace(TRACE_ALWAYS, "Unknown parameter \"" + parameter +"\".\n");
 	      }
 	      break;
       case 'd':
@@ -449,15 +443,11 @@ void parse_command_line(int argc, char* argv[])
 	      }
 	      else
 	      {
-		throw Exception(OPTION_MISMATCH, 
-				"Unrecognised debug mode!\n",
-				"Type " + progname + " -h for more information.\n");
+		trace(TRACE_ALWAYS, "Unrecognised debug mode!\n");
 	      }
 	      break;
       default:
-	     throw Exception(OPTION_MISMATCH,
-			     "Unknown option!\n",
-			     "Type " + progname + " -h for more information.\n");
+	      trace("Unknown option!\n");
              break;
       }
       
@@ -488,7 +478,8 @@ void parse_command_line(int argc, char* argv[])
     FILE * fin = NULL;
     if (!(fin = fopen(file->c_str(), "r")))
     {
-      throw Exception(FILE_NOT_FOUND, "File '" + *file + "' not found.\n");
+	    trace(TRACE_ALWAYS, "File '" + *file + "' not found.\n");
+//      throw Exception(FILE_NOT_FOUND, "File '" + *file + "' not found.\n");
     }
     fclose(fin);
     file++;
@@ -496,7 +487,8 @@ void parse_command_line(int argc, char* argv[])
     {
       if (!(fopen(file->c_str(), "r")))
       {
-	throw Exception(FILE_NOT_FOUND, "File '" + *file + "' not found.\n");
+	    trace(TRACE_ALWAYS, "File '" + *file + "' not found.\n");
+//	throw Exception(FILE_NOT_FOUND, "File '" + *file + "' not found.\n");
       }
       file++;
     }
@@ -608,7 +600,9 @@ std::ostream * openOutput(std::string name)
   std::ofstream * file = new std::ofstream(name.c_str(), std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
   if (!file->is_open())
   {
-    throw Exception(FILE_NOT_OPEN, "File \"" + name + "\" could not be opened for writing access!\n");
+	    trace(TRACE_ALWAYS, "File \"" + name + "\" could not be opened for writing access!\n");
+	  
+//    throw Exception(FILE_NOT_OPEN, "File \"" + name + "\" could not be opened for writing access!\n");
   } 
 
   return file;

@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/07/10 15:37:16 $
+ *          - last changed: \$Date: 2006/07/11 20:25:18 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
  *
  */
 %}
@@ -67,8 +67,8 @@
 %{ KC_UNPARSE
 #include <iostream>
 #include "petrinet.h"
-#include "check-symbols.h"
-#include "symbol-table.h"
+//#include "check-symbols.h"
+//#include "symbol-table.h"
 #include "options.h"
 #include "bpel-unparse-tools.h"
 #include "ast-printers.h"

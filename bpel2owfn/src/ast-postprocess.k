@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/07/11 06:53:04 $
+ *          - last changed: \$Date: 2006/07/11 20:25:18 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.19 $
+ * \version \$Revision: 1.20 $
  */
 %}
 
@@ -61,7 +61,7 @@
 #include "bpel-unparse-tools.h"
 #include "ast-printers.h"
 #include "ast-details.h"
-#include "symbol-table.h"
+//#include "symbol-table.h"
 
 using namespace std;
 
@@ -127,12 +127,12 @@ Process(a,b,c,d,e,f,g,h,i) ->
 
       // distribute the process' id to the enclosed FH/CH/EH/activity
       assert(ASTEmap[e->id] != NULL);
-      ASTEmap[e->id]->parentActivityId = myid;
       assert(ASTEmap[f->id] != NULL);
-      ASTEmap[f->id]->parentActivityId = myid;
       assert(ASTEmap[g->id] != NULL);
-      ASTEmap[g->id]->parentActivityId = myid;
       assert(ASTEmap[i->id] != NULL);
+      ASTEmap[e->id]->parentActivityId = myid;
+      ASTEmap[f->id]->parentActivityId = myid;
+      ASTEmap[g->id]->parentActivityId = myid;
       ASTEmap[i->id]->parentActivityId = myid;
 
       PPcurrentScope = myid;
@@ -148,6 +148,15 @@ Process(a,b,c,d,e,f,g,h,i) ->
         f->hasCompensateWithoutScope = true;
       if(PPhasCompensateMap[myid] == 2)
         f->hasCompensateWithScope = true;
+
+      
+      // pass list of enclosed scopes to the compensation handler
+      ASTEmap[f->id]->enclosedScopes = ASTEmap[myid]->enclosedScopes;
+
+
+      // this assertion guarantees that we did not forget a link and encounter
+      // problems generating the Petri net
+      assert(ASTEmap[myid]->enclosedSourceLinks.size() == ASTE_links.size());
 
 //      cerr << myid << " has " << ASTEmap[myid]->enclosedSourceLinks.size() << " indirectly enclosed source links" << endl;
     }
@@ -483,7 +492,7 @@ Invoke(a,b) ->
       /* here we can check the attributes */
 
       // switch to discriminate asynchronous and synchronous invokes
-      $0->isAsynchronousInvoke = ($0->A_inputVariable == "");
+      $0->isAsynchronousInvoke = ($0->A_outputVariable == "");
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -495,13 +504,20 @@ Invoke(a,b) ->
       
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
 
-      // create a channel
+      // create a channel (or two in case of a synchronous invoke)
 //      $0->channelName = $0->A_partnerLink + "." + $0->A_portType + "." + $0->A_operation;
       $0->channelName = $0->A_operation; //TODO
-      ASTE_outputChannels.insert($0->channelName);
-      if ($0->isAsynchronousInvoke)
-        ASTE_inputChannels.insert($0->channelName);
 
+      if ($0->isAsynchronousInvoke)
+        ASTE_outputChannels.insert($0->channelName);
+      else
+      {
+        ASTE_outputChannels.insert($0->channelName);
+        ASTE_inputChannels.insert($0->channelName);
+      }
+
+
+      // add variables
       $0->inputVariableName = $0->A_inputVariable;
       $0->outputVariableName = $0->A_outputVariable;
     }
@@ -1162,6 +1178,9 @@ Scope(a,b,c,d,e,f,g) ->
       PPcurrentScope = myid;
       a->parentId = myid;
 
+      // register at parent scope
+      ASTEmap[ASTEmap[myid]->parentScopeId]->enclosedScopes.insert(myid);
+
       $0->hasEH = (string(e->op_name()) == "userDefinedEventHandler");
 
       // copy attributes to AST
@@ -1195,6 +1214,11 @@ Scope(a,b,c,d,e,f,g) ->
         d->hasCompensateWithoutScope = true;
       if(PPhasCompensateMap[myid] == 2)
         d->hasCompensateWithScope = true;
+
+
+      // pass list of enclosed scopes to the compensation handler
+      ASTEmap[d->id]->enclosedScopes = ASTEmap[myid]->enclosedScopes;
+
 
       // collect enclosed source links
       assert(ASTEmap[g->id] != NULL);

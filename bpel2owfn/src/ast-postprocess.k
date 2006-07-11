@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/07/11 20:25:18 $
+ *          - last changed: \$Date: 2006/07/11 22:32:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  */
 %}
 
@@ -61,11 +61,19 @@
 #include "bpel-unparse-tools.h"
 #include "ast-printers.h"
 #include "ast-details.h"
-//#include "symbol-table.h"
 
 using namespace std;
 
+
+
+
+/******************************************************************************
+ * External variables
+ *****************************************************************************/
+
 extern map<unsigned int, ASTE*> ASTEmap;
+
+
 
 // global sets
 set<string> ASTE_inputChannels;

@@ -53,7 +53,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/07/11 20:25:18 $
+ *          - last changed: \$Date: 2006/07/11 22:32:29 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  */
 %}
 
@@ -84,22 +84,23 @@
 
 // All the includes and variables can be used during the unparsing.
 %{ KC_UNPARSE
-/* These lines are from bpel-unparse-petri.k */
+/* These lines are from bpel-unparse-petri2.k */
 #include <iostream>
 #include "petrinet.h"
-//#include "check-symbols.h"
-//#include "symbol-table.h"
 #include "options.h"
 #include "bpel-unparse-tools.h"
 #include "ast-printers.h"
 
 using namespace std;
 
+
+/******************************************************************************
+ * External variables
+ *****************************************************************************/
+
 // introduced in main.c
 extern PetriNet *TheNet;
 
-// introduced in bpel-syntax.y
-//extern SymbolTable symTab;
 
 /// prefix of the current scope (read by the stop pattern and used to direct
 /// failures to the correct fault_in place)
@@ -160,11 +161,9 @@ This=Empty(a) ->
  */
 
 This=Invoke(a,b) provided (This->isAsynchronousInvoke) ->
-//(This->outputVariableName == "") -> //TODO ((dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id)))->isAsynchronousInvoke) -> //(This->outputVariable == mkcasestring("")) ->
   [petrinet:
     {
       string prefix = intToString(This->id) + ".internal.";
-//      STCommunicationActivity* myself = dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id));
       header(This->id);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
@@ -176,14 +175,12 @@ This=Invoke(a,b) provided (This->isAsynchronousInvoke) ->
 
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1); 
-//      TheNet->newArc(TheNet->findPlace("variable." + string(myself->inputVariable->name)), t1, READ);
       TheNet->newArc(TheNet->findPlace("variable." + This->inputVariableName), t1, READ);
       TheNet->newArc(t1, p2);
 
       Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
-//      TheNet->newArc(t2, TheNet->findPlace("out." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)));
       TheNet->newArc(t2, TheNet->findPlace("out." + This->channelName));
       t2->type = OUT;
 
@@ -215,11 +212,9 @@ This=Invoke(a,b) provided (This->isAsynchronousInvoke) ->
  */
 
 This=Invoke(a,b) provided (!This->isAsynchronousInvoke) ->
-//(This->outputVariableName != "") -> //TODO (!(dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id)))->isAsynchronousInvoke) -> //This->outputVariable != mkcasestring("")) ->
   [petrinet:
     {
       header(This->id);
-//      STCommunicationActivity* myself = dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id));
       string prefix = intToString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
@@ -233,19 +228,16 @@ This=Invoke(a,b) provided (!This->isAsynchronousInvoke) ->
 
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1);
-//      TheNet->newArc(TheNet->findPlace("variable." + string(myself->inputVariable->name)), t1, READ);
       TheNet->newArc(TheNet->findPlace("variable." + This->inputVariableName), t1, READ);
       TheNet->newArc(t1, p2);
 
       Transition *t2 = TheNet->newTransition(prefix + "t2");
-//      TheNet->newArc(t2, TheNet->findPlace("out." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)));
       TheNet->newArc(t2, TheNet->findPlace("out." + This->channelName));
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       t2->type = OUT;
 
       Transition *t3 = TheNet->newTransition(prefix + "t3");
-//      TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)), t3);
       TheNet->newArc(TheNet->findPlace("in." + This->channelName), t3);
       TheNet->newArc(p3, t3);
       TheNet->newArc(t3, p4);
@@ -254,8 +246,6 @@ This=Invoke(a,b) provided (!This->isAsynchronousInvoke) ->
       Transition *t4 = TheNet->newTransition(prefix + "t4");
       TheNet->newArc(p4, t4);
       TheNet->newArc(t4, p5);
-//      TheNet->newArc(TheNet->findPlace("variable." + string(myself->outputVariable->name)), t4);
-//      TheNet->newArc(t4, TheNet->findPlace("variable." + string(myself->outputVariable->name)));
       TheNet->newArc(TheNet->findPlace("variable." + This->outputVariableName), t4);
       TheNet->newArc(t4, TheNet->findPlace("variable." + This->outputVariableName));
 
@@ -298,7 +288,6 @@ This=Receive(a,b) ->
   [petrinet:
     {
       header(This->id);
-//      STCommunicationActivity* myself = dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id));
       string prefix = intToString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
@@ -309,7 +298,6 @@ This=Receive(a,b) ->
       Place *p6 = TheNet->newPlace(prefix + "stopped");
 
       Transition *t1 = TheNet->newTransition(prefix + "t1");
-//      TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)), t1);
       TheNet->newArc(TheNet->findPlace("in." + This->channelName), t1);
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
@@ -318,8 +306,6 @@ This=Receive(a,b) ->
       Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
-//      TheNet->newArc(TheNet->findPlace("variable." + string(myself->variable->name)), t2);
-//      TheNet->newArc(t2, TheNet->findPlace("variable." + string(myself->variable->name)));
       TheNet->newArc(TheNet->findPlace("variable." + This->variableName), t2);
       TheNet->newArc(t2, TheNet->findPlace("variable." + This->variableName));
 
@@ -357,7 +343,6 @@ This=Reply(a,b) ->
   [petrinet:
     {
       header(This->id);
-//      STCommunicationActivity* myself = dynamic_cast<STCommunicationActivity*> (symTab.lookup(This->id));
       string prefix = intToString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
@@ -369,12 +354,10 @@ This=Reply(a,b) ->
 
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1);
-//      TheNet->newArc(TheNet->findPlace("variable." + string(myself->variable->name)), t1, READ);
       TheNet->newArc(TheNet->findPlace("variable." + This->variableName), t1, READ);
       TheNet->newArc(t1, p2);
 
       Transition *t2 = TheNet->newTransition(prefix + "t2");
-//      TheNet->newArc(t2, TheNet->findPlace("out." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(This->id)))->channelId)));
       TheNet->newArc(t2, TheNet->findPlace("out." + This->channelName));
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
@@ -437,10 +420,8 @@ This=Assign(a,b) ->
       foreach (copyBlock=Copy(from,to); tCopy_list b)
       {
 	string newPrefix = prefix + "copy." + intToString(copyCount) + ".";
-//	STFromTo* fromST = dynamic_cast<STFromTo*> (symTab.lookup(from->id));
-//	STFromTo* toST = dynamic_cast<STFromTo*> (symTab.lookup(to->id));
 
-	if (from->variableName != "") //(fromST->variable != NULL) // mkcasestring(""))
+	if (from->variableName != "")
 	{
 	  Place *p2 = TheNet->newPlace(newPrefix + "running");
 	  Place *p4 = TheNet->newPlace(newPrefix + "p4");
@@ -448,15 +429,12 @@ This=Assign(a,b) ->
 
 	  Transition *t1 = TheNet->newTransition(newPrefix + "t1");
 	  TheNet->newArc(lastPlace, t1);
-//	  TheNet->newArc(TheNet->findPlace("variable." + string(fromST->variable->name)), t1, READ);
 	  TheNet->newArc(TheNet->findPlace("variable." + from->variableName), t1, READ);
 	  TheNet->newArc(t1, p2);
 
 	  Transition *t2 = TheNet->newTransition(newPrefix + "t2");
 	  TheNet->newArc(p2, t2);
 	  TheNet->newArc(t2, p8);
-//	  TheNet->newArc(TheNet->findPlace("variable." + string(toST->variable->name)), t2);
-//	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(toST->variable->name)));
 	  TheNet->newArc(TheNet->findPlace("variable." + to->variableName), t2);
 	  TheNet->newArc(t2, TheNet->findPlace("variable." + to->variableName));
 
@@ -477,8 +455,6 @@ This=Assign(a,b) ->
 
 	  Transition *t2 = TheNet->newTransition(newPrefix + "t2");
 	  TheNet->newArc(lastPlace, t2);
-//	  TheNet->newArc(TheNet->findPlace("variable." + string(toST->variable->name)), t2);
-//	  TheNet->newArc(t2, TheNet->findPlace("variable." + string(toST->variable->name)));
 	  TheNet->newArc(TheNet->findPlace("variable." + to->variableName), t2);
 	  TheNet->newArc(t2, TheNet->findPlace("variable." + to->variableName));
 	  TheNet->newArc(t2, p8);
@@ -1156,7 +1132,6 @@ This=activityWhile(TheWhile=While(a,b)) ->
     {
       header(This->id, true);
       string prefix = intToString(TheWhile->id) + ".internal.";
-//      string condition = string(TheWhile->condition->name);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -1354,15 +1329,12 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	Place *p10 = TheNet->newPlace(newPrefix + "p10");
 
 	Transition *t2 = TheNet->newTransition(newPrefix + "t2");
-//	TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(ThisBranch->id)))->channelId)), t2);
 	TheNet->newArc(TheNet->findPlace("in." + ThisBranch->channelName), t2);
 	TheNet->newArc(TheNet->findPlace(TheActivity, ".internal.TimeStamp"), t2);
 	TheNet->newArc(t2, p3);
 	t2->type = IN;
 
 	Transition *t3 = TheNet->newTransition(newPrefix + "t3");
-//	TheNet->newArc(TheNet->findPlace("variable." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(ThisBranch->id)))->variable->name)), t3);
-//  	TheNet->newArc(t3, TheNet->findPlace("variable." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(ThisBranch->id)))->variable->name)));
 	TheNet->newArc(TheNet->findPlace("variable." + ThisBranch->variableName), t3);
   	TheNet->newArc(t3, TheNet->findPlace("variable." + ThisBranch->variableName));
 	TheNet->newArc(p3, t3);
@@ -1481,10 +1453,8 @@ This=Scope(a,b,c,d,e,f,g) ->
       header(This->id, true);
       string prefix = intToString(This->id) + ".internal.";
       currentScope = prefix;
-//      STScope* myself = dynamic_cast<STScope*> (symTab.lookup(This->id));
 
       // Create push-places for the children of the scope.
-//      for (list< STScope * >::iterator child = myself->childScopes.begin(); child != myself->childScopes.end(); child++)
       for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
       {
 	Place *push_child    = TheNet->newPlace(intToString(*child) + ".push");
@@ -1665,7 +1635,6 @@ This=Scope(a,b,c,d,e,f,g) ->
       // After the patterns of the inner activity of the process are generated
       // the push places of the child scopes are available and have to be
       // connected with the transition t2 of the process.
-//      for (list<STScope*>::iterator child = myself->childScopes.begin(); child != myself->childScopes.end(); child++)
       for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
 	TheNet->newArc(t2, TheNet->findPlace(intToString(*child) + ".!push"));
 
@@ -1705,7 +1674,6 @@ This=Scope(a,b,c,d,e,f,g) ->
 
 
       // If present, embed the event handler of the scope.
-//      if (myself->hasEventHandler)
       if (This->hasEH)
       {
 	TheNet->mergePlaces(prefix + "p25", prefix2 + "eventHandler.initial");
@@ -1843,7 +1811,6 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
       string newPrefix = intToString(This->parentId) + ".internal";
 
       Place *p2 = TheNet->newPlace(prefix + "initial");
-//      Place *p3 = TheNet->newPlace(prefix + "p3");
       Place *p4 = TheNet->newPlace(prefix + "p4");
       Place *p5 = TheNet->newPlace(prefix + "final");
       Place *p6 = TheNet->newPlace(prefix + "stop");
@@ -1885,9 +1852,6 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
       // t1 for dead path elimination.
       foreach (source; tSource_list a)
       {
-//	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
-//	Place *p8 = TheNet->findPlace("!link." + string(linkST->name));
-//	Place *p10 = TheNet->findPlace("link." + string(linkST->name));
 	Place *p8 = TheNet->findPlace("!link." + source->linkName);
 	Place *p10 = TheNet->findPlace("link." + source->linkName);
 
@@ -1921,9 +1885,7 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
  * suppressJoinFailure="no".
  *****************************************************************************/
 
-This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF)
-//(symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "no") ->
- ->
+This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF) ->
   [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 23\n");
@@ -1952,7 +1914,6 @@ This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF)
       // Connect the target links with transitions t1 and t2.
       foreach (target; tTarget_list a)
       {
-//	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
 	Place *p1 = TheNet->findPlace("!link." + target->linkName);
 	Place *p3 = TheNet->findPlace("link." + target->linkName);
 	TheNet->newArc(t1, p1);
@@ -1991,9 +1952,7 @@ This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF)
  * suppressJoinFailure="yes".
  *****************************************************************************/
 
-This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF)
-//(symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "yes") ->
- ->
+This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF) ->
   [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 24\n");
@@ -2022,7 +1981,6 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF)
       // Connect the target links with transitions t1 and t2.
       foreach (target; tTarget_list a)
       {
-//	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
 	Place *p1 = TheNet->findPlace("!link." + target->linkName);
 	Place *p3 = TheNet->findPlace("link." + target->linkName);
 	TheNet->newArc(t1, p1);
@@ -2061,9 +2019,7 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF)
  * case of suppressJoinFailure="yes".
  *****************************************************************************/
 
-This=StandardElements(a,b, jc) provided (This->suppressJF)
-//(symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "yes") ->
- ->
+This=StandardElements(a,b, jc) provided (This->suppressJF) ->
   [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 25\n");
@@ -2118,7 +2074,6 @@ This=StandardElements(a,b, jc) provided (This->suppressJF)
       // Connect each target links with t2 and t5.
       foreach (target; tTarget_list a)
       {
-//	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
 	Place *p1 = TheNet->findPlace("!link." + target->linkName);
 	Place *p3 = TheNet->findPlace("link." + target->linkName);
         TheNet->newArc(t2, p1);
@@ -2132,7 +2087,6 @@ This=StandardElements(a,b, jc) provided (This->suppressJF)
       // transition t1 for dead path elimination.
       foreach (source; tSource_list b)
       {
-//	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
 	Place *p5 = TheNet->findPlace("!link." + source->linkName);
 	Place *p7 = TheNet->findPlace("link." + source->linkName);
 
@@ -2179,9 +2133,7 @@ This=StandardElements(a,b, jc) provided (This->suppressJF)
  * case of suppressJoinFailure="no".
  *****************************************************************************/
 
-This=StandardElements(a,b, jc) provided (!This->suppressJF)
-//(symTab.readAttributeValue(This->parentId, "suppressJoinFailure") == "no") ->
- ->
+This=StandardElements(a,b, jc) provided (!This->suppressJF) ->
   [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 26\n");
@@ -2236,7 +2188,6 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF)
       // Connect each target links with t2 and t5.
       foreach (target; tTarget_list a)
       {
-//	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
 	Place *p1 = TheNet->findPlace("!link." + target->linkName);
 	Place *p3 = TheNet->findPlace("link." + target->linkName);
         TheNet->newArc(t2, p1);
@@ -2250,7 +2201,6 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF)
       // transition t1 for dead path elimination.
       foreach (source; tSource_list b)
       {
-//	STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
 	Place *p5 = TheNet->findPlace("!link." + source->linkName);
 	Place *p7 = TheNet->findPlace("link." + source->linkName);
 

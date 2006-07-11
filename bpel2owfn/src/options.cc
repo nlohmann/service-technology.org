@@ -12,20 +12,20 @@ using namespace std;
 // some file names and pointers
 
 /// Filename of input file
-std::string filename = "<STDIN>";
-list <std::string> inputfiles;
+string filename = "<STDIN>";
+list <string> inputfiles;
 /// Filename of output file
-std::string output_filename = "";
+string output_filename = "";
 
 /// pointer to input stream
-std::istream * input = &std::cin;
+istream * input = &cin;
 /// pointer to output stream
-std::ostream * output = &std::cout;
+ostream * output = &cout;
 /// pointer to log stream
-std::ostream * log_output = &std::clog;
+ostream * log_output = &clog;
 
 /// Filename of log file
-std::string log_filename = "";
+string log_filename = "";
 
 bool createOutputFile = false;
 
@@ -37,7 +37,7 @@ map<possibleOptions,    bool> options;
 map<possibleParameters, bool> parameters;
 map<possibleFormats,    bool> formats;
 // suffixes are defined in parse_command_line();
-map<possibleFormats, std::string> suffixes;
+map<possibleFormats, string> suffixes;
 
 // long options
 static struct option longopts[] =
@@ -69,7 +69,7 @@ void print_help()
   // 80 chars
   //    "--------------------------------------------------------------------------------"
   trace("\n");
-  trace(std::string(PACKAGE_STRING) + "\n");
+  trace(string(PACKAGE_STRING) + "\n");
   trace("\n");
   trace("Options: \n");
   trace("\n");
@@ -110,9 +110,9 @@ void print_help()
  *
  */
 
-void print_version(std::string name)
+void print_version(string name)
 {
-  trace(std::string(PACKAGE_STRING) + " -- ");
+  trace(string(PACKAGE_STRING) + " -- ");
   trace("Translating BPEL Processes to Open Workflow Nets\n");
   trace("\n");
   trace("Copyright (C) 2005, 2006 Niels Lohmann, Christian Gierds and Dennis Reinert\n");
@@ -474,7 +474,7 @@ void parse_command_line(int argc, char* argv[])
     {
       trace(TRACE_WARNINGS, "Multiple input options are given, only first one is used!\n");
     }
-    list< std::string >::iterator file = inputfiles.begin();
+    list< string >::iterator file = inputfiles.begin();
     FILE * fin = NULL;
     if (!(fin = fopen(file->c_str(), "r")))
     {
@@ -502,7 +502,7 @@ void parse_command_line(int argc, char* argv[])
   // set output file name if non is already chosen
   if ((options[O_OUTPUT] || options[O_LOG]) && (output_filename == ""))
   {
-    list< std::string >::iterator file = inputfiles.begin();
+    list< string >::iterator file = inputfiles.begin();
     unsigned int pos = file->rfind(".bpel", file->length());
     if (pos == (file->length() - 5))
     {
@@ -595,9 +595,9 @@ void parse_command_line(int argc, char* argv[])
 
 }
 
-std::ostream * openOutput(std::string name)
+ostream * openOutput(string name)
 {
-  std::ofstream * file = new std::ofstream(name.c_str(), std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
+  ofstream * file = new ofstream(name.c_str(), ofstream::out | ofstream::trunc | ofstream::binary);
   if (!file->is_open())
   {
 	    trace(TRACE_ALWAYS, "File \"" + name + "\" could not be opened for writing access!\n");
@@ -608,12 +608,12 @@ std::ostream * openOutput(std::string name)
   return file;
 }
 
-void closeOutput(std::ostream * file)
+void closeOutput(ostream * file)
 {
   if ( file != NULL )
   {
-    (*file) << std::flush;
-    ((std::ofstream*)file)->close();
+    (*file) << flush;
+    ((ofstream*)file)->close();
     delete(file);
     file = NULL;
   }

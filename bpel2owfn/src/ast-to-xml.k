@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/07/10 15:37:16 $
+ *          - last changed: \$Date: 2006/07/11 22:32:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.35 $
+ * \version \$Revision: 1.36 $
  */
 %}
 
@@ -103,7 +103,6 @@ Process(a,b,c,d,e,f,g,h,i) ->
 
 PartnerLink() ->
   [xml: { in(); } "<partnerLink id=\"" $0->id "\"/>\n"]
-//  [xml: { in(); } "<partnerLink />\n"]
 ;
 
 
@@ -113,7 +112,6 @@ PartnerLink() ->
 
 Partner(a) ->
   [xml: { inup(); } "<partner id=\"" $0->id "\">\n" a { indown(); } "</partner>\n"]
-//  [xml: { inup(); } "<partner>\n" a { indown(); } "</partner>\n"]
 ;
 
 
@@ -123,12 +121,10 @@ Partner(a) ->
 
 userDefinedFaultHandler(a,b) ->
   [xml: { inup(); } "<faultHandlers id=\"" $0->id "\">\n" a b { indown(); } "</faultHandlers>\n"]
-//  [xml: { inup(); } "<faultHandlers>\n" a b { indown(); } "</faultHandlers>\n"] 
 ;
 
 Catch(a) ->
   [xml: { inup(); } "<catch id=\"" $0->id "\">\n" a { indown(); } "</catch>\n"]
-//  [xml: { inup(); } "<catch>\n" a { indown(); } "</catch>\n"]  
 ;
 
 CatchAll(a) ->
@@ -142,7 +138,6 @@ CatchAll(a) ->
 
 userDefinedEventHandler(a,b) ->
   [xml: { inup(); } "<eventHandlers id=\"" $0->id "\">\n" a b { indown(); } "</eventHandlers>\n"]
-//  [xml: { inup(); } "<eventHandlers>\n" a b { indown(); } "</eventHandlers>\n"]  
 ;
 
 OnMessage(a) ->
@@ -160,7 +155,6 @@ OnAlarm(a) ->
 
 userDefinedCompensationHandler(a) ->
   [xml: { inup(); } "<compensationHandler id=\"" $0->id "\">\n" a { indown(); } "</compensationHandler>\n"]
-//  [xml: { inup(); } "<compensationHandler>\n" a { indown(); } "</compensationHandler>\n"]  
 ;
 
 
@@ -170,7 +164,6 @@ userDefinedCompensationHandler(a) ->
 
 Variable() ->
   [xml: { in(); } "<variable id=\"" $0->id "\"/>\n"]
-//   [xml: { in(); } "<variable />\n"]  
 ;
 
 
@@ -298,7 +291,6 @@ Flow(a,b,c) ->
 
 Link() ->
   [xml: { in(); } "<link id=\"" $0->id "\"/>\n"]
-//  [xml: { in(); } "<link />\n"]  
 ;
 
 
@@ -332,7 +324,6 @@ While(a,b) ->
   SEQUENCE
 ******************************************************************************/
 
-//activitySequence(Sequence(a,b)) ->
 Sequence(a,b) ->
   [xml: { inup(); } "<sequence id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\" dpe=\"" $0->dpe "\">\n" a b { indown(); } "</sequence>\n"]
 ;

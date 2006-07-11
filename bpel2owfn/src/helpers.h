@@ -32,13 +32,13 @@
  *          
  * \date    
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/07/11 21:17:26 $
+ *          - last changed: \$Date: 2006/07/11 22:32:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.28 $
+ * \version \$Revision: 1.29 $
  */
 
 
@@ -58,9 +58,6 @@
 
 #include <set>
 #include <string>
-// #include "petrinet.h"
-// #include "exception.h"	// exception handling
-// #include "check-symbols.h"
 #include "bpel2owfn.h"
 
 using namespace std;
@@ -151,14 +148,8 @@ void print_help();
 /// Prints version information
 void print_version(std::string name);
 
-/// Evaluates command line arguments
-// void parse_command_line(int argc, char * argv[]);
-
 /// Calls #cleanup(), then exits
 void error();
-
-/// Prints information about #Exception e, calls #cleanup() and exits 
-//void error(Exception e);
 
 /// Close all open files, delete all pointers.
 void cleanup();

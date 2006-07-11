@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/07/11 21:17:26 $
+ *          - last changed: \$Date: 2006/07/11 22:32:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.212 $
+ * \version \$Revision: 1.213 $
  * 
  */
 %}
@@ -119,27 +119,25 @@ using namespace kc;
 using namespace std;
 
 
+/******************************************************************************
+ * External variables
+ *****************************************************************************/
+
 // from flex
 extern char* yytext;
 extern int yylex();
 extern int yylineno;
 
-
 // defined in "debug.h"
 extern int yyerror(const char *);
 
-
-/// an instance of the symboltable
-//SymbolTable symTab = SymbolTable();
 
 
 /// the root of the abstract syntax tree
 tProcess TheProcess;
 
-
 /// a pointer to the current join condition
 impl_joinCondition* currentJoinCondition = standardJoinCondition();
-
 
 // Niels' stuff
 map<unsigned int, ASTE*> ASTEmap; ///< the map of all AST elements
@@ -225,7 +223,6 @@ unsigned int ASTEid = 1;
 tProcess:
     {
       // initialisation (for multiple input files)
-//      symTab = SymbolTable();
       yylineno = 0;
       ASTEid = 1;
       currentJoinCondition = standardJoinCondition();

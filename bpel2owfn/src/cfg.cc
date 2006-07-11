@@ -31,36 +31,37 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/07/11 20:47:51 $
+ *          - last changed: \$Date: 2006/07/11 22:32:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
 
+
+
+#include <assert.h>
 #include "cfg.h"
-//#include "symbol-table.h"
 #include "options.h"
 #include "debug.h"
 #include "ast-printers.h"
-#include <assert.h>
 
 
 /// The CFG
 CFGBlock * TheCFG = NULL;
 
-
-//extern SymbolTable symTab; // needed for access to the Symbol Table
-
 /// mapping of Link names to Source blocks
 map<std::string, CFGBlock*> sources; 
+
 /// mapping of Link names to Target blocks
 map<std::string, CFGBlock*> targets; 
+
+
 
 /**
  * Constructor for a CFG block.

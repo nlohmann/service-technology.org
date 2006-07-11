@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/07/11 20:25:18 $
+ *          - last changed: \$Date: 2006/07/11 22:32:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  */
 %}
 
@@ -69,7 +69,14 @@
 #include "helpers.h"
 #include <map>
 
+
+/******************************************************************************
+ * External variables
+ *****************************************************************************/
+
 extern CFGBlock * TheCFG;
+
+
 
 map <std::string, CFGBlock *> cfgMap;
 

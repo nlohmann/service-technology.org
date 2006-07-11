@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/07/11 20:25:18 $
+ *          - last changed: \$Date: 2006/07/11 22:32:29 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.186 $
+ * \version \$Revision: 1.187 $
  *
  */
 %}
@@ -75,21 +75,19 @@
 /* These lines are from bpel-unparse-petri.k */
 #include <iostream>
 #include "petrinet.h"
-//#include "check-symbols.h"
-//#include "symbol-table.h"
 #include "options.h"
 #include "bpel-unparse-tools.h"
 #include "ast-printers.h"
 
 using namespace std;
 
+
+/******************************************************************************
+ * External variables
+ *****************************************************************************/
+
 // introduced in main.c
 extern PetriNet *TheNet;
-
-// introduced in bpel-syntax.y
-//extern SymbolTable symTab;
-//CG extern SymbolManager symMan;
-//extern STProcess * stProcess;
 
 /// prefix of the current scope (read by the stop pattern and used to direct
 /// failures to the correct fault_in place)
@@ -116,7 +114,6 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       trace(TRACE_INFORMATION, "Generating Petri net...\n");
       header(This->id, true);
 
-//      STProcess* myself = NULL; //= dynamic_cast<STProcess*> (symTab.lookup(This->id));
       string prefix = intToString(This->id) + ".internal.";
       currentScope = prefix;
 
@@ -131,11 +128,6 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
 
 
       // Create push-places for the children of the process.
-/*      for (list<STScope *>::iterator child = myself->childScopes.begin(); child != myself->childScopes.end(); child++)
-      {
-	TheNet->newPlace( intToString((*child)->entryKey) + ".push");
-	TheNet->newPlace( intToString((*child)->entryKey) + ".!push");
-      }*/
       for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
       {
 	TheNet->newPlace(intToString(*child) + ".push");
@@ -146,11 +138,6 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       // Create the places for the links.
       // The used list is filled during parsing and contains all links of the
       // whole process -- also links defined in a deeper hierarchy.
-/*      for (list<STLink*>::iterator link = myself->enclosedLinks.begin(); link != myself->enclosedLinks.end(); link++)
-      {
-	TheNet->newPlace("link." + (*link)->name);
-	TheNet->newPlace("!link." + (*link)->name);
-      }*/
       for (set<string>::iterator link = ASTE_links.begin(); link != ASTE_links.end(); link++)
       {
 	TheNet->newPlace("link." + *link);
@@ -159,11 +146,6 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
 
 
       // Create variable places and initially mark them.
-/*      for (list<string>::iterator variable = symTab.variables.begin(); variable != symTab.variables.end(); variable++)
-      {
-	Place *v = TheNet->newPlace("variable." + *variable);
-	v->mark();
-      }*/
       for (set<string>::iterator variable = ASTE_variables.begin(); variable != ASTE_variables.end(); variable++)
       {
 	Place *v = TheNet->newPlace("variable." + *variable);
@@ -258,7 +240,6 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       // If the process has an event handler several places and transitions
       // have to be added to embed it. If the process lacks an event handler
       // some places can be merged.
-//      if (myself->hasEventHandler)
       if (This->hasEH)
       {
 	Place *p23 = TheNet->newPlace(prefix + "p23");
@@ -303,13 +284,11 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       // After the patterns of the inner activity of the process are generated
       // the push places of the child scopes are available and have to be
       // connected with the transition t2 of the process.
-//      for (list<STScope*>::iterator child = myself->childScopes.begin(); child != myself->childScopes.end(); child++)
       for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
 	TheNet->newArc(t2, TheNet->findPlace( intToString(*child) + ".!push" ));
 
 
       // Initialize the link places of the process.
-//      for (list<STLink*>::iterator link = myself->enclosedLinks.begin(); link != myself->enclosedLinks.end(); link++)
       for (set<string>::iterator link = ASTE_links.begin(); link != ASTE_links.end(); link++)
 	TheNet->newArc(t2, TheNet->findPlace("!link." + *link));
 
@@ -337,7 +316,6 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
 
 
       // If present, embed the event handler of the process.
-//      if (myself->hasEventHandler)
       if (This->hasEH)
       {
 	TheNet->mergePlaces("1.internal.p23",      "1.internal.eventHandler.initial");
@@ -1377,15 +1355,12 @@ This=userDefinedEventHandler(a,b) ->
 	Place *onMessage_p12 = TheNet->newPlace(newPrefix + "p12");
 
 	Transition *onMessage_t2 = TheNet->newTransition(newPrefix + "t2");
-//	TheNet->newArc(TheNet->findPlace("in." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(ThisBranch->id)))->channelId)), onMessage_t2);
 	TheNet->newArc(TheNet->findPlace("in." + ThisBranch->channelName), onMessage_t2);
 	TheNet->newArc(onMessage_t2, onMessage_p2);
 	TheNet->newArc(onMessage_p5, onMessage_t2);
 	onMessage_t2->type = IN;
 
 	Transition *onMessage_t3 = TheNet->newTransition(newPrefix + "t3");
-//	TheNet->newArc(TheNet->findPlace("variable." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(ThisBranch->id)))->variable->name)), onMessage_t3);
-//  	TheNet->newArc(onMessage_t3, TheNet->findPlace("variable." + string((dynamic_cast<STCommunicationActivity*>(symTab.lookup(ThisBranch->id)))->variable->name)));
 	TheNet->newArc(TheNet->findPlace("variable." + ThisBranch->variableName), onMessage_t3);
   	TheNet->newArc(onMessage_t3, TheNet->findPlace("variable." + ThisBranch->variableName));
 	TheNet->newArc(onMessage_p2, onMessage_t3);
@@ -1649,8 +1624,6 @@ This=implicitCompensationHandler() provided (!This->inProcess) ->
       // guarded in the original semantics and has to be unfolded for the
       // low-level representation. Therefore, each child gets its own place
       // "compScope".
-//      STScope * parentScope = dynamic_cast<STScope *>(symTab.lookup(This->parentScopeId));
-//      for (list< STScope * >::iterator child = parentScope->childScopes.begin(); child != parentScope->childScopes.end(); child++)
       for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
       {
 	Place *p19_new = TheNet->newPlace(prefix + "compScope." + intToString(*child));
@@ -1684,7 +1657,6 @@ This=userDefinedCompensationHandler(innerActivity) provided (!This->inProcess) -
     {
       string prefix = intToString(This->parentScopeId) + ".internal.compensationHandler.";
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<userDefinedCompensationHandler scope=\"" + currentScope + "\">\n");
-//      STScope * parentScope = dynamic_cast<STScope *>(symTab.lookup(This->parentScopeId));
 
       Place *p2  = TheNet->newPlace(prefix + "ch_in");
       Place *p3  = TheNet->newPlace(prefix + "Compensated");
@@ -1781,7 +1753,6 @@ This=userDefinedCompensationHandler(innerActivity) provided (!This->inProcess) -
 	TheNet->newArc(t7, p12);
 	TheNet->newArc(p15, t7, READ);
 
-//	for (list< STScope * >::iterator child = parentScope->childScopes.begin(); child != parentScope->childScopes.end(); child++)
         for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
 	  TheNet->newArc(TheNet->findPlace(intToString(*child) + ".!push"), t7);
 
@@ -1814,7 +1785,6 @@ This=userDefinedCompensationHandler(innerActivity) provided (!This->inProcess) -
       // guarded in the original semantics and has to be unfolded for the
       // low-level representation. Therefore, each child gets its own place
       // "compScope".
-//      for (list< STScope * >::iterator child = parentScope->childScopes.begin(); child != parentScope->childScopes.end(); child++)
       for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
       {
 	Place *p19_new = TheNet->newPlace(prefix + "compScope." + intToString(*child));
@@ -1920,8 +1890,6 @@ This=implicitCompensationHandler() provided (This->inProcess) ->
       // guarded in the original semantics and has to be unfolded for the
       // low-level representation. Therefore, each child gets its own place
       // "compScope".
-//      STScope * parentScope = dynamic_cast<STScope *>(symTab.lookup(This->parentScopeId));
-//      for (list< STScope * >::iterator child = parentScope->childScopes.begin(); child != parentScope->childScopes.end(); child++)
       for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
       {
 	Place *p19_new = TheNet->newPlace(prefix + "compScope." + intToString(*child));
@@ -2015,8 +1983,6 @@ This=userDefinedCompensationHandler(a) provided (This->inProcess) ->
       // guarded in the original semantics and has to be unfolded for the
       // low-level representation. Therefore, each child gets its own place
       // "compScope".
-//      STScope * parentScope = dynamic_cast<STScope *>(symTab.lookup(This->parentScopeId));
-//      for (list< STScope * >::iterator child = parentScope->childScopes.begin(); child != parentScope->childScopes.end(); child++)
       for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
       {
 	Place *p19_new = TheNet->newPlace(prefix + "compScope." + intToString(*child));

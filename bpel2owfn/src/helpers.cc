@@ -32,13 +32,13 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/07/11 21:17:26 $
+ *          - last changed: \$Date: 2006/07/11 22:32:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
  */
 
 
@@ -49,8 +49,6 @@
 #include "options.h"
 #include "debug.h"
 #include "petrinet.h"
-// #include "check-symbols.h"
-// #include "bpel-attributes.h"
 
 
 
@@ -132,34 +130,6 @@ void error()
 
 }
 
-
-
-
-
-/**
- * Some output in case an error has occured.
- * Prints out the exception's information.
- *
- * \param e The exception that triggered this function call. 
- * 
- */
-/*void error(Exception e)
-{
-  trace("\nAn error has occured while parsing \"" + filename + "\"!\n\n");
-  // output information about the exception
-  e.info();
-  trace(TRACE_WARNINGS, "-> Any output file might be in an undefinded state.\n");
-  // call #cleanup()
-  cleanup();
-  if (log_filename != "")
-  {
-    trace("\nProgramme aborted due to error.\n\n");
-    trace("Please check logfile for detailed information!\n\n");
-  }
-  // stop execution
-  exit(e.id);
-}
-*/
 
 
 

@@ -32,22 +32,31 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/07/11 21:17:26 $
+ *          - last changed: \$Date: 2006/07/11 22:32:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.92 $
+ * \version \$Revision: 1.93 $
  *
  */
 
 
 #include "main.h"
+#include "petrinet.h"           // Petri Net support
+#include "cfg.h"		// Control Flow Graph
+#include "debug.h"		// debugging help
 #include "options.h"
 #include "ast-printers.h"
 #include <assert.h>
+
+
+
+/******************************************************************************
+ * External variables
+ *****************************************************************************/
 
 /// The Petri Net
 PetriNet *TheNet = new PetriNet();

@@ -3,8 +3,11 @@
 
 #include <map>
 #include <list>
-#include <cstdio>
 #include "getopt.h"
+
+
+using namespace std;
+
 
 typedef enum
 {
@@ -56,26 +59,30 @@ typedef enum
 } possibleParameters;
 
 
+/******************************************************************************
+ * External variables
+ *****************************************************************************/
+
 // some file names and pointers (in options.cc)
 
 extern void parse_command_line(int argc, char* argv[]);
 
 
 /// Filename of input file
-extern std::string filename;
+extern string filename;
 /// Filename of first input file
-extern std::list <std::string> inputfiles;
+extern list <string> inputfiles;
 /// Filename of input file
-extern std::string output_filename;
+extern string output_filename;
 /// Filename of log file
-extern std::string log_filename;
+extern string log_filename;
 
 /// pointer to input stream
-extern std::istream * input;
+extern istream * input;
 /// pointer to output stream
-extern std::ostream * output;
+extern ostream * output;
 /// pointer to log stream
-extern std::ostream * log_output;
+extern ostream * log_output;
 
 extern bool createOutputFile;
 
@@ -83,11 +90,11 @@ extern bool createOutputFile;
 
 extern possibleModi modus;
 
-extern std::map<possibleOptions,    bool> options;
-extern std::map<possibleParameters, bool> parameters;
-extern std::map<possibleFormats,    bool> formats;
+extern map<possibleOptions,    bool> options;
+extern map<possibleParameters, bool> parameters;
+extern map<possibleFormats,    bool> formats;
 // suffixes are defined in parse_command_line();
-extern std::map<possibleFormats,  std::string> suffixes;
+extern map<possibleFormats,  string> suffixes;
 
 
 /* defined by Bison */
@@ -98,8 +105,8 @@ extern int yy_flex_debug;
 extern FILE *yyin;
 
 // returns an open file pointer
-extern std::ostream * openOutput(std::string name);
-extern void closeOutput(std::ostream * file);
+extern ostream * openOutput(string name);
+extern void closeOutput(ostream * file);
 
 #endif
 

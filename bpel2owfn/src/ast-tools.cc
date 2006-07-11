@@ -32,13 +32,13 @@
  *
  * \date
  *          - created: 2006/02/08
- *          - last changed: \$Date: 2006/07/11 20:47:51 $
+ *          - last changed: \$Date: 2006/07/11 22:32:29 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  */
 
 
@@ -58,9 +58,6 @@
 /******************************************************************************
  * External variables
  *****************************************************************************/
-
-// introduced in bpel-syntax.y
-//extern SymbolTable symTab;
 
 // introduced in main.c
 extern PetriNet *TheNet;

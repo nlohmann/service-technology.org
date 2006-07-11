@@ -26,9 +26,16 @@
  * This file implements the classes and functions defined in petrinet.h.
  *
  *  - PetriNet::removeInterface()
- *  - PetriNet::simplify()
- *  - PetriNet::removeIsolatedNodes()
  *  - PetriNet::removeVariables()
+ *  - PetriNet::removeUnusedStatusPlaces()
+ *  - PetriNet::removeDeadNodes()
+ *  - PetriNet::elminiationOfIdenticalPlaces()
+ *  - PetriNet::elminiationOfIdenticalTransitions()
+ *  - PetriNet::fusionOfSeriesPlaces()
+ *  - PetriNet::fusionOfSeriesTransitions()
+ *  - PetriNet::communicationInPostSet(Place *p)
+ *  - PetriNet::collapseSequences()
+ *  - PetriNet::simplify()
  *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
@@ -36,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/07/11 20:47:51 $
+ *          - last changed: \$Date: 2006/07/11 22:32:30 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.23 $
+ * \version \$Revision: 1.24 $
  */
 
 
@@ -54,11 +61,16 @@
 #include <set>
 #include "petrinet.h"
 #include "debug.h"		// debugging help
-//#include "symbol-table.h"
 #include "helpers.h"
 #include "options.h"
 
-extern set<string> ASTE_variables;
+
+
+/******************************************************************************
+ * External variables
+ *****************************************************************************/
+
+extern set<string> ASTE_variables; // needed for PetriNet::removeVariables()
 
 
 
@@ -97,9 +109,6 @@ void PetriNet::removeInterface()
  */
 void PetriNet::removeVariables()
 {
-//  extern SymbolTable symTab;
-  
-//  for (list<string>::iterator variable = symTab.variables.begin();
   for (set<string>::iterator variable = ASTE_variables.begin();
       variable != ASTE_variables.end(); variable++)
   {
@@ -440,6 +449,8 @@ void PetriNet::fusionOfSeriesTransitions()
  *
  * \param  p a place to check
  * \return true, if a communicating transition was found
+ *
+ * \deprecated This function is only called by PetriNet::collapseSequences().
  */
 bool PetriNet::communicationInPostSet(Place *p)
 {
@@ -464,6 +475,8 @@ bool PetriNet::communicationInPostSet(Place *p)
  *  - singleton postset
  *  - no communicating transition following
  *  - preset != postset
+ *
+ * \deprecated Should be replaced by PetriNet::fusionOfSeriesTransitions().
  */
 void PetriNet::collapseSequences()
 {
@@ -522,10 +535,11 @@ void PetriNet::collapseSequences()
  * - If two transitions t1 and t2 have the same preset and postset, one of them
  *   can safely be removed.
  *
+ * - Elimination of identical places (RB1)
  * - Elimination of identical transitions (RB2)
  * - Fusion of series places (RA1)
  * - Fusion of series transitions (RA2)
- *
+ * 
  * \todo
  *       -(nlohmann) improve performance
  *       -(nlohmann) implement more reduction rules

@@ -53,7 +53,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/07/12 11:37:03 $
+ *          - last changed: \$Date: 2006/07/12 15:40:15 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
  */
 %}
 
@@ -920,7 +920,7 @@ This=Flow(a,b,c) ->
       Transition *t4 = stop(p7, "initial", prefix);
       Transition *t7 = stop(p8, "final", prefix);
 
-
+/*
       // Dead-Path-Elimination.
       Transition *t1 = NULL;
       if (This->dpe > 0)
@@ -928,7 +928,7 @@ This=Flow(a,b,c) ->
 	Place *p1  = TheNet->newPlace(prefix + "negLink");
 	t1 = TheNet->newTransition(prefix + "t1");
 	TheNet->newArc(p1, t1);
-      }
+      }*/
     }
     a // standardElements
     c // inner activities
@@ -937,10 +937,10 @@ This=Flow(a,b,c) ->
       {
         string newPrefix = intToString(innerActivity->id);
         // Embed the inner activity.
-	if (This->dpe > 0 && TheNet->findPlace(newPrefix + ".negLink") != NULL)
-	{
-	  TheNet->newArc(t1, TheNet->findPlace(newPrefix + ".negLink"));
-	}
+//	if (This->dpe > 0 && TheNet->findPlace(newPrefix + ".negLink") != NULL)
+//	{
+//	  TheNet->newArc(t1, TheNet->findPlace(newPrefix + ".negLink"));
+//	}
 	TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
 	TheNet->newArc(t5, TheNet->findPlace(innerActivity, ".stop"));
 	TheNet->newArc(TheNet->findPlace(innerActivity, ".stopped"), t6);
@@ -990,7 +990,7 @@ This=activitySwitch(TheSwitch=Switch(a,b,Otherwise(c))) ->
       Transition *t9  = stop(p6, "running", prefix);
       Transition *t10 = stop(p10, "p10", prefix);
 
-
+/*
       // Dead Path Elimination
       Transition *t1 = NULL;
       if (This->dpe > 0)
@@ -998,7 +998,7 @@ This=activitySwitch(TheSwitch=Switch(a,b,Otherwise(c))) ->
 	t1 = TheNet->newTransition(prefix + "t1");
 	Place *p1 = TheNet->newPlace(prefix + "negLink");
 	TheNet->newArc(p1, t1);
-      }
+      }*/
     }
     a // standardElements
     b // case braches
@@ -1072,7 +1072,7 @@ This=activitySwitch(TheSwitch=Switch(a,b,Otherwise(c))) ->
       TheNet->mergePlaces(This, ".internal.stop",    c, ".stop");
       TheNet->mergePlaces(This, ".internal.stopped", c, ".stopped");
 
-
+/*
       // Create the arcs for the Dead Path elimination: each chosen activity
       // (i.e. firing of the respective t2-transition) has to be connected with
       // the negLink places of all other cases' activities as well as to the
@@ -1102,7 +1102,7 @@ This=activitySwitch(TheSwitch=Switch(a,b,Otherwise(c))) ->
 	if ((This->dpe > 0) && (thisCaseBranch->dpe > 0))
 	  TheNet->newArc(t1, TheNet->findPlace(innerActivity1, ".negLink"));
       }
-
+*/
       footer(This->id, true);
     }
   ]
@@ -1222,7 +1222,7 @@ This=activitySequence(Sequence(a,b)) ->
       Place *p10 = TheNet->newPlace(prefix + "stop");
       Place *p11 = TheNet->newPlace(prefix + "stopped");
 
-
+/*
       // If needed, transition t1 and a place negLink is created.
       Transition *t1 = NULL;
       if (This->dpe > 0)
@@ -1231,7 +1231,7 @@ This=activitySequence(Sequence(a,b)) ->
   	t1 = TheNet->newTransition(prefix + "t1");
 	TheNet->newArc(p1, t1);
       }
-
+*/
     }
     a // standardElements for this activity
     b // inner activities
@@ -1248,13 +1248,13 @@ This=activitySequence(Sequence(a,b)) ->
 
 	if (activityCount == b->length())
 	  TheNet->mergePlaces(This, ".internal.final", innerActivity, ".final");
-
+/*
 	// If an inner activity has a place negLink, it is connected to the transition
 	// t1.
         string newPrefix = intToString(innerActivity->id);
 	if (This->dpe > 0 && TheNet->findPlace(newPrefix + ".negLink") != NULL)
 	  TheNet->newArc(t1, TheNet->findPlace(newPrefix + ".negLink"));
-
+*/
 
 	TheNet->mergePlaces(This, ".internal.stop", innerActivity, ".stop");
 	TheNet->mergePlaces(This, ".internal.stopped", innerActivity, ".stopped");
@@ -1298,7 +1298,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
       TheNet->newArc(p6, t5);
       TheNet->newArc(t5, p7);
 
-
+/*
       // If needed, transition t1 and a place negLink is created.
       Transition *t1 = NULL;
       if (This->dpe > 0)
@@ -1307,7 +1307,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	Place *p1 = TheNet->newPlace(prefix + "negLink");
 	TheNet->newArc(p1, t1);
       }
-
+*/
 
       // Transitions for the negative control flow.
       Transition *t7 = stop(p6, "initial", prefix);
@@ -1379,7 +1379,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	trace(TRACE_DEBUG, "[PNU]\t\t</onAlarm>\n");
       }
 
-
+/*
       // Create the arcs for the Dead Path elimination: each chosen activity
       // (i.e. firing of the respective t2-transition) has to be connected with
       // the negLink places of all other <onAlarm> or <onMessage> activities.
@@ -1427,7 +1427,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 	if ((thisonalarm->dpe > 0) && (This->dpe > 0))
 	  TheNet->newArc(t1, TheNet->findPlace(innerActivity1, ".negLink"));
       }
-
+*/
       footer(This->id, true);
     }
   ]
@@ -1463,10 +1463,10 @@ This=Scope(a,b,c,d,e,f,g) ->
 
 
       // Create the internal places of the scope pattern.
-      if (This->dpe > 0)
-      {
-	Place *p1  = TheNet->newPlace(prefix + "negLink");
-      }
+//      if (This->dpe > 0)
+//      {
+//	Place *p1  = TheNet->newPlace(prefix + "negLink");
+//      }
       Place *p2  = TheNet->newPlace(prefix + "initial");
       Place *p3  = TheNet->newPlace(prefix + "ch_in");
       Place *p4  = TheNet->newPlace(prefix + "scopeCompensated");
@@ -1716,10 +1716,10 @@ This=Scope(a,b,c,d,e,f,g) ->
 
 
       // Embed the inner activity of the scope.
-      if (This->dpe > 0)
-      {
-        TheNet->mergePlaces(TheNet->findPlace(prefix + "negLink"), TheNet->findPlace(g, ".negLink"));
-      }
+//      if (This->dpe > 0)
+//      {
+//        TheNet->mergePlaces(TheNet->findPlace(prefix + "negLink"), TheNet->findPlace(g, ".negLink"));
+//      }
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p21"), TheNet->findPlace(g, ".initial"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p22"), TheNet->findPlace(g, ".final"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "p23"), TheNet->findPlace(g, ".stop"));
@@ -1775,7 +1775,7 @@ This=StandardElements(NiltTarget_list(), NiltSource_list(), jc) ->
       Place *p4 = TheNet->newPlace(prefix + "stop");
       Place *p5 = TheNet->newPlace(prefix + "stopped");
 
-
+/*
       // If the inner activity has a place negLink, connect merge this place
       // with a new created one.
       if (This->dpe > 0)
@@ -1783,7 +1783,7 @@ This=StandardElements(NiltTarget_list(), NiltSource_list(), jc) ->
 	Place *p1 = TheNet->newPlace(prefix + "negLink");
 	TheNet->mergePlaces(p1, TheNet->findPlace(newPrefix + ".negLink"));
       }
-
+*/
 
       // Embed the inner activity.
       TheNet->mergePlaces(p2, TheNet->findPlace(newPrefix + ".initial"));
@@ -1827,7 +1827,7 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
       // Transition for the negative control flow.
       Transition *t4 = stop(p5, "final", prefix);
 
-
+/*
       // If needed, transition t1 and the place p1 is created and connected
       // with the negLink place of the inner activity if existing for dead path
       // elimination.
@@ -1845,7 +1845,7 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
 	  TheNet->mergePlaces(p3, TheNet->findPlace(newPrefix + ".negLink"));
 	}
       }
-
+*/
 
       // Connect all source link places with t2 and, if needed, with transition
       // t1 for dead path elimination.
@@ -1857,12 +1857,12 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
 	TheNet->newArc(p8, t2);
 	TheNet->newArc(t2, p10);
 	TheNet->newArc(p10, t3, READ);
-
+/*
 	if (This->dpe > 0)
 	{
 	  TheNet->newArc(t1, p10);
 	  TheNet->newArc(p8, t1);
-	}
+	}*/
       }
 
 
@@ -1921,7 +1921,7 @@ This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF) ->
 	TheNet->newArc(p3, t2);
       }
 
-
+/*
       // If the inner activity has a place negLink, connect this place with
       // transition t2 for dead path elimination.
       Place *p5 = TheNet->findPlace(newPrefix + ".negLink");
@@ -1931,7 +1931,7 @@ This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF) ->
 	TheNet->newArc(t2, p5a);
 	TheNet->mergePlaces(p5a, p5);
       }
-
+*/
       
       // Embed the inner activity.
       TheNet->mergePlaces(p6,  TheNet->findPlace(newPrefix + ".initial"));
@@ -1988,7 +1988,7 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF) ->
 	TheNet->newArc(p3, t2);
       }
 
-
+/*
       // If the inner activity has a place negLink, connect this place with
       // transition t2 for dead path elimination.
       Place *p5 = TheNet->findPlace(newPrefix + ".negLink");
@@ -1998,7 +1998,7 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF) ->
 	TheNet->newArc(t2, p5);
 	TheNet->mergePlaces(p5a, p5);
       }
-
+*/
 
       // Embed the inner activity.
       TheNet->mergePlaces(p6, TheNet->findPlace(newPrefix + ".initial"));
@@ -2053,7 +2053,7 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
       Transition *t6 = stop(p16, "initial", prefix);
       Transition *t7 = stop(p13, "final", prefix);
 
-
+/*
       // If needed, transition t1 is created and connected with the negLink
       // place of the inner activity if existing for dead path elimination.
       Transition *t1 = NULL;
@@ -2068,7 +2068,7 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
 	if (p10 != NULL)
 	  TheNet->newArc(t1, p10);
       }
-
+*/
 
       // Connect each target links with t2 and t5.
       foreach (target; tTarget_list a)
@@ -2094,14 +2094,14 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
         TheNet->newArc(p5, t5);
         TheNet->newArc(t5, p7);
 	TheNet->newArc(p7, t4, READ);
-	if (This->dpe > 0)
+/*	if (This->dpe > 0)
 	{
 	  TheNet->newArc(p5, t1);
 	  TheNet->newArc(t1, p7);
-	}
+	}*/
       }
 
-
+/*
       // If the inner activity has a place negLink, connect this place with
       // transition t5 for dead path elimination.
       Place *p10 = TheNet->findPlace(newPrefix + ".negLink");
@@ -2111,7 +2111,7 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
 	if (This->dpe > 0)
 	  TheNet->mergePlaces(p10, TheNet->findPlace(newPrefix + ".negLink"));
       }
-
+*/
 
       // Embed the inner activity.
       TheNet->mergePlaces(p11, TheNet->findPlace(newPrefix + ".initial"));
@@ -2167,7 +2167,7 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF) ->
       Transition *t7 = stop(p17, "p17", prefix);
       Transition *t8 = stop(p13, "final", prefix);
 
-
+/*
       // If needed, transition t1 is created and connected with the negLink
       // place of the inner activity if existing for dead path elimination.
       Transition *t1 = NULL;
@@ -2182,7 +2182,7 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF) ->
 	if (p10 != NULL)
 	  TheNet->newArc(t1, p10);
       }
-
+*/
 
       // Connect each target links with t2 and t5.
       foreach (target; tTarget_list a)
@@ -2206,12 +2206,12 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF) ->
 	TheNet->newArc(p5, t3);
         TheNet->newArc(t3, p7);
 	TheNet->newArc(p7, t4, READ);
-
+/*
 	if (This->dpe > 0)
 	{
 	  TheNet->newArc(p5, t1);
 	  TheNet->newArc(t1, p7);
-	}
+	}*/
       }
 
 
@@ -2221,8 +2221,8 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF) ->
       if (p10 != NULL)
       {
 	TheNet->newArc(t5, p10);
-	if (This->dpe > 0)
-	  TheNet->mergePlaces(p10, TheNet->findPlace(newPrefix + ".negLink"));
+//	if (This->dpe > 0)
+//	  TheNet->mergePlaces(p10, TheNet->findPlace(newPrefix + ".negLink"));
       }
 
 

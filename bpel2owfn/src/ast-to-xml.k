@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/07/11 22:32:29 $
+ *          - last changed: \$Date: 2006/07/12 15:40:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.36 $
+ * \version \$Revision: 1.37 $
  */
 %}
 
@@ -141,11 +141,11 @@ userDefinedEventHandler(a,b) ->
 ;
 
 OnMessage(a) ->
-  [xml: { inup(); } "<onMessage dpe=\"" $0->dpe "\">\n" a { indown(); } "</onMessage>\n"]
+  [xml: { inup(); } "<onMessage dpe=\"" /* $0->dpe */ "\">\n" a { indown(); } "</onMessage>\n"]
 ;
 
 OnAlarm(a) ->
-  [xml: { inup(); } "<onAlarm dpe=\"" $0->dpe "\">\n" a { indown(); } "</onAlarm>\n"]
+  [xml: { inup(); } "<onAlarm dpe=\"" /* $0->dpe */ "\">\n" a { indown(); } "</onAlarm>\n"]
 ;
 
 
@@ -198,7 +198,7 @@ Empty(a) ->
 ******************************************************************************/
 
 Invoke(a,b) ->
-  [xml: { inup(); } "<invoke id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\" dpe=\"" $0->dpe "\">\n" a b { indown(); } "</invoke>\n"]
+  [xml: { inup(); } "<invoke id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\" dpe=\"" /* $0->dpe */ "\">\n" a b { indown(); } "</invoke>\n"]
 ;
 
 
@@ -282,11 +282,11 @@ Terminate(a) ->
 ******************************************************************************/
 
 Flow(a,NiltLink_list(),c) ->
-  [xml: { inup(); } "<flow id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\" dpe=\"" $0->dpe "\">\n" a c { indown(); } "</flow>\n"]
+  [xml: { inup(); } "<flow id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\" dpe=\"" /* $0->dpe */ "\">\n" a c { indown(); } "</flow>\n"]
 ;
 
 Flow(a,b,c) ->
-  [xml: { inup(); } "<flow id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\" dpe=\"" $0->dpe "\">\n" a { inup(); } "<links>\n" b { indown(); } "</links>\n" c { indown(); } "</flow>\n"]
+  [xml: { inup(); } "<flow id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\" dpe=\"" /* $0->dpe */ "\">\n" a { inup(); } "<links>\n" b { indown(); } "</links>\n" c { indown(); } "</flow>\n"]
 ;
 
 Link() ->
@@ -299,15 +299,15 @@ Link() ->
 ******************************************************************************/
 
 Switch(a,b,c) ->
-  [xml: { inup(); } "<switch id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\" dpe=\"" $0->dpe "\">\n" a b c { indown(); } "</switch>\n"]
+  [xml: { inup(); } "<switch id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\" dpe=\"" /* $0->dpe */ "\">\n" a b c { indown(); } "</switch>\n"]
 ;
 
 Case(a) ->
-  [xml: { inup(); } "<case dpe=\"" $0->dpe "\">\n" a { indown(); } "</case>\n"]
+  [xml: { inup(); } "<case dpe=\"" /* $0->dpe */ "\">\n" a { indown(); } "</case>\n"]
 ;
 
 Otherwise(a) ->
-  [xml: { inup(); } "<otherwise dpe=\"" $0->dpe "\">\n" a { indown(); } "</otherwise>\n"]
+  [xml: { inup(); } "<otherwise dpe=\"" /* $0->dpe */ "\">\n" a { indown(); } "</otherwise>\n"]
 ;
 
 
@@ -325,7 +325,7 @@ While(a,b) ->
 ******************************************************************************/
 
 Sequence(a,b) ->
-  [xml: { inup(); } "<sequence id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\" dpe=\"" $0->dpe "\">\n" a b { indown(); } "</sequence>\n"]
+  [xml: { inup(); } "<sequence id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\" dpe=\"" /* $0->dpe */ "\">\n" a b { indown(); } "</sequence>\n"]
 ;
 
 
@@ -334,7 +334,7 @@ Sequence(a,b) ->
 ******************************************************************************/
 
 Pick(a,b,c) ->
-  [xml: { inup(); } "<pick id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\" dpe=\"" $0->dpe "\">\n" a b c { indown(); } "</pick>\n"]
+  [xml: { inup(); } "<pick id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\" dpe=\"" /* $0->dpe */ "\">\n" a b c { indown(); } "</pick>\n"]
 ;
 
 
@@ -343,7 +343,7 @@ Pick(a,b,c) ->
 ******************************************************************************/
 
 Scope(a,b,c,d,e,f,g) ->
-  [xml: { inup(); } "<scope id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\" dpe=\"" $0->dpe "\">\n" 
+  [xml: { inup(); } "<scope id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\" dpe=\"" /* $0->dpe */ "\">\n" 
   
   a
 
@@ -367,5 +367,5 @@ Target() ->
 ;
 
 Source() ->
-  [xml: { in(); } "<source dpe=\"" $0->dpe "\" ncf=\"" $0->negativeControlFlow "\" />\n"]
+  [xml: { in(); } "<source dpe=\"" /* $0->dpe */ "\" ncf=\"" $0->negativeControlFlow "\" />\n"]
 ;

@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/07/11 22:32:28 $
+ *          - last changed: \$Date: 2006/07/12 16:24:20 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.28 $
+ * \version \$Revision: 1.29 $
  *
  */
 %}
@@ -567,7 +567,7 @@ This=Flow(a,b,c) ->
  * parsing an empty otherwise branch was added if it was not specified.
  */
 
-This=activitySwitch(Switch(a,b,otherwiseBranch=Otherwise(c))) ->
+This=Switch(a,b,otherwiseBranch=Otherwise(c)) ->
   [petrinetsmall:
     {
       header(This->id, true);
@@ -585,21 +585,21 @@ This=activitySwitch(Switch(a,b,otherwiseBranch=Otherwise(c))) ->
       {
 	string caseNumber = intToString(currentCase++);
 	Transition* t1 = TheNet->newTransition(prefix + "case" + caseNumber);
-	TheNet->newArc(TheNet->findPlace(This, ".initial"), t1);
+	TheNet->newArc(TheNet->findPlace(This->id, ".initial"), t1);
 
 	// Embed the inner activity.
 	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
-	TheNet->mergePlaces(This, ".internal.final", innerActivity, ".final");
+	TheNet->mergePlaces(This->id, ".internal.final", innerActivity->id, ".final");
       }
 
 
       // The <otherwise> branch.
       Transition *t1 = TheNet->newTransition(prefix + "caseo");
-      TheNet->newArc(TheNet->findPlace(This, ".initial"), t1);
+      TheNet->newArc(TheNet->findPlace(This->id, ".initial"), t1);
 
       // embed inner activity
       TheNet->newArc(t1, TheNet->findPlace(c, ".initial"));
-      TheNet->mergePlaces(This, ".internal.final",   c, ".final");
+      TheNet->mergePlaces(This->id, ".internal.final", c->id, ".final");
 
 
       // Create the arcs for the Dead Path elimination: each chosen activity
@@ -640,11 +640,11 @@ This=activitySwitch(Switch(a,b,otherwiseBranch=Otherwise(c))) ->
  * information refer to the comments below or the User's Manual.
  */
 
-This=activityWhile(TheWhile=While(a,b)) ->
+This=While(a,b) ->
   [petrinetsmall:
     {
       header(This->id, true);
-      string prefix = intToString(TheWhile->id) + ".internal.";
+      string prefix = intToString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -680,8 +680,8 @@ This=activityWhile(TheWhile=While(a,b)) ->
     b // innerActivity
     {
       // Embed the inner activity.
-      TheNet->mergePlaces(This, ".internal.running", b, ".initial");
-      TheNet->mergePlaces(This, ".internal.done", b, ".final");
+      TheNet->mergePlaces(This->id, ".internal.running", b->id, ".initial");
+      TheNet->mergePlaces(This->id, ".internal.done", b->id, ".final");
 
       footer(This->id, true);
     }
@@ -696,7 +696,7 @@ This=activityWhile(TheWhile=While(a,b)) ->
   SEQUENCE
 ******************************************************************************/
 
-This=activitySequence(Sequence(a,b)) ->
+This=Sequence(a,b) ->
   [petrinetsmall:
     {
       header(This->id, true);
@@ -714,12 +714,12 @@ This=activitySequence(Sequence(a,b)) ->
       foreach (innerActivity; activity_list b)
       {
 	if (activityCount == 1)
-	  TheNet->mergePlaces(This, ".internal.initial", innerActivity, ".initial");
+	  TheNet->mergePlaces(This->id, ".internal.initial", innerActivity->id, ".initial");
 	else
-	  TheNet->mergePlaces(lastActivity, ".final", innerActivity, ".initial");
+	  TheNet->mergePlaces(lastActivity->id, ".final", innerActivity->id, ".initial");
 
 	if (activityCount == b->length())
-	  TheNet->mergePlaces(This, ".internal.final", innerActivity, ".final");
+	  TheNet->mergePlaces(This->id, ".internal.final", innerActivity->id, ".final");
 
 	lastActivity = innerActivity;
 	activityCount++;
@@ -738,7 +738,7 @@ This=activitySequence(Sequence(a,b)) ->
   PICK
 ******************************************************************************/
 
-TheActivity=activityPick(This=Pick(a,b,c)) ->
+This=Pick(a,b,c) ->
   [petrinetsmall:
     {
       header(This->id, true);
@@ -760,13 +760,13 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 
 	Transition *t1 = TheNet->newTransition(prefix + "pickM" + message);
 	TheNet->newArc(TheNet->findPlace("in." + ThisBranch->channelName), t1);
-	TheNet->newArc(TheNet->findPlace(TheActivity, ".initial"), t1);
+	TheNet->newArc(TheNet->findPlace(This->id, ".initial"), t1);
 	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
 	t1->type = IN;
 
 
 	// Embed the inner activity.
-	TheNet->mergePlaces(TheActivity, ".final",   innerActivity, ".final");
+	TheNet->mergePlaces(This->id, ".final", innerActivity->id, ".final");
 
 	trace(TRACE_DEBUG, "[PNU]\t\t</onMessage>\n");
       }
@@ -780,12 +780,12 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
         string alarm = intToString(onAlarmCount++);
 
 	Transition *t1 = TheNet->newTransition(prefix + "pickA" + alarm);
-	TheNet->newArc(TheNet->findPlace(TheActivity, ".initial"), t1);
-	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
+	TheNet->newArc(TheNet->findPlace(This->id, ".initial"), t1);
+	TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
 
 
 	// Embed the inner activity.
-	TheNet->mergePlaces(TheActivity, ".final",   innerActivity, ".final");
+	TheNet->mergePlaces(This->id, ".final", innerActivity->id, ".final");
 
 	trace(TRACE_DEBUG, "[PNU]\t\t</onAlarm>\n");
       }

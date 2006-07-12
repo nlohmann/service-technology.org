@@ -53,7 +53,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/07/12 15:40:15 $
+ *          - last changed: \$Date: 2006/07/12 16:24:20 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.23 $
+ * \version \$Revision: 1.24 $
  */
 %}
 
@@ -964,7 +964,7 @@ This=Flow(a,b,c) ->
  * parsing an empty otherwise branch was added if it was not specified.
  */
 
-This=activitySwitch(TheSwitch=Switch(a,b,Otherwise(c))) ->
+This=Switch(a,b,Otherwise(c)) ->
   [petrinet:
     {
       header(This->id, true);
@@ -984,7 +984,7 @@ This=activitySwitch(TheSwitch=Switch(a,b,Otherwise(c))) ->
 
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
-	Transition *t7 = throwFault(p6, p10, "running", prefix, TheSwitch->negativeControlFlow);
+	Transition *t7 = throwFault(p6, p10, "running", prefix, This->negativeControlFlow);
 
       Transition *t8  = stop(p5, "initial", prefix);
       Transition *t9  = stop(p6, "running", prefix);
@@ -1023,8 +1023,8 @@ This=activitySwitch(TheSwitch=Switch(a,b,Otherwise(c))) ->
 	  t4 = TheNet->newTransition(prefix + "t4.case1");
 
 	  // arcs connecting "running"-place
-	  TheNet->newArc(TheNet->findPlace(This, ".internal.running"), t2);
-	  TheNet->newArc(TheNet->findPlace(This, ".internal.running"), t4);
+	  TheNet->newArc(TheNet->findPlace(This->id, ".internal.running"), t2);
+	  TheNet->newArc(TheNet->findPlace(This->id, ".internal.running"), t4);
 
 	  last = t4;
 	}
@@ -1046,10 +1046,10 @@ This=activitySwitch(TheSwitch=Switch(a,b,Otherwise(c))) ->
 	}
 
 	// Embed the inner activity.
-	TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
-	TheNet->mergePlaces(This, ".internal.final",   innerActivity, ".final");
-	TheNet->mergePlaces(This, ".internal.stop",    innerActivity, ".stop");
-	TheNet->mergePlaces(This, ".internal.stopped", innerActivity, ".stopped");
+	TheNet->newArc(t2, TheNet->findPlace(innerActivity->id, ".initial"));
+	TheNet->mergePlaces(This->id, ".internal.final",   innerActivity->id, ".final");
+	TheNet->mergePlaces(This->id, ".internal.stop",    innerActivity->id, ".stop");
+	TheNet->mergePlaces(This->id, ".internal.stopped", innerActivity->id, ".stopped");
 
 	currentCase++;
       }
@@ -1067,10 +1067,10 @@ This=activitySwitch(TheSwitch=Switch(a,b,Otherwise(c))) ->
       Transition *tnoname = stop(running, "runningOtherwise", prefix);
 
       // embed inner activity
-      TheNet->newArc(t2, TheNet->findPlace(c, ".initial"));
-      TheNet->mergePlaces(This, ".internal.final",   c, ".final");
-      TheNet->mergePlaces(This, ".internal.stop",    c, ".stop");
-      TheNet->mergePlaces(This, ".internal.stopped", c, ".stopped");
+      TheNet->newArc(t2, TheNet->findPlace(c->id, ".initial"));
+      TheNet->mergePlaces(This->id, ".internal.final",   c->id, ".final");
+      TheNet->mergePlaces(This->id, ".internal.stop",    c->id, ".stop");
+      TheNet->mergePlaces(This->id, ".internal.stopped", c->id, ".stopped");
 
 /*
       // Create the arcs for the Dead Path elimination: each chosen activity
@@ -1127,11 +1127,11 @@ This=activitySwitch(TheSwitch=Switch(a,b,Otherwise(c))) ->
  * information refer to the comments below or the User's Manual.
  */
 
-This=activityWhile(TheWhile=While(a,b)) ->
+This=While(a,b) ->
   [petrinet:
     {
       header(This->id, true);
-      string prefix = intToString(TheWhile->id) + ".internal.";
+      string prefix = intToString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -1169,7 +1169,7 @@ This=activityWhile(TheWhile=While(a,b)) ->
 
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
-	Transition *t5 = throwFault(p2, p6, "running", prefix, TheWhile->negativeControlFlow);
+	Transition *t5 = throwFault(p2, p6, "running", prefix, This->negativeControlFlow);
 
       Transition *t6 = stop(p1, "initial", prefix);
       Transition *t7 = stop(p2, "running", prefix);
@@ -1180,10 +1180,10 @@ This=activityWhile(TheWhile=While(a,b)) ->
     b // innerActivity
     {
       // Embed the inner activity.
-      TheNet->mergePlaces(This, ".internal.p4",      b, ".initial");
-      TheNet->mergePlaces(This, ".internal.p5",      b, ".final");
-      TheNet->mergePlaces(This, ".internal.stop",    b, ".stop");
-      TheNet->mergePlaces(This, ".internal.stopped", b, ".stopped");
+      TheNet->mergePlaces(This->id, ".internal.p4",      b->id, ".initial");
+      TheNet->mergePlaces(This->id, ".internal.p5",      b->id, ".final");
+      TheNet->mergePlaces(This->id, ".internal.stop",    b->id, ".stop");
+      TheNet->mergePlaces(This->id, ".internal.stopped", b->id, ".stopped");
 
 
       // When the parameter "-p cyclicwhile" is not set, the created pattern
@@ -1192,7 +1192,7 @@ This=activityWhile(TheWhile=While(a,b)) ->
       // is executed at most once to avoid problems with links embedded in the
       // inner activity.
       if (parameters[P_CYCLICWHILE] == false)
-	TheNet->mergePlaces(This, ".internal.p5", This, ".internal.final");
+	TheNet->mergePlaces(This->id, ".internal.p5", This->id, ".internal.final");
 
       footer(This->id, true);
     }
@@ -1211,7 +1211,7 @@ This=activityWhile(TheWhile=While(a,b)) ->
  * The <sequence> activity as it is depicted in Fig. 16.
  */
 
-This=activitySequence(Sequence(a,b)) ->
+This=Sequence(a,b) ->
   [petrinet:
     {
       header(This->id, true);
@@ -1242,12 +1242,12 @@ This=activitySequence(Sequence(a,b)) ->
       foreach (innerActivity; activity_list b)
       {
 	if (activityCount == 1)
-	  TheNet->mergePlaces(This, ".internal.initial", innerActivity, ".initial");
+	  TheNet->mergePlaces(This->id, ".internal.initial", innerActivity->id, ".initial");
 	else
-	  TheNet->mergePlaces(lastActivity, ".final", innerActivity, ".initial");
+	  TheNet->mergePlaces(lastActivity->id, ".final", innerActivity->id, ".initial");
 
 	if (activityCount == b->length())
-	  TheNet->mergePlaces(This, ".internal.final", innerActivity, ".final");
+	  TheNet->mergePlaces(This->id, ".internal.final", innerActivity->id, ".final");
 /*
 	// If an inner activity has a place negLink, it is connected to the transition
 	// t1.
@@ -1256,8 +1256,8 @@ This=activitySequence(Sequence(a,b)) ->
 	  TheNet->newArc(t1, TheNet->findPlace(newPrefix + ".negLink"));
 */
 
-	TheNet->mergePlaces(This, ".internal.stop", innerActivity, ".stop");
-	TheNet->mergePlaces(This, ".internal.stopped", innerActivity, ".stopped");
+	TheNet->mergePlaces(This->id, ".internal.stop", innerActivity->id, ".stop");
+	TheNet->mergePlaces(This->id, ".internal.stopped", innerActivity->id, ".stopped");
 
 	lastActivity = innerActivity;
 	activityCount++;
@@ -1280,7 +1280,7 @@ This=activitySequence(Sequence(a,b)) ->
  * The <pick> activity as it is depicted in Fig. 20.
  */
 
-TheActivity=activityPick(This=Pick(a,b,c)) ->
+This=Pick(a,b,c) ->
   [petrinet:
     {
       header(This->id, true);
@@ -1330,7 +1330,7 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 
 	Transition *t2 = TheNet->newTransition(newPrefix + "t2");
 	TheNet->newArc(TheNet->findPlace("in." + ThisBranch->channelName), t2);
-	TheNet->newArc(TheNet->findPlace(TheActivity, ".internal.TimeStamp"), t2);
+	TheNet->newArc(TheNet->findPlace(This->id, ".internal.TimeStamp"), t2);
 	TheNet->newArc(t2, p3);
 	t2->type = IN;
 
@@ -1350,9 +1350,9 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 
 
 	// Embed the inner activity.
-	TheNet->mergePlaces(TheActivity, ".stop",    innerActivity, ".stop");
-	TheNet->mergePlaces(TheActivity, ".stopped", innerActivity, ".stopped");
-	TheNet->mergePlaces(TheActivity, ".final",   innerActivity, ".final");
+	TheNet->mergePlaces(This->id, ".stop",    innerActivity->id, ".stop");
+	TheNet->mergePlaces(This->id, ".stopped", innerActivity->id, ".stopped");
+	TheNet->mergePlaces(This->id, ".final",   innerActivity->id, ".final");
 
 	trace(TRACE_DEBUG, "[PNU]\t\t</onMessage>\n");
       }
@@ -1367,14 +1367,14 @@ TheActivity=activityPick(This=Pick(a,b,c)) ->
 
 	Transition *t6 = TheNet->newTransition(newPrefix + "t6");
 	TheNet->newArc(TheNet->findPlace("1.internal.clock"), t6, READ);
-	TheNet->newArc(TheNet->findPlace(TheActivity, ".internal.TimeStamp"), t6);
-	TheNet->newArc(t6, TheNet->findPlace(innerActivity, ".initial"));
+	TheNet->newArc(TheNet->findPlace(This->id, ".internal.TimeStamp"), t6);
+	TheNet->newArc(t6, TheNet->findPlace(innerActivity->id, ".initial"));
 
 
 	// Embed the inner activity.
-	TheNet->mergePlaces(TheActivity, ".stop",    innerActivity, ".stop");
-	TheNet->mergePlaces(TheActivity, ".stopped", innerActivity, ".stopped");
-	TheNet->mergePlaces(TheActivity, ".final",   innerActivity, ".final");
+	TheNet->mergePlaces(This->id, ".stop",    innerActivity->id, ".stop");
+	TheNet->mergePlaces(This->id, ".stopped", innerActivity->id, ".stopped");
+	TheNet->mergePlaces(This->id, ".final",   innerActivity->id, ".final");
 
 	trace(TRACE_DEBUG, "[PNU]\t\t</onAlarm>\n");
       }

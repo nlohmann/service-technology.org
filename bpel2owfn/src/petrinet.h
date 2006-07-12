@@ -40,13 +40,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/07/12 08:56:43 $
+ *          - last changed: \$Date: 2006/07/12 16:24:20 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.88 $
+ * \version \$Revision: 1.89 $
  */
 
 
@@ -338,10 +338,13 @@ class PetriNet
     /// Merges places given two roles.
     void mergePlaces(string role1, string role2);
 
+    /// Merges places given two identifiers and roles.
+    void mergePlaces(int id1, string role1, int id2, string role2);
+    
     /// Merges places given two activities with roles.
     void mergePlaces(kc::impl_activity *act1, string role1,
 		     kc::impl_activity *act2, string role2);
-
+    
     /// Merges transitions given two transitions.
     void mergeTransitions(Transition *t1, Transition *t2);
 
@@ -351,6 +354,9 @@ class PetriNet
 
     /// Finds place given an activity with a role.
     Place* findPlace(kc::impl_activity *activity, string role);
+
+    /// Finds place given an id with a role.
+    Place* findPlace(int id, string role);
 
     /// Finds transition given a role.
     Transition* findTransition(string role);

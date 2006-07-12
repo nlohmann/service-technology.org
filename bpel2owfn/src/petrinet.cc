@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/07/12 08:32:19 $
+ *          - last changed: \$Date: 2006/07/12 16:24:20 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.134 $
+ * \version \$Revision: 1.135 $
  */
 
 
@@ -685,6 +685,8 @@ void PetriNet::mergePlaces(string role1, string role2)
  * \param act2  activity of the AST represented by the second place(beginning
  *              with a period: .empty
  * \param role2 string describing the role of the second place
+ *
+ * \deprecated Activities should not be passed to the Petri net class.
  */
 void PetriNet::mergePlaces(kc::impl_activity *act1, string role1,
                            kc::impl_activity *act2, string role2)
@@ -698,6 +700,25 @@ void PetriNet::mergePlaces(kc::impl_activity *act1, string role1,
 
 
 
+
+
+
+/*!
+ * Merges two places given two identifiers and the roles of the places. The
+ * identifiers are used to complete the role-string and pass the search
+ * request.
+ *
+ * \param id1   identifier of the activity represented by the first place
+ * \param role1 string describing the role of the first place (beginning with a
+ *              period: .empty
+ * \param id2   identifier of the activity represented by the second place
+ * \param role2 string describing the role of the second place (beginning with a
+ *              period: .empty
+ */
+void PetriNet::mergePlaces(int id1, string role1, int id2, string role2)
+{
+  mergePlaces(intToString(id1) + role1, intToString(id2) + role2);
+}
 
 
 /*---------------------------------------------------------------------------*/
@@ -774,12 +795,30 @@ Place *PetriNet::findPlace(string role)
  * \param  activity an activity of which the id is taken
  * \param  role the demanded role
  * \return a pointer to the place or a NULL pointer if the place was not found.
+ *
+ * \deprecated The activity should not be passed to the Petri net class.
  */
 Place *PetriNet::findPlace(kc::impl_activity *activity, string role)
 {
   assert(activity != NULL);
 
   return findPlace(intToString(activity->id) + role);
+}
+
+
+
+
+
+/*
+ * Finds a place of the Petri net given an id and a role.
+ *
+ * \param  id an identifier
+ * \param  role the demanded role
+ * \return a pointer to the place or a NULL pointer if the place was not found.
+ */
+Place *PetriNet::findPlace(int id, string role)
+{
+  return findPlace(intToString(id) + role);
 }
 
 

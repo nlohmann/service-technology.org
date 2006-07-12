@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/07/12 15:40:15 $
+ *          - last changed: \$Date: 2006/07/12 16:24:20 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.97 $
+ * \version \$Revision: 1.98 $
  */
 %}
 
@@ -121,7 +121,6 @@ activity:
 | activityCompensate(tCompensate)
   {
     int id = 0;
-//NL    int dpe = 0;
   }
 ;
 
@@ -223,23 +222,16 @@ tEventHandlers:
 
 tOnMessage_list:
   list tOnMessage
-  {
-//NL    int dpe = 0;
-  }
 ;
 
 tOnAlarm_list:
   list tOnAlarm
-  {
-//NL    int dpe = 0;
-  }
 ;
 
 tOnMessage:
   OnMessage(activity)
   {
     int id = 0;
-//NL    int dpe = 0;
 
     string A_partnerLink;
     string A_portType;
@@ -255,7 +247,6 @@ tOnAlarm:
   OnAlarm(activity)
   {
     int id = 0;
-//NL    int dpe = 0;
     
     string A_for;
     string A_until;
@@ -367,7 +358,6 @@ tInvoke:
   Invoke(standardElements tCorrelation_list)
   {
     int id = 0;
-//NL    int dpe = 0;
     int negativeControlFlow = 0;
     bool suppressJF = false;
 
@@ -592,7 +582,6 @@ tFlow:
   Flow(standardElements tLink_list activity_list)
   {
     int id = 0;
-//NL    int dpe = 0;
     int negativeControlFlow = 0;
     bool suppressJF = false;
 
@@ -604,9 +593,6 @@ tFlow:
 
 activity_list:
   list activity 
-  {
-//NL    int dpe = 0;
-  }
 ;
 
 tLink_list:
@@ -634,7 +620,6 @@ tSwitch:
   Switch(standardElements tCase_list tOtherwise)
   {
     int id = 0;
-//NL    int dpe = 0;
     int negativeControlFlow = 0;
     bool suppressJF = false;
 
@@ -646,16 +631,12 @@ tSwitch:
 
 tCase_list:
   list tCase
-  {
-//NL    int dpe = 0;
-  }
 ;
 
 tCase:
   Case(activity)
   {
     int id = 0;
-//NL    int dpe = 0;
     
     string A_condition;
   }
@@ -665,7 +646,6 @@ tOtherwise:
   Otherwise(activity)
   {
     int id = 0;
-//NL    int dpe = 0;
   }
 ;
 
@@ -697,7 +677,6 @@ tSequence:
   Sequence(standardElements activity_list)
   {
     int id = 0;
-//NL    int dpe = 0;
     int negativeControlFlow = 0;
     bool suppressJF = false;
 
@@ -716,7 +695,6 @@ tPick:
   Pick(standardElements tOnMessage_list tOnAlarm_list)
   {
     int id = 0;
-//NL    int dpe = 0;
     int negativeControlFlow = 0;
     bool suppressJF = false;
 
@@ -744,7 +722,6 @@ tScope:
       )
   {
     int id = 0;
-//NL    int dpe = 0;
     int negativeControlFlow = 0;
     bool suppressJF = false;
     bool hasEH = false;
@@ -767,7 +744,6 @@ tScope:
 standardElements:
   StandardElements(tTarget_list tSource_list joinCondition)
   {
-//NL    int dpe = 0;
     int negativeControlFlow = 0;
     bool suppressJF = false;
 
@@ -797,16 +773,12 @@ tTarget:
 
 tSource_list:
   list tSource
-  {
-//NL    int dpe = 0;
-  }
 ;
 
 tSource:
   Source()
   {
     int id = 0;
-//NL    int dpe = 0;
     int negativeControlFlow = 0;
 
     string A_linkName;

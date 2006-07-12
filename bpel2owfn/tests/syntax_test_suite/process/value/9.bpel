@@ -1,7 +1,0 @@
-<process name="processTest9" targetNamespace="http://acme.com/loanprocessing"
-	 abstractProcess="Yes"
->
-
-<empty/>
-
-</process>

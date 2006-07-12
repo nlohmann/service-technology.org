@@ -18,30 +18,11 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/07/06 14:52:34 $ by $Author: nlohmann $.
-# Version $Revision: 1.7 $
+# File last changed $Date: 2006/07/12 11:52:41 $ by $Author: nlohmann $.
+# Version $Revision: 1.8 $
 
+#TESTS = #test1
 TESTS = test2 test3
-#TESTS = test1 test2 test3 test4
-
-TESTSUITE = syntax_test_suite/run_root_suite \
-	    syntax_test_suite/process/run_test_suite \
-	    syntax_test_suite/process/attribute/1.bpel \
-	    syntax_test_suite/process/attribute/2.bpel \
-	    syntax_test_suite/process/attribute/3.bpel \
-	    syntax_test_suite/process/attribute/4.bpel \
-	    syntax_test_suite/process/attribute/5.bpel \
-	    syntax_test_suite/process/value/1.bpel \
-	    syntax_test_suite/process/value/2.bpel \
-	    syntax_test_suite/process/value/3.bpel \
-	    syntax_test_suite/process/value/4.bpel \
-	    syntax_test_suite/process/value/5.bpel \
-	    syntax_test_suite/process/value/6.bpel \
-	    syntax_test_suite/process/value/7.bpel \
-	    syntax_test_suite/process/value/8.bpel \
-	    syntax_test_suite/process/value/9.bpel \
-	    syntax_test_suite/process/value/10.bpel \
-	    syntax_test_suite/process/value/11.bpel
 
 BPEL_PROCESSES = error.bpel loan.bpel purchase.bpel shipping.bpel
 
@@ -54,4 +35,4 @@ CLEANFILES = $(BPEL_PROCESSES:.bpel=.info) \
 	     $(BPEL_PROCESSES:.bpel=.xml) \
 	     $(BPEL_PROCESSES:.bpel=.ast)
 	     
-EXTRA_DIST = $(TESTS) $(BPEL_PROCESSES) $(TESTSUITE)
+EXTRA_DIST = $(TESTS) $(BPEL_PROCESSES)

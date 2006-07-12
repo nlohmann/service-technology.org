@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/07/11 21:17:26 $ by $Author: nlohmann $.
-# Version $Revision: 1.27 $
+# File last changed $Date: 2006/07/12 08:32:18 $ by $Author: nlohmann $.
+# Version $Revision: 1.28 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -57,7 +57,7 @@ bpel2owfn_SOURCES = $(KCDUMMY)\
 		    bpel-unparse-tools.cc bpel-unparse-tools.h\
 		    debug.cc debug.h\
 		    helpers.cc helpers.h\
-		    main.cc main.h\
+		    main.cc\
 		    petrinet.h\
 		    petrinet.cc petrinet-output.cc petrinet-reduction.cc\
 		    cfg.cc cfg.h\

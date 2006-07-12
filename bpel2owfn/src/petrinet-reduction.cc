@@ -43,26 +43,33 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/07/11 22:32:30 $
+ *          - last changed: \$Date: 2006/07/12 08:32:19 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  */
 
 
 
 
 
+/******************************************************************************
+ * Headers
+ *****************************************************************************/
+
 #include <list>
 #include <assert.h>
 #include <set>
+
 #include "petrinet.h"
 #include "debug.h"		// debugging help
 #include "helpers.h"
 #include "options.h"
+
+
 
 
 
@@ -71,6 +78,8 @@
  *****************************************************************************/
 
 extern set<string> ASTE_variables; // needed for PetriNet::removeVariables()
+
+
 
 
 
@@ -126,7 +135,9 @@ void PetriNet::removeVariables()
  * Functions to structurally simplify the Petri net model
  *****************************************************************************/
 
-
+/*!
+ * Remove status places that are not read by any transition.
+ */
 void PetriNet::removeUnusedStatusPlaces()
 {
   list<Place*> unusedPlaces;
@@ -208,11 +219,6 @@ void PetriNet::removeDeadNodes()
 
 
 
-
-
-
-
-
 /*!
  * \brief Elimination of identical places (RB1):
  *
@@ -260,11 +266,6 @@ void PetriNet::elminiationOfIdenticalPlaces()
     mergePlaces(p1, p2);
   }
 }
-
-
-
-
-
 
 
 

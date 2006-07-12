@@ -1,62 +1,139 @@
+/*****************************************************************************\
+ * Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert      *
+ *                                                                           *
+ * This file is part of BPEL2oWFN.                                           *
+ *                                                                           *
+ * BPEL2oWFN is free software; you can redistribute it and/or modify it      *
+ * under the terms of the GNU General Public License as published by the     *
+ * Free Software Foundation; either version 2 of the License, or(at your     *
+ * option) any later version.                                                *
+ *                                                                           *
+ * BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT  *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
+ * more details.                                                             *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License along   *
+ * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
+\*****************************************************************************/
+
+/*!
+ * \file options.h
+ *
+ * \brief 
+ *
+ * \author
+ *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
+ *          - last changes of: \$Author: nlohmann $
+ *
+ * \date
+ *          - created: 2005/10/18
+ *          - last changed: \$Date: 2006/07/12 08:32:19 $
+ *
+ * \note    This file is part of the tool BPEL2oWFN and was created during the
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
+ *
+ * \version \$Revision: 1.28 $
+ */
+
+
+
+
+
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
+
+
+
+
+/******************************************************************************
+ * Headers
+ *****************************************************************************/
+
 #include <map>
 #include <list>
-#include "getopt.h"
 
+#include "getopt.h"
 
 using namespace std;
 
 
+
+
+
+/******************************************************************************
+ * Data structures
+ *****************************************************************************/
+
+/// Enumeration of the possible options
 typedef enum
 {
-   O_HELP,
-   O_VERSION,
-   O_INPUT,
-   O_OUTPUT,
-   O_MODE,
-   O_BPEL2PN,
-   O_LOG,
-   O_FORMAT,
-   O_PARAMETER,
-   O_DEBUG
+   O_HELP,		///< show help screen
+   O_VERSION,		///< show version information
+   O_INPUT,		///< read input file
+   O_OUTPUT,		///< write output file
+   O_MODE,		///< choose mode (see #possibleModi)
+   O_BPEL2PN,		///< emulate the tool BPEL2PN
+   O_LOG,		///< write a log-file
+   O_FORMAT,		///< choose output file format (see #possibleFormats)
+   O_PARAMETER,		///< set various parameters (see #possibleParameters)
+   O_DEBUG		///< set the debug level
 } possibleOptions;
 
+
+
+
+
+/// Enumeration of the possible modes
 typedef enum
 {
-  M_AST = 1,
-  M_PRETTY,
-  M_PETRINET,
-  M_CONSISTENCY,
-  M_CFG
+  M_AST = 1,		///< abstract syntax tree
+  M_PRETTY,		///< BPEL pretty-printer
+  M_PETRINET,		///< Petri net
+  M_CONSISTENCY,	///< consistency (parse two input files)
+  M_CFG			///< control flow analysis
 } possibleModi;
 
+
+
+
+
+/// Enumeration of the possible output file formats
 typedef enum
 {
-  F_LOLA,
-  F_OWFN,
-  F_DOT,
-  F_PEP,
-  F_APNN,
-  F_INFO,
-  F_PNML,
-  F_TXT,
-  F_XML
+  F_LOLA,		///< LoLA Petri net
+  F_OWFN,		///< Fiona open workflow net
+  F_DOT,		///< Graphviz dot format
+  F_PEP,		///< low-level PEP notation
+  F_APNN,		///< Abstract Petri Net Notation
+  F_INFO,		///< BPEL2oWFN information file
+  F_PNML,		///< Petri Net Markup Language
+  F_TXT,		///< ASCII output (for the abstract syntax tree)
+  F_XML			///< XML output (for pretty-printed BPEL)
 } possibleFormats;
 
+
+
+
+
+/// Enumeration of the possible parameters (mostly Petri net-related)
 typedef enum
 {
   P_SIMPLIFY,		///< structural reduction rules
   P_FINALLOOP,		///< live-lock "well-formed" systems
-  P_NOSTANDARDFAULTS,	///< only user-defined faults can occur
-  P_CYCLICWHILE,	///< use the original <while> pattern
-  P_CYCLICEH,		///< use the original <eventHandlers> pattern
-  P_NOFHFAULTS,		///< activities inside the FH throw no faults
   P_NOVARIABLES,	///< removes all variables from the model
+  P_NOSTANDARDFAULTS,	///< only user-defined faults can occur
+  P_NOFHFAULTS,		///< activities inside the FH throw no faults
   P_COMMUNICATIONONLY,	///< creates the smallest possible net
-  P_NEWLINKS		///< enables the new link concept
+  P_CYCLICWHILE,	///< use the original <while> pattern
+  P_CYCLICEH		///< use the original <eventHandlers> pattern
 } possibleParameters;
+
+
+
 
 
 /******************************************************************************
@@ -64,7 +141,6 @@ typedef enum
  *****************************************************************************/
 
 // some file names and pointers (in options.cc)
-
 extern void parse_command_line(int argc, char* argv[]);
 
 
@@ -109,4 +185,3 @@ extern ostream * openOutput(string name);
 extern void closeOutput(ostream * file);
 
 #endif
-

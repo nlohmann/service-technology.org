@@ -1,3 +1,51 @@
+/*****************************************************************************\
+ * Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert      *
+ *                                                                           *
+ * This file is part of BPEL2oWFN.                                           *
+ *                                                                           *
+ * BPEL2oWFN is free software; you can redistribute it and/or modify it      *
+ * under the terms of the GNU General Public License as published by the     *
+ * Free Software Foundation; either version 2 of the License, or(at your     *
+ * option) any later version.                                                *
+ *                                                                           *
+ * BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT  *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
+ * more details.                                                             *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License along   *
+ * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
+\*****************************************************************************/
+
+/*!
+ * \file options.cc
+ *
+ * \brief 
+ *
+ * \author
+ *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
+ *          - last changes of: \$Author: nlohmann $
+ *
+ * \date
+ *          - created: 2005/10/18
+ *          - last changed: \$Date: 2006/07/12 08:32:19 $
+ *
+ * \note    This file is part of the tool BPEL2oWFN and was created during the
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
+ *
+ * \version \$Revision: 1.38 $
+ */
+
+
+
+
+
+/******************************************************************************
+ * Headers
+ *****************************************************************************/
+
 #include <string>
 #include <iostream>
 #include <map>
@@ -5,9 +53,17 @@
 #include "bpel2owfn.h"
 #include "options.h"
 #include "debug.h"
-//#include "exception.h"
 
 using namespace std;
+
+
+
+
+
+
+/******************************************************************************
+ * Data structures
+ *****************************************************************************/
 
 // some file names and pointers
 
@@ -30,7 +86,6 @@ string log_filename = "";
 bool createOutputFile = false;
 
 // different modes controlled by command line
-
 possibleModi modus;
 
 map<possibleOptions,    bool> options;
@@ -58,6 +113,14 @@ static struct option longopts[] =
 };
 
 const char * par_string = "hvm:li:of:p:bd:";
+
+
+
+
+
+/******************************************************************************
+ * Functions for command line evaluation
+ *****************************************************************************/
 
 // --------------------- functions for command line evaluation ------------------------
 /**
@@ -102,14 +165,15 @@ void print_help()
 
 }
 
+
+
+
+
 /**
  * Prints some version information
  *
  * \param name commandline name of the this program
- *
- *
  */
-
 void print_version(string name)
 {
   trace(string(PACKAGE_STRING) + " -- ");
@@ -119,6 +183,9 @@ void print_version(string name)
   trace("This is free software; see the source for copying conditions. There is NO\n");
   trace("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
 }
+
+
+
 
 
 void parse_command_line(int argc, char* argv[])
@@ -160,13 +227,17 @@ void parse_command_line(int argc, char* argv[])
 
   validFormats[pair<possibleModi,possibleFormats>(M_CFG,F_DOT)] = true;
 
+
   // the programme's name on the commandline
   string progname = string(argv[0]);
+
 
   // turn off debug modi of flex and bison by default
   yydebug = 0;
   yy_flex_debug = 0;
 
+
+  // use GNU getopt to parse the command-line arguments
   int optc = 0;
   while ((optc = getopt_long (argc, argv, par_string, longopts, (int *) 0))
          != EOF)
@@ -176,65 +247,77 @@ void parse_command_line(int argc, char* argv[])
     possibleModi old_modus;
     switch (optc)
       {
-      case 'h':
-	      options[O_HELP] = true;
-  	      break;
-      case 'v':
-	      options[O_VERSION] = true;
-      	      break;
+      case 'h': options[O_HELP] = true; break;
+      case 'v': options[O_VERSION] = true; break;
       case 'm':
-	      old_modus = modus;
-	      parameter = string(optarg);
-	      if (parameter == "ast") {
-		modus = M_AST;
-	      }
-	      else if (parameter == "pretty") {
-		modus = M_PRETTY;
-		formats[F_XML] = true;
-		options[O_FORMAT] = true;
-	      }
-	      else if (parameter == "petrinet" || parameter == "pn") {
-		modus = M_PETRINET;
-	      }
-	      else if (parameter == "consistency") {
-		modus = M_CONSISTENCY;
-	      }
-	      else if (parameter == "cfg") {
-		modus = M_CFG;
-	      }
-	      else
-	      {
-//		throw Exception(OPTION_MISMATCH, 
-                trace(TRACE_ALWAYS, "Unknown mode \"" + parameter+ "\n");
-	      }
-	      if (options[O_MODE] && modus != old_modus)
-	      {
-//		throw Exception(OPTION_MISMATCH, 
-                trace(TRACE_ALWAYS, "Choose only one mode!\n");
-	      }
-	      options[O_MODE] = true;
-	      break;
+		{
+		  old_modus = modus;
+		  parameter = string(optarg);
+
+		  if (parameter == "ast")
+		  {
+		    modus = M_AST;
+		  }
+		  else if (parameter == "pretty")
+		  {
+		    modus = M_PRETTY;
+		    formats[F_XML] = true;
+		    options[O_FORMAT] = true;
+		  }
+		  else if (parameter == "petrinet" || parameter == "pn")
+		  {
+		    modus = M_PETRINET;
+		  }
+		  else if (parameter == "consistency")
+		  {
+		    modus = M_CONSISTENCY;
+		  }
+		  else if (parameter == "cfg")
+		  {
+		    modus = M_CFG;
+		  }
+		  else
+		  {
+		    // throw Exception(OPTION_MISMATCH, 
+		    trace(TRACE_ALWAYS, "Unknown mode \"" + parameter+ "\n");
+		  }
+		  
+		  if (options[O_MODE] && modus != old_modus)
+		  {
+		    // throw Exception(OPTION_MISMATCH,
+		    trace(TRACE_ALWAYS, "Choose only one mode!\n");
+		  }
+		  
+		  options[O_MODE] = true;
+
+		  break;
+		}
       case 'b':
- 	      if (options[O_MODE] && modus != M_PETRINET)
-	      {
-//	        throw Exception(OPTION_MISMATCH,
-                trace("Choose only one mode\n");
-	      }
-	      formats[F_LOLA] = true;
-	      formats[F_INFO] = true;
-	      options[O_OUTPUT] = true;
-	      modus = M_PETRINET;
-	      options[O_MODE] = true;
-	      options[O_FORMAT] = true;
-	      options[O_BPEL2PN] = true;
-	      break;
+		{
+		  if (options[O_MODE] && modus != M_PETRINET)
+		  {
+		    // throw Exception(OPTION_MISMATCH,
+		    trace("Choose only one mode\n");
+		  }
+		  
+		  formats[F_LOLA] = true;
+		  formats[F_INFO] = true;
+		  options[O_OUTPUT] = true;
+		  modus = M_PETRINET;
+		  options[O_MODE] = true;
+		  options[O_FORMAT] = true;
+		  options[O_BPEL2PN] = true;
+
+		  break;
+		}
       case 'l':
-	      options[O_LOG] = true;
-	      if (optarg != NULL)
-	      {
-	        log_filename = string(optarg);
-	      }
-              break;
+		{
+		  options[O_LOG] = true;
+		  if (optarg != NULL)
+		    log_filename = string(optarg);
+
+		  break;
+		}
       case 'i':
 	      if (options[O_INPUT])
 	      {
@@ -384,10 +467,10 @@ void parse_command_line(int argc, char* argv[])
 	      {
 	        parameters[P_COMMUNICATIONONLY] = true;
 	      }
-	      else if ( parameter == "newlinks" )
-	      {
-	        parameters[P_NEWLINKS] = true;
-	      }
+//	      else if ( parameter == "newlinks" )
+//	      {
+//	        parameters[P_NEWLINKS] = true;
+//	      }
 	      else if ( parameter == "cyclicwhile" )
 	      {
 	        parameters[P_CYCLICWHILE] = true;
@@ -453,12 +536,15 @@ void parse_command_line(int argc, char* argv[])
       
   }
 
+
   // print help and exit
   if (options[O_HELP])
   {
     print_help();
     exit(0);
   }
+
+
   // print version and exit
   if (options[O_VERSION])
   {

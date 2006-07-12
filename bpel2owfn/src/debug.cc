@@ -25,23 +25,44 @@
  *
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2006/06/08 13:39:28 $
+ *          - last changed: \$Date: 2006/07/12 08:56:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
  */
+
+
+
+
+
+/******************************************************************************
+ * Headers
+ *****************************************************************************/
+
+#include <iostream>
+#include <fstream>
 
 #include "debug.h"
 #include "options.h"
 #include "helpers.h"
+
+using namespace std;
+
+
+
+
+
+/******************************************************************************
+ * Global variables
+ *****************************************************************************/
 
 /// debug level
 trace_level debug_level = TRACE_ALWAYS;
@@ -49,6 +70,10 @@ trace_level debug_level = TRACE_ALWAYS;
 
 
 
+
+/******************************************************************************
+ * Functions to indicate errors, warnings or observations
+ *****************************************************************************/
 
 /**
  * Provides output to stderr using different #trace_level 
@@ -58,11 +83,11 @@ trace_level debug_level = TRACE_ALWAYS;
  * \param message	the output
  *
  */
-void trace(trace_level pTraceLevel, std::string message)
+void trace(trace_level pTraceLevel, string message)
 {
   if (pTraceLevel <= debug_level)
   {
-    (*log_output) << message << std::flush;
+    (*log_output) << message << flush;
   }
 }
 
@@ -71,12 +96,12 @@ void trace(trace_level pTraceLevel, std::string message)
 
 
 /**
- * Works like #trace(trace_level,std::string) with trace_level = TRACE_ALWAYS
+ * Works like #trace(trace_level,string) with trace_level = TRACE_ALWAYS
  *
  * \param message the output
  *
  */
-void trace(std::string message )
+void trace(string message )
 {
   trace(TRACE_ALWAYS, message);
 }
@@ -122,8 +147,8 @@ int yyerror(const char* msg)
 
     unsigned int firstShowedLine = ((yylineno-environment)>0)?(yylineno-environment):1;
   
-    std::ifstream inputFile(filename.c_str());
-    std::string errorLine;
+    ifstream inputFile(filename.c_str());
+    string errorLine;
     for (unsigned int i=0; i<firstShowedLine; i++)
     {
       getline(inputFile, errorLine);
@@ -145,5 +170,3 @@ int yyerror(const char* msg)
   error();
   return 1;
 }
-
-

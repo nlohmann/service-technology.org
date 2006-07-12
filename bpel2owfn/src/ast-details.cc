@@ -27,15 +27,23 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/07/11 22:32:28 $
+ *          - last changed: \$Date: 2006/07/12 08:56:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  */
+
+
+
+
+
+/******************************************************************************
+ * Headers
+ *****************************************************************************/
 
 #include "ast-details.h"
 #include <assert.h>
@@ -44,6 +52,9 @@
 #include <string>
 
 using namespace std;
+
+
+
 
 
 /******************************************************************************
@@ -55,6 +66,10 @@ extern map<unsigned int, map<string, string> > temporaryAttributeMap;
 
 
 
+
+/******************************************************************************
+ * Member functions
+ *****************************************************************************/
 
 ASTE::ASTE(kc::impl_abstract_phylum *mynode, int mytype)
 {

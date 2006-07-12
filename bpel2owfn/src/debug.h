@@ -29,24 +29,42 @@
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2006/07/11 22:32:29 $
+ *          - last changed: \$Date: 2006/07/12 08:56:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  */
+
+
+
+
 
 #ifndef DEBUG_H
 #define DEBUG_H
 
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <exception>
 
+
+
+
+/******************************************************************************
+ * Headers
+ *****************************************************************************/
+
+#include <string>
+
+using namespace std;
+
+
+
+
+
+/******************************************************************************
+ * Data structures
+ *****************************************************************************/
 
 typedef enum
 {
@@ -57,37 +75,35 @@ typedef enum
   TRACE_VERY_DEBUG	/// trace level for everything (? information collapse)
 } trace_level;
 
+
+
+
+
+/******************************************************************************
+ * External variables
+ *****************************************************************************/
+
 extern trace_level debug_level;
 
 
 
-/**
- * Provides output to stderr using different #trace_level 
- * (in order to regulate amount of output)
- *
- * \param pTraceLevel	the #trace_level
- * \param message	the output
- *
- */
-void trace(trace_level pTraceLevel, std::string message);
 
 
+/******************************************************************************
+ * Functions
+ *****************************************************************************/
 
+/// Provides output to stderr using different #trace_level 
+void trace(trace_level pTraceLevel, string message);
 
-
-/**
- * Works like #trace(trace_level,std::string) with trace_level = TRACE_ALWAYS
- *
- * \param message the output
- *
- */
-void trace(std::string message);
-
-
-
-
+/// Works like #trace(trace_level, string) with trace_level = TRACE_ALWAYS
+void trace(string message);
 
 /// Signalling syntax errors.
 int yyerror(const char* msg);
+
+
+
+
 
 #endif

@@ -32,23 +32,32 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/07/11 22:32:29 $
+ *          - last changed: \$Date: 2006/07/12 08:56:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  */
 
 
 
 
 
+/******************************************************************************
+ * Headers
+ *****************************************************************************/
+
+#include <iostream>
+#include <fstream>
+
 #include "helpers.h"
 #include "options.h"
 #include "debug.h"
 #include "petrinet.h"
+
+using namespace std;
 
 
 
@@ -156,22 +165,22 @@ void cleanup()
     fclose(yyin);
   }
  
-  if ( output != &std::cout && output != &std::clog && output != log_output && output != NULL )
+  if ( output != &cout && output != &clog && output != log_output && output != NULL )
   {
     trace(TRACE_INFORMATION," + Closing output file: " + output_filename + ".X\n");
-    (*output) << std::flush;
-    ((std::ofstream*)output)->close();
+    (*output) << flush;
+    ((ofstream*)output)->close();
     delete(output);
     output = NULL;
   }
  
-  if ( log_output != &std::clog )
+  if ( log_output != &clog )
   {
     trace(TRACE_INFORMATION," + Closing log file: " + log_filename + "\n");
-    (*log_output) << std::flush;
-    ((std::ofstream*)log_output)->close();
+    (*log_output) << flush;
+    ((ofstream*)log_output)->close();
     delete(log_output);
-    log_output = &std::cerr;
+    log_output = &cerr;
   }
 }
 

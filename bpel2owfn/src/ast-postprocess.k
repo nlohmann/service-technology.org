@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/07/11 22:32:28 $
+ *          - last changed: \$Date: 2006/07/12 11:37:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  */
 %}
 
@@ -797,6 +797,9 @@ Compensate(a) ->
       $0->A_suppressJoinFailure = ASTEmap[myid]->attributes["suppressJoinFailure"];
       $0->A_scope = ASTEmap[myid]->attributes["scope"];
       /* here we can check the attributes */
+
+      // attribute to discriminate the <compensate>-patterns
+      $0->hasScopeAttribute = ($0->A_scope != "");
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);

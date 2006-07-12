@@ -53,7 +53,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/07/11 22:32:29 $
+ *          - last changed: \$Date: 2006/07/12 11:37:03 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  */
 %}
 
@@ -448,7 +448,7 @@ This=Assign(a,b) ->
 
 	  lastPlace = p8;
 	}
-	else // if (from->literalValue != mkcasestring(""));
+	else
 	{
 	  Place *p4 = TheNet->newPlace(newPrefix + "p4");
 	  Place *p8 = TheNet->newPlace(newPrefix + "final");
@@ -621,7 +621,7 @@ This=Throw(a) ->
  * compensation handler of the current scope.
  */
 
-This=Compensate(a) provided (!This->inFaultHandler) -> // TODO!!! TODO /// && (symTab.readAttributeValue(This->id, "scope") == "")) -> //(!This->inFaultHandler && This->scope == mkcasestring("")) ->
+This=Compensate(a) provided (!This->inFaultHandler && !This->hasScopeAttribute) ->
   [petrinet:
     {
       header(This->id);
@@ -673,7 +673,7 @@ This=Compensate(a) provided (!This->inFaultHandler) -> // TODO!!! TODO /// && (s
  * handler of the current scope.
  */
 
-This=Compensate(a) provided (This->inFaultHandler) -> // TODO TODO && (symTab.readAttributeValue(This->id, "scope") == "")) ->  //(This->inFaultHandler && This->scope == mkcasestring("")) ->
+This=Compensate(a) provided (This->inFaultHandler && !This->hasScopeAttribute) ->
   [petrinet:
     {
       header(This->id);
@@ -725,7 +725,7 @@ This=Compensate(a) provided (This->inFaultHandler) -> // TODO TODO && (symTab.re
  * embedded to the compensation handler of the current scope.
  */
 
-This=Compensate(a) provided (!This->inFaultHandler) -> // TODO TODO && (symTab.readAttributeValue(This->id, "scope") != "")) -> //(!This->inFaultHandler && This->scope != mkcasestring("")) ->
+This=Compensate(a) provided (!This->inFaultHandler && This->hasScopeAttribute) ->
   [petrinet:
     {
       header(This->id);
@@ -776,7 +776,7 @@ This=Compensate(a) provided (!This->inFaultHandler) -> // TODO TODO && (symTab.r
  * the fault handler of the current scope.
  */
 
-This=Compensate(a) provided (This->inFaultHandler) -> // TODO TODO && (symTab.readAttributeValue(This->id, "scope") != "")) -> //(This->inFaultHandler && This->scope != mkcasestring("")) ->
+This=Compensate(a) provided (This->inFaultHandler && This->hasScopeAttribute) ->
   [petrinet:
     {
       header(This->id);
@@ -1571,7 +1571,6 @@ This=Scope(a,b,c,d,e,f,g) ->
       // If the process has an event handler several places and transitions
       // have to be added to embed it. If the process lacks an event handler
       // some places can be merged.
-//      if (myself->hasEventHandler)
       if (This->hasEH)
       {
 	Place *p25 = TheNet->newPlace(prefix + "p25");
@@ -1628,7 +1627,7 @@ This=Scope(a,b,c,d,e,f,g) ->
     f // Stop Pattern
     a // standardElements
     c // Fault Handler
-//TODO    d // Compensation Handler
+    d // Compensation Handler
     e // Event Handler
     g // innerActivity
     {

@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/07/11 22:32:29 $
+ *          - last changed: \$Date: 2006/07/12 11:37:02 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.187 $
+ * \version \$Revision: 1.188 $
  *
  */
 %}
@@ -277,7 +277,7 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
     }
       h // Stop Pattern
       e // FaultHandler
-//TODO      f // Compensation Handler
+      f // Compensation Handler
       g // Event Handler
       i // innerActivity
     {

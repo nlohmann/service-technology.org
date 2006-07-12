@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/07/12 16:24:20 $
+ *          - last changed: \$Date: 2006/07/12 16:47:50 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.135 $
+ * \version \$Revision: 1.136 $
  */
 
 
@@ -180,7 +180,7 @@ Place::Place(unsigned int myid, string role, communication_type mytype)
 
 
 
-/*
+/*!
  * Initially mark the place.
  */
 void Place::mark()
@@ -789,7 +789,7 @@ Place *PetriNet::findPlace(string role)
 
 
 
-/*
+/*!
  * Finds a place of the Petri net given an activity and a role.
  *
  * \param  activity an activity of which the id is taken
@@ -809,7 +809,7 @@ Place *PetriNet::findPlace(kc::impl_activity *activity, string role)
 
 
 
-/*
+/*!
  * Finds a place of the Petri net given an id and a role.
  *
  * \param  id an identifier

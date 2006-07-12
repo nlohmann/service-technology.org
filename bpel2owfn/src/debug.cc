@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2006/07/12 08:56:43 $
+ *          - last changed: \$Date: 2006/07/12 10:00:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  */
 
 
@@ -122,8 +122,8 @@ void trace(string message )
 int yyerror(const char* msg)
 {
   /* defined by flex */
-  extern int yylineno;      ///< line number of current token
-  extern char *yytext;      ///< text of the current token
+  extern int yylineno;      // line number of current token
+  extern char *yytext;      // text of the current token
 
   trace("Error while parsing!\n\n");
   trace(msg);

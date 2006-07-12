@@ -25,8 +25,10 @@
 // printers below.
 %{
 #include <iostream>
-#include "options.h"
+
+#include "options.h" // for #output
 %}
+
 
 %uview petrinet;
 %uview petrinetsmall;

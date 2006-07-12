@@ -18,13 +18,13 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/07/05 08:56:59 $ by $Author: nlohmann $.
-# Version $Revision: 1.14 $
+# File last changed $Date: 2006/07/12 10:55:07 $ by $Author: nlohmann $.
+# Version $Revision: 1.15 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([BPEL2oWFN],[1.3],[nlohmann@informatik.hu-berlin.de],[bpel2owfn])
-AC_REVISION($Revision: 1.14 $)
+AC_INIT([BPEL2oWFN],[2.0],[nlohmann@informatik.hu-berlin.de],[bpel2owfn])
+AC_REVISION($Revision: 1.15 $)
 AM_INIT_AUTOMAKE
 
 

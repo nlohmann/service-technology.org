@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/07/12 08:56:43 $
+ *          - last changed: \$Date: 2006/07/12 10:55:18 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  */
 
 
@@ -71,10 +71,18 @@ extern map<unsigned int, map<string, string> > temporaryAttributeMap;
  * Member functions
  *****************************************************************************/
 
+/*!
+ * Constructor
+ *
+ * \param mynode a node of the abstract syntax tree
+ * \param mytype value of the type of the node using the token values defined
+ *               by flex and bison
+ */
 ASTE::ASTE(kc::impl_abstract_phylum *mynode, int mytype)
 {
   assert(mynode != NULL);
 
+  // get the identifier from the abstract syntax tree
   switch (mytype)
   {
     case(K_ASSIGN):		id = ((kc::impl_tAssign*)mynode)->id; break;
@@ -114,8 +122,10 @@ ASTE::ASTE(kc::impl_abstract_phylum *mynode, int mytype)
     default:			id = 0;
   }
 
+  // make sure the node in the ast was really found
   assert(id != 0);
 
+  // initialize values
   node = mynode;
   type = mytype;
   attributes = temporaryAttributeMap[id];

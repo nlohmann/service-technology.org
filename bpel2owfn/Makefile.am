@@ -18,12 +18,18 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/07/05 08:56:59 $ by $Author: nlohmann $.
-# Version $Revision: 1.17 $
+# File last changed $Date: 2006/07/12 10:55:07 $ by $Author: nlohmann $.
+# Version $Revision: 1.18 $
 
 SUBDIRS = src doc tests
 
 .PHONY: binarydistreadme
+
+
+# flags for the compilers
+AM_CXXFLAGS= # -g -pedantic 
+AM_CFLAGS=   # -g -pedantic
+
 
 # all files that require the permission to execute
 SHELLSCRIPTS = tests/test1 tests/test2 tests/test3 tests/test4\
@@ -60,6 +66,7 @@ hu-prepare: maintainer-clean
 	@echo   automake -ac
 	@echo
 
+
 # a README file for a binary distribution
 binarydistreadme:
 	@echo -e Copyright \(C\) 2005, 2006 Niels Lohmann, Christian Gierds and Dennis > BINARYREADME
@@ -84,13 +91,15 @@ binarydistreadme:
 	@echo -e with BPEL2oWFN\; if not, write to the Free Software Foundation, Inc., 51 >> BINARYREADME
 	@echo -e Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. >> BINARYREADME
 
+
 # target to create an executable that is independet of Cygwin
 pure-windows-executable:
 	make hu-binarydist OS=win32 CXXFLAGS="-mno-cygwin -U _WIN32" CFLAGS="-mno-cygwin -U _WIN32" 
 
+
 # name of the directory/archive for a binary distribution
-#WIN32DISTDIR = $(distdir)-win32
 BINARYDISTDIR = $(distdir)-$(OS)
+
 
 # files that are distributed in a binary distribution
 BINARYDISTFILES = src/$(PACKAGE)$(EXEEXT) doc/$(PACKAGE).pdf COPYING
@@ -111,11 +120,11 @@ hu-bindist: binarydistreadme
 	mv BINARYREADME $(BINARYDISTDIR)/README
 	zip -9 -m -r $(BINARYDISTDIR).zip $(BINARYDISTDIR)
 
+
 # target to create a distribution for an operation system named OS
 # (set the variable OS by calling "make hu-binarydist OS=linux")
 hu-binarydist: hu-docdist hu-bindist
 
+
 # target to create a pure windows binary distribution
 hu-win32dist: pure-windows-executable
-
-

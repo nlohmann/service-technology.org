@@ -29,13 +29,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/07/12 08:56:43 $
+ *          - last changed: \$Date: 2006/07/12 10:55:18 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.39 $
+ * \version \$Revision: 1.40 $
  */
 
 
@@ -72,15 +72,18 @@ using namespace std;
 /// Filename of input file
 string filename = "<STDIN>";
 list <string> inputfiles;
+
 /// Filename of output file
 string output_filename = "";
 
 /// pointer to input stream
-istream * input = &cin;
+istream *input = &cin;
+
 /// pointer to output stream
-ostream * output = &cout;
+ostream *output = &cout;
+
 /// pointer to log stream
-ostream * log_output = &clog;
+ostream *log_output = &clog;
 
 /// Filename of log file
 string log_filename = "";
@@ -93,10 +96,12 @@ possibleModi modus;
 map<possibleOptions,    bool> options;
 map<possibleParameters, bool> parameters;
 map<possibleFormats,    bool> formats;
+
 // suffixes are defined in parse_command_line();
 map<possibleFormats, string> suffixes;
 
-// long options
+
+/// long options (needed by GNU getopt)
 static struct option longopts[] =
 {
   { "help",		no_argument,       NULL, 'h' },
@@ -114,6 +119,7 @@ static struct option longopts[] =
   NULL
 };
 
+/// short options (needed by GNU getopt)
 const char * par_string = "hvm:li:of:p:bd:";
 
 
@@ -248,18 +254,18 @@ void parse_command_line(int argc, char* argv[])
     string parameter = "";
     possibleModi old_modus;
     switch (optc)
-      {
+    {
       case 'h': options[O_HELP] = true; break;
+
       case 'v': options[O_VERSION] = true; break;
+
       case 'm':
 		{
 		  old_modus = modus;
 		  parameter = string(optarg);
 
 		  if (parameter == "ast")
-		  {
 		    modus = M_AST;
-		  }
 		  else if (parameter == "pretty")
 		  {
 		    modus = M_PRETTY;
@@ -267,40 +273,26 @@ void parse_command_line(int argc, char* argv[])
 		    options[O_FORMAT] = true;
 		  }
 		  else if (parameter == "petrinet" || parameter == "pn")
-		  {
 		    modus = M_PETRINET;
-		  }
 		  else if (parameter == "consistency")
-		  {
 		    modus = M_CONSISTENCY;
-		  }
 		  else if (parameter == "cfg")
-		  {
 		    modus = M_CFG;
-		  }
 		  else
-		  {
-		    // throw Exception(OPTION_MISMATCH, 
 		    trace(TRACE_ALWAYS, "Unknown mode \"" + parameter+ "\n");
-		  }
 		  
 		  if (options[O_MODE] && modus != old_modus)
-		  {
-		    // throw Exception(OPTION_MISMATCH,
 		    trace(TRACE_ALWAYS, "Choose only one mode!\n");
-		  }
 		  
 		  options[O_MODE] = true;
 
 		  break;
 		}
+
       case 'b':
 		{
 		  if (options[O_MODE] && modus != M_PETRINET)
-		  {
-		    // throw Exception(OPTION_MISMATCH,
 		    trace("Choose only one mode\n");
-		  }
 		  
 		  formats[F_LOLA] = true;
 		  formats[F_INFO] = true;
@@ -312,230 +304,121 @@ void parse_command_line(int argc, char* argv[])
 
 		  break;
 		}
+
       case 'l':
 		{
 		  options[O_LOG] = true;
 		  if (optarg != NULL)
 		    log_filename = string(optarg);
-
 		  break;
 		}
+
       case 'i':
-	      if (options[O_INPUT])
-	      {
-		// trace(TRACE_WARNINGS, "Multiple input options are given, only last one is used!\n");
+              {
+		options[O_INPUT] = true;
+		filename = string(optarg);
+		inputfiles.push_back(filename);
+		break;
 	      }
-	      options[O_INPUT] = true;
-	      filename = string(optarg);
-	      inputfiles.push_back(filename);
-              break;
+
       case 'o':
-	      if (options[O_OUTPUT])
 	      {
-		trace(TRACE_WARNINGS, "Multiple output options are given, only last given name is used!\n");
+		if (options[O_OUTPUT])
+		  trace(TRACE_WARNINGS, "Multiple output options are given, only last given name is used!\n");
+		
+		options[O_OUTPUT] = true;
+		
+		if (optarg != NULL)
+		  output_filename = string(optarg);
+		
+		break;
 	      }
-	      options[O_OUTPUT] = true;
-	      if (optarg != NULL)
-	      {
-		output_filename = string(optarg);
-	      }
-              break;
+
       case 'f':
-	      options[O_FORMAT] = true;
-	      parameter = string(optarg);
-	      if (parameter == suffixes[F_LOLA])
 	      {
-		formats[F_LOLA] = true;
-/*
-  	        if (options[O_MODE] && modus != M_PETRINET)
-	        {
-		  throw Exception(OPTION_MISMATCH, 
-				  "Choose only one mode\n",
-				  "Type " + progname + " -h for more information.\n");
-	        }
-	    	modus = M_PETRINET;
-	        options[O_MODE] = true;
-*/
+		options[O_FORMAT] = true;
+		parameter = string(optarg);
+		
+		if (parameter == suffixes[F_LOLA])
+		  formats[F_LOLA] = true;
+		else if (parameter == suffixes[F_OWFN])
+		  formats[F_OWFN] = true;
+		else if (parameter == suffixes[F_DOT])
+		  formats[F_DOT] = true;
+		else if (parameter == "pep")
+		  formats[F_PEP] = true;
+		else if (parameter == suffixes[F_APNN])
+		  formats[F_APNN] = true;
+		else if (parameter == suffixes[F_INFO])
+		  formats[F_INFO] = true;
+		else if (parameter == suffixes[F_PNML])
+		  formats[F_PNML] = true;
+		else if (parameter == suffixes[F_TXT])
+		  formats[F_TXT] = true;
+		else if (parameter == suffixes[F_XML])
+		  formats[F_XML] = true;
+		else
+		  trace(TRACE_ALWAYS, "Unknown format \"" + parameter +"\".\n");
+		
+		break;
 	      }
-	      else if (parameter == suffixes[F_OWFN])
-	      {
-		formats[F_OWFN] = true;
-/*
- 	        if (options[O_MODE] && modus != M_PETRINET)
-	        {
-		  throw Exception(OPTION_MISMATCH, 
-				  "Choose only one mode\n",
-				  "Type " + progname + " -h for more information.\n");
-	        }
-	    	modus = M_PETRINET;
-	        options[O_MODE] = true;
-*/
-	      }
-	      else if (parameter == suffixes[F_DOT])
-	      {
-		formats[F_DOT] = true;
-	      }
-	      else if (parameter == "pep")
-	      {
-		formats[F_PEP] = true;
-/*
- 	        if (options[O_MODE] && modus != M_PETRINET)
-	        {
-		  throw Exception(OPTION_MISMATCH, 
-				  "Choose only one mode\n",
-				  "Type " + progname + " -h for more information.\n");
-	        }
-	    	modus = M_PETRINET;
-	        options[O_MODE] = true;
-*/
-	      }
-	      else if (parameter == suffixes[F_APNN])
-	      {
-		formats[F_APNN] = true;
-/*
- 	        if (options[O_MODE] && modus != M_PETRINET)
-	        {
-		  throw Exception(OPTION_MISMATCH, 
-				  "Choose only one mode\n",
-				  "Type " + progname + " -h for more information.\n");
-	        }
-	    	modus = M_PETRINET;
-	        options[O_MODE] = true;
-*/
-	      }
-	      else if (parameter == suffixes[F_INFO])
-	      {
-		formats[F_INFO] = true;
-	      }
-	      else if (parameter == suffixes[F_PNML])
-	      {
-		formats[F_PNML] = true;
-/*
- 	        if (options[O_MODE] && modus != M_PETRINET)
-	        {
-		  throw Exception(OPTION_MISMATCH, 
-				  "Choose only one mode\n",
-				  "Type " + progname + " -h for more information.\n");
-	        }
-	    	modus = M_PETRINET;
-	        options[O_MODE] = true;
-*/
-	      }
-	      else if (parameter == suffixes[F_TXT])
-	      {
-		formats[F_TXT] = true;
-	      }
-	      else if (parameter == suffixes[F_XML])
-	      {
-		formats[F_XML] = true;
- 	        if (options[O_MODE] && modus != M_PRETTY)
-	        {
-//		  throw Exception(OPTION_MISMATCH, 
-                  trace(TRACE_ALWAYS, "Choose only one mode\n");
-	        }
-	    	modus = M_PRETTY;
-	        options[O_MODE] = true;
-	      }
-	      else
-	      {
-//		throw Exception(OPTION_MISMATCH, 
-		trace(TRACE_ALWAYS, "Unknown format \"" + parameter +"\".\n");
-	      }
-	      break;
+
       case 'p':
-	      options[O_PARAMETER] = true;
-	      parameter = string(optarg);
-	      if ( parameter == "simplify" )
 	      {
-	        parameters[P_SIMPLIFY] = true;
+		options[O_PARAMETER] = true;
+		parameter = string(optarg);
+		
+		if ( parameter == "simplify")
+		  parameters[P_SIMPLIFY] = true;
+		else if (parameter == "finalloop")
+		  parameters[P_FINALLOOP] = true;
+		else if (parameter == "communicationonly")
+		  parameters[P_COMMUNICATIONONLY] = true;
+		else if (parameter == "cyclicwhile")
+		  parameters[P_CYCLICWHILE] = true;
+		else if (parameter == "cycliceh")
+		  parameters[P_CYCLICEH] = true;
+		else if (parameter == "nostandardfaults")
+		  parameters[P_NOSTANDARDFAULTS] = true;
+		else if (parameter == "nofhfaults")
+		  parameters[P_NOFHFAULTS] = true;
+		else if (parameter == "novariables")
+		  parameters[P_NOVARIABLES] = true;
+		else
+		  trace(TRACE_ALWAYS, "Unknown parameter \"" + parameter +"\".\n");
+		
+		break;
 	      }
-//	      else if ( parameter == "nointerface" )
-//	      {
-//	        parameters[P_NOINTERFACE] = true;
-//	      }
-//	      else if ( parameter == "finalmarking" )
-//	      {
-//	        parameters[P_FINALMARKING] = true;
-//	      }
-//	      else if ( parameter == "uniquefault" )
-//	      {
-//	        parameters[P_UNIQUEFAULT] = true;
-//	      }
-	      else if ( parameter == "finalloop" )
-	      {
-	        parameters[P_FINALLOOP] = true;
-	      }
-	      else if ( parameter == "communicationonly" )
-	      {
-	        parameters[P_COMMUNICATIONONLY] = true;
-	      }
-//	      else if ( parameter == "newlinks" )
-//	      {
-//	        parameters[P_NEWLINKS] = true;
-//	      }
-	      else if ( parameter == "cyclicwhile" )
-	      {
-	        parameters[P_CYCLICWHILE] = true;
-	      }
-	      else if ( parameter == "cycliceh" )
-	      {
-	        parameters[P_CYCLICEH] = true;
-	      }
-	      else if ( parameter == "nostandardfaults" )
-	      {
-		parameters[P_NOSTANDARDFAULTS] = true;
-	      }
-	      else if ( parameter == "nofhfaults" )
-	      {
-		parameters[P_NOFHFAULTS] = true;
-	      }
-	      else if ( parameter == "novariables" )
-	      {
-		parameters[P_NOVARIABLES] = true;
-	      }
-	      else
-	      {
-//		throw Exception(OPTION_MISMATCH, 
-		trace(TRACE_ALWAYS, "Unknown parameter \"" + parameter +"\".\n");
-	      }
-	      break;
+
       case 'd':
-	      options[O_DEBUG] = true;
-	      parameter = string(optarg);
-	      if ( parameter == "flex" )
 	      {
-		yy_flex_debug = 1;
+		options[O_DEBUG] = true;
+		parameter = string(optarg);
+		
+		if (parameter == "flex")
+		  yy_flex_debug = 1;
+		else if (parameter == "bison")
+		  yydebug = 1;
+		else if (parameter == "1")
+		  debug_level = TRACE_WARNINGS;
+		else if (parameter == "2")
+		  debug_level = TRACE_INFORMATION;
+		else if (parameter == "3")
+		  debug_level = TRACE_DEBUG;
+		else if (parameter == "4")
+		  debug_level = TRACE_VERY_DEBUG;
+		else
+		  trace(TRACE_ALWAYS, "Unrecognised debug mode!\n");
+		
+		break;
 	      }
-	      else if ( parameter == "bison" )
-	      {
-		yydebug = 1;
-	      }
-	      else if ( parameter == "1" )
-	      {
-		debug_level = TRACE_WARNINGS;
-	      }
-	      else if ( parameter == "2" )
-	      {
-		debug_level = TRACE_INFORMATION;
-	      }
-	      else if ( parameter == "3" )
-	      {
-		debug_level = TRACE_DEBUG;
-	      }
-	      else if ( parameter == "4" )
-	      {
-		debug_level = TRACE_VERY_DEBUG;
-	      }
-	      else
-	      {
-		trace(TRACE_ALWAYS, "Unrecognised debug mode!\n");
-	      }
-	      break;
+
       default:
-	      trace("Unknown option!\n");
-             break;
+	      {
+		trace("Unknown option!\n");
+		break;
+	      }
       }
-      
   }
 
 
@@ -677,26 +560,35 @@ void parse_command_line(int argc, char* argv[])
   }
   
   if (options[O_LOG])
-  {
     trace(TRACE_INFORMATION, " - Logging additional information to \"" + log_filename + "\"\n");
-  }
 
 }
 
-ostream * openOutput(string name)
+
+
+
+
+/*!
+ * Open output file.
+ */
+ostream *openOutput(string name)
 {
-  ofstream * file = new ofstream(name.c_str(), ofstream::out | ofstream::trunc | ofstream::binary);
+  ofstream *file = new ofstream(name.c_str(), ofstream::out | ofstream::trunc | ofstream::binary);
+  
   if (!file->is_open())
-  {
-	    trace(TRACE_ALWAYS, "File \"" + name + "\" could not be opened for writing access!\n");
-	  
-//    throw Exception(FILE_NOT_OPEN, "File \"" + name + "\" could not be opened for writing access!\n");
-  } 
+    trace(TRACE_ALWAYS, "File \"" + name + "\" could not be opened for writing access!\n");
 
   return file;
 }
 
-void closeOutput(ostream * file)
+
+
+
+
+/*!
+ * Closes the output file.
+ */
+void closeOutput(ostream *file)
 {
   if ( file != NULL )
   {

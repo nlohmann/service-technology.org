@@ -29,11 +29,11 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/07/11 22:32:28 $
+ *          - last changed: \$Date: 2006/07/12 09:06:38 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
  */
 %}
 
@@ -363,6 +363,7 @@ Invoke(a,b) ->
 	  CFGBlock * block = new CFGBlock(CFGInvoke, $0->id, "Invoke");
 
 //NL	  block->channel_name = (dynamic_cast<STCommunicationActivity*>(symTab.lookup($0->id)))->channelId; 
+	  block->channel_name = $0->channelName;
 
 	  cfgMap[intToString($0->id)] = block; 
   	}
@@ -381,6 +382,7 @@ Receive(a,b) ->
 	  CFGBlock * block = new CFGBlock(CFGReceive, $0->id, "Receive"); 
 
 //NL	  block->channel_name = (dynamic_cast<STCommunicationActivity*>(symTab.lookup($0->id)))->channelId; 
+	  block->channel_name = $0->channelName;
 
 	  cfgMap[intToString($0->id)] = block; 
     	}
@@ -399,6 +401,7 @@ Reply(a,b) ->
 	  CFGBlock * block = new CFGBlock(CFGReply, $0->id, "Reply"); 
 
 //NL	  block->channel_name = (dynamic_cast<STCommunicationActivity*>(symTab.lookup($0->id)))->channelId; 
+	  block->channel_name = $0->channelName;
 
 	  cfgMap[intToString($0->id)] = block; 
   	}
@@ -672,6 +675,7 @@ Pick(a,b,c) ->
 	    CFGBlock * innerLast = cfgMap.find(intToString(innerActivity->id))->second->lastBlock;
 	    CFGBlock * onMessageBlock = new CFGBlock(CFGOnMessage, message->id, "OnMessage_" + intToString(i++)); 
 //NL	    onMessageBlock->channel_name = (dynamic_cast<STCommunicationActivity*>(symTab.lookup($0->id)))->channelId; 
+	    onMessageBlock->channel_name = $0->channelName;
 	  
 	    connectBlocks(firstBlock, onMessageBlock);
 	    connectBlocks(onMessageBlock, innerFirst);
@@ -768,7 +772,9 @@ This=StandardElements(a,b, jc) ->
 //NL	  STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
 	  //CFGBlock * target = new CFGBlock(CFGTarget, $0->parentId, "Target_" + std::string(linkST->name));
 //NL	  CFGBlock * target = new CFGBlock(CFGTarget, link->id, "Target_" + std::string(linkST->name));
+          CFGBlock * target = new CFGBlock(CFGTarget, link->id, "Target_" + link->linkName);
 //NL	  targets["Source_" + std::string(linkST->name)] = target;
+	  targets["Source_" + link->linkName] = target;
 	  /// \todo: use link to connect source and target
 /*	  for (list<CFGBlock *>::iterator iter = innerFirst->prevBlocks.begin(); iter != innerFirst->prevBlocks.end(); iter++)
 	  {
@@ -777,9 +783,10 @@ This=StandardElements(a,b, jc) ->
 	    innerFirst->prevBlocks.remove((*iter));
 	    connectBlocks((*iter), target);
 	  }
-*///NL	  connectBlocks(target, innerFirst->firstBlock);
-//NL	  innerFirst->firstBlock = target;
-//NL	  target->lastBlock = innerLast->lastBlock;
+*/
+	  connectBlocks(target, innerFirst->firstBlock);
+	  innerFirst->firstBlock = target;
+	  target->lastBlock = innerLast->lastBlock;
       }
 
       foreach (link; tSource_list b)
@@ -788,7 +795,10 @@ This=StandardElements(a,b, jc) ->
 //NL	  STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
 	  //CFGBlock * source = new CFGBlock(CFGSource, $0->parentId, "Source_" + std::string(linkST->name));
 //NL	  CFGBlock * source = new CFGBlock(CFGSource, link->id, "Source_" + std::string(linkST->name));
+	  CFGBlock * source = new CFGBlock(CFGSource, link->id, "Source_" + link->linkName);
 //NL	  sources["Target_" + std::string(linkST->name)] = source;
+	  sources["Target_" + link->linkName] = source;
+
 	  /// \todo: use link to connect source and target
 
 /*	  for (list<CFGBlock *>::iterator iter = innerLast->nextBlocks.begin(); iter != innerLast->nextBlocks.end(); iter++)
@@ -801,10 +811,10 @@ This=StandardElements(a,b, jc) ->
 	    connectBlocks(source, next);
 	  }
 */
-//NL	  connectBlocks(innerLast->lastBlock, source);
-//NL	  innerLast->lastBlock = innerFirst->lastBlock = source;
+	  connectBlocks(innerLast->lastBlock, source);
+	  innerLast->lastBlock = innerFirst->lastBlock = source;
 	  // trace("set last block again\n");
-//NL	  innerFirst->firstBlock->lastBlock = source;
+	  innerFirst->firstBlock->lastBlock = source;
 	  trace(TRACE_DEBUG, "[CFG] ~Source\n");
 
       }

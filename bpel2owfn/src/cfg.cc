@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/07/14 13:48:34 $
+ *          - last changed: \$Date: 2006/07/14 14:26:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -556,7 +556,7 @@ void CFGBlock::checkForConflictingReceive()
       for (list<CFGBlock *>::iterator iter = blockBegin; iter != nextBlocks.end(); iter++)
       {
 	// the actual check for duplicate receives but only for flows
-	if (type == CFGFlow && label == "Flow_begin")
+	if (type == CFGFlow && label == "Flow_begin" || type == CFGProcess && label == "Process_begin")
 	{
 	  for (set< pair< std::string, long> >::iterator elemA = (*iter)->receives.begin(); elemA != (*iter)->receives.end(); elemA++)
 	  {
@@ -587,8 +587,8 @@ void CFGBlock::checkForConflictingReceive()
 	      cerr << "               " << (*iter)->channel_name << " (" << (*iter)->id << ") vs. " << (*otherBlock)->channel_name << " (" << (*otherBlock)->id << ")" << endl;
 		trace("\n");
 	    }
-	    receives.insert(pair<std::string, long>( ((kc::impl_tOnMessage*)ASTEmap[id]->node)->channelName, (*iter)->id));
 	  }
+	  receives.insert(pair<std::string, long>( ((kc::impl_tOnMessage*)ASTEmap[(*iter)->id]->node)->channelName, (*iter)->id));
 	}
 	// 
 	receives = setUnion(receives, (*iter)->receives);

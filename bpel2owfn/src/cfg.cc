@@ -27,18 +27,18 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/07/11 22:32:29 $
+ *          - last changed: \$Date: 2006/07/14 13:48:34 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.25 $
+ * \version \$Revision: 1.26 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -50,7 +50,10 @@
 #include "options.h"
 #include "debug.h"
 #include "ast-printers.h"
+#include "ast-details.h"
 
+extern map<unsigned int, map<string, string> > temporaryAttributeMap;
+extern map<unsigned int, ASTE*> ASTEmap;
 
 /// The CFG
 CFGBlock * TheCFG = NULL;
@@ -345,7 +348,7 @@ void connectBlocks(CFGBlock * from, CFGBlock * to)
  *
  *
  */
-/*	void CFGBlock::checkForUninitializedVariables()
+void CFGBlock::checkForUninitializedVariables()
 {
 
   if (processed)
@@ -407,73 +410,52 @@ void connectBlocks(CFGBlock * from, CFGBlock * to)
   }
 
   // checking Variables for this Block
-  STVariable * stVar = NULL;
+  std::string var = "";
   std::string attributeName = "variable";
-  try
+
+  switch(type)
   {
-    switch(type)
-    {
-      case CFGReply     : stVar = (dynamic_cast<STReply*>     (symTab.lookup(id)))->variable; break;
-      case CFGFrom      : stVar = (dynamic_cast<STFromTo*>    (symTab.lookup(id)))->variable; break;
-      case CFGInvoke    : stVar = (dynamic_cast<STInvoke*>    (symTab.lookup(id)))->inputVariable; 
-			  attributeName = "inputVariable";
-			  break;
-      default: // should not happen (thinks Niels)
-    }
-  }
-  catch (bad_cast)
-  {
-    throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+    case CFGReply     : var = ((kc::impl_tReply*)ASTEmap[id]->node)->variableName; break;
+    case CFGFrom      : var = ((kc::impl_tFrom*)ASTEmap[id]->node)->variableName; break;
+    case CFGInvoke    : var = ((kc::impl_tInvoke*)ASTEmap[id]->node)->inputVariableName; 
+			attributeName = "inputVariable";
+			break;
   }
   
-  if ((type == CFGReply || type == CFGFrom || type == CFGInvoke) && stVar != NULL)
+  if ((type == CFGReply || type == CFGFrom || type == CFGInvoke) && var != "")
   {
-    std::string var = stVar->name;
-    if (var != "")
+    if (initializedVariables.find(var) == initializedVariables.end())
     {
-      if (initializedVariables.find(var) == initializedVariables.end())
-      {
-	trace("[CFG] WARNING: Variable \"" + symTab.readAttributeValue(id, attributeName) 
+      trace("[CFG] WARNING: Variable \"" + temporaryAttributeMap[id][attributeName] 
 //	      + "\" ("+ var +") (activity ID = " 
 //	      + intToString(id->value)  
 	      + "\" in line " 
-	      + intToString(symTab.readAttribute(id, attributeName)->line) 
+// TODO new line number	      + intToString(symTab.readAttribute(id, attributeName)->line) 
 	      + " might be undefined!\n\n");
-      }
     }
   }
   
   // adding Variables for this Block
-  stVar = NULL;
+  var = "";
   attributeName = "variable";
-  try
+    
+  switch(type)
   {
-    switch(type)
-    {
-      case CFGReceive   : stVar = (dynamic_cast<STReceive*>   (symTab.lookup(id)))->variable; break;
-      case CFGCatch     : stVar = (dynamic_cast<STCatch*>     (symTab.lookup(id)))->faultVariable; 
-			  attributeName = "faultVariable"; 
-			  break;
-      case CFGTo        : stVar = (dynamic_cast<STFromTo*>    (symTab.lookup(id)))->variable; break;
-      case CFGInvoke    : stVar = (dynamic_cast<STInvoke*>    (symTab.lookup(id)))->outputVariable;
-			  attributeName = "outputVariable";
-			  break;
-      case CFGOnMessage : stVar = (dynamic_cast<STOnMessage*> (symTab.lookup(id)))->variable; break;
-      default: // should not happen (thinks Niels)
-    }
-  }
-  catch (bad_cast)
-  {
-    throw Exception(CHECK_SYMBOLS_CAST_ERROR, "Could not cast correctly", pos(__FILE__, __LINE__, __FUNCTION__));
+    case CFGReceive   : var = ((kc::impl_tReceive*)ASTEmap[id]->node)->variableName; break;
+    case CFGCatch     : var = ((kc::impl_tCatch*)ASTEmap[id]->node)->variableName; 
+			attributeName = "faultVariable"; 
+			break;
+    case CFGTo        : var = ((kc::impl_tTo*)ASTEmap[id]->node)->variableName; break;
+    case CFGInvoke    : var = ((kc::impl_tInvoke*)ASTEmap[id]->node)->outputVariableName;
+			attributeName = "outputVariable";
+			break;
+    case CFGOnMessage : var = ((kc::impl_tOnMessage*)ASTEmap[id]->node)->variableName; break;
+//      default: // should not happen (thinks Niels)
   }
   
-  if ((type == CFGReceive || type == CFGCatch || type == CFGTo || type==CFGInvoke || type == CFGOnMessage) && stVar != NULL)
+  if ((type == CFGReceive || type == CFGCatch || type == CFGTo || type==CFGInvoke || type == CFGOnMessage) && var != "")
   {
-    std::string var = stVar->name;
-    if (var != "")
-    {
-      initializedVariables.insert(var); 
-    }
+    initializedVariables.insert(var); 
   }
   
   if (! nextBlocks.empty())
@@ -483,10 +465,8 @@ void connectBlocks(CFGBlock * from, CFGBlock * to)
       (*iter)->checkForUninitializedVariables();
     }
   }  
-}*/
+}
 
-
-/*
 
 /// checks for cyclic links
 void CFGBlock::checkForCyclicLinks()
@@ -496,9 +476,13 @@ void CFGBlock::checkForCyclicLinks()
     processed = true;
     std::string linkname = "";
 
-    if (type == CFGTarget || type == CFGSource)
+    if (type == CFGTarget)
     {
-      linkname = (dynamic_cast<STSourceTarget*>(symTab.lookup(id)))->link->name;
+      linkname = ((kc::impl_tTarget*)ASTEmap[id]->node)->linkName; //(dynamic_cast<STSourceTarget*>(symTab.lookup(id)))->link->name;
+    }
+    else if (type == CFGSource)
+    {
+      linkname = ((kc::impl_tSource*)ASTEmap[id]->node)->linkName; //(dynamic_cast<STSourceTarget*>(symTab.lookup(id)))->link->name;
     }
 
     
@@ -529,9 +513,7 @@ void CFGBlock::checkForCyclicLinks()
     }
   }
 }
-*/
 
-/*
 /// checks for conflicting receives
 void CFGBlock::checkForConflictingReceive()
 {
@@ -583,8 +565,8 @@ void CFGBlock::checkForConflictingReceive()
 	      if(elemA->first == elemB->first && elemA->second != elemB->second && receives.find(*elemA) == receives.end())
 	      {
 		trace("[CFG] WARNING: There are conflicting receives!\n");
-		trace("               Please check lines " + intToString((dynamic_cast<STElement*>(symTab.lookup(elemA->second)))->line));
-		trace(                " and " + intToString((dynamic_cast<STElement*>(symTab.lookup(elemB->second)))->line) + "\n");
+//		trace("               Please check lines " + intToString((dynamic_cast<STElement*>(symTab.lookup(elemA->second)))->line));
+//		trace(                " and " + intToString((dynamic_cast<STElement*>(symTab.lookup(elemB->second)))->line) + "\n");
 		cerr << "               " << elemA->first << " (" << elemA->second << ") vs. " << elemB->first << " (" << elemB->second << ")" << endl;
 		trace("\n");
 	      }
@@ -600,12 +582,12 @@ void CFGBlock::checkForConflictingReceive()
 	    if ((*otherBlock)->type == CFGOnMessage && (*iter)->channel_name == (*otherBlock)->channel_name) 
 	    {
 	      trace("[CFG] WARNING: There are conflicting onMessage conditions!\n");
-	      trace("               Please check lines " + intToString((dynamic_cast<STElement*>(symTab.lookup((*iter)->id)))->line));
-	      trace(                " and " + intToString((dynamic_cast<STElement*>(symTab.lookup((*otherBlock)->id)))->line) + "\n");
+//	      trace("               Please check lines " + intToString((dynamic_cast<STElement*>(symTab.lookup((*iter)->id)))->line));
+//	      trace(                " and " + intToString((dynamic_cast<STElement*>(symTab.lookup((*otherBlock)->id)))->line) + "\n");
 	      cerr << "               " << (*iter)->channel_name << " (" << (*iter)->id << ") vs. " << (*otherBlock)->channel_name << " (" << (*otherBlock)->id << ")" << endl;
 		trace("\n");
 	    }
-	    receives.insert(pair<std::string, long>( (dynamic_cast<STOnMessage*>(symTab.lookup((*iter)->id)))->channelId, (*iter)->id));
+	    receives.insert(pair<std::string, long>( ((kc::impl_tOnMessage*)ASTEmap[id]->node)->channelName, (*iter)->id));
 	  }
 	}
 	// 
@@ -621,8 +603,8 @@ void CFGBlock::checkForConflictingReceive()
 	  if(elemA->first == elemB->first && elemA->second != elemB->second && receives.find(*elemA) == receives.end())
 	  {
 	      trace("[CFG] WARNING: There are conflicting receives!\n");
-	      trace("               Please check lines " + intToString((dynamic_cast<STElement*>(symTab.lookup(elemA->second)))->line));
-	      trace(                " and " + intToString((dynamic_cast<STElement*>(symTab.lookup(elemB->second)))->line) + "\n");
+//	      trace("               Please check lines " + intToString((dynamic_cast<STElement*>(symTab.lookup(elemA->second)))->line));
+//	      trace(                " and " + intToString((dynamic_cast<STElement*>(symTab.lookup(elemB->second)))->line) + "\n");
 	      cerr << "               " << elemA->first << " (" << elemA->second << ") vs. " << elemB->first << " (" << elemB->second << ")" << endl;
 		trace("\n");
 	  }
@@ -632,12 +614,12 @@ void CFGBlock::checkForConflictingReceive()
     }
     if (type == CFGReceive)
     {
-      receives.insert(pair<std::string, long>( (dynamic_cast<STReceive*>(symTab.lookup(id)))->channelId, id));
+      receives.insert(pair<std::string, long>( ((kc::impl_tReceive*)ASTEmap[id]->node)->channelName, id));
     }
     if (type == CFGInvoke)
     {
-      if( (dynamic_cast<STInvoke*> (symTab.lookup(id)))->outputVariable != NULL) {
-	receives.insert(pair<std::string, long>( (dynamic_cast<STInvoke*>(symTab.lookup(id)))->channelId, id));
+      if( temporaryAttributeMap[id]["outputVariable"] != "") {
+	receives.insert(pair<std::string, long>( ((kc::impl_tInvoke*)ASTEmap[id]->node)->channelName, id));
       }
     }
     if (!prevBlocks.empty())
@@ -661,10 +643,6 @@ void CFGBlock::checkForConflictingReceive()
 
 }
 
-*/
-
-
-
 
 
 
@@ -686,16 +664,16 @@ void processCFG()
 
   trace(TRACE_DEBUG, "[CFG] checking for cyclic links\n");
   /// \todo (gierds) check for cyclic links, otherwise we will fail
-//  TheCFG->checkForCyclicLinks();
+  TheCFG->checkForCyclicLinks();
   TheCFG->resetProcessedFlag(true);
 
   trace(TRACE_DEBUG, "[CFG] checking for uninitialized variables\n");
   // test
-//  TheCFG->checkForUninitializedVariables();
+  TheCFG->checkForUninitializedVariables();
   TheCFG->resetProcessedFlag();
   // end test
 
-//  TheCFG->lastBlock->checkForConflictingReceive();
+  TheCFG->lastBlock->checkForConflictingReceive();
   TheCFG->resetProcessedFlag(true, false);
 
   

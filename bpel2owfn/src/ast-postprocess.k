@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/07/12 11:37:02 $
+ *          - last changed: \$Date: 2006/07/14 12:47:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
  */
 %}
 
@@ -1186,6 +1186,7 @@ Scope(a,b,c,d,e,f,g) ->
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      $0->parentScopeId = PPcurrentScope;
       PPcurrentScope = myid;
       a->parentId = myid;
 
@@ -1218,6 +1219,7 @@ Scope(a,b,c,d,e,f,g) ->
     a b c d e f g
     {
       PPcurrentScope = ASTEmap[myid]->parentScopeId;
+
       assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);
 
       // add an attribute to the compensation handler

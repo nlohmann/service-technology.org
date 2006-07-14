@@ -1,7 +1,7 @@
 // User configuration file for LoLA
 
 // specify whether each new operation shall be logged
-#define LOG_NEW
+//#define LOG_NEW
 
 // Select your operating system
 #define WINDOWS
@@ -12,7 +12,7 @@
 // Set CAPACITY to 1 for safe nets. Do not define CAPACITY if
 // you do not know upper limits for the number of tokens on places.
 
-//#define CAPACITY 10
+#define CAPACITY 4
 
 // REPORTFREQUENCY controls the output of progress messages to the
 // terminal (to be precise: to the standard error stream).

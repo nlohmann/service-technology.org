@@ -13,7 +13,7 @@
 
 #include <string>
 #include <ostream>
-#include <map>
+#include <set>
 
 #include "enums.h"
 
@@ -23,9 +23,23 @@
 
 using namespace std;
 
+class State;
 class graphEdge;
-class stateList;
 class successorNodeList;
+class clause;
+class CNF;
+
+
+struct StateCompare {
+
+  bool operator() ( State const * left, State const * right) {
+    return (left < right);
+  }
+
+}; // StateCompare 
+
+
+typedef std::set<State*, StateCompare> StateSet;
 
 
 class vertex
@@ -34,11 +48,12 @@ protected:
 	vertexColor color; 						//!< color of vertex
 	successorNodeList * successorNodes;		//!< list of all the nodes succeeding this one 
 											//!< including the edge between them
-	stateList * states;						//!< list of states of this node
 
  //   successorNodeList * predecessorNodes;	//!< list of vertices that point to this vertex
 
     unsigned int numberOfVertex;					//!< number of this vertex in the graph
+    
+    CNF * annotation;						//!< annotation of this node (a CNF)
     
 public:
 	vertex();
@@ -49,27 +64,34 @@ public:
 	int eventsToBeSeen;
 	
     unsigned int getNumber();
+    
+    StateSet setOfStates;
+    
     void setNumber(unsigned int);
-    void setStateList(stateList *);
-    // void addSuccessorNode(vertex *, char *, edgeType);
     void addSuccessorNode(graphEdge *);
+    
+    bool addState(State *);
+    
+    void addClause(clause *);
+    void setAnnotationEdges(graphEdge *);
+    
     graphEdge * getNextEdge();
     successorNodeList * getSuccessorNodes();
- //   successorNodeList * getPredecessorNodes();
     
     void resetIteratingSuccNodes();
-    
-    stateList * getStateList();
-    
-   // void addPredecessorNode(vertex *, char *, edgeType);  
-//    void addPredecessorNode(graphEdge *);  
+   
     void setColor(vertexColor c);
     vertexColor getColor();
-    int getNumberOfDeadlocks();
     
-    friend bool operator == (vertex const&, vertex const& );		// could be changed and replaced by hash-value
+    string getCNF();
+    
+    int getNumberOfDeadlocks();
+    analysisResult analyseNode(bool);
+    
+    
+//    friend bool operator == (vertex const&, vertex const& );		// could be changed and replaced by hash-value
     friend bool operator < (vertex const&, vertex const& );
-    friend ostream& operator << (std::ostream& os, const vertex& v);
+//    friend ostream& operator << (std::ostream& os, const vertex& v);
 
     
 };

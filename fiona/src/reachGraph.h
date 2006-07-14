@@ -26,9 +26,7 @@
 using namespace std;
 
 class oWFN;
-class reachGraphState;
-
-enum analysisResult {TERMINATE, CONTINUE};  //!< needed as feedback of the "analysis" function, whether this node is an end node or not
+class State;
 
 struct compareVertices {
   bool operator() (vertex const * left, vertex const * right) {
@@ -106,16 +104,16 @@ public:
 
     void buildGraphRandom();
 
-    stateList * calculateSuccStatesInput(unsigned int, vertex *);
-    stateList * calculateSuccStatesOutput(unsigned int, vertex *);
+    void calculateSuccStatesInput(unsigned int, vertex *, vertex *);
+    void calculateSuccStatesOutput(unsigned int, vertex *, vertex *);
 
-    stateList * calculateSuccStatesInput(messageMultiSet, vertex *);
-    stateList * calculateSuccStatesOutput(messageMultiSet, vertex *);
+    void calculateSuccStatesInput(messageMultiSet, vertex *, vertex *);
+    void calculateSuccStatesOutput(messageMultiSet, vertex *, vertex *);
 
     void printGraphToDot(vertex * v, fstream& os, bool[]);
     void printDotFile();
 
-    bool stateActivatesOutputEvents(reachGraphState *);
+    bool stateActivatesOutputEvents(State *);
 
     analysisResult analyseNode(vertex *, bool);
 };

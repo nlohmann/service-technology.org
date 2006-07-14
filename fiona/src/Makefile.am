@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006-07-06 13:37:30 $ by $Author: bretschn $.
-# Version $Revision: 1.5 $
+# File last changed $Date: 2006-07-14 11:48:33 $ by $Author: weinberg $.
+# Version $Revision: 1.6 $
 
 bin_PROGRAMS = fiona
 
@@ -31,11 +31,12 @@ YYSOURCES = syntax.h lexer.cc syntax.cc
 # the list of sources
 fiona_SOURCES = syntax.yy syntax.h syntax_wrap.h lexer.ll\
 		petriNetNode.h petriNetNode.cc\
+		CNF.cc CNF.h\
 		IG.cc owfnPlace.cc reachGraph.h\
 		IG.h owfnPlace.h\
 		OG.cc owfnTransition.cc\
-		OG.h  graph.cc owfnTransition.h stateList.cc\
-		debug.cc graph.h stateList.h\
+		OG.h  graph.cc owfnTransition.h\
+		debug.cc graph.h\
 		debug.h graphEdge.cc successorNodeList.cc\
 		dimensions.cc graphEdge.h successorNodeList.h\
 		dimensions.h main.cc symboltab.cc\

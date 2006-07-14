@@ -77,7 +77,7 @@ vertexColor reachGraphState::calcColor() {
 
 	trace(TRACE_5, "reachGraphState::calcColor(): start\n");
 
-	if (firstElement == NULL) {		// since theres is no clause we can't conclude anything
+	if (firstElement == NULL) {		// since there is no clause we can't conclude anything
 		return BLACK;	
 	}
 

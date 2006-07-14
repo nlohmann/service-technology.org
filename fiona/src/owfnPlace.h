@@ -25,12 +25,13 @@ enum placeType {INPUT, OUTPUT, INTERNAL, INITIAL, FINAL};	//< type of place
 
 class owfnPlace : public Node {
 	private :
-		placeType type;		// type of place (input, output, internal, initial, final)  
 		oWFN * net;			// pointer to underlying petri net (needed for hash value)
 		
  	public:
 	  	owfnPlace(char *, placeType, oWFN *);
 	  	~owfnPlace();
+
+		placeType type;		// type of place (input, output, internal, initial, final)  
 		
 		unsigned int initial_marking;
 	  	unsigned int hash_factor;
@@ -46,7 +47,7 @@ class owfnPlace : public Node {
 	  	int capacity;   // maximum capacity
 	  	int nrbits;     // nr of bits required for storing its marking (= log capacity)
 		int startbit;   // first bit representing this place in bit vector
-		placeType getType();
+	//	placeType getType();
 		unsigned int cardprop; // number of propositions in final condition that mention this place
 		formula ** proposition; // array of propositions in final condition that mention this place
 					// used for quick re-evaluation of condition

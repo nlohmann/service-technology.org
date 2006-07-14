@@ -1260,7 +1260,7 @@ yyreduce:
 					pl->ArrivingArcs[pl->NrOfArriving] = PN->Transitions[i]->LeavingArcs[j];
 					pl->NrOfArriving++;
 					
-					if (pl->getType() == OUTPUT) {
+					if (pl->type == OUTPUT) {
 						PN->commDepth += PN->Transitions[i]->LeavingArcs[j]->Multiplicity;
 					}
 				}
@@ -1270,7 +1270,7 @@ yyreduce:
 					pl->LeavingArcs[pl->NrOfLeaving] = PN->Transitions[i]->ArrivingArcs[j];
 					pl->NrOfLeaving ++;
 					
-					if (pl->getType() == INPUT) {
+					if (pl->type == INPUT) {
 						PN->commDepth += PN->Transitions[i]->ArrivingArcs[j]->Multiplicity;
 					}
 				}

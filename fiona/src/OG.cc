@@ -9,6 +9,7 @@
 #include "debug.h"
 #include "successorNodeList.h"
 #include "BddRepresentation.h" 
+#include "CNF.h"
 
 #ifdef LOG_NEW
 #include "mynew.h"
@@ -53,9 +54,9 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	trace(TRACE_1, intToString(currentNode->getNumber()) + ", \t current depth: " + intToString(actualDepth) + "\n");
 
 	trace(TRACE_3, "\t number of states in node: ");
-	trace(TRACE_3, intToString(currentNode->getStateList()->setOfReachGraphStates.size()) + "\n");
+	trace(TRACE_3, intToString(currentNode->setOfStates.size()) + "\n");
 
-	stateList * newNodeStateList;
+//	stateList * newNodeStateList;
 	
 	// get the annotation of the node (CNF)
 	getInputEvents(currentNode);				// all input events considered,
@@ -108,9 +109,9 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 			currentVertex = currentNode;
 			
 			trace(TRACE_5, "calculating successor states\n");
-			newNodeStateList = calculateSuccStatesInput(PN->inputPlacesArray[i], currentNode);
+			calculateSuccStatesInput(PN->inputPlacesArray[i], currentNode, v);
 			trace(TRACE_5, "calculating successor states succeeded\n");
-			v->setStateList(newNodeStateList);
+		//	v->setStateList(newNodeStateList);
 
 			if (AddVertex (v, i, sending)) {
 				buildGraph(v);				// going down with sending event...
@@ -164,9 +165,9 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 			currentVertex = currentNode;
 			
 			trace(TRACE_5, "calculating successor states\n");
-			newNodeStateList = calculateSuccStatesOutput(PN->outputPlacesArray[i], currentNode);
+			calculateSuccStatesOutput(PN->outputPlacesArray[i], currentNode, v);
 			trace(TRACE_5, "calculating successor states succeeded\n");
-			v->setStateList(newNodeStateList);
+		//	v->setStateList(newNodeStateList);
 			
 			if (AddVertex (v, i, receiving)) {
 				buildGraph(v);				// going down with receiving event...
@@ -201,9 +202,9 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	if (options[O_BDD] == true){
 		bdd->addOrDeleteLeavingEdges(currentNode);
 		
-		currentNode->resetIteratingSuccNodes();
+	//	currentNode->resetIteratingSuccNodes();
 		
-		if (currentNode->getStateList()->setOfReachGraphStates.size() != 0){
+		if (currentNode->setOfStates.size() != 0){
 			 
 			graphEdge* element;
 			//cout << "currentNode: " << currentNode->getNumber() << "\tdelete node: ";
@@ -234,18 +235,22 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 void operatingGuidelines::getInputEvents(vertex * node) {
 	
 	trace(TRACE_5, "operatingGuidelines::getInputEvents(vertex * node): start\n");
-	reachGraphStateSet::iterator iter;			// iterator over the stateList's elements
+	StateSet::iterator iter;			// iterator over the stateList's elements
+	
+	clause * cl = new clause();
 	
 	for (int i = 0; i < PN->placeInputCnt; i++) {
 		// iterate over all states of the node
-		for (iter = node->getStateList()->setOfReachGraphStates.begin();
-			 iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
-			if ((*iter)->state->type == DEADLOCK || (*iter)->state->type == FINALSTATE)  {
+		for (iter = node->setOfStates.begin();
+			 iter != node->setOfStates.end(); iter++) {
+			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {
 				// we just consider the maximal states only
-				(*iter)->addClauseElement(PN->Places[PN->inputPlacesArray[i]]->name);
+				cl->addLiteral(PN->Places[PN->inputPlacesArray[i]]->name);
 			}
 		}			
 	}
+	
+	node->addClause(cl);
 	trace(TRACE_5, "operatingGuidelines::getInputEvents(vertex * node): end\n");
 }
 
@@ -257,27 +262,30 @@ void  operatingGuidelines::getActivatedOutputEvents(vertex * node) {
 	trace(TRACE_5, "operatingGuidelines::getActivatedOutputEvents(vertex * node): start\n");
 	int i;
 	
-	reachGraphStateSet::iterator iter;			// iterator over the stateList's elements
+	clause * cl = new clause();
+	
+	StateSet::iterator iter;			// iterator over the stateList's elements
 	
 	// iterate over all states of the node
-	for (iter = node->getStateList()->setOfReachGraphStates.begin();
-         iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
+	for (iter = node->setOfStates.begin();
+         iter != node->setOfStates.end(); iter++) {
 		
 		// we just consider the maximal states only
-		if ((*iter)->state->type == DEADLOCK  || (*iter)->state->type == FINALSTATE)  {
+		if ((*iter)->type == DEADLOCK  || (*iter)->type == FINALSTATE)  {
 			int i;
 			int k = 0;
 			
-			(*iter)->state->decode(PN);
+			(*iter)->decode(PN);
 						
 			for (i = 0; i < PN->placeOutputCnt; i++) {
 				
 				if (PN->CurrentMarking[PN->outputPlacesArray[i]] > 0) {
-					(*iter)->addClauseElement(PN->Places[PN->outputPlacesArray[i]]->name);	
+					cl->addLiteral(PN->Places[PN->outputPlacesArray[i]]->name);	
 				}	
 			}
 		}
 	}
+	node->addClause(cl);
 	trace(TRACE_5, "operatingGuidelines::getActivatedOutputEvents(vertex * node): end\n");
 }
 

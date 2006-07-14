@@ -15,7 +15,7 @@
 #include<iosfwd>
 #include<iostream>
 #include <string>
-#include "stateList.h"
+//#include "stateList.h"
 #include "formula.h"
 #include "main.h"
 
@@ -95,18 +95,18 @@ class oWFN  {
 		void addPlace(unsigned int, owfnPlace *);
 		void addTransition(unsigned int, owfnTransition *);
 
-		void addStateToList(stateList *, State *, bool);
-		void addSuccStatesToList(stateList *, State *);
+		void addStateToList(vertex *, State *, bool);
+		void addSuccStatesToList(vertex *, State *);
 		
-		void addStateToList(stateList *, State *);
+		void addStateToList(vertex *, State *);
 		
 		State * calculateNextSate();
 		
 	//	int setCurrentMarkingFromState(reachGraphState *);// extracts the marking of the given state
 		unsigned int * copyCurrentMarking();
-	//	void copyMarkingToCurrentMarking(unsigned int * copy);
-		void calculateReachableStates(stateList *, bool);
-		void calculateReachableStatesFull(stateList *, bool);
+		void copyMarkingToCurrentMarking(unsigned int * copy);
+		void calculateReachableStates(vertex *, bool);
+		void calculateReachableStatesFull(vertex *, bool);
 		
 		int addInputMessage(unsigned int);
 		int addInputMessage(messageMultiSet);			// adds input message to the current marking

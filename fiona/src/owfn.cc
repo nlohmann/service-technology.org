@@ -111,7 +111,7 @@ void oWFN::initialize() {
   	for(i=0; i < placeCnt; i++) {
 		Places[i]->index = i;
         
-        if ((Places[i]->getType() == INPUT) && (CurrentMarking[i] < Places[i]->capacity)) {
+        if ((Places[i]->type == INPUT) && (CurrentMarking[i] < Places[i]->capacity)) {
         	CurrentMarking[i] = Places[i]->capacity;
         } else {
         	CurrentMarking[i] = Places[i]->initial_marking;
@@ -148,10 +148,10 @@ void oWFN::initialize() {
 	
 	// get the data for those arrays from the places of the net
 	for (i = 0; i < placeCnt; i++) { // getPlaceCnt(); i++) {
-		if (Places[i]->getType() == INPUT) {
+		if (Places[i]->type == INPUT) {
 			// current place is from type input
 			inputPlacesArray[ki++] = i;
-		} else if (Places[i]->getType() == OUTPUT) {
+		} else if (Places[i]->type == OUTPUT) {
 			// current place is from type output
 			outputPlacesArray[ko++] = i;
 		}	
@@ -241,31 +241,31 @@ owfnTransition ** oWFN::quasiFirelist() {
 
 
 
-void oWFN::addStateToList(stateList * list, State * NewState, bool minimal) {
+void oWFN::addStateToList(vertex * n, State * NewState, bool minimal) {
 
 	if (parameters[P_CALC_ALL_STATES]
  		|| NewState->type == DEADLOCK
 		|| minimal
 		|| NewState->type == FINALSTATE) { 
 		
-		list->addElement(NewState, minimal);
+		n->addState(NewState);
 	}
 	
 	for(int i = 0; i < NewState->CardFireList; i++) {
-		addStateToList(list, NewState->succ[i]);
+		addStateToList(n, NewState->succ[i]);
 	}
 }
 
-void oWFN::addSuccStatesToList(stateList * list, State * NewState) {
+void oWFN::addSuccStatesToList(vertex * n, State * NewState) {
 	if (NewState != NULL) {
 		for(int i = 0; i < NewState->CardFireList; i++) {
-			addStateToList(list, NewState->succ[i]);
+			addStateToList(n, NewState->succ[i]);
 		}
 	}
 }
 
 
-void oWFN::addStateToList(stateList * list, State * currentState) {
+void oWFN::addStateToList(vertex * n, State * currentState) {
 		bool minimal = false;
 		
 //		unsigned int * myMarking;
@@ -273,8 +273,8 @@ void oWFN::addStateToList(stateList * list, State * currentState) {
 		currentState->decode(this);
 			
 		for (int z = 0; z < placeCnt; z++) {
-//			if (Places[z]->getType() == OUTPUT && myMarking[z] > 0) {
-			if (Places[z]->getType() == OUTPUT && CurrentMarking[z] > 0) {
+//			if (Places[z]->type == OUTPUT && myMarking[z] > 0) {
+			if (Places[z]->type == OUTPUT && CurrentMarking[z] > 0) {
 				minimal = true;
 				break;
 			}
@@ -282,7 +282,7 @@ void oWFN::addStateToList(stateList * list, State * currentState) {
 		
 		if (currentState != NULL) {
 			if (parameters[P_CALC_ALL_STATES] || currentState->type == DEADLOCK || minimal || currentState->type == FINALSTATE) { 
-				list->addElement(currentState, minimal);
+				n->addState(currentState);
 			}
 		} else {
 			return ;
@@ -290,37 +290,37 @@ void oWFN::addStateToList(stateList * list, State * currentState) {
 	
 	if (currentState != NULL) {
 		for(int i = 0; i < currentState->CardFireList; i++) {
-			addStateToList(list, currentState->succ[i]);
+			addStateToList(n, currentState->succ[i]);
 		}
 	}
 }
 
-//unsigned int * oWFN::copyCurrentMarking() {
-//	unsigned int * copy = new unsigned int [getPlaceCnt()];
-//
-//	for (int i = 0; i < getPlaceCnt(); i++) {
-//		copy[i] = CurrentMarking[i];
-//	
-//	}	
-//	return copy;
-//}
+unsigned int * oWFN::copyCurrentMarking() {
+	unsigned int * copy = new unsigned int [getPlaceCnt()];
 
-//void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
-//
-//	for (int i = 0; i < getPlaceCnt(); i++) {
-//		CurrentMarking[i] = copy[i];
-//	}	
-//	
-//	initializeTransitions();
-//}
+	for (int i = 0; i < getPlaceCnt(); i++) {
+		copy[i] = CurrentMarking[i];
+	
+	}	
+	return copy;
+}
+
+void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
+
+	for (int i = 0; i < getPlaceCnt(); i++) {
+		CurrentMarking[i] = copy[i];
+	}	
+	
+	//initializeTransitions();
+}
 
 
-//! \fn void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal)
+//! \fn void oWFN::calculateReachableStatesFull(vertex * listOfStates, bool minimal)
 //! \param listOfStates list containing all reachable states from the current marking (after function is done)
 //! \param minimal the current state is minimal in the vertex
 //! \brief NO REDUCTION! calculate all reachable states from the current marking and store them in the list being passed 
 //! as parameter (== vertex of reachGraph)
-void oWFN::calculateReachableStates(stateList * listOfStates, bool minimal) {
+void oWFN::calculateReachableStates(vertex * n, bool minimal) {
 
 	trace(TRACE_5, "oWFN::calculateReachableStates: start\n");
 
@@ -344,19 +344,19 @@ void oWFN::calculateReachableStates(stateList * listOfStates, bool minimal) {
   		CurrentState->succ = new State * [CardFireList+1];
   		CurrentState->placeHashValue = placeHashValue;
 		CurrentState->type = typeOfState();
-		listOfStates->addElement(CurrentState, minimal);
+		n->addState(CurrentState);
 	} else {
 		if (CurrentState->type == DEADLOCK || minimal || CurrentState->type == FINALSTATE) { 
-			if (listOfStates->addElement(CurrentState, minimal)) {
-				addSuccStatesToList(listOfStates, CurrentState);
+			if (n->addState(CurrentState)) {
+				addSuccStatesToList(n, CurrentState);
 			}
 		}
 	}
   	
 	// building EG in a node
   	while(CurrentState) {
-		if ((listOfStates->elementCount() % 1000) == 0) {
-			trace(TRACE_2, "\t current state count: " + intToString(listOfStates->elementCount()) + "\n");
+		if ((n->setOfStates.size() % 1000) == 0) {
+			trace(TRACE_2, "\t current state count: " + intToString(n->setOfStates.size()) + "\n");
 		}
 
 		// no more transition to fire from current state?
@@ -378,8 +378,8 @@ void oWFN::calculateReachableStates(stateList * listOfStates, bool minimal) {
 	  		if(NewState != NULL) {
 		  		// Current marking already in bintree 
 				if (NewState->type == DEADLOCK || minimal || NewState->type == FINALSTATE) { 
-					if (listOfStates->addElement(NewState, minimal)) {
-						addSuccStatesToList(listOfStates, NewState);
+					if (n->addState(NewState)) {
+						addSuccStatesToList(n, NewState);
 					}
 				}
 				
@@ -404,7 +404,7 @@ void oWFN::calculateReachableStates(stateList * listOfStates, bool minimal) {
 	      		CurrentState = NewState;
 		      		
 				if (NewState->type == DEADLOCK || minimal || NewState->type == FINALSTATE) { 
-					listOfStates->addElement(NewState, minimal);
+					n->addState(NewState);
 				}
 	    	}
 		// no more transition to fire
@@ -425,12 +425,12 @@ void oWFN::calculateReachableStates(stateList * listOfStates, bool minimal) {
 	trace(TRACE_5, "end of function oWFN::calculateReachableStates\n");
 }
 
-//! \fn void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal)
+//! \fn void oWFN::calculateReachableStatesFull(vertex * listOfStates, bool minimal)
 //! \param listOfStates list containing all reachable states from the current marking (after function is done)
 //! \param minimal the current state is minimal in the vertex
 //! \brief NO REDUCTION! calculate all reachable states from the current marking and store them in the list being passed 
 //! as parameter (== vertex of reachGraph)
-void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) {
+void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 
 	// calculates the EG starting at the current marking
 	
@@ -442,10 +442,14 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
   	stateType type;
 	CurrentState = binSearch(this);
 	
+	unsigned int * tempCurrentMarking = NULL;
+	unsigned int tempPlaceHashValue;
+	
+	
 	if (options[O_BDD] == false && CurrentState != NULL) {
 		// marking already has a state -> put it (and all its successors) into the node
-		if (listOfStates->addElement(CurrentState, minimal)) {
-			addSuccStatesToList(listOfStates, CurrentState);
+		if (n->addState(CurrentState)) {
+			addSuccStatesToList(n, CurrentState);
 		}
 		trace(TRACE_5, "end of function oWFN::calculateReachableStatesFull\n");
 		return;
@@ -468,19 +472,29 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
 	CurrentState->succ = new State * [CardFireList+1];
 	CurrentState->placeHashValue = placeHashValue;
 	CurrentState->type = typeOfState();
-	listOfStates->addElement(CurrentState, minimal);
+	n->addState(CurrentState);
 	  	
 	// building EG in a node
   	while(CurrentState) {
  
-		if ((listOfStates->elementCount() % 1000) == 0) {
-			trace(TRACE_2, "\t current state count: " + intToString(listOfStates->elementCount()) + "\n");
+		if ((n->setOfStates.size() % 1000) == 0) {
+			trace(TRACE_2, "\t current state count: " + intToString(n->setOfStates.size()) + "\n");
 		}
 	  	
 		// no more transition to fire from current state?
 		if (CurrentState->current < CurrentState->CardFireList) {
 			// there is a next state that needs to be explored
-	  		
+
+			if (tempCurrentMarking) {
+				delete[] tempCurrentMarking;
+				tempCurrentMarking = NULL;
+			}
+			
+			tempCurrentMarking = copyCurrentMarking();
+			tempPlaceHashValue = placeHashValue;
+			  		
+	  		trace(TRACE_5, "fire transition\n");
+
 			CurrentState->firelist[CurrentState->current]->fire(this);
 			minimal = isMinimal();
 			NewState = binSearch(this);
@@ -488,14 +502,24 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
 	  		if(NewState != NULL) {
 		  		// Current marking already in bintree 
 				trace(TRACE_5, "Current marking already in bintree \n");
-				if (listOfStates->addElement(NewState, minimal)) {
-					addSuccStatesToList(listOfStates, NewState);
+				if (n->addState(NewState)) {
+					addSuccStatesToList(n, NewState);
 				}
-
+				
+				copyMarkingToCurrentMarking(tempCurrentMarking);
+				
+				CurrentState->firelist[CurrentState->current]->backfire(this);
+				
+				placeHashValue = tempPlaceHashValue;
+				
+				delete[] tempCurrentMarking;
+				tempCurrentMarking = NULL;
+									
 		   		CurrentState -> succ[CurrentState -> current] = NewState;
 	     		(CurrentState->current)++;
 	     		
-	     		CurrentState->decode(this);
+	     //		CurrentState->decode(this);
+	     		
 	    	} else {
 				trace(TRACE_5, "Current marking new\n");
       			NewState = binInsert(this);
@@ -513,7 +537,12 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
 	      		CurrentState->succ[CurrentState -> current] = NewState;
 	      		CurrentState = NewState;
 		      		
-				listOfStates->addElement(NewState, minimal);
+				n->addState(NewState);
+				
+				if (tempCurrentMarking) {
+					delete[] tempCurrentMarking;
+					tempCurrentMarking = NULL;
+				}
 	    	}
 		// no more transition to fire
 		} else {
@@ -526,6 +555,9 @@ void oWFN::calculateReachableStatesFull(stateList * listOfStates, bool minimal) 
 	      		CurrentState->current++;
 	    	}
 		}
+	}
+	if (tempCurrentMarking) {
+		delete[] tempCurrentMarking;	
 	}
 }
 
@@ -553,7 +585,7 @@ int oWFN::addInputMessage(unsigned int message) {
 //! \brief adds input message to the current marking
 int oWFN::addInputMessage(messageMultiSet messages) {
 	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
-		if (Places[*iter]->getType() == INPUT) {
+		if (Places[*iter]->type == INPUT) {
 			// found that place
 			CurrentMarking[*iter]++;
 			placeHashValue += Places[*iter]->hash_factor;
@@ -868,7 +900,7 @@ int oWFN::removeOutputMessage(messageMultiSet messages) {
 	unsigned int found = 0;
 	
 	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
-		if (Places[*iter]->getType() == OUTPUT) {
+		if (Places[*iter]->type == OUTPUT) {
 			if (CurrentMarking[*iter] > 0) {
 				found++;
 				// found that place
@@ -919,7 +951,7 @@ bool oWFN::isMinimal() {
 	int i;
 	int k = 0;
 	for (i = 0; i < placeCnt; i++) {
-		if (Places[i]->getType() == OUTPUT && CurrentMarking[i] > 0) {
+		if (Places[i]->type == OUTPUT && CurrentMarking[i] > 0) {
 			return true;
 		}
 	}
@@ -937,7 +969,7 @@ bool oWFN::isMaximal() {
 //! \brief checks if the marking given as parameter is the final marking of the net
 bool oWFN::isFinalMarking(unsigned int * marking) {
 	for (int i = 0; i < getPlaceCnt(); i++) {
-		if (Places[i]->getType() != INTERNAL && marking[i] > 0) {
+		if (Places[i]->type != INTERNAL && marking[i] > 0) {
 			return false;
 		}
 		if (FinalMarking[i] != 0 && marking[i] != FinalMarking[i]) {

@@ -5,7 +5,7 @@
 #include "math.h"
 
 #include "BddRepresentation.h" 
-#include "stateList.h"
+//#include "stateList.h"
 #include "graphEdge.h"
 #include "symboltab.h"
 #include "owfn.h"
@@ -79,7 +79,7 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 		
 		v->resetIteratingSuccNodes();
 		
-		if (v->getStateList()->setOfReachGraphStates.size() != 0){
+		if (v->setOfStates.size() != 0){
 			
 			graphEdge* element;
 			
@@ -87,7 +87,7 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 				
 				vertex* vNext = element->getNode();
 				
-				if (vNext != NULL){ //&& vNext->getStateList()->setOfReachGraphStates.size() != 0 
+				if (vNext != NULL){ //&& vNext->setOfStates.size() != 0 
 			
 				    //label						
 		            DdNode * label = labelToBddMp(element->getLabel()); 
@@ -139,7 +139,7 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
 	v->resetIteratingSuccNodes();
 	if (v->getColor() == BLUE) {	
-		if (v->getStateList()->setOfReachGraphStates.size() != 0){
+		if (v->setOfStates.size() != 0){
 			visitedNodes[v->getNumber()] = 1;
 			graphEdge* element;
 			
@@ -148,7 +148,7 @@ void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
 				vertex* vNext = element->getNode();
 				
 				if (vNext->getColor() == BLUE && 
-				    vNext->getStateList()->setOfReachGraphStates.size() != 0 &&
+				    vNext->setOfStates.size() != 0 &&
 				    vNext != NULL ) {
 				    						
 				    //label						

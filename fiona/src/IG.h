@@ -35,8 +35,8 @@ class interactionGraph : public reachGraph {
 
     	bool terminateBuildingGraph(vertex *);
     	
-    	stateList * calculateSuccStatesOutputSet(messageMultiSet, vertex *);
-    	stateList * calculateSuccStatesInputReduced(messageMultiSet, vertex *);
+    	void calculateSuccStatesOutputSet(messageMultiSet, vertex *);
+    	void calculateSuccStatesInputReduced(messageMultiSet, vertex *);
 };
 
 #endif /*IG_H_*/

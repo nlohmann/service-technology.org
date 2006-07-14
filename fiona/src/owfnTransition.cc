@@ -16,6 +16,7 @@
 #include "main.h"
 #include "debug.h"
 #include "graph.h"
+#include "options.h"
 
 #ifdef LOG_NEW
 #include "mynew.h"
@@ -303,62 +304,63 @@ void owfnTransition::fire(oWFN * PN) {
    	trace(TRACE_5, "owfnTransition::fire(oWFN * PN) : end\n");
 }
 
-void owfnTransition::backfire(oWFN * PN)
-{
-  PN->placeHashValue -= hash_change;
-  PN->placeHashValue %= HASHSIZE;
- 
-}
-
 //void owfnTransition::backfire(oWFN * PN)
 //{
-//  unsigned int * p;
-//  owfnTransition ** t;
-//  unsigned int * i;
-//
-//  for(p = IncrPlaces,i = Incr; *p < UINT_MAX; p++,i++)
-//    {
-//      PN->CurrentMarking[* p] -= * i;
-//    }
-//  for(p = DecrPlaces,i = Decr; * p < UINT_MAX; p++,i++)
-//    {
-//      PN->CurrentMarking[* p] += * i;
-//    }
 //  PN->placeHashValue -= hash_change;
 //  PN->placeHashValue %= HASHSIZE;
-//  for(t = ImproveEnabling;*t;t++)
-//    {
-//      if((*t) -> enabled)
-//	{
-//	  (*t)->check_enabled(PN);
-//	}
-//    }
-//  for(t = ImproveDisabling;*t;t++)
-//    {
-//      if(!((*t)->enabled))
-//	{
-//	  (*t)->check_enabled(PN);
-//	}
-//    }
-    //// update value of formula after having fired t
-//
-    //for(p = DecrPlaces,i = Decr; * p < UINT_MAX; p++,i++)
-    //{
-	//unsigned int j;
-        //for(j=0; j < PN->Places[*p] -> cardprop;j++)
-	//{
-            //PN->Places[*p]->proposition[j] -> update(PN->CurrentMarking[*p]);
-        //}
-    //}
-    //for(p = IncrPlaces,i = Incr; * p < UINT_MAX; p++,i++)
-    //{
-	//unsigned int j;
-        //for(j=0; j < PN->Places[*p] -> cardprop;j++)
-	//{
-            //PN->Places[*p]->proposition[j] -> update(PN->CurrentMarking[*p]);
-        //}
-    //}
+// 
 //}
+
+void owfnTransition::backfire(oWFN * PN)
+{
+  unsigned int * p;
+  owfnTransition ** t;
+  unsigned int * i;
+
+/*  for(p = IncrPlaces,i = Incr; *p < UINT_MAX; p++,i++)
+    {
+      PN->CurrentMarking[* p] -= * i;
+    }
+  for(p = DecrPlaces,i = Decr; * p < UINT_MAX; p++,i++)
+    {
+      PN->CurrentMarking[* p] += * i;
+    }
+  PN->placeHashValue -= hash_change;
+  PN->placeHashValue %= HASHSIZE;
+*/  
+  for(t = ImproveEnabling;*t;t++)
+    {
+      if((*t) -> enabled)
+	{
+	  (*t)->check_enabled(PN);
+	}
+    }
+  for(t = ImproveDisabling;*t;t++)
+    {
+      if(!((*t)->enabled))
+	{
+	  (*t)->check_enabled(PN);
+	}
+    }
+    // update value of formula after having fired t
+
+    for(p = DecrPlaces,i = Decr; * p < UINT_MAX; p++,i++)
+    {
+	unsigned int j;
+        for(j=0; j < PN->Places[*p] -> cardprop;j++)
+	{
+            PN->Places[*p]->proposition[j] -> update(PN->CurrentMarking[*p]);
+        }
+    }
+    for(p = IncrPlaces,i = Incr; * p < UINT_MAX; p++,i++)
+    {
+	unsigned int j;
+        for(j=0; j < PN->Places[*p] -> cardprop;j++)
+	{
+            PN->Places[*p]->proposition[j] -> update(PN->CurrentMarking[*p]);
+        }
+    }
+}
 
 void owfnTransition::excludeTransitionFromEnabledList(oWFN * PN) {
 	// exclude transition from list of enabled transitions
@@ -373,6 +375,7 @@ void owfnTransition::excludeTransitionFromEnabledList(oWFN * PN) {
 }
 
 void owfnTransition::excludeTransitionFromQuasiEnabledList(oWFN * PN) {
+
 	// exclude transition from list of quasi enabled transitions
 	if(NextQuasiEnabled) {
 		NextQuasiEnabled -> PrevQuasiEnabled = PrevQuasiEnabled;
@@ -398,7 +401,7 @@ void owfnTransition::check_enabled(oWFN * PN) {
 
 	for(p = PrePlaces , i = Pre ; *p < UINT_MAX; p++ , i++) {
 		if(PN->CurrentMarking[*p] < *i) {
-	    	if (PN->Places[*p]->getType() == INPUT) {
+	    	if (PN->Places[*p]->type == INPUT) {
 	    		messageSet.insert(*p);
 	    		quasiEnabledNr++;	// remember that we have found an input pre-place with no appropriate marking
 	    	}

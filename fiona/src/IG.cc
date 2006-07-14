@@ -7,6 +7,7 @@
 
 #include "options.h"
 #include "debug.h"
+#include "CNF.h"
 
 //#include <iostream>
 #include <vector>			// for combining receiving events
@@ -44,7 +45,7 @@ void interactionGraph::buildGraph() {
 //! \brief builds up the graph recursively
 void interactionGraph::buildGraph(vertex * currentNode) {
 
-	stateList * newNodeStateList;
+//	stateList * newNodeStateList;
 	unsigned int elementInput = 0;
 	unsigned int elementOutput = 0;
 	
@@ -67,7 +68,7 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	trace(TRACE_1, intToString(currentNode->getNumber()) + ", \t current depth: " + intToString(actualDepth) + "\n");
 
 	trace(TRACE_3, "\t number of states in node: ");
-	trace(TRACE_3, intToString(currentNode->getStateList()->setOfReachGraphStates.size()) + "\n");
+	trace(TRACE_3, intToString(currentNode->setOfStates.size()) + "\n");
 
 	if (terminateBuildingGraph(currentNode)) {
 		string color;
@@ -90,8 +91,8 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 		vertex * v = new vertex();	// create new vertex of the graph
 		currentVertex = currentNode;
 		
-		newNodeStateList = calculateSuccStatesInput(*iter, currentNode);
-		v->setStateList(newNodeStateList);
+		calculateSuccStatesInput(*iter, currentNode, v);
+		//v->setStateList(newNodeStateList);
 
 		if (AddVertex (v, *iter, sending)) {
 
@@ -122,8 +123,8 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 		vertex * v = new vertex();	// create new vertex of the graph
 		currentVertex = currentNode;
 				
-		newNodeStateList = calculateSuccStatesOutput(*iter, currentNode);
-		v->setStateList(newNodeStateList);
+		calculateSuccStatesOutput(*iter, currentNode, v);
+	//	v->setStateList(newNodeStateList);
 		
 		if (AddVertex (v, *iter, receiving)) {
 
@@ -171,7 +172,7 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 //! \brief builds up the graph recursively
 void interactionGraph::buildReducedGraph(vertex * currentNode) {
 
-	stateList * newNodeStateList;
+//	stateList * newNodeStateList;
 	
 	setOfMessages inputSet;
 	setOfMessages outputSet;
@@ -194,7 +195,7 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 	trace(TRACE_1, intToString(currentNode->getNumber()) + ", \t current depth: " + intToString(actualDepth) + "\n");
 
 	trace(TRACE_3, "\t number of states in node: ");
-	trace(TRACE_3, intToString(currentNode->getStateList()->setOfReachGraphStates.size()) + "\n");
+	trace(TRACE_3, intToString(currentNode->setOfStates.size()) + "\n");
 
 	if (terminateBuildingGraph(currentNode)) {
 		string color;
@@ -217,8 +218,8 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 		vertex * v = new vertex();		// create new vertex of the graph
 		currentVertex = currentNode;
 		
-		newNodeStateList = calculateSuccStatesInput(*iter, currentNode);
-		v->setStateList(newNodeStateList);
+		calculateSuccStatesInput(*iter, currentNode, v);
+	//	v->setStateList(newNodeStateList);
 		
 		if (AddVertex (v, *iter, sending)) {
 			buildReducedGraph(v);
@@ -234,8 +235,8 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 		vertex * v = new vertex();	// create new vertex of the graph
 		currentVertex = currentNode;
 					
-		newNodeStateList = calculateSuccStatesOutput(*iter, currentNode);
-		v->setStateList(newNodeStateList);
+		calculateSuccStatesOutput(*iter, currentNode, v);
+		//v->setStateList(newNodeStateList);
 
 		
 		if (AddVertex (v, *iter, receiving)) {
@@ -272,24 +273,26 @@ setOfMessages interactionGraph::getActivatedInputEvents(vertex * node) {
 
 	int i;
 
-	reachGraphStateSet::iterator iter;		
+	clause * cl = new clause();
+
+	StateSet::iterator iter;		
 	
 	setOfMessages inputMessages;	// list of all input messages of the current node
 	
-	for (iter = node->getStateList()->setOfReachGraphStates.begin(); iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
+	for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
 
 #ifdef DEBUG
-	//cout << "\t state " << PN->printMarking((*iter)->state->myMarking) << " activates the input events: " << endl;
+	//cout << "\t state " << PN->printMarking((*iter)->myMarking) << " activates the input events: " << endl;
 #endif		
-		if ((*iter)->state->type == DEADLOCK || (*iter)->state->type == FINALSTATE)  {				// we just consider the maximal states only
+		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {				// we just consider the maximal states only
 			i = 0;
 //			PN->setCurrentMarkingFromState((*iter));
 			
-			(*iter)->state->decode(PN);
-			while ((*iter)->state->quasiFirelist && (*iter)->state->quasiFirelist[i]) {
+			(*iter)->decode(PN);
+			while ((*iter)->quasiFirelist && (*iter)->quasiFirelist[i]) {
 				
-				for (std::set<unsigned int>::iterator index = (*iter)->state->quasiFirelist[i]->messageSet.begin();
-							index != (*iter)->state->quasiFirelist[i]->messageSet.end();
+				for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin();
+							index != (*iter)->quasiFirelist[i]->messageSet.end();
 							index++) {
 
 					messageMultiSet input;				// multiset holding one input message
@@ -297,12 +300,14 @@ setOfMessages interactionGraph::getActivatedInputEvents(vertex * node) {
 					
 					inputMessages.insert(input);
 					
-					(*iter)->addClauseElement(PN->Places[*index]->name);
+					cl->addLiteral(PN->Places[*index]->name);
 				}
 				i++;
 			}
 		}
 	}
+	
+	node->addClause(cl);
 	
 	trace(TRACE_5, "interactionGraph::getActivatedInputEvents(vertex * node): end\n");
 	
@@ -319,24 +324,26 @@ setOfMessages interactionGraph::getActivatedOutputEvents(vertex * node) {
 
 	int i;
 	
+	clause * cl = new clause();
+	
 	setOfMessages outputMessages;	// list of all input messages of the current node
 	
-	reachGraphStateSet::iterator iter;	
+	StateSet::iterator iter;	
 	
-	for (iter = node->getStateList()->setOfReachGraphStates.begin(); iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
+	for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
 	
-		if ((*iter)->state->type == DEADLOCK || (*iter)->state->type == FINALSTATE)  {				// we just consider the maximal states only
+		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {				// we just consider the maximal states only
 
 //			trace(TRACE_5, "\t state "<< *(*iter) << " activates the output events: " << endl;
 	
 			int i;
 			int k = 0;
 			
-			(*iter)->state->decode(PN);
-//			marking = (*iter)->state->myMarking;
+			(*iter)->decode(PN);
+//			marking = (*iter)->myMarking;
 			
 			for (i = 0; i < PN->getPlaceCnt(); i++) {
-				if (PN->Places[i]->getType() == OUTPUT && PN->CurrentMarking[i] > 0) {
+				if (PN->Places[i]->type == OUTPUT && PN->CurrentMarking[i] > 0) {
 					
 #ifdef DEBUG
 	cout << "\t\t" << PN->Places[i]->name << endl;
@@ -346,12 +353,12 @@ setOfMessages interactionGraph::getActivatedOutputEvents(vertex * node) {
 					output.insert(i);
 					
 					outputMessages.insert(output);
-					(*iter)->addClauseElement(PN->Places[i]->name);	
+					cl->addLiteral(PN->Places[i]->name);	
 				}	
 			}
 		}
 	}
-	
+	node->addClause(cl);
 	trace(TRACE_5, "interactionGraph::getActivatedOutputEvents(vertex * node): end\n");	
    	return outputMessages;		
 }
@@ -370,21 +377,23 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node) {
 
 	int i;
 	
-	std::vector<reachGraphStateSet::iterator> statesVector; // remember those states that activate an output event
+	std::vector<StateSet::iterator> statesVector; // remember those states that activate an output event
 	
 	setOfMessages listOfOutputMessageLists;	// list 
 	
 	messageMultiSet outputMessages;				// multiset of all input messages of the current state
 
-	reachGraphStateSet::iterator iter;		
+	StateSet::iterator iter;		
+	
+	clause * cl = new clause();
 	
 	bool found = false;
 	bool skip = false;
 	
-	for (iter = node->getStateList()->setOfReachGraphStates.begin(); iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
+	for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
 
 
-		if ((*iter)->state->type == DEADLOCK || (*iter)->state->type == FINALSTATE)  {  // we just consider the maximal states only
+		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {  // we just consider the maximal states only
 #ifdef DEBUG
 	cout << "\t state "<< (*iter) << " activates the output events: " << endl;
 #endif		
@@ -393,12 +402,12 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node) {
 			
 			messageMultiSet outputMessages;		// multiset of all input messages of the current state
 			
-			(*iter)->state->decode(PN);
-//			marking = (*iter)->state->myMarking;
+			(*iter)->decode(PN);
+//			marking = (*iter)->myMarking;
 			
 			for (i = 0; i < PN->getPlaceCnt(); i++) {
 				
-				if (PN->Places[i]->getType() == OUTPUT && PN->CurrentMarking[i] > 0) {	
+				if (PN->Places[i]->type == OUTPUT && PN->CurrentMarking[i] > 0) {	
 					for (int z = 0; z < PN->CurrentMarking[i]; z++) {			
 						outputMessages.insert(i);
 					}
@@ -462,16 +471,16 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node) {
 					}
 					
 					if (supset) {
-						(*iter)->addClauseElement(label);	
+						cl->addLiteral(label);	
 						listOfOutputMessageLists.insert(outputMessages);
 					}	
 				} else {
-					(*iter)->addClauseElement(label);	
+					cl->addLiteral(label);	
 				}
     			
 				if (!subset && !supset) {
 					listOfOutputMessageLists.insert(outputMessages);
-					(*iter)->addClauseElement(PN->createLabel(outputMessages));
+					cl->addLiteral(PN->createLabel(outputMessages));
 				} 
 				
 				found = false;
@@ -493,6 +502,8 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node) {
 	cout << "\t\t (after) number of message lists in list: " << listOfOutputMessageLists.size() << endl;
 #endif
 
+	node->addClause(cl);
+
    	return listOfOutputMessageLists;		
 }
 
@@ -507,27 +518,27 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 
 	int i;
 
-	reachGraphStateSet::iterator iter;		
-	
+	StateSet::iterator iter;		
+	clause * cl = new clause();
 	setOfMessages inputMessages;	// list of all input messages of the current node
 	
-	for (iter = node->getStateList()->setOfReachGraphStates.begin(); 
-					iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
+	for (iter = node->setOfStates.begin(); 
+					iter != node->setOfStates.end(); iter++) {
 
 #ifdef DEBUG
-	//cout << "\t state " << PN->printMarking((*iter)->state->myMarking) << " activates the input events: " << endl;
+	//cout << "\t state " << PN->printMarking((*iter)->myMarking) << " activates the input events: " << endl;
 #endif		
-		if ((*iter)->state->type == DEADLOCK || (*iter)->state->type == FINALSTATE)  {				// we just consider the maximal states only
+		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {				// we just consider the maximal states only
 			i = 0;
 //			PN->setCurrentMarkingFromState((*iter));
 			
-			(*iter)->state->decode(PN);
+			(*iter)->decode(PN);
 			while (!stateActivatesOutputEvents(*iter) && 
-						(*iter)->state->quasiFirelist && 
-						(*iter)->state->quasiFirelist[i]) {
+						(*iter)->quasiFirelist && 
+						(*iter)->quasiFirelist[i]) {
 				
-				for (std::set<unsigned int>::iterator index = (*iter)->state->quasiFirelist[i]->messageSet.begin();
-							index != (*iter)->state->quasiFirelist[i]->messageSet.end();
+				for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin();
+							index != (*iter)->quasiFirelist[i]->messageSet.end();
 							index++) {
 
 					messageMultiSet input;				// multiset holding one input message
@@ -535,12 +546,14 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 					
 					inputMessages.insert(input);
 					
-					(*iter)->addClauseElement(PN->Places[*index]->name);
+					cl->addLiteral(PN->Places[*index]->name);
 				}
 				i++;
 			}
 		}
 	}
+
+	node-> addClause(cl);
 
 	trace(TRACE_5, "number of input events: " + intToString(inputMessages.size()) + "\n" );
 	trace(TRACE_5, "interactionGraph::receivingBeforeSending(vertex * node): end\n");
@@ -570,7 +583,7 @@ bool interactionGraph::terminateBuildingGraph(vertex * node) {
 //! \param output the output messages that are taken from the marking
 //! \param node
 //! \brief calculates the set of successor states in case of an output message
-stateList * interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, vertex * node) {
+void interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, vertex * node) {
     
 	/* iterate over all states of the current node 
 	 * and get rid of the output messages in the marking of the state
@@ -580,59 +593,59 @@ stateList * interactionGraph::calculateSuccStatesOutputSet(messageMultiSet outpu
 	cout << "interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, vertex * node): start" << endl;
 	cout << "checking node: " << *node << endl;
 #endif
-	reachGraphStateSet::iterator iter;	
-	stateList * newStateList = new stateList();		// the new list of states for the next node
+	StateSet::iterator iter;	
+//	stateList * newStateList = new stateList();		// the new list of states for the next node
 	
 	// iterate over all states of the current node 
-	for (iter = node->getStateList()->setOfReachGraphStates.begin(); iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
+	for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
 	
 	
 //		PN->setCurrentMarkingFromState(*iter);		// set the net to the marking of the state being considered
-		(*iter)->state->decode(PN);
+		(*iter)->decode(PN);
 		if (PN->removeOutputMessage(output)) {	// remove the output message from the current marking
 			// if there is a state for which an output event was activated, catch that state
 			if (parameters[P_CALC_ALL_STATES]) {
-				PN->calculateReachableStatesFull(newStateList, (*iter)->isMinimal());	// calc the reachable states from that marking
+				PN->calculateReachableStatesFull(node, false);	// calc the reachable states from that marking
 			} else {
-				PN->calculateReachableStates(newStateList, (*iter)->isMinimal());	// calc the reachable states from that marking
+				PN->calculateReachableStates(node, false);	// calc the reachable states from that marking
 			}
 		}
 	}
-   	return newStateList;							// return the new state list
+ //  	return newStateList;							// return the new state list
 }
 
 //! \fn stateList * interactionGraph::calculateSuccStatesInputReduced(char * input, vertex * node)
 //! \param input set of input messages
 //! \param node the node for which the successor states are to be calculated
 //! \brief calculates the set of successor states in case of an input message
-stateList * interactionGraph::calculateSuccStatesInputReduced(messageMultiSet input, vertex * node) {
+void interactionGraph::calculateSuccStatesInputReduced(messageMultiSet input, vertex * node) {
 	
 #ifdef DEBUG
 	cout << "interactionGraph::calculateSuccStatesInputReduced(char * input, vertex * node): start" << endl;
 #endif
 
-	stateList * newStateList = new stateList();		// the new list of states for the next node
-	reachGraphStateSet::iterator iter;		
+//	stateList * newStateList = new stateList();		// the new list of states for the next node
+	StateSet::iterator iter;		
 	// iterate over all states of the current node 
-	for (iter = node->getStateList()->setOfReachGraphStates.begin(); iter != node->getStateList()->setOfReachGraphStates.end(); iter++) {
+	for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
 
 
 #ifdef DEBUG
 	cout << "add input message " << input << " to state " << (*iter) << endl;
 #endif
-		if ((*iter)->isMinimal()) {	// if state is representative for this node
+		if (true) {	// if state is representative for this node
 //			PN->setCurrentMarkingFromState(*iter);		// set the net to the marking of the state being considered
 
-			(*iter)->state->decode(PN);
+			(*iter)->decode(PN);
 
 			PN->addInputMessage(input);					// add the input message to the current marking
 			if (parameters[P_CALC_ALL_STATES]) {
-				PN->calculateReachableStatesFull(newStateList, (*iter)->isMinimal());	// calc the reachable states from that marking
+				PN->calculateReachableStatesFull(node, false);	// calc the reachable states from that marking
 			} else {
-				PN->calculateReachableStates(newStateList, (*iter)->isMinimal());	// calc the reachable states from that marking
+				PN->calculateReachableStates(node, false);	// calc the reachable states from that marking
 			}
 		}
 	}
 	
-   	return newStateList;							// return the new state list
+ //  	return newStateList;							// return the new state list
 }

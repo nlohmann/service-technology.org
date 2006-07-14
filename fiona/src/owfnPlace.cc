@@ -98,6 +98,3 @@ void owfnPlace::set_cmarking(unsigned int i)
   hash_value %= HASHSIZE;*/
 }  
 
-placeType owfnPlace::getType() {
-	return type;
-}

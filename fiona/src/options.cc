@@ -1,3 +1,4 @@
+#include "mynew.h"
 #include <string>
 #include <iostream>
 #include <map>
@@ -7,10 +8,6 @@
 #include "debug.h"
 #include "exception.h"
 #include "fiona.h"
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 // some file names and pointers
 

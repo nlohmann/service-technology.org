@@ -1,14 +1,11 @@
 #ifndef FORMULA_H
 #define FORMULA_H
+#include "mynew.h"
 #include"owfnPlace.h"
 #include"symboltab.h"
 #include<fstream>
 
 #include"dimensions.h"
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 using namespace std;
 

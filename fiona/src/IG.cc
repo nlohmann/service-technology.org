@@ -1,3 +1,4 @@
+#include "mynew.h"
 #include "IG.h"
 //#include "vertex.h"
 //#include "owfn.h"
@@ -12,11 +13,6 @@
 //#include <iostream>
 #include <vector>			// for combining receiving events
 //#include <string>
-
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 //! \fn interactionGraph::interactionGraph(oWFN * _PN) 
 //! \param _PN

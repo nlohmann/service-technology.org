@@ -4,11 +4,8 @@
 #define DIMENSIONS_H
 
 #include"userconfig.h"
-#include<limits>
-
-#ifdef LOG_NEW
 #include "mynew.h"
-#endif
+#include<limits>
 
 using namespace std;
 

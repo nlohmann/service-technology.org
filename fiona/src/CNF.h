@@ -11,13 +11,10 @@
 #define CNF_H_
 
 
+#include "mynew.h"
 #include "enums.h"
 #include <string>
 #include <set>		// set
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 using namespace std;
 
@@ -50,6 +47,12 @@ public:
 	string getClauseString();
 	
 	vertexColor getColor();
+
+    // Provides user defined operator new. Needed to trace all new operations
+    // on this class.
+#undef new
+    NEW_OPERATOR(clause)
+#define new NEW_NEW
 };
 
 
@@ -76,6 +79,12 @@ public:
 	void setEdge(graphEdge *);
 	
 	string getCNF();
+
+    // Provides user defined operator new. Needed to trace all new operations
+    // on this class.
+#undef new
+    NEW_OPERATOR(CNF)
+#define new NEW_NEW
 };
 
 #endif /* CNF_H_ */

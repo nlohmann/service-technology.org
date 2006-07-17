@@ -1,3 +1,4 @@
+#include "mynew.h"
 #include<iostream>
 #include"dimensions.h"
 

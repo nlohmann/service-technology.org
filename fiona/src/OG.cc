@@ -1,3 +1,4 @@
+#include "mynew.h"
 #include "OG.h"
 //#include "vertex.h"
 //#include "owfn.h"
@@ -10,10 +11,6 @@
 #include "successorNodeList.h"
 #include "BddRepresentation.h" 
 #include "CNF.h"
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 //#include <iostream>
 

@@ -1,12 +1,65 @@
 #ifndef MYNEW_H_ 
 #define MYNEW_H_ 
 
+#include "userconfig.h"
+
+#ifdef LOG_NEW
+
 #include <new>
 #include <string>
+#include <iostream>
+#include "newlogger.h"
 
-void * operator new (size_t size, const std::string &file, int line);
-void * operator new[] (size_t size, const std::string &file, int line);
+// prototypes for global operators new
+void* operator new (size_t size, const std::string &file, int line);
+void* operator new[] (size_t size, const std::string &file, int line);
 
-#define new new(__FILE__, __LINE__)
 
-#endif
+// new should be substituted with NEW_NEW such that user defined operators new
+// (with current file and line as parameters) are called. 
+#define NEW_NEW new(__FILE__, __LINE__) 
+
+// the body of user defined class operators new and new[]
+#define NEW_OPERATOR_BODY(CLASSNAME) \
+    {                                                                   \
+        std::string filepos(file);                                      \
+        filepos += ':';                                                 \
+        filepos += toString(line);                                      \
+        NewLogger::addInfo(#CLASSNAME, filepos, size);                  \
+                                                                        \
+        return ::new char[size];                                        \
+    }
+
+// definition of user defined class operators new and new[]
+//
+// Usage: If you want calls to operators new for class MyClass to be logged
+// then add the following lines to public part of the declaration of the class
+// MyClass:
+//
+//     #undef new
+//     NEW_OPERATOR(MyClass)
+//     #define new NEW_NEW
+//
+// Beware of copy-and-paste errors! Substitute MyClass with your class name.
+// Otherwise calls to operator new of your class will be logged as calls for
+// MyClass.
+#define NEW_OPERATOR(CLASSNAME) \
+    void* operator new (size_t size, const std::string &file, int line)   \
+    NEW_OPERATOR_BODY(CLASSNAME)                                          \
+    void* operator new[] (size_t size, const std::string &file, int line) \
+    NEW_OPERATOR_BODY(CLASSNAME)
+
+
+#else // LOG_NEW
+
+// LOG_NEW is undefined. So leave new defined as new. And let NEW_OPERATOR() be
+// void.
+
+#define NEW_NEW new
+#define NEW_OPERATOR(CLASSNAME)
+
+#endif // LOG_NEW
+
+#define new NEW_NEW
+
+#endif // MYNEW_H_

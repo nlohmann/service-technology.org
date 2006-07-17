@@ -11,14 +11,11 @@
 #ifndef SUCCESSORNODELIST_H
 #define SUCCESSORNODELIST_H
 
+#include "mynew.h"
 #include "graphEdge.h"
 #include "enums.h"
 #include <stddef.h>
 #include <string>
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 using namespace std;
 
@@ -48,5 +45,11 @@ public:
     
     void resetIterating();
     graphEdge * getNextElement();
+    
+    // Provides user defined operator new. Needed to trace all new operations
+    // on this class.
+#undef new
+    NEW_OPERATOR(successorNodeList)
+#define new NEW_NEW
 };
 #endif //SUCCESSORNODELIST_H

@@ -11,12 +11,10 @@
 #ifndef OWFNPLACE_H_
 #define OWFNPLACE_H_
 
+#include "mynew.h"
 #include "petriNetNode.h"
 #include "formula.h"
 
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 class oWFN;
 class formula;
@@ -51,6 +49,12 @@ class owfnPlace : public Node {
 		unsigned int cardprop; // number of propositions in final condition that mention this place
 		formula ** proposition; // array of propositions in final condition that mention this place
 					// used for quick re-evaluation of condition
+
+        // Provides user defined operator new. Needed to trace all new
+        // operations on this class.
+#undef new
+        NEW_OPERATOR(owfnPlace)
+#define new NEW_NEW
 };
 
 #endif /*OWFNPLACE_H_*/

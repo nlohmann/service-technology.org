@@ -10,11 +10,8 @@
 #ifndef IG_H_
 #define IG_H_
 
-#include "reachGraph.h"
-
-#ifdef LOG_NEW
 #include "mynew.h"
-#endif
+#include "reachGraph.h"
 
 class oWFN;
 
@@ -37,6 +34,12 @@ class interactionGraph : public reachGraph {
     	
     	void calculateSuccStatesOutputSet(messageMultiSet, vertex *);
     	void calculateSuccStatesInputReduced(messageMultiSet, vertex *);
+        
+        // Provides user defined operator new. Needed to trace all new
+        // operations on this class.
+#undef new
+        NEW_OPERATOR(interactionGraph)
+#define new NEW_NEW
 };
 
 #endif /*IG_H_*/

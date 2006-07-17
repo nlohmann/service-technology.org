@@ -1,13 +1,10 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
+#include "mynew.h"
 #include <map>
 #include <cstdio>
 #include "getopt.h"
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 typedef enum
 {

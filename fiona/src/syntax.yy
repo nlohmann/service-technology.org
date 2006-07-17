@@ -24,6 +24,7 @@ extern int yyerror(const char *);
 
 //using namespace std;
 
+#include "mynew.h"
 #include "dimensions.h"
 #include "graph.h"
 #include "symboltab.h"
@@ -44,6 +45,12 @@ class arc_list {
 	PlSymbol * place;
 	unsigned int nu;
     arc_list    * next;
+
+    // Provides user defined operator new. Needed to trace all new operations
+    // on this class.
+#undef new
+    NEW_OPERATOR(acr_list)
+#define new NEW_NEW
 };   
 
 

@@ -5,7 +5,7 @@
 #ifndef BDDREPRESENTATION_H_
 #define BDDREPRESENTATION_H_
  
- 
+#include "mynew.h" 
 #include <vector>
 #include <map>
 
@@ -28,6 +28,12 @@ class BddRepresentation{
 		void print();
 		void printDotFile(char** names= NULL);
 		
+        // Provides user defined operator new. Needed to trace all new
+        // operations on this class.
+#undef new
+        NEW_OPERATOR(BddRepresentation)
+#define new NEW_NEW
+
 	private:	 
 		DdManager* mgrMp;
 		DdManager* mgrAnn;

@@ -11,6 +11,7 @@
 #ifndef OWFN_H_
 #define OWFN_H_
 
+#include "mynew.h"
 #include<fstream>
 #include<iosfwd>
 #include<iostream>
@@ -20,10 +21,6 @@
 #include "main.h"
 
 #include "reachGraph.h"
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 using namespace std;
 
@@ -137,6 +134,12 @@ class oWFN  {
 	    void deleteTransition(owfnTransition *);
 		
 		char * createLabel(messageMultiSet);	
+
+        // Provides user defined operator new. Needed to trace all new
+        // operations on this class.
+#undef new
+        NEW_OPERATOR(oWFN)
+#define new NEW_NEW
 };
 
 #endif /*OWFN_H_*/

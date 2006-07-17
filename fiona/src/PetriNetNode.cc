@@ -1,8 +1,5 @@
-#include "petriNetNode.h"
-
-#ifdef LOG_NEW
 #include "mynew.h"
-#endif
+#include "petriNetNode.h"
 
 inline void Node::NewArriving(Arc & a)
 {

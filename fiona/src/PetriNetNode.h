@@ -1,12 +1,9 @@
 #ifndef PETRINETNODE_H_
 #define PETRINETNODE_H_
 
+#include "mynew.h"
 //#include<streambuf.h>
 #include<iostream>
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 using namespace std;
 
@@ -43,6 +40,12 @@ class Arc
 	  	unsigned int Multiplicity;
 	  	Node * Get(bool);
 	  	void operator += (unsigned int);
+
+        // Provides user defined operator new. Needed to trace all new
+        // operations on this class.
+#undef new
+        NEW_OPERATOR(Arc)
+#define new NEW_NEW
 };
 
 #endif /*PETRINETNODE_H_*/

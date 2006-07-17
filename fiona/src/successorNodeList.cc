@@ -1,13 +1,10 @@
+#include "mynew.h"
 #include "successorNodeList.h"
 #include "graphEdge.h"
 #include "vertex.h"
 #include "enums.h"
 #include <string>
 #include <iostream>
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 using namespace std;
 

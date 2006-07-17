@@ -1,3 +1,4 @@
+#include "mynew.h"
 #include "dimensions.h"
 #include "symboltab.h"
 #include "graph.h"
@@ -25,7 +26,6 @@
 #include<new>
 
 #ifdef LOG_NEW
-#include "mynew.h"
 #include "newlogger.h"
 #endif
 

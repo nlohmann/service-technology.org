@@ -1,3 +1,4 @@
+#include "mynew.h"
 #include "CNF.h"
 
 #include "graphEdge.h"
@@ -9,10 +10,6 @@
 #include "main.h"
 #include "enums.h"
 #include "debug.h"
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 using namespace std;
 

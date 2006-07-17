@@ -1,11 +1,8 @@
+#include "mynew.h"
 #include "graph.h"
 #include "successorNodeList.h"
 #include "vertex.h"
 #include "CNF.h"
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 //! \fn vertex::vertex()
 //! \brief constructor for OG nodes

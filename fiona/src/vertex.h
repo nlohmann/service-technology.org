@@ -11,15 +11,12 @@
 #ifndef VERTEX_H_
 #define VERTEX_H_
 
+#include "mynew.h"
 #include <string>
 #include <ostream>
 #include <set>
 
 #include "enums.h"
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 using namespace std;
 
@@ -93,6 +90,11 @@ public:
     friend bool operator < (vertex const&, vertex const& );
 //    friend ostream& operator << (std::ostream& os, const vertex& v);
 
+    // Provides user defined operator new. Needed to trace all new operations
+    // on this class.
+#undef new
+    NEW_OPERATOR(vertex)
+#define new NEW_NEW
     
 };
 

@@ -1,12 +1,9 @@
+#include "mynew.h"
 #include "graphEdge.h"
 #include <string>
 #include "vertex.h"
 #include "enums.h"
 
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
- 
 //! \fn  graphEdge::graphEdge(vertex * nodeP, char * labelP, edgeType typeP) 
 //! \param nodeP pointer to the node this edge is pointing to
 //! \param labelP label of this edge

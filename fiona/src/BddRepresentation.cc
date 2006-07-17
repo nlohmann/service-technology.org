@@ -1,3 +1,4 @@
+#include "mynew.h"
 #include "symboltab.h"
 
 #include <iostream>

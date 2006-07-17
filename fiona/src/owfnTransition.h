@@ -11,12 +11,9 @@
 #ifndef OWFNTRANSITION_H_
 #define OWFNTRANSITION_H_
 
+#include "mynew.h"
 #include "petriNetNode.h"
 #include <set>
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 class oWFN;
 
@@ -66,6 +63,12 @@ class owfnTransition : public Node {
 		unsigned int lastdisabled; 	// dfsnum of last state where
 							  		// some fired transition disables this one
 		unsigned int lastfired; 	// dfsnum of last state where this tr. was fired
+
+        // Provides user defined operator new. Needed to trace all new
+        // operations on this class.
+#undef new
+        NEW_OPERATOR(owfnTransition)
+#define new NEW_NEW
 };
 
 #endif /*OWFNTRANSITION_H_*/

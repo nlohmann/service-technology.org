@@ -10,12 +10,10 @@
 #ifndef OG_H_
 #define OG_H_
 
+#include "mynew.h"
 #include "reachGraph.h"
 #include "BddRepresentation.h" 
 
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 //#include <map>
 
 class oWFN;
@@ -37,6 +35,12 @@ class operatingGuidelines : public reachGraph {
 		void convertToBdd();
 		
 		BddRepresentation * bdd;
+
+        // Provides user defined operator new. Needed to trace all new
+        // operations on this class.
+#undef new
+        NEW_OPERATOR(operatingGuidelines)
+#define new NEW_NEW
 };
 
 

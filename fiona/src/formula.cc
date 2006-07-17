@@ -1,8 +1,5 @@
-#include"formula.h"
-
-#ifdef LOG_NEW
 #include "mynew.h"
-#endif
+#include"formula.h"
 
 unsigned int atomicformula::counttype(FType t) {
 	return 1;

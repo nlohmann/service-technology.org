@@ -11,14 +11,11 @@
 #ifndef STATELIST_H_
 #define STATELIST_H_
 
+#include "mynew.h"
 #include <iostream>
 #include "enums.h"
 #include <string>
 #include <set>		// set
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 using namespace std;
 
@@ -34,6 +31,12 @@ public:
 	clause * nextElement; 
 	
 	void setEdge(graphEdge *);
+
+    // Provides user defined operator new. Needed to trace all new operations
+    // on this class.
+#undef new
+    NEW_OPERATOR(clause)
+#define new NEW_NEW
 };
 
 
@@ -63,6 +66,12 @@ public:
 //	friend bool operator < (const reachGraphState& s1, const reachGraphState& s2);
 
     	friend ostream& operator << (std::ostream& os, const reachGraphState& s);	
+
+    // Provides user defined operator new. Needed to trace all new operations
+    // on this class.
+#undef new
+    NEW_OPERATOR(reachGraphState)
+#define new NEW_NEW
 };
 
 struct Object_Compare {
@@ -104,6 +113,12 @@ public:
 	friend bool operator == (const stateList& s1, const stateList& s2);
 	friend bool operator < (const stateList& s1, const stateList& s2);
     friend ostream& operator << (std::ostream& os, const stateList& v);	
+
+    // Provides user defined operator new. Needed to trace all new operations
+    // on this class.
+#undef new
+    NEW_OPERATOR(stateList)
+#define new NEW_NEW
 };
 
 #endif /*STATELIST_H_*/

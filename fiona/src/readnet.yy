@@ -1,4 +1,5 @@
 %{
+#include "mynew.h"
 #include "dimensions.h"
 #include "graph.h"
 #include "symboltab.h"

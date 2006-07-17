@@ -1,11 +1,8 @@
+#include "mynew.h"
 #include "symboltab.h"
 #include "petriNetNode.h"
 #include "owfnPlace.h"
 #include "owfnTransition.h"
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 SymbolTab * PlaceTable, * TransitionTable, * InterfaceTable;
 extern SymbolTab * GlobalTable;

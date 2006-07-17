@@ -1,3 +1,4 @@
+#include "mynew.h"
 #include "graph.h"
 #include "vertex.h"
 #include "successorNodeList.h"
@@ -16,10 +17,6 @@
 //#include <string>
 //#include <set>
 
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 using namespace std;
 

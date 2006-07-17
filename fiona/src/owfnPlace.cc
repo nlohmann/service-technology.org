@@ -7,14 +7,11 @@
 		- 2006-01-16 creation
 
  */ 
+#include "mynew.h"
 #include "petriNetNode.h"
 #include "owfn.h"
 #include "dimensions.h"
 #include "owfnPlace.h"
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 //! \fn owfnPlace::owfnPlace(char * name, placeType _type, oWFN * _net)
 //! \param name

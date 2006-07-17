@@ -11,6 +11,7 @@
 #ifndef GRAPH_H_
 #define GRAPH_H_
 
+#include "mynew.h"
 #include "vertex.h"
 #include "enums.h"
 #include <string>
@@ -18,10 +19,6 @@
 #include <iostream>
 
 #include <set>
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 using namespace std;
 

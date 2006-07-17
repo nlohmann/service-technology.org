@@ -8,6 +8,7 @@
 
  */ 
 
+#include "mynew.h"
 #include "owfnTransition.h"
 //#include "petriNetNode.h"
 #include "owfn.h"
@@ -17,10 +18,6 @@
 #include "debug.h"
 #include "graph.h"
 #include "options.h"
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 //#include <set>
 

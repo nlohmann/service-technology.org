@@ -1,6 +1,7 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
+#include "mynew.h"
 #include "dimensions.h"
 #include "owfnTransition.h"
 #include "owfn.h"
@@ -8,10 +9,6 @@
 #include "main.h"
 #include "debug.h"
 #include <iostream>
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 using namespace std;
 
@@ -39,6 +36,12 @@ public:
   State * parent;                   // state responsible for first generation
   stateType type;                   // type of state (Deadlock, Final, Transient)
   void decode(oWFN *);      		// decode state into given marking vector
+
+  // Provides user defined operator new. Needed to trace all new operations on
+  // this class.
+#undef new
+  NEW_OPERATOR(State)
+#define new NEW_NEW
 };
 
 
@@ -63,6 +66,12 @@ public:
     State * state;   			// link to state record for this state
 	binDecision(int, long int);
 	~binDecision();
+
+    // Provides user defined operator new. Needed to trace all new operations
+    // on this class.
+#undef new
+    NEW_OPERATOR(binDecision)
+#define new NEW_NEW
 };
 
 State * binSearch();

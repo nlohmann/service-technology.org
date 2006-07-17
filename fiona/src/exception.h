@@ -26,17 +26,17 @@
  * This file declares the exception class.
  * 
  * \author  
- *          - last changes of: \$Author: weinberg $
+ *          - last changes of: \$Author: bretschn $
  *          
  * \date
- *          - last changed: \$Date: 2006-06-26 13:38:17 $
+ *          - last changed: \$Date: 2006-07-17 13:50:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.3 $
  */
 
 
@@ -46,12 +46,9 @@
 #ifndef EXCEPTION_H
 #define EXCEPTION_H
 
+#include "mynew.h"
 #include <string>
 #include <iostream>
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 using namespace std;
 

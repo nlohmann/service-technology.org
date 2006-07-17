@@ -11,13 +11,10 @@
 #ifndef GRAPHEDGE_H
 #define GRAPHEDGE_H
 
+#include "mynew.h"
 #include "enums.h"
 #include <stddef.h>
 #include <string>
-
-#ifdef LOG_NEW
-#include "mynew.h"
-#endif
 
 using namespace std;
 
@@ -43,5 +40,11 @@ public:
 	edgeType getType();
 	vertex * getNode();
 	void setNode(vertex *);
+    
+    // Provides user defined operator new. Needed to trace all new operations
+    // on this class.
+#undef new
+    NEW_OPERATOR(graphEdge)
+#define new NEW_NEW
 };
 #endif //GRAPHEDGE_H

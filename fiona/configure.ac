@@ -18,12 +18,12 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006-07-06 13:37:10 $ by $Author: bretschn $.
-# Version $Revision: 1.4 $
+# File last changed $Date: 2006-07-17 14:33:06 $ by $Author: gierds $.
+# Version $Revision: 1.5 $
 
 # Process this file with autoconf to produce a configure script.
 AC_INIT(Fiona, 1.0, weinberg@informatik.hu-berlin.de, fiona)
-AC_REVISION($Revision: 1.4 $)
+AC_REVISION($Revision: 1.5 $)
 
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/fiona.h)
@@ -70,3 +70,4 @@ echo "--------- compile settings ---------"
 echo "compile for 64bit...: $enable_64bit"
 echo "------------------------------------"
 echo
+

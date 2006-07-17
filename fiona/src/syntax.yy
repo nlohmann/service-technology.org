@@ -182,7 +182,7 @@ net: key_place place_area key_marking {LocalTable = (SymbolTab *) 0;}
 					pl->ArrivingArcs[pl->NrOfArriving] = PN->Transitions[i]->LeavingArcs[j];
 					pl->NrOfArriving++;
 					
-					if (pl->getType() == OUTPUT) {
+					if (pl->type == OUTPUT) {
 						PN->commDepth += PN->Transitions[i]->LeavingArcs[j]->Multiplicity;
 					}
 				}
@@ -192,7 +192,7 @@ net: key_place place_area key_marking {LocalTable = (SymbolTab *) 0;}
 					pl->LeavingArcs[pl->NrOfLeaving] = PN->Transitions[i]->ArrivingArcs[j];
 					pl->NrOfLeaving ++;
 					
-					if (pl->getType() == INPUT) {
+					if (pl->type == INPUT) {
 						PN->commDepth += PN->Transitions[i]->ArrivingArcs[j]->Multiplicity;
 					}
 				}

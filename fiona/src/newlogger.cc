@@ -73,12 +73,14 @@ void NewLogger::printall_by_size()
     typedef multiset<LogInfo, log_by_size_compare_t> log_by_size_t;
     log_by_size_t log_by_size(&LogInfo::compare_by_mem);
     size_t total_mem_usage = 0;
+    size_t total_callcount = 0;
     
     for (log_t::const_iterator iter = log.begin(); iter != log.end();
         ++iter)
     {
         log_by_size.insert(iter->second);
         total_mem_usage += iter->second.allocated_mem;
+        total_callcount += iter->second.callcount;
     }
 
     for (log_by_size_t::const_reverse_iterator iter = log_by_size.rbegin();
@@ -93,7 +95,8 @@ void NewLogger::printall_by_size()
     }
 
     cerr << endl;
-    cerr << "total memory usage: " << total_mem_usage << endl;
+    cerr << "total memory usage: " << total_mem_usage << " bytes; "
+         << total_callcount << " total allocation calls" << endl;
     cerr << "(total memory usage in MB: " << (total_mem_usage/1024/1024)
          << ")" << endl;
 }
@@ -144,6 +147,9 @@ void NewLogger::printall_by_typesize()
 
     // Saves total memory usage.
     size_t total_mem_usage = 0;
+
+    // Saves total number of allocation calls.
+    size_t total_callcount = 0;
     
     // determine allocated memory per type and sort by size (descending)
     typedef std::map<std::string, TypeLogInfo> typelog_t;
@@ -153,6 +159,7 @@ void NewLogger::printall_by_typesize()
     {
         log_by_size.insert(iter->second);
         total_mem_usage += iter->second.allocated_mem;
+        total_callcount += iter->second.callcount;
         format.filepos_length =
             max(iter->second.filepos.size(), format.filepos_length);
         
@@ -226,7 +233,8 @@ void NewLogger::printall_by_typesize()
     }
 
     cerr << endl;
-    cerr << "total memory usage: " << total_mem_usage << endl;
+    cerr << "total memory usage: " << total_mem_usage << " bytes; "
+         << total_callcount << " total allocation calls" << endl;
     cerr << "(total memory usage in MB: " << (total_mem_usage/1024/1024)
          << ")" << endl;
 }

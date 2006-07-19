@@ -209,6 +209,7 @@ DdNode*  BddRepresentation::labelToBddMp(char* label){
         Cudd_RecursiveDeref(mgrMp, f);
         f = tmp;
     }
+    delete assignment;
     return (f);
 }
 
@@ -310,6 +311,8 @@ DdNode* BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2){
         f = tmp;
         
     }
+    delete assignment1;
+    delete assignment2;
     return (f);
 }
 

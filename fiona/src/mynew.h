@@ -11,9 +11,12 @@
 #include "newlogger.h"
 
 // prototypes for global operators new
-void* operator new (size_t size, const std::string &file, int line);
+void* operator new   (size_t size, const std::string &file, int line);
 void* operator new[] (size_t size, const std::string &file, int line);
 
+// prototypes for global operators delete
+void operator delete   (void* mem);
+void operator delete[] (void* mem);
 
 // new should be substituted with NEW_NEW such that user defined operators new
 // (with current file and line as parameters) are called. 
@@ -25,9 +28,9 @@ void* operator new[] (size_t size, const std::string &file, int line);
         std::string filepos(file);                                      \
         filepos += ':';                                                 \
         filepos += toString(line);                                      \
-        NewLogger::addInfo(#CLASSNAME, filepos, size);                  \
-                                                                        \
-        return ::new char[size];                                        \
+        void* ptr = malloc(size);                                       \
+        NewLogger::logAllocation(#CLASSNAME, filepos, size, ptr);       \
+        return ptr;                                                     \
     }
 
 // definition of user defined class operators new and new[]

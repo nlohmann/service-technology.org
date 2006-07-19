@@ -49,7 +49,7 @@ class arc_list {
     // Provides user defined operator new. Needed to trace all new operations
     // on this class.
 #undef new
-    NEW_OPERATOR(acr_list)
+    NEW_OPERATOR(arc_list)
 #define new NEW_NEW
 };   
 

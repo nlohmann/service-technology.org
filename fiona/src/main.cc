@@ -264,17 +264,7 @@ int main(int argc, char ** argv) {
 	
     trace(TRACE_0, "--------------------------------------------------------------\n\n");
 
-#ifdef LOG_NEW
-NewLogger::printall();
-#endif
 
-    try {
-        return  0; //1 - PN->depth_first();
-    } catch(bad_alloc) {
-        //char mess [] = "memory exhausted\n";
-        //cerr << mess;
-        _exit(2);
-    }
 }
     catch(bad_alloc) {
         char mess [] = "memory exhausted\n";
@@ -282,4 +272,9 @@ NewLogger::printall();
         _exit(2);
     }
 
+#ifdef LOG_NEW
+    NewLogger::printall();
+#endif
+    
+    return 0;
 }

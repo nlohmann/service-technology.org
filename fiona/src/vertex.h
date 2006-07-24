@@ -69,9 +69,11 @@ public:
     
     bool addState(State *);
     
-    void addClause(clause *);
+    void addClause(clause *, bool);
     void setAnnotationEdges(graphEdge *);
-    
+   
+	int numberOfElementsInAnnotation();
+ 
     graphEdge * getNextEdge();
     successorNodeList * getSuccessorNodes();
     

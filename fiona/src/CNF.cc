@@ -17,7 +17,7 @@ clause::clause() : edge(NULL), nextElement(NULL)  {
 	
 }
 
-clause::clause(graphEdge * _edge) : edge(_edge), nextElement(NULL)  {
+clause::clause(graphEdge * _edge) : edge(_edge), nextElement(NULL) {
 	
 }
 
@@ -47,6 +47,7 @@ void clause::setEdge(graphEdge * _edge) {
 //! \brief adds the given label to this clause list
 void clause::addLiteral(char * label) {
     trace(TRACE_5, "clause::addLiteral(char * label) : start\n");
+//	cout << "\t " << label << endl;
 	
 	clause * cl = this;
 	
@@ -70,6 +71,7 @@ void clause::addLiteral(char * label) {
 //! \return the clause as a string
 //! \brief returns the clause as a string
 string clause::getClauseString() {
+    trace(TRACE_5, "clause::getClauseString() : start\n");
 	
     string clauseString = "";
     bool comma = false;
@@ -77,8 +79,11 @@ string clause::getClauseString() {
 	clause * cl = this;
 
     while (cl) {
-        if (cl->edge->getNode() != NULL && cl->edge->getNode()->getColor() != RED && 
-        			cl->edge->getNode()->setOfStates.size() > 0) {
+        if (cl->edge != NULL && 
+        		cl->edge->getNode() != NULL && 
+        		//cl->edge->getNode()->getColor() != RED && 
+        		cl->edge->getNode()->setOfStates.size() > 0) {
+        			
             if (comma) {
                 clauseString += "+";
             }
@@ -92,6 +97,8 @@ string clause::getClauseString() {
         }    	
     	cl = cl->nextElement;	
     }
+    
+    trace(TRACE_5, "clause::getClauseString() : end\n");
     
     return clauseString;
 }
@@ -107,7 +114,7 @@ void clause::setEdges(graphEdge * edge) {
  	while (cl) {
 		if  (cl->edge != NULL && strcmp(cl->edge->getLabel(), edge->getLabel()) == 0) {
 			// we have found a pseudo edge with that label, so store the correct edge right here
-			cl->setEdge(edge);		
+			cl->setEdge(edge);	
 			trace(TRACE_5, "clause::setEdges(graphEdge * edge) : end\n");		
 			return;
 		}
@@ -171,8 +178,8 @@ vertexColor CNF::calcColor() {
 	            
 	            clause * literalTemp = literal->nextElement;	// remember the next literal in list
           
-	            delete literal;							// delete literal
-	            literal = literalTemp;						// get the remembered literal
+	            delete literal;				// delete literal
+	            literal = literalTemp;		// get the remembered literal
 	            continue ;
 	        } 
         }
@@ -200,6 +207,10 @@ string CNF::getCNF() {
 	if (cl == NULL) {		// since theres is no clause we can't conclude anything
 		return "NULL";	
 	}
+	
+	if (isFinalState) {
+		return "final";
+	}
 
 	clause * literal = cl;
 
@@ -220,10 +231,44 @@ string CNF::getCNF() {
 //! \param edge
 //! \brief sets the the clause's edge to the given edge
 void CNF::setEdge(graphEdge * edge) {
- 	clause * literal = cl;
+ 	clause * clauseTemp = cl;
+ 	clause * clausePrev = NULL;
  	
- 	while (literal) {
-		literal->setEdges(edge);				
- 		literal = literal->nextElement;	
+ 	if (edge->getNode() && edge->getNode()->getColor() != RED) {
+	
+	 	while (clauseTemp) {
+			if  (clauseTemp->edge != NULL && strcmp(clauseTemp->edge->getLabel(), edge->getLabel()) == 0) {
+				// we have found a pseudo edge with that label, so store the correct edge right here
+				if (clausePrev == NULL) {
+					cl = clauseTemp->nextElement;	
+				} else {
+					clausePrev->nextElement = clauseTemp->nextElement;
+				}				
+				
+			}
+			
+			clausePrev = clauseTemp;		// remember this clause
+	 		clauseTemp = clauseTemp->nextElement;	
+	 	}
+ 		
+ 		return;	
  	}
+ 	
+ 	while (clauseTemp) {
+		clauseTemp->setEdges(edge);				
+ 		clauseTemp = clauseTemp->nextElement;	
+ 	}
+}
+
+int CNF::numberOfElements() {
+	clause * literal = cl;
+ 	int count = 0;
+
+ 	while (literal) {
+ 		count++;
+		literal = literal->nextElement;	
+ 	}
+	
+	return count;
+
 }

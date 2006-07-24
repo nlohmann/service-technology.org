@@ -263,16 +263,10 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 //! \param node the node for which the activated input events are calculated
 //! \brief creates a list of all activated input events (messages) of the current node
 setOfMessages interactionGraph::getActivatedInputEvents(vertex * node) {
-
 	trace(TRACE_5, "interactionGraph::getActivatedInputEvents(vertex * node): start\n");
 
-
 	int i;
-
-	clause * cl = new clause();
-
 	StateSet::iterator iter;		
-	
 	setOfMessages inputMessages;	// list of all input messages of the current node
 	
 	for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
@@ -280,11 +274,14 @@ setOfMessages interactionGraph::getActivatedInputEvents(vertex * node) {
 #ifdef DEBUG
 	//cout << "\t state " << PN->printMarking((*iter)->myMarking) << " activates the input events: " << endl;
 #endif		
-		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {				// we just consider the maximal states only
+		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {	// we just consider the maximal states only
 			i = 0;
-//			PN->setCurrentMarkingFromState((*iter));
+
+			clause * cl = new clause();			// create a new clause for this particular state
+			bool add = false;
 			
 			(*iter)->decode(PN);
+			
 			while ((*iter)->quasiFirelist && (*iter)->quasiFirelist[i]) {
 				
 				for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin();
@@ -296,14 +293,22 @@ setOfMessages interactionGraph::getActivatedInputEvents(vertex * node) {
 					
 					inputMessages.insert(input);
 					
+					if (node->getNumber() == 9) {
+						cout << "sending event: " << PN->Places[*index]->name << endl;
+						cout << "i: " << i << endl;
+						cout << "transition: " << (*iter)->quasiFirelist[i]->name << endl;
+					}
+					
 					cl->addLiteral(PN->Places[*index]->name);
+					add = true;
 				}
 				i++;
 			}
+			if (add || (*iter)->type == FINALSTATE) {
+				node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
+			}
 		}
 	}
-	
-	node->addClause(cl);
 	
 	trace(TRACE_5, "interactionGraph::getActivatedInputEvents(vertex * node): end\n");
 	
@@ -329,32 +334,29 @@ setOfMessages interactionGraph::getActivatedOutputEvents(vertex * node) {
 	for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
 	
 		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {				// we just consider the maximal states only
-
-//			trace(TRACE_5, "\t state "<< *(*iter) << " activates the output events: " << endl;
-	
 			int i;
 			int k = 0;
+			bool add = false;
 			
+			clause * cl = new clause();			// create a new clause for this particular state
+
 			(*iter)->decode(PN);
-//			marking = (*iter)->myMarking;
 			
 			for (i = 0; i < PN->getPlaceCnt(); i++) {
 				if (PN->Places[i]->type == OUTPUT && PN->CurrentMarking[i] > 0) {
-					
-#ifdef DEBUG
-	cout << "\t\t" << PN->Places[i]->name << endl;
-#endif
-
 					messageMultiSet output;
 					output.insert(i);
 					
 					outputMessages.insert(output);
 					cl->addLiteral(PN->Places[i]->name);	
+					add = true;
 				}	
+			}
+			if (add  || (*iter)->type == FINALSTATE) {
+				node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
 			}
 		}
 	}
-	node->addClause(cl);
 	trace(TRACE_5, "interactionGraph::getActivatedOutputEvents(vertex * node): end\n");	
    	return outputMessages;		
 }
@@ -388,13 +390,15 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node) {
 	
 	for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
 
-
 		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {  // we just consider the maximal states only
+
 #ifdef DEBUG
 	cout << "\t state "<< (*iter) << " activates the output events: " << endl;
 #endif		
 			int i;
 			int k = 0;
+			clause * cl = new clause();			// create a new clause for this particular state
+			bool add = false;
 			
 			messageMultiSet outputMessages;		// multiset of all input messages of the current state
 			
@@ -472,17 +476,23 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node) {
 					}	
 				} else {
 					cl->addLiteral(label);	
+					add = true;
 				}
     			
 				if (!subset && !supset) {
 					listOfOutputMessageLists.insert(outputMessages);
 					cl->addLiteral(PN->createLabel(outputMessages));
+					add = true;
 				} 
 				
 				found = false;
 				skip = false;
 			}
+			if (add) {
+				node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
+			}
 		}
+		
 	}
 
     /* check the set of output-messages for containing subsets */
@@ -498,7 +508,6 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node) {
 	cout << "\t\t (after) number of message lists in list: " << listOfOutputMessageLists.size() << endl;
 #endif
 
-	node->addClause(cl);
 
    	return listOfOutputMessageLists;		
 }
@@ -515,7 +524,7 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 	int i;
 
 	StateSet::iterator iter;		
-	clause * cl = new clause();
+	
 	setOfMessages inputMessages;	// list of all input messages of the current node
 	
 	for (iter = node->setOfStates.begin(); 
@@ -527,6 +536,8 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {				// we just consider the maximal states only
 			i = 0;
 //			PN->setCurrentMarkingFromState((*iter));
+			clause * cl = new clause();
+			bool add = false;
 			
 			(*iter)->decode(PN);
 			while (!stateActivatesOutputEvents(*iter) && 
@@ -543,13 +554,17 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 					inputMessages.insert(input);
 					
 					cl->addLiteral(PN->Places[*index]->name);
+					add = true;
 				}
 				i++;
+			}
+			if (add) {
+				node-> addClause(cl, (*iter)->type == FINALSTATE);
 			}
 		}
 	}
 
-	node-> addClause(cl);
+	
 
 	trace(TRACE_5, "number of input events: " + intToString(inputMessages.size()) + "\n" );
 	trace(TRACE_5, "interactionGraph::receivingBeforeSending(vertex * node): end\n");

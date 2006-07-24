@@ -462,4 +462,7 @@ void owfnTransition::check_enabled(oWFN * PN) {
       		excludeTransitionFromQuasiEnabledList(PN);	// delete transition from list of quasi enabled transtions
   		}
   	}
+  	
+  //	cout << "current marking: " << PN->printCurrentMarkingForDot() << endl;
+  //	cout << "transition " << name << " is quasiEnabled: " << quasiEnabled << " and enabled: " << enabled << endl;
 }

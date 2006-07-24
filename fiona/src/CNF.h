@@ -71,12 +71,15 @@ public:
 
 	clause * cl;		
 	CNF * nextElement;			// !< next element in CNF
+	bool isFinalState;			// indicates whether this clause belongs to a final state or not
 	
 	vertexColor getColor();
 	vertexColor calcColor();
 	
 	void addClause(clause *);
 	void setEdge(graphEdge *);
+
+	int numberOfElements();
 	
 	string getCNF();
 

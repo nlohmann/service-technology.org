@@ -90,16 +90,17 @@ bool vertex::addState(State * s) {
 //! \fn void vertex::addClauseElement(clause * newClause)
 //! \param newClause the clause to be added to this CNF
 //! \brief adds the given clause to this CNF
-void vertex::addClause(clause * newClause) {
+void vertex::addClause(clause * newClause, bool _isFinalState) {
     trace(TRACE_5, "vertex::addClause(clause * newClause) : start\n");
 	
 	CNF * cnfElement = annotation;
 	
-	cout << "annotation: " << annotation << endl;
+	cout << "adding clause to node number " << numberOfVertex << endl;
 	
 	if (cnfElement == NULL) {
 		annotation = new CNF();
 		annotation->addClause(newClause);
+		annotation->isFinalState = _isFinalState;
 		trace(TRACE_5, "vertex::addClause(clause * newClause) : end\n");
 		return ;	
 	}
@@ -109,7 +110,10 @@ void vertex::addClause(clause * newClause) {
 	}	  
 	cnfElement->nextElement = new CNF();
 	cnfElement->nextElement->addClause(newClause);	// create a new clause literal	
+	cnfElement->nextElement->isFinalState = _isFinalState;
 
+	cout << "number of elements in annotation of node " << numberOfVertex << " : " << numberOfElementsInAnnotation() << endl;
+		
     trace(TRACE_5, "vertex::addClause(clause * newClause) : end\n");
 }
 
@@ -165,20 +169,37 @@ void vertex::setAnnotationEdges(graphEdge * edge) {
 //! \brief returns the annotation as a string
 string vertex::getCNF() {
 	string CNFString = "";
+	string CNFStringTemp = "";
+
 	bool mal = false;
 	
 	CNF * cl = annotation;
 	
 	while (cl) {
-		if (mal) {
+		CNFStringTemp = "";
+		CNFStringTemp = cl->cl->getClauseString();
+		if (mal && CNFStringTemp != "final" && CNFStringTemp != "") {
 			CNFString += " * ";
 		}
-		CNFString += cl->cl->getClauseString();
+		if (CNFStringTemp != "final" && CNFStringTemp != "") {
+			CNFString += CNFStringTemp;
+		}
 		mal = true;
 		cl = cl->nextElement;
 	}
 	
 	return CNFString;
+}
+
+int vertex::numberOfElementsInAnnotation() {
+	CNF * cl = annotation;
+	int count = 0;
+	while (cl) {
+		count++;
+		cl = cl->nextElement;
+	}
+	return count;
+
 }
 
 //! \fn void vertex::setColor(vertexColor c)
@@ -217,6 +238,9 @@ int vertex::getNumberOfDeadlocks() {
 analysisResult vertex::analyseNode(bool finalAnalysis) {
 
     trace(TRACE_2, "\t\t\t analysing node ");
+    if (finalAnalysis) {
+    	trace(TRACE_2, "(final analysis)");
+    }
     trace(TRACE_2, intToString(numberOfVertex) + ": ");
 
     if (color != RED) {          // red nodes stay red forever
@@ -238,7 +262,12 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
 
             // iterate over all clauses of the annotation and determine color for clause
             while (cl) {
-                if (eventsToBeSeen == 0 || finalAnalysis) {
+            	if (cl->isFinalState) {
+            		finalState = true;
+            		cout << "node : " << numberOfVertex << " has final state" << endl;
+            		c = BLUE;
+            	} else if (eventsToBeSeen == 0 || finalAnalysis) {
+                	finalState = false;
                     cTmp = cl->calcColor();
                     switch (cTmp) {
                     case RED:   // found a red clause; so node becomes red
@@ -274,7 +303,7 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
                     }
                 } else {
                     // still events left to resolve deadlocks...
-                    color  =BLACK;
+                    color = BLACK;
                     trace(TRACE_2, "node still indefinite \t\t ...continue\n");
                     return CONTINUE;
                 }
@@ -283,30 +312,21 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
             }
 
             // all clauses considered
-
             trace(TRACE_2, "all states checked, node becomes ");
-            if (c == BLACK)
-                trace(TRACE_2, "black");
-            else if (c == RED)
+            if (c == BLACK) {
                 trace(TRACE_2, "red");
-            else if (c == BLUE)
+            } else if (c == RED) {
+                trace(TRACE_2, "red");
+            } else if (c == BLUE) {
                 trace(TRACE_2, "blue");
-
+            }
+            
             color = c;
             
-            StateSet::iterator iter;          // iterator over the stateList's elements
-
-            // iterate over all states and check whether there is a final state in the set
-            for (iter = setOfStates.begin(); iter != setOfStates.end(); iter++) {
-                if ((*iter)->type == FINALSTATE) {
-                	// yes, there is a final state
-                	finalState = true;
-                	break;
-                }
-            }            
-            
-            
             if (finalState) {
+            	if (color == BLACK) {
+            		color = BLUE;
+            	}
                 trace(TRACE_2, " ...terminate\n");
                 return TERMINATE;
             } else {

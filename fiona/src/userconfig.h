@@ -1,7 +1,7 @@
 // User configuration file for LoLA
 
 // specify whether each new operation shall be logged
-//#define LOG_NEW
+#define LOG_NEW
 
 // Select your operating system
 #define WINDOWS

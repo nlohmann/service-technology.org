@@ -495,29 +495,28 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
                 }
 //              os << "(";
                 if (v->getColor() != RED) {
-                		CNF += v->getCNF();
-//                    switch ((*iter)->type) {
-//                        case DEADLOCK:  if (mult) {
+                    switch ((*iter)->type) {
+                        case DEADLOCK:  //if (mult) {
 //                                            CNF += " * ";
 //                                        }
-//                                        if (parameters[P_SHOW_STATES_PER_NODE]) {
-//	                                        os << " (DL)";
-//                                        }
-//                                        CNF += "("; CNF += (*iter)->getClause(); CNF += ")"; mult=true;
-//                                        break;
-//                        case FINALSTATE: if (mult) {
-//                                            CNF += " * ";
-//                                        }
-//                                        if (parameters[P_SHOW_STATES_PER_NODE]) {
-//	                                        os << " (FS)";
-//                                        }
-//                                        CNF += "(true)"; mult=true;
-//                                        break;
-//                        default:
-////                                      os << "TR";
-////                                      CNF += "true";
-//                                        break;
-//                    };
+                                        if (parameters[P_SHOW_STATES_PER_NODE]) {
+	                                        os << " (DL)";
+                                        }
+                                   //     CNF += "("; CNF += (*iter)->getClause(); CNF += ")"; mult=true;
+                                        break;
+                        case FINALSTATE: //if (mult) {
+                                         //   CNF += " * ";
+                                        //}
+                                        if (parameters[P_SHOW_STATES_PER_NODE]) {
+	                                        os << " (FS)";
+                                        }
+                                       // CNF += "(true)"; mult=true;
+                                        break;
+                        default:
+                                      os << "TR";
+//                                      CNF += "true";
+                                        break;
+                    };
                 } //else {
 //                  switch ((*iter)->type) {
 //                      case DEADLOCK:  os << "DL"; break;
@@ -531,6 +530,7 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
 	                os << "\\n";
 	            }
             }
+			CNF += v->getCNF();
 
             if (parameters[P_OG]) {
                 if (v->getColor() == RED) {
@@ -540,9 +540,10 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
                         CNF += "(true)";
                     }
                 }
-//                CNF += ">";
-                os << CNF;
             }
+//          }      CNF += ">";
+                os << CNF;
+            
 
             os << "\", fontcolor=black, color=";
 

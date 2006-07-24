@@ -225,7 +225,6 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 //	}
 }
 
-
 //! \fn void operatingGuidelines::getInputEvents(vertex * node)
 //! \param node the node for which the activated input events are calculated
 //! \brief calculates all activated input events (messages) of the current node for the annotation
@@ -234,20 +233,19 @@ void operatingGuidelines::getInputEvents(vertex * node) {
 	trace(TRACE_5, "operatingGuidelines::getInputEvents(vertex * node): start\n");
 	StateSet::iterator iter;			// iterator over the stateList's elements
 	
-	clause * cl = new clause();
-	
-	for (int i = 0; i < PN->placeInputCnt; i++) {
-		// iterate over all states of the node
-		for (iter = node->setOfStates.begin();
-			 iter != node->setOfStates.end(); iter++) {
-			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {
-				// we just consider the maximal states only
+	// iterate over all states of the node
+	for (iter = node->setOfStates.begin();
+		 iter != node->setOfStates.end(); iter++) {
+		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {
+			// we just consider the maximal states only
+			clause * cl = new clause();
+			for (int i = 0; i < PN->placeInputCnt; i++) {
 				cl->addLiteral(PN->Places[PN->inputPlacesArray[i]]->name);
 			}
+			node->addClause(cl, (*iter)->type == FINALSTATE);
 		}			
 	}
 	
-	node->addClause(cl);
 	trace(TRACE_5, "operatingGuidelines::getInputEvents(vertex * node): end\n");
 }
 
@@ -259,8 +257,6 @@ void  operatingGuidelines::getActivatedOutputEvents(vertex * node) {
 	trace(TRACE_5, "operatingGuidelines::getActivatedOutputEvents(vertex * node): start\n");
 	int i;
 	
-	clause * cl = new clause();
-	
 	StateSet::iterator iter;			// iterator over the stateList's elements
 	
 	// iterate over all states of the node
@@ -271,6 +267,9 @@ void  operatingGuidelines::getActivatedOutputEvents(vertex * node) {
 		if ((*iter)->type == DEADLOCK  || (*iter)->type == FINALSTATE)  {
 			int i;
 			int k = 0;
+			bool add = false;
+						
+			clause * cl = new clause();
 			
 			(*iter)->decode(PN);
 						
@@ -278,11 +277,14 @@ void  operatingGuidelines::getActivatedOutputEvents(vertex * node) {
 				
 				if (PN->CurrentMarking[PN->outputPlacesArray[i]] > 0) {
 					cl->addLiteral(PN->Places[PN->outputPlacesArray[i]]->name);	
+					add = true;
 				}	
+			}
+			if (add) {
+				node->addClause(cl, (*iter)->type == FINALSTATE);
 			}
 		}
 	}
-	node->addClause(cl);
 	trace(TRACE_5, "operatingGuidelines::getActivatedOutputEvents(vertex * node): end\n");
 }
 

@@ -36,6 +36,7 @@ public:
   State * parent;                   // state responsible for first generation
   stateType type;                   // type of state (Deadlock, Final, Transient)
   void decode(oWFN *);      		// decode state into given marking vector
+  void decodeShowOnly(oWFN *);		// decode state into given marking vector just for showing the marking!!!
 
   // Provides user defined operator new. Needed to trace all new operations on
   // this class.
@@ -168,6 +169,9 @@ inline binDecision::binDecision(int b, long int BitVectorSize) {
 
 inline binDecision::~binDecision() {
 	delete [] vector;
+	delete state;
+	
+	cout << "inline binDecision::~binDecision()" << endl;
 }
 
 

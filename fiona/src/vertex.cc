@@ -37,15 +37,22 @@ vertex::vertex() :
 //! \fn vertex::~vertex()
 //! \brief destructor
 vertex::~vertex () {
-	
+
 	if (successorNodes != NULL) {
 		delete successorNodes;
 	}
-//	if (states != NULL) {
-//		delete states;
-//	}
+	
 	if (eventsUsed != NULL) {
 		delete[] eventsUsed;
+	}
+	
+	CNF * cnfTemp1 = annotation;
+	CNF * cnfTemp2;
+	
+	while (cnfTemp1) {
+		cnfTemp2 = cnfTemp1->nextElement;
+		delete cnfTemp1;	
+		cnfTemp1 = cnfTemp2;
 	}
 	
 	numberDeletedVertices++;
@@ -95,7 +102,7 @@ void vertex::addClause(clause * newClause, bool _isFinalState) {
 	
 	CNF * cnfElement = annotation;
 	
-	cout << "adding clause to node number " << numberOfVertex << endl;
+	//cout << "adding clause to node number " << numberOfVertex << endl;
 	
 	if (cnfElement == NULL) {
 		annotation = new CNF();
@@ -112,7 +119,7 @@ void vertex::addClause(clause * newClause, bool _isFinalState) {
 	cnfElement->nextElement->addClause(newClause);	// create a new clause literal	
 	cnfElement->nextElement->isFinalState = _isFinalState;
 
-	cout << "number of elements in annotation of node " << numberOfVertex << " : " << numberOfElementsInAnnotation() << endl;
+//	cout << "number of elements in annotation of node " << numberOfVertex << " : " << numberOfElementsInAnnotation() << endl;
 		
     trace(TRACE_5, "vertex::addClause(clause * newClause) : end\n");
 }
@@ -264,7 +271,7 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
             while (cl) {
             	if (cl->isFinalState) {
             		finalState = true;
-            		cout << "node : " << numberOfVertex << " has final state" << endl;
+            	//	cout << "node : " << numberOfVertex << " has final state" << endl;
             		c = BLUE;
             	} else if (eventsToBeSeen == 0 || finalAnalysis) {
                 	finalState = false;

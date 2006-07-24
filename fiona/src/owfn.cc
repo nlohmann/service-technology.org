@@ -51,6 +51,14 @@ oWFN::oWFN() : arcCnt(0), placeHashValue(0), placeCnt(0),
 oWFN::~oWFN() {	
 	delete[] inputPlacesArray;
 	delete[] outputPlacesArray;
+//	for (int i = 0; i < HASHSIZE; i++) {
+//		if (binHashTable[i]) {
+//			delete binHashTable[i];
+//		}
+//	}
+	delete[] binHashTable;
+	delete[] Places;
+	delete[] Transitions;
 }
 
 
@@ -215,7 +223,7 @@ owfnTransition ** oWFN::firelist() {
 	owfnTransition * t;
 	int i;
 	tl = new owfnTransition * [transNrEnabled + 1];
-	for(i=0, t = startOfEnabledList; t; t = t -> NextEnabled) {
+	for(i = 0, t = startOfEnabledList; t; t = t->NextEnabled) {
 		tl[i++] = t;
 	}
 	tl[i] = (owfnTransition *) 0;
@@ -229,7 +237,7 @@ owfnTransition ** oWFN::quasiFirelist() {
 	owfnTransition * t;
 	int i;
 	tl = new owfnTransition * [transNrQuasiEnabled + 1];
-	for(i=0, t = startOfQuasiEnabledList; t; t = t -> NextQuasiEnabled) {
+	for(i = 0, t = startOfQuasiEnabledList; t; t = t->NextQuasiEnabled) {
 		tl[i++] = t;
 	}
 	tl[i] = (owfnTransition *) 0;
@@ -266,12 +274,9 @@ void oWFN::addSuccStatesToList(vertex * n, State * NewState) {
 void oWFN::addStateToList(vertex * n, State * currentState) {
 		bool minimal = false;
 		
-//		unsigned int * myMarking;
-		
-		currentState->decode(this);
+		currentState->decodeShowOnly(this);
 			
 		for (int z = 0; z < placeCnt; z++) {
-//			if (Places[z]->type == OUTPUT && myMarking[z] > 0) {
 			if (Places[z]->type == OUTPUT && CurrentMarking[z] > 0) {
 				minimal = true;
 				break;
@@ -279,7 +284,11 @@ void oWFN::addStateToList(vertex * n, State * currentState) {
 		}
 		
 		if (currentState != NULL) {
-			if (parameters[P_CALC_ALL_STATES] || currentState->type == DEADLOCK || minimal || currentState->type == FINALSTATE) { 
+			if (parameters[P_CALC_ALL_STATES] || 
+					currentState->type == DEADLOCK || 
+					minimal || 
+					currentState->type == FINALSTATE) { 
+						
 				n->addState(currentState);
 			}
 		} else {

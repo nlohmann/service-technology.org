@@ -44,7 +44,7 @@ class arc_list {
  public:
 	PlSymbol * place;
 	unsigned int nu;
-    arc_list    * next;
+    arc_list * next;
 
     // Provides user defined operator new. Needed to trace all new operations
     // on this class.
@@ -183,7 +183,7 @@ net: key_place place_area key_marking {LocalTable = (SymbolTab *) 0;}
 		
 			// pass 3 (fill in arcs)
 			for(i = 0; i < TransitionTable->card; i++) {
-				for(j=0;j < PN->Transitions[i]->NrOfLeaving;j++) {
+				for(j=0; j < PN->Transitions[i]->NrOfLeaving;j++) {
 					owfnPlace * pl;
 					pl = PN->Transitions[i]->LeavingArcs[j]->pl;
 					pl->ArrivingArcs[pl->NrOfArriving] = PN->Transitions[i]->LeavingArcs[j];

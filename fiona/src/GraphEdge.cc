@@ -19,14 +19,7 @@ graphEdge::graphEdge(vertex * nodeP, char * labelP, edgeType typeP) {
 //! \fn graphEdge::~graphEdge()
 //! \brief destructor
 graphEdge::~graphEdge() {
-	
-//	if (label) {
-//		delete label;
-//	}
 
-	//if (node != NULL && node->getColor() == RED) {
-	//	delete node;	
-	//}
 }
 
 //! \fn void graphEdge::setNextElement(graphEdge * element)

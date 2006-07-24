@@ -40,6 +40,13 @@ reachGraph::reachGraph(oWFN * _PN) :
 //! \fn reachGraph::~reachGraph()
 //! \brief destructor !to be implemented!
 reachGraph::~reachGraph() {
+	vertexSet::iterator iter;
+	
+	for (iter = setOfVertices.begin(); iter != setOfVertices.end(); iter++) {
+		delete *iter;	
+	}
+	
+	delete root;
 }
 
 //! \fn vertex * reachGraph::getRoot() const
@@ -488,7 +495,7 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
 
                 if (parameters[P_SHOW_STATES_PER_NODE]) {
                 	unsigned int * myMarking = new unsigned int [PN->getPlaceCnt()];
-                	(*iter)->decode(PN);
+                	(*iter)->decodeShowOnly(PN);
                 	
                     os << "[" << PN->printCurrentMarkingForDot() << "]";
 //                    os << "[" << PN->printCurrentMarkingForDot() << "]" << "(" << (*iter) << ")";

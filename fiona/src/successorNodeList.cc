@@ -19,7 +19,7 @@ successorNodeList::successorNodeList() :
 
 //! \fn successorNodeList::~successorNodeList()
 //! \brief destructor
-successorNodeList::~successorNodeList(){
+successorNodeList::~successorNodeList() {
 	deleteList(firstElement);
 }
 

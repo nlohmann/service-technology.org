@@ -294,6 +294,7 @@ setOfMessages interactionGraph::getActivatedInputEvents(vertex * node) {
 					inputMessages.insert(input);
 					
 					if (node->getNumber() == 9) {
+				//		cout << "current marking: " << PN->printCurrentMarkingForDot() << endl;
 						cout << "sending event: " << PN->Places[*index]->name << endl;
 						cout << "i: " << i << endl;
 						cout << "transition: " << (*iter)->quasiFirelist[i]->name << endl;
@@ -306,6 +307,8 @@ setOfMessages interactionGraph::getActivatedInputEvents(vertex * node) {
 			}
 			if (add || (*iter)->type == FINALSTATE) {
 				node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
+			} else {
+				delete cl;	
 			}
 		}
 	}
@@ -354,6 +357,8 @@ setOfMessages interactionGraph::getActivatedOutputEvents(vertex * node) {
 			}
 			if (add  || (*iter)->type == FINALSTATE) {
 				node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
+			} else {
+				delete cl;	
 			}
 		}
 	}
@@ -490,6 +495,8 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node) {
 			}
 			if (add) {
 				node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
+			} else {
+				delete cl;	
 			}
 		}
 		
@@ -560,6 +567,8 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 			}
 			if (add) {
 				node-> addClause(cl, (*iter)->type == FINALSTATE);
+			} else {
+				delete cl;	
 			}
 		}
 	}

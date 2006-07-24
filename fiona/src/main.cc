@@ -160,19 +160,12 @@ int main(int argc, char ** argv) {
         cerr << mess;
         _exit(2);
     }
+    
+    delete GlobalTable;
     delete PlaceTable;
     delete TransitionTable;
 
     // report the net
-
-	unsigned int * copy = new unsigned int [PN->getPlaceCnt()];
-
-	for (int i = 0; i < PN->getPlaceCnt(); i++) {
-		copy[i] = PN->CurrentMarking[i];
-	
-	}
-
-    
     trace(TRACE_0, "places: " + intToString(PN->getPlaceCnt()));
     trace(TRACE_0, " (including " + intToString(PN->getInputPlaceCnt()) + " input places, " + intToString(PN->getOutputPlaceCnt()) + " output places)\n");
     trace(TRACE_0, "transitions: " + intToString(PN->getTransitionCnt()) + "\n");
@@ -188,7 +181,6 @@ int main(int argc, char ** argv) {
 
     if (parameters[P_OG]) {
         // operating guideline is built
-
         operatingGuidelines * graph = new operatingGuidelines(PN);
 
         trace(TRACE_0, "building the operating guideline...\n");
@@ -213,14 +205,13 @@ int main(int argc, char ** argv) {
         if (options[O_BDD] == false){
         	graph->printDotFile();
         	//graph->convertToBdd();
-        }
-        
-        if (options[O_BDD] == true){
+        } else {       
         	graph->bdd->reorder((Cudd_ReorderingType)bdd_reordermethod);
         	graph->bdd->printDotFile();
         	//graph->bdd->print();
         }
-
+        
+		delete graph;
     } else {
         // interaction graph is built
 
@@ -254,16 +245,15 @@ int main(int argc, char ** argv) {
 		trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
 
         graph->printDotFile();
+        delete graph;
     }
 
 //	cout << "\ncomputation finished\n\t\t\t...please hit any key" << endl;
 //	getchar();
 	
-	//delete PlaceTable;
-    //delete TransitionTable;
+	delete PN;
 	
     trace(TRACE_0, "--------------------------------------------------------------\n\n");
-
 
 }
     catch(bad_alloc) {

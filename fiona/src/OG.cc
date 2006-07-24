@@ -282,6 +282,8 @@ void  operatingGuidelines::getActivatedOutputEvents(vertex * node) {
 			}
 			if (add) {
 				node->addClause(cl, (*iter)->type == FINALSTATE);
+			} else {
+				delete cl;	
 			}
 		}
 	}

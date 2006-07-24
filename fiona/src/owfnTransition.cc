@@ -387,7 +387,7 @@ void owfnTransition::excludeTransitionFromQuasiEnabledList(oWFN * PN) {
 //! \fn void owfnTransition::check_enabled(oWFN * PN)
 //! \param PN owfn this transition is part of
 //! \brief check whether this transition is (quasi) enabled at the current marking
-//! quasi enabled means, that this transition activates a sending event (this transition is a receiving transition)
+//! quasi-enabled means, that this transition activates a sending event (this transition is a receiving transition)
 void owfnTransition::check_enabled(oWFN * PN) {
 	unsigned int * p;
 	unsigned int *i;

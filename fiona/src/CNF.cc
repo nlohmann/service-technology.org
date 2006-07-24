@@ -22,9 +22,11 @@ clause::clause(graphEdge * _edge) : edge(_edge), nextElement(NULL) {
 }
 
 clause::~clause() {
-	if (edge->getNode() == NULL) {
-		delete edge;	
+	trace(TRACE_5, "clause::~clause() : start\n");
+	if (edge != NULL && edge->getNode() == NULL) {
+	//	delete edge;	
 	}
+	trace(TRACE_5, "clause::~clause() : end\n");
 }
 
 void clause::setEdge(graphEdge * _edge) {
@@ -128,6 +130,19 @@ void clause::setEdges(graphEdge * edge) {
 //! \brief constructor
 CNF::CNF() : nextElement(NULL), cl(NULL) {
 
+}
+
+//! \fn CNF::~CNF()
+//! \brief destructor
+CNF::~CNF() {
+	clause * clauseTemp1 = cl;
+	clause * clauseTemp2;
+	
+	while (clauseTemp1) {
+		clauseTemp2 = clauseTemp1->nextElement;
+		delete clauseTemp1;	
+		clauseTemp1 = clauseTemp2;
+	}
 }
 
 //! \fn void CNF::addClause(clause * newClause)

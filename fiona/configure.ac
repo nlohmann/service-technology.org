@@ -4,7 +4,7 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT(Fiona, 1.0, weinberg@informatik.hu-berlin.de, fiona)
-AC_REVISION($Revision: 1.7 $)
+AC_REVISION($Revision: 1.8 $)
 
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/fiona.h)
@@ -92,10 +92,10 @@ echo                                  >> cudd/Makefile.inc
 echo "RANLIB = $RANLIB"		      >> cudd/Makefile.inc
 echo                                  >> cudd/Makefile.inc
 case `uname -s` in
-  LINUX)    echo "XCFLAGS = -march=`uname -m` -malign-double -DHAVE_IEEE_754 -DBSD" >> cudd/Makefile.inc ;;
+  Linux)    echo "XCFLAGS = -march=`uname -m` -malign-double -DHAVE_IEEE_754 -DBSD" >> cudd/Makefile.inc ;;
   SunOS)    echo "XCFLAGS = -mcpu=ultrasparc  -DHAVE_IEEE_754 -DUNIX100 -DEPD_BIG_ENDIAN" >> cudd/Makefile.inc;;
   CYGWIN*)  echo "XCFLAGS = -march=`uname -m` -malign-double -DHAVE_IEEE_754 -DHAVE_GETRLIMIT=0 -DRLIMIT_DATA_DEFAULT=67108864" >> cudd/Makefile.inc;;
-  Darwin)   echo "XCFLAGS = -m`uname -p` -DBSD -DHAVE_IEEE_754 -DEPD_BIG_ENDIAN -O3 -qstrict" >> cudd/Makefile.inc ;;
+#  Darwin)   echo "XCFLAGS = -m`uname -p` -DBSD -DHAVE_IEEE_754 -DEPD_BIG_ENDIAN -O3 -qstrict" >> cudd/Makefile.inc ;;
   *) ;;
 esac
 echo                                  >> cudd/Makefile.inc

@@ -4,7 +4,7 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT(Fiona, 1.0, weinberg@informatik.hu-berlin.de, fiona)
-AC_REVISION($Revision: 1.8 $)
+AC_REVISION($Revision: 1.9 $)
 
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/fiona.h)
@@ -101,7 +101,7 @@ esac
 echo                                  >> cudd/Makefile.inc
 
 echo
-echo "Now run \"cd cudd; make; cd ..\" for building cudd package."
+echo "Now run \"cd cudd; make; cd obj; make; cd ../..\" for building cudd package."
 echo "Then you can call \"make\" to build fiona."
 echo
 

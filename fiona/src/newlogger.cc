@@ -280,10 +280,10 @@ void NewLogger::printall_by_typesize()
     
     // determine space needed for call count column
     format.callcount_length =
-        max((size_t)floor(log10(max_callcount)) + 1, format.callcount_length);
+        max((size_t)floor(log10((double) max_callcount)) + 1, format.callcount_length);
 
     // determine space needed for allocated memory column
-    format.allocated_mem_length = max((size_t)floor(log10(max_allocated_mem))+1,
+    format.allocated_mem_length = max((size_t)floor(log10((double) max_allocated_mem))+1,
         format.allocated_mem_length);
 
     // Right justify table cells.

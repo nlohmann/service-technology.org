@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.3 2006-07-06 13:37:20 bretschn Exp $
+# $Id: Makefile,v 1.4 2006-07-24 12:26:31 gierds Exp $
 #
 # Makefile for the CUDD distribution kit 
 #---------------------------------------------------------------------------
@@ -6,8 +6,10 @@
 # Beginning of the configuration section. These symbol definitions can
 # be overridden from the command line.
 
+include ./Makefile.inc
+
 # C++ compiler
-CPP	= g++
+#CPP	= g++
 #CPP	= icpc
 #CPP	= ecpc
 #CPP	= CC
@@ -15,7 +17,7 @@ CPP	= g++
 #CPP	= cxx
 
 # Specific options for compilation of C++ files.
-CPPFLAGS =
+# CPPFLAGS =
 # Stricter standard conformance for g++.
 #CPPFLAGS = -std=c++98
 # For Sun CC version 5, this invokes compatibility mode.
@@ -27,7 +29,7 @@ CPPFLAGS =
 # C compiler used for all targets except optimize_dec, which always uses cc.
 #CC	= cc
 #CC	= /usr/local/opt/SUNWspro/bin/cc
-CC	= gcc
+#CC	= gcc
 #CC	= icc
 #CC	= ecc
 #CC	= /usr/ucb/cc
@@ -37,7 +39,7 @@ CC	= gcc
 # On some machines ranlib is either non-existent or redundant.
 # Use the following definition if your machine has ranlib and you think
 # it is needed.
-RANLIB	= ranlib
+# RANLIB	= ranlib
 # Use the following definition if your machine either does not have
 # ranlib (e.g., SUN running solaris) or can do without it (e.g., DEC Alpha).
 #RANLIB	= :
@@ -154,7 +156,7 @@ ICFLAGS	= -g -O6
 # available memory (expressed in bytes).
 # Recent versions of cygwin have getrlimit, but the datasize limit
 # cannot be set.
-XCFLAGS	= -mcpu=pentiumpro -malign-double -DHAVE_IEEE_754 -DHAVE_GETRLIMIT=0 -DRLIMIT_DATA_DEFAULT=67108864
+# XCFLAGS	= -mcpu=pentiumpro -malign-double -DHAVE_IEEE_754 -DHAVE_GETRLIMIT=0 -DRLIMIT_DATA_DEFAULT=67108864
 
 
 # Define the level of self-checking and verbosity of the CUDD package.

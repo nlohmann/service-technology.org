@@ -489,7 +489,7 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
             string CNF = "";
             bool mult = false;  // more than one clause -> true
 
-            StateSet::iterator iter;                      // iterator over the stateList's elements
+            StateSet::iterator iter;  // iterator over the stateList's elements
 
             for (iter = v->setOfStates.begin(); iter != v->setOfStates.end(); iter++) {
 
@@ -501,30 +501,30 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
 //                    os << "[" << PN->printCurrentMarkingForDot() << "]" << "(" << (*iter) << ")";
                 }
 //              os << "(";
-                if (v->getColor() != RED) {
-                    switch ((*iter)->type) {
-                        case DEADLOCK:  //if (mult) {
-//                                            CNF += " * ";
+//                if (v->getColor() != RED) {
+//                    switch ((*iter)->type) {
+//                        case DEADLOCK:  //if (mult) {
+////                                            CNF += " * ";
+////                                        }
+//                                        if (parameters[P_SHOW_STATES_PER_NODE]) {
+//	                                        os << " (DL)";
 //                                        }
-                                        if (parameters[P_SHOW_STATES_PER_NODE]) {
-	                                        os << " (DL)";
-                                        }
-                                   //     CNF += "("; CNF += (*iter)->getClause(); CNF += ")"; mult=true;
-                                        break;
-                        case FINALSTATE: //if (mult) {
-                                         //   CNF += " * ";
-                                        //}
-                                        if (parameters[P_SHOW_STATES_PER_NODE]) {
-	                                        os << " (FS)";
-                                        }
-                                       // CNF += "(true)"; mult=true;
-                                        break;
-                        default:
-                                      os << "TR";
-//                                      CNF += "true";
-                                        break;
-                    };
-                } //else {
+//                                   //     CNF += "("; CNF += (*iter)->getClause(); CNF += ")"; mult=true;
+//                                        break;
+//                        case FINALSTATE: //if (mult) {
+//                                         //   CNF += " * ";
+//                                        //}
+//                                        if (parameters[P_SHOW_STATES_PER_NODE]) {
+//	                                        os << " (FS)";
+//                                        }
+//                                       // CNF += "(true)"; mult=true;
+//                                        break;
+//                        default:
+//                                      os << "TR";
+////                                      CNF += "true";
+//                                        break;
+//                    };
+//                } //else {
 //                  switch ((*iter)->type) {
 //                      case DEADLOCK:  os << "DL"; break;
 //                      case FINALSTATE: os << "FS"; break;

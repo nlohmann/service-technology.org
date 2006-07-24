@@ -4,7 +4,7 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT(Fiona, 1.0, weinberg@informatik.hu-berlin.de, fiona)
-AC_REVISION($Revision: 1.6 $)
+AC_REVISION($Revision: 1.7 $)
 
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/fiona.h)
@@ -14,10 +14,18 @@ AM_INIT_AUTOMAKE
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
+AC_PROG_CPP
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
-AC_PROG_CPP
+
+if test "$RANLIB" = ":"; then
+  AC_MSG_ERROR([ranlib was not found!])
+fi
+AC_CHECK_PROG(AR, ar, ar, not found)
+if test "$AR" = "not found"; then
+ AC_MSG_ERROR([ar was not found!])
+fi
 
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lm':
@@ -46,12 +54,12 @@ AC_CHECK_FUNCS([bzero dup2 floor gethostname getpagesize memchr memmove memset p
 
 AC_PROG_LEX
 if test "$LEX" != "flex"; then
- AC_MSG_WARN([Flex was not found.])
+ AC_MSG_ERROR([flex was not found.])
 fi
 
 AC_CHECK_PROG(YACC, bison, bison, not found)
 if test "$YACC" = "not found"; then
- AC_MSG_WARN([Bison was not found.])
+ AC_MSG_ERROR([bison was not found.])
 fi
 
 # Check for --enable-64bit parameter to enable 64bit compilation
@@ -68,9 +76,32 @@ AC_CONFIG_FILES([Makefile
 AC_OUTPUT
 
 # Print summary of compile settings
-echo
+
 echo "--------- compile settings ---------"
 echo "compile for 64bit...: $enable_64bit"
 echo "------------------------------------"
+echo
+
+AC_MSG_NOTICE([Creating Makefile include in order to build cudd package])
+# create Makefile include for cudd package
+echo "# created by configure script"  > cudd/Makefile.inc
+echo				      >> cudd/Makefile.inc
+echo "CPP = $CXX"		      >> cudd/Makefile.inc
+echo "CC  = $CC"		      >> cudd/Makefile.inc
+echo                                  >> cudd/Makefile.inc
+echo "RANLIB = $RANLIB"		      >> cudd/Makefile.inc
+echo                                  >> cudd/Makefile.inc
+case `uname -s` in
+  LINUX)    echo "XCFLAGS = -march=`uname -m` -malign-double -DHAVE_IEEE_754 -DBSD" >> cudd/Makefile.inc ;;
+  SunOS)    echo "XCFLAGS = -mcpu=ultrasparc  -DHAVE_IEEE_754 -DUNIX100 -DEPD_BIG_ENDIAN" >> cudd/Makefile.inc;;
+  CYGWIN*)  echo "XCFLAGS = -march=`uname -m` -malign-double -DHAVE_IEEE_754 -DHAVE_GETRLIMIT=0 -DRLIMIT_DATA_DEFAULT=67108864" >> cudd/Makefile.inc;;
+  Darwin)   echo "XCFLAGS = -m`uname -p` -DBSD -DHAVE_IEEE_754 -DEPD_BIG_ENDIAN -O3 -qstrict" >> cudd/Makefile.inc ;;
+  *) ;;
+esac
+echo                                  >> cudd/Makefile.inc
+
+echo
+echo "Now run \"cd cudd; make; cd ..\" for building cudd package."
+echo "Then you can call \"make\" to build fiona."
 echo
 

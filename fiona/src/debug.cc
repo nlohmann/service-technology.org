@@ -25,18 +25,18 @@
  *
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: bretschn $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2006-07-17 13:50:33 $
+ *          - last changed: \$Date: 2006-07-25 08:45:33 $
  * 
  * \note    This file is part of the tool Fiona and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  */
 
 #include "mynew.h"
@@ -44,6 +44,7 @@
 #include "debug.h"
 
 #include <string>
+#include <iostream>
 
 /// debug level
 trace_level debug_level = TRACE_0;
@@ -97,18 +98,48 @@ int yyerror(const char* msg)
   /* defined by flex */
   extern int yylineno;      ///< line number of current token
   extern char *yytext;      ///< text of the current token
+  extern char * netfile;
 
   trace("Error while parsing!\n\n");
   trace(msg);
   trace("\n");
 	
   // display passed error message
-//  trace("Error in '" + filename + "' in line ");
-//  trace(intToString(yylineno));
-//  trace(":\n");
+  trace("Error in '" + std::string(netfile) + "' in line ");
+  trace(intToString(yylineno));
+  trace(":\n");
   trace("  token/text last read was '");
   trace(yytext);
   trace("'\n\n");
+  
+  // if (filename != "<STDIN>")
+  {
+    trace("-------------------------------------------------------------------------------\n");
+    
+    // number of lines to print before and after errorneous line
+    int environment = 4;
 
+    unsigned int firstShowedLine = ((yylineno-environment)>0)?(yylineno-environment):1;
+  
+    std::ifstream inputFile(netfile);
+    std::string errorLine;
+    for (unsigned int i=0; i<firstShowedLine; i++)
+    {
+      getline(inputFile, errorLine);
+    }
+    // print the erroneous line (plus/minus three more)
+    for (unsigned int i=firstShowedLine; i<=firstShowedLine+(2*environment); i++)
+    {
+      trace(intToString(i) + ": " + errorLine + "\n");
+      getline(inputFile, errorLine);
+      if (inputFile.eof())
+	break;
+    }
+    inputFile.close();
+    
+    trace("-------------------------------------------------------------------------------\n");
+  }
+
+  exit(1);
   return 1;
 }

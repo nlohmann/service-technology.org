@@ -54,7 +54,7 @@ NOT		 								{ return op_not;}
 [0-9][0-9]*     						{ setlval(); return number; }
 "{"[^\n]*"}"    						{ break; }
 [^,;:()\t \n\{\}][^,;:()\t \n\{\}]*		{ setlval(); return ident; }
-[\n\r]            						{ yylineno++; break; }
+[\n\r]            						{ break; }
 [ \t]           						{ break; }
 .										{ yyerror("lexical error"); }
 

@@ -74,7 +74,7 @@ public:
 	bool isFinalState;			// indicates whether this clause belongs to a final state or not
 	
 	vertexColor getColor();
-	vertexColor calcColor();
+	vertexColor calcClauseColor();
 	
 	void addClause(clause *);
 	void setEdge(graphEdge *);

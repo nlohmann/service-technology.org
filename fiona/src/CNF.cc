@@ -75,7 +75,7 @@ void clause::addLiteral(char * label) {
 string clause::getClauseString() {
     trace(TRACE_5, "clause::getClauseString() : start\n");
 	
-    string clauseString = "";
+    string clauseString = "(";
     bool comma = false;
 
 	clause * cl = this;
@@ -87,7 +87,7 @@ string clause::getClauseString() {
         		cl->edge->getNode()->setOfStates.size() > 0) {
         			
             if (comma) {
-                clauseString += "+";
+                clauseString += " + ";
             }
             if (cl->edge->getType() == sending) {
                 clauseString += "!";
@@ -99,6 +99,8 @@ string clause::getClauseString() {
         }    	
     	cl = cl->nextElement;	
     }
+    
+    clauseString += ")";
     
     trace(TRACE_5, "clause::getClauseString() : end\n");
     
@@ -152,63 +154,70 @@ void CNF::addClause(clause * newClause) {
 	cl = newClause;
 }
 
-//! \fn vertexColor CNF::calcColor()
+//! \fn vertexColor CNF::calcClauseColor()
 //! \return RED, if the state is a bad state (it is red ;-)), BLUE if it shurely is good, BLACK otherwise
 //! \brief RED, if the state is a bad state (it is red ;-)), BLUE if it shurely is good, BLACK otherwise
 //! a state is RED, if all events it activates lead to bad nodes
-vertexColor CNF::calcColor() {
+vertexColor CNF::calcClauseColor() {
 
-	trace(TRACE_5, "CNF::calcColor(): start\n");
+	trace(TRACE_5, "CNF::calcClauseColor(): start\n");
 
 	if (cl == NULL) {		// since there is no clause we can't conclude anything
-		return BLACK;	
+		return RED;			// is not intended to happen
 	}
 
 	clause * literal = cl;			// point to the first literal of the clause
 	clause * literalPrev = NULL;
-	bool indefinite = false;
+	vertexColor clauseColor = BLACK;
 	
 	while (literal) {					// check the clause stored
+		// first case: the literal points to a blue node
 		if (literal->edge != NULL &&
 				literal->edge->getNode() != NULL && 
 				literal->edge->getNode()->getColor() == BLUE) {
 					
-			trace(TRACE_5, "CNF::calcColor(): end\n");
-            return BLUE;
-        } 
-        if (literal->edge == NULL ||
-        		literal->edge->getNode() == NULL || literal->edge->getNode()->getColor() == BLACK) {
-            indefinite = true;
-        } else {
-	        if (literal->edge != NULL && 
-	        		literal->edge->getNode() != NULL && 
-	        		literal->edge->getNode()->getColor() == RED) {
-	        			
-	            // delete that literal in the clause since it points to a red node
-	            if (literalPrev != NULL) {
-	            	literalPrev->nextElement = literal->nextElement;
-	            } else if (cl == literal) {
-	            	cl = literal->nextElement;
-	            }
-	            
-	            clause * literalTemp = literal->nextElement;	// remember the next literal in list
-          
-	            delete literal;				// delete literal
-	            literal = literalTemp;		// get the remembered literal
-	            continue ;
-	        } 
+            clauseColor = BLUE;
         }
+		// second case: the literal points to a red node, so we delete that literal
+        if (literal->edge != NULL && 
+        		literal->edge->getNode() != NULL && 
+        		literal->edge->getNode()->getColor() == RED) {
+            // delete that literal in the clause since it points to a red node
+
+            if (literalPrev != NULL) {
+            	literalPrev->nextElement = literal->nextElement;
+            } else if (cl == literal) {
+            	cl = literal->nextElement;
+            	if (cl == NULL) {
+            		delete literal;
+            		trace(TRACE_5, "CNF::calcClauseColor(): end\n");
+            		return RED;	
+            	}
+            }
+            
+            clause * literalTemp = literal->nextElement;	// remember the next literal in list
+      
+	        delete literal;
+            literal = literalTemp;		// get the remembered literal
+            continue ;
+        }
+        
+		// third case: current literal cannot be evaluated
+		// therefore clause cannot be evaluated and is indefinite
+		// however, still removing red literals from clause
+        
         literalPrev = literal;			// remember this literal
 		literal = literal->nextElement;	
 	}
 	
-	trace(TRACE_5, "CNF::calcColor(): end\n");
+	trace(TRACE_5, "CNF::calcClauseColor(): end\n");
 	
-	if (indefinite) {
-		return BLACK;
-	} else {
-	    return RED;
-	}
+//	if (indefinite) {
+//		return BLACK;
+//	} else {
+//	    return RED;
+//	}
+	return clauseColor;
 }
 
 //! \fn string CNF::getCNF()

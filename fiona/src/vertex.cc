@@ -102,7 +102,8 @@ void vertex::addClause(clause * newClause, bool _isFinalState) {
 	
 	CNF * cnfElement = annotation;
 	
-	//cout << "adding clause to node number " << numberOfVertex << endl;
+//	cout << "adding clause to node number " << numberOfVertex << endl;
+//	cout << "finalstate: " << _isFinalState << endl;
 	
 	if (cnfElement == NULL) {
 		annotation = new CNF();
@@ -271,11 +272,11 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
             while (cl) {
             	if (cl->isFinalState) {
             		finalState = true;
-            	//	cout << "node : " << numberOfVertex << " has final state" << endl;
             		c = BLUE;
             	} else if (eventsToBeSeen == 0 || finalAnalysis) {
-                	finalState = false;
-                    cTmp = cl->calcColor();
+                //	finalState = false;
+                    cTmp = cl->calcClauseColor();
+
                     switch (cTmp) {
                     case RED:   // found a red clause; so node becomes red
                         if (color == BLACK) {
@@ -290,6 +291,7 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
                             trace(TRACE_2, "analyseNode called when node already blue!!!");
                         }
                         trace(TRACE_2, "\t\t ...terminate\n");
+                        color = RED;
                         return TERMINATE;
                         break;
                     case BLUE:  // found a blue state (i.e. deadlock is resolved)
@@ -320,7 +322,11 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
 
             // all clauses considered
             trace(TRACE_2, "all states checked, node becomes ");
-            if (c == BLACK) {
+            if (c == BLACK && finalState) {
+            	c = BLUE;
+                trace(TRACE_2, "blue");
+            } else if (c == BLACK && !finalState && finalAnalysis) {
+            	c = RED;
                 trace(TRACE_2, "red");
             } else if (c == RED) {
                 trace(TRACE_2, "red");
@@ -331,9 +337,6 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
             color = c;
             
             if (finalState) {
-            	if (color == BLACK) {
-            		color = BLUE;
-            	}
                 trace(TRACE_2, " ...terminate\n");
                 return TERMINATE;
             } else {

@@ -56,8 +56,8 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 //	stateList * newNodeStateList;
 	
 	// get the annotation of the node (CNF)
-	getInputEvents(currentNode);				// all input events considered,
-	getActivatedOutputEvents(currentNode);		// but only activated outputs
+	computeCNF(currentNode);					// calculate CNF of this node
+//	getActivatedOutputEvents(currentNode);		// but only activated outputs
 	
 	if (terminateBuildingGraph(currentNode)) {
 		string color;
@@ -225,12 +225,12 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 //	}
 }
 
-//! \fn void operatingGuidelines::getInputEvents(vertex * node)
-//! \param node the node for which the activated input events are calculated
-//! \brief calculates all activated input events (messages) of the current node for the annotation
-void operatingGuidelines::getInputEvents(vertex * node) {
+//! \fn void operatingGuidelines::computeCNF(vertex * node)
+//! \param node the node for which the annotation is calculated
+//! \brief calculates the annotation (CNF) for the node
+void operatingGuidelines::computeCNF(vertex * node) {
 	
-	trace(TRACE_5, "operatingGuidelines::getInputEvents(vertex * node): start\n");
+	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): start\n");
 	StateSet::iterator iter;			// iterator over the stateList's elements
 	
 	// iterate over all states of the node
@@ -238,7 +238,21 @@ void operatingGuidelines::getInputEvents(vertex * node) {
 		 iter != node->setOfStates.end(); iter++) {
 		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {
 			// we just consider the maximal states only
+			
+			int i;
+			int k = 0;
+						
 			clause * cl = new clause();
+			
+			(*iter)->decodeShowOnly(PN);
+						
+			for (i = 0; i < PN->placeOutputCnt; i++) {
+				
+				if (PN->CurrentMarking[PN->outputPlacesArray[i]] > 0) {
+					cl->addLiteral(PN->Places[PN->outputPlacesArray[i]]->name);	
+				}	
+			}			
+			
 			for (int i = 0; i < PN->placeInputCnt; i++) {
 				cl->addLiteral(PN->Places[PN->inputPlacesArray[i]]->name);
 			}
@@ -246,7 +260,7 @@ void operatingGuidelines::getInputEvents(vertex * node) {
 		}			
 	}
 	
-	trace(TRACE_5, "operatingGuidelines::getInputEvents(vertex * node): end\n");
+	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): end\n");
 }
 
 
@@ -280,7 +294,7 @@ void  operatingGuidelines::getActivatedOutputEvents(vertex * node) {
 					add = true;
 				}	
 			}
-			if (add) {
+			if (add || (*iter)->type == FINALSTATE) {
 				node->addClause(cl, (*iter)->type == FINALSTATE);
 			} else {
 				delete cl;	

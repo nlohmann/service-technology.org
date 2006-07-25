@@ -493,7 +493,7 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node) {
 				found = false;
 				skip = false;
 			}
-			if (add) {
+			if (add || (*iter)->type == FINALSTATE) {
 				node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
 			} else {
 				delete cl;	
@@ -565,8 +565,8 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 				}
 				i++;
 			}
-			if (add) {
-				node-> addClause(cl, (*iter)->type == FINALSTATE);
+			if (add || (*iter)->type == FINALSTATE) {
+				node->addClause(cl, (*iter)->type == FINALSTATE);
 			} else {
 				delete cl;	
 			}

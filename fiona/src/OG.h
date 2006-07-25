@@ -28,7 +28,8 @@ class operatingGuidelines : public reachGraph {
 	    void buildGraph();
     	void buildGraph(vertex * );
     
-    	void getInputEvents(vertex *);
+    	void computeCNF(vertex *);
+    	
     	void getActivatedOutputEvents(vertex *);
     	 
     	bool terminateBuildingGraph(vertex * );

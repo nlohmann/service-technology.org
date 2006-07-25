@@ -243,6 +243,7 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
 
         if (options[O_BDD] == true || found == NULL) {
 
+//			if (true) {
 //            cout << "with event " << label << " (type " << type << " ):" << endl;
             trace(TRACE_1, "\n\t new successor node computed:");
             toAdd->setNumber(numberOfVertices++);
@@ -497,8 +498,18 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
                 	unsigned int * myMarking = new unsigned int [PN->getPlaceCnt()];
                 	(*iter)->decodeShowOnly(PN);
                 	
-                    os << "[" << PN->printCurrentMarkingForDot() << "]";
-//                    os << "[" << PN->printCurrentMarkingForDot() << "]" << "(" << (*iter) << ")";
+                    os << "[" << PN->printCurrentMarkingForDot() << "]" << "(";
+                    switch ((*iter)->type) {
+                        case DEADLOCK: os << "DL" << ")"; break;
+                        case FINALSTATE: os << "FS" << ")"; break;
+                        default: os << "TR" << ")"; break;
+                    }                                                
+                    
+
+
+
+
+//os << "[" << PN->printCurrentMarkingForDot() << "]" << "(" << (*iter) << ")";
                 }
 //              os << "(";
 //                if (v->getColor() != RED) {

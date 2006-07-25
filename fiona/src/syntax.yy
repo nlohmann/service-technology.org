@@ -280,7 +280,9 @@ markinglist:
 | markinglist comma marking
 ;
 
-marking: nodeident colon number {
+marking: 
+  nodeident colon number 
+      {
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable->lookup($1);
 	if(!PS) {
@@ -288,7 +290,17 @@ marking: nodeident colon number {
 	}
 	sscanf($3,"%u",&i);
 	*(PS->place) += i;
-}
+      } 
+| nodeident
+      {
+	unsigned int i;
+	PS = (PlSymbol *) PlaceTable->lookup($1);
+	if(!PS) {
+		yyerror("place does not exist");
+	}
+	sscanf("1","%u",&i);
+	*(PS->place) += i;
+      }
 ;
 
 finalmarkinglist: 
@@ -296,7 +308,9 @@ finalmarkinglist:
 | finalmarkinglist comma finalmarking
 ;
 
-finalmarking: nodeident colon number {
+finalmarking: 
+  nodeident colon number 
+      {
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable->lookup($1);
 	if(!PS) {
@@ -304,7 +318,17 @@ finalmarking: nodeident colon number {
 	}
 	sscanf($3,"%u",&i);
 	PN->FinalMarking[PS->place->index] = i;
-}
+      }
+| nodeident
+      {
+	unsigned int i;
+	PS = (PlSymbol *) PlaceTable->lookup($1);
+	if(!PS) {
+		yyerror("place does not exist");
+	}
+	sscanf("1","%u",&i);
+	PN->FinalMarking[PS->place->index] = i;
+      }
 ;
 
 
@@ -390,7 +414,9 @@ arclist: { $$ = (arc_list *) 0;}
 		}
 ;
 
-arc: nodeident colon number {
+arc: 
+  nodeident colon number 
+      {
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable -> lookup($1);
 	if(!PS) {
@@ -401,7 +427,20 @@ arc: nodeident colon number {
 	$$->next = (arc_list *)  0;
 	sscanf($3,"%u",&i);
 	$$->nu = i;
-    }
+      }
+| nodeident
+      {
+	unsigned int i;
+	PS = (PlSymbol *) PlaceTable -> lookup($1);
+	if(!PS) {
+		yyerror("place does not exist");
+	}
+	$$ = new arc_list;
+	$$->place = PS;
+	$$->next = (arc_list *)  0;
+	sscanf("1","%u",&i);
+	$$->nu = i;
+      }
 ;
 
 statepredicate: lpar statepredicate rpar {
@@ -470,3 +509,4 @@ statepredicate: lpar statepredicate rpar {
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(leq,PS->place,i);
 }
+

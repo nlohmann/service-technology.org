@@ -155,7 +155,6 @@ void parse_command_line(int argc, char* argv[]) {
 	options[O_CALC_REDUCED_IG] = false;
 	options[O_OWFN_NAME] = false;
 	options[O_COMM_DEPTH] = false;
-//	options[O_EVENT_USE_MAX] = false;
 	options[O_EVENT_USE_MAX] = true;
 	options[O_BDD] = false;
 
@@ -170,9 +169,11 @@ void parse_command_line(int argc, char* argv[]) {
 //	parameters[P_CALC_ALL_STATES] = false;   // standard: man muss -a angeben, um voll
 	parameters[P_CALC_ALL_STATES] = true;
 	parameters[P_CALC_REDUCED_IG] = false;
+
 	bdd_reordermethod = 1;
-//	events_manual = 0;
+
 	events_manual = 1;
+	commDepth_manual = 1;
 	
   	// evaluate options and set parameters
   	int optc = 0;
@@ -238,7 +239,7 @@ void parse_command_line(int argc, char* argv[]) {
 	          	break;
 	      	case 'e':
 		      	if (optarg != NULL) {
-		        	options[O_EVENT_USE_MAX] = true;
+		        	options[O_EVENT_USE_MAX] = true;  // <- default is true
 		        	events_manual = atoi(optarg);
 		      	} else {
 					throw Exception(OPTION_MISMATCH,

@@ -135,11 +135,12 @@ int main(int argc, char ** argv) {
     set_new_handler(&myown_newhandler);
     garbagefound = 0;
 
-    parse_command_line(argc, argv);         //!< evaluate command line options
+	// evaluate command line options
+	parse_command_line(argc, argv);
 
     trace(TRACE_0, "\n--------------------------------------------------------------\n");
 
-    // get the net!
+    // prepare getting the net
     try {
         PlaceTable = new SymbolTab(65536);
         TransitionTable = new SymbolTab(65536);
@@ -150,8 +151,9 @@ int main(int argc, char ** argv) {
         _exit(2);
     }
 
+    // get the net
     try {
-        readnet();
+        readnet();							// Parser
         PN->removeisolated();
 
     } catch(bad_alloc) {
@@ -160,7 +162,7 @@ int main(int argc, char ** argv) {
         cerr << mess;
         _exit(2);
     }
-    
+        
     delete GlobalTable;
     delete PlaceTable;
     delete TransitionTable;
@@ -168,15 +170,35 @@ int main(int argc, char ** argv) {
     // report the net
     trace(TRACE_0, "places: " + intToString(PN->getPlaceCnt()));
     trace(TRACE_0, " (including " + intToString(PN->getInputPlaceCnt()) + " input places, " + intToString(PN->getOutputPlaceCnt()) + " output places)\n");
-    trace(TRACE_0, "transitions: " + intToString(PN->getTransitionCnt()) + "\n");
+    trace(TRACE_0, "transitions: " + intToString(PN->getTransitionCnt()) + "\n\n");
 
+    // adjust commDepth and events_manual
     if (options[O_COMM_DEPTH] == true) {
         PN->commDepth = commDepth_manual;
-        trace(TRACE_0, "communication depth (manual): " + intToString(PN->getCommDepth()) + "\n");
-    } else {
-        trace(TRACE_0, "communication depth: " + intToString(PN->getCommDepth()) + "\n");
     }
 
+    if (options[O_EVENT_USE_MAX] = true) {
+		if (PN->getCommDepth() > events_manual * (PN->placeInputCnt + PN->placeOutputCnt)) {
+			trace(TRACE_0, "commDepth is set too high\n");
+			PN->commDepth = events_manual * (PN->placeInputCnt + PN->placeOutputCnt);
+		}
+    }
+    
+    if (options[O_EVENT_USE_MAX] = true) {
+		if (PN->getCommDepth() < events_manual) {
+			trace(TRACE_0, "events use is set too high\n");
+			events_manual = PN->commDepth;
+		}
+    }
+    
+	// report communication depth and events use    
+    trace(TRACE_0, "communication depth: " + intToString(PN->getCommDepth()) + "\n");
+    if (options[O_EVENT_USE_MAX] == true) {
+        trace(TRACE_0, "considering each event max. " + intToString(events_manual) + " times\n\n");
+    }
+
+
+	// ------------------- start computation -------------------------
     time_t seconds, seconds2;
 
     if (parameters[P_OG]) {
@@ -211,10 +233,13 @@ int main(int argc, char ** argv) {
         	//graph->bdd->print();
         }
         
-		delete graph;
+//		cout << "\nOG computation finished\n\t\t\t...please hit any key" << endl;
+//		getchar();
+	
+	    delete graph;
+        
     } else {
         // interaction graph is built
-
         interactionGraph * graph = new interactionGraph(PN);
 
         if (parameters[P_CALC_REDUCED_IG]) {
@@ -244,13 +269,14 @@ int main(int argc, char ** argv) {
         trace(TRACE_0, "    number of edges: " + intToString(graph->getNumberOfEdges()) + "\n");
 		trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
 
-        graph->printDotFile();
-        delete graph;
+        graph->printDotFile();				// for IG
+
+//		cout << "\nIG computation finished\n\t\t\t...please hit any key" << endl;
+//		getchar();
+	
+	    delete graph;
     }
 
-//	cout << "\ncomputation finished\n\t\t\t...please hit any key" << endl;
-//	getchar();
-	
 	delete PN;
 	
     trace(TRACE_0, "--------------------------------------------------------------\n\n");

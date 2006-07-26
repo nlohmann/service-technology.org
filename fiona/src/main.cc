@@ -153,8 +153,12 @@ int main(int argc, char ** argv) {
 
     // get the net
     try {
-        readnet();							// Parser
-        PN->removeisolated();
+        readnet();
+        // TODO: better removal of places 
+	// doesn't work with, since array for input and output places
+	// depend on the order of the Places array, reordering results in
+	// a heavy crash
+	// PN->removeisolated();
 
     } catch(bad_alloc) {
         char mess [] = "\nnot enough space to store net\n";
@@ -204,7 +208,6 @@ int main(int argc, char ** argv) {
     if (parameters[P_OG]) {
         // operating guideline is built
         operatingGuidelines * graph = new operatingGuidelines(PN);
-
         trace(TRACE_0, "building the operating guideline...\n");
         seconds = time (NULL);
         graph->buildGraph();                    // build operating guideline

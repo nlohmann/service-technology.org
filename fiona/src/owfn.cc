@@ -207,13 +207,19 @@ void oWFN::removeisolated() {
 			p = Places[placeCnt - 1];
 			Places[placeCnt - 1] = Places[i];
 			Places[i] = p;
-			placeCnt --;
+			deletePlace(Places[placeCnt - 1]);
+			// placeCnt --;
 		} else {
 			i++;
 		}
 	}
+/*
 	for(i=0;i<transCnt;i++) {
 		Transitions[i]->nr = i;
+	}
+*/
+	for(i=0;i<placeCnt;i++) {
+		Places[i]->nr = i;
 	}
 }
 

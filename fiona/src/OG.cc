@@ -19,16 +19,17 @@
 //! \param _PN
 //! \brief constructor
 operatingGuidelines::operatingGuidelines(oWFN * _PN) : reachGraph(_PN) {
-		//if (options[O_BDD] == true){
+	  if (options[O_BDD] == true) {
 		unsigned int nbrLabels = PN->placeInputCnt + PN->placeOutputCnt;
 		bdd = new BddRepresentation(root, nbrLabels, (Cudd_ReorderingType)bdd_reordermethod);
-	//}
+	  }
 }
 
 //! \fn operatingGuidelines::~operatingGuidelines() 
 //! \brief destructor !to be implemented!
 operatingGuidelines::~operatingGuidelines() {
-	delete bdd;
+	  if (options[O_BDD] == true)
+		delete bdd;
 }
 
 //! \fn void operatingGuidelines::buildGraph()

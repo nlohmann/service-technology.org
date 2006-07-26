@@ -153,12 +153,13 @@ int main(int argc, char ** argv) {
 
     // get the net
     try {
-        readnet();
-        // TODO: better removal of places 
-	// doesn't work with, since array for input and output places
-	// depend on the order of the Places array, reordering results in
-	// a heavy crash
-	// PN->removeisolated();
+        readnet();							// Parser
+
+        // PN->removeisolated();
+		// TODO: better removal of places 
+		// doesn't work with, since array for input and output places
+		// depend on the order of the Places array, reordering results in
+		// a heavy crash
 
     } catch(bad_alloc) {
         char mess [] = "\nnot enough space to store net\n";

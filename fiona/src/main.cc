@@ -168,7 +168,6 @@ int main(int argc, char ** argv) {
         _exit(2);
     }
         
-    delete GlobalTable;
     delete PlaceTable;
     delete TransitionTable;
 

@@ -24,7 +24,7 @@ clause::clause(graphEdge * _edge) : edge(_edge), nextElement(NULL) {
 clause::~clause() {
 	trace(TRACE_5, "clause::~clause() : start\n");
 	if (edge != NULL && edge->getNode() == NULL) {
-	//	delete edge;	
+		delete edge;	
 	}
 	trace(TRACE_5, "clause::~clause() : end\n");
 }

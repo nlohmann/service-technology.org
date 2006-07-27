@@ -551,17 +551,17 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
 	                os << "\\n";
 	            }
             }
-			CNF += v->getCNF();
+			
 
-            if (parameters[P_OG]) {
+          //  if (parameters[P_OG]) {
                 if (v->getColor() == RED) {
                     CNF += "(false)";
+                } else if (v->setOfStates.size() == 0) {
+                    CNF += "(true)";
                 } else {
-                    if (v->setOfStates.size() == 0) {
-                        CNF += "(true)";
-                    }
+                	CNF += v->getCNF();
                 }
-            }
+           // }
 //          }      CNF += ">";
                 os << CNF;
             

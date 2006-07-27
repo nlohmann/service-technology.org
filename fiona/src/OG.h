@@ -30,8 +30,6 @@ class operatingGuidelines : public reachGraph {
     
     	void computeCNF(vertex *);
     	
-    	void getActivatedOutputEvents(vertex *);
-    	 
     	bool terminateBuildingGraph(vertex * );
 		void convertToBdd();
 		

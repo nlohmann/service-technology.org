@@ -28,6 +28,7 @@ reachGraph::reachGraph(oWFN * _PN) :
     numberOfEdges(0),
     actualDepth(0),
     numberBlueNodes(0),
+    numberBlackNodes(0),
     numberBlueEdges(0),
     numberOfStatesAllNodes(0) {
 
@@ -474,6 +475,8 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
 
     if (v->getColor() == BLUE) {
         numberBlueNodes++;
+    } else if (v->getColor() == BLACK) {
+        numberBlackNodes++;
     }
 
     if (parameters[P_SHOW_ALL_NODES]
@@ -648,11 +651,15 @@ void reachGraph::printDotFile() {
         dotFile << "edge [fontname=\"Helvetica\" fontsize=10];\n";
 
         numberBlueNodes = 0;
+        numberBlackNodes = 0;
 
         printGraphToDot(tmp, dotFile, visitedNodes);
         dotFile << "}";
         dotFile.close();
         trace(TRACE_0, "\n    number of blue nodes: " + intToString(numberBlueNodes) + "\n");
+        if (numberBlackNodes > 0) {
+	        trace(TRACE_0, "\n    number of black nodes: " + intToString(numberBlackNodes) + "\n");
+        }
         trace(TRACE_0, "    number of blue edges: " + intToString(numberBlueEdges) + "\n");
         trace(TRACE_0, "    number of states stored in nodes: " + intToString(numberOfStatesAllNodes) + "\n");
 
@@ -733,6 +740,12 @@ analysisResult reachGraph::analyseNode(vertex * node, bool finalAnalysis) {
                 numberBlueNodes++;
             } else if (colorBefore == BLUE && colorAfter != BLUE) {
                 numberBlueNodes--;
+            }
+
+            if (colorBefore != BLACK && colorAfter == BLACK) {
+                numberBlueNodes++;
+            } else if (colorBefore == BLACK && colorAfter != BLACK) {
+                numberBlackNodes--;
             }
 
 			return result;

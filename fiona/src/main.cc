@@ -282,6 +282,7 @@ int main(int argc, char ** argv) {
     }
 
 	delete PN;
+    delete GlobalTable;	
 	
     trace(TRACE_0, "--------------------------------------------------------------\n\n");
 

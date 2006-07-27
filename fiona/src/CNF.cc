@@ -83,7 +83,7 @@ string clause::getClauseString() {
     while (cl) {
         if (cl->edge != NULL && 
         		cl->edge->getNode() != NULL && 
-        		//cl->edge->getNode()->getColor() != RED && 
+        		cl->edge->getNode()->getColor() != RED && 
         		cl->edge->getNode()->setOfStates.size() > 0) {
         			
             if (comma) {
@@ -96,7 +96,7 @@ string clause::getClauseString() {
             }
             clauseString += cl->edge->getLabel();
             comma = true;
-        }    	
+        }   	
     	cl = cl->nextElement;	
     }
     
@@ -220,33 +220,33 @@ vertexColor CNF::calcClauseColor() {
 	return clauseColor;
 }
 
-//! \fn string CNF::getCNF()
+//! \fn string CNF::getCNFString()
 //! \return the CNF as a string
 //! \brief returns the CNF as a string
-string CNF::getCNF() {
+string CNF::getCNFString() {
 	
     string clauseString = "";
     bool moreThanOne = false;
 
 	if (cl == NULL) {		// since theres is no clause we can't conclude anything
-		return "NULL";	
+		return "(false)";	
 	}
 	
 	if (isFinalState) {
-		return "final";
+		return "(true)";
 	}
 
-	clause * literal = cl;
+	clause * literal = cl;  // get the first literal of the clause
 
-    while (literal) {
-        if (moreThanOne) {
-        	clauseString += " + ";	
-        }
+ //   while (literal) {
+ //       if (moreThanOne) {
+ //       	clauseString += " + ";	
+ //       }
         clauseString += literal->getClauseString();
-        moreThanOne = true;
+ //       moreThanOne = true;
             	
-    	literal = literal->nextElement;	
-    }
+ //   	literal = literal->nextElement;	
+ //   }
     
     return clauseString;
 }

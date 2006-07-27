@@ -54,12 +54,8 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	trace(TRACE_3, "\t number of states in node: ");
 	trace(TRACE_3, intToString(currentNode->setOfStates.size()) + "\n");
 
-//	stateList * newNodeStateList;
-	
 	// get the annotation of the node (CNF)
 	computeCNF(currentNode);					// calculate CNF of this node
-//	getActivatedOutputEvents(currentNode);		// but only activated outputs
-	
 	if (terminateBuildingGraph(currentNode)) {
 		string color;
 		
@@ -109,7 +105,6 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 			trace(TRACE_5, "calculating successor states\n");
 			calculateSuccStatesInput(PN->inputPlacesArray[i], currentNode, v);
 			trace(TRACE_5, "calculating successor states succeeded\n");
-		//	v->setStateList(newNodeStateList);
 
 			if (AddVertex (v, i, sending)) {
 				buildGraph(v);				// going down with sending event...
@@ -165,7 +160,6 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 			trace(TRACE_5, "calculating successor states\n");
 			calculateSuccStatesOutput(PN->outputPlacesArray[i], currentNode, v);
 			trace(TRACE_5, "calculating successor states succeeded\n");
-		//	v->setStateList(newNodeStateList);
 			
 			if (AddVertex (v, i, receiving)) {
 				buildGraph(v);				// going down with receiving event...
@@ -232,7 +226,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 void operatingGuidelines::computeCNF(vertex * node) {
 	
 	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): start\n");
-	StateSet::iterator iter;			// iterator over the stateList's elements
+	StateSet::iterator iter;			// iterator over the states of the node
 	
 	// iterate over all states of the node
 	for (iter = node->setOfStates.begin();
@@ -240,71 +234,29 @@ void operatingGuidelines::computeCNF(vertex * node) {
 		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {
 			// we just consider the maximal states only
 			
-			int i;
-			int k = 0;
-						
 			clause * cl = new clause();
 			
+			// get the marking of this state
 			(*iter)->decodeShowOnly(PN);
 						
-			for (i = 0; i < PN->placeOutputCnt; i++) {
-				
+			for (int i = 0; i < PN->placeOutputCnt; i++) {
+				// get the activated output events
 				if (PN->CurrentMarking[PN->outputPlacesArray[i]] > 0) {
 					cl->addLiteral(PN->Places[PN->outputPlacesArray[i]]->name);	
 				}	
 			}			
 			
+			// get all the input events
 			for (int i = 0; i < PN->placeInputCnt; i++) {
 				cl->addLiteral(PN->Places[PN->inputPlacesArray[i]]->name);
 			}
+			
 			node->addClause(cl, (*iter)->type == FINALSTATE);
 		}			
 	}
 	
 	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): end\n");
 }
-
-
-//! \fn void operatingGuidelines::getActivatedOutputEvents(vertex * node)
-//! \param node the node for which the activated output events are calculated
-//! \brief calculates all activated output events (messages) of the current node for the annotation
-void  operatingGuidelines::getActivatedOutputEvents(vertex * node) {
-	trace(TRACE_5, "operatingGuidelines::getActivatedOutputEvents(vertex * node): start\n");
-	int i;
-	
-	StateSet::iterator iter;			// iterator over the stateList's elements
-	
-	// iterate over all states of the node
-	for (iter = node->setOfStates.begin();
-         iter != node->setOfStates.end(); iter++) {
-		
-		// we just consider the maximal states only
-		if ((*iter)->type == DEADLOCK  || (*iter)->type == FINALSTATE)  {
-			int i;
-			int k = 0;
-			bool add = false;
-						
-			clause * cl = new clause();
-			
-			(*iter)->decode(PN);
-						
-			for (i = 0; i < PN->placeOutputCnt; i++) {
-				
-				if (PN->CurrentMarking[PN->outputPlacesArray[i]] > 0) {
-					cl->addLiteral(PN->Places[PN->outputPlacesArray[i]]->name);	
-					add = true;
-				}	
-			}
-			if (add || (*iter)->type == FINALSTATE) {
-				node->addClause(cl, (*iter)->type == FINALSTATE);
-			} else {
-				delete cl;	
-			}
-		}
-	}
-	trace(TRACE_5, "operatingGuidelines::getActivatedOutputEvents(vertex * node): end\n");
-}
-
 
 //! \fn bool operatingGuidelines::terminateBuildingGraph(vertex * node)
 //! \param node the vertex to be checked

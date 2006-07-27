@@ -278,7 +278,6 @@ setOfMessages interactionGraph::getActivatedInputEvents(vertex * node) {
 			i = 0;
 
 			clause * cl = new clause();			// create a new clause for this particular state
-			bool add = false;
 			
 			(*iter)->decode(PN);
 			
@@ -293,23 +292,18 @@ setOfMessages interactionGraph::getActivatedInputEvents(vertex * node) {
 					
 					inputMessages.insert(input);
 					
-					if (node->getNumber() == 9) {
+					/*if (node->getNumber() == 9) {
 				//		cout << "current marking: " << PN->printCurrentMarkingForDot() << endl;
 						cout << "sending event: " << PN->Places[*index]->name << endl;
 						cout << "i: " << i << endl;
 						cout << "transition: " << (*iter)->quasiFirelist[i]->name << endl;
-					}
+					}*/
 					
 					cl->addLiteral(PN->Places[*index]->name);
-					add = true;
 				}
 				i++;
 			}
-			if (add || (*iter)->type == FINALSTATE) {
-				node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
-			} else {
-				delete cl;	
-			}
+			node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
 		}
 	}
 	
@@ -339,7 +333,6 @@ setOfMessages interactionGraph::getActivatedOutputEvents(vertex * node) {
 		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {				// we just consider the maximal states only
 			int i;
 			int k = 0;
-			bool add = false;
 			
 			clause * cl = new clause();			// create a new clause for this particular state
 
@@ -352,14 +345,9 @@ setOfMessages interactionGraph::getActivatedOutputEvents(vertex * node) {
 					
 					outputMessages.insert(output);
 					cl->addLiteral(PN->Places[i]->name);	
-					add = true;
 				}	
 			}
-			if (add  || (*iter)->type == FINALSTATE) {
-				node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
-			} else {
-				delete cl;	
-			}
+			node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
 		}
 	}
 	trace(TRACE_5, "interactionGraph::getActivatedOutputEvents(vertex * node): end\n");	
@@ -403,12 +391,10 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node) {
 			int i;
 			int k = 0;
 			clause * cl = new clause();			// create a new clause for this particular state
-			bool add = false;
 			
 			messageMultiSet outputMessages;		// multiset of all input messages of the current state
 			
 			(*iter)->decode(PN);
-//			marking = (*iter)->myMarking;
 			
 			for (i = 0; i < PN->getPlaceCnt(); i++) {
 				
@@ -481,23 +467,17 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node) {
 					}	
 				} else {
 					cl->addLiteral(label);	
-					add = true;
 				}
     			
 				if (!subset && !supset) {
 					listOfOutputMessageLists.insert(outputMessages);
 					cl->addLiteral(PN->createLabel(outputMessages));
-					add = true;
 				} 
 				
 				found = false;
 				skip = false;
 			}
-			if (add || (*iter)->type == FINALSTATE) {
-				node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
-			} else {
-				delete cl;	
-			}
+			node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
 		}
 		
 	}
@@ -506,16 +486,6 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node) {
     /* e.g. the set contains [a, b] and [a, b, c] */
     /* [a, b] is subset of [a, b, c], therefore the set [a, b, c] gets removed */
     
-#ifdef DEBUG
-	cout << "\t\t combining the output messages" << endl;
-	cout << "\t\t (before) number of message lists in list: " << listOfOutputMessageLists.size() << endl;
-#endif
-	
-#ifdef DEBUG
-	cout << "\t\t (after) number of message lists in list: " << listOfOutputMessageLists.size() << endl;
-#endif
-
-
    	return listOfOutputMessageLists;		
 }
 
@@ -537,14 +507,9 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 	for (iter = node->setOfStates.begin(); 
 					iter != node->setOfStates.end(); iter++) {
 
-#ifdef DEBUG
-	//cout << "\t state " << PN->printMarking((*iter)->myMarking) << " activates the input events: " << endl;
-#endif		
 		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {				// we just consider the maximal states only
 			i = 0;
-//			PN->setCurrentMarkingFromState((*iter));
 			clause * cl = new clause();
-			bool add = false;
 			
 			(*iter)->decode(PN);
 			while (!stateActivatesOutputEvents(*iter) && 
@@ -561,11 +526,10 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 					inputMessages.insert(input);
 					
 					cl->addLiteral(PN->Places[*index]->name);
-					add = true;
 				}
 				i++;
 			}
-			if (add || (*iter)->type == FINALSTATE) {
+			if ((*iter)->type == FINALSTATE) {
 				node->addClause(cl, (*iter)->type == FINALSTATE);
 			} else {
 				delete cl;	

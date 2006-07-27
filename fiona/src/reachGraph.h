@@ -68,6 +68,7 @@ protected:
 
    int numberOfVertices;            //!< the number of vertices of the graph
 
+   unsigned int numberBlackNodes;    //!< number of black nodes in the graph
    unsigned int numberBlueNodes;    //!< number of blue nodes in the graph
    unsigned int numberBlueEdges;    //!< number of blue edges in the graph
 

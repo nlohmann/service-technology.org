@@ -94,9 +94,9 @@ bool vertex::addState(State * s) {
 	 
 }
 
-//! \fn void vertex::addClauseElement(clause * newClause)
+//! \fn void vertex::addClause(clause * newClause, bool _isFinalState)
 //! \param newClause the clause to be added to this CNF
-//! \brief adds the given clause to this CNF
+//! \brief adds the given clause to the CNF of the node
 void vertex::addClause(clause * newClause, bool _isFinalState) {
     trace(TRACE_5, "vertex::addClause(clause * newClause) : start\n");
 	
@@ -113,7 +113,7 @@ void vertex::addClause(clause * newClause, bool _isFinalState) {
 		return ;	
 	}
 	
-	while (cnfElement->nextElement) {		// get the last literal of the clause
+	while (cnfElement->nextElement) {		// get the last clause of the CNF
 		cnfElement = cnfElement->nextElement;	
 	}	  
 	cnfElement->nextElement = new CNF();
@@ -185,11 +185,12 @@ string vertex::getCNF() {
 	
 	while (cl) {
 		CNFStringTemp = "";
-		CNFStringTemp = cl->cl->getClauseString();
-		if (mal && CNFStringTemp != "final" && CNFStringTemp != "") {
+		CNFStringTemp = cl->getCNFString();
+		
+		if (mal && CNFStringTemp != "()") {
 			CNFString += " * ";
 		}
-		if (CNFStringTemp != "final" && CNFStringTemp != "") {
+		if (CNFStringTemp != "()") {
 			CNFString += CNFStringTemp;
 		}
 		mal = true;

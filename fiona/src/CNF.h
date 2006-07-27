@@ -81,7 +81,7 @@ public:
 
 	int numberOfElements();
 	
-	string getCNF();
+	string getCNFString();
 
     // Provides user defined operator new. Needed to trace all new operations
     // on this class.

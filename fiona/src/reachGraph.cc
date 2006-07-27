@@ -489,7 +489,6 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
 
             os << "p" << v->getNumber() << " [label=\"# " << v->getNumber() << "\\n";
 
-//            string CNF = "<";
             string CNF = "";
             bool mult = false;  // more than one clause -> true
 
@@ -501,17 +500,14 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
                 	unsigned int * myMarking = new unsigned int [PN->getPlaceCnt()];
                 	(*iter)->decodeShowOnly(PN);
                 	
-                    os << "[" << PN->printCurrentMarkingForDot() << "]" << "(";
-                    switch ((*iter)->type) {
-                        case DEADLOCK: os << "DL" << ")"; break;
-                        case FINALSTATE: os << "FS" << ")"; break;
-                        default: os << "TR" << ")"; break;
-                    }                                                
+                    os << "[" << PN->printCurrentMarkingForDot() << "]";
+//                    os << "(";
+//                    switch ((*iter)->type) {
+//                        case DEADLOCK: os << "DL" << ")"; break;
+//                        case FINALSTATE: os << "FS" << ")"; break;
+//                        default: os << "TR" << ")"; break;
+//                    }                                                
                     
-
-
-
-
 //os << "[" << PN->printCurrentMarkingForDot() << "]" << "(" << (*iter) << ")";
                 }
 //              os << "(";
@@ -553,7 +549,7 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
             }
 			
 
-          //  if (parameters[P_OG]) {
+            if (parameters[P_OG]) {
                 if (v->getColor() == RED) {
                     CNF += "(false)";
                 } else if (v->setOfStates.size() == 0) {
@@ -561,7 +557,7 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
                 } else {
                 	CNF += v->getCNF();
                 }
-           // }
+            }
 //          }      CNF += ">";
                 os << CNF;
             

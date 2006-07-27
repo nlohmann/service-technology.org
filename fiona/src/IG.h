@@ -24,9 +24,8 @@ class interactionGraph : public reachGraph {
     	void buildGraph(vertex * );
     	void buildReducedGraph(vertex * );
     
-    	setOfMessages getActivatedInputEvents(vertex *);
-    	setOfMessages getActivatedOutputEvents(vertex *);
-
+    	void getActivatedEventsComputeCNF(vertex *, setOfMessages &, setOfMessages &);
+    
 		setOfMessages combineReceivingEvents(vertex *);
 		setOfMessages receivingBeforeSending(vertex *);
 

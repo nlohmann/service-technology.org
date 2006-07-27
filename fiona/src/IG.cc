@@ -41,21 +41,14 @@ void interactionGraph::buildGraph() {
 //! \brief builds up the graph recursively
 void interactionGraph::buildGraph(vertex * currentNode) {
 
-//	stateList * newNodeStateList;
 	unsigned int elementInput = 0;
 	unsigned int elementOutput = 0;
 	
 	setOfMessages inputSet;
 	setOfMessages outputSet;
 	
-	// initialize node
-	if (PN->getInputPlaceCnt() > 0) {
-		inputSet = getActivatedInputEvents(currentNode);		// per node
-	}
-	
-	if (PN->getOutputPlaceCnt() > 0) {
-		outputSet = getActivatedOutputEvents(currentNode);
-	}
+	// get the activated events and compute the CNF of the node
+	getActivatedEventsComputeCNF(currentNode, inputSet, outputSet);
 
 	actualDepth++;
 
@@ -81,14 +74,12 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	}
 	
 	// iterate over all elements of inputSet
-	//while (elementInput) { // && (currentNode->getColor() != RED)) {
 	for (setOfMessages::iterator iter = inputSet.begin(); iter != inputSet.end(); iter++) {
 		
 		vertex * v = new vertex();	// create new vertex of the graph
 		currentVertex = currentNode;
 		
 		calculateSuccStatesInput(*iter, currentNode, v);
-		//v->setStateList(newNodeStateList);
 
 		if (AddVertex (v, *iter, sending)) {
 
@@ -107,20 +98,13 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 #endif	
 
 		}
-	//	elementInput = elementInput->getNextElement();	
 	}
 	
-//	if (inputSet) {
-//		delete inputSet;
-//	}
-	
-//	while (elementOutput) { // && (currentNode->getColor() != RED)) {
 	for (setOfMessages::iterator iter = outputSet.begin(); iter != outputSet.end(); iter++) {
 		vertex * v = new vertex();	// create new vertex of the graph
 		currentVertex = currentNode;
 				
 		calculateSuccStatesOutput(*iter, currentNode, v);
-	//	v->setStateList(newNodeStateList);
 		
 		if (AddVertex (v, *iter, receiving)) {
 
@@ -139,12 +123,7 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 #endif
 
 		}	
-		//elementOutput = elementOutput->getNextElement();		
 	}	
-		
-	//if (outputSet) {
-	//	delete outputSet;
-	//}	
 		
 	analyseNode(currentNode, true);
 	trace(TRACE_5, "node analysed\n");
@@ -259,15 +238,16 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 	trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + "\n");
 }
 
-//! \fn setOfMessages interactionGraph::getActivatedInputEvents(vertex * node)
+//! \fn void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages & inputMessages, setOfMessages & outputMessages) {
 //! \param node the node for which the activated input events are calculated
+//! \param inputMessages
+//! \param outputMessages
 //! \brief creates a list of all activated input events (messages) of the current node
-setOfMessages interactionGraph::getActivatedInputEvents(vertex * node) {
+void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages & inputMessages, setOfMessages & outputMessages) {
 	trace(TRACE_5, "interactionGraph::getActivatedInputEvents(vertex * node): start\n");
 
 	int i;
 	StateSet::iterator iter;		
-	setOfMessages inputMessages;	// list of all input messages of the current node
 	
 	for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
 
@@ -275,14 +255,14 @@ setOfMessages interactionGraph::getActivatedInputEvents(vertex * node) {
 	//cout << "\t state " << PN->printMarking((*iter)->myMarking) << " activates the input events: " << endl;
 #endif		
 		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {	// we just consider the maximal states only
-			i = 0;
+			
 
 			clause * cl = new clause();			// create a new clause for this particular state
-			
 			(*iter)->decode(PN);
 			
+			i = 0;
+			// get the activated input events
 			while ((*iter)->quasiFirelist && (*iter)->quasiFirelist[i]) {
-				
 				for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin();
 							index != (*iter)->quasiFirelist[i]->messageSet.end();
 							index++) {
@@ -291,54 +271,13 @@ setOfMessages interactionGraph::getActivatedInputEvents(vertex * node) {
 					input.insert(*index);
 					
 					inputMessages.insert(input);
-					
-					/*if (node->getNumber() == 9) {
-				//		cout << "current marking: " << PN->printCurrentMarkingForDot() << endl;
-						cout << "sending event: " << PN->Places[*index]->name << endl;
-						cout << "i: " << i << endl;
-						cout << "transition: " << (*iter)->quasiFirelist[i]->name << endl;
-					}*/
-					
 					cl->addLiteral(PN->Places[*index]->name);
 				}
 				i++;
 			}
-			node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
-		}
-	}
-	
-	trace(TRACE_5, "interactionGraph::getActivatedInputEvents(vertex * node): end\n");
-	
-   	return inputMessages;
-}
 
-//! \fn setOfMessages interactionGraph::getActivatedOutputEvents(vertex * node)
-//! \param node the node for which the activated output events are calculated
-//! \brief creates a list of all output messages of the current node
-setOfMessages interactionGraph::getActivatedOutputEvents(vertex * node) {
-
-	trace(TRACE_5, "interactionGraph::getActivatedOutputEvents(vertex * node): start\n");
-
-
-	int i;
-	
-	clause * cl = new clause();
-	
-	setOfMessages outputMessages;	// list of all input messages of the current node
-	
-	StateSet::iterator iter;	
-	
-	for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
-	
-		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {				// we just consider the maximal states only
-			int i;
-			int k = 0;
-			
-			clause * cl = new clause();			// create a new clause for this particular state
-
-			(*iter)->decode(PN);
-			
-			for (i = 0; i < PN->getPlaceCnt(); i++) {
+			// get the activated output events			
+			for (int i = 0; i < PN->getPlaceCnt(); i++) {
 				if (PN->Places[i]->type == OUTPUT && PN->CurrentMarking[i] > 0) {
 					messageMultiSet output;
 					output.insert(i);
@@ -350,8 +289,9 @@ setOfMessages interactionGraph::getActivatedOutputEvents(vertex * node) {
 			node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
 		}
 	}
-	trace(TRACE_5, "interactionGraph::getActivatedOutputEvents(vertex * node): end\n");	
-   	return outputMessages;		
+	
+	trace(TRACE_5, "interactionGraph::getActivatedInputEvents(vertex * node): end\n");
+	
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////

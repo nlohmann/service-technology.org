@@ -354,7 +354,7 @@ transition: key_transition tname key_consume arclist semicolon key_produce arcli
 		
 	T->ArrivingArcs = new  Arc * [card+10];
 	/* Schleife ueber alle Boegen */
-	for(current = $4;current;current = current -> next) {
+	for(current = $4; current; current = current->next) {
 	/* gibt es Bogen schon? */
 
 		for(i = 0; i < T->NrOfArriving;i++) {

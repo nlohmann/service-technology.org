@@ -1,8 +1,7 @@
 #include "mynew.h"
 #include "petriNetNode.h"
 
-inline void Node::NewArriving(Arc & a)
-{
+inline void Node::NewArriving(Arc & a) {
   Arc ** Old = ArrivingArcs;
   NrOfArriving++;
   ArrivingArcs = new Arc* [NrOfArriving];
@@ -14,8 +13,7 @@ inline void Node::NewArriving(Arc & a)
   delete [] Old;
 }
 
-inline void Node::NewLeaving(Arc & a)
-{
+inline void Node::NewLeaving(Arc & a) {
   Arc ** Old = LeavingArcs;
   NrOfLeaving++;
   LeavingArcs = new Arc* [NrOfLeaving];
@@ -27,10 +25,23 @@ inline void Node::NewLeaving(Arc & a)
   delete [] Old;
 }
 
-Node::~Node()
-{
+Node::~Node() {
   delete [] name;
+  
+//  for(int i = 0; i < NrOfArriving - 1; i++) {
+//  	if (ArrivingArcs[i]) {
+//  		delete ArrivingArcs[i];
+//  	}
+//  	ArrivingArcs[i] = NULL;
+//  }
   delete [] ArrivingArcs;
+  
+//  for(int i = 0; i < NrOfLeaving - 1; i++) {
+//  	if (LeavingArcs[i]) {
+//	  	delete LeavingArcs[i];
+//  	}
+//  	LeavingArcs[i] = NULL;
+//  }  
   delete [] LeavingArcs;
 }
 

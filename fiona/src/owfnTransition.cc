@@ -61,24 +61,20 @@ owfnTransition::~owfnTransition() {
 }
 
 
-void owfnTransition::set_hashchange(oWFN * PN)
-{
+void owfnTransition::set_hashchange(oWFN * PN) {
 	unsigned int i;
 
 	hash_change = 0;
-	for(i = 0; IncrPlaces[i] < PN->getPlaceCnt(); i++)
-	{
+	for(i = 0; IncrPlaces[i] < PN->getPlaceCnt(); i++) {
 		hash_change += Incr[i] * PN->Places[IncrPlaces[i]]->hash_factor;
 	}
-	for(i = 0; DecrPlaces[i] < PN->getPlaceCnt(); i++)
-	{
+	for(i = 0; DecrPlaces[i] < PN->getPlaceCnt(); i++) {
 		hash_change -= Decr[i] * PN->Places[DecrPlaces[i]]->hash_factor;
 	}
 	hash_change %= HASHSIZE;
 }
 
-void owfnTransition::initialize(oWFN * PN)
-{
+void owfnTransition::initialize(oWFN * PN) {
 
   unsigned int i,j,k;
 

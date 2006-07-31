@@ -1,19 +1,7 @@
 #include "mynew.h"
 #include "graph.h"
-//#include "owfn.h"
-//#include "owfnPlace.h"
-//#include "owfnTransition.h"
-
 #include "options.h"
 #include "debug.h"
-
-//#include<stdlib.h>
-//#include<stdio.h>
-//#include<unistd.h>
-
-//#include <string>
-
-
 
 using namespace std;
 
@@ -51,16 +39,34 @@ oWFN::oWFN() : arcCnt(0), placeHashValue(0), placeCnt(0),
 oWFN::~oWFN() {	
 	delete[] inputPlacesArray;
 	delete[] outputPlacesArray;
-//	for (int i = 0; i < HASHSIZE; i++) {
+
+	//?????? warum klappt das nur für den IG und nicht für den OG????? und 
+	// Segmentation fault kommt nur unter Windows
+//	for(int i = 0; i < HASHSIZE; i++) {
 //		if (binHashTable[i]) {
 //			delete binHashTable[i];
 //		}
-//	}
+//		binHashTable[i] = (binDecision *) 0;
+//	}	
+
 	delete[] binHashTable;
+	
+	for(int i = 0; i < placeCnt; i++) {
+		if (Places[i]) {
+			delete Places[i];
+		}
+		Places[i] = NULL;
+	}	
 	delete[] Places;
+	
+	for(int i = 0; i < transCnt; i++) {
+		if (Transitions[i]) {
+			delete Transitions[i];
+		}
+		Transitions[i] = NULL;
+	}	
 	delete[] Transitions;
 }
-
 
 //! \fn unsigned int oWFN::getPlaceCnt()
 //! \brief returns the number of all places of the net
@@ -446,7 +452,6 @@ void oWFN::calculateReachableStates(vertex * n, bool minimal) {
 void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 
 	// calculates the EG starting at the current marking
-	
 	trace(TRACE_5, "start of function oWFN::calculateReachableStatesFull\n");
 
 	State * CurrentState;
@@ -530,9 +535,6 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 									
 		   		CurrentState -> succ[CurrentState -> current] = NewState;
 	     		(CurrentState->current)++;
-	     		
-	     //		CurrentState->decode(this);
-	     		
 	    	} else {
 				trace(TRACE_5, "Current marking new\n");
       			NewState = binInsert(this);
@@ -857,29 +859,13 @@ void oWFN::addPlace(unsigned int i, owfnPlace * place) {
   	}
 }
 
-//! \fn int oWFN::setCurrentMarkingFromState(reachGraphState * s)
-//! \param s state to be explored
-//! \brief extracts from the give state the marking and sets the currentmarking appropriatly
-//int oWFN::setCurrentMarkingFromState(reachGraphState * s) {
-//
-//	trace(TRACE_5, "oWFN::setCurrentMarkingFromState(reachGraphState * state): start\n");
-//
-////	copyMarkingToCurrentMarking(s->state->myMarking);
-//	
-////	placeHashValue = s->state->placeHashValue;
-//	
-////	copyMarkingToCurrentMarking(s->state->myMarking);
-//	
-////	unsigned int * markingvonkarsten = new unsigned int [placeCnt];
-//	s->state->decode(CurrentMarking, this);
-//}
-
-
 void oWFN::RemoveGraph() {
 	int i;
 
-	for(i=0;i<HASHSIZE;i++) {
-		if(binHashTable[i]) delete binHashTable[i];
+	for(i = 0; i < HASHSIZE; i++) {
+		if(binHashTable[i]) {
+			delete binHashTable[i];
+		}
 		binHashTable[i] = (binDecision *) 0;
 	}
 }

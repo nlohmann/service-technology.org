@@ -38,8 +38,8 @@ Node::Node(char * n)
 {
   name = new char [strlen(n) + 1];
   strcpy(name, n);
-  ArrivingArcs = new Arc* [1];
-  LeavingArcs = new Arc*  [1];
+  ArrivingArcs = new Arc * [1];
+  LeavingArcs = new Arc *  [1];
 }
 
 inline ostream& operator << (ostream & str,Node n)

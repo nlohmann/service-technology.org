@@ -168,10 +168,8 @@ inline binDecision::binDecision(int b, long int BitVectorSize) {
 
 
 inline binDecision::~binDecision() {
-	delete [] vector;
+	delete[] vector;
 	delete state;
-	
-	cout << "inline binDecision::~binDecision()" << endl;
 }
 
 

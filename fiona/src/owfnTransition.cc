@@ -22,17 +22,42 @@
 //#include <set>
 
 
-owfnTransition::owfnTransition(char * name) : Node(name), quasiEnabledNr(0), enabledNr(0), NextEnabled(NULL), PrevEnabled(NULL), NextQuasiEnabled(NULL), PrevQuasiEnabled(NULL), quasiEnabled(false), enabled(false) {
-/*  *cnt += 1;
-  if(!(*cnt % REPORTFREQUENCY))
-  {
-	cerr << "\n" << cnt << "transitions parsed\n";
-  }*/
+owfnTransition::owfnTransition(char * name) : Node(name), quasiEnabledNr(0), 
+	enabledNr(0), NextEnabled(NULL), PrevEnabled(NULL), 
+	NextQuasiEnabled(NULL), PrevQuasiEnabled(NULL), 
+	quasiEnabled(false), enabled(false) {
+		
 	NrOfArriving = 0;
 	NrOfLeaving = 0;
 }
 
 owfnTransition::~owfnTransition() {
+
+	if (ImproveEnabling) {
+		delete ImproveEnabling;
+	}
+	if (ImproveDisabling) {
+		delete ImproveDisabling;
+	}
+	if (IncrPlaces) {
+		delete IncrPlaces;
+	}
+	if (Incr) {
+		delete Incr;
+	}
+	if (DecrPlaces) {
+		delete DecrPlaces;
+	}
+	if (Decr) {
+		delete Decr;
+	}
+	
+//	if (ImproveEnabling) {
+//		delete ImproveEnabling;
+//	}			
+//	if (ImproveDisabling) {
+//		delete ImproveDisabling;
+//	}			
 }
 
 

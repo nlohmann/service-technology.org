@@ -1,9 +1,5 @@
 #include "mynew.h"
 #include "OG.h"
-//#include "vertex.h"
-//#include "owfn.h"
-//#include "stateList.h"
-//#include "main.h"
 #include "graph.h"
 
 #include "options.h"
@@ -11,8 +7,6 @@
 #include "successorNodeList.h"
 #include "BddRepresentation.h" 
 #include "CNF.h"
-
-//#include <iostream>
 
 
 //! \fn operatingGuidelines::operatingGuidelines(oWFN * _PN) 

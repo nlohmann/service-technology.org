@@ -10,17 +10,11 @@
 
 #include "mynew.h"
 #include "owfnTransition.h"
-//#include "petriNetNode.h"
 #include "owfn.h"
-//#include "owfnPlace.h"
-//#include "dimensions.h"
 #include "main.h"
 #include "debug.h"
 #include "graph.h"
 #include "options.h"
-
-//#include <set>
-
 
 owfnTransition::owfnTransition(char * name) : Node(name), quasiEnabledNr(0), 
 	enabledNr(0), NextEnabled(NULL), PrevEnabled(NULL), 

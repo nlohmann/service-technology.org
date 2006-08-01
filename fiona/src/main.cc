@@ -6,7 +6,6 @@
 #include "OG.h"
 #include "owfn.h"
 #include "owfnPlace.h"
-//#include "petriNetNode.h"
 
 #include "options.h"
 #include "debug.h"
@@ -175,32 +174,33 @@ int main(int argc, char ** argv) {
     trace(TRACE_0, "places: " + intToString(PN->getPlaceCnt()));
     trace(TRACE_0, " (including " + intToString(PN->getInputPlaceCnt()) + " input places, " + intToString(PN->getOutputPlaceCnt()) + " output places)\n");
     trace(TRACE_0, "transitions: " + intToString(PN->getTransitionCnt()) + "\n\n");
-
-    // adjust commDepth and events_manual
-    if (options[O_COMM_DEPTH] == true) {
-        PN->commDepth = commDepth_manual;
-    }
-
-    if (options[O_EVENT_USE_MAX] = true) {
-		if (PN->getCommDepth() > events_manual * (PN->placeInputCnt + PN->placeOutputCnt)) {
-			trace(TRACE_0, "commDepth is set too high\n");
-			PN->commDepth = events_manual * (PN->placeInputCnt + PN->placeOutputCnt);
-		}
-    }
-    
-    if (options[O_EVENT_USE_MAX] = true) {
-		if (PN->getCommDepth() < events_manual) {
-			trace(TRACE_0, "events use is set too high\n");
-			events_manual = PN->commDepth;
-		}
-    }
-    
-	// report communication depth and events use    
-    trace(TRACE_0, "communication depth: " + intToString(PN->getCommDepth()) + "\n");
-    if (options[O_EVENT_USE_MAX] == true) {
-        trace(TRACE_0, "considering each event max. " + intToString(events_manual) + " times\n\n");
-    }
-
+	
+	if (parameters[P_OG]) {
+	    // adjust commDepth and events_manual
+	    if (options[O_COMM_DEPTH] == true) {
+	        PN->commDepth = commDepth_manual;
+	    }
+	
+	    if (options[O_EVENT_USE_MAX] = true) {
+			if (PN->getCommDepth() > events_manual * (PN->placeInputCnt + PN->placeOutputCnt)) {
+				trace(TRACE_0, "commDepth is set too high\n");
+				PN->commDepth = events_manual * (PN->placeInputCnt + PN->placeOutputCnt);
+			}
+	    }
+	    
+	    if (options[O_EVENT_USE_MAX] = true) {
+			if (PN->getCommDepth() < events_manual) {
+				trace(TRACE_0, "number of events to be used is set too high\n");
+				events_manual = PN->commDepth;
+			}
+	    }
+	    
+		// report communication depth and events use    
+	    trace(TRACE_0, "communication depth: " + intToString(PN->getCommDepth()) + "\n");
+	    if (options[O_EVENT_USE_MAX] == true) {
+	        trace(TRACE_0, "considering each event max. " + intToString(events_manual) + " times\n\n");
+	    }
+	}
 
 	// ------------------- start computation -------------------------
     time_t seconds, seconds2;

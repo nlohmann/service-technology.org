@@ -46,8 +46,6 @@ protected:
 	successorNodeList * successorNodes;		//!< list of all the nodes succeeding this one 
 											//!< including the edge between them
 
- //   successorNodeList * predecessorNodes;	//!< list of vertices that point to this vertex
-
     unsigned int numberOfVertex;					//!< number of this vertex in the graph
     
     CNF * annotation;						//!< annotation of this node (a CNF)

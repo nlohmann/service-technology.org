@@ -2,20 +2,9 @@
 #include "graph.h"
 #include "vertex.h"
 #include "successorNodeList.h"
-//#include "reachGraph.h"
-//#include "graphEdge.h"
-//#include "owfn.h"
-//#include "stateList.h"
-//#include "main.h"
-
 #include "enums.h"
 #include "options.h"
 #include "debug.h"
-
-//#include <fstream>
-//#include <iostream>
-//#include <string>
-//#include <set>
 
 
 using namespace std;

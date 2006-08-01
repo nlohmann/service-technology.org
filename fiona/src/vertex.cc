@@ -9,7 +9,6 @@
 vertex::vertex(int numberEvents) :
 			   color(BLACK),
 			   successorNodes(NULL),
-		//	   states(NULL),
 			   numberOfVertex(0),
 			   annotation(NULL) {
 
@@ -26,7 +25,6 @@ vertex::vertex(int numberEvents) :
 vertex::vertex() :
                color(BLACK),
                successorNodes(NULL),
-        //       states(NULL),
                numberOfVertex(0),
 			   annotation(NULL) {
                	

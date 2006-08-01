@@ -36,6 +36,8 @@ public:
 	clause(graphEdge *);
 	~clause();	
 	
+	bool fake;
+	
 	graphEdge * edge;
 	clause * nextElement; 
 

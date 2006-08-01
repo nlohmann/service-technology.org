@@ -13,7 +13,7 @@
 
 using namespace std;
 
-clause::clause() : edge(NULL), nextElement(NULL)  {
+clause::clause() : edge(NULL), nextElement(NULL), fake(false)  {
 	
 }
 
@@ -23,8 +23,8 @@ clause::clause(graphEdge * _edge) : edge(_edge), nextElement(NULL) {
 
 clause::~clause() {
 	trace(TRACE_5, "clause::~clause() : start\n");
-	if (edge != NULL && edge->getNode() == NULL) {
-		delete edge;	
+	if (edge != NULL && fake) {
+		 delete edge;	
 	}
 	trace(TRACE_5, "clause::~clause() : end\n");
 }
@@ -33,11 +33,13 @@ void clause::setEdge(graphEdge * _edge) {
     trace(TRACE_5, "clause::setEdge(graphEdge * edge) : start\n");
 	
 	if (edge != NULL) {
-		if (edge->getNode() == NULL) {  // in case we have stored a "fake" edge, we delete that one
+		if (fake) {  // in case we have stored a "fake" edge, we delete that one
 			delete edge;	
 		} 
+		fake = false;
 		edge = _edge;					// set the edge stored to the one given
 	} else {
+		fake = false;
 		edge = _edge;
 	}	
     trace(TRACE_5, "clause::setEdge(graphEdge * edge) : end\n");
@@ -57,6 +59,7 @@ void clause::addLiteral(char * label) {
 	
 	if (!edge) {
 		edge = newEdge;
+		fake = true;
 	    trace(TRACE_5, "clause::addLiteral(char * label) : end\n");
 		return ;	
 	}
@@ -65,6 +68,7 @@ void clause::addLiteral(char * label) {
 		cl = cl->nextElement;	
 	}	  
 	cl->nextElement = new clause(newEdge);	// create a new clause literal	
+	cl->nextElement->fake = true;
 	
     trace(TRACE_5, "clause::addLiteral(char * label) : end\n");
 }

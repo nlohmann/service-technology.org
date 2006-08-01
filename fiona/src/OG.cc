@@ -22,8 +22,9 @@ operatingGuidelines::operatingGuidelines(oWFN * _PN) : reachGraph(_PN) {
 //! \fn operatingGuidelines::~operatingGuidelines() 
 //! \brief destructor !to be implemented!
 operatingGuidelines::~operatingGuidelines() {
-	  if (options[O_BDD] == true)
+	  if (options[O_BDD] == true) {
 		delete bdd;
+	  }
 }
 
 //! \fn void operatingGuidelines::buildGraph()

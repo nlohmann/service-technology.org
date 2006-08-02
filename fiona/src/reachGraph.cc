@@ -154,19 +154,6 @@ int reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType ty
             graphEdge * edgeSucc = new graphEdge(toAdd, label, type);
             currentVertex->addSuccessorNode(edgeSucc);
 
- //           StateSet::iterator iter;                      // iterator over the stateList's elements
-
-//            for (iter = currentVertex->setOfStates.begin();
-//                        iter != currentVertex->setOfStates.end();
-//                        iter++) {
-//
-//                if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) {
-//                    (*iter)->setEdge(edgeSucc);
-//                }
-//            }
-//            graphEdge * edgePred = new graphEdge(currentVertex, label, type);
-//            toAdd->addPredecessorNode(edgePred);
-
 			currentVertex->setAnnotationEdges(edgeSucc);
 			
             currentVertex = toAdd;
@@ -185,18 +172,8 @@ int reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType ty
             graphEdge * edgeSucc = new graphEdge(found, label, type);
             currentVertex->addSuccessorNode(edgeSucc);
 
-            StateSet::iterator iter;      // iterator over the stateList's elements
-
-//            for (iter = currentVertex->setOfStates.begin(); iter != currentVertex->setOfStates.end(); iter++) {
-//                if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) {
-//                    (*iter)->setEdge(edgeSucc);
-//                }
-//            }
-
 			currentVertex->setAnnotationEdges(edgeSucc);
 
-//            graphEdge * edgePred = new graphEdge(currentVertex, label, type);
-//            found->addPredecessorNode(edgePred);
             numberOfEdges++;
 
             delete toAdd;
@@ -231,7 +208,8 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
             edgeLabel = PN->Places[PN->outputPlacesArray[label]]->name;
         }
 
-        if (options[O_BDD] == true || found == NULL) {
+//        if (options[O_BDD] == true || found == NULL) {
+        if (found == NULL) {
 
 //			if (true) {
 //            cout << "with event " << label << " (type " << type << " ):" << endl;
@@ -241,19 +219,8 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
             graphEdge * edgeSucc = new graphEdge(toAdd, edgeLabel, type);
             currentVertex->addSuccessorNode(edgeSucc);
 
-            StateSet::iterator iter;      // iterator over the stateList's elements
-
-//            for (iter = currentVertex->setOfStates.begin(); iter != currentVertex->setOfStates.end(); iter++) {
-//                if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) {
-//                    (*iter)->setEdge(edgeSucc);
-//                }
-//            }
-			
 			currentVertex->setAnnotationEdges(edgeSucc);
 			
-//            graphEdge * edgePred = new graphEdge(currentVertex, edgeLabel, type);
-//            toAdd->addPredecessorNode(edgePred);
-
             for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
                 toAdd->eventsUsed[i] = currentVertex->eventsUsed[i];
             }
@@ -290,18 +257,8 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
             graphEdge * edgeSucc = new graphEdge(found, edgeLabel, type);
             currentVertex->addSuccessorNode(edgeSucc);
 
-            StateSet::iterator iter;        // iterator over the stateList's elements
-
-//            for (iter = currentVertex->setOfStates.begin(); iter != currentVertex->setOfStates.end(); iter++) {
-//                if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) {
-//                    (*iter)->setEdge(edgeSucc);
-//                }
-//            }
-
 			currentVertex->setAnnotationEdges(edgeSucc);
 
-//            graphEdge * edgePred = new graphEdge(currentVertex, edgeLabel, type);
-//            found->addPredecessorNode(edgePred);
             numberOfEdges++;
 
             if (type == receiving) {
@@ -343,10 +300,6 @@ void reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node, ver
 
     for (iter = node->setOfStates.begin();
          iter != node->setOfStates.end(); iter++) {
-
-        
-      //  PN->setCurrentMarkingFromState((*iter));    // set the net to the marking of the state being considered
-
 		(*iter)->decode(PN);
 
         PN->addInputMessage(input);                 // add the input message to the current marking
@@ -358,7 +311,6 @@ void reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node, ver
     }
     
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
-  //  return newStateList;                            // return the new state list
 }
 
 
@@ -369,13 +321,9 @@ void reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node, ver
 void reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, vertex * newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node) : start\n");
 
-  //  stateList * newStateList = new stateList();     // the new list of states for the next node
-
     StateSet::iterator iter;              // iterator over the stateList's elements
 
     for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
-//        PN->setCurrentMarkingFromState((*iter));    // set the net to the marking of the state being considered
-        
         (*iter)->decode(PN);
         
         PN->addInputMessage(input);                 // add the input message to the current marking
@@ -386,8 +334,6 @@ void reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, 
         }
     }
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node) : end\n");
-
- //   return newStateList;                            // return the new state list
 }
 
 //! \fn void reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node)
@@ -397,14 +343,10 @@ void reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, 
 void reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node, vertex * newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node) : start\n");
 
- //   stateList * newStateList = new stateList();     // the new list of states for the next node
-
     StateSet::iterator iter;                      // iterator over the stateList's elements
 
     for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
 
-//        PN->setCurrentMarkingFromState(*iter);      // set the net to the marking of the state being considered
-        
         (*iter)->decode(PN);
         
         if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
@@ -417,7 +359,6 @@ void reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node, v
         }
     }
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node) : end\n");
- //   return newStateList;                            // return the new state list
 }
 
 //! \fn void reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node)
@@ -427,13 +368,9 @@ void reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node, v
 void reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node) : start\n");
 
-  //  stateList * newStateList = new stateList();     // the new list of states for the next node
-
     StateSet::iterator iter;                      // iterator over the stateList's elements
 
     for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
-
-//        PN->setCurrentMarkingFromState(*iter);      // set the net to the marking of the state being considered
         
         (*iter)->decode(PN);
         
@@ -447,8 +384,6 @@ void reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node
         }
     }
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node) : end\n");
-
- //   return newStateList;                            // return the new state list
 }
 
 //! \fn void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[])

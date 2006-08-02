@@ -284,28 +284,28 @@ void oWFN::addSuccStatesToList(vertex * n, State * NewState) {
 
 
 void oWFN::addStateToList(vertex * n, State * currentState) {
-		bool minimal = false;
+	bool minimal = false;
+	
+	currentState->decodeShowOnly(this);
 		
-		currentState->decodeShowOnly(this);
-			
-		for (int z = 0; z < placeCnt; z++) {
-			if (Places[z]->type == OUTPUT && CurrentMarking[z] > 0) {
-				minimal = true;
-				break;
-			}
+	for (int z = 0; z < placeCnt; z++) {
+		if (Places[z]->type == OUTPUT && CurrentMarking[z] > 0) {
+			minimal = true;
+			break;
 		}
-		
-		if (currentState != NULL) {
-			if (parameters[P_CALC_ALL_STATES] || 
-					currentState->type == DEADLOCK || 
-					minimal || 
-					currentState->type == FINALSTATE) { 
-						
-				n->addState(currentState);
-			}
-		} else {
-			return ;
+	}
+	
+	if (currentState != NULL) {
+		if (parameters[P_CALC_ALL_STATES] || 
+				currentState->type == DEADLOCK || 
+				minimal || 
+				currentState->type == FINALSTATE) { 
+					
+			n->addState(currentState);
 		}
+	} else {
+		return ;
+	}
 	
 	if (currentState != NULL) {
 		for(int i = 0; i < currentState->CardFireList; i++) {
@@ -334,86 +334,104 @@ void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
 }
 
 
-//! \fn void oWFN::calculateReachableStatesFull(vertex * listOfStates, bool minimal)
-//! \param listOfStates list containing all reachable states from the current marking (after function is done)
+//! \fn void oWFN::calculateReachableStates(vertex * n, bool minimal) 
+//! \param n the node to be calculated
 //! \param minimal the current state is minimal in the vertex
-//! \brief NO REDUCTION! calculate all reachable states from the current marking and store them in the list being passed 
-//! as parameter (== vertex of reachGraph)
+//! \brief calculates the reduced set of states of the new vertex
 void oWFN::calculateReachableStates(vertex * n, bool minimal) {
 
+	// calculates the EG starting at the current marking
 	trace(TRACE_5, "oWFN::calculateReachableStates: start\n");
 
 	State * CurrentState;
   	unsigned int i;
   	State * NewState;
   	stateType type;
-  	
 	CurrentState = binSearch(this);
 	
-	if (CurrentState == NULL) {
- 	 	CurrentState = binInsert(this);
-  		CurrentState->firelist = firelist();
-  		CurrentState->CardFireList = CardFireList;
-  		if (parameters[P_IG]) {
-	  		CurrentState->quasiFirelist = quasiFirelist();
-  		}
-  	//	CurrentState->myMarking = copyCurrentMarking();
-  		CurrentState->current = 0;
-  		CurrentState->parent = (State *) 0;
-  		CurrentState->succ = new State * [CardFireList+1];
-  		CurrentState->placeHashValue = placeHashValue;
-		CurrentState->type = typeOfState();
-		n->addState(CurrentState);
-	} else {
-		if (CurrentState->type == DEADLOCK || minimal || CurrentState->type == FINALSTATE) { 
-			if (n->addState(CurrentState)) {
-				addSuccStatesToList(n, CurrentState);
-			}
+	unsigned int * tempCurrentMarking = NULL;
+	unsigned int tempPlaceHashValue;
+	
+	if (options[O_BDD] == false && CurrentState != NULL) {
+		// marking already has a state -> put it (and all its successors) into the node
+		if (n->addState(CurrentState)) {
+			addSuccStatesToList(n, CurrentState);
 		}
+		trace(TRACE_5, "oWFN::calculateReachableStates: end\n");
+		return;
 	}
-  	
+	
+	// the other case:
+	// we have a marking which has not yet a state object assigned to it
+	if (CurrentState == NULL) {
+		CurrentState = binInsert(this);
+	}
+	
+	CurrentState->firelist = firelist();
+	CurrentState->CardFireList = CardFireList;
+	if (parameters[P_IG]) {
+  		CurrentState->quasiFirelist = quasiFirelist();
+	}
+
+	CurrentState->current = 0;
+	CurrentState->parent = (State *) 0;
+	CurrentState->succ = new State * [CardFireList+1];
+	CurrentState->placeHashValue = placeHashValue;
+	CurrentState->type = typeOfState();
+	n->addState(CurrentState);
+	  	
 	// building EG in a node
   	while(CurrentState) {
+ 
 		if ((n->setOfStates.size() % 1000) == 0) {
 			trace(TRACE_2, "\t current state count: " + intToString(n->setOfStates.size()) + "\n");
 		}
-
+	  	
 		// no more transition to fire from current state?
 		if (CurrentState->current < CurrentState->CardFireList) {
-			//&& CurrentState->firelist[CurrentState->current] != NULL)
-
-		//	copyMarkingToCurrentMarking(CurrentState->myMarking);
-			CurrentState->decode(this);
-
-//			placeHashValue = CurrentState->placeHashValue;
-
 			// there is a next state that needs to be explored
-	  		CurrentState->firelist[CurrentState->current]->fire(this);
 
+			if (tempCurrentMarking) {
+				delete[] tempCurrentMarking;
+				tempCurrentMarking = NULL;
+			}
+			
+			tempCurrentMarking = copyCurrentMarking();
+			tempPlaceHashValue = placeHashValue;
+			  		
+	  		trace(TRACE_5, "fire transition\n");
+
+			CurrentState->firelist[CurrentState->current]->fire(this);
 			minimal = isMinimal();
-
-	  		NewState = binSearch(this);
-	  		
+			NewState = binSearch(this);
+			
 	  		if(NewState != NULL) {
 		  		// Current marking already in bintree 
-				if (NewState->type == DEADLOCK || minimal || NewState->type == FINALSTATE) { 
-					if (n->addState(NewState)) {
-						addSuccStatesToList(n, NewState);
-					}
+				trace(TRACE_5, "Current marking already in bintree \n");
+				if (n->addState(NewState)) {
+					addSuccStatesToList(n, NewState);
 				}
 				
+				copyMarkingToCurrentMarking(tempCurrentMarking);
+				
+				CurrentState->firelist[CurrentState->current]->backfire(this);
+				
+				placeHashValue = tempPlaceHashValue;
+				
+				delete[] tempCurrentMarking;
+				tempCurrentMarking = NULL;
+									
 		   		CurrentState -> succ[CurrentState -> current] = NewState;
 	     		(CurrentState->current)++;
 	    	} else {
+				trace(TRACE_5, "Current marking new\n");
       			NewState = binInsert(this);
-      			
-	      		NewState->firelist = firelist();
+      			NewState->firelist = firelist();
 	      		NewState->CardFireList = CardFireList;
 	      		if (parameters[P_IG]) {
 		      		NewState->quasiFirelist = quasiFirelist();
 	      		}
 	      		NewState->current = 0;
-	      	//	NewState->myMarking = copyCurrentMarking();
 	      		NewState->parent = CurrentState;
 	      		NewState->succ =  new State * [CardFireList+1];
 	      		NewState->placeHashValue = placeHashValue;
@@ -422,26 +440,29 @@ void oWFN::calculateReachableStates(vertex * n, bool minimal) {
 	      		CurrentState->succ[CurrentState -> current] = NewState;
 	      		CurrentState = NewState;
 		      		
-				if (NewState->type == DEADLOCK || minimal || NewState->type == FINALSTATE) { 
-					n->addState(NewState);
+				n->addState(NewState);
+				
+				if (tempCurrentMarking) {
+					delete[] tempCurrentMarking;
+					tempCurrentMarking = NULL;
 				}
 	    	}
 		// no more transition to fire
 		} else {
 	  		// close state and return to previous state
+			trace(TRACE_5, "close state and return to previous state\n");
 	  		CurrentState = CurrentState->parent;
 
 	  		if(CurrentState) {			// there is a father to further examine
-	  			placeHashValue = CurrentState->placeHashValue;
-	      		//copyMarkingToCurrentMarking(CurrentState->myMarking);
 	      		CurrentState->decode(this);
-	      		
 	      		CurrentState->current++;
 	    	}
 		}
 	}
-
-	trace(TRACE_5, "end of function oWFN::calculateReachableStates\n");
+	if (tempCurrentMarking) {
+		delete[] tempCurrentMarking;	
+	}
+	trace(TRACE_5, "oWFN::calculateReachableStates: end\n");
 }
 
 //! \fn void oWFN::calculateReachableStatesFull(vertex * listOfStates, bool minimal)

@@ -46,6 +46,20 @@
 
 using namespace std;
 
+class SearchTrace;
+
+extern SearchTrace * Trace;
+
+extern int bin_p; // (=place); index in CurrentMarking
+extern unsigned char bin_byte; // byte to be matched against tree vector; constructed from CurrentMarking
+extern int bin_t; // index in tree vector
+extern unsigned char * bin_v; // current tree vector
+extern int bin_s; // nr of bits pending in byte from previous iteration
+extern int bin_dir; // did we go "old" or "new" in last decision?
+extern int bin_b; // bit nr at start of byte
+extern binDecision * fromdec, * todec;
+extern binDecision * vectordec;
+
 class SearchTrace {
 public:
 	unsigned char bn_byte;	// byte to be matched against tree vector; constructed from MARKINGVECTOR
@@ -58,7 +72,17 @@ public:
 	binDecision * vectrdec;
 };
 
-
-extern SearchTrace * Trace;
+inline void trace() {
+	// bin_p = index, bin_pb = 0!
+	Trace[bin_p].bn_byte =  bin_byte; 
+	Trace[bin_p].bn_t = bin_t; 
+	Trace[bin_p].bn_v = bin_v; 
+	Trace[bin_p].bn_s = bin_s; 
+	Trace[bin_p].bn_dir = bin_dir; 
+	Trace[bin_p].bn_b = bin_b; 
+	Trace[bin_p].frmdec = fromdec;
+    Trace[bin_p].vectrdec = vectordec;
+	Trace[bin_p].tdec = todec;
+}
 
 #endif

@@ -44,9 +44,6 @@
 #ifndef STATE_H
 #define STATE_H
 
-//#include "binDecision.h"
-//#include "owfnTransition.h"
-
 using namespace std;
 
 // State objects are nodes in the state graph.
@@ -76,7 +73,6 @@ public:
   NEW_OPERATOR(State)
 #define new NEW_NEW
 };
-
 
 inline State::State() :
 				type(TRANS),

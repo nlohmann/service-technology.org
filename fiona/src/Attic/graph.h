@@ -49,18 +49,7 @@ inline unsigned int bitstoint(unsigned char * bytepos, int bitpos, int nrbits) {
 	return result;
 }
 
-inline void trace() {
-	// bin_p = index, bin_pb = 0!
-	Trace[bin_p].bn_byte =  bin_byte; 
-	Trace[bin_p].bn_t = bin_t; 
-	Trace[bin_p].bn_v = bin_v; 
-	Trace[bin_p].bn_s = bin_s; 
-	Trace[bin_p].bn_dir = bin_dir; 
-	Trace[bin_p].bn_b = bin_b; 
-	Trace[bin_p].frmdec = fromdec;
-    Trace[bin_p].vectrdec = vectordec;
-	Trace[bin_p].tdec = todec;
-}
+
 
 	
 #endif

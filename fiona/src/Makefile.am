@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006-08-02 12:08:23 $ by $Author: reinert $.
-# Version $Revision: 1.7 $
+# File last changed $Date: 2006-08-02 15:52:37 $ by $Author: reinert $.
+# Version $Revision: 1.8 $
 
 bin_PROGRAMS = fiona
 
@@ -36,7 +36,10 @@ fiona_SOURCES = syntax.yy syntax.h syntax_wrap.h lexer.ll\
 		IG.h owfnPlace.h\
 		OG.cc owfnTransition.cc\
 		OG.h  graph.cc owfnTransition.h\
-		debug.cc graph.h binDecision.h state.h searchTrace.h\
+		debug.cc graph.h \
+    binDecision.h binDecision.cc \
+    state.h state.cc \
+    searchTrace.h \
 		debug.h graphEdge.cc successorNodeList.cc\
 		dimensions.cc graphEdge.h successorNodeList.h\
 		dimensions.h main.cc symboltab.cc\

@@ -47,8 +47,13 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	setOfMessages inputSet;
 	setOfMessages outputSet;
 	
-	// get the activated events and compute the CNF of the node
-	getActivatedEventsComputeCNF(currentNode, inputSet, outputSet);
+	if (parameters[P_CALC_ALL_STATES]) {
+		// get the activated events and compute the CNF of the node
+		getActivatedEventsComputeCNF(currentNode, inputSet, outputSet);
+	} else {
+		inputSet = PN->inputMessages;
+		outputSet = PN->outputMessages;	
+	}
 
 	actualDepth++;
 
@@ -147,11 +152,8 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 //! \brief builds up the graph recursively
 void interactionGraph::buildReducedGraph(vertex * currentNode) {
 
-//	stateList * newNodeStateList;
-	
 	setOfMessages inputSet;
 	setOfMessages outputSet;
-	
 	
 	// initialize node
 	if (PN->getInputPlaceCnt() > 0) {
@@ -161,7 +163,6 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 	if (PN->getOutputPlaceCnt() > 0) {
 		outputSet = combineReceivingEvents(currentNode);
 	}
-
 
 	actualDepth++;
 
@@ -477,8 +478,6 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 		}
 	}
 
-	
-
 	trace(TRACE_5, "number of input events: " + intToString(inputMessages.size()) + "\n" );
 	trace(TRACE_5, "interactionGraph::receivingBeforeSending(vertex * node): end\n");
    	return inputMessages;							// return the new state list	
@@ -518,7 +517,6 @@ void interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, vert
 	cout << "checking node: " << *node << endl;
 #endif
 	StateSet::iterator iter;	
-//	stateList * newStateList = new stateList();		// the new list of states for the next node
 	
 	// iterate over all states of the current node 
 	for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
@@ -531,11 +529,10 @@ void interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, vert
 			if (parameters[P_CALC_ALL_STATES]) {
 				PN->calculateReachableStatesFull(node, false);	// calc the reachable states from that marking
 			} else {
-				PN->calculateReachableStates(node, false);	// calc the reachable states from that marking
+				PN->calculateReachableStatesOutputEvent(node, false);	// calc the reachable states from that marking
 			}
 		}
 	}
- //  	return newStateList;							// return the new state list
 }
 
 //! \fn stateList * interactionGraph::calculateSuccStatesInputReduced(char * input, vertex * node)
@@ -548,7 +545,6 @@ void interactionGraph::calculateSuccStatesInputReduced(messageMultiSet input, ve
 	cout << "interactionGraph::calculateSuccStatesInputReduced(char * input, vertex * node): start" << endl;
 #endif
 
-//	stateList * newStateList = new stateList();		// the new list of states for the next node
 	StateSet::iterator iter;		
 	// iterate over all states of the current node 
 	for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
@@ -566,10 +562,8 @@ void interactionGraph::calculateSuccStatesInputReduced(messageMultiSet input, ve
 			if (parameters[P_CALC_ALL_STATES]) {
 				PN->calculateReachableStatesFull(node, false);	// calc the reachable states from that marking
 			} else {
-				PN->calculateReachableStates(node, false);	// calc the reachable states from that marking
+				PN->calculateReachableStatesInputEvent(node, false);	// calc the reachable states from that marking
 			}
 		}
 	}
-	
- //  	return newStateList;							// return the new state list
 }

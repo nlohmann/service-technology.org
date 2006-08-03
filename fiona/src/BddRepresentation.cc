@@ -1,12 +1,10 @@
 #include "mynew.h"
-#include "symboltab.h"
 
 #include <iostream>
 #include <string>
 #include "math.h"
 
 #include "BddRepresentation.h" 
-//#include "stateList.h"
 #include "graphEdge.h"
 #include "symboltab.h"
 #include "owfn.h"
@@ -77,7 +75,7 @@ BddRepresentation::~BddRepresentation(){
 
 //add blue edges to BDD and delete red edges from BDD
 void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
-		
+trace(TRACE_5, "BddRepresentation::addOrDeleteLeavingEdges(vertex* v): start\n");		
 		v->resetIteratingSuccNodes();
 		
 		if (v->setOfStates.size() != 0){
@@ -87,13 +85,11 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 			while((element = v->getNextEdge()) != NULL){
 				
 				vertex* vNext = element->getNode();
-				
 				if (vNext != NULL){ //&& vNext->setOfStates.size() != 0 
 			
 				    //label						
 		            DdNode * label = labelToBddMp(element->getLabel()); 
 //                  if (label == NULL) exit(1);
-		            		
 		            //nodes		    
 		            DdNode * nodes = nodesToBddMp(v->getNumber(), vNext->getNumber());
 		            
@@ -127,17 +123,18 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 			            Cudd_RecursiveDeref(mgrMp, bddMp);
 			            bddMp = tmp;	 
 			            
-			            //cout << "delete edge " << v->getNumber() << "->" << vNext->getNumber() << endl;	
 					}
 				} 
 			}//end while 
 		}
+trace(TRACE_5, "BddRepresentation::addOrDeleteLeavingEdges(vertex* v): end\n");
 }
 
 
 //! \fn void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[])
 //! \brief generate BDD representation
 void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
+trace(TRACE_5, "BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]): start\n");
 	v->resetIteratingSuccNodes();
 	if (v->getColor() == BLUE) {	
 		if (v->setOfStates.size() != 0){
@@ -154,14 +151,13 @@ void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
 				    						
 				    //label						
 		            DdNode * label = labelToBddMp(element->getLabel()); 
-//                  if (label == NULL) exit(1);
-		            		
+                  if (label == NULL) exit(1);
 		            //nodes		    
 		            DdNode * nodes = nodesToBddMp(v->getNumber(), vNext->getNumber());
 		            
 		            //edge
 		            DdNode * edge = Cudd_bddAnd(mgrMp, label, nodes); 
-//                  if (edge == NULL) exit(1);
+                  if (edge == NULL) exit(1);
 		            Cudd_Ref(edge);
 		            Cudd_RecursiveDeref(mgrMp, label);
 		            Cudd_RecursiveDeref(mgrMp, nodes);
@@ -171,7 +167,7 @@ void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
 		            cout << "--------------------------------\n";
 					*/
 		            DdNode* tmp = Cudd_bddOr(mgrMp, edge, bddMp);
-//                  if (tmp == NULL) exit(1);
+                  if (tmp == NULL) exit(1);
 		            Cudd_Ref(tmp);
 		            Cudd_RecursiveDeref(mgrMp, edge);
 		            Cudd_RecursiveDeref(mgrMp, bddMp);
@@ -183,14 +179,16 @@ void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
 			}//end while
 		}
 	}
+trace(TRACE_5, "BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]): end\n");	
 }
 
 //! \fn DdNode*  BddRepresentation::labelToBddMp(char* label)
 //! \brief returns the BDD of a label (given as integer)
-DdNode*  BddRepresentation::labelToBddMp(char* label){
+DdNode* BddRepresentation::labelToBddMp(char* label) {
+	trace(TRACE_5, "BddRepresentation::labelToBddMp(char* label): start\n");
+	
 	Symbol * s = InterfaceTable->lookup(label);
     unsigned int number = ((ISymbol*)s)->place->index;
-	
 	BitVector* assignment = numberToBin(number, maxLabelBits);
 		
 	DdNode*  f = Cudd_ReadOne(mgrMp);
@@ -209,7 +207,8 @@ DdNode*  BddRepresentation::labelToBddMp(char* label){
         Cudd_RecursiveDeref(mgrMp, f);
         f = tmp;
     }
-    delete assignment;
+  //  delete assignment;
+	trace(TRACE_5, "BddRepresentation::labelToBddMp(char* label): end\n");    
     return (f);
 }
 
@@ -238,7 +237,7 @@ unsigned int BddRepresentation::getBddNumber(unsigned int node){
 //! \fn DdNode* BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2)
 //! \brief returns the BDD of the nodes (given as integer) of an edge
 DdNode* BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2){
-   
+trace(TRACE_5, "BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2): start\n");		   
     unsigned int bddNumber1 = getBddNumber(node1);   
     unsigned int bddNumber2 = getBddNumber(node2);
     
@@ -270,9 +269,13 @@ DdNode* BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2){
     	 
     	maxNodeBits = neededNodeBits;
 		tmp2 = Cudd_bddAnd(mgrMp, tmp1, bddMp);
+	//	cout << "before deref1" << endl;
 		Cudd_Ref(tmp2);
+    //	cout << "after deref1" << endl;
 		Cudd_RecursiveDeref(mgrMp, tmp1); 
+    //	cout << "after deref2" << endl;
     	Cudd_RecursiveDeref(mgrMp, bddMp);
+    //	cout << "after deref3" << endl;
     	bddMp = tmp2;
     	//cout << "maxNodeBits(new): " << maxNodeBits << endl;
     	//Cudd_PrintMinterm(mgrMp, bddMp);
@@ -306,20 +309,25 @@ DdNode* BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2){
         else{
             tmp = Cudd_bddAnd(mgrMp, Cudd_bddIthVar(mgrMp, maxLabelBits+1+(2*i)), f);
         }
+      //  cout << "before deref2" << endl;
         Cudd_Ref(tmp);
+     //   cout << "after deref21" << endl;
         Cudd_RecursiveDeref(mgrMp, f);
+     //   cout << "after deref22" << endl;
         f = tmp;
         
     }
     delete assignment1;
     delete assignment2;
+trace(TRACE_5, "BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2): end\n");		   
     return (f);
+
 }
 
 //! \fn BitVector* BddRepresentation::numberToBin(unsigned int number, int count)
 //! \brief returns the binary representation of a number **/
 BitVector* BddRepresentation::numberToBin(unsigned int number, int count){
-	BitVector* assignment = new BitVector(count);
+	BitVector * assignment = new BitVector(count);
     int base = 2;
 
     //calculate the binary representation

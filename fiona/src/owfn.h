@@ -54,6 +54,9 @@ class oWFN  {
 		
 		int * inputPlacesArray;
 		int * outputPlacesArray;
+		
+		setOfMessages inputMessages;		//!< activated input messages of current node
+		setOfMessages outputMessages;		//!< activated output messages of current node
 
 		unsigned int commDepth;				//!< depth of operating guideline
 											// wird in readnet.y gesetzt
@@ -97,12 +100,15 @@ class oWFN  {
 		
 		void addStateToList(vertex *, State *);
 		
+		void computeAnnotation(vertex *, State *);
+		void computeAnnotationInput(vertex *, State *, unsigned int *);
+		
 		State * calculateNextSate();
 		
-	//	int setCurrentMarkingFromState(reachGraphState *);// extracts the marking of the given state
 		unsigned int * copyCurrentMarking();
 		void copyMarkingToCurrentMarking(unsigned int * copy);
-		void calculateReachableStates(vertex *, bool);
+		void calculateReachableStatesOutputEvent(vertex *, bool);
+		void calculateReachableStatesInputEvent(vertex *, bool);
 		void calculateReachableStatesFull(vertex *, bool);
 		
 		int addInputMessage(unsigned int);

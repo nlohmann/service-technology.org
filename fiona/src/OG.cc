@@ -50,7 +50,10 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	trace(TRACE_3, intToString(currentNode->setOfStates.size()) + "\n");
 
 	// get the annotation of the node (CNF)
-	computeCNF(currentNode);					// calculate CNF of this node
+	if (parameters[P_CALC_ALL_STATES]) {
+		computeCNF(currentNode);					// calculate CNF of this node
+	}
+	
 	if (terminateBuildingGraph(currentNode)) {
 		string color;
 		
@@ -298,4 +301,6 @@ void operatingGuidelines::convertToBdd() {
     bdd->reorder();
     //bdd->print(); 
     bdd->printDotFile();
+    
+    delete bdd;
 }

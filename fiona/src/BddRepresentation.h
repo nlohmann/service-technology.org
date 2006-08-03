@@ -15,7 +15,7 @@
 #include "cuddInt.h"
 
 using namespace std;
-typedef vector<bool>    BitVector;
+typedef vector<bool> BitVector;
 
 class BddRepresentation{
 	public:

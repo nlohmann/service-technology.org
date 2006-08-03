@@ -26,7 +26,7 @@
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $
+ *          - last changes of: \$Author: weinberg $
  *          
  * \date
  *          - created:
@@ -47,7 +47,6 @@
 using namespace std;
 
 // State objects are nodes in the state graph.
-
 
 class State {
 public:

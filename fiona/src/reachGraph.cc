@@ -73,7 +73,7 @@ void reachGraph::calculateRootNode() {
     if (parameters[P_CALC_ALL_STATES]) {
         PN->calculateReachableStatesFull(v, true);
     } else {
-        PN->calculateReachableStates(v, true);
+        PN->calculateReachableStatesInputEvent(v, true);
     }
 
    // v->setStateList(list);
@@ -306,7 +306,7 @@ void reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node, ver
         if (parameters[P_CALC_ALL_STATES]) {
             PN->calculateReachableStatesFull(newNode, false);   // calc the reachable states from that marking
         } else {
-            PN->calculateReachableStates(newNode, false);       // calc the reachable states from that marking
+            PN->calculateReachableStatesInputEvent(newNode, false);       // calc the reachable states from that marking
         }
     }
     
@@ -330,7 +330,7 @@ void reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, 
         if (parameters[P_CALC_ALL_STATES]) {
             PN->calculateReachableStatesFull(newNode, false);   // calc the reachable states from that marking
         } else {
-            PN->calculateReachableStates(newNode, false);       // calc the reachable states from that marking
+            PN->calculateReachableStatesInputEvent(newNode, false);       // calc the reachable states from that marking
         }
     }
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node) : end\n");
@@ -354,7 +354,7 @@ void reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node, v
             if (parameters[P_CALC_ALL_STATES]) {
                 PN->calculateReachableStatesFull(newNode, true);   // calc the reachable states from that marking
             } else {
-                PN->calculateReachableStates(newNode, true);   // calc the reachable states from that marking
+                PN->calculateReachableStatesOutputEvent(newNode, true);   // calc the reachable states from that marking
             }
         }
     }
@@ -379,7 +379,7 @@ void reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node
             if (parameters[P_CALC_ALL_STATES]) {
                 PN->calculateReachableStatesFull(newNode, true);   // calc the reachable states from that marking
             } else {
-                PN->calculateReachableStates(newNode, true);   // calc the reachable states from that marking
+                PN->calculateReachableStatesOutputEvent(newNode, true);   // calc the reachable states from that marking
             }
         }
     }

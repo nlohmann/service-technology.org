@@ -274,7 +274,6 @@ void CNF::setEdge(graphEdge * edge) {
 				}				
 				
 			}
-			
 			clausePrev = clauseTemp;		// remember this clause
 	 		clauseTemp = clauseTemp->nextElement;	
 	 	}

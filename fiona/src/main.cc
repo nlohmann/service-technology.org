@@ -1,7 +1,7 @@
 #include "mynew.h"
 #include "dimensions.h"
 #include "symboltab.h"
-#include "graph.h"
+#include "state.h"
 #include "IG.h"
 #include "OG.h"
 #include "owfn.h"

@@ -41,9 +41,6 @@
  *
  */
 
-#include "owfnTransition.h"
-#include "owfn.h"
-#include "debug.h"
 #include "state.h"
 #include "binDecision.h"
 

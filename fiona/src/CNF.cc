@@ -3,7 +3,8 @@
 
 #include "graphEdge.h"
 #include "vertex.h"
-#include "graph.h"
+
+#include "state.h"
 
 #include <stddef.h>
 #include <string>

@@ -26,7 +26,7 @@
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: weinberg $
+ *          - last changes of: \$Author: reinert $
  *          
  * \date
  *          - created:
@@ -44,7 +44,14 @@
 #ifndef STATE_H
 #define STATE_H
 
+#include "owfnTransition.h"
+#include "owfn.h"
+#include "main.h"
+#include "debug.h"
+
 using namespace std;
+
+class binDecision;
 
 // State objects are nodes in the state graph.
 

@@ -45,19 +45,19 @@
 #include "debug.h"
 #include "state.h"
 #include "binDecision.h"
-
-extern int bin_p; // (=place); index in CurrentMarking
-extern int bin_pb; // next bit of place to be processed;
-extern unsigned char bin_byte; // byte to be matched against tree vector; constructed from CurrentMarking
-extern int bin_t; // index in tree vector
-extern unsigned char * bin_v; // current tree vector
-extern int bin_s; // nr of bits pending in byte from previous iteration
-extern int bin_d; // difference position
-extern int bin_dir; // did we go "old" or "new" in last decision?
-extern int bin_b; // bit nr at start of byte
-extern binDecision * fromdec, * todec;
-extern binDecision * vectordec;
  
+int bin_p; // (=place); index in CurrentMarking
+int bin_pb; // next bit of place to be processed;
+unsigned char bin_byte; // byte to be matched against tree vector; constructed from CurrentMarking
+int bin_t; // index in tree vector
+unsigned char * bin_v; // current tree vector
+int bin_s; // nr of bits pending in byte from previous iteration
+int bin_d; // difference position
+int bin_dir; // did we go "old" or "new" in last decision?
+int bin_b; // bit nr at start of byte
+binDecision * fromdec, * todec;
+binDecision * vectordec;
+
 binDecision::binDecision(int b, long int BitVectorSize) {
 	int i;
 	bitnr = b;

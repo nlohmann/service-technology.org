@@ -18,7 +18,6 @@
 
 class oWFN;
 
-
 class operatingGuidelines : public reachGraph {
 	
 	public:

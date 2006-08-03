@@ -4,8 +4,8 @@
 //#include "owfn.h"
 //#include "stateList.h"
 //#include "main.h"
-#include "graph.h"
 
+#include "state.h"
 #include "options.h"
 #include "debug.h"
 #include "CNF.h"

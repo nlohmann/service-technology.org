@@ -1,17 +1,20 @@
+/*
 #include "mynew.h"
+*/
 #include"graph.h"
+/*
 #include"dimensions.h"
 #include"debug.h"
 #include<fstream>
 #include<string.h>
 #include<stdio.h>
-
+*/
 using namespace std;
-
+/*
 unsigned int currentdfsnum = 1;
 unsigned int pos;
 //unsigned int State::card = 0;
-
+*/ /*
 	int bin_p; 				// (=place); index in MARKINGVECTOR
 	int bin_pb;				// next bit of place to be processed;
 	unsigned char bin_byte; // byte to be matched against tree vector; constructed from MARKINGVECTOR
@@ -22,7 +25,9 @@ unsigned int pos;
 	int bin_b;				// bit nr at start of byte
 	int bin_dir;			// bit nr at start of byte
 	binDecision * fromdec, * todec, * vectordec;
-
+	
+	*/
+/*
 char rapportstring[] = "search";
 
   unsigned int NrOfStates;
@@ -35,6 +40,6 @@ void statistics(unsigned int s, unsigned int e, unsigned int h) {
 State * binSearch();
 unsigned int MinBookmark; // MIN number of the first closed marking
                           // in the currently or last recently processed TSCC
-
+*/
 
 

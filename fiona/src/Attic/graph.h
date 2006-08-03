@@ -1,6 +1,6 @@
 #ifndef GRAPH_H
 #define GRAPH_H
-
+/*
 #include "mynew.h"
 #include "dimensions.h"
 #include "owfnTransition.h"
@@ -9,11 +9,13 @@
 #include "main.h"
 #include "debug.h"
 #include <iostream>
-
+*/
+/*
 #include "state.h"
 #include "binDecision.h"
 #include "searchTrace.h"
-
+*/
+/*
 using namespace std;
 
 // depository and search structures for reachability graph
@@ -48,7 +50,7 @@ inline unsigned int bitstoint(unsigned char * bytepos, int bitpos, int nrbits) {
 	}
 	return result;
 }
-
+*/
 
 
 	

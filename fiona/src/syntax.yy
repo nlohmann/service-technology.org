@@ -26,7 +26,7 @@ extern int yyerror(const char *);
 
 #include "mynew.h"
 #include "dimensions.h"
-#include "graph.h"
+#include "binDecision.h"
 #include "symboltab.h"
 #include "owfnTransition.h"
 #include "owfnPlace.h"

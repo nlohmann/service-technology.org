@@ -1,7 +1,6 @@
 #include "mynew.h"
 #include "OG.h"
-#include "graph.h"
-
+#include "state.h"
 #include "options.h"
 #include "debug.h"
 #include "successorNodeList.h"

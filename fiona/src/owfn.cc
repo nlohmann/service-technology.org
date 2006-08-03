@@ -1,5 +1,6 @@
 #include "mynew.h"
-#include "graph.h"
+#include "state.h"
+#include "binDecision.h"
 #include "options.h"
 #include "debug.h"
 #include "CNF.h"

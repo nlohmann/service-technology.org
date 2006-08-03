@@ -13,7 +13,7 @@
 #include "owfn.h"
 #include "main.h"
 #include "debug.h"
-#include "graph.h"
+#include "state.h"
 #include "options.h"
 
 owfnTransition::owfnTransition(char * name) : Node(name), quasiEnabledNr(0), 

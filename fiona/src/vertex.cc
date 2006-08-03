@@ -1,5 +1,5 @@
 #include "mynew.h"
-#include "graph.h"
+#include "state.h"
 #include "successorNodeList.h"
 #include "vertex.h"
 #include "CNF.h"

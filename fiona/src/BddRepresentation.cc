@@ -11,6 +11,7 @@
 
 #include "options.h"
 #include "debug.h"
+#include <cassert>
  
 //extern char* netfile;  
  
@@ -331,6 +332,7 @@ BitVector BddRepresentation::numberToBin(unsigned int number, int count){
     //calculate the binary representation
     int index = count - 1;
     do {
+        assert(index >= 0);
         assignment[index--] = number % base;
         number /= base;
     } while ( number );

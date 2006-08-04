@@ -189,7 +189,7 @@ DdNode* BddRepresentation::labelToBddMp(char* label) {
 	
 	Symbol * s = InterfaceTable->lookup(label);
     unsigned int number = ((ISymbol*)s)->place->index;
-	BitVector* assignment = numberToBin(number, maxLabelBits);
+	BitVector assignment = numberToBin(number, maxLabelBits);
 		
 	DdNode*  f = Cudd_ReadOne(mgrMp);
     Cudd_Ref(f);
@@ -197,7 +197,7 @@ DdNode* BddRepresentation::labelToBddMp(char* label) {
 
 	//assignment to BDD
 	for (int i = 0; i < maxLabelBits; ++i){     //TODO: Schleife Absteigend durchlaufen (--i)
-        if ((*assignment)[i] == false){
+        if (assignment[i] == false){
             tmp = Cudd_bddAnd(mgrMp, Cudd_Not(Cudd_bddIthVar(mgrMp,i)), f);
         }
         else{
@@ -207,7 +207,7 @@ DdNode* BddRepresentation::labelToBddMp(char* label) {
         Cudd_RecursiveDeref(mgrMp, f);
         f = tmp;
     }
-  //  delete assignment;
+
 	trace(TRACE_5, "BddRepresentation::labelToBddMp(char* label): end\n");    
     return (f);
 }
@@ -282,8 +282,8 @@ trace(TRACE_5, "BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int
 			    	
     }	
 	
-	BitVector* assignment1 = numberToBin(bddNumber1, maxNodeBits);
-	BitVector* assignment2 = numberToBin(bddNumber2, maxNodeBits);
+	BitVector assignment1 = numberToBin(bddNumber1, maxNodeBits);
+	BitVector assignment2 = numberToBin(bddNumber2, maxNodeBits);
 
     //calculate the BDD for assignment1 and assignment2
     DdNode* f = Cudd_ReadOne(mgrMp);
@@ -293,7 +293,7 @@ trace(TRACE_5, "BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int
     int j;
     for (int i = 0; i < maxNodeBits; ++i){     //TODO: schleife Absteigend durchlaufen (--i)
     	j = maxNodeBits-1-i;
-        if ((*assignment1)[j] == false){
+        if (assignment1[j] == false){
             tmp = Cudd_bddAnd(mgrMp, Cudd_Not(Cudd_bddIthVar(mgrMp, maxLabelBits+(2*i))), f);
         }
         else{
@@ -303,7 +303,7 @@ trace(TRACE_5, "BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int
         Cudd_RecursiveDeref(mgrMp, f);
         f = tmp; 
         
-        if ((*assignment2)[j] == false){
+        if (assignment2[j] == false){
             tmp = Cudd_bddAnd(mgrMp, Cudd_Not(Cudd_bddIthVar(mgrMp, maxLabelBits+1+(2*i))), f);
         }
         else{
@@ -317,33 +317,30 @@ trace(TRACE_5, "BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int
         f = tmp;
         
     }
-    delete assignment1;
-    delete assignment2;
 trace(TRACE_5, "BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2): end\n");		   
     return (f);
 
 }
 
-//! \fn BitVector* BddRepresentation::numberToBin(unsigned int number, int count)
+//! \fn BitVector BddRepresentation::numberToBin(unsigned int number, int count)
 //! \brief returns the binary representation of a number **/
-BitVector* BddRepresentation::numberToBin(unsigned int number, int count){
-	BitVector * assignment = new BitVector(count);
+BitVector BddRepresentation::numberToBin(unsigned int number, int count){
+	BitVector assignment = BitVector(count);
     int base = 2;
 
     //calculate the binary representation
     int index = count - 1;
     do {
-        (*assignment)[index--] = number % base;
+        assignment[index--] = number % base;
         number /= base;
     } while ( number );
 
     //add leading zeros
     for (int i = index; i >= 0; --i){
-        (*assignment)[i] = false;
+        assignment[i] = false;
     }
     
     return (assignment);
-	
 }
 
 //! \fn int BddRepresentation::nbrBits(unsigned int i)

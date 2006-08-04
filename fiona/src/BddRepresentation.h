@@ -46,7 +46,7 @@ class BddRepresentation{
 		
 		DdNode* nodesToBddMp(unsigned int node1, unsigned int node2);
 		DdNode* labelToBddMp(char* label);
-		BitVector* numberToBin(unsigned int number, int count);
+		BitVector numberToBin(unsigned int number, int count);
 		unsigned int getBddNumber(unsigned int node);
 		//DdNode* annotationToBddAnn(DdManager* mgr, int nodeNumber, DdNode* annotation, int maxNodeBits);
 		//DdNode* labelToBddAnn(DdManager* mgr, char* channel, int first, int count, vector<char*> v_channel);

@@ -22,7 +22,7 @@ class BddRepresentation{
 		BddRepresentation(vertex * v, int numberOfLabels, Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
 		~BddRepresentation();
 		
-		void BddRepresentation::addOrDeleteLeavingEdges(vertex* v);
+		void addOrDeleteLeavingEdges(vertex* v);
 		void generateRepresentation(vertex* v, bool visitedNodes[]);
 		void reorder(Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
 		void print();

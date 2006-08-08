@@ -17,6 +17,8 @@
 using namespace std;
 typedef vector<bool> BitVector;
 
+class BddLabelTab;
+
 class BddRepresentation{
 	public:
 		BddRepresentation(vertex * v, int numberOfLabels, Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
@@ -27,6 +29,7 @@ class BddRepresentation{
 		void reorder(Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
 		void print();
 		void printDotFile(char** names= NULL);
+
 		
         // Provides user defined operator new. Needed to trace all new
         // operations on this class.
@@ -43,10 +46,11 @@ class BddRepresentation{
 		int maxLabelBits;
 		unsigned int maxNodeNumber;
 		map<unsigned int, unsigned int> nodeMap;
+		BddLabelTab * labelTable;
 		
 		DdNode* nodesToBddMp(unsigned int node1, unsigned int node2);
 		DdNode* labelToBddMp(char* label);
-		BitVector numberToBin(unsigned int number, int count);
+		BitVector numberToBin(unsigned int number, int cntBits);
 		unsigned int getBddNumber(unsigned int node);
 		//DdNode* annotationToBddAnn(DdManager* mgr, int nodeNumber, DdNode* annotation, int maxNodeBits);
 		//DdNode* labelToBddAnn(DdManager* mgr, char* channel, int first, int count, vector<char*> v_channel);

@@ -229,7 +229,7 @@ int main(int argc, char ** argv) {
         
         if (options[O_BDD] == false){
         	graph->printDotFile();
-        	graph->convertToBdd();
+        	//graph->convertToBdd();
         } else {       
         	graph->bdd->reorder((Cudd_ReorderingType)bdd_reordermethod);
         	graph->bdd->printDotFile();

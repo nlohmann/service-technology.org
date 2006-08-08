@@ -27,7 +27,7 @@ class SymbolTab
 #define new NEW_NEW
 };
 
-extern SymbolTab * PlaceTable, * TransitionTable, * InterfaceTable;
+extern SymbolTab * PlaceTable, * TransitionTable;
 	
 typedef enum {pl,tr} kinds;
 class Symbol
@@ -58,14 +58,6 @@ public:
 #undef new
     NEW_OPERATOR(PlSymbl);
 #define new NEW_NEW
-};
-
-class ISymbol: public Symbol
-{
-public:
-	owfnPlace * place; 		  // interface places
-        ISymbol(owfnPlace *); // LL- places
-        ISymbol(char *); 	  // HL-places
 };
 
 class TrSymbol: public Symbol

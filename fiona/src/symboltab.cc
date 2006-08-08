@@ -4,7 +4,7 @@
 #include "owfnPlace.h"
 #include "owfnTransition.h"
 
-SymbolTab * PlaceTable, * TransitionTable, * InterfaceTable;
+SymbolTab * PlaceTable, * TransitionTable;
 extern SymbolTab * GlobalTable;
 
 SymbolTab::SymbolTab(unsigned int s = 65536)
@@ -88,18 +88,6 @@ PlSymbol::PlSymbol(char * txt):Symbol(txt,PlaceTable)
 }
 
 PlSymbol::PlSymbol(owfnPlace * p):Symbol(p->name,PlaceTable)
-{
-	place = p;
-	kind = pl;
-}
-
-ISymbol::ISymbol(char * txt):Symbol(txt, InterfaceTable)
-{
-	place = (owfnPlace *) 0;
-	kind = pl;
-}
-
-ISymbol::ISymbol(owfnPlace * p):Symbol(p->name, InterfaceTable)
 {
 	place = p;
 	kind = pl;

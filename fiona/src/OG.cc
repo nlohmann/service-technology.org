@@ -299,7 +299,6 @@ void operatingGuidelines::convertToBdd() {
     bdd->generateRepresentation(tmp, visitedNodes);
     bdd->reorder();
     //bdd->print(); 
-    bdd->printDotFile();
-    
+    //bdd->printDotFile();
     delete bdd;
 }

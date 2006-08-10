@@ -28,14 +28,14 @@
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2006-07-17 13:50:33 $
+ *          - last changed: \$Date: 2006-08-10 14:03:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  */
 
 #ifndef DEBUG_H
@@ -76,6 +76,20 @@ void trace(trace_level pTraceLevel, std::string message);
  *
  */
 void trace(std::string message);
+
+/**
+ * \def ASSERT(expr)
+ *
+ * Works like std::assert from <cassert> except that ASSERTs are evaluated only
+ * if ENABLE_ASSERTIONS is defined.
+ *
+ * \param expr Expression that is expected to be true.
+ */
+#ifdef ENABLE_ASSERTIONS
+#define ASSERT(expr) assert(expr)
+#else // ifdef ENABLE_ASSERTIONS
+#define ASSERT(expr)
+#endif // ifdef ENABLE_ASSERTIONS
 
 std::string intToString(int);
 

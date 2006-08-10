@@ -3,6 +3,12 @@
 // specify whether each new operation shall be logged
 //#define LOG_NEW
 
+// Specify whether for debugging purposes various assertions should be checked.
+// Helps to prevent doing unintended memory operations such as writing outside
+// of array bounds or losing memory by overwriting pointers that should not be
+// overwritten.
+//#define ENABLE_ASSERTIONS
+
 // Select your operating system
 #define WINDOWS
 //#define LINUX

@@ -4,6 +4,7 @@
 #include "options.h"
 #include "debug.h"
 #include "CNF.h"
+#include <cassert>
 
 using namespace std;
 
@@ -552,7 +553,13 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal) {
 
 	CurrentState->current = 0;
 	CurrentState->parent = (State *) 0;
+	ASSERT(CurrentState->succ == NULL);
 	CurrentState->succ = new State * [CardFireList+1];
+	for (size_t istate = 0; istate != CardFireList+1; ++istate)
+	{
+		CurrentState->succ[istate] = NULL;
+	}
+
 	CurrentState->placeHashValue = placeHashValue;
 	CurrentState->type = typeOfState();
 	n->addState(CurrentState);
@@ -596,7 +603,8 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal) {
 				delete[] tempCurrentMarking;
 				tempCurrentMarking = NULL;
 									
-		   		CurrentState -> succ[CurrentState -> current] = NewState;
+				ASSERT(CurrentState->succ[CurrentState->current] == NULL);
+				CurrentState->succ[CurrentState->current] = NewState;
 	     		(CurrentState->current)++;
 	    	} else {
 				trace(TRACE_5, "Current marking new\n");
@@ -608,11 +616,20 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal) {
 	      		}
 	      		NewState->current = 0;
 	      		NewState->parent = CurrentState;
-	      		NewState->succ =  new State * [CardFireList+1];
+
+				ASSERT(NewState->succ == NULL);
+				NewState->succ =  new State * [CardFireList+1];
+				for (size_t istate = 0; istate != CardFireList+1; ++istate)
+				{
+					NewState->succ[istate] = NULL;
+				}
+
 	      		NewState->placeHashValue = placeHashValue;
 	      		NewState->type = typeOfState();
 	      		
-	      		CurrentState->succ[CurrentState -> current] = NewState;
+				ASSERT(CurrentState->succ[CurrentState -> current] == NULL);
+	      		CurrentState->succ[CurrentState->current] = NewState;
+
 	      		CurrentState = NewState;
 		      		
 				computeAnnotation(n, NewState);
@@ -684,9 +701,10 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 
 	CurrentState->current = 0;
 	CurrentState->parent = (State *) 0;
+	ASSERT(CurrentState->succ == NULL);
 	CurrentState->succ = new State * [CardFireList + 1];
 	for (int i = 0; i < CardFireList + 1; i++) {
-		CurrentState->succ[i] = (State *) 0;	
+		CurrentState->succ[i] = NULL;
 	}
 	CurrentState->placeHashValue = placeHashValue;
 	CurrentState->type = typeOfState();
@@ -733,7 +751,8 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 				delete[] tempCurrentMarking;
 				tempCurrentMarking = NULL;
 									
-		   		CurrentState -> succ[CurrentState -> current] = NewState;
+				ASSERT(CurrentState->succ[CurrentState->current] == NULL);
+		   		CurrentState->succ[CurrentState->current] = NewState;
 	     		(CurrentState->current)++;
 	    	} else {
 				trace(TRACE_5, "Current marking new\n");
@@ -745,14 +764,16 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	      		}
 	      		NewState->current = 0;
 	      		NewState->parent = CurrentState;
+				ASSERT(NewState->succ == NULL);
 	      		NewState->succ =  new State * [CardFireList + 1];
 				for (int i = 0; i < CardFireList + 1; i++) {
-					NewState->succ[i] = (State *) 0;	
-				}	      		
+					NewState->succ[i] = NULL;	
+				}
 	      		NewState->placeHashValue = placeHashValue;
 	      		NewState->type = typeOfState();
 	      		
-	      		CurrentState->succ[CurrentState -> current] = NewState;
+				ASSERT(CurrentState->succ[CurrentState->current] == NULL);
+	      		CurrentState->succ[CurrentState->current] = NewState;
 	      		CurrentState = NewState;
 		      		
 				computeAnnotationInput(n, NewState, tempCurrentMarking);
@@ -823,7 +844,12 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 
 	CurrentState->current = 0;
 	CurrentState->parent = (State *) 0;
+	ASSERT(CurrentState->succ == NULL);
 	CurrentState->succ = new State * [CardFireList+1];
+	for (size_t istate = 0; istate != CardFireList+1; ++istate)
+	{
+		CurrentState->succ[istate] = NULL;
+	}
 	CurrentState->placeHashValue = placeHashValue;
 	CurrentState->type = typeOfState();
 	n->addState(CurrentState);
@@ -869,7 +895,8 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 				delete[] tempCurrentMarking;
 				tempCurrentMarking = NULL;
 									
-		   		CurrentState -> succ[CurrentState -> current] = NewState;
+				ASSERT(CurrentState->succ[CurrentState->current] == NULL);
+		   		CurrentState->succ[CurrentState->current] = NewState;
 	     		(CurrentState->current)++;
 	    	} else {
 				trace(TRACE_5, "Current marking new\n");
@@ -881,10 +908,16 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 	      		}
 	      		NewState->current = 0;
 	      		NewState->parent = CurrentState;
+				ASSERT(NewState->succ == NULL);
 	      		NewState->succ =  new State * [CardFireList+1];
+				for (size_t istate = 0; istate != CardFireList+1; ++istate)
+				{
+					NewState->succ[istate] = NULL;
+				}
 	      		NewState->placeHashValue = placeHashValue;
 	      		NewState->type = typeOfState();
 	      		
+				ASSERT(CurrentState->succ[CurrentState -> current] == NULL);
 	      		CurrentState->succ[CurrentState -> current] = NewState;
 	      		CurrentState = NewState;
 		      		

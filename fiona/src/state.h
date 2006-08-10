@@ -26,7 +26,7 @@
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $
+ *          - last changes of: \$Author: bretschn $
  *          
  * \date
  *          - created:
@@ -84,7 +84,13 @@ inline State::State() :
 				type(TRANS),
 				current(0),
 				CardFireList(0),
-				placeHashValue(0) {
+				placeHashValue(0),
+				firelist(NULL),
+				quasiFirelist(NULL),
+				my_entry(NULL),
+				succ(NULL),
+				parent(NULL)
+                {
 	card++;
 }
 

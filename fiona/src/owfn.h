@@ -59,7 +59,7 @@ class oWFN  {
 		setOfMessages outputMessages;		//!< activated output messages of current node
 
 		unsigned int commDepth;				//!< depth of operating guideline
-											// wird in readnet.y gesetzt
+											// wird in syntax.yy gesetzt
 		void initializeTransitions();		//!< calls the check_enabled function for all transitions
 
 		unsigned int getPlaceCnt();			//!< number of all places

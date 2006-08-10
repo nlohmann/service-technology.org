@@ -1,3 +1,6 @@
+#include "userconfig.h"
+#ifdef LOG_NEW
+
 #include <new>
 #include <iostream>
 #include <iomanip>
@@ -374,3 +377,5 @@ void operator delete[] (void* mem)
 {
     mydelete(mem);
 }
+
+#endif // LOG_NEW

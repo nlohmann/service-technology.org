@@ -1,6 +1,9 @@
 #ifndef NEWLOGGER_H_ 
 #define NEWLOGGER_H_ 
 
+#include "userconfig.h"
+#ifdef LOG_NEW
+
 #include <new>
 #include <iostream>
 #include <iomanip>
@@ -217,4 +220,5 @@ class NewLogger
         static void printall_by_typesize();
 };
 
-#endif
+#endif // LOG_NEW
+#endif // NEWLOGGER_H_

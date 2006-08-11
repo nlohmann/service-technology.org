@@ -27,30 +27,25 @@ inline void Node::NewLeaving(Arc & a) {
 
 Node::~Node() {
   delete [] name;
-  
-//  for(int i = 0; i < NrOfArriving - 1; i++) {
-//  	if (ArrivingArcs[i]) {
-//  		delete ArrivingArcs[i];
-//  	}
-//  	ArrivingArcs[i] = NULL;
-//  }
+
+  // Transitions and places share pointers to the same arcs because every
+  // arriving arc of a transition is a leaving arc of a place and vice versa.
+  // Therefore we only have to delete all arcs in ArrivingArcs[]. This way all
+  // arcs in LeavingArcs[] will also eventually be deleted.
+  for(int i = 0; i < NrOfArriving; i++) {
+    delete ArrivingArcs[i];
+    ArrivingArcs[i] = NULL;
+  }
+
   delete [] ArrivingArcs;
-  
-//  for(int i = 0; i < NrOfLeaving - 1; i++) {
-//  	if (LeavingArcs[i]) {
-//	  	delete LeavingArcs[i];
-//  	}
-//  	LeavingArcs[i] = NULL;
-//  }  
+
   delete [] LeavingArcs;
 }
 
-Node::Node(char * n)
+Node::Node(char * n) : NrOfArriving(0), NrOfLeaving(0)
 {
   name = new char [strlen(n) + 1];
   strcpy(name, n);
-  ArrivingArcs = new Arc * [1];
-  LeavingArcs = new Arc *  [1];
 }
 
 inline ostream& operator << (ostream & str,Node n)

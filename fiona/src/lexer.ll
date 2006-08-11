@@ -64,8 +64,7 @@ NOT		 								{ return op_not;}
 
 // pass token string as attribute to bison
 void setlval() {
-  yylval.str = new char[strlen(yytext)+1];
-  strcpy(yylval.str,yytext);
+  yylval.str = strdup(yytext);
 }
 
 

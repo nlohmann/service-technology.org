@@ -26,26 +26,15 @@ owfnTransition::owfnTransition(char * name) : Node(name), quasiEnabledNr(0),
 }
 
 owfnTransition::~owfnTransition() {
+	delete[] ImproveEnabling;
+	delete[] ImproveDisabling;
+	delete[] IncrPlaces;
+	delete[] Incr;
+	delete[] DecrPlaces;
+	delete[] Decr;
+	delete[] PrePlaces;
+	delete[] Pre;
 
-	if (ImproveEnabling) {
-		delete[] ImproveEnabling;
-	}
-	if (ImproveDisabling) {
-		delete[] ImproveDisabling;
-	}
-	if (IncrPlaces) {
-		delete[] IncrPlaces;
-	}
-	if (Incr) {
-		delete[] Incr;
-	}
-	if (DecrPlaces) {
-		delete[] DecrPlaces;
-	}
-	if (Decr) {
-		delete[] Decr;
-	}
-	
 //	if (ImproveEnabling) {
 //		delete ImproveEnabling;
 //	}			

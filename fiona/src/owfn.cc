@@ -69,6 +69,8 @@ oWFN::~oWFN() {
 		Transitions[i] = NULL;
 	}	
 	delete[] Transitions;
+	delete[] CurrentMarking;
+	delete[] FinalMarking;
 }
 
 //! \fn unsigned int oWFN::getPlaceCnt()

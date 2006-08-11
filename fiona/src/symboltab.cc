@@ -59,7 +59,7 @@ Symbol * SymbolTab::lookup(char * name)
   
 Symbol::Symbol(char * n, SymbolTab * table)
 {
-	name = n;
+	name = strdup(n);
 	table->add(this);
 }
 void SymbolTab::add(Symbol * s)
@@ -79,7 +79,9 @@ void SymbolTab::add(Symbol * s)
 }
 
 Symbol::~Symbol()
-{}
+{
+    free(name);
+}
 
 PlSymbol::PlSymbol(char * txt):Symbol(txt,PlaceTable)
 {

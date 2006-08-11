@@ -46,6 +46,14 @@ class arc_list {
 	unsigned int nu;
     arc_list * next;
 
+    ~arc_list()
+    {
+        // It's our responsibility to delete 'next' so that eventually the
+        // whole linked list is deleted. We shall not delete 'place' because
+        // other classes still want to use the PlSymbol pointed to by 'place'.
+        delete next;
+    }
+
     // Provides user defined operator new. Needed to trace all new operations
     // on this class.
 #undef new
@@ -248,6 +256,7 @@ capacity: { CurrentCapacity = CAPACITY;}
 | key_safe    colon  {CurrentCapacity = 1;}
 | key_safe number  colon { 
 				sscanf($2, "%u", &CurrentCapacity);
+				free($2);
 			}
 ;
 
@@ -268,6 +277,7 @@ place: nodeident {
 	PS = new PlSymbol(P);
 	P->capacity = CurrentCapacity;
 	P->nrbits = CurrentCapacity > 0 ? logzwo(CurrentCapacity) : 32;
+	free($1);
 }
 ;
 
@@ -290,6 +300,8 @@ marking:
 	}
 	sscanf($3,"%u",&i);
 	*(PS->place) += i;
+	free($1);
+	free($3);
       } 
 | nodeident
       {
@@ -300,6 +312,7 @@ marking:
 	}
 	sscanf("1","%u",&i);
 	*(PS->place) += i;
+	free($1);
       }
 ;
 
@@ -318,6 +331,8 @@ finalmarking:
 	}
 	sscanf($3,"%u",&i);
 	PN->FinalMarking[PS->place->index] = i;
+	free($1);
+	free($3);
       }
 | nodeident
       {
@@ -328,6 +343,7 @@ finalmarking:
 	}
 	sscanf("1","%u",&i);
 	PN->FinalMarking[PS->place->index] = i;
+	free($1);
       }
 ;
 
@@ -397,6 +413,11 @@ transition: key_transition tname key_consume arclist semicolon key_produce arcli
 		}
 	}
 
+	free($2);
+
+	// delete arc_list because they are no longer used.
+	delete $4;
+	delete $7;
 }
 ;
 
@@ -427,6 +448,8 @@ arc:
 	$$->next = (arc_list *)  0;
 	sscanf($3,"%u",&i);
 	$$->nu = i;
+	free($1);
+	free($3);
       }
 | nodeident
       {
@@ -440,6 +463,7 @@ arc:
 	$$->next = (arc_list *)  0;
 	sscanf("1","%u",&i);
 	$$->nu = i;
+	free($1);
       }
 ;
 
@@ -463,6 +487,8 @@ statepredicate: lpar statepredicate rpar {
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(eq,PS->place,i);
+	free($1);
+	free($3);
 }
 | nodeident op_ne number {
 	unsigned int i;
@@ -472,6 +498,8 @@ statepredicate: lpar statepredicate rpar {
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(neq,PS->place,i);
+	free($1);
+	free($3);
 }
 | nodeident op_lt number {
 	unsigned int i;
@@ -481,6 +509,8 @@ statepredicate: lpar statepredicate rpar {
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(lt,PS->place,i);
+	free($1);
+	free($3);
 }
 | nodeident op_gt number {
 	unsigned int i;
@@ -490,6 +520,8 @@ statepredicate: lpar statepredicate rpar {
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(gt,PS->place,i);
+	free($1);
+	free($3);
 }
 | nodeident op_ge number {
 	unsigned int i;
@@ -499,6 +531,8 @@ statepredicate: lpar statepredicate rpar {
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(geq,PS->place,i);
+	free($1);
+	free($3);
 }
 | nodeident op_le number {
 	unsigned int i;
@@ -508,5 +542,7 @@ statepredicate: lpar statepredicate rpar {
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(leq,PS->place,i);
+	free($1);
+	free($3);
 }
 

@@ -15,16 +15,17 @@ BddLabelTab::BddLabelTab(unsigned int s){
 	size = s;
 	table = new BddLabel * [s];
 	card = 0;
-	for(int i = 0; i < s;i++){
+	for(unsigned int i = 0; i < s;i++){
 		table[i] = (BddLabel *) 0;
 	}
 }
 
 BddLabelTab::~BddLabelTab(){
-	for(int i = 0;i < size;i++){
-		BddLabel * temp;
+	BddLabel * temp;
+	for(unsigned int i = 0;i < size;i++){
 		while(table[i]){
 			temp = table[i];
+			//std::cout << table[i]->name << "  ";
 			table[i] = table[i] -> next;
 			delete temp;
 		}	

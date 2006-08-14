@@ -536,7 +536,7 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal) {
 	unsigned int * tempCurrentMarking = NULL;
 	unsigned int tempPlaceHashValue;
 	
-	if (options[O_BDD] == false && CurrentState != NULL) {
+	if (CurrentState != NULL){ 		//&& options[O_BDD]
 		// marking already has a state -> put it (and all its successors) into the node
 		if (n->addState(CurrentState)) {
 			computeAnnotation(n, CurrentState);
@@ -684,7 +684,7 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	unsigned int * tempCurrentMarking = NULL;
 	unsigned int tempPlaceHashValue;
 	
-	if (options[O_BDD] == false && CurrentState != NULL) {
+	if (CurrentState != NULL){ 		//&& options[O_BDD]
 		// marking already has a state -> put it (and all its successors) into the node
 		if (n->addState(CurrentState)) {
 			computeAnnotationInput(n, CurrentState, NULL);
@@ -826,8 +826,7 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 	unsigned int * tempCurrentMarking = NULL;
 	unsigned int tempPlaceHashValue;
 	
-	
-	if (options[O_BDD] == false && CurrentState != NULL) {
+	if (CurrentState != NULL){ 		//&& options[O_BDD]
 		// marking already has a state -> put it (and all its successors) into the node
 		if (n->addState(CurrentState)) {
 			addSuccStatesToList(n, CurrentState);

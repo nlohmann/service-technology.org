@@ -18,7 +18,7 @@
  
 //! \fn BddRepresentation::BddRepresentation(vertex * root, int nbrLabels, Cudd_ReorderingType heuristic)
 //! \brief constructor
-BddRepresentation::BddRepresentation(vertex * root, int nbrLabels, Cudd_ReorderingType heuristic){
+BddRepresentation::BddRepresentation(vertex * root, unsigned int nbrLabels, Cudd_ReorderingType heuristic){
 	maxLabelBits = nbrBits(nbrLabels-1);
 	maxNodeBits = 1;
 	maxNodeNumber = 0;
@@ -42,7 +42,7 @@ BddRepresentation::BddRepresentation(vertex * root, int nbrLabels, Cudd_Reorderi
      
     nodeMap.insert(make_pair(root->getNumber(), 0));
     
-    labelTable = new BddLabelTab();
+    labelTable = new BddLabelTab(2*nbrLabels);
        
     //add labels and their bddNumber to labelTable
     BddLabel * label;
@@ -57,7 +57,7 @@ BddRepresentation::BddRepresentation(vertex * root, int nbrLabels, Cudd_Reorderi
     }
 /*
   	BddLabel * temp;
-    for(int i = 0; i < labelTable->size;i++){
+    for(unsigned int i = 0; i < labelTable->size;i++){
 		BddLabel * temp;
 		temp = labelTable->table[i];
 		while(temp != 0){
@@ -84,6 +84,7 @@ BddRepresentation::~BddRepresentation(){
     Cudd_Quit(mgrMp);
     
     delete labelTable;
+    //cout << "~BddRepresentation()\n";
 }
 
 
@@ -183,11 +184,14 @@ void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
 		            Cudd_Ref(edge);
 		            Cudd_RecursiveDeref(mgrMp, label);
 		            Cudd_RecursiveDeref(mgrMp, nodes);
-					/*
-		            cout << "bddMp " << v->getNumber() << " [" << element->getLabel() << "> "
-		                 << vNext->getNumber() << " :\t"; Cudd_PrintMinterm(this->mgrMp, edge);
+		            
+		       /*   cout << "Kante: " << v->getNumber() << " [" << element->getLabel() << "> "
+		                 << vNext->getNumber() << endl; 
+		            cout << "Kante: " << getBddNumber(v->getNumber()) << " [" << element->getLabel() << "> "
+		                 << getBddNumber(vNext->getNumber()) << " (neu)\n";
+		            Cudd_PrintMinterm(mgrMp, edge);
 		            cout << "--------------------------------\n";
-					*/
+			*/
 		            DdNode* tmp = Cudd_bddOr(mgrMp, edge, bddMp);
 //                  if (tmp == NULL) exit(1);
 		            Cudd_Ref(tmp);
@@ -394,7 +398,7 @@ void BddRepresentation::reorder(Cudd_ReorderingType heuristic){
      }
 */
     Cudd_ReduceHeap(mgrMp, heuristic, 0);
-    cout << "\nBDD_MP: number of nodes: " << Cudd_DagSize(bddMp)<<endl<<endl;
+    cout << "BDD_MP: number of nodes: " << Cudd_DagSize(bddMp)<<endl;
     //cout << "\t" << Cudd_ReadReorderingTime(this->mgrMp) << " ms consumed for variable reordering" << endl;
     
     //Cudd_ReduceHeap(this->mgrAnn, heuristic, 0);

@@ -21,7 +21,7 @@ class BddLabelTab;
 
 class BddRepresentation{
 	public:
-		BddRepresentation(vertex * v, int numberOfLabels, Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
+		BddRepresentation(vertex * v, unsigned int numberOfLabels, Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
 		~BddRepresentation();
 		
 		void addOrDeleteLeavingEdges(vertex* v);

@@ -226,13 +226,17 @@ int main(int argc, char ** argv) {
         trace(TRACE_0, "OG: number of nodes: " + intToString(graph->getNumberOfVertices()) + "\n");
         trace(TRACE_0, "    number of edges: " + intToString(graph->getNumberOfEdges()) + "\n");
 		trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
+                
+        graph->printDotFile();
         
-        if (options[O_BDD] == false){
-        	graph->printDotFile();
-        	//graph->convertToBdd();
-        } else {       
-        	graph->bdd->reorder((Cudd_ReorderingType)bdd_reordermethod);
-        	graph->bdd->printDotFile();
+        if (options[O_BDD] == true){
+        	trace(TRACE_0, "\nbuilding the BDD...\n");
+        	seconds = time (NULL);
+        	graph->convertToBdd();      
+        	seconds2 = time (NULL);
+        	cout << difftime(seconds2,seconds) << " s consumed for building the BDD" << endl;
+        	 
+        	//graph->bdd->printDotFile();
         	//graph->bdd->print();
         }
         

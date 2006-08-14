@@ -8,7 +8,7 @@ class BddLabelTab;
 class BddLabel{
 public:
   char * name;	//name of Label
-  int nbr;		//number of Label
+  unsigned int nbr;		//number of Label
   BddLabel * next;
   BddLabel(char * c, int n, BddLabelTab * table);
   ~BddLabel();

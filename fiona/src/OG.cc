@@ -188,13 +188,11 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 
 	trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + "\n");
 
+/*
 	if (options[O_BDD] == true){
 		bdd->addOrDeleteLeavingEdges(currentNode);
-		
-	//	currentNode->resetIteratingSuccNodes();
-		
-		if (currentNode->setOfStates.size() != 0){
-			 
+		//	currentNode->resetIteratingSuccNodes();
+		if (currentNode->setOfStates.size() != 0){	 
 			graphEdge* element;
 			//cout << "currentNode: " << currentNode->getNumber() << "\tdelete node: ";
 			while((element = currentNode->getNextEdge()) != NULL){
@@ -205,9 +203,8 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 			}
 			//cout << endl;
 		}
-		
 	}
-
+*/
 
 //
 //	if (currentNode->getColor() == RED) {
@@ -286,6 +283,7 @@ bool operatingGuidelines::terminateBuildingGraph(vertex * node) {
 }
 
 void operatingGuidelines::convertToBdd() {
+	trace(TRACE_5, "operatingGuidelines::convertToBdd(): start\n");
 	
 	vertex * tmp = root;
     bool visitedNodes[numberOfVertices];
@@ -294,11 +292,8 @@ void operatingGuidelines::convertToBdd() {
         visitedNodes[i] = 0;
     }
    
-    unsigned int nbrLabels = PN->placeInputCnt + PN->placeOutputCnt;
-    BddRepresentation * bdd = new BddRepresentation(root, nbrLabels); 
-    bdd->generateRepresentation(tmp, visitedNodes);
-    bdd->reorder();
-    //bdd->print(); 
-    //bdd->printDotFile();
-    delete bdd;
+    unsigned int nbrLabels = PN->placeInputCnt + PN->placeOutputCnt; 
+    this->bdd->generateRepresentation(tmp, visitedNodes);
+    this->bdd->reorder((Cudd_ReorderingType)bdd_reordermethod);
+    trace(TRACE_5,"operatingGuidelines::convertToBdd()\n");
 }

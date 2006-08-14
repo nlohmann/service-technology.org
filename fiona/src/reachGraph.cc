@@ -203,9 +203,9 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
         char * edgeLabel;
 
         if (type == sending) {
-            edgeLabel = PN->Places[PN->inputPlacesArray[label]]->name;
+            edgeLabel = PN->inputPlacesArray[label]->name;
         } else {
-            edgeLabel = PN->Places[PN->outputPlacesArray[label]]->name;
+            edgeLabel = PN->outputPlacesArray[label]->name;
         }
 
 //        if (options[O_BDD] == true || found == NULL) {
@@ -233,7 +233,7 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
 
             // \begin{hack} for online shop example
             if (type == sending) {
-                if (strcmp(PN->Places[PN->inputPlacesArray[label]]->name, "in.abort") == 0) {
+                if (strcmp(PN->inputPlacesArray[label]->name, "in.abort") == 0) {
                     for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
                         toAdd->eventsUsed[i]++;
                     }
@@ -269,7 +269,7 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
 
             // \begin{hack} for online shop example
             if (type == sending) {
-                if (strcmp(PN->Places[PN->inputPlacesArray[label]]->name, "in.abort") == 0) {
+                if (strcmp(PN->inputPlacesArray[label]->name, "in.abort") == 0) {
                     for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
                          found->eventsUsed[i]++;
                     }

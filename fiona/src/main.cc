@@ -106,7 +106,7 @@ void readnet() {
     {
         PN->CurrentMarking[ii] = PN->Places[ii]->initial_marking;
         PN->Places[ii]->index = ii;
-    }
+   }
 
     PN->initialize();
 }

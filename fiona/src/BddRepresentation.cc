@@ -48,12 +48,12 @@ BddRepresentation::BddRepresentation(vertex * root, int nbrLabels, Cudd_Reorderi
     BddLabel * label;
     for (unsigned int i = 0; i < PN->placeInputCnt; ++i){
     	//cout << i << "  " << PN->Places[PN->inputPlacesArray[i]]->name << endl;
-    	label = new BddLabel(PN->Places[PN->inputPlacesArray[i]]->name, i, labelTable);
+    	label = new BddLabel(PN->inputPlacesArray[i]->name, i, labelTable);
     }
     
     for (unsigned int i = 0; i < PN->placeOutputCnt; ++i){
     	//cout << i + PN->placeInputCnt << "  " << PN->Places[PN->outputPlacesArray[i]]->name << endl;
-    	label = new BddLabel(PN->Places[PN->outputPlacesArray[i]]->name, i + PN->placeInputCnt, labelTable);
+    	label = new BddLabel(PN->outputPlacesArray[i]->name, i + PN->placeInputCnt, labelTable);
     }
 /*
   	BddLabel * temp;

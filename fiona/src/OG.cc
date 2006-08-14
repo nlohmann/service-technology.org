@@ -82,7 +82,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	while (i < PN->placeInputCnt) { // && (currentNode->getColor() != RED)) {
 
 		trace(TRACE_3, "\t\t\t\t    sending event: !");
-		trace(TRACE_3, string(PN->Places[PN->inputPlacesArray[i]]->name) + "\n");
+		trace(TRACE_3, string(PN->inputPlacesArray[i]->name) + "\n");
 		
 		// hack per command line option until static analysis gives enough information
 	    if (options[O_EVENT_USE_MAX] == false) {
@@ -100,7 +100,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 			currentVertex = currentNode;
 			
 			trace(TRACE_5, "calculating successor states\n");
-			calculateSuccStatesInput(PN->inputPlacesArray[i], currentNode, v);
+			calculateSuccStatesInput(PN->inputPlacesArray[i]->index, currentNode, v);
 			trace(TRACE_5, "calculating successor states succeeded\n");
 
 			if (AddVertex (v, i, sending)) {
@@ -137,7 +137,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	while (i < PN->placeOutputCnt) { // && (currentNode->getColor() != RED)) {
 
 		trace(TRACE_3, "\t\t\t\t  receiving event: ?");
-		trace(TRACE_3, string(PN->Places[PN->outputPlacesArray[i]]->name) + "\n");
+		trace(TRACE_3, string(PN->outputPlacesArray[i]->name) + "\n");
 		
 		// hack per command line option until static analysis gives enough information
 	    if (options[O_EVENT_USE_MAX] == false) {
@@ -155,7 +155,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 			currentVertex = currentNode;
 			
 			trace(TRACE_5, "calculating successor states\n");
-			calculateSuccStatesOutput(PN->outputPlacesArray[i], currentNode, v);
+			calculateSuccStatesOutput(PN->outputPlacesArray[i]->index, currentNode, v);
 			trace(TRACE_5, "calculating successor states succeeded\n");
 			
 			if (AddVertex (v, i, receiving)) {
@@ -238,14 +238,14 @@ void operatingGuidelines::computeCNF(vertex * node) {
 						
 			for (int i = 0; i < PN->placeOutputCnt; i++) {
 				// get the activated output events
-				if (PN->CurrentMarking[PN->outputPlacesArray[i]] > 0) {
-					cl->addLiteral(PN->Places[PN->outputPlacesArray[i]]->name);	
+				if (PN->CurrentMarking[PN->outputPlacesArray[i]->index] > 0) {
+					cl->addLiteral(PN->outputPlacesArray[i]->name);	
 				}	
 			}			
 			
 			// get all the input events
 			for (int i = 0; i < PN->placeInputCnt; i++) {
-				cl->addLiteral(PN->Places[PN->inputPlacesArray[i]]->name);
+				cl->addLiteral(PN->inputPlacesArray[i]->name);
 			}
 			
 			node->addClause(cl, (*iter)->type == FINALSTATE);

@@ -160,17 +160,17 @@ void oWFN::initialize() {
 	unsigned int ki = 0;
 	unsigned int ko = 0;
 	
-	inputPlacesArray = new int [placeInputCnt];
-	outputPlacesArray = new int [placeOutputCnt];
+	inputPlacesArray = new owfnPlace* [placeInputCnt];
+	outputPlacesArray = new owfnPlace* [placeOutputCnt];
 	
 	// get the data for those arrays from the places of the net
 	for (i = 0; i < placeCnt; i++) { // getPlaceCnt(); i++) {
 		if (Places[i]->type == INPUT) {
 			// current place is from type input
-			inputPlacesArray[ki++] = i;
+			inputPlacesArray[ki++] = Places[i];
 		} else if (Places[i]->type == OUTPUT) {
 			// current place is from type output
-			outputPlacesArray[ko++] = i;
+			outputPlacesArray[ko++] = Places[i];
 		}	
 	}
 	
@@ -216,8 +216,11 @@ void oWFN::removeisolated() {
 	while(i<placeCnt) {
 		if(Places[i]->references == 0) { // owfnPlace isolated
 			p = Places[placeCnt - 1];
+			int m = CurrentMarking[placeCnt - 1];
 			Places[placeCnt - 1] = Places[i];
+			CurrentMarking[placeCnt - 1] = CurrentMarking[i];
 			Places[i] = p;
+			CurrentMarking[i] = m;
 			deletePlace(Places[placeCnt - 1]);
 			// placeCnt --;
 		} else {
@@ -230,7 +233,8 @@ void oWFN::removeisolated() {
 	}
 */
 	for(i=0;i<placeCnt;i++) {
-		Places[i]->nr = i;
+		// Places[i]->nr = i;
+		Places[i]->index = i;
 	}
 }
 
@@ -370,14 +374,14 @@ void oWFN::computeAnnotation(vertex * node, State * currentState) {
 		
 		for (int i = 0; i < placeOutputCnt; i++) {
 			// get the activated output events
-			if (CurrentMarking[outputPlacesArray[i]] > 0) {
-				cl->addLiteral(Places[outputPlacesArray[i]]->name);	
+			if (CurrentMarking[outputPlacesArray[i]->index] > 0) {
+				cl->addLiteral(outputPlacesArray[i]->name);	
 			}	
 		}			
 		
 		// get all the input events
 		for (int i = 0; i < placeInputCnt; i++) {
-			cl->addLiteral(Places[PN->inputPlacesArray[i]]->name);
+			cl->addLiteral(PN->inputPlacesArray[i]->name);
 		}
 		
 		node->addClause(cl, currentState->type == FINALSTATE);
@@ -430,7 +434,7 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 	
 			// get the activated output events			
 			for (int i = 0; i < placeOutputCnt; i++) {
-				if (CurrentMarking[outputPlacesArray[i]] > 0) {
+				if (CurrentMarking[outputPlacesArray[i]->index] > 0) {
 					messageMultiSet output;
 					output.insert(i);
 					
@@ -448,14 +452,14 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 			
 			for (int i = 0; i < placeOutputCnt; i++) {
 				// get the activated output events
-				if (CurrentMarking[outputPlacesArray[i]] > 0) {
-					cl->addLiteral(Places[outputPlacesArray[i]]->name);	
+				if (CurrentMarking[outputPlacesArray[i]->index] > 0) {
+					cl->addLiteral(outputPlacesArray[i]->name);	
 				}	
 			}			
 			
 			// get all the input events
 			for (int i = 0; i < placeInputCnt; i++) {
-				cl->addLiteral(Places[PN->inputPlacesArray[i]]->name);
+				cl->addLiteral(PN->inputPlacesArray[i]->name);
 			}
 			
 			node->addClause(cl, currentState->type == FINALSTATE);
@@ -469,8 +473,8 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 	}
 	for (int i = 0; i < placeOutputCnt; i++) {
 		// get the activated output events
-		if (CurrentMarking[outputPlacesArray[i]] > 0 && 
-				(markingPreviousState == NULL || markingPreviousState[outputPlacesArray[i]] == 0)) {
+		if (CurrentMarking[outputPlacesArray[i]->index] > 0 && 
+				(markingPreviousState == NULL || markingPreviousState[outputPlacesArray[i]->index] == 0)) {
 			node->addState(currentState);
 		}	
 	}	
@@ -876,7 +880,7 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 			tempPlaceHashValue = placeHashValue;
 			  		
 	  		trace(TRACE_5, "fire transition\n");
-
+    
 			CurrentState->firelist[CurrentState->current]->fire(this);
 			minimal = isMinimal();
 			NewState = binSearch(this);

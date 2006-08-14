@@ -11,7 +11,7 @@ class Arc;
 
 class Node {
 	public:
-		unsigned int nr;
+		// unsigned int nr;
 		char * name; 
 		unsigned short int NrOfArriving;
 		unsigned short int NrOfLeaving;

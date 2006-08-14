@@ -160,7 +160,7 @@ net: key_place place_area key_marking {LocalTable = (SymbolTab *) 0;}
 		{
 			unsigned int i,h,j;
 			Symbol * ss;
-			
+
 			// Create array of transitions 
 			PN->Transitions = new owfnTransition * [TransitionTable -> card+10];
 			i = 0;
@@ -211,9 +211,6 @@ net: key_place place_area key_marking {LocalTable = (SymbolTab *) 0;}
 						PN->commDepth += PN->Transitions[i]->ArrivingArcs[j]->Multiplicity;
 					}
 				}
-			}
-			for(i = 0; i < TransitionTable->card; i++)
-			{
 			}
 			PN->startOfEnabledList = PN->Transitions[0];
 		}

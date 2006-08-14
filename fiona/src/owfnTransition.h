@@ -16,6 +16,7 @@
 #include <set>
 
 class oWFN;
+class owfnPlace;
 
 class owfnTransition : public Node {
 	public:
@@ -37,11 +38,11 @@ class owfnTransition : public Node {
 		owfnTransition * PrevQuasiEnabled; 	// double linking in list of quasi enabled transitions
   											// in the sequel, lists are NIL-terminated								
 
-		unsigned int * PrePlaces; // Places to be checked for enabledness
+		owfnPlace* * PrePlaces; // Places to be checked for enabledness
 		unsigned int * Pre; // Multiplicity to be checked
-		unsigned int * IncrPlaces; // Places that are incremented by transition
+		owfnPlace* * IncrPlaces; // Places that are incremented by transition
 		unsigned int * Incr; // Amount of increment
-		unsigned int * DecrPlaces; // Places that are decremented by transition
+		owfnPlace* * DecrPlaces; // Places that are decremented by transition
 		unsigned int * Decr; // amount of decrement
 		
 		owfnTransition ** ImproveEnabling; 	// list of transitions where enabledness

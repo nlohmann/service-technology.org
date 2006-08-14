@@ -52,8 +52,8 @@ class oWFN  {
 		owfnPlace ** Places;				//!< array of places
 		owfnTransition ** Transitions;		//!< array of transitions
 		
-		int * inputPlacesArray;
-		int * outputPlacesArray;
+		owfnPlace * * inputPlacesArray;
+		owfnPlace * * outputPlacesArray;
 		
 		setOfMessages inputMessages;		//!< activated input messages of current node
 		setOfMessages outputMessages;		//!< activated output messages of current node

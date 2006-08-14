@@ -12,9 +12,21 @@
 #include <cmath>
 #include <cassert>
 #include "newlogger.h"
+#include "debug.h"
+
+#undef new
+#undef malloc
+#undef calloc
+#undef realloc
+#undef free
 
 using namespace std;
 
+// Converts given integer into a string.
+//
+// This function exists additionally to intToString() in debug.cc to ease
+// linking of the libraries in the cudd package which require newlogger.cc.
+// Using intToString() from debug.cc would pull in too much dependencies.
 std::string toString(int x)
 {
     //C++-like: (fehlerhaft: fuehrt zu trailing space)
@@ -46,6 +58,12 @@ void LogInfo::logAllocation(size_t mem)
     ++allocCallCount;
     allocated_mem += mem;
     peak_allocated_mem = max(allocated_mem, peak_allocated_mem);
+}
+
+void LogInfo::logReallocation(size_t oldmemsize, size_t newmemsize)
+{
+    assert(oldmemsize <= allocated_mem);
+    allocated_mem += (newmemsize - oldmemsize);
 }
 
 void LogInfo::logDeallocation(size_t mem)
@@ -111,6 +129,18 @@ LogInfo* PointerInfo::getLogInfo() const
     return logInfo;
 }
 
+void PointerInfo::logReallocation(size_t newsize)
+{
+    logInfo->logReallocation(allocated_mem, newsize);
+    allocated_mem = newsize;
+}
+
+void PointerInfo::logDeallocation()
+{
+    logInfo->logDeallocation(allocated_mem);
+    allocated_mem = 0;
+}
+
 ReportRowFormat::ReportRowFormat() :
     type_length(0), filepos_length(0), callcount_length(0),
     allocated_mem_length(0)
@@ -141,9 +171,28 @@ void NewLogger::logAllocation(std::string type, std::string filepos,
     
     log[key]->logAllocation(size);
 
-    assert(pointerLog.find(pointer) == pointerLog.end());
+    if (pointerLog.find(pointer) != pointerLog.end())
+    {
+        PointerInfo pinfo = pointerLog[pointer];
+        LogInfo linfo = *(pinfo.getLogInfo());
+        cerr << "ERROR at " << __FILE__ << ':' << __LINE__ << ". "
+             << "Memory allocated at " << linfo.filepos << " was not freed."
+             << endl;
+    }
 
     pointerLog[pointer] = PointerInfo(size, log[key]);
+}
+
+void NewLogger::logReallocation(const void* oldptr, const void* newptr,
+    size_t newsize)
+{
+    if (pointerLog.find(oldptr) == pointerLog.end())
+        return;
+
+    PointerInfo pinfo = pointerLog.find(oldptr)->second;
+    pinfo.logReallocation(newsize);
+    pointerLog[newptr] = pinfo;
+    pointerLog.erase(oldptr);
 }
 
 void NewLogger::logDeallocation(const void* pointer)
@@ -154,7 +203,7 @@ void NewLogger::logDeallocation(const void* pointer)
         return;
     
     PointerInfo pinfo = pointerLog.find(pointer)->second;
-    pinfo.getLogInfo()->logDeallocation(pinfo.getAllocatedMem()); 
+    pinfo.logDeallocation();
     pointerLog.erase(pointer);
 }
 
@@ -341,25 +390,47 @@ void NewLogger::printall_by_typesize()
          << " allocs w/o matching deallocs" << endl;
 }
 
-void* mynew(size_t size, const std::string &file, int line)
+void* mynew_without_log(size_t size)
 {
-    //std::cout << file << ": " << line << std::endl;
+    return malloc(size);
+}
+
+void* mynew(size_t size, const std::string &file, int line,
+    const std::string &type)
+{
     std::string filepos(file);
     filepos += ':';
     filepos += toString(line);
-    void* ptr = malloc(size);
-    NewLogger::logAllocation("", filepos, size, ptr); 
+    void* ptr = mynew_without_log(size);
+    NewLogger::logAllocation(type, filepos, size, ptr); 
     return ptr;
 }
 
 void * operator new (size_t size, const std::string &file, int line)
 {
-    return mynew(size, file, line);
+    return mynew(size, file, line, "");
+}
+
+void* myrealloc(void* oldptr, size_t newsize)
+{
+    void* newptr = realloc(oldptr, newsize);
+    NewLogger::logReallocation(oldptr, newptr, newsize); 
+    return newptr;
 }
 
 void * operator new[] (size_t size, const std::string &file, int line)
 {
-    return mynew(size, file, line);
+    return mynew(size, file, line, "");
+}
+
+void* mycalloc(size_t n, size_t s, const std::string &file, int line)
+{
+    std::string filepos(file);
+    filepos += ':';
+    filepos += toString(line);
+    void* ptr = calloc(n, s);
+    NewLogger::logAllocation("", filepos, n*s, ptr); 
+    return ptr;
 }
 
 void mydelete(void* mem)

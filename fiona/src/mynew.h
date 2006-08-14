@@ -9,18 +9,18 @@
 #include <string>
 #include <iostream>
 #include "newlogger.h"
+#include "debug.h"
 
-// prototypes for global operators new
-void* operator new   (size_t size, const std::string &file, int line);
-void* operator new[] (size_t size, const std::string &file, int line);
-
-// prototypes for global operators delete
-void operator delete   (void* mem);
-void operator delete[] (void* mem);
 
 // new should be substituted with NEW_NEW such that user defined operators new
 // (with current file and line as parameters) are called. 
 #define NEW_NEW new(__FILE__, __LINE__) 
+
+// Substitute malloc, calloc, realloc and free with own versions that log.
+#define malloc(size)       mynew(size, __FILE__, __LINE__)
+#define calloc(n, s)       mycalloc(n, s, __FILE__, __LINE__)
+#define realloc(ptr, size) myrealloc(ptr, size)
+#define free(ptr)          mydelete(ptr)
 
 // the body of user defined class operators new and new[]
 #define NEW_OPERATOR_BODY(CLASSNAME) \
@@ -28,7 +28,7 @@ void operator delete[] (void* mem);
         std::string filepos(file);                                      \
         filepos += ':';                                                 \
         filepos += toString(line);                                      \
-        void* ptr = malloc(size);                                       \
+        void* ptr = mynew_without_log(size);                            \
         NewLogger::logAllocation(#CLASSNAME, filepos, size, ptr);       \
         return ptr;                                                     \
     }

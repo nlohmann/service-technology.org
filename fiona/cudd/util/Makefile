@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1 2006-06-29 09:24:11 massuthe Exp $
+# $Id: Makefile,v 1.2 2006-08-14 15:29:02 bretschn Exp $
 #
 # util -- miscellaneous utility routines
 #---------------------------------------------------------------------------
@@ -21,9 +21,9 @@ P	= util
 PSRC	= cpu_time.c cpu_stats.c getopt.c safe_mem.c strsav.c texpand.c \
 	  ptime.c prtime.c pipefork.c pathsearch.c stub.c \
 	  tmpfile.c datalimit.c
-POBJ	= $(PSRC:.c=.o)
+POBJ	= $(PSRC:.c=.o) ../../src/newlogger.o
 PUBJ	= $(PSRC:.c=.u)
-PHDR	= util.h
+PHDR	= util.h ../../src/mynew.h
 
 WHERE	= ..
 INCLUDE = $(WHERE)/include

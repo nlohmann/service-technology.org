@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.4 2006-07-24 12:26:31 gierds Exp $
+# $Id: Makefile,v 1.5 2006-08-14 15:28:51 bretschn Exp $
 #
 # Makefile for the CUDD distribution kit 
 #---------------------------------------------------------------------------
@@ -27,9 +27,15 @@ include ./Makefile.inc
 #CPPFLAGS = +a1
 
 # C compiler used for all targets except optimize_dec, which always uses cc.
+#
+# IMPORTANT NOTICE: C sources also need to be compiled as C++, because the code
+# for logging malloc, realloc, free, new and delete (newlogger.cc) is
+# written in C++, and C cannot call C++. Only C++ can do that.
+#
 #CC	= cc
 #CC	= /usr/local/opt/SUNWspro/bin/cc
 #CC	= gcc
+CC	= g++
 #CC	= icc
 #CC	= ecc
 #CC	= /usr/ucb/cc

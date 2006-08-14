@@ -1,7 +1,10 @@
-/* $Id: util.h,v 1.1 2006-06-29 09:24:13 massuthe Exp $ */
+/* $Id: util.h,v 1.2 2006-08-14 15:29:02 bretschn Exp $ */
 
 #ifndef UTIL_H
 #define UTIL_H
+
+/* to log memory (re/de)allocation */
+#include "../../src/mynew.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -14,6 +14,27 @@
 // Converts int to string.
 std::string toString(int x);
 
+// prototypes for global operators new
+void* operator new   (size_t size, const std::string &file, int line);
+void* operator new[] (size_t size, const std::string &file, int line);
+
+// prototypes for global operators delete
+void operator delete   (void* mem);
+void operator delete[] (void* mem);
+
+// prototypes own memory (re/de)allocation funtions that log their operations.
+void* mynew(size_t size, const std::string &file, int line,
+    const std::string& type = "");
+
+void* mycalloc(size_t n, size_t s, const std::string &file, int line);
+void* myrealloc(void* oldptr, size_t newsize);
+void mydelete(void* mem);
+
+
+// Declare own memory allocation function that does _not_ log. Needed because
+// we have overwritten standard malloc with own version that logs.
+void* mynew_without_log(size_t size);
+
 // Collects memory allocation statistics for a particular type at a particular
 // source file position.
 class LogInfo
@@ -50,6 +71,9 @@ class LogInfo
         // bytes by to be logged operation.
         void logAllocation(size_t mem);
 
+        // Logs a reallocation operation.
+        void logReallocation(size_t oldmemsize, size_t newmemsize);
+        
         // Logs a deallocation operation. mem specifies number of allocated
         // bytes by to be logged operation.
         void logDeallocation(size_t mem);
@@ -116,6 +140,15 @@ class PointerInfo
 
         // Constructs PointerInfo.
         PointerInfo(size_t mem, LogInfo* info);
+
+        // Logs a reallocation operation for pointer associated with this
+        // PointerInfo. newsize is the new size of the associated memory after
+        // the reallocation operation.
+        void logReallocation(size_t newsize);
+
+        // Logs a deallocation operation for pointer associated with this
+        // PointerInfo.
+        void logDeallocation();
 
         // Returns number of allocated bytes under corresponding pointer.
         size_t getAllocatedMem() const;
@@ -209,6 +242,10 @@ class NewLogger
         // bytes. pointer is the pointer returned by the allocation call.
         static void logAllocation(std::string type, std::string filepos,
             size_t size, const void* pointer);
+
+        // Logs deallocation operation.
+        static void logReallocation(const void* oldptr, const void* newptr,
+            size_t newsize);
 
         // Logs deallocation for given pointer.
         static void logDeallocation(const void* pointer);

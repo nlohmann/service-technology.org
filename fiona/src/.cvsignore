@@ -6,3 +6,5 @@ fiona.h.in
 lexer.cc
 stamp-h1
 syntax.cc
+fiona.exe.stackdump
+gmon.out

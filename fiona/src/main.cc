@@ -102,6 +102,7 @@ void readnet() {
     PN = new oWFN();
 
     yyparse();
+    fclose(yyin);
 
     unsigned int ii;
     for(ii = 0; ii < PN->getPlaceCnt();ii++)

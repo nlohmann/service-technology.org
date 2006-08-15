@@ -129,7 +129,6 @@ int reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType ty
         vertex * found = findVertexInSet(toAdd); //findVertex(toAdd);
 
         char * label = new char[256];
-        char * actualMessage;
         bool comma = false;
 
         strcpy(label, "");
@@ -138,9 +137,7 @@ int reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType ty
             if (comma) {
                 strcat(label, ", ");
             }
-            actualMessage = new char[strlen(PN->Places[*iter]->name)+1];
-            strcpy(actualMessage, PN->Places[*iter]->name);
-            strcat(label, actualMessage);
+            strcat(label, PN->Places[*iter]->name);
             comma = true;
         }
 

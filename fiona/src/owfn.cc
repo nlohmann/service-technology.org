@@ -43,14 +43,12 @@ oWFN::~oWFN() {
 	delete[] inputPlacesArray;
 	delete[] outputPlacesArray;
 
-	//?????? warum klappt das nur für den IG und nicht für den OG????? und 
-	// Segmentation fault kommt nur unter Windows
-//	for(int i = 0; i < HASHSIZE; i++) {
-//		if (binHashTable[i]) {
-//			delete binHashTable[i];
-//		}
-//		binHashTable[i] = (binDecision *) 0;
-//	}	
+	for(int i = 0; i < HASHSIZE; i++) {
+		if (binHashTable[i]) {
+			delete binHashTable[i];
+		}
+		binHashTable[i] = (binDecision *) 0;
+	}	
 
 	delete[] binHashTable;
 	

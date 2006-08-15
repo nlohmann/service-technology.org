@@ -6,12 +6,13 @@
 
 //! \fn  graphEdge::graphEdge(vertex * nodeP, char * labelP, edgeType typeP) 
 //! \param nodeP pointer to the node this edge is pointing to
-//! \param labelP label of this edge
+//! \param labelP label of this edge. A copy is made. Caller should delete/free
+//!      his copy. graphEdge will in turn dealloc _its_ copy.
 //! \param typeP type of this edge (receiving, sending)
 //! \brief constructor
 graphEdge::graphEdge(vertex * nodeP, char * labelP, edgeType typeP) {
 	node = nodeP;
-	label = labelP;
+	label = strdup(labelP);
 	type = typeP; 
 	nextElement = NULL;	
 }
@@ -19,7 +20,7 @@ graphEdge::graphEdge(vertex * nodeP, char * labelP, edgeType typeP) {
 //! \fn graphEdge::~graphEdge()
 //! \brief destructor
 graphEdge::~graphEdge() {
-
+    free(label);
 }
 
 //! \fn void graphEdge::setNextElement(graphEdge * element)

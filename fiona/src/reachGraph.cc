@@ -160,6 +160,8 @@ int reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType ty
 
             numberOfStatesAllNodes += toAdd->setOfStates.size();
 
+            delete[] label;
+
             trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : end\n");
 
             return 1;
@@ -174,6 +176,7 @@ int reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType ty
             numberOfEdges++;
 
             delete toAdd;
+            delete[] label;
 
             trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : end\n");
 

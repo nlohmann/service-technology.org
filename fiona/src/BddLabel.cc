@@ -37,7 +37,7 @@ BddLabelTab::~BddLabelTab(){
 BddLabel * BddLabelTab::lookup(char * name){
   	/* 1. Hashvalue bestimmen */
   	unsigned int h,i;
-  	BddLabel * lst;
+  	BddLabel * lst = (BddLabel *) 0;
   	h = 0;
   	for(i = 0; i < strlen(name); i++){
       	h += (int) name[i];

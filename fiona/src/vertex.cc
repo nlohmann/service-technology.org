@@ -198,6 +198,10 @@ string vertex::getCNF() {
 	return CNFString;
 }
 
+CNF * vertex::getAnnotation(){
+	return annotation;
+}
+
 int vertex::numberOfElementsInAnnotation() {
 	CNF * cl = annotation;
 	int count = 0;

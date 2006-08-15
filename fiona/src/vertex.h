@@ -81,6 +81,7 @@ public:
     vertexColor getColor();
     
     string getCNF();
+    CNF * getAnnotation();
     
     int getNumberOfDeadlocks();
     analysisResult analyseNode(bool);

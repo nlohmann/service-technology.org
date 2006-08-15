@@ -10,6 +10,7 @@
 #include <map>
 
 #include "vertex.h"
+#include "CNF.h"
 
 #include "cudd.h" 
 #include "cuddInt.h"
@@ -45,13 +46,17 @@ class BddRepresentation{
 		int maxNodeBits;
 		int maxLabelBits;
 		unsigned int maxNodeNumber;
+		unsigned int nbrLabels;
 		map<unsigned int, unsigned int> nodeMap;
 		BddLabelTab * labelTable;
 		
 		DdNode* nodesToBddMp(unsigned int node1, unsigned int node2);
 		DdNode* labelToBddMp(char* label);
+		DdNode* annotationToBddAnn(vertex * v);
+		DdNode* CNFtoBddAnn(CNF * cl);
 		BitVector numberToBin(unsigned int number, int cntBits);
 		unsigned int getBddNumber(unsigned int node);
+		void addBddVars(unsigned int max);
 		//DdNode* annotationToBddAnn(DdManager* mgr, int nodeNumber, DdNode* annotation, int maxNodeBits);
 		//DdNode* labelToBddAnn(DdManager* mgr, char* channel, int first, int count, vector<char*> v_channel);
 		

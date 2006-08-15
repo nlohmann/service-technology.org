@@ -237,11 +237,11 @@ int main(int argc, char ** argv) {
         graph->printDotFile();
         
         if (options[O_BDD] == true){
-        	trace(TRACE_0, "\nbuilding the BDD...\n");
+        	trace(TRACE_0, "\nbuilding the BDDs...\n");
         	seconds = time (NULL);
         	graph->convertToBdd();      
         	seconds2 = time (NULL);
-        	cout << difftime(seconds2,seconds) << " s consumed for building the BDD" << endl;
+        	cout << difftime(seconds2,seconds) << " s consumed for building and reordering the BDDs" << endl;
         	 
         	//graph->bdd->printDotFile();
         	//graph->bdd->print();

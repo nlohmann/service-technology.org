@@ -9,6 +9,7 @@
 
 #include "options.h"
 #include "debug.h"
+#include "lexer_wrap.h"
 
 
 #include <cstdlib> 
@@ -37,7 +38,10 @@ extern int yy_flex_debug;
 extern FILE *yyin;
 extern int yyerror();
 extern int yyparse();
+
+#ifdef YY_FLEX_HAS_YYLEX_DESTROY     
 extern int yylex_destroy();
+#endif
 
 extern SymbolTab* GlobalTable;
 
@@ -104,7 +108,9 @@ void readnet() {
 
     yyparse();
     fclose(yyin);
+#ifdef YY_FLEX_HAS_YYLEX_DESTROY     
     yylex_destroy(); // must NOT be called before flose(yyin);
+#endif
 
     unsigned int ii;
     for(ii = 0; ii < PN->getPlaceCnt();ii++)

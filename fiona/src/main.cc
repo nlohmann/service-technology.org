@@ -68,6 +68,8 @@ unsigned int numberDeletedVertices;
 
 extern unsigned int State::card;
 
+unsigned int numberOfDecodes;
+
 inline void garbagecollection() {
 }
 
@@ -123,6 +125,8 @@ int yywrap() {
 
 int main(int argc, char ** argv) {
   unsigned int i, h;
+
+	numberOfDecodes = 0;
 
   garbagefound = 0;
   State::card = 0;          // number of states
@@ -286,6 +290,8 @@ int main(int argc, char ** argv) {
 
 	delete PN;
     delete GlobalTable;	
+	
+//	cout << "numberOfDecodes: " << numberOfDecodes << endl;
 	
     trace(TRACE_0, "--------------------------------------------------------------\n\n");
 

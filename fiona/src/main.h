@@ -36,6 +36,8 @@ extern char * reserve;
 
 extern oWFN * PN;
 
+extern unsigned int numberOfDecodes;
+
 extern unsigned int NonEmptyHash;
 
 typedef enum {TRANS, DEADLOCK, FINALSTATE, NN} stateType;   //!< TRANS == Transient; NN == NO IDEA ;-) --> should not be the case ever

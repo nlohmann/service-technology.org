@@ -26,14 +26,14 @@
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $
+ *          - last changes of: \$Author: weinberg $
  *          
  * \date
  *          - created:
  *          - last changed:
  * 
  * \note    This file is part of the tool Fiona and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universitï¿½t zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
@@ -44,11 +44,15 @@
 #include "state.h"
 #include "binDecision.h"
 
- // decodes State in bintree and returns the corresponding marking
+//! \fn void State::decode(oWFN * PN)
+//! \param PN the corresponding open workflow net
+//! \brief decodes State in bintree and returns the corresponding marking
 void State::decode(oWFN * PN) {
 	
 	trace(TRACE_5, "void State::decode(int * v, oWFN * PN):start\n");
 		
+	numberOfDecodes++;
+	
 //	for (int i = 0; i < PN->getPlaceCnt(); i++) {
 //		cout << PN->Places[i]->name << " (" << PN->Places[i]->nrbits << ")" << endl;
 //	}
@@ -215,7 +219,9 @@ void State::decode(oWFN * PN) {
 	
 }
 
-// decodes State in bintree and returns the corresponding marking
+//! \fn void State::decodeShowOnly(oWFN * PN)
+//! \param PN the corresponding open workflow net
+//! \brief decodes State in bintree and returns the corresponding marking
 void State::decodeShowOnly(oWFN * PN) {
 	
 	trace(TRACE_5, "void State::decodeShowOnly(int * v, oWFN * PN):start\n");
@@ -223,6 +229,8 @@ void State::decodeShowOnly(oWFN * PN) {
 //	for (int i = 0; i < PN->getPlaceCnt(); i++) {
 //		cout << PN->Places[i]->name << " (" << PN->Places[i]->nrbits << ")" << endl;
 //	}
+
+	numberOfDecodes++;
 
     binDecision * currentbindec;                // the considered part of bintree
     currentbindec = my_entry;

@@ -379,7 +379,7 @@ void oWFN::computeAnnotation(vertex * node, State * currentState) {
 		
 		// get all the input events
 		for (int i = 0; i < placeInputCnt; i++) {
-			cl->addLiteral(PN->inputPlacesArray[i]->name);
+			cl->addLiteral(Places[inputPlacesArray[i]]->name);
 		}
 		
 		node->addClause(cl, currentState->type == FINALSTATE);
@@ -395,13 +395,14 @@ void oWFN::computeAnnotation(vertex * node, State * currentState) {
 	}
 }
 
-//! \fn void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned int * markingPreviousState)
+//! \fn void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned int * markingPreviousState, bool isCurrentMarking)
 //! \param node the node that is calculated
 //! \param currentState the state for which the appropriate clause is to be created if this state is DL or FS
 //! \param markingPreviousState the marking of the parent state, needed to check whether this state needs to be added to the node's states
+//! \param isCurrentMarking flag, whether this state is the currentMarking or not
 //! \brief computes the CNF of the current node starting with the currentState, goes recursively through
 //! all of its successor states 
-void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned int * markingPreviousState) {
+void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned int * markingPreviousState, bool isCurrentMarking) {
 	trace(TRACE_5, "oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned int * markingPreviousState): start\n");
 	
 	bool decodedAlready = false;  // flag stating that the currentState has been decoded already
@@ -411,7 +412,9 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 		// in case we calculate the OG and the current state is a DL or a FS
 		if (parameters[P_IG])  {
 			clause * cl = new clause();			// create a new clause for this particular state
-			currentState->decode(this);
+			if (!isCurrentMarking) {
+				currentState->decode(this);
+			}
 			decodedAlready = true;
 			
 			unsigned int i = 0;
@@ -445,7 +448,9 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 		} else if (parameters[P_OG])  {
 			// in case we calculate the OG and the current state is a DL or a FS
 			clause * cl = new clause();
-			currentState->decodeShowOnly(this);
+			if (!isCurrentMarking) {
+				currentState->decodeShowOnly(this);
+			}
 			decodedAlready = true;
 			
 			for (int i = 0; i < placeOutputCnt; i++) {
@@ -457,7 +462,7 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 			
 			// get all the input events
 			for (int i = 0; i < placeInputCnt; i++) {
-				cl->addLiteral(PN->inputPlacesArray[i]->name);
+				cl->addLiteral(Places[inputPlacesArray[i]]->name);
 			}
 			
 			node->addClause(cl, currentState->type == FINALSTATE);
@@ -466,7 +471,8 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 	
 	// check, whether this state is to be added to the node or not
 	// we do this right here, because of the decode function that might have been called already
-	if (!decodedAlready) {
+	// if the currentState is just the currentMarking, then we don't decode again ;-)
+	if (!isCurrentMarking && !decodedAlready) {
 		currentState->decodeShowOnly(this);	
 	}
 	for (int i = 0; i < placeOutputCnt; i++) {
@@ -478,11 +484,11 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 	}	
 	
 	// get the successor states	and compute their corresponding annotation
-	if (currentState != NULL) {
+	if (currentState != NULL && currentState->succ[0] != NULL) {
 		marking = copyCurrentMarking();	// save the marking of the current state since it is the parent state of its successors
 		for(int i = 0; i < currentState->CardFireList; i++) {
 			if (currentState->succ[i]) {
-				computeAnnotationInput(node, currentState->succ[i], marking);
+				computeAnnotationInput(node, currentState->succ[i], marking, false);
 			}
 		}
 		if (marking) {
@@ -534,7 +540,7 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal) {
 	unsigned int * tempCurrentMarking = NULL;
 	unsigned int tempPlaceHashValue;
 	
-	if (CurrentState != NULL){ 		//&& options[O_BDD]
+	if (CurrentState != NULL) {
 		// marking already has a state -> put it (and all its successors) into the node
 		if (n->addState(CurrentState)) {
 			computeAnnotation(n, CurrentState);
@@ -682,10 +688,10 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	unsigned int * tempCurrentMarking = NULL;
 	unsigned int tempPlaceHashValue;
 	
-	if (CurrentState != NULL){ 		//&& options[O_BDD]
+	if (CurrentState != NULL) {
 		// marking already has a state -> put it (and all its successors) into the node
 		if (n->addState(CurrentState)) {
-			computeAnnotationInput(n, CurrentState, NULL);
+			computeAnnotationInput(n, CurrentState, NULL, true);
 		}
 		trace(TRACE_5, "oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal): end\n");
 		return;
@@ -714,7 +720,7 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	CurrentState->type = typeOfState();
 	
 	n->addState(CurrentState);
-	computeAnnotationInput(n, CurrentState, NULL);
+	computeAnnotationInput(n, CurrentState, NULL, true);
 	  	
 	// building EG in a node
   	while(CurrentState) {
@@ -744,7 +750,7 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	  		if(NewState != NULL) {
 		  		// Current marking already in bintree 
 				trace(TRACE_5, "Current marking already in bintree \n");
-				computeAnnotationInput(n, NewState, tempCurrentMarking);
+				computeAnnotationInput(n, NewState, tempCurrentMarking, true);
 				
 				copyMarkingToCurrentMarking(tempCurrentMarking);
 				
@@ -780,7 +786,7 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	      		CurrentState->succ[CurrentState->current] = NewState;
 	      		CurrentState = NewState;
 		      		
-				computeAnnotationInput(n, NewState, tempCurrentMarking);
+				computeAnnotationInput(n, NewState, tempCurrentMarking, true);
 				
 				if (tempCurrentMarking) {
 					delete[] tempCurrentMarking;
@@ -824,6 +830,7 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 	unsigned int * tempCurrentMarking = NULL;
 	unsigned int tempPlaceHashValue;
 	
+//	if (options[O_BDD] == false && CurrentState != NULL) {
 	if (CurrentState != NULL){ 		//&& options[O_BDD]
 		// marking already has a state -> put it (and all its successors) into the node
 		if (n->addState(CurrentState)) {

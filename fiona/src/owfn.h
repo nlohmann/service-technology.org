@@ -101,7 +101,7 @@ class oWFN  {
 		void addStateToList(vertex *, State *);
 		
 		void computeAnnotation(vertex *, State *);
-		void computeAnnotationInput(vertex *, State *, unsigned int *);
+		void computeAnnotationInput(vertex *, State *, unsigned int *, bool);
 		
 		State * calculateNextSate();
 		

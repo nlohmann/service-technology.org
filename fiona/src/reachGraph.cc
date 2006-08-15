@@ -138,7 +138,7 @@ int reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType ty
             if (comma) {
                 strcat(label, ", ");
             }
-            actualMessage = new char[strlen(PN->Places[*iter]->name)];
+            actualMessage = new char[strlen(PN->Places[*iter]->name)+1];
             strcpy(actualMessage, PN->Places[*iter]->name);
             strcat(label, actualMessage);
             comma = true;

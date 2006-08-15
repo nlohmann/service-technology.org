@@ -37,6 +37,7 @@ extern int yy_flex_debug;
 extern FILE *yyin;
 extern int yyerror();
 extern int yyparse();
+extern int yylex_destroy();
 
 extern SymbolTab* GlobalTable;
 
@@ -103,6 +104,7 @@ void readnet() {
 
     yyparse();
     fclose(yyin);
+    yylex_destroy(); // must NOT be called before flose(yyin);
 
     unsigned int ii;
     for(ii = 0; ii < PN->getPlaceCnt();ii++)

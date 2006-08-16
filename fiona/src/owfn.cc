@@ -379,9 +379,9 @@ void oWFN::computeAnnotation(vertex * node, State * currentState) {
 		
 		// get all the input events
 		for (int i = 0; i < placeInputCnt; i++) {
-			// TODO: warum nicht gleich:
-			// TODO: cl->addLiteral(inputPlacesArray[i]->name); ?
-			cl->addLiteral(Places[inputPlacesArray[i]->index]->name);
+			// TODO: warum nicht gleich: yup!
+			cl->addLiteral(inputPlacesArray[i]->name); 
+			//cl->addLiteral(Places[inputPlacesArray[i]->index]->name);
 		}
 		
 		node->addClause(cl, currentState->type == FINALSTATE);
@@ -464,9 +464,9 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 			
 			// get all the input events
 			for (int i = 0; i < placeInputCnt; i++) {
-				// TODO: warum nicht gleich:
-				// TODO: cl->addLiteral(inputPlacesArray[i]->name); ?
-				cl->addLiteral(Places[inputPlacesArray[i]->index]->name);
+				// TODO: warum nicht gleich: yup!
+				cl->addLiteral(inputPlacesArray[i]->name);
+				//cl->addLiteral(Places[inputPlacesArray[i]->index]->name);
 			}
 			
 			node->addClause(cl, currentState->type == FINALSTATE);

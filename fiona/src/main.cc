@@ -108,8 +108,9 @@ void readnet() {
 
     yyparse();
     fclose(yyin);
+    
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY     
-    yylex_destroy(); // must NOT be called before flose(yyin);
+    yylex_destroy(); // must NOT be called before fclose(yyin);
 #endif
 
     unsigned int ii;

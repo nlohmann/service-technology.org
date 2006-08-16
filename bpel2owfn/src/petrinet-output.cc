@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/07/12 08:32:19 $
+ *          - last changed: \$Date: 2006/08/16 12:29:45 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  */
 
 
@@ -439,7 +439,7 @@ void PetriNet::pnmlOut()
   {
     (*output) << "    <arc id=\"a" << arcNumber << "\" ";
     (*output) << "source=\"" << (*f)->source->nodeShortName() << "\" ";
-    (*output) << "target=\"" << (*f)->source->nodeShortName() << "\" />" << endl;
+    (*output) << "target=\"" << (*f)->target->nodeShortName() << "\" />" << endl;
   }
   (*output) << endl;
   (*output) << "  </net>" << endl;

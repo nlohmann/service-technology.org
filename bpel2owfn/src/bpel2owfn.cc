@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/07/12 08:32:19 $
+ *          - last changed: \$Date: 2006/08/17 07:39:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.94 $
+ * \version \$Revision: 1.95 $
  *
  */
 
@@ -410,22 +410,7 @@ int main( int argc, char *argv[])
 	}
       }
 
-      // a hack for Turku: show that our tool exists
-      trace(TheNet->information() + "\n");
     }
-//  }
-//  catch (Exception& e)
-//  {
-//    // output info file ?
-//    if ( formats[F_INFO] )
-//    {
-//      output = log_output;
-//      // just print to std::out
-//      TheNet->printInformation();
-//      output = NULL;
-//    }
-//    error(e);
-//  }
 
   return 0;  
 }

@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/08/16 12:29:45 $
+ *          - last changed: \$Date: 2006/08/17 07:39:24 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.25 $
+ * \version \$Revision: 1.26 $
  */
 
 
@@ -401,10 +401,15 @@ void PetriNet::pnmlOut()
   // remove interface since we do not create an open workflow net
   removeInterface();
 
-  (*output) << "<!-- Petri net created by " << PACKAGE_STRING << " reading file " << filename << " -->" << endl << endl;
+  (*output) << "<!--" << endl;
+  (*output) << "  Petri net created by " << PACKAGE_STRING << " reading file " << filename << "." << endl;
+  (*output) << "  See http://www.informatik.hu-berlin.de/top/tools4bpel/bpel2owfn" << endl;
+  (*output) << "  for more details." << endl;
+  (*output) << "-->" << endl << endl;
 
+  (*output) << "<?xml version=\"1.0\" encoding=\"utf-8\"?>" << endl;
   (*output) << "<pnml>" << endl;
-  (*output) << "  <net id=\"" << filename << "\" type=\"\">" << endl << endl;
+  (*output) << "  <net id=\"bpel-net\" type=\"\">" << endl << endl;
 
   // places(only internal)
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)

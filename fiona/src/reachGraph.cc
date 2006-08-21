@@ -66,7 +66,6 @@ void reachGraph::calculateRootNode() {
     trace(TRACE_5, "void reachGraph::calculateRootNode(): start\n");
 
     // initialize graph => calcualte root node
-//    stateList * list = new stateList();
     vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);
 
     // calc the reachable states from that marking
@@ -75,8 +74,6 @@ void reachGraph::calculateRootNode() {
     } else {
         PN->calculateReachableStatesInputEvent(v, true);
     }
-
-   // v->setStateList(list);
 
     root = v;
     numberOfVertices++;
@@ -292,17 +289,16 @@ int reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
 //! \param node the node for which the successor states are to be calculated
 //! \brief calculates the set of successor states in case of an input message
 void reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node, vertex * newNode) {
-
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : start\n");
-//    stateList * newStateList = new stateList();     // the new list of states for the next node
 
-    StateSet::iterator iter;              // iterator over the stateList's elements
+    StateSet::iterator iter;              // iterator over the state set's elements
 
     for (iter = node->setOfStates.begin();
          iter != node->setOfStates.end(); iter++) {
 		(*iter)->decode(PN);
-
+		
         PN->addInputMessage(input);                 // add the input message to the current marking
+        
         if (parameters[P_CALC_ALL_STATES]) {
             PN->calculateReachableStatesFull(newNode, false);   // calc the reachable states from that marking
         } else {
@@ -421,9 +417,7 @@ void reachGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[]) {
             for (iter = v->setOfStates.begin(); iter != v->setOfStates.end(); iter++) {
 
                 if (parameters[P_SHOW_STATES_PER_NODE]) {
-                	unsigned int * myMarking = new unsigned int [PN->getPlaceCnt()];
                 	(*iter)->decodeShowOnly(PN);
-                	
                     os << "[" << PN->printCurrentMarkingForDot() << "]";
 //                    os << "(";
 //                    switch ((*iter)->type) {

@@ -27,8 +27,10 @@ extern unsigned int numberOfDecodes;
 
 extern unsigned int NonEmptyHash;
 
-typedef enum {TRANS, DEADLOCK, FINALSTATE, NN} stateType;   //!< TRANS == Transient; NN == NO IDEA ;-) --> should not be the case ever
+// extern int yyparse();
+extern void readnet();
 
 extern unsigned int numberDeletedVertices;
+typedef enum {TRANS, DEADLOCK, FINALSTATE, NN} stateType;   //!< TRANS == Transient; NN == NO IDEA ;-) --> should not be the case ever
 
 #endif /*MAIN_H*/

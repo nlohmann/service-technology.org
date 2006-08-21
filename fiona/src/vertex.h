@@ -6,7 +6,7 @@
 	\par History
 		- 2005-09-13 creation
 		- 2005-12-03 added comments
- */ 
+*/ 
 
 #ifndef VERTEX_H_
 #define VERTEX_H_
@@ -15,6 +15,7 @@
 #include <string>
 #include <ostream>
 #include <set>
+//#include "state.h"
 
 #include "enums.h"
 
@@ -30,7 +31,11 @@ class CNF;
 struct StateCompare {
 
   bool operator() ( State const * left, State const * right) {
-    return (left < right);
+//    if (left->minimal && right->minimal) {
+	    return (left < right);
+//    } else {
+//    	return false;
+//    }
   }
 
 }; // StateCompare 
@@ -60,7 +65,8 @@ public:
 	
     unsigned int getNumber();
     
-    StateSet setOfStates;
+    StateSet setOfStates;		// this set contains only a reduced number of states in case the state reduced graph is to be build
+    StateSet setOfStatesTemp;	// this set contains all states
     
     void setNumber(unsigned int);
     void addSuccessorNode(graphEdge *);

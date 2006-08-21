@@ -26,7 +26,7 @@ class interactionGraph : public reachGraph {
     
     	void getActivatedEventsComputeCNF(vertex *, setOfMessages &, setOfMessages &);
     
-		setOfMessages combineReceivingEvents(vertex *);
+		setOfMessages combineReceivingEvents(vertex *, setOfMessages &);
 		setOfMessages receivingBeforeSending(vertex *);
 
     	bool terminateBuildingGraph(vertex *);

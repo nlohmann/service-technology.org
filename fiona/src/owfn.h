@@ -16,7 +16,6 @@
 #include<iosfwd>
 #include<iostream>
 #include <string>
-//#include "stateList.h"
 #include "formula.h"
 #include "main.h"
 

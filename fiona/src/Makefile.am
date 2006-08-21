@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006-08-15 21:15:28 $ by $Author: bretschn $.
-# Version $Revision: 1.11 $
+# File last changed $Date: 2006-08-21 12:44:16 $ by $Author: weinberg $.
+# Version $Revision: 1.12 $
 
 bin_PROGRAMS = fiona
 
@@ -37,9 +37,8 @@ fiona_SOURCES = syntax.yy syntax.h syntax_wrap.h lexer.ll lexer_wrap.h\
 		OG.cc owfnTransition.cc\
 		OG.h owfnTransition.h\
 		debug.cc\
-    binDecision.h binDecision.cc \
-    state.h state.cc \
-    searchTrace.h \
+    	binDecision.h binDecision.cc \
+    	searchTrace.h \
 		debug.h graphEdge.cc successorNodeList.cc\
 		dimensions.cc graphEdge.h successorNodeList.h\
 		dimensions.h main.cc symboltab.cc\
@@ -51,6 +50,7 @@ fiona_SOURCES = syntax.yy syntax.h syntax_wrap.h lexer.ll lexer_wrap.h\
 		getopt.c getopt1.c getopt.h \
 		BddRepresentation.h BddRepresentation.cc \
 		BddLabel.h BddLabel.cc \
+		state.h state.cc \
 		newlogger.h newlogger.cc mynew.h
 
 BUILT_SOURCES = lexer.h

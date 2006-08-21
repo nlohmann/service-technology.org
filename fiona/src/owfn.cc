@@ -327,66 +327,14 @@ void oWFN::addStateToList(vertex * n, State * currentState) {
 //! \brief computes the CNF of the current node starting with the currentState, goes recursively through
 //! all of its successor states 
 void oWFN::computeAnnotation(vertex * node, State * currentState) {
+	trace(TRACE_5, "oWFN::computeAnnotation(vertex * node, State * currentState, unsigned int * markingPreviousState): start\n");
 
-	// in case we calculate the OG and the current state is a DL or a FS
-	if (parameters[P_IG] && 
-			(currentState->type == DEADLOCK || currentState->type == FINALSTATE))  {
-		
-		clause * cl = new clause();			// create a new clause for this particular state
-		currentState->decode(this);
-		
-		unsigned int i = 0;
-		// get the activated input events
-		while (currentState->quasiFirelist && currentState->quasiFirelist[i]) {
-			for (std::set<unsigned int>::iterator index = currentState->quasiFirelist[i]->messageSet.begin();
-						index != currentState->quasiFirelist[i]->messageSet.end();
-						index++) {
-
-				messageMultiSet input;				// multiset holding one input message
-				input.insert(*index);
-				
-				inputMessages.insert(input);
-				cl->addLiteral(Places[*index]->name);
-			}
-			i++;
-		}
-
-		// get the activated output events			
-		for (int i = 0; i < getPlaceCnt(); i++) {
-			if (Places[i]->type == OUTPUT && CurrentMarking[i] > 0) {
-				messageMultiSet output;
-				output.insert(i);
-				
-				outputMessages.insert(output);
-				cl->addLiteral(Places[i]->name);	
-			}	
-		}
-		node->addClause(cl, currentState->type == FINALSTATE); 	// attach the new clause to the node
-					
-	} else if (parameters[P_OG] && 
-			(currentState->type == DEADLOCK || currentState->type == FINALSTATE))  {
-					
-		// in case we calculate the OG and the current state is a DL or a FS
-		clause * cl = new clause();
-		currentState->decodeShowOnly(this);
-		
-		for (int i = 0; i < placeOutputCnt; i++) {
-			// get the activated output events
-			if (CurrentMarking[outputPlacesArray[i]->index] > 0) {
-				cl->addLiteral(outputPlacesArray[i]->name);	
-			}	
-		}			
-		
-		// get all the input events
-		for (int i = 0; i < placeInputCnt; i++) {
-			// TODO: warum nicht gleich: yup!
-			cl->addLiteral(inputPlacesArray[i]->name); 
-			//cl->addLiteral(Places[inputPlacesArray[i]->index]->name);
-		}
-		
-		node->addClause(cl, currentState->type == FINALSTATE);
+	if (parameters[P_CALC_ALL_STATES]) {
+		node->setOfStates.insert(currentState);
+	} else {
+		// store this state in the node's temp set of state (storing all states of the node)
+		node->setOfStatesTemp.insert(currentState);		
 	}
-
 	// get the successor states	and compute their corresponding annotation
 	if (currentState != NULL) {
 		for(int i = 0; i < currentState->CardFireList; i++) {
@@ -395,6 +343,7 @@ void oWFN::computeAnnotation(vertex * node, State * currentState) {
 			}
 		}
 	}
+	trace(TRACE_5, "oWFN::computeAnnotation(vertex * node, State * currentState, unsigned int * markingPreviousState): end\n");
 }
 
 //! \fn void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned int * markingPreviousState, bool isCurrentMarking)
@@ -407,76 +356,19 @@ void oWFN::computeAnnotation(vertex * node, State * currentState) {
 void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned int * markingPreviousState, bool isCurrentMarking) {
 	trace(TRACE_5, "oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned int * markingPreviousState): start\n");
 	
-	bool decodedAlready = false;  // flag stating that the currentState has been decoded already
 	unsigned int * marking = NULL;
-	
-	if (currentState->type == DEADLOCK || currentState->type == FINALSTATE) {
-		// in case we calculate the OG and the current state is a DL or a FS
-		if (parameters[P_IG])  {
-			clause * cl = new clause();			// create a new clause for this particular state
-			if (!isCurrentMarking) {
-				currentState->decode(this);
-			}
-			decodedAlready = true;
-			
-			unsigned int i = 0;
-			// get the activated input events
-			while (currentState->quasiFirelist && currentState->quasiFirelist[i]) {
-				for (std::set<unsigned int>::iterator index = currentState->quasiFirelist[i]->messageSet.begin();
-							index != currentState->quasiFirelist[i]->messageSet.end();
-							index++) {
-	
-					messageMultiSet input;				// multiset holding one input message
-					input.insert(*index);
-					
-					inputMessages.insert(input);
-					cl->addLiteral(Places[*index]->name);
-				}
-				i++;
-			}
-	
-			// get the activated output events			
-			for (int i = 0; i < placeOutputCnt; i++) {
-				if (CurrentMarking[outputPlacesArray[i]->index] > 0) {
-					messageMultiSet output;
-					output.insert(i);
-					
-					outputMessages.insert(output);
-					cl->addLiteral(Places[i]->name);	
-				}	
-			}
-			node->addClause(cl, currentState->type == FINALSTATE); 	// attach the new clause to the node
-						
-		} else if (parameters[P_OG])  {
-			// in case we calculate the OG and the current state is a DL or a FS
-			clause * cl = new clause();
-			if (!isCurrentMarking) {
-				currentState->decodeShowOnly(this);
-			}
-			decodedAlready = true;
-			
-			for (int i = 0; i < placeOutputCnt; i++) {
-				// get the activated output events
-				if (CurrentMarking[outputPlacesArray[i]->index] > 0) {
-					cl->addLiteral(outputPlacesArray[i]->name);	
-				}	
-			}			
-			
-			// get all the input events
-			for (int i = 0; i < placeInputCnt; i++) {
-				// TODO: warum nicht gleich: yup!
-				cl->addLiteral(inputPlacesArray[i]->name);
-				//cl->addLiteral(Places[inputPlacesArray[i]->index]->name);
-			}
-			
-			node->addClause(cl, currentState->type == FINALSTATE);
-		}
+
+	if (parameters[P_CALC_ALL_STATES]) {
+		node->setOfStates.insert(currentState);
+	} else {
+		// store this state in the node's temp set of state (storing all states of the node)
+		node->setOfStatesTemp.insert(currentState);		
 	}
 	
 	// check, whether this state is to be added to the node or not
 	// we do this right here, because of the decode function that might have been called already
 	// if the currentState is just the currentMarking, then we don't decode again ;-)
-	if (!isCurrentMarking && !decodedAlready) {
+	if (!isCurrentMarking && placeOutputCnt > 0) {
 		currentState->decodeShowOnly(this);	
 	}
 	for (int i = 0; i < placeOutputCnt; i++) {
@@ -576,7 +468,9 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal) {
 
 	CurrentState->placeHashValue = placeHashValue;
 	CurrentState->type = typeOfState();
+	
 	n->addState(CurrentState);
+	n->setOfStatesTemp.insert(CurrentState);
 	  	
 	// building EG in a node
   	while(CurrentState) {
@@ -600,7 +494,6 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal) {
 	  		trace(TRACE_5, "fire transition\n");
 
 			CurrentState->firelist[CurrentState->current]->fire(this);
-			minimal = isMinimal();
 			NewState = binSearch(this);
 			
 	  		if(NewState != NULL) {
@@ -645,7 +538,7 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal) {
 	      		CurrentState->succ[CurrentState->current] = NewState;
 
 	      		CurrentState = NewState;
-		      		
+		      	
 				computeAnnotation(n, NewState);
 				
 				if (tempCurrentMarking) {
@@ -723,6 +616,8 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	CurrentState->placeHashValue = placeHashValue;
 	CurrentState->type = typeOfState();
 	
+	n->setOfStatesTemp.insert(CurrentState);
+	
 	n->addState(CurrentState);
 	computeAnnotationInput(n, CurrentState, NULL, true);
 	  	
@@ -754,6 +649,7 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	  		if(NewState != NULL) {
 		  		// Current marking already in bintree 
 				trace(TRACE_5, "Current marking already in bintree \n");
+				
 				computeAnnotationInput(n, NewState, tempCurrentMarking, true);
 				
 				copyMarkingToCurrentMarking(tempCurrentMarking);
@@ -829,18 +725,20 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
   	unsigned int i;
   	State * NewState;
   	stateType type;
+  	
 	CurrentState = binSearch(this);
 	
 	unsigned int * tempCurrentMarking = NULL;
 	unsigned int tempPlaceHashValue;
 	
 //	if (options[O_BDD] == false && CurrentState != NULL) {
-	if (CurrentState != NULL){ 		//&& options[O_BDD]
+	if (CurrentState != NULL) { 		//&& options[O_BDD]
 		// marking already has a state -> put it (and all its successors) into the node
 		if (n->addState(CurrentState)) {
+			CurrentState->decodeShowOnly(PN);
 			addSuccStatesToList(n, CurrentState);
 		}
-		trace(TRACE_5, "end of function oWFN::calculateReachableStatesFull\n");
+		trace(TRACE_5, "end of function oWFN::calculateReachableStatesFull (found state in the first place)\n");
 		return;
 	}
 	
@@ -866,6 +764,7 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 	}
 	CurrentState->placeHashValue = placeHashValue;
 	CurrentState->type = typeOfState();
+	
 	n->addState(CurrentState);
 	  	
 	// building EG in a node
@@ -957,6 +856,7 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 	if (tempCurrentMarking) {
 		delete[] tempCurrentMarking;	
 	}
+	trace(TRACE_5, "end of function oWFN::calculateReachableStatesFull\n");
 }
 
 

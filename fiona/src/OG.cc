@@ -6,7 +6,8 @@
 #include "successorNodeList.h"
 #include "BddRepresentation.h" 
 #include "CNF.h"
-
+#include "owfn.h"
+#include <vector>
 
 //! \fn operatingGuidelines::operatingGuidelines(oWFN * _PN) 
 //! \param _PN
@@ -49,9 +50,9 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	trace(TRACE_3, intToString(currentNode->setOfStates.size()) + "\n");
 
 	// get the annotation of the node (CNF)
-	if (parameters[P_CALC_ALL_STATES]) {
+//	if (parameters[P_CALC_ALL_STATES]) {
 		computeCNF(currentNode);					// calculate CNF of this node
-	}
+//	}
 	
 	if (terminateBuildingGraph(currentNode)) {
 		string color;
@@ -222,32 +223,65 @@ void operatingGuidelines::computeCNF(vertex * node) {
 	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): start\n");
 	StateSet::iterator iter;			// iterator over the states of the node
 	
-	// iterate over all states of the node
-	for (iter = node->setOfStates.begin();
-		 iter != node->setOfStates.end(); iter++) {
-		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {
-			// we just consider the maximal states only
-			
-			clause * cl = new clause();
-			
-			// get the marking of this state
-			(*iter)->decodeShowOnly(PN);
-						
-			for (int i = 0; i < PN->placeOutputCnt; i++) {
-				// get the activated output events
-				if (PN->CurrentMarking[PN->outputPlacesArray[i]->index] > 0) {
-					cl->addLiteral(PN->outputPlacesArray[i]->name);	
-				}	
-			}			
-			
-			// get all the input events
-			for (int i = 0; i < PN->placeInputCnt; i++) {
-				cl->addLiteral(PN->inputPlacesArray[i]->name);
+	if (!parameters[P_CALC_ALL_STATES]) { // in case of the state reduced graph
+		
+		// iterate over all states of the node
+		for (iter = node->setOfStatesTemp.begin();
+			 iter != node->setOfStatesTemp.end(); iter++) {
+			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {
+				// we just consider the maximal states only
+				
+				clause * cl = new clause();
+				
+				// get the marking of this state
+				(*iter)->decodeShowOnly(PN);
+							
+				for (int i = 0; i < PN->placeOutputCnt; i++) {
+					// get the activated output events
+					if (PN->CurrentMarking[PN->outputPlacesArray[i]->index] > 0) {
+						cl->addLiteral(PN->outputPlacesArray[i]->name);	
+					}	
+				}			
+				
+				// get all the input events
+				for (int i = 0; i < PN->placeInputCnt; i++) {
+					cl->addLiteral(PN->inputPlacesArray[i]->name);
+				}
+				
+				node->addClause(cl, (*iter)->type == FINALSTATE);
 			}
-			
-			node->addClause(cl, (*iter)->type == FINALSTATE);
-		}			
+		}
+	} else {	// no state reduction
+		// iterate over all states of the node
+		for (iter = node->setOfStates.begin();
+			 iter != node->setOfStates.end(); iter++) {
+			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {
+				// we just consider the maximal states only
+				
+				clause * cl = new clause();
+				
+				// get the marking of this state
+				(*iter)->decodeShowOnly(PN);
+							
+				for (int i = 0; i < PN->placeOutputCnt; i++) {
+					// get the activated output events
+					if (PN->CurrentMarking[PN->outputPlacesArray[i]->index] > 0) {
+						cl->addLiteral(PN->outputPlacesArray[i]->name);	
+					}	
+				}			
+				
+				// get all the input events
+				for (int i = 0; i < PN->placeInputCnt; i++) {
+					cl->addLiteral(PN->inputPlacesArray[i]->name);
+				}
+				
+				node->addClause(cl, (*iter)->type == FINALSTATE);
+			}
+		}
+
 	}
+		
+	node->setOfStatesTemp.clear();
 	
 	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): end\n");
 }

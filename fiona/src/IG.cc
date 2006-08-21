@@ -9,6 +9,7 @@
 #include "options.h"
 #include "debug.h"
 #include "CNF.h"
+#include "owfn.h"
 
 //#include <iostream>
 #include <vector>			// for combining receiving events
@@ -47,13 +48,13 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	setOfMessages inputSet;
 	setOfMessages outputSet;
 	
-	if (parameters[P_CALC_ALL_STATES]) {
+//	if (parameters[P_CALC_ALL_STATES]) {
 		// get the activated events and compute the CNF of the node
 		getActivatedEventsComputeCNF(currentNode, inputSet, outputSet);
-	} else {
-		inputSet = PN->inputMessages;
-		outputSet = PN->outputMessages;	
-	}
+//	} else {
+//		inputSet = PN->inputMessages;
+//		outputSet = PN->outputMessages;	
+//	}
 
 	actualDepth++;
 
@@ -157,13 +158,13 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 	
 	// initialize node
 	if (PN->getInputPlaceCnt() > 0) {
-		inputSet = receivingBeforeSending(currentNode);		// per node
+	//	inputSet = receivingBeforeSending(currentNode);		// per node
 	}
 	
-	if (PN->getOutputPlaceCnt() > 0) {
-		outputSet = combineReceivingEvents(currentNode);
-	}
-
+//	if (PN->getOutputPlaceCnt() > 0) {
+		outputSet = combineReceivingEvents(currentNode, inputSet);
+//	}
+	
 	actualDepth++;
 
 	trace(TRACE_1, "\n=================================================================\n");
@@ -250,47 +251,90 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 	int i;
 	StateSet::iterator iter;		
 	
-	for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
-
-#ifdef DEBUG
-	//cout << "\t state " << PN->printMarking((*iter)->myMarking) << " activates the input events: " << endl;
-#endif		
-		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {	// we just consider the maximal states only
-			
-
-			clause * cl = new clause();			// create a new clause for this particular state
-			(*iter)->decode(PN);
-			
-			i = 0;
-			// get the activated input events
-			while ((*iter)->quasiFirelist && (*iter)->quasiFirelist[i]) {
-				for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin();
-							index != (*iter)->quasiFirelist[i]->messageSet.end();
-							index++) {
-
-					messageMultiSet input;				// multiset holding one input message
-					input.insert(*index);
-					
-					inputMessages.insert(input);
-					cl->addLiteral(PN->Places[*index]->name);
-				}
-				i++;
-			}
-
-			// get the activated output events			
-			for (int i = 0; i < PN->getPlaceCnt(); i++) {
-				if (PN->Places[i]->type == OUTPUT && PN->CurrentMarking[i] > 0) {
-					messageMultiSet output;
-					output.insert(i);
-					
-					outputMessages.insert(output);
-					cl->addLiteral(PN->Places[i]->name);	
-				}	
-			}
-			node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
-		}
-	}
+	if (!parameters[P_CALC_ALL_STATES]) { // in case of the state reduced graph
 	
+		for (iter = node->setOfStatesTemp.begin(); iter != node->setOfStatesTemp.end(); iter++) {
+	
+	#ifdef DEBUG
+		//cout << "\t state " << PN->printMarking((*iter)->myMarking) << " activates the input events: " << endl;
+	#endif		
+			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {	// we just consider the maximal states only
+				
+	
+				clause * cl = new clause();			// create a new clause for this particular state
+				(*iter)->decode(PN);
+				
+				i = 0;
+				// get the activated input events
+				while ((*iter)->quasiFirelist && (*iter)->quasiFirelist[i]) {
+					for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin();
+								index != (*iter)->quasiFirelist[i]->messageSet.end();
+								index++) {
+	
+						messageMultiSet input;				// multiset holding one input message
+						input.insert(*index);
+						
+						inputMessages.insert(input);
+						cl->addLiteral(PN->Places[*index]->name);
+					}
+					i++;
+				}
+	
+				// get the activated output events			
+				for (int i = 0; i < PN->getPlaceCnt(); i++) {
+					if (PN->Places[i]->type == OUTPUT && PN->CurrentMarking[i] > 0) {
+						messageMultiSet output;
+						output.insert(i);
+						
+						outputMessages.insert(output);
+						cl->addLiteral(PN->Places[i]->name);	
+					}	
+				}
+				node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
+			}
+		}
+	} else {
+		for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
+	
+	#ifdef DEBUG
+		//cout << "\t state " << PN->printMarking((*iter)->myMarking) << " activates the input events: " << endl;
+	#endif		
+			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {	// we just consider the maximal states only
+				
+	
+				clause * cl = new clause();			// create a new clause for this particular state
+				(*iter)->decode(PN);
+				
+				i = 0;
+				// get the activated input events
+				while ((*iter)->quasiFirelist && (*iter)->quasiFirelist[i]) {
+					for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin();
+								index != (*iter)->quasiFirelist[i]->messageSet.end();
+								index++) {
+	
+						messageMultiSet input;				// multiset holding one input message
+						input.insert(*index);
+						
+						inputMessages.insert(input);
+						cl->addLiteral(PN->Places[*index]->name);
+					}
+					i++;
+				}
+	
+				// get the activated output events			
+				for (int i = 0; i < PN->getPlaceCnt(); i++) {
+					if (PN->Places[i]->type == OUTPUT && PN->CurrentMarking[i] > 0) {
+						messageMultiSet output;
+						output.insert(i);
+						
+						outputMessages.insert(output);
+						cl->addLiteral(PN->Places[i]->name);	
+					}	
+				}
+				node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
+			}
+		}
+	}			
 	trace(TRACE_5, "interactionGraph::getActivatedInputEvents(vertex * node): end\n");
 	
 }
@@ -302,7 +346,7 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 //! \fn setOfMessages interactionGraph::combineReceivingEvents(vertex * node)
 //! \param node the node for which the activated output events are calculated
 //! \brief creates a list of all output messages of the current node
-setOfMessages interactionGraph::combineReceivingEvents(vertex * node) {
+setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessages & inputMessages) {
 #ifdef DEBUG
 	cout << "interactionGraph::combineReceivingEvents(vertex * node): start" << endl;
 #endif
@@ -329,9 +373,28 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node) {
 #ifdef DEBUG
 	cout << "\t state "<< (*iter) << " activates the output events: " << endl;
 #endif		
-			int i;
+			int i = 0;
 			int k = 0;
 			clause * cl = new clause();			// create a new clause for this particular state
+
+			// "receiving before sending" reduction rule
+			while (!stateActivatesOutputEvents(*iter) && 
+						(*iter)->quasiFirelist && 
+						(*iter)->quasiFirelist[i]) {
+				
+				for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin();
+							index != (*iter)->quasiFirelist[i]->messageSet.end();
+							index++) {
+
+					messageMultiSet input;				// multiset holding one input message
+					input.insert(*index);
+					
+					inputMessages.insert(input);
+					
+					cl->addLiteral(PN->Places[*index]->name);
+				}
+				i++;
+			}			
 			
 			messageMultiSet outputMessages;		// multiset of all input messages of the current state
 			

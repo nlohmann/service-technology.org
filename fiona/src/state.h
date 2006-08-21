@@ -26,7 +26,7 @@
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: bretschn $
+ *          - last changes by: \$Author: weinberg $
  *          
  * \date
  *          - created:
@@ -44,34 +44,32 @@
 #ifndef STATE_H
 #define STATE_H
 
-#include "owfnTransition.h"
+//#include "owfnTransition.h"
 #include "owfn.h"
-#include "main.h"
 #include "debug.h"
-
-using namespace std;
+#include "main.h"
 
 class binDecision;
+class owfnTransition;
 
 // State objects are nodes in the state graph.
-
 class State {
 public:
-  State();
-  ~State();
-  static unsigned int card;         // number of states
-  unsigned int CardFireList;        // number of transitions to be fired
-  owfnTransition ** firelist;       // Transitions to be fired
-  owfnTransition ** quasiFirelist;  // Transitions that are quasi enabled
-  unsigned int current;             // Nr of last already fired element of firelist
-//  unsigned int * myMarking;         // current marking at that state
-  binDecision * my_entry;           // last branch in binary decision tree that represents marking
-  unsigned int placeHashValue;      // hashValue of that state (necessary for binDecision)
-  State ** succ;                    // successor states in graph
-  State * parent;                   // state responsible for first generation
-  stateType type;                   // type of state (Deadlock, Final, Transient)
-  void decode(oWFN *);      		// decode state into given marking vector
-  void decodeShowOnly(oWFN *);		// decode state into given marking vector just for showing the marking!!!
+	State();
+	~State();
+	static unsigned int card;         // number of states
+	unsigned int CardFireList;        // number of transitions to be fired
+	owfnTransition ** firelist;       // Transitions to be fired
+	owfnTransition ** quasiFirelist;  // Transitions that are quasi enabled
+	unsigned int current;             // Nr of last already fired element of firelist
+//  unsigned int * myMarking;       // current marking at that state
+	binDecision * my_entry;           // last branch in binary decision tree that represents marking
+	unsigned int placeHashValue;      // hashValue of that state (necessary for binDecision)
+	State ** succ;                    // successor states in graph
+	State * parent;                   // state responsible for first generation
+	stateType type;                   // type of state (Deadlock, Final, Transient)
+	void decode(oWFN *);      		// decode state into given marking vector
+	void decodeShowOnly(oWFN *);		// decode state into given marking vector just for showing the marking!!!
 
   // Provides user defined operator new. Needed to trace all new operations on
   // this class.
@@ -79,25 +77,5 @@ public:
   NEW_OPERATOR(State)
 #define new NEW_NEW
 };
-
-inline State::State() :
-				type(TRANS),
-				current(0),
-				CardFireList(0),
-				placeHashValue(0),
-				firelist(NULL),
-				quasiFirelist(NULL),
-				my_entry(NULL),
-				succ(NULL),
-				parent(NULL)
-                {
-	card++;
-}
-
-inline State::~State() {
-  if(firelist) delete [] firelist;
-  if(quasiFirelist) delete [] quasiFirelist;
-  if(succ) delete [] succ;
-}
 
 #endif

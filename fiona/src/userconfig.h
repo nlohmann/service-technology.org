@@ -18,7 +18,7 @@
 // Set CAPACITY to 1 for safe nets. Do not define CAPACITY if
 // you do not know upper limits for the number of tokens on places.
 
-#define CAPACITY 4
+//#define CAPACITY 4
 
 // REPORTFREQUENCY controls the output of progress messages to the
 // terminal (to be precise: to the standard error stream).

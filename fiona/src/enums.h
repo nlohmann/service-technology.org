@@ -8,4 +8,5 @@ enum edgeType {sending, receiving}; 		//!< ENUM possible types of an edge
 enum analysisResult {TERMINATE, CONTINUE};  //!< needed as feedback of the "analysis" function, whether this node is an end node or not
 
 
+
 #endif /*ENUMS_H_*/

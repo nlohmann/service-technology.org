@@ -26,7 +26,7 @@
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: weinberg $
+ *          - last changes by: \$Author: weinberg $
  *          
  * \date
  *          - created:
@@ -42,7 +42,37 @@
  */
 
 #include "state.h"
+#include "enums.h"
+#include "owfnTransition.h"
+#include "owfn.h"
 #include "binDecision.h"
+
+
+//! \fn State::State()
+//! \brief constructor
+// inline rausgenommen!
+State::State() :
+				type(TRANS),
+				current(0),
+				CardFireList(0),
+				placeHashValue(0),
+				firelist(NULL),
+				quasiFirelist(NULL),
+				my_entry(NULL),
+				succ(NULL),
+				parent(NULL)
+                {
+	card++;
+}
+
+//! \fn State::~State()
+//! \brief destructor
+// inline rausgenommen!
+State::~State() {
+  if(firelist) delete [] firelist;
+  if(quasiFirelist) delete [] quasiFirelist;
+  if(succ) delete [] succ;
+}
 
 //! \fn void State::decode(oWFN * PN)
 //! \param PN the corresponding open workflow net

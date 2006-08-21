@@ -17,22 +17,9 @@
 
 #include "mynew.h"
 
-extern char * lownetfile;
-extern char * pnmlfile;
-extern char * analysefile;
-extern char * graphfile;
-extern char * pathfile;
 extern char * statefile;
-extern char * symmfile;
-extern char * netbasename;
 
-extern bool hflg, Nflg, nflg, Aflg, Sflg, Yflg, Pflg,GMflg, aflg,
-sflg, yflg,pflg,gmflg, cflg;
-
-extern char graphformat;
-
-extern int garbagefound;
-extern char * reserve;
+extern bool Sflg, sflg;
 
 extern oWFN * PN;
 
@@ -41,11 +28,6 @@ extern unsigned int numberOfDecodes;
 extern unsigned int NonEmptyHash;
 
 typedef enum {TRANS, DEADLOCK, FINALSTATE, NN} stateType;   //!< TRANS == Transient; NN == NO IDEA ;-) --> should not be the case ever
-
-
-// extern int yyparse();
-extern void readnet();
-
 
 extern unsigned int numberDeletedVertices;
 

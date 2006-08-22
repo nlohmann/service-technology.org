@@ -1,36 +1,15 @@
-#include "mynew.h"
-#include "dimensions.h"
-#include "symboltab.h"
 #include "state.h"
 #include "IG.h"
 #include "OG.h"
 #include "owfn.h"
-#include "owfnPlace.h"
-
 #include "options.h"
-#include "debug.h"
-#include "lexer_wrap.h"
-
-
-#include <cstdlib> 
-#include <time.h>
-
 #include "main.h"
-
-#include<fstream>
-#include<iostream>
-#include<ctype.h>
-#include<stdlib.h>
-#include<stdio.h>
-#include<unistd.h>
-#include<new>
 
 #ifdef LOG_NEW
 #include "newlogger.h"
 #endif
 
 using namespace std;
-
 
 extern int yydebug;
 extern int yy_flex_debug;
@@ -44,36 +23,19 @@ extern int yylex_destroy();
 #endif
 
 extern SymbolTab* GlobalTable;
+extern unsigned int State::card;
+extern char * netfile;
 
-//extern char * lownetfile;
-
-char * lownetfile;
-char * pnmlfile;
-
-char * analysefile;
-char * graphfile;
-char * pathfile;
 char * statefile;
-char * symmfile;
-char * netbasename;
+char * reserve;
+char * diagnosefilename;
 
-bool hflg, Nflg, nflg, Aflg, Sflg, Yflg, Pflg,GMflg, aflg, sflg,
-        yflg,pflg,gmflg, cflg;
-
-char graphformat;
+bool Sflg, sflg;
 
 int garbagefound;
-char * reserve;
-
 unsigned int NonEmptyHash;
-
-
-unsigned int numberDeletedVertices;
-
-
-extern unsigned int State::card;
-
 unsigned int numberOfDecodes;
+unsigned int numberDeletedVertices;
 
 inline void garbagecollection() {
 }
@@ -83,10 +45,6 @@ void myown_newhandler() {
         cerr << "new failed\n";
     throw bad_alloc();
 }
-
-char * diagnosefilename;
-
-extern char * netfile;
 
 void readnet() {
     yydebug = 0;

@@ -15,22 +15,16 @@
 
 //#define NO_STATES_PER_NODE
 
-#include "mynew.h"
-
 extern char * statefile;
-
 extern bool Sflg, sflg;
-
 extern oWFN * PN;
-
 extern unsigned int numberOfDecodes;
-
 extern unsigned int NonEmptyHash;
+extern unsigned int numberDeletedVertices;
 
 // extern int yyparse();
 extern void readnet();
 
-extern unsigned int numberDeletedVertices;
 typedef enum {TRANS, DEADLOCK, FINALSTATE, NN} stateType;   //!< TRANS == Transient; NN == NO IDEA ;-) --> should not be the case ever
 
 #endif /*MAIN_H*/

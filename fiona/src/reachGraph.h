@@ -68,13 +68,13 @@ protected:
 
    int numberOfVertices;            //!< the number of vertices of the graph
 
-   unsigned int numberBlackNodes;    //!< number of black nodes in the graph
+   unsigned int numberBlackNodes;   //!< number of black nodes in the graph
    unsigned int numberBlueNodes;    //!< number of blue nodes in the graph
    unsigned int numberBlueEdges;    //!< number of blue edges in the graph
 
-   oWFN * PN;                   //!< pointer to the underlying petri net
+   oWFN * PN;                   	//!< pointer to the underlying petri net
 
-   int actualDepth; //!< actual depth in graph
+   int actualDepth; 				//!< actual depth in graph
 
   
    unsigned int numberOfStatesAllNodes;

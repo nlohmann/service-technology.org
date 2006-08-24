@@ -226,8 +226,8 @@ void operatingGuidelines::computeCNF(vertex * node) {
 	if (!parameters[P_CALC_ALL_STATES]) { // in case of the state reduced graph
 		
 		// iterate over all states of the node
-		for (iter = node->setOfStatesTemp.begin();
-			 iter != node->setOfStatesTemp.end(); iter++) {
+		for (iter = PN->setOfStatesTemp.begin();
+			 iter != PN->setOfStatesTemp.end(); iter++) {
 			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {
 				// we just consider the maximal states only
 				
@@ -281,7 +281,7 @@ void operatingGuidelines::computeCNF(vertex * node) {
 
 	}
 		
-	node->setOfStatesTemp.clear();
+	PN->setOfStatesTemp.clear();
 	
 	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): end\n");
 }

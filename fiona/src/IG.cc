@@ -1,19 +1,12 @@
 #include "mynew.h"
 #include "IG.h"
-//#include "vertex.h"
-//#include "owfn.h"
-//#include "stateList.h"
-//#include "main.h"
-
 #include "state.h"
 #include "options.h"
 #include "debug.h"
 #include "CNF.h"
 #include "owfn.h"
 
-//#include <iostream>
 #include <vector>			// for combining receiving events
-//#include <string>
 
 //! \fn interactionGraph::interactionGraph(oWFN * _PN) 
 //! \param _PN
@@ -48,13 +41,7 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	setOfMessages inputSet;
 	setOfMessages outputSet;
 	
-//	if (parameters[P_CALC_ALL_STATES]) {
-		// get the activated events and compute the CNF of the node
-		getActivatedEventsComputeCNF(currentNode, inputSet, outputSet);
-//	} else {
-//		inputSet = PN->inputMessages;
-//		outputSet = PN->outputMessages;	
-//	}
+	getActivatedEventsComputeCNF(currentNode, inputSet, outputSet);
 
 	actualDepth++;
 
@@ -79,14 +66,19 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 		return;
 	}
 	
+	trace(TRACE_5, "iterating over inputSet\n");
 	// iterate over all elements of inputSet
 	for (setOfMessages::iterator iter = inputSet.begin(); iter != inputSet.end(); iter++) {
+
+		trace(TRACE_3, "\t\t\t\t    sending event: !");
+//		trace(TRACE_3, string(PN->inputPlacesArray[i]->name) + "\n");
 		
 		vertex * v = new vertex();	// create new vertex of the graph
 		currentVertex = currentNode;
 		
 		calculateSuccStatesInput(*iter, currentNode, v);
-
+		trace(TRACE_3, "\n");
+		
 		if (AddVertex (v, *iter, sending)) {
 
 #ifdef LOOP
@@ -106,11 +98,15 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 		}
 	}
 	
+	trace(TRACE_5, "iterating over outputSet\n");
 	for (setOfMessages::iterator iter = outputSet.begin(); iter != outputSet.end(); iter++) {
+		trace(TRACE_3, "\t\t\t\t    output event: ?");
+
 		vertex * v = new vertex();	// create new vertex of the graph
 		currentVertex = currentNode;
 				
 		calculateSuccStatesOutput(*iter, currentNode, v);
+		trace(TRACE_3, "\n");
 		
 		if (AddVertex (v, *iter, receiving)) {
 
@@ -189,14 +185,12 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 	}
 
 	// iterate over all elements of inputSet
-//	while (elementInput&& (currentNode->getColor() != RED)) {
 	for (setOfMessages::iterator iter = inputSet.begin(); iter != inputSet.end(); iter++) {
 
 		vertex * v = new vertex();		// create new vertex of the graph
 		currentVertex = currentNode;
 		
 		calculateSuccStatesInput(*iter, currentNode, v);
-	//	v->setStateList(newNodeStateList);
 		
 		if (AddVertex (v, *iter, sending)) {
 			buildReducedGraph(v);
@@ -208,12 +202,10 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 
 
 	for (setOfMessages::iterator iter = outputSet.begin(); iter != outputSet.end(); iter++) {
-//	while (elementOutput&& (currentNode->getColor() != RED)) {
 		vertex * v = new vertex();	// create new vertex of the graph
 		currentVertex = currentNode;
 					
 		calculateSuccStatesOutput(*iter, currentNode, v);
-		//v->setStateList(newNodeStateList);
 
 		
 		if (AddVertex (v, *iter, receiving)) {
@@ -253,14 +245,10 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 	
 	if (!parameters[P_CALC_ALL_STATES]) { // in case of the state reduced graph
 	
-		for (iter = node->setOfStatesTemp.begin(); iter != node->setOfStatesTemp.end(); iter++) {
+		for (iter = PN->setOfStatesTemp.begin(); iter != PN->setOfStatesTemp.end(); iter++) {
 	
-	#ifdef DEBUG
-		//cout << "\t state " << PN->printMarking((*iter)->myMarking) << " activates the input events: " << endl;
-	#endif		
 			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {	// we just consider the maximal states only
 				
-	
 				clause * cl = new clause();			// create a new clause for this particular state
 				(*iter)->decode(PN);
 				
@@ -360,8 +348,6 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 	messageMultiSet outputMessages;				// multiset of all input messages of the current state
 
 	StateSet::iterator iter;		
-	
-	clause * cl = new clause();
 	
 	bool found = false;
 	bool skip = false;

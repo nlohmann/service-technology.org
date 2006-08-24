@@ -15,15 +15,10 @@
 
 //#define NO_STATES_PER_NODE
 
-extern char * statefile;
-extern bool Sflg, sflg;
 extern oWFN * PN;
 extern unsigned int numberOfDecodes;
 extern unsigned int NonEmptyHash;
 extern unsigned int numberDeletedVertices;
-
-// extern int yyparse();
-extern void readnet();
 
 typedef enum {TRANS, DEADLOCK, FINALSTATE, NN} stateType;   //!< TRANS == Transient; NN == NO IDEA ;-) --> should not be the case ever
 

@@ -26,11 +26,8 @@ extern SymbolTab* GlobalTable;
 extern unsigned int State::card;
 extern char * netfile;
 
-char * statefile;
 char * reserve;
-char * diagnosefilename;
-
-bool Sflg, sflg;
+//char * diagnosefilename;
 
 int garbagefound;
 unsigned int NonEmptyHash;
@@ -49,7 +46,7 @@ void myown_newhandler() {
 void readnet() {
     yydebug = 0;
     yy_flex_debug = 0;
-    diagnosefilename = (char *) 0;
+   // diagnosefilename = (char *) 0;
     if(netfile)
     {
         yyin = fopen(netfile,"r");
@@ -58,7 +55,7 @@ void readnet() {
             cerr << "cannot open netfile: " << netfile << "\n";
             exit(4);
         }
-        diagnosefilename = netfile;
+      //  diagnosefilename = netfile;
     }
     GlobalTable = new SymbolTab(1024);
 

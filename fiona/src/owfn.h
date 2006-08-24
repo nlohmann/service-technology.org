@@ -12,12 +12,13 @@
 #define OWFN_H_
 
 #include "mynew.h"
-#include<fstream>
-#include<iosfwd>
-#include<iostream>
+#include <fstream>
+#include <iosfwd>
+#include <iostream>
 #include <string>
 #include "formula.h"
 #include "main.h"
+#include "vertex.h"
 
 #include "reachGraph.h"
 
@@ -56,6 +57,9 @@ class oWFN  {
 		
 		setOfMessages inputMessages;		//!< activated input messages of current node
 		setOfMessages outputMessages;		//!< activated output messages of current node
+
+	    StateSet setOfStatesTemp;			//!< this set contains all states of the newly calculated node
+		StateSet visitedStates;				//!< in case of state reduction, remember those state that we have visited so far by calculating the new node
 
 		unsigned int commDepth;				//!< depth of operating guideline
 											// wird in syntax.yy gesetzt
@@ -99,7 +103,7 @@ class oWFN  {
 		
 		void addStateToList(vertex *, State *);
 		
-		void computeAnnotation(vertex *, State *);
+		void computeAnnotationOutput(vertex *, State *);
 		void computeAnnotationInput(vertex *, State *, unsigned int *, bool);
 		
 		State * calculateNextSate();
@@ -127,7 +131,6 @@ class oWFN  {
 /* print the net */
 		void printmarking();
 		void printmarking(unsigned int *);
-		void printstate(char *, unsigned int *);
 		void print_binDec(int);
 		void print_binDec(binDecision *, int);
 		

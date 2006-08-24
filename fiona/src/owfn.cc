@@ -4,6 +4,7 @@
 #include "options.h"
 #include "debug.h"
 #include "CNF.h"
+#include "vertex.h"
 #include <cassert>
 
 using namespace std;
@@ -321,25 +322,25 @@ void oWFN::addStateToList(vertex * n, State * currentState) {
 	}
 }
 
-//! \fn void oWFN::computeAnnotation(vertex * node, State * currentState)
+//! \fn void oWFN::computeAnnotationOutput(vertex * node, State * currentState)
 //! \param node the node that is calculated
 //! \param currentState the state for which the appropriate clause is to be created if this state is DL or FS
 //! \brief computes the CNF of the current node starting with the currentState, goes recursively through
 //! all of its successor states 
-void oWFN::computeAnnotation(vertex * node, State * currentState) {
+void oWFN::computeAnnotationOutput(vertex * node, State * currentState) {
 	trace(TRACE_5, "oWFN::computeAnnotation(vertex * node, State * currentState, unsigned int * markingPreviousState): start\n");
 
 	if (parameters[P_CALC_ALL_STATES]) {
 		node->setOfStates.insert(currentState);
 	} else {
 		// store this state in the node's temp set of state (storing all states of the node)
-		node->setOfStatesTemp.insert(currentState);		
+		setOfStatesTemp.insert(currentState);		
 	}
 	// get the successor states	and compute their corresponding annotation
 	if (currentState != NULL) {
 		for(int i = 0; i < currentState->CardFireList; i++) {
 			if (currentState->succ[i]) {
-				computeAnnotation(node, currentState->succ[i]);
+				computeAnnotationOutput(node, currentState->succ[i]);
 			}
 		}
 	}
@@ -362,7 +363,7 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 		node->setOfStates.insert(currentState);
 	} else {
 		// store this state in the node's temp set of state (storing all states of the node)
-		node->setOfStatesTemp.insert(currentState);		
+		setOfStatesTemp.insert(currentState);		
 	}
 	
 	// check, whether this state is to be added to the node or not
@@ -371,13 +372,26 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 	if (!isCurrentMarking && placeOutputCnt > 0) {
 		currentState->decodeShowOnly(this);	
 	}
+	
+	bool storeState = false;	// flag indicating whether this state shall be stored in the node or not
+	
 	for (int i = 0; i < placeOutputCnt; i++) {
 		// get the activated output events
 		if (CurrentMarking[outputPlacesArray[i]->index] > 0 && 
 				(markingPreviousState == NULL || markingPreviousState[outputPlacesArray[i]->index] == 0)) {
-			node->addState(currentState);
+			storeState = true;
+			if (visitedStates.find(currentState) == visitedStates.end()) {
+				// no, we have not yet visited this state
+				node->addState(currentState);
+			}
 		}	
 	}	
+
+	if (!storeState && markingPreviousState != NULL) {
+		node->setOfStates.erase(currentState);  // remove this state from the node's state list, because it should not be stored
+	}
+
+	visitedStates.insert(currentState);	// remember that we have visited this state
 	
 	// get the successor states	and compute their corresponding annotation
 	if (currentState != NULL && currentState->succ[0] != NULL) {
@@ -396,11 +410,10 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 }
 
 unsigned int * oWFN::copyCurrentMarking() {
-	unsigned int * copy = new unsigned int [getPlaceCnt()];
+	unsigned int * copy = new unsigned int [placeCnt];
 
-	for (int i = 0; i < getPlaceCnt(); i++) {
+	for (int i = 0; i < placeCnt; i++) {
 		copy[i] = CurrentMarking[i];
-	
 	}	
 	return copy;
 }
@@ -439,7 +452,7 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal) {
 	if (CurrentState != NULL) {
 		// marking already has a state -> put it (and all its successors) into the node
 		if (n->addState(CurrentState)) {
-			computeAnnotation(n, CurrentState);
+			computeAnnotationOutput(n, CurrentState);
 		}
 		trace(TRACE_5, "oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal): end\n");
 		return;
@@ -470,7 +483,7 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal) {
 	CurrentState->type = typeOfState();
 	
 	n->addState(CurrentState);
-	n->setOfStatesTemp.insert(CurrentState);
+	setOfStatesTemp.insert(CurrentState);
 	  	
 	// building EG in a node
   	while(CurrentState) {
@@ -499,7 +512,7 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal) {
 	  		if(NewState != NULL) {
 		  		// Current marking already in bintree 
 				trace(TRACE_5, "Current marking already in bintree \n");
-				computeAnnotation(n, NewState);
+				computeAnnotationOutput(n, NewState);
 				
 				copyMarkingToCurrentMarking(tempCurrentMarking);
 				
@@ -539,7 +552,7 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal) {
 
 	      		CurrentState = NewState;
 		      	
-				computeAnnotation(n, NewState);
+				computeAnnotationOutput(n, NewState);
 				
 				if (tempCurrentMarking) {
 					delete[] tempCurrentMarking;
@@ -616,7 +629,7 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	CurrentState->placeHashValue = placeHashValue;
 	CurrentState->type = typeOfState();
 	
-	n->setOfStatesTemp.insert(CurrentState);
+	setOfStatesTemp.insert(CurrentState);
 	
 	n->addState(CurrentState);
 	computeAnnotationInput(n, CurrentState, NULL, true);
@@ -884,6 +897,8 @@ int oWFN::addInputMessage(unsigned int message) {
 int oWFN::addInputMessage(messageMultiSet messages) {
 	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
 		if (Places[*iter]->type == INPUT) {
+			trace(TRACE_3, string(Places[*iter]->name) + " ");
+			
 			// found that place
 			CurrentMarking[*iter]++;
 			placeHashValue += Places[*iter]->hash_factor;
@@ -1037,47 +1052,6 @@ char * oWFN::printCurrentMarkingForDot() {
 
 }
 
-
-void oWFN::printstate(char * c, unsigned int * st) {
-    int i,j;
-    if(Sflg) {
-		cout << "STATE"; cout << c ;
-		for(i=0,j=0;i<placeCnt;i++) {
-        	if(st[i]) {
-            	if(st[i] == VERYLARGE) {
-                	cout << (j++ ? ",\n" : "\n") << Places[i]->name << " : oo" ;
-            	} else {
-					cout << (j++ ? ",\n" : "\n") << Places[i]->name << " : " << st[i];
-            	}
-        	}
-    	}
-    	cout << "\n\n";
-    	return;
-    }
-    
-    if(sflg) {
-    	ofstream statestream(statefile);
-    	if(! statestream) {  
-        	cerr << "Cannot open state output file: " << statefile <<
-        	"\n no output written\n";
-        	return;
-    	}
-    	statestream << "STATE";
-    	for(i=0,j=0;i<placeCnt;i++) {
-        	if(st[i]) {
-            	if(st[i] == VERYLARGE) {
-                	statestream << (j++ ? ",\n" : "\n") << Places[i]->name << " : oo" ;
-            	} else {
-	                statestream << (j++ ? ",\n" : "\n") << Places[i]->name << " : " << st[i];
-				}
-        	}
-		}
-    	statestream << "\n\n";
-    	return;
-    }
-}
-
-
 void oWFN::print_binDec(int h) {
 
 	for(int i=0; i < placeCnt; i++) {
@@ -1182,7 +1156,9 @@ int oWFN::removeOutputMessage(messageMultiSet messages) {
 	unsigned int found = 0;
 	
 	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
+
 		if (Places[*iter]->type == OUTPUT) {
+			trace(TRACE_3, string(Places[*iter]->name) + " ");
 			if (CurrentMarking[*iter] > 0) {
 				found++;
 				// found that place

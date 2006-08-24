@@ -292,6 +292,8 @@ void reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node, ver
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : start\n");
 
     StateSet::iterator iter;              // iterator over the state set's elements
+  	PN->setOfStatesTemp.clear();
+  	PN->visitedStates.clear();
 
     for (iter = node->setOfStates.begin();
          iter != node->setOfStates.end(); iter++) {
@@ -319,6 +321,9 @@ void reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, 
 
     StateSet::iterator iter;              // iterator over the stateList's elements
 
+  	PN->setOfStatesTemp.clear();
+  	PN->visitedStates.clear();
+
     for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
         (*iter)->decode(PN);
         
@@ -329,6 +334,7 @@ void reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, 
             PN->calculateReachableStatesInputEvent(newNode, false);       // calc the reachable states from that marking
         }
     }
+    
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node) : end\n");
 }
 
@@ -340,6 +346,8 @@ void reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node, v
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node) : start\n");
 
     StateSet::iterator iter;                      // iterator over the stateList's elements
+  	PN->setOfStatesTemp.clear();
+  	PN->visitedStates.clear();
 
     for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
 
@@ -365,6 +373,8 @@ void reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node) : start\n");
 
     StateSet::iterator iter;                      // iterator over the stateList's elements
+  	PN->setOfStatesTemp.clear();
+  	PN->visitedStates.clear();
 
     for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
         

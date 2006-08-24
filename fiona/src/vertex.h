@@ -66,7 +66,7 @@ public:
     unsigned int getNumber();
     
     StateSet setOfStates;		// this set contains only a reduced number of states in case the state reduced graph is to be build
-    StateSet setOfStatesTemp;	// this set contains all states
+//    StateSet setOfStatesTemp;	// this set contains all states
     
     void setNumber(unsigned int);
     void addSuccessorNode(graphEdge *);

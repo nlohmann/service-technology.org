@@ -4,7 +4,7 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT(Fiona, 1.0, weinberg@informatik.hu-berlin.de, fiona)
-AC_REVISION($Revision: 1.10 $)
+AC_REVISION($Revision: 1.11 $)
 
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/fiona.h)
@@ -73,7 +73,8 @@ AM_CONDITIONAL(ENABLE_64BIT, test "$enable_64bit" = "yes")
 CXXFLAGS=-g
 
 AC_CONFIG_FILES([Makefile
-                 src/Makefile])
+                 src/Makefile
+                 tests/Makefile])
 AC_OUTPUT
 
 # Print summary of compile settings

@@ -1,5 +1,6 @@
 ############################################################################
-# Copyright 2005, 2006 Peter Massuthe and Daniela Weinberg                 #
+# Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Dennis Reinert,   #
+#                      Jan Bretschneider and Christian Gierds              #
 #                                                                          #
 # This file is part of Fiona.                                              #
 #                                                                          #
@@ -18,12 +19,15 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006-04-07 06:53:32 $ by $Author: weinberg $.
-# Version $Revision: 1.1 $
+# File last changed $Date: 2006-08-28 17:15:25 $ by $Author: reinert $.
+# Version $Revision: 1.2 $
 
-SUBDIRS = src 
+SUBDIRS = src tests
 
 .PHONY: binarydistreadme
+
+# all files that require the permission to execute
+SHELLSCRIPTS = tests/testSequenceSuite
 
 # delete all files that can be created by other files
 hu-prepare: maintainer-clean

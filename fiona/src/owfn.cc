@@ -331,7 +331,7 @@ void oWFN::computeAnnotationOutput(vertex * node, State * currentState) {
 	trace(TRACE_5, "oWFN::computeAnnotation(vertex * node, State * currentState, unsigned int * markingPreviousState): start\n");
 
 	if (parameters[P_CALC_ALL_STATES]) {
-		node->setOfStates.insert(currentState);
+		node->addState(currentState);
 	} else {
 		// store this state in the node's temp set of state (storing all states of the node)
 		setOfStatesTemp.insert(currentState);		
@@ -360,7 +360,7 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 	unsigned int * marking = NULL;
 
 	if (parameters[P_CALC_ALL_STATES]) {
-		node->setOfStates.insert(currentState);
+		node->addState(currentState);
 	} else {
 		// store this state in the node's temp set of state (storing all states of the node)
 		setOfStatesTemp.insert(currentState);		
@@ -387,7 +387,7 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 		}	
 	}	
 
-	if (!storeState && markingPreviousState != NULL) {
+	if (!storeState && markingPreviousState != NULL && !parameters[P_CALC_ALL_STATES]) {
 		node->setOfStates.erase(currentState);  // remove this state from the node's state list, because it should not be stored
 	}
 
@@ -440,9 +440,6 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal) {
   	unsigned int i;
   	State * NewState;
   	stateType type;
-  	
-  	inputMessages.clear();	// clear the activated input messages since we now calculate a new node
-  	outputMessages.clear();	// clear the activated output messages since we now calculate a new node
   	
 	CurrentState = binSearch(this);
 	
@@ -590,9 +587,6 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
   	State * NewState;
   	stateType type;
   	
-  	inputMessages.clear();	// clear the activated input messages since we now calculate a new node
-  	outputMessages.clear();	// clear the activated output messages since we now calculate a new node
-  	
 	CurrentState = binSearch(this);
 	
 	unsigned int * tempCurrentMarking = NULL;
@@ -612,6 +606,8 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	if (CurrentState == NULL) {
 		CurrentState = binInsert(this);
 	}
+	
+//	cout << "new state: " << printCurrentMarkingForDot() << " with " << CardQuasiFireList << " in quasiFirelist" << endl;
 	
 	CurrentState->firelist = firelist();
 	CurrentState->CardFireList = CardFireList;
@@ -679,6 +675,10 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	     		(CurrentState->current)++;
 	    	} else {
 				trace(TRACE_5, "Current marking new\n");
+
+//	cout << "new state: " << printCurrentMarkingForDot() << " with " << CardQuasiFireList << " in quasiFirelist" << endl;
+
+
       			NewState = binInsert(this);
       			NewState->firelist = firelist();
 	      		NewState->CardFireList = CardFireList;
@@ -760,6 +760,7 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 	if (CurrentState == NULL) {
 		CurrentState = binInsert(this);
 	}
+//	cout << "new state: " << printCurrentMarkingForDot() << " with " << CardQuasiFireList << " in quasiFirelist" << endl;
 	
 	CurrentState->firelist = firelist();
 	CurrentState->CardFireList = CardFireList;
@@ -826,6 +827,7 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 	     		(CurrentState->current)++;
 	    	} else {
 				trace(TRACE_5, "Current marking new\n");
+//	cout << "new state: " << printCurrentMarkingForDot() << " with " << CardQuasiFireList << " in quasiFirelist" << endl;
       			NewState = binInsert(this);
       			NewState->firelist = firelist();
 	      		NewState->CardFireList = CardFireList;
@@ -908,7 +910,7 @@ int oWFN::addInputMessage(messageMultiSet messages) {
 			for (int k = 0; k < Places[*iter]->NrOfLeaving; k++) {
 				((owfnTransition *) Places[*iter]->LeavingArcs[k]->Destination)->check_enabled(this);
 			}
-			return 0;
+		//	return 0;
 		}
 	}
 	return 1;		// place not found

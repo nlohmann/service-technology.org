@@ -256,7 +256,7 @@ int main(int argc, char ** argv) {
 	delete PN;
     delete GlobalTable;	
 	
-	cout << "numberOfDecodes: " << numberOfDecodes << endl;
+	//cout << "numberOfDecodes: " << numberOfDecodes << endl;
 	
     trace(TRACE_0, "--------------------------------------------------------------\n\n");
 

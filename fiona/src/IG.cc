@@ -71,7 +71,6 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	for (setOfMessages::iterator iter = inputSet.begin(); iter != inputSet.end(); iter++) {
 
 		trace(TRACE_3, "\t\t\t\t    sending event: !");
-//		trace(TRACE_3, string(PN->inputPlacesArray[i]->name) + "\n");
 		
 		vertex * v = new vertex();	// create new vertex of the graph
 		currentVertex = currentNode;
@@ -238,7 +237,7 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 //! \param outputMessages
 //! \brief creates a list of all activated input events (messages) of the current node
 void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages & inputMessages, setOfMessages & outputMessages) {
-	trace(TRACE_5, "interactionGraph::getActivatedInputEvents(vertex * node): start\n");
+	trace(TRACE_5, "interactionGraph::getActivatedEventsComputeCNF(vertex * node): start\n");
 
 	int i;
 	StateSet::iterator iter;		
@@ -252,18 +251,23 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 				clause * cl = new clause();			// create a new clause for this particular state
 				(*iter)->decode(PN);
 				
+				(*iter)->quasiFirelist = PN->quasiFirelist();
+				
 				i = 0;
 				// get the activated input events
+			//	cout << "state " << PN->printCurrentMarkingForDot() << " activates the input events: " << (*iter)->quasiFirelist << ", " << (*iter)->quasiFirelist[i] << endl;
 				while ((*iter)->quasiFirelist && (*iter)->quasiFirelist[i]) {
 					for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin();
 								index != (*iter)->quasiFirelist[i]->messageSet.end();
 								index++) {
 	
 						messageMultiSet input;				// multiset holding one input message
-						input.insert(*index);
+					 	input.insert(*index);
 						
 						inputMessages.insert(input);
 						cl->addLiteral(PN->Places[*index]->name);
+						
+			//			cout << "\t" << PN->Places[*index]->name << endl;
 					}
 					i++;
 				}
@@ -295,6 +299,7 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 				
 				i = 0;
 				// get the activated input events
+			//	cout << "state " << PN->printCurrentMarkingForDot() << " activates the input events: " << (*iter)->quasiFirelist << ", " << (*iter)->quasiFirelist[i] << endl;
 				while ((*iter)->quasiFirelist && (*iter)->quasiFirelist[i]) {
 					for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin();
 								index != (*iter)->quasiFirelist[i]->messageSet.end();
@@ -305,6 +310,7 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 						
 						inputMessages.insert(input);
 						cl->addLiteral(PN->Places[*index]->name);
+				//		cout << "\t" << PN->Places[*index]->name << endl;
 					}
 					i++;
 				}
@@ -322,6 +328,16 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 				node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
 			}
 		}
+//		for (int k = 0; k < PN->placeInputCnt; k++) {		
+//			messageMultiSet input;				// multiset holding one input message
+//			input.insert(k);
+//			inputMessages.insert(input);
+//		}
+//		for (int k = 0; k < PN->placeOutputCnt; k++) {		
+//			messageMultiSet output;				// multiset holding one input message
+//			output.insert(k);
+//			outputMessages.insert(output);
+//		}
 	}			
 	trace(TRACE_5, "interactionGraph::getActivatedInputEvents(vertex * node): end\n");
 	

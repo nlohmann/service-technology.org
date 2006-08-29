@@ -42,12 +42,14 @@ class oWFN  {
 		unsigned int CardQuasiFireList;
 		
 		owfnTransition ** firelist();
-		owfnTransition ** quasiFirelist();
+		
 		
 	public:
 		oWFN();
 		~oWFN();
 		void RemoveGraph();
+		
+		owfnTransition ** quasiFirelist();
 
 		owfnPlace ** Places;				//!< array of places
 		owfnTransition ** Transitions;		//!< array of transitions

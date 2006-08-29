@@ -475,7 +475,7 @@ void owfnTransition::check_enabled(oWFN * PN)
     }
   }
   	
-  //	cout << "current marking: " << PN->printCurrentMarkingForDot() << endl;
-  // cerr << "transition " << name << " is quasiEnabled: " << quasiEnabled << " and enabled: " << enabled << endl;
+//  	cout << "current marking: " << PN->printCurrentMarkingForDot() << endl;
+//   cout << "transition " << name << " is quasiEnabled: " << quasiEnabled << " and enabled: " << enabled << endl;
 }
 

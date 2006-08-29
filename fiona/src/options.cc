@@ -150,8 +150,8 @@ void parse_command_line(int argc, char* argv[]) {
 	options[O_DEBUG] = false;
 	options[O_GRAPH_TYPE] = false;
 	options[O_SHOW_NODES] = false;
-	options[O_CALC_ALL_STATES] = false;   // standard: man muss -a angeben, um voll
-//	options[O_CALC_ALL_STATES] = true;
+//	options[O_CALC_ALL_STATES] = false;   // standard: man muss -a angeben, um voll
+	options[O_CALC_ALL_STATES] = true;
 	options[O_CALC_REDUCED_IG] = false;
 	options[O_OWFN_NAME] = false;
 	options[O_COMM_DEPTH] = false;
@@ -166,8 +166,8 @@ void parse_command_line(int argc, char* argv[]) {
 	parameters[P_SHOW_NO_RED_NODES] = true;
 	parameters[P_SHOW_EMPTY_NODE] = false;
 	parameters[P_SHOW_STATES_PER_NODE] = false;
-	parameters[P_CALC_ALL_STATES] = false;   // standard: man muss -a angeben, um voll
-//	parameters[P_CALC_ALL_STATES] = true;
+//	parameters[P_CALC_ALL_STATES] = false;   // standard: man muss -a angeben, um voll
+	parameters[P_CALC_ALL_STATES] = true;
 	parameters[P_CALC_REDUCED_IG] = false;
 
 	bdd_reordermethod = 1;

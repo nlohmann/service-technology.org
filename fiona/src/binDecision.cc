@@ -26,7 +26,7 @@
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: reinert $
+ *          - last changes of: \$Author: bretschn $
  *          
  * \date
  *          - created:
@@ -71,6 +71,8 @@ binDecision::binDecision(int b, long int BitVectorSize) {
 binDecision::~binDecision() {
 	delete[] vector;
 	delete state;
+	delete nextold;
+	delete nextnew;
 }
 
 void inttobits(unsigned char * bytepos, int bitpos, int nrbits, unsigned int value) {

@@ -29,11 +29,11 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/07/12 09:06:38 $
+ *          - last changed: \$Date: 2006/09/03 14:36:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.23 $
+ * \version \$Revision: 1.24 $
  */
 %}
 
@@ -91,13 +91,17 @@ map <std::string, CFGBlock *> cfgMap;
 
 Process(a,b,c,d,e,f,g,h,i) ->
   [cfg: {
-	  cfgMap = map <std::string, CFGBlock *>();
+          // reset data structures
+	  cfgMap = map<std::string, CFGBlock *>();
 	  sources = map<std::string, CFGBlock *>();
           targets = map<std::string, CFGBlock *>();
-	  trace(TRACE_DEBUG, "[CFG] Process\n");
-	  CFGBlock * firstBlock = new CFGBlock(CFGProcess, $0->id, "Process_begin"); 
-	  CFGBlock * lastBlock = new CFGBlock(CFGProcess, $0->id, "Process_end");
 
+          // create blocks for the process
+	  trace(TRACE_DEBUG, "[CFG] Process\n");
+	  CFGBlock* firstBlock = new CFGBlock(CFGProcess, $0->id, "Process_begin"); 
+	  CFGBlock* lastBlock  = new CFGBlock(CFGProcess, $0->id, "Process_end");
+
+          // manage relationships
 	  firstBlock->firstBlock = lastBlock->firstBlock = firstBlock;
 	  firstBlock->lastBlock  = lastBlock->lastBlock  = lastBlock;
 	  
@@ -106,21 +110,23 @@ Process(a,b,c,d,e,f,g,h,i) ->
 	}
 	e //faultHandler
 	{
-	  CFGBlock * fhFirst = cfgMap.find(intToString(e->id))->second->firstBlock;
-	  CFGBlock * fhLast  = cfgMap.find(intToString(e->id))->second->lastBlock;
+          // create blocks for the fault handlers
+	  CFGBlock *fhFirst = cfgMap.find(intToString(e->id))->second->firstBlock;
+	  CFGBlock *fhLast  = cfgMap.find(intToString(e->id))->second->lastBlock;
 
+          // embed fault handler to process
 	  connectBlocks(firstBlock, fhFirst);
 	  connectBlocks(fhLast, lastBlock);
-
 	}
 	f //compensationHandler
 	{
-	  CFGBlock * chFirst = cfgMap.find(intToString(f->id))->second->firstBlock;
-	  CFGBlock * chLast  = cfgMap.find(intToString(f->id))->second->lastBlock;
+          // create blocks for the compensation handlers
+	  CFGBlock* chFirst = cfgMap.find(intToString(f->id))->second->firstBlock;
+	  CFGBlock* chLast  = cfgMap.find(intToString(f->id))->second->lastBlock;
 
+          // embed compensation handler block
 	  connectBlocks(firstBlock, chFirst);
 	  connectBlocks(chLast, lastBlock);
-
 	}
 	g //eventHandler
 	{
@@ -159,8 +165,8 @@ Process(a,b,c,d,e,f,g,h,i) ->
 This=userDefinedFaultHandler(a,catchAll = CatchAll(b)) ->
   [cfg: {
 	  trace(TRACE_DEBUG, "[CFG] FaultHandler (user defined)\n");
-	  CFGBlock * firstBlock = new CFGBlock(CFGFaultHandler, $0->id, "FaultHandler_begin"); 
-	  CFGBlock * lastBlock  = new CFGBlock(CFGFaultHandler, $0->id, "FaultHandler_end"); 
+	  CFGBlock* firstBlock = new CFGBlock(CFGFaultHandler, $0->id, "FaultHandler_begin"); 
+	  CFGBlock* lastBlock  = new CFGBlock(CFGFaultHandler, $0->id, "FaultHandler_end"); 
 	  cfgMap[intToString($0->id)] = firstBlock;
 
 	  firstBlock->firstBlock = lastBlock->firstBlock = firstBlock;

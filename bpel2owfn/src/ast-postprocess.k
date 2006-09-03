@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/07/14 12:47:54 $
+ *          - last changed: \$Date: 2006/09/03 14:36:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.23 $
+ * \version \$Revision: 1.24 $
  */
 %}
 
@@ -229,8 +229,18 @@ userDefinedFaultHandler(a,b) ->
         ASTEmap[innerActivity->id]->parentActivityId = myid;
         ASTEmap[innerActivity->id]->controlFlow = FHCF;
       }
-//      assert(ASTEmap[b->id] != NULL); /TODO!
-//      ASTEmap[b->id]->parentActivityId = myid;
+
+      // check whether a <catchAll>-branch with an enclosed activity is present
+      // and if yes, annotate it
+      with (b)
+      {
+        CatchAll(c) :
+        {
+          assert(ASTEmap[c->id] != NULL);
+          ASTEmap[c->id]->parentActivityId = myid;
+        }
+        default : { /* nothing to do */ }
+      }
     }
     a b
   ]
@@ -1082,6 +1092,7 @@ Sequence(a,b) ->
       $0->A_joinCondition = ASTEmap[myid]->attributes["joinCondition"];
       $0->A_suppressJoinFailure = ASTEmap[myid]->attributes["suppressJoinFailure"];
       /* here we can check the attributes */
+
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);

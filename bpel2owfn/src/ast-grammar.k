@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/07/12 16:24:20 $
+ *          - last changed: \$Date: 2006/09/03 14:36:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.98 $
+ * \version \$Revision: 1.99 $
  */
 %}
 
@@ -60,7 +60,10 @@
 %{ KC_TYPES_HEADER
 
 #include <string>
+#include <iostream>
 using std::string;
+using std::cerr;
+using std::endl;
 
 %}
 
@@ -91,6 +94,10 @@ tProcess:
     string A_enableInstanceCompensation;
     string A_abstractProcess;
     string A_xmlns;
+
+    {
+      cerr << "created a <process> phylum" << endl;
+    }
   }
 ;
 
@@ -375,6 +382,10 @@ tInvoke:
     string channelName;
     string inputVariableName;
     string outputVariableName;
+
+    {
+      cerr << "created an <invoke> phylum" << endl;
+    }
   }
 ;
 
@@ -801,3 +812,15 @@ expression:
 | Conjunction(expression expression)
 | Disjunction(expression expression)
 ;
+
+
+
+/* macht nichts vernünftiges -- geht aber...
+ * kann vielleicht dazu benutzt werden, die Attribute elegant zu überprüfen,
+ * indem an jedem Phylum einfach checkAttributes() gerufen wird...
+ * 
+int tTarget::equals()
+{
+  return 42;
+}
+*/

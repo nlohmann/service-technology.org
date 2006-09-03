@@ -14,6 +14,7 @@
 char * netfile;
 int commDepth_manual;
 int events_manual;
+int messages_manual;
 int bdd_reordermethod;
 
 /// Filename of input file
@@ -51,13 +52,14 @@ static struct option longopts[] =
   { "calcallstates", no_argument, 			NULL, 'a' },
   { "reduceIG",   	 no_argument,	    	NULL, 'r' },
   { "commDepth",   	 required_argument,    	NULL, 'c' },
+  { "messagemaximum",required_argument,    	NULL, 'm' },
   { "eventsmaximum", required_argument,    	NULL, 'e' },
   { "BDD",			 optional_argument,    	NULL, 'b' },
   NULL
 };
 
 
-const char * par_string = "hvd:n:t:s:arc:e:b:";
+const char * par_string = "hvd:n:t:s:arc:m:e:b:";
 
 // --------------------- functions for command line evaluation ------------------------
 // Prints an overview of all commandline arguments.
@@ -83,6 +85,8 @@ void print_help() {
   trace("\n");
   trace(" -c | --commDepth=<level>     - set communication depth to <level>\n");
   trace("                                   (only relevant for OG)\n");
+  trace("\n");
+  trace(" -m | --messagemaximum=<level> - set maximum number of same messages per state to <level>\n");
   trace("\n");
   trace(" -e | --eventsmaximum=<level> - set event to occur at most <level> times\n");
   trace("                                   (only relevant for OG)\n");
@@ -150,11 +154,12 @@ void parse_command_line(int argc, char* argv[]) {
 	options[O_DEBUG] = false;
 	options[O_GRAPH_TYPE] = false;
 	options[O_SHOW_NODES] = false;
-//	options[O_CALC_ALL_STATES] = false;   // standard: man muss -a angeben, um voll
-	options[O_CALC_ALL_STATES] = true;
+	options[O_CALC_ALL_STATES] = false;   // standard: man muss -a angeben, um voll
+//	options[O_CALC_ALL_STATES] = true;
 	options[O_CALC_REDUCED_IG] = false;
 	options[O_OWFN_NAME] = false;
 	options[O_COMM_DEPTH] = false;
+	options[O_MESSAGES_MAX] = false;
 	options[O_EVENT_USE_MAX] = true;
 	options[O_BDD] = false;
 
@@ -166,12 +171,13 @@ void parse_command_line(int argc, char* argv[]) {
 	parameters[P_SHOW_NO_RED_NODES] = true;
 	parameters[P_SHOW_EMPTY_NODE] = false;
 	parameters[P_SHOW_STATES_PER_NODE] = false;
-//	parameters[P_CALC_ALL_STATES] = false;   // standard: man muss -a angeben, um voll
-	parameters[P_CALC_ALL_STATES] = true;
+	parameters[P_CALC_ALL_STATES] = false;   // standard: man muss -a angeben, um voll
+//	parameters[P_CALC_ALL_STATES] = true;
 	parameters[P_CALC_REDUCED_IG] = false;
 
 	bdd_reordermethod = 1;
 
+	messages_manual = 1;
 	events_manual = 1;
 	commDepth_manual = 1;
 	
@@ -234,6 +240,16 @@ void parse_command_line(int argc, char* argv[]) {
 		      	} else {
 					throw Exception(OPTION_MISMATCH,
 						"Please enter valid communication depth\n",
+						"Type " + progname + " -h for more information.\n");
+			    }
+	          	break;
+	      	case 'm':
+		      	if (optarg != NULL) {
+		        	options[O_MESSAGES_MAX] = true;  // <- default is true
+		        	messages_manual = atoi(optarg);
+		      	} else {
+					throw Exception(OPTION_MISMATCH,
+						"Please enter valid maximal number for same messages per state\n",
 						"Type " + progname + " -h for more information.\n");
 			    }
 	          	break;

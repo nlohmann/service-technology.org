@@ -18,6 +18,7 @@ typedef enum
 	O_OWFN_NAME,
 	O_COMM_DEPTH,
 	O_EVENT_USE_MAX,
+	O_MESSAGES_MAX,
 	O_BDD
 } possibleOptions;
 
@@ -45,6 +46,7 @@ extern std::map<possibleParameters, bool> parameters;
 
 extern char * netfile;
 extern int commDepth_manual;
+extern int messages_manual;
 extern int events_manual;
 extern int bdd_reordermethod;
 

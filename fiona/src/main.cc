@@ -150,14 +150,14 @@ int main(int argc, char ** argv) {
 	        PN->commDepth = commDepth_manual;
 	    }
 	
-	    if (options[O_EVENT_USE_MAX] = true) {
+	    if (options[O_EVENT_USE_MAX] == true) {
 			if (PN->getCommDepth() > events_manual * (PN->placeInputCnt + PN->placeOutputCnt)) {
-				trace(TRACE_0, "commDepth is set too high\n");
+				trace(TRACE_0, "commDepth is set too high ... adjusting it\n");
 				PN->commDepth = events_manual * (PN->placeInputCnt + PN->placeOutputCnt);
 			}
 	    }
 	    
-	    if (options[O_EVENT_USE_MAX] = true) {
+	    if (options[O_EVENT_USE_MAX] == true) {
 			if (PN->getCommDepth() < events_manual) {
 				trace(TRACE_0, "number of events to be used is set too high\n");
 				events_manual = PN->commDepth;
@@ -179,7 +179,10 @@ int main(int argc, char ** argv) {
         operatingGuidelines * graph = new operatingGuidelines(PN);
         trace(TRACE_0, "building the operating guideline...\n");
         seconds = time (NULL);
-        graph->buildGraph();                    // build operating guideline
+
+        graph->calculateRootNode();	// creates the root node and calculates its reachability graph (set of states)
+		graph->buildGraph(graph->getRoot()); // build operating guideline
+		
         seconds2 = time (NULL);
         trace(TRACE_0, "building the operating guideline finished.\n");
 

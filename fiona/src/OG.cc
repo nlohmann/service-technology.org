@@ -27,13 +27,6 @@ operatingGuidelines::~operatingGuidelines() {
 	  }
 }
 
-//! \fn void operatingGuidelines::buildGraph()
-//! \brief builds the graph starting with the root node
-void operatingGuidelines::buildGraph() {
-	buildGraph(root);
-}
-
-
 //! \fn void operatingGuidelines::buildGraph(vertex * currentNode)
 //! \param currentNode current node of the graph
 //! \brief builds up the graph recursively
@@ -50,7 +43,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 
 	// get the annotation of the node (CNF)
 	computeCNF(currentNode);					// calculate CNF of this node
-	
+
 	if (terminateBuildingGraph(currentNode)) {
 		string color;
 		
@@ -63,6 +56,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 		}
 
 		trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + " (leaf)\n");		
+		
 		return;
 	}
 	
@@ -75,16 +69,6 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 		trace(TRACE_3, "\t\t\t\t    sending event: !");
 		trace(TRACE_3, string(PN->inputPlacesArray[i]->name) + "\n");
 		
-		// hack per command line option until static analysis gives enough information
-	    if (options[O_EVENT_USE_MAX] == false) {
-	    	// no information means that every event can happen <commDepth> often
-		    if (options[O_COMM_DEPTH] == true) {
-		    	events_manual = commDepth_manual;
-		    } else {
-		    	events_manual = PN->commDepth;
-		    }
-	    }
-	    
 		if (currentNode->eventsUsed[i] < events_manual){
 			
 			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
@@ -95,16 +79,17 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 			trace(TRACE_5, "calculating successor states succeeded\n");
 
 			if (AddVertex (v, i, sending)) {
+				
 				buildGraph(v);				// going down with sending event...
 
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 
-				analyseNode(currentNode, false);
+//				analyseNode(currentNode, false);
 				trace(TRACE_5, "node analysed\n");
 
 				actualDepth--; 
 			}
-		} // end of hack
+		}
 		i++;
 	}
 
@@ -116,16 +101,6 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 
 		trace(TRACE_3, "\t\t\t\t  receiving event: ?");
 		trace(TRACE_3, string(PN->outputPlacesArray[i]->name) + "\n");
-		
-		// hack per command line option until static analysis gives enough information
-	    if (options[O_EVENT_USE_MAX] == false) {
-	    	// no information means that every event can happen <commDepth> often
-		    if (options[O_COMM_DEPTH] == true) {
-		    	events_manual = commDepth_manual;
-		    } else {
-		    	events_manual = PN->commDepth;
-		    }
-	    }
 	    
 		if (currentNode->eventsUsed[i + PN->placeInputCnt] < events_manual) {
 				
@@ -137,6 +112,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 			trace(TRACE_5, "calculating successor states succeeded\n");
 			
 			if (AddVertex (v, i, receiving)) {
+
 				buildGraph(v);				// going down with receiving event...
 
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
@@ -146,7 +122,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 
 				actualDepth--;
 			}
-		} // end of hack
+		} 
 		i++;	
 	}
 
@@ -182,13 +158,6 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 		}
 	}
 */
-
-//
-//	if (currentNode->getColor() == RED) {
-//		trace(TRACE_1, "\t\t\t\t so it was deleted\n");
-//		setOfVertices.erase(currentNode);		
-//		delete currentNode;
-//	}
 }
 
 //! \fn void operatingGuidelines::computeCNF(vertex * node)

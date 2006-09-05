@@ -22,9 +22,6 @@ communicationGraph::communicationGraph(oWFN * _PN) :
     numberOfStatesAllNodes(0) {
 
     PN = _PN;
-
-    // get the root node
-    calculateRootNode();
 }
 
 //! \fn communicationGraph::~communicationGraph()
@@ -65,21 +62,21 @@ unsigned int communicationGraph::getNumberOfVertices () const {
 void communicationGraph::calculateRootNode() {
     trace(TRACE_5, "void reachGraph::calculateRootNode(): start\n");
 
-    // initialize graph => calcualte root node
-    vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);
+    // initialize graph => calculate root node
+    root = new vertex(PN->placeInputCnt + PN->placeOutputCnt);
 
     // calc the reachable states from that marking
     if (parameters[P_CALC_ALL_STATES]) {
-        PN->calculateReachableStatesFull(v, true);
+        PN->calculateReachableStatesFull(root, true);
     } else {
-        PN->calculateReachableStatesInputEvent(v, true);
+        PN->calculateReachableStatesInputEvent(root, true);
     }
 
-    root = v;
-    numberOfVertices++;
     currentVertex = root;
 
     numberOfStatesAllNodes += root->reachGraphStateSet.size();
+    
+	numberOfVertices++;
 
     trace(TRACE_5, "void reachGraph::calculateRootNode(): end\n");
 }

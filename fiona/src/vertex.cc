@@ -86,7 +86,7 @@ void vertex::addSuccessorNode(graphEdge * edge) {
 //! \param s pointer to the state that is to be added to this node
 //! \brief adds the state s to the list of states
 bool vertex::addState(State * s) {
-	pair<StateSet::iterator, bool> result = setOfStates.insert(s);
+	pair<StateSet::iterator, bool> result = reachGraphStateSet.insert(s);
 
     return result.second;       // returns whether the element got inserted (true) or not (false)
 	 
@@ -235,7 +235,7 @@ int vertex::getNumberOfDeadlocks() {
 	int count = 0;
 	
 	// iterate over all states of the current node 
-	for (iter = setOfStates.begin(); iter != setOfStates.end(); iter++) {
+	for (iter = reachGraphStateSet.begin(); iter != reachGraphStateSet.end(); iter++) {
 		
 		if ((*iter)->type == DEADLOCK) {	// state is a DEADLOCK, so count it
 			count++;
@@ -255,7 +255,7 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
     trace(TRACE_2, intToString(numberOfVertex) + ": ");
 
     if (color != RED) {          // red nodes stay red forever
-        if (setOfStates.size() == 0) {
+        if (reachGraphStateSet.size() == 0) {
             // we analyse an empty node; it becomes blue
             color = BLUE;
             trace(TRACE_2, "node analysed blue (empty node)");
@@ -367,7 +367,7 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
 //! \param right right hand vertex
 //! \brief implements the operator < by comparing the states of the two vertices
 bool operator < (vertex const& left, vertex const& right) {
-    return (left.setOfStates < right.setOfStates);	
+    return (left.reachGraphStateSet < right.reachGraphStateSet);	
 }
 
 

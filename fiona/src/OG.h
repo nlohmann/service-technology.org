@@ -11,14 +11,14 @@
 #define OG_H_
 
 #include "mynew.h"
-#include "reachGraph.h"
+#include "communicationGraph.h"
 #include "BddRepresentation.h" 
 
 //#include <map>
 
 class oWFN;
 
-class operatingGuidelines : public reachGraph {
+class operatingGuidelines : public communicationGraph {
 	
 	public:
 		operatingGuidelines(oWFN *);

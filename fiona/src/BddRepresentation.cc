@@ -95,14 +95,14 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 		
 		v->resetIteratingSuccNodes();
 		
-		if (v->setOfStates.size() != 0){
+		if (v->reachGraphStateSet.size() != 0){
 			
 			graphEdge* element;
 			
 			while((element = v->getNextEdge()) != NULL){
 				
 				vertex* vNext = element->getNode();
-				if (vNext != NULL){ //&& vNext->setOfStates.size() != 0 
+				if (vNext != NULL){ //&& vNext->reachGraphStateSet.size() != 0 
 			
 				    //label						
 		            DdNode * label = labelToBddMp(element->getLabel()); 
@@ -166,7 +166,7 @@ void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
 	
 	v->resetIteratingSuccNodes();
 	if (v->getColor() == BLUE) {	
-		if (v->setOfStates.size() != 0){
+		if (v->reachGraphStateSet.size() != 0){
 			visitedNodes[v->getNumber()] = 1;
 			graphEdge* element;
 			
@@ -175,7 +175,7 @@ void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
 				vertex* vNext = element->getNode();
 				
 				if (vNext->getColor() == BLUE && 
-				    vNext->setOfStates.size() != 0 &&
+				    vNext->reachGraphStateSet.size() != 0 &&
 				    vNext != NULL ) {
 				    						
 				    //label						
@@ -271,7 +271,7 @@ DdNode* BddRepresentation::CNFtoBddAnn(CNF* cl){
         if (literal->edge != NULL && 
         	literal->edge->getNode() != NULL && 
         	literal->edge->getNode()->getColor() != RED && 
-        	literal->edge->getNode()->setOfStates.size() > 0) {
+        	literal->edge->getNode()->reachGraphStateSet.size() > 0) {
         			
 //            cout << "search for label " << literal->edge->getLabel() << " ...";
             BddLabel* label = labelTable->lookup(literal->edge->getLabel());

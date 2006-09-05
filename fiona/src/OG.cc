@@ -12,7 +12,7 @@
 //! \fn operatingGuidelines::operatingGuidelines(oWFN * _PN) 
 //! \param _PN
 //! \brief constructor
-operatingGuidelines::operatingGuidelines(oWFN * _PN) : reachGraph(_PN) {
+operatingGuidelines::operatingGuidelines(oWFN * _PN) : communicationGraph(_PN) {
 	  if (options[O_BDD] == true) {
 		unsigned int nbrLabels = PN->placeInputCnt + PN->placeOutputCnt;
 		bdd = new BddRepresentation(root, nbrLabels, (Cudd_ReorderingType)bdd_reordermethod);
@@ -31,7 +31,6 @@ operatingGuidelines::~operatingGuidelines() {
 //! \brief builds the graph starting with the root node
 void operatingGuidelines::buildGraph() {
 	buildGraph(root);
-//	root->deleteRedSuccessorNodes(this);
 }
 
 
@@ -47,12 +46,10 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	trace(TRACE_1, intToString(currentNode->getNumber()) + ", \t current depth: " + intToString(actualDepth) + "\n");
 
 	trace(TRACE_3, "\t number of states in node: ");
-	trace(TRACE_3, intToString(currentNode->setOfStates.size()) + "\n");
+	trace(TRACE_3, intToString(currentNode->reachGraphStateSet.size()) + "\n");
 
 	// get the annotation of the node (CNF)
-//	if (parameters[P_CALC_ALL_STATES]) {
-		computeCNF(currentNode);					// calculate CNF of this node
-//	}
+	computeCNF(currentNode);					// calculate CNF of this node
 	
 	if (terminateBuildingGraph(currentNode)) {
 		string color;
@@ -66,13 +63,6 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 		}
 
 		trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + " (leaf)\n");		
-	
-//		if (currentNode->getColor() == RED) {
-//			setOfVertices.erase(currentNode);
-//			delete currentNode;
-//			trace(TRACE_1, "\t\t\t\t so it was deleted\n");
-//		}
-			
 		return;
 	}
 	
@@ -80,7 +70,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 		
 	trace(TRACE_5, "iterating over inputSet\n");
 	// iterate over all elements of inputSet
-	while (i < PN->placeInputCnt) { // && (currentNode->getColor() != RED)) {
+	while (i < PN->placeInputCnt) { 
 
 		trace(TRACE_3, "\t\t\t\t    sending event: !");
 		trace(TRACE_3, string(PN->inputPlacesArray[i]->name) + "\n");
@@ -109,19 +99,6 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 
-			//	currentNode->deleteRedSuccessorNodes(this);
-				
-//				if (currentNode->getSuccessorNodes() != NULL) {
-//					graphEdge * edgeTmp = currentNode->getSuccessorNodes()->getFirstElement();
-//				
-//					while (edgeTmp) {
-//					//	cout << "successor: " << edgeTmp->getNode()->getNumber() << endl;
-//						edgeTmp = edgeTmp->getNextElement();
-//					}				
-//				} else {
-//					//cout << "no successors!" << endl;	
-//				}
-				
 				analyseNode(currentNode, false);
 				trace(TRACE_5, "node analysed\n");
 
@@ -135,7 +112,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 		
 	trace(TRACE_5, "iterating over outputSet\n");
 	// iterate over all elements of outputSet
-	while (i < PN->placeOutputCnt) { // && (currentNode->getColor() != RED)) {
+	while (i < PN->placeOutputCnt) { 
 
 		trace(TRACE_3, "\t\t\t\t  receiving event: ?");
 		trace(TRACE_3, string(PN->outputPlacesArray[i]->name) + "\n");
@@ -164,7 +141,6 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 
-		//		currentNode->deleteRedSuccessorNodes(this);
 				analyseNode(currentNode, false);
 				trace(TRACE_5, "node analysed\n");
 
@@ -193,7 +169,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	if (options[O_BDD] == true){
 		bdd->addOrDeleteLeavingEdges(currentNode);
 		//	currentNode->resetIteratingSuccNodes();
-		if (currentNode->setOfStates.size() != 0){	 
+		if (currentNode->reachGraphStateSet.size() != 0){	 
 			graphEdge* element;
 			//cout << "currentNode: " << currentNode->getNumber() << "\tdelete node: ";
 			while((element = currentNode->getNextEdge()) != NULL){
@@ -253,8 +229,8 @@ void operatingGuidelines::computeCNF(vertex * node) {
 		}
 	} else {	// no state reduction
 		// iterate over all states of the node
-		for (iter = node->setOfStates.begin();
-			 iter != node->setOfStates.end(); iter++) {
+		for (iter = node->reachGraphStateSet.begin();
+			 iter != node->reachGraphStateSet.end(); iter++) {
 			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {
 				// we just consider the maximal states only
 				

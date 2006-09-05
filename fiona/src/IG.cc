@@ -11,7 +11,7 @@
 //! \fn interactionGraph::interactionGraph(oWFN * _PN) 
 //! \param _PN
 //! \brief constructor
-interactionGraph::interactionGraph(oWFN * _PN) : reachGraph(_PN) {
+interactionGraph::interactionGraph(oWFN * _PN) : communicationGraph(_PN) {
 }
 
 //! \fn interactionGraph::~interactionGraph() 
@@ -50,7 +50,7 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	trace(TRACE_1, intToString(currentNode->getNumber()) + ", \t current depth: " + intToString(actualDepth) + "\n");
 
 	trace(TRACE_3, "\t number of states in node: ");
-	trace(TRACE_3, intToString(currentNode->setOfStates.size()) + "\n");
+	trace(TRACE_3, intToString(currentNode->reachGraphStateSet.size()) + "\n");
 
 	if (terminateBuildingGraph(currentNode)) {
 		string color;
@@ -167,7 +167,7 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 	trace(TRACE_1, intToString(currentNode->getNumber()) + ", \t current depth: " + intToString(actualDepth) + "\n");
 
 	trace(TRACE_3, "\t number of states in node: ");
-	trace(TRACE_3, intToString(currentNode->setOfStates.size()) + "\n");
+	trace(TRACE_3, intToString(currentNode->reachGraphStateSet.size()) + "\n");
 
 	if (terminateBuildingGraph(currentNode)) {
 		string color;
@@ -286,7 +286,7 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 			}
 		}
 	} else {
-		for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
+		for (iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
 	
 	#ifdef DEBUG
 		//cout << "\t state " << PN->printMarking((*iter)->myMarking) << " activates the input events: " << endl;
@@ -368,7 +368,7 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 	bool found = false;
 	bool skip = false;
 	
-	for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
+	for (iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
 
 		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {  // we just consider the maximal states only
 
@@ -510,8 +510,8 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 	
 	setOfMessages inputMessages;	// list of all input messages of the current node
 	
-	for (iter = node->setOfStates.begin(); 
-					iter != node->setOfStates.end(); iter++) {
+	for (iter = node->reachGraphStateSet.begin(); 
+					iter != node->reachGraphStateSet.end(); iter++) {
 
 		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {				// we just consider the maximal states only
 			i = 0;
@@ -584,7 +584,7 @@ void interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, vert
 	StateSet::iterator iter;	
 	
 	// iterate over all states of the current node 
-	for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
+	for (iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
 	
 	
 //		PN->setCurrentMarkingFromState(*iter);		// set the net to the marking of the state being considered
@@ -612,7 +612,7 @@ void interactionGraph::calculateSuccStatesInputReduced(messageMultiSet input, ve
 
 	StateSet::iterator iter;		
 	// iterate over all states of the current node 
-	for (iter = node->setOfStates.begin(); iter != node->setOfStates.end(); iter++) {
+	for (iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
 
 
 #ifdef DEBUG

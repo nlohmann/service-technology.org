@@ -20,7 +20,7 @@
 #include "main.h"
 #include "vertex.h"
 
-#include "reachGraph.h"
+#include "communicationGraph.h"
 
 using namespace std;
 

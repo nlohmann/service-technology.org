@@ -11,11 +11,11 @@
 #define IG_H_
 
 #include "mynew.h"
-#include "reachGraph.h"
+#include "communicationGraph.h"
 
 class oWFN;
 
-class interactionGraph : public reachGraph {
+class interactionGraph : public communicationGraph {
 	public:
 		interactionGraph(oWFN *);
 		~interactionGraph();

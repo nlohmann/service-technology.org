@@ -388,7 +388,7 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 	}	
 
 	if (!storeState && markingPreviousState != NULL && !parameters[P_CALC_ALL_STATES]) {
-		node->setOfStates.erase(currentState);  // remove this state from the node's state list, because it should not be stored
+		node->reachGraphStateSet.erase(currentState);  // remove this state from the node's state list, because it should not be stored
 	}
 
 	visitedStates.insert(currentState);	// remember that we have visited this state
@@ -485,8 +485,8 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal) {
 	// building EG in a node
   	while(CurrentState) {
  
-		if ((n->setOfStates.size() % 1000) == 0) {
-			trace(TRACE_2, "\t current state count: " + intToString(n->setOfStates.size()) + "\n");
+		if ((n->reachGraphStateSet.size() % 1000) == 0) {
+			trace(TRACE_2, "\t current state count: " + intToString(n->reachGraphStateSet.size()) + "\n");
 		}
 	  	
 		// no more transition to fire from current state?
@@ -633,8 +633,8 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	// building EG in a node
   	while(CurrentState) {
  
-		if ((n->setOfStates.size() % 1000) == 0) {
-			trace(TRACE_2, "\t current state count: " + intToString(n->setOfStates.size()) + "\n");
+		if ((n->reachGraphStateSet.size() % 1000) == 0) {
+			trace(TRACE_2, "\t current state count: " + intToString(n->reachGraphStateSet.size()) + "\n");
 		}
 	  	
 		// no more transition to fire from current state?
@@ -728,7 +728,7 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 //! \param listOfStates list containing all reachable states from the current marking (after function is done)
 //! \param minimal the current state is minimal in the vertex
 //! \brief NO REDUCTION! calculate all reachable states from the current marking and store them in the list being passed 
-//! as parameter (== vertex of reachGraph)
+//! as parameter (== vertex of communicationGraph)
 void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 
 	// calculates the EG starting at the current marking
@@ -784,8 +784,8 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 	// building EG in a node
   	while(CurrentState) {
  
-		if ((n->setOfStates.size() % 1000) == 0) {
-			trace(TRACE_2, "\t current state count: " + intToString(n->setOfStates.size()) + "\n");
+		if ((n->reachGraphStateSet.size() % 1000) == 0) {
+			trace(TRACE_2, "\t current state count: " + intToString(n->reachGraphStateSet.size()) + "\n");
 		}
 	  	
 		// no more transition to fire from current state?
@@ -983,7 +983,7 @@ void oWFN::printmarking(unsigned int * marking) {
 //! \brief returns the label of the given marking, that means the label consists of the names of the 
 //! places of the net that have tokens (is a multiset => occurance of name == number of tokens
 //
-// used in dotFile creation (reachGraph::printGraphToDot)
+// used in dotFile creation (communicationGraph::printGraphToDot)
 char * oWFN::printMarking(unsigned int * marking) {
 	bool comma = false;
 

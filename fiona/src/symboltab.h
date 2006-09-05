@@ -2,8 +2,8 @@
 #define SYMBOLTAB_H
 
 #include "mynew.h"
-#include"petriNetNode.h"
-#include"dimensions.h"
+#include "petriNetNode.h"
+#include "dimensions.h"
 #include "owfnPlace.h"
 #include "owfnTransition.h"
 

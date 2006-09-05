@@ -89,7 +89,7 @@ string clause::getClauseString() {
         if (cl->edge != NULL && 
         		cl->edge->getNode() != NULL && 
         		cl->edge->getNode()->getColor() != RED && 
-        		cl->edge->getNode()->setOfStates.size() > 0) {
+        		cl->edge->getNode()->reachGraphStateSet.size() > 0) {
         			
             if (comma) {
                 clauseString += " + ";

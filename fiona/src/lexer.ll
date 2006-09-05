@@ -52,8 +52,8 @@ NOT		 								{ return op_not;}
 \(		 								{ return lpar;}
 \)		 								{ return rpar;}
 [0-9][0-9]*     						{ setlval(); return number; }
-"{"[^\n]*"}"    						{ break; }
-[^,;:()\t \n\{\}][^,;:()\t \n\{\}]*		{ setlval(); return ident; }
+"{"[^\n\r]*"}"    						{ break; }
+[^,;:()\t \n\r\{\}][^,;:()\t \n\r\{\}]*		{ setlval(); return ident; }
 [\n\r]            						{ break; }
 [ \t]           						{ break; }
 .										{ yyerror("lexical error"); }

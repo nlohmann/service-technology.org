@@ -16,7 +16,8 @@ oWFN::oWFN() : arcCnt(0), placeHashValue(0), placeCnt(0),
                placeInputCnt(0), placeOutputCnt(0), transCnt(0),
                transNrEnabled(0), BitVectorSize(0), currentState(0),
                startOfEnabledList(NULL), startOfQuasiEnabledList(NULL),
-               FinalCondition(NULL) {
+               FinalCondition(NULL), filename(NULL)
+{
 	startOfEnabledList = (owfnTransition *) 0;
 
 	unsigned int i;

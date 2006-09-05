@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <map>
+#include <list>
 #include <stdlib.h>
 
 #include "options.h"
@@ -12,6 +13,8 @@
 // some file names and pointers
 
 char * netfile;
+std::list<char*> netfiles; 
+
 int commDepth_manual;
 int events_manual;
 int messages_manual;
@@ -212,7 +215,8 @@ void parse_command_line(int argc, char* argv[]) {
 	      	case 'n':
 		      	options[O_OWFN_NAME] = true;
 		      	if (optarg != NULL) {
-		        	netfile = optarg;
+		        	// netfile = optarg;
+				netfiles.push_back(optarg);
 		      	} else {
 					throw Exception(OPTION_MISMATCH,
 						"missing net file!\n",

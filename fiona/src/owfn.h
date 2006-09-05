@@ -48,6 +48,8 @@ class oWFN  {
 		oWFN();
 		~oWFN();
 		void RemoveGraph();
+
+		char * filename;
 		
 		owfnTransition ** quasiFirelist();
 

@@ -642,6 +642,7 @@ analysisResult communicationGraph::analyseNode(vertex * node, bool finalAnalysis
         if (node->reachGraphStateSet.size() == 0) {
             // we analyse an empty node; it becomes blue
             if (node->getColor() != BLUE) {
+                // not yet counted
                 numberBlueNodes++;
             }
             node->setColor(BLUE);

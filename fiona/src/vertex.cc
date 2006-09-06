@@ -249,9 +249,11 @@ int vertex::getNumberOfDeadlocks() {
 analysisResult vertex::analyseNode(bool finalAnalysis) {
 
     trace(TRACE_2, "\t\t\t analysing node ");
+
     if (finalAnalysis) {
     	trace(TRACE_2, "(final analysis)");
     }
+
     trace(TRACE_2, intToString(numberOfVertex) + ": ");
 
     if (color != RED) {          // red nodes stay red forever

@@ -181,12 +181,12 @@ void operatingGuidelines::computeCNF(vertex * node) {
 				// get the marking of this state
 				(*iter)->decodeShowOnly(PN);
 							
+				// get the activated output events
 				for (int i = 0; i < PN->placeOutputCnt; i++) {
-					// get the activated output events
 					if (PN->CurrentMarking[PN->outputPlacesArray[i]->index] > 0) {
 						cl->addLiteral(PN->outputPlacesArray[i]->name);	
-					}	
-				}			
+					}
+				}
 				
 				// get all the input events
 				for (int i = 0; i < PN->placeInputCnt; i++) {
@@ -197,6 +197,7 @@ void operatingGuidelines::computeCNF(vertex * node) {
 			}
 		}
 	} else {	// no state reduction
+
 		// iterate over all states of the node
 		for (iter = node->reachGraphStateSet.begin();
 			 iter != node->reachGraphStateSet.end(); iter++) {
@@ -208,12 +209,12 @@ void operatingGuidelines::computeCNF(vertex * node) {
 				// get the marking of this state
 				(*iter)->decodeShowOnly(PN);
 							
+				// get the activated output events
 				for (int i = 0; i < PN->placeOutputCnt; i++) {
-					// get the activated output events
 					if (PN->CurrentMarking[PN->outputPlacesArray[i]->index] > 0) {
 						cl->addLiteral(PN->outputPlacesArray[i]->name);	
-					}	
-				}			
+					}
+				}
 				
 				// get all the input events
 				for (int i = 0; i < PN->placeInputCnt; i++) {
@@ -222,8 +223,27 @@ void operatingGuidelines::computeCNF(vertex * node) {
 				
 				node->addClause(cl, (*iter)->type == FINALSTATE);
 			}
-		}
+			
 
+			// test marking of current state for violation of message bound k
+			if (options[O_MESSAGES_MAX] == true) {      // k-message-bounded set
+
+				// get the marking of this state
+				(*iter)->decodeShowOnly(PN);
+
+				for (int i = 0; i < PN->placeInputCnt; i++) {
+					if (PN->CurrentMarking[PN->inputPlacesArray[i]->index] > messages_manual) {
+						cout << "\t interface place violating bound was found!" << endl;
+					}
+				}
+				for (int i = 0; i < PN->placeOutputCnt; i++) {
+					if (PN->CurrentMarking[PN->outputPlacesArray[i]->index] > messages_manual) {
+						cout << "\t interface place violating bound was found!" << endl;
+					}
+				}
+
+			}
+		}
 	}
 		
 	PN->setOfStatesTemp.clear();

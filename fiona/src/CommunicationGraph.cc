@@ -282,20 +282,36 @@ int communicationGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType 
 
 
 //! \fn void communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * node)
-//! \param input set of input messages
+//! \param input the sending event currently performed
 //! \param node the node for which the successor states are to be calculated
-//! \brief calculates the set of successor states in case of an input message
-void communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * node, vertex * newNode) {
+//! \return true iff message bound violation occured
+//! \brief calculates the set of successor states in case of an input message (sending event)
+bool communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * node, vertex * newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : start\n");
 
+    bool messageboundviolation = false;
+    
     StateSet::iterator iter;              // iterator over the state set's elements
   	PN->setOfStatesTemp.clear();
   	PN->visitedStates.clear();
 
     for (iter = node->reachGraphStateSet.begin();
          iter != node->reachGraphStateSet.end(); iter++) {
+
+		// get the marking of this state
 		(*iter)->decode(PN);
 		
+		// test for each marking of current node if message bound k reached
+		// then supress new sending event
+		if (options[O_MESSAGES_MAX] == true) {      // k-message-bounded set
+			if (PN->CurrentMarking[PN->Places[input]->index] == messages_manual) {
+				// adding input message to state already using full message bound
+				trace(TRACE_5, "violation found\n");
+			    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
+				return true;
+			}
+		}
+        
         PN->addInputMessage(input);                 // add the input message to the current marking
         
         if (parameters[P_CALC_ALL_STATES]) {
@@ -303,14 +319,17 @@ void communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * n
         } else {
             PN->calculateReachableStatesInputEvent(newNode, false);       // calc the reachable states from that marking
         }
-    }
+	}
     
+	trace(TRACE_5, "no violation found\n");
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
+    
+    return false;
 }
 
 
 //! \fn void communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node)
-//! \param input set of input messages
+//! \param input (multi) set of input messages
 //! \param node the node for which the successor states are to be calculated
 //! \brief calculates the set of successor states in case of an input message
 void communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, vertex * newNode) {

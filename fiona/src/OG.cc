@@ -75,19 +75,29 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 			currentVertex = currentNode;
 			
 			trace(TRACE_5, "calculating successor states\n");
+
+			bool messageboundviolation =
 			calculateSuccStatesInput(PN->inputPlacesArray[i]->index, currentNode, v);
-			trace(TRACE_5, "calculating successor states succeeded\n");
 
-			if (AddVertex (v, i, sending)) {
-				
-				buildGraph(v);				// going down with sending event...
+			if (messageboundviolation) {
+				trace(TRACE_0, "\t message bound violation detected (sending event ");
+				trace(TRACE_0, PN->inputPlacesArray[i]->name);
+				trace(TRACE_0, ", node " + intToString(currentNode->getNumber()) + ")\n");
+			} else {
 
-				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
-
-//				analyseNode(currentNode, false);
-				trace(TRACE_5, "node analysed\n");
-
-				actualDepth--; 
+				trace(TRACE_5, "calculating successor states succeeded\n");
+	
+				if (AddVertex (v, i, sending)) {
+					
+					buildGraph(v);				// going down with sending event...
+	
+					trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
+	
+//					analyseNode(currentNode, false);
+					trace(TRACE_5, "node analysed\n");
+	
+					actualDepth--;
+				}
 			}
 		}
 		i++;
@@ -222,26 +232,6 @@ void operatingGuidelines::computeCNF(vertex * node) {
 				}
 				
 				node->addClause(cl, (*iter)->type == FINALSTATE);
-			}
-			
-
-			// test marking of current state for violation of message bound k
-			if (options[O_MESSAGES_MAX] == true) {      // k-message-bounded set
-
-				// get the marking of this state
-				(*iter)->decodeShowOnly(PN);
-
-				for (int i = 0; i < PN->placeInputCnt; i++) {
-					if (PN->CurrentMarking[PN->inputPlacesArray[i]->index] > messages_manual) {
-						cout << "\t interface place violating bound was found!" << endl;
-					}
-				}
-				for (int i = 0; i < PN->placeOutputCnt; i++) {
-					if (PN->CurrentMarking[PN->outputPlacesArray[i]->index] > messages_manual) {
-						cout << "\t interface place violating bound was found!" << endl;
-					}
-				}
-
 			}
 		}
 	}

@@ -102,11 +102,13 @@ class oWFN  {
 		void addPlace(unsigned int, owfnPlace *);
 		void addTransition(unsigned int, owfnTransition *);
 
-		void addStateToList(vertex *, State *, bool);
+//		void addStateToList(vertex *, State *, bool);
 		void addSuccStatesToList(vertex *, State *);
 		
 		void addStateToList(vertex *, State *);
 		
+
+		void checkMessageBound(vertex *);
 		void computeAnnotationOutput(vertex *, State *);
 		void computeAnnotationInput(vertex *, State *, unsigned int *, bool);
 		

@@ -15,6 +15,7 @@
 char * netfile;
 std::list<char*> netfiles; 
 
+
 int commDepth_manual;
 int events_manual;
 int messages_manual;

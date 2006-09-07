@@ -26,7 +26,7 @@
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes by: \$Author: weinberg $
+ *          - last changes by: \$Author: gierds $
  *          
  * \date
  *          - created:
@@ -69,9 +69,15 @@ State::State() :
 //! \brief destructor
 // inline rausgenommen!
 State::~State() {
-  if(firelist) delete [] firelist;
-  if(quasiFirelist) delete [] quasiFirelist;
-  if(succ) delete [] succ;
+    if(firelist) {
+	delete [] firelist;
+    }
+    if(quasiFirelist) {
+	delete [] quasiFirelist;
+    }
+    if(succ) {
+	delete [] succ;
+    }
 }
 
 //! \fn void State::decode(oWFN * PN)

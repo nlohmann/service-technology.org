@@ -252,7 +252,11 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 				
 				clause * cl = new clause();			// create a new clause for this particular state
 				(*iter)->decode(PN);
-				
+			    
+				if ((*iter)->quasiFirelist) {
+				    delete [] (*iter)->quasiFirelist;
+				    (*iter)->quasiFirelist = NULL;
+				}	    
 				(*iter)->quasiFirelist = PN->quasiFirelist();
 				
 				i = 0;

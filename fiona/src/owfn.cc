@@ -263,6 +263,7 @@ owfnTransition ** oWFN::quasiFirelist() {
 	}
 	tl[i] = (owfnTransition *) 0;
 	CardQuasiFireList = i;
+
 	return tl;
 }
 
@@ -484,7 +485,11 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal) {
 	CurrentState->firelist = firelist();
 	CurrentState->CardFireList = CardFireList;
 	if (parameters[P_IG]) {
-  		CurrentState->quasiFirelist = quasiFirelist();
+	    if (CurrentState->quasiFirelist) {
+		delete [] CurrentState->quasiFirelist;
+		CurrentState->quasiFirelist = NULL;
+	    }
+  	    CurrentState->quasiFirelist = quasiFirelist();
 	}
 
 	CurrentState->current = 0;
@@ -549,7 +554,11 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal) {
       			NewState->firelist = firelist();
 	      		NewState->CardFireList = CardFireList;
 	      		if (parameters[P_IG]) {
-		      		NewState->quasiFirelist = quasiFirelist();
+			    if (NewState->quasiFirelist) {
+				delete [] NewState->quasiFirelist;
+				NewState->quasiFirelist = NULL;
+			    }
+			    NewState->quasiFirelist = quasiFirelist();
 	      		}
 	      		NewState->current = 0;
 	      		NewState->parent = CurrentState;
@@ -632,7 +641,11 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	CurrentState->firelist = firelist();
 	CurrentState->CardFireList = CardFireList;
 	if (parameters[P_IG]) {
-  		CurrentState->quasiFirelist = quasiFirelist();
+	    if (CurrentState->quasiFirelist) {
+		delete [] CurrentState->quasiFirelist;
+		CurrentState->quasiFirelist = NULL;
+	    }
+  	    CurrentState->quasiFirelist = quasiFirelist();
 	}
 
 	CurrentState->current = 0;
@@ -703,7 +716,11 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
       			NewState->firelist = firelist();
 	      		NewState->CardFireList = CardFireList;
 	      		if (parameters[P_IG]) {
-		      		NewState->quasiFirelist = quasiFirelist();
+			    if (NewState->quasiFirelist) {
+				delete [] NewState->quasiFirelist;
+				NewState->quasiFirelist = NULL;
+			    }
+			    NewState->quasiFirelist = quasiFirelist();
 	      		}
 	      		NewState->current = 0;
 	      		NewState->parent = CurrentState;
@@ -786,7 +803,11 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 	CurrentState->firelist = firelist();
 	CurrentState->CardFireList = CardFireList;
 	if (parameters[P_IG]) {
-  		CurrentState->quasiFirelist = quasiFirelist();
+	    if (CurrentState->quasiFirelist) {
+		delete [] CurrentState->quasiFirelist;
+		CurrentState->quasiFirelist = NULL;
+	    }
+  	    CurrentState->quasiFirelist = quasiFirelist();
 	}
 
 	CurrentState->current = 0;
@@ -857,7 +878,11 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
       			NewState->firelist = firelist();
 	      		NewState->CardFireList = CardFireList;
 	      		if (parameters[P_IG]) {
-		      		NewState->quasiFirelist = quasiFirelist();
+			    if (NewState->quasiFirelist) {
+				delete [] NewState->quasiFirelist;
+				NewState->quasiFirelist = NULL;
+			    }
+			    NewState->quasiFirelist = quasiFirelist();
 	      		}
 	      		NewState->current = 0;
 	      		NewState->parent = CurrentState;

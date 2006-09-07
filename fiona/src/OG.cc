@@ -83,6 +83,8 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 				trace(TRACE_0, "\t message bound violation detected (sending event ");
 				trace(TRACE_0, PN->inputPlacesArray[i]->name);
 				trace(TRACE_0, ", node " + intToString(currentNode->getNumber()) + ")\n");
+				
+				delete v;
 			} else {
 
 				trace(TRACE_5, "calculating successor states succeeded\n");

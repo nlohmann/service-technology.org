@@ -77,10 +77,15 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 		vertex * v = new vertex();	// create new vertex of the graph
 		currentVertex = currentNode;
 		
-		calculateSuccStatesInput(*iter, currentNode, v);
+		bool messageboundviolation = calculateSuccStatesInput(*iter, currentNode, v);
 		trace(TRACE_3, "\n");
 		
-		if (AddVertex (v, *iter, sending)) {
+		if (messageboundviolation) {
+			trace(TRACE_0, ", node " + intToString(currentNode->getNumber()) + ")\n");
+			
+			delete v;
+		} else {		
+			if (AddVertex (v, *iter, sending)) {
 
 #ifdef LOOP
 	cout << "calc next node? [y,n]" << endl;
@@ -88,14 +93,15 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	if (a == 'y') {
 #endif
 			
-			buildGraph(v);
-			trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
-			analyseNode(currentNode, false);
-			trace(TRACE_5, "node analysed\n");
+				buildGraph(v);
+				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
+				analyseNode(currentNode, false);
+				trace(TRACE_5, "node analysed\n");
 #ifdef LOOP
 	}
 #endif	
 
+			}
 		}
 	}
 	
@@ -110,22 +116,22 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 		trace(TRACE_3, "\n");
 		
 		if (AddVertex (v, *iter, receiving)) {
-
+	
 #ifdef LOOP
-	cout << "calc next node? [y,n]" << endl;
-	char a = getchar();
-	if (a == 'y') {
+		cout << "calc next node? [y,n]" << endl;
+		char a = getchar();
+		if (a == 'y') {
 #endif
 			buildGraph(v);
 			trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 			analyseNode(currentNode, false);
 			trace(TRACE_5, "node analysed\n");
-
+	
 #ifdef LOOP
-	}
+		}
 #endif
-
-		}	
+	
+		}
 	}	
 		
 	analyseNode(currentNode, true);

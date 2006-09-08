@@ -332,7 +332,7 @@ bool communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * n
 //! \param input (multi) set of input messages
 //! \param node the node for which the successor states are to be calculated
 //! \brief calculates the set of successor states in case of an input message
-void communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, vertex * newNode) {
+bool communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, vertex * newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node) : start\n");
 
     StateSet::iterator iter;              // iterator over the stateList's elements
@@ -343,6 +343,21 @@ void communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex 
     for (iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
         (*iter)->decode(PN);
         
+		// test for each marking of current node if message bound k reached
+		// then supress new sending event
+		if (options[O_MESSAGES_MAX] == true) {      // k-message-bounded set
+			// iterate over the set of input messages
+			for (messageMultiSet::iterator iter = input.begin(); iter != input.end(); iter++) {
+				if (PN->CurrentMarking[PN->Places[*iter]->index] == messages_manual) {
+					// adding input message to state already using full message bound
+					trace(TRACE_0, "\t message bound violation detected (sending event)");
+					trace(TRACE_0, PN->Places[*iter]->name);
+				    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
+					return true;
+				}
+			}
+		}        
+        
         PN->addInputMessage(input);                 // add the input message to the current marking
         if (parameters[P_CALC_ALL_STATES]) {
             PN->calculateReachableStatesFull(newNode, false);   // calc the reachable states from that marking
@@ -352,6 +367,7 @@ void communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex 
     }
     
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node) : end\n");
+	return false;
 }
 
 //! \fn void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex * node)

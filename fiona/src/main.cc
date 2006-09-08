@@ -187,7 +187,7 @@ int main(int argc, char ** argv) {
 			trace(TRACE_0, " (including " + intToString(PN->getInputPlaceCnt()) + " input places, " + intToString(PN->getOutputPlaceCnt()) + " output places)\n");
 			trace(TRACE_0, "transitions: " + intToString(PN->getTransitionCnt()) + "\n\n");
 		
-			if (parameters[P_OG]) {
+	//		if (parameters[P_OG]) {
 				// adjust commDepth and events_manual
 	
 				if (options[O_COMM_DEPTH] == true) {
@@ -216,7 +216,7 @@ int main(int argc, char ** argv) {
 				if (options[O_EVENT_USE_MAX] == true) {
 					trace(TRACE_0, "considering each event max. " + intToString(events_manual) + " times\n\n");
 				}
-			}
+	//		}
 	
 			// ------------------- start computation -------------------------
 			time_t seconds, seconds2;

@@ -105,7 +105,7 @@ public:
     bool calculateSuccStatesInput(unsigned int, vertex *, vertex *);
     void calculateSuccStatesOutput(unsigned int, vertex *, vertex *);
 
-    void calculateSuccStatesInput(messageMultiSet, vertex *, vertex *);
+    bool calculateSuccStatesInput(messageMultiSet, vertex *, vertex *);
     void calculateSuccStatesOutput(messageMultiSet, vertex *, vertex *);
 
     void printGraphToDot(vertex * v, fstream& os, bool[]);

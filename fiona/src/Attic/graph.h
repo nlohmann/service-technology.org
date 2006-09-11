@@ -51,7 +51,6 @@ inline unsigned int bitstoint(unsigned char * bytepos, int bitpos, int nrbits) {
 	return result;
 }
 */
-
-
 	
 #endif
+

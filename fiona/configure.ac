@@ -4,7 +4,7 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT(Fiona, 1.0, weinberg@informatik.hu-berlin.de, fiona)
-AC_REVISION($Revision: 1.11 $)
+AC_REVISION($Revision: 1.12 $)
 
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/fiona.h)
@@ -86,24 +86,24 @@ echo
 
 AC_MSG_NOTICE([Creating Makefile include in order to build cudd package])
 # create Makefile include for cudd package
-echo "# created by configure script"  > cudd/Makefile.inc
-echo				      >> cudd/Makefile.inc
-echo "CPP = $CXX"		      >> cudd/Makefile.inc
-echo "CC  = $CC"		      >> cudd/Makefile.inc
-echo                                  >> cudd/Makefile.inc
-echo "RANLIB = $RANLIB"		      >> cudd/Makefile.inc
-echo                                  >> cudd/Makefile.inc
+echo "# created by configure script"  > $srcdir/cudd/Makefile.inc
+echo				      >> $srcdir/cudd/Makefile.inc
+echo "CPP = $CXX"		      >> $srcdir/cudd/Makefile.inc
+echo "CC  = $CC"		      >> $srcdir/cudd/Makefile.inc
+echo                                  >> $srcdir/cudd/Makefile.inc
+echo "RANLIB = $RANLIB"		      >> $srcdir/cudd/Makefile.inc
+echo                                  >> $srcdir/cudd/Makefile.inc
 case `uname -s` in
-  Linux)    echo "XCFLAGS = -march=`uname -m` -malign-double -DHAVE_IEEE_754 -DBSD" >> cudd/Makefile.inc ;;
-  SunOS)    echo "XCFLAGS = -mcpu=ultrasparc  -DHAVE_IEEE_754 -DUNIX100 -DEPD_BIG_ENDIAN" >> cudd/Makefile.inc;;
-  CYGWIN*)  echo "XCFLAGS = -march=`uname -m` -malign-double -DHAVE_IEEE_754 -DHAVE_GETRLIMIT=0 -DRLIMIT_DATA_DEFAULT=67108864" >> cudd/Makefile.inc;;
-#  Darwin)   echo "XCFLAGS = -m`uname -p` -DBSD -DHAVE_IEEE_754 -DEPD_BIG_ENDIAN -O3 -qstrict" >> cudd/Makefile.inc ;;
+  Linux)    echo "XCFLAGS = -march=`uname -m` -malign-double -DHAVE_IEEE_754 -DBSD" >> $srcdir/cudd/Makefile.inc ;;
+  SunOS)    echo "XCFLAGS = -mcpu=ultrasparc  -DHAVE_IEEE_754 -DUNIX100 -DEPD_BIG_ENDIAN" >> $srcdir/cudd/Makefile.inc;;
+  CYGWIN*)  echo "XCFLAGS = -march=`uname -m` -malign-double -DHAVE_IEEE_754 -DHAVE_GETRLIMIT=0 -DRLIMIT_DATA_DEFAULT=67108864" >> $srcdir/cudd/Makefile.inc;;
+#  Darwin)   echo "XCFLAGS = -m`uname -p` -DBSD -DHAVE_IEEE_754 -DEPD_BIG_ENDIAN -O3 -qstrict" >> $srcdir/cudd/Makefile.inc ;;
   *) ;;
 esac
-echo                                  >> cudd/Makefile.inc
+echo                                  >> $srcdir/cudd/Makefile.inc
 
 echo
-echo "Now run \"cd cudd; make; cd obj; make; cd ../..\" for building cudd package."
+echo "Now run \"pushd $srcdir/cudd; make; cd obj; make; popd\" for building cudd package."
 echo "Then you can call \"make\" to build fiona."
 echo
 

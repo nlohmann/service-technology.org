@@ -19,15 +19,15 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006-08-28 17:15:25 $ by $Author: reinert $.
-# Version $Revision: 1.2 $
+# File last changed $Date: 2006-09-11 09:45:56 $ by $Author: reinert $.
+# Version $Revision: 1.3 $
 
 SUBDIRS = src tests
 
 .PHONY: binarydistreadme
 
 # all files that require the permission to execute
-SHELLSCRIPTS = tests/testSequenceSuite
+SHELLSCRIPTS = tests/testSequenceSuite tests/testSequenceSuite2
 
 # delete all files that can be created by other files
 hu-prepare: maintainer-clean

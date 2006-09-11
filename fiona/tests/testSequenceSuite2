@@ -22,8 +22,9 @@
 ############################################################################
 
 DIR=$testdir/sequence_suite
+FIONA=fiona
 
-fiona.exe --net=$DIR/sequence5.owfn -a -b 4 --graphtype=OG
+$FIONA --net=$DIR/sequence5.owfn -a -b 4 --graphtype=OG
 result5=$?
 
 if test \( $result5 -eq 0 \) -a \

@@ -22,59 +22,60 @@
 ############################################################################
 
 DIR=$testdir/sequence_suite
+FIONA=fiona
 
-fiona.exe --net=$DIR/sequence3.owfn -a --graphtype=IG
+$FIONA --net=$DIR/sequence3.owfn -a --graphtype=IG
 result3=$?
 
-fiona.exe --net=$DIR/sequence4.owfn -a --graphtype=IG
+$FIONA --net=$DIR/sequence4.owfn -a --graphtype=IG
 result4=$?
 
-fiona.exe --net=$DIR/sequence5.owfn -a --graphtype=IG
+$FIONA --net=$DIR/sequence5.owfn -a --graphtype=IG
 result5=$?
 
-fiona.exe --net=$DIR/sequence6.owfn -a --graphtype=IG
+$FIONA --net=$DIR/sequence6.owfn -a --graphtype=IG
 result6=$?
 
-fiona.exe --net=$DIR/sequence7.owfn -a --graphtype=IG
+$FIONA --net=$DIR/sequence7.owfn -a --graphtype=IG
 result7=$?
 
-fiona.exe --net=$DIR/sequence8.owfn -a --graphtype=IG
+$FIONA --net=$DIR/sequence8.owfn -a --graphtype=IG
 result8=$?
 
-fiona.exe --net=$DIR/sequence9.owfn -a --graphtype=IG
+$FIONA --net=$DIR/sequence9.owfn -a --graphtype=IG
 result9=$?
 
-fiona.exe --net=$DIR/sequence10.owfn -a --graphtype=IG
+$FIONA --net=$DIR/sequence10.owfn -a --graphtype=IG
 result10=$?
 
-fiona.exe --net=$DIR/sequence11.owfn -a --graphtype=IG
+$FIONA --net=$DIR/sequence11.owfn -a --graphtype=IG
 result11=$?
 
-fiona.exe --net=$DIR/sequence12.owfn -a --graphtype=IG
+$FIONA --net=$DIR/sequence12.owfn -a --graphtype=IG
 result12=$?
 
-fiona.exe --net=$DIR/sequence13.owfn -a --graphtype=IG
+$FIONA --net=$DIR/sequence13.owfn -a --graphtype=IG
 result13=$?
 
-fiona.exe --net=$DIR/sequence14.owfn -a --graphtype=IG
+$FIONA --net=$DIR/sequence14.owfn -a --graphtype=IG
 result14=$?
 
-fiona.exe --net=$DIR/sequence15.owfn -a --graphtype=IG
+$FIONA --net=$DIR/sequence15.owfn -a --graphtype=IG
 result15=$?
 
-fiona.exe --net=$DIR/sequence16.owfn -a --graphtype=IG
+$FIONA --net=$DIR/sequence16.owfn -a --graphtype=IG
 result16=$?
 
-fiona.exe --net=$DIR/sequence17.owfn -a --graphtype=IG
+$FIONA --net=$DIR/sequence17.owfn -a --graphtype=IG
 result17=$?
 
-fiona.exe --net=$DIR/sequence18.owfn -a --graphtype=IG
+$FIONA --net=$DIR/sequence18.owfn -a --graphtype=IG
 result18=$?
 
-fiona.exe --net=$DIR/sequence19.owfn -a --graphtype=IG
+$FIONA --net=$DIR/sequence19.owfn -a --graphtype=IG
 result19=$?
 
-fiona.exe --net=$DIR/sequence20.owfn -a --graphtype=IG
+$FIONA --net=$DIR/sequence20.owfn -a --graphtype=IG
 result20=$?
 
 if test \( $result3 -eq 0 -a $result4 -eq 0 -a $result5 -eq 0 -a \

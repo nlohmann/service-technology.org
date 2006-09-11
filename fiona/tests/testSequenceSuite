@@ -24,6 +24,10 @@
 DIR=$testdir/sequence_suite
 FIONA=fiona
 
+#loeschen aller erzeugten Dateien im letzten Durchlauf
+rm $DIR/*.out
+rm $DIR/*.png
+
 $FIONA --net=$DIR/sequence3.owfn -a --graphtype=IG
 result3=$?
 

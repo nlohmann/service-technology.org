@@ -345,8 +345,8 @@ finalmarking:
 ;
 
 
-transitionlist: transition
-| transitionlist transition
+transitionlist: transitionlist transition
+| /* empty */
 ;
 
 transition: key_transition tname key_consume arclist semicolon key_produce arclist semicolon  {

@@ -16,9 +16,9 @@
   
 //extern char* netfile;  
  
-//! \fn BddRepresentation::BddRepresentation(vertex * root, int nbrLabels, Cudd_ReorderingType heuristic)
+//! \fn BddRepresentation::BddRepresentation(int nbrLabels, Cudd_ReorderingType heuristic)
 //! \brief constructor
-BddRepresentation::BddRepresentation(vertex * root, unsigned int numberOfLabels, Cudd_ReorderingType heuristic){
+BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_ReorderingType heuristic){
 	nbrLabels = numberOfLabels;
 	maxLabelBits = nbrBits(numberOfLabels-1);
 	maxNodeBits = 1;
@@ -41,7 +41,7 @@ BddRepresentation::BddRepresentation(vertex * root, unsigned int numberOfLabels,
     bddAnn = Cudd_Not(Cudd_ReadOne(mgrAnn)); //BDDannotation
     Cudd_Ref(bddAnn); 
      
-    nodeMap.insert(make_pair(root->getNumber(), 0));
+    //nodeMap.insert(make_pair(root->getNumber(), 0));
     
     labelTable = new BddLabelTab(2*nbrLabels);
        
@@ -85,6 +85,74 @@ BddRepresentation::~BddRepresentation(){
     Cudd_Quit(mgrMp);
     
     delete labelTable; 
+}
+
+void BddRepresentation::convertRootNode(vertex* root){
+	nodeMap.insert(make_pair(root->getNumber(), 0)); 
+}
+
+//! \fn void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[])
+//! \brief generate BDD representation
+void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
+	
+	trace(TRACE_5, "BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]): start\n");
+	
+	DdNode * annotation = annotationToBddAnn(v);
+	DdNode* tmp = Cudd_bddOr(mgrAnn, annotation, bddAnn);
+//  if (tmp == NULL) exit(1);
+    Cudd_Ref(tmp);
+    Cudd_RecursiveDeref(mgrAnn, annotation);
+    Cudd_RecursiveDeref(mgrAnn, bddAnn);
+    bddAnn = tmp;	
+	
+	v->resetIteratingSuccNodes();
+	if (v->getColor() == BLUE) {	
+		if (v->reachGraphStateSet.size() != 0){
+			visitedNodes[v->getNumber()] = 1;
+			graphEdge* element;
+			
+			while((element = v->getNextEdge()) != NULL){
+				
+				vertex* vNext = element->getNode();
+				
+				if (vNext->getColor() == BLUE && 
+				    vNext->reachGraphStateSet.size() != 0 &&
+				    vNext != NULL ) {
+				    						
+				    //label						
+		            DdNode * label = labelToBddMp(element->getLabel()); 
+
+		            //nodes		    
+		            DdNode * nodes = nodesToBddMp(v->getNumber(), vNext->getNumber());
+		            
+		            //edge
+		            DdNode * edge = Cudd_bddAnd(mgrMp, label, nodes); 
+//                  if (edge == NULL) exit(1);
+		            Cudd_Ref(edge);
+		            Cudd_RecursiveDeref(mgrMp, label);
+		            Cudd_RecursiveDeref(mgrMp, nodes);
+		            
+/*		            cout << "Kante: " << v->getNumber() << " [" << element->getLabel() << "> "
+		                 << vNext->getNumber() << endl; 
+		            cout << "Kante: " << getBddNumber(v->getNumber()) << " [" << element->getLabel() << "> "
+		                 << getBddNumber(vNext->getNumber()) << " (neu)\n";
+		            Cudd_PrintMinterm(mgrMp, edge);
+		            cout << "--------------------------------\n";
+*/
+		            tmp = Cudd_bddOr(mgrMp, edge, bddMp);
+//                  if (tmp == NULL) exit(1);
+		            Cudd_Ref(tmp);
+		            Cudd_RecursiveDeref(mgrMp, edge);
+		            Cudd_RecursiveDeref(mgrMp, bddMp);
+		            bddMp = tmp;	
+		            if ((vNext != v) && !visitedNodes[vNext->getNumber()]){
+		            	generateRepresentation(vNext, visitedNodes); 
+		            }   
+				}	
+			}//end while
+		}
+	}
+	trace(TRACE_5, "BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]): end\n");	
 }
 
 
@@ -140,8 +208,7 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 			            Cudd_Ref(tmp);
 			            Cudd_RecursiveDeref(mgrMp, edge);
 			            Cudd_RecursiveDeref(mgrMp, bddMp);
-			            bddMp = tmp;	 
-			            
+			            bddMp = tmp;	   
 					}
 				} 
 			}//end while 
@@ -149,70 +216,6 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 		trace(TRACE_5, "BddRepresentation::addOrDeleteLeavingEdges(vertex* v): end\n");
 }
 
-
-//! \fn void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[])
-//! \brief generate BDD representation
-void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
-	
-	trace(TRACE_5, "BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]): start\n");
-	
-	DdNode * annotation = annotationToBddAnn(v);
-	DdNode* tmp = Cudd_bddOr(mgrAnn, annotation, bddAnn);
-//  if (tmp == NULL) exit(1);
-    Cudd_Ref(tmp);
-    Cudd_RecursiveDeref(mgrAnn, annotation);
-    Cudd_RecursiveDeref(mgrAnn, bddAnn);
-    bddAnn = tmp;	
-	
-	v->resetIteratingSuccNodes();
-	if (v->getColor() == BLUE) {	
-		if (v->reachGraphStateSet.size() != 0){
-			visitedNodes[v->getNumber()] = 1;
-			graphEdge* element;
-			
-			while((element = v->getNextEdge()) != NULL){
-				
-				vertex* vNext = element->getNode();
-				
-				if (vNext->getColor() == BLUE && 
-				    vNext->reachGraphStateSet.size() != 0 &&
-				    vNext != NULL ) {
-				    						
-				    //label						
-		            DdNode * label = labelToBddMp(element->getLabel()); 
-
-		            //nodes		    
-		            DdNode * nodes = nodesToBddMp(v->getNumber(), vNext->getNumber());
-		            
-		            //edge
-		            DdNode * edge = Cudd_bddAnd(mgrMp, label, nodes); 
-//                  if (edge == NULL) exit(1);
-		            Cudd_Ref(edge);
-		            Cudd_RecursiveDeref(mgrMp, label);
-		            Cudd_RecursiveDeref(mgrMp, nodes);
-		            
-		       /*   cout << "Kante: " << v->getNumber() << " [" << element->getLabel() << "> "
-		                 << vNext->getNumber() << endl; 
-		            cout << "Kante: " << getBddNumber(v->getNumber()) << " [" << element->getLabel() << "> "
-		                 << getBddNumber(vNext->getNumber()) << " (neu)\n";
-		            Cudd_PrintMinterm(mgrMp, edge);
-		            cout << "--------------------------------\n";
-			*/
-		            tmp = Cudd_bddOr(mgrMp, edge, bddMp);
-//                  if (tmp == NULL) exit(1);
-		            Cudd_Ref(tmp);
-		            Cudd_RecursiveDeref(mgrMp, edge);
-		            Cudd_RecursiveDeref(mgrMp, bddMp);
-		            bddMp = tmp;	
-		            if ((vNext != v) && !visitedNodes[vNext->getNumber()]){
-		            	generateRepresentation(vNext, visitedNodes); 
-		            }   
-				}	
-			}//end while
-		}
-	}
-	trace(TRACE_5, "BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]): end\n");	
-}
 
 //! \fn DdNode*  BddRepresentation::labelToBddMp(char* label)
 //! \brief returns the BDD of a label (given as integer)
@@ -247,48 +250,65 @@ DdNode* BddRepresentation::labelToBddMp(char* label) {
 }
 
 
-DdNode* BddRepresentation::CNFtoBddAnn(CNF* cl){
-	DdNode* tmp;
+//! \fn DdNode* BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2)
+//! \brief returns the BDD of the nodes (given as integer) of an edge
+DdNode* BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2){
 	
-	if (cl == NULL) {		// since there is no clause we can't conclude anything
-		tmp = Cudd_Not(Cudd_ReadOne(mgrAnn));
-		Cudd_Ref(tmp);
-		return tmp;  //"(false)";	
-	}
-	
-	if (cl->isFinalState) {
-		tmp = Cudd_ReadOne(mgrAnn);
-		Cudd_Ref(tmp);
-		return tmp;  //"(true)";
-	}
-
-	DdNode* clause1 = Cudd_Not(Cudd_ReadOne(mgrAnn));
-    Cudd_Ref(clause1);
+	trace(TRACE_5, "BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2): start\n");		   
     
-	clause* literal = cl->cl;  // get the first literal of the clause
-
-    while (literal) {
-        if (literal->edge != NULL && 
-        	literal->edge->getNode() != NULL && 
-        	literal->edge->getNode()->getColor() != RED && 
-        	literal->edge->getNode()->reachGraphStateSet.size() > 0) {
-        			
-//            cout << "search for label " << literal->edge->getLabel() << " ...";
-            BddLabel* label = labelTable->lookup(literal->edge->getLabel());
-            //if (!l) { cout << "  Label not found\n"; exit(1);}
-//            cout << "   found: nbr = " << label->nbr << endl;
-            int i = label->nbr;
-            tmp = Cudd_bddOr(mgrAnn, clause1, Cudd_bddIthVar(mgrAnn,i));
-            Cudd_Ref(tmp);
-    		Cudd_RecursiveDeref(mgrAnn, clause1);
-    		clause1 = tmp;
-        }   	
-    	literal = literal->nextElement;	
+    unsigned int bddNumber1 = getBddNumber(node1);   
+    unsigned int bddNumber2 = getBddNumber(node2);
+    
+	unsigned int max;	
+	if (bddNumber1 > bddNumber2){
+		max = bddNumber1;
+	}else {max = bddNumber2;}
+		
+	//cout << "max: " << max  << "  maxNodeNumber(old): " << maxNodeNumber << endl;
+    
+    if (max > maxNodeNumber){
+    	addBddVars(max);
     }
-      
-//	cout<< "clause: \n"; Cudd_PrintMinterm(mgrAnn, clause1);
-	return clause1; 
+    	
+	BitVector assignment1 = numberToBin(bddNumber1, maxNodeBits);
+	BitVector assignment2 = numberToBin(bddNumber2, maxNodeBits);
+
+    //calculate the BDD for assignment1 and assignment2
+    DdNode* f = Cudd_ReadOne(mgrMp);
+    Cudd_Ref(f);
+    DdNode* tmp;
+    
+    int j;
+    for (int i = 0; i < maxNodeBits; ++i){     //TODO: schleife Absteigend durchlaufen (--i)
+    	assert(j >= 0);
+    	j = maxNodeBits-1-i;
+        if (assignment1[j] == false){
+            tmp = Cudd_bddAnd(mgrMp, Cudd_Not(Cudd_bddIthVar(mgrMp, maxLabelBits+(2*i))), f);
+        }
+        else{
+            tmp = Cudd_bddAnd(mgrMp, Cudd_bddIthVar(mgrMp, maxLabelBits+(2*i)), f);
+        }
+//      if (tmp == NULL) exit(1);        
+        Cudd_Ref(tmp);
+        Cudd_RecursiveDeref(mgrMp, f);
+        f = tmp; 
+        
+        if (assignment2[j] == false){
+            tmp = Cudd_bddAnd(mgrMp, Cudd_Not(Cudd_bddIthVar(mgrMp, maxLabelBits+1+(2*i))), f);
+        }
+        else{
+            tmp = Cudd_bddAnd(mgrMp, Cudd_bddIthVar(mgrMp, maxLabelBits+1+(2*i)), f);
+        }
+//      if (tmp == NULL) exit(1);
+        Cudd_Ref(tmp);
+        Cudd_RecursiveDeref(mgrMp, f);
+        f = tmp;
+        
+    }
+	trace(TRACE_5, "BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2): end\n");		   
+    return (f);
 }
+
 
 DdNode* BddRepresentation::annotationToBddAnn(vertex* v){
 	trace(TRACE_5, "DdNode* BddRepresentation::annotationToBddAnn(vertex * v): start\n");
@@ -358,6 +378,51 @@ DdNode* BddRepresentation::annotationToBddAnn(vertex* v){
 	return annotation;	
 }
 
+
+DdNode* BddRepresentation::CNFtoBddAnn(CNF* cl){
+	DdNode* tmp;
+	
+	if (cl == NULL) {		// since there is no clause we can't conclude anything
+		tmp = Cudd_Not(Cudd_ReadOne(mgrAnn));
+		Cudd_Ref(tmp);
+		return tmp;  //"(false)";	
+	}
+	
+	if (cl->isFinalState) {
+		tmp = Cudd_ReadOne(mgrAnn);
+		Cudd_Ref(tmp);
+		return tmp;  //"(true)";
+	}
+
+	DdNode* clause1 = Cudd_Not(Cudd_ReadOne(mgrAnn));
+    Cudd_Ref(clause1);
+    
+	clause* literal = cl->cl;  // get the first literal of the clause
+
+    while (literal) {
+        if (literal->edge != NULL && 
+        	literal->edge->getNode() != NULL && 
+        	literal->edge->getNode()->getColor() != RED && 
+        	literal->edge->getNode()->reachGraphStateSet.size() > 0) {
+        			
+//            cout << "search for label " << literal->edge->getLabel() << " ...";
+            BddLabel* label = labelTable->lookup(literal->edge->getLabel());
+            //if (!l) { cout << "  Label not found\n"; exit(1);}
+//            cout << "   found: nbr = " << label->nbr << endl;
+            int i = label->nbr;
+            tmp = Cudd_bddOr(mgrAnn, clause1, Cudd_bddIthVar(mgrAnn,i));
+            Cudd_Ref(tmp);
+    		Cudd_RecursiveDeref(mgrAnn, clause1);
+    		clause1 = tmp;
+        }   	
+    	literal = literal->nextElement;	
+    }
+      
+//	cout<< "clause: \n"; Cudd_PrintMinterm(mgrAnn, clause1);
+	return clause1; 
+}
+
+
 //! \fn 
 //! \param 
 //! \brief
@@ -383,64 +448,7 @@ unsigned int BddRepresentation::getBddNumber(unsigned int node){
 }
 
 
-//! \fn DdNode* BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2)
-//! \brief returns the BDD of the nodes (given as integer) of an edge
-DdNode* BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2){
-	
-	trace(TRACE_5, "BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2): start\n");		   
-    
-    unsigned int bddNumber1 = getBddNumber(node1);   
-    unsigned int bddNumber2 = getBddNumber(node2);
-    
-	unsigned int max;	
-	if (bddNumber1 > bddNumber2){
-		max = bddNumber1;
-	}else {max = bddNumber2;}
-		
-	//cout << "max: " << max  << "  maxNodeNumber(old): " << maxNodeNumber << endl;
-    
-    if (max > maxNodeNumber){
-    	addBddVars(max);
-    }
-    	
-	BitVector assignment1 = numberToBin(bddNumber1, maxNodeBits);
-	BitVector assignment2 = numberToBin(bddNumber2, maxNodeBits);
 
-    //calculate the BDD for assignment1 and assignment2
-    DdNode* f = Cudd_ReadOne(mgrMp);
-    Cudd_Ref(f);
-    DdNode* tmp;
-    
-    int j;
-    for (int i = 0; i < maxNodeBits; ++i){     //TODO: schleife Absteigend durchlaufen (--i)
-    	assert(j >= 0);
-    	j = maxNodeBits-1-i;
-        if (assignment1[j] == false){
-            tmp = Cudd_bddAnd(mgrMp, Cudd_Not(Cudd_bddIthVar(mgrMp, maxLabelBits+(2*i))), f);
-        }
-        else{
-            tmp = Cudd_bddAnd(mgrMp, Cudd_bddIthVar(mgrMp, maxLabelBits+(2*i)), f);
-        }
-//      if (tmp == NULL) exit(1);        
-        Cudd_Ref(tmp);
-        Cudd_RecursiveDeref(mgrMp, f);
-        f = tmp; 
-        
-        if (assignment2[j] == false){
-            tmp = Cudd_bddAnd(mgrMp, Cudd_Not(Cudd_bddIthVar(mgrMp, maxLabelBits+1+(2*i))), f);
-        }
-        else{
-            tmp = Cudd_bddAnd(mgrMp, Cudd_bddIthVar(mgrMp, maxLabelBits+1+(2*i)), f);
-        }
-//      if (tmp == NULL) exit(1);
-        Cudd_Ref(tmp);
-        Cudd_RecursiveDeref(mgrMp, f);
-        f = tmp;
-        
-    }
-	trace(TRACE_5, "BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2): end\n");		   
-    return (f);
-}
 
 void BddRepresentation::addBddVars(unsigned int max){
     int neededNodeBits = nbrBits(max); 	    	
@@ -530,51 +538,7 @@ int BddRepresentation::nbrBits(unsigned int i){
     }
 }
 
-//! \fn void BddRepresentation::reorder(Cudd_ReorderingType heuristic)
-void BddRepresentation::reorder(Cudd_ReorderingType heuristic){
-/*
-     if (filename == "bddMp.dot"){
-         //Variablen im bddMp Gruppieren:
-         //die Variablen für den zweiten Knoten sind im BDD immer unten => günstig für Restrict beim Matching
-         Cudd_MakeTreeNode(mgrMp, 0 ,maxChannelBits + maxNodeBits, MTR_DEFAULT); //1. Gruppe: innerhalb der Gruppe ist die Variablenordnung beliebig
-         Cudd_MakeTreeNode(mgrMp, maxChannelBits + maxNodeBits, maxNodeBits, MTR_DEFAULT); //2. Gruppe: innerhalb der Gruppe ist die Variablenordnung beliebig
-         Cudd_MakeTreeNode(mgrMp, 0 ,maxNodeBits, MTR_FIXED);   //1. und 2. Gruppe sind wieder in einer Gruppe, in dieser ist aber die Reihenfolge der Elemente (hier die beiden Gruppen) fest
-     }
-*/
-    Cudd_ReduceHeap(mgrMp, heuristic, 0);
-    cout << "BDD_MP: number of nodes: " << Cudd_DagSize(bddMp);
-    cout << "\t" << Cudd_ReadReorderingTime(this->mgrMp) << " ms consumed for variable reordering" << endl;
-    
-    Cudd_ReduceHeap(this->mgrAnn, heuristic, 0);
-    cout << "BDD_ANN: number of nodes: "  << Cudd_DagSize(this->bddAnn);
-    cout << "\t" << Cudd_ReadReorderingTime(this->mgrAnn) << " ms consumed for variable reordering" << endl;
-}
  
-/*
-//Für Annotationen
-DdNode* BddRepresentation::labelToBdd(vector<char*> v_channel){
-    bool gefunden = false;
-    int pos = 0;
-
-    while (!gefunden && (pos < v_channel.size())){
-        if (strcmp(v_channel[pos],channel)== 0){  //Channel gefunden
-            gefunden = true;
-            return (numberToBdd(mgr, pos, first, count));   //Channelnummer als BDD zurückgeben
-        }
-        ++pos;
-
-    }
-
-    if (!gefunden) {
-        cout << "FEHLER: Channel " << channel << " NICHT gefunden" << endl;
-        cout << "CONTROLLER PASST NICHT!\n\n";
-        exit(1);
-    }
-}
-*/
-
-
-
 /**C++ version std::string style "itoa" by John Maloney
    (http://www.jb.man.ac.uk/~slowe/cpp/itoa.html)
 **/
@@ -611,13 +575,26 @@ void BddRepresentation::checkManager(DdManager* mgr, char* table){
     Cudd_DebugCheck(mgr);
 }
 
-//! \fn void BddRepresentation::print()
-//! \brief  print bdd_Mp and bdd_Ann
-void BddRepresentation::print(){
-//TODO für Ausgabe (zur leichteren Lesbarkeit) Variablenordnung verändern: node1 label node2	
-	Cudd_PrintMinterm(mgrMp, bddMp); 
-	//Cudd_PrintMinterm(this->mgrAnn, this->bddAnn);
+//! \fn void BddRepresentation::reorder(Cudd_ReorderingType heuristic)
+void BddRepresentation::reorder(Cudd_ReorderingType heuristic){
+/*
+     if (filename == "bddMp.dot"){
+         //Variablen im bddMp Gruppieren:
+         //die Variablen für den zweiten Knoten sind im BDD immer unten => günstig für Restrict beim Matching
+         Cudd_MakeTreeNode(mgrMp, 0 ,maxChannelBits + maxNodeBits, MTR_DEFAULT); //1. Gruppe: innerhalb der Gruppe ist die Variablenordnung beliebig
+         Cudd_MakeTreeNode(mgrMp, maxChannelBits + maxNodeBits, maxNodeBits, MTR_DEFAULT); //2. Gruppe: innerhalb der Gruppe ist die Variablenordnung beliebig
+         Cudd_MakeTreeNode(mgrMp, 0 ,maxNodeBits, MTR_FIXED);   //1. und 2. Gruppe sind wieder in einer Gruppe, in dieser ist aber die Reihenfolge der Elemente (hier die beiden Gruppen) fest
+     }
+*/
+    Cudd_ReduceHeap(mgrMp, heuristic, 0);
+    cout << "BDD_MP: number of nodes: " << Cudd_DagSize(bddMp);
+    cout << "\t" << Cudd_ReadReorderingTime(this->mgrMp) << " ms consumed for variable reordering" << endl;
+    
+    Cudd_ReduceHeap(this->mgrAnn, heuristic, 0);
+    cout << "BDD_ANN: number of nodes: "  << Cudd_DagSize(this->bddAnn);
+    cout << "\t" << Cudd_ReadReorderingTime(this->mgrAnn) << " ms consumed for variable reordering" << endl;
 }
+
 
 //! \fn void BddRepresentation::printDotFile(char** varNames)
 //! \brief creates dot files of the BDDs
@@ -645,7 +622,7 @@ void BddRepresentation::printDotFile(char** varNames){
 	    fclose(fpAnn);
 	    
 	    if ((Cudd_DagSize(bddMp) < 900) && (Cudd_DagSize(bddAnn) < 900)) {
-            trace(TRACE_0, "creating the dot file of BDD_MP and BDD_ANN...\n");
+            trace(TRACE_0, "\ncreating the dot file of BDD_MP and BDD_ANN...\n");
             if (parameters[P_CALC_ALL_STATES]) {
                 sprintf(bufferMp, "dot -Tpng %s.a.OG.BDD_MP.out -o %s.a.OG.BDD_MP.png", netfile, netfile);
                 sprintf(bufferAnn, "dot -Tpng %s.a.OG.BDD_ANN.out -o %s.a.OG.BDD_ANN.png", netfile, netfile);
@@ -660,11 +637,19 @@ void BddRepresentation::printDotFile(char** varNames){
             system(bufferAnn);
          
         } else {
-            trace(TRACE_0, "BDDs are too big to have dot create the graphics\n");
+            trace(TRACE_0, "\nBDDs are too big to have dot create the graphics\n");
         }
     } else {
-        trace(TRACE_0, "BDDs are too big to create dot file\n");
-    }
-            
+        trace(TRACE_0, "\nBDDs are too big to create dot file\n");
+    }      
 }	
 
+//! \fn void BddRepresentation::print()
+//! \brief print bdd_Mp and bdd_Ann
+void BddRepresentation::print(){
+//TODO für Ausgabe (zur leichteren Lesbarkeit) Variablenordnung verändern: node1 label node2
+	cout << "\nBDD_MP:\n";	
+	Cudd_PrintMinterm(mgrMp, bddMp);
+	cout << "\nBDD_ANN:\n"; 
+	Cudd_PrintMinterm(mgrAnn, bddAnn);
+}

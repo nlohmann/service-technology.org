@@ -13,18 +13,21 @@
 //! \param _PN
 //! \brief constructor
 operatingGuidelines::operatingGuidelines(oWFN * _PN) : communicationGraph(_PN) {
-	  if (options[O_BDD] == true) {
+	
+	 if (options[O_BDD] == true) {
 		unsigned int nbrLabels = PN->placeInputCnt + PN->placeOutputCnt;
-		bdd = new BddRepresentation(root, nbrLabels, (Cudd_ReorderingType)bdd_reordermethod);
-	  }
+		bdd = new BddRepresentation(nbrLabels, (Cudd_ReorderingType)bdd_reordermethod);
+	 }
 }
 
 //! \fn operatingGuidelines::~operatingGuidelines() 
 //! \brief destructor !to be implemented!
 operatingGuidelines::~operatingGuidelines() {
+
 	  if (options[O_BDD] == true) {
 		delete bdd;
 	  }
+	  
 }
 
 //! \fn void operatingGuidelines::buildGraph(vertex * currentNode)
@@ -283,7 +286,8 @@ void operatingGuidelines::convertToBdd() {
         visitedNodes[i] = 0;
     }
    
-    unsigned int nbrLabels = PN->placeInputCnt + PN->placeOutputCnt; 
+    //unsigned int nbrLabels = PN->placeInputCnt + PN->placeOutputCnt;
+    this->bdd->convertRootNode(root);
     this->bdd->generateRepresentation(tmp, visitedNodes);
     this->bdd->reorder((Cudd_ReorderingType)bdd_reordermethod);
     trace(TRACE_5,"operatingGuidelines::convertToBdd()\n");

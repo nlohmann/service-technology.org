@@ -22,14 +22,15 @@ class BddLabelTab;
 
 class BddRepresentation{
 	public:
-		BddRepresentation(vertex * v, unsigned int numberOfLabels, Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
+		BddRepresentation(unsigned int numberOfLabels, Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
 		~BddRepresentation();
 		
-		void addOrDeleteLeavingEdges(vertex* v);
+		void convertRootNode(vertex* root);
 		void generateRepresentation(vertex* v, bool visitedNodes[]);
+		void addOrDeleteLeavingEdges(vertex* v);
 		void reorder(Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
-		void print();
 		void printDotFile(char** names= NULL);
+		void print();
 
 		
         // Provides user defined operator new. Needed to trace all new
@@ -50,19 +51,15 @@ class BddRepresentation{
 		map<unsigned int, unsigned int> nodeMap;
 		BddLabelTab * labelTable;
 		
-		DdNode* nodesToBddMp(unsigned int node1, unsigned int node2);
 		DdNode* labelToBddMp(char* label);
+		DdNode* nodesToBddMp(unsigned int node1, unsigned int node2);
 		DdNode* annotationToBddAnn(vertex * v);
 		DdNode* CNFtoBddAnn(CNF * cl);
-		BitVector numberToBin(unsigned int number, int cntBits);
 		unsigned int getBddNumber(unsigned int node);
-		void addBddVars(unsigned int max);
-		//DdNode* annotationToBddAnn(DdManager* mgr, int nodeNumber, DdNode* annotation, int maxNodeBits);
-		//DdNode* labelToBddAnn(DdManager* mgr, char* channel, int first, int count, vector<char*> v_channel);
-		
+		void addBddVars(unsigned int max);	
+		BitVector numberToBin(unsigned int number, int cntBits);
 		int nbrBits(unsigned int i);
 		string myitoa(unsigned int value, int base);
-		
 		void checkManager(DdManager* mgr, char* table);
 };
 

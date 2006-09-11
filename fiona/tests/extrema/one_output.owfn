@@ -1,0 +1,16 @@
+{ sequence depth 3 }
+
+PLACE
+
+OUTPUT
+  p0
+ ;
+
+INITIALMARKING
+ ;
+
+FINALMARKING
+ ;
+
+
+{ END OF FILE }

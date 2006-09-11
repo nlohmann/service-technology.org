@@ -1,0 +1,33 @@
+{ sequence depth 3 }
+
+PLACE
+
+INTERNAL
+  start,
+  final
+ ;
+
+INPUT
+  p0,
+  p1
+ ;
+
+INITIALMARKING
+  start
+ ;
+
+FINALMARKING
+  final
+ ;
+
+TRANSITION t1
+ CONSUME
+  start,
+  p0,
+  p1
+ ;
+ PRODUCE
+  final
+ ;
+
+{ END OF FILE }

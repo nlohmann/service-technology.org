@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/09/03 14:36:06 $
+ *          - last changed: \$Date: 2006/09/12 06:59:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  */
 %}
 
@@ -342,7 +342,9 @@ OnMessage(a) ->
       $0->A_portType = ASTEmap[myid]->attributes["portType"];
       $0->A_operation = ASTEmap[myid]->attributes["operation"];
       $0->A_variable = ASTEmap[myid]->attributes["variable"];
-      /* here we can check the attributes */
+
+      // check the attributes
+      $0->checkAttributes();
 
       // create a channel
 //      $0->channelName = $0->A_partnerLink + "." + $0->A_portType + "." + $0->A_operation;

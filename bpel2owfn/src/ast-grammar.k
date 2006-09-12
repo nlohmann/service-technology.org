@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/09/03 14:36:06 $
+ *          - last changed: \$Date: 2006/09/12 06:59:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.99 $
+ * \version \$Revision: 1.100 $
  */
 %}
 
@@ -61,9 +61,12 @@
 
 #include <string>
 #include <iostream>
+
 using std::string;
 using std::cerr;
 using std::endl;
+
+extern int yylineno;
 
 %}
 
@@ -96,6 +99,7 @@ tProcess:
     string A_xmlns;
 
     {
+      // these lines define a constructor of the process phylum
       cerr << "created a <process> phylum" << endl;
     }
   }
@@ -227,6 +231,7 @@ tEventHandlers:
   }
 ;
 
+// onMessage is called onAlarm in WS-BPEL 2.0
 tOnMessage_list:
   list tOnMessage
 ;
@@ -235,30 +240,77 @@ tOnAlarm_list:
   list tOnAlarm
 ;
 
+
+
+
+
 tOnMessage:
   OnMessage(activity)
   {
     int id = 0;
+    int referenceLine;
 
     string A_partnerLink;
     string A_portType;
     string A_operation;
     string A_variable;
+    string A_messageExchange; // WS-BPEL 2.0
 
     string channelName;
     string variableName;
+
+    {
+      $0->referenceLine = yylineno;
+    }
   }
 ;
+
+void tOnMessage::checkAttributes()
+{
+  if (A_partnerLink == "")
+    cerr << "no `partnerLink' given near line " << referenceLine << endl;
+  if (A_portType == "")
+    cerr << "no `portType' given near line " << referenceLine << endl; // optional
+  if (A_operation == "")
+    cerr << "no `operation' given near line " << referenceLine << endl;
+  if (A_variable == "")
+    cerr << "no `variable' given near line " << referenceLine << endl; // optional
+  if (A_messageExchange == "")
+    cerr << "no `messageExchange' given near line " << referenceLine << endl; // optional
+}
+
+
+
+
 
 tOnAlarm:
   OnAlarm(activity)
   {
     int id = 0;
+    int referenceLine;
     
     string A_for;
     string A_until;
+    string A_expressionLanguage; // WS-BPEL
+
+    {
+      $0->referenceLine = yylineno;
+    }
   } 
 ;
+
+void tOnAlarm::checkAttributes()
+{
+  if (A_for == "" && A_until == "")
+    cerr << "neither `for' nor `until' given near line " << referenceLine << endl;
+  if (A_for != "" && A_until != "")
+    cerr << "both `for' and `until' given near line " << referenceLine << endl;
+  if (A_expressionLanguage == "")
+    cerr << "no `expressionLanguage' given near line " << referenceLine << endl;
+}
+
+
+
 
 
 /******************************************************************************

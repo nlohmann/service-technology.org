@@ -1,4 +1,4 @@
-/* $Id: datalimit.c,v 1.1 2006-06-29 09:24:11 massuthe Exp $ */
+/* $Id: datalimit.c,v 1.2 2006-09-12 12:12:03 bretschn Exp $ */
 
 #ifndef HAVE_SYS_RESOURCE_H
 #define HAVE_SYS_RESOURCE_H 1
@@ -14,7 +14,9 @@
 #if HAVE_SYS_TIME_H == 1
 #include <sys/time.h>
 #endif
+#ifndef WIN32
 #include <sys/resource.h>
+#endif
 #endif
 
 #ifndef RLIMIT_DATA_DEFAULT

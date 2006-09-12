@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.2 2006-08-14 15:29:02 bretschn Exp $
+# $Id: Makefile,v 1.3 2006-09-12 12:12:03 bretschn Exp $
 #
 # util -- miscellaneous utility routines
 #---------------------------------------------------------------------------
@@ -7,7 +7,7 @@
 CC	= gcc
 RANLIB	= ranlib
 
-FLAGS	= -DUNIX
+#FLAGS	= -DUNIX
 MFLAG   =
 ICFLAGS = -g
 CFLAGS  = $(ICFLAGS) $(MFLAG) $(XCFLAGS)
@@ -34,6 +34,9 @@ lib$(P).a: $(POBJ)
 
 .c.o: $(PHDR)
 	$(CC) -c $< -I$(INCLUDE) $(FLAGS) $(CFLAGS)
+
+.cc.o: $(PHDR)
+	$(CPP) -c $< -I$(INCLUDE) $(FLAGS) $(CFLAGS) -o $@
 
 optimize_dec: lib$(P).b
 

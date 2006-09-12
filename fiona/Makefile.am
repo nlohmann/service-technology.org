@@ -19,10 +19,10 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006-09-11 09:45:56 $ by $Author: reinert $.
-# Version $Revision: 1.3 $
+# File last changed $Date: 2006-09-12 12:11:43 $ by $Author: bretschn $.
+# Version $Revision: 1.4 $
 
-SUBDIRS = src tests
+SUBDIRS = cudd src tests
 
 .PHONY: binarydistreadme
 
@@ -77,29 +77,30 @@ binarydistreadme:
 	@echo -e Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. >> BINARYREADME
 
 # target to create an executable that is independet of Cygwin
-pure-windows-executable:
-	make hu-binarydist OS=win32 CXXFLAGS="-g -mno-cygwin -U _WIN32" CFLAGS="-g -mno-cygwin -U _WIN32" 
+win32:
+	$(MAKE) --directory cudd win32 
+	$(MAKE) --directory src CXXFLAGS="$(CXXFLAGS) -mno-cygwin -U _WIN32" CFLAGS="$(CFLAGS) -mno-cygwin -U _WIN32" 
+
 
 # name of the directory/archive for a binary distribution
-#WIN32DISTDIR = $(distdir)-win32
-BINARYDISTDIR = $(distdir)-$(OS)
+BINARYDISTDIR = $(distdir)
 
 # files that are distributed in a binary distribution
 BINARYDISTFILES = src/$(PACKAGE)$(EXEEXT) COPYING
 
 BINARYFILES = src/$(PACKAGE)$(EXEEXT) COPYING
 
-hu-bindist: binarydistreadme
-	make --directory=src clean
-	make --directory=src
+# target to create a binary distribution
+bindist: clean binarydistreadme all create_bindist_archive
+
+# target to create a binary distribution for systems having no cygwin1.dll.
+win32bindist: clean binarydistreadme win32
+	$(MAKE) create_bindist_archive BINARYDISTDIR="$(distdir)-win32"
+
+# Helper target for bindist and win32bindist. Creates the actual zip file to be
+# distributed.
+create_bindist_archive:
 	$(mkdir_p) $(BINARYDISTDIR)
 	cp $(BINARYFILES) $(BINARYDISTDIR)
 	mv BINARYREADME $(BINARYDISTDIR)/README
 	zip -9 -m -r $(BINARYDISTDIR).zip $(BINARYDISTDIR)
-
-# target to create a distribution for an operation system named OS
-# (set the variable OS by calling "make hu-binarydist OS=linux")
-hu-binarydist: hu-bindist
-
-# target to create a pure windows binary distribution
-hu-win32dist: pure-windows-executable

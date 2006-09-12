@@ -1,13 +1,16 @@
 /*
  * Revision Control Information
  *
- * $Id: pipefork.c,v 1.1 2006-06-29 09:24:12 massuthe Exp $
+ * $Id: pipefork.c,v 1.2 2006-09-12 12:12:03 bretschn Exp $
  *
  */
 /* LINTLIBRARY */
 
 #include "util.h"
+
+#ifndef WIN32
 #include <sys/wait.h>
+#endif
 
 /*
  * util_pipefork - fork a command and set up pipes to and from

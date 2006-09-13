@@ -21,18 +21,31 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
+echo -----------------------------------------------------------
+echo running $0
+echo -----------------------------------------------------------
+echo 
+
 DIR=$testdir/sequence_suite
 FIONA=fiona
 
-$FIONA --net=$DIR/sequence5.owfn -a -b 4 --graphtype=OG
+#loeschen aller erzeugten Dateien im letzten Durchlauf
+rm -f $DIR/*.out
+rm -f $DIR/*.png
+
+$FIONA --net=$DIR/sequence5.owfn -a -b 4 --graphtype=OG  2> /dev/null 1> /dev/null
 result5=$?
 
 if test \( $result5 -eq 0 \) -a \
-	\( -f $DIR/sequence5.owfn.a.IG.png -a -f $DIR/sequence5.owfn.a.IG.out \)
+	\( -f $DIR/sequence5.owfn.a.OG.png -a -f $DIR/sequence5.owfn.a.OG.out \)
 then
   result=0
 else
   result=1
 fi
+
+#loeschen aller erzeugten Dateien im letzten Durchlauf
+rm -f $DIR/*.out
+rm -f $DIR/*.png
 
 exit $result

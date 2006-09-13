@@ -21,68 +21,62 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
+echo -----------------------------------------------------------
+echo running $0
+echo -----------------------------------------------------------
+echo 
+
 DIR=$testdir/extrema
 FIONA=fiona
 
-$FIONA --net=$DIR/no_final_marking.owfn -a --graphtype=OG | grep "net is controllable: YES"
+$FIONA --net=$DIR/no_final_marking.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" >& /dev/null
 result1=$?
-echo result $?
 
-$FIONA --net=$DIR/all_final_marking.owfn -a --graphtype=OG | grep "net is controllable: NO"
+$FIONA --net=$DIR/all_final_marking.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: NO" >& /dev/null
 result2=$?
-echo result $?
 
-$FIONA --net=$DIR/no_communication.owfn -a --graphtype=OG | grep "net is controllable: YES"
+$FIONA --net=$DIR/no_communication.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" >& /dev/null
 result3=$?
-echo result $?
 
-$FIONA --net=$DIR/no_initial_marking.owfn -a --graphtype=OG | grep "net is controllable: NO"
+$FIONA --net=$DIR/no_initial_marking.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: NO" >& /dev/null
 result4=$?
-echo result $?
 
-$FIONA --net=$DIR/no_initial_marking2.owfn -a --graphtype=OG | grep "net is controllable: YES"
+$FIONA --net=$DIR/no_initial_marking2.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" >& /dev/null
 result5=$?
-echo result $?
 
-$FIONA --net=$DIR/empty.owfn -a --graphtype=OG | grep "net is controllable: YES"
+$FIONA --net=$DIR/empty.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" >& /dev/null
 result6=$?
-echo result $?
 
-$FIONA --net=$DIR/one_input.owfn -a --graphtype=OG | grep "net is controllable: YES"
+$FIONA --net=$DIR/one_input.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" >& /dev/null
 result7=$?
-echo result $?
 
-$FIONA --net=$DIR/one_output.owfn -a --graphtype=OG | grep "net is controllable: YES"
+$FIONA --net=$DIR/one_output.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" >& /dev/null
 result8=$?
-echo result $?
 
-$FIONA --net=$DIR/one_input_marked.owfn -a --graphtype=OG | grep "net is controllable: NO"
+$FIONA --net=$DIR/one_input_marked.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: NO" >& /dev/null
 result9=$?
-echo result $?
 
-$FIONA --net=$DIR/one_output_marked.owfn -a --graphtype=OG | grep "net is controllable: NO"
+$FIONA --net=$DIR/one_output_marked.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: NO" >& /dev/null
 result10=$?
-echo result $?
 
-$FIONA --net=$DIR/one_input_one_output.owfn -a --graphtype=OG | grep "net is controllable: YES"
+$FIONA --net=$DIR/one_input_one_output.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" >& /dev/null
 result11=$?
-echo result $?
 
-$FIONA --net=$DIR/one_input_2.owfn -a --graphtype=OG | grep "net is controllable: NO"
+$FIONA --net=$DIR/one_input_2.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: NO" >& /dev/null
 result12=$?
-echo result $?
 
-$FIONA --net=$DIR/multiple_input.owfn -a --graphtype=OG | grep "net is controllable: YES"
+$FIONA --net=$DIR/multiple_input.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" >& /dev/null
 result13=$?
-echo result $?
 
-$FIONA --net=$DIR/multiple_output.owfn -a --graphtype=OG | grep "net is controllable: YES"
+$FIONA --net=$DIR/multiple_output.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" >& /dev/null
 result14=$?
-echo result $?
 
-$FIONA --net=$DIR/multiple_input_multiple_output.owfn -a --graphtype=OG | grep "net is controllable: YES"
+$FIONA --net=$DIR/multiple_input_multiple_output.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" >& /dev/null
 result15=$?
-echo result $?
+
+OUTPUT=`$FIONA --net=$DIR/multiple_input_multiple_output.owfn -a --graphtype=OG 2>&1`
+echo $OUTPUT | grep "net is controllable: YES" >& /dev/null
+result15=$?
 
 
 if test \( $result1 -eq 0 -a $result2 -eq 0 -a $result3 -eq 0 -a \

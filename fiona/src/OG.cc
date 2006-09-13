@@ -183,7 +183,7 @@ void operatingGuidelines::computeCNF(vertex * node) {
 	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): start\n");
 	StateSet::iterator iter;			// iterator over the states of the node
 	
-	if (!parameters[P_CALC_ALL_STATES]) { // in case of the state reduced graph
+	if (!options[O_CALC_ALL_STATES]) { // in case of the state reduced graph
 		
 		// iterate over all states of the node
 		for (iter = PN->setOfStatesTemp.begin();

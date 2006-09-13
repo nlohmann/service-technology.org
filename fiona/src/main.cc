@@ -87,24 +87,15 @@ int yywrap() {
 }
 
 
-// ----------------------------------------------------------------------------------
-// MAIN
-// ----------------------------------------------------------------------------------
+// **********************************************************************************
+// ********                   MAIN                                           ********
+// **********************************************************************************
 
 int main(int argc, char ** argv) {
 
 	unsigned int i, h;
 
 	list<oWFN*> petrinets;
-
-/*
-	numberOfDecodes = 0;
-
-	garbagefound = 0;
-	State::card = 0;          // number of states
-
-	numberDeletedVertices = 0;
-*/
 
 	// 0. eigenen New-Handler installieren
 	try {
@@ -121,8 +112,6 @@ int main(int argc, char ** argv) {
 			State::card = 0;          // number of states
 	
 			numberDeletedVertices = 0;
-	
-			// trace(TRACE_0, "\n--------------------------------------------------------------\n");
 	
 			// prepare getting the net
 			try {
@@ -180,20 +169,19 @@ int main(int argc, char ** argv) {
 	
 			trace(TRACE_0, "\n--------------------------------------------------------------\n");
 			if (netfile) {
-				trace(TRACE_0, "processing net " + string(netfile) + " ...\n\n");
+				trace(TRACE_0, "processing net " + string(netfile) + " ...\n");
 			}	
 			// report the net
-			trace(TRACE_0, "places: " + intToString(PN->getPlaceCnt()));
+			trace(TRACE_0, "    places: " + intToString(PN->getPlaceCnt()));
 			trace(TRACE_0, " (including " + intToString(PN->getInputPlaceCnt()) + " input places, " + intToString(PN->getOutputPlaceCnt()) + " output places)\n");
-			trace(TRACE_0, "transitions: " + intToString(PN->getTransitionCnt()) + "\n\n");
+			trace(TRACE_0, "    transitions: " + intToString(PN->getTransitionCnt()) + "\n\n");
 		
-	//		if (parameters[P_OG]) {
-				// adjust commDepth and events_manual
-	
-				if (options[O_COMM_DEPTH] == true) {
-					PN->commDepth = commDepth_manual;
-				}
-			
+			// adjust commDepth and events_manual
+			if (options[O_COMM_DEPTH] == true) {
+				PN->commDepth = commDepth_manual;
+			}
+
+			if (options[O_MESSAGES_MAX] == false) {
 				if (options[O_EVENT_USE_MAX] == true) {
 					if (PN->getCommDepth() > events_manual * (PN->placeInputCnt + PN->placeOutputCnt)) {
 						trace(TRACE_1, "commDepth is set too high ... adjusting it\n");
@@ -203,20 +191,24 @@ int main(int argc, char ** argv) {
 			    
 				if (options[O_EVENT_USE_MAX] == true) {
 					if (PN->getCommDepth() < events_manual) {
-					    trace(TRACE_0, "number of events to be used is set too high\n");
+					    trace(TRACE_1, "number of events to be used is set too high\n");
 					    events_manual = PN->commDepth;
 					}
 				}
-		    
-				// report communication depth, events use, and message bound
-				trace(TRACE_0, "communication depth: " + intToString(PN->getCommDepth()) + "\n");
-				if (options[O_MESSAGES_MAX] == true) {
-					trace(TRACE_0, "interface message bound set to: " + intToString(messages_manual) +"\n");
+			} else {
+				if (options[O_COMM_DEPTH] == false) {
+					// commdepth auf ver
 				}
-				if (options[O_EVENT_USE_MAX] == true) {
-					trace(TRACE_0, "considering each event max. " + intToString(events_manual) + " times\n\n");
-				}
-	//		}
+			}
+	    
+			// report communication depth, events use, and message bound
+			trace(TRACE_0, "communication depth: " + intToString(PN->getCommDepth()) + "\n");
+			if (options[O_MESSAGES_MAX] == true) {
+				trace(TRACE_0, "interface message bound set to: " + intToString(messages_manual) +"\n");
+			}
+			if (options[O_EVENT_USE_MAX] == true) {
+				trace(TRACE_0, "considering each event max. " + intToString(events_manual) + " times\n\n");
+			}
 	
 			// ------------------- start computation -------------------------
 			time_t seconds, seconds2;
@@ -270,7 +262,7 @@ int main(int argc, char ** argv) {
 		        // interaction graph is built
 		        interactionGraph * graph = new interactionGraph(PN);
 		
-		        if (parameters[P_CALC_REDUCED_IG]) {
+		        if (options[O_CALC_REDUCED_IG]) {
 					trace(TRACE_0, "building the reduced interaction graph...\n");
 				} else {
 					trace(TRACE_0, "building the interaction graph...\n");
@@ -278,7 +270,7 @@ int main(int argc, char ** argv) {
 		        seconds = time (NULL);
 		        graph->buildGraph();                    // build interaction graph
 		        seconds2 = time (NULL);
-		        if (parameters[P_CALC_REDUCED_IG]) {
+		        if (options[O_CALC_REDUCED_IG]) {
 					trace(TRACE_0, "building the reduced interaction graph finished.\n");
 				} else {
 					trace(TRACE_0, "building the interaction graph finished.\n");

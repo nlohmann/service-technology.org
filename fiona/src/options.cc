@@ -34,10 +34,10 @@ std::ostream * output = &std::cout;
 /// pointer to log stream
 std::ostream * log_output = &std::cout;   // &std::clog;
 
-/// Filename of log file
-std::string log_filename = "";
-
-bool createOutputFile = false;
+///// Filename of log file
+//std::string log_filename = "";
+//
+//bool createOutputFile = false;
 
 // different modes controlled by command line
 
@@ -158,14 +158,16 @@ void parse_command_line(int argc, char* argv[]) {
 	options[O_DEBUG] = false;
 	options[O_GRAPH_TYPE] = false;
 	options[O_SHOW_NODES] = false;
-//	options[O_CALC_ALL_STATES] = false;   // standard: man muss -a angeben, um voll
-	options[O_CALC_ALL_STATES] = true;
+//	options[O_CALC_ALL_STATES] = false;		// standard: man muss -a angeben, um voll
+	options[O_CALC_ALL_STATES] = true;		// so lange Reduktion im Teststadium
 	options[O_CALC_REDUCED_IG] = false;
 	options[O_OWFN_NAME] = false;
+	options[O_BDD] = false;
+
 	options[O_COMM_DEPTH] = false;
 	options[O_MESSAGES_MAX] = false;
-	options[O_EVENT_USE_MAX] = true;
-	options[O_BDD] = false;
+	options[O_EVENT_USE_MAX] = false;
+
 
 	// initialize parameters
 	parameters[P_IG] = true;
@@ -175,9 +177,6 @@ void parse_command_line(int argc, char* argv[]) {
 	parameters[P_SHOW_NO_RED_NODES] = true;
 	parameters[P_SHOW_EMPTY_NODE] = false;
 	parameters[P_SHOW_STATES_PER_NODE] = false;
-//	parameters[P_CALC_ALL_STATES] = false;   // standard: man muss -a angeben, um voll
-	parameters[P_CALC_ALL_STATES] = true;
-	parameters[P_CALC_REDUCED_IG] = false;
 
 	bdd_reordermethod = 1;
 
@@ -250,7 +249,7 @@ void parse_command_line(int argc, char* argv[]) {
 	          	break;
 	      	case 'm':
 		      	if (optarg != NULL) {
-		        	options[O_MESSAGES_MAX] = true;  // <- default is true
+		        	options[O_MESSAGES_MAX] = true;
 		        	messages_manual = atoi(optarg);
 		      	} else {
 					throw Exception(OPTION_MISMATCH,
@@ -260,7 +259,7 @@ void parse_command_line(int argc, char* argv[]) {
 	          	break;
 	      	case 'e':
 		      	if (optarg != NULL) {
-		        	options[O_EVENT_USE_MAX] = true;  // <- default is true
+		        	options[O_EVENT_USE_MAX] = true;
 		        	events_manual = atoi(optarg);
 		      	} else {
 					throw Exception(OPTION_MISMATCH,
@@ -295,11 +294,9 @@ void parse_command_line(int argc, char* argv[]) {
 			    break;
 	      	case 'a':
 			  	options[O_CALC_ALL_STATES] = true;
-				parameters[P_CALC_ALL_STATES] = true;
 			  	break;
 	      	case 'r':
 		      	options[O_CALC_REDUCED_IG] = true;
-		      	parameters[P_CALC_REDUCED_IG] = true;
 	          	break;
 	      	case 'b':
 		      	options[O_BDD] = true;

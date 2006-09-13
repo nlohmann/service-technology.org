@@ -25,7 +25,7 @@ interactionGraph::~interactionGraph() {
 void interactionGraph::buildGraph() {	
     calculateRootNode(); // creates the root node and calculates its reachability graph (set of states)
 
-	if (parameters[P_CALC_REDUCED_IG]) {
+	if (options[O_CALC_REDUCED_IG]) {
 		buildReducedGraph(root);
 	} else {
 		buildGraph(root);
@@ -250,7 +250,7 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 	int i;
 	StateSet::iterator iter;		
 	
-	if (!parameters[P_CALC_ALL_STATES]) { // in case of the state reduced graph
+	if (!options[O_CALC_ALL_STATES]) { // in case of the state reduced graph
 	
 		for (iter = PN->setOfStatesTemp.begin(); iter != PN->setOfStatesTemp.end(); iter++) {
 	
@@ -603,7 +603,7 @@ void interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, vert
 		(*iter)->decode(PN);
 		if (PN->removeOutputMessage(output)) {	// remove the output message from the current marking
 			// if there is a state for which an output event was activated, catch that state
-			if (parameters[P_CALC_ALL_STATES]) {
+			if (options[O_CALC_ALL_STATES]) {
 				PN->calculateReachableStatesFull(node, false);	// calc the reachable states from that marking
 			} else {
 				PN->calculateReachableStatesOutputEvent(node, false);	// calc the reachable states from that marking
@@ -636,7 +636,7 @@ void interactionGraph::calculateSuccStatesInputReduced(messageMultiSet input, ve
 			(*iter)->decode(PN);
 
 			PN->addInputMessage(input);					// add the input message to the current marking
-			if (parameters[P_CALC_ALL_STATES]) {
+			if (options[O_CALC_ALL_STATES]) {
 				PN->calculateReachableStatesFull(node, false);	// calc the reachable states from that marking
 			} else {
 				PN->calculateReachableStatesInputEvent(node, false);	// calc the reachable states from that marking

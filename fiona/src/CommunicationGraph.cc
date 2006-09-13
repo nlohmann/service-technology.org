@@ -66,7 +66,7 @@ void communicationGraph::calculateRootNode() {
     root = new vertex(PN->placeInputCnt + PN->placeOutputCnt);
 
     // calc the reachable states from that marking
-    if (parameters[P_CALC_ALL_STATES]) {
+    if (options[O_CALC_ALL_STATES]) {
         PN->calculateReachableStatesFull(root, true);
     } else {
         PN->calculateReachableStatesInputEvent(root, true);
@@ -314,7 +314,7 @@ bool communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * n
         
         PN->addInputMessage(input);                 // add the input message to the current marking
         
-        if (parameters[P_CALC_ALL_STATES]) {
+        if (options[O_CALC_ALL_STATES]) {
             PN->calculateReachableStatesFull(newNode, false);   // calc the reachable states from that marking
         } else {
             PN->calculateReachableStatesInputEvent(newNode, false);       // calc the reachable states from that marking
@@ -359,7 +359,7 @@ bool communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex 
 		}        
         
         PN->addInputMessage(input);                 // add the input message to the current marking
-        if (parameters[P_CALC_ALL_STATES]) {
+        if (options[O_CALC_ALL_STATES]) {
             PN->calculateReachableStatesFull(newNode, false);   // calc the reachable states from that marking
         } else {
             PN->calculateReachableStatesInputEvent(newNode, false);       // calc the reachable states from that marking
@@ -387,7 +387,7 @@ void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex *
         
         if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
             // if there is a state for which an output event was activated, catch that state
-            if (parameters[P_CALC_ALL_STATES]) {
+            if (options[O_CALC_ALL_STATES]) {
                 PN->calculateReachableStatesFull(newNode, true);   // calc the reachable states from that marking
             } else {
                 PN->calculateReachableStatesOutputEvent(newNode, true);   // calc the reachable states from that marking
@@ -414,7 +414,7 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
         
         if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
             // if there is a state for which an output event was activated, catch that state
-            if (parameters[P_CALC_ALL_STATES]) {
+            if (options[O_CALC_ALL_STATES]) {
                 PN->calculateReachableStatesFull(newNode, true);   // calc the reachable states from that marking
             } else {
                 PN->calculateReachableStatesOutputEvent(newNode, true);   // calc the reachable states from that marking
@@ -584,13 +584,13 @@ void communicationGraph::printDotFile() {
 
         char buffer[256];
         if (parameters[P_OG]) {
-            if (parameters[P_CALC_ALL_STATES]) {
+            if (options[O_CALC_ALL_STATES]) {
                 sprintf(buffer, "%s.a.OG.out", netfile);
             } else {
                 sprintf(buffer, "%s.OG.out", netfile);
             }
         } else {
-            if (parameters[P_CALC_ALL_STATES]) {
+            if (options[O_CALC_ALL_STATES]) {
                 sprintf(buffer, "%s.a.IG.out", netfile);
             } else {
                 sprintf(buffer, "%s.IG.out", netfile);
@@ -623,13 +623,13 @@ void communicationGraph::printDotFile() {
         if (numberOfVertices < 900) {
             trace(TRACE_0, "\ncreating the dot file of the graph...\n");
             if (parameters[P_OG]) {
-                if (parameters[P_CALC_ALL_STATES]) {
+                if (options[O_CALC_ALL_STATES]) {
                     sprintf(buffer, "dot -Tpng %s.a.OG.out -o %s.a.OG.png", netfile, netfile);
                 } else {
                     sprintf(buffer, "dot -Tpng %s.OG.out -o %s.OG.png", netfile, netfile);
                 }
             } else {
-                if (parameters[P_CALC_ALL_STATES]) {
+                if (options[O_CALC_ALL_STATES]) {
                     sprintf(buffer, "dot -Tpng %s.a.IG.out -o %s.a.IG.png", netfile, netfile);
                 } else {
                     sprintf(buffer, "dot -Tpng %s.IG.out -o %s.IG.png", netfile, netfile);

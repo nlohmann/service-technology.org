@@ -11,14 +11,14 @@ typedef enum
    	O_HELP,
 	O_VERSION,
 	O_DEBUG,
+	O_OWFN_NAME,
 	O_GRAPH_TYPE,	//!< OG or IG
+	O_COMM_DEPTH,
+	O_MESSAGES_MAX,
+	O_EVENT_USE_MAX,
+	O_CALC_REDUCED_IG,
 	O_SHOW_NODES,	//!<
 	O_CALC_ALL_STATES,
-	O_CALC_REDUCED_IG,
-	O_OWFN_NAME,
-	O_COMM_DEPTH,
-	O_EVENT_USE_MAX,
-	O_MESSAGES_MAX,
 	O_BDD
 } possibleOptions;
 
@@ -30,9 +30,7 @@ typedef enum
 	P_SHOW_BLUE_NODES_ONLY,
 	P_SHOW_NO_RED_NODES,
 	P_SHOW_EMPTY_NODE,
-	P_SHOW_STATES_PER_NODE,
-	P_CALC_ALL_STATES,
-	P_CALC_REDUCED_IG
+	P_SHOW_STATES_PER_NODE
 } possibleParameters;
 
 
@@ -52,9 +50,9 @@ extern int bdd_reordermethod;
 
 
 /// pointer to input stream
-extern std::istream * input;
+//extern std::istream * input;
 /// pointer to output stream
-extern std::ostream * output;
+//extern std::ostream * output;
 /// pointer to log stream
 extern std::ostream * log_output;
 

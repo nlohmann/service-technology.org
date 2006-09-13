@@ -348,7 +348,7 @@ void oWFN::checkMessageBound(vertex * n) {
 void oWFN::computeAnnotationOutput(vertex * node, State * currentState) {
 	trace(TRACE_5, "oWFN::computeAnnotation(vertex * node, State * currentState, unsigned int * markingPreviousState): start\n");
 
-	if (parameters[P_CALC_ALL_STATES]) {
+	if (options[O_CALC_ALL_STATES]) {
 		node->addState(currentState);
 	} else {
 		// store this state in the node's temp set of state (storing all states of the node)
@@ -378,7 +378,7 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 	
 	unsigned int * marking = NULL;
 
-	if (parameters[P_CALC_ALL_STATES]) {
+	if (options[O_CALC_ALL_STATES]) {
 		node->addState(currentState);
 	} else {
 		// store this state in the node's temp set of state (storing all states of the node)
@@ -406,7 +406,7 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 		}	
 	}	
 
-	if (!storeState && markingPreviousState != NULL && !parameters[P_CALC_ALL_STATES]) {
+	if (!storeState && markingPreviousState != NULL && !options[O_CALC_ALL_STATES]) {
 		node->reachGraphStateSet.erase(currentState);  // remove this state from the node's state list, because it should not be stored
 	}
 

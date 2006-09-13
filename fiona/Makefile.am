@@ -19,8 +19,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006-09-12 12:11:43 $ by $Author: bretschn $.
-# Version $Revision: 1.4 $
+# File last changed $Date: 2006-09-13 09:30:55 $ by $Author: bretschn $.
+# Version $Revision: 1.5 $
 
 SUBDIRS = cudd src tests
 
@@ -78,8 +78,8 @@ binarydistreadme:
 
 # target to create an executable that is independet of Cygwin
 win32:
-	$(MAKE) --directory cudd win32 
-	$(MAKE) --directory src CXXFLAGS="$(CXXFLAGS) -mno-cygwin -U _WIN32" CFLAGS="$(CFLAGS) -mno-cygwin -U _WIN32" 
+	(cd cudd && $(MAKE) win32)
+	(cd src && $(MAKE) CXXFLAGS="$(CXXFLAGS) -mno-cygwin -U _WIN32" CFLAGS="$(CFLAGS) -mno-cygwin -U _WIN32")
 
 
 # name of the directory/archive for a binary distribution
@@ -104,3 +104,14 @@ create_bindist_archive:
 	cp $(BINARYFILES) $(BINARYDISTDIR)
 	mv BINARYREADME $(BINARYDISTDIR)/README
 	zip -9 -m -r $(BINARYDISTDIR).zip $(BINARYDISTDIR)
+
+
+clean:
+	for subdir in $(SUBDIRS); do \
+		if [ "$$subdir" != "cudd" ]; then \
+			(cd "$$subdir" && $(MAKE) $(AM_MAKEFLAGS) $@); \
+		fi \
+	done
+
+libclean: clean
+	(cd cudd && $(MAKE) $(AM_MAKEFLAGS) clean)

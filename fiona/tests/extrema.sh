@@ -29,53 +29,53 @@ echo
 DIR=$testdir/extrema
 FIONA=fiona
 
-$FIONA --net=$DIR/no_final_marking.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" >& /dev/null
+$FIONA --net=$DIR/no_final_marking.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result1=$?
 
-$FIONA --net=$DIR/all_final_marking.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: NO" >& /dev/null
+$FIONA --net=$DIR/all_final_marking.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: NO" > /dev/null
 result2=$?
 
-$FIONA --net=$DIR/no_communication.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" >& /dev/null
+$FIONA --net=$DIR/no_communication.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result3=$?
 
-$FIONA --net=$DIR/no_initial_marking.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: NO" >& /dev/null
+$FIONA --net=$DIR/no_initial_marking.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: NO" > /dev/null
 result4=$?
 
-$FIONA --net=$DIR/no_initial_marking2.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" >& /dev/null
+$FIONA --net=$DIR/no_initial_marking2.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result5=$?
 
-$FIONA --net=$DIR/empty.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" >& /dev/null
+$FIONA --net=$DIR/empty.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result6=$?
 
-$FIONA --net=$DIR/one_input.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" >& /dev/null
+$FIONA --net=$DIR/one_input.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result7=$?
 
-$FIONA --net=$DIR/one_output.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" >& /dev/null
+$FIONA --net=$DIR/one_output.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result8=$?
 
-$FIONA --net=$DIR/one_input_marked.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: NO" >& /dev/null
+$FIONA --net=$DIR/one_input_marked.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: NO" > /dev/null
 result9=$?
 
-$FIONA --net=$DIR/one_output_marked.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: NO" >& /dev/null
+$FIONA --net=$DIR/one_output_marked.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: NO" > /dev/null
 result10=$?
 
-$FIONA --net=$DIR/one_input_one_output.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" >& /dev/null
+$FIONA --net=$DIR/one_input_one_output.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result11=$?
 
-$FIONA --net=$DIR/one_input_2.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: NO" >& /dev/null
+$FIONA --net=$DIR/one_input_2.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: NO" > /dev/null
 result12=$?
 
-$FIONA --net=$DIR/multiple_input.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" >& /dev/null
+$FIONA --net=$DIR/multiple_input.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result13=$?
 
-$FIONA --net=$DIR/multiple_output.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" >& /dev/null
+$FIONA --net=$DIR/multiple_output.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result14=$?
 
-$FIONA --net=$DIR/multiple_input_multiple_output.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" >& /dev/null
+$FIONA --net=$DIR/multiple_input_multiple_output.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result15=$?
 
 OUTPUT=`$FIONA --net=$DIR/multiple_input_multiple_output.owfn -a --graphtype=OG 2>&1`
-echo $OUTPUT | grep "net is controllable: YES" >& /dev/null
+echo $OUTPUT | grep "net is controllable: YES" > /dev/null
 result15=$?
 
 

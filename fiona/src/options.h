@@ -35,8 +35,6 @@ typedef enum
 
 
 // some file names and pointers (in options.cc)
-
-
 // different modes controlled by command line (in options.cc)
 
 extern std::map<possibleOptions,    bool> options;

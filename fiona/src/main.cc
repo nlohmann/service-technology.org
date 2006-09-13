@@ -86,6 +86,44 @@ int yywrap() {
     return 1;
 }
 
+//! \fn void adjustOptionValues()
+//! \brief adjusts values for -e and -c options
+void adjustOptionValues() {
+	if (options[O_COMM_DEPTH] == true) {
+		// adjusting commDepth if dominated by events
+		if (commDepth_manual > events_manual * (PN->placeInputCnt + PN->placeOutputCnt)) {
+			trace(TRACE_1, "manual commDepth is set too high ... adjusting it\n");
+			PN->commDepth = events_manual * (PN->placeInputCnt + PN->placeOutputCnt);
+		} else {
+			PN->commDepth = commDepth_manual;
+		}
+
+		// adjusting events if dominated by commDepth
+		if (options[O_EVENT_USE_MAX] == true) {
+			if (PN->getCommDepth() < events_manual) {
+			    trace(TRACE_1, "number of events to be used is set too high\n");
+			    events_manual = PN->commDepth;
+			}
+		}
+	} else {
+		// compute commDepth if not specified by -c option
+		trace(TRACE_1, "standard commDepth too high ... adjusting it\n");
+		if (PN->commDepth > events_manual * (PN->placeInputCnt + PN->placeOutputCnt)) {
+			PN->commDepth = events_manual * (PN->placeInputCnt + PN->placeOutputCnt);
+		}
+	}
+
+	// report ...
+	trace(TRACE_0, "communication depth: " + intToString(PN->getCommDepth()) + "\n");
+	if (options[O_MESSAGES_MAX] == true) {
+		trace(TRACE_0, "interface message bound set to: " + intToString(messages_manual) +"\n");
+	}
+	trace(TRACE_0, "considering each event max. " + intToString(events_manual) + " times\n\n");
+	
+	options[O_EVENT_USE_MAX] = true;	
+}
+
+
 
 // **********************************************************************************
 // ********                   MAIN                                           ********
@@ -177,38 +215,7 @@ int main(int argc, char ** argv) {
 			trace(TRACE_0, "    transitions: " + intToString(PN->getTransitionCnt()) + "\n\n");
 		
 			// adjust commDepth and events_manual
-			if (options[O_COMM_DEPTH] == true) {
-				PN->commDepth = commDepth_manual;
-			}
-
-			if (options[O_MESSAGES_MAX] == false) {
-				if (options[O_EVENT_USE_MAX] == true) {
-					if (PN->getCommDepth() > events_manual * (PN->placeInputCnt + PN->placeOutputCnt)) {
-						trace(TRACE_1, "commDepth is set too high ... adjusting it\n");
-						PN->commDepth = events_manual * (PN->placeInputCnt + PN->placeOutputCnt);
-					}
-				}
-			    
-				if (options[O_EVENT_USE_MAX] == true) {
-					if (PN->getCommDepth() < events_manual) {
-					    trace(TRACE_1, "number of events to be used is set too high\n");
-					    events_manual = PN->commDepth;
-					}
-				}
-			} else {
-				if (options[O_COMM_DEPTH] == false) {
-					// commdepth auf ver
-				}
-			}
-	    
-			// report communication depth, events use, and message bound
-			trace(TRACE_0, "communication depth: " + intToString(PN->getCommDepth()) + "\n");
-			if (options[O_MESSAGES_MAX] == true) {
-				trace(TRACE_0, "interface message bound set to: " + intToString(messages_manual) +"\n");
-			}
-			if (options[O_EVENT_USE_MAX] == true) {
-				trace(TRACE_0, "considering each event max. " + intToString(events_manual) + " times\n\n");
-			}
+			adjustOptionValues();
 	
 			// ------------------- start computation -------------------------
 			time_t seconds, seconds2;

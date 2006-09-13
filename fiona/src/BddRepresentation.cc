@@ -653,3 +653,4 @@ void BddRepresentation::print(){
 	cout << "\nBDD_ANN:\n"; 
 	Cudd_PrintMinterm(mgrAnn, bddAnn);
 }
+

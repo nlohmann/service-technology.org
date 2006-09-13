@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.6 2006-09-12 12:11:53 bretschn Exp $
+# $Id: Makefile,v 1.7 2006-09-13 09:41:08 bretschn Exp $
 #
 # Makefile for the CUDD distribution kit 
 #---------------------------------------------------------------------------
@@ -332,3 +332,5 @@ distclean:
 	     make -s EXE="$(EXE)" distclean	) \
 	done
 	sh ./shutdown.sh
+
+check:

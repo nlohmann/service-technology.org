@@ -43,8 +43,8 @@ E-mail
 
 Copyright (C) 2005, 2006 Peter Massuthe and Daniela Weinberg.
 
-This file is part of Fiona, a tool translating business processes
-described in BPEL to open workflow nets (oWFN).
+This file is part of Fiona, a tool analysing business processes
+modelled as open workflow nets (oWFN).
 
 Fiona is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the

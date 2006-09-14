@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/09/14 06:08:33 $ by $Author: nlohmann $.
-# Version $Revision: 1.7 $
+# File last changed $Date: 2006/09/14 06:09:34 $ by $Author: nlohmann $.
+# Version $Revision: 1.8 $
 
 #info_TEXINFOS = bpel2owfn.texi
 
@@ -58,3 +58,4 @@
 #	sed -n '/BEGIN OF AUTHORS/,/END OF AUTHORS/w ../AUTHORS' install.txt
 #	sed -n '/BEGIN OF INSTALL/,/END OF INSTALL/w ../INSTALL' install.txt
 #	rm install.txt
+#

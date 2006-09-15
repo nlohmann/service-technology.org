@@ -1,10 +1,8 @@
 .deps
 Makefile
 Makefile.in
-fiona.h
-fiona.h.in
-lexer.cc
-stamp-h1
-syntax.cc
-fiona.exe.stackdump
-gmon.out
+bpel2owfn.h
+bpel2owfn.h.in
+bpel-lexic.cc
+bpel-syntax.cc
+bpel2owfn.exe.stackdump

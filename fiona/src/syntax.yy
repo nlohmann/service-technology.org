@@ -263,7 +263,8 @@ placelist:  placelist comma place
 
 place: nodeident {
 	if(PlaceTable->lookup($1)) {
-		yyerror("Place name used twice");
+		string error = "Place name " + string($1) + " was used twice!";
+		yyerror(error.c_str());
 	}
 	P = new owfnPlace($1, type, PN);
 	if (type == INPUT) {
@@ -293,7 +294,8 @@ marking:
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable->lookup($1);
 	if(!PS) {
-		yyerror("place does not exist");
+		string error = "Place " + string($1) + " does not exist!";
+		yyerror(error.c_str());
 	}
 	sscanf($3,"%u",&i);
 	*(PS->place) += i;
@@ -305,7 +307,8 @@ marking:
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable->lookup($1);
 	if(!PS) {
-		yyerror("place does not exist");
+		string error = "Place " + string($1) + " does not exist!";
+		yyerror(error.c_str());
 	}
 	sscanf("1","%u",&i);
 	*(PS->place) += i;
@@ -324,7 +327,8 @@ finalmarking:
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable->lookup($1);
 	if(!PS) {
-		yyerror("place does not exist");
+		string error = "Place " + string($1) + " does not exist!";
+		yyerror(error.c_str());
 	}
 	sscanf($3,"%u",&i);
 	PN->FinalMarking[PS->place->index] = i;
@@ -336,7 +340,8 @@ finalmarking:
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable->lookup($1);
 	if(!PS) {
-		yyerror("place does not exist");
+		string error = "Place " + string($1) + " does not exist!";
+		yyerror(error.c_str());
 	}
 	sscanf("1","%u",&i);
 	PN->FinalMarking[PS->place->index] = i;
@@ -355,7 +360,8 @@ transition: key_transition tname key_consume arclist semicolon key_produce arcli
 	arc_list * current;
 	/* 1. Transition anlegen */
 	if(TransitionTable -> lookup($2)) {
-		yyerror("transition name used twice");
+		string error = "Transition name " + string($2) + " was used twice!";
+		yyerror(error.c_str());
 	}
 	TS = new TrSymbol($2);
 	T = TS->transition = new owfnTransition(TS->name);	// counter++ in PN
@@ -438,7 +444,8 @@ arc:
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable -> lookup($1);
 	if(!PS) {
-		yyerror("place does not exist");
+		string error = "Place " + string($1) + " does not exist!";
+		yyerror(error.c_str());
 	}
 	$$ = new arc_list;
 	$$->place = PS;
@@ -453,7 +460,8 @@ arc:
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable -> lookup($1);
 	if(!PS) {
-		yyerror("place does not exist");
+		string error = "Place " + string($1) + " does not exist!";
+		yyerror(error.c_str());
 	}
 	$$ = new arc_list;
 	$$->place = PS;
@@ -480,7 +488,8 @@ statepredicate: lpar statepredicate rpar {
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable->lookup($1);
 	if(!PS) {
-		yyerror("place does not exist");
+		string error = "Place " + string($1) + " does not exist!";
+		yyerror(error.c_str());
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(eq,PS->place,i);
@@ -491,7 +500,8 @@ statepredicate: lpar statepredicate rpar {
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable->lookup($1);
 	if(!PS) {
-		yyerror("place does not exist");
+		string error = "Place " + string($1) + " does not exist!";
+		yyerror(error.c_str());
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(neq,PS->place,i);
@@ -502,7 +512,8 @@ statepredicate: lpar statepredicate rpar {
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable->lookup($1);
 	if(!PS) {
-		yyerror("place does not exist");
+		string error = "Place " + string($1) + " does not exist!";
+		yyerror(error.c_str());
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(lt,PS->place,i);
@@ -513,7 +524,8 @@ statepredicate: lpar statepredicate rpar {
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable->lookup($1);
 	if(!PS) {
-		yyerror("place does not exist");
+		string error = "Place " + string($1) + " does not exist!";
+		yyerror(error.c_str());
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(gt,PS->place,i);
@@ -524,7 +536,8 @@ statepredicate: lpar statepredicate rpar {
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable->lookup($1);
 	if(!PS) {
-		yyerror("place does not exist");
+		string error = "Place " + string($1) + " does not exist!";
+		yyerror(error.c_str());
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(geq,PS->place,i);
@@ -535,7 +548,8 @@ statepredicate: lpar statepredicate rpar {
 	unsigned int i;
 	PS = (PlSymbol *) PlaceTable->lookup($1);
 	if(!PS) {
-		yyerror("place does not exist");
+		string error = "Place " + string($1) + " does not exist!";
+		yyerror(error.c_str());
 	}
 	sscanf($3,"%u",&i);
 	$$ = new atomicformula(leq,PS->place,i);

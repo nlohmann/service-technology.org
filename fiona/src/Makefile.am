@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006-09-05 07:48:48 $ by $Author: weinberg $.
-# Version $Revision: 1.13 $
+# File last changed $Date: 2006-09-15 10:40:55 $ by $Author: bretschn $.
+# Version $Revision: 1.14 $
 
 bin_PROGRAMS = fiona
 
@@ -81,4 +81,4 @@ fiona_LDADD = $(srcdir)/../cudd/obj/libobj.a \
 	$(srcdir)/../cudd/util/libutil.a $(srcdir)/../cudd/epd/libepd.a
 
 lexer.h: lexer.cc
-	$(EGREP) '^#define.*FLEX.*VERSION' $< > $@
+	$(EGREP) '^#define.*FLEX.*VERSION' $^ > $@

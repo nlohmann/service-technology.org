@@ -6,3 +6,6 @@ compile
 config.log
 config.status
 configure
+*.owfn
+*.out
+*.png

@@ -52,13 +52,13 @@ static struct option longopts[] =
   { "debug",      	 required_argument, 	NULL, 'd' },
   { "net",       	 required_argument, 	NULL, 'n' },
   { "graphtype", 	 required_argument, 	NULL, 't' },
-  { "show",      	 optional_argument, 	NULL, 's' },
+  { "show",      	 required_argument, 	NULL, 's' },
   { "calcallstates", no_argument, 			NULL, 'a' },
   { "reduceIG",   	 no_argument,	    	NULL, 'r' },
   { "commDepth",   	 required_argument,    	NULL, 'c' },
   { "messagemaximum",required_argument,    	NULL, 'm' },
   { "eventsmaximum", required_argument,    	NULL, 'e' },
-  { "BDD",			 optional_argument,    	NULL, 'b' },
+  { "BDD",			 required_argument,    	NULL, 'b' },
   NULL
 };
 
@@ -185,6 +185,7 @@ void parse_command_line(int argc, char* argv[]) {
 	commDepth_manual = 1;
 	
   	// evaluate options and set parameters
+  	trace(TRACE_0, "\n");
   	int optc = 0;
   	while ((optc = getopt_long (argc, argv, par_string, longopts, (int *) 0)) != EOF) {
 	    switch (optc) {
@@ -215,14 +216,9 @@ void parse_command_line(int argc, char* argv[]) {
 			    }
 		      	break;
 	      	case 'n':
-		      	if (optarg != NULL) {
-			      	options[O_OWFN_NAME] = true;
-		        	// netfile = optarg;
-					netfiles.push_back(optarg);
-		      	} else {
-					cerr << "Option error: missing net file \t ...exiting" << endl;
-					exit(1);
-			    }
+		      	options[O_OWFN_NAME] = true;
+	        	// netfile = optarg;
+				netfiles.push_back(optarg);
 	          	break;
 	      	case 't':
 			  	if (string(optarg) == "OG") {
@@ -238,28 +234,16 @@ void parse_command_line(int argc, char* argv[]) {
 			    }
 			  	break;
 	      	case 'c':
-		      	if (optarg != NULL) {
-		        	options[O_COMM_DEPTH] = true;
-		        	commDepth_manual = atoi(optarg);
-		      	} else {
-					cerr << "Option error: missing communication depth value \t ...ignored" << endl;
-			    }
+	        	options[O_COMM_DEPTH] = true;
+	        	commDepth_manual = atoi(optarg);
 	          	break;
 	      	case 'm':
-		      	if (optarg != NULL) {
-		        	options[O_MESSAGES_MAX] = true;
-		        	messages_manual = atoi(optarg);
-		      	} else {
-					cerr << "Option error: missing message bound \t ...ignored" << endl;
-			    }
+	        	options[O_MESSAGES_MAX] = true;
+	        	messages_manual = atoi(optarg);
 	          	break;
 	      	case 'e':
-		      	if (optarg != NULL) {
-		        	options[O_EVENT_USE_MAX] = true;
-		        	events_manual = atoi(optarg);
-		      	} else {
-					cerr << "Option error: missing event bound \t ...ignored" << endl;
-			    }
+	        	options[O_EVENT_USE_MAX] = true;
+	        	events_manual = atoi(optarg);
 	          	break;
 	      	case 's':
 	      		if (string(optarg) == "blue") {
@@ -295,8 +279,8 @@ void parse_command_line(int argc, char* argv[]) {
 		      	options[O_CALC_REDUCED_IG] = true;
 	          	break;
 	      	case 'b':
-		      	options[O_BDD] = true;
 		      	if (optarg) {
+			      	options[O_BDD] = true;
 		      		int i = atoi(optarg);
 		      		if (i >= 0 && i <= 21){
 		      			bdd_reordermethod = i;
@@ -305,13 +289,13 @@ void parse_command_line(int argc, char* argv[]) {
 			      		bdd_reordermethod = 0;
 		      		}
 		      	} else {
+					cerr << "Option error: missing parameter for -b option \t ...method 0 used" << endl;
 		      		bdd_reordermethod = 0;
 		      	}
 		      	break;
 	      	default:
-				cerr << "Option error: wrong parameter for -b option unknown option \t ...ignored" << endl;
+				cerr << "Option error: unknown option or missing argument" << endl;
 				break;
-				
 		}
 	}
 
@@ -328,10 +312,14 @@ void parse_command_line(int argc, char* argv[]) {
   	}
 
   	if (options[O_OWFN_NAME] == false) {
-  		trace(TRACE_0, "\nmissing parameter -n\n");
-		print_help();
+  		trace(TRACE_0, "missing parameter -n\n");
   		exit(1);
   	}
+
+	if (options[O_BDD] == true && parameters[P_OG] == false) {
+		cerr << "computing IG -- BDD option ignored" << endl;
+		options[O_BDD] = false;
+	}
 }
 
 

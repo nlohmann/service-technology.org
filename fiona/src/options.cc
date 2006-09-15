@@ -178,7 +178,7 @@ void parse_command_line(int argc, char* argv[]) {
 	parameters[P_SHOW_EMPTY_NODE] = false;
 	parameters[P_SHOW_STATES_PER_NODE] = false;
 
-	bdd_reordermethod = 1;
+	bdd_reordermethod = 0;
 
 	messages_manual = 1;
 	events_manual = 1;
@@ -195,46 +195,46 @@ void parse_command_line(int argc, char* argv[]) {
 		      	options[O_VERSION] = true;
 				break;
 	      	case 'd':
-		      	options[O_DEBUG] = true;
 	 			if ( string(optarg) == "1" ) {
+		      		options[O_DEBUG] = true;
 					debug_level = TRACE_1;
 		      	} else if ( string(optarg) == "2" ) {
+		    	  	options[O_DEBUG] = true;
 					debug_level = TRACE_2;
 		      	} else if ( string(optarg) == "3" ) {
+			      	options[O_DEBUG] = true;
 					debug_level = TRACE_3;
 		      	} else if ( string(optarg) == "4" ) {
+			      	options[O_DEBUG] = true;
 					debug_level = TRACE_4;
 		      	} else if ( string(optarg) == "5" ) {
+			      	options[O_DEBUG] = true;
 					debug_level = TRACE_5;
 		      	} else {
-					throw Exception(OPTION_MISMATCH,
-						"Unrecognised debug mode!\n",
-						"Type " + progname + " -h for more information.\n");
+					cerr << "Option error: wrong debug mode \t ...ignored" << endl;
 			    }
 		      	break;
 	      	case 'n':
-		      	options[O_OWFN_NAME] = true;
 		      	if (optarg != NULL) {
+			      	options[O_OWFN_NAME] = true;
 		        	// netfile = optarg;
-				netfiles.push_back(optarg);
+					netfiles.push_back(optarg);
 		      	} else {
-					throw Exception(OPTION_MISMATCH,
-						"missing net file!\n",
-						"Type " + progname + " -h for more information.\n");
+					cerr << "Option error: missing net file \t ...exiting" << endl;
+					exit(1);
 			    }
 	          	break;
 	      	case 't':
-			  	options[O_GRAPH_TYPE] = true;
 			  	if (string(optarg) == "OG") {
+				  	options[O_GRAPH_TYPE] = true;
 			  		parameters[P_OG] = true;
 			  		parameters[P_IG] = false;
 			  	} else if (string(optarg) == "IG") {
+				  	options[O_GRAPH_TYPE] = true;
 			  		parameters[P_OG] = false;
 			  		parameters[P_IG] = true;
 			  	} else {
-					throw Exception(OPTION_MISMATCH,
-						"Unrecognised type parameter!\n",
-						"Type " + progname + " -h for more information.\n");
+					cerr << "Option error: wrong graph type \t ...IG computed" << endl;
 			    }
 			  	break;
 	      	case 'c':
@@ -242,9 +242,7 @@ void parse_command_line(int argc, char* argv[]) {
 		        	options[O_COMM_DEPTH] = true;
 		        	commDepth_manual = atoi(optarg);
 		      	} else {
-					throw Exception(OPTION_MISMATCH,
-						"Please enter valid communication depth\n",
-						"Type " + progname + " -h for more information.\n");
+					cerr << "Option error: missing communication depth value \t ...ignored" << endl;
 			    }
 	          	break;
 	      	case 'm':
@@ -252,9 +250,7 @@ void parse_command_line(int argc, char* argv[]) {
 		        	options[O_MESSAGES_MAX] = true;
 		        	messages_manual = atoi(optarg);
 		      	} else {
-					throw Exception(OPTION_MISMATCH,
-						"Please enter valid maximal number for same messages per state\n",
-						"Type " + progname + " -h for more information.\n");
+					cerr << "Option error: missing message bound \t ...ignored" << endl;
 			    }
 	          	break;
 	      	case 'e':
@@ -262,34 +258,34 @@ void parse_command_line(int argc, char* argv[]) {
 		        	options[O_EVENT_USE_MAX] = true;
 		        	events_manual = atoi(optarg);
 		      	} else {
-					throw Exception(OPTION_MISMATCH,
-						"Please enter valid maximal number for using events\n",
-						"Type " + progname + " -h for more information.\n");
+					cerr << "Option error: missing event bound \t ...ignored" << endl;
 			    }
 	          	break;
 	      	case 's':
-	      		options[O_SHOW_NODES] = true;
 	      		if (string(optarg) == "blue") {
+	      			options[O_SHOW_NODES] = true;
 	      			parameters[P_SHOW_ALL_NODES] = false;
 	      			parameters[P_SHOW_NO_RED_NODES] = false;
 	      			parameters[P_SHOW_BLUE_NODES_ONLY] = true;
 	      		} else if (string(optarg) == "nored") {
+	      			options[O_SHOW_NODES] = true;
 	      			parameters[P_SHOW_ALL_NODES] = false;
 	      			parameters[P_SHOW_NO_RED_NODES] = true;
 	      			parameters[P_SHOW_BLUE_NODES_ONLY] = false;
 	      		} else if (string(optarg) == "empty") {
+	    	  		options[O_SHOW_NODES] = true;
 	      			parameters[P_SHOW_EMPTY_NODE] = true;
 	      		} else if (string(optarg) == "allstates") {
+		      		options[O_SHOW_NODES] = true;
 	      			parameters[P_SHOW_STATES_PER_NODE] = true;
 	      		} else if (string(optarg) == "allnodes") {
+		      		options[O_SHOW_NODES] = true;
 	      			parameters[P_SHOW_ALL_NODES] = true;
 	      			parameters[P_SHOW_EMPTY_NODE] = true;
 	      			parameters[P_SHOW_NO_RED_NODES] = false;
 	      			parameters[P_SHOW_BLUE_NODES_ONLY] = false;
 	      		} else {
-					throw Exception(OPTION_MISMATCH,
-						"Unrecognised show parameter!\n",
-						"Type " + progname + " -h for more information.\n");
+					cerr << "Option error: wrong show option \t ...ignored" << endl;
 			    }
 			    break;
 	      	case 'a':
@@ -305,18 +301,15 @@ void parse_command_line(int argc, char* argv[]) {
 		      		if (i >= 0 && i <= 21){
 		      			bdd_reordermethod = i;
 		      		} else {
-		      			throw Exception(OPTION_MISMATCH,
-				     	"Unknown option!\n",
-				     	"Type " + progname + " -h for more information.\n");
+						cerr << "Option error: wrong parameter for -b option \t ...method 0 used" << endl;
+			      		bdd_reordermethod = 0;
 		      		}
 		      	} else {
 		      		bdd_reordermethod = 0;
 		      	}
 		      	break;
 	      	default:
-		     	throw Exception(OPTION_MISMATCH,
-				     "Unknown option!\n",
-				     "Type " + progname + " -h for more information.\n");
+				cerr << "Option error: wrong parameter for -b option unknown option \t ...ignored" << endl;
 				break;
 				
 		}
@@ -335,8 +328,9 @@ void parse_command_line(int argc, char* argv[]) {
   	}
 
   	if (options[O_OWFN_NAME] == false) {
-  		trace(TRACE_0, "missing parameter -n\n");
-  		exit(0);
+  		trace(TRACE_0, "\nmissing parameter -n\n");
+		print_help();
+  		exit(1);
   	}
 }
 

@@ -1,0 +1,10 @@
+.deps
+Makefile
+Makefile.in
+fiona.h
+fiona.h.in
+lexer.cc
+stamp-h1
+syntax.cc
+fiona.exe.stackdump
+gmon.out

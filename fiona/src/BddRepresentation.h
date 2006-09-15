@@ -12,8 +12,10 @@
 #include "vertex.h"
 #include "CNF.h"
 
+#include "util.h"
 #include "cudd.h" 
 #include "cuddInt.h"
+#include "dddmp.h"
 
 using namespace std;
 typedef vector<bool> BitVector;
@@ -31,6 +33,7 @@ class BddRepresentation{
 		void reorder(Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
 		void printDotFile(char** names= NULL);
 		void print();
+		void save();
 
 		
         // Provides user defined operator new. Needed to trace all new
@@ -39,7 +42,7 @@ class BddRepresentation{
         NEW_OPERATOR(BddRepresentation)
 #define new NEW_NEW
 
-	private:	 
+	private:	  
 		DdManager* mgrMp;
 		DdManager* mgrAnn;
 		DdNode* bddMp;

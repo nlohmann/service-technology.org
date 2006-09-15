@@ -247,7 +247,7 @@ int main(int argc, char ** argv) {
 				trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
 	                
 		        graph->printDotFile();
-	        
+       
 		        if (options[O_BDD] == true) {
 					trace(TRACE_0, "\nbuilding the BDDs...\n");
 					seconds = time (NULL);
@@ -257,8 +257,9 @@ int main(int argc, char ** argv) {
 		        	 
 					//graph->bdd->printDotFile();
 					//graph->bdd->print();
+					graph->bdd->save();
 		        }
-	        
+		              
 //				cout << "\nOG computation finished\n\t\t\t...please hit any key" << endl;
 //				getchar();
 		

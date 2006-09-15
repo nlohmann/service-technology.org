@@ -10,9 +10,9 @@
 #include "symboltab.h" 
 #include "owfn.h"
 
-#include "options.h"
+#include "options.h" 
 #include "debug.h"
-#include <cassert> 
+#include <cassert>  
   
 //extern char* netfile;  
  
@@ -22,8 +22,8 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_Reorderin
 	nbrLabels = numberOfLabels;
 	maxLabelBits = nbrBits(numberOfLabels-1);
 	maxNodeBits = 1;
-	maxNodeNumber = 0;
-	
+	maxNodeNumber = 0;  
+	 
 	int sizeMp = 2 * maxNodeBits + maxLabelBits;
     int sizeAnn = nbrLabels + maxNodeBits;
     
@@ -33,7 +33,7 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_Reorderin
     
     //enable automatic dynamic reordering of BDDs
     Cudd_AutodynEnable(mgrMp, heuristic);
-    Cudd_AutodynEnable(mgrAnn, heuristic);
+    Cudd_AutodynEnable(mgrAnn, heuristic);		
     
     //init BDDs
     bddMp = Cudd_Not(Cudd_ReadOne(mgrMp)); //BDDstructure
@@ -604,6 +604,7 @@ void BddRepresentation::printDotFile(char** varNames){
 	
 		char bufferMp[256]; 
 		char bufferAnn[256];
+
 		if (options[O_CALC_ALL_STATES]) {
 	                sprintf(bufferMp, "%s.a.OG.BDD_MP.out", netfile);
 	                sprintf(bufferAnn, "%s.a.OG.BDD_ANN.out", netfile); 
@@ -611,7 +612,8 @@ void BddRepresentation::printDotFile(char** varNames){
 	                sprintf(bufferMp, "%s.OG.BDD_MP.out", netfile);
 	                sprintf(bufferAnn, "%s.OG.BDD_ANN.out", netfile);
 	            }
-		FILE* fpMp;
+            
+            FILE* fpMp;
 	    fpMp = fopen(bufferMp, "w");
 	    Cudd_DumpDot(mgrMp, 1, &bddMp, varNames, NULL, fpMp);
 	    fclose(fpMp);
@@ -652,5 +654,80 @@ void BddRepresentation::print(){
 	Cudd_PrintMinterm(mgrMp, bddMp);
 	cout << "\nBDD_ANN:\n"; 
 	Cudd_PrintMinterm(mgrAnn, bddAnn);
+}
+
+
+//! \fn void BddRepresentation::save()
+//! \brief save bddMp and bddAnn in file
+void BddRepresentation::save(){
+	int size = nbrLabels + maxNodeBits;
+	char** names = new char*[size];
+
+    int j = 0;
+    //for (int i = countBddVar - v.size(); i< countBddVar; ++i){
+    for (unsigned int i = 0; i < PN->placeInputCnt; ++i){
+    	assert(i < nbrLabels + maxNodeBits);
+        names[i] = PN->inputPlacesArray[i]->name;
+    }
+    
+    for (unsigned int i = 0; i < PN->placeOutputCnt; ++i){
+		assert(i+PN->placeInputCnt < nbrLabels + maxNodeBits);
+    	names[i + PN->placeInputCnt] = PN->outputPlacesArray[i]->name;
+    }
+
+	assert(nbrLabels == PN->placeInputCnt+PN->placeOutputCnt);
+	assert(Cudd_ReadSize(mgrAnn) == nbrLabels + maxNodeBits);
+    for (int i = nbrLabels; i < nbrLabels + maxNodeBits; ++i){
+    	assert(i < Cudd_ReadSize(mgrAnn));
+        //strcpy(hlp,(char*)(myitoa(i,10).c_str())); 
+        
+        int varNumber = i-nbrLabels;
+        assert (varNumber >= 0);
+        //int z = (int)floor(log10((double)(varNumber)))+2;
+        char* buffer = new char[11];
+        sprintf(buffer, "%d", varNumber);
+        names[i] = buffer; 
+    }
+	
+	char bufferMp[256]; 
+	char bufferAnn[256];
+	
+	if (options[O_CALC_ALL_STATES]) {
+                sprintf(bufferMp, "%s.a.OG.BDD_MP.cudd", netfile);
+                sprintf(bufferAnn, "%s.a.OG.BDD_ANN.cudd", netfile); 
+    } else {
+        sprintf(bufferMp, "%s.OG.BDD_MP.cudd", netfile);
+        sprintf(bufferAnn, "%s.OG.BDD_ANN.cudd", netfile);
+    }
+    
+   	cout << "\nsaving the BDDs... \n";
+    FILE* fpMp = fopen(bufferMp, "w");
+    Dddmp_VarInfoType varinfo = DDDMP_VARDEFAULT; //DDDMP_VARPERMIDS;
+    Dddmp_cuddBddStore (
+            mgrMp,              /* DD Manager */
+            "bddMp",            /* DD name (or NULL) */
+            bddMp,              /* BDD root to be stored */
+            NULL,               /* array of variable names (or NULL) */
+            NULL, //int *auxids /* array of converted var ids (optional) */
+            DDDMP_MODE_TEXT,    /* storing mode selector */
+            varinfo,            /* extra info for variables in text mode */
+            NULL,               /* File name */
+            fpMp                /* File pointer to the store file */
+     );
+     fclose(fpMp);
+
+      FILE* fpAnn = fopen(bufferAnn, "w");
+     Dddmp_cuddBddStore (
+            mgrAnn,             /* DD Manager */
+            "bddAnn",           /* DD name (or NULL) */
+            bddAnn,             /* BDD root to be stored */
+            names,              /* array of variable names (or NULL) */
+            NULL, //int *auxids /* array of converted var ids (optional) */
+            DDDMP_MODE_TEXT,    /* storing mode selector */
+            varinfo,            /* extra info for variables in text mode */
+            NULL,               /* File name */
+            fpAnn               /* File pointer to the store file */
+     );
+     fclose(fpAnn);
 }
 

@@ -14,7 +14,12 @@
 #include "debug.h"
 #include <cassert>  
   
-//extern char* netfile;  
+//comparison function object
+struct cmp{
+    bool operator()(char* x, char* y){
+        return (strcmp(x,y)<0); // true falls x kleiner y, sonst false
+    }
+};
  
 //! \fn BddRepresentation::BddRepresentation(int nbrLabels, Cudd_ReorderingType heuristic)
 //! \brief constructor
@@ -44,7 +49,35 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_Reorderin
     //nodeMap.insert(make_pair(root->getNumber(), 0));
     
     labelTable = new BddLabelTab(2*nbrLabels);
-       
+    
+    list<char*> labelList;
+    for (unsigned int i = 0; i < PN->placeInputCnt; ++i){
+    	//cout << i << "  " << PN->inputPlacesArray[i]->name << endl;
+    	labelList.push_back(PN->inputPlacesArray[i]->name);
+    }
+      
+    for (unsigned int i = 0; i < PN->placeOutputCnt; ++i){
+    	//cout << i << "  " << PN->outputPlacesArray[i]->name << endl;
+    	labelList.push_back(PN->outputPlacesArray[i]->name);
+    }
+    
+    labelList.sort(cmp());	//for a unigue coding of the labels
+    
+    labelTable = new BddLabelTab(2*nbrLabels);    
+    BddLabel * label;
+    list<char*>::const_iterator list_iter = labelList.begin();
+    
+    //add labels and their bddNumber to labelTable
+    for (unsigned int i = 0; i < PN->placeInputCnt + PN->placeOutputCnt; ++i){
+    	assert(list_iter != labelList.end());
+    	//cout << i << "  " << *list_iter << endl;
+    	label = new BddLabel(*list_iter, i, labelTable);
+    	++list_iter;
+    }
+    
+    labelList.clear();
+
+/*      
     //add labels and their bddNumber to labelTable
     BddLabel * label;
     for (unsigned int i = 0; i < PN->placeInputCnt; ++i){
@@ -56,6 +89,8 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_Reorderin
     	//cout << i + PN->placeInputCnt << "  " << PN->outputPlacesArray[i]->name << endl;
     	label = new BddLabel(PN->outputPlacesArray[i]->name, i + PN->placeInputCnt, labelTable);
     }
+*/
+
 /*
   	BddLabel * temp;
     for(unsigned int i = 0; i < labelTable->size;i++){
@@ -65,8 +100,8 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_Reorderin
 			cout << i << "    " << temp->nbr <<"   " << temp->name << endl;
 			temp = temp->next;			
 		}	
-	}
-*/ 
+	}    
+*/    
 }
 
 //! \fn BddRepresentation::~BddRepresentation()()

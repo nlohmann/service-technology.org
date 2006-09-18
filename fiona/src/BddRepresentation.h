@@ -8,6 +8,7 @@
 #include "mynew.h" 
 #include <vector>
 #include <map>
+#include <list>
 
 #include "vertex.h"
 #include "CNF.h"

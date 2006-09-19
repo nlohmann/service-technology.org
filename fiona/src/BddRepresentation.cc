@@ -702,17 +702,27 @@ void BddRepresentation::save(){
     //for (int i = countBddVar - v.size(); i< countBddVar; ++i){
     for (unsigned int i = 0; i < PN->placeInputCnt; ++i){
     	assert(i < nbrLabels + maxNodeBits);
-        names[i] = PN->inputPlacesArray[i]->name;
+    	//cout << "i: " << i << "   name: " << PN->inputPlacesArray[i]->name << "   nbr: " << labelTable->lookup(PN->inputPlacesArray[i]->name)->nbr << endl;
+    	char* tmp = new char [strlen(PN->inputPlacesArray[i]->name) + 2];
+    	strcpy (tmp,"!");
+    	strcat (tmp, PN->inputPlacesArray[i]->name);
+    	unsigned int nbr = labelTable->lookup(PN->inputPlacesArray[i]->name)->nbr;
+        names[nbr] = tmp;
     }
     
     for (unsigned int i = 0; i < PN->placeOutputCnt; ++i){
 		assert(i+PN->placeInputCnt < nbrLabels + maxNodeBits);
-    	names[i + PN->placeInputCnt] = PN->outputPlacesArray[i]->name;
+		//cout << "i: " << i << "   name: " << PN->outputPlacesArray[i]->name << "   nbr: " << labelTable->lookup(PN->outputPlacesArray[i]->name)->nbr << endl;
+    	char* tmp = new char [strlen(PN->outputPlacesArray[i]->name) + 2];
+    	strcpy (tmp,"?");
+    	strcat (tmp, PN->outputPlacesArray[i]->name);
+    	unsigned int nbr = labelTable->lookup(PN->outputPlacesArray[i]->name)->nbr;
+        names[nbr] = tmp;
     }
 
 	assert(nbrLabels == PN->placeInputCnt+PN->placeOutputCnt);
 	assert(Cudd_ReadSize(mgrAnn) == nbrLabels + maxNodeBits);
-    for (int i = nbrLabels; i < nbrLabels + maxNodeBits; ++i){
+    for (int i = nbrLabels; i < size; ++i){
     	assert(i < Cudd_ReadSize(mgrAnn));
         //strcpy(hlp,(char*)(myitoa(i,10).c_str())); 
         
@@ -723,6 +733,9 @@ void BddRepresentation::save(){
         sprintf(buffer, "%d", varNumber);
         names[i] = buffer; 
     }
+    
+//    for (int i = 0; i < size; ++i){cout << names[i] << "  ";}
+    
 	
 	char bufferMp[256]; 
 	char bufferAnn[256];

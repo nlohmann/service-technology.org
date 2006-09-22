@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/09/14 12:37:54 $
+ *          - last changed: \$Date: 2006/09/22 10:59:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.101 $
+ * \version \$Revision: 1.102 $
  */
 %}
 
@@ -61,10 +61,15 @@
 
 #include <string>
 #include <iostream>
+#include <map>
+#include "helpers.h"
 
 using std::string;
 using std::cerr;
 using std::endl;
+using std::map;
+
+typedef map<string, string> stringMap;
 
 extern int yylineno;
 
@@ -86,24 +91,34 @@ tProcess:
       )
   {
     int id = 0;
+    int referenceLine;
+    stringMap attributes;
+
     bool suppressJF = false;
     bool hasEH = false;
-
-    string A_name;
-    string A_targetNamespace;
-    string A_queryLanguage;
-    string A_expressionLanguage;
-    string A_suppressJoinFailure;
-    string A_enableInstanceCompensation;
-    string A_abstractProcess;
-    string A_xmlns;
-
-    {
-      // these lines define a constructor of the process phylum
-      // cerr << "created a <process> phylum" << endl;
-    }
   }
 ;
+
+void tProcess::checkAttributes()
+{
+  string required[] = { "name", "targetNamespace" };
+  string optional[] = { "queryLanguage", "expressionLanguage", "suppressJoinFailure", "enableInstanceCompensation", "abstractProcess", "xmlns" };
+  string defaults[] = { "http://www.w3.org/TR/1999/REC-xpath-19991116", "http://www.w3.org/TR/1999/REC-xpath-19991116", "no", "no", "no", "" };
+  const int requireds = sizeof(required)/sizeof(required[0]);
+  const int optionals = sizeof(optional)/sizeof(optional[0]);
+
+  for (int i = 0; i < requireds; i++)
+    if (attributes[required[i]] == "")
+      cerr << "no `" << required[i] << "' given in near " << referenceLine << " (required)" << endl;
+
+  for (int i = 0; i < optionals; i++)
+    if (attributes[optional[i]] == "")
+    {
+      cerr << "no `" << optional[i] << "' given in near " << referenceLine << " (optional)" << endl;
+      if (defaults[i] != "")
+        cerr << "  initialized `"<< optional[i] << "' with standard value `" << defaults[i] << "'" << endl;
+    }
+}
 
 
 tStop:
@@ -148,13 +163,10 @@ tPartnerLink:
   PartnerLink()
   {
     int id = 0;
+    int referenceLine;
+    stringMap attributes;
 
     bool inPartners = false;
-
-    string A_name;
-    string A_partnerLinkType;
-    string A_myRole;
-    string A_partnerRole;
   }
 ;
 
@@ -171,8 +183,8 @@ tPartner:
   Partner(tPartnerLink_list)
   {
     int id = 0;
-
-    string A_name;
+    int referenceLine;
+    stringMap attributes;
   }
 ;
 
@@ -201,9 +213,8 @@ tCatch:
   Catch(activity)
   {
     int id = 0;
-
-    string A_faultName;
-    string A_faultVariable;
+    int referenceLine;
+    stringMap attributes;
 
     string variableName;
   }
@@ -249,34 +260,15 @@ tOnMessage:
   {
     int id = 0;
     int referenceLine;
-
-    string A_partnerLink;
-    string A_portType;
-    string A_operation;
-    string A_variable;
-    string A_messageExchange; // WS-BPEL 2.0
+    stringMap attributes;
 
     string channelName;
     string variableName;
-
-    {
-      $0->referenceLine = yylineno;
-    }
   }
 ;
 
 void tOnMessage::checkAttributes()
 {
-  if (A_partnerLink == "")
-    cerr << "no `partnerLink' given near line " << referenceLine << endl;
-  if (A_portType == "")
-    cerr << "no `portType' given near line " << referenceLine << endl; // optional
-  if (A_operation == "")
-    cerr << "no `operation' given near line " << referenceLine << endl;
-  if (A_variable == "")
-    cerr << "no `variable' given near line " << referenceLine << endl; // optional
-  if (A_messageExchange == "")
-    cerr << "no `messageExchange' given near line " << referenceLine << endl; // optional
 }
 
 
@@ -288,25 +280,12 @@ tOnAlarm:
   {
     int id = 0;
     int referenceLine;
-    
-    string A_for;
-    string A_until;
-    string A_expressionLanguage; // WS-BPEL
-
-    {
-      $0->referenceLine = yylineno;
-    }
+    stringMap attributes;
   } 
 ;
 
 void tOnAlarm::checkAttributes()
 {
-  if (A_for == "" && A_until == "")
-    cerr << "neither `for' nor `until' given near line " << referenceLine << endl;
-  if (A_for != "" && A_until != "")
-    cerr << "both `for' and `until' given near line " << referenceLine << endl;
-  if (A_expressionLanguage == "")
-    cerr << "no `expressionLanguage' given near line " << referenceLine << endl;
 }
 
 
@@ -343,11 +322,8 @@ tVariable:
   Variable()
   {
     int id = 0;
-
-    string A_name;
-    string A_messageType;
-    string A_type;
-    string A_element;
+    int referenceLine;
+    stringMap attributes;
   }
 ;
 
@@ -364,9 +340,8 @@ tCorrelationSet:
   CorrelationSet()
   {
     int id = 0;
-
-    string A_name;
-    string A_properties;
+    int referenceLine;
+    stringMap attributes;
   }
 ;
 
@@ -383,10 +358,8 @@ tCorrelation:
   Correlation()
   {
     int id = 0;
-
-    string A_set;
-    string A_initiate;
-    string A_pattern;
+    int referenceLine;
+    stringMap attributes;
   }
 ;
 
@@ -399,12 +372,11 @@ tEmpty:
   Empty(standardElements)
   {
     int id = 0;
+    int referenceLine;
+    stringMap attributes;
+
     int negativeControlFlow = 0;
     bool suppressJF = false;
-
-    string A_name;
-    string A_joinCondition;
-    string A_suppressJoinFailure;
   }
 ;
 
@@ -417,27 +389,17 @@ tInvoke:
   Invoke(standardElements tCorrelation_list)
   {
     int id = 0;
+    int referenceLine;
+    stringMap attributes;
+
     int negativeControlFlow = 0;
     bool suppressJF = false;
 
     bool isAsynchronousInvoke = false;
 
-    string A_name;
-    string A_joinCondition;
-    string A_suppressJoinFailure;
-    string A_partnerLink;
-    string A_portType;
-    string A_operation;
-    string A_inputVariable;
-    string A_outputVariable;    
-
     string channelName;
     string inputVariableName;
     string outputVariableName;
-
-    {
-      // cerr << "created an <invoke> phylum" << endl;
-    }
   }
 ;
 
@@ -450,17 +412,11 @@ tReceive:
   Receive(standardElements tCorrelation_list)
   {
     int id = 0;
+    int referenceLine;
+    stringMap attributes;
+
     int negativeControlFlow = 0;
     bool suppressJF = false;
-
-    string A_name;
-    string A_joinCondition;
-    string A_suppressJoinFailure;
-    string A_partnerLink;
-    string A_portType;
-    string A_operation;
-    string A_variable;
-    string A_createInstance;
 
     string channelName;
     string variableName;
@@ -476,17 +432,11 @@ tReply:
   Reply(standardElements tCorrelation_list)
   {
     int id = 0;
+    int referenceLine;
+    stringMap attributes;
+
     int negativeControlFlow = 0;
     bool suppressJF = false;
-
-    string A_name;
-    string A_joinCondition;
-    string A_suppressJoinFailure;
-    string A_partnerLink;
-    string A_portType;
-    string A_operation;
-    string A_variable;
-    string A_faultName;
 
     string channelName;
     string variableName;
@@ -502,12 +452,11 @@ tAssign:
   Assign(standardElements tCopy_list)
   {
     int id = 0;
+    int referenceLine;
+    stringMap attributes;
+
     int negativeControlFlow = 0;
     bool suppressJF = false;
-
-    string A_name;
-    string A_joinCondition;
-    string A_suppressJoinFailure;
   }
 ;
 
@@ -523,15 +472,10 @@ tFrom:
   From()
   {
     int id = 0;
+    int referenceLine;
+    stringMap attributes;
 
     string literal;
-
-    string A_variable;
-    string A_part;
-    string A_partnerLink;
-    string A_endpointReference;
-    string A_property;
-    string A_expression;
 
     string variableName;
   }
@@ -541,11 +485,8 @@ tTo:
   To()
   {
     int id = 0;
-
-    string A_variable;
-    string A_part;
-    string A_partnerLink;
-    string A_property;
+    int referenceLine;
+    stringMap attributes;
 
     string variableName;
   }
@@ -560,16 +501,13 @@ tWait:
   Wait(standardElements)
   {
     int id = 0;
+    int referenceLine;
+    stringMap attributes;
+
     int negativeControlFlow = 0;
     bool suppressJF = false;
 
     bool isWaitFor = false;
-
-    string A_name;
-    string A_joinCondition;
-    string A_suppressJoinFailure;
-    string A_for;
-    string A_until;
   }
 ;
 
@@ -582,14 +520,11 @@ tThrow:
   Throw(standardElements)
   {
     int id = 0;
+    int referenceLine;
+    stringMap attributes;
+
     int negativeControlFlow = 0;
     bool suppressJF = false;
-
-    string A_name;
-    string A_joinCondition;
-    string A_suppressJoinFailure;
-    string A_faultName;
-    string A_faultVariable;
 
     string variableName;
   }
@@ -604,17 +539,15 @@ tCompensate:
   Compensate(standardElements)
   {
     int id = 0;
+    int referenceLine;
+    stringMap attributes;
+
     int negativeControlFlow = 0;
     bool suppressJF = false;
 
     bool inFaultHandler = true;
 
     bool hasScopeAttribute = false;
-    
-    string A_name;
-    string A_joinCondition;
-    string A_suppressJoinFailure;
-    string A_scope;
   }
 ;
 
@@ -627,12 +560,11 @@ tTerminate:
   Terminate(standardElements)
   {
     int id = 0;
+    int referenceLine;
+    stringMap attributes;
+
     int negativeControlFlow = 0;
     bool suppressJF = false;
-
-    string A_name;
-    string A_joinCondition;
-    string A_suppressJoinFailure;
   }
 ;
 
@@ -645,12 +577,11 @@ tFlow:
   Flow(standardElements tLink_list activity_list)
   {
     int id = 0;
+    int referenceLine;
+    stringMap attributes;
+
     int negativeControlFlow = 0;
     bool suppressJF = false;
-
-    string A_name;
-    string A_joinCondition;
-    string A_suppressJoinFailure;
   }
 ;
 
@@ -666,8 +597,8 @@ tLink:
   Link()
   {
     int id = 0;
-
-    string A_name;
+    int referenceLine;
+    stringMap attributes;
 
     bool usedAsSource = false;
     bool usedAsTarget = false;
@@ -683,12 +614,11 @@ tSwitch:
   Switch(standardElements tCase_list tOtherwise)
   {
     int id = 0;
+    int referenceLine;
+    stringMap attributes;
+
     int negativeControlFlow = 0;
     bool suppressJF = false;
-
-    string A_name;
-    string A_joinCondition;
-    string A_suppressJoinFailure;
   }
 ;
 
@@ -700,8 +630,8 @@ tCase:
   Case(activity)
   {
     int id = 0;
-    
-    string A_condition;
+    int referenceLine;
+    stringMap attributes;
   }
 ;
 
@@ -721,13 +651,11 @@ tWhile:
   While(standardElements activity)
   {
     int id = 0;
+    int referenceLine;
+    stringMap attributes;
+
     int negativeControlFlow = 0;
     bool suppressJF = false;
-
-    string A_name;
-    string A_joinCondition;
-    string A_suppressJoinFailure;
-    string A_condition;
   }
 ;
 
@@ -740,12 +668,11 @@ tSequence:
   Sequence(standardElements activity_list)
   {
     int id = 0;
+    int referenceLine;
+    stringMap attributes;
+
     int negativeControlFlow = 0;
     bool suppressJF = false;
-
-    string A_name;
-    string A_joinCondition;
-    string A_suppressJoinFailure;
   }
 ;
 
@@ -758,13 +685,11 @@ tPick:
   Pick(standardElements tOnMessage_list tOnAlarm_list)
   {
     int id = 0;
+    int referenceLine;
+    stringMap attributes;
+
     int negativeControlFlow = 0;
     bool suppressJF = false;
-
-    string A_name;
-    string A_joinCondition;
-    string A_suppressJoinFailure;
-    string A_createInstance;
   }
 ;
 
@@ -785,16 +710,14 @@ tScope:
       )
   {
     int id = 0;
+    int referenceLine;
+    stringMap attributes;
+
     int negativeControlFlow = 0;
     bool suppressJF = false;
     bool hasEH = false;
 
     int parentScopeId;
-
-    string A_name;
-    string A_joinCondition;
-    string A_suppressJoinFailure;
-    string A_variableAccessSerializable;
   }
 ;
 
@@ -826,9 +749,10 @@ tTarget:
   Target()
   {
     int id = 0;
+    int referenceLine;
+    stringMap attributes;
+
     int negativeControlFlow = 0;
-    
-    string A_linkName;
     
     string linkName;
   }
@@ -842,11 +766,10 @@ tSource:
   Source()
   {
     int id = 0;
-    int negativeControlFlow = 0;
+    int referenceLine;
+    stringMap attributes;
 
-    string A_linkName;
-    string A_transitionCondition;
-    string A_variableAccessSerializable;
+    int negativeControlFlow = 0;
 
     string linkName;
   }
@@ -864,15 +787,3 @@ expression:
 | Conjunction(expression expression)
 | Disjunction(expression expression)
 ;
-
-
-
-/* macht nichts vernünftiges -- geht aber...
- * kann vielleicht dazu benutzt werden, die Attribute elegant zu überprüfen,
- * indem an jedem Phylum einfach checkAttributes() gerufen wird...
- * 
-int tTarget::equals()
-{
-  return 42;
-}
-*/

@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/07/12 16:24:20 $
+ *          - last changed: \$Date: 2006/09/22 10:59:58 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.29 $
+ * \version \$Revision: 1.30 $
  *
  */
 %}
@@ -896,7 +896,7 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
 	Place *p4 = TheNet->findPlace("link." + source->linkName);
         TheNet->newArc(t1, p4);
 
-        string givenTransitionCondition = source->A_transitionCondition;
+        string givenTransitionCondition = source->attributes["transitionCondition"];
         if (givenTransitionCondition != "" && givenTransitionCondition != "true")
         {
           cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
@@ -1071,7 +1071,7 @@ This=StandardElements(a,b, jc) provided (This->suppressJF)
 	Place *p7 = TheNet->findPlace("link." + source->linkName);
         TheNet->newArc(t3, p7);
 
-        string givenTransitionCondition = source->A_transitionCondition;
+        string givenTransitionCondition = source->attributes["transitionCondition"];
         if (givenTransitionCondition != "" && givenTransitionCondition != "true")
         {
           cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;

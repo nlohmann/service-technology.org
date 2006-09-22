@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/07/12 11:37:02 $
+ *          - last changed: \$Date: 2006/09/22 10:59:58 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.188 $
+ * \version \$Revision: 1.189 $
  *
  */
 %}
@@ -759,7 +759,7 @@ This=userDefinedFaultHandler(a,b) provided (This->inProcess) ->
     {
       foreach (catchBranch=Catch(innerActivity); tCatch_list a)
       {
-	string faultToCatch = catchBranch->A_faultName;
+	string faultToCatch = catchBranch->attributes["faultName"];
 	Transition *t1 = TheNet->newTransition(prefix + "t1.internal." + faultToCatch);
 	Transition *t2 = TheNet->newTransition(prefix + "t2." + faultToCatch);
 
@@ -1087,7 +1087,7 @@ This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
     {
       foreach (catchBranch=Catch(innerActivity); tCatch_list a)
       {
-	string faultToCatch = catchBranch->A_faultName;
+	string faultToCatch = catchBranch->attributes["faultName"];
 
 	Transition *t1 = TheNet->newTransition(prefix + "t1.internal." + faultToCatch);
 	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));

@@ -32,13 +32,13 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/07/12 08:56:43 $
+ *          - last changed: \$Date: 2006/09/22 10:59:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.51 $
+ * \version \$Revision: 1.52 $
  */
 
 
@@ -51,6 +51,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 #include "helpers.h"
 #include "options.h"
@@ -100,6 +101,23 @@ string intToString(int i)
   return string(buffer);
 }
 
+
+
+
+
+/*!
+ * \param s C++ string
+ * \return integer representing s
+ */
+int stringToInt(string s)
+{
+  int temp;
+  istringstream isst;
+  isst.str(s);
+  isst >> temp;
+
+  return temp;
+}
 
 
 
@@ -183,4 +201,3 @@ void cleanup()
     log_output = &cerr;
   }
 }
-

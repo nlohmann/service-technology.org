@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/09/22 10:59:58 $
+ *          - last changed: \$Date: 2006/09/22 15:08:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.214 $
+ * \version \$Revision: 1.215 $
  * 
  */
 %}
@@ -286,19 +286,15 @@ tPartnerLink_list:
 
 tPartnerLink:
   K_PARTNERLINK arbitraryAttributes X_NEXT X_SLASH K_PARTNERLINK
-    { 
-      $$ = PartnerLink();
+    { $$ = PartnerLink();
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_PARTNERLINK);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_PARTNERLINK); }
 | K_PARTNERLINK arbitraryAttributes X_SLASH
-    { 
-      $$ = PartnerLink();
+    { $$ = PartnerLink();
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_PARTNERLINK);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_PARTNERLINK); }
 ;
 
 
@@ -322,15 +318,11 @@ tPartner_list:
 
 tPartner:
   K_PARTNER arbitraryAttributes X_NEXT tPartnerLink_list X_SLASH K_PARTNER
-    {
-      $$ = Partner($4);
-      $$->id = $2->value;
-    }
+    { $$ = Partner($4);
+      $$->id = $2->value; }
 | K_PARTNER arbitraryAttributes X_SLASH
-    {
-      $$ = Partner(NiltPartnerLink_list());
-      $$->id = $2->value;
-    }
+    { $$ = Partner(NiltPartnerLink_list());
+      $$->id = $2->value; }
 ;
 
 
@@ -340,19 +332,15 @@ tPartner:
 
 tFaultHandlers:
   /* empty */
-    {
-      $$ = implicitFaultHandler();
+    { $$ = implicitFaultHandler();
       $$->id = ASTEid++;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FAULTHANDLERS);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FAULTHANDLERS); }
 | K_FAULTHANDLERS X_NEXT tCatch_list tCatchAll X_SLASH K_FAULTHANDLERS X_NEXT
-    {
-      $$ = userDefinedFaultHandler($3, $4);
+    { $$ = userDefinedFaultHandler($3, $4);
       $$->id = ASTEid++;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FAULTHANDLERS);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FAULTHANDLERS); }
 ;
 
 tCatch_list:
@@ -364,24 +352,20 @@ tCatch_list:
 
 tCatch:
   K_CATCH arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CATCH
-    { 
-      $$ = Catch($4);
+    { $$ = Catch($4);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CATCH);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CATCH); }
 ;
 
 tCatchAll:
   /* empty */
     { $$ = NoCatchAll(); }
 | K_CATCHALL arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CATCHALL X_NEXT
-    {
-      $$ = CatchAll($4);
+    { $$ = CatchAll($4);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CATCHALL);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CATCHALL); }
 ;
 
 
@@ -391,19 +375,15 @@ tCatchAll:
 
 tCompensationHandler:
   /* empty */
-    {
-      $$ = implicitCompensationHandler();
+    { $$ = implicitCompensationHandler();
       $$->id = ASTEid++;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_COMPENSATIONHANDLER);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_COMPENSATIONHANDLER); }
 | K_COMPENSATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_COMPENSATIONHANDLER X_NEXT
-    {
-      $$ = userDefinedCompensationHandler($3);
+    { $$ = userDefinedCompensationHandler($3);
       $$->id = ASTEid++;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_COMPENSATIONHANDLER);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_COMPENSATIONHANDLER); }
 ;
 
 
@@ -413,19 +393,15 @@ tCompensationHandler:
 
 tEventHandlers:
   /* empty */
-    {
-      $$ = implicitEventHandler();
+    { $$ = implicitEventHandler();
       $$->id = ASTEid++;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_EVENTHANDLERS);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_EVENTHANDLERS); }
 | K_EVENTHANDLERS X_NEXT tOnMessage_list tOnAlarm_list X_SLASH K_EVENTHANDLERS X_NEXT
-    {
-      $$ = userDefinedEventHandler($3, $4);
+    { $$ = userDefinedEventHandler($3, $4);
       $$->id = ASTEid++;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_EVENTHANDLERS);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_EVENTHANDLERS); }
 ;
 
 tOnMessage_list:
@@ -444,22 +420,18 @@ tOnAlarm_list:
 
 tOnMessage:
   K_ONMESSAGE arbitraryAttributes X_NEXT tCorrelations activity X_NEXT X_SLASH K_ONMESSAGE
-    {
-      $$ = OnMessage($5);
+    { $$ = OnMessage($5);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_ONMESSAGE);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_ONMESSAGE); }
 ;
 
 tOnAlarm:
   K_ONALARM arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_ONALARM 
-    {
-      $$ = OnAlarm($4);
+    { $$ = OnAlarm($4);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_ONALARM);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_ONALARM); }
 ;
 
 
@@ -483,19 +455,15 @@ tVariable_list:
 
 tVariable:
   K_VARIABLE arbitraryAttributes X_NEXT X_SLASH K_VARIABLE
-    {
-      $$ = Variable();
+    { $$ = Variable();
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_VARIABLE);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_VARIABLE); }
 | K_VARIABLE arbitraryAttributes X_SLASH
-    {
-      $$ = Variable();
+    { $$ = Variable();
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_VARIABLE);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_VARIABLE); }
 ;
 
 
@@ -519,19 +487,15 @@ tCorrelationSet_list:
 
 tCorrelationSet:
   K_CORRELATIONSET arbitraryAttributes X_NEXT X_SLASH K_CORRELATIONSET
-    {
-      $$ = CorrelationSet();
+    { $$ = CorrelationSet();
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CORRELATIONSET);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CORRELATIONSET); }
 | K_CORRELATIONSET arbitraryAttributes X_SLASH
-    {
-      $$ = CorrelationSet();
+    { $$ = CorrelationSet();
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CORRELATIONSET);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CORRELATIONSET); }
 ;
 
 
@@ -555,19 +519,15 @@ tCorrelation_list:
 
 tCorrelation:
   K_CORRELATION arbitraryAttributes X_NEXT X_SLASH K_CORRELATION
-    {
-      $$ = Correlation();
+    { $$ = Correlation();
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CORRELATION);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CORRELATION); }
 | K_CORRELATION arbitraryAttributes X_SLASH
-    {
-      $$ = Correlation();
+    { $$ = Correlation();
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CORRELATION);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CORRELATION); }
 ;
 
 
@@ -577,20 +537,16 @@ tCorrelation:
 
 tEmpty:
   K_EMPTY arbitraryAttributes X_NEXT standardElements X_SLASH K_EMPTY
-    {
-      $$ = Empty($4);
+    { $$ = Empty($4);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_EMPTY);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_EMPTY); }
 | K_EMPTY arbitraryAttributes X_SLASH
-    {
-      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       $$ = Empty(noLinks);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_EMPTY);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_EMPTY); }
 ;
 
 
@@ -602,20 +558,16 @@ tInvoke:
   K_INVOKE arbitraryAttributes X_NEXT
   standardElements tCorrelations //tCatch_list tCatchAll tCompensationHandler
   X_SLASH K_INVOKE
-    {
-      $$ = Invoke($4, $5);
+    { $$ = Invoke($4, $5);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_INVOKE);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_INVOKE); }
 | K_INVOKE arbitraryAttributes X_SLASH
-    {
-      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       $$ = Invoke(noLinks, NiltCorrelation_list());
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_INVOKE);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_INVOKE); }
 ;
 
 
@@ -625,20 +577,16 @@ tInvoke:
 
 tReceive:
   K_RECEIVE arbitraryAttributes X_NEXT standardElements tCorrelations X_SLASH K_RECEIVE
-    {
-      $$ = Receive($4, $5);
+    { $$ = Receive($4, $5);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_RECEIVE);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_RECEIVE); }
 | K_RECEIVE arbitraryAttributes X_SLASH
-    {
-      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       $$ = Receive(noLinks, NiltCorrelation_list());
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_RECEIVE);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_RECEIVE); }
 ;
 
 
@@ -648,20 +596,16 @@ tReceive:
 
 tReply:
   K_REPLY arbitraryAttributes X_NEXT standardElements tCorrelations X_SLASH K_REPLY
-    {
-      $$ = Reply($4, $5);
+    { $$ = Reply($4, $5);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_REPLY);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_REPLY); }
 | K_REPLY arbitraryAttributes X_SLASH
-    {
-      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       $$ = Reply(noLinks, NiltCorrelation_list());
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_REPLY);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_REPLY); }
 ;
 
 
@@ -671,12 +615,10 @@ tReply:
 
 tAssign:
   K_ASSIGN arbitraryAttributes X_NEXT standardElements tCopy_list X_SLASH K_ASSIGN
-    {
-      $$ = Assign($4, $5);
+    { $$ = Assign($4, $5);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_ASSIGN);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_ASSIGN); }
 ;
 
 tCopy_list:
@@ -693,44 +635,34 @@ tCopy:
 
 tFrom:
   K_FROM arbitraryAttributes X_NEXT X_SLASH K_FROM
-    {
-      $$ = From();
+    { $$ = From();
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FROM);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FROM); }
 | K_FROM arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_FROM
-    {
-      $$ = From();
+    { $$ = From();
       $$->id = $2->value;
       $$->literal = $4->name;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FROM);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FROM); }
 | K_FROM arbitraryAttributes X_SLASH
-    {
-      $$ = From();
+    { $$ = From();
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FROM);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FROM); }
 ;
 
 tTo:
   K_TO arbitraryAttributes X_NEXT X_SLASH K_TO
-    {
-      $$ = To();
+    { $$ = To();
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TO);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TO); }
 | K_TO arbitraryAttributes X_SLASH
-    {
-      $$ = To();
+    { $$ = To();
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TO);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TO); }
 ;
 
 
@@ -740,20 +672,16 @@ tTo:
 
 tWait:
   K_WAIT arbitraryAttributes X_NEXT standardElements X_SLASH K_WAIT
-    {
-      $$ = Wait($4);
+    { $$ = Wait($4);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_WAIT);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_WAIT); }
 | K_WAIT arbitraryAttributes X_SLASH
-    {
-      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       $$ = Wait(noLinks);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_WAIT);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_WAIT); }
 ;
 
 
@@ -763,20 +691,16 @@ tWait:
 
 tThrow:
   K_THROW arbitraryAttributes X_NEXT standardElements X_SLASH K_THROW
-    {
-      $$ = Throw($4);
+    { $$ = Throw($4);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_THROW);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_THROW); }
 | K_THROW arbitraryAttributes X_SLASH
-    {
-      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       $$ = Throw(noLinks);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_THROW);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_THROW); }
 ;
 
 
@@ -786,20 +710,16 @@ tThrow:
 
 tCompensate:
   K_COMPENSATE arbitraryAttributes X_NEXT standardElements X_SLASH K_COMPENSATE
-    {
-      $$ = Compensate($4);
+    { $$ = Compensate($4);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_COMPENSATE);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_COMPENSATE); }
 | K_COMPENSATE arbitraryAttributes X_SLASH
-    {
-      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       $$ = Compensate(noLinks);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_COMPENSATE);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_COMPENSATE); }
 ;
 
 
@@ -809,20 +729,16 @@ tCompensate:
 
 tTerminate:
   K_TERMINATE arbitraryAttributes X_NEXT standardElements X_SLASH K_TERMINATE
-    {
-      $$ = Terminate($4);
+    { $$ = Terminate($4);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TERMINATE);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TERMINATE); }
 | K_TERMINATE arbitraryAttributes X_SLASH
-    {
-      impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       $$ = Terminate(noLinks);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TERMINATE);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TERMINATE); }
 ;
 
 
@@ -832,12 +748,10 @@ tTerminate:
 
 tFlow:
   K_FLOW arbitraryAttributes X_NEXT standardElements tLinks activity_list X_SLASH K_FLOW
-    {
-      $$ = Flow($4, $5, $6);
+    { $$ = Flow($4, $5, $6);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FLOW);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FLOW); }
 ;
 
 activity_list:
@@ -863,19 +777,15 @@ tLink_list:
 
 tLink:
   K_LINK arbitraryAttributes X_NEXT X_SLASH K_LINK
-    {
-      $$ = Link();
+    { $$ = Link();
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_LINK);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_LINK); }
 | K_LINK arbitraryAttributes X_SLASH
-    {
-      $$ = Link();
+    { $$ = Link();
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_LINK);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_LINK); }
 ;
 
 
@@ -885,12 +795,10 @@ tLink:
 
 tSwitch:
   K_SWITCH arbitraryAttributes X_NEXT standardElements tCase_list tOtherwise X_SLASH K_SWITCH
-    {
-      $$ = Switch($4, $5, $6);
+    { $$ = Switch($4, $5, $6);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_SWITCH);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_SWITCH); }
 ;
 
 
@@ -903,12 +811,10 @@ tCase_list:
 
 tCase:
   K_CASE arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CASE
-    {
-      $$ = Case($4);
+    { $$ = Case($4);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CASE);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CASE); }
 ;
 
 
@@ -929,12 +835,10 @@ tOtherwise:
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_OTHERWISE);
     }
 | K_OTHERWISE X_NEXT activity X_NEXT X_SLASH K_OTHERWISE X_NEXT
-    {
-      $$ = Otherwise($3);
+    { $$ = Otherwise($3);
       $$->id = ASTEid++;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_OTHERWISE);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_OTHERWISE); }
 ;
 
 
@@ -944,12 +848,10 @@ tOtherwise:
 
 tWhile:
   K_WHILE arbitraryAttributes X_NEXT standardElements activity X_NEXT X_SLASH K_WHILE
-    {
-      $$ = While($4, $5);
+    { $$ = While($4, $5);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_WHILE);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_WHILE); }
 ;
 
 
@@ -959,12 +861,10 @@ tWhile:
 
 tSequence:
   K_SEQUENCE arbitraryAttributes X_NEXT standardElements activity_list X_SLASH K_SEQUENCE
-    {
-      $$ = Sequence($4, $5);
+    { $$ = Sequence($4, $5);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_SEQUENCE);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_SEQUENCE); }
 ;
 
 
@@ -974,12 +874,10 @@ tSequence:
 
 tPick:
   K_PICK arbitraryAttributes X_NEXT standardElements tOnMessage X_NEXT tOnMessage_list tOnAlarm_list X_SLASH K_PICK
-    {
-      $$ = Pick($4, ConstOnMessage_list($5, $7), $8);
+    { $$ = Pick($4, ConstOnMessage_list($5, $7), $8);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_PICK);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_PICK); }
 ;
 
 
@@ -991,12 +889,10 @@ tScope:
   K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
   tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers activity 
   X_NEXT X_SLASH K_SCOPE
-    {
-      $$ = Scope($4, $5, $7, $8, $9, StopInScope(), $10);
+    { $$ = Scope($4, $5, $7, $8, $9, StopInScope(), $10);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_SCOPE);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_SCOPE); }
 ;
 
 
@@ -1006,10 +902,8 @@ tScope:
 
 standardElements:
   tTarget_list tSource_list
-    {
-      $$ = StandardElements($1, $2, currentJoinCondition);
-      currentJoinCondition = standardJoinCondition();
-    }
+    { $$ = StandardElements($1, $2, currentJoinCondition);
+      currentJoinCondition = standardJoinCondition(); }
 ;
 
 tTarget_list:
@@ -1021,19 +915,15 @@ tTarget_list:
 
 tTarget:
   K_TARGET arbitraryAttributes X_NEXT X_SLASH K_TARGET
-    {
-      $$ = Target();
+    { $$ = Target();
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TARGET);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TARGET); }
 | K_TARGET arbitraryAttributes X_SLASH
-    {
-      $$ = Target();
+    { $$ = Target();
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TARGET);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TARGET); }
 ;
 
 tSource_list:
@@ -1045,19 +935,15 @@ tSource_list:
 
 tSource:
   K_SOURCE arbitraryAttributes X_NEXT X_SLASH K_SOURCE
-    {
-      $$ = Source();
+    { $$ = Source();
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_SOURCE);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_SOURCE); }
 | K_SOURCE arbitraryAttributes X_SLASH
-    {
-      $$ = Source();
+    { $$ = Source();
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_SOURCE);
-    }
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_SOURCE); }
 ;
 
 

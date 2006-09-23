@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/09/23 11:13:24 $
+ *          - last changed: \$Date: 2006/09/23 17:50:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
  */
 
 
@@ -65,6 +65,7 @@ using namespace std;
 extern map<unsigned int, map<string, string> > temporaryAttributeMap;
 extern set<string> ASTE_inputChannels;
 extern set<string> ASTE_outputChannels;
+extern set<string> ASTE_variables;
 
 
 
@@ -142,6 +143,8 @@ ASTE::ASTE(kc::impl_abstract_phylum *mynode, int mytype)
 
 /*!
  * Checks and returns attributes.
+ *
+ * \returns a name-value mapping of the attributes
  */
 map<string, string> ASTE::getAttributes()
 {
@@ -168,10 +171,18 @@ map<string, string> ASTE::getAttributes()
 
 /*!
  * Creates a channel for communicating activities
+ *
+ * \return name of the channel
  */
 string ASTE::createChannel(bool synchronousCommunication)
 {
   string channelName = attributes["operation"];
+
+  if (channelName == "")
+  {
+    cerr << "no operation given" << endl;
+    return "";
+  }
 
   switch (type)
   {
@@ -198,4 +209,65 @@ string ASTE::createChannel(bool synchronousCommunication)
   }
 
   return channelName;
+}
+
+
+
+
+
+/*!
+ * Checks whether a given variable was defined before and returns the name of
+ * the variable.
+ *
+ * \return name of the variable
+ */
+
+string ASTE::checkVariable()
+{
+  string variableName = attributes["variable"];
+
+  if (variableName != "")
+    if (ASTE_variables.find(variableName) == ASTE_variables.end())
+      cerr << "variable " << variableName << " was not defined before" << endl;
+
+  return variableName;
+}
+
+string ASTE::checkInputVariable()
+{
+  string variableName = attributes["inputVariable"];
+
+  if (variableName != "")
+    if (ASTE_variables.find(variableName) == ASTE_variables.end())
+      cerr << "variable " << variableName << " was not defined before" << endl;
+
+  return variableName;
+}
+
+string ASTE::checkOutputVariable()
+{
+  string variableName = attributes["outputVariable"];
+
+  if (variableName != "")
+    if (ASTE_variables.find(variableName) == ASTE_variables.end())
+      cerr << "variable " << variableName << " was not defined before" << endl;
+
+  return variableName;
+}
+
+
+
+
+
+/*!
+ * Defines a variable.
+ */
+void ASTE::defineVariable()
+{
+  string variableName = attributes["name"];
+
+  if (ASTE_variables.find(variableName) != ASTE_variables.end())
+    cerr << "variable " << variableName << " was already defined" << endl;
+
+  ASTE_variables.insert(variableName);
 }

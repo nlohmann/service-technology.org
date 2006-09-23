@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/09/23 11:13:24 $
+ *          - last changed: \$Date: 2006/09/23 17:50:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  */
 
 
@@ -127,6 +127,14 @@ class ASTE
 
     /// creates a communication channel
     string createChannel(bool synchronousCommunication = false);
+
+    /// checks a variable and returns its name
+    string checkVariable();
+    string checkInputVariable();
+    string checkOutputVariable();
+
+    /// defines a variable
+    void defineVariable();
 };
 
 

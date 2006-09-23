@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/09/22 10:59:58 $
+ *          - last changed: \$Date: 2006/09/23 08:46:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.30 $
+ * \version \$Revision: 1.31 $
  *
  */
 %}
@@ -104,7 +104,7 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       trace(TRACE_INFORMATION, "Generating Petri net...\n");
       header(This->id, true);
 
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
       currentScope = prefix;
 
       // Create the interface places.
@@ -199,7 +199,7 @@ This=userDefinedEventHandler(a,b) ->
   [petrinetsmall:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<eventHandler scope=\"" + currentScope + "\">\n");
-      string prefix = intToString(This->parentScopeId) + ".internal.eventHandler.";
+      string prefix = toString(This->parentScopeId) + ".internal.eventHandler.";
     }
     a // onMessage branches
     b // onAlarm branches
@@ -207,7 +207,7 @@ This=userDefinedEventHandler(a,b) ->
       int onMessageCount = 1;
       foreach (ThisBranch = OnMessage(innerActivity); tOnMessage_list a)
       {
-        Transition *t1 = TheNet->newTransition(prefix + "ehM" + intToString(onMessageCount));
+        Transition *t1 = TheNet->newTransition(prefix + "ehM" + toString(onMessageCount));
         onMessageCount++;
       }
 
@@ -215,7 +215,7 @@ This=userDefinedEventHandler(a,b) ->
       int onAlarmCount = 1;
       foreach (onAlarmBranch=OnAlarm(innerActivity); tOnAlarm_list b)
       {
-        Transition *t1 = TheNet->newTransition(prefix + "ehA" + intToString(onAlarmCount));
+        Transition *t1 = TheNet->newTransition(prefix + "ehA" + toString(onAlarmCount));
         onAlarmCount++;
       }
 
@@ -243,7 +243,7 @@ This=userDefinedEventHandler(a,b) ->
 This=Empty(a) ->
   [petrinetsmall:
     {
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
       header(This->id);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
@@ -271,7 +271,7 @@ This=Empty(a) ->
 This=Invoke(a,b) provided (This->isAsynchronousInvoke) ->
   [petrinetsmall:
     {
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
       header(This->id);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
@@ -296,7 +296,7 @@ This=Invoke(a,b) provided (!This->isAsynchronousInvoke) ->
   [petrinetsmall:
     {
       header(This->id);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -333,7 +333,7 @@ This=Receive(a,b) ->
   [petrinetsmall:
     {
       header(This->id);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -363,7 +363,7 @@ This=Reply(a,b) ->
   [petrinetsmall:
     {
       header(This->id);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -393,7 +393,7 @@ This=Assign(a,b) ->
   [petrinetsmall:
     {
       header(This->id);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -423,7 +423,7 @@ This=Wait(a) provided (!This->isWaitFor) ->
   [petrinetsmall:
     {
       header(This->id);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -447,7 +447,7 @@ This=Wait(a) provided (This->isWaitFor) ->
   [petrinetsmall:
     {
       header(This->id);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -530,7 +530,7 @@ This=Flow(a,b,c) ->
   [petrinetsmall:
     {
       header(This->id, true);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1  = TheNet->newPlace(prefix + "initial");
       Place *p2  = TheNet->newPlace(prefix + "final");
@@ -571,7 +571,7 @@ This=Switch(a,b,otherwiseBranch=Otherwise(c)) ->
   [petrinetsmall:
     {
       header(This->id, true);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1 =  TheNet->newPlace(prefix + "final");
       Place *p2 =  TheNet->newPlace(prefix + "initial");
@@ -583,7 +583,7 @@ This=Switch(a,b,otherwiseBranch=Otherwise(c)) ->
       int currentCase = 1;
       foreach (caseBranch=Case(innerActivity); tCase_list b)
       {
-	string caseNumber = intToString(currentCase++);
+	string caseNumber = toString(currentCase++);
 	Transition* t1 = TheNet->newTransition(prefix + "case" + caseNumber);
 	TheNet->newArc(TheNet->findPlace(This->id, ".initial"), t1);
 
@@ -609,9 +609,9 @@ This=Switch(a,b,otherwiseBranch=Otherwise(c)) ->
       foreach (thisCaseBranch=Case(innerActivity1); tCase_list b) {
         foreach (otherCaseBranch=Case(innerActivity2); tCase_list b) {
 	  if (innerActivity1 != innerActivity2)
-            dpeLinks(TheNet->findTransition(prefix + "case" + intToString(currentCase)), otherCaseBranch->id); // case -> case'
+            dpeLinks(TheNet->findTransition(prefix + "case" + toString(currentCase)), otherCaseBranch->id); // case -> case'
     	}
-        dpeLinks(TheNet->findTransition(prefix + "case" + intToString(currentCase)), otherwiseBranch->id); // case -> otherwise
+        dpeLinks(TheNet->findTransition(prefix + "case" + toString(currentCase)), otherwiseBranch->id); // case -> otherwise
         dpeLinks(TheNet->findTransition(prefix + "caseo"), thisCaseBranch->id); // otherwise -> case
   	currentCase++;
       }
@@ -644,7 +644,7 @@ This=While(a,b) ->
   [petrinetsmall:
     {
       header(This->id, true);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -700,7 +700,7 @@ This=Sequence(a,b) ->
   [petrinetsmall:
     {
       header(This->id, true);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1  = TheNet->newPlace(prefix + "initial");
       Place *p2  = TheNet->newPlace(prefix + "final");
@@ -742,7 +742,7 @@ This=Pick(a,b,c) ->
   [petrinetsmall:
     {
       header(This->id, true);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "final");
       Place *p2 = TheNet->newPlace(prefix + "initial");
@@ -756,7 +756,7 @@ This=Pick(a,b,c) ->
       foreach (ThisBranch = OnMessage(innerActivity); tOnMessage_list b)
       {
 	trace(TRACE_DEBUG, "[PNU]\t\t<onMessage>\n");
-	string message = intToString(onMessageCount++);
+	string message = toString(onMessageCount++);
 
 	Transition *t1 = TheNet->newTransition(prefix + "pickM" + message);
 	TheNet->newArc(TheNet->findPlace("in." + ThisBranch->channelName), t1);
@@ -777,7 +777,7 @@ This=Pick(a,b,c) ->
       foreach (onAlarmBranch=OnAlarm(innerActivity); tOnAlarm_list c)
       {
 	trace(TRACE_DEBUG, "[PNU]\t\t<onAlarm>\n");
-        string alarm = intToString(onAlarmCount++);
+        string alarm = toString(onAlarmCount++);
 
 	Transition *t1 = TheNet->newTransition(prefix + "pickA" + alarm);
 	TheNet->newArc(TheNet->findPlace(This->id, ".initial"), t1);
@@ -798,11 +798,11 @@ This=Pick(a,b,c) ->
       foreach (thisonmessage=OnMessage(innerActivity1); tOnMessage_list b) {
 	foreach (otheronmessage=OnMessage(innerActivity2); tOnMessage_list b) {
 	  if ((innerActivity1 != innerActivity2))
-            dpeLinks(TheNet->findTransition(prefix + "pickM" + intToString(currentMessage)), otheronmessage->id); // onMessage -> onMessage'
+            dpeLinks(TheNet->findTransition(prefix + "pickM" + toString(currentMessage)), otheronmessage->id); // onMessage -> onMessage'
 	}
 
 	foreach (thisonalarm=OnAlarm(innerActivity2); tOnAlarm_list c) {
-          dpeLinks(TheNet->findTransition(prefix + "pickM" + intToString(currentMessage)), thisonalarm->id); // onMessage -> onAlarm
+          dpeLinks(TheNet->findTransition(prefix + "pickM" + toString(currentMessage)), thisonalarm->id); // onMessage -> onAlarm
 	}
 	currentMessage++;
       }
@@ -811,11 +811,11 @@ This=Pick(a,b,c) ->
       foreach (thisonalarm=OnAlarm(innerActivity1); tOnAlarm_list c) {
 	foreach (otheronalarm=OnAlarm(innerActivity2); tOnAlarm_list c) {
 	  if ((innerActivity1 != innerActivity2))
-            dpeLinks(TheNet->findTransition(prefix + "pickA" + intToString(currentAlarm)), otheronalarm->id); // onAlarm -> onAlarm'
+            dpeLinks(TheNet->findTransition(prefix + "pickA" + toString(currentAlarm)), otheronalarm->id); // onAlarm -> onAlarm'
 	}
 
 	foreach (thisonmessage=OnMessage(innerActivity2); tOnMessage_list b) {
-          dpeLinks(TheNet->findTransition(prefix + "pickA" + intToString(currentAlarm)), thisonmessage->id); // onAlarm -> onMessage
+          dpeLinks(TheNet->findTransition(prefix + "pickA" + toString(currentAlarm)), thisonmessage->id); // onAlarm -> onMessage
 	}
 	currentAlarm++;
       }
@@ -854,8 +854,8 @@ This=Scope(a,b,c,d,e,f,g) ->
 This=StandardElements(NiltTarget_list(), NiltSource_list(), jc) ->
   [petrinetsmall:
     {
-      string prefix = intToString(This->parentId) + ".";
-      string newPrefix = intToString(This->parentId) + ".internal";
+      string prefix = toString(This->parentId) + ".";
+      string newPrefix = toString(This->parentId) + ".internal";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -879,8 +879,8 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
   [petrinetsmall:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 22 (new)\n");
-      string prefix = intToString(This->parentId) + ".";
-      string newPrefix = intToString(This->parentId) + ".internal";
+      string prefix = toString(This->parentId) + ".";
+      string newPrefix = toString(This->parentId) + ".internal";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "done");
@@ -944,8 +944,8 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF)
   [petrinetsmall:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 24 (new)\n");
-      string prefix = intToString(This->parentId) + ".";
-      string newPrefix = intToString(This->parentId) + ".internal";
+      string prefix = toString(This->parentId) + ".";
+      string newPrefix = toString(This->parentId) + ".internal";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -994,7 +994,7 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF)
         unsigned int transitionNumber = (unsigned int)pow(2.0, a->length());
         for (unsigned int i = 0; i < transitionNumber; i++)
         {
-          joinTransitions[i] = TheNet->newTransition(prefix + "join" + intToString(i));
+          joinTransitions[i] = TheNet->newTransition(prefix + "join" + toString(i));
 
           for (unsigned int j = 0; j < linkCount; j++)
           {
@@ -1037,8 +1037,8 @@ This=StandardElements(a,b, jc) provided (This->suppressJF)
   [petrinetsmall:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 25 (new)\n");
-      string prefix = intToString(This->parentId) + ".";
-      string newPrefix = intToString(This->parentId) + ".internal";
+      string prefix = toString(This->parentId) + ".";
+      string newPrefix = toString(This->parentId) + ".internal";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "begin");
@@ -1107,7 +1107,7 @@ This=StandardElements(a,b, jc) provided (This->suppressJF)
         unsigned int transitionNumber = (unsigned int)pow(2.0, a->length());
         for (unsigned int i = 0; i < transitionNumber; i++)
         {
-          joinTransitions[i] = TheNet->newTransition(prefix + "join" + intToString(i));
+          joinTransitions[i] = TheNet->newTransition(prefix + "join" + toString(i));
 
           for (unsigned int j = 0; j < linkCount; j++)
           {

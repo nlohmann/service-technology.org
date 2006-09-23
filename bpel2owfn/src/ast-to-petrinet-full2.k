@@ -53,7 +53,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/07/12 16:24:20 $
+ *          - last changed: \$Date: 2006/09/23 08:46:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  */
 %}
 
@@ -122,7 +122,7 @@ extern string currentScope;
 This=Empty(a) ->
   [petrinet:
     {
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
       header(This->id);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
@@ -163,7 +163,7 @@ This=Empty(a) ->
 This=Invoke(a,b) provided (This->isAsynchronousInvoke) ->
   [petrinet:
     {
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
       header(This->id);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
@@ -215,7 +215,7 @@ This=Invoke(a,b) provided (!This->isAsynchronousInvoke) ->
   [petrinet:
     {
       header(This->id);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running1");
@@ -288,7 +288,7 @@ This=Receive(a,b) ->
   [petrinet:
     {
       header(This->id);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -343,7 +343,7 @@ This=Reply(a,b) ->
   [petrinet:
     {
       header(This->id);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -402,7 +402,7 @@ This=Assign(a,b) ->
   [petrinet:
     {
       header(This->id);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p3 = TheNet->newPlace(prefix + "final");
@@ -419,7 +419,7 @@ This=Assign(a,b) ->
 
       foreach (copyBlock=Copy(from,to); tCopy_list b)
       {
-	string newPrefix = prefix + "copy." + intToString(copyCount) + ".";
+	string newPrefix = prefix + "copy." + toString(copyCount) + ".";
 
 	if (from->variableName != "")
 	{
@@ -443,7 +443,7 @@ This=Assign(a,b) ->
 	  if (parameters[P_NOSTANDARDFAULTS] == false)
 	    Transition *t3 = throwFault(p2, p4, "running", newPrefix, This->negativeControlFlow);
 
-	  Transition *t6 = stop(p4, "p4at" + intToString(copyCount), prefix);
+	  Transition *t6 = stop(p4, "p4at" + toString(copyCount), prefix);
 
 
 	  lastPlace = p8;
@@ -464,7 +464,7 @@ This=Assign(a,b) ->
 	  if (parameters[P_NOSTANDARDFAULTS] == false)
 	    Transition *t3 = throwFault(lastPlace, p4, "initial", newPrefix, This->negativeControlFlow);
 
-	  Transition *t6 = stop(p4, "p4at" + intToString(copyCount), prefix);
+	  Transition *t6 = stop(p4, "p4at" + toString(copyCount), prefix);
 
 
 	  lastPlace = p8;
@@ -496,7 +496,7 @@ This=Wait(a) provided (!This->isWaitFor)->
   [petrinet:
     {
       header(This->id);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -532,7 +532,7 @@ This=Wait(a) provided (This->isWaitFor)->
   [petrinet:
     {
       header(This->id);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "TimeStamp");
@@ -579,7 +579,7 @@ This=Throw(a) ->
   [petrinet:
     {
       header(This->id);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "p2");
@@ -625,7 +625,7 @@ This=Compensate(a) provided (!This->inFaultHandler && !This->hasScopeAttribute) 
   [petrinet:
     {
       header(This->id);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -677,7 +677,7 @@ This=Compensate(a) provided (This->inFaultHandler && !This->hasScopeAttribute) -
   [petrinet:
     {
       header(This->id);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -729,7 +729,7 @@ This=Compensate(a) provided (!This->inFaultHandler && This->hasScopeAttribute) -
   [petrinet:
     {
       header(This->id);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -780,7 +780,7 @@ This=Compensate(a) provided (This->inFaultHandler && This->hasScopeAttribute) ->
   [petrinet:
     {
       header(This->id);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -835,7 +835,7 @@ This=Terminate(a) ->
   [petrinet:
     {
       header(This->id);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -892,7 +892,7 @@ This=Flow(a,b,c) ->
   [petrinet:
     {
       header(This->id, true);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p7  = TheNet->newPlace(prefix + "initial");
       Place *p8  = TheNet->newPlace(prefix + "final");
@@ -935,7 +935,7 @@ This=Flow(a,b,c) ->
     {
       foreach (innerActivity; activity_list c)
       {
-        string newPrefix = intToString(innerActivity->id);
+        string newPrefix = toString(innerActivity->id);
         // Embed the inner activity.
 //	if (This->dpe > 0 && TheNet->findPlace(newPrefix + ".negLink") != NULL)
 //	{
@@ -968,7 +968,7 @@ This=Switch(a,b,Otherwise(c)) ->
   [petrinet:
     {
       header(This->id, true);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p4 =  TheNet->newPlace(prefix + "final");
       Place *p5 =  TheNet->newPlace(prefix + "initial");
@@ -1008,7 +1008,7 @@ This=Switch(a,b,Otherwise(c)) ->
       Transition *last;
       foreach (caseBranch=Case(innerActivity); tCase_list b)
       {
-	string caseNumber = intToString(currentCase);
+	string caseNumber = toString(currentCase);
 
 	trace(TRACE_VERY_DEBUG, "[PNU]\tEmbedding case branch " + caseNumber + "...\n");
 
@@ -1085,10 +1085,10 @@ This=Switch(a,b,Otherwise(c)) ->
 	foreach (otherCaseBranch=Case(innerActivity2); tCase_list b)
 	{
 	  if ((innerActivity1 != innerActivity2) && (otherCaseBranch->dpe > 0))
-	    TheNet->newArc(TheNet->findTransition(prefix + "t2.case" + intToString(currentCase)), TheNet->findPlace(innerActivity2, ".negLink"));
+	    TheNet->newArc(TheNet->findTransition(prefix + "t2.case" + toString(currentCase)), TheNet->findPlace(innerActivity2, ".negLink"));
 
 	  if (c->dpe > 0)
-	    TheNet->newArc(TheNet->findTransition(prefix + "t2.case" + intToString(currentCase)), TheNet->findPlace(c, ".negLink"));
+	    TheNet->newArc(TheNet->findTransition(prefix + "t2.case" + toString(currentCase)), TheNet->findPlace(c, ".negLink"));
 	}
 
 	if (thisCaseBranch->dpe > 0)
@@ -1131,7 +1131,7 @@ This=While(a,b) ->
   [petrinet:
     {
       header(This->id, true);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -1215,7 +1215,7 @@ This=Sequence(a,b) ->
   [petrinet:
     {
       header(This->id, true);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p2  = TheNet->newPlace(prefix + "initial");
       Place *p9  = TheNet->newPlace(prefix + "final");
@@ -1251,7 +1251,7 @@ This=Sequence(a,b) ->
 /*
 	// If an inner activity has a place negLink, it is connected to the transition
 	// t1.
-        string newPrefix = intToString(innerActivity->id);
+        string newPrefix = toString(innerActivity->id);
 	if (This->dpe > 0 && TheNet->findPlace(newPrefix + ".negLink") != NULL)
 	  TheNet->newArc(t1, TheNet->findPlace(newPrefix + ".negLink"));
 */
@@ -1284,7 +1284,7 @@ This=Pick(a,b,c) ->
   [petrinet:
     {
       header(This->id, true);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
 
       Place *p5 = TheNet->newPlace(prefix + "final");
       Place *p6 = TheNet->newPlace(prefix + "initial");
@@ -1322,7 +1322,7 @@ This=Pick(a,b,c) ->
       foreach (ThisBranch = OnMessage(innerActivity); tOnMessage_list b)
       {
 	trace(TRACE_DEBUG, "[PNU]\t\t<onMessage>\n");
-	string message = intToString(onMessageCount++);
+	string message = toString(onMessageCount++);
 	string newPrefix = prefix + "onMessage" + message + ".";
 
 	Place *p3 = TheNet->newPlace(newPrefix + "p3");
@@ -1363,7 +1363,7 @@ This=Pick(a,b,c) ->
       foreach (onAlarmBranch=OnAlarm(innerActivity); tOnAlarm_list c)
       {
 	trace(TRACE_DEBUG, "[PNU]\t\t<onAlarm>\n");
-	string newPrefix = prefix + "onAlarm" + intToString(onAlarmCount++) + ".";
+	string newPrefix = prefix + "onAlarm" + toString(onAlarmCount++) + ".";
 
 	Transition *t6 = TheNet->newTransition(newPrefix + "t6");
 	TheNet->newArc(TheNet->findPlace("1.internal.clock"), t6, READ);
@@ -1391,13 +1391,13 @@ This=Pick(a,b,c) ->
 	foreach (otheronmessage=OnMessage(innerActivity2); tOnMessage_list b)
 	{
 	  if ((innerActivity1 != innerActivity2) && (otheronmessage->dpe > 0))
-	    TheNet->newArc(TheNet->findTransition(prefix + "onMessage" + intToString(currentMessage) + ".t3"), TheNet->findPlace(innerActivity2, ".negLink"));
+	    TheNet->newArc(TheNet->findTransition(prefix + "onMessage" + toString(currentMessage) + ".t3"), TheNet->findPlace(innerActivity2, ".negLink"));
 	}
 
 	foreach (thisonalarm=OnAlarm(innerActivity2); tOnAlarm_list c)
 	{
 	  if (thisonalarm->dpe > 0)
-	    TheNet->newArc(TheNet->findTransition(prefix + "onMessage" + intToString(currentMessage) + ".t3"), TheNet->findPlace(innerActivity2, ".negLink"));
+	    TheNet->newArc(TheNet->findTransition(prefix + "onMessage" + toString(currentMessage) + ".t3"), TheNet->findPlace(innerActivity2, ".negLink"));
 	}
 
 	currentMessage++;
@@ -1413,13 +1413,13 @@ This=Pick(a,b,c) ->
 	foreach (otheronalarm=OnAlarm(innerActivity2); tOnAlarm_list c)
 	{
 	  if ((innerActivity1 != innerActivity2) && (otheronalarm->dpe > 0))
-	    TheNet->newArc(TheNet->findTransition(prefix + "onAlarm" + intToString(currentAlarm) + ".t6"), TheNet->findPlace(innerActivity2, ".negLink"));
+	    TheNet->newArc(TheNet->findTransition(prefix + "onAlarm" + toString(currentAlarm) + ".t6"), TheNet->findPlace(innerActivity2, ".negLink"));
 	}
 
 	foreach (thisonmessage=OnMessage(innerActivity2); tOnMessage_list b)
 	{
 	  if (thisonmessage->dpe > 0)
-	    TheNet->newArc(TheNet->findTransition(prefix + "onAlarm" + intToString(currentAlarm) + ".t6"), TheNet->findPlace(innerActivity2, ".negLink"));
+	    TheNet->newArc(TheNet->findTransition(prefix + "onAlarm" + toString(currentAlarm) + ".t6"), TheNet->findPlace(innerActivity2, ".negLink"));
 	}
 
 	currentAlarm++;
@@ -1451,14 +1451,14 @@ This=Scope(a,b,c,d,e,f,g) ->
   [petrinet:
     {
       header(This->id, true);
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
       currentScope = prefix;
 
       // Create push-places for the children of the scope.
       for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
       {
-	Place *push_child    = TheNet->newPlace(intToString(*child) + ".push");
-	Place *notPush_child = TheNet->newPlace(intToString(*child) + ".!push");
+	Place *push_child    = TheNet->newPlace(toString(*child) + ".push");
+	Place *notPush_child = TheNet->newPlace(toString(*child) + ".!push");
       }
 
 
@@ -1538,8 +1538,8 @@ This=Scope(a,b,c,d,e,f,g) ->
       TheNet->newArc(p11, t4);
       TheNet->newArc(t4, p12);
       TheNet->newArc(t4, p14);
-      TheNet->newArc(TheNet->findPlace(intToString(This->id) + ".!push"), t4);
-      TheNet->newArc(t4, TheNet->findPlace(intToString(This->id) + ".push"));
+      TheNet->newArc(TheNet->findPlace(toString(This->id) + ".!push"), t4);
+      TheNet->newArc(t4, TheNet->findPlace(toString(This->id) + ".push"));
       TheNet->newArc(p35, t4);
       TheNet->newArc(t4, p51);
 
@@ -1609,20 +1609,20 @@ This=Scope(a,b,c,d,e,f,g) ->
       // New transitions to pass fault to parent.
       Transition *t12 = TheNet->newTransition(prefix + "passFaultUp");
       TheNet->newArc(p48, t12);
-      TheNet->newArc(TheNet->findPlace(intToString(This->parentScopeId) + ".internal.Active"), t12);
-      TheNet->newArc(t12, TheNet->findPlace(intToString(This->parentScopeId) + ".internal.!Active")); //newer fault management
-      TheNet->newArc(t12, TheNet->findPlace(intToString(This->parentScopeId) + ".internal.stop.fault_in"));
+      TheNet->newArc(TheNet->findPlace(toString(This->parentScopeId) + ".internal.Active"), t12);
+      TheNet->newArc(t12, TheNet->findPlace(toString(This->parentScopeId) + ".internal.!Active")); //newer fault management
+      TheNet->newArc(t12, TheNet->findPlace(toString(This->parentScopeId) + ".internal.stop.fault_in"));
 
       Transition *t13 = TheNet->newTransition(prefix + "ignoreFault");
       TheNet->newArc(p48, t13);
-      TheNet->newArc(TheNet->findPlace(intToString(This->parentScopeId) + ".internal.!Active"), t13, READ);
+      TheNet->newArc(TheNet->findPlace(toString(This->parentScopeId) + ".internal.!Active"), t13, READ);
 
 
       // Merge places with parent scope.
-      TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId) +
-	    ".internal.compensationHandler.compScope." + intToString(This->id)), p3); // was "....internal.compScope."
-      TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId) + ".internal.scopeCompensated"), p56);
-      TheNet->mergePlaces(TheNet->findPlace(intToString(This->parentScopeId) + ".internal.upperTerminate"), p46);
+      TheNet->mergePlaces(TheNet->findPlace(toString(This->parentScopeId) +
+	    ".internal.compensationHandler.compScope." + toString(This->id)), p3); // was "....internal.compScope."
+      TheNet->mergePlaces(TheNet->findPlace(toString(This->parentScopeId) + ".internal.scopeCompensated"), p56);
+      TheNet->mergePlaces(TheNet->findPlace(toString(This->parentScopeId) + ".internal.upperTerminate"), p46);
     }
     f // Stop Pattern
     a // standardElements
@@ -1635,9 +1635,9 @@ This=Scope(a,b,c,d,e,f,g) ->
       // the push places of the child scopes are available and have to be
       // connected with the transition t2 of the process.
       for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
-	TheNet->newArc(t2, TheNet->findPlace(intToString(*child) + ".!push"));
+	TheNet->newArc(t2, TheNet->findPlace(toString(*child) + ".!push"));
 
-      string prefix2 = intToString(This->id) + ".internal.";
+      string prefix2 = toString(This->id) + ".internal.";
 
 
       // Embed the fault handler of the scope.
@@ -1750,7 +1750,7 @@ This=Scope(a,b,c,d,e,f,g) ->
       }
 */
 
-      currentScope = intToString(This->parentScopeId) + ".internal.";
+      currentScope = toString(This->parentScopeId) + ".internal.";
       footer(This->id, true);
     }
   ]
@@ -1767,8 +1767,8 @@ This=Scope(a,b,c,d,e,f,g) ->
 This=StandardElements(NiltTarget_list(), NiltSource_list(), jc) ->
   [petrinet:
     {
-      string prefix = intToString(This->parentId) + ".";
-      string newPrefix = intToString(This->parentId) + ".internal";
+      string prefix = toString(This->parentId) + ".";
+      string newPrefix = toString(This->parentId) + ".internal";
 
       Place *p2 = TheNet->newPlace(prefix + "initial");
       Place *p3 = TheNet->newPlace(prefix + "final");
@@ -1806,8 +1806,8 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
   [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 22\n");
-      string prefix = intToString(This->parentId) + ".";
-      string newPrefix = intToString(This->parentId) + ".internal";
+      string prefix = toString(This->parentId) + ".";
+      string newPrefix = toString(This->parentId) + ".internal";
 
       Place *p2 = TheNet->newPlace(prefix + "initial");
       Place *p4 = TheNet->newPlace(prefix + "p4");
@@ -1888,8 +1888,8 @@ This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF) ->
   [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 23\n");
-      string prefix = intToString(This->parentId) + ".";
-      string newPrefix = intToString(This->parentId) + ".internal";
+      string prefix = toString(This->parentId) + ".";
+      string newPrefix = toString(This->parentId) + ".internal";
 
       Place *p6  = TheNet->newPlace(prefix + "p6");
       Place *p7  = TheNet->newPlace(prefix + "final");
@@ -1955,8 +1955,8 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF) ->
   [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 24\n");
-      string prefix = intToString(This->parentId) + ".";
-      string newPrefix = intToString(This->parentId) + ".internal";
+      string prefix = toString(This->parentId) + ".";
+      string newPrefix = toString(This->parentId) + ".internal";
 
       Place *p6  = TheNet->newPlace(prefix + "p6");
       Place *p7  = TheNet->newPlace(prefix + "final");
@@ -2022,8 +2022,8 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
   [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 25\n");
-      string prefix = intToString(This->parentId) + ".";
-      string newPrefix = intToString(This->parentId) + ".internal";
+      string prefix = toString(This->parentId) + ".";
+      string newPrefix = toString(This->parentId) + ".internal";
 
       Place *p11 = TheNet->newPlace(prefix + "p11");
       Place *p12 = TheNet->newPlace(prefix + "p12");
@@ -2136,8 +2136,8 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF) ->
   [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 26\n");
-      string prefix = intToString(This->parentId) + ".";
-      string newPrefix = intToString(This->parentId) + ".internal";
+      string prefix = toString(This->parentId) + ".";
+      string newPrefix = toString(This->parentId) + ".internal";
 
       Place *p11 = TheNet->newPlace(prefix + "p11");
       Place *p12 = TheNet->newPlace(prefix + "p12");

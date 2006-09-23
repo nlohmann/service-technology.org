@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/07/12 08:32:19 $
+ *          - last changed: \$Date: 2006/09/23 08:46:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.25 $
+ * \version \$Revision: 1.26 $
  */
 
 
@@ -180,7 +180,7 @@ void PetriNet::removeDeadNodes()
       {
 	deadPlaces.push_back(*p);
 	tempPlaces.push_back(*p);
-	trace(TRACE_VERY_DEBUG, "[PN]\tPlace p" + intToString((*p)->id) + " is structurally dead.\n");
+	trace(TRACE_VERY_DEBUG, "[PN]\tPlace p" + toString((*p)->id) + " is structurally dead.\n");
 	done = false;
       }
     }
@@ -198,7 +198,7 @@ void PetriNet::removeDeadNodes()
       for (set<Node*>::iterator t = ps.begin(); t != ps.end(); t++)
       {
       	deadTransitions.push_back( (Transition*)(*t) );
-	trace(TRACE_VERY_DEBUG, "[PN]\tTransition t" + intToString((*t)->id) + " is structurally dead\n");
+	trace(TRACE_VERY_DEBUG, "[PN]\tTransition t" + toString((*t)->id) + " is structurally dead\n");
 	done = false;
       }
     }
@@ -255,7 +255,7 @@ void PetriNet::elminiationOfIdenticalPlaces()
     }
   }
   
-  trace(TRACE_VERY_DEBUG, "[PN]\tFound " + intToString(placePairs.size()) + " places with same preset and postset...\n");
+  trace(TRACE_VERY_DEBUG, "[PN]\tFound " + toString(placePairs.size()) + " places with same preset and postset...\n");
 
   // merge the found transitions
   for (set<pair<string, string> >::iterator labels = placePairs.begin();
@@ -304,7 +304,7 @@ void PetriNet::elminiationOfIdenticalTransitions()
     }
   }
   
-  trace(TRACE_VERY_DEBUG, "[PN]\tFound " + intToString(transitionPairs.size()) + " transitions with same preset and postset...\n");
+  trace(TRACE_VERY_DEBUG, "[PN]\tFound " + toString(transitionPairs.size()) + " transitions with same preset and postset...\n");
 
   // merge the found transitions
   for (set<pair<string, string> >::iterator labels = transitionPairs.begin();
@@ -566,7 +566,7 @@ void PetriNet::simplify()
 
 //    collapseSequences();
 
-    trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification pass " + intToString(passes++) + ": " + information() + "\n");
+    trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification pass " + toString(passes++) + ": " + information() + "\n");
 
     done = (old == information());
     old = information();

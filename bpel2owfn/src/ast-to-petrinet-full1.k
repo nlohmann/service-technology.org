@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/09/22 10:59:58 $
+ *          - last changed: \$Date: 2006/09/23 08:46:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.189 $
+ * \version \$Revision: 1.190 $
  *
  */
 %}
@@ -114,7 +114,7 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       trace(TRACE_INFORMATION, "Generating Petri net...\n");
       header(This->id, true);
 
-      string prefix = intToString(This->id) + ".internal.";
+      string prefix = toString(This->id) + ".internal.";
       currentScope = prefix;
 
 
@@ -130,8 +130,8 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       // Create push-places for the children of the process.
       for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
       {
-	TheNet->newPlace(intToString(*child) + ".push");
-	TheNet->newPlace(intToString(*child) + ".!push");
+	TheNet->newPlace(toString(*child) + ".push");
+	TheNet->newPlace(toString(*child) + ".!push");
       }
 
 
@@ -285,7 +285,7 @@ This=Process(a,b,c,d,e,f,g,h,i) ->
       // the push places of the child scopes are available and have to be
       // connected with the transition t2 of the process.
       for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
-	TheNet->newArc(t2, TheNet->findPlace( intToString(*child) + ".!push" ));
+	TheNet->newArc(t2, TheNet->findPlace( toString(*child) + ".!push" ));
 
 
       // Initialize the link places of the process.
@@ -914,7 +914,7 @@ This=implicitFaultHandler() provided (This->inProcess) ->
 This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
   [petrinet:
     {
-      string prefix = intToString(This->parentScopeId) + ".internal.faultHandler.";
+      string prefix = toString(This->parentScopeId) + ".internal.faultHandler.";
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<userDefinedFaultHandlerInsideScope scope=\"" + currentScope + "\">\n");
 
       Place *p3 =  TheNet->newPlace(prefix + "out");
@@ -1146,7 +1146,7 @@ This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
 This=implicitFaultHandler() provided (!This->inProcess) ->
   [petrinet:
     {
-      string prefix = intToString(This->parentScopeId) + ".internal.faultHandler.";
+      string prefix = toString(This->parentScopeId) + ".internal.faultHandler.";
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<implicitFaultHandlerInsideScope scope=\"" + currentScope + "\">\n");
 
       Place *p1 =  TheNet->newPlace(prefix + "ft");
@@ -1290,7 +1290,7 @@ This=userDefinedEventHandler(a,b) ->
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<eventHandler scope=\"" + currentScope + "\">\n");
 
-      string prefix = intToString(This->parentScopeId) + ".internal.eventHandler.";
+      string prefix = toString(This->parentScopeId) + ".internal.eventHandler.";
       Place *p6  = TheNet->newPlace(prefix + "initial");
       Place *p8  = TheNet->newPlace(prefix + "final");
       Place *p13 = TheNet->newPlace(prefix + "finish");
@@ -1340,7 +1340,7 @@ This=userDefinedEventHandler(a,b) ->
       int onMessageCount = 1;
       foreach (ThisBranch = OnMessage(innerActivity); tOnMessage_list a)
       {
-	string message = intToString(onMessageCount++);
+	string message = toString(onMessageCount++);
 	string newPrefix = prefix + "onMessage" + message + ".";
 
 	Place *onMessage_p1  = TheNet->newPlace(newPrefix + "p1");
@@ -1441,15 +1441,15 @@ This=userDefinedEventHandler(a,b) ->
       int onAlarmCount = 1;
       foreach (onAlarmBranch=OnAlarm(innerActivity); tOnAlarm_list b)
       {
-	string newPrefix = prefix + "onAlarm" + intToString(onAlarmCount) + ".";
+	string newPrefix = prefix + "onAlarm" + toString(onAlarmCount) + ".";
 
 	Place *onAlarm_p1  = TheNet->newPlace(newPrefix + "p1");
 	Place *onAlarm_p2  = TheNet->newPlace(newPrefix + "p2");
-	Place *onAlarm_p3  = TheNet->newPlace(newPrefix + "wait" + intToString(onAlarmCount));
+	Place *onAlarm_p3  = TheNet->newPlace(newPrefix + "wait" + toString(onAlarmCount));
 	Place *onAlarm_p4  = TheNet->newPlace(newPrefix + "p4");
-	Place *onAlarm_p5  = TheNet->newPlace(newPrefix + "finish" + intToString(onAlarmCount));
-	Place *onAlarm_p7  = TheNet->newPlace(newPrefix + "stop+finish" + intToString(onAlarmCount));
-	Place *onAlarm_p9  = TheNet->newPlace(newPrefix + "stop" + intToString(onAlarmCount));
+	Place *onAlarm_p5  = TheNet->newPlace(newPrefix + "finish" + toString(onAlarmCount));
+	Place *onAlarm_p7  = TheNet->newPlace(newPrefix + "stop+finish" + toString(onAlarmCount));
+	Place *onAlarm_p9  = TheNet->newPlace(newPrefix + "stop" + toString(onAlarmCount));
 	Place *onAlarm_p10 = TheNet->newPlace(newPrefix + "p10");
 
 	Transition *onAlarm_t1 = TheNet->newTransition(newPrefix + "t1");
@@ -1525,7 +1525,7 @@ This=userDefinedEventHandler(a,b) ->
 This=implicitCompensationHandler() provided (!This->inProcess) ->
   [petrinet:
     {
-      string prefix = intToString(This->parentScopeId) + ".internal.compensationHandler.";
+      string prefix = toString(This->parentScopeId) + ".internal.compensationHandler.";
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<implicitCompensationHandler scope=\"" + currentScope + "\">\n");
 
       Place *p2  = TheNet->newPlace(prefix + "ch_in");
@@ -1626,10 +1626,10 @@ This=implicitCompensationHandler() provided (!This->inProcess) ->
       // "compScope".
       for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
       {
-	Place *p19_new = TheNet->newPlace(prefix + "compScope." + intToString(*child));
-	Place *p20 = TheNet->findPlace(intToString(*child) + ".!push");
-	Place *p21 = TheNet->findPlace(intToString(*child) + ".push");
-	Transition *t13 = TheNet->newTransition(prefix + "t13." + intToString(*child));
+	Place *p19_new = TheNet->newPlace(prefix + "compScope." + toString(*child));
+	Place *p20 = TheNet->findPlace(toString(*child) + ".!push");
+	Place *p21 = TheNet->findPlace(toString(*child) + ".push");
+	Transition *t13 = TheNet->newTransition(prefix + "t13." + toString(*child));
 	TheNet->newArc(p20, t7);
 	TheNet->newArc(p20, t8);
 	TheNet->newArc(p11, t13);
@@ -1655,7 +1655,7 @@ This=implicitCompensationHandler() provided (!This->inProcess) ->
 This=userDefinedCompensationHandler(innerActivity) provided (!This->inProcess) ->
   [petrinet:
     {
-      string prefix = intToString(This->parentScopeId) + ".internal.compensationHandler.";
+      string prefix = toString(This->parentScopeId) + ".internal.compensationHandler.";
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<userDefinedCompensationHandler scope=\"" + currentScope + "\">\n");
 
       Place *p2  = TheNet->newPlace(prefix + "ch_in");
@@ -1754,7 +1754,7 @@ This=userDefinedCompensationHandler(innerActivity) provided (!This->inProcess) -
 	TheNet->newArc(p15, t7, READ);
 
         for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
-	  TheNet->newArc(TheNet->findPlace(intToString(*child) + ".!push"), t7);
+	  TheNet->newArc(TheNet->findPlace(toString(*child) + ".!push"), t7);
 
 	Transition *t10 = TheNet->newTransition(prefix + "t10");
 	TheNet->newArc(t10, p11);
@@ -1787,10 +1787,10 @@ This=userDefinedCompensationHandler(innerActivity) provided (!This->inProcess) -
       // "compScope".
       for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
       {
-	Place *p19_new = TheNet->newPlace(prefix + "compScope." + intToString(*child));
-	Place *p20 = TheNet->findPlace(intToString(*child) + ".!push");
-	Place *p21 = TheNet->findPlace(intToString(*child) + ".push");
-	Transition *t13 = TheNet->newTransition(prefix + "t13." + intToString(*child));
+	Place *p19_new = TheNet->newPlace(prefix + "compScope." + toString(*child));
+	Place *p20 = TheNet->findPlace(toString(*child) + ".!push");
+	Place *p21 = TheNet->findPlace(toString(*child) + ".push");
+	Transition *t13 = TheNet->newTransition(prefix + "t13." + toString(*child));
 	TheNet->newArc(p20, t8);
 	TheNet->newArc(p11, t13);
 	TheNet->newArc(t13, p19_new);
@@ -1822,7 +1822,7 @@ This=userDefinedCompensationHandler(innerActivity) provided (!This->inProcess) -
 This=implicitCompensationHandler() provided (This->inProcess) ->
   [petrinet:
     {
-      string prefix = intToString(This->parentScopeId) + ".internal.compensationHandler.";
+      string prefix = toString(This->parentScopeId) + ".internal.compensationHandler.";
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<processCompensationHandler>\n");
 
       Place *p2  = TheNet->newPlace(prefix + "ch_in");
@@ -1892,10 +1892,10 @@ This=implicitCompensationHandler() provided (This->inProcess) ->
       // "compScope".
       for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
       {
-	Place *p19_new = TheNet->newPlace(prefix + "compScope." + intToString(*child));
-	Place *p20 = TheNet->findPlace(intToString(*child) + ".!push");
-	Place *p21 = TheNet->findPlace(intToString(*child) + ".push");
-	Transition *t13 = TheNet->newTransition(prefix + "t13." + intToString(*child));
+	Place *p19_new = TheNet->newPlace(prefix + "compScope." + toString(*child));
+	Place *p20 = TheNet->findPlace(toString(*child) + ".!push");
+	Place *p21 = TheNet->findPlace(toString(*child) + ".push");
+	Transition *t13 = TheNet->newTransition(prefix + "t13." + toString(*child));
 	TheNet->newArc(p20, t7);
 	TheNet->newArc(p20, t8);
 	TheNet->newArc(p11, t13);
@@ -1915,7 +1915,7 @@ This=implicitCompensationHandler() provided (This->inProcess) ->
 This=userDefinedCompensationHandler(a) provided (This->inProcess) ->
   [petrinet:
     {
-      string prefix = intToString(This->parentScopeId) + ".internal.compensationHandler.";
+      string prefix = toString(This->parentScopeId) + ".internal.compensationHandler.";
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<processCompensationHandler>\n");
 
       Place *p2  = TheNet->newPlace(prefix + "ch_in");
@@ -1985,10 +1985,10 @@ This=userDefinedCompensationHandler(a) provided (This->inProcess) ->
       // "compScope".
       for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
       {
-	Place *p19_new = TheNet->newPlace(prefix + "compScope." + intToString(*child));
-	Place *p20 = TheNet->findPlace(intToString(*child) + ".!push");
-	Place *p21 = TheNet->findPlace(intToString(*child) + ".push");
-	Transition *t13 = TheNet->newTransition(prefix + "t13." + intToString(*child));
+	Place *p19_new = TheNet->newPlace(prefix + "compScope." + toString(*child));
+	Place *p20 = TheNet->findPlace(toString(*child) + ".!push");
+	Place *p21 = TheNet->findPlace(toString(*child) + ".push");
+	Transition *t13 = TheNet->newTransition(prefix + "t13." + toString(*child));
 	TheNet->newArc(p20, t7);
 	TheNet->newArc(p20, t8);
 	TheNet->newArc(p11, t13);

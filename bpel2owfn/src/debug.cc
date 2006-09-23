@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2006/07/12 10:00:52 $
+ *          - last changed: \$Date: 2006/09/23 08:46:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.19 $
+ * \version \$Revision: 1.20 $
  */
 
 
@@ -86,9 +86,7 @@ trace_level debug_level = TRACE_ALWAYS;
 void trace(trace_level pTraceLevel, string message)
 {
   if (pTraceLevel <= debug_level)
-  {
     (*log_output) << message << flush;
-  }
 }
 
 
@@ -131,7 +129,7 @@ int yyerror(const char* msg)
 	
   // display passed error message
   trace("Error in '" + filename + "' in line ");
-  trace(intToString(yylineno));
+  trace(toString(yylineno));
   trace(":\n");
   trace("  token/text last read was '");
   trace(yytext);
@@ -156,7 +154,7 @@ int yyerror(const char* msg)
     // print the erroneous line (plus/minus three more)
     for (unsigned int i=firstShowedLine; i<=firstShowedLine+(2*environment); i++)
     {
-      trace(intToString(i) + ": " + errorLine + "\n");
+      trace(toString(i) + ": " + errorLine + "\n");
       getline(inputFile, errorLine);
       if (inputFile.eof())
 	break;

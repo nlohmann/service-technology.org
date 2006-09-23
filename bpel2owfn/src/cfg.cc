@@ -27,18 +27,18 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/07/14 14:26:28 $
+ *          - last changed: \$Date: 2006/09/23 08:46:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -191,7 +191,7 @@ std::string CFGBlock::dot_name()
   }
   else
   {
-    return label + "_" + intToString(id);
+    return label + "_" + toString(id);
   }
 }
 
@@ -428,9 +428,9 @@ void CFGBlock::checkForUninitializedVariables()
     {
       trace("[CFG] WARNING: Variable \"" + temporaryAttributeMap[id][attributeName] 
 //	      + "\" ("+ var +") (activity ID = " 
-//	      + intToString(id->value)  
+//	      + toString(id->value)  
 	      + "\" in line " 
-// TODO new line number	      + intToString(symTab.readAttribute(id, attributeName)->line) 
+// TODO new line number	      + toString(symTab.readAttribute(id, attributeName)->line) 
 	      + " might be undefined!\n\n");
     }
   }
@@ -565,8 +565,8 @@ void CFGBlock::checkForConflictingReceive()
 	      if(elemA->first == elemB->first && elemA->second != elemB->second && receives.find(*elemA) == receives.end())
 	      {
 		trace("[CFG] WARNING: There are conflicting receives!\n");
-//		trace("               Please check lines " + intToString((dynamic_cast<STElement*>(symTab.lookup(elemA->second)))->line));
-//		trace(                " and " + intToString((dynamic_cast<STElement*>(symTab.lookup(elemB->second)))->line) + "\n");
+//		trace("               Please check lines " + toString((dynamic_cast<STElement*>(symTab.lookup(elemA->second)))->line));
+//		trace(                " and " + toString((dynamic_cast<STElement*>(symTab.lookup(elemB->second)))->line) + "\n");
 		cerr << "               " << elemA->first << " (" << elemA->second << ") vs. " << elemB->first << " (" << elemB->second << ")" << endl;
 		trace("\n");
 	      }
@@ -582,8 +582,8 @@ void CFGBlock::checkForConflictingReceive()
 	    if ((*otherBlock)->type == CFGOnMessage && (*iter)->channel_name == (*otherBlock)->channel_name) 
 	    {
 	      trace("[CFG] WARNING: There are conflicting onMessage conditions!\n");
-//	      trace("               Please check lines " + intToString((dynamic_cast<STElement*>(symTab.lookup((*iter)->id)))->line));
-//	      trace(                " and " + intToString((dynamic_cast<STElement*>(symTab.lookup((*otherBlock)->id)))->line) + "\n");
+//	      trace("               Please check lines " + toString((dynamic_cast<STElement*>(symTab.lookup((*iter)->id)))->line));
+//	      trace(                " and " + toString((dynamic_cast<STElement*>(symTab.lookup((*otherBlock)->id)))->line) + "\n");
 	      cerr << "               " << (*iter)->channel_name << " (" << (*iter)->id << ") vs. " << (*otherBlock)->channel_name << " (" << (*otherBlock)->id << ")" << endl;
 		trace("\n");
 	    }
@@ -603,8 +603,8 @@ void CFGBlock::checkForConflictingReceive()
 	  if(elemA->first == elemB->first && elemA->second != elemB->second && receives.find(*elemA) == receives.end())
 	  {
 	      trace("[CFG] WARNING: There are conflicting receives!\n");
-//	      trace("               Please check lines " + intToString((dynamic_cast<STElement*>(symTab.lookup(elemA->second)))->line));
-//	      trace(                " and " + intToString((dynamic_cast<STElement*>(symTab.lookup(elemB->second)))->line) + "\n");
+//	      trace("               Please check lines " + toString((dynamic_cast<STElement*>(symTab.lookup(elemA->second)))->line));
+//	      trace(                " and " + toString((dynamic_cast<STElement*>(symTab.lookup(elemB->second)))->line) + "\n");
 	      cerr << "               " << elemA->first << " (" << elemA->second << ") vs. " << elemB->first << " (" << elemB->second << ")" << endl;
 		trace("\n");
 	  }

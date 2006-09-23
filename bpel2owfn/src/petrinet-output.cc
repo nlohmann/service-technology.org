@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/08/18 09:36:02 $
+ *          - last changed: \$Date: 2006/09/23 08:46:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  */
 
 
@@ -143,7 +143,7 @@ string Node::nodeName()
 string Place::nodeShortName()
 {
   if (type == INTERNAL)
-    return ("p" + intToString(id));
+    return ("p" + toString(id));
   else
     return history[0];
 }
@@ -157,7 +157,7 @@ string Place::nodeShortName()
  */
 string Transition::nodeShortName()
 {
-  return ("t" + intToString(id));
+  return ("t" + toString(id));
 }
 
 
@@ -169,11 +169,11 @@ string Transition::nodeShortName()
  */
 string PetriNet::information()
 {
-  string result = "|P|=" + intToString(P.size() + P_in.size() + P_out.size());
-  result += ", |P_in|= " + intToString(P_in.size());
-  result += ", |P_out|= " + intToString(P_out.size());
-  result += ", |T|=" + intToString(T.size());
-  result += ", |F|=" + intToString(F.size());
+  string result = "|P|=" + toString(P.size() + P_in.size() + P_out.size());
+  result += ", |P_in|= " + toString(P_in.size());
+  result += ", |P_out|= " + toString(P_out.size());
+  result += ", |T|=" + toString(T.size());
+  result += ", |F|=" + toString(F.size());
   return result;
 }
 
@@ -261,9 +261,9 @@ string Arc::dotOut()
 {
   string result = " ";
   if (source->nodeType == PLACE)
-    result += "p" + intToString(source->id) + " -> t" + intToString(target->id);
+    result += "p" + toString(source->id) + " -> t" + toString(target->id);
   else
-    result += "t" + intToString(source->id) + " -> p" + intToString(target->id);
+    result += "t" + toString(source->id) + " -> p" + toString(target->id);
   result += ";\n";
 
   return result;
@@ -280,7 +280,7 @@ string Arc::dotOut()
 string Transition::dotOut()
 {
   string result;
-  result += " t" + intToString(id) + "\t[label=\"" + nodeShortName();
+  result += " t" + toString(id) + "\t[label=\"" + nodeShortName();
  
   if (parameters[P_COMMUNICATIONONLY])
   {
@@ -310,7 +310,7 @@ string Transition::dotOut()
 string Place::dotOut()
 {
   string result;
-  result += " p" + intToString(id) + "\t[label=\"" + nodeShortName() + "\"";
+  result += " p" + toString(id) + "\t[label=\"" + nodeShortName() + "\"";
 
 
   if (firstMemberIs("in."))

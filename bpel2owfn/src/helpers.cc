@@ -32,13 +32,13 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/09/22 10:59:59 $
+ *          - last changed: \$Date: 2006/09/23 08:46:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  */
 
 
@@ -89,11 +89,15 @@ set<Node *> setUnion(set<Node *> a, set<Node *> b)
   return result;
 }
 
+
+
+
+
 /*!
  * \param i standard C int
  * \return  C++ string representing i
  */
-string intToString(int i)
+string toString(int i)
 {
   char buffer[20];
   sprintf(buffer, "%d", i);
@@ -109,7 +113,7 @@ string intToString(int i)
  * \param s C++ string
  * \return integer representing s
  */
-int stringToInt(string s)
+int toInt(string s)
 {
   int temp;
   istringstream isst;
@@ -122,25 +126,9 @@ int stringToInt(string s)
 
 
 
-/*!
- * \param  file     a filename
- * \param  line     a line number
- * \param  function a function
- * \return a formatted string uniting the given information
- */
-string pos(const char *file, int line, const char *function)
-{
-  string result = "function " + string(function) + " (" + string(file) + ":" + intToString(line) + ")\n";
-  return result;
-}
-
-
-
-
 
 /**
  * Some output in case an error has occured.
- * 
  */
 void error()
 {
@@ -164,7 +152,6 @@ void error()
 /**
  * Cleans up.
  * Afterwards we should have an almost defined state.
- *
  */
 void cleanup()
 {

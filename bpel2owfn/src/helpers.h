@@ -32,13 +32,13 @@
  *          
  * \date    
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/09/22 10:59:59 $
+ *          - last changed: \$Date: 2006/09/23 08:46:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.30 $
+ * \version \$Revision: 1.31 $
  */
 
 
@@ -137,13 +137,10 @@ set<T> setDifference(set<T> & a, set<T> & b)
 }
 
 /// Converts int to string.
-string intToString(int i);
+string toString(int i);
 
 /// Converts string to int.
-int stringToInt(string s);
-
-/// Formats a debug information.
-string pos(const char *file, int line, const char *function);
+int toInt(string s);
 
 /// Prints help for command line arguments
 void print_help();

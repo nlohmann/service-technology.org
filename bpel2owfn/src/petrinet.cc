@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/07/12 16:47:50 $
+ *          - last changed: \$Date: 2006/09/23 08:46:49 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.136 $
+ * \version \$Revision: 1.137 $
  */
 
 
@@ -109,7 +109,7 @@ bool Node::historyContains(string role)
 
 Node::~Node()
 {
-  trace(TRACE_VERY_DEBUG, "Removing node " + intToString(id) + "...");
+  trace(TRACE_VERY_DEBUG, "Removing node " + toString(id) + "...");
 }
 
 
@@ -228,7 +228,7 @@ Place *PetriNet::newPlace()
  */
 Place *PetriNet::newPlace(string role, communication_type mytype)
 {
-  trace(TRACE_VERY_DEBUG, "[PN]\tCreating place p" + intToString(id()) + " (" + role + ") ...\n");
+  trace(TRACE_VERY_DEBUG, "[PN]\tCreating place p" + toString(id()) + " (" + role + ") ...\n");
 
   Place *p = new Place(getId(), role, mytype);
   assert(p != NULL);
@@ -285,7 +285,7 @@ Transition *PetriNet::newTransition()
  */
 Transition *PetriNet::newTransition(string role)
 {
-  trace(TRACE_VERY_DEBUG, "[PN]\tCreating transition t" + intToString(id()) + " (" + role + ") ...\n");
+  trace(TRACE_VERY_DEBUG, "[PN]\tCreating transition t" + toString(id()) + " (" + role + ") ...\n");
 
   Transition *t = new Transition(getId(), role);
   assert(t != NULL);
@@ -372,7 +372,7 @@ Arc *PetriNet::newArc(Node *source, Node *target, arc_type type)
   */
 
   // Now we can be sure both nodes exist.
-  trace(TRACE_VERY_DEBUG, "[PN]\tCreating arc (" + intToString(source->id) + "," + intToString(target->id) + ")...\n");
+  trace(TRACE_VERY_DEBUG, "[PN]\tCreating arc (" + toString(source->id) + "," + toString(target->id) + ")...\n");
 
 
   assert(source->nodeType != target->nodeType);
@@ -419,7 +419,7 @@ void PetriNet::detachNode(Node *n)
 {
   assert(n != NULL);
 
-  trace(TRACE_VERY_DEBUG, "[PN]\tDetaching node " + intToString(n->id) + "...\n");
+  trace(TRACE_VERY_DEBUG, "[PN]\tDetaching node " + toString(n->id) + "...\n");
 
   vector<Arc*> removeList;
 
@@ -444,7 +444,7 @@ void PetriNet::removePlace(Place *p)
   if (p == NULL)
     return;
 
-  trace(TRACE_VERY_DEBUG, "[PN]\tRemoving place " + intToString(p->id) + "...\n");
+  trace(TRACE_VERY_DEBUG, "[PN]\tRemoving place " + toString(p->id) + "...\n");
   
   detachNode(p);
 
@@ -479,7 +479,7 @@ void PetriNet::removeTransition(Transition *t)
   if (t == NULL)
     return;
 
-  trace(TRACE_VERY_DEBUG, "[PN]\tRemoving transition " + intToString(t->id) + "...\n");
+  trace(TRACE_VERY_DEBUG, "[PN]\tRemoving transition " + toString(t->id) + "...\n");
 
   detachNode(t);
 
@@ -505,7 +505,7 @@ void PetriNet::removeArc(Arc *f)
   if (f == NULL)
     return;
 
-  trace(TRACE_VERY_DEBUG, "[PN]\tRemoving arc (" + intToString(f->source->id) + "," + intToString(f->target->id) + ")...\n");
+  trace(TRACE_VERY_DEBUG, "[PN]\tRemoving arc (" + toString(f->source->id) + "," + toString(f->target->id) + ")...\n");
 
   F.erase(f);
   delete f;
@@ -543,7 +543,7 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
     throw Exception(MERGING_ERROR, "One of the transitions is null!\n", pos(__FILE__, __LINE__, __FUNCTION__));
     */
 
-  trace(TRACE_VERY_DEBUG, "[PN]\tMerging transitions " + intToString(t1->id) + " and " + intToString(t2->id) + "...\n");
+  trace(TRACE_VERY_DEBUG, "[PN]\tMerging transitions " + toString(t1->id) + " and " + toString(t2->id) + "...\n");
 
 
 //  if (t1->type != INTERNAL && t2->type != INTERNAL)
@@ -618,11 +618,11 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
   /*
   if (p1->type != INTERNAL || p2->type != INTERNAL)
     throw Exception(MERGING_ERROR, (string)"Merging of interface places not supported!\n" + "place " +
-	p1->nodeShortName() + "(type " + intToString(p2->type) + ") and " +
-	p2->nodeShortName() + "(type " + intToString(p2->type) + ")", pos(__FILE__, __LINE__, __FUNCTION__));
+	p1->nodeShortName() + "(type " + toString(p2->type) + ") and " +
+	p2->nodeShortName() + "(type " + toString(p2->type) + ")", pos(__FILE__, __LINE__, __FUNCTION__));
 	*/
 
-  trace(TRACE_VERY_DEBUG, "[PN]\tMerging places " + intToString(p1->id) + " and " + intToString(p2->id) + "...\n");
+  trace(TRACE_VERY_DEBUG, "[PN]\tMerging places " + toString(p1->id) + " and " + toString(p2->id) + "...\n");
 
   Node *p12 = newPlace();
   assert(p12 != NULL);
@@ -694,8 +694,8 @@ void PetriNet::mergePlaces(kc::impl_activity *act1, string role1,
   assert(act1 != NULL);
   assert(act2 != NULL);
 
-  mergePlaces(intToString(act1->id) + role1,
-	      intToString(act2->id) + role2);
+  mergePlaces(toString(act1->id) + role1,
+	      toString(act2->id) + role2);
 }
 
 
@@ -717,7 +717,7 @@ void PetriNet::mergePlaces(kc::impl_activity *act1, string role1,
  */
 void PetriNet::mergePlaces(int id1, string role1, int id2, string role2)
 {
-  mergePlaces(intToString(id1) + role1, intToString(id2) + role2);
+  mergePlaces(toString(id1) + role1, toString(id2) + role2);
 }
 
 
@@ -802,7 +802,7 @@ Place *PetriNet::findPlace(kc::impl_activity *activity, string role)
 {
   assert(activity != NULL);
 
-  return findPlace(intToString(activity->id) + role);
+  return findPlace(toString(activity->id) + role);
 }
 
 
@@ -818,7 +818,7 @@ Place *PetriNet::findPlace(kc::impl_activity *activity, string role)
  */
 Place *PetriNet::findPlace(int id, string role)
 {
-  return findPlace(intToString(id) + role);
+  return findPlace(toString(id) + role);
 }
 
 

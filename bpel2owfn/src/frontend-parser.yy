@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/09/22 15:08:15 $
+ *          - last changed: \$Date: 2006/09/23 08:46:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.215 $
+ * \version \$Revision: 1.216 $
  * 
  */
 %}
@@ -952,7 +952,7 @@ tSource:
 arbitraryAttributes:
   /* empty */
      { $$ = mkinteger(ASTEid++); // generate a new id
-       temporaryAttributeMap[ASTEid-1]["referenceLine"] = intToString(yylineno); // remember the file position
+       temporaryAttributeMap[ASTEid-1]["referenceLine"] = toString(yylineno); // remember the file position
      }
 | joinCondition arbitraryAttributes
      { $$ = $2; }

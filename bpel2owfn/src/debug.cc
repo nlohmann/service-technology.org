@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2006/09/23 08:46:48 $
+ *          - last changed: \$Date: 2006/09/23 20:23:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  */
 
 
@@ -123,27 +123,41 @@ int yyerror(const char* msg)
   extern int yylineno;      // line number of current token
   extern char *yytext;      // text of the current token
 
-  trace("Error while parsing!\n\n");
-  trace(msg);
-  trace("\n");
-	
-  // display passed error message
-  trace("Error in '" + filename + "' in line ");
-  trace(toString(yylineno));
-  trace(":\n");
-  trace("  token/text last read was '");
-  trace(yytext);
-  trace("'\n\n");
+  trace("===============================================================================\n");
+  trace("PARSE ERROR\n\n");
+
+  trace("+ Problem: " + string(msg) + " in file `" + filename + "' near line " + toString(yylineno) + ".\n");
+  trace("  The token/text last read was `" + string(yytext) + "'.\n\n");
+  
+  showLineEnvironment(yylineno);
+
+  trace("+ Description: either the input file does not validate with the BPEL XML schema\n");
+  trace("  or it uses extension elements that cannot be processed by BPEL2oWFN.\n\n");
+
+  trace("For more information see Appendix E of the WS-BPEL 2.0 specification.\n");
+  trace("===============================================================================\n\n");
+
+  error();
+  return 1;
+}
 
 
+
+
+
+/*!
+ * Outputs the environment (i.e. four lines before and after) of a line.
+ *
+ * \param lineNumber line number
+ */
+void showLineEnvironment(int lineNumber)
+{
   if (filename != "<STDIN>")
   {
-    trace("-------------------------------------------------------------------------------\n");
-    
     // number of lines to print before and after errorneous line
     int environment = 4;
 
-    unsigned int firstShowedLine = ((yylineno-environment)>0)?(yylineno-environment):1;
+    unsigned int firstShowedLine = ((lineNumber-environment)>0)?(lineNumber-environment):1;
   
     ifstream inputFile(filename.c_str());
     string errorLine;
@@ -154,17 +168,89 @@ int yyerror(const char* msg)
     // print the erroneous line (plus/minus three more)
     for (unsigned int i=firstShowedLine; i<=firstShowedLine+(2*environment); i++)
     {
-      trace(toString(i) + ": " + errorLine + "\n");
+      trace("  " + toString(i) + ": " + errorLine + "\n");
       getline(inputFile, errorLine);
       if (inputFile.eof())
 	break;
     }
+    trace("\n");
     inputFile.close();
-    
-    trace("-------------------------------------------------------------------------------\n");
   }
+}
 
 
-  error();
-  return 1;
+
+
+
+/*!
+ * Outputs error messages triggered by several static tests.
+ */
+void SAerror(unsigned int code, string information, int lineNumber)
+{
+  trace("===============================================================================\n");
+  switch (code)
+  {
+    case(23):
+      {
+	trace("STATIC ANALYSIS FAULT (Code SA00023)\n\n");
+	trace("+ Problem: variable named `" + information + "' (near line " + toString(lineNumber) + ") defined twice\n\n");
+
+      	showLineEnvironment(lineNumber);
+	
+	trace("+ Description: The name of a variable MUST be unique among the names of all\n");
+	trace("  variables defined within the same immediately enclosing scope.\n\n");
+
+        trace("For more information see Section 8.1 of the WS-BPEL 2.0 specification.\n");
+	break;
+      }
+
+    case(72):
+      {
+	trace("STATIC ANALYSIS FAULT (Code SA00072)\n\n");
+	trace("+ Problem: link named `" + information + "' near line " + toString(lineNumber) + " closes a control cycle\n\n");
+
+      	showLineEnvironment(lineNumber);
+
+	trace("+ Description: A <link> declared in a <flow> MUST NOT create a control cycle\n");
+        trace("  that is, the source activity must not have the target activity as a\n");
+	trace("  logically preceding activity.\n\n");
+
+        trace("For more information see Section 11.6.1 of the WS-BPEL 2.0 specification.\n");
+	break;
+      }
+
+    case(80):
+       {
+	trace("STATIC ANALYSIS FAULT (Code SA00080)\n\n");
+	trace("+ Problem: <faultHandlers> of scope define near line " + toString(lineNumber));
+	trace(" has no <catch> or\n  <catchAll> element\n\n");
+
+	showLineEnvironment(lineNumber);
+
+	trace("+ Description: There MUST be at least one <catch> or <catchAll> element\n");
+        trace("  within a <faultHandlers> element.\n\n");
+
+        trace("For more information see Section 12.5 of the WS-BPEL 2.0 specification.\n");
+	break;
+       }
+
+    case(83):
+       {
+	trace("STATIC ANALYSIS FAULT (Code SA00083)\n\n");
+	trace("+ Problem: <eventHandlers> of scope define near line " + toString(lineNumber));
+	trace(" has no <onEvent> or\n  <onAlarm> element\n\n");
+
+	showLineEnvironment(lineNumber);
+
+	trace("+ Description: An event handler MUST contain at least one <onEvent> or\n");
+	trace("  <onAlarm> element.\n\n");
+
+	trace("For more information see Section 12.7 of the WS-BPEL 2.0 specification.\n");
+	break;
+       }
+
+    default:
+      break;
+  }
+  trace("===============================================================================\n\n");
 }

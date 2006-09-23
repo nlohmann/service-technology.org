@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/09/23 08:46:49 $
+ *          - last changed: \$Date: 2006/09/23 20:23:04 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.137 $
+ * \version \$Revision: 1.138 $
  */
 
 
@@ -326,77 +326,21 @@ Arc *PetriNet::newArc(Node *source, Node *target, arc_type type)
   assert(source != NULL);
   assert(target != NULL);
 
-  /*
-  // Tests if the source node is a NULL pointer, i.e. the node was not found
-  // and the arc cannot be added.
-  if ((Place *) source == NULL ||(Transition *) source == NULL)
-  {
-    string name = "unknown";
-    string role = "unknown";
-    if ((Place *) target != NULL)
-    {
-      name = target->nodeTypeName() + " " + target->nodeShortName();
-      role = *(target->history.begin());
-    }
-
-    if ((Transition *) target != NULL)
-    {
-      name = target->nodeTypeName() + " " + target->nodeShortName();
-      role = *(target->history.begin());
-    }
-
-    throw Exception(ARC_ERROR, "Source of arc to " + name + " (" + role + ") not found!\n", pos(__FILE__, __LINE__, __FUNCTION__));
-  }
-  */
-
-  /*
-  // Tests if the target node is a NULL pointer, i.e. the node was not found
-  // and the arc cannot be added.
-  if ((Place *) target == NULL ||(Transition *) target == NULL)
-  {
-    string name = "unknown";
-    string role = "unknown";
-    if ((Place *) source != NULL)
-    {
-      name = source->nodeTypeName() + " " + source->nodeShortName();
-      role = *(source->history.begin());
-    }
-    if ((Transition *) source != NULL)
-    {
-      name = source->nodeTypeName() + " " + source->nodeShortName();
-      role = *(source->history.begin());
-    }
-
-    throw Exception(ARC_ERROR, "Target of arc from " + name + " (" + role + ") not found!\n", pos(__FILE__, __LINE__, __FUNCTION__));
-  }
-  */
-
-  // Now we can be sure both nodes exist.
   trace(TRACE_VERY_DEBUG, "[PN]\tCreating arc (" + toString(source->id) + "," + toString(target->id) + ")...\n");
-
-
   assert(source->nodeType != target->nodeType);
 
-  /*
-  // Tests if the two nodes are of different types, i.e. we only draw arcs
-  // between places and transitions.
-  if (source->nodeType == target->nodeType)
-    throw Exception(ARC_ERROR, "Arc between two " + source->nodeTypeName() +
-	"s!\n" + *((source->history).begin()) + " and " + *((target->history).begin()), pos(__FILE__, __LINE__, __FUNCTION__));
-	*/
 
   // Finally add the arc to the Petri net.
   Arc *f = new Arc(source, target);
   assert(f != NULL);
-
   F.insert(f);
+
 
   // Add a second arc to close a loop if the arc is a read arc.
   if (type == READ)
   {
     Arc *f2 = new Arc(target, source);
     assert(f2 != NULL);
-
     F.insert(f2);
   }
 
@@ -538,17 +482,7 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
   assert(t1 != NULL);
   assert(t2 != NULL);
 
-  /*
-  if (t1 == NULL || t2 == NULL)
-    throw Exception(MERGING_ERROR, "One of the transitions is null!\n", pos(__FILE__, __LINE__, __FUNCTION__));
-    */
-
   trace(TRACE_VERY_DEBUG, "[PN]\tMerging transitions " + toString(t1->id) + " and " + toString(t2->id) + "...\n");
-
-
-//  if (t1->type != INTERNAL && t2->type != INTERNAL)
-//    throw Exception(MERGING_ERROR, "Cannot merge communication transition!\n", pos(__FILE__, __LINE__, __FUNCTION__));
-  
 
   Node *t12 = newTransition();
   if (t1->type != INTERNAL)
@@ -556,7 +490,6 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 
   if (t2->type != INTERNAL)
     t12->type = t2->type;
-
 
   for (vector<string>::iterator role = t1->history.begin(); role != t1->history.end(); role++)
   {
@@ -614,13 +547,6 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
 
   assert(p1->type == INTERNAL);
   assert(p2->type == INTERNAL);
-
-  /*
-  if (p1->type != INTERNAL || p2->type != INTERNAL)
-    throw Exception(MERGING_ERROR, (string)"Merging of interface places not supported!\n" + "place " +
-	p1->nodeShortName() + "(type " + toString(p2->type) + ") and " +
-	p2->nodeShortName() + "(type " + toString(p2->type) + ")", pos(__FILE__, __LINE__, __FUNCTION__));
-	*/
 
   trace(TRACE_VERY_DEBUG, "[PN]\tMerging places " + toString(p1->id) + " and " + toString(p2->id) + "...\n");
 
@@ -719,6 +645,10 @@ void PetriNet::mergePlaces(int id1, string role1, int id2, string role2)
 {
   mergePlaces(toString(id1) + role1, toString(id2) + role2);
 }
+
+
+
+
 
 
 /*---------------------------------------------------------------------------*/
@@ -903,6 +833,9 @@ void PetriNet::addPrefix(string prefix)
 
 
 
+/*!
+ * \todo gierds: comment me!
+ */
 void PetriNet::connectNet(PetriNet * net)
 {
   for (set< Place * >::iterator place = net->P.begin(); place != net->P.end(); place ++)
@@ -1024,6 +957,7 @@ void PetriNet::makeChannelsInternal()
 void PetriNet::reenumerate()
 {
   int currentId = 1;
+
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
     (*p)->id = currentId++;
   for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)

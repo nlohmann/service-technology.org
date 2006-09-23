@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/09/23 17:50:09 $
+ *          - last changed: \$Date: 2006/09/23 20:23:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  */
 
 
@@ -46,6 +46,7 @@
  *****************************************************************************/
 
 #include "ast-details.h"
+#include "debug.h"
 #include <assert.h>
 #include <iostream>
 #include <map>
@@ -266,8 +267,9 @@ void ASTE::defineVariable()
 {
   string variableName = attributes["name"];
 
+  // triggers SA00023
   if (ASTE_variables.find(variableName) != ASTE_variables.end())
-    cerr << "variable " << variableName << " was already defined" << endl;
+    SAerror(23, variableName, toInt(attributes["referenceLine"]));
 
   ASTE_variables.insert(variableName);
 }

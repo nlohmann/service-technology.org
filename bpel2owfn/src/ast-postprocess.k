@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/09/23 17:50:09 $
+ *          - last changed: \$Date: 2006/09/23 20:23:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.29 $
+ * \version \$Revision: 1.30 $
  */
 %}
 
@@ -231,7 +231,12 @@ userDefinedFaultHandler(a,b) ->
           assert(ASTEmap[c->id] != NULL);
           ASTEmap[c->id]->parentActivityId = myid;
         }
-        default : { /* nothing to do */ }
+        default :
+        {
+          // triggers SA00080
+          if (a->length() == 0)
+            SAerror(80, "", toInt(ASTEmap[parentScopeId]->attributes["referenceLine"]));
+        }
       }
     }
     a b
@@ -305,6 +310,10 @@ userDefinedEventHandler(a,b) ->
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       $0->parentScopeId = PPcurrentScope;
+
+      // triggers SA00083
+      if (a->length() == 0 && b->length() == 0)
+        SAerror(83, "", toInt(ASTEmap[parentScopeId]->attributes["referenceLine"]));
 
       // distribute the event handlers's id to the enclosed activities
       foreach(branch=OnMessage(innerActivity); tOnMessage_list a)

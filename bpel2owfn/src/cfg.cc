@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/09/23 08:46:48 $
+ *          - last changed: \$Date: 2006/09/23 20:23:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.28 $
+ * \version \$Revision: 1.29 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -490,8 +490,8 @@ void CFGBlock::checkForCyclicLinks()
     {
       if (!targetsSeen.empty() && targetsSeen.find(linkname) != targetsSeen.end())
       {
-        trace("[CFG] WARNING: Cyclic Links detected!\n");
-        trace("[CFG]          Process will most likely run into deadlock.\n\n");
+        // triggers SA00072
+	SAerror(72, linkname, toInt(ASTEmap[id]->attributes["referenceLine"]));
 	return;
       }
       CFGBlock * targ = targets[dot_name()];

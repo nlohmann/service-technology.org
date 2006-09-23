@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2006/07/12 08:56:43 $
+ *          - last changed: \$Date: 2006/09/23 20:23:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
  */
 
 
@@ -102,7 +102,11 @@ void trace(string message);
 /// Signalling syntax errors.
 int yyerror(const char* msg);
 
+/// Signal an error with a SA (static analysis) code
+void SAerror(unsigned int code, string information = "", int lineNumber = 0);
 
+/// Outputs the environment (i.e. four lines before and after) of a line.
+void showLineEnvironment(int lineNumber);
 
 
 

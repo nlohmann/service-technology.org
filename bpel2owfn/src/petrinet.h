@@ -40,13 +40,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/07/12 16:24:20 $
+ *          - last changed: \$Date: 2006/09/23 22:31:01 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.89 $
+ * \version \$Revision: 1.90 $
  */
 
 
@@ -187,7 +187,7 @@ class Node
  *
 */
 
-class Transition:public Node
+class Transition: public Node
 {
   public:
     /// constructor which creates a transition and adds a first role to the history
@@ -223,7 +223,7 @@ class Transition:public Node
  *
 */
 
-class Place:public Node
+class Place: public Node
 {
   public:
     /// constructor which creates a place and adds a first role to the history
@@ -430,6 +430,8 @@ class PetriNet
     /// fusion of series transitions (RA2)
     void fusionOfSeriesTransitions();
 
+    /// remove transitive nodes and arcs
+    void transitiveReduction();
 
     // old functions
     bool communicationInPostSet(Place *p);

@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/09/23 11:13:24 $
+ *          - last changed: \$Date: 2006/09/23 22:31:01 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  *
  */
 %}
@@ -585,7 +585,7 @@ This=Switch(a,b,otherwiseBranch=Otherwise(c)) ->
       {
 	string caseNumber = toString(currentCase++);
 	Transition* t1 = TheNet->newTransition(prefix + "case" + caseNumber);
-	TheNet->newArc(TheNet->findPlace(This->id, ".initial"), t1);
+	TheNet->newArc(TheNet->findPlace(This->id, ".internal.initial"), t1); // added ".internal" here
 
 	// Embed the inner activity.
 	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
@@ -595,7 +595,7 @@ This=Switch(a,b,otherwiseBranch=Otherwise(c)) ->
 
       // The <otherwise> branch.
       Transition *t1 = TheNet->newTransition(prefix + "caseo");
-      TheNet->newArc(TheNet->findPlace(This->id, ".initial"), t1);
+      TheNet->newArc(TheNet->findPlace(This->id, ".internal.initial"), t1); // added ".internal" here
 
       // embed inner activity
       TheNet->newArc(t1, TheNet->findPlace(c, ".initial"));
@@ -760,7 +760,7 @@ This=Pick(a,b,c) ->
 
 	Transition *t1 = TheNet->newTransition(prefix + "pickM" + message);
 	TheNet->newArc(TheNet->findPlace("in." + ThisBranch->channelName), t1);
-	TheNet->newArc(TheNet->findPlace(This->id, ".initial"), t1);
+	TheNet->newArc(TheNet->findPlace(This->id, ".internal.initial"), t1);
 	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
 	t1->type = IN;
 
@@ -780,7 +780,7 @@ This=Pick(a,b,c) ->
         string alarm = toString(onAlarmCount++);
 
 	Transition *t1 = TheNet->newTransition(prefix + "pickA" + alarm);
-	TheNet->newArc(TheNet->findPlace(This->id, ".initial"), t1);
+	TheNet->newArc(TheNet->findPlace(This->id, ".internal.initial"), t1);
 	TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
 
 

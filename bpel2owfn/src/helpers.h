@@ -32,13 +32,13 @@
  *          
  * \date    
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/09/23 08:46:48 $
+ *          - last changed: \$Date: 2006/09/23 08:58:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  */
 
 
@@ -65,6 +65,29 @@ using namespace std;
 
 
 
+/******************************************************************************
+ * Conversion and error handling functions
+ *****************************************************************************/
+
+/// Converts int to string.
+string toString(int i);
+
+/// Converts string to int.
+int toInt(string s);
+
+/// Calls #cleanup(), then exits
+void error();
+
+/// Close all open files, delete all pointers.
+void cleanup();
+
+
+
+
+
+/******************************************************************************
+ * Set functions (since we're using templates, we cannot move this to a header
+ *****************************************************************************/
 
 // to avoid compile errors
 class Node;
@@ -77,7 +100,7 @@ set<Node *> setUnion(set<Node *> a, set<Node *> b);
  *
  * \par a the first set
  * \par b the second set
- * \returns the set of a united with b (a \\/ b)
+ * \returns the set of a united with b
  */
 template <class T>
 set<T> setUnion(set<T> & a, set<T> & b)
@@ -89,12 +112,16 @@ set<T> setUnion(set<T> & a, set<T> & b)
   return resultSet;
 }
 
+
+
+
+
 /**
  * Returns the intersection of two sets of T's.
  *
  * \par a the first set
  * \par b the second set
- * \returns the set of a intersected with b (a /\\ b)
+ * \returns the set of a intersected with b
  */
 template <class T>
 set<T> setIntersection(set<T> & a, set<T> & b)
@@ -113,6 +140,10 @@ set<T> setIntersection(set<T> & a, set<T> & b)
 
   return resultSet;
 }
+
+
+
+
 
 /**
  * Returns the difference of two sets of T's.
@@ -135,23 +166,5 @@ set<T> setDifference(set<T> & a, set<T> & b)
 
   return resultSet;
 }
-
-/// Converts int to string.
-string toString(int i);
-
-/// Converts string to int.
-int toInt(string s);
-
-/// Prints help for command line arguments
-void print_help();
-
-/// Prints version information
-void print_version(std::string name);
-
-/// Calls #cleanup(), then exits
-void error();
-
-/// Close all open files, delete all pointers.
-void cleanup();
 
 #endif

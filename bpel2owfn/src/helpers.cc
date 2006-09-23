@@ -32,13 +32,13 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/09/23 08:46:48 $
+ *          - last changed: \$Date: 2006/09/23 08:58:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.53 $
+ * \version \$Revision: 1.54 $
  */
 
 
@@ -75,6 +75,10 @@ extern PetriNet *TheNet;
 
 
 
+/******************************************************************************
+ * Set functions
+ *****************************************************************************/
+
 /*!
  * \param a set of Petri net nodes
  * \param b set of Petri net nodes
@@ -92,6 +96,10 @@ set<Node *> setUnion(set<Node *> a, set<Node *> b)
 
 
 
+
+/******************************************************************************
+ * Conversion functions
+ *****************************************************************************/
 
 /*!
  * \param i standard C int
@@ -115,17 +123,21 @@ string toString(int i)
  */
 int toInt(string s)
 {
-  int temp;
+  int result;
   istringstream isst;
   isst.str(s);
-  isst >> temp;
+  isst >> result;
 
-  return temp;
+  return result;
 }
 
 
 
 
+
+/******************************************************************************
+ * Error handling functions
+ *****************************************************************************/
 
 /**
  * Some output in case an error has occured.

@@ -53,7 +53,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/09/23 08:46:48 $
+ *          - last changed: \$Date: 2006/09/23 11:13:25 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.25 $
+ * \version \$Revision: 1.26 $
  */
 %}
 
@@ -160,7 +160,7 @@ This=Empty(a) ->
  * Fig. 11.
  */
 
-This=Invoke(a,b) provided (This->isAsynchronousInvoke) ->
+This=Invoke(a,b) provided (!This->isSynchronousInvoke) ->
   [petrinet:
     {
       string prefix = toString(This->id) + ".internal.";
@@ -211,7 +211,7 @@ This=Invoke(a,b) provided (This->isAsynchronousInvoke) ->
  * Fig. 13.
  */
 
-This=Invoke(a,b) provided (!This->isAsynchronousInvoke) ->
+This=Invoke(a,b) provided (This->isSynchronousInvoke) ->
   [petrinet:
     {
       header(This->id);

@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/07/12 08:56:43 $
+ *          - last changed: \$Date: 2006/09/23 11:13:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  */
 
 
@@ -53,6 +53,7 @@
  *****************************************************************************/
 
 #include <map>
+#include <string>
 #include <list>
 #include <set>
 
@@ -120,6 +121,12 @@ class ASTE
 
     /// constructor
     ASTE(kc::impl_abstract_phylum *mynode, int mytype);
+
+    /// checks and returns attributes
+    map<string, string> getAttributes();
+
+    /// creates a communication channel
+    string createChannel(bool synchronousCommunication = false);
 };
 
 

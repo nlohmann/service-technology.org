@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/09/23 08:46:47 $
+ *          - last changed: \$Date: 2006/09/23 11:13:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.216 $
+ * \version \$Revision: 1.217 $
  * 
  */
 %}
@@ -226,6 +226,7 @@ tProcess:
       yylineno = 0;
       ASTEid = 1;
       currentJoinCondition = standardJoinCondition();
+      temporaryAttributeMap.clear();
     }
   X_OPEN K_PROCESS arbitraryAttributes X_NEXT imports
   tPartnerLinks tPartners tVariables tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers activity

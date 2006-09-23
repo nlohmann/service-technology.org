@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/09/23 08:46:47 $
+ *          - last changed: \$Date: 2006/09/23 11:13:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  */
 %}
 
@@ -116,8 +116,7 @@ Process(a,b,c,d,e,f,g,h,i) ->
 
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
 
       // organize ids
@@ -265,8 +264,7 @@ Catch(a) ->
       assert(ASTEmap[myid] != NULL);
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
     }
     a
   ]
@@ -333,14 +331,10 @@ OnMessage(a) ->
       assert(ASTEmap[myid] != NULL);
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
       // create a channel
-//      $0->channelName = $0->A_partnerLink + "." + $0->A_portType + "." + $0->A_operation;
-      $0->channelName = $0->attributes["operation"]; //TODO
-      ASTE_inputChannels.insert($0->channelName);
-
+      $0->channelName = ASTEmap[myid]->createChannel();
 
       $0->variableName = $0->attributes["variable"];
     }
@@ -388,8 +382,7 @@ Variable() ->
       assert(ASTEmap[myid] != NULL);
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
       // register this variable
 //TODO      assert($0->A_name != "");
@@ -413,8 +406,7 @@ CorrelationSet() ->
       assert(ASTEmap[myid] != NULL);
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
      }
   ]
 ;
@@ -431,8 +423,7 @@ Correlation() ->
       assert(ASTEmap[myid] != NULL);
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
      }
   ]
 ;
@@ -452,8 +443,7 @@ Empty(a) ->
       a->parentId = myid;
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -484,11 +474,10 @@ Invoke(a,b) ->
       a->parentId = myid;
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
       // switch to discriminate asynchronous and synchronous invokes
-      $0->isAsynchronousInvoke = ($0->attributes["outputVariable"] == "");
+      $0->isSynchronousInvoke = ($0->attributes["outputVariable"] != "");
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -501,17 +490,7 @@ Invoke(a,b) ->
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
 
       // create a channel (or two in case of a synchronous invoke)
-//      $0->channelName = $0->A_partnerLink + "." + $0->A_portType + "." + $0->A_operation;
-      $0->channelName = $0->attributes["operation"]; //TODO
-
-      if ($0->isAsynchronousInvoke)
-        ASTE_outputChannels.insert($0->channelName);
-      else
-      {
-        ASTE_outputChannels.insert($0->channelName);
-        ASTE_inputChannels.insert($0->channelName);
-      }
-
+      $0->channelName = ASTEmap[myid]->createChannel($0->isSynchronousInvoke);
 
       // add variables
       $0->inputVariableName = $0->attributes["inputVariable"];
@@ -536,8 +515,7 @@ Receive(a,b) ->
       a->parentId = myid;
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -550,9 +528,7 @@ Receive(a,b) ->
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
 
       // create a channel
-//      $0->channelName = $0->A_partnerLink + "." + $0->A_portType + "." + $0->A_operation;
-      $0->channelName = $0->attributes["operation"]; //TODO
-      ASTE_inputChannels.insert($0->channelName);
+      $0->channelName = ASTEmap[myid]->createChannel();
 
       $0->variableName = $0->attributes["variable"];
     }
@@ -575,8 +551,7 @@ Reply(a,b) ->
       a->parentId = myid;
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -589,10 +564,7 @@ Reply(a,b) ->
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
 
       // create a channel
-//      $0->channelName = $0->A_partnerLink + "." + $0->A_portType + "." + $0->A_operation;
-      $0->channelName = $0->attributes["operation"]; //TODO
-      ASTE_outputChannels.insert($0->channelName);
-
+      $0->channelName = ASTEmap[myid]->createChannel();
 
       $0->variableName = $0->attributes["variable"];
     }
@@ -615,8 +587,7 @@ Assign(a,b) ->
       a->parentId = myid;
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -643,8 +614,7 @@ From() ->
       assert(ASTEmap[myid] != NULL);
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
       $0->variableName = $0->attributes["variable"];
     }
@@ -658,8 +628,7 @@ To() ->
       assert(ASTEmap[myid] != NULL);
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
       $0->variableName = $0->attributes["variable"];
     }
@@ -682,8 +651,7 @@ Wait(a) ->
       a->parentId = myid;
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -717,8 +685,7 @@ Throw(a) ->
       a->parentId = myid;
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -749,8 +716,7 @@ Compensate(a) ->
       a->parentId = myid;
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
       // attribute to discriminate the <compensate>-patterns
       $0->hasScopeAttribute = ($0->attributes["scope"] != "");
@@ -791,8 +757,7 @@ Terminate(a) ->
       a->parentId = myid;
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -823,8 +788,7 @@ Flow(a,b,c) ->
       a->parentId = myid;
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -869,8 +833,7 @@ Link() ->
       assert(ASTEmap[myid] != NULL);
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
       /* here we can check whether this link was not defined before */
       linkIdMap[$0->attributes["name"]] = myid;
@@ -899,8 +862,7 @@ Switch(a,b,c=Otherwise(d)) ->
       a->parentId = myid;
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -945,8 +907,7 @@ Case(a) ->
       assert(ASTEmap[myid] != NULL);
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
     }
@@ -981,8 +942,7 @@ While(a,b) ->
       a->parentId = myid;
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -1023,8 +983,7 @@ Sequence(a,b) ->
       a->parentId = myid;
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
 
       // set or inherit suppressJoinFailure-attribute
@@ -1072,8 +1031,7 @@ Pick(a,b,c) ->
       a->parentId = myid;
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -1138,8 +1096,7 @@ Scope(a,b,c,d,e,f,g) ->
       $0->hasEH = (string(e->op_name()) == "userDefinedEventHandler");
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
@@ -1226,8 +1183,7 @@ Target() ->
 
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
 
       // remember that that link was used as a target
@@ -1255,8 +1211,7 @@ Source() ->
 
 
       // copy attributes to AST
-      $0->referenceLine = toInt(ASTEmap[myid]->attributes["referenceLine"]);
-      $0->attributes = ASTEmap[myid]->attributes;
+      $0->attributes = ASTEmap[myid]->getAttributes();
 
 
       // remember that that link was used as a source

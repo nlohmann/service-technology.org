@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/09/22 10:59:58 $
+ *          - last changed: \$Date: 2006/09/23 11:13:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.102 $
+ * \version \$Revision: 1.103 $
  */
 %}
 
@@ -91,35 +91,12 @@ tProcess:
       )
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     bool suppressJF = false;
     bool hasEH = false;
   }
 ;
-
-void tProcess::checkAttributes()
-{
-  string required[] = { "name", "targetNamespace" };
-  string optional[] = { "queryLanguage", "expressionLanguage", "suppressJoinFailure", "enableInstanceCompensation", "abstractProcess", "xmlns" };
-  string defaults[] = { "http://www.w3.org/TR/1999/REC-xpath-19991116", "http://www.w3.org/TR/1999/REC-xpath-19991116", "no", "no", "no", "" };
-  const int requireds = sizeof(required)/sizeof(required[0]);
-  const int optionals = sizeof(optional)/sizeof(optional[0]);
-
-  for (int i = 0; i < requireds; i++)
-    if (attributes[required[i]] == "")
-      cerr << "no `" << required[i] << "' given in near " << referenceLine << " (required)" << endl;
-
-  for (int i = 0; i < optionals; i++)
-    if (attributes[optional[i]] == "")
-    {
-      cerr << "no `" << optional[i] << "' given in near " << referenceLine << " (optional)" << endl;
-      if (defaults[i] != "")
-        cerr << "  initialized `"<< optional[i] << "' with standard value `" << defaults[i] << "'" << endl;
-    }
-}
-
 
 tStop:
   StopInProcess()
@@ -163,7 +140,6 @@ tPartnerLink:
   PartnerLink()
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     bool inPartners = false;
@@ -183,7 +159,6 @@ tPartner:
   Partner(tPartnerLink_list)
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
   }
 ;
@@ -213,7 +188,6 @@ tCatch:
   Catch(activity)
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     string variableName;
@@ -259,7 +233,6 @@ tOnMessage:
   OnMessage(activity)
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     string channelName;
@@ -279,7 +252,6 @@ tOnAlarm:
   OnAlarm(activity)
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
   } 
 ;
@@ -322,7 +294,6 @@ tVariable:
   Variable()
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
   }
 ;
@@ -340,7 +311,6 @@ tCorrelationSet:
   CorrelationSet()
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
   }
 ;
@@ -358,7 +328,6 @@ tCorrelation:
   Correlation()
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
   }
 ;
@@ -372,7 +341,6 @@ tEmpty:
   Empty(standardElements)
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -389,13 +357,12 @@ tInvoke:
   Invoke(standardElements tCorrelation_list)
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     int negativeControlFlow = 0;
     bool suppressJF = false;
 
-    bool isAsynchronousInvoke = false;
+    bool isSynchronousInvoke = false;
 
     string channelName;
     string inputVariableName;
@@ -412,7 +379,6 @@ tReceive:
   Receive(standardElements tCorrelation_list)
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -432,7 +398,6 @@ tReply:
   Reply(standardElements tCorrelation_list)
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -452,7 +417,6 @@ tAssign:
   Assign(standardElements tCopy_list)
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -472,7 +436,6 @@ tFrom:
   From()
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     string literal;
@@ -485,7 +448,6 @@ tTo:
   To()
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     string variableName;
@@ -501,7 +463,6 @@ tWait:
   Wait(standardElements)
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -520,7 +481,6 @@ tThrow:
   Throw(standardElements)
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -539,7 +499,6 @@ tCompensate:
   Compensate(standardElements)
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -560,7 +519,6 @@ tTerminate:
   Terminate(standardElements)
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -577,7 +535,6 @@ tFlow:
   Flow(standardElements tLink_list activity_list)
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -597,7 +554,6 @@ tLink:
   Link()
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     bool usedAsSource = false;
@@ -614,7 +570,6 @@ tSwitch:
   Switch(standardElements tCase_list tOtherwise)
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -630,7 +585,6 @@ tCase:
   Case(activity)
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
   }
 ;
@@ -651,7 +605,6 @@ tWhile:
   While(standardElements activity)
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -668,7 +621,6 @@ tSequence:
   Sequence(standardElements activity_list)
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -685,7 +637,6 @@ tPick:
   Pick(standardElements tOnMessage_list tOnAlarm_list)
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -710,7 +661,6 @@ tScope:
       )
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -749,7 +699,6 @@ tTarget:
   Target()
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -766,7 +715,6 @@ tSource:
   Source()
   {
     int id = 0;
-    int referenceLine;
     stringMap attributes;
 
     int negativeControlFlow = 0;

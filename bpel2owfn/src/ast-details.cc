@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/07/12 10:55:18 $
+ *          - last changed: \$Date: 2006/09/23 11:13:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  */
 
 
@@ -49,6 +49,7 @@
 #include <assert.h>
 #include <iostream>
 #include <map>
+#include <set>
 #include <string>
 
 using namespace std;
@@ -62,6 +63,8 @@ using namespace std;
  *****************************************************************************/
 
 extern map<unsigned int, map<string, string> > temporaryAttributeMap;
+extern set<string> ASTE_inputChannels;
+extern set<string> ASTE_outputChannels;
 
 
 
@@ -131,4 +134,68 @@ ASTE::ASTE(kc::impl_abstract_phylum *mynode, int mytype)
   attributes = temporaryAttributeMap[id];
   suppressJF = false; // required initialization!
   controlFlow = POSITIVECF;
+}
+
+
+
+
+
+/*!
+ * Checks and returns attributes.
+ */
+map<string, string> ASTE::getAttributes()
+{
+  switch (type)
+  {
+    case(K_PROCESS):
+      {
+      	string required[] = { "name", "targetNamespace" };
+	string optional[] = { "queryLanguage", "expressionLanguage", "suppressJoinFailure", "enableInstanceCompensation", "abstractProcess", "xmlns" };
+	string defaults[] = { "http://www.w3.org/TR/1999/REC-xpath-19991116", "http://www.w3.org/TR/1999/REC-xpath-19991116", "no", "no", "no", "" };
+      	const int requireds = sizeof(required)/sizeof(required[0]);
+	const int optionals = sizeof(optional)/sizeof(optional[0]);
+	break;
+      }
+    default: ;
+  }
+
+  return attributes;
+}
+
+
+
+
+
+/*!
+ * Creates a channel for communicating activities
+ */
+string ASTE::createChannel(bool synchronousCommunication)
+{
+  string channelName = attributes["operation"];
+
+  switch (type)
+  {
+    case(K_RECEIVE):
+    case(K_ONMESSAGE):
+      {
+	ASTE_inputChannels.insert(channelName);
+	break;
+      }
+
+    case(K_INVOKE):
+    case(K_REPLY):
+      {
+	ASTE_outputChannels.insert(channelName);
+
+	if (synchronousCommunication)
+	  ASTE_inputChannels.insert(channelName);
+
+	break;
+      }
+    
+    default:
+      assert(false);
+  }
+
+  return channelName;
 }

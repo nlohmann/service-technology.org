@@ -1,0 +1,7 @@
+<process name="SA00080" targetNamespace="anyURI">
+
+	<faultHandlers>
+	</faultHandlers>
+
+	<empty />
+</process>

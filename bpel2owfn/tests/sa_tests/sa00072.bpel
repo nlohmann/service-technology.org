@@ -1,0 +1,19 @@
+<process name="SA00072" targetNamespace="anyURI">
+
+  <flow>
+    <links>
+      <link name="AtoB" />
+      <link name="BtoA" />
+    </links>
+
+    <empty name="A">
+      <target linkName="BtoA" />
+      <source linkName="AtoB" />
+    </empty>
+
+    <empty name="B">
+      <target linkName="AtoB" />
+      <source linkName="BtoA" />
+    </empty>
+  </flow>
+</process>

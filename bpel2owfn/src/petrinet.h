@@ -40,13 +40,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/09/23 22:31:01 $
+ *          - last changed: \$Date: 2006/09/25 13:52:01 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.90 $
+ * \version \$Revision: 1.91 $
  */
 
 
@@ -472,6 +472,10 @@ class PetriNet
 
     /// Mapping of roles to nodes of the Petri net.
     map<string, Node *> roleMap;
+
+
+
+    Place *findPlace(unsigned int id1, unsigned int id2);
 };
 
 

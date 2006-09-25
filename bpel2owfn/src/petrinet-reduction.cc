@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/09/23 22:31:01 $
+ *          - last changed: \$Date: 2006/09/25 13:52:01 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  */
 
 
@@ -572,7 +572,8 @@ void PetriNet::simplify()
     old = information();
   }
 
-  transitiveReduction();
+//  cerr << information() << endl;
+//  transitiveReduction();
 
   trace(TRACE_INFORMATION, "Simplifying complete.\n");
   trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification: " + information() + "\n");
@@ -582,7 +583,206 @@ void PetriNet::simplify()
 
 
 
+
+
+/* another set union function */
+set<unsigned int> setUnion(set<unsigned int> a, set<unsigned int> b)
+{
+  set<unsigned int> result;
+  insert_iterator<set<unsigned int, less<unsigned int> > > res_ins(result, result.begin());
+  set_union(a.begin(), a.end(), b.begin(), b.end(), res_ins);
+  
+  return result;
+}
+
+set<unsigned int> setDifference(set<unsigned int> a, set<unsigned int> b)
+{
+  set<unsigned int> resultSet (a);
+  if (! (a.empty() || b.empty()))
+    for (set<unsigned int>::iterator iter = b.begin(); iter != b.end(); iter++)
+      resultSet.erase(*iter);
+
+  return resultSet;
+}
+
+set<Node *> setIntersection(set<Node *> a, set<Node *> b)
+{
+  set<Node *> result;
+  insert_iterator<set<Node *, less<Node *> > > res_ins(result, result.begin());
+  set_intersection(a.begin(), a.end(), b.begin(), b.end(), res_ins);
+  
+  return result;
+}
+
+
+
+
+
+set<unsigned int> visited2;
+
+
+/* depth-first search returning the set of reachable nodes */
+set<unsigned int> dfs(unsigned int i, map<unsigned int, set<unsigned int> > &Adj)
+{
+  set<unsigned int> result;
+  result.insert(i);
+  visited2.insert(i);
+
+  for (set<unsigned int>::iterator it = Adj[i].begin(); it != Adj[i].end(); it++)
+  {
+    if (visited2.find(*it) == visited2.end())
+      result = setUnion(result, dfs(*it, Adj));
+  }
+
+  return result;
+}
+
+
+/* creates accessibility list from adjacency list */
+map<unsigned int, set<unsigned int> > toAcc(map<unsigned int, set<unsigned int> > &Adj, set<unsigned int> &nodes)
+{
+  map<unsigned int, set<unsigned int> > result;
+
+  for (set<unsigned int>::iterator it = nodes.begin(); it != nodes.end(); it++)
+  {
+    result[*it] = dfs(*it, Adj);
+    result[*it].erase(*it);
+    visited2.clear();
+  }
+
+  return result;
+}
+
+
+/* outputs a mapping */
+void mapOutput(map<unsigned int, set<unsigned int> > &mapping, set<unsigned int> &nodes)
+{
+  for (set<unsigned int>::iterator it = nodes.begin(); it != nodes.end(); it++)
+  {
+    cerr << *it << "\t";
+
+    for (set<unsigned int>::iterator it2 = mapping[*it].begin(); it2 != mapping[*it].end(); it2++)
+      cerr << *it2 << " ";
+
+    cerr << endl;
+  }
+}
+
+set<unsigned int> visited;
+
+
+
+
+
+
+
+
+void prune_acc(unsigned int i, map<unsigned int, set<unsigned int> > &Acc, map<unsigned int, set<unsigned int> > &Adj)
+{
+  for (set<unsigned int>::iterator it = Acc[i].begin(); it != Acc[i].end(); it++)
+  {
+    if (Acc[*it].empty())
+      visited.insert(*it);
+    else
+      prune_acc(*it, Acc, Adj);
+  }
+
+  for (set<unsigned int>::iterator it = Acc[i].begin(); it != Acc[i].end(); it++)
+    for (set<unsigned int>::iterator it2 = Adj[*it].begin(); it2 != Adj[*it].end(); it2++)
+      if (Acc[i].find(*it2) != Acc[i].end())
+	Adj[i].erase(*it2);
+
+  visited.insert(i);
+}
+
+
+
+
+
+
+/* wrapper functions for the transitive reduction */
 void PetriNet::transitiveReduction()
 {
+  set<unsigned int> nodes;
+  map<unsigned int, set<unsigned int> > Adj;
 
+  // generate the list of nodes
+  for (set<Transition*>::iterator t = T.begin(); t != T.end(); t++)
+    nodes.insert((*t)->id);
+
+  // generate the adjacency lists
+  for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
+  {
+    set<Node*> pre = preset(*p);
+    set<Node*> post = postset(*p);
+
+    if (pre.size() > 0 && post.size() > 0)
+      for (set<Node*>::iterator t1 = pre.begin(); t1 != pre.end(); t1++)
+	for (set<Node*>::iterator t2 = post.begin(); t2 != post.end(); t2++)
+	  Adj[(*t1)->id].insert((*t2)->id);
+  }
+
+  // generate the accessibility list
+  map<unsigned int, set<unsigned int> > Acc = toAcc(Adj, nodes);
+
+  // the accessibility is base for the transitive reduction
+  map<unsigned int, set<unsigned int> > Adj_reduced = Acc;
+
+  // iterate the nodes and reduce
+  for (set<unsigned int>::iterator it = nodes.begin(); it != nodes.end(); it++)
+  {
+    if (visited.find(*it) == visited.end())
+      prune_acc(*it, Acc, Adj_reduced);
+  }
+
+  visited.clear();
+
+  set<Place*> transitivePlaces;
+
+  for (set<unsigned int>::iterator it = nodes.begin(); it != nodes.end(); it++)
+  {
+    set<unsigned int> difference = setDifference(Adj[*it], Adj_reduced[*it]);
+    for (set<unsigned int>::iterator it2 = difference.begin(); it2 != difference.end(); it2++)
+      transitivePlaces.insert(findPlace(*it, *it2));
+  }
+
+
+  // remove transitive places
+  for (set<Place*>::iterator p = transitivePlaces.begin(); p != transitivePlaces.end(); p++)
+    removePlace(*p);
+
+  cerr << "removed " << transitivePlaces.size() << " transitive places" << endl;
+}
+
+
+
+
+
+Place *PetriNet::findPlace(unsigned id1, unsigned id2)
+{
+  Transition *t1 = NULL;
+  Transition *t2 = NULL;
+
+  for (set<Transition*>::iterator t = T.begin(); t != T.end(); t++)
+  {
+    if ( (*t)->id == id1 )
+      t1 = *t;
+    if ( (*t)->id == id2 )
+      t2 = *t;
+  }
+
+  assert(t1 != NULL);
+  assert(t2 != NULL);
+  assert(t1 != t2);
+
+  set<Node*> temp = setIntersection(postset(t1), preset(t2));
+
+  if (temp.size() > 1)
+    cerr << "WARNING" << endl;
+
+  Place *result = (Place*)(*(temp.begin()));
+
+  assert(result != NULL);
+
+  return result;
 }

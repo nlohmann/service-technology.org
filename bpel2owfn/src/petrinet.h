@@ -40,13 +40,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/09/27 13:34:44 $
+ *          - last changed: \$Date: 2006/09/27 13:40:20 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.92 $
+ * \version \$Revision: 1.93 $
  */
 
 
@@ -437,10 +437,6 @@ class PetriNet
 
     /// remove transitive nodes and arcs
     void transitiveReduction();
-
-    // old functions
-    bool communicationInPostSet(Place *p);
-    void collapseSequences();
 
     
     /// Removes interface places (for non-oWFN formats)

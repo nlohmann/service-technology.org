@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/09/23 20:23:04 $
+ *          - last changed: \$Date: 2006/09/27 13:34:44 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.138 $
+ * \version \$Revision: 1.139 $
  */
 
 
@@ -245,11 +245,6 @@ Place *PetriNet::newPlace(string role, communication_type mytype)
   if (role != "")
   {
     assert(roleMap[role] == NULL);
-/*    if (roleMap[role] != NULL)
-    {
-      throw Exception(DOUBLE_NODE, "Place with role '" + role + "' already defined.\n", pos(__FILE__, __LINE__, __FUNCTION__));
-    }
-    else*/
     roleMap[role] = p;
   }
 
@@ -389,7 +384,7 @@ void PetriNet::removePlace(Place *p)
     return;
 
   trace(TRACE_VERY_DEBUG, "[PN]\tRemoving place " + toString(p->id) + "...\n");
-  
+
   detachNode(p);
 
   // Remove the roles of the place p, i.e. set the mappings to the NULL
@@ -485,11 +480,24 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
   trace(TRACE_VERY_DEBUG, "[PN]\tMerging transitions " + toString(t1->id) + " and " + toString(t2->id) + "...\n");
 
   Node *t12 = newTransition();
-  if (t1->type != INTERNAL)
+
+  // organize the communication type of the new transition
+  if (t1->type == t2->type)
     t12->type = t1->type;
 
-  if (t2->type != INTERNAL)
-    t12->type = t2->type;
+  if ((t1->type == IN && t2->type == INTERNAL) ||
+      (t1->type == INTERNAL && t2->type == IN))
+    t12->type = IN;
+
+  if ((t1->type == INTERNAL && t2->type == OUT) ||
+      (t1->type == OUT && t2->type == INTERNAL))
+    t12->type = OUT;
+
+  if ((t1->type == OUT && t2->type == IN) ||
+      (t1->type == IN && t2->type == OUT) ||
+      (t1->type == INOUT || t2->type == INOUT))
+    t12->type = INOUT;
+
 
   for (vector<string>::iterator role = t1->history.begin(); role != t1->history.end(); role++)
   {

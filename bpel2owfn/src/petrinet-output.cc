@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/09/23 20:23:04 $
+ *          - last changed: \$Date: 2006/09/27 13:34:44 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.29 $
+ * \version \$Revision: 1.30 $
  */
 
 
@@ -292,9 +292,11 @@ string Transition::dotOut()
   result += "\"";
 
   if (type == IN)
-    result += " style=filled fillcolor=gold";
+    result += " style=filled fillcolor=orange";
   if (type == OUT)
     result += " style=filled fillcolor=yellow";
+  if (type == INOUT)
+    result += " style=filled fillcolor=gold";
   
   result += "];\n";
   return result;
@@ -315,7 +317,7 @@ string Place::dotOut()
 
 
   if (firstMemberIs("in."))
-    result += " style=filled fillcolor=gold shape=ellipse";
+    result += " style=filled fillcolor=orange shape=ellipse";
   else if (firstMemberIs("out."))
     result += " style=filled fillcolor=yellow shape=ellipse";
   else if (firstMemberIs("!link."))
@@ -324,10 +326,10 @@ string Place::dotOut()
     result += " style=filled fillcolor=cornflowerblue";
   else if (firstMemberIs("variable."))
     result += " style=filled fillcolor=cyan";
-  else if (firstMemberIs("1.internal.initial")
-	   || firstMemberIs("1.internal.final"))
+  else if (historyContains("1.internal.initial")
+	   || historyContains("1.internal.final"))
     result += " style=filled fillcolor=green";
-  else if (firstMemberIs("1.internal.clock"))
+  else if (historyContains("1.internal.clock"))
     result += " style=filled fillcolor=seagreen";
 
   result += "];\n";

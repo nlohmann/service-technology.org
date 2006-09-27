@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/09/27 09:24:31 $
+ *          - last changed: \$Date: 2006/09/27 13:34:44 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.30 $
+ * \version \$Revision: 1.31 $
  */
 
 
@@ -144,7 +144,7 @@ void PetriNet::removeUnusedStatusPlaces()
 
   for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
   {
-    if (postset(*p).empty() && (*p)->history[0] != "1.internal.final")
+    if (postset(*p).empty() && !((*p)->historyContains("1.internal.final")))
       unusedPlaces.push_back(*p);
   }
 
@@ -163,6 +163,8 @@ void PetriNet::removeUnusedStatusPlaces()
  */
 void PetriNet::removeDeadNodes()
 {
+  trace(TRACE_DEBUG, "[PN]\tRemoving structurally dead nodes...\n");
+  
   bool done = false;
 
   while (!done)
@@ -253,7 +255,7 @@ void PetriNet::elminiationOfIdenticalPlaces()
 {
   set<pair<string, string> > placePairs;
 
-  trace(TRACE_VERY_DEBUG, "[PN]\tSearching for places with same preset and postset...\n");
+  trace(TRACE_DEBUG, "[PN]\tApplying rule RB1 (elimination of identical places)...\n");
 
   // iterate the places
   for (set<Place*>::iterator p1 = P.begin(); p1 != P.end(); p1++)
@@ -305,7 +307,7 @@ void PetriNet::elminiationOfIdenticalTransitions()
 {
   set<pair<string, string> > transitionPairs;
 
-  trace(TRACE_VERY_DEBUG, "[PN]\tSearching for transitions with same preset and postset...\n");
+  trace(TRACE_DEBUG, "[PN]\tApplying rule RB2 (elimination of identical transitions)...\n");
 
   // iterate the transitions
   for (set<Transition*>::iterator t1 = T.begin(); t1 != T.end(); t1++)
@@ -351,10 +353,13 @@ void PetriNet::elminiationOfIdenticalTransitions()
  * If there exists a transition with singleton preset and postset
  * (precondition 1) that are distinct (precondition 2) and where the place in
  * the preset has no other outgoing arcs (precondition 3), then the places
- * can be merged and the transition can be removed.
+ * can be merged and the transition can be removed. Furthermore, none of the
+ * places may be communicating (precondition 4).
  */
 void PetriNet::fusionOfSeriesPlaces()
 {
+  trace(TRACE_DEBUG, "[PN]\tApplying rule RA1 (fusion of series places)...\n");
+
   set<string> uselessTransitions;
   set<pair<string, string> > placePairs;
 
@@ -369,15 +374,16 @@ void PetriNet::fusionOfSeriesPlaces()
 
     if ((preSet.size() == 1) &&	(postSet.size() == 1) && // precondition 1
 	(prePlace != postPlace) &&			 // precondition 2
-	(postset(prePlace).size() == 1) )		 // precondition 3
-    {
+	(postset(prePlace).size() == 1) &&		 // precondition 3
+	(prePlace->type == INTERNAL) &&			 // precondition 4
+	(postPlace->type == INTERNAL))
+   {
       string id1 = *((*(preSet.begin()))->history.begin());
       string id2 = *((*(postSet.begin()))->history.begin());
       placePairs.insert(pair<string, string>(id1, id2));
       uselessTransitions.insert(*((*t)->history.begin()));
     }
   }
-
 
   // remove useless transtions
   for (set<string>::iterator label = uselessTransitions.begin();
@@ -387,7 +393,6 @@ void PetriNet::fusionOfSeriesPlaces()
     if (uselessTransition != NULL)
       removeTransition(uselessTransition);
   }  
-
 
   // merge place pairs
   for (set<pair<string, string> >::iterator placePair = placePairs.begin();
@@ -411,6 +416,8 @@ void PetriNet::fusionOfSeriesPlaces()
  */
 void PetriNet::fusionOfSeriesTransitions()
 {
+  trace(TRACE_DEBUG, "[PN]\tApplying rule RA2 (fusion of series transitions)...\n");
+
   set<string> uselessPlaces;
   set<pair<string, string> > transitionPairs;
 
@@ -438,7 +445,7 @@ void PetriNet::fusionOfSeriesTransitions()
   for (set<string>::iterator label = uselessPlaces.begin();
       label != uselessPlaces.end(); label++)
   {
-    Place* uselessPlace = findPlace(*label);
+    Place *uselessPlace = findPlace(*label);
     removePlace(uselessPlace);
   }
 
@@ -577,12 +584,13 @@ void PetriNet::simplify()
 
   string old = information();
   bool done = false;
+  bool treduced = false;
   int passes = 1;
   while (!done)
   {
     removeDeadNodes();
-
     removeUnusedStatusPlaces();
+
     elminiationOfIdenticalPlaces();		// RB1
     elminiationOfIdenticalTransitions();	// RB2
     fusionOfSeriesPlaces();			// RA1
@@ -594,10 +602,14 @@ void PetriNet::simplify()
 
     done = (old == information());
     old = information();
-  }
 
-//  cerr << information() << endl;
-//  transitiveReduction();
+    if (parameters[P_TRED] && !treduced)
+    {
+      treduced = true;
+      transitiveReduction();
+      done = false;
+    }
+  }
 
   trace(TRACE_INFORMATION, "Simplifying complete.\n");
   trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification: " + information() + "\n");
@@ -727,6 +739,8 @@ void prune_acc(unsigned int i, map<unsigned int, set<unsigned int> > &Acc, map<u
 /* wrapper functions for the transitive reduction */
 void PetriNet::transitiveReduction()
 {
+  trace(TRACE_DEBUG, "[PN]\tApplying transitive reduction...\n");
+  
   set<unsigned int> nodes;
   map<unsigned int, set<unsigned int> > Adj;
 

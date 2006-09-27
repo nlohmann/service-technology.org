@@ -40,13 +40,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/09/25 13:52:01 $
+ *          - last changed: \$Date: 2006/09/27 13:34:44 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.91 $
+ * \version \$Revision: 1.92 $
  */
 
 
@@ -87,7 +87,8 @@ typedef enum
 {
   INTERNAL,			///< non-communicating (standard)
   IN,				///< input of an open workflow net (oWFN)
-  OUT				///< output of an open workflow net (oWFN)
+  OUT,				///< output of an open workflow net (oWFN)
+  INOUT				///< input and output of an open workflow net (oWFN)
 } communication_type;
 
 
@@ -358,6 +359,10 @@ class PetriNet
     /// Finds place given an id with a role.
     Place* findPlace(int id, string role);
 
+    /// Finds a place given the ids of two transitions (one in the pre and one in the postset).
+    Place *findPlace(unsigned int id1, unsigned int id2);
+
+
     /// Finds transition given a role.
     Transition* findTransition(string role);
 
@@ -472,10 +477,6 @@ class PetriNet
 
     /// Mapping of roles to nodes of the Petri net.
     map<string, Node *> roleMap;
-
-
-
-    Place *findPlace(unsigned int id1, unsigned int id2);
 };
 
 

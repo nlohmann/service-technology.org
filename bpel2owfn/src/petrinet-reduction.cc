@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/09/25 13:52:01 $
+ *          - last changed: \$Date: 2006/09/27 09:23:55 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.28 $
+ * \version \$Revision: 1.29 $
  */
 
 
@@ -212,6 +212,30 @@ void PetriNet::removeDeadNodes()
     for (list<Transition*>::iterator t = deadTransitions.begin(); t != deadTransitions.end(); t++)
       if (T. find(*t) != T.end())
 	removeTransition(*t);
+
+    
+
+    // remove isolated communication places
+
+    list<Place*> uselessCommunicationPlaces;
+
+    for (set<Place*>::iterator p = P_in.begin(); p != P_in.end(); p++)
+      if (postset(*p).empty())
+	uselessCommunicationPlaces.push_back(*p);
+
+    for (list<Place*>::iterator p = uselessCommunicationPlaces.begin(); p != uselessCommunicationPlaces.end(); p++)
+      if (P_in.find(*p) != P_in.end())
+	P_in.erase(*p);
+
+    uselessCommunicationPlaces.clear();
+
+    for (set<Place*>::iterator p = P_out.begin(); p != P_out.end(); p++)
+      if (preset(*p).empty())
+	uselessCommunicationPlaces.push_back(*p);
+
+    for (list<Place*>::iterator p = uselessCommunicationPlaces.begin(); p != uselessCommunicationPlaces.end(); p++)
+      if (P_out.find(*p) != P_out.end())
+	P_out.erase(*p);
   }
 }
 

@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/09/23 20:23:04 $
+ *          - last changed: \$Date: 2006/09/27 09:23:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  */
 
 
@@ -272,4 +272,53 @@ void ASTE::defineVariable()
     SAerror(23, variableName, toInt(attributes["referenceLine"]));
 
   ASTE_variables.insert(variableName);
+}
+
+
+
+
+
+
+
+
+string ASTE::activityTypeName()
+{
+  switch (type)
+  {
+    case(K_ASSIGN):		return "assign";
+    case(K_CASE):		return "case";
+    case(K_CATCH):		return "catch";
+    case(K_CATCHALL):		return "catchAll";
+    case(K_COMPENSATE):		return "compensate";
+    case(K_COMPENSATIONHANDLER):return "compensationHandler";
+    case(K_CORRELATION):	return "correlation";
+    case(K_CORRELATIONSET):	return "correlationSet";
+    case(K_EMPTY):		return "empty";
+    case(K_EVENTHANDLERS):	return "eventHandlers";
+    case(K_FAULTHANDLERS):	return "faultHandlers";
+    case(K_FROM):		return "from";
+    case(K_FLOW):		return "flow";
+    case(K_INVOKE):		return "invoke";
+    case(K_LINK):		return "link";
+    case(K_ONALARM):		return "onAlarm";
+    case(K_ONMESSAGE):		return "onMessage";
+    case(K_OTHERWISE):		return "otherwise";
+    case(K_PICK):		return "pick";
+    case(K_PARTNERLINK):	return "partnerLink";
+    case(K_PROCESS):		return "process";
+    case(K_RECEIVE):		return "receive";
+    case(K_REPLY):		return "reply";
+    case(K_SCOPE):		return "scope";
+    case(K_SOURCE):		return "source";
+    case(K_SEQUENCE):		return "sequence";
+    case(K_SWITCH):		return "switch";
+    case(K_TERMINATE):		return "terminate";
+    case(K_TARGET):		return "target";
+    case(K_THROW):		return "throw";
+    case(K_TO):			return "to";
+    case(K_VARIABLE):		return "variable";
+    case(K_WAIT):		return "wait";
+    case(K_WHILE):		return "while";
+    default:			return "unknown";
+  }
 }

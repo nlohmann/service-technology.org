@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/09/23 08:46:48 $
+ *          - last changed: \$Date: 2006/09/27 09:23:55 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.190 $
+ * \version \$Revision: 1.191 $
  *
  */
 %}
@@ -1542,7 +1542,6 @@ This=implicitCompensationHandler() provided (!This->inProcess) ->
       Place *p17 = TheNet->newPlace(prefix + "ch_out");
       Place *p18 = TheNet->newPlace(prefix + "scopeCompensated");
       Place *p24 = TheNet->newPlace(prefix + "clean");
-
 
       // The following subnet is only needed if the standard faults are
       // switched on (i.e. not using the parameter "nostandardfaults").

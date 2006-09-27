@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/09/23 22:31:01 $
+ *          - last changed: \$Date: 2006/09/27 09:23:55 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.33 $
+ * \version \$Revision: 1.34 $
  *
  */
 %}
@@ -837,7 +837,20 @@ This=Scope(a,b,c,d,e,f,g) ->
   [petrinetsmall:
     {
       header(This->id);
-      cerr << "the <scope> activity cannot be modelled!" << endl;
+      string prefix = toString(This->id) + ".internal.";
+      
+      cerr << "the handlers of the <scope>-activity will not be modelled!" << endl;
+
+      Place *p1 = TheNet->newPlace(prefix + "initial");
+      Place *p2 = TheNet->newPlace(prefix + "final");
+    }
+    a // standardElements
+    g // innerActivity
+    {
+      // Embed the inner activity.
+      TheNet->mergePlaces(This->id, ".internal.initial", g->id, ".initial");
+      TheNet->mergePlaces(This->id, ".internal.final", g->id, ".final");
+
       footer(This->id);
     }
   ]

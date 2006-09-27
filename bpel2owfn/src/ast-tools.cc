@@ -32,13 +32,13 @@
  *
  * \date
  *          - created: 2006/02/08
- *          - last changed: \$Date: 2006/09/23 08:46:48 $
+ *          - last changed: \$Date: 2006/09/27 09:23:55 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
  */
 
 
@@ -64,6 +64,8 @@ extern PetriNet *TheNet;
 
 // introduced in bpel-unparse.k
 extern string currentScope;
+
+extern map<unsigned int, ASTE*> ASTEmap;
 
 
 
@@ -260,8 +262,7 @@ string inString()
  */
 void header(int id, bool myindent)
 {
-//  trace(TRACE_DEBUG, "[PNU]" + inString() + symTab.getInformation(id) + "\n");
-  trace(TRACE_DEBUG, "[PNU]" + inString() + "<id=" + toString(id) + ">\n");
+  trace(TRACE_DEBUG, "[PNU]" + inString() + "<" + ASTEmap[id]->activityTypeName() + " id=" + toString(id) + ">\n");
 
   if (myindent)
     indent += indentStep;
@@ -281,8 +282,7 @@ void footer(int id, bool myindent)
   if (myindent)
     indent -= indentStep;
 
-//  trace(TRACE_DEBUG, "[PNU]" + inString() + symTab.getInformation(id, true) + "\n");
-  trace(TRACE_DEBUG, "[PNU]" + inString() + "</id=" + toString(id) + ">\n");
+  trace(TRACE_DEBUG, "[PNU]" + inString() + "</" + ASTEmap[id]->activityTypeName() + " id=" + toString(id) + ">\n");
 }
 
 

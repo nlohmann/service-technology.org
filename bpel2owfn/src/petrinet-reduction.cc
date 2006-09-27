@@ -33,8 +33,6 @@
  *  - PetriNet::elminiationOfIdenticalTransitions()
  *  - PetriNet::fusionOfSeriesPlaces()
  *  - PetriNet::fusionOfSeriesTransitions()
- *  - PetriNet::communicationInPostSet(Place *p)
- *  - PetriNet::collapseSequences()
  *  - PetriNet::simplify()
  *
  * \author
@@ -43,13 +41,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/09/27 13:40:20 $
+ *          - last changed: \$Date: 2006/09/27 14:19:43 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  */
 
 
@@ -79,6 +77,8 @@
 
 extern set<string> ASTE_variables; // needed for PetriNet::removeVariables()
 
+set<unsigned int> visited;
+set<unsigned int> visited2;
 
 
 
@@ -489,7 +489,6 @@ void PetriNet::simplify()
 
   string old = information();
   bool done = false;
-  bool treduced = false;
   int passes = 1;
   while (!done)
   {
@@ -501,19 +500,14 @@ void PetriNet::simplify()
     fusionOfSeriesPlaces();			// RA1
     fusionOfSeriesTransitions();		// RA2
 
-//    collapseSequences();
-
+    if (parameters[P_TRED])
+      transitiveReduction();
+    
     trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification pass " + toString(passes++) + ": " + information() + "\n");
 
     done = (old == information());
     old = information();
 
-    if (parameters[P_TRED] && !treduced)
-    {
-      treduced = true;
-      transitiveReduction();
-      done = false;
-    }
   }
 
   trace(TRACE_INFORMATION, "Simplifying complete.\n");
@@ -522,44 +516,6 @@ void PetriNet::simplify()
 
 
 
-
-
-
-
-/* another set union function */
-set<unsigned int> setUnion(set<unsigned int> a, set<unsigned int> b)
-{
-  set<unsigned int> result;
-  insert_iterator<set<unsigned int, less<unsigned int> > > res_ins(result, result.begin());
-  set_union(a.begin(), a.end(), b.begin(), b.end(), res_ins);
-  
-  return result;
-}
-
-set<unsigned int> setDifference(set<unsigned int> a, set<unsigned int> b)
-{
-  set<unsigned int> resultSet (a);
-  if (! (a.empty() || b.empty()))
-    for (set<unsigned int>::iterator iter = b.begin(); iter != b.end(); iter++)
-      resultSet.erase(*iter);
-
-  return resultSet;
-}
-
-set<Node *> setIntersection(set<Node *> a, set<Node *> b)
-{
-  set<Node *> result;
-  insert_iterator<set<Node *, less<Node *> > > res_ins(result, result.begin());
-  set_intersection(a.begin(), a.end(), b.begin(), b.end(), res_ins);
-  
-  return result;
-}
-
-
-
-
-
-set<unsigned int> visited2;
 
 
 /* depth-first search returning the set of reachable nodes */
@@ -579,6 +535,9 @@ set<unsigned int> dfs(unsigned int i, map<unsigned int, set<unsigned int> > &Adj
 }
 
 
+
+
+
 /* creates accessibility list from adjacency list */
 map<unsigned int, set<unsigned int> > toAcc(map<unsigned int, set<unsigned int> > &Adj, set<unsigned int> &nodes)
 {
@@ -593,26 +552,6 @@ map<unsigned int, set<unsigned int> > toAcc(map<unsigned int, set<unsigned int> 
 
   return result;
 }
-
-
-/* outputs a mapping */
-void mapOutput(map<unsigned int, set<unsigned int> > &mapping, set<unsigned int> &nodes)
-{
-  for (set<unsigned int>::iterator it = nodes.begin(); it != nodes.end(); it++)
-  {
-    cerr << *it << "\t";
-
-    for (set<unsigned int>::iterator it2 = mapping[*it].begin(); it2 != mapping[*it].end(); it2++)
-      cerr << *it2 << " ";
-
-    cerr << endl;
-  }
-}
-
-set<unsigned int> visited;
-
-
-
 
 
 
@@ -635,7 +574,6 @@ void prune_acc(unsigned int i, map<unsigned int, set<unsigned int> > &Acc, map<u
 
   visited.insert(i);
 }
-
 
 
 
@@ -694,38 +632,6 @@ void PetriNet::transitiveReduction()
   for (set<Place*>::iterator p = transitivePlaces.begin(); p != transitivePlaces.end(); p++)
     removePlace(*p);
 
-  cerr << "removed " << transitivePlaces.size() << " transitive places" << endl;
-}
-
-
-
-
-
-Place *PetriNet::findPlace(unsigned id1, unsigned id2)
-{
-  Transition *t1 = NULL;
-  Transition *t2 = NULL;
-
-  for (set<Transition*>::iterator t = T.begin(); t != T.end(); t++)
-  {
-    if ( (*t)->id == id1 )
-      t1 = *t;
-    if ( (*t)->id == id2 )
-      t2 = *t;
-  }
-
-  assert(t1 != NULL);
-  assert(t2 != NULL);
-  assert(t1 != t2);
-
-  set<Node*> temp = setIntersection(postset(t1), preset(t2));
-
-  if (temp.size() > 1)
-    cerr << "WARNING" << endl;
-
-  Place *result = (Place*)(*(temp.begin()));
-
-  assert(result != NULL);
-
-  return result;
+  if (transitivePlaces.size() != 0)
+    cerr << "removed " << transitivePlaces.size() << " transitive places" << endl;
 }

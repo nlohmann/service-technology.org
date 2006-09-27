@@ -32,13 +32,13 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/09/23 08:58:54 $
+ *          - last changed: \$Date: 2006/09/27 14:19:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.54 $
+ * \version \$Revision: 1.55 $
  */
 
 
@@ -70,28 +70,6 @@ using namespace std;
 
 /// The Petri Net
 extern PetriNet *TheNet;
-
-
-
-
-
-/******************************************************************************
- * Set functions
- *****************************************************************************/
-
-/*!
- * \param a set of Petri net nodes
- * \param b set of Petri net nodes
- * \return union of the sets a and b
- */
-set<Node *> setUnion(set<Node *> a, set<Node *> b)
-{
-  set<Node *> result;
-  insert_iterator<set<Node *, less<Node *> > > res_ins(result, result.begin());
-  set_union(a.begin(), a.end(), b.begin(), b.end(), res_ins);
-  
-  return result;
-}
 
 
 

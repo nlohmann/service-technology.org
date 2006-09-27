@@ -32,13 +32,13 @@
  *          
  * \date    
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/09/23 08:58:54 $
+ *          - last changed: \$Date: 2006/09/27 14:19:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  */
 
 
@@ -92,8 +92,9 @@ void cleanup();
 // to avoid compile errors
 class Node;
 
-/// Returns the union of two sets of Petri net nodes.
-set<Node *> setUnion(set<Node *> a, set<Node *> b);
+
+
+
 
 /**
  * Returns the union of two sets of T's.
@@ -103,13 +104,13 @@ set<Node *> setUnion(set<Node *> a, set<Node *> b);
  * \returns the set of a united with b
  */
 template <class T>
-set<T> setUnion(set<T> & a, set<T> & b)
+set<T> setUnion(set<T> a, set<T> b)
 {
-  set<T> resultSet;
-  resultSet.insert(a.begin(), a.end());
-  resultSet.insert(b.begin(), b.end());
+  set<T> result;
+  insert_iterator<set<T, less<T> > > res_ins(result, result.begin());
+  set_union(a.begin(), a.end(), b.begin(), b.end(), res_ins);
 
-  return resultSet;
+  return result;
 }
 
 
@@ -124,21 +125,13 @@ set<T> setUnion(set<T> & a, set<T> & b)
  * \returns the set of a intersected with b
  */
 template <class T>
-set<T> setIntersection(set<T> & a, set<T> & b)
+set<T> setIntersection(set<T> a, set<T> b)
 {
-  std::set<T> resultSet;
-  if (! (a.empty() || b.empty()))
-  {
-    for (typename set<T>::iterator iter = a.begin(); iter != a.end(); iter++)
-    {
-      if (b.find(*iter) != b.end())
-      {
-	resultSet.insert(*iter);
-      }
-    }
-  }
+  set<T> result;
+  insert_iterator<set<T, less<T> > > res_ins(result, result.begin());
+  set_intersection(a.begin(), a.end(), b.begin(), b.end(), res_ins);
 
-  return resultSet;
+  return result;
 }
 
 
@@ -153,18 +146,13 @@ set<T> setIntersection(set<T> & a, set<T> & b)
  * \returns the set of a minus b (a \\ b)
  */
 template <class T>
-set<T> setDifference(set<T> & a, set<T> & b)
+set<T> setDifference(set<T> a, set<T> b)
 {
-  set<T> resultSet (a);
-  if (! (a.empty() || b.empty()))
-  {
-    for (typename set<T>::iterator iter = b.begin(); iter != b.end(); iter++)
-    {
-      resultSet.erase(*iter);
-    }
-  }
+  set<T> result;
+  insert_iterator<set<T, less<T> > > res_ins(result, result.begin());
+  set_difference(a.begin(), a.end(), b.begin(), b.end(), res_ins);
 
-  return resultSet;
+  return result;
 }
 
 #endif

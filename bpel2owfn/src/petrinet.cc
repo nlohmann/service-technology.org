@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/09/27 13:34:44 $
+ *          - last changed: \$Date: 2006/09/27 14:19:43 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.139 $
+ * \version \$Revision: 1.140 $
  */
 
 
@@ -764,6 +764,48 @@ Place *PetriNet::findPlace(int id, string role)
 
 
 /*!
+ * Finds a place given the identifiers of two transitions: one transition in
+ * the preset of the place (id1) and one transition in the postset of the place
+ * (id2). The result should be unique after structural reduction.
+ *
+ * \param  id1 an identifier of a transition
+ * \param  id2 an identifier of a transition
+ * \return a pointer to the place or a NULL pointer if the place was not found.
+ */
+Place *PetriNet::findPlace(unsigned id1, unsigned id2)
+{
+  Transition *t1 = NULL;
+  Transition *t2 = NULL;
+
+  for (set<Transition*>::iterator t = T.begin(); t != T.end(); t++)
+  {
+    if ( (*t)->id == id1 )
+      t1 = *t;
+    if ( (*t)->id == id2 )
+      t2 = *t;
+  }
+
+  assert(t1 != NULL);
+  assert(t2 != NULL);
+  assert(t1 != t2); // this only holds for acyclic nets
+
+  set<Node*> temp = setIntersection(postset(t1), preset(t2));
+
+  if (temp.size() > 1)
+    cerr << "WARNING" << endl;
+
+  Place *result = (Place*)(*(temp.begin()));
+
+  assert(result != NULL);
+
+  return result;
+}
+
+
+
+
+
+/*!
  * Finds a transition of the Petri net given a role the place fills or filled.
  *
  * \param  role the demanded role
@@ -779,6 +821,7 @@ Transition *PetriNet::findTransition(string role)
 
   return result;
 }
+
 
 
 

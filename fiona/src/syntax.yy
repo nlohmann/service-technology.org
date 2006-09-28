@@ -220,7 +220,7 @@ final: key_finalmarking finalmarkinglist semicolon
 | key_finalcondition statepredicate semicolon {
 	formula * F;
 	F = $2;
-	F = F -> posate();
+//	F = F -> posate();
 	F = F -> merge();
       F = F -> posate();
 	F -> setstatic();

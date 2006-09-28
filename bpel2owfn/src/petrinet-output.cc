@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/09/27 13:34:44 $
+ *          - last changed: \$Date: 2006/09/28 08:24:45 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.30 $
+ * \version \$Revision: 1.31 $
  */
 
 
@@ -67,7 +67,7 @@
 #include "options.h"
 
 
-
+extern string invocation;
 
 
 /******************************************************************************
@@ -128,7 +128,10 @@ string Node::nodeShortName()
 string Node::nodeName()
 {
   string result = history[0];
-  result = result.substr(result.find_last_of(".")+1,result.length());
+
+  if (type == INTERNAL)
+    result = result.substr(result.find_last_of(".")+1,result.length());
+
   result = prefix + result;
   return result;
 }
@@ -640,22 +643,26 @@ void PetriNet::owfnOut()
 {
   trace(TRACE_DEBUG, "[PN]\tCreating oWFN-output.\n");
 
-  (*output) << "{ oWFN created by " << PACKAGE_STRING << " reading " << filename << " }" << endl << endl;
+  (*output) << "{ oWFN created by " << PACKAGE_STRING << " reading `" << filename << "': }" << endl;
+  (*output) << "{   " << invocation << "}" << endl << endl << endl;
 
   // places
   (*output) << "PLACE" << endl;
 
   // internal places
   (*output) << "  INTERNAL" << endl;
+  (*output) << "    ";
+
+
   unsigned int count = 1;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); count++, p++)
   {
-    (*output) << "    " << (*p)->nodeShortName();
+    (*output) << (*p)->nodeShortName();
     
     if (count < P.size())
-      (*output) << "," << endl;
+      (*output) << ", ";// << endl;
   }
-  (*output) << endl << ";" << endl << endl;
+  (*output) << ";" << endl << endl;
 
 
   // input places
@@ -668,7 +675,7 @@ void PetriNet::owfnOut()
     if (count < P_in.size())
       (*output) << "," << endl;
   }
-  (*output) << endl << ";" << endl << endl;
+  (*output) << ";" << endl << endl;
 
 
   // output places
@@ -681,7 +688,7 @@ void PetriNet::owfnOut()
     if (count < P_out.size())
       (*output) << "," << endl;
   }
-  (*output) << endl << ";" << endl << endl;
+  (*output) << ";" << endl << endl << endl;
   
 
   // initial marking
@@ -692,12 +699,12 @@ void PetriNet::owfnOut()
     if ((*p)->marked)
     {
       if (count++ != 1)
-	(*output) << "," << endl;
+	(*output) << ",";// << endl;
       
-      (*output) << "  " << (*p)->nodeShortName() << ":\t1";
+      (*output) << "  " << (*p)->nodeShortName(); // << ":\t1";
     }
   }
-  (*output) << endl << ";" << endl << endl;  
+  (*output) << ";" << endl << endl;  
 
 /*
   // final condition
@@ -728,15 +735,15 @@ void PetriNet::owfnOut()
   count = 1;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
-    if ((*p)->history[0] == ((*p)->prefix + "1.internal.final") ) // was: ((*p)->nodeName() == ((*p)->prefix + "1.internal.final") )
+    if ((*p)->historyContains((*p)->prefix + "1.internal.final") ) // was: ((*p)->nodeName() == ((*p)->prefix + "1.internal.final") )
     {
       if (count++ != 1)
-	(*output) << "," << endl;
+	(*output) << ",";// << endl;
       
-      (*output) << "  " << (*p)->nodeShortName() << ":\t1";
+      (*output) << "  " << (*p)->nodeShortName();// << ":\t1";
     }
   }
-  (*output) << endl << ";" << endl << endl << endl;
+  (*output) << ";" << endl << endl << endl;
 
 
   // transitions
@@ -746,25 +753,26 @@ void PetriNet::owfnOut()
     set<Node *> consume = preset(*t);
     set<Node *> produce = postset(*t);
     
-    (*output) << "CONSUME" << endl;
+    (*output) << "  CONSUME ";// << endl;
     count = 1;
     for (set<Node *>::iterator pre = consume.begin(); pre != consume.end(); count++, pre++)
     {
-      (*output) << "  " << (*pre)->nodeShortName() << ":\t1";
+      (*output) << (*pre)->nodeShortName();// << ":\t1";
       
       if (count < consume.size())
-	(*output) << "," << endl;
+	(*output) << ", "; // << endl;
     }
     (*output) << ";" << endl;
     
-    (*output) << "PRODUCE" << endl;
+    (*output) << "  PRODUCE ";// << endl;
+//    (*output) << "  ";
     count = 1;
     for (set<Node *>::iterator post = produce.begin(); post != produce.end(); count++, post++)
     {
-      (*output) << "  " << (*post)->nodeShortName() << ":\t1";
+      (*output) << (*post)->nodeShortName();// << ":\t1";
       
       if (count < produce.size())
-	(*output) << "," << endl;
+	(*output) << ", ";// << endl;
     }
     
     (*output) << ";" << endl << endl;

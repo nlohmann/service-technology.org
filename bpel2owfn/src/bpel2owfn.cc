@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/08/17 07:39:24 $
+ *          - last changed: \$Date: 2006/09/28 08:24:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.95 $
+ * \version \$Revision: 1.96 $
  *
  */
 
@@ -95,6 +95,8 @@ extern FILE *yyin;        ///< pointer to the input file
 /// The Petri Net
 PetriNet *TheNet = new PetriNet();
 
+/// string holding the invocation of BPEL2oWFN
+string invocation;
 
 
 
@@ -111,6 +113,10 @@ PetriNet *TheNet = new PetriNet();
  */
 int main( int argc, char *argv[])
 {
+  // generate the invocation string
+  for (int i = 0; i < argc; i++)
+    invocation += (string(argv[i]) + " ");
+
 //  try
 //  {
     /***

@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/09/27 09:23:55 $
+ *          - last changed: \$Date: 2006/09/28 08:24:45 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
  *
  */
 %}
@@ -475,7 +475,19 @@ This=Throw(a) ->
   [petrinetsmall:
     {
       header(This->id);
+      string prefix = toString(This->id) + ".internal.";
+
       cerr << "the <throw> activity cannot be modelled!" << endl;
+
+      Place *p1 = TheNet->newPlace(prefix + "initial");
+      Place *p2 = TheNet->newPlace(prefix + "final");
+
+      Transition *t1 = TheNet->newTransition(prefix + "throw");
+      TheNet->newArc(p1, t1);
+      TheNet->newArc(t1, p2);
+    }
+    a // standardElements
+    {
       footer(This->id);
     }
   ]

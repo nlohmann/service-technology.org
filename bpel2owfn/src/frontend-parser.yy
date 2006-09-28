@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/09/23 11:13:24 $
+ *          - last changed: \$Date: 2006/09/28 09:38:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.217 $
+ * \version \$Revision: 1.218 $
  * 
  */
 %}
@@ -824,6 +824,7 @@ tOtherwise:
      branch with an empty activity is deemed to be present. */
     {
       // creaty empty activity with id, without links etc.
+      // TODO FIX THIS BUG
       impl_standardElements_StandardElements* noLinks = StandardElements(NiltTarget_list(),NiltSource_list(), standardJoinCondition());
       impl_tEmpty_Empty* implicitEmpty = Empty(noLinks);
       implicitEmpty->id = ASTEid++;

@@ -150,15 +150,15 @@ PLACE
 ;
 
   INPUT
-    in.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_Melderegisterauskunft_Ist_Ausbaustufe_II_PT.MRA-Anfrage_empfangen,
-    in.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_Melderegisterauskunft_Ist_Ausbaustufe_II_PT.MRA-Anfrage_pruefen,
-    in.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_Melderegisterauskunft_Ist_Ausbaustufe_II_PT.Zahlungsnachweis_empfangen
+    Melderegisterauskunft_Ist_Ausbaustufe_II_PT.MRA-Anfrage_empfangen,
+    Melderegisterauskunft_Ist_Ausbaustufe_II_PT.MRA-Anfrage_pruefen,
+    Melderegisterauskunft_Ist_Ausbaustufe_II_PT.Zahlungsnachweis_empfangen
 ;
 
   OUTPUT
-    out.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_default_PT.Bescheid_versenden,
-    out.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_default_PT.Rechnung_versenden,
-    out.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_default_PT.Vervollstaendigungsnachricht_versenden
+    default_PT.Bescheid_versenden,
+    default_PT.Rechnung_versenden,
+    default_PT.Vervollstaendigungsnachricht_versenden
 ;
 
 INITIALMARKING
@@ -299,7 +299,7 @@ PRODUCE
 
 TRANSITION t226
 CONSUME
-  in.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_Melderegisterauskunft_Ist_Ausbaustufe_II_PT.MRA-Anfrage_empfangen:    1,
+  Melderegisterauskunft_Ist_Ausbaustufe_II_PT.MRA-Anfrage_empfangen:    1,
   p241: 1;
 PRODUCE
   p221: 1;
@@ -502,7 +502,7 @@ TRANSITION t344
 CONSUME
   p338: 1;
 PRODUCE
-  out.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_default_PT.Vervollstaendigungsnachricht_versenden:   1,
+  default_PT.Vervollstaendigungsnachricht_versenden:   1,
   p362: 1;
 
 TRANSITION t355
@@ -541,7 +541,7 @@ PRODUCE
 
 TRANSITION t371
 CONSUME
-  in.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_Melderegisterauskunft_Ist_Ausbaustufe_II_PT.MRA-Anfrage_pruefen:  1,
+  Melderegisterauskunft_Ist_Ausbaustufe_II_PT.MRA-Anfrage_pruefen:  1,
   p389: 1;
 PRODUCE
   p366: 1;
@@ -1006,7 +1006,7 @@ TRANSITION t687
 CONSUME
   p681: 1;
 PRODUCE
-  out.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_default_PT.Bescheid_versenden:   1,
+  default_PT.Bescheid_versenden:   1,
   p701: 1;
 
 TRANSITION t697
@@ -1053,12 +1053,12 @@ TRANSITION t727
 CONSUME
   p721: 1;
 PRODUCE
-  out.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_default_PT.Rechnung_versenden:   1,
+  default_PT.Rechnung_versenden:   1,
   p763: 1;
 
 TRANSITION t746
 CONSUME
-  in.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_Melderegisterauskunft_Ist_Ausbaustufe_II_PT.Zahlungsnachweis_empfangen:   1,
+  Melderegisterauskunft_Ist_Ausbaustufe_II_PT.Zahlungsnachweis_empfangen:   1,
   p763: 1;
 PRODUCE
   p741: 1;

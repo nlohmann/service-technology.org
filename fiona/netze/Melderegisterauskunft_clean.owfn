@@ -151,14 +151,14 @@ PLACE
 
   INPUT
     in.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_Melderegisterauskunft_Ist_Ausbaustufe_II_PT.MRA-Anfrage_empfangen,
-    in.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_Melderegisterauskunft_Ist_Ausbaustufe_II_PT.MRA-Anfrage_prüfen,
+    in.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_Melderegisterauskunft_Ist_Ausbaustufe_II_PT.MRA-Anfrage_pruefen,
     in.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_Melderegisterauskunft_Ist_Ausbaustufe_II_PT.Zahlungsnachweis_empfangen
 ;
 
   OUTPUT
     out.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_default_PT.Bescheid_versenden,
     out.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_default_PT.Rechnung_versenden,
-    out.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_default_PT.Vervollständigungsnachricht_versenden
+    out.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_default_PT.Vervollstaendigungsnachricht_versenden
 ;
 
 INITIALMARKING
@@ -502,7 +502,7 @@ TRANSITION t344
 CONSUME
   p338: 1;
 PRODUCE
-  out.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_default_PT.Vervollständigungsnachricht_versenden:   1,
+  out.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_default_PT.Vervollstaendigungsnachricht_versenden:   1,
   p362: 1;
 
 TRANSITION t355
@@ -541,7 +541,7 @@ PRODUCE
 
 TRANSITION t371
 CONSUME
-  in.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_Melderegisterauskunft_Ist_Ausbaustufe_II_PT.MRA-Anfrage_prüfen:  1,
+  in.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_Melderegisterauskunft_Ist_Ausbaustufe_II_PT.MRA-Anfrage_pruefen:  1,
   p389: 1;
 PRODUCE
   p366: 1;

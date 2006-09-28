@@ -222,6 +222,7 @@ final: key_finalmarking finalmarkinglist semicolon
 	F = $2;
 	F = F -> posate();
 	F = F -> merge();
+      F = F -> posate();
 	F -> setstatic();
 	PN -> FinalCondition = F;
 }

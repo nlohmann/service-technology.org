@@ -1,0 +1,1074 @@
+{ oWFN created by BPEL2oWFN 1.2 reading Melderegisterauskunft_Ist_Ausbaustufe_II.bpel }
+
+PLACE
+  INTERNAL
+    p7,
+    p8,
+    p9,
+    p10,
+    p11,
+    p12,
+    p13,
+    p14,
+    p15,
+    p16,
+    p17,
+    p18,
+    p19,
+    p20,
+    p21,
+    p22,
+    p23,
+    p24,
+    p25,
+    p26,
+    p27,
+    p28,
+    p29,
+    p30,
+    p31,
+    p32,
+    p33,
+    p34,
+    p35,
+    p36,
+    p37,
+    p38,
+    p39,
+    p40,
+    p41,
+    p42,
+    p43,
+    p44,
+    p45,
+    p46,
+    p47,
+    p48,
+    p49,
+    p50,
+    p51,
+    p52,
+    p53,
+    p54,
+    p55,
+    p56,
+    p57,
+    p58,
+    p59,
+    p60,
+    p61,
+    p62,
+    p63,
+    p64,
+    p65,
+    p67,
+    p787,
+    p74,
+    p81,
+    p776,
+    p789,
+    p804,
+    p788,
+    p805,
+    p795,
+    p775,
+    p791,
+    p801,
+    p203,
+    p808,
+    p221,
+    p242,
+    p235,
+    p241,
+    p254,
+    p257,
+    p809,
+    p811,
+    p277,
+    p280,
+    p810,
+    p812,
+    p300,
+    p303,
+    p362,
+    p323,
+    p326,
+    p338,
+    p366,
+    p390,
+    p351,
+    p354,
+    p361,
+    p814,
+    p379,
+    p382,
+    p389,
+    p816,
+    p402,
+    p405,
+    p813,
+    p425,
+    p428,
+    p448,
+    p451,
+    p815,
+    p819,
+    p471,
+    p474,
+    p494,
+    p497,
+    p817,
+    p517,
+    p520,
+    p818,
+    p540,
+    p543,
+    p820,
+    p563,
+    p566,
+    p822,
+    p586,
+    p823,
+    p821,
+    p605,
+    p608,
+    p824,
+    p628,
+    p631,
+    p651,
+    p681,
+    p670,
+    p701,
+    p694,
+    p700,
+    p710,
+    p721,
+    p763,
+    p741,
+    p764,
+    p760
+;
+
+  INPUT
+    in.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_Melderegisterauskunft_Ist_Ausbaustufe_II_PT.MRA-Anfrage_empfangen,
+    in.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_Melderegisterauskunft_Ist_Ausbaustufe_II_PT.MRA-Anfrage_prüfen,
+    in.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_Melderegisterauskunft_Ist_Ausbaustufe_II_PT.Zahlungsnachweis_empfangen
+;
+
+  OUTPUT
+    out.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_default_PT.Bescheid_versenden,
+    out.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_default_PT.Rechnung_versenden,
+    out.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_default_PT.Vervollständigungsnachricht_versenden
+;
+
+INITIALMARKING
+  p61:  1,
+  p62:  1,
+  p63:  1,
+  p64:  1,
+  p65:  1,
+  p67:  1
+;
+
+FINALMARKING
+  p789: 1
+;
+
+
+TRANSITION t101
+CONSUME
+  p67:  1;
+PRODUCE
+  p8:   1,
+  p10:  1,
+  p12:  1,
+  p14:  1,
+  p16:  1,
+  p18:  1,
+  p20:  1,
+  p22:  1,
+  p24:  1,
+  p26:  1,
+  p28:  1,
+  p30:  1,
+  p32:  1,
+  p34:  1,
+  p36:  1,
+  p38:  1,
+  p40:  1,
+  p42:  1,
+  p44:  1,
+  p46:  1,
+  p48:  1,
+  p50:  1,
+  p52:  1,
+  p54:  1,
+  p56:  1,
+  p58:  1,
+  p60:  1,
+  p787: 1,
+  p74:  1,
+  p81:  1,
+  p776: 1,
+  p804: 1,
+  p795: 1,
+  p791: 1,
+  p801: 1;
+
+TRANSITION t102
+CONSUME
+  p787: 1,
+  p776: 1,
+  p805: 1;
+PRODUCE
+  p789: 1,
+  p788: 1,
+  p775: 1;
+
+TRANSITION t825
+CONSUME
+  p45:  1,
+  p586: 1;
+PRODUCE
+  p46:  1,
+  p820: 1;
+
+TRANSITION t827
+CONSUME
+  p31:  1,
+  p670: 1;
+PRODUCE
+  p32:  1,
+  p824: 1;
+
+TRANSITION t206
+CONSUME
+  p804: 1;
+PRODUCE
+  p203: 1,
+  p241: 1,
+  p257: 1,
+  p280: 1,
+  p303: 1,
+  p326: 1,
+  p354: 1,
+  p382: 1,
+  p405: 1,
+  p428: 1,
+  p451: 1,
+  p474: 1,
+  p497: 1,
+  p520: 1,
+  p543: 1,
+  p566: 1,
+  p586: 1,
+  p608: 1,
+  p631: 1,
+  p651: 1,
+  p670: 1,
+  p694: 1,
+  p710: 1;
+
+TRANSITION t207
+CONSUME
+  p203: 1,
+  p235: 1,
+  p254: 1,
+  p277: 1,
+  p300: 1,
+  p323: 1,
+  p351: 1,
+  p379: 1,
+  p402: 1,
+  p425: 1,
+  p448: 1,
+  p471: 1,
+  p494: 1,
+  p517: 1,
+  p540: 1,
+  p820: 1,
+  p563: 1,
+  p823: 1,
+  p605: 1,
+  p824: 1,
+  p628: 1,
+  p701: 1,
+  p764: 1;
+PRODUCE
+  p805: 1;
+
+TRANSITION t226
+CONSUME
+  in.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_Melderegisterauskunft_Ist_Ausbaustufe_II_PT.MRA-Anfrage_empfangen:    1,
+  p241: 1;
+PRODUCE
+  p221: 1;
+
+TRANSITION t227
+CONSUME
+  p65:  1,
+  p221: 1;
+PRODUCE
+  p65:  1,
+  p242: 1;
+
+TRANSITION t238
+CONSUME
+  p8:   1,
+  p242: 1;
+PRODUCE
+  p7:   1,
+  p235: 1;
+
+TRANSITION t239
+CONSUME
+  p7:   1,
+  p242: 1;
+PRODUCE
+  p7:   1,
+  p235: 1;
+
+TRANSITION t258
+CONSUME
+  p7:   1,
+  p257: 1;
+PRODUCE
+  p8:   1,
+  p808: 1;
+
+TRANSITION t259
+CONSUME
+  p10:  1,
+  p52:  1,
+  p54:  1,
+  p808: 1;
+PRODUCE
+  p9:   1,
+  p51:  1,
+  p53:  1,
+  p254: 1;
+
+TRANSITION t260
+CONSUME
+  p9:   1,
+  p51:  1,
+  p53:  1,
+  p808: 1;
+PRODUCE
+  p9:   1,
+  p51:  1,
+  p53:  1,
+  p254: 1;
+
+TRANSITION t261
+CONSUME
+  p7:   1,
+  p10:  1,
+  p52:  1,
+  p54:  1,
+  p257: 1;
+PRODUCE
+  p8:   1,
+  p9:   1,
+  p51:  1,
+  p53:  1,
+  p254: 1;
+
+TRANSITION t281
+CONSUME
+  p9:   1,
+  p59:  1,
+  p280: 1;
+PRODUCE
+  p10:  1,
+  p60:  1,
+  p809: 1;
+
+TRANSITION t282
+CONSUME
+  p12:  1,
+  p38:  1,
+  p809: 1;
+PRODUCE
+  p11:  1,
+  p37:  1,
+  p277: 1;
+
+TRANSITION t283
+CONSUME
+  p11:  1,
+  p37:  1,
+  p809: 1;
+PRODUCE
+  p11:  1,
+  p37:  1,
+  p277: 1;
+
+TRANSITION t284
+CONSUME
+  p9:   1,
+  p12:  1,
+  p38:  1,
+  p59:  1,
+  p280: 1;
+PRODUCE
+  p10:  1,
+  p11:  1,
+  p37:  1,
+  p60:  1,
+  p277: 1;
+
+TRANSITION t304
+CONSUME
+  p47:  1,
+  p51:  1,
+  p303: 1;
+PRODUCE
+  p48:  1,
+  p52:  1,
+  p810: 1;
+
+TRANSITION t305
+CONSUME
+  p50:  1,
+  p810: 1;
+PRODUCE
+  p49:  1,
+  p300: 1;
+
+TRANSITION t306
+CONSUME
+  p49:  1,
+  p810: 1;
+PRODUCE
+  p49:  1,
+  p300: 1;
+
+TRANSITION t307
+CONSUME
+  p47:  1,
+  p50:  1,
+  p51:  1,
+  p303: 1;
+PRODUCE
+  p48:  1,
+  p49:  1,
+  p52:  1,
+  p300: 1;
+
+TRANSITION t327
+CONSUME
+  p53:  1,
+  p326: 1;
+PRODUCE
+  p54:  1,
+  p811: 1;
+
+TRANSITION t328
+CONSUME
+  p56:  1,
+  p811: 1;
+PRODUCE
+  p55:  1,
+  p323: 1;
+
+TRANSITION t329
+CONSUME
+  p55:  1,
+  p811: 1;
+PRODUCE
+  p55:  1,
+  p323: 1;
+
+TRANSITION t330
+CONSUME
+  p53:  1,
+  p56:  1,
+  p326: 1;
+PRODUCE
+  p54:  1,
+  p55:  1,
+  p323: 1;
+
+TRANSITION t343
+CONSUME
+  p61:  1,
+  p361: 1;
+PRODUCE
+  p61:  1,
+  p338: 1;
+
+TRANSITION t344
+CONSUME
+  p338: 1;
+PRODUCE
+  out.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_default_PT.Vervollständigungsnachricht_versenden:   1,
+  p362: 1;
+
+TRANSITION t355
+CONSUME
+  p55:  1,
+  p354: 1;
+PRODUCE
+  p56:  1,
+  p361: 1;
+
+TRANSITION t356
+CONSUME
+  p58:  1,
+  p362: 1;
+PRODUCE
+  p57:  1,
+  p351: 1;
+
+TRANSITION t357
+CONSUME
+  p57:  1,
+  p362: 1;
+PRODUCE
+  p57:  1,
+  p351: 1;
+
+TRANSITION t358
+CONSUME
+  p55:  1,
+  p58:  1,
+  p354: 1;
+PRODUCE
+  p56:  1,
+  p57:  1,
+  p351: 1;
+
+TRANSITION t371
+CONSUME
+  in.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_Melderegisterauskunft_Ist_Ausbaustufe_II_PT.MRA-Anfrage_prüfen:  1,
+  p389: 1;
+PRODUCE
+  p366: 1;
+
+TRANSITION t372
+CONSUME
+  p65:  1,
+  p366: 1;
+PRODUCE
+  p65:  1,
+  p390: 1;
+
+TRANSITION t383
+CONSUME
+  p57:  1,
+  p382: 1;
+PRODUCE
+  p58:  1,
+  p389: 1;
+
+TRANSITION t384
+CONSUME
+  p60:  1,
+  p390: 1;
+PRODUCE
+  p59:  1,
+  p379: 1;
+
+TRANSITION t385
+CONSUME
+  p59:  1,
+  p390: 1;
+PRODUCE
+  p59:  1,
+  p379: 1;
+
+TRANSITION t386
+CONSUME
+  p57:  1,
+  p60:  1,
+  p382: 1;
+PRODUCE
+  p58:  1,
+  p59:  1,
+  p379: 1;
+
+TRANSITION t826
+CONSUME
+  p17:  1,
+  p651: 1;
+PRODUCE
+  p18:  1,
+  p823: 1;
+
+TRANSITION t406
+CONSUME
+  p11:  1,
+  p39:  1,
+  p405: 1;
+PRODUCE
+  p12:  1,
+  p40:  1,
+  p812: 1;
+
+TRANSITION t407
+CONSUME
+  p14:  1,
+  p36:  1,
+  p812: 1;
+PRODUCE
+  p13:  1,
+  p35:  1,
+  p402: 1;
+
+TRANSITION t408
+CONSUME
+  p13:  1,
+  p35:  1,
+  p812: 1;
+PRODUCE
+  p13:  1,
+  p35:  1,
+  p402: 1;
+
+TRANSITION t409
+CONSUME
+  p11:  1,
+  p14:  1,
+  p36:  1,
+  p39:  1,
+  p405: 1;
+PRODUCE
+  p12:  1,
+  p13:  1,
+  p35:  1,
+  p40:  1,
+  p402: 1;
+
+TRANSITION t429
+CONSUME
+  p37:  1,
+  p428: 1;
+PRODUCE
+  p38:  1,
+  p813: 1;
+
+TRANSITION t430
+CONSUME
+  p40:  1,
+  p42:  1,
+  p48:  1,
+  p813: 1;
+PRODUCE
+  p39:  1,
+  p41:  1,
+  p47:  1,
+  p425: 1;
+
+TRANSITION t431
+CONSUME
+  p39:  1,
+  p41:  1,
+  p47:  1,
+  p813: 1;
+PRODUCE
+  p39:  1,
+  p41:  1,
+  p47:  1,
+  p425: 1;
+
+TRANSITION t432
+CONSUME
+  p37:  1,
+  p40:  1,
+  p42:  1,
+  p48:  1,
+  p428: 1;
+PRODUCE
+  p38:  1,
+  p39:  1,
+  p41:  1,
+  p47:  1,
+  p425: 1;
+
+TRANSITION t452
+CONSUME
+  p21:  1,
+  p49:  1,
+  p451: 1;
+PRODUCE
+  p22:  1,
+  p50:  1,
+  p814: 1;
+
+TRANSITION t453
+CONSUME
+  p24:  1,
+  p34:  1,
+  p814: 1;
+PRODUCE
+  p23:  1,
+  p33:  1,
+  p448: 1;
+
+TRANSITION t454
+CONSUME
+  p23:  1,
+  p33:  1,
+  p814: 1;
+PRODUCE
+  p23:  1,
+  p33:  1,
+  p448: 1;
+
+TRANSITION t455
+CONSUME
+  p21:  1,
+  p24:  1,
+  p34:  1,
+  p49:  1,
+  p451: 1;
+PRODUCE
+  p22:  1,
+  p23:  1,
+  p33:  1,
+  p50:  1,
+  p448: 1;
+
+TRANSITION t475
+CONSUME
+  p13:  1,
+  p474: 1;
+PRODUCE
+  p14:  1,
+  p815: 1;
+
+TRANSITION t476
+CONSUME
+  p16:  1,
+  p815: 1;
+PRODUCE
+  p15:  1,
+  p471: 1;
+
+TRANSITION t477
+CONSUME
+  p15:  1,
+  p815: 1;
+PRODUCE
+  p15:  1,
+  p471: 1;
+
+TRANSITION t478
+CONSUME
+  p13:  1,
+  p16:  1,
+  p474: 1;
+PRODUCE
+  p14:  1,
+  p15:  1,
+  p471: 1;
+
+TRANSITION t498
+CONSUME
+  p15:  1,
+  p497: 1;
+PRODUCE
+  p16:  1,
+  p816: 1;
+
+TRANSITION t499
+CONSUME
+  p18:  1,
+  p20:  1,
+  p816: 1;
+PRODUCE
+  p17:  1,
+  p19:  1,
+  p494: 1;
+
+TRANSITION t500
+CONSUME
+  p17:  1,
+  p19:  1,
+  p816: 1;
+PRODUCE
+  p17:  1,
+  p19:  1,
+  p494: 1;
+
+TRANSITION t501
+CONSUME
+  p15:  1,
+  p18:  1,
+  p20:  1,
+  p497: 1;
+PRODUCE
+  p16:  1,
+  p17:  1,
+  p19:  1,
+  p494: 1;
+
+TRANSITION t521
+CONSUME
+  p19:  1,
+  p35:  1,
+  p520: 1;
+PRODUCE
+  p20:  1,
+  p36:  1,
+  p817: 1;
+
+TRANSITION t522
+CONSUME
+  p22:  1,
+  p817: 1;
+PRODUCE
+  p21:  1,
+  p517: 1;
+
+TRANSITION t523
+CONSUME
+  p21:  1,
+  p817: 1;
+PRODUCE
+  p21:  1,
+  p517: 1;
+
+TRANSITION t524
+CONSUME
+  p19:  1,
+  p22:  1,
+  p35:  1,
+  p520: 1;
+PRODUCE
+  p20:  1,
+  p21:  1,
+  p36:  1,
+  p517: 1;
+
+TRANSITION t544
+CONSUME
+  p41:  1,
+  p543: 1;
+PRODUCE
+  p42:  1,
+  p818: 1;
+
+TRANSITION t545
+CONSUME
+  p44:  1,
+  p818: 1;
+PRODUCE
+  p43:  1,
+  p540: 1;
+
+TRANSITION t546
+CONSUME
+  p43:  1,
+  p818: 1;
+PRODUCE
+  p43:  1,
+  p540: 1;
+
+TRANSITION t547
+CONSUME
+  p41:  1,
+  p44:  1,
+  p543: 1;
+PRODUCE
+  p42:  1,
+  p43:  1,
+  p540: 1;
+
+TRANSITION t567
+CONSUME
+  p43:  1,
+  p566: 1;
+PRODUCE
+  p44:  1,
+  p819: 1;
+
+TRANSITION t568
+CONSUME
+  p46:  1,
+  p819: 1;
+PRODUCE
+  p45:  1,
+  p563: 1;
+
+TRANSITION t569
+CONSUME
+  p45:  1,
+  p819: 1;
+PRODUCE
+  p45:  1,
+  p563: 1;
+
+TRANSITION t570
+CONSUME
+  p43:  1,
+  p46:  1,
+  p566: 1;
+PRODUCE
+  p44:  1,
+  p45:  1,
+  p563: 1;
+
+TRANSITION t609
+CONSUME
+  p23:  1,
+  p608: 1;
+PRODUCE
+  p24:  1,
+  p821: 1;
+
+TRANSITION t610
+CONSUME
+  p26:  1,
+  p32:  1,
+  p821: 1;
+PRODUCE
+  p25:  1,
+  p31:  1,
+  p605: 1;
+
+TRANSITION t611
+CONSUME
+  p25:  1,
+  p31:  1,
+  p821: 1;
+PRODUCE
+  p25:  1,
+  p31:  1,
+  p605: 1;
+
+TRANSITION t612
+CONSUME
+  p23:  1,
+  p26:  1,
+  p32:  1,
+  p608: 1;
+PRODUCE
+  p24:  1,
+  p25:  1,
+  p31:  1,
+  p605: 1;
+
+TRANSITION t632
+CONSUME
+  p25:  1,
+  p33:  1,
+  p631: 1;
+PRODUCE
+  p26:  1,
+  p34:  1,
+  p822: 1;
+
+TRANSITION t633
+CONSUME
+  p28:  1,
+  p30:  1,
+  p822: 1;
+PRODUCE
+  p27:  1,
+  p29:  1,
+  p628: 1;
+
+TRANSITION t634
+CONSUME
+  p27:  1,
+  p29:  1,
+  p822: 1;
+PRODUCE
+  p27:  1,
+  p29:  1,
+  p628: 1;
+
+TRANSITION t635
+CONSUME
+  p25:  1,
+  p28:  1,
+  p30:  1,
+  p33:  1,
+  p631: 1;
+PRODUCE
+  p26:  1,
+  p27:  1,
+  p29:  1,
+  p34:  1,
+  p628: 1;
+
+TRANSITION t686
+CONSUME
+  p63:  1,
+  p700: 1;
+PRODUCE
+  p63:  1,
+  p681: 1;
+
+TRANSITION t687
+CONSUME
+  p681: 1;
+PRODUCE
+  out.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_default_PT.Bescheid_versenden:   1,
+  p701: 1;
+
+TRANSITION t697
+CONSUME
+  p27:  1,
+  p694: 1;
+PRODUCE
+  p28:  1,
+  p700: 1;
+
+TRANSITION t698
+CONSUME
+  p27:  1,
+  p694: 1;
+PRODUCE
+  p28:  1,
+  p701: 1;
+
+TRANSITION t713
+CONSUME
+  p29:  1,
+  p710: 1;
+PRODUCE
+  p30:  1,
+  p760: 1;
+
+TRANSITION t714
+CONSUME
+  p29:  1,
+  p710: 1;
+PRODUCE
+  p30:  1,
+  p764: 1;
+
+TRANSITION t726
+CONSUME
+  p64:  1,
+  p760: 1;
+PRODUCE
+  p64:  1,
+  p721: 1;
+
+TRANSITION t727
+CONSUME
+  p721: 1;
+PRODUCE
+  out.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_default_PT.Rechnung_versenden:   1,
+  p763: 1;
+
+TRANSITION t746
+CONSUME
+  in.Melderegisterauskunft_Ist_Ausbaustufe_II_default.tns_Melderegisterauskunft_Ist_Ausbaustufe_II_PT.Zahlungsnachweis_empfangen:   1,
+  p763: 1;
+PRODUCE
+  p741: 1;
+
+TRANSITION t747
+CONSUME
+  p62:  1,
+  p741: 1;
+PRODUCE
+  p62:  1,
+  p764: 1;
+
+{ END OF FILE }

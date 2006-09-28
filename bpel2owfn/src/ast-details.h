@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/09/27 09:23:54 $
+ *          - last changed: \$Date: 2006/09/28 15:30:50 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  */
 
 
@@ -102,7 +102,7 @@ class ASTE
     map<string, string> attributes;
 
     /// the identifiers of all (recursively) enclosed source links
-    list<int> enclosedSourceLinks;
+    set<int> enclosedSourceLinks;
 
     /// the identifiers of all (direct) enclosed scopes (only relevant for <scope> and <process>)
     set<int> enclosedScopes;

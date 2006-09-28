@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/09/28 08:24:45 $
+ *          - last changed: \$Date: 2006/09/28 15:30:51 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  */
 
 
@@ -323,15 +323,15 @@ string Place::dotOut()
     result += " style=filled fillcolor=orange shape=ellipse";
   else if (firstMemberIs("out."))
     result += " style=filled fillcolor=yellow shape=ellipse";
-  else if (firstMemberIs("!link."))
-    result += " style=filled fillcolor=deeppink";
-  else if (firstMemberIs("link."))
-    result += " style=filled fillcolor=cornflowerblue";
-  else if (firstMemberIs("variable."))
-    result += " style=filled fillcolor=cyan";
   else if (historyContains("1.internal.initial")
 	   || historyContains("1.internal.final"))
+    result += " style=filled fillcolor=gray";
+  else if (firstMemberIs("!link."))
+    result += " style=filled fillcolor=red";
+  else if (firstMemberIs("link."))
     result += " style=filled fillcolor=green";
+  else if (firstMemberIs("variable."))
+    result += " style=filled fillcolor=cyan";
   else if (historyContains("1.internal.clock"))
     result += " style=filled fillcolor=seagreen";
 

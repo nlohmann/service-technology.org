@@ -32,13 +32,13 @@
  *
  * \date
  *          - created: 2006/02/08
- *          - last changed: \$Date: 2006/09/27 09:23:55 $
+ *          - last changed: \$Date: 2006/09/28 15:30:50 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  */
 
 
@@ -65,6 +65,7 @@ extern PetriNet *TheNet;
 // introduced in bpel-unparse.k
 extern string currentScope;
 
+// introduced in bpel-unparse-tools.h
 extern map<unsigned int, ASTE*> ASTEmap;
 
 
@@ -294,22 +295,10 @@ void footer(int id, bool myindent)
  */
 void dpeLinks(Transition *t, int id)
 {
-  extern map<unsigned int, ASTE*> ASTEmap;  
-
   assert(t != NULL);
-
-//  STActivity *branch = dynamic_cast<STActivity*>(symTab.lookup(id));
-//  assert(branch != NULL);
-  
-//  for (set<STLink*>::iterator link = branch->enclosedSourceLinks.begin();
-//      link != branch->enclosedSourceLinks.end();
-//      link++)
-//
   assert(ASTEmap[id] != NULL);
 
-  // TODO Overwork and TEST this function -- don't have a good feeling about it...
-
-  for (list<int>::iterator linkID = ASTEmap[id]->enclosedSourceLinks.begin();
+  for (set<int>::iterator linkID = ASTEmap[id]->enclosedSourceLinks.begin();
       linkID != ASTEmap[id]->enclosedSourceLinks.end();
       linkID++)
   {

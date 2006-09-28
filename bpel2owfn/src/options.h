@@ -29,13 +29,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/09/27 13:34:44 $
+ *          - last changed: \$Date: 2006/09/28 15:30:51 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.29 $
+ * \version \$Revision: 1.30 $
  */
 
 
@@ -130,7 +130,8 @@ typedef enum
   P_COMMUNICATIONONLY,	///< creates the smallest possible net
   P_CYCLICWHILE,	///< use the original <while> pattern
   P_CYCLICEH,		///< use the original <eventHandlers> pattern
-  P_TRED		///< use transitive reduction
+  P_TRED,		///< use transitive reduction
+  P_XOR			///< use XOR as transition condition
 } possibleParameters;
 
 

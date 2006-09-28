@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/09/27 09:23:54 $
+ *          - last changed: \$Date: 2006/09/28 15:30:50 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  */
 %}
 
@@ -490,11 +490,9 @@ Invoke(a,b) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
-      // switch to discriminate asynchronous and synchronous invokes
-      $0->isSynchronousInvoke = ($0->attributes["outputVariable"] != "");
-
       // annotate AST and check information
       $0->attributes = ASTEmap[myid]->getAttributes();
+      $0->isSynchronousInvoke = ($0->attributes["outputVariable"] != "");
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
       $0->channelName = ASTEmap[myid]->createChannel($0->isSynchronousInvoke);
       $0->inputVariableName = ASTEmap[myid]->checkInputVariable();
@@ -816,7 +814,7 @@ Flow(a,b,c) ->
       foreach(innerActivity; activity_list c)
       {
         assert(ASTEmap[innerActivity->id] != NULL);
-        ASTEmap[myid]->enclosedSourceLinks.splice(ASTEmap[myid]->enclosedSourceLinks.end(), ASTEmap[innerActivity->id]->enclosedSourceLinks);
+        ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
       }
       
       /* here we can check whether each link was used as source and target */
@@ -889,10 +887,10 @@ Switch(a,b,c=Otherwise(d)) ->
       foreach(branch=Case(innerActivity); tCase_list b)
       {
         assert(ASTEmap[innerActivity->id] != NULL);
-        ASTEmap[myid]->enclosedSourceLinks.splice(ASTEmap[myid]->enclosedSourceLinks.end(), ASTEmap[innerActivity->id]->enclosedSourceLinks);
+        ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
       }
       assert(ASTEmap[d->id] != NULL);
-      ASTEmap[myid]->enclosedSourceLinks.splice(ASTEmap[myid]->enclosedSourceLinks.end(), ASTEmap[d->id]->enclosedSourceLinks);
+      ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[d->id]->enclosedSourceLinks);
     }
   ]
 ;
@@ -957,7 +955,7 @@ While(a,b) ->
     {
       // collect enclosed source links
       assert(ASTEmap[b->id] != NULL);
-      ASTEmap[myid]->enclosedSourceLinks.splice(ASTEmap[myid]->enclosedSourceLinks.end(), ASTEmap[b->id]->enclosedSourceLinks);
+      ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[b->id]->enclosedSourceLinks);
     }
   ]
 ;
@@ -1002,7 +1000,7 @@ Sequence(a,b) ->
       foreach(innerActivity; activity_list b)
       {
         assert(ASTEmap[innerActivity->id] != NULL);
-        ASTEmap[myid]->enclosedSourceLinks.splice(ASTEmap[myid]->enclosedSourceLinks.end(), ASTEmap[innerActivity->id]->enclosedSourceLinks);
+        ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
       }
     }
   ]
@@ -1054,12 +1052,12 @@ Pick(a,b,c) ->
       foreach(branch=OnMessage(innerActivity); tOnMessage_list b)
       {
         assert(ASTEmap[innerActivity->id] != NULL);
-        ASTEmap[myid]->enclosedSourceLinks.splice(ASTEmap[myid]->enclosedSourceLinks.end(), ASTEmap[innerActivity->id]->enclosedSourceLinks);
+        ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
       }
       foreach(branch=OnAlarm(innerActivity); tOnAlarm_list c)
       {
         assert(ASTEmap[innerActivity->id] != NULL);
-        ASTEmap[myid]->enclosedSourceLinks.splice(ASTEmap[myid]->enclosedSourceLinks.end(), ASTEmap[innerActivity->id]->enclosedSourceLinks);
+        ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
       }
     }
   ]
@@ -1121,7 +1119,7 @@ Scope(a,b,c,d,e,f,g) ->
 
       // collect enclosed source links
       assert(ASTEmap[g->id] != NULL);
-      ASTEmap[myid]->enclosedSourceLinks.splice(ASTEmap[myid]->enclosedSourceLinks.end(), ASTEmap[g->id]->enclosedSourceLinks);
+      ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[g->id]->enclosedSourceLinks);
     }
   ]
 ;
@@ -1213,12 +1211,9 @@ Source() ->
       theLink->usedAsSource = true;
 
 
-      // cerr << ASTEmap[myid]->parentActivityId << " has a source link (" << linkId << ")" << endl;
-
-
       // add that link to the parent activity
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      ASTEmap[ASTEmap[myid]->parentActivityId]->enclosedSourceLinks.push_back(linkId);
+      ASTEmap[ASTEmap[myid]->parentActivityId]->enclosedSourceLinks.insert(linkId);
 
       $0->linkName = $0->attributes["linkName"];
     }

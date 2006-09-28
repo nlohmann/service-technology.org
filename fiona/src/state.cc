@@ -26,7 +26,7 @@
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes by: \$Author: gierds $
+ *          - last changes by: \$Author: massuthe $
  *          
  * \date
  *          - created:
@@ -260,7 +260,7 @@ void State::decode(oWFN * PN) {
 //! \brief decodes State in bintree and returns the corresponding marking
 void State::decodeShowOnly(oWFN * PN) {
 	
-	trace(TRACE_5, "void State::decodeShowOnly(int * v, oWFN * PN):start\n");
+	trace(TRACE_5, "void State::decodeShowOnly(oWFN * PN) : start\n");
 		
 //	for (int i = 0; i < PN->getPlaceCnt(); i++) {
 //		cout << PN->Places[i]->name << " (" << PN->Places[i]->nrbits << ")" << endl;
@@ -331,10 +331,10 @@ void State::decodeShowOnly(oWFN * PN) {
 		if(cfirst == pfirst) {
 			if(currentplacenr == 0) {
 				// all places decoded - finishing
-				trace(TRACE_5, "void State::decode(int * v, oWFN * PN):end\n");
+				trace(TRACE_5, "void State::decodeShowOnly(oWFN * PN) : end\n");
 				
 				return;
-			}		
+			}
 			
 			// take new place
 			currentplacenr--;

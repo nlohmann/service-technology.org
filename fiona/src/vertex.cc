@@ -108,6 +108,7 @@ void vertex::addClause(clause * newClause, bool _isFinalState) {
 		annotation->addClause(newClause);
 		annotation->isFinalState = _isFinalState;
 		trace(TRACE_5, "vertex::addClause(clause * newClause) : end\n");
+//		cout << "number of elements in annotation of node " << numberOfVertex << " : " << numberOfElementsInAnnotation() << endl;
 		return ;	
 	}
 	
@@ -248,10 +249,12 @@ int vertex::getNumberOfDeadlocks() {
 //! \brief analyses the node and sets its color, if the node gets to be red, then TERMINATE is returned
 analysisResult vertex::analyseNode(bool finalAnalysis) {
 
+    trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : start\n");
+    
     trace(TRACE_2, "\t\t\t analysing node ");
 
     if (finalAnalysis) {
-    	trace(TRACE_2, "(final analysis)");
+    	trace(TRACE_2, "(final analysis) ");	//debug 2
     }
 
     trace(TRACE_2, intToString(numberOfVertex) + ": ");
@@ -262,6 +265,7 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
             color = BLUE;
             trace(TRACE_2, "node analysed blue (empty node)");
             trace(TRACE_2, "\t ...terminate\n");
+            trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
             return TERMINATE;
         } else {
             // we analyse a non-empty node
@@ -276,6 +280,8 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
             // iterate over all clauses of the annotation and determine color for clause
             while (cl) {
             	if (cl->isFinalState) {
+//            		cout << "found a final state" << endl;
+            		
             		finalState = true;
             		c = BLUE;
             	} else if (eventsToBeSeen == 0 || finalAnalysis) {
@@ -297,6 +303,7 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
                         }
                         trace(TRACE_2, "\t\t ...terminate\n");
                         color = RED;
+                        trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
                         return TERMINATE;
                         break;
                     case BLUE:  // found a blue state (i.e. deadlock is resolved)
@@ -307,10 +314,12 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
                             color = RED;
                             trace(TRACE_2, "node analysed red (final analysis)");
                             trace(TRACE_2, "\t ...terminate\n");
+                            trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
                             return TERMINATE;           // <---------------------???
                         } else {
                             color = BLACK;
                             trace(TRACE_2, "node still indefinite \t\t ...continue\n");
+                            trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
                             return CONTINUE;
                         }
                         break;
@@ -319,6 +328,7 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
                     // still events left to resolve deadlocks...
                     color = BLACK;
                     trace(TRACE_2, "node still indefinite \t\t ...continue\n");
+                    trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
                     return CONTINUE;
                 }
                 
@@ -343,13 +353,16 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
             
             if (finalState) {
                 trace(TRACE_2, " ...terminate\n");
+                trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
                 return TERMINATE;
             } else {
                 trace(TRACE_2, " ...continue\n");
+                trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
                 return CONTINUE;
             }
         }
     }
+    trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
     return TERMINATE;
 }
 

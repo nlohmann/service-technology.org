@@ -1285,24 +1285,23 @@ bool oWFN::isFinalMarking(unsigned int * marking) {
 		if (Places[i]->type != INTERNAL && marking[i] > 0) {
 			return false;
 		}
-		if (FinalMarking[i] != 0 && marking[i] != FinalMarking[i]) {
+//		if (FinalMarking[i] != 0 && marking[i] != FinalMarking[i]) {
+		if (FinalMarking[i] != 0 && marking[i] < FinalMarking[i]) {
 			return false;	
-		}	
+		}
 	}
-
 	return true;
 }
 
+
 bool oWFN::isFinal() {
-	if(FinalCondition) 
-	{
+	if(FinalCondition) {
 		return FinalCondition -> value;
-	}
-	else
-	{
+	} else {
 		return isFinalMarking(CurrentMarking);
 	}
 }
+
 
 char * oWFN::createLabel(messageMultiSet m) {
 	char * label = new char[256];

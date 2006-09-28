@@ -253,15 +253,23 @@ void operatingGuidelines::computeCNF(vertex * node) {
 bool operatingGuidelines::terminateBuildingGraph(vertex * node) {
 	trace(TRACE_5, "bool operatingGuidelines::terminateBuildingGraph(vertex * node): start\n");
 	
-//    analyseNode(node, false);
+    analyseNode(node, false);
 
-	if (analyseNode(node, false) == TERMINATE) {
-		trace(TRACE_5, "node analysed\n");
-		trace(TRACE_5, "bool operatingGuidelines::terminateBuildingGraph(vertex * node): end\n");
-		return true;
-	}
+//	if (analyseNode(node, false) == TERMINATE) {
+//		trace(TRACE_5, "node analysed\n");
+//		trace(TRACE_5, "bool operatingGuidelines::terminateBuildingGraph(vertex * node): end\n");
+//		return true;
+//	}
 	
-	trace(TRACE_5, "node analysed\n");
+//	trace(TRACE_5, "node analysed, color is ");
+//	if (node->getColor() == BLUE) {
+//		trace(TRACE_5, "blue\n");
+//	} else if (node->getColor() == RED) {
+//		trace(TRACE_5, "red\n");
+//	} else {
+//		trace(TRACE_5, "black\n");
+//	}
+	
 	
 	// do not change termination | here, but set commDepth in main.cc
 	//                           v       to desired value

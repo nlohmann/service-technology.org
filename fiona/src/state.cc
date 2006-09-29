@@ -152,9 +152,11 @@ void State::decode(oWFN * PN) {
 		}
 
 		// after decoding the new marking for a place update the final condition
-		for(int j=0; j < PN->Places[currentplacenr] -> cardprop; j++) {
-		    if (PN->Places[currentplacenr]->proposition != NULL) {
-			PN->Places[currentplacenr]->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
+		if (PN->FinalCondition) {
+		    for(int j=0; j < PN->Places[currentplacenr] -> cardprop; j++) {
+			if (PN->Places[currentplacenr]->proposition != NULL) {
+			    PN->Places[currentplacenr]->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
+			}
 		    }
 		}
 
@@ -334,9 +336,11 @@ void State::decodeShowOnly(oWFN * PN) {
 		}
 
 		// after decoding the new marking for a place update the final condition
-		for(int j=0; j < PN->Places[currentplacenr] -> cardprop; j++) {
-		    if (PN->Places[currentplacenr]->proposition != NULL) {
-			PN->Places[currentplacenr]->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
+		if (PN->FinalCondition) {
+		    for(int j=0; j < PN->Places[currentplacenr] -> cardprop; j++) {
+			if (PN->Places[currentplacenr]->proposition != NULL) {
+			    PN->Places[currentplacenr]->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
+			}
 		    }
 		}
 

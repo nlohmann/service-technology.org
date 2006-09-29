@@ -26,7 +26,7 @@
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes by: \$Author: massuthe $
+ *          - last changes by: \$Author: gierds $
  *          
  * \date
  *          - created:
@@ -149,6 +149,13 @@ void State::decode(oWFN * PN) {
 			PN->CurrentMarking[currentplacenr] += cutplace << (plast - clast); 		
 		} else {
 			PN->CurrentMarking[currentplacenr] = cutplace;
+		}
+
+		// after decoding the new marking for a place update the final condition
+		for(int j=0; j < PN->Places[currentplacenr] -> cardprop; j++) {
+		    if (PN->Places[currentplacenr]->proposition != NULL) {
+			PN->Places[currentplacenr]->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
+		    }
 		}
 
 
@@ -324,6 +331,13 @@ void State::decodeShowOnly(oWFN * PN) {
 			PN->CurrentMarking[currentplacenr] += cutplace << (plast - clast); 		
 		} else {
 			PN->CurrentMarking[currentplacenr] = cutplace;
+		}
+
+		// after decoding the new marking for a place update the final condition
+		for(int j=0; j < PN->Places[currentplacenr] -> cardprop; j++) {
+		    if (PN->Places[currentplacenr]->proposition != NULL) {
+			PN->Places[currentplacenr]->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
+		    }
 		}
 
 

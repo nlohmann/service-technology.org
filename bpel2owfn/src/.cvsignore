@@ -33,6 +33,7 @@ bpel-unparse-petri-small.cc
 bpel-unparse-petri-small.h
 bpel-unparse-xml.cc
 bpel-unparse-xml.h
+preprocess.exe
 bpel2owfn.exe
 bpel2owfn.exe.stackdump
 *.bpel
@@ -40,3 +41,6 @@ bpel2owfn.exe.stackdump
 *.pnml
 *.lola
 *.info
+*.png
+*.dot
+*.out

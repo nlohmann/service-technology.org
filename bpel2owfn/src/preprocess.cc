@@ -5,8 +5,8 @@
 
 using namespace std;
 
-string keywords[] = { "assign", "case", "catch", "catchAll", "compensate", "compensationHandler", "copy", "correlation", "correlations", "correlationSet", "correlationSets", "empty", "eventHandlers", "faultHandlers", "flow", "from", "invoke", "link", "links", "onAlarm", "onMessage", "otherwise", "partner", "partnerLink", "partnerLinks", "partners", "pick", "process", "receive", "reply", "scope", "sequence", "source", "switch", "target", "terminate", "throw", "to", "variable", "variables", "wait", "while", "?xml" };
-const unsigned int keywordCount = 43;
+string keywords[] = { "assign", "case", "catch", "catchAll", "compensate", "compensationHandler", "copy", "correlation", "correlations", "correlationSet", "correlationSets", "empty", "eventHandlers", "faultHandlers", "flow", "from", "import", "invoke", "link", "links", "onAlarm", "onMessage", "otherwise", "partner", "partnerLink", "partnerLinks", "partners", "pick", "process", "receive", "reply", "scope", "sequence", "source", "switch", "target", "terminate", "throw", "to", "variable", "variables", "wait", "while", "?xml" };
+const unsigned int keywordCount = 44;
 
 
 bool parsingBPEL = true;
@@ -33,7 +33,7 @@ bool isKeyword(string s)
   }
 
   for (int i = 0; i < keywordCount; i++)
-    if (s == keywords[i] || s == ("/" + keywords[i]))
+    if (s == keywords[i] || s == ("/" + keywords[i]) || (s == "bpws:" + keywords[i]) || (s == "/bpws:" + keywords[i]))
       return true;
 
   ignoredTags.insert(s);
@@ -58,9 +58,14 @@ string getNextWord(ifstream &inputStream)
 	    return (result + toString(ch));
 	  else
 	  {
-	    parsingBPEL = false;
-	    closingTag = result;
-	    return ("!-- <" + result + toString(ch));
+	    if (ch != '/')
+	    {
+	      parsingBPEL = false;
+	      closingTag = result;
+	      return ("!-- <" + result + toString(ch));
+	    }
+	    else
+	      return ("!-- <" + result + "/>" + " --");
 	  }
 	}
 	else

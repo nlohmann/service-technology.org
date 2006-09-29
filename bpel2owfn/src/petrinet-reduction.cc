@@ -41,13 +41,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/09/27 14:19:43 $
+ *          - last changed: \$Date: 2006/09/29 06:29:31 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.33 $
+ * \version \$Revision: 1.34 $
  */
 
 
@@ -550,6 +550,8 @@ map<unsigned int, set<unsigned int> > toAcc(map<unsigned int, set<unsigned int> 
     visited2.clear();
   }
 
+  trace(TRACE_VERY_DEBUG, "[PN]\tDFS complete.\n");
+
   return result;
 }
 
@@ -559,6 +561,8 @@ map<unsigned int, set<unsigned int> > toAcc(map<unsigned int, set<unsigned int> 
 
 void prune_acc(unsigned int i, map<unsigned int, set<unsigned int> > &Acc, map<unsigned int, set<unsigned int> > &Adj)
 {
+  trace(TRACE_VERY_DEBUG, "[PN]\tCalling prune_acc for t" + toString(i) + "\n");
+
   for (set<unsigned int>::iterator it = Acc[i].begin(); it != Acc[i].end(); it++)
   {
     if (Acc[*it].empty())
@@ -632,6 +636,5 @@ void PetriNet::transitiveReduction()
   for (set<Place*>::iterator p = transitivePlaces.begin(); p != transitivePlaces.end(); p++)
     removePlace(*p);
 
-  if (transitivePlaces.size() != 0)
-    cerr << "removed " << transitivePlaces.size() << " transitive places" << endl;
+  trace(TRACE_DEBUG, "[PN]\tRemoved " + toString(transitivePlaces.size()) + " transitive places\n");
 }

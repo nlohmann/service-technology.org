@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/09/28 09:38:51 $
+ *          - last changed: \$Date: 2006/09/29 08:42:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.218 $
+ * \version \$Revision: 1.219 $
  * 
  */
 %}
@@ -274,8 +274,8 @@ activity:
 tPartnerLinks:
   /* empty */
     { $$ = NiltPartnerLink_list(); }
-| K_PARTNERLINKS X_NEXT tPartnerLink_list X_SLASH K_PARTNERLINKS X_NEXT
-    { $$ = $3; } 
+| K_PARTNERLINKS arbitraryAttributes X_NEXT tPartnerLink_list X_SLASH K_PARTNERLINKS X_NEXT
+    { $$ = $4; } 
 ;
 
 tPartnerLink_list:

@@ -39,7 +39,7 @@
  *          
  * \date
  *          - created 2005-11-10
- *          - last changed: \$Date: 2006/05/29 11:04:40 $
+ *          - last changed: \$Date: 2006/09/29 08:42:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -48,7 +48,7 @@
  * \note    This file was created using Flex reading file bpel-lexic.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  *
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -185,7 +185,7 @@ bpwsns			"bpws:"|"bpel:"
 {bpwsns}?"otherwise"		{ return K_OTHERWISE; }
 {bpwsns}?"partner"		{ BEGIN(ATTRIBUTE); return K_PARTNER; }
 {bpwsns}?"partnerLink"		{ BEGIN(ATTRIBUTE); return K_PARTNERLINK; }
-{bpwsns}?"partnerLinks"		{ return K_PARTNERLINKS; }
+{bpwsns}?"partnerLinks"		{ BEGIN(ATTRIBUTE); return K_PARTNERLINKS; }
 {bpwsns}?"partners"		{ return K_PARTNERS; }
 {bpwsns}?"pick"			{ BEGIN(ATTRIBUTE); return K_PICK; }
 {bpwsns}?"process"		{ BEGIN(ATTRIBUTE); return K_PROCESS; }

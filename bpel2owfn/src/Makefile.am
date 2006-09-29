@@ -18,10 +18,10 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/09/23 22:31:01 $ by $Author: nlohmann $.
-# Version $Revision: 1.31 $
+# File last changed $Date: 2006/09/29 12:40:19 $ by $Author: nlohmann $.
+# Version $Revision: 1.32 $
 
-bin_PROGRAMS = bpel2owfn
+bin_PROGRAMS = bpel2owfn preprocess
 
 
 # define flags for Kimwitu++
@@ -61,6 +61,8 @@ bpel2owfn_SOURCES = $(KCDUMMY)\
 		    options.cc options.h\
 		    getopt.h getopt.c getopt1.c\
 		    ast-details.cc ast-details.h
+
+preprocess_SOURCES = preprocess.cc
 
 
 # dependencies of the Kimwitu++ files

@@ -193,12 +193,33 @@ formula * binarybooleanformula::merge() {
 	for(i=0;i<f->cardsub;i++)
 	{
 		f -> sub[i] -> parent = f;
+		f -> sub[i] -> parentindex = i;
 	}
 	f -> sub[f -> cardsub] = (formula *) 0;
 	for(i=0;i<f -> cardsub;i++)
 	{
 		f -> sub[i] = f -> sub[i]->merge();
 	}
+
+	// order sub formulas 
+	f->firstvalid = f->cardsub;
+	unsigned int n;
+
+	n=0;
+	while(n < f->firstvalid) {
+		if(f->sub[n] -> value) {
+			formula * tmp;
+			f->firstvalid --;
+			tmp = f->sub[f->firstvalid];
+			f->sub[f->firstvalid] = f->sub[n];
+			f->sub[n] = tmp;
+			f->sub[n] -> parentindex = n;
+			f->sub[f->firstvalid] -> parentindex = f->firstvalid;
+		} else {
+			n++;
+		}
+	}
+
 	return f;
 }
 		
@@ -218,6 +239,7 @@ formula * booleanformula::merge()
 	for(i=0;i<f->cardsub;i++)
 	{
 		f -> sub[i] -> parent = f;
+		f -> sub[i] -> parentindex = i;
 	}
 	f -> sub[f -> cardsub] = (formula *) 0;
 	for(i=0;i<f -> cardsub;i++)

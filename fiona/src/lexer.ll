@@ -6,6 +6,7 @@
 %option nodefault
 %option debug
 
+%s COMMENT
 
 
 %{
@@ -24,6 +25,10 @@ void setlval();
 
 %%
  /* RULES */
+
+"{"            { BEGIN(COMMENT); }
+<COMMENT>"}"   { BEGIN(INITIAL); }
+<COMMENT>[^}]* {}
 
 SAFE             						{ return key_safe;}
 PLACE            						{ return key_place; }
@@ -52,7 +57,6 @@ NOT		 								{ return op_not;}
 \(		 								{ return lpar;}
 \)		 								{ return rpar;}
 [0-9][0-9]*     						{ setlval(); return number; }
-"{"[^\n\r]*"}"    						{ break; }
 [^,;:()\t \n\r\{\}][^,;:()\t \n\r\{\}]*		{ setlval(); return ident; }
 [\n\r]            						{ break; }
 [ \t]           						{ break; }

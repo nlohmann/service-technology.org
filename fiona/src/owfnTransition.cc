@@ -234,73 +234,67 @@ void owfnTransition::initialize(oWFN * PN) {
 
 
 void owfnTransition::fire(oWFN * PN) {
-  owfnPlace* * p;
-  owfnTransition ** t;
-  unsigned int * i;
-  unsigned int a,b;
+	owfnPlace* * p;
+	owfnTransition ** t;
+	unsigned int * i;
+	unsigned int a,b;
 
 	trace(TRACE_5, "owfnTransition::fire(oWFN * PN) : start\n");
 			
-  for(p = IncrPlaces,i = Incr; *p != NULL; p++,i++)
-    {
-      PN->CurrentMarking[(* p)->index] += * i;
+	for(p = IncrPlaces,i = Incr; *p != NULL; p++,i++) {
+		PN->CurrentMarking[(* p)->index] += * i;
 #ifdef CHECKCAPACITY
-	if(PN->CurrentMarking[(* p)->index] > (* p)->capacity) 
-	{
-		cerr << "capacity of place " << (* p)->name << " exceeded!" << endl;
-		_exit(4);
-	}
+		if(PN->CurrentMarking[(* p)->index] > (* p)->capacity) {
+			cerr << "capacity of place " << (* p)->name << " exceeded!" << endl;
+			_exit(4);
+		}
 #endif
-    }
-  for(p = DecrPlaces, i = Decr; * p != NULL; p++,i++)
-    {
-      if (PN->CurrentMarking[(* p)->index] < *i) {
-      		PN->printmarking();
+	}
+	for(p = DecrPlaces, i = Decr; * p != NULL; p++,i++) {
+		if (PN->CurrentMarking[(* p)->index] < *i) {
+			PN->printmarking();
       		cerr << "marking of place " << (* p)->name << " is: " << PN->CurrentMarking[(* p)->index] << " but transition " << this->name << " consumes: " << *i << endl;
 			cerr << "number of states calculated so far: " << State::card << endl;
-		_exit(4);
-      } else {
+			_exit(4);
+		} else {
 			PN->CurrentMarking[(* p)->index] -= * i;
-      } 
+		}
     }
 
-  
-  PN->placeHashValue += hash_change;
-  PN->placeHashValue %= HASHSIZE;
-  for(t = ImproveEnabling;*t;t++)
-    {
-      if(!((*t) -> enabled) || !((*t) -> quasiEnabled))
-	{
-	  (*t)->check_enabled(PN);
+
+	PN->placeHashValue += hash_change;
+	PN->placeHashValue %= HASHSIZE;
+	for(t = ImproveEnabling; *t; t++) {
+		if(!((*t) -> enabled) || !((*t) -> quasiEnabled)) {
+			(*t)->check_enabled(PN);
+		}
 	}
-    }
-  for(t = ImproveDisabling;*t;t++)
-    {
-      if((*t)->enabled || (*t)->quasiEnabled)
-	{
-	  (*t)->check_enabled(PN);
+	for(t = ImproveDisabling; *t; t++) {
+		if((*t)->enabled || (*t)->quasiEnabled) {
+			(*t)->check_enabled(PN);
+		}
 	}
-    }
+
 
     // update value of formula after having fired t
-
-    for(p = DecrPlaces; * p != NULL; p++) {
-		unsigned int j;
-        for(j=0; j < (* p) -> cardprop; j++) {
-            if ((* p)->proposition != NULL) {
-	            (* p)->proposition[j] -> update(PN->CurrentMarking[(* p)->index]);
-			}
-        }
-    }
+//    for(p = DecrPlaces; *p != NULL; p++) {
+//		unsigned int j;
+//        for(j=0; j < (* p) -> cardprop; j++) {
+//            if ((* p)->proposition != NULL) {
+//	            (* p)->proposition[j] -> update(PN->CurrentMarking[(* p)->index]);
+//			}
+//        }
+//    }
+//    
+//    for(p = IncrPlaces; * p != NULL; p++) {
+//		unsigned int j;
+//        for(j=0; j < (* p) -> cardprop; j++) {
+//            if ((* p)->proposition != NULL) {
+//	            (* p)->proposition[j] -> update(PN->CurrentMarking[(* p)->index]);
+//            }
+//        }
+//    }
     
-    for(p = IncrPlaces; * p != NULL; p++) {
-		unsigned int j;
-        for(j=0; j < (* p) -> cardprop; j++) {
-            if ((* p)->proposition != NULL) {
-	            (* p)->proposition[j] -> update(PN->CurrentMarking[(* p)->index]);
-            }
-        }
-    }
    	trace(TRACE_5, "owfnTransition::fire(oWFN * PN) : end\n");
 }
 
@@ -342,24 +336,25 @@ void owfnTransition::backfire(oWFN * PN)
 	  (*t)->check_enabled(PN);
 	}
     }
-    // update value of formula after having fired t
 
-    for(p = DecrPlaces,i = Decr; * p != NULL; p++,i++)
-    {
-	unsigned int j;
-        for(j=0; j < (* p) -> cardprop;j++)
-	{
-            (* p)->proposition[j] -> update(PN->CurrentMarking[(* p)->index]);
-        }
-    }
-    for(p = IncrPlaces,i = Incr; * p != NULL; p++,i++)
-    {
-	unsigned int j;
-        for(j=0; j < (* p) -> cardprop;j++)
-	{
-	  (* p)->proposition[j] -> update(PN->CurrentMarking[(* p)->index]);
-        }
-    }
+
+    // update value of formula after having fired t
+//    for(p = DecrPlaces,i = Decr; * p != NULL; p++,i++)
+//    {
+//	unsigned int j;
+//        for(j=0; j < (* p) -> cardprop;j++)
+//	{
+//            (* p)->proposition[j] -> update(PN->CurrentMarking[(* p)->index]);
+//        }
+//    }
+//    for(p = IncrPlaces,i = Incr; * p != NULL; p++,i++)
+//    {
+//	unsigned int j;
+//        for(j=0; j < (* p) -> cardprop;j++)
+//	{
+//	  (* p)->proposition[j] -> update(PN->CurrentMarking[(* p)->index]);
+//        }
+//    }
 }
 
 void owfnTransition::excludeTransitionFromEnabledList(oWFN * PN) {
@@ -391,91 +386,73 @@ void owfnTransition::excludeTransitionFromQuasiEnabledList(oWFN * PN) {
 //! \param PN owfn this transition is part of
 //! \brief check whether this transition is (quasi) enabled at the current marking
 //! quasi-enabled means, that this transition activates a sending event (this transition is a receiving transition)
-void owfnTransition::check_enabled(oWFN * PN) 
-{
-  owfnPlace* * p;
-  unsigned int *i;
-		
-  messageSet.clear();
-	
-  enabledNr = quasiEnabledNr = 0;		// suppose no pre-place has appropriate marking at all
+void owfnTransition::check_enabled(oWFN * PN) {
+	owfnPlace* * p;
+	unsigned int *i;
 
-  for(p = PrePlaces , i = Pre ; *p != NULL; p++ , i++) 
-  {
-    if(PN->CurrentMarking[(* p)->index] < *i) 
-    {
-      if ((* p)->type == INPUT) 
-      {
-	messageSet.insert((* p)->index);
-	quasiEnabledNr++;	// remember that we have found an input pre-place with no appropriate marking
-      }
-    } 
-    else if(PN->CurrentMarking[(* p)->index] >= *i) 
-    {
-      enabledNr++;	// remember that we have found a pre-place with appropriate marking
-    }
-  }
-  if(enabledNr == NrOfArriving) 
-  {		// there are as many pre-places appropriatly marked as there are incoming arcs
-    if (!enabled || PN->startOfEnabledList == 0) 
-    {		// transition was not enabled before
-      // include transition into list of enabled transitions
-      NextEnabled = PN->startOfEnabledList;
-      if(PN->startOfEnabledList) 
-      {
-	NextEnabled -> PrevEnabled = this;
-      }
-      PN->startOfEnabledList = this;
-      PrevEnabled = (owfnTransition *) 0;
-      enabled = true;
-      PN->transNrEnabled++;
-    }
-    if (quasiEnabled) 
-    {		// transition was quasi enabled before
-      quasiEnabled = false;
-      PN->transNrQuasiEnabled--;
-      excludeTransitionFromQuasiEnabledList(PN);		// delete transition from list of quasi enabled transtions
-    }
-  } 
-  else if ((enabledNr + quasiEnabledNr) == NrOfArriving) 
-  {	// transition is quasi enabled
-    if (!quasiEnabled) 
-    {	// transition was not quasi enabled before
-      // include transition into list of quasi enabled transitions
-      NextQuasiEnabled = PN->startOfQuasiEnabledList;
-      if(PN->startOfQuasiEnabledList) 
-      {
-	NextQuasiEnabled -> PrevQuasiEnabled = this;
-      }
-      PN->startOfQuasiEnabledList = this;
-      PrevQuasiEnabled = (owfnTransition *) 0;
-      quasiEnabled = true;
-      PN->transNrQuasiEnabled++;
-    } 
-    if (enabled) 
-    {		// transition was enabled before
-      enabled = false;
-      PN->transNrEnabled--;
-      excludeTransitionFromEnabledList(PN);		// delete transition from list of enabled transtions
-    }
-  }
-  else 
-  {	// transition is not enabled at all
-    if (enabled) 
-    {		// transition was enabled before
-      enabled = false;
-      PN->transNrEnabled--;
-      excludeTransitionFromEnabledList(PN);		// delete transition from list of enabled transtions
-    }
-    if (quasiEnabled) 
-    {  // transition was quasi enabled before
-      quasiEnabled = false;
-      PN->transNrQuasiEnabled--;
-      excludeTransitionFromQuasiEnabledList(PN);	// delete transition from list of quasi enabled transtions
-    }
-  }
-  	
-//  	cout << "current marking: " << PN->printCurrentMarkingForDot() << endl;
-//   cout << "transition " << name << " is quasiEnabled: " << quasiEnabled << " and enabled: " << enabled << endl;
+	messageSet.clear();
+
+	enabledNr = quasiEnabledNr = 0;		// suppose no pre-place has appropriate marking at all
+
+	for(p = PrePlaces , i = Pre ; *p != NULL; p++ , i++) {
+		if(PN->CurrentMarking[(* p)->index] < *i) {
+			if ((* p)->type == INPUT) {
+				messageSet.insert((* p)->index);
+				quasiEnabledNr++;	// remember that we have found an input pre-place with no appropriate marking
+			}
+		} else if(PN->CurrentMarking[(* p)->index] >= *i) {
+			enabledNr++;	// remember that we have found a pre-place with appropriate marking
+		}
+	}
+	
+	if(enabledNr == NrOfArriving) {		// there are as many pre-places appropriatly marked as there are incoming arcs
+		if (!enabled || PN->startOfEnabledList == 0) {		// transition was not enabled before
+			// include transition into list of enabled transitions
+			NextEnabled = PN->startOfEnabledList;
+			if(PN->startOfEnabledList) {
+				NextEnabled -> PrevEnabled = this;
+			}
+			PN->startOfEnabledList = this;
+			PrevEnabled = (owfnTransition *) 0;
+			enabled = true;
+			PN->transNrEnabled++;
+		}
+		if (quasiEnabled) {		// transition was quasi enabled before
+			quasiEnabled = false;
+			PN->transNrQuasiEnabled--;
+			excludeTransitionFromQuasiEnabledList(PN);		// delete transition from list of quasi enabled transtions
+		}
+	} else if ((enabledNr + quasiEnabledNr) == NrOfArriving) {
+		// transition is quasi enabled
+		if (!quasiEnabled) {          // transition was not quasi enabled before
+			// include transition into list of quasi enabled transitions
+			NextQuasiEnabled = PN->startOfQuasiEnabledList;
+			if(PN->startOfQuasiEnabledList) {
+				NextQuasiEnabled -> PrevQuasiEnabled = this;
+			}
+			PN->startOfQuasiEnabledList = this;
+			PrevQuasiEnabled = (owfnTransition *) 0;
+			quasiEnabled = true;
+			PN->transNrQuasiEnabled++;
+		} 
+		if (enabled) {		// transition was enabled before
+			enabled = false;
+			PN->transNrEnabled--;
+			excludeTransitionFromEnabledList(PN);		// delete transition from list of enabled transtions
+		}
+	} else {	// transition is not enabled at all
+	    if (enabled) {		// transition was enabled before
+			enabled = false;
+			PN->transNrEnabled--;
+			excludeTransitionFromEnabledList(PN);		// delete transition from list of enabled transtions
+		}
+		if (quasiEnabled) {  // transition was quasi enabled before
+			quasiEnabled = false;
+			PN->transNrQuasiEnabled--;
+			excludeTransitionFromQuasiEnabledList(PN);	// delete transition from list of quasi enabled transtions
+		}
+	}
+	// cout << "current marking: " << PN->printCurrentMarkingForDot() << endl;
+	// cout << "transition " << name << " is quasiEnabled: " << quasiEnabled << " and enabled: " << enabled << endl;
 }
 

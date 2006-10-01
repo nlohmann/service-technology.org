@@ -48,18 +48,16 @@ void myown_newhandler() {
 void readnet() {
     yydebug = 0;
     yy_flex_debug = 0;
-   // diagnosefilename = (char *) 0;
-    if(netfile)
-    {
+	// diagnosefilename = (char *) 0;
+    if(netfile) {
         yyin = fopen(netfile,"r");
-        if(!yyin)
-        {
+        if(!yyin) {
             cerr << "cannot open netfile: " << netfile << "\n";
             exit(4);
         }
-	trace(TRACE_1, "--------------------------------------------------------------\n");
-	trace(TRACE_1, "reading from file " + string(netfile) + "\n");
-      //  diagnosefilename = netfile;
+		trace(TRACE_1, "--------------------------------------------------------------\n");
+		trace(TRACE_1, "reading from file " + string(netfile) + "\n");
+		//  diagnosefilename = netfile;
     }
 
     PN = new oWFN();
@@ -72,11 +70,10 @@ void readnet() {
 #endif
 
     unsigned int ii;
-    for(ii = 0; ii < PN->getPlaceCnt();ii++)
-    {
+    for(ii = 0; ii < PN->getPlaceCnt();ii++) {
         PN->CurrentMarking[ii] = PN->Places[ii]->initial_marking;
         PN->Places[ii]->index = ii;
-   }
+	}
 
     PN->initialize();
 }
@@ -214,6 +211,18 @@ int main(int argc, char ** argv) {
 			trace(TRACE_0, " (including " + intToString(PN->getInputPlaceCnt()) + " input places, " + intToString(PN->getOutputPlaceCnt()) + " output places)\n");
 			trace(TRACE_0, "    transitions: " + intToString(PN->getTransitionCnt()) + "\n\n");
 		
+			
+			if (PN->FinalCondition) {
+				cout << "finalcondition given" << endl;
+			} else {
+				cout << "NO finalcondition given\n" << endl;
+			}
+			if (PN->FinalMarking) {
+				cout << "finalmarking given" << endl;
+			} else {
+				cout << "NO finalmarking given\n" << endl;
+			}
+			
 			// adjust commDepth and events_manual
 			adjustOptionValues();
 	

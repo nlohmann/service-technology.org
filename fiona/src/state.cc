@@ -26,7 +26,7 @@
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes by: \$Author: gierds $
+ *          - last changes by: \$Author: massuthe $
  *          
  * \date
  *          - created:
@@ -151,16 +151,15 @@ void State::decode(oWFN * PN) {
 			PN->CurrentMarking[currentplacenr] = cutplace;
 		}
 
-		// after decoding the new marking for a place update the final condition
-		if (PN->FinalCondition) {
-		    for(int j=0; j < PN->Places[currentplacenr] -> cardprop; j++) {
-			if (PN->Places[currentplacenr]->proposition != NULL) {
-			    PN->Places[currentplacenr]->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
-			}
-		    }
-		}
-
-
+//		// after decoding the new marking for a place update the final condition
+//		if (PN->FinalCondition) {
+//		    for(int j=0; j < PN->Places[currentplacenr]->cardprop; j++) {
+//				if (PN->Places[currentplacenr]->proposition != NULL) {
+//				    PN->Places[currentplacenr]->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
+//				}
+//		    }
+//		}
+		
 		// erster Fall: neuer Platz und neues Byte
 		if(cfirst == pfirst) {
 			if(currentplacenr == 0) {
@@ -169,7 +168,6 @@ void State::decode(oWFN * PN) {
 				PN->initializeTransitions();
 
 				trace(TRACE_5, "void State::decode(int * v, oWFN * PN):end\n");
-				
 				return;
 			}		
 			
@@ -335,14 +333,14 @@ void State::decodeShowOnly(oWFN * PN) {
 			PN->CurrentMarking[currentplacenr] = cutplace;
 		}
 
-		// after decoding the new marking for a place update the final condition
-		if (PN->FinalCondition) {
-		    for(int j=0; j < PN->Places[currentplacenr] -> cardprop; j++) {
-			if (PN->Places[currentplacenr]->proposition != NULL) {
-			    PN->Places[currentplacenr]->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
-			}
-		    }
-		}
+//		// after decoding the new marking for a place update the final condition
+//		if (PN->FinalCondition) {
+//		    for(int j=0; j < PN->Places[currentplacenr] -> cardprop; j++) {
+//				if (PN->Places[currentplacenr]->proposition != NULL) {
+//				    PN->Places[currentplacenr]->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
+//				}
+//		    }
+//		}
 
 
 		// erster Fall: neuer Platz und neues Byte

@@ -135,7 +135,7 @@ void oWFN::initialize() {
         }
   	}
   	
-	//initialize transitions
+	// initialize transitions
   	for(i = 0; i < transCnt; i++) {
 		Transitions[i]->enabled = false;
 		Transitions[i]->quasiEnabled = false;
@@ -151,7 +151,7 @@ void oWFN::initialize() {
  
 	for(int i = 0; i < transCnt; i++) {
 		Transitions[i]->check_enabled(this);
-  	}	
+  	}
   	
 //  	for(i = 0, BitVectorSize = 0; i < placeCnt; i++) {
 //        BitVectorSize += Places[i]->nrbits;
@@ -188,7 +188,7 @@ void oWFN::initialize() {
 void oWFN::initializeTransitions() {
 	unsigned int i;
 	 	
-  	for(i = 0;i < transCnt; i++) {
+  	for(i = 0; i < transCnt; i++) {
 		Transitions[i]->PrevEnabled = (i == 0 ? (owfnTransition *) 0 : Transitions[i-1]);
 		Transitions[i]->NextEnabled = (i == transCnt - 1 ? (owfnTransition *) 0 : Transitions[i+1]);
  		Transitions[i]->enabled = true;
@@ -389,7 +389,7 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 	// we do this right here, because of the decode function that might have been called already
 	// if the currentState is just the currentMarking, then we don't decode again ;-)
 	if (!isCurrentMarking && placeOutputCnt > 0) {
-		currentState->decodeShowOnly(this);	
+		currentState->decodeShowOnly(this);
 	}
 	
 	bool storeState = false;	// flag indicating whether this state shall be stored in the node or not
@@ -445,6 +445,16 @@ void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
 		CurrentMarking[i] = copy[i];
 	}	
 	
+//	// after decoding the new marking for a place update the final condition
+//	if (PN->FinalCondition) {
+//		for (int currentplacenr = 0; currentplacenr < getPlaceCnt(); currentplacenr++) {
+//		    for(int j=0; j < PN->Places[currentplacenr]->cardprop; j++) {
+//				if (PN->Places[currentplacenr]->proposition != NULL) {
+//				    PN->Places[currentplacenr]->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
+//				}
+//			}
+//		}
+//	}
 	//initializeTransitions();
 }
 
@@ -1296,6 +1306,17 @@ bool oWFN::isFinalMarking(unsigned int * marking) {
 
 bool oWFN::isFinal() {
 	if(FinalCondition) {
+		// update formula for each place
+		// TODO: update should always be done after firing (in owfnTransition::fire)
+		//                                        decoding (in State::decode and State::decodeShowOnly)
+		//                            or copying a marking (oWFN::copyCurrentMarking and oWFN::copyMarkingToCurrentMarking)
+		for (int currentplacenr = 0; currentplacenr < getPlaceCnt(); currentplacenr++) {
+		    for(int j=0; j < PN->Places[currentplacenr]->cardprop; j++) {
+				if (PN->Places[currentplacenr]->proposition != NULL) {
+				    PN->Places[currentplacenr]->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
+				}
+			}
+		}
 		return FinalCondition -> value;
 	} else {
 		return isFinalMarking(CurrentMarking);

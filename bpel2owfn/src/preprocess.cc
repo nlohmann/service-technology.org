@@ -5,16 +5,22 @@
 
 using namespace std;
 
+
+/// the "known" elements
 string keywords[] = { "assign", "case", "catch", "catchAll", "compensate", "compensationHandler", "copy", "correlation", "correlations", "correlationSet", "correlationSets", "empty", "eventHandlers", "faultHandlers", "flow", "from", "import", "invoke", "link", "links", "onAlarm", "onMessage", "otherwise", "partner", "partnerLink", "partnerLinks", "partners", "pick", "process", "receive", "reply", "scope", "sequence", "source", "switch", "target", "terminate", "throw", "to", "variable", "variables", "wait", "while", "?xml" };
+
+/// the size of keywords[]
 const unsigned int keywordCount = 44;
 
 
+// some global variables
 bool parsingBPEL = true;
 bool parsingComments = false;
 string closingTag;
 set<string> ignoredTags;
 
 
+/// converts a char to a C++ string
 string toString(char &c)
 {
   char* s = (char*)malloc(2 * sizeof(char));
@@ -24,6 +30,7 @@ string toString(char &c)
 }
 
 
+/// checks whether a given string matches with one of the known elements
 bool isKeyword(string s)
 {
   if (s == "!--")

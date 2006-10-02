@@ -21,63 +21,86 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-echo -----------------------------------------------------------
+echo
+echo ---------------------------------------------------------------------
 echo running $0
-echo -----------------------------------------------------------
-echo 
+echo
 
+#testdir=.
 DIR=$testdir/extrema
 FIONA=fiona
 
-$FIONA --net=$DIR/no_final_marking.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" > /dev/null
+#loeschen aller erzeugten Dateien im letzten Durchlauf
+rm -f $DIR/*.out
+rm -f $DIR/*.png
+
+############################################################################
+
+echo running $FIONA -n $DIR/no_final_marking.owfn -a -t OG
+$FIONA -n $DIR/no_final_marking.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result1=$?
 
-$FIONA --net=$DIR/all_final_marking.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: NO" > /dev/null
+echo running $FIONA -n $DIR/all_final_marking.owfn -a -t OG
+$FIONA -n $DIR/all_final_marking.owfn -a -t OG 2>&1 | grep "net is controllable: NO" > /dev/null
 result2=$?
 
-$FIONA --net=$DIR/no_communication.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" > /dev/null
+echo running $FIONA -n $DIR/no_communication.owfn -a -t OG
+$FIONA -n $DIR/no_communication.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result3=$?
 
-$FIONA --net=$DIR/no_initial_marking.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: NO" > /dev/null
+echo running $FIONA -n $DIR/no_initial_marking.owfn -a -t OG
+$FIONA -n $DIR/no_initial_marking.owfn -a -t OG 2>&1 | grep "net is controllable: NO" > /dev/null
 result4=$?
 
-$FIONA --net=$DIR/no_initial_marking2.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" > /dev/null
+echo running $FIONA -n $DIR/no_initial_marking2.owfn -a -t OG
+$FIONA -n $DIR/no_initial_marking2.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result5=$?
 
-$FIONA --net=$DIR/empty.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" > /dev/null
+echo running $FIONA -n $DIR/empty.owfn -a -t OG
+$FIONA -n $DIR/empty.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result6=$?
 
-$FIONA --net=$DIR/one_input.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" > /dev/null
+echo running $FIONA -n $DIR/one_input.owfn -a -t OG
+$FIONA -n $DIR/one_input.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result7=$?
 
-$FIONA --net=$DIR/one_output.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" > /dev/null
+echo running $FIONA -n $DIR/one_output.owfn -a -t OG
+$FIONA -n $DIR/one_output.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result8=$?
 
-$FIONA --net=$DIR/one_input_marked.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: NO" > /dev/null
+echo running $FIONA -n $DIR/one_input_marked.owfn -a -t OG
+$FIONA -n $DIR/one_input_marked.owfn -a -t OG 2>&1 | grep "net is controllable: NO" > /dev/null
 result9=$?
 
-$FIONA --net=$DIR/one_output_marked.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: NO" > /dev/null
+echo running $FIONA -n $DIR/one_output_marked.owfn -a -t OG
+$FIONA -n $DIR/one_output_marked.owfn -a -t OG 2>&1 | grep "net is controllable: NO" > /dev/null
 result10=$?
 
-$FIONA --net=$DIR/one_input_one_output.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" > /dev/null
+echo running $FIONA -n $DIR/one_input_one_output.owfn -a -t OG
+$FIONA -n $DIR/one_input_one_output.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result11=$?
 
-$FIONA --net=$DIR/one_input_2.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: NO" > /dev/null
+echo running $FIONA -n $DIR/one_input_2.owfn -a -t OG
+$FIONA -n $DIR/one_input_2.owfn -a -t OG 2>&1 | grep "net is controllable: NO" > /dev/null
 result12=$?
 
-$FIONA --net=$DIR/multiple_input.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" > /dev/null
+echo running $FIONA -n $DIR/multiple_input.owfn -a -t OG
+$FIONA -n $DIR/multiple_input.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result13=$?
 
-$FIONA --net=$DIR/multiple_output.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" > /dev/null
+echo running $FIONA -n $DIR/multiple_output.owfn -a -t OG
+$FIONA -n $DIR/multiple_output.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result14=$?
 
-$FIONA --net=$DIR/multiple_input_multiple_output.owfn -a --graphtype=OG 2>&1 | grep "net is controllable: YES" > /dev/null
+echo running $FIONA -n $DIR/multiple_input_multiple_output.owfn -a -t OG
+$FIONA -n $DIR/multiple_input_multiple_output.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result15=$?
 
-OUTPUT=`$FIONA --net=$DIR/multiple_input_multiple_output.owfn -a --graphtype=OG 2>&1`
-echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-result15=$?
+#OUTPUT=`$FIONA -n $DIR/multiple_input_multiple_output.owfn -a -t OG 2>&1`
+#echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+#result15=$?
 
+############################################################################
 
 if test \( $result1 -eq 0 -a $result2 -eq 0 -a $result3 -eq 0 -a \
            $result4 -eq 0 -a $result5 -eq 0 -a $result6 -eq 0 -a \
@@ -89,5 +112,11 @@ then
 else
   result=1
 fi
+
+#loeschen aller erzeugten Dateien im letzten Durchlauf
+rm -f $DIR/*.out
+rm -f $DIR/*.png
+
+echo
 
 exit $result

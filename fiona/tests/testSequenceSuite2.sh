@@ -1,3 +1,5 @@
+#! /bin/sh
+
 ############################################################################
 # Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Dennis Reinert,   #
 #                      Jan Bretschneider and Christian Gierds              #
@@ -19,6 +21,39 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-TESTS = testSequenceSuite.sh testSequenceSuite2.sh extrema.sh
+echo
+echo ---------------------------------------------------------------------
+echo running $0
+echo
 
-TESTS_ENVIRONMENT = testdir=$(top_srcdir)/tests PATH=.:../src:$$PATH
+#testdir=.
+DIR=$testdir/sequence_suite
+FIONA=fiona
+
+#loeschen aller erzeugten Dateien im letzten Durchlauf
+rm -f $DIR/*.out
+rm -f $DIR/*.png
+
+############################################################################
+
+echo running $FIONA -n $DIR/sequence5.owfn -a -b 4 -t OG
+$FIONA -n $DIR/sequence5.owfn -a -b 4 --graphtype=OG  2> /dev/null 1> /dev/null
+result5=$?
+
+############################################################################
+
+if test \( $result5 -eq 0 \) -a \
+    \( -f $DIR/sequence5.owfn.a.OG.png -a -f $DIR/sequence5.owfn.a.OG.out \)
+then
+  result=0
+else
+  result=1
+fi
+
+#loeschen aller erzeugten Dateien im letzten Durchlauf
+rm -f $DIR/*.out
+rm -f $DIR/*.png
+
+echo
+
+exit $result

@@ -40,13 +40,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/09/27 13:40:20 $
+ *          - last changed: \$Date: 2006/10/02 06:52:16 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.93 $
+ * \version \$Revision: 1.94 $
  */
 
 
@@ -419,6 +419,9 @@ class PetriNet
 
     /// remove unused status places
     void removeUnusedStatusPlaces();
+
+    /// remove transitions with empty pre or postset
+    void removeSuspiciousTransitions();
 
     /// remove dead nodes of the Petri net
     void removeDeadNodes();

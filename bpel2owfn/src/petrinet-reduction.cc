@@ -41,13 +41,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/09/29 06:29:31 $
+ *          - last changed: \$Date: 2006/10/02 06:52:16 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
  */
 
 
@@ -159,6 +159,27 @@ void PetriNet::removeUnusedStatusPlaces()
 
 
 /*!
+ * Remove transitions with empty pre or postset.
+ */
+void PetriNet::removeSuspiciousTransitions()
+{
+  list<Transition*> suspiciousTransitions;
+
+  for (set<Transition*>::iterator t = T.begin(); t != T.end(); t++)
+    if (postset(*t).empty() || preset(*t).empty())
+      suspiciousTransitions.push_back(*t);
+
+  // remove suspicious transitions
+  for (list<Transition*>::iterator t = suspiciousTransitions.begin(); t != suspiciousTransitions.end(); t++)
+    if (T.find(*t) != T.end())
+      removeTransition(*t);
+}
+
+
+
+
+
+/*!
  * Remove structural dead nodes.
  */
 void PetriNet::removeDeadNodes()
@@ -218,24 +239,23 @@ void PetriNet::removeDeadNodes()
     
 
     // remove isolated communication places
-
-    list<Place*> uselessCommunicationPlaces;
+    list<Place*> uselessInputPlaces;
 
     for (set<Place*>::iterator p = P_in.begin(); p != P_in.end(); p++)
       if (postset(*p).empty())
-	uselessCommunicationPlaces.push_back(*p);
+	uselessInputPlaces.push_back(*p);
 
-    for (list<Place*>::iterator p = uselessCommunicationPlaces.begin(); p != uselessCommunicationPlaces.end(); p++)
+    for (list<Place*>::iterator p = uselessInputPlaces.begin(); p != uselessInputPlaces.end(); p++)
       if (P_in.find(*p) != P_in.end())
 	P_in.erase(*p);
 
-    uselessCommunicationPlaces.clear();
+    list<Place*> uselessOutputPlaces;
 
     for (set<Place*>::iterator p = P_out.begin(); p != P_out.end(); p++)
       if (preset(*p).empty())
-	uselessCommunicationPlaces.push_back(*p);
+	uselessOutputPlaces.push_back(*p);
 
-    for (list<Place*>::iterator p = uselessCommunicationPlaces.begin(); p != uselessCommunicationPlaces.end(); p++)
+    for (list<Place*>::iterator p = uselessOutputPlaces.begin(); p != uselessOutputPlaces.end(); p++)
       if (P_out.find(*p) != P_out.end())
 	P_out.erase(*p);
   }
@@ -494,6 +514,7 @@ void PetriNet::simplify()
   {
     removeDeadNodes();
     removeUnusedStatusPlaces();
+    removeSuspiciousTransitions();
 
     elminiationOfIdenticalPlaces();		// RB1
     elminiationOfIdenticalTransitions();	// RB2
@@ -631,10 +652,18 @@ void PetriNet::transitiveReduction()
       transitivePlaces.insert(findPlace(*it, *it2));
   }
 
+  int actualDeleted = 0;
 
   // remove transitive places
   for (set<Place*>::iterator p = transitivePlaces.begin(); p != transitivePlaces.end(); p++)
-    removePlace(*p);
+  {
+    // only remove places that are not conflicting
+    if ( postset(*p).size() == 1 )
+    {
+      actualDeleted++;
+      removePlace(*p);
+    }
+  }
 
-  trace(TRACE_DEBUG, "[PN]\tRemoved " + toString(transitivePlaces.size()) + " transitive places\n");
+  trace(TRACE_DEBUG, "[PN]\tRemoved " + toString(actualDeleted) + " transitive places\n");
 }

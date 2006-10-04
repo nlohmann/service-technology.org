@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.7 2006-09-13 09:41:08 bretschn Exp $
+# $Id: Makefile,v 1.8 2006-10-04 11:52:15 bretschn Exp $
 #
 # Makefile for the CUDD distribution kit 
 #---------------------------------------------------------------------------
@@ -334,3 +334,29 @@ distclean:
 	sh ./shutdown.sh
 
 check:
+
+# Calling find only once while ORing the conditions would be nicer, but
+# somehow find on radon gets it wrong *shrug*
+distdir:
+	cp -pR * $(distdir)/
+	find $(distdir) -type d -name CVS -prune -exec rm -rf '{}' ';'
+	find $(distdir) -type f -name '*.o' -exec rm -rf '{}' ';'
+	find $(distdir) -type f -name '*.obj' -exec rm -rf '{}' ';'
+	find $(distdir) -type f -name '*.a' -exec rm -rf '{}' ';'
+
+
+#The following distdir target copies the necessary files only and does
+#not first copy everything and then delete the rest. Maybe this can be made to
+#work on radon some time in the future.
+#
+#COPY_CMD_FILE=copy_cudd
+#
+#distdir:
+#	find . -mindepth 1 -type d -not -name CVS -exec mkdir $(distdir)/'{}' ';'
+#	echo "#!/bin/bash" >$(COPY_CMD_FILE)
+#	find . -mindepth 1 -not -type d ! -wholename '*CVS*' -not -name '*.o' \
+#		-not -name '*.obj' -not -name '*.a' -not -wholename ./$(COPY_CMD_FILE) \
+#		-printf "cp -a %P $(distdir)/\`dirname %P\`\n" >>$(COPY_CMD_FILE)
+#	chmod u+x $(COPY_CMD_FILE)
+#	./$(COPY_CMD_FILE)
+#	$(RM) $(COPY_CMD_FILE)

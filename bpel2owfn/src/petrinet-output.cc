@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/10/04 16:37:59 $
+ *          - last changed: \$Date: 2006/10/04 17:28:03 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
  */
 
 
@@ -689,7 +689,10 @@ void PetriNet::owfnOut()
   for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); count++, p++)
   {
     (*output) << "    " << (*p)->nodeShortName();
-    (*output) << " {$ MAX_UNIQUE_EVENTS=" << postset((*p)).size() << " $}";
+    (*output) << " {$ MAX_UNIQUE_EVENTS=" << postset((*p)).size();
+    if ( (*p)->inWhile )
+      (*output) << " ON_LOOP=TRUE";
+    (*output) << " $}";
 
     if (count < P_in.size())
       (*output) << "," << endl;
@@ -703,7 +706,10 @@ void PetriNet::owfnOut()
   for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); count++, p++)
   {
     (*output) << "    " << (*p)->nodeShortName();
-    (*output) << " {$ MAX_UNIQUE_EVENTS=" << preset((*p)).size() << " $}";
+    (*output) << " {$ MAX_UNIQUE_EVENTS=" << preset((*p)).size();
+    if ( (*p)->inWhile )
+      (*output) << " ON_LOOP=TRUE";
+    (*output) << " $}";
     
     if (count < P_out.size())
       (*output) << "," << endl;

@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/09/28 15:30:50 $
+ *          - last changed: \$Date: 2006/10/04 17:28:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
  */
 
 
@@ -118,6 +118,9 @@ class ASTE
 
     /// the kind of control flow the activity is embedded in
     controlFlowType controlFlow;
+
+    /// true if activity is embedded in a while activity
+    bool inWhile;
 
     /// constructor
     ASTE(kc::impl_abstract_phylum *mynode, int mytype);

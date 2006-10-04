@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/09/27 09:23:54 $
+ *          - last changed: \$Date: 2006/10/04 17:28:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.105 $
+ * \version \$Revision: 1.106 $
  */
 %}
 
@@ -211,6 +211,7 @@ tEventHandlers:
   implicitEventHandler()
 | userDefinedEventHandler(tOnMessage_list tOnAlarm_list)
   {
+    bool inWhile = false;
     int id = 0;
     int parentScopeId;
   }
@@ -234,6 +235,7 @@ tOnMessage:
   {
     int id = 0;
     stringMap attributes;
+    bool inWhile = false;
 
     string channelName;
     string variableName;
@@ -353,6 +355,7 @@ tInvoke:
 
     int negativeControlFlow = 0;
     bool suppressJF = false;
+    bool inWhile = false;
 
     bool isSynchronousInvoke = false;
 
@@ -375,6 +378,7 @@ tReceive:
 
     int negativeControlFlow = 0;
     bool suppressJF = false;
+    bool inWhile = false;
 
     string channelName;
     string variableName;
@@ -394,6 +398,7 @@ tReply:
 
     int negativeControlFlow = 0;
     bool suppressJF = false;
+    bool inWhile = false;
 
     string channelName;
     string variableName;

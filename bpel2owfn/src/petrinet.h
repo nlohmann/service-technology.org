@@ -40,13 +40,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/10/02 06:52:16 $
+ *          - last changed: \$Date: 2006/10/04 17:28:03 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.94 $
+ * \version \$Revision: 1.95 $
  */
 
 
@@ -244,6 +244,9 @@ class Place: public Node
 
     /// the initial marking of the place
     bool marked;
+
+    /// this (communication) place is embedded in a while activity
+    bool inWhile;
 };
 
 

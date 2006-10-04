@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/09/27 09:23:55 $
+ *          - last changed: \$Date: 2006/10/04 17:28:03 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.191 $
+ * \version \$Revision: 1.192 $
  *
  */
 %}
@@ -1366,6 +1366,8 @@ This=userDefinedEventHandler(a,b) ->
 	TheNet->newArc(onMessage_p2, onMessage_t3);
 	TheNet->newArc(onMessage_t3, onMessage_p3);
 
+        if (parameters[P_CYCLICEH] && ThisBranch->inWhile)
+          TheNet->findPlace("in." + ThisBranch->channelName)->inWhile = true;
 
 
 	Transition *onMessage_t12 = TheNet->newTransition(newPrefix + "t12");
@@ -1377,7 +1379,7 @@ This=userDefinedEventHandler(a,b) ->
       	// Petri nets.
 	Transition *onMessage_t4 = TheNet->newTransition(newPrefix + "t4");
 	TheNet->newArc(onMessage_p4, onMessage_t4);
-	if (parameters[P_CYCLICEH] == true)
+	if (parameters[P_CYCLICEH])
         {
 	  TheNet->newArc(onMessage_t4, onMessage_p5); // loop
           TheNet->newArc(onMessage_p5, onMessage_t12);

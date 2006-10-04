@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/04 08:26:36 $
+ *          - last changed: \$Date: 2006/10/04 17:28:03 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.37 $
+ * \version \$Revision: 1.38 $
  *
  */
 %}
@@ -281,6 +281,10 @@ This=Invoke(a,b) provided (!This->isSynchronousInvoke) ->
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       TheNet->newArc(t1, TheNet->findPlace("out." + This->channelName));
+
+      if (parameters[P_CYCLICWHILE] && $0->inWhile)
+        TheNet->findPlace("out." + This->channelName)->inWhile = true;
+
       t1->type = OUT;
     }
     a // standardElements
@@ -313,6 +317,13 @@ This=Invoke(a,b) provided (This->isSynchronousInvoke) ->
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       t2->type = IN;
+
+      if (parameters[P_CYCLICWHILE] && $0->inWhile)
+      {
+        TheNet->findPlace("in." + This->channelName)->inWhile = true;
+        TheNet->findPlace("out." + This->channelName)->inWhile = true;
+      }
+
     }
     a // standardElements
     {
@@ -343,6 +354,9 @@ This=Receive(a,b) ->
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       t1->type = IN;
+
+      if (parameters[P_CYCLICWHILE] && $0->inWhile)
+        TheNet->findPlace("in." + This->channelName)->inWhile = true;
     }
     a // standardElements
     {
@@ -373,6 +387,9 @@ This=Reply(a,b) ->
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       t1->type = OUT;
+
+      if (parameters[P_CYCLICWHILE] && $0->inWhile)
+        TheNet->findPlace("out." + This->channelName)->inWhile = true;
     }
     a // standardElements
     {
@@ -788,6 +805,8 @@ This=Pick(a,b,c) ->
 	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
 	t1->type = IN;
 
+        if (parameters[P_CYCLICWHILE] && ThisBranch->inWhile)
+          TheNet->findPlace("in." + ThisBranch->channelName)->inWhile = true;
 
 	// Embed the inner activity.
 	TheNet->mergePlaces(This->id, ".final", innerActivity->id, ".final");

@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/09/28 08:24:45 $
+ *          - last changed: \$Date: 2006/10/04 17:28:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  */
 
 
@@ -135,6 +135,7 @@ ASTE::ASTE(kc::impl_abstract_phylum *mynode, int mytype)
   type = mytype;
   attributes = temporaryAttributeMap[id];
   suppressJF = false; // required initialization!
+  inWhile = false; // required initialization!
   controlFlow = POSITIVECF;
 }
 

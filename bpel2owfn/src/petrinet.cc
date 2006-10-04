@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/09/27 14:19:43 $
+ *          - last changed: \$Date: 2006/10/04 17:28:03 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.140 $
+ * \version \$Revision: 1.141 $
  */
 
 
@@ -171,6 +171,7 @@ Place::Place(unsigned int myid, string role, communication_type mytype)
   id = myid;
   nodeType = PLACE;
   marked = false;
+  inWhile = false;
 
   if (role != "")
     history.push_back(role);

@@ -53,7 +53,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/09/23 11:13:25 $
+ *          - last changed: \$Date: 2006/10/04 17:28:03 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
  */
 %}
 
@@ -184,6 +184,9 @@ This=Invoke(a,b) provided (!This->isSynchronousInvoke) ->
       TheNet->newArc(t2, TheNet->findPlace("out." + This->channelName));
       t2->type = OUT;
 
+      if (parameters[P_CYCLICWHILE] && $0->inWhile)
+        TheNet->findPlace("out." + This->channelName)->inWhile = true;
+
 
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
@@ -249,6 +252,11 @@ This=Invoke(a,b) provided (This->isSynchronousInvoke) ->
       TheNet->newArc(TheNet->findPlace("variable." + This->outputVariableName), t4);
       TheNet->newArc(t4, TheNet->findPlace("variable." + This->outputVariableName));
 
+      if (parameters[P_CYCLICWHILE] && $0->inWhile)
+      {
+        TheNet->findPlace("in." + This->channelName)->inWhile = true;
+        TheNet->findPlace("out." + This->channelName)->inWhile = true;
+      }
 
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
@@ -309,6 +317,9 @@ This=Receive(a,b) ->
       TheNet->newArc(TheNet->findPlace("variable." + This->variableName), t2);
       TheNet->newArc(t2, TheNet->findPlace("variable." + This->variableName));
 
+      if (parameters[P_CYCLICWHILE] && $0->inWhile)
+        TheNet->findPlace("in." + This->channelName)->inWhile = true;
+
 
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
@@ -362,6 +373,9 @@ This=Reply(a,b) ->
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       t2->type = OUT;
+
+      if (parameters[P_CYCLICWHILE] && $0->inWhile)
+        TheNet->findPlace("out." + This->channelName)->inWhile = true;
 
 
       // Transitions for the negative control flow.
@@ -1339,6 +1353,9 @@ This=Pick(a,b,c) ->
   	TheNet->newArc(t3, TheNet->findPlace("variable." + ThisBranch->variableName));
 	TheNet->newArc(p3, t3);
 	TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
+
+        if (parameters[P_CYCLICWHILE] && ThisBranch->inWhile)
+          TheNet->findPlace("in." + ThisBranch->channelName)->inWhile = true;
 
 
 	// Transitions for the negative control flow.

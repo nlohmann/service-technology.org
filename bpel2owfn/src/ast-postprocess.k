@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/09/28 15:30:50 $
+ *          - last changed: \$Date: 2006/10/04 17:28:03 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  */
 %}
 
@@ -311,6 +311,8 @@ userDefinedEventHandler(a,b) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       $0->parentScopeId = PPcurrentScope;
 
+      $0->inWhile = true;
+
       // triggers SA00083
       if (a->length() == 0 && b->length() == 0)
         SAerror(83, "", toInt(ASTEmap[parentScopeId]->attributes["referenceLine"]));
@@ -339,6 +341,8 @@ OnMessage(a) ->
       // manage identifiers
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
+
+      $0->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
 
       // annotate AST and check information
       $0->attributes = ASTEmap[myid]->getAttributes();
@@ -490,6 +494,8 @@ Invoke(a,b) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
+      $0->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
+
       // annotate AST and check information
       $0->attributes = ASTEmap[myid]->getAttributes();
       $0->isSynchronousInvoke = ($0->attributes["outputVariable"] != "");
@@ -524,6 +530,8 @@ Receive(a,b) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
+      $0->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
+
       // annotate AST and check information
       $0->attributes = ASTEmap[myid]->getAttributes();
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
@@ -555,6 +563,8 @@ Reply(a,b) ->
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
+
+      $0->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
 
       // annotate AST and check information
       $0->attributes = ASTEmap[myid]->getAttributes();
@@ -782,6 +792,8 @@ Flow(a,b,c) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
+      ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
+
       // annotate AST and check information
       $0->attributes = ASTEmap[myid]->getAttributes();
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
@@ -856,6 +868,8 @@ Switch(a,b,c=Otherwise(d)) ->
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
+
+      ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
 
       // annotate AST and check information
       $0->attributes = ASTEmap[myid]->getAttributes();
@@ -934,6 +948,8 @@ While(a,b) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
+      ASTEmap[myid]->inWhile = true;
+
       // annotate AST and check information
       $0->attributes = ASTEmap[myid]->getAttributes();
       $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
@@ -973,6 +989,8 @@ Sequence(a,b) ->
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
+
+      ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
 
       // annotate AST and check information
       $0->attributes = ASTEmap[myid]->getAttributes();
@@ -1019,6 +1037,8 @@ Pick(a,b,c) ->
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
+
+      ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
 
       // annotate AST and check information
       $0->attributes = ASTEmap[myid]->getAttributes();
@@ -1078,6 +1098,8 @@ Scope(a,b,c,d,e,f,g) ->
       $0->parentScopeId = PPcurrentScope;
       PPcurrentScope = myid;
       a->parentId = myid;
+
+      ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
 
       // annotate AST and check information
       $0->attributes = ASTEmap[myid]->getAttributes();

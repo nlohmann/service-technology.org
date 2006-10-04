@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/10/04 09:23:08 $
+ *          - last changed: \$Date: 2006/10/04 16:37:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.97 $
+ * \version \$Revision: 1.98 $
  *
  */
 
@@ -115,7 +115,11 @@ int main( int argc, char *argv[])
 {
   // generate the invocation string
   for (int i = 0; i < argc; i++)
-    invocation += (string(argv[i]) + " ");
+  {
+    invocation += string(argv[i]);
+    if (i != (argc-1))
+      invocation += " ";
+  }
 
 //  try
 //  {

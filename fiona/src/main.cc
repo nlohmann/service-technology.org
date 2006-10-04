@@ -211,18 +211,17 @@ int main(int argc, char ** argv) {
 			trace(TRACE_0, " (including " + intToString(PN->getInputPlaceCnt()) + " input places, " + intToString(PN->getOutputPlaceCnt()) + " output places)\n");
 			trace(TRACE_0, "    transitions: " + intToString(PN->getTransitionCnt()) + "\n\n");
 		
-			
-			if (PN->FinalCondition) {
-				cout << "finalcondition given" << endl;
-			} else {
-				cout << "NO finalcondition given\n" << endl;
-			}
 			if (PN->FinalMarking) {
-				cout << "finalmarking given" << endl;
+				trace(TRACE_0, "finalmarking given\n");
 			} else {
-				cout << "NO finalmarking given\n" << endl;
+				trace(TRACE_0, "NO finalmarking given\n");
 			}
-			
+			if (PN->FinalCondition) {
+				trace(TRACE_0, "finalcondition given\n\n");
+			} else {
+				trace(TRACE_0, "NO finalcondition given\n\n");
+			}
+
 			// adjust commDepth and events_manual
 			adjustOptionValues();
 	

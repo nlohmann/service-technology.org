@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/09/28 15:30:50 $
+ *          - last changed: \$Date: 2006/10/04 08:26:36 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.36 $
+ * \version \$Revision: 1.37 $
  *
  */
 %}
@@ -522,8 +522,20 @@ This=Compensate(a) ->
 This=Terminate(a) ->
   [petrinetsmall:
     {
+      string prefix = toString(This->id) + ".internal.";
       header(This->id);
+
       cerr << "the <terminate> activity cannot be modelled!" << endl;
+
+      Place *p1 = TheNet->newPlace(prefix + "initial");
+      Place *p2 = TheNet->newPlace(prefix + "final");
+
+      Transition *t1 = TheNet->newTransition(prefix + "empty");
+      TheNet->newArc(p1, t1);
+      TheNet->newArc(t1, p2);
+    }
+    a // standardElements
+    {
       footer(This->id);
     }
   ]

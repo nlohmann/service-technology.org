@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/09/29 08:42:15 $
+ *          - last changed: \$Date: 2006/10/04 08:26:36 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.219 $
+ * \version \$Revision: 1.220 $
  * 
  */
 %}
@@ -823,6 +823,7 @@ tOtherwise:
   /* If the otherwise branch is not explicitly specified, then an otherwise
      branch with an empty activity is deemed to be present. */
     {
+      cerr << "You did not specify an otherwise branch." << endl;
       // creaty empty activity with id, without links etc.
       // TODO FIX THIS BUG
       impl_standardElements_StandardElements* noLinks = StandardElements(NiltTarget_list(),NiltSource_list(), standardJoinCondition());

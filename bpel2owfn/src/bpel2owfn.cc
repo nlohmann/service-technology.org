@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/09/28 08:24:45 $
+ *          - last changed: \$Date: 2006/10/04 09:23:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.96 $
+ * \version \$Revision: 1.97 $
  *
  */
 
@@ -197,7 +197,7 @@ int main( int argc, char *argv[])
 	    assert(TheNet != NULL);
 
 	    TheProcess = NULL;
-	  }
+	  }	  
 	}
 
       }
@@ -262,6 +262,8 @@ int main( int argc, char *argv[])
  	trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
         TheNet->simplify();
       }
+
+      cerr << TheNet->information() << endl;
 
       // now the net will not change any more (hopefully...)
       TheNet->reenumerate(); 

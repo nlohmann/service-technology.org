@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/04 17:28:03 $
+ *          - last changed: \$Date: 2006/10/04 20:16:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.33 $
+ * \version \$Revision: 1.34 $
  */
 %}
 
@@ -322,12 +322,14 @@ userDefinedEventHandler(a,b) ->
       {
         assert(ASTEmap[innerActivity->id] != NULL);
         ASTEmap[innerActivity->id]->parentActivityId = myid;
+        ASTEmap[branch->id]->parentActivityId = myid;
         ASTEmap[innerActivity->id]->controlFlow = ASTEmap[myid]->controlFlow;
       }
       foreach(branch=OnAlarm(innerActivity); tOnAlarm_list b)
       {
         assert(ASTEmap[innerActivity->id] != NULL);
         ASTEmap[innerActivity->id]->parentActivityId = myid;
+        ASTEmap[branch->id]->parentActivityId = myid;
         ASTEmap[innerActivity->id]->controlFlow = ASTEmap[myid]->controlFlow;
       }
     }
@@ -342,6 +344,7 @@ OnMessage(a) ->
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
 
+      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       $0->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
 
       // annotate AST and check information
@@ -494,6 +497,7 @@ Invoke(a,b) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
+      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       $0->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
 
       // annotate AST and check information
@@ -530,6 +534,7 @@ Receive(a,b) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
+      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       $0->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
 
       // annotate AST and check information
@@ -564,6 +569,7 @@ Reply(a,b) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
+      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       $0->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
 
       // annotate AST and check information
@@ -792,6 +798,7 @@ Flow(a,b,c) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
+      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
 
       // annotate AST and check information
@@ -869,6 +876,7 @@ Switch(a,b,c=Otherwise(d)) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
+      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
 
       // annotate AST and check information
@@ -990,6 +998,7 @@ Sequence(a,b) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
+      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
 
       // annotate AST and check information
@@ -1038,6 +1047,7 @@ Pick(a,b,c) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
+      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
 
       // annotate AST and check information
@@ -1057,12 +1067,14 @@ Pick(a,b,c) ->
       {
         assert(ASTEmap[innerActivity->id] != NULL);
         ASTEmap[innerActivity->id]->parentActivityId = myid;
+        ASTEmap[branch->id]->parentActivityId = myid;
         ASTEmap[innerActivity->id]->controlFlow = ASTEmap[myid]->controlFlow;
       }
       foreach(branch=OnAlarm(innerActivity); tOnAlarm_list c)
       {
         assert(ASTEmap[innerActivity->id] != NULL);
         ASTEmap[innerActivity->id]->parentActivityId = myid;
+        ASTEmap[branch->id]->parentActivityId = myid;
         ASTEmap[innerActivity->id]->controlFlow = ASTEmap[myid]->controlFlow;
       }
     }
@@ -1099,6 +1111,7 @@ Scope(a,b,c,d,e,f,g) ->
       PPcurrentScope = myid;
       a->parentId = myid;
 
+      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
 
       // annotate AST and check information

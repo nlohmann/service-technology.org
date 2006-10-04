@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2006/09/23 20:23:04 $
+ *          - last changed: \$Date: 2006/10/04 20:16:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  */
 
 
@@ -168,12 +168,12 @@ void showLineEnvironment(int lineNumber)
     // print the erroneous line (plus/minus three more)
     for (unsigned int i=firstShowedLine; i<=firstShowedLine+(2*environment); i++)
     {
-      trace("  " + toString(i) + ": " + errorLine + "\n");
+      trace(TRACE_INFORMATION, "  " + toString(i) + ": " + errorLine + "\n");
       getline(inputFile, errorLine);
       if (inputFile.eof())
 	break;
     }
-    trace("\n");
+    trace(TRACE_INFORMATION, "\n");
     inputFile.close();
   }
 }
@@ -187,70 +187,70 @@ void showLineEnvironment(int lineNumber)
  */
 void SAerror(unsigned int code, string information, int lineNumber)
 {
-  trace("===============================================================================\n");
+  trace(TRACE_INFORMATION, "===============================================================================\n");
   switch (code)
   {
     case(23):
       {
-	trace("STATIC ANALYSIS FAULT (Code SA00023)\n\n");
-	trace("+ Problem: variable named `" + information + "' (near line " + toString(lineNumber) + ") defined twice\n\n");
+	trace(TRACE_INFORMATION, "STATIC ANALYSIS FAULT (Code SA00023)\n\n");
+	trace(TRACE_INFORMATION, "+ Problem: variable named `" + information + "' (near line " + toString(lineNumber) + ") defined twice\n\n");
 
       	showLineEnvironment(lineNumber);
 	
-	trace("+ Description: The name of a variable MUST be unique among the names of all\n");
-	trace("  variables defined within the same immediately enclosing scope.\n\n");
+	trace(TRACE_INFORMATION, "+ Description: The name of a variable MUST be unique among the names of all\n");
+	trace(TRACE_INFORMATION, "  variables defined within the same immediately enclosing scope.\n\n");
 
-        trace("For more information see Section 8.1 of the WS-BPEL 2.0 specification.\n");
+        trace(TRACE_INFORMATION, "For more information see Section 8.1 of the WS-BPEL 2.0 specification.\n");
 	break;
       }
 
     case(72):
       {
-	trace("STATIC ANALYSIS FAULT (Code SA00072)\n\n");
-	trace("+ Problem: link named `" + information + "' near line " + toString(lineNumber) + " closes a control cycle\n\n");
+	trace(TRACE_INFORMATION, "STATIC ANALYSIS FAULT (Code SA00072)\n\n");
+	trace(TRACE_INFORMATION, "+ Problem: link named `" + information + "' near line " + toString(lineNumber) + " closes a control cycle\n\n");
 
       	showLineEnvironment(lineNumber);
 
-	trace("+ Description: A <link> declared in a <flow> MUST NOT create a control cycle\n");
-        trace("  that is, the source activity must not have the target activity as a\n");
-	trace("  logically preceding activity.\n\n");
+	trace(TRACE_INFORMATION, "+ Description: A <link> declared in a <flow> MUST NOT create a control cycle\n");
+        trace(TRACE_INFORMATION, "  that is, the source activity must not have the target activity as a\n");
+	trace(TRACE_INFORMATION, "  logically preceding activity.\n\n");
 
-        trace("For more information see Section 11.6.1 of the WS-BPEL 2.0 specification.\n");
+        trace(TRACE_INFORMATION, "For more information see Section 11.6.1 of the WS-BPEL 2.0 specification.\n");
 	break;
       }
 
     case(80):
        {
-	trace("STATIC ANALYSIS FAULT (Code SA00080)\n\n");
-	trace("+ Problem: <faultHandlers> of scope define near line " + toString(lineNumber));
-	trace(" has no <catch> or\n  <catchAll> element\n\n");
+	trace(TRACE_INFORMATION, "STATIC ANALYSIS FAULT (Code SA00080)\n\n");
+	trace(TRACE_INFORMATION, "+ Problem: <faultHandlers> of scope define near line " + toString(lineNumber));
+	trace(TRACE_INFORMATION, " has no <catch> or\n  <catchAll> element\n\n");
 
 	showLineEnvironment(lineNumber);
 
-	trace("+ Description: There MUST be at least one <catch> or <catchAll> element\n");
-        trace("  within a <faultHandlers> element.\n\n");
+	trace(TRACE_INFORMATION, "+ Description: There MUST be at least one <catch> or <catchAll> element\n");
+        trace(TRACE_INFORMATION, "  within a <faultHandlers> element.\n\n");
 
-        trace("For more information see Section 12.5 of the WS-BPEL 2.0 specification.\n");
+        trace(TRACE_INFORMATION, "For more information see Section 12.5 of the WS-BPEL 2.0 specification.\n");
 	break;
        }
 
     case(83):
        {
-	trace("STATIC ANALYSIS FAULT (Code SA00083)\n\n");
-	trace("+ Problem: <eventHandlers> of scope define near line " + toString(lineNumber));
-	trace(" has no <onEvent> or\n  <onAlarm> element\n\n");
+	trace(TRACE_INFORMATION, "STATIC ANALYSIS FAULT (Code SA00083)\n\n");
+	trace(TRACE_INFORMATION, "+ Problem: <eventHandlers> of scope define near line " + toString(lineNumber));
+	trace(TRACE_INFORMATION, " has no <onEvent> or\n  <onAlarm> element\n\n");
 
 	showLineEnvironment(lineNumber);
 
-	trace("+ Description: An event handler MUST contain at least one <onEvent> or\n");
-	trace("  <onAlarm> element.\n\n");
+	trace(TRACE_INFORMATION, "+ Description: An event handler MUST contain at least one <onEvent> or\n");
+	trace(TRACE_INFORMATION, "  <onAlarm> element.\n\n");
 
-	trace("For more information see Section 12.7 of the WS-BPEL 2.0 specification.\n");
+	trace(TRACE_INFORMATION, "For more information see Section 12.7 of the WS-BPEL 2.0 specification.\n");
 	break;
        }
 
     default:
       break;
   }
-  trace("===============================================================================\n\n");
+  trace(TRACE_INFORMATION, "===============================================================================\n\n");
 }

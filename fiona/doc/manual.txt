@@ -1,0 +1,111 @@
+On the usage of ALL_OTHER_PLACES_EMPTY, ALL_OTHER_INTERNAL_PLACES_EMPTY, and
+ALL_OTHER_EXTERNAL_PLACES_EMPTY in FINALCONDITION
+============================================================================
+
+Say, you have an oWFN with many places and you want to specify in the
+FINALCONDITION of your oWFN that a state is a final state iff one certain place
+of your oWFN has exactly one token and all other places are empty. How do you
+do this? Saying
+
+    FINALCONDITION p1 = 1;
+
+is insufficient if there are other places except p1, because then the state
+p1 = 1, p2 = 1 also is a final state because it fulfills the FINALCONDITION.
+
+
+Specifying
+
+    FINALCONDITION p1 = 1 AND p2 = 0 AND p3 = 0 AND ...;
+    
+may become long and tedious to type if your oWFN has many places. Therefore the
+keyword ALL_OTHER_PLACES_EMPTY exists. Using this keyword you can now specify
+the following:
+
+    FINALCONDITION p1 = 1 AND ALL_OTHER_PLACES_EMPTY;
+    
+meaning exactly what you expect it to mean, namely the same as
+
+    FINALCONDITION p1 = 1 AND p2 = 0 and p3 = 0;
+
+if your oWFN has exactly the places p1, p2, and p3.
+
+
+If you require only the internal places of your oWFN to be empty, use the
+keyword ALL_OTHER_INTERNAL_PLACES_EMPTY. Requiring the same for the external
+places only (that are all non-internal or interface places) can be achieved
+with the keyword ALL_OTHER_EXTERNAL_PLACES_EMPTY.
+
+All three keywords can be combined at will. Saying
+
+    FINALCONDITION p1 = 1 AND ALL_OTHER_INTERNAL_PLACES_EMPTY AND
+                              ALL_OTHER_EXTERNAL_PLACES_EMPTY;
+
+is the same as
+
+    FINALCONDITION p1 = 1 AND ALL_OTHER_PLACES_EMPTY;
+
+which in turn is the same as
+
+    FINALCONDITION p1 = 1 AND ALL_OTHER_PLACES_EMPTY AND;
+                              ALL_OTHER_INTERNAL_PLACES_EMPTY AND
+                              ALL_OTHER_EXTERNAL_PLACES_EMPTY;
+
+The latter, of course, is highly redundant.
+
+
+All three keywords can only be used as the right hand side of a conjunction
+with another state predicate while the whole conjunction is then again a state
+predicate. So the rule is
+
+    statepredicate := statepredicate AND ALL_OTHER_PLACES_EMPTY
+
+The scope of ALL_OTHER_PLACES_EMPTY is the left hand side of state predicate of
+the above conjunction. All places that are not mentioned in the left hand side
+predicate are then required to be empty.
+
+For you to decide the scope of ALL_OTHER_PLACES_EMPTY, it is crucial that you
+understand all bracing and precedence rules of state predicate formulas and
+that you can construct the fully braced form of your formula in your mind!
+
+Say, you have an oWFN with places p1, p2, p3, and p4. Then the formula:
+
+    FINALCONDITION p1 = 1 AND ALL_OTHER_PLACES_EMPTY OR
+                   p2 = 1 AND ALL_OTHER_PLACES_EMPTY;
+
+expands to
+
+    FINALCONDITION (p1 = 1 AND p2 = 0 AND p3 = 0 AND p4 = 0) OR
+                   (p2 = 1 AND p1 = 0 AND p3 = 0 AND p4 = 0);
+
+because AND takes precedence over OR.
+
+In the same oWFN the formula
+
+    FINALCONDITION p1 = 1 AND ALL_OTHER_PLACES_EMPTY AND p2 = 1;
+
+expands to
+
+    FINALCONDITION p1 = 1 AND p2 = 0 AND p3 = 0 AND p4 = 0 AND p2 = 1;
+
+because AND is left associative. So the fully braced form of the original
+formula is
+
+    FINALCONDITION (((p1 = 1) AND ALL_OTHER_PLACES_EMPTY) AND (p2 = 1));
+
+Consequently (p1 = 1) is the scope of ALL_OTHER_PLACES_EMPTY. Therefore
+ALL_OTHER_PLACES_EMPTY expands to ((p2 = 0) AND (p3 = 0) AND (p4 = 0)). Putting
+it all together and removing redundant braces results in
+
+    FINALCONDITION p1 = 1 AND p2 = 0 AND p3 = 0 AND p4 = 0 AND p2 = 1;
+
+which is the formula that was stated as the expansion in the first place.
+
+As you have probably already noticed, this formula is unsatisfiable because it
+requires p2 to be empty and marked at the same time. Therefore it is
+recommended to use ALL_OTHER_PLACES_EMPTY only at the very end of an n-ary
+conjunction (or anywhere along with proper explicit bracing).
+
+The same rules, of course, apply to ALL_OTHER_INTERNAL_PLACES_EMPTY and
+ALL_OTHER_EXTERNAL_PLACES_EMPTY.
+
+Now, feel free to use and misuse these great keywords at your own private risk.

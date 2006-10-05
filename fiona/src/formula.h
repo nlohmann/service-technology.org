@@ -4,6 +4,7 @@
 #include"owfnPlace.h"
 #include"symboltab.h"
 #include<fstream>
+#include<set>
 
 #include"dimensions.h"
 
@@ -28,6 +29,7 @@ public:
   virtual void  update(unsigned int) = 0; // incremental re-calculation of partial formula
   virtual unsigned int  counttype(FType) = 0; // explore size of AND or OR chain
   virtual unsigned int  collectsubs(FType,formula **,unsigned int) = 0; //collect elements of AND or OR chain
+  virtual void collectplaces(std::set<owfnPlace*>& places) = 0; //collect all mentioned places and add them to /places/
   formula * parent;
   unsigned int parentindex; //position of this in parent's array of subformulas
   formula() : parent(NULL) {}
@@ -47,6 +49,7 @@ public:
   virtual formula * copy();
     formula *  merge();
     virtual unsigned int  collectsubs(FType,formula **,unsigned int);
+    virtual void collectplaces(std::set<owfnPlace*>& places);
     unsigned int  counttype(FType);
 };
 
@@ -63,6 +66,7 @@ public:
   bool init(unsigned int *);
     void  setstatic();
     virtual unsigned int  collectsubs(FType,formula **,unsigned int);
+    virtual void collectplaces(std::set<owfnPlace*>& places);
     unsigned int  counttype(FType);
   formula * copy();
 };
@@ -79,6 +83,7 @@ public:
     void  setstatic();
   void  update(unsigned int){}
     virtual unsigned int  collectsubs(FType,formula **,unsigned int);
+    virtual void collectplaces(std::set<owfnPlace*>& places);
     unsigned int  counttype(FType);
   formula * copy();
   bool init(unsigned int *);
@@ -92,6 +97,7 @@ public:
 	formula * posate();
 	formula * negate();
     virtual unsigned int  collectsubs(FType,formula **,unsigned int);
+    virtual void collectplaces(std::set<owfnPlace*>& places);
   void  update(unsigned int);
     unsigned int  counttype(FType);
     void  setstatic();

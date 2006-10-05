@@ -58,6 +58,30 @@ unsigned int booleanformula::collectsubs(FType ty, formula ** subs, unsigned int
 	return pos;
 }
 	
+void atomicformula::collectplaces(std::set<owfnPlace*>& places)
+{
+	places.insert(p);
+}
+
+void unarybooleanformula::collectplaces(std::set<owfnPlace*>& places)
+{
+	sub->collectplaces(places);
+}
+
+void binarybooleanformula::collectplaces(std::set<owfnPlace*>& places)
+{
+	left->collectplaces(places);
+	right->collectplaces(places);
+}
+
+void booleanformula::collectplaces(std::set<owfnPlace*>& places)
+{
+	for (size_t isub = 0; isub != cardsub; ++isub)
+	{
+		sub[isub]->collectplaces(places);
+	}
+}
+
 atomicformula::atomicformula(FType t, owfnPlace * pp, unsigned int kk) {
   unsigned int i;
   type = t;
@@ -262,6 +286,42 @@ formula * booleanformula::merge()
 	{
 		f -> sub[i] = f -> sub[i]->merge();
 	}
+
+	// order sub formulas 
+	f->firstvalid = f->cardsub;
+	unsigned int n;
+
+	n=0;
+	while(n < f->firstvalid) {
+		if(f->sub[n] -> value) {
+			formula * tmp;
+			f->firstvalid --;
+			tmp = f->sub[f->firstvalid];
+			f->sub[f->firstvalid] = f->sub[n];
+			f->sub[n] = tmp;
+			f->sub[n] -> parentindex = n;
+			f->sub[f->firstvalid] -> parentindex = f->firstvalid;
+		} else {
+			n++;
+		}
+	}
+
+	// set value of new merged formula f
+	switch(f->type) {
+	case conj:
+		if(f->firstvalid) {
+			f->value = false;
+		} else {
+			f->value = true;
+		}
+	case disj:
+		if(f->firstvalid < f->cardsub) {
+			f->value = true;
+		} else {
+			f->value = false;
+		}
+	}
+
 	return f;
 }
 		

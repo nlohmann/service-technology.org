@@ -49,6 +49,9 @@ FINALMARKING          					{ return key_finalmarking; }
 FINALCONDITION     						{ return key_finalcondition; }
 CONSUME          						{ return key_consume; }
 PRODUCE          						{ return key_produce; }
+ALL_OTHER_PLACES_EMPTY           { return key_all_other_places_empty; }
+ALL_OTHER_INTERNAL_PLACES_EMPTY  { return key_all_other_internal_places_empty; }
+ALL_OTHER_EXTERNAL_PLACES_EMPTY  { return key_all_other_external_places_empty; }
 AND		 								{ return op_and;}
 OR		 								{ return op_or;}
 NOT		 								{ return op_not;}

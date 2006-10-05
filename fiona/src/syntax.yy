@@ -40,6 +40,7 @@ extern unsigned int numberOfEvents;
 
 #include<stdio.h>
 #include<limits.h>
+#include<set>
 
 
 
@@ -85,6 +86,9 @@ placeType type = INTERNAL;		/* type of place */
 %token key_safe key_place key_internal key_input key_output
 %token key_marking key_finalmarking key_finalcondition
 %token key_transition key_consume key_produce
+%token key_all_other_places_empty
+%token key_all_other_internal_places_empty
+%token key_all_other_external_places_empty
 %token key_max_unique_events key_on_loop key_max_occurences
 %token key_true key_false lcontrol rcontrol
 %token comma colon semicolon ident number
@@ -514,6 +518,140 @@ statepredicate: lpar statepredicate rpar {
 }
 | statepredicate op_and statepredicate {
 	$$ = new binarybooleanformula(conj,$1,$3);
+}
+| statepredicate op_and key_all_other_places_empty {
+	//
+	// Warning: code duplication! Keep the rules for
+	// key_all_other_places_empty, key_all_other_internal_places_empty and
+	// key_all_other_external_places_empty in sync!
+	//
+	formula* lhs = $1;
+	set<owfnPlace*> places_in_lhs;
+	lhs->collectplaces(places_in_lhs);
+	set<owfnPlace*> all_other_places;
+	for (size_t iplace = 0; iplace != PN->getPlaceCnt(); ++iplace)
+	{
+		owfnPlace* current_place = PN->Places[iplace];
+		if (places_in_lhs.find(current_place) == places_in_lhs.end())
+		{
+			all_other_places.insert(current_place);
+		}
+	}
+
+	if (all_other_places.size() == 0)
+	{
+		$$ = $1;
+	}
+	else
+	{
+		booleanformula* rhs = new booleanformula();
+		rhs->type = conj;
+		rhs->cardsub = all_other_places.size();
+		rhs->sub = new formula*[rhs->cardsub];
+		size_t iplace = 0;
+		for (set<owfnPlace*>::const_iterator itplace = all_other_places.begin();
+			 itplace != all_other_places.end(); ++itplace)
+		{
+			rhs->sub[iplace] = new atomicformula(eq, *itplace, 0);
+            rhs->sub[iplace]->parent = rhs;
+            rhs->sub[iplace]->parentindex = iplace;
+			++iplace;
+		}
+		
+		$$ = new binarybooleanformula(conj, lhs, rhs);
+	}
+}
+| statepredicate op_and key_all_other_internal_places_empty {
+	//
+	// Warning: code duplication! Keep the rules for
+	// key_all_other_places_empty, key_all_other_internal_places_empty and
+	// key_all_other_external_places_empty in sync!
+	//
+	formula* lhs = $1;
+	set<owfnPlace*> places_in_lhs;
+	lhs->collectplaces(places_in_lhs);
+	set<owfnPlace*> all_other_internal_places;
+	for (size_t iplace = 0; iplace != PN->getPlaceCnt(); ++iplace)
+	{
+		owfnPlace* current_place = PN->Places[iplace];
+		if ((current_place->type == INTERNAL) &&
+		    (places_in_lhs.find(current_place) == places_in_lhs.end()))
+		{
+			all_other_internal_places.insert(current_place);
+		}
+	}
+
+	if (all_other_internal_places.size() == 0)
+	{
+		$$ = $1;
+	}
+	else
+	{
+		booleanformula* rhs = new booleanformula();
+		rhs->type = conj;
+		rhs->cardsub = all_other_internal_places.size();
+		rhs->sub = new formula*[rhs->cardsub];
+		size_t iplace = 0;
+		for (set<owfnPlace*>::const_iterator itplace =
+		     all_other_internal_places.begin();
+		     itplace != all_other_internal_places.end(); ++itplace)
+		{
+			rhs->sub[iplace] = new atomicformula(eq, *itplace, 0);
+            rhs->sub[iplace]->parent = rhs;
+            rhs->sub[iplace]->parentindex = iplace;
+			++iplace;
+		}
+		
+		$$ = new binarybooleanformula(conj, lhs, rhs);
+	}
+}
+| statepredicate op_and key_all_other_external_places_empty {
+	//
+	// Warning: code duplication! Keep the rules for
+	// key_all_other_places_empty, key_all_other_internal_places_empty and
+	// key_all_other_external_places_empty in sync!
+	//
+	formula* lhs = $1;
+	set<owfnPlace*> places_in_lhs;
+	lhs->collectplaces(places_in_lhs);
+	set<owfnPlace*> all_other_external_places;
+
+    // We cannot use PN->inputPlacesArray and PN->outputPlacesArray here
+    // because they are not initialized yet. They would be initialized only
+    // after PN->initialize() were called, but we cannot wait until then.
+	for (size_t iplace = 0; iplace != PN->getPlaceCnt(); ++iplace)
+	{
+		owfnPlace* current_place = PN->Places[iplace];
+		if ((current_place->type != INTERNAL) &&
+		    (places_in_lhs.find(current_place) == places_in_lhs.end()))
+		{
+			all_other_external_places.insert(current_place);
+		}
+	}
+
+	if (all_other_external_places.size() == 0)
+	{
+		$$ = $1;
+	}
+	else
+	{
+		booleanformula* rhs = new booleanformula();
+		rhs->type = conj;
+		rhs->cardsub = all_other_external_places.size();
+		rhs->sub = new formula*[rhs->cardsub];
+		size_t iplace = 0;
+		for (set<owfnPlace*>::const_iterator itplace =
+		     all_other_external_places.begin();
+		     itplace != all_other_external_places.end(); ++itplace)
+		{
+			rhs->sub[iplace] = new atomicformula(eq, *itplace, 0);
+            rhs->sub[iplace]->parent = rhs;
+            rhs->sub[iplace]->parentindex = iplace;
+			++iplace;
+		}
+		
+		$$ = new binarybooleanformula(conj, lhs, rhs);
+	}
 }
 | statepredicate op_or statepredicate {
 	$$ = new binarybooleanformula(disj,$1,$3);

@@ -76,6 +76,16 @@ void readnet() {
 	}
 
     PN->initialize();
+
+    // Initialize final condition (if present) with initial marking.
+    // Only afterwards is merging allowed, because merge requires subformulas
+    // to have sensible values.
+    if (PN->FinalCondition) {
+        PN->FinalCondition->init(PN->CurrentMarking);
+        PN->FinalCondition = PN->FinalCondition->merge();
+        PN->FinalCondition = PN->FinalCondition->posate();
+        PN->FinalCondition->setstatic();
+    }
 }
 
 

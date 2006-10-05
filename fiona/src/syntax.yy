@@ -218,14 +218,11 @@ net: key_place place_area key_marking {LocalTable = (SymbolTab *) 0;}
 
 final: key_finalmarking finalmarkinglist semicolon
 | key_finalcondition statepredicate semicolon {
-	formula * F;
-	F = $2;
-//	F = F -> posate();
-	F -> init(PN->CurrentMarking);
-	F = F -> merge();
-      F = F -> posate();
-	F -> setstatic();
-	PN -> FinalCondition = F;
+	PN->FinalCondition = $2;
+
+	// merge() and posate() can only be called on FinalCondition after the PN
+	// and the FinalCondition (in this order) have been initialized with the
+	// initial marking. This is done after parsing is complete.
 }
 ;
 

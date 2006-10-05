@@ -19,7 +19,7 @@
 class oWFN;
 class formula;
 
-enum placeType {INPUT, OUTPUT, INTERNAL, INITIAL, FINAL};	//< type of place
+enum placeType {INPUT, OUTPUT, INTERNAL};	//< type of place
 
 class owfnPlace : public Node {
 	private :

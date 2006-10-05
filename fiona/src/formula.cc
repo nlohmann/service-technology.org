@@ -220,6 +220,22 @@ formula * binarybooleanformula::merge() {
 		}
 	}
 
+	// set value of new merged formula f
+	switch(f->type) {
+	case conj:
+		if(f->firstvalid) {
+			f->value = false;
+		} else {
+			f->value = true;
+		}
+	case disj:
+		if(f->firstvalid < f->cardsub) {
+			f->value = true;
+		} else {
+			f->value = false;
+		}
+	}
+
 	return f;
 }
 		

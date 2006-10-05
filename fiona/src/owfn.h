@@ -108,7 +108,7 @@ class oWFN  {
 		void addStateToList(vertex *, State *);
 		
 
-		bool checkMessageBound(vertex *);
+		void checkMessageBound(vertex *);
 		void computeAnnotationOutput(vertex *, State *);
 		void computeAnnotationInput(vertex *, State *, unsigned int *, bool);
 		

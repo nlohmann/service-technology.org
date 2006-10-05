@@ -286,11 +286,10 @@ int communicationGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType 
 //! \param node the node for which the successor states are to be calculated
 //! \return true iff message bound violation occured
 //! \brief calculates the set of successor states in case of an input message (sending event)
+// for OG
 bool communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * node, vertex * newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : start\n");
 
-    bool messageboundviolation = false;
-    
     StateSet::iterator iter;              // iterator over the state set's elements
   	PN->setOfStatesTemp.clear();
   	PN->visitedStates.clear();
@@ -306,7 +305,7 @@ bool communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * n
 		if (options[O_MESSAGES_MAX] == true) {      // k-message-bounded set
 			if (PN->CurrentMarking[PN->Places[input]->index] == messages_manual) {
 				// adding input message to state already using full message bound
-				trace(TRACE_3, "\t\t\t\t\t message bound violation detected\n");
+				trace(TRACE_3, "\t\t\t\t\t adding input event would cause message bound violation\n");
 			    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
 				return true;
 			}
@@ -330,6 +329,7 @@ bool communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * n
 //! \param input (multi) set of input messages
 //! \param node the node for which the successor states are to be calculated
 //! \brief calculates the set of successor states in case of an input message
+// for IG
 bool communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, vertex * newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node) : start\n");
 
@@ -348,7 +348,7 @@ bool communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex 
 			for (messageMultiSet::iterator iter = input.begin(); iter != input.end(); iter++) {
 				if (PN->CurrentMarking[PN->Places[*iter]->index] == messages_manual) {
 					// adding input message to state already using full message bound
-					trace(TRACE_3, "\t\t\t\t\t message bound violation detected (sending event)");
+					trace(TRACE_3, "\t\t\t\t\t adding input event would cause message bound violation\n");
 					trace(TRACE_3, PN->Places[*iter]->name);
 				    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
 					return true;
@@ -372,10 +372,11 @@ bool communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex 
 //! \param output the output messages that are taken from the marking
 //! \param node the node for which the successor states are to be calculated
 //! \brief calculates the set of successor states in case of an output message
+// for OG
 void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex * node, vertex * newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node) : start\n");
 
-    StateSet::iterator iter;                      // iterator over the stateList's elements
+	StateSet::iterator iter;                      // iterator over the stateList's elements
   	PN->setOfStatesTemp.clear();
   	PN->visitedStates.clear();
 
@@ -399,6 +400,7 @@ void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex *
 //! \param output the output messages that are taken from the marking
 //! \param node the node for which the successor states are to be calculated
 //! \brief calculates the set of successor states in case of an output message
+// for IG
 void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node) : start\n");
 
@@ -670,8 +672,8 @@ analysisResult communicationGraph::analyseNode(vertex * node, bool finalAnalysis
 
 	trace(TRACE_5, "communicationGraph::analyseNode(vertex * node, bool finalAnalysis) : start\n");
 
-    trace(TRACE_2, "\t\t\t analysing node ");
-    trace(TRACE_2, intToString(node->getNumber()) + "...\n");
+    trace(TRACE_3, "\t\t\t analysing node ");
+    trace(TRACE_3, intToString(node->getNumber()) + "...\n");
 
     if (node->getColor() != RED) {          // red nodes stay red forever
         if (node->reachGraphStateSet.size() == 0) {
@@ -680,8 +682,8 @@ analysisResult communicationGraph::analyseNode(vertex * node, bool finalAnalysis
                 numberBlueNodes++;
             }
             node->setColor(BLUE);
-            trace(TRACE_2, "node analysed blue (empty node)");
-            trace(TRACE_2, "\t ...terminate\n");
+            trace(TRACE_3, "\t\t\t node analysed blue (empty node)");
+            trace(TRACE_3, "\t ...terminate\n");
 			trace(TRACE_5, "communicationGraph::analyseNode(vertex * node, bool finalAnalysis) : end\n");
             return TERMINATE;
         } else {

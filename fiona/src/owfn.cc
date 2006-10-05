@@ -287,10 +287,11 @@ owfnTransition ** oWFN::quasiFirelist() {
 void oWFN::addSuccStatesToList(vertex * n, State * NewState) {
 	if (NewState != NULL) {
 		
-		// test marking of current state if message bound k reached
-		if (checkMessageBound(n) == true) {
-			// bound violated
-			cout << "\t --- (in addSuccStatesToList)" << endl;
+		// test current marking if message bound k reached
+		vertexColor beforeViolationCheck = n->getColor();
+		checkMessageBound(n);
+		if (n->getColor() != beforeViolationCheck) {
+			cout << "checkMessageBound changed color for node " << n << " (addSuccStatesToList)" << endl;
 		}
 		
 		// add successors
@@ -305,11 +306,11 @@ void oWFN::addStateToList(vertex * n, State * currentState) {
 
 	currentState->decodeShowOnly(this);
 		
-	// test marking of current state if message bound k reached
-	if (checkMessageBound(n) == true) {
-		// bound violated
-		cout << "\t --- (in addStateToList)" << endl;
-	
+	// test current marking if message bound k reached
+	vertexColor beforeViolationCheck = n->getColor();
+	checkMessageBound(n);
+	if (n->getColor() != beforeViolationCheck) {
+		cout << "checkMessageBound changed color for node " << n << " (addStateToList)" << endl;
 	}
 
 	n->addState(currentState);
@@ -322,35 +323,35 @@ void oWFN::addStateToList(vertex * n, State * currentState) {
 }
 
 
-//! \fn bool oWFN::checkMessageBound(vertex * node)
+//! \fn void oWFN::checkMessageBound(vertex * node)
 //! \param node the current node
 //! \return returns true iff bound is VIOLATED
 //! \brief checks if message bound is violated by the current marking (for interface places only)
-bool oWFN::checkMessageBound(vertex * n) {
+void oWFN::checkMessageBound(vertex * n) {
 	trace(TRACE_5, "oWFN::checkMessageBound(vertex * node): start\n");
 	// test marking of current state if message bound k reached
 	if (options[O_MESSAGES_MAX] == true) {      // k-message-bounded set
 		// test input places
 		for (int i = 0; i < placeInputCnt; i++) {
 			if (CurrentMarking[inputPlacesArray[i]->index] > messages_manual) {
-				cout << "\t checkMessageBound: interface place violating message bound was found!" << endl;
+				cout << "\t checkMessageBound found violation for input place " << inputPlacesArray[i]->name << endl;
 				n->setColor(RED);
 				trace(TRACE_5, "oWFN::checkMessageBound(vertex * node): end\n");
-				return true;
+				return;
 			}
 		}
 		// test output places
 		for (int i = 0; i < placeOutputCnt; i++) {
 			if (CurrentMarking[outputPlacesArray[i]->index] > messages_manual) {
-				cout << "\t checkMessageBound: interface place violating message bound was found!" << endl;
+				cout << "\t checkMessageBound found violation for output place " << outputPlacesArray[i]->name << endl;
 				n->setColor(RED);
 				trace(TRACE_5, "oWFN::checkMessageBound(vertex * node): end\n");
-				return true;
+				return;
 			}
 		}
 	}
 	trace(TRACE_5, "oWFN::checkMessageBound(vertex * node): end\n");
-	return false;
+	return;
 }
 
 
@@ -789,21 +790,21 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 //! \fn void oWFN::calculateReachableStatesFull(vertex * listOfStates, bool minimal)
 //! \param listOfStates list containing all reachable states from the current marking (after function is done)
 //! \param minimal the current state is minimal in the vertex
-//! \brief NO REDUCTION! calculate all reachable states from the current marking and store them in the list being passed 
-//! as parameter (== vertex of communicationGraph)
+//! \brief NO REDUCTION! calculate all reachable states from the current marking
+//! and store them in the list being passed as parameter (== vertex of communicationGraph)
+// returns true iff a message violation occured -> caller shall delete current node
 void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 
 	// calculates the EG starting at the current marking
-	trace(TRACE_5, "start of function oWFN::calculateReachableStatesFull\n");
+	trace(TRACE_5, "oWFN::calculateReachableStatesFull(vertex * n, bool minimal) : start\n");
 
 	// test current marking if message bound k reached
-	if (checkMessageBound(n) == true) {
-		// bound violated
-		cout << "\t --- (in calculateReachableStatesFull, oben)" << endl;
-//		delete n;
-//		return;
+	vertexColor beforeViolationCheck = n->getColor();
+	checkMessageBound(n);
+	if (n->getColor() != beforeViolationCheck) {
+		cout << "checkMessageBound changed color for node " << n << " (calculateReachableStatesFull)" << endl;
 	}
-
+	
 	State * CurrentState;
   	State * NewState;
   	stateType type;
@@ -822,140 +823,142 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 			CurrentState->decodeShowOnly(PN);
 			addSuccStatesToList(n, CurrentState);
 		}
-		trace(TRACE_5, "end of function oWFN::calculateReachableStatesFull (root marking of EG already in bintree; states copied only)\n");
+		trace(TRACE_5, "oWFN::calculateReachableStatesFull(vertex * n, bool minimal) : end (root marking of EG already in bintree; states copied only)\n");
 		return;
-	}
+	} else {
 	
-	// the other case:
-	// we have a marking which has not yet a state object assigned to it
-	ASSERT(CurrentState == NULL);
+		// the other case:
+		// we have a marking which has not yet a state object assigned to it
+		
+		CurrentState = binInsert(this);
 	
-	CurrentState = binInsert(this);
-
-	CurrentState->firelist = firelist();
-	CurrentState->CardFireList = CardFireList;
-
-	if (parameters[P_IG]) {
-	    if (CurrentState->quasiFirelist) {
-			delete [] CurrentState->quasiFirelist;
-			CurrentState->quasiFirelist = NULL;
-	    }
-  	    CurrentState->quasiFirelist = quasiFirelist();
-	}
-
-	CurrentState->current = 0;
-	CurrentState->parent = (State *) 0;
-	ASSERT(CurrentState->succ == NULL);
-	CurrentState->succ = new State * [CardFireList+1];
-	for (size_t istate = 0; istate != CardFireList+1; ++istate)
-	{
-		CurrentState->succ[istate] = NULL;
-	}
-	CurrentState->placeHashValue = placeHashValue;
-	CurrentState->type = typeOfState();
+		CurrentState->firelist = firelist();
+		CurrentState->CardFireList = CardFireList;
 	
-	n->addState(CurrentState);
-	
-	// building EG in a node
-  	while(CurrentState) {
- 
-		if ((n->reachGraphStateSet.size() % 1000) == 0) {
-			trace(TRACE_2, "\t current state count: " + intToString(n->reachGraphStateSet.size()) + "\n");
+		if (parameters[P_IG]) {
+		    if (CurrentState->quasiFirelist) {
+				delete [] CurrentState->quasiFirelist;
+				CurrentState->quasiFirelist = NULL;
+		    }
+	  	    CurrentState->quasiFirelist = quasiFirelist();
 		}
-	  	
-		// no more transition to fire from current state?
-		if (CurrentState->current < CurrentState->CardFireList) {
-			// there is a next state that needs to be explored
-
-			if (tempCurrentMarking) {
-				delete[] tempCurrentMarking;
-				tempCurrentMarking = NULL;
+	
+		CurrentState->current = 0;
+		CurrentState->parent = (State *) 0;
+		ASSERT(CurrentState->succ == NULL);
+	
+		CurrentState->succ = new State * [CardFireList+1];
+		for (size_t istate = 0; istate != CardFireList+1; ++istate)
+		{
+			CurrentState->succ[istate] = NULL;
+		}
+		
+		CurrentState->placeHashValue = placeHashValue;
+		CurrentState->type = typeOfState();
+		n->addState(CurrentState);
+		
+		// building EG in a node
+	  	while(CurrentState) {
+	 
+			if ((n->reachGraphStateSet.size() % 1000) == 0) {
+				trace(TRACE_2, "\t current state count: " + intToString(n->reachGraphStateSet.size()) + "\n");
 			}
-			
-			tempCurrentMarking = copyCurrentMarking();
-			tempPlaceHashValue = placeHashValue;
-			  		
-			// fire and reach next state
-			CurrentState->firelist[CurrentState->current]->fire(this);
-			minimal = isMinimal();
-			NewState = binSearch(this);
-			
-	  		if(NewState != NULL) {
-		  		// Current marking already in bintree 
-				trace(TRACE_5, "Current marking already in bintree \n");
-				if (n->addState(NewState)) {
-					addSuccStatesToList(n, NewState);
-				}
-				
-				copyMarkingToCurrentMarking(tempCurrentMarking);
-				
-				CurrentState->firelist[CurrentState->current]->backfire(this);
-				
-				placeHashValue = tempPlaceHashValue;
-				
-				delete[] tempCurrentMarking;
-				tempCurrentMarking = NULL;
-									
-				ASSERT(CurrentState->succ[CurrentState->current] == NULL);
-		   		CurrentState->succ[CurrentState->current] = NewState;
-	     		(CurrentState->current)++;
-	    	} else {
-				trace(TRACE_5, "Current marking new\n");
-      			NewState = binInsert(this);
-      			NewState->firelist = firelist();
-	      		NewState->CardFireList = CardFireList;
-	      		if (parameters[P_IG]) {
-				    if (NewState->quasiFirelist) {
-						delete [] NewState->quasiFirelist;
-						NewState->quasiFirelist = NULL;
-				    }
-				    NewState->quasiFirelist = quasiFirelist();
-	      		}
-	      		NewState->current = 0;
-	      		NewState->parent = CurrentState;
-				ASSERT(NewState->succ == NULL);
-	      		NewState->succ =  new State * [CardFireList+1];
-				for (size_t istate = 0; istate != CardFireList+1; ++istate)
-				{
-					NewState->succ[istate] = NULL;
-				}
-	      		NewState->placeHashValue = placeHashValue;
-	      		NewState->type = typeOfState();
-	      		
-				ASSERT(CurrentState->succ[CurrentState -> current] == NULL);
-	      		CurrentState->succ[CurrentState -> current] = NewState;
-	      		CurrentState = NewState;
-		      		
-				// test marking of current state if message bound k reached
-				if (checkMessageBound(n) == true) {
-					// bound violated
-					cout << "\t --- (in calculateReachableStatesFull, unten)" << endl;
-					
-				}
-
-				n->addState(NewState);
-				
+		  	
+			// no more transition to fire from current state?
+			if (CurrentState->current < CurrentState->CardFireList) {
+				// there is a next state that needs to be explored
+	
 				if (tempCurrentMarking) {
 					delete[] tempCurrentMarking;
 					tempCurrentMarking = NULL;
 				}
-	    	}
-		// no more transition to fire
-		} else {
-	  		// close state and return to previous state
-			trace(TRACE_5, "close state and return to previous state\n");
-	  		CurrentState = CurrentState->parent;
-
-	  		if(CurrentState) {			// there is a father to further examine
-	      		CurrentState->decode(this);
-	      		CurrentState->current++;
-	    	}
+				
+				tempCurrentMarking = copyCurrentMarking();
+				tempPlaceHashValue = placeHashValue;
+				  		
+				// fire and reach next state
+				CurrentState->firelist[CurrentState->current]->fire(this);
+				minimal = isMinimal();
+				NewState = binSearch(this);
+				
+		  		if(NewState != NULL) {
+			  		// Current marking already in bintree 
+					trace(TRACE_5, "Current marking already in bintree \n");
+					if (n->addState(NewState)) {
+						addSuccStatesToList(n, NewState);
+					}
+					
+					copyMarkingToCurrentMarking(tempCurrentMarking);
+					
+					CurrentState->firelist[CurrentState->current]->backfire(this);
+					
+					placeHashValue = tempPlaceHashValue;
+					
+					delete[] tempCurrentMarking;
+					tempCurrentMarking = NULL;
+										
+					ASSERT(CurrentState->succ[CurrentState->current] == NULL);
+			   		CurrentState->succ[CurrentState->current] = NewState;
+		     		(CurrentState->current)++;
+		    	} else {
+					trace(TRACE_5, "Current marking new\n");
+	      			NewState = binInsert(this);
+	      			NewState->firelist = firelist();
+		      		NewState->CardFireList = CardFireList;
+		      		if (parameters[P_IG]) {
+					    if (NewState->quasiFirelist) {
+							delete [] NewState->quasiFirelist;
+							NewState->quasiFirelist = NULL;
+					    }
+					    NewState->quasiFirelist = quasiFirelist();
+		      		}
+		      		NewState->current = 0;
+		      		NewState->parent = CurrentState;
+					ASSERT(NewState->succ == NULL);
+		      		NewState->succ =  new State * [CardFireList+1];
+					for (size_t istate = 0; istate != CardFireList+1; ++istate)
+					{
+						NewState->succ[istate] = NULL;
+					}
+		      		NewState->placeHashValue = placeHashValue;
+		      		NewState->type = typeOfState();
+		      		
+					ASSERT(CurrentState->succ[CurrentState -> current] == NULL);
+		      		CurrentState->succ[CurrentState -> current] = NewState;
+		      		CurrentState = NewState;
+			      		
+					// test current marking if message bound k reached
+					vertexColor beforeViolationCheck = n->getColor();
+					checkMessageBound(n);
+					if (n->getColor() != beforeViolationCheck) {
+						cout << "checkMessageBound changed color for node " << n << " (calculateReachableStatesFull, unten)" << endl;
+					}
+	
+					n->addState(NewState);
+					
+					if (tempCurrentMarking) {
+						delete[] tempCurrentMarking;
+						tempCurrentMarking = NULL;
+					}
+		    	}
+			// no more transition to fire
+			} else {
+		  		// close state and return to previous state
+				trace(TRACE_5, "close state and return to previous state\n");
+		  		CurrentState = CurrentState->parent;
+	
+		  		if(CurrentState) {			// there is a father to further examine
+		      		CurrentState->decode(this);
+		      		CurrentState->current++;
+		    	}
+			}
 		}
+		if (tempCurrentMarking) {
+			delete[] tempCurrentMarking;	
+		}
+		trace(TRACE_5, "oWFN::calculateReachableStatesFull(vertex * n, bool minimal) : end\n");
+		return;
 	}
-	if (tempCurrentMarking) {
-		delete[] tempCurrentMarking;	
-	}
-	trace(TRACE_5, "end of function oWFN::calculateReachableStatesFull\n");
 }
 
 
@@ -1277,15 +1280,17 @@ void oWFN::deleteTransition(owfnTransition * transition) {
 //! \fn stateType oWFN::typeOfState()
 //! \brief returns true, if current state is transient; that means the number of enabled transitions is > 0
 stateType oWFN::typeOfState() {
+	trace(TRACE_5, "oWFN::typeOfState() : start\n");
 	if (isFinal()) {			// state is final
 		return FINALSTATE;
-	} 
+	}
 	if (transNrEnabled == 0) {
 		return DEADLOCK;		// state is an internal deadlock, no transition is enabled or quasi-enabled
 	} else if (transNrEnabled != 0) {
 		return TRANS;		// state is transient since there are transitions which are enabled
 	}
-	return NN;			
+	return NN;
+	trace(TRACE_5, "oWFN::typeOfState() : end\n");	
 }
 
 //! \fn bool oWFN::isMinimal()
@@ -1326,6 +1331,7 @@ bool oWFN::isMaximal() {
 
 
 bool oWFN::isFinal() {
+	trace(TRACE_5, "oWFN::bool oWFN::isFinal() : start\n");
 	if(FinalCondition) {
 		// update formula for each place
 		// TODO: update should always be done after firing (in owfnTransition::fire)
@@ -1340,7 +1346,6 @@ bool oWFN::isFinal() {
 		}
 		return FinalCondition -> value;
 	} else {
-//		return isFinalMarking(CurrentMarking);
 		for (int i = 0; i < getPlaceCnt(); i++) {
 			if (Places[i]->type != INTERNAL && CurrentMarking[i] > 0) {
 				return false;
@@ -1352,6 +1357,7 @@ bool oWFN::isFinal() {
 		}
 		return true;
 	}
+	trace(TRACE_5, "oWFN::bool oWFN::isFinal() : end\n");
 }
 
 

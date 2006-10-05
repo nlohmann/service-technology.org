@@ -35,21 +35,31 @@ operatingGuidelines::~operatingGuidelines() {
 //! \brief builds up the graph recursively
 void operatingGuidelines::buildGraph(vertex * currentNode) {
 
+	string color = "";
+	
 	actualDepth++;
 
 	trace(TRACE_1, "\n=================================================================\n");
 	trace(TRACE_1, "\t current node: ");
 	trace(TRACE_1, intToString(currentNode->getNumber()) + ", \t current depth: " + intToString(actualDepth) + "\n");
+	if (debug_level >= TRACE_2) {
+		cout << "\t (" << currentNode << ")" << endl;
+	}
 
-	trace(TRACE_3, "\t number of states in node: ");
-	trace(TRACE_3, intToString(currentNode->reachGraphStateSet.size()) + "\n");
+	trace(TRACE_2, "\t number of states in node: ");
+	trace(TRACE_2, intToString(currentNode->reachGraphStateSet.size()) + "\n");
+
+	if (currentNode->getColor() == RED) {
+		// this may happen due to a message bound violation
+		trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color RED\n");
+		trace(TRACE_1, "=================================================================\n");
+		return;
+	}
 
 	// get the annotation of the node (CNF)
 	computeCNF(currentNode);					// calculate CNF of this node
 
 	if (terminateBuildingGraph(currentNode)) {
-		string color;
-		
 		if (currentNode->getColor() == RED) {
 			color = "RED";
 		} else if (currentNode->getColor() == BLUE) {
@@ -57,20 +67,22 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 		} else {
 			color = "BLACK";
 		}
+		trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + " (leaf)\n");		
 
-		trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + " (leaf)\n");		
-		
+		trace(TRACE_1, "=================================================================\n");		
 		return;
 	}
 	
+	trace(TRACE_1, "=================================================================\n");
+
 	int i = 0;
 		
 	trace(TRACE_5, "iterating over inputSet\n");
 	// iterate over all elements of inputSet
 	while (i < PN->placeInputCnt) { 
 
-		trace(TRACE_3, "\t\t\t\t    sending event: !");
-		trace(TRACE_3, string(PN->inputPlacesArray[i]->name) + "\n");
+		trace(TRACE_2, "\t\t\t\t    sending event: !");
+		trace(TRACE_2, string(PN->inputPlacesArray[i]->name) + "\n");
 		
 		if (currentNode->eventsUsed[i] < PN->inputPlacesArray[i]->max_occurence){
 			
@@ -83,15 +95,13 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 			calculateSuccStatesInput(PN->inputPlacesArray[i]->index, currentNode, v);
 
 			if (messageboundviolation) {
-				trace(TRACE_3, "\t\t\t\t\t message bound violation detected (sending event ");
-				trace(TRACE_3, PN->inputPlacesArray[i]->name);
-				trace(TRACE_3, ", node " + intToString(currentNode->getNumber()) + ")\n");
+				trace(TRACE_2, "\t\t\t\t    sending event: !");
+				trace(TRACE_2, PN->inputPlacesArray[i]->name);
+				trace(TRACE_2, " at node " + intToString(currentNode->getNumber()) + " suppressed\n");
 				
 				delete v;
 			} else {
 
-				trace(TRACE_5, "calculating successor states succeeded\n");
-	
 				if (AddVertex (v, i, sending)) {
 					
 					buildGraph(v);				// going down with sending event...
@@ -104,6 +114,10 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 					actualDepth--;
 				}
 			}
+		} else {
+			trace(TRACE_2, "\t\t\t\t    sending event: !");
+			trace(TRACE_2, string(PN->inputPlacesArray[i]->name));
+			trace(TRACE_2, " suppressed (max_occurence reached)\n");
 		}
 		i++;
 	}
@@ -114,27 +128,22 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	// iterate over all elements of outputSet
 	while (i < PN->placeOutputCnt) { 
 
-		trace(TRACE_3, "\t\t\t\t  receiving event: ?");
-		trace(TRACE_3, string(PN->outputPlacesArray[i]->name) + "\n");
+		trace(TRACE_2, "\t\t\t\t  receiving event: ?");
+		trace(TRACE_2, string(PN->outputPlacesArray[i]->name) + "\n");
 	    
 		if (currentNode->eventsUsed[i + PN->placeInputCnt] < PN->outputPlacesArray[i]->max_occurence) {
 				
 			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
 			currentVertex = currentNode;
 			
-			trace(TRACE_5, "calculating successor states\n");
 			calculateSuccStatesOutput(PN->outputPlacesArray[i]->index, currentNode, v);
-			trace(TRACE_5, "calculating successor states succeeded\n");
 			
 			if (AddVertex (v, i, receiving)) {
 
 				buildGraph(v);				// going down with receiving event...
 
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
-
 				analyseNode(currentNode, false);
-				trace(TRACE_5, "node analysed\n");
-
 				actualDepth--;
 			}
 		} 
@@ -143,8 +152,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 
 	trace(TRACE_2, "\t\t\t\t no events left...\n");
 	analyseNode(currentNode, true);
-	
-	string color;
+
 	if (currentNode->getColor() == RED) {
 		color = "RED";
 	} else if (currentNode->getColor() == BLUE) {
@@ -154,7 +162,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 		color = "BLACK";
 	}
 
-	trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + "\n");
+	trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + "\n");
 
 /*
 	if (options[O_BDD] == true){

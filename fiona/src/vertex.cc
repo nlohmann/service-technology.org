@@ -251,20 +251,20 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
 
     trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : start\n");
     
-    trace(TRACE_2, "\t\t\t analysing node ");
+    trace(TRACE_3, "\t\t\t analysing node ");
 
     if (finalAnalysis) {
-    	trace(TRACE_2, "(final analysis) ");	//debug 2
+    	trace(TRACE_3, "(final analysis) ");	//debug 2
     }
 
-    trace(TRACE_2, intToString(numberOfVertex) + ": ");
+    trace(TRACE_3, intToString(numberOfVertex) + ": ");
 
     if (color != RED) {          // red nodes stay red forever
         if (reachGraphStateSet.size() == 0) {
             // we analyse an empty node; it becomes blue
             color = BLUE;
-            trace(TRACE_2, "node analysed blue (empty node)");
-            trace(TRACE_2, "\t ...terminate\n");
+            trace(TRACE_3, "\t\t\t node analysed blue (empty node)");
+            trace(TRACE_3, "\t ...terminate\n");
             trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
             return TERMINATE;
         } else {
@@ -292,16 +292,16 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
                     case RED:   // found a red clause; so node becomes red
                         if (color == BLACK) {
                             // node was black
-                            trace(TRACE_2, "node analysed red \t");
+                            trace(TRACE_3, "node analysed red \t");
                             color = RED;
                         } else if (color == RED) {
                             // this should not be the case!
-                            trace(TRACE_2, "analyseNode called when node already red!!!");
+                            trace(TRACE_3, "analyseNode called when node already red!!!");
                         } else if (color == BLUE) {
                             // this should not be the case!
-                            trace(TRACE_2, "analyseNode called when node already blue!!!");
+                            trace(TRACE_3, "analyseNode called when node already blue!!!");
                         }
-                        trace(TRACE_2, "\t\t ...terminate\n");
+                        trace(TRACE_3, "\t\t ...terminate\n");
                         color = RED;
                         trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
                         return TERMINATE;
@@ -312,13 +312,13 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
                     case BLACK: // no definite result of state analysis
                         if (finalAnalysis) {
                             color = RED;
-                            trace(TRACE_2, "node analysed red (final analysis)");
-                            trace(TRACE_2, "\t ...terminate\n");
+                            trace(TRACE_3, "node analysed red (final analysis)");
+                            trace(TRACE_3, "\t ...terminate\n");
                             trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
                             return TERMINATE;           // <---------------------???
                         } else {
                             color = BLACK;
-                            trace(TRACE_2, "node still indefinite \t\t ...continue\n");
+                            trace(TRACE_3, "node still indefinite \t\t ...continue\n");
                             trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
                             return CONTINUE;
                         }
@@ -327,7 +327,7 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
                 } else {
                     // still events left to resolve deadlocks...
                     color = BLACK;
-                    trace(TRACE_2, "node still indefinite \t\t ...continue\n");
+                    trace(TRACE_3, "node still indefinite \t\t ...continue\n");
                     trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
                     return CONTINUE;
                 }
@@ -336,27 +336,27 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
             }
 
             // all clauses considered
-            trace(TRACE_2, "all states checked, node becomes ");
+            trace(TRACE_3, "all states checked, node becomes ");
             if (c == BLACK && finalState) {
             	c = BLUE;
-                trace(TRACE_2, "blue");
+                trace(TRACE_3, "blue");
             } else if (c == BLACK && !finalState && finalAnalysis) {
             	c = RED;
-                trace(TRACE_2, "red");
+                trace(TRACE_3, "red");
             } else if (c == RED) {
-                trace(TRACE_2, "red");
+                trace(TRACE_3, "red");
             } else if (c == BLUE) {
-                trace(TRACE_2, "blue");
+                trace(TRACE_3, "blue");
             }
             
             color = c;
             
             if (finalState) {
-                trace(TRACE_2, " ...terminate\n");
+                trace(TRACE_3, " ...terminate\n");
                 trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
                 return TERMINATE;
             } else {
-                trace(TRACE_2, " ...continue\n");
+                trace(TRACE_3, " ...continue\n");
                 trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
                 return CONTINUE;
             }

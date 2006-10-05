@@ -36,6 +36,8 @@ unsigned int NonEmptyHash;
 unsigned int numberOfDecodes;
 unsigned int numberDeletedVertices;
 
+unsigned int numberOfEvents;
+
 inline void garbagecollection() {
 }
 
@@ -98,13 +100,14 @@ int yywrap() {
 void adjustOptionValues() {
 	if (options[O_COMM_DEPTH] == true) {
 		// adjusting commDepth if dominated by events
-		if (commDepth_manual > events_manual * (PN->placeInputCnt + PN->placeOutputCnt)) {
+		if (commDepth_manual > numberOfEvents) {
 			trace(TRACE_1, "manual commDepth is set too high ... adjusting it\n");
-			PN->commDepth = events_manual * (PN->placeInputCnt + PN->placeOutputCnt);
+			PN->commDepth = numberOfEvents;
 		} else {
 			PN->commDepth = commDepth_manual;
 		}
 
+		/*
 		// adjusting events if dominated by commDepth
 		if (options[O_EVENT_USE_MAX] == true) {
 			if (PN->getCommDepth() < events_manual) {
@@ -112,20 +115,20 @@ void adjustOptionValues() {
 			    events_manual = PN->commDepth;
 			}
 		}
+		*/
 	} else {
 		// compute commDepth if not specified by -c option
 		trace(TRACE_1, "standard commDepth too high ... adjusting it\n");
-		if (PN->commDepth > events_manual * (PN->placeInputCnt + PN->placeOutputCnt)) {
-			PN->commDepth = events_manual * (PN->placeInputCnt + PN->placeOutputCnt);
+		if (PN->commDepth > numberOfEvents) {
+			PN->commDepth = numberOfEvents;
 		}
 	}
-
 	// report ...
 	trace(TRACE_0, "communication depth: " + intToString(PN->getCommDepth()) + "\n");
 	if (options[O_MESSAGES_MAX] == true) {
 		trace(TRACE_0, "interface message bound set to: " + intToString(messages_manual) +"\n");
 	}
-	trace(TRACE_0, "considering each event max. " + intToString(events_manual) + " times\n\n");
+	trace(TRACE_0, "considering max. " + intToString(numberOfEvents) + " events at all\n\n");
 	
 	options[O_EVENT_USE_MAX] = true;	
 }
@@ -157,6 +160,8 @@ int main(int argc, char ** argv) {
 			State::card = 0;          // number of states
 	
 			numberDeletedVertices = 0;
+
+			numberOfEvents = 0;
 	
 			// prepare getting the net
 			try {

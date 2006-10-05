@@ -72,7 +72,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 		trace(TRACE_3, "\t\t\t\t    sending event: !");
 		trace(TRACE_3, string(PN->inputPlacesArray[i]->name) + "\n");
 		
-		if (currentNode->eventsUsed[i] < events_manual){
+		if (currentNode->eventsUsed[i] < PN->inputPlacesArray[i]->max_occurence){
 			
 			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
 			currentVertex = currentNode;
@@ -117,7 +117,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 		trace(TRACE_3, "\t\t\t\t  receiving event: ?");
 		trace(TRACE_3, string(PN->outputPlacesArray[i]->name) + "\n");
 	    
-		if (currentNode->eventsUsed[i + PN->placeInputCnt] < events_manual) {
+		if (currentNode->eventsUsed[i + PN->placeInputCnt] < PN->outputPlacesArray[i]->max_occurence) {
 				
 			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
 			currentVertex = currentNode;

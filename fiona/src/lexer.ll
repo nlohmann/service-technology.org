@@ -8,7 +8,6 @@
 
 %s COMMENT
 
-
 %{
 // c-code (wird übernommen)
 
@@ -26,9 +25,18 @@ void setlval();
 %%
  /* RULES */
 
+"{$"		{ return lcontrol; }
+"$}"		{ return rcontrol; }
+
 "{"            { BEGIN(COMMENT); }
 <COMMENT>"}"   { BEGIN(INITIAL); }
 <COMMENT>[^}]* {}
+
+MAX_UNIQUE_EVENTS		{ return key_max_unique_events; }
+ON_LOOP				{ return key_on_loop; }
+MAX_OCCURENCES			{ return key_max_occurences; }
+TRUE				{ return key_true; }
+FALSE				{ return key_false; }
 
 SAFE             						{ return key_safe;}
 PLACE            						{ return key_place; }
@@ -57,7 +65,7 @@ NOT		 								{ return op_not;}
 \(		 								{ return lpar;}
 \)		 								{ return rpar;}
 [0-9][0-9]*     						{ setlval(); return number; }
-[^,;:()\t \n\r\{\}][^,;:()\t \n\r\{\}]*		{ setlval(); return ident; }
+[^,;:()\t \n\r\{\}=][^,;:()\t \n\r\{\}=]*		{ setlval(); return ident; }
 [\n\r]            						{ break; }
 [ \t]           						{ break; }
 .										{ yyerror("lexical error"); }

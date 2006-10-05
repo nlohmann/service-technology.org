@@ -22,6 +22,8 @@ extern int yylex();
 // defined in "debug.h"
 extern int yyerror(const char *);
 
+extern unsigned int numberOfEvents;
+
 //using namespace std;
 
 #include "mynew.h"
@@ -37,6 +39,7 @@ extern int yyerror(const char *);
 
 #include<stdio.h>
 #include<limits.h>
+
 
 
 /* list of places and multiplicities to become arcs */
@@ -81,6 +84,8 @@ placeType type = INTERNAL;		/* type of place */
 %token key_safe key_place key_internal key_input key_output
 %token key_marking key_finalmarking key_finalcondition
 %token key_transition key_consume key_produce
+%token key_max_unique_events key_on_loop key_max_occurences
+%token key_true key_false lcontrol rcontrol
 %token comma colon semicolon ident number
 %token op_and op_or op_not op_gt op_lt op_ge op_le op_eq op_ne lpar rpar
 
@@ -275,14 +280,42 @@ place: nodeident {
 	P->capacity = CurrentCapacity;
 	P->nrbits = CurrentCapacity > 0 ? logzwo(CurrentCapacity) : 32;
 	free($1);
-}
+	if (type == INPUT || type == OUTPUT) {
+	    numberOfEvents++;
+	}
+    }
+    controlcommands
 ;
 
 nodeident: ident { $$ = $1;}
 | number  {$$ = $1; }
 ;
 
-markinglist: 
+controlcommands:
+  /* emtpy */
+| lcontrol commands rcontrol
+;
+
+commands:
+  /* empty */
+| key_max_unique_events op_eq number commands
+    {
+    }
+| key_on_loop op_eq key_true commands
+    {
+    }
+| key_on_loop op_eq key_false commands
+    {
+    }
+| key_max_occurences op_eq number commands
+    {
+	sscanf($3, "%u", &(PS->place->max_occurence));
+	numberOfEvents += PS->place->max_occurence - 1;
+    }
+;
+
+markinglist:
+  /* empty */ 
 | marking
 | markinglist comma marking
 ;

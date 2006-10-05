@@ -221,6 +221,7 @@ final: key_finalmarking finalmarkinglist semicolon
 	formula * F;
 	F = $2;
 //	F = F -> posate();
+	F -> init(PN->CurrentMarking);
 	F = F -> merge();
       F = F -> posate();
 	F -> setstatic();

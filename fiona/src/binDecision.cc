@@ -26,7 +26,7 @@
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes of: \$Author: bretschn $
+ *          - last changes of: \$Author: massuthe $
  *          
  * \date
  *          - created:
@@ -111,7 +111,7 @@ int logzwo(int m) {
 	return k;
 }
 
-State * binInsert(binDecision ** Bucket, oWFN * PN);
+//State * binInsert(binDecision ** Bucket, oWFN * PN);
 
 State * binInsert(oWFN * PN) {
 
@@ -277,7 +277,7 @@ void binDeleteAll(oWFN * PN, int h) {
 	PN->binHashTable[h] = (binDecision *) 0;
 }
 
-State * binSearch(binDecision * Bucket, oWFN * PN);
+//State * binSearch(binDecision * Bucket, oWFN * PN);
 
 State * binSearch(oWFN * PN) {
 

@@ -83,9 +83,9 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 			calculateSuccStatesInput(PN->inputPlacesArray[i]->index, currentNode, v);
 
 			if (messageboundviolation) {
-				trace(TRACE_0, "\t message bound violation detected (sending event ");
-				trace(TRACE_0, PN->inputPlacesArray[i]->name);
-				trace(TRACE_0, ", node " + intToString(currentNode->getNumber()) + ")\n");
+				trace(TRACE_3, "\t\t\t\t\t message bound violation detected (sending event ");
+				trace(TRACE_3, PN->inputPlacesArray[i]->name);
+				trace(TRACE_3, ", node " + intToString(currentNode->getNumber()) + ")\n");
 				
 				delete v;
 			} else {

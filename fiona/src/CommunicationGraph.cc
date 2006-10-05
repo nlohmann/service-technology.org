@@ -306,7 +306,7 @@ bool communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * n
 		if (options[O_MESSAGES_MAX] == true) {      // k-message-bounded set
 			if (PN->CurrentMarking[PN->Places[input]->index] == messages_manual) {
 				// adding input message to state already using full message bound
-				trace(TRACE_5, "violation found\n");
+				trace(TRACE_3, "\t\t\t\t\t message bound violation detected\n");
 			    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
 				return true;
 			}
@@ -321,9 +321,7 @@ bool communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * n
         }
 	}
     
-	trace(TRACE_5, "no violation found\n");
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
-    
     return false;
 }
 
@@ -350,8 +348,8 @@ bool communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex 
 			for (messageMultiSet::iterator iter = input.begin(); iter != input.end(); iter++) {
 				if (PN->CurrentMarking[PN->Places[*iter]->index] == messages_manual) {
 					// adding input message to state already using full message bound
-					trace(TRACE_0, "\t message bound violation detected (sending event)");
-					trace(TRACE_0, PN->Places[*iter]->name);
+					trace(TRACE_3, "\t\t\t\t\t message bound violation detected (sending event)");
+					trace(TRACE_3, PN->Places[*iter]->name);
 				    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
 					return true;
 				}

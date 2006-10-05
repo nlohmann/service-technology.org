@@ -288,7 +288,10 @@ void oWFN::addSuccStatesToList(vertex * n, State * NewState) {
 	if (NewState != NULL) {
 		
 		// test marking of current state if message bound k reached
-		checkMessageBound(n);
+		if (checkMessageBound(n) == true) {
+			// bound violated
+			cout << "\t --- (in addSuccStatesToList)" << endl;
+		}
 		
 		// add successors
 		for(int i = 0; i < NewState->CardFireList; i++) {
@@ -303,7 +306,11 @@ void oWFN::addStateToList(vertex * n, State * currentState) {
 	currentState->decodeShowOnly(this);
 		
 	// test marking of current state if message bound k reached
-	checkMessageBound(n);
+	if (checkMessageBound(n) == true) {
+		// bound violated
+		cout << "\t --- (in addStateToList)" << endl;
+	
+	}
 
 	n->addState(currentState);
 	
@@ -315,27 +322,35 @@ void oWFN::addStateToList(vertex * n, State * currentState) {
 }
 
 
-//! \fn void oWFN::checkMessageBound(vertex * node)
+//! \fn bool oWFN::checkMessageBound(vertex * node)
 //! \param node the current node
-//! \brief checks if message bound is violated by the current marking
-void oWFN::checkMessageBound(vertex * n) {
+//! \return returns true iff bound is VIOLATED
+//! \brief checks if message bound is violated by the current marking (for interface places only)
+bool oWFN::checkMessageBound(vertex * n) {
 	trace(TRACE_5, "oWFN::checkMessageBound(vertex * node): start\n");
 	// test marking of current state if message bound k reached
 	if (options[O_MESSAGES_MAX] == true) {      // k-message-bounded set
+		// test input places
 		for (int i = 0; i < placeInputCnt; i++) {
 			if (CurrentMarking[inputPlacesArray[i]->index] > messages_manual) {
 				cout << "\t checkMessageBound: interface place violating message bound was found!" << endl;
 				n->setColor(RED);
+				trace(TRACE_5, "oWFN::checkMessageBound(vertex * node): end\n");
+				return true;
 			}
 		}
+		// test output places
 		for (int i = 0; i < placeOutputCnt; i++) {
 			if (CurrentMarking[outputPlacesArray[i]->index] > messages_manual) {
 				cout << "\t checkMessageBound: interface place violating message bound was found!" << endl;
 				n->setColor(RED);
+				trace(TRACE_5, "oWFN::checkMessageBound(vertex * node): end\n");
+				return true;
 			}
 		}
 	}
 	trace(TRACE_5, "oWFN::checkMessageBound(vertex * node): end\n");
+	return false;
 }
 
 
@@ -781,8 +796,15 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 	// calculates the EG starting at the current marking
 	trace(TRACE_5, "start of function oWFN::calculateReachableStatesFull\n");
 
+	// test current marking if message bound k reached
+	if (checkMessageBound(n) == true) {
+		// bound violated
+		cout << "\t --- (in calculateReachableStatesFull, oben)" << endl;
+//		delete n;
+//		return;
+	}
+
 	State * CurrentState;
-  	unsigned int i;
   	State * NewState;
   	stateType type;
   	
@@ -792,30 +814,31 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 	unsigned int tempPlaceHashValue;
 	
 //	if (options[O_BDD] == false && CurrentState != NULL) {
-	if (CurrentState != NULL) { 		//&& options[O_BDD]
-		// marking already has a state -> put it (and all its successors) into the node
+
+	if (CurrentState != NULL) {
+		// marking already has a state
+		// -> put it (and all its successors) into the node
 		if (n->addState(CurrentState)) {
 			CurrentState->decodeShowOnly(PN);
 			addSuccStatesToList(n, CurrentState);
 		}
-		trace(TRACE_5, "end of function oWFN::calculateReachableStatesFull (found state in the first place)\n");
-
+		trace(TRACE_5, "end of function oWFN::calculateReachableStatesFull (root marking of EG already in bintree; states copied only)\n");
 		return;
 	}
 	
 	// the other case:
 	// we have a marking which has not yet a state object assigned to it
-	if (CurrentState == NULL) {
-		CurrentState = binInsert(this);
-	}
-//	cout << "new state: " << printCurrentMarkingForDot() << " with " << CardQuasiFireList << " in quasiFirelist" << endl;
+	ASSERT(CurrentState == NULL);
 	
+	CurrentState = binInsert(this);
+
 	CurrentState->firelist = firelist();
 	CurrentState->CardFireList = CardFireList;
+
 	if (parameters[P_IG]) {
 	    if (CurrentState->quasiFirelist) {
-		delete [] CurrentState->quasiFirelist;
-		CurrentState->quasiFirelist = NULL;
+			delete [] CurrentState->quasiFirelist;
+			CurrentState->quasiFirelist = NULL;
 	    }
   	    CurrentState->quasiFirelist = quasiFirelist();
 	}
@@ -831,12 +854,8 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 	CurrentState->placeHashValue = placeHashValue;
 	CurrentState->type = typeOfState();
 	
-	
-	// test marking of current state if message bound k reached
-	checkMessageBound(n);
-	
 	n->addState(CurrentState);
-	  	
+	
 	// building EG in a node
   	while(CurrentState) {
  
@@ -856,8 +875,7 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 			tempCurrentMarking = copyCurrentMarking();
 			tempPlaceHashValue = placeHashValue;
 			  		
-	  		trace(TRACE_5, "fire transition\n");
-    
+			// fire and reach next state
 			CurrentState->firelist[CurrentState->current]->fire(this);
 			minimal = isMinimal();
 			NewState = binSearch(this);
@@ -883,16 +901,15 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 	     		(CurrentState->current)++;
 	    	} else {
 				trace(TRACE_5, "Current marking new\n");
-//	cout << "new state: " << printCurrentMarkingForDot() << " with " << CardQuasiFireList << " in quasiFirelist" << endl;
       			NewState = binInsert(this);
       			NewState->firelist = firelist();
 	      		NewState->CardFireList = CardFireList;
 	      		if (parameters[P_IG]) {
-			    if (NewState->quasiFirelist) {
-				delete [] NewState->quasiFirelist;
-				NewState->quasiFirelist = NULL;
-			    }
-			    NewState->quasiFirelist = quasiFirelist();
+				    if (NewState->quasiFirelist) {
+						delete [] NewState->quasiFirelist;
+						NewState->quasiFirelist = NULL;
+				    }
+				    NewState->quasiFirelist = quasiFirelist();
 	      		}
 	      		NewState->current = 0;
 	      		NewState->parent = CurrentState;
@@ -910,7 +927,11 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 	      		CurrentState = NewState;
 		      		
 				// test marking of current state if message bound k reached
-				checkMessageBound(n);
+				if (checkMessageBound(n) == true) {
+					// bound violated
+					cout << "\t --- (in calculateReachableStatesFull, unten)" << endl;
+					
+				}
 
 				n->addState(NewState);
 				
@@ -1290,18 +1311,18 @@ bool oWFN::isMaximal() {
 //! \fn bool oWFN::isFinalMarking(unsigned int * marking) 
 //! \param marking marking to be checked
 //! \brief checks if the marking given as parameter is the final marking of the net
-bool oWFN::isFinalMarking(unsigned int * marking) {
-	for (int i = 0; i < getPlaceCnt(); i++) {
-		if (Places[i]->type != INTERNAL && marking[i] > 0) {
-			return false;
-		}
-//		if (FinalMarking[i] != 0 && marking[i] != FinalMarking[i]) {
-		if (FinalMarking[i] != 0 && marking[i] < FinalMarking[i]) {
-			return false;	
-		}
-	}
-	return true;
-}
+//bool oWFN::isFinalMarking(unsigned int * marking) {
+//	for (int i = 0; i < getPlaceCnt(); i++) {
+//		if (Places[i]->type != INTERNAL && marking[i] > 0) {
+//			return false;
+//		}
+////		if (FinalMarking[i] != 0 && marking[i] != FinalMarking[i]) {
+//		if (FinalMarking[i] != 0 && marking[i] < FinalMarking[i]) {
+//			return false;	
+//		}
+//	}
+//	return true;
+//}
 
 
 bool oWFN::isFinal() {
@@ -1319,7 +1340,17 @@ bool oWFN::isFinal() {
 		}
 		return FinalCondition -> value;
 	} else {
-		return isFinalMarking(CurrentMarking);
+//		return isFinalMarking(CurrentMarking);
+		for (int i = 0; i < getPlaceCnt(); i++) {
+			if (Places[i]->type != INTERNAL && CurrentMarking[i] > 0) {
+				return false;
+			}
+//			if (FinalMarking[i] != 0 && marking[i] != FinalMarking[i]) {
+			if (FinalMarking[i] != 0 && CurrentMarking[i] < FinalMarking[i]) {
+				return false;	
+			}
+		}
+		return true;
 	}
 }
 

@@ -293,6 +293,9 @@ void parse_command_line(int argc, char* argv[]) {
 		      		bdd_reordermethod = 0;
 		      	}
 		      	break;
+	      	case '?':
+				cerr << "getopt hat ein problem :( " << endl;
+				break;
 	      	default:
 				cerr << "Option error: unknown option or missing argument" << endl;
 				break;

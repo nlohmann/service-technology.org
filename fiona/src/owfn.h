@@ -108,7 +108,7 @@ class oWFN  {
 		void addStateToList(vertex *, State *);
 		
 
-		void checkMessageBound(vertex *);
+		bool checkMessageBound(vertex *);
 		void computeAnnotationOutput(vertex *, State *);
 		void computeAnnotationInput(vertex *, State *, unsigned int *, bool);
 		
@@ -131,7 +131,7 @@ class oWFN  {
 		bool isMinimal();					// returns true if the state is minimal
 		char * printMarking(unsigned int *); // creates the label of the given marking
 		char * printCurrentMarkingForDot();  // creates the label of the current marking
-		bool isFinalMarking(unsigned int *);	// is the given marking == final marking of the net?
+//		bool isFinalMarking(unsigned int *);	// is the given marking == final marking of the net?
 		bool isFinal();	// does current marking satisfy final condition/final marking of the net?
 
 /* print the net */

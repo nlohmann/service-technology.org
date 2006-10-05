@@ -17,6 +17,7 @@ std::list<char*> netfiles;
 
 
 int commDepth_manual;
+int events_manual;
 int messages_manual;
 int bdd_reordermethod;
 
@@ -180,7 +181,7 @@ void parse_command_line(int argc, char* argv[]) {
 	bdd_reordermethod = 0;
 
 	messages_manual = 1;
-	// events_manual = 1;
+	events_manual = 1;
 	commDepth_manual = 1;
 	
   	// evaluate options and set parameters
@@ -242,7 +243,7 @@ void parse_command_line(int argc, char* argv[]) {
 	          	break;
 	      	case 'e':
 	        	options[O_EVENT_USE_MAX] = true;
-	        	// events_manual = atoi(optarg);
+	        	events_manual = atoi(optarg);
 	          	break;
 	      	case 's':
 	      		if (string(optarg) == "blue") {
@@ -292,9 +293,6 @@ void parse_command_line(int argc, char* argv[]) {
 		      		bdd_reordermethod = 0;
 		      	}
 		      	break;
-	      	case '?':
-				cerr << "getopt hat ein problem :( " << endl;
-				break;
 	      	default:
 				cerr << "Option error: unknown option or missing argument" << endl;
 				break;

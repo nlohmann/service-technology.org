@@ -107,7 +107,6 @@ void adjustOptionValues() {
 			PN->commDepth = commDepth_manual;
 		}
 
-		/*
 		// adjusting events if dominated by commDepth
 		if (options[O_EVENT_USE_MAX] == true) {
 			if (PN->getCommDepth() < events_manual) {
@@ -115,7 +114,6 @@ void adjustOptionValues() {
 			    events_manual = PN->commDepth;
 			}
 		}
-		*/
 	} else {
 		// compute commDepth if not specified by -c option
 		trace(TRACE_1, "standard commDepth too high ... adjusting it\n");

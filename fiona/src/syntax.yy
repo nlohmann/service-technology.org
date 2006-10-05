@@ -34,6 +34,7 @@ extern unsigned int numberOfEvents;
 #include "owfnPlace.h"
 #include "owfn.h"
 #include "formula.h"
+#include "options.h"
 
 #include "main.h"
 
@@ -279,9 +280,10 @@ place: nodeident {
 	PS = new PlSymbol(P);
 	P->capacity = CurrentCapacity;
 	P->nrbits = CurrentCapacity > 0 ? logzwo(CurrentCapacity) : 32;
+	P->max_occurence = events_manual;
 	free($1);
 	if (type == INPUT || type == OUTPUT) {
-	    numberOfEvents++;
+	    numberOfEvents += events_manual;
 	}
     }
     controlcommands
@@ -310,7 +312,10 @@ commands:
 | key_max_occurences op_eq number commands
     {
 	sscanf($3, "%u", &(PS->place->max_occurence));
-	numberOfEvents += PS->place->max_occurence - 1;
+	if (options[O_EVENT_USE_MAX] && PS->place->max_occurence > events_manual) {
+	    PS->place->max_occurence = events_manual;
+	}
+	numberOfEvents += PS->place->max_occurence - events_manual;
     }
 ;
 

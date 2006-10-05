@@ -30,6 +30,7 @@ public:
   virtual unsigned int  collectsubs(FType,formula **,unsigned int) = 0; //collect elements of AND or OR chain
   formula * parent;
   unsigned int parentindex; //position of this in parent's array of subformulas
+  formula() : parent(NULL) {}
 };
 
 class atomicformula : public formula

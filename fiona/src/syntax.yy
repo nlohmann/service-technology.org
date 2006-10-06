@@ -92,11 +92,12 @@ placeType type = INTERNAL;		/* type of place */
 %token key_max_unique_events key_on_loop key_max_occurences
 %token key_true key_false lcontrol rcontrol
 %token comma colon semicolon ident number
-%token op_and op_or op_not op_gt op_lt op_ge op_le op_eq op_ne lpar rpar
+%token lpar rpar
 
 %nonassoc op_eq op_ne op_gt op_lt op_ge op_le
 %left op_not
-%left op_and op_or
+%left op_and
+%left op_or
 
 
 // the start symbol of the grammar

@@ -6,6 +6,9 @@
 #include "main.h"
 #include <list>
 
+// #defines YY_FLEX_HAS_YYLEX_DESTROY if we can call yylex_destroy()
+#include "lexer_wrap.h"
+
 #ifdef LOG_NEW
 #include "newlogger.h"
 #endif

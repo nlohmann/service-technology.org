@@ -95,10 +95,31 @@ unarybooleanformula::unarybooleanformula(FType t, formula * l) {
   sub = l;
 }
 
+unarybooleanformula::~unarybooleanformula()
+{
+    delete sub;
+}
+
 binarybooleanformula::binarybooleanformula(FType t, formula * l, formula * r) {
   type = t;
   left = l;
   right = r;
+}
+
+binarybooleanformula::~binarybooleanformula()
+{
+    delete left;
+    delete right;
+}
+
+booleanformula::~booleanformula()
+{
+    for (size_t isub = 0; isub != cardsub; ++isub)
+    {
+        delete sub[isub];
+    }
+
+    delete[] sub;
 }
 
 bool atomicformula::init(unsigned int * CurrentMarking) {
@@ -162,46 +183,106 @@ bool booleanformula::init(unsigned int * m) {
 }
 
 
-formula * atomicformula::copy() {
+atomicformula * atomicformula::deep_copy() {
+    return flat_copy();
+}
+
+atomicformula * atomicformula::flat_copy() {
     atomicformula * f;
-    f = new atomicformula(type,p,k);
+    f              = new atomicformula(type,p,k);
+    f->value       = value;
+    f->parent      = parent;
+    f->parentindex = parentindex;
     return f;
 }
 
-formula * unarybooleanformula::copy() {
+unarybooleanformula * unarybooleanformula::deep_copy() {
     unarybooleanformula * f;
-    f = new unarybooleanformula(type,sub -> copy());
+    f = new unarybooleanformula(type,sub->deep_copy());
+    f->value       = value;
+    f->parent      = parent;
+    f->parentindex = parentindex;
+    f->sub->parent = f;
     return f;
 }
 
-formula * binarybooleanformula::copy() {
+unarybooleanformula * unarybooleanformula::flat_copy() {
+    unarybooleanformula * f;
+    f              = new unarybooleanformula(type,sub);
+    f->value       = value;
+    f->parent      = parent;
+    f->parentindex = parentindex;
+    return f;
+}
+
+binarybooleanformula * binarybooleanformula::deep_copy() {
     binarybooleanformula * f;
-    f = new binarybooleanformula(type,left->copy(),right -> copy());
+    f = new binarybooleanformula(type,left->deep_copy(),right->deep_copy());
+    f->value = value;
+    f->parent = parent;
+    f->parentindex = parentindex;
+    f->left->parent = f->right->parent = f;
     return f;
 }
 
-formula * booleanformula::copy() {
+binarybooleanformula * binarybooleanformula::flat_copy() {
+    binarybooleanformula * f;
+    f = new binarybooleanformula(type,left,right);
+    f->value = value;
+    f->parent = parent;
+    f->parentindex = parentindex;
+    return f;
+}
+
+booleanformula * booleanformula::deep_copy() {
     unsigned int i;
     booleanformula * f;
-	formula **newsub;
+    formula **newsub;
     newsub = new formula * [cardsub];
     for(i=0;i<cardsub;i++) {
-        newsub[i] = sub[i]->copy();
+        newsub[i] = sub[i]->deep_copy();
+        newsub[i]->parent = f;
+        newsub[i]->parentindex = i;
     }
-    f = new booleanformula();
-    f -> type = type;
-    f -> sub = newsub;
+    f              = new booleanformula();
+    f->type        = type;
+    f->sub         = newsub;
+    f->cardsub     = cardsub;
+    f->firstvalid  = firstvalid;
+    f->value       = value;
+    f->parent      = parent;
+    f->parentindex = parentindex;
+    return f;
+}
+
+booleanformula * booleanformula::flat_copy() {
+    unsigned int i;
+    booleanformula * f;
+    formula **newsub;
+    newsub = new formula * [cardsub];
+    for(i=0;i<cardsub;i++) {
+        newsub[i] = sub[i];
+    }
+    f              = new booleanformula();
+    f->type        = type;
+    f->sub         = newsub;
+    f->cardsub     = cardsub;
+    f->firstvalid  = firstvalid;
+    f->value       = value;
+    f->parent      = parent;
+    f->parentindex = parentindex;
     return f;
 }
 
 formula * atomicformula::merge() {
-	return this;
+    return deep_copy();
 }
 
 formula * unarybooleanformula::merge() {
-	sub = sub -> merge();
-	sub -> parent = this;
-	return this;
+    unarybooleanformula* f = flat_copy();
+    f->sub = f->sub->merge();
+    f->sub->parent = f;
+    return f;
 }
 
 
@@ -214,15 +295,12 @@ formula * binarybooleanformula::merge() {
 	unsigned int i;
 	i = left -> collectsubs(type,f -> sub,0);
 	i = right -> collectsubs(type,f->sub,i);
-	for(i=0;i<f->cardsub;i++)
-	{
-		f -> sub[i] -> parent = f;
-		f -> sub[i] -> parentindex = i;
-	}
 	f -> sub[f -> cardsub] = (formula *) 0;
 	for(i=0;i<f -> cardsub;i++)
 	{
 		f -> sub[i] = f -> sub[i]->merge();
+		f -> sub[i] -> parent = f;
+		f -> sub[i] -> parentindex = i;
 	}
 
 	// order sub formulas 
@@ -276,15 +354,12 @@ formula * booleanformula::merge()
 	{
 		i = sub[j] -> collectsubs(type,f -> sub,i);
 	}
-	for(i=0;i<f->cardsub;i++)
-	{
-		f -> sub[i] -> parent = f;
-		f -> sub[i] -> parentindex = i;
-	}
 	f -> sub[f -> cardsub] = (formula *) 0;
 	for(i=0;i<f -> cardsub;i++)
 	{
 		f -> sub[i] = f -> sub[i]->merge();
+		f -> sub[i] -> parent = f;
+		f -> sub[i] -> parentindex = i;
 	}
 
 	// order sub formulas 

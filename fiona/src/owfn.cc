@@ -71,6 +71,7 @@ oWFN::~oWFN() {
 	delete[] Transitions;
 	delete[] CurrentMarking;
 	delete[] FinalMarking;
+	delete FinalCondition;
 }
 
 //! \fn unsigned int oWFN::getPlaceCnt()

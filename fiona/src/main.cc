@@ -84,7 +84,11 @@ void readnet() {
     // to have sensible values.
     if (PN->FinalCondition) {
         PN->FinalCondition->init(PN->CurrentMarking);
+        
+        formula* oldFinalCondition = PN->FinalCondition;
         PN->FinalCondition = PN->FinalCondition->merge();
+        delete oldFinalCondition;
+
         PN->FinalCondition = PN->FinalCondition->posate();
         PN->FinalCondition->setstatic();
     }

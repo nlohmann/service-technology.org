@@ -675,18 +675,18 @@ analysisResult communicationGraph::analyseNode(vertex * node, bool finalAnalysis
     trace(TRACE_3, "\t\t\t analysing node ");
     trace(TRACE_3, intToString(node->getNumber()) + "...\n");
 
-    if (node->getColor() != RED) {          // red nodes stay red forever
-        if (node->reachGraphStateSet.size() == 0) {
-            // we analyse an empty node; it becomes blue
-            if (node->getColor() != BLUE) {			// not yet counted
-                numberBlueNodes++;
-            }
-            node->setColor(BLUE);
-            trace(TRACE_3, "\t\t\t node analysed blue (empty node)");
-            trace(TRACE_3, "\t ...terminate\n");
-			trace(TRACE_5, "communicationGraph::analyseNode(vertex * node, bool finalAnalysis) : end\n");
-            return TERMINATE;
-        } else {
+//    if (node->getColor() != RED) {          // red nodes stay red forever
+//        if (node->reachGraphStateSet.size() == 0) {
+//            // we analyse an empty node; it becomes blue
+//            if (node->getColor() != BLUE) {			// not yet counted
+//                numberBlueNodes++;
+//            }
+//            node->setColor(BLUE);
+//            trace(TRACE_3, "\t\t\t node analysed blue (empty node)");
+//            trace(TRACE_3, "\t ...terminate\n");
+//			trace(TRACE_5, "communicationGraph::analyseNode(vertex * node, bool finalAnalysis) : end\n");
+//            return TERMINATE;
+//        } else {
             // we analyse a non-empty node
 
 			vertexColor colorBefore = node->getColor();		// remember the color of the node before the analysis
@@ -709,8 +709,8 @@ analysisResult communicationGraph::analyseNode(vertex * node, bool finalAnalysis
 
 			trace(TRACE_5, "communicationGraph::analyseNode(vertex * node, bool finalAnalysis) : end\n");
 			return result;
-        }
-    }
-    trace(TRACE_5, "communicationGraph::analyseNode(vertex * node, bool finalAnalysis) : end\n");
-    return TERMINATE;
+//        }
+//    }
+//    trace(TRACE_5, "communicationGraph::analyseNode(vertex * node, bool finalAnalysis) : end\n");
+//    return TERMINATE;
 }

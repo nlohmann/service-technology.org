@@ -7,7 +7,8 @@
 //! \fn vertex::vertex()
 //! \brief constructor for OG nodes
 vertex::vertex(int numberEvents) :
-			   color(BLACK),
+			   color(BLUE),
+//			   color(BLACK),
 			   successorNodes(NULL),
 			   numberOfVertex(0),
 			   annotation(NULL) {
@@ -272,7 +273,7 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
 
             vertexColor c = BLACK;                      // the color of the current node
             vertexColor cTmp = BLACK;                   // the color of a state of the current node
-            string clause;
+//            string clause;
             bool finalState = false;
 
 			CNF * cl = annotation;						// get pointer to the first clause of the CNF

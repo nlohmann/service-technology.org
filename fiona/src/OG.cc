@@ -59,19 +59,27 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	// get the annotation of the node (CNF)
 	computeCNF(currentNode);					// calculate CNF of this node
 
-	if (terminateBuildingGraph(currentNode)) {
-		if (currentNode->getColor() == RED) {
-			color = "RED";
-		} else if (currentNode->getColor() == BLUE) {
-			color = "BLUE";
-		} else {
-			color = "BLACK";
-		}
-		trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + " (leaf)\n");		
-
-		trace(TRACE_1, "=================================================================\n");		
+	if (actualDepth > PN->commDepth) {
+		// we have reached a leaf node
+		analyseNode(currentNode, true);
+		assert(currentNode->getColor() != BLACK);
 		return;
 	}
+
+
+//	if (terminateBuildingGraph(currentNode)) {
+//		if (currentNode->getColor() == RED) {
+//			color = "RED";
+//		} else if (currentNode->getColor() == BLUE) {
+//			color = "BLUE";
+//		} else {
+//			color = "BLACK";
+//		}
+//		trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + " (leaf)\n");		
+//
+//		trace(TRACE_1, "=================================================================\n");		
+//		return;
+//	}
 	
 	trace(TRACE_1, "=================================================================\n");
 
@@ -258,39 +266,43 @@ void operatingGuidelines::computeCNF(vertex * node) {
 //! \param node the vertex to be checked
 //! \brief figure out when to terminate the building of the graph
 //! return true, if building up shall be terminated, false otherwise 
-bool operatingGuidelines::terminateBuildingGraph(vertex * node) {
-	trace(TRACE_5, "bool operatingGuidelines::terminateBuildingGraph(vertex * node): start\n");
-	
-    analyseNode(node, false);
-
-//	if (analyseNode(node, false) == TERMINATE) {
-//		trace(TRACE_5, "node analysed\n");
+//bool operatingGuidelines::terminateBuildingGraph(vertex * node) {
+//	trace(TRACE_5, "bool operatingGuidelines::terminateBuildingGraph(vertex * node): start\n");
+//	
+//    analyseNode(node, false);
+//
+////	if (analyseNode(node, false) == TERMINATE) {
+////		trace(TRACE_5, "node analysed\n");
+////		trace(TRACE_5, "bool operatingGuidelines::terminateBuildingGraph(vertex * node): end\n");
+////		return true;
+////	}
+//	
+////	trace(TRACE_5, "node analysed, color is ");
+////	if (node->getColor() == BLUE) {
+////		trace(TRACE_5, "blue\n");
+////	} else if (node->getColor() == RED) {
+////		trace(TRACE_5, "red\n");
+////	} else {
+////		trace(TRACE_5, "black\n");
+////	}
+//	
+//	
+//	// do not change termination | here, but set commDepth in main.cc
+//	//                           v       to desired value
+//	if (actualDepth > PN->getCommDepth()) {	// we have reached the maximal communication depth
+//		
+//		assert(node->getNumber() > PN->getCommDepth());
+//		
+////		if (node->getColor() != BLUE) {
+//			node->setColor(RED);
+////		}
+//		trace(TRACE_3, "graph reached commDepth. " + intToString(actualDepth) +" terminating\n");
 //		trace(TRACE_5, "bool operatingGuidelines::terminateBuildingGraph(vertex * node): end\n");
 //		return true;
 //	}
-	
-//	trace(TRACE_5, "node analysed, color is ");
-//	if (node->getColor() == BLUE) {
-//		trace(TRACE_5, "blue\n");
-//	} else if (node->getColor() == RED) {
-//		trace(TRACE_5, "red\n");
-//	} else {
-//		trace(TRACE_5, "black\n");
-//	}
-	
-	
-	// do not change termination | here, but set commDepth in main.cc
-	//                           v       to desired value
-	if (actualDepth > PN->getCommDepth()) {	// we have reached the maximal communication depth
-		if (node->getColor() != BLUE) {
-			node->setColor(RED);
-		}
-		trace(TRACE_5, "bool operatingGuidelines::terminateBuildingGraph(vertex * node): end\n");
-		return true;
-	}
-	trace(TRACE_5, "bool operatingGuidelines::terminateBuildingGraph(vertex * node): end (returning false)\n");
-	return false;
-}
+//	trace(TRACE_5, "bool operatingGuidelines::terminateBuildingGraph(vertex * node): end (returning false)\n");
+//	return false;
+//}
 
 void operatingGuidelines::convertToBdd() {
 	trace(TRACE_5, "operatingGuidelines::convertToBdd(): start\n");

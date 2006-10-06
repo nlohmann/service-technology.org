@@ -28,7 +28,7 @@ class operatingGuidelines : public communicationGraph {
     
     	void computeCNF(vertex *);
     	
-    	bool terminateBuildingGraph(vertex * );
+//    	bool terminateBuildingGraph(vertex * );
 		void convertToBdd();
 		
 		BddRepresentation * bdd;

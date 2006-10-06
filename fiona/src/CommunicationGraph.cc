@@ -27,13 +27,15 @@ communicationGraph::communicationGraph(oWFN * _PN) :
 //! \fn communicationGraph::~communicationGraph()
 //! \brief destructor !to be implemented!
 communicationGraph::~communicationGraph() {
+	trace(TRACE_5, "communicationGraph::~communicationGraph() : start\n");
 	vertexSet::iterator iter;
 	
 	for (iter = setOfVertices.begin(); iter != setOfVertices.end(); iter++) {
-		delete *iter;	
+		delete *iter;
 	}
 	
-	delete root;
+//	delete root;
+	trace(TRACE_5, "communicationGraph::~communicationGraph() : start\n");
 }
 
 //! \fn vertex * communicationGraph::getRoot() const
@@ -77,6 +79,7 @@ void communicationGraph::calculateRootNode() {
     numberOfStatesAllNodes += root->reachGraphStateSet.size();
     
 	numberOfVertices++;
+	setOfVertices.insert(root);
 
     trace(TRACE_5, "void reachGraph::calculateRootNode(): end\n");
 }
@@ -137,7 +140,6 @@ int communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edg
 
         if (found == NULL) {
 
-//            cout << "with event " << label << " (type " << type << " ):" << endl;
             trace(TRACE_1, "\n\t new successor node computed:");
 
             toAdd->setNumber(numberOfVertices++);
@@ -187,12 +189,15 @@ int communicationGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType 
 
 	int offset = 0;
 
-    if (numberOfVertices == 0) {                // graph contains no nodes at all
-        root = toAdd;                           // the given node becomes the root node
-        currentVertex = root;
-        numberOfVertices++;
-        setOfVertices.insert(toAdd);
-    } else {
+    assert(numberOfVertices > 0);
+    assert(setOfVertices.size() > 0);
+    
+//    if (numberOfVertices == 0) {                // graph contains no nodes at all
+//        root = toAdd;                           // the given node becomes the root node
+//        currentVertex = root;
+//        numberOfVertices++;
+//        setOfVertices.insert(toAdd);
+//    } else {
         vertex * found = findVertexInSet(toAdd);
         char * edgeLabel;
 
@@ -205,8 +210,7 @@ int communicationGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType 
 //        if (options[O_BDD] == true || found == NULL) {
         if (found == NULL) {
 
-//			if (true) {
-//            cout << "with event " << label << " (type " << type << " ):" << endl;
+//		if (true) {
             trace(TRACE_1, "\n\t new successor node computed:");
             toAdd->setNumber(numberOfVertices++);
 
@@ -277,7 +281,7 @@ int communicationGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType 
 
             return 0;
         }
-    }
+//    }
 }
 
 

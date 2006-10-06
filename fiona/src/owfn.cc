@@ -110,7 +110,7 @@ unsigned int oWFN::getCommDepth() {
 
 
 unsigned int oWFN::getCardFireList() {
-	cout << "oWFN::getCardFireList() never used" << endl;
+	assert(false);		// cout << "oWFN::getCardFireList() never used" << endl;
 	return CardFireList;
 }
 

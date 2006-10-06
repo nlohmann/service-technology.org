@@ -35,7 +35,8 @@ vertex::vertex() :
 
 //! \fn vertex::~vertex()
 //! \brief destructor
-vertex::~vertex () {
+vertex::~vertex() {
+	trace(TRACE_5, "vertex::~vertex() : start\n");
 
 	if (successorNodes != NULL) {
 		delete successorNodes;
@@ -55,6 +56,7 @@ vertex::~vertex () {
 	}
 	
 	numberDeletedVertices++;
+	trace(TRACE_5, "vertex::~vertex() : end\n");
 }
 	
 //! \fn unsigned int vertex::getNumber()

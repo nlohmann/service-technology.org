@@ -287,11 +287,11 @@ int main(int argc, char ** argv) {
 					//graph->bdd->print();
 					graph->bdd->save();
 		        }
-		              
-//				cout << "\nOG computation finished\n\t\t\t...please hit any key" << endl;
-//				getchar();
 		
+				trace(TRACE_5, "computation finished -- trying to delete graph\n");
+//				getchar();
 				delete graph;
+				trace(TRACE_5, "graph deleted\n");
 	        
 			} else {
 		        
@@ -327,10 +327,10 @@ int main(int argc, char ** argv) {
 	
 				graph->printDotFile();				// for IG
 	
-//				cout << "\nIG computation finished\n\t\t\t...please hit any key" << endl;
+				trace(TRACE_5, "computation finished -- trying to delete graph\n");
 //				getchar();
-		
 				delete graph;
+				trace(TRACE_5, "graph deleted\n");
 			}
 	
 			delete PN;

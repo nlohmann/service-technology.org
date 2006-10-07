@@ -72,12 +72,12 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	int i = 0;
 	trace(TRACE_5, "iterating over inputSet\n");
 	// iterate over all elements of inputSet
-	while (i < PN->placeInputCnt) { 
+	while (i < PN->placeInputCnt) {
 
 		trace(TRACE_2, "\t\t\t\t    sending event: !");
 		trace(TRACE_2, string(PN->inputPlacesArray[i]->name) + "\n");
 		
-		if (currentNode->eventsUsed[i] < PN->inputPlacesArray[i]->max_occurence){
+		if (currentNode->eventsUsed[i] < PN->inputPlacesArray[i]->max_occurence) {
 			
 			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
 			currentVertex = currentNode;
@@ -90,7 +90,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 				// message bound violation occured during calculateSuccStatesInput
 				trace(TRACE_2, "\t\t\t\t    sending event: !");
 				trace(TRACE_2, PN->inputPlacesArray[i]->name);
-				trace(TRACE_2, " at node " + intToString(currentNode->getNumber()) + " suppressed\n");
+				trace(TRACE_2, " at node " + intToString(currentNode->getNumber()) + " suppressed (message bound violated)\n");
 				
 				delete v;
 			} else {
@@ -102,7 +102,6 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 					trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 	
 //					analyseNode(currentNode, false);
-					trace(TRACE_5, "node analysed\n");
 	
 					actualDepth--;
 				}
@@ -119,7 +118,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 		
 	trace(TRACE_5, "iterating over outputSet\n");
 	// iterate over all elements of outputSet
-	while (i < PN->placeOutputCnt) { 
+	while (i < PN->placeOutputCnt) {
 
 		trace(TRACE_2, "\t\t\t\t  receiving event: ?");
 		trace(TRACE_2, string(PN->outputPlacesArray[i]->name) + "\n");
@@ -136,14 +135,17 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 				buildGraph(v);				// going down with receiving event...
 
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
-				analyseNode(currentNode, false);
+
+//				analyseNode(currentNode, false);
+
 				actualDepth--;
 			}
 		} 
-		i++;	
+		i++;
 	}
 
 	trace(TRACE_2, "\t\t\t\t no events left...\n");
+
 	analyseNode(currentNode, true);
 
 	string color = "";

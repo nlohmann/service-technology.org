@@ -257,9 +257,8 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
     trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : start\n");
     
     trace(TRACE_3, "\t\t\t analysing node ");
-
     if (finalAnalysis) {
-    	trace(TRACE_3, "(final analysis) ");	//debug 2
+    	trace(TRACE_3, "(final analysis) ");
     }
 
     trace(TRACE_3, intToString(numberOfVertex) + ": ");
@@ -277,7 +276,6 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
 
             vertexColor c = BLACK;                      // the color of the current node
             vertexColor cTmp = BLACK;                   // the color of a state of the current node
-//            string clause;
             bool finalState = false;
 
 			CNF * cl = annotation;						// get pointer to the first clause of the CNF
@@ -366,6 +364,9 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
                 return CONTINUE;
             }
         }
+    } else {
+    	// we analyse a red node; it stays red
+		trace(TRACE_3, "\t\t\t node already red\n");
     }
     trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
     return TERMINATE;

@@ -82,11 +82,11 @@ State::~State() {
 
 //! \fn void State::decode(oWFN * PN)
 //! \param PN the corresponding open workflow net
-//! \brief decodes State in bintree and returns the corresponding marking
+//! \brief decodes State in bintree and writes the corresponding marking into currentMarking
 void State::decode(oWFN * PN) {
 	
 	trace(TRACE_5, "void State::decode(int * v, oWFN * PN):start\n");
-		
+
 	numberOfDecodes++;
 	
 //	for (int i = 0; i < PN->getPlaceCnt(); i++) {
@@ -128,7 +128,7 @@ void State::decode(oWFN * PN) {
     cutplace = cutplace >> (7-(clast -cfirst));
     cutplace = cutplace << (7-(clast -cfirst));
 
-	while(1) {		
+	while(1) {
         if(cfirst < pfirst) {
             // vorn abschneiden = verunden mit 00011111 wenn differenz 3
             cutplace &= (1 << (cfirst + 8 - pfirst)) - 1;
@@ -169,7 +169,7 @@ void State::decode(oWFN * PN) {
 
 				trace(TRACE_5, "void State::decode(int * v, oWFN * PN):end\n");
 				return;
-			}		
+			}
 			
 			// take new place
 			currentplacenr--;
@@ -259,7 +259,6 @@ void State::decode(oWFN * PN) {
 	cerr << "this line is not reachable" << endl;
 	cerr << "if this happens please contact the authors" << endl;	
 	cerr << "\tvoid State::decode(oWFN * PN) in graph.cc" << endl;
-	
 }
 
 //! \fn void State::decodeShowOnly(oWFN * PN)

@@ -123,8 +123,8 @@ class oWFN  {
 		void addInputMessage(unsigned int);
 		int addInputMessage(messageMultiSet);			// adds input message to the current marking
 
-		int removeOutputMessage(unsigned int);
-		int removeOutputMessage(messageMultiSet);
+		bool removeOutputMessage(unsigned int);
+		bool removeOutputMessage(messageMultiSet);
 		
 		stateType typeOfState();			// returns the type of state (transient, maximal, minimal)
 		bool isMaximal();					// returns true if the state is maximal

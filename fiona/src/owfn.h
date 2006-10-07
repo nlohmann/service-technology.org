@@ -118,9 +118,9 @@ class oWFN  {
 		void copyMarkingToCurrentMarking(unsigned int * copy);
 		void calculateReachableStatesOutputEvent(vertex *, bool);
 		void calculateReachableStatesInputEvent(vertex *, bool);
-		void calculateReachableStatesFull(vertex *, bool);
+		void calculateReachableStatesFull(vertex *);
 		
-		int addInputMessage(unsigned int);
+		void addInputMessage(unsigned int);
 		int addInputMessage(messageMultiSet);			// adds input message to the current marking
 
 		int removeOutputMessage(unsigned int);

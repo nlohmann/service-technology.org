@@ -6,9 +6,9 @@
 
 //! \fn vertex::vertex()
 //! \brief constructor for OG nodes
+// for OG
 vertex::vertex(int numberEvents) :
 			   color(BLUE),
-//			   color(BLACK),
 			   successorNodes(NULL),
 			   numberOfVertex(0),
 			   annotation(NULL) {
@@ -23,14 +23,15 @@ vertex::vertex(int numberEvents) :
 
 //! \fn vertex::vertex()
 //! \brief constructor for IG nodes
+// for IG
 vertex::vertex() :
                color(BLACK),
                successorNodes(NULL),
                numberOfVertex(0),
 			   annotation(NULL) {
                	
-	eventsToBeSeen = 0;
 	eventsUsed = NULL;
+	eventsToBeSeen = 0;
 }
 
 //! \fn vertex::~vertex()
@@ -97,6 +98,7 @@ bool vertex::addState(State * s) {
 
 //! \fn void vertex::addClause(clause * newClause, bool _isFinalState)
 //! \param newClause the clause to be added to this CNF
+//! \param _isFinalState determines whether clause points to a final state or not
 //! \brief adds the given clause to the CNF of the node
 void vertex::addClause(clause * newClause, bool _isFinalState) {
     trace(TRACE_5, "vertex::addClause(clause * newClause) : start\n");

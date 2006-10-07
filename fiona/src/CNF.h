@@ -1,11 +1,3 @@
-/*!
- * 	\class clause
-    \brief class for storing a clause (set of literals)
-
-	\author Daniela Weinberg
-	\par History
-		- 2006-07-11 creation
- */
 
 #ifndef CNF_H_
 #define CNF_H_

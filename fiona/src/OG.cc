@@ -9,7 +9,7 @@
 #include "owfn.h"
 #include <vector>
 
-//! \fn operatingGuidelines::operatingGuidelines(oWFN * _PN) 
+//! \fn operatingGuidelines::operatingGuidelines(oWFN * _PN)
 //! \param _PN
 //! \brief constructor
 operatingGuidelines::operatingGuidelines(oWFN * _PN) : communicationGraph(_PN) {
@@ -21,7 +21,7 @@ operatingGuidelines::operatingGuidelines(oWFN * _PN) : communicationGraph(_PN) {
 }
 
 //! \fn operatingGuidelines::~operatingGuidelines() 
-//! \brief destructor !to be implemented!
+//! \brief destructor
 operatingGuidelines::~operatingGuidelines() {
 
 	  if (options[O_BDD] == true) {
@@ -35,8 +35,6 @@ operatingGuidelines::~operatingGuidelines() {
 //! \brief builds up the graph recursively
 void operatingGuidelines::buildGraph(vertex * currentNode) {
 
-	string color = "";
-	
 	actualDepth++;
 
 	trace(TRACE_1, "\n=================================================================\n");
@@ -50,7 +48,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	trace(TRACE_2, intToString(currentNode->reachGraphStateSet.size()) + "\n");
 
 	if (currentNode->getColor() == RED) {
-		// this may happen due to a message bound violation
+		// this may happen due to a message bound violation in function calculateReachableStatesFull
 		trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color RED\n");
 		trace(TRACE_1, "=================================================================\n");
 		return;
@@ -64,6 +62,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 		// node is a leaf
 		analyseNode(currentNode, true);
 		assert(currentNode->getColor() != BLACK);
+		trace(TRACE_1, "=================================================================\n");
 		return;
 	}
 
@@ -85,10 +84,10 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 			
 			trace(TRACE_5, "calculating successor states\n");
 
-			bool messageboundviolation =
 			calculateSuccStatesInput(PN->inputPlacesArray[i]->index, currentNode, v);
 
-			if (messageboundviolation) {
+			if (v->getColor() == RED) {
+				// message bound violation occured during calculateSuccStatesInput
 				trace(TRACE_2, "\t\t\t\t    sending event: !");
 				trace(TRACE_2, PN->inputPlacesArray[i]->name);
 				trace(TRACE_2, " at node " + intToString(currentNode->getNumber()) + " suppressed\n");
@@ -147,11 +146,12 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	trace(TRACE_2, "\t\t\t\t no events left...\n");
 	analyseNode(currentNode, true);
 
+	string color = "";
+
 	if (currentNode->getColor() == RED) {
 		color = "RED";
 	} else if (currentNode->getColor() == BLUE) {
 		color = "BLUE";
-		
 	} else {
 		color = "BLACK";
 	}
@@ -248,47 +248,6 @@ void operatingGuidelines::computeCNF(vertex * node) {
 	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): end\n");
 }
 
-//! \fn bool operatingGuidelines::terminateBuildingGraph(vertex * node)
-//! \param node the vertex to be checked
-//! \brief figure out when to terminate the building of the graph
-//! return true, if building up shall be terminated, false otherwise 
-//bool operatingGuidelines::terminateBuildingGraph(vertex * node) {
-//	trace(TRACE_5, "bool operatingGuidelines::terminateBuildingGraph(vertex * node): start\n");
-//	
-//    analyseNode(node, false);
-//
-////	if (analyseNode(node, false) == TERMINATE) {
-////		trace(TRACE_5, "node analysed\n");
-////		trace(TRACE_5, "bool operatingGuidelines::terminateBuildingGraph(vertex * node): end\n");
-////		return true;
-////	}
-//	
-////	trace(TRACE_5, "node analysed, color is ");
-////	if (node->getColor() == BLUE) {
-////		trace(TRACE_5, "blue\n");
-////	} else if (node->getColor() == RED) {
-////		trace(TRACE_5, "red\n");
-////	} else {
-////		trace(TRACE_5, "black\n");
-////	}
-//	
-//	
-//	// do not change termination | here, but set commDepth in main.cc
-//	//                           v       to desired value
-//	if (actualDepth > PN->getCommDepth()) {	// we have reached the maximal communication depth
-//		
-//		assert(node->getNumber() > PN->getCommDepth());
-//		
-////		if (node->getColor() != BLUE) {
-//			node->setColor(RED);
-////		}
-//		trace(TRACE_3, "graph reached commDepth. " + intToString(actualDepth) +" terminating\n");
-//		trace(TRACE_5, "bool operatingGuidelines::terminateBuildingGraph(vertex * node): end\n");
-//		return true;
-//	}
-//	trace(TRACE_5, "bool operatingGuidelines::terminateBuildingGraph(vertex * node): end (returning false)\n");
-//	return false;
-//}
 
 void operatingGuidelines::convertToBdd() {
 	trace(TRACE_5, "operatingGuidelines::convertToBdd(): start\n");

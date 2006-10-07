@@ -21,7 +21,9 @@ struct cmp{
     }
 };
  
-//! \fn BddRepresentation::BddRepresentation(int nbrLabels, Cudd_ReorderingType heuristic)
+//! \fn BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_ReorderingType heuristic)
+//! \param numberOfLabels
+//! \param heuristic
 //! \brief constructor
 BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_ReorderingType heuristic){
 	nbrLabels = numberOfLabels;
@@ -458,9 +460,8 @@ DdNode* BddRepresentation::CNFtoBddAnn(CNF* cl){
 }
 
 
-//! \fn 
-//! \param 
-//! \brief
+//! \fn int BddRepresentation::getBddNumber(unsigned int node)
+//! \param node
 unsigned int BddRepresentation::getBddNumber(unsigned int node){
 	
 	trace(TRACE_5, "BddRepresentation::getBddNumber(unsigned int node): begin\n");
@@ -600,6 +601,8 @@ string BddRepresentation::myitoa(unsigned int value, int base) {
 }
 
 //! \fn void BddRepresentation::checkManager(DdManager* mgr, char* table)
+//! \param mgr
+//! \param table
 void BddRepresentation::checkManager(DdManager* mgr, char* table){
     cout << "\ncheck " <<table << ":\n";
     if (Cudd_CheckZeroRef(mgr) != 0){
@@ -611,6 +614,7 @@ void BddRepresentation::checkManager(DdManager* mgr, char* table){
 }
 
 //! \fn void BddRepresentation::reorder(Cudd_ReorderingType heuristic)
+//! \param heuristic
 void BddRepresentation::reorder(Cudd_ReorderingType heuristic){
 /*
      if (filename == "bddMp.dot"){

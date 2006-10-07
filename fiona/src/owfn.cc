@@ -286,19 +286,16 @@ owfnTransition ** oWFN::quasiFirelist() {
 //}
 
 void oWFN::addSuccStatesToList(vertex * n, State * NewState) {
-	if (NewState != NULL) {
 		
-		// test current marking if message bound k reached
-		vertexColor beforeViolationCheck = n->getColor();
-		checkMessageBound(n);
-		if (n->getColor() != beforeViolationCheck) {
-			cout << "checkMessageBound changed color for node " << n << " (addSuccStatesToList)" << endl;
-		}
-		
-		// add successors
-		for(int i = 0; i < NewState->CardFireList; i++) {
-			addStateToList(n, NewState->succ[i]);
-		}
+	// test current marking if message bound k reached
+	if (checkMessageBound()) {
+		n->setColor(RED);
+		cout << "checkMessageBound changed color for node " << n << " (addSuccStatesToList)" << endl;
+	}
+	
+	// add successors
+	for(int i = 0; i < NewState->CardFireList; i++) {
+		addStateToList(n, NewState->succ[i]);
 	}
 }
 
@@ -308,9 +305,8 @@ void oWFN::addStateToList(vertex * n, State * currentState) {
 	currentState->decodeShowOnly(this);
 		
 	// test current marking if message bound k reached
-	vertexColor beforeViolationCheck = n->getColor();
-	checkMessageBound(n);
-	if (n->getColor() != beforeViolationCheck) {
+	if (checkMessageBound()) {
+		n->setColor(RED);
 		cout << "checkMessageBound changed color for node " << n << " (addStateToList)" << endl;
 	}
 
@@ -324,7 +320,7 @@ void oWFN::addStateToList(vertex * n, State * currentState) {
 }
 
 
-//! \fn void oWFN::checkMessageBound()
+//! \fn bool oWFN::checkMessageBound()
 //! \return returns true iff current marking VIOLATES message bound
 //! \brief checks if message bound is violated by the current marking (for interface places only)
 bool oWFN::checkMessageBound() {
@@ -469,6 +465,7 @@ void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
 //			}
 //		}
 //	}
+
 	//initializeTransitions();
 }
 
@@ -785,21 +782,20 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	trace(TRACE_5, "oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal): end\n");
 }
 
-//! \fn void oWFN::calculateReachableStatesFull(vertex * listOfStates, bool minimal)
-//! \param listOfStates list containing all reachable states from the current marking (after function is done)
-//! \param minimal the current state is minimal in the vertex
+//! \fn void oWFN::calculateReachableStatesFull(vertex * n)
+//! \param n the node for which the reachability graph is computed
 //! \brief NO REDUCTION! calculate all reachable states from the current marking
-//! and store them in the list being passed as parameter (== vertex of communicationGraph)
-// returns true iff a message violation occured -> caller shall delete current node
-void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
+//! and store them in the node n (== vertex of communicationGraph);
+//! it will color the node n RED if a given message bound is violated
+void oWFN::calculateReachableStatesFull(vertex * n) {
 
 	// calculates the EG starting at the current marking
-	trace(TRACE_5, "oWFN::calculateReachableStatesFull(vertex * n, bool minimal) : start\n");
+	trace(TRACE_5, "oWFN::calculateReachableStatesFull(vertex * n) : start\n");
 
 	// test current marking if message bound k reached
 	if (checkMessageBound()) {
 		n->setColor(RED);
-		cout << "message bound violated; color of node " << n << " set to RED (calculateReachableStatesFull)" << endl;
+		cout << "message bound violated; color of node " << n << " set to RED (calculateReachableStatesFull, oben)" << endl;
 		return;
 	}
 	
@@ -821,13 +817,12 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 			CurrentState->decodeShowOnly(PN);
 			addSuccStatesToList(n, CurrentState);
 		}
-		trace(TRACE_5, "oWFN::calculateReachableStatesFull(vertex * n, bool minimal) : end (root marking of EG already in bintree; states copied only)\n");
+		trace(TRACE_5, "oWFN::calculateReachableStatesFull(vertex * n) : end (root marking of EG already in bintree; states copied only)\n");
 		return;
 	} else {
 	
 		// the other case:
 		// we have a marking which has not yet a state object assigned to it
-		
 		CurrentState = binInsert(this);
 	
 		CurrentState->firelist = firelist();
@@ -858,10 +853,10 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 		// building EG in a node
 	  	while(CurrentState) {
 	 
-			if ((n->reachGraphStateSet.size() % 1000) == 0) {
-				trace(TRACE_2, "\t current state count: " + intToString(n->reachGraphStateSet.size()) + "\n");
-			}
-		  	
+//			if ((n->reachGraphStateSet.size() % 1000) == 0) {
+//				trace(TRACE_2, "\t current state count: " + intToString(n->reachGraphStateSet.size()) + "\n");
+//			}
+//		  	
 			// no more transition to fire from current state?
 			if (CurrentState->current < CurrentState->CardFireList) {
 				// there is a next state that needs to be explored
@@ -876,7 +871,6 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 				  		
 				// fire and reach next state
 				CurrentState->firelist[CurrentState->current]->fire(this);
-				minimal = isMinimal();
 				NewState = binSearch(this);
 				
 		  		if(NewState != NULL) {
@@ -926,9 +920,8 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 		      		CurrentState = NewState;
 			      		
 					// test current marking if message bound k reached
-					vertexColor beforeViolationCheck = n->getColor();
-					checkMessageBound(n);
-					if (n->getColor() != beforeViolationCheck) {
+					if (checkMessageBound()) {
+						n->setColor(RED);
 						cout << "checkMessageBound changed color for node " << n << " (calculateReachableStatesFull, unten)" << endl;
 					}
 	
@@ -954,18 +947,17 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 		if (tempCurrentMarking) {
 			delete[] tempCurrentMarking;	
 		}
-		trace(TRACE_5, "oWFN::calculateReachableStatesFull(vertex * n, bool minimal) : end\n");
+		trace(TRACE_5, "oWFN::calculateReachableStatesFull(vertex * n) : end\n");
 		return;
 	}
 }
 
 
 //! \fn int oWFN::addInputMessage(unsigned int message)
-//! \param message name of message to be added to the currentmarking
+//! \param message message to be added to the currentmarking
 //! \brief adds input message to the current marking
-int oWFN::addInputMessage(unsigned int message) {
+void oWFN::addInputMessage(unsigned int message) {
 
-	// found that place
 	CurrentMarking[message]++;
 
 	placeHashValue += Places[message]->hash_factor;
@@ -974,13 +966,13 @@ int oWFN::addInputMessage(unsigned int message) {
 	for (int k = 0; k < Places[message]->NrOfLeaving; k++) {
 		((owfnTransition *) Places[message]->LeavingArcs[k]->Destination)->check_enabled(this);
 	}
-	return 0;		// place found
-}			
+	return;
+}
 
 
-//! \fn int oWFN::addInputMessage(char * messages)
-//! \param message name of message to be added to the currentmarking
-//! \brief adds input message to the current marking
+//! \fn int oWFN::addInputMessage(messageMultiSet messages)
+//! \param messages multiset of messages to be added to the currentmarking
+//! \brief adds input messages to the current marking
 int oWFN::addInputMessage(messageMultiSet messages) {
 	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
 		if (Places[*iter]->type == INPUT) {
@@ -1063,8 +1055,8 @@ void oWFN::printmarking(unsigned int * marking) {
 }
 
 
-//! \fn char * oWFN::printMarking(unsigned int * myMarking) 
-//! \param myMarking the marking to be printed out
+//! \fn char * oWFN::printMarking(unsigned int * marking) 
+//! \param marking the marking to be printed out
 //! \brief returns the label of the given marking, that means the label consists of the names of the 
 //! places of the net that have tokens (is a multiset => occurance of name == number of tokens
 //
@@ -1216,7 +1208,7 @@ void oWFN::RemoveGraph() {
 
 
 //! \fn int oWFN::removeOutputMessage(unsigned int message)
-//! \param messageName name of message to be deleted from currentmarking
+//! \param message name of message to be deleted from currentmarking
 //! \brief removes an output message from the current marking, if an output place was found the marking on that
 //! place is decreased by one and the function returns 1
 int oWFN::removeOutputMessage(unsigned int message) {
@@ -1236,8 +1228,8 @@ int oWFN::removeOutputMessage(unsigned int message) {
 }	
 
 //! \fn int oWFN::removeOutputMessage(messageMultiSet messages)
-//! \param message index of message to be deleted from currentmarking
-//! \brief removes an output message from the current marking, if an output place was found the marking on that
+//! \param messages multiset of messages to be deleted from currentmarking
+//! \brief removes output messages from the current marking, if an output place was found the marking on that
 //! place is decreased by one and the function returns 1
 int oWFN::removeOutputMessage(messageMultiSet messages) {
 	unsigned int found = 0;
@@ -1276,7 +1268,7 @@ void oWFN::deleteTransition(owfnTransition * transition) {
 
 
 //! \fn stateType oWFN::typeOfState()
-//! \brief returns true, if current state is transient; that means the number of enabled transitions is > 0
+//! \brief returns type of state: {TRANS, DEADLOCK, FINALSTATE, NN}
 stateType oWFN::typeOfState() {
 	trace(TRACE_5, "oWFN::typeOfState() : start\n");
 	if (isFinal()) {			// state is final
@@ -1311,30 +1303,13 @@ bool oWFN::isMaximal() {
 	return transNrEnabled == 0;			
 }
 
-//! \fn bool oWFN::isFinalMarking(unsigned int * marking) 
-//! \param marking marking to be checked
-//! \brief checks if the marking given as parameter is the final marking of the net
-//bool oWFN::isFinalMarking(unsigned int * marking) {
-//	for (int i = 0; i < getPlaceCnt(); i++) {
-//		if (Places[i]->type != INTERNAL && marking[i] > 0) {
-//			return false;
-//		}
-////		if (FinalMarking[i] != 0 && marking[i] != FinalMarking[i]) {
-//		if (FinalMarking[i] != 0 && marking[i] < FinalMarking[i]) {
-//			return false;	
-//		}
-//	}
-//	return true;
-//}
 
-
+//! \fn bool oWFN::isFinal()
+//! \brief checks if the current marking satisfies final condition or final marking, resp.
+//! if a final condition is given, a possible final marking is ignored
 bool oWFN::isFinal() {
 	trace(TRACE_5, "oWFN::bool oWFN::isFinal() : start\n");
 	if(FinalCondition) {
-		// update formula for each place
-		// TODO: update should always be done after firing (in owfnTransition::fire)
-		//                                        decoding (in State::decode and State::decodeShowOnly)
-		//                            or copying a marking (oWFN::copyCurrentMarking and oWFN::copyMarkingToCurrentMarking)
 		for (int currentplacenr = 0; currentplacenr < getPlaceCnt(); currentplacenr++) {
 		    for(int j=0; j < PN->Places[currentplacenr]->cardprop; j++) {
 				if (PN->Places[currentplacenr]->proposition != NULL) {

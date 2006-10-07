@@ -259,7 +259,6 @@ int main(int argc, char ** argv) {
 				
 		        seconds2 = time (NULL);
 		        trace(TRACE_0, "building the operating guideline finished.\n");
-		
 		        cout << difftime(seconds2,seconds) << " s consumed for building graph" << endl;
 		
 		        trace(TRACE_0, "\nnet is controllable: ");
@@ -268,6 +267,7 @@ int main(int argc, char ** argv) {
 				} else {
 					trace(TRACE_0, "NO\n\n");
 				}
+				
 				trace(TRACE_0, "number of states calculated: " + intToString(State::card) + "\n");
 		        trace(TRACE_0, "OG: number of nodes: " + intToString(graph->getNumberOfVertices()) + "\n");
 	    	    trace(TRACE_0, "    number of edges: " + intToString(graph->getNumberOfEdges()) + "\n");

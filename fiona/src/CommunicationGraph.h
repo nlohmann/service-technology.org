@@ -80,13 +80,13 @@ protected:
    unsigned int numberOfStatesAllNodes;
 
 public:
-    communicationGraph (oWFN *);
-    ~communicationGraph ();
+	communicationGraph (oWFN *);
+	~communicationGraph ();
 
-   int numberOfEdges;               //!< the number of edges of the graph
+	int numberOfEdges;               //!< the number of edges of the graph
 
+	vertexSet setOfVertices;
 
-   vertexSet setOfVertices;
 
     void calculateRootNode();
 
@@ -97,8 +97,8 @@ public:
 
     vertex * findVertexInSet(vertex *);
 
-    int AddVertex (vertex *, unsigned int, edgeType);
-    int AddVertex (vertex *, messageMultiSet, edgeType);
+    bool AddVertex (vertex *, unsigned int, edgeType);
+    bool AddVertex (vertex *, messageMultiSet, edgeType);
 
     void buildGraphRandom();
 

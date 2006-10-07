@@ -22,7 +22,7 @@ interactionGraph::~interactionGraph() {
 
 //! \fn void interactionGraph::buildGraph()
 //! \brief builds the graph starting with the root node
-void interactionGraph::buildGraph() {	
+void interactionGraph::buildGraph() {
     calculateRootNode(); // creates the root node and calculates its reachability graph (set of states)
 
 	if (options[O_CALC_REDUCED_IG]) {
@@ -359,8 +359,9 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 // reduction rules
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-//! \fn setOfMessages interactionGraph::combineReceivingEvents(vertex * node)
+//! \fn setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessages & inputMessages)
 //! \param node the node for which the activated output events are calculated
+//! \param inputMessages
 //! \brief creates a list of all output messages of the current node
 setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessages & inputMessages) {
 #ifdef DEBUG
@@ -579,7 +580,7 @@ bool interactionGraph::terminateBuildingGraph(vertex * node) {
 	return false;
 }
 
-//! \fn stateList * interactionGraph::calculateSuccStatesOutputSet(messageList * output, vertex * node)
+//! \fn void interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, vertex * node)
 //! \param output the output messages that are taken from the marking
 //! \param node
 //! \brief calculates the set of successor states in case of an output message
@@ -604,7 +605,7 @@ void interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, vert
 		if (PN->removeOutputMessage(output)) {	// remove the output message from the current marking
 			// if there is a state for which an output event was activated, catch that state
 			if (options[O_CALC_ALL_STATES]) {
-				PN->calculateReachableStatesFull(node, false);	// calc the reachable states from that marking
+				PN->calculateReachableStatesFull(node);	// calc the reachable states from that marking
 			} else {
 				PN->calculateReachableStatesOutputEvent(node, false);	// calc the reachable states from that marking
 			}
@@ -612,7 +613,7 @@ void interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, vert
 	}
 }
 
-//! \fn stateList * interactionGraph::calculateSuccStatesInputReduced(char * input, vertex * node)
+//! \fn void interactionGraph::calculateSuccStatesInputReduced(messageMultiSet input, vertex * node)
 //! \param input set of input messages
 //! \param node the node for which the successor states are to be calculated
 //! \brief calculates the set of successor states in case of an input message
@@ -637,7 +638,7 @@ void interactionGraph::calculateSuccStatesInputReduced(messageMultiSet input, ve
 
 			PN->addInputMessage(input);					// add the input message to the current marking
 			if (options[O_CALC_ALL_STATES]) {
-				PN->calculateReachableStatesFull(node, false);	// calc the reachable states from that marking
+				PN->calculateReachableStatesFull(node);	// calc the reachable states from that marking
 			} else {
 				PN->calculateReachableStatesInputEvent(node, false);	// calc the reachable states from that marking
 			}

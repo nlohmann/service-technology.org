@@ -32,19 +32,14 @@ void clause::setEdge(graphEdge * _edge) {
 	}	
 }
 
-//! \fn reachGraphState::reachGraphState(char * _label, stateType _type, bool isMinimal)
-//! \param _label the label/ name of the state
-//! \param _type type of the state (transient, deadlock)
+//! \fn reachGraphState::reachGraphState(bool isMinimal)
 //! \param isMinimal the state is a minimal state or not
 //! \brief constructor
 reachGraphState::reachGraphState(bool isMinimal) :
                 state(NULL), isMin(isMinimal), firstElement(NULL) {
-     	
 }
 
-//! \fn reachGraphState::reachGraphState(char * _label, stateType _type, bool isMinimal, State * s)
-//! \param _label the label/ name of the state
-//! \param _type type of the state (transient, deadlock)
+//! \fn reachGraphState::reachGraphState(bool isMinimal, State * s)
 //! \param isMinimal the state is a minimal state or not
 //! \param s pointer to Karsten's state
 //! \brief constructor

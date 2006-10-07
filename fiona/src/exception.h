@@ -26,17 +26,17 @@
  * This file declares the exception class.
  * 
  * \author  
- *          - last changes of: \$Author: bretschn $
+ *          - last changes of: \$Author: massuthe $
  *          
  * \date
- *          - last changed: \$Date: 2006-07-17 13:50:33 $
+ *          - last changed: \$Date: 2006-10-07 18:11:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  */
 
 
@@ -89,10 +89,10 @@ typedef enum
 class Exception
 {
   public:
-    /// Constructor with mandatory parameters #myid and #myerror.
+    /// Constructor with mandatory parameters myid and myerror.
     Exception(exception_id myid, std::string myerror);
 
-    /// Constructor with mandatory parameters #myid, #myerror and #myinformation.
+    /// Constructor with mandatory parameters myid, myerror and myinformation.
     Exception(exception_id myid, std::string myerror, std::string myinformation);
 
     /// Prints exception message.

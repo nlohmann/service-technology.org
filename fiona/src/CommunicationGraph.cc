@@ -25,7 +25,7 @@ communicationGraph::communicationGraph(oWFN * _PN) :
 }
 
 //! \fn communicationGraph::~communicationGraph()
-//! \brief destructor !to be implemented!
+//! \brief destructor
 communicationGraph::~communicationGraph() {
 	trace(TRACE_5, "communicationGraph::~communicationGraph() : start\n");
 	vertexSet::iterator iter;
@@ -34,8 +34,8 @@ communicationGraph::~communicationGraph() {
 		delete *iter;
 	}
 	
-//	delete root;
-	trace(TRACE_5, "communicationGraph::~communicationGraph() : start\n");
+//	delete root; 		// not necessary for OG   ...and for IG?????
+	trace(TRACE_5, "communicationGraph::~communicationGraph() : end\n");
 }
 
 //! \fn vertex * communicationGraph::getRoot() const
@@ -45,31 +45,32 @@ vertex * communicationGraph::getRoot() const {
     return root;
 }
 
-//! \fn unsigned int communicationGraph::NumberOfEdges () const
+//! \fn unsigned int communicationGraph::getNumberOfEdges() const
 //! \return number of edges
 //! \brief returns the number of edges of the graph
-unsigned int communicationGraph::getNumberOfEdges () const {
+unsigned int communicationGraph::getNumberOfEdges() const {
     return numberOfEdges;
 }
 
-//! \fn unsigned int communicationGraph::NumberOfVertices () const
+//! \fn unsigned int communicationGraph::getNumberOfVertices() const
 //! \return number of vertices
 //! \brief returns the number of vertices of the graph
-unsigned int communicationGraph::getNumberOfVertices () const {
+unsigned int communicationGraph::getNumberOfVertices() const {
     return numberOfVertices;
 }
 
 //! \fn void communicationGraph::calculateRootNode()
 //! \brief calculates the root node of the graph
+// for OG only
 void communicationGraph::calculateRootNode() {
     trace(TRACE_5, "void reachGraph::calculateRootNode(): start\n");
 
-    // initialize graph => calculate root node
+    // create new OG root node
     root = new vertex(PN->placeInputCnt + PN->placeOutputCnt);
 
     // calc the reachable states from that marking
     if (options[O_CALC_ALL_STATES]) {
-        PN->calculateReachableStatesFull(root, true);
+        PN->calculateReachableStatesFull(root);
     } else {
         PN->calculateReachableStatesInputEvent(root, true);
     }
@@ -98,9 +99,9 @@ vertex * communicationGraph::findVertexInSet(vertex * toAdd) {
 }
 
 
-//! \fn int communicationGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type)
+//! \fn bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type)
 //! \param toAdd a reference to the vertex that is to be added to the graph
-//! \param label the label of the edge between the current vertex and the one to be added
+//! \param messages the label of the edge between the current vertex and the one to be added
 //! \param type the type of the edge (sending, receiving)
 //! \brief adding a new vertex/ edge to the graph
 //!
@@ -113,7 +114,7 @@ vertex * communicationGraph::findVertexInSet(vertex * toAdd) {
 //! and the node we have just found, the found one gets the current node as a predecessor node
 
 // for IG
-int communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) {
+bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) {
     trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : start\n");
 
     if (numberOfVertices == 0) {                // graph contains no nodes at all
@@ -160,7 +161,7 @@ int communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edg
 
             trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : end\n");
 
-            return 1;
+            return true;
         } else {
             trace(TRACE_1, "\t successor node already known: " + intToString(found->getNumber()) + "\n");
 
@@ -176,130 +177,124 @@ int communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edg
 
             trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : end\n");
 
-            return 0;
+            return false;
         }
     }
 }
 
 
 // for OG
-int communicationGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type) {
+bool communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType type) {
 
-	trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type): start\n");
+	trace(TRACE_5, "reachGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType type): start\n");
 
 	int offset = 0;
 
     assert(numberOfVertices > 0);
     assert(setOfVertices.size() > 0);
     
-//    if (numberOfVertices == 0) {                // graph contains no nodes at all
-//        root = toAdd;                           // the given node becomes the root node
-//        currentVertex = root;
-//        numberOfVertices++;
-//        setOfVertices.insert(toAdd);
-//    } else {
-        vertex * found = findVertexInSet(toAdd);
-        char * edgeLabel;
+    char * edgeLabel;
+    if (type == sending) {
+        edgeLabel = PN->inputPlacesArray[label]->name;
+    } else {
+        edgeLabel = PN->outputPlacesArray[label]->name;
+	}
 
+	// try to find vertex in set of known vertices
+    vertex * found = findVertexInSet(toAdd);
+
+//	if (options[O_BDD] == true || found == NULL) {
+    if (found == NULL) {
+
+        trace(TRACE_1, "\n\t new successor node computed:");
+        toAdd->setNumber(numberOfVertices++);
+
+        graphEdge * edgeSucc = new graphEdge(toAdd, edgeLabel, type);
+        currentVertex->addSuccessorNode(edgeSucc);
+
+		currentVertex->setAnnotationEdges(edgeSucc);
+		
+        for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
+            toAdd->eventsUsed[i] = currentVertex->eventsUsed[i];
+        }
+
+        if (type == receiving) {
+            offset = PN->placeInputCnt;
+        }
+
+        toAdd->eventsUsed[offset + label]++;
+
+        // \begin{hack} for online shop example
         if (type == sending) {
-            edgeLabel = PN->inputPlacesArray[label]->name;
-        } else {
-            edgeLabel = PN->outputPlacesArray[label]->name;
-        }
-
-//        if (options[O_BDD] == true || found == NULL) {
-        if (found == NULL) {
-
-//		if (true) {
-            trace(TRACE_1, "\n\t new successor node computed:");
-            toAdd->setNumber(numberOfVertices++);
-
-            graphEdge * edgeSucc = new graphEdge(toAdd, edgeLabel, type);
-            currentVertex->addSuccessorNode(edgeSucc);
-
-			currentVertex->setAnnotationEdges(edgeSucc);
-			
-            for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
-                toAdd->eventsUsed[i] = currentVertex->eventsUsed[i];
-            }
-
-            if (type == receiving) {
-                offset = PN->placeInputCnt;
-            }
-
-            toAdd->eventsUsed[offset + label]++;
-
-            // \begin{hack} for online shop example
-            if (type == sending) {
-                if (strcmp(PN->inputPlacesArray[label]->name, "in.abort") == 0) {
-                    for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
-                        toAdd->eventsUsed[i]++;
-                    }
+            if (strcmp(PN->inputPlacesArray[label]->name, "in.abort") == 0) {
+                for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
+                    toAdd->eventsUsed[i]++;
                 }
             }
-			// \end{hack}
+        }
+		// \end{hack}
 
-            currentVertex = toAdd;
-            numberOfEdges++;
+        currentVertex = toAdd;
+        numberOfEdges++;
 
-            setOfVertices.insert(toAdd);
+        setOfVertices.insert(toAdd);
 
-           	numberOfStatesAllNodes += toAdd->reachGraphStateSet.size();
-	
-			trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type): end\n");
+       	numberOfStatesAllNodes += toAdd->reachGraphStateSet.size();
 
-            return 1;
-        } else {
-            trace(TRACE_5, "\t computed successor node already known: " + intToString(found->getNumber()) + "\n");
+		trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type): end\n");
 
-            graphEdge * edgeSucc = new graphEdge(found, edgeLabel, type);
-            currentVertex->addSuccessorNode(edgeSucc);
+        return true;
+    } else {
+        trace(TRACE_5, "\t computed successor node already known: " + intToString(found->getNumber()) + "\n");
 
-			currentVertex->setAnnotationEdges(edgeSucc);
+        graphEdge * edgeSucc = new graphEdge(found, edgeLabel, type);
+        currentVertex->addSuccessorNode(edgeSucc);
 
-            numberOfEdges++;
+		currentVertex->setAnnotationEdges(edgeSucc);
 
-            if (type == receiving) {
-                offset = PN->placeInputCnt;
-            }
+        numberOfEdges++;
 
-            found->eventsUsed[offset + label]++;
+        if (type == receiving) {
+            offset = PN->placeInputCnt;
+        }
 
-            // \begin{hack} for online shop example
-            if (type == sending) {
-                if (strcmp(PN->inputPlacesArray[label]->name, "in.abort") == 0) {
-                    for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
-                         found->eventsUsed[i]++;
-                    }
+        found->eventsUsed[offset + label]++;
+
+        // \begin{hack} for online shop example
+        if (type == sending) {
+            if (strcmp(PN->inputPlacesArray[label]->name, "in.abort") == 0) {
+                for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
+                     found->eventsUsed[i]++;
                 }
             }
-            // \end{hack}
-
-            delete toAdd;
-
-			trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type): end\n");
-
-            return 0;
         }
-//    }
+        // \end{hack}
+
+        delete toAdd;
+
+		trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type): end\n");
+
+        return false;
+    }
 }
 
 
-//! \fn void communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * node)
+//! \fn void communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * oldNode, vertex * newNode)
 //! \param input the sending event currently performed
-//! \param node the node for which the successor states are to be calculated
-//! \return true iff message bound violation occured
-//! \brief calculates the set of successor states in case of an input message (sending event)
-// for OG
-void communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * node, vertex * newNode) {
+//! \param oldNode the old node carrying the states
+//! \param newNode the new node wich is computed
+//! \brief for each state of the old node:
+//! add input message and build reachability graph and add all states to new node
+// for OG only
+void communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * oldNode, vertex * newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : start\n");
 
     StateSet::iterator iter;              // iterator over the state set's elements
   	PN->setOfStatesTemp.clear();
   	PN->visitedStates.clear();
 
-    for (iter = node->reachGraphStateSet.begin();
-         iter != node->reachGraphStateSet.end(); iter++) {
+    for (iter = oldNode->reachGraphStateSet.begin();
+         iter != oldNode->reachGraphStateSet.end(); iter++) {
 
 		// get the marking of this state
 		(*iter)->decode(PN);
@@ -311,17 +306,24 @@ void communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * n
 				// adding input message to state already using full message bound
 				trace(TRACE_3, "\t\t\t\t\t adding input event would cause message bound violation\n");
 			    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
-				node->setColor(RED);
+				newNode->setColor(RED);
 				return;
 			}
 		}
         
-        PN->addInputMessage(input);                 // add the input message to the current marking
+        // asserted: adding input message does not violate message bound
+        PN->addInputMessage(input);			// add the input message to the current marking
         
         if (options[O_CALC_ALL_STATES]) {
-            PN->calculateReachableStatesFull(newNode, false);   // calc the reachable states from that marking
+            PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
         } else {
             PN->calculateReachableStatesInputEvent(newNode, false);       // calc the reachable states from that marking
+        }
+        
+        if (newNode->getColor() == RED) {
+        	// a message bound violation occured during computation of reachability graph
+		    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
+        	return;
         }
 	}
     
@@ -330,13 +332,14 @@ void communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * n
 }
 
 
-//! \fn void communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node)
+//! \fn bool communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, vertex * newNode)
 //! \param input (multi) set of input messages
 //! \param node the node for which the successor states are to be calculated
+//! \param newNode the new node where the new states go into
 //! \brief calculates the set of successor states in case of an input message
 // for IG
 bool communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, vertex * newNode) {
-    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node) : start\n");
+    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, vertex * newNode) : start\n");
 
     StateSet::iterator iter;              // iterator over the stateList's elements
 
@@ -363,23 +366,24 @@ bool communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex 
         
         PN->addInputMessage(input);                 // add the input message to the current marking
         if (options[O_CALC_ALL_STATES]) {
-            PN->calculateReachableStatesFull(newNode, false);   // calc the reachable states from that marking
+            PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
         } else {
             PN->calculateReachableStatesInputEvent(newNode, false);       // calc the reachable states from that marking
         }
     }
     
-    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node) : end\n");
+    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, vertex * newNode) : end\n");
 	return false;
 }
 
-//! \fn void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex * node)
+//! \fn void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex * node, vertex * newNode)
 //! \param output the output messages that are taken from the marking
 //! \param node the node for which the successor states are to be calculated
+//! \param newNode the new node where the new states go into
 //! \brief calculates the set of successor states in case of an output message
 // for OG
 void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex * node, vertex * newNode) {
-    trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node) : start\n");
+    trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node, vertex * newNode) : start\n");
 
 	StateSet::iterator iter;                      // iterator over the stateList's elements
   	PN->setOfStatesTemp.clear();
@@ -392,22 +396,23 @@ void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex *
         if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
             // if there is a state for which an output event was activated, catch that state
             if (options[O_CALC_ALL_STATES]) {
-                PN->calculateReachableStatesFull(newNode, true);   // calc the reachable states from that marking
+                PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
             } else {
                 PN->calculateReachableStatesOutputEvent(newNode, true);   // calc the reachable states from that marking
             }
         }
     }
-    trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node) : end\n");
+    trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node, vertex * newNode) : end\n");
 }
 
-//! \fn void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex * node)
+//! \fn void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode)
 //! \param output the output messages that are taken from the marking
 //! \param node the node for which the successor states are to be calculated
+//! \param newNode the new node where the new states go into
 //! \brief calculates the set of successor states in case of an output message
 // for IG
 void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) {
-    trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node) : start\n");
+    trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) : start\n");
 
     StateSet::iterator iter;                      // iterator over the stateList's elements
   	PN->setOfStatesTemp.clear();
@@ -420,13 +425,13 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
         if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
             // if there is a state for which an output event was activated, catch that state
             if (options[O_CALC_ALL_STATES]) {
-                PN->calculateReachableStatesFull(newNode, true);   // calc the reachable states from that marking
+                PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
             } else {
                 PN->calculateReachableStatesOutputEvent(newNode, true);   // calc the reachable states from that marking
             }
         }
     }
-    trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node) : end\n");
+    trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) : end\n");
 }
 
 //! \fn void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[])
@@ -571,7 +576,6 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
                 }
             } // while
         }
-
     }
 }
 
@@ -652,7 +656,7 @@ void communicationGraph::printDotFile() {
 }
 
 
-//! \fn bool communicationGraph::stateActivatesOutputEvents(reachGraphState * s)
+//! \fn bool communicationGraph::stateActivatesOutputEvents(State * s)
 //! \param s the state that is checked for activating output events
 //! \brief returns true, if the given state activates at least one output event
 bool communicationGraph::stateActivatesOutputEvents(State * s) {
@@ -672,6 +676,7 @@ bool communicationGraph::stateActivatesOutputEvents(State * s) {
 
 //! \fn analysisResult communicationGraph::analyseNode(vertex * node, bool finalAnalysis)
 //! \param node the node to be analysed
+//! \param finalAnalysis obsolete???
 //! \brief analyses the node and sets its color, if the node gets to be red, then TERMINATE is returned
 analysisResult communicationGraph::analyseNode(vertex * node, bool finalAnalysis) {
 

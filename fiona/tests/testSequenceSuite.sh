@@ -91,7 +91,7 @@ OGNOSC=15
 OGNON=8
 OGNOE=12
 
-while [ $i -le 12 ]
+while [ $i -le 9 ]
 do
     #echo running sequence$i
 

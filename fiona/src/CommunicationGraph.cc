@@ -291,7 +291,7 @@ int communicationGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType 
 //! \return true iff message bound violation occured
 //! \brief calculates the set of successor states in case of an input message (sending event)
 // for OG
-bool communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * node, vertex * newNode) {
+void communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * node, vertex * newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : start\n");
 
     StateSet::iterator iter;              // iterator over the state set's elements
@@ -311,7 +311,8 @@ bool communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * n
 				// adding input message to state already using full message bound
 				trace(TRACE_3, "\t\t\t\t\t adding input event would cause message bound violation\n");
 			    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
-				return true;
+				node->setColor(RED);
+				return;
 			}
 		}
         
@@ -325,7 +326,7 @@ bool communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * n
 	}
     
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
-    return false;
+    return;
 }
 
 

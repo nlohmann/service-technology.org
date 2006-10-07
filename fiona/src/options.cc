@@ -68,8 +68,6 @@ const char * par_string = "hvd:n:t:s:arc:m:e:b:";
 // --------------------- functions for command line evaluation ------------------------
 // Prints an overview of all commandline arguments.
 void print_help() {
-  trace("\n");
-  trace("\n");
   trace("Options: (if an option is skipped, the default settings are denoted)\n");
   trace("\n");
   trace(" -h | --help                  - print this information and exit\n");
@@ -142,7 +140,7 @@ void print_version(std::string name) {
   trace("\n");
   trace("Copyright (C) 2005, 2006 Peter Massuthe and Daniela Weinberg\n");
   trace("This is free software; see the source for copying conditions. There is NO\n");
-  trace("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
+  trace("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
 }
 
 
@@ -190,11 +188,11 @@ void parse_command_line(int argc, char* argv[]) {
   	while ((optc = getopt_long (argc, argv, par_string, longopts, (int *) 0)) != EOF) {
 	    switch (optc) {
 			case 'h':
-		      	options[O_HELP] = true;
-	  	      	break;
+		      	print_help();
+	  	      	exit(0);
 	      	case 'v':
-		      	options[O_VERSION] = true;
-				break;
+				print_version("");
+	  	      	exit(0);
 	      	case 'd':
 	 			if ( string(optarg) == "1" ) {
 		      		options[O_DEBUG] = true;
@@ -212,14 +210,20 @@ void parse_command_line(int argc, char* argv[]) {
 			      	options[O_DEBUG] = true;
 					debug_level = TRACE_5;
 		      	} else {
-					cerr << "Option error: wrong debug mode \t ...ignored" << endl;
+					cerr << "Error: \t wrong debug mode\n \t enter \"fiona --help\" for more information\n" << endl;
+					exit(1);
 			    }
 		      	break;
 	      	case 'n':
-		      	options[O_OWFN_NAME] = true;
-	        	// netfile = optarg;
-				netfiles.push_back(optarg);
-	          	break;
+	      		if (optarg) {
+			      	options[O_OWFN_NAME] = true;
+		        	// netfile = optarg;
+					netfiles.push_back(optarg);
+	      		} else {
+					cerr << "Error: \t net name missing\n \t enter \"fiona --help\" for more information\n" << endl;
+					exit(1);
+			    }
+		      	break;	      			
 	      	case 't':
 			  	if (string(optarg) == "OG") {
 				  	options[O_GRAPH_TYPE] = true;
@@ -230,7 +234,10 @@ void parse_command_line(int argc, char* argv[]) {
 			  		parameters[P_OG] = false;
 			  		parameters[P_IG] = true;
 			  	} else {
-					cerr << "Option error: wrong graph type \t ...IG computed" << endl;
+					cerr << "Warning: \t wrong graph type\n \t IG computed" << endl;
+				  	options[O_GRAPH_TYPE] = true;
+			  		parameters[P_OG] = false;
+			  		parameters[P_IG] = true;
 			    }
 			  	break;
 	      	case 'c':
@@ -269,7 +276,8 @@ void parse_command_line(int argc, char* argv[]) {
 	      			parameters[P_SHOW_NO_RED_NODES] = false;
 	      			parameters[P_SHOW_BLUE_NODES_ONLY] = false;
 	      		} else {
-					cerr << "Option error: wrong show option \t ...ignored" << endl;
+					cerr << "Error: \t wrong show option\n \t enter \"fiona --help\" for more information\n" << endl;
+					exit(1);
 			    }
 			    break;
 	      	case 'a':
@@ -279,40 +287,26 @@ void parse_command_line(int argc, char* argv[]) {
 		      	options[O_CALC_REDUCED_IG] = true;
 	          	break;
 	      	case 'b':
-		      	if (optarg) {
-			      	options[O_BDD] = true;
-		      		int i = atoi(optarg);
-		      		if (i >= 0 && i <= 21){
-		      			bdd_reordermethod = i;
-		      		} else {
-						cerr << "Option error: wrong parameter for -b option \t ...method 0 used" << endl;
-			      		bdd_reordermethod = 0;
-		      		}
-		      	} else {
-					cerr << "Option error: missing parameter for -b option \t ...method 0 used" << endl;
-		      		bdd_reordermethod = 0;
-		      	}
+		      	options[O_BDD] = true;
+	      		int i = atoi(optarg);
+	      		if (i >= 0 && i <= 21){
+	      			bdd_reordermethod = i;
+	      		} else {
+					cerr << "Error: \t wrong BDD reorder method\n \t enter \"fiona --help\" for more information\n" << endl;
+					exit(1);
+	      		}
 		      	break;
+	      	case '?':
+				cerr << "Error: \t option error \n \t enter \"fiona --help\" for more information\n" << endl;
+				exit(1);
 	      	default:
-				cerr << "Option error: unknown option or missing argument" << endl;
+				cerr << "Warning: \t unknown option ignored\n \t enter \"fiona --help\" for more information\n" << endl;
 				break;
 		}
 	}
 
-  	// print help and exit
-  	if (options[O_HELP]) {
-		print_help();
-    	exit(0);
-  	}
-  	
-  	// print version and exit
-  	if (options[O_VERSION]) {
-    	print_version("");
-    	exit(0);
-  	}
-
   	if (options[O_OWFN_NAME] == false) {
-  		trace(TRACE_0, "missing parameter -n\n");
+  		cerr << "Error: \t missing parameter -n\n \t enter \"fiona --help\" for more information\n" << endl;
   		exit(1);
   	}
 

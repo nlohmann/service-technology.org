@@ -102,9 +102,11 @@ public:
 
     void buildGraphRandom();
 
-    bool calculateSuccStatesInput(unsigned int, vertex *, vertex *);
+    // for OG
+    void calculateSuccStatesInput(unsigned int, vertex *, vertex *);
     void calculateSuccStatesOutput(unsigned int, vertex *, vertex *);
 
+    // for IG
     bool calculateSuccStatesInput(messageMultiSet, vertex *, vertex *);
     void calculateSuccStatesOutput(messageMultiSet, vertex *, vertex *);
 

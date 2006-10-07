@@ -59,32 +59,18 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	// get the annotation of the node (CNF)
 	computeCNF(currentNode);					// calculate CNF of this node
 
+	// stop when communication depth reached
 	if (actualDepth > PN->commDepth) {
-		// we have reached a leaf node
+		// node is a leaf
 		analyseNode(currentNode, true);
 		assert(currentNode->getColor() != BLACK);
 		return;
 	}
 
-
-//	if (terminateBuildingGraph(currentNode)) {
-//		if (currentNode->getColor() == RED) {
-//			color = "RED";
-//		} else if (currentNode->getColor() == BLUE) {
-//			color = "BLUE";
-//		} else {
-//			color = "BLACK";
-//		}
-//		trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + " (leaf)\n");		
-//
-//		trace(TRACE_1, "=================================================================\n");		
-//		return;
-//	}
-	
 	trace(TRACE_1, "=================================================================\n");
 
+	// communication depth not yet reached, going down
 	int i = 0;
-		
 	trace(TRACE_5, "iterating over inputSet\n");
 	// iterate over all elements of inputSet
 	while (i < PN->placeInputCnt) { 
@@ -111,7 +97,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 			} else {
 
 				if (AddVertex (v, i, sending)) {
-					
+
 					buildGraph(v);				// going down with sending event...
 	
 					trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");

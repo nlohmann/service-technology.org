@@ -57,7 +57,7 @@ void readnet() {
     if(netfile) {
         yyin = fopen(netfile,"r");
         if(!yyin) {
-            cerr << "cannot open netfile: " << netfile << "\n";
+            cerr << "cannot open netfile: " << netfile << "\n\n";
             exit(4);
         }
 		trace(TRACE_1, "--------------------------------------------------------------\n");
@@ -231,15 +231,14 @@ int main(int argc, char ** argv) {
 			trace(TRACE_0, " (including " + intToString(PN->getInputPlaceCnt()) + " input places, " + intToString(PN->getOutputPlaceCnt()) + " output places)\n");
 			trace(TRACE_0, "    transitions: " + intToString(PN->getTransitionCnt()) + "\n\n");
 		
-			if (PN->FinalMarking) {
-				trace(TRACE_0, "finalmarking given\n");
-			} else {
-				trace(TRACE_0, "NO finalmarking given\n");
-			}
 			if (PN->FinalCondition) {
-				trace(TRACE_0, "finalcondition given\n\n");
+				trace(TRACE_0, "finalcondition used\n\n");
 			} else {
-				trace(TRACE_0, "NO finalcondition given\n\n");
+				if (PN->FinalMarking) {
+					trace(TRACE_0, "finalmarking used\n\n");
+				} else {
+					trace(TRACE_0, "neither finalcondition nor finalmarking given\n");
+				}
 			}
 
 			// adjust commDepth and events_manual

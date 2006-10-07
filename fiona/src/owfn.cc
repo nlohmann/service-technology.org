@@ -324,35 +324,32 @@ void oWFN::addStateToList(vertex * n, State * currentState) {
 }
 
 
-//! \fn void oWFN::checkMessageBound(vertex * node)
-//! \param node the current node
-//! \return returns true iff bound is VIOLATED
+//! \fn void oWFN::checkMessageBound()
+//! \return returns true iff current marking VIOLATES message bound
 //! \brief checks if message bound is violated by the current marking (for interface places only)
-void oWFN::checkMessageBound(vertex * n) {
-	trace(TRACE_5, "oWFN::checkMessageBound(vertex * node): start\n");
+bool oWFN::checkMessageBound() {
+	trace(TRACE_5, "oWFN::checkMessageBound(): start\n");
 	// test marking of current state if message bound k reached
 	if (options[O_MESSAGES_MAX] == true) {      // k-message-bounded set
 		// test input places
 		for (int i = 0; i < placeInputCnt; i++) {
 			if (CurrentMarking[inputPlacesArray[i]->index] > messages_manual) {
 				cout << "\t checkMessageBound found violation for input place " << inputPlacesArray[i]->name << endl;
-				n->setColor(RED);
-				trace(TRACE_5, "oWFN::checkMessageBound(vertex * node): end\n");
-				return;
+				trace(TRACE_5, "oWFN::checkMessageBound(): end\n");
+				return true;
 			}
 		}
 		// test output places
 		for (int i = 0; i < placeOutputCnt; i++) {
 			if (CurrentMarking[outputPlacesArray[i]->index] > messages_manual) {
 				cout << "\t checkMessageBound found violation for output place " << outputPlacesArray[i]->name << endl;
-				n->setColor(RED);
-				trace(TRACE_5, "oWFN::checkMessageBound(vertex * node): end\n");
-				return;
+				trace(TRACE_5, "oWFN::checkMessageBound(): end\n");
+				return true;
 			}
 		}
 	}
-	trace(TRACE_5, "oWFN::checkMessageBound(vertex * node): end\n");
-	return;
+	trace(TRACE_5, "oWFN::checkMessageBound(): end\n");
+	return false;			// no violation found
 }
 
 
@@ -800,10 +797,10 @@ void oWFN::calculateReachableStatesFull(vertex * n, bool minimal) {
 	trace(TRACE_5, "oWFN::calculateReachableStatesFull(vertex * n, bool minimal) : start\n");
 
 	// test current marking if message bound k reached
-	vertexColor beforeViolationCheck = n->getColor();
-	checkMessageBound(n);
-	if (n->getColor() != beforeViolationCheck) {
-		cout << "checkMessageBound changed color for node " << n << " (calculateReachableStatesFull)" << endl;
+	if (checkMessageBound()) {
+		n->setColor(RED);
+		cout << "message bound violated; color of node " << n << " set to RED (calculateReachableStatesFull)" << endl;
+		return;
 	}
 	
 	State * CurrentState;

@@ -5,7 +5,6 @@
 #include "debug.h"
 #include "CNF.h"
 #include "vertex.h"
-#include <cassert>
 
 using namespace std;
 
@@ -110,7 +109,7 @@ unsigned int oWFN::getCommDepth() {
 
 
 unsigned int oWFN::getCardFireList() {
-	assert(false);		// cout << "oWFN::getCardFireList() never used" << endl;
+	ASSERT(false);		// cout << "oWFN::getCardFireList() never used" << endl;
 	return CardFireList;
 }
 
@@ -293,7 +292,7 @@ owfnTransition ** oWFN::quasiFirelist() {
 void oWFN::addSuccStatesToList(vertex * n, State * currentState) {
 	
 	if (currentState != NULL) {
-		assert(!n->addState(currentState));		// currentState was added to node before
+		ASSERT(!n->addState(currentState));		// currentState was added to node before
 
 		currentState->decodeShowOnly(this);		// decodes currently considered state
 	

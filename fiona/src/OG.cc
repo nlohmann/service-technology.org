@@ -61,7 +61,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	if (actualDepth > PN->commDepth) {
 		// node is a leaf
 		analyseNode(currentNode, true);
-		assert(currentNode->getColor() != BLACK);
+		ASSERT(currentNode->getColor() != BLACK);
 		trace(TRACE_1, "=================================================================\n");
 		return;
 	}

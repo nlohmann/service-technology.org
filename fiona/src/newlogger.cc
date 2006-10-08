@@ -10,7 +10,6 @@
 #include <cstdio>
 #include <set>
 #include <cmath>
-#include <cassert>
 #include "newlogger.h"
 #include "debug.h"
 
@@ -62,14 +61,14 @@ void LogInfo::logAllocation(size_t mem)
 
 void LogInfo::logReallocation(size_t oldmemsize, size_t newmemsize)
 {
-    assert(oldmemsize <= allocated_mem);
+    ASSERT(oldmemsize <= allocated_mem);
     allocated_mem += (newmemsize - oldmemsize);
 }
 
 void LogInfo::logDeallocation(size_t mem)
 {
     ++deallocCallCount;
-    assert(mem <= allocated_mem);
+    ASSERT(mem <= allocated_mem);
     allocated_mem -= mem;
 }
 

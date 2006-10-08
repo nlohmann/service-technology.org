@@ -7,7 +7,7 @@
 // Helps to prevent doing unintended memory operations such as writing outside
 // of array bounds or losing memory by overwriting pointers that should not be
 // overwritten.
-//#define ENABLE_ASSERTIONS
+#define ENABLE_ASSERTIONS
 
 // Select your operating system
 #define WINDOWS

@@ -190,8 +190,8 @@ bool communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
 
 	int offset = 0;
 
-    assert(numberOfVertices > 0);
-    assert(setOfVertices.size() > 0);
+    ASSERT(numberOfVertices > 0);
+    ASSERT(setOfVertices.size() > 0);
     
     char * edgeLabel;
     if (type == sending) {

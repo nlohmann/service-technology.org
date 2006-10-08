@@ -12,7 +12,6 @@
 
 #include "options.h" 
 #include "debug.h"
-#include <cassert>  
   
 //comparison function object
 struct cmp{
@@ -71,7 +70,7 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_Reorderin
     
     //add labels and their bddNumber to labelTable
     for (unsigned int i = 0; i < PN->placeInputCnt + PN->placeOutputCnt; ++i){
-    	assert(list_iter != labelList.end());
+    	ASSERT(list_iter != labelList.end());
     	//cout << i << "  " << *list_iter << endl;
     	label = new BddLabel(*list_iter, i, labelTable);
     	++list_iter;
@@ -317,7 +316,7 @@ DdNode* BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2){
     
     int j;
     for (int i = 0; i < maxNodeBits; ++i){     //TODO: schleife Absteigend durchlaufen (--i)
-    	assert(j >= 0);
+    	ASSERT(j >= 0);
     	j = maxNodeBits-1-i;
         if (assignment1[j] == false){
             tmp = Cudd_bddAnd(mgrMp, Cudd_Not(Cudd_bddIthVar(mgrMp, maxLabelBits+(2*i))), f);
@@ -389,7 +388,7 @@ DdNode* BddRepresentation::annotationToBddAnn(vertex* v){
     int j;
     for (int i = 0; i < maxNodeBits; ++i){     //TODO: schleife Absteigend durchlaufen (--i)
     	j = maxNodeBits-1-i;
-    	assert(j >= 0);
+    	ASSERT(j >= 0);
         if (assignment[j] == false){
             tmp = Cudd_bddAnd(mgrAnn, Cudd_Not(Cudd_bddIthVar(mgrAnn, nbrLabels+i)), f);
         }
@@ -547,7 +546,7 @@ BitVector BddRepresentation::numberToBin(unsigned int number, int cntBits){
     //calculate the binary representation
     int index = cntBits - 1;
     do {
-        assert(index >= 0);
+        ASSERT(index >= 0);
         assignment[index--] = number % base;
         number /= base;
     } while ( number );
@@ -705,7 +704,7 @@ void BddRepresentation::save(){
     int j = 0;
     //for (int i = countBddVar - v.size(); i< countBddVar; ++i){
     for (unsigned int i = 0; i < PN->placeInputCnt; ++i){
-    	assert(i < nbrLabels + maxNodeBits);
+    	ASSERT(i < nbrLabels + maxNodeBits);
     	//cout << "i: " << i << "   name: " << PN->inputPlacesArray[i]->name << "   nbr: " << labelTable->lookup(PN->inputPlacesArray[i]->name)->nbr << endl;
     	char* tmp = new char [strlen(PN->inputPlacesArray[i]->name) + 2];
     	strcpy (tmp,"!");
@@ -715,7 +714,7 @@ void BddRepresentation::save(){
     }
     
     for (unsigned int i = 0; i < PN->placeOutputCnt; ++i){
-		assert(i+PN->placeInputCnt < nbrLabels + maxNodeBits);
+		ASSERT(i+PN->placeInputCnt < nbrLabels + maxNodeBits);
 		//cout << "i: " << i << "   name: " << PN->outputPlacesArray[i]->name << "   nbr: " << labelTable->lookup(PN->outputPlacesArray[i]->name)->nbr << endl;
     	char* tmp = new char [strlen(PN->outputPlacesArray[i]->name) + 2];
     	strcpy (tmp,"?");
@@ -724,14 +723,14 @@ void BddRepresentation::save(){
         names[nbr] = tmp;
     }
 
-	assert(nbrLabels == PN->placeInputCnt+PN->placeOutputCnt);
-	assert(Cudd_ReadSize(mgrAnn) == nbrLabels + maxNodeBits);
+	ASSERT(nbrLabels == PN->placeInputCnt+PN->placeOutputCnt);
+	ASSERT(Cudd_ReadSize(mgrAnn) == nbrLabels + maxNodeBits);
     for (int i = nbrLabels; i < size; ++i){
-    	assert(i < Cudd_ReadSize(mgrAnn));
+    	ASSERT(i < Cudd_ReadSize(mgrAnn));
         //strcpy(hlp,(char*)(myitoa(i,10).c_str())); 
         
         int varNumber = i-nbrLabels;
-        assert (varNumber >= 0);
+        ASSERT(varNumber >= 0);
         //int z = (int)floor(log10((double)(varNumber)))+2;
         char* buffer = new char[11];
         sprintf(buffer, "%d", varNumber);

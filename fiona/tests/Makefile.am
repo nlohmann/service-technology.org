@@ -19,6 +19,6 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-TESTS = testSequenceSuite.sh testSequenceSuite2.sh extrema.sh
+TESTS = testSequenceSuite.sh bddtest.sh extrema.sh samples.sh messages.sh cyclic.sh
 
 TESTS_ENVIRONMENT = testdir=$(top_srcdir)/tests PATH=.:../src:$$PATH

@@ -1,0 +1,47 @@
+{ artifical net where oWFN may cause violation of message bound k=1 (additional partners for k=2) }
+
+PLACE
+INTERNAL
+  p0,
+  p1,
+  p2,
+  p3;
+
+INPUT
+  a,
+  b;
+
+OUTPUT
+  c,
+  d;
+
+INITIALMARKING
+  p0;
+
+FINALCONDITION
+  p3 = 2 AND p0 = 0 AND p1 = 0 AND p2 = 0 AND a = 0 AND b = 0 AND c = 0 AND d = 0;
+
+TRANSITION t1    { ?a }
+CONSUME
+  p0, a;
+PRODUCE
+  p1;
+
+TRANSITION t2    { ?b }
+CONSUME
+  p0, b;
+PRODUCE
+  p2: 2;
+
+TRANSITION t3    { !c }
+CONSUME
+  p1:   1;
+PRODUCE
+  p3: 2,
+  c;
+
+TRANSITION t4    { !d }
+CONSUME
+  p2:   1;
+PRODUCE
+  p3, d;

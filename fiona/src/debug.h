@@ -24,18 +24,18 @@
  * \brief Some debugging tools for BPEL2oWFN
  *
  * \author  
- *          - last changes of: \$Author: bretschn $
+ *          - last changes of: \$Author: massuthe $
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2006-08-10 14:03:30 $
+ *          - last changed: \$Date: 2006-10-08 13:36:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  */
 
 #ifndef DEBUG_H
@@ -46,6 +46,7 @@
 #include <iostream>
 #include <fstream>
 #include <exception>
+#include <cassert>
 
 typedef enum
 {

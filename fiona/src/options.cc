@@ -147,6 +147,8 @@ void print_version(std::string name) {
 // get parameters from options
 void parse_command_line(int argc, char* argv[]) {
 	
+  	int i;
+  	
   	// the program name on the commandline
   	string progname = string(argv[0]);
 
@@ -288,7 +290,7 @@ void parse_command_line(int argc, char* argv[]) {
 	          	break;
 	      	case 'b':
 		      	options[O_BDD] = true;
-	      		int i = atoi(optarg);
+	      		i = atoi(optarg);
 	      		if (i >= 0 && i <= 21){
 	      			bdd_reordermethod = i;
 	      		} else {

@@ -91,7 +91,8 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 				trace(TRACE_2, "\t\t\t\t    sending event: !");
 				trace(TRACE_2, PN->inputPlacesArray[i]->name);
 				trace(TRACE_2, " at node " + intToString(currentNode->getNumber()) + " suppressed (message bound violated)\n");
-				
+
+				numberDeletedVertices--;
 				delete v;
 			} else {
 

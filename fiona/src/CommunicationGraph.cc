@@ -224,16 +224,6 @@ bool communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
 
         toAdd->eventsUsed[offset + label]++;
 
-        // \begin{hack} for online shop example
-        if (type == sending) {
-            if (strcmp(PN->inputPlacesArray[label]->name, "in.abort") == 0) {
-                for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
-                    toAdd->eventsUsed[i]++;
-                }
-            }
-        }
-		// \end{hack}
-
         currentVertex = toAdd;
         numberOfEdges++;
 
@@ -259,16 +249,6 @@ bool communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
         }
 
         found->eventsUsed[offset + label]++;
-
-        // \begin{hack} for online shop example
-        if (type == sending) {
-            if (strcmp(PN->inputPlacesArray[label]->name, "in.abort") == 0) {
-                for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
-                     found->eventsUsed[i]++;
-                }
-            }
-        }
-        // \end{hack}
 
         delete toAdd;
 
@@ -310,10 +290,10 @@ void communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * o
 				return;
 			}
 		}
-        
+
         // asserted: adding input message does not violate message bound
         PN->addInputMessage(input);			// add the input message to the current marking
-        
+
         if (options[O_CALC_ALL_STATES]) {
             PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
         } else {
@@ -389,8 +369,10 @@ void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex *
   	PN->setOfStatesTemp.clear();
   	PN->visitedStates.clear();
 
-    for (iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
+    for (iter = node->reachGraphStateSet.begin();
+         iter != node->reachGraphStateSet.end(); iter++) {
 
+		// get the marking of this state
         (*iter)->decode(PN);
         
         if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking

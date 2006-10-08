@@ -104,8 +104,9 @@ class oWFN  {
 
 //		void addStateToList(vertex *, State *, bool);
 		void addSuccStatesToList(vertex *, State *);
+		void addSuccStatesToListOrig(vertex *, State *);
 		
-		void addStateToList(vertex *, State *);
+//		void addStateToList(vertex *, State *);
 		
 
 		bool checkMessageBound();

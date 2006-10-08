@@ -286,14 +286,16 @@ owfnTransition ** oWFN::quasiFirelist() {
 //}
 
 
-//! \fn void oWFN::addSuccStatesToList(vertex * n, State * newState)
+//! \fn void oWFN::addSuccStatesToList(vertex * n, State * currentState)
 //! \param n the node to add the states to
-//! \param newState the currently added state
+//! \param currentState the currently added state
 //! \brief decodes state, checks for message bound violation and adds successors recursively
-void oWFN::addSuccStatesToList(vertex * n, State * newState) {
+void oWFN::addSuccStatesToList(vertex * n, State * currentState) {
+	
+	if (currentState != NULL) {
+		assert(!n->addState(currentState));		// currentState was added to node before
 
-	if (newState != NULL) {
-		newState->decodeShowOnly(this);		// decodes currently considered state
+		currentState->decodeShowOnly(this);		// decodes currently considered state
 	
 		// test decoded current marking if message bound k reached
 		if (checkMessageBound()) {
@@ -302,11 +304,12 @@ void oWFN::addSuccStatesToList(vertex * n, State * newState) {
 			return;
 		}
 		
-		n->addState(newState);
-	
 		// add successors
-		for(int i = 0; i < newState->CardFireList; i++) {
-			addSuccStatesToList(n, newState->succ[i]);
+		for(int i = 0; i < currentState->CardFireList; i++) {
+			if (n->addState(currentState->succ[i])) {	// add current successor
+				// its successors need only be added if state was not yet in current node
+				addSuccStatesToList(n, currentState->succ[i]);
+			}
 		}
 	}
 }
@@ -806,7 +809,6 @@ void oWFN::calculateReachableStatesFull(vertex * n) {
 
 		if (n->addState(CurrentState)) {
 			// successors need only be added if state was not yet in current node
-//			CurrentState->decodeShowOnly(PN);
 			addSuccStatesToList(n, CurrentState);	// decodes and checks for message bound
 		}
 		trace(TRACE_5, "oWFN::calculateReachableStatesFull(vertex * n) : end (root marking of EG already in bintree; states copied only)\n");

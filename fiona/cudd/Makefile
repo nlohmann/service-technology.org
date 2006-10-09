@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.8 2006-10-04 11:52:15 bretschn Exp $
+# $Id: Makefile,v 1.9 2006-10-09 09:04:15 bretschn Exp $
 #
 # Makefile for the CUDD distribution kit 
 #---------------------------------------------------------------------------
@@ -58,7 +58,7 @@ include ./Makefile.inc
 # These four are typical settings for optimized code with gcc.  The
 # last two also work with icc/ecc.
 #ICFLAGS	= -g -O6 -Wall
-ICFLAGS	= -g -O6
+ICFLAGS	= -g -O2
 #ICFLAGS	= -g -O3 -Wall
 #ICFLAGS	= -g -O3
 

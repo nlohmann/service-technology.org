@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006-10-04 11:53:50 $ by $Author: bretschn $.
-# Version $Revision: 1.15 $
+# File last changed $Date: 2006-10-09 09:04:23 $ by $Author: bretschn $.
+# Version $Revision: 1.16 $
 
 bin_PROGRAMS = fiona
 
@@ -70,9 +70,11 @@ else
 LINK_COMPILE_64BIT_FLAG =
 endif
 
+OPTIMIZATION_LEVEL=-O2
+
 # Collect all compile flags
-fiona_CXXFLAGS = ${LINK_COMPILE_64BIT_FLAG}
-fiona_CFLAGS = ${LINK_COMPILE_64BIT_FLAG}
+fiona_CXXFLAGS = ${LINK_COMPILE_64BIT_FLAG} $(OPTIMIZATION_LEVEL)
+fiona_CFLAGS = ${LINK_COMPILE_64BIT_FLAG} $(OPTIMIZATION_LEVEL)
 
 # the library search path.
 fiona_LDFLAGS = ${LINK_COMPILE_64BIT_FLAG} $(all_libraries) 

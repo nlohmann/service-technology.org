@@ -9,20 +9,22 @@
 
 using namespace std;
 
+
 //! \fn communicationGraph::communicationGraph(oWFN * _PN)
 //! \param _PN
 //! \brief constructor
 communicationGraph::communicationGraph(oWFN * _PN) :
-    numberOfVertices(0),
+    numberOfNodes(0),
     numberOfEdges(0),
     actualDepth(0),
-    numberBlueNodes(0),
-    numberBlackNodes(0),
-    numberBlueEdges(0),
+    numberOfBlueNodes(0),
+    numberOfBlackNodes(0),
+    numberOfBlueEdges(0),
     numberOfStatesAllNodes(0) {
 
     PN = _PN;
 }
+
 
 //! \fn communicationGraph::~communicationGraph()
 //! \brief destructor
@@ -38,12 +40,22 @@ communicationGraph::~communicationGraph() {
 	trace(TRACE_5, "communicationGraph::~communicationGraph() : end\n");
 }
 
+
 //! \fn vertex * communicationGraph::getRoot() const
 //! \return pointer to root
 //! \brief returns a pointer to the root node of the graph
 vertex * communicationGraph::getRoot() const {
     return root;
 }
+
+
+//! \fn unsigned int communicationGraph::getNumberOfVertices() const
+//! \return number of vertices
+//! \brief returns the number of vertices of the graph
+unsigned int communicationGraph::getNumberOfNodes() const {
+    return numberOfNodes;
+}
+
 
 //! \fn unsigned int communicationGraph::getNumberOfEdges() const
 //! \return number of edges
@@ -52,12 +64,37 @@ unsigned int communicationGraph::getNumberOfEdges() const {
     return numberOfEdges;
 }
 
-//! \fn unsigned int communicationGraph::getNumberOfVertices() const
-//! \return number of vertices
-//! \brief returns the number of vertices of the graph
-unsigned int communicationGraph::getNumberOfVertices() const {
-    return numberOfVertices;
+
+//! \fn unsigned int communicationGraph::getNumberOfBlueNodes() const
+//! \return number of blue nodes
+//! \brief returns the number of blue nodes of the graph
+unsigned int communicationGraph::getNumberOfBlueNodes() const {
+    return numberOfBlueNodes;
 }
+
+
+//! \fn unsigned int communicationGraph::getNumberBlueOfEdges() const
+//! \return number of blue edges
+//! \brief returns the number of blue edges of the graph
+unsigned int communicationGraph::getNumberOfBlueEdges() const {
+    return numberOfBlueEdges;
+}
+
+
+//! \fn unsigned int communicationGraph::getNumberOfBlackNodes() const
+//! \return number of black nodes
+//! \brief returns the number of black nodes of the graph
+unsigned int communicationGraph::getNumberOfBlackNodes() const {
+    return numberOfBlackNodes;
+}
+
+
+//! \fn unsigned int communicationGraph::getNumberOfStatesAllNodes() const
+//! \return number of states stored in all nodes
+unsigned int communicationGraph::getNumberOfStatesAllNodes() const {
+    return numberOfStatesAllNodes;
+}
+
 
 //! \fn void communicationGraph::calculateRootNode()
 //! \brief calculates the root node of the graph
@@ -79,7 +116,9 @@ void communicationGraph::calculateRootNode() {
 
     numberOfStatesAllNodes += root->reachGraphStateSet.size();
     
-	numberOfVertices++;
+	numberOfNodes++;
+	numberOfBlueNodes++;
+	
 	setOfVertices.insert(root);
 
     trace(TRACE_5, "void reachGraph::calculateRootNode(): end\n");
@@ -117,10 +156,10 @@ vertex * communicationGraph::findVertexInSet(vertex * toAdd) {
 bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) {
     trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : start\n");
 
-    if (numberOfVertices == 0) {                // graph contains no nodes at all
+    if (numberOfNodes == 0) {                // graph contains no nodes at all
         root = toAdd;                           // the given node becomes the root node
         currentVertex = root;
-        numberOfVertices++;
+        numberOfNodes++;
 
         setOfVertices.insert(toAdd);
     } else {
@@ -143,7 +182,7 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
 
             trace(TRACE_1, "\n\t new successor node computed:");
 
-            toAdd->setNumber(numberOfVertices++);
+            toAdd->setNumber(numberOfNodes++);
 
             graphEdge * edgeSucc = new graphEdge(toAdd, label, type);
             currentVertex->addSuccessorNode(edgeSucc);
@@ -190,8 +229,8 @@ bool communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
 
 	int offset = 0;
 
-    ASSERT(numberOfVertices > 0);
-    ASSERT(setOfVertices.size() > 0);
+    assert(numberOfNodes > 0);
+    assert(setOfVertices.size() > 0);
     
     char * edgeLabel;
     if (type == sending) {
@@ -205,9 +244,10 @@ bool communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
 
 //	if (options[O_BDD] == true || found == NULL) {
     if (found == NULL) {
-
         trace(TRACE_1, "\n\t new successor node computed:");
-        toAdd->setNumber(numberOfVertices++);
+
+        toAdd->setNumber(numberOfNodes++);
+        numberOfBlueNodes++;			// all nodes initially blue
 
         graphEdge * edgeSucc = new graphEdge(toAdd, edgeLabel, type);
         currentVertex->addSuccessorNode(edgeSucc);
@@ -416,6 +456,88 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) : end\n");
 }
 
+
+//! \fn void communicationGraph::printDotFile()
+//! \brief creates a dot file of the graph
+void communicationGraph::printDotFile() {
+    
+    int maxWriteingSize = 1000;
+    int maxPrintingSize =  500;
+    
+    if (numberOfBlueNodes <= maxWriteingSize) {
+        vertex * tmp = root;
+        bool visitedNodes[numberOfNodes];
+
+        for (int i = 0; i < numberOfNodes; i++) {
+            visitedNodes[i] = 0;
+        }
+
+        char buffer[256];
+        if (parameters[P_OG]) {
+            if (options[O_CALC_ALL_STATES]) {
+                sprintf(buffer, "%s.a.OG.out", netfile);
+            } else {
+                sprintf(buffer, "%s.OG.out", netfile);
+            }
+        } else {
+            if (options[O_CALC_ALL_STATES]) {
+                sprintf(buffer, "%s.a.IG.out", netfile);
+            } else {
+                sprintf(buffer, "%s.IG.out", netfile);
+            }
+        }
+
+        fstream dotFile(buffer, ios_base::out | ios_base::trunc);
+        dotFile << "digraph g1 {\n";
+        dotFile << "graph [fontname=\"Helvetica\", label=\"";
+        parameters[P_OG] ? dotFile << "OG of " : dotFile << "IG of ";
+        dotFile << netfile;
+        dotFile << "\"];\n";
+        dotFile << "node [fontname=\"Helvetica\" fontsize=10];\n";
+        dotFile << "edge [fontname=\"Helvetica\" fontsize=10];\n";
+
+        numberOfBlueNodes = 0;
+        numberOfBlackNodes = 0;
+
+        printGraphToDot(tmp, dotFile, visitedNodes);
+        dotFile << "}";
+        dotFile.close();
+
+	    trace(TRACE_0, "\n    number of blue nodes: " + intToString(getNumberOfBlueNodes()) + "\n");
+	    if (getNumberOfBlackNodes() > 0) {
+	        trace(TRACE_0, "\n    number of black nodes: " + intToString(getNumberOfBlackNodes()) + "\n");
+	    }
+        trace(TRACE_0, "    number of blue edges: " + intToString(getNumberOfBlueEdges()) + "\n");
+        trace(TRACE_0, "    number of states stored in nodes: " + intToString(getNumberOfStatesAllNodes()) + "\n");
+
+		trace(TRACE_0, "creating the dot file of the graph...\n");
+        
+        if (numberOfNodes < maxPrintingSize) {
+            if (parameters[P_OG]) {
+                if (options[O_CALC_ALL_STATES]) {
+                    sprintf(buffer, "dot -Tpng %s.a.OG.out -o %s.a.OG.png", netfile, netfile);
+                } else {
+                    sprintf(buffer, "dot -Tpng %s.OG.out -o %s.OG.png", netfile, netfile);
+                }
+            } else {
+                if (options[O_CALC_ALL_STATES]) {
+                    sprintf(buffer, "dot -Tpng %s.a.IG.out -o %s.a.IG.png", netfile, netfile);
+                } else {
+                    sprintf(buffer, "dot -Tpng %s.IG.out -o %s.IG.png", netfile, netfile);
+                }
+            }
+            trace(TRACE_0, buffer); trace(TRACE_0, "\n");
+            system(buffer);
+
+        } else {
+            trace(TRACE_0, "graph is too big (>" + intToString(maxPrintingSize) + " nodes) to have dot create the graphics\n");
+        }
+    } else {
+        trace(TRACE_0, "graph is too big (>" + intToString(maxWriteingSize) + " nodes) to create dot file\n");
+    }
+}
+
+
 //! \fn void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNodes[])
 //! \param v current node in the iteration process
 //! \param os output stream
@@ -428,9 +550,9 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
 	}
 
     if (v->getColor() == BLUE) {
-        numberBlueNodes++;
+        numberOfBlueNodes++;
     } else if (v->getColor() == BLACK) {
-        numberBlackNodes++;
+        numberOfBlackNodes++;
     }
 
     if (parameters[P_SHOW_ALL_NODES]
@@ -546,7 +668,7 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
                             os << "p" << v->getNumber() << "->" << "p" << vNext->getNumber() << " [label=\"" << label << element->getLabel() << "\", fontcolor=black, color=";
                             switch (vNext->getColor()) {
                                 case RED: os << "red"; break;
-                                case BLUE: os << "blue"; numberBlueEdges++; break;
+                                case BLUE: os << "blue"; numberOfBlueEdges++; break;
                                 default: os << "black"; break;
                             }
                             os << "];\n";
@@ -558,82 +680,6 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
                 }
             } // while
         }
-    }
-}
-
-
-//! \fn void communicationGraph::printDotFile()
-//! \brief creates a dot file of the graph
-void communicationGraph::printDotFile() {
-    if (numberOfVertices < 200000) {
-        vertex * tmp = root;
-        bool visitedNodes[numberOfVertices];
-
-        for (int i = 0; i < numberOfVertices; i++) {
-            visitedNodes[i] = 0;
-        }
-
-        char buffer[256];
-        if (parameters[P_OG]) {
-            if (options[O_CALC_ALL_STATES]) {
-                sprintf(buffer, "%s.a.OG.out", netfile);
-            } else {
-                sprintf(buffer, "%s.OG.out", netfile);
-            }
-        } else {
-            if (options[O_CALC_ALL_STATES]) {
-                sprintf(buffer, "%s.a.IG.out", netfile);
-            } else {
-                sprintf(buffer, "%s.IG.out", netfile);
-            }
-        }
-
-        fstream dotFile(buffer, ios_base::out | ios_base::trunc);
-        dotFile << "digraph g1 {\n";
-        dotFile << "graph [fontname=\"Helvetica\", label=\"";
-        parameters[P_OG] ? dotFile << "OG of " : dotFile << "IG of ";
-        dotFile << netfile;
-        dotFile << "\"];\n";
-        dotFile << "node [fontname=\"Helvetica\" fontsize=10];\n";
-        dotFile << "edge [fontname=\"Helvetica\" fontsize=10];\n";
-
-        numberBlueNodes = 0;
-        numberBlackNodes = 0;
-
-        printGraphToDot(tmp, dotFile, visitedNodes);
-        dotFile << "}";
-        dotFile.close();
-        trace(TRACE_0, "\n    number of blue nodes: " + intToString(numberBlueNodes) + "\n");
-        if (numberBlackNodes > 0) {
-	        trace(TRACE_0, "\n    number of black nodes: " + intToString(numberBlackNodes) + "\n");
-        }
-        trace(TRACE_0, "    number of blue edges: " + intToString(numberBlueEdges) + "\n");
-        trace(TRACE_0, "    number of states stored in nodes: " + intToString(numberOfStatesAllNodes) + "\n");
-
-
-        if (numberOfVertices < 900) {
-            trace(TRACE_0, "\ncreating the dot file of the graph...\n");
-            if (parameters[P_OG]) {
-                if (options[O_CALC_ALL_STATES]) {
-                    sprintf(buffer, "dot -Tpng %s.a.OG.out -o %s.a.OG.png", netfile, netfile);
-                } else {
-                    sprintf(buffer, "dot -Tpng %s.OG.out -o %s.OG.png", netfile, netfile);
-                }
-            } else {
-                if (options[O_CALC_ALL_STATES]) {
-                    sprintf(buffer, "dot -Tpng %s.a.IG.out -o %s.a.IG.png", netfile, netfile);
-                } else {
-                    sprintf(buffer, "dot -Tpng %s.IG.out -o %s.IG.png", netfile, netfile);
-                }
-            }
-            trace(TRACE_0, buffer); trace(TRACE_0, "\n");
-            system(buffer);
-
-        } else {
-            trace(TRACE_0, "graph is too big to have dot create the graphics\n");
-        }
-    } else {
-        trace(TRACE_0, "graph is too big to create dot file\n");
     }
 }
 
@@ -671,7 +717,7 @@ analysisResult communicationGraph::analyseNode(vertex * node, bool finalAnalysis
 //        if (node->reachGraphStateSet.size() == 0) {
 //            // we analyse an empty node; it becomes blue
 //            if (node->getColor() != BLUE) {			// not yet counted
-//                numberBlueNodes++;
+//                numberOfBlueNodes++;
 //            }
 //            node->setColor(BLUE);
 //            trace(TRACE_3, "\t\t\t node analysed blue (empty node)");
@@ -688,15 +734,15 @@ analysisResult communicationGraph::analyseNode(vertex * node, bool finalAnalysis
 			vertexColor colorAfter = node->getColor();		// color of the node now
 
             if (colorBefore != BLUE && colorAfter == BLUE) {
-                numberBlueNodes++;
+                numberOfBlueNodes++;
             } else if (colorBefore == BLUE && colorAfter != BLUE) {
-                numberBlueNodes--;
+                numberOfBlueNodes--;
             }
 
             if (colorBefore != BLACK && colorAfter == BLACK) {
-                numberBlackNodes++;
+                numberOfBlackNodes++;
             } else if (colorBefore == BLACK && colorAfter != BLACK) {
-                numberBlackNodes--;
+                numberOfBlackNodes--;
             }
 
 			trace(TRACE_5, "communicationGraph::analyseNode(vertex * node, bool finalAnalysis) : end\n");

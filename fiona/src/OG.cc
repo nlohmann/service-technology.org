@@ -61,7 +61,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	if (actualDepth > PN->commDepth) {
 		// node is a leaf
 		analyseNode(currentNode, true);
-		ASSERT(currentNode->getColor() != BLACK);
+		assert(currentNode->getColor() != BLACK);
 		trace(TRACE_1, "=================================================================\n");
 		return;
 	}
@@ -256,9 +256,9 @@ void operatingGuidelines::convertToBdd() {
 	trace(TRACE_5, "operatingGuidelines::convertToBdd(): start\n");
 	
 	vertex * tmp = root;
-    bool visitedNodes[numberOfVertices];
+    bool visitedNodes[numberOfNodes];
 
-    for (int i = 0; i < numberOfVertices; i++) {
+    for (int i = 0; i < numberOfNodes; i++) {
         visitedNodes[i] = 0;
     }
    

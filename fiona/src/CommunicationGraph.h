@@ -63,42 +63,47 @@ typedef std::set<messageMultiSet, compareMessageMultiSets> setOfMessages;
 /* reachability graph */
 class communicationGraph {
 protected:
-   vertex * currentVertex;          //!< the vertex we are working on at a certain time
-   vertex * root;                   //!< the root node of the graph
+	oWFN * PN;                   	//!< pointer to the underlying petri net
 
-   int numberOfVertices;            //!< the number of vertices of the graph
+	vertex * root;                   //!< the root node of the graph
+	vertex * currentVertex;          //!< the vertex we are working on at a certain time
 
-   unsigned int numberBlackNodes;   //!< number of black nodes in the graph
-   unsigned int numberBlueNodes;    //!< number of blue nodes in the graph
-   unsigned int numberBlueEdges;    //!< number of blue edges in the graph
+    unsigned int numberOfNodes;            	//!< the number of vertices of the graph
+	unsigned int numberOfEdges;           	//!< the number of edges of the graph
 
-   oWFN * PN;                   	//!< pointer to the underlying petri net
+	unsigned int numberOfBlueNodes;			//!< number of blue nodes in the graph
+	unsigned int numberOfBlueEdges;			//!< number of blue edges in the graph
 
-   int actualDepth; 				//!< actual depth in graph
+	unsigned int numberOfBlackNodes;		//!< number of black nodes in the graph
 
+	unsigned int numberOfStatesAllNodes;
+
+	unsigned int actualDepth; 				//!< actual depth in graph
   
-   unsigned int numberOfStatesAllNodes;
-
 public:
-	communicationGraph (oWFN *);
-	~communicationGraph ();
-
-	int numberOfEdges;               //!< the number of edges of the graph
+	communicationGraph(oWFN *);
+	~communicationGraph();
 
 	vertexSet setOfVertices;
-
 
     void calculateRootNode();
 
     vertex * getRoot() const;
     
-    unsigned int getNumberOfEdges () const;
-    unsigned int getNumberOfVertices () const;
+    unsigned int getNumberOfNodes() const;
+    unsigned int getNumberOfEdges() const;
+
+    unsigned int getNumberOfBlueNodes() const;
+    unsigned int getNumberOfBlueEdges() const;
+
+    unsigned int getNumberOfBlackNodes() const;
+    
+    unsigned int getNumberOfStatesAllNodes() const;
 
     vertex * findVertexInSet(vertex *);
 
-    bool AddVertex (vertex *, unsigned int, edgeType);
-    bool AddVertex (vertex *, messageMultiSet, edgeType);
+    bool AddVertex(vertex *, unsigned int, edgeType);
+    bool AddVertex(vertex *, messageMultiSet, edgeType);
 
     void buildGraphRandom();
 

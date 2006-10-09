@@ -269,7 +269,7 @@ int main(int argc, char ** argv) {
 				}
 				
 				trace(TRACE_0, "number of states calculated: " + intToString(State::card) + "\n");
-		        trace(TRACE_0, "OG: number of nodes: " + intToString(graph->getNumberOfVertices()) + "\n");
+		        trace(TRACE_0, "OG: number of nodes: " + intToString(graph->getNumberOfNodes()) + "\n");
 	    	    trace(TRACE_0, "    number of edges: " + intToString(graph->getNumberOfEdges()) + "\n");
 				trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
 	                
@@ -320,7 +320,7 @@ int main(int argc, char ** argv) {
 					trace(TRACE_0, "NO\n\n");
 				}
 				trace(TRACE_0, "number of states calculated: " + intToString(State::card) + "\n");
-				trace(TRACE_0, "IG: number of nodes: " + intToString(graph->getNumberOfVertices()) + "\n");
+				trace(TRACE_0, "IG: number of nodes: " + intToString(graph->getNumberOfNodes()) + "\n");
 				trace(TRACE_0, "    number of edges: " + intToString(graph->getNumberOfEdges()) + "\n");
 				trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
 	

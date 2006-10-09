@@ -7,7 +7,8 @@
 // Helps to prevent doing unintended memory operations such as writing outside
 // of array bounds or losing memory by overwriting pointers that should not be
 // overwritten.
-#define ENABLE_ASSERTIONS
+#undef NDEBUG     // assertions are tested
+//#define NDEBUG 1     // assertions are ignored
 
 // Select your operating system
 #define WINDOWS

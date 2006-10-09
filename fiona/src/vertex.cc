@@ -14,7 +14,7 @@ vertex::vertex(int numberEvents) :
 			   annotation(NULL) {
 
 	eventsUsed = new int [numberEvents];
-
+	
 	for (int i = 0; i < numberEvents; i++) {
 		eventsUsed[i] = 0;
 	}

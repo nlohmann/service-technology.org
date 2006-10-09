@@ -32,13 +32,13 @@
  *
  * \date
  *          - created: 2006/02/08
- *          - last changed: \$Date: 2006/09/28 15:30:50 $
+ *          - last changed: \$Date: 2006/10/09 10:43:46 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  */
 
 
@@ -48,7 +48,7 @@
 #include "bpel-unparse-tools.h"
 #include "options.h"
 #include "helpers.h"
-#include <assert.h>
+#include <cassert>
 #include "ast-details.h"
 
 

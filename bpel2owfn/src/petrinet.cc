@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/10/04 17:28:03 $
+ *          - last changed: \$Date: 2006/10/09 10:43:46 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.141 $
+ * \version \$Revision: 1.142 $
  */
 
 
@@ -48,7 +48,7 @@
  * Headers
  *****************************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "petrinet.h"
 #include "debug.h"		// debugging help

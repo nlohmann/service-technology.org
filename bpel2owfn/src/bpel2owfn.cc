@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/10/04 16:37:59 $
+ *          - last changed: \$Date: 2006/10/09 10:43:46 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.98 $
+ * \version \$Revision: 1.99 $
  *
  */
 
@@ -55,7 +55,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <assert.h>
+#include <cassert>
 
 #include "petrinet.h"           // Petri Net support
 #include "cfg.h"		// Control Flow Graph

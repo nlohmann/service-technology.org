@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/04 17:28:03 $
+ *          - last changed: \$Date: 2006/10/09 10:43:45 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.38 $
+ * \version \$Revision: 1.39 $
  *
  */
 %}
@@ -71,7 +71,7 @@
 #include "bpel-unparse-tools.h"
 #include "ast-printers.h"
 #include <cmath>
-#include <assert.h>
+#include <cassert>
 
 using namespace std;
 

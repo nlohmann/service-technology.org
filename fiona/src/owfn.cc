@@ -5,6 +5,7 @@
 #include "debug.h"
 #include "CNF.h"
 #include "vertex.h"
+#include <cassert>
 
 using namespace std;
 

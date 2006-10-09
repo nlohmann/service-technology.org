@@ -5,6 +5,7 @@
 #include "enums.h"
 #include "options.h"
 #include "debug.h"
+#include <cassert>
 
 
 using namespace std;

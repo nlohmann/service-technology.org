@@ -18,18 +18,18 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/09/14 06:32:08 $ by $Author: nlohmann $.
-# Version $Revision: 1.14 $
+# File last changed $Date: 2006/10/09 15:01:49 $ by $Author: nlohmann $.
+# Version $Revision: 1.15 $
 
-#info_TEXINFOS = bpel2owfn.texi
+info_TEXINFOS = bpel2owfn.texi
 
-#bpel2owfn_TEXINFOS = gpl.texi \
-#		     images/bpel2owfn.eps \
-#		     images/bpel2owfn.pdf \
-#		     images/bpel2owfn.png \
-#		     images/tools4bpel.eps \
-#		     images/tools4bpel.pdf \
-#		     images/tools4bpel.png
+bpel2owfn_TEXINFOS = gpl.texi \
+		     images/bpel2owfn.eps \
+		     images/bpel2owfn.pdf \
+		     images/bpel2owfn.png \
+		     images/tools4bpel.eps \
+		     images/tools4bpel.pdf \
+		     images/tools4bpel.png
 
 
 # rules for the installation manual

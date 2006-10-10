@@ -1,0 +1,37 @@
+{ net consumes and produces round and round and round... }
+
+PLACE
+INTERNAL
+  p0,
+  p1;
+
+INPUT
+  a;
+
+OUTPUT
+  b;
+
+INITIALMARKING
+  p0: 1;
+
+{FINALCONDITION}
+{  p0 = 1 AND p1 = 0 AND a = 0 AND b = 0;}
+
+FINALMARKING
+  p0: 1;
+
+TRANSITION t1    { ?a }
+CONSUME
+  p0: 1,
+  a: 1;
+PRODUCE
+  p1: 1;
+
+TRANSITION t2    { !b }
+CONSUME
+  p1: 1;
+PRODUCE
+  b: 1,
+  p0: 1;
+
+{ end of file }

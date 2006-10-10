@@ -170,10 +170,6 @@ done
 #  result=1
 #fi
 
-#loeschen aller erzeugten Dateien im letzten Durchlauf
-rm -f $DIR/*.out
-rm -f $DIR/*.png
-
 echo
 
 exit $result

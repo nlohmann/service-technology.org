@@ -65,7 +65,7 @@ fi
 result=`expr $result + $shop3control + $shop3bluenodes + $shop3blueedges + $shop3storedstates`
 
 ############################################################################
-# IG 
+# IG
 ############################################################################
 
 shop3bluenodes_soll=11
@@ -297,10 +297,6 @@ fi
 result=`expr $result + $keescoffee2control + $keescoffee2bluenodes + $keescoffee2blueedges + $keescoffee2storedstates`
 
 ############################################################################
-
-#loeschen aller erzeugten Dateien im letzten Durchlauf
-rm -f $DIR/*.out
-rm -f $DIR/*.png
 
 echo
 

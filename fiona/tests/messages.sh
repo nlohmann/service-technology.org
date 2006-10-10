@@ -149,10 +149,6 @@ result=`expr $result + $mb22control + $mb22bluenodes + $mb22blueedges`
 
 ############################################################################
 
-#loeschen aller erzeugten Dateien im letzten Durchlauf
-rm -f $DIR/*.out
-rm -f $DIR/*.png
-
 echo
 
 exit $result

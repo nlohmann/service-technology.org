@@ -39,7 +39,7 @@
  *          
  * \date
  *          - created 2005-11-10
- *          - last changed: \$Date: 2006/10/10 08:14:40 $
+ *          - last changed: \$Date: 2006/10/10 15:04:03 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -48,7 +48,7 @@
  * \note    This file was created using Flex reading file bpel-lexic.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.29 $
+ * \version \$Revision: 1.30 $
  *
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -111,7 +111,6 @@ comment			([^-]|"-"[^-])*
 xmlheader		([^?]|"-"[^?])*
 bpwsns			"bpws:"|"bpel:"
 
-
  /* start conditions of the lexer */
 %s ATTRIBUTE
 %s COMMENT
@@ -171,6 +170,7 @@ bpwsns			"bpws:"|"bpel:"
 {bpwsns}?"correlations"		{ return K_CORRELATIONS; }
 {bpwsns}?"correlationSet"	{ BEGIN(ATTRIBUTE); return K_CORRELATIONSET; }
 {bpwsns}?"correlationSets"	{ return K_CORRELATIONSETS; }
+{bpwsns}?"documentation"	{ BEGIN(ATTRIBUTE); return K_DOCUMENTATION; }	/* WS-BPEL */
 {bpwsns}?"empty"		{ BEGIN(ATTRIBUTE); return K_EMPTY; }
 {bpwsns}?"eventHandlers"	{ return K_EVENTHANDLERS; }
 {bpwsns}?"extension"		{ BEGIN(ATTRIBUTE); return K_EXTENSION; }	/* WS-BPEL */
@@ -211,6 +211,7 @@ bpwsns			"bpws:"|"bpel:"
 
 {name}				{ yylval.yt_casestring = kc::mkcasestring(yytext);
                                   return X_NAME; }
+
 
  /* end of input file */
 <<EOF>>				{ return EOF; }

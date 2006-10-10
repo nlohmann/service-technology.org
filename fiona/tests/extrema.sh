@@ -40,7 +40,7 @@ echo running $FIONA -n $DIR/no_final_marking.owfn -a -t OG
 $FIONA -n $DIR/no_final_marking.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result1=$?
 
-if [ $? -ne 0 ] ; then
+if [ $result1 -ne 0 ] ; then
     echo     ... FAILED
     echo
 fi
@@ -49,7 +49,7 @@ echo running $FIONA -n $DIR/all_final_marking.owfn -a -t OG
 $FIONA -n $DIR/all_final_marking.owfn -a -t OG 2>&1 | grep "net is controllable: NO" > /dev/null
 result2=$?
 
-if [ $? -ne 0 ] ; then
+if [ $result2 -ne 0 ] ; then
     echo     ... FAILED
     echo
 fi
@@ -58,7 +58,7 @@ echo running $FIONA -n $DIR/no_communication.owfn -a -t OG
 $FIONA -n $DIR/no_communication.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result3=$?
 
-if [ $? -ne 0 ] ; then
+if [ $result3 -ne 0 ] ; then
     echo     ... FAILED
     echo
 fi
@@ -67,7 +67,7 @@ echo running $FIONA -n $DIR/no_initial_marking.owfn -a -t OG
 $FIONA -n $DIR/no_initial_marking.owfn -a -t OG 2>&1 | grep "net is controllable: NO" > /dev/null
 result4=$?
 
-if [ $? -ne 0 ] ; then
+if [ $result4 -ne 0 ] ; then
     echo     ... FAILED
     echo
 fi
@@ -76,7 +76,7 @@ echo running $FIONA -n $DIR/no_initial_marking2.owfn -a -t OG
 $FIONA -n $DIR/no_initial_marking2.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result5=$?
 
-if [ $? -ne 0 ] ; then
+if [ $result5 -ne 0 ] ; then
     echo     ... FAILED
     echo
 fi
@@ -85,7 +85,7 @@ echo running $FIONA -n $DIR/empty.owfn -a -t OG
 $FIONA -n $DIR/empty.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result6=$?
 
-if [ $? -ne 0 ] ; then
+if [ $result6 -ne 0 ] ; then
     echo     ... FAILED
     echo
 fi
@@ -94,7 +94,7 @@ echo running $FIONA -n $DIR/one_input.owfn -a -t OG
 $FIONA -n $DIR/one_input.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result7=$?
 
-if [ $? -ne 0 ] ; then
+if [ $result7 -ne 0 ] ; then
     echo     ... FAILED
     echo
 fi
@@ -103,7 +103,7 @@ echo running $FIONA -n $DIR/one_output.owfn -a -t OG
 $FIONA -n $DIR/one_output.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result8=$?
 
-if [ $? -ne 0 ] ; then
+if [ $result8 -ne 0 ] ; then
     echo     ... FAILED
     echo
 fi
@@ -112,16 +112,16 @@ echo running $FIONA -n $DIR/one_input_marked.owfn -a -t OG
 $FIONA -n $DIR/one_input_marked.owfn -a -t OG 2>&1 | grep "net is controllable: NO" > /dev/null
 result9=$?
 
-if [ $? -ne 0 ] ; then
+if [ $result9 -ne 0 ] ; then
     echo     ... FAILED
     echo
 fi
 
 echo running $FIONA -n $DIR/one_output_marked.owfn -a -t OG
-$FIONA -n $DIR/one_output_marked.owfn -a -t OG 2>&1 | grep "net is controllable: NO" > /dev/null
+$FIONA -n $DIR/one_output_marked.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result10=$?
 
-if [ $? -ne 0 ] ; then
+if [ $result10 -ne 0 ] ; then
     echo     ... FAILED
     echo
 fi
@@ -130,7 +130,7 @@ echo running $FIONA -n $DIR/one_input_one_output.owfn -a -t OG
 $FIONA -n $DIR/one_input_one_output.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result11=$?
 
-if [ $? -ne 0 ] ; then
+if [ $result11 -ne 0 ] ; then
     echo     ... FAILED
     echo
 fi
@@ -139,7 +139,7 @@ echo running $FIONA -n $DIR/one_input_2.owfn -a -t OG
 $FIONA -n $DIR/one_input_2.owfn -a -t OG 2>&1 | grep "net is controllable: NO" > /dev/null
 result12=$?
 
-if [ $? -ne 0 ] ; then
+if [ $result12 -ne 0 ] ; then
     echo     ... FAILED
     echo
 fi
@@ -148,7 +148,7 @@ echo running $FIONA -n $DIR/multiple_input.owfn -a -t OG
 $FIONA -n $DIR/multiple_input.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result13=$?
 
-if [ $? -ne 0 ] ; then
+if [ $result13 -ne 0 ] ; then
     echo     ... FAILED
     echo
 fi
@@ -157,7 +157,7 @@ echo running $FIONA -n $DIR/multiple_output.owfn -a -t OG
 $FIONA -n $DIR/multiple_output.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result14=$?
 
-if [ $? -ne 0 ] ; then
+if [ $result14 -ne 0 ] ; then
     echo     ... FAILED
     echo
 fi
@@ -166,7 +166,7 @@ echo running $FIONA -n $DIR/multiple_input_multiple_output.owfn -a -t OG
 $FIONA -n $DIR/multiple_input_multiple_output.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
 result15=$?
 
-if [ $? -ne 0 ] ; then
+if [ $result15 -ne 0 ] ; then
     echo     ... FAILED
     echo
 fi

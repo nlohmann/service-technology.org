@@ -41,7 +41,7 @@ echo running $FIONA -n $DIR/sequence5.owfn -a -b 4 -t OG
 $FIONA -n $DIR/sequence5.owfn -a -b 4 --graphtype=OG  2> /dev/null 1> /dev/null
 result5=$?
 
-if [ $? -ne 0 ] ; then
+if [ $result5 -ne 0 ] ; then
     echo     ... FAILED
     echo
 fi
@@ -59,3 +59,4 @@ fi
 echo
 
 exit $result
+

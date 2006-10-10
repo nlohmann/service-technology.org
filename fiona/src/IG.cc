@@ -8,6 +8,9 @@
 
 #include <vector>			// for combining receiving events
 
+#define INPUT 1
+#define OUTPUT 0
+
 //! \fn interactionGraph::interactionGraph(oWFN * _PN) 
 //! \param _PN
 //! \brief constructor
@@ -30,6 +33,42 @@ void interactionGraph::buildGraph() {
 	} else {
 		buildGraph(root);
 	}
+}
+
+//! \fn bool interactionGraph::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace)
+//! \param currentNode the node from which the input event is to be sent
+//! \brief checks whether the set of input messages contains at least one input message
+//! that has been sent at its maximum
+bool interactionGraph::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace) {
+	trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): start\n");
+	for (messageMultiSet::iterator iter = input.begin(); iter != input.end(); iter++) {
+		if (typeOfPlace == INPUT) {
+			unsigned int i = 0;
+			while (i < PN->placeInputCnt && PN->inputPlacesArray[i] && PN->inputPlacesArray[i]->index != *iter) {
+				i++;	
+			}
+			if (currentNode->eventsUsed[i] >= PN->inputPlacesArray[i]->max_occurence) {
+				// this input event shall not be sent anymore, so quit here
+				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");
+				return false;
+			}
+		} else if (typeOfPlace == OUTPUT) {
+			unsigned int i = 0;
+			//cout << "PN->placeOutputCnt: " << PN->placeOutputCnt << endl;
+			
+			while (i < PN->placeOutputCnt && PN->outputPlacesArray[i] && PN->outputPlacesArray[i]->index != *iter) {
+				i++;	
+			}
+			if (currentNode->eventsUsed[i + PN->placeInputCnt] < PN->outputPlacesArray[i]->max_occurence) {
+				// this output event shall not be received anymore, so quit here
+				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");
+				return false;		
+			}
+		}
+	}
+	// everything is fine
+	trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");
+	return true;
 }
 
 //! \fn void interactionGraph::buildGraph(vertex * node)
@@ -72,20 +111,26 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	// iterate over all elements of inputSet
 	for (setOfMessages::iterator iter = inputSet.begin(); iter != inputSet.end(); iter++) {
 
-		trace(TRACE_3, "\t\t\t\t    sending event: !");
-		
-		vertex * v = new vertex();	// create new vertex of the graph
-		currentVertex = currentNode;
-		
-		bool messageboundviolation = calculateSuccStatesInput(*iter, currentNode, v);
-		trace(TRACE_3, "\n");
-		
-		if (messageboundviolation) {
-			trace(TRACE_0, ", node " + intToString(currentNode->getNumber()) + ")\n");
+		if (checkMaximalEvents(*iter, currentNode, INPUT)) {
+	
+			trace(TRACE_3, "\t\t\t\t    sending event: !");
 			
-			delete v;
-		} else {		
-			if (AddVertex (v, *iter, sending)) {
+			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
+			currentVertex = currentNode;
+			
+			calculateSuccStatesInput(*iter, currentNode, v);
+			trace(TRACE_3, "\n");
+			
+			if (v->getColor() == RED) {
+				// message bound violation occured during calculateSuccStatesInput
+				trace(TRACE_2, "\t\t\t\t    sending event: !");
+			//	trace(TRACE_2, PN->inputPlacesArray[*iter]->name);
+				trace(TRACE_2, " at node " + intToString(currentNode->getNumber()) + " suppressed (message bound violated)\n");
+	
+				numberDeletedVertices--;
+				delete v;
+			} else {
+				if (AddVertex (v, *iter, sending)) {
 
 #ifdef LOOP
 	cout << "calc next node? [y,n]" << endl;
@@ -93,47 +138,49 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	if (a == 'y') {
 #endif
 			
-				buildGraph(v);
-				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
-				analyseNode(currentNode, false);
-				trace(TRACE_5, "node analysed\n");
+					buildGraph(v);
+					trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
+					analyseNode(currentNode, false);
+					trace(TRACE_5, "node analysed\n");
 #ifdef LOOP
 	}
 #endif	
-
+				}
 			}
 		}
 	}
 	
 	trace(TRACE_5, "iterating over outputSet\n");
 	for (setOfMessages::iterator iter = outputSet.begin(); iter != outputSet.end(); iter++) {
-		trace(TRACE_3, "\t\t\t\t    output event: ?");
-
-		vertex * v = new vertex();	// create new vertex of the graph
-		currentVertex = currentNode;
-				
-		calculateSuccStatesOutput(*iter, currentNode, v);
-		trace(TRACE_3, "\n");
-		
-		if (AddVertex (v, *iter, receiving)) {
+		if (checkMaximalEvents(*iter, currentNode, OUTPUT)) {
+			
+			trace(TRACE_3, "\t\t\t\t    output event: ?");
 	
+			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
+			currentVertex = currentNode;
+					
+			calculateSuccStatesOutput(*iter, currentNode, v);
+			trace(TRACE_3, "\n");
+			
+			if (AddVertex (v, *iter, receiving)) {
+		
 #ifdef LOOP
 		cout << "calc next node? [y,n]" << endl;
 		char a = getchar();
 		if (a == 'y') {
 #endif
-			buildGraph(v);
-			trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
-			analyseNode(currentNode, false);
-			trace(TRACE_5, "node analysed\n");
-	
+				buildGraph(v);
+				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
+				analyseNode(currentNode, false);
+				trace(TRACE_5, "node analysed\n");
+		
 #ifdef LOOP
 		}
 #endif
-	
-		}
-	}	
 		
+			}
+		}	
+	}		
 	analyseNode(currentNode, true);
 	trace(TRACE_5, "node analysed\n");
 
@@ -257,8 +304,10 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {	// we just consider the maximal states only
 				
 				clause * cl = new clause();			// create a new clause for this particular state
-				(*iter)->decode(PN);
-			    
+				
+//				PN->copyMarkingToCurrentMarking((*iter)->myMarking);
+			    (*iter)->decode(PN);
+
 				if ((*iter)->quasiFirelist) {
 				    delete [] (*iter)->quasiFirelist;
 				    (*iter)->quasiFirelist = NULL;

@@ -26,7 +26,7 @@
  *
  * \author  
  *          - responsible: Dennis Reinert <reinert@informatik.hu-berlin.de>
- *          - last changes by: \$Author: massuthe $
+ *          - last changes by: \$Author: weinberg $
  *          
  * \date
  *          - created:
@@ -58,6 +58,7 @@ State::State() :
 				placeHashValue(0),
 				firelist(NULL),
 				quasiFirelist(NULL),
+				myMarking(NULL),
 				my_entry(NULL),
 				succ(NULL),
 				parent(NULL)
@@ -70,13 +71,16 @@ State::State() :
 // inline rausgenommen!
 State::~State() {
     if(firelist) {
-	delete [] firelist;
+		delete [] firelist;
     }
     if(quasiFirelist) {
-	delete [] quasiFirelist;
+		delete [] quasiFirelist;
     }
     if(succ) {
-	delete [] succ;
+		delete [] succ;
+    }
+    if (myMarking) {
+    	delete [] myMarking;
     }
 }
 

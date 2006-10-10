@@ -19,6 +19,7 @@ vertex::vertex(int numberEvents) :
 		eventsUsed[i] = 0;
 	}
 	eventsToBeSeen = numberEvents;
+	
 }
 
 //! \fn vertex::vertex()

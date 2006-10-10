@@ -20,6 +20,8 @@ class interactionGraph : public communicationGraph {
 		interactionGraph(oWFN *);
 		~interactionGraph();
 	
+		bool checkMaximalEvents(messageMultiSet, vertex *, bool);	
+	
 	    void buildGraph();
     	void buildGraph(vertex * );
     	void buildReducedGraph(vertex * );

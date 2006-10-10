@@ -66,10 +66,10 @@ unsigned int communicationGraph::getNumberOfEdges() const {
 }
 
 
-//! \fn unsigned int communicationGraph::getNumberOfBlueNodes() const
+//! \fn unsigned int communicationGraph::getNumberOfBlueNodes() 
 //! \return number of blue nodes
 //! \brief returns the number of blue nodes of the graph
-unsigned int communicationGraph::getNumberOfBlueNodes() const {
+unsigned int communicationGraph::getNumberOfBlueNodes() {
     return numberOfBlueNodes;
 }
 
@@ -168,8 +168,13 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
 
         char * label = new char[256];
         bool comma = false;
+        unsigned int offset = 0;
 
         strcpy(label, "");
+        
+        if (type == receiving) {
+            offset = PN->placeInputCnt;
+        } 
 
         for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
             if (comma) {
@@ -177,6 +182,24 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
             }
             strcat(label, PN->Places[*iter]->name);
             comma = true;
+            
+            unsigned int i = 0;
+            if (type == receiving) {
+	            while (i < PN->placeOutputCnt && PN->outputPlacesArray[i]->index != *iter) {
+					i++;	
+				}
+				//i--;
+            } else {
+	            while (i < PN->placeInputCnt && PN->inputPlacesArray[i]->index != *iter) {
+					i++;	
+				}
+				//i--;
+            }
+			if (found == 0) {
+	            toAdd->eventsUsed[offset + i]++;
+			} else {
+				found->eventsUsed[offset + i]++;
+			}
         }
 
         if (found == NULL) {
@@ -353,13 +376,13 @@ void communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * o
 }
 
 
-//! \fn bool communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, vertex * newNode)
+//! \fn void communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, vertex * newNode)
 //! \param input (multi) set of input messages
 //! \param node the node for which the successor states are to be calculated
 //! \param newNode the new node where the new states go into
 //! \brief calculates the set of successor states in case of an input message
 // for IG
-bool communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, vertex * newNode) {
+void communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, vertex * newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, vertex * newNode) : start\n");
 
     StateSet::iterator iter;              // iterator over the stateList's elements
@@ -380,7 +403,7 @@ bool communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex 
 					trace(TRACE_3, "\t\t\t\t\t adding input event would cause message bound violation\n");
 					trace(TRACE_3, PN->Places[*iter]->name);
 				    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
-					return true;
+					return;
 				}
 			}
 		}        
@@ -391,10 +414,15 @@ bool communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex 
         } else {
             PN->calculateReachableStatesInputEvent(newNode, false);       // calc the reachable states from that marking
         }
+        if (newNode->getColor() == RED) {
+        	// a message bound violation occured during computation of reachability graph
+		    trace(TRACE_5, "reachGraph::calculateSuccStatesInput(unsigned int input, vertex * node) : end\n");
+        	return;
+        }        
     }
     
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, vertex * newNode) : end\n");
-	return false;
+	return;
 }
 
 //! \fn void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex * node, vertex * newNode)
@@ -457,6 +485,32 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) : end\n");
 }
 
+//! \fn void communicationGraph::printNodeStatistics()
+//! \brief creates a dot file of the graph
+void communicationGraph::printNodeStatistics() {
+    vertex * tmp = root;
+    bool visitedNodes[numberOfNodes];
+
+    for (int i = 0; i < numberOfNodes; i++) {
+        visitedNodes[i] = false;
+    }	
+    
+    numberOfBlueNodes = 0;
+    numberOfBlueEdges = 0;
+    
+    // calculate the number of blue nodes and edges first
+    computeNumberOfBlueNodesEdges(tmp, visitedNodes);	
+	
+    trace(TRACE_0, "\n    number of blue nodes: " + intToString(getNumberOfBlueNodes()) + "\n");
+    if (getNumberOfBlackNodes() > 0) {
+        trace(TRACE_0, "\n    number of black nodes: " + intToString(getNumberOfBlackNodes()) + "\n");
+    }
+    trace(TRACE_0, "    number of blue edges: " + intToString(getNumberOfBlueEdges()) + "\n");
+    trace(TRACE_0, "    number of states stored in nodes: " + intToString(getNumberOfStatesAllNodes()) + "\n");
+
+	trace(TRACE_0, "creating the dot file of the graph...\n");	
+}
+
 
 //! \fn void communicationGraph::printDotFile()
 //! \brief creates a dot file of the graph
@@ -504,15 +558,6 @@ void communicationGraph::printDotFile() {
         dotFile << "}";
         dotFile.close();
 
-	    trace(TRACE_0, "\n    number of blue nodes: " + intToString(getNumberOfBlueNodes()) + "\n");
-	    if (getNumberOfBlackNodes() > 0) {
-	        trace(TRACE_0, "\n    number of black nodes: " + intToString(getNumberOfBlackNodes()) + "\n");
-	    }
-        trace(TRACE_0, "    number of blue edges: " + intToString(getNumberOfBlueEdges()) + "\n");
-        trace(TRACE_0, "    number of states stored in nodes: " + intToString(getNumberOfStatesAllNodes()) + "\n");
-
-		trace(TRACE_0, "creating the dot file of the graph...\n");
-        
         if (numberOfNodes < maxPrintingSize) {
             if (parameters[P_OG]) {
                 if (options[O_CALC_ALL_STATES]) {
@@ -684,6 +729,38 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
     }
 }
 
+//! \fn void communicationGraph::computeNumberOfBlueNodesEdges(vertex * v, bool visitedNodes[])
+//! \param v current node in the iteration process
+//! \param visitedNodes[] array of bool storing the nodes that we have looked at so far
+//! \brief breadthsearch through the graph computing the number of blue nodes
+void communicationGraph::computeNumberOfBlueNodesEdges(vertex * v, bool visitedNodes[]) {
+
+	if (v == NULL) {
+		return ;
+	}
+
+    if (v->getColor() == BLUE && 
+    		(parameters[P_SHOW_EMPTY_NODE] || v->reachGraphStateSet.size() != 0)) {
+		
+		numberOfBlueNodes++;
+		
+        v->resetIteratingSuccNodes();
+        visitedNodes[v->getNumber()] = true;
+        graphEdge * element;
+
+        while ((element = v->getNextEdge()) != NULL) {
+            vertex * vNext = element->getNode();
+            if (vNext->getColor() == BLUE && 
+    			(parameters[P_SHOW_EMPTY_NODE] || vNext->reachGraphStateSet.size() != 0)) {
+
+    			numberOfBlueEdges++;		
+    		}
+            if ((vNext != v) && !visitedNodes[vNext->getNumber()]) {
+                computeNumberOfBlueNodesEdges(vNext, visitedNodes);
+            }
+        } // while
+    }
+}
 
 //! \fn bool communicationGraph::stateActivatesOutputEvents(State * s)
 //! \param s the state that is checked for activating output events

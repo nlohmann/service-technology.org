@@ -273,6 +273,7 @@ int main(int argc, char ** argv) {
 	    	    trace(TRACE_0, "    number of edges: " + intToString(graph->getNumberOfEdges()) + "\n");
 				trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
 	                
+	            graph->printNodeStatistics();
 		        graph->printDotFile();
 		        
 		        if (options[O_BDD] == true) {
@@ -324,6 +325,7 @@ int main(int argc, char ** argv) {
 				trace(TRACE_0, "    number of edges: " + intToString(graph->getNumberOfEdges()) + "\n");
 				trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
 	
+				graph->printNodeStatistics();
 				graph->printDotFile();				// for IG
 	
 				trace(TRACE_5, "computation finished -- trying to delete graph\n");

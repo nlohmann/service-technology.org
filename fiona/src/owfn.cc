@@ -118,6 +118,7 @@ unsigned int oWFN::getCardFireList() {
 //! \fn oWFN::initialize()
 //! \brief initializes the owfn; is called right after the parsing of the net file is done
 void oWFN::initialize() {
+	trace(TRACE_5, "oWFN::initialize(): start\n");
 	int i;
 	
 	// initialize places hashes
@@ -180,8 +181,7 @@ void oWFN::initialize() {
         BitVectorSize += Places[i]->nrbits;
   	}
 	
-	trace(TRACE_5, "oWFN initialized\n");
-	
+	trace(TRACE_5, "oWFN::initialize(): end\n");
 }
 
 

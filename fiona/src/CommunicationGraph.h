@@ -93,7 +93,7 @@ public:
     unsigned int getNumberOfNodes() const;
     unsigned int getNumberOfEdges() const;
 
-    unsigned int getNumberOfBlueNodes() const;
+    unsigned int getNumberOfBlueNodes();
     unsigned int getNumberOfBlueEdges() const;
 
     unsigned int getNumberOfBlackNodes() const;
@@ -112,11 +112,14 @@ public:
     void calculateSuccStatesOutput(unsigned int, vertex *, vertex *);
 
     // for IG
-    bool calculateSuccStatesInput(messageMultiSet, vertex *, vertex *);
+    void calculateSuccStatesInput(messageMultiSet, vertex *, vertex *);
     void calculateSuccStatesOutput(messageMultiSet, vertex *, vertex *);
 
+	void printNodeStatistics();
     void printGraphToDot(vertex * v, fstream& os, bool[]);
     void printDotFile();
+    void computeNumberOfBlueNodesEdges(vertex *, bool[]);
+    
 
     bool stateActivatesOutputEvents(State *);
 

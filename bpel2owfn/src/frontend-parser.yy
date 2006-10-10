@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/09 10:43:45 $
+ *          - last changed: \$Date: 2006/10/10 08:14:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.221 $
+ * \version \$Revision: 1.222 $
  * 
  */
 %}
@@ -73,6 +73,7 @@
 %token K_SEQUENCE K_SOURCE K_SWITCH K_TARGET K_TERMINATE K_THROW K_TO
 %token K_VARIABLE K_VARIABLES K_WAIT K_WHILE
 %token X_OPEN X_SLASH X_CLOSE X_NEXT X_EQUALS QUOTE
+%token K_EXTENSION K_EXTENSIONS
 %token K_JOINCONDITION K_GETLINKSTATUS RBRACKET LBRACKET APOSTROPHE K_AND K_OR
 %token <yt_casestring> X_NAME
 %token <yt_casestring> X_STRING
@@ -228,21 +229,15 @@ tProcess:
       currentJoinCondition = standardJoinCondition();
       temporaryAttributeMap.clear();
     }
-  X_OPEN K_PROCESS arbitraryAttributes X_NEXT imports
+  X_OPEN K_PROCESS arbitraryAttributes X_NEXT tExtensions imports
   tPartnerLinks tPartners tVariables tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers activity
   X_NEXT X_SLASH K_PROCESS X_CLOSE
     {
-      TheProcess = $$ = Process($7, $8, $9, $10, $11, $12, $13, StopInProcess(), $14);
+      TheProcess = $$ = Process($8, $9, $10, $11, $12, $13, $14, StopInProcess(), $15);
       $$->id = $4->value;
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_PROCESS);
     }
-;
-
-/* import other namespaces */
-imports:
-  /* empty */
-| K_IMPORT arbitraryAttributes X_SLASH X_NEXT imports
 ;
 
 /*---------------------------------------------------------------------------*/
@@ -264,6 +259,31 @@ activity:
 | tPick		{ $$ = activityPick($1);	$$->id = $1->id; }
 | tScope	{ $$ = activityScope($1);	$$->id = $1->id; }
 | tCompensate	{ $$ = activityCompensate($1);	$$->id = $1->id; }
+;
+
+
+/******************************************************************************
+  EXTENSIONS AND IMPORTS
+******************************************************************************/
+
+imports:
+  /* empty */
+| K_IMPORT arbitraryAttributes X_SLASH X_NEXT imports
+;
+
+tExtensions:
+  /* empty */
+| K_EXTENSIONS X_NEXT tExtension_list X_SLASH K_EXTENSIONS X_NEXT
+;
+
+tExtension_list:
+  tExtension X_NEXT
+| tExtension X_NEXT tExtension_list
+;
+
+tExtension:
+  K_EXTENSION arbitraryAttributes X_SLASH X_NEXT
+| K_EXTENSION arbitraryAttributes X_NEXT X_SLASH K_EXTENSION
 ;
 
 

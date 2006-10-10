@@ -29,13 +29,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/09/28 15:30:51 $
+ *          - last changed: \$Date: 2006/10/10 08:14:41 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
  */
 
 
@@ -374,10 +374,10 @@ void parse_command_line(int argc, char* argv[])
 		  parameters[P_FINALLOOP] = true;
 		else if (parameter == "communicationonly")
 		  parameters[P_COMMUNICATIONONLY] = true;
-		else if (parameter == "cyclicwhile")
-		  parameters[P_CYCLICWHILE] = true;
-		else if (parameter == "cycliceh")
-		  parameters[P_CYCLICEH] = true;
+//		else if (parameter == "cyclicwhile")
+//		  parameters[P_CYCLICWHILE] = true;
+//		else if (parameter == "cycliceh")
+//		  parameters[P_CYCLICEH] = true;
 		else if (parameter == "nostandardfaults")
 		  parameters[P_NOSTANDARDFAULTS] = true;
 		else if (parameter == "nofhfaults")

@@ -53,7 +53,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/04 17:28:03 $
+ *          - last changed: \$Date: 2006/10/10 08:14:40 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  */
 %}
 
@@ -184,7 +184,7 @@ This=Invoke(a,b) provided (!This->isSynchronousInvoke) ->
       TheNet->newArc(t2, TheNet->findPlace("out." + This->channelName));
       t2->type = OUT;
 
-      if (parameters[P_CYCLICWHILE] && $0->inWhile)
+      if ($0->inWhile) // was: (parameters[P_CYCLICWHILE] && $0->inWhile)
         TheNet->findPlace("out." + This->channelName)->inWhile = true;
 
 
@@ -252,7 +252,7 @@ This=Invoke(a,b) provided (This->isSynchronousInvoke) ->
       TheNet->newArc(TheNet->findPlace("variable." + This->outputVariableName), t4);
       TheNet->newArc(t4, TheNet->findPlace("variable." + This->outputVariableName));
 
-      if (parameters[P_CYCLICWHILE] && $0->inWhile)
+      if ($0->inWhile) // was: (parameters[P_CYCLICWHILE] && $0->inWhile)
       {
         TheNet->findPlace("in." + This->channelName)->inWhile = true;
         TheNet->findPlace("out." + This->channelName)->inWhile = true;
@@ -317,7 +317,7 @@ This=Receive(a,b) ->
       TheNet->newArc(TheNet->findPlace("variable." + This->variableName), t2);
       TheNet->newArc(t2, TheNet->findPlace("variable." + This->variableName));
 
-      if (parameters[P_CYCLICWHILE] && $0->inWhile)
+      if ($0->inWhile) // was: (parameters[P_CYCLICWHILE] && $0->inWhile)
         TheNet->findPlace("in." + This->channelName)->inWhile = true;
 
 
@@ -374,7 +374,7 @@ This=Reply(a,b) ->
       TheNet->newArc(t2, p3);
       t2->type = OUT;
 
-      if (parameters[P_CYCLICWHILE] && $0->inWhile)
+      if ($0->inWhile) // was: (parameters[P_CYCLICWHILE] && $0->inWhile)
         TheNet->findPlace("out." + This->channelName)->inWhile = true;
 
 
@@ -1173,12 +1173,12 @@ This=While(a,b) ->
       // it is depicted in Fig. 18. Setting this option might lead to not
       // 1-safe Petri nets as links embedded in the inner activity might be
       // initialized more than once.
-      if (parameters[P_CYCLICWHILE] == true)
-      {
+//      if (parameters[P_CYCLICWHILE] == true)
+//      {
 	Transition *t4 = TheNet->newTransition(prefix + "t4");
 	TheNet->newArc(t4, p1);
 	TheNet->newArc(p5, t4);
-      }
+//      }
 
 
       // Transitions for the negative control flow.
@@ -1205,8 +1205,8 @@ This=While(a,b) ->
       // executing the inner activity each time the given condition holds, it
       // is executed at most once to avoid problems with links embedded in the
       // inner activity.
-      if (parameters[P_CYCLICWHILE] == false)
-	TheNet->mergePlaces(This->id, ".internal.p5", This->id, ".internal.final");
+//      if (parameters[P_CYCLICWHILE] == false)
+//	TheNet->mergePlaces(This->id, ".internal.p5", This->id, ".internal.final");
 
       footer(This->id, true);
     }
@@ -1354,7 +1354,7 @@ This=Pick(a,b,c) ->
 	TheNet->newArc(p3, t3);
 	TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
 
-        if (parameters[P_CYCLICWHILE] && ThisBranch->inWhile)
+        if (ThisBranch->inWhile) // was: (parameters[P_CYCLICWHILE] && ThisBranch->inWhile)
           TheNet->findPlace("in." + ThisBranch->channelName)->inWhile = true;
 
 

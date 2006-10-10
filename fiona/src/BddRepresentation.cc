@@ -316,8 +316,8 @@ DdNode* BddRepresentation::nodesToBddMp(unsigned int node1, unsigned int node2){
     
     int j;
     for (int i = 0; i < maxNodeBits; ++i){     //TODO: schleife Absteigend durchlaufen (--i)
-    	assert(j >= 0);
     	j = maxNodeBits-1-i;
+    	assert(j >= 0);
         if (assignment1[j] == false){
             tmp = Cudd_bddAnd(mgrMp, Cudd_Not(Cudd_bddIthVar(mgrMp, maxLabelBits+(2*i))), f);
         }

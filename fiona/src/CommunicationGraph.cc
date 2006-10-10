@@ -188,12 +188,10 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
 	            while (i < PN->placeOutputCnt && PN->outputPlacesArray[i]->index != *iter) {
 					i++;	
 				}
-				//i--;
             } else {
 	            while (i < PN->placeInputCnt && PN->inputPlacesArray[i]->index != *iter) {
 					i++;	
 				}
-				//i--;
             }
 			if (found == 0) {
 	            toAdd->eventsUsed[offset + i]++;

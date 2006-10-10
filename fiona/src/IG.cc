@@ -8,9 +8,6 @@
 
 #include <vector>			// for combining receiving events
 
-#define INPUT 1
-#define OUTPUT 0
-
 //! \fn interactionGraph::interactionGraph(oWFN * _PN) 
 //! \param _PN
 //! \brief constructor
@@ -39,12 +36,13 @@ void interactionGraph::buildGraph() {
 //! \param currentNode the node from which the input event is to be sent
 //! \brief checks whether the set of input messages contains at least one input message
 //! that has been sent at its maximum
-bool interactionGraph::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace) {
+bool interactionGraph::checkMaximalEvents(messageMultiSet input, vertex * currentNode, edgeType typeOfPlace) {
 	trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): start\n");
 	for (messageMultiSet::iterator iter = input.begin(); iter != input.end(); iter++) {
-		if (typeOfPlace == INPUT) {
+		if (typeOfPlace == sending) {
 			unsigned int i = 0;
-			while (i < PN->placeInputCnt && PN->inputPlacesArray[i] && PN->inputPlacesArray[i]->index != *iter) {
+			while (i < PN->placeInputCnt && PN->inputPlacesArray[i] && 
+						PN->inputPlacesArray[i]->index != *iter) {
 				i++;	
 			}
 			if (currentNode->eventsUsed[i] >= PN->inputPlacesArray[i]->max_occurence) {
@@ -52,14 +50,13 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet input, vertex * curren
 				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");
 				return false;
 			}
-		} else if (typeOfPlace == OUTPUT) {
+		} else if (typeOfPlace == receiving) {
 			unsigned int i = 0;
-			//cout << "PN->placeOutputCnt: " << PN->placeOutputCnt << endl;
-			
-			while (i < PN->placeOutputCnt && PN->outputPlacesArray[i] && PN->outputPlacesArray[i]->index != *iter) {
+			while (i < PN->placeOutputCnt && PN->outputPlacesArray[i] && 
+						PN->outputPlacesArray[i]->index != *iter) {
 				i++;	
 			}
-			if (currentNode->eventsUsed[i + PN->placeInputCnt] < PN->outputPlacesArray[i]->max_occurence) {
+			if (currentNode->eventsUsed[i + PN->placeInputCnt] >= PN->outputPlacesArray[i]->max_occurence) {
 				// this output event shall not be received anymore, so quit here
 				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");
 				return false;		
@@ -111,7 +108,7 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	// iterate over all elements of inputSet
 	for (setOfMessages::iterator iter = inputSet.begin(); iter != inputSet.end(); iter++) {
 
-		if (checkMaximalEvents(*iter, currentNode, INPUT)) {
+		if (checkMaximalEvents(*iter, currentNode, sending)) {
 	
 			trace(TRACE_3, "\t\t\t\t    sending event: !");
 			
@@ -152,7 +149,7 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	
 	trace(TRACE_5, "iterating over outputSet\n");
 	for (setOfMessages::iterator iter = outputSet.begin(); iter != outputSet.end(); iter++) {
-		if (checkMaximalEvents(*iter, currentNode, OUTPUT)) {
+		if (checkMaximalEvents(*iter, currentNode, receiving)) {
 			
 			trace(TRACE_3, "\t\t\t\t    output event: ?");
 	
@@ -241,7 +238,7 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 	// iterate over all elements of inputSet
 	for (setOfMessages::iterator iter = inputSet.begin(); iter != inputSet.end(); iter++) {
 
-		vertex * v = new vertex();		// create new vertex of the graph
+		vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);		// create new vertex of the graph
 		currentVertex = currentNode;
 		
 		calculateSuccStatesInput(*iter, currentNode, v);
@@ -256,7 +253,7 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 
 
 	for (setOfMessages::iterator iter = outputSet.begin(); iter != outputSet.end(); iter++) {
-		vertex * v = new vertex();	// create new vertex of the graph
+		vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
 		currentVertex = currentNode;
 					
 		calculateSuccStatesOutput(*iter, currentNode, v);
@@ -375,7 +372,6 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 					}
 					i++;
 				}
-	
 				// get the activated output events			
 				for (int i = 0; i < PN->getPlaceCnt(); i++) {
 					if (PN->Places[i]->type == OUTPUT && PN->CurrentMarking[i] > 0) {
@@ -389,16 +385,7 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 				node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
 			}
 		}
-//		for (int k = 0; k < PN->placeInputCnt; k++) {		
-//			messageMultiSet input;				// multiset holding one input message
-//			input.insert(k);
-//			inputMessages.insert(input);
-//		}
-//		for (int k = 0; k < PN->placeOutputCnt; k++) {		
-//			messageMultiSet output;				// multiset holding one input message
-//			output.insert(k);
-//			outputMessages.insert(output);
-//		}
+
 	}			
 	trace(TRACE_5, "interactionGraph::getActivatedInputEvents(vertex * node): end\n");
 	

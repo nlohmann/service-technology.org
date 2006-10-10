@@ -39,7 +39,7 @@
  *          
  * \date
  *          - created 2005-11-10
- *          - last changed: \$Date: 2006/10/10 15:04:03 $
+ *          - last changed: \$Date: 2006/10/10 18:26:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -48,7 +48,7 @@
  * \note    This file was created using Flex reading file bpel-lexic.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.30 $
+ * \version \$Revision: 1.31 $
  *
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -91,10 +91,10 @@ extern int yyerror(const char *msg);
 int currentView;
 
 // two additional views for attributes and comments
-#define ATTRIBUTE 1 ///< start condition to allow lexing attributes
-#define COMMENT 2   ///< start condition to allow lexing comments
-#define XMLHEADER 3 ///< start condition to allow lexing xml headers
-
+#define ATTRIBUTE 1     ///< start condition to allow lexing attributes
+#define COMMENT 2       ///< start condition to allow lexing comments
+#define XMLHEADER 3     ///< start condition to allow lexing xml headers
+#define DOCUMENTATION 4
 
 
 %}
@@ -109,18 +109,26 @@ quote			\"
 string			{quote}([^"]|{esc})*{quote}
 comment			([^-]|"-"[^-])*
 xmlheader		([^?]|"-"[^?])*
+whitespace		[ \t\r\n]*
 bpwsns			"bpws:"|"bpel:"
+docu_end		"</documentation>"[ \t\r\n]*"<"
+
 
  /* start conditions of the lexer */
 %s ATTRIBUTE
 %s COMMENT
 %s XMLHEADER
+%s DOCUMENTATION
 
 
 
 %%
 
+ /* <documentation tags> */
 
+<DOCUMENTATION>{docu_end}	{ /* skip */ BEGIN(currentView); }
+<DOCUMENTATION>[^<]		{ /* skip */ }
+<INITIAL>"documentation"	{ /* skip */ currentView = YY_START; BEGIN(DOCUMENTATION); }
 
  /* comments */
 "!--"				{ currentView = YY_START; BEGIN(COMMENT); }
@@ -151,66 +159,66 @@ bpwsns			"bpws:"|"bpel:"
 <ATTRIBUTE>"="		{ return X_EQUALS; }
 
 
+
  /* XML-elements */
 "<"				{ return X_OPEN; }
 "/"				{ return X_SLASH; }
-">"				{ BEGIN(INITIAL); return X_CLOSE; }
+<INITIAL,ATTRIBUTE>">"				{ BEGIN(INITIAL); return X_CLOSE; }
 ">"[ \t\r\n]*"<"		{ BEGIN(INITIAL); return X_NEXT; }
 
 
  /* names of BPEL-elements */
-{bpwsns}?"assign"		{ BEGIN(ATTRIBUTE); return K_ASSIGN; }
-{bpwsns}?"case"			{ BEGIN(ATTRIBUTE); return K_CASE; }
-{bpwsns}?"catch"		{ BEGIN(ATTRIBUTE); return K_CATCH; }
-{bpwsns}?"catchAll"		{ BEGIN(ATTRIBUTE); return K_CATCHALL; }
-{bpwsns}?"compensate"		{ BEGIN(ATTRIBUTE); return K_COMPENSATE; }
-{bpwsns}?"compensationHandler"	{ return K_COMPENSATIONHANDLER; }
-{bpwsns}?"copy"			{ return K_COPY; }
-{bpwsns}?"correlation"		{ BEGIN(ATTRIBUTE); return K_CORRELATION; }
-{bpwsns}?"correlations"		{ return K_CORRELATIONS; }
-{bpwsns}?"correlationSet"	{ BEGIN(ATTRIBUTE); return K_CORRELATIONSET; }
-{bpwsns}?"correlationSets"	{ return K_CORRELATIONSETS; }
-{bpwsns}?"documentation"	{ BEGIN(ATTRIBUTE); return K_DOCUMENTATION; }	/* WS-BPEL */
-{bpwsns}?"empty"		{ BEGIN(ATTRIBUTE); return K_EMPTY; }
-{bpwsns}?"eventHandlers"	{ return K_EVENTHANDLERS; }
-{bpwsns}?"extension"		{ BEGIN(ATTRIBUTE); return K_EXTENSION; }	/* WS-BPEL */
-{bpwsns}?"extensions"		{ BEGIN(ATTRIBUTE); return K_EXTENSIONS; }	/* WS-BPEL */
-{bpwsns}?"faultHandlers"	{ return K_FAULTHANDLERS; }
-{bpwsns}?"flow"			{ BEGIN(ATTRIBUTE); return K_FLOW; }
-{bpwsns}?"from"			{ BEGIN(ATTRIBUTE); return K_FROM; }
-{bpwsns}?"import"		{ BEGIN(ATTRIBUTE); return K_IMPORT; }
-{bpwsns}?"invoke"		{ BEGIN(ATTRIBUTE); return K_INVOKE; }
-{bpwsns}?"link"			{ BEGIN(ATTRIBUTE); return K_LINK; }
-{bpwsns}?"links"		{ BEGIN(ATTRIBUTE); return K_LINKS; }
-{bpwsns}?"onAlarm"		{ BEGIN(ATTRIBUTE); return K_ONALARM; }
-{bpwsns}?"onMessage"		{ BEGIN(ATTRIBUTE); return K_ONMESSAGE; }
-{bpwsns}?"otherwise"		{ return K_OTHERWISE; }
-{bpwsns}?"partner"		{ BEGIN(ATTRIBUTE); return K_PARTNER; }
-{bpwsns}?"partnerLink"		{ BEGIN(ATTRIBUTE); return K_PARTNERLINK; }
-{bpwsns}?"partnerLinks"		{ BEGIN(ATTRIBUTE); return K_PARTNERLINKS; }
-{bpwsns}?"partners"		{ return K_PARTNERS; }
-{bpwsns}?"pick"			{ BEGIN(ATTRIBUTE); return K_PICK; }
-{bpwsns}?"process"		{ BEGIN(ATTRIBUTE); return K_PROCESS; }
-{bpwsns}?"receive"		{ BEGIN(ATTRIBUTE); return K_RECEIVE; }
-{bpwsns}?"reply"		{ BEGIN(ATTRIBUTE); return K_REPLY; }
-{bpwsns}?"scope"		{ BEGIN(ATTRIBUTE); return K_SCOPE; }
-{bpwsns}?"sequence"		{ BEGIN(ATTRIBUTE); return K_SEQUENCE; }
-{bpwsns}?"source"		{ BEGIN(ATTRIBUTE); return K_SOURCE; }
-{bpwsns}?"switch"		{ BEGIN(ATTRIBUTE); return K_SWITCH; }
-{bpwsns}?"target"		{ BEGIN(ATTRIBUTE); return K_TARGET; }
-{bpwsns}?"terminate"		{ BEGIN(ATTRIBUTE); return K_TERMINATE; }
-{bpwsns}?"throw"		{ BEGIN(ATTRIBUTE); return K_THROW; }
-{bpwsns}?"to"			{ BEGIN(ATTRIBUTE); return K_TO; }
-{bpwsns}?"variable"		{ BEGIN(ATTRIBUTE); return K_VARIABLE; }
-{bpwsns}?"variables"		{ return K_VARIABLES; }
-{bpwsns}?"wait"			{ BEGIN(ATTRIBUTE); return K_WAIT; }
-{bpwsns}?"while"		{ BEGIN(ATTRIBUTE); return K_WHILE; }
+<INITIAL>{bpwsns}?"assign"		{ BEGIN(ATTRIBUTE); return K_ASSIGN; }
+<INITIAL>{bpwsns}?"case"		{ BEGIN(ATTRIBUTE); return K_CASE; }
+<INITIAL>{bpwsns}?"catch"		{ BEGIN(ATTRIBUTE); return K_CATCH; }
+<INITIAL>{bpwsns}?"catchAll"		{ BEGIN(ATTRIBUTE); return K_CATCHALL; }
+<INITIAL>{bpwsns}?"compensate"		{ BEGIN(ATTRIBUTE); return K_COMPENSATE; }
+<INITIAL>{bpwsns}?"compensationHandler"	{ return K_COMPENSATIONHANDLER; }
+<INITIAL>{bpwsns}?"copy"		{ return K_COPY; }
+<INITIAL>{bpwsns}?"correlation"		{ BEGIN(ATTRIBUTE); return K_CORRELATION; }
+<INITIAL>{bpwsns}?"correlations"	{ return K_CORRELATIONS; }
+<INITIAL>{bpwsns}?"correlationSet"	{ BEGIN(ATTRIBUTE); return K_CORRELATIONSET; }
+<INITIAL>{bpwsns}?"correlationSets"	{ return K_CORRELATIONSETS; }
+<INITIAL>{bpwsns}?"empty"		{ BEGIN(ATTRIBUTE); return K_EMPTY; }
+<INITIAL>{bpwsns}?"eventHandlers"	{ return K_EVENTHANDLERS; }
+<INITIAL>{bpwsns}?"extension"		{ BEGIN(ATTRIBUTE); return K_EXTENSION; }	/* WS-BPEL */
+<INITIAL>{bpwsns}?"extensions"		{ BEGIN(ATTRIBUTE); return K_EXTENSIONS; }	/* WS-BPEL */
+<INITIAL>{bpwsns}?"faultHandlers"	{ return K_FAULTHANDLERS; }
+<INITIAL>{bpwsns}?"flow"		{ BEGIN(ATTRIBUTE); return K_FLOW; }
+<INITIAL>{bpwsns}?"from"		{ BEGIN(ATTRIBUTE); return K_FROM; }
+<INITIAL>{bpwsns}?"import"		{ BEGIN(ATTRIBUTE); return K_IMPORT; }
+<INITIAL>{bpwsns}?"invoke"		{ BEGIN(ATTRIBUTE); return K_INVOKE; }
+<INITIAL>{bpwsns}?"link"		{ BEGIN(ATTRIBUTE); return K_LINK; }
+<INITIAL>{bpwsns}?"links"		{ BEGIN(ATTRIBUTE); return K_LINKS; }
+<INITIAL>{bpwsns}?"onAlarm"		{ BEGIN(ATTRIBUTE); return K_ONALARM; }
+<INITIAL>{bpwsns}?"onMessage"		{ BEGIN(ATTRIBUTE); return K_ONMESSAGE; }
+<INITIAL>{bpwsns}?"otherwise"		{ return K_OTHERWISE; }
+<INITIAL>{bpwsns}?"partner"		{ BEGIN(ATTRIBUTE); return K_PARTNER; }
+<INITIAL>{bpwsns}?"partnerLink"		{ BEGIN(ATTRIBUTE); return K_PARTNERLINK; }
+<INITIAL>{bpwsns}?"partnerLinks"	{ BEGIN(ATTRIBUTE); return K_PARTNERLINKS; }
+<INITIAL>{bpwsns}?"partners"		{ return K_PARTNERS; }
+<INITIAL>{bpwsns}?"pick"		{ BEGIN(ATTRIBUTE); return K_PICK; }
+<INITIAL>{bpwsns}?"process"		{ BEGIN(ATTRIBUTE); return K_PROCESS; }
+<INITIAL>{bpwsns}?"receive"		{ BEGIN(ATTRIBUTE); return K_RECEIVE; }
+<INITIAL>{bpwsns}?"reply"		{ BEGIN(ATTRIBUTE); return K_REPLY; }
+<INITIAL>{bpwsns}?"scope"		{ BEGIN(ATTRIBUTE); return K_SCOPE; }
+<INITIAL>{bpwsns}?"sequence"		{ BEGIN(ATTRIBUTE); return K_SEQUENCE; }
+<INITIAL>{bpwsns}?"source"		{ BEGIN(ATTRIBUTE); return K_SOURCE; }
+<INITIAL>{bpwsns}?"switch"		{ BEGIN(ATTRIBUTE); return K_SWITCH; }
+<INITIAL>{bpwsns}?"target"		{ BEGIN(ATTRIBUTE); return K_TARGET; }
+<INITIAL>{bpwsns}?"terminate"		{ BEGIN(ATTRIBUTE); return K_TERMINATE; }
+<INITIAL>{bpwsns}?"throw"		{ BEGIN(ATTRIBUTE); return K_THROW; }
+<INITIAL>{bpwsns}?"to"			{ BEGIN(ATTRIBUTE); return K_TO; }
+<INITIAL>{bpwsns}?"variable"		{ BEGIN(ATTRIBUTE); return K_VARIABLE; }
+<INITIAL>{bpwsns}?"variables"		{ return K_VARIABLES; }
+<INITIAL>{bpwsns}?"wait"			{ BEGIN(ATTRIBUTE); return K_WAIT; }
+<INITIAL>{bpwsns}?"while"		{ BEGIN(ATTRIBUTE); return K_WHILE; }
 
  /* white space */
-[ \t\r\n]*			{ /* skip white space */ }
+{whitespace}			{ /* skip white space */ }
 
-{name}				{ yylval.yt_casestring = kc::mkcasestring(yytext);
-                                  return X_NAME; }
+ /* {name}				{ yylval.yt_casestring = kc::mkcasestring(yytext);
+                                  return X_NAME; } */
 
 
  /* end of input file */

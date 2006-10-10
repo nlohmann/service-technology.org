@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/10 15:04:03 $
+ *          - last changed: \$Date: 2006/10/10 18:26:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.223 $
+ * \version \$Revision: 1.224 $
  * 
  */
 %}
@@ -73,7 +73,7 @@
 %token K_SEQUENCE K_SOURCE K_SWITCH K_TARGET K_TERMINATE K_THROW K_TO
 %token K_VARIABLE K_VARIABLES K_WAIT K_WHILE
 %token X_OPEN X_SLASH X_CLOSE X_NEXT X_EQUALS QUOTE
-%token K_EXTENSION K_EXTENSIONS K_DOCUMENTATION
+%token K_EXTENSION K_EXTENSIONS
 %token K_JOINCONDITION K_GETLINKSTATUS RBRACKET LBRACKET APOSTROPHE K_AND K_OR
 %token <yt_casestring> X_NAME
 %token <yt_casestring> X_STRING
@@ -229,11 +229,11 @@ tProcess:
       currentJoinCondition = standardJoinCondition();
       temporaryAttributeMap.clear();
     }
-  X_OPEN K_PROCESS arbitraryAttributes X_NEXT documentation tExtensions imports
+  X_OPEN K_PROCESS arbitraryAttributes X_NEXT tExtensions imports
   tPartnerLinks tPartners tVariables tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers activity
   X_NEXT X_SLASH K_PROCESS X_CLOSE
     {
-      TheProcess = $$ = Process($9, $10, $11, $12, $13, $14, $15, StopInProcess(), $16);
+      TheProcess = $$ = Process($8, $9, $10, $11, $12, $13, $14, StopInProcess(), $15);
       $$->id = $4->value;
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_PROCESS);
@@ -1001,11 +1001,4 @@ booleanLinkCondition:
     { $$ = Conjunction($2, $4); }
 | LBRACKET booleanLinkCondition K_OR booleanLinkCondition RBRACKET
     { $$ = Disjunction($2, $4); }
-;
-
-
-
-documentation:
-  /* empty */
-| K_DOCUMENTATION arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_DOCUMENTATION X_NEXT
 ;

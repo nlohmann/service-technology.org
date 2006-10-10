@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 ############################################################################
 # Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Dennis Reinert,   #
@@ -85,14 +85,15 @@ rm -f $DIR/*.png
 #result10OG=$?
 
 i=3
-result=0
-IGNOSC=10
-OGNOSC=15
-OGNON=8
-OGNOE=12
 
 while [ $i -le 9 ]
 do
+    #only run sequences 3 and 9
+    if [ $i -ne 3 -a $i -ne 9 ]; then
+        let i=i+1
+        continue
+    fi
+
     #echo running sequence$i
 
     echo running $FIONA -n $DIR/sequence${i}.owfn -a -t IG
@@ -100,13 +101,13 @@ do
     OUTPUT=`$FIONA -n $DIR/sequence${i}.owfn -a --graphtype=IG  2>&1`
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     resultIG=$?
-    echo $OUTPUT | grep "number of states calculated: $IGNOSC" > /dev/null
+    echo $OUTPUT | grep "number of states calculated: $(((i+1)*(i+2)/2))" > /dev/null
     resultIGNOSC=$?
-    echo $OUTPUT | grep "number of nodes: `expr $i + 1`" > /dev/null
+    echo $OUTPUT | grep "number of nodes: $((i+1))" > /dev/null
     resultIGNON=$?
     echo $OUTPUT | grep "number of edges: $i" > /dev/null
     resultIGNOE=$?
-    echo $OUTPUT | grep "number of blue nodes: `expr $i + 1`" > /dev/null
+    echo $OUTPUT | grep "number of blue nodes: $((i+1))" > /dev/null
     resultIGNOBN=$?
     echo $OUTPUT | grep "number of blue edges: $i" > /dev/null
     resultIGNOBE=$?
@@ -116,35 +117,27 @@ do
     echo   ... failed to build IG correctly
     fi
 
-    result=`expr $result + $resultIG + $resultIGNOSC`
-    IGNOSC=`expr $IGNOSC + $i + 2`
-
     echo running $FIONA -n $DIR/sequence${i}.owfn -a -t OG
 
     OUTPUT=`$FIONA -n $DIR/sequence${i}.owfn -a --graphtype=OG  2>&1`
     echo $OUTPUT | grep "net is controllable: YES" > /dev/null
     resultOG=$?
-    echo $OUTPUT | grep "number of states calculated: $OGNOSC" > /dev/null
+    echo $OUTPUT | grep "number of states calculated: $(((2**(i+1))-1))" > /dev/null
     resultOGNOSC=$?
-    echo $OUTPUT | grep "number of nodes: $OGNON" > /dev/null
+    echo $OUTPUT | grep "number of nodes: $((2**i))" > /dev/null
     resultOGNON=$?
-    echo $OUTPUT | grep "number of edges: $OGNOE" > /dev/null
+    echo $OUTPUT | grep "number of edges: $((i*(2**(i-1))))" > /dev/null
     resultOGNOE=$?
-    echo $OUTPUT | grep "number of blue nodes: $OGNON" > /dev/null
+    echo $OUTPUT | grep "number of blue nodes: $((2**i))" > /dev/null
     resultOGNOBN=$?
-    echo $OUTPUT | grep "number of blue edges: $OGNOE" > /dev/null
+    echo $OUTPUT | grep "number of blue edges: $((i*(2**(i-1))))" > /dev/null
     resultOGNOBE=$?
     if [ $resultOG -ne 0 -o $resultOGNOSC -ne 0 -o $resultOGNON -ne 0 -o $resultOGNOE -ne 0 -o $resultOGNOBN -ne 0 -o $resultOGNOBE -ne 0 ]
     then
     echo   ... failed to build OG
     fi
 
-    result=`expr $result + $resultOG`
-    OGNOSC=`expr $OGNOSC \* 2 + 1`
-    OGNON=`expr $OGNON \* 2`
-    OGNOE=`expr $OGNOE \* 2 + \( $OGNON \/ 2 \)`
-
-    i=`expr $i + 1`
+    let i=i+1
 done
 
 #if test \( $result3IG  -eq 0 -a $result3OG  -eq 0 -a \

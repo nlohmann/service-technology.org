@@ -39,7 +39,7 @@
  *          
  * \date
  *          - created 2005-11-10
- *          - last changed: \$Date: 2006/10/10 18:26:39 $
+ *          - last changed: \$Date: 2006/10/10 20:09:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -48,7 +48,7 @@
  * \note    This file was created using Flex reading file bpel-lexic.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  *
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -124,11 +124,14 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 
 %%
 
+
+
  /* <documentation tags> */
 
 <DOCUMENTATION>{docu_end}	{ /* skip */ BEGIN(currentView); }
 <DOCUMENTATION>[^<]		{ /* skip */ }
 <INITIAL>"documentation"	{ /* skip */ currentView = YY_START; BEGIN(DOCUMENTATION); }
+
 
  /* comments */
 "!--"				{ currentView = YY_START; BEGIN(COMMENT); }
@@ -217,8 +220,8 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
  /* white space */
 {whitespace}			{ /* skip white space */ }
 
- /* {name}				{ yylval.yt_casestring = kc::mkcasestring(yytext);
-                                  return X_NAME; } */
+<INITIAL>{name}			{ yylval.yt_casestring = kc::mkcasestring(yytext);
+                                  return X_NAME; }
 
 
  /* end of input file */

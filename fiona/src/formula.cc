@@ -330,12 +330,14 @@ formula * binarybooleanformula::merge() {
 		} else {
 			f->value = true;
 		}
+		break;
 	case disj:
 		if(f->firstvalid < f->cardsub) {
 			f->value = true;
 		} else {
 			f->value = false;
 		}
+		break;
 	}
 
 	return f;
@@ -389,12 +391,14 @@ formula * booleanformula::merge()
 		} else {
 			f->value = true;
 		}
+		break;
 	case disj:
 		if(f->firstvalid < f->cardsub) {
 			f->value = true;
 		} else {
 			f->value = false;
 		}
+		break;
 	}
 
 	return f;

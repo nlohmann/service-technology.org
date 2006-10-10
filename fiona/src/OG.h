@@ -24,8 +24,9 @@ class operatingGuidelines : public communicationGraph {
 		operatingGuidelines(oWFN *);
 		~operatingGuidelines();
 	
-    	void buildGraph(vertex * );
-    
+    	void buildGraph(vertex *);
+		bool terminateBuildGraph(vertex *);
+		
     	void computeCNF(vertex *);
     	
 //    	bool terminateBuildingGraph(vertex * );

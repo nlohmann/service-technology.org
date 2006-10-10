@@ -135,7 +135,7 @@ void adjustOptionValues() {
 	}
 	trace(TRACE_0, "considering max. " + intToString(numberOfEvents) + " events at all\n\n");
 	
-	options[O_EVENT_USE_MAX] = true;	
+	options[O_EVENT_USE_MAX] = true;
 }
 
 

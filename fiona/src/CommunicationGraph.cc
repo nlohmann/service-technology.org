@@ -297,7 +297,7 @@ bool communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
 
         return true;
     } else {
-        trace(TRACE_5, "\t computed successor node already known: " + intToString(found->getNumber()) + "\n");
+        trace(TRACE_1, "\t computed successor node already known: " + intToString(found->getNumber()) + "\n");
 
         graphEdge * edgeSucc = new graphEdge(found, edgeLabel, type);
         currentVertex->addSuccessorNode(edgeSucc);
@@ -484,14 +484,14 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
 }
 
 //! \fn void communicationGraph::printNodeStatistics()
-//! \brief creates a dot file of the graph
+//! \brief computes number of blue nodes and edges and prints them
 void communicationGraph::printNodeStatistics() {
     vertex * tmp = root;
     bool visitedNodes[numberOfNodes];
 
     for (int i = 0; i < numberOfNodes; i++) {
         visitedNodes[i] = false;
-    }	
+    }
     
     numberOfBlueNodes = 0;
     numberOfBlueEdges = 0;
@@ -504,9 +504,7 @@ void communicationGraph::printNodeStatistics() {
         trace(TRACE_0, "\n    number of black nodes: " + intToString(getNumberOfBlackNodes()) + "\n");
     }
     trace(TRACE_0, "    number of blue edges: " + intToString(getNumberOfBlueEdges()) + "\n");
-    trace(TRACE_0, "    number of states stored in nodes: " + intToString(getNumberOfStatesAllNodes()) + "\n");
-
-	trace(TRACE_0, "creating the dot file of the graph...\n");	
+    trace(TRACE_0, "    number of states stored in nodes: " + intToString(getNumberOfStatesAllNodes()) + "\n\n");
 }
 
 
@@ -514,10 +512,12 @@ void communicationGraph::printNodeStatistics() {
 //! \brief creates a dot file of the graph
 void communicationGraph::printDotFile() {
     
-    int maxWriteingSize = 1000;
+    int maxWritingSize = 1000;
     int maxPrintingSize =  500;
     
-    if (numberOfBlueNodes <= maxWriteingSize) {
+    if (numberOfBlueNodes <= maxWritingSize) {
+        
+		trace(TRACE_0, "creating the dot file of the graph...\n");	
         vertex * tmp = root;
         bool visitedNodes[numberOfNodes];
 
@@ -555,29 +555,32 @@ void communicationGraph::printDotFile() {
         printGraphToDot(tmp, dotFile, visitedNodes);
         dotFile << "}";
         dotFile.close();
-
-        if (numberOfNodes < maxPrintingSize) {
-            if (parameters[P_OG]) {
-                if (options[O_CALC_ALL_STATES]) {
-                    sprintf(buffer, "dot -Tpng %s.a.OG.out -o %s.a.OG.png", netfile, netfile);
-                } else {
-                    sprintf(buffer, "dot -Tpng %s.OG.out -o %s.OG.png", netfile, netfile);
-                }
+        	
+        // prepare dot command line for printing
+        if (parameters[P_OG]) {
+            if (options[O_CALC_ALL_STATES]) {
+                sprintf(buffer, "dot -Tpng %s.a.OG.out -o %s.a.OG.png", netfile, netfile);
             } else {
-                if (options[O_CALC_ALL_STATES]) {
-                    sprintf(buffer, "dot -Tpng %s.a.IG.out -o %s.a.IG.png", netfile, netfile);
-                } else {
-                    sprintf(buffer, "dot -Tpng %s.IG.out -o %s.IG.png", netfile, netfile);
-                }
+                sprintf(buffer, "dot -Tpng %s.OG.out -o %s.OG.png", netfile, netfile);
             }
-            trace(TRACE_0, buffer); trace(TRACE_0, "\n");
-            system(buffer);
-
         } else {
-            trace(TRACE_0, "graph is too big (>" + intToString(maxPrintingSize) + " nodes) to have dot create the graphics\n");
+            if (options[O_CALC_ALL_STATES]) {
+                sprintf(buffer, "dot -Tpng %s.a.IG.out -o %s.a.IG.png", netfile, netfile);
+            } else {
+                sprintf(buffer, "dot -Tpng %s.IG.out -o %s.IG.png", netfile, netfile);
+            }
+        }
+
+		// print commandline and execute system command
+        if (numberOfNodes <= maxPrintingSize) {
+			trace(TRACE_0, string(buffer) + "\n");
+            system(buffer);
+        } else {
+        	trace(TRACE_0, "graph is too big to create the graphics; ");
+			trace(TRACE_0, string(buffer) + "\n");
         }
     } else {
-        trace(TRACE_0, "graph is too big (>" + intToString(maxWriteingSize) + " nodes) to create dot file\n");
+        trace(TRACE_0, "graph is too big to create dot file\n");
     }
 }
 

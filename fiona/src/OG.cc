@@ -58,7 +58,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	computeCNF(currentNode);					// calculate CNF of this node
 
 	// stop when communication depth reached
-	if (actualDepth > PN->commDepth) {
+	if (terminateBuildGraph(currentNode)) {
 		// node is a leaf
 		analyseNode(currentNode, true);
 		assert(currentNode->getColor() != BLACK);
@@ -66,6 +66,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 		return;
 	}
 
+//	cout << " ... continue " << endl;
 	trace(TRACE_1, "=================================================================\n");
 
 	// communication depth not yet reached, going down
@@ -95,15 +96,12 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 				numberDeletedVertices--;
 				delete v;
 			} else {
-
-				if (AddVertex (v, i, sending)) {
+				if (AddVertex(v, i, sending)) {
 
 					buildGraph(v);				// going down with sending event...
 	
 					trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
-	
 //					analyseNode(currentNode, false);
-	
 					actualDepth--;
 				}
 			}
@@ -126,22 +124,28 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	    
 		if (currentNode->eventsUsed[i + PN->placeInputCnt] < PN->outputPlacesArray[i]->max_occurence) {
 				
+			cout << "event " << PN->outputPlacesArray[i]->name << " at node "
+                 << currentNode->getNumber() << " considered " << " since it did occure yet "
+                 << currentNode->eventsUsed[i + PN->placeInputCnt] << " times" << endl;
+			
 			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
 			currentVertex = currentNode;
 			
 			calculateSuccStatesOutput(PN->outputPlacesArray[i]->index, currentNode, v);
 			
-			if (AddVertex (v, i, receiving)) {
+			if (AddVertex(v, i, receiving)) {
 
 				buildGraph(v);				// going down with receiving event...
 
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
-
 //				analyseNode(currentNode, false);
-
 				actualDepth--;
 			}
-		} 
+		} else {
+				trace(TRACE_2, "\t\t\t\t  receiving event: ?");
+				trace(TRACE_2, string(PN->outputPlacesArray[i]->name));
+				trace(TRACE_2, " suppressed (max_occurence reached)\n");
+		}
 		i++;
 	}
 
@@ -268,3 +272,37 @@ void operatingGuidelines::convertToBdd() {
     this->bdd->reorder((Cudd_ReorderingType)bdd_reordermethod);
     trace(TRACE_5,"operatingGuidelines::convertToBdd()\n");
 }
+
+
+//! \fn bool operatingGuidelines::terminateBuildGraph(vertex * currentNode)
+//! \param currentNode the node for which termination is decided
+//! \brief decides whether a leaf node of the graph is reached;
+//! either because of reaching communication depth or because there are no events left
+bool operatingGuidelines::terminateBuildGraph(vertex * currentNode) {
+	
+	if (options[O_COMM_DEPTH]) {
+		// when -c set to a value, then stop at that depth
+		if (actualDepth > PN->commDepth) {
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		// check whether there are input or output events left
+		// (i.e. their max_occurences value is not reached)
+		int i;
+		
+		for (i = 0; i < PN->getInputPlaceCnt(); i++) {
+			if (currentNode->eventsUsed[i] < PN->inputPlacesArray[i]->max_occurence) {
+				return false;    // at least one event can be sent
+			}
+		}
+		for (i = 0; i < PN->getOutputPlaceCnt(); i++) {
+			if (currentNode->eventsUsed[i + PN->placeInputCnt] < PN->outputPlacesArray[i]->max_occurence) {
+				return false;    // at least one event can be received
+			}
+		}
+		return true;
+	}
+}
+

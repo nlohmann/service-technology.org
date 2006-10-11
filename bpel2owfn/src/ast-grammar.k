@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/11 08:03:57 $
+ *          - last changed: \$Date: 2006/10/11 18:43:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.107 $
+ * \version \$Revision: 1.108 $
  */
 %}
 
@@ -72,6 +72,8 @@ using std::map;
 typedef map<string, string> stringMap;
 
 extern int yylineno;
+extern unsigned int ASTEid;
+
 
 %}
 
@@ -342,6 +344,15 @@ tEmpty:
   }
 ;
 
+%ctor tEmpty(int myid = 0) {
+  cerr << "called user-defined constructor for tEmpty(): myid = " << myid << endl;
+}
+
+%ctor Empty(int myid = 0) {
+  cerr << "called user-defined constructor for Empty(): myid = " << myid << endl;
+  id = myid;
+}
+
 
 /******************************************************************************
   INVOKE
@@ -471,6 +482,8 @@ tWait:
     bool suppressJF = false;
 
     bool isWaitFor = false;
+
+    { cerr << "called constructor for Wait()" << endl; }
   }
 ;
 

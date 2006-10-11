@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/10/11 09:58:23 $
+ *          - last changed: \$Date: 2006/10/11 18:43:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.100 $
+ * \version \$Revision: 1.101 $
  *
  */
 
@@ -226,6 +226,8 @@ int main( int argc, char *argv[])
     {
       trace(TRACE_INFORMATION, "-> Printing AST ...\n");
       TheProcess->print();
+      TheProcess = TheProcess->rewrite(kc::test);
+      TheProcess->print();      
     }
 
 

@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/11 12:13:08 $
+ *          - last changed: \$Date: 2006/10/11 12:43:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.229 $
+ * \version \$Revision: 1.230 $
  * 
  */
 %}
@@ -947,8 +947,8 @@ tElse:
 ******************************************************************************/
 
 tWhile:
-  K_WHILE arbitraryAttributes X_NEXT standardElements activity X_NEXT X_SLASH K_WHILE
-    { $$ = While($4, $5);
+  K_WHILE arbitraryAttributes X_NEXT standardElements tCondition activity X_NEXT X_SLASH K_WHILE
+    { $$ = While($4, $6);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_WHILE); }

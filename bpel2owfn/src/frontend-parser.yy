@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/10 20:09:31 $
+ *          - last changed: \$Date: 2006/10/11 08:03:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.225 $
+ * \version \$Revision: 1.226 $
  * 
  */
 %}
@@ -73,7 +73,7 @@
 %token K_SEQUENCE K_SOURCE K_SWITCH K_TARGET K_TERMINATE K_THROW K_TO
 %token K_VARIABLE K_VARIABLES K_WAIT K_WHILE
 %token X_OPEN X_SLASH X_CLOSE X_NEXT X_EQUALS QUOTE
-%token K_EXTENSION K_EXTENSIONS
+%token K_EXTENSION K_EXTENSIONS K_LITERAL K_QUERY K_SOURCES K_TARGETS
 %token K_JOINCONDITION K_GETLINKSTATUS RBRACKET LBRACKET APOSTROPHE K_AND K_OR
 %token <yt_casestring> X_NAME
 %token <yt_casestring> X_STRING
@@ -178,6 +178,7 @@ unsigned int ASTEid = 1;
 %type <yt_tLink_list> tLink_list
 %type <yt_tLink_list> tLinks
 %type <yt_tLink> tLink
+%type <yt_casestring> tLiteral
 %type <yt_tOnAlarm_list> tOnAlarm_list
 %type <yt_tOnAlarm> tOnAlarm
 %type <yt_tOnMessage_list> tOnMessage_list
@@ -650,8 +651,11 @@ tCopy_list:
 ;
 
 tCopy:
-  K_COPY X_NEXT tFrom X_NEXT tTo X_NEXT X_SLASH K_COPY
-    { $$ = Copy($3, $5); }
+  K_COPY arbitraryAttributes X_NEXT tFrom X_NEXT tTo X_NEXT X_SLASH K_COPY
+    { $$ = Copy($4, $6);
+      $$->id = $2->value;
+      assert(ASTEmap[$$->id] == NULL);
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_COPY); }
 ; 
 
 tFrom:
@@ -663,7 +667,18 @@ tFrom:
 | K_FROM arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_FROM
     { $$ = From();
       $$->id = $2->value;
+      $$->expression = $4->name;
+      assert(ASTEmap[$$->id] == NULL);
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FROM); }
+| K_FROM arbitraryAttributes X_NEXT tLiteral X_NEXT X_SLASH K_FROM
+    { $$ = From();
+      $$->id = $2->value;
       $$->literal = $4->name;
+      assert(ASTEmap[$$->id] == NULL);
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FROM); }
+| K_FROM arbitraryAttributes X_NEXT tQuery X_NEXT X_SLASH K_FROM
+    { $$ = From();
+      $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FROM); }
 | K_FROM arbitraryAttributes X_SLASH
@@ -673,6 +688,15 @@ tFrom:
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FROM); }
 ;
 
+tLiteral:
+  K_LITERAL X_CLOSE X_NAME X_OPEN X_SLASH K_LITERAL
+    { $$ = $3; }
+;
+
+tQuery:
+  K_QUERY arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_QUERY
+;
+
 tTo:
   K_TO arbitraryAttributes X_NEXT X_SLASH K_TO
     { $$ = To();
@@ -680,6 +704,12 @@ tTo:
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TO); }
 | K_TO arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_TO
+    { $$ = To();
+      $$->id = $2->value;
+//      $$->literal = $4->name; // TODO!
+      assert(ASTEmap[$$->id] == NULL);
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TO); }
+| K_TO arbitraryAttributes X_NEXT tQuery X_NEXT X_SLASH K_TO
     { $$ = To();
       $$->id = $2->value;
 //      $$->literal = $4->name; // TODO!
@@ -932,6 +962,16 @@ tScope:
 standardElements:
   tTarget_list tSource_list
     { $$ = StandardElements($1, $2, currentJoinCondition);
+      currentJoinCondition = standardJoinCondition(); }
+| K_TARGETS X_NEXT tTarget X_NEXT tTarget_list X_SLASH K_TARGETS X_NEXT
+    { $$ = StandardElements(ConstTarget_list($3, $5), NiltSource_list(), currentJoinCondition);
+      currentJoinCondition = standardJoinCondition(); }
+| K_SOURCES X_NEXT tSource X_NEXT tSource_list X_SLASH K_SOURCES X_NEXT
+    { $$ = StandardElements(NiltTarget_list(), ConstSource_list($3, $5), currentJoinCondition);
+      currentJoinCondition = standardJoinCondition(); }
+| K_TARGETS X_NEXT tTarget X_NEXT tTarget_list X_SLASH K_TARGETS X_NEXT
+  K_SOURCES X_NEXT tSource X_NEXT tSource_list X_SLASH K_SOURCES X_NEXT
+    { $$ = StandardElements(ConstTarget_list($3, $5), ConstSource_list($11, $13), currentJoinCondition);
       currentJoinCondition = standardJoinCondition(); }
 ;
 

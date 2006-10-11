@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/04 17:28:02 $
+ *          - last changed: \$Date: 2006/10/11 08:03:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.106 $
+ * \version \$Revision: 1.107 $
  */
 %}
 
@@ -427,6 +427,10 @@ tCopy_list:
 
 tCopy:
   Copy(tFrom tTo)
+  {
+    int id = 0;
+    stringMap attributes;
+  }
 ;
 
 tFrom:
@@ -435,6 +439,7 @@ tFrom:
     int id = 0;
     stringMap attributes;
 
+    string expression;
     string literal;
 
     string variableName;

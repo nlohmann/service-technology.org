@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/10/09 10:43:45 $
+ *          - last changed: \$Date: 2006/10/11 08:03:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  */
 
 
@@ -96,6 +96,7 @@ ASTE::ASTE(kc::impl_abstract_phylum *mynode, int mytype)
     case(K_CATCHALL):		id = ((kc::impl_tCatchAll*)mynode)->id; break;
     case(K_COMPENSATE):		id = ((kc::impl_tCompensate*)mynode)->id; break;
     case(K_COMPENSATIONHANDLER):id = ((kc::impl_tCompensationHandler*)mynode)->id; break;
+    case(K_COPY):		id = ((kc::impl_tCopy*)mynode)->id; break;
     case(K_CORRELATION):	id = ((kc::impl_tCorrelation*)mynode)->id; break;
     case(K_CORRELATIONSET):	id = ((kc::impl_tCorrelationSet*)mynode)->id; break;
     case(K_EMPTY):		id = ((kc::impl_tEmpty*)mynode)->id; break;

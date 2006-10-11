@@ -39,7 +39,7 @@
  *          
  * \date
  *          - created 2005-11-10
- *          - last changed: \$Date: 2006/10/10 20:09:31 $
+ *          - last changed: \$Date: 2006/10/11 08:03:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -48,7 +48,7 @@
  * \note    This file was created using Flex reading file bpel-lexic.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  *
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -166,7 +166,7 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
  /* XML-elements */
 "<"				{ return X_OPEN; }
 "/"				{ return X_SLASH; }
-<INITIAL,ATTRIBUTE>">"				{ BEGIN(INITIAL); return X_CLOSE; }
+<INITIAL,ATTRIBUTE>">"		{ BEGIN(INITIAL); return X_CLOSE; }
 ">"[ \t\r\n]*"<"		{ BEGIN(INITIAL); return X_NEXT; }
 
 
@@ -192,8 +192,8 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 <INITIAL>{bpwsns}?"import"		{ BEGIN(ATTRIBUTE); return K_IMPORT; }
 <INITIAL>{bpwsns}?"invoke"		{ BEGIN(ATTRIBUTE); return K_INVOKE; }
 <INITIAL>{bpwsns}?"link"		{ BEGIN(ATTRIBUTE); return K_LINK; }
-<INITIAL>{bpwsns}?"links"		{ BEGIN(ATTRIBUTE); return K_LINKS; }
-<INITIAL>{bpwsns}?"onAlarm"		{ BEGIN(ATTRIBUTE); return K_ONALARM; }
+<INITIAL>{bpwsns}?"links"		{ BEGIN(ATTRIBUTE); return K_LINKS; }		/* WS-BPEL */
+<INITIAL>{bpwsns}?"literal"		{ BEGIN(ATTRIBUTE); return K_LITERAL; }
 <INITIAL>{bpwsns}?"onMessage"		{ BEGIN(ATTRIBUTE); return K_ONMESSAGE; }
 <INITIAL>{bpwsns}?"otherwise"		{ return K_OTHERWISE; }
 <INITIAL>{bpwsns}?"partner"		{ BEGIN(ATTRIBUTE); return K_PARTNER; }
@@ -202,25 +202,28 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 <INITIAL>{bpwsns}?"partners"		{ return K_PARTNERS; }
 <INITIAL>{bpwsns}?"pick"		{ BEGIN(ATTRIBUTE); return K_PICK; }
 <INITIAL>{bpwsns}?"process"		{ BEGIN(ATTRIBUTE); return K_PROCESS; }
+<INITIAL>{bpwsns}?"query"		{ BEGIN(ATTRIBUTE); return K_QUERY; }		/* WS-BPEL */
 <INITIAL>{bpwsns}?"receive"		{ BEGIN(ATTRIBUTE); return K_RECEIVE; }
 <INITIAL>{bpwsns}?"reply"		{ BEGIN(ATTRIBUTE); return K_REPLY; }
 <INITIAL>{bpwsns}?"scope"		{ BEGIN(ATTRIBUTE); return K_SCOPE; }
 <INITIAL>{bpwsns}?"sequence"		{ BEGIN(ATTRIBUTE); return K_SEQUENCE; }
 <INITIAL>{bpwsns}?"source"		{ BEGIN(ATTRIBUTE); return K_SOURCE; }
+<INITIAL>{bpwsns}?"sources"		{ BEGIN(ATTRIBUTE); return K_SOURCES; }		/* WS-BPEL */
 <INITIAL>{bpwsns}?"switch"		{ BEGIN(ATTRIBUTE); return K_SWITCH; }
 <INITIAL>{bpwsns}?"target"		{ BEGIN(ATTRIBUTE); return K_TARGET; }
+<INITIAL>{bpwsns}?"targets"		{ BEGIN(ATTRIBUTE); return K_TARGETS; }		/* WS-BPEL */
 <INITIAL>{bpwsns}?"terminate"		{ BEGIN(ATTRIBUTE); return K_TERMINATE; }
 <INITIAL>{bpwsns}?"throw"		{ BEGIN(ATTRIBUTE); return K_THROW; }
 <INITIAL>{bpwsns}?"to"			{ BEGIN(ATTRIBUTE); return K_TO; }
 <INITIAL>{bpwsns}?"variable"		{ BEGIN(ATTRIBUTE); return K_VARIABLE; }
 <INITIAL>{bpwsns}?"variables"		{ return K_VARIABLES; }
-<INITIAL>{bpwsns}?"wait"			{ BEGIN(ATTRIBUTE); return K_WAIT; }
+<INITIAL>{bpwsns}?"wait"		{ BEGIN(ATTRIBUTE); return K_WAIT; }
 <INITIAL>{bpwsns}?"while"		{ BEGIN(ATTRIBUTE); return K_WHILE; }
 
  /* white space */
 {whitespace}			{ /* skip white space */ }
 
-<INITIAL>{name}			{ yylval.yt_casestring = kc::mkcasestring(yytext);
+<INITIAL>"$"?{name}		{ yylval.yt_casestring = kc::mkcasestring(yytext);
                                   return X_NAME; }
 
 

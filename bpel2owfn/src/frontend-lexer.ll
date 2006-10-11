@@ -39,7 +39,7 @@
  *          
  * \date
  *          - created 2005-11-10
- *          - last changed: \$Date: 2006/10/11 09:23:35 $
+ *          - last changed: \$Date: 2006/10/11 12:13:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -48,7 +48,7 @@
  * \note    This file was created using Flex reading file bpel-lexic.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
  *
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -179,17 +179,21 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 <INITIAL>{bpwsns}?"compensate"		{ BEGIN(ATTRIBUTE); return K_COMPENSATE; }
 <INITIAL>{bpwsns}?"compensationHandler"	{ return K_COMPENSATIONHANDLER; }
 <INITIAL>{bpwsns}?"copy"		{ return K_COPY; }
+<INITIAL>{bpwsns}?"condition"		{ BEGIN(ATTRIBUTE); return K_CONDITION; }	/* WS-BPEL */
 <INITIAL>{bpwsns}?"correlation"		{ BEGIN(ATTRIBUTE); return K_CORRELATION; }
 <INITIAL>{bpwsns}?"correlations"	{ return K_CORRELATIONS; }
 <INITIAL>{bpwsns}?"correlationSet"	{ BEGIN(ATTRIBUTE); return K_CORRELATIONSET; }
 <INITIAL>{bpwsns}?"correlationSets"	{ return K_CORRELATIONSETS; }
 <INITIAL>{bpwsns}?"empty"		{ BEGIN(ATTRIBUTE); return K_EMPTY; }
+<INITIAL>{bpwsns}?"else"		{ BEGIN(ATTRIBUTE); return K_ELSE; }		/* WS-BPEL */
+<INITIAL>{bpwsns}?"elseif"		{ BEGIN(ATTRIBUTE); return K_ELSEIF; }		/* WS-BPEL */
 <INITIAL>{bpwsns}?"eventHandlers"	{ return K_EVENTHANDLERS; }
 <INITIAL>{bpwsns}?"extension"		{ BEGIN(ATTRIBUTE); return K_EXTENSION; }	/* WS-BPEL */
 <INITIAL>{bpwsns}?"extensions"		{ BEGIN(ATTRIBUTE); return K_EXTENSIONS; }	/* WS-BPEL */
 <INITIAL>{bpwsns}?"faultHandlers"	{ return K_FAULTHANDLERS; }
 <INITIAL>{bpwsns}?"flow"		{ BEGIN(ATTRIBUTE); return K_FLOW; }
 <INITIAL>{bpwsns}?"from"		{ BEGIN(ATTRIBUTE); return K_FROM; }
+<INITIAL>{bpwsns}?"if"			{ BEGIN(ATTRIBUTE); return K_IF; }		/* WS-BPEL */
 <INITIAL>{bpwsns}?"import"		{ BEGIN(ATTRIBUTE); return K_IMPORT; }
 <INITIAL>{bpwsns}?"invoke"		{ BEGIN(ATTRIBUTE); return K_INVOKE; }
 <INITIAL>{bpwsns}?"link"		{ BEGIN(ATTRIBUTE); return K_LINK; }

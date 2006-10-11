@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/11 09:58:22 $
+ *          - last changed: \$Date: 2006/10/11 12:13:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.228 $
+ * \version \$Revision: 1.229 $
  * 
  */
 %}
@@ -74,7 +74,7 @@
 %token K_VARIABLE K_VARIABLES K_WAIT K_WHILE
 %token X_OPEN X_SLASH X_CLOSE X_NEXT X_EQUALS QUOTE
 %token GREATEROREQUAL GREATER LESS LESSOREQUAL EQUAL NOTEQUAL VARIABLENAME NUMBER
-%token K_EXTENSION K_EXTENSIONS K_LITERAL K_QUERY K_SOURCES K_TARGETS K_TRANSITIONCONDITION 
+%token K_EXTENSION K_EXTENSIONS K_LITERAL K_QUERY K_SOURCES K_TARGETS K_TRANSITIONCONDITION K_IF K_CONDITION K_ELSE K_ELSEIF
 %token K_JOINCONDITION K_GETLINKSTATUS RBRACKET LBRACKET APOSTROPHE K_AND K_OR
 %token <yt_casestring> X_NAME
 %token <yt_casestring> X_STRING
@@ -175,6 +175,7 @@ unsigned int ASTEid = 1;
 %type <yt_tFaultHandlers> tFaultHandlers
 %type <yt_tFlow> tFlow
 %type <yt_tFrom> tFrom
+%type <yt_tSwitch> tIf
 %type <yt_tInvoke> tInvoke
 %type <yt_tLink_list> tLink_list
 %type <yt_tLink_list> tLinks
@@ -256,6 +257,7 @@ activity:
 | tTerminate	{ $$ = activityTerminate($1);	$$->id = $1->id; }
 | tFlow		{ $$ = activityFlow($1);	$$->id = $1->id; }
 | tSwitch	{ $$ = activitySwitch($1);	$$->id = $1->id; }
+| tIf		{ $$ = activitySwitch($1);	$$->id = $1->id; } /* WS-BPEL */
 | tWhile	{ $$ = activityWhile($1);	$$->id = $1->id; }
 | tSequence	{ $$ = activitySequence($1);	$$->id = $1->id; }
 | tPick		{ $$ = activityPick($1);	$$->id = $1->id; }
@@ -910,6 +912,33 @@ tOtherwise:
       $$->id = ASTEid++;
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_OTHERWISE); }
+;
+
+
+/******************************************************************************
+  IF
+******************************************************************************/
+
+tIf:
+  K_IF arbitraryAttributes X_NEXT standardElements tCondition activity X_NEXT tElseIf_list tElse X_SLASH K_IF
+;
+
+tCondition:
+  K_CONDITION arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_CONDITION X_NEXT
+;
+
+tElseIf_list:
+  /* empty */
+| tElseIf X_NEXT tElseIf_list
+;
+
+tElseIf:
+  K_ELSEIF X_NEXT tCondition X_NEXT activity X_NEXT X_SLASH K_ELSEIF X_NEXT
+;
+
+tElse:
+  /* empty */
+| K_ELSE X_NEXT activity X_NEXT X_SLASH K_ELSE X_NEXT
 ;
 
 

@@ -1,0 +1,134 @@
+<process name="shippingService"
+    targetNamespace="http://example.com/shipping/"
+    xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/abstract"
+    xmlns:plt="http://example.com/shipping/partnerLinkTypes/"
+    xmlns:props="http://example.com/shipping/properties/"
+    xmlns:ship="http://example.com/shipping/ship.xsd"
+    xmlns:sif="http://example.com/shipping/interfaces/"
+    abstractProcessProfile="http://docs.oasisopen.org/wsbpel/2.0/process/abstract/ap11/2006/08">
+    
+    <import importType="http://schemas.xmlsoap.org/wsdl/"
+	location="shippingLT.wsdl"
+	namespace="http://example.com/shipping/partnerLinkTypes/" />
+    <import importType="http://schemas.xmlsoap.org/wsdl/"
+	location="shippingPT.wsdl"
+	namespace="http://example.com/shipping/interfaces/" />
+    <import importType="http://schemas.xmlsoap.org/wsdl/"
+	location="shippingProperties.wsdl"
+	namespace="http://example.com/shipping/properties/" />
+    
+    <partnerLinks>
+	<partnerLink name="customer" partnerLinkType="plt:shippingLT"
+	    partnerRole="shippingServiceCustomer"
+	    myRole="shippingService" />
+    </partnerLinks>
+
+    <variables>
+	<variable name="shipRequest"
+	    messageType="sif:shippingRequestMsg" />
+	<variable name="shipNotice"
+	    messageType="sif:shippingNoticeMsg" />
+	<variable name="itemsShipped"
+	    type="ship:itemCountType" />
+    </variables>
+    
+    <correlationSets>
+	<correlationSet name="shipOrder"
+	    properties="props:shipOrderID" />
+    </correlationSets>
+	
+    <sequence>
+	<receive partnerLink="customer"
+	    operation="shippingRequest"
+	    variable="shipRequest">
+	    <correlations>
+		<correlation set="shipOrder" initiate="yes" />
+    	    </correlations>
+	</receive>
+
+	<if>
+	    <condition>
+		bpel:getVariableProperty('shipRequest', 'props:shipComplete')
+	    </condition>
+	    
+	    <sequence>
+		<assign>
+		    <copy>
+			<from variable="shipRequest"
+			    property="props:shipOrderID" />
+			<to variable="shipNotice"
+			    property="props:shipOrderID" />
+		    </copy>
+		    <copy>
+			<from variable="shipRequest"
+			    property="props:itemsCount" />
+			<to variable="shipNotice"
+			    property="props:itemsCount" />
+		    </copy>
+		</assign>
+		
+		<invoke partnerLink="customer"
+		    operation="shippingNotice"
+		    inputVariable="shipNotice">
+		    <correlations>
+			<correlation set="shipOrder" pattern="request" />
+	    	    </correlations>
+		</invoke>
+	    </sequence>
+	    <else>
+		<sequence>
+		    <assign>
+			<copy>
+			    <from>0</from>
+			    <to>$itemsShipped</to>
+			</copy>
+		    </assign>
+		
+		    <while>
+			<condition>
+			    $itemsShipped
+			    &lt;
+			    bpel:getVariableProperty('shipRequest',
+			    'props:itemsTotal')
+			</condition>
+			<sequence>
+			    <assign>
+				<copy>
+				    <from opaque="yes" />
+				    <to variable="shipNotice"
+					property="props:shipOrderID" />
+				</copy>
+				<copy>
+				    <from opaque="yes" />
+				    <to variable="shipNotice"
+					property="props:itemsCount" />
+				</copy>
+			    </assign>
+			
+			    <invoke partnerLink="customer"
+				operation="shippingNotice"
+				inputVariable="shipNotice">
+				<correlations>
+				    <correlation set="shipOrder"
+					pattern="request" />
+				</correlations>
+			    </invoke>
+			
+			    <assign>
+				<copy>
+				    <from>
+					$itemsShipped
+					+
+					bpel:getVariableProperty('shipNotice',
+					'props:itemsCount')
+				    </from>
+				    <to>$itemsShipped</to>
+				</copy>
+			    </assign>
+			</sequence>
+		    </while>
+		</sequence>
+	    </else>
+	</if>
+    </sequence>
+</process>

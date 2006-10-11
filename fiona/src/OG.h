@@ -25,7 +25,6 @@ class operatingGuidelines : public communicationGraph {
 		~operatingGuidelines();
 	
     	void buildGraph(vertex *);
-		bool terminateBuildGraph(vertex *);
 		
     	void computeCNF(vertex *);
     	

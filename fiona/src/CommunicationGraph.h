@@ -102,8 +102,10 @@ public:
 
     vertex * findVertexInSet(vertex *);
 
-    bool AddVertex(vertex *, unsigned int, edgeType);
+    vertex * AddVertex(vertex *, unsigned int, edgeType);
     bool AddVertex(vertex *, messageMultiSet, edgeType);
+
+	bool terminateBuildGraph(vertex *);
 
     void buildGraphRandom();
 

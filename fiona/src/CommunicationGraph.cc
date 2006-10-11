@@ -245,7 +245,7 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
 
 
 // for OG
-bool communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType type) {
+vertex * communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType type) {
 
 	trace(TRACE_5, "reachGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType type): start\n");
 
@@ -295,9 +295,11 @@ bool communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
 
 		trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type): end\n");
 
-        return true;
+        return toAdd;
     } else {
         trace(TRACE_1, "\t computed successor node already known: " + intToString(found->getNumber()) + "\n");
+
+		vertex * returnVertex;
 
         graphEdge * edgeSucc = new graphEdge(found, edgeLabel, type);
         currentVertex->addSuccessorNode(edgeSucc);
@@ -310,16 +312,84 @@ bool communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeType 
             offset = PN->placeInputCnt;
         }
 
-        found->eventsUsed[offset + label]++;
+		unsigned int greaterEqual = 0;
 
+        for (unsigned int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
+        	if (label == i) {
+        		// current event is considered, but the eventsUsed is not yet set appropriatly
+        		// in the currentVertex
+        		if ((currentVertex->eventsUsed[i] + 1) >= found->eventsUsed[i]) {
+		        	greaterEqual++;
+		        }
+        	} else if (currentVertex->eventsUsed[i] >= found->eventsUsed[i]) {
+            	greaterEqual++;
+            }
+        }
+
+		if (greaterEqual == (PN->placeInputCnt + PN->placeOutputCnt)) {
+			found->eventsUsed[offset + label]++;
+			returnVertex = NULL;
+		} else {
+			// set the events of the newly calculated vertex according to its predecessor node
+	        for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
+	            toAdd->eventsUsed[i] = currentVertex->eventsUsed[i];
+	        }			
+	        toAdd->eventsUsed[offset + label]++;
+	        
+			// find out, whether we want to terminate after the calculated node 
+			if (terminateBuildGraph(toAdd)) {
+				found->eventsUsed[offset + label]++;
+				returnVertex = NULL;	
+			} else {
+				// set the events of the found vertex according to its "shadow vertex" that we have just calculated
+		        for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
+		            found->eventsUsed[i] = toAdd->eventsUsed[i];
+		        }		
+		        cout << "returning true!" << endl;	
+		        currentVertex = found;
+		        
+				returnVertex = found;
+			}
+		}
         delete toAdd;
-
+		
 		trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type): end\n");
 
-        return false;
+        return returnVertex;
     }
 }
 
+//! \fn bool communicationGraph::terminateBuildGraph(vertex * currentNode)
+//! \param currentNode the node for which termination is decided
+//! \brief decides whether a leaf node of the graph is reached;
+//! either because of reaching communication depth or because there are no events left
+bool communicationGraph::terminateBuildGraph(vertex * currentNode) {
+	
+	if (options[O_COMM_DEPTH]) {
+		// when -c set to a value, then stop at that depth
+		if (false) { //actualDepth > PN->commDepth) {
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		// check whether there are input or output events left
+		// (i.e. their max_occurences value is not reached)
+		int i;
+		
+		for (i = 0; i < PN->getInputPlaceCnt(); i++) {
+			if (currentNode->eventsUsed[i] < PN->inputPlacesArray[i]->max_occurence) {
+				return false;    // at least one event can be sent
+			}
+		}
+		for (i = 0; i < PN->getOutputPlaceCnt(); i++) {
+			if (currentNode->eventsUsed[i + PN->placeInputCnt] < PN->outputPlacesArray[i]->max_occurence) {
+				return false;    // at least one event can be received
+			}
+		}
+		return true;
+	}
+}
 
 //! \fn void communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * oldNode, vertex * newNode)
 //! \param input the sending event currently performed

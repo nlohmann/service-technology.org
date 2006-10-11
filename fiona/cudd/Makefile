@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.9 2006-10-09 09:04:15 bretschn Exp $
+# $Id: Makefile,v 1.10 2006-10-11 07:47:21 bretschn Exp $
 #
 # Makefile for the CUDD distribution kit 
 #---------------------------------------------------------------------------
@@ -227,6 +227,8 @@ DIRS	= $(BDIRS) nanotrav
 .PHONY : distclean
 
 all: objlib
+
+install: all
 
 build:
 	sh ./setup.sh

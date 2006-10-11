@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/11 12:43:12 $
+ *          - last changed: \$Date: 2006/10/11 16:45:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.230 $
+ * \version \$Revision: 1.231 $
  * 
  */
 %}
@@ -170,6 +170,9 @@ unsigned int ASTEid = 1;
 %type <yt_tCorrelationSet_list> tCorrelationSet_list
 %type <yt_tCorrelationSet_list> tCorrelationSets
 %type <yt_tCorrelationSet> tCorrelationSet
+%type <yt_tCase> tElseIf
+%type <yt_tCase_list> tElseIf_list
+%type <yt_tOtherwise> tElse
 %type <yt_tEmpty> tEmpty
 %type <yt_tEventHandlers> tEventHandlers
 %type <yt_tFaultHandlers> tFaultHandlers
@@ -921,24 +924,55 @@ tOtherwise:
 
 tIf:
   K_IF arbitraryAttributes X_NEXT standardElements tCondition activity X_NEXT tElseIf_list tElse X_SLASH K_IF
+    { $$ = Switch($4, ConstCase_list(Case($6), $8), $9);
+      $$->id = $2->value;
+      assert(ASTEmap[$$->id] == NULL);
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_SWITCH); }
 ;
 
 tCondition:
-  K_CONDITION arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_CONDITION X_NEXT
+  /* empty */
+| K_CONDITION arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_CONDITION X_NEXT
 ;
 
 tElseIf_list:
   /* empty */
+    { $$ = NiltCase_list(); }
 | tElseIf X_NEXT tElseIf_list
+    { $$ = ConstCase_list($1, $3); }
 ;
 
 tElseIf:
-  K_ELSEIF X_NEXT tCondition X_NEXT activity X_NEXT X_SLASH K_ELSEIF X_NEXT
+  K_ELSEIF arbitraryAttributes X_NEXT tCondition X_NEXT activity X_NEXT X_SLASH K_ELSEIF X_NEXT
+    { $$ = Case($6);
+      $$->id = $2->value;
+      assert(ASTEmap[$$->id] == NULL);
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_CASE); }
 ;
 
 tElse:
-  /* empty */
+  /* If the otherwise branch is not explicitly specified, then an otherwise
+     branch with an empty activity is deemed to be present. */
+    {
+      cerr << "You did not specify an otherwise branch." << endl;
+      // creaty empty activity with id, without links etc.
+      // TODO FIX THIS BUG
+      impl_standardElements_StandardElements* noLinks = StandardElements(NiltTarget_list(),NiltSource_list(), standardJoinCondition());
+      impl_tEmpty_Empty* implicitEmpty = Empty(noLinks);
+      implicitEmpty->id = ASTEid++;
+      impl_activity *otherwiseActivity = activityEmpty(implicitEmpty);
+      otherwiseActivity->id = ASTEid++;
+
+      $$ = Otherwise(otherwiseActivity);
+      $$->id = otherwiseActivity->id;
+      assert(ASTEmap[$$->id] == NULL);
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_OTHERWISE);
+    }
 | K_ELSE X_NEXT activity X_NEXT X_SLASH K_ELSE X_NEXT
+    { $$ = Otherwise($3);
+      $$->id = ASTEid++;
+      assert(ASTEmap[$$->id] == NULL);
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_OTHERWISE); }
 ;
 
 

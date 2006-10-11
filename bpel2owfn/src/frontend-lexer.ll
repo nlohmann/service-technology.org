@@ -39,7 +39,7 @@
  *          
  * \date
  *          - created 2005-11-10
- *          - last changed: \$Date: 2006/10/11 08:03:57 $
+ *          - last changed: \$Date: 2006/10/11 09:23:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -48,7 +48,7 @@
  * \note    This file was created using Flex reading file bpel-lexic.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.33 $
+ * \version \$Revision: 1.34 $
  *
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -103,6 +103,7 @@ int currentView;
 
 namestart		[A-Za-z\200-\377_]
 namechar		[A-Za-z\200-\377_0-9.\-:]
+number			[0-9]+
 name			{namestart}{namechar}*
 esc			"&#"[0-9]+";"|"&#x"[0-9a-fA-F]+";"
 quote			\"
@@ -215,6 +216,7 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 <INITIAL>{bpwsns}?"terminate"		{ BEGIN(ATTRIBUTE); return K_TERMINATE; }
 <INITIAL>{bpwsns}?"throw"		{ BEGIN(ATTRIBUTE); return K_THROW; }
 <INITIAL>{bpwsns}?"to"			{ BEGIN(ATTRIBUTE); return K_TO; }
+<INITIAL>{bpwsns}?"transitionCondition"	{ BEGIN(ATTRIBUTE); return K_TRANSITIONCONDITION; } /* WS-BPEL */
 <INITIAL>{bpwsns}?"variable"		{ BEGIN(ATTRIBUTE); return K_VARIABLE; }
 <INITIAL>{bpwsns}?"variables"		{ return K_VARIABLES; }
 <INITIAL>{bpwsns}?"wait"		{ BEGIN(ATTRIBUTE); return K_WAIT; }
@@ -223,8 +225,23 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
  /* white space */
 {whitespace}			{ /* skip white space */ }
 
-<INITIAL>"$"?{name}		{ yylval.yt_casestring = kc::mkcasestring(yytext);
+<INITIAL>{name}			{ yylval.yt_casestring = kc::mkcasestring(yytext);
                                   return X_NAME; }
+<INITIAL>"$"{name}		{ yylval.yt_casestring = kc::mkcasestring(yytext);
+                                  return VARIABLENAME; }
+
+
+ /* some things for transition conditions */
+
+"&ge;"		{ return GREATEROREQUAL; }
+"&gt;"		{ return GREATER; }
+"&lt;"		{ return LESS; }
+"&le;"		{ return LESSOREQUAL; }
+"="		{ return EQUAL; }
+"!="		{ return NOTEQUAL; }
+"'"		{ return APOSTROPHE; }
+
+{number}	{ return NUMBER; }
 
 
  /* end of input file */

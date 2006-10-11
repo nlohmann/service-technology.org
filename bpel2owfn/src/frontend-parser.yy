@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/11 08:03:58 $
+ *          - last changed: \$Date: 2006/10/11 09:23:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.226 $
+ * \version \$Revision: 1.227 $
  * 
  */
 %}
@@ -73,7 +73,8 @@
 %token K_SEQUENCE K_SOURCE K_SWITCH K_TARGET K_TERMINATE K_THROW K_TO
 %token K_VARIABLE K_VARIABLES K_WAIT K_WHILE
 %token X_OPEN X_SLASH X_CLOSE X_NEXT X_EQUALS QUOTE
-%token K_EXTENSION K_EXTENSIONS K_LITERAL K_QUERY K_SOURCES K_TARGETS
+%token GREATEROREQUAL GREATER LESS LESSOREQUAL EQUAL NOTEQUAL VARIABLENAME NUMBER
+%token K_EXTENSION K_EXTENSIONS K_LITERAL K_QUERY K_SOURCES K_TARGETS K_TRANSITIONCONDITION 
 %token K_JOINCONDITION K_GETLINKSTATUS RBRACKET LBRACKET APOSTROPHE K_AND K_OR
 %token <yt_casestring> X_NAME
 %token <yt_casestring> X_STRING
@@ -1003,7 +1004,7 @@ tSource_list:
 ;
 
 tSource:
-  K_SOURCE arbitraryAttributes X_NEXT X_SLASH K_SOURCE
+  K_SOURCE arbitraryAttributes X_NEXT tTransitionCondition X_SLASH K_SOURCE
     { $$ = Source();
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
@@ -1015,6 +1016,10 @@ tSource:
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_SOURCE); }
 ;
 
+tTransitionCondition:
+  /* empty */
+| K_TRANSITIONCONDITION X_CLOSE transitionCondition X_OPEN X_SLASH K_TRANSITIONCONDITION X_NEXT
+;
 
 /*---------------------------------------------------------------------------*/
 
@@ -1047,4 +1052,23 @@ booleanLinkCondition:
     { $$ = Conjunction($2, $4); }
 | LBRACKET booleanLinkCondition K_OR booleanLinkCondition RBRACKET
     { $$ = Disjunction($2, $4); }
+;
+
+transitionCondition:
+  VARIABLENAME comparison constant
+;
+
+comparison:
+  GREATEROREQUAL
+| GREATER
+| LESS
+| LESSOREQUAL
+| EQUAL
+| NOTEQUAL
+;
+
+constant:
+  X_NAME
+| APOSTROPHE X_NAME APOSTROPHE
+| NUMBER
 ;

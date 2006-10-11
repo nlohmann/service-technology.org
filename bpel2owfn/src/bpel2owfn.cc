@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/10/09 10:43:46 $
+ *          - last changed: \$Date: 2006/10/11 09:58:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.99 $
+ * \version \$Revision: 1.100 $
  *
  */
 
@@ -83,7 +83,6 @@ extern kc::tProcess TheProcess;
 /* defined by flex */
 extern int yy_flex_debug; ///< if set to 1 the lexer trace is printed
 extern FILE *yyin;        ///< pointer to the input file
-
 
 
 

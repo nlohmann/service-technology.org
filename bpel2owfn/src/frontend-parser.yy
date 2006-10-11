@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/11 09:23:35 $
+ *          - last changed: \$Date: 2006/10/11 09:58:22 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.227 $
+ * \version \$Revision: 1.228 $
  * 
  */
 %}
@@ -665,10 +665,15 @@ tFrom:
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FROM); }
-| K_FROM arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_FROM
+| K_FROM arbitraryAttributes X_CLOSE constant X_OPEN X_SLASH K_FROM
     { $$ = From();
       $$->id = $2->value;
-      $$->expression = $4->name;
+//      $$->expression = $4->name; TODO
+      assert(ASTEmap[$$->id] == NULL);
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FROM); }
+| K_FROM arbitraryAttributes X_CLOSE VARIABLENAME X_OPEN X_SLASH K_FROM
+    { $$ = From();
+      $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FROM); }
 | K_FROM arbitraryAttributes X_NEXT tLiteral X_NEXT X_SLASH K_FROM
@@ -704,7 +709,13 @@ tTo:
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TO); }
-| K_TO arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_TO
+| K_TO arbitraryAttributes X_CLOSE constant X_OPEN X_SLASH K_TO
+    { $$ = To();
+      $$->id = $2->value;
+//      $$->literal = $4->name; // TODO!
+      assert(ASTEmap[$$->id] == NULL);
+      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TO); }
+| K_TO arbitraryAttributes X_CLOSE VARIABLENAME X_OPEN X_SLASH K_TO
     { $$ = To();
       $$->id = $2->value;
 //      $$->literal = $4->name; // TODO!

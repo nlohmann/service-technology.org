@@ -36,64 +36,11 @@ rm -f $DIR/*.png
 
 ############################################################################
 
-#$FIONA -n $DIR/sequence3.owfn -a --graphtype=IG  2> /dev/null 1> /dev/null
-#result3IG=$?
+result=0
 
-#$FIONA -n $DIR/sequence3.owfn -a --graphtype=OG -e1 2> /dev/null 1> /dev/null
-#result3OG=$?
-
-#$FIONA -n $DIR/sequence4.owfn -a --graphtype=IG  2> /dev/null 1> /dev/null
-#result4IG=$?
-
-#$FIONA -n $DIR/sequence4.owfn -a --graphtype=OG -e1 2> /dev/null 1> /dev/null
-#result4OG=$?
-
-#$FIONA -n $DIR/sequence5.owfn -a --graphtype=IG  2> /dev/null 1> /dev/null
-#result5IG=$?
-
-#$FIONA -n $DIR/sequence5.owfn -a --graphtype=OG -e1 2> /dev/null 1> /dev/null
-#result5OG=$?
-
-#$FIONA -n $DIR/sequence6.owfn -a --graphtype=IG  2> /dev/null 1> /dev/null
-#result6IG=$?
-
-#$FIONA -n $DIR/sequence6.owfn -a --graphtype=OG -e1 2> /dev/null 1> /dev/null
-#result6OG=$?
-
-#$FIONA -n $DIR/sequence7.owfn -a --graphtype=IG  2> /dev/null 1> /dev/null
-#result7IG=$?
-
-#$FIONA -n $DIR/sequence7.owfn -a --graphtype=OG -e1 2> /dev/null 1> /dev/null
-#result7OG=$?
-
-#$FIONA -n $DIR/sequence8.owfn -a --graphtype=IG  2> /dev/null 1> /dev/null
-#result8IG=$?
-
-#$FIONA -n $DIR/sequence8.owfn -a --graphtype=OG -e1 2> /dev/null 1> /dev/null
-#result8OG=$?
-
-#$FIONA -n $DIR/sequence9.owfn -a --graphtype=IG  2> /dev/null 1> /dev/null
-#result9IG=$?
-
-#$FIONA -n $DIR/sequence9.owfn -a --graphtype=OG -e1 2> /dev/null 1> /dev/null
-#result9OG=$?
-
-#$FIONA -n $DIR/sequence10.owfn -a --graphtype=IG  2> /dev/null 1> /dev/null
-#result10IG=$?
-
-#$FIONA -n $DIR/sequence10.owfn -a --graphtype=OG -e1 2> /dev/null 1> /dev/null
-#result10OG=$?
-
-i=3
-
-while [ $i -le 9 ]
+#only run sequences 3 and 9
+for i in 3 9;
 do
-    #only run sequences 3 and 9
-    if [ $i -ne 3 -a $i -ne 9 ]; then
-        let i=i+1
-        continue
-    fi
-
     #echo running sequence$i
 
     echo running $FIONA -n $DIR/sequence${i}.owfn -a -t IG
@@ -114,7 +61,8 @@ do
 
     if [ $resultIG -ne 0 -o $resultIGNOSC -ne 0 -o $resultIGNON -ne 0 -o $resultIGNOE -ne 0 -o $resultIGNOBN -ne 0 -o $resultIGNOBE -ne 0 ]
     then
-    echo   ... failed to build IG correctly
+        result=1
+        echo   ... failed to build IG correctly
     fi
 
     echo running $FIONA -n $DIR/sequence${i}.owfn -a -t OG
@@ -134,41 +82,12 @@ do
     resultOGNOBE=$?
     if [ $resultOG -ne 0 -o $resultOGNOSC -ne 0 -o $resultOGNON -ne 0 -o $resultOGNOE -ne 0 -o $resultOGNOBN -ne 0 -o $resultOGNOBE -ne 0 ]
     then
-    echo   ... failed to build OG
+        result=1
+        echo   ... failed to build OG
     fi
 
     let i=i+1
 done
-
-#if test \( $result3IG  -eq 0 -a $result3OG  -eq 0 -a \
-#           $result4IG  -eq 0 -a $result4OG  -eq 0 -a \
-#           $result5IG  -eq 0 -a $result5OG  -eq 0 -a \
-#           $result6IG  -eq 0 -a $result6OG  -eq 0 -a \
-#           $result7IG  -eq 0 -a $result7OG  -eq 0 -a \
-#           $result8IG  -eq 0 -a $result8OG  -eq 0 -a \
-#           $result9IG  -eq 0 -a $result9OG  -eq 0 -a \
-#           $result10IG -eq 0 -a $result10OG -eq 0 \) -a \
-#   \( -f $DIR/sequence3.owfn.a.IG.png -a -f $DIR/sequence3.owfn.a.IG.out \) -a \
-#   \( -f $DIR/sequence4.owfn.a.IG.png -a -f $DIR/sequence4.owfn.a.IG.out \) -a \
-#   \( -f $DIR/sequence5.owfn.a.IG.png -a -f $DIR/sequence5.owfn.a.IG.out \) -a \
-#   \( -f $DIR/sequence6.owfn.a.IG.png -a -f $DIR/sequence6.owfn.a.IG.out \) -a \
-#   \( -f $DIR/sequence7.owfn.a.IG.png -a -f $DIR/sequence7.owfn.a.IG.out \) -a \
-#   \( -f $DIR/sequence8.owfn.a.IG.png -a -f $DIR/sequence8.owfn.a.IG.out \) -a \
-#   \( -f $DIR/sequence9.owfn.a.IG.png -a -f $DIR/sequence9.owfn.a.IG.out \) -a \
-#   \( -f $DIR/sequence10.owfn.a.IG.png -a -f $DIR/sequence10.owfn.a.IG.out \) -a \
-#   \( -f $DIR/sequence3.owfn.a.OG.png -a -f $DIR/sequence3.owfn.a.OG.out \) -a \
-#   \( -f $DIR/sequence4.owfn.a.OG.png -a -f $DIR/sequence4.owfn.a.OG.out \) -a \
-#   \( -f $DIR/sequence5.owfn.a.OG.png -a -f $DIR/sequence5.owfn.a.OG.out \) -a \
-#   \( -f $DIR/sequence6.owfn.a.OG.png -a -f $DIR/sequence6.owfn.a.OG.out \) -a \
-#   \( -f $DIR/sequence7.owfn.a.OG.png -a -f $DIR/sequence7.owfn.a.OG.out \) -a \
-#   \( -f $DIR/sequence8.owfn.a.OG.png -a -f $DIR/sequence8.owfn.a.OG.out \) -a \
-#   \( -f $DIR/sequence9.owfn.a.OG.png -a -f $DIR/sequence9.owfn.a.OG.out \) -a \
-#   \( -f $DIR/sequence10.owfn.a.OG.png -a -f $DIR/sequence10.owfn.a.OG.out \)
-#then
-#  result=0
-#else
-#  result=1
-#fi
 
 echo
 

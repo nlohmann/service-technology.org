@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/10/05 07:11:52 $
+ *          - last changed: \$Date: 2006/10/12 08:47:47 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.36 $
+ * \version \$Revision: 1.37 $
  */
 
 
@@ -320,7 +320,7 @@ string Transition::dotOut()
 string Place::dotOut()
 {
   string result;
-  result += " p" + toString(id) + "\t[label=\"" + nodeShortName() + "\"";
+  result += " p" + toString(id) + "\t[label=\"" + nodeShortName() + "\"" + " URL=\"http://www.google.de\"";
 
 
   if (firstMemberIs("in."))
@@ -689,7 +689,7 @@ void PetriNet::owfnOut()
   for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); count++, p++)
   {
     (*output) << "    " << (*p)->nodeShortName();
-    (*output) << " {$ MAX_UNIQUE_EVENTS = " << postset((*p)).size();
+//    (*output) << " {$ MAX_UNIQUE_EVENTS = " << postset((*p)).size();
     if ( (*p)->inWhile )
       (*output) << " ON_LOOP = TRUE";
     (*output) << " $}";
@@ -706,7 +706,7 @@ void PetriNet::owfnOut()
   for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); count++, p++)
   {
     (*output) << "    " << (*p)->nodeShortName();
-    (*output) << " {$ MAX_UNIQUE_EVENTS = " << preset((*p)).size();
+//    (*output) << " {$ MAX_UNIQUE_EVENTS = " << preset((*p)).size();
     if ( (*p)->inWhile )
       (*output) << " ON_LOOP = TRUE";
     (*output) << " $}";

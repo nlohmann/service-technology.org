@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/11 18:43:07 $
+ *          - last changed: \$Date: 2006/10/12 09:13:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.232 $
+ * \version \$Revision: 1.233 $
  * 
  */
 %}
@@ -113,7 +113,6 @@
 #include "bpel-kc-k.h" // phylum definitions
 #include "bpel-kc-yystype.h" // data types for tokens and non-terminals
 #include "helpers.h"
-//#include "symbol-table.h"
 #include "ast-details.h"
 
 
@@ -250,7 +249,7 @@ tProcess:
 
 
 activity:
-  tEmpty	{ $$ = activityEmpty($1);	$$->id = $1->id; }
+  tEmpty	{ $$ = activityEmpty($1); }
 | tInvoke	{ $$ = activityInvoke($1);	$$->id = $1->id; }
 | tReceive	{ $$ = activityReceive($1);	$$->id = $1->id; }
 | tReply	{ $$ = activityReply($1);	$$->id = $1->id; }
@@ -565,16 +564,10 @@ tCorrelation:
 
 tEmpty:
   K_EMPTY arbitraryAttributes X_NEXT standardElements X_SLASH K_EMPTY
-    { $$ = Empty($4, $2->value); // added second parameter
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_EMPTY); }
+    { $$ = Empty($4, $2->value); }
 | K_EMPTY arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Empty(noLinks);
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_EMPTY); }
+      $$ = Empty(noLinks, $2->value); }
 ;
 
 
@@ -583,9 +576,7 @@ tEmpty:
 ******************************************************************************/
 
 tInvoke:
-  K_INVOKE arbitraryAttributes X_NEXT
-  standardElements tCorrelations //tCatch_list tCatchAll tCompensationHandler
-  X_SLASH K_INVOKE
+  K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations X_SLASH K_INVOKE
     { $$ = Invoke($4, $5);
       $$->id = $2->value;
       assert(ASTEmap[$$->id] == NULL);
@@ -894,7 +885,7 @@ tCase:
 
 tOtherwise:
   /* If the otherwise branch is not explicitly specified, then an otherwise
-     branch with an empty activity is deemed to be present. */
+     branch with an empty activity is deemed to be present.
     {
       cerr << "You did not specify an otherwise branch." << endl;
       // creaty empty activity with id, without links etc.
@@ -909,8 +900,8 @@ tOtherwise:
       $$->id = otherwiseActivity->id;
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_OTHERWISE);
-    }
-| K_OTHERWISE X_NEXT activity X_NEXT X_SLASH K_OTHERWISE X_NEXT
+    } */
+  K_OTHERWISE X_NEXT activity X_NEXT X_SLASH K_OTHERWISE X_NEXT
     { $$ = Otherwise($3);
       $$->id = ASTEid++;
       assert(ASTEmap[$$->id] == NULL);
@@ -952,7 +943,7 @@ tElseIf:
 
 tElse:
   /* If the otherwise branch is not explicitly specified, then an otherwise
-     branch with an empty activity is deemed to be present. */
+     branch with an empty activity is deemed to be present.
     {
       cerr << "You did not specify an otherwise branch." << endl;
       // creaty empty activity with id, without links etc.
@@ -967,8 +958,8 @@ tElse:
       $$->id = otherwiseActivity->id;
       assert(ASTEmap[$$->id] == NULL);
       ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_OTHERWISE);
-    }
-| K_ELSE X_NEXT activity X_NEXT X_SLASH K_ELSE X_NEXT
+    }*/
+  K_ELSE X_NEXT activity X_NEXT X_SLASH K_ELSE X_NEXT
     { $$ = Otherwise($3);
       $$->id = ASTEid++;
       assert(ASTEmap[$$->id] == NULL);

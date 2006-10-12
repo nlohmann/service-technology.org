@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/10/11 08:03:57 $
+ *          - last changed: \$Date: 2006/10/12 09:13:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.19 $
+ * \version \$Revision: 1.20 $
  */
 
 
@@ -141,6 +141,29 @@ ASTE::ASTE(kc::impl_abstract_phylum *mynode, int mytype)
 }
 
 
+
+
+
+/*!
+ * Constructor
+ *
+ * \param myid an id of an AST node
+ * \param mytype value of the type of the node using the token values defined
+ *               by flex and bison
+ */
+ASTE::ASTE(int myid, int mytype)
+{
+  assert(myid != 0);
+
+  // initialize values
+//  node = mynode; //TODO
+  id = myid;
+  type = mytype;
+  attributes = temporaryAttributeMap[id];
+  suppressJF = false; // required initialization!
+  inWhile = false; // required initialization!
+  controlFlow = POSITIVECF;
+}
 
 
 

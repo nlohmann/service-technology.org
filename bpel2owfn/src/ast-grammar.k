@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/11 18:43:07 $
+ *          - last changed: \$Date: 2006/10/12 09:13:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.108 $
+ * \version \$Revision: 1.109 $
  */
 %}
 
@@ -54,6 +54,10 @@
  *
  * See \ref bpel-abstract.cc for more information.
  */
+
+#include "ast-details.h"
+extern map<unsigned int, ASTE*> ASTEmap;
+
 %}
 
 
@@ -70,10 +74,6 @@ using std::endl;
 using std::map;
 
 typedef map<string, string> stringMap;
-
-extern int yylineno;
-extern unsigned int ASTEid;
-
 
 %}
 
@@ -125,10 +125,11 @@ activity:
 | activityScope(tScope)
 | activityCompensate(tCompensate)
   {
-    int id = 0;
+    int id;
   }
 ;
 
+%ctor activityEmpty() { id = tEmpty_1->id; }
 
 /******************************************************************************
   PARTNER LINKS
@@ -336,7 +337,7 @@ tCorrelation:
 tEmpty:
   Empty(standardElements)
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -344,14 +345,10 @@ tEmpty:
   }
 ;
 
-%ctor tEmpty(int myid = 0) {
-  cerr << "called user-defined constructor for tEmpty(): myid = " << myid << endl;
-}
-
-%ctor Empty(int myid = 0) {
-  cerr << "called user-defined constructor for Empty(): myid = " << myid << endl;
-  id = myid;
-}
+%ctor Empty(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_EMPTY); }
 
 
 /******************************************************************************

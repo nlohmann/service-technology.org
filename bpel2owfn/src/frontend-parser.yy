@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/12 09:13:44 $
+ *          - last changed: \$Date: 2006/10/12 09:53:32 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.233 $
+ * \version \$Revision: 1.234 $
  * 
  */
 %}
@@ -249,22 +249,22 @@ tProcess:
 
 
 activity:
-  tEmpty	{ $$ = activityEmpty($1); }
-| tInvoke	{ $$ = activityInvoke($1);	$$->id = $1->id; }
-| tReceive	{ $$ = activityReceive($1);	$$->id = $1->id; }
-| tReply	{ $$ = activityReply($1);	$$->id = $1->id; }
-| tAssign	{ $$ = activityAssign($1);	$$->id = $1->id; }
-| tWait		{ $$ = activityWait($1);	$$->id = $1->id; }
-| tThrow	{ $$ = activityThrow($1);	$$->id = $1->id; }
-| tTerminate	{ $$ = activityTerminate($1);	$$->id = $1->id; }
-| tFlow		{ $$ = activityFlow($1);	$$->id = $1->id; }
-| tSwitch	{ $$ = activitySwitch($1);	$$->id = $1->id; }
-| tIf		{ $$ = activitySwitch($1);	$$->id = $1->id; } /* WS-BPEL */
-| tWhile	{ $$ = activityWhile($1);	$$->id = $1->id; }
-| tSequence	{ $$ = activitySequence($1);	$$->id = $1->id; }
-| tPick		{ $$ = activityPick($1);	$$->id = $1->id; }
-| tScope	{ $$ = activityScope($1);	$$->id = $1->id; }
-| tCompensate	{ $$ = activityCompensate($1);	$$->id = $1->id; }
+  tEmpty	{ $$ = activityEmpty($1);	}
+| tInvoke	{ $$ = activityInvoke($1);	}
+| tReceive	{ $$ = activityReceive($1);	}
+| tReply	{ $$ = activityReply($1);	}
+| tAssign	{ $$ = activityAssign($1);	}
+| tWait		{ $$ = activityWait($1);	}
+| tThrow	{ $$ = activityThrow($1);	}
+| tTerminate	{ $$ = activityTerminate($1);	}
+| tFlow		{ $$ = activityFlow($1);	}
+| tSwitch	{ $$ = activitySwitch($1);	}
+| tIf		{ $$ = activitySwitch($1);	} /* WS-BPEL */
+| tWhile	{ $$ = activityWhile($1);	}
+| tSequence	{ $$ = activitySequence($1);	}
+| tPick		{ $$ = activityPick($1);	}
+| tScope	{ $$ = activityScope($1);	}
+| tCompensate	{ $$ = activityCompensate($1);	}
 ;
 
 
@@ -577,16 +577,10 @@ tEmpty:
 
 tInvoke:
   K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations X_SLASH K_INVOKE
-    { $$ = Invoke($4, $5);
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_INVOKE); }
+    { $$ = Invoke($4, $5, $2->value); }
 | K_INVOKE arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Invoke(noLinks, NiltCorrelation_list());
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_INVOKE); }
+      $$ = Invoke(noLinks, NiltCorrelation_list(), $2->value); }
 ;
 
 
@@ -596,16 +590,10 @@ tInvoke:
 
 tReceive:
   K_RECEIVE arbitraryAttributes X_NEXT standardElements tCorrelations X_SLASH K_RECEIVE
-    { $$ = Receive($4, $5);
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_RECEIVE); }
+    { $$ = Receive($4, $5, $2->value); }
 | K_RECEIVE arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Receive(noLinks, NiltCorrelation_list());
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_RECEIVE); }
+      $$ = Receive(noLinks, NiltCorrelation_list(), $2->value); }
 ;
 
 
@@ -615,16 +603,10 @@ tReceive:
 
 tReply:
   K_REPLY arbitraryAttributes X_NEXT standardElements tCorrelations X_SLASH K_REPLY
-    { $$ = Reply($4, $5);
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_REPLY); }
+    { $$ = Reply($4, $5, $2->value); }
 | K_REPLY arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Reply(noLinks, NiltCorrelation_list());
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_REPLY); }
+      $$ = Reply(noLinks, NiltCorrelation_list(), $2->value); }
 ;
 
 
@@ -634,10 +616,7 @@ tReply:
 
 tAssign:
   K_ASSIGN arbitraryAttributes X_NEXT standardElements tCopy_list X_SLASH K_ASSIGN
-    { $$ = Assign($4, $5);
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_ASSIGN); }
+    { $$ = Assign($4, $5, $2->value); }
 ;
 
 tCopy_list:
@@ -737,16 +716,10 @@ tTo:
 
 tWait:
   K_WAIT arbitraryAttributes X_NEXT standardElements X_SLASH K_WAIT
-    { $$ = Wait($4);
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_WAIT); }
+    { $$ = Wait($4, $2->value); }
 | K_WAIT arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Wait(noLinks);
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_WAIT); }
+      $$ = Wait(noLinks, $2->value); }
 ;
 
 
@@ -756,16 +729,10 @@ tWait:
 
 tThrow:
   K_THROW arbitraryAttributes X_NEXT standardElements X_SLASH K_THROW
-    { $$ = Throw($4);
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_THROW); }
+    { $$ = Throw($4, $2->value); }
 | K_THROW arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Throw(noLinks);
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_THROW); }
+      $$ = Throw(noLinks, $2->value); }
 ;
 
 
@@ -775,16 +742,10 @@ tThrow:
 
 tCompensate:
   K_COMPENSATE arbitraryAttributes X_NEXT standardElements X_SLASH K_COMPENSATE
-    { $$ = Compensate($4);
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_COMPENSATE); }
+    { $$ = Compensate($4, $2->value); }
 | K_COMPENSATE arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Compensate(noLinks);
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_COMPENSATE); }
+      $$ = Compensate(noLinks, $2->value); }
 ;
 
 
@@ -794,16 +755,10 @@ tCompensate:
 
 tTerminate:
   K_TERMINATE arbitraryAttributes X_NEXT standardElements X_SLASH K_TERMINATE
-    { $$ = Terminate($4);
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TERMINATE); }
+    { $$ = Terminate($4, $2->value); }
 | K_TERMINATE arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Terminate(noLinks);
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_TERMINATE); }
+      $$ = Terminate(noLinks, $2->value); }
 ;
 
 
@@ -813,10 +768,7 @@ tTerminate:
 
 tFlow:
   K_FLOW arbitraryAttributes X_NEXT standardElements tLinks activity_list X_SLASH K_FLOW
-    { $$ = Flow($4, $5, $6);
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_FLOW); }
+    { $$ = Flow($4, $5, $6, $2->value); }
 ;
 
 activity_list:
@@ -860,10 +812,7 @@ tLink:
 
 tSwitch:
   K_SWITCH arbitraryAttributes X_NEXT standardElements tCase_list tOtherwise X_SLASH K_SWITCH
-    { $$ = Switch($4, $5, $6);
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_SWITCH); }
+    { $$ = Switch($4, $5, $6, $2->value); }
 ;
 
 
@@ -915,10 +864,7 @@ tOtherwise:
 
 tIf:
   K_IF arbitraryAttributes X_NEXT standardElements tCondition activity X_NEXT tElseIf_list tElse X_SLASH K_IF
-    { $$ = Switch($4, ConstCase_list(Case($6), $8), $9);
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_SWITCH); }
+    { $$ = Switch($4, ConstCase_list(Case($6), $8), $9, $2->value); }
 ;
 
 tCondition:
@@ -973,10 +919,7 @@ tElse:
 
 tWhile:
   K_WHILE arbitraryAttributes X_NEXT standardElements tCondition activity X_NEXT X_SLASH K_WHILE
-    { $$ = While($4, $6);
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_WHILE); }
+    { $$ = While($4, $6, $2->value); }
 ;
 
 
@@ -986,10 +929,7 @@ tWhile:
 
 tSequence:
   K_SEQUENCE arbitraryAttributes X_NEXT standardElements activity_list X_SLASH K_SEQUENCE
-    { $$ = Sequence($4, $5);
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_SEQUENCE); }
+    { $$ = Sequence($4, $5, $2->value); }
 ;
 
 
@@ -999,10 +939,7 @@ tSequence:
 
 tPick:
   K_PICK arbitraryAttributes X_NEXT standardElements tOnMessage X_NEXT tOnMessage_list tOnAlarm_list X_SLASH K_PICK
-    { $$ = Pick($4, ConstOnMessage_list($5, $7), $8);
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_PICK); }
+    { $$ = Pick($4, ConstOnMessage_list($5, $7), $8, $2->value); }
 ;
 
 
@@ -1014,10 +951,7 @@ tScope:
   K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
   tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers activity 
   X_NEXT X_SLASH K_SCOPE
-    { $$ = Scope($4, $5, $7, $8, $9, StopInScope(), $10);
-      $$->id = $2->value;
-      assert(ASTEmap[$$->id] == NULL);
-      ASTEmap[$$->id] = new ASTE((kc::impl_activity*)$$, K_SCOPE); }
+    { $$ = Scope($4, $5, $7, $8, $9, StopInScope(), $10, $2->value); }
 ;
 
 

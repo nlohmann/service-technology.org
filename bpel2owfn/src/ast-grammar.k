@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/12 09:13:44 $
+ *          - last changed: \$Date: 2006/10/12 09:53:32 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.109 $
+ * \version \$Revision: 1.110 $
  */
 %}
 
@@ -129,7 +129,23 @@ activity:
   }
 ;
 
-%ctor activityEmpty() { id = tEmpty_1->id; }
+%ctor activityEmpty()		{ id = tEmpty_1->id; }
+%ctor activityInvoke()		{ id = tInvoke_1->id; }
+%ctor activityReceive()		{ id = tReceive_1->id; }
+%ctor activityReply()		{ id = tReply_1->id; }
+%ctor activityAssign()		{ id = tAssign_1->id; }
+%ctor activityWait()		{ id = tWait_1->id; }
+%ctor activityThrow()		{ id = tThrow_1->id; }
+%ctor activityTerminate()	{ id = tTerminate_1->id; }
+%ctor activityFlow()		{ id = tFlow_1->id; }
+%ctor activitySwitch()		{ id = tSwitch_1->id; }
+%ctor activityWhile()		{ id = tWhile_1->id; }
+%ctor activitySequence()	{ id = tSequence_1->id; }
+%ctor activityPick()		{ id = tPick_1->id; }
+%ctor activityScope()		{ id = tScope_1->id; }
+%ctor activityCompensate()	{ id = tCompensate_1->id; }
+
+
 
 /******************************************************************************
   PARTNER LINKS
@@ -358,7 +374,7 @@ tEmpty:
 tInvoke:
   Invoke(standardElements tCorrelation_list)
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -373,6 +389,11 @@ tInvoke:
   }
 ;
 
+%ctor Invoke(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_INVOKE); }
+
 
 /******************************************************************************
   RECEIVE
@@ -381,7 +402,7 @@ tInvoke:
 tReceive:
   Receive(standardElements tCorrelation_list)
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -392,6 +413,11 @@ tReceive:
     string variableName;
   }
 ;
+
+%ctor Receive(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_RECEIVE); }
 
 
 /******************************************************************************
@@ -401,7 +427,7 @@ tReceive:
 tReply:
   Reply(standardElements tCorrelation_list)
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -413,6 +439,11 @@ tReply:
   }
 ;
 
+%ctor Reply(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_REPLY); }
+
 
 /******************************************************************************
   ASSIGN
@@ -421,13 +452,18 @@ tReply:
 tAssign:
   Assign(standardElements tCopy_list)
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     int negativeControlFlow = 0;
     bool suppressJF = false;
   }
 ;
+
+%ctor Assign(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_ASSIGN); }
 
 tCopy_list:
   list tCopy
@@ -472,7 +508,7 @@ tTo:
 tWait:
   Wait(standardElements)
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -484,6 +520,11 @@ tWait:
   }
 ;
 
+%ctor Wait(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_WAIT); }
+
 
 /******************************************************************************
   THROW
@@ -492,7 +533,7 @@ tWait:
 tThrow:
   Throw(standardElements)
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -502,6 +543,11 @@ tThrow:
   }
 ;
 
+%ctor Throw(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_THROW); }
+
 
 /******************************************************************************
   COMPENSATE
@@ -510,7 +556,7 @@ tThrow:
 tCompensate:
   Compensate(standardElements)
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -522,6 +568,11 @@ tCompensate:
   }
 ;
 
+%ctor Compensate(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_COMPENSATE); }
+
 
 /******************************************************************************
   TERMINATE
@@ -530,13 +581,18 @@ tCompensate:
 tTerminate:
   Terminate(standardElements)
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     int negativeControlFlow = 0;
     bool suppressJF = false;
   }
 ;
+
+%ctor Terminate(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_TERMINATE); }
 
 
 /******************************************************************************
@@ -546,13 +602,18 @@ tTerminate:
 tFlow:
   Flow(standardElements tLink_list activity_list)
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     int negativeControlFlow = 0;
     bool suppressJF = false;
   }
 ;
+
+%ctor Flow(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_FLOW); }
 
 activity_list:
   list activity 
@@ -581,13 +642,18 @@ tLink:
 tSwitch:
   Switch(standardElements tCase_list tOtherwise)
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     int negativeControlFlow = 0;
     bool suppressJF = false;
   }
 ;
+
+%ctor Switch(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_SWITCH); }
 
 tCase_list:
   list tCase
@@ -616,13 +682,18 @@ tOtherwise:
 tWhile:
   While(standardElements activity)
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     int negativeControlFlow = 0;
     bool suppressJF = false;
   }
 ;
+
+%ctor While(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_WHILE); }
 
 
 /******************************************************************************
@@ -632,13 +703,18 @@ tWhile:
 tSequence:
   Sequence(standardElements activity_list)
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     int negativeControlFlow = 0;
     bool suppressJF = false;
   }
 ;
+
+%ctor Sequence(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_SEQUENCE); }
 
 
 /******************************************************************************
@@ -648,13 +724,18 @@ tSequence:
 tPick:
   Pick(standardElements tOnMessage_list tOnAlarm_list)
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     int negativeControlFlow = 0;
     bool suppressJF = false;
   }
 ;
+
+%ctor Pick(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_PICK); }
 
 
 /******************************************************************************
@@ -672,7 +753,7 @@ tScope:
       activity
       )
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -683,6 +764,10 @@ tScope:
   }
 ;
 
+%ctor Scope(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_SCOPE); }
 
 
 /******************************************************************************

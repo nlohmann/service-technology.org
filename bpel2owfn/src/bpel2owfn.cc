@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/10/11 18:43:07 $
+ *          - last changed: \$Date: 2006/10/12 08:51:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.101 $
+ * \version \$Revision: 1.102 $
  *
  */
 
@@ -229,6 +229,7 @@ int main( int argc, char *argv[])
       TheProcess = TheProcess->rewrite(kc::test);
       TheProcess->print();      
     }
+
 
 
 

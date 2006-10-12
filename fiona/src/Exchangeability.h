@@ -40,6 +40,7 @@ class Exchangeability{
 	private:	  
 		static DdManager* mgrMp;
 		static DdManager* mgrAnn;
+		static int nbrBdd; //Number of represented operating guidelines
 		
 		DdNode* bddMp;
 		DdNode* bddAnn;
@@ -49,7 +50,8 @@ class Exchangeability{
 		
 		void loadBdd(char* filename);
 		void loadHeader(FILE* fp, char*** names, int* nVars, int** permids);
-		DdNode* loadDiagram(FILE* fp, DdManager* mgr, int size, int* permids);
+		void loadOptimalOrder(DdManager* mgr, int size, int* permids);
+		DdNode* loadDiagram(FILE* fp, DdManager* mgr);
 		void printDotFile(char* filename, char** varNames, DdNode* bddMp, DdNode* bddAnn);
 		//void checkManager(DdManager* mgr, char* table);
 };

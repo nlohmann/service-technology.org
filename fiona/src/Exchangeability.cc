@@ -7,6 +7,7 @@
 
 DdManager* Exchangeability::mgrMp = Cudd_Init(0, 0, CUDD_UNIQUE_SLOTS, CUDD_CACHE_SLOTS, 0);
 DdManager* Exchangeability::mgrAnn = Cudd_Init(0, 0, CUDD_UNIQUE_SLOTS, CUDD_CACHE_SLOTS, 0);
+int Exchangeability::nbrBdd = 0;
  
 Exchangeability::Exchangeability(char* filename){
 	trace(TRACE_5, "Exchangeability::Exchangeability(char* filename): begin\n");		   
@@ -14,6 +15,7 @@ Exchangeability::Exchangeability(char* filename){
     names = NULL;
     nbrVarAnn = 0;
 	loadBdd(filename);
+	++nbrBdd;
 	 
 	for (int i = 0; i < nbrVarAnn; ++i){
         if (names[i][0] == '!' || names[i][0] == '?'){
@@ -31,9 +33,31 @@ Exchangeability::Exchangeability(char* filename){
 	trace(TRACE_5, "Exchangeability::Exchangeability(char* filename): end\n");
 }
 
+Exchangeability::~Exchangeability(){
+	trace(TRACE_5, "Exchangeability::~Exchangeability(): begin\n");		   
+    
+    delete [] names;
+    
+    Cudd_RecursiveDeref(mgrAnn, bddAnn);
+    Cudd_RecursiveDeref(mgrMp, bddMp);
+
+    //checkManager(mgrAnn, "mgrAnn");
+    //checkManager(mgrMp, "mgrMp");
+
+    Cudd_Quit(mgrAnn);
+    Cudd_Quit(mgrMp);
+    
+    --nbrBdd;
+    assert(nbrBdd >= 0);
+    
+    labelList.clear();
+    
+	trace(TRACE_5, "Exchangeability::~Exchangeability(): end\n");
+}
+
 void Exchangeability::loadBdd(char* filename){
-    trace(TRACE_5, "Exchangeability::loadBdds(char* filename): begin\n");		   		   
-    cout << "load BDD-representation of the operating guideline of " << filename << endl;
+    trace(TRACE_5, "Exchangeability::loadBdds(char* filename): begin\n");		   
+    cout << "loading BDD-representation of the operating guideline of " << filename << endl;
     
 	//open cudd-files
 	char bufferMp[256]; 
@@ -64,11 +88,13 @@ void Exchangeability::loadBdd(char* filename){
 	//load header of bddAnn
     int* permids = NULL;    //optimal variable ordering      
     loadHeader(fpAnn, &names, &nbrVarAnn, &permids);
-    
     fseek(fpAnn, 0, SEEK_SET); //File-Pointer auf Anfang der Datei setzen, damit später BDD geladen werden kann;      
     
     //load bddAnn
-    bddAnn = loadDiagram(fpAnn, mgrAnn, nbrVarAnn, permids);
+    if (nbrBdd == 0) {
+    	loadOptimalOrder(mgrAnn, nbrVarAnn, permids);
+    }
+    bddAnn = loadDiagram(fpAnn, mgrAnn);
     fclose(fpAnn);
     
     int nbrVarMp = 0;     //number of variables in bddMp
@@ -79,9 +105,12 @@ void Exchangeability::loadBdd(char* filename){
     //load header of bddMp
     loadHeader(fpMp, NULL, &nbrVarMp, &permids);
     fseek(fpMp, 0, SEEK_SET); //File-Pointer auf Anfang der Datei setzen, damit Bdd geladen werden kann;
-    
-    //load bddMp 
-    bddMp = loadDiagram(fpMp, mgrMp, nbrVarMp, permids);
+
+    //load bddMp
+    if (nbrBdd == 0) { 
+    	loadOptimalOrder(mgrMp, nbrVarMp, permids);
+    }
+    bddMp = loadDiagram(fpMp, mgrMp);
     fclose(fpMp);
     
     trace(TRACE_5, "Exchangeability::loadBdds(char* filename): end\n");		   
@@ -122,9 +151,32 @@ void Exchangeability::loadHeader(FILE* fp, char*** names, int* nVars, int** perm
     trace(TRACE_5,"Exchangeability::loadHeader(FILE* fp, char*** names, int* nVars, int** permids): end\n");
 }
 
+// optimale Reihenfolge der Variablen im Manager wieder bilden  
+void Exchangeability::loadOptimalOrder(DdManager* mgr, int size, int* permids){ 
+    int length; 
+    if (size < Cudd_ReadSize(mgr)){
+    	length = Cudd_ReadSize(mgr);  
+    }
+    else {
+    	length = size;
+    }
+    int idOrder[length]; //The size of idOrder should be equal or greater to the number of variables currently in use in mgr
+    for (int i = 0; i < size; ++i){
+    	assert(permids[i] < size);
+        idOrder[permids[i]] = i;
+    }
+    for(int i = size; i < length; ++i){
+    	idOrder[i] = i;
+    }
 
-DdNode* Exchangeability::loadDiagram(FILE* fp, DdManager* mgr, int size, int* permids){
+    assert (length >= Cudd_ReadSize(mgr));
+    int res = Cudd_ShuffleHeap(mgr,idOrder);
+    assert(res == 1);	
+} 
+
+DdNode* Exchangeability::loadDiagram(FILE* fp, DdManager* mgr){
 	trace(TRACE_5,"Exchangeability::loadDiagram(FILE* fp, DdManager* mgr, int size, int* permids): begin\n");
+    
     DdNode* bdd = Dddmp_cuddBddLoad (
             mgr                 /* IN: DD Manager */,
             DDDMP_VAR_MATCHIDS  /* IN: storing mode selector */,
@@ -136,12 +188,6 @@ DdNode* Exchangeability::loadDiagram(FILE* fp, DdManager* mgr, int size, int* pe
             fp                  /* IN: file pointer */
     );
     
-    // optimale Reihenfolge der Variablen im neuen Manager wieder bilden
-    int idOrder[size];
-    for (int i = 0; i < size; ++i){
-        idOrder[permids[i]] = i;
-    }
-    Cudd_ShuffleHeap(mgr,idOrder);
     trace(TRACE_5,"Exchangeability::loadDiagram(FILE* fp, DdManager* mgr, int size, int* permids): end\n");
     return (bdd);
 }
@@ -182,6 +228,7 @@ void Exchangeability::printDotFile(char* filename, char** varNames, DdNode* bddM
 
 bool Exchangeability::check(Exchangeability* bdd){
 	trace(TRACE_5,"Exchangeability::check(Exchangeability* bdd): begin\n");
+	
 	if (this->labelList.size() != bdd->labelList.size()){
 		return (false);
 	}

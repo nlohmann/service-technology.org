@@ -47,23 +47,24 @@ map<possibleParameters, bool> parameters;
 // long options
 static struct option longopts[] =
 {
-  { "help",       	 no_argument,       	NULL, 'h' },
-  { "version",    	 no_argument,       	NULL, 'v' },
-  { "debug",      	 required_argument, 	NULL, 'd' },
-  { "net",       	 required_argument, 	NULL, 'n' },
-  { "graphtype", 	 required_argument, 	NULL, 't' },
-  { "show",      	 required_argument, 	NULL, 's' },
-  { "calcallstates", no_argument, 			NULL, 'a' },
-  { "reduceIG",   	 no_argument,	    	NULL, 'r' },
-  { "commDepth",   	 required_argument,    	NULL, 'c' },
-  { "messagemaximum",required_argument,    	NULL, 'm' },
-  { "eventsmaximum", required_argument,    	NULL, 'e' },
-  { "BDD",			 required_argument,    	NULL, 'b' },
+  { "help",       	  no_argument,       	NULL, 'h' },
+  { "version",    	  no_argument,       	NULL, 'v' },
+  { "debug",      	  required_argument, 	NULL, 'd' },
+  { "net",       	  required_argument, 	NULL, 'n' },
+  { "graphtype", 	  required_argument, 	NULL, 't' },
+  { "show",      	  required_argument, 	NULL, 's' },
+  { "calcallstates",  no_argument, 			NULL, 'a' },
+  { "reduceIG",   	  no_argument,	    	NULL, 'r' },
+  { "commDepth",   	  required_argument,    NULL, 'c' },
+  { "messagemaximum", required_argument,    NULL, 'm' },
+  { "eventsmaximum",  required_argument,    NULL, 'e' },
+  { "BDD",			  required_argument,    NULL, 'b' },
+  { "exchangeability",no_argument,    		NULL, 'x' },
   NULL
 };
 
 
-const char * par_string = "hvd:n:t:s:arc:m:e:b:";
+const char * par_string = "hvd:n:t:s:arc:m:e:b:x";
 
 // --------------------- functions for command line evaluation ------------------------
 // Prints an overview of all commandline arguments.
@@ -102,8 +103,12 @@ void print_help() {
   trace("                                   empty     - show empty node\n");
   trace("                                   allstates - show all calculated states per node\n");
   trace("\n");
+  trace(" -x | --exchangeability       - check for two oWFN the equality of its operating guidelines\n");
+  trace("                                (the BDD-representation must have been computed before)\n");
+  trace("                                 syntax: -n netfile1 -n netfile2 -x\n");
+  trace("\n");
   trace(" -b | --BDD=<reordering>      - enable BDD construction (only relevant for OG)\n");
-  trace("                                optional argument <reordering> specifies reodering method:\n");
+  trace("                                argument <reordering> specifies reodering method:\n");
   trace("                                    0 - CUDD_REORDER_SAME\n");
   trace("                                    1 - CUDD_REORDER_NONE\n");
   trace("                                    2 - CUDD_REORDER_RANDOM\n");
@@ -163,6 +168,7 @@ void parse_command_line(int argc, char* argv[]) {
 	options[O_CALC_REDUCED_IG] = false;
 	options[O_OWFN_NAME] = false;
 	options[O_BDD] = false;
+	options[O_EX] = false;
 
 	options[O_COMM_DEPTH] = false;
 	options[O_MESSAGES_MAX] = false;
@@ -179,7 +185,7 @@ void parse_command_line(int argc, char* argv[]) {
 	parameters[P_SHOW_STATES_PER_NODE] = false;
 
 	bdd_reordermethod = 0;
-
+	
 	messages_manual = 1;
 	events_manual = 1;
 	commDepth_manual = 1;
@@ -298,6 +304,12 @@ void parse_command_line(int argc, char* argv[]) {
 					exit(1);
 	      		}
 		      	break;
+		    case 'x':
+		      	options[O_EX] = true;
+		      	options[O_GRAPH_TYPE] = false;
+		      	parameters[P_IG] = false;
+				parameters[P_OG] = false;
+		      	break;
 	      	case '?':
 				cerr << "Error: \t option error \n \t enter \"fiona --help\" for more information\n" << endl;
 				exit(1);
@@ -312,7 +324,7 @@ void parse_command_line(int argc, char* argv[]) {
   		exit(1);
   	}
 
-	if (options[O_BDD] == true && parameters[P_OG] == false) {
+	if (options[O_BDD] == true && parameters[P_OG] == false && options[O_EX] == false) {
 		cerr << "computing IG -- BDD option ignored" << endl;
 		options[O_BDD] = false;
 	}

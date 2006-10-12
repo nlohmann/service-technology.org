@@ -19,7 +19,8 @@ typedef enum
 	O_CALC_REDUCED_IG,
 	O_SHOW_NODES,	//!<
 	O_CALC_ALL_STATES,
-	O_BDD
+	O_BDD,
+	O_EX
 } possibleOptions;
 
 typedef enum

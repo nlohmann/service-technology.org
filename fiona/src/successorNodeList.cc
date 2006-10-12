@@ -55,6 +55,13 @@ bool successorNodeList::addNextNode(graphEdge * transition){
 	tmpEdge = firstElement;
 	
 	while (tmpEdge) {
+		// test if this edge is already stored
+		if (tmpEdge->getNode() == transition->getNode() && 
+				tmpEdge->getType() == transition->getType() &&
+				strcmp(tmpEdge->getLabel(), transition->getLabel()) == 0) {
+			// yes, we have such an edge already -> return false, because no annotation shall be added either
+			return false;	
+		}
 		if (tmpEdge->getNextElement() != NULL) {
 			tmpEdge = tmpEdge->getNextElement();	
 		} else {
@@ -62,8 +69,6 @@ bool successorNodeList::addNextNode(graphEdge * transition){
 			return true;
 		}
 	}
-	
-	/* not good ;-) - to be changed */
 	return true;
 }
 

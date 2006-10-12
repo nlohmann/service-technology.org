@@ -75,16 +75,17 @@ void vertex::setNumber(unsigned int _number) {
 	numberOfVertex = _number;
 }
 
-//! \fn void vertex::addSuccessorNode(graphEdge * edge) 
+//! \fn bool vertex::addSuccessorNode(graphEdge * edge) 
 //! \param edge pointer to the edge which is to point to the successor node
 //! \brief adds the node v to the list of successor nodes of this node using the edge
 //! given by the parameters
-void vertex::addSuccessorNode(graphEdge * edge) {
+bool vertex::addSuccessorNode(graphEdge * edge) {
 	if (successorNodes == NULL) {
 		successorNodes = new successorNodeList();	
 	}	
-	successorNodes->addNextNode(edge);
 	eventsToBeSeen--;
+	return successorNodes->addNextNode(edge);
+	
 }
 
 //! \fn void vertex::addState(State * s) 

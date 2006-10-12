@@ -69,7 +69,7 @@ public:
 //    StateSet setOfStatesTemp;	// this set contains all states
     
     void setNumber(unsigned int);
-    void addSuccessorNode(graphEdge *);
+    bool addSuccessorNode(graphEdge *);
     
     bool addState(State *);
     

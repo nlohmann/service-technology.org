@@ -264,16 +264,82 @@ vertex * communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeT
 	// try to find vertex in set of known vertices
     vertex * found = findVertexInSet(toAdd);
 
+	unsigned int greaterEqual = 0;
+	bool doNotMerge = true;
+
+	if (found != NULL) {
+	    for (unsigned int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
+	    	if (label == i) {
+	    		// current event is considered, but the eventsUsed is not yet set appropriatly
+	    		// in the currentVertex
+	    		if ((currentVertex->eventsUsed[i] + 1) >= found->eventsUsed[i]) {
+	//    			cout << PN->inputPlacesArray[i]->name << "! ";
+		        	greaterEqual++;
+		        }
+	    	} else if (currentVertex->eventsUsed[i] >= found->eventsUsed[i]) {
+    	//		cout << PN->inputPlacesArray[i]->name << " ";
+	        	greaterEqual++;
+	        }
+	    }
+	
+//		cout << "\ntoAdd: " << numberOfNodes + 1 << " compared with vertex: " << found->getNumber() << " -> " << greaterEqual << endl;
+	
+		if (greaterEqual == (PN->placeInputCnt + PN->placeOutputCnt)) {
+			// new vertex activates no more events than the found one -> nothing to be done anymore 
+			//found->eventsUsed[offset + label]++;
+			doNotMerge = false;
+		} //else {
+//			for (unsigned int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
+//		    	if (label == i) {
+//		    		cout << PN->inputPlacesArray[i]->name << ": " << currentVertex->eventsUsed[i] + 1 << " ";
+//		    	} else {
+//		    		cout << PN->inputPlacesArray[i]->name << ": " << currentVertex->eventsUsed[i] << " ";
+//		        }
+//		    }
+//		    cout << "\n";
+//			for (unsigned int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
+//		    	if (label == i) {
+//		    		cout << PN->inputPlacesArray[i]->name << ": " << found->eventsUsed[i] + 1 << " ";
+//		    	} else {
+//		    		cout << PN->inputPlacesArray[i]->name << ": " << found->eventsUsed[i] << " ";
+//		        }
+//		    }		 				
+//		}
+	}
+//		 set the events of the newly calculated vertex according to its predecessor node
+//        for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
+//            toAdd->eventsUsed[i] = currentVertex->eventsUsed[i];
+//        }			
+//        toAdd->eventsUsed[offset + label]++;
+//        
+//		 find out, whether we want to terminate after the calculated node 
+//		if (terminateBuildGraph(toAdd)) {
+//			found->eventsUsed[offset + label]++;
+//			doNotMerge = false;
+//		} else {
+//			// set the events of the found vertex according to its "shadow vertex" that we have just calculated
+//	        for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
+//	            found->eventsUsed[i] = toAdd->eventsUsed[i];
+//	        }		
+//	     //   cout << "returning true!" << endl;	
+//	        currentVertex = found;
+//	   //     found->setColor(BLUE);
+//
+//		}
+//	}
+
 //	if (options[O_BDD] == true || found == NULL) {
-    if (found == NULL) {
+    if (found == NULL || doNotMerge) {
         trace(TRACE_1, "\n\t new successor node computed:");
 
         toAdd->setNumber(numberOfNodes++);
         numberOfBlueNodes++;			// all nodes initially blue
 
         graphEdge * edgeSucc = new graphEdge(toAdd, edgeLabel, type);
-        currentVertex->addSuccessorNode(edgeSucc);
 
+		currentVertex->addSuccessorNode(edgeSucc);
+		currentVertex->setAnnotationEdges(edgeSucc);
+	
 		currentVertex->setAnnotationEdges(edgeSucc);
 		
         for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
@@ -302,60 +368,23 @@ vertex * communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeT
 		vertex * returnVertex;
 
         graphEdge * edgeSucc = new graphEdge(found, edgeLabel, type);
-        currentVertex->addSuccessorNode(edgeSucc);
-
+        
+        if (currentVertex->addSuccessorNode(edgeSucc)) {
+	        numberOfEdges++;
+        }
 		currentVertex->setAnnotationEdges(edgeSucc);
-
-        numberOfEdges++;
 
         if (type == receiving) {
             offset = PN->placeInputCnt;
         }
 
-		unsigned int greaterEqual = 0;
-
-        for (unsigned int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
-        	if (label == i) {
-        		// current event is considered, but the eventsUsed is not yet set appropriatly
-        		// in the currentVertex
-        		if ((currentVertex->eventsUsed[i] + 1) >= found->eventsUsed[i]) {
-		        	greaterEqual++;
-		        }
-        	} else if (currentVertex->eventsUsed[i] >= found->eventsUsed[i]) {
-            	greaterEqual++;
-            }
-        }
-
-		if (greaterEqual == (PN->placeInputCnt + PN->placeOutputCnt)) {
-			found->eventsUsed[offset + label]++;
-			returnVertex = NULL;
-		} else {
-			// set the events of the newly calculated vertex according to its predecessor node
-	        for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
-	            toAdd->eventsUsed[i] = currentVertex->eventsUsed[i];
-	        }			
-	        toAdd->eventsUsed[offset + label]++;
-	        
-			// find out, whether we want to terminate after the calculated node 
-			if (terminateBuildGraph(toAdd)) {
-				found->eventsUsed[offset + label]++;
-				returnVertex = NULL;	
-			} else {
-				// set the events of the found vertex according to its "shadow vertex" that we have just calculated
-		        for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
-		            found->eventsUsed[i] = toAdd->eventsUsed[i];
-		        }		
-		        cout << "returning true!" << endl;	
-		        currentVertex = found;
-		        
-				returnVertex = found;
-			}
-		}
         delete toAdd;
+	
+//		found->eventsUsed[offset + label]++;
 		
 		trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, unsigned int label, edgeType type): end\n");
 
-        return returnVertex;
+        return NULL;
     }
 }
 
@@ -367,7 +396,7 @@ bool communicationGraph::terminateBuildGraph(vertex * currentNode) {
 	
 	if (options[O_COMM_DEPTH]) {
 		// when -c set to a value, then stop at that depth
-		if (false) { //actualDepth > PN->commDepth) {
+		if (actualDepth > PN->commDepth) {
 			return true;
 		} else {
 			return false;

@@ -17,8 +17,9 @@
 struct cmp{
     bool operator()(char* x, char* y){
         return (strcmp(x,y)<0); // true falls x kleiner y, sonst false
-    }
+    } 
 };
+
  
 //! \fn BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_ReorderingType heuristic)
 //! \param numberOfLabels
@@ -51,6 +52,9 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_Reorderin
     
     labelTable = new BddLabelTab(2*nbrLabels);
     
+    assert(nbrLabels ==  PN->placeInputCnt + PN->placeOutputCnt);
+    
+/*    //for a unigue coding of the labels
     list<char*> labelList;
     for (unsigned int i = 0; i < PN->placeInputCnt; ++i){
     	//cout << i << "  " << PN->inputPlacesArray[i]->name << endl;
@@ -62,23 +66,24 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_Reorderin
     	labelList.push_back(PN->outputPlacesArray[i]->name);
     }
     
-    labelList.sort(cmp());	//for a unigue coding of the labels
+    labelList.sort(cmp());	
+  
     
     labelTable = new BddLabelTab(2*nbrLabels);    
     BddLabel * label;
-    list<char*>::const_iterator list_iter = labelList.begin();
+    //list<char*>::const_iterator list_iter = labelList.begin();
     
     //add labels and their bddNumber to labelTable
     for (unsigned int i = 0; i < PN->placeInputCnt + PN->placeOutputCnt; ++i){
     	assert(list_iter != labelList.end());
-    	//cout << i << "  " << *list_iter << endl;
+    	cout << i << "  " << *list_iter << endl;
     	label = new BddLabel(*list_iter, i, labelTable);
     	++list_iter;
     }
     
     labelList.clear();
-
-/*      
+*/
+      
     //add labels and their bddNumber to labelTable
     BddLabel * label;
     for (unsigned int i = 0; i < PN->placeInputCnt; ++i){
@@ -90,7 +95,7 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_Reorderin
     	//cout << i + PN->placeInputCnt << "  " << PN->outputPlacesArray[i]->name << endl;
     	label = new BddLabel(PN->outputPlacesArray[i]->name, i + PN->placeInputCnt, labelTable);
     }
-*/
+
 
 /*
   	BddLabel * temp;

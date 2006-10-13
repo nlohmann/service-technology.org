@@ -5,10 +5,17 @@
 #include "debug.h"
 #include "CNF.h"
 #include "vertex.h"
+#include <stdlib.h>
 #include <cassert>
 
 using namespace std;
 
+//comparison function, in order to sort the input/output place names 
+int compare (const void * a, const void * b){
+	owfnPlace *o1 = *((owfnPlace **)(a));
+	owfnPlace *o2 = *((owfnPlace **)(b));
+	return (strcmp(o1->name,o2->name));
+}
 
 //! \fn oWFN::oWFN()
 //! \brief constructor
@@ -175,6 +182,10 @@ void oWFN::initialize() {
 			outputPlacesArray[ko++] = Places[i];
 		}	
 	}
+	
+	// sort the inputPlacesArray and the outputPlacesArray
+	qsort (inputPlacesArray,  placeInputCnt,  sizeof(owfnPlace*), compare);
+	qsort (outputPlacesArray, placeOutputCnt, sizeof(owfnPlace*), compare);	
 	
 	for(i = 0, BitVectorSize = 0; i < placeCnt; i++) {
         Places[i]->startbit = BitVectorSize;

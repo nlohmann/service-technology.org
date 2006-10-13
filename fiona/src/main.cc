@@ -360,7 +360,6 @@ int main(int argc, char ** argv) {
 			
 	//			cout << "numberOfDecodes: " << numberOfDecodes << endl;
 			
-				trace(TRACE_0, "--------------------------------------------------------------\n\n");
 			} // end of "for all nets ..."
 	  }
 //	  trace(TRACE_0, "--------------------------------------------------------------\n\n");

@@ -71,7 +71,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 
 	// communication depth not yet reached, going down
 	int i = 0;
-	trace(TRACE_5, "iterating over inputSet\n");
+	trace(TRACE_2, "iterating over inputSet\n");
 	// iterate over all elements of inputSet
 	while (i < PN->placeInputCnt) {
 
@@ -114,7 +114,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 
 	i = 0;
 		
-	trace(TRACE_5, "iterating over outputSet\n");
+	trace(TRACE_2, "iterating over outputSet\n");
 	// iterate over all elements of outputSet
 	while (i < PN->placeOutputCnt) {
 
@@ -123,9 +123,9 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	    
 		if (currentNode->eventsUsed[i + PN->placeInputCnt] < PN->outputPlacesArray[i]->max_occurence) {
 				
-			cout << "event " << PN->outputPlacesArray[i]->name << " at node "
-                 << currentNode->getNumber() << " considered " << " since it did occure yet "
-                 << currentNode->eventsUsed[i + PN->placeInputCnt] << " times" << endl;
+//			cout << "event " << PN->outputPlacesArray[i]->name << " at node "
+//               << currentNode->getNumber() << " considered " << " since it did occure yet "
+//               << currentNode->eventsUsed[i + PN->placeInputCnt] << " times" << endl;
 			
 			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
 			currentVertex = currentNode;

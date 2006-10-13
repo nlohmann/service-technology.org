@@ -363,7 +363,7 @@ int main(int argc, char ** argv) {
 				trace(TRACE_0, "--------------------------------------------------------------\n\n");
 			} // end of "for all nets ..."
 	  }
-	  trace(TRACE_0, "--------------------------------------------------------------\n\n");
+//	  trace(TRACE_0, "--------------------------------------------------------------\n\n");
 	} // end try
 	catch(bad_alloc) {
 		char mess [] = "memory exhausted\n";

@@ -328,8 +328,10 @@ vertex * communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeT
 //		}
 //	}
 
+//	doNotMerge = false;
+	
 //	if (options[O_BDD] == true || found == NULL) {
-    if (found == NULL || doNotMerge) {
+    if (found == NULL) {// || doNotMerge) {
         trace(TRACE_1, "\n\t new successor node computed:");
 
         toAdd->setNumber(numberOfNodes++);
@@ -397,6 +399,7 @@ bool communicationGraph::terminateBuildGraph(vertex * currentNode) {
 	if (options[O_COMM_DEPTH]) {
 		// when -c set to a value, then stop at that depth
 		if (actualDepth > PN->commDepth) {
+//		if (true) {
 			return true;
 		} else {
 			return false;

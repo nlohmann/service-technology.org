@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/12 09:53:32 $
+ *          - last changed: \$Date: 2006/10/13 09:11:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.110 $
+ * \version \$Revision: 1.111 $
  */
 %}
 
@@ -99,6 +99,7 @@ tProcess:
     bool hasEH = false;
   }
 ;
+
 
 tStop:
   StopInProcess()
@@ -351,7 +352,7 @@ tCorrelation:
 ******************************************************************************/
 
 tEmpty:
-  Empty(standardElements)
+  Empty(standardElements integer)
   {
     int id;
     stringMap attributes;
@@ -361,7 +362,12 @@ tEmpty:
   }
 ;
 
-%ctor Empty(int myid = 0)
+%ctor Empty()
+{
+  cerr << "called Empty()" << endl;
+}
+
+%ctor Empty(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_EMPTY); }
@@ -515,13 +521,13 @@ tWait:
     bool suppressJF = false;
 
     bool isWaitFor = false;
-
-    { cerr << "called constructor for Wait()" << endl; }
   }
 ;
 
-%ctor Wait(int myid = 0)
-{ id = myid;
+%ctor Wait() {}
+%ctor Wait(int myid)
+{ cerr << "called Wait(int)" << endl; 
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_WAIT); }
 
@@ -610,7 +616,8 @@ tFlow:
   }
 ;
 
-%ctor Flow(int myid = 0)
+%ctor Flow() {}
+%ctor Flow(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_FLOW); }

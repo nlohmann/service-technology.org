@@ -1,4 +1,4 @@
 %rview test;
 
-activityEmpty(Empty(a))
+activityEmpty(Empty(a,b))
   -> < test: activityWait(Wait(a)) >;

@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/12 09:53:32 $
+ *          - last changed: \$Date: 2006/10/13 09:11:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.234 $
+ * \version \$Revision: 1.235 $
  * 
  */
 %}
@@ -564,10 +564,10 @@ tCorrelation:
 
 tEmpty:
   K_EMPTY arbitraryAttributes X_NEXT standardElements X_SLASH K_EMPTY
-    { $$ = Empty($4, $2->value); }
+    { $$ = Empty($4, $2, $2->value); }
 | K_EMPTY arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Empty(noLinks, $2->value); }
+      $$ = Empty(noLinks, $2, $2->value); }
 ;
 
 

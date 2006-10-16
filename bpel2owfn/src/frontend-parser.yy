@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/16 13:24:26 $
+ *          - last changed: \$Date: 2006/10/16 13:35:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.240 $
+ * \version \$Revision: 1.241 $
  * 
  */
 %}
@@ -154,6 +154,7 @@ unsigned int ASTEid = 1;
 %type <yt_tCatch> tCatch
 %type <yt_tCatchAll> tCatchAll
 %type <yt_tCompensate> tCompensate
+%type <yt_tCompensateScope> tCompensateScope
 %type <yt_tCompensationHandler> tCompensationHandler
 %type <yt_tCopy_list> tCopy_list
 %type <yt_tCopy> tCopy
@@ -194,6 +195,7 @@ unsigned int ASTEid = 1;
 %type <yt_tReceive> tReceive
 %type <yt_tReply> tReply
 %type <yt_tRepeatUntil> tRepeatUntil
+%type <yt_tRethrow> tRethrow
 %type <yt_tScope> tScope
 %type <yt_tSequence> tSequence
 %type <yt_tSource_list> tSource_list
@@ -235,9 +237,9 @@ tProcess:
       currentJoinCondition = standardJoinCondition();
       temporaryAttributeMap.clear();
     }
-  X_OPEN K_PROCESS arbitraryAttributes X_NEXT tExtensions imports
-  tPartnerLinks tPartners tMessageExchanges tVariables tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers activity
-  X_NEXT X_SLASH K_PROCESS X_CLOSE
+  X_OPEN K_PROCESS arbitraryAttributes X_NEXT tExtensions imports tPartnerLinks
+  tPartners tMessageExchanges tVariables tCorrelationSets tFaultHandlers
+  tCompensationHandler tEventHandlers activity X_NEXT X_SLASH K_PROCESS X_CLOSE
     { TheProcess = $$ = Process($8, $9, $11, $12, $13, $14, $15, StopInProcess(), $16, $4->value); }
 ;
 
@@ -245,26 +247,28 @@ tProcess:
 
 
 activity:
-  tReceive	{ $$ = activityReceive($1);	}
-| tReply	{ $$ = activityReply($1);	}
-| tInvoke	{ $$ = activityInvoke($1);	}
-| tAssign	{ $$ = activityAssign($1);	}
-| tValidate	{ $$ = activityValidate($1);	}
-| tEmpty	{ $$ = activityEmpty($1);	}
-| tWait		{ $$ = activityWait($1);	}
-| tTerminate	{ $$ = activityTerminate($1);	}
-| tExit		{ $$ = activityTerminate($1);	}
-| tThrow	{ $$ = activityThrow($1);	}
-| tCompensate	{ $$ = activityCompensate($1);	}
-| tSequence	{ $$ = activitySequence($1);	}
-| tSwitch	{ $$ = activitySwitch($1);	}
-| tIf		{ $$ = activitySwitch($1);	}
-| tWhile	{ $$ = activityWhile($1);	}
-| tRepeatUntil	{ $$ = activityRepeatUntil($1);	}
-| tForEach	{ $$ = activityForEach($1);	}
-| tFlow		{ $$ = activityFlow($1);	}
-| tPick		{ $$ = activityPick($1);	}
-| tScope	{ $$ = activityScope($1);	}
+  tReceive		{ $$ = activityReceive($1);	}
+| tReply		{ $$ = activityReply($1);	}
+| tInvoke		{ $$ = activityInvoke($1);	}
+| tAssign		{ $$ = activityAssign($1);	}
+| tValidate		{ $$ = activityValidate($1);	}
+| tEmpty		{ $$ = activityEmpty($1);	}
+| tWait			{ $$ = activityWait($1);	}
+| tTerminate		{ $$ = activityTerminate($1);	}
+| tExit			{ $$ = activityTerminate($1);	}
+| tThrow		{ $$ = activityThrow($1);	}
+| tRethrow		{ $$ = activityRethrow($1);	}
+| tCompensate		{ $$ = activityCompensate($1);	}
+| tCompensateScope	{ $$ = activityCompensateScope($1);	}
+| tSequence		{ $$ = activitySequence($1);	}
+| tSwitch		{ $$ = activitySwitch($1);	}
+| tIf			{ $$ = activitySwitch($1);	}
+| tWhile		{ $$ = activityWhile($1);	}
+| tRepeatUntil		{ $$ = activityRepeatUntil($1);	}
+| tForEach		{ $$ = activityForEach($1);	}
+| tFlow			{ $$ = activityFlow($1);	}
+| tPick			{ $$ = activityPick($1);	}
+| tScope		{ $$ = activityScope($1);	}
 ;
 
 
@@ -787,7 +791,13 @@ tThrow:
   RETHROW                                                        (WS-BPEL 2.0)
 ******************************************************************************/
 
-/* TODO */
+tRethrow:
+  K_RETHROW arbitraryAttributes X_NEXT standardElements X_SLASH K_RETHROW
+    { $$ = Rethrow($4, $2->value); }
+| K_RETHROW arbitraryAttributes X_SLASH
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
+      $$ = Rethrow(noLinks, $2->value); }
+;
 
 
 /******************************************************************************
@@ -807,7 +817,13 @@ tCompensate:
   COMPENSATESCOPE                                                (WS-BPEL 2.0)
 ******************************************************************************/
 
-/* TODO */
+tCompensateScope:
+  K_COMPENSATESCOPE arbitraryAttributes X_NEXT standardElements X_SLASH K_COMPENSATESCOPE
+    { $$ = CompensateScope($4, $2->value); }
+| K_COMPENSATESCOPE arbitraryAttributes X_SLASH
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
+      $$ = CompensateScope(noLinks, $2->value); }
+;
 
 
 /******************************************************************************

@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/16 12:56:44 $
+ *          - last changed: \$Date: 2006/10/16 13:35:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.114 $
+ * \version \$Revision: 1.115 $
  */
 %}
 
@@ -124,7 +124,9 @@ activity:
 | activityWait(tWait)
 | activityTerminate(tTerminate)
 | activityThrow(tThrow)
+| activityRethrow(tRethrow)
 | activityCompensate(tCompensate)
+| activityCompensateScope(tCompensateScope)
 | activitySequence(tSequence)
 | activitySwitch(tSwitch)
 | activityWhile(tWhile)
@@ -147,7 +149,9 @@ activity:
 %ctor activityWait()		{ id = tWait_1->id; }
 %ctor activityTerminate()	{ id = tTerminate_1->id; }
 %ctor activityThrow()		{ id = tThrow_1->id; }
+%ctor activityRethrow()		{ id = tRethrow_1->id; }
 %ctor activityCompensate()	{ id = tCompensate_1->id; }
+%ctor activityCompensateScope()	{ id = tCompensateScope_1->id; }
 %ctor activitySequence()	{ id = tSequence_1->id; }
 %ctor activitySwitch()		{ id = tSwitch_1->id; }
 %ctor activityWhile()		{ id = tWhile_1->id; }
@@ -735,6 +739,29 @@ tThrow:
 
 
 /******************************************************************************
+  RETHROW                                                        (WS-BPEL 2.0)
+******************************************************************************/
+
+tRethrow:
+  Rethrow(standardElements)
+  {
+    int id;
+    stringMap attributes;
+
+    int negativeControlFlow = 0;
+    bool suppressJF = false;
+
+    string variableName;
+  }
+;
+
+%ctor Rethrow(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_RETHROW); }
+
+
+/******************************************************************************
   COMPENSATE
 ******************************************************************************/
 
@@ -757,6 +784,31 @@ tCompensate:
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_COMPENSATE); }
+
+
+/******************************************************************************
+  COMPENSATESCOPE                                                (WS-BPEL 2.0)
+******************************************************************************/
+
+tCompensateScope:
+  CompensateScope(standardElements)
+  {
+    int id;
+    stringMap attributes;
+
+    int negativeControlFlow = 0;
+    bool suppressJF = false;
+
+    bool inFaultHandler = true;
+
+    bool hasScopeAttribute = true;
+  }
+;
+
+%ctor CompensateScope(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_COMPENSATESCOPE); }
 
 
 /******************************************************************************

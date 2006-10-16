@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/16 13:35:07 $
+ *          - last changed: \$Date: 2006/10/16 14:01:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.115 $
+ * \version \$Revision: 1.116 $
  */
 %}
 
@@ -123,12 +123,14 @@ activity:
 | activityEmpty(tEmpty)
 | activityWait(tWait)
 | activityTerminate(tTerminate)
+| activityExit(tExit)
 | activityThrow(tThrow)
 | activityRethrow(tRethrow)
 | activityCompensate(tCompensate)
 | activityCompensateScope(tCompensateScope)
 | activitySequence(tSequence)
 | activitySwitch(tSwitch)
+| activityIf(tIf)
 | activityWhile(tWhile)
 | activityRepeatUntil(tRepeatUntil)
 | activityForEach(tForEach)
@@ -148,12 +150,14 @@ activity:
 %ctor activityEmpty()		{ id = tEmpty_1->id; }
 %ctor activityWait()		{ id = tWait_1->id; }
 %ctor activityTerminate()	{ id = tTerminate_1->id; }
+%ctor activityExit()		{ id = tExit_1->id; }
 %ctor activityThrow()		{ id = tThrow_1->id; }
 %ctor activityRethrow()		{ id = tRethrow_1->id; }
 %ctor activityCompensate()	{ id = tCompensate_1->id; }
 %ctor activityCompensateScope()	{ id = tCompensateScope_1->id; }
 %ctor activitySequence()	{ id = tSequence_1->id; }
 %ctor activitySwitch()		{ id = tSwitch_1->id; }
+%ctor activityIf()		{ id = tIf_1->id; }
 %ctor activityWhile()		{ id = tWhile_1->id; }
 %ctor activityRepeatUntil()	{ id = tRepeatUntil_1->id; }
 %ctor activityForEach()		{ id = tForEach_1->id; }
@@ -695,7 +699,7 @@ tWait:
 
 
 /******************************************************************************
-  TERMINATE
+  TERMINATE                                                      (BPEL4WS 1.1)
 ******************************************************************************/
 
 tTerminate:
@@ -713,6 +717,27 @@ tTerminate:
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_TERMINATE); }
+
+
+/******************************************************************************
+  EXIT                                                           (WS-BPEL 2.0)
+******************************************************************************/
+
+tExit:
+  Exit(standardElements)
+  {
+    int id;
+    stringMap attributes;
+
+    int negativeControlFlow = 0;
+    bool suppressJF = false;
+  }
+;
+
+%ctor Exit(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_EXIT); }
 
 
 /******************************************************************************
@@ -833,7 +858,7 @@ tSequence:
 
 
 /******************************************************************************
-  SWITCH
+  SWITCH                                                         (BPEL4WS 1.1)
 ******************************************************************************/
 
 tSwitch:
@@ -851,6 +876,7 @@ tSwitch:
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_SWITCH); }
+
 
 tCase_list:
   list tCase
@@ -881,6 +907,58 @@ tOtherwise:
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_OTHERWISE); }
+
+
+/******************************************************************************
+  IF                                                             (WS-BPEL 2.0)
+******************************************************************************/
+
+tIf:
+  If(standardElements tElseIf_list tElse)
+  {
+    int id;
+    stringMap attributes;
+
+    int negativeControlFlow = 0;
+    bool suppressJF = false;
+  }
+;
+
+%ctor If(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_IF); }
+
+
+tElseIf_list:
+  list tElseIf
+;
+
+tElseIf:
+  ElseIf(activity)
+  {
+    int id;
+    stringMap attributes;
+  }
+;
+
+%ctor ElseIf(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_ELSEIF); }
+
+
+tElse:
+  Else(activity)
+  {
+    int id;
+  }
+;
+
+%ctor Else(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_ELSE); }
 
 
 /******************************************************************************

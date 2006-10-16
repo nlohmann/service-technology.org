@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/16 13:35:07 $
+ *          - last changed: \$Date: 2006/10/16 14:01:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.241 $
+ * \version \$Revision: 1.242 $
  * 
  */
 %}
@@ -147,9 +147,7 @@ unsigned int ASTEid = 1;
 %type <yt_standardElements> standardElements
 %type <yt_tAssign> tAssign
 %type <yt_tCase_list> tCase_list
-%type <yt_tCase_list> tElseIf_list
 %type <yt_tCase> tCase
-%type <yt_tCase> tElseIf
 %type <yt_tCatch_list> tCatch_list
 %type <yt_tCatch> tCatch
 %type <yt_tCatchAll> tCatchAll
@@ -164,8 +162,12 @@ unsigned int ASTEid = 1;
 %type <yt_tCorrelationSet_list> tCorrelationSet_list
 %type <yt_tCorrelationSet_list> tCorrelationSets
 %type <yt_tCorrelationSet> tCorrelationSet
+%type <yt_tElse> tElse
+%type <yt_tElseIf> tElseIf
+%type <yt_tElseIf_list> tElseIf_list
 %type <yt_tEmpty> tEmpty
 %type <yt_tEventHandlers> tEventHandlers
+%type <yt_tExit> tExit
 %type <yt_tFaultHandlers> tFaultHandlers
 %type <yt_tFlow> tFlow
 %type <yt_tForEach> tForEach
@@ -173,6 +175,7 @@ unsigned int ASTEid = 1;
 %type <yt_tFromPart> tFromPart
 %type <yt_tFromPart_list> tFromPart_list
 %type <yt_tFromPart_list> tFromParts
+%type <yt_tIf> tIf
 %type <yt_tInvoke> tInvoke
 %type <yt_tLink_list> tLink_list
 %type <yt_tLink_list> tLinks
@@ -182,7 +185,6 @@ unsigned int ASTEid = 1;
 %type <yt_tOnMessage> tOnEvent
 %type <yt_tOnMessage_list> tOnMessage_list
 %type <yt_tOnMessage> tOnMessage
-%type <yt_tOtherwise> tElse
 %type <yt_tOtherwise> tOtherwise
 %type <yt_tPartner_list> tPartner_list
 %type <yt_tPartner_list> tPartners
@@ -200,11 +202,9 @@ unsigned int ASTEid = 1;
 %type <yt_tSequence> tSequence
 %type <yt_tSource_list> tSource_list
 %type <yt_tSource> tSource
-%type <yt_tSwitch> tIf
 %type <yt_tSwitch> tSwitch
 %type <yt_tTarget_list> tTarget_list
 %type <yt_tTarget> tTarget
-%type <yt_tTerminate> tExit
 %type <yt_tTerminate> tTerminate
 %type <yt_tThrow> tThrow
 %type <yt_tTo> tTo
@@ -255,14 +255,14 @@ activity:
 | tEmpty		{ $$ = activityEmpty($1);	}
 | tWait			{ $$ = activityWait($1);	}
 | tTerminate		{ $$ = activityTerminate($1);	}
-| tExit			{ $$ = activityTerminate($1);	}
+| tExit			{ $$ = activityExit($1);	}
 | tThrow		{ $$ = activityThrow($1);	}
 | tRethrow		{ $$ = activityRethrow($1);	}
 | tCompensate		{ $$ = activityCompensate($1);	}
 | tCompensateScope	{ $$ = activityCompensateScope($1);	}
 | tSequence		{ $$ = activitySequence($1);	}
 | tSwitch		{ $$ = activitySwitch($1);	}
-| tIf			{ $$ = activitySwitch($1);	}
+| tIf			{ $$ = activityIf($1);	}
 | tWhile		{ $$ = activityWhile($1);	}
 | tRepeatUntil		{ $$ = activityRepeatUntil($1);	}
 | tForEach		{ $$ = activityForEach($1);	}
@@ -767,10 +767,10 @@ tTerminate:
 
 tExit:
   K_EXIT arbitraryAttributes X_NEXT standardElements X_SLASH K_EXIT
-    { $$ = Terminate($4, $2->value); }
+    { $$ = Exit($4, $2->value); }
 | K_EXIT arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Terminate(noLinks, $2->value); }
+      $$ = Exit(noLinks, $2->value); }
 ;
 
 
@@ -870,7 +870,7 @@ tOtherwise:
 
 tIf:
   K_IF arbitraryAttributes X_NEXT standardElements tCondition activity X_NEXT tElseIf_list tElse X_SLASH K_IF
-    { $$ = Switch($4, ConstCase_list(Case($6), $8), $9, $2->value); }
+    { $$ = If($4, ConstElseIf_list(ElseIf($6), $8), $9, $2->value); }
 ;
 
 tCondition:
@@ -880,19 +880,19 @@ tCondition:
 
 tElseIf_list:
   /* empty */
-    { $$ = NiltCase_list(); }
+    { $$ = NiltElseIf_list(); }
 | tElseIf X_NEXT tElseIf_list
-    { $$ = ConstCase_list($1, $3); }
+    { $$ = ConstElseIf_list($1, $3); }
 ;
 
 tElseIf:
   K_ELSEIF arbitraryAttributes X_NEXT tCondition X_NEXT activity X_NEXT X_SLASH K_ELSEIF X_NEXT
-    { $$ = Case($6, $2->value); }
+    { $$ = ElseIf($6, $2->value); }
 ;
 
 tElse:
   K_ELSE X_NEXT activity X_NEXT X_SLASH K_ELSE X_NEXT
-    { $$ = Otherwise($3, ASTEid++); }
+    { $$ = Else($3, ASTEid++); }
 ;
 
 

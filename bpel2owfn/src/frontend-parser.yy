@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/16 12:56:44 $
+ *          - last changed: \$Date: 2006/10/16 13:24:26 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.239 $
+ * \version \$Revision: 1.240 $
  * 
  */
 %}
@@ -178,6 +178,7 @@ unsigned int ASTEid = 1;
 %type <yt_tLink> tLink
 %type <yt_tOnAlarm_list> tOnAlarm_list
 %type <yt_tOnAlarm> tOnAlarm
+%type <yt_tOnMessage> tOnEvent
 %type <yt_tOnMessage_list> tOnMessage_list
 %type <yt_tOnMessage> tOnMessage
 %type <yt_tOtherwise> tElse
@@ -235,9 +236,9 @@ tProcess:
       temporaryAttributeMap.clear();
     }
   X_OPEN K_PROCESS arbitraryAttributes X_NEXT tExtensions imports
-  tPartnerLinks tPartners tVariables tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers activity
+  tPartnerLinks tPartners tMessageExchanges tVariables tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers activity
   X_NEXT X_SLASH K_PROCESS X_CLOSE
-    { TheProcess = $$ = Process($8, $9, $10, $11, $12, $13, $14, StopInProcess(), $15, $4->value); }
+    { TheProcess = $$ = Process($8, $9, $11, $12, $13, $14, $15, StopInProcess(), $16, $4->value); }
 ;
 
 /*---------------------------------------------------------------------------*/
@@ -268,7 +269,7 @@ activity:
 
 
 /******************************************************************************
-  EXTENSIONS AND IMPORTS
+  EXTENSIONS AND IMPORTS                                         (WS-BPEL 2.0)
 ******************************************************************************/
 
 imports:
@@ -319,7 +320,7 @@ tPartnerLink:
 
 
 /******************************************************************************
-  PARTNERS
+  PARTNERS                                                       (BPEL4WS 1.1)
 ******************************************************************************/
 
 tPartners:
@@ -342,6 +343,26 @@ tPartner:
 | K_PARTNER arbitraryAttributes X_SLASH
     { $$ = Partner(NiltPartnerLink_list(), $2->value); }
 ;
+
+
+/******************************************************************************
+  MESSAGE EXCHANGES                                              (WS-BPEL 2.0)
+******************************************************************************/
+
+tMessageExchanges:
+  /* empty */
+| K_MESSAGEEXCHANGES X_NEXT tMessageExchange_list X_SLASH K_MESSAGEEXCHANGES X_NEXT
+;
+
+tMessageExchange_list:
+  tMessageExchange X_NEXT
+| tMessageExchange X_NEXT tMessageExchange_list
+;
+
+tMessageExchange:
+  K_MESSAGEEXCHANGE arbitraryAttributes X_NEXT X_SLASH K_MESSAGEEXCHANGE
+| K_MESSAGEEXCHANGE arbitraryAttributes X_SLASH
+;		
 
 
 /******************************************************************************
@@ -403,6 +424,8 @@ tOnMessage_list:
     { $$ = NiltOnMessage_list(); }
 | tOnMessage X_NEXT tOnMessage_list
     { $$ = ConstOnMessage_list($1, $3); }
+| tOnEvent X_NEXT tOnMessage_list
+    { $$ = ConstOnMessage_list($1, $3); }
 ;
 
 tOnAlarm_list:
@@ -417,9 +440,23 @@ tOnMessage:
     { $$ = OnMessage($5, $2->value); }
 ;
 
+tOnEvent:
+  K_ONEVENT arbitraryAttributes X_NEXT tCorrelations tFromParts activity X_NEXT X_SLASH K_ONEVENT
+    { $$ = OnMessage($6, $2->value); }
+;
+
 tOnAlarm:
   K_ONALARM arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_ONALARM 
     { $$ = OnAlarm($4, $2->value); }
+| K_ONALARM arbitraryAttributes X_NEXT tFor tRepeatEvery activity X_NEXT X_SLASH K_ONALARM 
+    { $$ = OnAlarm($6, $2->value); }
+| K_ONALARM arbitraryAttributes X_NEXT tUntil tRepeatEvery activity X_NEXT X_SLASH K_ONALARM 
+    { $$ = OnAlarm($6, $2->value); }
+;
+
+tRepeatEvery:
+  /* empty */
+| K_REPEATEVERY arbitraryAttributes X_CLOSE constant X_OPEN X_SLASH K_REPEATEVERY X_NEXT
 ;
 
 
@@ -944,14 +981,17 @@ tLink:
 ******************************************************************************/
 
 tScope:
-  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
-  tCorrelationSets tFaultHandlers tCompensationHandler tEventHandlers activity 
+  K_SCOPE arbitraryAttributes X_NEXT standardElements tPartnerLinks
+  tMessageExchanges tVariables tCorrelationSets tFaultHandlers
+  tCompensationHandler tTerminationHandler tEventHandlers activity 
   X_NEXT X_SLASH K_SCOPE
-    { $$ = Scope($4, $5, $7, $8, $9, StopInScope(), $10, $2->value); }
+    { $$ = Scope($4, $7, $9, $10, $12, StopInScope(), $13, $2->value); }
 ;
 
-
-
+tTerminationHandler:
+  /* empty */
+| K_TERMINATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_TERMINATIONHANDLER X_NEXT
+;
 
 
 /******************************************************************************

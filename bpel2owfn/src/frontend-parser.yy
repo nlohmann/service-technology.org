@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/16 09:57:29 $
+ *          - last changed: \$Date: 2006/10/16 12:18:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.237 $
+ * \version \$Revision: 1.238 $
  * 
  */
 %}
@@ -65,7 +65,7 @@
 
 
 // the terminal symbols (tokens)
-%token APOSTROPHE EQUAL GREATER GREATEROREQUAL K_AND K_ASSIGN K_BRANCHES K_CASE K_CATCH K_CATCHALL K_COMPENSATE K_COMPENSATESCOPE K_COMPENSATIONHANDLER K_COMPLETIONCONDITION K_CONDITION K_COPY K_CORRELATION K_CORRELATIONS K_CORRELATIONSET K_CORRELATIONSETS K_ELSE K_ELSEIF K_EMPTY K_EVENTHANDLERS K_EXIT K_EXTENSION K_EXTENSIONACTIVITY K_EXTENSIONASSIGNOPERATION K_EXTENSIONS K_FAULTHANDLERS K_FINALCOUNTERVALUE K_FLOW K_FOR K_FOREACH K_FROM K_FROMPARTS K_GETLINKSTATUS K_IF K_IMPORT K_INVOKE K_JOINCONDITION K_LINK K_LINKS K_LITERAL K_MESSAGEEXCHANGE K_MESSAGEEXCHANGES K_ONALARM K_ONEVENT K_ONMESSAGE K_OR K_OTHERWISE K_PARTNER K_PARTNERLINK K_PARTNERLINKS K_PARTNERS K_PICK K_PROCESS K_QUERY K_RECEIVE K_REPEATEVERY K_REPEATUNTIL K_REPLY K_RETHROW K_SCOPE K_SEQUENCE K_SOURCE K_SOURCES K_STARTCOUNTERVALUE K_SWITCH K_TARGET K_TARGETS K_TERMINATE K_TERMINATIONHANDLER K_THROW K_TO K_TOPARTS K_TRANSITIONCONDITION K_UNTIL K_VALIDATE K_VARIABLE K_VARIABLES K_WAIT K_WHILE LBRACKET LESS LESSOREQUAL NOTEQUAL NUMBER QUOTE RBRACKET VARIABLENAME X_CLOSE X_EQUALS X_NEXT X_OPEN X_SLASH
+%token APOSTROPHE EQUAL GREATER GREATEROREQUAL K_AND K_ASSIGN K_BRANCHES K_CASE K_CATCH K_CATCHALL K_COMPENSATE K_COMPENSATESCOPE K_COMPENSATIONHANDLER K_COMPLETIONCONDITION K_CONDITION K_COPY K_CORRELATION K_CORRELATIONS K_CORRELATIONSET K_CORRELATIONSETS K_ELSE K_ELSEIF K_EMPTY K_EVENTHANDLERS K_EXIT K_EXTENSION K_EXTENSIONACTIVITY K_EXTENSIONASSIGNOPERATION K_EXTENSIONS K_FAULTHANDLERS K_FINALCOUNTERVALUE K_FLOW K_FOR K_FOREACH K_FROM K_FROMPART K_FROMPARTS K_GETLINKSTATUS K_IF K_IMPORT K_INVOKE K_JOINCONDITION K_LINK K_LINKS K_LITERAL K_MESSAGEEXCHANGE K_MESSAGEEXCHANGES K_ONALARM K_ONEVENT K_ONMESSAGE K_OR K_OTHERWISE K_PARTNER K_PARTNERLINK K_PARTNERLINKS K_PARTNERS K_PICK K_PROCESS K_QUERY K_RECEIVE K_REPEATEVERY K_REPEATUNTIL K_REPLY K_RETHROW K_SCOPE K_SEQUENCE K_SOURCE K_SOURCES K_STARTCOUNTERVALUE K_SWITCH K_TARGET K_TARGETS K_TERMINATE K_TERMINATIONHANDLER K_THROW K_TO K_TOPART K_TOPARTS K_TRANSITIONCONDITION K_UNTIL K_VALIDATE K_VARIABLE K_VARIABLES K_WAIT K_WHILE LBRACKET LESS LESSOREQUAL NOTEQUAL NUMBER QUOTE RBRACKET VARIABLENAME X_CLOSE X_EQUALS X_NEXT X_OPEN X_SLASH
 %token <yt_casestring> X_NAME
 %token <yt_casestring> X_STRING
 
@@ -167,7 +167,11 @@ unsigned int ASTEid = 1;
 %type <yt_tEventHandlers> tEventHandlers
 %type <yt_tFaultHandlers> tFaultHandlers
 %type <yt_tFlow> tFlow
+%type <yt_tForEach> tForEach
 %type <yt_tFrom> tFrom
+%type <yt_tFromPart> tFromPart
+%type <yt_tFromPart_list> tFromPart_list
+%type <yt_tFromPart_list> tFromParts
 %type <yt_tInvoke> tInvoke
 %type <yt_tLink_list> tLink_list
 %type <yt_tLink_list> tLinks
@@ -188,6 +192,7 @@ unsigned int ASTEid = 1;
 %type <yt_tProcess> tProcess
 %type <yt_tReceive> tReceive
 %type <yt_tReply> tReply
+%type <yt_tRepeatUntil> tRepeatUntil
 %type <yt_tScope> tScope
 %type <yt_tSequence> tSequence
 %type <yt_tSource_list> tSource_list
@@ -200,6 +205,10 @@ unsigned int ASTEid = 1;
 %type <yt_tTerminate> tTerminate
 %type <yt_tThrow> tThrow
 %type <yt_tTo> tTo
+%type <yt_tToPart> tToPart
+%type <yt_tToPart_list> tToPart_list
+%type <yt_tToPart_list> tToParts
+%type <yt_tValidate> tValidate
 %type <yt_tVariable_list> tVariable_list
 %type <yt_tVariable_list> tVariables
 %type <yt_tVariable> tVariable
@@ -241,14 +250,17 @@ activity:
 | tReply	{ $$ = activityReply($1);	}
 | tAssign	{ $$ = activityAssign($1);	}
 | tWait		{ $$ = activityWait($1);	}
+| tValidate	{ $$ = activityValidate($1);	}
 | tThrow	{ $$ = activityThrow($1);	}
 | tTerminate	{ $$ = activityTerminate($1);	}
 | tExit		{ $$ = activityTerminate($1);	}
 | tFlow		{ $$ = activityFlow($1);	}
 | tSwitch	{ $$ = activitySwitch($1);	}
-| tIf		{ $$ = activitySwitch($1);	} /* WS-BPEL */
+| tIf		{ $$ = activitySwitch($1);	}
 | tWhile	{ $$ = activityWhile($1);	}
+| tRepeatUntil	{ $$ = activityRepeatUntil($1);	}
 | tSequence	{ $$ = activitySequence($1);	}
+| tForEach	{ $$ = activityForEach($1);	}
 | tPick		{ $$ = activityPick($1);	}
 | tScope	{ $$ = activityScope($1);	}
 | tCompensate	{ $$ = activityCompensate($1);	}
@@ -490,6 +502,61 @@ tCorrelation:
 
 
 /******************************************************************************
+  TOPARTS                                                        (WS-BPEL 2.0)
+******************************************************************************/
+
+tToParts:
+  /* empty */
+    { $$ = NiltToPart_list(); }
+| K_TOPARTS X_NEXT tToPart_list X_SLASH K_TOPARTS X_NEXT
+    { $$ = $3; }
+;
+
+tToPart_list:
+  tToPart X_NEXT
+    { $$ = ConstToPart_list($1, NiltToPart_list()); }
+| tToPart X_NEXT tToPart_list
+    { $$ = ConstToPart_list($1, $3); }
+;
+
+tToPart:
+  K_TOPART arbitraryAttributes X_NEXT X_SLASH K_TOPART
+    { $$ = ToPart($2->value); }
+| K_TOPART arbitraryAttributes X_SLASH
+    { $$ = ToPart($2->value); }
+;
+
+
+/******************************************************************************
+  FROMPARTS                                                      (WS-BPEL 2.0)
+******************************************************************************/
+
+tFromParts:
+  /* empty */
+    { $$ = NiltFromPart_list(); }
+| K_FROMPARTS X_NEXT tFromPart_list X_SLASH K_FROMPARTS X_NEXT
+    { $$ = $3; }
+;
+
+tFromPart_list:
+  tFromPart X_NEXT
+    { $$ = ConstFromPart_list($1, NiltFromPart_list()); }
+| tFromPart X_NEXT tFromPart_list
+    { $$ = ConstFromPart_list($1, $3); }
+;
+
+tFromPart:
+  K_FROMPART arbitraryAttributes X_NEXT X_SLASH K_FROMPART
+    { $$ = FromPart($2->value); }
+| K_FROMPART arbitraryAttributes X_SLASH
+    { $$ = FromPart($2->value); }
+;
+
+
+
+
+
+/******************************************************************************
   EMPTY
 ******************************************************************************/
 
@@ -507,7 +574,7 @@ tEmpty:
 ******************************************************************************/
 
 tInvoke:
-  K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations X_SLASH K_INVOKE
+  K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations tToParts tFromParts X_SLASH K_INVOKE
     { $$ = Invoke($4, $5, $2->value); }
 | K_INVOKE arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
@@ -520,7 +587,7 @@ tInvoke:
 ******************************************************************************/
 
 tReceive:
-  K_RECEIVE arbitraryAttributes X_NEXT standardElements tCorrelations X_SLASH K_RECEIVE
+  K_RECEIVE arbitraryAttributes X_NEXT standardElements tCorrelations tFromParts X_SLASH K_RECEIVE
     { $$ = Receive($4, $5, $2->value); }
 | K_RECEIVE arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
@@ -533,7 +600,7 @@ tReceive:
 ******************************************************************************/
 
 tReply:
-  K_REPLY arbitraryAttributes X_NEXT standardElements tCorrelations X_SLASH K_REPLY
+  K_REPLY arbitraryAttributes X_NEXT standardElements tCorrelations tToParts X_SLASH K_REPLY
     { $$ = Reply($4, $5, $2->value); }
 | K_REPLY arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
@@ -602,15 +669,40 @@ tTo:
 
 
 /******************************************************************************
+  VALIDATE                                                       (WS-BPEL 2.0)
+******************************************************************************/
+
+tValidate:
+  K_VALIDATE arbitraryAttributes X_NEXT standardElements X_SLASH K_VALIDATE
+    { $$ = Validate($4, $2->value); }
+| K_VALIDATE arbitraryAttributes X_SLASH
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
+      $$ = Validate(noLinks, $2->value); }
+;
+
+
+/******************************************************************************
   WAIT
 ******************************************************************************/
 
 tWait:
   K_WAIT arbitraryAttributes X_NEXT standardElements X_SLASH K_WAIT
     { $$ = Wait($4, $2->value); }
+| K_WAIT arbitraryAttributes X_NEXT tFor standardElements X_SLASH K_WAIT
+    { $$ = Wait($5, $2->value); }
+| K_WAIT arbitraryAttributes X_NEXT tUntil standardElements X_SLASH K_WAIT
+    { $$ = Wait($5, $2->value); }
 | K_WAIT arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       $$ = Wait(noLinks, $2->value); }
+;
+
+tFor:
+  K_FOR arbitraryAttributes X_CLOSE constant X_OPEN X_SLASH K_FOR X_NEXT
+;
+
+tUntil:
+  K_UNTIL arbitraryAttributes X_CLOSE constant X_OPEN X_SLASH K_UNTIL X_NEXT
 ;
 
 
@@ -641,7 +733,7 @@ tCompensate:
 
 
 /******************************************************************************
-  TERMINATE
+  TERMINATE                                                      (BPEL4WS 1.1)
 ******************************************************************************/
 
 tTerminate:
@@ -654,7 +746,7 @@ tTerminate:
 
 
 /******************************************************************************
-  EXIT
+  EXIT                                                           (WS-BPEL 2.0)
 ******************************************************************************/
 
 tExit:
@@ -705,7 +797,7 @@ tLink:
 
 
 /******************************************************************************
-  SWITCH
+  SWITCH                                                         (BPEL4WS 1.1)
 ******************************************************************************/
 
 tSwitch:
@@ -734,7 +826,7 @@ tOtherwise:
 
 
 /******************************************************************************
-  IF
+  IF                                                             (WS-BPEL 2.0)
 ******************************************************************************/
 
 tIf:
@@ -776,12 +868,49 @@ tWhile:
 
 
 /******************************************************************************
+  REPEATUNTIL                                                    (WS-BPEL 2.0)
+******************************************************************************/
+
+tRepeatUntil:
+  K_REPEATUNTIL arbitraryAttributes X_NEXT standardElements activity tCondition X_NEXT X_SLASH K_REPEATUNTIL
+    { $$ = RepeatUntil($4, $5, $2->value); }
+;
+
+
+/******************************************************************************
   SEQUENCE
 ******************************************************************************/
 
 tSequence:
   K_SEQUENCE arbitraryAttributes X_NEXT standardElements activity_list X_SLASH K_SEQUENCE
     { $$ = Sequence($4, $5, $2->value); }
+;
+
+
+/******************************************************************************
+  FOREACH                                                        (WS-BPEL 2.0)
+******************************************************************************/
+
+tForEach:
+  K_FOREACH arbitraryAttributes X_NEXT standardElements tStartCounterValue tFinalCounterValue tCompletionCondition tScope X_SLASH K_FOREACH
+    { $$ = ForEach($4, $8, $2->value); }
+;
+
+tStartCounterValue:
+  K_STARTCOUNTERVALUE arbitraryAttributes X_CLOSE constant X_OPEN X_SLASH K_STARTCOUNTERVALUE X_NEXT
+;
+
+tFinalCounterValue:
+  K_FINALCOUNTERVALUE arbitraryAttributes X_CLOSE constant X_OPEN X_SLASH K_FINALCOUNTERVALUE X_NEXT
+;
+
+tCompletionCondition:
+  /* empty */
+| K_COMPLETIONCONDITION X_NEXT tBranches X_SLASH K_COMPLETIONCONDITION X_NEXT
+;
+
+tBranches:
+  K_BRANCHES arbitraryAttributes X_CLOSE constant X_OPEN X_SLASH K_BRANCHES X_NEXT
 ;
 
 

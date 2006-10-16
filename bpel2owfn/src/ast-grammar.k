@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/16 09:15:04 $
+ *          - last changed: \$Date: 2006/10/16 12:18:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.112 $
+ * \version \$Revision: 1.113 $
  */
 %}
 
@@ -73,7 +73,7 @@ using std::cerr;
 using std::endl;
 using std::map;
 
-typedef map<string, string> stringMap;
+typedef std::map<string, string> stringMap;
 
 %}
 
@@ -121,12 +121,15 @@ activity:
 | activityReply(tReply)
 | activityAssign(tAssign)
 | activityWait(tWait)
+| activityValidate(tValidate)
 | activityThrow(tThrow)
 | activityTerminate(tTerminate)
 | activityFlow(tFlow)
 | activitySwitch(tSwitch)
 | activityWhile(tWhile)
+| activityRepeatUntil(tRepeatUntil)
 | activitySequence(tSequence)
+| activityForEach(tForEach)
 | activityPick(tPick)
 | activityScope(tScope)
 | activityCompensate(tCompensate)
@@ -141,12 +144,15 @@ activity:
 %ctor activityReply()		{ id = tReply_1->id; }
 %ctor activityAssign()		{ id = tAssign_1->id; }
 %ctor activityWait()		{ id = tWait_1->id; }
+%ctor activityValidate()	{ id = tValidate_1->id; }
 %ctor activityThrow()		{ id = tThrow_1->id; }
 %ctor activityTerminate()	{ id = tTerminate_1->id; }
 %ctor activityFlow()		{ id = tFlow_1->id; }
 %ctor activitySwitch()		{ id = tSwitch_1->id; }
 %ctor activityWhile()		{ id = tWhile_1->id; }
+%ctor activityRepeatUntil()	{ id = tRepeatUntil_1->id; }
 %ctor activitySequence()	{ id = tSequence_1->id; }
+%ctor activityForEach()		{ id = tForEach_1->id; }
 %ctor activityPick()		{ id = tPick_1->id; }
 %ctor activityScope()		{ id = tScope_1->id; }
 %ctor activityCompensate()	{ id = tCompensate_1->id; }
@@ -427,6 +433,52 @@ tCorrelation:
   ASTEmap[id] = new ASTE(id, K_CORRELATION); }
 
 
+/******************************************************************************
+  TOPARTS                                                        (WS-BPEL 2.0)
+******************************************************************************/
+
+tToPart_list:
+  list tToPart
+;
+
+tToPart:
+  ToPart()
+  {
+    int id;
+    stringMap attributes;
+  }
+;
+
+%ctor ToPart(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_TOPART); }
+
+
+/******************************************************************************
+  FROMPARTS                                                      (WS-BPEL 2.0)
+******************************************************************************/
+
+tFromPart_list:
+  list tFromPart
+;
+
+tFromPart:
+  FromPart()
+  {
+    int id;
+    stringMap attributes;
+  }
+;
+
+%ctor FromPart(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_FROMPART); }
+
+
+
+
 
 /******************************************************************************
   EMPTY
@@ -601,6 +653,27 @@ tTo:
 
 
 /******************************************************************************
+  VALIDATE                                                       (WS-BPEL 2.0)
+******************************************************************************/
+
+tValidate:
+  Validate(standardElements)
+  {
+    int id;
+    stringMap attributes;
+
+    int negativeControlFlow = 0;
+    bool suppressJF = false;
+  }
+;
+
+%ctor Validate(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_VALIDATE); }
+
+
+/******************************************************************************
   WAIT
 ******************************************************************************/
 
@@ -618,8 +691,7 @@ tWait:
 ;
 
 %ctor Wait(int myid = 0)
-{ cerr << "called Wait(int)" << endl; 
-  id = myid;
+{ id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_WAIT); }
 
@@ -812,6 +884,27 @@ tWhile:
 
 
 /******************************************************************************
+  REPEATUNTIL                                                    (WS-BPEL 2.0)
+******************************************************************************/
+
+tRepeatUntil:
+  RepeatUntil(standardElements activity)
+  {
+    int id;
+    stringMap attributes;
+
+    int negativeControlFlow = 0;
+    bool suppressJF = false;
+  }
+;
+
+%ctor RepeatUntil(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_REPEATUNTIL); }
+
+
+/******************************************************************************
   SEQUENCE
 ******************************************************************************/
 
@@ -830,6 +923,27 @@ tSequence:
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_SEQUENCE); }
+
+
+/******************************************************************************
+  FOREACH                                                       (WS-BPEL 2.0)
+******************************************************************************/
+
+tForEach:
+  ForEach(standardElements tScope)
+  {
+    int id;
+    stringMap attributes;
+
+    int negativeControlFlow = 0;
+    bool suppressJF = false;
+  }
+;
+
+%ctor ForEach(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_FOREACH); }
 
 
 /******************************************************************************

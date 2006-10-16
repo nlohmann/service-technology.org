@@ -39,7 +39,7 @@
  *          
  * \date
  *          - created 2005-11-10
- *          - last changed: \$Date: 2006/10/16 09:57:29 $
+ *          - last changed: \$Date: 2006/10/16 12:18:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -48,7 +48,7 @@
  * \note    This file was created using Flex reading file bpel-lexic.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.37 $
+ * \version \$Revision: 1.38 $
  *
  * \todo
  *          - add rules to ignored everything non-BPEL
@@ -204,6 +204,7 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 <INITIAL>{bpwsns}?"for"			{ BEGIN(ATTRIBUTE); return K_FOR; }
 <INITIAL>{bpwsns}?"forEach"		{ BEGIN(ATTRIBUTE); return K_FOREACH; }
 <INITIAL>{bpwsns}?"from"		{ BEGIN(ATTRIBUTE); return K_FROM; }
+<INITIAL>{bpwsns}?"fromPart"		{ BEGIN(ATTRIBUTE); return K_FROMPART; }
 <INITIAL>{bpwsns}?"fromParts"		{ BEGIN(ATTRIBUTE); return K_FROMPARTS; }
 <INITIAL>{bpwsns}?"if"			{ BEGIN(ATTRIBUTE); return K_IF; }
 <INITIAL>{bpwsns}?"import"		{ BEGIN(ATTRIBUTE); return K_IMPORT; }
@@ -241,6 +242,7 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 <INITIAL>{bpwsns}?"terminationHandler"	{ BEGIN(ATTRIBUTE); return K_TERMINATIONHANDLER; }
 <INITIAL>{bpwsns}?"throw"		{ BEGIN(ATTRIBUTE); return K_THROW; }
 <INITIAL>{bpwsns}?"to"			{ BEGIN(ATTRIBUTE); return K_TO; }
+<INITIAL>{bpwsns}?"toPart"		{ BEGIN(ATTRIBUTE); return K_TOPART; }
 <INITIAL>{bpwsns}?"toParts"		{ BEGIN(ATTRIBUTE); return K_TOPARTS; }
 <INITIAL>{bpwsns}?"transitionCondition"	{ BEGIN(ATTRIBUTE); return K_TRANSITIONCONDITION; }
 <INITIAL>{bpwsns}?"until"		{ BEGIN(ATTRIBUTE); return K_UNTIL; }

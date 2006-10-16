@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/16 09:15:04 $
+ *          - last changed: \$Date: 2006/10/16 09:57:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.36 $
+ * \version \$Revision: 1.37 $
  */
 %}
 
@@ -1209,13 +1209,15 @@ Target() ->
       $0->attributes = ASTEmap[myid]->getAttributes();
 
 
+/*TODO
       // remember that that link was used as a target
       assert(ASTEmap[linkId] != NULL);
       kc::impl_tLink *theLink = (kc::impl_tLink*)(ASTEmap[linkId]->node);
       assert(theLink != NULL);
       assert(theLink->id == linkId);
-      /* here we can check whether this link was not used as target before */
+      // here we can check whether this link was not used as target before
       theLink->usedAsTarget = true;
+*/
 
       $0->linkName = $0->attributes["linkName"];
     }
@@ -1236,15 +1238,15 @@ Source() ->
       // annotate AST and check information
       $0->attributes = ASTEmap[myid]->getAttributes();
 
-
+/*TODO
       // remember that that link was used as a source
       assert(ASTEmap[linkId] != NULL);
       kc::impl_tLink *theLink = (kc::impl_tLink*)(ASTEmap[linkId]->node);
       assert(theLink != NULL);
       assert(theLink->id == linkId);
-      /* here we can check whether this link was not used as target before */
+      // here we can check whether this link was not used as target before
       theLink->usedAsSource = true;
-
+*/
 
       // add that link to the parent activity
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);

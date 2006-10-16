@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/10/12 09:13:44 $
+ *          - last changed: \$Date: 2006/10/16 09:57:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  */
 
 
@@ -82,7 +82,7 @@ extern set<string> ASTE_variables;
  * \param mynode a node of the abstract syntax tree
  * \param mytype value of the type of the node using the token values defined
  *               by flex and bison
- */
+ *
 ASTE::ASTE(kc::impl_abstract_phylum *mynode, int mytype)
 {
   assert(mynode != NULL);
@@ -139,6 +139,7 @@ ASTE::ASTE(kc::impl_abstract_phylum *mynode, int mytype)
   inWhile = false; // required initialization!
   controlFlow = POSITIVECF;
 }
+*/
 
 
 

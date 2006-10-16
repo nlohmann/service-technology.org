@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/16 09:15:04 $
+ *          - last changed: \$Date: 2006/10/16 09:57:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.236 $
+ * \version \$Revision: 1.237 $
  * 
  */
 %}
@@ -65,17 +65,7 @@
 
 
 // the terminal symbols (tokens)
-%token K_ASSIGN K_CASE K_CATCH K_CATCHALL K_COMPENSATE K_COMPENSATIONHANDLER
-%token K_COPY K_CORRELATION K_CORRELATIONS K_CORRELATIONSET K_CORRELATIONSETS
-%token K_EMPTY K_EVENTHANDLERS K_FAULTHANDLERS K_FLOW K_FROM K_IMPORT K_INVOKE
-%token K_LINK K_LINKS K_ONALARM K_ONMESSAGE K_OTHERWISE K_PARTNER K_PARTNERLINK
-%token K_PARTNERLINKS K_PARTNERS K_PICK K_PROCESS K_RECEIVE K_REPLY K_SCOPE
-%token K_SEQUENCE K_SOURCE K_SWITCH K_TARGET K_TERMINATE K_THROW K_TO
-%token K_VARIABLE K_VARIABLES K_WAIT K_WHILE
-%token X_OPEN X_SLASH X_CLOSE X_NEXT X_EQUALS QUOTE
-%token GREATEROREQUAL GREATER LESS LESSOREQUAL EQUAL NOTEQUAL VARIABLENAME NUMBER
-%token K_EXTENSION K_EXTENSIONS K_LITERAL K_QUERY K_SOURCES K_TARGETS K_TRANSITIONCONDITION K_IF K_CONDITION K_ELSE K_ELSEIF
-%token K_JOINCONDITION K_GETLINKSTATUS RBRACKET LBRACKET APOSTROPHE K_AND K_OR
+%token APOSTROPHE EQUAL GREATER GREATEROREQUAL K_AND K_ASSIGN K_BRANCHES K_CASE K_CATCH K_CATCHALL K_COMPENSATE K_COMPENSATESCOPE K_COMPENSATIONHANDLER K_COMPLETIONCONDITION K_CONDITION K_COPY K_CORRELATION K_CORRELATIONS K_CORRELATIONSET K_CORRELATIONSETS K_ELSE K_ELSEIF K_EMPTY K_EVENTHANDLERS K_EXIT K_EXTENSION K_EXTENSIONACTIVITY K_EXTENSIONASSIGNOPERATION K_EXTENSIONS K_FAULTHANDLERS K_FINALCOUNTERVALUE K_FLOW K_FOR K_FOREACH K_FROM K_FROMPARTS K_GETLINKSTATUS K_IF K_IMPORT K_INVOKE K_JOINCONDITION K_LINK K_LINKS K_LITERAL K_MESSAGEEXCHANGE K_MESSAGEEXCHANGES K_ONALARM K_ONEVENT K_ONMESSAGE K_OR K_OTHERWISE K_PARTNER K_PARTNERLINK K_PARTNERLINKS K_PARTNERS K_PICK K_PROCESS K_QUERY K_RECEIVE K_REPEATEVERY K_REPEATUNTIL K_REPLY K_RETHROW K_SCOPE K_SEQUENCE K_SOURCE K_SOURCES K_STARTCOUNTERVALUE K_SWITCH K_TARGET K_TARGETS K_TERMINATE K_TERMINATIONHANDLER K_THROW K_TO K_TOPARTS K_TRANSITIONCONDITION K_UNTIL K_VALIDATE K_VARIABLE K_VARIABLES K_WAIT K_WHILE LBRACKET LESS LESSOREQUAL NOTEQUAL NUMBER QUOTE RBRACKET VARIABLENAME X_CLOSE X_EQUALS X_NEXT X_OPEN X_SLASH
 %token <yt_casestring> X_NAME
 %token <yt_casestring> X_STRING
 
@@ -108,7 +98,6 @@
 
 #include <cassert>
 #include <map>
-#include <iostream> // for cerr
 
 #include "bpel-kc-k.h" // phylum definitions
 #include "bpel-kc-yystype.h" // data types for tokens and non-terminals
@@ -152,10 +141,15 @@ unsigned int ASTEid = 1;
 /* the types of the non-terminal symbols */
 %type <yt_activity_list> activity_list
 %type <yt_activity> activity
+%type <yt_casestring> tLiteral
+%type <yt_expression> booleanLinkCondition
 %type <yt_integer> arbitraryAttributes
+%type <yt_standardElements> standardElements
 %type <yt_tAssign> tAssign
 %type <yt_tCase_list> tCase_list
+%type <yt_tCase_list> tElseIf_list
 %type <yt_tCase> tCase
+%type <yt_tCase> tElseIf
 %type <yt_tCatch_list> tCatch_list
 %type <yt_tCatch> tCatch
 %type <yt_tCatchAll> tCatchAll
@@ -169,24 +163,20 @@ unsigned int ASTEid = 1;
 %type <yt_tCorrelationSet_list> tCorrelationSet_list
 %type <yt_tCorrelationSet_list> tCorrelationSets
 %type <yt_tCorrelationSet> tCorrelationSet
-%type <yt_tCase> tElseIf
-%type <yt_tCase_list> tElseIf_list
-%type <yt_tOtherwise> tElse
 %type <yt_tEmpty> tEmpty
 %type <yt_tEventHandlers> tEventHandlers
 %type <yt_tFaultHandlers> tFaultHandlers
 %type <yt_tFlow> tFlow
 %type <yt_tFrom> tFrom
-%type <yt_tSwitch> tIf
 %type <yt_tInvoke> tInvoke
 %type <yt_tLink_list> tLink_list
 %type <yt_tLink_list> tLinks
 %type <yt_tLink> tLink
-%type <yt_casestring> tLiteral
 %type <yt_tOnAlarm_list> tOnAlarm_list
 %type <yt_tOnAlarm> tOnAlarm
 %type <yt_tOnMessage_list> tOnMessage_list
 %type <yt_tOnMessage> tOnMessage
+%type <yt_tOtherwise> tElse
 %type <yt_tOtherwise> tOtherwise
 %type <yt_tPartner_list> tPartner_list
 %type <yt_tPartner_list> tPartners
@@ -202,10 +192,11 @@ unsigned int ASTEid = 1;
 %type <yt_tSequence> tSequence
 %type <yt_tSource_list> tSource_list
 %type <yt_tSource> tSource
-%type <yt_standardElements> standardElements
+%type <yt_tSwitch> tIf
 %type <yt_tSwitch> tSwitch
 %type <yt_tTarget_list> tTarget_list
 %type <yt_tTarget> tTarget
+%type <yt_tTerminate> tExit
 %type <yt_tTerminate> tTerminate
 %type <yt_tThrow> tThrow
 %type <yt_tTo> tTo
@@ -214,7 +205,7 @@ unsigned int ASTEid = 1;
 %type <yt_tVariable> tVariable
 %type <yt_tWait> tWait
 %type <yt_tWhile> tWhile
-%type <yt_expression> booleanLinkCondition
+
 
 
 
@@ -252,6 +243,7 @@ activity:
 | tWait		{ $$ = activityWait($1);	}
 | tThrow	{ $$ = activityThrow($1);	}
 | tTerminate	{ $$ = activityTerminate($1);	}
+| tExit		{ $$ = activityTerminate($1);	}
 | tFlow		{ $$ = activityFlow($1);	}
 | tSwitch	{ $$ = activitySwitch($1);	}
 | tIf		{ $$ = activitySwitch($1);	} /* WS-BPEL */
@@ -656,6 +648,19 @@ tTerminate:
   K_TERMINATE arbitraryAttributes X_NEXT standardElements X_SLASH K_TERMINATE
     { $$ = Terminate($4, $2->value); }
 | K_TERMINATE arbitraryAttributes X_SLASH
+    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
+      $$ = Terminate(noLinks, $2->value); }
+;
+
+
+/******************************************************************************
+  EXIT
+******************************************************************************/
+
+tExit:
+  K_EXIT arbitraryAttributes X_NEXT standardElements X_SLASH K_EXIT
+    { $$ = Terminate($4, $2->value); }
+| K_EXIT arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
       $$ = Terminate(noLinks, $2->value); }
 ;

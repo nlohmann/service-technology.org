@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/10/13 09:11:41 $
+ *          - last changed: \$Date: 2006/10/16 09:15:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.39 $
+ * \version \$Revision: 1.40 $
  */
 %}
 
@@ -189,7 +189,7 @@ Correlation() ->
   EMPTY
 ******************************************************************************/
 
-Empty(a,b) ->
+Empty(a) ->
   [xml: { inup(); } "<empty id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a { indown(); } "</empty>\n"];
 
 

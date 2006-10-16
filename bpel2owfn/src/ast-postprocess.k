@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/13 09:11:40 $
+ *          - last changed: \$Date: 2006/10/16 09:15:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.35 $
+ * \version \$Revision: 1.36 $
  */
 %}
 
@@ -458,7 +458,7 @@ Correlation() ->
   EMPTY
 ******************************************************************************/
 
-Empty(a,b) ->
+Empty(a) ->
   [postprocessing:
     {
       // manage identifiers

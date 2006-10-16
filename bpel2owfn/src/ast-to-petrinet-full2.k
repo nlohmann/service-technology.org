@@ -53,7 +53,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/13 09:11:41 $
+ *          - last changed: \$Date: 2006/10/16 09:15:05 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.29 $
+ * \version \$Revision: 1.30 $
  */
 %}
 
@@ -119,7 +119,7 @@ extern string currentScope;
  * The <empty> activity as depicted in Fig. 3.
  */
 
-This=Empty(a,b) ->
+This=Empty(a) ->
   [petrinet:
     {
       string prefix = toString(This->id) + ".internal.";

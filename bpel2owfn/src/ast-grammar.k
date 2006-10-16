@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/13 09:11:40 $
+ *          - last changed: \$Date: 2006/10/16 09:15:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.111 $
+ * \version \$Revision: 1.112 $
  */
 %}
 
@@ -92,13 +92,18 @@ tProcess:
       activity
       )
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     bool suppressJF = false;
     bool hasEH = false;
   }
 ;
+
+%ctor Process(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_PROCESS); }
 
 
 tStop:
@@ -159,12 +164,17 @@ tPartnerLink_list:
 tPartnerLink:
   PartnerLink()
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     bool inPartners = false;
   }
 ;
+
+%ctor PartnerLink(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_PARTNERLINK); }
 
 
 /******************************************************************************
@@ -178,10 +188,15 @@ tPartner_list:
 tPartner:
   Partner(tPartnerLink_list)
   {
-    int id = 0;
+    int id;
     stringMap attributes;
   }
 ;
+
+%ctor Partner(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_PARTNER); }
 
 
 /******************************************************************************
@@ -192,13 +207,24 @@ tFaultHandlers:
   userDefinedFaultHandler(tCatch_list tCatchAll)
 | implicitFaultHandler()
   {
-    int id = 0;
+    int id;
 
     bool inProcess;
     int parentScopeId;
     bool hasCatchAll; 
   }  
 ;
+
+%ctor implicitFaultHandler(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_FAULTHANDLERS); }
+
+%ctor userDefinedFaultHandler(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_FAULTHANDLERS); }
+
 
 tCatch_list:
   list tCatch
@@ -207,20 +233,37 @@ tCatch_list:
 tCatch:
   Catch(activity)
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     string variableName;
   }
 ;
 
+%ctor Catch(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_CATCH); }
+
+
 tCatchAll:
   CatchAll(activity)
 | NoCatchAll()
   {
-    int id = 0;
+    int id;
   }
 ;
+
+%ctor CatchAll(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_CATCHALL); }
+/*
+%ctor NoCatchAll(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_CATCHALL); }
+*/
 
 
 /******************************************************************************
@@ -232,10 +275,21 @@ tEventHandlers:
 | userDefinedEventHandler(tOnMessage_list tOnAlarm_list)
   {
     bool inWhile = false;
-    int id = 0;
+    int id;
     int parentScopeId;
   }
 ;
+
+%ctor implicitEventHandler(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_EVENTHANDLERS); }
+
+%ctor userDefinedEventHandler(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_EVENTHANDLERS); }
+
 
 // onMessage is called onEvent in WS-BPEL 2.0
 tOnMessage_list:
@@ -246,14 +300,10 @@ tOnAlarm_list:
   list tOnAlarm
 ;
 
-
-
-
-
 tOnMessage:
   OnMessage(activity)
   {
-    int id = 0;
+    int id;
     stringMap attributes;
     bool inWhile = false;
 
@@ -262,20 +312,24 @@ tOnMessage:
   }
 ;
 
-
-
+%ctor OnMessage(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_ONMESSAGE); }
 
 
 tOnAlarm:
   OnAlarm(activity)
   {
-    int id = 0;
+    int id;
     stringMap attributes;
   } 
 ;
 
-
-
+%ctor OnAlarm(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_ONALARM); }
 
 
 /******************************************************************************
@@ -286,7 +340,7 @@ tCompensationHandler:
   implicitCompensationHandler()
 | userDefinedCompensationHandler(activity)
   {
-    int id = 0;
+    int id;
 
     int parentScopeId;
     bool hasCompensateWithoutScope = false;
@@ -295,6 +349,17 @@ tCompensationHandler:
     bool inProcess = false;
   }
 ;
+
+%ctor implicitCompensationHandler(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_COMPENSATIONHANDLER); }
+
+%ctor userDefinedCompensationHandler(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_COMPENSATIONHANDLER); }
+
 
 /******************************************************************************
   VARIABLES
@@ -307,10 +372,15 @@ tVariable_list:
 tVariable:
   Variable()
   {
-    int id = 0;
+    int id;
     stringMap attributes;
   }
 ;
+
+%ctor Variable(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_VARIABLE); }
 
 
 /******************************************************************************
@@ -324,10 +394,15 @@ tCorrelationSet_list:
 tCorrelationSet:
   CorrelationSet()
   {
-    int id = 0;
+    int id;
     stringMap attributes;
   }
 ;
+
+%ctor CorrelationSet(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_CORRELATIONSET); }
 
 
 /******************************************************************************
@@ -341,10 +416,16 @@ tCorrelation_list:
 tCorrelation:
   Correlation()
   {
-    int id = 0;
+    int id;
     stringMap attributes;
   }
 ;
+
+%ctor Correlation(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_CORRELATION); }
+
 
 
 /******************************************************************************
@@ -352,7 +433,7 @@ tCorrelation:
 ******************************************************************************/
 
 tEmpty:
-  Empty(standardElements integer)
+  Empty(standardElements)
   {
     int id;
     stringMap attributes;
@@ -362,12 +443,7 @@ tEmpty:
   }
 ;
 
-%ctor Empty()
-{
-  cerr << "called Empty()" << endl;
-}
-
-%ctor Empty(int myid)
+%ctor Empty(int myid = 0)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_EMPTY); }
@@ -478,15 +554,21 @@ tCopy_list:
 tCopy:
   Copy(tFrom tTo)
   {
-    int id = 0;
+    int id;
     stringMap attributes;
   }
 ;
 
+%ctor Copy(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_COPY); }
+
+
 tFrom:
   From()
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     string expression;
@@ -496,15 +578,26 @@ tFrom:
   }
 ;
 
+%ctor From(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_FROM); }
+
+
 tTo:
   To()
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     string variableName;
   }
 ;
+
+%ctor To(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_TO); }
 
 
 /******************************************************************************
@@ -524,8 +617,7 @@ tWait:
   }
 ;
 
-%ctor Wait() {}
-%ctor Wait(int myid)
+%ctor Wait(int myid = 0)
 { cerr << "called Wait(int)" << endl; 
   id = myid;
   assert(ASTEmap[id] == NULL);
@@ -616,11 +708,11 @@ tFlow:
   }
 ;
 
-%ctor Flow() {}
-%ctor Flow(int myid)
+%ctor Flow(int myid = 0)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_FLOW); }
+
 
 activity_list:
   list activity 
@@ -633,13 +725,18 @@ tLink_list:
 tLink:
   Link()
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     bool usedAsSource = false;
     bool usedAsTarget = false;
   }
 ;
+
+%ctor Link(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_LINK); }
 
 
 /******************************************************************************
@@ -669,17 +766,28 @@ tCase_list:
 tCase:
   Case(activity)
   {
-    int id = 0;
+    int id;
     stringMap attributes;
   }
 ;
 
+%ctor Case(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_CASE); }
+
+
 tOtherwise:
   Otherwise(activity)
   {
-    int id = 0;
+    int id;
   }
 ;
+
+%ctor Otherwise(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_OTHERWISE); }
 
 
 /******************************************************************************
@@ -802,7 +910,7 @@ tTarget_list:
 tTarget:
   Target()
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -811,6 +919,12 @@ tTarget:
   }
 ;
 
+%ctor Target(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_TARGET); }
+
+
 tSource_list:
   list tSource
 ;
@@ -818,7 +932,7 @@ tSource_list:
 tSource:
   Source()
   {
-    int id = 0;
+    int id;
     stringMap attributes;
 
     int negativeControlFlow = 0;
@@ -826,6 +940,11 @@ tSource:
     string linkName;
   }
 ;
+
+%ctor Source(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_SOURCE); }
 
 
 joinCondition:

@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/10/12 08:47:47 $
+ *          - last changed: \$Date: 2006/10/16 09:15:05 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.37 $
+ * \version \$Revision: 1.38 $
  */
 
 
@@ -691,8 +691,7 @@ void PetriNet::owfnOut()
     (*output) << "    " << (*p)->nodeShortName();
 //    (*output) << " {$ MAX_UNIQUE_EVENTS = " << postset((*p)).size();
     if ( (*p)->inWhile )
-      (*output) << " ON_LOOP = TRUE";
-    (*output) << " $}";
+      (*output) << " {$ ON_LOOP = TRUE $}";
 
     if (count < P_in.size())
       (*output) << "," << endl;
@@ -708,8 +707,7 @@ void PetriNet::owfnOut()
     (*output) << "    " << (*p)->nodeShortName();
 //    (*output) << " {$ MAX_UNIQUE_EVENTS = " << preset((*p)).size();
     if ( (*p)->inWhile )
-      (*output) << " ON_LOOP = TRUE";
-    (*output) << " $}";
+      (*output) << " {$ ON_LOOP = TRUE $}";
     
     if (count < P_out.size())
       (*output) << "," << endl;

@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/17 19:54:02 $
+ *          - last changed: \$Date: 2006/10/17 22:01:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.119 $
+ * \version \$Revision: 1.120 $
  */
 %}
 
@@ -57,6 +57,7 @@
 
 #include "ast-details.h"
 extern map<unsigned int, ASTE*> ASTEmap;
+extern int ASTEid;
 
 %}
 
@@ -66,6 +67,7 @@ extern map<unsigned int, ASTE*> ASTEmap;
 #include <string>
 #include <iostream>
 #include <map>
+#include "debug.h"
 #include "helpers.h"
 
 using std::string;
@@ -101,10 +103,12 @@ tProcess:
   }
 ;
 
-%ctor Process() {}
+%ctor Process() { trace(TRACE_INFORMATION, "[AST]\tProcess()\n");
+                  id = integer_1->value;  }
 
 %ctor Process(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tProcess(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_PROCESS); }
 
@@ -188,10 +192,13 @@ tPartnerLink:
   }
 ;
 
-%ctor PartnerLink() {}
+%ctor PartnerLink() { trace(TRACE_INFORMATION, "[AST]\tPartnerLink()\n");
+                      id = integer_1->value; }
+
 
 %ctor PartnerLink(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tPartnerLink(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_PARTNERLINK); }
 
@@ -212,10 +219,13 @@ tPartner:
   }
 ;
 
-%ctor Partner() {}
+%ctor Partner() { trace(TRACE_INFORMATION, "[AST]\tPartner()\n");
+                  id = integer_1->value; }
+
 
 %ctor Partner(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tPartner(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_PARTNER); }
 
@@ -237,12 +247,14 @@ tFaultHandlers:
 ;
 
 %ctor implicitFaultHandler(int myid = 0)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\timplicitFaultHandler(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_FAULTHANDLERS); }
 
 %ctor userDefinedFaultHandler(int myid = 0)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tuserDefinedFaultHandler(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_FAULTHANDLERS); }
 
@@ -261,10 +273,12 @@ tCatch:
   }
 ;
 
-%ctor Catch() {}
+%ctor Catch() { trace(TRACE_INFORMATION, "[AST]\tCatch()\n");
+                id = integer_1->value; }
 
 %ctor Catch(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tCatch(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_CATCH); }
 
@@ -277,10 +291,12 @@ tCatchAll:
   }
 ;
 
-%ctor CatchAll() {}
+%ctor CatchAll() { trace(TRACE_INFORMATION, "[AST]\tCatchAll()\n");
+                   id = integer_1->value; }
 
 %ctor CatchAll(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tCatchAll(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_CATCHALL); }
 
@@ -300,12 +316,14 @@ tEventHandlers:
 ;
 
 %ctor implicitEventHandler(int myid = 0)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\timplicitEventHandler(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_EVENTHANDLERS); }
 
 %ctor userDefinedEventHandler(int myid = 0)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tuserDefinedEventHandler(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_EVENTHANDLERS); }
 
@@ -327,10 +345,12 @@ tOnMessage:
   }
 ;
 
-%ctor OnMessage() {}
+%ctor OnMessage() { trace(TRACE_INFORMATION, "[AST]\tOnMessage()\n");
+                    id = integer_1->value; }
 
 %ctor OnMessage(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tOnMessage(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_ONMESSAGE); }
 
@@ -347,10 +367,12 @@ tOnAlarm:
   } 
 ;
 
-%ctor OnAlarm() {}
+%ctor OnAlarm() { trace(TRACE_INFORMATION, "[AST]\tOnAlarm()\n");
+                  id = integer_1->value; }
 
 %ctor OnAlarm(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tOnAlarm(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_ONALARM); }
 
@@ -374,12 +396,14 @@ tCompensationHandler:
 ;
 
 %ctor implicitCompensationHandler(int myid = 0)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\timplicitCompensationHandler(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_COMPENSATIONHANDLER); }
 
 %ctor userDefinedCompensationHandler(int myid = 0)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tuserDefinedCompensationHandler(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_COMPENSATIONHANDLER); }
 
@@ -400,10 +424,12 @@ tVariable:
   }
 ;
 
-%ctor Variable() {}
+%ctor Variable() { trace(TRACE_INFORMATION, "[AST]\tVariable()\n");
+                   id = integer_1->value; }
 
 %ctor Variable(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tVariable(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_VARIABLE); }
 
@@ -424,10 +450,12 @@ tCorrelationSet:
   }
 ;
 
-%ctor CorrelationSet() {}
+%ctor CorrelationSet() { trace(TRACE_INFORMATION, "[AST]\tCorrelationSet()\n");
+                         id = integer_1->value; }
 
 %ctor CorrelationSet(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tCorrelationSet(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_CORRELATIONSET); }
 
@@ -448,10 +476,12 @@ tCorrelation:
   }
 ;
 
-%ctor Correlation() {}
+%ctor Correlation() { trace(TRACE_INFORMATION, "[AST]\tCorrelation()\n");
+                      id = integer_1->value; }
 
 %ctor Correlation(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tCorrelation(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_CORRELATION); }
 
@@ -473,7 +503,8 @@ tToPart:
 ;
 
 %ctor ToPart(int myid = 0)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tToPart(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_TOPART); }
 
@@ -495,7 +526,8 @@ tFromPart:
 ;
 
 %ctor FromPart(int myid = 0)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tFromPart(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_FROMPART); }
 
@@ -522,10 +554,12 @@ tReceive:
   }
 ;
 
-%ctor Receive() {}
+%ctor Receive() { trace(TRACE_INFORMATION, "[AST]\tReceive()\n");
+                  id = integer_1->value; }
 
 %ctor Receive(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tReceive(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_RECEIVE); }
 
@@ -549,10 +583,12 @@ tReply:
   }
 ;
 
-%ctor Reply() {}
+%ctor Reply() { trace(TRACE_INFORMATION, "[AST]\tReply()\n");
+                id = integer_1->value; }
 
 %ctor Reply(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tReply(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_REPLY); }
 
@@ -579,10 +615,12 @@ tInvoke:
   }
 ;
 
-%ctor Invoke() {}
+%ctor Invoke() { trace(TRACE_INFORMATION, "[AST]\tInvoke()\n");
+                 id = integer_1->value; }
 
 %ctor Invoke(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tInvoke(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_INVOKE); }
 
@@ -602,10 +640,12 @@ tAssign:
   }
 ;
 
-%ctor Assign() {}
+%ctor Assign() { trace(TRACE_INFORMATION, "[AST]\tAssign()\n");
+                 id = integer_1->value; }
 
 %ctor Assign(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tAssign(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_ASSIGN); }
 
@@ -621,10 +661,12 @@ tCopy:
   }
 ;
 
-%ctor Copy() {}
+%ctor Copy() { trace(TRACE_INFORMATION, "[AST]\tCopy()\n");
+               id = integer_1->value; }
 
 %ctor Copy(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tCopy(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_COPY); }
 
@@ -642,10 +684,12 @@ tFrom:
   }
 ;
 
-%ctor From() {}
+%ctor From() { trace(TRACE_INFORMATION, "[AST]\tFrom()\n");
+               id = integer_1->value; }
 
 %ctor From(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tFrom(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_FROM); }
 
@@ -660,10 +704,12 @@ tTo:
   }
 ;
 
-%ctor To() {}
+%ctor To() { trace(TRACE_INFORMATION, "[AST]\tTo()\n");
+             id = integer_1->value; }
 
 %ctor To(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tTo(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_TO); }
 
@@ -683,10 +729,12 @@ tValidate:
   }
 ;
 
-%ctor Validate() {}
+%ctor Validate() { trace(TRACE_INFORMATION, "[AST]\tValidate()\n");
+                   id = integer_1->value; }
 
 %ctor Validate(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tValidate(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_VALIDATE); }
 
@@ -706,10 +754,23 @@ tEmpty:
   }
 ;
 
-%ctor Empty() {}
+%ctor Empty()
+{
+  trace(TRACE_INFORMATION, "[AST]\tEmpty()\n");
+  if (integer_1->value == 0)
+  {
+    id = ASTEid;
+    integer_1 = mkinteger(ASTEid++);
+    assert(ASTEmap[id] == NULL);
+    ASTEmap[id] = new ASTE(id, K_EMPTY);
+  }
+  else
+    id = integer_1->value;
+}
 
 %ctor Empty(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tEmpty(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_EMPTY); }
 
@@ -731,10 +792,12 @@ tWait:
   }
 ;
 
-%ctor Wait() {}
+%ctor Wait() { trace(TRACE_INFORMATION, "[AST]\tWait()\n");
+               id = integer_1->value; }
 
 %ctor Wait(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tWait(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_WAIT); }
 
@@ -754,10 +817,12 @@ tTerminate:
   }
 ;
 
-%ctor Terminate() {}
+%ctor Terminate() { trace(TRACE_INFORMATION, "[AST]\tTerminate()\n");
+                    id = integer_1->value; }
 
 %ctor Terminate(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tTerminate(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_TERMINATE); }
 
@@ -777,10 +842,12 @@ tExit:
   }
 ;
 
-%ctor Exit() {}
+%ctor Exit() { trace(TRACE_INFORMATION, "[AST]\tExit()\n");
+               id = integer_1->value; }
 
 %ctor Exit(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tExit(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_EXIT); }
 
@@ -802,10 +869,12 @@ tThrow:
   }
 ;
 
-%ctor Throw() {}
+%ctor Throw() { trace(TRACE_INFORMATION, "[AST]\tThrow()\n");
+                id = integer_1->value; }
 
 %ctor Throw(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tThrow(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_THROW); }
 
@@ -827,10 +896,12 @@ tRethrow:
   }
 ;
 
-%ctor Rethrow() {}
+%ctor Rethrow() { trace(TRACE_INFORMATION, "[AST]\tRethrow()\n");
+                  id = integer_1->value; }
 
 %ctor Rethrow(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tRethrow(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_RETHROW); }
 
@@ -854,10 +925,12 @@ tCompensate:
   }
 ;
 
-%ctor Compensate() {}
+%ctor Compensate() { trace(TRACE_INFORMATION, "[AST]\tCompensate()\n");
+                     id = integer_1->value; }
 
 %ctor Compensate(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tCompensate(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_COMPENSATE); }
 
@@ -881,10 +954,12 @@ tCompensateScope:
   }
 ;
 
-%ctor CompensateScope() {}
+%ctor CompensateScope() { trace(TRACE_INFORMATION, "[AST]\tCompensateScope()\n");
+                          id = integer_1->value; }
 
 %ctor CompensateScope(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tCompensateScope(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_COMPENSATESCOPE); }
 
@@ -904,10 +979,12 @@ tSequence:
   }
 ;
 
-%ctor Sequence() {}
+%ctor Sequence() { trace(TRACE_INFORMATION, "[AST]\tSequence()\n");
+                 id = integer_1->value; }
 
 %ctor Sequence(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tSequence(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_SEQUENCE); }
 
@@ -927,10 +1004,12 @@ tSwitch:
   }
 ;
 
-%ctor Switch() {}
+%ctor Switch() { trace(TRACE_INFORMATION, "[AST]\tSwitch()\n");
+                 id = integer_1->value; }
 
 %ctor Switch(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tSwitch(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_SWITCH); }
 
@@ -940,28 +1019,48 @@ tCase_list:
 ;
 
 tCase:
-  Case(activity)
+  Case(activity integer)
   {
     int id;
     stringMap attributes;
   }
 ;
 
-%ctor Case(int myid = 0)
-{ id = myid;
+%ctor Case() { trace(TRACE_INFORMATION, "[AST]\tCase()\n");
+               id = integer_1->value; }
+
+%ctor Case(int myid)
+{ trace(TRACE_INFORMATION, "[AST]\tCase(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_CASE); }
 
 
 tOtherwise:
-  Otherwise(activity)
+  Otherwise(activity integer)
+| NoOtherwise()
   {
     int id;
   }
 ;
 
-%ctor Otherwise(int myid = 0)
-{ id = myid;
+%ctor Otherwise()
+{
+  trace(TRACE_INFORMATION, "[AST]\tOtherwise()\n");
+  if (integer_1->value == 0)
+  {
+    id = ASTEid;
+    integer_1 = mkinteger(ASTEid++);
+    assert(ASTEmap[id] == NULL);
+    ASTEmap[id] = new ASTE(id, K_OTHERWISE);
+  }
+  else
+    id = integer_1->value;
+}
+
+%ctor Otherwise(int myid)
+{ trace(TRACE_INFORMATION, "[AST]\tOtherwise(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_OTHERWISE); }
 
@@ -982,7 +1081,8 @@ tIf:
 ;
 
 %ctor If(int myid = 0)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tIf(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_IF); }
 
@@ -1000,7 +1100,8 @@ tElseIf:
 ;
 
 %ctor ElseIf(int myid = 0)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tElseIf(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_ELSEIF); }
 
@@ -1013,7 +1114,8 @@ tElse:
 ;
 
 %ctor Else(int myid = 0)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tElse(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_ELSE); }
 
@@ -1033,10 +1135,12 @@ tWhile:
   }
 ;
 
-%ctor While() {}
+%ctor While() { trace(TRACE_INFORMATION, "[AST]\tWhile()\n");
+                id = integer_1->value; }
 
 %ctor While(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tWhile(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_WHILE); }
 
@@ -1056,10 +1160,12 @@ tRepeatUntil:
   }
 ;
 
-%ctor RepeatUntil() {}
+%ctor RepeatUntil() { trace(TRACE_INFORMATION, "[AST]\tRepeatUntil()\n");
+                      id = integer_1->value; }
 
 %ctor RepeatUntil(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tRepeatUntil(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_REPEATUNTIL); }
 
@@ -1079,10 +1185,12 @@ tForEach:
   }
 ;
 
-%ctor ForEach() {}
+%ctor ForEach() { trace(TRACE_INFORMATION, "[AST]\tForEach()\n");
+                  id = integer_1->value; }
 
 %ctor ForEach(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tForEach(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_FOREACH); }
 
@@ -1102,10 +1210,12 @@ tPick:
   }
 ;
 
-%ctor Pick() {}
+%ctor Pick() { trace(TRACE_INFORMATION, "[AST]\tPick()\n");
+               id = integer_1->value; }
 
 %ctor Pick(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tPick(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_PICK); }
 
@@ -1125,10 +1235,12 @@ tFlow:
   }
 ;
 
-%ctor Flow() {}
+%ctor Flow() { trace(TRACE_INFORMATION, "[AST]\tFlow()\n");
+               id = integer_1->value; }
 
 %ctor Flow(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tFlow(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_FLOW); }
 
@@ -1152,10 +1264,12 @@ tLink:
   }
 ;
 
-%ctor Link() {}
+%ctor Link() { trace(TRACE_INFORMATION, "[AST]\tLink()\n");
+               id = integer_1->value; }
 
 %ctor Link(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tLink(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_LINK); }
 
@@ -1188,10 +1302,12 @@ tScope:
   }
 ;
 
-%ctor Scope() {}
+%ctor Scope() { trace(TRACE_INFORMATION, "[AST]\tScope()\n");
+                id = integer_1->value;  }
 
 %ctor Scope(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tScope(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_SCOPE); }
 
@@ -1211,12 +1327,14 @@ tTerminationHandler:
 ;
 
 %ctor implicitTerminationHandler(int myid = 0)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\timplicitTerminationHandler(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_TERMINATIONHANDLER); }
 
 %ctor userDefinedTerminationHandler(int myid = 0)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tuserDefinedTerminationHandler(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_TERMINATIONHANDLER); }
 
@@ -1258,10 +1376,12 @@ tTarget:
   }
 ;
 
-%ctor Target() {}
+%ctor Target() { trace(TRACE_INFORMATION, "[AST]\tTarget()\n");
+                 id = integer_1->value; }
 
 %ctor Target(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tTarget(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_TARGET); }
 
@@ -1282,10 +1402,12 @@ tSource:
   }
 ;
 
-%ctor Source() {}
+%ctor Source() { trace(TRACE_INFORMATION, "[AST]\tSource()\n");
+                 id = integer_1->value; }
 
 %ctor Source(int myid)
-{ id = myid;
+{ trace(TRACE_INFORMATION, "[AST]\tSource(" + toString(myid) + ")\n");
+  id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_SOURCE); }
 

@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/17 19:54:02 $
+ *          - last changed: \$Date: 2006/10/17 22:01:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.40 $
+ * \version \$Revision: 1.41 $
  */
 %}
 
@@ -871,7 +871,7 @@ Link(a) ->
   SWITCH
 ******************************************************************************/
 
-Switch(a,b,c=Otherwise(d),e) ->
+Switch(a,b,c,_id) ->
   [postprocessing:
     {
       // manage identifiers
@@ -903,9 +903,18 @@ Switch(a,b,c=Otherwise(d),e) ->
         ASTEmap[innerActivity->id]->parentActivityId = myid;
         ASTEmap[innerActivity->id]->controlFlow = ASTEmap[myid]->controlFlow;
       }
-      assert(ASTEmap[d->id] != NULL);
-      ASTEmap[d->id]->parentActivityId = myid;
-      ASTEmap[d->id]->controlFlow = ASTEmap[myid]->controlFlow;
+
+      // process Otherwise-branch
+      with(c)
+      {
+        c=Otherwise(d,e):
+        { 
+          assert(ASTEmap[d->id] != NULL);
+          ASTEmap[d->id]->parentActivityId = myid;
+          ASTEmap[d->id]->controlFlow = ASTEmap[myid]->controlFlow;
+        }
+        default: { /* do nothing */ }
+      }
     }
     a b c
     {
@@ -915,13 +924,21 @@ Switch(a,b,c=Otherwise(d),e) ->
         assert(ASTEmap[innerActivity->id] != NULL);
         ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
       }
-      assert(ASTEmap[d->id] != NULL);
-      ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[d->id]->enclosedSourceLinks);
+
+      with(c)
+      {
+        c=Otherwise(d,e):
+        {
+          assert(ASTEmap[d->id] != NULL);
+          ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[d->id]->enclosedSourceLinks);
+        }
+        default: { /* do nothing */ }
+      }
     }
   ]
 ;
 
-Case(a) ->
+Case(a,b) ->
   [postprocessing:
     {
       int myid = $0->id;
@@ -935,7 +952,7 @@ Case(a) ->
   ]
 ;
 
-Otherwise(a) ->
+Otherwise(a,b) ->
   [postprocessing:
     {
       int myid = $0->id;

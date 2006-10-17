@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/10/13 09:11:41 $
+ *          - last changed: \$Date: 2006/10/17 22:01:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.103 $
+ * \version \$Revision: 1.104 $
  *
  */
 
@@ -158,7 +158,11 @@ int main( int argc, char *argv[])
 	  trace(TRACE_INFORMATION," + Closing input file: " + filename + "\n");
 	  fclose(yyin);
 	}
- 
+
+	trace(TRACE_INFORMATION, "Rewriting...\n");
+        TheProcess = TheProcess->rewrite(kc::implicit);
+	trace(TRACE_INFORMATION, "Rewriting complete...\n");
+
 	trace(TRACE_INFORMATION, "Postprocessing...\n");
 	TheProcess->unparse(kc::printer, kc::postprocessing);
 	trace(TRACE_INFORMATION, "Postprocessing complete...\n");
@@ -227,10 +231,7 @@ int main( int argc, char *argv[])
     {
       trace(TRACE_INFORMATION, "-> Printing AST ...\n");
       TheProcess->print();
-      TheProcess = TheProcess->rewrite(kc::test);
-      TheProcess->print();
     }
-
 
 
 

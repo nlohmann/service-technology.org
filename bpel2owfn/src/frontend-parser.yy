@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/17 19:54:02 $
+ *          - last changed: \$Date: 2006/10/17 22:01:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.245 $
+ * \version \$Revision: 1.246 $
  * 
  */
 %}
@@ -856,13 +856,15 @@ tCase_list:
 
 tCase:
   K_CASE arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CASE
-    { $$ = Case($4, $2->value); }
+    { $$ = Case($4, $2, $2->value); }
 ;
 
 
 tOtherwise:
-  K_OTHERWISE X_NEXT activity X_NEXT X_SLASH K_OTHERWISE X_NEXT
-    { $$ = Otherwise($3, ASTEid++); }
+  /* empty */
+    { $$ = NoOtherwise(); }
+| K_OTHERWISE arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_OTHERWISE X_NEXT
+    { $$ = Otherwise($4, $2, $2->value); }
 ;
 
 

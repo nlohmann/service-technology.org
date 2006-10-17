@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/10/17 19:54:02 $
+ *          - last changed: \$Date: 2006/10/17 22:01:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.30 $
+ * \version \$Revision: 1.31 $
  */
 %}
 
@@ -554,7 +554,7 @@ Flow(a,b,c,d) ->
   SWITCH
 ******************************************************************************/
 
-This=Switch(a,b,Otherwise(c),d) ->
+This=Switch(a,b,Otherwise(c,d),e) ->
   [cfg: {
 	  trace(TRACE_DEBUG, "[CFG] Switch\n");
 	  CFGBlock * firstBlock = new CFGBlock(CFGSwitch, $0->id, "Switch_begin"); 

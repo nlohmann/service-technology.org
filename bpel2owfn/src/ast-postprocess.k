@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/17 14:14:30 $
+ *          - last changed: \$Date: 2006/10/17 18:52:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.38 $
+ * \version \$Revision: 1.39 $
  */
 %}
 
@@ -99,7 +99,7 @@ unsigned int PPcurrentScope = 0;
   PROCESS
 ******************************************************************************/
 
-Process(a,b,c,d,e,f,g,h,i) ->
+Process(a,b,c,d,e,f,g,h,i,j) ->
   [postprocessing:
     {
       // manage identifiers
@@ -458,7 +458,7 @@ Correlation() ->
   EMPTY
 ******************************************************************************/
 
-Empty(a) ->
+Empty(a,b) ->
   [postprocessing:
     {
       // manage identifiers
@@ -488,7 +488,7 @@ Empty(a) ->
   INVOKE
 ******************************************************************************/
 
-Invoke(a,b) ->
+Invoke(a,b,c) ->
   [postprocessing:
     {
       // manage identifiers
@@ -525,7 +525,7 @@ Invoke(a,b) ->
   RECEIVE
 ******************************************************************************/
 
-Receive(a,b) ->
+Receive(a,b,c) ->
   [postprocessing:
     {
       // manage identifiers
@@ -560,7 +560,7 @@ Receive(a,b) ->
   REPLY
 ******************************************************************************/
 
-Reply(a,b) ->
+Reply(a,b,c) ->
   [postprocessing:
     {
       // manage identifiers
@@ -595,7 +595,7 @@ Reply(a,b) ->
   ASSIGN
 ******************************************************************************/
 
-Assign(a,b) ->
+Assign(a,b,c) ->
   [postprocessing:
     {
       // manage identifiers
@@ -656,7 +656,7 @@ To() ->
   WAIT
 ******************************************************************************/
 
-Wait(a) ->
+Wait(a,b) ->
   [postprocessing:
     {
       // manage identifiers
@@ -689,7 +689,7 @@ Wait(a) ->
   THROW
 ******************************************************************************/
 
-Throw(a) ->
+Throw(a,b) ->
   [postprocessing:
     {
       // manage identifiers
@@ -719,7 +719,7 @@ Throw(a) ->
   COMPENSATE
 ******************************************************************************/
 
-Compensate(a) ->
+Compensate(a,b) ->
   [postprocessing:
     {
       // manage identifiers
@@ -759,7 +759,7 @@ Compensate(a) ->
   TERMINATE
 ******************************************************************************/
 
-Terminate(a) ->
+Terminate(a,b) ->
   [postprocessing:
     {
       // manage identifiers
@@ -789,7 +789,7 @@ Terminate(a) ->
   FLOW
 ******************************************************************************/
 
-Flow(a,b,c) ->
+Flow(a,b,c,d) ->
   [postprocessing:
     {
       // manage identifiers
@@ -947,7 +947,7 @@ Otherwise(a) ->
   WHILE
 ******************************************************************************/
 
-While(a,b) ->
+While(a,b,c) ->
   [postprocessing:
     {
       // manage identifiers
@@ -989,7 +989,7 @@ While(a,b) ->
   SEQUENCE
 ******************************************************************************/
 
-Sequence(a,b) ->
+Sequence(a,b,c) ->
   [postprocessing:
     {
       // manage identifiers
@@ -1100,7 +1100,7 @@ Pick(a,b,c) ->
   SCOPE
 ******************************************************************************/
 
-Scope(a,b,c,d,e,f,g,h) ->
+Scope(a,b,c,d,e,f,g,h,i) ->
   [postprocessing:
     {
       // manage identifiers

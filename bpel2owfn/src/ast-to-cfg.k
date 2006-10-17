@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/10/17 14:14:31 $
+ *          - last changed: \$Date: 2006/10/17 18:52:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.28 $
+ * \version \$Revision: 1.29 $
  */
 %}
 
@@ -89,7 +89,7 @@ map <std::string, CFGBlock *> cfgMap;
   PROCESS
 ******************************************************************************/
 
-Process(a,b,c,d,e,f,g,h,i) ->
+Process(a,b,c,d,e,f,g,h,i,j) ->
   [cfg: {
           // reset data structures
 	  cfgMap = map<std::string, CFGBlock *>();
@@ -348,7 +348,7 @@ implicitCompensationHandler() ->
   EMPTY
 ******************************************************************************/
 
-Empty(a) ->
+Empty(a,b) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Empty\n");
 	  CFGBlock * block = new CFGBlock(CFGEmpty, $0->id, "Empty"); 
@@ -363,7 +363,7 @@ Empty(a) ->
   INVOKE
 ******************************************************************************/
 
-Invoke(a,b) ->
+Invoke(a,b,c) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Invoke\n");
 	  CFGBlock * block = new CFGBlock(CFGInvoke, $0->id, "Invoke");
@@ -382,7 +382,7 @@ Invoke(a,b) ->
   RECEIVE
 ******************************************************************************/
 
-Receive(a,b) ->
+Receive(a,b,c) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Receive\n");
 	  CFGBlock * block = new CFGBlock(CFGReceive, $0->id, "Receive"); 
@@ -401,7 +401,7 @@ Receive(a,b) ->
   REPLY
 ******************************************************************************/
 
-Reply(a,b) ->
+Reply(a,b,c) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Reply\n");
 	  CFGBlock * block = new CFGBlock(CFGReply, $0->id, "Reply"); 
@@ -420,7 +420,7 @@ Reply(a,b) ->
   ASSIGN
 ******************************************************************************/
 
-Assign(a,b) ->
+Assign(a,b,c) ->
   [cfg: {
 	  trace(TRACE_DEBUG, "[CFG] Assign\n");
 	  CFGBlock * firstBlock = new CFGBlock(CFGAssign, $0->id, "Assign_begin"); 
@@ -456,7 +456,7 @@ Assign(a,b) ->
   WAIT
 ******************************************************************************/
 
-Wait(a) ->
+Wait(a,b) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Wait\n");
 	  CFGBlock * block = new CFGBlock(CFGWait, $0->id, "Wait"); 
@@ -472,7 +472,7 @@ Wait(a) ->
   THROW
 ******************************************************************************/
 
-Throw(a) ->
+Throw(a,b) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Throw\n");
 	  CFGBlock * block = new CFGBlock(CFGThrow, $0->id, "Throw"); 
@@ -488,7 +488,7 @@ Throw(a) ->
   COMPENSATE
 ******************************************************************************/
 
-Compensate(a) ->
+Compensate(a,b) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Compensate\n");
 	  CFGBlock * block = new CFGBlock(CFGCompensate, $0->id, "Compensate"); 
@@ -504,7 +504,7 @@ Compensate(a) ->
   TERMINATE
 ******************************************************************************/
 
-Terminate(a) ->
+Terminate(a,b) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Terminate\n");
 	  CFGBlock * block = new CFGBlock(CFGTerminate, $0->id, "Terminate"); 
@@ -520,7 +520,7 @@ Terminate(a) ->
   FLOW
 ******************************************************************************/
 
-Flow(a,b,c) ->
+Flow(a,b,c,d) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Flow\n");
 	  CFGBlock * firstBlock = new CFGBlock(CFGFlow, $0->id, "Flow_begin"); 
@@ -601,7 +601,7 @@ This=Switch(a,b,Otherwise(c)) ->
   WHILE
 ******************************************************************************/
 
-While(a,b) ->
+While(a,b,c) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] While\n");
 	  CFGBlock * block = new CFGBlock(CFGWhile, $0->id, "While"); 
@@ -625,7 +625,7 @@ While(a,b) ->
   SEQUENCE
 ******************************************************************************/
 
-Sequence(a,b) ->
+Sequence(a,b,c) ->
   [cfg: {
 	  trace(TRACE_DEBUG, "[CFG] Sequence\n");
 	  CFGBlock * firstBlock = new CFGBlock(CFGSequence, $0->id, "Sequence_begin"); 
@@ -708,7 +708,7 @@ Pick(a,b,c) ->
   SCOPE
 ******************************************************************************/
 
-Scope(a,b,c,d,e,f,g,h) ->
+Scope(a,b,c,d,e,f,g,h,i) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Scope\n");
 	  CFGBlock * firstBlock = new CFGBlock(CFGScope, $0->id, "Scope_begin"); 

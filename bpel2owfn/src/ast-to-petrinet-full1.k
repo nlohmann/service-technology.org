@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/17 13:48:16 $
+ *          - last changed: \$Date: 2006/10/17 18:52:10 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.195 $
+ * \version \$Revision: 1.196 $
  *
  */
 %}
@@ -108,7 +108,7 @@ string currentScope;
  * handler are merged.
  */
 
-This=Process(a,b,c,d,e,f,g,h,i) ->
+This=Process(a,b,c,d,e,f,g,h,i,j) ->
   [petrinet:
     {
       trace(TRACE_INFORMATION, "Generating Petri net...\n");

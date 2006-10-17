@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/10/17 14:14:31 $
+ *          - last changed: \$Date: 2006/10/17 18:52:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.41 $
+ * \version \$Revision: 1.42 $
  */
 %}
 
@@ -70,7 +70,7 @@
 
 
 
-Process(a,b,c,d,e,f,g,h,i) ->
+Process(a,b,c,d,e,f,g,h,i,j) ->
   [xml: { inup(); } "<process id=\"" $0->id "\">\n" 
   
   { if (a->length() == 0) }
@@ -189,7 +189,7 @@ Correlation() ->
   EMPTY
 ******************************************************************************/
 
-Empty(a) ->
+Empty(a,b) ->
   [xml: { inup(); } "<empty id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a { indown(); } "</empty>\n"];
 
 
@@ -197,7 +197,7 @@ Empty(a) ->
   INVOKE
 ******************************************************************************/
 
-Invoke(a,b) ->
+Invoke(a,b,c) ->
   [xml: { inup(); } "<invoke id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a b { indown(); } "</invoke>\n"]
 ;
 
@@ -206,7 +206,7 @@ Invoke(a,b) ->
   RECEIVE
 ******************************************************************************/
 
-Receive(a,b) ->
+Receive(a,b,c) ->
   [xml: { inup(); } "<receive id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a b { indown(); } "</receive>\n"]
 ;
 
@@ -215,7 +215,7 @@ Receive(a,b) ->
   REPLY
 ******************************************************************************/
 
-Reply(a,b) ->
+Reply(a,b,c) ->
   [xml: { inup(); } "<reply id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a b { indown(); } "</reply>\n"]
 ;
 
@@ -224,7 +224,7 @@ Reply(a,b) ->
   ASSIGN
 ******************************************************************************/
 
-Assign(a,b) ->
+Assign(a,b,c) ->
   [xml: { inup(); } "<assign id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a b { indown(); } "</assign>\n"]
 ;
 
@@ -245,7 +245,7 @@ To() ->
   WAIT
 ******************************************************************************/
 
-Wait(a) ->
+Wait(a,b) ->
   [xml: { inup(); } "<wait id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a { indown(); } "</wait>\n"]
 ;
 
@@ -254,7 +254,7 @@ Wait(a) ->
   THROW
 ******************************************************************************/
 
-Throw(a) ->
+Throw(a,b) ->
   [xml: { inup(); } "<throw id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a { indown(); } "</throw>\n"]
 ;
 
@@ -263,7 +263,7 @@ Throw(a) ->
   COMPENSATE
 ******************************************************************************/
 
-Compensate(a) ->
+Compensate(a,b) ->
   [xml: { inup(); } "<compensate id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a { indown(); } "</compensate>\n"]
 ;
 
@@ -272,7 +272,7 @@ Compensate(a) ->
   TERMINATE
 ******************************************************************************/
 
-Terminate(a) ->
+Terminate(a,b) ->
   [xml: { inup(); } "<terminate id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a { indown(); } "</terminate>\n"]
 ;
 
@@ -281,11 +281,11 @@ Terminate(a) ->
   FLOW
 ******************************************************************************/
 
-Flow(a,NiltLink_list(),c) ->
+Flow(a,NiltLink_list(),c,d) ->
   [xml: { inup(); } "<flow id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a c { indown(); } "</flow>\n"]
 ;
 
-Flow(a,b,c) ->
+Flow(a,b,c,d) ->
   [xml: { inup(); } "<flow id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a { inup(); } "<links>\n" b { indown(); } "</links>\n" c { indown(); } "</flow>\n"]
 ;
 
@@ -315,7 +315,7 @@ Otherwise(a) ->
   WHILE
 ******************************************************************************/
 
-While(a,b) ->
+While(a,b,c) ->
   [xml: { inup(); } "<while id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a b { indown(); } "</while>\n"]
 ;
 
@@ -324,7 +324,7 @@ While(a,b) ->
   SEQUENCE
 ******************************************************************************/
 
-Sequence(a,b) ->
+Sequence(a,b,c) ->
   [xml: { inup(); } "<sequence id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a b { indown(); } "</sequence>\n"]
 ;
 
@@ -342,7 +342,7 @@ Pick(a,b,c) ->
   SCOPE
 ******************************************************************************/
 
-Scope(a,b,c,d,e,f,g,h) ->
+Scope(a,b,c,d,e,f,g,h,i) ->
   [xml: { inup(); } "<scope id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" 
   
   a

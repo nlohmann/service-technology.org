@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/17 14:14:31 $
+ *          - last changed: \$Date: 2006/10/17 18:52:10 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
  *
  */
 %}
@@ -98,7 +98,7 @@ extern PetriNet *TheNet;
  * handler are merged.
  */
 
-This=Process(a,b,c,d,e,f,g,h,i) ->
+This=Process(a,b,c,d,e,f,g,h,i,j) ->
   [petrinetsmall:
     {
       trace(TRACE_INFORMATION, "Generating Petri net...\n");
@@ -240,7 +240,7 @@ This=userDefinedEventHandler(a,b) ->
  * The <empty> activity as depicted in Fig. 3.
  */
 
-This=Empty(a) ->
+This=Empty(a,b) ->
   [petrinetsmall:
     {
       string prefix = toString(This->id) + ".internal.";
@@ -268,7 +268,7 @@ This=Empty(a) ->
   INVOKE
 ******************************************************************************/
 
-This=Invoke(a,b) provided (!This->isSynchronousInvoke) ->
+This=Invoke(a,b,c) provided (!This->isSynchronousInvoke) ->
   [petrinetsmall:
     {
       string prefix = toString(This->id) + ".internal.";
@@ -296,7 +296,7 @@ This=Invoke(a,b) provided (!This->isSynchronousInvoke) ->
 
 
 
-This=Invoke(a,b) provided (This->isSynchronousInvoke) ->
+This=Invoke(a,b,c) provided (This->isSynchronousInvoke) ->
   [petrinetsmall:
     {
       header(This->id);
@@ -340,7 +340,7 @@ This=Invoke(a,b) provided (This->isSynchronousInvoke) ->
   RECEIVE
 ******************************************************************************/
 
-This=Receive(a,b) ->
+This=Receive(a,b,c) ->
   [petrinetsmall:
     {
       header(This->id);
@@ -373,7 +373,7 @@ This=Receive(a,b) ->
   REPLY
 ******************************************************************************/
 
-This=Reply(a,b) ->
+This=Reply(a,b,c) ->
   [petrinetsmall:
     {
       header(This->id);
@@ -406,7 +406,7 @@ This=Reply(a,b) ->
   ASSIGN
 ******************************************************************************/
 
-This=Assign(a,b) ->
+This=Assign(a,b,c) ->
   [petrinetsmall:
     {
       header(This->id);
@@ -436,7 +436,7 @@ This=Assign(a,b) ->
   WAIT
 ******************************************************************************/
 
-This=Wait(a) provided (!This->isWaitFor) ->
+This=Wait(a,b) provided (!This->isWaitFor) ->
   [petrinetsmall:
     {
       header(This->id);
@@ -460,7 +460,7 @@ This=Wait(a) provided (!This->isWaitFor) ->
 
 
 
-This=Wait(a) provided (This->isWaitFor) ->
+This=Wait(a,b) provided (This->isWaitFor) ->
   [petrinetsmall:
     {
       header(This->id);
@@ -488,7 +488,7 @@ This=Wait(a) provided (This->isWaitFor) ->
   THROW
 ******************************************************************************/
 
-This=Throw(a) ->
+This=Throw(a,b) ->
   [petrinetsmall:
     {
       header(This->id);
@@ -518,7 +518,7 @@ This=Throw(a) ->
   COMPENSATE
 ******************************************************************************/
 
-This=Compensate(a) ->
+This=Compensate(a,b) ->
   [petrinetsmall:
     {
       header(This->id);
@@ -536,7 +536,7 @@ This=Compensate(a) ->
   TERMINATE
 ******************************************************************************/
 
-This=Terminate(a) ->
+This=Terminate(a,b) ->
   [petrinetsmall:
     {
       string prefix = toString(This->id) + ".internal.";
@@ -567,7 +567,7 @@ This=Terminate(a) ->
   FLOW
 ******************************************************************************/
 
-This=Flow(a,b,c) ->
+This=Flow(a,b,c,d) ->
   [petrinetsmall:
     {
       header(This->id, true);
@@ -681,7 +681,7 @@ This=Switch(a,b,otherwiseBranch=Otherwise(c)) ->
  * information refer to the comments below or the User's Manual.
  */
 
-This=While(a,b) ->
+This=While(a,b,c) ->
   [petrinetsmall:
     {
       header(This->id, true);
@@ -700,22 +700,9 @@ This=While(a,b) ->
       TheNet->newArc(p1, t2);
       TheNet->newArc(t2, p3);
 
-      // When the parameter "-p cyclicwhile" is set, the pattern is created as
-      // it is depicted in Fig. 18. Setting this option might lead to not
-      // 1-safe Petri nets as links embedded in the inner activity might be
-      // initialized more than once.
-//      if (parameters[P_CYCLICWHILE] == true)
-//      {
-	Transition *t3 = TheNet->newTransition(prefix + "loop");
-	TheNet->newArc(p4, t3);
-	TheNet->newArc(t3, p1);
-//      }
-//      else
-//      {
-//	Transition *t3 = TheNet->newTransition(prefix + "finish");
-//	TheNet->newArc(p4, t3);
-//	TheNet->newArc(t3, p3);
-//      }
+      Transition *t3 = TheNet->newTransition(prefix + "loop");
+      TheNet->newArc(p4, t3);
+      TheNet->newArc(t3, p1);
     }
     a // standardElements
     b // innerActivity
@@ -737,7 +724,7 @@ This=While(a,b) ->
   SEQUENCE
 ******************************************************************************/
 
-This=Sequence(a,b) ->
+This=Sequence(a,b,c) ->
   [petrinetsmall:
     {
       header(This->id, true);
@@ -876,7 +863,7 @@ This=Pick(a,b,c) ->
   SCOPE
 ******************************************************************************/
 
-This=Scope(a,b,c,d,e,f,g,h) ->
+This=Scope(a,b,c,d,e,f,g,h,i) ->
   [petrinetsmall:
     {
       header(This->id);

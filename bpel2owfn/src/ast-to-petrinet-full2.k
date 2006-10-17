@@ -53,7 +53,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/17 14:14:31 $
+ *          - last changed: \$Date: 2006/10/17 18:52:11 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  */
 %}
 
@@ -119,7 +119,7 @@ extern string currentScope;
  * The <empty> activity as depicted in Fig. 3.
  */
 
-This=Empty(a) ->
+This=Empty(a,b) ->
   [petrinet:
     {
       string prefix = toString(This->id) + ".internal.";
@@ -160,7 +160,7 @@ This=Empty(a) ->
  * Fig. 11.
  */
 
-This=Invoke(a,b) provided (!This->isSynchronousInvoke) ->
+This=Invoke(a,b,c) provided (!This->isSynchronousInvoke) ->
   [petrinet:
     {
       string prefix = toString(This->id) + ".internal.";
@@ -214,7 +214,7 @@ This=Invoke(a,b) provided (!This->isSynchronousInvoke) ->
  * Fig. 13.
  */
 
-This=Invoke(a,b) provided (This->isSynchronousInvoke) ->
+This=Invoke(a,b,c) provided (This->isSynchronousInvoke) ->
   [petrinet:
     {
       header(This->id);
@@ -292,7 +292,7 @@ This=Invoke(a,b) provided (This->isSynchronousInvoke) ->
  * ignored, the resulting pattern is the same as in Fig. 2.
  */
 
-This=Receive(a,b) ->
+This=Receive(a,b,c) ->
   [petrinet:
     {
       header(This->id);
@@ -350,7 +350,7 @@ This=Receive(a,b) ->
  * ignored, the resulting pattern is the same as in Fig. 9.
  */
 
-This=Reply(a,b) ->
+This=Reply(a,b,c) ->
   [petrinet:
     {
       header(This->id);
@@ -412,7 +412,7 @@ This=Reply(a,b) ->
  * final place, as well as for all places after a fault has occured.
  */
 
-This=Assign(a,b) ->
+This=Assign(a,b,c) ->
   [petrinet:
     {
       header(This->id);
@@ -506,7 +506,7 @@ This=Assign(a,b) ->
  * The <wait until=""> activity as depicted in Fig. 4.
  */
 
-This=Wait(a) provided (!This->isWaitFor)->
+This=Wait(a,b) provided (!This->isWaitFor)->
   [petrinet:
     {
       header(This->id);
@@ -542,7 +542,7 @@ This=Wait(a) provided (!This->isWaitFor)->
  * The <wait for=""> activity as depicted in Fig. 5.
  */
 
-This=Wait(a) provided (This->isWaitFor)->
+This=Wait(a,b) provided (This->isWaitFor)->
   [petrinet:
     {
       header(This->id);
@@ -589,7 +589,7 @@ This=Wait(a) provided (This->isWaitFor)->
  * The <throw> activity as it is depicted in Fig. 14.
  */
 
-This=Throw(a) ->
+This=Throw(a,b) ->
   [petrinet:
     {
       header(This->id);
@@ -635,7 +635,7 @@ This=Throw(a) ->
  * compensation handler of the current scope.
  */
 
-This=Compensate(a) provided (!This->inFaultHandler && !This->hasScopeAttribute) ->
+This=Compensate(a,b) provided (!This->inFaultHandler && !This->hasScopeAttribute) ->
   [petrinet:
     {
       header(This->id);
@@ -687,7 +687,7 @@ This=Compensate(a) provided (!This->inFaultHandler && !This->hasScopeAttribute) 
  * handler of the current scope.
  */
 
-This=Compensate(a) provided (This->inFaultHandler && !This->hasScopeAttribute) ->
+This=Compensate(a,b) provided (This->inFaultHandler && !This->hasScopeAttribute) ->
   [petrinet:
     {
       header(This->id);
@@ -739,7 +739,7 @@ This=Compensate(a) provided (This->inFaultHandler && !This->hasScopeAttribute) -
  * embedded to the compensation handler of the current scope.
  */
 
-This=Compensate(a) provided (!This->inFaultHandler && This->hasScopeAttribute) ->
+This=Compensate(a,b) provided (!This->inFaultHandler && This->hasScopeAttribute) ->
   [petrinet:
     {
       header(This->id);
@@ -790,7 +790,7 @@ This=Compensate(a) provided (!This->inFaultHandler && This->hasScopeAttribute) -
  * the fault handler of the current scope.
  */
 
-This=Compensate(a) provided (This->inFaultHandler && This->hasScopeAttribute) ->
+This=Compensate(a,b) provided (This->inFaultHandler && This->hasScopeAttribute) ->
   [petrinet:
     {
       header(This->id);
@@ -845,7 +845,7 @@ This=Compensate(a) provided (This->inFaultHandler && This->hasScopeAttribute) ->
  * and p5 are correctly correlated with "(!)Terminated" here.
  */
 
-This=Terminate(a) ->
+This=Terminate(a,b) ->
   [petrinet:
     {
       header(This->id);
@@ -902,7 +902,7 @@ This=Terminate(a) ->
  * The <flow> activity as it is depicted in Fig. 17.
  */
 
-This=Flow(a,b,c) ->
+This=Flow(a,b,c,d) ->
   [petrinet:
     {
       header(This->id, true);
@@ -1141,7 +1141,7 @@ This=Switch(a,b,Otherwise(c)) ->
  * information refer to the comments below or the User's Manual.
  */
 
-This=While(a,b) ->
+This=While(a,b,c) ->
   [petrinet:
     {
       header(This->id, true);
@@ -1168,17 +1168,9 @@ This=While(a,b) ->
       TheNet->newArc(p2, t3);
       TheNet->newArc(t3, p4);
 
-
-      // When the parameter "-p cyclicwhile" is set, the pattern is created as
-      // it is depicted in Fig. 18. Setting this option might lead to not
-      // 1-safe Petri nets as links embedded in the inner activity might be
-      // initialized more than once.
-//      if (parameters[P_CYCLICWHILE] == true)
-//      {
-	Transition *t4 = TheNet->newTransition(prefix + "t4");
-	TheNet->newArc(t4, p1);
-	TheNet->newArc(p5, t4);
-//      }
+      Transition *t4 = TheNet->newTransition(prefix + "t4");
+      TheNet->newArc(t4, p1);
+      TheNet->newArc(p5, t4);
 
 
       // Transitions for the negative control flow.
@@ -1225,7 +1217,7 @@ This=While(a,b) ->
  * The <sequence> activity as it is depicted in Fig. 16.
  */
 
-This=Sequence(a,b) ->
+This=Sequence(a,b,c) ->
   [petrinet:
     {
       header(This->id, true);
@@ -1464,7 +1456,7 @@ This=Pick(a,b,c) ->
  * are merged.
  */
 
-This=Scope(a,b,c,d,e,f,g,h) ->
+This=Scope(a,b,c,d,e,f,g,h,i) ->
   [petrinet:
     {
       header(This->id, true);

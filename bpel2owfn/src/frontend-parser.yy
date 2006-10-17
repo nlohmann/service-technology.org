@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/17 14:14:30 $
+ *          - last changed: \$Date: 2006/10/17 18:52:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.243 $
+ * \version \$Revision: 1.244 $
  * 
  */
 %}
@@ -244,7 +244,7 @@ tProcess:
   X_OPEN K_PROCESS arbitraryAttributes X_NEXT tExtensions imports tPartnerLinks
   tPartners tMessageExchanges tVariables tCorrelationSets tFaultHandlers
   tCompensationHandler tEventHandlers activity X_NEXT X_SLASH K_PROCESS X_CLOSE
-    { TheProcess = $$ = Process($8, $9, $11, $12, $13, $14, $15, StopInProcess(), $16, $4->value); }
+    { TheProcess = $$ = Process($8, $9, $11, $12, $13, $14, $15, StopInProcess(), $16, $4, $4->value); }
 ;
 
 /*---------------------------------------------------------------------------*/
@@ -608,10 +608,10 @@ tFromPart:
 
 tReceive:
   K_RECEIVE arbitraryAttributes X_NEXT standardElements tCorrelations tFromParts X_SLASH K_RECEIVE
-    { $$ = Receive($4, $5, $2->value); }
+    { $$ = Receive($4, $5, $2, $2->value); }
 | K_RECEIVE arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Receive(noLinks, NiltCorrelation_list(), $2->value); }
+      $$ = Receive(noLinks, NiltCorrelation_list(), $2, $2->value); }
 ;
 
 
@@ -621,10 +621,10 @@ tReceive:
 
 tReply:
   K_REPLY arbitraryAttributes X_NEXT standardElements tCorrelations tToParts X_SLASH K_REPLY
-    { $$ = Reply($4, $5, $2->value); }
+    { $$ = Reply($4, $5, $2, $2->value); }
 | K_REPLY arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Reply(noLinks, NiltCorrelation_list(), $2->value); }
+      $$ = Reply(noLinks, NiltCorrelation_list(), $2, $2->value); }
 ;
 
 
@@ -634,10 +634,10 @@ tReply:
 
 tInvoke:
   K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations tToParts tFromParts X_SLASH K_INVOKE
-    { $$ = Invoke($4, $5, $2->value); }
+    { $$ = Invoke($4, $5, $2, $2->value); }
 | K_INVOKE arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Invoke(noLinks, NiltCorrelation_list(), $2->value); }
+      $$ = Invoke(noLinks, NiltCorrelation_list(), $2, $2->value); }
 ;
 
 
@@ -647,7 +647,7 @@ tInvoke:
 
 tAssign:
   K_ASSIGN arbitraryAttributes X_NEXT standardElements tCopy_list X_SLASH K_ASSIGN
-    { $$ = Assign($4, $5, $2->value); }
+    { $$ = Assign($4, $5, $2, $2->value); }
 ;
 
 tCopy_list:
@@ -707,10 +707,10 @@ tTo:
 
 tValidate:
   K_VALIDATE arbitraryAttributes X_NEXT standardElements X_SLASH K_VALIDATE
-    { $$ = Validate($4, $2->value); }
+    { $$ = Validate($4, $2, $2->value); }
 | K_VALIDATE arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Validate(noLinks, $2->value); }
+      $$ = Validate(noLinks, $2, $2->value); }
 ;
 
 
@@ -720,10 +720,10 @@ tValidate:
 
 tEmpty:
   K_EMPTY arbitraryAttributes X_NEXT standardElements X_SLASH K_EMPTY
-    { $$ = Empty($4, $2->value); }
+    { $$ = Empty($4, $2, $2->value); }
 | K_EMPTY arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Empty(noLinks, $2->value); }
+      $$ = Empty(noLinks, $2, $2->value); }
 ;
 
 
@@ -733,14 +733,14 @@ tEmpty:
 
 tWait:
   K_WAIT arbitraryAttributes X_NEXT standardElements X_SLASH K_WAIT
-    { $$ = Wait($4, $2->value); }
+    { $$ = Wait($4, $2, $2->value); }
 | K_WAIT arbitraryAttributes X_NEXT tFor standardElements X_SLASH K_WAIT
-    { $$ = Wait($5, $2->value); }
+    { $$ = Wait($5, $2, $2->value); }
 | K_WAIT arbitraryAttributes X_NEXT tUntil standardElements X_SLASH K_WAIT
-    { $$ = Wait($5, $2->value); }
+    { $$ = Wait($5, $2, $2->value); }
 | K_WAIT arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Wait(noLinks, $2->value); }
+      $$ = Wait(noLinks, $2, $2->value); }
 ;
 
 tFor:
@@ -758,10 +758,10 @@ tUntil:
 
 tTerminate:
   K_TERMINATE arbitraryAttributes X_NEXT standardElements X_SLASH K_TERMINATE
-    { $$ = Terminate($4, $2->value); }
+    { $$ = Terminate($4, $2, $2->value); }
 | K_TERMINATE arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Terminate(noLinks, $2->value); }
+      $$ = Terminate(noLinks, $2, $2->value); }
 ;
 
 
@@ -771,10 +771,10 @@ tTerminate:
 
 tExit:
   K_EXIT arbitraryAttributes X_NEXT standardElements X_SLASH K_EXIT
-    { $$ = Exit($4, $2->value); }
+    { $$ = Exit($4, $2, $2->value); }
 | K_EXIT arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Exit(noLinks, $2->value); }
+      $$ = Exit(noLinks, $2, $2->value); }
 ;
 
 
@@ -784,10 +784,10 @@ tExit:
 
 tThrow:
   K_THROW arbitraryAttributes X_NEXT standardElements X_SLASH K_THROW
-    { $$ = Throw($4, $2->value); }
+    { $$ = Throw($4, $2, $2->value); }
 | K_THROW arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Throw(noLinks, $2->value); }
+      $$ = Throw(noLinks, $2, $2->value); }
 ;
 
 
@@ -797,10 +797,10 @@ tThrow:
 
 tRethrow:
   K_RETHROW arbitraryAttributes X_NEXT standardElements X_SLASH K_RETHROW
-    { $$ = Rethrow($4, $2->value); }
+    { $$ = Rethrow($4, $2, $2->value); }
 | K_RETHROW arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Rethrow(noLinks, $2->value); }
+      $$ = Rethrow(noLinks, $2, $2->value); }
 ;
 
 
@@ -810,10 +810,10 @@ tRethrow:
 
 tCompensate:
   K_COMPENSATE arbitraryAttributes X_NEXT standardElements X_SLASH K_COMPENSATE
-    { $$ = Compensate($4, $2->value); }
+    { $$ = Compensate($4, $2, $2->value); }
 | K_COMPENSATE arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Compensate(noLinks, $2->value); }
+      $$ = Compensate(noLinks, $2, $2->value); }
 ;
 
 
@@ -823,10 +823,10 @@ tCompensate:
 
 tCompensateScope:
   K_COMPENSATESCOPE arbitraryAttributes X_NEXT standardElements X_SLASH K_COMPENSATESCOPE
-    { $$ = CompensateScope($4, $2->value); }
+    { $$ = CompensateScope($4, $2, $2->value); }
 | K_COMPENSATESCOPE arbitraryAttributes X_SLASH
     { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = CompensateScope(noLinks, $2->value); }
+      $$ = CompensateScope(noLinks, $2, $2->value); }
 ;
 
 
@@ -836,7 +836,7 @@ tCompensateScope:
 
 tSequence:
   K_SEQUENCE arbitraryAttributes X_NEXT standardElements activity_list X_SLASH K_SEQUENCE
-    { $$ = Sequence($4, $5, $2->value); }
+    { $$ = Sequence($4, $5, $2, $2->value); }
 ;
 
 
@@ -906,7 +906,7 @@ tElse:
 
 tWhile:
   K_WHILE arbitraryAttributes X_NEXT standardElements tCondition activity X_NEXT X_SLASH K_WHILE
-    { $$ = While($4, $6, $2->value); }
+    { $$ = While($4, $6, $2, $2->value); }
 ;
 
 
@@ -916,7 +916,7 @@ tWhile:
 
 tRepeatUntil:
   K_REPEATUNTIL arbitraryAttributes X_NEXT standardElements activity tCondition X_NEXT X_SLASH K_REPEATUNTIL
-    { $$ = RepeatUntil($4, $5, $2->value); }
+    { $$ = RepeatUntil($4, $5, $2, $2->value); }
 ;
 
 
@@ -926,7 +926,7 @@ tRepeatUntil:
 
 tForEach:
   K_FOREACH arbitraryAttributes X_NEXT standardElements tStartCounterValue tFinalCounterValue tCompletionCondition tScope X_SLASH K_FOREACH
-    { $$ = ForEach($4, $8, $2->value); }
+    { $$ = ForEach($4, $8, $2, $2->value); }
 ;
 
 tStartCounterValue:
@@ -963,7 +963,7 @@ tPick:
 
 tFlow:
   K_FLOW arbitraryAttributes X_NEXT standardElements tLinks activity_list X_SLASH K_FLOW
-    { $$ = Flow($4, $5, $6, $2->value); }
+    { $$ = Flow($4, $5, $6, $2, $2->value); }
 ;
 
 activity_list:
@@ -1004,7 +1004,7 @@ tScope:
   tMessageExchanges tVariables tCorrelationSets tFaultHandlers
   tCompensationHandler tTerminationHandler tEventHandlers activity 
   X_NEXT X_SLASH K_SCOPE
-    { $$ = Scope($4, $7, $9, $10, $11, $12, StopInScope(), $13, $2->value); }
+    { $$ = Scope($4, $7, $9, $10, $11, $12, StopInScope(), $13, $2, $2->value); }
 ;
 
 

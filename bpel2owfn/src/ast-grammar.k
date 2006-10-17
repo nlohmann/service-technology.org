@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/17 14:14:30 $
+ *          - last changed: \$Date: 2006/10/17 18:52:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.117 $
+ * \version \$Revision: 1.118 $
  */
 %}
 
@@ -90,6 +90,7 @@ tProcess:
       tEventHandlers
       tStop
       activity
+      integer
       )
   {
     int id;
@@ -100,7 +101,9 @@ tProcess:
   }
 ;
 
-%ctor Process(int myid = 0)
+%ctor Process() {}
+
+%ctor Process(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_PROCESS); }
@@ -487,7 +490,7 @@ tFromPart:
 ******************************************************************************/
 
 tReceive:
-  Receive(standardElements tCorrelation_list)
+  Receive(standardElements tCorrelation_list integer)
   {
     int id;
     stringMap attributes;
@@ -501,7 +504,9 @@ tReceive:
   }
 ;
 
-%ctor Receive(int myid = 0)
+%ctor Receive() {}
+
+%ctor Receive(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_RECEIVE); }
@@ -512,7 +517,7 @@ tReceive:
 ******************************************************************************/
 
 tReply:
-  Reply(standardElements tCorrelation_list)
+  Reply(standardElements tCorrelation_list integer)
   {
     int id;
     stringMap attributes;
@@ -526,7 +531,9 @@ tReply:
   }
 ;
 
-%ctor Reply(int myid = 0)
+%ctor Reply() {}
+
+%ctor Reply(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_REPLY); }
@@ -537,7 +544,7 @@ tReply:
 ******************************************************************************/
 
 tInvoke:
-  Invoke(standardElements tCorrelation_list)
+  Invoke(standardElements tCorrelation_list integer)
   {
     int id;
     stringMap attributes;
@@ -554,7 +561,9 @@ tInvoke:
   }
 ;
 
-%ctor Invoke(int myid = 0)
+%ctor Invoke() {}
+
+%ctor Invoke(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_INVOKE); }
@@ -565,7 +574,7 @@ tInvoke:
 ******************************************************************************/
 
 tAssign:
-  Assign(standardElements tCopy_list)
+  Assign(standardElements tCopy_list integer)
   {
     int id;
     stringMap attributes;
@@ -575,7 +584,9 @@ tAssign:
   }
 ;
 
-%ctor Assign(int myid = 0)
+%ctor Assign() {}
+
+%ctor Assign(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_ASSIGN); }
@@ -638,7 +649,7 @@ tTo:
 ******************************************************************************/
 
 tValidate:
-  Validate(standardElements)
+  Validate(standardElements integer)
   {
     int id;
     stringMap attributes;
@@ -648,7 +659,9 @@ tValidate:
   }
 ;
 
-%ctor Validate(int myid = 0)
+%ctor Validate() {}
+
+%ctor Validate(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_VALIDATE); }
@@ -659,7 +672,7 @@ tValidate:
 ******************************************************************************/
 
 tEmpty:
-  Empty(standardElements)
+  Empty(standardElements integer)
   {
     int id;
     stringMap attributes;
@@ -669,7 +682,9 @@ tEmpty:
   }
 ;
 
-%ctor Empty(int myid = 0)
+%ctor Empty() {}
+
+%ctor Empty(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_EMPTY); }
@@ -680,7 +695,7 @@ tEmpty:
 ******************************************************************************/
 
 tWait:
-  Wait(standardElements)
+  Wait(standardElements integer)
   {
     int id;
     stringMap attributes;
@@ -692,7 +707,9 @@ tWait:
   }
 ;
 
-%ctor Wait(int myid = 0)
+%ctor Wait() {}
+
+%ctor Wait(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_WAIT); }
@@ -703,7 +720,7 @@ tWait:
 ******************************************************************************/
 
 tTerminate:
-  Terminate(standardElements)
+  Terminate(standardElements integer)
   {
     int id;
     stringMap attributes;
@@ -713,7 +730,9 @@ tTerminate:
   }
 ;
 
-%ctor Terminate(int myid = 0)
+%ctor Terminate() {}
+
+%ctor Terminate(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_TERMINATE); }
@@ -724,7 +743,7 @@ tTerminate:
 ******************************************************************************/
 
 tExit:
-  Exit(standardElements)
+  Exit(standardElements integer)
   {
     int id;
     stringMap attributes;
@@ -734,7 +753,9 @@ tExit:
   }
 ;
 
-%ctor Exit(int myid = 0)
+%ctor Exit() {}
+
+%ctor Exit(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_EXIT); }
@@ -745,7 +766,7 @@ tExit:
 ******************************************************************************/
 
 tThrow:
-  Throw(standardElements)
+  Throw(standardElements integer)
   {
     int id;
     stringMap attributes;
@@ -757,7 +778,9 @@ tThrow:
   }
 ;
 
-%ctor Throw(int myid = 0)
+%ctor Throw() {}
+
+%ctor Throw(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_THROW); }
@@ -768,7 +791,7 @@ tThrow:
 ******************************************************************************/
 
 tRethrow:
-  Rethrow(standardElements)
+  Rethrow(standardElements integer)
   {
     int id;
     stringMap attributes;
@@ -780,7 +803,9 @@ tRethrow:
   }
 ;
 
-%ctor Rethrow(int myid = 0)
+%ctor Rethrow() {}
+
+%ctor Rethrow(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_RETHROW); }
@@ -791,7 +816,7 @@ tRethrow:
 ******************************************************************************/
 
 tCompensate:
-  Compensate(standardElements)
+  Compensate(standardElements integer)
   {
     int id;
     stringMap attributes;
@@ -805,7 +830,9 @@ tCompensate:
   }
 ;
 
-%ctor Compensate(int myid = 0)
+%ctor Compensate() {}
+
+%ctor Compensate(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_COMPENSATE); }
@@ -816,7 +843,7 @@ tCompensate:
 ******************************************************************************/
 
 tCompensateScope:
-  CompensateScope(standardElements)
+  CompensateScope(standardElements integer)
   {
     int id;
     stringMap attributes;
@@ -830,7 +857,9 @@ tCompensateScope:
   }
 ;
 
-%ctor CompensateScope(int myid = 0)
+%ctor CompensateScope() {}
+
+%ctor CompensateScope(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_COMPENSATESCOPE); }
@@ -841,7 +870,7 @@ tCompensateScope:
 ******************************************************************************/
 
 tSequence:
-  Sequence(standardElements activity_list)
+  Sequence(standardElements activity_list integer)
   {
     int id;
     stringMap attributes;
@@ -851,7 +880,9 @@ tSequence:
   }
 ;
 
-%ctor Sequence(int myid = 0)
+%ctor Sequence() {}
+
+%ctor Sequence(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_SEQUENCE); }
@@ -966,7 +997,7 @@ tElse:
 ******************************************************************************/
 
 tWhile:
-  While(standardElements activity)
+  While(standardElements activity integer)
   {
     int id;
     stringMap attributes;
@@ -976,7 +1007,9 @@ tWhile:
   }
 ;
 
-%ctor While(int myid = 0)
+%ctor While() {}
+
+%ctor While(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_WHILE); }
@@ -987,7 +1020,7 @@ tWhile:
 ******************************************************************************/
 
 tRepeatUntil:
-  RepeatUntil(standardElements activity)
+  RepeatUntil(standardElements activity integer)
   {
     int id;
     stringMap attributes;
@@ -997,7 +1030,9 @@ tRepeatUntil:
   }
 ;
 
-%ctor RepeatUntil(int myid = 0)
+%ctor RepeatUntil() {}
+
+%ctor RepeatUntil(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_REPEATUNTIL); }
@@ -1008,7 +1043,7 @@ tRepeatUntil:
 ******************************************************************************/
 
 tForEach:
-  ForEach(standardElements tScope)
+  ForEach(standardElements tScope integer)
   {
     int id;
     stringMap attributes;
@@ -1018,7 +1053,9 @@ tForEach:
   }
 ;
 
-%ctor ForEach(int myid = 0)
+%ctor ForEach() {}
+
+%ctor ForEach(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_FOREACH); }
@@ -1050,7 +1087,7 @@ tPick:
 ******************************************************************************/
 
 tFlow:
-  Flow(standardElements tLink_list activity_list)
+  Flow(standardElements tLink_list activity_list integer)
   {
     int id;
     stringMap attributes;
@@ -1060,7 +1097,9 @@ tFlow:
   }
 ;
 
-%ctor Flow(int myid = 0)
+%ctor Flow() {}
+
+%ctor Flow(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_FLOW); }
@@ -1105,6 +1144,7 @@ tScope:
       tEventHandlers
       tStop
       activity
+      integer
       )
   {
     int id;
@@ -1118,7 +1158,9 @@ tScope:
   }
 ;
 
-%ctor Scope(int myid = 0)
+%ctor Scope() {}
+
+%ctor Scope(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_SCOPE); }

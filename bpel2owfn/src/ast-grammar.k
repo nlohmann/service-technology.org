@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/16 14:01:12 $
+ *          - last changed: \$Date: 2006/10/17 14:14:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.116 $
+ * \version \$Revision: 1.117 $
  */
 %}
 
@@ -1101,6 +1101,7 @@ tScope:
       tVariable_list
       tFaultHandlers
       tCompensationHandler
+      tTerminationHandler
       tEventHandlers
       tStop
       activity
@@ -1121,6 +1122,31 @@ tScope:
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_SCOPE); }
+
+
+/******************************************************************************
+  TERMINATION HANDLER
+******************************************************************************/
+
+tTerminationHandler:
+  implicitTerminationHandler()
+| userDefinedTerminationHandler(activity)
+  {
+    bool inWhile = false;
+    int id;
+    int parentScopeId;
+  }
+;
+
+%ctor implicitTerminationHandler(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_TERMINATIONHANDLER); }
+
+%ctor userDefinedTerminationHandler(int myid = 0)
+{ id = myid;
+  assert(ASTEmap[id] == NULL);
+  ASTEmap[id] = new ASTE(id, K_TERMINATIONHANDLER); }
 
 
 

@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/10/16 09:15:04 $
+ *          - last changed: \$Date: 2006/10/17 14:14:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  */
 %}
 
@@ -708,7 +708,7 @@ Pick(a,b,c) ->
   SCOPE
 ******************************************************************************/
 
-Scope(a,b,c,d,e,f,g) ->
+Scope(a,b,c,d,e,f,g,h) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Scope\n");
 	  CFGBlock * firstBlock = new CFGBlock(CFGScope, $0->id, "Scope_begin"); 
@@ -737,7 +737,7 @@ Scope(a,b,c,d,e,f,g) ->
 	  connectBlocks(chLast, lastBlock);
 
 	}
-	e //compensationHandler
+	f //eventHandler
 	{
 	  CFGBlock * ehFirst = cfgMap.find(toString(e->id))->second->firstBlock;
 	  CFGBlock * ehLast  = cfgMap.find(toString(e->id))->second->lastBlock;
@@ -746,10 +746,10 @@ Scope(a,b,c,d,e,f,g) ->
 	  connectBlocks(ehLast, lastBlock);
 
 	}
-	g // activity
+	h // activity
 	{
-	  CFGBlock * innerFirst = cfgMap.find(toString(g->id))->second->firstBlock;
-	  CFGBlock * innerLast = cfgMap.find(toString(g->id))->second->lastBlock;
+	  CFGBlock * innerFirst = cfgMap.find(toString(h->id))->second->firstBlock;
+	  CFGBlock * innerLast = cfgMap.find(toString(h->id))->second->lastBlock;
 	  
 	  connectBlocks(firstBlock, innerFirst);
 	  connectBlocks(innerLast, lastBlock);

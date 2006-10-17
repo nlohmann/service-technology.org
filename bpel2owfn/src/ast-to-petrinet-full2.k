@@ -53,7 +53,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/17 13:48:16 $
+ *          - last changed: \$Date: 2006/10/17 14:14:31 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  */
 %}
 
@@ -1464,7 +1464,7 @@ This=Pick(a,b,c) ->
  * are merged.
  */
 
-This=Scope(a,b,c,d,e,f,g) ->
+This=Scope(a,b,c,d,e,f,g,h) ->
   [petrinet:
     {
       header(This->id, true);
@@ -1645,8 +1645,8 @@ This=Scope(a,b,c,d,e,f,g) ->
     a // standardElements
     c // Fault Handler
     d // Compensation Handler
-    e // Event Handler
-    g // innerActivity
+    f // Event Handler
+    h // innerActivity
     {
       // After the patterns of the inner activity of the process are generated
       // the push places of the child scopes are available and have to be
@@ -1733,14 +1733,10 @@ This=Scope(a,b,c,d,e,f,g) ->
 
 
       // Embed the inner activity of the scope.
-//      if (This->dpe > 0)
-//      {
-//        TheNet->mergePlaces(TheNet->findPlace(prefix + "negLink"), TheNet->findPlace(g, ".negLink"));
-//      }
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "p21"), TheNet->findPlace(g, ".initial"));
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "p22"), TheNet->findPlace(g, ".final"));
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "p23"), TheNet->findPlace(g, ".stop"));
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "p24"), TheNet->findPlace(g, ".stopped"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "p21"), TheNet->findPlace(h, ".initial"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "p22"), TheNet->findPlace(h, ".final"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "p23"), TheNet->findPlace(h, ".stop"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "p24"), TheNet->findPlace(h, ".stopped"));
 
 
       // Merge (!)Terminated places

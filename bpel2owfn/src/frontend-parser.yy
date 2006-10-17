@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/16 14:01:12 $
+ *          - last changed: \$Date: 2006/10/17 14:14:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.242 $
+ * \version \$Revision: 1.243 $
  * 
  */
 %}
@@ -114,7 +114,7 @@ using namespace std;
  *****************************************************************************/
 
 // from flex
-extern char* yytext;
+extern char *yytext;
 extern int yylex();
 extern int yylineno;
 
@@ -122,6 +122,10 @@ extern int yylineno;
 extern int yyerror(const char *);
 
 
+
+/******************************************************************************
+ * Global variables
+ *****************************************************************************/
 
 /// the root of the abstract syntax tree
 tProcess TheProcess;
@@ -206,6 +210,7 @@ unsigned int ASTEid = 1;
 %type <yt_tTarget_list> tTarget_list
 %type <yt_tTarget> tTarget
 %type <yt_tTerminate> tTerminate
+%type <yt_tTerminationHandler> tTerminationHandler
 %type <yt_tThrow> tThrow
 %type <yt_tTo> tTo
 %type <yt_tToPart> tToPart
@@ -217,7 +222,6 @@ unsigned int ASTEid = 1;
 %type <yt_tVariable> tVariable
 %type <yt_tWait> tWait
 %type <yt_tWhile> tWhile
-
 
 
 
@@ -978,8 +982,7 @@ tLinks:
 
 tLink_list:
   tLink X_NEXT
-    
-{ $$ = ConstLink_list($1, NiltLink_list()); }
+    { $$ = ConstLink_list($1, NiltLink_list()); }
 | tLink X_NEXT tLink_list
     { $$ = ConstLink_list($1, $3); }
 ;
@@ -1001,12 +1004,19 @@ tScope:
   tMessageExchanges tVariables tCorrelationSets tFaultHandlers
   tCompensationHandler tTerminationHandler tEventHandlers activity 
   X_NEXT X_SLASH K_SCOPE
-    { $$ = Scope($4, $7, $9, $10, $12, StopInScope(), $13, $2->value); }
+    { $$ = Scope($4, $7, $9, $10, $11, $12, StopInScope(), $13, $2->value); }
 ;
+
+
+/******************************************************************************
+  TERMINATION HANDLER                                            (WS-BPEL 2.0)
+******************************************************************************/
 
 tTerminationHandler:
   /* empty */
+    { $$ = implicitTerminationHandler(ASTEid++); }
 | K_TERMINATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_TERMINATIONHANDLER X_NEXT
+    { $$ = userDefinedTerminationHandler($3, ASTEid++); }
 ;
 
 

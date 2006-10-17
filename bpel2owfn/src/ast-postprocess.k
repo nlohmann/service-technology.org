@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/16 09:57:29 $
+ *          - last changed: \$Date: 2006/10/17 14:14:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.37 $
+ * \version \$Revision: 1.38 $
  */
 %}
 
@@ -1100,7 +1100,7 @@ Pick(a,b,c) ->
   SCOPE
 ******************************************************************************/
 
-Scope(a,b,c,d,e,f,g) ->
+Scope(a,b,c,d,e,f,g,h) ->
   [postprocessing:
     {
       // manage identifiers
@@ -1132,10 +1132,10 @@ Scope(a,b,c,d,e,f,g) ->
       }
 
       // distribute the scope's id to the enclosed activity
-      assert(ASTEmap[g->id] != NULL);
-      ASTEmap[g->id]->parentActivityId = myid;
+      assert(ASTEmap[h->id] != NULL);
+      ASTEmap[h->id]->parentActivityId = myid;
     }
-    a b c d e f g
+    a b c d e f g h
     {
       PPcurrentScope = ASTEmap[myid]->parentScopeId;
 
@@ -1153,8 +1153,8 @@ Scope(a,b,c,d,e,f,g) ->
 
 
       // collect enclosed source links
-      assert(ASTEmap[g->id] != NULL);
-      ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[g->id]->enclosedSourceLinks);
+      assert(ASTEmap[h->id] != NULL);
+      ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[h->id]->enclosedSourceLinks);
     }
   ]
 ;

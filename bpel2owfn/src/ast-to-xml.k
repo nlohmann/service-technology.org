@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/10/16 09:15:05 $
+ *          - last changed: \$Date: 2006/10/17 14:14:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.40 $
+ * \version \$Revision: 1.41 $
  */
 %}
 
@@ -342,7 +342,7 @@ Pick(a,b,c) ->
   SCOPE
 ******************************************************************************/
 
-Scope(a,b,c,d,e,f,g) ->
+Scope(a,b,c,d,e,f,g,h) ->
   [xml: { inup(); } "<scope id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" 
   
   a
@@ -352,7 +352,7 @@ Scope(a,b,c,d,e,f,g) ->
   { else }
     ${ { inup(); } "<variables id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" b { indown(); } "</variables>\n" $}
 
-  c d e f g
+  c d e f g h
     
   { indown(); } "</scope>\n" ]
 ;

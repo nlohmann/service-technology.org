@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/17 18:52:10 $
+ *          - last changed: \$Date: 2006/10/17 19:54:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.39 $
+ * \version \$Revision: 1.40 $
  */
 %}
 
@@ -166,7 +166,7 @@ Process(a,b,c,d,e,f,g,h,i,j) ->
   PARTNER LINKS
 ******************************************************************************/
 
-PartnerLink() ->
+PartnerLink(a) ->
   [postprocessing:
     {
       // manage identifiers
@@ -182,7 +182,7 @@ PartnerLink() ->
   PARTNERS
 ******************************************************************************/
 
-Partner(a) ->
+Partner(a,b) ->
   [postprocessing:
     {
       // annotate all enclosed partner links
@@ -226,7 +226,7 @@ userDefinedFaultHandler(a,b) ->
       // and if yes, annotate it
       with (b)
       {
-        CatchAll(c) :
+        CatchAll(c,_id) :
         {
           assert(ASTEmap[c->id] != NULL);
           ASTEmap[c->id]->parentActivityId = myid;
@@ -260,7 +260,7 @@ implicitFaultHandler() ->
 ;
 
 
-Catch(a) ->
+Catch(a,b) ->
   [postprocessing:
     {
       // manage identifiers
@@ -274,7 +274,7 @@ Catch(a) ->
   ]
 ;
 
-CatchAll(a) ->
+CatchAll(a,b) ->
   [postprocessing:
     a
     {
@@ -337,7 +337,7 @@ userDefinedEventHandler(a,b) ->
   ]
 ;
 
-OnMessage(a) ->
+OnMessage(a,b) ->
   [postprocessing:
     {
       // manage identifiers
@@ -356,7 +356,7 @@ OnMessage(a) ->
   ]
 ;
 
-OnAlarm(a) ->
+OnAlarm(a,b) ->
   [postprocessing: a]
 ;
 
@@ -401,7 +401,7 @@ userDefinedCompensationHandler(a) ->
   VARIABLES
 ******************************************************************************/
 
-Variable() ->
+Variable(a) ->
   [postprocessing:
     {
       // manage identifiers
@@ -422,7 +422,7 @@ Variable() ->
   CORRELATION SETS
 ******************************************************************************/
 
-CorrelationSet() ->
+CorrelationSet(a) ->
   [postprocessing:
     {
       // manage identifiers
@@ -440,7 +440,7 @@ CorrelationSet() ->
   CORRELATIONS
 ******************************************************************************/
 
-Correlation() ->
+Correlation(a) ->
   [postprocessing:
     {
       // manage identifiers
@@ -530,6 +530,10 @@ Receive(a,b,c) ->
     {
       // manage identifiers
       int myid = $0->id;
+
+// TODO: replace $0->id by c->value...
+assert($0->id == c->value);
+
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
@@ -620,11 +624,11 @@ Assign(a,b,c) ->
   ]
 ;
 
-Copy(a,b) ->
+Copy(a,b,c) ->
   [postprocessing: a b]
 ;
 
-From() ->
+From(a) ->
   [postprocessing:
     {
       int myid = $0->id;
@@ -637,7 +641,7 @@ From() ->
   ]
 ;
 
-To() ->
+To(a) ->
   [postprocessing:
     {
       int myid = $0->id;
@@ -841,7 +845,7 @@ Flow(a,b,c,d) ->
   ]
 ;
 
-Link() ->
+Link(a) ->
   [postprocessing:
     {
       int myid = $0->id;
@@ -867,7 +871,7 @@ Link() ->
   SWITCH
 ******************************************************************************/
 
-Switch(a,b,c=Otherwise(d)) ->
+Switch(a,b,c=Otherwise(d),e) ->
   [postprocessing:
     {
       // manage identifiers
@@ -1038,11 +1042,12 @@ Sequence(a,b,c) ->
   PICK
 ******************************************************************************/
 
-Pick(a,b,c) ->
+Pick(a,b,c,d) ->
   [postprocessing:
     {
       // manage identifiers
       int myid = $0->id;
+assert($0->id == d->value);
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
@@ -1194,7 +1199,7 @@ StandardElements(a,b,c) ->
   ]
 ;
 
-Target() ->
+Target(a) ->
   [postprocessing:
     {
       int myid = $0->id;
@@ -1224,7 +1229,7 @@ Target() ->
   ]
 ;
 
-Source() ->
+Source(a) ->
   [postprocessing:
     {
       int myid = $0->id;

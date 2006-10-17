@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/17 18:52:10 $
+ *          - last changed: \$Date: 2006/10/17 19:54:02 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.44 $
+ * \version \$Revision: 1.45 $
  *
  */
 %}
@@ -608,7 +608,7 @@ This=Flow(a,b,c,d) ->
  * parsing an empty otherwise branch was added if it was not specified.
  */
 
-This=Switch(a,b,otherwiseBranch=Otherwise(c)) ->
+This=Switch(a,b,otherwiseBranch=Otherwise(c),d) ->
   [petrinetsmall:
     {
       header(This->id, true);
@@ -766,7 +766,7 @@ This=Sequence(a,b,c) ->
   PICK
 ******************************************************************************/
 
-This=Pick(a,b,c) ->
+This=Pick(a,b,c,d) ->
   [petrinetsmall:
     {
       header(This->id, true);

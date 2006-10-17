@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/17 18:52:10 $
+ *          - last changed: \$Date: 2006/10/17 19:54:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.244 $
+ * \version \$Revision: 1.245 $
  * 
  */
 %}
@@ -321,9 +321,9 @@ tPartnerLink_list:
 
 tPartnerLink:
   K_PARTNERLINK arbitraryAttributes X_NEXT X_SLASH K_PARTNERLINK
-    { $$ = PartnerLink($2->value); }
+    { $$ = PartnerLink($2, $2->value); }
 | K_PARTNERLINK arbitraryAttributes X_SLASH
-    { $$ = PartnerLink($2->value); }
+    { $$ = PartnerLink($2, $2->value); }
 ;
 
 
@@ -347,9 +347,7 @@ tPartner_list:
 
 tPartner:
   K_PARTNER arbitraryAttributes X_NEXT tPartnerLink_list X_SLASH K_PARTNER
-    { $$ = Partner($4, $2->value); }
-| K_PARTNER arbitraryAttributes X_SLASH
-    { $$ = Partner(NiltPartnerLink_list(), $2->value); }
+    { $$ = Partner($4, $2, $2->value); }
 ;
 
 
@@ -393,14 +391,14 @@ tCatch_list:
 
 tCatch:
   K_CATCH arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CATCH
-    { $$ = Catch($4, $2->value); }
+    { $$ = Catch($4, $2, $2->value); }
 ;
 
 tCatchAll:
   /* empty */
     { $$ = NoCatchAll(); }
 | K_CATCHALL arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CATCHALL X_NEXT
-    { $$ = CatchAll($4, $2->value); }
+    { $$ = CatchAll($4, $2, $2->value); }
 ;
 
 
@@ -445,21 +443,21 @@ tOnAlarm_list:
 
 tOnMessage:
   K_ONMESSAGE arbitraryAttributes X_NEXT tCorrelations activity X_NEXT X_SLASH K_ONMESSAGE
-    { $$ = OnMessage($5, $2->value); }
+    { $$ = OnMessage($5, $2, $2->value); }
 ;
 
 tOnEvent:
   K_ONEVENT arbitraryAttributes X_NEXT tCorrelations tFromParts activity X_NEXT X_SLASH K_ONEVENT
-    { $$ = OnMessage($6, $2->value); }
+    { $$ = OnMessage($6, $2, $2->value); }
 ;
 
 tOnAlarm:
   K_ONALARM arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_ONALARM 
-    { $$ = OnAlarm($4, $2->value); }
+    { $$ = OnAlarm($4, $2, $2->value); }
 | K_ONALARM arbitraryAttributes X_NEXT tFor tRepeatEvery activity X_NEXT X_SLASH K_ONALARM 
-    { $$ = OnAlarm($6, $2->value); }
+    { $$ = OnAlarm($6, $2, $2->value); }
 | K_ONALARM arbitraryAttributes X_NEXT tUntil tRepeatEvery activity X_NEXT X_SLASH K_ONALARM 
-    { $$ = OnAlarm($6, $2->value); }
+    { $$ = OnAlarm($6, $2, $2->value); }
 ;
 
 tRepeatEvery:
@@ -488,9 +486,9 @@ tVariable_list:
 
 tVariable:
   K_VARIABLE arbitraryAttributes X_NEXT X_SLASH K_VARIABLE
-    { $$ = Variable($2->value); }
+    { $$ = Variable($2, $2->value); }
 | K_VARIABLE arbitraryAttributes X_SLASH
-    { $$ = Variable($2->value); }
+    { $$ = Variable($2, $2->value); }
 ;
 
 
@@ -514,9 +512,9 @@ tCorrelationSet_list:
 
 tCorrelationSet:
   K_CORRELATIONSET arbitraryAttributes X_NEXT X_SLASH K_CORRELATIONSET
-    { $$ = CorrelationSet($2->value); }
+    { $$ = CorrelationSet($2, $2->value); }
 | K_CORRELATIONSET arbitraryAttributes X_SLASH
-    { $$ = CorrelationSet($2->value); }
+    { $$ = CorrelationSet($2, $2->value); }
 ;
 
 
@@ -540,9 +538,9 @@ tCorrelation_list:
 
 tCorrelation:
   K_CORRELATION arbitraryAttributes X_NEXT X_SLASH K_CORRELATION
-    { $$ = Correlation($2->value); }
+    { $$ = Correlation($2, $2->value); }
 | K_CORRELATION arbitraryAttributes X_SLASH
-    { $$ = Correlation($2->value); }
+    { $$ = Correlation($2, $2->value); }
 ;
 
 
@@ -659,23 +657,23 @@ tCopy_list:
 
 tCopy:
   K_COPY arbitraryAttributes X_NEXT tFrom X_NEXT tTo X_NEXT X_SLASH K_COPY
-    { $$ = Copy($4, $6, $2->value); }
+    { $$ = Copy($4, $6, $2, $2->value); }
 ; 
 
 tFrom:
   K_FROM arbitraryAttributes X_NEXT X_SLASH K_FROM
-    { $$ = From($2->value); }
+    { $$ = From($2, $2->value); }
 | K_FROM arbitraryAttributes X_CLOSE constant X_OPEN X_SLASH K_FROM
-    { $$ = From($2->value); }
+    { $$ = From($2, $2->value); }
 | K_FROM arbitraryAttributes X_CLOSE VARIABLENAME X_OPEN X_SLASH K_FROM
-    { $$ = From($2->value); }
+    { $$ = From($2, $2->value); }
 | K_FROM arbitraryAttributes X_NEXT tLiteral X_NEXT X_SLASH K_FROM
-    { $$ = From($2->value);
+    { $$ = From($2, $2->value);
       $$->literal = $4->name; }
 | K_FROM arbitraryAttributes X_NEXT tQuery X_NEXT X_SLASH K_FROM
-    { $$ = From($2->value); }
+    { $$ = From($2, $2->value); }
 | K_FROM arbitraryAttributes X_SLASH
-    { $$ = From($2->value); }
+    { $$ = From($2, $2->value); }
 ;
 
 tLiteral:
@@ -689,15 +687,15 @@ tQuery:
 
 tTo:
   K_TO arbitraryAttributes X_NEXT X_SLASH K_TO
-    { $$ = To($2->value); }
+    { $$ = To($2, $2->value); }
 | K_TO arbitraryAttributes X_CLOSE constant X_OPEN X_SLASH K_TO
-    { $$ = To($2->value); }
+    { $$ = To($2, $2->value); }
 | K_TO arbitraryAttributes X_CLOSE VARIABLENAME X_OPEN X_SLASH K_TO
-    { $$ = To($2->value); }
+    { $$ = To($2, $2->value); }
 | K_TO arbitraryAttributes X_NEXT tQuery X_NEXT X_SLASH K_TO
-    { $$ = To($2->value); }
+    { $$ = To($2, $2->value); }
 | K_TO arbitraryAttributes X_SLASH
-    { $$ = To($2->value); }
+    { $$ = To($2, $2->value); }
 ;
 
 
@@ -846,7 +844,7 @@ tSequence:
 
 tSwitch:
   K_SWITCH arbitraryAttributes X_NEXT standardElements tCase_list tOtherwise X_SLASH K_SWITCH
-    { $$ = Switch($4, $5, $6, $2->value); }
+    { $$ = Switch($4, $5, $6, $2, $2->value); }
 ;
 
 tCase_list:
@@ -953,7 +951,7 @@ tBranches:
 
 tPick:
   K_PICK arbitraryAttributes X_NEXT standardElements tOnMessage X_NEXT tOnMessage_list tOnAlarm_list X_SLASH K_PICK
-    { $$ = Pick($4, ConstOnMessage_list($5, $7), $8, $2->value); }
+    { $$ = Pick($4, ConstOnMessage_list($5, $7), $8, $2, $2->value); }
 ;
 
 
@@ -989,9 +987,9 @@ tLink_list:
 
 tLink:
   K_LINK arbitraryAttributes X_NEXT X_SLASH K_LINK
-    { $$ = Link($2->value); }
+    { $$ = Link($2, $2->value); }
 | K_LINK arbitraryAttributes X_SLASH
-    { $$ = Link($2->value); }
+    { $$ = Link($2, $2->value); }
 ;
 
 
@@ -1049,9 +1047,9 @@ tTarget_list:
 
 tTarget:
   K_TARGET arbitraryAttributes X_NEXT X_SLASH K_TARGET
-    { $$ = Target($2->value); }
+    { $$ = Target($2, $2->value); }
 | K_TARGET arbitraryAttributes X_SLASH
-    { $$ = Target($2->value); }
+    { $$ = Target($2, $2->value); }
 ;
 
 tSource_list:
@@ -1063,9 +1061,9 @@ tSource_list:
 
 tSource:
   K_SOURCE arbitraryAttributes X_NEXT tTransitionCondition X_SLASH K_SOURCE
-    { $$ = Source($2->value); }
+    { $$ = Source($2, $2->value); }
 | K_SOURCE arbitraryAttributes X_SLASH
-    { $$ = Source($2->value); }
+    { $$ = Source($2, $2->value); }
 ;
 
 tTransitionCondition:

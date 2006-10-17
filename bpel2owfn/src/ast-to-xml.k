@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/10/17 18:52:11 $
+ *          - last changed: \$Date: 2006/10/17 19:54:03 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
  */
 %}
 
@@ -101,7 +101,7 @@ Process(a,b,c,d,e,f,g,h,i,j) ->
   PARTNER LINKS
 ******************************************************************************/
 
-PartnerLink() ->
+PartnerLink(a) ->
   [xml: { in(); } "<partnerLink id=\"" $0->id "\"/>\n"]
 ;
 
@@ -110,7 +110,7 @@ PartnerLink() ->
   PARTNERS
 ******************************************************************************/
 
-Partner(a) ->
+Partner(a,b) ->
   [xml: { inup(); } "<partner id=\"" $0->id "\">\n" a { indown(); } "</partner>\n"]
 ;
 
@@ -123,11 +123,11 @@ userDefinedFaultHandler(a,b) ->
   [xml: { inup(); } "<faultHandlers id=\"" $0->id "\">\n" a b { indown(); } "</faultHandlers>\n"]
 ;
 
-Catch(a) ->
+Catch(a,b) ->
   [xml: { inup(); } "<catch id=\"" $0->id "\">\n" a { indown(); } "</catch>\n"]
 ;
 
-CatchAll(a) ->
+CatchAll(a,b) ->
   [xml: { inup(); } "<catchAll>\n" a { indown(); } "</catchAll>\n"]
 ;
 
@@ -140,11 +140,11 @@ userDefinedEventHandler(a,b) ->
   [xml: { inup(); } "<eventHandlers id=\"" $0->id "\">\n" a b { indown(); } "</eventHandlers>\n"]
 ;
 
-OnMessage(a) ->
+OnMessage(a,b) ->
   [xml: { inup(); } "<onMessage>\n" a { indown(); } "</onMessage>\n"]
 ;
 
-OnAlarm(a) ->
+OnAlarm(a,b) ->
   [xml: { inup(); } "<onAlarm>\n" a { indown(); } "</onAlarm>\n"]
 ;
 
@@ -162,7 +162,7 @@ userDefinedCompensationHandler(a) ->
   VARIABLES
 ******************************************************************************/
 
-Variable() ->
+Variable(a) ->
   [xml: { in(); } "<variable id=\"" $0->id "\"/>\n"]
 ;
 
@@ -171,7 +171,7 @@ Variable() ->
   CORRELATION SETS
 ******************************************************************************/
 
-CorrelationSet() ->
+CorrelationSet(a) ->
   [xml: { in(); } "<correlationSet />\n"]
 ;
 
@@ -180,7 +180,7 @@ CorrelationSet() ->
   CORRELATIONS
 ******************************************************************************/
 
-Correlation() ->
+Correlation(a) ->
   [xml: { in(); } "<correlation />\n"]
 ;
 
@@ -228,15 +228,15 @@ Assign(a,b,c) ->
   [xml: { inup(); } "<assign id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a b { indown(); } "</assign>\n"]
 ;
 
-Copy(a,b) ->
+Copy(a,b,c) ->
   [xml: { inup(); } "<copy>\n" a b { indown(); } "</copy>\n"]
 ;
 
-From() ->
+From(a) ->
   [xml: { in(); } "<from />\n"]
 ;
 
-To() ->
+To(b) ->
   [xml: { in(); } "<to />\n"]
 ;
 
@@ -289,7 +289,7 @@ Flow(a,b,c,d) ->
   [xml: { inup(); } "<flow id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a { inup(); } "<links>\n" b { indown(); } "</links>\n" c { indown(); } "</flow>\n"]
 ;
 
-Link() ->
+Link(a) ->
   [xml: { in(); } "<link id=\"" $0->id "\"/>\n"]
 ;
 
@@ -298,7 +298,7 @@ Link() ->
   SWITCH
 ******************************************************************************/
 
-Switch(a,b,c) ->
+Switch(a,b,c,d) ->
   [xml: { inup(); } "<switch id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a b c { indown(); } "</switch>\n"]
 ;
 
@@ -333,7 +333,7 @@ Sequence(a,b,c) ->
   PICK
 ******************************************************************************/
 
-Pick(a,b,c) ->
+Pick(a,b,c,d) ->
   [xml: { inup(); } "<pick id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a b c { indown(); } "</pick>\n"]
 ;
 
@@ -362,10 +362,10 @@ Scope(a,b,c,d,e,f,g,h,i) ->
   STANDARD ELEMENTS
 ******************************************************************************/
 
-Target() ->
+Target(a) ->
   [xml: { in(); } "<target ncf=\"" $0->negativeControlFlow "\" />\n"]
 ;
 
-Source() ->
+Source(a) ->
   [xml: { in(); } "<source ncf=\"" $0->negativeControlFlow "\" />\n"]
 ;

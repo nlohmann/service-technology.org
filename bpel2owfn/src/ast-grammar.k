@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/17 18:52:10 $
+ *          - last changed: \$Date: 2006/10/17 19:54:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.118 $
+ * \version \$Revision: 1.119 $
  */
 %}
 
@@ -179,7 +179,7 @@ tPartnerLink_list:
 ;
 
 tPartnerLink:
-  PartnerLink()
+  PartnerLink(integer)
   {
     int id;
     stringMap attributes;
@@ -188,7 +188,9 @@ tPartnerLink:
   }
 ;
 
-%ctor PartnerLink(int myid = 0)
+%ctor PartnerLink() {}
+
+%ctor PartnerLink(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_PARTNERLINK); }
@@ -203,14 +205,16 @@ tPartner_list:
 ;
 
 tPartner:
-  Partner(tPartnerLink_list)
+  Partner(tPartnerLink_list integer)
   {
     int id;
     stringMap attributes;
   }
 ;
 
-%ctor Partner(int myid = 0)
+%ctor Partner() {}
+
+%ctor Partner(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_PARTNER); }
@@ -248,7 +252,7 @@ tCatch_list:
 ;
 
 tCatch:
-  Catch(activity)
+  Catch(activity integer)
   {
     int id;
     stringMap attributes;
@@ -257,21 +261,25 @@ tCatch:
   }
 ;
 
-%ctor Catch(int myid = 0)
+%ctor Catch() {}
+
+%ctor Catch(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_CATCH); }
 
 
 tCatchAll:
-  CatchAll(activity)
+  CatchAll(activity integer)
 | NoCatchAll()
   {
     int id;
   }
 ;
 
-%ctor CatchAll(int myid = 0)
+%ctor CatchAll() {}
+
+%ctor CatchAll(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_CATCHALL); }
@@ -307,12 +315,8 @@ tOnMessage_list:
   list tOnMessage
 ;
 
-tOnAlarm_list:
-  list tOnAlarm
-;
-
 tOnMessage:
-  OnMessage(activity)
+  OnMessage(activity integer)
   {
     int id;
     stringMap attributes;
@@ -323,21 +327,29 @@ tOnMessage:
   }
 ;
 
-%ctor OnMessage(int myid = 0)
+%ctor OnMessage() {}
+
+%ctor OnMessage(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_ONMESSAGE); }
 
 
+tOnAlarm_list:
+  list tOnAlarm
+;
+
 tOnAlarm:
-  OnAlarm(activity)
+  OnAlarm(activity integer)
   {
     int id;
     stringMap attributes;
   } 
 ;
 
-%ctor OnAlarm(int myid = 0)
+%ctor OnAlarm() {}
+
+%ctor OnAlarm(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_ONALARM); }
@@ -381,14 +393,16 @@ tVariable_list:
 ;
 
 tVariable:
-  Variable()
+  Variable(integer)
   {
     int id;
     stringMap attributes;
   }
 ;
 
-%ctor Variable(int myid = 0)
+%ctor Variable() {}
+
+%ctor Variable(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_VARIABLE); }
@@ -403,14 +417,16 @@ tCorrelationSet_list:
 ;
 
 tCorrelationSet:
-  CorrelationSet()
+  CorrelationSet(integer)
   {
     int id;
     stringMap attributes;
   }
 ;
 
-%ctor CorrelationSet(int myid = 0)
+%ctor CorrelationSet() {}
+
+%ctor CorrelationSet(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_CORRELATIONSET); }
@@ -425,14 +441,16 @@ tCorrelation_list:
 ;
 
 tCorrelation:
-  Correlation()
+  Correlation(integer)
   {
     int id;
     stringMap attributes;
   }
 ;
 
-%ctor Correlation(int myid = 0)
+%ctor Correlation() {}
+
+%ctor Correlation(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_CORRELATION); }
@@ -596,21 +614,23 @@ tCopy_list:
 ;
 
 tCopy:
-  Copy(tFrom tTo)
+  Copy(tFrom tTo integer)
   {
     int id;
     stringMap attributes;
   }
 ;
 
-%ctor Copy(int myid = 0)
+%ctor Copy() {}
+
+%ctor Copy(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_COPY); }
 
 
 tFrom:
-  From()
+  From(integer)
   {
     int id;
     stringMap attributes;
@@ -622,14 +642,16 @@ tFrom:
   }
 ;
 
-%ctor From(int myid = 0)
+%ctor From() {}
+
+%ctor From(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_FROM); }
 
 
 tTo:
-  To()
+  To(integer)
   {
     int id;
     stringMap attributes;
@@ -638,7 +660,9 @@ tTo:
   }
 ;
 
-%ctor To(int myid = 0)
+%ctor To() {}
+
+%ctor To(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_TO); }
@@ -893,7 +917,7 @@ tSequence:
 ******************************************************************************/
 
 tSwitch:
-  Switch(standardElements tCase_list tOtherwise)
+  Switch(standardElements tCase_list tOtherwise integer)
   {
     int id;
     stringMap attributes;
@@ -903,7 +927,9 @@ tSwitch:
   }
 ;
 
-%ctor Switch(int myid = 0)
+%ctor Switch() {}
+
+%ctor Switch(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_SWITCH); }
@@ -1066,7 +1092,7 @@ tForEach:
 ******************************************************************************/
 
 tPick:
-  Pick(standardElements tOnMessage_list tOnAlarm_list)
+  Pick(standardElements tOnMessage_list tOnAlarm_list integer)
   {
     int id;
     stringMap attributes;
@@ -1076,7 +1102,9 @@ tPick:
   }
 ;
 
-%ctor Pick(int myid = 0)
+%ctor Pick() {}
+
+%ctor Pick(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_PICK); }
@@ -1114,7 +1142,7 @@ tLink_list:
 ;
 
 tLink:
-  Link()
+  Link(integer)
   {
     int id;
     stringMap attributes;
@@ -1124,7 +1152,9 @@ tLink:
   }
 ;
 
-%ctor Link(int myid = 0)
+%ctor Link() {}
+
+%ctor Link(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_LINK); }
@@ -1217,7 +1247,7 @@ tTarget_list:
 ;
 
 tTarget:
-  Target()
+  Target(integer)
   {
     int id;
     stringMap attributes;
@@ -1228,7 +1258,9 @@ tTarget:
   }
 ;
 
-%ctor Target(int myid = 0)
+%ctor Target() {}
+
+%ctor Target(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_TARGET); }
@@ -1239,7 +1271,7 @@ tSource_list:
 ;
 
 tSource:
-  Source()
+  Source(integer)
   {
     int id;
     stringMap attributes;
@@ -1250,7 +1282,9 @@ tSource:
   }
 ;
 
-%ctor Source(int myid = 0)
+%ctor Source() {}
+
+%ctor Source(int myid)
 { id = myid;
   assert(ASTEmap[id] == NULL);
   ASTEmap[id] = new ASTE(id, K_SOURCE); }

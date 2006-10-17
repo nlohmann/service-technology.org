@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/10/17 18:52:10 $
+ *          - last changed: \$Date: 2006/10/17 19:54:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.29 $
+ * \version \$Revision: 1.30 $
  */
 %}
 
@@ -162,7 +162,7 @@ Process(a,b,c,d,e,f,g,h,i,j) ->
   FAULT HANDLERS
 ******************************************************************************/
 
-This=userDefinedFaultHandler(a,catchAll = CatchAll(b)) ->
+This=userDefinedFaultHandler(a,catchAll = CatchAll(b,c)) ->
   [cfg: {
 	  trace(TRACE_DEBUG, "[CFG] FaultHandler (user defined)\n");
 	  CFGBlock* firstBlock = new CFGBlock(CFGFaultHandler, $0->id, "FaultHandler_begin"); 
@@ -554,7 +554,7 @@ Flow(a,b,c,d) ->
   SWITCH
 ******************************************************************************/
 
-This=Switch(a,b,Otherwise(c)) ->
+This=Switch(a,b,Otherwise(c),d) ->
   [cfg: {
 	  trace(TRACE_DEBUG, "[CFG] Switch\n");
 	  CFGBlock * firstBlock = new CFGBlock(CFGSwitch, $0->id, "Switch_begin"); 
@@ -660,7 +660,7 @@ Sequence(a,b,c) ->
   PICK
 ******************************************************************************/
 
-Pick(a,b,c) ->
+Pick(a,b,c,d) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Pick\n");
 	  CFGBlock * firstBlock = new CFGBlock(CFGPick, $0->id, "Pick_begin"); 

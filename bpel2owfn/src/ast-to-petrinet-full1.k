@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/17 18:52:10 $
+ *          - last changed: \$Date: 2006/10/17 19:54:02 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.196 $
+ * \version \$Revision: 1.197 $
  *
  */
 %}
@@ -776,7 +776,7 @@ This=userDefinedFaultHandler(a,b) provided (This->inProcess) ->
       }
 
       with(b) {
-	CatchAll(innerActivity):
+	CatchAll(innerActivity, _id):
 	{
 	  Transition *t3 = TheNet->newTransition(prefix + "t3.catchAll");
 	  Transition *t4 = TheNet->newTransition(prefix + "t4.catchAll");
@@ -1108,7 +1108,7 @@ This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
       }
 
       with(b) {
-	CatchAll(innerActivity):
+	CatchAll(innerActivity, _id):
 	{
 	  Transition *t3 = TheNet->newTransition(prefix + "t3.catchAll");
 	  TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
@@ -1264,7 +1264,7 @@ This=implicitFaultHandler() provided (!This->inProcess) ->
 
 
 
-CatchAll(innerActivity) ->
+CatchAll(innerActivity, id) ->
   [petrinet: innerActivity]
 ;
 

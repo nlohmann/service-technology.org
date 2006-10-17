@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/16 09:15:05 $
+ *          - last changed: \$Date: 2006/10/17 13:48:16 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.194 $
+ * \version \$Revision: 1.195 $
  *
  */
 %}
@@ -446,9 +446,9 @@ StopInProcess() ->
       Transition *t3 = TheNet->newTransition(prefix + "t3");
       TheNet->newArc(p3, t3);
       TheNet->newArc(p22, t3);
+      TheNet->newArc(t3, p4);
 
       Transition *t4 =  TheNet->newTransition(prefix + "t4");
-      TheNet->newArc(t3, p4);
       TheNet->newArc(p5, t4);
       TheNet->newArc(t4, p2);
       TheNet->newArc(t4, p6);

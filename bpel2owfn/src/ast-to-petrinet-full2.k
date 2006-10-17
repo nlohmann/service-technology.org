@@ -53,7 +53,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/16 09:15:05 $
+ *          - last changed: \$Date: 2006/10/17 13:48:16 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +63,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.30 $
+ * \version \$Revision: 1.31 $
  */
 %}
 
@@ -252,7 +252,7 @@ This=Invoke(a,b) provided (This->isSynchronousInvoke) ->
       TheNet->newArc(TheNet->findPlace("variable." + This->outputVariableName), t4);
       TheNet->newArc(t4, TheNet->findPlace("variable." + This->outputVariableName));
 
-      if ($0->inWhile) // was: (parameters[P_CYCLICWHILE] && $0->inWhile)
+      if ($0->inWhile)
       {
         TheNet->findPlace("in." + This->channelName)->inWhile = true;
         TheNet->findPlace("out." + This->channelName)->inWhile = true;

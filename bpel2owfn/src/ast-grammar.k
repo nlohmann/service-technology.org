@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/18 09:37:41 $
+ *          - last changed: \$Date: 2006/10/18 09:54:42 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.122 $
+ * \version \$Revision: 1.123 $
  */
 %}
 
@@ -123,8 +123,6 @@ tProcess:
   }
 ;
 
-%ctor Process() { CTOR(K_PROCESS) }
-
 
 tStop:
   StopInProcess()
@@ -162,28 +160,9 @@ activity:
   }
 ;
 
-%ctor activityReceive()		{ id = tReceive_1->id; }
-%ctor activityReply()		{ id = tReply_1->id; }
-%ctor activityInvoke()		{ id = tInvoke_1->id; }
-%ctor activityAssign()		{ id = tAssign_1->id; }
-%ctor activityValidate()	{ id = tValidate_1->id; }
-%ctor activityEmpty()		{ id = tEmpty_1->id; }
-%ctor activityWait()		{ id = tWait_1->id; }
-%ctor activityTerminate()	{ id = tTerminate_1->id; }
-%ctor activityExit()		{ id = tExit_1->id; }
-%ctor activityThrow()		{ id = tThrow_1->id; }
-%ctor activityRethrow()		{ id = tRethrow_1->id; }
-%ctor activityCompensate()	{ id = tCompensate_1->id; }
-%ctor activityCompensateScope()	{ id = tCompensateScope_1->id; }
-%ctor activitySequence()	{ id = tSequence_1->id; }
-%ctor activitySwitch()		{ id = tSwitch_1->id; }
-%ctor activityIf()		{ id = tIf_1->id; }
-%ctor activityWhile()		{ id = tWhile_1->id; }
-%ctor activityRepeatUntil()	{ id = tRepeatUntil_1->id; }
-%ctor activityForEach()		{ id = tForEach_1->id; }
-%ctor activityPick()		{ id = tPick_1->id; }
-%ctor activityFlow()		{ id = tFlow_1->id; }
-%ctor activityScope()		{ id = tScope_1->id; }
+activity_list: list activity;
+
+
 
 
 
@@ -205,16 +184,12 @@ tPartnerLink:
   }
 ;
 
-%ctor PartnerLink() { CTOR(K_PARTNERLINK) }
-
 
 /******************************************************************************
   PARTNERS
 ******************************************************************************/
 
-tPartner_list:
-  list tPartner
-;
+tPartner_list: list tPartner;
 
 tPartner:
   Partner(tPartnerLink_list integer)
@@ -223,8 +198,6 @@ tPartner:
     stringMap attributes;
   }
 ;
-
-%ctor Partner() { CTOR(K_PARTNER) }
 
 
 /******************************************************************************
@@ -243,13 +216,7 @@ tFaultHandlers:
   }  
 ;
 
-%ctor implicitFaultHandler()  { CTOR(K_FAULTHANDLERS) }
-%ctor userDefinedFaultHandler() { CTOR(K_FAULTHANDLERS) }
-
-
-tCatch_list:
-  list tCatch
-;
+tCatch_list: list tCatch;
 
 tCatch:
   Catch(activity integer)
@@ -261,9 +228,6 @@ tCatch:
   }
 ;
 
-%ctor Catch() { CTOR(K_CATCH) }
-
-
 tCatchAll:
   CatchAll(activity integer)
 | NoCatchAll()
@@ -271,8 +235,6 @@ tCatchAll:
     int id;
   }
 ;
-
-%ctor CatchAll() { CTOR(K_CATCHALL) }
 
 
 /******************************************************************************
@@ -289,14 +251,8 @@ tEventHandlers:
   }
 ;
 
-%ctor implicitEventHandler() { CTOR(K_EVENTHANDLERS) }
-%ctor userDefinedEventHandler() { CTOR(K_EVENTHANDLERS) }
-
-
 // onMessage is called onEvent in WS-BPEL 2.0
-tOnMessage_list:
-  list tOnMessage
-;
+tOnMessage_list: list tOnMessage;
 
 tOnMessage:
   OnMessage(activity integer)
@@ -310,12 +266,7 @@ tOnMessage:
   }
 ;
 
-%ctor OnMessage() { CTOR(K_ONMESSAGE) }
-
-
-tOnAlarm_list:
-  list tOnAlarm
-;
+tOnAlarm_list: list tOnAlarm;
 
 tOnAlarm:
   OnAlarm(activity integer)
@@ -324,8 +275,6 @@ tOnAlarm:
     stringMap attributes;
   } 
 ;
-
-%ctor OnAlarm() { CTOR(K_ONALARM) }
 
 
 /******************************************************************************
@@ -346,17 +295,12 @@ tCompensationHandler:
   }
 ;
 
-%ctor implicitCompensationHandler() { CTOR(K_COMPENSATIONHANDLER) }
-%ctor userDefinedCompensationHandler() { CTOR(K_COMPENSATIONHANDLER) }
-
 
 /******************************************************************************
   VARIABLES
 ******************************************************************************/
 
-tVariable_list:
-  list tVariable
-;
+tVariable_list: list tVariable;
 
 tVariable:
   Variable(integer)
@@ -366,16 +310,12 @@ tVariable:
   }
 ;
 
-%ctor Variable() { CTOR(K_VARIABLE) }
-
 
 /******************************************************************************
   CORRELATION SETS
 ******************************************************************************/
 
-tCorrelationSet_list:
-  list tCorrelationSet
-;
+tCorrelationSet_list: list tCorrelationSet;
 
 tCorrelationSet:
   CorrelationSet(integer)
@@ -385,16 +325,12 @@ tCorrelationSet:
   }
 ;
 
-%ctor CorrelationSet() { CTOR(K_CORRELATIONSET) }
-
 
 /******************************************************************************
   CORRELATIONS
 ******************************************************************************/
 
-tCorrelation_list:
-  list tCorrelation
-;
+tCorrelation_list: list tCorrelation;
 
 tCorrelation:
   Correlation(integer)
@@ -404,16 +340,12 @@ tCorrelation:
   }
 ;
 
-%ctor Correlation() { CTOR(K_CORRELATION) }
-
 
 /******************************************************************************
-  TOPARTS                                                        (WS-BPEL 2.0)
+  TO & FROM PARTS                                                (WS-BPEL 2.0)
 ******************************************************************************/
 
-tToPart_list:
-  list tToPart
-;
+tToPart_list: list tToPart;
 
 tToPart:
   ToPart(integer)
@@ -423,16 +355,7 @@ tToPart:
   }
 ;
 
-%ctor ToPart() { CTOR(K_TOPART) }
-
-
-/******************************************************************************
-  FROMPARTS                                                      (WS-BPEL 2.0)
-******************************************************************************/
-
-tFromPart_list:
-  list tFromPart
-;
+tFromPart_list: list tFromPart;
 
 tFromPart:
   FromPart(integer)
@@ -441,8 +364,6 @@ tFromPart:
     stringMap attributes;
   }
 ;
-
-%ctor FromPart() { CTOR(K_FROMPART) }
 
 
 
@@ -467,8 +388,6 @@ tReceive:
   }
 ;
 
-%ctor Receive() { CTOR(K_RECEIVE) }
-
 
 /******************************************************************************
   REPLY
@@ -488,8 +407,6 @@ tReply:
     string variableName;
   }
 ;
-
-%ctor Reply() { CTOR(K_REPLY) }
 
 
 /******************************************************************************
@@ -514,8 +431,6 @@ tInvoke:
   }
 ;
 
-%ctor Invoke() { CTOR(K_INVOKE) }
-
 
 /******************************************************************************
   ASSIGN
@@ -532,12 +447,7 @@ tAssign:
   }
 ;
 
-%ctor Assign() { CTOR(K_ASSIGN) }
-
-
-tCopy_list:
-  list tCopy
-;
+tCopy_list: list tCopy;
 
 tCopy:
   Copy(tFrom tTo integer)
@@ -546,9 +456,6 @@ tCopy:
     stringMap attributes;
   }
 ;
-
-%ctor Copy() { CTOR(K_COPY) }
-
 
 tFrom:
   From(integer)
@@ -563,9 +470,6 @@ tFrom:
   }
 ;
 
-%ctor From() { CTOR(K_FROM) }
-
-
 tTo:
   To(integer)
   {
@@ -575,8 +479,6 @@ tTo:
     string variableName;
   }
 ;
-
-%ctor To() { CTOR(K_TO) }
 
 
 /******************************************************************************
@@ -594,8 +496,6 @@ tValidate:
   }
 ;
 
-%ctor Validate() { CTOR(K_VALIDATE) }
-
 
 /******************************************************************************
   EMPTY
@@ -611,8 +511,6 @@ tEmpty:
     bool suppressJF = false;
   }
 ;
-
-%ctor Empty() { CTOR(K_EMPTY) }
 
 
 /******************************************************************************
@@ -632,8 +530,6 @@ tWait:
   }
 ;
 
-%ctor Wait() { CTOR(K_WAIT) }
-
 
 /******************************************************************************
   TERMINATE                                                      (BPEL4WS 1.1)
@@ -650,8 +546,6 @@ tTerminate:
   }
 ;
 
-%ctor Terminate() { CTOR(K_TERMINATE) }
-
 
 /******************************************************************************
   EXIT                                                           (WS-BPEL 2.0)
@@ -667,8 +561,6 @@ tExit:
     bool suppressJF = false;
   }
 ;
-
-%ctor Exit() { CTOR(K_EXIT) }
 
 
 /******************************************************************************
@@ -688,8 +580,6 @@ tThrow:
   }
 ;
 
-%ctor Throw() { CTOR(K_THROW) }
-
 
 /******************************************************************************
   RETHROW                                                        (WS-BPEL 2.0)
@@ -707,8 +597,6 @@ tRethrow:
     string variableName;
   }
 ;
-
-%ctor Rethrow() { CTOR(K_RETHROW) }
 
 
 /******************************************************************************
@@ -730,8 +618,6 @@ tCompensate:
   }
 ;
 
-%ctor Compensate() { CTOR(K_COMPENSATE) }
-
 
 /******************************************************************************
   COMPENSATESCOPE                                                (WS-BPEL 2.0)
@@ -752,8 +638,6 @@ tCompensateScope:
   }
 ;
 
-%ctor CompensateScope() { CTOR(K_COMPENSATESCOPE) }
-
 
 /******************************************************************************
   SEQUENCE
@@ -769,8 +653,6 @@ tSequence:
     bool suppressJF = false;
   }
 ;
-
-%ctor Sequence()  { CTOR(K_SEQUENCE) }
 
 
 /******************************************************************************
@@ -788,12 +670,7 @@ tSwitch:
   }
 ;
 
-%ctor Switch() { CTOR(K_SWITCH) }
-
-
-tCase_list:
-  list tCase
-;
+tCase_list: list tCase;
 
 tCase:
   Case(activity integer)
@@ -803,9 +680,6 @@ tCase:
   }
 ;
 
-%ctor Case() { CTOR(K_CASE) }
-
-
 tOtherwise:
   Otherwise(activity integer)
 | NoOtherwise()
@@ -813,8 +687,6 @@ tOtherwise:
     int id;
   }
 ;
-
-%ctor Otherwise() { CTOR(K_OTHERWISE) }
 
 
 /******************************************************************************
@@ -832,11 +704,7 @@ tIf:
   }
 ;
 
-%ctor If() { CTOR(K_IF) }
-
-
-tElseIf_list:
-  list tElseIf
+tElseIf_list: list tElseIf
 ;
 
 tElseIf:
@@ -847,17 +715,12 @@ tElseIf:
   }
 ;
 
-%ctor ElseIf() { CTOR(K_ELSEIF) }
-
-
 tElse:
   Else(activity integer)
   {
     int id;
   }
 ;
-
-%ctor Else() { CTOR(K_ELSE) }
 
 
 /******************************************************************************
@@ -875,8 +738,6 @@ tWhile:
   }
 ;
 
-%ctor While() { CTOR(K_WHILE) }
-
 
 /******************************************************************************
   REPEATUNTIL                                                    (WS-BPEL 2.0)
@@ -892,8 +753,6 @@ tRepeatUntil:
     bool suppressJF = false;
   }
 ;
-
-%ctor RepeatUntil() { CTOR(K_REPEATUNTIL) }
 
 
 /******************************************************************************
@@ -911,8 +770,6 @@ tForEach:
   }
 ;
 
-%ctor ForEach() { CTOR(K_FOREACH) }
-
 
 /******************************************************************************
   PICK
@@ -928,8 +785,6 @@ tPick:
     bool suppressJF = false;
   }
 ;
-
-%ctor Pick() { CTOR(K_PICK) }
 
 
 /******************************************************************************
@@ -947,16 +802,7 @@ tFlow:
   }
 ;
 
-%ctor Flow() { CTOR(K_FLOW) }
-
-
-activity_list:
-  list activity 
-;
-
-tLink_list:
-  list tLink
-;
+tLink_list: list tLink;
 
 tLink:
   Link(integer)
@@ -968,8 +814,6 @@ tLink:
     bool usedAsTarget = false;
   }
 ;
-
-%ctor Link() { CTOR(K_LINK) }
 
 
 /******************************************************************************
@@ -1000,8 +844,6 @@ tScope:
   }
 ;
 
-%ctor Scope() { CTOR(K_SCOPE) }
-
 
 /******************************************************************************
   TERMINATION HANDLER
@@ -1016,9 +858,6 @@ tTerminationHandler:
     int parentScopeId;
   }
 ;
-
-%ctor implicitTerminationHandler() { CTOR(K_TERMINATIONHANDLER) }
-%ctor userDefinedTerminationHandler() { CTOR(K_TERMINATIONHANDLER) }
 
 
 
@@ -1059,12 +898,7 @@ tTarget:
   }
 ;
 
-%ctor Target() { CTOR(K_TARGET) }
-
-
-tSource_list:
-  list tSource
-;
+tSource_list: list tSource;
 
 tSource:
   Source(integer)
@@ -1078,9 +912,6 @@ tSource:
   }
 ;
 
-%ctor Source() { CTOR(K_SOURCE) }
-
-
 joinCondition:
   standardJoinCondition()
 | userDefinedJoinCondition(expression)
@@ -1092,3 +923,87 @@ expression:
 | Conjunction(expression expression)
 | Disjunction(expression expression)
 ;
+
+
+
+
+
+/******************************************************************************
+  CONSTRUCTORS
+******************************************************************************/
+
+%ctor activityReceive()			{ id = tReceive_1->id; }
+%ctor activityReply()			{ id = tReply_1->id; }
+%ctor activityInvoke()			{ id = tInvoke_1->id; }
+%ctor activityAssign()			{ id = tAssign_1->id; }
+%ctor activityValidate()		{ id = tValidate_1->id; }
+%ctor activityEmpty()			{ id = tEmpty_1->id; }
+%ctor activityWait()			{ id = tWait_1->id; }
+%ctor activityTerminate()		{ id = tTerminate_1->id; }
+%ctor activityExit()			{ id = tExit_1->id; }
+%ctor activityThrow()			{ id = tThrow_1->id; }
+%ctor activityRethrow()			{ id = tRethrow_1->id; }
+%ctor activityCompensate()		{ id = tCompensate_1->id; }
+%ctor activityCompensateScope()		{ id = tCompensateScope_1->id; }
+%ctor activitySequence()		{ id = tSequence_1->id; }
+%ctor activitySwitch()			{ id = tSwitch_1->id; }
+%ctor activityIf()			{ id = tIf_1->id; }
+%ctor activityWhile()			{ id = tWhile_1->id; }
+%ctor activityRepeatUntil()		{ id = tRepeatUntil_1->id; }
+%ctor activityForEach()			{ id = tForEach_1->id; }
+%ctor activityPick()			{ id = tPick_1->id; }
+%ctor activityFlow()			{ id = tFlow_1->id; }
+%ctor activityScope()			{ id = tScope_1->id; }
+
+%ctor Process()				{ CTOR(K_PROCESS) }
+%ctor PartnerLink()			{ CTOR(K_PARTNERLINK) }
+%ctor Partner()				{ CTOR(K_PARTNER) }
+%ctor implicitFaultHandler()		{ CTOR(K_FAULTHANDLERS) }
+%ctor userDefinedFaultHandler()		{ CTOR(K_FAULTHANDLERS) }
+%ctor Catch()				{ CTOR(K_CATCH) }
+%ctor CatchAll()			{ CTOR(K_CATCHALL) }
+%ctor implicitEventHandler()		{ CTOR(K_EVENTHANDLERS) }
+%ctor userDefinedEventHandler()		{ CTOR(K_EVENTHANDLERS) }
+%ctor OnMessage()			{ CTOR(K_ONMESSAGE) }
+%ctor OnAlarm()				{ CTOR(K_ONALARM) }
+%ctor implicitCompensationHandler()	{ CTOR(K_COMPENSATIONHANDLER) }
+%ctor userDefinedCompensationHandler()	{ CTOR(K_COMPENSATIONHANDLER) }
+%ctor Variable()			{ CTOR(K_VARIABLE) }
+%ctor CorrelationSet()			{ CTOR(K_CORRELATIONSET) }
+%ctor Correlation()			{ CTOR(K_CORRELATION) }
+%ctor ToPart()				{ CTOR(K_TOPART) }
+%ctor FromPart()			{ CTOR(K_FROMPART) }
+%ctor Receive()				{ CTOR(K_RECEIVE) }
+%ctor Reply()				{ CTOR(K_REPLY) }
+%ctor Invoke()				{ CTOR(K_INVOKE) }
+%ctor Assign()				{ CTOR(K_ASSIGN) }
+%ctor Copy()				{ CTOR(K_COPY) }
+%ctor From()				{ CTOR(K_FROM) }
+%ctor To()				{ CTOR(K_TO) }
+%ctor Validate()			{ CTOR(K_VALIDATE) }
+%ctor Empty()				{ CTOR(K_EMPTY) }
+%ctor Wait() 				{ CTOR(K_WAIT) }
+%ctor Terminate()			{ CTOR(K_TERMINATE) }
+%ctor Exit()				{ CTOR(K_EXIT) }
+%ctor Throw()				{ CTOR(K_THROW) }
+%ctor Rethrow()				{ CTOR(K_RETHROW) }
+%ctor Compensate()			{ CTOR(K_COMPENSATE) }
+%ctor CompensateScope()			{ CTOR(K_COMPENSATESCOPE) }
+%ctor Sequence()			{ CTOR(K_SEQUENCE) }
+%ctor Switch()				{ CTOR(K_SWITCH) }
+%ctor Case()				{ CTOR(K_CASE) }
+%ctor Otherwise()			{ CTOR(K_OTHERWISE) }
+%ctor If() 				{ CTOR(K_IF) }
+%ctor ElseIf()				{ CTOR(K_ELSEIF) }
+%ctor Else()				{ CTOR(K_ELSE) }
+%ctor While()				{ CTOR(K_WHILE) }
+%ctor RepeatUntil()			{ CTOR(K_REPEATUNTIL) }
+%ctor ForEach()				{ CTOR(K_FOREACH) }
+%ctor Pick()				{ CTOR(K_PICK) }
+%ctor Flow()				{ CTOR(K_FLOW) }
+%ctor Link()				{ CTOR(K_LINK) }
+%ctor Scope()				{ CTOR(K_SCOPE) }
+%ctor implicitTerminationHandler()	{ CTOR(K_TERMINATIONHANDLER) }
+%ctor userDefinedTerminationHandler()	{ CTOR(K_TERMINATIONHANDLER) }
+%ctor Target()				{ CTOR(K_TARGET) }
+%ctor Source()				{ CTOR(K_SOURCE) }

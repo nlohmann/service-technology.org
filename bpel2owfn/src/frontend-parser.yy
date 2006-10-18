@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/18 08:49:05 $
+ *          - last changed: \$Date: 2006/10/18 09:37:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.247 $
+ * \version \$Revision: 1.248 $
  * 
  */
 %}
@@ -377,9 +377,9 @@ tMessageExchange:
 
 tFaultHandlers:
   /* empty */
-    { $$ = implicitFaultHandler(ASTEid++); }
+    { $$ = implicitFaultHandler(mkinteger(0)); }
 | K_FAULTHANDLERS X_NEXT tCatch_list tCatchAll X_SLASH K_FAULTHANDLERS X_NEXT
-    { $$ = userDefinedFaultHandler($3, $4, ASTEid++); }
+    { $$ = userDefinedFaultHandler($3, $4, mkinteger(0)); }
 ;
 
 tCatch_list:
@@ -408,9 +408,9 @@ tCatchAll:
 
 tCompensationHandler:
   /* empty */
-    { $$ = implicitCompensationHandler(ASTEid++); }
+    { $$ = implicitCompensationHandler(mkinteger(0)); }
 | K_COMPENSATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_COMPENSATIONHANDLER X_NEXT
-    { $$ = userDefinedCompensationHandler($3, ASTEid++); }
+    { $$ = userDefinedCompensationHandler($3, mkinteger(0)); }
 ;
 
 
@@ -420,9 +420,9 @@ tCompensationHandler:
 
 tEventHandlers:
   /* empty */
-    { $$ = implicitEventHandler(ASTEid++); }
+    { $$ = implicitEventHandler(mkinteger(0)); }
 | K_EVENTHANDLERS X_NEXT tOnMessage_list tOnAlarm_list X_SLASH K_EVENTHANDLERS X_NEXT
-    { $$ = userDefinedEventHandler($3, $4, ASTEid++); }
+    { $$ = userDefinedEventHandler($3, $4, mkinteger(0)); }
 ;
 
 tOnMessage_list:
@@ -564,9 +564,9 @@ tToPart_list:
 
 tToPart:
   K_TOPART arbitraryAttributes X_NEXT X_SLASH K_TOPART
-    { $$ = ToPart($2->value); }
+    { $$ = ToPart($2); }
 | K_TOPART arbitraryAttributes X_SLASH
-    { $$ = ToPart($2->value); }
+    { $$ = ToPart($2); }
 ;
 
 
@@ -590,9 +590,9 @@ tFromPart_list:
 
 tFromPart:
   K_FROMPART arbitraryAttributes X_NEXT X_SLASH K_FROMPART
-    { $$ = FromPart($2->value); }
+    { $$ = FromPart($2); }
 | K_FROMPART arbitraryAttributes X_SLASH
-    { $$ = FromPart($2->value); }
+    { $$ = FromPart($2); }
 ;
 
 
@@ -608,8 +608,7 @@ tReceive:
   K_RECEIVE arbitraryAttributes X_NEXT standardElements tCorrelations tFromParts X_SLASH K_RECEIVE
     { $$ = Receive($4, $5, $2); }
 | K_RECEIVE arbitraryAttributes X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Receive(noLinks, NiltCorrelation_list(), $2); }
+    { $$ = Receive(NoStandardElements(), NiltCorrelation_list(), $2); }
 ;
 
 
@@ -621,8 +620,7 @@ tReply:
   K_REPLY arbitraryAttributes X_NEXT standardElements tCorrelations tToParts X_SLASH K_REPLY
     { $$ = Reply($4, $5, $2); }
 | K_REPLY arbitraryAttributes X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Reply(noLinks, NiltCorrelation_list(), $2); }
+    { $$ = Reply(NoStandardElements(), NiltCorrelation_list(), $2); }
 ;
 
 
@@ -634,8 +632,7 @@ tInvoke:
   K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations tToParts tFromParts X_SLASH K_INVOKE
     { $$ = Invoke($4, $5, $2); }
 | K_INVOKE arbitraryAttributes X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Invoke(noLinks, NiltCorrelation_list(), $2); }
+    { $$ = Invoke(NoStandardElements(), NiltCorrelation_list(), $2); }
 ;
 
 
@@ -707,8 +704,7 @@ tValidate:
   K_VALIDATE arbitraryAttributes X_NEXT standardElements X_SLASH K_VALIDATE
     { $$ = Validate($4, $2); }
 | K_VALIDATE arbitraryAttributes X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Validate(noLinks, $2); }
+    { $$ = Validate(NoStandardElements(), $2); }
 ;
 
 
@@ -720,8 +716,7 @@ tEmpty:
   K_EMPTY arbitraryAttributes X_NEXT standardElements X_SLASH K_EMPTY
     { $$ = Empty($4, $2); }
 | K_EMPTY arbitraryAttributes X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Empty(noLinks, $2); }
+    { $$ = Empty(NoStandardElements(), $2); }
 ;
 
 
@@ -737,8 +732,7 @@ tWait:
 | K_WAIT arbitraryAttributes X_NEXT tUntil standardElements X_SLASH K_WAIT
     { $$ = Wait($5, $2); }
 | K_WAIT arbitraryAttributes X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Wait(noLinks, $2); }
+    { $$ = Wait(NoStandardElements(), $2); }
 ;
 
 tFor:
@@ -758,8 +752,7 @@ tTerminate:
   K_TERMINATE arbitraryAttributes X_NEXT standardElements X_SLASH K_TERMINATE
     { $$ = Terminate($4, $2); }
 | K_TERMINATE arbitraryAttributes X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Terminate(noLinks, $2); }
+    { $$ = Terminate(NoStandardElements(), $2); }
 ;
 
 
@@ -771,8 +764,7 @@ tExit:
   K_EXIT arbitraryAttributes X_NEXT standardElements X_SLASH K_EXIT
     { $$ = Exit($4, $2); }
 | K_EXIT arbitraryAttributes X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Exit(noLinks, $2); }
+    { $$ = Exit(NoStandardElements(), $2); }
 ;
 
 
@@ -784,8 +776,7 @@ tThrow:
   K_THROW arbitraryAttributes X_NEXT standardElements X_SLASH K_THROW
     { $$ = Throw($4, $2); }
 | K_THROW arbitraryAttributes X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Throw(noLinks, $2); }
+    { $$ = Throw(NoStandardElements(), $2); }
 ;
 
 
@@ -797,8 +788,7 @@ tRethrow:
   K_RETHROW arbitraryAttributes X_NEXT standardElements X_SLASH K_RETHROW
     { $$ = Rethrow($4, $2); }
 | K_RETHROW arbitraryAttributes X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Rethrow(noLinks, $2); }
+    { $$ = Rethrow(NoStandardElements(), $2); }
 ;
 
 
@@ -810,8 +800,7 @@ tCompensate:
   K_COMPENSATE arbitraryAttributes X_NEXT standardElements X_SLASH K_COMPENSATE
     { $$ = Compensate($4, $2); }
 | K_COMPENSATE arbitraryAttributes X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = Compensate(noLinks, $2); }
+    { $$ = Compensate(NoStandardElements(), $2); }
 ;
 
 
@@ -823,8 +812,7 @@ tCompensateScope:
   K_COMPENSATESCOPE arbitraryAttributes X_NEXT standardElements X_SLASH K_COMPENSATESCOPE
     { $$ = CompensateScope($4, $2); }
 | K_COMPENSATESCOPE arbitraryAttributes X_SLASH
-    { impl_standardElements_StandardElements *noLinks = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition());
-      $$ = CompensateScope(noLinks, $2); }
+    { $$ = CompensateScope(NoStandardElements(), $2); }
 ;
 
 
@@ -874,7 +862,7 @@ tOtherwise:
 
 tIf:
   K_IF arbitraryAttributes X_NEXT standardElements tCondition activity X_NEXT tElseIf_list tElse X_SLASH K_IF
-    { $$ = If($4, ConstElseIf_list(ElseIf($6), $8), $9, $2->value); }
+    { $$ = If($4, ConstElseIf_list(ElseIf($6, ((impl_tElseIf_ElseIf*)$6)->integer_1), $8), $9, $2); }
 ;
 
 tCondition:
@@ -891,12 +879,12 @@ tElseIf_list:
 
 tElseIf:
   K_ELSEIF arbitraryAttributes X_NEXT tCondition X_NEXT activity X_NEXT X_SLASH K_ELSEIF X_NEXT
-    { $$ = ElseIf($6, $2->value); }
+    { $$ = ElseIf($6, $2); }
 ;
 
 tElse:
   K_ELSE X_NEXT activity X_NEXT X_SLASH K_ELSE X_NEXT
-    { $$ = Else($3, ASTEid++); }
+    { $$ = Else($3, mkinteger(0)); }
 ;
 
 
@@ -1014,9 +1002,9 @@ tScope:
 
 tTerminationHandler:
   /* empty */
-    { $$ = implicitTerminationHandler(ASTEid++); }
+    { $$ = implicitTerminationHandler(mkinteger(0)); }
 | K_TERMINATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_TERMINATIONHANDLER X_NEXT
-    { $$ = userDefinedTerminationHandler($3, ASTEid++); }
+    { $$ = userDefinedTerminationHandler($3, mkinteger(0)); }
 ;
 
 

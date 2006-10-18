@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/17 19:54:02 $
+ *          - last changed: \$Date: 2006/10/18 09:37:41 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.197 $
+ * \version \$Revision: 1.198 $
  *
  */
 %}
@@ -654,7 +654,7 @@ StopInScope() ->
  * The user-defined fault handler inside a process. See Fig. 37 for details.
  */
 
-This=userDefinedFaultHandler(a,b) provided (This->inProcess) ->
+This=userDefinedFaultHandler(a,b, _id) provided (This->inProcess) ->
   [petrinet:
     {
       string prefix = "1.internal.faultHandler.";
@@ -809,7 +809,7 @@ This=userDefinedFaultHandler(a,b) provided (This->inProcess) ->
  * The implicit fault handler inside a process. See Fig. 35 for details.
  */
 
-This=implicitFaultHandler() provided (This->inProcess) ->
+This=implicitFaultHandler(_id) provided (This->inProcess) ->
   [petrinet:
     {
       string prefix = "1.internal.faultHandler.";
@@ -911,7 +911,7 @@ This=implicitFaultHandler() provided (This->inProcess) ->
  * The user-defined fault handler inside a scope. See Fig. 36 for details.
  */
 
-This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
+This=userDefinedFaultHandler(a,b,_id) provided (!This->inProcess) ->
   [petrinet:
     {
       string prefix = toString(This->parentScopeId) + ".internal.faultHandler.";
@@ -1143,7 +1143,7 @@ This=userDefinedFaultHandler(a,b) provided (!This->inProcess) ->
  * The implicit fault handler inside a scope. See Fig. 34 for details.
  */
 
-This=implicitFaultHandler() provided (!This->inProcess) ->
+This=implicitFaultHandler(_id) provided (!This->inProcess) ->
   [petrinet:
     {
       string prefix = toString(This->parentScopeId) + ".internal.faultHandler.";
@@ -1264,7 +1264,7 @@ This=implicitFaultHandler() provided (!This->inProcess) ->
 
 
 
-CatchAll(innerActivity, id) ->
+CatchAll(innerActivity, _id) ->
   [petrinet: innerActivity]
 ;
 
@@ -1285,7 +1285,7 @@ CatchAll(innerActivity, id) ->
  * name in Fig. 29 and in Fig. 30) are mentioned in a comment.
  */
 
-This=userDefinedEventHandler(a,b) ->
+This=userDefinedEventHandler(a,b,_id) ->
   [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<eventHandler scope=\"" + currentScope + "\">\n");
@@ -1508,7 +1508,7 @@ This=userDefinedEventHandler(a,b) ->
  * Implicit compensation handler as it is depicted in Fig. 42.
  */
 
-This=implicitCompensationHandler() provided (!This->inProcess) ->
+This=implicitCompensationHandler(_id) provided (!This->inProcess) ->
   [petrinet:
     {
       string prefix = toString(This->parentScopeId) + ".internal.compensationHandler.";
@@ -1637,7 +1637,7 @@ This=implicitCompensationHandler() provided (!This->inProcess) ->
  * that this pattern combines the four different compensation handler patterns.
  */
 
-This=userDefinedCompensationHandler(innerActivity) provided (!This->inProcess) ->
+This=userDefinedCompensationHandler(innerActivity,_id) provided (!This->inProcess) ->
   [petrinet:
     {
       string prefix = toString(This->parentScopeId) + ".internal.compensationHandler.";
@@ -1804,7 +1804,7 @@ This=userDefinedCompensationHandler(innerActivity) provided (!This->inProcess) -
  * will never be called from a surrounding scope, the whole "left" part of the
  * pattern depicted in Fig. 42 is not necessary.
  */
-This=implicitCompensationHandler() provided (This->inProcess) ->
+This=implicitCompensationHandler(_id) provided (This->inProcess) ->
   [petrinet:
     {
       string prefix = toString(This->parentScopeId) + ".internal.compensationHandler.";
@@ -1897,7 +1897,7 @@ This=implicitCompensationHandler() provided (This->inProcess) ->
 
 
 /* this pattern is just a copy from the pattern above */
-This=userDefinedCompensationHandler(a) provided (This->inProcess) ->
+This=userDefinedCompensationHandler(a,_id) provided (This->inProcess) ->
   [petrinet:
     {
       string prefix = toString(This->parentScopeId) + ".internal.compensationHandler.";

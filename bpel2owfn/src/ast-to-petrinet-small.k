@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/17 22:01:54 $
+ *          - last changed: \$Date: 2006/10/18 09:37:41 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.46 $
+ * \version \$Revision: 1.47 $
  *
  */
 %}
@@ -195,7 +195,7 @@ This=Process(a,b,c,d,e,f,g,h,i,j) ->
  * name in Fig. 29 and in Fig. 30) are mentioned in a comment.
  */
 
-This=userDefinedEventHandler(a,b) ->
+This=userDefinedEventHandler(a,b,_id) ->
   [petrinetsmall:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<eventHandler scope=\"" + currentScope + "\">\n");

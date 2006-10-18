@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/17 22:01:54 $
+ *          - last changed: \$Date: 2006/10/18 09:37:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.41 $
+ * \version \$Revision: 1.42 $
  */
 %}
 
@@ -200,7 +200,7 @@ Partner(a,b) ->
   FAULT HANDLERS
 ******************************************************************************/
 
-userDefinedFaultHandler(a,b) ->
+userDefinedFaultHandler(a,b,_id) ->
   [postprocessing:
     {
       // manage identifiers
@@ -243,7 +243,7 @@ userDefinedFaultHandler(a,b) ->
   ]
 ;
 
-implicitFaultHandler() ->
+implicitFaultHandler(_id) ->
   [postprocessing:
     {
       // manage identifiers
@@ -290,7 +290,7 @@ CatchAll(a,b) ->
   EVENT HANDLERS
 ******************************************************************************/
 
-implicitEventHandler() ->
+implicitEventHandler(_id) ->
   [postprocessing:
     {
       // manage identifiers
@@ -302,7 +302,7 @@ implicitEventHandler() ->
   ]
 ;
 
-userDefinedEventHandler(a,b) ->
+userDefinedEventHandler(a,b,_id) ->
   [postprocessing:
     {
       // manage identifiers
@@ -365,7 +365,7 @@ OnAlarm(a,b) ->
   COMPENSATION HANDLERS
 ******************************************************************************/
 
-implicitCompensationHandler() ->
+implicitCompensationHandler(_id) ->
   [postprocessing:
     {
       // manage identifiers
@@ -377,7 +377,7 @@ implicitCompensationHandler() ->
   ]
 ;
 
-userDefinedCompensationHandler(a) ->
+userDefinedCompensationHandler(a,_id) ->
   [postprocessing:
     {
       // manage identifiers

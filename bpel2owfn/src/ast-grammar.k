@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/18 08:49:05 $
+ *          - last changed: \$Date: 2006/10/18 09:37:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.121 $
+ * \version \$Revision: 1.122 $
  */
 %}
 
@@ -232,8 +232,8 @@ tPartner:
 ******************************************************************************/
 
 tFaultHandlers:
-  userDefinedFaultHandler(tCatch_list tCatchAll)
-| implicitFaultHandler()
+  userDefinedFaultHandler(tCatch_list tCatchAll integer)
+| implicitFaultHandler(integer)
   {
     int id;
 
@@ -243,17 +243,8 @@ tFaultHandlers:
   }  
 ;
 
-%ctor implicitFaultHandler(int myid = 0)
-{ trace(TRACE_INFORMATION, "[AST]\timplicitFaultHandler(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_FAULTHANDLERS); }
-
-%ctor userDefinedFaultHandler(int myid = 0)
-{ trace(TRACE_INFORMATION, "[AST]\tuserDefinedFaultHandler(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_FAULTHANDLERS); }
+%ctor implicitFaultHandler()  { CTOR(K_FAULTHANDLERS) }
+%ctor userDefinedFaultHandler() { CTOR(K_FAULTHANDLERS) }
 
 
 tCatch_list:
@@ -289,8 +280,8 @@ tCatchAll:
 ******************************************************************************/
 
 tEventHandlers:
-  implicitEventHandler()
-| userDefinedEventHandler(tOnMessage_list tOnAlarm_list)
+  implicitEventHandler(integer)
+| userDefinedEventHandler(tOnMessage_list tOnAlarm_list integer)
   {
     bool inWhile = false;
     int id;
@@ -298,17 +289,8 @@ tEventHandlers:
   }
 ;
 
-%ctor implicitEventHandler(int myid = 0)
-{ trace(TRACE_INFORMATION, "[AST]\timplicitEventHandler(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_EVENTHANDLERS); }
-
-%ctor userDefinedEventHandler(int myid = 0)
-{ trace(TRACE_INFORMATION, "[AST]\tuserDefinedEventHandler(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_EVENTHANDLERS); }
+%ctor implicitEventHandler() { CTOR(K_EVENTHANDLERS) }
+%ctor userDefinedEventHandler() { CTOR(K_EVENTHANDLERS) }
 
 
 // onMessage is called onEvent in WS-BPEL 2.0
@@ -351,8 +333,8 @@ tOnAlarm:
 ******************************************************************************/
 
 tCompensationHandler:
-  implicitCompensationHandler()
-| userDefinedCompensationHandler(activity)
+  implicitCompensationHandler(integer)
+| userDefinedCompensationHandler(activity integer)
   {
     int id;
 
@@ -364,17 +346,8 @@ tCompensationHandler:
   }
 ;
 
-%ctor implicitCompensationHandler(int myid = 0)
-{ trace(TRACE_INFORMATION, "[AST]\timplicitCompensationHandler(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_COMPENSATIONHANDLER); }
-
-%ctor userDefinedCompensationHandler(int myid = 0)
-{ trace(TRACE_INFORMATION, "[AST]\tuserDefinedCompensationHandler(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_COMPENSATIONHANDLER); }
+%ctor implicitCompensationHandler() { CTOR(K_COMPENSATIONHANDLER) }
+%ctor userDefinedCompensationHandler() { CTOR(K_COMPENSATIONHANDLER) }
 
 
 /******************************************************************************
@@ -443,18 +416,14 @@ tToPart_list:
 ;
 
 tToPart:
-  ToPart()
+  ToPart(integer)
   {
     int id;
     stringMap attributes;
   }
 ;
 
-%ctor ToPart(int myid = 0)
-{ trace(TRACE_INFORMATION, "[AST]\tToPart(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_TOPART); }
+%ctor ToPart() { CTOR(K_TOPART) }
 
 
 /******************************************************************************
@@ -466,18 +435,14 @@ tFromPart_list:
 ;
 
 tFromPart:
-  FromPart()
+  FromPart(integer)
   {
     int id;
     stringMap attributes;
   }
 ;
 
-%ctor FromPart(int myid = 0)
-{ trace(TRACE_INFORMATION, "[AST]\tFromPart(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_FROMPART); }
+%ctor FromPart() { CTOR(K_FROMPART) }
 
 
 
@@ -857,7 +822,7 @@ tOtherwise:
 ******************************************************************************/
 
 tIf:
-  If(standardElements tElseIf_list tElse)
+  If(standardElements tElseIf_list tElse integer)
   {
     int id;
     stringMap attributes;
@@ -867,11 +832,7 @@ tIf:
   }
 ;
 
-%ctor If(int myid = 0)
-{ trace(TRACE_INFORMATION, "[AST]\tIf(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_IF); }
+%ctor If() { CTOR(K_IF) }
 
 
 tElseIf_list:
@@ -879,32 +840,24 @@ tElseIf_list:
 ;
 
 tElseIf:
-  ElseIf(activity)
+  ElseIf(activity integer)
   {
     int id;
     stringMap attributes;
   }
 ;
 
-%ctor ElseIf(int myid = 0)
-{ trace(TRACE_INFORMATION, "[AST]\tElseIf(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_ELSEIF); }
+%ctor ElseIf() { CTOR(K_ELSEIF) }
 
 
 tElse:
-  Else(activity)
+  Else(activity integer)
   {
     int id;
   }
 ;
 
-%ctor Else(int myid = 0)
-{ trace(TRACE_INFORMATION, "[AST]\tElse(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_ELSE); }
+%ctor Else() { CTOR(K_ELSE) }
 
 
 /******************************************************************************
@@ -1055,8 +1008,8 @@ tScope:
 ******************************************************************************/
 
 tTerminationHandler:
-  implicitTerminationHandler()
-| userDefinedTerminationHandler(activity)
+  implicitTerminationHandler(integer)
+| userDefinedTerminationHandler(activity integer)
   {
     bool inWhile = false;
     int id;
@@ -1064,17 +1017,8 @@ tTerminationHandler:
   }
 ;
 
-%ctor implicitTerminationHandler(int myid = 0)
-{ trace(TRACE_INFORMATION, "[AST]\timplicitTerminationHandler(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_TERMINATIONHANDLER); }
-
-%ctor userDefinedTerminationHandler(int myid = 0)
-{ trace(TRACE_INFORMATION, "[AST]\tuserDefinedTerminationHandler(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_TERMINATIONHANDLER); }
+%ctor implicitTerminationHandler() { CTOR(K_TERMINATIONHANDLER) }
+%ctor userDefinedTerminationHandler() { CTOR(K_TERMINATIONHANDLER) }
 
 
 
@@ -1086,6 +1030,7 @@ tTerminationHandler:
 
 standardElements:
   StandardElements(tTarget_list tSource_list joinCondition)
+| NoStandardElements()
   {
     int negativeControlFlow = 0;
     bool suppressJF = false;

@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2006/09/23 20:23:04 $
+ *          - last changed: \$Date: 2006/10/18 08:49:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  */
 
 
@@ -107,6 +107,19 @@ void SAerror(unsigned int code, string information = "", int lineNumber = 0);
 
 /// Outputs the environment (i.e. four lines before and after) of a line.
 void showLineEnvironment(int lineNumber);
+
+
+
+
+
+/******************************************************************************
+ * Macros
+ *****************************************************************************/
+
+// a preprocessor directive to print the called function and its position
+#define FTRACE(prefix) trace(TRACE_INFORMATION, string(prefix) + "\t" + string(__FUNCTION__) + "() [" + string(__FILE__) + ":" + toString(__LINE__) + "]\n")
+
+
 
 
 

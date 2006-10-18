@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/17 22:01:53 $
+ *          - last changed: \$Date: 2006/10/18 08:49:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.120 $
+ * \version \$Revision: 1.121 $
  */
 %}
 
@@ -77,6 +77,26 @@ using std::map;
 
 typedef std::map<string, string> stringMap;
 
+
+
+
+// a preprocessor directive for the quite generic constructors
+#define CTOR(token) { \
+  FTRACE("[AST]"); \
+  if (integer_1->value == 0) \
+  { \
+    id = ASTEid; \
+    integer_1 = mkinteger(ASTEid++); \
+    assert(ASTEmap[id] == NULL); \
+  } \
+  else { \
+    id = integer_1->value; \
+  } \
+  if(ASTEmap[id] == NULL); \
+    ASTEmap[id] = new ASTE(id, token); \
+}
+
+
 %}
 
 
@@ -103,14 +123,7 @@ tProcess:
   }
 ;
 
-%ctor Process() { trace(TRACE_INFORMATION, "[AST]\tProcess()\n");
-                  id = integer_1->value;  }
-
-%ctor Process(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tProcess(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_PROCESS); }
+%ctor Process() { CTOR(K_PROCESS) }
 
 
 tStop:
@@ -192,15 +205,7 @@ tPartnerLink:
   }
 ;
 
-%ctor PartnerLink() { trace(TRACE_INFORMATION, "[AST]\tPartnerLink()\n");
-                      id = integer_1->value; }
-
-
-%ctor PartnerLink(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tPartnerLink(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_PARTNERLINK); }
+%ctor PartnerLink() { CTOR(K_PARTNERLINK) }
 
 
 /******************************************************************************
@@ -219,15 +224,7 @@ tPartner:
   }
 ;
 
-%ctor Partner() { trace(TRACE_INFORMATION, "[AST]\tPartner()\n");
-                  id = integer_1->value; }
-
-
-%ctor Partner(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tPartner(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_PARTNER); }
+%ctor Partner() { CTOR(K_PARTNER) }
 
 
 /******************************************************************************
@@ -273,14 +270,7 @@ tCatch:
   }
 ;
 
-%ctor Catch() { trace(TRACE_INFORMATION, "[AST]\tCatch()\n");
-                id = integer_1->value; }
-
-%ctor Catch(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tCatch(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_CATCH); }
+%ctor Catch() { CTOR(K_CATCH) }
 
 
 tCatchAll:
@@ -291,14 +281,7 @@ tCatchAll:
   }
 ;
 
-%ctor CatchAll() { trace(TRACE_INFORMATION, "[AST]\tCatchAll()\n");
-                   id = integer_1->value; }
-
-%ctor CatchAll(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tCatchAll(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_CATCHALL); }
+%ctor CatchAll() { CTOR(K_CATCHALL) }
 
 
 /******************************************************************************
@@ -345,14 +328,7 @@ tOnMessage:
   }
 ;
 
-%ctor OnMessage() { trace(TRACE_INFORMATION, "[AST]\tOnMessage()\n");
-                    id = integer_1->value; }
-
-%ctor OnMessage(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tOnMessage(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_ONMESSAGE); }
+%ctor OnMessage() { CTOR(K_ONMESSAGE) }
 
 
 tOnAlarm_list:
@@ -367,14 +343,7 @@ tOnAlarm:
   } 
 ;
 
-%ctor OnAlarm() { trace(TRACE_INFORMATION, "[AST]\tOnAlarm()\n");
-                  id = integer_1->value; }
-
-%ctor OnAlarm(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tOnAlarm(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_ONALARM); }
+%ctor OnAlarm() { CTOR(K_ONALARM) }
 
 
 /******************************************************************************
@@ -424,14 +393,7 @@ tVariable:
   }
 ;
 
-%ctor Variable() { trace(TRACE_INFORMATION, "[AST]\tVariable()\n");
-                   id = integer_1->value; }
-
-%ctor Variable(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tVariable(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_VARIABLE); }
+%ctor Variable() { CTOR(K_VARIABLE) }
 
 
 /******************************************************************************
@@ -450,14 +412,7 @@ tCorrelationSet:
   }
 ;
 
-%ctor CorrelationSet() { trace(TRACE_INFORMATION, "[AST]\tCorrelationSet()\n");
-                         id = integer_1->value; }
-
-%ctor CorrelationSet(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tCorrelationSet(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_CORRELATIONSET); }
+%ctor CorrelationSet() { CTOR(K_CORRELATIONSET) }
 
 
 /******************************************************************************
@@ -476,14 +431,7 @@ tCorrelation:
   }
 ;
 
-%ctor Correlation() { trace(TRACE_INFORMATION, "[AST]\tCorrelation()\n");
-                      id = integer_1->value; }
-
-%ctor Correlation(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tCorrelation(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_CORRELATION); }
+%ctor Correlation() { CTOR(K_CORRELATION) }
 
 
 /******************************************************************************
@@ -554,14 +502,7 @@ tReceive:
   }
 ;
 
-%ctor Receive() { trace(TRACE_INFORMATION, "[AST]\tReceive()\n");
-                  id = integer_1->value; }
-
-%ctor Receive(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tReceive(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_RECEIVE); }
+%ctor Receive() { CTOR(K_RECEIVE) }
 
 
 /******************************************************************************
@@ -583,14 +524,7 @@ tReply:
   }
 ;
 
-%ctor Reply() { trace(TRACE_INFORMATION, "[AST]\tReply()\n");
-                id = integer_1->value; }
-
-%ctor Reply(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tReply(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_REPLY); }
+%ctor Reply() { CTOR(K_REPLY) }
 
 
 /******************************************************************************
@@ -615,14 +549,7 @@ tInvoke:
   }
 ;
 
-%ctor Invoke() { trace(TRACE_INFORMATION, "[AST]\tInvoke()\n");
-                 id = integer_1->value; }
-
-%ctor Invoke(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tInvoke(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_INVOKE); }
+%ctor Invoke() { CTOR(K_INVOKE) }
 
 
 /******************************************************************************
@@ -640,14 +567,8 @@ tAssign:
   }
 ;
 
-%ctor Assign() { trace(TRACE_INFORMATION, "[AST]\tAssign()\n");
-                 id = integer_1->value; }
+%ctor Assign() { CTOR(K_ASSIGN) }
 
-%ctor Assign(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tAssign(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_ASSIGN); }
 
 tCopy_list:
   list tCopy
@@ -661,14 +582,7 @@ tCopy:
   }
 ;
 
-%ctor Copy() { trace(TRACE_INFORMATION, "[AST]\tCopy()\n");
-               id = integer_1->value; }
-
-%ctor Copy(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tCopy(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_COPY); }
+%ctor Copy() { CTOR(K_COPY) }
 
 
 tFrom:
@@ -684,14 +598,7 @@ tFrom:
   }
 ;
 
-%ctor From() { trace(TRACE_INFORMATION, "[AST]\tFrom()\n");
-               id = integer_1->value; }
-
-%ctor From(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tFrom(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_FROM); }
+%ctor From() { CTOR(K_FROM) }
 
 
 tTo:
@@ -704,14 +611,7 @@ tTo:
   }
 ;
 
-%ctor To() { trace(TRACE_INFORMATION, "[AST]\tTo()\n");
-             id = integer_1->value; }
-
-%ctor To(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tTo(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_TO); }
+%ctor To() { CTOR(K_TO) }
 
 
 /******************************************************************************
@@ -729,14 +629,7 @@ tValidate:
   }
 ;
 
-%ctor Validate() { trace(TRACE_INFORMATION, "[AST]\tValidate()\n");
-                   id = integer_1->value; }
-
-%ctor Validate(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tValidate(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_VALIDATE); }
+%ctor Validate() { CTOR(K_VALIDATE) }
 
 
 /******************************************************************************
@@ -754,25 +647,7 @@ tEmpty:
   }
 ;
 
-%ctor Empty()
-{
-  trace(TRACE_INFORMATION, "[AST]\tEmpty()\n");
-  if (integer_1->value == 0)
-  {
-    id = ASTEid;
-    integer_1 = mkinteger(ASTEid++);
-    assert(ASTEmap[id] == NULL);
-    ASTEmap[id] = new ASTE(id, K_EMPTY);
-  }
-  else
-    id = integer_1->value;
-}
-
-%ctor Empty(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tEmpty(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_EMPTY); }
+%ctor Empty() { CTOR(K_EMPTY) }
 
 
 /******************************************************************************
@@ -792,14 +667,7 @@ tWait:
   }
 ;
 
-%ctor Wait() { trace(TRACE_INFORMATION, "[AST]\tWait()\n");
-               id = integer_1->value; }
-
-%ctor Wait(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tWait(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_WAIT); }
+%ctor Wait() { CTOR(K_WAIT) }
 
 
 /******************************************************************************
@@ -817,14 +685,7 @@ tTerminate:
   }
 ;
 
-%ctor Terminate() { trace(TRACE_INFORMATION, "[AST]\tTerminate()\n");
-                    id = integer_1->value; }
-
-%ctor Terminate(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tTerminate(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_TERMINATE); }
+%ctor Terminate() { CTOR(K_TERMINATE) }
 
 
 /******************************************************************************
@@ -842,14 +703,7 @@ tExit:
   }
 ;
 
-%ctor Exit() { trace(TRACE_INFORMATION, "[AST]\tExit()\n");
-               id = integer_1->value; }
-
-%ctor Exit(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tExit(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_EXIT); }
+%ctor Exit() { CTOR(K_EXIT) }
 
 
 /******************************************************************************
@@ -869,14 +723,7 @@ tThrow:
   }
 ;
 
-%ctor Throw() { trace(TRACE_INFORMATION, "[AST]\tThrow()\n");
-                id = integer_1->value; }
-
-%ctor Throw(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tThrow(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_THROW); }
+%ctor Throw() { CTOR(K_THROW) }
 
 
 /******************************************************************************
@@ -896,14 +743,7 @@ tRethrow:
   }
 ;
 
-%ctor Rethrow() { trace(TRACE_INFORMATION, "[AST]\tRethrow()\n");
-                  id = integer_1->value; }
-
-%ctor Rethrow(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tRethrow(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_RETHROW); }
+%ctor Rethrow() { CTOR(K_RETHROW) }
 
 
 /******************************************************************************
@@ -925,14 +765,7 @@ tCompensate:
   }
 ;
 
-%ctor Compensate() { trace(TRACE_INFORMATION, "[AST]\tCompensate()\n");
-                     id = integer_1->value; }
-
-%ctor Compensate(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tCompensate(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_COMPENSATE); }
+%ctor Compensate() { CTOR(K_COMPENSATE) }
 
 
 /******************************************************************************
@@ -954,14 +787,7 @@ tCompensateScope:
   }
 ;
 
-%ctor CompensateScope() { trace(TRACE_INFORMATION, "[AST]\tCompensateScope()\n");
-                          id = integer_1->value; }
-
-%ctor CompensateScope(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tCompensateScope(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_COMPENSATESCOPE); }
+%ctor CompensateScope() { CTOR(K_COMPENSATESCOPE) }
 
 
 /******************************************************************************
@@ -979,14 +805,7 @@ tSequence:
   }
 ;
 
-%ctor Sequence() { trace(TRACE_INFORMATION, "[AST]\tSequence()\n");
-                 id = integer_1->value; }
-
-%ctor Sequence(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tSequence(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_SEQUENCE); }
+%ctor Sequence()  { CTOR(K_SEQUENCE) }
 
 
 /******************************************************************************
@@ -1004,14 +823,7 @@ tSwitch:
   }
 ;
 
-%ctor Switch() { trace(TRACE_INFORMATION, "[AST]\tSwitch()\n");
-                 id = integer_1->value; }
-
-%ctor Switch(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tSwitch(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_SWITCH); }
+%ctor Switch() { CTOR(K_SWITCH) }
 
 
 tCase_list:
@@ -1026,14 +838,7 @@ tCase:
   }
 ;
 
-%ctor Case() { trace(TRACE_INFORMATION, "[AST]\tCase()\n");
-               id = integer_1->value; }
-
-%ctor Case(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tCase(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_CASE); }
+%ctor Case() { CTOR(K_CASE) }
 
 
 tOtherwise:
@@ -1044,25 +849,7 @@ tOtherwise:
   }
 ;
 
-%ctor Otherwise()
-{
-  trace(TRACE_INFORMATION, "[AST]\tOtherwise()\n");
-  if (integer_1->value == 0)
-  {
-    id = ASTEid;
-    integer_1 = mkinteger(ASTEid++);
-    assert(ASTEmap[id] == NULL);
-    ASTEmap[id] = new ASTE(id, K_OTHERWISE);
-  }
-  else
-    id = integer_1->value;
-}
-
-%ctor Otherwise(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tOtherwise(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_OTHERWISE); }
+%ctor Otherwise() { CTOR(K_OTHERWISE) }
 
 
 /******************************************************************************
@@ -1135,14 +922,7 @@ tWhile:
   }
 ;
 
-%ctor While() { trace(TRACE_INFORMATION, "[AST]\tWhile()\n");
-                id = integer_1->value; }
-
-%ctor While(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tWhile(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_WHILE); }
+%ctor While() { CTOR(K_WHILE) }
 
 
 /******************************************************************************
@@ -1160,14 +940,7 @@ tRepeatUntil:
   }
 ;
 
-%ctor RepeatUntil() { trace(TRACE_INFORMATION, "[AST]\tRepeatUntil()\n");
-                      id = integer_1->value; }
-
-%ctor RepeatUntil(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tRepeatUntil(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_REPEATUNTIL); }
+%ctor RepeatUntil() { CTOR(K_REPEATUNTIL) }
 
 
 /******************************************************************************
@@ -1185,14 +958,7 @@ tForEach:
   }
 ;
 
-%ctor ForEach() { trace(TRACE_INFORMATION, "[AST]\tForEach()\n");
-                  id = integer_1->value; }
-
-%ctor ForEach(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tForEach(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_FOREACH); }
+%ctor ForEach() { CTOR(K_FOREACH) }
 
 
 /******************************************************************************
@@ -1210,14 +976,7 @@ tPick:
   }
 ;
 
-%ctor Pick() { trace(TRACE_INFORMATION, "[AST]\tPick()\n");
-               id = integer_1->value; }
-
-%ctor Pick(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tPick(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_PICK); }
+%ctor Pick() { CTOR(K_PICK) }
 
 
 /******************************************************************************
@@ -1235,14 +994,7 @@ tFlow:
   }
 ;
 
-%ctor Flow() { trace(TRACE_INFORMATION, "[AST]\tFlow()\n");
-               id = integer_1->value; }
-
-%ctor Flow(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tFlow(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_FLOW); }
+%ctor Flow() { CTOR(K_FLOW) }
 
 
 activity_list:
@@ -1264,14 +1016,7 @@ tLink:
   }
 ;
 
-%ctor Link() { trace(TRACE_INFORMATION, "[AST]\tLink()\n");
-               id = integer_1->value; }
-
-%ctor Link(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tLink(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_LINK); }
+%ctor Link() { CTOR(K_LINK) }
 
 
 /******************************************************************************
@@ -1302,14 +1047,7 @@ tScope:
   }
 ;
 
-%ctor Scope() { trace(TRACE_INFORMATION, "[AST]\tScope()\n");
-                id = integer_1->value;  }
-
-%ctor Scope(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tScope(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_SCOPE); }
+%ctor Scope() { CTOR(K_SCOPE) }
 
 
 /******************************************************************************
@@ -1376,14 +1114,7 @@ tTarget:
   }
 ;
 
-%ctor Target() { trace(TRACE_INFORMATION, "[AST]\tTarget()\n");
-                 id = integer_1->value; }
-
-%ctor Target(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tTarget(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_TARGET); }
+%ctor Target() { CTOR(K_TARGET) }
 
 
 tSource_list:
@@ -1402,14 +1133,7 @@ tSource:
   }
 ;
 
-%ctor Source() { trace(TRACE_INFORMATION, "[AST]\tSource()\n");
-                 id = integer_1->value; }
-
-%ctor Source(int myid)
-{ trace(TRACE_INFORMATION, "[AST]\tSource(" + toString(myid) + ")\n");
-  id = myid;
-  assert(ASTEmap[id] == NULL);
-  ASTEmap[id] = new ASTE(id, K_SOURCE); }
+%ctor Source() { CTOR(K_SOURCE) }
 
 
 joinCondition:

@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/18 09:37:41 $
+ *          - last changed: \$Date: 2006/10/18 12:47:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.248 $
+ * \version \$Revision: 1.249 $
  * 
  */
 %}
@@ -154,6 +154,7 @@ unsigned int ASTEid = 1;
 %type <yt_tCase> tCase
 %type <yt_tCatch_list> tCatch_list
 %type <yt_tCatch> tCatch
+%type <yt_tCatch> tCatch_opt
 %type <yt_tCatchAll> tCatchAll
 %type <yt_tCompensate> tCompensate
 %type <yt_tCompensateScope> tCompensateScope
@@ -273,6 +274,13 @@ activity:
 | tFlow			{ $$ = activityFlow($1);	}
 | tPick			{ $$ = activityPick($1);	}
 | tScope		{ $$ = activityScope($1);	}
+;
+
+activity_list:
+  activity X_NEXT
+    { $$ = Consactivity_list($1, Nilactivity_list()); }
+| activity X_NEXT activity_list
+    { $$ = Consactivity_list($1, $3); }
 ;
 
 
@@ -545,7 +553,7 @@ tCorrelation:
 
 
 /******************************************************************************
-  TOPARTS                                                        (WS-BPEL 2.0)
+  FROM & TO PARTS                                                (WS-BPEL 2.0)
 ******************************************************************************/
 
 tToParts:
@@ -568,11 +576,6 @@ tToPart:
 | K_TOPART arbitraryAttributes X_SLASH
     { $$ = ToPart($2); }
 ;
-
-
-/******************************************************************************
-  FROMPARTS                                                      (WS-BPEL 2.0)
-******************************************************************************/
 
 tFromParts:
   /* empty */
@@ -633,8 +636,16 @@ tInvoke:
     { $$ = Invoke($4, $5, $2); }
 | K_INVOKE arbitraryAttributes X_SLASH
     { $$ = Invoke(NoStandardElements(), NiltCorrelation_list(), $2); }
+| K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations tCatch_opt tCatchAll tCompensationHandler tToParts tFromParts X_SLASH K_INVOKE
+    { $$ = annotatedInvoke($4, $5, $6, $7, $8, $2); }
 ;
 
+tCatch_opt:
+  /* empty */
+    { $$ = NoCatch(); }
+| tCatch
+    { $$ = $1; }
+; 
 
 /******************************************************************************
   ASSIGN
@@ -851,6 +862,8 @@ tCase:
 tOtherwise:
   /* empty */
     { $$ = NoOtherwise(); }
+| K_OTHERWISE arbitraryAttributes X_SLASH // wrong BPEL, yet widely-used...
+    { $$ = NoOtherwise(); }
 | K_OTHERWISE arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_OTHERWISE X_NEXT
     { $$ = Otherwise($4, $2); }
 ;
@@ -883,7 +896,9 @@ tElseIf:
 ;
 
 tElse:
-  K_ELSE X_NEXT activity X_NEXT X_SLASH K_ELSE X_NEXT
+  /* empty */
+    { $$ = NoElse(mkinteger(0)); }
+| K_ELSE X_NEXT activity X_NEXT X_SLASH K_ELSE X_NEXT
     { $$ = Else($3, mkinteger(0)); }
 ;
 
@@ -954,13 +969,6 @@ tFlow:
     { $$ = Flow($4, $5, $6, $2); }
 ;
 
-activity_list:
-  activity X_NEXT
-    { $$ = Consactivity_list($1, Nilactivity_list()); }
-| activity X_NEXT activity_list
-    { $$ = Consactivity_list($1, $3); }
-;
-
 tLinks:
   /* empty */
     { $$ = NiltLink_list(); }
@@ -1002,9 +1010,9 @@ tScope:
 
 tTerminationHandler:
   /* empty */
-    { $$ = implicitTerminationHandler(mkinteger(0)); }
+    { $$ = standardTerminationHandler(mkinteger(0)); }
 | K_TERMINATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_TERMINATIONHANDLER X_NEXT
-    { $$ = userDefinedTerminationHandler($3, mkinteger(0)); }
+    { $$ = TerminationHandler($3, mkinteger(0)); }
 ;
 
 

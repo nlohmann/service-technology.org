@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2006/10/11
- *          - last changed: \$Date: 2006/10/18 09:37:41 $
+ *          - last changed: \$Date: 2006/10/18 12:47:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  *
  */
 
@@ -46,6 +46,14 @@
 
 %rview implicit;
 
+
+
+
+
+/*
+ * A shortcut in the parser is unfolded to empty list of target and source
+ * links.
+ */
 NoStandardElements()
 ->
 < implicit:
@@ -57,20 +65,117 @@ NoStandardElements()
 >;
 
 
+/*
+ * Implicit Otherwise Branch (cf. Sect. 12.2 in BPEL4WS 1.1)
+ */
 NoOtherwise()
 ->
 < implicit:
   Otherwise(
     activityEmpty(
       Empty(
-        StandardElements(
-          NiltTarget_list(),
-          NiltSource_list(),
-          standardJoinCondition()
-        ),
+        NoStandardElements(),
         mkinteger(0)
       )
     ),
     mkinteger(0)
+  )
+>;
+
+
+/*
+ * Default Termination Handler (cf. Sect. 12.5.1 in WS-BPEL 2.0)
+ */
+standardTerminationHandler(_id)
+->
+< implicit:
+  TerminationHandler(
+    activityCompensate(
+      Compensate(
+        NoStandardElements(),
+        mkinteger(0)
+      )
+    ),
+    _id
+  )
+>;
+
+
+/*
+ * Implicit transformation of the <invoke> activity with fault or compensation
+ * handler (cf. Sect. 10.3 in WS-BPEL 2.0)
+ */
+activityInvoke(
+  annotatedInvoke(
+    my_standardElements,
+    my_tCorrelation_list,
+    my_tCatch,
+    my_tCatchAll,
+    my_tCompensationHandler,
+    my_integer
+  )
+)
+->
+< implicit:
+  activityScope(
+    Scope(
+      my_standardElements,
+      NiltVariable_list(),
+      userDefinedFaultHandler(
+        ConstCatch_list(
+          my_tCatch,
+          NiltCatch_list()
+        ),
+        my_tCatchAll,
+        mkinteger(0)
+      ),
+      my_tCompensationHandler,
+      standardTerminationHandler(
+        mkinteger(0)
+      ),
+      implicitEventHandler(
+        mkinteger(0)
+      ),
+      StopInScope(),
+      activityInvoke(
+        Invoke(
+          NoStandardElements(),
+          my_tCorrelation_list,
+          my_integer
+        )
+      ),
+      mkinteger(0)
+    )
+  )
+>;
+
+
+/*
+ * A list of <catch> branches is empty if it just encloses a NoCatch
+ * element.
+ */
+ConstCatch_list(
+  NoCatch(),
+  NiltCatch_list()
+)
+->
+<implicit:
+  NiltCatch_list()
+>;
+
+
+/*
+ * A fault handler is implicit if it does not enclose any <catch> or <catchAll>
+ * branches.
+ */
+userDefinedFaultHandler(
+  NiltCatch_list(),
+  NoCatchAll(),
+  my_integer
+)
+->
+<implicit:
+  implicitFaultHandler(
+    my_integer
   )
 >;

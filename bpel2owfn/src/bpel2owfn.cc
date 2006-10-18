@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/10/17 22:01:54 $
+ *          - last changed: \$Date: 2006/10/18 12:47:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.104 $
+ * \version \$Revision: 1.105 $
  *
  */
 
@@ -163,6 +163,13 @@ int main( int argc, char *argv[])
         TheProcess = TheProcess->rewrite(kc::implicit);
 	trace(TRACE_INFORMATION, "Rewriting complete...\n");
 
+    if (modus == M_AST)
+    {
+      trace(TRACE_INFORMATION, "-> Printing AST ...\n");
+      TheProcess->print();
+    }
+
+
 	trace(TRACE_INFORMATION, "Postprocessing...\n");
 	TheProcess->unparse(kc::printer, kc::postprocessing);
 	trace(TRACE_INFORMATION, "Postprocessing complete...\n");
@@ -227,11 +234,6 @@ int main( int argc, char *argv[])
 
 
 
-    if (modus == M_AST)
-    {
-      trace(TRACE_INFORMATION, "-> Printing AST ...\n");
-      TheProcess->print();
-    }
 
 
 

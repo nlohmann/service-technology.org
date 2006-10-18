@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/18 09:37:41 $
+ *          - last changed: \$Date: 2006/10/18 12:47:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
  */
 %}
 
@@ -395,6 +395,33 @@ userDefinedCompensationHandler(a,_id) ->
     a
   ]
 ;
+
+
+/******************************************************************************
+  TERMINATION HANDLER                                            (WS-BPEL 2.0)
+******************************************************************************/
+
+TerminationHandler(a,_id) ->
+  [postprocessing:
+    {
+      // manage identifiers
+      int myid = $0->id;
+      assert(ASTEmap[myid] != NULL);
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      $0->parentScopeId = PPcurrentScope;
+
+      // distribute the compensation handlers's id to the enclosed activity
+      // also mark the activities as "inside compensation handlers"
+      assert(ASTEmap[a->id] != NULL);
+      ASTEmap[a->id]->parentActivityId = myid;
+      ASTEmap[a->id]->controlFlow = CHCF; //TODO: introduce a new value
+    }
+    a
+  ]
+;
+
+
+
 
 
 /******************************************************************************

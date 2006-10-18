@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/18 09:54:42 $
+ *          - last changed: \$Date: 2006/10/18 12:47:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.123 $
+ * \version \$Revision: 1.124 $
  */
 %}
 
@@ -220,6 +220,7 @@ tCatch_list: list tCatch;
 
 tCatch:
   Catch(activity integer)
+| NoCatch()
   {
     int id;
     stringMap attributes;
@@ -415,6 +416,7 @@ tReply:
 
 tInvoke:
   Invoke(standardElements tCorrelation_list integer)
+| annotatedInvoke(standardElements tCorrelation_list tCatch tCatchAll tCompensationHandler integer)
   {
     int id;
     stringMap attributes;
@@ -717,6 +719,7 @@ tElseIf:
 
 tElse:
   Else(activity integer)
+| NoElse(integer)
   {
     int id;
   }
@@ -850,8 +853,8 @@ tScope:
 ******************************************************************************/
 
 tTerminationHandler:
-  implicitTerminationHandler(integer)
-| userDefinedTerminationHandler(activity integer)
+  standardTerminationHandler(integer)
+| TerminationHandler(activity integer)
   {
     bool inWhile = false;
     int id;
@@ -976,6 +979,7 @@ expression:
 %ctor Receive()				{ CTOR(K_RECEIVE) }
 %ctor Reply()				{ CTOR(K_REPLY) }
 %ctor Invoke()				{ CTOR(K_INVOKE) }
+%ctor annotatedInvoke()			{ CTOR(K_INVOKE) }
 %ctor Assign()				{ CTOR(K_ASSIGN) }
 %ctor Copy()				{ CTOR(K_COPY) }
 %ctor From()				{ CTOR(K_FROM) }
@@ -996,6 +1000,7 @@ expression:
 %ctor If() 				{ CTOR(K_IF) }
 %ctor ElseIf()				{ CTOR(K_ELSEIF) }
 %ctor Else()				{ CTOR(K_ELSE) }
+%ctor NoElse()				{ CTOR(K_ELSE) }
 %ctor While()				{ CTOR(K_WHILE) }
 %ctor RepeatUntil()			{ CTOR(K_REPEATUNTIL) }
 %ctor ForEach()				{ CTOR(K_FOREACH) }
@@ -1003,7 +1008,7 @@ expression:
 %ctor Flow()				{ CTOR(K_FLOW) }
 %ctor Link()				{ CTOR(K_LINK) }
 %ctor Scope()				{ CTOR(K_SCOPE) }
-%ctor implicitTerminationHandler()	{ CTOR(K_TERMINATIONHANDLER) }
-%ctor userDefinedTerminationHandler()	{ CTOR(K_TERMINATIONHANDLER) }
+%ctor standardTerminationHandler()	{ CTOR(K_TERMINATIONHANDLER) }
+%ctor TerminationHandler()		{ CTOR(K_TERMINATIONHANDLER) }
 %ctor Target()				{ CTOR(K_TARGET) }
 %ctor Source()				{ CTOR(K_SOURCE) }

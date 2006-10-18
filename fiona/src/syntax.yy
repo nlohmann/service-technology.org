@@ -268,7 +268,8 @@ capacity: { CurrentCapacity = CAPACITY;}
 ;
 
 placelist:  placelist comma place 
-|  place 
+|  place
+|  /* empty */ 
 ;
 
 place: nodeident {

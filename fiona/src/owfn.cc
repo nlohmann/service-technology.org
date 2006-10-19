@@ -311,7 +311,7 @@ void oWFN::addSuccStatesToList(vertex * n, State * currentState) {
 		// test decoded current marking if message bound k reached
 		if (checkMessageBound()) {
 			n->setColor(RED);
-			cout << "message bound violation detected in node " << n << " (addSuccStatesToList)" << endl;
+			trace(TRACE_3, "\t\t\t message bound violation detected in node " + intToString(n->getNumber()) + " (addSuccStatesToList)\n");
 			return;
 		}
 		
@@ -336,7 +336,7 @@ bool oWFN::checkMessageBound() {
 		// test input places
 		for (int i = 0; i < placeInputCnt; i++) {
 			if (CurrentMarking[inputPlacesArray[i]->index] > messages_manual) {
-				cout << "\t checkMessageBound found violation for input place " << inputPlacesArray[i]->name << endl;
+				trace(TRACE_3, "\t\t\t checkMessageBound found violation for input place " + string(inputPlacesArray[i]->name) + "\n");
 				trace(TRACE_5, "oWFN::checkMessageBound(): end\n");
 				return true;
 			}
@@ -344,7 +344,7 @@ bool oWFN::checkMessageBound() {
 		// test output places
 		for (int i = 0; i < placeOutputCnt; i++) {
 			if (CurrentMarking[outputPlacesArray[i]->index] > messages_manual) {
-				cout << "\t checkMessageBound found violation for output place " << outputPlacesArray[i]->name << endl;
+				trace(TRACE_3, "\t\t\t checkMessageBound found violation for output place " + string(outputPlacesArray[i]->name) + "\n");
 				trace(TRACE_5, "oWFN::checkMessageBound(): end\n");
 				return true;
 			}
@@ -800,7 +800,7 @@ void oWFN::calculateReachableStatesFull(vertex * n) {
 	// test current marking if message bound k reached
 	if (checkMessageBound()) {
 		n->setColor(RED);
-		cout << "message bound violated; color of node " << n << " set to RED (calculateReachableStatesFull, oben)" << endl;
+		trace(TRACE_3, "\t\t\t message bound violated; color of node " + intToString(n->getNumber()) + " set to RED (calculateReachableStatesFull, oben)\n");
 		return;
 	}
 	
@@ -884,7 +884,7 @@ void oWFN::calculateReachableStatesFull(vertex * n) {
 					if (n->addState(NewState)) {
 						addSuccStatesToList(n, NewState);
 						if (n->getColor() == RED) {
-							cout << "message bound violated; color of node " << n << " set to RED (calculateReachableStatesFull, during fire)" << endl;
+							trace(TRACE_3, "\t\t\t message bound violated; color of node " + intToString(n->getNumber()) + " set to RED (calculateReachableStatesFull, during fire)\n");
 							trace(TRACE_5, "oWFN::calculateReachableStatesFull(vertex * n) : end\n");
 							return;
 						}
@@ -932,7 +932,7 @@ void oWFN::calculateReachableStatesFull(vertex * n) {
 					// test current marking if message bound k reached
 					if (checkMessageBound()) {
 						n->setColor(RED);
-						cout << "message bound violated; color of node " << n << " set to RED (calculateReachableStatesFull, during fire)" << endl;
+						trace(TRACE_3, "\t\t\t message bound violated; color of node " + intToString(n->getNumber()) + " set to RED (calculateReachableStatesFull, during fire)\n");
 						trace(TRACE_5, "oWFN::calculateReachableStatesFull(vertex * n) : end\n");
 						return;
 					}

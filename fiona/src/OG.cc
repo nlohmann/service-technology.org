@@ -71,7 +71,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 
 	// communication depth not yet reached, going down
 	int i = 0;
-	trace(TRACE_2, "iterating over inputSet\n");
+	trace(TRACE_2, "\t\t\t iterating over inputSet\n");
 	// iterate over all elements of inputSet
 	while (i < PN->placeInputCnt) {
 
@@ -89,9 +89,9 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 
 			if (v->getColor() == RED) {
 				// message bound violation occured during calculateSuccStatesInput
-				trace(TRACE_2, "\t\t\t\t    sending event: !");
+				trace(TRACE_2, "\t\t\t\t\t    sending event: !");
 				trace(TRACE_2, PN->inputPlacesArray[i]->name);
-				trace(TRACE_2, " at node " + intToString(currentNode->getNumber()) + " suppressed (message bound violated)\n");
+				trace(TRACE_2, " suppressed (message bound violated)\n");
 
 				numberDeletedVertices--;
 				delete v;
@@ -105,7 +105,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 				}
 			}
 		} else {
-			trace(TRACE_2, "\t\t\t\t    sending event: !");
+			trace(TRACE_2, "\t\t\t\t\t    sending event: !");
 			trace(TRACE_2, string(PN->inputPlacesArray[i]->name));
 			trace(TRACE_2, " suppressed (max_occurence reached)\n");
 		}
@@ -114,7 +114,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 
 	i = 0;
 		
-	trace(TRACE_2, "iterating over outputSet\n");
+	trace(TRACE_2, "\t\t\t iterating over outputSet\n");
 	// iterate over all elements of outputSet
 	while (i < PN->placeOutputCnt) {
 
@@ -140,14 +140,14 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 				actualDepth--;
 			}
 		} else {
-				trace(TRACE_2, "\t\t\t\t  receiving event: ?");
+				trace(TRACE_2, "\t\t\t\t\t  receiving event: ?");
 				trace(TRACE_2, string(PN->outputPlacesArray[i]->name));
 				trace(TRACE_2, " suppressed (max_occurence reached)\n");
 		}
 		i++;
 	}
 
-	trace(TRACE_2, "\t\t\t\t no events left...\n");
+	trace(TRACE_2, "\t\t\t no events left...\n");
 
 	analyseNode(currentNode, true);
 

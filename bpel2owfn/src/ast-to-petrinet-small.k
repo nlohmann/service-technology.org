@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/18 09:37:41 $
+ *          - last changed: \$Date: 2006/10/19 20:16:17 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.47 $
+ * \version \$Revision: 1.48 $
  *
  */
 %}
@@ -671,14 +671,7 @@ This=Switch(a,b,otherwiseBranch=Otherwise(c,d),e) ->
 ******************************************************************************/
 
 /*
- * The <while> activity as it is depicted in Fig. 18, but with two possible
- * scenarios:
- *
- *   - cyclic <while>: the standard case as it is depicted in Fig. 18.
- *   - acyclic <while>: a different case leading to an acyclic pattern.
- *
- * The scenario is selected by setting the parameter "-p cyclicwhile". For more
- * information refer to the comments below or the User's Manual.
+ * The <while> activity as it is depicted in Fig. 18.
  */
 
 This=While(a,b,c) ->
@@ -710,6 +703,48 @@ This=While(a,b,c) ->
       // Embed the inner activity.
       TheNet->mergePlaces(This->id, ".internal.running", b->id, ".initial");
       TheNet->mergePlaces(This->id, ".internal.done", b->id, ".final");
+
+      footer(This->id, true);
+    }
+  ]
+;
+
+
+
+
+
+/******************************************************************************
+  REPEAT UNTIL                                                   (WS-BPEL 2.0)
+******************************************************************************/
+
+/*
+ * The <repeatUntil> activity.
+ */
+
+This=RepeatUntil(a,b,_id) ->
+  [petrinetsmall:
+    {
+      header(This->id, true);
+      string prefix = toString(This->id) + ".internal.";
+
+      Place *p1 = TheNet->newPlace(prefix + "initial");
+      Place *p2 = TheNet->newPlace(prefix + "p2");
+      Place *p3 = TheNet->newPlace(prefix + "final");
+
+      Transition *t1 = TheNet->newTransition(prefix + "end");
+      TheNet->newArc(p2, t1);
+      TheNet->newArc(t1, p3);
+
+      Transition *t2 = TheNet->newTransition(prefix + "repeat");
+      TheNet->newArc(p2, t2);
+      TheNet->newArc(t2, p1);
+    }
+    a // standardElements
+    b // innerActivity
+    {
+      // Embed the inner activity.
+      TheNet->mergePlaces(This->id, ".internal.initial", b->id, ".initial");
+      TheNet->mergePlaces(This->id, ".internal.p2", b->id, ".final");
 
       footer(This->id, true);
     }

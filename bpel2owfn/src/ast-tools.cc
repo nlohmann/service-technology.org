@@ -32,13 +32,13 @@
  *
  * \date
  *          - created: 2006/02/08
- *          - last changed: \$Date: 2006/10/09 10:43:46 $
+ *          - last changed: \$Date: 2006/10/19 20:16:18 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  */
 
 
@@ -256,6 +256,12 @@ string inString()
 
 
 
+void header(kc::integer id, bool myindent)
+{
+  header(id->value, myindent);
+}
+
+
 /**
  * Prints a debug trace message containing the (opening) tag name of the
  * activity of the given id. If myindent is set to true, the enclosed
@@ -271,6 +277,12 @@ void header(int id, bool myindent)
 
 
 
+
+
+void footer(kc::integer id, bool myindent)
+{
+  footer(id->value, myindent);
+}
 
 
 /**

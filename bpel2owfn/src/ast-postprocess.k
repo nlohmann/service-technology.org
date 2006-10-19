@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/18 12:47:52 $
+ *          - last changed: \$Date: 2006/10/19 20:16:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
  */
 %}
 
@@ -1031,6 +1031,54 @@ While(a,b,c) ->
     }
   ]
 ;
+
+
+
+
+
+/******************************************************************************
+  REPEAT UNTIL                                                   (WS-BPEL 2.0)
+******************************************************************************/
+
+RepeatUntil(a,b,c) ->
+  [postprocessing:
+    {
+      // manage identifiers
+      int myid = $0->id;
+      assert(ASTEmap[myid] != NULL);
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      a->parentId = myid;
+
+      ASTEmap[myid]->inWhile = true;
+
+      // annotate AST and check information
+      $0->attributes = ASTEmap[myid]->getAttributes();
+      $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
+
+      // set or inherit suppressJoinFailure-attribute
+      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
+      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
+      {
+        $0->suppressJF = true;
+        ASTEmap[myid]->suppressJF = true;
+      }
+
+      // distribute the repeatUntil's id to the enclosed activity
+      assert(ASTEmap[b->id] != NULL);
+      ASTEmap[b->id]->parentActivityId = myid;
+      ASTEmap[b->id]->controlFlow = ASTEmap[myid]->controlFlow;
+    }
+    a b
+    {
+      // collect enclosed source links
+      assert(ASTEmap[b->id] != NULL);
+      ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[b->id]->enclosedSourceLinks);
+    }
+  ]
+;
+
+
+
 
 
 /******************************************************************************

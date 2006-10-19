@@ -27,33 +27,13 @@
  * This file defines and implements the conversion of each BPEL activity to its
  * associated Petri net pattern followed by neccessary merge operations.
  *
- * Patterns:
- *   - <empty>
- *   - <invoke>
- *   - <receive>
- *   - <reply>
- *   - <assign>
- *   - <wait>
- *   - <throw>
- *   - <compensate>
- *   - <terminate>
- *   - <flow>
- *   - <switch>
- *   - <while>
- *   - <sequence>
- *   - <pick>
- *   - <scope>
- *   - standard elements
- *   
- *   
- *
  * \author
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
  *          - last changes of: \$Author: nlohmann $
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/17 22:01:54 $
+ *          - last changed: \$Date: 2006/10/19 20:16:18 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -63,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.35 $
+ * \version \$Revision: 1.36 $
  */
 %}
 
@@ -119,11 +99,12 @@ extern string currentScope;
  * The <empty> activity as depicted in Fig. 3.
  */
 
-This=Empty(a,b) ->
+This=Empty(a,_id) ->
   [petrinet:
     {
-      string prefix = toString(This->id) + ".internal.";
       header(This->id);
+      string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -160,11 +141,12 @@ This=Empty(a,b) ->
  * Fig. 11.
  */
 
-This=Invoke(a,b,c) provided (!This->isSynchronousInvoke) ->
+This=Invoke(a,b,_id) provided (!This->isSynchronousInvoke) ->
   [petrinet:
     {
-      string prefix = toString(This->id) + ".internal.";
       header(This->id);
+      string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -214,11 +196,12 @@ This=Invoke(a,b,c) provided (!This->isSynchronousInvoke) ->
  * Fig. 13.
  */
 
-This=Invoke(a,b,c) provided (This->isSynchronousInvoke) ->
+This=Invoke(a,b,_id) provided (This->isSynchronousInvoke) ->
   [petrinet:
     {
       header(This->id);
       string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running1");
@@ -292,11 +275,12 @@ This=Invoke(a,b,c) provided (This->isSynchronousInvoke) ->
  * ignored, the resulting pattern is the same as in Fig. 2.
  */
 
-This=Receive(a,b,c) ->
+This=Receive(a,b,_id) ->
   [petrinet:
     {
       header(This->id);
       string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -350,11 +334,12 @@ This=Receive(a,b,c) ->
  * ignored, the resulting pattern is the same as in Fig. 9.
  */
 
-This=Reply(a,b,c) ->
+This=Reply(a,b,_id) ->
   [petrinet:
     {
       header(This->id);
       string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -412,11 +397,12 @@ This=Reply(a,b,c) ->
  * final place, as well as for all places after a fault has occured.
  */
 
-This=Assign(a,b,c) ->
+This=Assign(a,b,_id) ->
   [petrinet:
     {
       header(This->id);
       string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p3 = TheNet->newPlace(prefix + "final");
@@ -506,11 +492,12 @@ This=Assign(a,b,c) ->
  * The <wait until=""> activity as depicted in Fig. 4.
  */
 
-This=Wait(a,b) provided (!This->isWaitFor)->
+This=Wait(a,_id) provided (!This->isWaitFor)->
   [petrinet:
     {
       header(This->id);
       string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -542,11 +529,12 @@ This=Wait(a,b) provided (!This->isWaitFor)->
  * The <wait for=""> activity as depicted in Fig. 5.
  */
 
-This=Wait(a,b) provided (This->isWaitFor)->
+This=Wait(a,_id) provided (This->isWaitFor)->
   [petrinet:
     {
       header(This->id);
       string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "TimeStamp");
@@ -589,11 +577,12 @@ This=Wait(a,b) provided (This->isWaitFor)->
  * The <throw> activity as it is depicted in Fig. 14.
  */
 
-This=Throw(a,b) ->
+This=Throw(a,_id) ->
   [petrinet:
     {
       header(This->id);
       string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "p2");
@@ -635,11 +624,12 @@ This=Throw(a,b) ->
  * compensation handler of the current scope.
  */
 
-This=Compensate(a,b) provided (!This->inFaultHandler && !This->hasScopeAttribute) ->
+This=Compensate(a,_id) provided (!This->inFaultHandler && !This->hasScopeAttribute) ->
   [petrinet:
     {
       header(This->id);
       string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -687,11 +677,12 @@ This=Compensate(a,b) provided (!This->inFaultHandler && !This->hasScopeAttribute
  * handler of the current scope.
  */
 
-This=Compensate(a,b) provided (This->inFaultHandler && !This->hasScopeAttribute) ->
+This=Compensate(a,_id) provided (This->inFaultHandler && !This->hasScopeAttribute) ->
   [petrinet:
     {
       header(This->id);
       string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -739,11 +730,12 @@ This=Compensate(a,b) provided (This->inFaultHandler && !This->hasScopeAttribute)
  * embedded to the compensation handler of the current scope.
  */
 
-This=Compensate(a,b) provided (!This->inFaultHandler && This->hasScopeAttribute) ->
+This=Compensate(a,_id) provided (!This->inFaultHandler && This->hasScopeAttribute) ->
   [petrinet:
     {
       header(This->id);
       string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -790,11 +782,12 @@ This=Compensate(a,b) provided (!This->inFaultHandler && This->hasScopeAttribute)
  * the fault handler of the current scope.
  */
 
-This=Compensate(a,b) provided (This->inFaultHandler && This->hasScopeAttribute) ->
+This=Compensate(a,_id) provided (This->inFaultHandler && This->hasScopeAttribute) ->
   [petrinet:
     {
       header(This->id);
       string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -845,11 +838,12 @@ This=Compensate(a,b) provided (This->inFaultHandler && This->hasScopeAttribute) 
  * and p5 are correctly correlated with "(!)Terminated" here.
  */
 
-This=Terminate(a,b) ->
+This=Terminate(a,_id) ->
   [petrinet:
     {
       header(This->id);
       string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -902,11 +896,12 @@ This=Terminate(a,b) ->
  * The <flow> activity as it is depicted in Fig. 17.
  */
 
-This=Flow(a,b,c,d) ->
+This=Flow(a,b,c,_id) ->
   [petrinet:
     {
       header(This->id, true);
       string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
 
       Place *p7  = TheNet->newPlace(prefix + "initial");
       Place *p8  = TheNet->newPlace(prefix + "final");
@@ -978,11 +973,12 @@ This=Flow(a,b,c,d) ->
  * parsing an empty otherwise branch was added if it was not specified.
  */
 
-This=Switch(a,b,Otherwise(c,d),e) ->
+This=Switch(a,b,Otherwise(c,d),_id) ->
   [petrinet:
     {
       header(This->id, true);
       string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
 
       Place *p4 =  TheNet->newPlace(prefix + "final");
       Place *p5 =  TheNet->newPlace(prefix + "initial");
@@ -1131,21 +1127,15 @@ This=Switch(a,b,Otherwise(c,d),e) ->
 ******************************************************************************/
 
 /*
- * The <while> activity as it is depicted in Fig. 18, but with two possible
- * scenarios:
- *
- *   - cyclic <while>: the standard case as it is depicted in Fig. 18.
- *   - acyclic <while>: a different case leading to an acyclic pattern.
- *
- * The scenario is selected by setting the parameter "-p cyclicwhile". For more
- * information refer to the comments below or the User's Manual.
+ * The <while> activity as it is depicted in Fig. 18.
  */
 
-This=While(a,b,c) ->
+This=While(a,b,_id) ->
   [petrinet:
     {
       header(This->id, true);
       string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -1191,14 +1181,68 @@ This=While(a,b,c) ->
       TheNet->mergePlaces(This->id, ".internal.stop",    b->id, ".stop");
       TheNet->mergePlaces(This->id, ".internal.stopped", b->id, ".stopped");
 
+      footer(This->id, true);
+    }
+  ]
+;
 
-      // When the parameter "-p cyclicwhile" is not set, the created pattern
-      // differs from the original pattern depicted in Fig. 18: instead of
-      // executing the inner activity each time the given condition holds, it
-      // is executed at most once to avoid problems with links embedded in the
-      // inner activity.
-//      if (parameters[P_CYCLICWHILE] == false)
-//	TheNet->mergePlaces(This->id, ".internal.p5", This->id, ".internal.final");
+
+
+
+
+/******************************************************************************
+  REPEAT UNTIL                                                   (WS-BPEL 2.0)
+******************************************************************************/
+
+/*
+ * The <repeatUntil> activity.
+ */
+
+This=RepeatUntil(a,b,_id) ->
+  [petrinet:
+    {
+      header(This->id, true);
+      string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
+
+      Place *p1 = TheNet->newPlace(prefix + "initial");
+      Place *p2 = TheNet->newPlace(prefix + "p2");
+      Place *p3 = TheNet->newPlace(prefix + "running");
+      Place *p4 = TheNet->newPlace(prefix + "final");
+      Place *p5 = TheNet->newPlace(prefix + "p5");
+      Place *p6 = TheNet->newPlace(prefix + "stop");
+      Place *p7 = TheNet->newPlace(prefix + "stopped");
+
+      Transition *t1 = TheNet->newTransition(prefix + "t1"); /* read variable */
+      TheNet->newArc(p2, t1);
+      TheNet->newArc(t1, p3);
+
+      Transition *t2 = TheNet->newTransition(prefix + "t2"); /* end */
+      TheNet->newArc(p3, t2);
+      TheNet->newArc(t2, p4);
+
+      Transition *t3 = TheNet->newTransition(prefix + "t3"); /* repeat */
+      TheNet->newArc(p3, t3);
+      TheNet->newArc(t3, p1);
+
+
+       // Transitions for the negative control flow.
+      if (parameters[P_NOSTANDARDFAULTS] == false)
+	Transition *t4 = throwFault(p3, p6, "running", prefix, This->negativeControlFlow);
+
+      Transition *t5 = stop(p1, "initial", prefix);
+      Transition *t6 = stop(p2, "running", prefix);
+      Transition *t7 = stop(p5, "p5", prefix);
+      Transition *t8 = stop(p4, "final", prefix);
+    }
+    a // standardElements
+    b // innerActivity
+    {
+      // Embed the inner activity.
+      TheNet->mergePlaces(This->id, ".internal.initial", b->id, ".initial");
+      TheNet->mergePlaces(This->id, ".internal.p2",      b->id, ".final");
+      TheNet->mergePlaces(This->id, ".internal.stop",    b->id, ".stop");
+      TheNet->mergePlaces(This->id, ".internal.stopped", b->id, ".stopped");
 
       footer(This->id, true);
     }
@@ -1217,11 +1261,12 @@ This=While(a,b,c) ->
  * The <sequence> activity as it is depicted in Fig. 16.
  */
 
-This=Sequence(a,b,c) ->
+This=Sequence(a,b,_id) ->
   [petrinet:
     {
       header(This->id, true);
       string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
 
       Place *p2  = TheNet->newPlace(prefix + "initial");
       Place *p9  = TheNet->newPlace(prefix + "final");
@@ -1286,11 +1331,12 @@ This=Sequence(a,b,c) ->
  * The <pick> activity as it is depicted in Fig. 20.
  */
 
-This=Pick(a,b,c,d) ->
+This=Pick(a,b,c,_id) ->
   [petrinet:
     {
       header(This->id, true);
       string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
 
       Place *p5 = TheNet->newPlace(prefix + "final");
       Place *p6 = TheNet->newPlace(prefix + "initial");
@@ -1456,11 +1502,13 @@ This=Pick(a,b,c,d) ->
  * are merged.
  */
 
-This=Scope(a,b,c,d,e,f,g,h,i) ->
+This=Scope(a,b,c,d,e,f,g,h,_id) ->
   [petrinet:
     {
       header(This->id, true);
       string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
+
       currentScope = prefix;
 
       // Create push-places for the children of the scope.

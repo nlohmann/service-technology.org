@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/19 08:30:37 $
+ *          - last changed: \$Date: 2006/10/19 20:16:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.250 $
+ * \version \$Revision: 1.251 $
  * 
  */
 %}
@@ -656,11 +656,10 @@ tReply:
 ******************************************************************************/
 
 tInvoke:
-  K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations tToParts tFromParts X_SLASH K_INVOKE
-    { $$ = Invoke($4, $5, $2); }
-| K_INVOKE arbitraryAttributes X_SLASH
+  K_INVOKE arbitraryAttributes X_SLASH
     { $$ = Invoke(NoStandardElements(), NiltCorrelation_list(), $2); }
-| K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations tCatch_opt tCatchAll tCompensationHandler tToParts tFromParts X_SLASH K_INVOKE
+| K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations tCatch_opt
+  tCatchAll tCompensationHandler tToParts tFromParts X_SLASH K_INVOKE
     { $$ = annotatedInvoke($4, $5, $6, $7, $8, $2); }
 ;
 
@@ -897,9 +896,8 @@ tIf:
 ;
 
 tCondition:
-  /* empty */
-| K_CONDITION arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_CONDITION X_NEXT
-;
+  K_CONDITION arbitraryAttributes X_CLOSE X_NAME X_OPEN X_SLASH K_CONDITION X_NEXT
+;	  
 
 tElseIf_list:
   /* empty */
@@ -926,7 +924,9 @@ tElse:
 ******************************************************************************/
 
 tWhile:
-  K_WHILE arbitraryAttributes X_NEXT standardElements tCondition activity X_NEXT X_SLASH K_WHILE
+  K_WHILE arbitraryAttributes X_NEXT standardElements activity X_NEXT X_SLASH K_WHILE
+    { $$ = While($4, $5, $2); }
+| K_WHILE arbitraryAttributes X_NEXT standardElements tCondition activity X_NEXT X_SLASH K_WHILE
     { $$ = While($4, $6, $2); }
 ;
 
@@ -936,7 +936,7 @@ tWhile:
 ******************************************************************************/
 
 tRepeatUntil:
-  K_REPEATUNTIL arbitraryAttributes X_NEXT standardElements activity tCondition X_NEXT X_SLASH K_REPEATUNTIL
+  K_REPEATUNTIL arbitraryAttributes X_NEXT standardElements activity X_NEXT tCondition X_SLASH K_REPEATUNTIL
     { $$ = RepeatUntil($4, $5, $2); }
 ;
 

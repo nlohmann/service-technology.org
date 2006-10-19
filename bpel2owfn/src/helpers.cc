@@ -32,13 +32,13 @@
  *          
  * \date
  *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/09/27 14:19:43 $
+ *          - last changed: \$Date: 2006/10/19 20:16:18 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.55 $
+ * \version \$Revision: 1.56 $
  */
 
 
@@ -78,6 +78,19 @@ extern PetriNet *TheNet;
 /******************************************************************************
  * Conversion functions
  *****************************************************************************/
+
+/*!
+ * \param i Kimwitu++ integer
+ * \return  C++ string representing i
+ */
+string toString(kc::integer i)
+{
+  return toString(i->value);
+}
+
+
+
+
 
 /*!
  * \param i standard C int

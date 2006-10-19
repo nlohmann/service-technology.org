@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2006/10/11
- *          - last changed: \$Date: 2006/10/18 12:47:52 $
+ *          - last changed: \$Date: 2006/10/19 20:16:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  *
  */
 
@@ -145,6 +145,31 @@ activityInvoke(
         )
       ),
       mkinteger(0)
+    )
+  )
+>;
+
+
+/*
+ * "Transform" standard <invoke>.
+ */
+activityInvoke(
+  annotatedInvoke(
+    my_standardElements,
+    my_tCorrelation_list,
+    NoCatch(),
+    NoCatchAll(),
+    implicitCompensationHandler(a),
+    my_integer
+  )
+)
+->
+< implicit:
+  activityInvoke(
+    Invoke(
+      my_standardElements,
+      my_tCorrelation_list,
+      my_integer
     )
   )
 >;

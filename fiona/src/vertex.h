@@ -53,13 +53,12 @@ protected:
 
     unsigned int numberOfVertex;					//!< number of this vertex in the graph
     
-    CNF * annotation;						//!< annotation of this node (a CNF)
-    
 public:
-	vertex();
 	vertex(int);
 	~vertex ();
 	
+    CNF * annotation;						//!< annotation of this node (a CNF)
+
 	int * eventsUsed;
 	int eventsToBeSeen;
 	

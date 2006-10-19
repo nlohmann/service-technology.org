@@ -22,19 +22,6 @@ vertex::vertex(int numberEvents) :
 	
 }
 
-//! \fn vertex::vertex()
-//! \brief constructor for IG nodes
-// for IG
-vertex::vertex() :
-               color(BLACK),
-               successorNodes(NULL),
-               numberOfVertex(0),
-			   annotation(NULL) {
-               	
-	eventsUsed = NULL;
-	eventsToBeSeen = 0;
-}
-
 //! \fn vertex::~vertex()
 //! \brief destructor
 vertex::~vertex() {
@@ -218,7 +205,6 @@ int vertex::numberOfElementsInAnnotation() {
 		cl = cl->nextElement;
 	}
 	return count;
-
 }
 
 //! \fn void vertex::setColor(vertexColor c)
@@ -281,7 +267,6 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
             bool finalState = false;
 
 			CNF * cl = annotation;						// get pointer to the first clause of the CNF
-
             // iterate over all clauses of the annotation and determine color for clause
             while (cl) {
             	if (cl->isFinalState) {
@@ -292,7 +277,6 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
             	} else if (eventsToBeSeen == 0 || finalAnalysis) {
                 //	finalState = false;
                     cTmp = cl->calcClauseColor();
-
                     switch (cTmp) {
                     case RED:   // found a red clause; so node becomes red
                         if (color == BLACK) {

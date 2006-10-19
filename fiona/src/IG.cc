@@ -108,7 +108,7 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	// iterate over all elements of inputSet
 	for (setOfMessages::iterator iter = inputSet.begin(); iter != inputSet.end(); iter++) {
 
-		if (checkMaximalEvents(*iter, currentNode, sending)) {
+		if (options[O_MESSAGES_MAX] == false || checkMaximalEvents(*iter, currentNode, sending)) {
 	
 			trace(TRACE_3, "\t\t\t\t    sending event: !");
 			
@@ -147,9 +147,9 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 		}
 	}
 	
-	trace(TRACE_5, "iterating over outputSet\n");
+	trace(TRACE_3, "iterating over outputSet\n");
 	for (setOfMessages::iterator iter = outputSet.begin(); iter != outputSet.end(); iter++) {
-		if (checkMaximalEvents(*iter, currentNode, receiving)) {
+		if (options[O_MESSAGES_MAX] == false || checkMaximalEvents(*iter, currentNode, receiving)) {
 			
 			trace(TRACE_3, "\t\t\t\t    output event: ?");
 	
@@ -176,7 +176,7 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 #endif
 		
 			}
-		}	
+		} 	
 	}		
 	analyseNode(currentNode, true);
 	trace(TRACE_5, "node analysed\n");

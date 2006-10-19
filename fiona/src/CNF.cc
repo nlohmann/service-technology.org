@@ -123,7 +123,7 @@ void clause::setEdges(graphEdge * edge) {
  	while (cl) {
 		if  (cl->edge != NULL && strcmp(cl->edge->getLabel(), edge->getLabel()) == 0) {
 			// we have found a pseudo edge with that label, so store the correct edge right here
-			cl->setEdge(edge);	
+			cl->setEdge(edge);
 			trace(TRACE_5, "clause::setEdges(graphEdge * edge) : end\n");		
 			return;
 		}
@@ -170,17 +170,18 @@ vertexColor CNF::calcClauseColor() {
 	if (cl == NULL) {		// since there is no clause we can't conclude anything
 		return RED;			// is not intended to happen
 	}
-
 	clause * literal = cl;			// point to the first literal of the clause
 	clause * literalPrev = NULL;
 	vertexColor clauseColor = BLACK;
 	
 	while (literal) {					// check the clause stored
+
 		// first case: the literal points to a blue node
 		if (literal->edge != NULL &&
 				literal->edge->getNode() != NULL && 
-				literal->edge->getNode()->getColor() == BLUE) {
-					
+				(literal->edge->getNode()->getColor() == BLUE
+					|| literal->edge->getNode()->getColor() == BLACK)) {
+		
             clauseColor = BLUE;
         }
 		// second case: the literal points to a red node, so we delete that literal

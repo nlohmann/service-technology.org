@@ -5,6 +5,7 @@
 #include "enums.h"
 #include "options.h"
 #include "debug.h"
+#include "CNF.h"
 #include <cassert>
 
 
@@ -230,7 +231,7 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
             currentVertex->addSuccessorNode(edgeSucc);
 
 			currentVertex->setAnnotationEdges(edgeSucc);
-
+			
             numberOfEdges++;
 
             delete toAdd;
@@ -267,6 +268,8 @@ vertex * communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeT
 	unsigned int greaterEqual = 0;
 	bool doNotMerge = true;
 
+	cout << "\ntoAdd: " << numberOfNodes << endl;
+
 	if (found != NULL) {
 	    for (unsigned int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
 	    	if (label == i) {
@@ -282,29 +285,43 @@ vertex * communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeT
 	        }
 	    }
 	
-//		cout << "\ntoAdd: " << numberOfNodes + 1 << " compared with vertex: " << found->getNumber() << " -> " << greaterEqual << endl;
+		cout << "\ntoAdd: " << numberOfNodes << " compared with vertex: " << found->getNumber() << " -> " << greaterEqual << endl;
 	
 		if (greaterEqual == (PN->placeInputCnt + PN->placeOutputCnt)) {
 			// new vertex activates no more events than the found one -> nothing to be done anymore 
 			//found->eventsUsed[offset + label]++;
 			doNotMerge = false;
-		} //else {
-//			for (unsigned int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
-//		    	if (label == i) {
-//		    		cout << PN->inputPlacesArray[i]->name << ": " << currentVertex->eventsUsed[i] + 1 << " ";
-//		    	} else {
-//		    		cout << PN->inputPlacesArray[i]->name << ": " << currentVertex->eventsUsed[i] << " ";
-//		        }
-//		    }
-//		    cout << "\n";
-//			for (unsigned int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
-//		    	if (label == i) {
-//		    		cout << PN->inputPlacesArray[i]->name << ": " << found->eventsUsed[i] + 1 << " ";
-//		    	} else {
-//		    		cout << PN->inputPlacesArray[i]->name << ": " << found->eventsUsed[i] << " ";
-//		        }
-//		    }		 				
-//		}
+		} else {
+			for (unsigned int i = 0; i < PN->placeInputCnt; i++) {
+		    	if (label == i) {
+		    		cout << PN->inputPlacesArray[i]->name << ": " << currentVertex->eventsUsed[i] + 1 << " ";
+		    	} else {
+		    		cout << PN->inputPlacesArray[i]->name << ": " << currentVertex->eventsUsed[i] << " ";
+		        }
+		    }
+			for (unsigned int i = PN->placeInputCnt; i < PN->placeInputCnt + PN->placeOutputCnt; i++) {
+		    	if (label == i) {
+		    		cout << PN->outputPlacesArray[i-PN->placeInputCnt]->name << ": " << currentVertex->eventsUsed[i] + 1 << " ";
+		    	} else {
+		    		cout << PN->outputPlacesArray[i-PN->placeInputCnt]->name << ": " << currentVertex->eventsUsed[i] << " ";
+		        }
+		    }
+		    cout << "\n";
+			for (unsigned int i = 0; i < PN->placeInputCnt; i++) {
+		    	if (label == i) {
+		    		cout << PN->inputPlacesArray[i]->name << ": " << found->eventsUsed[i] + 1 << " ";
+		    	} else {
+		    		cout << PN->inputPlacesArray[i]->name << ": " << found->eventsUsed[i] << " ";
+		        }
+		    }		 				
+			for (unsigned int i = PN->placeInputCnt; i < PN->placeInputCnt + PN->placeOutputCnt; i++) {
+		    	if (label == i) {
+		    		cout << PN->outputPlacesArray[i-PN->placeInputCnt]->name << ": " << currentVertex->eventsUsed[i] + 1 << " ";
+		    	} else {
+		    		cout << PN->outputPlacesArray[i-PN->placeInputCnt]->name << ": " << currentVertex->eventsUsed[i] << " ";
+		        }
+		    }
+		}
 	}
 //		 set the events of the newly calculated vertex according to its predecessor node
 //        for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
@@ -333,7 +350,7 @@ vertex * communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeT
 //	if (options[O_BDD] == true || found == NULL) {
     if (found == NULL) {// || doNotMerge) {
         trace(TRACE_1, "\n\t new successor node computed:");
-
+cout << "no merge!" << endl;
         toAdd->setNumber(numberOfNodes++);
         numberOfBlueNodes++;			// all nodes initially blue
 
@@ -366,7 +383,7 @@ vertex * communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeT
         return toAdd;
     } else {
         trace(TRACE_1, "\t computed successor node already known: " + intToString(found->getNumber()) + "\n");
-
+cout << "merged!" << endl;
 		vertex * returnVertex;
 
         graphEdge * edgeSucc = new graphEdge(found, edgeLabel, type);

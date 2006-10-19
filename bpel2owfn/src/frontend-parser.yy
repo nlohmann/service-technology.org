@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/18 12:47:52 $
+ *          - last changed: \$Date: 2006/10/19 08:30:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.249 $
+ * \version \$Revision: 1.250 $
  * 
  */
 %}
@@ -65,7 +65,7 @@
 
 
 // the terminal symbols (tokens)
-%token APOSTROPHE EQUAL GREATER GREATEROREQUAL K_AND K_ASSIGN K_BRANCHES K_CASE K_CATCH K_CATCHALL K_COMPENSATE K_COMPENSATESCOPE K_COMPENSATIONHANDLER K_COMPLETIONCONDITION K_CONDITION K_COPY K_CORRELATION K_CORRELATIONS K_CORRELATIONSET K_CORRELATIONSETS K_ELSE K_ELSEIF K_EMPTY K_EVENTHANDLERS K_EXIT K_EXTENSION K_EXTENSIONACTIVITY K_EXTENSIONASSIGNOPERATION K_EXTENSIONS K_FAULTHANDLERS K_FINALCOUNTERVALUE K_FLOW K_FOR K_FOREACH K_FROM K_FROMPART K_FROMPARTS K_GETLINKSTATUS K_IF K_IMPORT K_INVOKE K_JOINCONDITION K_LINK K_LINKS K_LITERAL K_MESSAGEEXCHANGE K_MESSAGEEXCHANGES K_ONALARM K_ONEVENT K_ONMESSAGE K_OR K_OTHERWISE K_PARTNER K_PARTNERLINK K_PARTNERLINKS K_PARTNERS K_PICK K_PROCESS K_QUERY K_RECEIVE K_REPEATEVERY K_REPEATUNTIL K_REPLY K_RETHROW K_SCOPE K_SEQUENCE K_SOURCE K_SOURCES K_STARTCOUNTERVALUE K_SWITCH K_TARGET K_TARGETS K_TERMINATE K_TERMINATIONHANDLER K_THROW K_TO K_TOPART K_TOPARTS K_TRANSITIONCONDITION K_UNTIL K_VALIDATE K_VARIABLE K_VARIABLES K_WAIT K_WHILE LBRACKET LESS LESSOREQUAL NOTEQUAL NUMBER QUOTE RBRACKET VARIABLENAME X_CLOSE X_EQUALS X_NEXT X_OPEN X_SLASH
+%token APOSTROPHE EQUAL GREATER GREATEROREQUAL K_AND K_ASSIGN K_BRANCHES K_CASE K_CATCH K_CATCHALL K_COMPENSATE K_COMPENSATESCOPE K_COMPENSATIONHANDLER K_COMPLETIONCONDITION K_CONDITION K_COPY K_CORRELATION K_CORRELATIONS K_CORRELATIONSET K_CORRELATIONSETS K_ELSE K_ELSEIF K_EMPTY K_EVENTHANDLERS K_EXIT K_EXTENSION K_EXTENSIONACTIVITY K_EXTENSIONASSIGNOPERATION K_EXTENSIONS K_FAULTHANDLERS K_FINALCOUNTERVALUE K_FLOW K_FOR K_FOREACH K_FROM K_FROMPART K_FROMPARTS K_GETLINKSTATUS K_IF K_IMPORT K_INVOKE K_JOINCONDITION K_LINK K_LINKS K_LITERAL K_MESSAGEEXCHANGE K_MESSAGEEXCHANGES K_ONALARM K_ONEVENT K_ONMESSAGE K_OR K_OTHERWISE K_PARTNER K_PARTNERLINK K_PARTNERLINKS K_PARTNERS K_PICK K_PROCESS K_QUERY K_RECEIVE K_REPEATEVERY K_REPEATUNTIL K_REPLY K_RETHROW K_SCOPE K_SEQUENCE K_SOURCE K_SOURCES K_STARTCOUNTERVALUE K_SWITCH K_TARGET K_TARGETS K_TERMINATE K_TERMINATIONHANDLER K_THROW K_TO K_TOPART K_TOPARTS K_TRANSITIONCONDITION K_UNTIL K_VALIDATE K_VARIABLE K_VARIABLES K_WAIT K_WHILE LBRACKET LESS LESSOREQUAL NOTEQUAL NUMBER RBRACKET VARIABLENAME X_CLOSE X_EQUALS X_NEXT X_OPEN X_SLASH
 %token <yt_casestring> X_NAME
 %token <yt_casestring> X_STRING
 
@@ -379,6 +379,9 @@ tMessageExchange:
 ;		
 
 
+
+
+
 /******************************************************************************
   FAULT HANDLERS
 ******************************************************************************/
@@ -402,6 +405,13 @@ tCatch:
     { $$ = Catch($4, $2); }
 ;
 
+tCatch_opt: /* for <invoke> */
+  /* empty */
+    { $$ = NoCatch(); }
+| tCatch
+    { $$ = $1; }
+;
+
 tCatchAll:
   /* empty */
     { $$ = NoCatchAll(); }
@@ -419,6 +429,18 @@ tCompensationHandler:
     { $$ = implicitCompensationHandler(mkinteger(0)); }
 | K_COMPENSATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_COMPENSATIONHANDLER X_NEXT
     { $$ = userDefinedCompensationHandler($3, mkinteger(0)); }
+;
+
+
+/******************************************************************************
+  TERMINATION HANDLER                                            (WS-BPEL 2.0)
+******************************************************************************/
+
+tTerminationHandler:
+  /* empty */
+    { $$ = standardTerminationHandler(mkinteger(0)); }
+| K_TERMINATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_TERMINATIONHANDLER X_NEXT
+    { $$ = TerminationHandler($3, mkinteger(0)); }
 ;
 
 
@@ -472,6 +494,9 @@ tRepeatEvery:
   /* empty */
 | K_REPEATEVERY arbitraryAttributes X_CLOSE constant X_OPEN X_SLASH K_REPEATEVERY X_NEXT
 ;
+
+
+
 
 
 /******************************************************************************
@@ -602,7 +627,6 @@ tFromPart:
 
 
 
-
 /******************************************************************************
   RECEIVE
 ******************************************************************************/
@@ -640,12 +664,6 @@ tInvoke:
     { $$ = annotatedInvoke($4, $5, $6, $7, $8, $2); }
 ;
 
-tCatch_opt:
-  /* empty */
-    { $$ = NoCatch(); }
-| tCatch
-    { $$ = $1; }
-; 
 
 /******************************************************************************
   ASSIGN
@@ -1004,16 +1022,7 @@ tScope:
 ;
 
 
-/******************************************************************************
-  TERMINATION HANDLER                                            (WS-BPEL 2.0)
-******************************************************************************/
 
-tTerminationHandler:
-  /* empty */
-    { $$ = standardTerminationHandler(mkinteger(0)); }
-| K_TERMINATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_TERMINATIONHANDLER X_NEXT
-    { $$ = TerminationHandler($3, mkinteger(0)); }
-;
 
 
 /******************************************************************************

@@ -265,64 +265,64 @@ vertex * communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeT
 	// try to find vertex in set of known vertices
     vertex * found = findVertexInSet(toAdd);
 
-	unsigned int greaterEqual = 0;
-	bool doNotMerge = true;
-
-	cout << "\ntoAdd: " << numberOfNodes << endl;
-
-	if (found != NULL) {
-	    for (unsigned int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
-	    	if (label == i) {
-	    		// current event is considered, but the eventsUsed is not yet set appropriatly
-	    		// in the currentVertex
-	    		if ((currentVertex->eventsUsed[i] + 1) >= found->eventsUsed[i]) {
-	//    			cout << PN->inputPlacesArray[i]->name << "! ";
-		        	greaterEqual++;
-		        }
-	    	} else if (currentVertex->eventsUsed[i] >= found->eventsUsed[i]) {
-    	//		cout << PN->inputPlacesArray[i]->name << " ";
-	        	greaterEqual++;
-	        }
-	    }
-	
-		cout << "\ntoAdd: " << numberOfNodes << " compared with vertex: " << found->getNumber() << " -> " << greaterEqual << endl;
-	
-		if (greaterEqual == (PN->placeInputCnt + PN->placeOutputCnt)) {
-			// new vertex activates no more events than the found one -> nothing to be done anymore 
-			//found->eventsUsed[offset + label]++;
-			doNotMerge = false;
-		} else {
-			for (unsigned int i = 0; i < PN->placeInputCnt; i++) {
-		    	if (label == i) {
-		    		cout << PN->inputPlacesArray[i]->name << ": " << currentVertex->eventsUsed[i] + 1 << " ";
-		    	} else {
-		    		cout << PN->inputPlacesArray[i]->name << ": " << currentVertex->eventsUsed[i] << " ";
-		        }
-		    }
-			for (unsigned int i = PN->placeInputCnt; i < PN->placeInputCnt + PN->placeOutputCnt; i++) {
-		    	if (label == i) {
-		    		cout << PN->outputPlacesArray[i-PN->placeInputCnt]->name << ": " << currentVertex->eventsUsed[i] + 1 << " ";
-		    	} else {
-		    		cout << PN->outputPlacesArray[i-PN->placeInputCnt]->name << ": " << currentVertex->eventsUsed[i] << " ";
-		        }
-		    }
-		    cout << "\n";
-			for (unsigned int i = 0; i < PN->placeInputCnt; i++) {
-		    	if (label == i) {
-		    		cout << PN->inputPlacesArray[i]->name << ": " << found->eventsUsed[i] + 1 << " ";
-		    	} else {
-		    		cout << PN->inputPlacesArray[i]->name << ": " << found->eventsUsed[i] << " ";
-		        }
-		    }		 				
-			for (unsigned int i = PN->placeInputCnt; i < PN->placeInputCnt + PN->placeOutputCnt; i++) {
-		    	if (label == i) {
-		    		cout << PN->outputPlacesArray[i-PN->placeInputCnt]->name << ": " << currentVertex->eventsUsed[i] + 1 << " ";
-		    	} else {
-		    		cout << PN->outputPlacesArray[i-PN->placeInputCnt]->name << ": " << currentVertex->eventsUsed[i] << " ";
-		        }
-		    }
-		}
-	}
+//	unsigned int greaterEqual = 0;
+//	bool doNotMerge = true;
+//
+//	cout << "\ntoAdd: " << numberOfNodes << endl;
+//
+//	if (found != NULL) {
+//	    for (unsigned int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
+//	    	if (label == i) {
+//	    		// current event is considered, but the eventsUsed is not yet set appropriatly
+//	    		// in the currentVertex
+//	    		if ((currentVertex->eventsUsed[i] + 1) >= found->eventsUsed[i]) {
+//	//    			cout << PN->inputPlacesArray[i]->name << "! ";
+//		        	greaterEqual++;
+//		        }
+//	    	} else if (currentVertex->eventsUsed[i] >= found->eventsUsed[i]) {
+//    	//		cout << PN->inputPlacesArray[i]->name << " ";
+//	        	greaterEqual++;
+//	        }
+//	    }
+//	
+//		cout << "\ntoAdd: " << numberOfNodes << " compared with vertex: " << found->getNumber() << " -> " << greaterEqual << endl;
+//	
+//		if (greaterEqual == (PN->placeInputCnt + PN->placeOutputCnt)) {
+//			// new vertex activates no more events than the found one -> nothing to be done anymore 
+//			//found->eventsUsed[offset + label]++;
+//			doNotMerge = false;
+//		} else {
+//			for (unsigned int i = 0; i < PN->placeInputCnt; i++) {
+//		    	if (label == i) {
+//		    		cout << PN->inputPlacesArray[i]->name << ": " << currentVertex->eventsUsed[i] + 1 << " ";
+//		    	} else {
+//		    		cout << PN->inputPlacesArray[i]->name << ": " << currentVertex->eventsUsed[i] << " ";
+//		        }
+//		    }
+//			for (unsigned int i = PN->placeInputCnt; i < PN->placeInputCnt + PN->placeOutputCnt; i++) {
+//		    	if (label == i) {
+//		    		cout << PN->outputPlacesArray[i-PN->placeInputCnt]->name << ": " << currentVertex->eventsUsed[i] + 1 << " ";
+//		    	} else {
+//		    		cout << PN->outputPlacesArray[i-PN->placeInputCnt]->name << ": " << currentVertex->eventsUsed[i] << " ";
+//		        }
+//		    }
+//		    cout << "\n";
+//			for (unsigned int i = 0; i < PN->placeInputCnt; i++) {
+//		    	if (label == i) {
+//		    		cout << PN->inputPlacesArray[i]->name << ": " << found->eventsUsed[i] + 1 << " ";
+//		    	} else {
+//		    		cout << PN->inputPlacesArray[i]->name << ": " << found->eventsUsed[i] << " ";
+//		        }
+//		    }		 				
+//			for (unsigned int i = PN->placeInputCnt; i < PN->placeInputCnt + PN->placeOutputCnt; i++) {
+//		    	if (label == i) {
+//		    		cout << PN->outputPlacesArray[i-PN->placeInputCnt]->name << ": " << currentVertex->eventsUsed[i] + 1 << " ";
+//		    	} else {
+//		    		cout << PN->outputPlacesArray[i-PN->placeInputCnt]->name << ": " << currentVertex->eventsUsed[i] << " ";
+//		        }
+//		    }
+//		}
+//	}
 //		 set the events of the newly calculated vertex according to its predecessor node
 //        for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
 //            toAdd->eventsUsed[i] = currentVertex->eventsUsed[i];
@@ -346,11 +346,12 @@ vertex * communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeT
 //	}
 
 //	doNotMerge = false;
-	
+
+
+
 //	if (options[O_BDD] == true || found == NULL) {
     if (found == NULL) {// || doNotMerge) {
         trace(TRACE_1, "\n\t new successor node computed:");
-cout << "no merge!" << endl;
         toAdd->setNumber(numberOfNodes++);
         numberOfBlueNodes++;			// all nodes initially blue
 
@@ -383,8 +384,6 @@ cout << "no merge!" << endl;
         return toAdd;
     } else {
         trace(TRACE_1, "\t computed successor node already known: " + intToString(found->getNumber()) + "\n");
-cout << "merged!" << endl;
-		vertex * returnVertex;
 
         graphEdge * edgeSucc = new graphEdge(found, edgeLabel, type);
         
@@ -407,38 +406,6 @@ cout << "merged!" << endl;
     }
 }
 
-//! \fn bool communicationGraph::terminateBuildGraph(vertex * currentNode)
-//! \param currentNode the node for which termination is decided
-//! \brief decides whether a leaf node of the graph is reached;
-//! either because of reaching communication depth or because there are no events left
-bool communicationGraph::terminateBuildGraph(vertex * currentNode) {
-	
-	if (options[O_COMM_DEPTH]) {
-		// when -c set to a value, then stop at that depth
-		if (actualDepth > PN->commDepth) {
-//		if (true) {
-			return true;
-		} else {
-			return false;
-		}
-	} else {
-		// check whether there are input or output events left
-		// (i.e. their max_occurences value is not reached)
-		int i;
-		
-		for (i = 0; i < PN->getInputPlaceCnt(); i++) {
-			if (currentNode->eventsUsed[i] < PN->inputPlacesArray[i]->max_occurence) {
-				return false;    // at least one event can be sent
-			}
-		}
-		for (i = 0; i < PN->getOutputPlaceCnt(); i++) {
-			if (currentNode->eventsUsed[i + PN->placeInputCnt] < PN->outputPlacesArray[i]->max_occurence) {
-				return false;    // at least one event can be received
-			}
-		}
-		return true;
-	}
-}
 
 //! \fn void communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * oldNode, vertex * newNode)
 //! \param input the sending event currently performed
@@ -949,4 +916,39 @@ analysisResult communicationGraph::analyseNode(vertex * node, bool finalAnalysis
 //    }
 //    trace(TRACE_5, "communicationGraph::analyseNode(vertex * node, bool finalAnalysis) : end\n");
 //    return TERMINATE;
+}
+
+
+//! \fn bool communicationGraph::terminateBuildGraph(vertex * currentNode)
+//! \param currentNode the node for which termination is decided
+//! \brief decides whether a leaf node of the graph is reached;
+//! either because of reaching communication depth or because there are no events left
+bool communicationGraph::terminateBuildGraph(vertex * currentNode) {
+	
+//	if (options[O_COMM_DEPTH]) {
+		// when -c set to a value, then stop at that depth
+
+		if (actualDepth > PN->commDepth) {
+			return true;
+		} else {
+			return false;
+		}
+
+//	} else {
+//		// check whether there are input or output events left
+//		// (i.e. their max_occurences value is not reached)
+//		int i;
+//		
+//		for (i = 0; i < PN->getInputPlaceCnt(); i++) {
+//			if (currentNode->eventsUsed[i] < PN->inputPlacesArray[i]->max_occurence) {
+//				return false;    // at least one event can be sent
+//			}
+//		}
+//		for (i = 0; i < PN->getOutputPlaceCnt(); i++) {
+//			if (currentNode->eventsUsed[i + PN->placeInputCnt] < PN->outputPlacesArray[i]->max_occurence) {
+//				return false;    // at least one event can be received
+//			}
+//		}
+//		return true;
+//	}
 }

@@ -42,8 +42,8 @@ zyklusRbluenodes_soll=7
 zyklusRblueedges_soll=6
 zyklusRstoredstates_soll=0
 
-echo running $FIONA -a -t OG -n $DIR/zyklusR.owfn -e5
-OUTPUT=`$FIONA -a -t OG -n $DIR/zyklusR.owfn -e5  2>&1`
+echo running $FIONA -a -t OG -n $DIR/zyklusR.owfn -e5 -c5
+OUTPUT=`$FIONA -a -t OG -n $DIR/zyklusR.owfn -e5 -c5 2>&1`
 
 echo $OUTPUT | grep "net is controllable: YES" > /dev/null
 zyklusRcontrol=$?
@@ -80,7 +80,7 @@ result=`expr $result + $zyklusPcontrol`
 
 zyklusPcommitbluenodes_soll=4
 zyklusPcommitblueedges_soll=5
-zyklusPcommitstoredstates_soll=11
+zyklusPcommitstoredstates_soll=10
 
 echo running $FIONA -a -t OG -n $DIR/zyklusPmitcommit.owfn -e2 -m1
 OUTPUT=`$FIONA -a -t OG -n $DIR/zyklusPmitcommit.owfn -e2 -m1  2>&1`

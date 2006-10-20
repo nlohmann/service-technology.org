@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/19 20:16:18 $
+ *          - last changed: \$Date: 2006/10/20 07:43:07 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.36 $
+ * \version \$Revision: 1.37 $
  */
 %}
 
@@ -474,6 +474,53 @@ This=Assign(a,b,_id) ->
 
       TheNet->mergePlaces(TheNet->findPlace(prefix + "final"), lastPlace);
 
+      footer(This->id);
+    }
+  ]
+;
+
+
+
+
+
+/******************************************************************************
+  VALIDATE                                                       (WS-BPEL 2.0)
+******************************************************************************/
+
+This=Validate(a,_id) ->
+  [petrinet:
+    {
+      header(This->id);
+      string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
+
+      Place *p1 = TheNet->newPlace(prefix + "initial");
+      Place *p2 = TheNet->newPlace(prefix + "running");
+      Place *p3 = TheNet->newPlace(prefix + "final");
+      Place *p4 = TheNet->newPlace(prefix + "p4");
+      Place *p5 = TheNet->newPlace(prefix + "stop");
+      Place *p6 = TheNet->newPlace(prefix + "stopped");
+
+      Transition *t1 = TheNet->newTransition(prefix + "t1");
+      TheNet->newArc(p1, t1);
+      TheNet->newArc(t1, p2);
+
+      Transition *t2 = TheNet->newTransition(prefix + "t2");
+      TheNet->newArc(p2, t2);
+      TheNet->newArc(t2, p3);
+
+
+      // Transitions for the negative control flow.
+      if (parameters[P_NOSTANDARDFAULTS] == false)
+        Transition *t3 = throwFault(p2, p4, "running", prefix, This->negativeControlFlow);
+
+      Transition *t4 = stop(p1, "initial", prefix);
+      Transition *t5 = stop(p2, "running", prefix);
+      Transition *t6 = stop(p4, "p4", prefix);
+      Transition *t7 = stop(p3, "final", prefix);
+    }
+    a // standardElements
+    {
       footer(This->id);
     }
   ]

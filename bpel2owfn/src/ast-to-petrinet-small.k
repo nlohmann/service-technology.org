@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/19 20:16:17 $
+ *          - last changed: \$Date: 2006/10/20 07:43:07 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.48 $
+ * \version \$Revision: 1.49 $
  *
  */
 %}
@@ -427,6 +427,34 @@ This=Assign(a,b,c) ->
   ]
 ;
 
+
+
+
+
+/******************************************************************************
+  VALIDATE                                                       (WS-BPEL 2.0)
+******************************************************************************/
+
+This=Validate(a,b) ->
+  [petrinetsmall:
+    {
+      header(This->id);
+      string prefix = toString(This->id) + ".internal.";
+
+      Place *p1 = TheNet->newPlace(prefix + "initial");
+      Place *p2 = TheNet->newPlace(prefix + "final");
+
+      Transition *t1 = TheNet->newTransition(prefix + "validate"); // dummy transition
+
+      TheNet->newArc(p1, t1);
+      TheNet->newArc(t1, p2);
+    }
+    a // standardElements
+    {
+      footer(This->id);
+    }
+  ]
+;
 
 
 

@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/20 07:43:07 $
+ *          - last changed: \$Date: 2006/10/20 18:55:05 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
  *
  */
 %}
@@ -675,13 +675,102 @@ This=Switch(a,b,otherwiseBranch=Otherwise(c,d),e) ->
       // (i.e. firing of the respective t2-transition) has set the links of all
       // other branches to false.
       currentCase = 1;
-      foreach (thisCaseBranch=Case(innerActivity1); tCase_list b) {
-        foreach (otherCaseBranch=Case(innerActivity2); tCase_list b) {
+      foreach (Case(innerActivity1); tCase_list b)
+      {
+        foreach (Case(innerActivity2); tCase_list b)
+        {
 	  if (innerActivity1 != innerActivity2)
-            dpeLinks(TheNet->findTransition(prefix + "case" + toString(currentCase)), otherCaseBranch->id); // case -> case'
+            dpeLinks(TheNet->findTransition(prefix + "case" + toString(currentCase)), innerActivity2->id); // case -> case'
     	}
-        dpeLinks(TheNet->findTransition(prefix + "case" + toString(currentCase)), otherwiseBranch->id); // case -> otherwise
-        dpeLinks(TheNet->findTransition(prefix + "caseo"), thisCaseBranch->id); // otherwise -> case
+        dpeLinks(TheNet->findTransition(prefix + "case" + toString(currentCase)), c->id); // case -> otherwise
+        dpeLinks(TheNet->findTransition(prefix + "caseo"), innerActivity1->id); // otherwise -> case
+  	currentCase++;
+      }
+
+      footer(This->id, true);
+    }
+  ]
+;
+
+
+
+
+
+/******************************************************************************
+  IF
+******************************************************************************/
+
+/*
+ * The <if> activity.
+ */
+
+This=If(a,b,c,_id) ->
+  [petrinetsmall:
+    {
+      header(This->id, true);
+      string prefix = toString(This->id) + ".internal.";
+
+      Place *p1 =  TheNet->newPlace(prefix + "initial");
+      Place *p2 =  TheNet->newPlace(prefix + "final");
+    }
+    a // standardElements
+    b // elseIf braches
+    c // else branch
+    {
+      int currentCase = 1;
+      foreach (caseBranch=ElseIf(innerActivity, _id2); tElseIf_list b)
+      {
+	string caseNumber = toString(currentCase++);
+	Transition* t1 = TheNet->newTransition(prefix + "case" + caseNumber);
+	TheNet->newArc(TheNet->findPlace(This->id, ".internal.initial"), t1); // added ".internal" here
+
+	// Embed the inner activity.
+	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
+	TheNet->mergePlaces(This->id, ".internal.final", innerActivity->id, ".final");
+      }
+
+      // The <else> branch.
+      Transition *t1 = TheNet->newTransition(prefix + "caseo");
+      TheNet->newArc(TheNet->findPlace(This->id, ".internal.initial"), t1); // added ".internal" here
+
+      with (c)
+      {
+        c=Else(innerActivity,_id2):
+        {
+          // embed inner activity
+          TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
+          TheNet->mergePlaces(This->id, ".internal.final", innerActivity->id, ".final");
+        }
+        c=NoElse(_id2):
+        {
+          TheNet->newArc(t1, TheNet->findPlace(This->id, ".internal.final"));
+        }
+        default: { /* do nothing */ }
+      }
+
+
+      // Create the arcs for the Dead Path elimination: each chosen activity
+      // (i.e. firing of the respective t2-transition) has set the links of all
+      // other branches to false.
+      currentCase = 1;
+      foreach (ElseIf(innerActivity1); tElseIf_list b)
+      {
+        foreach (ElseIf(innerActivity2); tElseIf_list b)
+         {
+	  if (innerActivity1 != innerActivity2)
+          {
+            dpeLinks(TheNet->findTransition(prefix + "case" + toString(currentCase)), innerActivity2->id); // case -> case'
+          }
+    	}
+        with (c)
+        {
+          c=Else(innerActivity3,_id2):
+          {
+            dpeLinks(TheNet->findTransition(prefix + "case" + toString(currentCase)), innerActivity3->id); // case -> otherwise
+            dpeLinks(TheNet->findTransition(prefix + "caseo"), innerActivity1->id); // otherwise -> case
+          }
+          default: { /* do nothing */ }
+        }
   	currentCase++;
       }
 

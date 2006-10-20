@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/19 20:16:17 $
+ *          - last changed: \$Date: 2006/10/20 18:55:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.251 $
+ * \version \$Revision: 1.252 $
  * 
  */
 %}
@@ -102,6 +102,7 @@
 #include "bpel-kc-k.h" // phylum definitions
 #include "bpel-kc-yystype.h" // data types for tokens and non-terminals
 #include "helpers.h"
+#include "debug.h"
 #include "ast-details.h"
 
 
@@ -892,7 +893,7 @@ tOtherwise:
 
 tIf:
   K_IF arbitraryAttributes X_NEXT standardElements tCondition activity X_NEXT tElseIf_list tElse X_SLASH K_IF
-    { $$ = If($4, ConstElseIf_list(ElseIf($6, ((impl_tElseIf_ElseIf*)$6)->integer_1), $8), $9, $2); }
+    { $$ = If($4, ConstElseIf_list(ElseIf($6, mkinteger($6->id)), $8), $9, $2); }
 ;
 
 tCondition:
@@ -902,13 +903,13 @@ tCondition:
 tElseIf_list:
   /* empty */
     { $$ = NiltElseIf_list(); }
-| tElseIf X_NEXT tElseIf_list
-    { $$ = ConstElseIf_list($1, $3); }
+| tElseIf tElseIf_list
+    { $$ = ConstElseIf_list($1, $2); }
 ;
 
 tElseIf:
-  K_ELSEIF arbitraryAttributes X_NEXT tCondition X_NEXT activity X_NEXT X_SLASH K_ELSEIF X_NEXT
-    { $$ = ElseIf($6, $2); }
+  K_ELSEIF arbitraryAttributes X_NEXT tCondition activity X_NEXT X_SLASH K_ELSEIF X_NEXT
+    { $$ = ElseIf($5, $2); }
 ;
 
 tElse:

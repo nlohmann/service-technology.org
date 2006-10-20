@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/20 07:43:07 $
+ *          - last changed: \$Date: 2006/10/20 18:55:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.45 $
+ * \version \$Revision: 1.46 $
  */
 %}
 
@@ -507,6 +507,9 @@ Empty(a,b) ->
       }
     }
     a
+{
+cerr << myid << " has " << ASTEmap[myid]->enclosedSourceLinks.size() << " indirectly enclosed source links" << endl;
+}
   ]
 ;
 
@@ -924,7 +927,7 @@ Link(a) ->
 
 
 /******************************************************************************
-  SWITCH
+  SWITCH                                                         (BPEL4WS 1.1)
 ******************************************************************************/
 
 Switch(a,b,c,_id) ->
@@ -1018,6 +1021,107 @@ Otherwise(a,b) ->
     a
   ]
 ;
+
+
+/******************************************************************************
+  IF                                                             (WS-BPEL 2.0)
+******************************************************************************/
+
+If(a,b,c,_id) ->
+  [postprocessing:
+    {
+      // manage identifiers
+      int myid = $0->id;
+      assert(ASTEmap[myid] != NULL);
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      a->parentId = myid;
+
+      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
+      ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
+
+      // annotate AST and check information
+      $0->attributes = ASTEmap[myid]->getAttributes();
+      $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
+
+      // set or inherit suppressJoinFailure-attribute
+      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
+      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
+      {
+        $0->suppressJF = true;
+        ASTEmap[myid]->suppressJF = true;
+      }
+
+      // distribute the switch's id to the enclosed activities
+      // also distribute the control flow
+      foreach(branch=ElseIf(innerActivity,_id2); tElseIf_list b)
+      {
+        assert(ASTEmap[innerActivity->id] != NULL);
+        ASTEmap[innerActivity->id]->parentActivityId = myid;
+        ASTEmap[innerActivity->id]->controlFlow = ASTEmap[myid]->controlFlow;
+      }
+
+      // process Else-branch
+      with(c)
+      {
+        c=Else(d,_id2):
+        { 
+          assert(ASTEmap[d->id] != NULL);
+          ASTEmap[d->id]->parentActivityId = myid;
+          ASTEmap[d->id]->controlFlow = ASTEmap[myid]->controlFlow;
+        }
+        default: { /* do nothing */ }
+      }
+    }
+    a b c
+    {
+      // collect enclosed source links
+      foreach(branch=ElseIf(innerActivity,_id2); tElseIf_list b)
+      {
+        assert(ASTEmap[innerActivity->id] != NULL);
+        ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
+      }
+
+      with(c)
+      {
+        c=Else(d,_id2):
+        {
+          assert(ASTEmap[d->id] != NULL);
+          ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[d->id]->enclosedSourceLinks);
+        }
+        default: { /* do nothing */ }
+      }
+
+cerr << myid << " has " << ASTEmap[myid]->enclosedSourceLinks.size() << " indirectly enclosed source links" << endl;
+    }
+  ]
+;
+
+ElseIf(a,_id) ->
+  [postprocessing:
+    {
+      int myid = $0->id;
+      assert(ASTEmap[myid] != NULL);
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+
+      // annotate AST and check information
+      $0->attributes = ASTEmap[myid]->getAttributes();
+    }
+    a
+  ]
+;
+
+Else(a,_id) ->
+  [postprocessing:
+    {
+      int myid = $0->id;
+      assert(ASTEmap[myid] != NULL);
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+    }
+    a
+  ]
+;
+
+NoElse(_id) -> [postprocessing: ];
 
 
 /******************************************************************************

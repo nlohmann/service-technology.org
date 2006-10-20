@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/10/16 09:57:29 $
+ *          - last changed: \$Date: 2006/10/20 18:55:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  */
 
 
@@ -154,6 +154,7 @@ ASTE::ASTE(kc::impl_abstract_phylum *mynode, int mytype)
  */
 ASTE::ASTE(int myid, int mytype)
 {
+  FTRACE("[ASTE]");
   assert(myid != 0);
 
   // initialize values
@@ -164,6 +165,8 @@ ASTE::ASTE(int myid, int mytype)
   suppressJF = false; // required initialization!
   inWhile = false; // required initialization!
   controlFlow = POSITIVECF;
+
+  FTRACE2("[ASTE]");
 }
 
 
@@ -318,11 +321,14 @@ string ASTE::activityTypeName()
     case(K_COMPENSATIONHANDLER):return "compensationHandler";
     case(K_CORRELATION):	return "correlation";
     case(K_CORRELATIONSET):	return "correlationSet";
+    case(K_ELSE):		return "else";
+    case(K_ELSEIF):		return "elseIf";
     case(K_EMPTY):		return "empty";
     case(K_EVENTHANDLERS):	return "eventHandlers";
     case(K_FAULTHANDLERS):	return "faultHandlers";
     case(K_FROM):		return "from";
     case(K_FLOW):		return "flow";
+    case(K_IF):			return "if";
     case(K_INVOKE):		return "invoke";
     case(K_LINK):		return "link";
     case(K_ONALARM):		return "onAlarm";
@@ -332,6 +338,7 @@ string ASTE::activityTypeName()
     case(K_PARTNERLINK):	return "partnerLink";
     case(K_PROCESS):		return "process";
     case(K_RECEIVE):		return "receive";
+    case(K_REPEATUNTIL):	return "repeatUntil";
     case(K_REPLY):		return "reply";
     case(K_SCOPE):		return "scope";
     case(K_SOURCE):		return "source";
@@ -341,6 +348,7 @@ string ASTE::activityTypeName()
     case(K_TARGET):		return "target";
     case(K_THROW):		return "throw";
     case(K_TO):			return "to";
+    case(K_VALIDATE):		return "validate";
     case(K_VARIABLE):		return "variable";
     case(K_WAIT):		return "wait";
     case(K_WHILE):		return "while";

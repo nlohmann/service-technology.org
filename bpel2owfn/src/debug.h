@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2005/11/09
- *          - last changed: \$Date: 2006/10/18 08:49:05 $
+ *          - last changed: \$Date: 2006/10/20 18:55:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.19 $
+ * \version \$Revision: 1.20 $
  */
 
 
@@ -117,8 +117,11 @@ void showLineEnvironment(int lineNumber);
  *****************************************************************************/
 
 // a preprocessor directive to print the called function and its position
-#define FTRACE(prefix) trace(TRACE_INFORMATION, string(prefix) + "\t" + string(__FUNCTION__) + "() [" + string(__FILE__) + ":" + toString(__LINE__) + "]\n")
+#define FTRACE(prefix) \
+  trace(TRACE_INFORMATION, string(prefix) + "\t+" + string(__FUNCTION__) + "() [" + string(__FILE__) + ":" + toString(__LINE__) + "]\n")
 
+#define FTRACE2(prefix) \
+  trace(TRACE_INFORMATION, string(prefix) + "\t-" + string(__FUNCTION__) + "() [" + string(__FILE__) + ":" + toString(__LINE__) + "]\n")
 
 
 

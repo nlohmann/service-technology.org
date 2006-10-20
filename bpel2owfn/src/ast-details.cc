@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/10/20 19:31:54 $
+ *          - last changed: \$Date: 2006/10/20 20:14:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.23 $
+ * \version \$Revision: 1.24 $
  */
 
 
@@ -47,9 +47,6 @@
 
 #include <cassert>
 #include <iostream>
-#include <map>
-#include <set>
-#include <string>
 
 #include "ast-details.h"
 #include "debug.h"
@@ -324,6 +321,7 @@ string ASTE::activityTypeName()
     case(K_ELSE):		return "else";
     case(K_ELSEIF):		return "elseIf";
     case(K_EMPTY):		return "empty";
+    case(K_EXIT):		return "exit";
     case(K_EVENTHANDLERS):	return "eventHandlers";
     case(K_FAULTHANDLERS):	return "faultHandlers";
     case(K_FROM):		return "from";

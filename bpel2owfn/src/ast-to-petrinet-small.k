@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/20 19:31:54 $
+ *          - last changed: \$Date: 2006/10/20 20:14:58 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.51 $
+ * \version \$Revision: 1.52 $
  *
  */
 %}
@@ -569,7 +569,7 @@ This=Compensate(a,b) ->
 
 
 /******************************************************************************
-  TERMINATE
+  TERMINATE                                                      (BPEL4WS 1.1)
 ******************************************************************************/
 
 This=Terminate(a,b) ->
@@ -594,6 +594,35 @@ This=Terminate(a,b) ->
   ]
 ;
 
+
+
+
+
+/******************************************************************************
+  EXIT                                                           (WS-BPEL 2.0)
+******************************************************************************/
+
+This=Exit(a,b) ->
+  [petrinetsmall:
+    {
+      string prefix = toString(This->id) + ".internal.";
+      header(This->id);
+
+      cerr << "the <exit> activity cannot be modelled!" << endl;
+
+      Place *p1 = TheNet->newPlace(prefix + "initial");
+      Place *p2 = TheNet->newPlace(prefix + "final");
+
+      Transition *t1 = TheNet->newTransition(prefix + "empty");
+      TheNet->newArc(p1, t1);
+      TheNet->newArc(t1, p2);
+    }
+    a // standardElements
+    {
+      footer(This->id);
+    }
+  ]
+;
 
 
 

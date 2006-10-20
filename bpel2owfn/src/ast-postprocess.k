@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/20 19:31:54 $
+ *          - last changed: \$Date: 2006/10/20 20:14:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.47 $
+ * \version \$Revision: 1.48 $
  */
 %}
 
@@ -813,10 +813,40 @@ Compensate(a,b) ->
 
 
 /******************************************************************************
-  TERMINATE
+  TERMINATE                                                      (BPEL4WS 1.1)
 ******************************************************************************/
 
 Terminate(a,b) ->
+  [postprocessing:
+    {
+      // manage identifiers
+      int myid = $0->id;
+      assert(ASTEmap[myid] != NULL);
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      a->parentId = myid;
+
+      // annotate AST and check information
+      $0->attributes = ASTEmap[myid]->getAttributes();
+      $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
+
+      // set or inherit suppressJoinFailure-attribute
+      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
+      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
+      {
+        $0->suppressJF = true;
+        ASTEmap[myid]->suppressJF = true;
+      }
+    }
+    a
+  ]
+;
+
+
+/******************************************************************************
+  EXIT                                                           (WS-BPEL 2.0)
+******************************************************************************/
+
+Exit(a,b) ->
   [postprocessing:
     {
       // manage identifiers

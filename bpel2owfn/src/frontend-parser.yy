@@ -38,16 +38,16 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/20 18:55:05 $
+ *          - last changed: \$Date: 2006/10/20 20:14:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universitï¿½t zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.252 $
+ * \version \$Revision: 1.253 $
  * 
  */
 %}
@@ -65,7 +65,7 @@
 
 
 // the terminal symbols (tokens)
-%token APOSTROPHE EQUAL GREATER GREATEROREQUAL K_AND K_ASSIGN K_BRANCHES K_CASE K_CATCH K_CATCHALL K_COMPENSATE K_COMPENSATESCOPE K_COMPENSATIONHANDLER K_COMPLETIONCONDITION K_CONDITION K_COPY K_CORRELATION K_CORRELATIONS K_CORRELATIONSET K_CORRELATIONSETS K_ELSE K_ELSEIF K_EMPTY K_EVENTHANDLERS K_EXIT K_EXTENSION K_EXTENSIONACTIVITY K_EXTENSIONASSIGNOPERATION K_EXTENSIONS K_FAULTHANDLERS K_FINALCOUNTERVALUE K_FLOW K_FOR K_FOREACH K_FROM K_FROMPART K_FROMPARTS K_GETLINKSTATUS K_IF K_IMPORT K_INVOKE K_JOINCONDITION K_LINK K_LINKS K_LITERAL K_MESSAGEEXCHANGE K_MESSAGEEXCHANGES K_ONALARM K_ONEVENT K_ONMESSAGE K_OR K_OTHERWISE K_PARTNER K_PARTNERLINK K_PARTNERLINKS K_PARTNERS K_PICK K_PROCESS K_QUERY K_RECEIVE K_REPEATEVERY K_REPEATUNTIL K_REPLY K_RETHROW K_SCOPE K_SEQUENCE K_SOURCE K_SOURCES K_STARTCOUNTERVALUE K_SWITCH K_TARGET K_TARGETS K_TERMINATE K_TERMINATIONHANDLER K_THROW K_TO K_TOPART K_TOPARTS K_TRANSITIONCONDITION K_UNTIL K_VALIDATE K_VARIABLE K_VARIABLES K_WAIT K_WHILE LBRACKET LESS LESSOREQUAL NOTEQUAL NUMBER RBRACKET VARIABLENAME X_CLOSE X_EQUALS X_NEXT X_OPEN X_SLASH
+%token APOSTROPHE EQUAL GREATER GREATEROREQUAL K_AND K_ASSIGN K_BRANCHES K_CASE K_CATCH K_CATCHALL K_COMPENSATE K_COMPENSATESCOPE K_COMPENSATIONHANDLER K_COMPLETIONCONDITION K_CONDITION K_COPY K_CORRELATION K_CORRELATIONS K_CORRELATIONSET K_CORRELATIONSETS K_ELSE K_ELSEIF K_EMPTY K_EVENTHANDLERS K_EXIT K_EXTENSION K_EXTENSIONACTIVITY K_EXTENSIONASSIGNOPERATION K_EXTENSIONS K_FAULTHANDLERS K_FINALCOUNTERVALUE K_FLOW K_FOR K_FOREACH K_FROM K_FROMPART K_FROMPARTS K_GETLINKSTATUS K_IF K_IMPORT K_INVOKE K_JOINCONDITION K_LINK K_LINKS K_LITERAL K_MESSAGEEXCHANGE K_MESSAGEEXCHANGES K_ONALARM K_ONEVENT K_ONMESSAGE K_OR K_OTHERWISE K_PARTNER K_PARTNERLINK K_PARTNERLINKS K_PARTNERS K_PICK K_PROCESS K_QUERY K_RECEIVE K_REPEATEVERY K_REPEATUNTIL K_REPLY K_RETHROW K_SCOPE K_SEQUENCE K_SOURCE K_SOURCES K_STARTCOUNTERVALUE K_SWITCH K_TARGET K_TARGETS K_TERMINATE K_TERMINATIONHANDLER K_THROW K_TO K_TOPART K_TOPARTS K_TRANSITIONCONDITION K_UNTIL K_VALIDATE K_VARIABLE K_VARIABLES K_WAIT K_WHILE LBRACKET LESS LESSOREQUAL NOTEQUAL NUMBER RBRACKET %token VARIABLENAME X_CLOSE X_EQUALS X_NEXT X_OPEN X_SLASH
 %token <yt_casestring> X_NAME
 %token <yt_casestring> X_STRING
 
@@ -110,6 +110,9 @@ using namespace kc;
 using namespace std;
 
 
+
+
+
 /******************************************************************************
  * External variables
  *****************************************************************************/
@@ -121,6 +124,8 @@ extern int yylineno;
 
 // defined in "debug.h"
 extern int yyerror(const char *);
+
+
 
 
 
@@ -253,28 +258,28 @@ tProcess:
 
 
 activity:
-  tReceive		{ $$ = activityReceive($1);	}
-| tReply		{ $$ = activityReply($1);	}
-| tInvoke		{ $$ = activityInvoke($1);	}
-| tAssign		{ $$ = activityAssign($1);	}
-| tValidate		{ $$ = activityValidate($1);	}
-| tEmpty		{ $$ = activityEmpty($1);	}
-| tWait			{ $$ = activityWait($1);	}
-| tTerminate		{ $$ = activityTerminate($1);	}
-| tExit			{ $$ = activityExit($1);	}
-| tThrow		{ $$ = activityThrow($1);	}
-| tRethrow		{ $$ = activityRethrow($1);	}
-| tCompensate		{ $$ = activityCompensate($1);	}
+  tReceive		{ $$ = activityReceive($1);		}
+| tReply		{ $$ = activityReply($1);		}
+| tInvoke		{ $$ = activityInvoke($1);		}
+| tAssign		{ $$ = activityAssign($1);		}
+| tValidate		{ $$ = activityValidate($1);		}
+| tEmpty		{ $$ = activityEmpty($1);		}
+| tWait			{ $$ = activityWait($1);		}
+| tTerminate		{ $$ = activityTerminate($1);		}
+| tExit			{ $$ = activityExit($1);		}
+| tThrow		{ $$ = activityThrow($1);		}
+| tRethrow		{ $$ = activityRethrow($1);		}
+| tCompensate		{ $$ = activityCompensate($1);		}
 | tCompensateScope	{ $$ = activityCompensateScope($1);	}
-| tSequence		{ $$ = activitySequence($1);	}
-| tSwitch		{ $$ = activitySwitch($1);	}
-| tIf			{ $$ = activityIf($1);		}
-| tWhile		{ $$ = activityWhile($1);	}
-| tRepeatUntil		{ $$ = activityRepeatUntil($1);	}
-| tForEach		{ $$ = activityForEach($1);	}
-| tFlow			{ $$ = activityFlow($1);	}
-| tPick			{ $$ = activityPick($1);	}
-| tScope		{ $$ = activityScope($1);	}
+| tSequence		{ $$ = activitySequence($1);		}
+| tSwitch		{ $$ = activitySwitch($1);		}
+| tIf			{ $$ = activityIf($1);			}
+| tWhile		{ $$ = activityWhile($1);		}
+| tRepeatUntil		{ $$ = activityRepeatUntil($1);		}
+| tForEach		{ $$ = activityForEach($1);		}
+| tFlow			{ $$ = activityFlow($1);		}
+| tPick			{ $$ = activityPick($1);		}
+| tScope		{ $$ = activityScope($1);		}
 ;
 
 activity_list:

@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/20 19:31:54 $
+ *          - last changed: \$Date: 2006/10/20 20:14:58 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.38 $
+ * \version \$Revision: 1.39 $
  */
 %}
 
@@ -877,7 +877,7 @@ This=Compensate(a,_id) provided (This->inFaultHandler && This->hasScopeAttribute
 
 
 /******************************************************************************
-  TERMINATE
+  TERMINATE                                                      (BPEL4WS 1.1)
 ******************************************************************************/
 
 /*
@@ -930,6 +930,62 @@ This=Terminate(a,_id) ->
   ]
 ;
 
+
+
+
+
+/******************************************************************************
+  EXIT                                                           (BPEL4WS 1.1)
+******************************************************************************/
+
+/*
+ * The <exit> activity.
+ */
+
+This=Exit(a,_id) ->
+  [petrinet:
+    {
+      header(This->id);
+      string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
+
+      Place *p1 = TheNet->newPlace(prefix + "initial");
+      Place *p2 = TheNet->newPlace(prefix + "final");
+      Place *p3 = TheNet->newPlace(prefix + "stop");
+      Place *p4 = TheNet->newPlace(prefix + "!Terminated");
+      Place *p5 = TheNet->newPlace(prefix + "Terminated");
+      Place *p6 = TheNet->newPlace(prefix + "terminate");
+      Place *p7 = TheNet->newPlace(prefix + "stopped");
+
+      Transition *t1 = TheNet->newTransition(prefix + "t1");
+      TheNet->newArc(p1, t1);
+      TheNet->newArc(t1, p2);
+      TheNet->newArc(p5, t1, READ);
+
+      Transition *t2 = TheNet->newTransition(prefix + "t2");
+      TheNet->newArc(p1, t2);
+      TheNet->newArc(t2, p2);
+      TheNet->newArc(t2, p5);
+      TheNet->newArc(p4, t2);
+      TheNet->newArc(t2, p6);
+
+
+      // Transitions for the negative control flow.
+      Transition *t3 = stop(p1, "initial", prefix);
+      Transition *t4 = stop(p2, "final", prefix);
+
+
+      // Embed the <terminate /> activity in the process.
+      TheNet->mergePlaces(TheNet->findPlace("1.internal.!Terminated"), p4);
+      TheNet->mergePlaces(TheNet->findPlace("1.internal.Terminated"), p5);
+      TheNet->mergePlaces(TheNet->findPlace(currentScope + "upperTerminate"), p6);
+    }
+    a // standardElements
+    {
+      footer(This->id);
+    }
+  ]
+;
 
 
 

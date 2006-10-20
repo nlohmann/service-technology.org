@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/10/16 09:57:29 $
+ *          - last changed: \$Date: 2006/10/20 19:31:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  */
 
 
@@ -123,7 +123,6 @@ class ASTE
     bool inWhile;
 
     /// constructor
-//    ASTE(kc::impl_abstract_phylum *mynode, int mytype);
     ASTE(int myid, int mytype);
 
     /// checks and returns attributes
@@ -134,7 +133,9 @@ class ASTE
 
     /// checks a variable and returns its name
     string checkVariable();
+    /// checks a variable and returns its name
     string checkInputVariable();
+    /// checks a variable and returns its name
     string checkOutputVariable();
 
     /// defines a variable

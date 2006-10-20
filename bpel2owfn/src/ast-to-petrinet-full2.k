@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/20 07:43:07 $
+ *          - last changed: \$Date: 2006/10/20 19:31:54 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.37 $
+ * \version \$Revision: 1.38 $
  */
 %}
 
@@ -1012,7 +1012,7 @@ This=Flow(a,b,c,_id) ->
 
 
 /******************************************************************************
-  SWITCH
+  SWITCH                                                         (BPEL4WS 1.1)
 ******************************************************************************/
 
 /*

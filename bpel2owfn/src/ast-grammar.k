@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/20 18:55:04 $
+ *          - last changed: \$Date: 2006/10/20 19:31:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.125 $
+ * \version \$Revision: 1.126 $
  */
 %}
 
@@ -82,7 +82,7 @@ typedef std::map<string, string> stringMap;
 
 // a preprocessor directive for the quite generic constructors
 #define CTOR(token) { \
-  FTRACE("[AST]"); \
+  ENTER("[AST]"); \
   assert(integer_1 != NULL); \
   if (integer_1->value == 0) \
   { \
@@ -95,7 +95,7 @@ typedef std::map<string, string> stringMap;
   } \
   if(ASTEmap[id] == NULL); \
     ASTEmap[id] = new ASTE(id, token); \
-  FTRACE2("[AST]"); \
+  LEAVE("[AST]"); \
 }
 
 

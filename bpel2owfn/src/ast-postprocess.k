@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/20 18:55:05 $
+ *          - last changed: \$Date: 2006/10/20 19:31:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.46 $
+ * \version \$Revision: 1.47 $
  */
 %}
 
@@ -507,9 +507,6 @@ Empty(a,b) ->
       }
     }
     a
-{
-cerr << myid << " has " << ASTEmap[myid]->enclosedSourceLinks.size() << " indirectly enclosed source links" << endl;
-}
   ]
 ;
 
@@ -560,9 +557,6 @@ Receive(a,b,c) ->
     {
       // manage identifiers
       int myid = $0->id;
-
-// TODO: replace $0->id by c->value...
-assert($0->id == c->value);
 
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
@@ -1090,8 +1084,6 @@ If(a,b,c,_id) ->
         }
         default: { /* do nothing */ }
       }
-
-cerr << myid << " has " << ASTEmap[myid]->enclosedSourceLinks.size() << " indirectly enclosed source links" << endl;
     }
   ]
 ;

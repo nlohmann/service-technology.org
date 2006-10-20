@@ -32,13 +32,13 @@
  *
  * \date
  *          - created: 2006/02/08
- *          - last changed: \$Date: 2006/10/20 18:55:05 $
+ *          - last changed: \$Date: 2006/10/20 19:31:54 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
  */
 
 
@@ -256,10 +256,18 @@ string inString()
 
 
 
+/**
+ * Prints a debug trace message containing the (opening) tag name of the
+ * activity of the given id. If myindent is set to true, the enclosed
+ * elements are indented.
+ */
 void header(kc::integer id, bool myindent)
 {
   header(id->value, myindent);
 }
+
+
+
 
 
 /**
@@ -279,10 +287,18 @@ void header(int id, bool myindent)
 
 
 
+/**
+ * Prints a debug trace message containing the (closing) tag name of the
+ * activity of the given id. If myindent is set to true, the indentation is
+ * reduced.
+ */
 void footer(kc::integer id, bool myindent)
 {
   footer(id->value, myindent);
 }
+
+
+
 
 
 /**
@@ -307,7 +323,6 @@ void footer(int id, bool myindent)
  */
 void dpeLinks(Transition *t, int id)
 {
-  FTRACE("[UT]");
   assert(t != NULL);
   assert(ASTEmap[id] != NULL);
 
@@ -319,7 +334,6 @@ void dpeLinks(Transition *t, int id)
     string linkName = ASTEmap[*linkID]->attributes["name"];
     TheNet->newArc(t, TheNet->findPlace("!link." + linkName));
   }
-  FTRACE2("[UT]");  
 }
 
 

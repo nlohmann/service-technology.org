@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/10/20 18:55:04 $
+ *          - last changed: \$Date: 2006/10/20 19:31:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
  */
 
 
@@ -45,13 +45,14 @@
  * Headers
  *****************************************************************************/
 
-#include "ast-details.h"
-#include "debug.h"
 #include <cassert>
 #include <iostream>
 #include <map>
 #include <set>
 #include <string>
+
+#include "ast-details.h"
+#include "debug.h"
 
 using namespace std;
 
@@ -154,7 +155,6 @@ ASTE::ASTE(kc::impl_abstract_phylum *mynode, int mytype)
  */
 ASTE::ASTE(int myid, int mytype)
 {
-  FTRACE("[ASTE]");
   assert(myid != 0);
 
   // initialize values
@@ -165,9 +165,9 @@ ASTE::ASTE(int myid, int mytype)
   suppressJF = false; // required initialization!
   inWhile = false; // required initialization!
   controlFlow = POSITIVECF;
-
-  FTRACE2("[ASTE]");
 }
+
+
 
 
 
@@ -200,7 +200,7 @@ map<string, string> ASTE::getAttributes()
 
 
 /*!
- * Creates a channel for communicating activities
+ * Creates a channel for communicating activities.
  *
  * \return name of the channel
  */
@@ -306,9 +306,9 @@ void ASTE::defineVariable()
 
 
 
-
-
-
+/*!
+ * Returns the name of an acitivity given its keyword.
+ */
 string ASTE::activityTypeName()
 {
   switch (type)

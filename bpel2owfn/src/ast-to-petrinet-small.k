@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/20 18:55:05 $
+ *          - last changed: \$Date: 2006/10/20 19:31:54 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  *
  */
 %}
@@ -106,6 +106,7 @@ This=Process(a,b,c,d,e,f,g,h,i,j) ->
 
       string prefix = toString(This->id) + ".internal.";
       currentScope = prefix;
+
 
       // Create the interface places.
       // The used lists are filled during parsing mapping each combination of
@@ -236,10 +237,6 @@ This=userDefinedEventHandler(a,b,_id) ->
   EMPTY
 ******************************************************************************/
 
-/*
- * The <empty> activity as depicted in Fig. 3.
- */
-
 This=Empty(a,b) ->
   [petrinetsmall:
     {
@@ -282,7 +279,7 @@ This=Invoke(a,b,c) provided (!This->isSynchronousInvoke) ->
       TheNet->newArc(t1, p2);
       TheNet->newArc(t1, TheNet->findPlace("out." + This->channelName));
 
-      if ($0->inWhile) // was: (parameters[P_CYCLICWHILE] && $0->inWhile)
+      if ($0->inWhile)
         TheNet->findPlace("out." + This->channelName)->inWhile = true;
 
       t1->type = OUT;
@@ -293,7 +290,6 @@ This=Invoke(a,b,c) provided (!This->isSynchronousInvoke) ->
     }
   ]
 ;
-
 
 
 This=Invoke(a,b,c) provided (This->isSynchronousInvoke) ->
@@ -318,7 +314,7 @@ This=Invoke(a,b,c) provided (This->isSynchronousInvoke) ->
       TheNet->newArc(t2, p3);
       t2->type = IN;
 
-      if ($0->inWhile) // was: (parameters[P_CYCLICWHILE] && $0->inWhile)
+      if ($0->inWhile)
       {
         TheNet->findPlace("in." + This->channelName)->inWhile = true;
         TheNet->findPlace("out." + This->channelName)->inWhile = true;
@@ -355,7 +351,7 @@ This=Receive(a,b,c) ->
       TheNet->newArc(t1, p2);
       t1->type = IN;
 
-      if ($0->inWhile) // was: (parameters[P_CYCLICWHILE] && $0->inWhile)
+      if ($0->inWhile)
         TheNet->findPlace("in." + This->channelName)->inWhile = true;
     }
     a // standardElements
@@ -388,7 +384,7 @@ This=Reply(a,b,c) ->
       TheNet->newArc(t1, p2);
       t1->type = OUT;
 
-      if ($0->inWhile) // was: (parameters[P_CYCLICWHILE] && $0->inWhile)
+      if ($0->inWhile)
         TheNet->findPlace("out." + This->channelName)->inWhile = true;
     }
     a // standardElements
@@ -549,8 +545,20 @@ This=Throw(a,b) ->
 This=Compensate(a,b) ->
   [petrinetsmall:
     {
+      string prefix = toString(This->id) + ".internal.";
       header(This->id);
+
       cerr << "the <compensate> activity cannot be modelled!" << endl;
+
+      Place *p1 = TheNet->newPlace(prefix + "initial");
+      Place *p2 = TheNet->newPlace(prefix + "final");
+
+      Transition *t1 = TheNet->newTransition(prefix + "empty");
+      TheNet->newArc(p1, t1);
+      TheNet->newArc(t1, p2);
+    }
+    a // standardElements
+    {
       footer(This->id);
     }
   ]
@@ -628,13 +636,8 @@ This=Flow(a,b,c,d) ->
 
 
 /******************************************************************************
-  SWITCH
+  SWITCH                                                         (BPEL4WS 1.1)
 ******************************************************************************/
-
-/*
- * The <switch> activity as it is depicted in Fig. 19. Please note that during
- * parsing an empty otherwise branch was added if it was not specified.
- */
 
 This=Switch(a,b,otherwiseBranch=Otherwise(c,d),e) ->
   [petrinetsmall:
@@ -697,12 +700,8 @@ This=Switch(a,b,otherwiseBranch=Otherwise(c,d),e) ->
 
 
 /******************************************************************************
-  IF
+  IF                                                             (WS-BPEL 2.0)
 ******************************************************************************/
-
-/*
- * The <if> activity.
- */
 
 This=If(a,b,c,_id) ->
   [petrinetsmall:
@@ -787,10 +786,6 @@ This=If(a,b,c,_id) ->
   WHILE
 ******************************************************************************/
 
-/*
- * The <while> activity as it is depicted in Fig. 18.
- */
-
 This=While(a,b,c) ->
   [petrinetsmall:
     {
@@ -833,10 +828,6 @@ This=While(a,b,c) ->
 /******************************************************************************
   REPEAT UNTIL                                                   (WS-BPEL 2.0)
 ******************************************************************************/
-
-/*
- * The <repeatUntil> activity.
- */
 
 This=RepeatUntil(a,b,_id) ->
   [petrinetsmall:
@@ -944,7 +935,7 @@ This=Pick(a,b,c,d) ->
 	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
 	t1->type = IN;
 
-        if (ThisBranch->inWhile) // was: (parameters[P_CYCLICWHILE] && ThisBranch->inWhile)
+        if (ThisBranch->inWhile)
           TheNet->findPlace("in." + ThisBranch->channelName)->inWhile = true;
 
 	// Embed the inner activity.
@@ -977,27 +968,27 @@ This=Pick(a,b,c,d) ->
       // (i.e. firing of the respective t2/t6-transition) has set the links of
       // all other branches to false.
       int currentMessage = 1;
-      foreach (thisonmessage=OnMessage(innerActivity1); tOnMessage_list b) {
-	foreach (otheronmessage=OnMessage(innerActivity2); tOnMessage_list b) {
+      foreach (OnMessage(innerActivity1); tOnMessage_list b) {
+	foreach (OnMessage(innerActivity2); tOnMessage_list b) {
 	  if ((innerActivity1 != innerActivity2))
-            dpeLinks(TheNet->findTransition(prefix + "pickM" + toString(currentMessage)), otheronmessage->id); // onMessage -> onMessage'
+            dpeLinks(TheNet->findTransition(prefix + "pickM" + toString(currentMessage)), innerActivity2->id); // onMessage -> onMessage'
 	}
 
-	foreach (thisonalarm=OnAlarm(innerActivity2); tOnAlarm_list c) {
-          dpeLinks(TheNet->findTransition(prefix + "pickM" + toString(currentMessage)), thisonalarm->id); // onMessage -> onAlarm
+	foreach (OnAlarm(innerActivity2); tOnAlarm_list c) {
+          dpeLinks(TheNet->findTransition(prefix + "pickM" + toString(currentMessage)), innerActivity2->id); // onMessage -> onAlarm
 	}
 	currentMessage++;
       }
 
       int currentAlarm = 1;
-      foreach (thisonalarm=OnAlarm(innerActivity1); tOnAlarm_list c) {
+      foreach (OnAlarm(innerActivity1); tOnAlarm_list c) {
 	foreach (otheronalarm=OnAlarm(innerActivity2); tOnAlarm_list c) {
 	  if ((innerActivity1 != innerActivity2))
-            dpeLinks(TheNet->findTransition(prefix + "pickA" + toString(currentAlarm)), otheronalarm->id); // onAlarm -> onAlarm'
+            dpeLinks(TheNet->findTransition(prefix + "pickA" + toString(currentAlarm)), innerActivity2->id); // onAlarm -> onAlarm'
 	}
 
-	foreach (thisonmessage=OnMessage(innerActivity2); tOnMessage_list b) {
-          dpeLinks(TheNet->findTransition(prefix + "pickA" + toString(currentAlarm)), thisonmessage->id); // onAlarm -> onMessage
+	foreach (OnMessage(innerActivity2); tOnMessage_list b) {
+          dpeLinks(TheNet->findTransition(prefix + "pickA" + toString(currentAlarm)), innerActivity2->id); // onAlarm -> onMessage
 	}
 	currentAlarm++;
       }

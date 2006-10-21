@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/10/16 09:15:05 $
+ *          - last changed: \$Date: 2006/10/21 10:53:51 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.38 $
+ * \version \$Revision: 1.39 $
  */
 
 
@@ -67,11 +67,19 @@
 #include "options.h"
 #include "ast-details.h"
 
+
+
+
+
+/******************************************************************************
+ * Extern variables
+ *****************************************************************************/
+
 extern map<unsigned int, ASTE*> ASTEmap;
-
-
-
 extern string invocation;
+
+
+
 
 
 /******************************************************************************
@@ -459,7 +467,6 @@ void PetriNet::pnmlOut()
   (*output) << endl;
   (*output) << "  </net>" << endl;
   (*output) << "</pnml>" << endl;
-//  (*output) << endl << "<!-- END OF FILE -->" << endl;
 }
 
 
@@ -689,7 +696,6 @@ void PetriNet::owfnOut()
   for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); count++, p++)
   {
     (*output) << "    " << (*p)->nodeShortName();
-//    (*output) << " {$ MAX_UNIQUE_EVENTS = " << postset((*p)).size();
     if ( (*p)->inWhile )
       (*output) << " {$ ON_LOOP = TRUE $}";
 
@@ -705,7 +711,6 @@ void PetriNet::owfnOut()
   for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); count++, p++)
   {
     (*output) << "    " << (*p)->nodeShortName();
-//    (*output) << " {$ MAX_UNIQUE_EVENTS = " << preset((*p)).size();
     if ( (*p)->inWhile )
       (*output) << " {$ ON_LOOP = TRUE $}";
     
@@ -735,36 +740,13 @@ void PetriNet::owfnOut()
   }
   (*output) << ";" << endl << endl;  
 
-/*
-  // final condition
-  (*output) << "FINALCONDITION" << endl << "  (";
-  
-  for (set<Place*>::iterator p_in = P_in.begin();
-      p_in != P_in.end();
-      p_in++)
-  {
-    (*output) << "(" << (*p_in)->nodeShortName() << " = 0) AND ";
-  }
-
-  (*output) << endl << "   ";
-  
-  for (set<Place*>::iterator p_out = P_out.begin();
-      p_out != P_out.end();
-      p_out++)
-  {
-    (*output) << "(" << (*p_out)->nodeShortName() << " = 0) AND ";
-  }
-
-  (*output) << endl << "   (" << findPlace("1.internal.final")->nodeShortName() << " > 0));" << endl;
-  (*output) << endl << endl << endl;
-*/
 
   // final marking
   (*output) << "FINALMARKING" << endl;
   count = 1;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
-    if ((*p)->historyContains((*p)->prefix + "1.internal.final") ) // was: ((*p)->nodeName() == ((*p)->prefix + "1.internal.final") )
+    if ((*p)->historyContains((*p)->prefix + "1.internal.final") )
     {
       if (count++ != 1)
 	(*output) << ",";// << endl;

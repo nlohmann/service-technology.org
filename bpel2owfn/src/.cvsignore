@@ -19,6 +19,8 @@ bpel-kc-unpk.cc
 bpel-kc-unpk.h
 bpel-kc-yystype.h
 bpel-lexic.cc
+bpel-rewrite.cc
+bpel-rewrite.h
 bpel-syntax.cc
 bpel-syntax.h
 bpel-unparse-ast.cc

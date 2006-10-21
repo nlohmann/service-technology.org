@@ -31,13 +31,13 @@
  *
  * \date
  *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/10/09 10:43:46 $
+ *          - last changed: \$Date: 2006/10/21 10:53:51 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.142 $
+ * \version \$Revision: 1.143 $
  */
 
 
@@ -196,6 +196,9 @@ void Place::mark()
 /*****************************************************************************/
 
 
+/*!
+ * The constructor.
+ */
 PetriNet::PetriNet()
 {
   hasNoInterface = false;
@@ -292,11 +295,6 @@ Transition *PetriNet::newTransition(string role)
   if (role != "")
   {
     assert(roleMap[role] == NULL);
-/*    if (roleMap[role] != NULL)
-    {
-      throw Exception(DOUBLE_NODE, "Transition with role '" + role + "' already defined.\n", pos(__FILE__, __LINE__, __FUNCTION__));
-    }
-    else*/
     roleMap[role] = t;
   }
 
@@ -632,7 +630,6 @@ void PetriNet::mergePlaces(kc::impl_activity *act1, string role1,
   mergePlaces(toString(act1->id) + role1,
 	      toString(act2->id) + role2);
 }
-
 
 
 

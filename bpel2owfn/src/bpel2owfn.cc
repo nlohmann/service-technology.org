@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/10/18 12:47:52 $
+ *          - last changed: \$Date: 2006/10/22 13:45:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.105 $
+ * \version \$Revision: 1.106 $
  *
  */
 
@@ -173,6 +173,11 @@ int main( int argc, char *argv[])
 	trace(TRACE_INFORMATION, "Postprocessing...\n");
 	TheProcess->unparse(kc::printer, kc::postprocessing);
 	trace(TRACE_INFORMATION, "Postprocessing complete...\n");
+
+	trace(TRACE_INFORMATION, "Rewriting 2...\n");
+        TheProcess = TheProcess->rewrite(kc::newNames);
+	trace(TRACE_INFORMATION, "Rewriting 2 complete...\n");
+
 
 	if (modus == M_CFG)
 	  processCFG();

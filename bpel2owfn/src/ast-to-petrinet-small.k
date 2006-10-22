@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/20 20:14:58 $
+ *          - last changed: \$Date: 2006/10/22 13:45:30 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  *
  */
 %}
@@ -460,7 +460,7 @@ This=Validate(a,b) ->
   WAIT
 ******************************************************************************/
 
-This=Wait(a,b) provided (!This->isWaitFor) ->
+This=WaitUntil(a,b) -> // provided (!This->isWaitFor) ->
   [petrinetsmall:
     {
       header(This->id);
@@ -469,7 +469,7 @@ This=Wait(a,b) provided (!This->isWaitFor) ->
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
 
-      Transition *t1 = TheNet->newTransition(prefix + "wait");
+      Transition *t1 = TheNet->newTransition(prefix + "waitUntil");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
     }
@@ -484,7 +484,7 @@ This=Wait(a,b) provided (!This->isWaitFor) ->
 
 
 
-This=Wait(a,b) provided (This->isWaitFor) ->
+This=WaitFor(a,b) -> // provided (This->isWaitFor) ->
   [petrinetsmall:
     {
       header(This->id);
@@ -493,7 +493,7 @@ This=Wait(a,b) provided (This->isWaitFor) ->
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
 
-      Transition *t1 = TheNet->newTransition(prefix + "wait");
+      Transition *t1 = TheNet->newTransition(prefix + "waitFor");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
     }

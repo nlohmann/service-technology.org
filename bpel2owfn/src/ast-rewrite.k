@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2006/10/11
- *          - last changed: \$Date: 2006/10/19 20:16:17 $
+ *          - last changed: \$Date: 2006/10/22 13:45:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  *
  */
 
@@ -44,7 +44,21 @@
 
 
 
+%{ KC_REWRITE
+#include <map>
+#include "ast-details.h"
+
+using namespace std;
+
+extern map<unsigned int, ASTE*> ASTEmap;
+%}
+
+
+
+
+
 %rview implicit;
+%rview newNames;
 
 
 
@@ -203,4 +217,21 @@ userDefinedFaultHandler(
   implicitFaultHandler(
     my_integer
   )
+>;
+
+
+
+
+
+
+This=Wait(a,_id) provided (ASTEmap[_id->value]->attributes["for"] != "")
+->
+<newNames:
+  WaitFor(a,_id)
+>;
+
+This=Wait(a,_id) provided (ASTEmap[_id->value]->attributes["until"] != "")
+->
+<newNames:
+  WaitUntil(a,_id)
 >;

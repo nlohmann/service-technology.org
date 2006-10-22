@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/20 20:14:58 $
+ *          - last changed: \$Date: 2006/10/22 13:45:30 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.39 $
+ * \version \$Revision: 1.40 $
  */
 %}
 
@@ -539,7 +539,7 @@ This=Validate(a,_id) ->
  * The <wait until=""> activity as depicted in Fig. 4.
  */
 
-This=Wait(a,_id) provided (!This->isWaitFor)->
+This=WaitUntil(a,_id) -> // provided (!This->isWaitFor)->
   [petrinet:
     {
       header(This->id);
@@ -576,7 +576,7 @@ This=Wait(a,_id) provided (!This->isWaitFor)->
  * The <wait for=""> activity as depicted in Fig. 5.
  */
 
-This=Wait(a,_id) provided (This->isWaitFor)->
+This=WaitFor(a,_id) -> // provided (This->isWaitFor)->
   [petrinet:
     {
       header(This->id);

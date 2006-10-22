@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/20 19:31:54 $
+ *          - last changed: \$Date: 2006/10/22 13:45:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.126 $
+ * \version \$Revision: 1.127 $
  */
 %}
 
@@ -523,14 +523,14 @@ tEmpty:
 
 tWait:
   Wait(standardElements integer)
+| WaitFor(standardElements integer)
+| WaitUntil(standardElements integer)
   {
     int id;
-    stringMap attributes;
+//    stringMap attributes;
 
     int negativeControlFlow = 0;
     bool suppressJF = false;
-
-    bool isWaitFor = false;
   }
 ;
 
@@ -988,6 +988,8 @@ expression:
 %ctor Validate()			{ CTOR(K_VALIDATE) }
 %ctor Empty()				{ CTOR(K_EMPTY) }
 %ctor Wait() 				{ CTOR(K_WAIT) }
+%ctor WaitFor() 			{ CTOR(K_WAIT) }
+%ctor WaitUntil() 			{ CTOR(K_WAIT) }
 %ctor Terminate()			{ CTOR(K_TERMINATE) }
 %ctor Exit()				{ CTOR(K_EXIT) }
 %ctor Throw()				{ CTOR(K_THROW) }

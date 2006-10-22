@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/22 13:45:29 $
+ *          - last changed: \$Date: 2006/10/22 14:37:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.127 $
+ * \version \$Revision: 1.128 $
  */
 %}
 
@@ -197,7 +197,6 @@ tPartner:
   Partner(tPartnerLink_list integer)
   {
     int id;
-    stringMap attributes;
   }
 ;
 
@@ -309,7 +308,6 @@ tVariable:
   Variable(integer)
   {
     int id;
-    stringMap attributes;
   }
 ;
 
@@ -324,7 +322,6 @@ tCorrelationSet:
   CorrelationSet(integer)
   {
     int id;
-    stringMap attributes;
   }
 ;
 
@@ -339,7 +336,6 @@ tCorrelation:
   Correlation(integer)
   {
     int id;
-    stringMap attributes;
   }
 ;
 
@@ -354,7 +350,6 @@ tToPart:
   ToPart(integer)
   {
     int id;
-    stringMap attributes;
   }
 ;
 
@@ -364,7 +359,6 @@ tFromPart:
   FromPart(integer)
   {
     int id;
-    stringMap attributes;
   }
 ;
 
@@ -493,10 +487,6 @@ tValidate:
   Validate(standardElements integer)
   {
     int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    bool suppressJF = false;
   }
 ;
 
@@ -509,10 +499,6 @@ tEmpty:
   Empty(standardElements integer)
   {
     int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    bool suppressJF = false;
   }
 ;
 
@@ -527,10 +513,6 @@ tWait:
 | WaitUntil(standardElements integer)
   {
     int id;
-//    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    bool suppressJF = false;
   }
 ;
 
@@ -543,10 +525,6 @@ tTerminate:
   Terminate(standardElements integer)
   {
     int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    bool suppressJF = false;
   }
 ;
 
@@ -559,10 +537,6 @@ tExit:
   Exit(standardElements integer)
   {
     int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    bool suppressJF = false;
   }
 ;
 
@@ -651,10 +625,6 @@ tSequence:
   Sequence(standardElements activity_list integer)
   {
     int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    bool suppressJF = false;
   }
 ;
 
@@ -667,10 +637,6 @@ tSwitch:
   Switch(standardElements tCase_list tOtherwise integer)
   {
     int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    bool suppressJF = false;
   }
 ;
 
@@ -680,7 +646,6 @@ tCase:
   Case(activity integer)
   {
     int id;
-    stringMap attributes;
   }
 ;
 
@@ -701,10 +666,6 @@ tIf:
   If(standardElements tElseIf_list tElse integer)
   {
     int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    bool suppressJF = false;
   }
 ;
 
@@ -714,7 +675,6 @@ tElseIf:
   ElseIf(activity integer)
   {
     int id;
-    stringMap attributes;
   }
 ;
 
@@ -735,10 +695,6 @@ tWhile:
   While(standardElements activity integer)
   {
     int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    bool suppressJF = false;
   }
 ;
 
@@ -751,10 +707,6 @@ tRepeatUntil:
   RepeatUntil(standardElements activity integer)
   {
     int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    bool suppressJF = false;
   }
 ;
 
@@ -767,10 +719,6 @@ tForEach:
   ForEach(standardElements tScope integer)
   {
     int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    bool suppressJF = false;
   }
 ;
 
@@ -783,10 +731,6 @@ tPick:
   Pick(standardElements tOnMessage_list tOnAlarm_list integer)
   {
     int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    bool suppressJF = false;
   }
 ;
 
@@ -799,10 +743,6 @@ tFlow:
   Flow(standardElements tLink_list activity_list integer)
   {
     int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    bool suppressJF = false;
   }
 ;
 
@@ -812,10 +752,6 @@ tLink:
   Link(integer)
   {
     int id;
-    stringMap attributes;
-
-    bool usedAsSource = false;
-    bool usedAsTarget = false;
   }
 ;
 

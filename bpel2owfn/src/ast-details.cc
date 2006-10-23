@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/10/20 20:14:57 $
+ *          - last changed: \$Date: 2006/10/23 09:04:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  */
 
 
@@ -152,6 +152,7 @@ ASTE::ASTE(kc::impl_abstract_phylum *mynode, int mytype)
  */
 ASTE::ASTE(int myid, int mytype)
 {
+  ENTER("[ASTE]");
   assert(myid != 0);
 
   // initialize values
@@ -162,6 +163,7 @@ ASTE::ASTE(int myid, int mytype)
   suppressJF = false; // required initialization!
   inWhile = false; // required initialization!
   controlFlow = POSITIVECF;
+  LEAVE("[ASTE]");
 }
 
 

@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/23 07:20:48 $
+ *          - last changed: \$Date: 2006/10/23 09:04:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.51 $
+ * \version \$Revision: 1.52 $
  */
 %}
 
@@ -99,11 +99,11 @@ unsigned int PPcurrentScope = 0;
   PROCESS
 ******************************************************************************/
 
-Process(a,b,c,d,e,f,g,h,i,j) ->
+Process(a,b,c,d,e,f,g,h,i,_id) ->
   [postprocessing:
     {
       // manage identifiers
-      int myid = $0->id;
+      int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = myid;
       ASTEmap[myid]->parentActivityId = myid;

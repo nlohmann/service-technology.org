@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/23 07:20:48 $
+ *          - last changed: \$Date: 2006/10/23 09:04:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.129 $
+ * \version \$Revision: 1.130 $
  */
 %}
 
@@ -88,13 +88,15 @@ typedef std::map<string, string> stringMap;
   { \
     id = ASTEid; \
     integer_1 = mkinteger(ASTEid++); \
-    assert(ASTEmap[id] == NULL); \
   } \
   else { \
     id = integer_1->value; \
   } \
-  if(ASTEmap[id] == NULL); \
+  if (ASTEmap[id] == NULL) \
+  { \
     ASTEmap[id] = new ASTE(id, token); \
+  } \
+  assert(ASTEmap[id] != NULL); \
   LEAVE("[AST]"); \
 }
 

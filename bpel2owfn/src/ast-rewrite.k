@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2006/10/11
- *          - last changed: \$Date: 2006/10/22 13:45:29 $
+ *          - last changed: \$Date: 2006/10/23 07:20:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  *
  */
 
@@ -224,14 +224,26 @@ userDefinedFaultHandler(
 
 
 
-This=Wait(a,_id) provided (ASTEmap[_id->value]->attributes["for"] != "")
+Wait(a,_id) provided (ASTEmap[_id->value]->attributes["for"] != "")
 ->
 <newNames:
   WaitFor(a,_id)
 >;
 
-This=Wait(a,_id) provided (ASTEmap[_id->value]->attributes["until"] != "")
+Wait(a,_id) provided (ASTEmap[_id->value]->attributes["until"] != "")
 ->
 <newNames:
   WaitUntil(a,_id)
+>;
+
+Invoke(a,b,_id) provided (ASTEmap[_id->value]->attributes["outputVariable"] != "")
+->
+<newNames:
+  SynchronousInvoke(a,b,_id)
+>;
+
+Invoke(a,b,_id) provided (ASTEmap[_id->value]->attributes["outputVariable"] == "")
+->
+<newNames:
+  AsynchronousInvoke(a,b,_id)
 >;

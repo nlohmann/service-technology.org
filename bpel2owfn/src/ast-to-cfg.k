@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/10/18 09:37:41 $
+ *          - last changed: \$Date: 2006/10/23 07:20:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  */
 %}
 
@@ -369,7 +369,7 @@ Invoke(a,b,c) ->
 	  CFGBlock * block = new CFGBlock(CFGInvoke, $0->id, "Invoke");
 
 //NL	  block->channel_name = (dynamic_cast<STCommunicationActivity*>(symTab.lookup($0->id)))->channelId; 
-	  block->channel_name = $0->channelName;
+	  block->channel_name = ASTEmap[c->value]->channelName;
 
 	  cfgMap[toString($0->id)] = block; 
   	}
@@ -388,7 +388,7 @@ Receive(a,b,c) ->
 	  CFGBlock * block = new CFGBlock(CFGReceive, $0->id, "Receive"); 
 
 //NL	  block->channel_name = (dynamic_cast<STCommunicationActivity*>(symTab.lookup($0->id)))->channelId; 
-	  block->channel_name = $0->channelName;
+	  block->channel_name = ASTEmap[c->value]->channelName;
 
 	  cfgMap[toString($0->id)] = block; 
     	}
@@ -407,7 +407,7 @@ Reply(a,b,c) ->
 	  CFGBlock * block = new CFGBlock(CFGReply, $0->id, "Reply"); 
 
 //NL	  block->channel_name = (dynamic_cast<STCommunicationActivity*>(symTab.lookup($0->id)))->channelId; 
-	  block->channel_name = $0->channelName;
+	  block->channel_name = ASTEmap[c->value]->channelName;
 
 	  cfgMap[toString($0->id)] = block; 
   	}

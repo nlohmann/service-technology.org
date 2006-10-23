@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/22 14:37:33 $
+ *          - last changed: \$Date: 2006/10/23 07:20:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.128 $
+ * \version \$Revision: 1.129 $
  */
 %}
 
@@ -374,14 +374,6 @@ tReceive:
   Receive(standardElements tCorrelation_list integer)
   {
     int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    bool suppressJF = false;
-    bool inWhile = false;
-
-    string channelName;
-    string variableName;
   }
 ;
 
@@ -394,14 +386,6 @@ tReply:
   Reply(standardElements tCorrelation_list integer)
   {
     int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    bool suppressJF = false;
-    bool inWhile = false;
-
-    string channelName;
-    string variableName;
   }
 ;
 
@@ -412,20 +396,11 @@ tReply:
 
 tInvoke:
   Invoke(standardElements tCorrelation_list integer)
+| SynchronousInvoke(standardElements tCorrelation_list integer)
+| AsynchronousInvoke(standardElements tCorrelation_list integer)
 | annotatedInvoke(standardElements tCorrelation_list tCatch tCatchAll tCompensationHandler integer)
   {
     int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    bool suppressJF = false;
-    bool inWhile = false;
-
-    bool isSynchronousInvoke = false;
-
-    string channelName;
-    string inputVariableName;
-    string outputVariableName;
   }
 ;
 
@@ -916,6 +891,8 @@ expression:
 %ctor Receive()				{ CTOR(K_RECEIVE) }
 %ctor Reply()				{ CTOR(K_REPLY) }
 %ctor Invoke()				{ CTOR(K_INVOKE) }
+%ctor SynchronousInvoke()		{ CTOR(K_INVOKE) }
+%ctor AsynchronousInvoke()		{ CTOR(K_INVOKE) }
 %ctor annotatedInvoke()			{ CTOR(K_INVOKE) }
 %ctor Assign()				{ CTOR(K_ASSIGN) }
 %ctor Copy()				{ CTOR(K_COPY) }

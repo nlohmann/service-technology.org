@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/22 13:45:30 $
+ *          - last changed: \$Date: 2006/10/23 07:20:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.53 $
+ * \version \$Revision: 1.54 $
  *
  */
 %}
@@ -265,7 +265,7 @@ This=Empty(a,b) ->
   INVOKE
 ******************************************************************************/
 
-This=Invoke(a,b,c) provided (!This->isSynchronousInvoke) ->
+This=AsynchronousInvoke(a,b,_id) -> //provided (!This->isSynchronousInvoke) ->
   [petrinetsmall:
     {
       string prefix = toString(This->id) + ".internal.";
@@ -277,10 +277,10 @@ This=Invoke(a,b,c) provided (!This->isSynchronousInvoke) ->
       Transition *t1 = TheNet->newTransition(prefix + "invoke");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
-      TheNet->newArc(t1, TheNet->findPlace("out." + This->channelName));
+      TheNet->newArc(t1, TheNet->findPlace("out." + ASTEmap[_id->value]->channelName));
 
-      if ($0->inWhile)
-        TheNet->findPlace("out." + This->channelName)->inWhile = true;
+      if (ASTEmap[_id->value]->inWhile)
+        TheNet->findPlace("out." + ASTEmap[_id->value]->channelName)->inWhile = true;
 
       t1->type = OUT;
     }
@@ -292,7 +292,7 @@ This=Invoke(a,b,c) provided (!This->isSynchronousInvoke) ->
 ;
 
 
-This=Invoke(a,b,c) provided (This->isSynchronousInvoke) ->
+This=SynchronousInvoke(a,b,_id) -> //provided (This->isSynchronousInvoke) ->
   [petrinetsmall:
     {
       header(This->id);
@@ -303,21 +303,21 @@ This=Invoke(a,b,c) provided (This->isSynchronousInvoke) ->
       Place *p3 = TheNet->newPlace(prefix + "final");
 
       Transition *t1 = TheNet->newTransition(prefix + "invokeO");
-      TheNet->newArc(t1, TheNet->findPlace("out." + This->channelName));
+      TheNet->newArc(t1, TheNet->findPlace("out." + ASTEmap[_id->value]->channelName));
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       t1->type = OUT;
 
       Transition *t2 = TheNet->newTransition(prefix + "invokeI");
-      TheNet->newArc(TheNet->findPlace("in." + This->channelName), t2);
+      TheNet->newArc(TheNet->findPlace("in." + ASTEmap[_id->value]->channelName), t2);
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       t2->type = IN;
 
-      if ($0->inWhile)
+      if (ASTEmap[_id->value]->inWhile)
       {
-        TheNet->findPlace("in." + This->channelName)->inWhile = true;
-        TheNet->findPlace("out." + This->channelName)->inWhile = true;
+        TheNet->findPlace("in." + ASTEmap[_id->value]->channelName)->inWhile = true;
+        TheNet->findPlace("out." + ASTEmap[_id->value]->channelName)->inWhile = true;
       }
 
     }
@@ -336,7 +336,7 @@ This=Invoke(a,b,c) provided (This->isSynchronousInvoke) ->
   RECEIVE
 ******************************************************************************/
 
-This=Receive(a,b,c) ->
+This=Receive(a,b,_id) ->
   [petrinetsmall:
     {
       header(This->id);
@@ -346,13 +346,13 @@ This=Receive(a,b,c) ->
       Place *p2 = TheNet->newPlace(prefix + "final");
 
       Transition *t1 = TheNet->newTransition(prefix + "receive");
-      TheNet->newArc(TheNet->findPlace("in." + This->channelName), t1);
+      TheNet->newArc(TheNet->findPlace("in." + ASTEmap[_id->value]->channelName), t1);
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       t1->type = IN;
 
-      if ($0->inWhile)
-        TheNet->findPlace("in." + This->channelName)->inWhile = true;
+      if (ASTEmap[_id->value]->inWhile)
+        TheNet->findPlace("in." + ASTEmap[_id->value]->channelName)->inWhile = true;
     }
     a // standardElements
     {
@@ -369,7 +369,7 @@ This=Receive(a,b,c) ->
   REPLY
 ******************************************************************************/
 
-This=Reply(a,b,c) ->
+This=Reply(a,b,_id) ->
   [petrinetsmall:
     {
       header(This->id);
@@ -379,13 +379,13 @@ This=Reply(a,b,c) ->
       Place *p2 = TheNet->newPlace(prefix + "final");
 
       Transition *t1 = TheNet->newTransition(prefix + "reply");
-      TheNet->newArc(t1, TheNet->findPlace("out." + This->channelName));
+      TheNet->newArc(t1, TheNet->findPlace("out." + ASTEmap[_id->value]->channelName));
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       t1->type = OUT;
 
-      if ($0->inWhile)
-        TheNet->findPlace("out." + This->channelName)->inWhile = true;
+      if (ASTEmap[_id->value]->inWhile)
+        TheNet->findPlace("out." + ASTEmap[_id->value]->channelName)->inWhile = true;
     }
     a // standardElements
     {

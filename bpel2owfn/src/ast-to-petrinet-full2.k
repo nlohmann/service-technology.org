@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/22 14:37:33 $
+ *          - last changed: \$Date: 2006/10/23 07:20:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.41 $
+ * \version \$Revision: 1.42 $
  */
 %}
 
@@ -141,7 +141,7 @@ This=Empty(a,_id) ->
  * Fig. 11.
  */
 
-This=Invoke(a,b,_id) provided (!This->isSynchronousInvoke) ->
+This=AsynchronousInvoke(a,b,_id) -> // provided (!This->isSynchronousInvoke) ->
   [petrinet:
     {
       header(This->id);
@@ -157,22 +157,23 @@ This=Invoke(a,b,_id) provided (!This->isSynchronousInvoke) ->
 
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1); 
-      TheNet->newArc(TheNet->findPlace("variable." + This->inputVariableName), t1, READ);
       TheNet->newArc(t1, p2);
+      if (!parameters[P_NOVARIABLES])
+        TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[_id->value]->inputVariableName), t1, READ);
 
       Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
-      TheNet->newArc(t2, TheNet->findPlace("out." + This->channelName));
+      TheNet->newArc(t2, TheNet->findPlace("out." + ASTEmap[_id->value]->channelName));
       t2->type = OUT;
 
-      if ($0->inWhile) // was: (parameters[P_CYCLICWHILE] && $0->inWhile)
-        TheNet->findPlace("out." + This->channelName)->inWhile = true;
+      if (ASTEmap[_id->value]->inWhile) // was: (parameters[P_CYCLICWHILE] && $0->inWhile)
+        TheNet->findPlace("out." + ASTEmap[_id->value]->channelName)->inWhile = true;
 
 
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
-	Transition *t3 = throwFault(p2, p4, "running", prefix, This->negativeControlFlow);
+	Transition *t3 = throwFault(p2, p4, "running", prefix, ASTEmap[_id->value]->controlFlow);
 
       Transition *t4 = stop(p1, "initial", prefix);
       Transition *t5 = stop(p2, "running", prefix);
@@ -196,7 +197,7 @@ This=Invoke(a,b,_id) provided (!This->isSynchronousInvoke) ->
  * Fig. 13.
  */
 
-This=Invoke(a,b,_id) provided (This->isSynchronousInvoke) ->
+This=SynchronousInvoke(a,b,_id) -> //provided (This->isSynchronousInvoke) ->
   [petrinet:
     {
       header(This->id);
@@ -214,17 +215,18 @@ This=Invoke(a,b,_id) provided (This->isSynchronousInvoke) ->
 
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1);
-      TheNet->newArc(TheNet->findPlace("variable." + This->inputVariableName), t1, READ);
       TheNet->newArc(t1, p2);
+      if (!parameters[P_NOVARIABLES])
+        TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[_id->value]->inputVariableName), t1, READ);
 
       Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(t2, TheNet->findPlace("out." + This->channelName));
+      TheNet->newArc(t2, TheNet->findPlace("out." + ASTEmap[_id->value]->channelName));
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       t2->type = OUT;
 
       Transition *t3 = TheNet->newTransition(prefix + "t3");
-      TheNet->newArc(TheNet->findPlace("in." + This->channelName), t3);
+      TheNet->newArc(TheNet->findPlace("in." + ASTEmap[_id->value]->channelName), t3);
       TheNet->newArc(p3, t3);
       TheNet->newArc(t3, p4);
       t3->type = IN;
@@ -232,20 +234,23 @@ This=Invoke(a,b,_id) provided (This->isSynchronousInvoke) ->
       Transition *t4 = TheNet->newTransition(prefix + "t4");
       TheNet->newArc(p4, t4);
       TheNet->newArc(t4, p5);
-      TheNet->newArc(TheNet->findPlace("variable." + This->outputVariableName), t4);
-      TheNet->newArc(t4, TheNet->findPlace("variable." + This->outputVariableName));
-
-      if ($0->inWhile)
+      if (!parameters[P_NOVARIABLES])
       {
-        TheNet->findPlace("in." + This->channelName)->inWhile = true;
-        TheNet->findPlace("out." + This->channelName)->inWhile = true;
+        TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[_id->value]->outputVariableName), t4);
+        TheNet->newArc(t4, TheNet->findPlace("variable." + ASTEmap[_id->value]->outputVariableName));
+      }
+
+      if (ASTEmap[_id->value]->inWhile)
+      {
+        TheNet->findPlace("in." + ASTEmap[_id->value]->channelName)->inWhile = true;
+        TheNet->findPlace("out." + ASTEmap[_id->value]->channelName)->inWhile = true;
       }
 
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
       {
-	Transition *t5 = throwFault(p4, p6, "running2", prefix, This->negativeControlFlow);
-	Transition *t6 = throwFault(p2, p6, "running1", prefix, This->negativeControlFlow);
+	Transition *t5 = throwFault(p4, p6, "running2", prefix, ASTEmap[_id->value]->controlFlow);
+	Transition *t6 = throwFault(p2, p6, "running1", prefix, ASTEmap[_id->value]->controlFlow);
       }
 
       Transition *t7  = stop(p1, "initial", prefix);
@@ -290,7 +295,7 @@ This=Receive(a,b,_id) ->
       Place *p6 = TheNet->newPlace(prefix + "stopped");
 
       Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(TheNet->findPlace("in." + This->channelName), t1);
+      TheNet->newArc(TheNet->findPlace("in." + ASTEmap[_id->value]->channelName), t1);
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       t1->type = IN;
@@ -298,16 +303,19 @@ This=Receive(a,b,_id) ->
       Transition *t2 = TheNet->newTransition(prefix + "t2");
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
-      TheNet->newArc(TheNet->findPlace("variable." + This->variableName), t2);
-      TheNet->newArc(t2, TheNet->findPlace("variable." + This->variableName));
+      if (!parameters[P_NOVARIABLES])
+      {
+        TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[_id->value]->variableName), t2);
+        TheNet->newArc(t2, TheNet->findPlace("variable." + ASTEmap[_id->value]->variableName));
+      }
 
-      if ($0->inWhile) // was: (parameters[P_CYCLICWHILE] && $0->inWhile)
-        TheNet->findPlace("in." + This->channelName)->inWhile = true;
+      if (ASTEmap[_id->value]->inWhile)
+        TheNet->findPlace("in." + ASTEmap[_id->value]->channelName)->inWhile = true;
 
 
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
-	Transition *t3 = throwFault(p2, p4, "running", prefix, This->negativeControlFlow);
+	Transition *t3 = throwFault(p2, p4, "running", prefix, ASTEmap[_id->value]->controlFlow);
 
       Transition *t4 = stop(p1, "initial", prefix);
       Transition *t5 = stop(p2, "running", prefix);
@@ -350,22 +358,23 @@ This=Reply(a,b,_id) ->
 
       Transition *t1 = TheNet->newTransition(prefix + "t1");
       TheNet->newArc(p1, t1);
-      TheNet->newArc(TheNet->findPlace("variable." + This->variableName), t1, READ);
       TheNet->newArc(t1, p2);
+      if (!parameters[P_NOVARIABLES])
+        TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[_id->value]->variableName), t1, READ);
 
       Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(t2, TheNet->findPlace("out." + This->channelName));
+      TheNet->newArc(t2, TheNet->findPlace("out." + ASTEmap[_id->value]->channelName));
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       t2->type = OUT;
 
-      if ($0->inWhile) // was: (parameters[P_CYCLICWHILE] && $0->inWhile)
-        TheNet->findPlace("out." + This->channelName)->inWhile = true;
+      if (ASTEmap[_id->value]->inWhile) // was: (parameters[P_CYCLICWHILE] && $0->inWhile)
+        TheNet->findPlace("out." + ASTEmap[_id->value]->channelName)->inWhile = true;
 
 
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
-	Transition *t3 = throwFault(p2, p4, "running", prefix, This->negativeControlFlow);
+	Transition *t3 = throwFault(p2, p4, "running", prefix, ASTEmap[_id->value]->controlFlow);
 
       Transition *t3 = stop(p1, "initial", prefix);
       Transition *t5 = stop(p2, "running", prefix);

@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/22 14:37:33 $
+ *          - last changed: \$Date: 2006/10/23 07:20:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  */
 %}
 
@@ -511,33 +511,28 @@ Empty(a,_id) ->
   INVOKE
 ******************************************************************************/
 
-Invoke(a,b,c) ->
+Invoke(a,b,_id) ->
   [postprocessing:
     {
       // manage identifiers
-      int myid = $0->id;
+      int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      $0->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
-
       // annotate AST and check information
-      $0->attributes = ASTEmap[myid]->getAttributes();
-      $0->isSynchronousInvoke = ($0->attributes["outputVariable"] != "");
-      $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
-      $0->channelName = ASTEmap[myid]->createChannel($0->isSynchronousInvoke);
-      $0->inputVariableName = ASTEmap[myid]->checkInputVariable();
-      $0->outputVariableName = ASTEmap[myid]->checkOutputVariable();
+      ASTEmap[myid]->getAttributes();
+//      $0->isSynchronousInvoke = ($0->attributes["outputVariable"] != "");
+      ASTEmap[myid]->channelName = ASTEmap[myid]->createChannel((ASTEmap[myid]->attributes["outputVariable"] != ""));
+      ASTEmap[myid]->inputVariableName = ASTEmap[myid]->checkInputVariable();
+      ASTEmap[myid]->outputVariableName = ASTEmap[myid]->checkOutputVariable();
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-      {
-        $0->suppressJF = true;
         ASTEmap[myid]->suppressJF = true;
-      }
+
+      ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
     }
     a b
   ]
@@ -548,32 +543,27 @@ Invoke(a,b,c) ->
   RECEIVE
 ******************************************************************************/
 
-Receive(a,b,c) ->
+Receive(a,b,_id) ->
   [postprocessing:
     {
       // manage identifiers
-      int myid = $0->id;
-
+      int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      $0->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
+      // check attributes
+      ASTEmap[myid]->getAttributes();
 
-      // annotate AST and check information
-      $0->attributes = ASTEmap[myid]->getAttributes();
-      $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
-      $0->channelName = ASTEmap[myid]->createChannel();
-      $0->variableName = ASTEmap[myid]->checkVariable();
+      ASTEmap[myid]->channelName = ASTEmap[myid]->createChannel();
+      ASTEmap[myid]->variableName = ASTEmap[myid]->checkVariable();
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-      {
-        $0->suppressJF = true;
         ASTEmap[myid]->suppressJF = true;
-      }
+
+      ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
     }
     a b
   ]
@@ -584,31 +574,26 @@ Receive(a,b,c) ->
   REPLY
 ******************************************************************************/
 
-Reply(a,b,c) ->
+Reply(a,b,_id) ->
   [postprocessing:
     {
       // manage identifiers
-      int myid = $0->id;
+      int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      $0->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
-
-      // annotate AST and check information
-      $0->attributes = ASTEmap[myid]->getAttributes();
-      $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
-      $0->channelName = ASTEmap[myid]->createChannel();
-      $0->variableName = ASTEmap[myid]->checkVariable();
+      // check attributes
+      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->channelName = ASTEmap[myid]->createChannel();
+      ASTEmap[myid]->variableName = ASTEmap[myid]->checkVariable();
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-      {
-        $0->suppressJF = true;
         ASTEmap[myid]->suppressJF = true;
-      }
+
+      ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
     }
     a b
   ]

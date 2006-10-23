@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/10/09 10:43:46 $
+ *          - last changed: \$Date: 2006/10/23 07:20:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.30 $
+ * \version \$Revision: 1.31 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -415,9 +415,9 @@ void CFGBlock::checkForUninitializedVariables()
 
   switch(type)
   {
-    case CFGReply     : var = ((kc::impl_tReply*)ASTEmap[id]->node)->variableName; break;
+    case CFGReply     : var = ASTEmap[id]->variableName; break;
     case CFGFrom      : var = ((kc::impl_tFrom*)ASTEmap[id]->node)->variableName; break;
-    case CFGInvoke    : var = ((kc::impl_tInvoke*)ASTEmap[id]->node)->inputVariableName; 
+    case CFGInvoke    : var = ASTEmap[id]->inputVariableName; 
 			attributeName = "inputVariable";
 			break;
   }
@@ -441,12 +441,12 @@ void CFGBlock::checkForUninitializedVariables()
     
   switch(type)
   {
-    case CFGReceive   : var = ((kc::impl_tReceive*)ASTEmap[id]->node)->variableName; break;
+    case CFGReceive   : var = ASTEmap[id]->variableName; break;
     case CFGCatch     : var = ((kc::impl_tCatch*)ASTEmap[id]->node)->variableName; 
 			attributeName = "faultVariable"; 
 			break;
     case CFGTo        : var = ((kc::impl_tTo*)ASTEmap[id]->node)->variableName; break;
-    case CFGInvoke    : var = ((kc::impl_tInvoke*)ASTEmap[id]->node)->outputVariableName;
+    case CFGInvoke    : ASTEmap[id]->outputVariableName;
 			attributeName = "outputVariable";
 			break;
     case CFGOnMessage : var = ((kc::impl_tOnMessage*)ASTEmap[id]->node)->variableName; break;
@@ -614,12 +614,12 @@ void CFGBlock::checkForConflictingReceive()
     }
     if (type == CFGReceive)
     {
-      receives.insert(pair<std::string, long>( ((kc::impl_tReceive*)ASTEmap[id]->node)->channelName, id));
+      receives.insert(pair<std::string, long>( ASTEmap[id]->channelName, id));
     }
     if (type == CFGInvoke)
     {
       if( temporaryAttributeMap[id]["outputVariable"] != "") {
-	receives.insert(pair<std::string, long>( ((kc::impl_tInvoke*)ASTEmap[id]->node)->channelName, id));
+	receives.insert(pair<std::string, long>( ASTEmap[id]->channelName, id));
       }
     }
     if (!prevBlocks.empty())

@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/10/22 14:37:33 $
+ *          - last changed: \$Date: 2006/10/23 07:20:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.46 $
+ * \version \$Revision: 1.47 $
  */
 %}
 
@@ -198,7 +198,7 @@ Empty(a,b) ->
 ******************************************************************************/
 
 Invoke(a,b,c) ->
-  [xml: { inup(); } "<invoke id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a b { indown(); } "</invoke>\n"]
+  [xml: { inup(); } "<invoke id=\"" $0->id "\" ncf=\"" { ASTEmap[c->value]->controlFlow; } "\">\n" a b { indown(); } "</invoke>\n"]
 ;
 
 
@@ -207,7 +207,7 @@ Invoke(a,b,c) ->
 ******************************************************************************/
 
 Receive(a,b,c) ->
-  [xml: { inup(); } "<receive id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a b { indown(); } "</receive>\n"]
+  [xml: { inup(); } "<receive id=\"" $0->id "\" ncf=\"" { ASTEmap[c->value]->controlFlow; } "\">\n" a b { indown(); } "</receive>\n"]
 ;
 
 
@@ -216,7 +216,7 @@ Receive(a,b,c) ->
 ******************************************************************************/
 
 Reply(a,b,c) ->
-  [xml: { inup(); } "<reply id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a b { indown(); } "</reply>\n"]
+  [xml: { inup(); } "<reply id=\"" $0->id "\" ncf=\"" { ASTEmap[c->value]->controlFlow; } "\">\n" a b { indown(); } "</reply>\n"]
 ;
 
 

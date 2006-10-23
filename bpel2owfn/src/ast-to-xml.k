@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/10/23 07:20:48 $
+ *          - last changed: \$Date: 2006/10/23 11:39:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.47 $
+ * \version \$Revision: 1.48 $
  */
 %}
 
@@ -225,7 +225,7 @@ Reply(a,b,c) ->
 ******************************************************************************/
 
 Assign(a,b,c) ->
-  [xml: { inup(); } "<assign id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a b { indown(); } "</assign>\n"]
+  [xml: { inup(); } "<assign id=\"" $0->id "\" ncf=\"" { ASTEmap[c->value]->controlFlow; } "\">\n" a b { indown(); } "</assign>\n"]
 ;
 
 Copy(a,b,c) ->
@@ -255,7 +255,7 @@ Wait(a,b) ->
 ******************************************************************************/
 
 Throw(a,b) ->
-  [xml: { inup(); } "<throw id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a { indown(); } "</throw>\n"]
+  [xml: { inup(); } "<throw id=\"" $0->id "\" ncf=\"" { ASTEmap[b->value]->controlFlow; } "\">\n" a { indown(); } "</throw>\n"]
 ;
 
 
@@ -363,9 +363,9 @@ Scope(a,b,c,d,e,f,g,h,i) ->
 ******************************************************************************/
 
 Target(a) ->
-  [xml: { in(); } "<target ncf=\"" $0->negativeControlFlow "\" />\n"]
+  [xml: { in(); } "<target ncf=\"" { ASTEmap[a->value]->controlFlow; } "\" />\n"]
 ;
 
 Source(a) ->
-  [xml: { in(); } "<source ncf=\"" $0->negativeControlFlow "\" />\n"]
+  [xml: { in(); } "<source ncf=\"" { ASTEmap[a->value]->controlFlow; } "\" />\n"]
 ;

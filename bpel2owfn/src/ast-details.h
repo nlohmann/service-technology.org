@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/10/23 07:20:48 $
+ *          - last changed: \$Date: 2006/10/23 11:39:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
  */
 
 
@@ -148,6 +148,7 @@ class ASTE
     string variableName;
     string inputVariableName;
     string outputVariableName;
+    string linkName;
 };
 
 

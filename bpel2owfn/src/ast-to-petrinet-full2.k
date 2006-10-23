@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/23 07:20:48 $
+ *          - last changed: \$Date: 2006/10/23 11:39:12 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
  */
 %}
 
@@ -430,7 +430,7 @@ This=Assign(a,b,_id) ->
       {
 	string newPrefix = prefix + "copy." + toString(copyCount) + ".";
 
-	if (from->variableName != "")
+	if (ASTEmap[from->id]->variableName != "")
 	{
 	  Place *p2 = TheNet->newPlace(newPrefix + "running");
 	  Place *p4 = TheNet->newPlace(newPrefix + "p4");
@@ -438,19 +438,19 @@ This=Assign(a,b,_id) ->
 
 	  Transition *t1 = TheNet->newTransition(newPrefix + "t1");
 	  TheNet->newArc(lastPlace, t1);
-	  TheNet->newArc(TheNet->findPlace("variable." + from->variableName), t1, READ);
+	  TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[from->id]->variableName), t1, READ);
 	  TheNet->newArc(t1, p2);
 
 	  Transition *t2 = TheNet->newTransition(newPrefix + "t2");
 	  TheNet->newArc(p2, t2);
 	  TheNet->newArc(t2, p8);
-	  TheNet->newArc(TheNet->findPlace("variable." + to->variableName), t2);
-	  TheNet->newArc(t2, TheNet->findPlace("variable." + to->variableName));
+	  TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[to->id]->variableName), t2);
+	  TheNet->newArc(t2, TheNet->findPlace("variable." + ASTEmap[to->id]->variableName));
 
 
 	  // Transitions for the negative control flow.
 	  if (parameters[P_NOSTANDARDFAULTS] == false)
-	    Transition *t3 = throwFault(p2, p4, "running", newPrefix, This->negativeControlFlow);
+	    Transition *t3 = throwFault(p2, p4, "running", newPrefix, ASTEmap[_id->value]->controlFlow);
 
 	  Transition *t6 = stop(p4, "p4at" + toString(copyCount), prefix);
 
@@ -464,14 +464,14 @@ This=Assign(a,b,_id) ->
 
 	  Transition *t2 = TheNet->newTransition(newPrefix + "t2");
 	  TheNet->newArc(lastPlace, t2);
-	  TheNet->newArc(TheNet->findPlace("variable." + to->variableName), t2);
-	  TheNet->newArc(t2, TheNet->findPlace("variable." + to->variableName));
+	  TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[to->id]->variableName), t2);
+	  TheNet->newArc(t2, TheNet->findPlace("variable." + ASTEmap[to->id]->variableName));
 	  TheNet->newArc(t2, p8);
 
 
 	  // Transitions for the negative control flow.
 	  if (parameters[P_NOSTANDARDFAULTS] == false)
-	    Transition *t3 = throwFault(lastPlace, p4, "initial", newPrefix, This->negativeControlFlow);
+	    Transition *t3 = throwFault(lastPlace, p4, "initial", newPrefix, ASTEmap[_id->value]->controlFlow);
 
 	  Transition *t6 = stop(p4, "p4at" + toString(copyCount), prefix);
 
@@ -647,7 +647,7 @@ This=Throw(a,_id) ->
 
 
       // Transitions for the negative control flow.
-      Transition *t1 = throwFault(p1, p2, "initial", prefix, This->negativeControlFlow);
+      Transition *t1 = throwFault(p1, p2, "initial", prefix, ASTEmap[_id->value]->controlFlow);
       Transition *t2 = stop(p1, "initial", prefix);
       Transition *t3 = stop(p2, "p2", prefix);
     }
@@ -2016,8 +2016,8 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
       // t1 for dead path elimination.
       foreach (source; tSource_list a)
       {
-	Place *p8 = TheNet->findPlace("!link." + source->linkName);
-	Place *p10 = TheNet->findPlace("link." + source->linkName);
+	Place *p8 = TheNet->findPlace("!link." + ASTEmap[source->id]->linkName);
+	Place *p10 = TheNet->findPlace("link." + ASTEmap[source->id]->linkName);
 
 	TheNet->newArc(p8, t2);
 	TheNet->newArc(t2, p10);
@@ -2078,8 +2078,8 @@ This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF) ->
       // Connect the target links with transitions t1 and t2.
       foreach (target; tTarget_list a)
       {
-	Place *p1 = TheNet->findPlace("!link." + target->linkName);
-	Place *p3 = TheNet->findPlace("link." + target->linkName);
+	Place *p1 = TheNet->findPlace("!link." + ASTEmap[target->id]->linkName);
+	Place *p3 = TheNet->findPlace("link." + ASTEmap[target->id]->linkName);
 	TheNet->newArc(t1, p1);
 	TheNet->newArc(p3, t1);
 	TheNet->newArc(t2, p1);
@@ -2145,8 +2145,8 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF) ->
       // Connect the target links with transitions t1 and t2.
       foreach (target; tTarget_list a)
       {
-	Place *p1 = TheNet->findPlace("!link." + target->linkName);
-	Place *p3 = TheNet->findPlace("link." + target->linkName);
+	Place *p1 = TheNet->findPlace("!link." + ASTEmap[target->id]->linkName);
+	Place *p3 = TheNet->findPlace("link." + ASTEmap[target->id]->linkName);
 	TheNet->newArc(t1, p1);
 	TheNet->newArc(p3, t1);
 	TheNet->newArc(t2, p1);
@@ -2238,8 +2238,8 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
       // Connect each target links with t2 and t5.
       foreach (target; tTarget_list a)
       {
-	Place *p1 = TheNet->findPlace("!link." + target->linkName);
-	Place *p3 = TheNet->findPlace("link." + target->linkName);
+	Place *p1 = TheNet->findPlace("!link." + ASTEmap[target->id]->linkName);
+	Place *p3 = TheNet->findPlace("link." + ASTEmap[target->id]->linkName);
         TheNet->newArc(t2, p1);
 	TheNet->newArc(p3, t2);
         TheNet->newArc(t5, p1);
@@ -2251,8 +2251,8 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
       // transition t1 for dead path elimination.
       foreach (source; tSource_list b)
       {
-	Place *p5 = TheNet->findPlace("!link." + source->linkName);
-	Place *p7 = TheNet->findPlace("link." + source->linkName);
+	Place *p5 = TheNet->findPlace("!link." + ASTEmap[source->id]->linkName);
+	Place *p7 = TheNet->findPlace("link." + ASTEmap[source->id]->linkName);
 
         TheNet->newArc(p5, t3);
         TheNet->newArc(t3, p7);
@@ -2352,8 +2352,8 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF) ->
       // Connect each target links with t2 and t5.
       foreach (target; tTarget_list a)
       {
-	Place *p1 = TheNet->findPlace("!link." + target->linkName);
-	Place *p3 = TheNet->findPlace("link." + target->linkName);
+	Place *p1 = TheNet->findPlace("!link." + ASTEmap[target->id]->linkName);
+	Place *p3 = TheNet->findPlace("link." + ASTEmap[target->id]->linkName);
         TheNet->newArc(t2, p1);
 	TheNet->newArc(p3, t2);
 	TheNet->newArc(t5, p1);
@@ -2365,8 +2365,8 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF) ->
       // transition t1 for dead path elimination.
       foreach (source; tSource_list b)
       {
-	Place *p5 = TheNet->findPlace("!link." + source->linkName);
-	Place *p7 = TheNet->findPlace("link." + source->linkName);
+	Place *p5 = TheNet->findPlace("!link." + ASTEmap[source->id]->linkName);
+	Place *p7 = TheNet->findPlace("link." + ASTEmap[source->id]->linkName);
 
 	TheNet->newArc(p5, t3);
         TheNet->newArc(t3, p7);

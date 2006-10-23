@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/10/23 07:20:48 $
+ *          - last changed: \$Date: 2006/10/23 11:39:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.33 $
+ * \version \$Revision: 1.34 $
  */
 %}
 
@@ -778,9 +778,9 @@ This=StandardElements(a,b, jc) ->
 //NL	  STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
 	  //CFGBlock * target = new CFGBlock(CFGTarget, $0->parentId, "Target_" + std::string(linkST->name));
 //NL	  CFGBlock * target = new CFGBlock(CFGTarget, link->id, "Target_" + std::string(linkST->name));
-          CFGBlock * target = new CFGBlock(CFGTarget, link->id, "Target_" + link->linkName);
+          CFGBlock * target = new CFGBlock(CFGTarget, link->id, "Target_" + ASTEmap[link->id]->linkName);
 //NL	  targets["Source_" + std::string(linkST->name)] = target;
-	  targets["Source_" + link->linkName] = target;
+	  targets["Source_" + ASTEmap[link->id]->linkName] = target;
 	  /// \todo: use link to connect source and target
 /*	  for (list<CFGBlock *>::iterator iter = innerFirst->prevBlocks.begin(); iter != innerFirst->prevBlocks.end(); iter++)
 	  {
@@ -801,9 +801,9 @@ This=StandardElements(a,b, jc) ->
 //NL	  STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
 	  //CFGBlock * source = new CFGBlock(CFGSource, $0->parentId, "Source_" + std::string(linkST->name));
 //NL	  CFGBlock * source = new CFGBlock(CFGSource, link->id, "Source_" + std::string(linkST->name));
-	  CFGBlock * source = new CFGBlock(CFGSource, link->id, "Source_" + link->linkName);
+	  CFGBlock * source = new CFGBlock(CFGSource, link->id, "Source_" + ASTEmap[link->id]->linkName);
 //NL	  sources["Target_" + std::string(linkST->name)] = source;
-	  sources["Target_" + link->linkName] = source;
+	  sources["Target_" + ASTEmap[link->id]->linkName] = source;
 
 	  /// \todo: use link to connect source and target
 

@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/10/23 07:20:48 $
+ *          - last changed: \$Date: 2006/10/23 11:39:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -416,7 +416,7 @@ void CFGBlock::checkForUninitializedVariables()
   switch(type)
   {
     case CFGReply     : var = ASTEmap[id]->variableName; break;
-    case CFGFrom      : var = ((kc::impl_tFrom*)ASTEmap[id]->node)->variableName; break;
+    case CFGFrom      : var = ASTEmap[id]->variableName; break;
     case CFGInvoke    : var = ASTEmap[id]->inputVariableName; 
 			attributeName = "inputVariable";
 			break;
@@ -445,8 +445,8 @@ void CFGBlock::checkForUninitializedVariables()
     case CFGCatch     : var = ((kc::impl_tCatch*)ASTEmap[id]->node)->variableName; 
 			attributeName = "faultVariable"; 
 			break;
-    case CFGTo        : var = ((kc::impl_tTo*)ASTEmap[id]->node)->variableName; break;
-    case CFGInvoke    : ASTEmap[id]->outputVariableName;
+    case CFGTo        : var = ASTEmap[id]->variableName; break;
+    case CFGInvoke    : var = ASTEmap[id]->outputVariableName;
 			attributeName = "outputVariable";
 			break;
     case CFGOnMessage : var = ((kc::impl_tOnMessage*)ASTEmap[id]->node)->variableName; break;
@@ -478,11 +478,11 @@ void CFGBlock::checkForCyclicLinks()
 
     if (type == CFGTarget)
     {
-      linkname = ((kc::impl_tTarget*)ASTEmap[id]->node)->linkName; //(dynamic_cast<STSourceTarget*>(symTab.lookup(id)))->link->name;
+      linkname = ASTEmap[id]->linkName; //(dynamic_cast<STSourceTarget*>(symTab.lookup(id)))->link->name;
     }
     else if (type == CFGSource)
     {
-      linkname = ((kc::impl_tSource*)ASTEmap[id]->node)->linkName; //(dynamic_cast<STSourceTarget*>(symTab.lookup(id)))->link->name;
+      linkname = ASTEmap[id]->linkName; //(dynamic_cast<STSourceTarget*>(symTab.lookup(id)))->link->name;
     }
 
     

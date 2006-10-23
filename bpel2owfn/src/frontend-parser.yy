@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/20 20:14:58 $
+ *          - last changed: \$Date: 2006/10/23 11:39:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.253 $
+ * \version \$Revision: 1.254 $
  * 
  */
 %}
@@ -699,8 +699,7 @@ tFrom:
 | K_FROM arbitraryAttributes X_CLOSE VARIABLENAME X_OPEN X_SLASH K_FROM
     { $$ = From($2); }
 | K_FROM arbitraryAttributes X_NEXT tLiteral X_NEXT X_SLASH K_FROM
-    { $$ = From($2);
-      $$->literal = $4->name; }
+    { $$ = From($2); }
 | K_FROM arbitraryAttributes X_NEXT tQuery X_NEXT X_SLASH K_FROM
     { $$ = From($2); }
 | K_FROM arbitraryAttributes X_SLASH

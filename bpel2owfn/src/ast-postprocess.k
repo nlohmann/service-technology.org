@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/23 09:04:40 $
+ *          - last changed: \$Date: 2006/10/23 11:39:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  */
 %}
 
@@ -405,7 +405,7 @@ TerminationHandler(a,_id) ->
   [postprocessing:
     {
       // manage identifiers
-      int myid = $0->id;
+      int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       $0->parentScopeId = PPcurrentScope;
@@ -604,26 +604,22 @@ Reply(a,b,_id) ->
   ASSIGN
 ******************************************************************************/
 
-Assign(a,b,c) ->
+Assign(a,b,_id) ->
   [postprocessing:
     {
       // manage identifiers
-      int myid = $0->id;
+      int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
-      // annotate AST and check information
-      $0->attributes = ASTEmap[myid]->getAttributes();
-      $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
+      // check attributes
+      ASTEmap[myid]->getAttributes();
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-      {
-        $0->suppressJF = true;
         ASTEmap[myid]->suppressJF = true;
-      }
     }
     a b
   ]
@@ -633,28 +629,28 @@ Copy(a,b,c) ->
   [postprocessing: a b]
 ;
 
-From(a) ->
+From(_id) ->
   [postprocessing:
     {
-      int myid = $0->id;
+      int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
 
       // annotate AST and check information
-      $0->attributes = ASTEmap[myid]->getAttributes();
-      $0->variableName = ASTEmap[myid]->checkVariable();
+      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->variableName = ASTEmap[myid]->checkVariable();
     }
   ]
 ;
 
-To(a) ->
+To(_id) ->
   [postprocessing:
     {
-      int myid = $0->id;
+      int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
 
       // annotate AST and check information
-      $0->attributes = ASTEmap[myid]->getAttributes();
-      $0->variableName = ASTEmap[myid]->checkVariable();
+      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->variableName = ASTEmap[myid]->checkVariable();
     }
   ]
 ;
@@ -716,26 +712,22 @@ Wait(a,_id) ->
   THROW
 ******************************************************************************/
 
-Throw(a,b) ->
+Throw(a,_id) ->
   [postprocessing:
     {
       // manage identifiers
-      int myid = $0->id;
+      int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
-      // annotate AST and check information
-      $0->attributes = ASTEmap[myid]->getAttributes();
-      $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
+      // check attributes
+      ASTEmap[myid]->getAttributes();
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-      {
-        $0->suppressJF = true;
         ASTEmap[myid]->suppressJF = true;
-      }
     }
     a
   ]
@@ -1360,7 +1352,7 @@ StandardElements(a,b,c) ->
       {
         assert(ASTEmap[targetLink->id] != NULL);
         ASTEmap[targetLink->id]->controlFlow = ASTEmap[$0->parentId]->controlFlow;
-        targetLink->negativeControlFlow = ASTEmap[$0->parentId]->controlFlow;
+//        targetLink->negativeControlFlow = ASTEmap[$0->parentId]->controlFlow;
         ASTEmap[targetLink->id]->parentActivityId = $0->parentId;
       }
 
@@ -1368,7 +1360,7 @@ StandardElements(a,b,c) ->
       {
         assert(ASTEmap[sourceLink->id] != NULL);
         ASTEmap[sourceLink->id]->controlFlow = ASTEmap[$0->parentId]->controlFlow;
-        sourceLink->negativeControlFlow = ASTEmap[$0->parentId]->controlFlow;
+//        sourceLink->negativeControlFlow = ASTEmap[$0->parentId]->controlFlow;
         ASTEmap[sourceLink->id]->parentActivityId = $0->parentId;
       }
     }
@@ -1391,7 +1383,7 @@ Target(a) ->
 
 
       // annotate AST and check information
-      $0->attributes = ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->getAttributes();
 
 
 /*TODO
@@ -1404,7 +1396,7 @@ Target(a) ->
       theLink->usedAsTarget = true;
 */
 
-      $0->linkName = $0->attributes["linkName"];
+      ASTEmap[myid]->linkName = ASTEmap[myid]->attributes["linkName"];
     }
   ]
 ;
@@ -1421,7 +1413,7 @@ Source(a) ->
 
 
       // annotate AST and check information
-      $0->attributes = ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->getAttributes();
 
 /*TODO
       // remember that that link was used as a source
@@ -1437,7 +1429,7 @@ Source(a) ->
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[ASTEmap[myid]->parentActivityId]->enclosedSourceLinks.insert(linkId);
 
-      $0->linkName = $0->attributes["linkName"];
+      ASTEmap[myid]->linkName = ASTEmap[myid]->attributes["linkName"];
     }
   ]
 ;

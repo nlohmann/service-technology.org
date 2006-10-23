@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/23 09:04:40 $
+ *          - last changed: \$Date: 2006/10/23 11:39:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.130 $
+ * \version \$Revision: 1.131 $
  */
 %}
 
@@ -415,10 +415,6 @@ tAssign:
   Assign(standardElements tCopy_list integer)
   {
     int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    bool suppressJF = false;
   }
 ;
 
@@ -428,7 +424,6 @@ tCopy:
   Copy(tFrom tTo integer)
   {
     int id;
-    stringMap attributes;
   }
 ;
 
@@ -436,12 +431,6 @@ tFrom:
   From(integer)
   {
     int id;
-    stringMap attributes;
-
-    string expression;
-    string literal;
-
-    string variableName;
   }
 ;
 
@@ -449,9 +438,6 @@ tTo:
   To(integer)
   {
     int id;
-    stringMap attributes;
-
-    string variableName;
   }
 ;
 
@@ -526,12 +512,6 @@ tThrow:
   Throw(standardElements integer)
   {
     int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    bool suppressJF = false;
-
-    string variableName;
   }
 ;
 
@@ -544,12 +524,6 @@ tRethrow:
   Rethrow(standardElements integer)
   {
     int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    bool suppressJF = false;
-
-    string variableName;
   }
 ;
 
@@ -770,7 +744,6 @@ tTerminationHandler:
   standardTerminationHandler(integer)
 | TerminationHandler(activity integer)
   {
-    bool inWhile = false;
     int id;
     int parentScopeId;
   }
@@ -807,11 +780,6 @@ tTarget:
   Target(integer)
   {
     int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    
-    string linkName;
   }
 ;
 
@@ -821,11 +789,6 @@ tSource:
   Source(integer)
   {
     int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-
-    string linkName;
   }
 ;
 

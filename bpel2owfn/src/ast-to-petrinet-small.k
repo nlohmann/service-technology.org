@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/23 07:20:48 $
+ *          - last changed: \$Date: 2006/10/23 11:39:12 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.54 $
+ * \version \$Revision: 1.55 $
  *
  */
 %}
@@ -1112,19 +1112,19 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
     	  TheNet->newArc(p2, t1);
       	  TheNet->newArc(t1, p3);
 
-          Place *p4 = TheNet->findPlace("link." + source->linkName);
+          Place *p4 = TheNet->findPlace("link." + ASTEmap[source->id]->linkName);
 	  TheNet->newArc(t1, p4);
 
           foreach (source2; tSource_list a)
           {
-            if (source2->linkName != source->linkName)
+            if (ASTEmap[source2->id]->linkName != ASTEmap[source->id]->linkName)
             {
-              Place *p5 = TheNet->findPlace("!link." + source2->linkName);
+              Place *p5 = TheNet->findPlace("!link." + ASTEmap[source2->id]->linkName);
 	      TheNet->newArc(t1, p5);
             }
           }
 
-          string givenTransitionCondition = source->attributes["transitionCondition"];
+          string givenTransitionCondition = ASTEmap[source->id]->attributes["transitionCondition"];
           if (givenTransitionCondition != "" && givenTransitionCondition != "true")
           {
             cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
@@ -1141,10 +1141,10 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
 	// Set the outgoing links (standard transition condition expected).
 	foreach (source; tSource_list a)
 	{
-          Place *p4 = TheNet->findPlace("link." + source->linkName);
+          Place *p4 = TheNet->findPlace("link." + ASTEmap[source->id]->linkName);
 	  TheNet->newArc(t1, p4);
 
-          string givenTransitionCondition = source->attributes["transitionCondition"];
+          string givenTransitionCondition = ASTEmap[source->id]->attributes["transitionCondition"];
           if (givenTransitionCondition != "" && givenTransitionCondition != "true")
           {
             cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
@@ -1232,8 +1232,8 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF)
         int linkCount = 0;
 	foreach (target; tTarget_list a)
 	{
-	  Place *linkT = TheNet->findPlace("link." + target->linkName);
-	  Place *linkF = TheNet->findPlace("!link." + target->linkName);
+	  Place *linkT = TheNet->findPlace("link." + ASTEmap[target->id]->linkName);
+	  Place *linkF = TheNet->findPlace("!link." + ASTEmap[target->id]->linkName);
 
           trueLinks[linkCount] = linkT;
           falseLinks[linkCount] = linkF;
@@ -1321,19 +1321,19 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
     	  TheNet->newArc(p3, t3);
       	  TheNet->newArc(t3, p4);
 
-          Place *p7 = TheNet->findPlace("link." + source->linkName);
+          Place *p7 = TheNet->findPlace("link." + ASTEmap[source->id]->linkName);
 	  TheNet->newArc(t3, p7);
 
           foreach (source2; tSource_list b)
           {
             if (source2 != source)
             {
-              Place *p8 = TheNet->findPlace("!link." + source2->linkName);
+              Place *p8 = TheNet->findPlace("!link." + ASTEmap[source2->id]->linkName);
 	      TheNet->newArc(t3, p8);
             }
           }
 
-          string givenTransitionCondition = source->attributes["transitionCondition"];
+          string givenTransitionCondition = ASTEmap[source->id]->attributes["transitionCondition"];
           if (givenTransitionCondition != "" && givenTransitionCondition != "true")
           {
             cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
@@ -1350,10 +1350,10 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
 	// Set the outgoing links (standard transition condition expected).
 	foreach (source; tSource_list b)
         {
-	  Place *p7 = TheNet->findPlace("link." + source->linkName);
+	  Place *p7 = TheNet->findPlace("link." + ASTEmap[source->id]->linkName);
           TheNet->newArc(t3, p7);
 
-          string givenTransitionCondition = source->attributes["transitionCondition"];
+          string givenTransitionCondition = ASTEmap[source->id]->attributes["transitionCondition"];
           if (givenTransitionCondition != "" && givenTransitionCondition != "true")
           {
             cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
@@ -1379,8 +1379,8 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
         int linkCount = 0;
 	foreach (target; tTarget_list a)
 	{
-	  Place *linkT = TheNet->findPlace("link." + target->linkName);
-	  Place *linkF = TheNet->findPlace("!link." + target->linkName);
+	  Place *linkT = TheNet->findPlace("link." + ASTEmap[target->id]->linkName);
+	  Place *linkF = TheNet->findPlace("!link." + ASTEmap[target->id]->linkName);
 
           trueLinks[linkCount] = linkT;
           falseLinks[linkCount] = linkF;

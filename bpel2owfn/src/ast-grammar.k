@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/23 12:41:29 $
+ *          - last changed: \$Date: 2006/10/23 14:31:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.133 $
+ * \version \$Revision: 1.134 $
  */
 %}
 
@@ -120,9 +120,6 @@ tProcess:
       )
   {
     int id;
-    stringMap attributes;
-
-    bool suppressJF = false;
     bool hasEH = false;
   }
 ;
@@ -182,9 +179,6 @@ tPartnerLink:
   PartnerLink(integer)
   {
     int id;
-    stringMap attributes;
-
-    bool inPartners = false;
   }
 ;
 

@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/23 12:41:29 $
+ *          - last changed: \$Date: 2006/10/23 14:31:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.55 $
+ * \version \$Revision: 1.56 $
  */
 %}
 
@@ -112,12 +112,12 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
       // set suppressJoinFailure-attribute
       if (ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
       {
-        $0->suppressJF = true;
+//        $0->suppressJF = true;
         ASTEmap[myid]->suppressJF = true;
       }
 
       // annotate AST and check information
-      $0->attributes = ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->getAttributes();
       $0->hasEH = (string(g->op_name()) == "userDefinedEventHandler");
 
 
@@ -188,7 +188,7 @@ Partner(a,b) ->
       // annotate all enclosed partner links
       foreach(partner; tPartnerLink_list a)
       {
-        partner->inPartners = true;
+//        partner->inPartners = true;
       }
     }
     a

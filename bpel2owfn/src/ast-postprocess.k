@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/23 11:39:12 $
+ *          - last changed: \$Date: 2006/10/23 12:04:03 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.53 $
+ * \version \$Revision: 1.54 $
  */
 %}
 
@@ -260,15 +260,15 @@ implicitFaultHandler(_id) ->
 ;
 
 
-Catch(a,b) ->
+Catch(a,_id) ->
   [postprocessing:
     {
       // manage identifiers
-      int myid = $0->id;
+      int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
 
       // annotate AST and check information
-      $0->attributes = ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->getAttributes();
     }
     a
   ]
@@ -337,20 +337,20 @@ userDefinedEventHandler(a,b,_id) ->
   ]
 ;
 
-OnMessage(a,b) ->
+OnMessage(a,_id) ->
   [postprocessing:
     {
       // manage identifiers
-      int myid = $0->id;
+      int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
 
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      $0->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
+      ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
 
       // annotate AST and check information
-      $0->attributes = ASTEmap[myid]->getAttributes();
-      $0->channelName = ASTEmap[myid]->createChannel();
-      $0->variableName = ASTEmap[myid]->checkVariable();
+      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->channelName = ASTEmap[myid]->createChannel();
+      ASTEmap[myid]->variableName = ASTEmap[myid]->checkVariable();
     }
     a
   ]

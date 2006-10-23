@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/23 11:39:12 $
+ *          - last changed: \$Date: 2006/10/23 12:04:03 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.131 $
+ * \version \$Revision: 1.132 $
  */
 %}
 
@@ -226,9 +226,6 @@ tCatch:
 | NoCatch()
   {
     int id;
-    stringMap attributes;
-
-    string variableName;
   }
 ;
 
@@ -262,11 +259,6 @@ tOnMessage:
   OnMessage(activity integer)
   {
     int id;
-    stringMap attributes;
-    bool inWhile = false;
-
-    string channelName;
-    string variableName;
   }
 ;
 
@@ -276,7 +268,6 @@ tOnAlarm:
   OnAlarm(activity integer)
   {
     int id;
-    stringMap attributes;
   } 
 ;
 

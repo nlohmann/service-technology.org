@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/10/23 11:39:13 $
+ *          - last changed: \$Date: 2006/10/23 12:04:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -442,14 +442,14 @@ void CFGBlock::checkForUninitializedVariables()
   switch(type)
   {
     case CFGReceive   : var = ASTEmap[id]->variableName; break;
-    case CFGCatch     : var = ((kc::impl_tCatch*)ASTEmap[id]->node)->variableName; 
+    case CFGCatch     : var = ASTEmap[id]->variableName; 
 			attributeName = "faultVariable"; 
 			break;
     case CFGTo        : var = ASTEmap[id]->variableName; break;
     case CFGInvoke    : var = ASTEmap[id]->outputVariableName;
 			attributeName = "outputVariable";
 			break;
-    case CFGOnMessage : var = ((kc::impl_tOnMessage*)ASTEmap[id]->node)->variableName; break;
+    case CFGOnMessage : var = ASTEmap[id]->variableName; break;
 //      default: // should not happen (thinks Niels)
   }
   
@@ -588,7 +588,7 @@ void CFGBlock::checkForConflictingReceive()
 		trace("\n");
 	    }
 	  }
-	  receives.insert(pair<std::string, long>( ((kc::impl_tOnMessage*)ASTEmap[(*iter)->id]->node)->channelName, (*iter)->id));
+	  receives.insert(pair<std::string, long>( ASTEmap[id]->channelName, (*iter)->id));
 	}
 	// 
 	receives = setUnion(receives, (*iter)->receives);

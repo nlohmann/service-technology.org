@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/18 09:37:41 $
+ *          - last changed: \$Date: 2006/10/23 12:04:04 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.198 $
+ * \version \$Revision: 1.199 $
  *
  */
 %}
@@ -759,7 +759,7 @@ This=userDefinedFaultHandler(a,b, _id) provided (This->inProcess) ->
     {
       foreach (catchBranch=Catch(innerActivity); tCatch_list a)
       {
-	string faultToCatch = catchBranch->attributes["faultName"];
+	string faultToCatch = ASTEmap[catchBranch->id]->attributes["faultName"];
 	Transition *t1 = TheNet->newTransition(prefix + "t1.internal." + faultToCatch);
 	Transition *t2 = TheNet->newTransition(prefix + "t2." + faultToCatch);
 
@@ -1087,7 +1087,7 @@ This=userDefinedFaultHandler(a,b,_id) provided (!This->inProcess) ->
     {
       foreach (catchBranch=Catch(innerActivity); tCatch_list a)
       {
-	string faultToCatch = catchBranch->attributes["faultName"];
+	string faultToCatch = ASTEmap[catchBranch->id]->attributes["faultName"];
 
 	Transition *t1 = TheNet->newTransition(prefix + "t1.internal." + faultToCatch);
 	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
@@ -1355,18 +1355,18 @@ This=userDefinedEventHandler(a,b,_id) ->
 	Place *onMessage_p12 = TheNet->newPlace(newPrefix + "p12");
 
 	Transition *onMessage_t2 = TheNet->newTransition(newPrefix + "t2");
-	TheNet->newArc(TheNet->findPlace("in." + ThisBranch->channelName), onMessage_t2);
+	TheNet->newArc(TheNet->findPlace("in." + ASTEmap[ThisBranch->id]->channelName), onMessage_t2);
 	TheNet->newArc(onMessage_t2, onMessage_p2);
 	TheNet->newArc(onMessage_p5, onMessage_t2);
 	onMessage_t2->type = IN;
 
 	Transition *onMessage_t3 = TheNet->newTransition(newPrefix + "t3");
-	TheNet->newArc(TheNet->findPlace("variable." + ThisBranch->variableName), onMessage_t3);
-  	TheNet->newArc(onMessage_t3, TheNet->findPlace("variable." + ThisBranch->variableName));
+	TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[ThisBranch->id]->variableName), onMessage_t3);
+  	TheNet->newArc(onMessage_t3, TheNet->findPlace("variable." + ASTEmap[ThisBranch->id]->variableName));
 	TheNet->newArc(onMessage_p2, onMessage_t3);
 	TheNet->newArc(onMessage_t3, onMessage_p3);
 
-        TheNet->findPlace("in." + ThisBranch->channelName)->inWhile = true;
+        TheNet->findPlace("in." + ASTEmap[ThisBranch->id]->channelName)->inWhile = true;
 
 
 	Transition *onMessage_t12 = TheNet->newTransition(newPrefix + "t12");

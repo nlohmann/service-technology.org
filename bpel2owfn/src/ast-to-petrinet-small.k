@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/23 11:39:12 $
+ *          - last changed: \$Date: 2006/10/23 12:04:03 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.55 $
+ * \version \$Revision: 1.56 $
  *
  */
 %}
@@ -959,13 +959,13 @@ This=Pick(a,b,c,d) ->
 	string message = toString(onMessageCount++);
 
 	Transition *t1 = TheNet->newTransition(prefix + "pickM" + message);
-	TheNet->newArc(TheNet->findPlace("in." + ThisBranch->channelName), t1);
+	TheNet->newArc(TheNet->findPlace("in." + ASTEmap[ThisBranch->id]->channelName), t1);
 	TheNet->newArc(TheNet->findPlace(This->id, ".internal.initial"), t1);
 	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
 	t1->type = IN;
 
-        if (ThisBranch->inWhile)
-          TheNet->findPlace("in." + ThisBranch->channelName)->inWhile = true;
+        if (ASTEmap[ThisBranch->id]->inWhile)
+          TheNet->findPlace("in." + ASTEmap[ThisBranch->id]->channelName)->inWhile = true;
 
 	// Embed the inner activity.
 	TheNet->mergePlaces(This->id, ".final", innerActivity->id, ".final");

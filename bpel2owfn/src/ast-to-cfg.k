@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/10/23 11:39:12 $
+ *          - last changed: \$Date: 2006/10/23 12:04:03 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
  */
 %}
 
@@ -681,7 +681,7 @@ Pick(a,b,c,d) ->
 	    CFGBlock * innerLast = cfgMap.find(toString(innerActivity->id))->second->lastBlock;
 	    CFGBlock * onMessageBlock = new CFGBlock(CFGOnMessage, message->id, "OnMessage_" + toString(i++)); 
 //NL	    onMessageBlock->channel_name = (dynamic_cast<STCommunicationActivity*>(symTab.lookup($0->id)))->channelId; 
-	    onMessageBlock->channel_name = $0->channelName;
+	    onMessageBlock->channel_name = ASTEmap[$0->id]->channelName;
 	  
 	    connectBlocks(firstBlock, onMessageBlock);
 	    connectBlocks(onMessageBlock, innerFirst);

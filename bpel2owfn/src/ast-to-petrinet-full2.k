@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/23 11:39:12 $
+ *          - last changed: \$Date: 2006/10/23 12:04:04 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
  */
 %}
 
@@ -1493,19 +1493,19 @@ This=Pick(a,b,c,_id) ->
 	Place *p10 = TheNet->newPlace(newPrefix + "p10");
 
 	Transition *t2 = TheNet->newTransition(newPrefix + "t2");
-	TheNet->newArc(TheNet->findPlace("in." + ThisBranch->channelName), t2);
+	TheNet->newArc(TheNet->findPlace("in." + ASTEmap[ThisBranch->id]->channelName), t2);
 	TheNet->newArc(TheNet->findPlace(This->id, ".internal.TimeStamp"), t2);
 	TheNet->newArc(t2, p3);
 	t2->type = IN;
 
 	Transition *t3 = TheNet->newTransition(newPrefix + "t3");
-	TheNet->newArc(TheNet->findPlace("variable." + ThisBranch->variableName), t3);
-  	TheNet->newArc(t3, TheNet->findPlace("variable." + ThisBranch->variableName));
+	TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[ThisBranch->id]->variableName), t3);
+  	TheNet->newArc(t3, TheNet->findPlace("variable." + ASTEmap[ThisBranch->id]->variableName));
 	TheNet->newArc(p3, t3);
 	TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
 
-        if (ThisBranch->inWhile) // was: (parameters[P_CYCLICWHILE] && ThisBranch->inWhile)
-          TheNet->findPlace("in." + ThisBranch->channelName)->inWhile = true;
+        if (ASTEmap[ThisBranch->id]->inWhile) // was: (parameters[P_CYCLICWHILE] && ThisBranch->inWhile)
+          TheNet->findPlace("in." + ASTEmap[ThisBranch->id]->channelName)->inWhile = true;
 
 
 	// Transitions for the negative control flow.

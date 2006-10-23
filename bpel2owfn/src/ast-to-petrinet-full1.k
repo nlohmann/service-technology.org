@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/23 12:04:04 $
+ *          - last changed: \$Date: 2006/10/23 12:41:30 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.199 $
+ * \version \$Revision: 1.200 $
  *
  */
 %}
@@ -914,7 +914,7 @@ This=implicitFaultHandler(_id) provided (This->inProcess) ->
 This=userDefinedFaultHandler(a,b,_id) provided (!This->inProcess) ->
   [petrinet:
     {
-      string prefix = toString(This->parentScopeId) + ".internal.faultHandler.";
+      string prefix = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.faultHandler.";
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<userDefinedFaultHandlerInsideScope scope=\"" + currentScope + "\">\n");
 
       Place *p3 =  TheNet->newPlace(prefix + "out");
@@ -1146,7 +1146,7 @@ This=userDefinedFaultHandler(a,b,_id) provided (!This->inProcess) ->
 This=implicitFaultHandler(_id) provided (!This->inProcess) ->
   [petrinet:
     {
-      string prefix = toString(This->parentScopeId) + ".internal.faultHandler.";
+      string prefix = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.faultHandler.";
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<implicitFaultHandlerInsideScope scope=\"" + currentScope + "\">\n");
 
       Place *p1 =  TheNet->newPlace(prefix + "ft");
@@ -1290,7 +1290,7 @@ This=userDefinedEventHandler(a,b,_id) ->
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<eventHandler scope=\"" + currentScope + "\">\n");
 
-      string prefix = toString(This->parentScopeId) + ".internal.eventHandler.";
+      string prefix = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.eventHandler.";
       Place *p6  = TheNet->newPlace(prefix + "initial");
       Place *p8  = TheNet->newPlace(prefix + "final");
       Place *p13 = TheNet->newPlace(prefix + "finish");
@@ -1511,7 +1511,7 @@ This=userDefinedEventHandler(a,b,_id) ->
 This=implicitCompensationHandler(_id) provided (!This->inProcess) ->
   [petrinet:
     {
-      string prefix = toString(This->parentScopeId) + ".internal.compensationHandler.";
+      string prefix = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.compensationHandler.";
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<implicitCompensationHandler scope=\"" + currentScope + "\">\n");
 
       Place *p2  = TheNet->newPlace(prefix + "ch_in");
@@ -1640,7 +1640,7 @@ This=implicitCompensationHandler(_id) provided (!This->inProcess) ->
 This=userDefinedCompensationHandler(innerActivity,_id) provided (!This->inProcess) ->
   [petrinet:
     {
-      string prefix = toString(This->parentScopeId) + ".internal.compensationHandler.";
+      string prefix = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.compensationHandler.";
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<userDefinedCompensationHandler scope=\"" + currentScope + "\">\n");
 
       Place *p2  = TheNet->newPlace(prefix + "ch_in");
@@ -1807,7 +1807,7 @@ This=userDefinedCompensationHandler(innerActivity,_id) provided (!This->inProces
 This=implicitCompensationHandler(_id) provided (This->inProcess) ->
   [petrinet:
     {
-      string prefix = toString(This->parentScopeId) + ".internal.compensationHandler.";
+      string prefix = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.compensationHandler.";
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<processCompensationHandler>\n");
 
       Place *p2  = TheNet->newPlace(prefix + "ch_in");
@@ -1900,7 +1900,7 @@ This=implicitCompensationHandler(_id) provided (This->inProcess) ->
 This=userDefinedCompensationHandler(a,_id) provided (This->inProcess) ->
   [petrinet:
     {
-      string prefix = toString(This->parentScopeId) + ".internal.compensationHandler.";
+      string prefix = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.compensationHandler.";
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<processCompensationHandler>\n");
 
       Place *p2  = TheNet->newPlace(prefix + "ch_in");

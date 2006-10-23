@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/23 12:04:03 $
+ *          - last changed: \$Date: 2006/10/23 12:41:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.54 $
+ * \version \$Revision: 1.55 $
  */
 %}
 
@@ -210,7 +210,7 @@ userDefinedFaultHandler(a,b,_id) ->
 
       // annotate AST 
       $0->hasCatchAll = (b->op_name() == "CatchAll");
-      $0->parentScopeId = PPcurrentScope;
+//      $0->parentScopeId = PPcurrentScope;
       $0->inProcess = (ASTEmap[myid]->parentScopeId == 1);
 
       // distribute the fault handlers's id to the enclosed catch/catchAll branches
@@ -235,7 +235,7 @@ userDefinedFaultHandler(a,b,_id) ->
         {
           // triggers SA00080
           if (a->length() == 0)
-            SAerror(80, "", toInt(ASTEmap[parentScopeId]->attributes["referenceLine"]));
+            SAerror(80, "", toInt(ASTEmap[ASTEmap[myid]->parentScopeId]->attributes["referenceLine"]));
         }
       }
     }
@@ -253,7 +253,7 @@ implicitFaultHandler(_id) ->
 
       // annotate AST 
       $0->hasCatchAll = false;
-      $0->parentScopeId = PPcurrentScope;
+//      $0->parentScopeId = PPcurrentScope;
       $0->inProcess = (ASTEmap[myid]->parentScopeId == 1);
     }
   ]
@@ -297,7 +297,7 @@ implicitEventHandler(_id) ->
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      $0->parentScopeId = PPcurrentScope;
+//      $0->parentScopeId = PPcurrentScope;
     }  
   ]
 ;
@@ -309,13 +309,14 @@ userDefinedEventHandler(a,b,_id) ->
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      $0->parentScopeId = PPcurrentScope;
+//      $0->parentScopeId = PPcurrentScope;
 
-      $0->inWhile = true;
+      ASTEmap[myid]->inWhile = true;
+//      $0->inWhile = true;
 
       // triggers SA00083
       if (a->length() == 0 && b->length() == 0)
-        SAerror(83, "", toInt(ASTEmap[parentScopeId]->attributes["referenceLine"]));
+        SAerror(83, "", toInt(ASTEmap[ASTEmap[myid]->parentScopeId]->attributes["referenceLine"]));
 
       // distribute the event handlers's id to the enclosed activities
       foreach(branch=OnMessage(innerActivity); tOnMessage_list a)
@@ -372,7 +373,7 @@ implicitCompensationHandler(_id) ->
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      $0->parentScopeId = PPcurrentScope;
+//      $0->parentScopeId = PPcurrentScope;
     }
   ]
 ;
@@ -384,7 +385,7 @@ userDefinedCompensationHandler(a,_id) ->
       int myid = $0->id;
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      $0->parentScopeId = PPcurrentScope;
+//      $0->parentScopeId = PPcurrentScope;
 
       // distribute the compensation handlers's id to the enclosed activity
       // also mark the activities as "inside compensation handlers"
@@ -408,7 +409,7 @@ TerminationHandler(a,_id) ->
       int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      $0->parentScopeId = PPcurrentScope;
+//      $0->parentScopeId = PPcurrentScope;
 
       // distribute the compensation handlers's id to the enclosed activity
       // also mark the activities as "inside compensation handlers"

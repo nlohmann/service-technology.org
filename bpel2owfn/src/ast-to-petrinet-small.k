@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/23 12:04:03 $
+ *          - last changed: \$Date: 2006/10/23 12:41:30 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.56 $
+ * \version \$Revision: 1.57 $
  *
  */
 %}
@@ -200,7 +200,7 @@ This=userDefinedEventHandler(a,b,_id) ->
   [petrinetsmall:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<eventHandler scope=\"" + currentScope + "\">\n");
-      string prefix = toString(This->parentScopeId) + ".internal.eventHandler.";
+      string prefix = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.eventHandler.";
     }
     a // onMessage branches
     b // onAlarm branches

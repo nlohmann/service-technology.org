@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/23 14:31:02 $
+ *          - last changed: \$Date: 2006/10/23 15:06:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.134 $
+ * \version \$Revision: 1.135 $
  */
 %}
 
@@ -105,6 +105,10 @@ typedef std::map<string, string> stringMap;
 
 
 
+%member int abstract_phylum::id;
+
+
+
 tProcess:
   Process(
       tPartnerLink_list
@@ -119,7 +123,6 @@ tProcess:
       integer
       )
   {
-    int id;
     bool hasEH = false;
   }
 ;
@@ -156,9 +159,6 @@ activity:
 | activityPick(tPick)
 | activityFlow(tFlow)
 | activityScope(tScope)
-  {
-    int id;
-  }
 ;
 
 activity_list: list activity;
@@ -177,9 +177,6 @@ tPartnerLink_list:
 
 tPartnerLink:
   PartnerLink(integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -191,9 +188,6 @@ tPartner_list: list tPartner;
 
 tPartner:
   Partner(tPartnerLink_list integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -217,17 +211,11 @@ tCatch_list: list tCatch;
 tCatch:
   Catch(activity integer)
 | NoCatch()
-  {
-    int id;
-  }
 ;
 
 tCatchAll:
   CatchAll(activity integer)
 | NoCatchAll()
-  {
-    int id;
-  }
 ;
 
 
@@ -355,9 +343,6 @@ tFromPart:
 
 tReceive:
   Receive(standardElements tCorrelation_list integer)
-  {
-    int id;
-  }
 ;
 
 

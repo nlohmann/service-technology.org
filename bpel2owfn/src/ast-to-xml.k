@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/10/23 11:39:12 $
+ *          - last changed: \$Date: 2006/10/23 15:06:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.48 $
+ * \version \$Revision: 1.49 $
  */
 %}
 
@@ -70,8 +70,8 @@
 
 
 
-Process(a,b,c,d,e,f,g,h,i,j) ->
-  [xml: { inup(); } "<process id=\"" $0->id "\">\n" 
+Process(a,b,c,d,e,f,g,h,i,_id) ->
+  [xml: { inup(); } "<process id=\"" _id "\">\n" 
   
   { if (a->length() == 0) }
     ${ /* no Partner Links */ $}
@@ -101,8 +101,8 @@ Process(a,b,c,d,e,f,g,h,i,j) ->
   PARTNER LINKS
 ******************************************************************************/
 
-PartnerLink(a) ->
-  [xml: { in(); } "<partnerLink id=\"" $0->id "\"/>\n"]
+PartnerLink(_id) ->
+  [xml: { in(); } "<partnerLink id=\"" _id "\"/>\n"]
 ;
 
 
@@ -110,8 +110,8 @@ PartnerLink(a) ->
   PARTNERS
 ******************************************************************************/
 
-Partner(a,b) ->
-  [xml: { inup(); } "<partner id=\"" $0->id "\">\n" a { indown(); } "</partner>\n"]
+Partner(a,_id) ->
+  [xml: { inup(); } "<partner id=\"" _id "\">\n" a { indown(); } "</partner>\n"]
 ;
 
 
@@ -123,12 +123,12 @@ userDefinedFaultHandler(a,b,_id) ->
   [xml: { inup(); } "<faultHandlers id=\"" $0->id "\">\n" a b { indown(); } "</faultHandlers>\n"]
 ;
 
-Catch(a,b) ->
-  [xml: { inup(); } "<catch id=\"" $0->id "\">\n" a { indown(); } "</catch>\n"]
+Catch(a,_id) ->
+  [xml: { inup(); } "<catch id=\"" _id "\">\n" a { indown(); } "</catch>\n"]
 ;
 
-CatchAll(a,b) ->
-  [xml: { inup(); } "<catchAll>\n" a { indown(); } "</catchAll>\n"]
+CatchAll(a,_id) ->
+  [xml: { inup(); } "<catchAll>\n" _id { indown(); } "</catchAll>\n"]
 ;
 
 
@@ -207,7 +207,7 @@ Invoke(a,b,c) ->
 ******************************************************************************/
 
 Receive(a,b,c) ->
-  [xml: { inup(); } "<receive id=\"" $0->id "\" ncf=\"" { ASTEmap[c->value]->controlFlow; } "\">\n" a b { indown(); } "</receive>\n"]
+  [xml: { inup(); } "<receive id=\"" c "\" ncf=\"" { ASTEmap[c->value]->controlFlow; } "\">\n" a b { indown(); } "</receive>\n"]
 ;
 
 

@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/10/23 15:06:05 $
+ *          - last changed: \$Date: 2006/10/24 06:47:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
  */
 %}
 
@@ -137,7 +137,7 @@ CatchAll(a,_id) ->
 ******************************************************************************/
 
 userDefinedEventHandler(a,b,_id) ->
-  [xml: { inup(); } "<eventHandlers id=\"" $0->id "\">\n" a b { indown(); } "</eventHandlers>\n"]
+  [xml: { inup(); } "<eventHandlers id=\"" _id "\">\n" a b { indown(); } "</eventHandlers>\n"]
 ;
 
 OnMessage(a,b) ->
@@ -162,8 +162,8 @@ userDefinedCompensationHandler(a,_id) ->
   VARIABLES
 ******************************************************************************/
 
-Variable(a) ->
-  [xml: { in(); } "<variable id=\"" $0->id "\"/>\n"]
+Variable(_id) ->
+  [xml: { in(); } "<variable id=\"" _id "\"/>\n"]
 ;
 
 
@@ -189,16 +189,16 @@ Correlation(a) ->
   EMPTY
 ******************************************************************************/
 
-Empty(a,b) ->
-  [xml: { inup(); } "<empty id=\"" $0->id "\" ncf=\"" { ASTEmap[b->value]->controlFlow; } "\">\n" a { indown(); } "</empty>\n"];
+Empty(a,_id) ->
+  [xml: { inup(); } "<empty id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { indown(); } "</empty>\n"];
 
 
 /******************************************************************************
   INVOKE
 ******************************************************************************/
 
-Invoke(a,b,c) ->
-  [xml: { inup(); } "<invoke id=\"" $0->id "\" ncf=\"" { ASTEmap[c->value]->controlFlow; } "\">\n" a b { indown(); } "</invoke>\n"]
+Invoke(a,b,_id) ->
+  [xml: { inup(); } "<invoke id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b { indown(); } "</invoke>\n"]
 ;
 
 
@@ -206,8 +206,8 @@ Invoke(a,b,c) ->
   RECEIVE
 ******************************************************************************/
 
-Receive(a,b,c) ->
-  [xml: { inup(); } "<receive id=\"" c "\" ncf=\"" { ASTEmap[c->value]->controlFlow; } "\">\n" a b { indown(); } "</receive>\n"]
+Receive(a,b,_id) ->
+  [xml: { inup(); } "<receive id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b { indown(); } "</receive>\n"]
 ;
 
 
@@ -215,8 +215,8 @@ Receive(a,b,c) ->
   REPLY
 ******************************************************************************/
 
-Reply(a,b,c) ->
-  [xml: { inup(); } "<reply id=\"" $0->id "\" ncf=\"" { ASTEmap[c->value]->controlFlow; } "\">\n" a b { indown(); } "</reply>\n"]
+Reply(a,b,_id) ->
+  [xml: { inup(); } "<reply id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b { indown(); } "</reply>\n"]
 ;
 
 
@@ -224,8 +224,8 @@ Reply(a,b,c) ->
   ASSIGN
 ******************************************************************************/
 
-Assign(a,b,c) ->
-  [xml: { inup(); } "<assign id=\"" $0->id "\" ncf=\"" { ASTEmap[c->value]->controlFlow; } "\">\n" a b { indown(); } "</assign>\n"]
+Assign(a,b,_id) ->
+  [xml: { inup(); } "<assign id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b { indown(); } "</assign>\n"]
 ;
 
 Copy(a,b,c) ->
@@ -245,8 +245,8 @@ To(b) ->
   WAIT
 ******************************************************************************/
 
-Wait(a,b) ->
-  [xml: { inup(); } "<wait id=\"" $0->id "\" ncf=\"" { ASTEmap[b->value]->controlFlow; } "\">\n" a { indown(); } "</wait>\n"]
+Wait(a,_id) ->
+  [xml: { inup(); } "<wait id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { indown(); } "</wait>\n"]
 ;
 
 
@@ -254,8 +254,8 @@ Wait(a,b) ->
   THROW
 ******************************************************************************/
 
-Throw(a,b) ->
-  [xml: { inup(); } "<throw id=\"" $0->id "\" ncf=\"" { ASTEmap[b->value]->controlFlow; } "\">\n" a { indown(); } "</throw>\n"]
+Throw(a,_id) ->
+  [xml: { inup(); } "<throw id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { indown(); } "</throw>\n"]
 ;
 
 
@@ -272,8 +272,8 @@ Compensate(a,b) ->
   TERMINATE
 ******************************************************************************/
 
-Terminate(a,b) ->
-  [xml: { inup(); } "<terminate id=\"" $0->id "\" ncf=\"" { ASTEmap[b->value]->controlFlow; } "\">\n" a { indown(); } "</terminate>\n"]
+Terminate(a,_id) ->
+  [xml: { inup(); } "<terminate id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { indown(); } "</terminate>\n"]
 ;
 
 
@@ -281,16 +281,16 @@ Terminate(a,b) ->
   FLOW
 ******************************************************************************/
 
-Flow(a,NiltLink_list(),c,d) ->
-  [xml: { inup(); } "<flow id=\"" $0->id "\" ncf=\"" { ASTEmap[d->value]->controlFlow; } "\">\n" a c { indown(); } "</flow>\n"]
+Flow(a,NiltLink_list(),c,_id) ->
+  [xml: { inup(); } "<flow id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a c { indown(); } "</flow>\n"]
 ;
 
-Flow(a,b,c,d) ->
-  [xml: { inup(); } "<flow id=\"" $0->id "\" ncf=\"" { ASTEmap[d->value]->controlFlow; } "\">\n" a { inup(); } "<links>\n" b { indown(); } "</links>\n" c { indown(); } "</flow>\n"]
+Flow(a,b,c,_id) ->
+  [xml: { inup(); } "<flow id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { inup(); } "<links>\n" b { indown(); } "</links>\n" c { indown(); } "</flow>\n"]
 ;
 
-Link(a) ->
-  [xml: { in(); } "<link id=\"" $0->id "\"/>\n"]
+Link(_id) ->
+  [xml: { in(); } "<link id=\"" _id "\"/>\n"]
 ;
 
 
@@ -298,8 +298,8 @@ Link(a) ->
   SWITCH
 ******************************************************************************/
 
-Switch(a,b,c,d) ->
-  [xml: { inup(); } "<switch id=\"" $0->id "\" ncf=\"" { ASTEmap[d->value]->controlFlow; } "\">\n" a b c { indown(); } "</switch>\n"]
+Switch(a,b,c,_id) ->
+  [xml: { inup(); } "<switch id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b c { indown(); } "</switch>\n"]
 ;
 
 Case(a,b) ->
@@ -315,8 +315,8 @@ Otherwise(a,b) ->
   WHILE
 ******************************************************************************/
 
-While(a,b,c) ->
-  [xml: { inup(); } "<while id=\"" $0->id "\" ncf=\"" { ASTEmap[c->value]->controlFlow; } "\">\n" a b { indown(); } "</while>\n"]
+While(a,b,_id) ->
+  [xml: { inup(); } "<while id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b { indown(); } "</while>\n"]
 ;
 
 
@@ -324,8 +324,8 @@ While(a,b,c) ->
   SEQUENCE
 ******************************************************************************/
 
-Sequence(a,b,c) ->
-  [xml: { inup(); } "<sequence id=\"" $0->id "\" ncf=\"" { ASTEmap[c->value]->controlFlow; } "\">\n" a b { indown(); } "</sequence>\n"]
+Sequence(a,b,_id) ->
+  [xml: { inup(); } "<sequence id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b { indown(); } "</sequence>\n"]
 ;
 
 
@@ -333,8 +333,8 @@ Sequence(a,b,c) ->
   PICK
 ******************************************************************************/
 
-Pick(a,b,c,d) ->
-  [xml: { inup(); } "<pick id=\"" $0->id "\" ncf=\"" { ASTEmap[d->value]->controlFlow; } "\">\n" a b c { indown(); } "</pick>\n"]
+Pick(a,b,c,_id) ->
+  [xml: { inup(); } "<pick id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b c { indown(); } "</pick>\n"]
 ;
 
 

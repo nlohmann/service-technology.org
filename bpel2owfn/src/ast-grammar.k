@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/23 15:06:05 $
+ *          - last changed: \$Date: 2006/10/24 06:47:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.135 $
+ * \version \$Revision: 1.136 $
  */
 %}
 
@@ -104,8 +104,8 @@ typedef std::map<string, string> stringMap;
 %}
 
 
-
-%member int abstract_phylum::id;
+/* every phylum has an id */
+%member unsigned int abstract_phylum::id;
 
 
 
@@ -226,9 +226,6 @@ tCatchAll:
 tEventHandlers:
   implicitEventHandler(integer)
 | userDefinedEventHandler(tOnMessage_list tOnAlarm_list integer)
-  {
-    int id;
-  }
 ;
 
 // onMessage is called onEvent in WS-BPEL 2.0
@@ -236,18 +233,12 @@ tOnMessage_list: list tOnMessage;
 
 tOnMessage:
   OnMessage(activity integer)
-  {
-    int id;
-  }
 ;
 
 tOnAlarm_list: list tOnAlarm;
 
 tOnAlarm:
   OnAlarm(activity integer)
-  {
-    int id;
-  } 
 ;
 
 
@@ -277,9 +268,6 @@ tVariable_list: list tVariable;
 
 tVariable:
   Variable(integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -291,9 +279,6 @@ tCorrelationSet_list: list tCorrelationSet;
 
 tCorrelationSet:
   CorrelationSet(integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -305,9 +290,6 @@ tCorrelation_list: list tCorrelation;
 
 tCorrelation:
   Correlation(integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -319,18 +301,12 @@ tToPart_list: list tToPart;
 
 tToPart:
   ToPart(integer)
-  {
-    int id;
-  }
 ;
 
 tFromPart_list: list tFromPart;
 
 tFromPart:
   FromPart(integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -352,9 +328,6 @@ tReceive:
 
 tReply:
   Reply(standardElements tCorrelation_list integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -367,9 +340,6 @@ tInvoke:
 | SynchronousInvoke(standardElements tCorrelation_list integer)
 | AsynchronousInvoke(standardElements tCorrelation_list integer)
 | annotatedInvoke(standardElements tCorrelation_list tCatch tCatchAll tCompensationHandler integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -379,32 +349,20 @@ tInvoke:
 
 tAssign:
   Assign(standardElements tCopy_list integer)
-  {
-    int id;
-  }
 ;
 
 tCopy_list: list tCopy;
 
 tCopy:
   Copy(tFrom tTo integer)
-  {
-    int id;
-  }
 ;
 
 tFrom:
   From(integer)
-  {
-    int id;
-  }
 ;
 
 tTo:
   To(integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -414,9 +372,6 @@ tTo:
 
 tValidate:
   Validate(standardElements integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -426,9 +381,6 @@ tValidate:
 
 tEmpty:
   Empty(standardElements integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -440,9 +392,6 @@ tWait:
   Wait(standardElements integer)
 | WaitFor(standardElements integer)
 | WaitUntil(standardElements integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -452,9 +401,6 @@ tWait:
 
 tTerminate:
   Terminate(standardElements integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -464,9 +410,6 @@ tTerminate:
 
 tExit:
   Exit(standardElements integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -476,9 +419,6 @@ tExit:
 
 tThrow:
   Throw(standardElements integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -488,9 +428,6 @@ tThrow:
 
 tRethrow:
   Rethrow(standardElements integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -540,9 +477,6 @@ tCompensateScope:
 
 tSequence:
   Sequence(standardElements activity_list integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -552,26 +486,17 @@ tSequence:
 
 tSwitch:
   Switch(standardElements tCase_list tOtherwise integer)
-  {
-    int id;
-  }
 ;
 
 tCase_list: list tCase;
 
 tCase:
   Case(activity integer)
-  {
-    int id;
-  }
 ;
 
 tOtherwise:
   Otherwise(activity integer)
 | NoOtherwise()
-  {
-    int id;
-  }
 ;
 
 
@@ -581,26 +506,17 @@ tOtherwise:
 
 tIf:
   If(standardElements tElseIf_list tElse integer)
-  {
-    int id;
-  }
 ;
 
 tElseIf_list: list tElseIf;
 
 tElseIf:
   ElseIf(activity integer)
-  {
-    int id;
-  }
 ;
 
 tElse:
   Else(activity integer)
 | NoElse(integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -610,9 +526,6 @@ tElse:
 
 tWhile:
   While(standardElements activity integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -622,9 +535,6 @@ tWhile:
 
 tRepeatUntil:
   RepeatUntil(standardElements activity integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -634,9 +544,6 @@ tRepeatUntil:
 
 tForEach:
   ForEach(standardElements tScope integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -646,9 +553,6 @@ tForEach:
 
 tPick:
   Pick(standardElements tOnMessage_list tOnAlarm_list integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -658,18 +562,12 @@ tPick:
 
 tFlow:
   Flow(standardElements tLink_list activity_list integer)
-  {
-    int id;
-  }
 ;
 
 tLink_list: list tLink;
 
 tLink:
   Link(integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -709,9 +607,6 @@ tScope:
 tTerminationHandler:
   standardTerminationHandler(integer)
 | TerminationHandler(activity integer)
-  {
-    int id;
-  }
 ;
 
 
@@ -743,18 +638,12 @@ tTarget_list:
 
 tTarget:
   Target(integer)
-  {
-    int id;
-  }
 ;
 
 tSource_list: list tSource;
 
 tSource:
   Source(integer)
-  {
-    int id;
-  }
 ;
 
 joinCondition:

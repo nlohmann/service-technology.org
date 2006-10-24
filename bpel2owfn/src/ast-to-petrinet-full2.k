@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/24 08:22:13 $
+ *          - last changed: \$Date: 2006/10/24 10:35:39 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.45 $
+ * \version \$Revision: 1.46 $
  */
 %}
 
@@ -1740,7 +1740,7 @@ This=Scope(a,b,c,d,e,f,g,h,_id) ->
       // If the process has an event handler several places and transitions
       // have to be added to embed it. If the process lacks an event handler
       // some places can be merged.
-      if (This->hasEH)
+      if (ASTEmap[_id->value]->hasEH)
       {
 	Place *p25 = TheNet->newPlace(prefix + "p25");
 	Place *p26 = TheNet->newPlace(prefix + "p26");
@@ -1842,7 +1842,7 @@ This=Scope(a,b,c,d,e,f,g,h,_id) ->
 
 
       // If present, embed the event handler of the scope.
-      if (This->hasEH)
+      if (ASTEmap[_id->value]->hasEH)
       {
 	TheNet->mergePlaces(prefix + "p25", prefix2 + "eventHandler.initial");
 	TheNet->mergePlaces(prefix + "p26", prefix2 + "eventHandler.finish");
@@ -2069,7 +2069,7 @@ This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF) ->
 
 
       // Transitions for the negative control flow.
-      Transition *t2 = throwFault(p8, p11, "initial", prefix, This->negativeControlFlow);
+      Transition *t2 = throwFault(p8, p11, "initial", prefix, ASTEmap[This->parentId]->controlFlow);
 
       Transition *t3 = stop(p8, "initial", prefix);
       Transition *t4 = stop(p11, "p11", prefix);
@@ -2326,7 +2326,7 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF) ->
 
 
       // Transitions for the negative control flow.
-      Transition *t5 = throwFault(p16, p17, "initial", prefix, This->negativeControlFlow);
+      Transition *t5 = throwFault(p16, p17, "initial", prefix, ASTEmap[This->parentId]->controlFlow);
 
       Transition *t6 = stop(p16, "initial", prefix);
       Transition *t7 = stop(p17, "p17", prefix);

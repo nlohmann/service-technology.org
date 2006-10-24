@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/23 12:41:30 $
+ *          - last changed: \$Date: 2006/10/24 10:35:39 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.200 $
+ * \version \$Revision: 1.201 $
  *
  */
 %}
@@ -108,7 +108,7 @@ string currentScope;
  * handler are merged.
  */
 
-This=Process(a,b,c,d,e,f,g,h,i,j) ->
+This=Process(a,b,c,d,e,f,g,h,i,_id) ->
   [petrinet:
     {
       trace(TRACE_INFORMATION, "Generating Petri net...\n");
@@ -240,7 +240,7 @@ This=Process(a,b,c,d,e,f,g,h,i,j) ->
       // If the process has an event handler several places and transitions
       // have to be added to embed it. If the process lacks an event handler
       // some places can be merged.
-      if (This->hasEH)
+      if (ASTEmap[_id->value]->hasEH)
       {
 	Place *p23 = TheNet->newPlace(prefix + "p23");
 	Place *p24 = TheNet->newPlace(prefix + "p24");
@@ -316,7 +316,7 @@ This=Process(a,b,c,d,e,f,g,h,i,j) ->
 
 
       // If present, embed the event handler of the process.
-      if (This->hasEH)
+      if (ASTEmap[_id->value]->hasEH)
       {
 	TheNet->mergePlaces("1.internal.p23",      "1.internal.eventHandler.initial");
 	TheNet->mergePlaces("1.internal.p24",      "1.internal.eventHandler.finish");
@@ -654,7 +654,7 @@ StopInScope() ->
  * The user-defined fault handler inside a process. See Fig. 37 for details.
  */
 
-This=userDefinedFaultHandler(a,b, _id) provided (This->inProcess) ->
+This=userDefinedFaultHandler(a,b, _id) provided (ASTEmap[_id->value]->inProcess) ->
   [petrinet:
     {
       string prefix = "1.internal.faultHandler.";
@@ -693,7 +693,7 @@ This=userDefinedFaultHandler(a,b, _id) provided (This->inProcess) ->
 
 
       // The rethrow part is only necessary if there is no <catchAll> element.
-      if (!This->hasCatchAll)
+      if (!ASTEmap[_id->value]->hasCatchAll)
       {
 	Transition *t5 = TheNet->newTransition(prefix + "t5");
 	TheNet->newArc(p4, t5);
@@ -809,7 +809,7 @@ This=userDefinedFaultHandler(a,b, _id) provided (This->inProcess) ->
  * The implicit fault handler inside a process. See Fig. 35 for details.
  */
 
-This=implicitFaultHandler(_id) provided (This->inProcess) ->
+This=implicitFaultHandler(_id) provided (ASTEmap[_id->value]->inProcess) ->
   [petrinet:
     {
       string prefix = "1.internal.faultHandler.";
@@ -911,7 +911,7 @@ This=implicitFaultHandler(_id) provided (This->inProcess) ->
  * The user-defined fault handler inside a scope. See Fig. 36 for details.
  */
 
-This=userDefinedFaultHandler(a,b,_id) provided (!This->inProcess) ->
+This=userDefinedFaultHandler(a,b,_id) provided (!ASTEmap[_id->value]->inProcess) ->
   [petrinet:
     {
       string prefix = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.faultHandler.";
@@ -976,7 +976,7 @@ This=userDefinedFaultHandler(a,b,_id) provided (!This->inProcess) ->
 
 
       // The rethrow part is only necessary if there is no <catchAll> element.
-      if (!This->hasCatchAll)
+      if (!ASTEmap[_id->value]->hasCatchAll)
       {
   	Transition *t5 = TheNet->newTransition(prefix + "t5");
     	TheNet->newArc(p4, t5);
@@ -1143,7 +1143,7 @@ This=userDefinedFaultHandler(a,b,_id) provided (!This->inProcess) ->
  * The implicit fault handler inside a scope. See Fig. 34 for details.
  */
 
-This=implicitFaultHandler(_id) provided (!This->inProcess) ->
+This=implicitFaultHandler(_id) provided (!ASTEmap[_id->value]->inProcess) ->
   [petrinet:
     {
       string prefix = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.faultHandler.";
@@ -1508,7 +1508,7 @@ This=userDefinedEventHandler(a,b,_id) ->
  * Implicit compensation handler as it is depicted in Fig. 42.
  */
 
-This=implicitCompensationHandler(_id) provided (!This->inProcess) ->
+This=implicitCompensationHandler(_id) provided (!ASTEmap[_id->value]->inProcess) ->
   [petrinet:
     {
       string prefix = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.compensationHandler.";
@@ -1637,7 +1637,7 @@ This=implicitCompensationHandler(_id) provided (!This->inProcess) ->
  * that this pattern combines the four different compensation handler patterns.
  */
 
-This=userDefinedCompensationHandler(innerActivity,_id) provided (!This->inProcess) ->
+This=userDefinedCompensationHandler(innerActivity,_id) provided (!ASTEmap[_id->value]->inProcess) ->
   [petrinet:
     {
       string prefix = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.compensationHandler.";
@@ -1804,7 +1804,7 @@ This=userDefinedCompensationHandler(innerActivity,_id) provided (!This->inProces
  * will never be called from a surrounding scope, the whole "left" part of the
  * pattern depicted in Fig. 42 is not necessary.
  */
-This=implicitCompensationHandler(_id) provided (This->inProcess) ->
+This=implicitCompensationHandler(_id) provided (ASTEmap[_id->value]->inProcess) ->
   [petrinet:
     {
       string prefix = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.compensationHandler.";
@@ -1897,7 +1897,7 @@ This=implicitCompensationHandler(_id) provided (This->inProcess) ->
 
 
 /* this pattern is just a copy from the pattern above */
-This=userDefinedCompensationHandler(a,_id) provided (This->inProcess) ->
+This=userDefinedCompensationHandler(a,_id) provided (ASTEmap[_id->value]->inProcess) ->
   [petrinet:
     {
       string prefix = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.compensationHandler.";

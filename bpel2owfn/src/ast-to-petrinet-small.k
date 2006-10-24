@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/23 12:41:30 $
+ *          - last changed: \$Date: 2006/10/24 10:35:39 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.57 $
+ * \version \$Revision: 1.58 $
  *
  */
 %}
@@ -98,7 +98,7 @@ extern PetriNet *TheNet;
  * handler are merged.
  */
 
-This=Process(a,b,c,d,e,f,g,h,i,j) ->
+This=Process(a,b,c,d,e,f,g,h,i,_id) ->
   [petrinetsmall:
     {
       trace(TRACE_INFORMATION, "Generating Petri net...\n");
@@ -136,7 +136,7 @@ This=Process(a,b,c,d,e,f,g,h,i,j) ->
 
 
       // Create subnet to support event handlers.
-      if (This->hasEH)
+      if (ASTEmap[_id->value]->hasEH)
       {
 	Place *p3 = TheNet->newPlace(prefix + "EHactive");
 	Place *p4 = TheNet->newPlace(prefix + "begin");
@@ -162,7 +162,7 @@ This=Process(a,b,c,d,e,f,g,h,i,j) ->
       i // innerActivity
     {
       // Embed the inner activity of the process.
-      if (This->hasEH)
+      if (ASTEmap[_id->value]->hasEH)
       {
 	TheNet->mergePlaces(TheNet->findPlace("1.internal.begin"), TheNet->findPlace(i, ".initial"));
 	TheNet->mergePlaces(TheNet->findPlace("1.internal.end"), TheNet->findPlace(i, ".final"));

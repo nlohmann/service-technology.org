@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/24 08:22:13 $
+ *          - last changed: \$Date: 2006/10/24 10:35:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.57 $
+ * \version \$Revision: 1.58 $
  */
 %}
 
@@ -118,11 +118,11 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
 
       // annotate AST and check information
       ASTEmap[myid]->getAttributes();
-      $0->hasEH = (string(g->op_name()) == "userDefinedEventHandler");
+      ASTEmap[myid]->hasEH = (string(g->op_name()) == "userDefinedEventHandler");
 
 
       // tag the (useless) compensation handler
-      f->inProcess = true;
+      ASTEmap[f->id]->inProcess = true;
 
 
       // distribute the process' id to the enclosed FH/CH/EH/activity
@@ -209,9 +209,9 @@ userDefinedFaultHandler(a,b,_id) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       // annotate AST 
-      $0->hasCatchAll = (b->op_name() == "CatchAll");
+      ASTEmap[myid]->hasCatchAll = (b->op_name() == "CatchAll");
 //      $0->parentScopeId = PPcurrentScope;
-      $0->inProcess = (ASTEmap[myid]->parentScopeId == 1);
+      ASTEmap[myid]->inProcess = (ASTEmap[myid]->parentScopeId == 1);
 
       // distribute the fault handlers's id to the enclosed catch/catchAll branches
       // also mark the activities as "inside fault handlers"
@@ -252,9 +252,9 @@ implicitFaultHandler(_id) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
       // annotate AST 
-      $0->hasCatchAll = false;
+//      $0->hasCatchAll = false;
 //      $0->parentScopeId = PPcurrentScope;
-      $0->inProcess = (ASTEmap[myid]->parentScopeId == 1);
+      ASTEmap[myid]->inProcess = (ASTEmap[myid]->parentScopeId == 1);
     }
   ]
 ;
@@ -1298,14 +1298,13 @@ Pick(a,b,c,_id) ->
   SCOPE
 ******************************************************************************/
 
-Scope(a,b,c,d,e,f,g,h,i) ->
+Scope(a,b,c,d,e,f,g,h,_id) ->
   [postprocessing:
     {
       // manage identifiers
-      int myid = $0->id;
+      int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      $0->parentScopeId = PPcurrentScope;
       PPcurrentScope = myid;
       a->parentId = myid;
 
@@ -1313,21 +1312,17 @@ Scope(a,b,c,d,e,f,g,h,i) ->
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
 
       // annotate AST and check information
-      $0->attributes = ASTEmap[myid]->getAttributes();
-      $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
+      ASTEmap[myid]->getAttributes();
 
       // register at parent scope
       ASTEmap[ASTEmap[myid]->parentScopeId]->enclosedScopes.insert(myid);
 
-      $0->hasEH = (string(e->op_name()) == "userDefinedEventHandler");
+      ASTEmap[myid]->hasEH = (string(e->op_name()) == "userDefinedEventHandler");
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-      {
-        $0->suppressJF = true;
         ASTEmap[myid]->suppressJF = true;
-      }
 
       // distribute the scope's id to the enclosed activity
       assert(ASTEmap[h->id] != NULL);
@@ -1366,7 +1361,7 @@ StandardElements(a,b,c) ->
   [postprocessing:
     {
       assert(ASTEmap[$0->parentId] != NULL);
-      $0->negativeControlFlow = ASTEmap[$0->parentId]->controlFlow;
+//      $0->negativeControlFlow = ASTEmap[$0->parentId]->controlFlow;
       $0->suppressJF = ASTEmap[$0->parentId]->suppressJF;
 
       foreach(targetLink; tTarget_list a)

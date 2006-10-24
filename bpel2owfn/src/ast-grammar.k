@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/24 08:22:13 $
+ *          - last changed: \$Date: 2006/10/24 10:35:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.137 $
+ * \version \$Revision: 1.138 $
  */
 %}
 
@@ -122,9 +122,6 @@ tProcess:
       activity
       integer
       )
-  {
-    bool hasEH = false;
-  }
 ;
 
 
@@ -197,12 +194,6 @@ tPartner:
 tFaultHandlers:
   userDefinedFaultHandler(tCatch_list tCatchAll integer)
 | implicitFaultHandler(integer)
-  {
-    int id;
-
-    bool inProcess;
-    bool hasCatchAll; 
-  }  
 ;
 
 tCatch_list: list tCatch;
@@ -249,12 +240,8 @@ tCompensationHandler:
   implicitCompensationHandler(integer)
 | userDefinedCompensationHandler(activity integer)
   {
-    int id;
-
     bool hasCompensateWithoutScope = false;
     bool hasCompensateWithScope = false;
-
-    bool inProcess = false;
   }
 ;
 
@@ -560,13 +547,6 @@ tScope:
       integer
       )
   {
-    int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    bool suppressJF = false;
-    bool hasEH = false;
-
     int parentScopeId;
   }
 ;
@@ -593,19 +573,13 @@ standardElements:
   StandardElements(tTarget_list tSource_list joinCondition)
 | NoStandardElements()
   {
-    int negativeControlFlow = 0;
     bool suppressJF = false;
-
     int parentId;
-    bool hasTarget = false;
   }
 ;
 
 tTarget_list:
   list tTarget
-  {
-    bool hasTarget = false;
-  }
 ;
 
 tTarget:

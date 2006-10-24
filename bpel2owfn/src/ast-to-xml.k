@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/10/24 08:22:13 $
+ *          - last changed: \$Date: 2006/10/24 10:35:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.51 $
+ * \version \$Revision: 1.52 $
  */
 %}
 
@@ -120,7 +120,7 @@ Partner(a,_id) ->
 ******************************************************************************/
 
 userDefinedFaultHandler(a,b,_id) ->
-  [xml: { inup(); } "<faultHandlers id=\"" $0->id "\">\n" a b { indown(); } "</faultHandlers>\n"]
+  [xml: { inup(); } "<faultHandlers id=\"" _id "\">\n" a b { indown(); } "</faultHandlers>\n"]
 ;
 
 Catch(a,_id) ->
@@ -154,7 +154,7 @@ OnAlarm(a,b) ->
 ******************************************************************************/
 
 userDefinedCompensationHandler(a,_id) ->
-  [xml: { inup(); } "<compensationHandler id=\"" $0->id "\">\n" a { indown(); } "</compensationHandler>\n"]
+  [xml: { inup(); } "<compensationHandler id=\"" _id "\">\n" a { indown(); } "</compensationHandler>\n"]
 ;
 
 
@@ -342,15 +342,15 @@ Pick(a,b,c,_id) ->
   SCOPE
 ******************************************************************************/
 
-Scope(a,b,c,d,e,f,g,h,i) ->
-  [xml: { inup(); } "<scope id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" 
+Scope(a,b,c,d,e,f,g,h,_id) ->
+  [xml: { inup(); } "<scope id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" 
   
   a
 
   { if (b->length() == 0) }
     ${ /* no Variables */ $}
   { else }
-    ${ { inup(); } "<variables id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" b { indown(); } "</variables>\n" $}
+    ${ { inup(); } "<variables id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" b { indown(); } "</variables>\n" $}
 
   c d e f g h
     

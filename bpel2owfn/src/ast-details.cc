@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/10/23 09:04:39 $
+ *          - last changed: \$Date: 2006/10/24 10:35:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.25 $
+ * \version \$Revision: 1.26 $
  */
 
 
@@ -164,6 +164,8 @@ ASTE::ASTE(int myid, int mytype)
   inWhile = false; // required initialization!
   controlFlow = POSITIVECF;
   LEAVE("[ASTE]");
+
+  inProcess = false;
 }
 
 

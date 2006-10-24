@@ -18,29 +18,29 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/10/24 12:01:51 $ by $Author: nlohmann $.
-# Version $Revision: 1.34 $
+# File last changed $Date: 2006/10/24 12:27:16 $ by $Author: nlohmann $.
+# Version $Revision: 1.35 $
 
 bin_PROGRAMS = bpel2owfn preprocess
 
 
 # define flags for Kimwitu++
-KCFLAGS = --yystype --no-printdot --file-prefix=bpel-kc- --suffix=cc
+KCFLAGS = --yystype --no-printdot --file-prefix=ast-system- --suffix=cc
 
 # generated Flex and Bison sources
 YYSOURCES = parser.h parser.cc lexer.cc
 
 # everything about the Kimwitu++ sources
-KCDUMMY = bpel-kc-dummy.cc
-KCFILES = ast-grammar.k bpel-unparse-petri.k bpel-unparse-petri2.k \
+KCDUMMY = ast-system-dummy.cc
+KCFILES = ast-grammar.k ast-to-petrinet-full1.k ast-to-petrinet-full2.k \
 	  ast-to-xml.k ast-to-cfg.k ast-printers.k \
-	  bpel-unparse-petri-small.k ast-postprocess.k ast-rewrite.k
-KCGENERATED = bpel-kc-csgiok bpel-kc-k bpel-kc-rk bpel-kc-unpk
+	  ast-to-petrinet-small.k ast-postprocess.k ast-rewrite.k
+KCGENERATED = ast-system-csgiok ast-system-k ast-system-rk ast-system-unpk
 KCSOURCES = $(KCFILES:.k=.cc) \
 	    $(KCFILES:.k=.h) \
 	    $(KCGENERATED:=.cc) \
 	    $(KCGENERATED:=.h) \
-	    bpel-kc-yystype.h
+	    ast-system-yystype.h
 KCOBJECTS = $(KCFILES:.k=.o) \
 	    $(KCGENERATED:=.o)
 

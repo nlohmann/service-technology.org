@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/10/24 12:39:16 $ by $Author: nlohmann $.
-# Version $Revision: 1.36 $
+# File last changed $Date: 2006/10/24 13:47:31 $ by $Author: nlohmann $.
+# Version $Revision: 1.37 $
 
 bin_PROGRAMS = bpel2owfn preprocess
 
@@ -33,7 +33,7 @@ YYSOURCES = parser.h parser.cc lexer.cc
 # everything about the Kimwitu++ sources
 KCDUMMY = ast-system-dummy.cc
 KCFILES = ast-grammar.k ast-to-petrinet-full1.k ast-to-petrinet-full2.k \
-	  ast-to-xml.k ast-to-cfg.k ast-output.k \
+	  ast-to-xml.k ast-to-cfg.k ast-config.k \
 	  ast-to-petrinet-small.k ast-postprocess.k ast-rewrite.k
 KCGENERATED = ast-system-csgiok ast-system-k ast-system-rk ast-system-unpk
 KCSOURCES = $(KCFILES:.k=.cc) \

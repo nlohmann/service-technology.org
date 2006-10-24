@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/24 12:39:16 $
+ *          - last changed: \$Date: 2006/10/24 13:47:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,59 +37,9 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.60 $
+ * \version \$Revision: 1.61 $
  */
 %}
-
-
-%{	
-/*!
- * \file bpel-unparse-ast.h
- *
- * See \ref bpel-unparse-ast.cc for more information.
- */
-%}
-
-
-/******************************************************************************/
-
-// All the includes and variables can be used during the unparsing.
-%{ KC_UNPARSE
-#include <iostream>
-#include <map>
-#include <set>
-#include "bpel-unparse-tools.h"
-#include "ast-output.h"
-#include "ast-details.h"
-#include "helpers.h"
-
-using namespace std;
-
-
-
-
-/******************************************************************************
- * External variables
- *****************************************************************************/
-
-extern map<unsigned int, ASTE*> ASTEmap;
-
-
-
-// global sets
-set<string> ASTE_inputChannels;
-set<string> ASTE_outputChannels;
-set<string> ASTE_variables;
-set<string> ASTE_links;
-
-
-map<string, int> linkIdMap;
-
-map<int, int> PPhasCompensateMap;
-
-unsigned int PPcurrentScope = 0;
-%}
-
 
 
 

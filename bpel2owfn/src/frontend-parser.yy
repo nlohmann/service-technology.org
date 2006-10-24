@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/24 12:27:17 $
+ *          - last changed: \$Date: 2006/10/24 13:47:32 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.257 $
+ * \version \$Revision: 1.258 $
  * 
  */
 %}
@@ -99,8 +99,7 @@
 #include <cassert>
 #include <map>
 
-#include "ast-system-k.h" // phylum definitions
-#include "ast-system-yystype.h" // data types for tokens and non-terminals
+#include "ast-config.h"		// all you need from Kimwitu++
 #include "helpers.h"
 #include "debug.h"
 #include "ast-details.h"

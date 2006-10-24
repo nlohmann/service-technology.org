@@ -20,6 +20,19 @@
 
 
 
+/******************************************************************************
+ * THE HEADER FOR ALL KIMWITU++ USERS (ast-config.h)
+ *****************************************************************************/
+
+%{ HEADER
+#include "ast-system-k.h"	// phylum definitions
+#include "ast-system-rk.h"	// ?
+#include "ast-system-unpk.h"	// ?
+#include "ast-system-yystype.h" // data types for tokens and non-terminals
+%}
+
+
+
 
 
 /******************************************************************************
@@ -41,18 +54,22 @@
 #include <iostream>
 #include <cmath>
 #include <cassert>
+#include <map>
+#include <set>
 
 #include "petrinet.h"
 #include "options.h"
 #include "bpel-unparse-tools.h"
-#include "ast-output.h"
 #include "cfg.h"
 #include "helpers.h"
+#include "ast-details.h"
 
 using namespace std;
 
 extern PetriNet *TheNet;   // introduced in main.c
 extern CFGBlock * TheCFG;  // introduced in cfg.cc
+extern map<unsigned int, ASTE*> ASTEmap; // introduced in ast-details.cc
+
 
 /// prefix of the current scope (read by the stop pattern and used to direct
 /// failures to the correct fault_in place)
@@ -60,6 +77,18 @@ string currentScope;
 
 /// \todo (gierds) comment me!
 map <std::string, CFGBlock *> cfgMap;
+
+
+set<string> ASTE_inputChannels;
+set<string> ASTE_outputChannels;
+set<string> ASTE_variables;
+set<string> ASTE_links;
+
+map<string, int> linkIdMap;
+
+map<int, int> PPhasCompensateMap;
+
+unsigned int PPcurrentScope = 0;
 %}
 
 
@@ -67,7 +96,6 @@ map <std::string, CFGBlock *> cfgMap;
 // printers below.
 %{
 #include <iostream>
-
 #include "options.h" // for #output
 %}
 

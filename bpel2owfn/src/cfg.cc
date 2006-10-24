@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/10/24 12:39:17 $
+ *          - last changed: \$Date: 2006/10/24 13:47:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -49,7 +49,6 @@
 #include "cfg.h"
 #include "options.h"
 #include "debug.h"
-#include "ast-output.h"
 #include "ast-details.h"
 
 extern map<unsigned int, map<string, string> > temporaryAttributeMap;

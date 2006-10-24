@@ -4,8 +4,8 @@ Makefile
 Makefile.in
 bpel2owfn.h
 bpel2owfn.h.in
-ast-printers.cc
-ast-printers.h
+ast-output.cc
+ast-output.h
 ast-grammar.cc
 ast-grammar.h
 ast-rewrite.cc

@@ -27,14 +27,14 @@
  *          
  * \date
  *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/10/24 13:47:31 $
+ *          - last changed: \$Date: 2006/10/24 14:06:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
  */
 
 
@@ -54,11 +54,11 @@
 
 #include <map>
 #include <string>
-#include <list>
+//#include <list>
 #include <set>
 
-#include "parser.h"		// created by Bison
-#include "ast-config.h"		// all you need from Kimwitu++
+//#include "parser.h"		// created by Bison
+//#include "ast-config.h"		// all you need from Kimwitu++
 
 using namespace std;
 
@@ -96,7 +96,7 @@ class ASTE
 
   public:
     /// a pointer to the node in the abstract syntax tree
-    kc::impl_abstract_phylum *node;
+//    kc::impl_abstract_phylum *node;
 
     /// the parsed attributes
     map<string, string> attributes;

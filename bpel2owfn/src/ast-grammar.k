@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/24 10:35:39 $
+ *          - last changed: \$Date: 2006/10/24 14:06:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.138 $
+ * \version \$Revision: 1.139 $
  */
 %}
 
@@ -56,52 +56,14 @@
  */
 
 #include "ast-details.h"
+#include "parser.h"
 extern map<unsigned int, ASTE*> ASTEmap;
 extern int ASTEid;
 
 %}
 
 
-%{ KC_TYPES_HEADER
 
-#include <string>
-#include <iostream>
-#include <map>
-#include "debug.h"
-#include "helpers.h"
-
-using std::string;
-using std::cerr;
-using std::endl;
-using std::map;
-
-typedef std::map<string, string> stringMap;
-
-
-
-
-// a preprocessor directive for the quite generic constructors
-#define CTOR(token) { \
-  ENTER("[AST]"); \
-  assert(integer_1 != NULL); \
-  if (integer_1->value == 0) \
-  { \
-    id = ASTEid; \
-    integer_1 = mkinteger(ASTEid++); \
-  } \
-  else { \
-    id = integer_1->value; \
-  } \
-  if (ASTEmap[id] == NULL) \
-  { \
-    ASTEmap[id] = new ASTE(id, token); \
-  } \
-  assert(ASTEmap[id] != NULL); \
-  LEAVE("[AST]"); \
-}
-
-
-%}
 
 
 /* every phylum has an id */

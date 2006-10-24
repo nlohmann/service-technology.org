@@ -29,13 +29,13 @@
  *
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/10/10 08:14:41 $
+ *          - last changed: \$Date: 2006/10/24 14:06:51 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  */
 
 
@@ -56,7 +56,7 @@
 #include <map>
 #include <list>
 
-#include "getopt.h"
+//#include "getopt.h"
 
 using namespace std;
 

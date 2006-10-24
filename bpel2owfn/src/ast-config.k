@@ -136,3 +136,54 @@ using namespace std;
 
 extern map<unsigned int, ASTE*> ASTEmap;
 %}
+
+
+
+
+
+/******************************************************************************
+  PHYLUM DECLARATIONS
+******************************************************************************/
+
+// all class declarations generated from phylum definitions; included by all
+// implicitly generated files
+
+%{ KC_TYPES_HEADER
+
+#include <string>
+#include <iostream>
+#include <map>
+#include "debug.h"
+#include "helpers.h"
+
+using std::string;
+using std::cerr;
+using std::endl;
+using std::map;
+
+typedef std::map<string, string> stringMap;
+
+
+
+
+// a preprocessor directive for the quite generic constructors
+#define CTOR(token) { \
+  ENTER("[AST]"); \
+  assert(integer_1 != NULL); \
+  if (integer_1->value == 0) \
+  { \
+    id = ASTEid; \
+    integer_1 = mkinteger(ASTEid++); \
+  } \
+  else { \
+    id = integer_1->value; \
+  } \
+  if (ASTEmap[id] == NULL) \
+  { \
+    ASTEmap[id] = new ASTE(id, token); \
+  } \
+  assert(ASTEmap[id] != NULL); \
+  LEAVE("[AST]"); \
+}
+
+%}

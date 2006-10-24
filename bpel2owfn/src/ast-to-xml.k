@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/10/24 06:47:11 $
+ *          - last changed: \$Date: 2006/10/24 08:22:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  */
 %}
 
@@ -263,8 +263,8 @@ Throw(a,_id) ->
   COMPENSATE
 ******************************************************************************/
 
-Compensate(a,b) ->
-  [xml: { inup(); } "<compensate id=\"" $0->id "\" ncf=\"" $0->negativeControlFlow "\">\n" a { indown(); } "</compensate>\n"]
+Compensate(a,_id) ->
+  [xml: { inup(); } "<compensate id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { indown(); } "</compensate>\n"]
 ;
 
 

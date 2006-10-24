@@ -28,7 +28,7 @@
  *          
  * \date    
  *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/23 14:31:02 $
+ *          - last changed: \$Date: 2006/10/24 08:22:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +37,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.56 $
+ * \version \$Revision: 1.57 $
  */
 %}
 
@@ -739,36 +739,56 @@ Throw(a,_id) ->
   COMPENSATE
 ******************************************************************************/
 
-Compensate(a,b) ->
+Compensate(a,_id) ->
   [postprocessing:
     {
       // manage identifiers
-      int myid = $0->id;
+      int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       a->parentId = myid;
 
-      // annotate AST and check information
-      $0->attributes = ASTEmap[myid]->getAttributes();
-      $0->negativeControlFlow = ASTEmap[myid]->controlFlow;
+      // check attributes
+      ASTEmap[myid]->getAttributes();
 
       // set or inherit suppressJoinFailure-attribute
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-      {
-        $0->suppressJF = true;
         ASTEmap[myid]->suppressJF = true;
-      }
-
-      // attribute to discriminate the <compensate>-patterns
-      $0->hasScopeAttribute = ($0->attributes["scope"] != "");
 
       // register this compensate at the current scope
       /* here we can check whether it is the only compensate activity */
-      if ($0->attributes["scope"] == "")
-        PPhasCompensateMap[PPcurrentScope] = 1;
-      else
-        PPhasCompensateMap[PPcurrentScope] = 2;
+      PPhasCompensateMap[PPcurrentScope] = 1;
+    }
+    a
+  ]
+;
+
+
+/******************************************************************************
+  COMPENSATE SCOPE                                               (WS-BPEL 2.0)
+******************************************************************************/
+
+CompensateScope(a,b,_id) ->
+  [postprocessing:
+    {
+      // manage identifiers
+      int myid = _id->value;
+      assert(ASTEmap[myid] != NULL);
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      a->parentId = myid;
+
+      // check attributes
+      ASTEmap[myid]->getAttributes();
+
+      // set or inherit suppressJoinFailure-attribute
+      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
+      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
+        ASTEmap[myid]->suppressJF = true;
+
+      // register this compensate at the current scope
+      /* here we can check whether it is the only compensate activity */
+      PPhasCompensateMap[PPcurrentScope] = 2;
     }
     a
   ]

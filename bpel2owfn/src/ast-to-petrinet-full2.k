@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/23 12:04:04 $
+ *          - last changed: \$Date: 2006/10/24 08:22:13 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.44 $
+ * \version \$Revision: 1.45 $
  */
 %}
 
@@ -680,7 +680,7 @@ This=Throw(a,_id) ->
  * compensation handler of the current scope.
  */
 
-This=Compensate(a,_id) provided (!This->inFaultHandler && !This->hasScopeAttribute) ->
+This=Compensate(a,_id) provided (!This->inFaultHandler) ->
   [petrinet:
     {
       header(This->id);
@@ -733,7 +733,7 @@ This=Compensate(a,_id) provided (!This->inFaultHandler && !This->hasScopeAttribu
  * handler of the current scope.
  */
 
-This=Compensate(a,_id) provided (This->inFaultHandler && !This->hasScopeAttribute) ->
+This=Compensate(a,_id) provided (This->inFaultHandler) ->
   [petrinet:
     {
       header(This->id);
@@ -786,7 +786,7 @@ This=Compensate(a,_id) provided (This->inFaultHandler && !This->hasScopeAttribut
  * embedded to the compensation handler of the current scope.
  */
 
-This=Compensate(a,_id) provided (!This->inFaultHandler && This->hasScopeAttribute) ->
+This=CompensateScope(a,b,_id) provided (!This->inFaultHandler) ->
   [petrinet:
     {
       header(This->id);
@@ -838,7 +838,7 @@ This=Compensate(a,_id) provided (!This->inFaultHandler && This->hasScopeAttribut
  * the fault handler of the current scope.
  */
 
-This=Compensate(a,_id) provided (This->inFaultHandler && This->hasScopeAttribute) ->
+This=CompensateScope(a,b,_id) provided (This->inFaultHandler) ->
   [petrinet:
     {
       header(This->id);

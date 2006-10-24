@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/24 06:47:11 $
+ *          - last changed: \$Date: 2006/10/24 08:22:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.136 $
+ * \version \$Revision: 1.137 $
  */
 %}
 
@@ -149,7 +149,6 @@ activity:
 | activityThrow(tThrow)
 | activityRethrow(tRethrow)
 | activityCompensate(tCompensate)
-| activityCompensateScope(tCompensateScope)
 | activitySequence(tSequence)
 | activitySwitch(tSwitch)
 | activityIf(tIf)
@@ -432,41 +431,14 @@ tRethrow:
 
 
 /******************************************************************************
-  COMPENSATE
+  COMPENSATE / COMPENSATESCOPE                                   (WS-BPEL 2.0)
 ******************************************************************************/
 
 tCompensate:
   Compensate(standardElements integer)
+| CompensateScope(standardElements casestring integer)
   {
-    int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    bool suppressJF = false;
-
     bool inFaultHandler = true;
-
-    bool hasScopeAttribute = false;
-  }
-;
-
-
-/******************************************************************************
-  COMPENSATESCOPE                                                (WS-BPEL 2.0)
-******************************************************************************/
-
-tCompensateScope:
-  CompensateScope(standardElements integer)
-  {
-    int id;
-    stringMap attributes;
-
-    int negativeControlFlow = 0;
-    bool suppressJF = false;
-
-    bool inFaultHandler = true;
-
-    bool hasScopeAttribute = true;
   }
 ;
 
@@ -678,7 +650,6 @@ expression:
 %ctor activityThrow()			{ id = tThrow_1->id; }
 %ctor activityRethrow()			{ id = tRethrow_1->id; }
 %ctor activityCompensate()		{ id = tCompensate_1->id; }
-%ctor activityCompensateScope()		{ id = tCompensateScope_1->id; }
 %ctor activitySequence()		{ id = tSequence_1->id; }
 %ctor activitySwitch()			{ id = tSwitch_1->id; }
 %ctor activityIf()			{ id = tIf_1->id; }

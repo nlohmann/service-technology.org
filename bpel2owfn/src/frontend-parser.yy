@@ -38,7 +38,7 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/23 11:39:12 $
+ *          - last changed: \$Date: 2006/10/24 08:22:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -47,7 +47,7 @@
  * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.254 $
+ * \version \$Revision: 1.255 $
  * 
  */
 %}
@@ -163,7 +163,7 @@ unsigned int ASTEid = 1;
 %type <yt_tCatch> tCatch_opt
 %type <yt_tCatchAll> tCatchAll
 %type <yt_tCompensate> tCompensate
-%type <yt_tCompensateScope> tCompensateScope
+%type <yt_tCompensate> tCompensateScope
 %type <yt_tCompensationHandler> tCompensationHandler
 %type <yt_tCopy_list> tCopy_list
 %type <yt_tCopy> tCopy
@@ -258,28 +258,28 @@ tProcess:
 
 
 activity:
-  tReceive		{ $$ = activityReceive($1);		}
-| tReply		{ $$ = activityReply($1);		}
-| tInvoke		{ $$ = activityInvoke($1);		}
-| tAssign		{ $$ = activityAssign($1);		}
-| tValidate		{ $$ = activityValidate($1);		}
-| tEmpty		{ $$ = activityEmpty($1);		}
-| tWait			{ $$ = activityWait($1);		}
-| tTerminate		{ $$ = activityTerminate($1);		}
-| tExit			{ $$ = activityExit($1);		}
-| tThrow		{ $$ = activityThrow($1);		}
-| tRethrow		{ $$ = activityRethrow($1);		}
-| tCompensate		{ $$ = activityCompensate($1);		}
-| tCompensateScope	{ $$ = activityCompensateScope($1);	}
-| tSequence		{ $$ = activitySequence($1);		}
-| tSwitch		{ $$ = activitySwitch($1);		}
-| tIf			{ $$ = activityIf($1);			}
-| tWhile		{ $$ = activityWhile($1);		}
-| tRepeatUntil		{ $$ = activityRepeatUntil($1);		}
-| tForEach		{ $$ = activityForEach($1);		}
-| tFlow			{ $$ = activityFlow($1);		}
-| tPick			{ $$ = activityPick($1);		}
-| tScope		{ $$ = activityScope($1);		}
+  tReceive		{ $$ = activityReceive($1);	}
+| tReply		{ $$ = activityReply($1);	}
+| tInvoke		{ $$ = activityInvoke($1);	}
+| tAssign		{ $$ = activityAssign($1);	}
+| tValidate		{ $$ = activityValidate($1);	}
+| tEmpty		{ $$ = activityEmpty($1);	}
+| tWait			{ $$ = activityWait($1);	}
+| tTerminate		{ $$ = activityTerminate($1);	}
+| tExit			{ $$ = activityExit($1);	}
+| tThrow		{ $$ = activityThrow($1);	}
+| tRethrow		{ $$ = activityRethrow($1);	}
+| tCompensate		{ $$ = activityCompensate($1);	}
+| tCompensateScope	{ $$ = activityCompensate($1);	}
+| tSequence		{ $$ = activitySequence($1);	}
+| tSwitch		{ $$ = activitySwitch($1);	}
+| tIf			{ $$ = activityIf($1);		}
+| tWhile		{ $$ = activityWhile($1);	}
+| tRepeatUntil		{ $$ = activityRepeatUntil($1);	}
+| tForEach		{ $$ = activityForEach($1);	}
+| tFlow			{ $$ = activityFlow($1);	}
+| tPick			{ $$ = activityPick($1);	}
+| tScope		{ $$ = activityScope($1);	}
 ;
 
 activity_list:
@@ -831,9 +831,15 @@ tRethrow:
 
 tCompensate:
   K_COMPENSATE arbitraryAttributes X_NEXT standardElements X_SLASH K_COMPENSATE
-    { $$ = Compensate($4, $2); }
+    { if(temporaryAttributeMap[$2->value]["scope"] == "")
+        $$ = Compensate($4, $2);
+      else
+        $$ = CompensateScope($4, mkcasestring(temporaryAttributeMap[$2->value]["scope"].c_str()), $2); }
 | K_COMPENSATE arbitraryAttributes X_SLASH
-    { $$ = Compensate(NoStandardElements(), $2); }
+    { if(temporaryAttributeMap[$2->value]["scope"] == "")
+        $$ = Compensate(NoStandardElements(), $2);
+      else
+        $$ = CompensateScope(NoStandardElements(), mkcasestring(temporaryAttributeMap[$2->value]["scope"].c_str()), $2); }
 ;
 
 
@@ -843,9 +849,9 @@ tCompensate:
 
 tCompensateScope:
   K_COMPENSATESCOPE arbitraryAttributes X_NEXT standardElements X_SLASH K_COMPENSATESCOPE
-    { $$ = CompensateScope($4, $2); }
+    { $$ = CompensateScope($4, mkcasestring(temporaryAttributeMap[$2->value]["target"].c_str()), $2); }
 | K_COMPENSATESCOPE arbitraryAttributes X_SLASH
-    { $$ = CompensateScope(NoStandardElements(), $2); }
+    { $$ = CompensateScope(NoStandardElements(), mkcasestring(temporaryAttributeMap[$2->value]["target"].c_str()), $2); }
 ;
 
 

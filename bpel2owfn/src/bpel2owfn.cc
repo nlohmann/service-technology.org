@@ -27,19 +27,19 @@
  * environment.
  * 
  * \author  
- *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
+ *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
  *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/10/24 14:06:51 $
+ *          - last changed: \$Date: 2006/10/24 18:18:34 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.111 $
+ * \version \$Revision: 1.112 $
  *
  */
 

@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/10/11 18:43:07 $ by $Author: nlohmann $.
-# Version $Revision: 1.33 $
+# File last changed $Date: 2006/10/24 12:01:51 $ by $Author: nlohmann $.
+# Version $Revision: 1.34 $
 
 bin_PROGRAMS = bpel2owfn preprocess
 
@@ -28,13 +28,13 @@ bin_PROGRAMS = bpel2owfn preprocess
 KCFLAGS = --yystype --no-printdot --file-prefix=bpel-kc- --suffix=cc
 
 # generated Flex and Bison sources
-YYSOURCES = bpel-syntax.h bpel-syntax.cc bpel-lexic.cc
+YYSOURCES = parser.h parser.cc lexer.cc
 
 # everything about the Kimwitu++ sources
 KCDUMMY = bpel-kc-dummy.cc
-KCFILES = bpel-abstract.k bpel-unparse-petri.k bpel-unparse-petri2.k \
-	  bpel-unparse-xml.k bpel-unparse-cfg.k ast-printers.k \
-	  bpel-unparse-petri-small.k bpel-unparse-ast.k bpel-rewrite.k
+KCFILES = ast-grammar.k bpel-unparse-petri.k bpel-unparse-petri2.k \
+	  ast-to-xml.k ast-to-cfg.k ast-printers.k \
+	  bpel-unparse-petri-small.k ast-postprocess.k ast-rewrite.k
 KCGENERATED = bpel-kc-csgiok bpel-kc-k bpel-kc-rk bpel-kc-unpk
 KCSOURCES = $(KCFILES:.k=.cc) \
 	    $(KCFILES:.k=.h) \
@@ -49,12 +49,12 @@ KCOBJECTS = $(KCFILES:.k=.o) \
 bpel2owfn_SOURCES = $(KCDUMMY)\
 		    $(KCFILES)\
 		    $(KCSOURCES)\
-		    bpel-syntax.yy bpel-syntax.h\
-		    bpel-lexic.ll\
+		    parser.yy parser.h\
+		    lexer.ll\
 		    bpel-unparse-tools.cc bpel-unparse-tools.h\
 		    debug.cc debug.h\
 		    helpers.cc helpers.h\
-		    main.cc\
+		    bpel2owfn.cc\
 		    petrinet.h\
 		    petrinet.cc petrinet-output.cc petrinet-reduction.cc\
 		    cfg.cc cfg.h\

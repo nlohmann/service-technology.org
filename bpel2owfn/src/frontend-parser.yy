@@ -20,7 +20,7 @@
 
 %{
 /*!
- * \file bpel-syntax.cc
+ * \file parser.cc
  *
  * \brief BPEL grammar (implementation)
  *
@@ -38,16 +38,16 @@
  *          
  * \date 
  *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/24 08:22:13 $
+ *          - last changed: \$Date: 2006/10/24 12:01:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \note    This file was created using GNU Bison reading file bpel-syntax.yy.
+ * \note    This file was created using GNU Bison reading file parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.255 $
+ * \version \$Revision: 1.256 $
  * 
  */
 %}
@@ -55,10 +55,10 @@
 
 %{	
 /*!
- * \file bpel-syntax.h
+ * \file parser.h
  * \brief BPEL grammar (interface)
  *
- * See \ref bpel-syntax.cc for more information.
+ * See \ref parser.cc for more information.
  */
 %}
 
@@ -74,7 +74,7 @@
 %start tProcess
 
 
-// Bison generates a list of all used tokens in file "bpel-syntax.h" (for flex)
+// Bison generates a list of all used tokens in file "parser.h" (for flex)
 %token_table
 
 %defines

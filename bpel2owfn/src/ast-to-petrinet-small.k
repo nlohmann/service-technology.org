@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/24 12:39:17 $
+ *          - last changed: \$Date: 2006/10/24 12:57:32 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,47 +43,11 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.59 $
+ * \version \$Revision: 1.60 $
  *
  */
 %}
 
-
-%{
-/*!
- * \file bpel-unparse-petri-small.h
- * \brief Petri net unparser (interface)
- *
- * See \ref bpel-unparse-petri-small.cc for more information.
- */
-%}
-
-
-
-
-/******************************************************************************/
-
-// All the includes and variables can be used during the unparsing.
-%{ KC_UNPARSE
-#include <iostream>
-#include "petrinet.h"
-#include "options.h"
-#include "bpel-unparse-tools.h"
-#include "ast-output.h"
-#include <cmath>
-#include <cassert>
-
-using namespace std;
-
-
-/******************************************************************************
- * External variables
- *****************************************************************************/
-
-// introduced in main.cc
-extern PetriNet *TheNet;
-
-%}
 
 
 

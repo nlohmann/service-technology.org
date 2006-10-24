@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/10/23 12:04:03 $
+ *          - last changed: \$Date: 2006/10/24 12:57:32 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,46 +43,12 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.35 $
- */
-%}
-
-
-%{	
-/*!
- * \file bpel-unparse-cfg.h
- * \brief CFG unparser (interface)
- *
- * See \ref bpel-unparse-cfg.cc for more information.
+ * \version \$Revision: 1.36 $
  */
 %}
 
 
 
-/******************************************************************************/
-
-// All the includes, variables and structs defined here can be used in the
-// printers below.
-%{ KC_UNPARSE
-
-#include "cfg.h"
-#include "helpers.h"
-#include <map>
-
-
-/******************************************************************************
- * External variables
- *****************************************************************************/
-
-extern CFGBlock * TheCFG;
-
-
-
-map <std::string, CFGBlock *> cfgMap;
-
-%}
-
-/******************************************************************************/
 
 
 /******************************************************************************

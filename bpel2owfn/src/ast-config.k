@@ -19,7 +19,49 @@
 \*****************************************************************************/
 
 
-/******************************************************************************/
+
+
+
+/******************************************************************************
+  UNPARSING FEATURES
+******************************************************************************/
+
+// the unparse views
+
+%uview petrinet;
+%uview petrinetsmall;
+%uview xml;
+%uview cfg;
+%uview postprocessing;
+
+
+// the header file
+
+%{ KC_UNPARSE
+#include <iostream>
+#include <cmath>
+#include <cassert>
+
+#include "petrinet.h"
+#include "options.h"
+#include "bpel-unparse-tools.h"
+#include "ast-output.h"
+#include "cfg.h"
+#include "helpers.h"
+
+using namespace std;
+
+extern PetriNet *TheNet;   // introduced in main.c
+extern CFGBlock * TheCFG;  // introduced in cfg.cc
+
+/// prefix of the current scope (read by the stop pattern and used to direct
+/// failures to the correct fault_in place)
+string currentScope;
+
+/// \todo (gierds) comment me!
+map <std::string, CFGBlock *> cfgMap;
+%}
+
 
 // All the includes, variables and structs defined here can be used in the
 // printers below.
@@ -30,23 +72,39 @@
 %}
 
 
-%uview petrinet;
-%uview petrinetsmall;
-%uview xml;
-%uview cfg;
-%uview postprocessing;
-
-
-/*****************************************************************************/
 // the printer functions
 
 /// "fake" printer-function
-void pseudoPrinter(const char *s, uview v)
-{
-}
+void pseudoPrinter(const char *s, uview v) { }
+
 
 /// printer-function for output on stdout
 void printer(const char *s, uview v)
 {
   *output << s;
 }
+
+
+
+
+
+/******************************************************************************
+  REWRITING FEATURES
+******************************************************************************/
+
+// the rewrite views
+
+%rview implicit;
+%rview newNames;
+
+
+// the header file
+
+%{ KC_REWRITE
+#include <map>
+#include "ast-details.h"
+
+using namespace std;
+
+extern map<unsigned int, ASTE*> ASTEmap;
+%}

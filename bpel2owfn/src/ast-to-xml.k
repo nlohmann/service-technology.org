@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/10/24 12:39:17 $
+ *          - last changed: \$Date: 2006/10/24 12:57:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,34 +41,17 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.53 $
+ * \version \$Revision: 1.54 $
  */
 %}
 
 
-%{	
-/*!
- * \file bpel-unparse-xml.h
- * \brief XML unparser (interface)
- *
- * See \ref bpel-unparse-xml.cc for more information.
- */
-%}
-
-
-/******************************************************************************/
-
-// All the includes and variables can be used during the unparsing.
-%{ KC_UNPARSE
-/* These lines are from bpel-unparse-xml.k */
-#include <iostream>
-#include "bpel-unparse-tools.h"
-#include "ast-output.h"
-%}
 
 
 
-
+/******************************************************************************
+  PROCESS
+******************************************************************************/
 
 Process(a,b,c,d,e,f,g,h,i,_id) ->
   [xml: { inup(); } "<process id=\"" _id "\">\n" 

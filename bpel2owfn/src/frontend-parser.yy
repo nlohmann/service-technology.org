@@ -37,7 +37,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2006/10/25 08:22:56 $
+ * \date    \$Date: 2006/10/25 08:35:34 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -46,7 +46,7 @@
  * \note    This file was created using GNU Bison reading file parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.259 $
+ * \version \$Revision: 1.260 $
  *
  * \ingroup frontend
  */
@@ -175,7 +175,6 @@ unsigned int ASTEid = 1; ///< identifier of the next AST element
 %type <yt_tCase> tCase
 %type <yt_tCatch_list> tCatch_list
 %type <yt_tCatch> tCatch
-%type <yt_tCatch> tCatch_opt
 %type <yt_tCatchAll> tCatchAll
 %type <yt_tCompensate> tCompensate
 %type <yt_tCompensate> tCompensateScope
@@ -259,7 +258,6 @@ tProcess:
     {
       // initialisation (for multiple input files)
       yylineno = 0;
-//      ASTEid = 1;
       currentJoinCondition = standardJoinCondition();
       temporaryAttributeMap.clear();
     }
@@ -424,13 +422,6 @@ tCatch_list:
 tCatch:
   K_CATCH arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CATCH
     { $$ = Catch($4, $2); }
-;
-
-tCatch_opt: /* for <invoke> */
-  /* empty */
-    { $$ = NoCatch(); }
-| tCatch
-    { $$ = $1; }
 ;
 
 tCatchAll:
@@ -679,9 +670,10 @@ tReply:
 tInvoke:
   K_INVOKE arbitraryAttributes X_SLASH
     { $$ = Invoke(NoStandardElements(), NiltCorrelation_list(), $2); }
-| K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations tCatch_opt
-  tCatchAll tCompensationHandler tToParts tFromParts X_SLASH K_INVOKE
+| K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations tCatch tCatchAll tCompensationHandler tToParts tFromParts X_SLASH K_INVOKE
     { $$ = annotatedInvoke($4, $5, $6, $7, $8, $2); }
+| K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations tCatchAll tCompensationHandler tToParts tFromParts X_SLASH K_INVOKE
+    { $$ = annotatedInvoke($4, $5, NoCatch(), $6, $7, $2); }
 ;
 
 

@@ -32,7 +32,7 @@ ast-system-rk.h
 ast-system-unpk.cc
 ast-system-unpk.h
 ast-system-yystype.h
-bpel-lexic.cc
+lexer.cc
 parser.cc
 parser.h
 preprocess.exe

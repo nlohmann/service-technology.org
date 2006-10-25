@@ -20,25 +20,24 @@
 
 %{
 /*!
- * \file parser.cc
+ * \file    parser.cc
  *
- * \brief BPEL grammar (implementation)
+ * \brief   BPEL parser
  *
  * This file defines and implements the grammar of BPEL using standard 
  * BNF-rules to describe the originally XML-based syntax as it is specified in
  * the BPEL4WS 1.1 specification. All terminals are passed from the lexer
- * (implemented in \ref bpel-lexic.cc). Besides simple syntax-checking the
+ * (implemented in \ref lexer.cc). Besides simple syntax-checking the
  * grammar is used to build the abstract syntax tree as it is defined in
- * bpel-abstract.k and implemented in \ref bpel-abstract.cc and
- * \ref bpel-abstract.h.
+ * ast-grammar.k and implemented in \ref ast-grammar.cc and
+ * \ref ast-grammar.h.
  * 
- * \author  
- *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
- *          
- * \date 
- *          - created: 2005/11/10
- *          - last changed: \$Date: 2006/10/24 13:47:32 $
+ * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $
+ *
+ * \since   2005/11/10
+ *
+ * \date    \$Date: 2006/10/25 08:22:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -47,8 +46,9 @@
  * \note    This file was created using GNU Bison reading file parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.258 $
- * 
+ * \version \$Revision: 1.259 $
+ *
+ * \ingroup frontend
  */
 %}
 
@@ -56,9 +56,28 @@
 %{	
 /*!
  * \file parser.h
- * \brief BPEL grammar (interface)
+ * \brief BPEL parser
  *
  * See \ref parser.cc for more information.
+ * \ingroup frontend
+ */
+
+/*!
+ * \fn yyparse
+ * \brief parse the input file
+ *
+ * \note C LALR(1) parser skeleton written by Richard Stallman, by simplifying
+ *       the original so-called "semantic" parser.
+ *
+ * \return 0 if no parse error occurs
+ * \return 1 if any error occurs
+ * \ingroup frontend
+ */
+
+/*!
+ * \enum yytokentype
+ * \brief list of possible tokens
+ * \ingroup frontend
  */
 %}
 
@@ -116,13 +135,10 @@ using namespace std;
  * External variables
  *****************************************************************************/
 
-// from flex
-extern char *yytext;
-extern int yylex();
-extern int yylineno;
-
-// defined in "debug.h"
-extern int yyerror(const char *);
+extern char *yytext;			// from flex
+extern int yylex();			// from flex
+extern int yylineno;			// from flex
+extern int yyerror(const char *);	// from Bison
 
 
 
@@ -141,7 +157,7 @@ impl_joinCondition* currentJoinCondition = standardJoinCondition();
 // Niels' stuff
 map<unsigned int, ASTE*> ASTEmap; ///< the map of all AST elements
 map<unsigned int, map<string, string> > temporaryAttributeMap; ///< a temporary mapping of attributs
-unsigned int ASTEid = 1;
+unsigned int ASTEid = 1; ///< identifier of the next AST element
 
 %}
 
@@ -243,7 +259,7 @@ tProcess:
     {
       // initialisation (for multiple input files)
       yylineno = 0;
-      ASTEid = 1;
+//      ASTEid = 1;
       currentJoinCondition = standardJoinCondition();
       temporaryAttributeMap.clear();
     }

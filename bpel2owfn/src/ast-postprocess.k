@@ -20,15 +20,14 @@
 
 %{
 /*!
- * \file bpel-unparse-ast.cc
+ * \file    ast-postprocess.cc
  *
- * \author  
- *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
- *          
- * \date    
- *          - created: 2006-07-02
- *          - last changed: \$Date: 2006/10/24 13:47:31 $
+ * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $
+ * 
+ * \since   2006-07-02
+ *
+ * \date    \$Date: 2006/10/25 10:11:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -37,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.61 $
+ * \version \$Revision: 1.62 $
  */
 %}
 
@@ -339,7 +338,7 @@ TerminationHandler(a,_id) ->
       // also mark the activities as "inside compensation handlers"
       assert(ASTEmap[a->id] != NULL);
       ASTEmap[a->id]->parentActivityId = myid;
-      ASTEmap[a->id]->controlFlow = CHCF; //TODO: introduce a new value
+      ASTEmap[a->id]->controlFlow = THCF;
     }
     a
   ]

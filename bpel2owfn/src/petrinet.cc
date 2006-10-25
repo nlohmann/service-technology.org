@@ -28,13 +28,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/10/25 06:53:38 $
+ * \date    \$Date: 2006/10/25 10:11:22 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.144 $
+ * \version \$Revision: 1.145 $
  *
  * \ingroup petrinet
  */
@@ -758,6 +758,22 @@ Place *PetriNet::findPlace(kc::impl_activity *activity, string role)
  * \return a pointer to the place or a NULL pointer if the place was not found.
  */
 Place *PetriNet::findPlace(int id, string role)
+{
+  return findPlace(toString(id) + role);
+}
+
+
+
+
+
+/*!
+ * Finds a place of the Petri net given an id and a role.
+ *
+ * \param  id an identifier
+ * \param  role the demanded role
+ * \return a pointer to the place or a NULL pointer if the place was not found.
+ */
+Place *PetriNet::findPlace(kc::integer id, string role)
 {
   return findPlace(toString(id) + role);
 }

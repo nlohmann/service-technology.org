@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/24 12:57:32 $
+ *          - last changed: \$Date: 2006/10/25 10:11:21 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.60 $
+ * \version \$Revision: 1.61 $
  *
  */
 %}
@@ -62,13 +62,13 @@
  * handler are merged.
  */
 
-This=Process(a,b,c,d,e,f,g,h,i,_id) ->
+Process(a,b,c,d,e,f,g,h,i,_id) ->
   [petrinetsmall:
     {
       trace(TRACE_INFORMATION, "Generating Petri net...\n");
-      header(This->id, true);
+      header(_id, true);
 
-      string prefix = toString(This->id) + ".internal.";
+      string prefix = toString(_id) + ".internal.";
       currentScope = prefix;
 
 
@@ -137,7 +137,7 @@ This=Process(a,b,c,d,e,f,g,h,i,_id) ->
 	TheNet->mergePlaces(TheNet->findPlace("1.internal.final"), TheNet->findPlace(i, ".final"));
       }
 
-      footer(This->id, true);
+      footer(_id, true);
       trace(TRACE_INFORMATION, "Generating Petri net complete.\n");
     }
   ]
@@ -160,7 +160,7 @@ This=Process(a,b,c,d,e,f,g,h,i,_id) ->
  * name in Fig. 29 and in Fig. 30) are mentioned in a comment.
  */
 
-This=userDefinedEventHandler(a,b,_id) ->
+userDefinedEventHandler(a,b,_id) ->
   [petrinetsmall:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<eventHandler scope=\"" + currentScope + "\">\n");
@@ -201,11 +201,11 @@ This=userDefinedEventHandler(a,b,_id) ->
   EMPTY
 ******************************************************************************/
 
-This=Empty(a,b) ->
+Empty(a,_id) ->
   [petrinetsmall:
     {
-      string prefix = toString(This->id) + ".internal.";
-      header(This->id);
+      header(_id);
+      string prefix = toString(_id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -216,7 +216,7 @@ This=Empty(a,b) ->
     }
     a // standardElements
     {
-      footer(This->id);
+      footer(_id);
     }
   ]
 ;
@@ -229,11 +229,11 @@ This=Empty(a,b) ->
   INVOKE
 ******************************************************************************/
 
-This=AsynchronousInvoke(a,b,_id) -> //provided (!This->isSynchronousInvoke) ->
+AsynchronousInvoke(a,b,_id) ->
   [petrinetsmall:
     {
-      string prefix = toString(This->id) + ".internal.";
-      header(This->id);
+      header(_id);
+      string prefix = toString(_id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -250,17 +250,17 @@ This=AsynchronousInvoke(a,b,_id) -> //provided (!This->isSynchronousInvoke) ->
     }
     a // standardElements
     {
-      footer(This->id);
+      footer(_id);
     }
   ]
 ;
 
 
-This=SynchronousInvoke(a,b,_id) -> //provided (This->isSynchronousInvoke) ->
+SynchronousInvoke(a,b,_id) ->
   [petrinetsmall:
     {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
+      header(_id);
+      string prefix = toString(_id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -287,7 +287,7 @@ This=SynchronousInvoke(a,b,_id) -> //provided (This->isSynchronousInvoke) ->
     }
     a // standardElements
     {
-      footer(This->id);
+      footer(_id);
     }
   ]
 ;
@@ -300,11 +300,11 @@ This=SynchronousInvoke(a,b,_id) -> //provided (This->isSynchronousInvoke) ->
   RECEIVE
 ******************************************************************************/
 
-This=Receive(a,b,_id) ->
+Receive(a,b,_id) ->
   [petrinetsmall:
     {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
+      header(_id);
+      string prefix = toString(_id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -320,7 +320,7 @@ This=Receive(a,b,_id) ->
     }
     a // standardElements
     {
-      footer(This->id);
+      footer(_id);
     }
   ]
 ;
@@ -333,11 +333,11 @@ This=Receive(a,b,_id) ->
   REPLY
 ******************************************************************************/
 
-This=Reply(a,b,_id) ->
+Reply(a,b,_id) ->
   [petrinetsmall:
     {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
+      header(_id);
+      string prefix = toString(_id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -353,7 +353,7 @@ This=Reply(a,b,_id) ->
     }
     a // standardElements
     {
-      footer(This->id);
+      footer(_id);
     }
   ]
 ;
@@ -366,11 +366,11 @@ This=Reply(a,b,_id) ->
   ASSIGN
 ******************************************************************************/
 
-This=Assign(a,b,c) ->
+Assign(a,b,_id) ->
   [petrinetsmall:
     {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
+      header(_id);
+      string prefix = toString(_id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -382,7 +382,7 @@ This=Assign(a,b,c) ->
     }
     a // standardElements
     {
-      footer(This->id);
+      footer(_id);
     }
   ]
 ;
@@ -395,11 +395,11 @@ This=Assign(a,b,c) ->
   VALIDATE                                                       (WS-BPEL 2.0)
 ******************************************************************************/
 
-This=Validate(a,b) ->
+Validate(a,_id) ->
   [petrinetsmall:
     {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
+      header(_id);
+      string prefix = toString(_id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -411,7 +411,7 @@ This=Validate(a,b) ->
     }
     a // standardElements
     {
-      footer(This->id);
+      footer(_id);
     }
   ]
 ;
@@ -424,11 +424,11 @@ This=Validate(a,b) ->
   WAIT
 ******************************************************************************/
 
-This=WaitUntil(a,b) -> // provided (!This->isWaitFor) ->
+WaitUntil(a,_id) ->
   [petrinetsmall:
     {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
+      header(_id);
+      string prefix = toString(_id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -439,7 +439,7 @@ This=WaitUntil(a,b) -> // provided (!This->isWaitFor) ->
     }
     a // standardElements
     {
-      footer(This->id);
+      footer(_id);
     }
   ]
 ;
@@ -448,11 +448,11 @@ This=WaitUntil(a,b) -> // provided (!This->isWaitFor) ->
 
 
 
-This=WaitFor(a,b) -> // provided (This->isWaitFor) ->
+WaitFor(a,_id) ->
   [petrinetsmall:
     {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
+      header(_id);
+      string prefix = toString(_id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
@@ -463,7 +463,7 @@ This=WaitFor(a,b) -> // provided (This->isWaitFor) ->
     }
     a // standardElements
     {
-      footer(This->id);
+      footer(_id);
     }
   ]
 ;
@@ -476,11 +476,11 @@ This=WaitFor(a,b) -> // provided (This->isWaitFor) ->
   THROW
 ******************************************************************************/
 
-This=Throw(a,b) ->
+Throw(a,_id) ->
   [petrinetsmall:
     {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
+      header(_id);
+      string prefix = toString(_id) + ".internal.";
 
       cerr << "the <throw> activity cannot be modelled!" << endl;
 
@@ -493,7 +493,7 @@ This=Throw(a,b) ->
     }
     a // standardElements
     {
-      footer(This->id);
+      footer(_id);
     }
   ]
 ;
@@ -506,11 +506,11 @@ This=Throw(a,b) ->
   COMPENSATE
 ******************************************************************************/
 
-This=Compensate(a,b) ->
+Compensate(a,_id) ->
   [petrinetsmall:
     {
-      string prefix = toString(This->id) + ".internal.";
-      header(This->id);
+      header(_id);
+      string prefix = toString(_id) + ".internal.";
 
       cerr << "the <compensate> activity cannot be modelled!" << endl;
 
@@ -523,7 +523,7 @@ This=Compensate(a,b) ->
     }
     a // standardElements
     {
-      footer(This->id);
+      footer(_id);
     }
   ]
 ;
@@ -536,11 +536,11 @@ This=Compensate(a,b) ->
   TERMINATE                                                      (BPEL4WS 1.1)
 ******************************************************************************/
 
-This=Terminate(a,b) ->
+Terminate(a,_id) ->
   [petrinetsmall:
     {
-      string prefix = toString(This->id) + ".internal.";
-      header(This->id);
+      header(_id);
+      string prefix = toString(_id) + ".internal.";
 
       cerr << "the <terminate> activity cannot be modelled!" << endl;
 
@@ -553,7 +553,7 @@ This=Terminate(a,b) ->
     }
     a // standardElements
     {
-      footer(This->id);
+      footer(_id);
     }
   ]
 ;
@@ -566,11 +566,11 @@ This=Terminate(a,b) ->
   EXIT                                                           (WS-BPEL 2.0)
 ******************************************************************************/
 
-This=Exit(a,b) ->
+Exit(a,_id) ->
   [petrinetsmall:
     {
-      string prefix = toString(This->id) + ".internal.";
-      header(This->id);
+      header(_id);
+      string prefix = toString(_id) + ".internal.";
 
       cerr << "the <exit> activity cannot be modelled!" << endl;
 
@@ -583,7 +583,7 @@ This=Exit(a,b) ->
     }
     a // standardElements
     {
-      footer(This->id);
+      footer(_id);
     }
   ]
 ;
@@ -596,11 +596,11 @@ This=Exit(a,b) ->
   FLOW
 ******************************************************************************/
 
-This=Flow(a,b,c,d) ->
+Flow(a,b,c,_id) ->
   [petrinetsmall:
     {
-      header(This->id, true);
-      string prefix = toString(This->id) + ".internal.";
+      header(_id, true);
+      string prefix = toString(_id) + ".internal.";
 
       Place *p1  = TheNet->newPlace(prefix + "initial");
       Place *p2  = TheNet->newPlace(prefix + "final");
@@ -619,7 +619,7 @@ This=Flow(a,b,c,d) ->
 	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
 	TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t2);
       }
-      footer(This->id, true);
+      footer(_id, true);
     }
   ]
 ;
@@ -632,11 +632,11 @@ This=Flow(a,b,c,d) ->
   SWITCH                                                         (BPEL4WS 1.1)
 ******************************************************************************/
 
-This=Switch(a,b,otherwiseBranch=Otherwise(c,d),e) ->
+Switch(a,b,otherwiseBranch=Otherwise(c,d),_id) ->
   [petrinetsmall:
     {
-      header(This->id, true);
-      string prefix = toString(This->id) + ".internal.";
+      header(_id, true);
+      string prefix = toString(_id) + ".internal.";
 
       Place *p1 =  TheNet->newPlace(prefix + "final");
       Place *p2 =  TheNet->newPlace(prefix + "initial");
@@ -646,25 +646,25 @@ This=Switch(a,b,otherwiseBranch=Otherwise(c,d),e) ->
     c // otherwise branch
     {
       int currentCase = 1;
-      foreach (caseBranch=Case(innerActivity); tCase_list b)
+      foreach (caseBranch=Case(innerActivity,_id2); tCase_list b)
       {
 	string caseNumber = toString(currentCase++);
 	Transition* t1 = TheNet->newTransition(prefix + "case" + caseNumber);
-	TheNet->newArc(TheNet->findPlace(This->id, ".internal.initial"), t1); // added ".internal" here
+	TheNet->newArc(TheNet->findPlace(_id, ".internal.initial"), t1); // added ".internal" here
 
 	// Embed the inner activity.
 	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
-	TheNet->mergePlaces(This->id, ".internal.final", innerActivity->id, ".final");
+	TheNet->mergePlaces(_id->value, ".internal.final", _id2->value, ".final");
       }
 
 
       // The <otherwise> branch.
       Transition *t1 = TheNet->newTransition(prefix + "caseo");
-      TheNet->newArc(TheNet->findPlace(This->id, ".internal.initial"), t1); // added ".internal" here
+      TheNet->newArc(TheNet->findPlace(_id, ".internal.initial"), t1); // added ".internal" here
 
       // embed inner activity
       TheNet->newArc(t1, TheNet->findPlace(c, ".initial"));
-      TheNet->mergePlaces(This->id, ".internal.final", c->id, ".final");
+      TheNet->mergePlaces(_id->value, ".internal.final", d->value, ".final");
 
 
       // Create the arcs for the Dead Path elimination: each chosen activity
@@ -683,7 +683,7 @@ This=Switch(a,b,otherwiseBranch=Otherwise(c,d),e) ->
   	currentCase++;
       }
 
-      footer(This->id, true);
+      footer(_id, true);
     }
   ]
 ;
@@ -696,11 +696,11 @@ This=Switch(a,b,otherwiseBranch=Otherwise(c,d),e) ->
   IF                                                             (WS-BPEL 2.0)
 ******************************************************************************/
 
-This=If(a,b,c,_id) ->
+If(a,b,c,_id) ->
   [petrinetsmall:
     {
-      header(This->id, true);
-      string prefix = toString(This->id) + ".internal.";
+      header(_id, true);
+      string prefix = toString(_id) + ".internal.";
 
       Place *p1 =  TheNet->newPlace(prefix + "initial");
       Place *p2 =  TheNet->newPlace(prefix + "final");
@@ -714,16 +714,16 @@ This=If(a,b,c,_id) ->
       {
 	string caseNumber = toString(currentCase++);
 	Transition* t1 = TheNet->newTransition(prefix + "case" + caseNumber);
-	TheNet->newArc(TheNet->findPlace(This->id, ".internal.initial"), t1); // added ".internal" here
+	TheNet->newArc(TheNet->findPlace(_id, ".internal.initial"), t1); // added ".internal" here
 
 	// Embed the inner activity.
 	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
-	TheNet->mergePlaces(This->id, ".internal.final", innerActivity->id, ".final");
+	TheNet->mergePlaces(_id->value, ".internal.final", _id2->value, ".final");
       }
 
       // The <else> branch.
       Transition *t1 = TheNet->newTransition(prefix + "caseo");
-      TheNet->newArc(TheNet->findPlace(This->id, ".internal.initial"), t1); // added ".internal" here
+      TheNet->newArc(TheNet->findPlace(_id, ".internal.initial"), t1); // added ".internal" here
 
       with (c)
       {
@@ -731,11 +731,11 @@ This=If(a,b,c,_id) ->
         {
           // embed inner activity
           TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
-          TheNet->mergePlaces(This->id, ".internal.final", innerActivity->id, ".final");
+          TheNet->mergePlaces(_id->value, ".internal.final", _id2->value, ".final");
         }
         c=NoElse(_id2):
         {
-          TheNet->newArc(t1, TheNet->findPlace(This->id, ".internal.final"));
+          TheNet->newArc(t1, TheNet->findPlace(_id, ".internal.final"));
         }
         default: { /* do nothing */ }
       }
@@ -766,7 +766,7 @@ This=If(a,b,c,_id) ->
   	currentCase++;
       }
 
-      footer(This->id, true);
+      footer(_id, true);
     }
   ]
 ;
@@ -779,11 +779,11 @@ This=If(a,b,c,_id) ->
   WHILE
 ******************************************************************************/
 
-This=While(a,b,c) ->
+While(a,b,_id) ->
   [petrinetsmall:
     {
-      header(This->id, true);
-      string prefix = toString(This->id) + ".internal.";
+      header(_id, true);
+      string prefix = toString(_id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
@@ -806,10 +806,10 @@ This=While(a,b,c) ->
     b // innerActivity
     {
       // Embed the inner activity.
-      TheNet->mergePlaces(This->id, ".internal.running", b->id, ".initial");
-      TheNet->mergePlaces(This->id, ".internal.done", b->id, ".final");
+      TheNet->mergePlaces(_id->value, ".internal.running", b->id, ".initial");
+      TheNet->mergePlaces(_id->value, ".internal.done", b->id, ".final");
 
-      footer(This->id, true);
+      footer(_id, true);
     }
   ]
 ;
@@ -822,11 +822,11 @@ This=While(a,b,c) ->
   REPEAT UNTIL                                                   (WS-BPEL 2.0)
 ******************************************************************************/
 
-This=RepeatUntil(a,b,_id) ->
+RepeatUntil(a,b,_id) ->
   [petrinetsmall:
     {
-      header(This->id, true);
-      string prefix = toString(This->id) + ".internal.";
+      header(_id, true);
+      string prefix = toString(_id) + ".internal.";
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "p2");
@@ -844,10 +844,10 @@ This=RepeatUntil(a,b,_id) ->
     b // innerActivity
     {
       // Embed the inner activity.
-      TheNet->mergePlaces(This->id, ".internal.initial", b->id, ".initial");
-      TheNet->mergePlaces(This->id, ".internal.p2", b->id, ".final");
+      TheNet->mergePlaces(_id->value, ".internal.initial", b->id, ".initial");
+      TheNet->mergePlaces(_id->value, ".internal.p2", b->id, ".final");
 
-      footer(This->id, true);
+      footer(_id, true);
     }
   ]
 ;

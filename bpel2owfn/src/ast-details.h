@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/10/25 06:53:37 $
+ * \date    \$Date: 2006/10/25 10:11:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  */
 
 
@@ -67,11 +67,15 @@ using namespace std;
  * Data structures
  *****************************************************************************/
 
+/*!
+ * \brief enumeration of possible types of control flow
+ */
 typedef enum
 {
   POSITIVECF = 0,	///< positive control flow
   FHCF = 1,		///< control flow in fault handler
-  CHCF = 2		///< control flow in compensation handler
+  CHCF = 2,		///< control flow in compensation handler
+  THCF = 3		///< control flow in termination handler
 } controlFlowType;
 
 
@@ -82,67 +86,48 @@ typedef enum
  * Class definitions
  *****************************************************************************/
 
+/*!
+ * \brief AST extensions
+ */
 class ASTE
 {
   private:
-    /// the id of the AST extension
-    unsigned int id;
-
-    /// the type of the node, identified by the keywords as parsed by Flex
-    int type;
+    unsigned int id;	///< the id of the AST phylum
+    unsigned int type;	///< the type of the node, identified by the keywords as parsed by Flex
 
   public:
-    /// the parsed attributes
-    map<string, string> attributes;
+    map<string, string> attributes;	///< the parsed attributes
+    set<int> enclosedSourceLinks;	///< the identifiers of all (recursively) enclosed source links
+    set<int> enclosedScopes;		///< the identifiers of all (direct!) enclosed scopes
 
-    /// the identifiers of all (recursively) enclosed source links
-    set<int> enclosedSourceLinks;
+    unsigned int parentScopeId;		///< the identifier of the parent scope
+    unsigned int parentActivityId;	///< the identifier of the parent activity
+    
+    controlFlowType controlFlow;	///< the kind of control flow the activity is embedded in
 
-    /// the identifiers of all (direct) enclosed scopes (only relevant for <scope> and <process>)
-    set<int> enclosedScopes;
+    string channelName;		///< name of a channel
+    string variableName;	///< name of a variable
+    string inputVariableName;	///< name of an input variable
+    string outputVariableName;	///< name of an output variable
+    string linkName;		///< name of a link
 
-    /// the identifier of the parent scope
-    unsigned int parentScopeId;
-
-    /// the identifier of the parent activity
-    unsigned int parentActivityId;
-
-    /// true if join failures are suppressed
-    bool suppressJF;
-
-    /// the kind of control flow the activity is embedded in
-    controlFlowType controlFlow;
-
-    /// true if activity is embedded in a while activity
-    bool inWhile;
+    bool hasEH;		///< true if process or scope has an event handler
+    bool hasCatchAll;	///< true if fault handler has a catchAll branch
+    bool inProcess;	///< true if compensation handler is embedded to a process
+    bool inWhile;	///< true if activity is embedded in a while, repeatUntil activity or in onEvent
+    bool suppressJF;	///< true if join failures are suppressed
 
     ASTE(int myid, int mytype);
 
     map<string, string> getAttributes();
     string createChannel(bool synchronousCommunication = false);
 
-    /// checks a variable and returns its name
     string checkVariable();
-    /// checks a variable and returns its name
     string checkInputVariable();
-    /// checks a variable and returns its name
     string checkOutputVariable();
 
-    /// defines a variable
     void defineVariable();
-
-    /// returns the name of an activity type
     string activityTypeName();
-
-    string channelName;
-    string variableName;
-    string inputVariableName;
-    string outputVariableName;
-    string linkName;
-
-    bool hasEH;
-    bool hasCatchAll;
-    bool inProcess;
 };
 
 

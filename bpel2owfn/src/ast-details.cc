@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/10/25 06:53:37 $
+ * \date    \$Date: 2006/10/25 10:11:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.28 $
+ * \version \$Revision: 1.29 $
  */
 
 
@@ -88,15 +88,15 @@ ASTE::ASTE(int myid, int mytype)
 {
   assert(myid != 0);
 
-  // initialize values
   id = myid;
   type = mytype;
   attributes = temporaryAttributeMap[id];
-  suppressJF = false; // required initialization!
-  inWhile = false; // required initialization!
-  controlFlow = POSITIVECF;
 
+  suppressJF = false;	// required initialization!
+  inWhile = false;	// required initialization!
   inProcess = false;
+
+  controlFlow = POSITIVECF;
 }
 
 
@@ -110,6 +110,7 @@ ASTE::ASTE(int myid, int mytype)
  */
 map<string, string> ASTE::getAttributes()
 {
+  // checks attributes...
   switch (type)
   {
     case(K_PROCESS):
@@ -177,6 +178,8 @@ string ASTE::createChannel(bool synchronousCommunication)
 
 
 /*!
+ * \brief checks a variable and returns its name
+ *
  * Checks whether a given variable was defined before and returns the name of
  * the variable.
  *
@@ -194,6 +197,18 @@ string ASTE::checkVariable()
   return variableName;
 }
 
+
+
+
+
+/*!
+ * \brief checks a variable and returns its name
+ *
+ * Checks whether a given input variable was defined before and returns the
+ * name of the variable.
+ *
+ * \return name of the variable
+ */
 string ASTE::checkInputVariable()
 {
   string variableName = attributes["inputVariable"];
@@ -205,6 +220,18 @@ string ASTE::checkInputVariable()
   return variableName;
 }
 
+
+
+
+
+/*!
+ * \brief checks a variable and returns its name
+ *
+ * Checks whether a given output variable was defined before and returns the
+ * name of the variable.
+ *
+ * \return name of the variable
+ */
 string ASTE::checkOutputVariable()
 {
   string variableName = attributes["outputVariable"];
@@ -239,7 +266,12 @@ void ASTE::defineVariable()
 
 
 /*!
- * Returns the name of an acitivity given its keyword.
+ * \brief returns the name of an activity type
+ *
+ * Returns the name of an acitivity given using the token value passed upon
+ * construction.
+ *
+ * \returns name of the activity type
  *
  * \todo complete the list
  */

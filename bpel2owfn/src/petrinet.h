@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/10/25 06:53:38 $
+ * \date    \$Date: 2006/10/25 10:11:22 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.98 $
+ * \version \$Revision: 1.99 $
  *
  * \ingroup petrinet
  */
@@ -379,6 +379,9 @@ class PetriNet
 
     /// finds place given an id with a role
     Place* findPlace(int id, string role);
+
+    /// finds place given an id with a role
+    Place* findPlace(kc::integer id, string role);    
 
     /// finds a place given the ids of two transitions (one in the pre and one in the postset)
     Place *findPlace(unsigned int id1, unsigned int id2);

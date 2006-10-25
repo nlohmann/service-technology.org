@@ -19,25 +19,24 @@
 \*****************************************************************************/
 
 /*!
- * \file petrinet.cc
+ * \file    petrinet.cc
  *
- * \brief Functions for Petri nets(implementation)
+ * \brief   functions for Petri nets
  *
- * This file implements the classes and functions defined in petrinet.h.
+ * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $
  *
- * \author
- *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ * \since   2005-10-18
  *
- * \date
- *          - created: 2005-10-18
- *          - last changed: \$Date: 2006/10/21 10:53:51 $
+ * \date    \$Date: 2006/10/25 06:53:38 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.143 $
+ * \version \$Revision: 1.144 $
+ *
+ * \ingroup petrinet
  */
 
 
@@ -63,7 +62,8 @@
  *****************************************************************************/
 
 /*!
- * \param role a role of a node
+ * \brief  true if first role contains role
+ * \param  role a role of a node
  * \return true, if the node's first history entry contains the given role
  */
 bool Node::firstMemberAs(string role)
@@ -77,7 +77,8 @@ bool Node::firstMemberAs(string role)
 
 
 /*!
- * \param role a role of a node
+ * \brief  true if first role begins with role
+ * \param  role a role of a node
  * \return true, if the node's first history entry begins with the given role
  */
 bool Node::firstMemberIs(string role)
@@ -91,7 +92,8 @@ bool Node::firstMemberIs(string role)
 
 
 /*!
- * \param role a role of a node
+ * \brief  true if history contains role
+ * \param  role a role of a node
  * \return true, if the node's history contains the given role
  */
 bool Node::historyContains(string role)
@@ -107,6 +109,9 @@ bool Node::historyContains(string role)
 
 
 
+/*!
+ * \brief destructor
+ */
 Node::~Node()
 {
   trace(TRACE_VERY_DEBUG, "Removing node " + toString(id) + "...");

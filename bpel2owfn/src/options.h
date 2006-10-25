@@ -19,23 +19,22 @@
 \*****************************************************************************/
 
 /*!
- * \file options.h
+ * \file    options.h
  *
- * \brief 
+ * \brief   evaluation of command-line options
  *
- * \author
- *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ * \author  responsible: Christian Gierds <gierds@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $
  *
- * \date
- *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/10/24 14:06:51 $
+ * \since   2005/10/18
+ *
+ * \date    \$Date: 2006/10/25 06:53:38 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  */
 
 
@@ -56,8 +55,6 @@
 #include <map>
 #include <list>
 
-//#include "getopt.h"
-
 using namespace std;
 
 
@@ -68,7 +65,9 @@ using namespace std;
  * Data structures
  *****************************************************************************/
 
-/// Enumeration of the possible options
+/*!
+ * \brief enumeration of the possible options
+ */
 typedef enum
 {
    O_HELP,		///< show help screen
@@ -87,7 +86,9 @@ typedef enum
 
 
 
-/// Enumeration of the possible modes
+/*!
+ * \brief enumeration of the possible modes
+ */
 typedef enum
 {
   M_AST = 1,		///< abstract syntax tree
@@ -101,7 +102,9 @@ typedef enum
 
 
 
-/// Enumeration of the possible output file formats
+/*!
+ * \brief enumeration of the possible output file formats
+ */
 typedef enum
 {
   F_LOLA,		///< LoLA Petri net
@@ -119,7 +122,9 @@ typedef enum
 
 
 
-/// Enumeration of the possible parameters (mostly Petri net-related)
+/*!
+ * \brief enumeration of the possible parameters
+ */
 typedef enum
 {
   P_SIMPLIFY,		///< structural reduction rules
@@ -128,8 +133,6 @@ typedef enum
   P_NOSTANDARDFAULTS,	///< only user-defined faults can occur
   P_NOFHFAULTS,		///< activities inside the FH throw no faults
   P_COMMUNICATIONONLY,	///< creates the smallest possible net
-//  P_CYCLICWHILE,	///< use the original <while> pattern
-//  P_CYCLICEH,		///< use the original <eventHandlers> pattern
   P_TRED,		///< use transitive reduction
   P_XOR			///< use XOR as transition condition
 } possibleParameters;
@@ -139,51 +142,45 @@ typedef enum
 
 
 /******************************************************************************
+ * External functions
+ *****************************************************************************/
+
+// from options.cc
+
+extern void closeOutput(ostream *file);
+extern void parse_command_line(int argc, char* argv[]);
+extern ostream *openOutput(string name);
+
+
+
+
+
+/******************************************************************************
  * External variables
  *****************************************************************************/
 
-// some file names and pointers (in options.cc)
-extern void parse_command_line(int argc, char* argv[]);
-
-
-/// Filename of input file
-extern string filename;
-/// Filename of first input file
-extern list <string> inputfiles;
-/// Filename of input file
-extern string output_filename;
-/// Filename of log file
-extern string log_filename;
-
-/// pointer to input stream
-extern istream * input;
-/// pointer to output stream
-extern ostream * output;
-/// pointer to log stream
-extern ostream * log_output;
+// from options.cc
 
 extern bool createOutputFile;
-
-// different modes controlled by command line (in options.cc)
-
+extern string filename;
+extern list <string> inputfiles;
+extern string output_filename;
+extern string log_filename;
+extern istream *input;
+extern ostream *output;
+extern ostream *log_output;
 extern possibleModi modus;
-
 extern map<possibleOptions,    bool> options;
 extern map<possibleParameters, bool> parameters;
 extern map<possibleFormats,    bool> formats;
-// suffixes are defined in parse_command_line();
 extern map<possibleFormats,  string> suffixes;
 
-
-/* defined by Bison */
 extern int yydebug;
-
-/* defined by flex */
 extern int yy_flex_debug;
 extern FILE *yyin;
 
-// returns an open file pointer
-extern ostream * openOutput(string name);
-extern void closeOutput(ostream * file);
+
+
+
 
 #endif

@@ -19,34 +19,24 @@
 \*****************************************************************************/
 
 /*!
- * \file petrinet.h
+ * \file    petrinet.h
  *
- * \brief Functions for Petri nets (interface)
+ * \brief   functions for Petri nets
  *
- * This file contains the data structures and classes to store and organize
- * Petri nets generated from the abstract syntax tree. It contains the
- * following classes:
+ * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $
  *
- * - Node
- *   - Transition
- *   - Place
- * - Arc
- * - PetriNet
+ * \since   2005/10/18
  *
- *
- * \author
- *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
- *
- * \date
- *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/10/24 13:47:32 $
+ * \date    \$Date: 2006/10/25 06:53:38 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.97 $
+ * \version \$Revision: 1.98 $
+ *
+ * \ingroup petrinet
  */
 
 
@@ -82,7 +72,15 @@ using namespace std;
  * Data structures
  *****************************************************************************/
 
-/// Enumeration of the possible types of a place or transition.
+/*!
+ * \brief place and transition types
+ *
+ * Enumeration of the possible types of a place or transition, i.e. whether
+ * a place or transition is internal, receives a message, sends a message or
+ * both.
+ *
+ * \ingroup petrinet
+ */
 typedef enum
 {
   INTERNAL,			///< non-communicating (standard)
@@ -95,7 +93,14 @@ typedef enum
 
 
 
-/// Enumeration of the possible types of an arc.
+/*!
+ * \brief arc types
+ *
+ * Enumeration of the possible types of an arc, i.e. whether it is a standard
+ * arc or a read arc. The latter will be "unfolded" to a loop.
+ *
+ * \ingroup petrinet
+ */
 typedef enum
 {
   STANDARD,			///< standard arc
@@ -106,7 +111,14 @@ typedef enum
 
 
 
-/// Enumeration of the possible types of a node.
+/*!
+ * \brief node types
+ *
+ * Enumeration of the possible types of a node, i.e. whether it is a place or
+ * a transition.
+ *
+ * \ingroup petrinet
+ */
 typedef enum
 {
   PLACE,			///< a place
@@ -124,12 +136,13 @@ typedef enum
 /*!
  * \class Node
  *
- * \brief Nodes of the Petri net
+ * \brief unspecified Petri net nodes
  *
  * Class to represent nodes (i.e. places and transitions) of Petri nets. Each
  * node has an id and a history (i.e. the list of roles the node had during
  * the processing of a BPEL-file).
  *
+ * \ingroup petrinet
 */
 
 class Node
@@ -168,6 +181,7 @@ class Node
     /// an additional prefix for the name in order to distinguish nodes of different nets
     string prefix;
 
+    /// destructor
     virtual ~Node();
 };
 
@@ -181,11 +195,12 @@ class Node
 /*!
  * \class Transition
  *
- * \brief Transitions of the Petri net
+ * \brief transitions of the Petri net
  *
  * Class to represent transitions of Petri nets. Each transition inherits the
- * variables #id and #history.
+ * functions and variables from class #Node.
  *
+ * \ingroup petrinet
 */
 
 class Transition: public Node
@@ -217,11 +232,12 @@ class Transition: public Node
  * \brief Places of the Petri net
  *
  * Class to represent places of Petri nets. In addition to the inherited
- * variables #id and #history, each place has a type defined in the
- * enumeation #communication_type and an initial marking. As the generated net
- * and its inital marking is 1-safe, it is sufficent to represent the initial
- * marking as a Boolean value.
+ * functions and variables from class #Node, each place has a type defined in
+ * the enumeration #communication_type and an initial marking. As the
+ * generated net and its inital marking is 1-safe, it is sufficent to
+ * represent the initial marking as a Boolean value.
  *
+ * \ingroup petrinet
 */
 
 class Place: public Node
@@ -239,10 +255,10 @@ class Place: public Node
     /// the short name of the place
     string nodeShortName();
 
-    /// Mark the current place.
+    /// mark the place
     void mark();
 
-    /// the initial marking of the place
+    /// initial marking of the place
     bool marked;
 
     /// this (communication) place is embedded in a while activity
@@ -257,13 +273,14 @@ class Place: public Node
 
 
 /*!
- * \class  Arc
+ * \class Arc
  *
- * \brief Arcs of the Petri net
+ * \brief arcs of the Petri net
  *
  * Class to represent arcs of Petri nets. An arc written as a tupel (n1,n2)
  * has n1 as #source and n2 as #target.
  *
+ * \ingroup petrinet
 */
 
 class Arc
@@ -275,7 +292,7 @@ class Arc
     /// target node of the arc
     Node *target;
   
-    /// Constructor to create an arc of certain type.
+    /// constructor to create an arc
     Arc(Node *source, Node *target);
   
     /// DOT-output of the arc (used by PetriNet::dotOut())
@@ -290,7 +307,7 @@ class Arc
 
 
 /*!
- * \class  PetriNet
+ * \class PetriNet
  *
  * \brief A Petri net
  *
@@ -298,93 +315,94 @@ class Arc
  * #Place, transitions of class #Transition and arcs of class #Arc. The sets
  * are saved in three lists #P, #T and #F.
  *
+ * \ingroup petrinet
  */
 
 
 class PetriNet
 {
   public:
-    /// Adds a place with a given role and type.
+    /// adds a place with a given role and type
     Place* newPlace(string role, communication_type type = INTERNAL);
   
-    /// Adds a transition with a given role.
+    /// adds a transition with a given role
     Transition*newTransition(string role);
   
-    /// Adds an arc given source and target node, and arc type.
+    /// adds an arc given source and target node, and arc type
     Arc *newArc(Node *source, Node *target, arc_type type = STANDARD);
 
-    /// Information about the net including histories of all nodes.
+    /// information about the net including histories of all nodes
     void printInformation();
 
 
-    /// DOT (Graphviz) output.
+    /// DOT (Graphviz) output
     void dotOut();
 
-    /// PNML (Petri Net Markup Language) output.
+    /// PNML (Petri Net Markup Language) output
     void pnmlOut();
 
-    /// low-level PEP output.
+    /// low-level PEP output
     void pepOut();
 
-    /// APNN (Abstract Petri Net Notation) output.
+    /// APNN (Abstract Petri Net Notation) output
     void apnnOut();
 
-    /// LoLA-output.
+    /// LoLA-output
     void lolaOut();
 
-    /// oWFN-output.
+    /// oWFN-output
     void owfnOut();
 
 
-    /// Merges places given two places.
+    /// merges places given two places
     void mergePlaces(Place *p1, Place *p2);
 
-    /// Merges places given two roles.
+    /// merges places given two roles
     void mergePlaces(string role1, string role2);
 
-    /// Merges places given two identifiers and roles.
+    /// merges places given two identifiers and roles
     void mergePlaces(int id1, string role1, int id2, string role2);
     
-    /// Merges places given two activities with roles.
+    /// merges places given two activities with roles
     void mergePlaces(kc::impl_activity *act1, string role1,
 		     kc::impl_activity *act2, string role2);
     
-    /// Merges transitions given two transitions.
+    /// merges transitions given two transitions
     void mergeTransitions(Transition *t1, Transition *t2);
 
 
-    /// Finds place given a role.
+    /// finds place given a role
     Place* findPlace(string role);
 
-    /// Finds place given an activity with a role.
+    /// finds place given an activity with a role
     Place* findPlace(kc::impl_activity *activity, string role);
 
-    /// Finds place given an id with a role.
+    /// finds place given an id with a role
     Place* findPlace(int id, string role);
 
-    /// Finds a place given the ids of two transitions (one in the pre and one in the postset).
+    /// finds a place given the ids of two transitions (one in the pre and one in the postset)
     Place *findPlace(unsigned int id1, unsigned int id2);
 
 
-    /// Finds transition given a role.
+    /// finds transition given a role
     Transition* findTransition(string role);
 
-    /// Calculates the preset of a node.
+    /// calculates the preset of a node
     set<Node*> preset(Node *n);
 
-    /// Calculates the postset of a node.
+    /// calculates the postset of a node
     set<Node*> postset(Node *n);
 
-    /// Simplifies the Petri net.
+    /// simplifies the Petri net
     void simplify();
 
-    /// Removes all variable places.
+    /// removes all variable places
     void removeVariables();
 
-    /// Adds a prefix to the name of all nodes of the net
+    /// adds a prefix to the name of all nodes of the net
     void addPrefix(string prefix);
 
-    /// Connects a second oWFN
+    /// connects a second oWFN
     void connectNet(PetriNet *net);
 
     /// moves channel places to the list of internal places
@@ -393,30 +411,30 @@ class PetriNet
     /// re-enumerates the nodes
     void reenumerate();
 
-    /// Statistical output.
+    /// statistical output
     string information();
     
-    /// Constructor to create an empty Petri net.
+    /// constructor
     PetriNet();
 
 
   private:
-    /// Adds a place without an initial role.
+    /// adds a place without an initial role
     Place* newPlace();
 
-    /// Removes a place from the net.
+    /// removes a place from the net
     void removePlace(Place *p);
 
-    /// Adds a transition without an initial role.
+    /// adds a transition without an initial role
     Transition* newTransition();
 
-    /// Removes a transition from the net.
+    /// removes a transition from the net
     void removeTransition(Transition *t);
 
-    /// Removes an arc from the net.
+    /// removes an arc from the net
     void removeArc(Arc *f);
 
-    /// Removes all ingoing and outgoing arcs of a node.
+    /// removes all ingoing and outgoing arcs of a node
     void detachNode(Node *n);
 
 
@@ -445,39 +463,39 @@ class PetriNet
     void transitiveReduction();
 
     
-    /// Removes interface places (for non-oWFN formats)
+    /// removes interface places (for non-oWFN formats)
     void removeInterface();
   
-    /// Returns an id for new nodes.
+    /// returns an id for new nodes
     unsigned int getId();
 
-    /// Returns current id.
+    /// returns current id
     unsigned int id();
 
 
-    /// the list of places of the Petri net
+    /// set of places of the Petri net
     set<Place *> P;
 
-    /// the list of input places of the oWFN
+    /// set of input places of the oWFN
     set<Place *> P_in;
 
-    /// the list of output places of the oWFN
+    /// set of output places of the oWFN
     set<Place *> P_out;
 
-    /// the list of transitions of the Petri net
+    /// set of transitions of the Petri net
     set<Transition *> T;
 
-    /// the list of arcs of the Petri net
+    /// set of arcs of the Petri net
     set<Arc *> F;
 
 
-    /// the id that will be assigned to the next node
+    /// id that will be assigned to the next node
     unsigned int nextId;
 
     /// true if function #PetriNet::removeInterface() was called
     bool hasNoInterface;
 
-    /// Mapping of roles to nodes of the Petri net.
+    /// mapping of roles to nodes of the Petri net
     map<string, Node *> roleMap;
 };
 
@@ -486,3 +504,15 @@ class PetriNet
 
 
 #endif
+
+
+
+/**
+ * \defgroup petrinet Petri Net Base Module
+ *
+ * \author   responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *
+ * All functions needed to organize a Petri net representation that can be
+ * written to several output file formats and that supports structural
+ * reduction rules.
+ */

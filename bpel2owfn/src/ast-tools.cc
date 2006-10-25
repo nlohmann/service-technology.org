@@ -19,32 +19,32 @@
 \****************************************************************************/
 
 /*!
- * \file bpel-unparse-tools.cc
+ * \file    bpel-unparse-tools.cc
  *
- * \brief Unparse helper tools (implementation)
+ * \brief   unparse helper tools
  *
- * This file implements several helpe functions used during the unparsing
- * of the abstract syntax tree.
+ * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $
  *
- * \author
- *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ * \since   2006/02/08
  *
- * \date
- *          - created: 2006/02/08
- *          - last changed: \$Date: 2006/10/20 19:31:54 $
+ * \date    \$Date: 2006/10/25 06:53:37 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
+ *
+ * \ingroup debug
+ * \ingroup creation
  */
 
 
 
 
 #include <cmath>
+
 #include "bpel-unparse-tools.h"
 #include "options.h"
 #include "helpers.h"
@@ -90,8 +90,8 @@ unsigned int indentStep = 4;
  * Functions for the Petri net unparser defined in bpel-unparse-petri.k
  *****************************************************************************/
 
-/**
- * Generates transition and places to throw a fault.
+/*!
+ * \brief generates transition and places to throw a fault
  *
  * \param p1  the place in positive control flow from which the control flow
  *            enters the negative control flow
@@ -116,6 +116,55 @@ unsigned int indentStep = 4;
  *                               - false: these faults are suppressed
  *
  * \return a pointer to the (first) generated fault transition
+ *
+ * \post case 0 (preventFurtherFaults = false):
+ * \dot
+   digraph D
+   {
+     node [shape=circle fixedsize]
+     p1
+     p2
+     A1 [label="Active"]
+     A2 [label="!Active"]
+     fault_in
+     node [shape=box regular=true fixedsize]
+     t1 [label="t1\nthrowFault.p1name"]
+     t2 [label="t1\nignoreFault.p1name"]
+     
+     p1 -> t1
+     t1 -> p2
+     A1 -> t1
+     t1 -> A2
+     t1 -> fault_in
+
+     p1 -> t2
+     t2 -> p2
+     A2 -> t2
+     t2 -> A2
+   }
+   \enddot
+ * \post case 0 (preventFurtherFaults = true):
+ * \dot
+   digraph D
+   {
+     node [shape=circle fixedsize]
+     p1
+     p2
+     A1 [label="Active"]
+     A2 [label="!Active"]
+     fault_in
+     node [shape=box regular=true fixedsize]
+     t1 [label="t1\nthrowFault.p1name"]
+     
+     p1 -> t1
+     t1 -> p2
+     A1 -> t1
+     t1 -> A2
+     t1 -> fault_in
+   }
+   \enddot
+ * 
+ * \ingroup creation
 */
 Transition *throwFault(Place *p1, Place *p2,
     string p1name, string prefix,
@@ -204,7 +253,9 @@ Transition *throwFault(Place *p1, Place *p2,
 
 
 
-/**
+/*!
+ * \brief generates a subnet to stop
+ *
  * Generates a transition and places to stop the activity, i.e. a
  * transition moving a token on the "stop" place to "stopped".
  *
@@ -218,6 +269,26 @@ Transition *throwFault(Place *p1, Place *p2,
  * \param prefix  prefix of the pattern to label generated transition
  *
  * \return a pointer to the stop transition
+ *
+ * \post Generated Petri net
+ * \dot
+   digraph D
+   {
+     node [shape=circle fixedsize]
+     p [label="p_name"]
+     stop
+     stopped
+
+     node [shape=box regular=true fixedsize]
+     t [label="stoppedAt.p_name"]
+     
+     stop -> t
+     p -> t
+     t -> stopped
+   }
+   \enddot
+ *
+ * \ingroup creation
  */
 Transition *stop(Place *p, string p_name, string prefix)
 {
@@ -239,8 +310,9 @@ Transition *stop(Place *p, string p_name, string prefix)
 
 
 
-/**
- * Returns a string used for identation.
+/*!
+ * \brief   returns a string used for identation.
+ * \ingroup debug
  */
 string inString()
 {
@@ -256,25 +328,17 @@ string inString()
 
 
 
-/**
+/*!
+ * \brief prints name of activity that is unparsed
+ *
  * Prints a debug trace message containing the (opening) tag name of the
  * activity of the given id. If myindent is set to true, the enclosed
  * elements are indented.
- */
-void header(kc::integer id, bool myindent)
-{
-  header(id->value, myindent);
-}
-
-
-
-
-
-/**
- * Prints a debug trace message containing the (opening) tag name of the
- * activity of the given id. If myindent is set to true, the enclosed
- * elements are indented.
- */
+ *
+ * \see #footer
+ *
+ * \ingroup debug
+*/
 void header(int id, bool myindent)
 {
   trace(TRACE_DEBUG, "[PNU]" + inString() + "<" + ASTEmap[id]->activityTypeName() + " id=" + toString(id) + ">\n");
@@ -287,24 +351,31 @@ void header(int id, bool myindent)
 
 
 
-/**
- * Prints a debug trace message containing the (closing) tag name of the
- * activity of the given id. If myindent is set to true, the indentation is
- * reduced.
- */
-void footer(kc::integer id, bool myindent)
+/*!
+ * \brief prints name of activity that is unparsed
+ * \overload
+ * \see header(int id, bool myindent)
+ * \ingroup debug
+*/
+void header(kc::integer id, bool myindent)
 {
-  footer(id->value, myindent);
+  header(id->value, myindent);
 }
 
 
 
 
 
-/**
+/*!
+ * \brief prints name of activity that is unparsed
+ *
  * Prints a debug trace message containing the (closing) tag name of the
  * activity of the given id. If myindent is set to true, the indentation is
  * reduced.
+ *
+ * \see #header
+
+ * \ingroup debug
  */
 void footer(int id, bool myindent)
 {
@@ -318,8 +389,46 @@ void footer(int id, bool myindent)
 
 
 
-/**
+/*!
+ * \brief prints name of activity that is unparsed
+ * \overload
+ * \see footer(int id, bool myindent)
+ * \ingroup debug
+ */
+void footer(kc::integer id, bool myindent)
+{
+  footer(id->value, myindent);
+}
+
+
+
+
+
+/*!
+ * \brief add a subnet for dead-path elimination
+ *
  * Creates arcs to set links on dead paths to false.
+ *
+ * \param t	transition that invokes DPE
+ * \param id	the identifier of the AST node
+ *
+ * \post
+ * \dot
+   digraph D
+   {
+     node [shape=circle fixedsize]
+     link1 [label="!link1"]
+     link2 [label="!link2"]
+
+     node [shape=box regular=true fixedsize]
+     t
+     
+     t -> link1
+     t -> link2
+   }
+   \enddot
+
+ * \ingroup creation
  */
 void dpeLinks(Transition *t, int id)
 {
@@ -344,7 +453,11 @@ void dpeLinks(Transition *t, int id)
  * Functions for the XML (pretty) unparser defined in bpel-unparse-xml.k
  *****************************************************************************/
 
-/// Adds whitespace to indent output
+/*!
+ * \brief adds whitespace to indent output
+ * \see #inup #indown
+ * \ingroup debug
+ */
 void in()
 {
   for(unsigned int i=0; i<indent; i++)
@@ -355,7 +468,11 @@ void in()
 
 
 
-/// Increases indention
+/*!
+ * \brief increases indention#
+ * \see #indown #in
+ * \ingroup debug
+ */
 void inup()
 {
   in();
@@ -366,7 +483,11 @@ void inup()
 
 
 
-/// Decreases indention
+/*!
+ * \brief decreases indention
+ * \see #inup #in
+ * \ingroup debug
+ */
 void indown()
 {
   indent -= indentStep;

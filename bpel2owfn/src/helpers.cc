@@ -19,26 +19,25 @@
 \****************************************************************************/
 
 /*!
- * \file helpers.cc
+ * \file    helpers.cc
  *
- * \brief Helper functions (implementation)
+ * \brief   helper functions
  *
- * This file implements several small helper functions that do not belong to
- * any other file.
+ * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $
  * 
- * \author  
- *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
- *          
- * \date
- *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/10/19 20:16:18 $
+ * \since   2005/11/11
+ *
+ * \date    \$Date: 2006/10/25 06:53:38 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.56 $
+ * \version \$Revision: 1.57 $
+ *
+ * \ingroup conversion
+ * \ingroup debug
  */
 
 
@@ -68,8 +67,8 @@ using namespace std;
  * External variables
  *****************************************************************************/
 
-/// The Petri Net
-extern PetriNet *TheNet;
+// The Petri Net
+extern PetriNet *TheNet;	// defined in bpel2owfn.cc
 
 
 
@@ -80,8 +79,14 @@ extern PetriNet *TheNet;
  *****************************************************************************/
 
 /*!
+ * \brief converts integer to string
+ *
+ * Converts a Kimwitu++ kc::integer to a C++ string.
+ *
  * \param i Kimwitu++ integer
  * \return  C++ string representing i
+ *
+ * \ingroup conversion
  */
 string toString(kc::integer i)
 {
@@ -93,8 +98,14 @@ string toString(kc::integer i)
 
 
 /*!
+ * \brief converts int to string
+ *
+ * Converts a C++ int to a C++ string.
+ *
  * \param i standard C int
  * \return  C++ string representing i
+ *
+ * \ingroup conversion
  */
 string toString(int i)
 {
@@ -109,8 +120,14 @@ string toString(int i)
 
 
 /*!
+ * \brief converts string to int
+ *
+ * Converts a C++ int to a C++ int.
+ *
  * \param s C++ string
  * \return integer representing s
+ *
+ * \ingroup conversion
  */
 int toInt(string s)
 {
@@ -130,31 +147,47 @@ int toInt(string s)
  * Error handling functions
  *****************************************************************************/
 
-/**
+/*!
+ * \brief calls #cleanup() then exits
+ *
  * Some output in case an error has occured.
+ *
+ * \post all goals from #cleanup
+ * \post programm terminated
+ *
+ * \ingroup debug
  */
 void error()
 {
   trace("\nAn error has occured while parsing \"" + filename + "\"!\n\n");
   trace(TRACE_WARNINGS, "-> Any output file might be in an undefinded state.\n");
-  // call #cleanup()
+
   cleanup();
+
   if (log_filename != "")
   {
     trace("\nProgramme aborted due to error.\n\n");
     trace("Please check logfile for detailed information!\n\n");
   }
-  exit(1);
 
+  exit(1);
 }
 
 
 
 
 
-/**
- * Cleans up.
- * Afterwards we should have an almost defined state.
+/*!
+ * \brief closes all open files and delete all pointers
+ *
+ * Cleans up. Afterwards we should have an almost defined state.
+ *
+ * \post input file closed
+ * \post current output file closed
+ * \post log file closed
+ * \post Petri net (pointer #TheNet) deleted
+ *
+ * \ingroup debug
  */
 void cleanup()
 {

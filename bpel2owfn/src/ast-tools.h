@@ -19,26 +19,25 @@
 \****************************************************************************/
 
 /*!
- * \file bpel-unparse-tools.h
+ * \file    bpel-unparse-tools.h
  *
- * \brief Unparse helper tools (interface)
+ * \brief   unparse helper tools
  *
- * This file defines several helpe functions used during the unparsing
- * of the abstract syntax tree.
+ * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $
  *
- * \author
- *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ * \since   2006/02/08
  *
- * \date
- *          - created: 2006/02/08
- *          - last changed: \$Date: 2006/10/19 20:16:18 $
+ * \date    \$Date: 2006/10/25 06:53:37 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
+ *
+ * \ingroup debug
+ * \ingroup creation
  */
 
 
@@ -71,23 +70,16 @@ using namespace std;
  * Functions for the Petri net unparser defined in bpel-unparse-petri.k
  *****************************************************************************/
 
-/// add a subnet to throw a fault
 Transition *throwFault(Place *p1, Place *p2,
     string p1name, string prefix,
     int negativeControlFlow, bool preventFurtherFaults = true);
-
-/// add a subnet to remove tokens from an activity
 Transition *stop(Place *p, string p_name, string prefix);
-
+void dpeLinks(Transition* t, int id);
 string inString();
-
 void header(kc::integer id, bool indent = false);
 void header(int id, bool indent = false);
 void footer(kc::integer id, bool indent = false);
 void footer(int id, bool indent = false);
-
-/// add a subnet for dead-path elimination
-void dpeLinks(Transition* t, int id);
 
 
 
@@ -106,3 +98,8 @@ void indown();
 
 
 #endif
+
+
+/*!
+ * \defgroup creation Petri Net Creation Module
+ */

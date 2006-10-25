@@ -19,24 +19,24 @@
 \****************************************************************************/
 
 /*!
- * \file debug.cc
+ * \file    debug.cc
  *
- * \brief Some debugging tools for BPEL2oWFN
+ * \brief   debugging tools
  *
- * \author  
- *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $
+ *
+ * \since   2005/11/09
  *          
- * \date
- *          - created: 2005/11/09
- *          - last changed: \$Date: 2006/10/04 20:16:28 $
+ * \date    \$Date: 2006/10/25 06:53:38 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
- *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
- *          for details.
+ *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
+ *
+ * \ingroup debug
  */
 
 
@@ -64,7 +64,17 @@ using namespace std;
  * Global variables
  *****************************************************************************/
 
-/// debug level
+/*!
+ * \brief debug level
+ *
+ * The command-line parameter "-d" can be used to set a debug level.
+ *
+ * \see #trace_level
+ * \see #yy_flex_debug
+ * \see #yydebug
+ *
+ * \ingroup debug
+ */
 trace_level debug_level = TRACE_ALWAYS;
 
 
@@ -75,13 +85,17 @@ trace_level debug_level = TRACE_ALWAYS;
  * Functions to indicate errors, warnings or observations
  *****************************************************************************/
 
-/**
- * Provides output to stderr using different #trace_level 
- * (in order to regulate amount of output)
+/*!
+ * \brief traces a string to the log stream
+ *
+ * Prints the string message to the output string #log_output if the passed
+ * debug level #debug_level is greater or equal to the set debug level
+ * #debug_level.
  *
  * \param pTraceLevel	the #trace_level
  * \param message	the output
  *
+ * \ingroup debug
  */
 void trace(trace_level pTraceLevel, string message)
 {
@@ -93,13 +107,12 @@ void trace(trace_level pTraceLevel, string message)
 
 
 
-/**
- * Works like #trace(trace_level,string) with trace_level = TRACE_ALWAYS
- *
- * \param message the output
- *
+/*!
+ * \brief traces a string to the log stream
+ * \overload
+ * \ingroup debug
  */
-void trace(string message )
+void trace(string message)
 {
   trace(TRACE_ALWAYS, message);
 }
@@ -109,15 +122,19 @@ void trace(string message )
 
 
 /*!
+ * \brief signal a syntax error
+ *
  * This function is invoked by the parser and the lexer during the syntax
- * analysis. When an error occurs, it prints an accordant message and shows the
- * lines of the input files where the error occured.
+ * analysis. When an error occurs, it prints an accordant message and shows
+ * the lines of the input files where the error occured.
  *
  * \param msg a message (mostly "Parse error") and some more information e.g.
  *            the location of the syntax error.
  * \return 1, since an error occured
+ *
+ * \ingroup debug
  */
-int yyerror(const char* msg)
+int yyerror(const char *msg)
 {
   /* defined by flex */
   extern int yylineno;      // line number of current token
@@ -146,9 +163,14 @@ int yyerror(const char* msg)
 
 
 /*!
- * Outputs the environment (i.e. four lines before and after) of a line.
+ * \brief prints a line of the input file
+ * 
+ * Outputs the environment (i.e. four lines before and after) of a line in the
+ * input file.
  *
  * \param lineNumber line number
+ *
+ * \ingroup debug
  */
 void showLineEnvironment(int lineNumber)
 {
@@ -183,7 +205,17 @@ void showLineEnvironment(int lineNumber)
 
 
 /*!
- * Outputs error messages triggered by several static tests.
+ * \brief prints static analysis error messages
+ *
+ * Outputs error messages triggered by several static tests. The static
+ * anaylsis codes are taken from the WS-BPEL 2.0 specification. For each error
+ * code, a standard problem description is printed.
+ *
+ * \param code		code of the static analysis error
+ * \param information	additional information about the error
+ * \param lineNumber	a line number to locate the error
+ *
+ * \ingroup debug
  */
 void SAerror(unsigned int code, string information, int lineNumber)
 {

@@ -32,14 +32,14 @@
  *          
  * \date
  *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/10/24 18:18:34 $
+ *          - last changed: \$Date: 2006/10/25 06:53:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.112 $
+ * \version \$Revision: 1.113 $
  *
  */
 
@@ -435,3 +435,14 @@ int main( int argc, char *argv[])
 
   return 0;  
 }
+
+
+
+
+
+/*!
+ * \mainpage
+ *
+ * \image html "../../../doc/images/bpel2owfn.png"
+ *
+ */

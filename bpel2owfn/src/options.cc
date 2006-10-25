@@ -19,23 +19,22 @@
 \*****************************************************************************/
 
 /*!
- * \file options.cc
+ * \file    options.cc
  *
- * \brief 
+ * \brief   evaluation of command-line options
  *
- * \author
- *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ * \author  responsible: Christian Gierds <gierds@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $
  *
- * \date
- *          - created: 2005/10/18
- *          - last changed: \$Date: 2006/10/10 08:14:41 $
+ * \since   2005/10/18
+ *
+ * \date    \$Date: 2006/10/25 06:53:38 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
  */
 
 
@@ -62,18 +61,17 @@ using namespace std;
 
 
 
-
 /******************************************************************************
  * Data structures
  *****************************************************************************/
 
-// some file names and pointers
-
-/// Filename of input file
+/// filename of input file
 string filename = "<STDIN>";
+
+/// list of input files
 list <string> inputfiles;
 
-/// Filename of output file
+/// filename of output file
 string output_filename = "";
 
 /// pointer to input stream
@@ -85,21 +83,26 @@ ostream *output = &cout;
 /// pointer to log stream
 ostream *log_output = &clog;
 
-/// Filename of log file
+/// filename of log file
 string log_filename = "";
 
+/// true if output is created
 bool createOutputFile = false;
 
-// different modes controlled by command line
+/// different modes controlled by command line
 possibleModi modus;
 
+/// options (set by #parse_command_line)
 map<possibleOptions,    bool> options;
+
+/// parameters (set by #parse_command_line)
 map<possibleParameters, bool> parameters;
+
+/// output file formats (set by #parse_command_line)
 map<possibleFormats,    bool> formats;
 
-// suffixes are defined in parse_command_line();
+/// suffixes are defined in parse_command_line();
 map<possibleFormats, string> suffixes;
-
 
 /// long options (needed by GNU getopt)
 static struct option longopts[] =
@@ -130,15 +133,15 @@ const char * par_string = "hvm:li:of:p:bd:";
  * Functions for command line evaluation
  *****************************************************************************/
 
-// --------------------- functions for command line evaluation ------------------------
-/**
- * Prints an overview of all commandline arguments.
+/*!
+ * \brief prints an overview of all commandline arguments
  *
+ * \todo This functions should be adopted to the current version!
  */
 void print_help() 
 {
   // 80 chars
-  //    "--------------------------------------------------------------------------------"
+  //    "12345678901234567890123456789012345678901234567890123456789012345678901234567890"
   trace("\n");
   trace(string(PACKAGE_STRING) + "\n");
   trace("\n");
@@ -170,15 +173,14 @@ void print_help()
   trace("For more information see:\n");
   trace("  http://www.informatik.hu-berlin.de/top/tools4bpel/bpel2owfn\n");
   trace("\n");
-
 }
 
 
 
 
 
-/**
- * Prints some version information
+/*!
+ * \brief prints version information
  *
  * \param name commandline name of the this program
  */
@@ -196,6 +198,12 @@ void print_version(string name)
 
 
 
+/*!
+ * \brief parses the command line using GNU getopt
+ *
+ * \param argc argument counter from #main
+ * \param argv argument array from #main
+ */
 void parse_command_line(int argc, char* argv[])
 {
   // suffixes stores the file suffixes for the various supported file types
@@ -250,7 +258,7 @@ void parse_command_line(int argc, char* argv[])
   while ((optc = getopt_long (argc, argv, par_string, longopts, (int *) 0))
          != EOF)
   {
-    // \todo call one of them argument and remove the rest
+    /// \todo call one of them argument and remove the rest
     string parameter = "";
     possibleModi old_modus;
     switch (optc)
@@ -374,10 +382,6 @@ void parse_command_line(int argc, char* argv[])
 		  parameters[P_FINALLOOP] = true;
 		else if (parameter == "communicationonly")
 		  parameters[P_COMMUNICATIONONLY] = true;
-//		else if (parameter == "cyclicwhile")
-//		  parameters[P_CYCLICWHILE] = true;
-//		else if (parameter == "cycliceh")
-//		  parameters[P_CYCLICEH] = true;
 		else if (parameter == "nostandardfaults")
 		  parameters[P_NOSTANDARDFAULTS] = true;
 		else if (parameter == "nofhfaults")
@@ -529,7 +533,7 @@ void parse_command_line(int argc, char* argv[])
     }
   }
 
-  // \todo: TODO (gierds) complete information for modus operandi
+  /// \todo: TODO (gierds) complete information for modus operandi
   trace(TRACE_INFORMATION, "Modus operandi:\n");
   switch ( modus )
   {
@@ -573,7 +577,12 @@ void parse_command_line(int argc, char* argv[])
 
 
 /*!
- * Open output file.
+ * \brief open output file
+ *
+ * \param name filename of the output file
+ * \return output file stream to the output file
+ *
+ * \post output file with filename #name opened and bound to stream file
  */
 ostream *openOutput(string name)
 {
@@ -590,7 +599,11 @@ ostream *openOutput(string name)
 
 
 /*!
- * Closes the output file.
+ * \brief close output file
+ *
+ * \param output file stream of the output file
+ *
+ * \post out file addressed by output file stream #file closed
  */
 void closeOutput(ostream *file)
 {
@@ -602,4 +615,3 @@ void closeOutput(ostream *file)
     file = NULL;
   }
 }
-

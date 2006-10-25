@@ -19,26 +19,25 @@
 \****************************************************************************/
 
 /*!
- * \file helpers.h
+ * \file    helpers.h
  *
- * \brief Helper functions (interface)
+ * \brief   helper functions
  *
- * This file defines several small helper functions that do not belong to any
- * other file.
+ * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $
  * 
- * \author  
- *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes by: \$Author: nlohmann $
- *          
- * \date    
- *          - created: 2005/11/11
- *          - last changed: \$Date: 2006/10/24 13:47:31 $
+ * \since   2005/11/11
+ *
+ * \date    \$Date: 2006/10/25 06:53:38 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.36 $
+ * \version \$Revision: 1.37 $
+ *
+ * \ingroup conversion
+ * \ingroup debug
  */
 
 
@@ -58,6 +57,7 @@
 
 #include <set>
 #include <string>
+
 #include "ast-config.h"		// all you need from Kimwitu++
 #include "bpel2owfn.h"
 
@@ -70,19 +70,10 @@ using namespace std;
  * Conversion and error handling functions
  *****************************************************************************/
 
-/// Converts integer to string.
 string toString(kc::integer i);
-
-/// Converts int to string.
 string toString(int i);
-
-/// Converts string to int.
 int toInt(string s);
-
-/// Calls #cleanup(), then exits
 void error();
-
-/// Close all open files, delete all pointers.
 void cleanup();
 
 
@@ -100,8 +91,8 @@ class Node;
 
 
 
-/**
- * Returns the union of two sets of T's.
+/*!
+ * \brief Returns the union of two sets of T's.
  *
  * \par a the first set
  * \par b the second set
@@ -121,8 +112,8 @@ set<T> setUnion(set<T> a, set<T> b)
 
 
 
-/**
- * Returns the intersection of two sets of T's.
+/*!
+ * \brief Returns the intersection of two sets of T's.
  *
  * \par a the first set
  * \par b the second set
@@ -142,8 +133,8 @@ set<T> setIntersection(set<T> a, set<T> b)
 
 
 
-/**
- * Returns the difference of two sets of T's.
+/*!
+ * \brief Returns the difference of two sets of T's.
  *
  * \par a the first set
  * \par b the second set
@@ -159,4 +150,14 @@ set<T> setDifference(set<T> a, set<T> b)
   return result;
 }
 
+
+
+
+
 #endif
+
+
+
+/*!
+ *\defgroup conversion Conversion Functions
+ */

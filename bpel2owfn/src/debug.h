@@ -19,7 +19,7 @@
 \****************************************************************************/
 
 /*!
- * \file debug.h
+ * \file    debug.h
  *
  * \brief   debugging tools
  *
@@ -28,14 +28,15 @@
  * 
  * \since   2005/11/09
  *
- * \date    \$Date: 2006/10/24 18:18:34 $
+ * \date    \$Date: 2006/10/25 06:53:38 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
- *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
- *          for details.
+ *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
+ *
+ * \ingroup debug
  */
 
 
@@ -69,13 +70,16 @@ using namespace std;
  * \brief trace levels
  *
  * The trace levels that are used by the #trace function. A standard trace
- * level can be set using the command-line parameter "-d".
+ * level #debug_level can be set using the command-line parameter "-d".
  *
  * \todo Provide a detailled documentation of what the several debug levels
  * actually show.
  *
+ * \see #debug_level
  * \see #yy_flex_debug
  * \see #yydebug
+ *
+ * \ingroup debug
  */
 typedef enum
 {
@@ -94,7 +98,7 @@ typedef enum
  * External variables
  *****************************************************************************/
 
-extern trace_level debug_level; // defined in debug.h
+extern trace_level debug_level; // defined in debug.cc
 
 
 
@@ -104,20 +108,11 @@ extern trace_level debug_level; // defined in debug.h
  * Functions
  *****************************************************************************/
 
-/// Provides output to stderr using different #trace_level 
 void trace(trace_level pTraceLevel, string message);
-
-/// Works like #trace(trace_level, string) with trace_level = TRACE_ALWAYS
 void trace(string message);
-
-/// Signalling syntax errors.
-int yyerror(const char* msg);
-
-/// Signal an error with a SA (static analysis) code
-void SAerror(unsigned int code, string information = "", int lineNumber = 0);
-
-/// Outputs the environment (i.e. four lines before and after) of a line.
+int yyerror(const char *msg);
 void showLineEnvironment(int lineNumber);
+void SAerror(unsigned int code, string information = "", int lineNumber = 0);
 
 
 
@@ -137,6 +132,8 @@ void showLineEnvironment(int lineNumber);
  * output.
  *
  * \param prefix additional string to print
+ *
+ * \ingroup debug
 */
 #define ENTER(prefix) \
   trace(TRACE_VERY_DEBUG, string(prefix) + "\t+" + string(__FUNCTION__) + \
@@ -153,6 +150,8 @@ void showLineEnvironment(int lineNumber);
  * output.
  *
  * \param prefix additional string to print
+ *
+ * \ingroup debug
  */
 #define LEAVE(prefix) \
   trace(TRACE_VERY_DEBUG, string(prefix) + "\t-" + string(__FUNCTION__) + \
@@ -163,3 +162,9 @@ void showLineEnvironment(int lineNumber);
 
 
 #endif
+
+
+
+/**
+ * \defgroup debug Debug Module
+ */

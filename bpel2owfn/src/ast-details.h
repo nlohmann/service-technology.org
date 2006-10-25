@@ -19,22 +19,23 @@
 \****************************************************************************/
 
 /*!
- * \file ast-details.h
+ * \file    ast-details.h
  *
- * \author  
- *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ * \brief   annotations of the AST
+ *
+ * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $
  *          
- * \date
- *          - created: 2005/07/02
- *          - last changed: \$Date: 2006/10/24 14:06:51 $
+ * \since   2005/07/02
+ *
+ * \date    \$Date: 2006/10/25 06:53:37 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.23 $
+ * \version \$Revision: 1.24 $
  */
 
 
@@ -54,11 +55,7 @@
 
 #include <map>
 #include <string>
-//#include <list>
 #include <set>
-
-//#include "parser.h"		// created by Bison
-//#include "ast-config.h"		// all you need from Kimwitu++
 
 using namespace std;
 
@@ -95,9 +92,6 @@ class ASTE
     int type;
 
   public:
-    /// a pointer to the node in the abstract syntax tree
-//    kc::impl_abstract_phylum *node;
-
     /// the parsed attributes
     map<string, string> attributes;
 
@@ -122,13 +116,9 @@ class ASTE
     /// true if activity is embedded in a while activity
     bool inWhile;
 
-    /// constructor
     ASTE(int myid, int mytype);
 
-    /// checks and returns attributes
     map<string, string> getAttributes();
-
-    /// creates a communication channel
     string createChannel(bool synchronousCommunication = false);
 
     /// checks a variable and returns its name

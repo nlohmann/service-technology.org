@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/10/26 11:06:51 $
+ * \date    \$Date: 2006/10/26 14:40:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  */
 
 
@@ -108,8 +108,6 @@ ASTE::ASTE(int myid, int mytype)
   type = mytype;
   attributes = temporaryAttributeMap[id];
 
-  exitOnStandardFault = false;	// required initialization!
-  suppressJF = false;		// required initialization!
   inWhile = false;		// required initialization!
   inProcess = false;
 
@@ -135,7 +133,7 @@ map<string, string> ASTE::getAttributes()
     case(K_PROCESS):
       {
 	// the require attributes
-      	string required[] = { "name", "targetNamespace" };
+      	string required[] = {"name", "targetNamespace"};
       	const unsigned int requireds = sizeof(required)/sizeof(required[0]);
 
 	for (unsigned int i = 0; i < requireds; i++)
@@ -152,7 +150,58 @@ map<string, string> ASTE::getAttributes()
 
 	break;
       }
-    default: ;
+
+    case(K_SCOPE):
+      {
+	extern map<unsigned int, ASTE*> ASTEmap;
+
+	assert(ASTEmap[parentScopeId] != NULL);
+	if (attributes["exitOnStandardFault"] == "")
+	  attributes["exitOnStandardFault"] = ASTEmap[parentScopeId]->attributes["exitOnStandardFault"];
+	assert(attributes["exitOnStandardFault"] != "");
+
+	/* no break here */
+      }
+
+    case(K_EMPTY):
+    case(K_INVOKE):
+    case(K_RECEIVE):
+    case(K_REPLY):
+    case(K_ASSIGN):
+    case(K_VALIDATE):
+    case(K_WAIT):
+    case(K_THROW):
+    case(K_COMPENSATE):
+    case(K_COMPENSATESCOPE):
+    case(K_TERMINATE):
+    case(K_EXIT):
+    case(K_FLOW):
+    case(K_SWITCH):
+    case(K_IF):
+    case(K_WHILE):
+    case(K_REPEATUNTIL):
+    case(K_SEQUENCE):
+    case(K_PICK):
+      {
+	extern map<unsigned int, ASTE*> ASTEmap;
+
+	assert(ASTEmap[parentActivityId] != NULL);
+	assert(ASTEmap[parentScopeId] != NULL);
+	if (attributes["suppressJoinFailure"] == "")
+	  attributes["suppressJoinFailure"] = ASTEmap[parentActivityId]->attributes["suppressJoinFailure"];
+
+	// if the attribute is not set now, the activity is directly enclosed
+	// to a fault, compensation, event or termination handler, thus the
+	// value of the surrounding scope should be taken.
+	if (attributes["suppressJoinFailure"] == "")
+	  attributes["suppressJoinFailure"] = ASTEmap[parentScopeId]->attributes["suppressJoinFailure"];	
+	assert(attributes["suppressJoinFailure"] != "");
+	
+	break;
+      }
+
+    default:
+      { }
   }
 
   return attributes;
@@ -351,34 +400,4 @@ string ASTE::activityTypeName()
     case(K_WHILE):		return "while";
     default:			return "unknown";
   }
-}
-
-
-
-
-
-bool ASTE::calculateExitOnStandardFault()
-{
-  extern map<unsigned int, ASTE*> ASTEmap;
-
-  if (attributes["exitOnStandardFault"] == "yes")
-    return true;
-  if (attributes["exitOnStandardFault"] == "no")
-    return false;
-
-  return ASTEmap[parentScopeId]->exitOnStandardFault;
-}
-
-
-bool ASTE::calculateSuppressJoinFailure()
-{
-  extern map<unsigned int, ASTE*> ASTEmap;
-
-  if (attributes["suppressJoinFailure"] == "yes")
-    return true;
-  if (attributes["suppressJoinFailure"] == "no")
-    return false;
-
-  assert (ASTEmap[parentScopeId] != NULL);
-  return ASTEmap[parentScopeId]->suppressJF;
 }

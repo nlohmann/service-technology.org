@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/26 08:16:11 $
+ *          - last changed: \$Date: 2006/10/26 09:20:08 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  */
 %}
 
@@ -1745,7 +1745,6 @@ This=Scope(a,b,c,d,e,f,g,h,_id) ->
       Transition *t13 = TheNet->newTransition(prefix + "ignoreFault");
       TheNet->newArc(p48, t13);
       TheNet->newArc(TheNet->findPlace(toString(ASTEmap[_id->value]->parentScopeId) + ".internal.!Active"), t13, READ);
-
 
       // Merge places with parent scope.
       TheNet->mergePlaces(TheNet->findPlace(toString(ASTEmap[_id->value]->parentScopeId) +

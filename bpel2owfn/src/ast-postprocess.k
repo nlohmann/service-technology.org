@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/10/26 09:20:08 $
+ * \date    \$Date: 2006/10/26 10:42:03 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.64 $
+ * \version \$Revision: 1.65 $
  */
 %}
 
@@ -58,15 +58,17 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
       ASTEmap[myid]->parentActivityId = myid;
       PPcurrentScope = myid;
 
-      // set suppressJoinFailure-attribute
-      if (ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-        ASTEmap[myid]->suppressJF = true;
-
       // annotate AST and check information
       ASTEmap[myid]->getAttributes();
       ASTEmap[myid]->hasEH = (string(g->op_name()) == "userDefinedEventHandler");
       ASTEmap[f->id]->inProcess = true;
 
+      // set suppressJoinFailure-attribute
+      if (ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
+        ASTEmap[myid]->suppressJF = true;
+      // set exitOnStandardFault-attribute
+      if (ASTEmap[myid]->attributes["exitOnStandardFault"] == "yes")
+        ASTEmap[myid]->exitOnStandardFault = true;
 
       // distribute the process' id to the enclosed FH/CH/EH/activity
       assert(ASTEmap[e->id] != NULL);
@@ -412,11 +414,7 @@ Empty(a,_id) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       ASTEmap[myid]->getAttributes();
-
-      // set or inherit suppressJoinFailure-attribute
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-        ASTEmap[myid]->suppressJF = true;
+      ASTEmap[myid]->suppressJF = ASTEmap[myid]->calculateSuppressJoinFailure();
     }
     a
   ]
@@ -441,11 +439,7 @@ Invoke(a,b,_id) ->
       ASTEmap[myid]->inputVariableName = ASTEmap[myid]->checkInputVariable();
       ASTEmap[myid]->outputVariableName = ASTEmap[myid]->checkOutputVariable();
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
-
-      // set or inherit suppressJoinFailure-attribute
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-        ASTEmap[myid]->suppressJF = true;
+      ASTEmap[myid]->suppressJF = ASTEmap[myid]->calculateSuppressJoinFailure();
     }
     a b
   ]
@@ -469,11 +463,7 @@ Receive(a,b,_id) ->
       ASTEmap[myid]->channelName = ASTEmap[myid]->createChannel();
       ASTEmap[myid]->variableName = ASTEmap[myid]->checkVariable();
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
-
-      // set or inherit suppressJoinFailure-attribute
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-        ASTEmap[myid]->suppressJF = true;
+      ASTEmap[myid]->suppressJF = ASTEmap[myid]->calculateSuppressJoinFailure();
     }
     a b
   ]
@@ -497,11 +487,7 @@ Reply(a,b,_id) ->
       ASTEmap[myid]->channelName = ASTEmap[myid]->createChannel();
       ASTEmap[myid]->variableName = ASTEmap[myid]->checkVariable();
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
-
-      // set or inherit suppressJoinFailure-attribute
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-        ASTEmap[myid]->suppressJF = true;
+      ASTEmap[myid]->suppressJF = ASTEmap[myid]->calculateSuppressJoinFailure();
     }
     a b
   ]
@@ -522,11 +508,7 @@ Assign(a,b,_id) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       ASTEmap[myid]->getAttributes();
-
-      // set or inherit suppressJoinFailure-attribute
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-        ASTEmap[myid]->suppressJF = true;
+      ASTEmap[myid]->suppressJF = ASTEmap[myid]->calculateSuppressJoinFailure();
     }
     a b
   ]
@@ -575,11 +557,7 @@ Validate(a,_id) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       ASTEmap[myid]->getAttributes();
-
-      // set or inherit suppressJoinFailure-attribute
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-        ASTEmap[myid]->suppressJF = true;
+      ASTEmap[myid]->suppressJF = ASTEmap[myid]->calculateSuppressJoinFailure();
     }
     a
   ]
@@ -600,11 +578,7 @@ Wait(a,_id) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       ASTEmap[myid]->getAttributes();
-
-      // set or inherit suppressJoinFailure-attribute
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-        ASTEmap[myid]->suppressJF = true;
+      ASTEmap[myid]->suppressJF = ASTEmap[myid]->calculateSuppressJoinFailure();
     }
     a
   ]
@@ -625,11 +599,7 @@ Throw(a,_id) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       ASTEmap[myid]->getAttributes();
-
-      // set or inherit suppressJoinFailure-attribute
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-        ASTEmap[myid]->suppressJF = true;
+      ASTEmap[myid]->suppressJF = ASTEmap[myid]->calculateSuppressJoinFailure();
     }
     a
   ]
@@ -650,11 +620,7 @@ Compensate(a,_id) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       ASTEmap[myid]->getAttributes();
-
-      // set or inherit suppressJoinFailure-attribute
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-        ASTEmap[myid]->suppressJF = true;
+      ASTEmap[myid]->suppressJF = ASTEmap[myid]->calculateSuppressJoinFailure();
 
       // register this compensate at the current scope
       /* here we can check whether it is the only compensate activity */
@@ -679,11 +645,7 @@ CompensateScope(a,b,_id) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       ASTEmap[myid]->getAttributes();
-
-      // set or inherit suppressJoinFailure-attribute
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-        ASTEmap[myid]->suppressJF = true;
+      ASTEmap[myid]->suppressJF = ASTEmap[myid]->calculateSuppressJoinFailure();
 
       // register this compensate at the current scope
       /* here we can check whether it is the only compensate activity */
@@ -708,11 +670,7 @@ Terminate(a,_id) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       ASTEmap[myid]->getAttributes();
-
-      // set or inherit suppressJoinFailure-attribute
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-        ASTEmap[myid]->suppressJF = true;
+      ASTEmap[myid]->suppressJF = ASTEmap[myid]->calculateSuppressJoinFailure();
     }
     a
   ]
@@ -733,11 +691,7 @@ Exit(a,_id) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       ASTEmap[myid]->getAttributes();
-
-      // set or inherit suppressJoinFailure-attribute
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-        ASTEmap[myid]->suppressJF = true;
+      ASTEmap[myid]->suppressJF = ASTEmap[myid]->calculateSuppressJoinFailure();
     }
     a
   ]
@@ -760,11 +714,7 @@ Flow(a,b,c,_id) ->
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
       ASTEmap[myid]->getAttributes();
-
-      // set or inherit suppressJoinFailure-attribute
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-        ASTEmap[myid]->suppressJF = true;
+      ASTEmap[myid]->suppressJF = ASTEmap[myid]->calculateSuppressJoinFailure();
 
       // distribute the flow's id to the enclosed activities
       // also distribute the control flow type
@@ -830,11 +780,7 @@ Switch(a,b,c,_id) ->
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
       ASTEmap[myid]->getAttributes();
-
-      // set or inherit suppressJoinFailure-attribute
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-        ASTEmap[myid]->suppressJF = true;
+      ASTEmap[myid]->suppressJF = ASTEmap[myid]->calculateSuppressJoinFailure();
 
       // distribute the switch's id to the enclosed activities
       // also distribute the control flow
@@ -921,11 +867,7 @@ If(a,b,c,_id) ->
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
       ASTEmap[myid]->getAttributes();
-
-      // set or inherit suppressJoinFailure-attribute
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-        ASTEmap[myid]->suppressJF = true;
+      ASTEmap[myid]->suppressJF = ASTEmap[myid]->calculateSuppressJoinFailure();
 
       // distribute the switch's id to the enclosed activities
       // also distribute the control flow
@@ -1014,11 +956,7 @@ While(a,b,_id) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       ASTEmap[myid]->inWhile = true;
       ASTEmap[myid]->getAttributes();
-
-      // set or inherit suppressJoinFailure-attribute
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-        ASTEmap[myid]->suppressJF = true;
+      ASTEmap[myid]->suppressJF = ASTEmap[myid]->calculateSuppressJoinFailure();
 
       // distribute the while's id to the enclosed activity
       assert(ASTEmap[b->id] != NULL);
@@ -1053,11 +991,7 @@ RepeatUntil(a,b,_id) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       ASTEmap[myid]->inWhile = true;
       ASTEmap[myid]->getAttributes();
-
-      // set or inherit suppressJoinFailure-attribute
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-        ASTEmap[myid]->suppressJF = true;
+      ASTEmap[myid]->suppressJF = ASTEmap[myid]->calculateSuppressJoinFailure();
 
       // distribute the repeatUntil's id to the enclosed activity
       assert(ASTEmap[b->id] != NULL);
@@ -1093,11 +1027,7 @@ Sequence(a,b,_id) ->
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
       ASTEmap[myid]->getAttributes();
-
-      // set or inherit suppressJoinFailure-attribute
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-        ASTEmap[myid]->suppressJF = true;
+      ASTEmap[myid]->suppressJF = ASTEmap[myid]->calculateSuppressJoinFailure();
 
       // distribute the sequence's id to the enclosed activities
       foreach(innerActivity; activity_list b)
@@ -1136,11 +1066,7 @@ Pick(a,b,c,_id) ->
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
       ASTEmap[myid]->getAttributes();
-
-      // set or inherit suppressJoinFailure-attribute
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-        ASTEmap[myid]->suppressJF = true;
+      ASTEmap[myid]->suppressJF = ASTEmap[myid]->calculateSuppressJoinFailure();
 
       // distribute the pick's id to the enclosed activities
       foreach(branch=OnMessage(innerActivity); tOnMessage_list b)
@@ -1197,11 +1123,8 @@ Scope(a,b,c,d,e,f,g,h,_id) ->
       ASTEmap[myid]->getAttributes();
       ASTEmap[ASTEmap[myid]->parentScopeId]->enclosedScopes.insert(myid);
       ASTEmap[myid]->hasEH = (string(e->op_name()) == "userDefinedEventHandler");
-
-      // set or inherit suppressJoinFailure-attribute
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      if (ASTEmap[ASTEmap[myid]->parentActivityId]->suppressJF || ASTEmap[myid]->attributes["suppressJoinFailure"] == "yes")
-        ASTEmap[myid]->suppressJF = true;
+      ASTEmap[myid]->suppressJF = ASTEmap[myid]->calculateSuppressJoinFailure();
+      ASTEmap[myid]->exitOnStandardFault = ASTEmap[myid]->calculateExitOnStandardFault();
 
       // distribute the scope's id to the enclosed activity
       assert(ASTEmap[h->id] != NULL);

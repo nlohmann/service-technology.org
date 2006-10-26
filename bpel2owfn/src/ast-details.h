@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/10/25 10:11:21 $
+ * \date    \$Date: 2006/10/26 10:42:03 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.25 $
+ * \version \$Revision: 1.26 $
  */
 
 
@@ -111,11 +111,12 @@ class ASTE
     string outputVariableName;	///< name of an output variable
     string linkName;		///< name of a link
 
-    bool hasEH;		///< true if process or scope has an event handler
-    bool hasCatchAll;	///< true if fault handler has a catchAll branch
-    bool inProcess;	///< true if compensation handler is embedded to a process
-    bool inWhile;	///< true if activity is embedded in a while, repeatUntil activity or in onEvent
-    bool suppressJF;	///< true if join failures are suppressed
+    bool hasEH;			///< true if process or scope has an event handler
+    bool hasCatchAll;		///< true if fault handler has a catchAll branch
+    bool inProcess;		///< true if compensation handler is embedded to a process
+    bool inWhile;		///< true if activity is embedded in a while, repeatUntil activity or in onEvent
+    bool suppressJF;		///< true if join failures are suppressed
+    bool exitOnStandardFault;	///< true if attribute is set to "yes" or left out and set at a parent scope
 
     ASTE(int myid, int mytype);
 
@@ -125,6 +126,9 @@ class ASTE
     string checkVariable();
     string checkInputVariable();
     string checkOutputVariable();
+
+    bool calculateExitOnStandardFault();
+    bool calculateSuppressJoinFailure();
 
     void defineVariable();
     string activityTypeName();

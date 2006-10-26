@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/10/25 10:11:21 $
+ * \date    \$Date: 2006/10/26 10:42:03 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.29 $
+ * \version \$Revision: 1.30 $
  */
 
 
@@ -92,8 +92,9 @@ ASTE::ASTE(int myid, int mytype)
   type = mytype;
   attributes = temporaryAttributeMap[id];
 
-  suppressJF = false;	// required initialization!
-  inWhile = false;	// required initialization!
+  exitOnStandardFault = false;	// required initialization!
+  suppressJF = false;		// required initialization!
+  inWhile = false;		// required initialization!
   inProcess = false;
 
   controlFlow = POSITIVECF;
@@ -321,4 +322,34 @@ string ASTE::activityTypeName()
     case(K_WHILE):		return "while";
     default:			return "unknown";
   }
+}
+
+
+
+
+
+bool ASTE::calculateExitOnStandardFault()
+{
+  extern map<unsigned int, ASTE*> ASTEmap;
+
+  if (attributes["exitOnStandardFault"] == "yes")
+    return true;
+  if (attributes["exitOnStandardFault"] == "no")
+    return false;
+
+  return ASTEmap[parentScopeId]->exitOnStandardFault;
+}
+
+
+bool ASTE::calculateSuppressJoinFailure()
+{
+  extern map<unsigned int, ASTE*> ASTEmap;
+
+  if (attributes["suppressJoinFailure"] == "yes")
+    return true;
+  if (attributes["suppressJoinFailure"] == "no")
+    return false;
+
+  assert (ASTEmap[parentScopeId] != NULL);
+  return ASTEmap[parentScopeId]->suppressJF;
 }

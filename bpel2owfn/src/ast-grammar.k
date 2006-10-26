@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/24 14:06:51 $
+ *          - last changed: \$Date: 2006/10/26 07:05:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.139 $
+ * \version \$Revision: 1.140 $
  */
 %}
 
@@ -386,9 +386,6 @@ tRethrow:
 tCompensate:
   Compensate(standardElements integer)
 | CompensateScope(standardElements casestring integer)
-  {
-    bool inFaultHandler = true;
-  }
 ;
 
 

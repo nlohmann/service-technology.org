@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/24 12:57:32 $
+ *          - last changed: \$Date: 2006/10/26 07:05:07 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.48 $
+ * \version \$Revision: 1.49 $
  */
 %}
 
@@ -640,7 +640,7 @@ This=Throw(a,_id) ->
  * compensation handler of the current scope.
  */
 
-This=Compensate(a,_id) provided (!This->inFaultHandler) ->
+This=Compensate(a,_id) provided (ASTEmap[_id->value]->controlFlow == CHCF) ->
   [petrinet:
     {
       header(This->id);
@@ -693,7 +693,7 @@ This=Compensate(a,_id) provided (!This->inFaultHandler) ->
  * handler of the current scope.
  */
 
-This=Compensate(a,_id) provided (This->inFaultHandler) ->
+This=Compensate(a,_id) provided (ASTEmap[_id->value]->controlFlow == FHCF) ->
   [petrinet:
     {
       header(This->id);
@@ -741,12 +741,12 @@ This=Compensate(a,_id) provided (This->inFaultHandler) ->
 
 
 /*
- * The <compensate scope="C"/> activity as depicted in Fig.40. As the context
+ * The <compensate scope="C"/> activity as depicted in Fig. 40. As the context
  * (embedded in a compensation handler) is clear, the pattern is directly
  * embedded to the compensation handler of the current scope.
  */
 
-This=CompensateScope(a,b,_id) provided (!This->inFaultHandler) ->
+This=CompensateScope(a,b,_id) provided (ASTEmap[_id->value]->controlFlow == CHCF) ->
   [petrinet:
     {
       header(This->id);
@@ -798,7 +798,7 @@ This=CompensateScope(a,b,_id) provided (!This->inFaultHandler) ->
  * the fault handler of the current scope.
  */
 
-This=CompensateScope(a,b,_id) provided (This->inFaultHandler) ->
+This=CompensateScope(a,b,_id) provided (ASTEmap[_id->value]->controlFlow == FHCF) ->
   [petrinet:
     {
       header(This->id);

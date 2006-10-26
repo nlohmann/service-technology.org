@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/10/26 10:42:03 $
+ * \date    \$Date: 2006/10/26 11:06:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.30 $
+ * \version \$Revision: 1.31 $
  */
 
 
@@ -68,6 +68,22 @@ extern map<unsigned int, map<string, string> > temporaryAttributeMap;
 extern set<string> ASTE_inputChannels;
 extern set<string> ASTE_outputChannels;
 extern set<string> ASTE_variables;
+
+
+
+
+
+/******************************************************************************
+ * Data structures
+ *****************************************************************************/
+
+/*!
+ * \brief structure to store standard values of attributes
+ */
+typedef struct attribute {
+  string name;
+  string value;
+};
 
 
 
@@ -108,6 +124,8 @@ ASTE::ASTE(int myid, int mytype)
  * \brief checks and returns attributes.
  *
  * \returns a name-value mapping of the attributes
+ *
+ * \todo a real error message
  */
 map<string, string> ASTE::getAttributes()
 {
@@ -116,11 +134,22 @@ map<string, string> ASTE::getAttributes()
   {
     case(K_PROCESS):
       {
+	// the require attributes
       	string required[] = { "name", "targetNamespace" };
-	string optional[] = { "queryLanguage", "expressionLanguage", "suppressJoinFailure", "enableInstanceCompensation", "abstractProcess", "xmlns" };
-	string defaults[] = { "http://www.w3.org/TR/1999/REC-xpath-19991116", "http://www.w3.org/TR/1999/REC-xpath-19991116", "no", "no", "no", "" };
-      	const int requireds = sizeof(required)/sizeof(required[0]);
-	const int optionals = sizeof(optional)/sizeof(optional[0]);
+      	const unsigned int requireds = sizeof(required)/sizeof(required[0]);
+
+	for (unsigned int i = 0; i < requireds; i++)
+	  if (attributes[required[i]] == "")
+	    cerr << "error: attribute `" << required[i] << "' is not set!" << endl;
+
+	// the optional attributes
+	attribute optional[] = { {"suppressJoinFailure", "no"}, {"exitOnStandardFault", "no"} };
+	const unsigned int optionals = sizeof(optional)/sizeof(optional[0]);
+
+	for (unsigned int i = 0; i < optionals; i++)
+	  if (attributes[optional[i].name] == "")
+	    attributes[optional[i].name] = optional[i].value;
+
 	break;
       }
     default: ;

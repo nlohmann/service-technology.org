@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/10/25 10:11:21 $
+ * \date    \$Date: 2006/10/26 08:16:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.62 $
+ * \version \$Revision: 1.63 $
  */
 %}
 
@@ -1185,11 +1185,13 @@ Scope(a,b,c,d,e,f,g,h,_id) ->
     {
       int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
-
-      PPcurrentScope = myid;
       a->parentId = myid;
 
+      // my parent is the current scope
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      // now I am the current scope
+      PPcurrentScope = myid;
+
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
       ASTEmap[myid]->getAttributes();
@@ -1207,10 +1209,6 @@ Scope(a,b,c,d,e,f,g,h,_id) ->
     }
     a b c d e f g h
     {
-      PPcurrentScope = ASTEmap[myid]->parentScopeId;
-
-      assert($0->parentScopeId == ASTEmap[myid]->parentScopeId);
-
       // add an attribute to the compensation handler
       if(PPhasCompensateMap[myid] == 1)
         d->hasCompensateWithoutScope = true;

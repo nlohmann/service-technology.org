@@ -28,13 +28,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/10/25 10:11:22 $
+ * \date    \$Date: 2006/10/26 08:16:12 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.145 $
+ * \version \$Revision: 1.146 $
  *
  * \ingroup petrinet
  */
@@ -114,7 +114,7 @@ bool Node::historyContains(string role)
  */
 Node::~Node()
 {
-  trace(TRACE_VERY_DEBUG, "Removing node " + toString(id) + "...");
+  trace(TRACE_VERY_DEBUG, "[PN]\tDestructing node " + toString(id) + "...\n");
 }
 
 

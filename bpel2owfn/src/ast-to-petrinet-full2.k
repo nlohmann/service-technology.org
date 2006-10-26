@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/26 07:05:07 $
+ *          - last changed: \$Date: 2006/10/26 08:16:11 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
  */
 %}
 
@@ -1738,22 +1738,22 @@ This=Scope(a,b,c,d,e,f,g,h,_id) ->
       // New transitions to pass fault to parent.
       Transition *t12 = TheNet->newTransition(prefix + "passFaultUp");
       TheNet->newArc(p48, t12);
-      TheNet->newArc(TheNet->findPlace(toString(This->parentScopeId) + ".internal.Active"), t12);
-      TheNet->newArc(t12, TheNet->findPlace(toString(This->parentScopeId) + ".internal.!Active")); //newer fault management
-      TheNet->newArc(t12, TheNet->findPlace(toString(This->parentScopeId) + ".internal.stop.fault_in"));
+      TheNet->newArc(TheNet->findPlace(toString(ASTEmap[_id->value]->parentScopeId) + ".internal.Active"), t12);
+      TheNet->newArc(t12, TheNet->findPlace(toString(ASTEmap[_id->value]->parentScopeId) + ".internal.!Active")); //newer fault management
+      TheNet->newArc(t12, TheNet->findPlace(toString(ASTEmap[_id->value]->parentScopeId) + ".internal.stop.fault_in"));
 
       Transition *t13 = TheNet->newTransition(prefix + "ignoreFault");
       TheNet->newArc(p48, t13);
-      TheNet->newArc(TheNet->findPlace(toString(This->parentScopeId) + ".internal.!Active"), t13, READ);
+      TheNet->newArc(TheNet->findPlace(toString(ASTEmap[_id->value]->parentScopeId) + ".internal.!Active"), t13, READ);
 
 
       // Merge places with parent scope.
-      TheNet->mergePlaces(TheNet->findPlace(toString(This->parentScopeId) +
+      TheNet->mergePlaces(TheNet->findPlace(toString(ASTEmap[_id->value]->parentScopeId) +
 	    ".internal.compensationHandler.compScope." + toString(This->id)), p3); // was "....internal.compScope."
-      TheNet->mergePlaces(TheNet->findPlace(toString(This->parentScopeId) + ".internal.scopeCompensated"), p56);
-      TheNet->mergePlaces(TheNet->findPlace(toString(This->parentScopeId) + ".internal.upperTerminate"), p46);
+      TheNet->mergePlaces(TheNet->findPlace(toString(ASTEmap[_id->value]->parentScopeId) + ".internal.scopeCompensated"), p56);
+      TheNet->mergePlaces(TheNet->findPlace(toString(ASTEmap[_id->value]->parentScopeId) + ".internal.upperTerminate"), p46);
     }
-    f // Stop Pattern
+    g // Stop Pattern
     a // standardElements
     c // Fault Handler
     d // Compensation Handler
@@ -1779,7 +1779,7 @@ This=Scope(a,b,c,d,e,f,g,h,_id) ->
       TheNet->mergePlaces(prefix + "Ended",   prefix2 + "faultHandler.Ended");
       TheNet->mergePlaces(prefix + "p49",     prefix2 + "faultHandler.ch_fh");
       TheNet->mergePlaces(prefix + "p50",     prefix2 + "faultHandler.ch_out");
-      TheNet->mergePlaces(prefix + "final",   prefix2 + "faultHandler.out");
+      TheNet->mergePlaces(prefix + "final",   prefix2 + "faultHandler.out");	// only for user-defined FH
       TheNet->mergePlaces(prefix + "p52",     prefix2 + "faultHandler.trueOut");
       TheNet->mergePlaces(prefix + "p53",     prefix2 + "faultHandler.sourceFalse");
       TheNet->mergePlaces(prefix + "p54",     prefix2 + "faultHandler.falseOut");
@@ -1875,7 +1875,7 @@ This=Scope(a,b,c,d,e,f,g,h,_id) ->
       }
 */
 
-      currentScope = toString(This->parentScopeId) + ".internal.";
+      currentScope = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.";
       footer(This->id, true);
     }
   ]

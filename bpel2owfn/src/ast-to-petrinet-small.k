@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/25 10:11:21 $
+ *          - last changed: \$Date: 2006/10/26 17:17:24 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.61 $
+ * \version \$Revision: 1.62 $
  *
  */
 %}
@@ -242,11 +242,10 @@ AsynchronousInvoke(a,b,_id) ->
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       TheNet->newArc(t1, TheNet->findPlace("out." + ASTEmap[_id->value]->channelName));
+      t1->type = OUT;
 
       if (ASTEmap[_id->value]->inWhile)
         TheNet->findPlace("out." + ASTEmap[_id->value]->channelName)->inWhile = true;
-
-      t1->type = OUT;
     }
     a // standardElements
     {
@@ -283,7 +282,6 @@ SynchronousInvoke(a,b,_id) ->
         TheNet->findPlace("in." + ASTEmap[_id->value]->channelName)->inWhile = true;
         TheNet->findPlace("out." + ASTEmap[_id->value]->channelName)->inWhile = true;
       }
-
     }
     a // standardElements
     {
@@ -645,6 +643,7 @@ Switch(a,b,otherwiseBranch=Otherwise(c,d),_id) ->
     b // case braches
     c // otherwise branch
     {
+      // the <case> branches
       int currentCase = 1;
       foreach (caseBranch=Case(innerActivity,_id2); tCase_list b)
       {
@@ -658,7 +657,7 @@ Switch(a,b,otherwiseBranch=Otherwise(c,d),_id) ->
       }
 
 
-      // The <otherwise> branch.
+      // the <otherwise> branch
       Transition *t1 = TheNet->newTransition(prefix + "caseo");
       TheNet->newArc(TheNet->findPlace(_id, ".internal.initial"), t1); // added ".internal" here
 

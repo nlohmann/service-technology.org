@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/10/26 14:40:29 $
+ * \date    \$Date: 2006/10/26 17:17:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.66 $
+ * \version \$Revision: 1.67 $
  */
 %}
 
@@ -427,6 +427,9 @@ Invoke(a,b,_id) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       ASTEmap[myid]->getAttributes();
+
+      /* above is generic */
+
       ASTEmap[myid]->channelName = ASTEmap[myid]->createChannel((ASTEmap[myid]->attributes["outputVariable"] != ""));
       ASTEmap[myid]->inputVariableName = ASTEmap[myid]->checkInputVariable();
       ASTEmap[myid]->outputVariableName = ASTEmap[myid]->checkOutputVariable();
@@ -451,6 +454,8 @@ Receive(a,b,_id) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       ASTEmap[myid]->getAttributes();
+
+      /* above is generic */
       ASTEmap[myid]->channelName = ASTEmap[myid]->createChannel();
       ASTEmap[myid]->variableName = ASTEmap[myid]->checkVariable();
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
@@ -474,6 +479,9 @@ Reply(a,b,_id) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       ASTEmap[myid]->getAttributes();
+
+      /* above is generic */
+
       ASTEmap[myid]->channelName = ASTEmap[myid]->createChannel();
       ASTEmap[myid]->variableName = ASTEmap[myid]->checkVariable();
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
@@ -606,6 +614,8 @@ Compensate(a,_id) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       ASTEmap[myid]->getAttributes();
 
+      /* above is generic */
+
       // register this compensate at the current scope
       /* here we can check whether it is the only compensate activity */
       PPhasCompensateMap[PPcurrentScope] = 1;
@@ -629,6 +639,8 @@ CompensateScope(a,b,_id) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       ASTEmap[myid]->getAttributes();
+
+      /* above is generic */
 
       // register this compensate at the current scope
       /* here we can check whether it is the only compensate activity */
@@ -692,9 +704,12 @@ Flow(a,b,c,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      ASTEmap[myid]->getAttributes();
+
+      /* above is generic */
+
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
-      ASTEmap[myid]->getAttributes();
 
       // distribute the flow's id to the enclosed activities
       // also distribute the control flow type
@@ -757,9 +772,12 @@ Switch(a,b,c,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      ASTEmap[myid]->getAttributes();
+
+      /* above is generic */
+
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
-      ASTEmap[myid]->getAttributes();
 
       // distribute the switch's id to the enclosed activities
       // also distribute the control flow
@@ -843,9 +861,12 @@ If(a,b,c,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      ASTEmap[myid]->getAttributes();
+
+      /* above is generic */
+
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
-      ASTEmap[myid]->getAttributes();
 
       // distribute the switch's id to the enclosed activities
       // also distribute the control flow
@@ -932,8 +953,11 @@ While(a,b,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->inWhile = true;
       ASTEmap[myid]->getAttributes();
+
+      /* above is generic */
+
+      ASTEmap[myid]->inWhile = true;
 
       // distribute the while's id to the enclosed activity
       assert(ASTEmap[b->id] != NULL);
@@ -966,8 +990,11 @@ RepeatUntil(a,b,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->inWhile = true;
       ASTEmap[myid]->getAttributes();
+
+      /* above is generic */
+
+      ASTEmap[myid]->inWhile = true;
 
       // distribute the repeatUntil's id to the enclosed activity
       assert(ASTEmap[b->id] != NULL);
@@ -1000,9 +1027,12 @@ Sequence(a,b,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      ASTEmap[myid]->getAttributes();
+
+      /* above is generic */
+
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
-      ASTEmap[myid]->getAttributes();
 
       // distribute the sequence's id to the enclosed activities
       foreach(innerActivity; activity_list b)
@@ -1038,9 +1068,12 @@ Pick(a,b,c,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      ASTEmap[myid]->getAttributes();
+
+      /* above is generic */
+
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
-      ASTEmap[myid]->getAttributes();
 
       // distribute the pick's id to the enclosed activities
       foreach(branch=OnMessage(innerActivity); tOnMessage_list b)

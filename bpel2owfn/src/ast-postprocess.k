@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/10/27 12:15:27 $
+ * \date    \$Date: 2006/10/27 14:06:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.68 $
+ * \version \$Revision: 1.69 $
  */
 %}
 
@@ -111,6 +111,7 @@ PartnerLink(_id) ->
       assert(ASTEmap[myid] != NULL);
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      ASTEmap[myid]->checkAttributes();
     }
   ]
 ;
@@ -382,6 +383,33 @@ CorrelationSet(_id) ->
 ******************************************************************************/
 
 Correlation(_id) ->
+  [postprocessing:
+    {
+      int myid = _id->value;
+      assert(ASTEmap[myid] != NULL);
+
+      ASTEmap[myid]->checkAttributes();
+     }
+  ]
+;
+
+
+/******************************************************************************
+  TO & FROM PARTS                                                (WS-BPEL 2.0)
+******************************************************************************/
+
+ToPart(_id) ->
+  [postprocessing:
+    {
+      int myid = _id->value;
+      assert(ASTEmap[myid] != NULL);
+
+      ASTEmap[myid]->checkAttributes();
+     }
+  ]
+;
+
+FromPart(_id) ->
   [postprocessing:
     {
       int myid = _id->value;

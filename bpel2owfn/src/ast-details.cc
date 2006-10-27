@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/10/27 12:39:53 $
+ * \date    \$Date: 2006/10/27 14:06:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
  */
 
 
@@ -117,8 +117,9 @@ void ASTE::checkRequiredAttributes(string required[], unsigned int length)
   for (unsigned int i = 0; i < length; i++)
     if (attributes[required[i]] == "")
     {
-      cerr << "error in " << filename << ":" << attributes["referenceLine"] << " - ";
-      cerr << "attribute `" << required[i] << "' required for <" << activityTypeName() << ">" << endl;
+      cerr << "error in " << filename << ":" << attributes["referenceLine"];
+      cerr << " - attribute `" << required[i] << "' is required for <";
+      cerr << activityTypeName() << ">" << endl;
     }
 }
 
@@ -256,6 +257,13 @@ void ASTE::checkAttributes()
         checkRequiredAttributes(required, 2);
 	break;
       }
+    
+    case(K_PARTNERLINK):
+      {
+	string required[] = {"name", "partnerLinkType"};
+        checkRequiredAttributes(required, 2);
+	break;
+      }
 
     case(K_PROCESS):
       {
@@ -302,6 +310,85 @@ void ASTE::checkAttributes()
 
     default: { /* do nothing */ }
   }
+
+
+  // pass 3: set the default values (should be pass 1)
+  switch (type)
+  {
+    case(K_PICK):
+      {
+	string names[] = {"createInstance"};
+	string values[] = {"no"};
+	setStandardAttributes(names, values, 1);
+
+	break;
+      }
+
+    case(K_RECEIVE):
+      {
+	string names[] = {"createInstance"};
+	string values[] = {"no"};
+	setStandardAttributes(names, values, 1);
+
+	break;
+      }
+
+    case(K_PARTNERLINK):
+      {
+	string names[] = {"initalizePartnerLinkRole"};
+	string values[] = {"no"};
+	setStandardAttributes(names, values, 1);
+
+	break;
+      }
+
+    case(K_CORRELATION):
+      {
+	string names[] = {"initiate"};
+	string values[] = {"no"};
+	setStandardAttributes(names, values, 1);
+
+	break;
+      }
+
+    case(K_SCOPE):
+      {
+	string names[] = {"isolated"};
+	string values[] = {"no"};
+	setStandardAttributes(names, values, 1);
+
+	break;
+      }
+
+    case(K_COPY):
+      {
+	string names[] = {"keepSrcElementName"};
+	string values[] = {"no"};
+	setStandardAttributes(names, values, 1);
+
+	break;
+      }
+
+    case(K_BRANCHES):
+      {
+	string names[] = {"successfulBranchesOnly"};
+	string values[] = {"no"};
+	setStandardAttributes(names, values, 1);
+
+	break;
+      }
+
+    case(K_ASSIGN):
+      {
+	string names[] = {"validate"};
+	string values[] = {"no"};
+	setStandardAttributes(names, values, 1);
+
+	break;
+      }      
+
+    default: { /* do nothing */ }
+  }
 }
 
 
@@ -318,7 +405,7 @@ string ASTE::createChannel(bool synchronousCommunication)
   string channelName = attributes["partnerLink"] + "." + attributes["operation"];
   if (channelName == ".")
   {
-    cerr << "no operation or partnerLink given" << endl;
+//    cerr << "no operation or partnerLink given" << endl;
     return "";
   }
 
@@ -469,6 +556,7 @@ string ASTE::activityTypeName()
     case(K_EXIT):		return "exit";
     case(K_EVENTHANDLERS):	return "eventHandlers";
     case(K_FAULTHANDLERS):	return "faultHandlers";
+    case(K_FROMPART):		return "fromPart";
     case(K_FROM):		return "from";
     case(K_FLOW):		return "flow";
     case(K_IF):			return "if";
@@ -491,10 +579,12 @@ string ASTE::activityTypeName()
     case(K_TARGET):		return "target";
     case(K_THROW):		return "throw";
     case(K_TO):			return "to";
+    case(K_TOPART):		return "toPart";
     case(K_VALIDATE):		return "validate";
     case(K_VARIABLE):		return "variable";
     case(K_WAIT):		return "wait";
     case(K_WHILE):		return "while";
+
     default:			return "unknown";
   }
 }

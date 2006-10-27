@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/10/24 13:47:31 $ by $Author: nlohmann $.
-# Version $Revision: 1.37 $
+# File last changed $Date: 2006/10/27 06:48:49 $ by $Author: nlohmann $.
+# Version $Revision: 1.38 $
 
 bin_PROGRAMS = bpel2owfn preprocess
 
@@ -51,15 +51,15 @@ bpel2owfn_SOURCES = $(KCDUMMY)\
 		    $(KCSOURCES)\
 		    parser.yy parser.h\
 		    lexer.ll\
-		    bpel-unparse-tools.cc bpel-unparse-tools.h\
+		    bpel2owfn.cc\
 		    debug.cc debug.h\
 		    helpers.cc helpers.h\
-		    bpel2owfn.cc\
 		    petrinet.h\
 		    petrinet.cc petrinet-output.cc petrinet-reduction.cc\
 		    cfg.cc cfg.h\
 		    options.cc options.h\
 		    getopt.h getopt.c getopt1.c\
+		    ast-tools.cc ast-tools.h\
 		    ast-details.cc ast-details.h
 
 preprocess_SOURCES = preprocess.cc

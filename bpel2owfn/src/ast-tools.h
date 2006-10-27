@@ -19,7 +19,7 @@
 \****************************************************************************/
 
 /*!
- * \file    bpel-unparse-tools.h
+ * \file    ast-tools.h
  *
  * \brief   unparse helper tools
  *
@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/10/25 06:53:37 $
+ * \date    \$Date: 2006/10/27 06:48:49 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -44,8 +44,8 @@
 
 
 
-#ifndef BPEL_UNPARSE_TOOLS_H
-#define BPEL_UNPARSE_TOOLS_H
+#ifndef AST_TOOLS_H
+#define AST_TOOLS_H
 
 
 

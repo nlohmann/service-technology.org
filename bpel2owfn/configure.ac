@@ -18,13 +18,13 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/10/24 12:01:42 $ by $Author: nlohmann $.
-# Version $Revision: 1.16 $
+# File last changed $Date: 2006/10/27 08:27:12 $ by $Author: nlohmann $.
+# Version $Revision: 1.17 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT([BPEL2oWFN],[2.0],[nlohmann@informatik.hu-berlin.de],[bpel2owfn])
-AC_REVISION($Revision: 1.16 $)
+AC_REVISION($Revision: 1.17 $)
 AM_INIT_AUTOMAKE
 
 
@@ -84,6 +84,8 @@ fi
 AC_CHECK_PROG(DOT, dot, dot, not found)
 if test "$DOT" = "not found"; then
  AC_MSG_WARN([Graphviz dot was not found.])
+else
+ AC_DEFINE(HAVE_DOT, 1, [Graphviz dot can be used on this system.])
 fi
 
 

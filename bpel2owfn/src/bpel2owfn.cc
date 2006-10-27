@@ -28,14 +28,14 @@
  * 
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/10/25 08:22:56 $
+ * \date    \$Date: 2006/10/27 08:27:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.114 $
+ * \version \$Revision: 1.115 $
  */
 
 
@@ -399,11 +399,13 @@ int main( int argc, char *argv[])
       {
 	closeOutput(output);
 	output = NULL;
-	
+
+#ifdef HAVE_DOT
 	std::string systemcall = "dot -q -Tpng -o" + output_filename + ".png " + output_filename + "." + suffixes[F_DOT];
 	trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");
 	trace(TRACE_INFORMATION, systemcall + "\n\n");
 	system(systemcall.c_str());
+#endif
       }
     }
 

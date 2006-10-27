@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/10/27 07:06:39 $
+ * \date    \$Date: 2006/10/27 07:31:34 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -106,6 +106,8 @@ unsigned int indentStep = 4;
  * \param prefix  prefix of the pattern to label generated places and
  *                transitions
  *
+ * \param id  identifier of the caller activity
+ *
  * \param negativeControlFlow  signals where the activity is located:
  *                             - 0: inside a scope or the process
  *                             - 1: inside a fault handler
@@ -164,6 +166,8 @@ unsigned int indentStep = 4;
    }
    \enddot
  * 
+ * \todo set scope to "Faulted" in case of "exitOnStandardFault"
+ *
  * \ingroup creation
 */
 Transition *throwFault(Place *p1, Place *p2,
@@ -173,9 +177,34 @@ Transition *throwFault(Place *p1, Place *p2,
   assert(p1 != NULL);
   assert(p2 != NULL);
 
-  // no fault transitions in case of "nano" parameter
+  // no fault transitions in case of "communicationonly" parameter
   if (parameters[P_COMMUNICATIONONLY])
     return NULL;
+
+
+  // if attribute "exitOnStandardFault" is set to "yes", the process should
+  // terminate rather than handling the fault
+  if (ASTEmap[ASTEmap[id->value]->parentScopeId]->attributes["exitOnStandardFault"] == "yes")
+  {
+    Place *p4 = TheNet->findPlace("1.internal.!Terminated");
+    Place *p5 = TheNet->findPlace("1.internal.Terminated");
+    Place *p6 = TheNet->findPlace(currentScope + "upperTerminate");
+
+    Transition *t1 = TheNet->newTransition(prefix + "exitOnStandardFault1." + p1name);
+    TheNet->newArc(p1, t1);
+    TheNet->newArc(t1, p2);
+    TheNet->newArc(t1, p5);
+    TheNet->newArc(p4, t1);
+    TheNet->newArc(t1, p6);
+
+    Transition *t2 = TheNet->newTransition(prefix + "exitOnStandardFault2." + p1name);
+    TheNet->newArc(p1, t2);
+    TheNet->newArc(t2, p2);
+    TheNet->newArc(p5, t2, READ);
+
+    return t1;
+  }
+
 
   switch (negativeControlFlow)
   {

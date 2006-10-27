@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/10/27 14:06:40 $
+ * \date    \$Date: 2006/10/27 18:12:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.35 $
+ * \version \$Revision: 1.36 $
  */
 
 
@@ -152,20 +152,97 @@ void ASTE::checkAttributes()
 {
   extern map<unsigned int, ASTE*> ASTEmap;
 
-  // pass 1: set the values of suppressJoinFailure and exitOnStandardFault
+  // pass 1: set the default values
   switch (type)
   {
     case(K_PROCESS):
       {
-	string names[] = {"suppressJoinFailure", "exitOnStandardFault"};
-	string values[] = {"no", "no"};
-	setStandardAttributes(names, values, 2);
-	assert(attributes["suppressJoinFailure"] != "");
-	assert(attributes["exitOnStandardFault"] != "");
+	string names[] = {"suppressJoinFailure", "exitOnStandardFault", "abstractProcess", "enableInstanceCompensation"};
+	string values[] = {"no", "no", "no", "no"};
+	setStandardAttributes(names, values, 3);
 
 	break;
       }
 
+    case(K_PICK):
+      {
+	string names[] = {"createInstance"};
+	string values[] = {"no"};
+	setStandardAttributes(names, values, 1);
+
+	break;
+      }
+
+    case(K_RECEIVE):
+      {
+	string names[] = {"createInstance"};
+	string values[] = {"no"};
+	setStandardAttributes(names, values, 1);
+
+	break;
+      }
+
+    case(K_PARTNERLINK):
+      {
+	string names[] = {"initalizePartnerLinkRole"};
+	string values[] = {"no"};
+	setStandardAttributes(names, values, 1);
+
+	break;
+      }
+
+    case(K_CORRELATION):
+      {
+	string names[] = {"initiate"};
+	string values[] = {"no"};
+	setStandardAttributes(names, values, 1);
+
+	break;
+      }
+
+    case(K_SCOPE):
+      {
+	string names[] = {"isolated", "variableAccessSerializable"};
+	string values[] = {"no", "no"};
+	setStandardAttributes(names, values, 2);
+
+	break;
+      }
+
+    case(K_COPY):
+      {
+	string names[] = {"keepSrcElementName"};
+	string values[] = {"no"};
+	setStandardAttributes(names, values, 1);
+
+	break;
+      }
+
+    case(K_BRANCHES):
+      {
+	string names[] = {"successfulBranchesOnly"};
+	string values[] = {"no"};
+	setStandardAttributes(names, values, 1);
+
+	break;
+      }
+
+    case(K_ASSIGN):
+      {
+	string names[] = {"validate"};
+	string values[] = {"no"};
+	setStandardAttributes(names, values, 1);
+
+	break;
+      }      
+
+    default: { /* do nothing */ }
+  }
+
+
+  // pass 2: set the values of suppressJoinFailure and exitOnStandardFault
+  switch (type)
+  {
     case(K_SCOPE):
       {
 	/* organize the exitOnStandardFault attribute */
@@ -217,7 +294,7 @@ void ASTE::checkAttributes()
   }
 
 
-  // pass 2: check the required attributes
+  // pass 3: check the required attributes
   switch (type)
   {
     case(K_CORRELATION):
@@ -307,85 +384,6 @@ void ASTE::checkAttributes()
         checkRequiredAttributes(required, 1);
 	break;
       }
-
-    default: { /* do nothing */ }
-  }
-
-
-  // pass 3: set the default values (should be pass 1)
-  switch (type)
-  {
-    case(K_PICK):
-      {
-	string names[] = {"createInstance"};
-	string values[] = {"no"};
-	setStandardAttributes(names, values, 1);
-
-	break;
-      }
-
-    case(K_RECEIVE):
-      {
-	string names[] = {"createInstance"};
-	string values[] = {"no"};
-	setStandardAttributes(names, values, 1);
-
-	break;
-      }
-
-    case(K_PARTNERLINK):
-      {
-	string names[] = {"initalizePartnerLinkRole"};
-	string values[] = {"no"};
-	setStandardAttributes(names, values, 1);
-
-	break;
-      }
-
-    case(K_CORRELATION):
-      {
-	string names[] = {"initiate"};
-	string values[] = {"no"};
-	setStandardAttributes(names, values, 1);
-
-	break;
-      }
-
-    case(K_SCOPE):
-      {
-	string names[] = {"isolated"};
-	string values[] = {"no"};
-	setStandardAttributes(names, values, 1);
-
-	break;
-      }
-
-    case(K_COPY):
-      {
-	string names[] = {"keepSrcElementName"};
-	string values[] = {"no"};
-	setStandardAttributes(names, values, 1);
-
-	break;
-      }
-
-    case(K_BRANCHES):
-      {
-	string names[] = {"successfulBranchesOnly"};
-	string values[] = {"no"};
-	setStandardAttributes(names, values, 1);
-
-	break;
-      }
-
-    case(K_ASSIGN):
-      {
-	string names[] = {"validate"};
-	string values[] = {"no"};
-	setStandardAttributes(names, values, 1);
-
-	break;
-      }      
 
     default: { /* do nothing */ }
   }

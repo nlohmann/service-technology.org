@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/10/27 12:15:27 $
+ * \date    \$Date: 2006/10/27 12:39:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.33 $
+ * \version \$Revision: 1.34 $
  */
 
 
@@ -105,16 +105,23 @@ ASTE::ASTE(int myid, int mytype)
 /*!
  * \brief checks whether required attributes are set
  *
+ * \param required array of attribute names
+ * \param length   length of the array
+
  * \todo a real error message
- *
- * \param array of strings holding attribute names
  */
 void ASTE::checkRequiredAttributes(string required[], unsigned int length)
 {
+  extern string filename;
+
   for (unsigned int i = 0; i < length; i++)
     if (attributes[required[i]] == "")
-      cerr << "error: attribute `" << required[i] << "' is not set!" << endl;
+    {
+      cerr << "error in " << filename << ":" << attributes["referenceLine"] << " - ";
+      cerr << "attribute `" << required[i] << "' required for <" << activityTypeName() << ">" << endl;
+    }
 }
+
 
 
 
@@ -122,7 +129,9 @@ void ASTE::checkRequiredAttributes(string required[], unsigned int length)
 /*!
  * \brief set unset attributes to their standard values
  *
- * \param array of pairs holding attribute names and their standard value
+ * \param names  array of attribute names
+ * \param values array of standard values
+ * \param length length of the arrays
  */
 void ASTE::setStandardAttributes(string names[], string values[], unsigned int length)
 {

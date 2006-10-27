@@ -37,7 +37,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2006/10/27 12:15:27 $
+ * \date    \$Date: 2006/10/27 12:39:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -46,7 +46,7 @@
  * \note    This file was created using GNU Bison reading file parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.261 $
+ * \version \$Revision: 1.262 $
  *
  * \ingroup frontend
  */
@@ -415,12 +415,12 @@ tFaultHandlers:
 tCatch_list:
   /* empty */
     { $$ = NiltCatch_list(); }
-| tCatch X_NEXT tCatch_list
-    { $$ = ConstCatch_list($1, $3); }
+| tCatch tCatch_list
+    { $$ = ConstCatch_list($1, $2); }
 ;
 
 tCatch:
-  K_CATCH arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CATCH
+  K_CATCH arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CATCH X_NEXT
     { $$ = Catch($4, $2); }
 ;
 

@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/24 12:57:32 $
+ *          - last changed: \$Date: 2006/10/27 07:06:39 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.203 $
+ * \version \$Revision: 1.204 $
  *
  */
 %}
@@ -1299,7 +1299,7 @@ This=userDefinedEventHandler(a,b,_id) ->
     b // onAlarm branches
     {
       int onMessageCount = 1;
-      foreach (ThisBranch = OnMessage(innerActivity); tOnMessage_list a)
+      foreach (ThisBranch = OnMessage(innerActivity, _id2); tOnMessage_list a)
       {
 	string message = toString(onMessageCount++);
 	string newPrefix = prefix + "onMessage" + message + ".";
@@ -1365,7 +1365,7 @@ This=userDefinedEventHandler(a,b,_id) ->
 	TheNet->newArc(onMessage_t11, onMessage_p12);
 
 	if (parameters[P_NOSTANDARDFAULTS] == false)
-	  Transition *t1 = throwFault(onMessage_p2, onMessage_p1, toString(onMessageCount-1) + ".p2", prefix, 0); // the toString-part fixed a bug
+	  Transition *t1 = throwFault(onMessage_p2, onMessage_p1, toString(onMessageCount-1) + ".p2", prefix, _id2, 0); // the toString-part fixed a bug
 
 	// arcs from the EH
 	TheNet->newArc(t11, onMessage_p7); // t11 in AEH is t13 in MEH
@@ -1496,7 +1496,7 @@ This=implicitCompensationHandler(_id) provided (!ASTEmap[_id->value]->inProcess)
       {
 	Place *p1  = TheNet->newPlace(prefix + "p1");
 
-	Transition *t1 = throwFault(p2, p1, "ch_in", prefix, 2);
+	Transition *t1 = throwFault(p2, p1, "ch_in", prefix, _id, 2);
 	TheNet->newArc(p3, t1, READ);
 
 	Transition *t3 = TheNet->newTransition(prefix + "t3");
@@ -1627,7 +1627,7 @@ This=userDefinedCompensationHandler(innerActivity,_id) provided (!ASTEmap[_id->v
       {
 	Place *p1  = TheNet->newPlace(prefix + "p1");
 
-	Transition *t1 = throwFault(p2, p1, "ch_in", prefix, 2);
+	Transition *t1 = throwFault(p2, p1, "ch_in", prefix, _id, 2);
 	TheNet->newArc(p3, t1, READ);
 
 	Transition *t3 = TheNet->newTransition(prefix + "t3");

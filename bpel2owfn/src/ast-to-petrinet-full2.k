@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/26 09:20:08 $
+ *          - last changed: \$Date: 2006/10/27 07:06:39 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.51 $
+ * \version \$Revision: 1.52 $
  */
 %}
 
@@ -133,7 +133,7 @@ This=AsynchronousInvoke(a,b,_id) -> // provided (!This->isSynchronousInvoke) ->
 
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
-	Transition *t3 = throwFault(p2, p4, "running", prefix, ASTEmap[_id->value]->controlFlow);
+	Transition *t3 = throwFault(p2, p4, "running", prefix, _id, ASTEmap[_id->value]->controlFlow);
 
       Transition *t4 = stop(p1, "initial", prefix);
       Transition *t5 = stop(p2, "running", prefix);
@@ -209,8 +209,8 @@ This=SynchronousInvoke(a,b,_id) -> //provided (This->isSynchronousInvoke) ->
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
       {
-	Transition *t5 = throwFault(p4, p6, "running2", prefix, ASTEmap[_id->value]->controlFlow);
-	Transition *t6 = throwFault(p2, p6, "running1", prefix, ASTEmap[_id->value]->controlFlow);
+	Transition *t5 = throwFault(p4, p6, "running2", prefix, _id, ASTEmap[_id->value]->controlFlow);
+	Transition *t6 = throwFault(p2, p6, "running1", prefix, _id, ASTEmap[_id->value]->controlFlow);
       }
 
       Transition *t7  = stop(p1, "initial", prefix);
@@ -275,7 +275,7 @@ This=Receive(a,b,_id) ->
 
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
-	Transition *t3 = throwFault(p2, p4, "running", prefix, ASTEmap[_id->value]->controlFlow);
+	Transition *t3 = throwFault(p2, p4, "running", prefix, _id, ASTEmap[_id->value]->controlFlow);
 
       Transition *t4 = stop(p1, "initial", prefix);
       Transition *t5 = stop(p2, "running", prefix);
@@ -334,7 +334,7 @@ This=Reply(a,b,_id) ->
 
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
-	Transition *t3 = throwFault(p2, p4, "running", prefix, ASTEmap[_id->value]->controlFlow);
+	Transition *t3 = throwFault(p2, p4, "running", prefix, _id, ASTEmap[_id->value]->controlFlow);
 
       Transition *t3 = stop(p1, "initial", prefix);
       Transition *t5 = stop(p2, "running", prefix);
@@ -410,7 +410,7 @@ This=Assign(a,b,_id) ->
 
 	  // Transitions for the negative control flow.
 	  if (parameters[P_NOSTANDARDFAULTS] == false)
-	    Transition *t3 = throwFault(p2, p4, "running", newPrefix, ASTEmap[_id->value]->controlFlow);
+	    Transition *t3 = throwFault(p2, p4, "running", newPrefix, _id, ASTEmap[_id->value]->controlFlow);
 
 	  Transition *t6 = stop(p4, "p4at" + toString(copyCount), prefix);
 
@@ -431,7 +431,7 @@ This=Assign(a,b,_id) ->
 
 	  // Transitions for the negative control flow.
 	  if (parameters[P_NOSTANDARDFAULTS] == false)
-	    Transition *t3 = throwFault(lastPlace, p4, "initial", newPrefix, ASTEmap[_id->value]->controlFlow);
+	    Transition *t3 = throwFault(lastPlace, p4, "initial", newPrefix, _id, ASTEmap[_id->value]->controlFlow);
 
 	  Transition *t6 = stop(p4, "p4at" + toString(copyCount), prefix);
 
@@ -481,7 +481,7 @@ This=Validate(a,_id) ->
 
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
-        Transition *t3 = throwFault(p2, p4, "running", prefix, ASTEmap[This->id]->controlFlow); // was: This->negativeControlFlow);
+        Transition *t3 = throwFault(p2, p4, "running", prefix, _id, ASTEmap[This->id]->controlFlow); // was: This->negativeControlFlow);
 
       Transition *t4 = stop(p1, "initial", prefix);
       Transition *t5 = stop(p2, "running", prefix);
@@ -607,7 +607,7 @@ This=Throw(a,_id) ->
 
 
       // Transitions for the negative control flow.
-      Transition *t1 = throwFault(p1, p2, "initial", prefix, ASTEmap[_id->value]->controlFlow);
+      Transition *t1 = throwFault(p1, p2, "initial", prefix, _id, ASTEmap[_id->value]->controlFlow);
       Transition *t2 = stop(p1, "initial", prefix);
       Transition *t3 = stop(p2, "p2", prefix);
     }
@@ -1066,7 +1066,7 @@ This=Switch(a,b,Otherwise(c,d),_id) ->
 
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
-	Transition *t7 = throwFault(p6, p10, "running", prefix, ASTEmap[_id->value]->controlFlow);
+	Transition *t7 = throwFault(p6, p10, "running", prefix, _id, ASTEmap[_id->value]->controlFlow);
 
       Transition *t8  = stop(p5, "initial", prefix);
       Transition *t9  = stop(p6, "running", prefix);
@@ -1237,7 +1237,7 @@ This=While(a,b,_id) ->
 
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
-	Transition *t5 = throwFault(p2, p6, "running", prefix, ASTEmap[_id->value]->controlFlow);
+	Transition *t5 = throwFault(p2, p6, "running", prefix, _id, ASTEmap[_id->value]->controlFlow);
 
       Transition *t6 = stop(p1, "initial", prefix);
       Transition *t7 = stop(p2, "running", prefix);
@@ -1300,7 +1300,7 @@ This=RepeatUntil(a,b,_id) ->
 
        // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
-	Transition *t4 = throwFault(p3, p6, "running", prefix, ASTEmap[_id->value]->controlFlow);
+	Transition *t4 = throwFault(p3, p6, "running", prefix, _id, ASTEmap[_id->value]->controlFlow);
 
       Transition *t5 = stop(p1, "initial", prefix);
       Transition *t6 = stop(p2, "running", prefix);
@@ -1470,7 +1470,7 @@ This=Pick(a,b,c,_id) ->
 
 	// Transitions for the negative control flow.
 	if (parameters[P_NOSTANDARDFAULTS] == false)
-	  Transition *t4 = throwFault(p3, p10, "p3", newPrefix, ASTEmap[_id->value]->controlFlow);
+	  Transition *t4 = throwFault(p3, p10, "p3", newPrefix, _id, ASTEmap[_id->value]->controlFlow);
 
         Transition *t9  = stop(p3, "p3at" + message, prefix);
 	Transition *t10 = stop(p10, "p10at" + message, prefix);
@@ -2028,7 +2028,7 @@ This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF) ->
 
 
       // Transitions for the negative control flow.
-      Transition *t2 = throwFault(p8, p11, "initial", prefix, ASTEmap[This->parentId]->controlFlow);
+      Transition *t2 = throwFault(p8, p11, "initial", prefix, mkinteger(This->parentId), ASTEmap[This->parentId]->controlFlow);
 
       Transition *t3 = stop(p8, "initial", prefix);
       Transition *t4 = stop(p11, "p11", prefix);
@@ -2285,7 +2285,7 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF) ->
 
 
       // Transitions for the negative control flow.
-      Transition *t5 = throwFault(p16, p17, "initial", prefix, ASTEmap[This->parentId]->controlFlow);
+      Transition *t5 = throwFault(p16, p17, "initial", prefix, mkinteger(This->parentId), ASTEmap[This->parentId]->controlFlow);
 
       Transition *t6 = stop(p16, "initial", prefix);
       Transition *t7 = stop(p17, "p17", prefix);

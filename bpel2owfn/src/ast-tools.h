@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/10/27 06:48:49 $
+ * \date    \$Date: 2006/10/27 07:06:40 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -71,7 +71,7 @@ using namespace std;
  *****************************************************************************/
 
 Transition *throwFault(Place *p1, Place *p2,
-    string p1name, string prefix,
+    string p1name, string prefix, kc::integer id,
     int negativeControlFlow, bool preventFurtherFaults = true);
 Transition *stop(Place *p, string p_name, string prefix);
 void dpeLinks(Transition* t, int id);

@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/10/27 06:48:49 $
+ * \date    \$Date: 2006/10/27 07:06:39 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -167,7 +167,7 @@ unsigned int indentStep = 4;
  * \ingroup creation
 */
 Transition *throwFault(Place *p1, Place *p2,
-    string p1name, string prefix,
+    string p1name, string prefix, kc::integer id,
     int negativeControlFlow, bool preventFurtherFaults)
 {
   assert(p1 != NULL);
@@ -176,7 +176,7 @@ Transition *throwFault(Place *p1, Place *p2,
   // no fault transitions in case of "nano" parameter
   if (parameters[P_COMMUNICATIONONLY])
     return NULL;
-  
+
   switch (negativeControlFlow)
   {
     case(0): // activity in scope or process

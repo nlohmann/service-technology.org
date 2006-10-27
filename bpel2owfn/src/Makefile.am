@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/10/27 06:48:49 $ by $Author: nlohmann $.
-# Version $Revision: 1.38 $
+# File last changed $Date: 2006/10/27 07:06:39 $ by $Author: nlohmann $.
+# Version $Revision: 1.39 $
 
 bin_PROGRAMS = bpel2owfn preprocess
 
@@ -36,10 +36,10 @@ KCFILES = ast-grammar.k ast-to-petrinet-full1.k ast-to-petrinet-full2.k \
 	  ast-to-xml.k ast-to-cfg.k ast-config.k \
 	  ast-to-petrinet-small.k ast-postprocess.k ast-rewrite.k
 KCGENERATED = ast-system-csgiok ast-system-k ast-system-rk ast-system-unpk
-KCSOURCES = $(KCFILES:.k=.cc) \
-	    $(KCFILES:.k=.h) \
-	    $(KCGENERATED:=.cc) \
+KCSOURCES = $(KCGENERATED:=.cc) \
 	    $(KCGENERATED:=.h) \
+	    $(KCFILES:.k=.cc) \
+	    $(KCFILES:.k=.h) \
 	    ast-system-yystype.h
 KCOBJECTS = $(KCFILES:.k=.o) \
 	    $(KCGENERATED:=.o)
@@ -47,8 +47,8 @@ KCOBJECTS = $(KCFILES:.k=.o) \
 
 # the list of sources
 bpel2owfn_SOURCES = $(KCDUMMY)\
-		    $(KCFILES)\
 		    $(KCSOURCES)\
+		    $(KCFILES)\
 		    parser.yy parser.h\
 		    lexer.ll\
 		    bpel2owfn.cc\

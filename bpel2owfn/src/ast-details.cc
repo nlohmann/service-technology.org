@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/10/26 14:40:29 $
+ * \date    \$Date: 2006/10/27 12:15:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  */
 
 
@@ -74,22 +74,6 @@ extern set<string> ASTE_variables;
 
 
 /******************************************************************************
- * Data structures
- *****************************************************************************/
-
-/*!
- * \brief structure to store standard values of attributes
- */
-typedef struct attribute {
-  string name;
-  string value;
-};
-
-
-
-
-
-/******************************************************************************
  * Member functions
  *****************************************************************************/
 
@@ -119,42 +103,62 @@ ASTE::ASTE(int myid, int mytype)
 
 
 /*!
- * \brief checks and returns attributes.
- *
- * \returns a name-value mapping of the attributes
+ * \brief checks whether required attributes are set
  *
  * \todo a real error message
+ *
+ * \param array of strings holding attribute names
  */
-map<string, string> ASTE::getAttributes()
+void ASTE::checkRequiredAttributes(string required[], unsigned int length)
 {
-  // checks attributes...
+  for (unsigned int i = 0; i < length; i++)
+    if (attributes[required[i]] == "")
+      cerr << "error: attribute `" << required[i] << "' is not set!" << endl;
+}
+
+
+
+
+/*!
+ * \brief set unset attributes to their standard values
+ *
+ * \param array of pairs holding attribute names and their standard value
+ */
+void ASTE::setStandardAttributes(string names[], string values[], unsigned int length)
+{
+  for (unsigned int i = 0; i < length; i++)
+    if (attributes[names[i]] == "")
+      attributes[names[i]] = values[i];
+}
+
+
+
+
+
+/*!
+ * \brief checks and returns attributes.
+ */
+void ASTE::checkAttributes()
+{
+  extern map<unsigned int, ASTE*> ASTEmap;
+
+  // pass 1: set the values of suppressJoinFailure and exitOnStandardFault
   switch (type)
   {
     case(K_PROCESS):
       {
-	// the require attributes
-      	string required[] = {"name", "targetNamespace"};
-      	const unsigned int requireds = sizeof(required)/sizeof(required[0]);
-
-	for (unsigned int i = 0; i < requireds; i++)
-	  if (attributes[required[i]] == "")
-	    cerr << "error: attribute `" << required[i] << "' is not set!" << endl;
-
-	// the optional attributes
-	attribute optional[] = { {"suppressJoinFailure", "no"}, {"exitOnStandardFault", "no"} };
-	const unsigned int optionals = sizeof(optional)/sizeof(optional[0]);
-
-	for (unsigned int i = 0; i < optionals; i++)
-	  if (attributes[optional[i].name] == "")
-	    attributes[optional[i].name] = optional[i].value;
+	string names[] = {"suppressJoinFailure", "exitOnStandardFault"};
+	string values[] = {"no", "no"};
+	setStandardAttributes(names, values, 2);
+	assert(attributes["suppressJoinFailure"] != "");
+	assert(attributes["exitOnStandardFault"] != "");
 
 	break;
       }
 
     case(K_SCOPE):
       {
-	extern map<unsigned int, ASTE*> ASTEmap;
-
+	/* organize the exitOnStandardFault attribute */
 	assert(ASTEmap[parentScopeId] != NULL);
 	if (attributes["exitOnStandardFault"] == "")
 	  attributes["exitOnStandardFault"] = ASTEmap[parentScopeId]->attributes["exitOnStandardFault"];
@@ -183,8 +187,7 @@ map<string, string> ASTE::getAttributes()
     case(K_SEQUENCE):
     case(K_PICK):
       {
-	extern map<unsigned int, ASTE*> ASTEmap;
-
+	/* organize the suppressJoinFailure attribute */
 	assert(ASTEmap[parentActivityId] != NULL);
 	assert(ASTEmap[parentScopeId] != NULL);
 	if (attributes["suppressJoinFailure"] == "")
@@ -194,17 +197,102 @@ map<string, string> ASTE::getAttributes()
 	// to a fault, compensation, event or termination handler, thus the
 	// value of the surrounding scope should be taken.
 	if (attributes["suppressJoinFailure"] == "")
-	  attributes["suppressJoinFailure"] = ASTEmap[parentScopeId]->attributes["suppressJoinFailure"];	
+	  attributes["suppressJoinFailure"] = ASTEmap[parentScopeId]->attributes["suppressJoinFailure"];
+
 	assert(attributes["suppressJoinFailure"] != "");
 	
 	break;
       }
-
-    default:
-      { }
+    default: { /* do nothing */ }
   }
 
-  return attributes;
+
+  // pass 2: check the required attributes
+  switch (type)
+  {
+    case(K_CORRELATION):
+      {
+      	string required[] = {"set"};
+        checkRequiredAttributes(required, 1);
+	break;
+      }
+
+    case(K_CORRELATIONSET):
+      {
+      	string required[] = {"name", "properties"};
+        checkRequiredAttributes(required, 2);
+	break;
+      }
+      
+    case(K_FOREACH):
+      {
+      	string required[] = {"counterName", "parallel"};
+        checkRequiredAttributes(required, 2);
+	break;
+      }
+
+    case(K_FROMPART):
+      {
+      	string required[] = {"part", "toVariable"};
+        checkRequiredAttributes(required, 2);
+	break;
+      }
+
+    case(K_INVOKE):
+    case(K_RECEIVE):
+    case(K_REPLY):
+    case(K_ONMESSAGE):
+      {
+      	string required[] = {"partnerLink", "operation"};
+        checkRequiredAttributes(required, 2);
+	break;
+      }
+
+    case(K_PROCESS):
+      {
+      	string required[] = {"name", "targetNamespace"};
+        checkRequiredAttributes(required, 2);
+	break;
+      }
+
+    case(K_SOURCE):
+    case(K_TARGET):
+      {
+      	string required[] = {"linkName"};
+        checkRequiredAttributes(required, 1);
+	break;
+      }
+
+    case(K_THROW):
+      {
+      	string required[] = {"faultName"};
+        checkRequiredAttributes(required, 1);
+	break;
+      }
+
+    case(K_TOPART):
+      {
+      	string required[] = {"part", "fromVariable"};
+        checkRequiredAttributes(required, 2);
+	break;
+      }
+
+    case(K_VALIDATE):
+      {
+      	string required[] = {"variables"};
+        checkRequiredAttributes(required, 1);
+	break;
+      }
+
+    case(K_VARIABLE):
+      {
+      	string required[] = {"name"};
+        checkRequiredAttributes(required, 1);
+	break;
+      }
+
+    default: { /* do nothing */ }
+  }
 }
 
 

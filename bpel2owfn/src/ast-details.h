@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/10/26 14:40:29 $
+ * \date    \$Date: 2006/10/27 12:15:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  */
 
 
@@ -79,6 +79,15 @@ typedef enum
 } controlFlowType;
 
 
+/*!
+ * \brief structure to store standard values of attributes
+ */
+typedef struct attribute {
+  string name;
+  string value;
+};
+
+
 
 
 
@@ -94,6 +103,9 @@ class ASTE
   private:
     unsigned int id;	///< the id of the AST phylum
     unsigned int type;	///< the type of the node, identified by the keywords as parsed by Flex
+
+    void checkRequiredAttributes(string required[], unsigned int length);
+    void setStandardAttributes(string names[], string values[], unsigned int length);
 
   public:
     map<string, string> attributes;	///< the parsed attributes
@@ -118,13 +130,13 @@ class ASTE
 
     ASTE(int myid, int mytype);
 
-    map<string, string> getAttributes();
     string createChannel(bool synchronousCommunication = false);
 
     string checkVariable();
     string checkInputVariable();
     string checkOutputVariable();
 
+    void checkAttributes();
     void defineVariable();
     string activityTypeName();
 };

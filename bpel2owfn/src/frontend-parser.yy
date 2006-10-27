@@ -37,7 +37,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2006/10/25 08:35:34 $
+ * \date    \$Date: 2006/10/27 12:15:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -46,7 +46,7 @@
  * \note    This file was created using GNU Bison reading file parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.260 $
+ * \version \$Revision: 1.261 $
  *
  * \ingroup frontend
  */
@@ -1057,8 +1057,7 @@ standardElements:
 | K_SOURCES X_NEXT tSource X_NEXT tSource_list X_SLASH K_SOURCES X_NEXT
     { $$ = StandardElements(NiltTarget_list(), ConstSource_list($3, $5), currentJoinCondition);
       currentJoinCondition = standardJoinCondition(); }
-| K_TARGETS X_NEXT tTarget X_NEXT tTarget_list X_SLASH K_TARGETS X_NEXT
-  K_SOURCES X_NEXT tSource X_NEXT tSource_list X_SLASH K_SOURCES X_NEXT
+| K_TARGETS X_NEXT tTarget X_NEXT tTarget_list X_SLASH K_TARGETS X_NEXT K_SOURCES X_NEXT tSource X_NEXT tSource_list X_SLASH K_SOURCES X_NEXT
     { $$ = StandardElements(ConstTarget_list($3, $5), ConstSource_list($11, $13), currentJoinCondition);
       currentJoinCondition = standardJoinCondition(); }
 ;

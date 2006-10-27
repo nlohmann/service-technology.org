@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/10/26 17:17:24 $
+ * \date    \$Date: 2006/10/27 12:15:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.67 $
+ * \version \$Revision: 1.68 $
  */
 %}
 
@@ -59,7 +59,7 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
       PPcurrentScope = myid;
 
       // annotate AST and check information
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
       ASTEmap[myid]->hasEH = (string(g->op_name()) == "userDefinedEventHandler");
       ASTEmap[f->id]->inProcess = true;
 
@@ -197,7 +197,7 @@ Catch(a,_id) ->
       int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
 
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
     }
     a
   ]
@@ -270,7 +270,7 @@ OnMessage(a,_id) ->
 
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
       ASTEmap[myid]->channelName = ASTEmap[myid]->createChannel();
       ASTEmap[myid]->variableName = ASTEmap[myid]->checkVariable();
     }
@@ -354,7 +354,7 @@ Variable(_id) ->
       assert(ASTEmap[myid] != NULL);
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
       ASTEmap[myid]->defineVariable();
     }
   ]
@@ -371,7 +371,7 @@ CorrelationSet(_id) ->
       int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
 
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
      }
   ]
 ;
@@ -387,7 +387,7 @@ Correlation(_id) ->
       int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
 
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
      }
   ]
 ;
@@ -406,7 +406,7 @@ Empty(a,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
     }
     a
   ]
@@ -426,7 +426,7 @@ Invoke(a,b,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
 
       /* above is generic */
 
@@ -453,7 +453,7 @@ Receive(a,b,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
 
       /* above is generic */
       ASTEmap[myid]->channelName = ASTEmap[myid]->createChannel();
@@ -478,7 +478,7 @@ Reply(a,b,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
 
       /* above is generic */
 
@@ -504,7 +504,7 @@ Assign(a,b,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
     }
     a b
   ]
@@ -520,7 +520,7 @@ From(_id) ->
       int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
 
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
       ASTEmap[myid]->variableName = ASTEmap[myid]->checkVariable();
     }
   ]
@@ -532,7 +532,7 @@ To(_id) ->
       int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
 
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
       ASTEmap[myid]->variableName = ASTEmap[myid]->checkVariable();
     }
   ]
@@ -552,7 +552,7 @@ Validate(a,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
     }
     a
   ]
@@ -572,7 +572,7 @@ Wait(a,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
     }
     a
   ]
@@ -592,7 +592,7 @@ Throw(a,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
     }
     a
   ]
@@ -612,7 +612,7 @@ Compensate(a,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
 
       /* above is generic */
 
@@ -638,7 +638,7 @@ CompensateScope(a,b,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
 
       /* above is generic */
 
@@ -664,7 +664,7 @@ Terminate(a,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
     }
     a
   ]
@@ -684,7 +684,7 @@ Exit(a,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
     }
     a
   ]
@@ -704,7 +704,7 @@ Flow(a,b,c,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
 
       /* above is generic */
 
@@ -746,7 +746,7 @@ Link(_id) ->
       assert(ASTEmap[myid] != NULL);
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
 
       /* here we can check whether this link was not defined before */
       linkIdMap[ASTEmap[myid]->attributes["name"]] = myid;
@@ -772,7 +772,7 @@ Switch(a,b,c,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
 
       /* above is generic */
 
@@ -829,7 +829,7 @@ Case(a,_id) ->
       assert(ASTEmap[myid] != NULL);
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
     }
     a
   ]
@@ -861,7 +861,7 @@ If(a,b,c,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
 
       /* above is generic */
 
@@ -918,7 +918,7 @@ ElseIf(a,_id) ->
       assert(ASTEmap[myid] != NULL);
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
     }
     a
   ]
@@ -953,7 +953,7 @@ While(a,b,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
 
       /* above is generic */
 
@@ -990,7 +990,7 @@ RepeatUntil(a,b,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
 
       /* above is generic */
 
@@ -1027,7 +1027,7 @@ Sequence(a,b,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
 
       /* above is generic */
 
@@ -1068,7 +1068,7 @@ Pick(a,b,c,_id) ->
       a->parentId = myid;
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
 
       /* above is generic */
 
@@ -1127,7 +1127,7 @@ Scope(a,b,c,d,e,f,g,h,_id) ->
 
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
       ASTEmap[ASTEmap[myid]->parentScopeId]->enclosedScopes.insert(myid);
       ASTEmap[myid]->hasEH = (string(e->op_name()) == "userDefinedEventHandler");
 
@@ -1202,7 +1202,7 @@ Target(a) ->
 
 
       // annotate AST and check information
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
 
 
 /*TODO
@@ -1232,7 +1232,7 @@ Source(a) ->
 
 
       // annotate AST and check information
-      ASTEmap[myid]->getAttributes();
+      ASTEmap[myid]->checkAttributes();
 
 /*TODO
       // remember that that link was used as a source

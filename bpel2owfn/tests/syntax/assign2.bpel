@@ -17,10 +17,14 @@
     <variable name="shippingSchedule" messageType="lns:scheduleMessage" />
   </variables>
 
+  <extensions>
+    <extension namespace="foo" mustUnderstand="no" />
+  </extensions>
+
   <assign>
 
     <extensionAssignOperation>
-      assign-element-of-other-namespace
+      <foo:assignAnything>SomeNature</foo:assignAnything>
     </extensionAssignOperation>
 
   </assign>

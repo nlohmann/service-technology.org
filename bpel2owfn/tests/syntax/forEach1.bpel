@@ -1,0 +1,35 @@
+<process name="forEach1" targetNamespace="anyURI">
+
+  <documentation xml:lang="EN"></documentation>
+
+  <variables>
+    <variable name="forEachCounter"/>
+  </variables>
+
+  <forEach  counterName="forEachCounter"
+            parallel="no">
+    
+    <startCounterValue expressionLanguage="anyURI"?>
+      1
+    </startCounterValue>
+    
+    <finalCounterValue expressionLanguage="anyURI"?>
+      10
+    </finalCounterValue>
+    
+    <completionCondition>?
+      <branches expressionLanguage="anyURI"?
+                successfulBranchesOnly="no"?>
+        9
+      </branches>
+    </completionCondition>
+    
+    <scope>
+      <wait>
+        <for>'1S'</for>
+      </wait>
+    </scope>
+  
+  </forEach>
+
+</process>

@@ -1,0 +1,16 @@
+<process name="compensateScope2" targetNamespace="anyURI">
+
+  <documentation xml:lang="EN"></documentation>
+
+  <scope name="S1">
+    <faultHandlers>
+      <catch faultName="faultTest">
+        <compensateScope target="S2" />
+      </catch>
+    </faultHandlers>
+    <scope name="S2">
+      <exit/>
+    </scope>
+  </scope>
+
+</process>

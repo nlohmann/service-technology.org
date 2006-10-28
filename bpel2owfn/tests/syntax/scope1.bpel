@@ -1,0 +1,50 @@
+<process name="scope1" targetNamespace="anyURI">
+
+  <scope>
+    <variables>
+      <variable name="shipRequest"
+                messageType="shippingRequestMsg" />
+    </variables>
+    
+    <partnerLinks>
+        <partnerLink  name="buyer" 
+                      partnerLinkType="buyerLT"
+                      partnerRole="sellerService"
+                      myRole="buyerService" />
+    </partnerLinks>
+    
+    <messageExchanges>
+      <messageExchange name="shippingRequestMsg" />
+    </messageExchanges>
+    
+    <correlationSets>
+      <correlation set="specialID" initialize="yes" />
+    </correlationSets>
+    
+    <eventHandlers>
+      <onEvent  partnerLink="buyer"
+                operation="haltOrder">
+        <scope>
+          <exit />
+        </scope>
+      </onEvent>
+    </eventHandlers>
+    
+    <faultHandlers>
+      <catchAll>
+          <exit />
+      </catchAll>
+    </faultHandlers>
+    
+    <compensationHandler>
+      <compensate />
+    </compensationHandler>
+    
+    <terminationHandler>
+      <compensate />
+    </terminationHandler>
+
+    <empty/>
+  </scope>
+  
+</process>

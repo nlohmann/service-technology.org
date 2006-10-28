@@ -1,0 +1,13 @@
+<process name="throw1" targetNamespace="anyURI">
+
+  <faultHandlers>
+    <catch faultName="someFault">
+      <exit/>
+    </catch>
+  </faultHandlers>
+
+  <sequence>
+    <throw faultName="someFault" />
+  </sequence>
+  
+</process>

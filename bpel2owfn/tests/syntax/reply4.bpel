@@ -1,0 +1,30 @@
+<process name="reply4" targetNamespace="anyURI">
+
+  <documentation xml:lang="EN"></documentation>
+
+  <partnerLinks>
+    <partnerLink name="shipping"
+                 partnerLinkType="lns:shippingLT"
+                 myRole="shippingRequester"
+                 partnerRole="shippingService" />
+  </partnerLinks>
+
+  <variables>
+    <variable name="shippingInfo"
+              messageType="lns:shippingInfoMessage" />
+  </variables>
+
+  <reply partnerLink="shipping"
+         operation="sendSchedule">
+
+    <correlations>
+      <correlation set="test"/>
+    </correlations>    
+
+    <toParts>
+      <toPart part="test" toVariable="shippingInfo" />
+    </toParts>           
+
+  </reply>
+
+</process>

@@ -1,0 +1,104 @@
+<process name="flow2" targetNamespace="anyURI">
+
+  <documentation xml:lang="EN"></documentation>
+
+  <partnerLinks>
+    <partnerLink  name="purchasing"
+                  partnerLinkType="lns:purchasingLT"
+                  myRole="purchaseService" />
+
+    <partnerLink  name="invoicing" 
+                  partnerLinkType="lns:invoicingLT"
+                  myRole="invoiceRequester"
+                  partnerRole="invoiceService" />
+
+    <partnerLink  name="shipping"
+                  partnerLinkType="lns:shippingLT"
+                  myRole="shippingRequester"
+                  partnerRole="shippingService" />
+
+    <partnerLink  name="scheduling"
+                  partnerLinkType="lns:schedulingLT"
+                  partnerRole="schedulingService" />
+  </partnerLinks>
+
+  <variables>
+    <variable name="PO" messageType="lns:POMessage" />
+
+    <variable name="Invoice" messageType="lns:InvMessage" />
+
+    <variable name="shippingRequest"
+              messageType="lns:shippingRequestMessage" />
+    
+    <variable name="shippingInfo"
+              messageType="lns:shippingInfoMessage" />
+    
+    <variable name="shippingSchedule"
+              messageType="lns:scheduleMessage" />
+  </variables>
+
+
+  <sequence>
+    <flow>
+      
+      <links>
+        <link name="ship-to-invoice" />
+        <link name="ship-to-scheduling" />
+      </links>
+      
+      <sequence>        
+        <invoke partnerLink="shipping"
+                portType="lns:shippingPT"
+                operation="requestShipping"
+                inputVariable="shippingRequest"
+                outputVariable="shippingInfo">
+          <documentation>Decide On Shipper</documentation>
+          <sources>
+            <source linkName="ship-to-invoice" />
+          </sources>
+        </invoke>
+        
+        <receive  partnerLink="shipping"
+                  portType="lns:shippingCallbackPT"
+                  operation="sendSchedule"
+                  variable="shippingSchedule">
+          <documentation>Arrange Logistics</documentation>
+          <sources>
+            <source linkName="ship-to-scheduling" />
+          </sources>
+        </receive>  
+      </sequence>
+      
+      <sequence>
+        <invoke partnerLink="invoicing"
+                portType="lns:computePricePT"
+                operation="sendShippingPrice"
+                inputVariable="shippingInfo">
+          <documentation> Complete Price Calculation </documentation>
+          <targets>
+            <target linkName="ship-to-invoice" />
+          </targets>
+        </invoke>
+        
+        <receive  partnerLink="invoicing"
+                  portType="lns:invoiceCallbackPT"
+                  operation="sendInvoice"
+                  variable="Invoice" />
+      </sequence>
+      
+      <sequence>
+        <invoke partnerLink="scheduling"
+                portType="lns:schedulingPT"
+                operation="sendShippingSchedule"
+                inputVariable="shippingSchedule">
+          <documentation> Complete Production Scheduling </documentation>
+          <targets>
+            <target linkName="ship-to-scheduling" />
+          </targets>
+        </invoke>
+      </sequence>
+    
+    </flow>
+  </sequence>
+
+</process>

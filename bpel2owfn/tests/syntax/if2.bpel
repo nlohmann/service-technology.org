@@ -1,0 +1,35 @@
+<process name="if2" targetNamespace="anyURI">
+
+  <documentation xml:lang="EN"></documentation>
+
+  <partnerLinks>
+    <partnerLink  name="customer" 
+                  partnerLinkType="plt:shippingLT"
+                  partnerRole="shippingServiceCustomer"
+                  myRole="shippingService" />
+  </partnerLinks>
+
+  <variables>
+    <variable name="shipRequest"
+              messageType="sif:shippingRequestMsg" />
+    <variable name="shipNotice"
+              messageType="sif:shippingNoticeMsg" />
+    <variable name="itemsShipped"
+              type="ship:itemCountType" />
+  </variables>
+
+
+  <if>
+    <condition>
+      bpel:getVariableProperty('shipRequest','props:shipComplete')
+    </condition>
+      <exit></exit>
+  <elseif>
+    <condition>
+      bpel:getVariableProperty('shipNotice','props:shipComplete')
+    </condition>
+      <exit></exit>
+  </elseif>
+  </if> 
+  
+</process>

@@ -1,0 +1,49 @@
+<process name="invoke1" targetNamespace="anyURI">
+
+  <documentation xml:lang="EN"></documentation>
+
+  <partnerLinks>
+    <partnerLink name="shipping"
+                 partnerLinkType="lns:shippingLT"
+                 myRole="shippingRequester"
+                 partnerRole="shippingService" />
+  </partnerLinks>
+
+  <variables>
+    <variable name="shippingInfo"
+              messageType="lns:shippingInfoMessage" />
+  </variables>
+
+  <invoke partnerLink="shipping">
+
+    <correlations>
+      <correlation set="test"/>
+    </correlations>
+    
+    <catch faultName="test">
+      <exit>
+      </exit>
+    </catch>
+    
+    <catchAll>
+      <exit>
+      </exit>
+    </catchAll>
+    
+    <compensationHandler>
+      <receive partnerLink="shipping"
+               operation="sendSchedule">
+      </receive>
+    </compensationHandler>
+    
+    <toParts>
+      <toPart part="test" fromVariable="shippingInfo" />
+    </toParts>
+    
+    <fromParts>
+      <fromPart part="test" toVariable="shippingInfo" />
+    </fromParts>
+  
+  </invoke>
+
+</process>

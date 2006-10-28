@@ -1,0 +1,17 @@
+<process name="reply1" targetNamespace="anyURI">
+
+  <documentation xml:lang="EN"></documentation>
+
+  <partnerLinks>
+    <partnerLink name="shipping"
+                 partnerLinkType="lns:shippingLT"
+                 myRole="shippingRequester"
+                 partnerRole="shippingService" />
+  </partnerLinks>
+
+  <reply partnerLink="shipping"
+         operation="sendSchedule">
+  </reply>
+
+</process>
+

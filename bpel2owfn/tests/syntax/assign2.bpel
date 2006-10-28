@@ -1,0 +1,28 @@
+<process name="assign2" targetNamespace="anyURI">
+
+  <documentation xml:lang="EN"></documentation>
+
+  <partnerLinks>
+    <partnerLink name="shipping"
+                 partnerLinkType="lns:shippingLT"
+                 myRole="shippingRequester"
+                 partnerRole="shippingService" />
+  </partnerLinks>
+
+  <variables>
+    <variable name="PO" messageType="lns:POMessage" />
+    <variable name="Invoice" messageType="lns:InvMessage" />
+    <variable name="shippingRequest" messageType="lns:shippingRequestMessage" />
+    <variable name="shippingInfo" messageType="lns:shippingInfoMessage" />
+    <variable name="shippingSchedule" messageType="lns:scheduleMessage" />
+  </variables>
+
+  <assign>
+
+    <extensionAssignOperation>
+      assign-element-of-other-namespace
+    </extensionAssignOperation>
+
+  </assign>
+
+</process>

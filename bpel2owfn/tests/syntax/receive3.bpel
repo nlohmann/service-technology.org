@@ -1,0 +1,27 @@
+<process name="receive3" targetNamespace="anyURI">
+
+  <documentation xml:lang="EN"></documentation>
+
+  <partnerLinks>
+    <partnerLink name="shipping"
+                 partnerLinkType="lns:shippingLT"
+                 myRole="shippingRequester"
+                 partnerRole="shippingService" />
+  </partnerLinks>
+
+  <variables>
+    <variable name="shippingInfo"
+              messageType="lns:shippingInfoMessage" />
+  </variables>
+
+  <receive partnerLink="shipping"
+           operation="sendSchedule">
+
+    <fromParts>
+      <fromPart part="test" toVariable="shippingInfo" />
+    </fromParts>           
+
+  </receive>
+
+</process>
+

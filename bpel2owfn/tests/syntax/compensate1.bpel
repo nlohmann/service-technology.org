@@ -1,0 +1,61 @@
+<process name="compensate1" targetNamespace="anyURI">
+
+  <variables>
+    <variable name="V1" type="xsd:int">
+      <from>0</from>
+    </variable>
+  </variables>
+
+  <faultHandlers>
+    <catch faultName="prefix:someFault">
+      <compensate />
+    </catch>
+  </faultHandlers>
+
+  <scope name="S2">
+    
+    <variables>
+      <variable name="V2" type="xsd:int">
+        <from>0</from>
+      </variable>
+    </variables>
+    
+    <compensationHandler>
+      <empty/>
+    </compensationHandler>
+    
+    <sequence>
+      
+      <scope name="S3">
+        <variables>
+        <variable name="V3" type="xsd:int">
+        <from>0</from>
+        </variable>
+        </variables>
+        <compensationHandler>
+          <empty/>
+        </compensationHandler>
+        <assign>
+        <copy>
+        <from>1</from>
+        <to variable="V3" />
+        </copy>
+        </assign>
+      </scope> <!-- end of scope S3 -->
+      
+      <assign>
+        <copy>
+          <from>1</from>
+          <to variable="V1" />
+        </copy>
+        <copy>
+          <from>1</from>
+          <to variable="V2" />
+        </copy>
+      </assign>
+      
+      <throw faultName="prefix:someFault" />
+     
+     </sequence>
+  </scope> <!-- end of scope S2 -->
+</process>

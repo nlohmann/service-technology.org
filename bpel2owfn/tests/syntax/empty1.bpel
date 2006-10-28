@@ -1,0 +1,22 @@
+<process name="empty1" targetNamespace="anyURI">
+
+  <documentation xml:lang="EN"></documentation>
+
+  <partnerLinks>
+    <partnerLink  name="purchasing"
+                  partnerLinkType="lns:purchasingLT"
+                  myRole="purchaseService" />
+  </partnerLinks>
+
+  <variables>
+    <variable name="PO" messageType="lns:POMessage" />
+    <variable name="Invoice" messageType="lns:InvMessage" />
+    <variable name="shippingRequest" messageType="lns:shippingRequestMessage" />
+    <variable name="shippingInfo" messageType="lns:shippingInfoMessage" />
+    <variable name="shippingSchedule" messageType="lns:scheduleMessage" />
+  </variables>
+
+  <empty>
+  </empty>
+  
+</process>

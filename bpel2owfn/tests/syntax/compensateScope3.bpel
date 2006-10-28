@@ -1,0 +1,14 @@
+<process name="compensateScope3" targetNamespace="anyURI">
+
+  <documentation xml:lang="EN"></documentation>
+
+  <scope name="S1">
+    <terminationHandler>
+        <compensateScope target="S2" />
+    </terminationHandler>
+    <scope name="S2">
+      <exit/>
+    </scope>
+  </scope>
+
+</process>

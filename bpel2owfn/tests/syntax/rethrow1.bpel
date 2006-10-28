@@ -1,0 +1,12 @@
+<process name="rethrow1" targetNamespace="anyURI">
+
+  <faultHandlers>
+    <catch faultName="someFault">
+      <rethrow />
+    </catch>
+    <catchAll>
+      <rethrow />
+    </catchAll>
+  </faultHandlers>
+
+</process>

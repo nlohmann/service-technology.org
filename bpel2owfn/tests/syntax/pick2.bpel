@@ -1,0 +1,18 @@
+<process name="pick2" targetNamespace="anyURI">
+
+  <documentation xml:lang="EN"></documentation>
+
+  <partnerLinks>
+    <partnerLink  name="buyer" 
+                  partnerLinkType="buyerLT"
+                  partnerRole="sellerService"
+                  myRole="buyerService" />
+  </partnerLinks>
+
+  <pick>
+    <onMessage  partnerLink="buyer"
+                operation="inputLineItem">
+    </onMessage>
+  </pick>
+
+</process>

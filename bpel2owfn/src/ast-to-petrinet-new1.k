@@ -1,0 +1,257 @@
+/*****************************************************************************\
+ * Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert      *
+ *                                                                           *
+ * This file is part of BPEL2oWFN.                                           *
+ *                                                                           *
+ * BPEL2oWFN is free software; you can redistribute it and/or modify it      *
+ * under the terms of the GNU General Public License as published by the     *
+ * Free Software Foundation; either version 2 of the License, or (at your    *
+ * option) any later version.                                                *
+ *                                                                           *
+ * BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT  *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
+ * more details.                                                             *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License along   *
+ * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
+\*****************************************************************************/
+
+%{
+/*!
+ * \file bpel-unparse-petri-new.cc
+ *
+ * \brief Petri net unparser (implementation)
+ *
+ * \author
+ *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ *          - last changes of: \$Author: nlohmann $
+ *
+ * \date
+ *          - created 2006-10-29
+ *          - last changed: \$Date: 2006/10/29 15:56:51 $
+ *
+ * \note    This file is part of the tool BPEL2oWFN and was created during the
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
+ *
+ * \note    This file was created using Kimwitu++ reading file
+ *          bpel-unparse-petri.k.
+ *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
+ *
+ * \version \$Revision: 1.1 $
+ *
+ */
+%}
+
+
+
+
+
+/******************************************************************************
+  PROCESS
+******************************************************************************/
+
+Process(a,b,c,d,e,f,g,h,i,_id) ->
+  [petrinetnew:
+    {
+      trace(TRACE_INFORMATION, "Generating Petri net...\n");
+      header(_id, true);
+
+      string prefix = toString(_id) + ".internal.";
+      currentScope = prefix;
+
+
+      // Create the interface places.
+      // The used lists are filled during parsing mapping each combination of
+      // partnerLink, portType and operation to one input (resp. output) place.
+      for (set<string>::iterator in = ASTE_inputChannels.begin(); in != ASTE_inputChannels.end(); in++)
+	TheNet->newPlace("in." + *in, IN);
+      for (set<string>::iterator out = ASTE_outputChannels.begin(); out != ASTE_outputChannels.end(); out++)
+	TheNet->newPlace("out." + *out, OUT);
+
+
+      // Create the places for the links.
+      // The used list is filled during parsing and contains all links of the
+      // whole process -- also links defined in a deeper hierarchy.
+      for (set<string>::iterator link = ASTE_links.begin(); link != ASTE_links.end(); link++)
+      {
+	TheNet->newPlace("link." + *link);
+	TheNet->newPlace("!link." + *link);
+      }
+
+
+      Place *p1  = TheNet->newPlace(prefix + "initial"); p1->mark();
+      Place *p2  = TheNet->newPlace(prefix + "final");
+      Place *p3  = TheNet->newPlace(prefix + "activity_stop");
+      Place *p4  = TheNet->newPlace(prefix + "activity_stopped");
+      Place *p5  = TheNet->newPlace(prefix + "fault_in");
+      Place *p6  = TheNet->newPlace(prefix + "stopping");
+      Place *p7  = TheNet->newPlace(prefix + "fh_fault_in");
+      Place *p8  = TheNet->newPlace(prefix + "fh_stop");
+      Place *p9  = TheNet->newPlace(prefix + "!FH_Faulted"); p9->mark();
+      Place *p10 = TheNet->newPlace(prefix + "FH_Faulted");
+      Place *p11 = TheNet->newPlace(prefix + "!Faulted"); p11->mark();
+      Place *p12 = TheNet->newPlace(prefix + "Faulted");
+
+      Transition *t1 = TheNet->newTransition(prefix + "t1");
+      TheNet->newArc(p5, t1);
+      TheNet->newArc(t1, p3);
+      TheNet->newArc(t1, p6);
+      TheNet->newArc(p11, t1);
+      TheNet->newArc(t1, p12);
+
+      Transition *t2 = TheNet->newTransition(prefix + "t2");
+      TheNet->newArc(p4, t2);
+      TheNet->newArc(p6, t2);
+      TheNet->newArc(t2, p7);
+
+      Transition *t3 = TheNet->newTransition(prefix + "t3");
+      TheNet->newArc(p5, t3);
+      TheNet->newArc(p12, t3, READ);
+    }
+    e // faultHandler
+    i // innerActivity
+    {
+      // embed fault handler
+      TheNet->mergePlaces(p7, TheNet->findPlace(prefix + "faultHandler.fault"));
+      TheNet->mergePlaces(TheNet->findPlace("1.internal.final"), TheNet->findPlace(prefix + "faultHandler.handled"));
+      TheNet->mergePlaces(TheNet->findPlace("1.internal.final"), TheNet->findPlace(prefix + "faultHandler.!handled"));
+      TheNet->mergePlaces(p8, TheNet->findPlace(prefix + "faultHandler.stop"));
+      TheNet->mergePlaces(TheNet->findPlace("1.internal.final"), TheNet->findPlace(prefix + "faultHandler.stopped"));
+
+      // embed inner activity
+      TheNet->mergePlaces(p1, TheNet->findPlace(i->id, ".initial"));
+      TheNet->mergePlaces(TheNet->findPlace("1.internal.final"), TheNet->findPlace(i->id, ".final"));
+      TheNet->mergePlaces(p3, TheNet->findPlace(i->id, ".stop"));
+      TheNet->mergePlaces(p4, TheNet->findPlace(i->id, ".stopped"));
+
+      footer(_id, true);
+      trace(TRACE_INFORMATION, "Generating Petri net complete.\n");
+    }
+  ]
+;
+
+
+
+
+
+
+
+
+
+
+This=userDefinedFaultHandler(a,b, _id) ->
+  [petrinetnew:
+    {
+      string prefix = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.faultHandler.";
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "<userDefinedFaultHandler scope=\"" + currentScope + "\">\n");
+
+      Place *p1 =  TheNet->newPlace(prefix + "fault");
+      Place *p2 =  TheNet->newPlace(prefix + "handled");
+      Place *p3 =  TheNet->newPlace(prefix + "!handled");
+      Place *p4 =  TheNet->newPlace(prefix + "stop");
+      Place *p5 =  TheNet->newPlace(prefix + "stopped");
+    }
+    a // catch-branches
+    b // catchAll-branch
+    {
+      int catchBranches = 1;
+      foreach (catchBranch=Catch(innerActivity); tCatch_list a)
+      {
+        Transition *t1 = TheNet->newTransition(prefix + "catch" + toString(catchBranches++));
+        TheNet->newArc(p1, t1);
+	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
+	TheNet->mergePlaces(TheNet->findPlace(prefix + "handled"), TheNet->findPlace(innerActivity, ".final"));
+	TheNet->mergePlaces(TheNet->findPlace(prefix + "stop"), TheNet->findPlace(innerActivity, ".stop"));
+	TheNet->mergePlaces(TheNet->findPlace(prefix + "stopped"), TheNet->findPlace(innerActivity, ".stopped"));
+      }
+
+      with(b) {
+	CatchAll(innerActivity, _id):
+	{
+	  Transition *t2 = TheNet->newTransition(prefix + "catchAll");
+	  TheNet->newArc(p1, t2);
+	  TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
+
+	  TheNet->mergePlaces(TheNet->findPlace(prefix + "handled"), TheNet->findPlace(innerActivity, ".final"));
+	  TheNet->mergePlaces(TheNet->findPlace(prefix + "stop"), TheNet->findPlace(innerActivity, ".stop"));
+	  TheNet->mergePlaces(TheNet->findPlace(prefix + "stopped"), TheNet->findPlace(innerActivity, ".stopped"));
+	}
+        NoCatchAll():
+        {
+          Transition *t2 = TheNet->newTransition(prefix + "rethrow");
+          TheNet->newArc(p1, t2);
+          TheNet->newArc(t2, p3);
+        }
+	default: { /* this should never happen */ }
+      }
+
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "</userDefinedFaultHandler scope=\"" + currentScope + "\">\n");
+    }
+  ]
+;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+This=Empty(a,_id) ->
+  [petrinetnew:
+    {
+      header(This->id);
+      string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
+
+      Place *p1 = TheNet->newPlace(prefix + "initial");
+      Place *p2 = TheNet->newPlace(prefix + "final");
+      Place *p3 = TheNet->newPlace(prefix + "stop");
+      Place *p4 = TheNet->newPlace(prefix + "stopped");
+
+      Transition *t1 = TheNet->newTransition(prefix + "t1");
+      TheNet->newArc(p1, t1);
+      TheNet->newArc(t1, p2);
+
+
+      // Transitions for the negative control flow.
+      Transition *t2 = stop(p1, "initial", prefix);
+      Transition *t3 = stop(p2, "final", prefix);
+    }
+    a // standardElements
+    {
+      footer(This->id);
+    }
+  ]
+;
+
+
+This=StandardElements(NiltTarget_list(), NiltSource_list(), jc) ->
+  [petrinetnew:
+    {
+      string prefix = toString(This->parentId) + ".";
+      string newPrefix = toString(This->parentId) + ".internal";
+
+      Place *p2 = TheNet->newPlace(prefix + "initial");
+      Place *p3 = TheNet->newPlace(prefix + "final");
+      Place *p4 = TheNet->newPlace(prefix + "stop");
+      Place *p5 = TheNet->newPlace(prefix + "stopped");
+
+      // Embed the inner activity.
+      TheNet->mergePlaces(p2, TheNet->findPlace(newPrefix + ".initial"));
+      TheNet->mergePlaces(p3, TheNet->findPlace(newPrefix + ".final"));
+      TheNet->mergePlaces(p4, TheNet->findPlace(newPrefix + ".stop"));
+      TheNet->mergePlaces(p5, TheNet->findPlace(newPrefix + ".stopped"));
+    }
+  ]
+;

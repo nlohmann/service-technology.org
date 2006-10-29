@@ -28,14 +28,14 @@
  * 
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/10/27 08:27:21 $
+ * \date    \$Date: 2006/10/29 15:56:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.115 $
+ * \version \$Revision: 1.116 $
  */
 
 
@@ -183,10 +183,12 @@ int main( int argc, char *argv[])
 	trace(TRACE_INFORMATION, "-> Unparsing AST to Petri net ...\n");
 	
 	// choose Petri net patterns
-	if (parameters[P_COMMUNICATIONONLY] == false)
-	  TheProcess->unparse(kc::pseudoPrinter, kc::petrinet);
-	else
+	if (parameters[P_COMMUNICATIONONLY] == true)
 	  TheProcess->unparse(kc::pseudoPrinter, kc::petrinetsmall);
+	else if (parameters[P_NEW] == true)
+	  TheProcess->unparse(kc::pseudoPrinter, kc::petrinetnew);
+	else
+	  TheProcess->unparse(kc::pseudoPrinter, kc::petrinet);
 
 	if (modus == M_CONSISTENCY)
 	{

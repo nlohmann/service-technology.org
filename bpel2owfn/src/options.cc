@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/10/25 06:53:38 $
+ * \date    \$Date: 2006/10/29 15:56:51 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.44 $
+ * \version \$Revision: 1.45 $
  */
 
 
@@ -392,6 +392,8 @@ void parse_command_line(int argc, char* argv[])
 		  parameters[P_TRED] = true;
 		else if (parameter == "xor")
 		  parameters[P_XOR] = true;
+		else if (parameter == "new")
+		  parameters[P_NEW] = true;
 		else
 		  trace(TRACE_ALWAYS, "Unknown parameter \"" + parameter +"\".\n");
 		

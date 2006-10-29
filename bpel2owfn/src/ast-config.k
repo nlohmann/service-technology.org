@@ -43,6 +43,7 @@
 
 %uview petrinet;
 %uview petrinetsmall;
+%uview petrinetnew;
 %uview xml;
 %uview cfg;
 %uview postprocessing;

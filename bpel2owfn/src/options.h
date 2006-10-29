@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/10/25 06:53:38 $
+ * \date    \$Date: 2006/10/29 15:56:51 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.33 $
+ * \version \$Revision: 1.34 $
  */
 
 
@@ -134,7 +134,8 @@ typedef enum
   P_NOFHFAULTS,		///< activities inside the FH throw no faults
   P_COMMUNICATIONONLY,	///< creates the smallest possible net
   P_TRED,		///< use transitive reduction
-  P_XOR			///< use XOR as transition condition
+  P_XOR,		///< use XOR as transition condition
+  P_NEW			///< use new (experimental) Petri net patterns
 } possibleParameters;
 
 

@@ -18,13 +18,13 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/10/27 08:27:12 $ by $Author: nlohmann $.
-# Version $Revision: 1.17 $
+# File last changed $Date: 2006/10/29 18:25:31 $ by $Author: nlohmann $.
+# Version $Revision: 1.18 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT([BPEL2oWFN],[2.0],[nlohmann@informatik.hu-berlin.de],[bpel2owfn])
-AC_REVISION($Revision: 1.17 $)
+AC_REVISION($Revision: 1.18 $)
 AM_INIT_AUTOMAKE
 
 
@@ -65,16 +65,9 @@ AC_FUNC_MALLOC
 AC_CHECK_FUNCS([memset])
 
 
-# Check if the compiler generators are there
+# Check for the compiler generators
+AC_PROG_YACC
 AC_PROG_LEX
-if test "$LEX" != "flex"; then
- AC_MSG_WARN([Flex was not found.])
-fi
-
-AC_CHECK_PROG(YACC, bison, bison, not found)
-if test "$YACC" = "not found"; then
- AC_MSG_WARN([Bison was not found.])
-fi
 
 AC_CHECK_PROG(KC, kc++, kc++, not found)
 if test "$KC" = "not found"; then

@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/10/29 15:56:51 $ by $Author: nlohmann $.
-# Version $Revision: 1.40 $
+# File last changed $Date: 2006/10/29 18:25:40 $ by $Author: nlohmann $.
+# Version $Revision: 1.41 $
 
 bin_PROGRAMS = bpel2owfn preprocess
 
@@ -45,6 +45,16 @@ KCOBJECTS = $(KCFILES:.k=.o) \
 	    $(KCGENERATED:=.o)
 
 
+# dependencies of the Kimwitu++ files
+$(KCDUMMY): $(KCFILES)
+	touch $@
+	$(KC) $(KCFLAGS) $^
+	$(MAKE) parser.o
+	$(MAKE) $(KCOBJECTS)
+
+$(KCOBJECTS): $(KCFILES)
+
+
 # the list of sources
 bpel2owfn_SOURCES = $(KCDUMMY)\
 		    $(KCSOURCES)\
@@ -63,14 +73,6 @@ bpel2owfn_SOURCES = $(KCDUMMY)\
 		    ast-details.cc ast-details.h
 
 preprocess_SOURCES = preprocess.cc
-
-
-# dependencies of the Kimwitu++ files
-$(KCDUMMY): $(KCFILES)
-	touch $@
-	$(KC) $(KCFLAGS) $^
-
-$(KCOBJECTS): $(KCFILES)
 
 
 # when cleaning, also delete Vi's temp files

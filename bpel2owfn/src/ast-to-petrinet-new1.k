@@ -30,7 +30,7 @@
  *
  * \date
  *          - created 2006-10-29
- *          - last changed: \$Date: 2006/10/29 15:56:51 $
+ *          - last changed: \$Date: 2006/10/29 18:56:02 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.1 $
+ * \version \$Revision: 1.2 $
  *
  */
 %}
@@ -198,7 +198,79 @@ This=userDefinedFaultHandler(a,b, _id) ->
 
 
 
+This=Scope(a,b,c,d,e,f,g,h,_id) ->
+  [petrinetnew:
+    {
+      header(This->id, true);
+      string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
 
+      currentScope = prefix;
+
+      Place *p1  = TheNet->newPlace(prefix + "initial");
+      Place *p2  = TheNet->newPlace(prefix + "activity_final");
+      Place *p3  = TheNet->newPlace(prefix + "final");
+      Place *p4  = TheNet->newPlace(prefix + "activity_stop");
+      Place *p5  = TheNet->newPlace(prefix + "activity_stopped");
+      Place *p6  = TheNet->newPlace(prefix + "!Successful"); p6->mark();
+      Place *p7  = TheNet->newPlace(prefix + "Successful");
+      Place *p8  = TheNet->newPlace(prefix + "compensateScope");
+      Place *p9  = TheNet->newPlace(prefix + "ch_activity_initial");
+      Place *p10 = TheNet->newPlace(prefix + "ch_activity_stop");
+      Place *p11 = TheNet->newPlace(prefix + "ch_activity_stopped");
+      Place *p12 = TheNet->newPlace(prefix + "scopeCompensated");
+      Place *p13 = TheNet->newPlace(prefix + "fault_in");
+      Place *p14 = TheNet->newPlace(prefix + "stopping_fault");
+      Place *p15 = TheNet->newPlace(prefix + "fh_fault_in");
+      Place *p16 = TheNet->newPlace(prefix + "rethrow");
+      Place *p17 = TheNet->newPlace(prefix + "fh_stop");
+      Place *p18 = TheNet->newPlace(prefix + "fh_stopped");
+      Place *p19 = TheNet->newPlace(prefix + "!Faulted"); p19->mark();
+      Place *p20 = TheNet->newPlace(prefix + "Faulted");
+      Place *p21 = TheNet->newPlace(prefix + "stop");
+      Place *p22 = TheNet->newPlace(prefix + "stopped");
+      Place *p23 = TheNet->newPlace(prefix + "stopping_termination1");
+      Place *p24 = TheNet->newPlace(prefix + "stopping_termination2");
+      Place *p25 = TheNet->newPlace(prefix + "th_activity_initial");
+      Place *p26 = TheNet->newPlace(prefix + "!CH_Faulted"); p26->mark();
+      Place *p27 = TheNet->newPlace(prefix + "CH_Faulted");
+      Place *p28 = TheNet->newPlace(prefix + "!FH_Faulted"); p28->mark();
+      Place *p29 = TheNet->newPlace(prefix + "FH_Faulted");
+
+      Transition *t1 = TheNet->newTransition(prefix + "t1");
+      Transition *t2 = TheNet->newTransition(prefix + "t2");
+      Transition *t3 = TheNet->newTransition(prefix + "t3");
+      Transition *t4 = TheNet->newTransition(prefix + "t4");
+      Transition *t5 = TheNet->newTransition(prefix + "t5");
+      Transition *t6 = TheNet->newTransition(prefix + "t6");
+      Transition *t7 = TheNet->newTransition(prefix + "t7");
+      Transition *t8 = TheNet->newTransition(prefix + "t8");
+      Transition *t9 = TheNet->newTransition(prefix + "t9");
+      Transition *t10 = TheNet->newTransition(prefix + "t10");
+      Transition *t11 = TheNet->newTransition(prefix + "t11");
+      Transition *t12 = TheNet->newTransition(prefix + "t12");
+      Transition *t13 = TheNet->newTransition(prefix + "t13");
+      Transition *t14 = TheNet->newTransition(prefix + "t14");
+
+      currentScope = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.";
+      footer(This->id, true);
+    }
+  ]
+;
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* below is standard */
 
 
 

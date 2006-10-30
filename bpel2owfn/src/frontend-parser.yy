@@ -37,7 +37,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2006/10/27 14:06:41 $
+ * \date    \$Date: 2006/10/30 14:21:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -46,7 +46,7 @@
  * \note    This file was created using GNU Bison reading file parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.263 $
+ * \version \$Revision: 1.264 $
  *
  * \ingroup frontend
  */
@@ -532,6 +532,8 @@ tVariable_list:
 tVariable:
   K_VARIABLE arbitraryAttributes X_NEXT X_SLASH K_VARIABLE
     { $$ = Variable($2); }
+| K_VARIABLE arbitraryAttributes X_NEXT tFrom X_NEXT X_SLASH K_VARIABLE
+    { $$ = Variable($2); }
 | K_VARIABLE arbitraryAttributes X_SLASH
     { $$ = Variable($2); }
 ;
@@ -964,7 +966,7 @@ tRepeatUntil:
 ******************************************************************************/
 
 tForEach:
-  K_FOREACH arbitraryAttributes X_NEXT standardElements tStartCounterValue tFinalCounterValue tCompletionCondition tScope X_SLASH K_FOREACH
+  K_FOREACH arbitraryAttributes X_NEXT standardElements tStartCounterValue tFinalCounterValue tCompletionCondition tScope X_NEXT X_SLASH K_FOREACH
     { $$ = ForEach($4, $8, $2); }
 ;
 
@@ -1032,11 +1034,17 @@ tLink:
 ******************************************************************************/
 
 tScope:
-  K_SCOPE arbitraryAttributes X_NEXT standardElements tPartnerLinks
-  tMessageExchanges tVariables tCorrelationSets tFaultHandlers
-  tCompensationHandler tTerminationHandler tEventHandlers activity 
+  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
+  tCorrelationSets tFaultHandlers tCompensationHandler tTerminationHandler
+  tEventHandlers activity 
   X_NEXT X_SLASH K_SCOPE
-    { $$ = Scope($4, $7, $9, $10, $11, $12, StopInScope(), $13, $2); }
+    { $$ = Scope($4, $5, $7, $8, $9, $10, StopInScope(), $11, $2); }
+| K_SCOPE arbitraryAttributes X_NEXT standardElements tPartnerLinks
+  tVariables tMessageExchanges tCorrelationSets tEventHandlers tFaultHandlers
+  tCompensationHandler tTerminationHandler activity 
+  X_NEXT X_SLASH K_SCOPE
+    { $$ = Scope($4, $6, $10, $11, $12, $9, StopInScope(), $13, $2); }
+
 ;
 
 

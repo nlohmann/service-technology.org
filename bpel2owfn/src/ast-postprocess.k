@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/10/27 14:06:40 $
+ * \date    \$Date: 2006/10/30 14:21:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.69 $
+ * \version \$Revision: 1.70 $
  */
 %}
 
@@ -628,6 +628,26 @@ Throw(a,_id) ->
 
 
 /******************************************************************************
+  RETHROW                                                        (WS-BPEL 2.0)
+******************************************************************************/
+
+Rethrow(a,_id) ->
+  [postprocessing:
+    {
+      int myid = _id->value;
+      assert(ASTEmap[myid] != NULL);
+
+      a->parentId = myid;
+
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      ASTEmap[myid]->checkAttributes();
+    }
+    a
+  ]
+;
+
+
+/******************************************************************************
   COMPENSATE
 ******************************************************************************/
 
@@ -1132,6 +1152,38 @@ Pick(a,b,c,_id) ->
         assert(ASTEmap[innerActivity->id] != NULL);
         ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
       }
+    }
+  ]
+;
+
+
+/******************************************************************************
+  FOREACH                                                        (WS-BPEL 2.0)
+******************************************************************************/
+
+ForEach(a,b,_id) ->
+  [postprocessing:
+    {
+      int myid = _id->value;
+      assert(ASTEmap[myid] != NULL);
+
+      a->parentId = myid;
+
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      ASTEmap[myid]->checkAttributes();
+
+      /* above is generic */
+
+      // distribute the forEach's id to the enclosed activity
+      assert(ASTEmap[b->id] != NULL);
+      ASTEmap[b->id]->parentActivityId = myid;
+      ASTEmap[b->id]->controlFlow = ASTEmap[myid]->controlFlow;
+    }
+    a b
+    {
+      // collect enclosed source links
+      assert(ASTEmap[b->id] != NULL);
+      ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[b->id]->enclosedSourceLinks);
     }
   ]
 ;

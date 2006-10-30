@@ -30,7 +30,7 @@
  *
  * \date
  *          - created 2006-10-29
- *          - last changed: \$Date: 2006/10/30 10:48:13 $
+ *          - last changed: \$Date: 2006/10/30 12:43:40 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  *
  */
 %}
@@ -382,66 +382,5 @@ TerminationHandler(a, _id) ->
     { header(_id->value, true); }
     a
     { footer(_id->value, true); }
-  ]
-;
-
-
-
-
-/* below is standard */
-
-
-
-
-
-
-
-
-This=Empty(a,_id) ->
-  [petrinetnew:
-    {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
-      assert(This->id == _id->value);
-
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "final");
-      Place *p3 = TheNet->newPlace(prefix + "stop");
-      Place *p4 = TheNet->newPlace(prefix + "stopped");
-
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(t1, p2);
-
-
-      // Transitions for the negative control flow.
-      Transition *t2 = stop(p1, "initial", prefix);
-      Transition *t3 = stop(p2, "final", prefix);
-    }
-    a // standardElements
-    {
-      footer(This->id);
-    }
-  ]
-;
-
-
-This=StandardElements(NiltTarget_list(), NiltSource_list(), jc) ->
-  [petrinetnew:
-    {
-      string prefix = toString(This->parentId) + ".";
-      string newPrefix = toString(This->parentId) + ".internal";
-
-      Place *p2 = TheNet->newPlace(prefix + "initial");
-      Place *p3 = TheNet->newPlace(prefix + "final");
-      Place *p4 = TheNet->newPlace(prefix + "stop");
-      Place *p5 = TheNet->newPlace(prefix + "stopped");
-
-      // Embed the inner activity.
-      TheNet->mergePlaces(p2, TheNet->findPlace(newPrefix + ".initial"));
-      TheNet->mergePlaces(p3, TheNet->findPlace(newPrefix + ".final"));
-      TheNet->mergePlaces(p4, TheNet->findPlace(newPrefix + ".stop"));
-      TheNet->mergePlaces(p5, TheNet->findPlace(newPrefix + ".stopped"));
-    }
   ]
 ;

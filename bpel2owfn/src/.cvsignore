@@ -20,8 +20,10 @@ ast-to-petrinet-full2.cc
 ast-to-petrinet-full2.h
 ast-to-petrinet-small.cc
 ast-to-petrinet-small.h
-ast-to-petrinet-new.cc
-ast-to-petrinet-new.h
+ast-to-petrinet-new1.cc
+ast-to-petrinet-new1.h
+ast-to-petrinet-new2.cc
+ast-to-petrinet-new2.h
 ast-to-xml.cc
 ast-to-xml.h
 ast-system-csgiok.cc

@@ -10,6 +10,7 @@
   <pick>
     <onMessage  partnerLink="buyer"
                 operation="inputLineItem">
+      <exit/>
     </onMessage>
   </pick>
 

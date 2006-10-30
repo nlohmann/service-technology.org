@@ -10,10 +10,12 @@
   <pick>
     <onMessage  partnerLink="buyer"
                 operation="inputLineItem">
+      <exit/>
     </onMessage>
 
     <onAlarm>
       <for>'P3DT10H'</for>
+      <exit/>
     </onAlarm>
   </pick>
 

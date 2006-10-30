@@ -7,17 +7,17 @@
   <forEach  counterName="forEachCounter"
             parallel="no">
     
-    <startCounterValue expressionLanguage="anyURI"?>
+    <startCounterValue expressionLanguage="anyURI">
       1
     </startCounterValue>
     
-    <finalCounterValue expressionLanguage="anyURI"?>
+    <finalCounterValue expressionLanguage="anyURI">
       10
     </finalCounterValue>
     
-    <completionCondition>?
-      <branches expressionLanguage="anyURI"?
-                successfulBranchesOnly="no"?>
+    <completionCondition>
+      <branches expressionLanguage="anyURI"
+                successfulBranchesOnly="no">
         9
       </branches>
     </completionCondition>

@@ -12,10 +12,11 @@
               messageType="lns:shippingInfoMessage" />
   </variables>
 
-  <invoke partnerLink="shipping">
+  <invoke partnerLink="shipping"
+          operation="requestShipping">
 
     <correlations>
-      <correlation set="test"/>
+      <correlationSet="test"/>
     </correlations>
     
     <catch faultName="test">

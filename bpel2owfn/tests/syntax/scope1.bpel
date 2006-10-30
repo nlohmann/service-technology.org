@@ -1,11 +1,6 @@
 <process name="scope1" targetNamespace="anyURI">
 
   <scope>
-    <variables>
-      <variable name="shipRequest"
-                messageType="shippingRequestMsg" />
-    </variables>
-    
     <partnerLinks>
         <partnerLink  name="buyer" 
                       partnerLinkType="buyerLT"
@@ -16,10 +11,29 @@
     <messageExchanges>
       <messageExchange name="shippingRequestMsg" />
     </messageExchanges>
+
+    <variables>
+      <variable name="shipRequest"
+                messageType="shippingRequestMsg" />
+    </variables>
     
     <correlationSets>
-      <correlation set="specialID" initialize="yes" />
+      <correlationSet name="specialID" initialize="yes" />
     </correlationSets>
+    
+    <faultHandlers>
+      <catchAll>
+          <exit />
+      </catchAll>
+    </faultHandlers>    
+
+    <compensationHandler>
+      <compensate />
+    </compensationHandler>
+    
+    <terminationHandler>
+      <compensate />
+    </terminationHandler>
     
     <eventHandlers>
       <onEvent  partnerLink="buyer"
@@ -29,20 +43,6 @@
         </scope>
       </onEvent>
     </eventHandlers>
-    
-    <faultHandlers>
-      <catchAll>
-          <exit />
-      </catchAll>
-    </faultHandlers>
-    
-    <compensationHandler>
-      <compensate />
-    </compensationHandler>
-    
-    <terminationHandler>
-      <compensate />
-    </terminationHandler>
 
     <empty/>
   </scope>

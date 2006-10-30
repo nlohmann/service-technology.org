@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/10/27 18:12:48 $
+ * \date    \$Date: 2006/10/30 10:48:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.36 $
+ * \version \$Revision: 1.37 $
  */
 
 
@@ -574,6 +574,7 @@ string ASTE::activityTypeName()
     case(K_SEQUENCE):		return "sequence";
     case(K_SWITCH):		return "switch";
     case(K_TERMINATE):		return "terminate";
+    case(K_TERMINATIONHANDLER):	return "terminationHandler";
     case(K_TARGET):		return "target";
     case(K_THROW):		return "throw";
     case(K_TO):			return "to";

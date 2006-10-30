@@ -9,4 +9,6 @@
     </catchAll>
   </faultHandlers>
 
+  <exit/>
+
 </process>

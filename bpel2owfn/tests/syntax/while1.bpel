@@ -16,32 +16,29 @@
               type="ship:itemCountType" />
   </variables>
 
-
-  <assign>
-    <copy>
-      <from>0</from>
-      <to>$itemsShipped</to>
-    </copy>
-  </assign>
-
-  <while>
-    <condition>
-      $itemsShipped
-      &lt;
-      bpel:getVariableProperty('shipRequest',
-      'props:itemsTotal')
-    </condition>
-    
+  <sequence>
     <assign>
       <copy>
-        <from opaque="yes" />
-        <to variable="shipNotice"
-        property="props:itemsCount" />
+        <from>0</from>
+        <to>$itemsShipped</to>
       </copy>
     </assign>
-
-  </while>
-
-
-
+  
+    <while>
+      <condition>
+        $itemsShipped
+        &lt;
+        bpel:getVariableProperty('shipRequest',
+        'props:itemsTotal')
+      </condition>
+        <assign>
+          <copy>
+            <from opaque="yes" />
+            <to variable="shipNotice"
+            property="props:itemsCount" />
+          </copy>
+        </assign>
+    </while>
+  </sequence>
+  
 </process>

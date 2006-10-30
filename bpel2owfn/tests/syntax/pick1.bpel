@@ -1,7 +1,5 @@
 <process name="pick1" targetNamespace="anyURI">
 
-  <documentation xml:lang="EN"></documentation>
-
   <partnerLinks>
     <partnerLink  name="buyer" 
                   partnerLinkType="buyerLT"

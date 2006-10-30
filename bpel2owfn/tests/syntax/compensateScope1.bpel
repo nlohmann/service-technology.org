@@ -1,7 +1,5 @@
 <process name="compensateScope1" targetNamespace="anyURI">
 
-  <documentation xml:lang="EN"></documentation>
-
   <scope name="S1">
     <compensationHandler>
       <sequence>

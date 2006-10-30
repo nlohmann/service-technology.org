@@ -1,7 +1,5 @@
 <process name="flow2" targetNamespace="anyURI">
 
-  <documentation xml:lang="EN"></documentation>
-
   <partnerLinks>
     <partnerLink  name="purchasing"
                   partnerLinkType="lns:purchasingLT"

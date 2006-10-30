@@ -1,7 +1,5 @@
 <process name="compensateScope3" targetNamespace="anyURI">
 
-  <documentation xml:lang="EN"></documentation>
-
   <scope name="S1">
     <terminationHandler>
         <compensateScope target="S2" />

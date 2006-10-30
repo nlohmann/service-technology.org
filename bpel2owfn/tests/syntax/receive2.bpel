@@ -1,7 +1,5 @@
 <process name="receive2" targetNamespace="anyURI">
 
-  <documentation xml:lang="EN"></documentation>
-
   <partnerLinks>
     <partnerLink name="shipping"
                  partnerLinkType="lns:shippingLT"

@@ -1,7 +1,5 @@
 <process name="compensateScope2" targetNamespace="anyURI">
 
-  <documentation xml:lang="EN"></documentation>
-
   <scope name="S1">
     <faultHandlers>
       <catch faultName="faultTest">

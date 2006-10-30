@@ -1,7 +1,5 @@
 <process name="extensionActivity1" targetNamespace="anyURI">
 
-  <documentation xml:lang="EN"></documentation>
-
   <extensions>
     <extension namespace="foo" mustUnderstand="no" />
   </extensions>

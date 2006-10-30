@@ -1,7 +1,5 @@
 <process name="flow1" targetNamespace="anyURI">
 
-  <documentation xml:lang="EN"></documentation>
-
   <partnerLinks>
     <partnerLink  name="invoicing" 
                   partnerLinkType="lns:invoicingLT"

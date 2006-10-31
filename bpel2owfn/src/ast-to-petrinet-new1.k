@@ -30,7 +30,7 @@
  *
  * \date
  *          - created 2006-10-29
- *          - last changed: \$Date: 2006/10/30 12:43:40 $
+ *          - last changed: \$Date: 2006/10/31 08:20:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  *
  */
 %}
@@ -112,6 +112,11 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
       Transition *t3 = TheNet->newTransition(prefix + "t3");
       TheNet->newArc(p5, t3);
       TheNet->newArc(p12, t3, READ);
+
+      Transition *t4 = TheNet->newTransition(prefix + "t4");
+      TheNet->newArc(t4, p2);
+      TheNet->newArc(p4, t4);
+      TheNet->newArc(p14, t4, READ);
     }
     e // faultHandler
     i // innerActivity
@@ -231,15 +236,17 @@ This=Scope(a,b,c,d,e,f,g,h,_id) ->
       Place *p20 = TheNet->newPlace(prefix + "Faulted");
       Place *p21 = TheNet->newPlace(prefix + "stop");
       Place *p22 = TheNet->newPlace(prefix + "stopped");
-      Place *p23 = TheNet->newPlace(prefix + "stopping_termination1");
-      Place *p24 = TheNet->newPlace(prefix + "stopping_termination2");
+      Place *p23 = TheNet->newPlace(prefix + "p23");
+      Place *p24 = TheNet->newPlace(prefix + "p24");
       Place *p25 = TheNet->newPlace(prefix + "th_activity_initial");
       Place *p26 = TheNet->newPlace(prefix + "!CH_Faulted"); p26->mark();
       Place *p27 = TheNet->newPlace(prefix + "CH_Faulted");
       Place *p28 = TheNet->newPlace(prefix + "!FH_Faulted"); p28->mark();
       Place *p29 = TheNet->newPlace(prefix + "FH_Faulted");
+      Place *p30 = TheNet->newPlace(prefix + "activity_initial");
 
       Transition *t1 = TheNet->newTransition(prefix + "t1");
+      TheNet->newArc(p2, t1);
       TheNet->newArc(t1, p3);
       TheNet->newArc(p6, t1);
       TheNet->newArc(t1, p7);
@@ -316,6 +323,10 @@ This=Scope(a,b,c,d,e,f,g,h,_id) ->
       TheNet->newArc(p5, t14);
       TheNet->newArc(p23, t14);
       TheNet->newArc(t14, p25);
+
+      Transition *t15 = TheNet->newTransition(prefix + "t15");
+      TheNet->newArc(p1, t15);
+      TheNet->newArc(t15, p30);
     }
       a // standard elements
       c // fault handlers
@@ -355,7 +366,7 @@ This=Scope(a,b,c,d,e,f,g,h,_id) ->
       }
 
       // embed inner activity
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "initial"), TheNet->findPlace(h->id, ".initial"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "activity_initial"), TheNet->findPlace(h->id, ".initial"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "activity_final"), TheNet->findPlace(h->id, ".final"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "activity_stop"), TheNet->findPlace(h->id, ".stop"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "activity_stopped"), TheNet->findPlace(h->id, ".stopped"));

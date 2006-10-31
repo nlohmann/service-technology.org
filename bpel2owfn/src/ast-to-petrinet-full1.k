@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/27 07:06:39 $
+ *          - last changed: \$Date: 2006/10/31 08:20:47 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.204 $
+ * \version \$Revision: 1.205 $
  *
  */
 %}
@@ -105,18 +105,20 @@ This=Process(a,b,c,d,e,f,g,h,i,_id) ->
 	TheNet->newPlace("!link." + *link);
       }
 
-
-      // Create variable places and initially mark them.
-      for (set<string>::iterator variable = ASTE_variables.begin(); variable != ASTE_variables.end(); variable++)
+      
+      if (!parameters[P_NOVARIABLES])
       {
-	Place *v = TheNet->newPlace("variable." + *variable);
-	v->mark();
+        // Create variable places and initially mark them.
+        for (set<string>::iterator variable = ASTE_variables.begin(); variable != ASTE_variables.end(); variable++)
+        {
+	  Place *v = TheNet->newPlace("variable." + *variable);
+	  v->mark();
+        }
+  
+        // Create a place for the global clock and mark it.
+        Place *clock = TheNet->newPlace(prefix + "clock");
+        clock->mark();
       }
-
-      // Create a place for the global clock and mark it.
-      Place *clock = TheNet->newPlace(prefix + "clock");
-      clock->mark();
-
 
       // Create the initial place of the process pattern and mark it.
       Place *p1 = TheNet->newPlace(prefix + "initial");

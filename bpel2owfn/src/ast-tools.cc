@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/10/27 07:31:34 $
+ * \date    \$Date: 2006/10/31 08:20:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -206,6 +206,35 @@ Transition *throwFault(Place *p1, Place *p2,
   }
 
 
+  if (parameters[P_NEW])
+  {
+    switch (negativeControlFlow)
+    {
+      case(0): // activity in scope or process
+	{
+	  Transition *t1 = TheNet->newTransition(prefix + "throwFault." + p1name);
+	  TheNet->newArc(TheNet->findPlace(currentScope + "!Faulted"), t1);
+	  TheNet->newArc(t1, TheNet->findPlace(currentScope + "Faulted"));
+	  TheNet->newArc(p1, t1);
+	  TheNet->newArc(t1, p2);
+	  TheNet->newArc(t1, TheNet->findPlace(currentScope + "fault_in"));
+	  
+	  if (!preventFurtherFaults)
+	  {
+	    Transition *t2 = TheNet->newTransition(prefix + "ignoreFault." + p1name);
+	    TheNet->newArc(TheNet->findPlace(currentScope + "Faulted"), t2, READ);
+	    TheNet->newArc(p1, t2);
+	    TheNet->newArc(t2, p2);
+	  }
+
+	  return t1;
+	}
+      default: return NULL;
+    }
+  }
+
+
+
   switch (negativeControlFlow)
   {
     case(0): // activity in scope or process
@@ -327,7 +356,7 @@ Transition *stop(Place *p, string p_name, string prefix)
   if (parameters[P_COMMUNICATIONONLY])
     return NULL;
   
-  Transition *stopTransition = TheNet->newTransition(prefix + "stoppedAt." + p_name);
+  Transition *stopTransition = TheNet->newTransition(prefix + "stopped." + p_name);
   TheNet->newArc(TheNet->findPlace(prefix + "stop"), stopTransition);
   TheNet->newArc(stopTransition, TheNet->findPlace(prefix + "stopped"));
   TheNet->newArc(p, stopTransition);

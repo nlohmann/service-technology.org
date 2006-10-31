@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2006-10-30
- *          - last changed: \$Date: 2006/10/30 12:44:10 $
+ *          - last changed: \$Date: 2006/10/31 08:20:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.1 $
+ * \version \$Revision: 1.2 $
  */
 %}
 
@@ -900,7 +900,7 @@ This=Terminate(a,_id) ->
 ;
 
 
-
+/* EDITED EDITED EDITED EDITED EDITED EDITED EDITED EDITED EDITED EDITED */
 
 
 /******************************************************************************
@@ -947,7 +947,7 @@ This=Exit(a,_id) ->
       // Embed the <terminate /> activity in the process.
       TheNet->mergePlaces(TheNet->findPlace("1.internal.!Terminated"), p4);
       TheNet->mergePlaces(TheNet->findPlace("1.internal.Terminated"), p5);
-      TheNet->mergePlaces(TheNet->findPlace(currentScope + "upperTerminate"), p6);
+      TheNet->mergePlaces(TheNet->findPlace("1.internal.activity_stop"), p6);
     }
     a // standardElements
     {

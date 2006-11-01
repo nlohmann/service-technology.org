@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/10/21 10:53:51 $
+ *          - last changed: \$Date: 2006/11/01 20:57:52 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.39 $
+ * \version \$Revision: 1.40 $
  */
 
 
@@ -610,7 +610,7 @@ void PetriNet::lolaOut()
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
   {
     (*output) << "TRANSITION " << (*t)->nodeShortName();
-
+/*   
     switch ((*t)->type)
     {
       case (INTERNAL): break;
@@ -618,7 +618,7 @@ void PetriNet::lolaOut()
       case (IN): (*output) << "_i"; break;
       case (INOUT): (*output) << "_io"; break;
     }
-
+*/
     (*output) << endl;
     set<Node *> consume = preset(*t);
     set<Node *> produce = postset(*t);

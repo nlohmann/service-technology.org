@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/10/31 08:20:48 $
+ * \date    \$Date: 2006/11/01 20:57:52 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.23 $
+ * \version \$Revision: 1.24 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -215,14 +215,17 @@ Transition *throwFault(Place *p1, Place *p2,
 	  Transition *t1 = TheNet->newTransition(prefix + "throwFault." + p1name);
 	  TheNet->newArc(TheNet->findPlace(currentScope + "!Faulted"), t1);
 	  TheNet->newArc(t1, TheNet->findPlace(currentScope + "Faulted"));
+	  TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t1);
+	  TheNet->newArc(t1, TheNet->findPlace(currentScope + "!Active"));
 	  TheNet->newArc(p1, t1);
 	  TheNet->newArc(t1, p2);
-	  TheNet->newArc(t1, TheNet->findPlace(currentScope + "fault_in"));
+	  TheNet->newArc(t1, TheNet->findPlace(currentScope + "stop"));
 	  
 	  if (!preventFurtherFaults)
 	  {
 	    Transition *t2 = TheNet->newTransition(prefix + "ignoreFault." + p1name);
 	    TheNet->newArc(TheNet->findPlace(currentScope + "Faulted"), t2, READ);
+	    TheNet->newArc(TheNet->findPlace(currentScope + "!Active"), t2, READ);
 	    TheNet->newArc(p1, t2);
 	    TheNet->newArc(t2, p2);
 	  }

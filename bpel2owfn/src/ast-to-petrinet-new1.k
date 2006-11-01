@@ -30,7 +30,7 @@
  *
  * \date
  *          - created 2006-10-29
- *          - last changed: \$Date: 2006/11/01 16:01:56 $
+ *          - last changed: \$Date: 2006/11/01 20:57:52 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
  *
  */
 %}
@@ -117,7 +117,7 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
 
       Transition *t4 = TheNet->newTransition(prefix + "exited");
       TheNet->newArc(t4, p2);
-      TheNet->newArc(p7, t4, READ);
+      TheNet->newArc(p6, t4, READ);
       TheNet->newArc(p11, t4);
     }
     e // faultHandler
@@ -156,7 +156,7 @@ This=userDefinedFaultHandler(a,b, _id) ->
       string prefix = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.faultHandler.";
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<userDefinedFaultHandler scope=\"" + currentScope + "\">\n");
 
-      Place *p1 =  TheNet->newPlace(prefix + "fault");
+      Place *p1 =  TheNet->newPlace(prefix + "initial");
       Place *p2 =  TheNet->newPlace(prefix + "final");
       Place *p3 =  TheNet->newPlace(prefix + "stop");
       Place *p4 =  TheNet->newPlace(prefix + "stopped");

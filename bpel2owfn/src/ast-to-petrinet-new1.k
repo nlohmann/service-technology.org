@@ -30,7 +30,7 @@
  *
  * \date
  *          - created 2006-10-29
- *          - last changed: \$Date: 2006/10/31 08:20:48 $
+ *          - last changed: \$Date: 2006/11/01 16:01:56 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  *
  */
 %}
@@ -84,53 +84,54 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
 
       Place *p1  = TheNet->newPlace(prefix + "initial"); p1->mark();
       Place *p2  = TheNet->newPlace(prefix + "final");
-      Place *p3  = TheNet->newPlace(prefix + "activity_stop");
-      Place *p4  = TheNet->newPlace(prefix + "activity_stopped");
-      Place *p5  = TheNet->newPlace(prefix + "fault_in");
-      Place *p6  = TheNet->newPlace(prefix + "stopping");
-      Place *p7  = TheNet->newPlace(prefix + "fh_fault_in");
-      Place *p8  = TheNet->newPlace(prefix + "fh_stop");
-      Place *p9  = TheNet->newPlace(prefix + "!FH_Faulted"); p9->mark();
-      Place *p10 = TheNet->newPlace(prefix + "FH_Faulted");
-      Place *p11 = TheNet->newPlace(prefix + "!Faulted"); p11->mark();
-      Place *p12 = TheNet->newPlace(prefix + "Faulted");
-      Place *p13 = TheNet->newPlace(prefix + "!Terminated"); p13->mark();
-      Place *p14 = TheNet->newPlace(prefix + "Terminated");
+      Place *p3  = TheNet->newPlace(prefix + "Active");
+      Place *p4  = TheNet->newPlace(prefix + "!Active"); p4->mark();
+      Place *p5  = TheNet->newPlace(prefix + "Faulted");
+      Place *p6  = TheNet->newPlace(prefix + "!Faulted"); p6->mark();
+      Place *p7  = TheNet->newPlace(prefix + "Exiting");
+      Place *p8  = TheNet->newPlace(prefix + "!Exiting"); p8->mark();
+      Place *p9  = TheNet->newPlace(prefix + "activity_initial");
+      Place *p10 = TheNet->newPlace(prefix + "activity_stop");
+      Place *p11 = TheNet->newPlace(prefix + "activity_stopped");
+      Place *p12 = TheNet->newPlace(prefix + "activity_final");
+      Place *p13 = TheNet->newPlace(prefix + "fh_initial");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(p5, t1);
+      Transition *t1 = TheNet->newTransition(prefix + "initialize");
+      TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p3);
-      TheNet->newArc(t1, p6);
-      TheNet->newArc(p11, t1);
-      TheNet->newArc(t1, p12);
+      TheNet->newArc(p4, t1);
+      TheNet->newArc(t1, p9);
 
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(p4, t2);
-      TheNet->newArc(p6, t2);
-      TheNet->newArc(t2, p7);
+      Transition *t2 = TheNet->newTransition(prefix + "finalize");
+      TheNet->newArc(t2, p2);
+      TheNet->newArc(p3, t2);
+      TheNet->newArc(t2, p4);
+      TheNet->newArc(p12, t2);
 
-      Transition *t3 = TheNet->newTransition(prefix + "t3");
+      Transition *t3 = TheNet->newTransition(prefix + "start_fh");
+      TheNet->newArc(p4, t3, READ);
       TheNet->newArc(p5, t3);
-      TheNet->newArc(p12, t3, READ);
+      TheNet->newArc(t3, p6);
+      TheNet->newArc(p11, t3);
+      TheNet->newArc(t3, p13);
 
-      Transition *t4 = TheNet->newTransition(prefix + "t4");
+      Transition *t4 = TheNet->newTransition(prefix + "exited");
       TheNet->newArc(t4, p2);
-      TheNet->newArc(p4, t4);
-      TheNet->newArc(p14, t4, READ);
+      TheNet->newArc(p7, t4, READ);
+      TheNet->newArc(p11, t4);
     }
     e // faultHandler
     i // innerActivity
     {
       // embed fault handler
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "fh_fault_in"), TheNet->findPlace(prefix + "faultHandler.fault"));
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "final"), TheNet->findPlace(prefix + "faultHandler.handled"));
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "final"), TheNet->findPlace(prefix + "faultHandler.!handled"));
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "fh_stop"), TheNet->findPlace(prefix + "faultHandler.stop"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "fh_initial"), TheNet->findPlace(prefix + "faultHandler.initial"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "final"), TheNet->findPlace(prefix + "faultHandler.final"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "activity_stop"), TheNet->findPlace(prefix + "faultHandler.stop"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "final"), TheNet->findPlace(prefix + "faultHandler.stopped"));
 
       // embed inner activity
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "initial"), TheNet->findPlace(i->id, ".initial"));
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "final"), TheNet->findPlace(i->id, ".final"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "activity_initial"), TheNet->findPlace(i->id, ".initial"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "activity_final"), TheNet->findPlace(i->id, ".final"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "activity_stop"), TheNet->findPlace(i->id, ".stop"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "activity_stopped"), TheNet->findPlace(i->id, ".stopped"));
 
@@ -156,10 +157,9 @@ This=userDefinedFaultHandler(a,b, _id) ->
       trace(TRACE_DEBUG, "[PNU]" + inString() + "<userDefinedFaultHandler scope=\"" + currentScope + "\">\n");
 
       Place *p1 =  TheNet->newPlace(prefix + "fault");
-      Place *p2 =  TheNet->newPlace(prefix + "handled");
-      Place *p3 =  TheNet->newPlace(prefix + "!handled");
-      Place *p4 =  TheNet->newPlace(prefix + "stop");
-      Place *p5 =  TheNet->newPlace(prefix + "stopped");
+      Place *p2 =  TheNet->newPlace(prefix + "final");
+      Place *p3 =  TheNet->newPlace(prefix + "stop");
+      Place *p4 =  TheNet->newPlace(prefix + "stopped");
     }
     a // catch-branches
     b // catchAll-branch
@@ -170,7 +170,7 @@ This=userDefinedFaultHandler(a,b, _id) ->
         Transition *t1 = TheNet->newTransition(prefix + "catch" + toString(catchBranches++));
         TheNet->newArc(p1, t1);
 	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
-	TheNet->mergePlaces(TheNet->findPlace(prefix + "handled"), TheNet->findPlace(innerActivity, ".final"));
+	TheNet->mergePlaces(TheNet->findPlace(prefix + "final"), TheNet->findPlace(innerActivity, ".final"));
 	TheNet->mergePlaces(TheNet->findPlace(prefix + "stop"), TheNet->findPlace(innerActivity, ".stop"));
 	TheNet->mergePlaces(TheNet->findPlace(prefix + "stopped"), TheNet->findPlace(innerActivity, ".stopped"));
       }
@@ -182,15 +182,13 @@ This=userDefinedFaultHandler(a,b, _id) ->
 	  TheNet->newArc(p1, t2);
 	  TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
 
-	  TheNet->mergePlaces(TheNet->findPlace(prefix + "handled"), TheNet->findPlace(innerActivity, ".final"));
+	  TheNet->mergePlaces(TheNet->findPlace(prefix + "final"), TheNet->findPlace(innerActivity, ".final"));
 	  TheNet->mergePlaces(TheNet->findPlace(prefix + "stop"), TheNet->findPlace(innerActivity, ".stop"));
 	  TheNet->mergePlaces(TheNet->findPlace(prefix + "stopped"), TheNet->findPlace(innerActivity, ".stopped"));
 	}
         NoCatchAll():
         {
-          Transition *t2 = TheNet->newTransition(prefix + "rethrow");
-          TheNet->newArc(p1, t2);
-          TheNet->newArc(t2, p3);
+          /* should not happen yet */ assert(false);
         }
 	default: { /* this should never happen */ }
       }
@@ -215,118 +213,75 @@ This=Scope(a,b,c,d,e,f,g,h,_id) ->
       currentScope = prefix;
 
       Place *p1  = TheNet->newPlace(prefix + "initial");
-      Place *p2  = TheNet->newPlace(prefix + "activity_final");
-      Place *p3  = TheNet->newPlace(prefix + "final");
-      Place *p4  = TheNet->newPlace(prefix + "activity_stop");
-      Place *p5  = TheNet->newPlace(prefix + "activity_stopped");
-      Place *p6  = TheNet->newPlace(prefix + "!Successful"); p6->mark();
-      Place *p7  = TheNet->newPlace(prefix + "Successful");
-      Place *p8  = TheNet->newPlace(prefix + "compensateScope");
-      Place *p9  = TheNet->newPlace(prefix + "ch_activity_initial");
-      Place *p10 = TheNet->newPlace(prefix + "ch_activity_stop");
-      Place *p11 = TheNet->newPlace(prefix + "ch_activity_stopped");
-      Place *p12 = TheNet->newPlace(prefix + "scopeCompensated");
-      Place *p13 = TheNet->newPlace(prefix + "fault_in");
-      Place *p14 = TheNet->newPlace(prefix + "stopping_fault");
-      Place *p15 = TheNet->newPlace(prefix + "fh_fault_in");
-      Place *p16 = TheNet->newPlace(prefix + "rethrow");
-      Place *p17 = TheNet->newPlace(prefix + "fh_stop");
-      Place *p18 = TheNet->newPlace(prefix + "fh_stopped");
-      Place *p19 = TheNet->newPlace(prefix + "!Faulted"); p19->mark();
-      Place *p20 = TheNet->newPlace(prefix + "Faulted");
-      Place *p21 = TheNet->newPlace(prefix + "stop");
-      Place *p22 = TheNet->newPlace(prefix + "stopped");
-      Place *p23 = TheNet->newPlace(prefix + "p23");
-      Place *p24 = TheNet->newPlace(prefix + "p24");
-      Place *p25 = TheNet->newPlace(prefix + "th_activity_initial");
-      Place *p26 = TheNet->newPlace(prefix + "!CH_Faulted"); p26->mark();
-      Place *p27 = TheNet->newPlace(prefix + "CH_Faulted");
-      Place *p28 = TheNet->newPlace(prefix + "!FH_Faulted"); p28->mark();
-      Place *p29 = TheNet->newPlace(prefix + "FH_Faulted");
-      Place *p30 = TheNet->newPlace(prefix + "activity_initial");
+      Place *p2  = TheNet->newPlace(prefix + "final");
+      Place *p3  = TheNet->newPlace(prefix + "compensate");
+      Place *p4  = TheNet->newPlace(prefix + "compensated");
+      Place *p5  = TheNet->newPlace(prefix + "stop");
+      Place *p6  = TheNet->newPlace(prefix + "stopped");
+      Place *p7  = TheNet->newPlace(prefix + "Active");
+      Place *p8  = TheNet->newPlace(prefix + "!Active"); p8->mark();
+      Place *p9  = TheNet->newPlace(prefix + "Successful");
+      Place *p10 = TheNet->newPlace(prefix + "!Successful"); p10->mark();
+      Place *p11 = TheNet->newPlace(prefix + "Faulted");
+      Place *p12 = TheNet->newPlace(prefix + "!Faulted"); p12->mark();
+      Place *p13 = TheNet->newPlace(prefix + "inner_stopped");
+      Place *p14 = TheNet->newPlace(prefix + "activity_initial");
+      Place *p15 = TheNet->newPlace(prefix + "activity_final");
+      Place *p16 = TheNet->newPlace(prefix + "fh_initial");
+      Place *p17 = TheNet->newPlace(prefix + "ch_initial");
+      Place *p18 = TheNet->newPlace(prefix + "th_initial");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(p2, t1);
-      TheNet->newArc(t1, p3);
-      TheNet->newArc(p6, t1);
+      Transition *t1 = TheNet->newTransition(prefix + "initialize");
+      TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p7);
+      TheNet->newArc(p8, t1);
+      TheNet->newArc(t1, p14);
 
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(t2, p6);
+      Transition *t2 = TheNet->newTransition(prefix + "finalize");
+      TheNet->newArc(t2, p2);
       TheNet->newArc(p7, t2);
-      TheNet->newArc(p8, t2);
+      TheNet->newArc(t2, p8);
       TheNet->newArc(t2, p9);
+      TheNet->newArc(p10, t2);
+      TheNet->newArc(p15, t2);
 
-      Transition *t3 = TheNet->newTransition(prefix + "t3");
-      TheNet->newArc(p6, t3, READ);
-      TheNet->newArc(p8, t3);
+      Transition *t3 = TheNet->newTransition(prefix + "start_fh");
+      TheNet->newArc(p8, t3, READ);
+      TheNet->newArc(p11, t3);
       TheNet->newArc(t3, p12);
+      TheNet->newArc(p13, t3);
+      TheNet->newArc(t3, p16);
 
-      Transition *t4 = TheNet->newTransition(prefix + "t4");
-      TheNet->newArc(t4, p4);
-      TheNet->newArc(p13, t4);
-      TheNet->newArc(t4, p14);
-      TheNet->newArc(p19, t4);
-      TheNet->newArc(t4, p20);
+      Transition *t4 = TheNet->newTransition(prefix + "start_ch");
+      TheNet->newArc(p3, t4);
+      TheNet->newArc(p9, t4);
+      TheNet->newArc(t4, p10);
+      TheNet->newArc(t4, p17);
 
-      Transition *t5 = TheNet->newTransition(prefix + "t5");
-      TheNet->newArc(p5, t5);
-      TheNet->newArc(p14, t5);
-      TheNet->newArc(t5, p15);
+      Transition *t5 = TheNet->newTransition(prefix + "skip_ch");
+      TheNet->newArc(p3, t5);
+      TheNet->newArc(t5, p4);
+      TheNet->newArc(p10, t5, READ);
 
-      Transition *t6 = TheNet->newTransition(prefix + "t6");
+      Transition *t6 = TheNet->newTransition(prefix + "start_th");
+      TheNet->newArc(p7, t6);
+      TheNet->newArc(t6, p8);
       TheNet->newArc(p13, t6);
-      TheNet->newArc(t6, p16);
-      TheNet->newArc(p20, t6, READ);
+      TheNet->newArc(t6, p18);
+      TheNet->newArc(TheNet->findPlace("1.internal.!Exiting"), t6, READ);
 
-      Transition *t7 = TheNet->newTransition(prefix + "t7");
-      TheNet->newArc(p11, t7);
-      TheNet->newArc(t7, p16);
+      Transition *t7 = TheNet->newTransition(prefix + "skip_th");
+      TheNet->newArc(t7, p6);
+      TheNet->newArc(p8, t7, READ);
+      TheNet->newArc(p13, t7);
 
-      Transition *t8 = TheNet->newTransition(prefix + "t8");
-      TheNet->newArc(t8, p16);
-      TheNet->newArc(p18, t8);
+      Transition *t8 = TheNet->newTransition(prefix + "exit");
+      TheNet->newArc(t8, p6);
+      TheNet->newArc(p13, t8);
+      TheNet->newArc(TheNet->findPlace("1.internal.Exiting"), t8, READ);
 
-      Transition *t9 = TheNet->newTransition(prefix + "t9");
-      TheNet->newArc(t9, p4);
-      TheNet->newArc(p19, t9, READ);
-      TheNet->newArc(p21, t9);
-      TheNet->newArc(t9, p23);
-      TheNet->newArc(TheNet->findPlace("1.internal.!Terminated"), t9, READ);
-
-      Transition *t10 = TheNet->newTransition(prefix + "t10");
-      TheNet->newArc(t10, p4);
-      TheNet->newArc(p20, t10, READ);
-      TheNet->newArc(p21, t10);
-      TheNet->newArc(t10, p24);
-      TheNet->newArc(TheNet->findPlace("1.internal.!Terminated"), t10, READ);
-
-      Transition *t11 = TheNet->newTransition(prefix + "t11");
-      TheNet->newArc(t11, p4);
-      TheNet->newArc(p19, t11, READ);
-      TheNet->newArc(p21, t11);
-      TheNet->newArc(t11, p24);
-      TheNet->newArc(TheNet->findPlace("1.internal.Terminated"), t11, READ);
-
-      Transition *t12 = TheNet->newTransition(prefix + "t12");
-      TheNet->newArc(p20, t12, READ);
-      TheNet->newArc(p21, t11);
-      TheNet->newArc(t12, p22);
-      TheNet->newArc(TheNet->findPlace("1.internal.Terminated"), t12, READ);
-
-      Transition *t13 = TheNet->newTransition(prefix + "t13");
-      TheNet->newArc(p24, t13);
-      TheNet->newArc(p5, t13);
-      TheNet->newArc(t13, p22);
-
-      Transition *t14 = TheNet->newTransition(prefix + "t14");
-      TheNet->newArc(p5, t14);
-      TheNet->newArc(p23, t14);
-      TheNet->newArc(t14, p25);
-
-      Transition *t15 = TheNet->newTransition(prefix + "t15");
-      TheNet->newArc(p1, t15);
-      TheNet->newArc(t15, p30);
+      Transition *t9 = stop(p1, "initial", prefix);
+      Transition *t10 = stop(p2, "final", prefix);
     }
       a // standard elements
       c // fault handlers
@@ -335,23 +290,22 @@ This=Scope(a,b,c,d,e,f,g,h,_id) ->
       h // inner activity
     {
       // embed fault handler
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "fh_fault_in"), TheNet->findPlace(prefix + "faultHandler.fault"));
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "final"), TheNet->findPlace(prefix + "faultHandler.handled"));
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "rethrow"), TheNet->findPlace(prefix + "faultHandler.!handled"));
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "fh_stop"), TheNet->findPlace(prefix + "faultHandler.stop"));
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "fh_stopped"), TheNet->findPlace(prefix + "faultHandler.stopped"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "fh_initial"), TheNet->findPlace(prefix + "faultHandler.initial"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "final"), TheNet->findPlace(prefix + "faultHandler.final"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "stop"), TheNet->findPlace(prefix + "faultHandler.stop"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "stopped"), TheNet->findPlace(prefix + "faultHandler.stopped"));
 
       // embed compensation handler
       with (d)
       {
         d = userDefinedCompensationHandler(ch_activity, *):
         {
-          TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_activity_initial"), TheNet->findPlace(ch_activity->id, ".initial"));
-          TheNet->mergePlaces(TheNet->findPlace(prefix + "scopeCompensated"), TheNet->findPlace(ch_activity->id, ".final"));
-          TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_activity_stop"), TheNet->findPlace(ch_activity->id, ".stop"));
-          TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_activity_stopped"), TheNet->findPlace(ch_activity->id, ".stopped"));
+          TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_initial"), TheNet->findPlace(ch_activity->id, ".initial"));
+          TheNet->mergePlaces(TheNet->findPlace(prefix + "compensated"), TheNet->findPlace(ch_activity->id, ".final"));
+          TheNet->mergePlaces(TheNet->findPlace(prefix + "stop"), TheNet->findPlace(ch_activity->id, ".stop"));
+          TheNet->mergePlaces(TheNet->findPlace(prefix + "stopped"), TheNet->findPlace(ch_activity->id, ".stopped"));
         }
-        default: { /* do nothing */ }
+        default: { assert(false); }
       }
 
       // embed compensation handler
@@ -359,8 +313,10 @@ This=Scope(a,b,c,d,e,f,g,h,_id) ->
       {
         e = TerminationHandler(th_activity, *):
         {
-          TheNet->mergePlaces(TheNet->findPlace(prefix + "th_activity_initial"), TheNet->findPlace(th_activity->id, ".initial"));
+          TheNet->mergePlaces(TheNet->findPlace(prefix + "th_initial"), TheNet->findPlace(th_activity->id, ".initial"));
           TheNet->mergePlaces(TheNet->findPlace(prefix + "stopped"), TheNet->findPlace(th_activity->id, ".final"));
+          TheNet->mergePlaces(TheNet->findPlace(prefix + "stop"), TheNet->findPlace(th_activity->id, ".stop"));
+          TheNet->mergePlaces(TheNet->findPlace(prefix + "stopped"), TheNet->findPlace(th_activity->id, ".stopped"));
         }
         default: { /* do nothing */ }
       }
@@ -368,8 +324,8 @@ This=Scope(a,b,c,d,e,f,g,h,_id) ->
       // embed inner activity
       TheNet->mergePlaces(TheNet->findPlace(prefix + "activity_initial"), TheNet->findPlace(h->id, ".initial"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "activity_final"), TheNet->findPlace(h->id, ".final"));
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "activity_stop"), TheNet->findPlace(h->id, ".stop"));
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "activity_stopped"), TheNet->findPlace(h->id, ".stopped"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "stop"), TheNet->findPlace(h->id, ".stop"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "inner_stopped"), TheNet->findPlace(h->id, ".stopped"));
 
       currentScope = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.";
       footer(This->id, true);

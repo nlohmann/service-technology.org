@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/11/01 20:57:52 $
+ * \date    \$Date: 2006/11/02 11:37:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -212,20 +212,22 @@ Transition *throwFault(Place *p1, Place *p2,
     {
       case(0): // activity in scope or process
 	{
+          unsigned int parentId = ASTEmap[id->value]->parentScopeId;
+
 	  Transition *t1 = TheNet->newTransition(prefix + "throwFault." + p1name);
-	  TheNet->newArc(TheNet->findPlace(currentScope + "!Faulted"), t1);
-	  TheNet->newArc(t1, TheNet->findPlace(currentScope + "Faulted"));
-	  TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t1);
-	  TheNet->newArc(t1, TheNet->findPlace(currentScope + "!Active"));
+	  TheNet->newArc(TheNet->findPlace(toString(parentId) + ".internal.!Faulted"), t1);
+	  TheNet->newArc(t1, TheNet->findPlace(toString(parentId) + ".internal.Faulted"));
+	  TheNet->newArc(TheNet->findPlace(toString(parentId) + ".internal.Active"), t1);
+	  TheNet->newArc(t1, TheNet->findPlace(toString(parentId) + ".internal.!Active"));
 	  TheNet->newArc(p1, t1);
 	  TheNet->newArc(t1, p2);
-	  TheNet->newArc(t1, TheNet->findPlace(currentScope + "stop"));
+	  TheNet->newArc(t1, TheNet->findPlace(toString(parentId) + ".internal.stop"));
 	  
 	  if (!preventFurtherFaults)
 	  {
 	    Transition *t2 = TheNet->newTransition(prefix + "ignoreFault." + p1name);
-	    TheNet->newArc(TheNet->findPlace(currentScope + "Faulted"), t2, READ);
-	    TheNet->newArc(TheNet->findPlace(currentScope + "!Active"), t2, READ);
+	    TheNet->newArc(TheNet->findPlace(toString(parentId) + ".internal.Faulted"), t2, READ);
+	    TheNet->newArc(TheNet->findPlace(toString(parentId) + ".internal.!Active"), t2, READ);
 	    TheNet->newArc(p1, t2);
 	    TheNet->newArc(t2, p2);
 	  }

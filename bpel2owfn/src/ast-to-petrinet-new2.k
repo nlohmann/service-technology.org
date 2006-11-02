@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2006-10-30
- *          - last changed: \$Date: 2006/11/01 16:01:56 $
+ *          - last changed: \$Date: 2006/11/02 11:37:48 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  */
 %}
 
@@ -620,27 +620,13 @@ This=Throw(a,_id) ->
 
 
 
-
+/* edited */
 
 /******************************************************************************
   COMPENSATE
 ******************************************************************************/
 
-/*
- * The compensate patterns for the four described scnearios of Fig. 38-41:
- *  - <compensate /> in a compensation handler
- *  - <compensate /> in a fault handler
- *  - <compensate scope="C"/> in a compensation handler
- *  - <compensate scope="C"/> in a fault handler
- */
-
-/*
- * The <compensate/> activity as depicted in Fig. 38. As the context (embedded
- * in a compensation handler) is clear, the pattern is directly embedded to the
- * compensation handler of the current scope.
- */
-
-This=Compensate(a,_id) provided (ASTEmap[_id->value]->controlFlow == CHCF) ->
+This=Compensate(a,_id) ->
   [petrinetnew:
     {
       header(This->id);
@@ -686,87 +672,38 @@ This=Compensate(a,_id) provided (ASTEmap[_id->value]->controlFlow == CHCF) ->
 
 
 
+/* edited */
 
-/*
- * The <compensate/> activity as depicted in Fig. 39. As the context (embedded
- * in a fault handler) is clear, the pattern is directly embedded to the fault
- * handler of the current scope.
- */
+/******************************************************************************
+  COMPENSATE SCOPE                                               (WS-BPEL 2.0)
+******************************************************************************/
 
-This=Compensate(a,_id) provided (ASTEmap[_id->value]->controlFlow == FHCF) ->
+This=CompensateScope(a,b,_id) ->
   [petrinetnew:
     {
       header(This->id);
       string prefix = toString(This->id) + ".internal.";
       assert(This->id == _id->value);
 
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "running");
-      Place *p3 = TheNet->newPlace(prefix + "final");
-      Place *p4 = TheNet->newPlace(prefix + "stop");
-      Place *p5 = TheNet->newPlace(prefix + "ch_fh");
-      Place *p6 = TheNet->newPlace(prefix + "ch_out");
-      Place *p7 = TheNet->newPlace(prefix + "stopped");
+      assert(ASTEmap[_id->value]->attributes["target"] != "");
+      assert(scopeNames[ASTEmap[_id->value]->attributes["target"]] != 0);
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(t1, p2);
-      TheNet->newArc(t1, p5);
-
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(p2, t2);
-      TheNet->newArc(t2, p3);
-      TheNet->newArc(p6, t2);
-
-
-      // Transitions for the negative control flow.
-      Transition *t3 = stop(p1, "initial", prefix);
-      Transition *t4 = stop(p2, "running", prefix);
-      Transition *t5 = stop(p3, "final", prefix);
-
-
-      // Embed this <compensate /> activity in fault handler.
-      TheNet->mergePlaces(p5, TheNet->findPlace(currentScope + "faultHandler.ch_fh"));
-      TheNet->mergePlaces(p6, TheNet->findPlace(currentScope + "faultHandler.ch_out"));
-    }
-    a // standardElements
-    {
-      footer(This->id);
-    }
-  ]
-;
-
-
-
-
-
-/*
- * The <compensate scope="C"/> activity as depicted in Fig. 40. As the context
- * (embedded in a compensation handler) is clear, the pattern is directly
- * embedded to the compensation handler of the current scope.
- */
-
-This=CompensateScope(a,b,_id) provided (ASTEmap[_id->value]->controlFlow == CHCF) ->
-  [petrinetnew:
-    {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
-      assert(This->id == _id->value);
+      unsigned int scopeId = scopeNames[ASTEmap[_id->value]->attributes["target"]];
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "running");
       Place *p3 = TheNet->newPlace(prefix + "final");
       Place *p4 = TheNet->newPlace(prefix + "stop");
-      Place *p5 = TheNet->newPlace(prefix + "compScope");
+      Place *p5 = TheNet->newPlace(prefix + "compensateScope");
       Place *p6 = TheNet->newPlace(prefix + "scopeCompensated");
       Place *p7 = TheNet->newPlace(prefix + "stopped");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
+      Transition *t1 = TheNet->newTransition(prefix + "compensate" + toString(scopeId));
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       TheNet->newArc(t1, p5);
 
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
+      Transition *t2 = TheNet->newTransition(prefix + "compensated" + toString(scopeId));
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       TheNet->newArc(p6, t2);
@@ -777,62 +714,9 @@ This=CompensateScope(a,b,_id) provided (ASTEmap[_id->value]->controlFlow == CHCF
       Transition *t4 = stop(p2, "running", prefix);
       Transition *t5 = stop(p3, "final", prefix);
 
-
-      // Embed this <compensate scope="C"/> activity in compensation handler.
-      TheNet->mergePlaces(p4, TheNet->findPlace(currentScope + "internal.compensationHandler.p10"));
-    }
-    a // standardElements
-    {
-      footer(This->id);
-    }
-  ]
-;
-
-
-
-
-
-/*
- * The <compensate scope="C"/> activity as depicted in Fig.41. As the context
- * (embedded in a fault handler) is clear, the pattern is directly embedded to
- * the fault handler of the current scope.
- */
-
-This=CompensateScope(a,b,_id) provided (ASTEmap[_id->value]->controlFlow == FHCF) ->
-  [petrinetnew:
-    {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
-      assert(This->id == _id->value);
-
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "running");
-      Place *p3 = TheNet->newPlace(prefix + "final");
-      Place *p4 = TheNet->newPlace(prefix + "stop");
-      Place *p5 = TheNet->newPlace(prefix + "ch_in");
-      Place *p6 = TheNet->newPlace(prefix + "compensated");
-      Place *p7 = TheNet->newPlace(prefix + "stopped");
-
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(t1, p2);
-      TheNet->newArc(t1, p5);
-
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(p2, t2);
-      TheNet->newArc(t2, p3);
-      TheNet->newArc(p6, t2);
-
-
-      // Transitions for the negative control flow.
-      Transition *t3 = stop(p1, "initial", prefix);
-      Transition *t4 = stop(p2, "running", prefix);
-      Transition *t5 = stop(p3, "final", prefix);
-
-
-      // Embed this <compensate scope="C"/> activity in fault handler.
-      TheNet->mergePlaces(p5, TheNet->findPlace(currentScope + "faultHandler.ch_fh"));
-      TheNet->mergePlaces(p6, TheNet->findPlace(currentScope + "faultHandler.ch_out"));
+      // merge the compensate/compensated places with the given scope
+      TheNet->mergePlaces(p5, TheNet->findPlace(toString(scopeId) + ".internal.compensate"));
+      TheNet->mergePlaces(p6, TheNet->findPlace(toString(scopeId) + ".internal.compensated"));
     }
     a // standardElements
     {

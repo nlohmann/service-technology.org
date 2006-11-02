@@ -85,6 +85,8 @@ set<string> ASTE_outputChannels;
 set<string> ASTE_variables;
 set<string> ASTE_links;
 
+map<string, unsigned int> scopeNames;
+
 map<string, int> linkIdMap;
 
 map<int, int> PPhasCompensateMap;

@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/10/30 14:21:56 $
+ * \date    \$Date: 2006/11/02 11:37:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.70 $
+ * \version \$Revision: 1.71 $
  */
 %}
 
@@ -1210,6 +1210,10 @@ Scope(a,b,c,d,e,f,g,h,_id) ->
       ASTEmap[myid]->checkAttributes();
       ASTEmap[ASTEmap[myid]->parentScopeId]->enclosedScopes.insert(myid);
       ASTEmap[myid]->hasEH = (string(e->op_name()) == "userDefinedEventHandler");
+
+      // remember the scope's name for compensation
+      if (ASTEmap[myid]->attributes["name"] != "")
+        scopeNames[ASTEmap[myid]->attributes["name"]] = myid;
 
       // distribute the scope's id to the enclosed activity
       assert(ASTEmap[h->id] != NULL);

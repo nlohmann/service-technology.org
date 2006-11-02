@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/10/30 10:48:13 $
+ * \date    \$Date: 2006/11/02 11:37:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.37 $
+ * \version \$Revision: 1.38 $
  */
 
 
@@ -297,6 +297,13 @@ void ASTE::checkAttributes()
   // pass 3: check the required attributes
   switch (type)
   {
+    case(K_COMPENSATESCOPE):
+      {
+      	string required[] = {"target"};
+        checkRequiredAttributes(required, 1);
+	break;
+      }
+
     case(K_CORRELATION):
       {
       	string required[] = {"set"};

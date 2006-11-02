@@ -30,7 +30,7 @@
  *
  * \date
  *          - created 2006-10-29
- *          - last changed: \$Date: 2006/11/01 20:57:52 $
+ *          - last changed: \$Date: 2006/11/02 07:26:49 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  *
  */
 %}
@@ -273,6 +273,7 @@ This=Scope(a,b,c,d,e,f,g,h,_id) ->
       Transition *t7 = TheNet->newTransition(prefix + "skip_th");
       TheNet->newArc(t7, p6);
       TheNet->newArc(p8, t7, READ);
+      TheNet->newArc(p12, t7, READ);
       TheNet->newArc(p13, t7);
 
       Transition *t8 = TheNet->newTransition(prefix + "exit");

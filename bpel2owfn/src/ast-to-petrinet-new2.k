@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2006-10-30
- *          - last changed: \$Date: 2006/11/02 11:37:48 $
+ *          - last changed: \$Date: 2006/11/02 14:02:06 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  */
 %}
 
@@ -589,10 +589,6 @@ This=WaitFor(a,_id) -> // provided (This->isWaitFor)->
   THROW
 ******************************************************************************/
 
-/*
- * The <throw> activity as it is depicted in Fig. 14.
- */
-
 This=Throw(a,_id) ->
   [petrinetnew:
     {
@@ -601,7 +597,7 @@ This=Throw(a,_id) ->
       assert(This->id == _id->value);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "p2");
+      Place *p2 = TheNet->newPlace(prefix + "faulted");
       Place *p3 = TheNet->newPlace(prefix + "stop");
       Place *p4 = TheNet->newPlace(prefix + "stopped");
 
@@ -609,7 +605,37 @@ This=Throw(a,_id) ->
       // Transitions for the negative control flow.
       Transition *t1 = throwFault(p1, p2, "initial", prefix, _id, ASTEmap[_id->value]->controlFlow);
       Transition *t2 = stop(p1, "initial", prefix);
-      Transition *t3 = stop(p2, "p2", prefix);
+      Transition *t3 = stop(p2, "faulted", prefix);
+    }
+    a // standardElements
+    {
+      footer(This->id);
+    }
+  ]
+;
+
+
+/******************************************************************************
+  RETHROW                                                        (WS-BPEL 2.0)
+******************************************************************************/
+
+This=Rethrow(a,_id) ->
+  [petrinetnew:
+    {
+      header(This->id);
+      string prefix = toString(This->id) + ".internal.";
+      assert(This->id == _id->value);
+
+      Place *p1 = TheNet->newPlace(prefix + "initial");
+      Place *p2 = TheNet->newPlace(prefix + "faulted");
+      Place *p3 = TheNet->newPlace(prefix + "stop");
+      Place *p4 = TheNet->newPlace(prefix + "stopped");
+
+
+      // Transitions for the negative control flow.
+      Transition *t1 = throwFault(p1, p2, "initial", prefix, _id, 4);
+      Transition *t2 = stop(p1, "initial", prefix);
+      Transition *t3 = stop(p2, "faulted", prefix);
     }
     a // standardElements
     {

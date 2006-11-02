@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/02 11:37:47 $
+ * \date    \$Date: 2006/11/02 14:02:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.71 $
+ * \version \$Revision: 1.72 $
  */
 %}
 
@@ -166,6 +166,7 @@ userDefinedFaultHandler(a,b,_id) ->
         {
           assert(ASTEmap[c->id] != NULL);
           ASTEmap[c->id]->parentActivityId = myid;
+          ASTEmap[c->id]->controlFlow = FHCF;
         }
         default :
         {

@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/11/02 11:37:48 $
+ * \date    \$Date: 2006/11/02 14:02:06 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.25 $
+ * \version \$Revision: 1.26 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -205,7 +205,6 @@ Transition *throwFault(Place *p1, Place *p2,
     return t1;
   }
 
-
   if (parameters[P_NEW])
   {
     switch (negativeControlFlow)
@@ -223,19 +222,41 @@ Transition *throwFault(Place *p1, Place *p2,
 	  TheNet->newArc(t1, p2);
 	  TheNet->newArc(t1, TheNet->findPlace(toString(parentId) + ".internal.stop"));
 	  
-	  if (!preventFurtherFaults)
-	  {
-	    Transition *t2 = TheNet->newTransition(prefix + "ignoreFault." + p1name);
-	    TheNet->newArc(TheNet->findPlace(toString(parentId) + ".internal.Faulted"), t2, READ);
-	    TheNet->newArc(TheNet->findPlace(toString(parentId) + ".internal.!Active"), t2, READ);
-	    TheNet->newArc(p1, t2);
-	    TheNet->newArc(t2, p2);
-	  }
+	  Transition *t2 = TheNet->newTransition(prefix + "ignoreFault." + p1name);
+	  TheNet->newArc(TheNet->findPlace(toString(parentId) + ".internal.Faulted"), t2, READ);
+	  TheNet->newArc(TheNet->findPlace(toString(parentId) + ".internal.!Active"), t2, READ);
+	  TheNet->newArc(p1, t2);
+	  TheNet->newArc(t2, p2);
 
 	  return t1;
 	}
-      default: return NULL;
+
+      case(1): // activity in fault handlers
+      case(2): // activity in compensation handler
+      case(3): // activity in termination handler
+      case(4): // <rethrow> activity
+	{
+          unsigned int parentId = ASTEmap[ASTEmap[id->value]->parentScopeId]->parentScopeId;
+
+	  Transition *t1 = TheNet->newTransition(prefix + "rethrowFault." + p1name);
+	  TheNet->newArc(TheNet->findPlace(toString(parentId) + ".internal.!Faulted"), t1);
+	  TheNet->newArc(t1, TheNet->findPlace(toString(parentId) + ".internal.Faulted"));
+	  TheNet->newArc(TheNet->findPlace(toString(parentId) + ".internal.Active"), t1);
+	  TheNet->newArc(t1, TheNet->findPlace(toString(parentId) + ".internal.!Active"));
+	  TheNet->newArc(p1, t1);
+	  TheNet->newArc(t1, p2);
+	  TheNet->newArc(t1, TheNet->findPlace(toString(parentId) + ".internal.stop"));
+	  
+	  Transition *t2 = TheNet->newTransition(prefix + "ignoreFault." + p1name);
+	  TheNet->newArc(TheNet->findPlace(toString(parentId) + ".internal.Faulted"), t2, READ);
+	  TheNet->newArc(TheNet->findPlace(toString(parentId) + ".internal.!Active"), t2, READ);
+	  TheNet->newArc(p1, t2);
+	  TheNet->newArc(t2, p2);
+
+	  return t1;
+	}
     }
+    return NULL;
   }
 
 

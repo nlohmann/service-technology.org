@@ -30,7 +30,7 @@
  *
  * \date
  *          - created 2006-10-29
- *          - last changed: \$Date: 2006/11/02 11:37:48 $
+ *          - last changed: \$Date: 2006/11/02 14:02:06 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  *
  */
 %}
@@ -188,7 +188,9 @@ This=userDefinedFaultHandler(a,b, _id) ->
 	}
         NoCatchAll():
         {
-          /* should not happen yet */ assert(false);
+          Place *p5 = TheNet->newPlace(prefix + "faulted");
+          Transition *t1 = throwFault(p1, p5, "initial", prefix, _id, 4);
+          Transition *t2 = stop(p5, "faulted", prefix);
         }
 	default: { /* this should never happen */ }
       }

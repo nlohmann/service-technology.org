@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/07/12 17:03:43 $ by $Author: nlohmann $.
-# Version $Revision: 1.19 $
+# File last changed $Date: 2006/11/03 16:23:54 $ by $Author: nlohmann $.
+# Version $Revision: 1.20 $
 
 SUBDIRS = src doc tests
 
@@ -43,6 +43,7 @@ hu-prepare: maintainer-clean
 	-rm -f install-sh
 	-rm -f Makefile.in
 	-rm -f missing
+	-rm -f ylwrap
 	-rm -f -r autom4te.cache
 	-rm -f doc/mdate-sh
 	-rm -f doc/bpel2owfn

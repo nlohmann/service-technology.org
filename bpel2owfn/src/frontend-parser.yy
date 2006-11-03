@@ -37,7 +37,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2006/10/30 14:21:56 $
+ * \date    \$Date: 2006/11/03 16:22:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -46,7 +46,7 @@
  * \note    This file was created using GNU Bison reading file parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.264 $
+ * \version \$Revision: 1.265 $
  *
  * \ingroup frontend
  */
@@ -671,11 +671,11 @@ tReply:
 
 tInvoke:
   K_INVOKE arbitraryAttributes X_SLASH
-    { $$ = Invoke(NoStandardElements(), NiltCorrelation_list(), $2); }
+    { $$ = Invoke(NoStandardElements(), NiltCorrelation_list(), NiltToPart_list(), NiltFromPart_list(), $2); }
 | K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations tCatch tCatchAll tCompensationHandler tToParts tFromParts X_SLASH K_INVOKE
-    { $$ = annotatedInvoke($4, $5, $6, $7, $8, $2); }
+    { $$ = annotatedInvoke($4, $5, $6, $7, $8, $9, $10, $2); }
 | K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations tCatchAll tCompensationHandler tToParts tFromParts X_SLASH K_INVOKE
-    { $$ = annotatedInvoke($4, $5, NoCatch(), $6, $7, $2); }
+    { $$ = annotatedInvoke($4, $5, NoCatch(), $6, $7, $8, $9, $2); }
 ;
 
 

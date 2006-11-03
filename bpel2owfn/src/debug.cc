@@ -28,13 +28,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/11/03 15:29:07 $
+ * \date    \$Date: 2006/11/03 16:22:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.25 $
+ * \version \$Revision: 1.26 $
  *
  * \ingroup debug
  */
@@ -205,12 +205,6 @@ void showLineEnvironment(int lineNumber)
 
 
 
-
-void SAerror(unsigned int code, string information, string lineNumber)
-{
-  SAerror(code, information, toInt(lineNumber));
-}
-
 /*!
  * \brief prints static analysis error messages
  *
@@ -233,60 +227,64 @@ void SAerror(unsigned int code, string information, int lineNumber)
   switch (code)
   {
     case(23):
-      {
-	cerr << "<variable> `" << information << "' defined twice" << endl;
-	break;
-      }
+      { cerr << "<variable> `" << information << "' defined twice" << endl;
+	break; }
+
+    case(51):
+      { cerr << "<invoke> must not be used with inputVariable AND <toPart> elements" << endl;
+	break; }
+
+    case(52):
+      { cerr << "<invoke> must not be used with outputVariable AND <fromPart> elements" << endl;
+	break; }
 
     case(72):
-      {
-	cerr << "<link> `" << information << "' closes a control cycle" << endl;
-	break;
-      }
+      { cerr << "<link> `" << information << "' closes a control cycle" << endl;
+	break; }
 
     case(77):
-      {
-	cerr << "<scope> `" << information << "' is not immediately enclosed to current scope" << endl;
-	break;
-      }
+      { cerr << "<scope> `" << information << "' is not immediately enclosed to current scope" << endl;
+	break; }
 
     case(78):
-      {
-	cerr << "`" << information << "' does not refer to a <scope> or an <invoke> activity" << endl;
-	break;
-      }
+      { cerr << "`" << information << "' does not refer to a <scope> or an <invoke> activity" << endl;
+	break; }
 
     case(80):
-       {
-	 cerr << "<faultHandler> have no <catch> or <catchAll> element" << endl;
-	 break;
-       }
+       { cerr << "<faultHandler> have no <catch> or <catchAll> element" << endl;
+	 break; }
 
     case(81):
-       {
-	 cerr << "<catch> attribute " << information << endl;
-	 break;
-       }
+       { cerr << "<catch> attribute " << information << endl;
+	 break; }
 
     case(83):
-       {
-	 cerr << "<eventHandlers> have no <onEvent> or <onAlarm> element" << endl;
-	 break;
-       }
+       { cerr << "<eventHandlers> have no <onEvent> or <onAlarm> element" << endl;
+	 break; }
 
     case(92):
-       {
-	 cerr << "<scope> with name `" << information << "' defined twice" << endl;
-	 break;
-       }
+       { cerr << "<scope> with name `" << information << "' defined twice" << endl;
+	 break; }
 
     case(93):
-       {
-	 cerr << "<catch> construct defined twice" << endl;
-	 break;
-       }
+       { cerr << "<catch> construct defined twice" << endl;
+	 break; }
 
     default:
-      break;
+	 cerr << endl;
   }
+}
+
+
+
+
+
+/*!
+ * \brief prints static analysis error messages
+ * \overload
+ * \ingroup debug
+ */
+void SAerror(unsigned int code, string information, string lineNumber)
+{
+  SAerror(code, information, toInt(lineNumber));
 }

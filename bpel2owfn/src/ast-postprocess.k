@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/03 15:29:07 $
+ * \date    \$Date: 2006/11/03 16:22:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.74 $
+ * \version \$Revision: 1.75 $
  */
 %}
 
@@ -454,23 +454,32 @@ Empty(a,_id) ->
   INVOKE
 ******************************************************************************/
 
-Invoke(a,b,_id) ->
+Invoke(a,b,c,d,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
 
       a->parentId = myid;
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
 
       /* above is generic */
 
-      ASTEmap[myid]->channelName = ASTEmap[myid]->createChannel((ASTEmap[myid]->attributes["outputVariable"] != ""));
-      ASTEmap[myid]->inputVariableName = ASTEmap[myid]->checkInputVariable();
-      ASTEmap[myid]->outputVariableName = ASTEmap[myid]->checkOutputVariable();
-      ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
+      // trigger [SA00051]
+      if (c->length() != 0 && myself->attributes["inputVariable"] != "")
+        SAerror(51, "", myself->attributes["referenceLine"]);
+
+      // trigger [SA00052]
+      if (d->length() != 0 && myself->attributes["outputVariable"] != "")
+        SAerror(52, "", myself->attributes["referenceLine"]);
+
+      myself->channelName = myself->createChannel((myself->attributes["outputVariable"] != ""));
+      myself->inputVariableName = myself->checkInputVariable();
+      myself->outputVariableName = myself->checkOutputVariable();
+      myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
     }
     a b
   ]

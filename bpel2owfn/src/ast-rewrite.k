@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2006/10/11
- *          - last changed: \$Date: 2006/10/24 12:57:32 $
+ *          - last changed: \$Date: 2006/11/03 16:22:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  *
  */
 
@@ -106,6 +106,8 @@ activityInvoke(
     my_tCatch,
     my_tCatchAll,
     my_tCompensationHandler,
+    my_tToPart_list,
+    my_tFromPart_list,
     my_integer
   )
 )
@@ -135,6 +137,8 @@ activityInvoke(
         Invoke(
           NoStandardElements(),
           my_tCorrelation_list,
+          my_tToPart_list,
+          my_tFromPart_list,
           my_integer
         )
       ),
@@ -154,6 +158,8 @@ activityInvoke(
     NoCatch(),
     NoCatchAll(),
     implicitCompensationHandler(a),
+    my_tToPart_list,
+    my_tFromPart_list,
     my_integer
   )
 )
@@ -163,6 +169,8 @@ activityInvoke(
     Invoke(
       my_standardElements,
       my_tCorrelation_list,
+      my_tToPart_list,
+      my_tFromPart_list,
       my_integer
     )
   )
@@ -216,14 +224,14 @@ Wait(a,_id) provided (ASTEmap[_id->value]->attributes["until"] != "")
   WaitUntil(a,_id)
 >;
 
-Invoke(a,b,_id) provided (ASTEmap[_id->value]->attributes["outputVariable"] != "")
+Invoke(a,b,c,d,_id) provided (ASTEmap[_id->value]->attributes["outputVariable"] != "")
 ->
 <newNames:
-  SynchronousInvoke(a,b,_id)
+  SynchronousInvoke(a,b,c,d,_id)
 >;
 
-Invoke(a,b,_id) provided (ASTEmap[_id->value]->attributes["outputVariable"] == "")
+Invoke(a,b,c,d,_id) provided (ASTEmap[_id->value]->attributes["outputVariable"] == "")
 ->
 <newNames:
-  AsynchronousInvoke(a,b,_id)
+  AsynchronousInvoke(a,b,c,d,_id)
 >;

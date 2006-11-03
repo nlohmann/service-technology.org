@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/27 07:06:39 $
+ *          - last changed: \$Date: 2006/11/03 16:22:16 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  */
 %}
 
@@ -101,7 +101,7 @@ This=Empty(a,_id) ->
  * Fig. 11.
  */
 
-This=AsynchronousInvoke(a,b,_id) -> // provided (!This->isSynchronousInvoke) ->
+This=AsynchronousInvoke(a,b,c,d,_id) -> // provided (!This->isSynchronousInvoke) ->
   [petrinet:
     {
       header(This->id);
@@ -157,7 +157,7 @@ This=AsynchronousInvoke(a,b,_id) -> // provided (!This->isSynchronousInvoke) ->
  * Fig. 13.
  */
 
-This=SynchronousInvoke(a,b,_id) -> //provided (This->isSynchronousInvoke) ->
+This=SynchronousInvoke(a,b,c,d,_id) -> //provided (This->isSynchronousInvoke) ->
   [petrinet:
     {
       header(This->id);

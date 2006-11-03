@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/10/24 12:57:32 $
+ *          - last changed: \$Date: 2006/11/03 16:22:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.36 $
+ * \version \$Revision: 1.37 $
  */
 %}
 
@@ -329,13 +329,13 @@ Empty(a,b) ->
   INVOKE
 ******************************************************************************/
 
-Invoke(a,b,c) ->
+Invoke(a,b,c,d,e) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Invoke\n");
 	  CFGBlock * block = new CFGBlock(CFGInvoke, $0->id, "Invoke");
 
 //NL	  block->channel_name = (dynamic_cast<STCommunicationActivity*>(symTab.lookup($0->id)))->channelId; 
-	  block->channel_name = ASTEmap[c->value]->channelName;
+	  block->channel_name = ASTEmap[e->value]->channelName;
 
 	  cfgMap[toString($0->id)] = block; 
   	}

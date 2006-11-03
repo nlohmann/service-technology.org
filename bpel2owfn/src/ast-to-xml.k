@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/10/24 12:57:33 $
+ *          - last changed: \$Date: 2006/11/03 16:22:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.54 $
+ * \version \$Revision: 1.55 $
  */
 %}
 
@@ -180,7 +180,7 @@ Empty(a,_id) ->
   INVOKE
 ******************************************************************************/
 
-Invoke(a,b,_id) ->
+Invoke(a,b,c,d,_id) ->
   [xml: { inup(); } "<invoke id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b { indown(); } "</invoke>\n"]
 ;
 

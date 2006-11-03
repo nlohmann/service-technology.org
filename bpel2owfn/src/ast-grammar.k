@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/10/27 18:12:48 $
+ *          - last changed: \$Date: 2006/11/03 16:22:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.142 $
+ * \version \$Revision: 1.143 $
  */
 %}
 
@@ -285,10 +285,10 @@ tReply:
 ******************************************************************************/
 
 tInvoke:
-  Invoke(standardElements tCorrelation_list integer)
-| SynchronousInvoke(standardElements tCorrelation_list integer)
-| AsynchronousInvoke(standardElements tCorrelation_list integer)
-| annotatedInvoke(standardElements tCorrelation_list tCatch tCatchAll tCompensationHandler integer)
+  Invoke(standardElements tCorrelation_list tToPart_list tFromPart_list integer)
+| SynchronousInvoke(standardElements tCorrelation_list tToPart_list tFromPart_list integer)
+| AsynchronousInvoke(standardElements tCorrelation_list tToPart_list tFromPart_list integer)
+| annotatedInvoke(standardElements tCorrelation_list tCatch tCatchAll tCompensationHandler tToPart_list tFromPart_list integer)
 ;
 
 

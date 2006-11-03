@@ -28,13 +28,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/10/25 06:53:38 $
+ * \date    \$Date: 2006/11/03 14:57:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.23 $
+ * \version \$Revision: 1.24 $
  *
  * \ingroup debug
  */
@@ -49,6 +49,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 
 #include "debug.h"
 #include "options.h"
@@ -204,6 +205,12 @@ void showLineEnvironment(int lineNumber)
 
 
 
+
+void SAerror(unsigned int code, string information, string lineNumber)
+{
+  SAerror(code, information, toInt(lineNumber));
+}
+
 /*!
  * \brief prints static analysis error messages
  *
@@ -219,70 +226,49 @@ void showLineEnvironment(int lineNumber)
  */
 void SAerror(unsigned int code, string information, int lineNumber)
 {
-  trace(TRACE_INFORMATION, "===============================================================================\n");
+  cerr << "error in " << filename << ":" << lineNumber << " - [SA";
+  cerr << setfill('0') << setw(5) << code;
+  cerr << "] ";
+
   switch (code)
   {
     case(23):
       {
-	trace(TRACE_INFORMATION, "STATIC ANALYSIS FAULT (Code SA00023)\n\n");
-	trace(TRACE_INFORMATION, "+ Problem: variable named `" + information + "' (near line " + toString(lineNumber) + ") defined twice\n\n");
-
-      	showLineEnvironment(lineNumber);
-	
-	trace(TRACE_INFORMATION, "+ Description: The name of a variable MUST be unique among the names of all\n");
-	trace(TRACE_INFORMATION, "  variables defined within the same immediately enclosing scope.\n\n");
-
-        trace(TRACE_INFORMATION, "For more information see Section 8.1 of the WS-BPEL 2.0 specification.\n");
+	cerr << "<variable> `" << information << "' defined twice" << endl;
 	break;
       }
 
     case(72):
       {
-	trace(TRACE_INFORMATION, "STATIC ANALYSIS FAULT (Code SA00072)\n\n");
-	trace(TRACE_INFORMATION, "+ Problem: link named `" + information + "' near line " + toString(lineNumber) + " closes a control cycle\n\n");
+	cerr << "<link> `" << information << "' closes a control cycle" << endl;
+	break;
+      }
 
-      	showLineEnvironment(lineNumber);
+    case(77):
+      {
+	cerr << "<scope> `" << information << "' is not immediately enclosed to current scope" << endl;
+	break;
+      }
 
-	trace(TRACE_INFORMATION, "+ Description: A <link> declared in a <flow> MUST NOT create a control cycle\n");
-        trace(TRACE_INFORMATION, "  that is, the source activity must not have the target activity as a\n");
-	trace(TRACE_INFORMATION, "  logically preceding activity.\n\n");
-
-        trace(TRACE_INFORMATION, "For more information see Section 11.6.1 of the WS-BPEL 2.0 specification.\n");
+    case(78):
+      {
+	cerr << "`" << information << "' does not refer to a <scope> or an <invoke> activity" << endl;
 	break;
       }
 
     case(80):
        {
-	trace(TRACE_INFORMATION, "STATIC ANALYSIS FAULT (Code SA00080)\n\n");
-	trace(TRACE_INFORMATION, "+ Problem: <faultHandlers> of scope define near line " + toString(lineNumber));
-	trace(TRACE_INFORMATION, " has no <catch> or\n  <catchAll> element\n\n");
-
-	showLineEnvironment(lineNumber);
-
-	trace(TRACE_INFORMATION, "+ Description: There MUST be at least one <catch> or <catchAll> element\n");
-        trace(TRACE_INFORMATION, "  within a <faultHandlers> element.\n\n");
-
-        trace(TRACE_INFORMATION, "For more information see Section 12.5 of the WS-BPEL 2.0 specification.\n");
-	break;
+	 cerr << "<faultHandler> have no <catch> or <catchAll> element" << endl;
+	 break;
        }
 
     case(83):
        {
-	trace(TRACE_INFORMATION, "STATIC ANALYSIS FAULT (Code SA00083)\n\n");
-	trace(TRACE_INFORMATION, "+ Problem: <eventHandlers> of scope define near line " + toString(lineNumber));
-	trace(TRACE_INFORMATION, " has no <onEvent> or\n  <onAlarm> element\n\n");
-
-	showLineEnvironment(lineNumber);
-
-	trace(TRACE_INFORMATION, "+ Description: An event handler MUST contain at least one <onEvent> or\n");
-	trace(TRACE_INFORMATION, "  <onAlarm> element.\n\n");
-
-	trace(TRACE_INFORMATION, "For more information see Section 12.7 of the WS-BPEL 2.0 specification.\n");
-	break;
+	 cerr << "<eventHandlers> have no <onEvent> or <onAlarm> element" << endl;
+	 break;
        }
 
     default:
       break;
   }
-  trace(TRACE_INFORMATION, "===============================================================================\n\n");
 }

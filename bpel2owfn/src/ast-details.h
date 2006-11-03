@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/10/27 12:15:27 $
+ * \date    \$Date: 2006/11/03 14:57:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.28 $
+ * \version \$Revision: 1.29 $
  */
 
 
@@ -139,6 +139,9 @@ class ASTE
     void checkAttributes();
     void defineVariable();
     string activityTypeName();
+
+    set<unsigned int> peerScopes;			///< as defined on page 132 of the spec
+    set<unsigned int> immediatelyEnclosedScopes;	///< as defined on page 122 of the spec
 };
 
 

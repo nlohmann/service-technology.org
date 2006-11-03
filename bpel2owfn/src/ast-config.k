@@ -87,6 +87,8 @@ set<string> ASTE_links;
 
 map<string, unsigned int> scopeNames;
 
+set<string> catches;
+
 map<string, int> linkIdMap;
 
 map<int, int> PPhasCompensateMap;

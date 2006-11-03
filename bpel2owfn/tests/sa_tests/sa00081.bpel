@@ -1,0 +1,15 @@
+<process name="SA00092" targetNamespace="none">
+
+    <faultHandlers>
+	<catch faultVariable="a" faultMessageType="b" faultElement="c">
+	    <empty />
+	</catch>
+
+	<catch faultMessageType="b" faultElement="c">
+	    <empty />
+	</catch>
+    </faultHandlers>
+
+    <empty />
+
+</process>

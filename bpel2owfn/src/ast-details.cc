@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/02 11:37:47 $
+ * \date    \$Date: 2006/11/03 15:29:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.38 $
+ * \version \$Revision: 1.39 $
  */
 
 
@@ -68,6 +68,7 @@ extern map<unsigned int, map<string, string> > temporaryAttributeMap;
 extern set<string> ASTE_inputChannels;
 extern set<string> ASTE_outputChannels;
 extern set<string> ASTE_variables;
+extern set<string> catches;
 
 
 
@@ -297,6 +298,36 @@ void ASTE::checkAttributes()
   // pass 3: check the required attributes
   switch (type)
   {
+    case(K_CATCH):
+      {
+	// trigger [SA00081]
+	if (attributes["faultVariable"] != "" && 
+	    attributes["faultMessageType"] != "" &&
+	    attributes["faultElement"] != "")
+	  SAerror(81, "`faultVariable' must not be used with `faultMessageType' AND `faultElement'", attributes["referenceLine"]);
+
+	if (attributes["faultMessageType"] != "" &&
+	    attributes["faultVariable"] == "")
+	  SAerror(81, "`faultMessageType' must be used with `faultVariable'", attributes["referenceLine"]);
+
+	if (attributes["faultElement"] != "" &&
+	    attributes["faultVariable"] == "")
+	  SAerror(81, "`faultElement' must be used with `faultVariable'", attributes["referenceLine"]);
+
+	string catchString = toString(parentScopeId)
+	  + "|" + attributes["faultName"]
+	  + "|" + attributes["faultElement"]
+	  + "|" + attributes["faultMessageType"];
+
+	// trigger [SA00093]
+	if (catches.find(catchString) != catches.end())
+	  SAerror(93, "", attributes["referenceLine"]);
+
+	catches.insert(catchString);
+
+	break;
+      }
+
     case(K_COMPENSATESCOPE):
       {
       	string required[] = {"target"};

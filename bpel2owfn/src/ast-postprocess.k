@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/03 14:57:44 $
+ * \date    \$Date: 2006/11/03 15:29:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.73 $
+ * \version \$Revision: 1.74 $
  */
 %}
 
@@ -1214,25 +1214,31 @@ Scope(a,b,c,d,e,f,g,h,_id) ->
     {
       int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
       a->parentId = myid;
 
       // my parent is the current scope
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = PPcurrentScope;
       // now I am the current scope
       PPcurrentScope = myid;
 
       // this scope is immediately enclosed to its parent scope
-      ASTEmap[ASTEmap[myid]->parentScopeId]->immediatelyEnclosedScopes.insert(myid);
+      ASTEmap[myself->parentScopeId]->immediatelyEnclosedScopes.insert(myid);
 
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
-      ASTEmap[myid]->checkAttributes();
-      ASTEmap[ASTEmap[myid]->parentScopeId]->enclosedScopes.insert(myid);
-      ASTEmap[myid]->hasEH = (string(e->op_name()) == "userDefinedEventHandler");
+      assert(ASTEmap[myself->parentActivityId] != NULL);
+      myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
+      myself->checkAttributes();
+      ASTEmap[myself->parentScopeId]->enclosedScopes.insert(myid);
+      myself->hasEH = (string(e->op_name()) == "userDefinedEventHandler");
 
       // remember the scope's name for compensation
-      if (ASTEmap[myid]->attributes["name"] != "")
-        scopeNames[ASTEmap[myid]->attributes["name"]] = myid;
+      if (myself->attributes["name"] != "")
+      {
+        if (scopeNames[myself->attributes["name"]] != 0)
+          SAerror(92, myself->attributes["name"], myself->attributes["referenceLine"]);
+        
+        scopeNames[myself->attributes["name"]] = myid;
+      }
 
       // distribute the scope's id to the enclosed activity
       assert(ASTEmap[h->id] != NULL);
@@ -1249,22 +1255,22 @@ Scope(a,b,c,d,e,f,g,h,_id) ->
 
 
       // pass list of enclosed scopes to the compensation handler
-      ASTEmap[d->id]->enclosedScopes = ASTEmap[myid]->enclosedScopes;
+      ASTEmap[d->id]->enclosedScopes = myself->enclosedScopes;
 
       // generate the set of peer scopes
-      for (set<unsigned int>::iterator scopeId = ASTEmap[myid]->immediatelyEnclosedScopes.begin();
-           scopeId != ASTEmap[myid]->immediatelyEnclosedScopes.end(); scopeId++)
+      for (set<unsigned int>::iterator scopeId = myself->immediatelyEnclosedScopes.begin();
+           scopeId != myself->immediatelyEnclosedScopes.end(); scopeId++)
       {
-        ASTEmap[*scopeId]->peerScopes = ASTEmap[myid]->immediatelyEnclosedScopes;
+        ASTEmap[*scopeId]->peerScopes = myself->immediatelyEnclosedScopes;
         ASTEmap[*scopeId]->peerScopes.erase(*scopeId);
       }
 
       // collect enclosed source links
       assert(ASTEmap[h->id] != NULL);
-      ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[h->id]->enclosedSourceLinks);
+      myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[h->id]->enclosedSourceLinks);
 
       // everybody after me has the same parent scope as me
-      PPcurrentScope = ASTEmap[myid]->parentScopeId;
+      PPcurrentScope = myself->parentScopeId;
     }
   ]
 ;

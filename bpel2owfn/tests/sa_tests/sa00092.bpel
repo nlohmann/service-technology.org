@@ -1,0 +1,12 @@
+<process name="SA00092" targetNamespace="none">
+    
+    <sequence>
+	<scope name="A">
+	    <empty />
+	</scope>
+	<scope name="A">
+	    <empty />
+	</scope>
+    </sequence>
+
+</process>

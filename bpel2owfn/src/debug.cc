@@ -28,13 +28,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/11/03 14:57:45 $
+ * \date    \$Date: 2006/11/03 15:29:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  *
  * \ingroup debug
  */
@@ -262,9 +262,27 @@ void SAerror(unsigned int code, string information, int lineNumber)
 	 break;
        }
 
+    case(81):
+       {
+	 cerr << "<catch> attribute " << information << endl;
+	 break;
+       }
+
     case(83):
        {
 	 cerr << "<eventHandlers> have no <onEvent> or <onAlarm> element" << endl;
+	 break;
+       }
+
+    case(92):
+       {
+	 cerr << "<scope> with name `" << information << "' defined twice" << endl;
+	 break;
+       }
+
+    case(93):
+       {
+	 cerr << "<catch> construct defined twice" << endl;
 	 break;
        }
 

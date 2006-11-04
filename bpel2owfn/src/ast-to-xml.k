@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/11/03 16:22:16 $
+ *          - last changed: \$Date: 2006/11/04 13:08:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.55 $
+ * \version \$Revision: 1.56 $
  */
 %}
 
@@ -123,8 +123,8 @@ userDefinedEventHandler(a,b,_id) ->
   [xml: { inup(); } "<eventHandlers id=\"" _id "\">\n" a b { indown(); } "</eventHandlers>\n"]
 ;
 
-OnMessage(a,b) ->
-  [xml: { inup(); } "<onMessage>\n" a { indown(); } "</onMessage>\n"]
+OnMessage(a,b,c,d) ->
+  [xml: { inup(); } "<onMessage>\n" c { indown(); } "</onMessage>\n"]
 ;
 
 OnAlarm(a,b) ->
@@ -189,7 +189,7 @@ Invoke(a,b,c,d,_id) ->
   RECEIVE
 ******************************************************************************/
 
-Receive(a,b,_id) ->
+Receive(a,b,c,_id) ->
   [xml: { inup(); } "<receive id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b { indown(); } "</receive>\n"]
 ;
 

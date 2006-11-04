@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/03 16:22:16 $
+ * \date    \$Date: 2006/11/04 13:08:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.75 $
+ * \version \$Revision: 1.76 $
  */
 %}
 
@@ -76,6 +76,10 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
     i // inner activity
     a b c d e f g h
     {
+      // trigger [SA00015]
+      if (startActivities.empty())
+        SAerror(15, "", ASTEmap[myid]->attributes["referenceLine"]);
+
       // collect enclosed source links
       assert(ASTEmap[i->id] != NULL);
       ASTEmap[myid]->enclosedSourceLinks = ASTEmap[i->id]->enclosedSourceLinks;
@@ -272,19 +276,25 @@ userDefinedEventHandler(a,b,_id) ->
   ]
 ;
 
-OnMessage(a,_id) ->
+OnMessage(a,b,c,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
 
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
-      ASTEmap[myid]->checkAttributes();
-      ASTEmap[myid]->channelName = ASTEmap[myid]->createChannel();
-      ASTEmap[myid]->variableName = ASTEmap[myid]->checkVariable();
+      assert(ASTEmap[myself->parentActivityId] != NULL);
+      myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
+      myself->checkAttributes();
+
+      // trigger [SA00063]
+      if (b->length() != 0 && myself->attributes["variable"] != "")
+        SAerror(63, "", myself->attributes["referenceLine"]);
+
+      myself->channelName = myself->createChannel();
+      myself->variableName = myself->checkVariable();
     }
-    a
+    c
   ]
 ;
 
@@ -490,21 +500,30 @@ Invoke(a,b,c,d,_id) ->
   RECEIVE
 ******************************************************************************/
 
-Receive(a,b,_id) ->
+Receive(a,b,c,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
 
       a->parentId = myid;
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
 
       /* above is generic */
-      ASTEmap[myid]->channelName = ASTEmap[myid]->createChannel();
-      ASTEmap[myid]->variableName = ASTEmap[myid]->checkVariable();
-      ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
+
+      // trigger [SA00055]
+      if (c->length() != 0 && myself->attributes["variable"] != "")
+        SAerror(55, "", myself->attributes["referenceLine"]);
+
+      if (myself->isStartActivity)
+        startActivities.insert(myid);
+
+      myself->channelName = myself->createChannel();
+      myself->variableName = myself->checkVariable();
+      myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
     }
     a b
   ]
@@ -1137,45 +1156,55 @@ Pick(a,b,c,_id) ->
     {
       int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
 
       a->parentId = myid;
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
 
       /* above is generic */
 
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
+      if (myself->isStartActivity)
+      {
+        startActivities.insert(myid);
+
+        // trigger [SA00062]
+        if (c->length() != 0)
+          SAerror(62, "", myself->attributes["referenceLine"]);
+      }
+
+      assert(ASTEmap[myself->parentActivityId] != NULL);
+      myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
 
       // distribute the pick's id to the enclosed activities
-      foreach(branch=OnMessage(innerActivity); tOnMessage_list b)
+      foreach(branch=OnMessage(_corr,_from,innerActivity,_id2); tOnMessage_list b)
       {
         assert(ASTEmap[innerActivity->id] != NULL);
         ASTEmap[innerActivity->id]->parentActivityId = myid;
         ASTEmap[branch->id]->parentActivityId = myid;
-        ASTEmap[innerActivity->id]->controlFlow = ASTEmap[myid]->controlFlow;
+        ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
       }
       foreach(branch=OnAlarm(innerActivity); tOnAlarm_list c)
       {
         assert(ASTEmap[innerActivity->id] != NULL);
         ASTEmap[innerActivity->id]->parentActivityId = myid;
         ASTEmap[branch->id]->parentActivityId = myid;
-        ASTEmap[innerActivity->id]->controlFlow = ASTEmap[myid]->controlFlow;
+        ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
       }
     }
     a b c
     {
       // collect enclosed source links
-      foreach(branch=OnMessage(innerActivity); tOnMessage_list b)
+      foreach(branch=OnMessage(_corr,_from,innerActivity,_id2); tOnMessage_list b)
       {
         assert(ASTEmap[innerActivity->id] != NULL);
-        ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
+        myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
       }
       foreach(branch=OnAlarm(innerActivity); tOnAlarm_list c)
       {
         assert(ASTEmap[innerActivity->id] != NULL);
-        ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
+        myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
       }
     }
   ]

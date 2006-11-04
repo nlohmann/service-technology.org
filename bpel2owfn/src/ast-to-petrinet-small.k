@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/11/03 16:22:16 $
+ *          - last changed: \$Date: 2006/11/04 13:08:12 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.63 $
+ * \version \$Revision: 1.64 $
  *
  */
 %}
@@ -298,7 +298,7 @@ SynchronousInvoke(a,b,c,d,_id) ->
   RECEIVE
 ******************************************************************************/
 
-Receive(a,b,_id) ->
+Receive(a,b,c,_id) ->
   [petrinetsmall:
     {
       header(_id);
@@ -916,7 +916,7 @@ This=Pick(a,b,c,d) ->
     {
       // Traverse the <onMessage> branches.
       int onMessageCount = 1;
-      foreach (ThisBranch = OnMessage(innerActivity); tOnMessage_list b)
+      foreach (ThisBranch = OnMessage(_corr,_from,innerActivity,_id2); tOnMessage_list b)
       {
 	trace(TRACE_DEBUG, "[PNU]\t\t<onMessage>\n");
 	string message = toString(onMessageCount++);

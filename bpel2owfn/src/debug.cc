@@ -28,13 +28,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/11/03 16:22:16 $
+ * \date    \$Date: 2006/11/04 13:08:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
  *
  * \ingroup debug
  */
@@ -141,64 +141,9 @@ int yyerror(const char *msg)
   extern int yylineno;      // line number of current token
   extern char *yytext;      // text of the current token
 
-  trace("===============================================================================\n");
-  trace("PARSE ERROR\n\n");
+  cerr << filename << ":" << yylineno+1 << " - " << string(msg) << "; last token read: `" << string(yytext) << "'" << endl;
 
-  trace("+ Problem: " + string(msg) + " in file `" + filename + "' near line " + toString(yylineno) + ".\n");
-  trace("  The token/text last read was `" + string(yytext) + "'.\n\n");
-  
-  showLineEnvironment(yylineno);
-
-  trace("+ Description: either the input file does not validate with the BPEL XML schema\n");
-  trace("  or it uses extension elements that cannot be processed by BPEL2oWFN.\n\n");
-
-  trace("For more information see Appendix E of the WS-BPEL 2.0 specification.\n");
-  trace("===============================================================================\n\n");
-
-  error();
   return 1;
-}
-
-
-
-
-
-/*!
- * \brief prints a line of the input file
- * 
- * Outputs the environment (i.e. four lines before and after) of a line in the
- * input file.
- *
- * \param lineNumber line number
- *
- * \ingroup debug
- */
-void showLineEnvironment(int lineNumber)
-{
-  if (filename != "<STDIN>")
-  {
-    // number of lines to print before and after errorneous line
-    int environment = 4;
-
-    unsigned int firstShowedLine = ((lineNumber-environment)>0)?(lineNumber-environment):1;
-  
-    ifstream inputFile(filename.c_str());
-    string errorLine;
-    for (unsigned int i=0; i<firstShowedLine; i++)
-    {
-      getline(inputFile, errorLine);
-    }
-    // print the erroneous line (plus/minus three more)
-    for (unsigned int i=firstShowedLine; i<=firstShowedLine+(2*environment); i++)
-    {
-      trace(TRACE_INFORMATION, "  " + toString(i) + ": " + errorLine + "\n");
-      getline(inputFile, errorLine);
-      if (inputFile.eof())
-	break;
-    }
-    trace(TRACE_INFORMATION, "\n");
-    inputFile.close();
-  }
 }
 
 
@@ -220,24 +165,48 @@ void showLineEnvironment(int lineNumber)
  */
 void SAerror(unsigned int code, string information, int lineNumber)
 {
-  cerr << "error in " << filename << ":" << lineNumber << " - [SA";
+  cerr << filename << ":" << lineNumber << " - [SA";
   cerr << setfill('0') << setw(5) << code;
   cerr << "] ";
 
   switch (code)
   {
+    case(15):
+      { cerr << "<process> does not contain a start activity" << endl;
+	break; }
+
+    case(16):
+      { cerr << "<partnerLink> `" << information << "' neither specifies `myRole' nor `partnerRole'" << endl;
+	break; }
+
+    case(17):
+      { cerr << "<partnerLink> `" << information << "' uses `initializePartnerRole' but does not have a partner role" << endl;
+	break; }
+
     case(23):
       { cerr << "<variable> `" << information << "' defined twice" << endl;
 	break; }
 
     case(51):
-      { cerr << "<invoke> must not be used with inputVariable AND <toPart> elements" << endl;
+      { cerr << "<invoke> must not be used with an inputVariable AND <toPart> elements" << endl;
 	break; }
 
     case(52):
-      { cerr << "<invoke> must not be used with outputVariable AND <fromPart> elements" << endl;
+      { cerr << "<invoke> must not be used with an outputVariable AND <fromPart> elements" << endl;
 	break; }
 
+    case(55):
+      { cerr << "<receive> must not be used with a variable AND <fromPart> elements" << endl;
+	break; }
+
+    case(62):
+      { cerr << "<pick> start activity must only contain <onMessage> branches" << endl;
+	break; }
+
+    case(63):
+      { cerr << "<onMessage> must not be used with a variable AND <fromPart> elements" << endl;
+	break; }
+	
     case(72):
       { cerr << "<link> `" << information << "' closes a control cycle" << endl;
 	break; }
@@ -251,7 +220,7 @@ void SAerror(unsigned int code, string information, int lineNumber)
 	break; }
 
     case(80):
-       { cerr << "<faultHandler> have no <catch> or <catchAll> element" << endl;
+       { cerr << "<faultHandlers> have no <catch> or <catchAll> element" << endl;
 	 break; }
 
     case(81):

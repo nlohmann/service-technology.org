@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/03 14:57:44 $
+ * \date    \$Date: 2006/11/04 13:08:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.29 $
+ * \version \$Revision: 1.30 $
  */
 
 
@@ -127,7 +127,11 @@ class ASTE
     bool hasCatchAll;		///< true if fault handler has a catchAll branch
     bool inProcess;		///< true if compensation handler is embedded to a process
     bool inWhile;		///< true if activity is embedded in a while, repeatUntil activity or in onEvent
+    bool isStartActivity;	///< true if "createInstance" attribute is set to "yes"
 
+    set<unsigned int> peerScopes;			///< as defined on page 132 of the spec
+    set<unsigned int> immediatelyEnclosedScopes;	///< as defined on page 122 of the spec
+    
     ASTE(int myid, int mytype);
 
     string createChannel(bool synchronousCommunication = false);
@@ -139,9 +143,6 @@ class ASTE
     void checkAttributes();
     void defineVariable();
     string activityTypeName();
-
-    set<unsigned int> peerScopes;			///< as defined on page 132 of the spec
-    set<unsigned int> immediatelyEnclosedScopes;	///< as defined on page 122 of the spec
 };
 
 

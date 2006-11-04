@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/11/03 16:22:16 $
+ *          - last changed: \$Date: 2006/11/04 13:08:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.37 $
+ * \version \$Revision: 1.38 $
  */
 %}
 
@@ -348,13 +348,13 @@ Invoke(a,b,c,d,e) ->
   RECEIVE
 ******************************************************************************/
 
-Receive(a,b,c) ->
+Receive(a,b,c,d) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Receive\n");
 	  CFGBlock * block = new CFGBlock(CFGReceive, $0->id, "Receive"); 
 
 //NL	  block->channel_name = (dynamic_cast<STCommunicationActivity*>(symTab.lookup($0->id)))->channelId; 
-	  block->channel_name = ASTEmap[c->value]->channelName;
+	  block->channel_name = ASTEmap[d->value]->channelName;
 
 	  cfgMap[toString($0->id)] = block; 
     	}

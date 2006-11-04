@@ -37,7 +37,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2006/11/03 16:22:17 $
+ * \date    \$Date: 2006/11/04 13:08:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -46,7 +46,7 @@
  * \note    This file was created using GNU Bison reading file parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.265 $
+ * \version \$Revision: 1.266 $
  *
  * \ingroup frontend
  */
@@ -484,13 +484,13 @@ tOnAlarm_list:
 ;
 
 tOnMessage:
-  K_ONMESSAGE arbitraryAttributes X_NEXT tCorrelations activity X_NEXT X_SLASH K_ONMESSAGE
-    { $$ = OnMessage($5, $2); }
+  K_ONMESSAGE arbitraryAttributes X_NEXT tCorrelations tFromParts activity X_NEXT X_SLASH K_ONMESSAGE
+    { $$ = OnMessage($4, $5, $6, $2); }
 ;
 
 tOnEvent:
   K_ONEVENT arbitraryAttributes X_NEXT tCorrelations tFromParts activity X_NEXT X_SLASH K_ONEVENT
-    { $$ = OnMessage($6, $2); }
+    { $$ = OnMessage($4, $5, $6, $2); }
 ;
 
 tOnAlarm:
@@ -647,9 +647,9 @@ tFromPart:
 
 tReceive:
   K_RECEIVE arbitraryAttributes X_NEXT standardElements tCorrelations tFromParts X_SLASH K_RECEIVE
-    { $$ = Receive($4, $5, $2); }
+    { $$ = Receive($4, $5, $6, $2); }
 | K_RECEIVE arbitraryAttributes X_SLASH
-    { $$ = Receive(NoStandardElements(), NiltCorrelation_list(), $2); }
+    { $$ = Receive(NoStandardElements(), NiltCorrelation_list(), NiltFromPart_list(), $2); }
 ;
 
 

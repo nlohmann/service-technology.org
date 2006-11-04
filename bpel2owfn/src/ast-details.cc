@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/03 15:29:07 $
+ * \date    \$Date: 2006/11/04 13:08:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.39 $
+ * \version \$Revision: 1.40 $
  */
 
 
@@ -95,6 +95,7 @@ ASTE::ASTE(int myid, int mytype)
 
   inWhile = false;		// required initialization!
   inProcess = false;
+  isStartActivity = false;
 
   controlFlow = POSITIVECF;
 }
@@ -118,7 +119,7 @@ void ASTE::checkRequiredAttributes(string required[], unsigned int length)
   for (unsigned int i = 0; i < length; i++)
     if (attributes[required[i]] == "")
     {
-      cerr << "error in " << filename << ":" << attributes["referenceLine"];
+      cerr << filename << ":" << attributes["referenceLine"];
       cerr << " - attribute `" << required[i] << "' is required for <";
       cerr << activityTypeName() << ">" << endl;
     }
@@ -295,7 +296,7 @@ void ASTE::checkAttributes()
   }
 
 
-  // pass 3: check the required attributes
+  // pass 3: check the required attributes and perform other tests
   switch (type)
   {
     case(K_CATCH):
@@ -364,12 +365,17 @@ void ASTE::checkAttributes()
       }
 
     case(K_INVOKE):
-    case(K_RECEIVE):
-    case(K_REPLY):
+      {
+      	string required[] = {"partnerLink", "operation"};
+        checkRequiredAttributes(required, 2);
+	break;
+      }
+
     case(K_ONMESSAGE):
       {
       	string required[] = {"partnerLink", "operation"};
         checkRequiredAttributes(required, 2);
+
 	break;
       }
     
@@ -377,12 +383,49 @@ void ASTE::checkAttributes()
       {
 	string required[] = {"name", "partnerLinkType"};
         checkRequiredAttributes(required, 2);
+
+	// trigger [SA00016]
+	if (attributes["myRole"] != "" && 
+	    attributes["partnerRole"] != "")
+	  SAerror(16, attributes["name"], attributes["referenceLine"]);
+
+	// trigger [SA00017]
+	if (attributes["partnerRole"] == "" &&
+	    attributes["initializePartnerRole"] == "yes")
+	  SAerror(17, attributes["name"], attributes["referenceLine"]);
+
+	break;
+      }
+
+    case(K_PICK):
+      {
+	if (attributes["createInstance"] == "yes")
+	  isStartActivity = true;
+
 	break;
       }
 
     case(K_PROCESS):
       {
       	string required[] = {"name", "targetNamespace"};
+        checkRequiredAttributes(required, 2);
+	break;
+      }
+
+    case(K_RECEIVE):
+      {
+      	string required[] = {"partnerLink", "operation"};
+        checkRequiredAttributes(required, 2);
+
+	if (attributes["createInstance"] == "yes")
+	  isStartActivity = true;
+
+	break;
+      }
+
+    case(K_REPLY):
+      {
+      	string required[] = {"partnerLink", "operation"};
         checkRequiredAttributes(required, 2);
 	break;
       }
@@ -488,11 +531,11 @@ string ASTE::createChannel(bool synchronousCommunication)
 string ASTE::checkVariable()
 {
   string variableName = attributes["variable"];
-
+/*
   if (variableName != "")
     if (ASTE_variables.find(variableName) == ASTE_variables.end())
       cerr << "variable " << variableName << " was not defined before" << endl;
-
+*/
   return variableName;
 }
 
@@ -511,11 +554,11 @@ string ASTE::checkVariable()
 string ASTE::checkInputVariable()
 {
   string variableName = attributes["inputVariable"];
-
+/*
   if (variableName != "")
     if (ASTE_variables.find(variableName) == ASTE_variables.end())
       cerr << "variable " << variableName << " was not defined before" << endl;
-
+*/
   return variableName;
 }
 
@@ -534,11 +577,11 @@ string ASTE::checkInputVariable()
 string ASTE::checkOutputVariable()
 {
   string variableName = attributes["outputVariable"];
-
+/*
   if (variableName != "")
     if (ASTE_variables.find(variableName) == ASTE_variables.end())
       cerr << "variable " << variableName << " was not defined before" << endl;
-
+*/
   return variableName;
 }
 

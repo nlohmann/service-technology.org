@@ -87,13 +87,15 @@ set<string> ASTE_links;
 
 map<string, unsigned int> scopeNames;
 
-set<string> catches;
+set<string> catches;			///< a set to detect multiple catches
+
+set<unsigned int> startActivities;	///< a set of the ids of the start activities
 
 map<string, int> linkIdMap;
 
 map<int, int> PPhasCompensateMap;
 
-unsigned int PPcurrentScope = 0;
+unsigned int PPcurrentScope = 0;	///< the identifier of the current scope
 %}
 
 

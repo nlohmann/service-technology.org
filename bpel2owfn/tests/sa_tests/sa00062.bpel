@@ -1,0 +1,12 @@
+<process name="SA00062" targetNamespace="anyURI">
+
+  <pick createInstance="yes">
+    <onMessage partnerLink="pl" operation="o">
+      <empty />
+    </onMessage>
+    <onAlarm>
+      <empty />
+    </onAlarm>
+  </pick>
+
+</process>

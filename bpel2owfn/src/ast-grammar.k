@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/11/03 16:22:16 $
+ *          - last changed: \$Date: 2006/11/04 13:08:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.143 $
+ * \version \$Revision: 1.144 $
  */
 %}
 
@@ -185,7 +185,7 @@ tEventHandlers:
 tOnMessage_list: list tOnMessage;
 
 tOnMessage:
-  OnMessage(activity integer)
+  OnMessage(tCorrelation_list tFromPart_list activity integer)
 ;
 
 tOnAlarm_list: list tOnAlarm;
@@ -267,7 +267,7 @@ tFromPart:
 ******************************************************************************/
 
 tReceive:
-  Receive(standardElements tCorrelation_list integer)
+  Receive(standardElements tCorrelation_list tFromPart_list integer)
 ;
 
 

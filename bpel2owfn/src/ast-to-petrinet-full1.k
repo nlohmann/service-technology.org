@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/10/31 08:20:47 $
+ *          - last changed: \$Date: 2006/11/04 13:08:11 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.205 $
+ * \version \$Revision: 1.206 $
  *
  */
 %}
@@ -1301,7 +1301,7 @@ This=userDefinedEventHandler(a,b,_id) ->
     b // onAlarm branches
     {
       int onMessageCount = 1;
-      foreach (ThisBranch = OnMessage(innerActivity, _id2); tOnMessage_list a)
+      foreach (ThisBranch = OnMessage(_corr, _from, innerActivity, _id2); tOnMessage_list a)
       {
 	string message = toString(onMessageCount++);
 	string newPrefix = prefix + "onMessage" + message + ".";

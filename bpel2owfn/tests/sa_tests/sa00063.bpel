@@ -1,0 +1,29 @@
+<process name="sa00063" targetNamespace="anyURI">
+
+  <partnerLinks>
+    <partnerLink name="shipping"
+                 partnerLinkType="lns:shippingLT"
+                 myRole="shippingRequester"
+                 partnerRole="shippingService" />
+  </partnerLinks>
+
+  <variables>
+    <variable name="shippingInfo"
+              messageType="lns:shippingInfoMessage" />
+  </variables>
+
+  <pick>
+    <onMessage partnerLink="shipping"
+      operation="sendSchedule"
+      variable="shippingInfo">
+      
+      <fromParts>
+	<fromPart part="test" toVariable="shippingInfo" />
+      </fromParts>
+      
+      <empty />
+    </onMessage>
+  </pick>
+
+</process>
+

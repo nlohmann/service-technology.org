@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/04 13:08:11 $
+ * \date    \$Date: 2006/11/04 14:03:14 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.30 $
+ * \version \$Revision: 1.31 $
  */
 
 
@@ -87,6 +87,17 @@ typedef struct attribute {
   string value;
 };
 
+
+/*!
+ * \brief enumeration of possible attribute types
+ */
+typedef enum
+{
+  T_BOOLEAN,		///< Boolean value: "yes" or "no"
+  T_INITIATE,		///< for correlation: "yes", "join" or "no"
+  T_ROLES,		///< for query: "myRole" or "partnerRole"
+  T_PATTERN		///< for correlation: "request", "response" or "request-response"
+} attributeType;
 
 
 
@@ -140,6 +151,7 @@ class ASTE
     string checkInputVariable();
     string checkOutputVariable();
 
+    void checkAttributeType(string attribute, attributeType type);
     void checkAttributes();
     void defineVariable();
     string activityTypeName();

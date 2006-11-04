@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/04 13:08:11 $
+ * \date    \$Date: 2006/11/04 14:03:14 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.40 $
+ * \version \$Revision: 1.41 $
  */
 
 
@@ -186,7 +186,7 @@ void ASTE::checkAttributes()
 
     case(K_PARTNERLINK):
       {
-	string names[] = {"initalizePartnerLinkRole"};
+	string names[] = {"initializePartnerRole"};
 	string values[] = {"no"};
 	setStandardAttributes(names, values, 1);
 
@@ -251,6 +251,9 @@ void ASTE::checkAttributes()
 	assert(ASTEmap[parentScopeId] != NULL);
 	if (attributes["exitOnStandardFault"] == "")
 	  attributes["exitOnStandardFault"] = ASTEmap[parentScopeId]->attributes["exitOnStandardFault"];
+	else
+	  checkAttributeType("exitOnStandardFault", T_BOOLEAN);
+
 	assert(attributes["exitOnStandardFault"] != "");
 
 	/* no break here */
@@ -281,6 +284,8 @@ void ASTE::checkAttributes()
 	assert(ASTEmap[parentScopeId] != NULL);
 	if (attributes["suppressJoinFailure"] == "")
 	  attributes["suppressJoinFailure"] = ASTEmap[parentActivityId]->attributes["suppressJoinFailure"];
+	else
+	  checkAttributeType("suppressJoinFailure", T_BOOLEAN);
 
 	// if the attribute is not set now, the activity is directly enclosed
 	// to a fault, compensation, event or termination handler, thus the
@@ -299,6 +304,12 @@ void ASTE::checkAttributes()
   // pass 3: check the required attributes and perform other tests
   switch (type)
   {
+    case(K_BRANCHES):
+      {
+	checkAttributeType("successfulBranchesOnly", T_BOOLEAN);	
+	break;
+      }
+
     case(K_CATCH):
       {
 	// trigger [SA00081]
@@ -340,6 +351,9 @@ void ASTE::checkAttributes()
       {
       	string required[] = {"set"};
         checkRequiredAttributes(required, 1);
+
+	checkAttributeType("initiate", T_INITIATE);	
+	checkAttributeType("pattern", T_PATTERN);	
 	break;
       }
 
@@ -354,6 +368,8 @@ void ASTE::checkAttributes()
       {
       	string required[] = {"counterName", "parallel"};
         checkRequiredAttributes(required, 2);
+
+	checkAttributeType("parallel", T_BOOLEAN);
 	break;
       }
 
@@ -384,6 +400,8 @@ void ASTE::checkAttributes()
 	string required[] = {"name", "partnerLinkType"};
         checkRequiredAttributes(required, 2);
 
+	checkAttributeType("initializePartnerRole", T_BOOLEAN);
+
 	// trigger [SA00016]
 	if (attributes["myRole"] != "" && 
 	    attributes["partnerRole"] != "")
@@ -399,6 +417,8 @@ void ASTE::checkAttributes()
 
     case(K_PICK):
       {
+	checkAttributeType("createInstance", T_BOOLEAN);
+
 	if (attributes["createInstance"] == "yes")
 	  isStartActivity = true;
 
@@ -409,6 +429,9 @@ void ASTE::checkAttributes()
       {
       	string required[] = {"name", "targetNamespace"};
         checkRequiredAttributes(required, 2);
+
+	checkAttributeType("suppressJoinFailure", T_BOOLEAN);
+	checkAttributeType("exitOnStandardFault", T_BOOLEAN);
 	break;
       }
 
@@ -416,7 +439,9 @@ void ASTE::checkAttributes()
       {
       	string required[] = {"partnerLink", "operation"};
         checkRequiredAttributes(required, 2);
-
+	
+	checkAttributeType("createInstance", T_BOOLEAN);
+	
 	if (attributes["createInstance"] == "yes")
 	  isStartActivity = true;
 
@@ -436,6 +461,13 @@ void ASTE::checkAttributes()
       	string required[] = {"linkName"};
         checkRequiredAttributes(required, 1);
 	break;
+      }
+
+    case(K_SCOPE):
+      {
+	checkAttributeType("isolated", T_BOOLEAN);
+
+        break;	
       }
 
     case(K_THROW):
@@ -513,6 +545,75 @@ string ASTE::createChannel(bool synchronousCommunication)
   }
 
   return channelName;
+}
+
+
+
+
+
+void ASTE::checkAttributeType(string attribute, attributeType type)
+{
+  extern string filename;
+
+  switch (type)
+  {
+    case(T_BOOLEAN):
+      {
+	if (attributes[attribute] == "yes" ||
+	    attributes[attribute] == "no")
+	  return;
+
+	cerr << filename << ":" << attributes["referenceLine"];
+	cerr << " - attribute `" << attribute << "' in <";
+	cerr << activityTypeName() << "> must be of type tBoolean" << endl;
+	
+	break;
+      }
+
+    case(T_INITIATE):
+      {
+	if (attributes[attribute] == "yes" ||
+	    attributes[attribute] == "join" ||
+	    attributes[attribute] == "no")
+	  return;
+
+	cerr << filename << ":" << attributes["referenceLine"];
+	cerr << " - attribute `" << attribute << "' in <";
+	cerr << activityTypeName() << "> must be of type tInitiate" << endl;
+	
+	break;
+      }
+
+    case(T_ROLES):
+      {
+	if (attributes[attribute] == "myRole" ||
+	    attributes[attribute] == "partnerRole")
+	  return;
+
+	cerr << filename << ":" << attributes["referenceLine"];
+	cerr << " - attribute `" << attribute << "' in <";
+	cerr << activityTypeName() << "> must be of type tRoles" << endl;
+	
+	break;
+      }
+
+    case(T_PATTERN):
+      {
+	if (attributes[attribute] == "" ||
+	    attributes[attribute] == "request" ||
+	    attributes[attribute] == "response" ||
+	    attributes[attribute] == "request-response")
+	  return;
+
+	cerr << filename << ":" << attributes["referenceLine"];
+	cerr << " - attribute `" << attribute << "' in <";
+	cerr << activityTypeName() << "> must be of type tPattern" << endl;
+	
+	break;
+      }      
+  }
+
+  return;
 }
 
 
@@ -635,6 +736,7 @@ string ASTE::activityTypeName()
     case(K_EXIT):		return "exit";
     case(K_EVENTHANDLERS):	return "eventHandlers";
     case(K_FAULTHANDLERS):	return "faultHandlers";
+    case(K_FOREACH):		return "forEach";
     case(K_FROMPART):		return "fromPart";
     case(K_FROM):		return "from";
     case(K_FLOW):		return "flow";

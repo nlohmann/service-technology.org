@@ -28,13 +28,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/11/04 13:08:12 $
+ * \date    \$Date: 2006/11/04 16:02:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  *
  * \ingroup debug
  */
@@ -197,6 +197,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
 
     case(55):
       { cerr << "<receive> must not be used with a variable AND <fromPart> elements" << endl;
+	break; }
+
+    case(56):
+      { cerr << information << " start activity must not be preceeded by another activity" << endl;
 	break; }
 
     case(62):

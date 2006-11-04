@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/04 14:03:14 $
+ * \date    \$Date: 2006/11/04 16:02:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.41 $
+ * \version \$Revision: 1.42 $
  */
 
 
@@ -96,6 +96,8 @@ ASTE::ASTE(int myid, int mytype)
   inWhile = false;		// required initialization!
   inProcess = false;
   isStartActivity = false;
+  hasSourceLink = false;
+  hasTargetLink = false;
 
   controlFlow = POSITIVECF;
 }
@@ -769,4 +771,22 @@ string ASTE::activityTypeName()
 
     default:			return "unknown";
   }
+}
+
+
+
+bool ASTE::checkAncestors()
+{
+  extern map<unsigned int, ASTE*> ASTEmap;
+
+  if (activityTypeName() != "scope" &&
+      activityTypeName() != "flow" &&
+      activityTypeName() != "sequence" &&      
+      activityTypeName() != "process")
+    return false;
+
+  if (id == 1)
+    return true;
+  
+  return ASTEmap[parentActivityId]->checkAncestors();
 }

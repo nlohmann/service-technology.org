@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/04 13:08:11 $
+ * \date    \$Date: 2006/11/04 16:02:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.76 $
+ * \version \$Revision: 1.77 $
  */
 %}
 
@@ -518,14 +518,21 @@ Receive(a,b,c,_id) ->
       if (c->length() != 0 && myself->attributes["variable"] != "")
         SAerror(55, "", myself->attributes["referenceLine"]);
 
-      if (myself->isStartActivity)
-        startActivities.insert(myid);
-
       myself->channelName = myself->createChannel();
       myself->variableName = myself->checkVariable();
       myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
     }
     a b
+    {
+      if (myself->isStartActivity)
+      {
+        startActivities.insert(myid);
+
+        // trigger [SA00056]
+        if (!ASTEmap[myself->parentActivityId]->checkAncestors() || myself->hasTargetLink)
+          SAerror(56, "<receive>", myself->attributes["referenceLine"]);
+      }
+    }
   ]
 ;
 
@@ -819,11 +826,34 @@ Flow(a,b,c,_id) ->
     }
     a b c
     {
+      // id of an enclosed start activity (for [SA00056])
+      unsigned int startActivityId = 0;
+
       // collect enclosed source links
       foreach(innerActivity; activity_list c)
       {
         assert(ASTEmap[innerActivity->id] != NULL);
         ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
+
+        // collect start activities (for [SA00056])
+        if (ASTEmap[innerActivity->id]->isStartActivity)
+          startActivityId = innerActivity->id;
+      }
+
+      // check whether activities precede a start actvitiy (for [SA00056])
+      if (startActivityId != 0)
+      {
+	foreach(innerActivity; activity_list c)
+	{
+          assert(ASTEmap[innerActivity->id] != NULL);
+	
+	  if (!ASTEmap[innerActivity->id]->isStartActivity &&
+	      !ASTEmap[innerActivity->id]->hasTargetLink)
+          {
+	    SAerror(56, "<" + ASTEmap[startActivityId]->activityTypeName() + ">", ASTEmap[startActivityId]->attributes["referenceLine"]);
+            break;
+          }
+	}
       }
       
       /* here we can check whether each link was used as source and target */
@@ -1136,11 +1166,18 @@ Sequence(a,b,_id) ->
     }
     a b
     {
-      // collect enclosed source links
+      // collect enclosed source links and check whether the sequence contains
+      // a start activity (for [SA00056])
+      int activityCount = 1;
       foreach(innerActivity; activity_list b)
       {
         assert(ASTEmap[innerActivity->id] != NULL);
+
         ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
+
+        // trigger [SA00056]
+        if (ASTEmap[innerActivity->id]->isStartActivity && activityCount++ > 1)
+          SAerror(56, "<" + ASTEmap[innerActivity->id]->activityTypeName() + ">", ASTEmap[innerActivity->id]->attributes["referenceLine"]);
       }
     }
   ]
@@ -1165,15 +1202,6 @@ Pick(a,b,c,_id) ->
 
       /* above is generic */
 
-      if (myself->isStartActivity)
-      {
-        startActivities.insert(myid);
-
-        // trigger [SA00062]
-        if (c->length() != 0)
-          SAerror(62, "", myself->attributes["referenceLine"]);
-      }
-
       assert(ASTEmap[myself->parentActivityId] != NULL);
       myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
 
@@ -1195,6 +1223,19 @@ Pick(a,b,c,_id) ->
     }
     a b c
     {
+      if (myself->isStartActivity)
+      {
+        startActivities.insert(myid);
+
+        // trigger [SA00062]
+        if (c->length() != 0)
+          SAerror(62, "", myself->attributes["referenceLine"]);
+
+        // trigger [SA00056]
+        if (!ASTEmap[myself->parentActivityId]->checkAncestors() || myself->hasTargetLink)
+          SAerror(56, "<pick>", myself->attributes["referenceLine"]);
+      }
+
       // collect enclosed source links
       foreach(branch=OnMessage(_corr,_from,innerActivity,_id2); tOnMessage_list b)
       {
@@ -1359,6 +1400,8 @@ Target(a) ->
       // annotate AST and check information
       ASTEmap[myid]->checkAttributes();
 
+      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
+      ASTEmap[ASTEmap[myid]->parentActivityId]->hasTargetLink = true;
 
 /*TODO
       // remember that that link was used as a target
@@ -1388,6 +1431,9 @@ Source(a) ->
 
       // annotate AST and check information
       ASTEmap[myid]->checkAttributes();
+
+      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
+      ASTEmap[ASTEmap[myid]->parentActivityId]->hasSourceLink = true;
 
 /*TODO
       // remember that that link was used as a source

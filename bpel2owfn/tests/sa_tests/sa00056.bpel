@@ -1,0 +1,18 @@
+<process name="purchaseOrderProcess"
+    targetNamespace="http://example.com/ws-bp/purchase">
+    
+    <partnerLinks>
+	<partnerLink name="purchasing" partnerLinkType="lns:purchasingLT" myRole="purchaseService" />
+    </partnerLinks>
+    
+    <variables>
+	<variable name="PO" messageType="lns:POMessage" />
+    </variables>
+
+    <flow>
+	<empty />
+
+	<receive partnerLink="purchasing" operation="sendPurchaseOrder" variable="PO" createInstance="yes" />
+    </flow>
+
+</process>

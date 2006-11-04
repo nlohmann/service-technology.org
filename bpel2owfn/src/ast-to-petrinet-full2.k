@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/11/04 13:08:11 $
+ *          - last changed: \$Date: 2006/11/04 16:58:05 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.54 $
+ * \version \$Revision: 1.55 $
  */
 %}
 
@@ -1584,7 +1584,7 @@ This=Scope(a,b,c,d,e,f,g,h,_id) ->
       currentScope = prefix;
 
       // Create push-places for the children of the scope.
-      for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
+      for (set<unsigned int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
       {
 	Place *push_child    = TheNet->newPlace(toString(*child) + ".push");
 	Place *notPush_child = TheNet->newPlace(toString(*child) + ".!push");
@@ -1762,7 +1762,7 @@ This=Scope(a,b,c,d,e,f,g,h,_id) ->
       // After the patterns of the inner activity of the process are generated
       // the push places of the child scopes are available and have to be
       // connected with the transition t2 of the process.
-      for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
+      for (set<unsigned int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
 	TheNet->newArc(t2, TheNet->findPlace(toString(*child) + ".!push"));
 
       string prefix2 = toString(This->id) + ".internal.";

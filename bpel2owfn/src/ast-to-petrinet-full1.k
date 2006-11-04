@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/11/04 13:08:11 $
+ *          - last changed: \$Date: 2006/11/04 16:58:05 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.206 $
+ * \version \$Revision: 1.207 $
  *
  */
 %}
@@ -89,7 +89,7 @@ This=Process(a,b,c,d,e,f,g,h,i,_id) ->
 
 
       // Create push-places for the children of the process.
-      for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
+      for (set<unsigned int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
       {
 	TheNet->newPlace(toString(*child) + ".push");
 	TheNet->newPlace(toString(*child) + ".!push");
@@ -247,7 +247,7 @@ This=Process(a,b,c,d,e,f,g,h,i,_id) ->
       // After the patterns of the inner activity of the process are generated
       // the push places of the child scopes are available and have to be
       // connected with the transition t2 of the process.
-      for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
+      for (set<unsigned int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
 	TheNet->newArc(t2, TheNet->findPlace( toString(*child) + ".!push" ));
 
 
@@ -1572,7 +1572,7 @@ This=implicitCompensationHandler(_id) provided (!ASTEmap[_id->value]->inProcess)
       // guarded in the original semantics and has to be unfolded for the
       // low-level representation. Therefore, each child gets its own place
       // "compScope".
-      for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
+      for (set<unsigned int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
       {
 	Place *p19_new = TheNet->newPlace(prefix + "compScope." + toString(*child));
 	Place *p20 = TheNet->findPlace(toString(*child) + ".!push");
@@ -1701,7 +1701,7 @@ This=userDefinedCompensationHandler(innerActivity,_id) provided (!ASTEmap[_id->v
 	TheNet->newArc(t7, p12);
 	TheNet->newArc(p15, t7, READ);
 
-        for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
+        for (set<unsigned int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
 	  TheNet->newArc(TheNet->findPlace(toString(*child) + ".!push"), t7);
 
 	Transition *t10 = TheNet->newTransition(prefix + "t10");
@@ -1733,7 +1733,7 @@ This=userDefinedCompensationHandler(innerActivity,_id) provided (!ASTEmap[_id->v
       // guarded in the original semantics and has to be unfolded for the
       // low-level representation. Therefore, each child gets its own place
       // "compScope".
-      for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
+      for (set<unsigned int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
       {
 	Place *p19_new = TheNet->newPlace(prefix + "compScope." + toString(*child));
 	Place *p20 = TheNet->findPlace(toString(*child) + ".!push");
@@ -1838,7 +1838,7 @@ This=implicitCompensationHandler(_id) provided (ASTEmap[_id->value]->inProcess) 
       // guarded in the original semantics and has to be unfolded for the
       // low-level representation. Therefore, each child gets its own place
       // "compScope".
-      for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
+      for (set<unsigned int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
       {
 	Place *p19_new = TheNet->newPlace(prefix + "compScope." + toString(*child));
 	Place *p20 = TheNet->findPlace(toString(*child) + ".!push");
@@ -1931,7 +1931,7 @@ This=userDefinedCompensationHandler(a,_id) provided (ASTEmap[_id->value]->inProc
       // guarded in the original semantics and has to be unfolded for the
       // low-level representation. Therefore, each child gets its own place
       // "compScope".
-      for (set<int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
+      for (set<unsigned int>::iterator child = ASTEmap[This->id]->enclosedScopes.begin(); child != ASTEmap[This->id]->enclosedScopes.end(); child++)
       {
 	Place *p19_new = TheNet->newPlace(prefix + "compScope." + toString(*child));
 	Place *p20 = TheNet->findPlace(toString(*child) + ".!push");

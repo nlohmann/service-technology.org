@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/04 16:02:44 $
+ * \date    \$Date: 2006/11/04 16:58:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  */
 
 
@@ -56,6 +56,8 @@
 #include <map>
 #include <string>
 #include <set>
+
+#include "ast-config.h"
 
 using namespace std;
 
@@ -119,9 +121,10 @@ class ASTE
     void setStandardAttributes(string names[], string values[], unsigned int length);
 
   public:
+    kc::impl_abstract_phylum* phylum;	///< the AST phylum
+
     map<string, string> attributes;	///< the parsed attributes
     set<int> enclosedSourceLinks;	///< the identifiers of all (recursively) enclosed source links
-    set<int> enclosedScopes;		///< the identifiers of all (direct!) enclosed scopes
 
     unsigned int parentScopeId;		///< the identifier of the parent scope
     unsigned int parentActivityId;	///< the identifier of the parent activity
@@ -143,8 +146,9 @@ class ASTE
     bool hasTargetLink;		///< true if activity is target of at least one link
 
     set<unsigned int> peerScopes;			///< as defined on page 132 of the spec
-    set<unsigned int> immediatelyEnclosedScopes;	///< as defined on page 122 of the spec
-    
+    set<unsigned int> enclosedScopes;			///< as defined on page 122 of the spec
+   
+
     ASTE(int myid, int mytype);
 
     string createChannel(bool synchronousCommunication = false);

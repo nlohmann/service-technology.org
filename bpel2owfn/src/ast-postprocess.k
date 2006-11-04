@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/04 16:02:44 $
+ * \date    \$Date: 2006/11/04 16:58:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.77 $
+ * \version \$Revision: 1.78 $
  */
 %}
 
@@ -89,14 +89,6 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
         f->hasCompensateWithoutScope = true;
       if(PPhasCompensateMap[myid] == 2)
         f->hasCompensateWithScope = true;
-
-      // generate the set of peer scopes
-      for (set<unsigned int>::iterator scopeId = ASTEmap[myid]->immediatelyEnclosedScopes.begin();
-           scopeId != ASTEmap[myid]->immediatelyEnclosedScopes.end(); scopeId++)
-      {
-        ASTEmap[*scopeId]->peerScopes = ASTEmap[myid]->immediatelyEnclosedScopes;
-        ASTEmap[*scopeId]->peerScopes.erase(*scopeId);
-      }      
 
       // pass list of enclosed scopes to the compensation handler
       ASTEmap[f->id]->enclosedScopes = ASTEmap[myid]->enclosedScopes;
@@ -738,7 +730,7 @@ CompensateScope(a,b,_id) ->
       // triggers SA00078 and SA00077
       if (scopeNames[myself->attributes["target"]] == 0)
         SAerror(78, myself->attributes["target"], myself->attributes["referenceLine"]);
-      else if (ASTEmap[myself->parentScopeId]->immediatelyEnclosedScopes.find(scopeNames[myself->attributes["target"]]) == ASTEmap[myself->parentScopeId]->immediatelyEnclosedScopes.end())
+      else if (ASTEmap[myself->parentScopeId]->enclosedScopes.find(scopeNames[myself->attributes["target"]]) == ASTEmap[myself->parentScopeId]->enclosedScopes.end())
         SAerror(77, myself->attributes["target"], myself->attributes["referenceLine"]);
 
       // register this compensate at the current scope
@@ -1301,10 +1293,8 @@ Scope(a,b,c,d,e,f,g,h,_id) ->
       // now I am the current scope
       PPcurrentScope = myid;
 
-      // this scope is immediately enclosed to its parent scope
-      ASTEmap[myself->parentScopeId]->immediatelyEnclosedScopes.insert(myid);
-
       assert(ASTEmap[myself->parentActivityId] != NULL);
+      assert(ASTEmap[myself->parentScopeId] != NULL);
       myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
       myself->checkAttributes();
       ASTEmap[myself->parentScopeId]->enclosedScopes.insert(myid);
@@ -1335,14 +1325,6 @@ Scope(a,b,c,d,e,f,g,h,_id) ->
 
       // pass list of enclosed scopes to the compensation handler
       ASTEmap[d->id]->enclosedScopes = myself->enclosedScopes;
-
-      // generate the set of peer scopes
-      for (set<unsigned int>::iterator scopeId = myself->immediatelyEnclosedScopes.begin();
-           scopeId != myself->immediatelyEnclosedScopes.end(); scopeId++)
-      {
-        ASTEmap[*scopeId]->peerScopes = myself->immediatelyEnclosedScopes;
-        ASTEmap[*scopeId]->peerScopes.erase(*scopeId);
-      }
 
       // collect enclosed source links
       assert(ASTEmap[h->id] != NULL);

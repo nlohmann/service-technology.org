@@ -190,6 +190,7 @@ typedef std::map<string, string> stringMap;
     ASTEmap[id] = new ASTE(id, token); \
   } \
   assert(ASTEmap[id] != NULL); \
+  ASTEmap[id]->phylum = this; \
   LEAVE("[AST]"); \
 }
 

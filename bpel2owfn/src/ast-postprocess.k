@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/04 16:58:05 $
+ * \date    \$Date: 2006/11/04 18:00:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.78 $
+ * \version \$Revision: 1.79 $
  */
 %}
 
@@ -533,22 +533,27 @@ Receive(a,b,c,_id) ->
   REPLY
 ******************************************************************************/
 
-Reply(a,b,_id) ->
+Reply(a,b,c,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
 
       a->parentId = myid;
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
 
       /* above is generic */
 
-      ASTEmap[myid]->channelName = ASTEmap[myid]->createChannel();
-      ASTEmap[myid]->variableName = ASTEmap[myid]->checkVariable();
-      ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
+      // trigger [SA00059]
+      if (c->length() != 0 && myself->attributes["variable"] != "")
+        SAerror(59, "", myself->attributes["referenceLine"]);
+
+      myself->channelName = myself->createChannel();
+      myself->variableName = myself->checkVariable();
+      myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
     }
     a b
   ]
@@ -1303,12 +1308,18 @@ Scope(a,b,c,d,e,f,g,h,_id) ->
       // remember the scope's name for compensation
       if (myself->attributes["name"] != "")
       {
+        // trigger [SA00092]
         if (scopeNames[myself->attributes["name"]] != 0)
           SAerror(92, myself->attributes["name"], myself->attributes["referenceLine"]);
         
         scopeNames[myself->attributes["name"]] = myid;
       }
 
+      // trigger [SA00091]
+      if (myself->attributes["isolated"] == "yes" &&
+          ASTEmap[myself->parentScopeId]->findIsolatedAncestor())
+        SAerror(91, "", myself->attributes["referenceLine"]);
+        
       // distribute the scope's id to the enclosed activity
       assert(ASTEmap[h->id] != NULL);
       ASTEmap[h->id]->parentActivityId = myid;

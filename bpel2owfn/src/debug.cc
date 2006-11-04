@@ -28,13 +28,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/11/04 16:02:44 $
+ * \date    \$Date: 2006/11/04 18:00:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.28 $
+ * \version \$Revision: 1.29 $
  *
  * \ingroup debug
  */
@@ -203,6 +203,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
       { cerr << information << " start activity must not be preceeded by another activity" << endl;
 	break; }
 
+    case(59):
+      { cerr << "<reply> must not be used with a variable AND <toPart> elements" << endl;
+	break; }
+
     case(62):
       { cerr << "<pick> start activity must only contain <onMessage> branches" << endl;
 	break; }
@@ -233,6 +237,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
 
     case(83):
        { cerr << "<eventHandlers> have no <onEvent> or <onAlarm> element" << endl;
+	 break; }
+
+    case(91):
+       { cerr << "an isolated <scope> may not contain other isolated scopes" << endl;
 	 break; }
 
     case(92):

@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/04 16:58:05 $
+ * \date    \$Date: 2006/11/04 18:00:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.33 $
+ * \version \$Revision: 1.34 $
  */
 
 
@@ -158,6 +158,7 @@ class ASTE
     string checkOutputVariable();
 
     bool checkAncestors();
+    bool findIsolatedAncestor();
     void checkAttributeType(string attribute, attributeType type);
     void checkAttributes();
     void defineVariable();

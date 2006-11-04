@@ -67,9 +67,9 @@
 
 using namespace std;
 
-extern PetriNet *TheNet;   // introduced in main.c
-extern CFGBlock * TheCFG;  // introduced in cfg.cc
-extern map<unsigned int, ASTE*> ASTEmap; // introduced in ast-details.cc
+extern PetriNet *TheNet;			// introduced in main.c
+extern CFGBlock * TheCFG;			// introduced in cfg.cc
+extern map<unsigned int, ASTE*> ASTEmap;	// introduced in ast-details.cc
 
 
 /// prefix of the current scope (read by the stop pattern and used to direct
@@ -88,11 +88,9 @@ set<string> ASTE_links;
 map<string, unsigned int> scopeNames;
 
 set<string> catches;			///< a set to detect multiple catches
-
 set<unsigned int> startActivities;	///< a set of the ids of the start activities
 
 map<string, int> linkIdMap;
-
 map<int, int> PPhasCompensateMap;
 
 unsigned int PPcurrentScope = 0;	///< the identifier of the current scope
@@ -160,6 +158,7 @@ extern map<unsigned int, ASTE*> ASTEmap;
 #include <string>
 #include <iostream>
 #include <map>
+
 #include "debug.h"
 #include "helpers.h"
 

@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2006-10-30
- *          - last changed: \$Date: 2006/11/04 13:08:11 $
+ *          - last changed: \$Date: 2006/11/04 18:00:43 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  */
 %}
 
@@ -302,7 +302,7 @@ This=Receive(a,b,c,_id) ->
  * ignored, the resulting pattern is the same as in Fig. 9.
  */
 
-This=Reply(a,b,_id) ->
+This=Reply(a,b,c,_id) ->
   [petrinetnew:
     {
       header(This->id);

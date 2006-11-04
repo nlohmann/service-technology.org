@@ -1,0 +1,11 @@
+<process name="SA00091" targetNamespace="none">
+    
+    <scope isolated="yes">
+	<scope>
+	    <scope isolated="yes">
+		<empty />
+	    </scope>
+	</scope>
+    </scope>
+
+</process>

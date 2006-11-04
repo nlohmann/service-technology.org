@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/11/04 13:08:12 $
+ *          - last changed: \$Date: 2006/11/04 18:00:43 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.64 $
+ * \version \$Revision: 1.65 $
  *
  */
 %}
@@ -331,7 +331,7 @@ Receive(a,b,c,_id) ->
   REPLY
 ******************************************************************************/
 
-Reply(a,b,_id) ->
+Reply(a,b,c,_id) ->
   [petrinetsmall:
     {
       header(_id);

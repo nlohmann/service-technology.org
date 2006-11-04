@@ -37,7 +37,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2006/11/04 13:08:12 $
+ * \date    \$Date: 2006/11/04 18:00:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -46,7 +46,7 @@
  * \note    This file was created using GNU Bison reading file parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.266 $
+ * \version \$Revision: 1.267 $
  *
  * \ingroup frontend
  */
@@ -659,9 +659,9 @@ tReceive:
 
 tReply:
   K_REPLY arbitraryAttributes X_NEXT standardElements tCorrelations tToParts X_SLASH K_REPLY
-    { $$ = Reply($4, $5, $2); }
+    { $$ = Reply($4, $5, $6, $2); }
 | K_REPLY arbitraryAttributes X_SLASH
-    { $$ = Reply(NoStandardElements(), NiltCorrelation_list(), $2); }
+    { $$ = Reply(NoStandardElements(), NiltCorrelation_list(), NiltToPart_list(), $2); }
 ;
 
 

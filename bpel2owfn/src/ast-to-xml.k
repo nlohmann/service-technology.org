@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/11/04 13:08:12 $
+ *          - last changed: \$Date: 2006/11/04 18:00:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.56 $
+ * \version \$Revision: 1.57 $
  */
 %}
 
@@ -198,7 +198,7 @@ Receive(a,b,c,_id) ->
   REPLY
 ******************************************************************************/
 
-Reply(a,b,_id) ->
+Reply(a,b,c,_id) ->
   [xml: { inup(); } "<reply id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b { indown(); } "</reply>\n"]
 ;
 

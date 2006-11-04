@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/04 16:02:44 $
+ * \date    \$Date: 2006/11/04 18:00:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
  */
 
 
@@ -775,6 +775,15 @@ string ASTE::activityTypeName()
 
 
 
+
+
+/*!
+ * for [SA00056]
+ *
+ * \returns true  if only <scope>, <flow>, <sequence> or <process> activities
+ *                are found in the ancestors
+ * \returns false otherwise
+ */
 bool ASTE::checkAncestors()
 {
   extern map<unsigned int, ASTE*> ASTEmap;
@@ -789,4 +798,27 @@ bool ASTE::checkAncestors()
     return true;
   
   return ASTEmap[parentActivityId]->checkAncestors();
+}
+
+
+
+
+
+/*!
+ * for [SA00091]
+ *
+ * \returns true  if a parent scope with "isolated=yes" is found
+ * \returns false otherwise
+ */
+bool ASTE::findIsolatedAncestor()
+{
+  extern map<unsigned int, ASTE*> ASTEmap;
+
+  if (id == 1)
+    return false;
+
+  if (attributes["isolated"] == "yes")
+    return true;
+  else
+    return ASTEmap[parentScopeId]->findIsolatedAncestor();
 }

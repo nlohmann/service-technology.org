@@ -29,6 +29,7 @@
 #include "ast-system-rk.h"	// ?
 #include "ast-system-unpk.h"	// ?
 #include "ast-system-yystype.h" // data types for tokens and non-terminals
+#include <cassert>
 %}
 
 

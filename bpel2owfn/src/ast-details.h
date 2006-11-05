@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/05 09:53:59 $
+ * \date    \$Date: 2006/11/05 11:36:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.35 $
+ * \version \$Revision: 1.36 $
  */
 
 
@@ -99,7 +99,8 @@ typedef enum
   T_BOOLEAN,		///< Boolean value: "yes" or "no"
   T_INITIATE,		///< for correlation: "yes", "join" or "no"
   T_ROLES,		///< for query: "myRole" or "partnerRole"
-  T_PATTERN		///< for correlation: "request", "response" or "request-response"
+  T_PATTERN,		///< for correlation: "request", "response" or "request-response"
+  T_BPELVARIABLENAME	///< a variable name (NCName without ".")
 } attributeType;
 
 

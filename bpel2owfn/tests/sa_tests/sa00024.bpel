@@ -1,0 +1,10 @@
+<process name="SA00024" targetNamespace="anyURI">
+	
+	<variables>
+		<variable name="shipping.Schedule"
+			messageType="lns:scheduleMessage" />
+     	</variables>
+
+     	<empty />
+
+</process>

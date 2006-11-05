@@ -28,13 +28,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/11/05 10:14:56 $
+ * \date    \$Date: 2006/11/05 11:36:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  *
  * \ingroup debug
  */
@@ -197,6 +197,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
 
     case(23):
       { cerr << "<variable> `" << information << "' defined twice" << endl;
+	break; }
+
+    case(24):
+      { cerr << "attribute `" << information << "' must be of type `BPELVariableName'" << endl;
 	break; }
 
     case(25):

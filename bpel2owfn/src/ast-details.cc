@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/05 10:14:56 $
+ * \date    \$Date: 2006/11/05 11:36:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.45 $
+ * \version \$Revision: 1.46 $
  */
 
 
@@ -314,6 +314,8 @@ void ASTE::checkAttributes()
 
     case(K_CATCH):
       {
+	checkAttributeType("faultVariable", T_BPELVARIABLENAME);
+	
 	// trigger [SA00081]
 	if (attributes["faultVariable"] != "" && 
 	    attributes["faultMessageType"] != "" &&
@@ -372,13 +374,20 @@ void ASTE::checkAttributes()
         checkRequiredAttributes(required, 2);
 
 	checkAttributeType("parallel", T_BOOLEAN);
+	checkAttributeType("counterName", T_BPELVARIABLENAME);
 	break;
+      }
+
+    case(K_FROM):
+      {
+	checkAttributeType("variable", T_BPELVARIABLENAME);
       }
 
     case(K_FROMPART):
       {
       	string required[] = {"part", "toVariable"};
         checkRequiredAttributes(required, 2);
+	checkAttributeType("toVariable", T_BPELVARIABLENAME);
 	break;
       }
 
@@ -386,11 +395,16 @@ void ASTE::checkAttributes()
       {
       	string required[] = {"partnerLink", "operation"};
         checkRequiredAttributes(required, 2);
+
+	checkAttributeType("inputVariable", T_BPELVARIABLENAME);
+	checkAttributeType("outputVariable", T_BPELVARIABLENAME);
 	break;
       }
 
     case(K_ONMESSAGE):
       {
+	checkAttributeType("variable", T_BPELVARIABLENAME);
+
       	string required[] = {"partnerLink", "operation"};
         checkRequiredAttributes(required, 2);
 
@@ -443,6 +457,7 @@ void ASTE::checkAttributes()
         checkRequiredAttributes(required, 2);
 	
 	checkAttributeType("createInstance", T_BOOLEAN);
+	checkAttributeType("variable", T_BPELVARIABLENAME);
 	
 	if (attributes["createInstance"] == "yes")
 	  isStartActivity = true;
@@ -454,6 +469,7 @@ void ASTE::checkAttributes()
       {
       	string required[] = {"partnerLink", "operation"};
         checkRequiredAttributes(required, 2);
+	checkAttributeType("variable", T_BPELVARIABLENAME);
 	break;
       }
 
@@ -476,19 +492,27 @@ void ASTE::checkAttributes()
       {
       	string required[] = {"faultName"};
         checkRequiredAttributes(required, 1);
+	checkAttributeType("faultVariable", T_BPELVARIABLENAME);
 	break;
+      }
+
+    case(K_TO):
+      {
+	checkAttributeType("variable", T_BPELVARIABLENAME);
       }
 
     case(K_TOPART):
       {
       	string required[] = {"part", "fromVariable"};
         checkRequiredAttributes(required, 2);
+	checkAttributeType("fromVariable", T_BPELVARIABLENAME);
 	break;
       }
 
     case(K_VALIDATE):
       {
       	string required[] = {"variables"};
+	checkAttributeType("variables", T_BPELVARIABLENAME);	// in fact BPELVariableNameS
         checkRequiredAttributes(required, 1);
 	break;
       }
@@ -497,6 +521,7 @@ void ASTE::checkAttributes()
       {
       	string required[] = {"name"};
         checkRequiredAttributes(required, 1);
+	checkAttributeType("name", T_BPELVARIABLENAME);
 
 	// trigger [SA00025]
 	if (attributes["messageType"] != "" && 
@@ -624,7 +649,16 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 	cerr << activityTypeName() << "> must be of type tPattern" << endl;
 	
 	break;
-      }      
+      }
+
+    case(T_BPELVARIABLENAME):
+      {
+	// trigger [SA00024]
+	if (attributes[attribute].find('.', 0) != string::npos)
+	  SAerror(24, attribute, attributes["referenceLine"]);
+
+	break;
+      }
   }
 
   return;

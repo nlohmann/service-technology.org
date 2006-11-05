@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/04 18:00:43 $
+ * \date    \$Date: 2006/11/05 09:53:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
  */
 
 
@@ -729,6 +729,7 @@ string ASTE::activityTypeName()
     case(K_CATCH):		return "catch";
     case(K_CATCHALL):		return "catchAll";
     case(K_COMPENSATE):		return "compensate";
+    case(K_COMPENSATESCOPE):	return "compensateScope";
     case(K_COMPENSATIONHANDLER):return "compensationHandler";
     case(K_CORRELATION):	return "correlation";
     case(K_CORRELATIONSET):	return "correlationSet";
@@ -754,6 +755,7 @@ string ASTE::activityTypeName()
     case(K_RECEIVE):		return "receive";
     case(K_REPEATUNTIL):	return "repeatUntil";
     case(K_REPLY):		return "reply";
+    case(K_RETHROW):		return "rethrow";
     case(K_SCOPE):		return "scope";
     case(K_SOURCE):		return "source";
     case(K_SEQUENCE):		return "sequence";
@@ -821,4 +823,54 @@ bool ASTE::findIsolatedAncestor()
     return true;
   else
     return ASTEmap[parentScopeId]->findIsolatedAncestor();
+}
+
+
+
+
+
+/*!
+ * \returns list of identifiers of all acestor activities
+ */
+list<unsigned int> ASTE::ancestorActivities()
+{
+  extern map<unsigned int, ASTE*> ASTEmap;
+  list<unsigned int> result;
+  
+  if (id != 1)
+  {
+    result.push_back(parentActivityId);
+    assert(ASTEmap[parentActivityId] != NULL);
+    list<unsigned int> result2 = ASTEmap[parentActivityId]->ancestorActivities();
+    result.splice(result.end(), result2);
+    
+    return result;
+  }
+  else
+    return result;
+}
+
+
+
+
+
+/*!
+ * \returns list of identifiers of all ancestor scopes
+ */
+list<unsigned int> ASTE::ancestorScopes()
+{
+  extern map<unsigned int, ASTE*> ASTEmap;
+  list<unsigned int> result;
+  
+  if (id != 1)
+  {
+    result.push_back(parentScopeId);
+    assert(ASTEmap[parentScopeId] != NULL);
+    list<unsigned int> result2 = ASTEmap[parentScopeId]->ancestorScopes();
+    result.splice(result.end(), result2);
+    
+    return result;
+  }
+  else
+    return result;
 }

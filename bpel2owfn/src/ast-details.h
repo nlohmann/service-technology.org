@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/04 18:00:43 $
+ * \date    \$Date: 2006/11/05 09:53:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
  */
 
 
@@ -56,6 +56,7 @@
 #include <map>
 #include <string>
 #include <set>
+#include <list>
 
 #include "ast-config.h"
 
@@ -157,6 +158,9 @@ class ASTE
     string checkInputVariable();
     string checkOutputVariable();
 
+    list<unsigned int> ancestorActivities();
+    list<unsigned int> ancestorScopes();
+    
     bool checkAncestors();
     bool findIsolatedAncestor();
     void checkAttributeType(string attribute, attributeType type);

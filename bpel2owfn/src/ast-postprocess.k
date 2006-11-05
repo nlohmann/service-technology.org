@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/04 18:00:43 $
+ * \date    \$Date: 2006/11/05 09:53:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.79 $
+ * \version \$Revision: 1.80 $
  */
 %}
 
@@ -341,8 +341,8 @@ TerminationHandler(a,_id) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
 
-      // distribute the compensation handlers's id to the enclosed activity
-      // also mark the activities as "inside compensation handlers"
+      // distribute the termination handlers's id to the enclosed activity
+      // also mark the activities as "inside termination handlers"
       assert(ASTEmap[a->id] != NULL);
       ASTEmap[a->id]->parentActivityId = myid;
       ASTEmap[a->id]->controlFlow = THCF;
@@ -682,6 +682,23 @@ Rethrow(a,_id) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       ASTEmap[myid]->checkAttributes();
+
+      /* above is generic */
+
+      // triggers [SA00006]
+      bool correctUse = false;
+      list<unsigned int> ancestorActivities = ASTEmap[myid]->ancestorActivities();
+      for (list<unsigned int>::iterator it = ancestorActivities.begin(); it != ancestorActivities.end(); it++)
+      {
+        assert(ASTEmap[*it] != NULL);
+        if (ASTEmap[*it]->activityTypeName() == "faultHandlers")
+        {
+          correctUse = true;
+          break;
+        }
+      }
+      if (!correctUse)
+        SAerror(6, "", ASTEmap[myid]->attributes["referenceLine"]);
     }
     a
   ]
@@ -704,6 +721,24 @@ Compensate(a,_id) ->
       ASTEmap[myid]->checkAttributes();
 
       /* above is generic */
+
+      // triggers [SA00008]
+      bool correctUse = false;
+      list<unsigned int> ancestorActivities = ASTEmap[myid]->ancestorActivities();
+
+      for (list<unsigned int>::iterator it = ancestorActivities.begin(); it != ancestorActivities.end(); it++)
+      {
+        if (ASTEmap[*it]->activityTypeName() == "faultHandlers" ||
+            ASTEmap[*it]->activityTypeName() == "compensationHandler" ||
+            ASTEmap[*it]->activityTypeName() == "terminationHandler")
+        {
+          correctUse = true;
+          break;
+        }
+      }
+      if (!correctUse)
+        SAerror(8, "", ASTEmap[myid]->attributes["referenceLine"]);
+
 
       // register this compensate at the current scope
       /* here we can check whether it is the only compensate activity */
@@ -731,6 +766,24 @@ CompensateScope(a,b,_id) ->
       myself->checkAttributes();
 
       /* above is generic */
+
+
+      // triggers [SA00007]
+      bool correctUse = false;
+      list<unsigned int> ancestorActivities = ASTEmap[myid]->ancestorActivities();
+      for (list<unsigned int>::iterator it = ancestorActivities.begin(); it != ancestorActivities.end(); it++)
+      {
+        if (ASTEmap[*it]->activityTypeName() == "faultHandlers" ||
+            ASTEmap[*it]->activityTypeName() == "compensationHandler" ||
+            ASTEmap[*it]->activityTypeName() == "terminationHandler")
+        {
+          correctUse = true;
+          break;
+        }
+      }
+      if (!correctUse)
+        SAerror(7, "", ASTEmap[myid]->attributes["referenceLine"]);
+
 
       // triggers SA00078 and SA00077
       if (scopeNames[myself->attributes["target"]] == 0)
@@ -1305,6 +1358,19 @@ Scope(a,b,c,d,e,f,g,h,_id) ->
       ASTEmap[myself->parentScopeId]->enclosedScopes.insert(myid);
       myself->hasEH = (string(e->op_name()) == "userDefinedEventHandler");
 
+
+      // distribute the scopes' id to the enclosed FH/CH/EH/activity
+      assert(ASTEmap[c->id] != NULL);
+      assert(ASTEmap[d->id] != NULL);
+      assert(ASTEmap[e->id] != NULL);
+      assert(ASTEmap[f->id] != NULL);
+      assert(ASTEmap[h->id] != NULL);
+      ASTEmap[c->id]->parentActivityId = myid;
+      ASTEmap[d->id]->parentActivityId = myid;
+      ASTEmap[e->id]->parentActivityId = myid;
+      ASTEmap[f->id]->parentActivityId = myid;
+      ASTEmap[h->id]->parentActivityId = myid;
+
       // remember the scope's name for compensation
       if (myself->attributes["name"] != "")
       {
@@ -1319,10 +1385,6 @@ Scope(a,b,c,d,e,f,g,h,_id) ->
       if (myself->attributes["isolated"] == "yes" &&
           ASTEmap[myself->parentScopeId]->findIsolatedAncestor())
         SAerror(91, "", myself->attributes["referenceLine"]);
-        
-      // distribute the scope's id to the enclosed activity
-      assert(ASTEmap[h->id] != NULL);
-      ASTEmap[h->id]->parentActivityId = myid;
     }
     h // inner activity
     a b c d e f g

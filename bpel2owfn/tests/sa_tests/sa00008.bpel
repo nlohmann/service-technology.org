@@ -1,0 +1,6 @@
+<process name="SA00006" targetNamespace="anyURI">
+
+	<scope>
+		<compensate />
+	</scope>
+</process>

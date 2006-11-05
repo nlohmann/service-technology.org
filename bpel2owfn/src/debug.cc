@@ -28,13 +28,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/11/04 18:00:44 $
+ * \date    \$Date: 2006/11/05 09:54:00 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.29 $
+ * \version \$Revision: 1.30 $
  *
  * \ingroup debug
  */
@@ -171,6 +171,18 @@ void SAerror(unsigned int code, string information, int lineNumber)
 
   switch (code)
   {
+    case(6):
+      { cerr << "<rethrow> activity must only be used within <catch> or <catchAll>" << endl;
+	break; }
+
+    case(7):
+      { cerr << "<compensateScope> activity must only be used within an FTC-handler" << endl;
+	break; }
+
+    case(8):
+      { cerr << "<compensate> activity must only be used within an FTC-handler" << endl;
+	break; }
+	
     case(15):
       { cerr << "<process> does not contain a start activity" << endl;
 	break; }

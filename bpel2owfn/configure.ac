@@ -18,13 +18,13 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/05 13:31:02 $ by $Author: nlohmann $.
-# Version $Revision: 1.19 $
+# File last changed $Date: 2006/11/05 13:37:41 $ by $Author: nlohmann $.
+# Version $Revision: 1.20 $
 
 # Process this file with autoconf to produce a configure script.
-AC_PREREQ(2.60)
+AC_PREREQ(2.59)
 AC_INIT([BPEL2oWFN],[2.0],[nlohmann@informatik.hu-berlin.de],[bpel2owfn])
-AC_REVISION($Revision: 1.19 $)
+AC_REVISION($Revision: 1.20 $)
 AM_INIT_AUTOMAKE
 
 
@@ -49,7 +49,7 @@ AC_TYPE_SIZE_T
 
 # Checks for header files and functions.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([malloc.h libintl.h stdlib.h string.h strings.h unistd.h stddef.h])
+AC_CHECK_HEADERS([assert.h libintl.h malloc.h stdlib.h string.h strings.h unistd.h stddef.h])
 AC_CHECK_FUNCS([pow])
 AC_FUNC_REALLOC
 

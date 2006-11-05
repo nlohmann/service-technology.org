@@ -30,7 +30,7 @@
  *
  * \date
  *          - created 2006-10-29
- *          - last changed: \$Date: 2006/11/05 13:16:47 $
+ *          - last changed: \$Date: 2006/11/05 14:33:11 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
  *
  */
 %}
@@ -205,7 +205,7 @@ This=userDefinedFaultHandler(a,b, _id) ->
 
 
 
-This=Scope(a,b,c,d,e,f,g,h,i,_id) ->
+This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
   [petrinetnew:
     {
       header(This->id, true);

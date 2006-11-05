@@ -20,7 +20,7 @@
 
 %{
 /*!
- * \file bpel-unparse-cfg.cc
+ * \file ast-to-cfg.cc
  *
  * \brief CFG unparser (implementation)
  *
@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/11/05 12:05:57 $
+ *          - last changed: \$Date: 2006/11/05 14:33:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.40 $
+ * \version \$Revision: 1.41 $
  */
 %}
 
@@ -674,7 +674,7 @@ Pick(a,b,c,d) ->
   SCOPE
 ******************************************************************************/
 
-Scope(a,b,c,d,e,f,g,h,i,_id) ->
+Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Scope\n");
 	  CFGBlock * firstBlock = new CFGBlock(CFGScope, $0->id, "Scope_begin"); 

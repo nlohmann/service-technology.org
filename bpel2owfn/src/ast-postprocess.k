@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/05 13:16:47 $
+ * \date    \$Date: 2006/11/05 14:33:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.83 $
+ * \version \$Revision: 1.84 $
  */
 %}
 
@@ -117,6 +117,8 @@ PartnerLink(_id) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       ASTEmap[myid]->checkAttributes();
+
+      ASTEmap[myid]->definePartnerLink();
     }
   ]
 ;
@@ -1338,7 +1340,7 @@ ForEach(a,b,_id) ->
   SCOPE
 ******************************************************************************/
 
-Scope(a,b,c,d,e,f,g,h,i,_id) ->
+Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
@@ -1386,7 +1388,7 @@ Scope(a,b,c,d,e,f,g,h,i,_id) ->
           ASTEmap[myself->parentScopeId]->findIsolatedAncestor())
         SAerror(91, "", myself->attributes["referenceLine"]);
     }
-    a b 
+    a b j
     i // inner activity
     c d e f g h
     {

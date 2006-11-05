@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2006/10/11
- *          - last changed: \$Date: 2006/11/05 14:03:06 $
+ *          - last changed: \$Date: 2006/11/05 14:33:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  *
  */
 
@@ -143,6 +143,7 @@ activityInvoke(
           my_integer
         )
       ),
+      NiltPartnerLink_list(),
       mkinteger(0)
     )
   )
@@ -211,6 +212,7 @@ activityScope(
     my_correlationSets,
     my_stop,
     activityInvoke(myinvoke),
+    my_partnerlinks,
     my_integer
   )
 )
@@ -229,6 +231,7 @@ activityScope(
       my_correlationSets,
       my_stop,
       activityInvoke(myinvoke),
+      my_partnerlinks,
       my_integer
     )
   )

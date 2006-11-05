@@ -28,13 +28,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/11/05 13:16:47 $
+ * \date    \$Date: 2006/11/05 14:33:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.35 $
+ * \version \$Revision: 1.36 $
  *
  * \ingroup debug
  */
@@ -193,6 +193,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
 
     case(17):
       { cerr << "<partnerLink> `" << information << "' uses `initializePartnerRole' but does not have a partner role" << endl;
+	break; }
+
+    case(18):
+      { cerr << "<partnerLink> `" << information << "' already defined in this scope/process" << endl;
 	break; }
 
     case(23):

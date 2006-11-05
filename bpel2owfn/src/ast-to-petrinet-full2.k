@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/11/05 12:05:57 $
+ *          - last changed: \$Date: 2006/11/05 14:33:11 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.57 $
+ * \version \$Revision: 1.58 $
  */
 %}
 
@@ -1574,7 +1574,7 @@ This=Pick(a,b,c,_id) ->
  * are merged.
  */
 
-This=Scope(a,b,c,d,e,f,g,h,i,_id) ->
+This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
   [petrinet:
     {
       header(This->id, true);

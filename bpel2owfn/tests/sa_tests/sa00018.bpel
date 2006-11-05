@@ -1,0 +1,16 @@
+<process name="SA00018" targetNamespace="http://example.com/ws-bp/purchase">
+    
+    <partnerLinks>
+	<partnerLink name="purchasing" partnerLinkType="lns:purchasingLT" myRole="purchaseService" />
+    </partnerLinks>
+    
+    <scope>
+	<partnerLinks>
+	    <partnerLink name="purchasing" partnerLinkType="lns:purchasingLT" myRole="purchaseService" />
+	    <partnerLink name="purchasing" partnerLinkType="lns:purchasingLT" myRole="purchaseService" />
+	</partnerLinks>
+
+	<empty />
+    </scope>
+
+</process>

@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/05 14:19:41 $
+ * \date    \$Date: 2006/11/05 14:33:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.40 $
+ * \version \$Revision: 1.41 $
  */
 
 
@@ -160,6 +160,7 @@ class ASTE
     void defineCorrelationSet();
     void defineVariable();
     void defineLink();
+    void definePartnerLink();
 
     string activityTypeName();
 };

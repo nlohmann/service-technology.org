@@ -20,7 +20,7 @@
 
 %{
 /*!
- * \file bpel-unparse-xml.cc
+ * \file ast-to-xml.cc
  *
  * \brief XML unparser (implementation)
  *
@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/11/05 12:05:57 $
+ *          - last changed: \$Date: 2006/11/05 14:33:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.58 $
+ * \version \$Revision: 1.59 $
  */
 %}
 
@@ -325,7 +325,7 @@ Pick(a,b,c,_id) ->
   SCOPE
 ******************************************************************************/
 
-Scope(a,b,c,d,e,f,g,h,i,_id) ->
+Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
   [xml: { inup(); } "<scope id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" 
   
   a

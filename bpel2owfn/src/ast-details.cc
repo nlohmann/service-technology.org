@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/05 09:53:59 $
+ * \date    \$Date: 2006/11/05 10:14:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.44 $
+ * \version \$Revision: 1.45 $
  */
 
 
@@ -405,8 +405,8 @@ void ASTE::checkAttributes()
 	checkAttributeType("initializePartnerRole", T_BOOLEAN);
 
 	// trigger [SA00016]
-	if (attributes["myRole"] != "" && 
-	    attributes["partnerRole"] != "")
+	if (attributes["myRole"] == "" && 
+	    attributes["partnerRole"] == "")
 	  SAerror(16, attributes["name"], attributes["referenceLine"]);
 
 	// trigger [SA00017]
@@ -497,6 +497,18 @@ void ASTE::checkAttributes()
       {
       	string required[] = {"name"};
         checkRequiredAttributes(required, 1);
+
+	// trigger [SA00025]
+	if (attributes["messageType"] != "" && 
+	    attributes["type"] != "")
+	  SAerror(25, attributes["name"], attributes["referenceLine"]);
+	if (attributes["messageType"] != "" && 
+	    attributes["element"] != "")
+	  SAerror(25, attributes["name"], attributes["referenceLine"]);
+	if (attributes["element"] != "" && 
+	    attributes["type"] != "")
+	  SAerror(25, attributes["name"], attributes["referenceLine"]);
+
 	break;
       }
 

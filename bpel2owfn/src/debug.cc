@@ -28,13 +28,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/11/05 09:54:00 $
+ * \date    \$Date: 2006/11/05 10:14:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.30 $
+ * \version \$Revision: 1.31 $
  *
  * \ingroup debug
  */
@@ -199,6 +199,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
       { cerr << "<variable> `" << information << "' defined twice" << endl;
 	break; }
 
+    case(25):
+      { cerr << "<variable> `" << information << "' must either use `messageType', `type' or `element' attribute" << endl;
+	break; }
+	
     case(51):
       { cerr << "<invoke> must not be used with an inputVariable AND <toPart> elements" << endl;
 	break; }

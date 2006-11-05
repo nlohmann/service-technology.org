@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/05 18:52:33 $
+ * \date    \$Date: 2006/11/05 19:13:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.86 $
+ * \version \$Revision: 1.87 $
  */
 %}
 
@@ -1447,11 +1447,21 @@ StandardElements(a,b,c) ->
       assert(ASTEmap[$0->parentId] != NULL);
       $0->suppressJF = (ASTEmap[$0->parentId]->attributes["suppressJoinFailure"] == "yes");
 
+      set<string> targetLinks;
+      set<string> sourceLinks;
+
       foreach(targetLink; tTarget_list a)
       {
         assert(ASTEmap[targetLink->id] != NULL);
         ASTEmap[targetLink->id]->controlFlow = ASTEmap[$0->parentId]->controlFlow;
         ASTEmap[targetLink->id]->parentActivityId = $0->parentId;
+
+        // trigger [SA00069]
+        string linkName = ASTEmap[targetLink->id]->attributes["linkName"];
+        if (targetLinks.find(linkName) != targetLinks.end())
+          SAerror(69, "<" + ASTEmap[$0->parentId]->activityTypeName() + "> must not use <link> `" + linkName + "'", ASTEmap[linkIdMap[linkName]]->attributes["referenceLine"]);
+        else
+          targetLinks.insert(linkName);
       }
 
       foreach(sourceLink; tSource_list b)
@@ -1459,6 +1469,13 @@ StandardElements(a,b,c) ->
         assert(ASTEmap[sourceLink->id] != NULL);
         ASTEmap[sourceLink->id]->controlFlow = ASTEmap[$0->parentId]->controlFlow;
         ASTEmap[sourceLink->id]->parentActivityId = $0->parentId;
+        
+        // trigger [SA00068]
+        string linkName = ASTEmap[sourceLink->id]->attributes["linkName"];
+        if (sourceLinks.find(linkName) != sourceLinks.end())
+          SAerror(68, "<" + ASTEmap[$0->parentId]->activityTypeName() + "> must not use <link> `" + linkName + "'", ASTEmap[linkIdMap[linkName]]->attributes["referenceLine"]);
+        else
+          sourceLinks.insert(linkName);
       }
     }
     a b c

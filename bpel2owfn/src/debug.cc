@@ -28,13 +28,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/11/05 14:33:12 $
+ * \date    \$Date: 2006/11/05 18:52:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.36 $
+ * \version \$Revision: 1.37 $
  *
  * \ingroup debug
  */
@@ -249,6 +249,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
 	
     case(65):
       { cerr << "<link> `" << information << "' was not defined before" << endl;
+	break; }
+
+    case(66):
+      { cerr << "<link> `" << information << "' must be used exactly once as source and target" << endl;
 	break; }
 
     case(72):

@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/05 14:46:11 $
+ * \date    \$Date: 2006/11/05 18:52:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.85 $
+ * \version \$Revision: 1.86 $
  */
 %}
 
@@ -94,10 +94,20 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
       // pass list of enclosed scopes to the compensation handler
       ASTEmap[f->id]->enclosedScopes = ASTEmap[myid]->enclosedScopes;
 
+      bool linksOK = true;
+      for(map<string, unsigned int>::iterator it = linkIdMap.begin(); it != linkIdMap.end(); it++)
+      {
+        if (!ASTEmap[it->second]->usedAsTarget || !ASTEmap[it->second]->usedAsSource)
+        {
+          SAerror(66, it->first, ASTEmap[it->second]->attributes["referenceLine"]);
+          linksOK = false;
+        }
+      }
 
       // this assertion guarantees that we did not forget a link and encounter
       // problems generating the Petri net
-      assert(ASTEmap[myid]->enclosedSourceLinks.size() == linkNames.size());
+      if (linksOK)
+        assert(ASTEmap[myid]->enclosedSourceLinks.size() == linkNames.size());
 
 //      cerr << myid << " has " << ASTEmap[myid]->enclosedSourceLinks.size() << " indirectly enclosed source links" << endl;
     }
@@ -1467,6 +1477,13 @@ Target(a) ->
       // find the id of the link used as target here
       int linkId = linkIdMap[ASTEmap[myid]->attributes["linkName"]];
 
+      // trigger [SA00066]
+      assert(ASTEmap[linkId] != NULL);
+      if (ASTEmap[linkId]->usedAsTarget)
+        SAerror(66, ASTEmap[myid]->attributes["linkName"], ASTEmap[myid]->attributes["referenceLine"]);
+      else
+        ASTEmap[linkId]->usedAsTarget = true;
+
       // annotate AST and check information
       ASTEmap[myid]->checkAttributes();
       ASTEmap[myid]->linkName = ASTEmap[myid]->checkLink();
@@ -1485,6 +1502,13 @@ Source(a) ->
 
       // find the id of the link used as source here
       int linkId = linkIdMap[ASTEmap[myid]->attributes["linkName"]];
+
+      // trigger [SA00066]
+      assert(ASTEmap[linkId] != NULL);
+      if (ASTEmap[linkId]->usedAsSource)
+        SAerror(66, ASTEmap[myid]->attributes["linkName"], ASTEmap[myid]->attributes["referenceLine"]);
+      else
+        ASTEmap[linkId]->usedAsSource = true;
 
       // annotate AST and check information
       ASTEmap[myid]->checkAttributes();

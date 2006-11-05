@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/05 14:46:11 $
+ * \date    \$Date: 2006/11/05 18:52:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
  */
 
 
@@ -138,6 +138,9 @@ class ASTE
     bool isStartActivity;	///< true if "createInstance" attribute is set to "yes"
     bool hasSourceLink;		///< true if activity is source of at least one link
     bool hasTargetLink;		///< true if activity is target of at least one link
+
+    bool usedAsSource;
+    bool usedAsTarget;
 
     set<unsigned int> peerScopes;			///< as defined on page 132 of the spec
     set<unsigned int> enclosedScopes;			///< as defined on page 122 of the spec

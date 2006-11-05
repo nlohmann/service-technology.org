@@ -98,8 +98,8 @@ map<string, unsigned int> scopeNames;
 set<string> catches;			///< a set to detect multiple catches
 set<unsigned int> startActivities;	///< a set of the ids of the start activities
 
-map<string, int> linkIdMap;
-map<int, int> PPhasCompensateMap;
+map<string, unsigned int> linkIdMap;
+map<unsigned int, unsigned int> PPhasCompensateMap;
 
 unsigned int PPcurrentScope = 0;	///< the identifier of the current scope
 %}

@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/05 14:46:11 $
+ * \date    \$Date: 2006/11/05 18:52:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.53 $
+ * \version \$Revision: 1.54 $
  */
 
 
@@ -96,6 +96,8 @@ ASTE::ASTE(int myid, int mytype)
   isStartActivity = false;
   hasSourceLink = false;
   hasTargetLink = false;
+  usedAsSource = false;	// required initialization!
+  usedAsTarget = false;	// required initialization!
 
   controlFlow = POSITIVECF;
 }

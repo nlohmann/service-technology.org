@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/05 13:16:47 $
+ * \date    \$Date: 2006/11/05 13:31:12 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
  */
 
 
@@ -64,10 +64,6 @@ using namespace std;
  * External variables
  *****************************************************************************/
 
-extern map<unsigned int, map<string, string> > temporaryAttributeMap;
-extern set<string> ASTE_inputChannels;
-extern set<string> ASTE_outputChannels;
-extern set<string> ASTE_variables;
 extern set<string> catches;
 
 
@@ -87,6 +83,8 @@ extern set<string> catches;
  */
 ASTE::ASTE(int myid, int mytype)
 {
+  extern map<unsigned int, map<string, string> > temporaryAttributeMap;
+
   assert(myid != 0);
 
   id = myid;
@@ -639,6 +637,9 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
  */
 string ASTE::createChannel(bool synchronousCommunication)
 {
+  extern set<string> ASTE_inputChannels;
+  extern set<string> ASTE_outputChannels;
+
   string channelName = attributes["partnerLink"] + "." + attributes["operation"];
   if (channelName == ".")
   {
@@ -721,56 +722,6 @@ bool ASTE::findIsolatedAncestor()
     return true;
   else
     return ASTEmap[parentScopeId]->findIsolatedAncestor();
-}
-
-
-
-
-
-/*!
- * \returns list of identifiers of all acestor activities
- */
-list<unsigned int> ASTE::ancestorActivities()
-{
-  extern map<unsigned int, ASTE*> ASTEmap;
-  list<unsigned int> result;
-  
-  if (id != 1)
-  {
-    result.push_back(parentActivityId);
-    assert(ASTEmap[parentActivityId] != NULL);
-    list<unsigned int> result2 = ASTEmap[parentActivityId]->ancestorActivities();
-    result.splice(result.end(), result2);
-    
-    return result;
-  }
-  else
-    return result;
-}
-
-
-
-
-
-/*!
- * \returns list of identifiers of all ancestor scopes
- */
-list<unsigned int> ASTE::ancestorScopes()
-{
-  extern map<unsigned int, ASTE*> ASTEmap;
-  list<unsigned int> result;
-  
-  if (id != 1)
-  {
-    result.push_back(parentScopeId);
-    assert(ASTEmap[parentScopeId] != NULL);
-    list<unsigned int> result2 = ASTEmap[parentScopeId]->ancestorScopes();
-    result.splice(result.end(), result2);
-    
-    return result;
-  }
-  else
-    return result;
 }
 
 
@@ -929,6 +880,57 @@ string ASTE::checkLink()
 /******************************************************************************
  * helper functions
  *****************************************************************************/
+
+/*!
+ * \returns list of identifiers of all acestor activities
+ */
+list<unsigned int> ASTE::ancestorActivities()
+{
+  extern map<unsigned int, ASTE*> ASTEmap;
+  list<unsigned int> result;
+  
+  if (id != 1)
+  {
+    result.push_back(parentActivityId);
+    assert(ASTEmap[parentActivityId] != NULL);
+    list<unsigned int> result2 = ASTEmap[parentActivityId]->ancestorActivities();
+    result.splice(result.end(), result2);
+    
+    return result;
+  }
+  else
+    return result;
+}
+
+
+
+
+
+/*!
+ * \returns list of identifiers of all ancestor scopes
+ */
+list<unsigned int> ASTE::ancestorScopes()
+{
+  extern map<unsigned int, ASTE*> ASTEmap;
+  list<unsigned int> result;
+  
+  if (id != 1)
+  {
+    result.push_back(parentScopeId);
+    assert(ASTEmap[parentScopeId] != NULL);
+    list<unsigned int> result2 = ASTEmap[parentScopeId]->ancestorScopes();
+    result.splice(result.end(), result2);
+    
+    return result;
+  }
+  else
+    return result;
+}
+
+
+
+
+
 
 /*!
  * \brief returns the name of an activity type

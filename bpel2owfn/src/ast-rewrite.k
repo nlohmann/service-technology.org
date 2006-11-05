@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2006/10/11
- *          - last changed: \$Date: 2006/11/05 12:05:57 $
+ *          - last changed: \$Date: 2006/11/05 14:03:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  *
  */
 
@@ -194,8 +194,47 @@ ConstCatch_list(
 
 /*
  * A fault handler is implicit if it does not enclose any <catch> or <catchAll>
- * branches.
+ * branches (only in newly generate <scope> around <invoke>)
  */
+activityScope(
+  Scope(
+    my_standardElements,
+    my_variables,
+    userDefinedFaultHandler(
+      NiltCatch_list(),
+      NoCatchAll(),
+      my_fh_integer
+    ),
+    my_compensationHandler,
+    my_terminationHandler,
+    my_eventHandler,
+    my_correlationSets,
+    my_stop,
+    activityInvoke(myinvoke),
+    my_integer
+  )
+)
+->
+<implicit:
+  activityScope(
+    Scope(
+      my_standardElements,
+      my_variables,
+      implicitFaultHandler(
+        my_fh_integer
+      ),
+      my_compensationHandler,
+      my_terminationHandler,
+      my_eventHandler,
+      my_correlationSets,
+      my_stop,
+      activityInvoke(myinvoke),
+      my_integer
+    )
+  )
+>;
+
+/*
 userDefinedFaultHandler(
   NiltCatch_list(),
   NoCatchAll(),
@@ -207,7 +246,7 @@ userDefinedFaultHandler(
     my_integer
   )
 >;
-
+*/
 
 
 

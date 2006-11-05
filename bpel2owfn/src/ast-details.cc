@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/05 13:31:12 $
+ * \date    \$Date: 2006/11/05 14:19:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  */
 
 
@@ -113,8 +113,6 @@ ASTE::ASTE(int myid, int mytype)
  *
  * \param required array of attribute names
  * \param length   length of the array
-
- * \todo a real error message
  */
 void ASTE::checkRequiredAttributes(string required[], unsigned int length)
 {

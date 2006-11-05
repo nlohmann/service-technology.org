@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/05 13:16:47 $
+ * \date    \$Date: 2006/11/05 14:19:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.39 $
+ * \version \$Revision: 1.40 $
  */
 
 
@@ -83,15 +83,6 @@ typedef enum
 
 
 /*!
- * \brief structure to store standard values of attributes
- */
-typedef struct attribute {
-  string name;
-  string value;
-};
-
-
-/*!
  * \brief enumeration of possible attribute types
  */
 typedef enum
@@ -116,8 +107,8 @@ typedef enum
 class ASTE
 {
   private:
-    unsigned int id;	///< the id of the AST phylum
-    unsigned int type;	///< the type of the node, identified by the keywords as parsed by Flex
+    unsigned int id;			///< the id of the AST phylum
+    unsigned int type;			///< the type of the node, identified by the keywords as parsed by Flex
 
     void checkRequiredAttributes(string required[], unsigned int length);
     void setStandardAttributes(string names[], string values[], unsigned int length);

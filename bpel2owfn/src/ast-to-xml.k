@@ -32,7 +32,7 @@
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/11/04 18:00:44 $
+ *          - last changed: \$Date: 2006/11/05 12:05:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.57 $
+ * \version \$Revision: 1.58 $
  */
 %}
 
@@ -325,7 +325,7 @@ Pick(a,b,c,_id) ->
   SCOPE
 ******************************************************************************/
 
-Scope(a,b,c,d,e,f,g,h,_id) ->
+Scope(a,b,c,d,e,f,g,h,i,_id) ->
   [xml: { inup(); } "<scope id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" 
   
   a
@@ -335,7 +335,7 @@ Scope(a,b,c,d,e,f,g,h,_id) ->
   { else }
     ${ { inup(); } "<variables id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" b { indown(); } "</variables>\n" $}
 
-  c d e f g h
+  c d e f g h i
     
   { indown(); } "</scope>\n" ]
 ;

@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/11/04 18:00:43 $
+ *          - last changed: \$Date: 2006/11/05 12:05:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.39 $
+ * \version \$Revision: 1.40 $
  */
 %}
 
@@ -674,7 +674,7 @@ Pick(a,b,c,d) ->
   SCOPE
 ******************************************************************************/
 
-Scope(a,b,c,d,e,f,g,h,i) ->
+Scope(a,b,c,d,e,f,g,h,i,_id) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Scope\n");
 	  CFGBlock * firstBlock = new CFGBlock(CFGScope, $0->id, "Scope_begin"); 
@@ -714,8 +714,8 @@ Scope(a,b,c,d,e,f,g,h,i) ->
 	}
 	h // activity
 	{
-	  CFGBlock * innerFirst = cfgMap.find(toString(h->id))->second->firstBlock;
-	  CFGBlock * innerLast = cfgMap.find(toString(h->id))->second->lastBlock;
+	  CFGBlock * innerFirst = cfgMap.find(toString(i->id))->second->firstBlock;
+	  CFGBlock * innerLast = cfgMap.find(toString(i->id))->second->lastBlock;
 	  
 	  connectBlocks(firstBlock, innerFirst);
 	  connectBlocks(innerLast, lastBlock);

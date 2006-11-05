@@ -33,7 +33,7 @@
  *          
  * \date
  *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/11/04 18:00:43 $
+ *          - last changed: \$Date: 2006/11/05 12:05:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.145 $
+ * \version \$Revision: 1.146 $
  */
 %}
 
@@ -502,6 +502,7 @@ tScope:
       tCompensationHandler
       tTerminationHandler
       tEventHandlers
+      tCorrelationSet_list
       tStop
       activity
       integer

@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/05 11:36:21 $
+ * \date    \$Date: 2006/11/05 12:05:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.36 $
+ * \version \$Revision: 1.37 $
  */
 
 
@@ -167,6 +167,7 @@ class ASTE
     void checkAttributeType(string attribute, attributeType type);
     void checkAttributes();
     void defineVariable();
+    void defineCorrelationSet();
     string activityTypeName();
 };
 

@@ -85,6 +85,12 @@ set<string> ASTE_outputChannels;
 set<string> ASTE_variables;
 set<string> ASTE_links;
 
+
+set<string> correlationSetNames;	///< a set holding all correlation set names (with prefix)
+set<string> variableNames;		///< a set holding all variable names (with prefix)
+set<string> partnerLinkNames;		///< a set holding all partnerLink names (with prefix)
+
+
 map<string, unsigned int> scopeNames;
 
 set<string> catches;			///< a set to detect multiple catches

@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/05 11:36:21 $
+ * \date    \$Date: 2006/11/05 12:05:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.46 $
+ * \version \$Revision: 1.47 $
  */
 
 
@@ -381,6 +381,7 @@ void ASTE::checkAttributes()
     case(K_FROM):
       {
 	checkAttributeType("variable", T_BPELVARIABLENAME);
+	break;
       }
 
     case(K_FROMPART):
@@ -395,7 +396,6 @@ void ASTE::checkAttributes()
       {
       	string required[] = {"partnerLink", "operation"};
         checkRequiredAttributes(required, 2);
-
 	checkAttributeType("inputVariable", T_BPELVARIABLENAME);
 	checkAttributeType("outputVariable", T_BPELVARIABLENAME);
 	break;
@@ -403,11 +403,9 @@ void ASTE::checkAttributes()
 
     case(K_ONMESSAGE):
       {
-	checkAttributeType("variable", T_BPELVARIABLENAME);
-
       	string required[] = {"partnerLink", "operation"};
         checkRequiredAttributes(required, 2);
-
+	checkAttributeType("variable", T_BPELVARIABLENAME);
 	break;
       }
     
@@ -415,7 +413,6 @@ void ASTE::checkAttributes()
       {
 	string required[] = {"name", "partnerLinkType"};
         checkRequiredAttributes(required, 2);
-
 	checkAttributeType("initializePartnerRole", T_BOOLEAN);
 
 	// trigger [SA00016]
@@ -445,7 +442,6 @@ void ASTE::checkAttributes()
       {
       	string required[] = {"name", "targetNamespace"};
         checkRequiredAttributes(required, 2);
-
 	checkAttributeType("suppressJoinFailure", T_BOOLEAN);
 	checkAttributeType("exitOnStandardFault", T_BOOLEAN);
 	break;
@@ -455,7 +451,6 @@ void ASTE::checkAttributes()
       {
       	string required[] = {"partnerLink", "operation"};
         checkRequiredAttributes(required, 2);
-	
 	checkAttributeType("createInstance", T_BOOLEAN);
 	checkAttributeType("variable", T_BPELVARIABLENAME);
 	
@@ -484,7 +479,6 @@ void ASTE::checkAttributes()
     case(K_SCOPE):
       {
 	checkAttributeType("isolated", T_BOOLEAN);
-
         break;	
       }
 
@@ -499,6 +493,7 @@ void ASTE::checkAttributes()
     case(K_TO):
       {
 	checkAttributeType("variable", T_BPELVARIABLENAME);
+	break;
       }
 
     case(K_TOPART):
@@ -919,4 +914,23 @@ list<unsigned int> ASTE::ancestorScopes()
   }
   else
     return result;
+}
+
+
+
+
+
+/*!
+ * checks the definition of a correlation set
+ */
+void ASTE::defineCorrelationSet()
+{
+  extern set<string> correlationSetNames;
+
+  string name = toString(parentScopeId) + "." + attributes["name"];
+
+  if (correlationSetNames.find(name) != correlationSetNames.end())
+    SAerror(44, attributes["name"], attributes["referenceLine"]);
+  else
+    correlationSetNames.insert(name);
 }

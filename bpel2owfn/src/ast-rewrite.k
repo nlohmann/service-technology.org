@@ -29,14 +29,14 @@
  *          
  * \date
  *          - created: 2006/10/11
- *          - last changed: \$Date: 2006/11/03 16:22:16 $
+ *          - last changed: \$Date: 2006/11/05 12:05:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
  *
  */
 
@@ -132,6 +132,7 @@ activityInvoke(
       implicitEventHandler(
         mkinteger(0)
       ),
+      NiltCorrelationSet_list(),
       StopInScope(),
       activityInvoke(
         Invoke(

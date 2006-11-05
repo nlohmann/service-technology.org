@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/05 09:53:59 $
+ * \date    \$Date: 2006/11/05 12:05:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.80 $
+ * \version \$Revision: 1.81 $
  */
 %}
 
@@ -383,8 +383,10 @@ CorrelationSet(_id) ->
       int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
 
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
       ASTEmap[myid]->checkAttributes();
-     }
+      ASTEmap[myid]->defineCorrelationSet();
+    }
   ]
 ;
 
@@ -1338,7 +1340,7 @@ ForEach(a,b,_id) ->
   SCOPE
 ******************************************************************************/
 
-Scope(a,b,c,d,e,f,g,h,_id) ->
+Scope(a,b,c,d,e,f,g,h,i,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
@@ -1364,12 +1366,12 @@ Scope(a,b,c,d,e,f,g,h,_id) ->
       assert(ASTEmap[d->id] != NULL);
       assert(ASTEmap[e->id] != NULL);
       assert(ASTEmap[f->id] != NULL);
-      assert(ASTEmap[h->id] != NULL);
+      assert(ASTEmap[i->id] != NULL);
       ASTEmap[c->id]->parentActivityId = myid;
       ASTEmap[d->id]->parentActivityId = myid;
       ASTEmap[e->id]->parentActivityId = myid;
       ASTEmap[f->id]->parentActivityId = myid;
-      ASTEmap[h->id]->parentActivityId = myid;
+      ASTEmap[i->id]->parentActivityId = myid;
 
       // remember the scope's name for compensation
       if (myself->attributes["name"] != "")
@@ -1386,8 +1388,8 @@ Scope(a,b,c,d,e,f,g,h,_id) ->
           ASTEmap[myself->parentScopeId]->findIsolatedAncestor())
         SAerror(91, "", myself->attributes["referenceLine"]);
     }
-    h // inner activity
-    a b c d e f g
+    i // inner activity
+    a b c d e f g h
     {
       // add an attribute to the compensation handler
       if(PPhasCompensateMap[myid] == 1)
@@ -1400,8 +1402,8 @@ Scope(a,b,c,d,e,f,g,h,_id) ->
       ASTEmap[d->id]->enclosedScopes = myself->enclosedScopes;
 
       // collect enclosed source links
-      assert(ASTEmap[h->id] != NULL);
-      myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[h->id]->enclosedSourceLinks);
+      assert(ASTEmap[i->id] != NULL);
+      myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[i->id]->enclosedSourceLinks);
 
       // everybody after me has the same parent scope as me
       PPcurrentScope = myself->parentScopeId;

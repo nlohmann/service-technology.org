@@ -33,7 +33,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/11/04 18:00:43 $
+ *          - last changed: \$Date: 2006/11/05 12:05:57 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.65 $
+ * \version \$Revision: 1.66 $
  *
  */
 %}
@@ -998,7 +998,7 @@ This=Pick(a,b,c,d) ->
   SCOPE
 ******************************************************************************/
 
-This=Scope(a,b,c,d,e,f,g,h,i) ->
+This=Scope(a,b,c,d,e,f,g,h,i,_id) ->
   [petrinetsmall:
     {
       header(This->id);
@@ -1010,11 +1010,11 @@ This=Scope(a,b,c,d,e,f,g,h,i) ->
       Place *p2 = TheNet->newPlace(prefix + "final");
     }
     a // standardElements
-    h // innerActivity
+    i // innerActivity
     {
       // Embed the inner activity.
-      TheNet->mergePlaces(This->id, ".internal.initial", h->id, ".initial");
-      TheNet->mergePlaces(This->id, ".internal.final", h->id, ".final");
+      TheNet->mergePlaces(This->id, ".internal.initial", i->id, ".initial");
+      TheNet->mergePlaces(This->id, ".internal.final", i->id, ".final");
 
       footer(This->id);
     }

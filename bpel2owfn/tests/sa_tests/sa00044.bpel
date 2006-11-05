@@ -1,0 +1,15 @@
+<process name="SA00044" targetNamespace="http://example.com/auction">
+    
+    <correlationSets>
+	<correlationSet name="auctionIdentification" properties="as:auctionId" />
+    </correlationSets>
+
+    <scope>
+	<correlationSets>
+	    <correlationSet name="auctionIdentification" properties="as:auctionId" />
+	    <correlationSet name="auctionIdentification" properties="as:auctionId" />
+	</correlationSets>
+	<empty />
+    </scope>    
+
+</process>

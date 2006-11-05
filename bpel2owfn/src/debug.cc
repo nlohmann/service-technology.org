@@ -28,13 +28,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/11/05 12:42:28 $
+ * \date    \$Date: 2006/11/05 13:16:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
  *
  * \ingroup debug
  */
@@ -238,7 +238,15 @@ void SAerror(unsigned int code, string information, int lineNumber)
     case(63):
       { cerr << "<onMessage> must not be used with a variable AND <fromPart> elements" << endl;
 	break; }
+
+    case(64):
+      { cerr << "<link> `" << information << "' already defined in this <flow>" << endl;
+	break; }
 	
+    case(65):
+      { cerr << "<link> `" << information << "' was not defined before" << endl;
+	break; }
+
     case(72):
       { cerr << "<link> `" << information << "' closes a control cycle" << endl;
 	break; }

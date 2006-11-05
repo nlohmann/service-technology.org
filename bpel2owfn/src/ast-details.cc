@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/05 12:42:27 $
+ * \date    \$Date: 2006/11/05 13:16:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.48 $
+ * \version \$Revision: 1.49 $
  */
 
 
@@ -105,6 +105,10 @@ ASTE::ASTE(int myid, int mytype)
 
 
 
+
+/******************************************************************************
+ * check attributes
+ *****************************************************************************/
 
 /*!
  * \brief checks whether required attributes are set
@@ -541,50 +545,11 @@ void ASTE::checkAttributes()
 
 
 /*!
- * \brief creates a channel for communicating activities
+ * \brief check whether an attribute is of a certain type
  *
- * \return name of the channel
+ * Checks whether the value of an attribute matches a given attribute type as
+ * defined in the BPEL specification.
  */
-string ASTE::createChannel(bool synchronousCommunication)
-{
-  string channelName = attributes["partnerLink"] + "." + attributes["operation"];
-  if (channelName == ".")
-  {
-//    cerr << "no operation or partnerLink given" << endl;
-    return "";
-  }
-
-  switch (type)
-  {
-    case(K_RECEIVE):
-    case(K_ONMESSAGE):
-      {
-	ASTE_inputChannels.insert(channelName);
-	break;
-      }
-
-    case(K_INVOKE):
-    case(K_REPLY):
-      {
-	ASTE_outputChannels.insert(channelName);
-
-	if (synchronousCommunication)
-	  ASTE_inputChannels.insert(channelName);
-
-	break;
-      }
-    
-    default:
-      assert(false);
-  }
-
-  return channelName;
-}
-
-
-
-
-
 void ASTE::checkAttributeType(string attribute, attributeType type)
 {
   extern string filename;
@@ -663,40 +628,49 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 
 
 
+/******************************************************************************
+ *
+ *****************************************************************************/
+
 /*!
- * \brief checks a variable and returns its name
+ * \brief creates a channel for communicating activities
  *
- * Checks whether a given variable was defined in an ancestor scope and returns
- * the name of the variable preceeded by the first scope that defined the
- * variable, e.g. "1.purchase".
- *
- * \param attributename name of the attribute ("variable", "inputVariable",
- *                      "outputVariable")
- * \return name of the variable
+ * \return name of the channel
  */
-
-string ASTE::checkVariable(string attributename)
+string ASTE::createChannel(bool synchronousCommunication)
 {
-  extern set<string> variableNames;
-  extern string filename;
+  string channelName = attributes["partnerLink"] + "." + attributes["operation"];
+  if (channelName == ".")
+  {
+//    cerr << "no operation or partnerLink given" << endl;
+    return "";
+  }
 
-  string variableName = attributes[attributename];
-  if (variableName == "")
-    return variableName;
+  switch (type)
+  {
+    case(K_RECEIVE):
+    case(K_ONMESSAGE):
+      {
+	ASTE_inputChannels.insert(channelName);
+	break;
+      }
 
-  list<unsigned int> ancestorScopes = this->ancestorScopes();
+    case(K_INVOKE):
+    case(K_REPLY):
+      {
+	ASTE_outputChannels.insert(channelName);
 
-  // travers the ancestor scopes
-  for (list<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
-    if (variableNames.find(toString(*scope) + "." + variableName) != variableNames.end())
-      return (toString(*scope) + "." + variableName);
+	if (synchronousCommunication)
+	  ASTE_inputChannels.insert(channelName);
 
-  // display an error message
-  cerr << filename << ":" << attributes["referenceLine"];
-  cerr << " - <variable> `" << variableName << "' referenced as `" << attributename << "' in <";
-  cerr << activityTypeName() << "> was not defined before" << endl;
+	break;
+      }
+    
+    default:
+      assert(false);
+  }
 
-  return "";
+  return channelName;
 }
 
 
@@ -803,6 +777,10 @@ list<unsigned int> ASTE::ancestorScopes()
 
 
 
+/******************************************************************************
+ * functions to define entities like variables, links, etc.
+ *****************************************************************************/
+
 /*!
  * \brief defines a correlation set
  */
@@ -842,6 +820,115 @@ void ASTE::defineVariable()
 
 
 
+
+/*!
+ * \brief defines a link
+ */
+void ASTE::defineLink()
+{
+  extern set<string> linkNames;
+
+  string name = toString(parentActivityId) + "." + attributes["name"];
+
+  // triggers [SA00064]
+  if (linkNames.find(name) != linkNames.end())
+    SAerror(64, attributes["name"], attributes["referenceLine"]);
+  else
+    linkNames.insert(name);
+}
+
+
+
+
+
+/******************************************************************************
+ * functions to check entities like variables, links, etc.
+ *****************************************************************************/
+
+
+/*!
+ * \brief checks a variable and returns its name
+ *
+ * Checks whether a given variable was defined in an ancestor scope and returns
+ * the name of the variable preceeded by the first scope that defined the
+ * variable, e.g. "1.purchase".
+ *
+ * \param attributename name of the attribute ("variable", "inputVariable",
+ *                      "outputVariable")
+ * \return name of the variable
+ */
+
+string ASTE::checkVariable(string attributename)
+{
+  extern set<string> variableNames;
+  extern string filename;
+
+  string variableName = attributes[attributename];
+  if (variableName == "")
+    return variableName;
+
+  list<unsigned int> ancestorScopes = this->ancestorScopes();
+
+  // travers the ancestor scopes
+  for (list<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
+    if (variableNames.find(toString(*scope) + "." + variableName) != variableNames.end())
+      return (toString(*scope) + "." + variableName);
+
+  // display an error message
+  cerr << filename << ":" << attributes["referenceLine"];
+  cerr << " - <variable> `" << variableName << "' referenced as `" << attributename << "' in <";
+  cerr << activityTypeName() << "> was not defined before" << endl;
+
+  return "";
+}
+
+
+
+
+
+/*!
+ * \brief checks a link and returns its name
+ *
+ * Checks whether a given link was defined in an ancestor flow and returns
+ * the name of the link preceeded by the first flow that defined the
+ * link, e.g. "1.ship-to-invoice".
+ *
+ * \return name of the link
+ */
+
+string ASTE::checkLink()
+{
+  extern map<unsigned int, ASTE*> ASTEmap;
+  extern set<string> linkNames;
+  extern string filename;
+
+  string linkName = attributes["linkName"];
+  if (linkName == "")
+    return linkName;
+
+  list<unsigned int> ancestorActivities = this->ancestorActivities();
+
+  // travers the ancestor flows
+  for (list<unsigned int>::iterator flow = ancestorActivities.begin(); flow != ancestorActivities.end(); flow++)
+  {
+    if (ASTEmap[*flow]->activityTypeName() == "flow")
+      if (linkNames.find(toString(*flow) + "." + linkName) != linkNames.end())
+	return (toString(*flow) + "." + linkName);
+  }
+
+  // trigger [SA00065]
+  SAerror(65, linkName, attributes["referenceLine"]);
+
+  return "";
+}
+
+
+
+
+
+/******************************************************************************
+ * helper functions
+ *****************************************************************************/
 
 /*!
  * \brief returns the name of an activity type

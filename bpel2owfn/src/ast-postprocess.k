@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/05 12:42:27 $
+ * \date    \$Date: 2006/11/05 13:16:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.82 $
+ * \version \$Revision: 1.83 $
  */
 %}
 
@@ -97,7 +97,7 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
 
       // this assertion guarantees that we did not forget a link and encounter
       // problems generating the Petri net
-      assert(ASTEmap[myid]->enclosedSourceLinks.size() == ASTE_links.size());
+      assert(ASTEmap[myid]->enclosedSourceLinks.size() == linkNames.size());
 
 //      cerr << myid << " has " << ASTEmap[myid]->enclosedSourceLinks.size() << " indirectly enclosed source links" << endl;
     }
@@ -923,12 +923,9 @@ Link(_id) ->
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       ASTEmap[myid]->checkAttributes();
 
-      /* here we can check whether this link was not defined before */
+      ASTEmap[myid]->defineLink();
+
       linkIdMap[ASTEmap[myid]->attributes["name"]] = myid;
-
-      // cerr << "defined a link " << $0->A_name << " (" << myid << ")" << endl;
-
-      ASTE_links.insert(ASTEmap[myid]->attributes["name"]);
     }
   ]
 ;
@@ -1453,26 +1450,13 @@ Target(a) ->
 
       // find the id of the link used as target here
       int linkId = linkIdMap[ASTEmap[myid]->attributes["linkName"]];
-      /* here we can check whether this link was defined before */
-
 
       // annotate AST and check information
       ASTEmap[myid]->checkAttributes();
+      ASTEmap[myid]->linkName = ASTEmap[myid]->checkLink();
 
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[ASTEmap[myid]->parentActivityId]->hasTargetLink = true;
-
-/*TODO
-      // remember that that link was used as a target
-      assert(ASTEmap[linkId] != NULL);
-      kc::impl_tLink *theLink = (kc::impl_tLink*)(ASTEmap[linkId]->node);
-      assert(theLink != NULL);
-      assert(theLink->id == linkId);
-      // here we can check whether this link was not used as target before
-      theLink->usedAsTarget = true;
-*/
-
-      ASTEmap[myid]->linkName = ASTEmap[myid]->attributes["linkName"];
     }
   ]
 ;
@@ -1485,30 +1469,17 @@ Source(a) ->
 
       // find the id of the link used as source here
       int linkId = linkIdMap[ASTEmap[myid]->attributes["linkName"]];
-      /* here we can check whether this link was defined before */
-
 
       // annotate AST and check information
       ASTEmap[myid]->checkAttributes();
+      ASTEmap[myid]->linkName = ASTEmap[myid]->checkLink();
 
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[ASTEmap[myid]->parentActivityId]->hasSourceLink = true;
 
-/*TODO
-      // remember that that link was used as a source
-      assert(ASTEmap[linkId] != NULL);
-      kc::impl_tLink *theLink = (kc::impl_tLink*)(ASTEmap[linkId]->node);
-      assert(theLink != NULL);
-      assert(theLink->id == linkId);
-      // here we can check whether this link was not used as target before
-      theLink->usedAsSource = true;
-*/
-
       // add that link to the parent activity
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[ASTEmap[myid]->parentActivityId]->enclosedSourceLinks.insert(linkId);
-
-      ASTEmap[myid]->linkName = ASTEmap[myid]->attributes["linkName"];
     }
   ]
 ;

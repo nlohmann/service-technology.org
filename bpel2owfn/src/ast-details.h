@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/05 12:42:27 $
+ * \date    \$Date: 2006/11/05 13:16:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.38 $
+ * \version \$Revision: 1.39 $
  */
 
 
@@ -151,21 +151,25 @@ class ASTE
     set<unsigned int> peerScopes;			///< as defined on page 132 of the spec
     set<unsigned int> enclosedScopes;			///< as defined on page 122 of the spec
    
-
     ASTE(int myid, int mytype);
 
     string createChannel(bool synchronousCommunication = false);
 
     string checkVariable(string attributename);
+    string checkLink();
 
     list<unsigned int> ancestorActivities();
     list<unsigned int> ancestorScopes();
     
     bool checkAncestors();
     bool findIsolatedAncestor();
+
     void checkAttributes();
-    void defineVariable();
+
     void defineCorrelationSet();
+    void defineVariable();
+    void defineLink();
+
     string activityTypeName();
 };
 

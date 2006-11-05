@@ -30,7 +30,7 @@
  *
  * \date
  *          - created 2006-10-29
- *          - last changed: \$Date: 2006/11/05 12:05:57 $
+ *          - last changed: \$Date: 2006/11/05 13:16:47 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  *
  */
 %}
@@ -75,7 +75,7 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
       // Create the places for the links.
       // The used list is filled during parsing and contains all links of the
       // whole process -- also links defined in a deeper hierarchy.
-      for (set<string>::iterator link = ASTE_links.begin(); link != ASTE_links.end(); link++)
+      for (set<string>::iterator link = linkNames.begin(); link != linkNames.end(); link++)
       {
 	TheNet->newPlace("link." + *link);
 	TheNet->newPlace("!link." + *link);

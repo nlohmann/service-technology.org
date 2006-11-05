@@ -272,6 +272,7 @@ should lead to an output like:
 @smallexample
 checking for a BSD-compatible install... /usr/bin/install -c
 checking whether build environment is sane... yes
+checking for a thread-safe mkdir -p... /usr/bin/mkdir -p
 checking for gawk... gawk
 checking whether make sets $(MAKE)... yes
 checking for style of include used by make... GNU
@@ -291,12 +292,13 @@ checking dependency style of g++... (cached) gcc3
 checking for gcc... gcc
 checking whether we are using the GNU C compiler... yes
 checking whether gcc accepts -g... yes
-checking for gcc option to accept ANSI C... none needed
+checking for gcc option to accept ISO C89... none needed
 checking dependency style of gcc... gcc3
 checking whether make sets $(MAKE)... (cached) yes
 checking for a BSD-compatible install... /usr/bin/install -c
 checking how to run the C++ preprocessor... g++ -E
-checking for egrep... grep -E
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
 checking for ANSI C header files... yes
 checking for sys/types.h... yes
 checking for sys/stat.h... yes
@@ -309,9 +311,15 @@ checking for stdint.h... yes
 checking for unistd.h... yes
 checking for size_t... yes
 checking for ANSI C header files... (cached) yes
+checking assert.h usability... yes
+checking assert.h presence... yes
+checking for assert.h... yes
 checking libintl.h usability... yes
 checking libintl.h presence... yes
 checking for libintl.h... yes
+checking malloc.h usability... yes
+checking malloc.h presence... yes
+checking for malloc.h... yes
 checking for stdlib.h... (cached) yes
 checking for string.h... (cached) yes
 checking for strings.h... (cached) yes
@@ -328,12 +336,14 @@ checking for an ANSI C-conforming const... yes
 checking for error_at_line... no
 checking for stdlib.h... (cached) yes
 checking for GNU libc compatible malloc... yes
+checking for working alloca.h... yes
+checking for alloca... yes
 checking for memset... yes
+checking for bison... bison -y
 checking for flex... flex
 checking for yywrap in -lfl... yes
 checking lex output file root... lex.yy
 checking whether yytext is a pointer... no
-checking for bison... bison
 checking for kc++... kc++
 checking for dot... dot
 configure: creating ./config.status
@@ -342,6 +352,7 @@ config.status: creating doc/Makefile
 config.status: creating src/Makefile
 config.status: creating tests/Makefile
 config.status: creating src/bpel2owfn.h
+config.status: src/bpel2owfn.h is unchanged
 config.status: executing depfiles commands
 @end smallexample
 @c @end cartouche
@@ -372,7 +383,7 @@ should announce
 @c @cartouche
 @smallexample
 ==================
-All 4 tests passed
+All 2 tests passed
 ==================
 @end smallexample
 @c @end cartouche
@@ -435,8 +446,8 @@ Kimwitu++ and are outside of our scope.
 The compilation of @acronym{BPEL2oWFN} was tested on several operating systems
 such as Microsoft Windows (running Cygwin), @acronym{GNU}/Linux, Apple Mac OS X
 and Sun Solaris. Anyway, if the compilation fails please make sure you use the
-most recent (stable) versions of the @acronym{GNU} Compiler Collection, Flex,
-Bison and Kimwitu++. If this does not help please send us an electronic mail to
+most recent (stable) versions of the @acronym{GNU} Compiler Collection. If this
+does not help please send us an electronic mail to
 @email{nlohmann@@informatik.hu-berlin.de}. Include the version number of your
 distribution (version @value{VERSION} of @value{UPDATED}). Also include in your
 message the output that the make process produced. We will try to answer your
@@ -525,7 +536,7 @@ under @url{http://www.gnu.org/software/bison/bison.html}.
 Kimwitu++ is needed to generate all files managing the @acronym{AST, abstract
 syntax tree}. Kimwitu++ was written by Toby Neumann and Michael Piefel.
 Copyright @copyright{} 1988-1997  Axel Belinfante, University of Twente.
-Copyright @copyright{} 1997-2000  Michael Piefel, Humboldt-University Berlin.
+Copyright @copyright{} 1997-2003  Michael Piefel, Humboldt-University Berlin.
 Kimwitu++ is available under
 @url{http://site.informatik.hu-berlin.de/kimwitu++}.
 @end table
@@ -546,14 +557,14 @@ reduction techniques such as partial order reduction, symmetries or the sweep
 line method. @acronym{LoLA} was written by Karsten Schmidt and is available
 under @url{http://www.informatik.hu-berlin.de/~kschmidt/lola.html}.
 
-@item @b{The Model-Checking Kit}
-The Model-Checking Kit is a collection of programs which allow to model a
-finite-state system using a variety of modelling languages, and verify it using
-a variety of checkers, including deadlock-checkers, reachability-checkers, and
-model-checkers for the temporal logics CTL and LTL. The Model-Checking Kit is
-maintained by Javier Esparza, Claus Schröter and Stefan Schwoon at the
-University of Stuttgart and is available under
-@url{http://www.fmi.uni-stuttgart.de/szs/tools/mckit}.
+@c @item @b{The Model-Checking Kit}
+@c The Model-Checking Kit is a collection of programs which allow to model a
+@c finite-state system using a variety of modelling languages, and verify it using
+@c a variety of checkers, including deadlock-checkers, reachability-checkers, and
+@c model-checkers for the temporal logics CTL and LTL. The Model-Checking Kit is
+@c maintained by Javier Esparza, Claus Schröter and Stefan Schwoon at the
+@c University of Stuttgart and is available under
+@c @url{http://www.fmi.uni-stuttgart.de/szs/tools/mckit}.
 
 
 @item @b{Graphviz}, the Graph Visualization Software
@@ -562,6 +573,10 @@ including dot. Graphviz is maintained by AT&T Labs and is available under
 @url{http://www.graphviz.org}.
 @end table
 
+The Graphviz tool dot can be used to create a graphical representation of the
+generated Petri net in @acronym{PNG, Portable Network Graphic} format. If dot
+is not found on your system, @acronym{BPEL2oWFN} will only create a .dot-file
+and does not try to invoke dot.
 
 
 
@@ -574,10 +589,10 @@ building @acronym{BPEL2oWFN}:
 @item Intel Pentium M processor, 1.60 GHz
 @item 1 GB RAM
 @item Microsoft Windows XP Home Edition Service Pack 2
-@item Cygwin with cygwin.dll version 1.5.19-4
+@item Cygwin with cygwin.dll version 1.5.21
 @item @acronym{GNU} Compiler Collection 3.4.4
 @item Flex version 2.5.4
-@item @acronym{GNU} Bison version 2.1
+@item @acronym{GNU} Bison version 2.3
 @item Kimwitu++ version 2.3.8
 @end itemize
 
@@ -716,6 +731,15 @@ net model.
 activity.
 @item Structural reduction rules no longer remove the loop transition for deadlock search.
 @end itemize
+@end itemize
+
+@unnumberedsubsec Version 2.0 (6 December 2006)
+@itemize --
+
+@item miscellaneous:
+@itemize 
+@item overworked architecture
+@end itemize
 
 
 @end itemize
@@ -749,16 +773,27 @@ BEGIN OF AUTHORS file for BPEL2oWFN Version @value{VERSION}
 The Petri net patterns were created by:
 @itemize
 @item Christian Stahl (Humboldt-Universit@"at zu Berlin)
+@item Niels Lohmann (Humboldt-Universit@"at zu Berlin)
 @end itemize
 
 @section Acknowledgements
 
 We would like to thank:
 @itemize
-@item Simon Moser (IBM) for valuable advice concerning @acronym{BPEL}
-@item Michael Piefel (Humboldt-Universit@"at zu Berlin) for help with Kimwitu++
+@item Maarten Boote (Technische Universiteit Eindhoven) for integrating
+@acronym{BPEL2oWFN} to LaQuSo
+@item Dirk Fahland (Humboldt-Universit@"at zu Berlin) for fruitful discussions
+about BPEL's semantics
+@item Carsten Frenkler (Gedilan Technologies) for challenging @acronym{BPEL}
+processes
 @item Oliver Kopp (Universit@"at Stuttgart) for challenging @acronym{BPEL}
 processes
+@item Axel Martens (IBM) for valuable advice concerning @acronym{BPEL}
+@item Simon Moser (IBM) for valuable advice concerning @acronym{BPEL}
+@item Michael Piefel (Humboldt-Universit@"at zu Berlin) for help with Kimwitu++
+@item Eric Verbeek (Technische Universiteit Eindhoven) for integrating
+@acronym{BPEL2oWFN} to the ProM framework and valuable comments on BPEL's link
+semantics
 @end itemize
 
 @acronym{BPEL2oWFN} is part of the Tools4@acronym{BPEL} project funded by the

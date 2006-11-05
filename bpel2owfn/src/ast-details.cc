@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/05 14:33:10 $
+ * \date    \$Date: 2006/11/05 14:46:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  */
 
 
@@ -889,6 +889,39 @@ string ASTE::checkLink()
   SAerror(65, linkName, attributes["referenceLine"]);
 
   return "";
+}
+
+
+
+
+
+/*!
+ * \brief checks a partner Link
+ *
+ * Checks whether a given partnerLink was defined in an ancestor scope.
+ */
+void ASTE::checkPartnerLink()
+{
+  extern set<string> partnerLinkNames;
+  extern string filename;
+
+  string partnerLinkName = attributes["partnerLink"];
+  if (partnerLinkName == "")
+    return;
+
+  list<unsigned int> ancestorScopes = this->ancestorScopes();
+
+  // travers the ancestor scopes
+  for (list<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
+    if (partnerLinkNames.find(toString(*scope) + "." + partnerLinkName) != partnerLinkNames.end())
+      return;
+
+  // display an error message
+  cerr << filename << ":" << attributes["referenceLine"];
+  cerr << " - <partnerLink> `" << partnerLinkName << "' referenced in <";
+  cerr << activityTypeName() << "> was not defined before" << endl;
+
+  return;
 }
 
 

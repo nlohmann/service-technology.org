@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/05 14:33:11 $
+ * \date    \$Date: 2006/11/05 14:46:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.84 $
+ * \version \$Revision: 1.85 $
  */
 %}
 
@@ -282,6 +282,8 @@ OnMessage(a,b,c,_id) ->
       myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
       myself->checkAttributes();
 
+      myself->checkPartnerLink();
+
       // trigger [SA00063]
       if (b->length() != 0 && myself->attributes["variable"] != "")
         SAerror(63, "", myself->attributes["referenceLine"]);
@@ -483,6 +485,8 @@ Invoke(a,b,c,d,_id) ->
       if (d->length() != 0 && myself->attributes["outputVariable"] != "")
         SAerror(52, "", myself->attributes["referenceLine"]);
 
+      myself->checkPartnerLink();
+
       myself->channelName = myself->createChannel((myself->attributes["outputVariable"] != ""));
       myself->inputVariableName = myself->checkVariable("inputVariable");
       myself->outputVariableName = myself->checkVariable("outputVariable");
@@ -514,6 +518,8 @@ Receive(a,b,c,_id) ->
       // trigger [SA00055]
       if (c->length() != 0 && myself->attributes["variable"] != "")
         SAerror(55, "", myself->attributes["referenceLine"]);
+
+      myself->checkPartnerLink();
 
       myself->channelName = myself->createChannel();
       myself->variableName = myself->checkVariable("variable");
@@ -551,6 +557,8 @@ Reply(a,b,c,_id) ->
       myself->checkAttributes();
 
       /* above is generic */
+
+      myself->checkPartnerLink();
 
       // trigger [SA00059]
       if (c->length() != 0 && myself->attributes["variable"] != "")
@@ -593,9 +601,12 @@ From(_id) ->
     {
       int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
 
-      ASTEmap[myid]->checkAttributes();
-      ASTEmap[myid]->variableName = ASTEmap[myid]->checkVariable("variable");
+      myself->checkAttributes();
+
+      myself->checkPartnerLink();
+      myself->variableName = myself->checkVariable("variable");
     }
   ]
 ;
@@ -605,9 +616,12 @@ To(_id) ->
     {
       int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
 
-      ASTEmap[myid]->checkAttributes();
-      ASTEmap[myid]->variableName = ASTEmap[myid]->checkVariable("variable");
+      myself->checkAttributes();
+
+      myself->checkPartnerLink();
+      myself->variableName = myself->checkVariable("variable");
     }
   ]
 ;

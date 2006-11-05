@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/10/29 15:56:51 $
+ * \date    \$Date: 2006/11/05 13:51:05 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.45 $
+ * \version \$Revision: 1.46 $
  */
 
 
@@ -54,6 +54,7 @@
 #include "bpel2owfn.h"
 #include "options.h"
 #include "debug.h"
+#include "getopt.h"	// for radon
 
 using namespace std;
 

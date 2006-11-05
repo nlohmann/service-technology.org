@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/05 12:05:56 $
+ * \date    \$Date: 2006/11/05 12:42:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.37 $
+ * \version \$Revision: 1.38 $
  */
 
 
@@ -121,6 +121,7 @@ class ASTE
 
     void checkRequiredAttributes(string required[], unsigned int length);
     void setStandardAttributes(string names[], string values[], unsigned int length);
+    void checkAttributeType(string attribute, attributeType type);
 
   public:
     kc::impl_abstract_phylum* phylum;	///< the AST phylum
@@ -155,16 +156,13 @@ class ASTE
 
     string createChannel(bool synchronousCommunication = false);
 
-    string checkVariable();
-    string checkInputVariable();
-    string checkOutputVariable();
+    string checkVariable(string attributename);
 
     list<unsigned int> ancestorActivities();
     list<unsigned int> ancestorScopes();
     
     bool checkAncestors();
     bool findIsolatedAncestor();
-    void checkAttributeType(string attribute, attributeType type);
     void checkAttributes();
     void defineVariable();
     void defineCorrelationSet();

@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/05 12:05:56 $
+ * \date    \$Date: 2006/11/05 12:42:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.47 $
+ * \version \$Revision: 1.48 $
  */
 
 
@@ -666,21 +666,37 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 /*!
  * \brief checks a variable and returns its name
  *
- * Checks whether a given variable was defined before and returns the name of
- * the variable.
+ * Checks whether a given variable was defined in an ancestor scope and returns
+ * the name of the variable preceeded by the first scope that defined the
+ * variable, e.g. "1.purchase".
  *
+ * \param attributename name of the attribute ("variable", "inputVariable",
+ *                      "outputVariable")
  * \return name of the variable
  */
 
-string ASTE::checkVariable()
+string ASTE::checkVariable(string attributename)
 {
-  string variableName = attributes["variable"];
-/*
-  if (variableName != "")
-    if (ASTE_variables.find(variableName) == ASTE_variables.end())
-      cerr << "variable " << variableName << " was not defined before" << endl;
-*/
-  return variableName;
+  extern set<string> variableNames;
+  extern string filename;
+
+  string variableName = attributes[attributename];
+  if (variableName == "")
+    return variableName;
+
+  list<unsigned int> ancestorScopes = this->ancestorScopes();
+
+  // travers the ancestor scopes
+  for (list<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
+    if (variableNames.find(toString(*scope) + "." + variableName) != variableNames.end())
+      return (toString(*scope) + "." + variableName);
+
+  // display an error message
+  cerr << filename << ":" << attributes["referenceLine"];
+  cerr << " - <variable> `" << variableName << "' referenced as `" << attributename << "' in <";
+  cerr << activityTypeName() << "> was not defined before" << endl;
+
+  return "";
 }
 
 
@@ -688,140 +704,7 @@ string ASTE::checkVariable()
 
 
 /*!
- * \brief checks a variable and returns its name
- *
- * Checks whether a given input variable was defined before and returns the
- * name of the variable.
- *
- * \return name of the variable
- */
-string ASTE::checkInputVariable()
-{
-  string variableName = attributes["inputVariable"];
-/*
-  if (variableName != "")
-    if (ASTE_variables.find(variableName) == ASTE_variables.end())
-      cerr << "variable " << variableName << " was not defined before" << endl;
-*/
-  return variableName;
-}
-
-
-
-
-
-/*!
- * \brief checks a variable and returns its name
- *
- * Checks whether a given output variable was defined before and returns the
- * name of the variable.
- *
- * \return name of the variable
- */
-string ASTE::checkOutputVariable()
-{
-  string variableName = attributes["outputVariable"];
-/*
-  if (variableName != "")
-    if (ASTE_variables.find(variableName) == ASTE_variables.end())
-      cerr << "variable " << variableName << " was not defined before" << endl;
-*/
-  return variableName;
-}
-
-
-
-
-
-/*!
- * \brief defines a variable
- */
-void ASTE::defineVariable()
-{
-  string variableName = attributes["name"];
-
-  // triggers SA00023
-  if (ASTE_variables.find(variableName) != ASTE_variables.end())
-    SAerror(23, variableName, toInt(attributes["referenceLine"]));
-
-  ASTE_variables.insert(variableName);
-}
-
-
-
-
-
-/*!
- * \brief returns the name of an activity type
- *
- * Returns the name of an acitivity given using the token value passed upon
- * construction.
- *
- * \returns name of the activity type
- *
- * \todo complete the list
- */
-string ASTE::activityTypeName()
-{
-  switch (type)
-  {
-    case(K_ASSIGN):		return "assign";
-    case(K_CASE):		return "case";
-    case(K_CATCH):		return "catch";
-    case(K_CATCHALL):		return "catchAll";
-    case(K_COMPENSATE):		return "compensate";
-    case(K_COMPENSATESCOPE):	return "compensateScope";
-    case(K_COMPENSATIONHANDLER):return "compensationHandler";
-    case(K_CORRELATION):	return "correlation";
-    case(K_CORRELATIONSET):	return "correlationSet";
-    case(K_ELSE):		return "else";
-    case(K_ELSEIF):		return "elseIf";
-    case(K_EMPTY):		return "empty";
-    case(K_EXIT):		return "exit";
-    case(K_EVENTHANDLERS):	return "eventHandlers";
-    case(K_FAULTHANDLERS):	return "faultHandlers";
-    case(K_FOREACH):		return "forEach";
-    case(K_FROMPART):		return "fromPart";
-    case(K_FROM):		return "from";
-    case(K_FLOW):		return "flow";
-    case(K_IF):			return "if";
-    case(K_INVOKE):		return "invoke";
-    case(K_LINK):		return "link";
-    case(K_ONALARM):		return "onAlarm";
-    case(K_ONMESSAGE):		return "onMessage";
-    case(K_OTHERWISE):		return "otherwise";
-    case(K_PICK):		return "pick";
-    case(K_PARTNERLINK):	return "partnerLink";
-    case(K_PROCESS):		return "process";
-    case(K_RECEIVE):		return "receive";
-    case(K_REPEATUNTIL):	return "repeatUntil";
-    case(K_REPLY):		return "reply";
-    case(K_RETHROW):		return "rethrow";
-    case(K_SCOPE):		return "scope";
-    case(K_SOURCE):		return "source";
-    case(K_SEQUENCE):		return "sequence";
-    case(K_SWITCH):		return "switch";
-    case(K_TERMINATE):		return "terminate";
-    case(K_TERMINATIONHANDLER):	return "terminationHandler";
-    case(K_TARGET):		return "target";
-    case(K_THROW):		return "throw";
-    case(K_TO):			return "to";
-    case(K_TOPART):		return "toPart";
-    case(K_VALIDATE):		return "validate";
-    case(K_VARIABLE):		return "variable";
-    case(K_WAIT):		return "wait";
-    case(K_WHILE):		return "while";
-
-    default:			return "unknown";
-  }
-}
-
-
-
-
-
-/*!
- * for [SA00056]
+ * \brief for [SA00056]
  *
  * \returns true  if only <scope>, <flow>, <sequence> or <process> activities
  *                are found in the ancestors
@@ -848,7 +731,7 @@ bool ASTE::checkAncestors()
 
 
 /*!
- * for [SA00091]
+ * \brief for [SA00091]
  *
  * \returns true  if a parent scope with "isolated=yes" is found
  * \returns false otherwise
@@ -921,7 +804,7 @@ list<unsigned int> ASTE::ancestorScopes()
 
 
 /*!
- * checks the definition of a correlation set
+ * \brief defines a correlation set
  */
 void ASTE::defineCorrelationSet()
 {
@@ -929,8 +812,98 @@ void ASTE::defineCorrelationSet()
 
   string name = toString(parentScopeId) + "." + attributes["name"];
 
+  // triggers [SA00044]
   if (correlationSetNames.find(name) != correlationSetNames.end())
     SAerror(44, attributes["name"], attributes["referenceLine"]);
   else
     correlationSetNames.insert(name);
+}
+
+
+
+
+
+/*!
+ * \brief defines a variable
+ */
+void ASTE::defineVariable()
+{
+  extern set<string> variableNames;
+
+  string name = toString(parentScopeId) + "." + attributes["name"];
+
+  // triggers [SA00023]
+  if (variableNames.find(name) != variableNames.end())
+    SAerror(23, attributes["name"], attributes["referenceLine"]);
+  else
+    variableNames.insert(name);
+}
+
+
+
+
+
+/*!
+ * \brief returns the name of an activity type
+ *
+ * Returns the name of an acitivity given using the token value passed upon
+ * construction.
+ *
+ * \returns name of the activity type
+ *
+ * \todo complete the list
+ */
+string ASTE::activityTypeName()
+{
+  switch (type)
+  {
+    case(K_ASSIGN):		return "assign";
+    case(K_CASE):		return "case";
+    case(K_CATCH):		return "catch";
+    case(K_CATCHALL):		return "catchAll";
+    case(K_COMPENSATE):		return "compensate";
+    case(K_COMPENSATESCOPE):	return "compensateScope";
+    case(K_COMPENSATIONHANDLER):return "compensationHandler";
+    case(K_CORRELATION):	return "correlation";
+    case(K_CORRELATIONSET):	return "correlationSet";
+    case(K_ELSE):		return "else";
+    case(K_ELSEIF):		return "elseIf";
+    case(K_EMPTY):		return "empty";
+    case(K_EXIT):		return "exit";
+    case(K_EVENTHANDLERS):	return "eventHandlers";
+    case(K_FAULTHANDLERS):	return "faultHandlers";
+    case(K_FOREACH):		return "forEach";
+    case(K_FROMPART):		return "fromPart";
+    case(K_FROM):		return "from";
+    case(K_FLOW):		return "flow";
+    case(K_IF):			return "if";
+    case(K_INVOKE):		return "invoke";
+    case(K_LINK):		return "link";
+    case(K_ONALARM):		return "onAlarm";
+    case(K_ONMESSAGE):		return "onMessage";
+    case(K_OTHERWISE):		return "otherwise";
+    case(K_PICK):		return "pick";
+    case(K_PARTNERLINK):	return "partnerLink";
+    case(K_PROCESS):		return "process";
+    case(K_RECEIVE):		return "receive";
+    case(K_REPEATUNTIL):	return "repeatUntil";
+    case(K_REPLY):		return "reply";
+    case(K_RETHROW):		return "rethrow";
+    case(K_SCOPE):		return "scope";
+    case(K_SOURCE):		return "source";
+    case(K_SEQUENCE):		return "sequence";
+    case(K_SWITCH):		return "switch";
+    case(K_TERMINATE):		return "terminate";
+    case(K_TERMINATIONHANDLER):	return "terminationHandler";
+    case(K_TARGET):		return "target";
+    case(K_THROW):		return "throw";
+    case(K_TO):			return "to";
+    case(K_TOPART):		return "toPart";
+    case(K_VALIDATE):		return "validate";
+    case(K_VARIABLE):		return "variable";
+    case(K_WAIT):		return "wait";
+    case(K_WHILE):		return "while";
+
+    default:			return "unknown";
+  }
 }

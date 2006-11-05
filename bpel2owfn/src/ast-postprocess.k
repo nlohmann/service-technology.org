@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/05 12:05:56 $
+ * \date    \$Date: 2006/11/05 12:42:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.81 $
+ * \version \$Revision: 1.82 $
  */
 %}
 
@@ -73,8 +73,9 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
       ASTEmap[g->id]->parentActivityId = myid;
       ASTEmap[i->id]->parentActivityId = myid;
     }
+    a b c
     i // inner activity
-    a b c d e f g h
+    d e f g h
     {
       // trigger [SA00015]
       if (startActivities.empty())
@@ -284,7 +285,7 @@ OnMessage(a,b,c,_id) ->
         SAerror(63, "", myself->attributes["referenceLine"]);
 
       myself->channelName = myself->createChannel();
-      myself->variableName = myself->checkVariable();
+      myself->variableName = myself->checkVariable("variable");
     }
     c
   ]
@@ -481,8 +482,8 @@ Invoke(a,b,c,d,_id) ->
         SAerror(52, "", myself->attributes["referenceLine"]);
 
       myself->channelName = myself->createChannel((myself->attributes["outputVariable"] != ""));
-      myself->inputVariableName = myself->checkInputVariable();
-      myself->outputVariableName = myself->checkOutputVariable();
+      myself->inputVariableName = myself->checkVariable("inputVariable");
+      myself->outputVariableName = myself->checkVariable("outputVariable");
       myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
     }
     a b
@@ -513,7 +514,7 @@ Receive(a,b,c,_id) ->
         SAerror(55, "", myself->attributes["referenceLine"]);
 
       myself->channelName = myself->createChannel();
-      myself->variableName = myself->checkVariable();
+      myself->variableName = myself->checkVariable("variable");
       myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
     }
     a b
@@ -554,7 +555,7 @@ Reply(a,b,c,_id) ->
         SAerror(59, "", myself->attributes["referenceLine"]);
 
       myself->channelName = myself->createChannel();
-      myself->variableName = myself->checkVariable();
+      myself->variableName = myself->checkVariable("variable");
       myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
     }
     a b
@@ -592,7 +593,7 @@ From(_id) ->
       assert(ASTEmap[myid] != NULL);
 
       ASTEmap[myid]->checkAttributes();
-      ASTEmap[myid]->variableName = ASTEmap[myid]->checkVariable();
+      ASTEmap[myid]->variableName = ASTEmap[myid]->checkVariable("variable");
     }
   ]
 ;
@@ -604,7 +605,7 @@ To(_id) ->
       assert(ASTEmap[myid] != NULL);
 
       ASTEmap[myid]->checkAttributes();
-      ASTEmap[myid]->variableName = ASTEmap[myid]->checkVariable();
+      ASTEmap[myid]->variableName = ASTEmap[myid]->checkVariable("variable");
     }
   ]
 ;
@@ -1388,8 +1389,9 @@ Scope(a,b,c,d,e,f,g,h,i,_id) ->
           ASTEmap[myself->parentScopeId]->findIsolatedAncestor())
         SAerror(91, "", myself->attributes["referenceLine"]);
     }
+    a b 
     i // inner activity
-    a b c d e f g h
+    c d e f g h
     {
       // add an attribute to the compensation handler
       if(PPhasCompensateMap[myid] == 1)

@@ -82,7 +82,7 @@ map <std::string, CFGBlock *> cfgMap;
 
 set<string> ASTE_inputChannels;
 set<string> ASTE_outputChannels;
-set<string> ASTE_variables;
+//set<string> ASTE_variables;
 set<string> ASTE_links;
 
 

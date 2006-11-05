@@ -41,13 +41,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/10/21 10:53:51 $
+ *          - last changed: \$Date: 2006/11/05 12:42:28 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.37 $
+ * \version \$Revision: 1.38 $
  */
 
 
@@ -74,8 +74,6 @@
 /******************************************************************************
  * External variables
  *****************************************************************************/
-
-extern set<string> ASTE_variables; // needed for PetriNet::removeVariables()
 
 set<unsigned int> visited;
 set<unsigned int> visited2;
@@ -119,8 +117,10 @@ void PetriNet::removeInterface()
  */
 void PetriNet::removeVariables()
 {
-  for (set<string>::iterator variable = ASTE_variables.begin();
-      variable != ASTE_variables.end(); variable++)
+  extern set<string> variableNames;
+
+  for (set<string>::iterator variable = variableNames.begin();
+      variable != variableNames.end(); variable++)
   {
     removePlace( findPlace("variable." + *variable) );
   }

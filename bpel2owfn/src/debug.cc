@@ -28,13 +28,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/11/05 12:05:57 $
+ * \date    \$Date: 2006/11/05 12:42:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.33 $
+ * \version \$Revision: 1.34 $
  *
  * \ingroup debug
  */
@@ -196,7 +196,7 @@ void SAerror(unsigned int code, string information, int lineNumber)
 	break; }
 
     case(23):
-      { cerr << "<variable> `" << information << "' defined twice" << endl;
+      { cerr << "<variable> `" << information << "' already defined in this scope/process" << endl;
 	break; }
 
     case(24):

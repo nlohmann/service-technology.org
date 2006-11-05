@@ -40,7 +40,7 @@
  *
  * \date
  *          - created 2005-11-01
- *          - last changed: \$Date: 2006/11/04 16:58:05 $
+ *          - last changed: \$Date: 2006/11/05 12:42:27 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.207 $
+ * \version \$Revision: 1.208 $
  *
  */
 %}
@@ -109,7 +109,7 @@ This=Process(a,b,c,d,e,f,g,h,i,_id) ->
       if (!parameters[P_NOVARIABLES])
       {
         // Create variable places and initially mark them.
-        for (set<string>::iterator variable = ASTE_variables.begin(); variable != ASTE_variables.end(); variable++)
+        for (set<string>::iterator variable = variableNames.begin(); variable != variableNames.end(); variable++)
         {
 	  Place *v = TheNet->newPlace("variable." + *variable);
 	  v->mark();

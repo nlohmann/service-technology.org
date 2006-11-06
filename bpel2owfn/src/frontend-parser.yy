@@ -37,7 +37,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2006/11/05 14:33:12 $
+ * \date    \$Date: 2006/11/06 15:40:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -46,7 +46,7 @@
  * \note    This file was created using GNU Bison reading file parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.269 $
+ * \version \$Revision: 1.270 $
  *
  * \ingroup frontend
  */
@@ -84,7 +84,8 @@
 
 
 // the terminal symbols (tokens)
-%token APOSTROPHE EQUAL GREATER GREATEROREQUAL K_AND K_ASSIGN K_BRANCHES K_CASE K_CATCH K_CATCHALL K_COMPENSATE K_COMPENSATESCOPE K_COMPENSATIONHANDLER K_COMPLETIONCONDITION K_CONDITION K_COPY K_CORRELATION K_CORRELATIONS K_CORRELATIONSET K_CORRELATIONSETS K_ELSE K_ELSEIF K_EMPTY K_EVENTHANDLERS K_EXIT K_EXTENSION K_EXTENSIONACTIVITY K_EXTENSIONASSIGNOPERATION K_EXTENSIONS K_FAULTHANDLERS K_FINALCOUNTERVALUE K_FLOW K_FOR K_FOREACH K_FROM K_FROMPART K_FROMPARTS K_GETLINKSTATUS K_IF K_IMPORT K_INVOKE K_JOINCONDITION K_LINK K_LINKS K_LITERAL K_MESSAGEEXCHANGE K_MESSAGEEXCHANGES K_ONALARM K_ONEVENT K_ONMESSAGE K_OR K_OTHERWISE K_PARTNER K_PARTNERLINK K_PARTNERLINKS K_PARTNERS K_PICK K_PROCESS K_QUERY K_RECEIVE K_REPEATEVERY K_REPEATUNTIL K_REPLY K_RETHROW K_SCOPE K_SEQUENCE K_SOURCE K_SOURCES K_STARTCOUNTERVALUE K_SWITCH K_TARGET K_TARGETS K_TERMINATE K_TERMINATIONHANDLER K_THROW K_TO K_TOPART K_TOPARTS K_TRANSITIONCONDITION K_UNTIL K_VALIDATE K_VARIABLE K_VARIABLES K_WAIT K_WHILE LBRACKET LESS LESSOREQUAL NOTEQUAL NUMBER RBRACKET %token VARIABLENAME X_CLOSE X_EQUALS X_NEXT X_OPEN X_SLASH
+%token APOSTROPHE EQUAL GREATER GREATEROREQUAL K_AND K_ASSIGN K_BRANCHES K_CASE K_CATCH K_CATCHALL K_COMPENSATE K_COMPENSATESCOPE K_COMPENSATIONHANDLER K_COMPLETIONCONDITION K_CONDITION K_COPY K_CORRELATION K_CORRELATIONS K_CORRELATIONSET K_CORRELATIONSETS K_ELSE K_ELSEIF K_EMPTY K_EVENTHANDLERS K_EXIT K_EXTENSION K_EXTENSIONACTIVITY K_EXTENSIONASSIGNOPERATION K_EXTENSIONS K_FAULTHANDLERS K_FINALCOUNTERVALUE K_FLOW K_FOR K_FOREACH K_FROM K_FROMPART K_FROMPARTS K_GETLINKSTATUS K_IF K_IMPORT K_INVOKE K_JOINCONDITION K_LINK K_LINKS K_LITERAL K_MESSAGEEXCHANGE K_MESSAGEEXCHANGES K_ONALARM K_ONEVENT K_ONMESSAGE K_OR K_OTHERWISE K_PARTNER K_PARTNERLINK K_PARTNERLINKS K_PARTNERS K_PICK K_PROCESS K_QUERY K_RECEIVE K_REPEATEVERY K_REPEATUNTIL K_REPLY K_RETHROW K_SCOPE K_SEQUENCE K_SOURCE K_SOURCES K_STARTCOUNTERVALUE K_SWITCH K_TARGET K_TARGETS K_TERMINATE K_TERMINATIONHANDLER K_THROW K_TO K_TOPART K_TOPARTS K_TRANSITIONCONDITION K_UNTIL K_VALIDATE K_VARIABLE K_VARIABLES K_WAIT K_WHILE LBRACKET LESS LESSOREQUAL NOTEQUAL RBRACKET VARIABLENAME X_CLOSE X_EQUALS X_NEXT X_OPEN X_SLASH
+%token <yt_casestring> NUMBER
 %token <yt_casestring> X_NAME
 %token <yt_casestring> X_STRING
 
@@ -166,11 +167,13 @@ unsigned int ASTEid = 1; ///< identifier of the next AST element
 /* the types of the non-terminal symbols */
 %type <yt_activity_list> activity_list
 %type <yt_activity> activity
+%type <yt_casestring> constant
 %type <yt_casestring> tLiteral
 %type <yt_expression> booleanLinkCondition
 %type <yt_integer> arbitraryAttributes
 %type <yt_standardElements> standardElements
 %type <yt_tAssign> tAssign
+%type <yt_casestring> tBranches
 %type <yt_tCase_list> tCase_list
 %type <yt_tCase> tCase
 %type <yt_tCatch_list> tCatch_list
@@ -179,6 +182,7 @@ unsigned int ASTEid = 1; ///< identifier of the next AST element
 %type <yt_tCompensate> tCompensate
 %type <yt_tCompensate> tCompensateScope
 %type <yt_tCompensationHandler> tCompensationHandler
+%type <yt_casestring> tCompletionCondition
 %type <yt_tCopy_list> tCopy_list
 %type <yt_tCopy> tCopy
 %type <yt_tCorrelation_list> tCorrelation_list
@@ -194,6 +198,7 @@ unsigned int ASTEid = 1; ///< identifier of the next AST element
 %type <yt_tEventHandlers> tEventHandlers
 %type <yt_tExit> tExit
 %type <yt_tFaultHandlers> tFaultHandlers
+%type <yt_casestring> tFinalCounterValue
 %type <yt_tFlow> tFlow
 %type <yt_tForEach> tForEach
 %type <yt_tFrom> tFrom
@@ -227,6 +232,7 @@ unsigned int ASTEid = 1; ///< identifier of the next AST element
 %type <yt_tSequence> tSequence
 %type <yt_tSource_list> tSource_list
 %type <yt_tSource> tSource
+%type <yt_casestring> tStartCounterValue
 %type <yt_tSwitch> tSwitch
 %type <yt_tTarget_list> tTarget_list
 %type <yt_tTarget> tTarget
@@ -967,24 +973,29 @@ tRepeatUntil:
 
 tForEach:
   K_FOREACH arbitraryAttributes X_NEXT standardElements tStartCounterValue tFinalCounterValue tCompletionCondition tScope X_NEXT X_SLASH K_FOREACH
-    { $$ = ForEach($4, $8, $2); }
+    { $$ = ForEach($4, $5, $6, $7, $8, $2); }
 ;
 
 tStartCounterValue:
   K_STARTCOUNTERVALUE arbitraryAttributes X_CLOSE constant X_OPEN X_SLASH K_STARTCOUNTERVALUE X_NEXT
+    { $$ = $4; }
 ;
 
 tFinalCounterValue:
   K_FINALCOUNTERVALUE arbitraryAttributes X_CLOSE constant X_OPEN X_SLASH K_FINALCOUNTERVALUE X_NEXT
+    { $$ = $4; }
 ;
 
 tCompletionCondition:
   /* empty */
+    { $$ = mkcasestring(""); }
 | K_COMPLETIONCONDITION X_NEXT tBranches X_SLASH K_COMPLETIONCONDITION X_NEXT
+    { $$ = $3; }
 ;
 
 tBranches:
   K_BRANCHES arbitraryAttributes X_CLOSE constant X_OPEN X_SLASH K_BRANCHES X_NEXT
+    { $$ = $4; }
 ;
 
 
@@ -1155,6 +1166,9 @@ comparison:
 
 constant:
   X_NAME
+    { $$ = $1; }
 | APOSTROPHE X_NAME APOSTROPHE
+    { $$ = $2; }
 | NUMBER
+    { $$ = $1; }
 ;

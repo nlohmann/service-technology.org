@@ -28,13 +28,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2006/10/25 06:53:38 $
+ * \date    \$Date: 2006/11/06 15:40:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.57 $
+ * \version \$Revision: 1.58 $
  *
  * \ingroup conversion
  * \ingroup debug
@@ -122,10 +122,10 @@ string toString(int i)
 /*!
  * \brief converts string to int
  *
- * Converts a C++ int to a C++ int.
+ * Converts a C++ string to a C++ int.
  *
  * \param s C++ string
- * \return integer representing s
+ * \return int representing s
  *
  * \ingroup conversion
  */
@@ -134,7 +134,39 @@ int toInt(string s)
   int result;
   istringstream isst;
   isst.str(s);
+ 
   isst >> result;
+
+  if (isst.fail())
+    return INT_MAX;
+
+  return result;
+}
+
+
+
+
+
+/*!
+ * \brief converts string to unsigned int
+ *
+ * Converts a C++ string to a C++ unsigned int.
+ *
+ * \param s C++ string
+ * \return unsigned int representing s
+ *
+ * \ingroup conversion
+ */
+unsigned int toUInt(string s)
+{
+  unsigned int result;
+  istringstream isst;
+  isst.str(s);
+ 
+  isst >> result;
+
+  if (isst.fail())
+    return UINT_MAX;
 
   return result;
 }

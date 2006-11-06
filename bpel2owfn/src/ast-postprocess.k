@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/06 14:17:19 $
+ * \date    \$Date: 2006/11/06 15:40:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.88 $
+ * \version \$Revision: 1.89 $
  */
 %}
 
@@ -1332,33 +1332,52 @@ Pick(a,b,c,_id) ->
   FOREACH                                                        (WS-BPEL 2.0)
 ******************************************************************************/
 
-ForEach(a,b,_id) ->
+ForEach(a,b,c,d,e,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
 
       a->parentId = myid;
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
 
       /* above is generic */
 
-      ASTEmap[myid]->checkVariable("counterName");
+      myself->checkVariable("counterName");
 
       // distribute the forEach's id to the enclosed activity
-      assert(ASTEmap[b->id] != NULL);
-      ASTEmap[b->id]->parentActivityId = myid;
-      ASTEmap[b->id]->controlFlow = ASTEmap[myid]->controlFlow;
-    }
-    a b
-    {
-      with (b)
+      assert(ASTEmap[e->id] != NULL);
+      ASTEmap[e->id]->parentActivityId = myid;
+      ASTEmap[e->id]->controlFlow = myself->controlFlow;
+
+      // trigger [SA00075]
+      unsigned int startCounter = toUInt(b->name);
+      unsigned int finalCounter = toUInt(c->name);
+      unsigned int completion = toUInt(d->name);
+      if (startCounter != UINT_MAX && finalCounter != UINT_MAX)
       {
-        b=Scope(*,c,*,*,*,*,*,*,*,*,*):
+        if (startCounter >= finalCounter)
+        {
+          cerr << filename << ":" << myself->attributes["referenceLine"] << " - ";
+          cerr << "constant <finalCounterValue> `" << finalCounter;
+          cerr << "' less or equal than constant <startCounterValue> `";
+          cerr << startCounter << "'" << endl;
+        }
+        if ((completion != UINT_MAX) && ((completion > (finalCounter-startCounter))))
+          SAerror(75, "", myself->attributes["referenceLine"]);
+      }
+    }
+    a e
+    {
+      // trigger [SA00076]
+      with (e)
+      {
+        e=Scope(*,_variables,*,*,*,*,*,*,*,*,*):
           {
-            foreach (variable=Variable(_id2); tVariable_list c)
+            foreach (variable=Variable(_id2); tVariable_list _variables)
             {
               assert(ASTEmap[_id2->value] != NULL);
               if (ASTEmap[_id2->value]->attributes["name"] == ASTEmap[_id->value]->attributes["counterName"])
@@ -1368,8 +1387,8 @@ ForEach(a,b,_id) ->
       }
 
       // collect enclosed source links
-      assert(ASTEmap[b->id] != NULL);
-      ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[b->id]->enclosedSourceLinks);
+      assert(ASTEmap[e->id] != NULL);
+      myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[e->id]->enclosedSourceLinks);
     }
   ]
 ;

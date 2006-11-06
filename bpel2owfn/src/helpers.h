@@ -28,13 +28,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2006/10/25 06:53:38 $
+ * \date    \$Date: 2006/11/06 15:40:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.37 $
+ * \version \$Revision: 1.38 $
  *
  * \ingroup conversion
  * \ingroup debug
@@ -73,6 +73,7 @@ using namespace std;
 string toString(kc::integer i);
 string toString(int i);
 int toInt(string s);
+unsigned int toUInt(string s);
 void error();
 void cleanup();
 

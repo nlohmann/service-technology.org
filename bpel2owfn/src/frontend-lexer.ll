@@ -34,7 +34,7 @@
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2006/10/25 08:22:56 $
+ * \date    \$Date: 2006/11/06 15:40:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  * \note    This file was created using Flex reading file lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
  *
  * \todo    add rules to ignored everything non-BPEL
  * \todo    add a more elegant way to handle XSD-namespaces
@@ -284,7 +284,8 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 "!="		{ return NOTEQUAL; }
 "'"		{ return APOSTROPHE; }
 
-{number}	{ return NUMBER; }
+{number}	{ yylval.yt_casestring = kc::mkcasestring(yytext);
+                  return NUMBER; }
 
 
  /* end of input file */

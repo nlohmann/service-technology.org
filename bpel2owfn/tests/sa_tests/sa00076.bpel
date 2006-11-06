@@ -1,0 +1,21 @@
+<process name="sa00076" targetNamespace="anyURI">
+    
+    <variables>
+	<variable name="forEachCounter"/>
+    </variables>
+	
+    <forEach counterName="forEachCounter" parallel="no">
+	<startCounterValue>1</startCounterValue>
+	<finalCounterValue>10</finalCounterValue>
+	
+	<scope>
+	    <variables>
+		<variable name="forEachCounter" />
+	    </variables>
+
+	    <empty />
+	</scope>
+    
+    </forEach>
+
+</process>

@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/05 19:13:23 $
+ * \date    \$Date: 2006/11/06 14:17:19 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.87 $
+ * \version \$Revision: 1.88 $
  */
 %}
 
@@ -1345,6 +1345,8 @@ ForEach(a,b,_id) ->
 
       /* above is generic */
 
+      ASTEmap[myid]->checkVariable("counterName");
+
       // distribute the forEach's id to the enclosed activity
       assert(ASTEmap[b->id] != NULL);
       ASTEmap[b->id]->parentActivityId = myid;
@@ -1352,6 +1354,19 @@ ForEach(a,b,_id) ->
     }
     a b
     {
+      with (b)
+      {
+        b=Scope(*,c,*,*,*,*,*,*,*,*,*):
+          {
+            foreach (variable=Variable(_id2); tVariable_list c)
+            {
+              assert(ASTEmap[_id2->value] != NULL);
+              if (ASTEmap[_id2->value]->attributes["name"] == ASTEmap[_id->value]->attributes["counterName"])
+                SAerror(76, ASTEmap[_id2->value]->attributes["name"], ASTEmap[_id2->value]->attributes["referenceLine"]);
+            }            
+          }
+      }
+
       // collect enclosed source links
       assert(ASTEmap[b->id] != NULL);
       ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[b->id]->enclosedSourceLinks);

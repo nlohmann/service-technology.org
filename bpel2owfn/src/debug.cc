@@ -28,13 +28,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/11/06 16:32:30 $
+ * \date    \$Date: 2006/11/06 18:03:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
  *
  * \ingroup debug
  */
@@ -253,6 +253,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
 
     case(66):
       { cerr << "<link> `" << information << "' must be used exactly once as source and target" << endl;
+	break; }
+
+    case(67):
+      { cerr << "<link> " << information << " connect the same activity" << endl;
 	break; }
 
     case(68):

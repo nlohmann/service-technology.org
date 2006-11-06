@@ -83,22 +83,18 @@ map <std::string, CFGBlock *> cfgMap;
 
 set<string> ASTE_inputChannels;
 set<string> ASTE_outputChannels;
-//set<string> ASTE_variables;
-//set<string> ASTE_links;
-
 
 set<string> correlationSetNames;	///< a set holding all correlation set names (with prefix)
 set<string> variableNames;		///< a set holding all variable names (with prefix)
 set<string> partnerLinkNames;		///< a set holding all partnerLink names (with prefix)
 set<string> linkNames;			///< a set holding all link names (with prefix)
 
-
-map<string, unsigned int> scopeNames;
-
 set<string> catches;			///< a set to detect multiple catches
 set<unsigned int> startActivities;	///< a set of the ids of the start activities
 
-map<string, unsigned int> linkIdMap;
+map<string, unsigned int> linkIdMap;	///< maps link names to identifiers
+map<string, unsigned int> scopeNames;	///< maps scope names to identifiers
+
 map<unsigned int, unsigned int> PPhasCompensateMap;
 
 unsigned int PPcurrentScope = 0;	///< the identifier of the current scope

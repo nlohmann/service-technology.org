@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/05 18:52:33 $
+ * \date    \$Date: 2006/11/06 18:03:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
  */
 
 
@@ -118,32 +118,33 @@ class ASTE
     kc::impl_abstract_phylum* phylum;	///< the AST phylum
 
     map<string, string> attributes;	///< the parsed attributes
-    set<int> enclosedSourceLinks;	///< the identifiers of all (recursively) enclosed source links
 
     unsigned int parentScopeId;		///< the identifier of the parent scope
     unsigned int parentActivityId;	///< the identifier of the parent activity
     
     controlFlowType controlFlow;	///< the kind of control flow the activity is embedded in
 
-    string channelName;		///< name of a channel
-    string variableName;	///< name of a variable
-    string inputVariableName;	///< name of an input variable
-    string outputVariableName;	///< name of an output variable
-    string linkName;		///< name of a link
+    string channelName;			///< name of a channel
+    string variableName;		///< (unique) name of a variable
+    string inputVariableName;		///< (unique) name of an input variable
+    string outputVariableName;		///< (unique) name of an output variable
+    string linkName;			///< (unique) name of a link
 
-    bool hasEH;			///< true if process or scope has an event handler
-    bool hasCatchAll;		///< true if fault handler has a catchAll branch
-    bool inProcess;		///< true if compensation handler is embedded to a process
-    bool inWhile;		///< true if activity is embedded in a while, repeatUntil activity or in onEvent
-    bool isStartActivity;	///< true if "createInstance" attribute is set to "yes"
-    bool hasSourceLink;		///< true if activity is source of at least one link
-    bool hasTargetLink;		///< true if activity is target of at least one link
+    bool hasEH;				///< true if <process> or <scope> have <eventHandlers>
+    bool hasCatchAll;			///< true if <faultHandlers> have a <catchAll> branch
+    bool inProcess;			///< true if <compensationHandler> is embedded to a <process>
+    bool inWhile;			///< true if activity is embedded in a <while>, <repeatUntil> or <onEvent>
+    bool isStartActivity;		///< true if "createInstance" attribute is set to "yes"
 
-    bool usedAsSource;
-    bool usedAsTarget;
+    set<unsigned int> sourceLinks;	///< outgoing links
+    set<unsigned int> targetLinks;	///< ingoing links
 
-    set<unsigned int> peerScopes;			///< as defined on page 132 of the spec
-    set<unsigned int> enclosedScopes;			///< as defined on page 122 of the spec
+    unsigned int targetActivity;	///< id of the target of a <link>
+    unsigned int sourceActivity;	///< id of the source of a <link>
+
+    set<unsigned int> peerScopes;	///< as defined on page 132 of the spec
+    set<unsigned int> enclosedScopes;	///< as defined on page 122 of the spec
+    set<int> enclosedSourceLinks;	///< the identifiers of all (recursively) enclosed source links
    
     ASTE(int myid, int mytype);
 

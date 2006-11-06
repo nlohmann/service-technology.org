@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/06 16:32:30 $
+ * \date    \$Date: 2006/11/06 18:03:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.91 $
+ * \version \$Revision: 1.92 $
  */
 %}
 
@@ -94,13 +94,32 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
       // pass list of enclosed scopes to the compensation handler
       ASTEmap[f->id]->enclosedScopes = ASTEmap[myid]->enclosedScopes;
 
+      // trigger [SA00066]
+      // should be actually calculated at a <flow> activity, but "linksOK" is
+      // used below to avoid an asserion failure
       bool linksOK = true;
       for(map<string, unsigned int>::iterator it = linkIdMap.begin(); it != linkIdMap.end(); it++)
       {
-        if (!ASTEmap[it->second]->usedAsTarget || !ASTEmap[it->second]->usedAsSource)
+        assert(ASTEmap[it->second] != NULL);
+
+        if ((ASTEmap[it->second]->targetActivity == 0) || (ASTEmap[it->second]->sourceActivity == 0))
         {
           SAerror(66, it->first, ASTEmap[it->second]->attributes["referenceLine"]);
           linksOK = false;
+        }
+
+        // trigger [SA00067]
+        if (linksOK)
+        {
+          assert(ASTEmap[ASTEmap[it->second]->sourceActivity] != NULL);
+          assert(ASTEmap[ASTEmap[it->second]->targetActivity] != NULL);
+          set<unsigned int> otherSources = ASTEmap[ASTEmap[it->second]->sourceActivity]->sourceLinks;
+          set<unsigned int> otherTargets = ASTEmap[ASTEmap[it->second]->targetActivity]->targetLinks;
+          set<unsigned int> jointLinks = setIntersection(otherSources, otherTargets);
+          jointLinks.erase(it->second);
+
+          if (jointLinks.size() > 0)
+            SAerror(67, "`" + it->first + "' and <link> `" + ASTEmap[*(jointLinks.begin())]->attributes["name"] + "'", ASTEmap[it->second]->attributes["referenceLine"]);
         }
       }
 
@@ -108,8 +127,6 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
       // problems generating the Petri net
       if (linksOK)
         assert(ASTEmap[myid]->enclosedSourceLinks.size() == linkNames.size());
-
-//      cerr << myid << " has " << ASTEmap[myid]->enclosedSourceLinks.size() << " indirectly enclosed source links" << endl;
     }
   ]
 ;
@@ -543,7 +560,7 @@ Receive(a,b,c,_id) ->
         startActivities.insert(myid);
 
         // trigger [SA00056]
-        if (!ASTEmap[myself->parentActivityId]->checkAncestors() || myself->hasTargetLink)
+        if (!ASTEmap[myself->parentActivityId]->checkAncestors() || !myself->targetLinks.empty())
           SAerror(56, "<receive>", myself->attributes["referenceLine"]);
       }
     }
@@ -909,9 +926,9 @@ Flow(a,b,c,_id) ->
       // id of an enclosed start activity (for [SA00056])
       unsigned int startActivityId = 0;
 
-      // collect enclosed source links
       foreach(innerActivity; activity_list c)
       {
+        // collect enclosed source links
         assert(ASTEmap[innerActivity->id] != NULL);
         ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
 
@@ -928,7 +945,7 @@ Flow(a,b,c,_id) ->
           assert(ASTEmap[innerActivity->id] != NULL);
 	
 	  if (!ASTEmap[innerActivity->id]->isStartActivity &&
-	      !ASTEmap[innerActivity->id]->hasTargetLink)
+	      ASTEmap[innerActivity->id]->targetLinks.empty())
           {
 	    SAerror(56, "<" + ASTEmap[startActivityId]->activityTypeName() + ">", ASTEmap[startActivityId]->attributes["referenceLine"]);
             break;
@@ -1309,7 +1326,7 @@ Pick(a,b,c,_id) ->
           SAerror(62, "", myself->attributes["referenceLine"]);
 
         // trigger [SA00056]
-        if (!ASTEmap[myself->parentActivityId]->checkAncestors() || myself->hasTargetLink)
+        if (!ASTEmap[myself->parentActivityId]->checkAncestors() || !myself->targetLinks.empty())
           SAerror(56, "<pick>", myself->attributes["referenceLine"]);
       }
 
@@ -1526,21 +1543,21 @@ Target(a) ->
       assert(ASTEmap[myid] != NULL);
 
       // find the id of the link used as target here
-      int linkId = linkIdMap[ASTEmap[myid]->attributes["linkName"]];
-
-      // trigger [SA00066]
-      assert(ASTEmap[linkId] != NULL);
-      if (ASTEmap[linkId]->usedAsTarget)
-        SAerror(66, ASTEmap[myid]->attributes["linkName"], ASTEmap[myid]->attributes["referenceLine"]);
-      else
-        ASTEmap[linkId]->usedAsTarget = true;
+      unsigned int linkId = linkIdMap[ASTEmap[myid]->attributes["linkName"]];
 
       // annotate AST and check information
       ASTEmap[myid]->checkAttributes();
       ASTEmap[myid]->linkName = ASTEmap[myid]->checkLink();
 
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      ASTEmap[ASTEmap[myid]->parentActivityId]->hasTargetLink = true;
+      ASTEmap[ASTEmap[myid]->parentActivityId]->targetLinks.insert(linkId);
+
+      // trigger [SA00066]
+      assert(ASTEmap[linkId] != NULL);
+      if (ASTEmap[linkId]->targetActivity != 0)
+        SAerror(66, ASTEmap[myid]->attributes["linkName"], ASTEmap[myid]->attributes["referenceLine"]);
+      else
+        ASTEmap[linkId]->targetActivity = ASTEmap[myid]->parentActivityId;
     }
   ]
 ;
@@ -1552,25 +1569,23 @@ Source(a) ->
       assert(ASTEmap[myid] != NULL);
 
       // find the id of the link used as source here
-      int linkId = linkIdMap[ASTEmap[myid]->attributes["linkName"]];
-
-      // trigger [SA00066]
-      assert(ASTEmap[linkId] != NULL);
-      if (ASTEmap[linkId]->usedAsSource)
-        SAerror(66, ASTEmap[myid]->attributes["linkName"], ASTEmap[myid]->attributes["referenceLine"]);
-      else
-        ASTEmap[linkId]->usedAsSource = true;
+      unsigned int linkId = linkIdMap[ASTEmap[myid]->attributes["linkName"]];
 
       // annotate AST and check information
       ASTEmap[myid]->checkAttributes();
       ASTEmap[myid]->linkName = ASTEmap[myid]->checkLink();
 
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      ASTEmap[ASTEmap[myid]->parentActivityId]->hasSourceLink = true;
-
       // add that link to the parent activity
       assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
       ASTEmap[ASTEmap[myid]->parentActivityId]->enclosedSourceLinks.insert(linkId);
+      ASTEmap[ASTEmap[myid]->parentActivityId]->sourceLinks.insert(linkId);
+
+      // trigger [SA00066]
+      assert(ASTEmap[linkId] != NULL);
+      if (ASTEmap[linkId]->sourceActivity != 0)
+        SAerror(66, ASTEmap[myid]->attributes["linkName"], ASTEmap[myid]->attributes["referenceLine"]);
+      else
+        ASTEmap[linkId]->sourceActivity = ASTEmap[myid]->parentActivityId;
     }
   ]
 ;

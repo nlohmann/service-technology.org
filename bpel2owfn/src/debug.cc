@@ -28,13 +28,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/11/06 15:40:40 $
+ * \date    \$Date: 2006/11/06 16:04:25 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.40 $
+ * \version \$Revision: 1.41 $
  *
  * \ingroup debug
  */
@@ -265,6 +265,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
 
     case(72):
       { cerr << "<link> `" << information << "' closes a control cycle" << endl;
+	break; }
+
+    case(74):
+      { cerr << information << endl;
 	break; }
 
     case(75):

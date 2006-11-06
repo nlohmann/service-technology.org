@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/06 15:40:40 $
+ * \date    \$Date: 2006/11/06 16:04:25 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.89 $
+ * \version \$Revision: 1.90 $
  */
 %}
 
@@ -1353,7 +1353,7 @@ ForEach(a,b,c,d,e,_id) ->
       ASTEmap[e->id]->parentActivityId = myid;
       ASTEmap[e->id]->controlFlow = myself->controlFlow;
 
-      // trigger [SA00075]
+      // trigger [SA00074] and [SA00075]
       unsigned int startCounter = toUInt(b->name);
       unsigned int finalCounter = toUInt(c->name);
       unsigned int completion = toUInt(d->name);
@@ -1361,10 +1361,9 @@ ForEach(a,b,c,d,e,_id) ->
       {
         if (startCounter >= finalCounter)
         {
-          cerr << filename << ":" << myself->attributes["referenceLine"] << " - ";
-          cerr << "constant <finalCounterValue> `" << finalCounter;
-          cerr << "' less or equal than constant <startCounterValue> `";
-          cerr << startCounter << "'" << endl;
+          string error = "constant <finalCounterValue> `" + toString(finalCounter) +
+             "' less or equal than constant <startCounterValue> `" + toString(startCounter) + "'";
+          SAerror(74, error, myself->attributes["referenceLine"]);
         }
         if ((completion != UINT_MAX) && ((completion > (finalCounter-startCounter))))
           SAerror(75, "", myself->attributes["referenceLine"]);

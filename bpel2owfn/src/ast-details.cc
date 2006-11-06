@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/06 18:03:39 $
+ * \date    \$Date: 2006/11/06 18:21:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.56 $
+ * \version \$Revision: 1.57 $
  */
 
 
@@ -972,7 +972,7 @@ list<unsigned int> ASTE::ancestorScopes()
 {
   extern map<unsigned int, ASTE*> ASTEmap;
   list<unsigned int> result;
-  
+
   if (id != 1)
   {
     result.push_back(parentScopeId);

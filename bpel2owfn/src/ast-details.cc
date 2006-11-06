@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/05 18:52:33 $
+ * \date    \$Date: 2006/11/06 16:32:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.54 $
+ * \version \$Revision: 1.55 $
  */
 
 
@@ -904,6 +904,7 @@ string ASTE::checkLink()
  */
 void ASTE::checkPartnerLink()
 {
+  extern map<unsigned int, ASTE*> ASTEmap;	
   extern set<string> partnerLinkNames;
   extern string filename;
 
@@ -917,6 +918,13 @@ void ASTE::checkPartnerLink()
   for (list<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
     if (partnerLinkNames.find(toString(*scope) + "." + partnerLinkName) != partnerLinkNames.end())
       return;
+
+  // trigger [SA00084]
+  if (ASTEmap[parentActivityId]->activityTypeName() == "eventHandlers")
+  {
+    SAerror(84, partnerLinkName, attributes["referenceLine"]);
+    return;
+  }
 
   // display an error message
   cerr << filename << ":" << attributes["referenceLine"];

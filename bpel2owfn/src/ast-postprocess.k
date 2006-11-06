@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/06 16:04:25 $
+ * \date    \$Date: 2006/11/06 16:32:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.90 $
+ * \version \$Revision: 1.91 $
  */
 %}
 
@@ -262,12 +262,12 @@ userDefinedEventHandler(a,b,_id) ->
         SAerror(83, "", toInt(ASTEmap[ASTEmap[myid]->parentScopeId]->attributes["referenceLine"]));
 
       // distribute the event handlers's id to the enclosed activities
-      foreach(branch=OnMessage(innerActivity); tOnMessage_list a)
+      foreach(branch=OnMessage(_cor,_from,_act,_id2); tOnMessage_list a)
       {
-        assert(ASTEmap[innerActivity->id] != NULL);
-        ASTEmap[innerActivity->id]->parentActivityId = myid;
+        assert(ASTEmap[_id2->value] != NULL);
+        ASTEmap[_id2->value]->parentActivityId = myid;
         ASTEmap[branch->id]->parentActivityId = myid;
-        ASTEmap[innerActivity->id]->controlFlow = ASTEmap[myid]->controlFlow;
+        ASTEmap[_id2->value]->controlFlow = ASTEmap[myid]->controlFlow;
       }
       foreach(branch=OnAlarm(innerActivity); tOnAlarm_list b)
       {
@@ -288,6 +288,7 @@ OnMessage(a,b,c,_id) ->
       assert(ASTEmap[myid] != NULL);
       ASTE *myself = ASTEmap[myid];
 
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
       assert(ASTEmap[myself->parentActivityId] != NULL);
       myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
       myself->checkAttributes();

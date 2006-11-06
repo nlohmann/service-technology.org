@@ -1,0 +1,10 @@
+<process name="SA00084" targetNamespace="anyURI">
+
+	<eventHandlers>
+	  <onEvent partnerLink="pl" operation="o" variable="v">
+	    <empty />
+	  </onEvent>
+	</eventHandlers>
+
+	<empty />
+</process>

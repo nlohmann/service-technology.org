@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/03 16:23:54 $ by $Author: nlohmann $.
-# Version $Revision: 1.20 $
+# File last changed $Date: 2006/11/06 21:29:40 $ by $Author: nlohmann $.
+# Version $Revision: 1.21 $
 
 SUBDIRS = src doc tests
 
@@ -32,7 +32,7 @@ AM_CFLAGS=   # -g -pedantic
 
 
 # all files that require the permission to execute
-SHELLSCRIPTS = tests/test1 tests/test2 tests/test3
+SHELLSCRIPTS = tests/test1 tests/test2 tests/test3 tests/test4
 
 # delete all files that can be created by other files
 hu-prepare: maintainer-clean

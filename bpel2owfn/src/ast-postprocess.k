@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/06 18:21:04 $
+ * \date    \$Date: 2006/11/06 21:29:50 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.93 $
+ * \version \$Revision: 1.94 $
  */
 %}
 
@@ -318,13 +318,30 @@ OnMessage(a,b,c,_id) ->
 
       myself->channelName = myself->createChannel();
       myself->variableName = myself->checkVariable("variable");
+
+      assert(ASTEmap[c->id] != NULL);
+      ASTEmap[c->id]->parentActivityId = myid;
     }
     c
   ]
 ;
 
-OnAlarm(a,b) ->
-  [postprocessing: a]
+OnAlarm(a,_id) ->
+  [postprocessing: a
+    {
+      int myid = _id->value;
+      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      assert(ASTEmap[myself->parentActivityId] != NULL);
+      //todo: cyclic-attribute if "repeatEvery" is set
+
+      assert(ASTEmap[a->id] != NULL);
+      ASTEmap[a->id]->parentActivityId = myid;
+    }
+    a
+  ]
 ;
 
 

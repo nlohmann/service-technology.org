@@ -18,11 +18,10 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/07/12 11:52:41 $ by $Author: nlohmann $.
-# Version $Revision: 1.8 $
+# File last changed $Date: 2006/11/06 21:29:59 $ by $Author: nlohmann $.
+# Version $Revision: 1.9 $
 
-#TESTS = #test1
-TESTS = test2 test3
+TESTS = test1 test2 test3 test4
 
 BPEL_PROCESSES = error.bpel loan.bpel purchase.bpel shipping.bpel
 
@@ -33,6 +32,7 @@ CLEANFILES = $(BPEL_PROCESSES:.bpel=.info) \
 	     $(BPEL_PROCESSES:.bpel=.owfn) \
 	     $(BPEL_PROCESSES:.bpel=.dot) \
 	     $(BPEL_PROCESSES:.bpel=.xml) \
-	     $(BPEL_PROCESSES:.bpel=.ast)
+	     $(BPEL_PROCESSES:.bpel=.ast) \
+	     bpel2owfn.exe.stackdump
 	     
 EXTRA_DIST = $(TESTS) $(BPEL_PROCESSES)

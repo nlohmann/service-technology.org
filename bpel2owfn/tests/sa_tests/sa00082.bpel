@@ -1,0 +1,40 @@
+<process name="P1">
+    
+    <flow name="F1">
+	<links>
+	    <link name="LinkA" />
+	    <link name="LinkB" />
+	</links>
+
+	<scope name="SC1">
+	    <flow name="F2">
+		<empty>
+		    <targets>
+			<target linkName="LinkA" />
+		    </targets>
+    		</empty>
+		
+		<empty>
+		    <sources>
+			<source linkName="LinkB" />
+		    </sources>
+		</empty>
+	    </flow>
+	</scope>
+	
+	<scope name="SC2">
+	    <flow name="F3">
+		<empty>
+		    <targets>
+			<target linkName="LinkB" />
+		    </targets>
+		</empty>
+		<empty>
+		    <sources>
+			<source linkName="LinkA" />
+		    </sources>
+		</empty>
+	    </flow>
+	</scope>
+    </flow>
+</process>

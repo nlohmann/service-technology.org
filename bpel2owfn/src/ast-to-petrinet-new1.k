@@ -30,7 +30,7 @@
  *
  * \date
  *          - created 2006-10-29
- *          - last changed: \$Date: 2006/11/05 14:33:11 $
+ *          - last changed: \$Date: 2006/11/07 15:04:57 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  *
  */
 %}
@@ -323,12 +323,11 @@ This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
         }
         default: { /* do nothing */ }
       }
-
       // embed inner activity
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "activity_initial"), TheNet->findPlace(h->id, ".initial"));
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "activity_final"), TheNet->findPlace(h->id, ".final"));
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "stop"), TheNet->findPlace(h->id, ".stop"));
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "inner_stopped"), TheNet->findPlace(h->id, ".stopped"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "activity_initial"), TheNet->findPlace(i->id, ".initial"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "activity_final"), TheNet->findPlace(i->id, ".final"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "stop"), TheNet->findPlace(i->id, ".stop"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "inner_stopped"), TheNet->findPlace(i->id, ".stopped"));
 
       currentScope = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.";
       footer(This->id, true);

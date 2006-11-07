@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/07 10:01:13 $
+ * \date    \$Date: 2006/11/07 13:24:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.95 $
+ * \version \$Revision: 1.96 $
  */
 %}
 
@@ -120,6 +120,22 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
 
           if (jointLinks.size() > 0)
             SAerror(67, "`" + it->first + "' and <link> `" + ASTEmap[*(jointLinks.begin())]->attributes["name"] + "'", ASTEmap[it->second]->attributes["referenceLine"]);
+        }
+      }
+
+      // trigger [SA00057]
+      set<string> reallySharedCorrelationSets;
+      for (set<unsigned int>::iterator it = startActivities.begin(); it != startActivities.end(); it++)
+      {
+        if (it == startActivities.begin())
+          reallySharedCorrelationSets = ASTEmap[*it]->sharedCorrelationSets;
+        else
+          reallySharedCorrelationSets = setIntersection(reallySharedCorrelationSets, ASTEmap[*it]->sharedCorrelationSets);
+
+        if (reallySharedCorrelationSets.empty())
+        {
+          SAerror(57, "", ASTEmap[*it]->attributes["referenceLine"]);
+          break;
         }
       }
 
@@ -459,8 +475,16 @@ Correlation(_id) ->
 
       ASTEmap[myid]->parentScopeId = PPcurrentScope;
       ASTEmap[myid]->checkAttributes();
-      ASTEmap[myid]->checkCorrelationSet();
-     }
+      string correlationSetName = ASTEmap[myid]->checkCorrelationSet();
+
+      // needed to trigger [SA00057] later
+      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
+      if (ASTEmap[ASTEmap[myid]->parentActivityId]->isStartActivity &&
+          ASTEmap[myid]->attributes["initiate"] == "join")
+      {
+        ASTEmap[ASTEmap[myid]->parentActivityId]->sharedCorrelationSets.insert(correlationSetName);
+      }
+    }
   ]
 ;
 

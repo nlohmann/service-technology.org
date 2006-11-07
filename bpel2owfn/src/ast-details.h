@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/07 10:01:13 $
+ * \date    \$Date: 2006/11/07 13:24:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.45 $
+ * \version \$Revision: 1.46 $
  */
 
 
@@ -146,6 +146,8 @@ class ASTE
     set<unsigned int> enclosedScopes;	///< as defined on page 122 of the spec
     set<int> enclosedSourceLinks;	///< the identifiers of all (recursively) enclosed source links
    
+    set<string> sharedCorrelationSets;	///< the identifiers of the joined correlation sets in case activity is a start activity
+
     ASTE(int myid, int mytype);
 
     string createChannel(bool synchronousCommunication = false);
@@ -153,7 +155,7 @@ class ASTE
     string checkVariable(string attributename);
     string checkLink();
     void checkPartnerLink();
-    void checkCorrelationSet();
+    string checkCorrelationSet();
 
     list<unsigned int> ancestorActivities();
     list<unsigned int> ancestorScopes();

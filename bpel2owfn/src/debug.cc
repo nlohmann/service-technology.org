@@ -28,13 +28,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/11/07 10:01:13 $
+ * \date    \$Date: 2006/11/07 13:24:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.44 $
+ * \version \$Revision: 1.45 $
  *
  * \ingroup debug
  */
@@ -229,6 +229,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
 
     case(56):
       { cerr << information << " start activity must not be preceeded by another activity" << endl;
+	break; }
+
+    case(57):
+      { cerr << "all start activities must share a correlation set with `initiate' set to \"join\"" << endl;
 	break; }
 
     case(59):

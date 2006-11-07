@@ -1,0 +1,70 @@
+<process name="sa00057"
+    targetNamespace="http://example.com/auction"
+    xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+    xmlns:sref=" http://docs.oasis-open.org/wsbpel/2.0/serviceref"
+    xmlns:addr="http://example.com/addressing"
+    xmlns:as="http://example.com/auction/wsdl/auctionService/">
+    
+    <import importType="http://schemas.xmlsoap.org/wsdl/"
+	location="auctionServiceInterface.wsdl"
+	namespace="http://example.com/auction/wsdl/auctionService/" />
+
+    <partnerLinks>
+	<partnerLink name="seller"
+	    partnerLinkType="as:sellerAuctionHouseLT"
+	    myRole="auctionHouse"
+	    partnerRole="seller" />
+	<partnerLink name="buyer"
+	    partnerLinkType="as:buyerAuctionHouseLT"
+	    myRole="auctionHouse"
+	    partnerRole="buyer" />
+	<partnerLink name="auctionRegistrationService"
+	    partnerLinkType="as:auctionHouseAuctionRegistrationServiceLT"
+	    myRole="auctionHouse"
+	    partnerRole="auctionRegistrationService" />
+    </partnerLinks>
+    
+    <variables>
+	<variable name="sellerData"
+	    messageType="as:sellerData" />
+	<variable name="sellerAnswerData"
+	    messageType="as:sellerAnswerData" />
+	<variable name="buyerData"
+	    messageType="as:buyerData" />
+	<variable name="buyerAnswerData"
+	    messageType="as:buyerAnswerData" />
+	<variable name="auctionData"
+	    messageType="as:auctionData" />
+	<variable name="auctionAnswerData"
+	    messageType="as:auctionAnswerData" />
+    </variables>
+    
+    <correlationSets>
+	<correlationSet name="auctionIdentification"
+	    properties="as:auctionId" />
+    </correlationSets>
+    
+	<flow>
+	    <!-- Process seller request -->
+	    <receive name="acceptSellerInformation"
+		partnerLink="seller"
+		portType="as:sellerPT"
+		operation="submit"
+		variable="sellerData"
+		createInstance="yes">
+		<correlations>
+		    <correlation set="auctionIdentification"
+			initiate="join" />
+		</correlations>
+	    </receive>
+	    
+	    <!-- Process buyer request -->
+	    <receive name="acceptBuyerInformation"
+		partnerLink="buyer"
+		portType="as:buyerPT"
+		operation="submit"
+		variable="buyerData"
+		createInstance="yes">
+	    </receive>
+	</flow>
+</process>

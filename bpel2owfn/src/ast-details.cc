@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/07 10:01:13 $
+ * \date    \$Date: 2006/11/07 13:24:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.58 $
+ * \version \$Revision: 1.59 $
  */
 
 
@@ -941,7 +941,7 @@ void ASTE::checkPartnerLink()
  *
  * Checks whether a given correlation set was defined in an ancestor scope.
  */
-void ASTE::checkCorrelationSet()
+string ASTE::checkCorrelationSet()
 {
   extern map<unsigned int, ASTE*> ASTEmap;	
   extern set<string> correlationSetNames;
@@ -949,14 +949,14 @@ void ASTE::checkCorrelationSet()
 
   string correlationSetName = attributes["set"];
   if (correlationSetName == "")
-    return;
+    return correlationSetName;
 
   list<unsigned int> ancestorScopes = this->ancestorScopes();
 
   // travers the ancestor scopes
   for (list<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
     if (correlationSetNames.find(toString(*scope) + "." + correlationSetName) != correlationSetNames.end())
-      return;
+      return (toString(*scope) + "." + correlationSetName);
 
   // trigger [SA00088]
   assert(ASTEmap[parentActivityId] != NULL);
@@ -964,7 +964,7 @@ void ASTE::checkCorrelationSet()
   if (ASTEmap[ASTEmap[parentActivityId]->parentActivityId]->activityTypeName() == "eventHandlers")
   {
     SAerror(88, correlationSetName, attributes["referenceLine"]);
-    return;
+    return correlationSetName;
   }
 
   // display an error message
@@ -972,7 +972,7 @@ void ASTE::checkCorrelationSet()
   cerr << " - <correlationSet> `" << correlationSetName << "' referenced in <";
   cerr << ASTEmap[parentActivityId]->activityTypeName() << "> was not defined before" << endl;
 
-  return;
+  return "";
 }
 
 

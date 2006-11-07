@@ -28,13 +28,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/11/06 18:03:39 $
+ * \date    \$Date: 2006/11/07 10:01:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
  *
  * \ingroup debug
  */
@@ -305,6 +305,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
 
     case(84):
        { cerr << "partnerLink reference `" << information << "' of <onEvent> cannot be resolved" << endl;
+	 break; }
+
+    case(88):
+       { cerr << "<correlation> reference `" << information << "' of <onEvent> cannot be resolved" << endl;
 	 break; }
 
     case(91):

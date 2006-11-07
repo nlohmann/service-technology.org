@@ -1,0 +1,21 @@
+<process name="SA00088" targetNamespace="anyURI">
+
+    <partnerLinks>
+	<partnerLink name="pl" partnerLinkType="plt" myRole="role" />
+    </partnerLinks>
+
+    <correlationSets>
+	<correlationSet name="auctionIdentification" properties="as:auctionId" />
+    </correlationSets>
+
+    <eventHandlers>
+	<onEvent partnerLink="pl" operation="op">
+	    <correlations>
+		<correlation set="sauctionIdentification" />
+	    </correlations>
+	    <empty />
+	</onEvent>
+    </eventHandlers>
+
+    <empty />
+</process>

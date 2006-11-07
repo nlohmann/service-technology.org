@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/06 18:03:39 $
+ * \date    \$Date: 2006/11/07 10:01:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.44 $
+ * \version \$Revision: 1.45 $
  */
 
 
@@ -153,6 +153,7 @@ class ASTE
     string checkVariable(string attributename);
     string checkLink();
     void checkPartnerLink();
+    void checkCorrelationSet();
 
     list<unsigned int> ancestorActivities();
     list<unsigned int> ancestorScopes();

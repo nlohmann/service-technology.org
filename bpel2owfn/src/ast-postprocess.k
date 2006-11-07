@@ -27,7 +27,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/06 21:29:50 $
+ * \date    \$Date: 2006/11/07 10:01:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +36,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.94 $
+ * \version \$Revision: 1.95 $
  */
 %}
 
@@ -73,9 +73,9 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
       ASTEmap[g->id]->parentActivityId = myid;
       ASTEmap[i->id]->parentActivityId = myid;
     }
-    a b c
+    a b c d
     i // inner activity
-    d e f g h
+    e f g h
     {
       // trigger [SA00015]
       if (startActivities.empty())
@@ -321,8 +321,14 @@ OnMessage(a,b,c,_id) ->
 
       assert(ASTEmap[c->id] != NULL);
       ASTEmap[c->id]->parentActivityId = myid;
+
+      foreach(correlation=Correlation(_id2); tCorrelation_list a)
+      {
+        assert(ASTEmap[_id2->value] != NULL);
+        ASTEmap[_id2->value]->parentActivityId = myid;
+      }
     }
-    c
+    a b c
   ]
 ;
 
@@ -451,7 +457,9 @@ Correlation(_id) ->
       int myid = _id->value;
       assert(ASTEmap[myid] != NULL);
 
+      ASTEmap[myid]->parentScopeId = PPcurrentScope;
       ASTEmap[myid]->checkAttributes();
+      ASTEmap[myid]->checkCorrelationSet();
      }
   ]
 ;
@@ -536,6 +544,12 @@ Invoke(a,b,c,d,_id) ->
       myself->inputVariableName = myself->checkVariable("inputVariable");
       myself->outputVariableName = myself->checkVariable("outputVariable");
       myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
+
+      foreach(correlation=Correlation(_id2); tCorrelation_list b)
+      {
+        assert(ASTEmap[_id2->value] != NULL);
+        ASTEmap[_id2->value]->parentActivityId = myid;
+      }
     }
     a b
   ]
@@ -569,6 +583,12 @@ Receive(a,b,c,_id) ->
       myself->channelName = myself->createChannel();
       myself->variableName = myself->checkVariable("variable");
       myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
+
+      foreach(correlation=Correlation(_id2); tCorrelation_list b)
+      {
+        assert(ASTEmap[_id2->value] != NULL);
+        ASTEmap[_id2->value]->parentActivityId = myid;
+      }
     }
     a b
     {
@@ -612,6 +632,12 @@ Reply(a,b,c,_id) ->
       myself->channelName = myself->createChannel();
       myself->variableName = myself->checkVariable("variable");
       myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
+
+      foreach(correlation=Correlation(_id2); tCorrelation_list b)
+      {
+        assert(ASTEmap[_id2->value] != NULL);
+        ASTEmap[_id2->value]->parentActivityId = myid;
+      }
     }
     a b
   ]
@@ -1482,9 +1508,9 @@ Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
           ASTEmap[myself->parentScopeId]->findIsolatedAncestor())
         SAerror(91, "", myself->attributes["referenceLine"]);
     }
-    a b j
+    a b j g
     i // inner activity
-    c d e f g h
+    c d e f h
     {
       // add an attribute to the compensation handler
       if(PPhasCompensateMap[myid] == 1)

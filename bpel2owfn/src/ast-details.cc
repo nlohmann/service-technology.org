@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/06 18:21:04 $
+ * \date    \$Date: 2006/11/07 10:01:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.57 $
+ * \version \$Revision: 1.58 $
  */
 
 
@@ -918,6 +918,7 @@ void ASTE::checkPartnerLink()
       return;
 
   // trigger [SA00084]
+  assert(ASTEmap[parentActivityId] != NULL);
   if (ASTEmap[parentActivityId]->activityTypeName() == "eventHandlers")
   {
     SAerror(84, partnerLinkName, attributes["referenceLine"]);
@@ -928,6 +929,48 @@ void ASTE::checkPartnerLink()
   cerr << filename << ":" << attributes["referenceLine"];
   cerr << " - <partnerLink> `" << partnerLinkName << "' referenced in <";
   cerr << activityTypeName() << "> was not defined before" << endl;
+
+  return;
+}
+
+
+
+
+/*!
+ * \brief checks a correlation set
+ *
+ * Checks whether a given correlation set was defined in an ancestor scope.
+ */
+void ASTE::checkCorrelationSet()
+{
+  extern map<unsigned int, ASTE*> ASTEmap;	
+  extern set<string> correlationSetNames;
+  extern string filename;
+
+  string correlationSetName = attributes["set"];
+  if (correlationSetName == "")
+    return;
+
+  list<unsigned int> ancestorScopes = this->ancestorScopes();
+
+  // travers the ancestor scopes
+  for (list<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
+    if (correlationSetNames.find(toString(*scope) + "." + correlationSetName) != correlationSetNames.end())
+      return;
+
+  // trigger [SA00088]
+  assert(ASTEmap[parentActivityId] != NULL);
+  assert(ASTEmap[ASTEmap[parentActivityId]->parentActivityId] != NULL);
+  if (ASTEmap[ASTEmap[parentActivityId]->parentActivityId]->activityTypeName() == "eventHandlers")
+  {
+    SAerror(88, correlationSetName, attributes["referenceLine"]);
+    return;
+  }
+
+  // display an error message
+  cerr << filename << ":" << attributes["referenceLine"];
+  cerr << " - <correlationSet> `" << correlationSetName << "' referenced in <";
+  cerr << ASTEmap[parentActivityId]->activityTypeName() << "> was not defined before" << endl;
 
   return;
 }

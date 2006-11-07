@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/07 08:36:56 $ by $Author: nlohmann $.
-# Version $Revision: 1.22 $
+# File last changed $Date: 2006/11/07 10:25:06 $ by $Author: nlohmann $.
+# Version $Revision: 1.23 $
 
 SUBDIRS = src doc tests
 
@@ -57,15 +57,15 @@ hu-prepare: maintainer-clean
 	find -type d -exec chmod 755 {} \;
 	find -type f -exec chmod 644 {} \;
 	chmod 755 $(SHELLSCRIPTS)
-	@echo -----------------------------------------------------
-	@echo To recreate installation status enter
-	@echo   aclocal
-	@echo   autoconf
-	@echo   autoheader
-	@echo   automake -ac
+	@echo "-----------------------------------------------------"
+	@echo "To recreate installation status enter"
+	@echo "  aclocal"
+	@echo "  autoconf"
+	@echo "  autoheader"
+	@echo "  automake -ac"
 	@echo
-	@echo or
-	@echo   autoreconf -i
+	@echo "or"
+	@echo "  autoreconf -i"
 	@echo
 
 

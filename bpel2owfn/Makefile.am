@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/06 21:29:40 $ by $Author: nlohmann $.
-# Version $Revision: 1.21 $
+# File last changed $Date: 2006/11/07 08:36:56 $ by $Author: nlohmann $.
+# Version $Revision: 1.22 $
 
 SUBDIRS = src doc tests
 
@@ -63,6 +63,9 @@ hu-prepare: maintainer-clean
 	@echo   autoconf
 	@echo   autoheader
 	@echo   automake -ac
+	@echo
+	@echo or
+	@echo   autoreconf -i
 	@echo
 
 

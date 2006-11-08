@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/08 07:38:23 $
+ * \date    \$Date: 2006/11/08 10:16:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.60 $
+ * \version \$Revision: 1.61 $
  */
 
 
@@ -81,7 +81,7 @@ extern set<string> catches;
  * \param mytype value of the type of the node using the token values defined
  *               by flex and bison
  */
-ASTE::ASTE(int myid, int mytype)
+ASTE::ASTE(unsigned int myid, unsigned int mytype)
 {
   extern map<unsigned int, map<string, string> > temporaryAttributeMap;
 

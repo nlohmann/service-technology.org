@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/08 07:38:23 $
+ * \date    \$Date: 2006/11/08 10:16:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.47 $
+ * \version \$Revision: 1.48 $
  */
 
 
@@ -149,7 +149,7 @@ class ASTE
     set<string> sharedCorrelationSets;	///< the identifiers of the joined correlation sets in case activity is a start activity
     set<string> catches;		///< the <catch> branches of <faultHandlers> to detect duplicates
 
-    ASTE(int myid, int mytype);
+    ASTE(unsigned int myid, unsigned int mytype);
 
     string createChannel(bool synchronousCommunication = false);
 

@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/10/25 10:11:22 $
+ * \date    \$Date: 2006/11/08 07:38:25 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.99 $
+ * \version \$Revision: 1.100 $
  *
  * \ingroup petrinet
  */
@@ -59,8 +59,6 @@
 #include <vector>
 #include <set>
 #include <map>
-
-#include "ast-config.h"		// all you need from Kimwitu++
 
 using namespace std;
 
@@ -361,11 +359,7 @@ class PetriNet
     void mergePlaces(string role1, string role2);
 
     /// merges places given two identifiers and roles
-    void mergePlaces(int id1, string role1, int id2, string role2);
-    
-    /// merges places given two activities with roles
-    void mergePlaces(kc::impl_activity *act1, string role1,
-		     kc::impl_activity *act2, string role2);
+    void mergePlaces(unsigned int id1, string role1, unsigned int id2, string role2);
     
     /// merges transitions given two transitions
     void mergeTransitions(Transition *t1, Transition *t2);
@@ -374,14 +368,8 @@ class PetriNet
     /// finds place given a role
     Place* findPlace(string role);
 
-    /// finds place given an activity with a role
-    Place* findPlace(kc::impl_activity *activity, string role);
-
     /// finds place given an id with a role
-    Place* findPlace(int id, string role);
-
-    /// finds place given an id with a role
-    Place* findPlace(kc::integer id, string role);    
+    Place* findPlace(unsigned int id, string role);
 
     /// finds a place given the ids of two transitions (one in the pre and one in the postset)
     Place *findPlace(unsigned int id1, unsigned int id2);

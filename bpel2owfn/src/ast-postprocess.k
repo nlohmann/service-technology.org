@@ -22,12 +22,14 @@
 /*!
  * \file    ast-postprocess.cc
  *
+ * \brief   AST postprocessor (implementation)
+ *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nlohmann $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/07 13:24:55 $
+ * \date    \$Date: 2006/11/08 07:38:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -36,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.96 $
+ * \version \$Revision: 1.97 $
  */
 %}
 
@@ -52,15 +54,16 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->parentScopeId = myid;
-      ASTEmap[myid]->parentActivityId = myid;
+      myself->parentScopeId = myid;
+      myself->parentActivityId = myid;
       PPcurrentScope = myid;
 
       // annotate AST and check information
-      ASTEmap[myid]->checkAttributes();
-      ASTEmap[myid]->hasEH = (string(g->op_name()) == "userDefinedEventHandler");
+      myself->checkAttributes();
+      myself->hasEH = (string(g->op_name()) == "userDefinedEventHandler");
       ASTEmap[f->id]->inProcess = true;
 
       // distribute the process' id to the enclosed FH/CH/EH/activity
@@ -79,11 +82,11 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
     {
       // trigger [SA00015]
       if (startActivities.empty())
-        SAerror(15, "", ASTEmap[myid]->attributes["referenceLine"]);
+        SAerror(15, "", myself->attributes["referenceLine"]);
 
       // collect enclosed source links
       assert(ASTEmap[i->id] != NULL);
-      ASTEmap[myid]->enclosedSourceLinks = ASTEmap[i->id]->enclosedSourceLinks;
+      myself->enclosedSourceLinks = ASTEmap[i->id]->enclosedSourceLinks;
 
       // add an attribute to the compensation handler
       if(PPhasCompensateMap[myid] == 1)
@@ -92,7 +95,7 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
         f->hasCompensateWithScope = true;
 
       // pass list of enclosed scopes to the compensation handler
-      ASTEmap[f->id]->enclosedScopes = ASTEmap[myid]->enclosedScopes;
+      ASTEmap[f->id]->enclosedScopes = myself->enclosedScopes;
 
       // trigger [SA00066]
       // should be actually calculated at a <flow> activity, but "linksOK" is
@@ -142,7 +145,7 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
       // this assertion guarantees that we did not forget a link and encounter
       // problems generating the Petri net
       if (linksOK)
-        assert(ASTEmap[myid]->enclosedSourceLinks.size() == linkNames.size());
+        assert(myself->enclosedSourceLinks.size() == linkNames.size());
     }
   ]
 ;
@@ -156,12 +159,13 @@ PartnerLink(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
 
-      ASTEmap[myid]->definePartnerLink();
+      myself->definePartnerLink();
     }
   ]
 ;
@@ -173,13 +177,6 @@ PartnerLink(_id) ->
 
 Partner(a,_id) ->
   [postprocessing:
-    {
-      // annotate all enclosed partner links
-      foreach(partner; tPartnerLink_list a)
-      {
-//        partner->inPartners = true;
-      }
-    }
     a
   ]
 ;
@@ -193,11 +190,12 @@ userDefinedFaultHandler(a,b,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->hasCatchAll = (b->op_name() == "CatchAll");
-      ASTEmap[myid]->inProcess = (ASTEmap[myid]->parentScopeId == 1);
+      myself->parentScopeId = PPcurrentScope;
+      myself->hasCatchAll = (b->op_name() == "CatchAll");
+      myself->inProcess = (myself->parentScopeId == 1);
 
       // distribute the fault handlers's id to the enclosed catch/catchAll branches
       // also mark the activities as "inside fault handlers"
@@ -205,6 +203,7 @@ userDefinedFaultHandler(a,b,_id) ->
       {
         assert(ASTEmap[innerActivity->id] != NULL);
         ASTEmap[innerActivity->id]->parentActivityId = myid;
+        ASTEmap[branch->id]->parentActivityId = myid;
         ASTEmap[innerActivity->id]->controlFlow = FHCF;
       }
 
@@ -216,13 +215,14 @@ userDefinedFaultHandler(a,b,_id) ->
         {
           assert(ASTEmap[c->id] != NULL);
           ASTEmap[c->id]->parentActivityId = myid;
+          ASTEmap[b->id]->parentActivityId = myid;
           ASTEmap[c->id]->controlFlow = FHCF;
         }
         default :
         {
           // triggers SA00080
           if (a->length() == 0)
-            SAerror(80, "", toInt(ASTEmap[ASTEmap[myid]->parentScopeId]->attributes["referenceLine"]));
+            SAerror(80, "", toInt(ASTEmap[myself->parentScopeId]->attributes["referenceLine"]));
         }
       }
     }
@@ -234,10 +234,11 @@ implicitFaultHandler(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->inProcess = (ASTEmap[myid]->parentScopeId == 1);
+      myself->parentScopeId = PPcurrentScope;
+      myself->inProcess = (myself->parentScopeId == 1);
     }
   ]
 ;
@@ -247,9 +248,10 @@ Catch(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->checkAttributes();
+      myself->checkAttributes();
     }
     a
   ]
@@ -259,7 +261,8 @@ CatchAll(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
     }
     a
   ]
@@ -274,9 +277,10 @@ implicitEventHandler(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = PPcurrentScope;
     }  
   ]
 ;
@@ -285,14 +289,15 @@ userDefinedEventHandler(a,b,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->inWhile = true;
+      myself->parentScopeId = PPcurrentScope;
+      myself->inWhile = true;
 
       // triggers SA00083
       if (a->length() == 0 && b->length() == 0)
-        SAerror(83, "", toInt(ASTEmap[ASTEmap[myid]->parentScopeId]->attributes["referenceLine"]));
+        SAerror(83, "", toInt(ASTEmap[myself->parentScopeId]->attributes["referenceLine"]));
 
       // distribute the event handlers's id to the enclosed activities
       foreach(branch=OnMessage(_cor,_from,_act,_id2); tOnMessage_list a)
@@ -300,14 +305,14 @@ userDefinedEventHandler(a,b,_id) ->
         assert(ASTEmap[_id2->value] != NULL);
         ASTEmap[_id2->value]->parentActivityId = myid;
         ASTEmap[branch->id]->parentActivityId = myid;
-        ASTEmap[_id2->value]->controlFlow = ASTEmap[myid]->controlFlow;
+        ASTEmap[_id2->value]->controlFlow = myself->controlFlow;
       }
       foreach(branch=OnAlarm(innerActivity); tOnAlarm_list b)
       {
         assert(ASTEmap[innerActivity->id] != NULL);
         ASTEmap[innerActivity->id]->parentActivityId = myid;
         ASTEmap[branch->id]->parentActivityId = myid;
-        ASTEmap[innerActivity->id]->controlFlow = ASTEmap[myid]->controlFlow;
+        ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
       }
     }
     a b
@@ -318,10 +323,10 @@ OnMessage(a,b,c,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
       ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = PPcurrentScope;
       assert(ASTEmap[myself->parentActivityId] != NULL);
       myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
       myself->checkAttributes();
@@ -352,10 +357,10 @@ OnAlarm(a,_id) ->
   [postprocessing: a
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
       ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = PPcurrentScope;
       assert(ASTEmap[myself->parentActivityId] != NULL);
       //todo: cyclic-attribute if "repeatEvery" is set
 
@@ -375,9 +380,10 @@ implicitCompensationHandler(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = PPcurrentScope;
     }
   ]
 ;
@@ -386,9 +392,10 @@ userDefinedCompensationHandler(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = PPcurrentScope;
 
       // distribute the compensation handlers's id to the enclosed activity
       // also mark the activities as "inside compensation handlers"
@@ -409,9 +416,10 @@ TerminationHandler(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = PPcurrentScope;
 
       // distribute the termination handlers's id to the enclosed activity
       // also mark the activities as "inside termination handlers"
@@ -435,11 +443,12 @@ Variable(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
-      ASTEmap[myid]->defineVariable();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
+      myself->defineVariable();
     }
   ]
 ;
@@ -453,11 +462,12 @@ CorrelationSet(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
-      ASTEmap[myid]->defineCorrelationSet();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
+      myself->defineCorrelationSet();
     }
   ]
 ;
@@ -471,18 +481,19 @@ Correlation(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
-      string correlationSetName = ASTEmap[myid]->checkCorrelationSet();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
+      string correlationSetName = myself->checkCorrelationSet();
 
       // needed to trigger [SA00057] later
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      if (ASTEmap[ASTEmap[myid]->parentActivityId]->isStartActivity &&
-          ASTEmap[myid]->attributes["initiate"] == "join")
+      assert(ASTEmap[myself->parentActivityId] != NULL);
+      if (ASTEmap[myself->parentActivityId]->isStartActivity &&
+          myself->attributes["initiate"] == "join")
       {
-        ASTEmap[ASTEmap[myid]->parentActivityId]->sharedCorrelationSets.insert(correlationSetName);
+        ASTEmap[myself->parentActivityId]->sharedCorrelationSets.insert(correlationSetName);
       }
     }
   ]
@@ -497,9 +508,10 @@ ToPart(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->checkAttributes();
+      myself->checkAttributes();
      }
   ]
 ;
@@ -508,9 +520,10 @@ FromPart(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->checkAttributes();
+      myself->checkAttributes();
      }
   ]
 ;
@@ -524,12 +537,13 @@ Empty(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
       a->parentId = myid;
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
     }
     a
   ]
@@ -544,8 +558,8 @@ Invoke(a,b,c,d,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
       ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
       a->parentId = myid;
 
@@ -588,8 +602,8 @@ Receive(a,b,c,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
       ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
       a->parentId = myid;
 
@@ -637,8 +651,8 @@ Reply(a,b,c,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
       ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
       a->parentId = myid;
 
@@ -676,12 +690,13 @@ Assign(a,b,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
       a->parentId = myid;
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
     }
     a b
   ]
@@ -695,10 +710,10 @@ From(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
       ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = PPcurrentScope;
       myself->checkAttributes();
 
       myself->checkPartnerLink();
@@ -711,10 +726,10 @@ To(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
       ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = PPcurrentScope;
       myself->checkAttributes();
 
       myself->checkPartnerLink();
@@ -732,12 +747,13 @@ Validate(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
       a->parentId = myid;
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
     }
     a
   ]
@@ -752,12 +768,13 @@ Wait(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
       a->parentId = myid;
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
     }
     a
   ]
@@ -772,12 +789,13 @@ Throw(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
       a->parentId = myid;
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
     }
     a
   ]
@@ -792,18 +810,19 @@ Rethrow(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
       a->parentId = myid;
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
 
       /* above is generic */
 
       // triggers [SA00006]
       bool correctUse = false;
-      list<unsigned int> ancestorActivities = ASTEmap[myid]->ancestorActivities();
+      list<unsigned int> ancestorActivities = myself->ancestorActivities();
       for (list<unsigned int>::iterator it = ancestorActivities.begin(); it != ancestorActivities.end(); it++)
       {
         assert(ASTEmap[*it] != NULL);
@@ -814,7 +833,7 @@ Rethrow(a,_id) ->
         }
       }
       if (!correctUse)
-        SAerror(6, "", ASTEmap[myid]->attributes["referenceLine"]);
+        SAerror(6, "", myself->attributes["referenceLine"]);
     }
     a
   ]
@@ -829,18 +848,19 @@ Compensate(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
       a->parentId = myid;
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
 
       /* above is generic */
 
       // triggers [SA00008]
       bool correctUse = false;
-      list<unsigned int> ancestorActivities = ASTEmap[myid]->ancestorActivities();
+      list<unsigned int> ancestorActivities = myself->ancestorActivities();
 
       for (list<unsigned int>::iterator it = ancestorActivities.begin(); it != ancestorActivities.end(); it++)
       {
@@ -853,7 +873,7 @@ Compensate(a,_id) ->
         }
       }
       if (!correctUse)
-        SAerror(8, "", ASTEmap[myid]->attributes["referenceLine"]);
+        SAerror(8, "", myself->attributes["referenceLine"]);
 
 
       // register this compensate at the current scope
@@ -873,8 +893,8 @@ CompensateScope(a,b,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
       ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
       a->parentId = myid;
 
@@ -886,7 +906,7 @@ CompensateScope(a,b,_id) ->
 
       // triggers [SA00007]
       bool correctUse = false;
-      list<unsigned int> ancestorActivities = ASTEmap[myid]->ancestorActivities();
+      list<unsigned int> ancestorActivities = myself->ancestorActivities();
       for (list<unsigned int>::iterator it = ancestorActivities.begin(); it != ancestorActivities.end(); it++)
       {
         if (ASTEmap[*it]->activityTypeName() == "faultHandlers" ||
@@ -898,7 +918,7 @@ CompensateScope(a,b,_id) ->
         }
       }
       if (!correctUse)
-        SAerror(7, "", ASTEmap[myid]->attributes["referenceLine"]);
+        SAerror(7, "", myself->attributes["referenceLine"]);
 
 
       // triggers SA00078 and SA00077
@@ -924,12 +944,13 @@ Terminate(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
       a->parentId = myid;
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
     }
     a
   ]
@@ -944,12 +965,13 @@ Exit(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
       a->parentId = myid;
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
     }
     a
   ]
@@ -964,17 +986,18 @@ Flow(a,b,c,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
       a->parentId = myid;
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
 
       /* above is generic */
 
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
+      assert(ASTEmap[myself->parentActivityId] != NULL);
+      myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
 
       // distribute the flow's id to the enclosed activities
       // also distribute the control flow type
@@ -982,7 +1005,7 @@ Flow(a,b,c,_id) ->
       {
         assert(ASTEmap[innerActivity->id] != NULL);
         ASTEmap[innerActivity->id]->parentActivityId = myid;
-        ASTEmap[innerActivity->id]->controlFlow = ASTEmap[myid]->controlFlow;
+        ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
       }
       foreach(link; tLink_list b)
       {
@@ -999,7 +1022,7 @@ Flow(a,b,c,_id) ->
       {
         // collect enclosed source links
         assert(ASTEmap[innerActivity->id] != NULL);
-        ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
+        myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
 
         // collect start activities (for [SA00056])
         if (ASTEmap[innerActivity->id]->isStartActivity)
@@ -1031,14 +1054,15 @@ Link(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
 
-      ASTEmap[myid]->defineLink();
+      myself->defineLink();
 
-      linkIdMap[ASTEmap[myid]->attributes["name"]] = myid;
+      linkIdMap[myself->attributes["name"]] = myid;
     }
   ]
 ;
@@ -1052,17 +1076,18 @@ Switch(a,b,c,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
       a->parentId = myid;
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
 
       /* above is generic */
 
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
+      assert(ASTEmap[myself->parentActivityId] != NULL);
+      myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
 
       // distribute the switch's id to the enclosed activities
       // also distribute the control flow
@@ -1070,7 +1095,7 @@ Switch(a,b,c,_id) ->
       {
         assert(ASTEmap[innerActivity->id] != NULL);
         ASTEmap[innerActivity->id]->parentActivityId = myid;
-        ASTEmap[innerActivity->id]->controlFlow = ASTEmap[myid]->controlFlow;
+        ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
       }
 
       // process Otherwise-branch
@@ -1080,7 +1105,7 @@ Switch(a,b,c,_id) ->
         { 
           assert(ASTEmap[d->id] != NULL);
           ASTEmap[d->id]->parentActivityId = myid;
-          ASTEmap[d->id]->controlFlow = ASTEmap[myid]->controlFlow;
+          ASTEmap[d->id]->controlFlow = myself->controlFlow;
         }
         default: { /* do nothing */ }
       }
@@ -1091,7 +1116,7 @@ Switch(a,b,c,_id) ->
       foreach(branch=Case(innerActivity); tCase_list b)
       {
         assert(ASTEmap[innerActivity->id] != NULL);
-        ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
+        myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
       }
 
       with(c)
@@ -1099,7 +1124,7 @@ Switch(a,b,c,_id) ->
         c=Otherwise(d,e):
         {
           assert(ASTEmap[d->id] != NULL);
-          ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[d->id]->enclosedSourceLinks);
+          myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[d->id]->enclosedSourceLinks);
         }
         default: { /* do nothing */ }
       }
@@ -1111,10 +1136,11 @@ Case(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
     }
     a
   ]
@@ -1124,9 +1150,10 @@ Otherwise(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = PPcurrentScope;
     }
     a
   ]
@@ -1141,17 +1168,18 @@ If(a,b,c,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
       a->parentId = myid;
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
 
       /* above is generic */
 
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
+      assert(ASTEmap[myself->parentActivityId] != NULL);
+      myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
 
       // distribute the switch's id to the enclosed activities
       // also distribute the control flow
@@ -1159,7 +1187,7 @@ If(a,b,c,_id) ->
       {
         assert(ASTEmap[innerActivity->id] != NULL);
         ASTEmap[innerActivity->id]->parentActivityId = myid;
-        ASTEmap[innerActivity->id]->controlFlow = ASTEmap[myid]->controlFlow;
+        ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
       }
 
       // process Else-branch
@@ -1169,7 +1197,7 @@ If(a,b,c,_id) ->
         { 
           assert(ASTEmap[d->id] != NULL);
           ASTEmap[d->id]->parentActivityId = myid;
-          ASTEmap[d->id]->controlFlow = ASTEmap[myid]->controlFlow;
+          ASTEmap[d->id]->controlFlow = myself->controlFlow;
         }
         default: { /* do nothing */ }
       }
@@ -1180,7 +1208,7 @@ If(a,b,c,_id) ->
       foreach(branch=ElseIf(innerActivity,_id2); tElseIf_list b)
       {
         assert(ASTEmap[innerActivity->id] != NULL);
-        ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
+        myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
       }
 
       with(c)
@@ -1188,7 +1216,7 @@ If(a,b,c,_id) ->
         c=Else(d,_id2):
         {
           assert(ASTEmap[d->id] != NULL);
-          ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[d->id]->enclosedSourceLinks);
+          myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[d->id]->enclosedSourceLinks);
         }
         default: { /* do nothing */ }
       }
@@ -1200,10 +1228,11 @@ ElseIf(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
     }
     a
   ]
@@ -1213,9 +1242,10 @@ Else(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = PPcurrentScope;
     }
     a
   ]
@@ -1233,27 +1263,28 @@ While(a,b,_id) ->
     {
       // manage identifiers
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
       a->parentId = myid;
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
 
       /* above is generic */
 
-      ASTEmap[myid]->inWhile = true;
+      myself->inWhile = true;
 
       // distribute the while's id to the enclosed activity
       assert(ASTEmap[b->id] != NULL);
       ASTEmap[b->id]->parentActivityId = myid;
-      ASTEmap[b->id]->controlFlow = ASTEmap[myid]->controlFlow;
+      ASTEmap[b->id]->controlFlow = myself->controlFlow;
     }
     a b
     {
       // collect enclosed source links
       assert(ASTEmap[b->id] != NULL);
-      ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[b->id]->enclosedSourceLinks);
+      myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[b->id]->enclosedSourceLinks);
     }
   ]
 ;
@@ -1270,27 +1301,28 @@ RepeatUntil(a,b,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
       a->parentId = myid;
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
 
       /* above is generic */
 
-      ASTEmap[myid]->inWhile = true;
+      myself->inWhile = true;
 
       // distribute the repeatUntil's id to the enclosed activity
       assert(ASTEmap[b->id] != NULL);
       ASTEmap[b->id]->parentActivityId = myid;
-      ASTEmap[b->id]->controlFlow = ASTEmap[myid]->controlFlow;
+      ASTEmap[b->id]->controlFlow = myself->controlFlow;
     }
     a b
     {
       // collect enclosed source links
       assert(ASTEmap[b->id] != NULL);
-      ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[b->id]->enclosedSourceLinks);
+      myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[b->id]->enclosedSourceLinks);
     }
   ]
 ;
@@ -1307,24 +1339,25 @@ Sequence(a,b,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
       a->parentId = myid;
 
-      ASTEmap[myid]->parentScopeId = PPcurrentScope;
-      ASTEmap[myid]->checkAttributes();
+      myself->parentScopeId = PPcurrentScope;
+      myself->checkAttributes();
 
       /* above is generic */
 
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      ASTEmap[myid]->inWhile = ASTEmap[ASTEmap[myid]->parentActivityId]->inWhile;
+      assert(ASTEmap[myself->parentActivityId] != NULL);
+      myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
 
       // distribute the sequence's id to the enclosed activities
       foreach(innerActivity; activity_list b)
       {
         assert(ASTEmap[innerActivity->id] != NULL);
         ASTEmap[innerActivity->id]->parentActivityId = myid;
-        ASTEmap[innerActivity->id]->controlFlow = ASTEmap[myid]->controlFlow;
+        ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
       }
     }
     a b
@@ -1336,7 +1369,7 @@ Sequence(a,b,_id) ->
       {
         assert(ASTEmap[innerActivity->id] != NULL);
 
-        ASTEmap[myid]->enclosedSourceLinks = setUnion(ASTEmap[myid]->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
+        myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
 
         // trigger [SA00056]
         if (ASTEmap[innerActivity->id]->isStartActivity && activityCount++ > 1)
@@ -1355,8 +1388,8 @@ Pick(a,b,c,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
       ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
       a->parentId = myid;
 
@@ -1423,8 +1456,8 @@ ForEach(a,b,c,d,e,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
       ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
 
       a->parentId = myid;
 
@@ -1488,8 +1521,8 @@ Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      assert(ASTEmap[myid] != NULL);
       ASTE *myself = ASTEmap[myid];
+      assert(myself != NULL);
       a->parentId = myid;
 
       // my parent is the current scope
@@ -1568,8 +1601,6 @@ StandardElements(a,b,c) ->
       $0->suppressJF = (ASTEmap[$0->parentId]->attributes["suppressJoinFailure"] == "yes");
 
       set<string> targetLinks;
-      set<string> sourceLinks;
-
       foreach(targetLink; tTarget_list a)
       {
         assert(ASTEmap[targetLink->id] != NULL);
@@ -1579,11 +1610,13 @@ StandardElements(a,b,c) ->
         // trigger [SA00069]
         string linkName = ASTEmap[targetLink->id]->attributes["linkName"];
         if (targetLinks.find(linkName) != targetLinks.end())
-          SAerror(69, "<" + ASTEmap[$0->parentId]->activityTypeName() + "> must not use <link> `" + linkName + "'", ASTEmap[linkIdMap[linkName]]->attributes["referenceLine"]);
+          SAerror(69, "<" + ASTEmap[$0->parentId]->activityTypeName() + "> must not use <link> `" +
+                  linkName + "'", ASTEmap[linkIdMap[linkName]]->attributes["referenceLine"]);
         else
           targetLinks.insert(linkName);
       }
 
+      set<string> sourceLinks;
       foreach(sourceLink; tSource_list b)
       {
         assert(ASTEmap[sourceLink->id] != NULL);
@@ -1593,40 +1626,37 @@ StandardElements(a,b,c) ->
         // trigger [SA00068]
         string linkName = ASTEmap[sourceLink->id]->attributes["linkName"];
         if (sourceLinks.find(linkName) != sourceLinks.end())
-          SAerror(68, "<" + ASTEmap[$0->parentId]->activityTypeName() + "> must not use <link> `" + linkName + "'", ASTEmap[linkIdMap[linkName]]->attributes["referenceLine"]);
+          SAerror(68, "<" + ASTEmap[$0->parentId]->activityTypeName() + "> must not use <link> `" +
+                  linkName + "'", ASTEmap[linkIdMap[linkName]]->attributes["referenceLine"]);
         else
           sourceLinks.insert(linkName);
       }
     }
     a b c
-    {
-      /* here we can check the links */
-    }
   ]
 ;
 
 Target(a) ->
   [postprocessing:
     {
-      int myid = $0->id;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[$0->id];
+      assert(myself != NULL);
 
-      // find the id of the link used as target here
-      unsigned int linkId = linkIdMap[ASTEmap[myid]->attributes["linkName"]];
+      myself->checkAttributes();
+      myself->linkName = myself->checkLink();
 
-      // annotate AST and check information
-      ASTEmap[myid]->checkAttributes();
-      ASTEmap[myid]->linkName = ASTEmap[myid]->checkLink();
-
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      ASTEmap[ASTEmap[myid]->parentActivityId]->targetLinks.insert(linkId);
+      // find the id of the link used as target here and add that link to the
+      // parent activity
+      unsigned int linkId = linkIdMap[myself->attributes["linkName"]];
+      assert(ASTEmap[myself->parentActivityId] != NULL);
+      ASTEmap[myself->parentActivityId]->targetLinks.insert(linkId);
 
       // trigger [SA00066]
       assert(ASTEmap[linkId] != NULL);
       if (ASTEmap[linkId]->targetActivity != 0)
-        SAerror(66, ASTEmap[myid]->attributes["linkName"], ASTEmap[myid]->attributes["referenceLine"]);
+        SAerror(66, myself->attributes["linkName"], myself->attributes["referenceLine"]);
       else
-        ASTEmap[linkId]->targetActivity = ASTEmap[myid]->parentActivityId;
+        ASTEmap[linkId]->targetActivity = myself->parentActivityId;
     }
   ]
 ;
@@ -1634,27 +1664,25 @@ Target(a) ->
 Source(a) ->
   [postprocessing:
     {
-      int myid = $0->id;
-      assert(ASTEmap[myid] != NULL);
+      ASTE *myself = ASTEmap[$0->id];
+      assert(myself != NULL);
 
-      // find the id of the link used as source here
-      unsigned int linkId = linkIdMap[ASTEmap[myid]->attributes["linkName"]];
+      myself->checkAttributes();
+      myself->linkName = myself->checkLink();
 
-      // annotate AST and check information
-      ASTEmap[myid]->checkAttributes();
-      ASTEmap[myid]->linkName = ASTEmap[myid]->checkLink();
-
-      // add that link to the parent activity
-      assert(ASTEmap[ASTEmap[myid]->parentActivityId] != NULL);
-      ASTEmap[ASTEmap[myid]->parentActivityId]->enclosedSourceLinks.insert(linkId);
-      ASTEmap[ASTEmap[myid]->parentActivityId]->sourceLinks.insert(linkId);
+      // find the id of the link used as source here and add that link to the
+      // parent activity
+      assert(ASTEmap[myself->parentActivityId] != NULL);
+      unsigned int linkId = linkIdMap[myself->attributes["linkName"]];
+      ASTEmap[myself->parentActivityId]->enclosedSourceLinks.insert(linkId);
+      ASTEmap[myself->parentActivityId]->sourceLinks.insert(linkId);
 
       // trigger [SA00066]
       assert(ASTEmap[linkId] != NULL);
       if (ASTEmap[linkId]->sourceActivity != 0)
-        SAerror(66, ASTEmap[myid]->attributes["linkName"], ASTEmap[myid]->attributes["referenceLine"]);
+        SAerror(66, myself->attributes["linkName"], myself->attributes["referenceLine"]);
       else
-        ASTEmap[linkId]->sourceActivity = ASTEmap[myid]->parentActivityId;
+        ASTEmap[linkId]->sourceActivity = myself->parentActivityId;
     }
   ]
 ;

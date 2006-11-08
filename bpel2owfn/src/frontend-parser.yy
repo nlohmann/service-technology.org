@@ -37,7 +37,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2006/11/06 15:40:40 $
+ * \date    \$Date: 2006/11/08 07:38:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -46,7 +46,7 @@
  * \note    This file was created using GNU Bison reading file parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.270 $
+ * \version \$Revision: 1.271 $
  *
  * \ingroup frontend
  */
@@ -139,7 +139,6 @@ using namespace std;
 extern char *yytext;			// from flex
 extern int yylex();			// from flex
 extern int yylineno;			// from flex
-extern int yyerror(const char *);	// from Bison
 
 
 
@@ -155,10 +154,14 @@ tProcess TheProcess;
 /// a pointer to the current join condition
 impl_joinCondition* currentJoinCondition = standardJoinCondition();
 
-// Niels' stuff
-map<unsigned int, ASTE*> ASTEmap; ///< the map of all AST elements
-map<unsigned int, map<string, string> > temporaryAttributeMap; ///< a temporary mapping of attributs
-unsigned int ASTEid = 1; ///< identifier of the next AST element
+/// the map of all AST elements
+map<unsigned int, ASTE*> ASTEmap;
+
+/// a temporary mapping of attributs
+map<unsigned int, map<string, string> > temporaryAttributeMap;
+
+/// identifier of the next AST element
+unsigned int ASTEid = 1;
 
 %}
 

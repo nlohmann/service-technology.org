@@ -20,27 +20,16 @@
 
 %{
 /*!
- * \file bpel-unparse-petri.cc
+ * \file    ast-to-petrinet-full1.cc
  *
- * \brief Petri net unparser (implementation)
+ * \brief   Petri net unparser (implementation)
  *
- * This file defines and implements the conversion of each BPEL activity to its
- * associated Petri net pattern followed by neccessary merge operations.
+ * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $
  *
- * Patters:
- *   - <process>
- *   - stop patterns
- *   - fault handlers
- *   - event handlers
- *   - compensation handlers
+ * \since   2005-11-01
  *
- * \author
- *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
- *
- * \date
- *          - created 2005-11-01
- *          - last changed: \$Date: 2006/11/05 13:16:47 $
+ * \date    \$Date: 2006/11/08 07:38:24 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.209 $
+ * \version \$Revision: 1.210 $
  *
  */
 %}
@@ -314,10 +303,10 @@ This=Process(a,b,c,d,e,f,g,h,i,_id) ->
 
 
       // Embed the inner activity of the process.
-      TheNet->mergePlaces(TheNet->findPlace("1.internal.p19"), TheNet->findPlace(i, ".initial"));
-      TheNet->mergePlaces(TheNet->findPlace("1.internal.p20"), TheNet->findPlace(i, ".final"));
-      TheNet->mergePlaces(TheNet->findPlace("1.internal.p21"), TheNet->findPlace(i, ".stop"));
-      TheNet->mergePlaces(TheNet->findPlace("1.internal.p22"), TheNet->findPlace(i, ".stopped"));
+      TheNet->mergePlaces(TheNet->findPlace("1.internal.p19"), TheNet->findPlace(i->id, ".initial"));
+      TheNet->mergePlaces(TheNet->findPlace("1.internal.p20"), TheNet->findPlace(i->id, ".final"));
+      TheNet->mergePlaces(TheNet->findPlace("1.internal.p21"), TheNet->findPlace(i->id, ".stop"));
+      TheNet->mergePlaces(TheNet->findPlace("1.internal.p22"), TheNet->findPlace(i->id, ".stopped"));
 
       footer(This->id, true);
       trace(TRACE_INFORMATION, "Generating Petri net complete.\n");
@@ -727,10 +716,10 @@ This=userDefinedFaultHandler(a,b, _id) provided (ASTEmap[_id->value]->inProcess)
 	Transition *t2 = TheNet->newTransition(prefix + "t2." + faultToCatch);
 
 	// Embed innerActivity_1 to innerActivity_n-1.
-	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
-	TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t2);
-	TheNet->mergePlaces(TheNet->findPlace("1.internal.faultHandler.p11"), TheNet->findPlace(innerActivity, ".stop"));
-	TheNet->mergePlaces(TheNet->findPlace("1.internal.faultHandler.p12"), TheNet->findPlace(innerActivity, ".stopped"));
+	TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
+	TheNet->newArc(TheNet->findPlace(innerActivity->id, ".final"), t2);
+	TheNet->mergePlaces(TheNet->findPlace("1.internal.faultHandler.p11"), TheNet->findPlace(innerActivity->id, ".stop"));
+	TheNet->mergePlaces(TheNet->findPlace("1.internal.faultHandler.p12"), TheNet->findPlace(innerActivity->id, ".stopped"));
 
 	TheNet->newArc(p4, t1);
 	TheNet->newArc(p7, t1, READ);
@@ -745,10 +734,10 @@ This=userDefinedFaultHandler(a,b, _id) provided (ASTEmap[_id->value]->inProcess)
 	  Transition *t4 = TheNet->newTransition(prefix + "t4.catchAll");
 
 	  // Embed innerActivity_n.
-	  TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
-	  TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t4);
-	  TheNet->mergePlaces(TheNet->findPlace("1.internal.faultHandler.p11"), TheNet->findPlace(innerActivity, ".stop"));
-	  TheNet->mergePlaces(TheNet->findPlace("1.internal.faultHandler.p12"), TheNet->findPlace(innerActivity, ".stopped"));
+	  TheNet->newArc(t3, TheNet->findPlace(innerActivity->id, ".initial"));
+	  TheNet->newArc(TheNet->findPlace(innerActivity->id, ".final"), t4);
+	  TheNet->mergePlaces(TheNet->findPlace("1.internal.faultHandler.p11"), TheNet->findPlace(innerActivity->id, ".stop"));
+	  TheNet->mergePlaces(TheNet->findPlace("1.internal.faultHandler.p12"), TheNet->findPlace(innerActivity->id, ".stopped"));
 
 	  TheNet->newArc(p4, t3);
 	  TheNet->newArc(p7, t3, READ);
@@ -1053,12 +1042,12 @@ This=userDefinedFaultHandler(a,b,_id) provided (!ASTEmap[_id->value]->inProcess)
 	string faultToCatch = ASTEmap[catchBranch->id]->attributes["faultName"];
 
 	Transition *t1 = TheNet->newTransition(prefix + "t1.internal." + faultToCatch);
-	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
+	TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
 	TheNet->newArc(p4, t1);
 	TheNet->newArc(p9, t1, READ);
 
 	Transition *t2 = TheNet->newTransition(prefix + "t2." + faultToCatch);
-	TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t2);
+	TheNet->newArc(TheNet->findPlace(innerActivity->id, ".final"), t2);
 	TheNet->newArc(t2, p3);
 	TheNet->newArc(t2, p7);
 	TheNet->newArc(t2, p8);
@@ -1066,20 +1055,20 @@ This=userDefinedFaultHandler(a,b,_id) provided (!ASTEmap[_id->value]->inProcess)
 
 
 	// Embed innerActivity_1 to innerActivity_1-n.
-	TheNet->mergePlaces(TheNet->findPlace(prefix + "p13"), TheNet->findPlace(innerActivity, ".stop"));
-	TheNet->mergePlaces(TheNet->findPlace(prefix + "p14"), TheNet->findPlace(innerActivity, ".stopped"));
+	TheNet->mergePlaces(TheNet->findPlace(prefix + "p13"), TheNet->findPlace(innerActivity->id, ".stop"));
+	TheNet->mergePlaces(TheNet->findPlace(prefix + "p14"), TheNet->findPlace(innerActivity->id, ".stopped"));
       }
 
       with(b) {
 	CatchAll(innerActivity, _id):
 	{
 	  Transition *t3 = TheNet->newTransition(prefix + "t3.catchAll");
-	  TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
+	  TheNet->newArc(t3, TheNet->findPlace(innerActivity->id, ".initial"));
 	  TheNet->newArc(p4, t3);
 	  TheNet->newArc(p9, t3, READ);
 
 	  Transition *t4 = TheNet->newTransition(prefix + "t4.catchAll");
-	  TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t4);
+	  TheNet->newArc(TheNet->findPlace(innerActivity->id, ".final"), t4);
 	  TheNet->newArc(t4, p3);
 	  TheNet->newArc(t4, p7);
 	  TheNet->newArc(t4, p8);
@@ -1087,8 +1076,8 @@ This=userDefinedFaultHandler(a,b,_id) provided (!ASTEmap[_id->value]->inProcess)
 
 
 	  // Embed innerActivity_n.
-	  TheNet->mergePlaces(TheNet->findPlace(prefix + "p13"), TheNet->findPlace(innerActivity, ".stop"));
-	  TheNet->mergePlaces(TheNet->findPlace(prefix + "p14"), TheNet->findPlace(innerActivity, ".stopped"));
+	  TheNet->mergePlaces(TheNet->findPlace(prefix + "p13"), TheNet->findPlace(innerActivity->id, ".stop"));
+	  TheNet->mergePlaces(TheNet->findPlace(prefix + "p14"), TheNet->findPlace(innerActivity->id, ".stopped"));
 	}
 	default: { /* this should never happen */ }
       }
@@ -1380,10 +1369,10 @@ This=userDefinedEventHandler(a,b,_id) ->
 	TheNet->newArc(onMessage_p12, t16);
 
 	// embed the innerActivity
-	TheNet->mergePlaces(onMessage_p3,  TheNet->findPlace(innerActivity, ".initial"));
-	TheNet->mergePlaces(onMessage_p11, TheNet->findPlace(innerActivity, ".stop"));
-	TheNet->mergePlaces(onMessage_p12, TheNet->findPlace(innerActivity, ".stopped"));
-	TheNet->mergePlaces(onMessage_p4,  TheNet->findPlace(innerActivity, ".final"));
+	TheNet->mergePlaces(onMessage_p3,  TheNet->findPlace(innerActivity->id, ".initial"));
+	TheNet->mergePlaces(onMessage_p11, TheNet->findPlace(innerActivity->id, ".stop"));
+	TheNet->mergePlaces(onMessage_p12, TheNet->findPlace(innerActivity->id, ".stopped"));
+	TheNet->mergePlaces(onMessage_p4,  TheNet->findPlace(innerActivity->id, ".final"));
       }
 
 
@@ -1445,10 +1434,10 @@ This=userDefinedEventHandler(a,b,_id) ->
 
 
 	// Embed the innerActivity.
-	TheNet->mergePlaces(onAlarm_p1,  TheNet->findPlace(innerActivity, ".initial"));
-	TheNet->mergePlaces(onAlarm_p9,  TheNet->findPlace(innerActivity, ".stop"));
-	TheNet->mergePlaces(onAlarm_p10, TheNet->findPlace(innerActivity, ".stopped"));
-	TheNet->mergePlaces(onAlarm_p2,  TheNet->findPlace(innerActivity, ".final"));
+	TheNet->mergePlaces(onAlarm_p1,  TheNet->findPlace(innerActivity->id, ".initial"));
+	TheNet->mergePlaces(onAlarm_p9,  TheNet->findPlace(innerActivity->id, ".stop"));
+	TheNet->mergePlaces(onAlarm_p10, TheNet->findPlace(innerActivity->id, ".stopped"));
+	TheNet->mergePlaces(onAlarm_p2,  TheNet->findPlace(innerActivity->id, ".final"));
 
 	onAlarmCount++;
       }
@@ -1749,10 +1738,10 @@ This=userDefinedCompensationHandler(innerActivity,_id) provided (!ASTEmap[_id->v
     innerActivity
     {
       // Embed inner activity.
-      TheNet->newArc(t4, TheNet->findPlace(innerActivity, ".initial"));
-      TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t5);
-      TheNet->mergePlaces(p24, TheNet->findPlace(innerActivity, ".stop"));
-      TheNet->mergePlaces(p13, TheNet->findPlace(innerActivity, ".stopped"));
+      TheNet->newArc(t4, TheNet->findPlace(innerActivity->id, ".initial"));
+      TheNet->newArc(TheNet->findPlace(innerActivity->id, ".final"), t5);
+      TheNet->mergePlaces(p24, TheNet->findPlace(innerActivity->id, ".stop"));
+      TheNet->mergePlaces(p13, TheNet->findPlace(innerActivity->id, ".stopped"));
 
       trace(TRACE_DEBUG, "[PNU]" + inString() + "</userDefinedCompensationHandler scope=\"" + currentScope + "\">\n");
     }

@@ -34,7 +34,7 @@
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2006/11/06 15:40:40 $
+ * \date    \$Date: 2006/11/08 07:38:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  * \note    This file was created using Flex reading file lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
  *
  * \todo    add rules to ignored everything non-BPEL
  * \todo    add a more elegant way to handle XSD-namespaces
@@ -202,9 +202,9 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 <INITIAL>{bpwsns}?"correlations"	{ return K_CORRELATIONS; }
 <INITIAL>{bpwsns}?"correlationSet"	{ BEGIN(ATTRIBUTE); return K_CORRELATIONSET; }
 <INITIAL>{bpwsns}?"correlationSets"	{ return K_CORRELATIONSETS; }
-<INITIAL>{bpwsns}?"empty"		{ BEGIN(ATTRIBUTE); return K_EMPTY; }
 <INITIAL>{bpwsns}?"else"		{ BEGIN(ATTRIBUTE); return K_ELSE; }
 <INITIAL>{bpwsns}?"elseif"		{ BEGIN(ATTRIBUTE); return K_ELSEIF; }
+<INITIAL>{bpwsns}?"empty"		{ BEGIN(ATTRIBUTE); return K_EMPTY; }
 <INITIAL>{bpwsns}?"eventHandlers"	{ return K_EVENTHANDLERS; }
 <INITIAL>{bpwsns}?"exit"		{ BEGIN(ATTRIBUTE); return K_EXIT; }
 <INITIAL>{bpwsns}?"extension"		{ BEGIN(ATTRIBUTE); return K_EXTENSION; }

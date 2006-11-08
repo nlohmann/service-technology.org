@@ -89,7 +89,6 @@ set<string> variableNames;		///< a set holding all variable names (with prefix)
 set<string> partnerLinkNames;		///< a set holding all partnerLink names (with prefix)
 set<string> linkNames;			///< a set holding all link names (with prefix)
 
-set<string> catches;			///< a set to detect multiple catches
 set<unsigned int> startActivities;	///< a set of the ids of the start activities
 
 map<string, unsigned int> linkIdMap;	///< maps link names to identifiers

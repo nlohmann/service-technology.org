@@ -18,31 +18,41 @@
  * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
 \****************************************************************************/
 
+%{
 /*!
- * \file bpel-rewrite.k
+ * \file    ast-rewrite.cc
  *
- * \brief Rewrite rules for BPEL.
+ * \brief   AST rewrite rules (implementation)
  *
- * \author  
- *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
- *          
- * \date
- *          - created: 2006/10/11
- *          - last changed: \$Date: 2006/11/05 14:33:11 $
+ * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $
+ * 
+ * \since   2006/10/11
+ *
+ * \date    \$Date: 2006/11/08 07:38:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.15 $
- *
+ * \version \$Revision: 1.16 $
  */
+%}
 
 
 
 
+
+/******************************************************************************
+ * IMPLICIT REWRITE RULES
+ *
+ * These rewriting rules are used to "unfold" simplified phylums (e.g.
+ * NoStandardElements() to an explicit StandardElements() element with empty
+ * source and target list. Furthermore, the rules implement the implicit
+ * transformations described in the WS-BPEL specification (e.g. standard
+ * FTC-handlers or <invoke> activities with FC-handlers).
+ *****************************************************************************/
 
 /*
  * A shortcut in the parser is unfolded to empty list of target and source
@@ -237,24 +247,22 @@ activityScope(
   )
 >;
 
+
+
+
+
+/******************************************************************************
+ * RENAMING REWRITE RULES
+ *
+ * These rules rewrite some AST phyla to simplify the later Petri net
+ * generation. In particular, the two <wait> activities (for vs. until) and
+ * the two <invoke> activities (synchronous vs. asynchronous) are
+ * distinguished.
+ *****************************************************************************/
+
 /*
-userDefinedFaultHandler(
-  NiltCatch_list(),
-  NoCatchAll(),
-  my_integer
-)
-->
-<implicit:
-  implicitFaultHandler(
-    my_integer
-  )
->;
-*/
-
-
-
-
-
+ * Rewrite-rules to distinguish <wait> activities
+ */
 Wait(a,_id) provided (ASTEmap[_id->value]->attributes["for"] != "")
 ->
 <newNames:
@@ -267,6 +275,10 @@ Wait(a,_id) provided (ASTEmap[_id->value]->attributes["until"] != "")
   WaitUntil(a,_id)
 >;
 
+
+/*
+ * Rewrite-rules to distinguish <invoke> activities
+ */
 Invoke(a,b,c,d,_id) provided (ASTEmap[_id->value]->attributes["outputVariable"] != "")
 ->
 <newNames:

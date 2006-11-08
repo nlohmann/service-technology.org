@@ -20,17 +20,16 @@
 
 %{
 /*!
- * \file bpel-unparse-petri-new.cc
+ * \file    ast-to-petrinet-new1.cc
  *
- * \brief Petri net unparser (implementation)
+ * \brief   Petri net unparser (implementation)
  *
- * \author
- *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $
  *
- * \date
- *          - created 2006-10-29
- *          - last changed: \$Date: 2006/11/07 15:04:57 $
+ * \since   2006-10-29
+ *
+ * \date    \$Date: 2006/11/08 07:38:24 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  *
  */
 %}
@@ -169,10 +168,10 @@ This=userDefinedFaultHandler(a,b, _id) ->
       {
         Transition *t1 = TheNet->newTransition(prefix + "catch" + toString(catchBranches++));
         TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
-	TheNet->mergePlaces(TheNet->findPlace(prefix + "final"), TheNet->findPlace(innerActivity, ".final"));
-	TheNet->mergePlaces(TheNet->findPlace(prefix + "stop"), TheNet->findPlace(innerActivity, ".stop"));
-	TheNet->mergePlaces(TheNet->findPlace(prefix + "stopped"), TheNet->findPlace(innerActivity, ".stopped"));
+	TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
+	TheNet->mergePlaces(TheNet->findPlace(prefix + "final"), TheNet->findPlace(innerActivity->id, ".final"));
+	TheNet->mergePlaces(TheNet->findPlace(prefix + "stop"), TheNet->findPlace(innerActivity->id, ".stop"));
+	TheNet->mergePlaces(TheNet->findPlace(prefix + "stopped"), TheNet->findPlace(innerActivity->id, ".stopped"));
       }
 
       with(b) {
@@ -180,11 +179,11 @@ This=userDefinedFaultHandler(a,b, _id) ->
 	{
 	  Transition *t2 = TheNet->newTransition(prefix + "catchAll");
 	  TheNet->newArc(p1, t2);
-	  TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
+	  TheNet->newArc(t2, TheNet->findPlace(innerActivity->id, ".initial"));
 
-	  TheNet->mergePlaces(TheNet->findPlace(prefix + "final"), TheNet->findPlace(innerActivity, ".final"));
-	  TheNet->mergePlaces(TheNet->findPlace(prefix + "stop"), TheNet->findPlace(innerActivity, ".stop"));
-	  TheNet->mergePlaces(TheNet->findPlace(prefix + "stopped"), TheNet->findPlace(innerActivity, ".stopped"));
+	  TheNet->mergePlaces(TheNet->findPlace(prefix + "final"), TheNet->findPlace(innerActivity->id, ".final"));
+	  TheNet->mergePlaces(TheNet->findPlace(prefix + "stop"), TheNet->findPlace(innerActivity->id, ".stop"));
+	  TheNet->mergePlaces(TheNet->findPlace(prefix + "stopped"), TheNet->findPlace(innerActivity->id, ".stopped"));
 	}
         NoCatchAll():
         {

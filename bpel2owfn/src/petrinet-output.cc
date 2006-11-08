@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/11/01 20:57:52 $
+ *          - last changed: \$Date: 2006/11/08 07:38:25 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.40 $
+ * \version \$Revision: 1.41 $
  */
 
 
@@ -66,17 +66,6 @@
 #include "bpel2owfn.h"
 #include "options.h"
 #include "ast-details.h"
-
-
-
-
-
-/******************************************************************************
- * Extern variables
- *****************************************************************************/
-
-extern map<unsigned int, ASTE*> ASTEmap;
-extern string invocation;
 
 
 
@@ -662,6 +651,9 @@ void PetriNet::lolaOut()
  */
 void PetriNet::owfnOut()
 {
+  extern map<unsigned int, ASTE*> ASTEmap;
+  extern string invocation;
+
   trace(TRACE_DEBUG, "[PN]\tCreating oWFN-output.\n");
 
   (*output) << "{" << endl;

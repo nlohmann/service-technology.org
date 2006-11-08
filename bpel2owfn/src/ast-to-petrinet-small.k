@@ -20,20 +20,16 @@
 
 %{
 /*!
- * \file bpel-unparse-petri-small.cc
+ * \file    ast-to-petrinet-small.cc
  *
- * \brief Petri net unparser (implementation)
+ * \brief   Petri net unparser (implementation)
  *
- * This file defines and implements the conversion of each BPEL activity to its
- * associated Petri net pattern followed by neccessary merge operations.
+ * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $
  *
- * \author
- *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ * \since   2005-11-01
  *
- * \date
- *          - created 2005-11-01
- *          - last changed: \$Date: 2006/11/05 14:33:11 $
+ * \date    \$Date: 2006/11/08 07:38:24 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.68 $
+ * \version \$Revision: 1.69 $
  *
  */
 %}
@@ -128,13 +124,13 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
       // Embed the inner activity of the process.
       if (ASTEmap[_id->value]->hasEH)
       {
-	TheNet->mergePlaces(TheNet->findPlace("1.internal.begin"), TheNet->findPlace(i, ".initial"));
-	TheNet->mergePlaces(TheNet->findPlace("1.internal.end"), TheNet->findPlace(i, ".final"));
+	TheNet->mergePlaces(TheNet->findPlace("1.internal.begin"), TheNet->findPlace(i->id, ".initial"));
+	TheNet->mergePlaces(TheNet->findPlace("1.internal.end"), TheNet->findPlace(i->id, ".final"));
       }
       else
       {
-	TheNet->mergePlaces(TheNet->findPlace("1.internal.initial"), TheNet->findPlace(i, ".initial"));
-	TheNet->mergePlaces(TheNet->findPlace("1.internal.final"), TheNet->findPlace(i, ".final"));
+	TheNet->mergePlaces(TheNet->findPlace("1.internal.initial"), TheNet->findPlace(i->id, ".initial"));
+	TheNet->mergePlaces(TheNet->findPlace("1.internal.final"), TheNet->findPlace(i->id, ".final"));
       }
 
       footer(_id, true);
@@ -614,8 +610,8 @@ Flow(a,b,c,_id) ->
     {
       foreach (innerActivity; activity_list c)
       {
-	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
-	TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t2);
+	TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
+	TheNet->newArc(TheNet->findPlace(innerActivity->id, ".final"), t2);
       }
       footer(_id, true);
     }
@@ -649,20 +645,20 @@ Switch(a,b,otherwiseBranch=Otherwise(c,d),_id) ->
       {
 	string caseNumber = toString(currentCase++);
 	Transition* t1 = TheNet->newTransition(prefix + "case" + caseNumber);
-	TheNet->newArc(TheNet->findPlace(_id, ".internal.initial"), t1); // added ".internal" here
+	TheNet->newArc(TheNet->findPlace(_id->value, ".internal.initial"), t1); // added ".internal" here
 
 	// Embed the inner activity.
-	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
+	TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
 	TheNet->mergePlaces(_id->value, ".internal.final", _id2->value, ".final");
       }
 
 
       // the <otherwise> branch
       Transition *t1 = TheNet->newTransition(prefix + "caseo");
-      TheNet->newArc(TheNet->findPlace(_id, ".internal.initial"), t1); // added ".internal" here
+      TheNet->newArc(TheNet->findPlace(_id->value, ".internal.initial"), t1); // added ".internal" here
 
       // embed inner activity
-      TheNet->newArc(t1, TheNet->findPlace(c, ".initial"));
+      TheNet->newArc(t1, TheNet->findPlace(c->id, ".initial"));
       TheNet->mergePlaces(_id->value, ".internal.final", d->value, ".final");
 
 
@@ -713,28 +709,28 @@ If(a,b,c,_id) ->
       {
 	string caseNumber = toString(currentCase++);
 	Transition* t1 = TheNet->newTransition(prefix + "case" + caseNumber);
-	TheNet->newArc(TheNet->findPlace(_id, ".internal.initial"), t1); // added ".internal" here
+	TheNet->newArc(TheNet->findPlace(_id->value, ".internal.initial"), t1); // added ".internal" here
 
 	// Embed the inner activity.
-	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
+	TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
 	TheNet->mergePlaces(_id->value, ".internal.final", _id2->value, ".final");
       }
 
       // The <else> branch.
       Transition *t1 = TheNet->newTransition(prefix + "caseo");
-      TheNet->newArc(TheNet->findPlace(_id, ".internal.initial"), t1); // added ".internal" here
+      TheNet->newArc(TheNet->findPlace(_id->value, ".internal.initial"), t1); // added ".internal" here
 
       with (c)
       {
         c=Else(innerActivity,_id2):
         {
           // embed inner activity
-          TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
+          TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
           TheNet->mergePlaces(_id->value, ".internal.final", _id2->value, ".final");
         }
         c=NoElse(_id2):
         {
-          TheNet->newArc(t1, TheNet->findPlace(_id, ".internal.final"));
+          TheNet->newArc(t1, TheNet->findPlace(_id->value, ".internal.final"));
         }
         default: { /* do nothing */ }
       }
@@ -924,7 +920,7 @@ This=Pick(a,b,c,d) ->
 	Transition *t1 = TheNet->newTransition(prefix + "pickM" + message);
 	TheNet->newArc(TheNet->findPlace("in." + ASTEmap[ThisBranch->id]->channelName), t1);
 	TheNet->newArc(TheNet->findPlace(This->id, ".internal.initial"), t1);
-	TheNet->newArc(t1, TheNet->findPlace(innerActivity, ".initial"));
+	TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
 	t1->type = IN;
 
         if (ASTEmap[ThisBranch->id]->inWhile)

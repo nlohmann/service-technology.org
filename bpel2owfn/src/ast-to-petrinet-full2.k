@@ -20,20 +20,16 @@
 
 %{
 /*!
- * \file bpel-unparse-petri.cc
+ * \file    ast-to-petrinet-full2.cc
  *
- * \brief Petri net unparser (implementation)
+ * \brief   Petri net unparser (implementation)
  *
- * This file defines and implements the conversion of each BPEL activity to its
- * associated Petri net pattern followed by neccessary merge operations.
+ * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $
  *
- * \author
- *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ * \since   2005-11-01
  *
- * \date
- *          - created 2005-11-01
- *          - last changed: \$Date: 2006/11/05 14:33:11 $
+ * \date    \$Date: 2006/11/08 07:38:24 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.58 $
+ * \version \$Revision: 1.59 $
  */
 %}
 
@@ -1022,10 +1018,10 @@ This=Flow(a,b,c,_id) ->
 //	{
 //	  TheNet->newArc(t1, TheNet->findPlace(newPrefix + ".negLink"));
 //	}
-	TheNet->newArc(t2, TheNet->findPlace(innerActivity, ".initial"));
-	TheNet->newArc(t5, TheNet->findPlace(innerActivity, ".stop"));
-	TheNet->newArc(TheNet->findPlace(innerActivity, ".stopped"), t6);
-	TheNet->newArc(TheNet->findPlace(innerActivity, ".final"), t3);
+	TheNet->newArc(t2, TheNet->findPlace(innerActivity->id, ".initial"));
+	TheNet->newArc(t5, TheNet->findPlace(innerActivity->id, ".stop"));
+	TheNet->newArc(TheNet->findPlace(innerActivity->id, ".stopped"), t6);
+	TheNet->newArc(TheNet->findPlace(innerActivity->id, ".final"), t3);
       }
       footer(This->id, true);
     }
@@ -1462,7 +1458,7 @@ This=Pick(a,b,c,_id) ->
 	TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[ThisBranch->id]->variableName), t3);
   	TheNet->newArc(t3, TheNet->findPlace("variable." + ASTEmap[ThisBranch->id]->variableName));
 	TheNet->newArc(p3, t3);
-	TheNet->newArc(t3, TheNet->findPlace(innerActivity, ".initial"));
+	TheNet->newArc(t3, TheNet->findPlace(innerActivity->id, ".initial"));
 
         if (ASTEmap[ThisBranch->id]->inWhile) // was: (parameters[P_CYCLICWHILE] && ThisBranch->inWhile)
           TheNet->findPlace("in." + ASTEmap[ThisBranch->id]->channelName)->inWhile = true;
@@ -1845,10 +1841,10 @@ This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
 
 
       // Embed the inner activity of the scope.
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "p21"), TheNet->findPlace(i, ".initial"));
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "p22"), TheNet->findPlace(i, ".final"));
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "p23"), TheNet->findPlace(i, ".stop"));
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "p24"), TheNet->findPlace(i, ".stopped"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "p21"), TheNet->findPlace(i->id, ".initial"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "p22"), TheNet->findPlace(i->id, ".final"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "p23"), TheNet->findPlace(i->id, ".stop"));
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "p24"), TheNet->findPlace(i->id, ".stopped"));
 
 
       // Merge (!)Terminated places

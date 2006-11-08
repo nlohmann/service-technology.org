@@ -20,20 +20,16 @@
 
 %{
 /*!
- * \file bpel-abstract.cc
+ * \file    ast-grammar.cc
  *
- * \brief Abstract grammar of BPEL (implementation)
+ * \brief   Abstract grammar of BPEL (implementation)
  *
- * This file defines and implements the abstract grammar of BPEL and the phyla
- * of the abstract syntax tree (AST).
+ * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $ 
  * 
- * \author  
- *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $ 
- *          
- * \date
- *          - created: 2005-10-03
- *          - last changed: \$Date: 2006/11/06 15:40:40 $
+ * \since   2005-10-03
+ *
+ * \date    \$Date: 2006/11/08 07:38:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.148 $
+ * \version \$Revision: 1.149 $
  */
 %}
 

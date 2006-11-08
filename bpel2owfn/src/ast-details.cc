@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/07 13:24:55 $
+ * \date    \$Date: 2006/11/08 07:38:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.59 $
+ * \version \$Revision: 1.60 $
  */
 
 
@@ -336,10 +336,11 @@ void ASTE::checkAttributes()
 	  + "|" + attributes["faultMessageType"];
 
 	// trigger [SA00093]
-	if (catches.find(catchString) != catches.end())
+	assert(ASTEmap[parentActivityId] != NULL);
+	if (ASTEmap[parentActivityId]->catches.find(catchString) != ASTEmap[parentActivityId]->catches.end())
 	  SAerror(93, "", attributes["referenceLine"]);
-
-	catches.insert(catchString);
+	else
+	  ASTEmap[parentActivityId]->catches.insert(catchString);
 
 	break;
       }
@@ -1041,60 +1042,89 @@ list<unsigned int> ASTE::ancestorScopes()
  * construction.
  *
  * \returns name of the activity type
- *
- * \todo complete the list
  */
 string ASTE::activityTypeName()
 {
   switch (type)
   {
     case(K_ASSIGN):		return "assign";
+    case(K_BRANCHES):		return "branches";
     case(K_CASE):		return "case";
     case(K_CATCH):		return "catch";
     case(K_CATCHALL):		return "catchAll";
     case(K_COMPENSATE):		return "compensate";
     case(K_COMPENSATESCOPE):	return "compensateScope";
     case(K_COMPENSATIONHANDLER):return "compensationHandler";
+    case(K_COMPLETIONCONDITION):return "completionCondition";
+    case(K_COPY):		return "copy";
+    case(K_CONDITION):		return "condition";
     case(K_CORRELATION):	return "correlation";
+    case(K_CORRELATIONS):	return "correlations";
     case(K_CORRELATIONSET):	return "correlationSet";
+    case(K_CORRELATIONSETS):	return "correlationSets";
     case(K_ELSE):		return "else";
     case(K_ELSEIF):		return "elseIf";
     case(K_EMPTY):		return "empty";
-    case(K_EXIT):		return "exit";
     case(K_EVENTHANDLERS):	return "eventHandlers";
+    case(K_EXIT):		return "exit";
+    case(K_EXTENSION):		return "extension";
+    case(K_EXTENSIONACTIVITY):	return "extensionActivity";
+    case(K_EXTENSIONASSIGNOPERATION): return "extensionAssignOperation";
+    case(K_EXTENSIONS):		return "extensions";
     case(K_FAULTHANDLERS):	return "faultHandlers";
-    case(K_FOREACH):		return "forEach";
-    case(K_FROMPART):		return "fromPart";
-    case(K_FROM):		return "from";
+    case(K_FINALCOUNTERVALUE):	return "finalCounterValue";
     case(K_FLOW):		return "flow";
+    case(K_FOR):		return "for";
+    case(K_FOREACH):		return "forEach";
+    case(K_FROM):		return "from";
+    case(K_FROMPART):		return "fromPart";
+    case(K_FROMPARTS):		return "fromParts";
     case(K_IF):			return "if";
+    case(K_IMPORT):		return "import";
     case(K_INVOKE):		return "invoke";
     case(K_LINK):		return "link";
+    case(K_LINKS):		return "links";
+    case(K_LITERAL):		return "literal";
+    case(K_MESSAGEEXCHANGE):	return "messageExchange";
+    case(K_MESSAGEEXCHANGES):	return "messageExchanges";
     case(K_ONALARM):		return "onAlarm";
+    case(K_ONEVENT):		return "onEvent";
     case(K_ONMESSAGE):		return "onMessage";
     case(K_OTHERWISE):		return "otherwise";
-    case(K_PICK):		return "pick";
+    case(K_PARTNER):		return "partner";
     case(K_PARTNERLINK):	return "partnerLink";
+    case(K_PARTNERLINKS):	return "partnerLinks";
+    case(K_PARTNERS):		return "partners";
+    case(K_PICK):		return "pick";
     case(K_PROCESS):		return "process";
+    case(K_QUERY):		return "query";
     case(K_RECEIVE):		return "receive";
-    case(K_REPEATUNTIL):	return "repeatUntil";
     case(K_REPLY):		return "reply";
+    case(K_REPEATEVERY):	return "repeatEvery";
+    case(K_REPEATUNTIL):	return "repeatUntil";
     case(K_RETHROW):		return "rethrow";
     case(K_SCOPE):		return "scope";
-    case(K_SOURCE):		return "source";
     case(K_SEQUENCE):		return "sequence";
+    case(K_SOURCE):		return "source";
+    case(K_SOURCES):		return "sources";
+    case(K_STARTCOUNTERVALUE):	return "startCounterValue";
     case(K_SWITCH):		return "switch";
+    case(K_TARGET):		return "target";
+    case(K_TARGETS):		return "targets";
     case(K_TERMINATE):		return "terminate";
     case(K_TERMINATIONHANDLER):	return "terminationHandler";
-    case(K_TARGET):		return "target";
     case(K_THROW):		return "throw";
     case(K_TO):			return "to";
     case(K_TOPART):		return "toPart";
+    case(K_TOPARTS):		return "toParts";
+    case(K_TRANSITIONCONDITION):return "transitionCondition";
+    case(K_UNTIL):		return "until";
     case(K_VALIDATE):		return "validate";
     case(K_VARIABLE):		return "variable";
+    case(K_VARIABLES):		return "variables";
     case(K_WAIT):		return "wait";
     case(K_WHILE):		return "while";
 
-    default:			return "unknown";
+    default:			return "unknown"; /* should not happen */
   }
 }

@@ -29,14 +29,14 @@
  * 
  * \since   2006/10/11
  *
- * \date    \$Date: 2006/11/08 07:38:24 $
+ * \date    \$Date: 2006/11/08 12:48:25 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  */
 %}
 
@@ -103,6 +103,62 @@ standardTerminationHandler(_id)
     _id
   )
 >;
+
+
+/*
+ * Default fault handler (cf. Sect. 12.5.1 in WS-BPEL 2.0)
+ */
+implicitFaultHandler(_id) provided (parameters[P_NEW]) ->
+<implicit:
+  userDefinedFaultHandler(
+    NiltCatch_list(),
+    CatchAll(
+      activitySequence(
+        Sequence(
+          NoStandardElements(),
+          Consactivity_list(
+            activityCompensate(
+              Compensate(
+                NoStandardElements(),
+                mkinteger(0)
+              )
+            ),
+            Consactivity_list(
+              activityRethrow(
+                Rethrow(
+                  NoStandardElements(),
+                  mkinteger(0)
+                )
+              ),
+              Nilactivity_list()
+            )
+          ),
+          mkinteger(0)
+        )
+      ),
+      mkinteger(0)
+    ),
+    _id
+  )
+>;
+
+
+/*
+ * Default compensation handler (cf. Sect. 12.5.1 in WS-BPEL 2.0)
+ */
+
+implicitCompensationHandler(_id) provided (parameters[P_NEW]) ->
+<implicit:
+  userDefinedCompensationHandler(
+    activityCompensate(
+      Compensate(
+        NoStandardElements(),
+        mkinteger(0)
+      )
+    ),
+    _id
+  )
+>;      
 
 
 /*

@@ -139,6 +139,7 @@ void printer(const char *s, uview v)
 %{ KC_REWRITE
 #include <map>
 #include "ast-details.h"
+#include "options.h"
 
 using namespace std;
 

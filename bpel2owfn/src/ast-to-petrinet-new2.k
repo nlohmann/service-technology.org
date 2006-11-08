@@ -29,7 +29,7 @@
  *
  * \since   2006-10-30
  *
- * \date    \$Date: 2006/11/08 07:38:24 $
+ * \date    \$Date: 2006/11/08 14:48:19 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  */
 %}
 
@@ -613,6 +613,10 @@ This=Throw(a,_id) ->
 
 /******************************************************************************
   RETHROW                                                        (WS-BPEL 2.0)
+
+  When the <rethrow> activity is used in the (perhaps implicit) fault
+  handlers of the <process>, the thrown fault cannot be caught. Thus, a
+  transition "abort" will just end the fault handlers.
 ******************************************************************************/
 
 This=Rethrow(a,_id) ->
@@ -623,15 +627,25 @@ This=Rethrow(a,_id) ->
       assert(This->id == _id->value);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "faulted");
-      Place *p3 = TheNet->newPlace(prefix + "stop");
-      Place *p4 = TheNet->newPlace(prefix + "stopped");
 
+      assert(ASTEmap[_id->value] != NULL);
+      if (ASTEmap[_id->value]->parentScopeId != 1)
+      {
+        Place *p2 = TheNet->newPlace(prefix + "faulted");
+        Place *p3 = TheNet->newPlace(prefix + "stop");
+        Place *p4 = TheNet->newPlace(prefix + "stopped");
 
-      // Transitions for the negative control flow.
-      Transition *t1 = throwFault(p1, p2, "initial", prefix, _id, 4);
-      Transition *t2 = stop(p1, "initial", prefix);
-      Transition *t3 = stop(p2, "faulted", prefix);
+        // Transitions for the negative control flow.
+        Transition *t1 = throwFault(p1, p2, "initial", prefix, _id, 4);
+        Transition *t2 = stop(p1, "initial", prefix);
+        Transition *t3 = stop(p2, "faulted", prefix);
+      }
+      else
+      {
+        Transition *t1 = TheNet->newTransition(prefix + "abort");
+        TheNet->newArc(p1, t1);
+        TheNet->newArc(t1, TheNet->findPlace("1.internal.faultHandler.final"));
+      }
     }
     a // standardElements
     {
@@ -646,6 +660,11 @@ This=Rethrow(a,_id) ->
 
 /******************************************************************************
   COMPENSATE
+
+  The <compensate> activity concurrently calls all compensation handlers of
+  the enclosed scopes. If there are no enclosed scopes, the Petri net pattern
+  can be simplified and consists of a single place both labelled with
+  "initial" and "final".
 ******************************************************************************/
 
 This=Compensate(a,_id) ->
@@ -657,32 +676,41 @@ This=Compensate(a,_id) ->
       assert(ASTEmap[_id->value] != NULL);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "running");
       Place *p3 = TheNet->newPlace(prefix + "final");
-      Place *p4 = TheNet->newPlace(prefix + "stop");
-      Place *p7 = TheNet->newPlace(prefix + "stopped");
 
-      Transition *t1 = TheNet->newTransition(prefix + "compensate");
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(t1, p2);
-
-      Transition *t2 = TheNet->newTransition(prefix + "compensated");
-      TheNet->newArc(p2, t2);
-      TheNet->newArc(t2, p3);
-
-      // connect the transitions with all enclosed scope's CHs
       assert(ASTEmap[ASTEmap[_id->value]->parentScopeId] != NULL);
-      for (set<unsigned int>::iterator it = ASTEmap[ASTEmap[_id->value]->parentScopeId]->enclosedScopes.begin();
-           it != ASTEmap[ASTEmap[_id->value]->parentScopeId]->enclosedScopes.end(); it++)
+      if (!ASTEmap[ASTEmap[_id->value]->parentScopeId]->enclosedScopes.empty())
       {
-        TheNet->newArc(t1, TheNet->findPlace(toString(*it) + ".internal.compensate"));
-        TheNet->newArc(TheNet->findPlace(toString(*it) + ".internal.compensated"), t2);
-      }
+        Place *p2 = TheNet->newPlace(prefix + "running");
+        Place *p4 = TheNet->newPlace(prefix + "stop");
+        Place *p7 = TheNet->newPlace(prefix + "stopped");
 
-      // Transitions for the negative control flow.
-      Transition *t3 = stop(p1, "initial", prefix);
-      Transition *t4 = stop(p2, "running", prefix);
-      Transition *t5 = stop(p3, "final", prefix);
+        Transition *t1 = TheNet->newTransition(prefix + "compensate");
+        TheNet->newArc(p1, t1);
+        TheNet->newArc(t1, p2);
+
+        Transition *t2 = TheNet->newTransition(prefix + "compensated");
+        TheNet->newArc(p2, t2);
+        TheNet->newArc(t2, p3);
+
+        // connect the transitions with all enclosed scope's CHs
+        assert(ASTEmap[ASTEmap[_id->value]->parentScopeId] != NULL);
+        for (set<unsigned int>::iterator it = ASTEmap[ASTEmap[_id->value]->parentScopeId]->enclosedScopes.begin();
+             it != ASTEmap[ASTEmap[_id->value]->parentScopeId]->enclosedScopes.end(); it++)
+        {
+          TheNet->newArc(t1, TheNet->findPlace(toString(*it) + ".internal.compensate"));
+          TheNet->newArc(TheNet->findPlace(toString(*it) + ".internal.compensated"), t2);
+        }
+
+        // Transitions for the negative control flow.
+        Transition *t3 = stop(p1, "initial", prefix);
+        Transition *t4 = stop(p2, "running", prefix);
+        Transition *t5 = stop(p3, "final", prefix);
+      }
+      else // no enclosed scopes
+      {
+        TheNet->mergePlaces(p1, p3);
+      }
     }
     a // standardElements
     {

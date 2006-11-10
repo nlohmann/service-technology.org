@@ -27,18 +27,18 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/10/24 14:06:51 $
+ *          - last changed: \$Date: 2006/11/10 11:49:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  */
 
 #ifndef CFG_H
@@ -165,6 +165,9 @@ class CFGBlock {
     /// checks for cyclic links
     void checkForCyclicLinks();
 
+    /// checks for cycles in control dependency (SA00082)
+    void checkForCyclicControlDependency();
+
     /// checks for conflicting receives
     void checkForConflictingReceive();
 
@@ -183,6 +186,8 @@ class CFGBlock {
 
     /// set of depending receives
     set< pair< std::string, long > > receives;
+
+    set< unsigned int > controllingPeers;
     
     /// \todo: move to symbol table
     bool dpe;

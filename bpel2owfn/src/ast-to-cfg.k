@@ -29,11 +29,11 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/11/05 14:33:11 $
+ *          - last changed: \$Date: 2006/11/10 11:49:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.41 $
+ * \version \$Revision: 1.42 $
  */
 %}
 
@@ -705,14 +705,14 @@ Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
 	}
 	f //eventHandler
 	{
-	  CFGBlock * ehFirst = cfgMap.find(toString(e->id))->second->firstBlock;
-	  CFGBlock * ehLast  = cfgMap.find(toString(e->id))->second->lastBlock;
+	  CFGBlock * ehFirst = cfgMap.find(toString(f->id))->second->firstBlock;
+	  CFGBlock * ehLast  = cfgMap.find(toString(f->id))->second->lastBlock;
 
 	  connectBlocks(firstBlock, ehFirst);
 	  connectBlocks(ehLast, lastBlock);
 
 	}
-	h // activity
+	i // activity
 	{
 	  CFGBlock * innerFirst = cfgMap.find(toString(i->id))->second->firstBlock;
 	  CFGBlock * innerLast = cfgMap.find(toString(i->id))->second->lastBlock;

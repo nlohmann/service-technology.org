@@ -27,18 +27,18 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/10/24 14:06:51 $
+ *          - last changed: \$Date: 2006/11/10 11:49:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.36 $
+ * \version \$Revision: 1.37 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -139,6 +139,22 @@ void CFGBlock::print_dot()
       for (set< pair< std::string, long > >::iterator iter = receives.begin(); iter != receives.end(); iter++)
       {
 	(*output) << iter->first << "," << iter->second << "\\n";
+      }
+    }
+    if (! ASTEmap[id]->peerScopes.empty())
+    {
+      (*output) << "\\npeer scopes: \\n ";
+      for (set< unsigned int  >::iterator iter = ASTEmap[id]->peerScopes.begin(); iter != ASTEmap[id]->peerScopes.end(); iter++)
+      {
+	(*output) << (*iter) << "\\n";
+      }
+    }
+    if (! controllingPeers.empty())
+    {
+      (*output) << "\\ncontrolling peers: \\n ";
+      for (set< unsigned int  >::iterator iter = controllingPeers.begin(); iter != controllingPeers.end(); iter++)
+      {
+	(*output) << (*iter) << "\\n";
       }
     }
     (*output) << "\"";
@@ -514,6 +530,146 @@ void CFGBlock::checkForCyclicLinks()
   }
 }
 
+/// checks for cycles in control dependency
+void CFGBlock::checkForCyclicControlDependency()
+{
+  if ( processed )
+  {
+    return;
+  }
+  processed = true;
+ 
+  bool allPrerequisites = true;
+  // check if all entries are allready processed
+  if ( !prevBlocks.empty() )
+  {
+    /// for a while, we assume, that the body is never executed, so we drop that set
+    list<CFGBlock *>::iterator blockBegin = prevBlocks.begin();
+    if ( type == CFGWhile )
+    {
+      blockBegin++;
+    }
+    for ( list<CFGBlock *>::iterator iter = blockBegin; iter != prevBlocks.end(); iter++ )
+    {
+      allPrerequisites = allPrerequisites && ( *iter )->processed;
+    }
+  }
+  if ( type == CFGTarget )
+  {
+    allPrerequisites = allPrerequisites && sources[ dot_name() ]->processed;
+  }
+  if ( allPrerequisites )
+  {
+    if ( type == CFGTarget )
+    {
+      unsigned int possiblePeer = ASTEmap[ ASTEmap[ sources[ dot_name() ]->id ]->parentActivityId ]->parentScopeId;
+      unsigned int parentId = id;
+      parentId = ASTEmap[ parentId ]->parentActivityId;
+
+      /*
+      list<unsigned int> al = ASTEmap[parentId]->ancestorScopes();
+      for (list<unsigned int>::iterator iter = al.begin(); iter != al.end(); iter++)
+      {
+      }
+      */
+
+      while ( parentId != 1 && parentId != possiblePeer )
+      {
+	parentId = ASTEmap[parentId]->parentScopeId;
+      }
+      if ( parentId == 1 && parentId != possiblePeer )
+      {
+	controllingPeers.insert( possiblePeer );
+      }
+    }
+    /*
+    else if ( type == CFGScope && label == "Scope_end" )
+    {
+      bool add = false;
+      for ( set< unsigned int >::iterator iter = controllingPeers.begin(); iter != controllingPeers.end(); iter ++)
+      {
+	if ( ASTEmap[ *iter ]->parentScopeId != id )
+	{
+	  add = true;
+	}
+      }
+      if ( add ) 
+      {
+	controllingPeers.insert(id);
+      }
+    }
+    */
+    else if ( type == CFGFlow && label == "Flow_end" )
+    {
+      // find direct child scopes
+      unsigned int child = 0;
+      for ( set< unsigned int >::iterator enclosedScope = ASTEmap[ ASTEmap[ id ]->parentScopeId ]->enclosedScopes.begin(); 
+					  enclosedScope != ASTEmap[ ASTEmap[ id ]->parentScopeId ]->enclosedScopes.end(); 
+					  enclosedScope++)
+      {
+	if ( ASTEmap[ *enclosedScope ]->parentScopeId == ASTEmap[ id ]->parentScopeId )
+	{
+	  child = *enclosedScope;
+	}
+      }
+      if ( child != 0 )
+      {
+	set< unsigned int > subscopes ( ASTEmap[ child ]->peerScopes );
+	subscopes.insert( child );
+	map< unsigned int, bool > seen;
+	for ( set< unsigned int >::iterator scope = subscopes.begin(); scope != subscopes.end(); scope++ )
+	{
+	  if ( ! seen[ *scope ] )
+	  {
+	    // depth first search for cycles
+	    list< unsigned int > queue;
+	    queue.push_back( *scope );
+	    while ( queue.size() > 0 )
+	    {
+	      unsigned int current = *( queue.begin() );
+	      if ( ! seen[ current ] )
+	      {
+		seen[ current ] = true;
+		for ( set< unsigned int >::iterator peer = ASTEmap[ current ]->peerScopes.begin(); peer != ASTEmap[ current ]->peerScopes.end(); peer++ )
+		{
+		  // is there a cycle?
+		  if ( seen [ *peer ] )
+		  {
+		    SAerror( 82, "", toInt( ASTEmap[ *peer ]->attributes[ "referenceLine" ] ) );
+		  }
+		  else
+		  {
+		    queue.push_back( *peer );
+		  }
+		}
+		queue.pop_front();
+	      }
+	    }
+	  }
+	}
+      }
+    }
+
+    if ( !nextBlocks.empty() )
+    {
+      for (list<CFGBlock*>::iterator iter = nextBlocks.begin(); iter != nextBlocks.end(); iter++)
+      {
+	(*iter)->controllingPeers = setUnion( (*iter)->controllingPeers, controllingPeers );
+	(*iter)->checkForCyclicControlDependency();
+      }
+    }
+    if (type == CFGSource)
+    {
+      targets[dot_name()]->checkForCyclicControlDependency();
+    }
+  }
+  else
+  {
+    processed = false;
+    return;
+  }
+}
+
 /// checks for conflicting receives
 void CFGBlock::checkForConflictingReceive()
 {
@@ -656,16 +812,20 @@ void processCFG()
   trace(TRACE_INFORMATION, "-> Unparsing AST to CFG ...\n");
   TheProcess->unparse(kc::pseudoPrinter, kc::cfg);
   
-  trace(TRACE_DEBUG, "[CFG] checking for DPE\n");
+  //trace(TRACE_DEBUG, "[CFG] checking for DPE\n");
   // do some business with CFG
-  list<int> kcl;
-  TheCFG->needsDPE(0, kcl);
-  TheCFG->resetProcessedFlag();
+  //list<int> kcl;
+  //TheCFG->needsDPE(0, kcl);
+  //TheCFG->resetProcessedFlag();
 
   trace(TRACE_DEBUG, "[CFG] checking for cyclic links\n");
   /// \todo (gierds) check for cyclic links, otherwise we will fail
   TheCFG->checkForCyclicLinks();
   TheCFG->resetProcessedFlag(true);
+
+  trace(TRACE_DEBUG, "[CFG] checking for cyclic control dependency\n");
+  TheCFG->checkForCyclicControlDependency();
+  TheCFG->resetProcessedFlag(true, false);
 
   trace(TRACE_DEBUG, "[CFG] checking for uninitialized variables\n");
   // test
@@ -676,7 +836,6 @@ void processCFG()
   TheCFG->lastBlock->checkForConflictingReceive();
   TheCFG->resetProcessedFlag(true, false);
 
-  
   if (formats[F_DOT])
   {
     if (output_filename != "")
@@ -693,6 +852,6 @@ void processCFG()
       output = NULL;
     }
   }
-  
+
   delete(TheCFG);
 }

@@ -25,11 +25,11 @@
  * \brief   AST postprocessor (implementation)
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/08 07:38:24 $
+ * \date    \$Date: 2006/11/10 11:49:46 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.97 $
+ * \version \$Revision: 1.98 $
  */
 %}
 
@@ -1527,6 +1527,7 @@ Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
 
       // my parent is the current scope
       myself->parentScopeId = PPcurrentScope;
+
       // now I am the current scope
       PPcurrentScope = myid;
 
@@ -1534,7 +1535,17 @@ Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
       assert(ASTEmap[myself->parentScopeId] != NULL);
       myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
       myself->checkAttributes();
+
+      for ( std::set<unsigned int>::iterator peerScope = ASTEmap[myself->parentScopeId]->enclosedScopes.begin(); 
+	    peerScope != ASTEmap[myself->parentScopeId]->enclosedScopes.end(); 
+	    peerScope++)
+      {
+	ASTEmap[*peerScope]->peerScopes.insert(myid);
+	ASTEmap[myid]->peerScopes.insert(*peerScope);
+      }
+
       ASTEmap[myself->parentScopeId]->enclosedScopes.insert(myid);
+
       myself->hasEH = (string(e->op_name()) == "userDefinedEventHandler");
 
 

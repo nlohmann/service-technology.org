@@ -29,7 +29,7 @@
  *
  * \since   2006-10-30
  *
- * \date    \$Date: 2006/11/12 18:22:53 $
+ * \date    \$Date: 2006/11/12 18:46:05 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
  */
 %}
 
@@ -848,33 +848,23 @@ This=Exit(a,_id) ->
       Place *p1 = TheNet->newPlace(prefix + "initial");
       Place *p2 = TheNet->newPlace(prefix + "final");
       Place *p3 = TheNet->newPlace(prefix + "stop");
-      Place *p4 = TheNet->newPlace(prefix + "!Terminated");
-      Place *p5 = TheNet->newPlace(prefix + "Terminated");
-      Place *p6 = TheNet->newPlace(prefix + "terminate");
-      Place *p7 = TheNet->newPlace(prefix + "stopped");
+      Place *p4 = TheNet->newPlace(prefix + "stopped");
 
-      Transition *t1 = TheNet->newTransition(prefix + "exit2");
+      Transition *t1 = TheNet->newTransition(prefix + "exit1");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
-      TheNet->newArc(p5, t1, READ);
+      TheNet->newArc(t1, TheNet->findPlace("1.internal.Exiting"));
+      TheNet->newArc(t1, TheNet->findPlace("1.internal.exit"));
+      TheNet->newArc(TheNet->findPlace("1.internal.!Exiting"), t1);
 
       Transition *t2 = TheNet->newTransition(prefix + "exit");
       TheNet->newArc(p1, t2);
       TheNet->newArc(t2, p2);
-      TheNet->newArc(t2, p5);
-      TheNet->newArc(p4, t2);
-      TheNet->newArc(t2, p6);
-
+      TheNet->newArc(TheNet->findPlace("1.internal.Exiting"), t2);
 
       // Transitions for the negative control flow.
       Transition *t3 = stop(p1, "initial", prefix);
       Transition *t4 = stop(p2, "final", prefix);
-
-
-      // Embed the <terminate /> activity in the process.
-      TheNet->mergePlaces(TheNet->findPlace("1.internal.!Exiting"), p4);
-      TheNet->mergePlaces(TheNet->findPlace("1.internal.Exiting"), p5);
-      TheNet->mergePlaces(TheNet->findPlace("1.internal.activity_stop"), p6);
     }
     a // standardElements
     {

@@ -29,7 +29,7 @@
  *
  * \since   2006-10-30
  *
- * \date    \$Date: 2006/11/08 14:48:19 $
+ * \date    \$Date: 2006/11/12 18:22:53 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  */
 %}
 
@@ -629,23 +629,16 @@ This=Rethrow(a,_id) ->
       Place *p1 = TheNet->newPlace(prefix + "initial");
 
       assert(ASTEmap[_id->value] != NULL);
-      if (ASTEmap[_id->value]->parentScopeId != 1)
-      {
-        Place *p2 = TheNet->newPlace(prefix + "faulted");
-        Place *p3 = TheNet->newPlace(prefix + "stop");
-        Place *p4 = TheNet->newPlace(prefix + "stopped");
+      Place *p2 = TheNet->newPlace(prefix + "faulted");
+      Place *p3 = TheNet->newPlace(prefix + "stop");
+      Place *p4 = TheNet->newPlace(prefix + "stopped");
 
-        // Transitions for the negative control flow.
-        Transition *t1 = throwFault(p1, p2, "initial", prefix, _id, 4);
-        Transition *t2 = stop(p1, "initial", prefix);
-        Transition *t3 = stop(p2, "faulted", prefix);
-      }
-      else
-      {
-        Transition *t1 = TheNet->newTransition(prefix + "abort");
-        TheNet->newArc(p1, t1);
-        TheNet->newArc(t1, TheNet->findPlace("1.internal.faultHandler.final"));
-      }
+      // Transitions for the negative control flow.
+      Transition *t1 = throwFault(p1, p2, "initial", prefix, _id, 4);
+      TheNet->newArc(TheNet->findPlace(toString(ASTEmap[_id->value]->parentScopeId) + ".internal.faultHandler.running"), t1, READ);
+
+      Transition *t2 = stop(p1, "initial", prefix);
+      Transition *t3 = stop(p2, "faulted", prefix);
     }
     a // standardElements
     {

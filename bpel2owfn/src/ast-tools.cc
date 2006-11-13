@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/11/13 13:46:53 $
+ * \date    \$Date: 2006/11/13 16:28:37 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.28 $
+ * \version \$Revision: 1.29 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -225,7 +225,7 @@ Transition *throwFault(Place *p1, Place *p2,
       case(2): // activity in compensation handler
       case(4): // <rethrow> activity
 	{
-          unsigned int parentId = ASTEmap[ASTEmap[id->value]->parentScopeId]->parentScopeId;
+          unsigned int parentId = ASTEmap[ASTEmap[id->value]->parentScopeId]->parentScopeId; // warum zweimal parent???
 
 	  Transition *t1;
 	  if (negativeControlFlow == 4)
@@ -236,7 +236,7 @@ Transition *throwFault(Place *p1, Place *p2,
 	  TheNet->newArc(p1, t1);
 	  TheNet->newArc(t1, p2);
 
-	  if (parentId == 1)
+	  if (ASTEmap[id->value]->parentScopeId == 1)
 	    TheNet->newArc(t1, TheNet->findPlace(toString(parentId) + ".internal.exit"));
 	  else
 	    TheNet->newArc(t1, TheNet->findPlace(toString(parentId) + ".internal.fault_in"));

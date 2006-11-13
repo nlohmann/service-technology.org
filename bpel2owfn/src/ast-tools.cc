@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/11/12 18:22:53 $
+ * \date    \$Date: 2006/11/13 13:46:53 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -223,22 +223,36 @@ Transition *throwFault(Place *p1, Place *p2,
 
       case(1): // activity in fault handlers
       case(2): // activity in compensation handler
-      case(3): // activity in termination handler
       case(4): // <rethrow> activity
 	{
           unsigned int parentId = ASTEmap[ASTEmap[id->value]->parentScopeId]->parentScopeId;
 
-	  Transition *t1 = TheNet->newTransition(prefix + "reThrowFault." + p1name);
+	  Transition *t1;
+	  if (negativeControlFlow == 4)
+	    t1 = TheNet->newTransition(prefix + "rethrow");
+	  else
+	    t1 = TheNet->newTransition(prefix + "rethrowFault." + p1name);
+
 	  TheNet->newArc(p1, t1);
 	  TheNet->newArc(t1, p2);
 
 	  if (parentId == 1)
-	    TheNet->newArc(t1, TheNet->findPlace(toString(parentId) + ".internal.inner_stop"));
+	    TheNet->newArc(t1, TheNet->findPlace(toString(parentId) + ".internal.exit"));
 	  else
 	    TheNet->newArc(t1, TheNet->findPlace(toString(parentId) + ".internal.fault_in"));
 
 	  return t1;
 	}
+
+      case(3): // activity in termination handler
+        {
+          unsigned int parentId = ASTEmap[id->value]->parentScopeId;
+
+	  Transition *t1 = TheNet->newTransition(prefix + "signalFault." + p1name);
+	  TheNet->newArc(p1, t1);
+	  TheNet->newArc(t1, p2);
+	  TheNet->newArc(t1, TheNet->findPlace(toString(parentId) + ".internal.terminationHandler.inner_fault"));
+        }
     }
     return NULL;
   }

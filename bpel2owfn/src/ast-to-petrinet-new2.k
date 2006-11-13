@@ -29,7 +29,7 @@
  *
  * \since   2006-10-30
  *
- * \date    \$Date: 2006/11/12 18:46:05 $
+ * \date    \$Date: 2006/11/13 13:46:53 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  */
 %}
 
@@ -669,40 +669,49 @@ This=Compensate(a,_id) ->
       assert(ASTEmap[_id->value] != NULL);
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p3 = TheNet->newPlace(prefix + "final");
+      Place *p2 = TheNet->newPlace(prefix + "final");
 
       assert(ASTEmap[ASTEmap[_id->value]->parentScopeId] != NULL);
       if (!ASTEmap[ASTEmap[_id->value]->parentScopeId]->enclosedScopes.empty())
       {
-        Place *p2 = TheNet->newPlace(prefix + "running");
-        Place *p4 = TheNet->newPlace(prefix + "stop");
-        Place *p7 = TheNet->newPlace(prefix + "stopped");
+        Place *p5 = TheNet->newPlace(prefix + "compensating");
+        Place *p3 = TheNet->newPlace(prefix + "stop");
+        Place *p4 = TheNet->newPlace(prefix + "stopped");
 
-        Transition *t1 = TheNet->newTransition(prefix + "compensate");
+        Transition *t1 = TheNet->newTransition(prefix + "begin_compensation");
         TheNet->newArc(p1, t1);
-        TheNet->newArc(t1, p2);
+        TheNet->newArc(t1, p5);
 
-        Transition *t2 = TheNet->newTransition(prefix + "compensated");
-        TheNet->newArc(p2, t2);
-        TheNet->newArc(t2, p3);
+        Transition *t2 = TheNet->newTransition(prefix + "complete_compensation");
+        TheNet->newArc(p5, t2);
+        TheNet->newArc(t2, p2);
 
-        // connect the transitions with all enclosed scope's CHs
+        Transition *t3 = TheNet->newTransition(prefix + "stop_compensation");
+        TheNet->newArc(p3, t3);
+        TheNet->newArc(p5, t3, READ);
+
+        Transition *t4 = TheNet->newTransition(prefix + "compensation_stopped");
+        TheNet->newArc(t4, p4);
+        TheNet->newArc(p5, t4);
+
+        // connect the transitions with all enclosed scopes
         assert(ASTEmap[ASTEmap[_id->value]->parentScopeId] != NULL);
         for (set<unsigned int>::iterator it = ASTEmap[ASTEmap[_id->value]->parentScopeId]->enclosedScopes.begin();
              it != ASTEmap[ASTEmap[_id->value]->parentScopeId]->enclosedScopes.end(); it++)
         {
           TheNet->newArc(t1, TheNet->findPlace(toString(*it) + ".internal.compensate"));
           TheNet->newArc(TheNet->findPlace(toString(*it) + ".internal.compensated"), t2);
+          TheNet->newArc(t3, TheNet->findPlace(toString(*it) + ".internal.stop"));
+          TheNet->newArc(TheNet->findPlace(toString(*it) + ".internal.stopped"), t4);
         }
 
         // Transitions for the negative control flow.
-        Transition *t3 = stop(p1, "initial", prefix);
-        Transition *t4 = stop(p2, "running", prefix);
-        Transition *t5 = stop(p3, "final", prefix);
+        Transition *t5 = stop(p1, "initial", prefix);
+        Transition *t6 = stop(p2, "final", prefix);
       }
       else // no enclosed scopes
       {
-        TheNet->mergePlaces(p1, p3);
+        TheNet->mergePlaces(p1, p2);
       }
     }
     a // standardElements
@@ -734,32 +743,34 @@ This=CompensateScope(a,b,_id) ->
       unsigned int scopeId = scopeNames[ASTEmap[_id->value]->attributes["target"]];
 
       Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "running");
-      Place *p3 = TheNet->newPlace(prefix + "final");
-      Place *p4 = TheNet->newPlace(prefix + "stop");
-      Place *p5 = TheNet->newPlace(prefix + "compensateScope");
-      Place *p6 = TheNet->newPlace(prefix + "scopeCompensated");
-      Place *p7 = TheNet->newPlace(prefix + "stopped");
+      Place *p2 = TheNet->newPlace(prefix + "final");
+      Place *p3 = TheNet->newPlace(prefix + "stop");
+      Place *p4 = TheNet->newPlace(prefix + "stopped");
+      Place *p5 = TheNet->newPlace(prefix + "compensating");
 
-      Transition *t1 = TheNet->newTransition(prefix + "compensate" + toString(scopeId));
+      Transition *t1 = TheNet->newTransition(prefix + "begin_compensation");
       TheNet->newArc(p1, t1);
-      TheNet->newArc(t1, p2);
       TheNet->newArc(t1, p5);
+      TheNet->newArc(t1, TheNet->findPlace(toString(scopeId) + ".internal.compensate"));
 
-      Transition *t2 = TheNet->newTransition(prefix + "compensated" + toString(scopeId));
-      TheNet->newArc(p2, t2);
-      TheNet->newArc(t2, p3);
-      TheNet->newArc(p6, t2);
+      Transition *t2 = TheNet->newTransition(prefix + "complete_compensation");
+      TheNet->newArc(p5, t2);
+      TheNet->newArc(t2, p2);
+      TheNet->newArc(TheNet->findPlace(toString(scopeId) + ".internal.compensated"), t2);
 
+      Transition *t3 = TheNet->newTransition(prefix + "stop_compensation");
+      TheNet->newArc(p3, t3);
+      TheNet->newArc(p5, t3, READ);
+      TheNet->newArc(t3, TheNet->findPlace(toString(scopeId) + ".internal.stop"));
+
+      Transition *t4 = TheNet->newTransition(prefix + "compensation_stopped");
+      TheNet->newArc(t4, p4);
+      TheNet->newArc(p5, t4);
+      TheNet->newArc(TheNet->findPlace(toString(scopeId) + ".internal.stopped"), t4);
 
       // Transitions for the negative control flow.
-      Transition *t3 = stop(p1, "initial", prefix);
-      Transition *t4 = stop(p2, "running", prefix);
-      Transition *t5 = stop(p3, "final", prefix);
-
-      // merge the compensate/compensated places with the given scope
-      TheNet->mergePlaces(p5, TheNet->findPlace(toString(scopeId) + ".internal.compensate"));
-      TheNet->mergePlaces(p6, TheNet->findPlace(toString(scopeId) + ".internal.compensated"));
+      Transition *t5 = stop(p1, "initial", prefix);
+      Transition *t6 = stop(p2, "final", prefix);
     }
     a // standardElements
     {
@@ -850,21 +861,21 @@ This=Exit(a,_id) ->
       Place *p3 = TheNet->newPlace(prefix + "stop");
       Place *p4 = TheNet->newPlace(prefix + "stopped");
 
-      Transition *t1 = TheNet->newTransition(prefix + "exit1");
+      Transition *t1 = TheNet->newTransition(prefix + "exit");
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
-      TheNet->newArc(t1, TheNet->findPlace("1.internal.Exiting"));
+//      TheNet->newArc(t1, TheNet->findPlace("1.internal.Exiting"));
       TheNet->newArc(t1, TheNet->findPlace("1.internal.exit"));
-      TheNet->newArc(TheNet->findPlace("1.internal.!Exiting"), t1);
+//      TheNet->newArc(TheNet->findPlace("1.internal.!Exiting"), t1);
 
-      Transition *t2 = TheNet->newTransition(prefix + "exit");
-      TheNet->newArc(p1, t2);
-      TheNet->newArc(t2, p2);
-      TheNet->newArc(TheNet->findPlace("1.internal.Exiting"), t2);
+//      Transition *t2 = TheNet->newTransition(prefix + "exit");
+//      TheNet->newArc(p1, t2);
+//      TheNet->newArc(t2, p2);
+//      TheNet->newArc(TheNet->findPlace("1.internal.Exiting"), t2);
 
       // Transitions for the negative control flow.
-      Transition *t3 = stop(p1, "initial", prefix);
-      Transition *t4 = stop(p2, "final", prefix);
+      Transition *t2 = stop(p1, "initial", prefix);
+      Transition *t3 = stop(p2, "final", prefix);
     }
     a // standardElements
     {

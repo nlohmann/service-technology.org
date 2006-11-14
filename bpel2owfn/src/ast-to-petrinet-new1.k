@@ -29,7 +29,7 @@
  *
  * \since   2006-10-29
  *
- * \date    \$Date: 2006/11/13 13:46:53 $
+ * \date    \$Date: 2006/11/14 14:40:45 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  *
  */
 %}
@@ -301,6 +301,8 @@ This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
       Place *p16 = TheNet->newPlace(prefix + "fh_fault");
       Place *p17 = TheNet->newPlace(prefix + "ch_initial");
       Place *p18 = TheNet->newPlace(prefix + "th_initial");
+      Place *p19 = TheNet->newPlace(prefix + "ch_fault_in");
+      Place *p20 = TheNet->newPlace(prefix + "ch_fault_up");
 
       Transition *t1 = TheNet->newTransition(prefix + "initialize");
       TheNet->newArc(p1, t1);
@@ -350,9 +352,19 @@ This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
       TheNet->newArc(p13, t8);
       TheNet->newArc(TheNet->findPlace("1.internal.Exiting"), t8, READ);
 
-      Transition *t9 = stop(p1, "initial", prefix);
-      Transition *t10 = stop(p2, "final", prefix);
-      Transition *t11 = stop(p5, "compensated", prefix);
+      Transition *t9 = TheNet->newTransition(prefix + "t9");
+      TheNet->newArc(p10, t9, READ);
+      TheNet->newArc(p19, t9);
+      TheNet->newArc(t9, p20);
+
+      Transition *t10 = TheNet->newTransition(prefix + "t10");
+      TheNet->newArc(t10, p3);
+      TheNet->newArc(p9, t10, READ);
+      TheNet->newArc(p19, t10);
+
+      Transition *t11 = stop(p1, "initial", prefix);
+      Transition *t12 = stop(p2, "final", prefix);
+      Transition *t13 = stop(p5, "compensated", prefix);
     }
       a // standard elements
       i // inner activity
@@ -391,6 +403,12 @@ This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
       TheNet->mergePlaces(TheNet->findPlace(prefix + "activity_final"),   TheNet->findPlace(i->id, ".final"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "stop"),             TheNet->findPlace(i->id, ".stop"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "inner_stopped"),    TheNet->findPlace(i->id, ".stopped"));
+
+      // merge ch_fault place with parent scope
+      if (ASTEmap[_id->value]->parentScopeId == 1)
+        TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_fault_up"), TheNet->findPlace("1.internal.exit"));
+      else
+        TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_fault_up"), TheNet->findPlace(ASTEmap[_id->value]->parentScopeId, ".internal.ch_fault_in"));
 
       currentScope = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.";
       footer(This->id, true);

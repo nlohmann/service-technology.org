@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/11/13 16:28:37 $
+ * \date    \$Date: 2006/11/14 14:40:45 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.29 $
+ * \version \$Revision: 1.30 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -222,7 +222,6 @@ Transition *throwFault(Place *p1, Place *p2,
 	}
 
       case(1): // activity in fault handlers
-      case(2): // activity in compensation handler
       case(4): // <rethrow> activity
 	{
           unsigned int parentId = ASTEmap[ASTEmap[id->value]->parentScopeId]->parentScopeId; // warum zweimal parent???
@@ -240,6 +239,19 @@ Transition *throwFault(Place *p1, Place *p2,
 	    TheNet->newArc(t1, TheNet->findPlace(toString(parentId) + ".internal.exit"));
 	  else
 	    TheNet->newArc(t1, TheNet->findPlace(toString(parentId) + ".internal.fault_in"));
+
+	  return t1;
+	}
+
+      case(2): // activity in compensation handler
+	{
+          unsigned int parentId = ASTEmap[id->value]->parentScopeId;
+	  assert(parentId != 1); // parent scope of a compensation handler shouldn't be the process :)
+
+	  Transition *t1 = TheNet->newTransition(prefix + "throwCHFault." + p1name);
+	  TheNet->newArc(p1, t1);
+	  TheNet->newArc(t1, p2);
+	  TheNet->newArc(t1, TheNet->findPlace(toString(parentId) + ".internal.ch_fault_in"));
 
 	  return t1;
 	}

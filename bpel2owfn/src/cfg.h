@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/11/10 11:49:47 $
+ *          - last changed: \$Date: 2006/11/15 14:32:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
  */
 
 #ifndef CFG_H
@@ -93,7 +93,17 @@ typedef enum
   CFGOnMessage,
   CFGScope,
   CFGTarget,
-  CFGSource
+  CFGSource,
+  // WS-BPEL 2.0
+  CFGValidate,
+  CFGExit,
+  CFGRethrow,
+  CFGCompensateScope,
+  CFGIf,
+  CFGElseIf,
+  CFGElse,
+  CFGForEach,
+  CFGRepeatUntil
 } CFGBlockType;
 
 // forward declarations

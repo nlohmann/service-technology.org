@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/11/10 11:49:47 $
+ *          - last changed: \$Date: 2006/11/15 14:32:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
  */
 %}
 
@@ -224,7 +224,7 @@ userDefinedEventHandler(a,b,_id) ->
 	b // tOnAlarm_list
 	{
 	  int i = 1;
-	  foreach(message=OnMessage(innerActivity); tOnMessage_list a)
+	  foreach(message=OnMessage(*,*,innerActivity,*); tOnMessage_list a)
 	  {
  	    CFGBlock * innerFirst = cfgMap.find(toString(innerActivity->id))->second->firstBlock;
 	    CFGBlock * innerLast = cfgMap.find(toString(innerActivity->id))->second->lastBlock;
@@ -235,7 +235,7 @@ userDefinedEventHandler(a,b,_id) ->
 	    connectBlocks(innerLast, lastBlock);
 	  }
 	  i = 1; 
-	  foreach(alarm=OnAlarm(innerActivity); tOnAlarm_list b)
+	  foreach(alarm=OnAlarm(innerActivity,*); tOnAlarm_list b)
 	  {
  	    CFGBlock * innerFirst = cfgMap.find(toString(innerActivity->id))->second->firstBlock;
 	    CFGBlock * innerLast = cfgMap.find(toString(innerActivity->id))->second->lastBlock;
@@ -311,6 +311,20 @@ implicitCompensationHandler(_id) ->
 
 
 /******************************************************************************
+  VALIDATE                                                       (WS-BPEL 2.0)
+******************************************************************************/
+
+Validate(a,b) ->
+  [cfg: { 
+	  trace(TRACE_DEBUG, "[CFG] Validate\n");
+	  CFGBlock * block = new CFGBlock(CFGValidate, $0->id, "Validate"); 
+
+	  cfgMap[toString($0->id)] = block; 
+	}
+	a // standard elements
+  ];
+
+/******************************************************************************
   EMPTY
 ******************************************************************************/
 
@@ -330,6 +344,32 @@ Empty(a,b) ->
 ******************************************************************************/
 
 Invoke(a,b,c,d,e) ->
+  [cfg: { 
+	  trace(TRACE_DEBUG, "[CFG] Invoke\n");
+	  CFGBlock * block = new CFGBlock(CFGInvoke, $0->id, "Invoke");
+
+//NL	  block->channel_name = (dynamic_cast<STCommunicationActivity*>(symTab.lookup($0->id)))->channelId; 
+	  block->channel_name = ASTEmap[e->value]->channelName;
+
+	  cfgMap[toString($0->id)] = block; 
+  	}
+	a // standard elements
+  ];
+
+SynchronousInvoke(a,b,c,d,e) ->
+  [cfg: { 
+	  trace(TRACE_DEBUG, "[CFG] Invoke\n");
+	  CFGBlock * block = new CFGBlock(CFGInvoke, $0->id, "Invoke");
+
+//NL	  block->channel_name = (dynamic_cast<STCommunicationActivity*>(symTab.lookup($0->id)))->channelId; 
+	  block->channel_name = ASTEmap[e->value]->channelName;
+
+	  cfgMap[toString($0->id)] = block; 
+  	}
+	a // standard elements
+  ];
+
+AsynchronousInvoke(a,b,c,d,e) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Invoke\n");
 	  CFGBlock * block = new CFGBlock(CFGInvoke, $0->id, "Invoke");
@@ -433,6 +473,28 @@ Wait(a,b) ->
   ]
 ;
 
+WaitFor(a,b) ->
+  [cfg: { 
+	  trace(TRACE_DEBUG, "[CFG] WaitFor\n");
+	  CFGBlock * block = new CFGBlock(CFGWait, $0->id, "WaitFor"); 
+
+	  cfgMap[toString($0->id)] = block; 
+  	} 
+	a // standard elements
+  ]
+;
+
+WaitUntil(a,b) ->
+  [cfg: { 
+	  trace(TRACE_DEBUG, "[CFG] WaitUntil\n");
+	  CFGBlock * block = new CFGBlock(CFGWait, $0->id, "WaitUntil"); 
+
+	  cfgMap[toString($0->id)] = block; 
+  	} 
+	a // standard elements
+  ]
+;
+
 
 /******************************************************************************
   THROW
@@ -442,6 +504,21 @@ Throw(a,b) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Throw\n");
 	  CFGBlock * block = new CFGBlock(CFGThrow, $0->id, "Throw"); 
+
+	  cfgMap[toString($0->id)] = block; 
+  	}
+	a // standard elements
+  ]
+;
+
+/******************************************************************************
+  RETHROW                                                        (WS-BPEL 2.0)
+******************************************************************************/
+
+Rethrow(a,b) ->
+  [cfg: { 
+	  trace(TRACE_DEBUG, "[CFG] Rethrow\n");
+	  CFGBlock * block = new CFGBlock(CFGRethrow, $0->id, "Rhrow"); 
 
 	  cfgMap[toString($0->id)] = block; 
   	}
@@ -465,6 +542,21 @@ Compensate(a,b) ->
   ]
 ;
 
+/******************************************************************************
+  COMPENSATE / COMPENSATESCOPE                                   (WS-BPEL 2.0)
+******************************************************************************/
+
+CompensateScope(a,name,b) ->
+  [cfg: { 
+	  trace(TRACE_DEBUG, "[CFG] CompensateScope\n");
+	  CFGBlock * block = new CFGBlock(CFGCompensateScope, $0->id, "CompensateScope"); 
+
+	  cfgMap[toString($0->id)] = block; 
+  	}
+	a // standard elements
+  ]
+;
+
 
 /******************************************************************************
   TERMINATE
@@ -474,6 +566,21 @@ Terminate(a,b) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Terminate\n");
 	  CFGBlock * block = new CFGBlock(CFGTerminate, $0->id, "Terminate"); 
+
+	  cfgMap[toString($0->id)] = block; 
+  	}
+	a // standard elements
+  ]
+;
+
+/******************************************************************************
+  EXIT                                                           (WS-BPEL 2.0)
+******************************************************************************/
+
+Exit(a,b) ->
+  [cfg: { 
+	  trace(TRACE_DEBUG, "[CFG] Exit\n");
+	  CFGBlock * block = new CFGBlock(CFGExit, $0->id, "Exit"); 
 
 	  cfgMap[toString($0->id)] = block; 
   	}
@@ -562,6 +669,96 @@ This=Switch(a,b,Otherwise(c,d),e) ->
   ]
 ;
 
+/******************************************************************************
+  IF                                                             (WS-BPEL 2.0)
+******************************************************************************/
+
+This=If(a,b,Else(c,d),e) ->
+  [cfg: {
+	  trace(TRACE_DEBUG, "[CFG] If\n");
+	  CFGBlock * firstBlock = new CFGBlock(CFGIf, $0->id, "If_begin"); 
+	  CFGBlock * lastBlock = new CFGBlock(CFGIf, $0->id, "If_end");
+
+	  firstBlock->firstBlock = lastBlock->firstBlock = firstBlock;
+	  firstBlock->lastBlock  = lastBlock->lastBlock  = lastBlock;
+	  
+	  cfgMap[toString($0->id)] = firstBlock; 
+	}
+	b // tElseIf_list
+	c // tElse
+	{
+	  CFGBlock * last = firstBlock;
+	  int i = 1;
+	  foreach(elseIfBranch=ElseIf(innerActivity); tElseIf_list b)
+	  {
+	    CFGBlock * elseIfBlock = new CFGBlock(CFGElseIf, This->id, "ElseIf_" + toString(i));
+	    
+ 	    CFGBlock * innerFirst = cfgMap.find(toString(innerActivity->id))->second->firstBlock;
+	    CFGBlock * innerLast = cfgMap.find(toString(innerActivity->id))->second->lastBlock;
+
+	    connectBlocks(last, elseIfBlock);
+	    connectBlocks(elseIfBlock, innerFirst);
+	    connectBlocks(innerLast, lastBlock);
+
+	    last = elseIfBlock;	    
+	    i++;
+	  } 
+          CFGBlock * elseBlock = new CFGBlock(CFGElse, $0->id, "Else");
+ 	  CFGBlock * innerFirst = cfgMap.find(toString(c->id))->second->firstBlock;
+	  CFGBlock * innerLast = cfgMap.find(toString(c->id))->second->lastBlock;
+
+	  connectBlocks(last, elseBlock);
+	  connectBlocks(elseBlock, innerFirst);
+	  connectBlocks(innerLast, lastBlock);
+  	}
+	a // standard elements
+  ]
+;
+
+This=If(a,b,NoElse(_id),e) ->
+  [cfg: {
+	  trace(TRACE_DEBUG, "[CFG] If\n");
+	  CFGBlock * firstBlock = new CFGBlock(CFGIf, $0->id, "If_begin"); 
+	  CFGBlock * lastBlock = new CFGBlock(CFGIf, $0->id, "If_end");
+
+	  firstBlock->firstBlock = lastBlock->firstBlock = firstBlock;
+	  firstBlock->lastBlock  = lastBlock->lastBlock  = lastBlock;
+	  
+	  cfgMap[toString($0->id)] = firstBlock; 
+	}
+	b // tElseIf_list
+	{
+	  CFGBlock * last = firstBlock;
+	  int i = 1;
+	  foreach(elseIfBranch=ElseIf(innerActivity); tElseIf_list b)
+	  {
+	    CFGBlock * elseIfBlock = new CFGBlock(CFGElseIf, This->id, "ElseIf_" + toString(i));
+	    
+ 	    CFGBlock * innerFirst = cfgMap.find(toString(innerActivity->id))->second->firstBlock;
+	    CFGBlock * innerLast = cfgMap.find(toString(innerActivity->id))->second->lastBlock;
+
+	    connectBlocks(last, elseIfBlock);
+	    connectBlocks(elseIfBlock, innerFirst);
+	    connectBlocks(innerLast, lastBlock);
+
+	    last = elseIfBlock;	    
+	    i++;
+	  } 
+	  /*
+          CFGBlock * elseBlock = new CFGBlock(CFGElse, $0->id, "Else");
+ 	  CFGBlock * innerFirst = cfgMap.find(toString(c->id))->second->firstBlock;
+	  CFGBlock * innerLast = cfgMap.find(toString(c->id))->second->lastBlock;
+
+	  connectBlocks(last, elseBlock);
+	  connectBlocks(elseBlock, innerFirst);
+	  connectBlocks(innerLast, lastBlock);
+	  */
+	  connectBlocks(last, lastBlock);
+  	}
+	a // standard elements
+  ]
+;
+
 
 /******************************************************************************
   WHILE
@@ -571,6 +768,54 @@ While(a,b,c) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] While\n");
 	  CFGBlock * block = new CFGBlock(CFGWhile, $0->id, "While"); 
+
+	  cfgMap[toString($0->id)] = block; 
+  	}
+	b
+	{
+	  CFGBlock * innerFirst = cfgMap.find(toString(b->id))->second->firstBlock;
+	  CFGBlock * innerLast = cfgMap.find(toString(b->id))->second->lastBlock;
+	  
+	  connectBlocks(block, innerFirst);
+	  connectBlocks(innerLast, block);
+	}
+	a // standard elements
+  ]
+;
+
+
+/******************************************************************************
+  FOREACH
+******************************************************************************/
+
+ForEach(a,b,c,d,e,f) ->
+  [cfg: { 
+	  trace(TRACE_DEBUG, "[CFG] ForEach\n");
+	  CFGBlock * block = new CFGBlock(CFGForEach, $0->id, "ForEach"); 
+
+	  cfgMap[toString($0->id)] = block; 
+  	}
+	e
+	{
+	  CFGBlock * innerFirst = cfgMap.find(toString(e->id))->second->firstBlock;
+	  CFGBlock * innerLast = cfgMap.find(toString(e->id))->second->lastBlock;
+	  
+	  connectBlocks(block, innerFirst);
+	  connectBlocks(innerLast, block);
+	}
+	a // standard elements
+  ]
+;
+
+
+/******************************************************************************
+  FOREACH
+******************************************************************************/
+
+RepeatUntil(a,b,c) ->
+  [cfg: { 
+	  trace(TRACE_DEBUG, "[CFG] RepeatUntil\n");
+	  CFGBlock * block = new CFGBlock(CFGRepeatUntil, $0->id, "RepeatUntil"); 
 
 	  cfgMap[toString($0->id)] = block; 
   	}
@@ -641,7 +886,7 @@ Pick(a,b,c,d) ->
 	c // tOnAlarm_list
 	{
 	  int i = 1;
-	  foreach(message=OnMessage(innerActivity); tOnMessage_list b)
+	  foreach(message=OnMessage(*,*,innerActivity,*); tOnMessage_list b)
 	  {
  	    CFGBlock * innerFirst = cfgMap.find(toString(innerActivity->id))->second->firstBlock;
 	    CFGBlock * innerLast = cfgMap.find(toString(innerActivity->id))->second->lastBlock;
@@ -735,7 +980,6 @@ Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
 This=StandardElements(a,b, jc) ->
   [cfg:
     {
-
       CFGBlock * innerFirst = cfgMap.find(toString(This->parentId))->second->firstBlock;
       CFGBlock * innerLast = cfgMap.find(toString(This->parentId))->second->lastBlock;
       foreach (link; tTarget_list a)

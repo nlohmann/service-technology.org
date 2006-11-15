@@ -5,7 +5,7 @@
  *                                                                           *
  * BPEL2oWFN is free software; you can redistribute it and/or modify it      *
  * under the terms of the GNU General Public License as published by the     *
- * Free Software Foundation; either version 2 of the License, or(at your    *
+ * Free Software Foundation; either version 2 of the License, or (at your    *
  * option) any later version.                                                *
  *                                                                           *
  * BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT  *
@@ -43,13 +43,13 @@
  *
  * \date
  *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/11/08 07:38:25 $
+ *          - last changed: \$Date: 2006/11/15 14:53:14 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.41 $
+ * \version \$Revision: 1.42 $
  */
 
 

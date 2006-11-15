@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/11/15 14:23:49 $
+ * \date    \$Date: 2006/11/15 14:53:14 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -186,21 +186,10 @@ Transition *throwFault(Place *p1, Place *p2,
   // terminate rather than handling the fault
   if (ASTEmap[ASTEmap[id->value]->parentScopeId]->attributes["exitOnStandardFault"] == "yes")
   {
-    Place *p4 = TheNet->findPlace("1.internal.!Terminated");
-    Place *p5 = TheNet->findPlace("1.internal.Terminated");
-    Place *p6 = TheNet->findPlace(currentScope + "upperTerminate");
-
-    Transition *t1 = TheNet->newTransition(prefix + "exitOnStandardFault1." + p1name);
+    Transition *t1 = TheNet->newTransition(prefix + "exitOnStandardFault." + p1name);
     TheNet->newArc(p1, t1);
     TheNet->newArc(t1, p2);
-    TheNet->newArc(t1, p5);
-    TheNet->newArc(p4, t1);
-    TheNet->newArc(t1, p6);
-
-    Transition *t2 = TheNet->newTransition(prefix + "exitOnStandardFault2." + p1name);
-    TheNet->newArc(p1, t2);
-    TheNet->newArc(t2, p2);
-    TheNet->newArc(p5, t2, READ);
+    TheNet->newArc(t1, TheNet->findPlace("1.internal.exit"));
 
     return t1;
   }

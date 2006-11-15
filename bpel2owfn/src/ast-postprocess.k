@@ -25,11 +25,11 @@
  * \brief   AST postprocessor (implementation)
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nlohmann $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/10 11:49:46 $
+ * \date    \$Date: 2006/11/15 14:53:14 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.98 $
+ * \version \$Revision: 1.99 $
  */
 %}
 
@@ -128,18 +128,21 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
 
       // trigger [SA00057]
       set<string> reallySharedCorrelationSets;
-      for (set<unsigned int>::iterator it = startActivities.begin(); it != startActivities.end(); it++)
+      if (startActivities.size() > 1)
       {
-        if (it == startActivities.begin())
-          reallySharedCorrelationSets = ASTEmap[*it]->sharedCorrelationSets;
-        else
-          reallySharedCorrelationSets = setIntersection(reallySharedCorrelationSets, ASTEmap[*it]->sharedCorrelationSets);
+  	for (set<unsigned int>::iterator it = startActivities.begin(); it != startActivities.end(); it++)
+  	{
+  	  if (it == startActivities.begin())
+    	    reallySharedCorrelationSets = ASTEmap[*it]->sharedCorrelationSets;
+  	  else
+	    reallySharedCorrelationSets = setIntersection(reallySharedCorrelationSets, ASTEmap[*it]->sharedCorrelationSets);
 
-        if (reallySharedCorrelationSets.empty())
-        {
-          SAerror(57, "", ASTEmap[*it]->attributes["referenceLine"]);
-          break;
-        }
+  	  if (reallySharedCorrelationSets.empty())
+  	  {
+  	    SAerror(57, "", ASTEmap[*it]->attributes["referenceLine"]);
+      	    break;
+    	  }
+  	}
       }
 
       // this assertion guarantees that we did not forget a link and encounter

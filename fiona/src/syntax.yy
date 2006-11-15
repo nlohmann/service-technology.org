@@ -89,7 +89,7 @@ placeType type = INTERNAL;		/* type of place */
 %token key_all_other_places_empty
 %token key_all_other_internal_places_empty
 %token key_all_other_external_places_empty
-%token key_max_unique_events key_on_loop key_max_occurences
+%token key_max_unique_events key_on_loop key_max_occurrences
 %token key_true key_false lcontrol rcontrol
 %token comma colon semicolon ident number
 %token lpar rpar
@@ -315,7 +315,7 @@ commands:
 | key_on_loop op_eq key_false commands
     {
     }
-| key_max_occurences op_eq number commands
+| key_max_occurrences op_eq number commands
     {
 	sscanf($3, "%u", &(PS->place->max_occurence));
 	if (options[O_EVENT_USE_MAX] && PS->place->max_occurence > events_manual) {

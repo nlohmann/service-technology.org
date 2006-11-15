@@ -34,7 +34,7 @@ void setlval();
 
 MAX_UNIQUE_EVENTS		{ return key_max_unique_events; }
 ON_LOOP				{ return key_on_loop; }
-MAX_OCCURENCES			{ return key_max_occurences; }
+MAX_OCCURRENCES			{ return key_max_occurrences; }
 TRUE				{ return key_true; }
 FALSE				{ return key_false; }
 

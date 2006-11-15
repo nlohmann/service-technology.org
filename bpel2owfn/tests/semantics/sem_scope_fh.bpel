@@ -1,0 +1,16 @@
+<process name="test" targetNamespace="none">
+
+  <sequence>
+    <scope name="a">
+      <faultHandlers>
+    	<catchAll>
+      	  <empty />
+	</catchAll>
+      </faultHandlers>
+
+      <throw faultName="a" />
+    </scope>
+    <empty />
+  </sequence>
+
+</process>

@@ -1,0 +1,18 @@
+<process name="test" targetNamespace="none">
+
+  <sequence>
+    <scope name="a">
+      <compensationHandler>
+      	<compensateScope target="b" />
+      </compensationHandler>
+      <scope name="b">
+	<compensationHandler>
+	  <empty />
+	</compensationHandler>
+	<empty />
+      </scope>
+    </scope>
+    <throw faultName="f" />
+  </sequence>
+
+</process>

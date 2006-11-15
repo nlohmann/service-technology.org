@@ -1,0 +1,11 @@
+<process name="test" targetNamespace="none">
+
+  <flow>
+    <scope name="a">
+      <empty />
+    </scope>
+
+    <throw faultName="f" />
+  </flow>
+
+</process>

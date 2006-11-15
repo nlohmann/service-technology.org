@@ -1,0 +1,14 @@
+<process name="test" targetNamespace="none">
+
+  <flow>
+    <scope name="a">
+      <terminationHandler>
+	<throw faultName="f" />
+      </terminationHandler>
+      <empty />
+    </scope>
+
+    <throw faultName="f" />
+  </flow>
+
+</process>

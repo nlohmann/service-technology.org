@@ -1,0 +1,11 @@
+<process name="Coffee Vending Machine"
+	targetNamespace="http://www.informatik.hu-berlin.de/top/tools4bpel"
+	suppressJoinFailure="yes" exitOnStandardFault="yes">
+
+	<variables>
+	    <variable name="v" />
+	</variables>
+	
+	<receive partnerLink="pl" portType="pt" operation="a" variable="v" />
+
+</process>

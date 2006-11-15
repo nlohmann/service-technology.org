@@ -1,0 +1,11 @@
+<process name="test" targetNamespace="none">
+
+  <faultHandlers>
+    <catchAll>
+      <empty />
+    </catchAll>
+  </faultHandlers>
+
+  <throw faultName="a" />
+
+</process>

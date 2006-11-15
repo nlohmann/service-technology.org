@@ -2,7 +2,7 @@ On the usage of ALL_OTHER_PLACES_EMPTY, ALL_OTHER_INTERNAL_PLACES_EMPTY, and
 ALL_OTHER_EXTERNAL_PLACES_EMPTY in FINALCONDITION
 ============================================================================
 
-Say, you have an oWFN with many places and you want to specify in the
+Suppose you have an oWFN with many places and you want to specify in the
 FINALCONDITION of your oWFN that a state is a final state iff one certain place
 of your oWFN has exactly one token and all other places are empty. How do you
 do this? Saying
@@ -67,7 +67,7 @@ For you to decide the scope of ALL_OTHER_PLACES_EMPTY, it is crucial that you
 understand all bracing and precedence rules of state predicate formulas and
 that you can construct the fully braced form of your formula in your mind!
 
-Say, you have an oWFN with places p1, p2, p3, and p4. Then the formula:
+Suppose you have an oWFN with places p1, p2, p3, and p4. Then the formula:
 
     FINALCONDITION p1 = 1 AND ALL_OTHER_PLACES_EMPTY OR
                    p2 = 1 AND ALL_OTHER_PLACES_EMPTY;

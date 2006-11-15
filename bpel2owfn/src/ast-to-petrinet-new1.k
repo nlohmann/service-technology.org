@@ -29,7 +29,7 @@
  *
  * \since   2006-10-29
  *
- * \date    \$Date: 2006/11/14 14:40:45 $
+ * \date    \$Date: 2006/11/15 10:56:16 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.19 $
+ * \version \$Revision: 1.20 $
  *
  */
 %}
@@ -303,6 +303,11 @@ This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
       Place *p18 = TheNet->newPlace(prefix + "th_initial");
       Place *p19 = TheNet->newPlace(prefix + "ch_fault_in");
       Place *p20 = TheNet->newPlace(prefix + "ch_fault_up");
+      Place *p21 = TheNet->newPlace(prefix + "p21"); p21->mark();
+      Place *p22 = TheNet->newPlace(prefix + "p22");
+      Place *p23 = TheNet->newPlace(prefix + "p23");
+      Place *p24 = TheNet->newPlace(prefix + "ch_stop");
+      Place *p25 = TheNet->newPlace(prefix + "ch_stopped");
 
       Transition *t1 = TheNet->newTransition(prefix + "initialize");
       TheNet->newArc(p1, t1);
@@ -325,7 +330,7 @@ This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
       TheNet->newArc(t3, p10);
       TheNet->newArc(t3, p16);
 
-      Transition *t4 = TheNet->newTransition(prefix + "ignore");
+      Transition *t4 = TheNet->newTransition(prefix + "ignore_fault");
       TheNet->newArc(p3, t4);
       TheNet->newArc(p10, t4, READ);
 
@@ -352,19 +357,28 @@ This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
       TheNet->newArc(p13, t8);
       TheNet->newArc(TheNet->findPlace("1.internal.Exiting"), t8, READ);
 
-      Transition *t9 = TheNet->newTransition(prefix + "t9");
-      TheNet->newArc(p10, t9, READ);
+      Transition *t9 = TheNet->newTransition(prefix + "take_ch_fault");
       TheNet->newArc(p19, t9);
-      TheNet->newArc(t9, p20);
+      TheNet->newArc(p21, t9);
+      TheNet->newArc(t9, p22);
+      TheNet->newArc(t9, p23);
 
-      Transition *t10 = TheNet->newTransition(prefix + "t10");
-      TheNet->newArc(t10, p3);
-      TheNet->newArc(p9, t10, READ);
+      Transition *t10 = TheNet->newTransition(prefix + "ignore_ch_fault");
       TheNet->newArc(p19, t10);
+      TheNet->newArc(p22, t10, READ);
 
-      Transition *t11 = stop(p1, "initial", prefix);
-      Transition *t12 = stop(p2, "final", prefix);
-      Transition *t13 = stop(p5, "compensated", prefix);
+      Transition *t11 = TheNet->newTransition(prefix + "rethrow_ch_fault");
+      TheNet->newArc(p10, t11, READ);
+      TheNet->newArc(t11, p20);
+      TheNet->newArc(p23, t11);
+
+      Transition *t12 = TheNet->newTransition(prefix + "handle_ch_fault");
+      TheNet->newArc(t12, p3);
+      TheNet->newArc(p9, t12, READ);
+      TheNet->newArc(p23, t12);
+
+      Transition *t13 = stop(p1, "initial", prefix);
+      Transition *t14 = stop(p2, "final", prefix);
     }
       a // standard elements
       i // inner activity
@@ -386,8 +400,8 @@ This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
         {
           TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_initial"),  TheNet->findPlace(ch_activity->id, ".initial"));
           TheNet->mergePlaces(TheNet->findPlace(prefix + "compensated"), TheNet->findPlace(ch_activity->id, ".final"));
-          TheNet->mergePlaces(TheNet->findPlace(prefix + "stop"),        TheNet->findPlace(ch_activity->id, ".stop"));
-          TheNet->mergePlaces(TheNet->findPlace(prefix + "stopped"),     TheNet->findPlace(ch_activity->id, ".stopped"));
+          TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_stop"),        TheNet->findPlace(ch_activity->id, ".stop"));
+          TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_stopped"),     TheNet->findPlace(ch_activity->id, ".stopped"));
         }
         default: { assert(false); }
       }
@@ -405,7 +419,7 @@ This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
       TheNet->mergePlaces(TheNet->findPlace(prefix + "inner_stopped"),    TheNet->findPlace(i->id, ".stopped"));
 
       // merge ch_fault place with parent scope
-      if (ASTEmap[_id->value]->parentScopeId == 1)
+      if (ASTEmap[_id->value]->parentScopeId == 1) // TODO: overwork this!
         TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_fault_up"), TheNet->findPlace("1.internal.exit"));
       else
         TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_fault_up"), TheNet->findPlace(ASTEmap[_id->value]->parentScopeId, ".internal.ch_fault_in"));

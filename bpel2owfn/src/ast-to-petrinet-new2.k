@@ -29,7 +29,7 @@
  *
  * \since   2006-10-30
  *
- * \date    \$Date: 2006/11/13 13:46:53 $
+ * \date    \$Date: 2006/11/15 10:56:16 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  */
 %}
 
@@ -701,8 +701,8 @@ This=Compensate(a,_id) ->
         {
           TheNet->newArc(t1, TheNet->findPlace(toString(*it) + ".internal.compensate"));
           TheNet->newArc(TheNet->findPlace(toString(*it) + ".internal.compensated"), t2);
-          TheNet->newArc(t3, TheNet->findPlace(toString(*it) + ".internal.stop"));
-          TheNet->newArc(TheNet->findPlace(toString(*it) + ".internal.stopped"), t4);
+          TheNet->newArc(t3, TheNet->findPlace(toString(*it) + ".internal.ch_stop"));
+          TheNet->newArc(TheNet->findPlace(toString(*it) + ".internal.ch_stopped"), t4);
         }
 
         // Transitions for the negative control flow.
@@ -761,12 +761,12 @@ This=CompensateScope(a,b,_id) ->
       Transition *t3 = TheNet->newTransition(prefix + "stop_compensation");
       TheNet->newArc(p3, t3);
       TheNet->newArc(p5, t3, READ);
-      TheNet->newArc(t3, TheNet->findPlace(toString(scopeId) + ".internal.stop"));
+      TheNet->newArc(t3, TheNet->findPlace(toString(scopeId) + ".internal.ch_stop"));
 
       Transition *t4 = TheNet->newTransition(prefix + "compensation_stopped");
       TheNet->newArc(t4, p4);
       TheNet->newArc(p5, t4);
-      TheNet->newArc(TheNet->findPlace(toString(scopeId) + ".internal.stopped"), t4);
+      TheNet->newArc(TheNet->findPlace(toString(scopeId) + ".internal.ch_stopped"), t4);
 
       // Transitions for the negative control flow.
       Transition *t5 = stop(p1, "initial", prefix);

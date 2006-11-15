@@ -29,7 +29,7 @@ oWFN::oWFN() : arcCnt(0), placeHashValue(0), placeCnt(0),
 
 	unsigned int i;
   	NonEmptyHash = 0;
-	commDepth = 0;
+//	commDepth = 0;
 
   	try {
   		binHashTable = new binDecision * [HASHSIZE];
@@ -109,13 +109,13 @@ unsigned int oWFN::getOutputPlaceCnt() {
 }
 
 
+//unsigned int oWFN::getCommDepth() {
+//	return commDepth;
+//}
+
+
 //! \fn unsigned int oWFN::getTransitionCnt()
 //! \brief returns the number of transitions of the net
-unsigned int oWFN::getCommDepth() {
-	return commDepth;
-}
-
-
 unsigned int oWFN::getCardFireList() {
 	assert(false);		// cout << "oWFN::getCardFireList() never used" << endl;
 	return CardFireList;

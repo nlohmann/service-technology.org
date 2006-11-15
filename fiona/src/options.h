@@ -13,7 +13,6 @@ typedef enum
 	O_DEBUG,
 	O_OWFN_NAME,
 	O_GRAPH_TYPE,	//!< OG or IG
-	O_COMM_DEPTH,
 	O_MESSAGES_MAX,
 	O_EVENT_USE_MAX,
 	O_CALC_REDUCED_IG,
@@ -42,7 +41,6 @@ extern std::map<possibleOptions,    bool> options;
 extern std::map<possibleParameters, bool> parameters;
 
 extern char * netfile;
-extern int commDepth_manual;
 extern int messages_manual;
 extern int events_manual;
 extern int bdd_reordermethod;

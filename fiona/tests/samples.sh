@@ -274,8 +274,8 @@ keescoffee2bluenodes_soll=27
 keescoffee2blueedges_soll=62
 keescoffee2storedstates_soll=1008
 
-echo running $FIONA -n $DIR/keesCoffee_condition.owfn -a -t OG -e 2 -c 6
-OUTPUT=`$FIONA -n $DIR/keesCoffee_condition.owfn -a -t OG -e 2 -c 6  2>&1`
+echo running $FIONA -n $DIR/keesCoffee_condition.owfn -a -t OG -e 2
+OUTPUT=`$FIONA -n $DIR/keesCoffee_condition.owfn -a -t OG -e 2  2>&1`
 
 echo $OUTPUT | grep "net is controllable: YES" > /dev/null
 keescoffee2control=$?

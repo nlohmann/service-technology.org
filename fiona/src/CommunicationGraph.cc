@@ -599,14 +599,14 @@ void communicationGraph::printNodeStatistics() {
 void communicationGraph::printDotFile() {
     
     int maxWritingSize = 1000;
-    int maxPrintingSize =  500;
+    int maxPrintingSize = 500;
     
     if (numberOfBlueNodes <= maxWritingSize) {
         
 		trace(TRACE_0, "creating the dot file of the graph...\n");	
         vertex * tmp = root;
-        bool visitedNodes[numberOfNodes];
 
+        bool visitedNodes[numberOfNodes];
         for (int i = 0; i < numberOfNodes; i++) {
             visitedNodes[i] = 0;
         }
@@ -639,6 +639,7 @@ void communicationGraph::printDotFile() {
         numberOfBlackNodes = 0;
 
         printGraphToDot(tmp, dotFile, visitedNodes);
+        
         dotFile << "}";
         dotFile.close();
         	
@@ -689,12 +690,12 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
     }
 
     if (parameters[P_SHOW_ALL_NODES]
-            || (parameters[P_SHOW_NO_RED_NODES] && (v->getColor() != RED))
-            || (parameters[P_SHOW_BLUE_NODES_ONLY] && (v->getColor() == BLUE))
-            || (v == root)) {
-
-        if (parameters[P_SHOW_EMPTY_NODE]
-            || v->reachGraphStateSet.size() != 0) {
+        || ( parameters[P_SHOW_NO_RED_NODES] && (v->getColor() != RED))
+		|| (!parameters[P_SHOW_NO_RED_NODES] && (v->getColor() == RED))
+        || (v->getColor() == BLUE)
+        || (v == root)) {
+        
+        if (parameters[P_SHOW_EMPTY_NODE] || v->reachGraphStateSet.size() != 0) {
 
             os << "p" << v->getNumber() << " [label=\"# " << v->getNumber() << "\\n";
 
@@ -703,9 +704,8 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
 
             StateSet::iterator iter;  // iterator over the stateList's elements
 
-            for (iter = v->reachGraphStateSet.begin(); iter != v->reachGraphStateSet.end(); iter++) {
-
-                if (parameters[P_SHOW_STATES_PER_NODE]) {
+			if (parameters[P_SHOW_STATES_PER_NODE]) {
+            	for (iter = v->reachGraphStateSet.begin(); iter != v->reachGraphStateSet.end(); iter++) {
                 	(*iter)->decodeShowOnly(PN);
 //					os << "[" << PN->printCurrentMarkingForDot() << "]" << "(" << (*iter) << ")";
                     os << "[" << PN->printCurrentMarkingForDot() << "]";
@@ -715,46 +715,9 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
                         case FINALSTATE: os << "FS" << ")"; break;
                         default: os << "TR" << ")"; break;
                     }                                                
-                }
-
-//              os << "(";
-//                if (v->getColor() != RED) {
-//                    switch ((*iter)->type) {
-//                        case DEADLOCK:  //if (mult) {
-////                                            CNF += " * ";
-////                                        }
-//                                        if (parameters[P_SHOW_STATES_PER_NODE]) {
-//	                                        os << " (DL)";
-//                                        }
-//                                   //     CNF += "("; CNF += (*iter)->getClause(); CNF += ")"; mult=true;
-//                                        break;
-//                        case FINALSTATE: //if (mult) {
-//                                         //   CNF += " * ";
-//                                        //}
-//                                        if (parameters[P_SHOW_STATES_PER_NODE]) {
-//	                                        os << " (FS)";
-//                                        }
-//                                       // CNF += "(true)"; mult=true;
-//                                        break;
-//                        default:
-//                                      os << "TR";
-////                                      CNF += "true";
-//                                        break;
-//                    };
-//                } //else {
-//                  switch ((*iter)->type) {
-//                      case DEADLOCK:  os << "DL"; break;
-//                      case FINALSTATE: os << "FS"; break;
-//                      default: os << "TR"; break;
-//                  };
-//              }
-//              os << ", " << (*iter)->isMinimal();
-//              os << ") " << (*iter)->index << "\\n";
-				if (parameters[P_SHOW_STATES_PER_NODE]) {
 	                os << "\\n";
 	            }
             }
-			
 
             if (parameters[P_OG]) {
                 if (v->getColor() == RED) {
@@ -765,9 +728,8 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
                 	CNF += v->getCNF();
                 }
             }
-//          }      CNF += ">";
-                os << CNF;
-            
+
+			os << CNF;
 
             os << "\", fontcolor=black, color=";
 
@@ -787,8 +749,9 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
                 vertex * vNext = element->getNode();
 
                 if (parameters[P_SHOW_ALL_NODES]
-                        || (parameters[P_SHOW_NO_RED_NODES] && vNext->getColor() != RED)
-                        || (parameters[P_SHOW_BLUE_NODES_ONLY] && vNext->getColor() == BLUE)) {
+                    || (parameters[P_SHOW_NO_RED_NODES] && vNext->getColor() != RED)
+                    || (!parameters[P_SHOW_NO_RED_NODES] && vNext->getColor() == RED)
+                    || (vNext->getColor() == BLUE)) {
 
                     if (parameters[P_SHOW_EMPTY_NODE] || vNext->reachGraphStateSet.size() != 0) {
 
@@ -925,30 +888,22 @@ analysisResult communicationGraph::analyseNode(vertex * node, bool finalAnalysis
 //! either because of reaching communication depth or because there are no events left
 bool communicationGraph::terminateBuildGraph(vertex * currentNode) {
 	
-//	if (options[O_COMM_DEPTH]) {
-		// when -c set to a value, then stop at that depth
+	return false;
 
-		if (actualDepth > PN->commDepth) {
-			return true;
-		} else {
-			return false;
-		}
-
-//	} else {
-//		// check whether there are input or output events left
-//		// (i.e. their max_occurences value is not reached)
-//		int i;
-//		
-//		for (i = 0; i < PN->getInputPlaceCnt(); i++) {
-//			if (currentNode->eventsUsed[i] < PN->inputPlacesArray[i]->max_occurence) {
-//				return false;    // at least one event can be sent
-//			}
+//	// check whether there are input or output events left
+//	// (i.e. their max_occurences value is not reached)
+//	int i;
+//	
+//	for (i = 0; i < PN->getInputPlaceCnt(); i++) {
+//		if (currentNode->eventsUsed[i] < PN->inputPlacesArray[i]->max_occurence) {
+//			return false;    // at least one event can be sent
 //		}
-//		for (i = 0; i < PN->getOutputPlaceCnt(); i++) {
-//			if (currentNode->eventsUsed[i + PN->placeInputCnt] < PN->outputPlacesArray[i]->max_occurence) {
-//				return false;    // at least one event can be received
-//			}
-//		}
-//		return true;
 //	}
+//	for (i = 0; i < PN->getOutputPlaceCnt(); i++) {
+//		if (currentNode->eventsUsed[i + PN->placeInputCnt] < PN->outputPlacesArray[i]->max_occurence) {
+//			return false;    // at least one event can be received
+//		}
+//	}
+//	return true;
 }
+

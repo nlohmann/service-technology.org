@@ -65,15 +65,16 @@ class oWFN  {
 	    StateSet setOfStatesTemp;			//!< this set contains all states of the newly calculated node
 		StateSet visitedStates;				//!< in case of state reduction, remember those state that we have visited so far by calculating the new node
 
-		unsigned int commDepth;				//!< depth of operating guideline
-											// wird in syntax.yy gesetzt
+//		unsigned int commDepth;				//!< depth of operating guideline
+//											// wird in syntax.yy gesetzt
+
 		void initializeTransitions();		//!< calls the check_enabled function for all transitions
 
 		unsigned int getPlaceCnt();			//!< number of all places
 		unsigned int placeInputCnt;			//!< number of input places
 		unsigned int placeOutputCnt;		//!< number of output places
 
-		unsigned int getCommDepth();
+//		unsigned int getCommDepth();
 		unsigned int getTransitionCnt();
 		unsigned int getPlaceHashValue();
 

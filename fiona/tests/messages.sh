@@ -38,8 +38,8 @@ result=0
 
 ############################################################################
 
-echo running $FIONA -n $DIR/messageboundtest1.owfn -a -t OG -e10 -c10 -m4
-OUTPUT=`$FIONA -n $DIR/messageboundtest1.owfn -a -t OG -e10 -c10 -m4  2>&1`
+echo running $FIONA -n $DIR/messageboundtest1.owfn -a -t OG -e10 -m4
+OUTPUT=`$FIONA -n $DIR/messageboundtest1.owfn -a -t OG -e10 -m4  2>&1`
 
 echo $OUTPUT | grep "net is controllable: NO" > /dev/null
 mb14control=$?
@@ -56,8 +56,8 @@ result=`expr $mb14control`
 mb15bluenodes_soll=36
 mb15blueedges_soll=60
 
-echo running $FIONA -n $DIR/messageboundtest1.owfn -a -t OG -e10 -c10 -m5
-OUTPUT=`$FIONA -n $DIR/messageboundtest1.owfn -a -t OG -e10 -c10 -m5  2>&1`
+echo running $FIONA -n $DIR/messageboundtest1.owfn -a -t OG -e10 -m5
+OUTPUT=`$FIONA -n $DIR/messageboundtest1.owfn -a -t OG -e10 -m5  2>&1`
 
 echo $OUTPUT | grep "net is controllable: YES" > /dev/null
 mb15control=$?
@@ -80,8 +80,8 @@ result=`expr $result + $mb15control + $mb15bluenodes + $mb15blueedges`
 mb16bluenodes_soll=46
 mb16blueedges_soll=78
 
-echo running $FIONA -n $DIR/messageboundtest1.owfn -a -t OG -e10 -c10 -m6
-OUTPUT=`$FIONA -n $DIR/messageboundtest1.owfn -a -t OG -e10 -c10 -m6  2>&1`
+echo running $FIONA -n $DIR/messageboundtest1.owfn -a -t OG -e10 -m6
+OUTPUT=`$FIONA -n $DIR/messageboundtest1.owfn -a -t OG -e10 -m6  2>&1`
 
 echo $OUTPUT | grep "net is controllable: YES" > /dev/null
 mb16control=$?
@@ -104,8 +104,8 @@ result=`expr $result + $mb16control + $mb16bluenodes + $mb16blueedges`
 mb21bluenodes_soll=3
 mb21blueedges_soll=2
 
-echo running $FIONA -n $DIR/messageboundtest2.owfn -a -t OG -e10 -c10 -m1
-OUTPUT=`$FIONA -n $DIR/messageboundtest2.owfn -a -t OG -e10 -c10 -m1  2>&1`
+echo running $FIONA -n $DIR/messageboundtest2.owfn -a -t OG -e10 -m1
+OUTPUT=`$FIONA -n $DIR/messageboundtest2.owfn -a -t OG -e10 -m1  2>&1`
 
 echo $OUTPUT | grep "net is controllable: YES" > /dev/null
 mb21control=$?
@@ -128,8 +128,8 @@ result=`expr $result + $mb21control + $mb21bluenodes + $mb21blueedges`
 mb22bluenodes_soll=5
 mb22blueedges_soll=5
 
-echo running $FIONA -n $DIR/messageboundtest2.owfn -a -t OG -e10 -c10 -m2
-OUTPUT=`$FIONA -n $DIR/messageboundtest2.owfn -a -t OG -e10 -c10 -m2  2>&1`
+echo running $FIONA -n $DIR/messageboundtest2.owfn -a -t OG -e10 -m2
+OUTPUT=`$FIONA -n $DIR/messageboundtest2.owfn -a -t OG -e10 -m2  2>&1`
 
 echo $OUTPUT | grep "net is controllable: YES" > /dev/null
 mb22control=$?

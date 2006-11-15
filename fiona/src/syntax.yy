@@ -208,9 +208,9 @@ net: key_place place_area key_marking {LocalTable = (SymbolTab *) 0;}
 					pl->ArrivingArcs[pl->NrOfArriving] = PN->Transitions[i]->LeavingArcs[j];
 					pl->NrOfArriving++;
 					
-					if (pl->type == OUTPUT) {
-						PN->commDepth += PN->Transitions[i]->LeavingArcs[j]->Multiplicity;
-					}
+//					if (pl->type == OUTPUT) {
+//						PN->commDepth += PN->Transitions[i]->LeavingArcs[j]->Multiplicity;
+//					}
 				}
 				for(j = 0;j < PN->Transitions[i]->NrOfArriving; j++) {
 					owfnPlace * pl;
@@ -218,9 +218,9 @@ net: key_place place_area key_marking {LocalTable = (SymbolTab *) 0;}
 					pl->LeavingArcs[pl->NrOfLeaving] = PN->Transitions[i]->ArrivingArcs[j];
 					pl->NrOfLeaving ++;
 					
-					if (pl->type == INPUT) {
-						PN->commDepth += PN->Transitions[i]->ArrivingArcs[j]->Multiplicity;
-					}
+//					if (pl->type == INPUT) {
+//						PN->commDepth += PN->Transitions[i]->ArrivingArcs[j]->Multiplicity;
+//					}
 				}
 			}
 			PN->startOfEnabledList = PN->Transitions[0];

@@ -55,7 +55,6 @@ static struct option longopts[] =
   { "show",      	  required_argument, 	NULL, 's' },
   { "calcallstates",  no_argument, 			NULL, 'a' },
   { "reduceIG",   	  no_argument,	    	NULL, 'r' },
-  { "commDepth",   	  required_argument,    NULL, 'c' },
   { "messagemaximum", required_argument,    NULL, 'm' },
   { "eventsmaximum",  required_argument,    NULL, 'e' },
   { "BDD",			  required_argument,    NULL, 'b' },
@@ -64,7 +63,7 @@ static struct option longopts[] =
 };
 
 
-const char * par_string = "hvd:n:t:s:arc:m:e:b:x";
+const char * par_string = "hvd:n:t:s:arm:e:b:x";
 
 // --------------------- functions for command line evaluation ------------------------
 // Prints an overview of all commandline arguments.
@@ -86,9 +85,6 @@ void print_help() {
   trace("                                   OG - operating guideline\n");
   trace("                                   IG - interaction graph (default)\n");
   trace("\n");
-  trace(" -c | --commDepth=<level>     - set communication depth to <level>\n");
-  trace("                                   (only relevant for OG)\n");
-  trace("\n");
   trace(" -m | --messagemaximum=<level> - set maximum number of same messages per state to <level>\n");
   trace("\n");
   trace(" -e | --eventsmaximum=<level> - set event to occur at most <level> times\n");
@@ -99,7 +95,7 @@ void print_help() {
   trace(" -s | --show=<parameter>      - different display options <parameter>:\n");
   trace("                                   allnodes  - show nodes of all colors\n");
   trace("                                   blue      - show blue nodes only (default)\n");
-  trace("                                   nored     - show blue and black nodes\n");
+  trace("                                   rednodes  - show blue and red nodes (no empty node and no black nodes)\n");
   trace("                                   empty     - show empty node\n");
   trace("                                   allstates - show all calculated states per node\n");
   trace("\n");
@@ -170,7 +166,6 @@ void parse_command_line(int argc, char* argv[]) {
 	options[O_BDD] = false;
 	options[O_EX] = false;
 
-	options[O_COMM_DEPTH] = false;
 	options[O_MESSAGES_MAX] = false;
 	options[O_EVENT_USE_MAX] = false;
 
@@ -188,7 +183,6 @@ void parse_command_line(int argc, char* argv[]) {
 	
 	messages_manual = 1;
 	events_manual = 1;
-	commDepth_manual = 1;
 	
   	// evaluate options and set parameters
   	trace(TRACE_0, "\n");
@@ -248,10 +242,6 @@ void parse_command_line(int argc, char* argv[]) {
 			  		parameters[P_IG] = true;
 			    }
 			  	break;
-	      	case 'c':
-	        	options[O_COMM_DEPTH] = true;
-	        	commDepth_manual = atoi(optarg);
-	          	break;
 	      	case 'm':
 	        	options[O_MESSAGES_MAX] = true;
 	        	messages_manual = atoi(optarg);
@@ -266,23 +256,23 @@ void parse_command_line(int argc, char* argv[]) {
 	      			parameters[P_SHOW_ALL_NODES] = false;
 	      			parameters[P_SHOW_NO_RED_NODES] = false;
 	      			parameters[P_SHOW_BLUE_NODES_ONLY] = true;
-	      		} else if (string(optarg) == "nored") {
+	      		} else if (string(optarg) == "rednodes") {
 	      			options[O_SHOW_NODES] = true;
 	      			parameters[P_SHOW_ALL_NODES] = false;
-	      			parameters[P_SHOW_NO_RED_NODES] = true;
+	      			parameters[P_SHOW_NO_RED_NODES] = false;
 	      			parameters[P_SHOW_BLUE_NODES_ONLY] = false;
 	      		} else if (string(optarg) == "empty") {
 	    	  		options[O_SHOW_NODES] = true;
 	      			parameters[P_SHOW_EMPTY_NODE] = true;
-	      		} else if (string(optarg) == "allstates") {
-		      		options[O_SHOW_NODES] = true;
-	      			parameters[P_SHOW_STATES_PER_NODE] = true;
 	      		} else if (string(optarg) == "allnodes") {
 		      		options[O_SHOW_NODES] = true;
 	      			parameters[P_SHOW_ALL_NODES] = true;
 	      			parameters[P_SHOW_EMPTY_NODE] = true;
 	      			parameters[P_SHOW_NO_RED_NODES] = false;
 	      			parameters[P_SHOW_BLUE_NODES_ONLY] = false;
+	      		} else if (string(optarg) == "allstates") {
+		      		options[O_SHOW_NODES] = true;
+	      			parameters[P_SHOW_STATES_PER_NODE] = true;
 	      		} else {
 					cerr << "Error: \t wrong show option\n \t enter \"fiona --help\" for more information\n" << endl;
 					exit(1);

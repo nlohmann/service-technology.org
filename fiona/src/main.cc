@@ -106,36 +106,50 @@ int yywrap() {
 //! \fn void adjustOptionValues()
 //! \brief adjusts values for -e and -c options
 void adjustOptionValues() {
-	if (options[O_COMM_DEPTH] == true) {
-		// adjusting commDepth if dominated by events
-		if (commDepth_manual > numberOfEvents) {
-			trace(TRACE_1, "manual commDepth is set too high ... adjusting it\n");
-			PN->commDepth = numberOfEvents;
-		} else {
-			PN->commDepth = commDepth_manual;
-		}
-
-		// adjusting events if dominated by commDepth
-		if (options[O_EVENT_USE_MAX] == true) {
-			if (PN->getCommDepth() < events_manual) {
-			    trace(TRACE_1, "number of events to be used is set too high\n");
-			    events_manual = PN->commDepth;
-			}
-		}
-	} else {
-		// compute commDepth if not specified by -c option
-		trace(TRACE_1, "standard commDepth too high ... adjusting it\n");
-		if (PN->commDepth > numberOfEvents) {
-			PN->commDepth = numberOfEvents;
-		}
-	}
+//	if (options[O_COMM_DEPTH] == true) {
+//		// adjusting commDepth if dominated by events
+//		if (commDepth_manual > numberOfEvents) {
+//			trace(TRACE_1, "manual commDepth is set too high ... adjusting it\n");
+//			PN->commDepth = numberOfEvents;
+//		} else {
+//			PN->commDepth = commDepth_manual;
+//		}
+//
+//		// adjusting events if dominated by commDepth
+//		if (options[O_EVENT_USE_MAX] == true) {
+//			if (PN->getCommDepth() < events_manual) {
+//			    trace(TRACE_1, "number of events to be used is set too high\n");
+//			    events_manual = PN->commDepth;
+//			}
+//		}
+//	} else {
+//		// compute commDepth if not specified by -c option
+//		trace(TRACE_1, "standard commDepth too high ... adjusting it\n");
+//		if (PN->commDepth > numberOfEvents) {
+//			PN->commDepth = numberOfEvents;
+//		}
+//	}
+	
 	// report ...
-	trace(TRACE_0, "communication depth: " + intToString(PN->getCommDepth()) + "\n");
+
+//	trace(TRACE_0, "communication depth: " + intToString(PN->getCommDepth()) + "\n");
+
 	if (options[O_MESSAGES_MAX] == true) {
 		trace(TRACE_0, "interface message bound set to: " + intToString(messages_manual) +"\n");
 	}
-	trace(TRACE_0, "considering max. " + intToString(numberOfEvents) + " events at all\n\n");
+	trace(TRACE_0, "considering max. " + intToString(numberOfEvents) + " events at all:\n");
+	trace(TRACE_0, "    input events:\n" );
+	for (int e=0; e < PN->getInputPlaceCnt(); e++) {
+		trace(TRACE_0, "\t" + string(PN->inputPlacesArray[e]->name));
+		trace(TRACE_0, "\t(max. " + intToString(PN->inputPlacesArray[e]->max_occurence) + "x)\n");
+	}
+	trace(TRACE_0, "    output events:\n" );
+	for (int e=0; e < PN->getOutputPlaceCnt(); e++) {
+		trace(TRACE_0, "\t" + string(PN->outputPlacesArray[e]->name));
+		trace(TRACE_0, "\t(max. " + intToString(PN->outputPlacesArray[e]->max_occurence) + "x)\n");
+	}
 	
+	trace(TRACE_0, "\n");
 	options[O_EVENT_USE_MAX] = true;
 }
 
@@ -264,7 +278,7 @@ int main(int argc, char ** argv) {
 	
 				// adjust commDepth and events_manual
 				adjustOptionValues();
-		
+				
 				// ------------------- start computation -------------------------
 				time_t seconds, seconds2;
 				

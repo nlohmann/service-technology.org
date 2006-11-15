@@ -50,3 +50,4 @@ bpel2owfn.exe.stackdump
 *.png
 *.dot
 *.out
+*.exe

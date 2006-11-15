@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/11/14 14:40:45 $
+ * \date    \$Date: 2006/11/15 14:23:49 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.30 $
+ * \version \$Revision: 1.31 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -224,7 +224,9 @@ Transition *throwFault(Place *p1, Place *p2,
       case(1): // activity in fault handlers
       case(4): // <rethrow> activity
 	{
-          unsigned int parentId = ASTEmap[ASTEmap[id->value]->parentScopeId]->parentScopeId; // warum zweimal parent???
+	  // The parent scope is just the scope of the handler or the
+	  // activity. Thus, we are interested in the parent's parent.
+          unsigned int parentId = ASTEmap[ASTEmap[id->value]->parentScopeId]->parentScopeId;
 
 	  Transition *t1;
 	  if (negativeControlFlow == 4)
@@ -246,7 +248,9 @@ Transition *throwFault(Place *p1, Place *p2,
       case(2): // activity in compensation handler
 	{
           unsigned int parentId = ASTEmap[id->value]->parentScopeId;
-	  assert(parentId != 1); // parent scope of a compensation handler shouldn't be the process :)
+
+          // parent scope of a compensation handler shouldn't be the process :)
+	  assert(parentId != 1);
 
 	  Transition *t1 = TheNet->newTransition(prefix + "throwCHFault." + p1name);
 	  TheNet->newArc(p1, t1);

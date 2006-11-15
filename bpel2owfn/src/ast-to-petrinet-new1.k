@@ -29,7 +29,7 @@
  *
  * \since   2006-10-29
  *
- * \date    \$Date: 2006/11/15 10:56:16 $
+ * \date    \$Date: 2006/11/15 14:23:49 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  *
  */
 %}
@@ -94,6 +94,7 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
       Place *p11 = TheNet->newPlace(prefix + "activity_initial");
       Place *p12 = TheNet->newPlace(prefix + "activity_final");
       Place *p13 = TheNet->newPlace(prefix + "fh_fault");
+      Place *p14 = TheNet->newPlace(prefix + "ch_fault_in");
 
       Transition *t1 = TheNet->newTransition(prefix + "initialize");
       TheNet->newArc(p1, t1);
@@ -141,6 +142,16 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
       TheNet->newArc(t8, p2);
       TheNet->newArc(p7, t8, READ);
       TheNet->newArc(p10, t8);
+
+      Transition *t9 = TheNet->newTransition(prefix + "forced_exit");
+      TheNet->newArc(t9, p4);
+      TheNet->newArc(p6, t9, READ);
+      TheNet->newArc(p14, t9);
+
+      Transition *t10 = TheNet->newTransition(prefix + "handle_ch_fault");
+      TheNet->newArc(t10, p3);
+      TheNet->newArc(p5, t10, READ);
+      TheNet->newArc(p14, t10);
     }
     i // innerActivity
     e // faultHandler
@@ -419,9 +430,9 @@ This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
       TheNet->mergePlaces(TheNet->findPlace(prefix + "inner_stopped"),    TheNet->findPlace(i->id, ".stopped"));
 
       // merge ch_fault place with parent scope
-      if (ASTEmap[_id->value]->parentScopeId == 1) // TODO: overwork this!
-        TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_fault_up"), TheNet->findPlace("1.internal.exit"));
-      else
+//      if (ASTEmap[_id->value]->parentScopeId == 1) // TODO: overwork this!
+//        TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_fault_up"), TheNet->findPlace("1.internal.exit"));
+//      else
         TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_fault_up"), TheNet->findPlace(ASTEmap[_id->value]->parentScopeId, ".internal.ch_fault_in"));
 
       currentScope = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.";

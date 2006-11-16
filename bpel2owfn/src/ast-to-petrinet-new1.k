@@ -29,7 +29,7 @@
  *
  * \since   2006-10-29
  *
- * \date    \$Date: 2006/11/16 10:29:41 $
+ * \date    \$Date: 2006/11/16 13:33:27 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
  *
  */
 %}
@@ -367,7 +367,7 @@ This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
       TheNet->newArc(t8, p7);
       TheNet->newArc(p13, t8);
       TheNet->newArc(TheNet->findPlace("1.internal.Exiting"), t8, READ);
-
+/*
       Transition *t9 = TheNet->newTransition(prefix + "take_ch_fault");
       TheNet->newArc(p19, t9);
       TheNet->newArc(p21, t9);
@@ -387,9 +387,27 @@ This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
       TheNet->newArc(t12, p3);
       TheNet->newArc(p9, t12, READ);
       TheNet->newArc(p23, t12);
+*/
+      Transition *t9 = TheNet->newTransition(prefix + "rethrow_ch_fault");
+      TheNet->newArc(p10, t9, READ);
+      TheNet->newArc(p19, t9);
+      TheNet->newArc(t9, p20);
+      TheNet->newArc(p21, t9);
+      TheNet->newArc(t9, p22);
 
-      Transition *t13 = stop(p1, "initial", prefix);
-      Transition *t14 = stop(p2, "final", prefix);
+      Transition *t10 = TheNet->newTransition(prefix + "handle_ch_fault");
+      TheNet->newArc(t10, p3);
+      TheNet->newArc(p9, t10, READ);
+      TheNet->newArc(p19, t10);
+      TheNet->newArc(p21, t10);
+      TheNet->newArc(t10, p22);
+
+      Transition *t11 = TheNet->newTransition(prefix + "ignore_ch_fault");
+      TheNet->newArc(p19, t11);
+      TheNet->newArc(p22, t11, READ);
+
+      Transition *t12 = stop(p1, "initial", prefix);
+      Transition *t13 = stop(p2, "final", prefix);
     }
       a // standard elements
       i // inner activity

@@ -109,19 +109,6 @@ unsigned int oWFN::getOutputPlaceCnt() {
 }
 
 
-//unsigned int oWFN::getCommDepth() {
-//	return commDepth;
-//}
-
-
-//! \fn unsigned int oWFN::getTransitionCnt()
-//! \brief returns the number of transitions of the net
-unsigned int oWFN::getCardFireList() {
-	assert(false);		// cout << "oWFN::getCardFireList() never used" << endl;
-	return CardFireList;
-}
-
-
 //! \fn oWFN::initialize()
 //! \brief initializes the owfn; is called right after the parsing of the net file is done
 void oWFN::initialize() {
@@ -278,23 +265,6 @@ owfnTransition ** oWFN::quasiFirelist() {
 
 	return tl;
 }
-
-
-
-//void oWFN::addStateToList(vertex * n, State * NewState, bool minimal) {
-//
-//	if (parameters[P_CALC_ALL_STATES]
-// 		|| NewState->type == DEADLOCK
-//		|| minimal
-//		|| NewState->type == FINALSTATE) { 
-//		
-//		n->addState(NewState);
-//	}
-//	
-//	for(int i = 0; i < NewState->CardFireList; i++) {
-//		addStateToList(n, NewState->succ[i]);
-//	}
-//}
 
 
 //! \fn void oWFN::addSuccStatesToList(vertex * n, State * currentState)
@@ -662,8 +632,6 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 		CurrentState = binInsert(this);
 	}
 	
-//	cout << "new state: " << printCurrentMarkingForDot() << " with " << CardQuasiFireList << " in quasiFirelist" << endl;
-	
 	CurrentState->firelist = firelist();
 	CurrentState->CardFireList = CardFireList;
 	if (parameters[P_IG]) {
@@ -734,9 +702,6 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	     		(CurrentState->current)++;
 	    	} else {
 				trace(TRACE_5, "Current marking new\n");
-
-//	cout << "new state: " << printCurrentMarkingForDot() << " with " << CardQuasiFireList << " in quasiFirelist" << endl;
-
 
       			NewState = binInsert(this);
       			NewState->firelist = firelist();
@@ -1143,6 +1108,7 @@ char * oWFN::printCurrentMarkingForDot() {
 
 }
 
+
 void oWFN::print_binDec(int h) {
 
 	for(int i=0; i < placeCnt; i++) {
@@ -1273,6 +1239,7 @@ void oWFN::deletePlace(owfnPlace * place) {
 	placeCnt--;
 }
 
+
 void oWFN::deleteTransition(owfnTransition * transition) {
 	delete transition;
 	transCnt--;
@@ -1295,6 +1262,7 @@ stateType oWFN::typeOfState() {
 	trace(TRACE_5, "oWFN::typeOfState() : end\n");	
 }
 
+
 //! \fn bool oWFN::isMinimal()
 //! \brief returns true, if current state is minimal
 bool oWFN::isMinimal() {
@@ -1308,6 +1276,7 @@ bool oWFN::isMinimal() {
 	}
 	return false;
 }
+
 
 //! \fn bool oWFN::isMaximal()
 //! \brief returns true, if current state is maximal

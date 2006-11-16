@@ -66,7 +66,6 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 		return;
 	}
 
-//	cout << " ... continue " << endl;
 	trace(TRACE_1, "=================================================================\n");
 
 	// communication depth not yet reached, going down
@@ -123,10 +122,6 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	    
 		if (currentNode->eventsUsed[i + PN->placeInputCnt] < PN->outputPlacesArray[i]->max_occurence) {
 				
-//			cout << "event " << PN->outputPlacesArray[i]->name << " at node "
-//               << currentNode->getNumber() << " considered " << " since it did occure yet "
-//               << currentNode->eventsUsed[i + PN->placeInputCnt] << " times" << endl;
-			
 			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
 			currentVertex = currentNode;
 			

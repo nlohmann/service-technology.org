@@ -28,13 +28,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/11/16 10:29:41 $
+ * \date    \$Date: 2006/11/16 10:44:35 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
  *
  * \ingroup petrinet
  */
@@ -306,12 +306,14 @@ string Place::dotOut()
   string result;
   result += " p" + toString(id) + "\t[label=\"" + nodeShortName() + "\"" + " URL=\"http://www.google.de\"";
 
-
-  if (firstMemberIs("in."))
+  if (type == IN)
     result += " style=filled fillcolor=orange shape=ellipse";
-  else if (firstMemberIs("out."))
+  if (type == OUT)
     result += " style=filled fillcolor=yellow shape=ellipse";
-  else if (historyContains("1.internal.initial")
+  if (type == INOUT)
+    result += " style=filled fillcolor=gold shape=ellipse";
+
+  if (historyContains("1.internal.initial")
 	   || historyContains("1.internal.final"))
     result += " style=filled fillcolor=gray";
   else if (firstMemberIs("!link."))

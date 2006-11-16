@@ -18,13 +18,13 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/05 13:37:41 $ by $Author: nlohmann $.
-# Version $Revision: 1.20 $
+# File last changed $Date: 2006/11/16 10:58:18 $ by $Author: nlohmann $.
+# Version $Revision: 1.21 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT([BPEL2oWFN],[2.0],[nlohmann@informatik.hu-berlin.de],[bpel2owfn])
-AC_REVISION($Revision: 1.20 $)
+AC_REVISION($Revision: 1.21 $)
 AM_INIT_AUTOMAKE
 
 
@@ -33,8 +33,13 @@ AC_CONFIG_SRCDIR(src/bpel2owfn.cc)
 AC_CONFIG_HEADERS(src/bpel2owfn.h)
 
 
-# The next line has to be un-commented to improve performance.
-# AC_DEFINE(NDEBUG,1,[The release version does not need assert-calls.])
+# The next lines have to be un-commented before releasing version.
+#AC_DEFINE(NDEBUG,1,[The release version does not need assert-calls.])
+#CXXFLAGS="-O2"
+#CFLAGS="-O2"
+CXXFLAGS=""
+CFLAGS=""
+
 
 
 # Checks for C/C++ details.
@@ -78,14 +83,10 @@ fi
 AC_CHECK_PROG(DOT, dot, dot, not found)
 if test "$DOT" = "not found"; then
  AC_MSG_WARN([Graphviz dot was not found.])
+ AC_DEFINE(HAVE_DOT, 0, [Graphviz dot can not be used on this system.])
 else
  AC_DEFINE(HAVE_DOT, 1, [Graphviz dot can be used on this system.])
 fi
-
-
-# Add this parameters to debug.
-#CXXFLAGS="-g -Wall"
-CXXFLAGS=""
 
 
 # Set files to generate.

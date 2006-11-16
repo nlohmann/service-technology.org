@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/07 10:25:06 $ by $Author: nlohmann $.
-# Version $Revision: 1.23 $
+# File last changed $Date: 2006/11/16 10:58:18 $ by $Author: nlohmann $.
+# Version $Revision: 1.24 $
 
 SUBDIRS = src doc tests
 
@@ -27,8 +27,10 @@ SUBDIRS = src doc tests
 
 
 # flags for the compilers
-AM_CXXFLAGS= # -g -pedantic 
-AM_CFLAGS=   # -g -pedantic
+#AM_CXXFLAGS= # -g -pedantic 
+#AM_CFLAGS=   # -g -pedantic
+AM_CXXFLAGS = -O2
+AM_CFLAGS   = -O2
 
 
 # all files that require the permission to execute

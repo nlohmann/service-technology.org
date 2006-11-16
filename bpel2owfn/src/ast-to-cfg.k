@@ -33,7 +33,7 @@
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/11/15 14:32:41 $
+ *          - last changed: \$Date: 2006/11/16 11:44:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
  */
 %}
 
@@ -815,17 +815,22 @@ ForEach(a,b,c,d,e,f) ->
 RepeatUntil(a,b,c) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] RepeatUntil\n");
-	  CFGBlock * block = new CFGBlock(CFGRepeatUntil, $0->id, "RepeatUntil"); 
+	  CFGBlock * repeat = new CFGBlock(CFGRepeatUntil, $0->id, "Repeat"); 
+	  CFGBlock * until = new CFGBlock(CFGRepeatUntil, $0->id, "Until"); 
 
-	  cfgMap[toString($0->id)] = block; 
+	  repeat->firstBlock = until->firstBlock = repeat;
+	  repeat->lastBlock  = until->lastBlock  = until;
+
+          cfgMap[toString($0->id)] = repeat; 
   	}
 	b
 	{
 	  CFGBlock * innerFirst = cfgMap.find(toString(b->id))->second->firstBlock;
 	  CFGBlock * innerLast = cfgMap.find(toString(b->id))->second->lastBlock;
 	  
-	  connectBlocks(block, innerFirst);
-	  connectBlocks(innerLast, block);
+	  connectBlocks(repeat, innerFirst);
+	  connectBlocks(innerLast, until);
+          connectBlocks(until, repeat);
 	}
 	a // standard elements
   ]

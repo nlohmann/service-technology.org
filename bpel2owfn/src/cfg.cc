@@ -31,14 +31,14 @@
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/11/10 11:49:47 $
+ *          - last changed: \$Date: 2006/11/16 11:44:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.37 $
+ * \version \$Revision: 1.38 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -272,6 +272,15 @@ bool CFGBlock::needsDPE(int hasStartingBlock, list<int> lastTargets)
 			  newStartingBlockNumber--;
 			}
 			break; 
+      case CFGIf :      if (label == "If_begin")
+			{
+			  newStartingBlockNumber++;
+			}
+			else
+			{
+			  newStartingBlockNumber--;
+			}
+			break; 
       case CFGPick :	if (label == "Pick_begin")
 			{
 			  newStartingBlockNumber++;
@@ -379,7 +388,7 @@ void CFGBlock::checkForUninitializedVariables()
   {
     /// for a while, we assume, that the body is never executed, so we drop that set
     list<CFGBlock *>::iterator blockBegin = prevBlocks.begin();
-    if (type == CFGWhile)
+    if (type == CFGWhile || type == CFGForEach || type == CFGRepeatUntil && label == "Repeat" )
     {
       blockBegin++;
     }
@@ -397,7 +406,7 @@ void CFGBlock::checkForUninitializedVariables()
     if (!prevBlocks.empty())
     {
       list<CFGBlock *>::iterator blockBegin = prevBlocks.begin();
-      if (type == CFGWhile)
+      if (type == CFGWhile || type == CFGForEach || type == CFGRepeatUntil && label == "Repeat" )
       {
 	blockBegin++;
       }
@@ -507,7 +516,7 @@ void CFGBlock::checkForCyclicLinks()
       if (!targetsSeen.empty() && targetsSeen.find(linkname) != targetsSeen.end())
       {
         // triggers SA00072
-	SAerror(72, linkname, toInt(ASTEmap[id]->attributes["referenceLine"]));
+	SAerror(72, ASTEmap[ id ]->attributes["linkName"], toInt(ASTEmap[id]->attributes["referenceLine"]));
 	return;
       }
       CFGBlock * targ = targets[dot_name()];
@@ -545,7 +554,7 @@ void CFGBlock::checkForCyclicControlDependency()
   {
     /// for a while, we assume, that the body is never executed, so we drop that set
     list<CFGBlock *>::iterator blockBegin = prevBlocks.begin();
-    if ( type == CFGWhile )
+    if ( type == CFGWhile || type == CFGForEach || type == CFGRepeatUntil && label == "Repeat"  )
     {
       blockBegin++;
     }
@@ -554,10 +563,12 @@ void CFGBlock::checkForCyclicControlDependency()
       allPrerequisites = allPrerequisites && ( *iter )->processed;
     }
   }
+  /*
   if ( type == CFGTarget )
   {
     allPrerequisites = allPrerequisites && sources[ dot_name() ]->processed;
   }
+  */
   if ( allPrerequisites )
   {
     if ( type == CFGTarget )
@@ -565,13 +576,6 @@ void CFGBlock::checkForCyclicControlDependency()
       unsigned int possiblePeer = ASTEmap[ ASTEmap[ sources[ dot_name() ]->id ]->parentActivityId ]->parentScopeId;
       unsigned int parentId = id;
       parentId = ASTEmap[ parentId ]->parentActivityId;
-
-      /*
-      list<unsigned int> al = ASTEmap[parentId]->ancestorScopes();
-      for (list<unsigned int>::iterator iter = al.begin(); iter != al.end(); iter++)
-      {
-      }
-      */
 
       while ( parentId != 1 && parentId != possiblePeer )
       {
@@ -582,24 +586,8 @@ void CFGBlock::checkForCyclicControlDependency()
 	controllingPeers.insert( possiblePeer );
       }
     }
-    /*
-    else if ( type == CFGScope && label == "Scope_end" )
-    {
-      bool add = false;
-      for ( set< unsigned int >::iterator iter = controllingPeers.begin(); iter != controllingPeers.end(); iter ++)
-      {
-	if ( ASTEmap[ *iter ]->parentScopeId != id )
-	{
-	  add = true;
-	}
-      }
-      if ( add ) 
-      {
-	controllingPeers.insert(id);
-      }
-    }
-    */
-    else if ( type == CFGFlow && label == "Flow_end" )
+    else if ( type == CFGFlow && label == "Flow_end" || type == CFGSequence && label == "Sequence_end" ) //
+//    else if ( type == CFGScope && label == "Scope_end" ) //
     {
       // find direct child scopes
       unsigned int child = 0;
@@ -627,15 +615,20 @@ void CFGBlock::checkForCyclicControlDependency()
 	    while ( queue.size() > 0 )
 	    {
 	      unsigned int current = *( queue.begin() );
+//              cerr << "Looking at scope " << current << endl;
 	      if ( ! seen[ current ] )
 	      {
+                extern map< std::string, CFGBlock* > cfgMap;
 		seen[ current ] = true;
-		for ( set< unsigned int >::iterator peer = ASTEmap[ current ]->peerScopes.begin(); peer != ASTEmap[ current ]->peerScopes.end(); peer++ )
+//		for ( set< unsigned int >::iterator peer = ASTEmap[ current ]->peerScopes.begin(); peer != ASTEmap[ current ]->peerScopes.end(); peer++ )
+		for ( set< unsigned int >::iterator peer = cfgMap[ toString(current) ]->lastBlock->controllingPeers.begin(); peer != cfgMap[ toString(current) ]->lastBlock->controllingPeers.end(); peer++ )
 		{
 		  // is there a cycle?
+//                  cerr << "    peer " << *peer << endl;
 		  if ( seen [ *peer ] )
 		  {
 		    SAerror( 82, "", toInt( ASTEmap[ *peer ]->attributes[ "referenceLine" ] ) );
+                    return;
 		  }
 		  else
 		  {
@@ -686,7 +679,7 @@ void CFGBlock::checkForConflictingReceive()
   {
     /// for a while, we assume, that the body is never executed, so we drop that set
     list<CFGBlock *>::iterator blockBegin = nextBlocks.begin();
-    if (type == CFGWhile)
+    if (type == CFGWhile || type == CFGForEach || type == CFGRepeatUntil && label == "Until" )
     {
       blockBegin++;
     }
@@ -704,7 +697,7 @@ void CFGBlock::checkForConflictingReceive()
     if (!nextBlocks.empty())
     {
       list<CFGBlock *>::iterator blockBegin = nextBlocks.begin();
-      if (type == CFGWhile)
+      if (type == CFGWhile || type == CFGForEach || type == CFGRepeatUntil && label == "Until" )
       {
 	blockBegin++;
       }

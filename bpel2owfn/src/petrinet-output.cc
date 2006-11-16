@@ -19,37 +19,24 @@
 \*****************************************************************************/
 
 /*!
- * \file petrinet-output.cc
+ * \file    petrinet-output.cc
  *
- * \brief Output Functions for Petri nets (implementation)
+ * \brief   output Functions for Petri nets (implementation)
  * 
- * This file implements the classes and functions defined in petrinet.h.
- *   - Transition::dotOut()
- *   - Place::dotOut()
- *   - Arc::dotOut()
- *   - PetriNet::information()
- *   - PetriNet::printInformation()
- *   - PetriNet::dotOut()
- *   - PetriNet::pnmlOut()
- *   - PetriNet::pepOut()
- *   - PetriNet::apnnOut()
- *   - PetriNet::lolaOut()
- *   - PetriNet::owfnOut()
+ * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $
  *
+ * \since   created: 2006-03-16
  *
- * \author
- *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
- *
- * \date
- *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/11/15 14:53:14 $
+ * \date    \$Date: 2006/11/16 10:29:41 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
+ *
+ * \ingroup petrinet
  */
 
 

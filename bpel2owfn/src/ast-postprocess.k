@@ -29,7 +29,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/15 14:53:14 $
+ * \date    \$Date: 2006/11/16 10:29:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.99 $
+ * \version \$Revision: 1.100 $
  */
 %}
 
@@ -80,10 +80,6 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
     i // inner activity
     e f g h
     {
-      // trigger [SA00015]
-      if (startActivities.empty())
-        SAerror(15, "", myself->attributes["referenceLine"]);
-
       // collect enclosed source links
       assert(ASTEmap[i->id] != NULL);
       myself->enclosedSourceLinks = ASTEmap[i->id]->enclosedSourceLinks;
@@ -96,6 +92,10 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
 
       // pass list of enclosed scopes to the compensation handler
       ASTEmap[f->id]->enclosedScopes = myself->enclosedScopes;
+
+      // trigger [SA00015]
+      if (startActivities.empty())
+        SAerror(15, "", myself->attributes["referenceLine"]);
 
       // trigger [SA00066]
       // should be actually calculated at a <flow> activity, but "linksOK" is
@@ -179,9 +179,7 @@ PartnerLink(_id) ->
 ******************************************************************************/
 
 Partner(a,_id) ->
-  [postprocessing:
-    a
-  ]
+  [postprocessing: a]
 ;
 
 

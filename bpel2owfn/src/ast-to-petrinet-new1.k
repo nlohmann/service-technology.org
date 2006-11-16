@@ -29,7 +29,7 @@
  *
  * \since   2006-10-29
  *
- * \date    \$Date: 2006/11/15 14:23:49 $
+ * \date    \$Date: 2006/11/16 10:29:41 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  *
  */
 %}
@@ -429,11 +429,8 @@ This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
       TheNet->mergePlaces(TheNet->findPlace(prefix + "stop"),             TheNet->findPlace(i->id, ".stop"));
       TheNet->mergePlaces(TheNet->findPlace(prefix + "inner_stopped"),    TheNet->findPlace(i->id, ".stopped"));
 
-      // merge ch_fault place with parent scope
-//      if (ASTEmap[_id->value]->parentScopeId == 1) // TODO: overwork this!
-//        TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_fault_up"), TheNet->findPlace("1.internal.exit"));
-//      else
-        TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_fault_up"), TheNet->findPlace(ASTEmap[_id->value]->parentScopeId, ".internal.ch_fault_in"));
+      // merge `ch_fault_up' place with `ch_fault_in' place of the parent scope
+      TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_fault_up"), TheNet->findPlace(ASTEmap[_id->value]->parentScopeId, ".internal.ch_fault_in"));
 
       currentScope = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.";
       footer(This->id, true);

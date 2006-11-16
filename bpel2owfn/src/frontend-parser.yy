@@ -37,7 +37,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2006/11/08 07:38:24 $
+ * \date    \$Date: 2006/11/16 10:29:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -46,7 +46,7 @@
  * \note    This file was created using GNU Bison reading file parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.271 $
+ * \version \$Revision: 1.272 $
  *
  * \ingroup frontend
  */
@@ -136,9 +136,9 @@ using namespace std;
  * External variables
  *****************************************************************************/
 
-extern char *yytext;			// from flex
-extern int yylex();			// from flex
-extern int yylineno;			// from flex
+extern char *yytext;	// from flex
+extern int yylex();	// from flex
+extern int yylineno;	// from flex
 
 
 

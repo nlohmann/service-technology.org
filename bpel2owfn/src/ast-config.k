@@ -26,8 +26,8 @@
 
 %{ HEADER
 #include "ast-system-k.h"	// phylum definitions
-#include "ast-system-rk.h"	// ?
-#include "ast-system-unpk.h"	// ?
+#include "ast-system-rk.h"	// rewrite rules
+#include "ast-system-unpk.h"	// unparse rules
 #include "ast-system-yystype.h" // data types for tokens and non-terminals
 #include <cassert>		// assertion header (for radon)
 %}
@@ -158,7 +158,6 @@ extern map<unsigned int, ASTE*> ASTEmap;
 // implicitly generated files
 
 %{ KC_TYPES_HEADER
-
 #include <string>
 #include <iostream>
 #include <map>

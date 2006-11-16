@@ -19,35 +19,24 @@
 \*****************************************************************************/
 
 /*!
- * \file petrinet-reduction.cc
+ * \file    petrinet-reduction.cc
  *
- * \brief Reduction rules for Petri nets (implementation)
+ * \brief   reduction rules for Petri nets (implementation)
  *
- * This file implements the classes and functions defined in petrinet.h.
+ * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $
  *
- *  - PetriNet::removeInterface()
- *  - PetriNet::removeVariables()
- *  - PetriNet::removeUnusedStatusPlaces()
- *  - PetriNet::removeDeadNodes()
- *  - PetriNet::elminiationOfIdenticalPlaces()
- *  - PetriNet::elminiationOfIdenticalTransitions()
- *  - PetriNet::fusionOfSeriesPlaces()
- *  - PetriNet::fusionOfSeriesTransitions()
- *  - PetriNet::simplify()
+ * \since   2006-03-16
  *
- * \author
- *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
- *
- * \date
- *          - created: 2006-03-16
- *          - last changed: \$Date: 2006/11/05 12:42:28 $
+ * \date    \$Date: 2006/11/16 10:29:41 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.38 $
+ * \version \$Revision: 1.39 $
+ *
+ * \ingroup petrinet
  */
 
 
@@ -72,11 +61,11 @@
 
 
 /******************************************************************************
- * External variables
+ * Global variables
  *****************************************************************************/
 
-set<unsigned int> visited;
-set<unsigned int> visited2;
+set<unsigned int> visited;    // used for transitive reduction
+set<unsigned int> visited2;   // used for transitive reduction
 
 
 

@@ -29,7 +29,7 @@
  * 
  * \since   2005-10-03
  *
- * \date    \$Date: 2006/11/08 07:38:23 $
+ * \date    \$Date: 2006/11/16 10:29:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.149 $
+ * \version \$Revision: 1.150 $
  */
 %}
 
@@ -454,7 +454,7 @@ tRepeatUntil:
 
 
 /******************************************************************************
-  FOREACH                                                       (WS-BPEL 2.0)
+  FOREACH                                                        (WS-BPEL 2.0)
 ******************************************************************************/
 
 tForEach:

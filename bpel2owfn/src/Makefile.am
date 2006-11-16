@@ -18,14 +18,14 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/10/30 12:43:40 $ by $Author: nlohmann $.
-# Version $Revision: 1.42 $
+# File last changed $Date: 2006/11/16 14:32:03 $ by $Author: nlohmann $.
+# Version $Revision: 1.43 $
 
 bin_PROGRAMS = bpel2owfn preprocess
 
 
 # define flags for Kimwitu++
-KCFLAGS = --yystype --no-printdot --file-prefix=ast-system- --suffix=cc
+KCFLAGS = --yystype --file-prefix=ast-system- --suffix=cc
 
 # generated Flex and Bison sources
 YYSOURCES = parser.h parser.cc lexer.cc

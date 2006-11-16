@@ -28,14 +28,14 @@
  * 
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/10/29 15:56:51 $
+ * \date    \$Date: 2006/11/16 10:10:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.116 $
+ * \version \$Revision: 1.117 $
  */
 
 
@@ -88,6 +88,9 @@ PetriNet *TheNet = new PetriNet();
 /// string holding the invocation of BPEL2oWFN
 string invocation;
 
+/// string holding the called program name of BPEL2oWFN
+string program_name;
+
 
 
 
@@ -107,6 +110,8 @@ string invocation;
  */
 int main( int argc, char *argv[])
 {
+  program_name = string(argv[0]);
+
   // generate the invocation string
   for (int i = 0; i < argc; i++)
   {

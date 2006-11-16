@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/10/29 15:56:51 $
+ * \date    \$Date: 2006/11/16 10:10:02 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
  */
 
 
@@ -75,7 +75,6 @@ typedef enum
    O_INPUT,		///< read input file
    O_OUTPUT,		///< write output file
    O_MODE,		///< choose mode (see #possibleModi)
-   O_BPEL2PN,		///< emulate the tool BPEL2PN
    O_LOG,		///< write a log-file
    O_FORMAT,		///< choose output file format (see #possibleFormats)
    O_PARAMETER,		///< set various parameters (see #possibleParameters)

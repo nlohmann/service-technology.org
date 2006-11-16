@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/05 13:51:05 $
+ * \date    \$Date: 2006/11/16 10:10:02 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.46 $
+ * \version \$Revision: 1.47 $
  */
 
 
@@ -94,13 +94,13 @@ bool createOutputFile = false;
 possibleModi modus;
 
 /// options (set by #parse_command_line)
-map<possibleOptions,    bool> options;
+map<possibleOptions, bool> options;
 
 /// parameters (set by #parse_command_line)
 map<possibleParameters, bool> parameters;
 
 /// output file formats (set by #parse_command_line)
-map<possibleFormats,    bool> formats;
+map<possibleFormats, bool> formats;
 
 /// suffixes are defined in parse_command_line();
 map<possibleFormats, string> suffixes;
@@ -113,18 +113,15 @@ static struct option longopts[] =
   { "mode",		required_argument, NULL, 'm' },
   { "log",		optional_argument, NULL, 'l' },
   { "input",		required_argument, NULL, 'i' },
-  { "inputfile",	required_argument, NULL, 'i' },
   { "output",		optional_argument, NULL, 'o' },
-  { "outputfile",	optional_argument, NULL, 'o' },
   { "format",		required_argument, NULL, 'f' },
   { "parameter",	required_argument, NULL, 'p' },
-  { "bpel2pn",		no_argument,	   NULL, 'b' },
   { "debug",		required_argument, NULL, 'd' },
   NULL
 };
 
 /// short options (needed by GNU getopt)
-const char * par_string = "hvm:li:of:p:bd:";
+const char *par_string = "hvm:li:of:p:d:";
 
 
 
@@ -141,39 +138,48 @@ const char * par_string = "hvm:li:of:p:bd:";
  */
 void print_help() 
 {
+  extern string program_name;
+
   // 80 chars
   //    "12345678901234567890123456789012345678901234567890123456789012345678901234567890"
+  trace(string(PACKAGE_NAME) + " - translates a BPEL process to an open workflow net\n");
   trace("\n");
-  trace(string(PACKAGE_STRING) + "\n");
+  trace("Usage: " + program_name + " [OPTION]\n");
   trace("\n");
-  trace("Options: \n");
+  trace("Options:\n");
+  trace(" -m, --mode=MODE            use the given mode\n");
+  trace(" -p, --parameter=PARAMETER  modify processing with given parameter\n");
+  trace(" -i, --input=FILE           read input from FILE\n");
+  trace(" -o, --output[=NAME]        write output to file (NAME sets filename)\n");
+  trace(" -f, --format=FORMAT        create output of the given format\n");
+  trace(" -l, --log=NAME             create log file (NAME sets filename)\n");
+  trace(" -d, --debug=NUMBER         set a debug level (NUMBER=1..4)\n");
+  trace(" -h, --help                 print this help list and exit\n");
+  trace(" -v, --version              print program version and exit\n");
   trace("\n");
-  trace(" -h | --help            - print these information and exit\n");
-  trace(" -v | --version         - print version information and exit\n");
+  trace("  MODE is one of the following (at most one mode permitted):\n");
+  trace("    petrinet                  create a Petri net representation\n");
+  trace("    ast                       print the abstract syntax tree\n");
+  trace("    pretty                    pretty-print the input BPEL process\n");
+  trace("    cfg                       build a control flow graph\n");
   trace("\n");
-  trace(" -m | --mode=<modus>    - select one of the following modes:\n");
-  trace("                          petrinet, consistency, ast, pretty, cfg\n");
-  trace(" -p | --parameter=<par> - select additional parameters like:\n");
-  trace("                          simplify, nointerface, acyclicwhile etc.\n");
-  trace("                          (see documentation for further information)\n");
-  trace(" -b | --bpel2pn         - implies \"-flola -finfo -o\"\n");
+  trace("  PARAMETER is one of the following (multiple parameters permitted):\n");
+  trace("    simplify                  structurally simplify generated Petri net\n");
+  trace("    novariables               do not model BPEL variables\n");
+  trace("    nostandardfaults          do not model BPEL standard faults\n");
+  trace("    nofhfaults                do not model faults in fault handlers \n");
+  trace("    communicationonly         only model the communicational behavior\n");
+  trace("    xor                       use mutually exclusive transition condition\n");
+  trace("    wsbpel                    use the semantics of WS-BPEL 2.0\n");
   trace("\n");
-  trace(" -i | --input=<file>       - read input from <file>\n");
-  trace(" -s | --secondinput=<file> - read input from <file>\n");
-  trace(" -o | --output=<prefix>    - write output to <prefix>.X\n");
+  trace("  FORMAT is one of the following (multiple formats permitted):\n");
+  trace("    lola, owfn, dot, pep, apnn, info, pnml, txt, info\n");
   trace("\n");
-  trace(" -f | --format          - select output formats (as far as supported for mode):\n");
-  trace("                          lola, owfn, dot, pep, apnn, info, pnml, txt, xml\n");
-  trace("                          (note: lola,owfn,pep,apnn,pnml imply modus=petrinet\n");
+  trace("Examples:\n");
+  trace("  bpel2owfn -i service.bpel -m petrinet -f owfn -o\n");
+  trace("  bpel2owfn -i service.bpel -m petrinet -f dot -p simplify -o\n");
   trace("\n");
-  trace(" -d | --debug           - set debug level: 1-4\n");
-  trace(" -l | --log[=<file>]    - write additional information into file\n");
-  trace("\n");
-  
-  trace("\n");
-  trace("For more information see:\n");
-  trace("  http://www.informatik.hu-berlin.de/top/tools4bpel/bpel2owfn\n");
-  trace("\n");
+  trace("Report bugs to <" + string(PACKAGE_BUGREPORT) + ">.\n");
 }
 
 
@@ -187,12 +193,12 @@ void print_help()
  */
 void print_version(string name)
 {
-  trace(string(PACKAGE_STRING) + " -- ");
-  trace("Translating BPEL Processes to Open Workflow Nets\n");
-  trace("\n");
+  trace(string(PACKAGE_STRING) + "\n\n");
   trace("Copyright (C) 2005, 2006 Niels Lohmann, Christian Gierds and Dennis Reinert\n");
-  trace("This is free software; see the source for copying conditions. There is NO\n");
-  trace("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
+
+  trace("There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR\n");
+  trace("PURPOSE. You may redistribute copies of BPEL2oWFN under the terms of the\n");
+  trace("GNU General Public License. See file COPYING for information.\n");
 }
 
 
@@ -294,22 +300,6 @@ void parse_command_line(int argc, char* argv[])
 		    trace(TRACE_ALWAYS, "Choose only one mode!\n");
 		  
 		  options[O_MODE] = true;
-
-		  break;
-		}
-
-      case 'b':
-		{
-		  if (options[O_MODE] && modus != M_PETRINET)
-		    trace("Choose only one mode\n");
-		  
-		  formats[F_LOLA] = true;
-		  formats[F_INFO] = true;
-		  options[O_OUTPUT] = true;
-		  modus = M_PETRINET;
-		  options[O_MODE] = true;
-		  options[O_FORMAT] = true;
-		  options[O_BPEL2PN] = true;
 
 		  break;
 		}

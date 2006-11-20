@@ -29,7 +29,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/20 15:25:50 $
+ * \date    \$Date: 2006/11/20 15:29:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.101 $
+ * \version \$Revision: 1.102 $
  */
 %}
 
@@ -540,9 +540,6 @@ Empty(a,_id) ->
       int myid = _id->value;
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
-
-
-cerr << myself->activityTypeName() << ": " << myself->max_occurrences << endl;
 
       a->parentId = myid;
 

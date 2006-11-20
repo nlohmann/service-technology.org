@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/08 07:38:25 $
+ * \date    \$Date: 2006/11/20 15:34:39 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.100 $
+ * \version \$Revision: 1.101 $
  *
  * \ingroup petrinet
  */
@@ -261,6 +261,9 @@ class Place: public Node
 
     /// this (communication) place is embedded in a while activity
     bool inWhile;
+
+    /// the maximal number of "occurrences" of this communication place
+    unsigned int max_occurrences;
 };
 
 

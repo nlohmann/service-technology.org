@@ -29,7 +29,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/20 15:29:53 $
+ * \date    \$Date: 2006/11/20 16:28:18 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.102 $
+ * \version \$Revision: 1.103 $
  */
 %}
 
@@ -206,6 +206,7 @@ userDefinedFaultHandler(a,b,_id) ->
         ASTEmap[innerActivity->id]->parentActivityId = myid;
         ASTEmap[branch->id]->parentActivityId = myid;
         ASTEmap[innerActivity->id]->controlFlow = FHCF;
+        ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
       }
 
       // check whether a <catchAll>-branch with an enclosed activity is present
@@ -218,6 +219,7 @@ userDefinedFaultHandler(a,b,_id) ->
           ASTEmap[c->id]->parentActivityId = myid;
           ASTEmap[b->id]->parentActivityId = myid;
           ASTEmap[c->id]->controlFlow = FHCF;
+          ASTEmap[c->id]->max_occurrences = myself->max_occurrences;
         }
         default :
         {
@@ -403,6 +405,7 @@ userDefinedCompensationHandler(a,_id) ->
       assert(ASTEmap[a->id] != NULL);
       ASTEmap[a->id]->parentActivityId = myid;
       ASTEmap[a->id]->controlFlow = CHCF;
+      ASTEmap[a->id]->max_occurrences = myself->max_occurrences;
     }
     a
   ]
@@ -427,6 +430,7 @@ TerminationHandler(a,_id) ->
       assert(ASTEmap[a->id] != NULL);
       ASTEmap[a->id]->parentActivityId = myid;
       ASTEmap[a->id]->controlFlow = THCF;
+      ASTEmap[a->id]->max_occurrences = myself->max_occurrences;
     }
     a
   ]
@@ -1588,7 +1592,7 @@ Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
       myself->hasEH = (string(e->op_name()) == "userDefinedEventHandler");
 
 
-      // distribute the scopes' id to the enclosed FH/CH/EH/activity
+      // distribute the scopes' id to the enclosed FH/CH/EH/TH/activity
       assert(ASTEmap[c->id] != NULL);
       assert(ASTEmap[d->id] != NULL);
       assert(ASTEmap[e->id] != NULL);
@@ -1600,6 +1604,10 @@ Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
       ASTEmap[f->id]->parentActivityId = myid;
       ASTEmap[i->id]->parentActivityId = myid;
 
+      ASTEmap[c->id]->max_occurrences = myself->max_occurrences;
+      ASTEmap[d->id]->max_occurrences = myself->max_occurrences;
+      ASTEmap[e->id]->max_occurrences = myself->max_occurrences;
+      ASTEmap[f->id]->max_occurrences = myself->max_occurrences;
       ASTEmap[i->id]->max_occurrences = myself->max_occurrences;
 
       // remember the scope's name for compensation

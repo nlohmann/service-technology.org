@@ -24,17 +24,17 @@
  * \brief   output Functions for Petri nets (implementation)
  * 
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: reinert $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/11/20 16:15:49 $
+ * \date    \$Date: 2006/11/20 17:00:44 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.46 $
+ * \version \$Revision: 1.47 $
  *
  * \ingroup petrinet
  */
@@ -47,7 +47,6 @@
  * Headers
  *****************************************************************************/
 
-#include <climits>
 #include "petrinet.h"		// to define member functions
 #include "debug.h"		// debugging help
 #include "helpers.h"		// helper functions
@@ -275,7 +274,12 @@ string Arc::dotOut()
 string Transition::dotOut()
 {
   string result;
+#ifdef USING_BPEL2OWFN
   result += " t" + toString(id) + "\t[label=\"" + nodeShortName();
+#endif
+#ifndef USING_BPEL2OWFN
+  result += " t" + toString(id) + "\t[label=\"" + nodeName();
+#endif
  
   if (parameters[P_COMMUNICATIONONLY])
   {
@@ -307,7 +311,12 @@ string Transition::dotOut()
 string Place::dotOut()
 {
   string result;
+#ifdef USING_BPEL2OWFN
   result += " p" + toString(id) + "\t[label=\"" + nodeShortName() + "\"" + " URL=\"http://www.google.de\"";
+#endif
+#ifndef USING_BPEL2OWFN
+  result += " p" + toString(id) + "\t[label=\"" + nodeName() + "\"" + " URL=\"http://www.google.de\"";
+#endif
 
   if (type == IN)
     result += " style=filled fillcolor=orange shape=ellipse";
@@ -413,7 +422,12 @@ void PetriNet::pnmlOut()
   // places(only internal)
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
+#ifdef USING_BPEL2OWFN
     (*output) << "    <place id=\"" << (*p)->nodeShortName() << "\">" << endl;
+#endif
+#ifndef USING_BPEL2OWFN
+    (*output) << "    <place id=\"" << (*p)->nodeName() << "\">" << endl;
+#endif
     (*output) << "      <name>" << endl;
     (*output) << "        <text>" << (*p)->history[0] << "</text>" << endl;
     (*output) << "      </name>" << endl;
@@ -429,7 +443,12 @@ void PetriNet::pnmlOut()
   // transitions
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
   {
+#ifdef USING_BPEL2OWFN
     (*output) << "    <transition id=\"" << (*t)->nodeShortName() << "\">" << endl;
+#endif
+#ifndef USING_BPEL2OWFN
+    (*output) << "    <transition id=\"" << (*t)->nodeName() << "\">" << endl;
+#endif
     (*output) << "      <name>" << endl;
     (*output) << "        <text>" << (*t)->history[0] << "</text>" << endl;
     (*output) << "      </name>" << endl;
@@ -442,8 +461,14 @@ void PetriNet::pnmlOut()
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++, arcNumber++)
   {
     (*output) << "    <arc id=\"a" << arcNumber << "\" ";
+#ifdef USING_BPEL2OWFN
     (*output) << "source=\"" << (*f)->source->nodeShortName() << "\" ";
     (*output) << "target=\"" << (*f)->target->nodeShortName() << "\" />" << endl;
+#endif
+#ifndef USING_BPEL2OWFN
+    (*output) << "source=\"" << (*f)->source->nodeName() << "\" ";
+    (*output) << "target=\"" << (*f)->target->nodeName() << "\" />" << endl;
+#endif
   }
   (*output) << endl;
   (*output) << "  </net>" << endl;
@@ -694,27 +719,8 @@ void PetriNet::owfnOut()
 #ifndef USING_BPEL2OWFN
     (*output) << "    " << (*p)->nodeName();
 #endif
-
-    // calculate "MAX_OCCURRENCE" values for Fiona
-    set<Node *> post_set = postset(*p);
-    unsigned int max_occurrences = 0;
-    for (set<Node *>::iterator it = post_set.begin(); it != post_set.end(); it++)
-    {
-      for (unsigned int hist = 0; hist < (*it)->history.size(); hist++)
-      {
-	string history_entry = (*it)->history[hist];
-	unsigned int ast_id = toUInt(history_entry.substr(0,history_entry.find_first_of(".")));
-	assert(ast_id != UINT_MAX);
-	assert(ASTEmap[ast_id] != NULL);
-	if (ASTEmap[ast_id]->max_occurrences != UINT_MAX)
-	  max_occurrences += ASTEmap[ast_id]->max_occurrences;
-	else
-	  max_occurrences = UINT_MAX;
-      }
-    }
-    if (max_occurrences != UINT_MAX)
-      (*output) << " {$ MAX_OCCURRENCES = " << max_occurrences << " $}";
-
+    if ( (*p)->inWhile )
+      (*output) << " {$ ON_LOOP = TRUE $}";
 
     if (count < P_in.size())
       (*output) << "," << endl;
@@ -733,28 +739,9 @@ void PetriNet::owfnOut()
 #ifndef USING_BPEL2OWFN
     (*output) << "    " << (*p)->nodeName();
 #endif
-
-    // calculate "MAX_OCCURRENCE" values for Fiona
-    set<Node *> post_set = preset(*p);
-    unsigned int max_occurrences = 0;
-    for (set<Node *>::iterator it = post_set.begin(); it != post_set.end(); it++)
-    {
-      for (unsigned int hist = 0; hist < (*it)->history.size(); hist++)
-      {
-	string history_entry = (*it)->history[hist];
-	unsigned int ast_id = toUInt(history_entry.substr(0,history_entry.find_first_of(".")));
-	assert(ast_id != UINT_MAX);
-	assert(ASTEmap[ast_id] != NULL);
-	if (ASTEmap[ast_id]->max_occurrences != UINT_MAX)
-	  max_occurrences += ASTEmap[ast_id]->max_occurrences;
-	else
-	  max_occurrences = UINT_MAX;
-      }
-    }
-    if (max_occurrences != UINT_MAX)
-      (*output) << " {$ MAX_OCCURRENCES = " << max_occurrences << " $}";
-
-
+    if ( (*p)->inWhile )
+      (*output) << " {$ ON_LOOP = TRUE $}";
+    
     if (count < P_out.size())
       (*output) << "," << endl;
   }

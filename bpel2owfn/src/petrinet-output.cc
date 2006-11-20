@@ -24,17 +24,17 @@
  * \brief   output Functions for Petri nets (implementation)
  * 
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: reinert $
+ *          last changes of: \$Author: nlohmann $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/11/20 15:55:57 $
+ * \date    \$Date: 2006/11/20 16:15:49 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.45 $
+ * \version \$Revision: 1.46 $
  *
  * \ingroup petrinet
  */
@@ -47,6 +47,7 @@
  * Headers
  *****************************************************************************/
 
+#include <climits>
 #include "petrinet.h"		// to define member functions
 #include "debug.h"		// debugging help
 #include "helpers.h"		// helper functions
@@ -693,8 +694,27 @@ void PetriNet::owfnOut()
 #ifndef USING_BPEL2OWFN
     (*output) << "    " << (*p)->nodeName();
 #endif
-    if ( (*p)->inWhile )
-      (*output) << " {$ ON_LOOP = TRUE $}";
+
+    // calculate "MAX_OCCURRENCE" values for Fiona
+    set<Node *> post_set = postset(*p);
+    unsigned int max_occurrences = 0;
+    for (set<Node *>::iterator it = post_set.begin(); it != post_set.end(); it++)
+    {
+      for (unsigned int hist = 0; hist < (*it)->history.size(); hist++)
+      {
+	string history_entry = (*it)->history[hist];
+	unsigned int ast_id = toUInt(history_entry.substr(0,history_entry.find_first_of(".")));
+	assert(ast_id != UINT_MAX);
+	assert(ASTEmap[ast_id] != NULL);
+	if (ASTEmap[ast_id]->max_occurrences != UINT_MAX)
+	  max_occurrences += ASTEmap[ast_id]->max_occurrences;
+	else
+	  max_occurrences = UINT_MAX;
+      }
+    }
+    if (max_occurrences != UINT_MAX)
+      (*output) << " {$ MAX_OCCURRENCES = " << max_occurrences << " $}";
+
 
     if (count < P_in.size())
       (*output) << "," << endl;
@@ -713,9 +733,28 @@ void PetriNet::owfnOut()
 #ifndef USING_BPEL2OWFN
     (*output) << "    " << (*p)->nodeName();
 #endif
-    if ( (*p)->inWhile )
-      (*output) << " {$ ON_LOOP = TRUE $}";
-    
+
+    // calculate "MAX_OCCURRENCE" values for Fiona
+    set<Node *> post_set = preset(*p);
+    unsigned int max_occurrences = 0;
+    for (set<Node *>::iterator it = post_set.begin(); it != post_set.end(); it++)
+    {
+      for (unsigned int hist = 0; hist < (*it)->history.size(); hist++)
+      {
+	string history_entry = (*it)->history[hist];
+	unsigned int ast_id = toUInt(history_entry.substr(0,history_entry.find_first_of(".")));
+	assert(ast_id != UINT_MAX);
+	assert(ASTEmap[ast_id] != NULL);
+	if (ASTEmap[ast_id]->max_occurrences != UINT_MAX)
+	  max_occurrences += ASTEmap[ast_id]->max_occurrences;
+	else
+	  max_occurrences = UINT_MAX;
+      }
+    }
+    if (max_occurrences != UINT_MAX)
+      (*output) << " {$ MAX_OCCURRENCES = " << max_occurrences << " $}";
+
+
     if (count < P_out.size())
       (*output) << "," << endl;
   }

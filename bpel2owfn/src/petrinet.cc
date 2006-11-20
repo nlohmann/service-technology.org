@@ -28,13 +28,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/11/20 15:34:39 $
+ * \date    \$Date: 2006/11/20 16:15:49 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.148 $
+ * \version \$Revision: 1.149 $
  *
  * \ingroup petrinet
  */
@@ -177,7 +177,6 @@ Place::Place(unsigned int myid, string role, communication_type mytype)
   nodeType = PLACE;
   marked = false;
   inWhile = false;
-  max_occurrences = 0;
 
   if (role != "")
     history.push_back(role);

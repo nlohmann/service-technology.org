@@ -18,13 +18,13 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/16 10:58:18 $ by $Author: nlohmann $.
-# Version $Revision: 1.21 $
+# File last changed $Date: 2006/11/20 15:22:46 $ by $Author: nlohmann $.
+# Version $Revision: 1.22 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT([BPEL2oWFN],[2.0],[nlohmann@informatik.hu-berlin.de],[bpel2owfn])
-AC_REVISION($Revision: 1.21 $)
+AC_REVISION($Revision: 1.22 $)
 AM_INIT_AUTOMAKE
 
 
@@ -69,6 +69,10 @@ AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MALLOC
 AC_FUNC_ALLOCA
 AC_CHECK_FUNCS([memset])
+
+
+# Preprocessor directive to share Petri net class
+AC_DEFINE(USING_BPEL2OWFN, 1, [Petri net class belongs to BPEL2oWFN.])
 
 
 # Check for the compiler generators

@@ -29,7 +29,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/16 10:29:40 $
+ * \date    \$Date: 2006/11/20 15:25:50 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.100 $
+ * \version \$Revision: 1.101 $
  */
 %}
 
@@ -541,6 +541,9 @@ Empty(a,_id) ->
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
 
+
+cerr << myself->activityTypeName() << ": " << myself->max_occurrences << endl;
+
       a->parentId = myid;
 
       myself->parentScopeId = PPcurrentScope;
@@ -1007,6 +1010,7 @@ Flow(a,b,c,_id) ->
         assert(ASTEmap[innerActivity->id] != NULL);
         ASTEmap[innerActivity->id]->parentActivityId = myid;
         ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
+        ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
       }
       foreach(link; tLink_list b)
       {
@@ -1097,6 +1101,7 @@ Switch(a,b,c,_id) ->
         assert(ASTEmap[innerActivity->id] != NULL);
         ASTEmap[innerActivity->id]->parentActivityId = myid;
         ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
+        ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
       }
 
       // process Otherwise-branch
@@ -1107,6 +1112,7 @@ Switch(a,b,c,_id) ->
           assert(ASTEmap[d->id] != NULL);
           ASTEmap[d->id]->parentActivityId = myid;
           ASTEmap[d->id]->controlFlow = myself->controlFlow;
+          ASTEmap[d->id]->max_occurrences = myself->max_occurrences;
         }
         default: { /* do nothing */ }
       }
@@ -1189,6 +1195,7 @@ If(a,b,c,_id) ->
         assert(ASTEmap[innerActivity->id] != NULL);
         ASTEmap[innerActivity->id]->parentActivityId = myid;
         ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
+        ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
       }
 
       // process Else-branch
@@ -1199,6 +1206,7 @@ If(a,b,c,_id) ->
           assert(ASTEmap[d->id] != NULL);
           ASTEmap[d->id]->parentActivityId = myid;
           ASTEmap[d->id]->controlFlow = myself->controlFlow;
+          ASTEmap[d->id]->max_occurrences = myself->max_occurrences;
         }
         default: { /* do nothing */ }
       }
@@ -1280,6 +1288,13 @@ While(a,b,_id) ->
       assert(ASTEmap[b->id] != NULL);
       ASTEmap[b->id]->parentActivityId = myid;
       ASTEmap[b->id]->controlFlow = myself->controlFlow;
+
+      // calculate the maximal occurrences of the enclosed activity
+      unsigned int max_loops = toUInt(myself->attributes["hu:maxloops"]);
+      if (max_loops != UINT_MAX && myself->max_occurrences != UINT_MAX)
+        ASTEmap[b->id]->max_occurrences = myself->max_occurrences * max_loops;
+      else
+        ASTEmap[b->id]->max_occurrences = UINT_MAX;
     }
     a b
     {
@@ -1318,6 +1333,13 @@ RepeatUntil(a,b,_id) ->
       assert(ASTEmap[b->id] != NULL);
       ASTEmap[b->id]->parentActivityId = myid;
       ASTEmap[b->id]->controlFlow = myself->controlFlow;
+
+      // calculate the maximal occurrences of the enclosed activity
+      unsigned int max_loops = toUInt(myself->attributes["hu:maxloops"]);
+      if (max_loops != UINT_MAX && myself->max_occurrences != UINT_MAX)
+        ASTEmap[b->id]->max_occurrences = myself->max_occurrences * max_loops;
+      else
+        ASTEmap[b->id]->max_occurrences = UINT_MAX;
     }
     a b
     {
@@ -1359,6 +1381,7 @@ Sequence(a,b,_id) ->
         assert(ASTEmap[innerActivity->id] != NULL);
         ASTEmap[innerActivity->id]->parentActivityId = myid;
         ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
+        ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
       }
     }
     a b
@@ -1409,6 +1432,7 @@ Pick(a,b,c,_id) ->
         ASTEmap[innerActivity->id]->parentActivityId = myid;
         ASTEmap[branch->id]->parentActivityId = myid;
         ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
+        ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
       }
       foreach(branch=OnAlarm(innerActivity); tOnAlarm_list c)
       {
@@ -1416,6 +1440,7 @@ Pick(a,b,c,_id) ->
         ASTEmap[innerActivity->id]->parentActivityId = myid;
         ASTEmap[branch->id]->parentActivityId = myid;
         ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
+        ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
       }
     }
     a b c
@@ -1486,8 +1511,24 @@ ForEach(a,b,c,d,e,_id) ->
              "' less or equal than constant <startCounterValue> `" + toString(startCounter) + "'";
           SAerror(74, error, myself->attributes["referenceLine"]);
         }
+        else
+        {
+          if (myself->attributes["hu:maxloops"] != "")
+            cerr << "ignoring attribute `hu:maxloops'" << endl; //TODO: make this a nice error message
+          ASTEmap[e->id]->max_occurrences = myself->max_occurrences * (finalCounter - startCounter);
+        }
+
         if ((completion != UINT_MAX) && ((completion > (finalCounter-startCounter))))
           SAerror(75, "", myself->attributes["referenceLine"]);
+      }
+      else
+      {
+  	// calculate the maximal occurrences of the enclosed activity
+    	unsigned int max_loops = toUInt(myself->attributes["hu:maxloops"]);
+      	if (max_loops != UINT_MAX && myself->max_occurrences != UINT_MAX)
+	  ASTEmap[e->id]->max_occurrences = myself->max_occurrences * max_loops;
+	else
+	  ASTEmap[e->id]->max_occurrences = UINT_MAX;
       }
     }
     a e
@@ -1561,6 +1602,8 @@ Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
       ASTEmap[e->id]->parentActivityId = myid;
       ASTEmap[f->id]->parentActivityId = myid;
       ASTEmap[i->id]->parentActivityId = myid;
+
+      ASTEmap[i->id]->max_occurrences = myself->max_occurrences;
 
       // remember the scope's name for compensation
       if (myself->attributes["name"] != "")

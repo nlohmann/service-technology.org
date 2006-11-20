@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/08 10:16:44 $
+ * \date    \$Date: 2006/11/20 15:25:50 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.61 $
+ * \version \$Revision: 1.62 $
  */
 
 
@@ -48,6 +48,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <climits>
 
 #include "ast-details.h"
 #include "debug.h"
@@ -92,12 +93,13 @@ ASTE::ASTE(unsigned int myid, unsigned int mytype)
   attributes = temporaryAttributeMap[id];
 
   inWhile = false;		// required initialization!
-  inProcess = false;
-  isStartActivity = false;
-  targetActivity = 0; // required initialization!
-  sourceActivity = 0; // required initialization!
+  inProcess = false;		// required initialization!
+  isStartActivity = false;	// required initialization!
+  targetActivity = 0;		// required initialization!
+  sourceActivity = 0;		// required initialization!
+  max_occurrences = 1;		// required initialization!
 
-  controlFlow = POSITIVECF;
+  controlFlow = POSITIVECF;	// required initialization!
 }
 
 
@@ -374,6 +376,7 @@ void ASTE::checkAttributes()
       	string required[] = {"counterName", "parallel"};
         checkRequiredAttributes(required, 2);
 
+	checkAttributeType("hu:maxloops", T_UINT);
 	checkAttributeType("parallel", T_BOOLEAN);
 	checkAttributeType("counterName", T_BPELVARIABLENAME);
 	break;
@@ -461,6 +464,12 @@ void ASTE::checkAttributes()
 	break;
       }
 
+    case(K_REPEATUNTIL):
+      {
+	checkAttributeType("hu:maxloops", T_UINT);
+	break;
+      }
+
     case(K_REPLY):
       {
       	string required[] = {"partnerLink", "operation"};
@@ -530,6 +539,12 @@ void ASTE::checkAttributes()
 	    attributes["type"] != "")
 	  SAerror(25, attributes["name"], attributes["referenceLine"]);
 
+	break;
+      }
+
+    case(K_WHILE):
+      {
+	checkAttributeType("hu:maxloops", T_UINT);
 	break;
       }
 
@@ -616,6 +631,17 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 
 	break;
       }
+
+    case(T_UINT):
+      {
+	if (attributes[attribute] != "" && toUInt(attributes[attribute]) == UINT_MAX)
+	{
+	  cerr << filename << ":" << attributes["referenceLine"];
+	  cerr << " - attribute `" << attribute << "' in <";
+	  cerr << activityTypeName() << "> must be of type unsigned integer" << endl;
+	}	
+      }
+
   }
 
   return;

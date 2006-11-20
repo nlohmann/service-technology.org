@@ -28,13 +28,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2006/11/06 15:40:40 $
+ * \date    \$Date: 2006/11/20 15:25:50 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.58 $
+ * \version \$Revision: 1.59 $
  *
  * \ingroup conversion
  * \ingroup debug
@@ -51,6 +51,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <climits>
 
 #include "helpers.h"
 #include "options.h"

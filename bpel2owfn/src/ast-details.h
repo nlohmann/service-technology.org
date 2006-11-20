@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/08 10:16:44 $
+ * \date    \$Date: 2006/11/20 15:25:50 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.48 $
+ * \version \$Revision: 1.49 $
  */
 
 
@@ -91,7 +91,8 @@ typedef enum
   T_INITIATE,		///< for correlation: "yes", "join" or "no"
   T_ROLES,		///< for query: "myRole" or "partnerRole"
   T_PATTERN,		///< for correlation: "request", "response" or "request-response"
-  T_BPELVARIABLENAME	///< a variable name (NCName without ".")
+  T_BPELVARIABLENAME,	///< a variable name (NCName without ".")
+  T_UINT		///< unsigned integers
 } attributeType;
 
 
@@ -141,6 +142,8 @@ class ASTE
 
     unsigned int targetActivity;	///< id of the target of a <link>
     unsigned int sourceActivity;	///< id of the source of a <link>
+
+    unsigned int max_occurrences;	///< number of maximum occurrences of the activity
 
     set<unsigned int> peerScopes;	///< as defined on page 132 of the spec
     set<unsigned int> enclosedScopes;	///< as defined on page 122 of the spec

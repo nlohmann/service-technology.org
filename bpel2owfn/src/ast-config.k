@@ -58,6 +58,7 @@
 #include <cassert>
 #include <map>
 #include <set>
+#include <climits>
 
 #include "petrinet.h"
 #include "options.h"

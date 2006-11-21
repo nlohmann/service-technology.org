@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/21 09:14:54 $
+ * \date    \$Date: 2006/11/21 14:40:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.63 $
+ * \version \$Revision: 1.64 $
  */
 
 
@@ -97,6 +97,7 @@ ASTE::ASTE(unsigned int myid, unsigned int mytype)
   targetActivity = 0;		// required initialization!
   sourceActivity = 0;		// required initialization!
   max_occurrences = 1;		// required initialization!
+  max_loops = UINT_MAX;		// required initialization!
 
   controlFlow = POSITIVECF;	// required initialization!
 }
@@ -1055,6 +1056,37 @@ list<unsigned int> ASTE::ancestorScopes()
     return result;
 }
 
+
+
+
+
+/*!
+ * \returns list of identifiers of all ancestor loops (<while>, <repeatUntil>,
+ * <forEach>)
+ */
+list<unsigned int> ASTE::ancestorLoops()
+{
+  extern map<unsigned int, ASTE*> ASTEmap;
+  list<unsigned int> result;
+
+  if (id != 1)
+  {
+    assert(ASTEmap[parentActivityId] != NULL);
+
+    if (ASTEmap[parentActivityId]->activityTypeName() == "while" ||
+	ASTEmap[parentActivityId]->activityTypeName() == "repeatUntil" ||
+	ASTEmap[parentActivityId]->activityTypeName() == "forEach")
+    {
+      result.push_back(parentActivityId);
+    }
+    list<unsigned int> result2 = ASTEmap[parentActivityId]->ancestorLoops();
+    result.splice(result.end(), result2);
+    
+    return result;
+  }
+  else
+    return result;
+}
 
 
 

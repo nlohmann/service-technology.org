@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/16 10:10:02 $
+ * \date    \$Date: 2006/11/21 14:40:54 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.35 $
+ * \version \$Revision: 1.36 $
  */
 
 
@@ -134,7 +134,8 @@ typedef enum
   P_COMMUNICATIONONLY,	///< creates the smallest possible net
   P_TRED,		///< use transitive reduction
   P_XOR,		///< use XOR as transition condition
-  P_NEW			///< use new (experimental) Petri net patterns
+  P_NEW,		///< use new (WS-BPEL) Petri net patterns
+  P_LOOPCOUNT		///< use loop counters
 } possibleParameters;
 
 

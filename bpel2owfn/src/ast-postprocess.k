@@ -29,7 +29,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/21 09:14:54 $
+ * \date    \$Date: 2006/11/21 14:40:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.104 $
+ * \version \$Revision: 1.105 $
  */
 %}
 
@@ -1280,6 +1280,8 @@ While(a,b,_id) ->
         ASTEmap[b->id]->max_occurrences = myself->max_occurrences * max_loops;
       else
         ASTEmap[b->id]->max_occurrences = UINT_MAX;
+
+      myself->max_loops = max_loops;
     }
     a b
     {
@@ -1323,6 +1325,8 @@ RepeatUntil(a,b,_id) ->
         ASTEmap[b->id]->max_occurrences = myself->max_occurrences * max_loops;
       else
         ASTEmap[b->id]->max_occurrences = UINT_MAX;
+      
+      myself->max_loops = max_loops;
     }
     a b
     {
@@ -1493,6 +1497,7 @@ ForEach(a,b,c,d,e,_id) ->
           if (myself->attributes["hu:maxloops"] != "")
             cerr << "ignoring attribute `hu:maxloops'" << endl; //TODO: make this a nice error message
           ASTEmap[e->id]->max_occurrences = myself->max_occurrences * (finalCounter - startCounter);
+          myself->max_loops = (finalCounter - startCounter);
         }
 
         if ((completion != UINT_MAX) && ((completion > (finalCounter-startCounter))))
@@ -1506,7 +1511,9 @@ ForEach(a,b,c,d,e,_id) ->
 	  ASTEmap[e->id]->max_occurrences = myself->max_occurrences * max_loops;
 	else
 	  ASTEmap[e->id]->max_occurrences = UINT_MAX;
-      }
+
+        myself->max_loops = max_loops;
+       }
     }
     a e
     {

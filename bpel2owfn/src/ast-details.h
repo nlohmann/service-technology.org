@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/21 09:14:54 $
+ * \date    \$Date: 2006/11/21 14:40:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  */
 
 
@@ -143,6 +143,7 @@ class ASTE
     unsigned int sourceActivity;	///< id of the source of a <link>
 
     unsigned int max_occurrences;	///< number of maximum occurrences of the activity
+    unsigned int max_loops;		///< number of maximum loops of the repeatable construct
 
     set<unsigned int> peerScopes;	///< as defined on page 132 of the spec
     set<unsigned int> enclosedScopes;	///< as defined on page 122 of the spec
@@ -162,6 +163,7 @@ class ASTE
 
     list<unsigned int> ancestorActivities();
     list<unsigned int> ancestorScopes();
+    list<unsigned int> ancestorLoops();
     
     bool checkAncestors();
     bool findIsolatedAncestor();

@@ -29,7 +29,7 @@
  *
  * \since   2006-10-30
  *
- * \date    \$Date: 2006/11/21 09:14:54 $
+ * \date    \$Date: 2006/11/21 14:40:54 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  */
 %}
 
@@ -1110,6 +1110,8 @@ This=Switch(a,b,Otherwise(c,d),_id) ->
   WHILE
 ******************************************************************************/
 
+// edited edited edited edited edited edited edited edited edited edited edited
+
 /*
  * The <while> activity as it is depicted in Fig. 18.
  */
@@ -1130,22 +1132,25 @@ This=While(a,b,_id) ->
       Place *p7 = TheNet->newPlace(prefix + "stop");
       Place *p8 = TheNet->newPlace(prefix + "stopped");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(p2, t1);
-      TheNet->newArc(t1, p3);
-
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
+      Transition *t2 = TheNet->newTransition(prefix + "init");
       TheNet->newArc(p1, t2);
       TheNet->newArc(t2, p2);
 
-      Transition *t3 = TheNet->newTransition(prefix + "t3");
+      Transition *t3 = TheNet->newTransition(prefix + "start");
       TheNet->newArc(p2, t3);
       TheNet->newArc(t3, p4);
 
-      Transition *t4 = TheNet->newTransition(prefix + "t4");
-      TheNet->newArc(t4, p1);
-      TheNet->newArc(p5, t4);
+      // the single loop/skip transition is only needed when loops are not counted
+      if (!parameters[P_LOOPCOUNT])
+      {
+  	Transition *t1 = TheNet->newTransition(prefix + "skip");
+    	TheNet->newArc(p2, t1);
+      	TheNet->newArc(t1, p3);
 
+      	Transition *t4 = TheNet->newTransition(prefix + "loop");
+    	TheNet->newArc(t4, p1);
+  	TheNet->newArc(p5, t4);
+      }
 
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
@@ -1155,6 +1160,55 @@ This=While(a,b,_id) ->
       Transition *t7 = stop(p2, "running", prefix);
       Transition *t8 = stop(p6, "p6", prefix);
       Transition *t9 = stop(p3, "final", prefix);
+
+
+      // the subnet if loops are counted
+      if (parameters[P_LOOPCOUNT])
+      {
+        unsigned int max_loops = ASTEmap[_id->value]->max_loops;
+        if (max_loops == UINT_MAX)
+          cerr << "no max loop provided!" << endl;
+        else
+        {
+          Place *p9_old = NULL;
+          Place *p9_first = NULL;
+          for (unsigned i = 1; i <= max_loops; i++)
+          {
+            Place *p9 = TheNet->newPlace(prefix + "count." + toString(i));
+
+            if (i == 1)
+            {
+              p9->mark();
+              p9_first = p9;
+            }
+
+            if (i > 1)
+            {
+              assert(p9_old != NULL);
+              Transition *t4 = TheNet->newTransition(prefix + "loop" + toString(i-1));
+      	      TheNet->newArc(t4, p1);
+	      TheNet->newArc(p5, t4);
+	      TheNet->newArc(p9_old, t4);
+	      TheNet->newArc(t4, p9);
+            }
+
+            assert(p9_first != NULL);
+	    Transition *t1 = TheNet->newTransition(prefix + "skip" + toString(i));
+	    TheNet->newArc(p2, t1);
+	    TheNet->newArc(t1, p3);
+            TheNet->newArc(t1, p9_first);
+            TheNet->newArc(p9, t1);
+
+            p9_old = p9;
+          }
+
+          Transition *t10 = TheNet->newTransition(prefix + "finish");
+          TheNet->newArc(p9_old, t10);
+          TheNet->newArc(p5, t10);
+          TheNet->newArc(t10, p3);
+	  TheNet->newArc(t10, p9_first);
+        }
+      }
     }
     a // standardElements
     b // innerActivity

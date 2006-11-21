@@ -28,13 +28,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/11/21 09:14:54 $
+ * \date    \$Date: 2006/11/21 09:45:02 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.150 $
+ * \version \$Revision: 1.151 $
  *
  * \ingroup petrinet
  */
@@ -125,8 +125,9 @@ Node::~Node()
 
 
 /*!
- * \param mysource      the source-node of the arc
- * \param mytarget      the target-node of the arc
+ * \param my_source      the source-node of the arc
+ * \param my_target      the target-node of the arc
+ * \param my_weight      the weigth of the arc (standard: 1)
  */
 Arc::Arc(Node *my_source, Node *my_target, unsigned int my_weight)
 {

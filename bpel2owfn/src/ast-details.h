@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/20 15:25:50 $
+ * \date    \$Date: 2006/11/21 09:14:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
  */
 
 
@@ -134,7 +134,6 @@ class ASTE
     bool hasEH;				///< true if <process> or <scope> have <eventHandlers>
     bool hasCatchAll;			///< true if <faultHandlers> have a <catchAll> branch
     bool inProcess;			///< true if <compensationHandler> is embedded to a <process>
-    bool inWhile;			///< true if activity is embedded in a <while>, <repeatUntil> or <onEvent>
     bool isStartActivity;		///< true if "createInstance" attribute is set to "yes"
 
     set<unsigned int> sourceLinks;	///< outgoing links

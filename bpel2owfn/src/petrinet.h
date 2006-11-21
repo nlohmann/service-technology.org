@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/20 16:15:49 $
+ * \date    \$Date: 2006/11/21 09:14:55 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.102 $
+ * \version \$Revision: 1.103 $
  *
  * \ingroup petrinet
  */
@@ -254,13 +254,10 @@ class Place: public Node
     string nodeShortName();
 
     /// mark the place
-    void mark();
+    void mark(unsigned int tokens = 1);
 
     /// initial marking of the place
-    bool marked;
-
-    /// this (communication) place is embedded in a while activity
-    bool inWhile;
+    unsigned int tokens;
 };
 
 
@@ -289,12 +286,15 @@ class Arc
   
     /// target node of the arc
     Node *target;
-  
+
     /// constructor to create an arc
-    Arc(Node *source, Node *target);
+    Arc(Node *source, Node *target, unsigned int weight = 1);
   
     /// DOT-output of the arc (used by PetriNet::dotOut())
     string dotOut();
+
+    /// weight of the arc (experimental)
+    unsigned int weight;
 };
 
 
@@ -327,7 +327,7 @@ class PetriNet
     Transition*newTransition(string role);
   
     /// adds an arc given source and target node, and arc type
-    Arc *newArc(Node *source, Node *target, arc_type type = STANDARD);
+    Arc *newArc(Node *source, Node *target, arc_type type = STANDARD, unsigned int weight = 1);
 
     /// information about the net including histories of all nodes
     void printInformation();

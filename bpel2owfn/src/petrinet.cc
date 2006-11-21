@@ -28,13 +28,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/11/20 16:15:49 $
+ * \date    \$Date: 2006/11/21 09:14:54 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.149 $
+ * \version \$Revision: 1.150 $
  *
  * \ingroup petrinet
  */
@@ -128,13 +128,14 @@ Node::~Node()
  * \param mysource      the source-node of the arc
  * \param mytarget      the target-node of the arc
  */
-Arc::Arc(Node *mysource, Node *mytarget)
+Arc::Arc(Node *my_source, Node *my_target, unsigned int my_weight)
 {
-  assert(mysource != NULL);
-  assert(mytarget != NULL);
+  assert(my_source != NULL);
+  assert(my_target != NULL);
 
-  source = mysource;
-  target = mytarget;
+  source = my_source;
+  target = my_target;
+  weight = my_weight;
 }
 
 
@@ -175,8 +176,7 @@ Place::Place(unsigned int myid, string role, communication_type mytype)
   type = mytype;
   id = myid;
   nodeType = PLACE;
-  marked = false;
-  inWhile = false;
+  tokens = 0;
 
   if (role != "")
     history.push_back(role);
@@ -189,9 +189,9 @@ Place::Place(unsigned int myid, string role, communication_type mytype)
 /*!
  * Initially mark the place.
  */
-void Place::mark()
+void Place::mark(unsigned int my_tokens)
 {
-  marked = true;
+  tokens = my_tokens;
 }
 
 
@@ -317,10 +317,11 @@ Transition *PetriNet::newTransition(string role)
  * Creates an arc with arbitrary type.
  * \param source      source node of the arc
  * \param target      target node of the arc
- * \param type        type of the arc(as defined in #arc_type)
+ * \param type        type of the arc (as defined in #arc_type)
+ * \param my_weight   weight of the arc (standard: 1)
  * \return pointer of the created arc
  */
-Arc *PetriNet::newArc(Node *source, Node *target, arc_type type)
+Arc *PetriNet::newArc(Node *source, Node *target, arc_type type, unsigned int my_weight)
 {
   assert(source != NULL);
   assert(target != NULL);
@@ -330,7 +331,7 @@ Arc *PetriNet::newArc(Node *source, Node *target, arc_type type)
 
 
   // Finally add the arc to the Petri net.
-  Arc *f = new Arc(source, target);
+  Arc *f = new Arc(source, target, my_weight);
   assert(f != NULL);
   F.insert(f);
 
@@ -338,7 +339,7 @@ Arc *PetriNet::newArc(Node *source, Node *target, arc_type type)
   // Add a second arc to close a loop if the arc is a read arc.
   if (type == READ)
   {
-    Arc *f2 = new Arc(target, source);
+    Arc *f2 = new Arc(target, source, my_weight);
     assert(f2 != NULL);
     F.insert(f2);
   }
@@ -565,8 +566,11 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
   Node *p12 = newPlace();
   assert(p12 != NULL);
 
-  if (p1->marked || p2->marked)
-    ((Place*)p12)->mark();
+  // p12 is marked with the maximum number of tokens of p1 and p2
+  if (p1->tokens > p2->tokens)
+    ((Place*)p12)->tokens = p1->tokens;
+  else
+    ((Place*)p12)->tokens = p2->tokens;
   
   for (vector<string>::iterator role = p1->history.begin(); role != p1->history.end(); role++)
   {

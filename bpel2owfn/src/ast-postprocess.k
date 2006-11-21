@@ -29,7 +29,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/20 16:28:18 $
+ * \date    \$Date: 2006/11/21 09:14:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.103 $
+ * \version \$Revision: 1.104 $
  */
 %}
 
@@ -296,7 +296,6 @@ userDefinedEventHandler(a,b,_id) ->
       assert(myself != NULL);
 
       myself->parentScopeId = PPcurrentScope;
-      myself->inWhile = true;
 
       // triggers SA00083
       if (a->length() == 0 && b->length() == 0)
@@ -331,7 +330,6 @@ OnMessage(a,b,c,_id) ->
 
       myself->parentScopeId = PPcurrentScope;
       assert(ASTEmap[myself->parentActivityId] != NULL);
-      myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
       myself->checkAttributes();
 
       myself->checkPartnerLink();
@@ -586,7 +584,6 @@ Invoke(a,b,c,d,_id) ->
       myself->channelName = myself->createChannel((myself->attributes["outputVariable"] != ""));
       myself->inputVariableName = myself->checkVariable("inputVariable");
       myself->outputVariableName = myself->checkVariable("outputVariable");
-      myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
 
       foreach(correlation=Correlation(_id2); tCorrelation_list b)
       {
@@ -625,7 +622,6 @@ Receive(a,b,c,_id) ->
 
       myself->channelName = myself->createChannel();
       myself->variableName = myself->checkVariable("variable");
-      myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
 
       foreach(correlation=Correlation(_id2); tCorrelation_list b)
       {
@@ -674,7 +670,6 @@ Reply(a,b,c,_id) ->
 
       myself->channelName = myself->createChannel();
       myself->variableName = myself->checkVariable("variable");
-      myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
 
       foreach(correlation=Correlation(_id2); tCorrelation_list b)
       {
@@ -1001,9 +996,6 @@ Flow(a,b,c,_id) ->
 
       /* above is generic */
 
-      assert(ASTEmap[myself->parentActivityId] != NULL);
-      myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
-
       // distribute the flow's id to the enclosed activities
       // also distribute the control flow type
       foreach(innerActivity; activity_list c)
@@ -1091,9 +1083,6 @@ Switch(a,b,c,_id) ->
       myself->checkAttributes();
 
       /* above is generic */
-
-      assert(ASTEmap[myself->parentActivityId] != NULL);
-      myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
 
       // distribute the switch's id to the enclosed activities
       // also distribute the control flow
@@ -1185,9 +1174,6 @@ If(a,b,c,_id) ->
       myself->checkAttributes();
 
       /* above is generic */
-
-      assert(ASTEmap[myself->parentActivityId] != NULL);
-      myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
 
       // distribute the switch's id to the enclosed activities
       // also distribute the control flow
@@ -1283,8 +1269,6 @@ While(a,b,_id) ->
 
       /* above is generic */
 
-      myself->inWhile = true;
-
       // distribute the while's id to the enclosed activity
       assert(ASTEmap[b->id] != NULL);
       ASTEmap[b->id]->parentActivityId = myid;
@@ -1328,8 +1312,6 @@ RepeatUntil(a,b,_id) ->
 
       /* above is generic */
 
-      myself->inWhile = true;
-
       // distribute the repeatUntil's id to the enclosed activity
       assert(ASTEmap[b->id] != NULL);
       ASTEmap[b->id]->parentActivityId = myid;
@@ -1372,9 +1354,6 @@ Sequence(a,b,_id) ->
       myself->checkAttributes();
 
       /* above is generic */
-
-      assert(ASTEmap[myself->parentActivityId] != NULL);
-      myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
 
       // distribute the sequence's id to the enclosed activities
       foreach(innerActivity; activity_list b)
@@ -1422,9 +1401,6 @@ Pick(a,b,c,_id) ->
       myself->checkAttributes();
 
       /* above is generic */
-
-      assert(ASTEmap[myself->parentActivityId] != NULL);
-      myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
 
       // distribute the pick's id to the enclosed activities
       foreach(branch=OnMessage(_corr,_from,innerActivity,_id2); tOnMessage_list b)
@@ -1576,7 +1552,6 @@ Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
 
       assert(ASTEmap[myself->parentActivityId] != NULL);
       assert(ASTEmap[myself->parentScopeId] != NULL);
-      myself->inWhile = ASTEmap[myself->parentActivityId]->inWhile;
       myself->checkAttributes();
 
       for ( std::set<unsigned int>::iterator peerScope = ASTEmap[myself->parentScopeId]->enclosedScopes.begin(); 

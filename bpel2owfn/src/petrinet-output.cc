@@ -28,13 +28,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/11/21 08:19:24 $
+ * \date    \$Date: 2006/11/21 09:14:54 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.48 $
+ * \version \$Revision: 1.49 $
  *
  * \ingroup petrinet
  */
@@ -431,10 +431,10 @@ void PetriNet::pnmlOut()
     (*output) << "      <name>" << endl;
     (*output) << "        <text>" << (*p)->history[0] << "</text>" << endl;
     (*output) << "      </name>" << endl;
-    if ((*p)->marked)
+    if ((*p)->tokens > 0)
     {
       (*output) << "      <initialMarking>" << endl;
-      (*output) << "        <text>1</text>" << endl;
+      (*output) << "        <text>" << (*p)->tokens << "</text>" << endl;
       (*output) << "      </initialMarking>" << endl;
     }
     (*output) << "    </place>" << endl << endl;
@@ -497,8 +497,8 @@ void PetriNet::pepOut()
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
     (*output) << (*p)->id << "\"" << (*p)->nodeShortName() << "\"80@40";
-    if ((*p)->marked)
-      (*output) << "M1";
+    if ((*p)->tokens > 0)
+      (*output) << "M" << (*p)->tokens;
     (*output) << "k1" << endl;
   }
 
@@ -540,8 +540,8 @@ void PetriNet::apnnOut()
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
     (*output) << "  \\place{" << (*p)->nodeShortName() << "}{";
-    if ((*p)->marked)
-      (*output) << "\\init{1}";
+    if ((*p)->tokens > 0)
+      (*output) << "\\init{" << (*p)->tokens << "}";
     (*output) << "}" << endl;
   }
   (*output) << endl;
@@ -601,12 +601,12 @@ void PetriNet::lolaOut()
   count = 1;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
-    if ((*p)->marked)
+    if ((*p)->tokens > 0)
     {
       if (count++ != 1)
 	(*output) << "," << endl;
       
-      (*output) << "  " << (*p)->nodeShortName() << ":\t1";
+      (*output) << "  " << (*p)->nodeShortName() << ":\t" << (*p)->tokens;
     }
   }
   (*output) << endl << ";" << endl << endl << endl;
@@ -718,8 +718,6 @@ void PetriNet::owfnOut()
 #ifndef USING_BPEL2OWFN
     (*output) << "    " << (*p)->nodeName();
 #endif
-    if ( (*p)->inWhile )
-      (*output) << " {$ ON_LOOP = TRUE $}";
 
     if (count < P_in.size())
       (*output) << "," << endl;
@@ -738,8 +736,6 @@ void PetriNet::owfnOut()
 #ifndef USING_BPEL2OWFN
     (*output) << "    " << (*p)->nodeName();
 #endif
-    if ( (*p)->inWhile )
-      (*output) << " {$ ON_LOOP = TRUE $}";
     
     if (count < P_out.size())
       (*output) << "," << endl;
@@ -748,20 +744,20 @@ void PetriNet::owfnOut()
   
 
   // initial marking
-  (*output) << "INITIALMARKING" << endl << " ";
+  (*output) << "INITIALMARKING" << endl;
   count = 1;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
-    if ((*p)->marked)
+    if ((*p)->tokens > 0)
     {
       if (count++ != 1)
-	(*output) << ",";// << endl;
+	(*output) << "," << endl;
 
 #ifdef USING_BPEL2OWFN
-      (*output) << " " << (*p)->nodeShortName(); // << ":\t1";
+      (*output) << " " << (*p)->nodeShortName() << ":\t" << (*p)->tokens;
 #endif
 #ifndef USING_BPEL2OWFN
-      (*output) << " " << (*p)->nodeName(); // << ":\t1";
+      (*output) << " " << (*p)->nodeName() << ":\t" << (*p)->tokens;
 #endif
 
       if ((*p)->historyContains("1.internal.initial"))

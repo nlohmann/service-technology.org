@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/20 15:25:50 $
+ * \date    \$Date: 2006/11/21 09:14:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.62 $
+ * \version \$Revision: 1.63 $
  */
 
 
@@ -92,7 +92,6 @@ ASTE::ASTE(unsigned int myid, unsigned int mytype)
   type = mytype;
   attributes = temporaryAttributeMap[id];
 
-  inWhile = false;		// required initialization!
   inProcess = false;		// required initialization!
   isStartActivity = false;	// required initialization!
   targetActivity = 0;		// required initialization!

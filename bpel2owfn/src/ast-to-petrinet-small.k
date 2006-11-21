@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/11/08 07:38:24 $
+ * \date    \$Date: 2006/11/21 09:14:54 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.69 $
+ * \version \$Revision: 1.70 $
  *
  */
 %}
@@ -239,9 +239,6 @@ AsynchronousInvoke(a,b,c,d,_id) ->
       TheNet->newArc(t1, p2);
       TheNet->newArc(t1, TheNet->findPlace("out." + ASTEmap[_id->value]->channelName));
       t1->type = OUT;
-
-      if (ASTEmap[_id->value]->inWhile)
-        TheNet->findPlace("out." + ASTEmap[_id->value]->channelName)->inWhile = true;
     }
     a // standardElements
     {
@@ -272,12 +269,6 @@ SynchronousInvoke(a,b,c,d,_id) ->
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       t2->type = IN;
-
-      if (ASTEmap[_id->value]->inWhile)
-      {
-        TheNet->findPlace("in." + ASTEmap[_id->value]->channelName)->inWhile = true;
-        TheNet->findPlace("out." + ASTEmap[_id->value]->channelName)->inWhile = true;
-      }
     }
     a // standardElements
     {
@@ -308,9 +299,6 @@ Receive(a,b,c,_id) ->
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       t1->type = IN;
-
-      if (ASTEmap[_id->value]->inWhile)
-        TheNet->findPlace("in." + ASTEmap[_id->value]->channelName)->inWhile = true;
     }
     a // standardElements
     {
@@ -341,9 +329,6 @@ Reply(a,b,c,_id) ->
       TheNet->newArc(p1, t1);
       TheNet->newArc(t1, p2);
       t1->type = OUT;
-
-      if (ASTEmap[_id->value]->inWhile)
-        TheNet->findPlace("out." + ASTEmap[_id->value]->channelName)->inWhile = true;
     }
     a // standardElements
     {
@@ -922,9 +907,6 @@ This=Pick(a,b,c,d) ->
 	TheNet->newArc(TheNet->findPlace(This->id, ".internal.initial"), t1);
 	TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
 	t1->type = IN;
-
-        if (ASTEmap[ThisBranch->id]->inWhile)
-          TheNet->findPlace("in." + ASTEmap[ThisBranch->id]->channelName)->inWhile = true;
 
 	// Embed the inner activity.
 	TheNet->mergePlaces(This->id, ".final", innerActivity->id, ".final");

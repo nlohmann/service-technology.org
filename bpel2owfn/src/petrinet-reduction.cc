@@ -28,13 +28,13 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2006/11/16 10:29:41 $
+ * \date    \$Date: 2006/11/21 09:14:54 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.39 $
+ * \version \$Revision: 1.40 $
  *
  * \ingroup petrinet
  */
@@ -189,7 +189,7 @@ void PetriNet::removeDeadNodes()
     // find unmarked places with empty preset
     for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
     {
-      if (preset(*p).empty() && !(*p)->marked)
+      if (preset(*p).empty() && (*p)->tokens == 0)
       {
 	deadPlaces.push_back(*p);
 	tempPlaces.push_back(*p);

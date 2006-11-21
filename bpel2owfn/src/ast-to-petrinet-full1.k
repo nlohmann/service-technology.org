@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/11/08 07:38:24 $
+ * \date    \$Date: 2006/11/21 09:14:54 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.210 $
+ * \version \$Revision: 1.211 $
  *
  */
 %}
@@ -1317,9 +1317,6 @@ This=userDefinedEventHandler(a,b,_id) ->
   	TheNet->newArc(onMessage_t3, TheNet->findPlace("variable." + ASTEmap[ThisBranch->id]->variableName));
 	TheNet->newArc(onMessage_p2, onMessage_t3);
 	TheNet->newArc(onMessage_t3, onMessage_p3);
-
-        TheNet->findPlace("in." + ASTEmap[ThisBranch->id]->channelName)->inWhile = true;
-
 
 	Transition *onMessage_t12 = TheNet->newTransition(newPrefix + "t12");
 	TheNet->newArc(onMessage_p11, onMessage_t12);

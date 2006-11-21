@@ -29,7 +29,7 @@
  *
  * \since   2006-10-30
  *
- * \date    \$Date: 2006/11/15 10:56:16 $
+ * \date    \$Date: 2006/11/21 09:14:54 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  */
 %}
 
@@ -123,9 +123,6 @@ This=AsynchronousInvoke(a,b,c,d,_id) -> // provided (!This->isSynchronousInvoke)
       TheNet->newArc(t2, TheNet->findPlace("out." + ASTEmap[_id->value]->channelName));
       t2->type = OUT;
 
-      if (ASTEmap[_id->value]->inWhile) // was: (parameters[P_CYCLICWHILE] && $0->inWhile)
-        TheNet->findPlace("out." + ASTEmap[_id->value]->channelName)->inWhile = true;
-
 
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
@@ -196,12 +193,6 @@ This=SynchronousInvoke(a,b,c,d,_id) -> //provided (This->isSynchronousInvoke) ->
         TheNet->newArc(t4, TheNet->findPlace("variable." + ASTEmap[_id->value]->outputVariableName));
       }
 
-      if (ASTEmap[_id->value]->inWhile)
-      {
-        TheNet->findPlace("in." + ASTEmap[_id->value]->channelName)->inWhile = true;
-        TheNet->findPlace("out." + ASTEmap[_id->value]->channelName)->inWhile = true;
-      }
-
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
       {
@@ -265,10 +256,6 @@ This=Receive(a,b,c,_id) ->
         TheNet->newArc(t2, TheNet->findPlace("variable." + ASTEmap[_id->value]->variableName));
       }
 
-      if (ASTEmap[_id->value]->inWhile)
-        TheNet->findPlace("in." + ASTEmap[_id->value]->channelName)->inWhile = true;
-
-
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
 	Transition *t3 = throwFault(p2, p4, "running", prefix, _id, ASTEmap[_id->value]->controlFlow);
@@ -323,10 +310,6 @@ This=Reply(a,b,c,_id) ->
       TheNet->newArc(p2, t2);
       TheNet->newArc(t2, p3);
       t2->type = OUT;
-
-      if (ASTEmap[_id->value]->inWhile) // was: (parameters[P_CYCLICWHILE] && $0->inWhile)
-        TheNet->findPlace("out." + ASTEmap[_id->value]->channelName)->inWhile = true;
-
 
       // Transitions for the negative control flow.
       if (parameters[P_NOSTANDARDFAULTS] == false)
@@ -1392,10 +1375,6 @@ This=Pick(a,b,c,_id) ->
   	TheNet->newArc(t3, TheNet->findPlace("variable." + ASTEmap[ThisBranch->id]->variableName));
 	TheNet->newArc(p3, t3);
 	TheNet->newArc(t3, TheNet->findPlace(innerActivity->id, ".initial"));
-
-        if (ASTEmap[ThisBranch->id]->inWhile) // was: (parameters[P_CYCLICWHILE] && ThisBranch->inWhile)
-          TheNet->findPlace("in." + ASTEmap[ThisBranch->id]->channelName)->inWhile = true;
-
 
 	// Transitions for the negative control flow.
 	if (parameters[P_NOSTANDARDFAULTS] == false)

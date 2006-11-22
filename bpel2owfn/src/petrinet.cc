@@ -28,13 +28,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/11/21 09:45:02 $
+ * \date    \$Date: 2006/11/22 15:06:03 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.151 $
+ * \version \$Revision: 1.152 $
  *
  * \ingroup petrinet
  */
@@ -634,6 +634,37 @@ void PetriNet::mergePlaces(unsigned int id1, string role1, unsigned int id2, str
   mergePlaces(toString(id1) + role1, toString(id2) + role2);
 }
 
+
+
+
+
+/*!
+ * Renames a place, i.e. a role of a place.
+ *
+ * \param old_name  the name of the role to be renamed
+ * \param new_name  the new name of that role
+ */
+void PetriNet::renamePlace(string old_name, string new_name)
+{
+  Place *p = findPlace(old_name);
+  assert(p != NULL);
+
+  bool found = false;
+  for (unsigned int i = 0; i < p->history.size(); i++)
+  {
+    if (p->history[i] == old_name)
+    {
+      p->history[i] = new_name;
+      found = true;
+      break;
+    }
+  }
+
+  assert(found == true);
+
+  roleMap[old_name] = NULL;
+  roleMap[new_name] = p;
+}
 
 
 

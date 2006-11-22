@@ -29,7 +29,7 @@
  *
  * \since   2006-10-29
  *
- * \date    \$Date: 2006/11/16 13:33:27 $
+ * \date    \$Date: 2006/11/22 15:06:03 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.23 $
+ * \version \$Revision: 1.24 $
  *
  */
 %}
@@ -408,6 +408,48 @@ This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
 
       Transition *t12 = stop(p1, "initial", prefix);
       Transition *t13 = stop(p2, "final", prefix);
+
+
+      // now comes everything we need for compensation in loops
+      assert(ASTEmap[_id->value] != NULL);
+      if (ASTEmap[_id->value]->ancestorLoops().size() != 0 && parameters[P_LOOPCOUNT])
+      {
+        // rename existing places
+        TheNet->renamePlace(prefix + "final", prefix + "final1");
+        TheNet->renamePlace(prefix + "compensate", prefix + "compensate1");
+        TheNet->renamePlace(prefix + "compensated", prefix + "compensated1");
+
+        // add new places (the interface places of the wrapper)
+        Place *p21 = TheNet->newPlace(prefix + "final");
+        Place *p22 = TheNet->newPlace(prefix + "compensate");
+        Place *p23 = TheNet->newPlace(prefix + "compensated");
+
+        list<unsigned int> ancestor_loops = ASTEmap[_id->value]->ancestorLoops();
+cerr << ancestor_loops.size() << " ancestor_loops" << endl;
+        if (ancestor_loops.size() > 1)
+        {
+          vector<unsigned int> loop_bounds;
+          vector<unsigned int> loop_identifiers;
+          unsigned int i = 0;
+	  for (list<unsigned int>::iterator loop = ancestor_loops.begin(); loop != ancestor_loops.end(); loop++)
+	  {
+            assert(ASTEmap[*loop] != NULL);
+
+	    if (loop == ancestor_loops.begin())
+	      continue;
+  
+            loop_bounds.push_back(ASTEmap[*loop]->max_loops);
+            loop_identifiers.push_back(*loop);
+	  }
+
+          process_loop_bounds(loop_bounds, loop_identifiers, prefix, ASTEmap[*ancestor_loops.begin()]->max_loops); 
+        }
+        else
+        {
+          TheNet->newPlace(prefix + "c");
+          TheNet->newPlace(prefix + "!c");
+        }
+      }
     }
       a // standard elements
       i // inner activity

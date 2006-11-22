@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/10/27 07:06:40 $
+ * \date    \$Date: 2006/11/22 15:06:03 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -94,6 +94,9 @@ void inup();
 void indown();
 
 
+
+/// comment me!
+void process_loop_bounds(vector<unsigned int> &loop_bounds, vector<unsigned int> &loop_identifiers, string prefix, unsigned int my_max);
 
 
 

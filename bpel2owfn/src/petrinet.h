@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/21 09:14:55 $
+ * \date    \$Date: 2006/11/22 15:06:03 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.103 $
+ * \version \$Revision: 1.104 $
  *
  * \ingroup petrinet
  */
@@ -373,6 +373,9 @@ class PetriNet
 
     /// finds a place given the ids of two transitions (one in the pre and one in the postset)
     Place *findPlace(unsigned int id1, unsigned int id2);
+
+    /// rename a node (i.e., rename one role in its history)
+    void renamePlace(string old_name, string new_name);
 
 
     /// finds transition given a role

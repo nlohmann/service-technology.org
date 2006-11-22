@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/11/15 14:53:14 $
+ * \date    \$Date: 2006/11/22 15:06:03 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -579,4 +579,119 @@ void indown()
 {
   indent -= indentStep;
   in();
+}
+
+
+
+
+
+
+
+
+
+void next_index(vector<unsigned int> &current_index, vector<unsigned int> &max_index)
+{
+  assert(current_index.size() == max_index.size());
+
+  for (unsigned int i = 0; i < current_index.size(); i++)
+  {
+    if (current_index[i] < max_index[i])
+    {
+      current_index[i]++;
+      break;
+    }
+    else
+      current_index[i] = 1;
+  }
+}
+
+
+
+
+
+/*!
+ * converts a vector to a C++ string
+ */
+string print_vector(vector<unsigned int> &v)
+{
+  string result;
+
+  for (unsigned int i = 0; i < v.size(); i++)
+  {
+    if (i != 0)
+      result += ".";
+
+    result += toString(v[i]);
+  }
+
+  return result;
+}
+
+
+
+
+
+/*!
+ * \param loop_bounds	a vector holding the maximal indices of the ancestor
+ *                      loops
+ * \param loop_bounds	a vector holding the identifiers of the ancestor loops
+ * \param prefix	the prefix of the calling <scope>
+ * \param my_max	the maximal index of the direct parent loop
+ */
+void process_loop_bounds(vector<unsigned int> &loop_bounds, vector<unsigned int> &loop_identifiers, string prefix, unsigned int my_max)
+{
+  vector<unsigned int> current_index(loop_bounds.size(), 1);
+  unsigned int number = 1;
+
+  // count the possible permutations of indices
+  for (unsigned int i = 0; i < loop_bounds.size(); i++)
+    number *= loop_bounds[i];
+
+  // create transitions, places and arcs
+  for (unsigned int i = 1; i <= number; i++)
+  {
+    Place *p1 = TheNet->newPlace(prefix + "c" + print_vector(current_index));
+    Place *p2 = TheNet->newPlace(prefix + "!c" + print_vector(current_index));
+    p2->mark(my_max);
+
+    Transition *t14 = TheNet->newTransition(prefix + "t14." + toString(i));
+    TheNet->newArc(TheNet->findPlace(prefix + "final1"), t14);
+    TheNet->newArc(TheNet->findPlace(prefix + "!Successful"), t14, READ);
+    TheNet->newArc(t14, TheNet->findPlace(prefix + "final"));
+
+    Transition *t15 = TheNet->newTransition(prefix + "t15." + toString(i));
+    TheNet->newArc(t15, p1);
+    TheNet->newArc(p2, t15);
+    TheNet->newArc(TheNet->findPlace(prefix + "final1"), t15);
+    TheNet->newArc(TheNet->findPlace(prefix + "Successful"), t15);
+    TheNet->newArc(t15, TheNet->findPlace(prefix + "!Successful"));
+    TheNet->newArc(t15, TheNet->findPlace(prefix + "final"));
+
+    Transition *t16 = TheNet->newTransition(prefix + "t16." + toString(i));
+    TheNet->newArc(p2, t16, READ, my_max);
+    TheNet->newArc(TheNet->findPlace(prefix + "compensated1"), t16);
+    TheNet->newArc(t16, TheNet->findPlace(prefix + "compensated"));
+
+    Transition *t17 = TheNet->newTransition(prefix + "t17." + toString(i));
+    TheNet->newArc(p1, t17);
+    TheNet->newArc(t17, p2);
+    TheNet->newArc(TheNet->findPlace(prefix + "compensate"), t17);
+    TheNet->newArc(t16, TheNet->findPlace(prefix + "ch_initial"));
+
+    TheNet->mergePlaces(TheNet->findPlace(prefix + "compensated1"), TheNet->findPlace(prefix + "compensate"));
+
+    // connect transitions with counters of ancestor loops
+    for (unsigned i = 0; i < loop_identifiers.size(); i++)
+    {
+      Place *p3 = TheNet->findPlace(toString(loop_identifiers[i]) + ".internal.count." + toString(current_index[i]));
+      assert(p3 != NULL);
+
+      TheNet->newArc(p3, t15, READ);
+      TheNet->newArc(p3, t16, READ);
+      TheNet->newArc(p3, t17, READ);
+    }
+
+    // generate next index
+    next_index(current_index, loop_bounds);
+  }
 }

@@ -1,19 +1,39 @@
+// *****************************************************************************\
+// * Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg,                    *
+// *                      Jan Bretschneider, Christian Gierds                  *
+// *                                                                           *
+// * This file is part of Fiona.                                               *
+// *                                                                           *
+// * Fiona is free software; you can redistribute it and/or modify it          *
+// * under the terms of the GNU General Public License as published by the     *
+// * Free Software Foundation; either version 2 of the License, or (at your    *
+// * option) any later version.                                                *
+// *                                                                           *
+// * Fiona is distributed in the hope that it will be useful, but WITHOUT      *
+// * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
+// * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
+// * more details.                                                             *
+// *                                                                           *
+// * You should have received a copy of the GNU General Public License along   *
+// * with Fiona; if not, write to the Free Software Foundation, Inc., 51       *
+// * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
+// *****************************************************************************/
+
+/*!
+ * \file    main.h
+ *
+ * \brief   main
+ *
+ * \author  responsible: Daniela Weinberg <weinberg@informatik.hu-berlin.de>
+ *
+ * \note    This file is part of the tool Fiona and was created during the
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
+ *
+ */
+
 #ifndef MAIN_H
 #define MAIN_H
-
-
-//#define DEBUG			// shows all the information available ;-)
-//#define DEBUG1		// shows the nodes we are working on 
-//#define DEBUG2		// just for the calculation of the reachable states for now
-
-//#define LOOP
-
-//#define ONLY_BLUE_NODES // only blue nodes in the dot file
-//#define NO_RED_NODES    // no red nodes in the dot file
-
-//#define NO_EMPTY_NODE   // don't show the empty node in the dot file
-
-//#define NO_STATES_PER_NODE
 
 extern oWFN * PN;
 extern unsigned int numberOfDecodes;

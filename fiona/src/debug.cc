@@ -1,42 +1,34 @@
-/*****************************************************************************\
- * Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg                     *
- *                                                                           *
- * This file is part of Fiona.                                               *
- *                                                                           *
- * Fiona is free software; you can redistribute it and/or modify it          *
- * under the terms of the GNU General Public License as published by the     *
- * Free Software Foundation; either version 2 of the License, or (at your    *
- * option) any later version.                                                *
- *                                                                           *
- * Fiona is distributed in the hope that it will be useful, but WITHOUT      *
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
- * more details.                                                             *
- *                                                                           *
- * You should have received a copy of the GNU General Public License along   *
- * with Fiona; if not, write to the Free Software Foundation, Inc., 51       *
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
-\****************************************************************************/
+// *****************************************************************************\
+// * Copyright 2005, 2006 Niels Lohmann, Peter Massuthe, Daniela Weinberg      *
+// *                                                                           *
+// * This file is part of Fiona.                                               *
+// *                                                                           *
+// * Fiona is free software; you can redistribute it and/or modify it          *
+// * under the terms of the GNU General Public License as published by the     *
+// * Free Software Foundation; either version 2 of the License, or (at your    *
+// * option) any later version.                                                *
+// *                                                                           *
+// * Fiona is distributed in the hope that it will be useful, but WITHOUT      *
+// * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
+// * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
+// * more details.                                                             *
+// *                                                                           *
+// * You should have received a copy of the GNU General Public License along   *
+// * with Fiona; if not, write to the Free Software Foundation, Inc., 51       *
+// * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
+// *****************************************************************************/
 
 /*!
- * \file debug.cc
+ * \file	debug.cc
  *
- * \brief Some debugging tools for Fiona
- *
- * \author  
- *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
- *          
- * \date
- *          - created: 2005/11/09
- *          - last changed: \$Date: 2006-07-25 08:45:33 $
+ * \brief	Some debugging tools for Fiona
  * 
+ * \author  responsible: Daniela Weinberg <weinberg@informatik.hu-berlin.de>
+ *
  * \note    This file is part of the tool Fiona and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
- *
- * \version \$Revision: 1.4 $
  */
 
 #include "mynew.h"

@@ -105,25 +105,6 @@ bool successorNodeList::addNextNode(graphEdge * transition){
 	return true;
 }
 
-//! \fn int successorNodeList::elementCount()
-//! \return the number of elements in the list
-//! \brief returns the number of elements in the list
-int successorNodeList::elementCount() {
-	int count = 0;
-	
-	graphEdge * tmpEdge = firstElement;
-	
-	while (tmpEdge) {
-		count++;
-		if (tmpEdge->getNextElement() != NULL) {
-			tmpEdge = tmpEdge->getNextElement();	
-		} 
-	}
-	
-	
-	return count;
-}
-
 //! \fn void successorNodeList::setFirstElement(graphEdge * _edge)
 //! \param _edge the new first element
 //! \brief sets the first element of the list to _edge

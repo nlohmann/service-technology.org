@@ -41,14 +41,13 @@
 
 #include "options.h"
 #include "debug.h"
-#include "exception.h"
 #include "fiona.h"
 
-// some file names and pointers
+using namespace std;
 
+// some file names and pointers
 char * netfile;
 std::list<char*> netfiles; 
-
 
 int commDepth_manual;
 int events_manual;
@@ -75,8 +74,8 @@ std::ostream * log_output = &std::cout;   // &std::clog;
 
 // different modes controlled by command line
 
-map<possibleOptions,    bool> options;
-map<possibleParameters, bool> parameters;
+std::map<possibleOptions,    bool> options;
+std::map<possibleParameters, bool> parameters;
 
 // long options
 static struct option longopts[] =
@@ -185,7 +184,7 @@ void parse_command_line(int argc, char* argv[]) {
   	int i;
   	
   	// the program name on the commandline
-  	string progname = string(argv[0]);
+  	std::string progname = std::string(argv[0]);
 
 	// initialize options
 	options[O_HELP] = false;

@@ -60,7 +60,6 @@ public:
     void deleteList(graphEdge *);   
 //    bool addNextNode(vertex *, char *, edgeType);
     bool addNextNode(graphEdge *);
-    int elementCount();
     
     void setFirstElement(graphEdge *);
     graphEdge * getFirstElement();

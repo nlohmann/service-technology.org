@@ -182,6 +182,5 @@ using namespace std;
 #define CAPACITY -1
 #endif
 
-void reportconfiguration();
 
 #endif

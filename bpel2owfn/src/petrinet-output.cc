@@ -28,13 +28,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/11/21 09:14:54 $
+ * \date    \$Date: 2006/11/22 15:11:02 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
  *
  * \ingroup petrinet
  */
@@ -702,7 +702,7 @@ void PetriNet::owfnOut()
     (*output) << (*p)->nodeName();
 #endif
     if (count < P.size())
-      (*output) << ", ";// << endl;
+      (*output) << ", ";
   }
   (*output) << ";" << endl << endl;
 
@@ -777,13 +777,13 @@ void PetriNet::owfnOut()
     if ((*p)->historyContains((*p)->prefix + "1.internal.final") )
     {
       if (count++ != 1)
-	(*output) << ",";// << endl;
+	(*output) << ",";
 
 #ifdef USING_BPEL2OWFN
-      (*output) << "  " << (*p)->nodeShortName();// << ":\t1";
+      (*output) << "  " << (*p)->nodeShortName();
 #endif
 #ifndef USING_BPEL2OWFN
-      (*output) << "  " << (*p)->nodeName();// << ":\t1";
+      (*output) << "  " << (*p)->nodeName();
 #endif
 
       if ((*p)->historyContains("1.internal.initial"))
@@ -799,10 +799,10 @@ void PetriNet::owfnOut()
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
   {
 #ifdef USING_BPEL2OWFN
-    (*output) << "TRANSITION " << (*t)->nodeShortName(); // << endl;
+    (*output) << "TRANSITION " << (*t)->nodeShortName();
 #endif
 #ifndef USING_BPEL2OWFN
-    (*output) << "TRANSITION " << (*t)->nodeName(); // << endl;
+    (*output) << "TRANSITION " << (*t)->nodeName();
 #endif
     switch( (*t)->type )
     {
@@ -815,36 +815,36 @@ void PetriNet::owfnOut()
     set<Node *> consume = preset(*t);
     set<Node *> produce = postset(*t);
     
-    (*output) << "  CONSUME ";// << endl;
+    (*output) << "  CONSUME ";
     count = 1;
     for (set<Node *>::iterator pre = consume.begin(); pre != consume.end(); count++, pre++)
     {
 #ifdef USING_BPEL2OWFN
-      (*output) << (*pre)->nodeShortName();// << ":\t1";
+      (*output) << (*pre)->nodeShortName();
 #endif
 #ifndef USING_BPEL2OWFN
-      (*output) << (*pre)->nodeName();// << ":\t1";
+      (*output) << (*pre)->nodeName();
 #endif
       
       if (count < consume.size())
-	(*output) << ", "; // << endl;
+	(*output) << ", ";
     }
     (*output) << ";" << endl;
     
-    (*output) << "  PRODUCE ";// << endl;
-//    (*output) << "  ";
+    (*output) << "  PRODUCE ";
+
     count = 1;
     for (set<Node *>::iterator post = produce.begin(); post != produce.end(); count++, post++)
     {
 #ifdef USING_BPEL2OWFN
-      (*output) << (*post)->nodeShortName();// << ":\t1";
+      (*output) << (*post)->nodeShortName();
 #endif
 #ifndef USING_BPEL2OWFN
-      (*output) << (*post)->nodeName();// << ":\t1";
+      (*output) << (*post)->nodeName();
 #endif
       
       if (count < produce.size())
-	(*output) << ", ";// << endl;
+	(*output) << ", ";
     }
     
     (*output) << ";" << endl << endl;

@@ -3,8 +3,8 @@
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT(Fiona, 1.0, weinberg@informatik.hu-berlin.de, fiona)
-AC_REVISION($Revision: 1.13 $)
+AC_INIT(Fiona, 1.5, weinberg@informatik.hu-berlin.de, fiona)
+AC_REVISION($Revision: 1.14 $)
 
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/fiona.h)
@@ -87,15 +87,15 @@ echo
 AC_MSG_NOTICE([Creating Makefile include in order to build cudd package])
 # create Makefile include for cudd package
 echo "# created by configure script"  > $srcdir/cudd/Makefile.inc
-echo				      >> $srcdir/cudd/Makefile.inc
-echo "CPP = $CXX"		      >> $srcdir/cudd/Makefile.inc
-echo 		      >> $srcdir/cudd/Makefile.inc
+echo                      >> $srcdir/cudd/Makefile.inc
+echo "CPP = $CXX"             >> $srcdir/cudd/Makefile.inc
+echo              >> $srcdir/cudd/Makefile.inc
 echo "# IMPORTANT NOTICE: C sources also need to be compiled as C++, because the code" >> $srcdir/cudd/Makefile.inc
 echo "# for logging malloc, realloc, free, new and delete (newlogger.cc) is" >> $srcdir/cudd/Makefile.inc
 echo "# written in C++, and C cannot call C++. Only C++ can do that." >> $srcdir/cudd/Makefile.inc
-echo "CC  = $CXX"		      >> $srcdir/cudd/Makefile.inc
+echo "CC  = $CXX"             >> $srcdir/cudd/Makefile.inc
 echo                                  >> $srcdir/cudd/Makefile.inc
-echo "RANLIB = $RANLIB"		      >> $srcdir/cudd/Makefile.inc
+echo "RANLIB = $RANLIB"           >> $srcdir/cudd/Makefile.inc
 echo                                  >> $srcdir/cudd/Makefile.inc
 case `uname -s` in
   Linux)    echo "XCFLAGS = -march=`uname -m` -malign-double -DHAVE_IEEE_754 -DBSD" >> $srcdir/cudd/Makefile.inc ;;
@@ -110,4 +110,3 @@ echo
 echo "Run \"make\" to build fiona (cudd package is built automatically)."
 echo "Run \"make win32\" to build a fiona executable that is independent of cygwin1.dll."
 echo
-

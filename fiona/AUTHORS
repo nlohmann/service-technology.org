@@ -1,4 +1,4 @@
-BEGIN OF AUTHORS file for Fiona Version 1.0
+BEGIN OF AUTHORS file for Fiona Version 1.5
 
 
 
@@ -19,6 +19,7 @@ Acknowledgements
 
 We would like to thank:
    * Karsten Wolf (Universita"t Rostock) for his support
+   * Niels Lohmann (Humboldt-Universita"t zu Berlin) for his support
 
 Fiona is part of the Tools4BPEL project funded by the German
 Bundesministerium fu"r Bildung und Forschung (BMBF).
@@ -45,8 +46,8 @@ E-mail
 
 Copyright (C) 2005, 2006 Peter Massuthe and Daniela Weinberg.
 
-This file is part of Fiona, a tool analysing business processes
-modelled as open workflow nets (oWFN).
+This file is part of Fiona, a tool for analyzing business processes
+modelled as open workflow nets (oWFNs).
 
 Fiona is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
@@ -62,4 +63,4 @@ You should have received a copy of the GNU General Public License along
 with Fiona; if not, write to the Free Software Foundation, Inc., 51
 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 
-END OF AUTHORS file for Fiona Version 1.0
+END OF AUTHORS file for Fiona Version 1.5

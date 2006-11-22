@@ -21,7 +21,7 @@
 /*!
  * \file    CNF.h
  *
- * \brief   functions for annotations of OGs
+ * \brief   functions for node annotations and analysis of IG / OG
  *
  * \author  responsible: Daniela Weinberg <weinberg@informatik.hu-berlin.de>
  *

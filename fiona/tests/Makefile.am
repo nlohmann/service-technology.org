@@ -22,3 +22,5 @@
 TESTS = testSequenceSuite.sh bddtest.sh extrema.sh samples.sh messages.sh cyclic.sh
 
 TESTS_ENVIRONMENT = testdir=$(top_srcdir)/tests PATH=.:../src:$$PATH
+
+EXTRA_DIST = $(TESTS) cyclic/*.owfn extrema/*.owfn messages/*.owfn samples/*.owfn sequence_suite/*.owfn

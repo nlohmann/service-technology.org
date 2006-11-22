@@ -1,4 +1,4 @@
-// User configuration file for LoLA
+// User configuration file for Fiona
 
 // specify whether each new operation shall be logged
 //#define LOG_NEW

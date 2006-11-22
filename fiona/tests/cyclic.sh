@@ -80,7 +80,7 @@ result=`expr $result + $zyklusPcontrol`
 
 zyklusPcommitbluenodes_soll=4
 zyklusPcommitblueedges_soll=5
-zyklusPcommitstoredstates_soll=10
+zyklusPcommitstoredstates_soll=11
 
 echo running $FIONA -a -t OG -n $DIR/zyklusPmitcommit.owfn -e2 -m1
 OUTPUT=`$FIONA -a -t OG -n $DIR/zyklusPmitcommit.owfn -e2 -m1  2>&1`

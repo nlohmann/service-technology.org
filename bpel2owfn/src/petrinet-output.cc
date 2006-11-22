@@ -28,13 +28,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/11/22 15:11:02 $
+ * \date    \$Date: 2006/11/22 15:29:51 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  *
  * \ingroup petrinet
  */
@@ -825,7 +825,9 @@ void PetriNet::owfnOut()
 #ifndef USING_BPEL2OWFN
       (*output) << (*pre)->nodeName();
 #endif
-      
+      if (arc_weight(*pre, *t) != 1)
+	(*output) << ":" << arc_weight(*pre, *t);
+
       if (count < consume.size())
 	(*output) << ", ";
     }
@@ -842,6 +844,8 @@ void PetriNet::owfnOut()
 #ifndef USING_BPEL2OWFN
       (*output) << (*post)->nodeName();
 #endif
+      if (arc_weight(*t, *post) != 1)
+	(*output) << ":" << arc_weight(*t, *post);
       
       if (count < produce.size())
 	(*output) << ", ";

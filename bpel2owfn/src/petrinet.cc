@@ -28,13 +28,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/11/22 15:06:03 $
+ * \date    \$Date: 2006/11/22 15:29:51 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.152 $
+ * \version \$Revision: 1.153 $
  *
  * \ingroup petrinet
  */
@@ -127,7 +127,7 @@ Node::~Node()
 /*!
  * \param my_source      the source-node of the arc
  * \param my_target      the target-node of the arc
- * \param my_weight      the weigth of the arc (standard: 1)
+ * \param my_weight      the weight of the arc (standard: 1)
  */
 Arc::Arc(Node *my_source, Node *my_target, unsigned int my_weight)
 {
@@ -664,6 +664,29 @@ void PetriNet::renamePlace(string old_name, string new_name)
 
   roleMap[old_name] = NULL;
   roleMap[new_name] = p;
+}
+
+
+
+
+
+/*!
+ * Returns the weight of an arc between two nodes.
+ *
+ * \param  source_node  the source node of the arc to be checked
+ * \param  target_node  the target node of the arc to be checked
+ * \result the weight of the arc
+ */
+unsigned int PetriNet::arc_weight(Node *source_node, Node *target_node)
+{
+  for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
+  {
+    if (((*f)->source == source_node) && ((*f)->target == target_node))
+      return (*f)->weight;
+  }
+
+  assert(false);
+  return 1;
 }
 
 

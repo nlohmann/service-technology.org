@@ -28,14 +28,14 @@
  * 
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/16 10:10:02 $
+ * \date    \$Date: 2006/11/23 15:29:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.117 $
+ * \version \$Revision: 1.118 $
  */
 
 
@@ -131,7 +131,8 @@ int main( int argc, char *argv[])
   
   list< std::string >::iterator file = inputfiles.begin();
 
-  do {
+  do
+  {
     if (inputfiles.size() >= 1)
     {
       filename = *file;
@@ -174,7 +175,21 @@ int main( int argc, char *argv[])
       if (modus == M_AST)
       {
 	trace(TRACE_INFORMATION, "-> Printing AST ...\n");
-	TheProcess->print();
+	if (formats[F_DOT])
+	{
+	  string dot_filename = output_filename + "." + suffixes[F_DOT];
+	  FILE *dotfile = fopen(dot_filename.c_str(), "w+");
+	  TheProcess->fprintdot(dotfile, "", "", "", true, true, true);
+	  fclose(dotfile); 
+#ifdef HAVE_DOT
+  	  std::string systemcall = "dot -q -Tpng -o" + output_filename + ".png " + output_filename + "." + suffixes[F_DOT];
+  	  trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");
+  	  trace(TRACE_INFORMATION, systemcall + "\n\n");
+  	  system(systemcall.c_str());
+#endif
+	}
+	else
+	  TheProcess->print();
       }
 
       // generate and process the control flow graph?      

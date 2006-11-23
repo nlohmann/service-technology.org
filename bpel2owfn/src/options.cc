@@ -24,17 +24,17 @@
  * \brief   evaluation of command-line options
  *
  * \author  responsible: Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nlohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/23 10:39:21 $
+ * \date    \$Date: 2006/11/23 15:29:44 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
  */
 
 
@@ -230,6 +230,8 @@ void parse_command_line(int argc, char* argv[])
   // this map indicates, whether a certain format is valid for a mode
   map< pair<possibleModi,possibleFormats>, bool > validFormats;
   
+  validFormats[pair<possibleModi,possibleFormats>(M_AST,F_DOT)] = true;
+
   validFormats[pair<possibleModi,possibleFormats>(M_PRETTY,F_XML)] = true;
 
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_LOLA)] = true;

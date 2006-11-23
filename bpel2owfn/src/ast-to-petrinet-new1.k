@@ -29,7 +29,7 @@
  *
  * \since   2006-10-29
  *
- * \date    \$Date: 2006/11/23 09:55:09 $
+ * \date    \$Date: 2006/11/23 14:07:40 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.25 $
+ * \version \$Revision: 1.26 $
  *
  */
 %}
@@ -407,8 +407,6 @@ This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
       TheNet->newArc(p22, t11, READ);
 
       Transition *t12 = stop(p1, "initial", prefix);
-      Transition *t13 = stop(p2, "final", prefix);
-
 
       // now comes everything we need for compensation in loops
       assert(ASTEmap[_id->value] != NULL);
@@ -425,7 +423,7 @@ This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
         Place *p23 = TheNet->newPlace(prefix + "compensated");
 
         list<unsigned int> ancestor_loops = ASTEmap[_id->value]->ancestorLoops();
-cerr << ancestor_loops.size() << " ancestor_loops" << endl;
+        cerr << ancestor_loops.size() << " ancestor_loops" << endl;
         if (ancestor_loops.size() > 1)
         {
           vector<unsigned int> loop_bounds;
@@ -450,6 +448,9 @@ cerr << ancestor_loops.size() << " ancestor_loops" << endl;
           TheNet->newPlace(prefix + "!c");
         }
       }
+
+      // don't stop from "final1" -- that's why this line is down here
+      Transition *t13 = stop(TheNet->findPlace(prefix + "final"), "final", prefix);
     }
       a // standard elements
       i // inner activity

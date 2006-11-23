@@ -33,11 +33,11 @@
  * \ref ast-grammar.h.
  * 
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2006/11/16 10:29:41 $
+ * \date    \$Date: 2006/11/23 10:39:21 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -46,7 +46,7 @@
  * \note    This file was created using GNU Bison reading file parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.272 $
+ * \version \$Revision: 1.273 $
  *
  * \ingroup frontend
  */
@@ -269,6 +269,9 @@ tProcess:
       yylineno = 0;
       currentJoinCondition = standardJoinCondition();
       temporaryAttributeMap.clear();
+      //ASTEmap = std::map< unsigned int, ASTE * >();
+      ASTEmap.clear();
+      ASTEid = 1;
     }
   X_OPEN K_PROCESS arbitraryAttributes X_NEXT tExtensions imports tPartnerLinks
   tPartners tMessageExchanges tVariables tCorrelationSets tFaultHandlers

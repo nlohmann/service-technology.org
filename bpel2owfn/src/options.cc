@@ -24,17 +24,17 @@
  * \brief   evaluation of command-line options
  *
  * \author  responsible: Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/21 14:40:54 $
+ * \date    \$Date: 2006/11/23 10:39:21 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.48 $
+ * \version \$Revision: 1.49 $
  */
 
 
@@ -453,16 +453,18 @@ void parse_command_line(int argc, char* argv[])
     if (!(fin = fopen(file->c_str(), "r")))
     {
 	    trace(TRACE_ALWAYS, "File '" + *file + "' not found.\n");
-//      throw Exception(FILE_NOT_FOUND, "File '" + *file + "' not found.\n");
     }
     fclose(fin);
     file++;
     while(modus == M_CONSISTENCY && file != inputfiles.end())
     {
-      if (!(fopen(file->c_str(), "r")))
+      if (!(fin = fopen(file->c_str(), "r")))
       {
 	    trace(TRACE_ALWAYS, "File '" + *file + "' not found.\n");
-//	throw Exception(FILE_NOT_FOUND, "File '" + *file + "' not found.\n");
+      }
+      else
+      {
+        fclose( fin );
       }
       file++;
     }

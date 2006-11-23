@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/11/23 14:33:39 $
+ * \date    \$Date: 2006/11/23 15:13:28 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.36 $
+ * \version \$Revision: 1.37 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -592,7 +592,17 @@ void listAttributes ( unsigned int id )
   std::string result = "";
   for (map< std::string, std::string >::iterator attribute = ASTEmap[ id ]->attributes.begin(); attribute != ASTEmap[ id ]->attributes.end(); attribute++ )
   {
-    if ( attribute->second != "" )
+    if ( attribute->second != "" &&
+         attribute->first != "referenceLine" &&
+         !( (attribute->first == "exitOnStandardFaults" ||
+             attribute->first == "createInstance" ||
+             attribute->first == "initializePartnerRole" ||
+             attribute->first == "initiate" ||
+             attribute->first == "isolated" ||
+             attribute->first == "surpressJoinFailure" ||
+             attribute->first == "validate")
+            && attribute->second == "no" )
+      )
     {
       result += " " + attribute->first + "=\""+ attribute->second +"\"";
     }

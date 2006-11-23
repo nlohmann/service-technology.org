@@ -786,6 +786,7 @@ We would like to thank:
 about BPEL's semantics
 @item Carsten Frenkler (Gedilan Technologies) for challenging @acronym{BPEL}
 processes
+@item Mario Karrenbrock (FH Wilhelmshaven) for finding bugs.
 @item Oliver Kopp (Universit@"at Stuttgart) for challenging @acronym{BPEL}
 processes
 @item Axel Martens (IBM) for valuable advice concerning @acronym{BPEL}

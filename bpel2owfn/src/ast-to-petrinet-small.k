@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/11/21 09:14:54 $
+ * \date    \$Date: 2006/11/23 10:27:41 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.70 $
+ * \version \$Revision: 1.71 $
  *
  */
 %}
@@ -166,7 +166,7 @@ userDefinedEventHandler(a,b,_id) ->
     b // onAlarm branches
     {
       int onMessageCount = 1;
-      foreach (ThisBranch = OnMessage(innerActivity); tOnMessage_list a)
+      foreach (ThisBranch = OnMessage(_corr, _from, innerActivity, _id2); tOnMessage_list a)
       {
         Transition *t1 = TheNet->newTransition(prefix + "ehM" + toString(onMessageCount));
         onMessageCount++;
@@ -938,8 +938,8 @@ This=Pick(a,b,c,d) ->
       // (i.e. firing of the respective t2/t6-transition) has set the links of
       // all other branches to false.
       int currentMessage = 1;
-      foreach (OnMessage(innerActivity1); tOnMessage_list b) {
-	foreach (OnMessage(innerActivity2); tOnMessage_list b) {
+      foreach (OnMessage(corr_1, from_1, innerActivity1, _id1); tOnMessage_list b) {
+	foreach (OnMessage(corr_2, from_2, innerActivity2, _id2); tOnMessage_list b) {
 	  if ((innerActivity1 != innerActivity2))
             dpeLinks(TheNet->findTransition(prefix + "pickM" + toString(currentMessage)), innerActivity2->id); // onMessage -> onMessage'
 	}
@@ -957,7 +957,7 @@ This=Pick(a,b,c,d) ->
             dpeLinks(TheNet->findTransition(prefix + "pickA" + toString(currentAlarm)), innerActivity2->id); // onAlarm -> onAlarm'
 	}
 
-	foreach (OnMessage(innerActivity2); tOnMessage_list b) {
+	foreach (OnMessage(_corr2, _from2, innerActivity2, _id2); tOnMessage_list b) {
           dpeLinks(TheNet->findTransition(prefix + "pickA" + toString(currentAlarm)), innerActivity2->id); // onAlarm -> onMessage
 	}
 	currentAlarm++;

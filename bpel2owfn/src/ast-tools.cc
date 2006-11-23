@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/11/23 09:55:09 $
+ * \date    \$Date: 2006/11/23 10:27:41 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -519,6 +519,8 @@ void footer(kc::integer id, bool myindent)
  */
 void dpeLinks(Transition *t, int id)
 {
+  ENTER("[ASTT]");
+
   assert(t != NULL);
   assert(ASTEmap[id] != NULL);
 
@@ -530,6 +532,8 @@ void dpeLinks(Transition *t, int id)
     string linkName = ASTEmap[*linkID]->attributes["name"];
     TheNet->newArc(t, TheNet->findPlace("!link." + linkName));
   }
+
+  LEAVE("[ASTT]");
 }
 
 

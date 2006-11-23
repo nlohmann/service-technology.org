@@ -3,7 +3,7 @@ Copyright (C) 2005, 2006 Peter Massuthe and Daniela Weinberg
 This is a binary distribution of Fiona, a tool to analyze
 processes described as an open workflow net (oWFN). The sources
 of Fiona can be downloaded from the website of Fiona
-(http://www.informatik.hu-berlin.de/top/tools4bpel/Fiona).
+(http://www.informatik.hu-berlin.de/top/tools4bpel/fiona).
 
 Fiona is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the

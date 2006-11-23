@@ -24,17 +24,17 @@
  * \brief   unparse helper tools
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/11/23 10:27:41 $
+ * \date    \$Date: 2006/11/23 14:33:39 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.35 $
+ * \version \$Revision: 1.36 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -522,6 +522,7 @@ void dpeLinks(Transition *t, int id)
   ENTER("[ASTT]");
 
   assert(t != NULL);
+  cerr << "id: " << id << endl;
   assert(ASTEmap[id] != NULL);
 
   for (set<int>::iterator linkID = ASTEmap[id]->enclosedSourceLinks.begin();
@@ -586,11 +587,18 @@ void indown()
 }
 
 
-
-
-
-
-
+void listAttributes ( unsigned int id )
+{
+  std::string result = "";
+  for (map< std::string, std::string >::iterator attribute = ASTEmap[ id ]->attributes.begin(); attribute != ASTEmap[ id ]->attributes.end(); attribute++ )
+  {
+    if ( attribute->second != "" )
+    {
+      result += " " + attribute->first + "=\""+ attribute->second +"\"";
+    }
+  }
+  *output << result;
+}
 
 
 void next_index(vector<unsigned int> &current_index, vector<unsigned int> &max_index)
@@ -699,3 +707,5 @@ void process_loop_bounds(vector<unsigned int> &loop_bounds, vector<unsigned int>
     next_index(current_index, loop_bounds);
   }
 }
+
+

@@ -24,17 +24,17 @@
  * \brief   unparse helper tools
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/11/22 15:06:03 $
+ * \date    \$Date: 2006/11/23 14:33:40 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.19 $
+ * \version \$Revision: 1.20 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -92,6 +92,11 @@ void footer(int id, bool indent = false);
 void in();
 void inup();
 void indown();
+void listAttributes ( unsigned int id );
+inline void listAttributes ( kc::integer id )
+{
+    listAttributes ( id->value );
+}
 
 
 

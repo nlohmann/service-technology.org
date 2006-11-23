@@ -24,18 +24,18 @@
  * \brief   annotations of the AST
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/21 14:40:54 $
+ * \date    \$Date: 2006/11/23 14:33:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.51 $
+ * \version \$Revision: 1.52 $
  */
 
 
@@ -96,6 +96,21 @@ typedef enum
 } attributeType;
 
 
+/*!
+ * \brief enumaration of possible relationship between activities
+ *
+ * Possible answers to the question: What is the relation of A to B?
+ */
+typedef enum
+{
+  AR_CONCURRENT,        ///< to activities are concurrent
+  AR_CONFLICT,          ///< to activities are conflict (like in switch)
+  AR_ENCLOSES,          ///< activity B is enclosed in activity A
+  AR_DESCENDS,          ///< activity B is a descendant of activity A
+  AR_BEFORE,            ///< activity A comes before activity B
+  AR_AFTER
+} activityRelation;
+
 
 
 /******************************************************************************
@@ -151,6 +166,9 @@ class ASTE
    
     set<string> sharedCorrelationSets;	///< the identifiers of the joined correlation sets in case activity is a start activity
     set<string> catches;		///< the <catch> branches of <faultHandlers> to detect duplicates
+
+    set<unsigned int> enclosedActivities;       ///< set of all the enclosed activities
+    set<unsigned int> conflictingActivities;    ///< set of all conflicting activities
 
     ASTE(unsigned int myid, unsigned int mytype);
 

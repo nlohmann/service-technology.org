@@ -25,11 +25,11 @@
  * \brief   AST postprocessor (implementation)
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/21 14:40:54 $
+ * \date    \$Date: 2006/11/23 14:33:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.105 $
+ * \version \$Revision: 1.106 $
  */
 %}
 
@@ -230,6 +230,11 @@ userDefinedFaultHandler(a,b,_id) ->
       }
     }
     a b
+    {
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( ASTEmap[ myid ]->enclosedActivities.begin(), ASTEmap[ myid ]->enclosedActivities.end() );
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->conflictingActivities.insert( ASTEmap[ myid ]->conflictingActivities.begin(), ASTEmap[ myid ]->conflictingActivities.end() );
+    }
   ]
 ;
 
@@ -242,6 +247,8 @@ implicitFaultHandler(_id) ->
 
       myself->parentScopeId = PPcurrentScope;
       myself->inProcess = (myself->parentScopeId == 1);
+
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
     }
   ]
 ;
@@ -257,6 +264,10 @@ Catch(a,_id) ->
       myself->checkAttributes();
     }
     a
+    {
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( ASTEmap[ myid ]->enclosedActivities.begin(), ASTEmap[ myid ]->enclosedActivities.end() );
+    }
   ]
 ;
 
@@ -268,6 +279,10 @@ CatchAll(a,_id) ->
       assert(myself != NULL);
     }
     a
+    {
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( ASTEmap[ myid ]->enclosedActivities.begin(), ASTEmap[ myid ]->enclosedActivities.end() );
+    }
   ]
 ;
 
@@ -284,7 +299,9 @@ implicitEventHandler(_id) ->
       assert(myself != NULL);
 
       myself->parentScopeId = PPcurrentScope;
-    }  
+
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+    }
   ]
 ;
 
@@ -318,6 +335,10 @@ userDefinedEventHandler(a,b,_id) ->
       }
     }
     a b
+    {
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( ASTEmap[ myid ]->enclosedActivities.begin(), ASTEmap[ myid ]->enclosedActivities.end() );
+    }
   ]
 ;
 
@@ -351,6 +372,10 @@ OnMessage(a,b,c,_id) ->
       }
     }
     a b c
+    {
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( ASTEmap[ myid ]->enclosedActivities.begin(), ASTEmap[ myid ]->enclosedActivities.end() );
+    }
   ]
 ;
 
@@ -369,6 +394,10 @@ OnAlarm(a,_id) ->
       ASTEmap[a->id]->parentActivityId = myid;
     }
     a
+    {
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( ASTEmap[ myid ]->enclosedActivities.begin(), ASTEmap[ myid ]->enclosedActivities.end() );
+    }
   ]
 ;
 
@@ -385,6 +414,8 @@ implicitCompensationHandler(_id) ->
       assert(myself != NULL);
 
       myself->parentScopeId = PPcurrentScope;
+
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
     }
   ]
 ;
@@ -406,6 +437,10 @@ userDefinedCompensationHandler(a,_id) ->
       ASTEmap[a->id]->max_occurrences = myself->max_occurrences;
     }
     a
+    {
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( ASTEmap[ myid ]->enclosedActivities.begin(), ASTEmap[ myid ]->enclosedActivities.end() );
+    }
   ]
 ;
 
@@ -431,6 +466,10 @@ TerminationHandler(a,_id) ->
       ASTEmap[a->id]->max_occurrences = myself->max_occurrences;
     }
     a
+    {
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( ASTEmap[ myid ]->enclosedActivities.begin(), ASTEmap[ myid ]->enclosedActivities.end() );
+    }
   ]
 ;
 
@@ -549,6 +588,9 @@ Empty(a,_id) ->
       myself->checkAttributes();
     }
     a
+    {
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+    }
   ]
 ;
 
@@ -592,6 +634,9 @@ Invoke(a,b,c,d,_id) ->
       }
     }
     a b
+    {
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+    }
   ]
 ;
 
@@ -639,6 +684,8 @@ Receive(a,b,c,_id) ->
         if (!ASTEmap[myself->parentActivityId]->checkAncestors() || !myself->targetLinks.empty())
           SAerror(56, "<receive>", myself->attributes["referenceLine"]);
       }
+
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
     }
   ]
 ;
@@ -678,6 +725,9 @@ Reply(a,b,c,_id) ->
       }
     }
     a b
+    {
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+    }
   ]
 ;
 
@@ -699,6 +749,9 @@ Assign(a,b,_id) ->
       myself->checkAttributes();
     }
     a b
+    {
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+    }
   ]
 ;
 
@@ -756,6 +809,9 @@ Validate(a,_id) ->
       myself->checkAttributes();
     }
     a
+    {
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+    }
   ]
 ;
 
@@ -777,6 +833,9 @@ Wait(a,_id) ->
       myself->checkAttributes();
     }
     a
+    {
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+    }
   ]
 ;
 
@@ -798,6 +857,9 @@ Throw(a,_id) ->
       myself->checkAttributes();
     }
     a
+    {
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+    }
   ]
 ;
 
@@ -836,6 +898,9 @@ Rethrow(a,_id) ->
         SAerror(6, "", myself->attributes["referenceLine"]);
     }
     a
+    {
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+    }
   ]
 ;
 
@@ -881,6 +946,9 @@ Compensate(a,_id) ->
       PPhasCompensateMap[PPcurrentScope] = 1;
     }
     a
+    {
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+    }
   ]
 ;
 
@@ -932,6 +1000,9 @@ CompensateScope(a,b,_id) ->
       PPhasCompensateMap[PPcurrentScope] = 2;
     }
     a
+    {
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+    }
   ]
 ;
 
@@ -953,6 +1024,9 @@ Terminate(a,_id) ->
       myself->checkAttributes();
     }
     a
+    {
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+    }
   ]
 ;
 
@@ -974,6 +1048,9 @@ Exit(a,_id) ->
       myself->checkAttributes();
     }
     a
+    {
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+    }
   ]
 ;
 
@@ -1044,6 +1121,10 @@ Flow(a,b,c,_id) ->
       }
       
       /* here we can check whether each link was used as source and target */
+
+
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( ASTEmap[ myid ]->enclosedActivities.begin(), ASTEmap[ myid ]->enclosedActivities.end() );
     }
   ]
 ;
@@ -1125,6 +1206,9 @@ Switch(a,b,c,_id) ->
         }
         default: { /* do nothing */ }
       }
+
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( ASTEmap[ myid ]->enclosedActivities.begin(), ASTEmap[ myid ]->enclosedActivities.end() );
     }
   ]
 ;
@@ -1216,6 +1300,9 @@ If(a,b,c,_id) ->
         }
         default: { /* do nothing */ }
       }
+
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( ASTEmap[ myid ]->enclosedActivities.begin(), ASTEmap[ myid ]->enclosedActivities.end() );
     }
   ]
 ;
@@ -1288,6 +1375,9 @@ While(a,b,_id) ->
       // collect enclosed source links
       assert(ASTEmap[b->id] != NULL);
       myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[b->id]->enclosedSourceLinks);
+
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( ASTEmap[ myid ]->enclosedActivities.begin(), ASTEmap[ myid ]->enclosedActivities.end() );
     }
   ]
 ;
@@ -1333,6 +1423,9 @@ RepeatUntil(a,b,_id) ->
       // collect enclosed source links
       assert(ASTEmap[b->id] != NULL);
       myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[b->id]->enclosedSourceLinks);
+
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( ASTEmap[ myid ]->enclosedActivities.begin(), ASTEmap[ myid ]->enclosedActivities.end() );
     }
   ]
 ;
@@ -1383,6 +1476,9 @@ Sequence(a,b,_id) ->
         if (ASTEmap[innerActivity->id]->isStartActivity && activityCount++ > 1)
           SAerror(56, "<" + ASTEmap[innerActivity->id]->activityTypeName() + ">", ASTEmap[innerActivity->id]->attributes["referenceLine"]);
       }
+
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( ASTEmap[ myid ]->enclosedActivities.begin(), ASTEmap[ myid ]->enclosedActivities.end() );
     }
   ]
 ;
@@ -1450,6 +1546,10 @@ Pick(a,b,c,_id) ->
         assert(ASTEmap[innerActivity->id] != NULL);
         myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
       }
+
+
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( ASTEmap[ myid ]->enclosedActivities.begin(), ASTEmap[ myid ]->enclosedActivities.end() );
     }
   ]
 ;
@@ -1534,6 +1634,9 @@ ForEach(a,b,c,d,e,_id) ->
       // collect enclosed source links
       assert(ASTEmap[e->id] != NULL);
       myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[e->id]->enclosedSourceLinks);
+
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( ASTEmap[ myid ]->enclosedActivities.begin(), ASTEmap[ myid ]->enclosedActivities.end() );
     }
   ]
 ;
@@ -1627,6 +1730,9 @@ Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
 
       // everybody after me has the same parent scope as me
       PPcurrentScope = myself->parentScopeId;
+
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
+      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( ASTEmap[ myid ]->enclosedActivities.begin(), ASTEmap[ myid ]->enclosedActivities.end() );
     }
   ]
 ;

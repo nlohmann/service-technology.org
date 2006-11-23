@@ -28,11 +28,11 @@
  * 
  * \author  
  *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
+ *          - last changes of: \$Author: gierds $
  *          
  * \date    
  *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/11/05 14:33:11 $
+ *          - last changed: \$Date: 2006/11/23 14:33:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universit�t zu Berlin. See
@@ -41,11 +41,18 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.59 $
+ * \version \$Revision: 1.60 $
  */
+
+#include "ast-details.h"
+#include "ast-config.h"
+#include "parser.h"
+#include "options.h"
+
+extern map<unsigned int, ASTE*> ASTEmap;
+extern int ASTEid;
+
 %}
-
-
 
 
 
@@ -54,7 +61,7 @@
 ******************************************************************************/
 
 Process(a,b,c,d,e,f,g,h,i,_id) ->
-  [xml: { inup(); } "<process id=\"" _id "\">\n" 
+  [xml: { inup(); } "<process id=\"" _id "\"" { listAttributes( _id ); } ">\n" 
   
   { if (a->length() == 0) }
     ${ /* no Partner Links */ $}
@@ -76,7 +83,7 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
   { else }
     ${ { inup(); } "<correlationSets>\n" d { indown(); } "</correlationSets>\n" $}
 
-  e f g h i { indown(); } "</process>\n"]
+  e f g /* h */  i { indown(); } "</process>\n"]
 ;
 
 
@@ -85,7 +92,7 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
 ******************************************************************************/
 
 PartnerLink(_id) ->
-  [xml: { in(); } "<partnerLink id=\"" _id "\"/>\n"]
+  [xml: { in(); } "<partnerLink id=\"" _id "\"" { listAttributes( _id ); } " />\n"]
 ;
 
 
@@ -107,7 +114,7 @@ userDefinedFaultHandler(a,b,_id) ->
 ;
 
 Catch(a,_id) ->
-  [xml: { inup(); } "<catch id=\"" _id "\">\n" a { indown(); } "</catch>\n"]
+  [xml: { inup(); } "<catch id=\"" _id "\"" { listAttributes( _id ); } ">\n" a { indown(); } "</catch>\n"]
 ;
 
 CatchAll(a,_id) ->
@@ -123,12 +130,24 @@ userDefinedEventHandler(a,b,_id) ->
   [xml: { inup(); } "<eventHandlers id=\"" _id "\">\n" a b { indown(); } "</eventHandlers>\n"]
 ;
 
-OnMessage(a,b,c,d) ->
-  [xml: { inup(); } "<onMessage>\n" c { indown(); } "</onMessage>\n"]
+OnMessage(a,b,c,_id) ->
+  [xml: { inup(); } "<onMessage" { listAttributes( _id ); } ">\n"
+
+  { if (a->length() == 0) }
+    ${ /* no correlation sets */ $}
+  { else }
+    ${ { inup(); } "<correlations>\n" a { indown(); } "</correlations>\n" $}
+  
+  { if (b->length() == 0) }
+    ${ /* no from parts */ $}
+  { else }
+    ${ { inup(); } "<fromParts>\n" b { indown(); } "</fromParts>\n" $}
+  
+  c { indown(); } "</onMessage>\n"]
 ;
 
-OnAlarm(a,b) ->
-  [xml: { inup(); } "<onAlarm>\n" a { indown(); } "</onAlarm>\n"]
+OnAlarm(a,_id) ->
+  [xml: { inup(); } "<onAlarm" { listAttributes( _id ); } ">\n" a { indown(); } "</onAlarm>\n"]
 ;
 
 
@@ -146,7 +165,7 @@ userDefinedCompensationHandler(a,_id) ->
 ******************************************************************************/
 
 Variable(_id) ->
-  [xml: { in(); } "<variable id=\"" _id "\"/>\n"]
+  [xml: { in(); } "<variable id=\"" _id "\"" { listAttributes( _id ); } " />\n"]
 ;
 
 
@@ -154,8 +173,8 @@ Variable(_id) ->
   CORRELATION SETS
 ******************************************************************************/
 
-CorrelationSet(a) ->
-  [xml: { in(); } "<correlationSet />\n"]
+CorrelationSet(_id) ->
+  [xml: { in(); } "<correlationSet" { listAttributes( _id ); } " />\n"]
 ;
 
 
@@ -163,25 +182,20 @@ CorrelationSet(a) ->
   CORRELATIONS
 ******************************************************************************/
 
-Correlation(a) ->
-  [xml: { in(); } "<correlation />\n"]
+Correlation(_id) ->
+  [xml: { in(); } "<correlation" { listAttributes( _id ); } " />\n"]
 ;
 
-
 /******************************************************************************
-  EMPTY
+  TO & FROM PARTS                                               (WS-BPEL 2.0)
 ******************************************************************************/
 
-Empty(a,_id) ->
-  [xml: { inup(); } "<empty id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { indown(); } "</empty>\n"];
+ToPart(_id) ->
+  [xml: { in(); } "<toPart" { listAttributes( _id ); } " />\n"]
+;
 
-
-/******************************************************************************
-  INVOKE
-******************************************************************************/
-
-Invoke(a,b,c,d,_id) ->
-  [xml: { inup(); } "<invoke id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b { indown(); } "</invoke>\n"]
+FromPart(_id) ->
+  [xml: { in(); } "<fromPart" { listAttributes( _id ); } " />\n"]
 ;
 
 
@@ -190,7 +204,7 @@ Invoke(a,b,c,d,_id) ->
 ******************************************************************************/
 
 Receive(a,b,c,_id) ->
-  [xml: { inup(); } "<receive id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b { indown(); } "</receive>\n"]
+  [xml: { inup(); } "<receive id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b c { indown(); } "</receive>\n"]
 ;
 
 
@@ -199,7 +213,24 @@ Receive(a,b,c,_id) ->
 ******************************************************************************/
 
 Reply(a,b,c,_id) ->
-  [xml: { inup(); } "<reply id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b { indown(); } "</reply>\n"]
+  [xml: { inup(); } "<reply id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b c { indown(); } "</reply>\n"]
+;
+
+
+/******************************************************************************
+  INVOKE
+******************************************************************************/
+
+Invoke(a,b,c,d,_id) ->
+  [xml: { inup(); } "<invoke id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b c d { indown(); } "</invoke>\n"]
+;
+
+SynchronousInvoke(a,b,c,d,_id) ->
+  [xml: { inup(); } "<invoke id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b c d { indown(); } "</invoke>\n"]
+;
+
+AsynchronousInvoke(a,b,c,d,_id) ->
+  [xml: { inup(); } "<invoke id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b c d { indown(); } "</invoke>\n"]
 ;
 
 
@@ -208,11 +239,11 @@ Reply(a,b,c,_id) ->
 ******************************************************************************/
 
 Assign(a,b,_id) ->
-  [xml: { inup(); } "<assign id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b { indown(); } "</assign>\n"]
+  [xml: { inup(); } "<assign id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b { indown(); } "</assign>\n"]
 ;
 
-Copy(a,b,c) ->
-  [xml: { inup(); } "<copy>\n" a b { indown(); } "</copy>\n"]
+Copy(a,b,_id) ->
+  [xml: { inup(); } "<copy id=\"" _id "\">\n" a b { indown(); } "</copy>\n"]
 ;
 
 From(a) ->
@@ -225,29 +256,35 @@ To(b) ->
 
 
 /******************************************************************************
+  VALIDATE                                                      (WS-BPEL 2.0)
+******************************************************************************/
+
+Validate(a,_id) ->
+  [xml: { inup(); } "<validate id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { indown(); } "</validate>\n"];
+
+
+/******************************************************************************
+  EMPTY
+******************************************************************************/
+
+Empty(a,_id) ->
+  [xml: { inup(); } "<empty id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { indown(); } "</empty>\n"];
+
+
+/******************************************************************************
   WAIT
 ******************************************************************************/
 
 Wait(a,_id) ->
-  [xml: { inup(); } "<wait id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { indown(); } "</wait>\n"]
+  [xml: { inup(); } "<wait id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { indown(); } "</wait>\n"]
 ;
 
-
-/******************************************************************************
-  THROW
-******************************************************************************/
-
-Throw(a,_id) ->
-  [xml: { inup(); } "<throw id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { indown(); } "</throw>\n"]
+WaitFor(a,_id) ->
+  [xml: { inup(); } "<wait id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { indown(); } "</wait>\n"]
 ;
 
-
-/******************************************************************************
-  COMPENSATE
-******************************************************************************/
-
-Compensate(a,_id) ->
-  [xml: { inup(); } "<compensate id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { indown(); } "</compensate>\n"]
+WaitUntil(a,_id) ->
+  [xml: { inup(); } "<wait id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { indown(); } "</wait>\n"]
 ;
 
 
@@ -256,50 +293,47 @@ Compensate(a,_id) ->
 ******************************************************************************/
 
 Terminate(a,_id) ->
-  [xml: { inup(); } "<terminate id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { indown(); } "</terminate>\n"]
+  [xml: { inup(); } "<terminate id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { indown(); } "</terminate>\n"]
 ;
 
 
 /******************************************************************************
-  FLOW
+  EXIT
 ******************************************************************************/
 
-Flow(a,NiltLink_list(),c,_id) ->
-  [xml: { inup(); } "<flow id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a c { indown(); } "</flow>\n"]
-;
-
-Flow(a,b,c,_id) ->
-  [xml: { inup(); } "<flow id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { inup(); } "<links>\n" b { indown(); } "</links>\n" c { indown(); } "</flow>\n"]
-;
-
-Link(_id) ->
-  [xml: { in(); } "<link id=\"" _id "\"/>\n"]
+Exit(a,_id) ->
+  [xml: { inup(); } "<exit id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { indown(); } "</exit>\n"]
 ;
 
 
 /******************************************************************************
-  SWITCH
+  THROW
 ******************************************************************************/
 
-Switch(a,b,c,_id) ->
-  [xml: { inup(); } "<switch id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b c { indown(); } "</switch>\n"]
-;
-
-Case(a,b) ->
-  [xml: { inup(); } "<case>\n" a { indown(); } "</case>\n"]
-;
-
-Otherwise(a,b) ->
-  [xml: { inup(); } "<otherwise>\n" a { indown(); } "</otherwise>\n"]
+Throw(a,_id) ->
+  [xml: { inup(); } "<throw id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { indown(); } "</throw>\n"]
 ;
 
 
 /******************************************************************************
-  WHILE
+  RETHROW
 ******************************************************************************/
 
-While(a,b,_id) ->
-  [xml: { inup(); } "<while id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b { indown(); } "</while>\n"]
+Rethrow(a,_id) ->
+  [xml: { inup(); } "<rethrow id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { indown(); } "</rethrow>\n"]
+;
+
+
+/******************************************************************************
+  COMPENSATE
+******************************************************************************/
+
+Compensate(a,_id) ->
+  [xml: { inup(); } "<compensate id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { indown(); } "</compensate>\n"]
+;
+
+CompensateScope(a,b,_id) ->
+  [xml: { inup(); } "<compensateScope id=\"" _id "\" target=\"" b "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { indown(); } "</compensateScope>\n"]
 ;
 
 
@@ -308,7 +342,74 @@ While(a,b,_id) ->
 ******************************************************************************/
 
 Sequence(a,b,_id) ->
-  [xml: { inup(); } "<sequence id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b { indown(); } "</sequence>\n"]
+  [xml: { inup(); } "<sequence id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b { indown(); } "</sequence>\n"]
+;
+
+
+/******************************************************************************
+  SWITCH
+******************************************************************************/
+
+Switch(a,b,c,_id) ->
+  [xml: { inup(); } "<switch id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b c { indown(); } "</switch>\n"]
+;
+
+Case(a,_id) ->
+  [xml: { inup(); } "<case id=\"" _id "\"" { listAttributes( _id ); } ">\n" a { indown(); } "</case>\n"]
+;
+
+Otherwise(a,_id) ->
+  [xml: { inup(); } "<otherwise id=\"" _id "\">\n" a { indown(); } "</otherwise>\n"]
+;
+
+
+/******************************************************************************
+  IF                                                            (WS-BPEL 2.0)
+******************************************************************************/
+
+If(a,b,c,_id) ->
+  [xml: { inup(); } "<if id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b c { indown(); } "</if>\n"]
+;
+
+ElseIf(a,_id) ->
+  [xml: { inup(); } "<elseif id=\"" _id "\"" { listAttributes( _id ); } ">\n" a { indown(); } "</elseif>\n"]
+;
+
+Else(a,_id) ->
+  [xml: { inup(); } "<else id=\"" _id "\">\n" a { indown(); } "</else>\n"]
+;
+
+
+/******************************************************************************
+  WHILE
+******************************************************************************/
+
+While(a,b,_id) ->
+  [xml: { inup(); } "<while id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b { indown(); } "</while>\n"]
+;
+
+
+/******************************************************************************
+  REPEATUNTIL                                                   (WS-BPEL 2.0)
+******************************************************************************/
+
+RepeatUntil(a,b,_id) ->
+  [xml: { inup(); } "<repeatUntil id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b { indown(); } "</repeatUntil>\n"]
+;
+
+
+/******************************************************************************
+  FOREACH                                                       (WS-BPEL 2.0)
+******************************************************************************/
+
+ForEach(a,b,c,d,e,_id) ->
+  [xml: { inup(); } "<foreach id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" 
+  a 
+  { inup(); } "<startCounterValue>\n" b { indown(); } "</startCounterValue>\n"
+  { inup(); } "<finalCounterValue>\n" c { indown(); } "</finalCounterValue>\n"
+  { inup(); } "<completionCondition>\n" d { indown(); } "</completionCondition>\n"
+  e
+  { indown(); } "</repeatUntil>\n"]
 ;
 
 
@@ -317,7 +418,24 @@ Sequence(a,b,_id) ->
 ******************************************************************************/
 
 Pick(a,b,c,_id) ->
-  [xml: { inup(); } "<pick id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b c { indown(); } "</pick>\n"]
+  [xml: { inup(); } "<pick id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a b c { indown(); } "</pick>\n"]
+;
+
+
+/******************************************************************************
+  FLOW
+******************************************************************************/
+
+Flow(a,NiltLink_list(),c,_id) ->
+  [xml: { inup(); } "<flow id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a c { indown(); } "</flow>\n"]
+;
+
+Flow(a,b,c,_id) ->
+  [xml: { inup(); } "<flow id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" a { inup(); } "<links>\n" b { indown(); } "</links>\n" c { indown(); } "</flow>\n"]
+;
+
+Link(_id) ->
+  [xml: { in(); } "<link id=\"" _id "\"/>\n"]
 ;
 
 
@@ -326,7 +444,7 @@ Pick(a,b,c,_id) ->
 ******************************************************************************/
 
 Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
-  [xml: { inup(); } "<scope id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" 
+  [xml: { inup(); } "<scope id=\"" _id "\"" { listAttributes( _id ); } " ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" 
   
   a
 
@@ -335,7 +453,7 @@ Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
   { else }
     ${ { inup(); } "<variables id=\"" _id "\" ncf=\"" { ASTEmap[_id->value]->controlFlow; } "\">\n" b { indown(); } "</variables>\n" $}
 
-  c d e f g h i
+  c d e f g /* h */ i
     
   { indown(); } "</scope>\n" ]
 ;
@@ -346,9 +464,10 @@ Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
 ******************************************************************************/
 
 Target(a) ->
-  [xml: { in(); } "<target ncf=\"" { ASTEmap[a->value]->controlFlow; } "\" />\n"]
+  [xml: { in(); } "<target" { listAttributes( a ); } " ncf=\"" { ASTEmap[a->value]->controlFlow; } "\" />\n"]
 ;
 
 Source(a) ->
-  [xml: { in(); } "<source ncf=\"" { ASTEmap[a->value]->controlFlow; } "\" />\n"]
+  [xml: { in(); } "<source" { listAttributes( a ); } " ncf=\"" { ASTEmap[a->value]->controlFlow; } "\" />\n"]
 ;
+

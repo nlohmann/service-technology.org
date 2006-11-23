@@ -25,11 +25,11 @@
  * \brief   Abstract grammar of BPEL (implementation)
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $ 
+ *          last changes of: \$Author: gierds $ 
  * 
  * \since   2005-10-03
  *
- * \date    \$Date: 2006/11/16 10:29:40 $
+ * \date    \$Date: 2006/11/23 14:33:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.150 $
+ * \version \$Revision: 1.151 $
  */
 %}
 
@@ -281,9 +281,11 @@ tReply:
 ******************************************************************************/
 
 tInvoke:
+  /* will be disposed during postprocessing: */
   Invoke(standardElements tCorrelation_list tToPart_list tFromPart_list integer)
 | SynchronousInvoke(standardElements tCorrelation_list tToPart_list tFromPart_list integer)
 | AsynchronousInvoke(standardElements tCorrelation_list tToPart_list tFromPart_list integer)
+  /* will be disposed during postprocessing: */
 | annotatedInvoke(standardElements tCorrelation_list tCatch tCatchAll tCompensationHandler tToPart_list tFromPart_list integer)
 ;
 
@@ -333,6 +335,7 @@ tEmpty:
   WAIT
 ******************************************************************************/
 
+/* will be disposed during postprocessing */
 tWait:
   Wait(standardElements integer)
 | WaitFor(standardElements integer)

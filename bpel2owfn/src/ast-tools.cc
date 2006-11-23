@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/11/22 15:06:03 $
+ * \date    \$Date: 2006/11/23 09:55:09 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.33 $
+ * \version \$Revision: 1.34 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -676,7 +676,7 @@ void process_loop_bounds(vector<unsigned int> &loop_bounds, vector<unsigned int>
     TheNet->newArc(p1, t17);
     TheNet->newArc(t17, p2);
     TheNet->newArc(TheNet->findPlace(prefix + "compensate"), t17);
-    TheNet->newArc(t16, TheNet->findPlace(prefix + "ch_initial"));
+    TheNet->newArc(t17, TheNet->findPlace(prefix + "ch_initial"));
 
     TheNet->mergePlaces(TheNet->findPlace(prefix + "compensated1"), TheNet->findPlace(prefix + "compensate"));
 

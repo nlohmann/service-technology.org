@@ -29,7 +29,7 @@
  *
  * \since   2006-10-29
  *
- * \date    \$Date: 2006/11/22 15:06:03 $
+ * \date    \$Date: 2006/11/23 09:55:09 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  *
  */
 %}
@@ -470,7 +470,10 @@ cerr << ancestor_loops.size() << " ancestor_loops" << endl;
         d = userDefinedCompensationHandler(ch_activity, *):
         {
           TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_initial"),  TheNet->findPlace(ch_activity->id, ".initial"));
-          TheNet->mergePlaces(TheNet->findPlace(prefix + "compensated"), TheNet->findPlace(ch_activity->id, ".final"));
+          if (ASTEmap[_id->value]->ancestorLoops().size() != 0 && parameters[P_LOOPCOUNT])
+            TheNet->mergePlaces(TheNet->findPlace(prefix + "compensated1"), TheNet->findPlace(ch_activity->id, ".final"));
+          else
+            TheNet->mergePlaces(TheNet->findPlace(prefix + "compensated"), TheNet->findPlace(ch_activity->id, ".final"));
           TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_stop"),        TheNet->findPlace(ch_activity->id, ".stop"));
           TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_stopped"),     TheNet->findPlace(ch_activity->id, ".stopped"));
         }

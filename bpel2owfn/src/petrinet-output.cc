@@ -28,13 +28,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/11/22 15:29:51 $
+ * \date    \$Date: 2006/11/23 09:55:09 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.51 $
+ * \version \$Revision: 1.52 $
  *
  * \ingroup petrinet
  */
@@ -616,15 +616,7 @@ void PetriNet::lolaOut()
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
   {
     (*output) << "TRANSITION " << (*t)->nodeShortName();
-/*   
-    switch ((*t)->type)
-    {
-      case (INTERNAL): break;
-      case (OUT): (*output) << "_o"; break;
-      case (IN): (*output) << "_i"; break;
-      case (INOUT): (*output) << "_io"; break;
-    }
-*/
+
     (*output) << endl;
     set<Node *> consume = preset(*t);
     set<Node *> produce = postset(*t);
@@ -633,7 +625,7 @@ void PetriNet::lolaOut()
     count = 1;
     for (set<Node *>::iterator pre = consume.begin(); pre != consume.end(); count++, pre++)
     {
-      (*output) << "  " << (*pre)->nodeShortName() << ":\t1";
+      (*output) << "  " << (*pre)->nodeShortName() << ":\t" << arc_weight(*pre, *t);
       
       if (count < consume.size())
 	(*output) << "," << endl;
@@ -644,8 +636,8 @@ void PetriNet::lolaOut()
     count = 1;
     for (set<Node *>::iterator post = produce.begin(); post != produce.end(); count++, post++)
     {
-      (*output) << "  " << (*post)->nodeShortName() << ":\t1";
-      
+      (*output) << "  " << (*post)->nodeShortName() << ":\t" << arc_weight(*t, *post);
+
       if (count < produce.size())
 	(*output) << "," << endl;
     }

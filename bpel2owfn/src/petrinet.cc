@@ -24,17 +24,17 @@
  * \brief   functions for Petri nets
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/11/22 15:29:51 $
+ * \date    \$Date: 2006/11/24 14:47:04 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.153 $
+ * \version \$Revision: 1.154 $
  *
  * \ingroup petrinet
  */
@@ -1007,8 +1007,8 @@ void PetriNet::makeChannelsInternal()
     P.insert(*place);
 
   // empty the set of input and output places
-  P_in.clear();
-  P_out.clear();
+  P_in.clear(); P_in = set< Place * >();
+  P_out.clear(); P_out = set< Place * >();
 }
 
 

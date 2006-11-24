@@ -27,11 +27,11 @@
  * This file defines and implements unparse rules to unparse BPEL to XML.
  * 
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/11/24 14:39:44 $
+ * \date    \$Date: 2006/11/24 14:47:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.62 $
+ * \version \$Revision: 1.63 $
  */
 
 %}
@@ -271,7 +271,24 @@ Validate(a,_id) ->
 ******************************************************************************/
 
 Empty(a,_id) ->
-  [xml: { inup(); } "<empty id=\"" _id "\"" { listAttributes( _id ); } ">\n" a { indown(); } "</empty>\n"];
+  [xml: { inup(); } "<empty id=\"" _id "\"" { listAttributes( _id ); } 
+    {  
+      with(a)
+      {
+        a = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition()): { *output << " />";  indown(); *output << endl; }
+        default: { *output << ">\n"; }
+      }
+    }
+    a
+    {  
+      with(a)
+      {
+        a = StandardElements(NiltTarget_list(), NiltSource_list(), standardJoinCondition()): { /* nothing more to do */ }
+        default: { indown(); *output << "</empty>\n"; }
+      }
+    }
+  ]
+;
 
 
 /******************************************************************************

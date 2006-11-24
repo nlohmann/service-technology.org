@@ -24,18 +24,18 @@
  * \brief   BPEL2oWFN's main
  * 
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/23 15:29:44 $
+ * \date    \$Date: 2006/11/24 14:47:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.118 $
+ * \version \$Revision: 1.119 $
  */
 
 
@@ -289,7 +289,7 @@ int main( int argc, char *argv[])
     cerr << TheNet->information() << endl; /// \todo remove this line
 
     // now the net will not change any more, thus the nodes are re-enumerated
-    TheNet->reenumerate(); 
+    // TheNet->reenumerate(); 
 
     // create oWFN output ?
     if (formats[F_OWFN])
@@ -345,8 +345,9 @@ int main( int argc, char *argv[])
 	    prefix = file->substr(pos2 + 1, pos - pos2 - 1) + "_";
 	  }
 	  comment += andStr + prefix + "1.internal.final";
+          assert( TheNet->findPlace(prefix + "1.internal.final") != NULL );
 	  formula += andStr + TheNet->findPlace(prefix + "1.internal.final")->nodeShortName() + " > 0";
-	  andStr = " AND ";
+       	  andStr = " AND ";
 	}
 	comment += ") }";
 	formula += ")";

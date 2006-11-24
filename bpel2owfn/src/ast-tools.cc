@@ -28,18 +28,22 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/11/24 10:40:00 $
+ * \date    \$Date: 2006/11/24 11:40:29 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.40 $
+ * \version \$Revision: 1.41 $
  *
  * \ingroup debug
  * \ingroup creation
  *
  * \remarks $Log: ast-tools.cc,v $
+ * \remarks Revision 1.41  2006/11/24 11:40:29  nlohmann
+ * \remarks + added comments
+ * \remarks + moved external variables into the functions
+ * \remarks
  * \remarks Revision 1.40  2006/11/24 10:40:00  nlohmann
  * \remarks + finished including CVS remarks to file header
  * \remarks
@@ -65,23 +69,6 @@
 
 
 /******************************************************************************
- * External variables
- *****************************************************************************/
-
-// introduced in main.c
-extern PetriNet *TheNet;
-
-// introduced in bpel-unparse.k
-extern string currentScope;
-
-// introduced in bpel-unparse-tools.h
-extern map<unsigned int, ASTE*> ASTEmap;
-
-
-
-
-
-/******************************************************************************
  * Global variables
  *****************************************************************************/
 
@@ -101,6 +88,10 @@ unsigned int indentStep = 4;
 
 /*!
  * \brief generates transition and places to throw a fault
+ *
+ * This functions generates a subnet to model the throwing of a fault. It
+ * models faults in any control flow of the BPEL process as well as in any
+ * patterns used.
  *
  * \param p1  the place in positive control flow from which the control flow
  *            enters the negative control flow
@@ -128,63 +119,19 @@ unsigned int indentStep = 4;
  *
  * \return a pointer to the (first) generated fault transition
  *
- * \post case 0 (preventFurtherFaults = false):
- * \dot
-   digraph D
-   {
-     node [shape=circle fixedsize]
-     p1
-     p2
-     A1 [label="Active"]
-     A2 [label="!Active"]
-     fault_in
-     node [shape=box regular=true fixedsize]
-     t1 [label="t1\nthrowFault.p1name"]
-     t2 [label="t1\nignoreFault.p1name"]
-     
-     p1 -> t1
-     t1 -> p2
-     A1 -> t1
-     t1 -> A2
-     t1 -> fault_in
-
-     p1 -> t2
-     t2 -> p2
-     A2 -> t2
-     t2 -> A2
-   }
-   \enddot
- * \post case 0 (preventFurtherFaults = true):
- * \dot
-   digraph D
-   {
-     node [shape=circle fixedsize]
-     p1
-     p2
-     A1 [label="Active"]
-     A2 [label="!Active"]
-     fault_in
-     node [shape=box regular=true fixedsize]
-     t1 [label="t1\nthrowFault.p1name"]
-     
-     p1 -> t1
-     t1 -> p2
-     A1 -> t1
-     t1 -> A2
-     t1 -> fault_in
-   }
-   \enddot
- * 
- * \todo set scope to "Faulted" in case of "exitOnStandardFault"
- *
  * \ingroup creation
 */
 Transition *throwFault(Place *p1, Place *p2,
     string p1name, string prefix, kc::integer id,
     int negativeControlFlow, bool preventFurtherFaults)
 {
+  extern string currentScope;	// introduced in bpel-unparse.k
+  extern PetriNet *TheNet;	// introduced in main.c
+  extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
+
   assert(p1 != NULL);
   assert(p2 != NULL);
+
 
   // no fault transitions in case of "communicationonly" parameter
   if (parameters[P_COMMUNICATIONONLY])
@@ -203,6 +150,8 @@ Transition *throwFault(Place *p1, Place *p2,
     return t1;
   }
 
+
+  // fault handling for the `new' patterns
   if (parameters[P_NEW])
   {
     switch (negativeControlFlow)
@@ -272,76 +221,76 @@ Transition *throwFault(Place *p1, Place *p2,
   }
 
 
-
+  // fault handling for the `old' patterns
   switch (negativeControlFlow)
   {
     case(0): // activity in scope or process
-    {
-      Transition *t1 = TheNet->newTransition(prefix + "throwFault." + p1name);
-      TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t1);
-      TheNet->newArc(t1, TheNet->findPlace(currentScope + "!Active"));
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(t1, p2);
-      TheNet->newArc(t1, TheNet->findPlace(currentScope + "stop.fault_in"));
-
-      if (!preventFurtherFaults)
       {
-	Transition *t2 = TheNet->newTransition(prefix + "ignoreFault." + p1name);
-	TheNet->newArc(TheNet->findPlace(currentScope + "!Active"), t2, READ);
-	TheNet->newArc(p1, t2);
-	TheNet->newArc(t2, p2);
+	Transition *t1 = TheNet->newTransition(prefix + "throwFault." + p1name);
+	TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t1);
+	TheNet->newArc(t1, TheNet->findPlace(currentScope + "!Active"));
+	TheNet->newArc(p1, t1);
+	TheNet->newArc(t1, p2);
+	TheNet->newArc(t1, TheNet->findPlace(currentScope + "stop.fault_in"));
+
+	if (!preventFurtherFaults)
+	{
+	  Transition *t2 = TheNet->newTransition(prefix + "ignoreFault." + p1name);
+	  TheNet->newArc(TheNet->findPlace(currentScope + "!Active"), t2, READ);
+	  TheNet->newArc(p1, t2);
+	  TheNet->newArc(t2, p2);
+	}
+	return t1;
       }
-      return t1;
-    }
 
     case(1): // activity in fault handler
-    {
-      // No transition is added if the parameter "nofhfaults" is set, since
-      // then it is not allowed for activities in the fault handler to throw
-      // fault.s
-      if (parameters[P_NOFHFAULTS])
-	return NULL;
-
-      Transition *t1 = TheNet->newTransition(prefix + "throwFault." + p1name);
-      TheNet->newArc(TheNet->findPlace(currentScope + "!FHFaulted"), t1);
-      TheNet->newArc(t1, TheNet->findPlace(currentScope + "FHFaulted"));
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(t1, p2);
-      TheNet->newArc(t1, TheNet->findPlace(currentScope + "stop.fh_fault_in"));
-
-      if (!preventFurtherFaults)
       {
-	Transition *t2 = TheNet->newTransition(prefix + "ignoreFault." + p1name);
-	TheNet->newArc(TheNet->findPlace(currentScope + "FHFaulted"), t2, READ);
-	TheNet->newArc(p1, t2);
-	TheNet->newArc(t2, p2);
+	// No transition is added if the parameter "nofhfaults" is set, since
+	// then it is not allowed for activities in the fault handler to throw
+	// fault.s
+	if (parameters[P_NOFHFAULTS])
+	  return NULL;
+
+	Transition *t1 = TheNet->newTransition(prefix + "throwFault." + p1name);
+	TheNet->newArc(TheNet->findPlace(currentScope + "!FHFaulted"), t1);
+	TheNet->newArc(t1, TheNet->findPlace(currentScope + "FHFaulted"));
+	TheNet->newArc(p1, t1);
+	TheNet->newArc(t1, p2);
+	TheNet->newArc(t1, TheNet->findPlace(currentScope + "stop.fh_fault_in"));
+
+	if (!preventFurtherFaults)
+	{
+	  Transition *t2 = TheNet->newTransition(prefix + "ignoreFault." + p1name);
+	  TheNet->newArc(TheNet->findPlace(currentScope + "FHFaulted"), t2, READ);
+	  TheNet->newArc(p1, t2);
+	  TheNet->newArc(t2, p2);
+	}
+	return t1;
       }
-      return t1;
-    }
 
     case(2): // activity in compensation handler
-    {
-      Transition *t1 = TheNet->newTransition(prefix + "throwFault." + p1name);
-      TheNet->newArc(TheNet->findPlace(currentScope + "!CHFaulted"), t1);
-      TheNet->newArc(t1, TheNet->findPlace(currentScope + "CHFaulted"));
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(t1, p2);
-      TheNet->newArc(t1, TheNet->findPlace(currentScope + "stop.ch_fault_in"));
-
-      if (!preventFurtherFaults)
       {
-	Transition *t2 = TheNet->newTransition(prefix + "ignoreFault." + p1name);
-	TheNet->newArc(TheNet->findPlace(currentScope + "CHFaulted"), t2, READ);
-	TheNet->newArc(p1, t2);
-	TheNet->newArc(t2, p2);
+       	Transition *t1 = TheNet->newTransition(prefix + "throwFault." + p1name);
+    	TheNet->newArc(TheNet->findPlace(currentScope + "!CHFaulted"), t1);
+      	TheNet->newArc(t1, TheNet->findPlace(currentScope + "CHFaulted"));
+	TheNet->newArc(p1, t1);
+	TheNet->newArc(t1, p2);
+	TheNet->newArc(t1, TheNet->findPlace(currentScope + "stop.ch_fault_in"));
+
+	if (!preventFurtherFaults)
+	{
+	  Transition *t2 = TheNet->newTransition(prefix + "ignoreFault." + p1name);
+	  TheNet->newArc(TheNet->findPlace(currentScope + "CHFaulted"), t2, READ);
+	  TheNet->newArc(p1, t2);
+	  TheNet->newArc(t2, p2);
+	}
+	return t1;
       }
-      return t1;
-    }
 
     default:
-    {
-      return NULL; /* should never happen */
-    }
+      {
+	return NULL; /* should never happen */
+      }
   }
 }
 
@@ -366,28 +315,12 @@ Transition *throwFault(Place *p1, Place *p2,
  *
  * \return a pointer to the stop transition
  *
- * \post Generated Petri net
- * \dot
-   digraph D
-   {
-     node [shape=circle fixedsize]
-     p [label="p_name"]
-     stop
-     stopped
-
-     node [shape=box regular=true fixedsize]
-     t [label="stoppedAt.p_name"]
-     
-     stop -> t
-     p -> t
-     t -> stopped
-   }
-   \enddot
- *
  * \ingroup creation
  */
 Transition *stop(Place *p, string p_name, string prefix)
 {
+  extern PetriNet *TheNet;	// introduced in main.c
+
   assert(p != NULL);
 
   // no stop transitions in case of "nano" parameter
@@ -437,6 +370,8 @@ string inString()
 */
 void header(int id, bool myindent)
 {
+  extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
+
   trace(TRACE_DEBUG, "[PNU]" + inString() + "<" + ASTEmap[id]->activityTypeName() + " id=" + toString(id) + ">\n");
 
   if (myindent)
@@ -475,6 +410,8 @@ void header(kc::integer id, bool myindent)
  */
 void footer(int id, bool myindent)
 {
+  extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
+
   if (myindent)
     indent -= indentStep;
 
@@ -508,30 +445,16 @@ void footer(kc::integer id, bool myindent)
  * \param t	transition that invokes DPE
  * \param id	the identifier of the AST node
  *
- * \post
- * \dot
-   digraph D
-   {
-     node [shape=circle fixedsize]
-     link1 [label="!link1"]
-     link2 [label="!link2"]
-
-     node [shape=box regular=true fixedsize]
-     t
-     
-     t -> link1
-     t -> link2
-   }
-   \enddot
-
  * \ingroup creation
  */
 void dpeLinks(Transition *t, int id)
 {
   ENTER("[ASTT]");
 
+  extern PetriNet *TheNet;	// introduced in main.c
+  extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
+
   assert(t != NULL);
-  cerr << "id: " << id << endl;
   assert(ASTEmap[id] != NULL);
 
   for (set<int>::iterator linkID = ASTEmap[id]->enclosedSourceLinks.begin();
@@ -559,6 +482,8 @@ void dpeLinks(Transition *t, int id)
  */
 void process_loop_bounds(vector<unsigned int> &loop_bounds, vector<unsigned int> &loop_identifiers, string prefix, unsigned int my_max)
 {
+  extern PetriNet *TheNet;	// introduced in main.c
+
   vector<unsigned int> current_index(loop_bounds.size(), 1);
   unsigned int number = 1;
 
@@ -673,6 +598,8 @@ void indown()
  */
 void listAttributes ( unsigned int id )
 {
+  extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
+
   std::string result = "";
   for (map< std::string, std::string >::iterator attribute = ASTEmap[ id ]->attributes.begin(); attribute != ASTEmap[ id ]->attributes.end(); attribute++ )
   {

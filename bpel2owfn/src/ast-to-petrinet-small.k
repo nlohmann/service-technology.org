@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/11/23 10:27:41 $
+ * \date    \$Date: 2006/11/24 14:42:22 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.71 $
+ * \version \$Revision: 1.72 $
  *
  */
 %}
@@ -634,7 +634,7 @@ Switch(a,b,otherwiseBranch=Otherwise(c,d),_id) ->
 
 	// Embed the inner activity.
 	TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
-	TheNet->mergePlaces(_id->value, ".internal.final", _id2->value, ".final");
+	TheNet->mergePlaces(_id->value, ".internal.final", innerActivity->id, ".final");
       }
 
 
@@ -644,7 +644,7 @@ Switch(a,b,otherwiseBranch=Otherwise(c,d),_id) ->
 
       // embed inner activity
       TheNet->newArc(t1, TheNet->findPlace(c->id, ".initial"));
-      TheNet->mergePlaces(_id->value, ".internal.final", d->value, ".final");
+      TheNet->mergePlaces(_id->value, ".internal.final", c->id, ".final");
 
 
       // Create the arcs for the Dead Path elimination: each chosen activity

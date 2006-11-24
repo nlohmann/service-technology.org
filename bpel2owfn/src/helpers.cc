@@ -28,13 +28,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2006/11/24 09:52:24 $
+ * \date    \$Date: 2006/11/24 14:39:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.60 $
+ * \version \$Revision: 1.61 $
  *
  * \ingroup conversion
  * \ingroup debug
@@ -59,17 +59,6 @@
 #include "petrinet.h"
 
 using namespace std;
-
-
-
-
-
-/******************************************************************************
- * External variables
- *****************************************************************************/
-
-// The Petri Net
-extern PetriNet *TheNet;	// defined in bpel2owfn.cc
 
 
 
@@ -156,7 +145,7 @@ string toString(vector<unsigned int> &v)
  * Converts a C++ string to a C++ int.
  *
  * \param s C++ string
- * \return int representing s
+ * \return int representing s or INT_MAX if the conversion failed
  *
  * \ingroup conversion
  */
@@ -184,7 +173,8 @@ int toInt(string s)
  * Converts a C++ string to a C++ unsigned int.
  *
  * \param s C++ string
- * \return unsigned int representing s
+ * \return unsigned int representing s or UINT_MAX if the conversion failed
+ *         (e.g. a negative value was passed)
  *
  * \ingroup conversion
  */
@@ -254,6 +244,8 @@ void error()
  */
 void cleanup()
 {
+  extern PetriNet *TheNet;	// defined in bpel2owfn.cc
+
   trace(TRACE_INFORMATION,"Cleaning up ...\n");
 
   if ( modus == M_PETRINET ) 
@@ -299,8 +291,17 @@ void cleanup()
 /*!
  * \brief increases the index vector
  *
+ * The function increases the indices in the vector and propagates resulting
+ * carries. For example, if the index vector [3,2] is increased and the maximal
+ * bounds are [5,2] the resulting vector is [4,1].
+ *
  * \param current_index  vector holding the current indices
  * \param max_index      vector holding the upper bounds of the indices
+ *
+ * \post Index vector is increased according to the described rules.
+ *
+ * \invariant Each index lies between 1 and its maximal value, i.e., 1 and the
+ *            maximal value can be reached.
  */
 void next_index(vector<unsigned int> &current_index, vector<unsigned int> &max_index)
 {

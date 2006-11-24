@@ -26,31 +26,22 @@
  *
  * This file defines and implements unparse rules to unparse BPEL to XML.
  * 
- * \author  
- *          - responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
- *          
- * \date    
- *          - created: 2005-11-01
- *          - last changed: \$Date: 2006/11/23 15:13:28 $
+ * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $
+ * 
+ * \since   2005-11-01
+ *
+ * \date    \$Date: 2006/11/24 14:39:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universitï¿½t zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.61 $
+ * \version \$Revision: 1.62 $
  */
-
-#include "ast-details.h"
-#include "ast-config.h"
-#include "parser.h"
-#include "options.h"
-
-extern map<unsigned int, ASTE*> ASTEmap;
-extern int ASTEid;
 
 %}
 

@@ -28,13 +28,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/11/23 09:55:09 $
+ * \date    \$Date: 2006/11/24 14:39:44 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  *
  * \ingroup petrinet
  */
@@ -258,6 +258,10 @@ string Arc::dotOut()
     result += "p" + toString(source->id) + " -> t" + toString(target->id);
   else
     result += "t" + toString(source->id) + " -> p" + toString(target->id);
+
+  if (weight != 1)
+    result += " [label=\"" + toString(weight) + "\"]";
+
   result += ";\n";
 
   return result;
@@ -312,10 +316,10 @@ string Place::dotOut()
 {
   string result;
 #ifdef USING_BPEL2OWFN
-  result += " p" + toString(id) + "\t[label=\"" + nodeShortName() + "\"" + " URL=\"http://www.google.de\"";
+  result += " p" + toString(id) + "\t[label=\"" + nodeShortName() + "\"";
 #endif
 #ifndef USING_BPEL2OWFN
-  result += " p" + toString(id) + "\t[label=\"" + nodeName() + "\"" + " URL=\"http://www.google.de\"";
+  result += " p" + toString(id) + "\t[label=\"" + nodeName() + "\"";
 #endif
 
   if (type == IN)

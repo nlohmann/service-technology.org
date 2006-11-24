@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/23 15:29:44 $
+ * \date    \$Date: 2006/11/24 14:39:44 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  */
 
 
@@ -133,8 +133,6 @@ const char *par_string = "hvm:li:of:p:d:";
 
 /*!
  * \brief prints an overview of all commandline arguments
- *
- * \todo This functions should be adopted to the current version!
  */
 void print_help() 
 {

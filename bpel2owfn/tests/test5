@@ -1,3 +1,5 @@
+#! /bin/sh
+
 ############################################################################
 # Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert     #
 #                                                                          #
@@ -19,20 +21,33 @@
 ############################################################################
 
 # File last changed $Date: 2006/11/24 15:03:43 $ by $Author: gierds $.
-# Version $Revision: 1.12 $
+# Version $Revision: 1.1 $
 
-TESTS = test1 test2 test3 test4 test5
+echo ""
 
-BPEL_PROCESSES = error.bpel loan.bpel purchase.bpel shipping.bpel
+rm -rf $testdir/coffee/*.task $testdir/coffee/*.lola
 
-TESTS_ENVIRONMENT = testdir=$(top_srcdir)/tests PATH=.:../src:$$PATH
+echo "test: consistency mode"
+echo "customer 1"
+bpel2owfn --input=$testdir/consistency/coffee.bpel --input=$testdir/consistency/customer1.bpel --mode=consistency --format=lola --parameter=simplify -o &> /dev/null
+result1=$?
 
-CLEANFILES = $(BPEL_PROCESSES:.bpel=.info) \
-	     $(BPEL_PROCESSES:.bpel=.lola) \
-	     $(BPEL_PROCESSES:.bpel=.owfn) \
-	     $(BPEL_PROCESSES:.bpel=.dot) \
-	     $(BPEL_PROCESSES:.bpel=.xml) \
-	     $(BPEL_PROCESSES:.bpel=.ast) \
-	     bpel2owfn.exe.stackdump
-	     
-EXTRA_DIST = $(TESTS) $(BPEL_PROCESSES) sa_tests/*.bpel
+echo "customer 2"
+bpel2owfn --input=$testdir/consistency/coffee.bpel --input=$testdir/consistency/customer2.bpel --mode=consistency --format=lola --parameter=simplify -o &> /dev/null
+result2=$?
+
+echo "customer 3"
+bpel2owfn --input=$testdir/consistency/coffee.bpel --input=$testdir/consistency/customer3.bpel --mode=consistency --format=lola --parameter=simplify -o &> /dev/null
+result3=$?
+
+if test \( $result1 -eq 0 -a $result2 -eq 0 -a $result3 -eq 0 \) \
+	-a \( -f $testdir/consistency/coffee_customer1.lola -a -f $testdir/consistency/coffee_customer1.task \) \
+	-a \( -f $testdir/consistency/coffee_customer2.lola -a -f $testdir/consistency/coffee_customer2.task \) \
+	-a \( -f $testdir/consistency/coffee_customer3.lola -a -f $testdir/consistency/coffee_customer3.task \)
+then
+  result=0
+else
+  result=1
+fi
+
+exit $result

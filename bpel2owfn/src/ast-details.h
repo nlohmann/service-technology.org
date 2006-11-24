@@ -24,18 +24,18 @@
  * \brief   annotations of the AST
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nlohmann $
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/23 14:33:39 $
+ * \date    \$Date: 2006/11/24 09:52:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  */
 
 
@@ -170,8 +170,6 @@ class ASTE
     set<unsigned int> enclosedActivities;       ///< set of all the enclosed activities
     set<unsigned int> conflictingActivities;    ///< set of all conflicting activities
 
-    ASTE(unsigned int myid, unsigned int mytype);
-
     string createChannel(bool synchronousCommunication = false);
 
     string checkVariable(string attributename);
@@ -194,6 +192,8 @@ class ASTE
     void definePartnerLink();
 
     string activityTypeName();
+
+    ASTE(unsigned int myid, unsigned int mytype);
 };
 
 

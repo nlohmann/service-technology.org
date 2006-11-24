@@ -28,13 +28,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2006/11/20 15:25:50 $
+ * \date    \$Date: 2006/11/24 09:52:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.59 $
+ * \version \$Revision: 1.60 $
  *
  * \ingroup conversion
  * \ingroup debug
@@ -114,6 +114,36 @@ string toString(int i)
   sprintf(buffer, "%d", i);
   
   return string(buffer);
+}
+
+
+
+
+
+/*!
+ * \brief converts a vector to a C++ string
+ *
+ * Convers an STL vector of unsigned ints to a C++ string representation. The
+ * integers are seperated by a period.
+ *
+ * \param v  an STL vector of unsigned ints
+ * \return   C++ string representation of v
+ *
+ * \ingroup conversion
+ */
+string toString(vector<unsigned int> &v)
+{
+  string result;
+
+  for (unsigned int i = 0; i < v.size(); i++)
+  {
+    if (i != 0)
+      result += ".";
+
+    result += toString(v[i]);
+  }
+
+  return result;
 }
 
 
@@ -257,3 +287,34 @@ void cleanup()
     log_output = &cerr;
   }
 }
+
+
+
+
+
+/******************************************************************************
+ * Other functions
+ *****************************************************************************/
+
+/*!
+ * \brief increases the index vector
+ *
+ * \param current_index  vector holding the current indices
+ * \param max_index      vector holding the upper bounds of the indices
+ */
+void next_index(vector<unsigned int> &current_index, vector<unsigned int> &max_index)
+{
+  assert(current_index.size() == max_index.size());
+
+  for (unsigned int i = 0; i < current_index.size(); i++)
+  {
+    if (current_index[i] < max_index[i])
+    {
+      current_index[i]++;
+      break;
+    }
+    else
+      current_index[i] = 1;
+  }
+}
+

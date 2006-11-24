@@ -29,7 +29,7 @@
  *
  * \since   2006-10-29
  *
- * \date    \$Date: 2006/11/23 14:07:40 $
+ * \date    \$Date: 2006/11/24 09:52:23 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
  *
  */
 %}
@@ -179,11 +179,6 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
 
 
 
-
-
-
-
-
 This=userDefinedFaultHandler(a,b, _id) ->
   [petrinetnew:
     {
@@ -232,30 +227,36 @@ This=userDefinedFaultHandler(a,b, _id) ->
 	TheNet->mergePlaces(TheNet->findPlace(prefix + "stopped"), TheNet->findPlace(innerActivity->id, ".stopped"));
       }
 
-      with(b) {
+      with(b)
+      {
 	CatchAll(innerActivity, _id2):
 	{
-        Transition *t2 = TheNet->newTransition(prefix + "catchAll");
-        TheNet->newArc(p1, t2);
-        TheNet->newArc(p3, t2);
-        TheNet->newArc(t2, p7);
-	TheNet->newArc(t2, TheNet->findPlace(innerActivity->id, ".initial"));
+          Transition *t2 = TheNet->newTransition(prefix + "catchAll");
+          TheNet->newArc(p1, t2);
+          TheNet->newArc(p3, t2);
+          TheNet->newArc(t2, p7);
+          TheNet->newArc(t2, TheNet->findPlace(innerActivity->id, ".initial"));
 
-        Transition *t7 = TheNet->newTransition(prefix + "finishCatchAll");
-	TheNet->newArc(p7, t7);
-        TheNet->newArc(t7, p2);
-	TheNet->newArc(TheNet->findPlace(innerActivity->id, ".final"), t7);
+          Transition *t7 = TheNet->newTransition(prefix + "finishCatchAll");
+	  TheNet->newArc(p7, t7);
+          TheNet->newArc(t7, p2);
+	  TheNet->newArc(TheNet->findPlace(innerActivity->id, ".final"), t7);
 
-	TheNet->mergePlaces(TheNet->findPlace(prefix + "inner_stop"), TheNet->findPlace(innerActivity->id, ".stop"));
-	TheNet->mergePlaces(TheNet->findPlace(prefix + "stopped"), TheNet->findPlace(innerActivity->id, ".stopped"));
+	  TheNet->mergePlaces(TheNet->findPlace(prefix + "inner_stop"), TheNet->findPlace(innerActivity->id, ".stop"));
+	  TheNet->mergePlaces(TheNet->findPlace(prefix + "stopped"), TheNet->findPlace(innerActivity->id, ".stopped"));
 	}
+
         NoCatchAll():
         {
           Place *p6 = TheNet->newPlace(prefix + "faulted");
           Transition *t1 = throwFault(p1, p6, "initial", prefix, _id, 4);
           Transition *t2 = stop(p6, "faulted", prefix);
         }
-	default: { /* this should never happen */ }
+
+	default:
+        {
+          /* this should never happen */
+        }
       }
 
       footer(_id, true);
@@ -367,27 +368,7 @@ This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
       TheNet->newArc(t8, p7);
       TheNet->newArc(p13, t8);
       TheNet->newArc(TheNet->findPlace("1.internal.Exiting"), t8, READ);
-/*
-      Transition *t9 = TheNet->newTransition(prefix + "take_ch_fault");
-      TheNet->newArc(p19, t9);
-      TheNet->newArc(p21, t9);
-      TheNet->newArc(t9, p22);
-      TheNet->newArc(t9, p23);
 
-      Transition *t10 = TheNet->newTransition(prefix + "ignore_ch_fault");
-      TheNet->newArc(p19, t10);
-      TheNet->newArc(p22, t10, READ);
-
-      Transition *t11 = TheNet->newTransition(prefix + "rethrow_ch_fault");
-      TheNet->newArc(p10, t11, READ);
-      TheNet->newArc(t11, p20);
-      TheNet->newArc(p23, t11);
-
-      Transition *t12 = TheNet->newTransition(prefix + "handle_ch_fault");
-      TheNet->newArc(t12, p3);
-      TheNet->newArc(p9, t12, READ);
-      TheNet->newArc(p23, t12);
-*/
       Transition *t9 = TheNet->newTransition(prefix + "rethrow_ch_fault");
       TheNet->newArc(p10, t9, READ);
       TheNet->newArc(p19, t9);
@@ -471,12 +452,13 @@ This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
         d = userDefinedCompensationHandler(ch_activity, *):
         {
           TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_initial"),  TheNet->findPlace(ch_activity->id, ".initial"));
+          TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_stop"),        TheNet->findPlace(ch_activity->id, ".stop"));
+          TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_stopped"),     TheNet->findPlace(ch_activity->id, ".stopped"));
+
           if (ASTEmap[_id->value]->ancestorLoops().size() != 0 && parameters[P_LOOPCOUNT])
             TheNet->mergePlaces(TheNet->findPlace(prefix + "compensated1"), TheNet->findPlace(ch_activity->id, ".final"));
           else
             TheNet->mergePlaces(TheNet->findPlace(prefix + "compensated"), TheNet->findPlace(ch_activity->id, ".final"));
-          TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_stop"),        TheNet->findPlace(ch_activity->id, ".stop"));
-          TheNet->mergePlaces(TheNet->findPlace(prefix + "ch_stopped"),     TheNet->findPlace(ch_activity->id, ".stopped"));
         }
         default: { assert(false); }
       }
@@ -511,6 +493,7 @@ userDefinedCompensationHandler(a, _id) ->
     { footer(_id->value, true); }
   ]
 ;
+
 
 
 TerminationHandler(a, _id) ->

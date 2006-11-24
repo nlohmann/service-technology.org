@@ -33,11 +33,11 @@
  * \ref ast-grammar.h.
  * 
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nlohmann $
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2006/11/23 10:39:21 $
+ * \date    \$Date: 2006/11/24 09:52:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -46,7 +46,7 @@
  * \note    This file was created using GNU Bison reading file parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.273 $
+ * \version \$Revision: 1.274 $
  *
  * \ingroup frontend
  */
@@ -265,11 +265,10 @@ unsigned int ASTEid = 1;
 
 tProcess:
     {
-      // initialisation (for multiple input files)
+      // initialisation (for multiple input files, i.e. `consistency' mode)
       yylineno = 0;
       currentJoinCondition = standardJoinCondition();
       temporaryAttributeMap.clear();
-      //ASTEmap = std::map< unsigned int, ASTE * >();
       ASTEmap.clear();
       ASTEid = 1;
     }
@@ -1069,6 +1068,35 @@ tScope:
 
 
 /******************************************************************************
+  ATTRIBUTES
+
+  Most BPEL activities can have attributes which (due to the extensibility of
+  the language) can be pretty arbitrary. As the attributes are parsed before
+  an AST phylum is generated they can be not "pinned" to a phylum. Therefore,
+  attributes are stored in the mapping `temporaryAttributeMap' and are
+  indexed by an unsigned integer `ASTEid'. This identifier is passed to the
+  activity and used to identify the generated phylum. In the postrocessing
+  steps, the attributes are copied from the `temporaryAttributeMap' to the
+  phylum.
+******************************************************************************/
+
+arbitraryAttributes:
+  /* empty */
+     { $$ = mkinteger(ASTEid++); // generate a new id
+       temporaryAttributeMap[ASTEid-1]["referenceLine"] = toString(yylineno-1); // remember the file position
+     }
+| X_NAME X_EQUALS X_STRING arbitraryAttributes
+     { temporaryAttributeMap[$4->value][$1->name] = $3->name;
+       $$ = $4; }
+| joinCondition arbitraryAttributes
+     { $$ = $2; }
+;
+
+
+
+
+
+/******************************************************************************
   STANDARD ELEMENTS
 ******************************************************************************/
 
@@ -1120,25 +1148,6 @@ tTransitionCondition:
 | K_TRANSITIONCONDITION X_CLOSE transitionCondition X_OPEN X_SLASH K_TRANSITIONCONDITION X_NEXT
 ;
 
-
-
-
-
-/*---------------------------------------------------------------------------*/
-
-arbitraryAttributes:
-  /* empty */
-     { $$ = mkinteger(ASTEid++); // generate a new id
-       temporaryAttributeMap[ASTEid-1]["referenceLine"] = toString(yylineno-1); // remember the file position
-     }
-| joinCondition arbitraryAttributes
-     { $$ = $2; }
-| X_NAME X_EQUALS X_STRING arbitraryAttributes
-     { temporaryAttributeMap[$4->value][$1->name] = $3->name;
-       $$ = $4; }
-;
-
-
 joinCondition:
   K_JOINCONDITION X_EQUALS booleanLinkCondition
     { currentJoinCondition = userDefinedJoinCondition($3);
@@ -1146,7 +1155,6 @@ joinCondition:
 | K_JOINCONDITION X_EQUALS X_STRING
     { cerr << "ignoring given join condition: \"" << $3->name << "\"" << endl; }
 ;
-
 
 booleanLinkCondition:
   K_GETLINKSTATUS LBRACKET APOSTROPHE X_NAME APOSTROPHE RBRACKET

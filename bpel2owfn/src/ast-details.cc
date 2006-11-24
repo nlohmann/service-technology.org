@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/21 14:40:53 $
+ * \date    \$Date: 2006/11/24 09:52:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.64 $
+ * \version \$Revision: 1.65 $
  */
 
 
@@ -639,12 +639,13 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 	  cerr << filename << ":" << attributes["referenceLine"];
 	  cerr << " - attribute `" << attribute << "' in <";
 	  cerr << activityTypeName() << "> must be of type unsigned integer" << endl;
-	}	
+	}
+
+	break;
       }
 
+    default: return;
   }
-
-  return;
 }
 
 
@@ -652,7 +653,7 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 
 
 /******************************************************************************
- *
+ * functions to trigger some SA errors
  *****************************************************************************/
 
 /*!

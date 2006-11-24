@@ -28,13 +28,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/11/24 14:39:44 $
+ * \date    \$Date: 2006/11/24 14:57:10 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.53 $
+ * \version \$Revision: 1.54 $
  *
  * \ingroup petrinet
  */
@@ -467,12 +467,14 @@ void PetriNet::pnmlOut()
     (*output) << "    <arc id=\"a" << arcNumber << "\" ";
 #ifdef USING_BPEL2OWFN
     (*output) << "source=\"" << (*f)->source->nodeShortName() << "\" ";
-    (*output) << "target=\"" << (*f)->target->nodeShortName() << "\" />" << endl;
+    (*output) << "target=\"" << (*f)->target->nodeShortName() << "\">" << endl;
 #endif
 #ifndef USING_BPEL2OWFN
     (*output) << "source=\"" << (*f)->source->nodeName() << "\" ";
-    (*output) << "target=\"" << (*f)->target->nodeName() << "\" />" << endl;
+    (*output) << "target=\"" << (*f)->target->nodeName() << "\">" << endl;
 #endif
+    (*output) << "      <inscription>\n        <value>" << (*f)->weight << "</value>\n      </inscription>" << endl;
+    (*output) << "    </arc>" << endl;
   }
   (*output) << endl;
   (*output) << "  </net>" << endl;
@@ -515,13 +517,13 @@ void PetriNet::pepOut()
   (*output) << "TP" << endl;
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     if (((*f)->source->nodeType) == TRANSITION)
-      (*output) << (*f)->source->id << "<" << (*f)->target->id << endl;
+      (*output) << (*f)->source->id << "<" << (*f)->target->id << "w" << (*f)->weight << endl;
 
   // arcs from places to transitions
   (*output) << "PT" << endl;
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     if (((*f)->source->nodeType) == PLACE)
-      (*output) << (*f)->source->id << ">" << (*f)->target->id << endl;
+      (*output) << (*f)->source->id << ">" << (*f)->target->id << "w" << (*f)->weight << endl;
 }
 
 
@@ -562,8 +564,8 @@ void PetriNet::apnnOut()
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++, arcNumber++)
   {
     (*output) << "  \\arc{a" << arcNumber << "}{ ";
-    (*output) << "\\from{" << (*f)->source->nodeShortName() << "} ";
-    (*output) << "\\to{" << (*f)->target->nodeShortName() << "} }" << endl;
+    (*output) << "\\from{" << (*f)->source->nodeShortName() << " } ";
+    (*output) << "\\to{" << (*f)->target->nodeShortName() << "} \\weight{" << (*f)->weight << "} }" << endl;
   }
   (*output) << endl;
 

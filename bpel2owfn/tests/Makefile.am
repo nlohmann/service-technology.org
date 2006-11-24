@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/24 15:03:43 $ by $Author: gierds $.
-# Version $Revision: 1.12 $
+# File last changed $Date: 2006/11/24 15:10:37 $ by $Author: nlohmann $.
+# Version $Revision: 1.13 $
 
 TESTS = test1 test2 test3 test4 test5
 
@@ -33,6 +33,10 @@ CLEANFILES = $(BPEL_PROCESSES:.bpel=.info) \
 	     $(BPEL_PROCESSES:.bpel=.dot) \
 	     $(BPEL_PROCESSES:.bpel=.xml) \
 	     $(BPEL_PROCESSES:.bpel=.ast) \
+             consistency/*.lola \
+             consistency/*.task \
 	     bpel2owfn.exe.stackdump
 	     
-EXTRA_DIST = $(TESTS) $(BPEL_PROCESSES) sa_tests/*.bpel
+EXTRA_DIST = $(TESTS) $(BPEL_PROCESSES) \
+	     sa_tests/*.bpel \
+	     consistency/*.bpel

@@ -1,0 +1,87 @@
+<!--
+  Copyright 2006 Niels Lohmann
+
+  This file is part of the Tools4BPEL Tutorial.
+
+  This work is licensed under the Creative Commons Attribution-ShareAlike 2.0
+  Germany License. To view a copy of this license, visit
+  http://creativecommons.org/licenses/by-sa/2.0/de/ or send a letter to
+  Creative Commons, 543 Howard Street, 5th Floor, San Francisco,
+  California, 94105, USA.
+
+  For more information see http://www.informatik.hu-berlin.de/top/tools4bpel.
+-->
+
+
+<process name="Coffee Vending Machine"
+    targetNamespace="http://www.informatik.hu-berlin.de/top/tools4bpel">
+    
+    <partnerLinks>
+	<partnerLink name="coffeeButton"
+	    partnerLinkType="coffeeButtonPL" />
+	<partnerLink name="teaButton"
+	    partnerLinkType="teaButtonPL" />
+	<partnerLink name="moneySlot"
+	    partnerLinkType="moneySlotPL" />
+	<partnerLink name="beverageDispensor"
+	    partnerLinkType="beverageDispensor PL" />
+    </partnerLinks>
+    
+    <variables>
+	<variable name="requestedBeverage"
+	    type="xsd:string" />
+	<variable name="buttonPressed"
+	    type="xsd:boolean" />
+	<variable name="moneyInserted"
+	    type="currency" />
+	<variable name="brewedBeverage"
+	    type="beverage" />
+    </variables>
+    
+    <sequence>
+	<flow>
+	    <pick>
+		<onMessage partnerLink="coffeeButton"
+		    portType="vendingmachine"
+		    operation="psdCoffee"
+		    variable="buttonPressed">
+		    <assign>
+			<copy>
+			    <from>coffee</from>
+			    <to variable="requestedBeverage" />
+			</copy>
+		    </assign>
+		</onMessage>
+
+		<onMessage partnerLink="teaButton"
+		    portType="vendingmachine"
+		    operation="psdTea"
+		    variable="buttonPressed">
+		    <assign>
+			<copy>
+			    <from>tea</from>
+			    <to variable="requestedBeverage" />
+			</copy>
+		    </assign>
+		</onMessage>
+	    </pick>
+      
+	    <receive partnerLink="moneySlot"
+		portType="vendingmachine"
+		operation="inserted"
+		variable="moneyInserted" />
+	</flow>
+	
+	<assign>
+	    <copy>
+		<from variable="requestedBeverage" />
+		<to variable="brewedBeverage" />
+	    </copy>
+	</assign>
+
+	<reply partnerLink="beverageDispensor"
+	    portType="vendingmachine"
+	    operation="brewBeverage"
+	    variable="brewedBeverage" />
+  </sequence>
+</process>

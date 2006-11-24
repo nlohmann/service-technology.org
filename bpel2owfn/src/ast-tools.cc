@@ -28,16 +28,24 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/11/24 09:52:24 $
+ * \date    \$Date: 2006/11/24 10:34:54 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.38 $
+ * \version \$Revision: 1.39 $
  *
  * \ingroup debug
  * \ingroup creation
+ *
+ * \par Version history
+ * 
+ * \remarks $Log: ast-tools.cc,v $
+ * \remarks Revision 1.39  2006/11/24 10:34:54  nlohmann
+ * \remarks + minor changes: mostly documentation
+ * \remarks
+ *
  */
 
 
@@ -684,28 +692,3 @@ void listAttributes ( unsigned int id )
   }
   *output << result;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-/*****************************************************************************/
-
-/*!
- * \file ast-tools.cc
- *
- * \par Version history
- * 
- *   - $Log: ast-tools.cc,v $
- *   - Revision 1.38  2006/11/24 09:52:24  nlohmann
- *   - + minor changes: mostly documentation and re-arrangement of functions
- *   -
- *
- */

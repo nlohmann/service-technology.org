@@ -18,13 +18,13 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/20 15:22:46 $ by $Author: nlohmann $.
-# Version $Revision: 1.22 $
+# File last changed $Date: 2006/11/26 15:13:07 $ by $Author: nlohmann $.
+# Version $Revision: 1.23 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT([BPEL2oWFN],[2.0],[nlohmann@informatik.hu-berlin.de],[bpel2owfn])
-AC_REVISION($Revision: 1.22 $)
+AC_REVISION($Revision: 1.23 $)
 AM_INIT_AUTOMAKE
 
 
@@ -33,12 +33,8 @@ AC_CONFIG_SRCDIR(src/bpel2owfn.cc)
 AC_CONFIG_HEADERS(src/bpel2owfn.h)
 
 
-# The next lines have to be un-commented before releasing version.
+# The next line has to be un-commented before releasing version.
 #AC_DEFINE(NDEBUG,1,[The release version does not need assert-calls.])
-#CXXFLAGS="-O2"
-#CFLAGS="-O2"
-CXXFLAGS=""
-CFLAGS=""
 
 
 

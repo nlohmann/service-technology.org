@@ -18,20 +18,14 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/24 15:10:26 $ by $Author: nlohmann $.
-# Version $Revision: 1.25 $
+# File last changed $Date: 2006/11/26 15:13:06 $ by $Author: nlohmann $.
+# Version $Revision: 1.26 $
 
 SUBDIRS = src doc tests
 
 .PHONY: binarydistreadme
 
 CLEANFILES = -r *~
-
-# flags for the compilers
-#AM_CXXFLAGS= # -g -pedantic 
-#AM_CFLAGS=   # -g -pedantic
-AM_CXXFLAGS = -O2
-AM_CFLAGS   = -O2
 
 
 # all files that require the permission to execute

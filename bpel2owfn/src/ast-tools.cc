@@ -28,29 +28,16 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/11/24 11:40:29 $
+ * \date    \$Date: 2006/11/26 18:10:01 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.41 $
+ * \version \$Revision: 1.42 $
  *
  * \ingroup debug
  * \ingroup creation
- *
- * \remarks $Log: ast-tools.cc,v $
- * \remarks Revision 1.41  2006/11/24 11:40:29  nlohmann
- * \remarks + added comments
- * \remarks + moved external variables into the functions
- * \remarks
- * \remarks Revision 1.40  2006/11/24 10:40:00  nlohmann
- * \remarks + finished including CVS remarks to file header
- * \remarks
- * \remarks Revision 1.39  2006/11/24 10:34:54  nlohmann
- * \remarks + minor changes: mostly documentation
- * \remarks
- *
  */
 
 

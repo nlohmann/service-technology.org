@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/24 14:52:46 $ by $Author: gierds $.
-# Version $Revision: 1.45 $
+# File last changed $Date: 2006/11/26 12:23:41 $ by $Author: nlohmann $.
+# Version $Revision: 1.46 $
 
 bin_PROGRAMS = bpel2owfn preprocess
 
@@ -38,6 +38,7 @@ KCDUMMY = ast-system-dummy.cc
 KCFILES = ast-to-petrinet-full1.k ast-to-petrinet-full2.k \
 	  ast-to-petrinet-new1.k ast-to-petrinet-new2.k \
 	  ast-to-petrinet-small.k ast-to-xml.k ast-to-cfg.k \
+	  petrinet-patterns.k \
 	  ast-grammar.k ast-config.k ast-postprocess.k ast-rewrite.k
 KCGENERATED = ast-system-csgiok ast-system-k ast-system-rk ast-system-unpk
 KCSOURCES = $(KCGENERATED:=.cc) \

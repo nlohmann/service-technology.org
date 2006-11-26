@@ -61,6 +61,7 @@
 #include <climits>
 
 #include "petrinet.h"
+#include "petrinet-patterns.h"
 #include "options.h"
 #include "cfg.h"
 #include "helpers.h"

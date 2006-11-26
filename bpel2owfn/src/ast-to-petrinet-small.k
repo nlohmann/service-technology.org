@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/11/24 14:42:22 $
+ * \date    \$Date: 2006/11/26 12:23:42 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.72 $
+ * \version \$Revision: 1.73 $
  *
  */
 %}
@@ -181,38 +181,6 @@ userDefinedEventHandler(a,b,_id) ->
       }
 
       trace(TRACE_DEBUG, "[PNU]" + inString() + "</eventHandler scope=\"" + currentScope + "\">\n");
-    }
-  ]
-;
-
-
-
-
-
-
-
-
-
-/******************************************************************************
-  EMPTY
-******************************************************************************/
-
-Empty(a,_id) ->
-  [petrinetsmall:
-    {
-      header(_id);
-      string prefix = toString(_id) + ".internal.";
-
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "final");
-
-      Transition *t1 = TheNet->newTransition(prefix + "empty");
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(t1, p2);
-    }
-    a // standardElements
-    {
-      footer(_id);
     }
   ]
 ;

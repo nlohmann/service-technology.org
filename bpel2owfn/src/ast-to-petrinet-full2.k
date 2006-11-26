@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/11/21 09:14:54 $
+ * \date    \$Date: 2006/11/26 12:23:42 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.60 $
+ * \version \$Revision: 1.61 $
  */
 %}
 
@@ -51,280 +51,30 @@
   EMPTY
 ******************************************************************************/
 
-/*
- * The <empty> activity as depicted in Fig. 3.
- */
-
-This=Empty(a,_id) ->
-  [petrinet:
-    {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
-      assert(This->id == _id->value);
-
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "final");
-      Place *p3 = TheNet->newPlace(prefix + "stop");
-      Place *p4 = TheNet->newPlace(prefix + "stopped");
-
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(t1, p2);
-
-
-      // Transitions for the negative control flow.
-      Transition *t2 = stop(p1, "initial", prefix);
-      Transition *t3 = stop(p2, "final", prefix);
-    }
-    a // standardElements
-    {
-      footer(This->id);
-    }
-  ]
-;
-
-
-
+Empty -> [petrinet petrinetnew petrinetsmall:
+  { PEmpty($0, kc_current_view_base); }
+];
 
 
 /******************************************************************************
   INVOKE
 ******************************************************************************/
 
-/*
- * The (asynchronous) <invoke> activity as depicted in Fig. 10. Since
- * correlation sets are ignored, the resulting pattern is the same as in
- * Fig. 11.
- */
+AsynchronousInvoke -> [petrinet petrinetnew:
+  { PAsynchronousInvoke($0, kc_current_view_base); }
+];
 
-This=AsynchronousInvoke(a,b,c,d,_id) -> // provided (!This->isSynchronousInvoke) ->
-  [petrinet:
-    {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
-      assert(This->id == _id->value);
+SynchronousInvoke -> [petrinet petrinetnew:
+  { PSynchronousInvoke($0, kc_current_view_base); }
+];
 
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "running");
-      Place *p3 = TheNet->newPlace(prefix + "final");
-      Place *p4 = TheNet->newPlace(prefix + "p4");
-      Place *p5 = TheNet->newPlace(prefix + "stop");
-      Place *p6 = TheNet->newPlace(prefix + "stopped");
+Receive -> [petrinet petrinetnew:
+  { PReceive($0, kc_current_view_base); }
+];
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(p1, t1); 
-      TheNet->newArc(t1, p2);
-      if (!parameters[P_NOVARIABLES])
-        TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[_id->value]->inputVariableName), t1, READ);
-
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(p2, t2);
-      TheNet->newArc(t2, p3);
-      TheNet->newArc(t2, TheNet->findPlace("out." + ASTEmap[_id->value]->channelName));
-      t2->type = OUT;
-
-      // Transitions for the negative control flow.
-      if (parameters[P_NOSTANDARDFAULTS] == false)
-	Transition *t3 = throwFault(p2, p4, "running", prefix, _id, ASTEmap[_id->value]->controlFlow);
-
-      Transition *t4 = stop(p1, "initial", prefix);
-      Transition *t5 = stop(p2, "running", prefix);
-      Transition *t6 = stop(p4, "p4", prefix);
-      Transition *t7 = stop(p3, "final", prefix);
-    }
-    a // standardElements
-    {
-      footer(This->id);
-    }
-  ]
-;
-
-
-
-
-
-/*
- * The (synchronous) <invoke> activity as depicted in Fig. 12. Since
- * correlation sets are ignored, the resulting pattern is the same as in
- * Fig. 13.
- */
-
-This=SynchronousInvoke(a,b,c,d,_id) -> //provided (This->isSynchronousInvoke) ->
-  [petrinet:
-    {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
-      assert(This->id == _id->value);
-
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "running1");
-      Place *p3 = TheNet->newPlace(prefix + "p3");
-      Place *p4 = TheNet->newPlace(prefix + "running2");
-      Place *p5 = TheNet->newPlace(prefix + "final");
-      Place *p6 = TheNet->newPlace(prefix + "p6");
-      Place *p7 = TheNet->newPlace(prefix + "stop");
-      Place *p8 = TheNet->newPlace(prefix + "stopped");
-
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(t1, p2);
-      if (!parameters[P_NOVARIABLES])
-        TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[_id->value]->inputVariableName), t1, READ);
-
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(t2, TheNet->findPlace("out." + ASTEmap[_id->value]->channelName));
-      TheNet->newArc(p2, t2);
-      TheNet->newArc(t2, p3);
-      t2->type = OUT;
-
-      Transition *t3 = TheNet->newTransition(prefix + "t3");
-      TheNet->newArc(TheNet->findPlace("in." + ASTEmap[_id->value]->channelName), t3);
-      TheNet->newArc(p3, t3);
-      TheNet->newArc(t3, p4);
-      t3->type = IN;
-
-      Transition *t4 = TheNet->newTransition(prefix + "t4");
-      TheNet->newArc(p4, t4);
-      TheNet->newArc(t4, p5);
-      if (!parameters[P_NOVARIABLES])
-      {
-        TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[_id->value]->outputVariableName), t4);
-        TheNet->newArc(t4, TheNet->findPlace("variable." + ASTEmap[_id->value]->outputVariableName));
-      }
-
-      // Transitions for the negative control flow.
-      if (parameters[P_NOSTANDARDFAULTS] == false)
-      {
-	Transition *t5 = throwFault(p4, p6, "running2", prefix, _id, ASTEmap[_id->value]->controlFlow);
-	Transition *t6 = throwFault(p2, p6, "running1", prefix, _id, ASTEmap[_id->value]->controlFlow);
-      }
-
-      Transition *t7  = stop(p1, "initial", prefix);
-      Transition *t8  = stop(p2, "running1", prefix);
-      Transition *t9  = stop(p3, "p3", prefix);
-      Transition *t10 = stop(p4, "running2", prefix);
-      Transition *t11 = stop(p6, "p6", prefix);
-      Transition *t12 = stop(p5, "final", prefix);
-    }
-    a // standardElements
-    {
-      footer(This->id);
-    }
-  ]
-;
-
-
-
-
-
-/******************************************************************************
-  RECEIVE
-******************************************************************************/
-
-/*
- * The <receive> activity as depicted in Fig. 1. Since correlation sets are
- * ignored, the resulting pattern is the same as in Fig. 2.
- */
-
-This=Receive(a,b,c,_id) ->
-  [petrinet:
-    {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
-      assert(This->id == _id->value);
-
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "running");
-      Place *p3 = TheNet->newPlace(prefix + "final");
-      Place *p4 = TheNet->newPlace(prefix + "p4");
-      Place *p5 = TheNet->newPlace(prefix + "stop");
-      Place *p6 = TheNet->newPlace(prefix + "stopped");
-
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(TheNet->findPlace("in." + ASTEmap[_id->value]->channelName), t1);
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(t1, p2);
-      t1->type = IN;
-
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(p2, t2);
-      TheNet->newArc(t2, p3);
-      if (!parameters[P_NOVARIABLES])
-      {
-        TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[_id->value]->variableName), t2);
-        TheNet->newArc(t2, TheNet->findPlace("variable." + ASTEmap[_id->value]->variableName));
-      }
-
-      // Transitions for the negative control flow.
-      if (parameters[P_NOSTANDARDFAULTS] == false)
-	Transition *t3 = throwFault(p2, p4, "running", prefix, _id, ASTEmap[_id->value]->controlFlow);
-
-      Transition *t4 = stop(p1, "initial", prefix);
-      Transition *t5 = stop(p2, "running", prefix);
-      Transition *t6 = stop(p4, "p4", prefix);
-      Transition *t7 = stop(p3, "final", prefix);
-    }
-    a // standardElements
-    {
-      footer(This->id);
-    }
-  ]
-;
-
-
-
-
-
-/******************************************************************************
-  REPLY
-******************************************************************************/
-
-/*
- * The <reply> activity as depicted in Fig. 8. Since correlation sets are
- * ignored, the resulting pattern is the same as in Fig. 9.
- */
-
-This=Reply(a,b,c,_id) ->
-  [petrinet:
-    {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
-      assert(This->id == _id->value);
-
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "running");
-      Place *p3 = TheNet->newPlace(prefix + "final");
-      Place *p4 = TheNet->newPlace(prefix + "p4");
-      Place *p5 = TheNet->newPlace(prefix + "stop");
-      Place *p6 = TheNet->newPlace(prefix + "stopped");
-
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(t1, p2);
-      if (!parameters[P_NOVARIABLES])
-        TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[_id->value]->variableName), t1, READ);
-
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(t2, TheNet->findPlace("out." + ASTEmap[_id->value]->channelName));
-      TheNet->newArc(p2, t2);
-      TheNet->newArc(t2, p3);
-      t2->type = OUT;
-
-      // Transitions for the negative control flow.
-      if (parameters[P_NOSTANDARDFAULTS] == false)
-	Transition *t3 = throwFault(p2, p4, "running", prefix, _id, ASTEmap[_id->value]->controlFlow);
-
-      Transition *t3 = stop(p1, "initial", prefix);
-      Transition *t5 = stop(p2, "running", prefix);
-      Transition *t6 = stop(p4, "p4", prefix);
-      Transition *t7 = stop(p3, "final", prefix);
-    }
-    a // standardElements
-    {
-      footer(This->id);
-    }
-  ]
-;
+Reply -> [petrinet petrinetnew:
+  { PReply($0, kc_current_view_base); }
+];
 
 
 

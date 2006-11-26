@@ -26,8 +26,6 @@ ast-to-petrinet-new2.cc
 ast-to-petrinet-new2.h
 ast-to-xml.cc
 ast-to-xml.h
-ast-system-csgiok.cc
-ast-system-csgiok.h
 ast-system-dummy.cc
 ast-system-k.cc
 ast-system-k.h

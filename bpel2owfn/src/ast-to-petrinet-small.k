@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/11/26 17:15:44 $
+ * \date    \$Date: 2006/11/26 18:09:47 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.75 $
+ * \version \$Revision: 1.76 $
  *
  */
 %}
@@ -173,107 +173,6 @@ Compensate(a,_id) ->
 
 
 /******************************************************************************
-  FLOW
-******************************************************************************/
-
-Flow(a,b,c,_id) ->
-  [petrinetsmall:
-    {
-      header(_id, true);
-      string prefix = toString(_id) + ".internal.";
-
-      Place *p1  = TheNet->newPlace(prefix + "initial");
-      Place *p2  = TheNet->newPlace(prefix + "final");
-
-      Transition *t1 = TheNet->newTransition(prefix + "split");
-      TheNet->newArc(p1, t1);
-
-      Transition *t2 = TheNet->newTransition(prefix + "join");
-      TheNet->newArc(t2, p2);
-    }
-    a // standardElements
-    c // inner activities
-    {
-      foreach (innerActivity; activity_list c)
-      {
-	TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
-	TheNet->newArc(TheNet->findPlace(innerActivity->id, ".final"), t2);
-      }
-      footer(_id, true);
-    }
-  ]
-;
-
-
-
-
-
-/******************************************************************************
-  SWITCH                                                         (BPEL4WS 1.1)
-******************************************************************************/
-
-Switch(a,b,otherwiseBranch=Otherwise(c,d),_id) ->
-  [petrinetsmall:
-    {
-      header(_id, true);
-      string prefix = toString(_id) + ".internal.";
-
-      Place *p1 =  TheNet->newPlace(prefix + "final");
-      Place *p2 =  TheNet->newPlace(prefix + "initial");
-    }
-    a // standardElements
-    b // case braches
-    c // otherwise branch
-    {
-      // the <case> branches
-      int currentCase = 1;
-      foreach (caseBranch=Case(innerActivity,_id2); tCase_list b)
-      {
-	string caseNumber = toString(currentCase++);
-	Transition* t1 = TheNet->newTransition(prefix + "case" + caseNumber);
-	TheNet->newArc(TheNet->findPlace(_id->value, ".internal.initial"), t1); // added ".internal" here
-
-	// Embed the inner activity.
-	TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
-	TheNet->mergePlaces(_id->value, ".internal.final", innerActivity->id, ".final");
-      }
-
-
-      // the <otherwise> branch
-      Transition *t1 = TheNet->newTransition(prefix + "caseo");
-      TheNet->newArc(TheNet->findPlace(_id->value, ".internal.initial"), t1); // added ".internal" here
-
-      // embed inner activity
-      TheNet->newArc(t1, TheNet->findPlace(c->id, ".initial"));
-      TheNet->mergePlaces(_id->value, ".internal.final", c->id, ".final");
-
-
-      // Create the arcs for the Dead Path elimination: each chosen activity
-      // (i.e. firing of the respective t2-transition) has set the links of all
-      // other branches to false.
-      currentCase = 1;
-      foreach (Case(innerActivity1); tCase_list b)
-      {
-        foreach (Case(innerActivity2); tCase_list b)
-        {
-	  if (innerActivity1 != innerActivity2)
-            dpeLinks(TheNet->findTransition(prefix + "case" + toString(currentCase)), innerActivity2->id); // case -> case'
-    	}
-        dpeLinks(TheNet->findTransition(prefix + "case" + toString(currentCase)), c->id); // case -> otherwise
-        dpeLinks(TheNet->findTransition(prefix + "caseo"), innerActivity1->id); // otherwise -> case
-  	currentCase++;
-      }
-
-      footer(_id, true);
-    }
-  ]
-;
-
-
-
-
-
-/******************************************************************************
   IF                                                             (WS-BPEL 2.0)
 ******************************************************************************/
 
@@ -346,49 +245,6 @@ If(a,b,c,_id) ->
         }
   	currentCase++;
       }
-
-      footer(_id, true);
-    }
-  ]
-;
-
-
-
-
-
-/******************************************************************************
-  WHILE
-******************************************************************************/
-
-While(a,b,_id) ->
-  [petrinetsmall:
-    {
-      header(_id, true);
-      string prefix = toString(_id) + ".internal.";
-
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "running");
-      Place *p3 = TheNet->newPlace(prefix + "final");
-      Place *p4 = TheNet->newPlace(prefix + "done");
-
-      Transition *t1 = TheNet->newTransition(prefix + "enter");
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(t1, p2);
-
-      Transition *t2 = TheNet->newTransition(prefix + "leave");
-      TheNet->newArc(p1, t2);
-      TheNet->newArc(t2, p3);
-
-      Transition *t3 = TheNet->newTransition(prefix + "loop");
-      TheNet->newArc(p4, t3);
-      TheNet->newArc(t3, p1);
-    }
-    a // standardElements
-    b // innerActivity
-    {
-      // Embed the inner activity.
-      TheNet->mergePlaces(_id->value, ".internal.running", b->id, ".initial");
-      TheNet->mergePlaces(_id->value, ".internal.done", b->id, ".final");
 
       footer(_id, true);
     }

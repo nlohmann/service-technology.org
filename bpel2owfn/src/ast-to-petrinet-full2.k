@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/11/26 17:15:44 $
+ * \date    \$Date: 2006/11/26 18:09:47 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.63 $
+ * \version \$Revision: 1.64 $
  */
 %}
 
@@ -111,7 +111,7 @@ Exit -> [petrinet petrinetnew petrinetsmall:
   STRUCTURED ACTIVITIES
 ******************************************************************************/
 
-While -> [petrinet petrinetnew:
+While -> [petrinet petrinetnew petrinetsmall:
   { PWhile($0, kc_current_view_base); }
 ];
 
@@ -123,8 +123,12 @@ Sequence -> [petrinet petrinetnew petrinetsmall:
   { PSequence($0, kc_current_view_base); }
 ];
 
-Flow -> [petrinet petrinetnew:
+Flow -> [petrinet petrinetnew petrinetsmall:
   { PFlow($0, kc_current_view_base); }
+];
+
+Switch -> [petrinet petrinetnew petrinetsmall:
+  { PSwitch($0, kc_current_view_base); }
 ];
 
 
@@ -346,164 +350,6 @@ This=CompensateScope(a,b,_id) provided (ASTEmap[_id->value]->controlFlow == FHCF
     a // standardElements
     {
       footer(This->id);
-    }
-  ]
-;
-
-
-
-
-
-/******************************************************************************
-  SWITCH                                                         (BPEL4WS 1.1)
-******************************************************************************/
-
-/*
- * The <switch> activity as it is depicted in Fig. 19. Please note that during
- * parsing an empty otherwise branch was added if it was not specified.
- */
-
-This=Switch(a,b,Otherwise(c,d),_id) ->
-  [petrinet petrinetnew:
-    {
-      header(This->id, true);
-      string prefix = toString(This->id) + ".internal.";
-      assert(This->id == _id->value);
-
-      Place *p4 =  TheNet->newPlace(prefix + "final");
-      Place *p5 =  TheNet->newPlace(prefix + "initial");
-      Place *p6 =  TheNet->newPlace(prefix + "running");
-      Place *p10 = TheNet->newPlace(prefix + "p10");
-      Place *p11 = TheNet->newPlace(prefix + "stop");
-      Place *p12 = TheNet->newPlace(prefix + "stopped");
-
-      Transition *t3 = TheNet->newTransition(prefix + "t3");
-      TheNet->newArc(p5, t3);
-      TheNet->newArc(t3, p6);
-
-
-      // Transitions for the negative control flow.
-      if (parameters[P_NOSTANDARDFAULTS] == false)
-	Transition *t7 = throwFault(p6, p10, "running", prefix, _id, ASTEmap[_id->value]->controlFlow);
-
-      Transition *t8  = stop(p5, "initial", prefix);
-      Transition *t9  = stop(p6, "running", prefix);
-      Transition *t10 = stop(p10, "p10", prefix);
-
-/*
-      // Dead Path Elimination
-      Transition *t1 = NULL;
-      if (This->dpe > 0)
-      {
-	t1 = TheNet->newTransition(prefix + "t1");
-	Place *p1 = TheNet->newPlace(prefix + "negLink");
-	TheNet->newArc(p1, t1);
-      }*/
-    }
-    a // standardElements
-    b // case braches
-    c // otherwise branch
-    {
-      int currentCase = 1;
-      Transition *last;
-      foreach (caseBranch=Case(innerActivity); tCase_list b)
-      {
-	string caseNumber = toString(currentCase);
-
-	trace(TRACE_VERY_DEBUG, "[PNU]\tEmbedding case branch " + caseNumber + "...\n");
-
-
-	Transition *t2 = NULL;
-	Transition *t4 = NULL;
-
-	if (currentCase == 1)
-	{
-	  // two transitions: guard fulfilled or not
-	  t2 = TheNet->newTransition(prefix + "t2.case1");
-	  t4 = TheNet->newTransition(prefix + "t4.case1");
-
-	  // arcs connecting "running"-place
-	  TheNet->newArc(TheNet->findPlace(This->id, ".internal.running"), t2);
-	  TheNet->newArc(TheNet->findPlace(This->id, ".internal.running"), t4);
-
-	  last = t4;
-	}
-	else
-	{
-	  // two transitions: guard fulfilled or not
-	  t2 = TheNet->newTransition(prefix + "t2.case" + caseNumber);
-	  t4 = TheNet->newTransition(prefix + "t4.case" + caseNumber);
-
-	  // "running"-place and connecting arcs
-	  Place *running =  TheNet->newPlace(prefix + "running.case" + caseNumber);
-	  TheNet->newArc(last, running);
-	  TheNet->newArc(running, t2);
-	  TheNet->newArc(running, t4);
-
-	  Transition *t11 = stop(running, "runningCase" + caseNumber, prefix);
-
-	  last = t4;
-	}
-
-	// Embed the inner activity.
-	TheNet->newArc(t2, TheNet->findPlace(innerActivity->id, ".initial"));
-	TheNet->mergePlaces(This->id, ".internal.final",   innerActivity->id, ".final");
-	TheNet->mergePlaces(This->id, ".internal.stop",    innerActivity->id, ".stop");
-	TheNet->mergePlaces(This->id, ".internal.stopped", innerActivity->id, ".stopped");
-
-	currentCase++;
-      }
-
-
-      trace(TRACE_VERY_DEBUG, "[PNU]\tEmbedding otherwise branch...\n");
-      // The <otherwise> branch.
-      Transition *t2 = TheNet->newTransition(prefix + "t2.otherwise");
-
-      // "running"-place and connecting arcs
-      Place *running = TheNet->newPlace(prefix + "running.otherwise");
-      TheNet->newArc(running, t2);
-      TheNet->newArc(last, running);
-
-      Transition *tnoname = stop(running, "runningOtherwise", prefix);
-
-      // embed inner activity
-      TheNet->newArc(t2, TheNet->findPlace(c->id, ".initial"));
-      TheNet->mergePlaces(This->id, ".internal.final",   c->id, ".final");
-      TheNet->mergePlaces(This->id, ".internal.stop",    c->id, ".stop");
-      TheNet->mergePlaces(This->id, ".internal.stopped", c->id, ".stopped");
-
-/*
-      // Create the arcs for the Dead Path elimination: each chosen activity
-      // (i.e. firing of the respective t2-transition) has to be connected with
-      // the negLink places of all other cases' activities as well as to the
-      // activity in the otherwise branch. Of course, the arcs are only added
-      // if the negLink place is existing (i.e. a source link can be reached
-      // after all.
-      currentCase = 1;
-      foreach (thisCaseBranch=Case(innerActivity1); tCase_list b)
-      {
-	foreach (otherCaseBranch=Case(innerActivity2); tCase_list b)
-	{
-	  if ((innerActivity1 != innerActivity2) && (otherCaseBranch->dpe > 0))
-	    TheNet->newArc(TheNet->findTransition(prefix + "t2.case" + toString(currentCase)), TheNet->findPlace(innerActivity2, ".negLink"));
-
-	  if (c->dpe > 0)
-	    TheNet->newArc(TheNet->findTransition(prefix + "t2.case" + toString(currentCase)), TheNet->findPlace(c, ".negLink"));
-	}
-
-	if (thisCaseBranch->dpe > 0)
-	{
-	  TheNet->newArc(TheNet->findTransition(prefix + "t2.otherwise"), TheNet->findPlace(innerActivity1, ".negLink"));
-	}
-	  
-
-	currentCase++;
-
-	if ((This->dpe > 0) && (thisCaseBranch->dpe > 0))
-	  TheNet->newArc(t1, TheNet->findPlace(innerActivity1, ".negLink"));
-      }
-*/
-      footer(This->id, true);
     }
   ]
 ;

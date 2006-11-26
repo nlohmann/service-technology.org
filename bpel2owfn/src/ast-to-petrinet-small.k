@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/11/26 12:23:42 $
+ * \date    \$Date: 2006/11/26 15:10:00 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.73 $
+ * \version \$Revision: 1.74 $
  *
  */
 %}
@@ -796,48 +796,6 @@ RepeatUntil(a,b,_id) ->
       TheNet->mergePlaces(_id->value, ".internal.p2", b->id, ".final");
 
       footer(_id, true);
-    }
-  ]
-;
-
-
-
-
-
-/******************************************************************************
-  SEQUENCE
-******************************************************************************/
-
-This=Sequence(a,b,c) ->
-  [petrinetsmall:
-    {
-      header(This->id, true);
-      string prefix = toString(This->id) + ".internal.";
-
-      Place *p1  = TheNet->newPlace(prefix + "initial");
-      Place *p2  = TheNet->newPlace(prefix + "final");
-    }
-    a // standardElements for this activity
-    b // inner activities
-    {
-      int activityCount = 1;
-      kc::impl_activity* lastActivity;
-
-      foreach (innerActivity; activity_list b)
-      {
-	if (activityCount == 1)
-	  TheNet->mergePlaces(This->id, ".internal.initial", innerActivity->id, ".initial");
-	else
-	  TheNet->mergePlaces(lastActivity->id, ".final", innerActivity->id, ".initial");
-
-	if (activityCount == b->length())
-	  TheNet->mergePlaces(This->id, ".internal.final", innerActivity->id, ".final");
-
-	lastActivity = innerActivity;
-	activityCount++;
-      }
-
-      footer(This->id, true);
     }
   ]
 ;

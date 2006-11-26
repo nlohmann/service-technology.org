@@ -18,14 +18,10 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/26 12:43:39 $ by $Author: nlohmann $.
-# Version $Revision: 1.48 $
+# File last changed $Date: 2006/11/26 15:09:59 $ by $Author: nlohmann $.
+# Version $Revision: 1.49 $
 
 bin_PROGRAMS = bpel2owfn preprocess
-
-# flags for the compilers
-AM_CXXFLAGS= -O2
-AM_CFLAGS=   -O2
 
 # define flags for Kimwitu++
 KCFLAGS = --yystype --file-prefix=ast-system- --suffix=cc --no-csgio

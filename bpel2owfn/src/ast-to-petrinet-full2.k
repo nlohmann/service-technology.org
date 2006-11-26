@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/11/26 15:09:59 $
+ * \date    \$Date: 2006/11/26 17:15:44 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.62 $
+ * \version \$Revision: 1.63 $
  */
 %}
 
@@ -55,39 +55,39 @@ Empty -> [petrinet petrinetnew petrinetsmall:
   { PEmpty($0, kc_current_view_base); }
 ];
 
-AsynchronousInvoke -> [petrinet petrinetnew:
+AsynchronousInvoke -> [petrinet petrinetnew petrinetsmall:
   { PAsynchronousInvoke($0, kc_current_view_base); }
 ];
 
-SynchronousInvoke -> [petrinet petrinetnew:
+SynchronousInvoke -> [petrinet petrinetnew petrinetsmall:
   { PSynchronousInvoke($0, kc_current_view_base); }
 ];
 
-Receive -> [petrinet petrinetnew:
+Receive -> [petrinet petrinetnew petrinetsmall:
   { PReceive($0, kc_current_view_base); }
 ];
 
-Reply -> [petrinet petrinetnew:
+Reply -> [petrinet petrinetnew petrinetsmall:
   { PReply($0, kc_current_view_base); }
 ];
 
-Assign -> [petrinet petrinetnew:
+Assign -> [petrinet petrinetnew petrinetsmall:
   { PAssign($0, kc_current_view_base); }
 ];
 
-Validate -> [petrinet petrinetnew:
+Validate -> [petrinet petrinetnew petrinetsmall:
   { PValidate($0, kc_current_view_base); }
 ];
 
-WaitUntil -> [petrinet petrinetnew:
+WaitUntil -> [petrinet petrinetnew petrinetsmall:
   { PWaitUntil($0, kc_current_view_base); }
 ];
 
-WaitFor -> [petrinet petrinetnew:
+WaitFor -> [petrinet petrinetnew petrinetsmall:
   { PWaitFor($0, kc_current_view_base); }
 ];
 
-Throw -> [petrinet petrinetnew:
+Throw -> [petrinet petrinetnew petrinetsmall:
   { PThrow($0, kc_current_view_base); }
 ];
 
@@ -95,11 +95,11 @@ Rethrow -> [petrinetnew:
   { PRethrow($0, kc_current_view_base); }
 ];
 
-Terminate -> [petrinet petrinetnew:
+Terminate -> [petrinet petrinetnew petrinetsmall:
   { PTerminate($0, kc_current_view_base); }
 ];
 
-Exit -> [petrinet petrinetnew:
+Exit -> [petrinet petrinetnew petrinetsmall:
   { PExit($0, kc_current_view_base); }
 ];
 
@@ -115,12 +115,16 @@ While -> [petrinet petrinetnew:
   { PWhile($0, kc_current_view_base); }
 ];
 
-RepeatUntil -> [petrinet petrinetnew:
+RepeatUntil -> [petrinet petrinetnew petrinetsmall:
   { PRepeatUntil($0, kc_current_view_base); }
 ];
 
 Sequence -> [petrinet petrinetnew petrinetsmall:
   { PSequence($0, kc_current_view_base); }
+];
+
+Flow -> [petrinet petrinetnew:
+  { PFlow($0, kc_current_view_base); }
 ];
 
 
@@ -351,82 +355,6 @@ This=CompensateScope(a,b,_id) provided (ASTEmap[_id->value]->controlFlow == FHCF
 
 
 /******************************************************************************
-  FLOW
-******************************************************************************/
-
-/*
- * The <flow> activity as it is depicted in Fig. 17.
- */
-
-This=Flow(a,b,c,_id) ->
-  [petrinet:
-    {
-      header(This->id, true);
-      string prefix = toString(This->id) + ".internal.";
-      assert(This->id == _id->value);
-
-      Place *p7  = TheNet->newPlace(prefix + "initial");
-      Place *p8  = TheNet->newPlace(prefix + "final");
-      Place *p9  = TheNet->newPlace(prefix + "running");
-      Place *p15 = TheNet->newPlace(prefix + "stop");
-      Place *p16 = TheNet->newPlace(prefix + "stopped");
-
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(p7, t2);
-      TheNet->newArc(t2, p9);
-
-      Transition *t3 = TheNet->newTransition(prefix + "t3");
-      TheNet->newArc(t3, p8);
-      TheNet->newArc(p9, t3);
-
-      Transition *t5 = TheNet->newTransition(prefix + "t5");
-      TheNet->newArc(p9, t5);
-      TheNet->newArc(p15, t5);
-
-      Transition *t6 = TheNet->newTransition(prefix + "innerStopped");
-      TheNet->newArc(t6, p16);
-
-
-      // Transitions for the negative control flow.
-      Transition *t4 = stop(p7, "initial", prefix);
-      Transition *t7 = stop(p8, "final", prefix);
-
-/*
-      // Dead-Path-Elimination.
-      Transition *t1 = NULL;
-      if (This->dpe > 0)
-      {
-	Place *p1  = TheNet->newPlace(prefix + "negLink");
-	t1 = TheNet->newTransition(prefix + "t1");
-	TheNet->newArc(p1, t1);
-      }*/
-    }
-    a // standardElements
-    c // inner activities
-    {
-      foreach (innerActivity; activity_list c)
-      {
-        string newPrefix = toString(innerActivity->id);
-        // Embed the inner activity.
-//	if (This->dpe > 0 && TheNet->findPlace(newPrefix + ".negLink") != NULL)
-//	{
-//	  TheNet->newArc(t1, TheNet->findPlace(newPrefix + ".negLink"));
-//	}
-	TheNet->newArc(t2, TheNet->findPlace(innerActivity->id, ".initial"));
-	TheNet->newArc(t5, TheNet->findPlace(innerActivity->id, ".stop"));
-	TheNet->newArc(TheNet->findPlace(innerActivity->id, ".stopped"), t6);
-	TheNet->newArc(TheNet->findPlace(innerActivity->id, ".final"), t3);
-      }
-      footer(This->id, true);
-    }
-  ]
-;
-
-
-
-
-
-/******************************************************************************
   SWITCH                                                         (BPEL4WS 1.1)
 ******************************************************************************/
 
@@ -436,7 +364,7 @@ This=Flow(a,b,c,_id) ->
  */
 
 This=Switch(a,b,Otherwise(c,d),_id) ->
-  [petrinet:
+  [petrinet petrinetnew:
     {
       header(This->id, true);
       string prefix = toString(This->id) + ".internal.";
@@ -593,7 +521,7 @@ This=Switch(a,b,Otherwise(c,d),_id) ->
  */
 
 This=Pick(a,b,c,_id) ->
-  [petrinet:
+  [petrinet petrinetnew:
     {
       header(This->id, true);
       string prefix = toString(This->id) + ".internal.";
@@ -1075,7 +1003,7 @@ This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
 ******************************************************************************/
 
 This=StandardElements(NiltTarget_list(), NiltSource_list(), jc) ->
-  [petrinet:
+  [petrinet petrinetnew:
     {
       string prefix = toString(This->parentId) + ".";
       string newPrefix = toString(This->parentId) + ".internal";
@@ -1113,7 +1041,7 @@ This=StandardElements(NiltTarget_list(), NiltSource_list(), jc) ->
  *****************************************************************************/
 
 This=StandardElements(NiltTarget_list(), a, jc) ->
-  [petrinet:
+  [petrinet petrinetnew:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 22\n");
       string prefix = toString(This->parentId) + ".";
@@ -1195,7 +1123,7 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
  *****************************************************************************/
 
 This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF) ->
-  [petrinet:
+  [petrinet petrinetnew:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 23\n");
       string prefix = toString(This->parentId) + ".";
@@ -1262,7 +1190,7 @@ This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF) ->
  *****************************************************************************/
 
 This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF) ->
-  [petrinet:
+  [petrinet petrinetnew:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 24\n");
       string prefix = toString(This->parentId) + ".";
@@ -1329,7 +1257,7 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF) ->
  *****************************************************************************/
 
 This=StandardElements(a,b, jc) provided (This->suppressJF) ->
-  [petrinet:
+  [petrinet petrinetnew:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 25\n");
       string prefix = toString(This->parentId) + ".";
@@ -1443,7 +1371,7 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
  *****************************************************************************/
 
 This=StandardElements(a,b, jc) provided (!This->suppressJF) ->
-  [petrinet:
+  [petrinet petrinetnew:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 26\n");
       string prefix = toString(This->parentId) + ".";

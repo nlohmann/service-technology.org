@@ -34,8 +34,10 @@ ast-system-rk.h
 ast-system-unpk.cc
 ast-system-unpk.h
 ast-system-yystype.h
-petrinet-patterns.h
-petrinet-patterns.cc
+petrinet-patterns-structured.h
+petrinet-patterns-structured.cc
+petrinet-patterns-basic.h
+petrinet-patterns-basic.cc
 lexer.cc
 parser.cc
 parser.h

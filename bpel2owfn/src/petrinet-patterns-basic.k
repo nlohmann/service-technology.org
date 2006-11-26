@@ -61,12 +61,6 @@ void PEmpty(const impl_tEmpty* abstract_phylum, uview current_view)
   INVOKE
 ******************************************************************************/
 
-/*!
- * Petri net pattern for the asynchronous <invoke> activity
- *
- * \param abstract_phylum  pointer to the AST phylum
- * \param uview            the current unparse view
- */
 void PAsynchronousInvoke(const impl_tInvoke* abstract_phylum, uview current_view)
 {
   impl_tInvoke_AsynchronousInvoke* phylum = (impl_tInvoke_AsynchronousInvoke*) abstract_phylum;
@@ -113,12 +107,9 @@ void PAsynchronousInvoke(const impl_tInvoke* abstract_phylum, uview current_view
 }
 
 
-/*!
- * Petri net pattern for the synchronous <invoke> activity
- *
- * \param abstract_phylum  pointer to the AST phylum
- * \param uview            the current unparse view
- */
+
+
+
 void PSynchronousInvoke(const impl_tInvoke* abstract_phylum, uview current_view)
 {
   impl_tInvoke_SynchronousInvoke* phylum = (impl_tInvoke_SynchronousInvoke*) abstract_phylum;
@@ -195,12 +186,6 @@ void PSynchronousInvoke(const impl_tInvoke* abstract_phylum, uview current_view)
   RECEIVE
 ******************************************************************************/
 
-/*!
- * PetriNet pattern for the <receive> activity
- *
- * \param abstract_phylum  pointer to the AST phylum
- * \param uview            the current unparse view
- */
 void PReceive(const impl_tReceive* abstract_phylum, uview current_view)
 {
   impl_tReceive_Receive* phylum = (impl_tReceive_Receive*) abstract_phylum;
@@ -257,12 +242,6 @@ void PReceive(const impl_tReceive* abstract_phylum, uview current_view)
   REPLY
 ******************************************************************************/
 
-/*!
- * PetriNet pattern for the <reply> activity
- *
- * \param abstract_phylum  pointer to the AST phylum
- * \param uview            the current unparse view
- */
 void PReply(const impl_tReply* abstract_phylum, uview current_view)
 {
   impl_tReply_Reply* phylum = (impl_tReply_Reply*) abstract_phylum;
@@ -311,22 +290,32 @@ void PReply(const impl_tReply* abstract_phylum, uview current_view)
 
 
 
-
 /******************************************************************************
   ASSIGN
 ******************************************************************************/
 
-/*!
- * PetriNet pattern for the <assign> activity
- *
- * \param abstract_phylum  pointer to the AST phylum
- * \param uview            the current unparse view
- */
 void PAssign(const impl_tAssign* abstract_phylum, uview current_view)
 {
   impl_tAssign_Assign* phylum = (impl_tAssign_Assign*) abstract_phylum;
   assert(phylum != NULL);
 
   header(phylum->id);
-  string prefix = toString(phylum->id) + ".internal.";  
+  string prefix = toString(phylum->id) + ".internal.";
+
+  Place *p1 = TheNet->newPlace(prefix + "initial");
+  Place *p3 = TheNet->newPlace(prefix + "final");
+  Place *p5 = TheNet->newPlace(prefix + "stop");
+  Place *p6 = TheNet->newPlace(prefix + "stopped");
+
+  Transition *t4 = stop(p1, "initial", prefix);
+  Transition *t7 = stop(p3, "final", prefix);
+
+
+  // unparse the standard elements
+  phylum->standardElements_1->unparse(pseudoPrinter, current_view);
+
+
+  int copyCount = 1;
+  Place *lastPlace = TheNet->findPlace(prefix + "initial");
+
 }

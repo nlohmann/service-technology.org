@@ -120,7 +120,23 @@ class oWFN  {
 
 		owfnTransition * startOfQuasiEnabledList;	//!< start of list of quasi enabled transitions
 		owfnTransition * startOfEnabledList;		//!< start of list of real enabled transitions
-		
+
+// **** Definitions for Stubborn set calculations
+#ifdef STUBBORN
+		owfnTransition * StartOfStubbornList;		// anchor to linked list of ...
+		owfnTransition * EndOfStubbornList;                 // ... transitions in stubborn set
+		unsigned int NrStubborn;			// # of activated (!) elements in stubborn set
+		owfnTransition * TarjanStack;                       // Stubborn Set Calculation involves ...
+		owfnTransition * CallStack;                         // ... SCC investigation on a graph of tr.
+
+		owfnTransition ** stubbornfirelistdeadlocks();  	// returns transitions to be fired for
+								// reduced state space that preserves deadlocks
+		owfnTransition ** stubbornfirelistmessage(owfnPlace *);
+								// returns transitions to be fired for
+								// reduced state space for message
+								// successors
+#endif
+
 		void initialize();						// initializes the net
 
 		void addPlace(unsigned int, owfnPlace *);

@@ -40,6 +40,7 @@
 #include "vertex.h"
 #include <stdlib.h>
 #include <cassert>
+#include <limits.h>
 
 using namespace std;
 
@@ -163,6 +164,19 @@ void oWFN::initialize() {
         	CurrentMarking[i] = Places[i]->initial_marking;
         }
   	}
+
+#ifdef STUBBORN
+	// initialize array of pre-transitions
+	for(i=0;i<placeCnt;i++)
+	{
+		Places[i]->PreTransitions = new owfnTransition * [Places[i]->NrOfArriving + 1];
+		int j;
+		for(j=0;j<Places[i]->NrOfArriving;j++)
+		{
+			Places[i]->PreTransitions[j] = Places[i]->ArrivingArcs[j]->tr;
+		}
+	}
+#endif
   	
 	// initialize transitions
   	for(i = 0; i < transCnt; i++) {
@@ -1367,4 +1381,228 @@ char * oWFN::createLabel(messageMultiSet m) {
 	
 	return label;
 }
+
+
+// ****************** Implementation of Stubborn Set Calculation *******************
+
+#ifdef STUBBORN
+
+
+void stubbornclosure(oWFN * net)
+{
+	owfnTransition * current;
+	int i;
+
+	net->NrStubborn = 0;
+	for(current = net -> StartOfStubbornList;current; current = current -> NextStubborn)
+	{
+		if(current -> enabled)
+		{
+			net -> NrStubborn ++;
+		}
+		for(i=0;current -> mustbeincluded[i];i++)
+		{
+			if(!current -> mustbeincluded[i]->instubborn)
+			{
+				current -> mustbeincluded[i]->instubborn = true;
+				current -> mustbeincluded[i]->NextStubborn  = (owfnTransition *) 0;
+				net -> EndOfStubbornList -> NextStubborn = current -> mustbeincluded[i];
+				net -> EndOfStubbornList = current -> mustbeincluded[i];
+			}
+		}
+	}
+}
+	
+
+void stubborninsert(oWFN * net, owfnTransition* t)
+{
+	if(t -> instubborn) return;
+	t -> instubborn = true;
+	t -> NextStubborn = (owfnTransition *) 0;
+	if(net -> StartOfStubbornList)
+	{
+		net -> EndOfStubbornList -> NextStubborn = t;
+		net -> EndOfStubbornList = t;
+	}
+	else
+	{
+		net -> StartOfStubbornList = net -> EndOfStubbornList = t;
+	}
+}
+		
+owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess)
+{
+owfnTransition ** result;
+owfnTransition * t;
+unsigned int i;
+	if(!(mess->PreTransitions[0]))
+	{	
+		result = new owfnTransition * [1];
+		result[0] = (owfnTransition *) 0;
+		return result;
+	}
+	for(i = 0; mess->PreTransitions[i];i++)
+	{
+		stubborninsert(this,mess->PreTransitions[i]);
+	}
+	stubbornclosure(this);
+	result = new owfnTransition * [NrStubborn + 1];
+	for(t=StartOfStubbornList;t; t = t -> NextStubborn)
+	{
+		t -> instubborn = false;
+		if(t -> enabled)
+		{
+			result[i++] = t;
+		}
+	}
+	result[i] = (owfnTransition *)0;
+	CardFireList = NrStubborn;
+	StartOfStubbornList = (owfnTransition *) 0;
+	return result;
+}
+	
+	
+unsigned int StubbStamp = 0;
+
+void NewStubbStamp(oWFN * PN)
+{
+	if(StubbStamp < UINT_MAX)
+	{
+		StubbStamp ++;
+	}
+	else
+	{
+		unsigned int i;
+		for(i=0;i < PN->getTransitionCnt();i++)
+		{
+			PN->Transitions[i]-> stamp =0;
+		}
+		StubbStamp = 1;
+	}
+}
+
+#define MINIMUM(X,Y) ((X) < (Y) ? (X) : (Y))
+owfnTransition ** oWFN::stubbornfirelistdeadlocks()
+{
+	owfnTransition ** result;
+	unsigned int maxdfs;
+	owfnTransition * current, * next;
+
+	// computes stubborn set without goal orientation.
+	// The TSCC based optimisation is included
+
+	// 1. start with enabled transition
+	if(TarjanStack = startOfEnabledList)
+	{
+		maxdfs = 0;
+		NewStubbStamp(this);
+		TarjanStack -> nextontarjanstack = TarjanStack;
+		TarjanStack -> stamp  = StubbStamp;
+		TarjanStack -> dfs = TarjanStack -> min = maxdfs++;
+		TarjanStack -> mbiindex = 0;
+		current = TarjanStack;
+		CallStack = current;
+		current -> nextoncallstack = (owfnTransition *) 0;
+	}
+	else
+	{
+		result = new owfnTransition * [1];
+		result[0] = (owfnTransition *) 0;
+		CardFireList = 0;
+		return result;
+	}
+	while(current)
+	{
+		if(next = current->mustbeincluded[current->mbiindex])
+		{
+			// Successor exists
+			if(next->stamp == StubbStamp)
+			{
+				// already visited
+				if(next -> nextontarjanstack)
+				{
+					// next still on stack
+					current -> min = MINIMUM(current -> min, next -> dfs);
+				}
+				current -> mbiindex++;
+			}
+			else
+			{
+				// not yet visited
+				next -> nextontarjanstack = TarjanStack;
+				TarjanStack = next;
+				next -> min = next -> dfs = maxdfs++;
+				next -> stamp = StubbStamp;
+				next -> mbiindex = 0;
+				next -> nextoncallstack = current;
+				CallStack = next;
+				current = next;
+			}
+		}
+		else
+		{
+			// no more successors -> scc detection and backtracking
+			if(current -> dfs == current -> min)
+			{
+				// remove all states behind current from Tarjanstack;
+				// if enabled -> final sequence
+				while(1)
+				{
+					if(TarjanStack -> enabled)
+					{
+						// final sequence
+						unsigned int cardstubborn;
+						owfnTransition * t;
+
+						cardstubborn = 0;
+						for(t = TarjanStack;;t = t -> nextontarjanstack)
+						{
+							if(t -> enabled) cardstubborn ++;
+							if(t == current) break;
+						}
+						result = new owfnTransition * [cardstubborn + 1];
+						cardstubborn = 0;
+						for(t = TarjanStack;;t = t -> nextontarjanstack)
+						{
+							if(t -> enabled)
+							{
+								result[cardstubborn++] = t;
+							}
+							if(t == current)
+							{
+								result[cardstubborn] = (owfnTransition *) 0;
+								CardFireList = cardstubborn;
+								return(result);
+							}
+						}
+					}
+					else
+					{
+						if(TarjanStack == current) break;
+						TarjanStack = TarjanStack -> nextontarjanstack;
+					}
+				}
+			}
+			// backtracking to previous state
+			next = current -> nextoncallstack;
+			next -> min = MINIMUM(current -> min, next -> min);
+			next -> mbiindex++;
+			current = next;
+		}
+	}
+}
+
+
+#endif
+
+
+
+
+
+
+
+
+
+
+
 

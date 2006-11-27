@@ -168,8 +168,6 @@ void owfnTransition::initialize(oWFN * PN) {
   // abuse the Enabled linked list
   PN->startOfEnabledList = (owfnTransition *) 0;
   PN->transNrEnabled = 0;
-//  PN->startOfQuasiEnabledList = (owfnTransition *) 0;
-//  PN->transNrQuasiEnabled = 0;
   for(i=0;IncrPlaces[i] != NULL;i++)
     {
       for(j=0;j<IncrPlaces[i]->NrOfLeaving;j++)
@@ -182,14 +180,6 @@ void owfnTransition::initialize(oWFN * PN) {
 	      PN->transNrEnabled++;
 	      (IncrPlaces[i]->LeavingArcs)[j]->tr->enabled = true;
 	    }
-//	    if(!(PN->Places[IncrPlaces[i]]->LeavingArcs)[j]->tr->quasiEnabled)
-//	    {
-//	      // not yet in list
-//	      (PN->Places[IncrPlaces[i]]->LeavingArcs)[j]->tr->NextQuasiEnabled = PN->startOfQuasiEnabledList;
-//	      PN->startOfQuasiEnabledList = (PN->Places[IncrPlaces[i]]->LeavingArcs)[j]->tr;
-//	      PN->transNrQuasiEnabled++;
-//	      (PN->Places[IncrPlaces[i]]->LeavingArcs)[j]->tr->quasiEnabled = true;
-//	    }
 	}
     }
 
@@ -199,19 +189,12 @@ void owfnTransition::initialize(oWFN * PN) {
       PN->startOfEnabledList->enabled = false;
       ImproveEnabling[i] = PN->startOfEnabledList;
     }
-//  for(i; PN->startOfQuasiEnabledList; PN->startOfQuasiEnabledList = PN->startOfQuasiEnabledList -> NextQuasiEnabled,i++)
-//    {
-//      PN->startOfQuasiEnabledList->quasiEnabled = false;
-//      ImproveEnabling[i] = PN->startOfQuasiEnabledList;
-//    }
   ImproveEnabling[i] = (owfnTransition *) 0;
   // Create list of transitions where enabledness can change
   // if this transition fires. For collecting these transitions, we
   // abuse the Enabled linked list
   PN->startOfEnabledList = (owfnTransition *) 0;
   PN->transNrEnabled = 0;
-//  PN->startOfQuasiEnabledList = (owfnTransition *) 0;
-//  PN->transNrQuasiEnabled = 0;
   
   for(i=0;DecrPlaces[i] != NULL;i++)
     {
@@ -225,14 +208,6 @@ void owfnTransition::initialize(oWFN * PN) {
 	      PN->transNrEnabled++;
 	      (DecrPlaces[i]->LeavingArcs)[j]->tr->enabled = true;
 	    }
-//	     if(!(PN->Places[DecrPlaces[i]]->LeavingArcs)[j]->tr->quasiEnabled)
-//	    {
-//	      // not yet in list
-//	      (PN->Places[DecrPlaces[i]]->LeavingArcs)[j]->tr->NextQuasiEnabled = PN->startOfQuasiEnabledList;
-//	      PN->startOfQuasiEnabledList = (PN->Places[DecrPlaces[i]]->LeavingArcs)[j]->tr;
-//	      PN->transNrQuasiEnabled++;
-//	      (PN->Places[DecrPlaces[i]]->LeavingArcs)[j]->tr->quasiEnabled = true;
-//	    }
 	}
     }
   	
@@ -243,16 +218,45 @@ void owfnTransition::initialize(oWFN * PN) {
 		ImproveDisabling[i] = PN->startOfEnabledList;
     }
     
-//    for(i; PN->startOfQuasiEnabledList; PN->startOfQuasiEnabledList = PN->startOfQuasiEnabledList -> NextQuasiEnabled,i++) {
-//		PN->startOfQuasiEnabledList->quasiEnabled = false;
-//		ImproveDisabling[i] = PN->startOfQuasiEnabledList;
-//    }
     
   ImproveDisabling[i] = (owfnTransition *) 0;
-  PN->transNrEnabled = 0;
   PN->transNrQuasiEnabled = 0;
  
   set_hashchange(PN);
+#ifdef STUBBORN
+	stamp =0;
+	NextStubborn = 0;
+	instubborn = false;
+	
+	// create list of conflicting transitions
+	PN -> startOfEnabledList = (owfnTransition *) 0;
+	PN->transNrEnabled = 0;
+	for(i=0;PrePlaces[i];i++)
+	{
+		for(j=0;j<PrePlaces[i]->NrOfLeaving;j++)
+		{
+			if(PrePlaces[i]->LeavingArcs[j]->tr != this)
+			{
+				if(!(PrePlaces[i]->LeavingArcs)[j]->tr -> enabled)
+				{
+					(PrePlaces[i]->LeavingArcs)[j]->tr->NextEnabled = PN->startOfEnabledList;
+					PN->startOfEnabledList = (PrePlaces[i]->LeavingArcs)[j]->tr;
+					PN->transNrEnabled ++;
+					(PrePlaces[i]->LeavingArcs)[j]->tr->enabled = true;
+				}
+			}
+		}
+	}
+	conflicting = new owfnTransition * [PN->transNrEnabled + 1];
+	for(i=0;PN->startOfEnabledList;PN->startOfEnabledList = PN->startOfEnabledList ->NextEnabled,i++)
+	{
+		PN->startOfEnabledList ->enabled = false;
+		conflicting[i] = PN->startOfEnabledList;
+	}
+	conflicting[i] = (owfnTransition *) 0;
+	mustbeincluded = conflicting;
+#endif
+  PN->transNrEnabled = 0;
 }
 
 
@@ -412,6 +416,9 @@ void owfnTransition::excludeTransitionFromQuasiEnabledList(oWFN * PN) {
 void owfnTransition::check_enabled(oWFN * PN) {
 	owfnPlace* * p;
 	unsigned int *i;
+#ifdef STUBBORN
+	owfnPlace * scape;
+#endif
 
 	messageSet.clear();
 
@@ -419,6 +426,9 @@ void owfnTransition::check_enabled(oWFN * PN) {
 
 	for(p = PrePlaces , i = Pre ; *p != NULL; p++ , i++) {
 		if(PN->CurrentMarking[(* p)->index] < *i) {
+#ifdef STUBBORN
+			scape = *p;
+#endif
 			if ((* p)->type == INPUT) {
 				messageSet.insert((* p)->index);
 				quasiEnabledNr++;	// remember that we have found an input pre-place with no appropriate marking
@@ -439,6 +449,9 @@ void owfnTransition::check_enabled(oWFN * PN) {
 			PrevEnabled = (owfnTransition *) 0;
 			enabled = true;
 			PN->transNrEnabled++;
+#ifdef STUBBORN
+			mustbeincluded = conflicting;
+#endif
 		}
 		if (quasiEnabled) {		// transition was quasi enabled before
 			quasiEnabled = false;
@@ -462,12 +475,22 @@ void owfnTransition::check_enabled(oWFN * PN) {
 			enabled = false;
 			PN->transNrEnabled--;
 			excludeTransitionFromEnabledList(PN);		// delete transition from list of enabled transtions
+#ifdef STUBBORN
+			mustbeincluded = scape ->PreTransitions;
+			scapegoat = scape;
+#endif
+			
 		}
 	} else {	// transition is not enabled at all
 	    if (enabled) {		// transition was enabled before
 			enabled = false;
 			PN->transNrEnabled--;
 			excludeTransitionFromEnabledList(PN);		// delete transition from list of enabled transtions
+#ifdef STUBBORN
+			mustbeincluded = scape ->PreTransitions;
+			scapegoat = scape;
+#endif
+
 		}
 		if (quasiEnabled) {  // transition was quasi enabled before
 			quasiEnabled = false;

@@ -73,6 +73,12 @@ class owfnPlace : public Node {
 		unsigned int cardprop; // number of propositions in final condition that mention this place
 		formula ** proposition; // array of propositions in final condition that mention this place
 					// used for quick re-evaluation of condition
+// *** Definitions for stubborn set calculations
+#ifdef STUBBORN
+		owfnTransition ** PreTransitions;    // these transitions must be included in
+						 // stubborn set if this place is scapegoat
+		void initialize();		 // initialize PreTransitions
+#endif
 
         // Provides user defined operator new. Needed to trace all new
         // operations on this class.

@@ -51,7 +51,7 @@
 // technique will be switched off automatically.
 
 //#define COVER
-//#define STUBBORN
+#define STUBBORN
 //#define SYMMETRY
 
 // In connection with STATEPREDICATE (below), there exist two versions of

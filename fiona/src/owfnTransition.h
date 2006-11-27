@@ -88,6 +88,21 @@ class owfnTransition : public Node {
 							  		// some fired transition disables this one
 		unsigned int lastfired; 	// dfsnum of last state where this tr. was fired
 
+// *** Definitions for stubborn set calculations
+#ifdef STUBBORN
+		owfnTransition * NextStubborn;    	// elements of stubborn set are organized as linked list
+		bool instubborn;		// ... and marked
+		owfnPlace * scapegoat;		// an insufficiently marked pre-place, if this disabled
+		owfnTransition ** mustbeincluded;	// If this is in stubborn set, so must be the ones in array
+		owfnTransition ** conflicting;	// conflicting transitions, for use as mustbeincluded
+		unsigned int dfs;		// stubborn sets are calculated through scc detection
+		unsigned int min;		// = Tarjan's lowlink
+		unsigned int stamp;		// used to mark visited transitions
+		unsigned int mbiindex;		// currently processed index in mustbeincluded
+		owfnTransition * nextontarjanstack; // stack organized as list
+		owfnTransition * nextoncallstack;	// stack organized as list 
+#endif
+
         // Provides user defined operator new. Needed to trace all new
         // operations on this class.
 #undef new

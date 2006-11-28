@@ -28,13 +28,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/11/24 14:57:10 $
+ * \date    \$Date: 2006/11/28 12:39:57 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.54 $
+ * \version \$Revision: 1.55 $
  *
  * \ingroup petrinet
  */
@@ -50,9 +50,12 @@
 #include "petrinet.h"		// to define member functions
 #include "debug.h"		// debugging help
 #include "helpers.h"		// helper functions
-#include "bpel2owfn.h"
 #include "options.h"
+
+#ifdef USING_BPEL2OWFN
+#include "bpel2owfn.h"
 #include "ast-details.h"
+#endif
 
 #ifndef USING_BPEL2OWFN
 #include "bpel2owfn_wrapper.h"

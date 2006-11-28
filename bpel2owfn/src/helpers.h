@@ -28,13 +28,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2006/11/24 09:52:24 $
+ * \date    \$Date: 2006/11/28 12:39:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.39 $
+ * \version \$Revision: 1.40 $
  *
  * \ingroup conversion
  * \ingroup debug
@@ -58,9 +58,11 @@
 #include <set>
 #include <string>
 #include <vector>
-
-#include "ast-config.h"		// all you need from Kimwitu++
 #include "bpel2owfn.h"
+
+#ifdef USING_BPEL2OWFN
+#include "ast-config.h"		// all you need from Kimwitu++
+#endif
 
 using namespace std;
 
@@ -71,9 +73,11 @@ using namespace std;
  * Conversion and error handling functions
  *****************************************************************************/
 
-string toString(kc::integer i);
 string toString(int i);
 string toString(vector<unsigned int> &v);
+#ifdef USING_BPEL2OWFN
+string toString(kc::integer i);
+#endif
 int toInt(string s);
 unsigned int toUInt(string s);
 void error();

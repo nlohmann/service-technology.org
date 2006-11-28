@@ -28,13 +28,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2006/11/24 14:39:44 $
+ * \date    \$Date: 2006/11/28 12:39:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.61 $
+ * \version \$Revision: 1.62 $
  *
  * \ingroup conversion
  * \ingroup debug
@@ -68,6 +68,7 @@ using namespace std;
  * Conversion functions
  *****************************************************************************/
 
+#ifdef USING_BPEL2OWFN
 /*!
  * \brief converts integer to string
  *
@@ -82,7 +83,7 @@ string toString(kc::integer i)
 {
   return toString(i->value);
 }
-
+#endif
 
 
 

@@ -440,8 +440,9 @@ void PAssign(const impl_tAssign* abstract_phylum, uview current_view)
       
 	    Transition *t1 = TheNet->newTransition(newPrefix + "t1");
 	    TheNet->newArc(lastPlace, t1);
-	    TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[from->id]->variableName), t1, READ);
 	    TheNet->newArc(t1, p2);
+            if (!parameters[P_NOVARIABLES])
+	      TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[from->id]->variableName), t1, READ);
 
 	    Transition *t2 = TheNet->newTransition(newPrefix + "t2");
 	    TheNet->newArc(p2, t2);

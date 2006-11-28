@@ -24,17 +24,17 @@
  * \brief   functions for Petri nets
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nlohmann $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/11/24 14:47:04 $
+ * \date    \$Date: 2006/11/28 09:28:24 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.154 $
+ * \version \$Revision: 1.155 $
  *
  * \ingroup petrinet
  */
@@ -718,6 +718,24 @@ set<Node *> PetriNet::preset(Node *n)
 
 
 /*!
+ * \param s a set of nodes of the Petri net
+ * \result the merged preset of the nodes in s
+ */
+set<Node*> PetriNet::preset(set<Node *> &s)
+{
+  set<Node *> result;
+
+  for (set<Node *>::iterator n = s.begin(); n != s.end(); n++)
+    result = setUnion(result, preset(*n));
+
+  return result;
+}
+
+
+
+
+
+/*!
  * \param n a node of the Petri net
  * \result the postset of node n
  */
@@ -730,6 +748,24 @@ set<Node *> PetriNet::postset(Node *n)
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     if ((*f)->source == n)
       result.insert((*f)->target);
+
+  return result;
+}
+
+
+
+
+
+/*!
+ * \param s a set of nodes of the Petri net
+ * \result the merged postset of the nodes in s
+ */
+set<Node*> PetriNet::postset(set<Node *> &s)
+{
+  set<Node *> result;
+
+  for (set<Node *>::iterator n = s.begin(); n != s.end(); n++)
+    result = setUnion(result, postset(*n));
 
   return result;
 }

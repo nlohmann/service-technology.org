@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/22 15:29:51 $
+ * \date    \$Date: 2006/11/28 09:28:24 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.105 $
+ * \version \$Revision: 1.106 $
  *
  * \ingroup petrinet
  */
@@ -384,8 +384,14 @@ class PetriNet
     /// calculates the preset of a node
     set<Node*> preset(Node *n);
 
+    /// calculates the preset of a set of nodes
+    set<Node*> preset(set<Node *> &s);
+
     /// calculates the postset of a node
     set<Node*> postset(Node *n);
+
+    /// calculates the postset of a set of nodes
+    set<Node*> postset(set<Node *> &s);
 
     /// simplifies the Petri net
     void simplify();
@@ -459,7 +465,6 @@ class PetriNet
     /// remove transitive nodes and arcs
     void transitiveReduction();
 
-    
     /// removes interface places (for non-oWFN formats)
     void removeInterface();
   

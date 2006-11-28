@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/28 13:29:53 $
+ * \date    \$Date: 2006/11/28 14:01:26 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.107 $
+ * \version \$Revision: 1.108 $
  *
  * \ingroup petrinet
  */
@@ -79,10 +79,10 @@
  */
 typedef enum
 {
-  INTERNAL,			///< non-communicating (standard)
-  IN,				///< input of an open workflow net (oWFN)
-  OUT,				///< output of an open workflow net (oWFN)
-  INOUT				///< input and output of an open workflow net (oWFN)
+  INTERNAL,		///< non-communicating (standard)
+  IN,			///< input of an open workflow net (oWFN)
+  OUT,			///< output of an open workflow net (oWFN)
+  INOUT			///< input and output of an open workflow net (oWFN)
 } communication_type;
 
 
@@ -99,8 +99,8 @@ typedef enum
  */
 typedef enum
 {
-  STANDARD,			///< standard arc
-  READ				///< read arc (will be unfolded to a loop)
+  STANDARD,		///< standard arc
+  READ			///< read arc (will be unfolded to a loop)
 } arc_type;
 
 
@@ -117,8 +117,8 @@ typedef enum
  */
 typedef enum
 {
-  PLACE,			///< a place
-  TRANSITION			///< a transition
+  PLACE,		///< a place
+  TRANSITION		///< a transition
 } node_type;
 
 
@@ -156,7 +156,7 @@ class Node
     /// the type of the node
     node_type nodeType;
 
-    /// the std::set of roles (i.e. the history) of the node
+    /// the set of roles (i.e. the history) of the node
     std::vector<std::string> history;
 
     /// true if first role contains role
@@ -382,13 +382,13 @@ class PetriNet
     /// calculates the prestd::set of a node
     std::set<Node*> preset(Node *n);
 
-    /// calculates the prestd::set of a std::set of nodes
+    /// calculates the prestd::set of a set of nodes
     std::set<Node*> preset(std::set<Node *> &s);
 
     /// calculates the poststd::set of a node
     std::set<Node*> postset(Node *n);
 
-    /// calculates the poststd::set of a std::set of nodes
+    /// calculates the poststd::set of a set of nodes
     std::set<Node*> postset(std::set<Node *> &s);
 
     /// simplifies the Petri net
@@ -442,7 +442,7 @@ class PetriNet
     /// remove unused status places
     void removeUnusedStatusPlaces();
 
-    /// remove transitions with empty pre or poststd::set
+    /// remove transitions with empty pre or postset
     void removeSuspiciousTransitions();
 
     /// remove dead nodes of the Petri net
@@ -507,7 +507,7 @@ class PetriNet
 
 
 
-/**
+/*!
  * \defgroup petrinet Petri Net API
  *
  * \author Niels Lohmann <nlohmann@informatik.hu-berlin.de>

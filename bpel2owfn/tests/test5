@@ -20,30 +20,30 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/28 14:10:54 $ by $Author: gierds $.
-# Version $Revision: 1.3 $
+# File last changed $Date: 2006/11/28 14:46:20 $ by $Author: nlohmann $.
+# Version $Revision: 1.4 $
 
 echo ""
 
-rm -rf $testdir/coffee/*.task $testdir/coffee/*.lola
+rm -rf $testdir/consistency/*.task $testdir/consistency/*.lola
 
 echo "test: consistency mode"
 echo "customer 1"
-bpel2owfn --input=$testdir/consistency/coffee.bpel --input=$testdir/consistency/customer1.bpel --mode=consistency --format=lola --parameter=communicationonly --parameter=simplify --output=$testdir/consistency/coffee_customer1 &> /dev/null
+bpel2owfn --input=$testdir/consistency/coffee.bpel --input=$testdir/consistency/customer1.bpel --mode=consistency --format=lola --parameter=communicationonly --parameter=simplify --output=coffee_customer1 &> /dev/null
 result1=$?
 
 echo "customer 2"
-bpel2owfn --input=$testdir/consistency/coffee.bpel --input=$testdir/consistency/customer2.bpel --mode=consistency --format=lola --parameter=communicationonly --parameter=simplify --output=$testdir/consistency/coffee_customer2 &> /dev/null
+bpel2owfn --input=$testdir/consistency/coffee.bpel --input=$testdir/consistency/customer2.bpel --mode=consistency --format=lola --parameter=communicationonly --parameter=simplify --output=coffee_customer2 &> /dev/null
 result2=$?
 
 echo "customer 3"
-bpel2owfn --input=$testdir/consistency/coffee.bpel --input=$testdir/consistency/customer3.bpel --mode=consistency --format=lola --parameter=communicationonly --parameter=simplify --output=$testdir/consistency/coffee_customer3 &> /dev/null
+bpel2owfn --input=$testdir/consistency/coffee.bpel --input=$testdir/consistency/customer3.bpel --mode=consistency --format=lola --parameter=communicationonly --parameter=simplify --output=coffee_customer3 &> /dev/null
 result3=$?
 
 if test \( $result1 -eq 0 -a $result2 -eq 0 -a $result3 -eq 0 \) \
-	-a \( -f $testdir/consistency/coffee_customer1.lola -a -f $testdir/consistency/coffee_customer1.task \) \
-	-a \( -f $testdir/consistency/coffee_customer2.lola -a -f $testdir/consistency/coffee_customer2.task \) \
-	-a \( -f $testdir/consistency/coffee_customer3.lola -a -f $testdir/consistency/coffee_customer3.task \)
+	-a \( -f coffee_customer1.lola -a -f coffee_customer1.task \) \
+	-a \( -f coffee_customer2.lola -a -f coffee_customer2.task \) \
+	-a \( -f coffee_customer3.lola -a -f coffee_customer3.task \)
 then
   result=0
 else

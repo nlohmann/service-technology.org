@@ -20,21 +20,21 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/06 21:30:00 $ by $Author: nlohmann $.
-# Version $Revision: 1.7 $
+# File last changed $Date: 2006/11/28 14:46:20 $ by $Author: nlohmann $.
+# Version $Revision: 1.8 $
 
 echo ""
 
 echo "test: oWFN creation"
-bpel2owfn --input=$testdir/purchase.bpel --mode=petrinet --format=owfn > purchase.owfn &> /dev/null
+bpel2owfn --input=$testdir/purchase.bpel --mode=petrinet --format=owfn --output=purchase &> /dev/null
 result1=$?
 
 echo "test: LoLA creation"
-bpel2owfn --input=$testdir/loan.bpel --mode=petrinet --format=lola > loan.lola &> /dev/null
+bpel2owfn --input=$testdir/loan.bpel --mode=petrinet --format=lola --output=loan &> /dev/null
 result2=$?
 
 echo "test: dot creation"
-bpel2owfn --input=$testdir/shipping.bpel --mode=petrinet --parameter=simplify --format=dot > shipping.dot &> /dev/null
+bpel2owfn --input=$testdir/shipping.bpel --mode=petrinet --parameter=simplify --format=dot --output=shipping &> /dev/null
 result3=$?
 
 if test \( $result1 -eq 0 -a $result2 -eq 0 -a $result3 -eq 0 \) -a \

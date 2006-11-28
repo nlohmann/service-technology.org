@@ -20,8 +20,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/06 21:30:00 $ by $Author: nlohmann $.
-# Version $Revision: 1.6 $
+# File last changed $Date: 2006/11/28 14:46:20 $ by $Author: nlohmann $.
+# Version $Revision: 1.7 $
 
 echo ""
 
@@ -33,12 +33,8 @@ echo "test: XML creation"
 bpel2owfn --input=$testdir/purchase.bpel --mode=pretty -fxml --output=purchase  &> /dev/null
 result2=$?
 
-echo "test: AST creation"
-bpel2owfn --input=$testdir/shipping.bpel --mode=ast > shipping.ast &> /dev/null
-result3=$?
-
-if test \( $result1 -eq 0 -a $result2 -eq 0 -a $result3 -eq 0 \) -a \
-	\( -f purchase.xml -a -f shipping.ast \)
+if test \( $result1 -eq 0 -a $result2 -eq 0 \) -a \
+	\( -f purchase.xml \)
 then
   result=0
 else

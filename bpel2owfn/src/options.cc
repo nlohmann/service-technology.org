@@ -24,17 +24,17 @@
  * \brief   evaluation of command-line options
  *
  * \author  responsible: Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nlohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/24 15:02:56 $
+ * \date    \$Date: 2006/11/28 13:44:27 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  */
 
 
@@ -156,19 +156,20 @@ void print_help()
   trace(" -v, --version              print program version and exit\n");
   trace("\n");
   trace("  MODE is one of the following (at most one mode permitted):\n");
-  trace("    petrinet                  create a Petri net representation\n");
-  trace("    ast                       print the abstract syntax tree\n");
-  trace("    pretty                    pretty-print the input BPEL process\n");
-  trace("    cfg                       build a control flow graph\n");
+  trace("    petrinet                create a Petri net representation\n");
+  trace("    ast                     print the abstract syntax tree\n");
+  trace("    pretty                  pretty-print the input BPEL process\n");
+  trace("    cfg                     build a control flow graph\n");
+  trace("    consistency             checks whether services communicate deadlock-freely\n");
   trace("\n");
   trace("  PARAMETER is one of the following (multiple parameters permitted):\n");
-  trace("    simplify                  structurally simplify generated Petri net\n");
-  trace("    novariables               do not model BPEL variables\n");
-  trace("    nostandardfaults          do not model BPEL standard faults\n");
-  trace("    nofhfaults                do not model faults in fault handlers \n");
-  trace("    communicationonly         only model the communicational behavior\n");
-  trace("    xor                       use mutually exclusive transition condition\n");
-  trace("    wsbpel                    use the semantics of WS-BPEL 2.0\n");
+  trace("    simplify                structurally simplify generated Petri net\n");
+  trace("    novariables             do not model BPEL variables\n");
+  trace("    nostandardfaults        do not model BPEL standard faults\n");
+  trace("    nofhfaults              do not model faults in fault handlers \n");
+  trace("    communicationonly       only model the communicational behavior\n");
+  trace("    xor                     use mutually exclusive transition condition\n");
+  trace("    wsbpel                  use the semantics of WS-BPEL 2.0\n");
   trace("\n");
   trace("  FORMAT is one of the following (multiple formats permitted):\n");
   trace("    lola, owfn, dot, pep, apnn, info, pnml, txt, info\n");

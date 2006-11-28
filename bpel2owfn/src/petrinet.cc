@@ -24,17 +24,17 @@
  * \brief   functions for Petri nets
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/11/28 09:28:24 $
+ * \date    \$Date: 2006/11/28 13:57:37 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.155 $
+ * \version \$Revision: 1.156 $
  *
  * \ingroup petrinet
  */
@@ -939,6 +939,8 @@ void PetriNet::addPrefix(string prefix)
  */
 void PetriNet::connectNet(PetriNet * net)
 {
+  ENTER("connectNet");
+
   for (set< Place * >::iterator place = net->P.begin(); place != net->P.end(); place ++)
   {
     (*place)->id = getId();
@@ -970,11 +972,13 @@ void PetriNet::connectNet(PetriNet * net)
     {
       roleMap[(*place)->prefix + *name] = *place;
     }
+
     set< Place * >::iterator oPlace = P_out.begin();
+    
     bool finished = false;
     while ( ! finished && oPlace != P_out.end())
     {
-      if ((*oPlace)->nodeName() != (*place)->nodeName())
+      if ((*oPlace)->nodeName().erase(0,4) != (*place)->nodeShortName().erase(0,3))
 	oPlace++;
       else
 	finished = true;
@@ -1000,11 +1004,13 @@ void PetriNet::connectNet(PetriNet * net)
     {
       roleMap[(*place)->prefix + *name] = *place;
     }
+   
     set< Place * >::iterator iPlace = P_in.begin();
+    
     bool finished = false;
     while (!finished && (iPlace != P_in.end()))
     {
-      if ((*iPlace)->nodeName() != (*place)->nodeName())
+      if ((*iPlace)->nodeShortName().erase(0,3) != (*place)->nodeShortName().erase(0,4))
 	iPlace++;
       else
 	finished = true;
@@ -1024,6 +1030,8 @@ void PetriNet::connectNet(PetriNet * net)
 
   P_in = setUnion(P_in, additionalP_in);
   P_out = setUnion(P_out, additionalP_out); 
+
+  LEAVE("connectNet");
 }
 
 

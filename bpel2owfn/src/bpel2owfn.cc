@@ -24,18 +24,18 @@
  * \brief   BPEL2oWFN's main
  * 
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nlohmann $
  * 
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/24 14:47:04 $
+ * \date    \$Date: 2006/11/28 13:29:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.119 $
+ * \version \$Revision: 1.120 $
  */
 
 
@@ -299,7 +299,7 @@ int main( int argc, char *argv[])
 	output = openOutput(output_filename + "." + suffixes[F_OWFN]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for oWFN ...\n");
-      TheNet->owfnOut();
+      TheNet->owfnOut(output);
       if (output_filename != "")
       {
 	closeOutput(output);
@@ -319,7 +319,7 @@ int main( int argc, char *argv[])
 	TheNet->makeChannelsInternal();
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for LoLA ...\n");
-      TheNet->lolaOut();
+      TheNet->lolaOut(output);
       if (output_filename != "")
       {
 	closeOutput(output);
@@ -369,7 +369,7 @@ int main( int argc, char *argv[])
 	output = openOutput(output_filename + "." + suffixes[F_PNML]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for PNML ...\n");
-      TheNet->pnmlOut();
+      TheNet->pnmlOut(output);
       if (output_filename != "")
       {
 	closeOutput(output);
@@ -385,7 +385,7 @@ int main( int argc, char *argv[])
 	output = openOutput(output_filename + "." + suffixes[F_PEP]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for PEP ...\n");
-      TheNet->pepOut();
+      TheNet->pepOut(output);
       if (output_filename != "")
       {
 	closeOutput(output);
@@ -401,7 +401,7 @@ int main( int argc, char *argv[])
 	output = openOutput(output_filename + "." + suffixes[F_APNN]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for APNN ...\n");
-      TheNet->apnnOut();
+      TheNet->apnnOut(output);
       if (output_filename != "")
       {
 	closeOutput(output);
@@ -417,7 +417,7 @@ int main( int argc, char *argv[])
 	output = openOutput(output_filename + "." + suffixes[F_DOT]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for dot ...\n");
-      TheNet->dotOut();
+      TheNet->dotOut(output);
       if (output_filename != "")
       {
 	closeOutput(output);
@@ -440,7 +440,7 @@ int main( int argc, char *argv[])
 	output = openOutput(output_filename + "." + suffixes[F_INFO]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net information ...\n");
-      TheNet->printInformation();
+      TheNet->infoOut(output);
       if (output_filename != "")
       {
 	closeOutput(output);

@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/28 09:28:24 $
+ * \date    \$Date: 2006/11/28 13:29:53 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.106 $
+ * \version \$Revision: 1.107 $
  *
  * \ingroup petrinet
  */
@@ -55,12 +55,10 @@
  *****************************************************************************/
 
 #include <string>
-#include <iostream>
+#include <ostream>
 #include <vector>
 #include <set>
 #include <map>
-
-using namespace std;
 
 
 
@@ -150,34 +148,34 @@ class Node
     unsigned int id;
 
     /// the name of the type
-    virtual string nodeTypeName();
+    virtual std::string nodeTypeName();
 
     /// the short name of the node
-    virtual string nodeShortName();
+    virtual std::string nodeShortName();
 
     /// the type of the node
     node_type nodeType;
 
-    /// the set of roles (i.e. the history) of the node
-    vector<string> history;
+    /// the std::set of roles (i.e. the history) of the node
+    std::vector<std::string> history;
 
     /// true if first role contains role
-    bool firstMemberAs(string role);
+    bool firstMemberAs(std::string role);
 
     /// true if first role begins with role
-    bool firstMemberIs(string role);
+    bool firstMemberIs(std::string role);
     
     /// true if history contains role
-    bool historyContains(string role);
+    bool historyContains(std::string role);
 
     /// type of node as defined in #communication_type
     communication_type type;
 
     /// the name of the node
-    string nodeName();
+    std::string nodeName();
 
     /// an additional prefix for the name in order to distinguish nodes of different nets
-    string prefix;
+    std::string prefix;
 
     /// destructor
     virtual ~Node();
@@ -205,16 +203,16 @@ class Transition: public Node
 {
   public:
     /// constructor which creates a transition and adds a first role to the history
-    Transition(unsigned int id, string role);
+    Transition(unsigned int id, std::string role);
 
     /// DOT-output of the transition (used by PetriNet::dotOut())
-    string dotOut();
+    std::string dotOut();
 
     /// the name of the type
-    string nodeTypeName();
+    std::string nodeTypeName();
     
     /// the short name of the transition
-    string nodeShortName();
+    std::string nodeShortName();
 };
 
 
@@ -242,16 +240,16 @@ class Place: public Node
 {
   public:
     /// constructor which creates a place and adds a first role to the history
-    Place(unsigned int id, string role, communication_type type);
+    Place(unsigned int id, std::string role, communication_type type);
 
     /// DOT-output of the place (used by PetriNet::dotOut())
-    string dotOut();
+    std::string dotOut();
 
     /// the name of the type
-    string nodeTypeName();
+    std::string nodeTypeName();
 
     /// the short name of the place
-    string nodeShortName();
+    std::string nodeShortName();
 
     /// mark the place
     void mark(unsigned int tokens = 1);
@@ -291,7 +289,7 @@ class Arc
     Arc(Node *source, Node *target, unsigned int weight = 1);
   
     /// DOT-output of the arc (used by PetriNet::dotOut())
-    string dotOut();
+    std::string dotOut();
 
     /// weight of the arc (experimental)
     unsigned int weight;
@@ -310,7 +308,7 @@ class Arc
  * \brief A Petri net
  *
  * Class to represent Petri nets. The net is consists of places of class
- * #Place, transitions of class #Transition and arcs of class #Arc. The sets
+ * #Place, transitions of class #Transition and arcs of class #Arc. The std::sets
  * are saved in three lists #P, #T and #F.
  *
  * \ingroup petrinet
@@ -321,77 +319,77 @@ class PetriNet
 {
   public:
     /// adds a place with a given role and type
-    Place* newPlace(string role, communication_type type = INTERNAL);
+    Place* newPlace(std::string role, communication_type type = INTERNAL);
   
     /// adds a transition with a given role
-    Transition*newTransition(string role);
+    Transition*newTransition(std::string role);
   
     /// adds an arc given source and target node, and arc type
     Arc *newArc(Node *source, Node *target, arc_type type = STANDARD, unsigned int weight = 1);
 
-    /// information about the net including histories of all nodes
-    void printInformation();
 
+    /// info file output
+    void infoOut(std::ostream *output);
 
     /// DOT (Graphviz) output
-    void dotOut();
+    void dotOut(std::ostream *output);
 
     /// PNML (Petri Net Markup Language) output
-    void pnmlOut();
+    void pnmlOut(std::ostream *output);
 
     /// low-level PEP output
-    void pepOut();
+    void pepOut(std::ostream *output);
 
     /// APNN (Abstract Petri Net Notation) output
-    void apnnOut();
+    void apnnOut(std::ostream *output);
 
     /// LoLA-output
-    void lolaOut();
+    void lolaOut(std::ostream *output);
 
     /// oWFN-output
-    void owfnOut();
+    void owfnOut(std::ostream *output);
 
 
     /// merges places given two places
     void mergePlaces(Place *p1, Place *p2);
 
     /// merges places given two roles
-    void mergePlaces(string role1, string role2);
+    void mergePlaces(std::string role1, std::string role2);
 
     /// merges places given two identifiers and roles
-    void mergePlaces(unsigned int id1, string role1, unsigned int id2, string role2);
+    void mergePlaces(unsigned int id1, std::string role1, unsigned int id2, std::string role2);
     
     /// merges transitions given two transitions
     void mergeTransitions(Transition *t1, Transition *t2);
 
 
     /// finds place given a role
-    Place* findPlace(string role);
+    Place* findPlace(std::string role);
 
     /// finds place given an id with a role
-    Place* findPlace(unsigned int id, string role);
+    Place* findPlace(unsigned int id, std::string role);
 
-    /// finds a place given the ids of two transitions (one in the pre and one in the postset)
+    /// finds a place given the ids of two transitions (one in the pre and one in the poststd::set)
     Place *findPlace(unsigned int id1, unsigned int id2);
 
     /// rename a node (i.e., rename one role in its history)
-    void renamePlace(string old_name, string new_name);
+    void renamePlace(std::string old_name, std::string new_name);
 
 
     /// finds transition given a role
-    Transition* findTransition(string role);
+    Transition* findTransition(std::string role);
 
-    /// calculates the preset of a node
-    set<Node*> preset(Node *n);
+    /// calculates the prestd::set of a node
+    std::set<Node*> preset(Node *n);
 
-    /// calculates the preset of a set of nodes
-    set<Node*> preset(set<Node *> &s);
+    /// calculates the prestd::set of a std::set of nodes
+    std::set<Node*> preset(std::set<Node *> &s);
 
-    /// calculates the postset of a node
-    set<Node*> postset(Node *n);
+    /// calculates the poststd::set of a node
+    std::set<Node*> postset(Node *n);
 
-    /// calculates the postset of a set of nodes
-    set<Node*> postset(set<Node *> &s);
+    /// calculates the poststd::set of a std::set of nodes
+    std::set<Node*> postset(std::set<Node *> &s);
 
     /// simplifies the Petri net
     void simplify();
@@ -400,7 +398,7 @@ class PetriNet
     void removeVariables();
 
     /// adds a prefix to the name of all nodes of the net
-    void addPrefix(string prefix);
+    void addPrefix(std::string prefix);
 
     /// connects a second oWFN
     void connectNet(PetriNet *net);
@@ -412,7 +410,7 @@ class PetriNet
     void reenumerate();
 
     /// statistical output
-    string information();
+    std::string information();
     
     /// constructor
     PetriNet();
@@ -444,7 +442,7 @@ class PetriNet
     /// remove unused status places
     void removeUnusedStatusPlaces();
 
-    /// remove transitions with empty pre or postset
+    /// remove transitions with empty pre or poststd::set
     void removeSuspiciousTransitions();
 
     /// remove dead nodes of the Petri net
@@ -475,20 +473,20 @@ class PetriNet
     unsigned int id();
 
 
-    /// set of places of the Petri net
-    set<Place *> P;
+    /// std::set of places of the Petri net
+    std::set<Place *> P;
 
-    /// set of input places of the oWFN
-    set<Place *> P_in;
+    /// std::set of input places of the oWFN
+    std::set<Place *> P_in;
 
-    /// set of output places of the oWFN
-    set<Place *> P_out;
+    /// std::set of output places of the oWFN
+    std::set<Place *> P_out;
 
-    /// set of transitions of the Petri net
-    set<Transition *> T;
+    /// std::set of transitions of the Petri net
+    std::set<Transition *> T;
 
-    /// set of arcs of the Petri net
-    set<Arc *> F;
+    /// std::set of arcs of the Petri net
+    std::set<Arc *> F;
 
 
     /// id that will be assigned to the next node
@@ -498,7 +496,7 @@ class PetriNet
     bool hasNoInterface;
 
     /// mapping of roles to nodes of the Petri net
-    map<string, Node *> roleMap;
+    std::map<std::string, Node *> roleMap;
 };
 
 
@@ -510,9 +508,9 @@ class PetriNet
 
 
 /**
- * \defgroup petrinet Petri Net Base Module
+ * \defgroup petrinet Petri Net API
  *
- * \author   responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>
+ * \author Niels Lohmann <nlohmann@informatik.hu-berlin.de>
  *
  * All functions needed to organize a Petri net representation that can be
  * written to several output file formats and that supports structural

@@ -28,13 +28,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/11/07 13:24:55 $
+ * \date    \$Date: 2006/11/29 10:12:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.45 $
+ * \version \$Revision: 1.46 $
  *
  * \ingroup debug
  */
@@ -301,6 +301,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
 
     case(81):
        { cerr << "<catch> attribute " << information << endl;
+	 break; }
+
+    case(82):
+       { cerr << "peer-scope dependency relation must not include cycles" << endl;
 	 break; }
 
     case(83):

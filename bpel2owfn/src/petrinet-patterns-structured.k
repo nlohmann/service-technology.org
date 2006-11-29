@@ -624,3 +624,121 @@ void PSwitch(const impl_tSwitch* abstract_phylum, uview current_view)
 
   footer(phylum->id);
 }
+
+
+
+
+
+/******************************************************************************
+  PICK
+******************************************************************************/
+
+void PPick(const impl_tPick* abstract_phylum, uview current_view)
+{
+  impl_tPick_Pick* phylum = (impl_tPick_Pick*) abstract_phylum;
+  assert(phylum != NULL);
+
+  header(phylum->id);
+  string prefix = toString(phylum->id) + ".internal.";
+
+  
+  switch(current_view)
+  {
+    case(petrinet_enum):
+    case(petrinetnew_enum):
+      {
+	Place *p5 = TheNet->newPlace(prefix + "final");
+	Place *p6 = TheNet->newPlace(prefix + "initial");
+	Place *p7 = TheNet->newPlace(prefix + "TimeStamp");
+	Place *p11 = TheNet->newPlace(prefix + "stop");
+	Place *p12 = TheNet->newPlace(prefix + "stopped");
+
+	Transition *t5 = TheNet->newTransition(prefix + "t5");
+	TheNet->newArc(TheNet->findPlace("1.internal.clock"), t5, READ);
+	TheNet->newArc(p6, t5);
+	TheNet->newArc(t5, p7);
+
+  	// Transitions for the negative control flow.
+    	Transition *t7 = stop(p6, "initial", prefix);
+      	Transition *t8 = stop(p7, "TimeStamp", prefix);
+
+
+	// unparse the standard elements
+	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
+
+	// unparse the onMessage branches
+	phylum->tOnMessage_list_1->unparse(pseudoPrinter, current_view);
+	
+	// unparse the onAlarm branches
+	phylum->tOnAlarm_list_1->unparse(pseudoPrinter, current_view);
+
+
+  	// Traverse the <onMessage> branches.
+	int onMessageCount = 1;
+	foreach (ThisBranch = OnMessage(_corr,_from,innerActivity,_id2); tOnMessage_list phylum->tOnMessage_list_1)
+	{
+	  trace(TRACE_DEBUG, "[PNU]\t\t<onMessage>\n");
+	  string message = toString(onMessageCount++);
+	  string newPrefix = prefix + "onMessage" + message + ".";
+	  
+	  Place *p3 = TheNet->newPlace(newPrefix + "p3");
+	  Place *p10 = TheNet->newPlace(newPrefix + "p10");
+
+	  Transition *t2 = TheNet->newTransition(newPrefix + "t2");
+	  TheNet->newArc(TheNet->findPlace("in." + ASTEmap[ThisBranch->id]->channelName), t2);
+	  TheNet->newArc(TheNet->findPlace(phylum->id, ".internal.TimeStamp"), t2);
+	  TheNet->newArc(t2, p3);
+	  t2->type = IN;
+
+	  Transition *t3 = TheNet->newTransition(newPrefix + "t3");
+	  TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[ThisBranch->id]->variableName), t3);
+	  TheNet->newArc(t3, TheNet->findPlace("variable." + ASTEmap[ThisBranch->id]->variableName));
+	  TheNet->newArc(p3, t3);
+	  TheNet->newArc(t3, TheNet->findPlace(innerActivity->id, ".initial"));
+
+	  // Transitions for the negative control flow.
+	  if (parameters[P_NOSTANDARDFAULTS] == false)
+	    Transition *t4 = throwFault(p3, p10, "p3", newPrefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
+
+	  Transition *t9  = stop(p3, "p3at" + message, prefix);
+	  Transition *t10 = stop(p10, "p10at" + message, prefix);
+
+	  
+	  // Embed the inner activity.
+	  TheNet->mergePlaces(phylum->id, ".stop",    innerActivity->id, ".stop");
+	  TheNet->mergePlaces(phylum->id, ".stopped", innerActivity->id, ".stopped");
+	  TheNet->mergePlaces(phylum->id, ".final",   innerActivity->id, ".final");
+
+	  trace(TRACE_DEBUG, "[PNU]\t\t</onMessage>\n");
+	}
+
+	
+	// Traverse the <onAlarm> branches.
+	int onAlarmCount = 1;
+	foreach (onAlarmBranch=OnAlarm(innerActivity); tOnAlarm_list phylum->tOnAlarm_list_1)
+	{
+	  trace(TRACE_DEBUG, "[PNU]\t\t<onAlarm>\n");
+	  string newPrefix = prefix + "onAlarm" + toString(onAlarmCount++) + ".";
+
+	  Transition *t6 = TheNet->newTransition(newPrefix + "t6");
+	  TheNet->newArc(TheNet->findPlace("1.internal.clock"), t6, READ);
+	  TheNet->newArc(TheNet->findPlace(phylum->id, ".internal.TimeStamp"), t6);
+	  TheNet->newArc(t6, TheNet->findPlace(innerActivity->id, ".initial"));
+	  
+	  // Embed the inner activity.
+	  TheNet->mergePlaces(phylum->id, ".stop",    innerActivity->id, ".stop");
+	  TheNet->mergePlaces(phylum->id, ".stopped", innerActivity->id, ".stopped");
+	  TheNet->mergePlaces(phylum->id, ".final",   innerActivity->id, ".final");
+
+	  trace(TRACE_DEBUG, "[PNU]\t\t</onAlarm>\n");
+	}
+
+	break;
+      }
+
+    default: { /* no pattern in this case */ }
+  }
+
+
+  footer(phylum->id);
+}

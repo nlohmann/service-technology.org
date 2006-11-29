@@ -29,7 +29,7 @@
  * 
  * \since   2005-10-03
  *
- * \date    \$Date: 2006/11/29 15:21:07 $
+ * \date    \$Date: 2006/11/29 15:31:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,17 +38,17 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.152 $
+ * \version \$Revision: 1.153 $
  */
 %}
 
 
 %{
 /*!
- * \file bpel-abstract.h
+ * \file ast-grammar.h
  * \brief Abstract grammar of BPEL (interface)
  *
- * See \ref bpel-abstract.cc for more information.
+ * See \ref ast-grammar.cc for more information.
  */
 
 #include "ast-details.h"

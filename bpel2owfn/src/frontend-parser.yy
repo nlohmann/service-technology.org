@@ -37,7 +37,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2006/11/29 15:21:07 $
+ * \date    \$Date: 2006/11/29 15:31:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -47,7 +47,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.276 $
+ * \version \$Revision: 1.277 $
  *
  * \ingroup frontend
  */
@@ -56,10 +56,10 @@
 
 %{	
 /*!
- * \file parser.h
+ * \file frontend-parser.h
  * \brief BPEL parser
  *
- * See \ref parser.cc for more information.
+ * See \ref frontend-parser.cc for more information.
  * \ingroup frontend
  */
 

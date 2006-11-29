@@ -24,18 +24,18 @@
  * \brief   annotations of the AST
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/24 09:52:23 $
+ * \date    \$Date: 2006/11/29 13:42:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.53 $
+ * \version \$Revision: 1.54 $
  */
 
 
@@ -96,22 +96,6 @@ typedef enum
 } attributeType;
 
 
-/*!
- * \brief enumaration of possible relationship between activities
- *
- * Possible answers to the question: What is the relation of A to B?
- */
-typedef enum
-{
-  AR_CONCURRENT,        ///< to activities are concurrent
-  AR_CONFLICT,          ///< to activities are conflict (like in switch)
-  AR_ENCLOSES,          ///< activity B is enclosed in activity A
-  AR_DESCENDS,          ///< activity B is a descendant of activity A
-  AR_BEFORE,            ///< activity A comes before activity B
-  AR_AFTER
-} activityRelation;
-
-
 
 /******************************************************************************
  * Class definitions
@@ -168,7 +152,7 @@ class ASTE
     set<string> catches;		///< the <catch> branches of <faultHandlers> to detect duplicates
 
     set<unsigned int> enclosedActivities;       ///< set of all the enclosed activities
-    set<unsigned int> conflictingActivities;    ///< set of all conflicting activities
+//    set<unsigned int> conflictingActivities;    ///< set of all conflicting activities
 
     string createChannel(bool synchronousCommunication = false);
 

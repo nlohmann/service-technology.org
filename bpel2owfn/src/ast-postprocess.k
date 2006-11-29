@@ -29,7 +29,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/11/23 14:33:39 $
+ * \date    \$Date: 2006/11/29 13:42:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.106 $
+ * \version \$Revision: 1.107 $
  */
 %}
 
@@ -83,6 +83,16 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
       // collect enclosed source links
       assert(ASTEmap[i->id] != NULL);
       myself->enclosedSourceLinks = ASTEmap[i->id]->enclosedSourceLinks;
+
+      set< unsigned int > innerIds = ASTEmap[ i->id ]->enclosedActivities;
+      innerIds.insert( i->id );
+      set< unsigned int > faultIds = ASTEmap[ e->id ]->enclosedActivities;
+      faultIds.insert( e->id );
+      set< unsigned int > compIds = ASTEmap[ f->id ]->enclosedActivities;
+      compIds.insert( f->id );
+
+      enterConflictingActivities( innerIds, faultIds );
+      enterConflictingActivities( faultIds, compIds );
 
       // add an attribute to the compensation handler
       if(PPhasCompensateMap[myid] == 1)
@@ -233,7 +243,31 @@ userDefinedFaultHandler(a,b,_id) ->
     {
       ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
       ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( ASTEmap[ myid ]->enclosedActivities.begin(), ASTEmap[ myid ]->enclosedActivities.end() );
-      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->conflictingActivities.insert( ASTEmap[ myid ]->conflictingActivities.begin(), ASTEmap[ myid ]->conflictingActivities.end() );
+
+      foreach(branch=Catch(innerActivity,_id2); tCatch_list a)
+      {
+        foreach(otherbranch=Catch(secondActivity,_id3); tCatch_list a)
+        {
+          if ( _id2->value < _id3->value )
+          {
+            enterConflictingActivities( ASTEmap[ _id2->value ]->enclosedActivities, ASTEmap[ _id3->value ]->enclosedActivities );
+          }
+        }
+      }
+
+      with (b)
+      {
+        CatchAll(c,_id2) :
+        {
+          foreach(otherbranch=Catch(secondActivity,_id3); tCatch_list a)
+          {
+            enterConflictingActivities( ASTEmap[ _id2->value ]->enclosedActivities, ASTEmap[ _id3->value ]->enclosedActivities );
+          }
+        }
+        default :
+        {
+        }
+      }
     }
   ]
 ;
@@ -265,8 +299,8 @@ Catch(a,_id) ->
     }
     a
     {
-      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
-      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( ASTEmap[ myid ]->enclosedActivities.begin(), ASTEmap[ myid ]->enclosedActivities.end() );
+      ASTEmap[ myid ]->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
+      ASTEmap[ myid ]->enclosedActivities.insert( a->id );
     }
   ]
 ;
@@ -280,8 +314,8 @@ CatchAll(a,_id) ->
     }
     a
     {
-      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( myid );
-      ASTEmap[ ASTEmap[ myid ]->parentActivityId ]->enclosedActivities.insert( ASTEmap[ myid ]->enclosedActivities.begin(), ASTEmap[ myid ]->enclosedActivities.end() );
+      ASTEmap[ myid ]->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
+      ASTEmap[ myid ]->enclosedActivities.insert( a->id );
     }
   ]
 ;
@@ -1167,10 +1201,11 @@ Switch(a,b,c,_id) ->
 
       // distribute the switch's id to the enclosed activities
       // also distribute the control flow
-      foreach(branch=Case(innerActivity); tCase_list b)
+      foreach(branch=Case(innerActivity,_id2); tCase_list b)
       {
         assert(ASTEmap[innerActivity->id] != NULL);
         ASTEmap[innerActivity->id]->parentActivityId = myid;
+        ASTEmap[_id->value]->parentActivityId = myid;
         ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
         ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
       }
@@ -1184,6 +1219,7 @@ Switch(a,b,c,_id) ->
           ASTEmap[d->id]->parentActivityId = myid;
           ASTEmap[d->id]->controlFlow = myself->controlFlow;
           ASTEmap[d->id]->max_occurrences = myself->max_occurrences;
+          
         }
         default: { /* do nothing */ }
       }
@@ -1191,10 +1227,18 @@ Switch(a,b,c,_id) ->
     a b c
     {
       // collect enclosed source links
-      foreach(branch=Case(innerActivity); tCase_list b)
+      foreach(branch=Case(innerActivity,_id2); tCase_list b)
       {
         assert(ASTEmap[innerActivity->id] != NULL);
         myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
+
+        foreach(otherbranch=Case(secondActivity,_id3); tCase_list b)
+        {
+          if ( _id2->value < _id3->value )
+          {
+            enterConflictingActivities( ASTEmap[ _id2->value ]->enclosedActivities, ASTEmap[ _id3->value ]->enclosedActivities );
+          }
+        }
       }
 
       with(c)
@@ -1203,6 +1247,11 @@ Switch(a,b,c,_id) ->
         {
           assert(ASTEmap[d->id] != NULL);
           myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[d->id]->enclosedSourceLinks);
+
+          foreach(otherbranch=Case(secondActivity,_id3); tCase_list b)
+          {
+            enterConflictingActivities( ASTEmap[ e->value ]->enclosedActivities, ASTEmap[ _id3->value ]->enclosedActivities );
+          }
         }
         default: { /* do nothing */ }
       }
@@ -1224,6 +1273,10 @@ Case(a,_id) ->
       myself->checkAttributes();
     }
     a
+    {
+      ASTEmap[ myid ]->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
+      ASTEmap[ myid ]->enclosedActivities.insert( a->id );
+    }
   ]
 ;
 
@@ -1237,6 +1290,10 @@ Otherwise(a,_id) ->
       myself->parentScopeId = PPcurrentScope;
     }
     a
+    {
+      ASTEmap[ myid ]->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
+      ASTEmap[ myid ]->enclosedActivities.insert( a->id );
+    }
   ]
 ;
 
@@ -1318,6 +1375,10 @@ ElseIf(a,_id) ->
       myself->checkAttributes();
     }
     a
+    {
+      ASTEmap[ myid ]->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
+      ASTEmap[ myid ]->enclosedActivities.insert( a->id );
+    }
   ]
 ;
 
@@ -1331,6 +1392,10 @@ Else(a,_id) ->
       myself->parentScopeId = PPcurrentScope;
     }
     a
+    {
+      ASTEmap[ myid ]->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
+      ASTEmap[ myid ]->enclosedActivities.insert( a->id );
+    }
   ]
 ;
 
@@ -1540,11 +1605,32 @@ Pick(a,b,c,_id) ->
       {
         assert(ASTEmap[innerActivity->id] != NULL);
         myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
+
+        foreach(otherbranch=OnMessage(*,*,secondActivity,_id3); tOnMessage_list b)
+        {
+          if (_id2->value < _id3->value)
+          {
+            enterConflictingActivities( ASTEmap[ _id2->value ]->enclosedActivities, ASTEmap[ _id3->value ]->enclosedActivities );
+          }
+        }
       }
       foreach(branch=OnAlarm(innerActivity); tOnAlarm_list c)
       {
         assert(ASTEmap[innerActivity->id] != NULL);
         myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
+
+        foreach(otherbranch=OnMessage(*,*,secondActivity,*); tOnMessage_list b)
+        {
+          enterConflictingActivities( ASTEmap[ innerActivity->id ]->enclosedActivities, ASTEmap[ secondActivity->id ]->enclosedActivities );
+        }
+
+        foreach(otherbranch=OnAlarm(secondActivity); tOnAlarm_list c)
+        {
+          if (innerActivity->id < secondActivity->id)
+          {
+            enterConflictingActivities( ASTEmap[ innerActivity->id ]->enclosedActivities, ASTEmap[ secondActivity->id ]->enclosedActivities );
+          }
+        }
       }
 
 
@@ -1720,6 +1806,15 @@ Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
       if(PPhasCompensateMap[myid] == 2)
         d->hasCompensateWithScope = true;
 
+      set< unsigned int > innerIds = ASTEmap[ i->id ]->enclosedActivities;
+      innerIds.insert( i->id );
+      set< unsigned int > faultIds = ASTEmap[ c->id ]->enclosedActivities;
+      faultIds.insert( c->id );
+      set< unsigned int > compIds = ASTEmap[ d->id ]->enclosedActivities;
+      compIds.insert( d->id );
+
+      enterConflictingActivities( innerIds, faultIds );
+      enterConflictingActivities( faultIds, compIds );
 
       // pass list of enclosed scopes to the compensation handler
       ASTEmap[d->id]->enclosedScopes = myself->enclosedScopes;

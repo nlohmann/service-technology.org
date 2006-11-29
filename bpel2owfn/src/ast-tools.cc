@@ -24,17 +24,17 @@
  * \brief   unparse helper tools
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/11/26 18:10:01 $
+ * \date    \$Date: 2006/11/29 13:42:59 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -527,9 +527,42 @@ void process_loop_bounds(vector<unsigned int> &loop_bounds, vector<unsigned int>
   }
 }
 
+namespace {
+    map< pair< unsigned int, unsigned int >, activityRelationType > activityRelationMap;
+}
 
+activityRelationType activityRelation(unsigned int a, unsigned int b)
+{
+    ENTER("activityRelation");
+    return activityRelationMap[pair<unsigned int,unsigned int>(a,b)];
+    LEAVE("activityRelation");
+}
 
+void conflictingActivities(unsigned int a, unsigned int b)
+{
+    ENTER("conflictingActivities");
+    cerr << "Conflicting: \t" << a << "\t <-> \t" << b << endl; 
+    activityRelationMap[pair<unsigned int, unsigned int>(a,b)] = AR_CONFLICT;
+    activityRelationMap[pair<unsigned int, unsigned int>(b,a)] = AR_CONFLICT;
+    LEAVE("conflictingActivities");
+}
 
+void enterConflictingActivities( set< unsigned int > a, set< unsigned int > b )
+{
+  ENTER("enterConflictingActivities");
+  for ( set< unsigned int >::iterator id1 = a.begin();
+        id1 != a.end();
+        id1++ )
+  {
+    for ( set< unsigned int >::iterator id2 = b.begin();
+          id2 != b.end();
+          id2++ )
+    {
+      conflictingActivities( *id1, *id2 );
+    }
+  }
+  LEAVE("enterConflictingActivities");
+}
 
 /******************************************************************************
  * Functions for the XML (pretty) unparser defined in bpel-unparse-xml.k

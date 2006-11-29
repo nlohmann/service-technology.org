@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/11/23 14:33:40 $
+ * \date    \$Date: 2006/11/29 13:42:59 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -56,14 +56,29 @@
  *****************************************************************************/
 
 #include <string>
+#include <map>
+// #include <pair>
 
 #include "petrinet.h"
 #include "debug.h"
+#include "ast-details.h"
 
 using namespace std;
 
-
-
+/*!
+ * \brief enumaration of possible relationship between activities
+ *
+ * Possible answers to the question: What is the relation of A to B?
+ */
+typedef enum
+{
+  AR_CONCURRENT,        ///< to activities are concurrent
+  AR_CONFLICT,          ///< to activities are conflict (like in switch)
+  AR_ENCLOSES,          ///< activity B is enclosed in activity A
+  AR_DESCENDS,          ///< activity B is a descendant of activity A
+  AR_BEFORE,            ///< activity A comes before activity B
+  AR_AFTER
+} activityRelationType;
 
 
 /******************************************************************************
@@ -81,8 +96,11 @@ void header(int id, bool indent = false);
 void footer(kc::integer id, bool indent = false);
 void footer(int id, bool indent = false);
 
+// extern map< pair< unsigned int, unsigned int >, activityRelationType > activityRelationMap;
 
-
+activityRelationType activityRelation(unsigned int a, unsigned int b);
+void conflictingActivities(unsigned int a, unsigned int b);
+void enterConflictingActivities( set< unsigned int > a, set< unsigned int > b );
 
 
 /******************************************************************************

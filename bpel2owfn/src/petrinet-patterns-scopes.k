@@ -125,19 +125,6 @@ void PProcess(const impl_tProcess* abstract_phylum, uview current_view)
 	Place *ch_not_faulted = TheNet->newPlace(prefix + "!CHFaulted");
 
 
-	// If the parameter "-p finalloop" is used, a transition
-	// "1.internal.finalloop" is added to livelock the net as soon as the
-	// final place of the process ("1.internal.final") is marked. With this
-	// loop the net will only deadlock in the case ill-designed BPEL
-	// processes (e.g. cyclic links). These deadlocks then can be found
-	// using model checkers.
-	if (parameters[P_FINALLOOP])
-	{
-	  Transition *process_loop = TheNet->newTransition(prefix + "finalloop");
-	  TheNet->newArc(p39, process_loop, READ);
-	}
-
-
 	// The transitions of the process pattern.
 	Transition *t2 = TheNet->newTransition(prefix + "t2");
 	TheNet->newArc(p1, t2);

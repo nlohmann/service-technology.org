@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/28 13:44:27 $
+ * \date    \$Date: 2006/11/29 14:54:14 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.53 $
+ * \version \$Revision: 1.54 $
  */
 
 
@@ -370,8 +370,6 @@ void parse_command_line(int argc, char* argv[])
 		
 		if ( parameter == "simplify")
 		  parameters[P_SIMPLIFY] = true;
-		else if (parameter == "finalloop")
-		  parameters[P_FINALLOOP] = true;
 		else if (parameter == "communicationonly")
 		  parameters[P_COMMUNICATIONONLY] = true;
 		else if (parameter == "nostandardfaults")

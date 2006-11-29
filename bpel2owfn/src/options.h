@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/21 14:40:54 $
+ * \date    \$Date: 2006/11/29 14:54:14 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.36 $
+ * \version \$Revision: 1.37 $
  */
 
 
@@ -127,7 +127,6 @@ typedef enum
 typedef enum
 {
   P_SIMPLIFY,		///< structural reduction rules
-  P_FINALLOOP,		///< live-lock "well-formed" systems
   P_NOVARIABLES,	///< removes all variables from the model
   P_NOSTANDARDFAULTS,	///< only user-defined faults can occur
   P_NOFHFAULTS,		///< activities inside the FH throw no faults

@@ -192,8 +192,8 @@ void parse_command_line(int argc, char* argv[]) {
 	options[O_DEBUG] = false;
 	options[O_GRAPH_TYPE] = false;
 	options[O_SHOW_NODES] = false;
-//	options[O_CALC_ALL_STATES] = false;		// standard: man muss -a angeben, um voll
-	options[O_CALC_ALL_STATES] = true;		// so lange Reduktion im Teststadium
+	options[O_CALC_ALL_STATES] = false;		// standard: man muss -a angeben, um voll
+//	options[O_CALC_ALL_STATES] = true;		// so lange Reduktion im Teststadium
 	options[O_CALC_REDUCED_IG] = false;
 	options[O_OWFN_NAME] = false;
 	options[O_BDD] = false;

@@ -157,7 +157,7 @@ class oWFN  {
 		
 		unsigned int * copyCurrentMarking();
 		void copyMarkingToCurrentMarking(unsigned int * copy);
-		void calculateReachableStatesOutputEvent(vertex *, bool);
+		void calculateReachableStatesOutputEvent(vertex *, bool, owfnPlace *);
 		void calculateReachableStatesInputEvent(vertex *, bool);
 		void calculateReachableStatesFull(vertex *);
 		

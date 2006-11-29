@@ -138,7 +138,7 @@ State * binInsert(binDecision ** Bucket, oWFN * PN) {
 		(*Bucket)->state -> my_entry = * Bucket;
 		
 //		cout << "\t at address: " << (*Bucket)->state << endl;
-		
+		trace(TRACE_5, "binInsert(binDecision ** Bucket, oWFN * PN): end\n");
 		return (*Bucket)->state;
 	}
 	
@@ -183,6 +183,8 @@ State * binInsert(binDecision ** Bucket, oWFN * PN) {
 	newd->state->my_entry = newd;
         
 //	cout << "\t at address: " << newd->state << endl;
+
+	trace(TRACE_5, "binInsert(binDecision ** Bucket, oWFN * PN): end\n");
 	return newd -> state;
 	
 }

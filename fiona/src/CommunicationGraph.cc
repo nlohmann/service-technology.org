@@ -482,7 +482,7 @@ void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex *
             if (options[O_CALC_ALL_STATES]) {
                 PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
             } else {
-                PN->calculateReachableStatesOutputEvent(newNode, true);   // calc the reachable states from that marking
+                PN->calculateReachableStatesOutputEvent(newNode, true, PN->Places[output]);   // calc the reachable states from that marking
             }
         }
     }
@@ -507,11 +507,18 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
         (*iter)->decode(PN);
         
         if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
+            owfnPlace * outputPlace;
+            
+			// CHANGE THAT!!!!!!!!!!! is just a hack, stubborn set method does not yet work for more than one output event!
+			for (messageMultiSet::iterator iter = output.begin(); iter != output.end(); iter++) {
+				outputPlace = PN->Places[*iter];
+			}
+            
             // if there is a state for which an output event was activated, catch that state
             if (options[O_CALC_ALL_STATES]) {
                 PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
             } else {
-                PN->calculateReachableStatesOutputEvent(newNode, true);   // calc the reachable states from that marking
+                PN->calculateReachableStatesOutputEvent(newNode, true, outputPlace);   // calc the reachable states from that marking
             }
         }
     }

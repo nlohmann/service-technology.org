@@ -380,12 +380,9 @@ bool oWFN::checkMessageBound() {
 void oWFN::computeAnnotationOutput(vertex * node, State * currentState) {
 	trace(TRACE_5, "oWFN::computeAnnotation(vertex * node, State * currentState, unsigned int * markingPreviousState): start\n");
 
-	if (options[O_CALC_ALL_STATES]) {
-		node->addState(currentState);
-	} else {
-		// store this state in the node's temp set of state (storing all states of the node)
-		setOfStatesTemp.insert(currentState);		
-	}
+	// store this state in the node's temp set of state (storing all states of the node)
+	setOfStatesTemp.insert(currentState);		
+
 	// get the successor states	and compute their corresponding annotation
 	if (currentState != NULL) {
 		for(int i = 0; i < currentState->CardFireList; i++) {
@@ -410,12 +407,8 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 	
 	unsigned int * marking = NULL;
 
-	if (options[O_CALC_ALL_STATES]) {
-		node->addState(currentState);
-	} else {
-		// store this state in the node's temp set of state (storing all states of the node)
-		setOfStatesTemp.insert(currentState);		
-	}
+	// store this state in the node's temp set of state (storing all states of the node)
+	setOfStatesTemp.insert(currentState);		
 	
 	// check, whether this state is to be added to the node or not
 	// we do this right here, because of the decode function that might have been called already
@@ -423,26 +416,6 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 	if (!isCurrentMarking && placeOutputCnt > 0) {
 		currentState->decodeShowOnly(this);
 	}
-	
-	bool storeState = false;	// flag indicating whether this state shall be stored in the node or not
-	
-	for (int i = 0; i < placeOutputCnt; i++) {
-		// get the activated output events
-		if (CurrentMarking[outputPlacesArray[i]->index] > 0 && 
-				(markingPreviousState == NULL || markingPreviousState[outputPlacesArray[i]->index] == 0)) {
-			storeState = true;
-			if (visitedStates.find(currentState) == visitedStates.end()) {
-				// no, we have not yet visited this state
-				node->addState(currentState);
-			}
-		}	
-	}	
-
-	if (!storeState && markingPreviousState != NULL && !options[O_CALC_ALL_STATES]) {
-		node->reachGraphStateSet.erase(currentState);  // remove this state from the node's state list, because it should not be stored
-	}
-
-	visitedStates.insert(currentState);	// remember that we have visited this state
 	
 	// get the successor states	and compute their corresponding annotation
 	if (currentState != NULL && currentState->succ[0] != NULL) {
@@ -492,11 +465,11 @@ void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
 }
 
 
-//! \fn void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal) 
+//! \fn void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal, owfnPlace * outputPlace) 
 //! \param n the node to be calculated in case of an output event
 //! \param minimal the current state is minimal in the vertex
 //! \brief calculates the reduced set of states of the new vertex in case of an output event
-void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal) {
+void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal, owfnPlace * outputPlace) {
 	// calculates the EG starting at the current marking
 	trace(TRACE_5, "oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal): start\n");
 
@@ -525,7 +498,7 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal) {
 		CurrentState = binInsert(this);
 	}
 	
-	CurrentState->firelist = firelist();
+	CurrentState->firelist = stubbornfirelistmessage(outputPlace);
 	CurrentState->CardFireList = CardFireList;
 	if (parameters[P_IG]) {
 	    if (CurrentState->quasiFirelist) {
@@ -594,7 +567,7 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal) {
 	    	} else {
 				trace(TRACE_5, "Current marking new\n");
       			NewState = binInsert(this);
-      			NewState->firelist = firelist();
+      			NewState->firelist = stubbornfirelistdeadlocks();
 	      		NewState->CardFireList = CardFireList;
 	      		if (parameters[P_IG]) {
 			    if (NewState->quasiFirelist) {
@@ -679,7 +652,7 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 		CurrentState = binInsert(this);
 	}
 	
-	CurrentState->firelist = firelist();
+	CurrentState->firelist = stubbornfirelistdeadlocks();
 	CurrentState->CardFireList = CardFireList;
 	if (parameters[P_IG]) {
 	    if (CurrentState->quasiFirelist) {
@@ -751,7 +724,7 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 				trace(TRACE_5, "Current marking new\n");
 
       			NewState = binInsert(this);
-      			NewState->firelist = firelist();
+      			NewState->firelist = stubbornfirelistdeadlocks();
 	      		NewState->CardFireList = CardFireList;
 	      		if (parameters[P_IG]) {
 			    if (NewState->quasiFirelist) {
@@ -1432,6 +1405,10 @@ void stubborninsert(oWFN * net, owfnTransition* t)
 		
 owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess)
 {
+	
+trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess): begin\n");
+
+
 owfnTransition ** result;
 owfnTransition * t;
 unsigned int i;
@@ -1439,6 +1416,7 @@ unsigned int i;
 	{	
 		result = new owfnTransition * [1];
 		result[0] = (owfnTransition *) 0;
+		trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess): end\n");
 		return result;
 	}
 	for(i = 0; mess->PreTransitions[i];i++)
@@ -1458,6 +1436,8 @@ unsigned int i;
 	result[i] = (owfnTransition *)0;
 	CardFireList = NrStubborn;
 	StartOfStubbornList = (owfnTransition *) 0;
+	
+	trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess): end\n");
 	return result;
 }
 	
@@ -1484,6 +1464,7 @@ void NewStubbStamp(oWFN * PN)
 #define MINIMUM(X,Y) ((X) < (Y) ? (X) : (Y))
 owfnTransition ** oWFN::stubbornfirelistdeadlocks()
 {
+	trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistdeadlocks(): begin\n"); 
 	owfnTransition ** result;
 	unsigned int maxdfs;
 	owfnTransition * current, * next;
@@ -1509,6 +1490,8 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks()
 		result = new owfnTransition * [1];
 		result[0] = (owfnTransition *) 0;
 		CardFireList = 0;
+
+		trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistdeadlocks(): end\n");
 		return result;
 	}
 	while(current)
@@ -1572,6 +1555,7 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks()
 							{
 								result[cardstubborn] = (owfnTransition *) 0;
 								CardFireList = cardstubborn;
+								trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistdeadlocks(): end\n");
 								return(result);
 							}
 						}
@@ -1590,6 +1574,7 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks()
 			current = next;
 		}
 	}
+	trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistdeadlocks(): end\n");
 }
 
 

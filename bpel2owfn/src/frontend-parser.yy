@@ -20,7 +20,7 @@
 
 %{
 /*!
- * \file    parser.cc
+ * \file    frontend-parser.cc
  *
  * \brief   BPEL parser
  *
@@ -37,16 +37,17 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2006/11/29 15:00:47 $
+ * \date    \$Date: 2006/11/29 15:21:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \note    This file was created using GNU Bison reading file parser.yy.
+ * \note    This file was created using GNU Bison reading file
+ *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.275 $
+ * \version \$Revision: 1.276 $
  *
  * \ingroup frontend
  */
@@ -63,7 +64,7 @@
  */
 
 /*!
- * \fn yyparse
+ * \fn frontend_parse
  * \brief parse the input file
  *
  * \note C LALR(1) parser skeleton written by Richard Stallman, by simplifying
@@ -75,7 +76,7 @@
  */
 
 /*!
- * \enum yytokentype
+ * \enum frontend_tokentype
  * \brief list of possible tokens
  * \ingroup frontend
  */
@@ -137,9 +138,9 @@ using namespace std;
  * External variables
  *****************************************************************************/
 
-extern char *yytext;	// from flex
-extern int yylex();	// from flex
-extern int yylineno;	// from flex
+extern char *frontend_text;	// from flex
+extern int frontend_lex();	// from flex
+extern int frontend_lineno;	// from flex
 
 
 
@@ -267,7 +268,7 @@ unsigned int ASTEid = 1;
 tProcess:
     {
       // initialisation (for multiple input files, i.e. `consistency' mode)
-      yylineno = 0;
+      frontend_lineno = 0;
       currentJoinCondition = standardJoinCondition();
       temporaryAttributeMap.clear();
       ASTEmap.clear();
@@ -1084,7 +1085,7 @@ tScope:
 arbitraryAttributes:
   /* empty */
      { $$ = mkinteger(ASTEid++); // generate a new id
-       temporaryAttributeMap[ASTEid-1]["referenceLine"] = toString(yylineno-1); // remember the file position
+       temporaryAttributeMap[ASTEid-1]["referenceLine"] = toString(frontend_lineno-1); // remember the file position
      }
 | X_NAME X_EQUALS X_STRING arbitraryAttributes
      { temporaryAttributeMap[$4->value][$1->name] = $3->name;

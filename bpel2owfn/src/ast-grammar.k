@@ -25,11 +25,11 @@
  * \brief   Abstract grammar of BPEL (implementation)
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $ 
+ *          last changes of: \$Author: nlohmann $ 
  * 
  * \since   2005-10-03
  *
- * \date    \$Date: 2006/11/23 14:33:39 $
+ * \date    \$Date: 2006/11/29 15:21:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.151 $
+ * \version \$Revision: 1.152 $
  */
 %}
 
@@ -53,7 +53,7 @@
 
 #include "ast-details.h"
 #include "ast-config.h"
-#include "parser.h"
+#include "frontend-parser.h"
 extern map<unsigned int, ASTE*> ASTEmap;
 extern int ASTEid;
 

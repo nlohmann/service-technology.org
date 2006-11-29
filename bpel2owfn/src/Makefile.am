@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/29 12:47:23 $ by $Author: nlohmann $.
-# Version $Revision: 1.51 $
+# File last changed $Date: 2006/11/29 15:21:06 $ by $Author: nlohmann $.
+# Version $Revision: 1.52 $
 
 bin_PROGRAMS = bpel2owfn preprocess
 
@@ -27,7 +27,7 @@ bin_PROGRAMS = bpel2owfn preprocess
 KCFLAGS = --yystype --file-prefix=ast-system- --suffix=cc --no-csgio
 
 # generated Flex and Bison sources
-YYSOURCES = parser.h parser.cc lexer.cc
+YYSOURCES = frontend-parser.h frontend-parser.cc frontend-lexer.cc
 
 # everything about the Kimwitu++ sources
 KCDUMMY = ast-system-dummy.cc
@@ -50,7 +50,7 @@ KCOBJECTS = $(KCFILES:.k=.o) \
 $(KCDUMMY): $(KCFILES)
 	touch $@
 	$(KC) $(KCFLAGS) $^
-	$(MAKE) parser.o
+	$(MAKE) frontend-parser.o
 	$(MAKE) $(KCOBJECTS)
 
 $(KCOBJECTS): $(KCFILES)
@@ -60,8 +60,8 @@ $(KCOBJECTS): $(KCFILES)
 bpel2owfn_SOURCES = $(KCDUMMY)\
 		    $(KCSOURCES)\
 		    $(KCFILES)\
-		    parser.yy parser.h\
-		    lexer.ll\
+		    frontend-parser.yy frontend-parser.h\
+		    frontend-lexer.ll\
 		    bpel2owfn.cc\
 		    debug.cc debug.h\
 		    helpers.cc helpers.h\

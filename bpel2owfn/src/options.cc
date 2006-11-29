@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/29 14:54:14 $
+ * \date    \$Date: 2006/11/29 15:21:08 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.54 $
+ * \version \$Revision: 1.55 $
  */
 
 
@@ -257,8 +257,8 @@ void parse_command_line(int argc, char* argv[])
 
 
   // turn off debug modi of flex and bison by default
-  yydebug = 0;
-  yy_flex_debug = 0;
+  frontend_debug = 0;
+  frontend__flex_debug = 0;
 
 
   // use GNU getopt to parse the command-line arguments
@@ -398,9 +398,9 @@ void parse_command_line(int argc, char* argv[])
 		parameter = string(optarg);
 		
 		if (parameter == "flex")
-		  yy_flex_debug = 1;
+		  frontend__flex_debug = 1;
 		else if (parameter == "bison")
-		  yydebug = 1;
+		  frontend_debug = 1;
 		else if (parameter == "1")
 		  debug_level = TRACE_WARNINGS;
 		else if (parameter == "2")
@@ -440,7 +440,7 @@ void parse_command_line(int argc, char* argv[])
   }
 
 
-  // if input file is given, bind it to yyin
+  // if input file is given, bind it to frontend_in
   if (options[O_INPUT])
   {
     if (modus != M_CONSISTENCY && inputfiles.size() > 1)

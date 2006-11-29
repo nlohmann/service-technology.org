@@ -40,9 +40,9 @@ petrinet-patterns-basic.h
 petrinet-patterns-basic.cc
 petrinet-patterns-scopes.h
 petrinet-patterns-scopes.cc
-lexer.cc
-parser.cc
-parser.h
+frontend-lexer.cc
+frontend-parser.cc
+frontend-parser.h
 preprocess.exe
 bpel2owfn.exe
 bpel2owfn.exe.stackdump

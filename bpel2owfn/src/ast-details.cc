@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/24 09:52:23 $
+ * \date    \$Date: 2006/11/29 15:21:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.65 $
+ * \version \$Revision: 1.66 $
  */
 
 
@@ -53,7 +53,7 @@
 #include "ast-details.h"
 #include "debug.h"
 #include "helpers.h"
-#include "parser.h"
+#include "frontend-parser.h"
 
 using namespace std;
 

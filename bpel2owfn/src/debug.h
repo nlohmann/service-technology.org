@@ -28,13 +28,13 @@
  * 
  * \since   2005/11/09
  *
- * \date    \$Date: 2006/11/04 13:08:12 $
+ * \date    \$Date: 2006/11/29 15:21:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
  *
  * \ingroup debug
  */
@@ -76,8 +76,8 @@ using namespace std;
  * actually show.
  *
  * \see #debug_level
- * \see #yy_flex_debug
- * \see #yydebug
+ * \see #frontend__flex_debug
+ * \see #frontend_debug
  *
  * \ingroup debug
  */
@@ -110,7 +110,7 @@ extern trace_level debug_level; // defined in debug.cc
 
 void trace(trace_level pTraceLevel, string message);
 void trace(string message);
-int yyerror(const char *msg);
+int frontend_error(const char *msg);
 void SAerror(unsigned int code, string information = "", int lineNumber = 0);
 void SAerror(unsigned int code, string information, string lineNumber);
 

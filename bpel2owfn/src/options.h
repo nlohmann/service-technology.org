@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/29 14:54:14 $
+ * \date    \$Date: 2006/11/29 15:21:08 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.37 $
+ * \version \$Revision: 1.38 $
  */
 
 
@@ -175,9 +175,9 @@ extern map<possibleParameters, bool> parameters;
 extern map<possibleFormats,    bool> formats;
 extern map<possibleFormats,  string> suffixes;
 
-extern int yydebug;
-extern int yy_flex_debug;
-extern FILE *yyin;
+extern int frontend_debug;
+extern int frontend__flex_debug;
+extern FILE *frontend_in;
 
 
 

@@ -20,7 +20,7 @@
 
 %{
 /*!
- * \file lexer.cc
+ * \file frotnend-lexer.cc
  *
  * \brief BPEL lexer
  *
@@ -34,16 +34,16 @@
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2006/11/29 15:00:47 $
+ * \date    \$Date: 2006/11/29 15:21:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \note    This file was created using Flex reading file lexer.ll.
+ * \note    This file was created using Flex reading file frontend-lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.45 $
+ * \version \$Revision: 1.46 $
  *
  * \todo    add rules to ignored everything non-BPEL
  * \todo    add a more elegant way to handle XSD-namespaces
@@ -52,32 +52,32 @@
  */
 
 /*!
- * \fn yylex
+ * \fn frontend_lex
  * \brief lex the input file
- * \return tokens from type #yytokentype or calls #yyerror
+ * \return tokens from type #frontend_tokentype or calls #frontend_error
  * \ingroup frontend
  */
 
 /*!
- * \var yylineno
+ * \var frontend_lineno
  * \brief current line number of the input file
  * \ingroup frontend
  */
 
 /*!
- * \var yytext
+ * \var frontend_text
  * \brief the actual string of the current token
  * \ingroup frontend
  */
 
 /*!
- * \var yyin
+ * \var frontend_in
  * \brief pointer to the input file
  * \ingroup frontend
  */
 
 /*!
- * \var yy_flex_debug
+ * \var frontend__flex_debug
  * \brief if set to 1 the lexer trace is printed
  * \ingroup debug
  */
@@ -103,10 +103,10 @@
 #include <cstring>
 
 #include "ast-config.h"		// all you need from Kimwitu++
-#include "parser.h" 		// list of all tokens used
+#include "frontend-parser.h" 	// list of all tokens used
 
 
-extern int yyerror(const char *msg);
+extern int frontend_error(const char *msg);
 
 
 /// current start condition of the lexer
@@ -173,10 +173,10 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 
 
  /* attributes */
-<ATTRIBUTE>{name}	{ yylval.yt_casestring = kc::mkcasestring(yytext);
+<ATTRIBUTE>{name}	{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
                           return X_NAME; }
-<ATTRIBUTE>{string}	{ std::string stringwoquotes = std::string(yytext).substr(1, strlen(yytext)-2);
-                          yylval.yt_casestring = kc::mkcasestring(stringwoquotes.c_str());
+<ATTRIBUTE>{string}	{ std::string stringwoquotes = std::string(frontend_text).substr(1, strlen(frontend_text)-2);
+                          frontend_lval.yt_casestring = kc::mkcasestring(stringwoquotes.c_str());
                           return X_STRING; }
 <ATTRIBUTE>"="		{ return X_EQUALS; }
 
@@ -271,9 +271,9 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
  /* white space */
 {whitespace}			{ /* skip white space */ }
 
-<INITIAL>{name}			{ yylval.yt_casestring = kc::mkcasestring(yytext);
+<INITIAL>{name}			{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
                                   return X_NAME; }
-<INITIAL>"$"{name}		{ yylval.yt_casestring = kc::mkcasestring(yytext);
+<INITIAL>"$"{name}		{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
                                   return VARIABLENAME; }
 
 
@@ -287,7 +287,7 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 "!="		{ return NOTEQUAL; }
 "'"		{ return APOSTROPHE; }
 
-{number}	{ yylval.yt_casestring = kc::mkcasestring(yytext);
+{number}	{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
                   return NUMBER; }
 
 
@@ -296,4 +296,4 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 
 
  /* anything else */
-.				{ yyerror("lexical error"); }
+.				{ frontend_error("lexical error"); }

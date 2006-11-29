@@ -28,14 +28,14 @@
  * 
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/28 13:29:53 $
+ * \date    \$Date: 2006/11/29 15:21:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.120 $
+ * \version \$Revision: 1.121 $
  */
 
 
@@ -68,10 +68,10 @@ using namespace std;
  * External functions
  *****************************************************************************/
 
-extern int yyparse();			// from Bison
-extern int yydebug;			// from Bison
-extern int yy_flex_debug;		// from flex
-extern FILE *yyin;			// from flex
+extern int frontend_parse();			// from Bison
+extern int frontend_debug;			// from Bison
+extern int frontend__flex_debug;		// from flex
+extern FILE *frontend_in;			// from flex
 extern kc::tProcess TheProcess;
 
 
@@ -136,23 +136,23 @@ int main( int argc, char *argv[])
     if (inputfiles.size() >= 1)
     {
       filename = *file;
-      if (!(yyin = fopen(filename.c_str(), "r")))
+      if (!(frontend_in = fopen(filename.c_str(), "r")))
 	cerr << "file not found" << endl; /// \todo a "real" error message
     }
     
     trace(TRACE_INFORMATION, "Parsing " + filename + " ...\n");
   
     // invoke Bison parser
-    int error = yyparse();
+    int error = frontend_parse();
 
     if (!error)
     {
       trace(TRACE_INFORMATION, "Parsing complete.\n");
       
-      if ( filename != "<STDIN>" && yyin != NULL)
+      if ( filename != "<STDIN>" && frontend_in != NULL)
       {
 	trace(TRACE_INFORMATION," + Closing input file: " + filename + "\n");
-	fclose(yyin);
+	fclose(frontend_in);
       }
 
       // apply first set of rewrite rules

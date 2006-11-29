@@ -28,13 +28,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2006/11/28 12:39:57 $
+ * \date    \$Date: 2006/11/29 15:21:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.62 $
+ * \version \$Revision: 1.63 $
  *
  * \ingroup conversion
  * \ingroup debug
@@ -256,10 +256,10 @@ void cleanup()
     TheNet = NULL;
   }
 
-  if ( filename != "<STDIN>" && yyin != NULL)
+  if ( filename != "<STDIN>" && frontend_in != NULL)
   {
     trace(TRACE_INFORMATION," + Closing input file: " + filename + "\n");
-    fclose(yyin);
+    fclose(frontend_in);
   }
  
   if ( output != &cout && output != &clog && output != log_output && output != NULL )

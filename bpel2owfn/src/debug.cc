@@ -28,13 +28,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/11/29 10:12:53 $
+ * \date    \$Date: 2006/11/29 15:21:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.46 $
+ * \version \$Revision: 1.47 $
  *
  * \ingroup debug
  */
@@ -71,8 +71,8 @@ using namespace std;
  * The command-line parameter "-d" can be used to set a debug level.
  *
  * \see #trace_level
- * \see #yy_flex_debug
- * \see #yydebug
+ * \see #frontend__flex_debug
+ * \see #frontend_debug
  *
  * \ingroup debug
  */
@@ -135,13 +135,14 @@ void trace(string message)
  *
  * \ingroup debug
  */
-int yyerror(const char *msg)
+int frontend_error(const char *msg)
 {
   /* defined by flex */
-  extern int yylineno;      // line number of current token
-  extern char *yytext;      // text of the current token
+  extern int frontend_lineno;      // line number of current token
+  extern char *frontend_text;      // text of the current token
 
-  cerr << filename << ":" << yylineno+1 << " - " << string(msg) << "; last token read: `" << string(yytext) << "'" << endl;
+  cerr << filename << ":" << frontend_lineno+1 << " - " << string(msg) <<
+    "; last token read: `" << string(frontend_text) << "'" << endl;
 
   return 1;
 }

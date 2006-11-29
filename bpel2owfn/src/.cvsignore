@@ -38,6 +38,8 @@ petrinet-patterns-structured.h
 petrinet-patterns-structured.cc
 petrinet-patterns-basic.h
 petrinet-patterns-basic.cc
+petrinet-patterns-scopes.h
+petrinet-patterns-scopes.cc
 lexer.cc
 parser.cc
 parser.h

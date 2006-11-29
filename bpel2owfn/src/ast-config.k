@@ -63,6 +63,7 @@
 #include "petrinet.h"
 #include "petrinet-patterns-basic.h"
 #include "petrinet-patterns-structured.h"
+#include "petrinet-patterns-scopes.h"
 #include "options.h"
 #include "cfg.h"
 #include "helpers.h"

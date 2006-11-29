@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/11/29 11:44:21 $
+ * \date    \$Date: 2006/11/29 12:47:24 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.79 $
+ * \version \$Revision: 1.80 $
  *
  */
 %}
@@ -134,37 +134,6 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
 
       footer(_id, true);
       trace(TRACE_INFORMATION, "Generating Petri net complete.\n");
-    }
-  ]
-;
-
-
-
-
-
-/******************************************************************************
-  SCOPE
-******************************************************************************/
-
-This=Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
-  [petrinetsmall:
-    {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
-      
-      cerr << "the handlers of the <scope>-activity will not be modelled!" << endl;
-
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "final");
-    }
-    a // standardElements
-    i // innerActivity
-    {
-      // Embed the inner activity.
-      TheNet->mergePlaces(This->id, ".internal.initial", i->id, ".initial");
-      TheNet->mergePlaces(This->id, ".internal.final", i->id, ".final");
-
-      footer(This->id);
     }
   ]
 ;

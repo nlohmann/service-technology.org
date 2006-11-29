@@ -37,7 +37,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2006/11/24 09:52:24 $
+ * \date    \$Date: 2006/11/29 15:00:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -46,7 +46,7 @@
  * \note    This file was created using GNU Bison reading file parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.274 $
+ * \version \$Revision: 1.275 $
  *
  * \ingroup frontend
  */
@@ -100,6 +100,7 @@
 %defines
 %yacc
 
+%name-prefix="frontend_"
 
 
 %{

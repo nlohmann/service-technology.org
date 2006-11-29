@@ -34,7 +34,7 @@
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2006/11/08 07:38:24 $
+ * \date    \$Date: 2006/11/29 15:00:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  * \note    This file was created using Flex reading file lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.44 $
+ * \version \$Revision: 1.45 $
  *
  * \todo    add rules to ignored everything non-BPEL
  * \todo    add a more elegant way to handle XSD-namespaces
@@ -93,6 +93,9 @@
 %option nodefault
 %option debug
 
+
+%option outfile="lex.yy.c"
+%option prefix="frontend_"
 
 
 %{

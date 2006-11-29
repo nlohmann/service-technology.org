@@ -20,12 +20,12 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/28 14:46:20 $ by $Author: nlohmann $.
-# Version $Revision: 1.4 $
+# File last changed $Date: 2006/11/29 10:13:43 $ by $Author: gierds $.
+# Version $Revision: 1.5 $
 
 echo ""
 
-rm -rf $testdir/consistency/*.task $testdir/consistency/*.lola
+rm -rf *.task *.lola
 
 echo "test: consistency mode"
 echo "customer 1"

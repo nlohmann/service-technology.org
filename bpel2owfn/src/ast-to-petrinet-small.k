@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/11/29 10:32:58 $
+ * \date    \$Date: 2006/11/29 11:22:37 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.77 $
+ * \version \$Revision: 1.78 $
  *
  */
 %}
@@ -164,89 +164,6 @@ Compensate(a,_id) ->
     a // standardElements
     {
       footer(_id);
-    }
-  ]
-;
-
-
-
-
-
-/******************************************************************************
-  IF                                                             (WS-BPEL 2.0)
-******************************************************************************/
-
-If(a,b,c,_id) ->
-  [petrinetsmall:
-    {
-      header(_id, true);
-      string prefix = toString(_id) + ".internal.";
-
-      Place *p1 =  TheNet->newPlace(prefix + "initial");
-      Place *p2 =  TheNet->newPlace(prefix + "final");
-    }
-    a // standardElements
-    b // elseIf braches
-    c // else branch
-    {
-      int currentCase = 1;
-      foreach (caseBranch=ElseIf(innerActivity, _id2); tElseIf_list b)
-      {
-	string caseNumber = toString(currentCase++);
-	Transition* t1 = TheNet->newTransition(prefix + "case" + caseNumber);
-	TheNet->newArc(TheNet->findPlace(_id->value, ".internal.initial"), t1); // added ".internal" here
-
-	// Embed the inner activity.
-	TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
-	TheNet->mergePlaces(_id->value, ".internal.final", _id2->value, ".final");
-      }
-
-      // The <else> branch.
-      Transition *t1 = TheNet->newTransition(prefix + "caseo");
-      TheNet->newArc(TheNet->findPlace(_id->value, ".internal.initial"), t1); // added ".internal" here
-
-      with (c)
-      {
-        c=Else(innerActivity,_id2):
-        {
-          // embed inner activity
-          TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
-          TheNet->mergePlaces(_id->value, ".internal.final", _id2->value, ".final");
-        }
-        c=NoElse(_id2):
-        {
-          TheNet->newArc(t1, TheNet->findPlace(_id->value, ".internal.final"));
-        }
-        default: { /* do nothing */ }
-      }
-
-
-      // Create the arcs for the Dead Path elimination: each chosen activity
-      // (i.e. firing of the respective t2-transition) has set the links of all
-      // other branches to false.
-      currentCase = 1;
-      foreach (ElseIf(innerActivity1); tElseIf_list b)
-      {
-        foreach (ElseIf(innerActivity2); tElseIf_list b)
-         {
-	  if (innerActivity1 != innerActivity2)
-          {
-            dpeLinks(TheNet->findTransition(prefix + "case" + toString(currentCase)), innerActivity2->id); // case -> case'
-          }
-    	}
-        with (c)
-        {
-          c=Else(innerActivity3,_id2):
-          {
-            dpeLinks(TheNet->findTransition(prefix + "case" + toString(currentCase)), innerActivity3->id); // case -> otherwise
-            dpeLinks(TheNet->findTransition(prefix + "caseo"), innerActivity1->id); // otherwise -> case
-          }
-          default: { /* do nothing */ }
-        }
-  	currentCase++;
-      }
-
-      footer(_id, true);
     }
   ]
 ;

@@ -829,3 +829,109 @@ void PPick(const impl_tPick* abstract_phylum, uview current_view)
 
   footer(phylum->id);
 }
+
+
+
+
+
+/******************************************************************************
+  IF
+******************************************************************************/
+
+void PIf(const impl_tIf* abstract_phylum, uview current_view)
+{
+  impl_tIf_If* phylum = (impl_tIf_If*) abstract_phylum;
+  assert(phylum != NULL);
+
+  header(phylum->id);
+  string prefix = toString(phylum->id) + ".internal.";
+
+  
+  switch(current_view)
+  {
+    case(petrinetsmall_enum):
+      {
+	Place *p1 =  TheNet->newPlace(prefix + "initial");
+	Place *p2 =  TheNet->newPlace(prefix + "final");
+
+
+	// unparse the standard elements
+	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
+
+	// unparse the elseIf branches
+	phylum->tElseIf_list_1->unparse(pseudoPrinter, current_view);
+	
+	// unparse the else branch
+	phylum->tElse_1->unparse(pseudoPrinter, current_view);
+
+
+	int currentCase = 1;
+	foreach (caseBranch=ElseIf(innerActivity, _id2); tElseIf_list phylum->tElseIf_list_1)
+	{
+	  string caseNumber = toString(currentCase++);
+	  Transition* t1 = TheNet->newTransition(prefix + "case" + caseNumber);
+	  TheNet->newArc(TheNet->findPlace(phylum->id, ".internal.initial"), t1); // added ".internal" here
+	  
+	  // Embed the inner activity.
+	  TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
+	  TheNet->mergePlaces(phylum->id, ".internal.final", _id2->value, ".final");
+	}
+	
+	// The <else> branch.
+	Transition *t1 = TheNet->newTransition(prefix + "caseo");
+	TheNet->newArc(TheNet->findPlace(phylum->id, ".internal.initial"), t1); // added ".internal" here
+
+	impl_tElse *elseBranch = phylum->tElse_1;
+
+	with (elseBranch)
+	{
+	  elseBranch=Else(innerActivity,_id2):
+	  {
+	    // embed inner activity
+            TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
+	    TheNet->mergePlaces(phylum->id, ".internal.final", _id2->value, ".final");
+	  }
+	  
+	  elseBranch=NoElse(_id2):
+	  {
+	    TheNet->newArc(t1, TheNet->findPlace(phylum->id, ".internal.final"));
+	  }
+	  
+	  default: { /* do nothing */ }
+	}
+	
+	
+	// Create the arcs for the Dead Path elimination: each chosen activity
+	// (i.e. firing of the respective t2-transition) has set the links of all
+	// other branches to false.
+	currentCase = 1;
+	foreach (ElseIf(innerActivity1); tElseIf_list phylum->tElseIf_list_1)
+	{
+	  foreach (ElseIf(innerActivity2); tElseIf_list phylum->tElseIf_list_1)
+	  {
+	    if (innerActivity1 != innerActivity2)
+	    {
+	      dpeLinks(TheNet->findTransition(prefix + "case" + toString(currentCase)), innerActivity2->id); // case -> case'
+	    }
+	  }
+	  with (elseBranch)
+	  {
+	    elseBranch=Else(innerActivity3,_id2):
+	    {
+	      dpeLinks(TheNet->findTransition(prefix + "case" + toString(currentCase)), innerActivity3->id); // case -> otherwise
+	      dpeLinks(TheNet->findTransition(prefix + "caseo"), innerActivity1->id); // otherwise -> case
+	    }
+	    default: { /* do nothing */ }
+	  }
+	  currentCase++;
+	}
+
+	break;
+      }
+
+    default: { /* no pattern in this case */ }
+  }
+
+
+  footer(phylum->id);
+}      

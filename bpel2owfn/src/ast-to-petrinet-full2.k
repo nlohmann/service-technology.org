@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/11/29 10:32:58 $
+ * \date    \$Date: 2006/11/29 11:22:37 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.66 $
+ * \version \$Revision: 1.67 $
  */
 %}
 
@@ -133,6 +133,10 @@ Switch -> [petrinet petrinetnew petrinetsmall:
 
 Pick -> [petrinet petrinetnew petrinetsmall:
   { PPick($0, kc_current_view_base); }
+];
+
+If -> [petrinetsmall:
+  { PIf($0, kc_current_view_base); }
 ];
 
 

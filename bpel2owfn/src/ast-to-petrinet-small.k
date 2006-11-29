@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/11/26 18:09:47 $
+ * \date    \$Date: 2006/11/29 10:32:58 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.76 $
+ * \version \$Revision: 1.77 $
  *
  */
 %}
@@ -247,100 +247,6 @@ If(a,b,c,_id) ->
       }
 
       footer(_id, true);
-    }
-  ]
-;
-
-
-
-
-
-/******************************************************************************
-  PICK
-******************************************************************************/
-
-This=Pick(a,b,c,d) ->
-  [petrinetsmall:
-    {
-      header(This->id, true);
-      string prefix = toString(This->id) + ".internal.";
-
-      Place *p1 = TheNet->newPlace(prefix + "final");
-      Place *p2 = TheNet->newPlace(prefix + "initial");
-    }
-    a // standardElements
-    b // onMessage branches
-    c // onAlarm branches
-    {
-      // Traverse the <onMessage> branches.
-      int onMessageCount = 1;
-      foreach (ThisBranch = OnMessage(_corr,_from,innerActivity,_id2); tOnMessage_list b)
-      {
-	trace(TRACE_DEBUG, "[PNU]\t\t<onMessage>\n");
-	string message = toString(onMessageCount++);
-
-	Transition *t1 = TheNet->newTransition(prefix + "pickM" + message);
-	TheNet->newArc(TheNet->findPlace("in." + ASTEmap[ThisBranch->id]->channelName), t1);
-	TheNet->newArc(TheNet->findPlace(This->id, ".internal.initial"), t1);
-	TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
-	t1->type = IN;
-
-	// Embed the inner activity.
-	TheNet->mergePlaces(This->id, ".final", innerActivity->id, ".final");
-
-	trace(TRACE_DEBUG, "[PNU]\t\t</onMessage>\n");
-      }
-
-
-      // Traverse the <onAlarm> branches.
-      int onAlarmCount = 1;
-      foreach (onAlarmBranch=OnAlarm(innerActivity); tOnAlarm_list c)
-      {
-	trace(TRACE_DEBUG, "[PNU]\t\t<onAlarm>\n");
-        string alarm = toString(onAlarmCount++);
-
-	Transition *t1 = TheNet->newTransition(prefix + "pickA" + alarm);
-	TheNet->newArc(TheNet->findPlace(This->id, ".internal.initial"), t1);
-	TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
-
-
-	// Embed the inner activity.
-	TheNet->mergePlaces(This->id, ".final", innerActivity->id, ".final");
-
-	trace(TRACE_DEBUG, "[PNU]\t\t</onAlarm>\n");
-      }
-
-
-      // Create the arcs for the Dead Path elimination: each chosen activity
-      // (i.e. firing of the respective t2/t6-transition) has set the links of
-      // all other branches to false.
-      int currentMessage = 1;
-      foreach (OnMessage(corr_1, from_1, innerActivity1, _id1); tOnMessage_list b) {
-	foreach (OnMessage(corr_2, from_2, innerActivity2, _id2); tOnMessage_list b) {
-	  if ((innerActivity1 != innerActivity2))
-            dpeLinks(TheNet->findTransition(prefix + "pickM" + toString(currentMessage)), innerActivity2->id); // onMessage -> onMessage'
-	}
-
-	foreach (OnAlarm(innerActivity2); tOnAlarm_list c) {
-          dpeLinks(TheNet->findTransition(prefix + "pickM" + toString(currentMessage)), innerActivity2->id); // onMessage -> onAlarm
-	}
-	currentMessage++;
-      }
-
-      int currentAlarm = 1;
-      foreach (OnAlarm(innerActivity1); tOnAlarm_list c) {
-	foreach (otheronalarm=OnAlarm(innerActivity2); tOnAlarm_list c) {
-	  if ((innerActivity1 != innerActivity2))
-            dpeLinks(TheNet->findTransition(prefix + "pickA" + toString(currentAlarm)), innerActivity2->id); // onAlarm -> onAlarm'
-	}
-
-	foreach (OnMessage(_corr2, _from2, innerActivity2, _id2); tOnMessage_list b) {
-          dpeLinks(TheNet->findTransition(prefix + "pickA" + toString(currentAlarm)), innerActivity2->id); // onAlarm -> onMessage
-	}
-	currentAlarm++;
-      }
-
-      footer(This->id, true);
     }
   ]
 ;

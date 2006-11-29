@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/11/29 12:47:24 $
+ * \date    \$Date: 2006/11/29 13:06:30 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,104 +39,10 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.80 $
+ * \version \$Revision: 1.81 $
  *
  */
 %}
-
-
-
-
-
-/******************************************************************************
-  PROCESS
-******************************************************************************/
-
-/*
- * Pattern of BPEL's <process> as it is depicted in Fig. 28. Note that it
- * contains only one event handler since alarm-event handler and message-event
- * handler are merged.
- */
-
-Process(a,b,c,d,e,f,g,h,i,_id) ->
-  [petrinetsmall:
-    {
-      trace(TRACE_INFORMATION, "Generating Petri net...\n");
-      header(_id, true);
-
-      string prefix = toString(_id) + ".internal.";
-      currentScope = prefix;
-
-
-      // Create the interface places.
-      // The used lists are filled during parsing mapping each combination of
-      // partnerLink, portType and operation to one input (resp. output) place.
-      for (set<string>::iterator in = ASTE_inputChannels.begin(); in != ASTE_inputChannels.end(); in++)
-	TheNet->newPlace("in." + *in, IN);
-      for (set<string>::iterator out = ASTE_outputChannels.begin(); out != ASTE_outputChannels.end(); out++)
-	TheNet->newPlace("out." + *out, OUT);
-
-
-      // Create the places for the links.
-      // The used list is filled during parsing and contains all links of the
-      // whole process -- also links defined in a deeper hierarchy.
-      for (set<string>::iterator link = linkNames.begin(); link != linkNames.end(); link++)
-      {
-	TheNet->newPlace("link." + *link);
-	TheNet->newPlace("!link." + *link);
-      }
-
-
-      // Create the initial place of the process pattern and mark it.
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      p1->mark();
-      
-      // Create the internal places of the process pattern.
-      Place *p2 = TheNet->newPlace(prefix + "final");
-
-
-      // Create subnet to support event handlers.
-      if (ASTEmap[_id->value]->hasEH)
-      {
-	Place *p3 = TheNet->newPlace(prefix + "EHactive");
-	Place *p4 = TheNet->newPlace(prefix + "begin");
-	Place *p5 = TheNet->newPlace(prefix + "end");
-
-	Transition *t1 = TheNet->newTransition(prefix + "activate");
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p3);
-	TheNet->newArc(t1, p4);
-
-	Transition *t2 = TheNet->newTransition(prefix + "finalize1");
-	TheNet->newArc(p3, t2);
-	TheNet->newArc(p5, t2);
-	TheNet->newArc(t2, p2);
-
-	Transition *t3 = TheNet->newTransition(prefix + "finalize2");
-	TheNet->newArc(p3, t3);
-	TheNet->newArc(p5, t3);
-	TheNet->newArc(t3, p2);
-      }
-    }
-      i // innerActivity
-    {
-      // Embed the inner activity of the process.
-      if (ASTEmap[_id->value]->hasEH)
-      {
-	TheNet->mergePlaces(TheNet->findPlace("1.internal.begin"), TheNet->findPlace(i->id, ".initial"));
-	TheNet->mergePlaces(TheNet->findPlace("1.internal.end"), TheNet->findPlace(i->id, ".final"));
-      }
-      else
-      {
-	TheNet->mergePlaces(TheNet->findPlace("1.internal.initial"), TheNet->findPlace(i->id, ".initial"));
-	TheNet->mergePlaces(TheNet->findPlace("1.internal.final"), TheNet->findPlace(i->id, ".final"));
-      }
-
-      footer(_id, true);
-      trace(TRACE_INFORMATION, "Generating Petri net complete.\n");
-    }
-  ]
-;
 
 
 

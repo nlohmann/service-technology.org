@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/11/29 13:42:59 $
+ * \date    \$Date: 2006/11/29 13:44:27 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -541,7 +541,6 @@ activityRelationType activityRelation(unsigned int a, unsigned int b)
 void conflictingActivities(unsigned int a, unsigned int b)
 {
     ENTER("conflictingActivities");
-    cerr << "Conflicting: \t" << a << "\t <-> \t" << b << endl; 
     activityRelationMap[pair<unsigned int, unsigned int>(a,b)] = AR_CONFLICT;
     activityRelationMap[pair<unsigned int, unsigned int>(b,a)] = AR_CONFLICT;
     LEAVE("conflictingActivities");

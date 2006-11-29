@@ -990,3 +990,91 @@ void PExit(const impl_tExit* abstract_phylum, uview current_view)
 
   footer(phylum->id);
 }
+
+
+
+
+
+/******************************************************************************
+  COMPENSATE
+******************************************************************************/
+
+void PCompensate(const impl_tCompensate* abstract_phylum, uview current_view)
+{
+  impl_tCompensate_Compensate* phylum = (impl_tCompensate_Compensate*) abstract_phylum;
+  assert(phylum != NULL);
+
+  header(phylum->id);
+  string prefix = toString(phylum->id) + ".internal.";
+
+  
+  switch(current_view)
+  {
+    case(petrinetsmall_enum):
+      {
+	cerr << "the <compensate> activity cannot be modelled!" << endl;
+
+	Place *p1 = TheNet->newPlace(prefix + "initial");
+	Place *p2 = TheNet->newPlace(prefix + "final");
+	
+	Transition *t1 = TheNet->newTransition(prefix + "empty");
+	TheNet->newArc(p1, t1);
+	TheNet->newArc(t1, p2);
+
+	break;
+      }
+
+    default: { /* no pattern in this case */ }
+  }
+
+
+  // unparse the standard elements
+  phylum->standardElements_1->unparse(pseudoPrinter, current_view);
+
+
+  footer(phylum->id);
+}
+
+
+
+
+
+/******************************************************************************
+  COMPENSATE SCOPE
+******************************************************************************/
+
+void PCompensateScope(const impl_tCompensate* abstract_phylum, uview current_view)
+{
+  impl_tCompensate_CompensateScope* phylum = (impl_tCompensate_CompensateScope*) abstract_phylum;
+  assert(phylum != NULL);
+
+  header(phylum->id);
+  string prefix = toString(phylum->id) + ".internal.";
+
+  
+  switch(current_view)
+  {
+    case(petrinetsmall_enum):
+      {
+	cerr << "the <compensateScope> activity cannot be modelled!" << endl;
+
+	Place *p1 = TheNet->newPlace(prefix + "initial");
+	Place *p2 = TheNet->newPlace(prefix + "final");
+	
+	Transition *t1 = TheNet->newTransition(prefix + "empty");
+	TheNet->newArc(p1, t1);
+	TheNet->newArc(t1, p2);
+
+	break;
+      }
+
+    default: { /* no pattern in this case */ }
+  }
+
+
+  // unparse the standard elements
+  phylum->standardElements_1->unparse(pseudoPrinter, current_view);
+
+
+  footer(phylum->id);
+}

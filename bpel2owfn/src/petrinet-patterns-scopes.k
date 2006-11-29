@@ -12,6 +12,7 @@ extern string currentScope;
 extern set<string> ASTE_inputChannels;
 extern set<string> ASTE_outputChannels;
 extern set<string> linkNames;
+extern set<string> variableNames;
 %}
 
 
@@ -33,8 +34,268 @@ void PProcess(const impl_tProcess* abstract_phylum, uview current_view)
 
   switch(current_view)
   {
+    case(petrinet_enum):
+      {
+	currentScope = prefix;
+
+	// Create the interface places.
+	// The used lists are filled during parsing mapping each combination of
+	// partnerLink, portType and operation to one input (resp. output) place.
+	for (set<string>::iterator in = ASTE_inputChannels.begin(); in != ASTE_inputChannels.end(); in++)
+	  TheNet->newPlace("in." + *in, IN);
+	for (set<string>::iterator out = ASTE_outputChannels.begin(); out != ASTE_outputChannels.end(); out++)
+	  TheNet->newPlace("out." + *out, OUT);
+
+
+  	// Create push-places for the children of the process.
+    	for (set<unsigned int>::iterator child = ASTEmap[phylum->id]->enclosedScopes.begin(); child != ASTEmap[phylum->id]->enclosedScopes.end(); child++)
+      	{
+  	  TheNet->newPlace(toString(*child) + ".push");
+  	  TheNet->newPlace(toString(*child) + ".!push");
+    	}
+
+  
+    	// Create the places for the links.
+      	// The used list is filled during parsing and contains all links of the
+	// whole process -- also links defined in a deeper hierarchy.
+	for (set<string>::iterator link = linkNames.begin(); link != linkNames.end(); link++)
+	{
+	  TheNet->newPlace("link." + *link);
+	  TheNet->newPlace("!link." + *link);
+	}
+
+      
+	if (!parameters[P_NOVARIABLES])
+	{
+	  // Create variable places and initially mark them.
+	  for (set<string>::iterator variable = variableNames.begin(); variable != variableNames.end(); variable++)
+	  {
+	    Place *v = TheNet->newPlace("variable." + *variable);
+	    v->mark();
+	  }
+  
+	  // Create a place for the global clock and mark it.
+	  Place *clock = TheNet->newPlace(prefix + "clock");
+	  clock->mark();
+	}
+
+	// Create the initial place of the process pattern and mark it.
+	Place *p1 = TheNet->newPlace(prefix + "initial");
+	p1->mark();
+      
+	// Create the internal places of the process pattern.
+	Place *p3  = TheNet->newPlace(prefix + "scopeCompensated");
+	Place *p5  = TheNet->newPlace(prefix + "upperFH");
+	Place *p6  = TheNet->newPlace(prefix + "upperTerminate");
+	Place *p7  = TheNet->newPlace(prefix + "Active");
+	Place *p8  = TheNet->newPlace(prefix + "!Completed");
+	Place *p9  = TheNet->newPlace(prefix + "Completed");
+	Place *p10 = TheNet->newPlace(prefix + "!Compensated");
+	Place *p11 = TheNet->newPlace(prefix + "!Active");
+	Place *p12 = TheNet->newPlace(prefix + "Compensated");
+	Place *p13 = TheNet->newPlace(prefix + "!Ended");
+	Place *p14 = TheNet->newPlace(prefix + "Ended");
+	Place *p15 = TheNet->newPlace(prefix + "!Faulted");
+	Place *p16 = TheNet->newPlace(prefix + "Faulted");
+	Place *p17 = TheNet->newPlace(prefix + "!Terminated");
+	Place *p18 = TheNet->newPlace(prefix + "Terminated");
+	Place *p19 = TheNet->newPlace(prefix + "p19");
+	Place *p20 = TheNet->newPlace(prefix + "p20");
+	Place *p21 = TheNet->newPlace(prefix + "p21");
+	Place *p22 = TheNet->newPlace(prefix + "p22");
+	Place *p33 = TheNet->newPlace(prefix + "p33");
+	Place *p34 = TheNet->newPlace(prefix + "p34");
+	Place *p35 = TheNet->newPlace(prefix + "p35");
+	Place *p36 = TheNet->newPlace(prefix + "p36");
+	Place *p37 = TheNet->newPlace(prefix + "fault");
+	Place *p38 = TheNet->newPlace(prefix + "faultSave");
+	Place *p39 = TheNet->newPlace(prefix + "final");
+	Place *p40 = TheNet->newPlace(prefix + "rethrow");
+	Place *p41 = TheNet->newPlace(prefix + "p41");
+	Place *p42 = TheNet->newPlace(prefix + "ch_out");
+
+
+	// State places of the process modeling the new fault model: The places
+	// guarantee that the occurrence of more than one fault inside the fault
+	// or compensation handler is prevented. The places are used as guards
+	// by the transitions signalling faults.
+	Place *fh_faulted = TheNet->newPlace(prefix + "FHFaulted");
+	Place *fh_not_faulted = TheNet->newPlace(prefix + "!FHFaulted");
+	Place *ch_faulted = TheNet->newPlace(prefix + "CHFaulted");
+	Place *ch_not_faulted = TheNet->newPlace(prefix + "!CHFaulted");
+
+
+	// If the parameter "-p finalloop" is used, a transition
+	// "1.internal.finalloop" is added to livelock the net as soon as the
+	// final place of the process ("1.internal.final") is marked. With this
+	// loop the net will only deadlock in the case ill-designed BPEL
+	// processes (e.g. cyclic links). These deadlocks then can be found
+	// using model checkers.
+	if (parameters[P_FINALLOOP])
+	{
+	  Transition *process_loop = TheNet->newTransition(prefix + "finalloop");
+	  TheNet->newArc(p39, process_loop, READ);
+	}
+
+
+	// The transitions of the process pattern.
+	Transition *t2 = TheNet->newTransition(prefix + "t2");
+	TheNet->newArc(p1, t2);
+	TheNet->newArc(t2, p7);
+	TheNet->newArc(t2, p8);
+	TheNet->newArc(t2, p10);
+	TheNet->newArc(t2, p13);
+	TheNet->newArc(t2, p15);
+	TheNet->newArc(t2, p17);
+	TheNet->newArc(t2, p19);
+	TheNet->newArc(t2, fh_not_faulted);
+
+	Transition *t4 = TheNet->newTransition(prefix + "t4");
+	TheNet->newArc(p7, t4);
+	TheNet->newArc(p8, t4);
+	TheNet->newArc(t4, p9);
+	TheNet->newArc(t4, p11);
+	TheNet->newArc(p33, t4);
+	TheNet->newArc(t4, p39);
+
+
+	// If the process has an event handler several places and transitions
+	// have to be added to embed it. If the process lacks an event handler
+	// some places can be merged.
+	if (ASTEmap[phylum->id]->hasEH)
+	{
+	  Place *p23 = TheNet->newPlace(prefix + "p23");
+	  Place *p24 = TheNet->newPlace(prefix + "p24");
+	  Place *p25 = TheNet->newPlace(prefix + "p25");
+	  Place *p26 = TheNet->newPlace(prefix + "p26");
+	  Place *p27 = TheNet->newPlace(prefix + "p27");
+
+	  TheNet->newArc(t2, p23);
+	  TheNet->newArc(p25, t4);
+
+	  Transition *t1 = TheNet->newTransition(prefix + "t1");
+	  TheNet->newArc(p27, t1);
+	  TheNet->newArc(t1, p34);
+
+	  Transition *t3 = TheNet->newTransition(prefix + "t3");
+	  TheNet->newArc(p20, t3);
+	  TheNet->newArc(t3, p33);
+	  TheNet->newArc(t3, p24);
+
+	  Transition *t5 = TheNet->newTransition(prefix + "t5");
+	  TheNet->newArc(p22, t5);
+	  TheNet->newArc(t5, p26);
+
+	  Transition *t6 = TheNet->newTransition(prefix + "t6");
+	  TheNet->newArc(t6, p26);
+	  TheNet->newArc(p21, t6);
+	  TheNet->newArc(p33, t6);
+	}
+	else
+	{
+	  TheNet->mergePlaces(p20, p33);
+	  TheNet->mergePlaces(p22, p34);
+	}
+
+
+	// unparse the stop pattern
+	phylum->tStop_1->unparse(pseudoPrinter, current_view);
+
+	// unparse the fault handlers
+	phylum->tFaultHandlers_1->unparse(pseudoPrinter, current_view);
+
+	// unparse the compensation handler
+	phylum->tCompensationHandler_1->unparse(pseudoPrinter, current_view);
+
+	// unparse the event handler
+	phylum->tEventHandlers_1->unparse(pseudoPrinter, current_view);
+
+	// unparse the embedded activity
+	phylum->activity_1->unparse(pseudoPrinter, current_view);
+
+
+    	// After the patterns of the inner activity of the process are generated
+      	// the push places of the child scopes are available and have to be
+	// connected with the transition t2 of the process.
+	for (set<unsigned int>::iterator child = ASTEmap[phylum->id]->enclosedScopes.begin(); child != ASTEmap[phylum->id]->enclosedScopes.end(); child++)
+	  TheNet->newArc(t2, TheNet->findPlace( toString(*child) + ".!push" ));
+
+
+	// Initialize the link places of the process.
+	for (set<string>::iterator link = linkNames.begin(); link != linkNames.end(); link++)
+	  TheNet->newArc(t2, TheNet->findPlace("!link." + *link));
+
+
+	// Embed the fault handler of the process.
+	TheNet->mergePlaces("1.internal.fault",     "1.internal.faultHandler.fault");
+	TheNet->mergePlaces("1.internal.faultSave", "1.internal.faultHandler.faultSave");
+	TheNet->mergePlaces("1.internal.rethrow",   "1.internal.faultHandler.rethrow");
+	TheNet->mergePlaces("1.internal.!Ended",    "1.internal.faultHandler.!Ended");
+	TheNet->mergePlaces("1.internal.Ended",     "1.internal.faultHandler.Ended");
+	TheNet->mergePlaces("1.internal.p41",       "1.internal.faultHandler.ch_fh");
+	TheNet->mergePlaces("1.internal.ch_out",    "1.internal.faultHandler.ch_out");
+	TheNet->mergePlaces("1.internal.final",     "1.internal.faultHandler.final");
+
+
+	// Embed the compensation handler of the process.
+	TheNet->mergePlaces("1.internal.Completed",        "1.internal.compensationHandler.Completed");
+	TheNet->mergePlaces("1.internal.!Completed",       "1.internal.compensationHandler.!Completed");
+	TheNet->mergePlaces("1.internal.Compensated",      "1.internal.compensationHandler.Compensated");
+	TheNet->mergePlaces("1.internal.p41",              "1.internal.compensationHandler.fh");
+	TheNet->mergePlaces("1.internal.scopeCompensated", "1.internal.compensationHandler.scopeCompensated");
+	TheNet->mergePlaces("1.internal.p34",              "1.internal.compensationHandler.clean");
+	TheNet->mergePlaces("1.internal.p35",              "1.internal.compensationHandler.cleaned");
+	TheNet->mergePlaces("1.internal.ch_out",           "1.internal.compensationHandler.ch_out");
+
+
+	// If present, embed the event handler of the process.
+	if (ASTEmap[phylum->id]->hasEH)
+	{
+	  TheNet->mergePlaces("1.internal.p23",      "1.internal.eventHandler.initial");
+	  TheNet->mergePlaces("1.internal.p24",      "1.internal.eventHandler.finish");
+	  TheNet->mergePlaces("1.internal.p25",      "1.internal.eventHandler.final");
+	  TheNet->mergePlaces("1.internal.p26",      "1.internal.eventHandler.stop");
+	  TheNet->mergePlaces("1.internal.p27",      "1.internal.eventHandler.stopped");
+	}
+
+
+	// Embed the stop-pattern of the process.
+	TheNet->mergePlaces("1.internal.Faulted",        "1.internal.stop.Faulted");
+	TheNet->mergePlaces("1.internal.upperFH",        "1.internal.stop.fault_in");
+	TheNet->mergePlaces("1.internal.fault",          "1.internal.stop.fault");
+	TheNet->mergePlaces("1.internal.faultSave",      "1.internal.stop.faultSave");
+	TheNet->mergePlaces("1.internal.Active",         "1.internal.stop.Active");
+	TheNet->mergePlaces("1.internal.!Active",        "1.internal.stop.!Active");
+	TheNet->mergePlaces("1.internal.final",          "1.internal.stop.final");
+	TheNet->mergePlaces("1.internal.upperTerminate", "1.internal.stop.terminate");
+	TheNet->mergePlaces("1.internal.!Faulted",       "1.internal.stop.!Faulted");
+	TheNet->mergePlaces("1.internal.rethrow",        "1.internal.stop.rethrow");
+	TheNet->mergePlaces("1.internal.Ended",          "1.internal.stop.Ended");
+	TheNet->mergePlaces("1.internal.Compensated",    "1.internal.stop.Compensated");
+	TheNet->mergePlaces("1.internal.!Ended",         "1.internal.stop.!Ended");
+	TheNet->mergePlaces("1.internal.p21",            "1.internal.stop.stop");
+	TheNet->mergePlaces("1.internal.p34",            "1.internal.stop.stopped");
+	TheNet->mergePlaces("1.internal.p35",            "1.internal.stop.cleanCH");
+	TheNet->mergePlaces("1.internal.p36",            "1.internal.stop.ch_cleaned");
+	TheNet->mergePlaces("1.internal.FHFaulted",      "1.internal.stop.FHFaulted");
+	TheNet->mergePlaces("1.internal.!FHFaulted",     "1.internal.stop.!FHFaulted");
+	TheNet->mergePlaces("1.internal.CHFaulted",      "1.internal.stop.CHFaulted");
+	TheNet->mergePlaces("1.internal.!CHFaulted",     "1.internal.stop.!CHFaulted");
+
+
+	// Embed the inner activity of the process.
+	TheNet->mergePlaces(TheNet->findPlace("1.internal.p19"), TheNet->findPlace(phylum->activity_1->id, ".initial"));
+	TheNet->mergePlaces(TheNet->findPlace("1.internal.p20"), TheNet->findPlace(phylum->activity_1->id, ".final"));
+	TheNet->mergePlaces(TheNet->findPlace("1.internal.p21"), TheNet->findPlace(phylum->activity_1->id, ".stop"));
+	TheNet->mergePlaces(TheNet->findPlace("1.internal.p22"), TheNet->findPlace(phylum->activity_1->id, ".stopped"));
+
+	break;
+      }
+
     case(petrinetnew_enum):
       {
+	currentScope = prefix;
+
 	// Create the interface places.
 	// The used lists are filled during parsing mapping each combination of
 	// partnerLink, portType and operation to one input (resp. output) place.
@@ -399,7 +660,7 @@ void PScope(const impl_tScope* abstract_phylum, uview current_view)
 	// unparse the embedded activity
 	phylum->activity_1->unparse(pseudoPrinter, current_view);
 
-	// unparse the embedded activity
+	// unparse the correlation sets
 	phylum->tCorrelationSet_list_1->unparse(pseudoPrinter, current_view);
 
 

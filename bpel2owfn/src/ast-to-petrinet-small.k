@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/11/29 13:06:30 $
+ * \date    \$Date: 2006/11/30 11:31:39 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.81 $
+ * \version \$Revision: 1.82 $
  *
  */
 %}
@@ -58,12 +58,12 @@ This=StandardElements(NiltTarget_list(), NiltSource_list(), jc) ->
       string prefix = toString(This->parentId) + ".";
       string newPrefix = toString(This->parentId) + ".internal";
 
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "final");
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "final");
 
       // Embed the inner activity.
-      TheNet->mergePlaces(p1, TheNet->findPlace(newPrefix + ".initial"));
-      TheNet->mergePlaces(p2, TheNet->findPlace(newPrefix + ".final"));
+      PN.mergePlaces(p1, PN.findPlace(newPrefix + ".initial"));
+      PN.mergePlaces(p2, PN.findPlace(newPrefix + ".final"));
     }
   ]
 ;
@@ -83,9 +83,9 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
       string prefix = toString(This->parentId) + ".";
       string newPrefix = toString(This->parentId) + ".internal";
 
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "done");
-      Place *p3 = TheNet->newPlace(prefix + "final");
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "done");
+      Place *p3 = PN.newPlace(prefix + "final");
 
 
       unsigned int linkCounter = 1;
@@ -94,19 +94,19 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
 	// Set the outgoing links (XOR given).
 	foreach (source; tSource_list a)
 	{
-  	  Transition *t1 = TheNet->newTransition(prefix + "setLinks" + toString(linkCounter++));
-    	  TheNet->newArc(p2, t1);
-      	  TheNet->newArc(t1, p3);
+  	  Transition *t1 = PN.newTransition(prefix + "setLinks" + toString(linkCounter++));
+    	  PN.newArc(p2, t1);
+      	  PN.newArc(t1, p3);
 
-          Place *p4 = TheNet->findPlace("link." + ASTEmap[source->id]->linkName);
-	  TheNet->newArc(t1, p4);
+          Place *p4 = PN.findPlace("link." + ASTEmap[source->id]->linkName);
+	  PN.newArc(t1, p4);
 
           foreach (source2; tSource_list a)
           {
             if (ASTEmap[source2->id]->linkName != ASTEmap[source->id]->linkName)
             {
-              Place *p5 = TheNet->findPlace("!link." + ASTEmap[source2->id]->linkName);
-	      TheNet->newArc(t1, p5);
+              Place *p5 = PN.findPlace("!link." + ASTEmap[source2->id]->linkName);
+	      PN.newArc(t1, p5);
             }
           }
 
@@ -120,15 +120,15 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
       }
       else
       {
-  	Transition *t1 = TheNet->newTransition(prefix + "setLinks");
-    	TheNet->newArc(p2, t1);
-      	TheNet->newArc(t1, p3);
+  	Transition *t1 = PN.newTransition(prefix + "setLinks");
+    	PN.newArc(p2, t1);
+      	PN.newArc(t1, p3);
 
 	// Set the outgoing links (standard transition condition expected).
 	foreach (source; tSource_list a)
 	{
-          Place *p4 = TheNet->findPlace("link." + ASTEmap[source->id]->linkName);
-	  TheNet->newArc(t1, p4);
+          Place *p4 = PN.findPlace("link." + ASTEmap[source->id]->linkName);
+	  PN.newArc(t1, p4);
 
           string givenTransitionCondition = ASTEmap[source->id]->attributes["transitionCondition"];
           if (givenTransitionCondition != "" && givenTransitionCondition != "true")
@@ -143,8 +143,8 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
 
 
       // Embed the inner activity.
-      TheNet->mergePlaces(p1, TheNet->findPlace(newPrefix + ".initial"));
-      TheNet->mergePlaces(p2, TheNet->findPlace(newPrefix + ".final"));
+      PN.mergePlaces(p1, PN.findPlace(newPrefix + ".initial"));
+      PN.mergePlaces(p2, PN.findPlace(newPrefix + ".final"));
     }
   ]
 ;
@@ -185,21 +185,21 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF)
       string prefix = toString(This->parentId) + ".";
       string newPrefix = toString(This->parentId) + ".internal";
 
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "final");
-      Place *p3 = TheNet->newPlace(prefix + "joinTrue");
-      Place *p4 = TheNet->newPlace(prefix + "joinFalse");
-      Place *p5 = TheNet->newPlace(prefix + "begin");
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "final");
+      Place *p3 = PN.newPlace(prefix + "joinTrue");
+      Place *p4 = PN.newPlace(prefix + "joinFalse");
+      Place *p5 = PN.newPlace(prefix + "begin");
 
-      Transition *t1 = TheNet->newTransition(prefix + "start");
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(p3, t1);
-      TheNet->newArc(t1, p5);
+      Transition *t1 = PN.newTransition(prefix + "start");
+      PN.newArc(p1, t1);
+      PN.newArc(p3, t1);
+      PN.newArc(t1, p5);
 
-      Transition *t2 = TheNet->newTransition(prefix + "skip");
-      TheNet->newArc(p1, t2);
-      TheNet->newArc(p4, t2);
-      TheNet->newArc(t2, p2);
+      Transition *t2 = PN.newTransition(prefix + "skip");
+      PN.newArc(p1, t2);
+      PN.newArc(p4, t2);
+      PN.newArc(t2, p2);
 
       // sets enclosed source links to false
       dpeLinks(t2, parentId);
@@ -218,8 +218,8 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF)
         int linkCount = 0;
 	foreach (target; tTarget_list a)
 	{
-	  Place *linkT = TheNet->findPlace("link." + ASTEmap[target->id]->linkName);
-	  Place *linkF = TheNet->findPlace("!link." + ASTEmap[target->id]->linkName);
+	  Place *linkT = PN.findPlace("link." + ASTEmap[target->id]->linkName);
+	  Place *linkF = PN.findPlace("!link." + ASTEmap[target->id]->linkName);
 
           trueLinks[linkCount] = linkT;
           falseLinks[linkCount] = linkF;
@@ -232,21 +232,21 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF)
         unsigned int transitionNumber = (unsigned int)pow(2.0, a->length());
         for (unsigned int i = 0; i < transitionNumber; i++)
         {
-          joinTransitions[i] = TheNet->newTransition(prefix + "join" + toString(i));
+          joinTransitions[i] = PN.newTransition(prefix + "join" + toString(i));
 
           for (unsigned int j = 0; j < linkCount; j++)
           {
             if (((i >> j) % 2) == 0) // this rather cryptic expression correctly connects the links
-              TheNet->newArc(trueLinks[j], joinTransitions[i]);
+              PN.newArc(trueLinks[j], joinTransitions[i]);
             else
-              TheNet->newArc(falseLinks[j], joinTransitions[i]);
+              PN.newArc(falseLinks[j], joinTransitions[i]);
           }
 
           // only one transition makes the join fail
           if (i == transitionNumber-1)
-            TheNet->newArc(joinTransitions[i], p4);
+            PN.newArc(joinTransitions[i], p4);
           else
-            TheNet->newArc(joinTransitions[i], p3);
+            PN.newArc(joinTransitions[i], p3);
         }
       }
       else
@@ -254,8 +254,8 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF)
 
 
       // Embed the inner activity.
-      TheNet->mergePlaces(p5, TheNet->findPlace(newPrefix + ".initial"));
-      TheNet->mergePlaces(p2, TheNet->findPlace(newPrefix + ".final"));
+      PN.mergePlaces(p5, PN.findPlace(newPrefix + ".initial"));
+      PN.mergePlaces(p2, PN.findPlace(newPrefix + ".final"));
     }
   ]
 ;
@@ -277,22 +277,22 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
       string prefix = toString(This->parentId) + ".";
       string newPrefix = toString(This->parentId) + ".internal";
 
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "begin");
-      Place *p3 = TheNet->newPlace(prefix + "done");
-      Place *p4 = TheNet->newPlace(prefix + "final");
-      Place *p5 = TheNet->newPlace(prefix + "joinFalse");
-      Place *p6 = TheNet->newPlace(prefix + "joinTrue");
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "begin");
+      Place *p3 = PN.newPlace(prefix + "done");
+      Place *p4 = PN.newPlace(prefix + "final");
+      Place *p5 = PN.newPlace(prefix + "joinFalse");
+      Place *p6 = PN.newPlace(prefix + "joinTrue");
 
-      Transition *t1 = TheNet->newTransition(prefix + "start");
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(p6, t1);
-      TheNet->newArc(t1, p2);
+      Transition *t1 = PN.newTransition(prefix + "start");
+      PN.newArc(p1, t1);
+      PN.newArc(p6, t1);
+      PN.newArc(t1, p2);
 
-      Transition *t2 = TheNet->newTransition(prefix + "skip");
-      TheNet->newArc(p1, t2);
-      TheNet->newArc(p5, t2);
-      TheNet->newArc(t2, p4);
+      Transition *t2 = PN.newTransition(prefix + "skip");
+      PN.newArc(p1, t2);
+      PN.newArc(p5, t2);
+      PN.newArc(t2, p4);
 
       // sets enclosed source links to false
       dpeLinks(t2, This->parentId);
@@ -303,19 +303,19 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
 	// Set the outgoing links (XOR given).
 	foreach (source; tSource_list b)
 	{
-  	  Transition *t3 = TheNet->newTransition(prefix + "setLinks" + toString(linkCounter++));
-    	  TheNet->newArc(p3, t3);
-      	  TheNet->newArc(t3, p4);
+  	  Transition *t3 = PN.newTransition(prefix + "setLinks" + toString(linkCounter++));
+    	  PN.newArc(p3, t3);
+      	  PN.newArc(t3, p4);
 
-          Place *p7 = TheNet->findPlace("link." + ASTEmap[source->id]->linkName);
-	  TheNet->newArc(t3, p7);
+          Place *p7 = PN.findPlace("link." + ASTEmap[source->id]->linkName);
+	  PN.newArc(t3, p7);
 
           foreach (source2; tSource_list b)
           {
             if (source2 != source)
             {
-              Place *p8 = TheNet->findPlace("!link." + ASTEmap[source2->id]->linkName);
-	      TheNet->newArc(t3, p8);
+              Place *p8 = PN.findPlace("!link." + ASTEmap[source2->id]->linkName);
+	      PN.newArc(t3, p8);
             }
           }
 
@@ -329,15 +329,15 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
       }
       else
       {
-  	Transition *t3 = TheNet->newTransition(prefix + "setLinks");
-    	TheNet->newArc(p3, t3);
-      	TheNet->newArc(t3, p4);
+  	Transition *t3 = PN.newTransition(prefix + "setLinks");
+    	PN.newArc(p3, t3);
+      	PN.newArc(t3, p4);
       
 	// Set the outgoing links (standard transition condition expected).
 	foreach (source; tSource_list b)
         {
-	  Place *p7 = TheNet->findPlace("link." + ASTEmap[source->id]->linkName);
-          TheNet->newArc(t3, p7);
+	  Place *p7 = PN.findPlace("link." + ASTEmap[source->id]->linkName);
+          PN.newArc(t3, p7);
 
           string givenTransitionCondition = ASTEmap[source->id]->attributes["transitionCondition"];
           if (givenTransitionCondition != "" && givenTransitionCondition != "true")
@@ -365,8 +365,8 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
         int linkCount = 0;
 	foreach (target; tTarget_list a)
 	{
-	  Place *linkT = TheNet->findPlace("link." + ASTEmap[target->id]->linkName);
-	  Place *linkF = TheNet->findPlace("!link." + ASTEmap[target->id]->linkName);
+	  Place *linkT = PN.findPlace("link." + ASTEmap[target->id]->linkName);
+	  Place *linkF = PN.findPlace("!link." + ASTEmap[target->id]->linkName);
 
           trueLinks[linkCount] = linkT;
           falseLinks[linkCount] = linkF;
@@ -379,21 +379,21 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
         unsigned int transitionNumber = (unsigned int)pow(2.0, a->length());
         for (unsigned int i = 0; i < transitionNumber; i++)
         {
-          joinTransitions[i] = TheNet->newTransition(prefix + "join" + toString(i));
+          joinTransitions[i] = PN.newTransition(prefix + "join" + toString(i));
 
           for (unsigned int j = 0; j < linkCount; j++)
           {
             if (((i >> j) % 2) == 0) // this rather cryptic expression correctly connects the links
-              TheNet->newArc(trueLinks[j], joinTransitions[i]);
+              PN.newArc(trueLinks[j], joinTransitions[i]);
             else
-              TheNet->newArc(falseLinks[j], joinTransitions[i]);
+              PN.newArc(falseLinks[j], joinTransitions[i]);
           }
 
           // only one transition makes the join fail
           if (i == transitionNumber-1)
-            TheNet->newArc(joinTransitions[i], p5);
+            PN.newArc(joinTransitions[i], p5);
           else
-            TheNet->newArc(joinTransitions[i], p6);
+            PN.newArc(joinTransitions[i], p6);
         }
       }
       else
@@ -402,8 +402,8 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
 
 
       // Embed the inner activity.
-      TheNet->mergePlaces(p2, TheNet->findPlace(newPrefix + ".initial"));
-      TheNet->mergePlaces(p3, TheNet->findPlace(newPrefix + ".final"));
+      PN.mergePlaces(p2, PN.findPlace(newPrefix + ".initial"));
+      PN.mergePlaces(p3, PN.findPlace(newPrefix + ".final"));
     }
   ]
 ;

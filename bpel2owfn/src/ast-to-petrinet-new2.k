@@ -29,7 +29,7 @@
  *
  * \since   2006-10-30
  *
- * \date    \$Date: 2006/11/29 14:18:37 $
+ * \date    \$Date: 2006/11/30 11:31:39 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  */
 %}
 
@@ -64,41 +64,41 @@ This=Compensate(a,_id) ->
       assert(This->id == _id->value);
       assert(ASTEmap[_id->value] != NULL);
 
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "final");
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "final");
 
       assert(ASTEmap[ASTEmap[_id->value]->parentScopeId] != NULL);
       if (!ASTEmap[ASTEmap[_id->value]->parentScopeId]->enclosedScopes.empty())
       {
-        Place *p5 = TheNet->newPlace(prefix + "compensating");
-        Place *p3 = TheNet->newPlace(prefix + "stop");
-        Place *p4 = TheNet->newPlace(prefix + "stopped");
+        Place *p5 = PN.newPlace(prefix + "compensating");
+        Place *p3 = PN.newPlace(prefix + "stop");
+        Place *p4 = PN.newPlace(prefix + "stopped");
 
-        Transition *t1 = TheNet->newTransition(prefix + "begin_compensation");
-        TheNet->newArc(p1, t1);
-        TheNet->newArc(t1, p5);
+        Transition *t1 = PN.newTransition(prefix + "begin_compensation");
+        PN.newArc(p1, t1);
+        PN.newArc(t1, p5);
 
-        Transition *t2 = TheNet->newTransition(prefix + "complete_compensation");
-        TheNet->newArc(p5, t2);
-        TheNet->newArc(t2, p2);
+        Transition *t2 = PN.newTransition(prefix + "complete_compensation");
+        PN.newArc(p5, t2);
+        PN.newArc(t2, p2);
 
-        Transition *t3 = TheNet->newTransition(prefix + "stop_compensation");
-        TheNet->newArc(p3, t3);
-        TheNet->newArc(p5, t3, READ);
+        Transition *t3 = PN.newTransition(prefix + "stop_compensation");
+        PN.newArc(p3, t3);
+        PN.newArc(p5, t3, READ);
 
-        Transition *t4 = TheNet->newTransition(prefix + "compensation_stopped");
-        TheNet->newArc(t4, p4);
-        TheNet->newArc(p5, t4);
+        Transition *t4 = PN.newTransition(prefix + "compensation_stopped");
+        PN.newArc(t4, p4);
+        PN.newArc(p5, t4);
 
         // connect the transitions with all enclosed scopes
         assert(ASTEmap[ASTEmap[_id->value]->parentScopeId] != NULL);
         for (set<unsigned int>::iterator it = ASTEmap[ASTEmap[_id->value]->parentScopeId]->enclosedScopes.begin();
              it != ASTEmap[ASTEmap[_id->value]->parentScopeId]->enclosedScopes.end(); it++)
         {
-          TheNet->newArc(t1, TheNet->findPlace(toString(*it) + ".internal.compensate"));
-          TheNet->newArc(TheNet->findPlace(toString(*it) + ".internal.compensated"), t2);
-          TheNet->newArc(t3, TheNet->findPlace(toString(*it) + ".internal.ch_stop"));
-          TheNet->newArc(TheNet->findPlace(toString(*it) + ".internal.ch_stopped"), t4);
+          PN.newArc(t1, PN.findPlace(toString(*it) + ".internal.compensate"));
+          PN.newArc(PN.findPlace(toString(*it) + ".internal.compensated"), t2);
+          PN.newArc(t3, PN.findPlace(toString(*it) + ".internal.ch_stop"));
+          PN.newArc(PN.findPlace(toString(*it) + ".internal.ch_stopped"), t4);
         }
 
         // Transitions for the negative control flow.
@@ -107,7 +107,7 @@ This=Compensate(a,_id) ->
       }
       else // no enclosed scopes
       {
-        TheNet->mergePlaces(p1, p2);
+        PN.mergePlaces(p1, p2);
       }
     }
     a // standardElements
@@ -137,31 +137,31 @@ This=CompensateScope(a,b,_id) ->
 
       unsigned int scopeId = scopeNames[ASTEmap[_id->value]->attributes["target"]];
 
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "final");
-      Place *p3 = TheNet->newPlace(prefix + "stop");
-      Place *p4 = TheNet->newPlace(prefix + "stopped");
-      Place *p5 = TheNet->newPlace(prefix + "compensating");
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "final");
+      Place *p3 = PN.newPlace(prefix + "stop");
+      Place *p4 = PN.newPlace(prefix + "stopped");
+      Place *p5 = PN.newPlace(prefix + "compensating");
 
-      Transition *t1 = TheNet->newTransition(prefix + "begin_compensation");
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(t1, p5);
-      TheNet->newArc(t1, TheNet->findPlace(toString(scopeId) + ".internal.compensate"));
+      Transition *t1 = PN.newTransition(prefix + "begin_compensation");
+      PN.newArc(p1, t1);
+      PN.newArc(t1, p5);
+      PN.newArc(t1, PN.findPlace(toString(scopeId) + ".internal.compensate"));
 
-      Transition *t2 = TheNet->newTransition(prefix + "complete_compensation");
-      TheNet->newArc(p5, t2);
-      TheNet->newArc(t2, p2);
-      TheNet->newArc(TheNet->findPlace(toString(scopeId) + ".internal.compensated"), t2);
+      Transition *t2 = PN.newTransition(prefix + "complete_compensation");
+      PN.newArc(p5, t2);
+      PN.newArc(t2, p2);
+      PN.newArc(PN.findPlace(toString(scopeId) + ".internal.compensated"), t2);
 
-      Transition *t3 = TheNet->newTransition(prefix + "stop_compensation");
-      TheNet->newArc(p3, t3);
-      TheNet->newArc(p5, t3, READ);
-      TheNet->newArc(t3, TheNet->findPlace(toString(scopeId) + ".internal.ch_stop"));
+      Transition *t3 = PN.newTransition(prefix + "stop_compensation");
+      PN.newArc(p3, t3);
+      PN.newArc(p5, t3, READ);
+      PN.newArc(t3, PN.findPlace(toString(scopeId) + ".internal.ch_stop"));
 
-      Transition *t4 = TheNet->newTransition(prefix + "compensation_stopped");
-      TheNet->newArc(t4, p4);
-      TheNet->newArc(p5, t4);
-      TheNet->newArc(TheNet->findPlace(toString(scopeId) + ".internal.ch_stopped"), t4);
+      Transition *t4 = PN.newTransition(prefix + "compensation_stopped");
+      PN.newArc(t4, p4);
+      PN.newArc(p5, t4);
+      PN.newArc(PN.findPlace(toString(scopeId) + ".internal.ch_stopped"), t4);
 
       // Transitions for the negative control flow.
       Transition *t5 = stop(p1, "initial", prefix);

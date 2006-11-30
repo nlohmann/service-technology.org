@@ -5,7 +5,7 @@
 #include "ast-details.h"
 #include "options.h"
 
-extern PetriNet *TheNet;
+extern PetriNet PN;
 extern map<unsigned int, ASTE*> ASTEmap;
 extern string currentScope;
 %}
@@ -27,21 +27,21 @@ void PEmpty(impl_tEmpty* abstract_phylum, uview current_view)
 
 
   // places
-  Place *p1 = TheNet->newPlace(prefix + "initial");
-  Place *p2 = TheNet->newPlace(prefix + "final");
+  Place *p1 = PN.newPlace(prefix + "initial");
+  Place *p2 = PN.newPlace(prefix + "final");
 
 
   // transitions
-  Transition *t1 = TheNet->newTransition(prefix + "empty");
-  TheNet->newArc(p1, t1);
-  TheNet->newArc(t1, p2);
+  Transition *t1 = PN.newTransition(prefix + "empty");
+  PN.newArc(p1, t1);
+  PN.newArc(t1, p2);
 
 
   // places and transitions for the negative control flow
   if (current_view != petrinetsmall_enum)
   {
-    Place *p3 = TheNet->newPlace(prefix + "stop");
-    Place *p4 = TheNet->newPlace(prefix + "stopped");
+    Place *p3 = PN.newPlace(prefix + "stop");
+    Place *p4 = PN.newPlace(prefix + "stopped");
     Transition *t2 = stop(p1, "initial", prefix);
     Transition *t3 = stop(p2, "final", prefix);
   }
@@ -75,23 +75,23 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
     case(petrinet_enum):
     case(petrinetnew_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "running");
-	Place *p3 = TheNet->newPlace(prefix + "final");
-	Place *p4 = TheNet->newPlace(prefix + "p4");
-	Place *p5 = TheNet->newPlace(prefix + "stop");
-	Place *p6 = TheNet->newPlace(prefix + "stopped");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "running");
+	Place *p3 = PN.newPlace(prefix + "final");
+	Place *p4 = PN.newPlace(prefix + "p4");
+	Place *p5 = PN.newPlace(prefix + "stop");
+	Place *p6 = PN.newPlace(prefix + "stopped");
 
-	Transition *t1 = TheNet->newTransition(prefix + "t1");
-	TheNet->newArc(p1, t1); 
-	TheNet->newArc(t1, p2);
+	Transition *t1 = PN.newTransition(prefix + "t1");
+	PN.newArc(p1, t1); 
+	PN.newArc(t1, p2);
 	if (!parameters[P_NOVARIABLES])
-	  TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[phylum->id]->inputVariableName), t1, READ);
+	  PN.newArc(PN.findPlace("variable." + ASTEmap[phylum->id]->inputVariableName), t1, READ);
 
-	Transition *t2 = TheNet->newTransition(prefix + "t2");
-	TheNet->newArc(p2, t2);
-	TheNet->newArc(t2, p3);
-	TheNet->newArc(t2, TheNet->findPlace("out." + ASTEmap[phylum->id]->channelName));
+	Transition *t2 = PN.newTransition(prefix + "t2");
+	PN.newArc(p2, t2);
+	PN.newArc(t2, p3);
+	PN.newArc(t2, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
 	t2->type = OUT;
 
 	// Transitions for the negative control flow.
@@ -108,13 +108,13 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 
     case(petrinetsmall_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "final");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "final");
 
-	Transition *t1 = TheNet->newTransition(prefix + "invoke");
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
-	TheNet->newArc(t1, TheNet->findPlace("out." + ASTEmap[phylum->id]->channelName));
+	Transition *t1 = PN.newTransition(prefix + "invoke");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
+	PN.newArc(t1, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
 	t1->type = OUT;
 	
 	break;
@@ -149,40 +149,40 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
     case(petrinet_enum):
     case(petrinetnew_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "running1");
-	Place *p3 = TheNet->newPlace(prefix + "p3");
-	Place *p4 = TheNet->newPlace(prefix + "running2");
-	Place *p5 = TheNet->newPlace(prefix + "final");
-	Place *p6 = TheNet->newPlace(prefix + "p6");
-	Place *p7 = TheNet->newPlace(prefix + "stop");
-	Place *p8 = TheNet->newPlace(prefix + "stopped");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "running1");
+	Place *p3 = PN.newPlace(prefix + "p3");
+	Place *p4 = PN.newPlace(prefix + "running2");
+	Place *p5 = PN.newPlace(prefix + "final");
+	Place *p6 = PN.newPlace(prefix + "p6");
+	Place *p7 = PN.newPlace(prefix + "stop");
+	Place *p8 = PN.newPlace(prefix + "stopped");
 
-	Transition *t1 = TheNet->newTransition(prefix + "t1");
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
+	Transition *t1 = PN.newTransition(prefix + "t1");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
 	if (!parameters[P_NOVARIABLES])
-	  TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[phylum->id]->inputVariableName), t1, READ);
+	  PN.newArc(PN.findPlace("variable." + ASTEmap[phylum->id]->inputVariableName), t1, READ);
 
-	Transition *t2 = TheNet->newTransition(prefix + "t2");
-	TheNet->newArc(t2, TheNet->findPlace("out." + ASTEmap[phylum->id]->channelName));
-	TheNet->newArc(p2, t2);
-	TheNet->newArc(t2, p3);
+	Transition *t2 = PN.newTransition(prefix + "t2");
+	PN.newArc(t2, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
+	PN.newArc(p2, t2);
+	PN.newArc(t2, p3);
 	t2->type = OUT;
 
-	Transition *t3 = TheNet->newTransition(prefix + "t3");
-	TheNet->newArc(TheNet->findPlace("in." + ASTEmap[phylum->id]->channelName), t3);
-	TheNet->newArc(p3, t3);
-	TheNet->newArc(t3, p4);
+	Transition *t3 = PN.newTransition(prefix + "t3");
+	PN.newArc(PN.findPlace("in." + ASTEmap[phylum->id]->channelName), t3);
+	PN.newArc(p3, t3);
+	PN.newArc(t3, p4);
 	t3->type = IN;
 
-	Transition *t4 = TheNet->newTransition(prefix + "t4");
-	TheNet->newArc(p4, t4);
-	TheNet->newArc(t4, p5);
+	Transition *t4 = PN.newTransition(prefix + "t4");
+	PN.newArc(p4, t4);
+	PN.newArc(t4, p5);
 	if (!parameters[P_NOVARIABLES])
 	{
-	  TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[phylum->id]->outputVariableName), t4);
-	  TheNet->newArc(t4, TheNet->findPlace("variable." + ASTEmap[phylum->id]->outputVariableName));
+	  PN.newArc(PN.findPlace("variable." + ASTEmap[phylum->id]->outputVariableName), t4);
+	  PN.newArc(t4, PN.findPlace("variable." + ASTEmap[phylum->id]->outputVariableName));
 	}
 
 	// Transitions for the negative control flow.
@@ -204,20 +204,20 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 
     case(petrinetsmall_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "running");
-	Place *p3 = TheNet->newPlace(prefix + "final");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "running");
+	Place *p3 = PN.newPlace(prefix + "final");
 
-	Transition *t1 = TheNet->newTransition(prefix + "invokeO");
-	TheNet->newArc(t1, TheNet->findPlace("out." + ASTEmap[phylum->id]->channelName));
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
+	Transition *t1 = PN.newTransition(prefix + "invokeO");
+	PN.newArc(t1, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
 	t1->type = OUT;
 
-	Transition *t2 = TheNet->newTransition(prefix + "invokeI");
-	TheNet->newArc(TheNet->findPlace("in." + ASTEmap[phylum->id]->channelName), t2);
-	TheNet->newArc(p2, t2);
-	TheNet->newArc(t2, p3);
+	Transition *t2 = PN.newTransition(prefix + "invokeI");
+	PN.newArc(PN.findPlace("in." + ASTEmap[phylum->id]->channelName), t2);
+	PN.newArc(p2, t2);
+	PN.newArc(t2, p3);
 	t2->type = IN;
 
 	break;
@@ -256,26 +256,26 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
     case(petrinet_enum):
     case(petrinetnew_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "running");
-	Place *p3 = TheNet->newPlace(prefix + "final");
-	Place *p4 = TheNet->newPlace(prefix + "p4");
-	Place *p5 = TheNet->newPlace(prefix + "stop");
-	Place *p6 = TheNet->newPlace(prefix + "stopped");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "running");
+	Place *p3 = PN.newPlace(prefix + "final");
+	Place *p4 = PN.newPlace(prefix + "p4");
+	Place *p5 = PN.newPlace(prefix + "stop");
+	Place *p6 = PN.newPlace(prefix + "stopped");
 
-	Transition *t1 = TheNet->newTransition(prefix + "t1");
-	TheNet->newArc(TheNet->findPlace("in." + ASTEmap[phylum->id]->channelName), t1);
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
+	Transition *t1 = PN.newTransition(prefix + "t1");
+	PN.newArc(PN.findPlace("in." + ASTEmap[phylum->id]->channelName), t1);
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
 	t1->type = IN;
 
-	Transition *t2 = TheNet->newTransition(prefix + "t2");
-	TheNet->newArc(p2, t2);
-	TheNet->newArc(t2, p3);
+	Transition *t2 = PN.newTransition(prefix + "t2");
+	PN.newArc(p2, t2);
+	PN.newArc(t2, p3);
 	if (!parameters[P_NOVARIABLES])
 	{
-	  TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[phylum->id]->variableName), t2);
-	  TheNet->newArc(t2, TheNet->findPlace("variable." + ASTEmap[phylum->id]->variableName));
+	  PN.newArc(PN.findPlace("variable." + ASTEmap[phylum->id]->variableName), t2);
+	  PN.newArc(t2, PN.findPlace("variable." + ASTEmap[phylum->id]->variableName));
 	}
 
 	// Transitions for the negative control flow.
@@ -292,13 +292,13 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
 
     case(petrinetsmall_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "final");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "final");
 
-	Transition *t1 = TheNet->newTransition(prefix + "receive");
-	TheNet->newArc(TheNet->findPlace("in." + ASTEmap[phylum->id]->channelName), t1);
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
+	Transition *t1 = PN.newTransition(prefix + "receive");
+	PN.newArc(PN.findPlace("in." + ASTEmap[phylum->id]->channelName), t1);
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
 	t1->type = IN;
 
 	break;
@@ -336,23 +336,23 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
     case(petrinet_enum):
     case(petrinetnew_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "running");
-	Place *p3 = TheNet->newPlace(prefix + "final");
-	Place *p4 = TheNet->newPlace(prefix + "p4");
-	Place *p5 = TheNet->newPlace(prefix + "stop");
-	Place *p6 = TheNet->newPlace(prefix + "stopped");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "running");
+	Place *p3 = PN.newPlace(prefix + "final");
+	Place *p4 = PN.newPlace(prefix + "p4");
+	Place *p5 = PN.newPlace(prefix + "stop");
+	Place *p6 = PN.newPlace(prefix + "stopped");
 
-	Transition *t1 = TheNet->newTransition(prefix + "t1");
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
+	Transition *t1 = PN.newTransition(prefix + "t1");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
 	if (!parameters[P_NOVARIABLES])
-	  TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[phylum->id]->variableName), t1, READ);
+	  PN.newArc(PN.findPlace("variable." + ASTEmap[phylum->id]->variableName), t1, READ);
 
-	Transition *t2 = TheNet->newTransition(prefix + "t2");
-	TheNet->newArc(t2, TheNet->findPlace("out." + ASTEmap[phylum->id]->channelName));
-	TheNet->newArc(p2, t2);
-	TheNet->newArc(t2, p3);
+	Transition *t2 = PN.newTransition(prefix + "t2");
+	PN.newArc(t2, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
+	PN.newArc(p2, t2);
+	PN.newArc(t2, p3);
 	t2->type = OUT;
 
 	// Transitions for the negative control flow.
@@ -369,13 +369,13 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
 
     case(petrinetsmall_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "final");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "final");
 
-	Transition *t1 = TheNet->newTransition(prefix + "reply");
-	TheNet->newArc(t1, TheNet->findPlace("out." + ASTEmap[phylum->id]->channelName));
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
+	Transition *t1 = PN.newTransition(prefix + "reply");
+	PN.newArc(t1, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
 	t1->type = OUT;
 
 	break;
@@ -414,10 +414,10 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
     case(petrinet_enum):
     case(petrinetnew_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p3 = TheNet->newPlace(prefix + "final");
-	Place *p5 = TheNet->newPlace(prefix + "stop");
-	Place *p6 = TheNet->newPlace(prefix + "stopped");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p3 = PN.newPlace(prefix + "final");
+	Place *p5 = PN.newPlace(prefix + "stop");
+	Place *p6 = PN.newPlace(prefix + "stopped");
 	
 	Transition *t4 = stop(p1, "initial", prefix);
 	Transition *t7 = stop(p3, "final", prefix);
@@ -426,7 +426,7 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
 
 	int copyCount = 1;
-	Place *lastPlace = TheNet->findPlace(prefix + "initial");
+	Place *lastPlace = PN.findPlace(prefix + "initial");
 
 	foreach (copyBlock=Copy(from,to); tCopy_list phylum->tCopy_list_1)
 	{
@@ -434,23 +434,23 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 
 	  if (ASTEmap[from->id]->variableName != "")
 	  {
-	    Place *p2 = TheNet->newPlace(newPrefix + "running");
-	    Place *p4 = TheNet->newPlace(newPrefix + "p4");
-	    Place *p8 = TheNet->newPlace(newPrefix + "final");
+	    Place *p2 = PN.newPlace(newPrefix + "running");
+	    Place *p4 = PN.newPlace(newPrefix + "p4");
+	    Place *p8 = PN.newPlace(newPrefix + "final");
       
-	    Transition *t1 = TheNet->newTransition(newPrefix + "t1");
-	    TheNet->newArc(lastPlace, t1);
-	    TheNet->newArc(t1, p2);
+	    Transition *t1 = PN.newTransition(newPrefix + "t1");
+	    PN.newArc(lastPlace, t1);
+	    PN.newArc(t1, p2);
             if (!parameters[P_NOVARIABLES])
-	      TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[from->id]->variableName), t1, READ);
+	      PN.newArc(PN.findPlace("variable." + ASTEmap[from->id]->variableName), t1, READ);
 
-	    Transition *t2 = TheNet->newTransition(newPrefix + "t2");
-	    TheNet->newArc(p2, t2);
-	    TheNet->newArc(t2, p8);
+	    Transition *t2 = PN.newTransition(newPrefix + "t2");
+	    PN.newArc(p2, t2);
+	    PN.newArc(t2, p8);
 	    if (!parameters[P_NOVARIABLES])
 	    {
-	      TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[to->id]->variableName), t2);
-	      TheNet->newArc(t2, TheNet->findPlace("variable." + ASTEmap[to->id]->variableName));
+	      PN.newArc(PN.findPlace("variable." + ASTEmap[to->id]->variableName), t2);
+	      PN.newArc(t2, PN.findPlace("variable." + ASTEmap[to->id]->variableName));
 	    }
 
 	    // Transitions for the negative control flow.
@@ -463,16 +463,16 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 	  }
 	  else
 	  {
-	    Place *p4 = TheNet->newPlace(newPrefix + "p4");
-	    Place *p8 = TheNet->newPlace(newPrefix + "final");
+	    Place *p4 = PN.newPlace(newPrefix + "p4");
+	    Place *p8 = PN.newPlace(newPrefix + "final");
 	    
-	    Transition *t2 = TheNet->newTransition(newPrefix + "t2");
-	    TheNet->newArc(lastPlace, t2);
-	    TheNet->newArc(t2, p8);
+	    Transition *t2 = PN.newTransition(newPrefix + "t2");
+	    PN.newArc(lastPlace, t2);
+	    PN.newArc(t2, p8);
 	    if (!parameters[P_NOVARIABLES])
 	    {
-	      TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[to->id]->variableName), t2);
-	      TheNet->newArc(t2, TheNet->findPlace("variable." + ASTEmap[to->id]->variableName));
+	      PN.newArc(PN.findPlace("variable." + ASTEmap[to->id]->variableName), t2);
+	      PN.newArc(t2, PN.findPlace("variable." + ASTEmap[to->id]->variableName));
 	    }
 
 	    // Transitions for the negative control flow.
@@ -487,19 +487,19 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 	  copyCount++;
 	}
 
-	TheNet->mergePlaces(TheNet->findPlace(prefix + "final"), lastPlace);
+	PN.mergePlaces(PN.findPlace(prefix + "final"), lastPlace);
 	break;
       }
 
     case (petrinetsmall_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "final");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "final");
 
-	Transition *t1 = TheNet->newTransition(prefix + "assign");
+	Transition *t1 = PN.newTransition(prefix + "assign");
 
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
 
 	// unparse the standard elements
 	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
@@ -536,20 +536,20 @@ void PValidate(impl_tValidate* abstract_phylum, uview current_view)
     case(petrinet_enum):
     case(petrinetnew_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "running");
-	Place *p3 = TheNet->newPlace(prefix + "final");
-	Place *p4 = TheNet->newPlace(prefix + "p4");
-	Place *p5 = TheNet->newPlace(prefix + "stop");
-	Place *p6 = TheNet->newPlace(prefix + "stopped");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "running");
+	Place *p3 = PN.newPlace(prefix + "final");
+	Place *p4 = PN.newPlace(prefix + "p4");
+	Place *p5 = PN.newPlace(prefix + "stop");
+	Place *p6 = PN.newPlace(prefix + "stopped");
 
-	Transition *t1 = TheNet->newTransition(prefix + "t1");
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
+	Transition *t1 = PN.newTransition(prefix + "t1");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
 
-	Transition *t2 = TheNet->newTransition(prefix + "t2");
-	TheNet->newArc(p2, t2);
-	TheNet->newArc(t2, p3);
+	Transition *t2 = PN.newTransition(prefix + "t2");
+	PN.newArc(p2, t2);
+	PN.newArc(t2, p3);
 
 	// Transitions for the negative control flow.
 	if (parameters[P_NOSTANDARDFAULTS] == false)
@@ -565,12 +565,12 @@ void PValidate(impl_tValidate* abstract_phylum, uview current_view)
 
     case(petrinetsmall_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "final");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "final");
 
-	Transition *t1 = TheNet->newTransition(prefix + "validate");
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
+	Transition *t1 = PN.newTransition(prefix + "validate");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
 
 	break;
       }
@@ -608,15 +608,15 @@ void PWaitUntil(impl_tWait* abstract_phylum, uview current_view)
     case(petrinet_enum):
     case(petrinetnew_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "final");
-	Place *p3 = TheNet->newPlace(prefix + "stop");
-	Place *p4 = TheNet->newPlace(prefix + "stopped");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "final");
+	Place *p3 = PN.newPlace(prefix + "stop");
+	Place *p4 = PN.newPlace(prefix + "stopped");
 
-	Transition *t1 = TheNet->newTransition(prefix + "waitUntil");
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
-	TheNet->newArc(TheNet->findPlace("1.internal.clock"), t1, READ);
+	Transition *t1 = PN.newTransition(prefix + "waitUntil");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
+	PN.newArc(PN.findPlace("1.internal.clock"), t1, READ);
 
 	// Transitions for the negative control flow.
 	Transition *t2 = stop(p1, "initial", prefix);
@@ -627,12 +627,12 @@ void PWaitUntil(impl_tWait* abstract_phylum, uview current_view)
 
     case (petrinetsmall_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "final");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "final");
 
-	Transition *t1 = TheNet->newTransition(prefix + "waitUntil");
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
+	Transition *t1 = PN.newTransition(prefix + "waitUntil");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
 
 	break;
       }
@@ -663,21 +663,21 @@ void PWaitFor(impl_tWait* abstract_phylum, uview current_view)
     case(petrinet_enum):
     case(petrinetnew_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "TimeStamp");
-	Place *p3 = TheNet->newPlace(prefix + "final");
-	Place *p4 = TheNet->newPlace(prefix + "stop");
-	Place *p5 = TheNet->newPlace(prefix + "stopped");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "TimeStamp");
+	Place *p3 = PN.newPlace(prefix + "final");
+	Place *p4 = PN.newPlace(prefix + "stop");
+	Place *p5 = PN.newPlace(prefix + "stopped");
 
-	Transition *t1 = TheNet->newTransition(prefix + "readTime");
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
-	TheNet->newArc(TheNet->findPlace("1.internal.clock"), t1, READ);
+	Transition *t1 = PN.newTransition(prefix + "readTime");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
+	PN.newArc(PN.findPlace("1.internal.clock"), t1, READ);
 
-	Transition *t2 = TheNet->newTransition(prefix + "waitFor");
-	TheNet->newArc(p2, t2);
-	TheNet->newArc(t2, p3);
-	TheNet->newArc(TheNet->findPlace("1.internal.clock"), t2, READ);
+	Transition *t2 = PN.newTransition(prefix + "waitFor");
+	PN.newArc(p2, t2);
+	PN.newArc(t2, p3);
+	PN.newArc(PN.findPlace("1.internal.clock"), t2, READ);
 
 	// Transitions for the negative control flow.
 	Transition *t3 = stop(p1, "initial", prefix);
@@ -687,12 +687,12 @@ void PWaitFor(impl_tWait* abstract_phylum, uview current_view)
 
     case (petrinetsmall_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "final");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "final");
 
-	Transition *t1 = TheNet->newTransition(prefix + "waitFor");
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
+	Transition *t1 = PN.newTransition(prefix + "waitFor");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
 
 	break;
       }
@@ -730,10 +730,10 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
     case(petrinet_enum):
     case(petrinetnew_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "faulted");
-	Place *p3 = TheNet->newPlace(prefix + "stop");
-	Place *p4 = TheNet->newPlace(prefix + "stopped");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "faulted");
+	Place *p3 = PN.newPlace(prefix + "stop");
+	Place *p4 = PN.newPlace(prefix + "stopped");
 
 	// Transitions for the negative control flow.
 	Transition *t1 = throwFault(p1, p2, "initial", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
@@ -747,12 +747,12 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
       {
 	cerr << "the <throw> activity cannot be modelled!" << endl;
 
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "final");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "final");
 	
-	Transition *t1 = TheNet->newTransition(prefix + "empty");
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
+	Transition *t1 = PN.newTransition(prefix + "empty");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
 
 	break;
       }
@@ -785,16 +785,16 @@ void PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
   string prefix = toString(phylum->id) + ".internal.";
 
 
-  Place *p1 = TheNet->newPlace(prefix + "initial");
+  Place *p1 = PN.newPlace(prefix + "initial");
   
   assert(ASTEmap[phylum->id] != NULL);
-  Place *p2 = TheNet->newPlace(prefix + "faulted");
-  Place *p3 = TheNet->newPlace(prefix + "stop");
-  Place *p4 = TheNet->newPlace(prefix + "stopped");
+  Place *p2 = PN.newPlace(prefix + "faulted");
+  Place *p3 = PN.newPlace(prefix + "stop");
+  Place *p4 = PN.newPlace(prefix + "stopped");
 
   // Transitions for the negative control flow.
   Transition *t1 = throwFault(p1, p2, "initial", prefix, mkinteger(phylum->id), 4);
-  TheNet->newArc(TheNet->findPlace(toString(ASTEmap[phylum->id]->parentScopeId) + ".internal.faultHandler.running"), t1, READ);
+  PN.newArc(PN.findPlace(toString(ASTEmap[phylum->id]->parentScopeId) + ".internal.faultHandler.running"), t1, READ);
 
   Transition *t2 = stop(p1, "initial", prefix);
   Transition *t3 = stop(p2, "faulted", prefix);
@@ -828,25 +828,25 @@ void PTerminate(impl_tTerminate* abstract_phylum, uview current_view)
   {
     case(petrinet_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "final");
-	Place *p3 = TheNet->newPlace(prefix + "stop");
-	Place *p4 = TheNet->findPlace("1.internal.!Terminated");
-	Place *p5 = TheNet->findPlace("1.internal.Terminated");
-	Place *p6 = TheNet->findPlace(currentScope + "upperTerminate");
-	Place *p7 = TheNet->newPlace(prefix + "stopped");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "final");
+	Place *p3 = PN.newPlace(prefix + "stop");
+	Place *p4 = PN.findPlace("1.internal.!Terminated");
+	Place *p5 = PN.findPlace("1.internal.Terminated");
+	Place *p6 = PN.findPlace(currentScope + "upperTerminate");
+	Place *p7 = PN.newPlace(prefix + "stopped");
 
-	Transition *t1 = TheNet->newTransition(prefix + "t1");
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
-	TheNet->newArc(p5, t1, READ);
+	Transition *t1 = PN.newTransition(prefix + "t1");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
+	PN.newArc(p5, t1, READ);
 
-	Transition *t2 = TheNet->newTransition(prefix + "t2");
-	TheNet->newArc(p1, t2);
-	TheNet->newArc(t2, p2);
-	TheNet->newArc(t2, p5);
-	TheNet->newArc(p4, t2);
-	TheNet->newArc(t2, p6);
+	Transition *t2 = PN.newTransition(prefix + "t2");
+	PN.newArc(p1, t2);
+	PN.newArc(t2, p2);
+	PN.newArc(t2, p5);
+	PN.newArc(p4, t2);
+	PN.newArc(t2, p6);
 
 	// Transitions for the negative control flow.
 	Transition *t3 = stop(p1, "initial", prefix);
@@ -857,15 +857,15 @@ void PTerminate(impl_tTerminate* abstract_phylum, uview current_view)
 
     case(petrinetnew_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "final");
-	Place *p3 = TheNet->newPlace(prefix + "stop");
-	Place *p4 = TheNet->newPlace(prefix + "stopped");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "final");
+	Place *p3 = PN.newPlace(prefix + "stop");
+	Place *p4 = PN.newPlace(prefix + "stopped");
 
-	Transition *t1 = TheNet->newTransition(prefix + "terminate");
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
-	TheNet->newArc(t1, TheNet->findPlace("1.internal.exit"));
+	Transition *t1 = PN.newTransition(prefix + "terminate");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
+	PN.newArc(t1, PN.findPlace("1.internal.exit"));
 
 	// Transitions for the negative control flow.
 	Transition *t2 = stop(p1, "initial", prefix);
@@ -878,12 +878,12 @@ void PTerminate(impl_tTerminate* abstract_phylum, uview current_view)
       {
 	cerr << "the <terminate> activity cannot be modelled!" << endl;
 
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "final");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "final");
 	
-	Transition *t1 = TheNet->newTransition(prefix + "empty");
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
+	Transition *t1 = PN.newTransition(prefix + "empty");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
 
 	break;
       }      
@@ -920,25 +920,25 @@ void PExit(impl_tExit* abstract_phylum, uview current_view)
   {
     case(petrinet_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "final");
-	Place *p3 = TheNet->newPlace(prefix + "stop");
-	Place *p4 = TheNet->findPlace("1.internal.!Terminated");
-	Place *p5 = TheNet->findPlace("1.internal.Terminated");
-	Place *p6 = TheNet->findPlace(currentScope + "upperTerminate");
-	Place *p7 = TheNet->newPlace(prefix + "stopped");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "final");
+	Place *p3 = PN.newPlace(prefix + "stop");
+	Place *p4 = PN.findPlace("1.internal.!Terminated");
+	Place *p5 = PN.findPlace("1.internal.Terminated");
+	Place *p6 = PN.findPlace(currentScope + "upperTerminate");
+	Place *p7 = PN.newPlace(prefix + "stopped");
 
-	Transition *t1 = TheNet->newTransition(prefix + "t1");
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
-	TheNet->newArc(p5, t1, READ);
+	Transition *t1 = PN.newTransition(prefix + "t1");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
+	PN.newArc(p5, t1, READ);
 
-	Transition *t2 = TheNet->newTransition(prefix + "t2");
-	TheNet->newArc(p1, t2);
-	TheNet->newArc(t2, p2);
-	TheNet->newArc(t2, p5);
-	TheNet->newArc(p4, t2);
-	TheNet->newArc(t2, p6);
+	Transition *t2 = PN.newTransition(prefix + "t2");
+	PN.newArc(p1, t2);
+	PN.newArc(t2, p2);
+	PN.newArc(t2, p5);
+	PN.newArc(p4, t2);
+	PN.newArc(t2, p6);
 
 	// Transitions for the negative control flow.
 	Transition *t3 = stop(p1, "initial", prefix);
@@ -949,15 +949,15 @@ void PExit(impl_tExit* abstract_phylum, uview current_view)
 
     case(petrinetnew_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "final");
-	Place *p3 = TheNet->newPlace(prefix + "stop");
-	Place *p4 = TheNet->newPlace(prefix + "stopped");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "final");
+	Place *p3 = PN.newPlace(prefix + "stop");
+	Place *p4 = PN.newPlace(prefix + "stopped");
 
-	Transition *t1 = TheNet->newTransition(prefix + "exit");
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
-	TheNet->newArc(t1, TheNet->findPlace("1.internal.exit"));
+	Transition *t1 = PN.newTransition(prefix + "exit");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
+	PN.newArc(t1, PN.findPlace("1.internal.exit"));
 
 	// Transitions for the negative control flow.
 	Transition *t2 = stop(p1, "initial", prefix);
@@ -970,12 +970,12 @@ void PExit(impl_tExit* abstract_phylum, uview current_view)
       {
 	cerr << "the <exit> activity cannot be modelled!" << endl;
 
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "final");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "final");
 	
-	Transition *t1 = TheNet->newTransition(prefix + "empty");
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
+	Transition *t1 = PN.newTransition(prefix + "empty");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
 
 	break;
       }
@@ -1014,12 +1014,12 @@ void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
       {
 	cerr << "the <compensate> activity cannot be modelled!" << endl;
 
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "final");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "final");
 	
-	Transition *t1 = TheNet->newTransition(prefix + "empty");
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
+	Transition *t1 = PN.newTransition(prefix + "empty");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
 
 	break;
       }
@@ -1058,12 +1058,12 @@ void PCompensateScope(impl_tCompensate* abstract_phylum, uview current_view)
       {
 	cerr << "the <compensateScope> activity cannot be modelled!" << endl;
 
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "final");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "final");
 	
-	Transition *t1 = TheNet->newTransition(prefix + "empty");
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
+	Transition *t1 = PN.newTransition(prefix + "empty");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
 
 	break;
       }

@@ -5,7 +5,7 @@
 #include "ast-details.h"
 #include "options.h"
 
-extern PetriNet *TheNet;
+extern PetriNet PN;
 extern map<unsigned int, ASTE*> ASTEmap;
 extern string currentScope;
 %}
@@ -32,33 +32,33 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
     case(petrinet_enum):
     case(petrinetnew_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "running");
-	Place *p3 = TheNet->newPlace(prefix + "final");
-	Place *p4 = TheNet->newPlace(prefix + "p4");
-	Place *p5 = TheNet->newPlace(prefix + "p5");
-	Place *p6 = TheNet->newPlace(prefix + "p6");
-	Place *p7 = TheNet->newPlace(prefix + "stop");
-	Place *p8 = TheNet->newPlace(prefix + "stopped");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "running");
+	Place *p3 = PN.newPlace(prefix + "final");
+	Place *p4 = PN.newPlace(prefix + "p4");
+	Place *p5 = PN.newPlace(prefix + "p5");
+	Place *p6 = PN.newPlace(prefix + "p6");
+	Place *p7 = PN.newPlace(prefix + "stop");
+	Place *p8 = PN.newPlace(prefix + "stopped");
 	
-	Transition *t2 = TheNet->newTransition(prefix + "init");
-	TheNet->newArc(p1, t2);
-	TheNet->newArc(t2, p2);
+	Transition *t2 = PN.newTransition(prefix + "init");
+	PN.newArc(p1, t2);
+	PN.newArc(t2, p2);
 	
-	Transition *t3 = TheNet->newTransition(prefix + "start");
-	TheNet->newArc(p2, t3);
-	TheNet->newArc(t3, p4);
+	Transition *t3 = PN.newTransition(prefix + "start");
+	PN.newArc(p2, t3);
+	PN.newArc(t3, p4);
 
 	// the single loop/skip transition is only needed when loops are not counted
 	if (!parameters[P_LOOPCOUNT])
 	{
-	  Transition *t1 = TheNet->newTransition(prefix + "skip");
-	  TheNet->newArc(p2, t1);
-	  TheNet->newArc(t1, p3);
+	  Transition *t1 = PN.newTransition(prefix + "skip");
+	  PN.newArc(p2, t1);
+	  PN.newArc(t1, p3);
 	  
-	  Transition *t4 = TheNet->newTransition(prefix + "loop");
-	  TheNet->newArc(t4, p1);
-	  TheNet->newArc(p5, t4);
+	  Transition *t4 = PN.newTransition(prefix + "loop");
+	  PN.newArc(t4, p1);
+	  PN.newArc(p5, t4);
 	}
 	
 	// Transitions for the negative control flow.
@@ -82,7 +82,7 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 	    Place *p9_first = NULL;
 	    for (unsigned i = 1; i <= max_loops; i++)
 	    {
-	      Place *p9 = TheNet->newPlace(prefix + "count." + toString(i));
+	      Place *p9 = PN.newPlace(prefix + "count." + toString(i));
 
 	      if (i == 1)
 	      {
@@ -93,28 +93,28 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 	      if (i > 1)
 	      {
 		assert(p9_old != NULL);
-		Transition *t4 = TheNet->newTransition(prefix + "loop" + toString(i-1));
-		TheNet->newArc(t4, p1);
-		TheNet->newArc(p5, t4);
-		TheNet->newArc(p9_old, t4);
-		TheNet->newArc(t4, p9);
+		Transition *t4 = PN.newTransition(prefix + "loop" + toString(i-1));
+		PN.newArc(t4, p1);
+		PN.newArc(p5, t4);
+		PN.newArc(p9_old, t4);
+		PN.newArc(t4, p9);
 	      }
 	      
 	      assert(p9_first != NULL);
-	      Transition *t1 = TheNet->newTransition(prefix + "skip" + toString(i));
-	      TheNet->newArc(p2, t1);
-	      TheNet->newArc(t1, p3);
-	      TheNet->newArc(t1, p9_first);
-	      TheNet->newArc(p9, t1);
+	      Transition *t1 = PN.newTransition(prefix + "skip" + toString(i));
+	      PN.newArc(p2, t1);
+	      PN.newArc(t1, p3);
+	      PN.newArc(t1, p9_first);
+	      PN.newArc(p9, t1);
 	      
 	      p9_old = p9;
 	    }
 	    
-	    Transition *t10 = TheNet->newTransition(prefix + "finish");
-	    TheNet->newArc(p9_old, t10);
-	    TheNet->newArc(p5, t10);
-	    TheNet->newArc(t10, p3);
-	    TheNet->newArc(t10, p9_first);
+	    Transition *t10 = PN.newTransition(prefix + "finish");
+	    PN.newArc(p9_old, t10);
+	    PN.newArc(p5, t10);
+	    PN.newArc(t10, p3);
+	    PN.newArc(t10, p9_first);
 	  }
 	}
 	
@@ -127,32 +127,32 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 	
 	
 	// Embed the inner activity.
-	TheNet->mergePlaces(phylum->id, ".internal.p4",      phylum->activity_1->id, ".initial");
-	TheNet->mergePlaces(phylum->id, ".internal.p5",      phylum->activity_1->id, ".final");
-	TheNet->mergePlaces(phylum->id, ".internal.stop",    phylum->activity_1->id, ".stop");
-	TheNet->mergePlaces(phylum->id, ".internal.stopped", phylum->activity_1->id, ".stopped");
+	PN.mergePlaces(phylum->id, ".internal.p4",      phylum->activity_1->id, ".initial");
+	PN.mergePlaces(phylum->id, ".internal.p5",      phylum->activity_1->id, ".final");
+	PN.mergePlaces(phylum->id, ".internal.stop",    phylum->activity_1->id, ".stop");
+	PN.mergePlaces(phylum->id, ".internal.stopped", phylum->activity_1->id, ".stopped");
 	
 	break;
       }
 
     case(petrinetsmall_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "running");
-	Place *p3 = TheNet->newPlace(prefix + "final");
-	Place *p4 = TheNet->newPlace(prefix + "done");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "running");
+	Place *p3 = PN.newPlace(prefix + "final");
+	Place *p4 = PN.newPlace(prefix + "done");
 	
-	Transition *t1 = TheNet->newTransition(prefix + "enter");
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
+	Transition *t1 = PN.newTransition(prefix + "enter");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
 	
-	Transition *t2 = TheNet->newTransition(prefix + "leave");
-	TheNet->newArc(p1, t2);
-	TheNet->newArc(t2, p3);
+	Transition *t2 = PN.newTransition(prefix + "leave");
+	PN.newArc(p1, t2);
+	PN.newArc(t2, p3);
 
-	Transition *t3 = TheNet->newTransition(prefix + "loop");
-	TheNet->newArc(p4, t3);
-	TheNet->newArc(t3, p1);
+	Transition *t3 = PN.newTransition(prefix + "loop");
+	PN.newArc(p4, t3);
+	PN.newArc(t3, p1);
 
 
 	// unparse the standard elements
@@ -163,8 +163,8 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 
 
 	// Embed the inner activity.
-	TheNet->mergePlaces(phylum->id, ".internal.running", phylum->activity_1->id, ".initial");
-	TheNet->mergePlaces(phylum->id, ".internal.done", phylum->activity_1->id, ".final");	
+	PN.mergePlaces(phylum->id, ".internal.running", phylum->activity_1->id, ".initial");
+	PN.mergePlaces(phylum->id, ".internal.done", phylum->activity_1->id, ".final");	
 
 	break;
       }
@@ -197,25 +197,25 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
     case(petrinet_enum):
     case(petrinetnew_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "p2");
-	Place *p3 = TheNet->newPlace(prefix + "running");
-	Place *p4 = TheNet->newPlace(prefix + "final");
-	Place *p5 = TheNet->newPlace(prefix + "p5");
-	Place *p6 = TheNet->newPlace(prefix + "stop");
-	Place *p7 = TheNet->newPlace(prefix + "stopped");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "p2");
+	Place *p3 = PN.newPlace(prefix + "running");
+	Place *p4 = PN.newPlace(prefix + "final");
+	Place *p5 = PN.newPlace(prefix + "p5");
+	Place *p6 = PN.newPlace(prefix + "stop");
+	Place *p7 = PN.newPlace(prefix + "stopped");
 	
-	Transition *t1 = TheNet->newTransition(prefix + "t1"); /* read variable */
-	TheNet->newArc(p2, t1);
-	TheNet->newArc(t1, p3);
+	Transition *t1 = PN.newTransition(prefix + "t1"); /* read variable */
+	PN.newArc(p2, t1);
+	PN.newArc(t1, p3);
 
-	Transition *t2 = TheNet->newTransition(prefix + "t2"); /* end */
-	TheNet->newArc(p3, t2);
-	TheNet->newArc(t2, p4);
+	Transition *t2 = PN.newTransition(prefix + "t2"); /* end */
+	PN.newArc(p3, t2);
+	PN.newArc(t2, p4);
 	
-	Transition *t3 = TheNet->newTransition(prefix + "t3"); /* repeat */
-	TheNet->newArc(p3, t3);
-	TheNet->newArc(t3, p1);
+	Transition *t3 = PN.newTransition(prefix + "t3"); /* repeat */
+	PN.newArc(p3, t3);
+	PN.newArc(t3, p1);
 
 	// Transitions for the negative control flow.
 	if (parameters[P_NOSTANDARDFAULTS] == false)
@@ -233,27 +233,27 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 	phylum->activity_1->unparse(pseudoPrinter, current_view);
 
 	// Embed the inner activity.
-	TheNet->mergePlaces(phylum->id, ".internal.initial", phylum->activity_1->id, ".initial");
-	TheNet->mergePlaces(phylum->id, ".internal.p2",      phylum->activity_1->id, ".final");
-	TheNet->mergePlaces(phylum->id, ".internal.stop",    phylum->activity_1->id, ".stop");
-	TheNet->mergePlaces(phylum->id, ".internal.stopped", phylum->activity_1->id, ".stopped");
+	PN.mergePlaces(phylum->id, ".internal.initial", phylum->activity_1->id, ".initial");
+	PN.mergePlaces(phylum->id, ".internal.p2",      phylum->activity_1->id, ".final");
+	PN.mergePlaces(phylum->id, ".internal.stop",    phylum->activity_1->id, ".stop");
+	PN.mergePlaces(phylum->id, ".internal.stopped", phylum->activity_1->id, ".stopped");
 
 	break;
       }
 
     case(petrinetsmall_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "initial");
-	Place *p2 = TheNet->newPlace(prefix + "p2");
-	Place *p3 = TheNet->newPlace(prefix + "final");
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "p2");
+	Place *p3 = PN.newPlace(prefix + "final");
 
-	Transition *t1 = TheNet->newTransition(prefix + "end");
-	TheNet->newArc(p2, t1);
-	TheNet->newArc(t1, p3);
+	Transition *t1 = PN.newTransition(prefix + "end");
+	PN.newArc(p2, t1);
+	PN.newArc(t1, p3);
 
-	Transition *t2 = TheNet->newTransition(prefix + "repeat");
-	TheNet->newArc(p2, t2);
-	TheNet->newArc(t2, p1);
+	Transition *t2 = PN.newTransition(prefix + "repeat");
+	PN.newArc(p2, t2);
+	PN.newArc(t2, p1);
 
 	// unparse the standard elements
 	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
@@ -262,8 +262,8 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 	phylum->activity_1->unparse(pseudoPrinter, current_view);
 
 	// Embed the inner activity.
-	TheNet->mergePlaces(phylum->id, ".internal.initial", phylum->activity_1->id, ".initial");
-	TheNet->mergePlaces(phylum->id, ".internal.p2", phylum->activity_1->id, ".final");
+	PN.mergePlaces(phylum->id, ".internal.initial", phylum->activity_1->id, ".initial");
+	PN.mergePlaces(phylum->id, ".internal.p2", phylum->activity_1->id, ".final");
 
 	break;
       }
@@ -291,13 +291,13 @@ void PSequence(impl_tSequence* abstract_phylum, uview current_view)
   string prefix = toString(phylum->id) + ".internal.";
 
 
-  Place *p2  = TheNet->newPlace(prefix + "initial");
-  Place *p9  = TheNet->newPlace(prefix + "final");
+  Place *p2  = PN.newPlace(prefix + "initial");
+  Place *p9  = PN.newPlace(prefix + "final");
 
   if (current_view != petrinetsmall_enum)
   {
-    Place *p10 = TheNet->newPlace(prefix + "stop");
-    Place *p11 = TheNet->newPlace(prefix + "stopped");
+    Place *p10 = PN.newPlace(prefix + "stop");
+    Place *p11 = PN.newPlace(prefix + "stopped");
   }
 
 
@@ -314,17 +314,17 @@ void PSequence(impl_tSequence* abstract_phylum, uview current_view)
   foreach (innerActivity; activity_list phylum->activity_list_1)
   {
     if (activityCount == 1)
-      TheNet->mergePlaces(phylum->id, ".internal.initial", innerActivity->id, ".initial");
+      PN.mergePlaces(phylum->id, ".internal.initial", innerActivity->id, ".initial");
     else
-      TheNet->mergePlaces(lastActivity->id, ".final", innerActivity->id, ".initial");
+      PN.mergePlaces(lastActivity->id, ".final", innerActivity->id, ".initial");
 
     if (activityCount == phylum->activity_list_1->length())
-      TheNet->mergePlaces(phylum->id, ".internal.final", innerActivity->id, ".final");
+      PN.mergePlaces(phylum->id, ".internal.final", innerActivity->id, ".final");
 
     if (current_view != petrinetsmall_enum)
     {
-      TheNet->mergePlaces(phylum->id, ".internal.stop", innerActivity->id, ".stop");
-      TheNet->mergePlaces(phylum->id, ".internal.stopped", innerActivity->id, ".stopped");
+      PN.mergePlaces(phylum->id, ".internal.stop", innerActivity->id, ".stop");
+      PN.mergePlaces(phylum->id, ".internal.stopped", innerActivity->id, ".stopped");
     }
 
     lastActivity = innerActivity;
@@ -357,26 +357,26 @@ void PFlow(impl_tFlow* abstract_phylum, uview current_view)
     case(petrinet_enum):
     case(petrinetnew_enum):
       {
-	Place *p7  = TheNet->newPlace(prefix + "initial");
-	Place *p8  = TheNet->newPlace(prefix + "final");
-	Place *p9  = TheNet->newPlace(prefix + "running");
-	Place *p15 = TheNet->newPlace(prefix + "stop");
-	Place *p16 = TheNet->newPlace(prefix + "stopped");
+	Place *p7  = PN.newPlace(prefix + "initial");
+	Place *p8  = PN.newPlace(prefix + "final");
+	Place *p9  = PN.newPlace(prefix + "running");
+	Place *p15 = PN.newPlace(prefix + "stop");
+	Place *p16 = PN.newPlace(prefix + "stopped");
 
-	Transition *t2 = TheNet->newTransition(prefix + "t2");
-	TheNet->newArc(p7, t2);
-	TheNet->newArc(t2, p9);
+	Transition *t2 = PN.newTransition(prefix + "t2");
+	PN.newArc(p7, t2);
+	PN.newArc(t2, p9);
 
-	Transition *t3 = TheNet->newTransition(prefix + "t3");
-	TheNet->newArc(t3, p8);
-	TheNet->newArc(p9, t3);
+	Transition *t3 = PN.newTransition(prefix + "t3");
+	PN.newArc(t3, p8);
+	PN.newArc(p9, t3);
 
-	Transition *t5 = TheNet->newTransition(prefix + "t5");
-	TheNet->newArc(p9, t5);
-	TheNet->newArc(p15, t5);
+	Transition *t5 = PN.newTransition(prefix + "t5");
+	PN.newArc(p9, t5);
+	PN.newArc(p15, t5);
 
-	Transition *t6 = TheNet->newTransition(prefix + "innerStopped");
-	TheNet->newArc(t6, p16);
+	Transition *t6 = PN.newTransition(prefix + "innerStopped");
+	PN.newArc(t6, p16);
 
 	// Transitions for the negative control flow.
 	Transition *t4 = stop(p7, "initial", prefix);
@@ -391,10 +391,10 @@ void PFlow(impl_tFlow* abstract_phylum, uview current_view)
 	// embed the inner activity 
 	foreach (innerActivity; activity_list phylum->activity_list_1)
 	{
-	  TheNet->newArc(t2, TheNet->findPlace(innerActivity->id, ".initial"));
-	  TheNet->newArc(t5, TheNet->findPlace(innerActivity->id, ".stop"));
-	  TheNet->newArc(TheNet->findPlace(innerActivity->id, ".stopped"), t6);
-	  TheNet->newArc(TheNet->findPlace(innerActivity->id, ".final"), t3);
+	  PN.newArc(t2, PN.findPlace(innerActivity->id, ".initial"));
+	  PN.newArc(t5, PN.findPlace(innerActivity->id, ".stop"));
+	  PN.newArc(PN.findPlace(innerActivity->id, ".stopped"), t6);
+	  PN.newArc(PN.findPlace(innerActivity->id, ".final"), t3);
 	}
 
 	break;
@@ -402,14 +402,14 @@ void PFlow(impl_tFlow* abstract_phylum, uview current_view)
 
     case(petrinetsmall_enum):
       {
-	Place *p1  = TheNet->newPlace(prefix + "initial");
-	Place *p2  = TheNet->newPlace(prefix + "final");
+	Place *p1  = PN.newPlace(prefix + "initial");
+	Place *p2  = PN.newPlace(prefix + "final");
 
-	Transition *t1 = TheNet->newTransition(prefix + "split");
-	TheNet->newArc(p1, t1);
+	Transition *t1 = PN.newTransition(prefix + "split");
+	PN.newArc(p1, t1);
 
-	Transition *t2 = TheNet->newTransition(prefix + "join");
-	TheNet->newArc(t2, p2);
+	Transition *t2 = PN.newTransition(prefix + "join");
+	PN.newArc(t2, p2);
 
 	// unparse the standard elements
 	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
@@ -419,8 +419,8 @@ void PFlow(impl_tFlow* abstract_phylum, uview current_view)
 
 	foreach (innerActivity; activity_list phylum->activity_list_1)
 	{
-	  TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
-	  TheNet->newArc(TheNet->findPlace(innerActivity->id, ".final"), t2);
+	  PN.newArc(t1, PN.findPlace(innerActivity->id, ".initial"));
+	  PN.newArc(PN.findPlace(innerActivity->id, ".final"), t2);
 	}
 	
 	break;
@@ -456,16 +456,16 @@ void PSwitch(impl_tSwitch* abstract_phylum, uview current_view)
     case(petrinet_enum):
     case(petrinetnew_enum):
       {
-	Place *p4 =  TheNet->newPlace(prefix + "final");
-	Place *p5 =  TheNet->newPlace(prefix + "initial");
-	Place *p6 =  TheNet->newPlace(prefix + "running");
-	Place *p10 = TheNet->newPlace(prefix + "p10");
-	Place *p11 = TheNet->newPlace(prefix + "stop");
-	Place *p12 = TheNet->newPlace(prefix + "stopped");
+	Place *p4 =  PN.newPlace(prefix + "final");
+	Place *p5 =  PN.newPlace(prefix + "initial");
+	Place *p6 =  PN.newPlace(prefix + "running");
+	Place *p10 = PN.newPlace(prefix + "p10");
+	Place *p11 = PN.newPlace(prefix + "stop");
+	Place *p12 = PN.newPlace(prefix + "stopped");
 
-	Transition *t3 = TheNet->newTransition(prefix + "t3");
-	TheNet->newArc(p5, t3);
-	TheNet->newArc(t3, p6);
+	Transition *t3 = PN.newTransition(prefix + "t3");
+	PN.newArc(p5, t3);
+	PN.newArc(t3, p6);
 
 	// Transitions for the negative control flow.
 	if (parameters[P_NOSTANDARDFAULTS] == false)
@@ -503,26 +503,26 @@ void PSwitch(impl_tSwitch* abstract_phylum, uview current_view)
 	  if (currentCase == 1)
 	  {
 	    // two transitions: guard fulfilled or not
-	    t2 = TheNet->newTransition(prefix + "t2.case1");
-	    t4 = TheNet->newTransition(prefix + "t4.case1");
+	    t2 = PN.newTransition(prefix + "t2.case1");
+	    t4 = PN.newTransition(prefix + "t4.case1");
 
 	    // arcs connecting "running"-place
-	    TheNet->newArc(TheNet->findPlace(phylum->id, ".internal.running"), t2);
-	    TheNet->newArc(TheNet->findPlace(phylum->id, ".internal.running"), t4);
+	    PN.newArc(PN.findPlace(phylum->id, ".internal.running"), t2);
+	    PN.newArc(PN.findPlace(phylum->id, ".internal.running"), t4);
 
 	    last = t4;
 	  }
 	  else
 	  {
 	    // two transitions: guard fulfilled or not
-	    t2 = TheNet->newTransition(prefix + "t2.case" + caseNumber);
-	    t4 = TheNet->newTransition(prefix + "t4.case" + caseNumber);
+	    t2 = PN.newTransition(prefix + "t2.case" + caseNumber);
+	    t4 = PN.newTransition(prefix + "t4.case" + caseNumber);
 
 	    // "running"-place and connecting arcs
-	    Place *running =  TheNet->newPlace(prefix + "running.case" + caseNumber);
-	    TheNet->newArc(last, running);
-	    TheNet->newArc(running, t2);
-	    TheNet->newArc(running, t4);
+	    Place *running =  PN.newPlace(prefix + "running.case" + caseNumber);
+	    PN.newArc(last, running);
+	    PN.newArc(running, t2);
+	    PN.newArc(running, t4);
 	    
 	    Transition *t11 = stop(running, "runningCase" + caseNumber, prefix);
 	    
@@ -530,38 +530,38 @@ void PSwitch(impl_tSwitch* abstract_phylum, uview current_view)
 	  }
 	  
 	  // Embed the inner activity.
-	  TheNet->newArc(t2, TheNet->findPlace(innerActivity->id, ".initial"));
-	  TheNet->mergePlaces(phylum->id, ".internal.final",   innerActivity->id, ".final");
-	  TheNet->mergePlaces(phylum->id, ".internal.stop",    innerActivity->id, ".stop");
-	  TheNet->mergePlaces(phylum->id, ".internal.stopped", innerActivity->id, ".stopped");
+	  PN.newArc(t2, PN.findPlace(innerActivity->id, ".initial"));
+	  PN.mergePlaces(phylum->id, ".internal.final",   innerActivity->id, ".final");
+	  PN.mergePlaces(phylum->id, ".internal.stop",    innerActivity->id, ".stop");
+	  PN.mergePlaces(phylum->id, ".internal.stopped", innerActivity->id, ".stopped");
 	  
 	  currentCase++;
 	}
 	
 	trace(TRACE_VERY_DEBUG, "[PNU]\tEmbedding otherwise branch...\n");
 	// The <otherwise> branch.
-	Transition *t2 = TheNet->newTransition(prefix + "t2.otherwise");
+	Transition *t2 = PN.newTransition(prefix + "t2.otherwise");
 
 	// "running"-place and connecting arcs
-	Place *running = TheNet->newPlace(prefix + "running.otherwise");
-	TheNet->newArc(running, t2);
-	TheNet->newArc(last, running);
+	Place *running = PN.newPlace(prefix + "running.otherwise");
+	PN.newArc(running, t2);
+	PN.newArc(last, running);
 	
 	Transition *tnoname = stop(running, "runningOtherwise", prefix);
 	
 	// embed inner activity
-	TheNet->newArc(t2, TheNet->findPlace(otherwise->activity_1->id, ".initial"));
-	TheNet->mergePlaces(phylum->id, ".internal.final",   otherwise->activity_1->id, ".final");
-	TheNet->mergePlaces(phylum->id, ".internal.stop",    otherwise->activity_1->id, ".stop");
-	TheNet->mergePlaces(phylum->id, ".internal.stopped", otherwise->activity_1->id, ".stopped");
+	PN.newArc(t2, PN.findPlace(otherwise->activity_1->id, ".initial"));
+	PN.mergePlaces(phylum->id, ".internal.final",   otherwise->activity_1->id, ".final");
+	PN.mergePlaces(phylum->id, ".internal.stop",    otherwise->activity_1->id, ".stop");
+	PN.mergePlaces(phylum->id, ".internal.stopped", otherwise->activity_1->id, ".stopped");
 
 	break;
       }
 
     case(petrinetsmall_enum):
       {
-	Place *p1 =  TheNet->newPlace(prefix + "final");
-	Place *p2 =  TheNet->newPlace(prefix + "initial");
+	Place *p1 =  PN.newPlace(prefix + "final");
+	Place *p2 =  PN.newPlace(prefix + "initial");
 
 
 	impl_tOtherwise_Otherwise *otherwise = (impl_tOtherwise_Otherwise*) phylum->tOtherwise_1;
@@ -581,21 +581,21 @@ void PSwitch(impl_tSwitch* abstract_phylum, uview current_view)
 	foreach (caseBranch=Case(innerActivity,_id2); tCase_list phylum->tCase_list_1)
 	{
 	  string caseNumber = toString(currentCase++);
-	  Transition* t1 = TheNet->newTransition(prefix + "case" + caseNumber);
-	  TheNet->newArc(TheNet->findPlace(phylum->id, ".internal.initial"), t1); // added ".internal" here
+	  Transition* t1 = PN.newTransition(prefix + "case" + caseNumber);
+	  PN.newArc(PN.findPlace(phylum->id, ".internal.initial"), t1); // added ".internal" here
 	  
 	  // Embed the inner activity.
-	  TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
-	  TheNet->mergePlaces(phylum->id, ".internal.final", innerActivity->id, ".final");
+	  PN.newArc(t1, PN.findPlace(innerActivity->id, ".initial"));
+	  PN.mergePlaces(phylum->id, ".internal.final", innerActivity->id, ".final");
 	}
 
 	// the <otherwise> branch
-	Transition *t1 = TheNet->newTransition(prefix + "caseo");
-	TheNet->newArc(TheNet->findPlace(phylum->id, ".internal.initial"), t1); // added ".internal" here
+	Transition *t1 = PN.newTransition(prefix + "caseo");
+	PN.newArc(PN.findPlace(phylum->id, ".internal.initial"), t1); // added ".internal" here
 
 	// embed inner activity
-	TheNet->newArc(t1, TheNet->findPlace(otherwise->activity_1->id, ".initial"));
-	TheNet->mergePlaces(phylum->id, ".internal.final", otherwise->activity_1->id, ".final");
+	PN.newArc(t1, PN.findPlace(otherwise->activity_1->id, ".initial"));
+	PN.mergePlaces(phylum->id, ".internal.final", otherwise->activity_1->id, ".final");
 
 
 	// Create the arcs for the Dead Path elimination: each chosen activity
@@ -607,11 +607,11 @@ void PSwitch(impl_tSwitch* abstract_phylum, uview current_view)
 	  foreach (Case(innerActivity2); tCase_list phylum->tCase_list_1)
 	  {
 	    if (innerActivity1 != innerActivity2)
-            dpeLinks(TheNet->findTransition(prefix + "case" + toString(currentCase)), innerActivity2->id); // case -> case'
+            dpeLinks(PN.findTransition(prefix + "case" + toString(currentCase)), innerActivity2->id); // case -> case'
 	  }
 
-	  dpeLinks(TheNet->findTransition(prefix + "case" + toString(currentCase)), otherwise->activity_1->id); // case -> otherwise
-	  dpeLinks(TheNet->findTransition(prefix + "caseo"), innerActivity1->id); // otherwise -> case
+	  dpeLinks(PN.findTransition(prefix + "case" + toString(currentCase)), otherwise->activity_1->id); // case -> otherwise
+	  dpeLinks(PN.findTransition(prefix + "caseo"), innerActivity1->id); // otherwise -> case
 	  currentCase++;
 	}
 
@@ -647,16 +647,16 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
     case(petrinet_enum):
     case(petrinetnew_enum):
       {
-	Place *p5 = TheNet->newPlace(prefix + "final");
-	Place *p6 = TheNet->newPlace(prefix + "initial");
-	Place *p7 = TheNet->newPlace(prefix + "TimeStamp");
-	Place *p11 = TheNet->newPlace(prefix + "stop");
-	Place *p12 = TheNet->newPlace(prefix + "stopped");
+	Place *p5 = PN.newPlace(prefix + "final");
+	Place *p6 = PN.newPlace(prefix + "initial");
+	Place *p7 = PN.newPlace(prefix + "TimeStamp");
+	Place *p11 = PN.newPlace(prefix + "stop");
+	Place *p12 = PN.newPlace(prefix + "stopped");
 
-	Transition *t5 = TheNet->newTransition(prefix + "t5");
-	TheNet->newArc(TheNet->findPlace("1.internal.clock"), t5, READ);
-	TheNet->newArc(p6, t5);
-	TheNet->newArc(t5, p7);
+	Transition *t5 = PN.newTransition(prefix + "t5");
+	PN.newArc(PN.findPlace("1.internal.clock"), t5, READ);
+	PN.newArc(p6, t5);
+	PN.newArc(t5, p7);
 
   	// Transitions for the negative control flow.
     	Transition *t7 = stop(p6, "initial", prefix);
@@ -681,20 +681,20 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 	  string message = toString(onMessageCount++);
 	  string newPrefix = prefix + "onMessage" + message + ".";
 	  
-	  Place *p3 = TheNet->newPlace(newPrefix + "p3");
-	  Place *p10 = TheNet->newPlace(newPrefix + "p10");
+	  Place *p3 = PN.newPlace(newPrefix + "p3");
+	  Place *p10 = PN.newPlace(newPrefix + "p10");
 
-	  Transition *t2 = TheNet->newTransition(newPrefix + "t2");
-	  TheNet->newArc(TheNet->findPlace("in." + ASTEmap[ThisBranch->id]->channelName), t2);
-	  TheNet->newArc(TheNet->findPlace(phylum->id, ".internal.TimeStamp"), t2);
-	  TheNet->newArc(t2, p3);
+	  Transition *t2 = PN.newTransition(newPrefix + "t2");
+	  PN.newArc(PN.findPlace("in." + ASTEmap[ThisBranch->id]->channelName), t2);
+	  PN.newArc(PN.findPlace(phylum->id, ".internal.TimeStamp"), t2);
+	  PN.newArc(t2, p3);
 	  t2->type = IN;
 
-	  Transition *t3 = TheNet->newTransition(newPrefix + "t3");
-	  TheNet->newArc(TheNet->findPlace("variable." + ASTEmap[ThisBranch->id]->variableName), t3);
-	  TheNet->newArc(t3, TheNet->findPlace("variable." + ASTEmap[ThisBranch->id]->variableName));
-	  TheNet->newArc(p3, t3);
-	  TheNet->newArc(t3, TheNet->findPlace(innerActivity->id, ".initial"));
+	  Transition *t3 = PN.newTransition(newPrefix + "t3");
+	  PN.newArc(PN.findPlace("variable." + ASTEmap[ThisBranch->id]->variableName), t3);
+	  PN.newArc(t3, PN.findPlace("variable." + ASTEmap[ThisBranch->id]->variableName));
+	  PN.newArc(p3, t3);
+	  PN.newArc(t3, PN.findPlace(innerActivity->id, ".initial"));
 
 	  // Transitions for the negative control flow.
 	  if (parameters[P_NOSTANDARDFAULTS] == false)
@@ -705,9 +705,9 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 
 	  
 	  // Embed the inner activity.
-	  TheNet->mergePlaces(phylum->id, ".stop",    innerActivity->id, ".stop");
-	  TheNet->mergePlaces(phylum->id, ".stopped", innerActivity->id, ".stopped");
-	  TheNet->mergePlaces(phylum->id, ".final",   innerActivity->id, ".final");
+	  PN.mergePlaces(phylum->id, ".stop",    innerActivity->id, ".stop");
+	  PN.mergePlaces(phylum->id, ".stopped", innerActivity->id, ".stopped");
+	  PN.mergePlaces(phylum->id, ".final",   innerActivity->id, ".final");
 
 	  trace(TRACE_DEBUG, "[PNU]\t\t</onMessage>\n");
 	}
@@ -720,15 +720,15 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 	  trace(TRACE_DEBUG, "[PNU]\t\t<onAlarm>\n");
 	  string newPrefix = prefix + "onAlarm" + toString(onAlarmCount++) + ".";
 
-	  Transition *t6 = TheNet->newTransition(newPrefix + "t6");
-	  TheNet->newArc(TheNet->findPlace("1.internal.clock"), t6, READ);
-	  TheNet->newArc(TheNet->findPlace(phylum->id, ".internal.TimeStamp"), t6);
-	  TheNet->newArc(t6, TheNet->findPlace(innerActivity->id, ".initial"));
+	  Transition *t6 = PN.newTransition(newPrefix + "t6");
+	  PN.newArc(PN.findPlace("1.internal.clock"), t6, READ);
+	  PN.newArc(PN.findPlace(phylum->id, ".internal.TimeStamp"), t6);
+	  PN.newArc(t6, PN.findPlace(innerActivity->id, ".initial"));
 	  
 	  // Embed the inner activity.
-	  TheNet->mergePlaces(phylum->id, ".stop",    innerActivity->id, ".stop");
-	  TheNet->mergePlaces(phylum->id, ".stopped", innerActivity->id, ".stopped");
-	  TheNet->mergePlaces(phylum->id, ".final",   innerActivity->id, ".final");
+	  PN.mergePlaces(phylum->id, ".stop",    innerActivity->id, ".stop");
+	  PN.mergePlaces(phylum->id, ".stopped", innerActivity->id, ".stopped");
+	  PN.mergePlaces(phylum->id, ".final",   innerActivity->id, ".final");
 
 	  trace(TRACE_DEBUG, "[PNU]\t\t</onAlarm>\n");
 	}
@@ -738,8 +738,8 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 
     case(petrinetsmall_enum):
       {
-	Place *p1 = TheNet->newPlace(prefix + "final");
-	Place *p2 = TheNet->newPlace(prefix + "initial");
+	Place *p1 = PN.newPlace(prefix + "final");
+	Place *p2 = PN.newPlace(prefix + "initial");
 
   
 	// unparse the standard elements
@@ -759,14 +759,14 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 	  trace(TRACE_DEBUG, "[PNU]\t\t<onMessage>\n");
 	  string message = toString(onMessageCount++);
 	  
-	  Transition *t1 = TheNet->newTransition(prefix + "pickM" + message);
-	  TheNet->newArc(TheNet->findPlace("in." + ASTEmap[ThisBranch->id]->channelName), t1);
-	  TheNet->newArc(TheNet->findPlace(phylum->id, ".internal.initial"), t1);
-	  TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
+	  Transition *t1 = PN.newTransition(prefix + "pickM" + message);
+	  PN.newArc(PN.findPlace("in." + ASTEmap[ThisBranch->id]->channelName), t1);
+	  PN.newArc(PN.findPlace(phylum->id, ".internal.initial"), t1);
+	  PN.newArc(t1, PN.findPlace(innerActivity->id, ".initial"));
 	  t1->type = IN;
 
 	  // Embed the inner activity.
-	  TheNet->mergePlaces(phylum->id, ".final", innerActivity->id, ".final");
+	  PN.mergePlaces(phylum->id, ".final", innerActivity->id, ".final");
 	  
 	  trace(TRACE_DEBUG, "[PNU]\t\t</onMessage>\n");
 	}
@@ -778,12 +778,12 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 	  trace(TRACE_DEBUG, "[PNU]\t\t<onAlarm>\n");
 	  string alarm = toString(onAlarmCount++);
 
-	  Transition *t1 = TheNet->newTransition(prefix + "pickA" + alarm);
-	  TheNet->newArc(TheNet->findPlace(phylum->id, ".internal.initial"), t1);
-	  TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
+	  Transition *t1 = PN.newTransition(prefix + "pickA" + alarm);
+	  PN.newArc(PN.findPlace(phylum->id, ".internal.initial"), t1);
+	  PN.newArc(t1, PN.findPlace(innerActivity->id, ".initial"));
 
 	  // Embed the inner activity.
-	  TheNet->mergePlaces(phylum->id, ".final", innerActivity->id, ".final");
+	  PN.mergePlaces(phylum->id, ".final", innerActivity->id, ".final");
 
 	  trace(TRACE_DEBUG, "[PNU]\t\t</onAlarm>\n");
 	}
@@ -796,11 +796,11 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 	foreach (OnMessage(corr_1, from_1, innerActivity1, _id1); tOnMessage_list phylum->tOnMessage_list_1) {
 	  foreach (OnMessage(corr_2, from_2, innerActivity2, _id2); tOnMessage_list phylum->tOnMessage_list_1) {
 	    if ((innerActivity1 != innerActivity2))
-	      dpeLinks(TheNet->findTransition(prefix + "pickM" + toString(currentMessage)), innerActivity2->id); // onMessage -> onMessage'
+	      dpeLinks(PN.findTransition(prefix + "pickM" + toString(currentMessage)), innerActivity2->id); // onMessage -> onMessage'
 	  }
 
 	  foreach (OnAlarm(innerActivity2); tOnAlarm_list phylum->tOnAlarm_list_1) {
-	    dpeLinks(TheNet->findTransition(prefix + "pickM" + toString(currentMessage)), innerActivity2->id); // onMessage -> onAlarm
+	    dpeLinks(PN.findTransition(prefix + "pickM" + toString(currentMessage)), innerActivity2->id); // onMessage -> onAlarm
 	  }
 	  
 	  currentMessage++;
@@ -810,11 +810,11 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 	foreach (OnAlarm(innerActivity1); tOnAlarm_list phylum->tOnAlarm_list_1) {
 	  foreach (otheronalarm=OnAlarm(innerActivity2); tOnAlarm_list phylum->tOnAlarm_list_1) {
 	    if ((innerActivity1 != innerActivity2))
-	      dpeLinks(TheNet->findTransition(prefix + "pickA" + toString(currentAlarm)), innerActivity2->id); // onAlarm -> onAlarm'
+	      dpeLinks(PN.findTransition(prefix + "pickA" + toString(currentAlarm)), innerActivity2->id); // onAlarm -> onAlarm'
 	  }
 
 	  foreach (OnMessage(_corr2, _from2, innerActivity2, _id2); tOnMessage_list phylum->tOnMessage_list_1) {
-	    dpeLinks(TheNet->findTransition(prefix + "pickA" + toString(currentAlarm)), innerActivity2->id); // onAlarm -> onMessage
+	    dpeLinks(PN.findTransition(prefix + "pickA" + toString(currentAlarm)), innerActivity2->id); // onAlarm -> onMessage
 	  }
 	  
 	  currentAlarm++;
@@ -851,8 +851,8 @@ void PIf(impl_tIf* abstract_phylum, uview current_view)
   {
     case(petrinetsmall_enum):
       {
-	Place *p1 =  TheNet->newPlace(prefix + "initial");
-	Place *p2 =  TheNet->newPlace(prefix + "final");
+	Place *p1 =  PN.newPlace(prefix + "initial");
+	Place *p2 =  PN.newPlace(prefix + "final");
 
 
 	// unparse the standard elements
@@ -869,17 +869,17 @@ void PIf(impl_tIf* abstract_phylum, uview current_view)
 	foreach (caseBranch=ElseIf(innerActivity, _id2); tElseIf_list phylum->tElseIf_list_1)
 	{
 	  string caseNumber = toString(currentCase++);
-	  Transition* t1 = TheNet->newTransition(prefix + "case" + caseNumber);
-	  TheNet->newArc(TheNet->findPlace(phylum->id, ".internal.initial"), t1); // added ".internal" here
+	  Transition* t1 = PN.newTransition(prefix + "case" + caseNumber);
+	  PN.newArc(PN.findPlace(phylum->id, ".internal.initial"), t1); // added ".internal" here
 	  
 	  // Embed the inner activity.
-	  TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
-	  TheNet->mergePlaces(phylum->id, ".internal.final", _id2->value, ".final");
+	  PN.newArc(t1, PN.findPlace(innerActivity->id, ".initial"));
+	  PN.mergePlaces(phylum->id, ".internal.final", _id2->value, ".final");
 	}
 	
 	// The <else> branch.
-	Transition *t1 = TheNet->newTransition(prefix + "caseo");
-	TheNet->newArc(TheNet->findPlace(phylum->id, ".internal.initial"), t1); // added ".internal" here
+	Transition *t1 = PN.newTransition(prefix + "caseo");
+	PN.newArc(PN.findPlace(phylum->id, ".internal.initial"), t1); // added ".internal" here
 
 	impl_tElse *elseBranch = phylum->tElse_1;
 
@@ -888,13 +888,13 @@ void PIf(impl_tIf* abstract_phylum, uview current_view)
 	  elseBranch=Else(innerActivity,_id2):
 	  {
 	    // embed inner activity
-            TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
-	    TheNet->mergePlaces(phylum->id, ".internal.final", _id2->value, ".final");
+            PN.newArc(t1, PN.findPlace(innerActivity->id, ".initial"));
+	    PN.mergePlaces(phylum->id, ".internal.final", _id2->value, ".final");
 	  }
 	  
 	  elseBranch=NoElse(_id2):
 	  {
-	    TheNet->newArc(t1, TheNet->findPlace(phylum->id, ".internal.final"));
+	    PN.newArc(t1, PN.findPlace(phylum->id, ".internal.final"));
 	  }
 	  
 	  default: { /* do nothing */ }
@@ -911,15 +911,15 @@ void PIf(impl_tIf* abstract_phylum, uview current_view)
 	  {
 	    if (innerActivity1 != innerActivity2)
 	    {
-	      dpeLinks(TheNet->findTransition(prefix + "case" + toString(currentCase)), innerActivity2->id); // case -> case'
+	      dpeLinks(PN.findTransition(prefix + "case" + toString(currentCase)), innerActivity2->id); // case -> case'
 	    }
 	  }
 	  with (elseBranch)
 	  {
 	    elseBranch=Else(innerActivity3,_id2):
 	    {
-	      dpeLinks(TheNet->findTransition(prefix + "case" + toString(currentCase)), innerActivity3->id); // case -> otherwise
-	      dpeLinks(TheNet->findTransition(prefix + "caseo"), innerActivity1->id); // otherwise -> case
+	      dpeLinks(PN.findTransition(prefix + "case" + toString(currentCase)), innerActivity3->id); // case -> otherwise
+	      dpeLinks(PN.findTransition(prefix + "caseo"), innerActivity1->id); // otherwise -> case
 	    }
 	    default: { /* do nothing */ }
 	  }

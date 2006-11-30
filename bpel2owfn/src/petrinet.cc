@@ -24,17 +24,17 @@
  * \brief   functions for Petri nets
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nlohmann $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/11/28 13:57:37 $
+ * \date    \$Date: 2006/11/30 11:31:40 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.156 $
+ * \version \$Revision: 1.157 $
  *
  * \ingroup petrinet
  */
@@ -103,18 +103,6 @@ bool Node::historyContains(string role)
       return true;
 
   return false;
-}
-
-
-
-
-
-/*!
- * \brief destructor
- */
-Node::~Node()
-{
-  trace(TRACE_VERY_DEBUG, "[PN]\tDestructing node " + toString(id) + "...\n");
 }
 
 
@@ -207,8 +195,37 @@ void Place::mark(unsigned int my_tokens)
  */
 PetriNet::PetriNet()
 {
+  ENTER("[PN]");
+  
   hasNoInterface = false;
   nextId = 1;
+
+  LEAVE("[PN]");
+}
+
+
+
+
+
+/*!
+ * The destructor.
+ */
+PetriNet::~PetriNet()
+{
+  ENTER("[PN]");
+
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+    delete *p;
+
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+    delete *t;
+
+  for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
+    delete *f;
+
+  roleMap.clear();
+
+  LEAVE("[PN]");
 }
 
 

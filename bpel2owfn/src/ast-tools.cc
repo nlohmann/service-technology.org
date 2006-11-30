@@ -24,17 +24,17 @@
  * \brief   unparse helper tools
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nlohmann $
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/11/29 13:44:27 $
+ * \date    \$Date: 2006/11/30 11:31:39 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.44 $
+ * \version \$Revision: 1.45 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -113,7 +113,7 @@ Transition *throwFault(Place *p1, Place *p2,
     int negativeControlFlow, bool preventFurtherFaults)
 {
   extern string currentScope;	// introduced in bpel-unparse.k
-  extern PetriNet *TheNet;	// introduced in main.c
+  extern PetriNet PN;		// introduced in main.c
   extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
 
   assert(p1 != NULL);
@@ -129,10 +129,10 @@ Transition *throwFault(Place *p1, Place *p2,
   // terminate rather than handling the fault
   if (ASTEmap[ASTEmap[id->value]->parentScopeId]->attributes["exitOnStandardFault"] == "yes")
   {
-    Transition *t1 = TheNet->newTransition(prefix + "exitOnStandardFault." + p1name);
-    TheNet->newArc(p1, t1);
-    TheNet->newArc(t1, p2);
-    TheNet->newArc(t1, TheNet->findPlace("1.internal.exit"));
+    Transition *t1 = PN.newTransition(prefix + "exitOnStandardFault." + p1name);
+    PN.newArc(p1, t1);
+    PN.newArc(t1, p2);
+    PN.newArc(t1, PN.findPlace("1.internal.exit"));
 
     return t1;
   }
@@ -147,10 +147,10 @@ Transition *throwFault(Place *p1, Place *p2,
 	{
           unsigned int parentId = ASTEmap[id->value]->parentScopeId;
 
-	  Transition *t1 = TheNet->newTransition(prefix + "throwFault." + p1name);
-	  TheNet->newArc(p1, t1);
-	  TheNet->newArc(t1, p2);
-	  TheNet->newArc(t1, TheNet->findPlace(toString(parentId) + ".internal.fault_in"));
+	  Transition *t1 = PN.newTransition(prefix + "throwFault." + p1name);
+	  PN.newArc(p1, t1);
+	  PN.newArc(t1, p2);
+	  PN.newArc(t1, PN.findPlace(toString(parentId) + ".internal.fault_in"));
 
 	  return t1;
 	}
@@ -164,17 +164,17 @@ Transition *throwFault(Place *p1, Place *p2,
 
 	  Transition *t1;
 	  if (negativeControlFlow == 4)
-	    t1 = TheNet->newTransition(prefix + "rethrow");
+	    t1 = PN.newTransition(prefix + "rethrow");
 	  else
-	    t1 = TheNet->newTransition(prefix + "rethrowFault." + p1name);
+	    t1 = PN.newTransition(prefix + "rethrowFault." + p1name);
 
-	  TheNet->newArc(p1, t1);
-	  TheNet->newArc(t1, p2);
+	  PN.newArc(p1, t1);
+	  PN.newArc(t1, p2);
 
 	  if (ASTEmap[id->value]->parentScopeId == 1)
-	    TheNet->newArc(t1, TheNet->findPlace(toString(parentId) + ".internal.exit"));
+	    PN.newArc(t1, PN.findPlace(toString(parentId) + ".internal.exit"));
 	  else
-	    TheNet->newArc(t1, TheNet->findPlace(toString(parentId) + ".internal.fault_in"));
+	    PN.newArc(t1, PN.findPlace(toString(parentId) + ".internal.fault_in"));
 
 	  return t1;
 	}
@@ -186,10 +186,10 @@ Transition *throwFault(Place *p1, Place *p2,
           // parent scope of a compensation handler shouldn't be the process :)
 	  assert(parentId != 1);
 
-	  Transition *t1 = TheNet->newTransition(prefix + "throwCHFault." + p1name);
-	  TheNet->newArc(p1, t1);
-	  TheNet->newArc(t1, p2);
-	  TheNet->newArc(t1, TheNet->findPlace(toString(parentId) + ".internal.ch_fault_in"));
+	  Transition *t1 = PN.newTransition(prefix + "throwCHFault." + p1name);
+	  PN.newArc(p1, t1);
+	  PN.newArc(t1, p2);
+	  PN.newArc(t1, PN.findPlace(toString(parentId) + ".internal.ch_fault_in"));
 
 	  return t1;
 	}
@@ -198,10 +198,10 @@ Transition *throwFault(Place *p1, Place *p2,
         {
           unsigned int parentId = ASTEmap[id->value]->parentScopeId;
 
-	  Transition *t1 = TheNet->newTransition(prefix + "signalFault." + p1name);
-	  TheNet->newArc(p1, t1);
-	  TheNet->newArc(t1, p2);
-	  TheNet->newArc(t1, TheNet->findPlace(toString(parentId) + ".internal.terminationHandler.inner_fault"));
+	  Transition *t1 = PN.newTransition(prefix + "signalFault." + p1name);
+	  PN.newArc(p1, t1);
+	  PN.newArc(t1, p2);
+	  PN.newArc(t1, PN.findPlace(toString(parentId) + ".internal.terminationHandler.inner_fault"));
         }
     }
     return NULL;
@@ -213,19 +213,19 @@ Transition *throwFault(Place *p1, Place *p2,
   {
     case(0): // activity in scope or process
       {
-	Transition *t1 = TheNet->newTransition(prefix + "throwFault." + p1name);
-	TheNet->newArc(TheNet->findPlace(currentScope + "Active"), t1);
-	TheNet->newArc(t1, TheNet->findPlace(currentScope + "!Active"));
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
-	TheNet->newArc(t1, TheNet->findPlace(currentScope + "stop.fault_in"));
+	Transition *t1 = PN.newTransition(prefix + "throwFault." + p1name);
+	PN.newArc(PN.findPlace(currentScope + "Active"), t1);
+	PN.newArc(t1, PN.findPlace(currentScope + "!Active"));
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
+	PN.newArc(t1, PN.findPlace(currentScope + "stop.fault_in"));
 
 	if (!preventFurtherFaults)
 	{
-	  Transition *t2 = TheNet->newTransition(prefix + "ignoreFault." + p1name);
-	  TheNet->newArc(TheNet->findPlace(currentScope + "!Active"), t2, READ);
-	  TheNet->newArc(p1, t2);
-	  TheNet->newArc(t2, p2);
+	  Transition *t2 = PN.newTransition(prefix + "ignoreFault." + p1name);
+	  PN.newArc(PN.findPlace(currentScope + "!Active"), t2, READ);
+	  PN.newArc(p1, t2);
+	  PN.newArc(t2, p2);
 	}
 	return t1;
       }
@@ -238,38 +238,38 @@ Transition *throwFault(Place *p1, Place *p2,
 	if (parameters[P_NOFHFAULTS])
 	  return NULL;
 
-	Transition *t1 = TheNet->newTransition(prefix + "throwFault." + p1name);
-	TheNet->newArc(TheNet->findPlace(currentScope + "!FHFaulted"), t1);
-	TheNet->newArc(t1, TheNet->findPlace(currentScope + "FHFaulted"));
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
-	TheNet->newArc(t1, TheNet->findPlace(currentScope + "stop.fh_fault_in"));
+	Transition *t1 = PN.newTransition(prefix + "throwFault." + p1name);
+	PN.newArc(PN.findPlace(currentScope + "!FHFaulted"), t1);
+	PN.newArc(t1, PN.findPlace(currentScope + "FHFaulted"));
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
+	PN.newArc(t1, PN.findPlace(currentScope + "stop.fh_fault_in"));
 
 	if (!preventFurtherFaults)
 	{
-	  Transition *t2 = TheNet->newTransition(prefix + "ignoreFault." + p1name);
-	  TheNet->newArc(TheNet->findPlace(currentScope + "FHFaulted"), t2, READ);
-	  TheNet->newArc(p1, t2);
-	  TheNet->newArc(t2, p2);
+	  Transition *t2 = PN.newTransition(prefix + "ignoreFault." + p1name);
+	  PN.newArc(PN.findPlace(currentScope + "FHFaulted"), t2, READ);
+	  PN.newArc(p1, t2);
+	  PN.newArc(t2, p2);
 	}
 	return t1;
       }
 
     case(2): // activity in compensation handler
       {
-       	Transition *t1 = TheNet->newTransition(prefix + "throwFault." + p1name);
-    	TheNet->newArc(TheNet->findPlace(currentScope + "!CHFaulted"), t1);
-      	TheNet->newArc(t1, TheNet->findPlace(currentScope + "CHFaulted"));
-	TheNet->newArc(p1, t1);
-	TheNet->newArc(t1, p2);
-	TheNet->newArc(t1, TheNet->findPlace(currentScope + "stop.ch_fault_in"));
+       	Transition *t1 = PN.newTransition(prefix + "throwFault." + p1name);
+    	PN.newArc(PN.findPlace(currentScope + "!CHFaulted"), t1);
+      	PN.newArc(t1, PN.findPlace(currentScope + "CHFaulted"));
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
+	PN.newArc(t1, PN.findPlace(currentScope + "stop.ch_fault_in"));
 
 	if (!preventFurtherFaults)
 	{
-	  Transition *t2 = TheNet->newTransition(prefix + "ignoreFault." + p1name);
-	  TheNet->newArc(TheNet->findPlace(currentScope + "CHFaulted"), t2, READ);
-	  TheNet->newArc(p1, t2);
-	  TheNet->newArc(t2, p2);
+	  Transition *t2 = PN.newTransition(prefix + "ignoreFault." + p1name);
+	  PN.newArc(PN.findPlace(currentScope + "CHFaulted"), t2, READ);
+	  PN.newArc(p1, t2);
+	  PN.newArc(t2, p2);
 	}
 	return t1;
       }
@@ -306,7 +306,7 @@ Transition *throwFault(Place *p1, Place *p2,
  */
 Transition *stop(Place *p, string p_name, string prefix)
 {
-  extern PetriNet *TheNet;	// introduced in main.c
+  extern PetriNet PN;	// introduced in main.c
 
   assert(p != NULL);
 
@@ -314,10 +314,10 @@ Transition *stop(Place *p, string p_name, string prefix)
   if (parameters[P_COMMUNICATIONONLY])
     return NULL;
   
-  Transition *stopTransition = TheNet->newTransition(prefix + "stopped." + p_name);
-  TheNet->newArc(TheNet->findPlace(prefix + "stop"), stopTransition);
-  TheNet->newArc(stopTransition, TheNet->findPlace(prefix + "stopped"));
-  TheNet->newArc(p, stopTransition);
+  Transition *stopTransition = PN.newTransition(prefix + "stopped." + p_name);
+  PN.newArc(PN.findPlace(prefix + "stop"), stopTransition);
+  PN.newArc(stopTransition, PN.findPlace(prefix + "stopped"));
+  PN.newArc(p, stopTransition);
 
   return stopTransition;
 }
@@ -438,7 +438,7 @@ void dpeLinks(Transition *t, int id)
 {
   ENTER("[ASTT]");
 
-  extern PetriNet *TheNet;	// introduced in main.c
+  extern PetriNet PN;	// introduced in main.c
   extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
 
   assert(t != NULL);
@@ -450,7 +450,7 @@ void dpeLinks(Transition *t, int id)
   {
     assert(ASTEmap[*linkID] != NULL);
     string linkName = ASTEmap[*linkID]->attributes["name"];
-    TheNet->newArc(t, TheNet->findPlace("!link." + linkName));
+    PN.newArc(t, PN.findPlace("!link." + linkName));
   }
 
   LEAVE("[ASTT]");
@@ -469,7 +469,7 @@ void dpeLinks(Transition *t, int id)
  */
 void process_loop_bounds(vector<unsigned int> &loop_bounds, vector<unsigned int> &loop_identifiers, string prefix, unsigned int my_max)
 {
-  extern PetriNet *TheNet;	// introduced in main.c
+  extern PetriNet PN;	// introduced in main.c
 
   vector<unsigned int> current_index(loop_bounds.size(), 1);
   unsigned int number = 1;
@@ -481,45 +481,45 @@ void process_loop_bounds(vector<unsigned int> &loop_bounds, vector<unsigned int>
   // create transitions, places and arcs
   for (unsigned int i = 1; i <= number; i++)
   {
-    Place *p1 = TheNet->newPlace(prefix + "c" + toString(current_index));
-    Place *p2 = TheNet->newPlace(prefix + "!c" + toString(current_index));
+    Place *p1 = PN.newPlace(prefix + "c" + toString(current_index));
+    Place *p2 = PN.newPlace(prefix + "!c" + toString(current_index));
     p2->mark(my_max);
 
-    Transition *t14 = TheNet->newTransition(prefix + "t14." + toString(i));
-    TheNet->newArc(TheNet->findPlace(prefix + "final1"), t14);
-    TheNet->newArc(TheNet->findPlace(prefix + "!Successful"), t14, READ);
-    TheNet->newArc(t14, TheNet->findPlace(prefix + "final"));
+    Transition *t14 = PN.newTransition(prefix + "t14." + toString(i));
+    PN.newArc(PN.findPlace(prefix + "final1"), t14);
+    PN.newArc(PN.findPlace(prefix + "!Successful"), t14, READ);
+    PN.newArc(t14, PN.findPlace(prefix + "final"));
 
-    Transition *t15 = TheNet->newTransition(prefix + "t15." + toString(i));
-    TheNet->newArc(t15, p1);
-    TheNet->newArc(p2, t15);
-    TheNet->newArc(TheNet->findPlace(prefix + "final1"), t15);
-    TheNet->newArc(TheNet->findPlace(prefix + "Successful"), t15);
-    TheNet->newArc(t15, TheNet->findPlace(prefix + "!Successful"));
-    TheNet->newArc(t15, TheNet->findPlace(prefix + "final"));
+    Transition *t15 = PN.newTransition(prefix + "t15." + toString(i));
+    PN.newArc(t15, p1);
+    PN.newArc(p2, t15);
+    PN.newArc(PN.findPlace(prefix + "final1"), t15);
+    PN.newArc(PN.findPlace(prefix + "Successful"), t15);
+    PN.newArc(t15, PN.findPlace(prefix + "!Successful"));
+    PN.newArc(t15, PN.findPlace(prefix + "final"));
 
-    Transition *t16 = TheNet->newTransition(prefix + "t16." + toString(i));
-    TheNet->newArc(p2, t16, READ, my_max);
-    TheNet->newArc(TheNet->findPlace(prefix + "compensated1"), t16);
-    TheNet->newArc(t16, TheNet->findPlace(prefix + "compensated"));
+    Transition *t16 = PN.newTransition(prefix + "t16." + toString(i));
+    PN.newArc(p2, t16, READ, my_max);
+    PN.newArc(PN.findPlace(prefix + "compensated1"), t16);
+    PN.newArc(t16, PN.findPlace(prefix + "compensated"));
 
-    Transition *t17 = TheNet->newTransition(prefix + "t17." + toString(i));
-    TheNet->newArc(p1, t17);
-    TheNet->newArc(t17, p2);
-    TheNet->newArc(TheNet->findPlace(prefix + "compensate"), t17);
-    TheNet->newArc(t17, TheNet->findPlace(prefix + "ch_initial"));
+    Transition *t17 = PN.newTransition(prefix + "t17." + toString(i));
+    PN.newArc(p1, t17);
+    PN.newArc(t17, p2);
+    PN.newArc(PN.findPlace(prefix + "compensate"), t17);
+    PN.newArc(t17, PN.findPlace(prefix + "ch_initial"));
 
-    TheNet->mergePlaces(TheNet->findPlace(prefix + "compensated1"), TheNet->findPlace(prefix + "compensate"));
+    PN.mergePlaces(PN.findPlace(prefix + "compensated1"), PN.findPlace(prefix + "compensate"));
 
     // connect transitions with counters of ancestor loops
     for (unsigned i = 0; i < loop_identifiers.size(); i++)
     {
-      Place *p3 = TheNet->findPlace(toString(loop_identifiers[i]) + ".internal.count." + toString(current_index[i]));
+      Place *p3 = PN.findPlace(toString(loop_identifiers[i]) + ".internal.count." + toString(current_index[i]));
       assert(p3 != NULL);
 
-      TheNet->newArc(p3, t15, READ);
-      TheNet->newArc(p3, t16, READ);
-      TheNet->newArc(p3, t17, READ);
+      PN.newArc(p3, t15, READ);
+      PN.newArc(p3, t16, READ);
+      PN.newArc(p3, t17, READ);
     }
 
     // generate next index

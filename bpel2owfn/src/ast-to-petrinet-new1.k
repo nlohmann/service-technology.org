@@ -29,7 +29,7 @@
  *
  * \since   2006-10-29
  *
- * \date    \$Date: 2006/11/29 14:18:37 $
+ * \date    \$Date: 2006/11/30 11:31:38 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.28 $
+ * \version \$Revision: 1.29 $
  *
  */
 %}
@@ -54,24 +54,24 @@ This=userDefinedFaultHandler(a,b, _id) ->
       string prefix = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.faultHandler.";
       header(_id, true);
 
-      Place *p1 =  TheNet->newPlace(prefix + "initial");
-      Place *p2 =  TheNet->newPlace(prefix + "final");
-      Place *p3 =  TheNet->newPlace(prefix + "fault");
-      Place *p4 =  TheNet->newPlace(prefix + "stop");
-      Place *p5 =  TheNet->newPlace(prefix + "stopped");
-      Place *p7 =  TheNet->newPlace(prefix + "running");
-      Place *p8 =  TheNet->newPlace(prefix + "inner_stop");
+      Place *p1 =  PN.newPlace(prefix + "initial");
+      Place *p2 =  PN.newPlace(prefix + "final");
+      Place *p3 =  PN.newPlace(prefix + "fault");
+      Place *p4 =  PN.newPlace(prefix + "stop");
+      Place *p5 =  PN.newPlace(prefix + "stopped");
+      Place *p7 =  PN.newPlace(prefix + "running");
+      Place *p8 =  PN.newPlace(prefix + "inner_stop");
 
-      Transition *t4 = TheNet->newTransition(prefix + "stopped.initial");
-      TheNet->newArc(p1, t4);
-      TheNet->newArc(p3, t4);
-      TheNet->newArc(p4, t4);
-      TheNet->newArc(t4, p5);
+      Transition *t4 = PN.newTransition(prefix + "stopped.initial");
+      PN.newArc(p1, t4);
+      PN.newArc(p3, t4);
+      PN.newArc(p4, t4);
+      PN.newArc(t4, p5);
 
-      Transition *t5 = TheNet->newTransition(prefix + "stop_fh");
-      TheNet->newArc(p4, t5);
-      TheNet->newArc(p7, t5);
-      TheNet->newArc(t5, p8);
+      Transition *t5 = PN.newTransition(prefix + "stop_fh");
+      PN.newArc(p4, t5);
+      PN.newArc(p7, t5);
+      PN.newArc(t5, p8);
 
       Transition *t9 = stop(p2, "final", prefix);
     }
@@ -81,43 +81,43 @@ This=userDefinedFaultHandler(a,b, _id) ->
       int catchBranches = 1;
       foreach (catchBranch=Catch(innerActivity); tCatch_list a)
       {
-        Transition *t1 = TheNet->newTransition(prefix + "catch" + toString(catchBranches));
-        TheNet->newArc(p1, t1);
-        TheNet->newArc(p3, t1);
-        TheNet->newArc(t1, p7);
-	TheNet->newArc(t1, TheNet->findPlace(innerActivity->id, ".initial"));
+        Transition *t1 = PN.newTransition(prefix + "catch" + toString(catchBranches));
+        PN.newArc(p1, t1);
+        PN.newArc(p3, t1);
+        PN.newArc(t1, p7);
+	PN.newArc(t1, PN.findPlace(innerActivity->id, ".initial"));
 
-        Transition *t6 = TheNet->newTransition(prefix + "finish" + toString(catchBranches++));
-	TheNet->newArc(p7, t6);
-        TheNet->newArc(t6, p2);
-	TheNet->newArc(TheNet->findPlace(innerActivity->id, ".final"), t6);
+        Transition *t6 = PN.newTransition(prefix + "finish" + toString(catchBranches++));
+	PN.newArc(p7, t6);
+        PN.newArc(t6, p2);
+	PN.newArc(PN.findPlace(innerActivity->id, ".final"), t6);
 
-	TheNet->mergePlaces(TheNet->findPlace(prefix + "inner_stop"), TheNet->findPlace(innerActivity->id, ".stop"));
-	TheNet->mergePlaces(TheNet->findPlace(prefix + "stopped"), TheNet->findPlace(innerActivity->id, ".stopped"));
+	PN.mergePlaces(PN.findPlace(prefix + "inner_stop"), PN.findPlace(innerActivity->id, ".stop"));
+	PN.mergePlaces(PN.findPlace(prefix + "stopped"), PN.findPlace(innerActivity->id, ".stopped"));
       }
 
       with(b)
       {
 	CatchAll(innerActivity, _id2):
 	{
-          Transition *t2 = TheNet->newTransition(prefix + "catchAll");
-          TheNet->newArc(p1, t2);
-          TheNet->newArc(p3, t2);
-          TheNet->newArc(t2, p7);
-          TheNet->newArc(t2, TheNet->findPlace(innerActivity->id, ".initial"));
+          Transition *t2 = PN.newTransition(prefix + "catchAll");
+          PN.newArc(p1, t2);
+          PN.newArc(p3, t2);
+          PN.newArc(t2, p7);
+          PN.newArc(t2, PN.findPlace(innerActivity->id, ".initial"));
 
-          Transition *t7 = TheNet->newTransition(prefix + "finishCatchAll");
-	  TheNet->newArc(p7, t7);
-          TheNet->newArc(t7, p2);
-	  TheNet->newArc(TheNet->findPlace(innerActivity->id, ".final"), t7);
+          Transition *t7 = PN.newTransition(prefix + "finishCatchAll");
+	  PN.newArc(p7, t7);
+          PN.newArc(t7, p2);
+	  PN.newArc(PN.findPlace(innerActivity->id, ".final"), t7);
 
-	  TheNet->mergePlaces(TheNet->findPlace(prefix + "inner_stop"), TheNet->findPlace(innerActivity->id, ".stop"));
-	  TheNet->mergePlaces(TheNet->findPlace(prefix + "stopped"), TheNet->findPlace(innerActivity->id, ".stopped"));
+	  PN.mergePlaces(PN.findPlace(prefix + "inner_stop"), PN.findPlace(innerActivity->id, ".stop"));
+	  PN.mergePlaces(PN.findPlace(prefix + "stopped"), PN.findPlace(innerActivity->id, ".stopped"));
 	}
 
         NoCatchAll():
         {
-          Place *p6 = TheNet->newPlace(prefix + "faulted");
+          Place *p6 = PN.newPlace(prefix + "faulted");
           Transition *t1 = throwFault(p1, p6, "initial", prefix, _id, 4);
           Transition *t2 = stop(p6, "faulted", prefix);
         }
@@ -172,47 +172,47 @@ TerminationHandler(a, _id) ->
       string prefix = toString(ASTEmap[_id->value]->parentScopeId) + ".internal.terminationHandler.";
       header(_id->value, true);
 
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "final");
-      Place *p3 = TheNet->newPlace(prefix + "stop");
-      Place *p4 = TheNet->newPlace(prefix + "running");
-      Place *p5 = TheNet->newPlace(prefix + "stopping");
-      Place *p6 = TheNet->newPlace(prefix + "inner_initial");
-      Place *p7 = TheNet->newPlace(prefix + "inner_final");
-      Place *p8 = TheNet->newPlace(prefix + "inner_fault");
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "final");
+      Place *p3 = PN.newPlace(prefix + "stop");
+      Place *p4 = PN.newPlace(prefix + "running");
+      Place *p5 = PN.newPlace(prefix + "stopping");
+      Place *p6 = PN.newPlace(prefix + "inner_initial");
+      Place *p7 = PN.newPlace(prefix + "inner_final");
+      Place *p8 = PN.newPlace(prefix + "inner_fault");
 
-      Transition *t1 = TheNet->newTransition(prefix + "begin");
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(t1, p4);
-      TheNet->newArc(t1, p6);
+      Transition *t1 = PN.newTransition(prefix + "begin");
+      PN.newArc(p1, t1);
+      PN.newArc(t1, p4);
+      PN.newArc(t1, p6);
 
-      Transition *t2 = TheNet->newTransition(prefix + "end");
-      TheNet->newArc(t2, p2);
-      TheNet->newArc(p4, t2);
-      TheNet->newArc(p7, t2);
+      Transition *t2 = PN.newTransition(prefix + "end");
+      PN.newArc(t2, p2);
+      PN.newArc(p4, t2);
+      PN.newArc(p7, t2);
 
-      Transition *t3 = TheNet->newTransition(prefix + "abort");
-      TheNet->newArc(t3, p3);
-      TheNet->newArc(p4, t3);
-      TheNet->newArc(t3, p5);
-      TheNet->newArc(p8, t3);
+      Transition *t3 = PN.newTransition(prefix + "abort");
+      PN.newArc(t3, p3);
+      PN.newArc(p4, t3);
+      PN.newArc(t3, p5);
+      PN.newArc(p8, t3);
 
-      Transition *t4 = TheNet->newTransition(prefix + "ignore_fault");
-      TheNet->newArc(p5, t4, READ);
-      TheNet->newArc(p8, t4);
+      Transition *t4 = PN.newTransition(prefix + "ignore_fault");
+      PN.newArc(p5, t4, READ);
+      PN.newArc(p8, t4);
 
-      Transition *t5 = TheNet->newTransition(prefix + "aborted");
-      TheNet->newArc(t5, p2);
-      TheNet->newArc(p5, t5);
-      TheNet->newArc(p7, t5);
+      Transition *t5 = PN.newTransition(prefix + "aborted");
+      PN.newArc(t5, p2);
+      PN.newArc(p5, t5);
+      PN.newArc(p7, t5);
     }
     a
     {
       // embed inner activity
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "inner_initial"), TheNet->findPlace(a->id, ".initial"));
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "inner_final"),   TheNet->findPlace(a->id, ".final"));
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "stop"),          TheNet->findPlace(a->id, ".stop"));
-      TheNet->mergePlaces(TheNet->findPlace(prefix + "inner_final"),   TheNet->findPlace(a->id, ".stopped"));
+      PN.mergePlaces(PN.findPlace(prefix + "inner_initial"), PN.findPlace(a->id, ".initial"));
+      PN.mergePlaces(PN.findPlace(prefix + "inner_final"),   PN.findPlace(a->id, ".final"));
+      PN.mergePlaces(PN.findPlace(prefix + "stop"),          PN.findPlace(a->id, ".stop"));
+      PN.mergePlaces(PN.findPlace(prefix + "inner_final"),   PN.findPlace(a->id, ".stopped"));
       
       footer(_id->value, true);
     }

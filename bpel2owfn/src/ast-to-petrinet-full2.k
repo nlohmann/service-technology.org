@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/11/30 08:43:23 $
+ * \date    \$Date: 2006/11/30 11:31:38 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.73 $
+ * \version \$Revision: 1.74 $
  */
 %}
 
@@ -200,23 +200,23 @@ This=Compensate(a,_id) provided (ASTEmap[_id->value]->controlFlow == CHCF) ->
       string prefix = toString(This->id) + ".internal.";
       assert(This->id == _id->value);
 
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "running");
-      Place *p3 = TheNet->newPlace(prefix + "final");
-      Place *p4 = TheNet->newPlace(prefix + "stop");
-      Place *p5 = TheNet->newPlace(prefix + "comp");
-      Place *p6 = TheNet->newPlace(prefix + "done");
-      Place *p7 = TheNet->newPlace(prefix + "stopped");
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "running");
+      Place *p3 = PN.newPlace(prefix + "final");
+      Place *p4 = PN.newPlace(prefix + "stop");
+      Place *p5 = PN.newPlace(prefix + "comp");
+      Place *p6 = PN.newPlace(prefix + "done");
+      Place *p7 = PN.newPlace(prefix + "stopped");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(t1, p2);
-      TheNet->newArc(t1, p5);
+      Transition *t1 = PN.newTransition(prefix + "t1");
+      PN.newArc(p1, t1);
+      PN.newArc(t1, p2);
+      PN.newArc(t1, p5);
 
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(p2, t2);
-      TheNet->newArc(t2, p3);
-      TheNet->newArc(p6, t2);
+      Transition *t2 = PN.newTransition(prefix + "t2");
+      PN.newArc(p2, t2);
+      PN.newArc(t2, p3);
+      PN.newArc(p6, t2);
 
 
       // Transitions for the negative control flow.
@@ -226,8 +226,8 @@ This=Compensate(a,_id) provided (ASTEmap[_id->value]->controlFlow == CHCF) ->
 
 
       // Embed this <compensate /> activity in compensation handler.
-      TheNet->mergePlaces(p4, TheNet->findPlace(currentScope + "internal.compensationHandler.p10"));
-      TheNet->mergePlaces(p6, TheNet->findPlace(currentScope + "internal.compensationHandler.p12"));
+      PN.mergePlaces(p4, PN.findPlace(currentScope + "internal.compensationHandler.p10"));
+      PN.mergePlaces(p6, PN.findPlace(currentScope + "internal.compensationHandler.p12"));
     }
     a // standardElements
     {
@@ -253,23 +253,23 @@ This=Compensate(a,_id) provided (ASTEmap[_id->value]->controlFlow == FHCF) ->
       string prefix = toString(This->id) + ".internal.";
       assert(This->id == _id->value);
 
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "running");
-      Place *p3 = TheNet->newPlace(prefix + "final");
-      Place *p4 = TheNet->newPlace(prefix + "stop");
-      Place *p5 = TheNet->newPlace(prefix + "ch_fh");
-      Place *p6 = TheNet->newPlace(prefix + "ch_out");
-      Place *p7 = TheNet->newPlace(prefix + "stopped");
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "running");
+      Place *p3 = PN.newPlace(prefix + "final");
+      Place *p4 = PN.newPlace(prefix + "stop");
+      Place *p5 = PN.newPlace(prefix + "ch_fh");
+      Place *p6 = PN.newPlace(prefix + "ch_out");
+      Place *p7 = PN.newPlace(prefix + "stopped");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(t1, p2);
-      TheNet->newArc(t1, p5);
+      Transition *t1 = PN.newTransition(prefix + "t1");
+      PN.newArc(p1, t1);
+      PN.newArc(t1, p2);
+      PN.newArc(t1, p5);
 
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(p2, t2);
-      TheNet->newArc(t2, p3);
-      TheNet->newArc(p6, t2);
+      Transition *t2 = PN.newTransition(prefix + "t2");
+      PN.newArc(p2, t2);
+      PN.newArc(t2, p3);
+      PN.newArc(p6, t2);
 
 
       // Transitions for the negative control flow.
@@ -279,8 +279,8 @@ This=Compensate(a,_id) provided (ASTEmap[_id->value]->controlFlow == FHCF) ->
 
 
       // Embed this <compensate /> activity in fault handler.
-      TheNet->mergePlaces(p5, TheNet->findPlace(currentScope + "faultHandler.ch_fh"));
-      TheNet->mergePlaces(p6, TheNet->findPlace(currentScope + "faultHandler.ch_out"));
+      PN.mergePlaces(p5, PN.findPlace(currentScope + "faultHandler.ch_fh"));
+      PN.mergePlaces(p6, PN.findPlace(currentScope + "faultHandler.ch_out"));
     }
     a // standardElements
     {
@@ -306,23 +306,23 @@ This=CompensateScope(a,b,_id) provided (ASTEmap[_id->value]->controlFlow == CHCF
       string prefix = toString(This->id) + ".internal.";
       assert(This->id == _id->value);
 
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "running");
-      Place *p3 = TheNet->newPlace(prefix + "final");
-      Place *p4 = TheNet->newPlace(prefix + "stop");
-      Place *p5 = TheNet->newPlace(prefix + "compScope");
-      Place *p6 = TheNet->newPlace(prefix + "scopeCompensated");
-      Place *p7 = TheNet->newPlace(prefix + "stopped");
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "running");
+      Place *p3 = PN.newPlace(prefix + "final");
+      Place *p4 = PN.newPlace(prefix + "stop");
+      Place *p5 = PN.newPlace(prefix + "compScope");
+      Place *p6 = PN.newPlace(prefix + "scopeCompensated");
+      Place *p7 = PN.newPlace(prefix + "stopped");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(t1, p2);
-      TheNet->newArc(t1, p5);
+      Transition *t1 = PN.newTransition(prefix + "t1");
+      PN.newArc(p1, t1);
+      PN.newArc(t1, p2);
+      PN.newArc(t1, p5);
 
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(p2, t2);
-      TheNet->newArc(t2, p3);
-      TheNet->newArc(p6, t2);
+      Transition *t2 = PN.newTransition(prefix + "t2");
+      PN.newArc(p2, t2);
+      PN.newArc(t2, p3);
+      PN.newArc(p6, t2);
 
 
       // Transitions for the negative control flow.
@@ -332,7 +332,7 @@ This=CompensateScope(a,b,_id) provided (ASTEmap[_id->value]->controlFlow == CHCF
 
 
       // Embed this <compensate scope="C"/> activity in compensation handler.
-      TheNet->mergePlaces(p4, TheNet->findPlace(currentScope + "internal.compensationHandler.p10"));
+      PN.mergePlaces(p4, PN.findPlace(currentScope + "internal.compensationHandler.p10"));
     }
     a // standardElements
     {
@@ -358,23 +358,23 @@ This=CompensateScope(a,b,_id) provided (ASTEmap[_id->value]->controlFlow == FHCF
       string prefix = toString(This->id) + ".internal.";
       assert(This->id == _id->value);
 
-      Place *p1 = TheNet->newPlace(prefix + "initial");
-      Place *p2 = TheNet->newPlace(prefix + "running");
-      Place *p3 = TheNet->newPlace(prefix + "final");
-      Place *p4 = TheNet->newPlace(prefix + "stop");
-      Place *p5 = TheNet->newPlace(prefix + "ch_in");
-      Place *p6 = TheNet->newPlace(prefix + "compensated");
-      Place *p7 = TheNet->newPlace(prefix + "stopped");
+      Place *p1 = PN.newPlace(prefix + "initial");
+      Place *p2 = PN.newPlace(prefix + "running");
+      Place *p3 = PN.newPlace(prefix + "final");
+      Place *p4 = PN.newPlace(prefix + "stop");
+      Place *p5 = PN.newPlace(prefix + "ch_in");
+      Place *p6 = PN.newPlace(prefix + "compensated");
+      Place *p7 = PN.newPlace(prefix + "stopped");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(p1, t1);
-      TheNet->newArc(t1, p2);
-      TheNet->newArc(t1, p5);
+      Transition *t1 = PN.newTransition(prefix + "t1");
+      PN.newArc(p1, t1);
+      PN.newArc(t1, p2);
+      PN.newArc(t1, p5);
 
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(p2, t2);
-      TheNet->newArc(t2, p3);
-      TheNet->newArc(p6, t2);
+      Transition *t2 = PN.newTransition(prefix + "t2");
+      PN.newArc(p2, t2);
+      PN.newArc(t2, p3);
+      PN.newArc(p6, t2);
 
 
       // Transitions for the negative control flow.
@@ -384,8 +384,8 @@ This=CompensateScope(a,b,_id) provided (ASTEmap[_id->value]->controlFlow == FHCF
 
 
       // Embed this <compensate scope="C"/> activity in fault handler.
-      TheNet->mergePlaces(p5, TheNet->findPlace(currentScope + "faultHandler.ch_fh"));
-      TheNet->mergePlaces(p6, TheNet->findPlace(currentScope + "faultHandler.ch_out"));
+      PN.mergePlaces(p5, PN.findPlace(currentScope + "faultHandler.ch_fh"));
+      PN.mergePlaces(p6, PN.findPlace(currentScope + "faultHandler.ch_out"));
     }
     a // standardElements
     {
@@ -408,26 +408,26 @@ This=StandardElements(NiltTarget_list(), NiltSource_list(), jc) ->
       string prefix = toString(This->parentId) + ".";
       string newPrefix = toString(This->parentId) + ".internal";
 
-      Place *p2 = TheNet->newPlace(prefix + "initial");
-      Place *p3 = TheNet->newPlace(prefix + "final");
-      Place *p4 = TheNet->newPlace(prefix + "stop");
-      Place *p5 = TheNet->newPlace(prefix + "stopped");
+      Place *p2 = PN.newPlace(prefix + "initial");
+      Place *p3 = PN.newPlace(prefix + "final");
+      Place *p4 = PN.newPlace(prefix + "stop");
+      Place *p5 = PN.newPlace(prefix + "stopped");
 
 /*
       // If the inner activity has a place negLink, connect merge this place
       // with a new created one.
       if (This->dpe > 0)
       {
-	Place *p1 = TheNet->newPlace(prefix + "negLink");
-	TheNet->mergePlaces(p1, TheNet->findPlace(newPrefix + ".negLink"));
+	Place *p1 = PN.newPlace(prefix + "negLink");
+	PN.mergePlaces(p1, PN.findPlace(newPrefix + ".negLink"));
       }
 */
 
       // Embed the inner activity.
-      TheNet->mergePlaces(p2, TheNet->findPlace(newPrefix + ".initial"));
-      TheNet->mergePlaces(p3, TheNet->findPlace(newPrefix + ".final"));
-      TheNet->mergePlaces(p4, TheNet->findPlace(newPrefix + ".stop"));
-      TheNet->mergePlaces(p5, TheNet->findPlace(newPrefix + ".stopped"));
+      PN.mergePlaces(p2, PN.findPlace(newPrefix + ".initial"));
+      PN.mergePlaces(p3, PN.findPlace(newPrefix + ".final"));
+      PN.mergePlaces(p4, PN.findPlace(newPrefix + ".stop"));
+      PN.mergePlaces(p5, PN.findPlace(newPrefix + ".stopped"));
     }
   ]
 ;
@@ -447,19 +447,19 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
       string prefix = toString(This->parentId) + ".";
       string newPrefix = toString(This->parentId) + ".internal";
 
-      Place *p2 = TheNet->newPlace(prefix + "initial");
-      Place *p4 = TheNet->newPlace(prefix + "p4");
-      Place *p5 = TheNet->newPlace(prefix + "final");
-      Place *p6 = TheNet->newPlace(prefix + "stop");
-      Place *p7 = TheNet->newPlace(prefix + "stopped");
+      Place *p2 = PN.newPlace(prefix + "initial");
+      Place *p4 = PN.newPlace(prefix + "p4");
+      Place *p5 = PN.newPlace(prefix + "final");
+      Place *p6 = PN.newPlace(prefix + "stop");
+      Place *p7 = PN.newPlace(prefix + "stopped");
 
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(p4, t2);
-      TheNet->newArc(t2, p5);
+      Transition *t2 = PN.newTransition(prefix + "t2");
+      PN.newArc(p4, t2);
+      PN.newArc(t2, p5);
 
-      Transition *t3 = TheNet->newTransition(prefix + "t3");
-      TheNet->newArc(p4, t3);
-      TheNet->newArc(t3, p5);
+      Transition *t3 = PN.newTransition(prefix + "t3");
+      PN.newArc(p4, t3);
+      PN.newArc(t3, p5);
 
 
       // Transition for the negative control flow.
@@ -472,15 +472,15 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
       Transition *t1 = NULL;
       if (This->dpe > 0)
       {
-        Place *p1 = TheNet->newPlace(prefix + "negLink");
-	t1 = TheNet->newTransition(prefix + "t1");
-	TheNet->newArc(p1, t1);
+        Place *p1 = PN.newPlace(prefix + "negLink");
+	t1 = PN.newTransition(prefix + "t1");
+	PN.newArc(p1, t1);
 
-	Place *p3 = TheNet->findPlace(newPrefix + ".negLink");
+	Place *p3 = PN.findPlace(newPrefix + ".negLink");
 	if (p3 != NULL)
 	{
-	  TheNet->newArc(t1, p3);
-	  TheNet->mergePlaces(p3, TheNet->findPlace(newPrefix + ".negLink"));
+	  PN.newArc(t1, p3);
+	  PN.mergePlaces(p3, PN.findPlace(newPrefix + ".negLink"));
 	}
       }
 */
@@ -489,26 +489,26 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
       // t1 for dead path elimination.
       foreach (source; tSource_list a)
       {
-	Place *p8 = TheNet->findPlace("!link." + ASTEmap[source->id]->linkName);
-	Place *p10 = TheNet->findPlace("link." + ASTEmap[source->id]->linkName);
+	Place *p8 = PN.findPlace("!link." + ASTEmap[source->id]->linkName);
+	Place *p10 = PN.findPlace("link." + ASTEmap[source->id]->linkName);
 
-	TheNet->newArc(p8, t2);
-	TheNet->newArc(t2, p10);
-	TheNet->newArc(p10, t3, READ);
+	PN.newArc(p8, t2);
+	PN.newArc(t2, p10);
+	PN.newArc(p10, t3, READ);
 /*
 	if (This->dpe > 0)
 	{
-	  TheNet->newArc(t1, p10);
-	  TheNet->newArc(p8, t1);
+	  PN.newArc(t1, p10);
+	  PN.newArc(p8, t1);
 	}*/
       }
 
 
       // Embed the inner activity.
-      TheNet->mergePlaces(p2, TheNet->findPlace(newPrefix + ".initial"));
-      TheNet->mergePlaces(p4, TheNet->findPlace(newPrefix + ".final"));
-      TheNet->mergePlaces(p6, TheNet->findPlace(newPrefix + ".stop"));
-      TheNet->mergePlaces(p7, TheNet->findPlace(newPrefix + ".stopped"));
+      PN.mergePlaces(p2, PN.findPlace(newPrefix + ".initial"));
+      PN.mergePlaces(p4, PN.findPlace(newPrefix + ".final"));
+      PN.mergePlaces(p6, PN.findPlace(newPrefix + ".stop"));
+      PN.mergePlaces(p7, PN.findPlace(newPrefix + ".stopped"));
    }
   ]
 ;
@@ -529,16 +529,16 @@ This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF) ->
       string prefix = toString(This->parentId) + ".";
       string newPrefix = toString(This->parentId) + ".internal";
 
-      Place *p6  = TheNet->newPlace(prefix + "p6");
-      Place *p7  = TheNet->newPlace(prefix + "final");
-      Place *p8  = TheNet->newPlace(prefix + "initial");
-      Place *p9  = TheNet->newPlace(prefix + "stop");
-      Place *p10 = TheNet->newPlace(prefix + "stopped");
-      Place *p11 = TheNet->newPlace(prefix + "p11");
+      Place *p6  = PN.newPlace(prefix + "p6");
+      Place *p7  = PN.newPlace(prefix + "final");
+      Place *p8  = PN.newPlace(prefix + "initial");
+      Place *p9  = PN.newPlace(prefix + "stop");
+      Place *p10 = PN.newPlace(prefix + "stopped");
+      Place *p11 = PN.newPlace(prefix + "p11");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(t1, p6);
-      TheNet->newArc(p8, t1);
+      Transition *t1 = PN.newTransition(prefix + "t1");
+      PN.newArc(t1, p6);
+      PN.newArc(p8, t1);
 
 
       // Transitions for the negative control flow.
@@ -551,31 +551,31 @@ This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF) ->
       // Connect the target links with transitions t1 and t2.
       foreach (target; tTarget_list a)
       {
-	Place *p1 = TheNet->findPlace("!link." + ASTEmap[target->id]->linkName);
-	Place *p3 = TheNet->findPlace("link." + ASTEmap[target->id]->linkName);
-	TheNet->newArc(t1, p1);
-	TheNet->newArc(p3, t1);
-	TheNet->newArc(t2, p1);
-	TheNet->newArc(p3, t2);
+	Place *p1 = PN.findPlace("!link." + ASTEmap[target->id]->linkName);
+	Place *p3 = PN.findPlace("link." + ASTEmap[target->id]->linkName);
+	PN.newArc(t1, p1);
+	PN.newArc(p3, t1);
+	PN.newArc(t2, p1);
+	PN.newArc(p3, t2);
       }
 
 /*
       // If the inner activity has a place negLink, connect this place with
       // transition t2 for dead path elimination.
-      Place *p5 = TheNet->findPlace(newPrefix + ".negLink");
+      Place *p5 = PN.findPlace(newPrefix + ".negLink");
       if (p5 != NULL)
       {
-	Place *p5a = TheNet->newPlace(prefix + "negLink");
-	TheNet->newArc(t2, p5a);
-	TheNet->mergePlaces(p5a, p5);
+	Place *p5a = PN.newPlace(prefix + "negLink");
+	PN.newArc(t2, p5a);
+	PN.mergePlaces(p5a, p5);
       }
 */
       
       // Embed the inner activity.
-      TheNet->mergePlaces(p6,  TheNet->findPlace(newPrefix + ".initial"));
-      TheNet->mergePlaces(p7,  TheNet->findPlace(newPrefix + ".final"));
-      TheNet->mergePlaces(p9,  TheNet->findPlace(newPrefix + ".stop"));
-      TheNet->mergePlaces(p10, TheNet->findPlace(newPrefix + ".stopped"));
+      PN.mergePlaces(p6,  PN.findPlace(newPrefix + ".initial"));
+      PN.mergePlaces(p7,  PN.findPlace(newPrefix + ".final"));
+      PN.mergePlaces(p9,  PN.findPlace(newPrefix + ".stop"));
+      PN.mergePlaces(p10, PN.findPlace(newPrefix + ".stopped"));
     }
   ]
 ;
@@ -596,19 +596,19 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF) ->
       string prefix = toString(This->parentId) + ".";
       string newPrefix = toString(This->parentId) + ".internal";
 
-      Place *p6  = TheNet->newPlace(prefix + "p6");
-      Place *p7  = TheNet->newPlace(prefix + "final");
-      Place *p8  = TheNet->newPlace(prefix + "initial");
-      Place *p9  = TheNet->newPlace(prefix + "stop");
-      Place *p10 = TheNet->newPlace(prefix + "stopped");
+      Place *p6  = PN.newPlace(prefix + "p6");
+      Place *p7  = PN.newPlace(prefix + "final");
+      Place *p8  = PN.newPlace(prefix + "initial");
+      Place *p9  = PN.newPlace(prefix + "stop");
+      Place *p10 = PN.newPlace(prefix + "stopped");
 
-      Transition *t1 = TheNet->newTransition(prefix + "t1");
-      TheNet->newArc(t1, p6);
-      TheNet->newArc(p8, t1);
+      Transition *t1 = PN.newTransition(prefix + "t1");
+      PN.newArc(t1, p6);
+      PN.newArc(p8, t1);
 
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(p8, t2);
-      TheNet->newArc(t2, p7);
+      Transition *t2 = PN.newTransition(prefix + "t2");
+      PN.newArc(p8, t2);
+      PN.newArc(t2, p7);
 
 
       // Transition for the negative control flow.
@@ -618,31 +618,31 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF) ->
       // Connect the target links with transitions t1 and t2.
       foreach (target; tTarget_list a)
       {
-	Place *p1 = TheNet->findPlace("!link." + ASTEmap[target->id]->linkName);
-	Place *p3 = TheNet->findPlace("link." + ASTEmap[target->id]->linkName);
-	TheNet->newArc(t1, p1);
-	TheNet->newArc(p3, t1);
-	TheNet->newArc(t2, p1);
-	TheNet->newArc(p3, t2);
+	Place *p1 = PN.findPlace("!link." + ASTEmap[target->id]->linkName);
+	Place *p3 = PN.findPlace("link." + ASTEmap[target->id]->linkName);
+	PN.newArc(t1, p1);
+	PN.newArc(p3, t1);
+	PN.newArc(t2, p1);
+	PN.newArc(p3, t2);
       }
 
 /*
       // If the inner activity has a place negLink, connect this place with
       // transition t2 for dead path elimination.
-      Place *p5 = TheNet->findPlace(newPrefix + ".negLink");
+      Place *p5 = PN.findPlace(newPrefix + ".negLink");
       if (p5 != NULL)
       {
-	Place *p5a = TheNet->newPlace(prefix + "negLink");
-	TheNet->newArc(t2, p5);
-	TheNet->mergePlaces(p5a, p5);
+	Place *p5a = PN.newPlace(prefix + "negLink");
+	PN.newArc(t2, p5);
+	PN.mergePlaces(p5a, p5);
       }
 */
 
       // Embed the inner activity.
-      TheNet->mergePlaces(p6, TheNet->findPlace(newPrefix + ".initial"));
-      TheNet->mergePlaces(p7, TheNet->findPlace(newPrefix + ".final"));
-      TheNet->mergePlaces(p9, TheNet->findPlace(newPrefix + ".stop"));
-      TheNet->mergePlaces(p10, TheNet->findPlace(newPrefix + ".stopped"));
+      PN.mergePlaces(p6, PN.findPlace(newPrefix + ".initial"));
+      PN.mergePlaces(p7, PN.findPlace(newPrefix + ".final"));
+      PN.mergePlaces(p9, PN.findPlace(newPrefix + ".stop"));
+      PN.mergePlaces(p10, PN.findPlace(newPrefix + ".stopped"));
     }
   ]
 ;
@@ -663,28 +663,28 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
       string prefix = toString(This->parentId) + ".";
       string newPrefix = toString(This->parentId) + ".internal";
 
-      Place *p11 = TheNet->newPlace(prefix + "p11");
-      Place *p12 = TheNet->newPlace(prefix + "p12");
-      Place *p13 = TheNet->newPlace(prefix + "final");
-      Place *p14 = TheNet->newPlace(prefix + "stop");
-      Place *p15 = TheNet->newPlace(prefix + "stopped");
-      Place *p16 = TheNet->newPlace(prefix + "initial");
+      Place *p11 = PN.newPlace(prefix + "p11");
+      Place *p12 = PN.newPlace(prefix + "p12");
+      Place *p13 = PN.newPlace(prefix + "final");
+      Place *p14 = PN.newPlace(prefix + "stop");
+      Place *p15 = PN.newPlace(prefix + "stopped");
+      Place *p16 = PN.newPlace(prefix + "initial");
 
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(t2, p11);
-      TheNet->newArc(p16, t2);
+      Transition *t2 = PN.newTransition(prefix + "t2");
+      PN.newArc(t2, p11);
+      PN.newArc(p16, t2);
 
-      Transition *t3 = TheNet->newTransition(prefix + "t3");
-      TheNet->newArc(p12, t3);
-      TheNet->newArc(t3, p13);
+      Transition *t3 = PN.newTransition(prefix + "t3");
+      PN.newArc(p12, t3);
+      PN.newArc(t3, p13);
 
-      Transition *t4 = TheNet->newTransition(prefix + "t4");
-      TheNet->newArc(p12, t4);
-      TheNet->newArc(t4, p13);
+      Transition *t4 = PN.newTransition(prefix + "t4");
+      PN.newArc(p12, t4);
+      PN.newArc(t4, p13);
 
-      Transition *t5 = TheNet->newTransition(prefix + "t5");
-      TheNet->newArc(t5, p13);
-      TheNet->newArc(p16, t5);
+      Transition *t5 = PN.newTransition(prefix + "t5");
+      PN.newArc(t5, p13);
+      PN.newArc(p16, t5);
 
 
       // Transitions for the negative control flow.
@@ -697,26 +697,26 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
       Transition *t1 = NULL;
       if (This->dpe > 0)
       {
-	Place *p9  = TheNet->newPlace(prefix + "negLink");
+	Place *p9  = PN.newPlace(prefix + "negLink");
 
-	t1 = TheNet->newTransition(prefix + "t1");
-	TheNet->newArc(p9, t1);
+	t1 = PN.newTransition(prefix + "t1");
+	PN.newArc(p9, t1);
 
-	Place *p10 = TheNet->findPlace(newPrefix + ".negLink");
+	Place *p10 = PN.findPlace(newPrefix + ".negLink");
 	if (p10 != NULL)
-	  TheNet->newArc(t1, p10);
+	  PN.newArc(t1, p10);
       }
 */
 
       // Connect each target links with t2 and t5.
       foreach (target; tTarget_list a)
       {
-	Place *p1 = TheNet->findPlace("!link." + ASTEmap[target->id]->linkName);
-	Place *p3 = TheNet->findPlace("link." + ASTEmap[target->id]->linkName);
-        TheNet->newArc(t2, p1);
-	TheNet->newArc(p3, t2);
-        TheNet->newArc(t5, p1);
-	TheNet->newArc(p3, t5);
+	Place *p1 = PN.findPlace("!link." + ASTEmap[target->id]->linkName);
+	Place *p3 = PN.findPlace("link." + ASTEmap[target->id]->linkName);
+        PN.newArc(t2, p1);
+	PN.newArc(p3, t2);
+        PN.newArc(t5, p1);
+	PN.newArc(p3, t5);
       }
 
 
@@ -724,38 +724,38 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
       // transition t1 for dead path elimination.
       foreach (source; tSource_list b)
       {
-	Place *p5 = TheNet->findPlace("!link." + ASTEmap[source->id]->linkName);
-	Place *p7 = TheNet->findPlace("link." + ASTEmap[source->id]->linkName);
+	Place *p5 = PN.findPlace("!link." + ASTEmap[source->id]->linkName);
+	Place *p7 = PN.findPlace("link." + ASTEmap[source->id]->linkName);
 
-        TheNet->newArc(p5, t3);
-        TheNet->newArc(t3, p7);
-        TheNet->newArc(p5, t5);
-        TheNet->newArc(t5, p7);
-	TheNet->newArc(p7, t4, READ);
+        PN.newArc(p5, t3);
+        PN.newArc(t3, p7);
+        PN.newArc(p5, t5);
+        PN.newArc(t5, p7);
+	PN.newArc(p7, t4, READ);
 /*	if (This->dpe > 0)
 	{
-	  TheNet->newArc(p5, t1);
-	  TheNet->newArc(t1, p7);
+	  PN.newArc(p5, t1);
+	  PN.newArc(t1, p7);
 	}*/
       }
 
 /*
       // If the inner activity has a place negLink, connect this place with
       // transition t5 for dead path elimination.
-      Place *p10 = TheNet->findPlace(newPrefix + ".negLink");
+      Place *p10 = PN.findPlace(newPrefix + ".negLink");
       if (p10 != NULL)
       {
-	TheNet->newArc(t5, p10);
+	PN.newArc(t5, p10);
 	if (This->dpe > 0)
-	  TheNet->mergePlaces(p10, TheNet->findPlace(newPrefix + ".negLink"));
+	  PN.mergePlaces(p10, PN.findPlace(newPrefix + ".negLink"));
       }
 */
 
       // Embed the inner activity.
-      TheNet->mergePlaces(p11, TheNet->findPlace(newPrefix + ".initial"));
-      TheNet->mergePlaces(p12, TheNet->findPlace(newPrefix + ".final"));
-      TheNet->mergePlaces(p14, TheNet->findPlace(newPrefix + ".stop"));
-      TheNet->mergePlaces(p15, TheNet->findPlace(newPrefix + ".stopped"));
+      PN.mergePlaces(p11, PN.findPlace(newPrefix + ".initial"));
+      PN.mergePlaces(p12, PN.findPlace(newPrefix + ".final"));
+      PN.mergePlaces(p14, PN.findPlace(newPrefix + ".stop"));
+      PN.mergePlaces(p15, PN.findPlace(newPrefix + ".stopped"));
     }
   ]
 ;
@@ -777,25 +777,25 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF) ->
       string prefix = toString(This->parentId) + ".";
       string newPrefix = toString(This->parentId) + ".internal";
 
-      Place *p11 = TheNet->newPlace(prefix + "p11");
-      Place *p12 = TheNet->newPlace(prefix + "p12");
-      Place *p13 = TheNet->newPlace(prefix + "final");
-      Place *p14 = TheNet->newPlace(prefix + "stop");
-      Place *p15 = TheNet->newPlace(prefix + "stopped");
-      Place *p16 = TheNet->newPlace(prefix + "initial");
-      Place *p17 = TheNet->newPlace(prefix + "p17");
+      Place *p11 = PN.newPlace(prefix + "p11");
+      Place *p12 = PN.newPlace(prefix + "p12");
+      Place *p13 = PN.newPlace(prefix + "final");
+      Place *p14 = PN.newPlace(prefix + "stop");
+      Place *p15 = PN.newPlace(prefix + "stopped");
+      Place *p16 = PN.newPlace(prefix + "initial");
+      Place *p17 = PN.newPlace(prefix + "p17");
 
-      Transition *t2 = TheNet->newTransition(prefix + "t2");
-      TheNet->newArc(t2, p11);
-      TheNet->newArc(p16, t2);
+      Transition *t2 = PN.newTransition(prefix + "t2");
+      PN.newArc(t2, p11);
+      PN.newArc(p16, t2);
 
-      Transition *t3 = TheNet->newTransition(prefix + "t3");
-      TheNet->newArc(p12, t3);
-      TheNet->newArc(t3, p13);
+      Transition *t3 = PN.newTransition(prefix + "t3");
+      PN.newArc(p12, t3);
+      PN.newArc(t3, p13);
 
-      Transition *t4 = TheNet->newTransition(prefix + "t4");
-      TheNet->newArc(p12, t4);
-      TheNet->newArc(t4, p13);
+      Transition *t4 = PN.newTransition(prefix + "t4");
+      PN.newArc(p12, t4);
+      PN.newArc(t4, p13);
 
 
       // Transitions for the negative control flow.
@@ -811,26 +811,26 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF) ->
       Transition *t1 = NULL;
       if (This->dpe > 0)
       {
-	Place *p9  = TheNet->newPlace(prefix + "negLink");
+	Place *p9  = PN.newPlace(prefix + "negLink");
 
-	t1 = TheNet->newTransition(prefix + "t1");
-	TheNet->newArc(p9, t1);
+	t1 = PN.newTransition(prefix + "t1");
+	PN.newArc(p9, t1);
 
-	Place *p10 = TheNet->findPlace(newPrefix + ".negLink");
+	Place *p10 = PN.findPlace(newPrefix + ".negLink");
 	if (p10 != NULL)
-	  TheNet->newArc(t1, p10);
+	  PN.newArc(t1, p10);
       }
 */
 
       // Connect each target links with t2 and t5.
       foreach (target; tTarget_list a)
       {
-	Place *p1 = TheNet->findPlace("!link." + ASTEmap[target->id]->linkName);
-	Place *p3 = TheNet->findPlace("link." + ASTEmap[target->id]->linkName);
-        TheNet->newArc(t2, p1);
-	TheNet->newArc(p3, t2);
-	TheNet->newArc(t5, p1);
-	TheNet->newArc(p3, t5);
+	Place *p1 = PN.findPlace("!link." + ASTEmap[target->id]->linkName);
+	Place *p3 = PN.findPlace("link." + ASTEmap[target->id]->linkName);
+        PN.newArc(t2, p1);
+	PN.newArc(p3, t2);
+	PN.newArc(t5, p1);
+	PN.newArc(p3, t5);
       }
 
 
@@ -838,37 +838,37 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF) ->
       // transition t1 for dead path elimination.
       foreach (source; tSource_list b)
       {
-	Place *p5 = TheNet->findPlace("!link." + ASTEmap[source->id]->linkName);
-	Place *p7 = TheNet->findPlace("link." + ASTEmap[source->id]->linkName);
+	Place *p5 = PN.findPlace("!link." + ASTEmap[source->id]->linkName);
+	Place *p7 = PN.findPlace("link." + ASTEmap[source->id]->linkName);
 
-	TheNet->newArc(p5, t3);
-        TheNet->newArc(t3, p7);
-	TheNet->newArc(p7, t4, READ);
+	PN.newArc(p5, t3);
+        PN.newArc(t3, p7);
+	PN.newArc(p7, t4, READ);
 /*
 	if (This->dpe > 0)
 	{
-	  TheNet->newArc(p5, t1);
-	  TheNet->newArc(t1, p7);
+	  PN.newArc(p5, t1);
+	  PN.newArc(t1, p7);
 	}*/
       }
 
 
       // If the inner activity has a place negLink, connect this place with
       // transition t5 for dead path elimination.
-      Place *p10 = TheNet->findPlace(newPrefix + ".negLink");
+      Place *p10 = PN.findPlace(newPrefix + ".negLink");
       if (p10 != NULL)
       {
-	TheNet->newArc(t5, p10);
+	PN.newArc(t5, p10);
 //	if (This->dpe > 0)
-//	  TheNet->mergePlaces(p10, TheNet->findPlace(newPrefix + ".negLink"));
+//	  PN.mergePlaces(p10, PN.findPlace(newPrefix + ".negLink"));
       }
 
 
       // Embed the inner activity.
-      TheNet->mergePlaces(p11, TheNet->findPlace(newPrefix + ".initial"));
-      TheNet->mergePlaces(p12, TheNet->findPlace(newPrefix + ".final"));
-      TheNet->mergePlaces(p14, TheNet->findPlace(newPrefix + ".stop"));
-      TheNet->mergePlaces(p15, TheNet->findPlace(newPrefix + ".stopped"));
+      PN.mergePlaces(p11, PN.findPlace(newPrefix + ".initial"));
+      PN.mergePlaces(p12, PN.findPlace(newPrefix + ".final"));
+      PN.mergePlaces(p14, PN.findPlace(newPrefix + ".stop"));
+      PN.mergePlaces(p15, PN.findPlace(newPrefix + ".stopped"));
     }
   ]
 ;

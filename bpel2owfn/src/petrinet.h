@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/28 14:01:26 $
+ * \date    \$Date: 2006/11/30 11:31:40 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.108 $
+ * \version \$Revision: 1.109 $
  *
  * \ingroup petrinet
  */
@@ -176,9 +176,6 @@ class Node
 
     /// an additional prefix for the name in order to distinguish nodes of different nets
     std::string prefix;
-
-    /// destructor
-    virtual ~Node();
 };
 
 
@@ -414,6 +411,9 @@ class PetriNet
     
     /// constructor
     PetriNet();
+
+    /// destructor
+    ~PetriNet();
 
 
   private:

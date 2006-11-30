@@ -28,14 +28,14 @@
  * 
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/30 09:05:14 $
+ * \date    \$Date: 2006/11/30 11:31:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.122 $
+ * \version \$Revision: 1.123 $
  */
 
 
@@ -83,7 +83,7 @@ extern kc::tProcess AST;
  *****************************************************************************/
 
 /// The Petri Net
-PetriNet *TheNet = new PetriNet();
+PetriNet PN = PetriNet();
 
 /// string holding the invocation of BPEL2oWFN
 string invocation;
@@ -224,14 +224,14 @@ int main( int argc, char *argv[])
 	  if (parameters[P_SIMPLIFY])
 	  {
 	    trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
-	    TheNet->simplify();
+	    PN.simplify();
 	  }
 	  
-	  TheNet->addPrefix(prefix);
-	  TheNet2->connectNet(TheNet);
+	  PN.addPrefix(prefix);
+	  TheNet2->connectNet(&PN);
 
-	  TheNet = new PetriNet();
-	  assert(TheNet != NULL);
+	  PN = PetriNet();
+//	  assert(TheNet != NULL);
 
 	  AST = NULL;
 	}
@@ -248,7 +248,7 @@ int main( int argc, char *argv[])
 
 
   if (modus == M_CONSISTENCY)
-    TheNet = TheNet2;
+    PN = *TheNet2;
 
 
   if (modus == M_PRETTY)
@@ -276,20 +276,20 @@ int main( int argc, char *argv[])
     if ( parameters[P_NOVARIABLES] )
     {
       trace(TRACE_INFORMATION, "-> Remove variable places from Petri Net ...\n");
-      TheNet->removeVariables();
+      PN.removeVariables();
     }    
     
     // apply structural reduction rules?
     if ( parameters[P_SIMPLIFY] )
     {
       trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
-      TheNet->simplify();
+      PN.simplify();
     }
     
-    cerr << TheNet->information() << endl; /// \todo remove this line
+    cerr << PN.information() << endl; /// \todo remove this line
 
     // now the net will not change any more, thus the nodes are re-enumerated
-    // TheNet->reenumerate(); 
+    // PN.reenumerate(); 
 
     // create oWFN output ?
     if (formats[F_OWFN])
@@ -299,7 +299,7 @@ int main( int argc, char *argv[])
 	output = openOutput(output_filename + "." + suffixes[F_OWFN]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for oWFN ...\n");
-      TheNet->owfnOut(output);
+      PN.owfnOut(output);
       if (output_filename != "")
       {
 	closeOutput(output);
@@ -316,10 +316,10 @@ int main( int argc, char *argv[])
       }
       if (modus == M_CONSISTENCY)
       {
-	TheNet->makeChannelsInternal();
+	PN.makeChannelsInternal();
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for LoLA ...\n");
-      TheNet->lolaOut(output);
+      PN.lolaOut(output);
       if (output_filename != "")
       {
 	closeOutput(output);
@@ -345,8 +345,8 @@ int main( int argc, char *argv[])
 	    prefix = file->substr(pos2 + 1, pos - pos2 - 1) + "_";
 	  }
 	  comment += andStr + prefix + "1.internal.final";
-          assert( TheNet->findPlace(prefix + "1.internal.final") != NULL );
-	  formula += andStr + TheNet->findPlace(prefix + "1.internal.final")->nodeShortName() + " > 0";
+          assert( PN.findPlace(prefix + "1.internal.final") != NULL );
+	  formula += andStr + PN.findPlace(prefix + "1.internal.final")->nodeShortName() + " > 0";
        	  andStr = " AND ";
 	}
 	comment += ") }";
@@ -369,7 +369,7 @@ int main( int argc, char *argv[])
 	output = openOutput(output_filename + "." + suffixes[F_PNML]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for PNML ...\n");
-      TheNet->pnmlOut(output);
+      PN.pnmlOut(output);
       if (output_filename != "")
       {
 	closeOutput(output);
@@ -385,7 +385,7 @@ int main( int argc, char *argv[])
 	output = openOutput(output_filename + "." + suffixes[F_PEP]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for PEP ...\n");
-      TheNet->pepOut(output);
+      PN.pepOut(output);
       if (output_filename != "")
       {
 	closeOutput(output);
@@ -401,7 +401,7 @@ int main( int argc, char *argv[])
 	output = openOutput(output_filename + "." + suffixes[F_APNN]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for APNN ...\n");
-      TheNet->apnnOut(output);
+      PN.apnnOut(output);
       if (output_filename != "")
       {
 	closeOutput(output);
@@ -417,7 +417,7 @@ int main( int argc, char *argv[])
 	output = openOutput(output_filename + "." + suffixes[F_DOT]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for dot ...\n");
-      TheNet->dotOut(output);
+      PN.dotOut(output);
       if (output_filename != "")
       {
 	closeOutput(output);
@@ -440,7 +440,7 @@ int main( int argc, char *argv[])
 	output = openOutput(output_filename + "." + suffixes[F_INFO]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net information ...\n");
-      TheNet->infoOut(output);
+      PN.infoOut(output);
       if (output_filename != "")
       {
 	closeOutput(output);

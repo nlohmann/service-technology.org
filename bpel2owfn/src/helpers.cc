@@ -28,13 +28,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2006/11/29 15:21:07 $
+ * \date    \$Date: 2006/11/30 11:31:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.63 $
+ * \version \$Revision: 1.64 $
  *
  * \ingroup conversion
  * \ingroup debug
@@ -245,16 +245,9 @@ void error()
  */
 void cleanup()
 {
-  extern PetriNet *TheNet;	// defined in bpel2owfn.cc
+  extern PetriNet PN;	// defined in bpel2owfn.cc
 
   trace(TRACE_INFORMATION,"Cleaning up ...\n");
-
-  if ( modus == M_PETRINET ) 
-  {
-    trace(TRACE_INFORMATION," + Deleting Petri Net pointer\n");
-    delete(TheNet);
-    TheNet = NULL;
-  }
 
   if ( filename != "<STDIN>" && frontend_in != NULL)
   {

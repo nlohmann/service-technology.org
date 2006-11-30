@@ -28,14 +28,14 @@
  * 
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/29 15:21:07 $
+ * \date    \$Date: 2006/11/30 09:05:14 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.121 $
+ * \version \$Revision: 1.122 $
  */
 
 
@@ -72,7 +72,7 @@ extern int frontend_parse();			// from Bison
 extern int frontend_debug;			// from Bison
 extern int frontend__flex_debug;		// from flex
 extern FILE *frontend_in;			// from flex
-extern kc::tProcess TheProcess;
+extern kc::tProcess AST;
 
 
 
@@ -157,17 +157,17 @@ int main( int argc, char *argv[])
 
       // apply first set of rewrite rules
       trace(TRACE_INFORMATION, "Rewriting...\n");
-      TheProcess = TheProcess->rewrite(kc::implicit);
+      AST = AST->rewrite(kc::implicit);
       trace(TRACE_INFORMATION, "Rewriting complete...\n");
 
       // postprocess and annotate the AST
       trace(TRACE_INFORMATION, "Postprocessing...\n");
-      TheProcess->unparse(kc::printer, kc::postprocessing);
+      AST->unparse(kc::printer, kc::postprocessing);
       trace(TRACE_INFORMATION, "Postprocessing complete...\n");
 
       // apply second set of rewrite rules
       trace(TRACE_INFORMATION, "Rewriting 2...\n");
-      TheProcess = TheProcess->rewrite(kc::newNames);
+      AST = AST->rewrite(kc::newNames);
       trace(TRACE_INFORMATION, "Rewriting 2 complete...\n");
 
 
@@ -179,7 +179,7 @@ int main( int argc, char *argv[])
 	{
 	  string dot_filename = output_filename + "." + suffixes[F_DOT];
 	  FILE *dotfile = fopen(dot_filename.c_str(), "w+");
-	  TheProcess->fprintdot(dotfile, "", "", "", true, true, true);
+	  AST->fprintdot(dotfile, "", "", "", true, true, true);
 	  fclose(dotfile); 
 #ifdef HAVE_DOT
   	  std::string systemcall = "dot -q -Tpng -o" + output_filename + ".png " + output_filename + "." + suffixes[F_DOT];
@@ -189,7 +189,7 @@ int main( int argc, char *argv[])
 #endif
 	}
 	else
-	  TheProcess->print();
+	  AST->print();
       }
 
       // generate and process the control flow graph?      
@@ -204,11 +204,11 @@ int main( int argc, char *argv[])
 	
 	// choose Petri net patterns
 	if (parameters[P_COMMUNICATIONONLY] == true)
-	  TheProcess->unparse(kc::pseudoPrinter, kc::petrinetsmall);
+	  AST->unparse(kc::pseudoPrinter, kc::petrinetsmall);
 	else if (parameters[P_NEW] == true)
-	  TheProcess->unparse(kc::pseudoPrinter, kc::petrinetnew);
+	  AST->unparse(kc::pseudoPrinter, kc::petrinetnew);
 	else
-	  TheProcess->unparse(kc::pseudoPrinter, kc::petrinet);
+	  AST->unparse(kc::pseudoPrinter, kc::petrinet);
 
 	if (modus == M_CONSISTENCY)
 	{
@@ -233,7 +233,7 @@ int main( int argc, char *argv[])
 	  TheNet = new PetriNet();
 	  assert(TheNet != NULL);
 
-	  TheProcess = NULL;
+	  AST = NULL;
 	}
       }
     }
@@ -260,7 +260,7 @@ int main( int argc, char *argv[])
 	output = openOutput(output_filename + "." + suffixes[F_XML]);
       }
       trace(TRACE_INFORMATION, "-> Printing \"pretty\" XML ...\n");
-      TheProcess->unparse(kc::printer, kc::xml);
+      AST->unparse(kc::printer, kc::xml);
       if (output_filename != "")
       {
 	closeOutput(output);

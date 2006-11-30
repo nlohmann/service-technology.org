@@ -27,18 +27,18 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date
  *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/11/16 11:44:07 $
+ *          - last changed: \$Date: 2006/11/30 09:05:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.38 $
+ * \version \$Revision: 1.39 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -56,7 +56,7 @@ extern map<unsigned int, map<string, string> > temporaryAttributeMap;
 extern map<unsigned int, ASTE*> ASTEmap;
 
 /// The CFG
-CFGBlock * TheCFG = NULL;
+CFGBlock * CFG = NULL;
 
 /// mapping of Link names to Source blocks
 map<std::string, CFGBlock*> sources; 
@@ -797,37 +797,37 @@ void CFGBlock::checkForConflictingReceive()
 
 void processCFG()
 {
-  extern kc::tProcess TheProcess;
+  extern kc::tProcess AST;
 
   assert(modus == M_CFG);
 
-  TheCFG = NULL;
+  CFG = NULL;
   trace(TRACE_INFORMATION, "-> Unparsing AST to CFG ...\n");
-  TheProcess->unparse(kc::pseudoPrinter, kc::cfg);
+  AST->unparse(kc::pseudoPrinter, kc::cfg);
   
   //trace(TRACE_DEBUG, "[CFG] checking for DPE\n");
   // do some business with CFG
   //list<int> kcl;
-  //TheCFG->needsDPE(0, kcl);
-  //TheCFG->resetProcessedFlag();
+  //CFG->needsDPE(0, kcl);
+  //CFG->resetProcessedFlag();
 
   trace(TRACE_DEBUG, "[CFG] checking for cyclic links\n");
   /// \todo (gierds) check for cyclic links, otherwise we will fail
-  TheCFG->checkForCyclicLinks();
-  TheCFG->resetProcessedFlag(true);
+  CFG->checkForCyclicLinks();
+  CFG->resetProcessedFlag(true);
 
   trace(TRACE_DEBUG, "[CFG] checking for cyclic control dependency\n");
-  TheCFG->checkForCyclicControlDependency();
-  TheCFG->resetProcessedFlag(true, false);
+  CFG->checkForCyclicControlDependency();
+  CFG->resetProcessedFlag(true, false);
 
   trace(TRACE_DEBUG, "[CFG] checking for uninitialized variables\n");
   // test
-  TheCFG->checkForUninitializedVariables();
-  TheCFG->resetProcessedFlag();
+  CFG->checkForUninitializedVariables();
+  CFG->resetProcessedFlag();
   // end test
 
-  TheCFG->lastBlock->checkForConflictingReceive();
-  TheCFG->resetProcessedFlag(true, false);
+  CFG->lastBlock->checkForConflictingReceive();
+  CFG->resetProcessedFlag(true, false);
 
   if (formats[F_DOT])
   {
@@ -837,7 +837,7 @@ void processCFG()
     trace(TRACE_INFORMATION, "-> Printing CFG in dot ...\n");
     
     // output CFG;
-    cfgDot(TheCFG);
+    cfgDot(CFG);
     
     if (output_filename != "")
     {
@@ -846,5 +846,5 @@ void processCFG()
     }
   }
 
-  delete(TheCFG);
+  delete(CFG);
 }

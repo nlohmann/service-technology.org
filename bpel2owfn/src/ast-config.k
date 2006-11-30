@@ -73,7 +73,7 @@
 using namespace std;
 
 extern PetriNet *TheNet;			// introduced in main.c
-extern CFGBlock * TheCFG;			// introduced in cfg.cc
+extern CFGBlock * CFG;				// introduced in cfg.cc
 extern map<unsigned int, ASTE*> ASTEmap;	// introduced in ast-details.cc
 
 

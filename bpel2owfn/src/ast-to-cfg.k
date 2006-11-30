@@ -29,11 +29,11 @@
  * 
  * \author  
  *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
+ *          - last changes of: \$Author: nlohmann $
  *          
  * \date    
  *          - created 2006-01-19
- *          - last changed: \$Date: 2006/11/16 11:44:07 $
+ *          - last changed: \$Date: 2006/11/30 09:05:14 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.44 $
+ * \version \$Revision: 1.45 $
  */
 %}
 
@@ -71,8 +71,8 @@ Process(a,b,c,d,e,f,g,h,i,j) ->
 	  firstBlock->firstBlock = lastBlock->firstBlock = firstBlock;
 	  firstBlock->lastBlock  = lastBlock->lastBlock  = lastBlock;
 	  
-	  TheCFG = firstBlock;
-	  cfgMap[toString($0->id)] = TheCFG; 
+	  CFG = firstBlock;
+	  cfgMap[toString($0->id)] = CFG; 
 	}
 	e //faultHandler
 	{

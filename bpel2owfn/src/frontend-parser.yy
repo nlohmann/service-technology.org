@@ -37,7 +37,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2006/11/29 15:31:47 $
+ * \date    \$Date: 2006/11/30 09:05:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -47,7 +47,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.277 $
+ * \version \$Revision: 1.278 $
  *
  * \ingroup frontend
  */
@@ -151,7 +151,7 @@ extern int frontend_lineno;	// from flex
  *****************************************************************************/
 
 /// the root of the abstract syntax tree
-tProcess TheProcess;
+tProcess AST;
 
 /// a pointer to the current join condition
 impl_joinCondition* currentJoinCondition = standardJoinCondition();
@@ -277,7 +277,7 @@ tProcess:
   X_OPEN K_PROCESS arbitraryAttributes X_NEXT tExtensions imports tPartnerLinks
   tPartners tMessageExchanges tVariables tCorrelationSets tFaultHandlers
   tCompensationHandler tEventHandlers activity X_NEXT X_SLASH K_PROCESS X_CLOSE
-    { TheProcess = $$ = Process($8, $9, $11, $12, $13, $14, $15, StopInProcess(), $16, $4); }
+    { AST = $$ = Process($8, $9, $11, $12, $13, $14, $15, StopInProcess(), $16, $4); }
 ;
 
 /*---------------------------------------------------------------------------*/

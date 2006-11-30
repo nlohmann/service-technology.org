@@ -18,7 +18,7 @@ extern string currentScope;
   WHILE
 ******************************************************************************/
 
-void PWhile(const impl_tWhile* abstract_phylum, uview current_view)
+void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 {
   impl_tWhile_While* phylum = (impl_tWhile_While*) abstract_phylum;
   assert(phylum != NULL);
@@ -184,7 +184,7 @@ void PWhile(const impl_tWhile* abstract_phylum, uview current_view)
   REPEAT UNTIL
 ******************************************************************************/
 
-void PRepeatUntil(const impl_tRepeatUntil* abstract_phylum, uview current_view)
+void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 {
   impl_tRepeatUntil_RepeatUntil* phylum = (impl_tRepeatUntil_RepeatUntil*) abstract_phylum;
   assert(phylum != NULL);
@@ -282,7 +282,7 @@ void PRepeatUntil(const impl_tRepeatUntil* abstract_phylum, uview current_view)
   SEQUENCE
 ******************************************************************************/
 
-void PSequence(const impl_tSequence* abstract_phylum, uview current_view)
+void PSequence(impl_tSequence* abstract_phylum, uview current_view)
 {
   impl_tSequence_Sequence* phylum = (impl_tSequence_Sequence*) abstract_phylum;
   assert(phylum != NULL);
@@ -343,7 +343,7 @@ void PSequence(const impl_tSequence* abstract_phylum, uview current_view)
   FLOW
 ******************************************************************************/
 
-void PFlow(const impl_tFlow* abstract_phylum, uview current_view)
+void PFlow(impl_tFlow* abstract_phylum, uview current_view)
 {
   impl_tFlow_Flow* phylum = (impl_tFlow_Flow*) abstract_phylum;
   assert(phylum != NULL);
@@ -442,7 +442,7 @@ void PFlow(const impl_tFlow* abstract_phylum, uview current_view)
   SWITCH
 ******************************************************************************/
 
-void PSwitch(const impl_tSwitch* abstract_phylum, uview current_view)
+void PSwitch(impl_tSwitch* abstract_phylum, uview current_view)
 {
   impl_tSwitch_Switch* phylum = (impl_tSwitch_Switch*) abstract_phylum;
   assert(phylum != NULL);
@@ -633,7 +633,7 @@ void PSwitch(const impl_tSwitch* abstract_phylum, uview current_view)
   PICK
 ******************************************************************************/
 
-void PPick(const impl_tPick* abstract_phylum, uview current_view)
+void PPick(impl_tPick* abstract_phylum, uview current_view)
 {
   impl_tPick_Pick* phylum = (impl_tPick_Pick*) abstract_phylum;
   assert(phylum != NULL);
@@ -838,7 +838,7 @@ void PPick(const impl_tPick* abstract_phylum, uview current_view)
   IF
 ******************************************************************************/
 
-void PIf(const impl_tIf* abstract_phylum, uview current_view)
+void PIf(impl_tIf* abstract_phylum, uview current_view)
 {
   impl_tIf_If* phylum = (impl_tIf_If*) abstract_phylum;
   assert(phylum != NULL);

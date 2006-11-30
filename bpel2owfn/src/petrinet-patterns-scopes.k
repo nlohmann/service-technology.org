@@ -23,7 +23,7 @@ extern set<string> variableNames;
   PROCESS
 ******************************************************************************/
 
-void PProcess(const impl_tProcess* abstract_phylum, uview current_view)
+void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 {
   impl_tProcess_Process* phylum = (impl_tProcess_Process*) abstract_phylum;
   assert(phylum != NULL);
@@ -449,7 +449,7 @@ void PProcess(const impl_tProcess* abstract_phylum, uview current_view)
   SCOPE
 ******************************************************************************/
 
-void PScope(const impl_tScope* abstract_phylum, uview current_view)
+void PScope(impl_tScope* abstract_phylum, uview current_view)
 {
   impl_tScope_Scope* phylum = (impl_tScope_Scope*) abstract_phylum;
   assert(phylum != NULL);
@@ -978,4 +978,259 @@ void PScope(const impl_tScope* abstract_phylum, uview current_view)
 
 
   footer(phylum->id);
+}
+
+
+
+
+
+/******************************************************************************
+  PROCESS
+******************************************************************************/
+
+void PStop(impl_tStop* abstract_phylum, uview current_view)
+{
+  switch(current_view)
+  {
+    case(petrinet_enum):
+      {
+	impl_tStop *phylum = abstract_phylum;
+
+	with (phylum)
+	{
+	  phylum = StopInProcess():
+	  {
+	    string prefix = "1.internal.stop.";
+	    trace(TRACE_DEBUG, "[PNU]" + inString() + "<stopPatternInsideProcess>\n");
+
+      	    Place *p1  = TheNet->newPlace(prefix + "Faulted");
+	    Place *p2  = TheNet->newPlace(prefix + "p2");
+	    Place *p3  = TheNet->newPlace(prefix + "p3");
+	    Place *p4  = TheNet->newPlace(prefix + "p4");
+	    Place *p5  = TheNet->newPlace(prefix + "fault_in");
+	    Place *p6  = TheNet->newPlace(prefix + "p6");
+	    Place *p7  = TheNet->newPlace(prefix + "fault");
+	    Place *p8  = TheNet->newPlace(prefix + "faultSave");
+	    Place *p9  = TheNet->newPlace(prefix + "Active");
+	    Place *p10 = TheNet->newPlace(prefix + "!Active");
+	    Place *p11 = TheNet->newPlace(prefix + "p11");
+	    Place *p12 = TheNet->newPlace(prefix + "final");
+	    Place *p13 = TheNet->newPlace(prefix + "terminate");
+	    Place *p14 = TheNet->newPlace(prefix + "!Faulted");
+	    Place *p15 = TheNet->newPlace(prefix + "rethrow");
+	    Place *p16 = TheNet->newPlace(prefix + "Ended");
+	    Place *p17 = TheNet->newPlace(prefix + "Compensated");
+	    Place *p19 = TheNet->newPlace(prefix + "p19");
+	    Place *p20 = TheNet->newPlace(prefix + "!Ended");
+	    Place *p21 = TheNet->newPlace(prefix + "stop");
+	    Place *p22 = TheNet->newPlace(prefix + "stopped");
+	    Place *p23 = TheNet->newPlace(prefix + "cleanCH");
+	    Place *p24 = TheNet->newPlace(prefix + "ch_cleaned");
+	    Place *fh_faulted = TheNet->newPlace(prefix + "FHFaulted");
+	    Place *fh_not_faulted = TheNet->newPlace(prefix + "!FHFaulted");
+	    Place *fh_fault_in = TheNet->newPlace(prefix + "fh_fault_in");  // for faults from the FH
+	    Place *ch_faulted = TheNet->newPlace(prefix + "CHFaulted");
+	    Place *ch_not_faulted = TheNet->newPlace(prefix + "!CHFaulted");
+	    Place *ch_fault_in = TheNet->newPlace(prefix + "ch_fault_in");  // for faults from the CH
+
+	    Transition *t1 = TheNet->newTransition(prefix + "t1");
+	    TheNet->newArc(p1, t1, READ);
+	    TheNet->newArc(fh_fault_in, t1);
+	    TheNet->newArc(t1, p15);
+
+	    Transition *t2 = TheNet->newTransition(prefix + "t2");
+	    TheNet->newArc(p2, t2);
+	    TheNet->newArc(t2, p3);
+	    TheNet->newArc(t2, p21);
+
+	    Transition *t3 = TheNet->newTransition(prefix + "t3");
+	    TheNet->newArc(p3, t3);
+	    TheNet->newArc(p22, t3);
+	    TheNet->newArc(t3, p4);
+
+	    Transition *t4 =  TheNet->newTransition(prefix + "t4");
+	    TheNet->newArc(p5, t4);
+	    TheNet->newArc(t4, p2);
+	    TheNet->newArc(t4, p6);
+
+	    Transition *t5 = TheNet->newTransition(prefix + "t5");
+	    TheNet->newArc(p4, t5);
+	    TheNet->newArc(p6, t5);
+	    TheNet->newArc(p14, t5);
+	    TheNet->newArc(t5, p1);
+	    TheNet->newArc(t5, p7);
+	    TheNet->newArc(t5, p8);
+
+	    Transition *t6 = TheNet->newTransition(prefix + "t6");
+	    TheNet->newArc(p9, t6);
+	    TheNet->newArc(p13, t6);
+	    TheNet->newArc(t6, p2);
+	    TheNet->newArc(t6, p10);
+	    TheNet->newArc(t6, p11);
+
+	    Transition *t7 = TheNet->newTransition(prefix + "t7");
+	    TheNet->newArc(p4, t7);
+	    TheNet->newArc(p11, t7);
+	    TheNet->newArc(p20, t7);
+	    TheNet->newArc(t7, p12);
+	    TheNet->newArc(t7, p16);
+
+	    Transition *t8 = TheNet->newTransition(prefix + "t8");
+	    TheNet->newArc(p10, t8, READ);
+	    TheNet->newArc(p13, t8);
+
+	    Transition *t10 = TheNet->newTransition(prefix + "t10");
+	    TheNet->newArc(ch_fault_in, t10);
+	    TheNet->newArc(p17, t10, READ);
+	    TheNet->newArc(p20, t10);
+	    TheNet->newArc(t10, p19);
+	    TheNet->newArc(t10, p23);
+
+	    Transition *t12 = TheNet->newTransition(prefix + "t12");
+	    TheNet->newArc(p19, t12);
+	    TheNet->newArc(p24, t12);
+	    TheNet->newArc(t12, p16);
+	    TheNet->newArc(t12, p12);
+
+	    trace(TRACE_DEBUG, "[PNU]" + inString() + "</stopPatternInsideProcess>\n");
+	  }
+
+	  phylum = StopInScope():
+	  {
+      	    string prefix = currentScope + "stop.";
+	    trace(TRACE_DEBUG, "[PNU]" + inString() + "<stopPatternInsideScope scope=\"" + currentScope + "\">\n");
+
+	    Place *p1 =  TheNet->newPlace(prefix + "ft_in");
+	    Place *p2 =  TheNet->newPlace(prefix + "p2");
+	    Place *p3 =  TheNet->newPlace(prefix + "ftSave");
+	    Place *p4 =  TheNet->newPlace(prefix + "ft");
+	    Place *p5 =  TheNet->newPlace(prefix + "Faulted");
+	    Place *p6 =  TheNet->newPlace(prefix + "p6");
+	    Place *p7 =  TheNet->newPlace(prefix + "p7");
+	    Place *p8 =  TheNet->newPlace(prefix + "p8");
+	    Place *p9 =  TheNet->newPlace(prefix + "!Faulted");
+	    Place *p10 = TheNet->newPlace(prefix + "fault_in");
+	    Place *p11 = TheNet->newPlace(prefix + "p11");
+	    Place *p12 = TheNet->newPlace(prefix + "fault");
+	    Place *p13 = TheNet->newPlace(prefix + "faultSave");
+	    Place *p14 = TheNet->newPlace(prefix + "Active");
+	    Place *p15 = TheNet->newPlace(prefix + "terminate_up");
+	    Place *p16 = TheNet->newPlace(prefix + "p16");
+	    Place *p17 = TheNet->newPlace(prefix + "stopped_s");
+	    Place *p18 = TheNet->newPlace(prefix + "!Active");
+	    Place *p19 = TheNet->newPlace(prefix + "p19");
+	    Place *p20 = TheNet->newPlace(prefix + "upperTerminate");
+	    Place *p21 = TheNet->newPlace(prefix + "terminate");
+	    Place *p22 = TheNet->newPlace(prefix + "Ended");
+	    Place *p23 = TheNet->newPlace(prefix + "rethrow");
+	    Place *p24 = TheNet->newPlace(prefix + "Compensated");
+	    Place *p25 = TheNet->newPlace(prefix + "p25");
+	    Place *p26 = TheNet->newPlace(prefix + "p26");
+	    Place *p27 = TheNet->newPlace(prefix + "upperFH");
+	    Place *p28 = TheNet->newPlace(prefix + "!Ended");
+	    Place *p29 = TheNet->newPlace(prefix + "stop");
+	    Place *p30 = TheNet->newPlace(prefix + "stopped");
+	    Place *p31 = TheNet->newPlace(prefix + "cleanCH");
+	    Place *p32 = TheNet->newPlace(prefix + "ch_cleaned");
+	    Place *fh_faulted = TheNet->newPlace(prefix + "FHFaulted");
+	    Place *fh_not_faulted = TheNet->newPlace(prefix + "!FHFaulted");
+	    Place *fh_fault_in = TheNet->newPlace(prefix + "fh_fault_in"); // for faults from the FH
+	    Place *ch_faulted = TheNet->newPlace(prefix + "CHFaulted");
+	    Place *ch_not_faulted = TheNet->newPlace(prefix + "!CHFaulted");
+	    Place *ch_fault_in = TheNet->newPlace(prefix + "ch_fault_in"); // for faults from the CH
+
+	    Transition *t1 = TheNet->newTransition(prefix + "t1");
+	    TheNet->newArc(p1, t1);
+	    TheNet->newArc(t1, p2);
+	    TheNet->newArc(t1, p6);
+
+	    Transition *t2 = TheNet->newTransition(prefix + "t2");
+	    TheNet->newArc(p2, t2);
+	    TheNet->newArc(t2, p3);
+	    TheNet->newArc(t2, p4);
+	    TheNet->newArc(t2, p5);
+	    TheNet->newArc(p8, t2);
+	    TheNet->newArc(p9, t2);
+
+	    Transition *t3 = TheNet->newTransition(prefix + "t3");
+	    TheNet->newArc(p5, t3, READ);
+	    TheNet->newArc(fh_fault_in, t3);
+	    TheNet->newArc(t3, p23);
+
+	    Transition *t4 = TheNet->newTransition(prefix + "t4");
+	    TheNet->newArc(p6, t4);
+	    TheNet->newArc(t4, p7);
+	    TheNet->newArc(t4, p29);
+
+	    Transition *t5 = TheNet->newTransition(prefix + "t5");
+	    TheNet->newArc(p7, t5);
+	    TheNet->newArc(t5, p8);
+	    TheNet->newArc(p30, t5);
+
+	    Transition *t6 = TheNet->newTransition(prefix + "t6");
+	    TheNet->newArc(t6, p6);
+	    TheNet->newArc(p10, t6);
+	    TheNet->newArc(t6, p11);
+
+	    Transition *t7 = TheNet->newTransition(prefix + "t7");
+	    TheNet->newArc(t7, p5);
+	    TheNet->newArc(p8, t7);
+	    TheNet->newArc(p9, t7);
+	    TheNet->newArc(p11, t7);
+	    TheNet->newArc(t7, p12);
+	    TheNet->newArc(t7, p13);
+
+	    Transition *t8 = TheNet->newTransition(prefix + "t8");
+	    TheNet->newArc(t8, p6);
+	    TheNet->newArc(p15, t8);
+	    TheNet->newArc(t8, p16);
+
+	    Transition *t9 = TheNet->newTransition(prefix + "t9");
+	    TheNet->newArc(p8, t9);
+	    TheNet->newArc(p16, t9);
+	    TheNet->newArc(t9, p17);
+	    TheNet->newArc(t9, p22);
+	    TheNet->newArc(p28, t9);
+
+	    Transition *t10 = TheNet->newTransition(prefix + "t10");
+	    TheNet->newArc(t10, p6);
+	    TheNet->newArc(p14, t10);
+	    TheNet->newArc(t10, p19);
+	    TheNet->newArc(t10, p18);
+	    TheNet->newArc(p21, t10);
+
+	    Transition *t11 = TheNet->newTransition(prefix + "t11");
+	    TheNet->newArc(p8, t11);
+	    TheNet->newArc(p19, t11);
+      	    TheNet->newArc(t11, p20);
+	    TheNet->newArc(t11, p22);
+	    TheNet->newArc(p28, t11);
+
+	    Transition *t12 = TheNet->newTransition(prefix + "t12");
+	    TheNet->newArc(p18, t12, READ);
+	    TheNet->newArc(p21, t12);
+	    TheNet->newArc(t12, p20);
+
+	    Transition *t14 = TheNet->newTransition(prefix + "faultInCH");
+	    TheNet->newArc(ch_fault_in, t14);
+	    TheNet->newArc(p24, t14, READ);
+	    TheNet->newArc(t14, p26);
+	    TheNet->newArc(p28, t14);
+	    TheNet->newArc(t14, p31);
+
+	    Transition *t16 = TheNet->newTransition(prefix + "t16");
+	    TheNet->newArc(t16, p22);
+	    TheNet->newArc(p26, t16);
+	    TheNet->newArc(t16, p27);
+	    TheNet->newArc(p32, t16);
+
+	    trace(TRACE_DEBUG, "[PNU]" + inString() + "</stopPatternInsideScope scope=\"" + currentScope + "\">\n");
+	  }
+	}
+
+	break;
+      }
+
+    default: { /* no pattern in this case */ }
+  }
 }

@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/30 08:55:10 $ by $Author: nlohmann $.
-# Version $Revision: 1.53 $
+# File last changed $Date: 2006/11/30 20:42:16 $ by $Author: nlohmann $.
+# Version $Revision: 1.54 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -50,8 +50,6 @@ KCOBJECTS = $(KCFILES:.k=.o) \
 $(KCDUMMY): $(KCFILES)
 	touch $@
 	$(KC) $(KCFLAGS) $^
-	$(MAKE) frontend-parser.o
-	$(MAKE) $(KCOBJECTS)
 
 $(KCOBJECTS): $(KCFILES)
 

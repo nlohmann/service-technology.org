@@ -3,7 +3,7 @@
 @include version.texi
 @afourpaper
 @finalout
-@settitle @acronym{BPEL2oWFN} User's Manual
+@settitle @acronym{GNU BPEL2oWFN} User's Manual
 
 @c ----------------------------------------------------------------------------
 
@@ -59,11 +59,11 @@ funded by the Bundesministerium f@"ur Bildung und Forschung. See
 @end iftex
 
 @ifnottex
-@title @acronym{BPEL2oWFN}
+@title @acronym{GNU BPEL2oWFN}
 @end ifnottex
 
 @subtitle Translating @acronym{BPEL} Processes into Open Workflow Nets
-@subtitle @acronym{BPEL2oWFN} Version @value{VERSION}, @value{UPDATED}
+@subtitle @acronym{GNU BPEL2oWFN} Version @value{VERSION}, @value{UPDATED}
 @vskip 4pt
 @subtitle User's Manual
 

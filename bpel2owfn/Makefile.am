@@ -18,15 +18,19 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/30 16:10:56 $ by $Author: nlohmann $.
-# Version $Revision: 1.27 $
+# File last changed $Date: 2006/11/30 20:41:51 $ by $Author: nlohmann $.
+# Version $Revision: 1.28 $
 
 SUBDIRS = src doc tests
 
 .PHONY: binarydistreadme
 
-CLEANFILES = -r *~
 
+####################################
+# Targets to clean generated files #
+####################################
+
+CLEANFILES = -r *~
 
 # all files that require the permission to execute
 SHELLSCRIPTS = tests/test1 tests/test2 tests/test3 tests/test4
@@ -66,6 +70,12 @@ hu-prepare: maintainer-clean
 	@echo
 
 
+####################################
+# Targets for binary distributions #
+####################################
+
+OS = $(build_cpu)-$(build_os)
+
 # a README file for a binary distribution
 binarydistreadme:
 	@echo -e Copyright \(C\) 2005, 2006 Niels Lohmann, Christian Gierds and Dennis > BINARYREADME
@@ -90,29 +100,33 @@ binarydistreadme:
 	@echo -e with BPEL2oWFN\; if not, write to the Free Software Foundation, Inc., 51 >> BINARYREADME
 	@echo -e Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. >> BINARYREADME
 
-
 # name of the directory/archive for a binary distribution
 BINARYDISTDIR = $(distdir)-$(OS)
 
-
-DOCFILES = doc/$(PACKAGE).pdf
-BINARYFILES = src/$(PACKAGE)$(EXEEXT) COPYING
-
 # set OS for the directory-prefix
-hu-bindist: dvi pdf binarydistreadme
+binarydist: dvi pdf binarydistreadme
 	make --directory=src clean
 	make --directory=src
 	$(mkdir_p) $(BINARYDISTDIR)
-	cp $(DOCFILES) $(BINARYDISTDIR)
-	cp $(BINARYFILES) $(BINARYDISTDIR)
+	cp doc/$(PACKAGE).pdf $(BINARYDISTDIR)
+	cp src/$(PACKAGE)$(EXEEXT) COPYING $(BINARYDISTDIR)
 	mv BINARYREADME $(BINARYDISTDIR)/README
 	$(AMTAR) -cf $(BINARYDISTDIR).tar $(BINARYDISTDIR)
 	gzip $(BINARYDISTDIR).tar
 	rm -fr $(BINARYDISTDIR)
 
-hu-binarydist:
-	make hu-bindist CXXFLAGS="-O2" CFLAGS="-O2"
+# target to create a Mac Universal binary
+bindist_universal:
+	echo "you have to configure with:"
+	echo "  ./configure --disable-dependency-tracking"
+	make binarydist OS=mac-universal CXXFLAGS="-O2 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
+	  CFLAGS="-O2 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
+	  LDFLAGS="-arch i386 -arch ppc"
 
 # target to create an executable that is independet of Cygwin
-hu-win32dist:
-	make hu-bindist OS=win32 CXXFLAGS="-mno-cygwin -U _WIN32" CFLAGS="-mno-cygwin -U _WIN32"
+bindist_win32:
+	make binarydist OS=$(build_cpu)-mingw32 CXXFLAGS="-mno-cygwin -U _WIN32 -O2" CFLAGS="-mno-cygwin -U _WIN32 -O2"
+
+# target for any other operating system
+bindist:
+	make binarydist CXXFLAGS="-O2" CFLAGS="-O2"

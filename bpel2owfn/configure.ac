@@ -18,13 +18,13 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/29 15:32:38 $ by $Author: nlohmann $.
-# Version $Revision: 1.24 $
+# File last changed $Date: 2006/11/30 20:41:51 $ by $Author: nlohmann $.
+# Version $Revision: 1.25 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT([GNU BPEL2oWFN],[2.0],[nlohmann@informatik.hu-berlin.de],[bpel2owfn])
-AC_REVISION($Revision: 1.24 $)
+AC_REVISION($Revision: 1.25 $)
 AM_INIT_AUTOMAKE
 
 
@@ -36,6 +36,10 @@ AC_CONFIG_HEADERS(src/bpel2owfn.h)
 # The next line has to be un-commented before releasing version.
 #AC_DEFINE(NDEBUG,1,[The release version does not need assert-calls.])
 
+
+# Compute the canonical build-system type variable, build, and its three
+# individual parts build_cpu, build_vendor, and build_os.
+AC_CANONICAL_BUILD
 
 
 # Checks for C/C++ details.

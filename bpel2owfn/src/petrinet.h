@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/30 11:31:40 $
+ * \date    \$Date: 2006/11/30 15:08:30 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.109 $
+ * \version \$Revision: 1.110 $
  *
  * \ingroup petrinet
  */
@@ -316,13 +316,13 @@ class PetriNet
 {
   public:
     /// adds a place with a given role and type
-    Place* newPlace(std::string role, communication_type type = INTERNAL);
+    Place *newPlace(std::string my_role, communication_type my_type = INTERNAL);
   
     /// adds a transition with a given role
-    Transition*newTransition(std::string role);
+    Transition *newTransition(std::string my_role);
   
     /// adds an arc given source and target node, and arc type
-    Arc *newArc(Node *source, Node *target, arc_type type = STANDARD, unsigned int weight = 1);
+    Arc *newArc(Node *my_source, Node *my_target, arc_type my_type = STANDARD, unsigned int my_weight = 1);
 
 
     /// info file output
@@ -417,17 +417,11 @@ class PetriNet
 
 
   private:
-    /// adds a place without an initial role
-    Place* newPlace();
-
     /// removes a place from the net
     void removePlace(Place *p);
 
-    /// adds a transition without an initial role
-    Transition* newTransition();
-
     /// returns the arc weight between two nodes
-    unsigned int arc_weight(Node *source_nodes, Node *target_node);
+    unsigned int arc_weight(Node *my_source, Node *my_target);
 
     /// removes a transition from the net
     void removeTransition(Transition *t);

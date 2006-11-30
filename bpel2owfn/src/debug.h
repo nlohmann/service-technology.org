@@ -28,13 +28,13 @@
  * 
  * \since   2005/11/09
  *
- * \date    \$Date: 2006/11/29 15:21:07 $
+ * \date    \$Date: 2006/11/30 15:08:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  *
  * \ingroup debug
  */
@@ -123,6 +123,7 @@ void SAerror(unsigned int code, string information, string lineNumber);
  *****************************************************************************/
 
 /*!
+ * \def ENTER
  * \brief prints the function name
  *
  * A preprocessor directive to print the name of the called function together
@@ -135,12 +136,47 @@ void SAerror(unsigned int code, string information, string lineNumber);
  *
  * \ingroup debug
 */
+#ifndef NDEBUG
 #define ENTER(prefix) \
   trace(TRACE_VERY_DEBUG, string(prefix) + "\t+" + string(__FUNCTION__) + \
     "() [" + string(__FILE__) + ":" + toString(__LINE__) + "]\n")
+#else
+#define ENTER(prefix)
+#endif
+
+
 
 
 /*!
+ * \def EN
+ * \brief prints the function name and passed arguments
+ *
+ * A preprocessor directive to print the name of the called function together
+ * with its file position. Furthermore, a printf-string is printed that
+ * allows to print and arbitrary number of arguments.
+ *
+ * \param ... a printf-string of arguments
+ *
+ * \ingroup debug
+*/
+#ifndef NDEBUG
+#define EN(...) \
+  { \
+    char buff[80]; \
+    sprintf(buff, __VA_ARGS__); \
+    trace(TRACE_VERY_DEBUG, "[" + string(__FILE__) + ":" + toString(__LINE__) + "]\t + " + string(__FUNCTION__) + \
+    "(" + string(buff) + ")\n"); \
+  }
+#else
+#define EN(...)
+#endif
+
+
+
+
+
+/*!
+ * \def LEAVE
  * \brief prints the function name
  *
  * A preprocessor directive to print the name of the called function together
@@ -153,9 +189,13 @@ void SAerror(unsigned int code, string information, string lineNumber);
  *
  * \ingroup debug
  */
+#ifndef NDEBUG
 #define LEAVE(prefix) \
   trace(TRACE_VERY_DEBUG, string(prefix) + "\t-" + string(__FUNCTION__) + \
     "() [" + string(__FILE__) + ":" + toString(__LINE__) + "]\n")
+#else
+#define LEAVE(prefix)
+#endif
 
 
 

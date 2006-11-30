@@ -27,7 +27,7 @@
  * This file defines and implements the grammar of BPEL using standard 
  * BNF-rules to describe the originally XML-based syntax as it is specified in
  * the BPEL4WS 1.1 specification. All terminals are passed from the lexer
- * (implemented in \ref lexer.cc). Besides simple syntax-checking the
+ * (implemented in \ref frontend-lexer.cc). Besides simple syntax-checking the
  * grammar is used to build the abstract syntax tree as it is defined in
  * ast-grammar.k and implemented in \ref ast-grammar.cc and
  * \ref ast-grammar.h.
@@ -37,7 +37,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2006/11/30 09:05:15 $
+ * \date    \$Date: 2006/11/30 15:08:30 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -47,7 +47,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.278 $
+ * \version \$Revision: 1.279 $
  *
  * \ingroup frontend
  */

@@ -18,10 +18,10 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/29 15:21:06 $ by $Author: nlohmann $.
-# Version $Revision: 1.52 $
+# File last changed $Date: 2006/11/30 08:55:10 $ by $Author: nlohmann $.
+# Version $Revision: 1.53 $
 
-bin_PROGRAMS = bpel2owfn preprocess
+bin_PROGRAMS = bpel2owfn
 
 # define flags for Kimwitu++
 KCFLAGS = --yystype --file-prefix=ast-system- --suffix=cc --no-csgio
@@ -72,8 +72,6 @@ bpel2owfn_SOURCES = $(KCDUMMY)\
 		    getopt.h getopt.c getopt1.c\
 		    ast-tools.cc ast-tools.h\
 		    ast-details.cc ast-details.h
-
-preprocess_SOURCES = preprocess.cc
 
 
 # when cleaning, also delete Vi's temp files

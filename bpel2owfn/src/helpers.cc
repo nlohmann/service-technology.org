@@ -28,13 +28,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2006/11/30 11:31:39 $
+ * \date    \$Date: 2006/11/30 15:16:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.64 $
+ * \version \$Revision: 1.65 $
  *
  * \ingroup conversion
  * \ingroup debug
@@ -56,7 +56,6 @@
 #include "helpers.h"
 #include "options.h"
 #include "debug.h"
-#include "petrinet.h"
 
 using namespace std;
 
@@ -245,8 +244,6 @@ void error()
  */
 void cleanup()
 {
-  extern PetriNet PN;	// defined in bpel2owfn.cc
-
   trace(TRACE_INFORMATION,"Cleaning up ...\n");
 
   if ( filename != "<STDIN>" && frontend_in != NULL)

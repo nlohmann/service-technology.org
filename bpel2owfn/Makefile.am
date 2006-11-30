@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/26 15:13:06 $ by $Author: nlohmann $.
-# Version $Revision: 1.26 $
+# File last changed $Date: 2006/11/30 16:10:56 $ by $Author: nlohmann $.
+# Version $Revision: 1.27 $
 
 SUBDIRS = src doc tests
 
@@ -91,39 +91,28 @@ binarydistreadme:
 	@echo -e Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. >> BINARYREADME
 
 
-# target to create an executable that is independet of Cygwin
-pure-windows-executable:
-	make hu-binarydist OS=win32 CXXFLAGS="-mno-cygwin -U _WIN32" CFLAGS="-mno-cygwin -U _WIN32" 
-
-
 # name of the directory/archive for a binary distribution
 BINARYDISTDIR = $(distdir)-$(OS)
 
 
-# files that are distributed in a binary distribution
-BINARYDISTFILES = src/$(PACKAGE)$(EXEEXT) doc/$(PACKAGE).pdf COPYING
-
 DOCFILES = doc/$(PACKAGE).pdf
 BINARYFILES = src/$(PACKAGE)$(EXEEXT) COPYING
 
-hu-docdist: dvi pdf
-	$(mkdir_p) $(BINARYDISTDIR)
-	cp $(DOCFILES) $(BINARYDISTDIR)
-	zip -9 -m -r $(BINARYDISTDIR).zip $(BINARYDISTDIR)
-	
-hu-bindist: binarydistreadme
+# set OS for the directory-prefix
+hu-bindist: dvi pdf binarydistreadme
 	make --directory=src clean
 	make --directory=src
 	$(mkdir_p) $(BINARYDISTDIR)
+	cp $(DOCFILES) $(BINARYDISTDIR)
 	cp $(BINARYFILES) $(BINARYDISTDIR)
 	mv BINARYREADME $(BINARYDISTDIR)/README
-	zip -9 -m -r $(BINARYDISTDIR).zip $(BINARYDISTDIR)
+	$(AMTAR) -cf $(BINARYDISTDIR).tar $(BINARYDISTDIR)
+	gzip $(BINARYDISTDIR).tar
+	rm -fr $(BINARYDISTDIR)
 
+hu-binarydist:
+	make hu-bindist CXXFLAGS="-O2" CFLAGS="-O2"
 
-# target to create a distribution for an operation system named OS
-# (set the variable OS by calling "make hu-binarydist OS=linux")
-hu-binarydist: hu-docdist hu-bindist
-
-
-# target to create a pure windows binary distribution
-hu-win32dist: pure-windows-executable
+# target to create an executable that is independet of Cygwin
+hu-win32dist:
+	make hu-bindist OS=win32 CXXFLAGS="-mno-cygwin -U _WIN32" CFLAGS="-mno-cygwin -U _WIN32"

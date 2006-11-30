@@ -20,8 +20,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/06 21:29:59 $ by $Author: nlohmann $.
-# Version $Revision: 1.6 $
+# File last changed $Date: 2006/11/30 08:43:08 $ by $Author: nlohmann $.
+# Version $Revision: 1.7 $
 
 echo ""
 
@@ -34,7 +34,7 @@ bpel2owfn --help &> /dev/null
 result2=$?
 
 echo "test: parser"
-bpel2owfn --input $testdir/error.bpel &> /dev/null
+bpel2owfn --input $testdir/testfiles/error.bpel &> /dev/null
 result3=$?
 
 echo "test: piping"

@@ -18,12 +18,10 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/28 14:46:20 $ by $Author: nlohmann $.
-# Version $Revision: 1.14 $
+# File last changed $Date: 2006/11/30 08:43:08 $ by $Author: nlohmann $.
+# Version $Revision: 1.15 $
 
 TESTS = test1 test2 test3 test4 test5
-
-BPEL_PROCESSES = error.bpel loan.bpel purchase.bpel shipping.bpel
 
 TESTS_ENVIRONMENT = testdir=$(top_srcdir)/tests PATH=.:../src:$$PATH
 
@@ -41,7 +39,8 @@ CLEANFILES = $(BPEL_PROCESSES:.bpel=.info) \
 	     *.png \
 	     bpel2owfn.exe.stackdump
 	     
-EXTRA_DIST = $(TESTS) $(BPEL_PROCESSES) \
+EXTRA_DIST = $(TESTS) \
+	     testfiles \
 	     sa_tests \
 	     consistency
 

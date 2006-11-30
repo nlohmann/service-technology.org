@@ -20,17 +20,17 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/28 14:46:20 $ by $Author: nlohmann $.
-# Version $Revision: 1.7 $
+# File last changed $Date: 2006/11/30 08:43:08 $ by $Author: nlohmann $.
+# Version $Revision: 1.8 $
 
 echo ""
 
 echo "test: parser"
-bpel2owfn --input=$testdir/loan.bpel &> /dev/null
+bpel2owfn --input=$testdir/testfiles/loan.bpel &> /dev/null
 result1=$?
 
 echo "test: XML creation"
-bpel2owfn --input=$testdir/purchase.bpel --mode=pretty -fxml --output=purchase  &> /dev/null
+bpel2owfn --input=$testdir/testfiles/purchase.bpel --mode=pretty -fxml --output=purchase  &> /dev/null
 result2=$?
 
 if test \( $result1 -eq 0 -a $result2 -eq 0 \) -a \

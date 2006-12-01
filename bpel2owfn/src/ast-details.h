@@ -24,18 +24,18 @@
  * \brief   annotations of the AST
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nlohmann $
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/29 13:42:59 $
+ * \date    \$Date: 2006/12/01 10:44:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.54 $
+ * \version \$Revision: 1.55 $
  */
 
 
@@ -57,6 +57,7 @@
 #include <string>
 #include <set>
 #include <list>
+#include <vector>
 
 #include "ast-config.h"
 
@@ -161,9 +162,9 @@ class ASTE
     void checkPartnerLink();
     string checkCorrelationSet();
 
-    list<unsigned int> ancestorActivities();
-    list<unsigned int> ancestorScopes();
-    list<unsigned int> ancestorLoops();
+    vector<unsigned int> ancestorActivities();
+    vector<unsigned int> ancestorScopes();
+    vector<unsigned int> ancestorLoops();
     
     bool checkAncestors();
     bool findIsolatedAncestor();

@@ -860,14 +860,14 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
 	  Place *p22 = PN.newPlace(prefix + "compensate");
 	  Place *p23 = PN.newPlace(prefix + "compensated");
 
-	  list<unsigned int> ancestor_loops = ASTEmap[phylum->id]->ancestorLoops();
+	  vector<unsigned int> ancestor_loops = ASTEmap[phylum->id]->ancestorLoops();
 	  cerr << ancestor_loops.size() << " ancestor_loops" << endl;
 	  if (ancestor_loops.size() > 1)
 	  {
 	    vector<unsigned int> loop_bounds;
 	    vector<unsigned int> loop_identifiers;
 	    unsigned int i = 0;
-	    for (list<unsigned int>::iterator loop = ancestor_loops.begin(); loop != ancestor_loops.end(); loop++)
+	    for (vector<unsigned int>::iterator loop = ancestor_loops.begin(); loop != ancestor_loops.end(); loop++)
 	    {
 	      assert(ASTEmap[*loop] != NULL);
 

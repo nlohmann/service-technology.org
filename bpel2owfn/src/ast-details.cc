@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/11/29 15:21:06 $
+ * \date    \$Date: 2006/12/01 10:44:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.66 $
+ * \version \$Revision: 1.67 $
  */
 
 
@@ -864,10 +864,10 @@ string ASTE::checkVariable(string attributename)
   if (variableName == "")
     return variableName;
 
-  list<unsigned int> ancestorScopes = this->ancestorScopes();
+  vector<unsigned int> ancestorScopes = this->ancestorScopes();
 
   // travers the ancestor scopes
-  for (list<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
+  for (vector<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
     if (variableNames.find(toString(*scope) + "." + variableName) != variableNames.end())
       return (toString(*scope) + "." + variableName);
 
@@ -903,10 +903,10 @@ string ASTE::checkLink()
   if (linkName == "")
     return linkName;
 
-  list<unsigned int> ancestorActivities = this->ancestorActivities();
+  vector<unsigned int> ancestorActivities = this->ancestorActivities();
 
   // travers the ancestor flows
-  for (list<unsigned int>::iterator flow = ancestorActivities.begin(); flow != ancestorActivities.end(); flow++)
+  for (vector<unsigned int>::iterator flow = ancestorActivities.begin(); flow != ancestorActivities.end(); flow++)
   {
     if (ASTEmap[*flow]->activityTypeName() == "flow")
       if (linkNames.find(toString(*flow) + "." + linkName) != linkNames.end())
@@ -938,10 +938,10 @@ void ASTE::checkPartnerLink()
   if (partnerLinkName == "")
     return;
 
-  list<unsigned int> ancestorScopes = this->ancestorScopes();
+  vector<unsigned int> ancestorScopes = this->ancestorScopes();
 
   // travers the ancestor scopes
-  for (list<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
+  for (vector<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
     if (partnerLinkNames.find(toString(*scope) + "." + partnerLinkName) != partnerLinkNames.end())
       return;
 
@@ -979,10 +979,10 @@ string ASTE::checkCorrelationSet()
   if (correlationSetName == "")
     return correlationSetName;
 
-  list<unsigned int> ancestorScopes = this->ancestorScopes();
+  vector<unsigned int> ancestorScopes = this->ancestorScopes();
 
   // travers the ancestor scopes
-  for (list<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
+  for (vector<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
     if (correlationSetNames.find(toString(*scope) + "." + correlationSetName) != correlationSetNames.end())
       return (toString(*scope) + "." + correlationSetName);
 
@@ -1014,17 +1014,17 @@ string ASTE::checkCorrelationSet()
 /*!
  * \returns list of identifiers of all acestor activities
  */
-list<unsigned int> ASTE::ancestorActivities()
+vector<unsigned int> ASTE::ancestorActivities()
 {
   extern map<unsigned int, ASTE*> ASTEmap;
-  list<unsigned int> result;
+  vector<unsigned int> result;
   
   if (id != 1)
   {
     result.push_back(parentActivityId);
     assert(ASTEmap[parentActivityId] != NULL);
-    list<unsigned int> result2 = ASTEmap[parentActivityId]->ancestorActivities();
-    result.splice(result.end(), result2);
+    vector<unsigned int> result2 = ASTEmap[parentActivityId]->ancestorActivities();
+    result.insert(result.end(), result2.begin(), result2.end());
     
     return result;
   }
@@ -1039,17 +1039,17 @@ list<unsigned int> ASTE::ancestorActivities()
 /*!
  * \returns list of identifiers of all ancestor scopes
  */
-list<unsigned int> ASTE::ancestorScopes()
+vector<unsigned int> ASTE::ancestorScopes()
 {
   extern map<unsigned int, ASTE*> ASTEmap;
-  list<unsigned int> result;
+  vector<unsigned int> result;
 
   if (id != 1)
   {
     result.push_back(parentScopeId);
     assert(ASTEmap[parentScopeId] != NULL);
-    list<unsigned int> result2 = ASTEmap[parentScopeId]->ancestorScopes();
-    result.splice(result.end(), result2);
+    vector<unsigned int> result2 = ASTEmap[parentScopeId]->ancestorScopes();
+    result.insert(result.end(), result2.begin(), result2.end());
     
     return result;
   }
@@ -1065,10 +1065,10 @@ list<unsigned int> ASTE::ancestorScopes()
  * \returns list of identifiers of all ancestor loops (<while>, <repeatUntil>,
  * <forEach>)
  */
-list<unsigned int> ASTE::ancestorLoops()
+vector<unsigned int> ASTE::ancestorLoops()
 {
   extern map<unsigned int, ASTE*> ASTEmap;
-  list<unsigned int> result;
+  vector<unsigned int> result;
 
   if (id != 1)
   {
@@ -1080,8 +1080,8 @@ list<unsigned int> ASTE::ancestorLoops()
     {
       result.push_back(parentActivityId);
     }
-    list<unsigned int> result2 = ASTEmap[parentActivityId]->ancestorLoops();
-    result.splice(result.end(), result2);
+    vector<unsigned int> result2 = ASTEmap[parentActivityId]->ancestorLoops();
+    result.insert(result.end(), result2.begin(), result2.end());
     
     return result;
   }

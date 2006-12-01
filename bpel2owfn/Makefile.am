@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/11/30 20:41:51 $ by $Author: nlohmann $.
-# Version $Revision: 1.28 $
+# File last changed $Date: 2006/12/01 07:14:57 $ by $Author: nlohmann $.
+# Version $Revision: 1.29 $
 
 SUBDIRS = src doc tests
 
@@ -130,3 +130,32 @@ bindist_win32:
 # target for any other operating system
 bindist:
 	make binarydist CXXFLAGS="-O2" CFLAGS="-O2"
+
+
+###############################################
+# Targets for automatic upload to ftp.gnu.org #
+###############################################
+
+gnupload_alpha: *.tar.gz
+	@echo "====================================="
+	@echo " FILE DISTRIBUTION TO GNU FTP SERVER "
+	@echo "====================================="
+	@ls *.tar.gz -1
+	@echo
+	@echo Are you sure you want to upload these files to ftp://alpha.gnu.org/bpel2owfn?
+	@echo "If not, please about (crtl+c) now."
+	@read answer
+	gnupload --to alpha.gnu.org:bpel2owfn $^
+	rm $(^:.tar.gz=.tar.gz.sig)
+
+gnupload_release: *.tar.gz
+	@echo "============================================="
+	@echo " RELEASE FILE DISTRIBUTION TO GNU FTP SERVER "
+	@echo "============================================="
+	@ls *.tar.gz -1
+	@echo
+	@echo Are you sure you want to upload these files to ftp://ftp.gnu.org/bpel2owfn?
+	@echo "If not, please about (crtl+c) now."
+	@read answer
+	gnupload --to ftp.gnu.org:bpel2owfn $^
+	rm $(^:.tar.gz=.tar.gz.sig)	

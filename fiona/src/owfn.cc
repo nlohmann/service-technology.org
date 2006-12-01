@@ -1419,6 +1419,7 @@ unsigned int i;
 		trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess): end\n");
 		return result;
 	}
+	StartOfStubbornList = (owfnTransition *) 0;
 	for(i = 0; mess->PreTransitions[i];i++)
 	{
 		stubborninsert(this,mess->PreTransitions[i]);

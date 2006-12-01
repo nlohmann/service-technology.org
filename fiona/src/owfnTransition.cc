@@ -416,18 +416,18 @@ void owfnTransition::excludeTransitionFromQuasiEnabledList(oWFN * PN) {
 void owfnTransition::check_enabled(oWFN * PN) {
 	owfnPlace* * p;
 	unsigned int *i;
-#ifdef STUBBORN
-	owfnPlace * scape;
-#endif
 
 	messageSet.clear();
 
 	enabledNr = quasiEnabledNr = 0;		// suppose no pre-place has appropriate marking at all
-
+#ifdef STUBBORN
+	mustbeincluded = conflicting;
+#endif
 	for(p = PrePlaces , i = Pre ; *p != NULL; p++ , i++) {
 		if(PN->CurrentMarking[(* p)->index] < *i) {
 #ifdef STUBBORN
-			scape = *p;
+			scapegoat = *p;
+			mustbeincluded = (*p)->PreTransitions;
 #endif
 			if ((* p)->type == INPUT) {
 				messageSet.insert((* p)->index);
@@ -449,9 +449,6 @@ void owfnTransition::check_enabled(oWFN * PN) {
 			PrevEnabled = (owfnTransition *) 0;
 			enabled = true;
 			PN->transNrEnabled++;
-#ifdef STUBBORN
-			mustbeincluded = conflicting;
-#endif
 		}
 		if (quasiEnabled) {		// transition was quasi enabled before
 			quasiEnabled = false;
@@ -475,10 +472,6 @@ void owfnTransition::check_enabled(oWFN * PN) {
 			enabled = false;
 			PN->transNrEnabled--;
 			excludeTransitionFromEnabledList(PN);		// delete transition from list of enabled transtions
-#ifdef STUBBORN
-			mustbeincluded = scape ->PreTransitions;
-			scapegoat = scape;
-#endif
 			
 		}
 	} else {	// transition is not enabled at all
@@ -486,10 +479,6 @@ void owfnTransition::check_enabled(oWFN * PN) {
 			enabled = false;
 			PN->transNrEnabled--;
 			excludeTransitionFromEnabledList(PN);		// delete transition from list of enabled transtions
-#ifdef STUBBORN
-			mustbeincluded = scape ->PreTransitions;
-			scapegoat = scape;
-#endif
 
 		}
 		if (quasiEnabled) {  // transition was quasi enabled before

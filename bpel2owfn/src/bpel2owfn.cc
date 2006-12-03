@@ -28,14 +28,14 @@
  * 
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/30 11:31:39 $
+ * \date    \$Date: 2006/12/03 16:52:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.123 $
+ * \version \$Revision: 1.124 $
  */
 
 
@@ -300,6 +300,7 @@ int main( int argc, char *argv[])
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for oWFN ...\n");
       PN.owfnOut(output);
+      cerr << PN;
       if (output_filename != "")
       {
 	closeOutput(output);

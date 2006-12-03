@@ -28,13 +28,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/11/28 13:29:53 $
+ * \date    \$Date: 2006/12/03 16:52:11 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.56 $
+ * \version \$Revision: 1.57 $
  *
  * \ingroup petrinet
  */
@@ -70,7 +70,7 @@
 /*!
  * \return the name of the node type
  */
-string Node::nodeTypeName()
+string Node::nodeTypeName() const
 {
   return "";
 }
@@ -82,7 +82,7 @@ string Node::nodeTypeName()
 /*!
  * \return the name of the node type
  */
-string Place::nodeTypeName()
+string Place::nodeTypeName() const
 {
   return "place";
 }
@@ -94,7 +94,7 @@ string Place::nodeTypeName()
 /*!
  * \return the name of the node type
  */
-string Transition::nodeTypeName()
+string Transition::nodeTypeName() const
 {
   return "transition";
 }
@@ -106,7 +106,7 @@ string Transition::nodeTypeName()
 /*!
  * dummy-implementation of virtual function
  */
-string Node::nodeShortName()
+string Node::nodeShortName() const
 {
   return "";
 }
@@ -118,7 +118,7 @@ string Node::nodeShortName()
 /*!
  * \return the (nice) name of the node for DOT output
  */
-string Node::nodeName()
+string Node::nodeName() const
 {
   string result = history[0];
 
@@ -137,7 +137,7 @@ string Node::nodeName()
 /*!
  * \return the short name of the place, e.g. for LoLA output
  */
-string Place::nodeShortName()
+string Place::nodeShortName() const
 {
   if (type == INTERNAL)
     return ("p" + toString(id));
@@ -152,7 +152,7 @@ string Place::nodeShortName()
 /*!
  * \return the short name of the transition, e.g. for LoLA output
  */
-string Transition::nodeShortName()
+string Transition::nodeShortName() const
 {
   return ("t" + toString(id));
 }
@@ -164,7 +164,7 @@ string Transition::nodeShortName()
 /*!
  * \return string containing information about the net
  */
-string PetriNet::information()
+string PetriNet::information() const
 {
   string result = "|P|=" + toString(P.size() + P_in.size() + P_out.size());
   result += ", |P_in|= " + toString(P_in.size());
@@ -185,7 +185,7 @@ string PetriNet::information()
  *
  * \todo put this to the nodes
  */
-void PetriNet::infoOut(ostream *output)
+void PetriNet::infoOut(ostream *output) const
 {
   assert(output != NULL);
 
@@ -256,7 +256,7 @@ void PetriNet::infoOut(ostream *output)
 /*!
  * DOT-output of the arc.
 */
-string Arc::dotOut()
+string Arc::dotOut() const
 {
   string result = " ";
   if (source->nodeType == PLACE)
@@ -280,7 +280,7 @@ string Arc::dotOut()
  * DOT-output of the transition. Transitions are colored corresponding to their
  * initial role.
 */
-string Transition::dotOut()
+string Transition::dotOut() const
 {
   string result;
 #ifdef USING_BPEL2OWFN
@@ -317,7 +317,7 @@ string Transition::dotOut()
  * DOT-output of the place. Places are colored corresponding to their initial
  * role.
 */
-string Place::dotOut()
+string Place::dotOut() const
 {
   string result;
 #ifdef USING_BPEL2OWFN
@@ -359,7 +359,7 @@ string Place::dotOut()
  * the digraph-statement and adds labels to transitions, places and arcs if
  * neccessary. It also distinguishes the three arc types of #arc_type.
  */
-void PetriNet::dotOut(ostream *output)
+void PetriNet::dotOut(ostream *output) const
 {
   trace(TRACE_DEBUG, "[PN]\tCreating DOT-output.\n");
 
@@ -679,11 +679,11 @@ void PetriNet::lolaOut(ostream *output)
 /*!
  * Outputs the net in oWFN-format.
  */
-void PetriNet::owfnOut(ostream *output)
+void PetriNet::owfnOut(std::ostream *output) const
 {
-  trace(TRACE_DEBUG, "[PN]\tCreating oWFN-output.\n");
-
   assert(output != NULL);
+
+  trace(TRACE_DEBUG, "[PN]\tCreating oWFN-output.\n");
 
   extern map<unsigned int, ASTE*> ASTEmap;
   extern string invocation;
@@ -869,4 +869,12 @@ void PetriNet::owfnOut(ostream *output)
     (*output) << ";" << endl << endl;
   }  
   (*output) << endl << "{ END OF FILE `" << output_filename << ".owfn' }" << endl;
+}
+
+
+
+std::ostream& operator<< (std::ostream& os, const PetriNet &obj)
+{
+  cerr << obj.information() << endl;
+  return os;
 }

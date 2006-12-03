@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/30 15:08:30 $
+ * \date    \$Date: 2006/12/03 16:52:12 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.110 $
+ * \version \$Revision: 1.111 $
  *
  * \ingroup petrinet
  */
@@ -148,10 +148,10 @@ class Node
     unsigned int id;
 
     /// the name of the type
-    virtual std::string nodeTypeName();
+    virtual std::string nodeTypeName() const;
 
     /// the short name of the node
-    virtual std::string nodeShortName();
+    virtual std::string nodeShortName() const;
 
     /// the type of the node
     node_type nodeType;
@@ -160,19 +160,19 @@ class Node
     std::vector<std::string> history;
 
     /// true if first role contains role
-    bool firstMemberAs(std::string role);
+    bool firstMemberAs(std::string role) const;
 
     /// true if first role begins with role
-    bool firstMemberIs(std::string role);
+    bool firstMemberIs(std::string role) const;
     
     /// true if history contains role
-    bool historyContains(std::string role);
+    bool historyContains(std::string role) const;
 
     /// type of node as defined in #communication_type
     communication_type type;
 
     /// the name of the node
-    std::string nodeName();
+    std::string nodeName() const;
 
     /// an additional prefix for the name in order to distinguish nodes of different nets
     std::string prefix;
@@ -203,13 +203,13 @@ class Transition: public Node
     Transition(unsigned int id, std::string role);
 
     /// DOT-output of the transition (used by PetriNet::dotOut())
-    std::string dotOut();
+    std::string dotOut() const;
 
     /// the name of the type
-    std::string nodeTypeName();
+    std::string nodeTypeName() const;
     
     /// the short name of the transition
-    std::string nodeShortName();
+    std::string nodeShortName() const;
 };
 
 
@@ -240,13 +240,13 @@ class Place: public Node
     Place(unsigned int id, std::string role, communication_type type);
 
     /// DOT-output of the place (used by PetriNet::dotOut())
-    std::string dotOut();
+    std::string dotOut() const;
 
     /// the name of the type
-    std::string nodeTypeName();
+    std::string nodeTypeName() const;
 
     /// the short name of the place
-    std::string nodeShortName();
+    std::string nodeShortName() const;
 
     /// mark the place
     void mark(unsigned int tokens = 1);
@@ -286,7 +286,7 @@ class Arc
     Arc(Node *source, Node *target, unsigned int weight = 1);
   
     /// DOT-output of the arc (used by PetriNet::dotOut())
-    std::string dotOut();
+    std::string dotOut() const;
 
     /// weight of the arc (experimental)
     unsigned int weight;
@@ -305,7 +305,7 @@ class Arc
  * \brief A Petri net
  *
  * Class to represent Petri nets. The net is consists of places of class
- * #Place, transitions of class #Transition and arcs of class #Arc. The std::sets
+ * #Place, transitions of class #Transition and arcs of class #Arc. The sets
  * are saved in three lists #P, #T and #F.
  *
  * \ingroup petrinet
@@ -326,10 +326,10 @@ class PetriNet
 
 
     /// info file output
-    void infoOut(std::ostream *output);
+    void infoOut(std::ostream *output) const;
 
     /// DOT (Graphviz) output
-    void dotOut(std::ostream *output);
+    void dotOut(std::ostream *output) const;
 
     /// PNML (Petri Net Markup Language) output
     void pnmlOut(std::ostream *output);
@@ -344,8 +344,11 @@ class PetriNet
     void lolaOut(std::ostream *output);
 
     /// oWFN-output
-    void owfnOut(std::ostream *output);
+    void owfnOut(std::ostream *output) const;
 
+    /// outputs the Petri net
+    friend std::ostream& operator<< (std::ostream& os, const PetriNet &obj);
+    
 
     /// merges places given two places
     void mergePlaces(Place *p1, Place *p2);
@@ -366,27 +369,15 @@ class PetriNet
     /// finds place given an id with a role
     Place* findPlace(unsigned int id, std::string role);
 
-    /// finds a place given the ids of two transitions (one in the pre and one in the poststd::set)
+    /// finds a place given the ids of two transitions (one in the pre and one in the postset)
     Place *findPlace(unsigned int id1, unsigned int id2);
-
-    /// rename a node (i.e., rename one role in its history)
-    void renamePlace(std::string old_name, std::string new_name);
-
 
     /// finds transition given a role
     Transition* findTransition(std::string role);
 
-    /// calculates the prestd::set of a node
-    std::set<Node*> preset(Node *n);
+    /// rename a node (i.e., rename one role in its history)
+    void renamePlace(std::string old_name, std::string new_name);
 
-    /// calculates the prestd::set of a set of nodes
-    std::set<Node*> preset(std::set<Node *> &s);
-
-    /// calculates the poststd::set of a node
-    std::set<Node*> postset(Node *n);
-
-    /// calculates the poststd::set of a set of nodes
-    std::set<Node*> postset(std::set<Node *> &s);
 
     /// simplifies the Petri net
     void simplify();
@@ -407,7 +398,7 @@ class PetriNet
     void reenumerate();
 
     /// statistical output
-    std::string information();
+    std::string information() const;
     
     /// constructor
     PetriNet();
@@ -421,7 +412,7 @@ class PetriNet
     void removePlace(Place *p);
 
     /// returns the arc weight between two nodes
-    unsigned int arc_weight(Node *my_source, Node *my_target);
+    unsigned int arc_weight(Node *my_source, Node *my_target) const;
 
     /// removes a transition from the net
     void removeTransition(Transition *t);
@@ -432,6 +423,19 @@ class PetriNet
     /// removes all ingoing and outgoing arcs of a node
     void detachNode(Node *n);
 
+
+    /// calculates the prestd::set of a node
+    std::set<Node*> preset(Node *n) const;
+
+    /// calculates the prestd::set of a set of nodes
+    std::set<Node*> preset(std::set<Node *> &s) const;
+
+    /// calculates the poststd::set of a node
+    std::set<Node*> postset(Node *n) const;
+
+    /// calculates the poststd::set of a set of nodes
+    std::set<Node*> postset(std::set<Node *> &s) const;
+    
 
     /// remove unused status places
     void removeUnusedStatusPlaces();
@@ -464,7 +468,7 @@ class PetriNet
     unsigned int getId();
 
     /// returns current id
-    unsigned int id();
+    unsigned int id() const;
 
 
     /// std::set of places of the Petri net

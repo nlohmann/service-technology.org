@@ -28,13 +28,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/11/30 15:08:30 $
+ * \date    \$Date: 2006/12/03 16:52:11 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.158 $
+ * \version \$Revision: 1.159 $
  *
  * \ingroup petrinet
  */
@@ -65,7 +65,7 @@
  * \param  role a role of a node
  * \return true, if the node's first history entry contains the given role
  */
-bool Node::firstMemberAs(string role)
+bool Node::firstMemberAs(string role) const
 {
   string firstEntry = (*history.begin());
   return (firstEntry.find(role, 0) == firstEntry.find_first_of(".") + 1);
@@ -80,7 +80,7 @@ bool Node::firstMemberAs(string role)
  * \param  role a role of a node
  * \return true, if the node's first history entry begins with the given role
  */
-bool Node::firstMemberIs(string role)
+bool Node::firstMemberIs(string role) const
 {
   string firstEntry = (*history.begin());
   return (firstEntry.find(role, 0) == 0);
@@ -95,7 +95,7 @@ bool Node::firstMemberIs(string role)
  * \param  role a role of a node
  * \return true, if the node's history contains the given role
  */
-bool Node::historyContains(string role)
+bool Node::historyContains(string role) const
 {
   for (unsigned int i = 0; i < history.size(); i++)
     if (history[i] == role)
@@ -664,7 +664,7 @@ void PetriNet::renamePlace(string old_name, string new_name)
  * \result the weight of the arc
  * \pre  the arc [my_source, my_target] was found in F
  */
-unsigned int PetriNet::arc_weight(Node *my_source, Node *my_target)
+unsigned int PetriNet::arc_weight(Node *my_source, Node *my_target) const
 {
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
   {
@@ -688,7 +688,7 @@ unsigned int PetriNet::arc_weight(Node *my_source, Node *my_target)
  * \result the preset of node n
  * \pre n != NULL
  */
-set<Node *> PetriNet::preset(Node *n)
+set<Node *> PetriNet::preset(Node *n) const
 {
   assert(n != NULL);
 
@@ -709,7 +709,7 @@ set<Node *> PetriNet::preset(Node *n)
  * \param s a set of nodes of the Petri net
  * \result the merged preset of the nodes in s
  */
-set<Node*> PetriNet::preset(set<Node *> &s)
+set<Node*> PetriNet::preset(set<Node *> &s) const
 {
   set<Node *> result;
 
@@ -728,7 +728,7 @@ set<Node*> PetriNet::preset(set<Node *> &s)
  * \result the postset of node n
  * \pre n != NULL
  */
-set<Node *> PetriNet::postset(Node *n)
+set<Node *> PetriNet::postset(Node *n) const
 {
   assert(n != NULL);
 
@@ -749,7 +749,7 @@ set<Node *> PetriNet::postset(Node *n)
  * \param s a set of nodes of the Petri net
  * \result the merged postset of the nodes in s
  */
-set<Node*> PetriNet::postset(set<Node *> &s)
+set<Node*> PetriNet::postset(set<Node *> &s) const
 {
   set<Node *> result;
 
@@ -884,7 +884,7 @@ unsigned int PetriNet::getId()
 /*!
  * \return id for last added node
  */
-unsigned int PetriNet::id()
+unsigned int PetriNet::id() const
 {
   return nextId;
 }

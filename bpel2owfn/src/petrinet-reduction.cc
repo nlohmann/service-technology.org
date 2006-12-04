@@ -28,13 +28,13 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2006/12/04 12:24:28 $
+ * \date    \$Date: 2006/12/04 14:49:29 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
  *
  * \ingroup petrinet
  */
@@ -431,20 +431,17 @@ void PetriNet::fusionOfSeriesTransitions()
  *
  * - Structural dead nodes are removed.
  *
- * - If two transitions t1 and t2 have the same preset and postset, one of them
- *   can safely be removed.
- *
  * - Elimination of identical places (RB1)
  * - Elimination of identical transitions (RB2)
  * - Fusion of series places (RA1)
  * - Fusion of series transitions (RA2)
  * 
  * \todo
- *       -(nlohmann) improve performance
- *       -(nlohmann) implement more reduction rules
+ *       - (nlohmann) improve performance
+ *       - (nlohmann) implement more reduction rules
  *
  */
-void PetriNet::simplify()
+void PetriNet::reduce()
 {
   trace(TRACE_DEBUG, "[PN]\tPetri net size before simplification: " + information() + "\n");
   trace(TRACE_INFORMATION, "Simplifying Petri net...\n");

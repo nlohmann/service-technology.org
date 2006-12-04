@@ -28,14 +28,14 @@
  * 
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/04 14:19:50 $
+ * \date    \$Date: 2006/12/04 14:49:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.126 $
+ * \version \$Revision: 1.127 $
  */
 
 
@@ -224,7 +224,7 @@ int main( int argc, char *argv[])
 	  if (parameters[P_SIMPLIFY])
 	  {
 	    trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
-	    PN.simplify();
+	    PN.reduce();
 	  }
 	  
 	  PN.addPrefix(prefix);
@@ -276,7 +276,7 @@ int main( int argc, char *argv[])
     if ( parameters[P_SIMPLIFY] )
     {
       trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
-      PN.simplify();
+      PN.reduce();
     }
     
     // now the net will not change any more, thus the nodes are re-enumerated

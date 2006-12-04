@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/04 14:32:17 $
+ * \date    \$Date: 2006/12/04 14:49:29 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.114 $
+ * \version \$Revision: 1.115 $
  *
  * \ingroup petrinet
  */
@@ -175,10 +175,12 @@ class Node
   /// class Arc is allowed to access the privates of class Node
   friend class Arc;
 
-  public:
   private:
     /// type of node as defined in #communication_type
     communication_type type;
+
+    /// the set of roles (i.e. the history) of the node
+    std::vector<std::string> history;
 
     /// the id of the node
     unsigned int id;
@@ -189,14 +191,12 @@ class Node
     /// an additional prefix for the name in order to distinguish nodes of different nets
     std::string prefix;
 
+
     /// true if first role contains role
     bool firstMemberAs(std::string role) const;
 
     /// true if first role begins with role
     bool firstMemberIs(std::string role) const;
-
-    /// the set of roles (i.e. the history) of the node
-    std::vector<std::string> history;
 
     /// true if history contains role
     bool historyContains(std::string role) const;
@@ -242,7 +242,7 @@ class Transition: public Node
     /// the name of the type
     std::string nodeTypeName() const;
     
-    /// constructor which creates a transition and adds a first role to the history
+    /// create a transition and add a first role to the history
     Transition(unsigned int id, std::string role);
 };
 
@@ -280,7 +280,7 @@ class Place: public Node
     /// the name of the type
     std::string nodeTypeName() const;
 
-    /// constructor which creates a place and adds a first role to the history
+    /// create a place and add a first role to the history
     Place(unsigned int id, std::string role, communication_type type);
 
   public:
@@ -325,7 +325,7 @@ class Arc
     /// DOT-output of the arc (used by PetriNet::dotOut())
     std::string output_dot() const;
 
-    /// constructor to create an arc
+    /// create an arc with a given weight
     Arc(Node *source, Node *target, unsigned int weight = 1);
 };
 
@@ -364,16 +364,16 @@ class PetriNet
     friend std::ostream& operator<< (std::ostream& os, const PetriNet &obj);
     
 
-    /// merges places given two places
+    /// merges two places
     void mergePlaces(Place *p1, Place *p2);
 
-    /// merges places given two roles
+    /// merges two places given two roles
     void mergePlaces(std::string role1, std::string role2);
 
-    /// merges places given two identifiers and roles
+    /// merges two places given two identifiers and roles
     void mergePlaces(unsigned int id1, std::string role1, unsigned int id2, std::string role2);
     
-    /// merges transitions given two transitions
+    /// merges two transitions
     void mergeTransitions(Transition *t1, Transition *t2);
 
     /// finds place given a role
@@ -390,8 +390,8 @@ class PetriNet
     void renamePlace(std::string old_name, std::string new_name);
 
 
-    /// simplifies the Petri net
-    void simplify();
+    /// applies structral reduction rules
+    void reduce();
 
     /// adds a prefix to the name of all nodes of the net
     void addPrefix(std::string prefix);

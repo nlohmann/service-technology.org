@@ -29,7 +29,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/12/01 10:44:05 $
+ * \date    \$Date: 2006/12/04 08:41:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.108 $
+ * \version \$Revision: 1.109 $
  */
 %}
 
@@ -226,7 +226,7 @@ userDefinedFaultHandler(a,b,_id) ->
         CatchAll(c,_id) :
         {
           assert(ASTEmap[c->id] != NULL);
-          ASTEmap[c->id]->parentActivityId = myid;
+//NL//          ASTEmap[c->id]->parentActivityId = myid;
           ASTEmap[b->id]->parentActivityId = myid;
           ASTEmap[c->id]->controlFlow = FHCF;
           ASTEmap[c->id]->max_occurrences = myself->max_occurrences;
@@ -311,6 +311,9 @@ CatchAll(a,_id) ->
       int myid = _id->value;
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
+cerr <<ASTEmap[a->id]->parentActivityId<<endl;
+      ASTEmap[a->id]->parentActivityId = myid;
+cerr <<ASTEmap[a->id]->parentActivityId<<endl;
     }
     a
     {
@@ -476,9 +479,12 @@ userDefinedCompensationHandler(a,_id) ->
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
 
 
-//      list<unsigned int> ancestors = myself->ancestorActivities();
-//      for (list<unsigned int>::iterator ancestor = ancestors.begin(); ancestor != ancestors.end(); ancestor++)
-//        cerr << ASTEmap[*ancestor]->activityTypeName() << endl;
+      vector<unsigned int> ancestors = myself->ancestorActivities();
+//      cerr << ASTEmap[ancestors[0]]->activityTypeName() << endl;
+//      cerr << ASTEmap[ancestors[1]]->activityTypeName() << endl;
+      for (vector<unsigned int>::iterator ancestor = ancestors.begin(); ancestor != ancestors.end(); ancestor++)
+        cerr << ASTEmap[*ancestor]->activityTypeName() << endl;
+cerr << endl;
 
     }
   ]
@@ -1834,8 +1840,6 @@ Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
 
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
-
-      cerr << endl;
     }
   ]
 ;

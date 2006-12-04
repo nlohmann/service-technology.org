@@ -28,13 +28,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/12/04 12:24:28 $
+ * \date    \$Date: 2006/12/04 14:19:50 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.59 $
+ * \version \$Revision: 1.60 $
  *
  * \ingroup petrinet
  */
@@ -48,7 +48,6 @@
  *****************************************************************************/
 
 #include "petrinet.h"		// to define member functions
-#include "debug.h"		// debugging help
 #include "helpers.h"		// helper functions
 #include "options.h"
 
@@ -361,8 +360,6 @@ string Place::output_dot() const
  */
 void PetriNet::output_dot(ostream *output) const
 {
-  trace(TRACE_DEBUG, "[PN]\tCreating DOT-output.\n");
-
   assert(output != NULL);
 
   (*output) << "digraph N {" << endl;
@@ -411,8 +408,6 @@ void PetriNet::output_dot(ostream *output) const
  */
 void PetriNet::output_pnml(std::ostream *output) const
 {
-  trace(TRACE_DEBUG, "[PN]\tCreating PNML-output.\n");
-
   assert(output != NULL);
 
   // remove interface since we do not create an open workflow net
@@ -505,8 +500,6 @@ void PetriNet::output_pnml(std::ostream *output) const
  */
 void PetriNet::output_pep(std::ostream *output) const
 {
-  trace(TRACE_DEBUG, "[PN]\tCreating PEP-output.\n");
-
   assert(output != NULL);
 
   // remove interface since we do not create an open workflow net
@@ -554,8 +547,6 @@ void PetriNet::output_pep(std::ostream *output) const
  */
 void PetriNet::output_apnn(std::ostream *output) const
 {
-  trace(TRACE_DEBUG, "[PN]\tCreating APNN-output.\n");
-
   assert(output != NULL);
 
   // remove interface since we do not create an open workflow net
@@ -612,8 +603,6 @@ void PetriNet::output_apnn(std::ostream *output) const
  */
 void PetriNet::output_lola(std::ostream *output) const
 {
-  trace(TRACE_DEBUG, "[PN]\tCreating LoLA-output.\n");
-
   assert(output != NULL);
 
   (*output) << "{ Petri net created by " << PACKAGE_STRING << " reading " << filename << " }" << endl << endl;
@@ -707,8 +696,6 @@ void PetriNet::output_lola(std::ostream *output) const
 void PetriNet::output_owfn(std::ostream *output) const
 {
   assert(output != NULL);
-
-  trace(TRACE_DEBUG, "[PN]\tCreating oWFN-output.\n");
 
   extern map<unsigned int, ASTE*> ASTEmap;
   extern string invocation;

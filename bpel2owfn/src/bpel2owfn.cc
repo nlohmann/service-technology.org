@@ -28,14 +28,14 @@
  * 
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/04 10:40:38 $
+ * \date    \$Date: 2006/12/04 14:19:50 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.125 $
+ * \version \$Revision: 1.126 $
  */
 
 
@@ -279,10 +279,8 @@ int main( int argc, char *argv[])
       PN.simplify();
     }
     
-    cerr << PN.information() << endl; /// \todo remove this line
-
     // now the net will not change any more, thus the nodes are re-enumerated
-    // PN.reenumerate(); 
+    PN.reenumerate(); 
 
     // create oWFN output ?
     if (formats[F_OWFN])

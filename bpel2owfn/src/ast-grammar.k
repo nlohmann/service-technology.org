@@ -22,14 +22,14 @@
 /*!
  * \file    ast-grammar.cc
  *
- * \brief   Abstract grammar of BPEL (implementation)
+ * \brief   Abstract grammar of BPEL
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nlohmann $ 
  * 
  * \since   2005-10-03
  *
- * \date    \$Date: 2006/11/29 15:31:47 $
+ * \date    \$Date: 2006/12/04 16:32:01 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.153 $
+ * \version \$Revision: 1.154 $
  */
 %}
 

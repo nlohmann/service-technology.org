@@ -28,13 +28,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/12/04 14:32:17 $
+ * \date    \$Date: 2006/12/04 15:28:19 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.162 $
+ * \version \$Revision: 1.163 $
  *
  * \ingroup petrinet
  */
@@ -48,9 +48,11 @@
  *****************************************************************************/
 
 #include <cassert>
+#include <iostream>
 
 #include "petrinet.h"
 #include "helpers.h"		// helper functions
+#include "debug.h"		// debug functions
 
 
 

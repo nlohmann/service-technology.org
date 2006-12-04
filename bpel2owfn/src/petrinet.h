@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/03 16:52:12 $
+ * \date    \$Date: 2006/12/04 08:08:23 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.111 $
+ * \version \$Revision: 1.112 $
  *
  * \ingroup petrinet
  */
@@ -130,52 +130,65 @@ typedef enum
  *****************************************************************************/
 
 /*!
- * \class Node
- *
  * \brief unspecified Petri net nodes
  *
  * Class to represent nodes (i.e. places and transitions) of Petri nets. Each
  * node has an id and a history (i.e. the list of roles the node had during
  * the processing of a BPEL-file).
  *
+ * \todo make type private
+ *
  * \ingroup petrinet
 */
 
 class Node
 {
+  /// class PetriNet is allowed to access the privates of class Node
+  friend class PetriNet;
+
+  /// class Place is allowed to access the privates of class Node
+  friend class Place;
+
+  /// class Transition is allowed to access the privates of class Node
+  friend class Transition;
+
+  /// class Arc is allowed to access the privates of class Node
+  friend class Arc;
+
   public:
+    /// type of node as defined in #communication_type (public to ast-to-petrinet-full1.k)
+    communication_type type;
+
+  private:
     /// the id of the node
     unsigned int id;
-
-    /// the name of the type
-    virtual std::string nodeTypeName() const;
-
-    /// the short name of the node
-    virtual std::string nodeShortName() const;
 
     /// the type of the node
     node_type nodeType;
 
-    /// the set of roles (i.e. the history) of the node
-    std::vector<std::string> history;
+    /// an additional prefix for the name in order to distinguish nodes of different nets
+    std::string prefix;
 
     /// true if first role contains role
     bool firstMemberAs(std::string role) const;
 
     /// true if first role begins with role
     bool firstMemberIs(std::string role) const;
-    
+
+    /// the set of roles (i.e. the history) of the node
+    std::vector<std::string> history;
+
     /// true if history contains role
     bool historyContains(std::string role) const;
-
-    /// type of node as defined in #communication_type
-    communication_type type;
 
     /// the name of the node
     std::string nodeName() const;
 
-    /// an additional prefix for the name in order to distinguish nodes of different nets
-    std::string prefix;
+    /// the short name of the node
+    virtual std::string nodeShortName() const;
+
+    /// the name of the type
+    virtual std::string nodeTypeName() const;
 };
 
 
@@ -186,8 +199,6 @@ class Node
 
 
 /*!
- * \class Transition
- *
  * \brief transitions of the Petri net
  *
  * Class to represent transitions of Petri nets. Each transition inherits the
@@ -198,18 +209,21 @@ class Node
 
 class Transition: public Node
 {
-  public:
-    /// constructor which creates a transition and adds a first role to the history
-    Transition(unsigned int id, std::string role);
+  /// class PetriNet is allowed to access the privates of class Transition
+  friend class PetriNet;
 
+  private:
     /// DOT-output of the transition (used by PetriNet::dotOut())
     std::string dotOut() const;
+
+    /// the short name of the transition
+    std::string nodeShortName() const;
 
     /// the name of the type
     std::string nodeTypeName() const;
     
-    /// the short name of the transition
-    std::string nodeShortName() const;
+    /// constructor which creates a transition and adds a first role to the history
+    Transition(unsigned int id, std::string role);
 };
 
 
@@ -220,9 +234,7 @@ class Transition: public Node
 
 
 /*!
- * \class  Place
- *
- * \brief Places of the Petri net
+ * \brief places of the Petri net
  *
  * Class to represent places of Petri nets. In addition to the inherited
  * functions and variables from class #Node, each place has a type defined in
@@ -230,14 +242,19 @@ class Transition: public Node
  * generated net and its inital marking is 1-safe, it is sufficent to
  * represent the initial marking as a Boolean value.
  *
+ * \todo make nodeShortName() private
+ *
  * \ingroup petrinet
 */
 
 class Place: public Node
 {
-  public:
-    /// constructor which creates a place and adds a first role to the history
-    Place(unsigned int id, std::string role, communication_type type);
+  /// class PetriNet is allowed to access the privates of class Place
+  friend class PetriNet;
+ 
+  private:
+    /// initial marking of the place
+    unsigned int tokens;
 
     /// DOT-output of the place (used by PetriNet::dotOut())
     std::string dotOut() const;
@@ -245,14 +262,15 @@ class Place: public Node
     /// the name of the type
     std::string nodeTypeName() const;
 
-    /// the short name of the place
-    std::string nodeShortName() const;
+    /// constructor which creates a place and adds a first role to the history
+    Place(unsigned int id, std::string role, communication_type type);
 
+  public:
     /// mark the place
-    void mark(unsigned int tokens = 1);
+    void mark(unsigned int tokens = 1);    
 
-    /// initial marking of the place
-    unsigned int tokens;
+    /// the short name of the place (public to bpel2owfn.cc)
+    std::string nodeShortName() const;
 };
 
 
@@ -263,8 +281,6 @@ class Place: public Node
 
 
 /*!
- * \class Arc
- *
  * \brief arcs of the Petri net
  *
  * Class to represent arcs of Petri nets. An arc written as a tupel (n1,n2)
@@ -275,21 +291,24 @@ class Place: public Node
 
 class Arc
 {
-  public:
+  /// class PetriNet is allowed to access the privates of class Arc
+  friend class PetriNet;
+
+  private:
     /// source node of the arc
     Node *source;
   
     /// target node of the arc
     Node *target;
 
-    /// constructor to create an arc
-    Arc(Node *source, Node *target, unsigned int weight = 1);
-  
+    /// weight of the arc (experimental)
+    unsigned int weight;
+ 
     /// DOT-output of the arc (used by PetriNet::dotOut())
     std::string dotOut() const;
 
-    /// weight of the arc (experimental)
-    unsigned int weight;
+    /// constructor to create an arc
+    Arc(Node *source, Node *target, unsigned int weight = 1);
 };
 
 
@@ -300,8 +319,6 @@ class Arc
 
 
 /*!
- * \class PetriNet
- *
  * \brief A Petri net
  *
  * Class to represent Petri nets. The net is consists of places of class

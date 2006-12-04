@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/12/01 07:44:12 $ by $Author: nlohmann $.
-# Version $Revision: 1.30 $
+# File last changed $Date: 2006/12/04 16:02:44 $ by $Author: nlohmann $.
+# Version $Revision: 1.31 $
 
 SUBDIRS = src doc tests
 
@@ -119,17 +119,17 @@ binarydist: dvi pdf binarydistreadme
 bindist_universal:
 	echo "you have to configure with:"
 	echo "  ./configure --disable-dependency-tracking"
-	make binarydist OS=mac-universal CXXFLAGS="-O2 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
-	  CFLAGS="-O2 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
+	make binarydist OS=mac-universal CXXFLAGS="-O3 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
+	  CFLAGS="-O3 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
 	  LDFLAGS="-arch i386 -arch ppc"
 
 # target to create an executable that is independet of Cygwin
 bindist_win32:
-	make binarydist OS=$(build_cpu)-mingw32 CXXFLAGS="-mno-cygwin -U _WIN32 -O2" CFLAGS="-mno-cygwin -U _WIN32 -O2"
+	make binarydist OS=$(build_cpu)-mingw32 CXXFLAGS="-mno-cygwin -U _WIN32 -O3" CFLAGS="-mno-cygwin -U _WIN32 -O3"
 
 # target for any other operating system
 bindist:
-	make binarydist CXXFLAGS="-O2" CFLAGS="-O2"
+	make binarydist CXXFLAGS="-O3" CFLAGS="-O3"
 
 
 ###############################################
@@ -158,4 +158,4 @@ gnupload_release: *.tar.gz
 	@echo "If not, please press (crtl+c) now."
 	@read answer
 	gnupload --to ftp.gnu.org:bpel2owfn $^
-	rm $(^:.tar.gz=.tar.gz.sig)	
+	rm $(^:.tar.gz=.tar.gz.sig)

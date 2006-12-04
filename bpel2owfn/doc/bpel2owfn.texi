@@ -8,6 +8,9 @@
 @c ----------------------------------------------------------------------------
 
 @copying
+
+@b{About this document:}
+
 This manual is for GNU BPEL2oWFN, version @value{VERSION}, a tool
 translating a web service described in @acronym{BPEL} into an open workflow net
 (@acronym{oWFN}), last updated @value{UPDATED}.
@@ -42,51 +45,6 @@ GNU BPEL2oWFN is part of the Tools4@acronym{BPEL} project funded by
 the Bundesministerium f@"ur Bildung und Forschung. See
 @url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
 @end copying
-
-
-@c @copying
-@c @ifhtml
-@c @image{images/bpel2owfn}
-@c @end ifhtml
-
-@c @b{About this document:}
-
-@c This manual is for GNU BPEL2oWFN, Version @value{VERSION}, a
-@c tool translating a web service described in @acronym{BPEL} into
-@c an open workflow net (@acronym{oWFN}), last updated @value{UPDATED}.
-@c This manual does not explain how to setup or install
-@c GNU BPEL2oWFN. For this information please read the
-@c Installation Manual which is part of the distribution or can be
-@c downloaded from the website of GNU BPEL2oWFN
-@c (@url{http://www.informatik.hu-berlin.de/top/tools4bpel/bpel2owfn}).
-
-
-@c @vskip 20pt
-
-@c Copyright @copyright{} 2005, 2006 Niels Lohmann
-
-@c Copying and distribution of this file, with or without modification,
-@c are permitted in any medium without royalty provided the copyright
-@c notice and this notice are preserved.
-
-@c GNU BPEL2oWFN is licensed under the @acronym{GNU} General
-@c Public License.
-
-@c Copyright @copyright{} 2005, 2006 Niels Lohmann, Christian Gierds
-@c and Dennis Reinert.
-
-@c @iftex
-@c @image{images/tools4bpel,,0.4in}
-@c @end iftex
-
-@c @ifhtml
-@c @image{images/tools4bpel}
-@c @end ifhtml
-
-@c GNU BPEL2oWFN is part of the Tools4@acronym{BPEL} project
-@c funded by the Bundesministerium f@"ur Bildung und Forschung. See
-@c @url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
-@c @end copying
 
 @c ----------------------------------------------------------------------------
 

@@ -3,76 +3,47 @@
 @include version.texi
 @afourpaper
 @finalout
-@settitle @acronym{BPEL2oWFN} Installation Manual
+@settitle GNU BPEL2oWFN Installation Manual
 
 @c ----------------------------------------------------------------------------
 
 @copying
-@ifnotplaintext
-
-@ifhtml
-@image{images/bpel2owfn}
-@end ifhtml
 
 @b{About this document:}
 
-This manual describes the installation of @acronym{BPEL2oWFN}, version
+This manual describes the installation of GNU BPEL2oWFN, version
 @value{VERSION}, a tool translating a web service described in
 @acronym{BPEL} into open workflow net (@acronym{oWFN}), last updated
-@value{UPDATED}. Once @acronym{BPEL2oWFN} is installed please read the User's
-Manual which is part of the distribution or can be downloaded from the website
-of @acronym{BPEL2oWFN}
-(@url{http://www.informatik.hu-berlin.de/top/tools4bpel/bpel2owfn}).
+@value{UPDATED}.
 
-@vskip 20pt
 Copyright @copyright{} 2005, 2006 Niels Lohmann
 
-Copying and distribution of this file, with or without modification,
-are permitted in any medium without royalty provided the copyright
-notice and this notice are preserved.
+@quotation
+Permission is granted to copy, distribute and/or modify this document under the
+terms of the GNU Free Documentation License, Version 1.2 or any later version
+published by the Free Software Foundation; with no Invariant Sections, with the
+Front-Cover Texts being ``A GNU Manual,'' and with the Back-Cover Texts as in
+(a) below.  A copy of the license is included in the section entitled ``GNU Free
+Documentation License.''
 
-@acronym{BPEL2oWFN} is licensed under the @acronym{GNU} General Public License.
+(a) The FSF's Back-Cover Text is: ``You have freedom to copy and modify
+this GNU Manual, like GNU software.
+@end quotation
 
-Copyright @copyright{} 2005, 2006 Niels Lohmann, Christian Gierds and Dennis
-Reinert.
+Once GNU BPEL2oWFN is installed please read the User's
+Manual which is part of the distribution or can be downloaded from the website
+of GNU BPEL2oWFN, @url{http://www.gnu.org/software/bpel2owfn}.
 
 @iftex
 @image{images/tools4bpel,,0.4in}
 @end iftex
-
 @ifhtml
 @image{images/tools4bpel}
 @end ifhtml
 
-@acronym{BPEL2oWFN} is part of the Tools4@acronym{BPEL} project funded by the
-Bundesministerium f@"ur Bildung und Forschung. See
+GNU BPEL2oWFN is part of the Tools4@acronym{BPEL} project funded by
+the Bundesministerium f@"ur Bildung und Forschung. See
 @url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
-
-@end ifnotplaintext
-
-@ifplaintext
------------------------------------------------------------------------
-
-Copyright @copyright{} 2005, 2006 Niels Lohmann, Christian Gierds and Dennis
-Reinert.
-
-This file is part of @acronym{BPEL2oWFN}, a tool translating a web service
-described into @acronym{BPEL} to an open workflow net (@acronym{oWFN}).
-
-@acronym{BPEL2oWFN} is free software; you can redistribute it and/or modify it
-under the terms of the @acronym{GNU} General Public License as published by the
-Free Software Foundation; either version 2 of the License, or (at your option)
-any later version.
-
-@acronym{BPEL2oWFN} is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE. See the @acronym{GNU} General Public License
-for more details.
-
-You should have received a copy of the @acronym{GNU} General Public License
-along with @acronym{BPEL2oWFN}; if not, write to the Free Software Foundation,
-Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
-@end ifplaintext
 @end copying
 
 @c ----------------------------------------------------------------------------
@@ -84,11 +55,11 @@ Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 @end iftex
 
 @ifnottex
-@title @acronym{BPEL2oWFN}
+@title GNU BPEL2oWFN
 @end ifnottex
 
 @subtitle Translating @acronym{BPEL} Processes into Open Workflow Nets
-@subtitle @acronym{BPEL2oWFN} Version @value{VERSION}, @value{UPDATED}
+@subtitle GNU BPEL2oWFN Version @value{VERSION}, @value{UPDATED}
 @vskip 4pt
 @subtitle Installation Manual
 
@@ -103,7 +74,7 @@ Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 
 @ifnottex
 @node Top
-@top @acronym{BPEL2oWFN}
+@top GNU BPEL2oWFN
 @insertcopying
 @end ifnottex
 
@@ -115,6 +86,7 @@ Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 * Needed Programs::
 * Change Log::
 * Authors and Acknowledgements::
+* GNU Free Documentation License::The license of this manual.
 @end menu
 
 @c ----------------------------------------------------------------------------
@@ -130,17 +102,17 @@ Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 BEGIN OF README file for BPEL2oWFN Version @value{VERSION}
 
 @chapter About this Distribution
-This file describes this distribution of @acronym{BPEL2oWFN}, version
+This file describes this distribution of GNU BPEL2oWFN, version
 @value{VERSION}, a tool translating business processes described in
 @acronym{BPEL} to open workflow nets (@acronym{oWFN}),
 last updated @value{UPDATED}.
 
-@acronym{BPEL2oWFN} is licensed under the @acronym{GNU} General Public License.
+GNU BPEL2oWFN is licensed under the @acronym{GNU} General Public License.
 
 Copyright @copyright{} 2005, 2006 Niels Lohmann, Christian Gierds and Dennis
 Reinert.
 
-@acronym{BPEL2oWFN} is part of the Tools4@acronym{BPEL} project funded by the
+GNU BPEL2oWFN is part of the Tools4@acronym{BPEL} project funded by the
 Bundesministerium f@"ur Bildung und Forschung. See
 @url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
 @end ifplaintext
@@ -151,23 +123,22 @@ Bundesministerium f@"ur Bildung und Forschung. See
 @section Files
 @table @code
 @item AUTHORS
-A list of all authors of @acronym{BPEL2oWFN} as well as acknowledgements.
+A list of all authors of GNU BPEL2oWFN as well as acknowledgements.
 
 @item ChangeLog
 The change log listing all changes made during the distribution versions of
-@acronym{BPEL2oWFN}.
+GNU BPEL2oWFN.
 
 @item COPYING
 The @acronym{GNU} General Public License (@acronym{GPL}) under which
-@acronym{BPEL2oWFN} is distributed. The @acronym{GPL} is also a chapter of the
-User's Manual.
+GNU BPEL2oWFN is distributed.
 
 @item INSTALL
 Setup and Installation instructions and all information needed to bootstrap
-@acronym{BPEL2oWFN}.
+GNU BPEL2oWFN.
 
 @item NEWS
-News concerning @acronym{BPEL2oWFN} or the Tools4@acronym{BPEL} project.
+News concerning GNU BPEL2oWFN or the Tools4@acronym{BPEL} project.
 
 @item README
 @ifplaintext
@@ -195,12 +166,12 @@ Installation}.
 
 @table @code
 @item src
-The sources of @acronym{BPEL2oWFN}. Each file contains a short documentation of
+The sources of GNU BPEL2oWFN. Each file contains a short documentation of
 what it does as well as Doxygen-styled comments (see
 @url{http://www.stack.nl/~dimitri/doxygen} for details).
 
 @item doc
-The documentation of @acronym{BPEL2oWFN} consisting of a manual and
+The documentation of GNU BPEL2oWFN consisting of a manual and
 @ifnottex
 an
 @end ifnottex
@@ -213,7 +184,7 @@ converted into many file formats using @samp{make @var{format}} where
 @samp{pdf} or @samp{ps}.
 
 @item tests
-Several test processes to self-test @acronym{BPEL2oWFN}. The processes
+Several test processes to self-test GNU BPEL2oWFN. The processes
 @file{loan.bpel}, @file{purchase.bpel} and @file{shipping.bpel} were taken from
 the @acronym{BPEL4WS} 1.1 specification.
 @end table
@@ -236,12 +207,12 @@ BEGIN OF INSTALL file for BPEL2oWFN Version @value{VERSION}
 @node Setup and Installation
 @chapter Setup and Installation
 
-The distribution environment of @acronym{BPEL2oWFN} was created using the
+The distribution environment of GNU BPEL2oWFN was created using the
 @acronym{GNU} Autotools. If you are familiar with the setup and installation
 procedure of any @acronym{GNU} tool you may skip this section.
 
 @section Setup
-To setup the installation environment and to compile @acronym{BPEL2oWFN} simply
+To setup the installation environment and to compile GNU BPEL2oWFN simply
 follow these steps:
 
 @enumerate
@@ -359,7 +330,7 @@ config.status: executing depfiles commands
 
 In some cases the configure script complains (i.e.@: warns) about tools which
 could not be found in your system path. In this case please check
-@ref{Needed Programs}. @acronym{BPEL2oWFN} can be compiled without these tools.
+@ref{Needed Programs}. GNU BPEL2oWFN can be compiled without these tools.
 However, you cannot make changes to large parts of the programm as you will not
 be able to generate source files without the tools.
 
@@ -395,9 +366,9 @@ encountered bug to @email{nlohmann@@informatik.hu-berlin.de}.
 @section Installation
 
 @ignore
-The compilation @acronym{BPEL2oWFN} is controlled by several Makefiles. Make
+The compilation GNU BPEL2oWFN is controlled by several Makefiles. Make
 sure that all required programs (see @ref{Required Programs}) are reachable in
-your path. To compile @acronym{BPEL2oWFN}, just run @samp{make}.
+your path. To compile GNU BPEL2oWFN, just run @samp{make}.
 @end ignore
 
 After successful compilation and self tests an executable file @file{bpel2owfn}
@@ -406,7 +377,7 @@ the directory @file{bpel2owfn-@value{VERSION}/src} of the distribution. This
 file has no dependencies to other files of the distribution and can be copied
 to any directory.
 
-Alternatively you can install @acronym{BPEL2oWFN} properly by executing
+Alternatively you can install GNU BPEL2oWFN properly by executing
 @footnote{Usually, @samp{make install} and @samp{make uninstall} can only be
 executed by the root user.}
 
@@ -443,7 +414,7 @@ Any warning during an in other respects successful compilation can be
 ignored --- these warnings mostly occur in generated files from Flex, Bison or
 Kimwitu++ and are outside of our scope.
 
-The compilation of @acronym{BPEL2oWFN} was tested on several operating systems
+The compilation of GNU BPEL2oWFN was tested on several operating systems
 such as Microsoft Windows (running Cygwin), @acronym{GNU}/Linux, Apple Mac OS X
 and Sun Solaris. Anyway, if the compilation fails please make sure you use the
 most recent (stable) versions of the @acronym{GNU} Compiler Collection. If this
@@ -453,9 +424,9 @@ distribution (version @value{VERSION} of @value{UPDATED}). Also include in your
 message the output that the make process produced. We will try to answer your
 mail within a week.
 
-If you are not interested in compiling @acronym{BPEL2oWFN} yourself you can
+If you are not interested in compiling GNU BPEL2oWFN yourself you can
 alternatively download executable binaries for several operating systems on the
-website of @acronym{BPEL2oWFN}
+website of GNU BPEL2oWFN
 (@url{http://www.informatik.hu-berlin.de/top/tools4bpel/bpel2owfn}).
 
 
@@ -466,7 +437,7 @@ The generated Makefiles serve different targets:
 
 @table @code
 @item all
-Compile @acronym{BPEL2oWFN} and create an executable binary @file{bpel2owfn}
+Compile GNU BPEL2oWFN and create an executable binary @file{bpel2owfn}
 (or @file{bpel2owfn.exe} on systems running Microsoft Windows) in the directory
 @file{bpel2owfn-@value{VERSION}/src}.
 
@@ -512,22 +483,22 @@ a Cygwin environment.
 @anchor{Required Programs}
 @section Required Programs
 
-To compile @acronym{BPEL2oWFN} you do not need any specific program other than
+To compile GNU BPEL2oWFN you do not need any specific program other than
 the @acronym{GNU} Compiler Collection. If you however want to change the
 program (e.g. add new Petri net patterns) you need the following programs to
-generate source code. These programs are (as @acronym{BPEL2oWFN} itself) free
+generate source code. These programs are (as GNU BPEL2oWFN itself) free
 software distributed under the @acronym{GNU} General Public License.
 
 
 @table @asis
 @item @b{Flex}, A fast scanner generator
-Flex is needed to generate the lexer of @acronym{BPEL2oWFN}. Flex was written
+Flex is needed to generate the lexer of GNU BPEL2oWFN. Flex was written
 by Vern Paxon. Copyright @copyright{} 1990 The Regents of the University of
 California. All rights reserved. Flex is available under
 @url{http://www.gnu.org/software/flex/flex.html}.
 
 @item @b{Bison}, The @acronym{YACC}-compatible Parser Generator
-Bison is needed to generate the parser of @acronym{BPEL2oWFN}. Bison was
+Bison is needed to generate the parser of GNU BPEL2oWFN. Bison was
 written by Robert Corbett und Richard Stallman. Copyright @copyright{} 1992,
 1998, 1999, 2003, 2004, 2005 Free Software Foundation, Inc. Bison is available
 under @url{http://www.gnu.org/software/bison/bison.html}.
@@ -544,9 +515,9 @@ Kimwitu++ is available under
 
 @section Optional Programs
 
-@acronym{BPEL2oWFN} is a compiler and thus creating output files which can be
+GNU BPEL2oWFN is a compiler and thus creating output files which can be
 read by several other programs. These programs are not needed to compile
-@acronym{BPEL2oWFN} yet without these programs @acronym{BPEL2oWFN} makes not
+GNU BPEL2oWFN yet without these programs GNU BPEL2oWFN makes not
 much sense.
 
 
@@ -575,7 +546,7 @@ including dot. Graphviz is maintained by AT&T Labs and is available under
 
 The Graphviz tool dot can be used to create a graphical representation of the
 generated Petri net in @acronym{PNG, Portable Network Graphic} format. If dot
-is not found on your system, @acronym{BPEL2oWFN} will only create a .dot-file
+is not found on your system, GNU BPEL2oWFN will only create a .dot-file
 and does not try to invoke dot.
 
 
@@ -583,7 +554,7 @@ and does not try to invoke dot.
 @section Reference System
 
 As of @value{UPDATED-MONTH}, we use the following system developing and
-building @acronym{BPEL2oWFN}:
+building GNU BPEL2oWFN:
 
 @itemize
 @item Intel Pentium M processor, 1.60 GHz
@@ -676,7 +647,7 @@ generate nodes for the @acronym{DPE, dead path elimination} when necessary.
 @item miscellaneous:
 @itemize
 @item The compiler generator tools Flex, Bison and Kimwitu++ are not any more
-necessary to compile @acronym{BPEL2oWFN}: the generated sources are now part of
+necessary to compile GNU BPEL2oWFN: the generated sources are now part of
 the distrubution.
 @item The @acronym{oWFN} format was overworked and allows final markings.
 @item @acronym{GNU} getopt allows more flexible command-line parameter
@@ -763,11 +734,10 @@ BEGIN OF AUTHORS file for BPEL2oWFN Version @value{VERSION}
 
 @section Authors
 
-@acronym{BPEL2oWFN} was written by:
+GNU BPEL2oWFN was written by:
 @itemize
 @item Niels Lohmann (Humboldt-Universit@"at zu Berlin)
 @item Christian Gierds (Humboldt-Universit@"at zu Berlin)
-@item Dennis Reinert (Humboldt-Universit@"at zu Berlin)
 @end itemize
 
 The Petri net patterns were created by:
@@ -776,12 +746,20 @@ The Petri net patterns were created by:
 @item Niels Lohmann (Humboldt-Universit@"at zu Berlin)
 @end itemize
 
+Other code was contributed by:
+@itemize
+@item Dennis Reinert (Humboldt-Universit@"at zu Berlin)
+@end itemize
+
+
 @section Acknowledgements
 
 We would like to thank:
 @itemize
 @item Maarten Boote (Technische Universiteit Eindhoven) for integrating
-@acronym{BPEL2oWFN} to LaQuSo
+GNU BPEL2oWFN to LaQuSo
+@item Jan Bretschneider (Humboldt-Universit@"at zu Berlin) for patient C++
+help.
 @item Dirk Fahland (Humboldt-Universit@"at zu Berlin) for fruitful discussions
 about BPEL's semantics
 @item Carsten Frenkler (Gedilan Technologies) for challenging @acronym{BPEL}
@@ -793,11 +771,11 @@ processes
 @item Simon Moser (IBM) for valuable advice concerning @acronym{BPEL}
 @item Michael Piefel (Humboldt-Universit@"at zu Berlin) for help with Kimwitu++
 @item Eric Verbeek (Technische Universiteit Eindhoven) for integrating
-@acronym{BPEL2oWFN} to the ProM framework and valuable comments on BPEL's link
+GNU BPEL2oWFN to the ProM framework and valuable comments on BPEL's link
 semantics
 @end itemize
 
-@acronym{BPEL2oWFN} is part of the Tools4@acronym{BPEL} project funded by the
+GNU BPEL2oWFN is part of the Tools4@acronym{BPEL} project funded by the
 German Bundesministerium f@"ur Bildung und Forschung.
 
 @section Contact Person
@@ -827,5 +805,9 @@ Unter den Linden 6@*
 
 END OF AUTHORS file for BPEL2oWFN Version @value{VERSION}
 @end ifplaintext
+
+@c ----------------------------------------------------------------------------
+
+@include fdl.texi
 
 @bye

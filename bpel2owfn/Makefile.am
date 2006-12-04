@@ -18,12 +18,16 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/12/04 16:37:16 $ by $Author: nlohmann $.
-# Version $Revision: 1.32 $
+# File last changed $Date: 2006/12/04 21:59:10 $ by $Author: nlohmann $.
+# Version $Revision: 1.33 $
 
 SUBDIRS = src doc tests
 
 .PHONY: binarydistreadme
+
+
+dist-hook:
+	rm -rf `find $(distdir) -name CVS`
 
 
 ####################################

@@ -28,13 +28,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/12/04 12:24:28 $
+ * \date    \$Date: 2006/12/04 14:32:17 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.161 $
+ * \version \$Revision: 1.162 $
  *
  * \ingroup petrinet
  */
@@ -314,6 +314,15 @@ Arc *PetriNet::newArc(Node *my_source, Node *my_target, arc_type my_type, unsign
   assert(my_target != NULL);
 
   assert(my_source->nodeType != my_target->nodeType);
+
+  // Tag the involved transition as communicating if it is.
+  if (my_source->nodeType == PLACE)
+    if (P_in.find(static_cast<Place*>(my_source)) != P_in.end())
+      (static_cast<Transition*>(my_target))->type = IN;
+    
+  if (my_target->nodeType == PLACE)
+    if (P_out.find(static_cast<Place*>(my_target)) != P_out.end())
+      (static_cast<Transition*>(my_source))->type = OUT;
 
 
   // Finally add the arc to the Petri net.

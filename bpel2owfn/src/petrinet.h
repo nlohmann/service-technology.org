@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/04 10:40:38 $
+ * \date    \$Date: 2006/12/04 14:32:17 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.113 $
+ * \version \$Revision: 1.114 $
  *
  * \ingroup petrinet
  */
@@ -158,8 +158,6 @@ typedef enum
  * node has an id and a history (i.e. the list of roles the node had during
  * the processing of a BPEL-file).
  *
- * \todo make type private
- *
  * \ingroup petrinet
 */
 
@@ -178,10 +176,10 @@ class Node
   friend class Arc;
 
   public:
-    /// type of node as defined in #communication_type (public to ast-to-petrinet-full1.k)
+  private:
+    /// type of node as defined in #communication_type
     communication_type type;
 
-  private:
     /// the id of the node
     unsigned int id;
 

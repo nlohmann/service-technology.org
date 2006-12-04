@@ -688,7 +688,6 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 	  PN.newArc(PN.findPlace("in." + ASTEmap[ThisBranch->id]->channelName), t2);
 	  PN.newArc(PN.findPlace(phylum->id, ".internal.TimeStamp"), t2);
 	  PN.newArc(t2, p3);
-	  t2->type = IN;
 
 	  Transition *t3 = PN.newTransition(newPrefix + "t3");
 	  PN.newArc(PN.findPlace("variable." + ASTEmap[ThisBranch->id]->variableName), t3);
@@ -763,7 +762,6 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 	  PN.newArc(PN.findPlace("in." + ASTEmap[ThisBranch->id]->channelName), t1);
 	  PN.newArc(PN.findPlace(phylum->id, ".internal.initial"), t1);
 	  PN.newArc(t1, PN.findPlace(innerActivity->id, ".initial"));
-	  t1->type = IN;
 
 	  // Embed the inner activity.
 	  PN.mergePlaces(phylum->id, ".final", innerActivity->id, ".final");

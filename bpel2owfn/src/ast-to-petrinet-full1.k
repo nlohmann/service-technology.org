@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/11/30 11:31:38 $
+ * \date    \$Date: 2006/12/04 14:32:16 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.214 $
+ * \version \$Revision: 1.215 $
  *
  */
 %}
@@ -760,7 +760,6 @@ This=userDefinedEventHandler(a,b,_id) ->
 	PN.newArc(PN.findPlace("in." + ASTEmap[ThisBranch->id]->channelName), onMessage_t2);
 	PN.newArc(onMessage_t2, onMessage_p2);
 	PN.newArc(onMessage_p5, onMessage_t2);
-	onMessage_t2->type = IN;
 
 	Transition *onMessage_t3 = PN.newTransition(newPrefix + "t3");
 	PN.newArc(PN.findPlace("variable." + ASTEmap[ThisBranch->id]->variableName), onMessage_t3);

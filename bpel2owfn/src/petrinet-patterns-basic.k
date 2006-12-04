@@ -92,7 +92,6 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	PN.newArc(p2, t2);
 	PN.newArc(t2, p3);
 	PN.newArc(t2, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
-	t2->type = OUT;
 
 	// Transitions for the negative control flow.
 	if (parameters[P_NOSTANDARDFAULTS] == false)
@@ -115,7 +114,6 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
 	PN.newArc(t1, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
-	t1->type = OUT;
 	
 	break;
       }
@@ -168,13 +166,11 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	PN.newArc(t2, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
 	PN.newArc(p2, t2);
 	PN.newArc(t2, p3);
-	t2->type = OUT;
 
 	Transition *t3 = PN.newTransition(prefix + "t3");
 	PN.newArc(PN.findPlace("in." + ASTEmap[phylum->id]->channelName), t3);
 	PN.newArc(p3, t3);
 	PN.newArc(t3, p4);
-	t3->type = IN;
 
 	Transition *t4 = PN.newTransition(prefix + "t4");
 	PN.newArc(p4, t4);
@@ -212,13 +208,11 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	PN.newArc(t1, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
-	t1->type = OUT;
 
 	Transition *t2 = PN.newTransition(prefix + "invokeI");
 	PN.newArc(PN.findPlace("in." + ASTEmap[phylum->id]->channelName), t2);
 	PN.newArc(p2, t2);
 	PN.newArc(t2, p3);
-	t2->type = IN;
 
 	break;
       }
@@ -267,7 +261,6 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
 	PN.newArc(PN.findPlace("in." + ASTEmap[phylum->id]->channelName), t1);
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
-	t1->type = IN;
 
 	Transition *t2 = PN.newTransition(prefix + "t2");
 	PN.newArc(p2, t2);
@@ -299,7 +292,6 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
 	PN.newArc(PN.findPlace("in." + ASTEmap[phylum->id]->channelName), t1);
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
-	t1->type = IN;
 
 	break;
       }
@@ -353,7 +345,6 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
 	PN.newArc(t2, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
 	PN.newArc(p2, t2);
 	PN.newArc(t2, p3);
-	t2->type = OUT;
 
 	// Transitions for the negative control flow.
 	if (parameters[P_NOSTANDARDFAULTS] == false)
@@ -376,7 +367,6 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
 	PN.newArc(t1, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
-	t1->type = OUT;
 
 	break;
       }

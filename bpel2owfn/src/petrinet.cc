@@ -28,13 +28,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/12/04 10:40:38 $
+ * \date    \$Date: 2006/12/04 12:24:28 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.160 $
+ * \version \$Revision: 1.161 $
  *
  * \ingroup petrinet
  */
@@ -507,10 +507,10 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
   set<Node *> post12 = setUnion(postset(t1), postset(t2));
 
   for (set<Node *>::iterator n = pre12.begin(); n != pre12.end(); n++)
-    newArc((Place*)(*n), t12);
+    newArc(static_cast<Place*>(*n), t12);
 
   for (set<Node *>::iterator n = post12.begin(); n != post12.end(); n++)
-    newArc(t12,(Place*)(*n));
+    newArc(t12, static_cast<Place*>(*n));
 
   removeTransition(t1);
   removeTransition(t2);
@@ -738,7 +738,7 @@ set<Node *> PetriNet::postset(Node *n) const
  */
 Place *PetriNet::findPlace(string role)
 {
-  Place *result = (Place *) roleMap[role];
+  Place *result = static_cast<Place*>(roleMap[role]);
 
   if (result == NULL)
     trace(TRACE_DEBUG, "[PN]\tPlace with role \"" + role + "\" not found.\n");
@@ -798,7 +798,7 @@ Place *PetriNet::findPlace(unsigned id1, unsigned id2)
   if (temp.size() > 1)
     cerr << "WARNING" << endl;
 
-  Place *result = (Place*)(*(temp.begin()));
+  Place *result = static_cast<Place*>(*(temp.begin()));
 
   assert(result != NULL);
 
@@ -818,7 +818,7 @@ Place *PetriNet::findPlace(unsigned id1, unsigned id2)
  */
 Transition *PetriNet::findTransition(string role)
 {
-  Transition *result = (Transition *) roleMap[role];
+  Transition *result = static_cast<Transition*>(roleMap[role]);
 
   if (result == NULL)
     trace(TRACE_DEBUG, "[PN]\tTransition with role \"" + role + "\" not found.\n");

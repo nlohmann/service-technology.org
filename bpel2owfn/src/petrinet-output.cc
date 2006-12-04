@@ -28,13 +28,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/12/04 10:40:38 $
+ * \date    \$Date: 2006/12/04 12:24:28 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.58 $
+ * \version \$Revision: 1.59 $
  *
  * \ingroup petrinet
  */
@@ -471,12 +471,12 @@ void PetriNet::output_pnml(std::ostream *output) const
   {
     // ignore input places
     if ((*f)->source->nodeType == PLACE)
-      if ( P_in.find((Place*)((*f)->source)) != P_in.end())
+      if ( P_in.find(static_cast<Place*>((*f)->source)) != P_in.end())
 	continue;
 
     // ignore output places
     if ((*f)->target->nodeType == PLACE)
-      if ( P_out.find((Place*)((*f)->target)) != P_out.end())
+      if ( P_out.find(static_cast<Place*>((*f)->target)) != P_out.end())
 	continue;
 
     (*output) << "    <arc id=\"a" << arcNumber << "\" ";
@@ -534,14 +534,14 @@ void PetriNet::output_pep(std::ostream *output) const
   (*output) << "TP" << endl;
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     if (((*f)->source->nodeType) == TRANSITION)
-      if ( P_out.find((Place*)((*f)->target)) == P_out.end())
+      if ( P_out.find(static_cast<Place*>((*f)->target)) == P_out.end())
 	(*output) << (*f)->source->id << "<" << (*f)->target->id << "w" << (*f)->weight << endl;
 
   // arcs from places to transitions
   (*output) << "PT" << endl;
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     if (((*f)->source->nodeType) == PLACE)
-      if ( P_in.find((Place*)((*f)->source)) == P_in.end())
+      if ( P_in.find(static_cast<Place*>((*f)->source)) == P_in.end())
 	(*output) << (*f)->source->id << ">" << (*f)->target->id << "w" << (*f)->weight << endl;
 }
 
@@ -586,12 +586,12 @@ void PetriNet::output_apnn(std::ostream *output) const
   {
     // ignore input places
     if ((*f)->source->nodeType == PLACE)
-      if ( P_in.find((Place*)((*f)->source)) != P_in.end())
+      if ( P_in.find(static_cast<Place*>((*f)->source)) != P_in.end())
 	continue;
 
     // ignore output places
     if ((*f)->target->nodeType == PLACE)
-      if ( P_out.find((Place*)((*f)->target)) != P_out.end())
+      if ( P_out.find(static_cast<Place*>((*f)->target)) != P_out.end())
 	continue;
 
     (*output) << "  \\arc{a" << arcNumber << "}{ ";
@@ -663,7 +663,7 @@ void PetriNet::output_lola(std::ostream *output) const
     {
       // ignore input places
       if ( (*pre)->nodeType == PLACE )
-	if ( P_in.find((Place*)(*pre)) != P_in.end())
+	if ( P_in.find(static_cast<Place*>(*pre)) != P_in.end())
 	  continue;
 
       (*output) << "  " << (*pre)->nodeShortName() << ":\t" << arc_weight(*pre, *t);
@@ -679,7 +679,7 @@ void PetriNet::output_lola(std::ostream *output) const
     {
       // ignore output places
       if ( (*post)->nodeType == PLACE )
-	if ( P_out.find((Place*)(*post)) != P_out.end())
+	if ( P_out.find(static_cast<Place*>(*post)) != P_out.end())
 	  continue;
 
       (*output) << "  " << (*post)->nodeShortName() << ":\t" << arc_weight(*t, *post);

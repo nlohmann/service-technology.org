@@ -20,7 +20,7 @@ extern string currentScope;
 
 void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 {
-  impl_tWhile_While* phylum = (impl_tWhile_While*) abstract_phylum;
+  impl_tWhile_While* phylum = static_cast<impl_tWhile_While*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -186,7 +186,7 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 
 void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 {
-  impl_tRepeatUntil_RepeatUntil* phylum = (impl_tRepeatUntil_RepeatUntil*) abstract_phylum;
+  impl_tRepeatUntil_RepeatUntil* phylum = static_cast<impl_tRepeatUntil_RepeatUntil*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -284,7 +284,7 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 
 void PSequence(impl_tSequence* abstract_phylum, uview current_view)
 {
-  impl_tSequence_Sequence* phylum = (impl_tSequence_Sequence*) abstract_phylum;
+  impl_tSequence_Sequence* phylum = static_cast<impl_tSequence_Sequence*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -345,7 +345,7 @@ void PSequence(impl_tSequence* abstract_phylum, uview current_view)
 
 void PFlow(impl_tFlow* abstract_phylum, uview current_view)
 {
-  impl_tFlow_Flow* phylum = (impl_tFlow_Flow*) abstract_phylum;
+  impl_tFlow_Flow* phylum = static_cast<impl_tFlow_Flow*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -444,7 +444,7 @@ void PFlow(impl_tFlow* abstract_phylum, uview current_view)
 
 void PSwitch(impl_tSwitch* abstract_phylum, uview current_view)
 {
-  impl_tSwitch_Switch* phylum = (impl_tSwitch_Switch*) abstract_phylum;
+  impl_tSwitch_Switch* phylum = static_cast<impl_tSwitch_Switch*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -476,7 +476,7 @@ void PSwitch(impl_tSwitch* abstract_phylum, uview current_view)
 	Transition *t10 = stop(p10, "p10", prefix);
 
 
-	impl_tOtherwise_Otherwise *otherwise = (impl_tOtherwise_Otherwise*) phylum->tOtherwise_1;
+	impl_tOtherwise_Otherwise *otherwise = static_cast<impl_tOtherwise_Otherwise*>(phylum->tOtherwise_1);
 
 	// unparse the standard elements
 	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
@@ -564,7 +564,7 @@ void PSwitch(impl_tSwitch* abstract_phylum, uview current_view)
 	Place *p2 =  PN.newPlace(prefix + "initial");
 
 
-	impl_tOtherwise_Otherwise *otherwise = (impl_tOtherwise_Otherwise*) phylum->tOtherwise_1;
+	impl_tOtherwise_Otherwise *otherwise = static_cast<impl_tOtherwise_Otherwise*>(phylum->tOtherwise_1);
 
 	// unparse the standard elements
 	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
@@ -635,7 +635,7 @@ void PSwitch(impl_tSwitch* abstract_phylum, uview current_view)
 
 void PPick(impl_tPick* abstract_phylum, uview current_view)
 {
-  impl_tPick_Pick* phylum = (impl_tPick_Pick*) abstract_phylum;
+  impl_tPick_Pick* phylum = static_cast<impl_tPick_Pick*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -840,7 +840,7 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 
 void PIf(impl_tIf* abstract_phylum, uview current_view)
 {
-  impl_tIf_If* phylum = (impl_tIf_If*) abstract_phylum;
+  impl_tIf_If* phylum = static_cast<impl_tIf_If*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);

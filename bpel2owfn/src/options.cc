@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/11/29 15:21:08 $
+ * \date    \$Date: 2006/12/04 12:24:27 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.55 $
+ * \version \$Revision: 1.56 $
  */
 
 
@@ -263,7 +263,7 @@ void parse_command_line(int argc, char* argv[])
 
   // use GNU getopt to parse the command-line arguments
   int optc = 0;
-  while ((optc = getopt_long (argc, argv, par_string, longopts, (int *) 0))
+  while ((optc = getopt_long (argc, argv, par_string, longopts, static_cast<int *>(0)))
          != EOF)
   {
     /// \todo call one of them argument and remove the rest
@@ -603,12 +603,12 @@ ostream *openOutput(string name)
  *
  * \post out file addressed by output file stream #file closed
  */
-void closeOutput(ostream *file)
+void closeOutput(std::ostream *file)
 {
   if ( file != NULL )
   {
     (*file) << flush;
-    ((ofstream*)file)->close();
+    (static_cast<std::ofstream*>(file))->close();
     delete(file);
     file = NULL;
   }

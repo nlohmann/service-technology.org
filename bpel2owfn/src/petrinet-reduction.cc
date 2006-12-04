@@ -28,13 +28,13 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2006/12/04 10:40:38 $
+ * \date    \$Date: 2006/12/04 12:24:28 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
  *
  * \ingroup petrinet
  */
@@ -162,7 +162,7 @@ void PetriNet::removeDeadNodes()
       // transitions in the postset of a dead place are dead
       for (set<Node*>::iterator t = ps.begin(); t != ps.end(); t++)
       {
-      	deadTransitions.push_back( (Transition*)(*t) );
+      	deadTransitions.push_back( static_cast<Transition*>(*t) );
 	trace(TRACE_VERY_DEBUG, "[PN]\tTransition t" + toString((*t)->id) + " is structurally dead\n");
 	done = false;
       }
@@ -331,8 +331,8 @@ void PetriNet::fusionOfSeriesPlaces()
   {
     set<Node*> postSet = postset(*t);
     set<Node*> preSet  = preset (*t);
-    Place* prePlace = (Place*) *(preSet.begin());
-    Place* postPlace = (Place*) *(postSet.begin());
+    Place* prePlace = static_cast<Place*>(*(preSet.begin()));
+    Place* postPlace = static_cast<Place*>(*(postSet.begin()));
 
     if ((preSet.size() == 1) &&	(postSet.size() == 1) && // precondition 1
 	(prePlace != postPlace) &&			 // precondition 2
@@ -389,8 +389,8 @@ void PetriNet::fusionOfSeriesTransitions()
   {
     if ((postset(*p).size() == 1) && (preset(*p).size() == 1)) // precondition 1
     {
-      Transition* t1 = (Transition*)(*(preset(*p).begin()));
-      Transition* t2 = (Transition*)(*(postset(*p).begin()));
+      Transition* t1 = static_cast<Transition*>(*(preset(*p).begin()));
+      Transition* t2 = static_cast<Transition*>(*(postset(*p).begin()));
 
       if (preset(t2).size() == 1) // precondition 2
       {

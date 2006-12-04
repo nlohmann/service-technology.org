@@ -19,7 +19,7 @@ extern string currentScope;
 
 void PEmpty(impl_tEmpty* abstract_phylum, uview current_view)
 {
-  impl_tEmpty_Empty* phylum = (impl_tEmpty_Empty*) abstract_phylum;
+  impl_tEmpty_Empty* phylum = static_cast<impl_tEmpty_Empty*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -64,7 +64,7 @@ void PEmpty(impl_tEmpty* abstract_phylum, uview current_view)
 
 void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 {
-  impl_tInvoke_AsynchronousInvoke* phylum = (impl_tInvoke_AsynchronousInvoke*) abstract_phylum;
+  impl_tInvoke_AsynchronousInvoke* phylum = static_cast<impl_tInvoke_AsynchronousInvoke*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -137,7 +137,7 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 
 void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 {
-  impl_tInvoke_SynchronousInvoke* phylum = (impl_tInvoke_SynchronousInvoke*) abstract_phylum;
+  impl_tInvoke_SynchronousInvoke* phylum = static_cast<impl_tInvoke_SynchronousInvoke*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -244,7 +244,7 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 
 void PReceive(impl_tReceive* abstract_phylum, uview current_view)
 {
-  impl_tReceive_Receive* phylum = (impl_tReceive_Receive*) abstract_phylum;
+  impl_tReceive_Receive* phylum = static_cast<impl_tReceive_Receive*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -324,7 +324,7 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
 
 void PReply(impl_tReply* abstract_phylum, uview current_view)
 {
-  impl_tReply_Reply* phylum = (impl_tReply_Reply*) abstract_phylum;
+  impl_tReply_Reply* phylum = static_cast<impl_tReply_Reply*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -402,7 +402,7 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
 
 void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 {
-  impl_tAssign_Assign* phylum = (impl_tAssign_Assign*) abstract_phylum;
+  impl_tAssign_Assign* phylum = static_cast<impl_tAssign_Assign*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -523,7 +523,7 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 
 void PValidate(impl_tValidate* abstract_phylum, uview current_view)
 {
-  impl_tValidate_Validate* phylum = (impl_tValidate_Validate*) abstract_phylum;
+  impl_tValidate_Validate* phylum = static_cast<impl_tValidate_Validate*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -596,7 +596,7 @@ void PValidate(impl_tValidate* abstract_phylum, uview current_view)
 
 void PWaitUntil(impl_tWait* abstract_phylum, uview current_view)
 {
-  impl_tWait_WaitUntil* phylum = (impl_tWait_WaitUntil*) abstract_phylum;
+  impl_tWait_WaitUntil* phylum = static_cast<impl_tWait_WaitUntil*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -651,7 +651,7 @@ void PWaitUntil(impl_tWait* abstract_phylum, uview current_view)
 
 void PWaitFor(impl_tWait* abstract_phylum, uview current_view)
 {
-  impl_tWait_WaitFor* phylum = (impl_tWait_WaitFor*) abstract_phylum;
+  impl_tWait_WaitFor* phylum = static_cast<impl_tWait_WaitFor*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -718,7 +718,7 @@ void PWaitFor(impl_tWait* abstract_phylum, uview current_view)
 
 void PThrow(impl_tThrow* abstract_phylum, uview current_view)
 {
-  impl_tThrow_Throw* phylum = (impl_tThrow_Throw*) abstract_phylum;
+  impl_tThrow_Throw* phylum = static_cast<impl_tThrow_Throw*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -778,7 +778,7 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
 
 void PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
 {
-  impl_tRethrow_Rethrow* phylum = (impl_tRethrow_Rethrow*) abstract_phylum;
+  impl_tRethrow_Rethrow* phylum = static_cast<impl_tRethrow_Rethrow*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -817,7 +817,7 @@ void PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
 
 void PTerminate(impl_tTerminate* abstract_phylum, uview current_view)
 {
-  impl_tTerminate_Terminate* phylum = (impl_tTerminate_Terminate*) abstract_phylum;
+  impl_tTerminate_Terminate* phylum = static_cast<impl_tTerminate_Terminate*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -909,7 +909,7 @@ void PTerminate(impl_tTerminate* abstract_phylum, uview current_view)
 
 void PExit(impl_tExit* abstract_phylum, uview current_view)
 {
-  impl_tExit_Exit* phylum = (impl_tExit_Exit*) abstract_phylum;
+  impl_tExit_Exit* phylum = static_cast<impl_tExit_Exit*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -1001,7 +1001,7 @@ void PExit(impl_tExit* abstract_phylum, uview current_view)
 
 void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
 {
-  impl_tCompensate_Compensate* phylum = (impl_tCompensate_Compensate*) abstract_phylum;
+  impl_tCompensate_Compensate* phylum = static_cast<impl_tCompensate_Compensate*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -1045,7 +1045,7 @@ void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
 
 void PCompensateScope(impl_tCompensate* abstract_phylum, uview current_view)
 {
-  impl_tCompensate_CompensateScope* phylum = (impl_tCompensate_CompensateScope*) abstract_phylum;
+  impl_tCompensate_CompensateScope* phylum = static_cast<impl_tCompensate_CompensateScope*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);

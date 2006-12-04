@@ -25,7 +25,7 @@ extern set<string> variableNames;
 
 void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 {
-  impl_tProcess_Process* phylum = (impl_tProcess_Process*) abstract_phylum;
+  impl_tProcess_Process* phylum = static_cast<impl_tProcess_Process*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -451,7 +451,7 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 
 void PScope(impl_tScope* abstract_phylum, uview current_view)
 {
-  impl_tScope_Scope* phylum = (impl_tScope_Scope*) abstract_phylum;
+  impl_tScope_Scope* phylum = static_cast<impl_tScope_Scope*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);

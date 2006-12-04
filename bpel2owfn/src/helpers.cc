@@ -28,13 +28,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2006/11/30 15:16:08 $
+ * \date    \$Date: 2006/12/04 12:24:27 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.65 $
+ * \version \$Revision: 1.66 $
  *
  * \ingroup conversion
  * \ingroup debug
@@ -256,7 +256,7 @@ void cleanup()
   {
     trace(TRACE_INFORMATION," + Closing output file: " + output_filename + ".X\n");
     (*output) << flush;
-    ((ofstream*)output)->close();
+    (static_cast<std::ofstream*>(output))->close();
     delete(output);
     output = NULL;
   }
@@ -265,7 +265,7 @@ void cleanup()
   {
     trace(TRACE_INFORMATION," + Closing log file: " + log_filename + "\n");
     (*log_output) << flush;
-    ((ofstream*)log_output)->close();
+    (static_cast<std::ofstream*>(log_output))->close();
     delete(log_output);
     log_output = &cerr;
   }

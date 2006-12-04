@@ -654,9 +654,10 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 	Place *p12 = PN.newPlace(prefix + "stopped");
 
 	Transition *t5 = PN.newTransition(prefix + "t5");
-	PN.newArc(PN.findPlace("1.internal.clock"), t5, READ);
 	PN.newArc(p6, t5);
 	PN.newArc(t5, p7);
+        if (!parameters[P_NOVARIABLES])
+	  PN.newArc(PN.findPlace("1.internal.clock"), t5, READ);
 
   	// Transitions for the negative control flow.
     	Transition *t7 = stop(p6, "initial", prefix);
@@ -690,10 +691,13 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 	  PN.newArc(t2, p3);
 
 	  Transition *t3 = PN.newTransition(newPrefix + "t3");
-	  PN.newArc(PN.findPlace("variable." + ASTEmap[ThisBranch->id]->variableName), t3);
-	  PN.newArc(t3, PN.findPlace("variable." + ASTEmap[ThisBranch->id]->variableName));
 	  PN.newArc(p3, t3);
 	  PN.newArc(t3, PN.findPlace(innerActivity->id, ".initial"));
+          if (!parameters[P_NOVARIABLES])
+          {
+	    PN.newArc(PN.findPlace("variable." + ASTEmap[ThisBranch->id]->variableName), t3);
+	    PN.newArc(t3, PN.findPlace("variable." + ASTEmap[ThisBranch->id]->variableName));
+          }
 
 	  // Transitions for the negative control flow.
 	  if (parameters[P_NOSTANDARDFAULTS] == false)
@@ -720,9 +724,10 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 	  string newPrefix = prefix + "onAlarm" + toString(onAlarmCount++) + ".";
 
 	  Transition *t6 = PN.newTransition(newPrefix + "t6");
-	  PN.newArc(PN.findPlace("1.internal.clock"), t6, READ);
 	  PN.newArc(PN.findPlace(phylum->id, ".internal.TimeStamp"), t6);
 	  PN.newArc(t6, PN.findPlace(innerActivity->id, ".initial"));
+          if(!parameters[P_NOVARIABLES])
+	    PN.newArc(PN.findPlace("1.internal.clock"), t6, READ);
 	  
 	  // Embed the inner activity.
 	  PN.mergePlaces(phylum->id, ".stop",    innerActivity->id, ".stop");

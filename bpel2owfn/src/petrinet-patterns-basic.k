@@ -606,7 +606,8 @@ void PWaitUntil(impl_tWait* abstract_phylum, uview current_view)
 	Transition *t1 = PN.newTransition(prefix + "waitUntil");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
-	PN.newArc(PN.findPlace("1.internal.clock"), t1, READ);
+        if (!parameters[P_NOVARIABLES])
+          PN.newArc(PN.findPlace("1.internal.clock"), t1, READ);
 
 	// Transitions for the negative control flow.
 	Transition *t2 = stop(p1, "initial", prefix);
@@ -662,7 +663,8 @@ void PWaitFor(impl_tWait* abstract_phylum, uview current_view)
 	Transition *t1 = PN.newTransition(prefix + "readTime");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
-	PN.newArc(PN.findPlace("1.internal.clock"), t1, READ);
+        if (!parameters[P_NOVARIABLES])
+	  PN.newArc(PN.findPlace("1.internal.clock"), t1, READ);
 
 	Transition *t2 = PN.newTransition(prefix + "waitFor");
 	PN.newArc(p2, t2);

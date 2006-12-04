@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/12/04 14:32:16 $
+ * \date    \$Date: 2006/12/04 15:16:30 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.215 $
+ * \version \$Revision: 1.216 $
  *
  */
 %}
@@ -704,7 +704,8 @@ This=userDefinedEventHandler(a,b,_id) ->
       Transition *t5 = PN.newTransition(prefix + "t5"); // t6 in MEH
       PN.newArc(p6, t5);
       PN.newArc(t5, p17);
-      PN.newArc(PN.findPlace("1.internal.clock"), t5, READ);
+      if (!parameters[P_NOVARIABLES])
+        PN.newArc(PN.findPlace("1.internal.clock"), t5, READ);
 
       Transition *t7 = PN.newTransition(prefix + "allFinished");
       PN.newArc(t7, p8);
@@ -762,10 +763,13 @@ This=userDefinedEventHandler(a,b,_id) ->
 	PN.newArc(onMessage_p5, onMessage_t2);
 
 	Transition *onMessage_t3 = PN.newTransition(newPrefix + "t3");
-	PN.newArc(PN.findPlace("variable." + ASTEmap[ThisBranch->id]->variableName), onMessage_t3);
-  	PN.newArc(onMessage_t3, PN.findPlace("variable." + ASTEmap[ThisBranch->id]->variableName));
 	PN.newArc(onMessage_p2, onMessage_t3);
 	PN.newArc(onMessage_t3, onMessage_p3);
+        if (!parameters[P_NOVARIABLES])
+        {
+	  PN.newArc(PN.findPlace("variable." + ASTEmap[ThisBranch->id]->variableName), onMessage_t3);
+	  PN.newArc(onMessage_t3, PN.findPlace("variable." + ASTEmap[ThisBranch->id]->variableName));
+        }
 
 	Transition *onMessage_t12 = PN.newTransition(newPrefix + "t12");
 	PN.newArc(onMessage_p11, onMessage_t12);
@@ -839,7 +843,8 @@ This=userDefinedEventHandler(a,b,_id) ->
 	Transition *onAlarm_t1 = PN.newTransition(newPrefix + "t1");
 	PN.newArc(onAlarm_p3, onAlarm_t1);
 	PN.newArc(onAlarm_t1, onAlarm_p1);
-	PN.newArc(PN.findPlace("1.internal.clock"), onAlarm_t1, READ);
+        if (!parameters[P_NOVARIABLES])
+          PN.newArc(PN.findPlace("1.internal.clock"), onAlarm_t1, READ);
 
 	Transition *onAlarm_t2 = PN.newTransition(newPrefix + "t2");
 	PN.newArc(onAlarm_p2, onAlarm_t2);

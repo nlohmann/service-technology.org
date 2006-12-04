@@ -1,40 +1,40 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert      *
+ * Copyright 2006 Niels Lohmann                                              *
  *                                                                           *
- * This file is part of BPEL2oWFN.                                           *
+ * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
- * BPEL2oWFN is free software; you can redistribute it and/or modify it      *
+ * GNU BPEL2oWFN is free software; you can redistribute it and/or modify it  *
  * under the terms of the GNU General Public License as published by the     *
  * Free Software Foundation; either version 2 of the License, or (at your    *
  * option) any later version.                                                *
  *                                                                           *
- * BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT  *
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
- * more details.                                                             *
+ * GNU BPEL2oWFN is distributed in the hope that it will be useful, but      *
+ * WITHOUT ANY WARRANTY; without even the implied warranty of                *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General  *
+ * Public License for more details.                                          *
  *                                                                           *
  * You should have received a copy of the GNU General Public License along   *
- * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
+ * with GNU BPEL2oWFN; see file COPYING. if not, write to the Free Software  *
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. *
 \*****************************************************************************/
 
 /*!
  * \file    petrinet-reduction.cc
  *
- * \brief   reduction rules for Petri nets (implementation)
+ * \brief   Petri Net API: structural reduction
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nlohmann $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2006/11/24 14:47:04 $
+ * \date    \$Date: 2006/12/04 10:40:38 $
  *
- * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ * \note    This file is part of the tool GNU BPEL2oWFN and was created during
+ *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.41 $
+ * \version \$Revision: 1.42 $
  *
  * \ingroup petrinet
  */
@@ -66,56 +66,6 @@
 
 set<unsigned int> visited;    // used for transitive reduction
 set<unsigned int> visited2;   // used for transitive reduction
-
-
-
-
-
-/******************************************************************************
- * Functions to remove several aspects of the Petri net model
- *****************************************************************************/
-
-/*!
- * Collect all input and output places and remove (i.e. detach) them. Formally
- * the inner of the generated open workflow is builded.
- */
-void PetriNet::removeInterface()
-{
-  trace(TRACE_DEBUG, "[PN]\tRemoving interface places.\n");
-
-  list<Place*> killList;
-
-  for (set<Place*>::iterator p = P_in.begin(); p != P_in.end(); p++)
-    killList.push_back(*p);
-
-  for (set<Place*>::iterator p = P_out.begin(); p != P_out.end(); p++)
-    killList.push_back(*p);
-
-  for (list<Place*>::iterator it = killList.begin(); it != killList.end(); it++)
-    removePlace(*it);
-
-  hasNoInterface = true;
-}
-
-
-
-
-
-/*!
- * Remove the places modelling variables.
- */
-void PetriNet::removeVariables()
-{
-  extern set<string> variableNames;
-
-  for (set<string>::iterator variable = variableNames.begin();
-      variable != variableNames.end(); variable++)
-  {
-    removePlace( findPlace("variable." + *variable) );
-  }
-
-  removePlace( findPlace("1.internal.clock") );
-}
 
 
 

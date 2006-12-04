@@ -28,14 +28,14 @@
  * 
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/03 16:52:11 $
+ * \date    \$Date: 2006/12/04 10:40:38 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.124 $
+ * \version \$Revision: 1.125 $
  */
 
 
@@ -272,13 +272,6 @@ int main( int argc, char *argv[])
 
   if (modus == M_PETRINET || modus == M_CONSISTENCY)
   {
-    // remove variables?
-    if ( parameters[P_NOVARIABLES] )
-    {
-      trace(TRACE_INFORMATION, "-> Remove variable places from Petri Net ...\n");
-      PN.removeVariables();
-    }    
-    
     // apply structural reduction rules?
     if ( parameters[P_SIMPLIFY] )
     {
@@ -299,8 +292,8 @@ int main( int argc, char *argv[])
 	output = openOutput(output_filename + "." + suffixes[F_OWFN]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for oWFN ...\n");
-      PN.owfnOut(output);
-      cerr << PN;
+      PN.set_format(FORMAT_OWFN);
+      (*output) << PN;
       if (output_filename != "")
       {
 	closeOutput(output);
@@ -320,7 +313,8 @@ int main( int argc, char *argv[])
 	PN.makeChannelsInternal();
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for LoLA ...\n");
-      PN.lolaOut(output);
+      PN.set_format(FORMAT_LOLA);
+      (*output) << PN;
       if (output_filename != "")
       {
 	closeOutput(output);
@@ -370,7 +364,8 @@ int main( int argc, char *argv[])
 	output = openOutput(output_filename + "." + suffixes[F_PNML]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for PNML ...\n");
-      PN.pnmlOut(output);
+      PN.set_format(FORMAT_PNML);
+      (*output) << PN;
       if (output_filename != "")
       {
 	closeOutput(output);
@@ -386,7 +381,8 @@ int main( int argc, char *argv[])
 	output = openOutput(output_filename + "." + suffixes[F_PEP]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for PEP ...\n");
-      PN.pepOut(output);
+      PN.set_format(FORMAT_PEP);
+      (*output) << PN;
       if (output_filename != "")
       {
 	closeOutput(output);
@@ -402,7 +398,8 @@ int main( int argc, char *argv[])
 	output = openOutput(output_filename + "." + suffixes[F_APNN]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for APNN ...\n");
-      PN.apnnOut(output);
+      PN.set_format(FORMAT_APNN);
+      (*output) << PN;
       if (output_filename != "")
       {
 	closeOutput(output);
@@ -418,7 +415,8 @@ int main( int argc, char *argv[])
 	output = openOutput(output_filename + "." + suffixes[F_DOT]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net for dot ...\n");
-      PN.dotOut(output);
+      PN.set_format(FORMAT_DOT);
+      (*output) << PN;
       if (output_filename != "")
       {
 	closeOutput(output);
@@ -441,7 +439,8 @@ int main( int argc, char *argv[])
 	output = openOutput(output_filename + "." + suffixes[F_INFO]);
       }
       trace(TRACE_INFORMATION, "-> Printing Petri net information ...\n");
-      PN.infoOut(output);
+      PN.set_format(FORMAT_INFO);
+      (*output) << PN;
       if (output_filename != "")
       {
 	closeOutput(output);
@@ -457,13 +456,6 @@ int main( int argc, char *argv[])
 
 
 
-
-/*!
- * \mainpage
- *
- * \image html "../../../doc/images/bpel2owfn.png"
- *
- */
 
 /*!
  * \defgroup frontend Front End

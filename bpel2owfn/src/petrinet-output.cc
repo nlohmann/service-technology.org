@@ -1,40 +1,40 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert      *
+ * Copyright 2006 Niels Lohmann                                              *
  *                                                                           *
- * This file is part of BPEL2oWFN.                                           *
+ * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
- * BPEL2oWFN is free software; you can redistribute it and/or modify it      *
+ * GNU BPEL2oWFN is free software; you can redistribute it and/or modify it  *
  * under the terms of the GNU General Public License as published by the     *
  * Free Software Foundation; either version 2 of the License, or (at your    *
  * option) any later version.                                                *
  *                                                                           *
- * BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT  *
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
- * more details.                                                             *
+ * GNU BPEL2oWFN is distributed in the hope that it will be useful, but      *
+ * WITHOUT ANY WARRANTY; without even the implied warranty of                *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General  *
+ * Public License for more details.                                          *
  *                                                                           *
  * You should have received a copy of the GNU General Public License along   *
- * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
+ * with GNU BPEL2oWFN; see file COPYING. if not, write to the Free Software  *
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. *
 \*****************************************************************************/
 
 /*!
  * \file    petrinet-output.cc
  *
- * \brief   output Functions for Petri nets (implementation)
+ * \brief   Petri Net API: file output
  * 
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nlohmann $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/12/03 16:52:11 $
+ * \date    \$Date: 2006/12/04 10:40:38 $
  *
- * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ * \note    This file is part of the tool GNU BPEL2oWFN and was created during
+ *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.57 $
+ * \version \$Revision: 1.58 $
  *
  * \ingroup petrinet
  */
@@ -185,7 +185,7 @@ string PetriNet::information() const
  *
  * \todo put this to the nodes
  */
-void PetriNet::infoOut(ostream *output) const
+void PetriNet::output_info(ostream *output) const
 {
   assert(output != NULL);
 
@@ -256,7 +256,7 @@ void PetriNet::infoOut(ostream *output) const
 /*!
  * DOT-output of the arc.
 */
-string Arc::dotOut() const
+string Arc::output_dot() const
 {
   string result = " ";
   if (source->nodeType == PLACE)
@@ -280,7 +280,7 @@ string Arc::dotOut() const
  * DOT-output of the transition. Transitions are colored corresponding to their
  * initial role.
 */
-string Transition::dotOut() const
+string Transition::output_dot() const
 {
   string result;
 #ifdef USING_BPEL2OWFN
@@ -317,7 +317,7 @@ string Transition::dotOut() const
  * DOT-output of the place. Places are colored corresponding to their initial
  * role.
 */
-string Place::dotOut() const
+string Place::output_dot() const
 {
   string result;
 #ifdef USING_BPEL2OWFN
@@ -359,7 +359,7 @@ string Place::dotOut() const
  * the digraph-statement and adds labels to transitions, places and arcs if
  * neccessary. It also distinguishes the three arc types of #arc_type.
  */
-void PetriNet::dotOut(ostream *output) const
+void PetriNet::output_dot(ostream *output) const
 {
   trace(TRACE_DEBUG, "[PN]\tCreating DOT-output.\n");
 
@@ -380,24 +380,20 @@ void PetriNet::dotOut(ostream *output) const
   // list the places
   (*output) << endl << " node [shape=circle];" << endl;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
-    (*output) << (*p)->dotOut();
-
-  if (!hasNoInterface)
-  {
-    for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
-      (*output) << (*p)->dotOut();
-    for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
-      (*output) << (*p)->dotOut();
-  }
+    (*output) << (*p)->output_dot();
+  for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
+    (*output) << (*p)->output_dot();
+  for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
+    (*output) << (*p)->output_dot();
 
   // list the transitions
   (*output) << endl << " node [shape=box regular=true];" << endl;
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
-    (*output) << (*t)->dotOut();
+    (*output) << (*t)->output_dot();
 
   // list the arcs
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
-    (*output) << (*f)->dotOut();
+    (*output) << (*f)->output_dot();
 
   (*output) << "}" << endl;
 }
@@ -413,14 +409,14 @@ void PetriNet::dotOut(ostream *output) const
 /*!
  * Outputs the net in PNML (Petri Net Markup Language).
  */
-void PetriNet::pnmlOut(ostream *output)
+void PetriNet::output_pnml(std::ostream *output) const
 {
   trace(TRACE_DEBUG, "[PN]\tCreating PNML-output.\n");
 
   assert(output != NULL);
 
   // remove interface since we do not create an open workflow net
-  removeInterface();
+//  removeInterface();
 
   (*output) << "<?xml version=\"1.0\" encoding=\"utf-8\"?>" << endl << endl;
   (*output) << "<!--" << endl;
@@ -473,6 +469,16 @@ void PetriNet::pnmlOut(ostream *output)
   int arcNumber = 1;
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++, arcNumber++)
   {
+    // ignore input places
+    if ((*f)->source->nodeType == PLACE)
+      if ( P_in.find((Place*)((*f)->source)) != P_in.end())
+	continue;
+
+    // ignore output places
+    if ((*f)->target->nodeType == PLACE)
+      if ( P_out.find((Place*)((*f)->target)) != P_out.end())
+	continue;
+
     (*output) << "    <arc id=\"a" << arcNumber << "\" ";
 #ifdef USING_BPEL2OWFN
     (*output) << "source=\"" << (*f)->source->nodeShortName() << "\" ";
@@ -497,19 +503,19 @@ void PetriNet::pnmlOut(ostream *output)
 /*!
  * Outputs the net in low-level PEP notation.
  */
-void PetriNet::pepOut(ostream *output)
+void PetriNet::output_pep(std::ostream *output) const
 {
   trace(TRACE_DEBUG, "[PN]\tCreating PEP-output.\n");
 
   assert(output != NULL);
 
   // remove interface since we do not create an open workflow net
-  removeInterface();
+//  removeInterface();
 
   // header
   (*output) << "PEP" << endl << "PTNet" << endl << "FORMAT_N" << endl;
 
-  // places(only internal)
+  // places (only internal)
   (*output) << "PL" << endl;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
@@ -524,17 +530,19 @@ void PetriNet::pepOut(ostream *output)
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
     (*output) << (*t)->id << "\"" << (*t)->nodeShortName() << "\"80@40" << endl;
 
-  // arcs from transitions to places
+  // arcs from transitions to places (no output places)
   (*output) << "TP" << endl;
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     if (((*f)->source->nodeType) == TRANSITION)
-      (*output) << (*f)->source->id << "<" << (*f)->target->id << "w" << (*f)->weight << endl;
+      if ( P_out.find((Place*)((*f)->target)) == P_out.end())
+	(*output) << (*f)->source->id << "<" << (*f)->target->id << "w" << (*f)->weight << endl;
 
   // arcs from places to transitions
   (*output) << "PT" << endl;
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     if (((*f)->source->nodeType) == PLACE)
-      (*output) << (*f)->source->id << ">" << (*f)->target->id << "w" << (*f)->weight << endl;
+      if ( P_in.find((Place*)((*f)->source)) == P_in.end())
+	(*output) << (*f)->source->id << ">" << (*f)->target->id << "w" << (*f)->weight << endl;
 }
 
 
@@ -544,14 +552,14 @@ void PetriNet::pepOut(ostream *output)
 /*!
  * Outputs the net in APNN (Abstract Petri Net Notation).
  */
-void PetriNet::apnnOut(ostream *output)
+void PetriNet::output_apnn(std::ostream *output) const
 {
   trace(TRACE_DEBUG, "[PN]\tCreating APNN-output.\n");
 
   assert(output != NULL);
 
   // remove interface since we do not create an open workflow net
-  removeInterface();
+//  removeInterface();
 
   (*output) << "\\beginnet{" << filename << "}" << endl << endl;
 
@@ -576,6 +584,16 @@ void PetriNet::apnnOut(ostream *output)
   int arcNumber = 1;
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++, arcNumber++)
   {
+    // ignore input places
+    if ((*f)->source->nodeType == PLACE)
+      if ( P_in.find((Place*)((*f)->source)) != P_in.end())
+	continue;
+
+    // ignore output places
+    if ((*f)->target->nodeType == PLACE)
+      if ( P_out.find((Place*)((*f)->target)) != P_out.end())
+	continue;
+
     (*output) << "  \\arc{a" << arcNumber << "}{ ";
     (*output) << "\\from{" << (*f)->source->nodeShortName() << " } ";
     (*output) << "\\to{" << (*f)->target->nodeShortName() << "} \\weight{" << (*f)->weight << "} }" << endl;
@@ -592,14 +610,11 @@ void PetriNet::apnnOut(ostream *output)
 /*!
  * Outputs the net in LoLA-format.
  */
-void PetriNet::lolaOut(ostream *output)
+void PetriNet::output_lola(std::ostream *output) const
 {
   trace(TRACE_DEBUG, "[PN]\tCreating LoLA-output.\n");
 
   assert(output != NULL);
-
-  // remove interface since we do not create an open workflow net
-  removeInterface();
 
   (*output) << "{ Petri net created by " << PACKAGE_STRING << " reading " << filename << " }" << endl << endl;
 
@@ -646,8 +661,13 @@ void PetriNet::lolaOut(ostream *output)
     count = 1;
     for (set<Node *>::iterator pre = consume.begin(); pre != consume.end(); count++, pre++)
     {
+      // ignore input places
+      if ( (*pre)->nodeType == PLACE )
+	if ( P_in.find((Place*)(*pre)) != P_in.end())
+	  continue;
+
       (*output) << "  " << (*pre)->nodeShortName() << ":\t" << arc_weight(*pre, *t);
-      
+
       if (count < consume.size())
 	(*output) << "," << endl;
     }
@@ -657,6 +677,11 @@ void PetriNet::lolaOut(ostream *output)
     count = 1;
     for (set<Node *>::iterator post = produce.begin(); post != produce.end(); count++, post++)
     {
+      // ignore output places
+      if ( (*post)->nodeType == PLACE )
+	if ( P_out.find((Place*)(*post)) != P_out.end())
+	  continue;
+
       (*output) << "  " << (*post)->nodeShortName() << ":\t" << arc_weight(*t, *post);
 
       if (count < produce.size())
@@ -679,7 +704,7 @@ void PetriNet::lolaOut(ostream *output)
 /*!
  * Outputs the net in oWFN-format.
  */
-void PetriNet::owfnOut(std::ostream *output) const
+void PetriNet::output_owfn(std::ostream *output) const
 {
   assert(output != NULL);
 
@@ -873,8 +898,42 @@ void PetriNet::owfnOut(std::ostream *output) const
 
 
 
+
+
+/*!
+ * Stream the PetriNet object to a given output stream, using the file format
+ * set before uing PetriNet::set_format().
+ *
+ * \param os  an output stream to which the net is streamed
+ * \param obj a PetriNet object
+ */
 std::ostream& operator<< (std::ostream& os, const PetriNet &obj)
 {
-  cerr << obj.information() << endl;
+  switch (obj.format)
+  {
+    case(FORMAT_APNN):	obj.output_apnn(&os); break;
+    case(FORMAT_DOT):	obj.output_dot(&os); break;
+    case(FORMAT_INFO):	obj.output_info(&os); break;
+    case(FORMAT_LOLA):	obj.output_lola(&os); break;
+    case(FORMAT_OWFN):	obj.output_owfn(&os); break;
+    case(FORMAT_PEP):	obj.output_pep(&os); break;
+    case(FORMAT_PNML):	obj.output_pnml(&os); break;
+    default:		break;
+  }
+
   return os;
+}
+
+
+
+
+/*!
+ * Set the output format to be used when the <<-operator is called the next
+ * time.
+ *
+ * \param my_format the output format from the enumeration output_format.
+ */
+void PetriNet::set_format(output_format my_format)
+{
+  format = my_format;
 }

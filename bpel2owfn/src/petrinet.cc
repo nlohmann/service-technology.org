@@ -1,40 +1,40 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert      *
+ * Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      *
  *                                                                           *
- * This file is part of BPEL2oWFN.                                           *
+ * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
- * BPEL2oWFN is free software; you can redistribute it and/or modify it      *
+ * GNU BPEL2oWFN is free software; you can redistribute it and/or modify it  *
  * under the terms of the GNU General Public License as published by the     *
- * Free Software Foundation; either version 2 of the License, or(at your    *
+ * Free Software Foundation; either version 2 of the License, or (at your    *
  * option) any later version.                                                *
  *                                                                           *
- * BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT  *
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
- * more details.                                                             *
+ * GNU BPEL2oWFN is distributed in the hope that it will be useful, but      *
+ * WITHOUT ANY WARRANTY; without even the implied warranty of                *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General  *
+ * Public License for more details.                                          *
  *                                                                           *
  * You should have received a copy of the GNU General Public License along   *
- * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
+ * with GNU BPEL2oWFN; see file COPYING. if not, write to the Free Software  *
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. *
 \*****************************************************************************/
 
 /*!
  * \file    petrinet.cc
  *
- * \brief   functions for Petri nets
+ * \brief   Petri Net API: base functions
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nlohmann $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/12/03 16:52:11 $
+ * \date    \$Date: 2006/12/04 10:40:38 $
  *
- * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ * \note    This file is part of the tool GNU BPEL2oWFN and was created during
+ *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.159 $
+ * \version \$Revision: 1.160 $
  *
  * \ingroup petrinet
  */
@@ -198,8 +198,8 @@ void Place::mark(unsigned int my_tokens)
  */
 PetriNet::PetriNet()
 {
-  hasNoInterface = false;
   nextId = 1;
+  format = FORMAT_OWFN;
 }
 
 
@@ -706,24 +706,6 @@ set<Node *> PetriNet::preset(Node *n) const
 
 
 /*!
- * \param s a set of nodes of the Petri net
- * \result the merged preset of the nodes in s
- */
-set<Node*> PetriNet::preset(set<Node *> &s) const
-{
-  set<Node *> result;
-
-  for (set<Node *>::iterator n = s.begin(); n != s.end(); n++)
-    result = setUnion(result, preset(*n));
-
-  return result;
-}
-
-
-
-
-
-/*!
  * \param n a node of the Petri net
  * \result the postset of node n
  * \pre n != NULL
@@ -738,24 +720,6 @@ set<Node *> PetriNet::postset(Node *n) const
     if ((*f)->source == n)
       result.insert((*f)->target);
   
-  return result;
-}
-
-
-
-
-
-/*!
- * \param s a set of nodes of the Petri net
- * \result the merged postset of the nodes in s
- */
-set<Node*> PetriNet::postset(set<Node *> &s) const
-{
-  set<Node *> result;
-
-  for (set<Node *>::iterator n = s.begin(); n != s.end(); n++)
-    result = setUnion(result, postset(*n));
-
   return result;
 }
 
@@ -875,18 +839,6 @@ Transition *PetriNet::findTransition(string role)
 unsigned int PetriNet::getId()
 {
   return nextId++;
-}
-
-
-
-
-
-/*!
- * \return id for last added node
- */
-unsigned int PetriNet::id() const
-{
-  return nextId;
 }
 
 

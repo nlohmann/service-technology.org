@@ -1,40 +1,40 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert      *
+ * Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      *
  *                                                                           *
- * This file is part of BPEL2oWFN.                                           *
+ * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
- * BPEL2oWFN is free software; you can redistribute it and/or modify it      *
+ * GNU BPEL2oWFN is free software; you can redistribute it and/or modify it  *
  * under the terms of the GNU General Public License as published by the     *
- * Free Software Foundation; either version 2 of the License, or(at your     *
+ * Free Software Foundation; either version 2 of the License, or (at your    *
  * option) any later version.                                                *
  *                                                                           *
- * BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT  *
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
- * more details.                                                             *
+ * GNU BPEL2oWFN is distributed in the hope that it will be useful, but      *
+ * WITHOUT ANY WARRANTY; without even the implied warranty of                *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General  *
+ * Public License for more details.                                          *
  *                                                                           *
  * You should have received a copy of the GNU General Public License along   *
- * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
+ * with GNU BPEL2oWFN; see file COPYING. if not, write to the Free Software  *
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. *
 \*****************************************************************************/
 
 /*!
  * \file    petrinet.h
  *
- * \brief   functions for Petri nets
+ * \brief   Petri Net API
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nlohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/04 08:08:23 $
+ * \date    \$Date: 2006/12/04 10:40:38 $
  *
- * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ * \note    This file is part of the tool GNU BPEL2oWFN and was created during
+ *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.112 $
+ * \version \$Revision: 1.113 $
  *
  * \ingroup petrinet
  */
@@ -120,6 +120,28 @@ typedef enum
   PLACE,		///< a place
   TRANSITION		///< a transition
 } node_type;
+
+
+
+
+
+/*!
+ * \brief file formats
+ *
+ * Enumeration of the possible output file formats.
+ *
+ * \ingroup petrinet
+ */
+typedef enum
+{
+  FORMAT_APNN,		///< Abstract Petri Net Notation (APNN)
+  FORMAT_DOT,		///< Graphviz dot
+  FORMAT_INFO,		///< Info File
+  FORMAT_LOLA,		///< LoLA
+  FORMAT_OWFN,		///< Fiona open workflow net (oWFN)
+  FORMAT_PEP,		///< Low-Level PEP Notation
+  FORMAT_PNML		///< Petri Net Markup Language (PNML)
+} output_format;
 
 
 
@@ -214,7 +236,7 @@ class Transition: public Node
 
   private:
     /// DOT-output of the transition (used by PetriNet::dotOut())
-    std::string dotOut() const;
+    std::string output_dot() const;
 
     /// the short name of the transition
     std::string nodeShortName() const;
@@ -238,9 +260,7 @@ class Transition: public Node
  *
  * Class to represent places of Petri nets. In addition to the inherited
  * functions and variables from class #Node, each place has a type defined in
- * the enumeration #communication_type and an initial marking. As the
- * generated net and its inital marking is 1-safe, it is sufficent to
- * represent the initial marking as a Boolean value.
+ * the enumeration #communication_type and an initial marking.
  *
  * \todo make nodeShortName() private
  *
@@ -257,7 +277,7 @@ class Place: public Node
     unsigned int tokens;
 
     /// DOT-output of the place (used by PetriNet::dotOut())
-    std::string dotOut() const;
+    std::string output_dot() const;
 
     /// the name of the type
     std::string nodeTypeName() const;
@@ -305,7 +325,7 @@ class Arc
     unsigned int weight;
  
     /// DOT-output of the arc (used by PetriNet::dotOut())
-    std::string dotOut() const;
+    std::string output_dot() const;
 
     /// constructor to create an arc
     Arc(Node *source, Node *target, unsigned int weight = 1);
@@ -333,7 +353,7 @@ class PetriNet
 {
   public:
     /// adds a place with a given role and type
-    Place *newPlace(std::string my_role, communication_type my_type = INTERNAL);
+    Place* newPlace(std::string my_role, communication_type my_type = INTERNAL);
   
     /// adds a transition with a given role
     Transition *newTransition(std::string my_role);
@@ -341,27 +361,6 @@ class PetriNet
     /// adds an arc given source and target node, and arc type
     Arc *newArc(Node *my_source, Node *my_target, arc_type my_type = STANDARD, unsigned int my_weight = 1);
 
-
-    /// info file output
-    void infoOut(std::ostream *output) const;
-
-    /// DOT (Graphviz) output
-    void dotOut(std::ostream *output) const;
-
-    /// PNML (Petri Net Markup Language) output
-    void pnmlOut(std::ostream *output);
-
-    /// low-level PEP output
-    void pepOut(std::ostream *output);
-
-    /// APNN (Abstract Petri Net Notation) output
-    void apnnOut(std::ostream *output);
-
-    /// LoLA-output
-    void lolaOut(std::ostream *output);
-
-    /// oWFN-output
-    void owfnOut(std::ostream *output) const;
 
     /// outputs the Petri net
     friend std::ostream& operator<< (std::ostream& os, const PetriNet &obj);
@@ -379,18 +378,15 @@ class PetriNet
     /// merges transitions given two transitions
     void mergeTransitions(Transition *t1, Transition *t2);
 
-
     /// finds place given a role
     Place* findPlace(std::string role);
 
     /// finds place given an id with a role
     Place* findPlace(unsigned int id, std::string role);
 
-    /// finds a place given the ids of two transitions (one in the pre and one in the postset)
-    Place *findPlace(unsigned int id1, unsigned int id2);
-
     /// finds transition given a role
     Transition* findTransition(std::string role);
+
 
     /// rename a node (i.e., rename one role in its history)
     void renamePlace(std::string old_name, std::string new_name);
@@ -398,9 +394,6 @@ class PetriNet
 
     /// simplifies the Petri net
     void simplify();
-
-    /// removes all variable places
-    void removeVariables();
 
     /// adds a prefix to the name of all nodes of the net
     void addPrefix(std::string prefix);
@@ -416,6 +409,9 @@ class PetriNet
 
     /// statistical output
     std::string information() const;
+
+    /// set the output format
+    void set_format(output_format my_format);
     
     /// constructor
     PetriNet();
@@ -428,9 +424,6 @@ class PetriNet
     /// removes a place from the net
     void removePlace(Place *p);
 
-    /// returns the arc weight between two nodes
-    unsigned int arc_weight(Node *my_source, Node *my_target) const;
-
     /// removes a transition from the net
     void removeTransition(Transition *t);
 
@@ -440,18 +433,40 @@ class PetriNet
     /// removes all ingoing and outgoing arcs of a node
     void detachNode(Node *n);
 
+    /// finds a place given the ids of two transitions (one in the pre and one in the postset)
+    Place *findPlace(unsigned int id1, unsigned int id2);  
+
+    /// returns the arc weight between two nodes
+    unsigned int arc_weight(Node *my_source, Node *my_target) const;
+
+
+    /// APNN (Abstract Petri Net Notation) output
+    void output_apnn(std::ostream *output) const;
+
+    /// DOT (Graphviz) output
+    void output_dot(std::ostream *output) const;
+
+    /// info file output
+    void output_info(std::ostream *output) const;
+
+    /// LoLA-output
+    void output_lola(std::ostream *output) const;
+
+    /// oWFN-output
+    void output_owfn(std::ostream *output) const;
+
+    /// low-level PEP output
+    void output_pep(std::ostream *output) const;
+    
+    /// PNML (Petri Net Markup Language) output
+    void output_pnml(std::ostream *output) const;
+
 
     /// calculates the prestd::set of a node
     std::set<Node*> preset(Node *n) const;
 
-    /// calculates the prestd::set of a set of nodes
-    std::set<Node*> preset(std::set<Node *> &s) const;
-
     /// calculates the poststd::set of a node
     std::set<Node*> postset(Node *n) const;
-
-    /// calculates the poststd::set of a set of nodes
-    std::set<Node*> postset(std::set<Node *> &s) const;
     
 
     /// remove unused status places
@@ -478,37 +493,32 @@ class PetriNet
     /// remove transitive nodes and arcs
     void transitiveReduction();
 
-    /// removes interface places (for non-oWFN formats)
-    void removeInterface();
-  
+
     /// returns an id for new nodes
     unsigned int getId();
 
-    /// returns current id
-    unsigned int id() const;
 
-
-    /// std::set of places of the Petri net
+    /// set of internal places of the Petri net
     std::set<Place *> P;
 
-    /// std::set of input places of the oWFN
+    /// set of input places of the Petri net
     std::set<Place *> P_in;
 
-    /// std::set of output places of the oWFN
+    /// set of output places of the Petri net
     std::set<Place *> P_out;
 
-    /// std::set of transitions of the Petri net
+    /// set of transitions of the Petri net
     std::set<Transition *> T;
 
-    /// std::set of arcs of the Petri net
+    /// set of arcs of the Petri net
     std::set<Arc *> F;
 
 
     /// id that will be assigned to the next node
     unsigned int nextId;
 
-    /// true if function #PetriNet::removeInterface() was called
-    bool hasNoInterface;
+    /// output file format
+    output_format format;
 
     /// mapping of roles to nodes of the Petri net
     std::map<std::string, Node *> roleMap;

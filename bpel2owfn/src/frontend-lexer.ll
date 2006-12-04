@@ -20,7 +20,7 @@
 
 %{
 /*!
- * \file frotnend-lexer.cc
+ * \file frontend-lexer.cc
  *
  * \brief BPEL lexer
  *
@@ -34,7 +34,7 @@
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2006/11/29 15:21:07 $
+ * \date    \$Date: 2006/12/04 16:15:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,7 +43,7 @@
  * \note    This file was created using Flex reading file frontend-lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.46 $
+ * \version \$Revision: 1.47 $
  *
  * \todo    add rules to ignored everything non-BPEL
  * \todo    add a more elegant way to handle XSD-namespaces

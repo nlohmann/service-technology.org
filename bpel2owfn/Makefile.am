@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/12/04 16:02:44 $ by $Author: nlohmann $.
-# Version $Revision: 1.31 $
+# File last changed $Date: 2006/12/04 16:37:16 $ by $Author: nlohmann $.
+# Version $Revision: 1.32 $
 
 SUBDIRS = src doc tests
 
@@ -39,6 +39,9 @@ SHELLSCRIPTS = tests/test1 tests/test2 tests/test3 tests/test4
 hu-prepare: maintainer-clean
 	-rm -f COPYING
 	-rm -f aclocal.m4
+	-rm -f configure
+	-rm -f config.sub
+	-rm -f config.guess
 	-rm -f configure
 	-rm -f depcomp
 	-rm -f install-sh

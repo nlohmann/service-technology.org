@@ -175,6 +175,7 @@ void oWFN::initialize() {
 		{
 			Places[i]->PreTransitions[j] = Places[i]->ArrivingArcs[j]->tr;
 		}
+		Places[i]->PreTransitions[j] = (owfnTransition *) 0;
 	}
 #endif
   	

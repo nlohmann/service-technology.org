@@ -10,3 +10,7 @@ fiona.exe.stackdump
 gmon.out
 lexer.h
 syntax.h
+lexer_owfn.cc
+lexer_owfn.h
+syntax_owfn.cc
+syntax_owfn.h

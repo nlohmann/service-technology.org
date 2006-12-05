@@ -31,7 +31,7 @@
  *
  */
 
-#include "lexer.h"
+#include "lexer_owfn.h"
 
 // #defines YY_FLEX_HAS_YYLEX_DESTROY for newer versions of flex. If
 // YY_FLEX_HAS_YYLEX_DESTROY is defined, you should call yylex_destroy() after

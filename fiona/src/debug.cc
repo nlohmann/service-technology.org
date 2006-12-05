@@ -85,11 +85,11 @@ std::string intToString(int i) {
  *            the location of the syntax error.
  * \return 1, since an error occured
  */
-int yyerror(const char* msg)
+int owfn_yyerror(const char* msg)
 {
   /* defined by flex */
-  extern int yylineno;      ///< line number of current token
-  extern char *yytext;      ///< text of the current token
+  extern int owfn_yylineno;      ///< line number of current token
+  extern char *owfn_yytext;      ///< text of the current token
   extern char * netfile;
 
   trace("Error while parsing!\n\n");
@@ -98,10 +98,10 @@ int yyerror(const char* msg)
 	
   // display passed error message
   trace("Error in '" + std::string(netfile) + "' in line ");
-  trace(intToString(yylineno));
+  trace(intToString(owfn_yylineno));
   trace(":\n");
   trace("  token/text last read was '");
-  trace(yytext);
+  trace(owfn_yytext);
   trace("'\n\n");
   
   // if (filename != "<STDIN>")
@@ -111,7 +111,7 @@ int yyerror(const char* msg)
     // number of lines to print before and after errorneous line
     int environment = 4;
 
-    unsigned int firstShowedLine = ((yylineno-environment)>0)?(yylineno-environment):1;
+    unsigned int firstShowedLine = ((owfn_yylineno-environment)>0)?(owfn_yylineno-environment):1;
   
     std::ifstream inputFile(netfile);
     std::string errorLine;

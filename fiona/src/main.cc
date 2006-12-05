@@ -42,7 +42,7 @@
 #include <list>
 
 // #defines YY_FLEX_HAS_YYLEX_DESTROY if we can call yylex_destroy()
-#include "lexer_wrap.h"
+#include "lexer_owfn_wrap.h"
 
 #ifdef LOG_NEW
 #include "newlogger.h"
@@ -50,15 +50,15 @@
 
 using namespace std;
 
-extern int yydebug;
-extern int yy_flex_debug;
+extern int owfn_yydebug;
+extern int owfn_yy_flex_debug;
 
-extern FILE *yyin;
-extern int yyerror();
-extern int yyparse();
+extern FILE *owfn_yyin;
+extern int owfn_yyerror();
+extern int owfn_yyparse();
 
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY     
-extern int yylex_destroy();
+extern int owfn_yylex_destroy();
 #endif
 
 extern SymbolTab* GlobalTable;
@@ -86,12 +86,12 @@ void myown_newhandler() {
 }
 
 void readnet() {
-    yydebug = 0;
-    yy_flex_debug = 0;
+    owfn_yydebug = 0;
+    owfn_yy_flex_debug = 0;
 	// diagnosefilename = (char *) 0;
     if(netfile) {
-        yyin = fopen(netfile,"r");
-        if(!yyin) {
+        owfn_yyin = fopen(netfile,"r");
+        if(!owfn_yyin) {
             cerr << "cannot open netfile: " << netfile << "\n\n";
             exit(4);
         }
@@ -102,11 +102,11 @@ void readnet() {
 
     PN = new oWFN();
 
-    yyparse();
-    fclose(yyin);
+    owfn_yyparse();
+    fclose(owfn_yyin);
     
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY     
-    yylex_destroy(); // must NOT be called before fclose(yyin);
+    owfn_yylex_destroy(); // must NOT be called before fclose(owfn_yyin);
 #endif
 
     unsigned int ii;
@@ -133,7 +133,7 @@ void readnet() {
 }
 
 
-int yywrap() {
+int owfn_yywrap() {
     return 1;
 }
 

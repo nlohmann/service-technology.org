@@ -19,7 +19,7 @@
 // *****************************************************************************/
 
 /*!
- * \file    syntax_wrap.h
+ * \file    syntax_owfn_wrap.h
  *
  * \brief   compatibility wrapper for the parser
  *
@@ -38,4 +38,4 @@ class owfnTransition;
 class TrSymbol;
 class formula;
 
-#include "syntax.h"
+#include "syntax_owfn.h"

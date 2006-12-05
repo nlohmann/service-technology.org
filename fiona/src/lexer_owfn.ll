@@ -35,6 +35,8 @@
 /* DEFINITIONS */
 
 /* flex options */
+%option outfile="lex.yy.c"
+%option prefix="owfn_yy"
 %option noyywrap
 %option yylineno
 %option nodefault
@@ -45,12 +47,12 @@
 %{
 // c-code (wird übernommen)
 
-#include "syntax_wrap.h"			// list of all tokens used
+#include "syntax_owfn_wrap.h"			// list of all tokens used
 #include <string>
 
 using namespace std;
 
-extern int yyerror(const char *msg);
+extern int owfn_yyerror(const char *msg);
 void setlval();
 
 %}
@@ -105,7 +107,7 @@ NOT		 								{ return op_not;}
 [^,;:()\t \n\r\{\}=][^,;:()\t \n\r\{\}=]*		{ setlval(); return ident; }
 [\n\r]            						{ break; }
 [ \t]           						{ break; }
-.										{ yyerror("lexical error"); }
+.										{ owfn_yyerror("lexical error"); }
 
 
 %%
@@ -113,7 +115,7 @@ NOT		 								{ return op_not;}
 
 // pass token string as attribute to bison
 void setlval() {
-  yylval.str = strdup(yytext);
+  owfn_yylval.str = strdup(owfn_yytext);
 }
 
 

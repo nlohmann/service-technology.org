@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2006/12/04 16:32:02 $
+ * \date    \$Date: 2006/12/05 13:58:01 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  */
 %}
 
@@ -77,7 +77,7 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
   impl_tWhile_While* phylum = static_cast<impl_tWhile_While*>(abstract_phylum);
   assert(phylum != NULL);
 
-  header(phylum->id);
+  header(phylum->id, true);
   string prefix = toString(phylum->id) + ".internal.";
 
 
@@ -227,7 +227,7 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
   }
 
 
-  footer(phylum->id);
+  footer(phylum->id, true);
 }
 
 
@@ -243,7 +243,7 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
   impl_tRepeatUntil_RepeatUntil* phylum = static_cast<impl_tRepeatUntil_RepeatUntil*>(abstract_phylum);
   assert(phylum != NULL);
 
-  header(phylum->id);
+  header(phylum->id, true);
   string prefix = toString(phylum->id) + ".internal.";
 
   switch (current_view)
@@ -325,7 +325,7 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
     default: { /* no pattern in this case */ }
   }
  
-  footer(phylum->id);
+  footer(phylum->id, true);
 }
 
 
@@ -341,7 +341,7 @@ void PSequence(impl_tSequence* abstract_phylum, uview current_view)
   impl_tSequence_Sequence* phylum = static_cast<impl_tSequence_Sequence*>(abstract_phylum);
   assert(phylum != NULL);
 
-  header(phylum->id);
+  header(phylum->id, true);
   string prefix = toString(phylum->id) + ".internal.";
 
 
@@ -386,7 +386,7 @@ void PSequence(impl_tSequence* abstract_phylum, uview current_view)
   }
 
 
-  footer(phylum->id);
+  footer(phylum->id, true);
 }
 
 
@@ -402,7 +402,7 @@ void PFlow(impl_tFlow* abstract_phylum, uview current_view)
   impl_tFlow_Flow* phylum = static_cast<impl_tFlow_Flow*>(abstract_phylum);
   assert(phylum != NULL);
 
-  header(phylum->id);
+  header(phylum->id, true);
   string prefix = toString(phylum->id) + ".internal.";
 
 
@@ -484,7 +484,7 @@ void PFlow(impl_tFlow* abstract_phylum, uview current_view)
   }
 
 
-  footer(phylum->id);
+  footer(phylum->id, true);
 
 }
 
@@ -501,7 +501,7 @@ void PSwitch(impl_tSwitch* abstract_phylum, uview current_view)
   impl_tSwitch_Switch* phylum = static_cast<impl_tSwitch_Switch*>(abstract_phylum);
   assert(phylum != NULL);
 
-  header(phylum->id);
+  header(phylum->id, true);
   string prefix = toString(phylum->id) + ".internal.";
 
   
@@ -676,7 +676,7 @@ void PSwitch(impl_tSwitch* abstract_phylum, uview current_view)
   }
 
 
-  footer(phylum->id);
+  footer(phylum->id, true);
 }
 
 
@@ -692,7 +692,7 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
   impl_tPick_Pick* phylum = static_cast<impl_tPick_Pick*>(abstract_phylum);
   assert(phylum != NULL);
 
-  header(phylum->id);
+  header(phylum->id, true);
   string prefix = toString(phylum->id) + ".internal.";
 
   
@@ -884,7 +884,7 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
   }
 
 
-  footer(phylum->id);
+  footer(phylum->id, true);
 }
 
 
@@ -900,12 +900,79 @@ void PIf(impl_tIf* abstract_phylum, uview current_view)
   impl_tIf_If* phylum = static_cast<impl_tIf_If*>(abstract_phylum);
   assert(phylum != NULL);
 
-  header(phylum->id);
+  header(phylum->id, true);
   string prefix = toString(phylum->id) + ".internal.";
 
-  
+  /*
+   * Ad hoc and not quite correct version of the pattern: the branches are not
+   * checked sequentially, but in parallel. FIXME!
+   */
   switch(current_view)
   {
+    case(petrinet_enum):
+    case(petrinetnew_enum):
+      {
+	Place *p1 =  PN.newPlace(prefix + "initial");
+	Place *p2 =  PN.newPlace(prefix + "final");
+	Place *p3 =  PN.newPlace(prefix + "stop");
+	Place *p4 =  PN.newPlace(prefix + "stopped");
+
+    	Transition *t9 = stop(p1, "initial", prefix);
+    	Transition *t10 = stop(p2, "final", prefix);
+
+
+	// unparse the standard elements
+	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
+
+	// unparse the elseIf branches
+	phylum->tElseIf_list_1->unparse(pseudoPrinter, current_view);
+	
+	// unparse the else branch
+	phylum->tElse_1->unparse(pseudoPrinter, current_view);
+
+
+	int currentCase = 1;
+	foreach (caseBranch=ElseIf(innerActivity, _id2); tElseIf_list phylum->tElseIf_list_1)
+	{
+	  string caseNumber = toString(currentCase++);
+	  Transition* t1 = PN.newTransition(prefix + "case" + caseNumber);
+	  PN.newArc(PN.findPlace(phylum->id, ".internal.initial"), t1); // added ".internal" here
+	  
+	  // Embed the inner activity.
+	  PN.newArc(t1, PN.findPlace(innerActivity->id, ".initial"));
+	  PN.mergePlaces(phylum->id, ".internal.final", innerActivity->id, ".final");
+	  PN.mergePlaces(phylum->id, ".internal.stop", innerActivity->id, ".stop");
+	  PN.mergePlaces(phylum->id, ".internal.stopped", innerActivity->id, ".stopped");
+	}
+	
+	// The <else> branch.
+	Transition *t3 = PN.newTransition(prefix + "caseo");
+	PN.newArc(PN.findPlace(phylum->id, ".internal.initial"), t3); // added ".internal" here
+
+	impl_tElse *elseBranch = phylum->tElse_1;
+
+	with (elseBranch)
+	{
+	  elseBranch=Else(innerActivity,_id2):
+	  {
+	    // embed inner activity
+            PN.newArc(t3, PN.findPlace(innerActivity->id, ".initial"));
+	    PN.mergePlaces(phylum->id, ".internal.final", innerActivity->id, ".final");
+	    PN.mergePlaces(phylum->id, ".internal.stop", innerActivity->id, ".stop");
+	    PN.mergePlaces(phylum->id, ".internal.stopped", innerActivity->id, ".stopped");
+	  }
+	  
+	  elseBranch=NoElse(_id2):
+	  {
+	    PN.newArc(t3, PN.findPlace(phylum->id, ".internal.final"));
+	  }
+	  
+	  default: { /* do nothing */ }
+	}
+
+	break;
+      }
+
     case(petrinetsmall_enum):
       {
 	Place *p1 =  PN.newPlace(prefix + "initial");
@@ -990,5 +1057,5 @@ void PIf(impl_tIf* abstract_phylum, uview current_view)
   }
 
 
-  footer(phylum->id);
+  footer(phylum->id, true);
 }      

@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2006/12/04 16:32:02 $
+ * \date    \$Date: 2006/12/05 13:58:00 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  */
 %}
 
@@ -82,7 +82,7 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
   impl_tProcess_Process* phylum = static_cast<impl_tProcess_Process*>(abstract_phylum);
   assert(phylum != NULL);
 
-  header(phylum->id);
+  header(phylum->id, true);
   string prefix = toString(phylum->id) + ".internal.";
 
 
@@ -493,7 +493,7 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
   }
 
 
-  footer(phylum->id);
+  footer(phylum->id, true);
 }
 
 
@@ -508,7 +508,7 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
   impl_tScope_Scope* phylum = static_cast<impl_tScope_Scope*>(abstract_phylum);
   assert(phylum != NULL);
 
-  header(phylum->id);
+  header(phylum->id, true);
   string prefix = toString(phylum->id) + ".internal.";
 
 
@@ -1031,7 +1031,7 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
   }
 
 
-  footer(phylum->id);
+  footer(phylum->id, true);
 }
 
 
@@ -1039,7 +1039,7 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
 
 
 /******************************************************************************
-  PROCESS
+  STOP PATTERNS
 ******************************************************************************/
 
 void PStop(impl_tStop* abstract_phylum, uview current_view)

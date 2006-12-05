@@ -1,4 +1,4 @@
-BEGIN OF AUTHORS file for BPEL2oWFN Version 1.2
+BEGIN OF AUTHORS file for BPEL2oWFN Version 2.0
 
 Authors and Acknowledgements
 ****************************
@@ -6,28 +6,53 @@ Authors and Acknowledgements
 Authors
 =======
 
-BPEL2oWFN was written by:
+GNU BPEL2oWFN was written by:
    * Niels Lohmann (Humboldt-Universita"t zu Berlin)
 
    * Christian Gierds (Humboldt-Universita"t zu Berlin)
 
-   * Dennis Reinert (Humboldt-Universita"t zu Berlin)
-
 The Petri net patterns were created by:
    * Christian Stahl (Humboldt-Universita"t zu Berlin)
+
+   * Niels Lohmann (Humboldt-Universita"t zu Berlin)
+
+Other code was contributed by:
+   * Dennis Reinert (Humboldt-Universita"t zu Berlin)
 
 Acknowledgements
 ================
 
 We would like to thank:
+   * Maarten Boote (Technische Universiteit Eindhoven) for integrating
+     GNU BPEL2oWFN to LaQuSo
+
+   * Jan Bretschneider (Humboldt-Universita"t zu Berlin) for patient C++
+     help.
+
+   * Dirk Fahland (Humboldt-Universita"t zu Berlin) for fruitful
+     discussions about BPEL's semantics
+
+   * Carsten Frenkler (Gedilan Technologies) for challenging BPEL
+     processes
+
+   * Mario Karrenbrock (FH Wilhelmshaven) for finding bugs.
+
+   * Dieter Ko"nig (IBM) for valuable advice concerning BPEL
+
+   * Oliver Kopp (Universita"t Stuttgart) for challenging BPEL processes
+
+   * Axel Martens (IBM) for valuable advice concerning BPEL
+
    * Simon Moser (IBM) for valuable advice concerning BPEL
 
    * Michael Piefel (Humboldt-Universita"t zu Berlin) for help with
      Kimwitu++
 
-   * Oliver Kopp (Universita"t Stuttgart) for challenging BPEL processes
+   * Eric Verbeek (Technische Universiteit Eindhoven) for integrating
+     GNU BPEL2oWFN to the ProM framework and valuable comments on
+     BPEL's link semantics
 
-BPEL2oWFN is part of the Tools4BPEL project funded by the German
+GNU BPEL2oWFN is part of the Tools4BPEL project funded by the German
 Bundesministerium fu"r Bildung und Forschung.
 
 Contact Person
@@ -52,26 +77,13 @@ Phone
 Fax
      (+49) (30) 2093-3067
 
-----------------------------------------------------------------------
+Copyright
+=========
 
-Copyright (C) 2005, 2006 Niels Lohmann, Christian Gierds and Dennis
-Reinert.
+Copyright (C) 2005, 2006 Niels Lohmann
 
-This file is part of BPEL2oWFN, a tool translating a web service
-described into BPEL to an open workflow net (oWFN).
+     Copying and distribution of this file, with or without
+     modification, are permitted in any medium without royalty provided
+     the copyright notice and this notice are preserved.
 
-BPEL2oWFN is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 2 of the License, or (at your
-option) any later version.
-
-BPEL2oWFN is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-General Public License for more details.
-
-You should have received a copy of the GNU General Public License along
-with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51
-Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
-
-END OF AUTHORS file for BPEL2oWFN Version 1.2
+END OF AUTHORS file for BPEL2oWFN Version 2.0

@@ -8,7 +8,7 @@
 @c ----------------------------------------------------------------------------
 
 @copying
-
+@ifnotplaintext
 @b{About this document:}
 
 This manual describes the installation of GNU BPEL2oWFN, version
@@ -44,6 +44,17 @@ of GNU BPEL2oWFN, @url{http://www.gnu.org/software/bpel2owfn}.
 GNU BPEL2oWFN is part of the Tools4@acronym{BPEL} project funded by
 the Bundesministerium f@"ur Bildung und Forschung. See
 @url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
+@end ifnotplaintext
+
+@ifplaintext
+@section Copyright
+Copyright @copyright{} 2005, 2006 Niels Lohmann
+@quotation
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+@end quotation
+@end ifplaintext
 @end copying
 
 @c ----------------------------------------------------------------------------
@@ -246,6 +257,7 @@ checking whether build environment is sane... yes
 checking for a thread-safe mkdir -p... /usr/bin/mkdir -p
 checking for gawk... gawk
 checking whether make sets $(MAKE)... yes
+checking build system type... i686-pc-cygwin
 checking for style of include used by make... GNU
 checking for g++... g++
 checking for C++ compiler default output file name... a.exe
@@ -323,7 +335,6 @@ config.status: creating doc/Makefile
 config.status: creating src/Makefile
 config.status: creating tests/Makefile
 config.status: creating src/bpel2owfn.h
-config.status: src/bpel2owfn.h is unchanged
 config.status: executing depfiles commands
 @end smallexample
 @c @end cartouche
@@ -348,19 +359,20 @@ to compile the executable binary as well as a documentation file.
 make check
 @end smallexample
 
-to self-test the created binary. After many lines of output @code{make check}
-should announce
+to self-test the created binary. After many lines of output@footnote{Unless 
+the testscript displays error messages warnings of GNU BPEL2oWFN can be
+ignored.} @code{make check} should announce
 
 @c @cartouche
 @smallexample
 ==================
-All 2 tests passed
+All 5 tests passed
 ==================
 @end smallexample
 @c @end cartouche
 
 or, if anything went wrong, prints error message and requests to report the
-encountered bug to @email{nlohmann@@informatik.hu-berlin.de}.
+encountered bug to @email{bug-bpel2owfn@@gnu.org}.
 @end enumerate
 
 @section Installation
@@ -419,7 +431,7 @@ such as Microsoft Windows (running Cygwin), @acronym{GNU}/Linux, Apple Mac OS X
 and Sun Solaris. Anyway, if the compilation fails please make sure you use the
 most recent (stable) versions of the @acronym{GNU} Compiler Collection. If this
 does not help please send us an electronic mail to
-@email{nlohmann@@informatik.hu-berlin.de}. Include the version number of your
+@email{bug-bpel2owfn@@gnu.org}. Include the version number of your
 distribution (version @value{VERSION} of @value{UPDATED}). Also include in your
 message the output that the make process produced. We will try to answer your
 mail within a week.
@@ -765,6 +777,7 @@ about BPEL's semantics
 @item Carsten Frenkler (Gedilan Technologies) for challenging @acronym{BPEL}
 processes
 @item Mario Karrenbrock (FH Wilhelmshaven) for finding bugs.
+@item Dieter K@"onig (IBM) for valuable advice concerning @acronym{BPEL}
 @item Oliver Kopp (Universit@"at Stuttgart) for challenging @acronym{BPEL}
 processes
 @item Axel Martens (IBM) for valuable advice concerning @acronym{BPEL}

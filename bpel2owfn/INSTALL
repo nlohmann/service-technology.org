@@ -1,25 +1,25 @@
-BEGIN OF INSTALL file for BPEL2oWFN Version 1.2
+BEGIN OF INSTALL file for BPEL2oWFN Version 2.0
 
 Setup and Installation
 **********************
 
-The distribution environment of BPEL2oWFN was created using the GNU
+The distribution environment of GNU BPEL2oWFN was created using the GNU
 Autotools. If you are familiar with the setup and installation
 procedure of any GNU tool you may skip this section.
 
 Setup
 =====
 
-To setup the installation environment and to compile BPEL2oWFN simply
-follow these steps:
+To setup the installation environment and to compile GNU BPEL2oWFN
+simply follow these steps:
 
   1. Unpack the source tarball by entering(1)
 
-          gunzip bpel2owfn-1.2.tar.gz
-          tar xf bpel2owfn-1.2.tar
+          gunzip bpel2owfn-2.0.tar.gz
+          tar xf bpel2owfn-2.0.tar
 
   2. Enter that directory:
-          cd bpel2owfn-1.2
+          cd bpel2owfn-2.0
 
   3. Run the configure shell script which attempts to guess correct
      values for various system-dependent variables used during
@@ -32,8 +32,11 @@ follow these steps:
 
           checking for a BSD-compatible install... /usr/bin/install -c
           checking whether build environment is sane... yes
+          checking for a thread-safe mkdir -p... /usr/bin/mkdir -p
           checking for gawk... gawk
           checking whether make sets $(MAKE)... yes
+          checking build system type... i686-pc-cygwin
+          checking for style of include used by make... GNU
           checking for g++... g++
           checking for C++ compiler default output file name... a.exe
           checking whether the C++ compiler works... yes
@@ -42,20 +45,68 @@ follow these steps:
           checking for suffix of object files... o
           checking whether we are using the GNU C++ compiler... yes
           checking whether g++ accepts -g... yes
-          checking for style of include used by make... GNU
           checking dependency style of g++... gcc3
+          checking for inline... inline
+          checking whether we are using the GNU C++ compiler... (cached) yes
+          checking whether g++ accepts -g... (cached) yes
+          checking dependency style of g++... (cached) gcc3
           checking for gcc... gcc
           checking whether we are using the GNU C compiler... yes
           checking whether gcc accepts -g... yes
-          checking for gcc option to accept ANSI C... none needed
+          checking for gcc option to accept ISO C89... none needed
           checking dependency style of gcc... gcc3
+          checking whether make sets $(MAKE)... (cached) yes
           checking for a BSD-compatible install... /usr/bin/install -c
+          checking how to run the C++ preprocessor... g++ -E
+          checking for grep that handles long lines and -e... /usr/bin/grep
+          checking for egrep... /usr/bin/grep -E
+          checking for ANSI C header files... yes
+          checking for sys/types.h... yes
+          checking for sys/stat.h... yes
+          checking for stdlib.h... yes
+          checking for string.h... yes
+          checking for memory.h... yes
+          checking for strings.h... yes
+          checking for inttypes.h... yes
+          checking for stdint.h... yes
+          checking for unistd.h... yes
+          checking for size_t... yes
+          checking for ANSI C header files... (cached) yes
+          checking assert.h usability... yes
+          checking assert.h presence... yes
+          checking for assert.h... yes
+          checking libintl.h usability... yes
+          checking libintl.h presence... yes
+          checking for libintl.h... yes
+          checking malloc.h usability... yes
+          checking malloc.h presence... yes
+          checking for malloc.h... yes
+          checking for stdlib.h... (cached) yes
+          checking for string.h... (cached) yes
+          checking for strings.h... (cached) yes
+          checking for unistd.h... (cached) yes
+          checking stddef.h usability... yes
+          checking stddef.h presence... yes
+          checking for stddef.h... yes
+          checking for pow... yes
+          checking for stdlib.h... (cached) yes
+          checking for GNU libc compatible realloc... yes
+          checking for stdbool.h that conforms to C99... yes
+          checking for _Bool... no
+          checking for an ANSI C-conforming const... yes
+          checking for error_at_line... no
+          checking for stdlib.h... (cached) yes
+          checking for GNU libc compatible malloc... yes
+          checking for working alloca.h... yes
+          checking for alloca... yes
+          checking for memset... yes
+          checking for bison... bison -y
           checking for flex... flex
           checking for yywrap in -lfl... yes
           checking lex output file root... lex.yy
           checking whether yytext is a pointer... no
-          checking for bison... bison
           checking for kc++... kc++
+          checking for dot... dot
           configure: creating ./config.status
           config.status: creating Makefile
           config.status: creating doc/Makefile
@@ -66,10 +117,10 @@ follow these steps:
 
      In some cases the configure script complains (i.e. warns) about
      tools which could not be found in your system path. In this case
-     please check *Note Needed Programs::. BPEL2oWFN can be compiled
-     without these tools.  However, you cannot make changes to large
-     parts of the programm as you will not be able to generate source
-     files without the tools.
+     please check *Note Needed Programs::. GNU BPEL2oWFN can be
+     compiled without these tools.  However, you cannot make changes to
+     large parts of the programm as you will not be able to generate
+     source files without the tools.
 
   4. After all Makefiles are created, run
 
@@ -81,26 +132,26 @@ follow these steps:
 
           make check
 
-     to self-test the created binary. After many lines of output `make
-     check' should announce
+     to self-test the created binary. After many lines of output(2)
+     `make check' should announce
 
           ==================
-          All 4 tests passed
+          All 5 tests passed
           ==================
 
      or, if anything went wrong, prints error message and requests to
-     report the encountered bug to <nlohmann@informatik.hu-berlin.de>.
+     report the encountered bug to <bug-bpel2owfn@gnu.org>.
 
 Installation
 ============
 
 After successful compilation and self tests an executable file
 `bpel2owfn' (or `bpel2owfn.exe' on systems running Microsoft Windows)
-is created in the directory `bpel2owfn-1.2/src' of the distribution.
+is created in the directory `bpel2owfn-2.0/src' of the distribution.
 This file has no dependencies to other files of the distribution and
 can be copied to any directory.
 
-Alternatively you can install BPEL2oWFN properly by executing (2)
+Alternatively you can install GNU BPEL2oWFN properly by executing (3)
 
      make install
 
@@ -127,19 +178,19 @@ Any warning during an in other respects successful compilation can be
 ignored -- these warnings mostly occur in generated files from Flex,
 Bison or Kimwitu++ and are outside of our scope.
 
-The compilation of BPEL2oWFN was tested on several operating systems
+The compilation of GNU BPEL2oWFN was tested on several operating systems
 such as Microsoft Windows (running Cygwin), GNU/Linux, Apple Mac OS X
 and Sun Solaris. Anyway, if the compilation fails please make sure you
-use the most recent (stable) versions of the GNU Compiler Collection,
-Flex, Bison and Kimwitu++. If this does not help please send us an
-electronic mail to <nlohmann@informatik.hu-berlin.de>. Include the
-version number of your distribution (version 1.2 of 6 April 2006). Also
-include in your message the output that the make process produced. We
-will try to answer your mail within a week.
+use the most recent (stable) versions of the GNU Compiler Collection.
+If this does not help please send us an electronic mail to
+<bug-bpel2owfn@gnu.org>. Include the version number of your
+distribution (version 2.0 of 4 December 2006). Also include in your
+message the output that the make process produced. We will try to
+answer your mail within a week.
 
-If you are not interested in compiling BPEL2oWFN yourself you can
+If you are not interested in compiling GNU BPEL2oWFN yourself you can
 alternatively download executable binaries for several operating
-systems on the website of BPEL2oWFN
+systems on the website of GNU BPEL2oWFN
 (`http://www.informatik.hu-berlin.de/top/tools4bpel/bpel2owfn').
 
 Makefile Targets
@@ -148,9 +199,9 @@ Makefile Targets
 The generated Makefiles serve different targets:
 
 `all'
-     Compile BPEL2oWFN and create an executable binary `bpel2owfn' (or
-     `bpel2owfn.exe' on systems running Microsoft Windows) in the
-     directory `bpel2owfn-1.2/src'.
+     Compile GNU BPEL2oWFN and create an executable binary `bpel2owfn'
+     (or `bpel2owfn.exe' on systems running Microsoft Windows) in the
+     directory `bpel2owfn-2.0/src'.
 
 `dvi'
 `html'
@@ -158,7 +209,7 @@ The generated Makefiles serve different targets:
 `ps'
      Generate documentation files in the given format which can be DVI,
      HTML, PDF or PostScript. The documentation is generated in the
-     directory `bpel2owfn-1.2/doc' and is named `bpel2owfn.FORMAT'
+     directory `bpel2owfn-2.0/doc' and is named `bpel2owfn.FORMAT'
      (User's Manual).
 
 `clean'
@@ -186,7 +237,10 @@ The generated Makefiles serve different targets:
 
 (1) Cygwin users should open a `tcsh'-shell before.
 
-(2) Usually, `make install' and `make uninstall' can only be executed
+(2) Unless the testscript displays error messages warnings of GNU
+BPEL2oWFN can be ignored.
+
+(3) Usually, `make install' and `make uninstall' can only be executed
 by the root user.
 
 Needed Programs
@@ -195,20 +249,20 @@ Needed Programs
 Required Programs
 =================
 
-To compile BPEL2oWFN you do not need any specific program other than
+To compile GNU BPEL2oWFN you do not need any specific program other than
 the GNU Compiler Collection. If you however want to change the program
 (e.g. add new Petri net patterns) you need the following programs to
-generate source code. These programs are (as BPEL2oWFN itself) free
+generate source code. These programs are (as GNU BPEL2oWFN itself) free
 software distributed under the GNU General Public License.
 
 Flex, A fast scanner generator
-     Flex is needed to generate the lexer of BPEL2oWFN. Flex was written
-     by Vern Paxon. Copyright (C) 1990 The Regents of the University of
-     California. All rights reserved. Flex is available under
-     `http://www.gnu.org/software/flex/flex.html'.
+     Flex is needed to generate the lexer of GNU BPEL2oWFN. Flex was
+     written by Vern Paxon. Copyright (C) 1990 The Regents of the
+     University of California. All rights reserved. Flex is available
+     under `http://www.gnu.org/software/flex/flex.html'.
 
 Bison, The YACC-compatible Parser Generator
-     Bison is needed to generate the parser of BPEL2oWFN. Bison was
+     Bison is needed to generate the parser of GNU BPEL2oWFN. Bison was
      written by Robert Corbett und Richard Stallman. Copyright (C) 1992,
      1998, 1999, 2003, 2004, 2005 Free Software Foundation, Inc. Bison
      is available under `http://www.gnu.org/software/bison/bison.html'.
@@ -217,16 +271,17 @@ Kimwitu++, The Term Processor
      Kimwitu++ is needed to generate all files managing the AST
      (abstract syntax tree). Kimwitu++ was written by Toby Neumann and
      Michael Piefel.  Copyright (C) 1988-1997  Axel Belinfante,
-     University of Twente.  Copyright (C) 1997-2000  Michael Piefel,
+     University of Twente.  Copyright (C) 1997-2003  Michael Piefel,
      Humboldt-University Berlin.  Kimwitu++ is available under
      `http://site.informatik.hu-berlin.de/kimwitu++'.
 
 Optional Programs
 =================
 
-BPEL2oWFN is a compiler and thus creating output files which can be
+GNU BPEL2oWFN is a compiler and thus creating output files which can be
 read by several other programs. These programs are not needed to compile
-BPEL2oWFN yet without these programs BPEL2oWFN makes not much sense.
+GNU BPEL2oWFN yet without these programs GNU BPEL2oWFN makes not much
+sense.
 
 LoLA, a Low Level Petri net Analyzer
      LoLA is an explicit model checker implementing a broad variety of
@@ -235,26 +290,21 @@ LoLA, a Low Level Petri net Analyzer
      is available under
      `http://www.informatik.hu-berlin.de/~kschmidt/lola.html'.
 
-The Model-Checking Kit
-     The Model-Checking Kit is a collection of programs which allow to
-     model a finite-state system using a variety of modelling
-     languages, and verify it using a variety of checkers, including
-     deadlock-checkers, reachability-checkers, and model-checkers for
-     the temporal logics CTL and LTL. The Model-Checking Kit is
-     maintained by Javier Esparza, Claus Schröter and Stefan Schwoon at
-     the University of Stuttgart and is available under
-     `http://www.fmi.uni-stuttgart.de/szs/tools/mckit'.
-
 Graphviz, the Graph Visualization Software
      Graphviz is a graph visualization software with several graph
      layout programs including dot. Graphviz is maintained by AT&T Labs
      and is available under `http://www.graphviz.org'.
 
+The Graphviz tool dot can be used to create a graphical representation
+of the generated Petri net in PNG (Portable Network Graphic) format. If
+dot is not found on your system, GNU BPEL2oWFN will only create a
+.dot-file and does not try to invoke dot.
+
 Reference System
 ================
 
-As of April 2006, we use the following system developing and building
-BPEL2oWFN:
+As of December 2006, we use the following system developing and
+building GNU BPEL2oWFN:
 
    * Intel Pentium M processor, 1.60 GHz
 
@@ -262,39 +312,26 @@ BPEL2oWFN:
 
    * Microsoft Windows XP Home Edition Service Pack 2
 
-   * Cygwin with cygwin.dll version 1.5.19-4
+   * Cygwin with cygwin.dll version 1.5.21
 
    * GNU Compiler Collection 3.4.4
 
    * Flex version 2.5.4
 
-   * GNU Bison version 2.1
+   * GNU Bison version 2.3
 
    * Kimwitu++ version 2.3.8
 
 The version numbers are not to be understood as system requirements,
 but as a help if you fail to compile the sources.
 
-----------------------------------------------------------------------
+Copyright
+=========
 
-Copyright (C) 2005, 2006 Niels Lohmann, Christian Gierds and Dennis
-Reinert.
+Copyright (C) 2005, 2006 Niels Lohmann
 
-This file is part of BPEL2oWFN, a tool translating a web service
-described into BPEL to an open workflow net (oWFN).
+     Copying and distribution of this file, with or without
+     modification, are permitted in any medium without royalty provided
+     the copyright notice and this notice are preserved.
 
-BPEL2oWFN is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 2 of the License, or (at your
-option) any later version.
-
-BPEL2oWFN is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-General Public License for more details.
-
-You should have received a copy of the GNU General Public License along
-with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51
-Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
-
-END OF INSTALL file for BPEL2oWFN Version 1.2
+END OF INSTALL file for BPEL2oWFN Version 2.0

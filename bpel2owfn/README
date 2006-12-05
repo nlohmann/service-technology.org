@@ -1,18 +1,18 @@
-BEGIN OF README file for BPEL2oWFN Version 1.2
+BEGIN OF README file for BPEL2oWFN Version 2.0
 
 About this Distribution
 ***********************
 
-This file describes this distribution of BPEL2oWFN, version 1.2, a tool
-translating business processes described in BPEL to open workflow nets
-(oWFN), last updated 6 April 2006.
+This file describes this distribution of GNU BPEL2oWFN, version 2.0, a
+tool translating business processes described in BPEL to open workflow
+nets (oWFN), last updated 4 December 2006.
 
-BPEL2oWFN is licensed under the GNU General Public License.
+GNU BPEL2oWFN is licensed under the GNU General Public License.
 
 Copyright (C) 2005, 2006 Niels Lohmann, Christian Gierds and Dennis
 Reinert.
 
-BPEL2oWFN is part of the Tools4BPEL project funded by the
+GNU BPEL2oWFN is part of the Tools4BPEL project funded by the
 Bundesministerium fu"r Bildung und Forschung. See
 `http://www.informatik.hu-berlin.de/top/tools4bpel' for details.
 
@@ -23,22 +23,22 @@ Files
 =====
 
 `AUTHORS'
-     A list of all authors of BPEL2oWFN as well as acknowledgements.
+     A list of all authors of GNU BPEL2oWFN as well as acknowledgements.
 
 `ChangeLog'
      The change log listing all changes made during the distribution
-     versions of BPEL2oWFN.
+     versions of GNU BPEL2oWFN.
 
 `COPYING'
-     The GNU General Public License (GPL) under which BPEL2oWFN is
-     distributed. The GPL is also a chapter of the User's Manual.
+     The GNU General Public License (GPL) under which GNU BPEL2oWFN is
+     distributed.
 
 `INSTALL'
      Setup and Installation instructions and all information needed to
-     bootstrap BPEL2oWFN.
+     bootstrap GNU BPEL2oWFN.
 
 `NEWS'
-     News concerning BPEL2oWFN or the Tools4BPEL project.
+     News concerning GNU BPEL2oWFN or the Tools4BPEL project.
 
 `README'
      This file.
@@ -52,41 +52,28 @@ Directories
 ===========
 
 `src'
-     The sources of BPEL2oWFN. Each file contains a short documentation
-     of what it does as well as Doxygen-styled comments (see
-     `http://www.stack.nl/~dimitri/doxygen' for details).
+     The sources of GNU BPEL2oWFN. Each file contains a short
+     documentation of what it does as well as Doxygen-styled comments
+     (see `http://www.stack.nl/~dimitri/doxygen' for details).
 
 `doc'
-     The documentation of BPEL2oWFN consisting of a manual and an
+     The documentation of GNU BPEL2oWFN consisting of a manual and an
      installation manual. The documentation is in Texinfo format and
      can be converted into many file formats using `make FORMAT' where
      `FORMAT' is a file format out of `dvi', `html', `pdf' or `ps'.
 
 `tests'
-     Several test processes to self-test BPEL2oWFN. The processes
+     Several test processes to self-test GNU BPEL2oWFN. The processes
      `loan.bpel', `purchase.bpel' and `shipping.bpel' were taken from
      the BPEL4WS 1.1 specification.
 
-----------------------------------------------------------------------
+Copyright
+=========
 
-Copyright (C) 2005, 2006 Niels Lohmann, Christian Gierds and Dennis
-Reinert.
+Copyright (C) 2005, 2006 Niels Lohmann
 
-This file is part of BPEL2oWFN, a tool translating a web service
-described into BPEL to an open workflow net (oWFN).
+     Copying and distribution of this file, with or without
+     modification, are permitted in any medium without royalty provided
+     the copyright notice and this notice are preserved.
 
-BPEL2oWFN is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 2 of the License, or (at your
-option) any later version.
-
-BPEL2oWFN is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-General Public License for more details.
-
-You should have received a copy of the GNU General Public License along
-with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51
-Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
-
-END OF README file for BPEL2oWFN Version 1.2
+END OF README file for BPEL2oWFN Version 2.0

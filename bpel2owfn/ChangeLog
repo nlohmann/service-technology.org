@@ -1,4 +1,4 @@
-BEGIN OF ChangeLog file for BPEL2oWFN Version 1.2
+BEGIN OF ChangeLog file for BPEL2oWFN Version 2.0
 
 Change Log
 **********
@@ -52,8 +52,8 @@ Version 1.1 (24 February 2006)
 
    - miscellaneous:
         * The compiler generator tools Flex, Bison and Kimwitu++ are
-          not any more necessary to compile BPEL2oWFN: the generated
-          sources are now part of the distrubution.
+          not any more necessary to compile GNU BPEL2oWFN: the
+          generated sources are now part of the distrubution.
 
         * The oWFN format was overworked and allows final markings.
 
@@ -106,27 +106,20 @@ Version 1.2 (6 April 2006)
         * Structural reduction rules no longer remove the loop
           transition for deadlock search.
 
+Version 2.0 (6 December 2006)
+-----------------------------
 
-----------------------------------------------------------------------
+   - miscellaneous:
+        * overworked architecture
 
-Copyright (C) 2005, 2006 Niels Lohmann, Christian Gierds and Dennis
-Reinert.
 
-This file is part of BPEL2oWFN, a tool translating a web service
-described into BPEL to an open workflow net (oWFN).
+Copyright
+=========
 
-BPEL2oWFN is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 2 of the License, or (at your
-option) any later version.
+Copyright (C) 2005, 2006 Niels Lohmann
 
-BPEL2oWFN is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-General Public License for more details.
+     Copying and distribution of this file, with or without
+     modification, are permitted in any medium without royalty provided
+     the copyright notice and this notice are preserved.
 
-You should have received a copy of the GNU General Public License along
-with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51
-Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
-
-END OF ChangeLog file for BPEL2oWFN Version 1.2
+END OF ChangeLog file for BPEL2oWFN Version 2.0

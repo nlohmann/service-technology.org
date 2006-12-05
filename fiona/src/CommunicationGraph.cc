@@ -752,7 +752,7 @@ void communicationGraph::printOGFile() const {
     printNodesToOGFile(root, ogFile, visitedNodes);
     ogFile << ';' << endl << endl;
 
-    ogFile << "INITIAL NODE" << endl;
+    ogFile << "INITIALNODE" << endl;
     ogFile << "  " << NodeNameForOG(root) << ';' << endl << endl;
 
     ogFile << "TRANSITIONS" << endl;

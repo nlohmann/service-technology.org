@@ -24,17 +24,17 @@
  * \brief   Petri Net API: base functions
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/12/04 15:28:19 $
+ * \date    \$Date: 2006/12/05 14:25:29 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.163 $
+ * \version \$Revision: 1.164 $
  *
  * \ingroup petrinet
  */
@@ -218,6 +218,7 @@ PetriNet::PetriNet()
  */
 PetriNet::~PetriNet()
 {
+/*
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
     delete *p;
 
@@ -228,6 +229,7 @@ PetriNet::~PetriNet()
     delete *f;
 
   roleMap.clear();
+  */
 }
 
 
@@ -929,6 +931,7 @@ void PetriNet::connectNet(PetriNet * net)
     bool finished = false;
     while ( ! finished && oPlace != P_out.end())
     {
+        
       if ((*oPlace)->nodeName().erase(0,4) != (*place)->nodeShortName().erase(0,3))
 	oPlace++;
       else

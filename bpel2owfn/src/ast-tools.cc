@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/11/30 11:31:39 $
+ * \date    \$Date: 2006/12/05 08:21:10 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.45 $
+ * \version \$Revision: 1.46 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -449,7 +449,7 @@ void dpeLinks(Transition *t, int id)
       linkID++)
   {
     assert(ASTEmap[*linkID] != NULL);
-    string linkName = ASTEmap[*linkID]->attributes["name"];
+    string linkName = ASTEmap[*linkID]->linkName;
     PN.newArc(t, PN.findPlace("!link." + linkName));
   }
 

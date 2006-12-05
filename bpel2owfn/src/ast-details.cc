@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/12/01 10:44:04 $
+ * \date    \$Date: 2006/12/05 08:21:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.67 $
+ * \version \$Revision: 1.68 $
  */
 
 
@@ -800,8 +800,10 @@ void ASTE::defineVariable()
 
 /*!
  * \brief defines a link
+ *
+ * \return the unique name of the link
  */
-void ASTE::defineLink()
+std::string ASTE::defineLink()
 {
   extern set<string> linkNames;
 
@@ -812,6 +814,8 @@ void ASTE::defineLink()
     SAerror(64, attributes["name"], attributes["referenceLine"]);
   else
     linkNames.insert(name);
+
+  return name;
 }
 
 

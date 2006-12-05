@@ -9,3 +9,6 @@ configure
 *.owfn
 *.out
 *.png
+depcomp
+install-sh
+missing

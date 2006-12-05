@@ -8,3 +8,5 @@ stamp-h1
 syntax.cc
 fiona.exe.stackdump
 gmon.out
+lexer.h
+syntax.h

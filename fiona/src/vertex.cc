@@ -84,7 +84,7 @@ vertex::~vertex() {
 //! \fn unsigned int vertex::getNumber()
 //! \return number of this node
 //! \brief returns the number of this node
-unsigned int vertex::getNumber() {
+unsigned int vertex::getNumber() const {
     return numberOfVertex;
 }
 
@@ -208,6 +208,9 @@ string vertex::getCNF() {
 	bool mal = false;
 	
 	CNF * cl = annotation;
+
+	if ((cl == NULL) && (getColor() == RED))
+		return "(false)";
 	
 	while (cl) {
 		CNFStringTemp = "";

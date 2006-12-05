@@ -85,7 +85,7 @@ public:
 	int * eventsUsed;
 	int eventsToBeSeen;
 	
-    unsigned int getNumber();
+    unsigned int getNumber() const;
     
     StateSet reachGraphStateSet;		// this set contains only a reduced number of states in case the state reduced graph is to be build
 //    StateSet setOfStatesTemp;	// this set contains all states

@@ -344,6 +344,7 @@ int main(int argc, char ** argv) {
 		                
 		            graph->printNodeStatistics();
 			        graph->printDotFile();
+			        graph->printOGFile();
 			        
 			        if (options[O_BDD] == true) {
 						trace(TRACE_0, "\nbuilding the BDDs...\n");

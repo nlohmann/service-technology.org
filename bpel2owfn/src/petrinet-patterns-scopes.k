@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2006/12/05 13:58:00 $
+ * \date    \$Date: 2006/12/05 14:14:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  */
 %}
 
@@ -1021,8 +1021,8 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
 
   
 	// Embed the inner activity.
-	PN.mergePlaces(phylum->id, ".internal.running", phylum->activity_1->id, ".initial");
-	PN.mergePlaces(phylum->id, ".internal.done", phylum->activity_1->id, ".final");	
+	PN.mergePlaces(phylum->id, ".internal.initial", phylum->activity_1->id, ".initial");
+	PN.mergePlaces(phylum->id, ".internal.final", phylum->activity_1->id, ".final");	
 
 	break;
       }

@@ -28,13 +28,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/11/29 15:21:07 $
+ * \date    \$Date: 2006/12/05 09:21:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.47 $
+ * \version \$Revision: 1.48 $
  *
  * \ingroup debug
  */
@@ -294,6 +294,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
 
     case(78):
       { cerr << "`" << information << "' does not refer to a <scope> or an <invoke> activity" << endl;
+	break; }
+
+    case(79):
+      { cerr << "root <scope> inside <" << information << "> must not have a <compensationHandler>" << endl;
 	break; }
 
     case(80):

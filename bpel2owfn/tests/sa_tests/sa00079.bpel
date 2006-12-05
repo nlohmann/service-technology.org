@@ -1,0 +1,34 @@
+<process name="SA00079" targetNamespace="none">
+  
+  <faultHandlers>
+    <catchAll>
+      <scope name="A">
+	<compensationHandler>
+	  <empty />
+	</compensationHandler>
+	<empty />
+      </scope>
+    </catchAll>
+  </faultHandlers>
+
+  <scope>
+    <compensationHandler>
+      <scope>
+	<compensationHandler>
+	  <empty />
+	</compensationHandler>
+	<empty />
+      </scope>
+    </compensationHandler>
+    <terminationHandler>
+      <scope>
+	<compensationHandler>
+	  <empty />
+	</compensationHandler>
+	<empty />
+      </scope>
+    </terminationHandler>
+    <empty />
+  </scope>
+
+</process>

@@ -29,7 +29,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/12/05 08:21:10 $
+ * \date    \$Date: 2006/12/05 09:21:06 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.110 $
+ * \version \$Revision: 1.111 $
  */
 %}
 
@@ -311,9 +311,7 @@ CatchAll(a,_id) ->
       int myid = _id->value;
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
-cerr <<ASTEmap[a->id]->parentActivityId<<endl;
       ASTEmap[a->id]->parentActivityId = myid;
-cerr <<ASTEmap[a->id]->parentActivityId<<endl;
     }
     a
     {
@@ -478,14 +476,15 @@ userDefinedCompensationHandler(a,_id) ->
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
 
-
+      // trigger SA00079
       vector<unsigned int> ancestors = myself->ancestorActivities();
-//      cerr << ASTEmap[ancestors[0]]->activityTypeName() << endl;
-//      cerr << ASTEmap[ancestors[1]]->activityTypeName() << endl;
-      for (vector<unsigned int>::iterator ancestor = ancestors.begin(); ancestor != ancestors.end(); ancestor++)
-        cerr << ASTEmap[*ancestor]->activityTypeName() << endl;
-cerr << endl;
-
+      assert(ancestors.size() > 1);
+      string ancestor = ASTEmap[ancestors[1]]->activityTypeName();
+      if (ancestor == "catch" ||
+	  ancestor == "catchAll" ||
+	  ancestor == "terminationHandler" ||
+	  ancestor == "compensationHandler")
+	SAerror(79, ancestor);
     }
   ]
 ;

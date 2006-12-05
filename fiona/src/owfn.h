@@ -144,6 +144,9 @@ class oWFN  {
 
 //		void addStateToList(vertex *, State *, bool);
 		void addSuccStatesToList(vertex *, State *);
+		
+		void addSuccStatesToListStubborn(StateSet &, owfnPlace * , State *, vertex *);
+		
 		void addSuccStatesToListOrig(vertex *, State *);
 		
 //		void addStateToList(vertex *, State *);
@@ -159,6 +162,7 @@ class oWFN  {
 		void copyMarkingToCurrentMarking(unsigned int * copy);
 		void calculateReachableStatesOutputEvent(vertex *, bool, owfnPlace *);
 		void calculateReachableStatesInputEvent(vertex *, bool);
+		void calculateReachableStates(StateSet&, owfnPlace *, vertex *);
 		void calculateReachableStatesFull(vertex *);
 		
 		void addInputMessage(unsigned int);

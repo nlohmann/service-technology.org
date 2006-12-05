@@ -503,25 +503,40 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
   	PN->visitedStates.clear();
 
     for (iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
-        
         (*iter)->decode(PN);
+
+        cout << "after decode: " << endl;
+        PN->printmarking();
         
-        if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
-            owfnPlace * outputPlace;
-            
+        // if there is a state for which an output event was activated, catch that state
+        if (options[O_CALC_ALL_STATES]) {
+        	if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
+            	PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
+        	}
+        } else {
+        	owfnPlace * outputPlace;
+        
 			// CHANGE THAT!!!!!!!!!!! is just a hack, stubborn set method does not yet work for more than one output event!
 			for (messageMultiSet::iterator iter = output.begin(); iter != output.end(); iter++) {
 				outputPlace = PN->Places[*iter];
 			}
-            
-            // if there is a state for which an output event was activated, catch that state
-            if (options[O_CALC_ALL_STATES]) {
-                PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
-            } else {
-                PN->calculateReachableStatesOutputEvent(newNode, true, outputPlace);   // calc the reachable states from that marking
-            }
+	        // end hack
+
+			StateSet stateSet;
+			// calculate temporary state set with the help of stubborn set method
+			PN->calculateReachableStates(stateSet, outputPlace, newNode);	
+
+			for (StateSet::iterator iter2 = stateSet.begin(); iter2 != stateSet.end(); iter2++) {		
+		        cout << "--> in node " << node->getNumber() << " for message " << outputPlace->name << " we calculated marking: " << endl;
+		        PN->printmarking();
+				(*iter2)->decode(PN); // get the marking of the state
+				if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
+					PN->calculateReachableStatesOutputEvent(newNode, true, outputPlace);   // calc the reachable states from that marking
+				}
+			}
         }
     }
+    
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) : end\n");
 }
 

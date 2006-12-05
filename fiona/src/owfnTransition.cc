@@ -414,6 +414,8 @@ void owfnTransition::excludeTransitionFromQuasiEnabledList(oWFN * PN) {
 //! \brief check whether this transition is (quasi) enabled at the current marking
 //! quasi-enabled means, that this transition activates a sending event (this transition is a receiving transition)
 void owfnTransition::check_enabled(oWFN * PN) {
+   	trace(TRACE_5, "owfnTransition::check_enabled(oWFN * PN) : start\n");
+
 	owfnPlace* * p;
 	unsigned int *i;
 
@@ -489,5 +491,7 @@ void owfnTransition::check_enabled(oWFN * PN) {
 	}
 	// cout << "current marking: " << PN->printCurrentMarkingForDot() << endl;
 	// cout << "transition " << name << " is quasiEnabled: " << quasiEnabled << " and enabled: " << enabled << endl;
+
+   	trace(TRACE_5, "owfnTransition::check_enabled(oWFN * PN) : end\n");
 }
 

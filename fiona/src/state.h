@@ -49,7 +49,9 @@ public:
 	~State();
 	static unsigned int card;         // number of states
 	unsigned int CardFireList;        // number of transitions to be fired
+	unsigned int CardStubbornFireList;        // number of transitions to be fired
 	owfnTransition ** firelist;       // Transitions to be fired
+	owfnTransition ** stubbornFirelist; // Transitions to be fired in the stubborn set
 	owfnTransition ** quasiFirelist;  // Transitions that are quasi enabled
 	unsigned int current;             // Nr of last already fired element of firelist
   	unsigned int * myMarking;       // current marking at that state

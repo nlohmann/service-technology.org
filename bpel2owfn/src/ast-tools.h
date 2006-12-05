@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/11/29 13:42:59 $
+ * \date    \$Date: 2006/12/05 11:51:08 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -98,9 +98,11 @@ void footer(int id, bool indent = false);
 
 // extern map< pair< unsigned int, unsigned int >, activityRelationType > activityRelationMap;
 
-activityRelationType activityRelation(unsigned int a, unsigned int b);
-void conflictingActivities(unsigned int a, unsigned int b);
+activityRelationType activityRelation( unsigned int a, unsigned int b );
+void conflictingActivities( unsigned int a, unsigned int b );
 void enterConflictingActivities( set< unsigned int > a, set< unsigned int > b );
+void enclosedActivities( unsigned int a, unsigned int b );
+void enterEnclosedActivities( unsigned int a, set< unsigned int > b );
 
 
 /******************************************************************************

@@ -25,11 +25,11 @@
  * \brief   AST postprocessor (implementation)
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/12/05 09:21:06 $
+ * \date    \$Date: 2006/12/05 11:51:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.111 $
+ * \version \$Revision: 1.112 $
  */
 %}
 
@@ -243,6 +243,7 @@ userDefinedFaultHandler(a,b,_id) ->
     {
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
 
       foreach(branch=Catch(innerActivity,_id2); tCatch_list a)
       {
@@ -301,6 +302,7 @@ Catch(a,_id) ->
     {
       myself->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
       myself->enclosedActivities.insert( a->id );
+      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -317,6 +319,7 @@ CatchAll(a,_id) ->
     {
       myself->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
       myself->enclosedActivities.insert( a->id );
+      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -373,6 +376,7 @@ userDefinedEventHandler(a,b,_id) ->
     {
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -410,6 +414,7 @@ OnMessage(a,b,c,_id) ->
     {
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -432,6 +437,7 @@ OnAlarm(a,_id) ->
     {
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -475,6 +481,7 @@ userDefinedCompensationHandler(a,_id) ->
     {
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
 
       // trigger SA00079
       vector<unsigned int> ancestors = myself->ancestorActivities();
@@ -514,6 +521,7 @@ TerminationHandler(a,_id) ->
     {
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -1170,6 +1178,7 @@ Flow(a,b,c,_id) ->
 
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -1269,6 +1278,7 @@ Switch(a,b,c,_id) ->
 
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -1287,6 +1297,7 @@ Case(a,_id) ->
     {
       myself->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
       myself->enclosedActivities.insert( a->id );
+      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -1304,6 +1315,7 @@ Otherwise(a,_id) ->
     {
       myself->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
       myself->enclosedActivities.insert( a->id );
+      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -1371,6 +1383,7 @@ If(a,b,c,_id) ->
 
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -1389,6 +1402,7 @@ ElseIf(a,_id) ->
     {
       myself->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
       myself->enclosedActivities.insert( a->id );
+      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -1406,6 +1420,7 @@ Else(a,_id) ->
     {
       myself->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
       myself->enclosedActivities.insert( a->id );
+      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -1454,6 +1469,7 @@ While(a,b,_id) ->
 
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -1502,6 +1518,7 @@ RepeatUntil(a,b,_id) ->
 
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -1555,6 +1572,7 @@ Sequence(a,b,_id) ->
 
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -1647,6 +1665,7 @@ Pick(a,b,c,_id) ->
 
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -1734,6 +1753,7 @@ ForEach(a,b,c,d,e,_id) ->
 
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -1839,6 +1859,7 @@ Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
 
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -1940,3 +1961,4 @@ Source(a) ->
     }
   ]
 ;
+

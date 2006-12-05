@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2006/12/04 16:32:01 $
+ * \date    \$Date: 2006/12/05 12:58:53 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  */
 %}
 
@@ -136,13 +136,13 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	Place *p5 = PN.newPlace(prefix + "stop");
 	Place *p6 = PN.newPlace(prefix + "stopped");
 
-	Transition *t1 = PN.newTransition(prefix + "t1");
+	Transition *t1 = PN.newTransition(prefix + "read_var");
 	PN.newArc(p1, t1); 
 	PN.newArc(t1, p2);
 	if (!parameters[P_NOVARIABLES])
 	  PN.newArc(PN.findPlace("variable." + ASTEmap[phylum->id]->inputVariableName), t1, READ);
 
-	Transition *t2 = PN.newTransition(prefix + "t2");
+	Transition *t2 = PN.newTransition(prefix + "invoke");
 	PN.newArc(p2, t2);
 	PN.newArc(t2, p3);
 	PN.newArc(t2, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
@@ -210,23 +210,23 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	Place *p7 = PN.newPlace(prefix + "stop");
 	Place *p8 = PN.newPlace(prefix + "stopped");
 
-	Transition *t1 = PN.newTransition(prefix + "t1");
+	Transition *t1 = PN.newTransition(prefix + "read_var");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
 	if (!parameters[P_NOVARIABLES])
 	  PN.newArc(PN.findPlace("variable." + ASTEmap[phylum->id]->inputVariableName), t1, READ);
 
-	Transition *t2 = PN.newTransition(prefix + "t2");
+	Transition *t2 = PN.newTransition(prefix + "invoke_out");
 	PN.newArc(t2, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
 	PN.newArc(p2, t2);
 	PN.newArc(t2, p3);
 
-	Transition *t3 = PN.newTransition(prefix + "t3");
+	Transition *t3 = PN.newTransition(prefix + "invoke_in");
 	PN.newArc(PN.findPlace("in." + ASTEmap[phylum->id]->channelName), t3);
 	PN.newArc(p3, t3);
 	PN.newArc(t3, p4);
 
-	Transition *t4 = PN.newTransition(prefix + "t4");
+	Transition *t4 = PN.newTransition(prefix + "save_var");
 	PN.newArc(p4, t4);
 	PN.newArc(t4, p5);
 	if (!parameters[P_NOVARIABLES])
@@ -311,12 +311,12 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
 	Place *p5 = PN.newPlace(prefix + "stop");
 	Place *p6 = PN.newPlace(prefix + "stopped");
 
-	Transition *t1 = PN.newTransition(prefix + "t1");
+	Transition *t1 = PN.newTransition(prefix + "receive");
 	PN.newArc(PN.findPlace("in." + ASTEmap[phylum->id]->channelName), t1);
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
 
-	Transition *t2 = PN.newTransition(prefix + "t2");
+	Transition *t2 = PN.newTransition(prefix + "save_var");
 	PN.newArc(p2, t2);
 	PN.newArc(t2, p3);
 	if (!parameters[P_NOVARIABLES])
@@ -389,13 +389,13 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
 	Place *p5 = PN.newPlace(prefix + "stop");
 	Place *p6 = PN.newPlace(prefix + "stopped");
 
-	Transition *t1 = PN.newTransition(prefix + "t1");
+	Transition *t1 = PN.newTransition(prefix + "read_var");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
 	if (!parameters[P_NOVARIABLES])
 	  PN.newArc(PN.findPlace("variable." + ASTEmap[phylum->id]->variableName), t1, READ);
 
-	Transition *t2 = PN.newTransition(prefix + "t2");
+	Transition *t2 = PN.newTransition(prefix + "reply");
 	PN.newArc(t2, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
 	PN.newArc(p2, t2);
 	PN.newArc(t2, p3);

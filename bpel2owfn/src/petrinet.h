@@ -24,17 +24,17 @@
  * \brief   Petri Net API
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nlohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/06 14:10:20 $
+ * \date    \$Date: 2006/12/06 22:15:28 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.118 $
+ * \version \$Revision: 1.119 $
  *
  * \ingroup petrinet
  */
@@ -362,12 +362,8 @@ class PetriNet
     Transition *newTransition(std::string my_role);
   
     /// adds an arc given source and target node, and arc type
-    Arc *newArc(Node *my_source, Node *my_target, arc_type my_type = STANDARD, unsigned int my_weight = 1);
+    Arc *newArc(Node *my_source, Node *my_target, arc_type my_type = STANDARD, unsigned int my_weight = 1);   
 
-
-    /// outputs the Petri net
-    friend std::ostream& operator<< (std::ostream& os, const PetriNet &obj);
-    
 
     /// merges two places
     void mergePlaces(Place *p1, Place *p2);
@@ -401,8 +397,8 @@ class PetriNet
     /// adds a prefix to the name of all nodes of the net
     void addPrefix(std::string prefix);
 
-    /// connects a second oWFN
-    void connectNet(PetriNet & net);
+    /// composes a second Petri net
+    void compose(PetriNet &net);
 
     /// moves channel places to the list of internal places
     void makeChannelsInternal();
@@ -419,11 +415,17 @@ class PetriNet
     /// calculate the maximal occurrences of communication
     void calculate_max_occurrences();
     
+
+    /// outputs the Petri net
+    friend std::ostream& operator<< (std::ostream& os, const PetriNet &obj);
+
     /// constructor
     PetriNet();
 
+    /// copy constructor
     PetriNet(const PetriNet &);
 
+    /// assignment operator
     PetriNet & operator=(const PetriNet &);
 
     /// destructor

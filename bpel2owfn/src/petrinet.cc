@@ -24,17 +24,17 @@
  * \brief   Petri Net API: base functions
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nlohmann $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/12/06 14:10:20 $
+ * \date    \$Date: 2006/12/06 22:15:28 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.167 $
+ * \version \$Revision: 1.168 $
  *
  * \ingroup petrinet
  */
@@ -1088,7 +1088,7 @@ void PetriNet::addPrefix(string prefix)
 /*!
  * \todo gierds: comment me!
  */
-void PetriNet::connectNet(PetriNet & net)
+void PetriNet::compose(PetriNet &net)
 {
   // add all internal places
   for (set< Place * >::iterator place = net.P.begin(); place != net.P.end(); place ++)

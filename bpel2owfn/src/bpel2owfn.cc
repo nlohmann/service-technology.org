@@ -24,18 +24,18 @@
  * \brief   BPEL2oWFN's main
  * 
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nlohmann $
  * 
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/06 14:10:20 $
+ * \date    \$Date: 2006/12/06 22:15:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.131 $
+ * \version \$Revision: 1.132 $
  */
 
 
@@ -227,10 +227,8 @@ int main( int argc, char *argv[])
 	  }
 	  
 	  PN.addPrefix(prefix);
-	  PN2.connectNet(PN);
-
+	  PN2.compose(PN);
 	  PN = PetriNet();
-//	  assert(TheNet != NULL);
 
 	  AST = NULL;
 	}
@@ -256,6 +254,10 @@ int main( int argc, char *argv[])
 
     file++;
   } while (modus == M_CONSISTENCY && file != inputfiles.end());
+
+
+
+
 
 
   if (modus == M_CONSISTENCY)

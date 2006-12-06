@@ -24,17 +24,17 @@
  * \brief   Petri Net API: base functions
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nlohmann $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/12/05 14:25:29 $
+ * \date    \$Date: 2006/12/06 10:57:47 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.164 $
+ * \version \$Revision: 1.165 $
  *
  * \ingroup petrinet
  */
@@ -53,6 +53,10 @@
 #include "petrinet.h"
 #include "helpers.h"		// helper functions
 #include "debug.h"		// debug functions
+
+#ifdef USING_BPEL2OWFN
+#include "ast-details.h"
+#endif
 
 
 
@@ -170,6 +174,7 @@ Place::Place(unsigned int my_id, string my_role, communication_type my_type)
   id = my_id;
   nodeType = PLACE;
   tokens = 0;
+  max_occurrences = 0;
 
   if (my_role != "")
     history.push_back(my_role);
@@ -1029,4 +1034,73 @@ void PetriNet::reenumerate()
   currentId = 1;
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
     (*t)->id = currentId++;
+}
+
+
+
+
+
+/*!
+ * Calculates the maximal number each communication place can be used, i.e. the
+ * maximal occurrences of transitions in the preset (postset) of output (input)
+ * places. This number is determined by postprocessing the AST.
+ *
+ * \post All communication places have max_occurrences values between 0
+ *       (initial value) and UINT_MAX (maximal value).
+ */
+void PetriNet::calculate_max_occurrences()
+{
+  extern map<unsigned int, ASTE*> ASTEmap;
+
+  // process the input places
+  for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
+  {
+    set<Node *> receiving_transitions = postset(*p);
+    for (set<Node *>::iterator t = receiving_transitions.begin(); t != receiving_transitions.end(); t++)
+    {
+      unsigned int max_occurrences;
+      for (unsigned int i = 0; i < (*t)->history.size(); i++)
+      {
+	unsigned int transition_activity_id = toUInt((*t)->history[i].substr(0, (*t)->history[i].find_first_of(".")));
+	assert(ASTEmap[transition_activity_id] != NULL);
+	if (i == 0)
+	  max_occurrences = ASTEmap[transition_activity_id]->max_occurrences;
+
+	// all activities have to have the same max_occurrences
+	assert (max_occurrences == ASTEmap[transition_activity_id]->max_occurrences);
+      }
+
+      // sum up the maximal occurrences
+      if (max_occurrences == UINT_MAX)
+	(*p)->max_occurrences = UINT_MAX;
+      else if ((*p)->max_occurrences != UINT_MAX)
+	(*p)->max_occurrences += max_occurrences;
+    }
+  }
+
+  // process the output places
+  for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
+  {
+    set<Node *> sending_transitions = preset(*p);
+    for (set<Node *>::iterator t = sending_transitions.begin(); t != sending_transitions.end(); t++)
+    {
+      unsigned int max_occurrences;
+      for (unsigned int i = 0; i < (*t)->history.size(); i++)
+      {
+	unsigned int transition_activity_id = toUInt((*t)->history[i].substr(0, (*t)->history[i].find_first_of(".")));
+	assert(ASTEmap[transition_activity_id] != NULL);
+	if (i == 0)
+	  max_occurrences = ASTEmap[transition_activity_id]->max_occurrences;
+
+	// all activities have to have the same max_occurrences
+	assert (max_occurrences == ASTEmap[transition_activity_id]->max_occurrences);
+      }
+
+      // sum up the maximal occurrences
+      if (max_occurrences == UINT_MAX)
+	(*p)->max_occurrences = UINT_MAX;
+      else if ((*p)->max_occurrences != UINT_MAX)
+	(*p)->max_occurrences += max_occurrences;
+    }
+  }
 }

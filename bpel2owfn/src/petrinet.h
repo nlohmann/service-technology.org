@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/04 14:49:29 $
+ * \date    \$Date: 2006/12/06 10:57:48 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.115 $
+ * \version \$Revision: 1.116 $
  *
  * \ingroup petrinet
  */
@@ -274,6 +274,9 @@ class Place: public Node
     /// initial marking of the place
     unsigned int tokens;
 
+    /// the maximal occurrences of this (communication) place
+    unsigned int max_occurrences;
+
     /// DOT-output of the place (used by PetriNet::dotOut())
     std::string output_dot() const;
 
@@ -410,6 +413,9 @@ class PetriNet
 
     /// set the output format
     void set_format(output_format my_format);
+
+    /// calculate the maximal occurrences of communication
+    void calculate_max_occurrences();
     
     /// constructor
     PetriNet();

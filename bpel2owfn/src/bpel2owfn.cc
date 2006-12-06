@@ -28,14 +28,14 @@
  * 
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/05 12:58:53 $
+ * \date    \$Date: 2006/12/06 10:57:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.128 $
+ * \version \$Revision: 1.129 $
  */
 
 
@@ -280,7 +280,9 @@ int main( int argc, char *argv[])
     }
     
     // now the net will not change any more, thus the nodes are re-enumerated
+    // and the maximal occurrences of the nodes are calculated.
     PN.reenumerate(); 
+    PN.calculate_max_occurrences(); 
 
     cerr << PN.information() << endl;
 

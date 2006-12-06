@@ -42,7 +42,7 @@
 owfnTransition::owfnTransition(char * name) : Node(name), quasiEnabledNr(0), 
 	enabledNr(0), NextEnabled(NULL), PrevEnabled(NULL), 
 	NextQuasiEnabled(NULL), PrevQuasiEnabled(NULL), 
-	quasiEnabled(false), enabled(false) {
+	quasiEnabled(false), enabled(false), DecrPlaces(NULL), IncrPlaces(NULL), Decr(NULL), Incr(NULL) {
 		
 	NrOfArriving = 0;
 	NrOfLeaving = 0;

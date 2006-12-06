@@ -827,6 +827,20 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
   	State * NewState;
   	stateType type;
   	
+
+	try {
+  		tempBinDecision = new binDecision * [HASHSIZE];
+	} catch(bad_alloc) {
+		char mess[] = "\nhash table too large!\n";
+		//write(2,mess,sizeof(mess));
+		cerr << mess;
+		_exit(2);
+	}
+  	
+  	for(unsigned int i = 0; i < HASHSIZE; i++) {
+        	tempBinDecision[i] = (binDecision *) 0;
+    	} 
+
 	CurrentState = binSearch(this);
 	
 	unsigned int * tempCurrentMarking = NULL;
@@ -835,11 +849,13 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 	if (CurrentState == NULL) {
 		// we have a marking which has not yet a state object assigned to it
 		CurrentState = binInsert(this);		// save current state to the global binDecision
+		
+		CurrentState = binSearch(tempBinDecision[0], this);
 		CurrentState = binInsert(tempBinDecision, this);  // save current state to the local binDecision 
 		
 		CurrentState->current = 0;
 		CurrentState->parent = (State *) 0;
-		
+
 		// marking already has a state -> put it (and all its successors) into the node
 //		addSuccessorStatesToSetStubborn(CurrentState, stateSet);
 	//	trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace): end\n");
@@ -852,20 +868,21 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 			// nothing else to be done here
 			return ;
 		}	
+
+		CurrentState = binSearch(tempBinDecision[0], this);
 		CurrentState = binInsert(tempBinDecision, this);  // save current state to the local binDecision 
 	}
 	
 	CurrentState->stubbornFirelist = stubbornfirelistmessage(outputPlace);
 	CurrentState->CardStubbornFireList = CardFireList;
 
-	assert(CurrentState->succ == NULL);
-	
-	CurrentState->succ = new State * [CardFireList+1];
-	for (size_t istate = 0; istate != CardFireList+1; ++istate)
-	{
-		CurrentState->succ[istate] = NULL;
+	if (CurrentState->succ == NULL) {
+		CurrentState->succ = new State * [CardFireList+1];
+		for (size_t istate = 0; istate != CardFireList+1; ++istate) {
+			CurrentState->succ[istate] = NULL;
+		}
 	}
-		
+	
 	CurrentState->placeHashValue = placeHashValue;
 	CurrentState->type = typeOfState();
 		
@@ -886,7 +903,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 				  		
 			// fire and reach next state
 			CurrentState->stubbornFirelist[CurrentState->current]->fire(this);
-			NewState = binSearch(*tempBinDecision, this);
+			NewState = binSearch(tempBinDecision[0], this);
 				
 	  		if(NewState != NULL) {
 		  		// Current marking already in local bintree 
@@ -920,16 +937,17 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 	      		
 	      		NewState->current = 0;
 	      		NewState->parent = CurrentState;
-				assert(NewState->succ == NULL);
-	      		NewState->succ =  new State * [CardFireList+1];
+			if (NewState->succ == NULL) {
+		      		NewState->succ =  new State * [CardFireList+1];
 				for (size_t istate = 0; istate != CardFireList+1; ++istate)
 				{
 					NewState->succ[istate] = NULL;
 				}
+			}
 	      		NewState->placeHashValue = placeHashValue;
 	      		NewState->type = typeOfState();
 	      		
-				assert(CurrentState->succ[CurrentState -> current] == NULL);
+			assert(CurrentState->succ[CurrentState -> current] == NULL);
 	      		CurrentState->succ[CurrentState -> current] = NewState;
 	      		CurrentState = NewState;
 		      		
@@ -946,7 +964,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 					stateSet.insert(NewState);
 					trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace) : end\n");
 					// nothing else to be done here
-					binDeleteAll(*tempBinDecision);
+					//binDeleteAll(tempBinDecision[0]);
 					return ;
 				}
 				
@@ -971,7 +989,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 		delete[] tempCurrentMarking;	
 	}
 	
-	binDeleteAll(*tempBinDecision);
+	//binDeleteAll(*tempBinDecision);
 	
 	trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, vertex * n) : end\n");
 	return;
@@ -1639,7 +1657,7 @@ unsigned int i;
 	}
 	stubbornclosure(this);
 	result = new owfnTransition * [NrStubborn + 1];
-	for(t=StartOfStubbornList;t; t = t -> NextStubborn)
+	for(t=StartOfStubbornList, i=0;t; t = t -> NextStubborn)
 	{
 		t -> instubborn = false;
 		if(t -> enabled)

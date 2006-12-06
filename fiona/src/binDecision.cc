@@ -61,7 +61,7 @@ binDecision::binDecision(int b, long int BitVectorSize) {
 binDecision::~binDecision() {
 	delete[] vector;
 	delete state;
-	delete nextold;
+	delete nextold;  // löschen!!!!!!!!!
 	delete nextnew;
 }
 
@@ -256,7 +256,6 @@ void binDeleteAll(binDecision * d) {
 	if(!d) return;
 	binDeleteAll(d -> nextold);
 	binDeleteAll(d -> nextnew);
-	//delete [] d -> vector;
 	delete d;
 }
 	

@@ -81,6 +81,8 @@ class oWFN  {
 		
 		owfnPlace * * inputPlacesArray;
 		owfnPlace * * outputPlacesArray;
+
+		binDecision * tempBinDecision;   // we want to store some the states calculated temporarily in a new binDecision structure
 		
 		setOfMessages inputMessages;		//!< activated input messages of current node
 		setOfMessages outputMessages;		//!< activated output messages of current node

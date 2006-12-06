@@ -451,7 +451,7 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 	}
 	
 	// get the successor states	and compute their corresponding annotation
-	if (currentState != NULL && currentState->succ[0] != NULL) {
+	if (currentState != NULL && currentState->succ != NULL && currentState->succ[0] != NULL) {
 		marking = copyCurrentMarking();	// save the marking of the current state since it is the parent state of its successors
 		for(int i = 0; i < currentState->CardFireList; i++) {
 			if (currentState->succ[i]) {
@@ -822,13 +822,13 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 		return;
 	}
 	
-	binDecision ** tempBinDecision;   // we want to store the states calculated temporarily in a new binDecision structure
+	
 	State * CurrentState;
   	State * NewState;
   	stateType type;
   	
 
-	try {
+/*	try {
   		tempBinDecision = new binDecision * [HASHSIZE];
 	} catch(bad_alloc) {
 		char mess[] = "\nhash table too large!\n";
@@ -840,6 +840,9 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
   	for(unsigned int i = 0; i < HASHSIZE; i++) {
         	tempBinDecision[i] = (binDecision *) 0;
     	} 
+*/
+
+	tempBinDecision = (binDecision *) 0;
 
 	CurrentState = binSearch(this);
 	
@@ -850,8 +853,8 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 		// we have a marking which has not yet a state object assigned to it
 		CurrentState = binInsert(this);		// save current state to the global binDecision
 		
-		CurrentState = binSearch(tempBinDecision[0], this);
-		CurrentState = binInsert(tempBinDecision, this);  // save current state to the local binDecision 
+		CurrentState = binSearch(tempBinDecision, this);
+		CurrentState = binInsert(&tempBinDecision, this);  // save current state to the local binDecision 
 		
 		CurrentState->current = 0;
 		CurrentState->parent = (State *) 0;
@@ -861,16 +864,9 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 	//	trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace): end\n");
 		//return;
 	} else {
-		// shall we save this state? meaning, is the correct output place marked?
-		if (CurrentMarking[outputPlace->index] > 0) {
-			stateSet.insert(NewState);
-			trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, vertex * n) : end\n");
-			// nothing else to be done here
-			return ;
-		}	
-
-		CurrentState = binSearch(tempBinDecision[0], this);
-		CurrentState = binInsert(tempBinDecision, this);  // save current state to the local binDecision 
+	
+		CurrentState = binSearch(tempBinDecision, this);
+		CurrentState = binInsert(&tempBinDecision, this);  // save current state to the local binDecision 
 	}
 	
 	CurrentState->stubbornFirelist = stubbornfirelistmessage(outputPlace);
@@ -886,6 +882,15 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 	CurrentState->placeHashValue = placeHashValue;
 	CurrentState->type = typeOfState();
 		
+	// shall we save this state? meaning, is the correct output place marked?
+	if (CurrentMarking[outputPlace->index] > 0) {
+		stateSet.insert(CurrentState);
+		
+		trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, vertex * n) : end\n");
+		// nothing else to be done here
+		return ;
+	}
+
 	// building EG in a node
 	while(CurrentState) {
 	 
@@ -903,7 +908,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 				  		
 			// fire and reach next state
 			CurrentState->stubbornFirelist[CurrentState->current]->fire(this);
-			NewState = binSearch(tempBinDecision[0], this);
+			NewState = binSearch(tempBinDecision, this);
 				
 	  		if(NewState != NULL) {
 		  		// Current marking already in local bintree 
@@ -919,7 +924,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 					
 				copyMarkingToCurrentMarking(tempCurrentMarking);
 				
-				CurrentState->firelist[CurrentState->current]->backfire(this);
+				CurrentState->stubbornFirelist[CurrentState->current]->backfire(this);
 				
 				placeHashValue = tempPlaceHashValue;
 				
@@ -931,7 +936,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 	     		(CurrentState->current)++;
 	    	} else {
 				trace(TRACE_5, "Current marking new\n");
-      			NewState = binInsert(tempBinDecision, this);
+      			NewState = binInsert(&tempBinDecision, this);
       			NewState->stubbornFirelist = stubbornfirelistmessage(outputPlace);
 	      		NewState->CardStubbornFireList = CardFireList;
 	      		
@@ -962,10 +967,18 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 				// shall we save this state? meaning, is the correct output place marked?
 				if (CurrentMarking[outputPlace->index] > 0) {
 					stateSet.insert(NewState);
+			
 					trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace) : end\n");
 					// nothing else to be done here
-					//binDeleteAll(tempBinDecision[0]);
-					return ;
+					// so we go back to parent state
+					// close state and return to previous state
+					trace(TRACE_5, "close state and return to previous state\n");
+	  				CurrentState = CurrentState->parent;
+
+	  				if(CurrentState) {			// there is a father to further examine
+	      					CurrentState->decode(this);
+	      					CurrentState->current++;
+	    				}
 				}
 				
 				if (tempCurrentMarking) {

@@ -39,6 +39,7 @@
 #include "options.h"
 #include "debug.h"
 #include "CNF.h"
+#include "binDecision.h"
 #include <cassert>
 
 
@@ -498,21 +499,17 @@ void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex *
 void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) : start\n");
 
-    StateSet::iterator iter;                      // iterator over the stateList's elements
+    
   	PN->setOfStatesTemp.clear();
   	PN->visitedStates.clear();
-
-    for (iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
-        (*iter)->decode(PN);
-
-        cout << "after decode: " << endl;
-        PN->printmarking();
         
-        // if there is a state for which an output event was activated, catch that state
         if (options[O_CALC_ALL_STATES]) {
-        	if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
-            	PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
-        	}
+		for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
+        		(*iter)->decode(PN);
+        		if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
+            			PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
+        		}
+		}
         } else {
         	owfnPlace * outputPlace;
         
@@ -523,19 +520,32 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
 	        // end hack
 
 			StateSet stateSet;
-			// calculate temporary state set with the help of stubborn set method
-			PN->calculateReachableStates(stateSet, outputPlace, newNode);	
+
+			for (StateSet::iterator iter = node->reachGraphStateSet.begin(); 
+					iter != node->reachGraphStateSet.end(); iter++) {
+	        		
+(*iter)->decode(PN);
+				// calculate temporary state set with the help of stubborn set method
+				PN->calculateReachableStates(stateSet, outputPlace, newNode);	
+			}
+
 
 			for (StateSet::iterator iter2 = stateSet.begin(); iter2 != stateSet.end(); iter2++) {		
-		        cout << "--> in node " << node->getNumber() << " for message " << outputPlace->name << " we calculated marking: " << endl;
-		        PN->printmarking();
+		        	//cout << "iter2: " << iter2 << endl;
+//		        	cout << "*iter2: " << *iter2 << endl;
+//				cout << "size of stateSet: " << stateSet.size() << endl;
+
 				(*iter2)->decode(PN); // get the marking of the state
+//				cout << "--> in node " << node->getNumber() << " for message " << outputPlace->name << " we calculated marking: " << endl;
+//		        	PN->printmarking();
+
 				if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
 					PN->calculateReachableStatesOutputEvent(newNode, true, outputPlace);   // calc the reachable states from that marking
 				}
 			}
         }
-    }
+
+//	binDeleteAll(PN->tempBinDecision);
     
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) : end\n");
 }

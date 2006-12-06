@@ -325,8 +325,8 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 	trace(TRACE_5, "interactionGraph::getActivatedEventsComputeCNF(vertex * node): start\n");
 
 	int i;
-	StateSet::iterator iter;		
-	
+	StateSet::iterator iter;	
+
 	if (!options[O_CALC_ALL_STATES]) { // in case of the state reduced graph
 	
 		for (iter = PN->setOfStatesTemp.begin(); iter != PN->setOfStatesTemp.end(); iter++) {

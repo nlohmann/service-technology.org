@@ -24,18 +24,18 @@
  * \brief   BPEL2oWFN's main
  * 
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/06 11:39:34 $
+ * \date    \$Date: 2006/12/06 14:10:20 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.130 $
+ * \version \$Revision: 1.131 $
  */
 
 
@@ -126,8 +126,7 @@ int main( int argc, char *argv[])
    */
   parse_command_line(argc, argv);
   
-  PetriNet *TheNet2 = new PetriNet();
-  assert(TheNet2 != NULL);
+  PetriNet PN2 = PetriNet();
   
   list< std::string >::iterator file = inputfiles.begin();
 
@@ -228,7 +227,7 @@ int main( int argc, char *argv[])
 	  }
 	  
 	  PN.addPrefix(prefix);
-	  TheNet2->connectNet(&PN);
+	  PN2.connectNet(PN);
 
 	  PN = PetriNet();
 //	  assert(TheNet != NULL);
@@ -260,7 +259,7 @@ int main( int argc, char *argv[])
 
 
   if (modus == M_CONSISTENCY)
-    PN = *TheNet2;
+    PN = PN2;
 
 
   if (modus == M_PRETTY)

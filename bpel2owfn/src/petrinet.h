@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/06 13:23:29 $
+ * \date    \$Date: 2006/12/06 14:10:20 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.117 $
+ * \version \$Revision: 1.118 $
  *
  * \ingroup petrinet
  */
@@ -402,7 +402,7 @@ class PetriNet
     void addPrefix(std::string prefix);
 
     /// connects a second oWFN
-    void connectNet(PetriNet *net);
+    void connectNet(PetriNet & net);
 
     /// moves channel places to the list of internal places
     void makeChannelsInternal();
@@ -421,6 +421,10 @@ class PetriNet
     
     /// constructor
     PetriNet();
+
+    PetriNet(const PetriNet &);
+
+    PetriNet & operator=(const PetriNet &);
 
     /// destructor
     ~PetriNet();

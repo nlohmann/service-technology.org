@@ -28,13 +28,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/12/06 13:23:29 $
+ * \date    \$Date: 2006/12/06 14:10:20 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.166 $
+ * \version \$Revision: 1.167 $
  *
  * \ingroup petrinet
  */
@@ -212,6 +212,169 @@ PetriNet::PetriNet()
   format = FORMAT_OWFN;
 }
 
+/*!
+ * The copy constructor with deep copy.
+ */
+PetriNet::PetriNet(const PetriNet & net)
+{
+  nextId = 1;
+  format = FORMAT_OWFN;
+
+  // add all internal places
+  for (set< Place * >::iterator place = net.P.begin(); place != net.P.end(); place ++)
+  {
+    Place * newPlace = new Place( **place );
+    newPlace->id = getId();
+    P.insert( newPlace );
+
+    roleMap[ newPlace->nodeFullName() ] = newPlace;
+
+    for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
+      roleMap[*name] = newPlace;
+  }
+  // add all input places
+  for (set< Place * >::iterator place = net.P_in.begin(); place != net.P_in.end(); place ++)
+  {
+    Place * newPlace = new Place( **place );
+    newPlace->id = getId();
+    P_in.insert( newPlace );
+
+    roleMap[ newPlace->nodeFullName() ] = newPlace;
+
+    for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
+      roleMap[*name] = newPlace;
+  }
+  // add all output places
+  for (set< Place * >::iterator place = net.P_out.begin(); place != net.P_out.end(); place ++)
+  {
+    Place * newPlace = new Place( **place );
+    newPlace->id = getId();
+    P_out.insert( newPlace );
+
+    roleMap[ newPlace->nodeFullName() ] = newPlace;
+
+    for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
+      roleMap[*name] = newPlace;
+  }
+  // add all transitions
+  for (set< Transition * >::iterator transition = net.T.begin(); transition != net.T.end(); transition ++)
+  {
+    Transition * newTransition = new Transition( **transition );
+    newTransition->id = getId();
+    T.insert( newTransition );
+    
+    roleMap[ newTransition->nodeFullName() ] = newTransition;
+
+    for(vector< string >::iterator name = (*transition)->history.begin(); name != (*transition)->history.end(); name++)
+      roleMap[ *name ] = newTransition;
+  }
+  // create arcs according to the given "net"
+  for (set< Arc * >::iterator arc = net.F.begin(); arc != net.F.end(); arc ++)
+  {
+    if ( (*arc)->source->nodeType == PLACE)
+    {
+      newArc( findPlace( (*arc)->source->nodeFullName() ), findTransition( (*arc)->target->nodeFullName() ), STANDARD, (*arc)->weight );
+    }
+    else
+    {
+      newArc( findTransition( (*arc)->source->nodeFullName() ), findPlace( (*arc)->target->nodeFullName() ), STANDARD, (*arc)->weight );
+    }
+  }
+}
+
+/*!
+ * The "=" operator.
+ */
+PetriNet & PetriNet::operator=(const PetriNet & net)
+{
+  // cleaning up old net
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+    delete *p;
+
+  for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
+    delete *p;
+  
+  for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
+    delete *p;
+
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+    delete *t;
+
+  for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
+    delete *f;
+
+  P.clear();
+  P_in.clear();
+  P_out.clear();
+  T.clear();
+  F.clear();
+  roleMap.clear();
+
+  nextId = 1;
+  format = FORMAT_OWFN;
+
+  // add all internal places
+  for (set< Place * >::iterator place = net.P.begin(); place != net.P.end(); place ++)
+  {
+    Place * newPlace = new Place( **place );
+    newPlace->id = getId();
+    P.insert( newPlace );
+
+    roleMap[ newPlace->nodeFullName() ] = newPlace;
+
+    for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
+      roleMap[*name] = newPlace;
+  }
+  // add all input places
+  for (set< Place * >::iterator place = net.P_in.begin(); place != net.P_in.end(); place ++)
+  {
+    Place * newPlace = new Place( **place );
+    newPlace->id = getId();
+    P_in.insert( newPlace );
+
+    roleMap[ newPlace->nodeFullName() ] = newPlace;
+
+    for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
+      roleMap[*name] = newPlace;
+  }
+  // add all output places
+  for (set< Place * >::iterator place = net.P_out.begin(); place != net.P_out.end(); place ++)
+  {
+    Place * newPlace = new Place( **place );
+    newPlace->id = getId();
+    P_out.insert( newPlace );
+
+    roleMap[ newPlace->nodeFullName() ] = newPlace;
+
+    for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
+      roleMap[*name] = newPlace;
+  }
+  // add all transitions
+  for (set< Transition * >::iterator transition = net.T.begin(); transition != net.T.end(); transition ++)
+  {
+    Transition * newTransition = new Transition( **transition );
+    newTransition->id = getId();
+    T.insert( newTransition );
+    
+    roleMap[ newTransition->nodeFullName() ] = newTransition;
+
+    for(vector< string >::iterator name = (*transition)->history.begin(); name != (*transition)->history.end(); name++)
+      roleMap[ *name ] = newTransition;
+  }
+  // create arcs according to the given "net"
+  for (set< Arc * >::iterator arc = net.F.begin(); arc != net.F.end(); arc ++)
+  {
+    if ( (*arc)->source->nodeType == PLACE)
+    {
+      newArc( findPlace( (*arc)->source->nodeFullName() ), findTransition( (*arc)->target->nodeFullName() ), STANDARD, (*arc)->weight );
+    }
+    else
+    {
+      newArc( findTransition( (*arc)->source->nodeFullName() ), findPlace( (*arc)->target->nodeFullName() ), STANDARD, (*arc)->weight );
+    }
+  }
+  return *this;
+}
 
 
 
@@ -228,6 +391,12 @@ PetriNet::~PetriNet()
 {
 
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+    delete *p;
+
+  for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
+    delete *p;
+  
+  for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
     delete *p;
 
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
@@ -919,10 +1088,10 @@ void PetriNet::addPrefix(string prefix)
 /*!
  * \todo gierds: comment me!
  */
-void PetriNet::connectNet(PetriNet * net)
+void PetriNet::connectNet(PetriNet & net)
 {
   // add all internal places
-  for (set< Place * >::iterator place = net->P.begin(); place != net->P.end(); place ++)
+  for (set< Place * >::iterator place = net.P.begin(); place != net.P.end(); place ++)
   {
     Place * newPlace = new Place( **place );
     newPlace->id = getId();
@@ -934,7 +1103,7 @@ void PetriNet::connectNet(PetriNet * net)
       roleMap[(newPlace->prefix + *name)] = newPlace;
   }
   // add all input places
-  for (set< Place * >::iterator place = net->P_in.begin(); place != net->P_in.end(); place ++)
+  for (set< Place * >::iterator place = net.P_in.begin(); place != net.P_in.end(); place ++)
   {
     Place * newPlace = new Place( **place );
     newPlace->id = getId();
@@ -946,7 +1115,7 @@ void PetriNet::connectNet(PetriNet * net)
       roleMap[(newPlace->prefix + *name)] = newPlace;
   }
   // add all output places
-  for (set< Place * >::iterator place = net->P_out.begin(); place != net->P_out.end(); place ++)
+  for (set< Place * >::iterator place = net.P_out.begin(); place != net.P_out.end(); place ++)
   {
     Place * newPlace = new Place( **place );
     newPlace->id = getId();
@@ -958,7 +1127,7 @@ void PetriNet::connectNet(PetriNet * net)
       roleMap[(newPlace->prefix + *name)] = newPlace;
   }
   // add all transitions
-  for (set< Transition * >::iterator transition = net->T.begin(); transition != net->T.end(); transition ++)
+  for (set< Transition * >::iterator transition = net.T.begin(); transition != net.T.end(); transition ++)
   {
     Transition * newTransition = new Transition( **transition );
     newTransition->id = getId();
@@ -970,7 +1139,7 @@ void PetriNet::connectNet(PetriNet * net)
       roleMap[ newTransition->prefix + *name ] = newTransition;
   }
   // create arcs according to the given "net"
-  for (set< Arc * >::iterator arc = net->F.begin(); arc != net->F.end(); arc ++)
+  for (set< Arc * >::iterator arc = net.F.begin(); arc != net.F.end(); arc ++)
   {
     if ( (*arc)->source->nodeType == PLACE)
     {

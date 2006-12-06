@@ -28,14 +28,14 @@
  * 
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/06 10:57:47 $
+ * \date    \$Date: 2006/12/06 11:39:34 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.129 $
+ * \version \$Revision: 1.130 $
  */
 
 
@@ -242,6 +242,18 @@ int main( int argc, char *argv[])
       cleanup();
       return error;
     }
+
+    // reset global mappings (could be done somewhere else...)    
+    extern set<string> correlationSetNames;
+    extern set<string> variableNames;
+    extern set<string> partnerLinkNames;
+    extern set<string> linkNames;
+    extern map<string, unsigned int> scopeNames;
+    correlationSetNames.clear();
+    variableNames.clear();
+    partnerLinkNames.clear();
+    linkNames.clear();
+    scopeNames.clear();
 
     file++;
   } while (modus == M_CONSISTENCY && file != inputfiles.end());

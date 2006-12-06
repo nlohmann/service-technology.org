@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/04 12:24:27 $
+ * \date    \$Date: 2006/12/06 13:07:22 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.56 $
+ * \version \$Revision: 1.57 $
  */
 
 
@@ -386,6 +386,8 @@ void parse_command_line(int argc, char* argv[])
 		  parameters[P_NEW] = true;
 		else if (parameter == "loopcount")
 		  parameters[P_LOOPCOUNT] = true;
+		else if (parameter == "controlloops")
+		  parameters[P_CONTROLLOOPS] = true;
 		else
 		  trace(TRACE_ALWAYS, "Unknown parameter \"" + parameter +"\".\n");
 		

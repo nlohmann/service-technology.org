@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for BPEL's <scope> and <process>
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $ 
+ *          last changes of: \$Author: nlohmann $ 
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2006/12/06 13:23:29 $
+ * \date    \$Date: 2006/12/06 22:17:03 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  */
 %}
 
@@ -437,6 +437,20 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 
 	// unparse the fault handlers
 	phylum->tFaultHandlers_1->unparse(pseudoPrinter, current_view);
+
+	// unparse the fault handlers
+	phylum->tEventHandlers_1->unparse(pseudoPrinter, current_view);
+
+
+	impl_tEventHandlers *eh = phylum->tEventHandlers_1;
+	with (eh)
+	{
+	  eh = userDefinedEventHandler:
+	  {
+	    PN.newArc(t1, PN.findPlace(toString(eh->id) + ".internal.initial"));
+	  }
+	  default: {}
+	}	
 
 
   	// embed fault handler
@@ -1318,4 +1332,103 @@ void PStop(impl_tStop* abstract_phylum, uview current_view)
 
     default: { /* no pattern in this case */ }
   }
+}
+
+
+
+
+
+/******************************************************************************
+  EVENT HANDLERS
+******************************************************************************/
+
+void PEventHandlers(impl_tEventHandlers* abstract_phylum, uview current_view)
+{
+  impl_tEventHandlers_userDefinedEventHandler* phylum = static_cast<impl_tEventHandlers_userDefinedEventHandler*>(abstract_phylum);
+  assert(phylum != NULL);
+
+  header(phylum->id, true);
+  string prefix = toString(phylum->id) + ".internal.";
+
+  switch(current_view)
+  {
+    case(petrinetnew_enum):
+      {
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "final");
+	Place *p3 = PN.newPlace(prefix + "running");
+	Place *p4 = PN.newPlace(prefix + "finishing");
+	Place *p5 = PN.newPlace(prefix + "stop");
+	Place *p6 = PN.newPlace(prefix + "stopped");
+
+	Transition *t1 = PN.newTransition(prefix + "start");
+        PN.newArc(p1, t1);
+        PN.newArc(t1, p3);
+
+	Transition *t2 = PN.newTransition(prefix + "stop_EH");
+        PN.newArc(p5, t2);
+
+	Transition *t3 = PN.newTransition(prefix + "EH_stopped");
+        PN.newArc(t3, p6);
+
+	Transition *t4 = PN.newTransition(prefix + "finish");
+        PN.newArc(t4, p2);
+	PN.newArc(p4, t4);
+
+
+	// traverse the <onMessage> branches
+	unsigned int event_number = 1;
+	foreach(branch=OnMessage(my_corr, my_from, my_activity, my_integer); tOnMessage_list phylum->tOnMessage_list_1)
+	{
+	  assert(ASTEmap[my_integer->value] != NULL);
+	  my_activity->unparse(pseudoPrinter, current_view);
+
+	  Place *p7 = PN.newPlace(prefix + "ready." + toString(event_number));
+	  PN.newArc(t1, p7);
+
+	  Transition *t5 = PN.newTransition(prefix + "event." + toString(event_number));
+	  PN.newArc(p7, t5);
+	  PN.newArc(t5, PN.findPlace(toString(my_activity->id) + ".internal.initial"));
+	  PN.newArc(PN.findPlace("in." + ASTEmap[my_integer->value]->channelName), t5);
+
+	  Transition *t6 = PN.newTransition(prefix + "reset." + toString(event_number));
+	  PN.newArc(PN.findPlace(toString(my_activity->id) + ".internal.final"), t6);
+	  PN.newArc(t6, p7);
+	  PN.newArc(p3, t6, READ);
+
+	  PN.newArc(PN.findPlace(toString(my_activity->id) + ".internal.final"), t4);
+	  PN.newArc(t2, PN.findPlace(toString(my_activity->id) + ".internal.stop"));
+	  PN.newArc(PN.findPlace(toString(my_activity->id) + ".internal.stopped"), t3);
+
+	  event_number++;
+	}
+
+
+	// traverse the <onAlarm> branches
+	event_number = 1;
+	foreach(branch=OnAlarm(my_activity, my_integer); tOnAlarm_list phylum->tOnAlarm_list_1)
+	{
+	  my_activity->unparse(pseudoPrinter, current_view);
+
+	  Place *p7 = PN.newPlace(prefix + "waiting." + toString(event_number));
+	  PN.newArc(t1, p7);
+
+	  Transition *t5 = PN.newTransition(prefix + "alarm." + toString(event_number));
+	  PN.newArc(p7, t5);
+	  PN.newArc(t5, PN.findPlace(toString(my_activity->id) + ".internal.initial"));
+
+	  PN.newArc(PN.findPlace(toString(my_activity->id) + ".internal.final"), t4);
+	  PN.newArc(t2, PN.findPlace(toString(my_activity->id) + ".internal.stop"));
+	  PN.newArc(PN.findPlace(toString(my_activity->id) + ".internal.stopped"), t3);
+
+	  event_number++;
+	}
+
+	break;
+      }
+
+    default: { /* no pattern in this case */ }
+  }
+
+  footer(phylum->id, true);
 }

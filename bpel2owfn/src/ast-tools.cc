@@ -24,17 +24,17 @@
  * \brief   unparse helper tools
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nlohmann $
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/12/05 11:51:08 $
+ * \date    \$Date: 2006/12/06 08:58:16 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.47 $
+ * \version \$Revision: 1.48 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -526,6 +526,14 @@ void process_loop_bounds(vector<unsigned int> &loop_bounds, vector<unsigned int>
     next_index(current_index, loop_bounds);
   }
 }
+
+
+
+
+
+/******************************************************************************
+ * ACTIVITY RELATIONS
+ *****************************************************************************/
 
 namespace {
     map< pair< unsigned int, unsigned int >, activityRelationType > activityRelationMap;

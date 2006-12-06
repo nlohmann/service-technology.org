@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2006/12/05 13:58:01 $
+ * \date    \$Date: 2006/12/06 08:58:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  */
 %}
 
@@ -124,6 +124,7 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 	Transition *t8 = stop(p6, "p6", prefix);
 	Transition *t9 = stop(p3, "final", prefix);
 
+	
 	// the subnet if loops are counted
 	if (parameters[P_LOOPCOUNT])
 	{
@@ -252,24 +253,27 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
     case(petrinetnew_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "p2");
+	Place *p2 = PN.newPlace(prefix + "p2"); // activity_initial
 	Place *p3 = PN.newPlace(prefix + "running");
 	Place *p4 = PN.newPlace(prefix + "final");
-	Place *p5 = PN.newPlace(prefix + "p5");
 	Place *p6 = PN.newPlace(prefix + "stop");
 	Place *p7 = PN.newPlace(prefix + "stopped");
 	
-	Transition *t1 = PN.newTransition(prefix + "t1"); /* read variable */
+	Transition *t1 = PN.newTransition(prefix + "read_var"); /* read variable */
 	PN.newArc(p2, t1);
 	PN.newArc(t1, p3);
 
-	Transition *t2 = PN.newTransition(prefix + "t2"); /* end */
-	PN.newArc(p3, t2);
-	PN.newArc(t2, p4);
+	// the single loop/skip transition is only needed when loops are not counted
+	if (!parameters[P_LOOPCOUNT])
+        {
+	  Transition *t2 = PN.newTransition(prefix + "end");
+	  PN.newArc(p3, t2);
+	  PN.newArc(t2, p4);
 	
-	Transition *t3 = PN.newTransition(prefix + "t3"); /* repeat */
-	PN.newArc(p3, t3);
-	PN.newArc(t3, p1);
+	  Transition *t3 = PN.newTransition(prefix + "repeat");
+	  PN.newArc(p3, t3);
+	  PN.newArc(t3, p1);
+	}
 
 	// Transitions for the negative control flow.
 	if (parameters[P_NOSTANDARDFAULTS] == false)
@@ -277,8 +281,51 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 
 	Transition *t5 = stop(p1, "initial", prefix);
 	Transition *t6 = stop(p2, "running", prefix);
-	Transition *t7 = stop(p5, "p5", prefix);
 	Transition *t8 = stop(p4, "final", prefix);
+
+
+	// the subnet if loops are counted
+	if (parameters[P_LOOPCOUNT])
+	{
+	  unsigned int max_loops = ASTEmap[phylum->id]->max_loops;
+	  if (max_loops == UINT_MAX)
+	    cerr << "no max loop provided!" << endl;
+	  else
+	  {
+	    Place *p9_old = NULL;
+	    Place *p9_first = NULL;
+	    for (unsigned i = 1; i <= max_loops; i++)
+	    {
+	      Place *p9 = PN.newPlace(prefix + "count." + toString(i));
+
+	      if (i == 1)
+	      {
+		p9->mark();
+		p9_first = p9;
+	      }
+	      
+	      if (i > 1)
+	      {
+		assert(p9_old != NULL);
+		Transition *t4 = PN.newTransition(prefix + "repeat" + toString(i-1));
+		PN.newArc(t4, p1);
+		PN.newArc(p3, t4);
+		PN.newArc(p9_old, t4);
+		PN.newArc(t4, p9);
+	      }
+	      
+	      assert(p9_first != NULL);
+	      Transition *t1 = PN.newTransition(prefix + "end" + toString(i));
+	      PN.newArc(p3, t1);
+	      PN.newArc(t1, p4);
+	      PN.newArc(t1, p9_first);
+	      PN.newArc(p9, t1);
+	      
+	      p9_old = p9;
+	    }
+	  }
+	}
+
 
 	// unparse the standard elements
 	phylum->standardElements_1->unparse(pseudoPrinter, current_view);

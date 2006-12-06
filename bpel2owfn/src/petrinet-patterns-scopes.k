@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2006/12/05 14:14:40 $
+ * \date    \$Date: 2006/12/06 08:58:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
  */
 %}
 
@@ -936,8 +936,35 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
 	  }
 	  else
 	  {
-	    PN.newPlace(prefix + "c");
-	    PN.newPlace(prefix + "!c");
+	    Place *c1 = PN.newPlace(prefix + "c");
+	    Place *c2 = PN.newPlace(prefix + "!c");
+	    c2->mark(ASTEmap[*ancestor_loops.begin()]->max_loops);
+	    
+	    Transition *t14 = PN.newTransition(prefix + "t14");
+	    PN.newArc(PN.findPlace(prefix + "final1"), t14);
+	    PN.newArc(PN.findPlace(prefix + "!Successful"), t14, READ);
+	    PN.newArc(t14, PN.findPlace(prefix + "final"));
+
+	    Transition *t15 = PN.newTransition(prefix + "t15");
+	    PN.newArc(t15, c1);
+	    PN.newArc(c2, t15);
+	    PN.newArc(PN.findPlace(prefix + "final1"), t15);
+	    PN.newArc(PN.findPlace(prefix + "Successful"), t15);
+	    PN.newArc(t15, PN.findPlace(prefix + "!Successful"));
+	    PN.newArc(t15, PN.findPlace(prefix + "final"));
+
+	    Transition *t16 = PN.newTransition(prefix + "t16");
+	    PN.newArc(c2, t16, READ, ASTEmap[*ancestor_loops.begin()]->max_loops);
+	    PN.newArc(PN.findPlace(prefix + "compensated1"), t16);
+	    PN.newArc(t16, PN.findPlace(prefix + "compensated"));
+
+	    Transition *t17 = PN.newTransition(prefix + "t17");
+	    PN.newArc(c1, t17);
+	    PN.newArc(t17, c2);
+	    PN.newArc(PN.findPlace(prefix + "compensate"), t17);
+	    PN.newArc(t17, PN.findPlace(prefix + "ch_initial"));
+
+	    PN.mergePlaces(PN.findPlace(prefix + "compensated1"), PN.findPlace(prefix + "compensate"));
 	  }
 	}
 
@@ -1022,7 +1049,7 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
   
 	// Embed the inner activity.
 	PN.mergePlaces(phylum->id, ".internal.initial", phylum->activity_1->id, ".initial");
-	PN.mergePlaces(phylum->id, ".internal.final", phylum->activity_1->id, ".final");	
+	PN.mergePlaces(phylum->id, ".internal.final", phylum->activity_1->id, ".final");
 
 	break;
       }

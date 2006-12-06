@@ -24,17 +24,17 @@
  * \brief   Petri Net API: structural reduction
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2006/12/04 14:49:29 $
+ * \date    \$Date: 2006/12/06 13:23:29 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.44 $
+ * \version \$Revision: 1.45 $
  *
  * \ingroup petrinet
  */
@@ -84,7 +84,7 @@ void PetriNet::removeUnusedStatusPlaces()
 
   for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
   {
-    if (postset(*p).empty() && !((*p)->historyContains((*p)->prefix + "1.internal.final")) && !((*p)->historyContains("1.internal.final")))
+    if ( postset(*p).empty() && !( (*p)->isFinal ) )
     {
       unusedPlaces.push_back(*p);
     }

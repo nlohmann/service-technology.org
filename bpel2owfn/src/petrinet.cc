@@ -24,17 +24,17 @@
  * \brief   Petri Net API: base functions
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/12/06 10:57:47 $
+ * \date    \$Date: 2006/12/06 13:23:29 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.165 $
+ * \version \$Revision: 1.166 $
  *
  * \ingroup petrinet
  */
@@ -168,12 +168,15 @@ Transition::Transition(unsigned int my_id, string my_role)
  * \param role   the first role of the place
  * \param mytype the type of the place (as defined in #communication_type)
  */
-Place::Place(unsigned int my_id, string my_role, communication_type my_type)
+Place::Place(unsigned int my_id, string my_role, communication_type my_type) :
+    tokens(0), isFinal(false)
 {
   type = my_type;
   id = my_id;
   nodeType = PLACE;
+    /*
   tokens = 0;
+  */
   max_occurrences = 0;
 
   if (my_role != "")
@@ -223,7 +226,7 @@ PetriNet::PetriNet()
  */
 PetriNet::~PetriNet()
 {
-/*
+
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
     delete *p;
 
@@ -232,9 +235,6 @@ PetriNet::~PetriNet()
 
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     delete *f;
-
-  roleMap.clear();
-  */
 }
 
 
@@ -581,7 +581,9 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
     p12->tokens = p1->tokens;
   else
     p12->tokens = p2->tokens;
-  
+ 
+  p12->isFinal = p1->isFinal || p2->isFinal;
+
   for (vector<string>::iterator role = p1->history.begin(); role != p1->history.end(); role++)
   {
     p12->history.push_back(*role);
@@ -880,6 +882,26 @@ void PetriNet::addPrefix(string prefix)
 	roleMap[(prefix + *name)] = *place;
     }
   }
+  for (set< Place * >::iterator place = P_in.begin(); place != P_in.end(); place ++)
+  {
+    (*place)->prefix = prefix;
+
+    for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
+    {
+      if (*place == NULL)
+	roleMap[(prefix + *name)] = *place;
+    }
+  }
+  for (set< Place * >::iterator place = P_out.begin(); place != P_out.end(); place ++)
+  {
+    (*place)->prefix = prefix;
+
+    for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
+    {
+      if (*place == NULL)
+	roleMap[(prefix + *name)] = *place;
+    }
+  }
 
   for (set< Transition * >::iterator transition = T.begin(); transition != T.end(); transition ++)
   {
@@ -899,45 +921,80 @@ void PetriNet::addPrefix(string prefix)
  */
 void PetriNet::connectNet(PetriNet * net)
 {
+  // add all internal places
   for (set< Place * >::iterator place = net->P.begin(); place != net->P.end(); place ++)
   {
-    (*place)->id = getId();
-    P.insert(*place);
+    Place * newPlace = new Place( **place );
+    newPlace->id = getId();
+    P.insert( newPlace );
+
+    roleMap[ newPlace->nodeFullName() ] = newPlace;
 
     for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
-      roleMap[((*place)->prefix + *name)] = *place;
+      roleMap[(newPlace->prefix + *name)] = newPlace;
   }
-
-  for (set< Transition * >::iterator transition = net->T.begin(); transition != net->T.end(); transition ++)
-  {
-    (*transition)->id = getId();
-    T.insert(*transition);
-
-    for(vector< string >::iterator name = (*transition)->history.begin(); name != (*transition)->history.end(); name++)
-      roleMap[(*transition)->prefix + *name] = *transition;
-  }
-
-  for (set< Arc * >::iterator arc = net->F.begin(); arc != net->F.end(); arc ++)
-    F.insert(*arc);
-
-  set< Place * > additionalP_in;
-  set< Place * > additionalP_out;
-
+  // add all input places
   for (set< Place * >::iterator place = net->P_in.begin(); place != net->P_in.end(); place ++)
   {
-    (*place)->id = getId();
-    for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
-    {
-      roleMap[(*place)->prefix + *name] = *place;
-    }
+    Place * newPlace = new Place( **place );
+    newPlace->id = getId();
+    P_in.insert( newPlace );
 
+    roleMap[ newPlace->nodeFullName() ] = newPlace;
+
+    for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
+      roleMap[(newPlace->prefix + *name)] = newPlace;
+  }
+  // add all output places
+  for (set< Place * >::iterator place = net->P_out.begin(); place != net->P_out.end(); place ++)
+  {
+    Place * newPlace = new Place( **place );
+    newPlace->id = getId();
+    P_out.insert( newPlace );
+
+    roleMap[ newPlace->nodeFullName() ] = newPlace;
+
+    for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
+      roleMap[(newPlace->prefix + *name)] = newPlace;
+  }
+  // add all transitions
+  for (set< Transition * >::iterator transition = net->T.begin(); transition != net->T.end(); transition ++)
+  {
+    Transition * newTransition = new Transition( **transition );
+    newTransition->id = getId();
+    T.insert( newTransition );
+    
+    roleMap[ newTransition->nodeFullName() ] = newTransition;
+
+    for(vector< string >::iterator name = (*transition)->history.begin(); name != (*transition)->history.end(); name++)
+      roleMap[ newTransition->prefix + *name ] = newTransition;
+  }
+  // create arcs according to the given "net"
+  for (set< Arc * >::iterator arc = net->F.begin(); arc != net->F.end(); arc ++)
+  {
+    if ( (*arc)->source->nodeType == PLACE)
+    {
+      newArc( findPlace( (*arc)->source->nodeFullName() ), findTransition( (*arc)->target->nodeFullName() ), STANDARD, (*arc)->weight );
+    }
+    else
+    {
+      newArc( findTransition( (*arc)->source->nodeFullName() ), findPlace( (*arc)->target->nodeFullName() ), STANDARD, (*arc)->weight );
+    }
+  }
+
+  set< Place * > eraseP_in;
+  set< Place * > additionalP_out;
+
+  // merge appropreate input and output places (same name, different prefixes)
+  for (set< Place * >::iterator place = P_in.begin(); place != P_in.end(); place ++)
+  {
     set< Place * >::iterator oPlace = P_out.begin();
     
     bool finished = false;
     while ( ! finished && oPlace != P_out.end())
     {
         
-      if ((*oPlace)->nodeName().erase(0,4) != (*place)->nodeShortName().erase(0,3))
+      if ((*oPlace)->nodeFullName().erase(0,4) != (*place)->nodeFullName().erase(0,3))
 	oPlace++;
       else
 	finished = true;
@@ -945,50 +1002,46 @@ void PetriNet::connectNet(PetriNet * net)
 
     if (oPlace != P_out.end())
     {
-      (*place)->type = INTERNAL;
-      (*place)->history[0] = (*place)->nodeName();
-      (*oPlace)->type = INTERNAL;
-      (*oPlace)->history[0] = (*oPlace)->nodeName();
-      mergePlaces(*place,*oPlace);
-      P_out.erase(*oPlace);
+      if ( (*place)->prefix != (*oPlace)->prefix )
+      {
+        (*place)->type = INTERNAL;
+        (*place)->history[0] = (*place)->nodeFullName();
+        (*oPlace)->type = INTERNAL;
+        (*oPlace)->history[0] = (*oPlace)->nodeFullName();
+        P.insert(*place);
+        P.insert(*oPlace);
+        mergePlaces(*place,*oPlace);
+        eraseP_in.insert(*place);
+        P_out.erase(*oPlace);
+      }
     }
-    else
-      additionalP_in.insert(*place);
   }
-
-  for (set< Place * >::iterator place = net->P_out.begin(); place != net->P_out.end(); place ++)
+  // erase input places, that were merged
+  for (set< Place * >::iterator place = eraseP_in.begin(); place != eraseP_in.end(); place ++)
   {
-    (*place)->id = getId();
-    for(vector< string >::iterator name = (*place)->history.begin(); name != (*place)->history.end(); name++)
-    {
-      roleMap[(*place)->prefix + *name] = *place;
-    }
-   
-    set< Place * >::iterator iPlace = P_in.begin();
-    
-    bool finished = false;
-    while (!finished && (iPlace != P_in.end()))
-    {
-      if ((*iPlace)->nodeShortName().erase(0,3) != (*place)->nodeShortName().erase(0,4))
-	iPlace++;
-      else
-	finished = true;
-    }
-    if (iPlace != P_in.end())
-    {
-      (*place)->type = INTERNAL;
-      (*place)->history[0] = (*place)->nodeName();
-      (*iPlace)->type = INTERNAL;
-      (*iPlace)->history[0] = (*iPlace)->nodeName();
-      mergePlaces(*place,*iPlace);
-      P_in.erase(*iPlace);
-    }
-    else
-      additionalP_out.insert(*place);
+    P_in.erase( *place );
   }
 
-  P_in = setUnion(P_in, additionalP_in);
-  P_out = setUnion(P_out, additionalP_out); 
+  // mark transitions as internal that are no longer communicating
+  for (set< Transition * >::iterator transition = T.begin(); transition != T.end(); transition ++)
+  {
+    if ( (*transition)->type != INTERNAL )
+    {
+      set< Node * > prePost = setUnion( preset( findTransition( (*transition)->nodeFullName() ) ), postset( findTransition( (*transition)->nodeFullName() ) ) );
+      bool isCommunicating = false;
+      for ( set< Node * >::iterator place = prePost.begin(); place != prePost.end(); place++ )
+      {
+        if ( (*place)->type != INTERNAL )
+        {
+          isCommunicating = true;
+        }
+      }
+      if ( ! isCommunicating )
+      {
+        (*transition)->type = INTERNAL;
+      }
+    }
+  }
 }
 
 

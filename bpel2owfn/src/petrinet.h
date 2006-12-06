@@ -24,17 +24,17 @@
  * \brief   Petri Net API
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/06 10:57:48 $
+ * \date    \$Date: 2006/12/06 13:23:29 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.116 $
+ * \version \$Revision: 1.117 $
  *
  * \ingroup petrinet
  */
@@ -166,16 +166,10 @@ class Node
   /// class PetriNet is allowed to access the privates of class Node
   friend class PetriNet;
 
-  /// class Place is allowed to access the privates of class Node
-  friend class Place;
-
-  /// class Transition is allowed to access the privates of class Node
-  friend class Transition;
-
   /// class Arc is allowed to access the privates of class Node
   friend class Arc;
 
-  private:
+  protected:
     /// type of node as defined in #communication_type
     communication_type type;
 
@@ -203,6 +197,9 @@ class Node
 
     /// the name of the node
     std::string nodeName() const;
+
+    /// the name of the node
+    std::string nodeFullName() const;
 
     /// the short name of the node
     virtual std::string nodeShortName() const;
@@ -286,12 +283,17 @@ class Place: public Node
     /// create a place and add a first role to the history
     Place(unsigned int id, std::string role, communication_type type);
 
+    // Copy constructor for deep copying
+    // Place(Place&);
+
   public:
     /// mark the place
     void mark(unsigned int tokens = 1);    
 
     /// the short name of the place (public to bpel2owfn.cc)
     std::string nodeShortName() const;
+
+    bool isFinal;
 };
 
 

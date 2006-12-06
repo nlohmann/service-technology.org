@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for BPEL's <scope> and <process>
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $ 
+ *          last changes of: \$Author: gierds $ 
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2006/12/06 08:58:16 $
+ * \date    \$Date: 2006/12/06 13:23:29 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  */
 %}
 
@@ -168,6 +168,7 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 	Place *p41 = PN.newPlace(prefix + "p41");
 	Place *p42 = PN.newPlace(prefix + "ch_out");
 
+        p39->isFinal = true;
 
 	// State places of the process modeling the new fault model: The places
 	// guarantee that the occurrence of more than one fault inside the fault
@@ -371,6 +372,8 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 	Place *p13 = PN.newPlace(prefix + "fh_fault");
 	Place *p14 = PN.newPlace(prefix + "ch_fault_in");
 
+        p2->isFinal = true;
+
 	Transition *t1 = PN.newTransition(prefix + "initialize");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p5);
@@ -478,6 +481,7 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 	// Create the internal places of the process pattern.
 	Place *p2 = PN.newPlace(prefix + "final");
 
+        p2->isFinal = true;
 
 	// unparse the embedded activity
 	phylum->activity_1->unparse(pseudoPrinter, current_view);

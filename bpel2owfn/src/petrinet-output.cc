@@ -24,17 +24,17 @@
  * \brief   Petri Net API: file output
  * 
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/12/06 10:57:47 $
+ * \date    \$Date: 2006/12/06 13:23:29 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.61 $
+ * \version \$Revision: 1.62 $
  *
  * \ingroup petrinet
  */
@@ -121,10 +121,28 @@ string Node::nodeName() const
 {
   string result = history[0];
 
-  if (type == INTERNAL)
+  if ( type == INTERNAL || nodeType == TRANSITION )
+  {
     result = result.substr(result.find_last_of(".")+1,result.length());
+    result = prefix + result;
+  }
 
-  result = prefix + result;
+  return result;
+}
+
+
+/*!
+ * \return the name of the node for DOT output
+ */
+string Node::nodeFullName() const
+{
+  string result = history[0];
+
+  if ( type == INTERNAL || nodeType == TRANSITION )
+  {
+    result = prefix + result;
+  }
+
   return result;
 }
 
@@ -334,7 +352,7 @@ string Place::output_dot() const
     result += " style=filled fillcolor=gold shape=ellipse";
 
   if (historyContains("1.internal.initial")
-	   || historyContains("1.internal.final"))
+           || isFinal )
     result += " style=filled fillcolor=gray";
   else if (firstMemberIs("!link."))
     result += " style=filled fillcolor=red";
@@ -797,7 +815,7 @@ void PetriNet::output_owfn(std::ostream *output) const
 
       if ((*p)->historyContains("1.internal.initial"))
 	(*output) << " {initial place}";
-      if ((*p)->historyContains("1.internal.final"))
+      if ( (*p)->isFinal )
 	(*output) << " {final place}";
     }
   }
@@ -809,21 +827,21 @@ void PetriNet::output_owfn(std::ostream *output) const
   count = 1;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
-    if ((*p)->historyContains((*p)->prefix + "1.internal.final") )
+    if ( (*p)->isFinal )
     {
       if (count++ != 1)
 	(*output) << ",";
 
 #ifdef USING_BPEL2OWFN
       (*output) << "  " << (*p)->nodeShortName();
-#endif
-#ifndef USING_BPEL2OWFN
+#else
+// #ifndef USING_BPEL2OWFN
       (*output) << "  " << (*p)->nodeName();
 #endif
 
       if ((*p)->historyContains("1.internal.initial"))
       	(*output) << " {initial place}";
-      if ((*p)->historyContains("1.internal.final"))
+      if ( (*p)->isFinal )
   	(*output) << " {final place}";
     }
   }

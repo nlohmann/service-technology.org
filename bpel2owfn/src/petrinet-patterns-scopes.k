@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2006/12/06 22:17:03 $
+ * \date    \$Date: 2006/12/07 10:49:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  */
 %}
 
@@ -334,6 +334,10 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 	break;
       }
 
+/*
+ * <process> pattern for WS-BPEL
+ */
+
     case(petrinetnew_enum):
       {
 	currentScope = prefix;
@@ -384,7 +388,8 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 	PN.newArc(t2, p2);
 	PN.newArc(p5, t2);
 	PN.newArc(t2, p6);
-	PN.newArc(p12, t2);
+	if (!ASTEmap[phylum->id]->hasEH)
+	  PN.newArc(p12, t2);
 
 	Transition *t3 = PN.newTransition(prefix + "ft");
 	PN.newArc(p3, t3);
@@ -442,15 +447,16 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 	phylum->tEventHandlers_1->unparse(pseudoPrinter, current_view);
 
 
-	impl_tEventHandlers *eh = phylum->tEventHandlers_1;
-	with (eh)
+	if (ASTEmap[phylum->id]->hasEH)
 	{
-	  eh = userDefinedEventHandler:
-	  {
-	    PN.newArc(t1, PN.findPlace(toString(eh->id) + ".internal.initial"));
-	  }
-	  default: {}
-	}	
+	  Transition *t11 = PN.newTransition(prefix + "finish_eh");
+	  PN.newArc(p12, t11);
+	  PN.newArc(PN.findPlace(toString(phylum->tEventHandlers_1->id) + ".internal.running"), t11);
+	  PN.newArc(t11, PN.findPlace(toString(phylum->tEventHandlers_1->id) + ".internal.finishing"));
+
+	  PN.newArc(t1, PN.findPlace(toString(phylum->tEventHandlers_1->id) + ".internal.initial"));
+	  PN.newArc(PN.findPlace(toString(phylum->tEventHandlers_1->id) + ".internal.final"), t2);
+	}
 
 
   	// embed fault handler
@@ -1360,20 +1366,29 @@ void PEventHandlers(impl_tEventHandlers* abstract_phylum, uview current_view)
 	Place *p4 = PN.newPlace(prefix + "finishing");
 	Place *p5 = PN.newPlace(prefix + "stop");
 	Place *p6 = PN.newPlace(prefix + "stopped");
+	Place *p7 = PN.newPlace(prefix + "stopping");
 
 	Transition *t1 = PN.newTransition(prefix + "start");
-        PN.newArc(p1, t1);
-        PN.newArc(t1, p3);
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p3);
 
-	Transition *t2 = PN.newTransition(prefix + "stop_EH");
-        PN.newArc(p5, t2);
+	Transition *t2 = PN.newTransition(prefix + "finish");
+	PN.newArc(t2, p2);
+	PN.newArc(p4, t2);
 
-	Transition *t3 = PN.newTransition(prefix + "EH_stopped");
-        PN.newArc(t3, p6);
+	Transition *t3 = PN.newTransition(prefix + "stop_finishing");
+	PN.newArc(p4, t3);
+	PN.newArc(p5, t3);
+	PN.newArc(t3, p7);
 
-	Transition *t4 = PN.newTransition(prefix + "finish");
-        PN.newArc(t4, p2);
-	PN.newArc(p4, t4);
+	Transition *t4 = PN.newTransition(prefix + "stop_running");
+	PN.newArc(p3, t4);
+	PN.newArc(p5, t4);
+	PN.newArc(t4, p7);
+
+	Transition *t5 = PN.newTransition(prefix + "EH_stopped");
+	PN.newArc(t5, p6);
+	PN.newArc(p7, t5);
 
 
 	// traverse the <onMessage> branches
@@ -1383,43 +1398,60 @@ void PEventHandlers(impl_tEventHandlers* abstract_phylum, uview current_view)
 	  assert(ASTEmap[my_integer->value] != NULL);
 	  my_activity->unparse(pseudoPrinter, current_view);
 
-	  Place *p7 = PN.newPlace(prefix + "ready." + toString(event_number));
-	  PN.newArc(t1, p7);
+	  Place *p8 = PN.newPlace(prefix + "pending." + toString(event_number));
+	  Place *p9 = PN.newPlace(prefix + "finished." + toString(event_number));
 
-	  Transition *t5 = PN.newTransition(prefix + "event." + toString(event_number));
-	  PN.newArc(p7, t5);
-	  PN.newArc(t5, PN.findPlace(toString(my_activity->id) + ".internal.initial"));
-	  PN.newArc(PN.findPlace("in." + ASTEmap[my_integer->value]->channelName), t5);
-
-	  Transition *t6 = PN.newTransition(prefix + "reset." + toString(event_number));
-	  PN.newArc(PN.findPlace(toString(my_activity->id) + ".internal.final"), t6);
-	  PN.newArc(t6, p7);
+	  Transition *t6 = PN.newTransition(prefix + "event." + toString(event_number));
 	  PN.newArc(p3, t6, READ);
+	  PN.newArc(p8, t6);
+	  PN.newArc(t6, PN.findPlace(toString(my_activity->id) + ".internal.initial"));
+	  PN.newArc(PN.findPlace("in." + ASTEmap[my_integer->value]->channelName), t6);
 
-	  PN.newArc(PN.findPlace(toString(my_activity->id) + ".internal.final"), t4);
-	  PN.newArc(t2, PN.findPlace(toString(my_activity->id) + ".internal.stop"));
-	  PN.newArc(PN.findPlace(toString(my_activity->id) + ".internal.stopped"), t3);
+	  Transition *t7 = PN.newTransition(prefix + "finish." + toString(event_number));
+	  PN.newArc(p8, t7);
+	  PN.newArc(p4, t7, READ);
+	  PN.newArc(t7, p9);
+
+	  PN.newArc(t1, p8);
+	  PN.newArc(p9, t2);
+	  PN.newArc(t3, PN.findPlace(toString(my_activity->id) + ".internal.stop"));
+	  PN.newArc(t4, PN.findPlace(toString(my_activity->id) + ".internal.stop"));
+	  PN.newArc(PN.findPlace(toString(my_activity->id) + ".internal.stopped"), t5);
+
+	  PN.mergePlaces(p8, PN.findPlace(toString(my_activity->id) + ".internal.final"));
+	  PN.mergePlaces(p9, PN.findPlace(toString(my_activity->id) + ".internal.stopped"));
 
 	  event_number++;
 	}
 
 
 	// traverse the <onAlarm> branches
-	event_number = 1;
 	foreach(branch=OnAlarm(my_activity, my_integer); tOnAlarm_list phylum->tOnAlarm_list_1)
 	{
+	  assert(ASTEmap[my_integer->value] != NULL);
 	  my_activity->unparse(pseudoPrinter, current_view);
 
-	  Place *p7 = PN.newPlace(prefix + "waiting." + toString(event_number));
-	  PN.newArc(t1, p7);
+	  Place *p8 = PN.newPlace(prefix + "pending." + toString(event_number));
+	  Place *p9 = PN.newPlace(prefix + "finished." + toString(event_number));
 
-	  Transition *t5 = PN.newTransition(prefix + "alarm." + toString(event_number));
-	  PN.newArc(p7, t5);
-	  PN.newArc(t5, PN.findPlace(toString(my_activity->id) + ".internal.initial"));
+	  Transition *t6 = PN.newTransition(prefix + "event." + toString(event_number));
+	  PN.newArc(p3, t6, READ);
+	  PN.newArc(p8, t6);
+	  PN.newArc(t6, PN.findPlace(toString(my_activity->id) + ".internal.initial"));
 
-	  PN.newArc(PN.findPlace(toString(my_activity->id) + ".internal.final"), t4);
-	  PN.newArc(t2, PN.findPlace(toString(my_activity->id) + ".internal.stop"));
-	  PN.newArc(PN.findPlace(toString(my_activity->id) + ".internal.stopped"), t3);
+	  Transition *t7 = PN.newTransition(prefix + "finish." + toString(event_number));
+	  PN.newArc(p8, t7);
+	  PN.newArc(p4, t7, READ);
+	  PN.newArc(t7, p9);
+
+	  PN.newArc(t1, p8);
+	  PN.newArc(p9, t2);
+	  PN.newArc(t3, PN.findPlace(toString(my_activity->id) + ".internal.stop"));
+	  PN.newArc(t4, PN.findPlace(toString(my_activity->id) + ".internal.stop"));
+	  PN.newArc(PN.findPlace(toString(my_activity->id) + ".internal.stopped"), t5);
+
+	  PN.mergePlaces(p9, PN.findPlace(toString(my_activity->id) + ".internal.final"));
+	  PN.mergePlaces(PN.findPlace(prefix + "finished." + toString(event_number)), PN.findPlace(toString(my_activity->id) + ".internal.stopped"));
 
 	  event_number++;
 	}

@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/06 22:15:28 $
+ * \date    \$Date: 2006/12/07 11:52:56 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.119 $
+ * \version \$Revision: 1.120 $
  *
  * \ingroup petrinet
  */
@@ -501,6 +501,9 @@ class PetriNet
 
     /// fusion of series transitions (RA2)
     void fusionOfSeriesTransitions();
+
+    /// elimination of self-loop places (RC1)
+    void eliminationOfSelfLoopPlaces();
 
     /// remove transitive nodes and arcs
     void transitiveReduction();

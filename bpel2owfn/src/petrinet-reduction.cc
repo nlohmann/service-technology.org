@@ -24,17 +24,17 @@
  * \brief   Petri Net API: structural reduction
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nlohmann $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2006/12/06 13:23:29 $
+ * \date    \$Date: 2006/12/07 11:52:56 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.45 $
+ * \version \$Revision: 1.46 $
  *
  * \ingroup petrinet
  */
@@ -425,6 +425,40 @@ void PetriNet::fusionOfSeriesTransitions()
 
 
 
+/*!
+ * \brief Elimination of self-loop places (RC1):
+ *
+ * \pre m0(p) = 1
+ * \pre |.p| = 1
+ * \pre |p.| = 1
+ * \pre p. \cap .p \neq {}
+ *
+ * \post p is removed
+ */
+void PetriNet::eliminationOfSelfLoopPlaces()
+{
+  trace(TRACE_DEBUG, "[PN]\tApplying rule RC1 (elimination of self-loop places)...\n");  
+
+  set<string> uselessPlaces;
+
+  for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
+    if ((*p)->tokens == 1)
+      if (postset(*p).size() == 1 && preset(*p).size() == 1)
+	if (!setIntersection(preset(*p), postset(*p)).empty())
+	  uselessPlaces.insert((*p)->history[0]);
+
+
+  // remove useless places
+  for (set<string>::iterator label = uselessPlaces.begin();
+      label != uselessPlaces.end(); label++)
+  {
+    Place *uselessPlace = findPlace(*label);
+    removePlace(uselessPlace);
+  }
+}
+
+
+
 
 /*!
  * Calls some simple structural reduction rules for Petri nets:
@@ -435,6 +469,7 @@ void PetriNet::fusionOfSeriesTransitions()
  * - Elimination of identical transitions (RB2)
  * - Fusion of series places (RA1)
  * - Fusion of series transitions (RA2)
+ * - Elimination of self-loop places (RC1)
  * 
  * \todo
  *       - (nlohmann) improve performance
@@ -459,6 +494,7 @@ void PetriNet::reduce()
     elminiationOfIdenticalTransitions();	// RB2
     fusionOfSeriesPlaces();			// RA1
     fusionOfSeriesTransitions();		// RA2
+    eliminationOfSelfLoopPlaces();		// RC1
 
     if (parameters[P_TRED])
       transitiveReduction();
@@ -477,6 +513,10 @@ void PetriNet::reduce()
 
 
 
+
+/******************************************************************************
+ * TRANSITIVE REDUCTION (alpha state)
+ *****************************************************************************/
 
 /* depth-first search returning the set of reachable nodes */
 set<unsigned int> dfs(unsigned int i, map<unsigned int, set<unsigned int> > &Adj)

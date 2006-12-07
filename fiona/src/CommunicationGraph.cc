@@ -524,7 +524,7 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
 			for (StateSet::iterator iter = node->reachGraphStateSet.begin(); 
 					iter != node->reachGraphStateSet.end(); iter++) {
 	        		
-(*iter)->decode(PN);
+				(*iter)->decode(PN);
 				// calculate temporary state set with the help of stubborn set method
 				PN->calculateReachableStates(stateSet, outputPlace, newNode);	
 			}
@@ -543,10 +543,10 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
 					PN->calculateReachableStatesOutputEvent(newNode, true, outputPlace);   // calc the reachable states from that marking
 				}
 			}
+		//	binDeleteAll(PN->tempBinDecision);
+			delete PN->tempBinDecision;
         }
 
-//	binDeleteAll(PN->tempBinDecision);
-    
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) : end\n");
 }
 

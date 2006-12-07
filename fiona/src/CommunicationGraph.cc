@@ -472,20 +472,36 @@ void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex *
   	PN->setOfStatesTemp.clear();
   	PN->visitedStates.clear();
 
-    for (iter = node->reachGraphStateSet.begin();
-         iter != node->reachGraphStateSet.end(); iter++) {
+    if (options[O_CALC_ALL_STATES]) {
+		for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
+	    		(*iter)->decode(PN);
+	    		if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
+	        			PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
+	    		}
+		}
+    } else {
+    	owfnPlace * outputPlace;
+    
+		outputPlace = PN->Places[output];
 
-		// get the marking of this state
-        (*iter)->decode(PN);
-        
-        if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
-            // if there is a state for which an output event was activated, catch that state
-            if (options[O_CALC_ALL_STATES]) {
-                PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
-            } else {
-                PN->calculateReachableStatesOutputEvent(newNode, true, PN->Places[output]);   // calc the reachable states from that marking
-            }
-        }
+		StateSet stateSet;
+
+		for (StateSet::iterator iter = node->reachGraphStateSet.begin(); 
+				iter != node->reachGraphStateSet.end(); iter++) {
+        		
+			(*iter)->decode(PN);
+			// calculate temporary state set with the help of stubborn set method
+			PN->calculateReachableStates(stateSet, outputPlace, newNode);	
+		}
+
+		for (StateSet::iterator iter2 = stateSet.begin(); iter2 != stateSet.end(); iter2++) {		
+			(*iter2)->decode(PN); // get the marking of the state
+			if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
+				PN->calculateReachableStatesOutputEvent(newNode, true, outputPlace);   // calc the reachable states from that marking
+			}
+		}
+	//	binDeleteAll(PN->tempBinDecision);
+		delete PN->tempBinDecision;
     }
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node, vertex * newNode) : end\n");
 }
@@ -498,54 +514,45 @@ void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex *
 // for IG
 void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) : start\n");
-
     
   	PN->setOfStatesTemp.clear();
   	PN->visitedStates.clear();
         
-        if (options[O_CALC_ALL_STATES]) {
+    if (options[O_CALC_ALL_STATES]) {
 		for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
-        		(*iter)->decode(PN);
-        		if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
-            			PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
-        		}
+	    		(*iter)->decode(PN);
+	    		if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
+	        			PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
+	    		}
 		}
-        } else {
-        	owfnPlace * outputPlace;
-        
-			// CHANGE THAT!!!!!!!!!!! is just a hack, stubborn set method does not yet work for more than one output event!
-			for (messageMultiSet::iterator iter = output.begin(); iter != output.end(); iter++) {
-				outputPlace = PN->Places[*iter];
+    } else {
+    	owfnPlace * outputPlace;
+    
+		// CHANGE THAT!!!!!!!!!!! is just a hack, stubborn set method does not yet work for more than one output event!
+		for (messageMultiSet::iterator iter = output.begin(); iter != output.end(); iter++) {
+			outputPlace = PN->Places[*iter];
+		}
+        // end hack
+
+		StateSet stateSet;
+
+		for (StateSet::iterator iter = node->reachGraphStateSet.begin(); 
+				iter != node->reachGraphStateSet.end(); iter++) {
+        		
+			(*iter)->decode(PN);
+			// calculate temporary state set with the help of stubborn set method
+			PN->calculateReachableStates(stateSet, outputPlace, newNode);	
+		}
+
+		for (StateSet::iterator iter2 = stateSet.begin(); iter2 != stateSet.end(); iter2++) {		
+			(*iter2)->decode(PN); // get the marking of the state
+			if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
+				PN->calculateReachableStatesOutputEvent(newNode, true, outputPlace);   // calc the reachable states from that marking
 			}
-	        // end hack
-
-			StateSet stateSet;
-
-			for (StateSet::iterator iter = node->reachGraphStateSet.begin(); 
-					iter != node->reachGraphStateSet.end(); iter++) {
-	        		
-				(*iter)->decode(PN);
-				// calculate temporary state set with the help of stubborn set method
-				PN->calculateReachableStates(stateSet, outputPlace, newNode);	
-			}
-
-
-			for (StateSet::iterator iter2 = stateSet.begin(); iter2 != stateSet.end(); iter2++) {		
-		        	//cout << "iter2: " << iter2 << endl;
-//		        	cout << "*iter2: " << *iter2 << endl;
-//				cout << "size of stateSet: " << stateSet.size() << endl;
-
-				(*iter2)->decode(PN); // get the marking of the state
-//				cout << "--> in node " << node->getNumber() << " for message " << outputPlace->name << " we calculated marking: " << endl;
-//		        	PN->printmarking();
-
-				if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
-					PN->calculateReachableStatesOutputEvent(newNode, true, outputPlace);   // calc the reachable states from that marking
-				}
-			}
-		//	binDeleteAll(PN->tempBinDecision);
-			delete PN->tempBinDecision;
-        }
+		}
+	//	binDeleteAll(PN->tempBinDecision);
+		delete PN->tempBinDecision;
+    }
 
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) : end\n");
 }

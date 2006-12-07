@@ -24,17 +24,17 @@
  * \brief   Petri Net API: file output
  * 
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nlohmann $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/12/06 13:23:29 $
+ * \date    \$Date: 2006/12/07 14:25:52 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.62 $
+ * \version \$Revision: 1.63 $
  *
  * \ingroup petrinet
  */
@@ -202,7 +202,7 @@ string PetriNet::information() const
  *
  * \todo put this to the nodes
  */
-void PetriNet::output_info(ostream *output) const
+void PetriNet::output_info(std::ostream *output) const
 {
   assert(output != NULL);
 
@@ -376,7 +376,7 @@ string Place::output_dot() const
  * the digraph-statement and adds labels to transitions, places and arcs if
  * neccessary. It also distinguishes the three arc types of #arc_type.
  */
-void PetriNet::output_dot(ostream *output) const
+void PetriNet::output_dot(std::ostream *output) const
 {
   assert(output != NULL);
 

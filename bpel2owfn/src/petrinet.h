@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/07 11:52:56 $
+ * \date    \$Date: 2006/12/07 14:25:53 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.120 $
+ * \version \$Revision: 1.121 $
  *
  * \ingroup petrinet
  */
@@ -482,31 +482,28 @@ class PetriNet
     
 
     /// remove unused status places
-    void removeUnusedStatusPlaces();
+    void reduce_unused_status_places();
 
     /// remove transitions with empty pre or postset
     void removeSuspiciousTransitions();
 
     /// remove dead nodes of the Petri net
-    void removeDeadNodes();
+    void reduce_dead_nodes();
 
     /// elimination of identical places (RB1)
-    void elminiationOfIdenticalPlaces();
+    void reduce_identical_places();
     
     /// elimination of identical transitions (RB2)
-    void elminiationOfIdenticalTransitions();
+    void reduce_identical_transitions();
 
     /// fusion of series places (RA1)
-    void fusionOfSeriesPlaces();
+    void reduce_series_places();
 
     /// fusion of series transitions (RA2)
-    void fusionOfSeriesTransitions();
+    void reduce_series_transitions();
 
     /// elimination of self-loop places (RC1)
-    void eliminationOfSelfLoopPlaces();
-
-    /// remove transitive nodes and arcs
-    void transitiveReduction();
+    unsigned int reduce_self_loop_places();
 
 
     /// returns an id for new nodes

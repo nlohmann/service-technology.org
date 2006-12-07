@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/06 13:07:22 $
+ * \date    \$Date: 2006/12/07 14:25:52 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.39 $
+ * \version \$Revision: 1.40 $
  */
 
 
@@ -150,7 +150,7 @@ typedef enum
 
 extern void closeOutput(ostream *file);
 extern void parse_command_line(int argc, char* argv[]);
-extern ostream *openOutput(string name);
+extern std::ostream *openOutput(std::string name);
 
 
 

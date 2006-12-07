@@ -28,13 +28,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/12/06 22:15:28 $
+ * \date    \$Date: 2006/12/07 14:25:52 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.168 $
+ * \version \$Revision: 1.169 $
  *
  * \ingroup petrinet
  */
@@ -71,7 +71,7 @@
  * \param  role a role of a node
  * \return true, if the node's first history entry contains the given role
  */
-bool Node::firstMemberAs(string role) const
+bool Node::firstMemberAs(std::string role) const
 {
   string firstEntry = (*history.begin());
   return (firstEntry.find(role, 0) == firstEntry.find_first_of(".") + 1);
@@ -86,7 +86,7 @@ bool Node::firstMemberAs(string role) const
  * \param  role a role of a node
  * \return true, if the node's first history entry begins with the given role
  */
-bool Node::firstMemberIs(string role) const
+bool Node::firstMemberIs(std::string role) const
 {
   string firstEntry = (*history.begin());
   return (firstEntry.find(role, 0) == 0);
@@ -101,7 +101,7 @@ bool Node::firstMemberIs(string role) const
  * \param  role a role of a node
  * \return true, if the node's history contains the given role
  */
-bool Node::historyContains(string role) const
+bool Node::historyContains(std::string role) const
 {
   for (unsigned int i = 0; i < history.size(); i++)
     if (history[i] == role)
@@ -143,10 +143,10 @@ Arc::Arc(Node *my_source, Node *my_target, unsigned int my_weight)
 
 
 /*!
- * \param myid	the id of the transition
- * \param role	the first role of the transition
+ * \param my_id    the id of the transition
+ * \param my_role  the first role of the transition
  */
-Transition::Transition(unsigned int my_id, string my_role)
+Transition::Transition(unsigned int my_id, std::string my_role)
 {
   id = my_id;
   nodeType = TRANSITION;
@@ -164,11 +164,11 @@ Transition::Transition(unsigned int my_id, string my_role)
 
 
 /*!
- * \param myid   the internal id of the place
- * \param role   the first role of the place
- * \param mytype the type of the place (as defined in #communication_type)
+ * \param my_id   the internal id of the place
+ * \param my_role the first role of the place
+ * \param my_type the type of the place (as defined in #communication_type)
  */
-Place::Place(unsigned int my_id, string my_role, communication_type my_type) :
+Place::Place(unsigned int my_id, std::string my_role, communication_type my_type) :
     tokens(0), isFinal(false)
 {
   type = my_type;
@@ -447,7 +447,7 @@ Place *PetriNet::newPlace(std::string my_role, communication_type my_type)
 
 
 /*!
- * \param role  the initial role of the transition
+ * \param my_role  the initial role of the transition
  * \return pointer of the created transition
  * \pre No transition with the given role is defined.
  */
@@ -476,9 +476,9 @@ Transition *PetriNet::newTransition(std::string my_role)
 
 
 /*!
- * \param source      source node of the arc
- * \param target      target node of the arc
- * \param type        type of the arc (as defined in #arc_type)
+ * \param my_source   source node of the arc
+ * \param my_target   target node of the arc
+ * \param my_type     type of the arc (as defined in #arc_type)
  * \param my_weight   weight of the arc (standard: 1)
  * \return pointer of the created arc
  * \pre The types of the nodes have to match, i.e. an arc can only be created
@@ -786,7 +786,7 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
  * \param role1 string describing the role of the first place
  * \param role2 string describing the role of the second place
  */
-void PetriNet::mergePlaces(string role1, string role2)
+void PetriNet::mergePlaces(std::string role1, std::string role2)
 {
   mergePlaces(findPlace(role1), findPlace(role2));
 }
@@ -807,7 +807,7 @@ void PetriNet::mergePlaces(string role1, string role2)
  * \param role2 string describing the role of the second place (beginning with a
  *              period: .empty
  */
-void PetriNet::mergePlaces(unsigned int id1, string role1, unsigned int id2, string role2)
+void PetriNet::mergePlaces(unsigned int id1, std::string role1, unsigned int id2, std::string role2)
 {
   mergePlaces(toString(id1) + role1, toString(id2) + role2);
 }
@@ -821,7 +821,7 @@ void PetriNet::mergePlaces(unsigned int id1, string role1, unsigned int id2, str
  * \param new_name  the new name of that role
  * \pre  p is a place of the Petri net.
  */
-void PetriNet::renamePlace(string old_name, string new_name)
+void PetriNet::renamePlace(std::string old_name, std::string new_name)
 {
   Place *p = findPlace(old_name);
   assert(p != NULL);
@@ -877,7 +877,7 @@ unsigned int PetriNet::arc_weight(Node *my_source, Node *my_target) const
  * \result the preset of node n
  * \pre n != NULL
  */
-set<Node *> PetriNet::preset(Node *n) const
+std::set<Node *> PetriNet::preset(Node *n) const
 {
   assert(n != NULL);
 
@@ -899,7 +899,7 @@ set<Node *> PetriNet::preset(Node *n) const
  * \result the postset of node n
  * \pre n != NULL
  */
-set<Node *> PetriNet::postset(Node *n) const
+std::set<Node *> PetriNet::postset(Node *n) const
 {
   assert(n != NULL);
 
@@ -925,7 +925,7 @@ set<Node *> PetriNet::postset(Node *n) const
  * \param  role the demanded role
  * \return a pointer to the place or a NULL pointer if the place was not found.
  */
-Place *PetriNet::findPlace(string role)
+Place *PetriNet::findPlace(std::string role)
 {
   Place *result = static_cast<Place*>(roleMap[role]);
 
@@ -946,7 +946,7 @@ Place *PetriNet::findPlace(string role)
  * \param  role the demanded role
  * \return a pointer to the place or a NULL pointer if the place was not found.
  */
-Place *PetriNet::findPlace(unsigned int id, string role)
+Place *PetriNet::findPlace(unsigned int id, std::string role)
 {
   return findPlace(toString(id) + role);
 }
@@ -965,7 +965,7 @@ Place *PetriNet::findPlace(unsigned int id, string role)
  * \return a pointer to the place
  * \pre    The place exists.
  */
-Place *PetriNet::findPlace(unsigned id1, unsigned id2)
+Place *PetriNet::findPlace(unsigned int id1, unsigned int id2)
 {
   Transition *t1 = NULL;
   Transition *t2 = NULL;
@@ -1005,7 +1005,7 @@ Place *PetriNet::findPlace(unsigned id1, unsigned id2)
  * \return a pointer to the transition or a NULL pointer if the place was not
  *         found.
  */
-Transition *PetriNet::findTransition(string role)
+Transition *PetriNet::findTransition(std::string role)
 {
   Transition *result = static_cast<Transition*>(roleMap[role]);
 
@@ -1039,7 +1039,7 @@ unsigned int PetriNet::getId()
  *
  *  \param prefix The prefix to add.
  */
-void PetriNet::addPrefix(string prefix)
+void PetriNet::addPrefix(std::string prefix)
 {
   for (set< Place * >::iterator place = P.begin(); place != P.end(); place ++)
   {

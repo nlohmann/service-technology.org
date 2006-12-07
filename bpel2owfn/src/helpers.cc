@@ -28,13 +28,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2006/12/04 12:24:27 $
+ * \date    \$Date: 2006/12/07 14:25:52 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.66 $
+ * \version \$Revision: 1.67 $
  *
  * \ingroup conversion
  * \ingroup debug
@@ -238,7 +238,6 @@ void error()
  * \post input file closed
  * \post current output file closed
  * \post log file closed
- * \post Petri net (pointer #TheNet) deleted
  *
  * \ingroup debug
  */

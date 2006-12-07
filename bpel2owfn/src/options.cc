@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/06 13:07:22 $
+ * \date    \$Date: 2006/12/07 14:25:52 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.57 $
+ * \version \$Revision: 1.58 $
  */
 
 
@@ -582,9 +582,9 @@ void parse_command_line(int argc, char* argv[])
  * \param name filename of the output file
  * \return output file stream to the output file
  *
- * \post output file with filename #name opened and bound to stream file
+ * \post output file with filename name opened and bound to stream file
  */
-ostream *openOutput(string name)
+std::ostream *openOutput(std::string name)
 {
   ofstream *file = new ofstream(name.c_str(), ofstream::out | ofstream::trunc | ofstream::binary);
   

@@ -232,7 +232,7 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
 	            toAdd->eventsUsed[offset + i]++;
 			} else {
 				found->eventsUsed[offset + i]++;
-			}
+		}
         }
 
         if (found == NULL) {
@@ -567,7 +567,7 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
 			}
 		}
 	//	binDeleteAll(PN->tempBinDecision);
-		delete PN->tempBinDecision;
+	//	delete PN->tempBinDecision;
     }
 
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) : end\n");

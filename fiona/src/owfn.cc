@@ -826,21 +826,6 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 	State * CurrentState;
   	State * NewState;
   	stateType type;
-  	
-
-/*	try {
-  		tempBinDecision = new binDecision * [HASHSIZE];
-	} catch(bad_alloc) {
-		char mess[] = "\nhash table too large!\n";
-		//write(2,mess,sizeof(mess));
-		cerr << mess;
-		_exit(2);
-	}
-  	
-  	for(unsigned int i = 0; i < HASHSIZE; i++) {
-        	tempBinDecision[i] = (binDecision *) 0;
-    	} 
-*/
 
 	tempBinDecision = (binDecision *) 0;
 
@@ -864,7 +849,6 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 	//	trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace): end\n");
 		//return;
 	} else {
-	
 		CurrentState = binSearch(tempBinDecision, this);
 		CurrentState = binInsert(&tempBinDecision, this);  // save current state to the local binDecision 
 	}
@@ -935,7 +919,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 		   		CurrentState->succ[CurrentState->current] = NewState;
 	     		(CurrentState->current)++;
 	    	} else {
-				trace(TRACE_5, "Current marking new\n");
+			trace(TRACE_5, "Current marking new\n");
       			NewState = binInsert(&tempBinDecision, this);
       			NewState->stubbornFirelist = stubbornfirelistmessage(outputPlace);
 	      		NewState->CardStubbornFireList = CardFireList;

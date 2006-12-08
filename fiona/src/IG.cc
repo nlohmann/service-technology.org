@@ -74,10 +74,11 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet input, vertex * curren
 	for (messageMultiSet::iterator iter = input.begin(); iter != input.end(); iter++) {
 		if (typeOfPlace == sending) {
 			unsigned int i = 0;
-			while (i < PN->placeInputCnt && PN->inputPlacesArray[i] && 
+			while (i < PN->placeInputCnt-1 && PN->inputPlacesArray[i] && 
 						PN->inputPlacesArray[i]->index != *iter) {
 				i++;	
 			}
+
 			if (currentNode->eventsUsed[i] >= PN->inputPlacesArray[i]->max_occurence) {
 				// this input event shall not be sent anymore, so quit here
 				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");
@@ -85,7 +86,7 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet input, vertex * curren
 			}
 		} else if (typeOfPlace == receiving) {
 			unsigned int i = 0;
-			while (i < PN->placeOutputCnt && PN->outputPlacesArray[i] && 
+			while (i < PN->placeOutputCnt-1 && PN->outputPlacesArray[i] && 
 						PN->outputPlacesArray[i]->index != *iter) {
 				i++;	
 			}

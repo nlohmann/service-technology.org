@@ -51,6 +51,7 @@ vertex::vertex(int numberEvents) :
 	for (int i = 0; i < numberEvents; i++) {
 		eventsUsed[i] = 0;
 	}
+
 	eventsToBeSeen = numberEvents;
 	
 }

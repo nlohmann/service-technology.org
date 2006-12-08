@@ -424,6 +424,14 @@ void communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex 
   	PN->setOfStatesTemp.clear();
   	PN->visitedStates.clear();
 
+	if (TRACE_2 <= debug_level) {
+		for (messageMultiSet::iterator iter = input.begin(); iter != input.end(); iter++) {
+			trace(TRACE_2, PN->Places[*iter]->name);
+			trace(TRACE_2, " ");			
+		}
+		trace(TRACE_2, "\n");
+	}
+
     for (iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
         (*iter)->decode(PN);
         
@@ -517,6 +525,14 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
     
   	PN->setOfStatesTemp.clear();
   	PN->visitedStates.clear();
+        
+	if (TRACE_2 <= debug_level) {
+		for (messageMultiSet::iterator iter = output.begin(); iter != output.end(); iter++) {
+			trace(TRACE_2, PN->Places[*iter]->name);
+			trace(TRACE_2, " ");
+		}
+		trace(TRACE_2, "\n");
+	}      
         
     if (options[O_CALC_ALL_STATES]) {
 		for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {

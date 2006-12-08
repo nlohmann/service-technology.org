@@ -141,15 +141,14 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	// iterate over all elements of inputSet
 	for (setOfMessages::iterator iter = inputSet.begin(); iter != inputSet.end(); iter++) {
 
-		if (options[O_MESSAGES_MAX] == false || checkMaximalEvents(*iter, currentNode, sending)) {
+		if (checkMaximalEvents(*iter, currentNode, sending)) {
 	
-			trace(TRACE_3, "\t\t\t\t    sending event: !");
+			trace(TRACE_2, "\t\t\t\t    sending event: !");
 			
 			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
 			currentVertex = currentNode;
 			
 			calculateSuccStatesInput(*iter, currentNode, v);
-			trace(TRACE_3, "\n");
 			
 			if (v->getColor() == RED) {
 				// message bound violation occured during calculateSuccStatesInput
@@ -182,15 +181,14 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	
 	trace(TRACE_3, "iterating over outputSet\n");
 	for (setOfMessages::iterator iter = outputSet.begin(); iter != outputSet.end(); iter++) {
-		if (options[O_MESSAGES_MAX] == false || checkMaximalEvents(*iter, currentNode, receiving)) {
+		if (checkMaximalEvents(*iter, currentNode, receiving)) {
 			
-			trace(TRACE_3, "\t\t\t\t    output event: ?");
+			trace(TRACE_2, "\t\t\t\t    output event: ?");
 	
 			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
 			currentVertex = currentNode;
 					
 			calculateSuccStatesOutput(*iter, currentNode, v);
-			trace(TRACE_3, "\n");
 			
 			if (AddVertex (v, *iter, receiving)) {
 		
@@ -270,36 +268,41 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 
 	// iterate over all elements of inputSet
 	for (setOfMessages::iterator iter = inputSet.begin(); iter != inputSet.end(); iter++) {
+		if (checkMaximalEvents(*iter, currentNode, sending)) {
 
-		vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);		// create new vertex of the graph
-		currentVertex = currentNode;
-		
-		calculateSuccStatesInput(*iter, currentNode, v);
-		
-		if (AddVertex (v, *iter, sending)) {
-			buildReducedGraph(v);
-			trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
-			analyseNode(currentNode, false);
-			trace(TRACE_5, "node analysed\n");
+			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);		// create new vertex of the graph
+			currentVertex = currentNode;
+			
+			calculateSuccStatesInput(*iter, currentNode, v);
+			
+			if (AddVertex (v, *iter, sending)) {
+				buildReducedGraph(v);
+				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
+				analyseNode(currentNode, false);
+				trace(TRACE_5, "node analysed\n");
+			}
 		}
 	}
 
 
 	for (setOfMessages::iterator iter = outputSet.begin(); iter != outputSet.end(); iter++) {
-		vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
-		currentVertex = currentNode;
-					
-		calculateSuccStatesOutput(*iter, currentNode, v);
-
+		if (checkMaximalEvents(*iter, currentNode, sending)) {
 		
-		if (AddVertex (v, *iter, receiving)) {
-			buildReducedGraph(v);
-			trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
-			analyseNode(currentNode, false);
-			trace(TRACE_5, "node analysed\n");
+			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
+			currentVertex = currentNode;
+						
+			calculateSuccStatesOutput(*iter, currentNode, v);
+	
+			
+			if (AddVertex (v, *iter, receiving)) {
+				buildReducedGraph(v);
+				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
+				analyseNode(currentNode, false);
+				trace(TRACE_5, "node analysed\n");
+			}	
 		}	
-	}	
-		
+	}
+			
 	actualDepth--;
 	analyseNode(currentNode, true);
 	trace(TRACE_5, "node analysed\n");

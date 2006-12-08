@@ -1210,8 +1210,6 @@ void oWFN::addInputMessage(unsigned int message) {
 int oWFN::addInputMessage(messageMultiSet messages) {
 	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
 		if (Places[*iter]->type == INPUT) {
-			trace(TRACE_3, string(Places[*iter]->name) + " ");
-			
 			// found that place
 			CurrentMarking[*iter]++;
 			placeHashValue += Places[*iter]->hash_factor;
@@ -1472,7 +1470,6 @@ bool oWFN::removeOutputMessage(messageMultiSet messages) {
 	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
 
 		if (Places[*iter]->type == OUTPUT) {
-			trace(TRACE_3, string(Places[*iter]->name) + " ");
 			if (CurrentMarking[*iter] > 0) {
 				found++;
 				// found that place

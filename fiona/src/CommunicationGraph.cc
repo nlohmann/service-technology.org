@@ -419,20 +419,18 @@ void communicationGraph::calculateSuccStatesInput(unsigned int input, vertex * o
 void communicationGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, vertex * newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesInput(messageMultiSet input, vertex * node, vertex * newNode) : start\n");
 
-    StateSet::iterator iter;              // iterator over the stateList's elements
-
   	PN->setOfStatesTemp.clear();
   	PN->visitedStates.clear();
 
 	if (TRACE_2 <= debug_level) {
-		for (messageMultiSet::iterator iter = input.begin(); iter != input.end(); iter++) {
-			trace(TRACE_2, PN->Places[*iter]->name);
+		for (messageMultiSet::iterator iter1 = input.begin(); iter1 != input.end(); iter1++) {
+			trace(TRACE_2, PN->Places[*iter1]->name);
 			trace(TRACE_2, " ");			
 		}
 		trace(TRACE_2, "\n");
 	}
 
-    for (iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
+    for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
         (*iter)->decode(PN);
         
 		// test for each marking of current node if message bound k reached
@@ -527,13 +525,15 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
   	PN->visitedStates.clear();
         
 	if (TRACE_2 <= debug_level) {
-		for (messageMultiSet::iterator iter = output.begin(); iter != output.end(); iter++) {
-			trace(TRACE_2, PN->Places[*iter]->name);
+		for (messageMultiSet::iterator iter1 = output.begin(); iter1 != output.end(); iter1++) {
+			trace(TRACE_2, PN->Places[*iter1]->name);
 			trace(TRACE_2, " ");
 		}
 		trace(TRACE_2, "\n");
 	}      
         
+	trace(TRACE_2, " "); // just for nothing, but why do we need this?! otherwise, the IG computed under Win differs from the one computed under linux
+
     if (options[O_CALC_ALL_STATES]) {
 		for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
 	    		(*iter)->decode(PN);

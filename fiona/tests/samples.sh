@@ -99,9 +99,9 @@ result=`expr $result + $shop3control + $shop3bluenodes + $shop3blueedges + $shop
 # IG reduced
 ############################################################################
 
-shop3bluenodes_soll=8
-shop3blueedges_soll=8
-shop3storedstates_soll=351
+shop3bluenodes_soll=7
+shop3blueedges_soll=6
+shop3storedstates_soll=329
 
 echo running $FIONA -n $DIR/06-03-23_BPM06_shop_sect_3.owfn -a -t IG -r
 OUTPUT=`$FIONA -n $DIR/06-03-23_BPM06_shop_sect_3.owfn -a -t IG -r 2>&1`
@@ -159,7 +159,7 @@ result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges + $shop
 
 shop6bluenodes_soll=6
 shop6blueedges_soll=5
-shop6storedstates_soll=5235
+shop6storedstates_soll=2491
 
 echo running $FIONA -n $DIR/06-03-23_BPM06_shop_sect_6.owfn -a -t IG
 OUTPUT=`$FIONA -n $DIR/06-03-23_BPM06_shop_sect_6.owfn -a -t IG  2>&1`
@@ -189,7 +189,7 @@ result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges + $shop
 
 shop6bluenodes_soll=6
 shop6blueedges_soll=5
-shop6storedstates_soll=1109
+shop6storedstates_soll=1087
 
 echo running $FIONA -n $DIR/06-03-23_BPM06_shop_sect_6.owfn -a -t IG -r
 OUTPUT=`$FIONA -n $DIR/06-03-23_BPM06_shop_sect_6.owfn -a -t IG -r 2>&1`

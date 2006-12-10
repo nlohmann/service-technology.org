@@ -1,22 +1,22 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert      *
+ * Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      *
  *                                                                           *
- * This file is part of BPEL2oWFN.                                           *
+ * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
- * BPEL2oWFN is free software; you can redistribute it and/or modify it      *
+ * GNU BPEL2oWFN is free software; you can redistribute it and/or modify it  *
  * under the terms of the GNU General Public License as published by the     *
  * Free Software Foundation; either version 2 of the License, or (at your    *
  * option) any later version.                                                *
  *                                                                           *
- * BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT  *
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
- * more details.                                                             *
+ * GNU BPEL2oWFN is distributed in the hope that it will be useful, but      *
+ * WITHOUT ANY WARRANTY; without even the implied warranty of                *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General  *
+ * Public License for more details.                                          *
  *                                                                           *
  * You should have received a copy of the GNU General Public License along   *
- * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
-\****************************************************************************/
+ * with GNU BPEL2oWFN; see file COPYING. if not, write to the Free Software  *
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. *
+\*****************************************************************************/
 
 /*!
  * \file    ast-tools.cc
@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/12/07 14:25:52 $
+ * \date    \$Date: 2006/12/10 17:31:15 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -50,6 +50,8 @@
 #include "helpers.h"
 #include "ast-details.h"
 #include "ast-tools.h"
+
+using namespace std;
 
 
 
@@ -444,7 +446,7 @@ void dpeLinks(Transition *t, int id)
   assert(t != NULL);
   assert(ASTEmap[id] != NULL);
 
-  for (set<int>::iterator linkID = ASTEmap[id]->enclosedSourceLinks.begin();
+  for (set<unsigned int>::iterator linkID = ASTEmap[id]->enclosedSourceLinks.begin();
       linkID != ASTEmap[id]->enclosedSourceLinks.end();
       linkID++)
   {
@@ -649,8 +651,8 @@ void listAttributes ( unsigned int id )
 {
   extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
 
-  std::string result = "";
-  for (map< std::string, std::string >::iterator attribute = ASTEmap[ id ]->attributes.begin(); attribute != ASTEmap[ id ]->attributes.end(); attribute++ )
+  string result = "";
+  for (map< string, string >::iterator attribute = ASTEmap[ id ]->attributes.begin(); attribute != ASTEmap[ id ]->attributes.end(); attribute++ )
   {
     if ( attribute->second != "" &&
          attribute->first != "referenceLine" &&

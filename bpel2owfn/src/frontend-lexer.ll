@@ -1,21 +1,21 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert      *
+ * Copyright 2005, 2006 Niels Lohmann                                        *
  *                                                                           *
- * This file is part of BPEL2oWFN.                                           *
+ * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
- * BPEL2oWFN is free software; you can redistribute it and/or modify it      *
+ * GNU BPEL2oWFN is free software; you can redistribute it and/or modify it  *
  * under the terms of the GNU General Public License as published by the     *
  * Free Software Foundation; either version 2 of the License, or (at your    *
  * option) any later version.                                                *
  *                                                                           *
- * BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT  *
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
- * more details.                                                             *
+ * GNU BPEL2oWFN is distributed in the hope that it will be useful, but      *
+ * WITHOUT ANY WARRANTY; without even the implied warranty of                *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General  *
+ * Public License for more details.                                          *
  *                                                                           *
  * You should have received a copy of the GNU General Public License along   *
- * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
+ * with GNU BPEL2oWFN; see file COPYING. if not, write to the Free Software  *
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. *
 \*****************************************************************************/
 
 %{
@@ -34,7 +34,7 @@
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2006/12/04 16:15:08 $
+ * \date    \$Date: 2006/12/10 17:31:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,10 +43,11 @@
  * \note    This file was created using Flex reading file frontend-lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.47 $
+ * \version \$Revision: 1.48 $
  *
  * \todo    add rules to ignored everything non-BPEL
  * \todo    add a more elegant way to handle XSD-namespaces
+ * \todo    overwork documentation: WS-BPEL can also be lexec
  *
  * \ingroup frontend
  */
@@ -54,7 +55,7 @@
 /*!
  * \fn frontend_lex
  * \brief lex the input file
- * \return tokens from type #frontend_tokentype or calls #frontend_error
+ * \return tokens from type #yytokentype or calls #frontend_error
  * \ingroup frontend
  */
 

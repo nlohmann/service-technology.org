@@ -1,22 +1,22 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert      *
+ * Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      *
  *                                                                           *
- * This file is part of BPEL2oWFN.                                           *
+ * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
- * BPEL2oWFN is free software; you can redistribute it and/or modify it      *
+ * GNU BPEL2oWFN is free software; you can redistribute it and/or modify it  *
  * under the terms of the GNU General Public License as published by the     *
  * Free Software Foundation; either version 2 of the License, or (at your    *
  * option) any later version.                                                *
  *                                                                           *
- * BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT  *
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
- * more details.                                                             *
+ * GNU BPEL2oWFN is distributed in the hope that it will be useful, but      *
+ * WITHOUT ANY WARRANTY; without even the implied warranty of                *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General  *
+ * Public License for more details.                                          *
  *                                                                           *
  * You should have received a copy of the GNU General Public License along   *
- * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
-\****************************************************************************/
+ * with GNU BPEL2oWFN; see file COPYING. if not, write to the Free Software  *
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. *
+\*****************************************************************************/
 
 /*!
  * \file    bpel2owfn.cc
@@ -28,14 +28,14 @@
  * 
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/06 22:15:28 $
+ * \date    \$Date: 2006/12/10 17:31:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.132 $
+ * \version \$Revision: 1.133 $
  */
 
 
@@ -128,7 +128,7 @@ int main( int argc, char *argv[])
   
   PetriNet PN2 = PetriNet();
   
-  list< std::string >::iterator file = inputfiles.begin();
+  list< string >::iterator file = inputfiles.begin();
 
   do
   {
@@ -153,6 +153,7 @@ int main( int argc, char *argv[])
 	trace(TRACE_INFORMATION," + Closing input file: " + filename + "\n");
 	fclose(frontend_in);
       }
+
 
       // apply first set of rewrite rules
       trace(TRACE_INFORMATION, "Rewriting...\n");
@@ -181,7 +182,7 @@ int main( int argc, char *argv[])
 	  AST->fprintdot(dotfile, "", "", "", true, true, true);
 	  fclose(dotfile); 
 #ifdef HAVE_DOT
-  	  std::string systemcall = "dot -q -Tpng -o" + output_filename + ".png " + output_filename + "." + suffixes[F_DOT];
+  	  string systemcall = "dot -q -Tpng -o" + output_filename + ".png " + output_filename + "." + suffixes[F_DOT];
   	  trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");
   	  trace(TRACE_INFORMATION, systemcall + "\n\n");
   	  system(systemcall.c_str());
@@ -190,6 +191,7 @@ int main( int argc, char *argv[])
 	else
 	  AST->print();
       }
+
 
       // generate and process the control flow graph?      
       if (modus == M_CFG)
@@ -213,7 +215,7 @@ int main( int argc, char *argv[])
 	{
 	  unsigned int pos = file->rfind(".bpel", file->length());
 	  unsigned int pos2 = file->rfind("/", file->length());
-	  std::string prefix = "";
+	  string prefix = "";
 	  if (pos == (file->length() - 5))
 	  {
 	    prefix = file->substr(pos2 + 1, pos - pos2 - 1) + "_";
@@ -240,6 +242,7 @@ int main( int argc, char *argv[])
       return error;
     }
 
+
     // reset global mappings (could be done somewhere else...)    
     extern set<string> correlationSetNames;
     extern set<string> variableNames;
@@ -256,6 +259,10 @@ int main( int argc, char *argv[])
   } while (modus == M_CONSISTENCY && file != inputfiles.end());
 
 
+
+  /*
+   * parsing complete
+   */
 
 
 
@@ -291,13 +298,14 @@ int main( int argc, char *argv[])
       trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
       PN.reduce();
     }
-    
+   
+
     // now the net will not change any more, thus the nodes are re-enumerated
     // and the maximal occurrences of the nodes are calculated.
     PN.reenumerate(); 
     PN.calculate_max_occurrences(); 
-
     cerr << PN.information() << endl;
+
 
     // create oWFN output ?
     if (formats[F_OWFN])
@@ -316,6 +324,7 @@ int main( int argc, char *argv[])
       }
     }
     
+
     // create LoLA output ?
     if ( formats[F_LOLA] )
     {
@@ -342,14 +351,14 @@ int main( int argc, char *argv[])
 	{
 	  output = openOutput(output_filename + ".task");
 	}
-	std::string comment = "{ AG EF (";
-	std::string formula = "FORMULA\n  ALLPATH ALWAYS EXPATH EVENTUALLY (";
-	std::string andStr = "";
-	for (list< std::string >::iterator file = inputfiles.begin(); file != inputfiles.end(); file++)
+	string comment = "{ AG EF (";
+	string formula = "FORMULA\n  ALLPATH ALWAYS EXPATH EVENTUALLY (";
+	string andStr = "";
+	for (list< string >::iterator file = inputfiles.begin(); file != inputfiles.end(); file++)
 	{
 	  unsigned int pos = file->rfind(".bpel", file->length());
 	  unsigned int pos2 = file->rfind("/", file->length());
-	  std::string prefix = "";
+	  string prefix = "";
 	  if (pos == (file->length() - 5))
 	  {
 	    prefix = file->substr(pos2 + 1, pos - pos2 - 1) + "_";
@@ -371,6 +380,7 @@ int main( int argc, char *argv[])
       }
     }
     
+
     // create PNML output ?
     if ( formats[F_PNML] )
     {
@@ -388,6 +398,7 @@ int main( int argc, char *argv[])
       }
     }
     
+
     // create PEP output ?
     if ( formats[F_PEP] )
     {
@@ -405,6 +416,7 @@ int main( int argc, char *argv[])
       }
     }
     
+
     // create APNN output ?
     if ( formats[F_APNN] )
     {
@@ -422,6 +434,7 @@ int main( int argc, char *argv[])
       }
     }
     
+
     // create dot output ?
     if ( formats[F_DOT] )
     {
@@ -438,13 +451,14 @@ int main( int argc, char *argv[])
 	output = NULL;
 
 #ifdef HAVE_DOT
-	std::string systemcall = "dot -q -Tpng -o" + output_filename + ".png " + output_filename + "." + suffixes[F_DOT];
+	string systemcall = "dot -q -Tpng -o" + output_filename + ".png " + output_filename + "." + suffixes[F_DOT];
 	trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");
 	trace(TRACE_INFORMATION, systemcall + "\n\n");
 	system(systemcall.c_str());
 #endif
       }
     }
+
 
     // create info file ?
     if ( formats[F_INFO] )
@@ -463,6 +477,7 @@ int main( int argc, char *argv[])
       }
     }
   }
+
 
   // everything went fine
   return 0;  

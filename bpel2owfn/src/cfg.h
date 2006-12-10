@@ -1,44 +1,43 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert      *
+ * Copyright 2006 Christian Gierds                                           *
  *                                                                           *
- * This file is part of BPEL2oWFN.                                           *
+ * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
- * BPEL2oWFN is free software; you can redistribute it and/or modify it      *
+ * GNU BPEL2oWFN is free software; you can redistribute it and/or modify it  *
  * under the terms of the GNU General Public License as published by the     *
  * Free Software Foundation; either version 2 of the License, or (at your    *
  * option) any later version.                                                *
  *                                                                           *
- * BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT  *
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
- * more details.                                                             *
+ * GNU BPEL2oWFN is distributed in the hope that it will be useful, but      *
+ * WITHOUT ANY WARRANTY; without even the implied warranty of                *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General  *
+ * Public License for more details.                                          *
  *                                                                           *
  * You should have received a copy of the GNU General Public License along   *
- * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
+ * with GNU BPEL2oWFN; see file COPYING. if not, write to the Free Software  *
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. *
 \*****************************************************************************/
 
-/**
+/*!
  * \file cfg.h
  *
- * \brief Functions for the Control Flow Graph (interface)
+ * \brief   control flow graph (interface)
  *
  * This file provides the necessary classes for building a Control Flow Graph
  * 
- * \author  
- *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: gierds $
- *          
- * \date
- *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/11/15 14:32:41 $
+ * \author  responsible: Christian Gierds <gierds@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $
+ * 
+ * \since   2006-01-19
+ *
+ * \date    \$Date: 2006/12/10 17:31:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.23 $
+ * \version \$Revision: 1.24 $
  */
 
 #ifndef CFG_H
@@ -48,8 +47,12 @@
 #include <iostream>
 #include <list>
 #include <map>
+
 #include "helpers.h"
-//#include "ast-config.h"		// all you need from Kimwitu++
+
+using namespace std;
+
+
 
 
 
@@ -57,7 +60,7 @@
  * External variables
  *****************************************************************************/
 
-extern std::string filename;
+extern string filename;
 
 
 
@@ -110,9 +113,9 @@ typedef enum
 class CFGBlock;
 
 /// map for assigning a target to its appropriate source object
-extern map<std::string, CFGBlock *> sources;
+extern map<string, CFGBlock *> sources;
 /// map for assigning a source to its appropriate target object
-extern map<std::string, CFGBlock *> targets;
+extern map<string, CFGBlock *> targets;
 
 /**
  * This class is a generic template for all blocks within
@@ -137,14 +140,14 @@ class CFGBlock {
     /// ID of the block
     int id;
     /// label of the block
-    std::string label;
+    string label;
 
     /// constructor
     CFGBlock();
     /// constructor
-    CFGBlock(CFGBlockType, int, std::string);
+    CFGBlock(CFGBlockType, int, string);
     /// generic constructor
-    CFGBlock(std::string id);
+    CFGBlock(string id);
     /// generic constructor
     CFGBlock(int id);
     /// generic destructor
@@ -155,10 +158,10 @@ class CFGBlock {
     /// dot_output
     virtual void print_dot();
     /// the name of the dot node
-    virtual std::string dot_name();
+    virtual string dot_name();
 
     /// additional name of the channel
-    std::string channel_name;
+    string channel_name;
 
     /// checks which blocks need DPE
     bool needsDPE(int hasStartingBlock, list<int> lastTarget);
@@ -189,13 +192,13 @@ class CFGBlock {
 
 /***************************** Program Analysis *******************************/
     /// set of initialized variables
-    set<std::string> initializedVariables;
+    set<string> initializedVariables;
 
     /// set of targets seen so far
-    set<std::string> targetsSeen;
+    set<string> targetsSeen;
 
     /// set of depending receives
-    set< pair< std::string, long > > receives;
+    set< pair< string, long > > receives;
 
     set< unsigned int > controllingPeers;
     

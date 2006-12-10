@@ -24,19 +24,19 @@
  *
  * \brief   AST rewrite rules (implementation)
  *
- * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nlohmann $
  * 
  * \since   2006/10/11
  *
- * \date    \$Date: 2006/12/05 09:21:06 $
+ * \date    \$Date: 2006/12/10 17:31:14 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  */
 %}
 

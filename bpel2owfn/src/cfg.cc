@@ -1,44 +1,43 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert      *
+ * Copyright 2006 Christian Gierds                                           *
  *                                                                           *
- * This file is part of BPEL2oWFN.                                           *
+ * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
- * BPEL2oWFN is free software; you can redistribute it and/or modify it      *
+ * GNU BPEL2oWFN is free software; you can redistribute it and/or modify it  *
  * under the terms of the GNU General Public License as published by the     *
  * Free Software Foundation; either version 2 of the License, or (at your    *
  * option) any later version.                                                *
  *                                                                           *
- * BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT  *
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
- * more details.                                                             *
+ * GNU BPEL2oWFN is distributed in the hope that it will be useful, but      *
+ * WITHOUT ANY WARRANTY; without even the implied warranty of                *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General  *
+ * Public License for more details.                                          *
  *                                                                           *
  * You should have received a copy of the GNU General Public License along   *
- * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
+ * with GNU BPEL2oWFN; see file COPYING. if not, write to the Free Software  *
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. *
 \*****************************************************************************/
 
-/**
+/*!
  * \file cfg.cc
  *
- * \brief Functions for the Control Flow Graph (implementation)
+ * \brief   control flow graph (implementation)
  *
  * This file implements the class defined in cfg.h
  * 
- * \author  
- *          - responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
- *          - last changes of: \$Author: nlohmann $
- *          
- * \date
- *          - created: 2006-01-19
- *          - last changed: \$Date: 2006/11/30 09:05:15 $
+ * \author  responsible: Christian Gierds <gierds@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nlohmann $
+ * 
+ * \since   2006-01-19
+ *
+ * \date    \$Date: 2006/12/10 17:31:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.39 $
+ * \version \$Revision: 1.40 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -46,11 +45,16 @@
 
 
 #include <cassert>
+
 #include "cfg.h"
 #include "options.h"
 #include "debug.h"
 #include "ast-details.h"
 #include "ast-config.h"		// all you need from Kimwitu++
+
+
+
+
 
 extern map<unsigned int, map<string, string> > temporaryAttributeMap;
 extern map<unsigned int, ASTE*> ASTEmap;
@@ -59,10 +63,10 @@ extern map<unsigned int, ASTE*> ASTEmap;
 CFGBlock * CFG = NULL;
 
 /// mapping of Link names to Source blocks
-map<std::string, CFGBlock*> sources; 
+map<string, CFGBlock*> sources; 
 
 /// mapping of Link names to Target blocks
-map<std::string, CFGBlock*> targets; 
+map<string, CFGBlock*> targets; 
 
 
 
@@ -88,7 +92,7 @@ CFGBlock::CFGBlock()
  * \param pLabel  a label for identifing the block (e.g. start vs. end block of a flow)
  *
  */
-CFGBlock::CFGBlock(CFGBlockType pType, int pId = 0, std::string pLabel = "")
+CFGBlock::CFGBlock(CFGBlockType pType, int pId = 0, string pLabel = "")
 {
   firstBlock = this;
   lastBlock  = this;
@@ -128,7 +132,7 @@ void CFGBlock::print_dot()
     if (! initializedVariables.empty())
     {
       (*output) << "\\ninitializedVariables: \\n ";
-      for (set<std::string>::iterator iter = initializedVariables.begin(); iter != initializedVariables.end(); iter++)
+      for (set<string>::iterator iter = initializedVariables.begin(); iter != initializedVariables.end(); iter++)
       {
 	(*output) << (*iter) << "\\n";
       }
@@ -136,7 +140,7 @@ void CFGBlock::print_dot()
     if (! receives.empty())
     {
       (*output) << "\\nreceives: \\n ";
-      for (set< pair< std::string, long > >::iterator iter = receives.begin(); iter != receives.end(); iter++)
+      for (set< pair< string, long > >::iterator iter = receives.begin(); iter != receives.end(); iter++)
       {
 	(*output) << iter->first << "," << iter->second << "\\n";
       }
@@ -180,7 +184,7 @@ void CFGBlock::print_dot()
     // draw link
     if (type == CFGSource)
     {
-      std::string targ = "dummy";
+      string targ = "dummy";
       if (targets[dot_name()] != NULL)
 	  targ = (targets[dot_name()])->dot_name();
       (*output) << "  \"" << dot_name() << "\" -> \"" << targ << "\" [ style=dotted ];" << endl;
@@ -199,7 +203,7 @@ void CFGBlock::print_dot()
  * \return the dot name
  *
  */
-std::string CFGBlock::dot_name()
+string CFGBlock::dot_name()
 {
   if (type == CFGSource || type == CFGTarget)
   {
@@ -435,8 +439,8 @@ void CFGBlock::checkForUninitializedVariables()
   }
 
   // checking Variables for this Block
-  std::string var = "";
-  std::string attributeName = "variable";
+  string var = "";
+  string attributeName = "variable";
 
   switch(type)
   {
@@ -499,7 +503,7 @@ void CFGBlock::checkForCyclicLinks()
   if (!processed)
   {
     processed = true;
-    std::string linkname = "";
+    string linkname = "";
 
     if (type == CFGTarget)
     {
@@ -618,7 +622,7 @@ void CFGBlock::checkForCyclicControlDependency()
 //              cerr << "Looking at scope " << current << endl;
 	      if ( ! seen[ current ] )
 	      {
-                extern map< std::string, CFGBlock* > cfgMap;
+                extern map< string, CFGBlock* > cfgMap;
 		seen[ current ] = true;
 //		for ( set< unsigned int >::iterator peer = ASTEmap[ current ]->peerScopes.begin(); peer != ASTEmap[ current ]->peerScopes.end(); peer++ )
 		for ( set< unsigned int >::iterator peer = cfgMap[ toString(current) ]->lastBlock->controllingPeers.begin(); peer != cfgMap[ toString(current) ]->lastBlock->controllingPeers.end(); peer++ )
@@ -707,9 +711,9 @@ void CFGBlock::checkForConflictingReceive()
 	// the actual check for duplicate receives but only for flows
 	if (type == CFGFlow && label == "Flow_begin" || type == CFGProcess && label == "Process_begin")
 	{
-	  for (set< pair< std::string, long> >::iterator elemA = (*iter)->receives.begin(); elemA != (*iter)->receives.end(); elemA++)
+	  for (set< pair< string, long> >::iterator elemA = (*iter)->receives.begin(); elemA != (*iter)->receives.end(); elemA++)
 	  {
-	    for (set< pair< std::string, long> >::iterator elemB = receives.begin(); elemB != receives.end(); elemB++)
+	    for (set< pair< string, long> >::iterator elemB = receives.begin(); elemB != receives.end(); elemB++)
 	    {
 	      if(elemA->first == elemB->first && elemA->second != elemB->second && receives.find(*elemA) == receives.end())
 	      {
@@ -737,7 +741,7 @@ void CFGBlock::checkForConflictingReceive()
 		trace("\n");
 	    }
 	  }
-	  receives.insert(pair<std::string, long>( ASTEmap[id]->channelName, (*iter)->id));
+	  receives.insert(pair<string, long>( ASTEmap[id]->channelName, (*iter)->id));
 	}
 	// 
 	receives = setUnion(receives, (*iter)->receives);
@@ -745,9 +749,9 @@ void CFGBlock::checkForConflictingReceive()
     }
     if (type == CFGSource)
     {
-      for (set< pair< std::string, long> >::iterator elemA = targets[dot_name()]->receives.begin(); elemA != targets[dot_name()]->receives.end(); elemA++)
+      for (set< pair< string, long> >::iterator elemA = targets[dot_name()]->receives.begin(); elemA != targets[dot_name()]->receives.end(); elemA++)
       {
-	for (set< pair< std::string, long> >::iterator elemB = receives.begin(); elemB != receives.end(); elemB++)
+	for (set< pair< string, long> >::iterator elemB = receives.begin(); elemB != receives.end(); elemB++)
 	{
 	  if(elemA->first == elemB->first && elemA->second != elemB->second && receives.find(*elemA) == receives.end())
 	  {
@@ -763,12 +767,12 @@ void CFGBlock::checkForConflictingReceive()
     }
     if (type == CFGReceive)
     {
-      receives.insert(pair<std::string, long>( ASTEmap[id]->channelName, id));
+      receives.insert(pair<string, long>( ASTEmap[id]->channelName, id));
     }
     if (type == CFGInvoke)
     {
       if( temporaryAttributeMap[id]["outputVariable"] != "") {
-	receives.insert(pair<std::string, long>( ASTEmap[id]->channelName, id));
+	receives.insert(pair<string, long>( ASTEmap[id]->channelName, id));
       }
     }
     if (!prevBlocks.empty())

@@ -23,18 +23,18 @@
  *
  * \brief   Petri Net API: file output
  * 
- * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nlohmann $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/12/07 14:25:52 $
+ * \date    \$Date: 2006/12/10 17:31:17 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.63 $
+ * \version \$Revision: 1.64 $
  *
  * \ingroup petrinet
  */
@@ -59,6 +59,8 @@
 #ifndef USING_BPEL2OWFN
 #include "bpel2owfn_wrapper.h"
 #endif
+
+
 
 
 
@@ -139,9 +141,7 @@ string Node::nodeFullName() const
   string result = history[0];
 
   if ( type == INTERNAL || nodeType == TRANSITION )
-  {
     result = prefix + result;
-  }
 
   return result;
 }
@@ -202,7 +202,7 @@ string PetriNet::information() const
  *
  * \todo put this to the nodes
  */
-void PetriNet::output_info(std::ostream *output) const
+void PetriNet::output_info(ostream *output) const
 {
   assert(output != NULL);
 
@@ -372,11 +372,11 @@ string Place::output_dot() const
 
 
 /*!
- * Creates a DOT output(see http://www.graphviz.org) of the Petri net. It uses
+ * Creates a DOT output (see http://www.graphviz.org) of the Petri net. It uses
  * the digraph-statement and adds labels to transitions, places and arcs if
  * neccessary. It also distinguishes the three arc types of #arc_type.
  */
-void PetriNet::output_dot(std::ostream *output) const
+void PetriNet::output_dot(ostream *output) const
 {
   assert(output != NULL);
 
@@ -423,13 +423,16 @@ void PetriNet::output_dot(std::ostream *output) const
 
 /*!
  * Outputs the net in PNML (Petri Net Markup Language).
+ *
+ * \param output  output stream
+ *
+ * \pre output != NULL
+ *
+ * \todo Somehow add the input and output places to the PNML output.
  */
-void PetriNet::output_pnml(std::ostream *output) const
+void PetriNet::output_pnml(ostream *output) const
 {
   assert(output != NULL);
-
-  // remove interface since we do not create an open workflow net
-//  removeInterface();
 
   (*output) << "<?xml version=\"1.0\" encoding=\"utf-8\"?>" << endl << endl;
   (*output) << "<!--" << endl;
@@ -515,13 +518,14 @@ void PetriNet::output_pnml(std::ostream *output) const
 
 /*!
  * Outputs the net in low-level PEP notation.
+ *
+ * \param output  output stream
+ *
+ * \pre output != NULL
  */
-void PetriNet::output_pep(std::ostream *output) const
+void PetriNet::output_pep(ostream *output) const
 {
   assert(output != NULL);
-
-  // remove interface since we do not create an open workflow net
-//  removeInterface();
 
   // header
   (*output) << "PEP" << endl << "PTNet" << endl << "FORMAT_N" << endl;
@@ -562,13 +566,14 @@ void PetriNet::output_pep(std::ostream *output) const
 
 /*!
  * Outputs the net in APNN (Abstract Petri Net Notation).
- */
-void PetriNet::output_apnn(std::ostream *output) const
+ *
+ * \param output  output stream
+ *
+ * \pre output != NULL
+*/
+void PetriNet::output_apnn(ostream *output) const
 {
   assert(output != NULL);
-
-  // remove interface since we do not create an open workflow net
-//  removeInterface();
 
   (*output) << "\\beginnet{" << filename << "}" << endl << endl;
 
@@ -618,8 +623,12 @@ void PetriNet::output_apnn(std::ostream *output) const
 
 /*!
  * Outputs the net in LoLA-format.
+ *
+ * \param output  output stream
+ *
+ * \pre output != NULL
  */
-void PetriNet::output_lola(std::ostream *output) const
+void PetriNet::output_lola(ostream *output) const
 {
   assert(output != NULL);
 
@@ -711,9 +720,12 @@ void PetriNet::output_lola(std::ostream *output) const
 /*!
  * Outputs the net in oWFN-format.
  *
+ * \param output  output stream
+ *
+ * \pre output != NULL
  * \pre PetriNet::calculate_max_occurrences() called
  */
-void PetriNet::output_owfn(std::ostream *output) const
+void PetriNet::output_owfn(ostream *output) const
 {
   assert(output != NULL);
 
@@ -766,7 +778,7 @@ void PetriNet::output_owfn(std::ostream *output) const
     (*output) << "    " << (*p)->nodeName();
 #endif
    
-    if ((*p)->max_occurrences != UINT_MAX)
+    if ((*p)->max_occurrences != UINT_MAX && (*p)->max_occurrences != 0)
       (*output) << " {$ MAX_OCCURRENCES = " << (*p)->max_occurrences << " $}";
 
     if (count < P_in.size())
@@ -787,7 +799,7 @@ void PetriNet::output_owfn(std::ostream *output) const
     (*output) << "    " << (*p)->nodeName();
 #endif
     
-    if ((*p)->max_occurrences != UINT_MAX)
+    if ((*p)->max_occurrences != UINT_MAX && (*p)->max_occurrences != 0)
       (*output) << " {$ MAX_OCCURRENCES = " << (*p)->max_occurrences << " $}";
 
     if (count < P_out.size())
@@ -815,8 +827,6 @@ void PetriNet::output_owfn(std::ostream *output) const
 
       if ((*p)->historyContains("1.internal.initial"))
 	(*output) << " {initial place}";
-      if ( (*p)->isFinal )
-	(*output) << " {final place}";
     }
   }
   (*output) << ";" << endl << endl;  
@@ -839,8 +849,6 @@ void PetriNet::output_owfn(std::ostream *output) const
       (*output) << "  " << (*p)->nodeName();
 #endif
 
-      if ((*p)->historyContains("1.internal.initial"))
-      	(*output) << " {initial place}";
       if ( (*p)->isFinal )
   	(*output) << " {final place}";
     }
@@ -920,7 +928,7 @@ void PetriNet::output_owfn(std::ostream *output) const
  * \param os  an output stream to which the net is streamed
  * \param obj a PetriNet object
  */
-std::ostream& operator<< (std::ostream& os, const PetriNet &obj)
+ostream& operator<< (ostream& os, const PetriNet &obj)
 {
   switch (obj.format)
   {

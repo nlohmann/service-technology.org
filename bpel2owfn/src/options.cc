@@ -1,21 +1,21 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert      *
+ * Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      *
  *                                                                           *
- * This file is part of BPEL2oWFN.                                           *
+ * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
- * BPEL2oWFN is free software; you can redistribute it and/or modify it      *
+ * GNU BPEL2oWFN is free software; you can redistribute it and/or modify it  *
  * under the terms of the GNU General Public License as published by the     *
- * Free Software Foundation; either version 2 of the License, or(at your     *
+ * Free Software Foundation; either version 2 of the License, or (at your    *
  * option) any later version.                                                *
  *                                                                           *
- * BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT  *
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
- * more details.                                                             *
+ * GNU BPEL2oWFN is distributed in the hope that it will be useful, but      *
+ * WITHOUT ANY WARRANTY; without even the implied warranty of                *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General  *
+ * Public License for more details.                                          *
  *                                                                           *
  * You should have received a copy of the GNU General Public License along   *
- * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
+ * with GNU BPEL2oWFN; see file COPYING. if not, write to the Free Software  *
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. *
 \*****************************************************************************/
 
 /*!
@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/07 14:25:52 $
+ * \date    \$Date: 2006/12/10 17:31:17 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.58 $
+ * \version \$Revision: 1.59 $
  */
 
 
@@ -56,8 +56,6 @@
 #include "debug.h"
 #include "getopt.h"	// for radon
 
-using namespace std;
-
 
 
 
@@ -70,7 +68,7 @@ using namespace std;
 string filename = "<STDIN>";
 
 /// list of input files
-list <string> inputfiles;
+list<string> inputfiles;
 
 /// filename of output file
 string output_filename = "";
@@ -187,10 +185,8 @@ void print_help()
 
 /*!
  * \brief prints version information
- *
- * \param name commandline name of the this program
  */
-void print_version(string name)
+void print_version()
 {
   trace(string(PACKAGE_STRING) + "\n\n");
   trace("Copyright (C) 2005, 2006 Niels Lohmann, Christian Gierds and Dennis Reinert\n");
@@ -437,7 +433,7 @@ void parse_command_line(int argc, char* argv[])
   // print version and exit
   if (options[O_VERSION])
   {
-    print_version("");
+    print_version();
     exit(0);
   }
 
@@ -584,7 +580,7 @@ void parse_command_line(int argc, char* argv[])
  *
  * \post output file with filename name opened and bound to stream file
  */
-std::ostream *openOutput(std::string name)
+ostream *openOutput(string name)
 {
   ofstream *file = new ofstream(name.c_str(), ofstream::out | ofstream::trunc | ofstream::binary);
   
@@ -601,16 +597,16 @@ std::ostream *openOutput(std::string name)
 /*!
  * \brief close output file
  *
- * \param output file stream of the output file
+ * \param file file stream of the output file
  *
  * \post out file addressed by output file stream #file closed
  */
-void closeOutput(std::ostream *file)
+void closeOutput(ostream *file)
 {
   if ( file != NULL )
   {
     (*file) << flush;
-    (static_cast<std::ofstream*>(file))->close();
+    (static_cast<ofstream*>(file))->close();
     delete(file);
     file = NULL;
   }

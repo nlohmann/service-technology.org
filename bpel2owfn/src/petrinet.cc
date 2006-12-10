@@ -23,18 +23,19 @@
  *
  * \brief   Petri Net API: base functions
  *
- * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nlohmann $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/12/07 14:25:52 $
+ * \date    \$Date: 2006/12/10 17:31:17 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.169 $
+ * \version \$Revision: 1.170 $
  *
  * \ingroup petrinet
  */
@@ -52,7 +53,6 @@
 
 #include "petrinet.h"
 #include "helpers.h"		// helper functions
-#include "debug.h"		// debug functions
 
 #ifdef USING_BPEL2OWFN
 #include "ast-details.h"
@@ -71,7 +71,7 @@
  * \param  role a role of a node
  * \return true, if the node's first history entry contains the given role
  */
-bool Node::firstMemberAs(std::string role) const
+bool Node::firstMemberAs(string role) const
 {
   string firstEntry = (*history.begin());
   return (firstEntry.find(role, 0) == firstEntry.find_first_of(".") + 1);
@@ -86,7 +86,7 @@ bool Node::firstMemberAs(std::string role) const
  * \param  role a role of a node
  * \return true, if the node's first history entry begins with the given role
  */
-bool Node::firstMemberIs(std::string role) const
+bool Node::firstMemberIs(string role) const
 {
   string firstEntry = (*history.begin());
   return (firstEntry.find(role, 0) == 0);
@@ -101,7 +101,7 @@ bool Node::firstMemberIs(std::string role) const
  * \param  role a role of a node
  * \return true, if the node's history contains the given role
  */
-bool Node::historyContains(std::string role) const
+bool Node::historyContains(string role) const
 {
   for (unsigned int i = 0; i < history.size(); i++)
     if (history[i] == role)
@@ -146,7 +146,7 @@ Arc::Arc(Node *my_source, Node *my_target, unsigned int my_weight)
  * \param my_id    the id of the transition
  * \param my_role  the first role of the transition
  */
-Transition::Transition(unsigned int my_id, std::string my_role)
+Transition::Transition(unsigned int my_id, string my_role)
 {
   id = my_id;
   nodeType = TRANSITION;
@@ -168,16 +168,14 @@ Transition::Transition(unsigned int my_id, std::string my_role)
  * \param my_role the first role of the place
  * \param my_type the type of the place (as defined in #communication_type)
  */
-Place::Place(unsigned int my_id, std::string my_role, communication_type my_type) :
-    tokens(0), isFinal(false)
+Place::Place(unsigned int my_id, string my_role, communication_type my_type) :
+  tokens(0),
+  max_occurrences(0),
+  isFinal(false)
 {
-  type = my_type;
   id = my_id;
+  type = my_type;
   nodeType = PLACE;
-    /*
-  tokens = 0;
-  */
-  max_occurrences = 0;
 
   if (my_role != "")
     history.push_back(my_role);
@@ -211,6 +209,10 @@ PetriNet::PetriNet()
   nextId = 1;
   format = FORMAT_OWFN;
 }
+
+
+
+
 
 /*!
  * The copy constructor with deep copy.
@@ -281,6 +283,10 @@ PetriNet::PetriNet(const PetriNet & net)
     }
   }
 }
+
+
+
+
 
 /*!
  * The "=" operator.
@@ -379,13 +385,9 @@ PetriNet & PetriNet::operator=(const PetriNet & net)
 
 
 
+
 /*!
  * The destructor of the PetriNet class.
- *
- * \post set of places empty
- * \post set of transitions empty
- * \post set of arcs empty
- * \post roleMap empty
  */
 PetriNet::~PetriNet()
 {
@@ -416,7 +418,7 @@ PetriNet::~PetriNet()
  * \return  pointer of the created place
  * \pre No place with the given role is defined.
  */
-Place *PetriNet::newPlace(std::string my_role, communication_type my_type)
+Place *PetriNet::newPlace(string my_role, communication_type my_type)
 {
   Place *p = new Place(getId(), my_role, my_type);
   assert(p != NULL);
@@ -451,7 +453,7 @@ Place *PetriNet::newPlace(std::string my_role, communication_type my_type)
  * \return pointer of the created transition
  * \pre No transition with the given role is defined.
  */
-Transition *PetriNet::newTransition(std::string my_role)
+Transition *PetriNet::newTransition(string my_role)
 {
   Transition *t = new Transition(getId(), my_role);
   assert(t != NULL);
@@ -655,7 +657,6 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
   assert(t2 != NULL);
 
   Node *t12 = newTransition("");
-  assert(t12 != NULL);
 
   // organize the communication type of the new transition
   if (t1->type == t2->type)
@@ -725,9 +726,6 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
  * \post Places p1 and p2 removed.
  * \post Place p12 having the incoming and outgoing arcs of p1 and p2 and the
  *       union of the histories of t1 and t2.
- *
- * \todo
- *       -(nlohmann) Make use of P_in and P_out
  */
 void PetriNet::mergePlaces(Place *p1, Place *p2)
 {
@@ -743,15 +741,9 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
   assert(p2->type == INTERNAL);
 
   Place *p12 = newPlace("");
-  assert(p12 != NULL);
 
-  // p12 is marked with the maximum number of tokens of p1 and p2
-  if (p1->tokens > p2->tokens)
-    p12->tokens = p1->tokens;
-  else
-    p12->tokens = p2->tokens;
- 
-  p12->isFinal = p1->isFinal || p2->isFinal;
+  p12->tokens = max(p1->tokens, p2->tokens); 
+  p12->isFinal = (p1->isFinal || p2->isFinal);
 
   for (vector<string>::iterator role = p1->history.begin(); role != p1->history.end(); role++)
   {
@@ -786,7 +778,7 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
  * \param role1 string describing the role of the first place
  * \param role2 string describing the role of the second place
  */
-void PetriNet::mergePlaces(std::string role1, std::string role2)
+void PetriNet::mergePlaces(string role1, string role2)
 {
   mergePlaces(findPlace(role1), findPlace(role2));
 }
@@ -807,7 +799,7 @@ void PetriNet::mergePlaces(std::string role1, std::string role2)
  * \param role2 string describing the role of the second place (beginning with a
  *              period: .empty
  */
-void PetriNet::mergePlaces(unsigned int id1, std::string role1, unsigned int id2, std::string role2)
+void PetriNet::mergePlaces(unsigned int id1, string role1, unsigned int id2, string role2)
 {
   mergePlaces(toString(id1) + role1, toString(id2) + role2);
 }
@@ -820,8 +812,10 @@ void PetriNet::mergePlaces(unsigned int id1, std::string role1, unsigned int id2
  * \param old_name  the name of the role to be renamed
  * \param new_name  the new name of that role
  * \pre  p is a place of the Petri net.
+ *
+ * \todo change "roleMap[old_name] = NULL;" to something with delete?
  */
-void PetriNet::renamePlace(std::string old_name, std::string new_name)
+void PetriNet::renamePlace(string old_name, string new_name)
 {
   Place *p = findPlace(old_name);
   assert(p != NULL);
@@ -856,10 +850,8 @@ void PetriNet::renamePlace(std::string old_name, std::string new_name)
 unsigned int PetriNet::arc_weight(Node *my_source, Node *my_target) const
 {
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
-  {
     if (((*f)->source == my_source) && ((*f)->target == my_target))
       return (*f)->weight;
-  }  
 
   assert(false);
   return 1;
@@ -877,7 +869,7 @@ unsigned int PetriNet::arc_weight(Node *my_source, Node *my_target) const
  * \result the preset of node n
  * \pre n != NULL
  */
-std::set<Node *> PetriNet::preset(Node *n) const
+set<Node *> PetriNet::preset(Node *n) const
 {
   assert(n != NULL);
 
@@ -899,7 +891,7 @@ std::set<Node *> PetriNet::preset(Node *n) const
  * \result the postset of node n
  * \pre n != NULL
  */
-std::set<Node *> PetriNet::postset(Node *n) const
+set<Node *> PetriNet::postset(Node *n) const
 {
   assert(n != NULL);
 
@@ -924,15 +916,12 @@ std::set<Node *> PetriNet::postset(Node *n) const
  *
  * \param  role the demanded role
  * \return a pointer to the place or a NULL pointer if the place was not found.
+ *
+ * \todo make this function "const"
  */
-Place *PetriNet::findPlace(std::string role)
+Place *PetriNet::findPlace(string role)
 {
-  Place *result = static_cast<Place*>(roleMap[role]);
-
-  if (result == NULL)
-    trace(TRACE_DEBUG, "[PN]\tPlace with role \"" + role + "\" not found.\n");
-
-  return result;
+  return static_cast<Place*>(roleMap[role]);
 }
 
 
@@ -945,53 +934,12 @@ Place *PetriNet::findPlace(std::string role)
  * \param  id an identifier
  * \param  role the demanded role
  * \return a pointer to the place or a NULL pointer if the place was not found.
- */
-Place *PetriNet::findPlace(unsigned int id, std::string role)
-{
-  return findPlace(toString(id) + role);
-}
-
-
-
-
-
-/*!
- * Finds a place given the identifiers of two transitions: one transition in
- * the preset of the place (id1) and one transition in the postset of the place
- * (id2). The result should be unique after structural reduction.
  *
- * \param  id1 an identifier of a transition
- * \param  id2 an identifier of a transition
- * \return a pointer to the place
- * \pre    The place exists.
+ * \todo make this function "const"
  */
-Place *PetriNet::findPlace(unsigned int id1, unsigned int id2)
+Place *PetriNet::findPlace(unsigned int id, string role)
 {
-  Transition *t1 = NULL;
-  Transition *t2 = NULL;
-
-  for (set<Transition*>::iterator t = T.begin(); t != T.end(); t++)
-  {
-    if ( (*t)->id == id1 )
-      t1 = *t;
-    if ( (*t)->id == id2 )
-      t2 = *t;
-  }
-
-  assert(t1 != NULL);
-  assert(t2 != NULL);
-  assert(t1 != t2); // this only holds for acyclic nets
-
-  set<Node*> temp = setIntersection(postset(t1), preset(t2));
-
-  if (temp.size() > 1)
-    cerr << "WARNING" << endl;
-
-  Place *result = static_cast<Place*>(*(temp.begin()));
-
-  assert(result != NULL);
-
-  return result;
+  return static_cast<Place*>(roleMap[toString(id) + role]);
 }
 
 
@@ -1005,14 +953,9 @@ Place *PetriNet::findPlace(unsigned int id1, unsigned int id2)
  * \return a pointer to the transition or a NULL pointer if the place was not
  *         found.
  */
-Transition *PetriNet::findTransition(std::string role)
+Transition *PetriNet::findTransition(string role)
 {
-  Transition *result = static_cast<Transition*>(roleMap[role]);
-
-  if (result == NULL)
-    trace(TRACE_DEBUG, "[PN]\tTransition with role \"" + role + "\" not found.\n");
-
-  return result;
+  return static_cast<Transition*>(roleMap[role]);
 }
 
 
@@ -1024,6 +967,7 @@ Transition *PetriNet::findTransition(std::string role)
 
 /*!
  * \return id for new nodes
+ * \post nextId is incremented
  */
 unsigned int PetriNet::getId()
 {
@@ -1035,11 +979,11 @@ unsigned int PetriNet::getId()
 
 
 /*!
- *  Adds a prefix to all nodes of the Petri net
+ * Adds a prefix to all nodes of the Petri net
  *
- *  \param prefix The prefix to add.
+ * \param prefix The prefix to add.
  */
-void PetriNet::addPrefix(std::string prefix)
+void PetriNet::addPrefix(string prefix)
 {
   for (set< Place * >::iterator place = P.begin(); place != P.end(); place ++)
   {
@@ -1219,6 +1163,8 @@ void PetriNet::compose(PetriNet &net)
 
 /*!
  * Converts input and output places (channels) to internal places.
+ *
+ * \todo What means "P_in.clear(); P_in = set< Place * >();"?
  */
 void PetriNet::makeChannelsInternal()
 {
@@ -1267,6 +1213,9 @@ void PetriNet::reenumerate()
  * maximal occurrences of transitions in the preset (postset) of output (input)
  * places. This number is determined by postprocessing the AST.
  *
+ * \todo use information from the postprocessing/CFG to improved (i.e.
+ *       minimize) the calculated values
+ *
  * \post All communication places have max_occurrences values between 0
  *       (initial value) and UINT_MAX (maximal value).
  */
@@ -1278,25 +1227,28 @@ void PetriNet::calculate_max_occurrences()
   for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
   {
     set<Node *> receiving_transitions = postset(*p);
+    set<unsigned int> receiving_activities;
+
     for (set<Node *>::iterator t = receiving_transitions.begin(); t != receiving_transitions.end(); t++)
-    {
-      unsigned int max_occurrences;
       for (unsigned int i = 0; i < (*t)->history.size(); i++)
       {
 	unsigned int transition_activity_id = toUInt((*t)->history[i].substr(0, (*t)->history[i].find_first_of(".")));
 	assert(ASTEmap[transition_activity_id] != NULL);
-	if (i == 0)
-	  max_occurrences = ASTEmap[transition_activity_id]->max_occurrences;
-
-	// all activities have to have the same max_occurrences
-	assert (max_occurrences == ASTEmap[transition_activity_id]->max_occurrences);
+	receiving_activities.insert(transition_activity_id);
       }
 
-      // sum up the maximal occurrences
-      if (max_occurrences == UINT_MAX)
+    for (set<unsigned int>::iterator activity_id = receiving_activities.begin(); activity_id != receiving_activities.end(); activity_id++)
+    {
+      if (ASTEmap[*activity_id]->max_occurrences == UINT_MAX)
 	(*p)->max_occurrences = UINT_MAX;
       else if ((*p)->max_occurrences != UINT_MAX)
-	(*p)->max_occurrences += max_occurrences;
+      {
+	if (ASTEmap[*activity_id]->activityTypeName() == "repeatUntil" ||
+	    ASTEmap[*activity_id]->activityTypeName() == "while")
+	  (*p)->max_occurrences += ASTEmap[*activity_id]->max_loops;
+	else
+	  (*p)->max_occurrences += ASTEmap[*activity_id]->max_occurrences;
+      }
     }
   }
 
@@ -1304,25 +1256,22 @@ void PetriNet::calculate_max_occurrences()
   for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
   {
     set<Node *> sending_transitions = preset(*p);
+    set<unsigned int> sending_activities;
+
     for (set<Node *>::iterator t = sending_transitions.begin(); t != sending_transitions.end(); t++)
-    {
-      unsigned int max_occurrences;
       for (unsigned int i = 0; i < (*t)->history.size(); i++)
       {
 	unsigned int transition_activity_id = toUInt((*t)->history[i].substr(0, (*t)->history[i].find_first_of(".")));
 	assert(ASTEmap[transition_activity_id] != NULL);
-	if (i == 0)
-	  max_occurrences = ASTEmap[transition_activity_id]->max_occurrences;
-
-	// all activities have to have the same max_occurrences
-	assert (max_occurrences == ASTEmap[transition_activity_id]->max_occurrences);
+	sending_activities.insert(transition_activity_id);
       }
 
-      // sum up the maximal occurrences
-      if (max_occurrences == UINT_MAX)
+    for (set<unsigned int>::iterator activity_id = sending_activities.begin(); activity_id != sending_activities.end(); activity_id++)
+    {
+      if (ASTEmap[*activity_id]->max_occurrences == UINT_MAX)
 	(*p)->max_occurrences = UINT_MAX;
       else if ((*p)->max_occurrences != UINT_MAX)
-	(*p)->max_occurrences += max_occurrences;
+	(*p)->max_occurrences += ASTEmap[*activity_id]->max_occurrences;
     }
   }
 }

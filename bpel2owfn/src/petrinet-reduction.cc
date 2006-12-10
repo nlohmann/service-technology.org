@@ -23,18 +23,18 @@
  *
  * \brief   Petri Net API: structural reduction
  *
- * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nlohmann $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2006/12/07 14:25:52 $
+ * \date    \$Date: 2006/12/10 17:31:17 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.47 $
+ * \version \$Revision: 1.48 $
  *
  * \ingroup petrinet
  */
@@ -76,24 +76,41 @@ set<unsigned int> visited2;   // used for transitive reduction
  *****************************************************************************/
 
 /*!
- * Remove status places that are not read by any transition.
+ * Remove status places that are not read by any transition. These places are
+ * usually the result of reduction rules applied before. The places are not
+ * "read" by any transition, thus can be removed if the are not covered by a
+ * final marking.
+ *
+ * \note This rule is BPEL2oWFN specific.
+ *
+ * \return number of removed places
+ *
+ * \pre \f$p\f$ is an internal place: \f$ p \in P \f$
+ * \pre \f$p\f$'s postset is empty: \f$ p^\bullet = \emptyset \f$
+ * \pre \f$p\f$ is not covered by a final marking: \f$ m(p) = 0 \f$ for all \f$ m \in \Omega \f$
+ *
+ * \post \f$p\f$ is removed: \f$ P' = P \; \backslash \; \{ p \} \f$
  */
-void PetriNet::reduce_unused_status_places()
+unsigned int PetriNet::reduce_unused_status_places()
 {
-  list<Place*> unusedPlaces;
+  list<Place *> unused_status_places;
+  unsigned int result = 0;
 
+  // find unused status places
   for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
-  {
-    if ( postset(*p).empty() && !( (*p)->isFinal ) )
-    {
-      unusedPlaces.push_back(*p);
-    }
-  }
+    if ( postset(*p).empty() )
+      if ( !( (*p)->isFinal ) )
+  	unused_status_places.push_back(*p);
 
   // remove unused places
-  for (list<Place*>::iterator p = unusedPlaces.begin(); p != unusedPlaces.end(); p++)
+  for (list<Place*>::iterator p = unused_status_places.begin(); p != unused_status_places.end(); p++)
     if (P.find(*p) != P.end())
+    {
       removePlace(*p);
+      result++;
+    }
+
+  return result;
 }
 
 
@@ -101,12 +118,24 @@ void PetriNet::reduce_unused_status_places()
 
 
 /*!
- * Remove transitions with empty pre or postset.
+ * Remove transitions with empty pre or postset. These transitions occur mostly
+ * atfer removing unused status places.
+ *
+ * \note This rule is BPEL2oWFN specific.
+ *
+ * \return number of removed transitions
+ *
+ * \pre \f$t\f$ is a transition of the net: \f$ t \in T \f$
+ * \pre \f$t\f$'s preset or postset empty: \f$ {}^\bullet t = \emptyset \f$ or \f$ t^\bullet = \emptyset \f$
+ *
+ * \post \f$t\f$ is removed: \f$ T' = T \; \backslash \; \{ t \} \f$
  */
-void PetriNet::removeSuspiciousTransitions()
+unsigned int PetriNet::reduce_suspicious_transitions()
 {
   list<Transition*> suspiciousTransitions;
+  unsigned int result = 0;
 
+  // find suspicious transitions
   for (set<Transition*>::iterator t = T.begin(); t != T.end(); t++)
     if (postset(*t).empty() || preset(*t).empty())
       suspiciousTransitions.push_back(*t);
@@ -114,7 +143,12 @@ void PetriNet::removeSuspiciousTransitions()
   // remove suspicious transitions
   for (list<Transition*>::iterator t = suspiciousTransitions.begin(); t != suspiciousTransitions.end(); t++)
     if (T.find(*t) != T.end())
+    {
       removeTransition(*t);
+      result++;
+    }
+
+  return result;
 }
 
 
@@ -123,6 +157,8 @@ void PetriNet::removeSuspiciousTransitions()
 
 /*!
  * Remove structural dead nodes.
+ *
+ * \todo Re-organize the storing and removing of nodes.
  */
 void PetriNet::reduce_dead_nodes()
 {
@@ -212,6 +248,11 @@ void PetriNet::reduce_dead_nodes()
  *
  * If there exist two distinct (precondition 1) places with identical preset
  * (precondition 2) and postset (precondition 3), then they can be merged.
+ *
+ * \image html rb1.png
+ *
+ * \todo Overwork the preconditions and postconditions.
+ * \todo Re-organize the storing and removing of nodes.
  */
 void PetriNet::reduce_identical_places()
 {
@@ -264,6 +305,11 @@ void PetriNet::reduce_identical_places()
  *
  * If there exist two distinct (precondition 1) transitions with identical
  * preset (precondition 2) and postset (precondition 3), then they can be merged.
+ *
+ * \image html ra2.png
+ *
+ * \todo Overwork the preconditions and postconditions.
+ * \todo Re-organize the storing and removing of nodes.
  */
 void PetriNet::reduce_identical_transitions()
 {
@@ -317,7 +363,12 @@ void PetriNet::reduce_identical_transitions()
  * the preset has no other outgoing arcs (precondition 3), then the places
  * can be merged and the transition can be removed. Furthermore, none of the
  * places may be communicating (precondition 4).
- */
+ *
+ * \image html ra1.png
+ *
+ * \todo Overwork the preconditions and postconditions.
+ * \todo Re-organize the storing and removing of nodes.
+*/
 void PetriNet::reduce_series_places()
 {
   trace(TRACE_DEBUG, "[PN]\tApplying rule RA1 (fusion of series places)...\n");
@@ -375,6 +426,11 @@ void PetriNet::reduce_series_places()
  * and if the transition in its postset has no other incoming arcs
  * (precondition 2), then the preset and the postset can be merged and the
  * place can be removed.
+ *
+ * \image html ra2.png
+ *
+ * \todo Overwork the preconditions and postconditions.
+ * \todo Re-organize the storing and removing of nodes.
  */
 void PetriNet::reduce_series_transitions()
 {
@@ -427,21 +483,28 @@ void PetriNet::reduce_series_transitions()
 
 
 /*!
- * \brief Elimination of self-loop places (RC1)
+ * Elimination of self-loop places (ESP) as depicted in [Murrata89]. The rule
+ * preserves liveness, safeness and boundedness.
+ *
+ * \note As \f$ p \f$ has both ingoing and outgoing arcs, \f$ p \f$ is an
+ *       internal place. Thus, removing this place preserves controllability
+ *       and all communicating partners if \f$ p \f$ is not covered by a final
+ *       marking.
  *
  * \return number of removed places
  *
  * \pre \f$ p \f$ is a place of the net: \f$ p \in P \f$
- * \pre \f$ p \f$ is initiall marked: \f$ m_0(p) > 0 \f$
+ * \pre \f$ p \f$ is initially marked: \f$ m_0(p) > 0 \f$
  * \pre \f$ p \f$ has one transition in its preset and one transition in its postset: \f$ |{}^\bullet p| = 1 \f$, \f$ |p^\bullet| = 1 \f$
- * \pre the transition in \f$ p \f$'s preset in the same as the transition in \f$ p \f$'s postset: \f$ p^\bullet \cap {}^\bullet p \neq \emptyset \f$
+ * \pre \f$ p \f$'s preset and postset are equal: \f$ p^\bullet = {}^\bullet p \f$
  *
  * \post \f$ p \f$ is removed: \f$ P' = P \; \backslash \; \{p\} \f$
- * \post \f$ p \f$'s ingoing and outgoing arcs are removed: \f$ F' = F \; \backslash \; \left( (\{p\}\times T) \cup (T \times \{p\}) \right) \f$
+ *
+ * \todo remove debug output
  */
 unsigned int PetriNet::reduce_self_loop_places()
 {
-  set<string> self_loop_places;
+  list<Place *> self_loop_places;
   unsigned int result = 0;
 
   // find places fulfilling the preconditions
@@ -449,17 +512,18 @@ unsigned int PetriNet::reduce_self_loop_places()
     if ((*p)->tokens > 0)
       if (postset(*p).size() == 1 && preset(*p).size() == 1)
 	if (preset(*p) == postset(*p))
-	  self_loop_places.insert((*p)->history[0]);
+	  self_loop_places.push_back(*p);
 
   // remove useless places
-  for (set<string>::iterator label = self_loop_places.begin();
-      label != self_loop_places.end(); label++)
-  {
-    Place *self_loop_place = findPlace(*label);
-    assert(self_loop_place != NULL);
-    removePlace(self_loop_place);
-    result++;
-  }
+  for (list<Place *>::iterator p = self_loop_places.begin(); p != self_loop_places.end(); p++)
+    if (P.find(*p) != P.end())
+    {
+      removePlace(*p);
+      result++;
+    }
+
+  if (result > 0)
+    cerr << "removed " << result << " self-loop places" << endl;
 
   return result;
 }
@@ -467,23 +531,83 @@ unsigned int PetriNet::reduce_self_loop_places()
 
 
 
+
 /*!
- * Calls some simple structural reduction rules for Petri nets:
+ * Elimination of self-loop transitions (EST) as depicted in [Murrata89]. The
+ * rule preserves liveness, safeness and boundedness.
  *
- *  - Structural dead nodes are removed.
+ * \note As the place in \f$ t \f$'s preset/postset has ingoing and outgoing
+ *       arcs, it is an internal place. Thus, \f$ t \f$ does not communicate
+ *       and its removal does not affect controllability or the set of
+ *       communicating partners.
  *
- *  - Elimination of identical places (RB1)
- *  - Elimination of identical transitions (RB2)
- *  - Fusion of series places (RA1)
- *  - Fusion of series transitions (RA2)
- *  - Elimination of self-loop places (RC1)
- * 
- * \todo
- *  - (nlohmann) improve performance
- *  - (nlohmann) implement more reduction rules
+ * \return number of removed transitions
  *
+ * \pre \f$ t \f$ is a transition of the net: \f$ t \in T \f$
+ * \pre \f$ t \f$ has one place in its preset and one place in its postset: \f$ |{}^\bullet t| = 1 \f$, \f$ |t^\bullet| = 1 \f$
+ * \pre \f$ t \f$'s preset and postset are equal: \f$ t^\bullet = {}^\bullet t \f$
+ *
+ * \post \f$ t \f$ is removed: \f$ T' = T \; \backslash \; \{t\} \f$
+ *
+ * \todo remove debug output
  */
-void PetriNet::reduce()
+unsigned int PetriNet::reduce_self_loop_transitions()
+{
+  list<Transition *> self_loop_transitions;
+  unsigned int result = 0;
+
+  // find transitions fulfilling the preconditions
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+    if (postset(*t).size() == 1 && preset(*t).size() == 1)
+      if (preset(*t) == postset(*t))
+	self_loop_transitions.push_back(*t);
+
+  // remove useless transitions
+  for (list<Transition *>::iterator t = self_loop_transitions.begin(); t != self_loop_transitions.end(); t++)
+    if (T.find(*t) != T.end())
+    {
+      removeTransition(*t);
+      result++;
+    }
+
+  if (result > 0)
+    cerr << "removed " << result << " self-loop transitions" << endl;
+
+  return result;
+}
+
+
+
+
+
+/*!
+ * Removes unnecessary nodes of the generated Petri net:
+ *
+ *  - structural dead nodes
+ *  - unused status places
+ *  - suspicious transitions
+ *
+ * Applys some simple structural reduction rules for Petri nets:
+ *
+ *  - elimination of identical places (RB1)
+ *  - elimination of identical transitions (RB2)
+ *  - fusion of series places (RA1)
+ *  - fusion of series transitions (RA2)
+ *  - elimination of self-loop places (RC1)
+ *  - elimination of self-loop transitions (RC2)
+ *
+ * The rules are applied until a fixed point (i.e. the number of places,
+ * transitions and arcs does not change) is reached.
+ *
+ * \return the number of passes until a fixed point was reached
+ *
+ * \todo improve performance
+ * \todo implement more reduction rules
+ * \todo pass a parameter to this function to choose the property of the model to
+ *       be preserved
+ * \todo adjust rules to allow for arc weights
+ */
+unsigned int PetriNet::reduce()
 {
   trace(TRACE_DEBUG, "[PN]\tPetri net size before simplification: " + information() + "\n");
   trace(TRACE_INFORMATION, "Simplifying Petri net...\n");
@@ -491,31 +615,120 @@ void PetriNet::reduce()
   string old = information();
   bool done = false;
   int passes = 1;
+
   while (!done)
   {
     reduce_dead_nodes();
     reduce_unused_status_places();
-    removeSuspiciousTransitions();
+    reduce_suspicious_transitions();
 
     reduce_identical_places();		// RB1
     reduce_identical_transitions();	// RB2
     reduce_series_places();		// RA1
     reduce_series_transitions();	// RA2
     reduce_self_loop_places();		// RC1
+    reduce_self_loop_transitions();	// RC2
 
-//    if (parameters[P_TRED])
-//      transitiveReduction();
+    if (parameters[P_TRED])
+      reduce_transitive_places();
     
     trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification pass " + toString(passes++) + ": " + information() + "\n");
 
     done = (old == information());
     old = information();
-
   }
 
   trace(TRACE_INFORMATION, "Simplifying complete.\n");
   trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification: " + information() + "\n");
+
+  return passes;
 }
+
+
+
+
+
+/*!
+ * Removes transitive places, i.e. places that are marked iff another subnet is
+ * marked. Transitivity means that there exist at least two paths in the net
+ * from p's preset to p's postset, and p itself is on the shorter path.
+ * Therefore p is marked while the net fires that longer path, thus p is marked
+ * iff the other path is marked. Thus, p can be removed, because the transition
+ * t2 in its postset can only fire if the tokens from the longer reach its
+ * preset.
+ *
+ * \note This is an experimental rule.
+ *
+ * \returns number of removed places
+ *
+ * \pre p is a place of the net
+ * \pre p is not marked initially
+ * \pre p has exactly one transition (t1) in its preset and exactly one
+ *      transition (t2) in its postset
+ * \pre t1 and t2 are distinct transitions
+ * \pre there exists a path from t1 to t2 such that p is not part of it
+ *
+ * \post p is removed
+ *
+ * \todo remove debug output
+ * \todo overwork the preconditions and postconditions
+ */
+unsigned int PetriNet::reduce_transitive_places()
+{
+  list<Place *> transitive_places;
+  unsigned int result = 0;
+
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+    if ((*p)->tokens == 0)
+      if (postset(*p).size() == 1 && preset(*p).size() == 1)
+	if (preset(*p) != postset(*p))
+	{
+	  Transition *t1 = static_cast<Transition *>(*(preset(*p).begin()));
+	  Node *t2 = *(postset(*p).begin());
+	  
+	  set<Node *> postset_nodes = postset(t1);
+	  postset_nodes.erase(*p);
+	  bool done = false;
+
+	  do
+	  {
+	    // collect the nodes reachable from the current set of nodes
+	    unsigned int old_size = postset_nodes.size();
+	    set<Node *> new_nodes;
+	    
+	    for (set<Node *>::iterator n = postset_nodes.begin(); n != postset_nodes.end(); n++)
+	      new_nodes = setUnion(new_nodes, postset(*n));
+	    
+	    postset_nodes = setUnion(postset_nodes, new_nodes);
+	    
+	    // a fixed point is reached -- abort
+	    if (postset_nodes.size() == old_size)
+	      done = true;
+	    
+	    // t2 is reached: p can be removed -- abort
+	    if (postset_nodes.find(t2) != postset_nodes.end())
+	    {
+	      done = true;
+	      transitive_places.push_back(*p);
+	    }
+	  } while (!done);
+	}
+
+
+  // remove transitive places
+  for (list<Place *>::iterator p = transitive_places.begin(); p != transitive_places.end(); p++)
+    if (P.find(*p) != P.end())
+    {
+      removePlace(*p);
+      result++;
+    }
+
+  if (result > 0)
+    cerr << "removed " << result << " transitive places" << endl;
+
+  return result;  
+}
+
 
 
 

@@ -1,22 +1,22 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert      *
+ * Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      *
  *                                                                           *
- * This file is part of BPEL2oWFN.                                           *
+ * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
- * BPEL2oWFN is free software; you can redistribute it and/or modify it      *
+ * GNU BPEL2oWFN is free software; you can redistribute it and/or modify it  *
  * under the terms of the GNU General Public License as published by the     *
  * Free Software Foundation; either version 2 of the License, or (at your    *
  * option) any later version.                                                *
  *                                                                           *
- * BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT  *
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
- * more details.                                                             *
+ * GNU BPEL2oWFN is distributed in the hope that it will be useful, but      *
+ * WITHOUT ANY WARRANTY; without even the implied warranty of                *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General  *
+ * Public License for more details.                                          *
  *                                                                           *
  * You should have received a copy of the GNU General Public License along   *
- * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
-\****************************************************************************/
+ * with GNU BPEL2oWFN; see file COPYING. if not, write to the Free Software  *
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. *
+\*****************************************************************************/
 
 /*!
  * \file    ast-details.cc
@@ -28,14 +28,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/12/05 08:21:10 $
+ * \date    \$Date: 2006/12/10 17:31:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.68 $
+ * \version \$Revision: 1.69 $
  */
 
 
@@ -54,8 +54,6 @@
 #include "debug.h"
 #include "helpers.h"
 #include "frontend-parser.h"
-
-using namespace std;
 
 
 
@@ -761,7 +759,7 @@ bool ASTE::findIsolatedAncestor()
 /*!
  * \brief defines a correlation set
  */
-void ASTE::defineCorrelationSet()
+string ASTE::defineCorrelationSet()
 {
   extern set<string> correlationSetNames;
 
@@ -772,6 +770,8 @@ void ASTE::defineCorrelationSet()
     SAerror(44, attributes["name"], attributes["referenceLine"]);
   else
     correlationSetNames.insert(name);
+
+  return name;
 }
 
 
@@ -781,7 +781,7 @@ void ASTE::defineCorrelationSet()
 /*!
  * \brief defines a variable
  */
-void ASTE::defineVariable()
+string ASTE::defineVariable()
 {
   extern set<string> variableNames;
 
@@ -792,6 +792,8 @@ void ASTE::defineVariable()
     SAerror(23, attributes["name"], attributes["referenceLine"]);
   else
     variableNames.insert(name);
+
+  return name;
 }
 
 
@@ -803,7 +805,7 @@ void ASTE::defineVariable()
  *
  * \return the unique name of the link
  */
-std::string ASTE::defineLink()
+string ASTE::defineLink()
 {
   extern set<string> linkNames;
 
@@ -825,7 +827,7 @@ std::string ASTE::defineLink()
 /*!
  * \brief defines a partner link
  */
-void ASTE::definePartnerLink()
+string ASTE::definePartnerLink()
 {
   extern set<string> partnerLinkNames;
 
@@ -836,6 +838,8 @@ void ASTE::definePartnerLink()
     SAerror(18, attributes["name"], attributes["referenceLine"]);
   else
     partnerLinkNames.insert(name);
+
+  return name;
 }
 
 
@@ -932,7 +936,7 @@ string ASTE::checkLink()
  *
  * Checks whether a given partnerLink was defined in an ancestor scope.
  */
-void ASTE::checkPartnerLink()
+string ASTE::checkPartnerLink()
 {
   extern map<unsigned int, ASTE*> ASTEmap;	
   extern set<string> partnerLinkNames;
@@ -940,21 +944,21 @@ void ASTE::checkPartnerLink()
 
   string partnerLinkName = attributes["partnerLink"];
   if (partnerLinkName == "")
-    return;
+    return partnerLinkName;
 
   vector<unsigned int> ancestorScopes = this->ancestorScopes();
 
   // travers the ancestor scopes
   for (vector<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
     if (partnerLinkNames.find(toString(*scope) + "." + partnerLinkName) != partnerLinkNames.end())
-      return;
+      return (toString(*scope) + "." + partnerLinkName);
 
   // trigger [SA00084]
   assert(ASTEmap[parentActivityId] != NULL);
   if (ASTEmap[parentActivityId]->activityTypeName() == "eventHandlers")
   {
     SAerror(84, partnerLinkName, attributes["referenceLine"]);
-    return;
+    return partnerLinkName;
   }
 
   // display an error message
@@ -962,7 +966,7 @@ void ASTE::checkPartnerLink()
   cerr << " - <partnerLink> `" << partnerLinkName << "' referenced in <";
   cerr << activityTypeName() << "> was not defined before" << endl;
 
-  return;
+  return "";
 }
 
 
@@ -1018,7 +1022,7 @@ string ASTE::checkCorrelationSet()
 /*!
  * \returns list of identifiers of all acestor activities
  */
-vector<unsigned int> ASTE::ancestorActivities()
+vector<unsigned int> ASTE::ancestorActivities() const
 {
   extern map<unsigned int, ASTE*> ASTEmap;
   vector<unsigned int> result;
@@ -1043,7 +1047,7 @@ vector<unsigned int> ASTE::ancestorActivities()
 /*!
  * \returns list of identifiers of all ancestor scopes
  */
-vector<unsigned int> ASTE::ancestorScopes()
+vector<unsigned int> ASTE::ancestorScopes() const
 {
   extern map<unsigned int, ASTE*> ASTEmap;
   vector<unsigned int> result;
@@ -1069,7 +1073,7 @@ vector<unsigned int> ASTE::ancestorScopes()
  * \returns list of identifiers of all ancestor loops (<while>, <repeatUntil>,
  * <forEach>)
  */
-vector<unsigned int> ASTE::ancestorLoops()
+vector<unsigned int> ASTE::ancestorLoops() const
 {
   extern map<unsigned int, ASTE*> ASTEmap;
   vector<unsigned int> result;
@@ -1105,7 +1109,7 @@ vector<unsigned int> ASTE::ancestorLoops()
  *
  * \returns name of the activity type
  */
-string ASTE::activityTypeName()
+string ASTE::activityTypeName() const
 {
   switch (type)
   {

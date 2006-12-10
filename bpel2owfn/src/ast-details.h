@@ -1,22 +1,22 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert      *
+ * Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      *
  *                                                                           *
- * This file is part of BPEL2oWFN.                                           *
+ * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
- * BPEL2oWFN is free software; you can redistribute it and/or modify it      *
+ * GNU BPEL2oWFN is free software; you can redistribute it and/or modify it  *
  * under the terms of the GNU General Public License as published by the     *
  * Free Software Foundation; either version 2 of the License, or (at your    *
  * option) any later version.                                                *
  *                                                                           *
- * BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT  *
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
- * more details.                                                             *
+ * GNU BPEL2oWFN is distributed in the hope that it will be useful, but      *
+ * WITHOUT ANY WARRANTY; without even the implied warranty of                *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General  *
+ * Public License for more details.                                          *
  *                                                                           *
  * You should have received a copy of the GNU General Public License along   *
- * with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51   *
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
-\****************************************************************************/
+ * with GNU BPEL2oWFN; see file COPYING. if not, write to the Free Software  *
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. *
+\*****************************************************************************/
 
 /*!
  * \file    ast-details.h
@@ -28,14 +28,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/12/05 08:21:10 $
+ * \date    \$Date: 2006/12/10 17:31:14 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.56 $
+ * \version \$Revision: 1.57 $
  */
 
 
@@ -104,6 +104,9 @@ typedef enum
 
 /*!
  * \brief AST extensions
+ *
+ * \todo comment me!
+ * \todo really comment me!
  */
 class ASTE
 {
@@ -147,7 +150,7 @@ class ASTE
 
     set<unsigned int> peerScopes;	///< as defined on page 132 of the spec
     set<unsigned int> enclosedScopes;	///< as defined on page 122 of the spec
-    set<int> enclosedSourceLinks;	///< the identifiers of all (recursively) enclosed source links
+    set<unsigned int> enclosedSourceLinks;	///< the identifiers of all (recursively) enclosed source links
    
     set<string> sharedCorrelationSets;	///< the identifiers of the joined correlation sets in case activity is a start activity
     set<string> catches;		///< the <catch> branches of <faultHandlers> to detect duplicates
@@ -159,24 +162,24 @@ class ASTE
 
     string checkVariable(string attributename);
     string checkLink();
-    void checkPartnerLink();
+    string checkPartnerLink();
     string checkCorrelationSet();
 
-    vector<unsigned int> ancestorActivities();
-    vector<unsigned int> ancestorScopes();
-    vector<unsigned int> ancestorLoops();
+    vector<unsigned int> ancestorActivities() const;
+    vector<unsigned int> ancestorScopes() const;
+    vector<unsigned int> ancestorLoops() const;
     
     bool checkAncestors();
     bool findIsolatedAncestor();
 
     void checkAttributes();
 
-    void defineCorrelationSet();
-    void defineVariable();
-    std::string defineLink();
-    void definePartnerLink();
+    string defineCorrelationSet();
+    string defineVariable();
+    string defineLink();
+    string definePartnerLink();
 
-    string activityTypeName();
+    string activityTypeName() const;
 
     ASTE(unsigned int myid, unsigned int mytype);
 };

@@ -70,8 +70,11 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_Reorderin
 	int sizeAnn = nbrLabels + maxNodeBits;
 	
 	//init managers
-	mgrMp = Cudd_Init(sizeMp, 0, CUDD_UNIQUE_SLOTS, CUDD_CACHE_SLOTS, 0);   
-	mgrAnn = Cudd_Init(sizeAnn, 0, CUDD_UNIQUE_SLOTS, CUDD_CACHE_SLOTS, 0); 
+	//mgrMp = Cudd_Init(sizeMp, 0, CUDD_UNIQUE_SLOTS, CUDD_CACHE_SLOTS, 30000000);   
+	//mgrAnn = Cudd_Init(sizeAnn, 0, CUDD_UNIQUE_SLOTS, CUDD_CACHE_SLOTS, 0);
+	mgrMp = Cudd_Init(sizeMp, 0, 1000, 1000, 300000);   
+	mgrAnn = Cudd_Init(sizeAnn, 0, 1000, 1000, 300000);
+	//PrintMemoryInUse();
 	
 	//enable automatic dynamic reordering of the BDDs
 	Cudd_AutodynEnable(mgrMp, heuristic);
@@ -756,6 +759,7 @@ void BddRepresentation::save(){
     	unsigned int nbr = labelTable->lookup(PN->outputPlacesArray[i]->name)->nbr;
         names[nbr] = tmp;
     }
+    
 
 	assert(nbrLabels == PN->placeInputCnt+PN->placeOutputCnt);
 	assert(Cudd_ReadSize(mgrAnn) == nbrLabels + maxNodeBits);
@@ -767,7 +771,7 @@ void BddRepresentation::save(){
         //int z = (int)floor(log10((double)(varNumber)))+2;
         char* buffer = new char[11];
         sprintf(buffer, "%d", varNumber);
-        names[i] = buffer; 
+        names[i] = buffer;
     }
     
 //    for (int i = 0; i < size; ++i){cout << names[i] << "  ";}
@@ -800,7 +804,7 @@ void BddRepresentation::save(){
      );
      fclose(fpMp);
 
-      FILE* fpAnn = fopen(bufferAnn, "w");
+     FILE* fpAnn = fopen(bufferAnn, "w");
      Dddmp_cuddBddStore (
             mgrAnn,             /* DD Manager */
             "bddAnn",           /* DD name (or NULL) */
@@ -813,5 +817,17 @@ void BddRepresentation::save(){
             fpAnn               /* File pointer to the store file */
      );
      fclose(fpAnn);
+     for (int i = 0; i < size; ++i){
+     	delete[] names[i];	
+     }
+     delete [] names;
+     names = 0;
 }
 
+void BddRepresentation::PrintMemoryInUse(){
+	cout << "\nNumber of live nodes in mgrMp: " << Cudd_ReadNodeCount(mgrMp)<<endl;
+	cout << "Peak number of nodes in mgrMp: " << Cudd_ReadPeakNodeCount(mgrMp)<<endl;
+	cout << "Memory in use for mgrMp:  " << Cudd_ReadMemoryInUse(mgrMp)<< endl;
+	cout << "Memory in use for mgrAnn: " << Cudd_ReadMemoryInUse(mgrAnn)<< endl;
+	cout << "Memory in use for both BDD: " << Cudd_ReadMemoryInUse(mgrMp) + Cudd_ReadMemoryInUse(mgrAnn)<< endl;
+}

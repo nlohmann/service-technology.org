@@ -211,6 +211,13 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
             offset = PN->placeInputCnt;
         } 
 
+		if (found == NULL) {
+			// copy the events used from the parent node
+			for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
+            	toAdd->eventsUsed[i] = currentVertex->eventsUsed[i];
+        	}
+		}
+			
         for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
             if (comma) {
                 strcat(label, ", ");

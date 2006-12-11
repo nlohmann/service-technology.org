@@ -48,6 +48,7 @@ using namespace std;
 // some file names and pointers
 char * netfile;
 std::list<char*> netfiles; 
+std::string ogfile;
 
 int commDepth_manual;
 int events_manual;
@@ -77,21 +78,27 @@ std::ostream * log_output = &std::cout;   // &std::clog;
 std::map<possibleOptions,    bool> options;
 std::map<possibleParameters, bool> parameters;
 
+
+// values getopt_long() should return for long options that have no short
+// version. Start with some value that cannot be the value of a char.
+#define GETOPTLONG_MATCH  256
+
 // long options
 static struct option longopts[] =
 {
-  { "help",       	  no_argument,       	NULL, 'h' },
-  { "version",    	  no_argument,       	NULL, 'v' },
-  { "debug",      	  required_argument, 	NULL, 'd' },
-  { "net",       	  required_argument, 	NULL, 'n' },
-  { "graphtype", 	  required_argument, 	NULL, 't' },
-  { "show",      	  required_argument, 	NULL, 's' },
-  { "calcallstates",  no_argument, 			NULL, 'a' },
-  { "reduceIG",   	  no_argument,	    	NULL, 'r' },
-  { "messagemaximum", required_argument,    NULL, 'm' },
-  { "eventsmaximum",  required_argument,    NULL, 'e' },
-  { "BDD",			  required_argument,    NULL, 'b' },
-  { "exchangeability",no_argument,    		NULL, 'x' },
+  { "help",            no_argument,       NULL, 'h' },
+  { "version",         no_argument,       NULL, 'v' },
+  { "debug",           required_argument, NULL, 'd' },
+  { "net",             required_argument, NULL, 'n' },
+  { "graphtype",       required_argument, NULL, 't' },
+  { "show",            required_argument, NULL, 's' },
+  { "calcallstates",   no_argument,       NULL, 'a' },
+  { "reduceIG",        no_argument,       NULL, 'r' },
+  { "messagemaximum",  required_argument, NULL, 'm' },
+  { "eventsmaximum",   required_argument, NULL, 'e' },
+  { "BDD",             required_argument, NULL, 'b' },
+  { "exchangeability", no_argument,       NULL, 'x' },
+  { "match",           required_argument, NULL, GETOPTLONG_MATCH },
   NULL
 };
 
@@ -103,41 +110,38 @@ const char * par_string = "hvd:n:t:s:arm:e:b:x";
 void print_help() {
   trace("Options: (if an option is skipped, the default settings are denoted)\n");
   trace("\n");
-  trace(" -h | --help                  - print this information and exit\n");
-  trace(" -v | --version               - print version information and exit\n");
-  trace(" -d | --debug=<level>         - set debug <level>:\n");
+  trace(" -h | --help ................... print this information and exit\n");
+  trace(" -v | --version ................ print version information and exit\n");
+  trace(" -d | --debug=<level> .......... set debug <level>:\n");
   trace("                                   1 - show nodes and dfs information\n");
   trace("                                   2 - show analyse information (i.e. colors)\n");
   trace("                                   3 - show information on events and states\n");
   trace("                                   4 - yet to be defined ;)\n");
   trace("                                   5 - show detailed information on everything\n");
-  trace("\n");
-  trace(" -n | --net=<filename>        - read input owfn from <filename>\n");
-  trace("\n");
-  trace(" -t | --graphtype=<type>      - select the graph <type> to be calculated:\n");
+  trace(" -n | --net=<filename> ......... read input owfn from <filename>\n");
+  trace(" -t | --graphtype=<type> ....... select the graph <type> to be calculated:\n");
   trace("                                   OG - operating guideline\n");
   trace("                                   IG - interaction graph (default)\n");
-  trace("\n");
-  trace(" -m | --messagemaximum=<level> - set maximum number of same messages per state to <level>\n");
-  trace("\n");
-  trace(" -e | --eventsmaximum=<level> - set event to occur at most <level> times\n");
-  trace("                                   (only relevant for OG)\n");
-  trace("\n");
-  trace(" -r | --reduceIG              - use reduction rules for IG\n");
-  trace("\n");
-  trace(" -s | --show=<parameter>      - different display options <parameter>:\n");
-  trace("                                   allnodes  - show nodes of all colors\n");
-  trace("                                   blue      - show blue nodes only (default)\n");
-  trace("                                   rednodes  - show blue and red nodes (no empty node and no black nodes)\n");
-  trace("                                   empty     - show empty node\n");
-  trace("                                   allstates - show all calculated states per node\n");
-  trace("\n");
-  trace(" -x | --exchangeability       - check for two oWFN the equality of its operating guidelines\n");
-  trace("                                (the BDD-representation must have been computed before)\n");
+  trace(" -m | --messagemaximum=<level>   set maximum number of same messages per state\n");
+  trace("                                 to <level>\n");
+  trace(" -e | --eventsmaximum=<level>    set event to occur at most <level> times\n");
+  trace("                                 (only relevant for OG)\n");
+  trace(" -r | --reduceIG ............... use reduction rules for IG\n");
+  trace(" -s | --show=<parameter> ....... different display options <parameter>:\n");
+  trace("                                   allnodes - show nodes of all colors\n");
+  trace("                                   blue     - show blue nodes only (default)\n");
+  trace("                                   rednodes - show blue and red nodes (no empty\n");
+  trace("                                              node and no black nodes)\n");
+  trace("                                   empty    - show empty node\n");
+  trace("                                   allstates- show all calculated states per\n");
+  trace("                                              node\n");
+  trace(" -x | --exchangeability ........ check for two oWFN the equality of its\n");
+  trace("                                 operating guidelines (the BDD-representation\n");
+  trace("                                 must have been computed before)\n");
   trace("                                 syntax: -n netfile1 -n netfile2 -x\n");
-  trace("\n");
-  trace(" -b | --BDD=<reordering>      - enable BDD construction (only relevant for OG)\n");
-  trace("                                argument <reordering> specifies reodering method:\n");
+  trace(" -b | --BDD=<reordering> ....... enable BDD construction (only relevant for OG)\n");
+  trace("                                 argument <reordering> specifies reodering\n");
+  trace("                                 method:\n");
   trace("                                    0 - CUDD_REORDER_SAME\n");
   trace("                                    1 - CUDD_REORDER_NONE\n");
   trace("                                    2 - CUDD_REORDER_RANDOM\n");
@@ -160,6 +164,8 @@ void print_help() {
   trace("                                   19 - CUDD_REORDER_LINEAR_CONVERGE\n");
   trace("                                   20 - CUDD_REORDER_LAZY_SIFT\n");
   trace("                                   21 - CUDD_REORDER_EXACT\n");
+  trace(" --match=<OG filename> ......... check if given oWFN (-n) matches with\n");
+  trace("                                 operating guideline given in <OG filename>\n");
   trace("\n");
   trace("\n");
   trace("For more information see:\n");
@@ -180,177 +186,203 @@ void print_version(std::string name) {
 
 // get parameters from options
 void parse_command_line(int argc, char* argv[]) {
-	
-  	int i;
-  	
-  	// the program name on the commandline
-  	std::string progname = std::string(argv[0]);
 
-	// initialize options
-	options[O_HELP] = false;
-	options[O_VERSION] = false;
-	options[O_DEBUG] = false;
-	options[O_GRAPH_TYPE] = false;
-	options[O_SHOW_NODES] = false;
-	options[O_CALC_ALL_STATES] = false;		// standard: man muss -a angeben, um voll
-//	options[O_CALC_ALL_STATES] = true;		// so lange Reduktion im Teststadium
-	options[O_CALC_REDUCED_IG] = false;
-	options[O_OWFN_NAME] = false;
-	options[O_BDD] = false;
-	options[O_EX] = false;
+    int i;
 
-	options[O_MESSAGES_MAX] = false;
-	options[O_EVENT_USE_MAX] = false;
+    // the program name on the commandline
+    std::string progname = std::string(argv[0]);
+
+    // initialize options
+    options[O_HELP] = false;
+    options[O_VERSION] = false;
+    options[O_DEBUG] = false;
+    options[O_GRAPH_TYPE] = false;
+    options[O_SHOW_NODES] = false;
+    options[O_CALC_ALL_STATES] = false; // standard: man muss -a angeben, um voll
+//    options[O_CALC_ALL_STATES] = true; // so lange Reduktion im Teststadium
+    options[O_CALC_REDUCED_IG] = false;
+    options[O_OWFN_NAME] = false;
+    options[O_BDD] = false;
+    options[O_EX] = false;
+    options[O_MATCH] = false;
+
+    options[O_MESSAGES_MAX] = false;
+    options[O_EVENT_USE_MAX] = false;
 
 
-	// initialize parameters
-	parameters[P_IG] = true;
-	parameters[P_OG] = false;
-	parameters[P_SHOW_ALL_NODES] = false;
-	parameters[P_SHOW_BLUE_NODES_ONLY] = true;
-	parameters[P_SHOW_NO_RED_NODES] = true;
-	parameters[P_SHOW_EMPTY_NODE] = false;
-	parameters[P_SHOW_STATES_PER_NODE] = false;
+    // initialize parameters
+    parameters[P_IG] = true;
+    parameters[P_OG] = false;
+    parameters[P_SHOW_ALL_NODES] = false;
+    parameters[P_SHOW_BLUE_NODES_ONLY] = true;
+    parameters[P_SHOW_NO_RED_NODES] = true;
+    parameters[P_SHOW_EMPTY_NODE] = false;
+    parameters[P_SHOW_STATES_PER_NODE] = false;
 
-	bdd_reordermethod = 0;
-	
-	messages_manual = 1;
-	events_manual = 1;
-	
-  	// evaluate options and set parameters
-  	trace(TRACE_0, "\n");
-  	int optc = 0;
-  	while ((optc = getopt_long (argc, argv, par_string, longopts, (int *) 0)) != EOF) {
-	    switch (optc) {
-			case 'h':
-		      	print_help();
-	  	      	exit(0);
-	      	case 'v':
-				print_version("");
-	  	      	exit(0);
-	      	case 'd':
-	 			if ( string(optarg) == "1" ) {
-		      		options[O_DEBUG] = true;
-					debug_level = TRACE_1;
-		      	} else if ( string(optarg) == "2" ) {
-		    	  	options[O_DEBUG] = true;
-					debug_level = TRACE_2;
-		      	} else if ( string(optarg) == "3" ) {
-			      	options[O_DEBUG] = true;
-					debug_level = TRACE_3;
-		      	} else if ( string(optarg) == "4" ) {
-			      	options[O_DEBUG] = true;
-					debug_level = TRACE_4;
-		      	} else if ( string(optarg) == "5" ) {
-			      	options[O_DEBUG] = true;
-					debug_level = TRACE_5;
-		      	} else {
-					cerr << "Error: \t wrong debug mode\n \t enter \"fiona --help\" for more information\n" << endl;
-					exit(1);
-			    }
-		      	break;
-	      	case 'n':
-	      		if (optarg) {
-			      	options[O_OWFN_NAME] = true;
-		        	// netfile = optarg;
-					netfiles.push_back(optarg);
-	      		} else {
-					cerr << "Error: \t net name missing\n \t enter \"fiona --help\" for more information\n" << endl;
-					exit(1);
-			    }
-		      	break;	      			
-	      	case 't':
-			  	if (string(optarg) == "OG") {
-				  	options[O_GRAPH_TYPE] = true;
-			  		parameters[P_OG] = true;
-			  		parameters[P_IG] = false;
-			  	} else if (string(optarg) == "IG") {
-				  	options[O_GRAPH_TYPE] = true;
-			  		parameters[P_OG] = false;
-			  		parameters[P_IG] = true;
-			  	} else {
-					cerr << "Warning: \t wrong graph type\n \t IG computed" << endl;
-				  	options[O_GRAPH_TYPE] = true;
-			  		parameters[P_OG] = false;
-			  		parameters[P_IG] = true;
-			    }
-			  	break;
-	      	case 'm':
-	        	options[O_MESSAGES_MAX] = true;
-	        	messages_manual = atoi(optarg);
-	          	break;
-	      	case 'e':
-	        	options[O_EVENT_USE_MAX] = true;
-	        	events_manual = atoi(optarg);
-	          	break;
-	      	case 's':
-	      		if (string(optarg) == "blue") {
-	      			options[O_SHOW_NODES] = true;
-	      			parameters[P_SHOW_ALL_NODES] = false;
-	      			parameters[P_SHOW_NO_RED_NODES] = false;
-	      			parameters[P_SHOW_BLUE_NODES_ONLY] = true;
-	      		} else if (string(optarg) == "rednodes") {
-	      			options[O_SHOW_NODES] = true;
-	      			parameters[P_SHOW_ALL_NODES] = false;
-	      			parameters[P_SHOW_NO_RED_NODES] = false;
-	      			parameters[P_SHOW_BLUE_NODES_ONLY] = false;
-	      		} else if (string(optarg) == "empty") {
-	    	  		options[O_SHOW_NODES] = true;
-	      			parameters[P_SHOW_EMPTY_NODE] = true;
-	      		} else if (string(optarg) == "allnodes") {
-		      		options[O_SHOW_NODES] = true;
-	      			parameters[P_SHOW_ALL_NODES] = true;
-	      			parameters[P_SHOW_EMPTY_NODE] = true;
-	      			parameters[P_SHOW_NO_RED_NODES] = false;
-	      			parameters[P_SHOW_BLUE_NODES_ONLY] = false;
-	      		} else if (string(optarg) == "allstates") {
-		      		options[O_SHOW_NODES] = true;
-	      			parameters[P_SHOW_STATES_PER_NODE] = true;
-	      		} else {
-					cerr << "Error: \t wrong show option\n \t enter \"fiona --help\" for more information\n" << endl;
-					exit(1);
-			    }
-			    break;
-	      	case 'a':
-			  	options[O_CALC_ALL_STATES] = true;
-			  	break;
-	      	case 'r':
-		      	options[O_CALC_REDUCED_IG] = true;
-	          	break;
-	      	case 'b':
-		      	options[O_BDD] = true;
-	      		i = atoi(optarg);
-	      		if (i >= 0 && i <= 21){
-	      			bdd_reordermethod = i;
-	      		} else {
-					cerr << "Error: \t wrong BDD reorder method\n \t enter \"fiona --help\" for more information\n" << endl;
-					exit(1);
-	      		}
-		      	break;
-		    case 'x':
-		      	options[O_EX] = true;
-		      	options[O_GRAPH_TYPE] = false;
-		      	parameters[P_IG] = false;
-				parameters[P_OG] = false;
-		      	break;
-	      	case '?':
-				cerr << "Error: \t option error \n \t enter \"fiona --help\" for more information\n" << endl;
-				exit(1);
-	      	default:
-				cerr << "Warning: \t unknown option ignored\n \t enter \"fiona --help\" for more information\n" << endl;
-				break;
-		}
-	}
+    bdd_reordermethod = 0;
 
-  	if (options[O_OWFN_NAME] == false) {
-  		cerr << "Error: \t missing parameter -n\n \t enter \"fiona --help\" for more information\n" << endl;
-  		exit(1);
-  	}
+    messages_manual = 1;
+    events_manual = 1;
 
-	if (options[O_BDD] == true && parameters[P_OG] == false && options[O_EX] == false) {
-		cerr << "computing IG -- BDD option ignored" << endl;
-		options[O_BDD] = false;
-	}
+    // evaluate options and set parameters
+    trace(TRACE_0, "\n");
+    int optc = 0;
+    while ((optc = getopt_long (argc, argv, par_string, longopts, (int *) 0))
+           != EOF)
+    {
+        switch (optc) {
+            case 'h': print_help();      exit(0);
+            case 'v': print_version(""); exit(0);
+            case 'd':
+                if (string(optarg) == "1") {
+                    options[O_DEBUG] = true;
+                    debug_level = TRACE_1;
+                } else if (string(optarg) == "2") {
+                    options[O_DEBUG] = true;
+                    debug_level = TRACE_2;
+                } else if (string(optarg) == "3") {
+                    options[O_DEBUG] = true;
+                    debug_level = TRACE_3;
+                } else if (string(optarg) == "4") {
+                    options[O_DEBUG] = true;
+                    debug_level = TRACE_4;
+                } else if (string(optarg) == "5") {
+                    options[O_DEBUG] = true;
+                    debug_level = TRACE_5;
+                } else {
+                    cerr << "Error:\twrong debug mode" << endl
+                         << "\tEnter \"fiona --help\" for more information."
+                         << endl;
+                    exit(1);
+                }
+                break;
+            case 'n':
+                if (optarg) {
+                    options[O_OWFN_NAME] = true;
+                    // netfile = optarg;
+                    netfiles.push_back(optarg);
+                } else {
+                    cerr << "Error:\tnet name missing" << endl
+                         << "\tEnter \"fiona --help\" for more information."
+                         << endl;
+                    exit(1);
+                }
+                break;
+            case 't':
+                if (string(optarg) == "OG") {
+                    options[O_GRAPH_TYPE] = true;
+                    parameters[P_OG] = true;
+                    parameters[P_IG] = false;
+                } else if (string(optarg) == "IG") {
+                    options[O_GRAPH_TYPE] = true;
+                    parameters[P_OG] = false;
+                    parameters[P_IG] = true;
+                } else {
+                    cerr << "Warning:\twrong graph type" << endl
+                         << "\tIG computed" << endl;
+                    options[O_GRAPH_TYPE] = true;
+                    parameters[P_OG] = false;
+                    parameters[P_IG] = true;
+                }
+                break;
+            case 'm':
+                options[O_MESSAGES_MAX] = true;
+                messages_manual = atoi(optarg);
+                break;
+            case 'e':
+                options[O_EVENT_USE_MAX] = true;
+                events_manual = atoi(optarg);
+                break;
+            case 's':
+                if (string(optarg) == "blue") {
+                    options[O_SHOW_NODES] = true;
+                    parameters[P_SHOW_ALL_NODES] = false;
+                    parameters[P_SHOW_NO_RED_NODES] = false;
+                    parameters[P_SHOW_BLUE_NODES_ONLY] = true;
+                } else if (string(optarg) == "rednodes") {
+                    options[O_SHOW_NODES] = true;
+                    parameters[P_SHOW_ALL_NODES] = false;
+                    parameters[P_SHOW_NO_RED_NODES] = false;
+                    parameters[P_SHOW_BLUE_NODES_ONLY] = false;
+                } else if (string(optarg) == "empty") {
+                    options[O_SHOW_NODES] = true;
+                    parameters[P_SHOW_EMPTY_NODE] = true;
+                } else if (string(optarg) == "allnodes") {
+                    options[O_SHOW_NODES] = true;
+                    parameters[P_SHOW_ALL_NODES] = true;
+                    parameters[P_SHOW_EMPTY_NODE] = true;
+                    parameters[P_SHOW_NO_RED_NODES] = false;
+                    parameters[P_SHOW_BLUE_NODES_ONLY] = false;
+                } else if (string(optarg) == "allstates") {
+                    options[O_SHOW_NODES] = true;
+                    parameters[P_SHOW_STATES_PER_NODE] = true;
+                } else {
+                    cerr << "Error:\twrong show option" << endl
+                         << "\tEnter \"fiona --help\" for more information."
+                         << endl;
+                    exit(1);
+                }
+                break;
+            case 'a':
+                options[O_CALC_ALL_STATES] = true;
+                break;
+            case 'r':
+                options[O_CALC_REDUCED_IG] = true;
+                break;
+            case 'b':
+                options[O_BDD] = true;
+                i = atoi(optarg);
+                if (i >= 0 && i <= 21){
+                    bdd_reordermethod = i;
+                } else {
+                    cerr << "Error:\twrong BDD reorder method" << endl
+                         << "\tEnter \"fiona --help\" for more information."
+                         << endl;
+                    exit(1);
+                }
+                break;
+            case 'x':
+                options[O_EX] = true;
+                options[O_GRAPH_TYPE] = false;
+                parameters[P_IG] = false;
+                parameters[P_OG] = false;
+                break;
+            case GETOPTLONG_MATCH:
+                if (optarg) {
+                    options[O_MATCH] = true;
+                    ogfile = optarg;
+                } else {
+                    cerr << "Error:\tOG file name missing" << endl
+                         << "\tEnter \"fiona --help\" for more information."
+                         << endl;
+                    exit(1);
+                }
+                break;
+            case '?':
+                cerr << "Error:\toption error" << endl
+                     << "\tEnter \"fiona --help\" for more information."
+                     << endl;
+                exit(1);
+            default:
+                cerr << "Warning:\tUnknown option ignored" << endl
+                     << "\tEnter \"fiona --help\" for more information"
+                     << endl;
+                break;
+        }
+    }
+
+    if (options[O_OWFN_NAME] == false) {
+        cerr << "Error:\tmissing parameter -n" << endl
+             << "\tEnter \"fiona --help\" for more information." << endl;
+        exit(1);
+    }
+
+    if (options[O_BDD] == true && parameters[P_OG] == false &&
+        options[O_EX] == false)
+    {
+        cerr << "computing IG -- BDD option ignored" << endl;
+        options[O_BDD] = false;
+    }
 }
 
 

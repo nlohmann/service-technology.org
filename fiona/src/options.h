@@ -53,7 +53,8 @@ typedef enum
 	O_SHOW_NODES,	//!<
 	O_CALC_ALL_STATES,
 	O_BDD,
-	O_EX
+	O_EX,
+	O_MATCH
 } possibleOptions;
 
 typedef enum
@@ -75,6 +76,7 @@ extern std::map<possibleOptions,    bool> options;
 extern std::map<possibleParameters, bool> parameters;
 
 extern char * netfile;
+extern std::string ogfile;
 extern int messages_manual;
 extern int events_manual;
 extern int bdd_reordermethod;

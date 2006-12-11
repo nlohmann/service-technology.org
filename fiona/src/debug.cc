@@ -147,5 +147,5 @@ int og_yyerror(const char* msg)
   extern int og_yylineno;      ///< line number of current token
   extern char *og_yytext;      ///< text of the current token
 
-  return yyerror(msg, og_yylineno, og_yytext, ""); // TODO: pass file
+  return yyerror(msg, og_yylineno, og_yytext, ogfile.c_str());
 }

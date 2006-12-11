@@ -61,6 +61,17 @@ extern int owfn_yyparse();
 extern int owfn_yylex_destroy();
 #endif
 
+extern int og_yydebug;
+extern int og_yy_flex_debug;
+
+extern FILE *og_yyin;
+extern int og_yyerror();
+extern int og_yyparse();
+
+#ifdef YY_FLEX_HAS_YYLEX_DESTROY     
+extern int og_yylex_destroy();
+#endif
+
 extern SymbolTab* GlobalTable;
 extern unsigned int State::card;
 // extern char * netfile;
@@ -135,6 +146,28 @@ void readnet() {
 
 int owfn_yywrap() {
     return 1;
+}
+
+void readog() {
+    og_yydebug = 0;
+    og_yy_flex_debug = 0;
+    assert(ogfile != "");
+
+    og_yyin = fopen(ogfile.c_str(), "r");
+    if (!og_yyin) {
+        cerr << "cannot open OG file '" << ogfile << "' for reading'" << endl;
+        exit(4);
+    }
+
+    trace(TRACE_1, "--------------------------------------------------------------\n");
+    trace(TRACE_1, "reading from file " + ogfile + "\n");
+
+    og_yyparse();
+    fclose(og_yyin);
+
+#ifdef YY_FLEX_HAS_YYLEX_DESTROY
+    og_yylex_destroy(); // must NOT be called before fclose(og_yyin);
+#endif
 }
 
 //! \fn void adjustOptionValues()
@@ -222,7 +255,7 @@ int main(int argc, char ** argv) {
         	else {
         		cerr << "Error: \t If option -x is used, exactly two oWFN must be entered\n" << endl;
         	}			
-		} 
+		}
 		else {
 	
 		    list<char*>::iterator netiter = netfiles.begin();
@@ -278,6 +311,9 @@ int main(int argc, char ** argv) {
 				
 				netiter++;
 			} while (netfiles.begin() != netfiles.end() && netiter != netfiles.end());
+			if (options[O_MATCH]) {
+				readog();
+			}
 	
 			for (list<oWFN*>::iterator net = petrinets.begin();
 				 net != petrinets.end(); net++) {
@@ -316,8 +352,10 @@ int main(int argc, char ** argv) {
 				// ------------------- start computation -------------------------
 				time_t seconds, seconds2;
 				
-				if (parameters[P_OG]) {
-		
+				if (options[O_MATCH]) {
+					// TODO: match OG with oWFN
+					cout << "Matching is not implemented yet." << endl;
+				} else if (parameters[P_OG]) {
 			        // operating guideline is built
 			        operatingGuidelines * graph = new operatingGuidelines(PN);
 			        trace(TRACE_0, "building the operating guideline...\n");

@@ -117,6 +117,7 @@ formula: lpar formula rpar {
 }
 | key_true
 | key_false
+| ident
 ;
 
 initialnode: key_initialnode ident semicolon

@@ -120,8 +120,7 @@ last updated @value{UPDATED}.
 
 GNU BPEL2oWFN is licensed under the @acronym{GNU} General Public License.
 
-Copyright @copyright{} 2005, 2006 Niels Lohmann, Christian Gierds and Dennis
-Reinert.
+Copyright @copyright{} 2005, 2006 Niels Lohmann and Christian Gierds.
 
 GNU BPEL2oWFN is part of the Tools4@acronym{BPEL} project funded by the
 Bundesministerium f@"ur Bildung und Forschung. See
@@ -758,11 +757,6 @@ The Petri net patterns were created by:
 @item Niels Lohmann (Humboldt-Universit@"at zu Berlin)
 @end itemize
 
-Other code was contributed by:
-@itemize
-@item Dennis Reinert (Humboldt-Universit@"at zu Berlin)
-@end itemize
-
 
 @section Acknowledgements
 
@@ -783,6 +777,8 @@ processes
 @item Axel Martens (IBM) for valuable advice concerning @acronym{BPEL}
 @item Simon Moser (IBM) for valuable advice concerning @acronym{BPEL}
 @item Michael Piefel (Humboldt-Universit@"at zu Berlin) for help with Kimwitu++
+@item Dennis Reinert (Humboldt-Universit@"at zu Berlin) for his work on the
+first versions of BPEL2oWFN
 @item Eric Verbeek (Technische Universiteit Eindhoven) for integrating
 GNU BPEL2oWFN to the ProM framework and valuable comments on BPEL's link
 semantics

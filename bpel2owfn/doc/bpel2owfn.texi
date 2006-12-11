@@ -130,9 +130,9 @@ Java-based compiler generating low-level Petri nets. GNU BPEL2oWFN can be
 understood as a re-implementation for extensibility and performance issues. Its
 functionality is a superset of the functionality of @acronym{BPEL2PN}.
 
-GNU BPEL2oWFN was written by Niels Lohmann, Christian Gierds
-and Dennis Reinert. It is part of the Tools4@acronym{BPEL} project
-funded by the German Bundesministerium f@"ur Bildung und Forschung. See
+GNU BPEL2oWFN was written by Niels Lohmann and Christian Gierds. It is part of
+the Tools4@acronym{BPEL} project funded by the German Bundesministerium f@"ur
+Bildung und Forschung. See
 @url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
 
 

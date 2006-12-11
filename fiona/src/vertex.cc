@@ -213,6 +213,9 @@ string vertex::getCNF() {
 	if ((cl == NULL) && (getColor() == RED))
 		return "(false)";
 	
+	if ((cl == NULL) && (getColor() == BLUE))
+		return "(true)";
+	
 	while (cl) {
 		CNFStringTemp = "";
 		CNFStringTemp = cl->getCNFString();

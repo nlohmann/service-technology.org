@@ -85,23 +85,18 @@ std::string intToString(int i) {
  *            the location of the syntax error.
  * \return 1, since an error occured
  */
-int owfn_yyerror(const char* msg)
+int yyerror(const char* msg, int yylineno, const char* yytext, const char* file)
 {
-  /* defined by flex */
-  extern int owfn_yylineno;      ///< line number of current token
-  extern char *owfn_yytext;      ///< text of the current token
-  extern char * netfile;
-
   trace("Error while parsing!\n\n");
   trace(msg);
   trace("\n");
 	
   // display passed error message
-  trace("Error in '" + std::string(netfile) + "' in line ");
-  trace(intToString(owfn_yylineno));
+  trace("Error in '" + std::string(file) + "' in line ");
+  trace(intToString(yylineno));
   trace(":\n");
   trace("  token/text last read was '");
-  trace(owfn_yytext);
+  trace(yytext);
   trace("'\n\n");
   
   // if (filename != "<STDIN>")
@@ -111,9 +106,9 @@ int owfn_yyerror(const char* msg)
     // number of lines to print before and after errorneous line
     int environment = 4;
 
-    unsigned int firstShowedLine = ((owfn_yylineno-environment)>0)?(owfn_yylineno-environment):1;
+    unsigned int firstShowedLine = ((yylineno-environment)>0)?(yylineno-environment):1;
   
-    std::ifstream inputFile(netfile);
+    std::ifstream inputFile(file);
     std::string errorLine;
     for (unsigned int i=0; i<firstShowedLine; i++)
     {
@@ -134,4 +129,23 @@ int owfn_yyerror(const char* msg)
 
   exit(1);
   return 1;
+}
+
+int owfn_yyerror(const char* msg)
+{
+  /* defined by flex */
+  extern int owfn_yylineno;      ///< line number of current token
+  extern char *owfn_yytext;      ///< text of the current token
+  extern char * netfile;
+
+  return yyerror(msg, owfn_yylineno, owfn_yytext, netfile);
+}
+
+int og_yyerror(const char* msg)
+{
+  /* defined by flex */
+  extern int og_yylineno;      ///< line number of current token
+  extern char *og_yytext;      ///< text of the current token
+
+  return yyerror(msg, og_yylineno, og_yytext, ""); // TODO: pass file
 }

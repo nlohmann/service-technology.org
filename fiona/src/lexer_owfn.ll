@@ -53,7 +53,7 @@
 using namespace std;
 
 extern int owfn_yyerror(const char *msg);
-void setlval();
+static void setlval();
 
 %}
 
@@ -114,7 +114,7 @@ NOT		 								{ return op_not;}
 // USER CODE
 
 // pass token string as attribute to bison
-void setlval() {
+static void setlval() {
   owfn_yylval.str = strdup(owfn_yytext);
 }
 

@@ -18,19 +18,21 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006-12-05 15:48:40 $ by $Author: bretschn $.
-# Version $Revision: 1.19 $
+# File last changed $Date: 2006-12-11 10:53:58 $ by $Author: bretschn $.
+# Version $Revision: 1.20 $
 
 bin_PROGRAMS = fiona
 
 # define flags for Bison
 AM_YFLAGS = --yacc --defines #--no-lines
 
-YYSOURCES = lexer_owfn.cc lexer_owfn.h syntax_owfn.cc syntax_owfn.h
+YYSOURCES = lexer_owfn.cc lexer_owfn.h syntax_owfn.cc syntax_owfn.h \
+			lexer_og.cc lexer_og.h syntax_og.cc syntax_og.h
 
 # the list of sources
 fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \
 		lexer_owfn.ll lexer_owfn_wrap.h\
+		syntax_og.yy lexer_og.ll\
 		petriNetNode.h petriNetNode.cc\
 		CNF.cc CNF.h\
 		IG.cc owfnPlace.cc communicationGraph.h\

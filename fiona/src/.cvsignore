@@ -14,3 +14,6 @@ lexer_owfn.cc
 lexer_owfn.h
 syntax_owfn.cc
 syntax_owfn.h
+lexer_og.cc
+syntax_og.cc
+syntax_og.h

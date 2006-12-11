@@ -63,7 +63,7 @@ static void setlval();
 <COMMENT>[^}]* {                 }
 
 NODES         { return key_nodes;       }
-INITIALNODES  { return key_initialnode; }
+INITIALNODE   { return key_initialnode; }
 TRANSITIONS   { return key_transitions; }
 
 TRUE          { return key_true;  }

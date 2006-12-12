@@ -670,7 +670,11 @@ void communicationGraph::printDotFile() {
         }
 
 		// print commandline and execute system command
-        if (numberOfNodes <= maxPrintingSize) {
+        if ((options[O_SHOW_NODES] && numberOfNodes <= maxPrintingSize) || 
+        		(!options[O_SHOW_NODES] && numberOfBlueNodes <= maxPrintingSize)) {
+        	// print only, if number of nodes is lower than required 
+        	// if option is set to show all nodes, then we compare the number of all nodes
+        	// otherwise, we compare the number of blue nodes only
 			trace(TRACE_0, string(buffer) + "\n");
             system(buffer);
         } else {

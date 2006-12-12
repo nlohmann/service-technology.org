@@ -65,13 +65,13 @@ void interactionGraph::buildGraph() {
 	}
 }
 
-//! \fn bool interactionGraph::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace)
+//! \fn bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * currentNode, bool typeOfPlace)
 //! \param currentNode the node from which the input event is to be sent
 //! \brief checks whether the set of input messages contains at least one input message
 //! that has been sent at its maximum
-bool interactionGraph::checkMaximalEvents(messageMultiSet input, vertex * currentNode, edgeType typeOfPlace) {
+bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * currentNode, edgeType typeOfPlace) {
 	trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): start\n");
-	for (messageMultiSet::iterator iter = input.begin(); iter != input.end(); iter++) {
+	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
 		if (typeOfPlace == sending) {
 			unsigned int i = 0;
 			while (i < PN->placeInputCnt-1 && PN->inputPlacesArray[i] && 
@@ -82,6 +82,9 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet input, vertex * curren
 			if (currentNode->eventsUsed[i] >= PN->inputPlacesArray[i]->max_occurence) {
 				// this input event shall not be sent anymore, so quit here
 				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");
+				trace(TRACE_3, "maximal occurances of event ");
+				trace(TRACE_3, PN->inputPlacesArray[i]->name);
+				trace(TRACE_3, " reached\n");
 				return false;
 			}
 		} else if (typeOfPlace == receiving) {
@@ -93,6 +96,9 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet input, vertex * curren
 			if (currentNode->eventsUsed[i + PN->placeInputCnt] >= PN->outputPlacesArray[i]->max_occurence) {
 				// this output event shall not be received anymore, so quit here
 				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");
+				trace(TRACE_3, "maximal occurances of event ");
+				trace(TRACE_3, PN->inputPlacesArray[i]->name);
+				trace(TRACE_3, " reached\n");
 				return false;		
 			}
 		}
@@ -232,6 +238,14 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 //! \brief builds up the graph recursively
 void interactionGraph::buildReducedGraph(vertex * currentNode) {
 
+	trace(TRACE_1, "\n=================================================================\n");
+	trace(TRACE_1, "\t current node: ");
+	trace(TRACE_1, intToString(currentNode->getNumber()) + ", \t current depth: " + intToString(actualDepth) + "\n");
+
+	trace(TRACE_3, "\t number of states in node: ");
+	trace(TRACE_3, intToString(currentNode->reachGraphStateSet.size()) + "\n");
+
+
 	setOfMessages inputSet;
 	setOfMessages outputSet;
 	
@@ -243,15 +257,8 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 //	if (PN->getOutputPlaceCnt() > 0) {
 		outputSet = combineReceivingEvents(currentNode, inputSet);
 //	}
-	
+
 	actualDepth++;
-
-	trace(TRACE_1, "\n=================================================================\n");
-	trace(TRACE_1, "\t current node: ");
-	trace(TRACE_1, intToString(currentNode->getNumber()) + ", \t current depth: " + intToString(actualDepth) + "\n");
-
-	trace(TRACE_3, "\t number of states in node: ");
-	trace(TRACE_3, intToString(currentNode->reachGraphStateSet.size()) + "\n");
 
 	if (terminateBuildingGraph(currentNode)) {
 		string color;
@@ -267,9 +274,12 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 		return;
 	}
 
+	trace(TRACE_3, "iterating over inputSet\n");
 	// iterate over all elements of inputSet
 	for (setOfMessages::iterator iter = inputSet.begin(); iter != inputSet.end(); iter++) {
 		if (checkMaximalEvents(*iter, currentNode, sending)) {
+
+			trace(TRACE_2, "\t\t\t\t    input event: ?");
 
 			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);		// create new vertex of the graph
 			currentVertex = currentNode;
@@ -286,8 +296,11 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 	}
 
 
+	trace(TRACE_3, "iterating over outputSet\n");
 	for (setOfMessages::iterator iter = outputSet.begin(); iter != outputSet.end(); iter++) {
-		if (checkMaximalEvents(*iter, currentNode, sending)) {
+		if (checkMaximalEvents(*iter, currentNode, receiving)) {
+		
+			trace(TRACE_2, "\t\t\t\t    output event: ?");
 		
 			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
 			currentVertex = currentNode;
@@ -443,11 +456,11 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 
 	int i;
 	
-	std::vector<StateSet::iterator> statesVector; // remember those states that activate an output event
+	std::vector<StateSet::iterator> statesVector; 	// remember those states that activate an output event
 	
-	setOfMessages listOfOutputMessageLists;	// list 
+	setOfMessages listOfOutputMessageLists;			// list 
 	
-	messageMultiSet outputMessages;				// multiset of all input messages of the current state
+	messageMultiSet outputMessages;					// multiset of all input messages of the current state
 
 	StateSet::iterator iter;		
 	

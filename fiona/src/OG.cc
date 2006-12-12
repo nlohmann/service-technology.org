@@ -299,4 +299,119 @@ void operatingGuidelines::convertToBdd() {
     trace(TRACE_5,"operatingGuidelines::convertToBdd()\n");
 }
 
+void operatingGuidelines::printOGFile() const {
+    string ogFilename = netfile;
+    if (options[O_CALC_ALL_STATES]) {
+        ogFilename += ".a";
+    }
+    ogFilename += ".og";
+    fstream ogFile(ogFilename.c_str(), ios_base::out | ios_base::trunc);
 
+    bool visitedNodes[numberOfNodes];
+
+    ogFile << "NODES" << endl;
+    for (int i = 0; i < numberOfNodes; ++i) {
+        visitedNodes[i] = false;
+    }
+    printNodesToOGFile(root, ogFile, visitedNodes);
+    ogFile << ';' << endl << endl;
+
+    ogFile << "INITIALNODE" << endl;
+    ogFile << "  " << NodeNameForOG(root) << ';' << endl << endl;
+
+    ogFile << "TRANSITIONS" << endl;
+    for (int i = 0; i < numberOfNodes; ++i) {
+        visitedNodes[i] = false;
+    }
+    printTransitionsToOGFile(root, ogFile, visitedNodes);
+    ogFile << ';' << endl;
+
+    ogFile.close();
+}
+
+void operatingGuidelines::printNodesToOGFile(vertex * v, fstream& os,
+    bool visitedNodes[]) const
+{
+    if (v == NULL)
+        return;
+
+    // print node name (separated by comma to previous node if needed)
+    if (v != root) {
+        os << ',' << endl;
+    }
+    os << "  " << NodeNameForOG(v);
+
+    // print node annotation
+    os << " : " << v->getCNF();
+
+    // mark current node as visited
+    visitedNodes[v->getNumber()] = true;
+
+    // recursively process successor nodes that have not been visited yet
+    graphEdge* edge;
+    v->resetIteratingSuccNodes();
+    while ((edge = v->getNextEdge()) != NULL) {
+        vertex* vNext = edge->getNode();
+
+        // do not process nodes already visited
+        if (visitedNodes[vNext->getNumber()])
+            continue;
+
+        // only output blue nodes
+        if (vNext->getColor() != BLUE)
+            continue;
+
+        printNodesToOGFile(vNext, os, visitedNodes);
+    }
+}
+
+string operatingGuidelines::NodeNameForOG(const vertex* v) const
+{
+    assert(v != NULL);
+    return "#" + intToString(v->getNumber());
+}
+
+void operatingGuidelines::printTransitionsToOGFile(vertex * v, fstream& os,
+    bool visitedNodes[]) const
+{
+    if (v == NULL)
+        return;
+
+    static bool firstTransitionSeen = false;
+    if (v == root) {
+        firstTransitionSeen = false;
+    }
+
+    // mark current node as visited
+    visitedNodes[v->getNumber()] = true;
+
+    // recursively process successor nodes that have not been visited yet
+    graphEdge* edge;
+    v->resetIteratingSuccNodes();
+    while ((edge = v->getNextEdge()) != NULL) {
+        vertex* vNext = edge->getNode();
+
+        // only output blue nodes
+        if (vNext->getColor() != BLUE)
+            continue;
+
+        // output transition (separated by comma to previous transition if
+        // needed)
+        if (firstTransitionSeen) {
+            os << ',' << endl;
+        }
+        else {
+            firstTransitionSeen = true;
+        }
+
+        os << "  " << NodeNameForOG(v) << " -> " << NodeNameForOG(vNext);
+        string labelPrefix = (edge->getType() == receiving) ? "?" : "!";
+        os << " : " << labelPrefix << edge->getLabel();
+
+        // do not process nodes already visited
+        if (visitedNodes[vNext->getNumber()])
+            continue;
+
+        printTransitionsToOGFile(vNext, os, visitedNodes);
+    }
+}

@@ -57,6 +57,23 @@ class operatingGuidelines : public communicationGraph {
 		
 		BddRepresentation * bdd;
 
+        /** Prints graph in OG output format. Should only be called if the graph
+         *  is an OG. */
+        void printOGFile() const;
+
+        /** Prints nodes of the OG into an OG file below the NODES section. */
+        void printNodesToOGFile(vertex * v, fstream& os, bool visitedNodes[])
+            const;
+
+        /** Generates for the given node its name to be used in operating
+         * guidelines. */
+        std::string NodeNameForOG(const vertex* v) const;
+
+        /** Prints transitions of the OG to an OG file below the TRANSITIONS
+         * section. */
+        void printTransitionsToOGFile(vertex * v, fstream& os,
+            bool visitedNodes[]) const;
+
         // Provides user defined operator new. Needed to trace all new
         // operations on this class.
 #undef new

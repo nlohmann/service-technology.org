@@ -1,22 +1,22 @@
-// *****************************************************************************\
-// * Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Karsten Wolf       *
-// *                                                                           *
-// * This file is part of Fiona.                                               *
-// *                                                                           *
-// * Fiona is free software; you can redistribute it and/or modify it          *
-// * under the terms of the GNU General Public License as published by the     *
-// * Free Software Foundation; either version 2 of the License, or (at your    *
-// * option) any later version.                                                *
-// *                                                                           *
-// * Fiona is distributed in the hope that it will be useful, but WITHOUT      *
-// * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
-// * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
-// * more details.                                                             *
-// *                                                                           *
-// * You should have received a copy of the GNU General Public License along   *
-// * with Fiona; if not, write to the Free Software Foundation, Inc., 51       *
-// * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
-// *****************************************************************************/
+/*****************************************************************************
+ * Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Karsten Wolf       *
+ *                                                                           *
+ * This file is part of Fiona.                                               *
+ *                                                                           *
+ * Fiona is free software; you can redistribute it and/or modify it          *
+ * under the terms of the GNU General Public License as published by the     *
+ * Free Software Foundation; either version 2 of the License, or (at your    *
+ * option) any later version.                                                *
+ *                                                                           *
+ * Fiona is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
+ * more details.                                                             *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License along   *
+ * with Fiona; if not, write to the Free Software Foundation, Inc., 51       *
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
+ *****************************************************************************/
 
 /*!
  * \file    owfnPlace.cc
@@ -43,7 +43,7 @@
 //! \param _net
 //! \brief constructor
 owfnPlace::owfnPlace(char * name, placeType _type, oWFN * _net) : 
-	Node(name), type(_type), index(0), capacity(0), nrbits(0), cardprop(0), max_occurence(1), proposition(NULL) {
+	Node(name), type(_type), index(0), capacity(0), nrbits(0), max_occurence(1), cardprop(0), proposition(NULL) {
   references = initial_marking = hash_factor = 0;
   net = _net;
 }

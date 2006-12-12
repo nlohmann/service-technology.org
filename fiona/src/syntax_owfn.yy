@@ -177,7 +177,7 @@ input:  net {
 
 net: key_place place_area key_marking {LocalTable = (SymbolTab *) 0;} 
 		{
-			unsigned int i,h,j;
+			unsigned int i,h;
 			Symbol * ss;
 			
 			// Create array of places

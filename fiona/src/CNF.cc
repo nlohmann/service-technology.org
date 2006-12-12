@@ -1,22 +1,22 @@
-// *****************************************************************************\
-// * Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg                     *
-// *                                                                           *
-// * This file is part of Fiona.                                               *
-// *                                                                           *
-// * Fiona is free software; you can redistribute it and/or modify it          *
-// * under the terms of the GNU General Public License as published by the     *
-// * Free Software Foundation; either version 2 of the License, or (at your    *
-// * option) any later version.                                                *
-// *                                                                           *
-// * Fiona is distributed in the hope that it will be useful, but WITHOUT      *
-// * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
-// * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
-// * more details.                                                             *
-// *                                                                           *
-// * You should have received a copy of the GNU General Public License along   *
-// * with Fiona; if not, write to the Free Software Foundation, Inc., 51       *
-// * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
-// *****************************************************************************/
+/*****************************************************************************
+ * Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg                     *
+ *                                                                           *
+ * This file is part of Fiona.                                               *
+ *                                                                           *
+ * Fiona is free software; you can redistribute it and/or modify it          *
+ * under the terms of the GNU General Public License as published by the     *
+ * Free Software Foundation; either version 2 of the License, or (at your    *
+ * option) any later version.                                                *
+ *                                                                           *
+ * Fiona is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
+ * more details.                                                             *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License along   *
+ * with Fiona; if not, write to the Free Software Foundation, Inc., 51       *
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
+ *****************************************************************************/
 
 /*!
  * \file    CNF.cc
@@ -47,7 +47,7 @@
 
 using namespace std;
 
-clause::clause() : edge(NULL), nextElement(NULL), fake(false)  {
+clause::clause() : fake(false), edge(NULL), nextElement(NULL) {
 	
 }
 
@@ -168,7 +168,7 @@ void clause::setEdges(graphEdge * edge) {
 
 //! \fn CNF::CNF()
 //! \brief constructor
-CNF::CNF() : nextElement(NULL), cl(NULL) {
+CNF::CNF() : cl(NULL), nextElement(NULL) {
 
 }
 
@@ -265,7 +265,6 @@ vertexColor CNF::calcClauseColor() {
 string CNF::getCNFString() {
 	
     string clauseString = "";
-    bool moreThanOne = false;
 
 	if (cl == NULL) {		// since theres is no clause we can't conclude anything
 		return "(false)";	

@@ -1,22 +1,22 @@
-// *****************************************************************************\
-// * Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg                     *
-// *                                                                           *
-// * This file is part of Fiona.                                               *
-// *                                                                           *
-// * Fiona is free software; you can redistribute it and/or modify it          *
-// * under the terms of the GNU General Public License as published by the     *
-// * Free Software Foundation; either version 2 of the License, or (at your    *
-// * option) any later version.                                                *
-// *                                                                           *
-// * Fiona is distributed in the hope that it will be useful, but WITHOUT      *
-// * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
-// * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
-// * more details.                                                             *
-// *                                                                           *
-// * You should have received a copy of the GNU General Public License along   *
-// * with Fiona; if not, write to the Free Software Foundation, Inc., 51       *
-// * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
-// *****************************************************************************/
+/*****************************************************************************
+ * Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg                     *
+ *                                                                           *
+ * This file is part of Fiona.                                               *
+ *                                                                           *
+ * Fiona is free software; you can redistribute it and/or modify it          *
+ * under the terms of the GNU General Public License as published by the     *
+ * Free Software Foundation; either version 2 of the License, or (at your    *
+ * option) any later version.                                                *
+ *                                                                           *
+ * Fiona is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
+ * more details.                                                             *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License along   *
+ * with Fiona; if not, write to the Free Software Foundation, Inc., 51       *
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
+ *****************************************************************************/
 
 /*!
  * \file    communicationGraph.cc
@@ -715,7 +715,6 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
             os << "p" << v->getNumber() << " [label=\"# " << v->getNumber() << "\\n";
 
             string CNF = "";
-            bool mult = false;  // more than one clause -> true
 
             StateSet::iterator iter;  // iterator over the stateList's elements
 
@@ -901,7 +900,7 @@ analysisResult communicationGraph::analyseNode(vertex * node, bool finalAnalysis
 //! \param currentNode the node for which termination is decided
 //! \brief decides whether a leaf node of the graph is reached;
 //! either because of reaching communication depth or because there are no events left
-bool communicationGraph::terminateBuildGraph(vertex * currentNode) {
+bool communicationGraph::terminateBuildGraph(vertex * /*currentNode*/) {
 	
 	return false;
 

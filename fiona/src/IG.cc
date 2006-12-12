@@ -1,22 +1,22 @@
-// *****************************************************************************\
-// * Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg                     *
-// *                                                                           *
-// * This file is part of Fiona.                                               *
-// *                                                                           *
-// * Fiona is free software; you can redistribute it and/or modify it          *
-// * under the terms of the GNU General Public License as published by the     *
-// * Free Software Foundation; either version 2 of the License, or (at your    *
-// * option) any later version.                                                *
-// *                                                                           *
-// * Fiona is distributed in the hope that it will be useful, but WITHOUT      *
-// * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
-// * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
-// * more details.                                                             *
-// *                                                                           *
-// * You should have received a copy of the GNU General Public License along   *
-// * with Fiona; if not, write to the Free Software Foundation, Inc., 51       *
-// * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
-// *****************************************************************************/
+/*****************************************************************************
+ * Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg                     *
+ *                                                                           *
+ * This file is part of Fiona.                                               *
+ *                                                                           *
+ * Fiona is free software; you can redistribute it and/or modify it          *
+ * under the terms of the GNU General Public License as published by the     *
+ * Free Software Foundation; either version 2 of the License, or (at your    *
+ * option) any later version.                                                *
+ *                                                                           *
+ * Fiona is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
+ * more details.                                                             *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License along   *
+ * with Fiona; if not, write to the Free Software Foundation, Inc., 51       *
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                      *
+ *****************************************************************************/
 
 /*!
  * \file    IG.cc
@@ -454,8 +454,6 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 	cout << "interactionGraph::combineReceivingEvents(vertex * node): start" << endl;
 #endif
 
-	int i;
-	
 	std::vector<StateSet::iterator> statesVector; 	// remember those states that activate an output event
 	
 	setOfMessages listOfOutputMessageLists;			// list 
@@ -475,7 +473,6 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 	cout << "\t state "<< (*iter) << " activates the output events: " << endl;
 #endif		
 			int i = 0;
-			int k = 0;
 			clause * cl = new clause();			// create a new clause for this particular state
 
 			// "receiving before sending" reduction rule

@@ -24,18 +24,18 @@
  * \brief   BPEL2oWFN's main
  * 
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/10 17:31:15 $
+ * \date    \$Date: 2006/12/12 16:13:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.133 $
+ * \version \$Revision: 1.134 $
  */
 
 
@@ -354,18 +354,12 @@ int main( int argc, char *argv[])
 	string comment = "{ AG EF (";
 	string formula = "FORMULA\n  ALLPATH ALWAYS EXPATH EVENTUALLY (";
 	string andStr = "";
-	for (list< string >::iterator file = inputfiles.begin(); file != inputfiles.end(); file++)
+
+        set< Place * > finalPlaces = PN.getFinalPlaces();
+	for (set< Place * >::iterator place = finalPlaces.begin(); place != finalPlaces.end(); place++)
 	{
-	  unsigned int pos = file->rfind(".bpel", file->length());
-	  unsigned int pos2 = file->rfind("/", file->length());
-	  string prefix = "";
-	  if (pos == (file->length() - 5))
-	  {
-	    prefix = file->substr(pos2 + 1, pos - pos2 - 1) + "_";
-	  }
-	  comment += andStr + prefix + "1.internal.final";
-          assert( PN.findPlace(prefix + "1.internal.final") != NULL );
-	  formula += andStr + PN.findPlace(prefix + "1.internal.final")->nodeShortName() + " > 0";
+	  comment += andStr + (*place)->nodeFullName();
+	  formula += andStr + (*place)->nodeShortName() + " > 0";
        	  andStr = " AND ";
 	}
 	comment += ") }";

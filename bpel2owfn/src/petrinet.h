@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/10 17:31:17 $
+ * \date    \$Date: 2006/12/12 16:13:49 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.122 $
+ * \version \$Revision: 1.123 $
  *
  * \ingroup petrinet
  */
@@ -172,6 +172,10 @@ class Node
   /// class Arc is allowed to access the privates of class Node
   friend class Arc;
 
+  public:
+    /// the name of the node
+    string nodeFullName() const;
+
   protected:
     /// type of node as defined in #communication_type
     communication_type type;
@@ -200,9 +204,6 @@ class Node
 
     /// the name of the node
     string nodeName() const;
-
-    /// the name of the node
-    string nodeFullName() const;
 
     /// the short name of the node
     virtual string nodeShortName() const;
@@ -389,6 +390,8 @@ class PetriNet
     /// finds transition given a role
     Transition* findTransition(string role);
 
+    /// returns a set of all final places
+    set< Place * > getFinalPlaces();
 
     /// rename a node (i.e., rename one role in its history)
     void renamePlace(string old_name, string new_name);

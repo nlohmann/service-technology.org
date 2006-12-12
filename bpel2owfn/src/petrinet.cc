@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/12/10 17:31:17 $
+ * \date    \$Date: 2006/12/12 16:13:49 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.170 $
+ * \version \$Revision: 1.171 $
  *
  * \ingroup petrinet
  */
@@ -958,6 +958,25 @@ Transition *PetriNet::findTransition(string role)
   return static_cast<Transition*>(roleMap[role]);
 }
 
+/*!
+ * Returns a set of all final places
+ *
+ * \return the set with all final places
+ */
+set< Place * > PetriNet::getFinalPlaces()
+{
+  set< Place * > result;
+
+  for ( set< Place * >::iterator place = P.begin(); place != P.end(); place++ )
+  {
+    if ( (*place)->isFinal )
+    {
+      result.insert( *place );
+    }
+  }
+
+  return result;
+}
 
 
 

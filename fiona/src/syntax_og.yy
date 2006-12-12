@@ -103,7 +103,7 @@ nodes_list: nodes_list comma node
 | /* empty */
 ;
 
-node: ident colon formula
+node: ident colon formula {}
 ;
 
 formula: lpar formula rpar {
@@ -117,7 +117,7 @@ formula: lpar formula rpar {
 }
 | key_true
 | key_false
-| ident
+| ident {}
 ;
 
 initialnode: key_initialnode ident semicolon
@@ -131,5 +131,5 @@ transitions_list: transitions_list comma transition
 | /* empty */
 ;
 
-transition: ident arrow ident colon ident
+transition: ident arrow ident colon ident {}
 ;

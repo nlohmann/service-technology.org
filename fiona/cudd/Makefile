@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.10 2006-10-11 07:47:21 bretschn Exp $
+# $Id: Makefile,v 1.11 2006-12-13 10:13:02 bretschn Exp $
 #
 # Makefile for the CUDD distribution kit 
 #---------------------------------------------------------------------------
@@ -341,7 +341,7 @@ check:
 # somehow find on radon gets it wrong *shrug*
 distdir:
 	cp -pR * $(distdir)/
-	find $(distdir) -type d -name CVS -prune -exec rm -rf '{}' ';'
+	rm -rf `find $(distdir) -type d -name CVS`
 	find $(distdir) -type f -name '*.o' -exec rm -rf '{}' ';'
 	find $(distdir) -type f -name '*.obj' -exec rm -rf '{}' ';'
 	find $(distdir) -type f -name '*.a' -exec rm -rf '{}' ';'

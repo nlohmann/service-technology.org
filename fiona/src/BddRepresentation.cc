@@ -90,7 +90,8 @@ BddRepresentation::BddRepresentation(unsigned int numberOfLabels, Cudd_Reorderin
 	
 	labelTable = new BddLabelTab(2*nbrLabels);
 	
-	assert(nbrLabels ==  PN->placeInputCnt + PN->placeOutputCnt);
+	assert(PN->placeInputCnt + PN->placeOutputCnt <= pow(double(2), double(sizeof(int)*8-1)) - 1); //PN->placeInputCnt + PN->placeOutputCnt <= 2^31 -1
+	assert(nbrLabels ==  int(PN->placeInputCnt + PN->placeOutputCnt));
 	
 /*	//for a unigue coding of the labels
 	list<char*> labelList;
@@ -738,9 +739,9 @@ void BddRepresentation::save(){
 	int size = nbrLabels + maxNodeBits;
 	char** names = new char*[size];
 
-    int j = 0;
-    //for (int i = countBddVar - v.size(); i< countBddVar; ++i){
-    for (unsigned int i = 0; i < PN->placeInputCnt; ++i){
+	assert(PN->placeInputCnt + PN->placeOutputCnt <= pow(double(2), double(sizeof(int)*8-1)) - 1); //PN->placeInputCnt + PN->placeOutputCnt <= 2^31 -1
+	
+    for (int i = 0; i < int(PN->placeInputCnt); ++i){
     	assert(i < nbrLabels + maxNodeBits);
     	//cout << "i: " << i << "   name: " << PN->inputPlacesArray[i]->name << "   nbr: " << labelTable->lookup(PN->inputPlacesArray[i]->name)->nbr << endl;
     	char* tmp = new char [strlen(PN->inputPlacesArray[i]->name) + 2];
@@ -750,8 +751,8 @@ void BddRepresentation::save(){
         names[nbr] = tmp;
     }
     
-    for (unsigned int i = 0; i < PN->placeOutputCnt; ++i){
-		assert(i+PN->placeInputCnt < nbrLabels + maxNodeBits);
+    for (int i = 0; i < int(PN->placeOutputCnt); ++i){
+		assert(int(i+PN->placeInputCnt) < nbrLabels + maxNodeBits);
 		//cout << "i: " << i << "   name: " << PN->outputPlacesArray[i]->name << "   nbr: " << labelTable->lookup(PN->outputPlacesArray[i]->name)->nbr << endl;
     	char* tmp = new char [strlen(PN->outputPlacesArray[i]->name) + 2];
     	strcpy (tmp,"?");
@@ -761,14 +762,13 @@ void BddRepresentation::save(){
     }
     
 
-	assert(nbrLabels == PN->placeInputCnt+PN->placeOutputCnt);
+	assert((unsigned int)nbrLabels == PN->placeInputCnt+PN->placeOutputCnt);
 	assert(Cudd_ReadSize(mgrAnn) == nbrLabels + maxNodeBits);
     for (int i = nbrLabels; i < size; ++i){
     	assert(i < Cudd_ReadSize(mgrAnn));
         
         int varNumber = i-nbrLabels;
         assert(varNumber >= 0);
-        //int z = (int)floor(log10((double)(varNumber)))+2;
         char* buffer = new char[11];
         sprintf(buffer, "%d", varNumber);
         names[i] = buffer;

@@ -81,7 +81,7 @@ class BddRepresentation{
 		int maxNodeBits;
 		int maxLabelBits;
 		unsigned int maxNodeNumber;
-		unsigned int nbrLabels;
+		int nbrLabels;
 		map<unsigned int, unsigned int> nodeMap;
 		BddLabelTab * labelTable;
 		

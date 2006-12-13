@@ -39,10 +39,10 @@
 #include "state.h"
 #include "options.h"
 
-owfnTransition::owfnTransition(char * name) : Node(name), quasiEnabledNr(0), 
-	enabledNr(0), NextEnabled(NULL), PrevEnabled(NULL), 
-	NextQuasiEnabled(NULL), PrevQuasiEnabled(NULL), 
-	quasiEnabled(false), enabled(false), DecrPlaces(NULL), IncrPlaces(NULL), Decr(NULL), Incr(NULL) {
+owfnTransition::owfnTransition(char * name) : Node(name), quasiEnabled(false),
+    enabled(false), quasiEnabledNr(0), enabledNr(0), NextEnabled(NULL),
+    PrevEnabled(NULL), NextQuasiEnabled(NULL), PrevQuasiEnabled(NULL), 
+	IncrPlaces(NULL), Incr(NULL), DecrPlaces(NULL), Decr(NULL) {
 		
 	NrOfArriving = 0;
 	NrOfLeaving = 0;
@@ -264,7 +264,6 @@ void owfnTransition::fire(oWFN * PN) {
 	owfnPlace* * p;
 	owfnTransition ** t;
 	unsigned int * i;
-	unsigned int a,b;
 
 	trace(TRACE_5, "owfnTransition::fire(oWFN * PN) : start\n");
 			
@@ -334,11 +333,12 @@ void owfnTransition::fire(oWFN * PN) {
 
 void owfnTransition::backfire(oWFN * PN)
 {
-  owfnPlace* * p;
   owfnTransition ** t;
-  unsigned int * i;
 
-/*  for(p = IncrPlaces,i = Incr; *p < UINT_MAX; p++,i++)
+/*
+  owfnPlace* * p;
+  unsigned int * i;
+  for(p = IncrPlaces,i = Incr; *p < UINT_MAX; p++,i++)
     {
       PN->CurrentMarking[* p] -= * i;
     }

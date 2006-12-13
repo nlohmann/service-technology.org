@@ -102,7 +102,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	trace(TRACE_1, "=================================================================\n");
 
 	// communication depth not yet reached, going down
-	int i = 0;
+	unsigned int i = 0;
 	trace(TRACE_2, "\t\t\t iterating over inputSet\n");
 	// iterate over all elements of inputSet
 	while (i < PN->placeInputCnt) {
@@ -232,14 +232,14 @@ void operatingGuidelines::computeCNF(vertex * node) {
 				(*iter)->decodeShowOnly(PN);
 							
 				// get the activated output events
-				for (int i = 0; i < PN->placeOutputCnt; i++) {
+				for (unsigned int i = 0; i < PN->placeOutputCnt; i++) {
 					if (PN->CurrentMarking[PN->outputPlacesArray[i]->index] > 0) {
 						cl->addLiteral(PN->outputPlacesArray[i]->name);	
 					}
 				}
 				
 				// get all the input events
-				for (int i = 0; i < PN->placeInputCnt; i++) {
+				for (unsigned int i = 0; i < PN->placeInputCnt; i++) {
 					cl->addLiteral(PN->inputPlacesArray[i]->name);
 				}
 				
@@ -260,14 +260,14 @@ void operatingGuidelines::computeCNF(vertex * node) {
 				(*iter)->decodeShowOnly(PN);
 							
 				// get the activated output events
-				for (int i = 0; i < PN->placeOutputCnt; i++) {
+				for (unsigned int i = 0; i < PN->placeOutputCnt; i++) {
 					if (PN->CurrentMarking[PN->outputPlacesArray[i]->index] > 0) {
 						cl->addLiteral(PN->outputPlacesArray[i]->name);	
 					}
 				}
 				
 				// get all the input events
-				for (int i = 0; i < PN->placeInputCnt; i++) {
+				for (unsigned int i = 0; i < PN->placeInputCnt; i++) {
 					cl->addLiteral(PN->inputPlacesArray[i]->name);
 				}
 				
@@ -288,7 +288,7 @@ void operatingGuidelines::convertToBdd() {
 	vertex * tmp = root;
     bool visitedNodes[numberOfNodes];
 
-    for (int i = 0; i < numberOfNodes; i++) {
+    for (unsigned int i = 0; i < numberOfNodes; i++) {
         visitedNodes[i] = 0;
     }
    
@@ -310,7 +310,7 @@ void operatingGuidelines::printOGFile() const {
     bool visitedNodes[numberOfNodes];
 
     ogFile << "NODES" << endl;
-    for (int i = 0; i < numberOfNodes; ++i) {
+    for (unsigned int i = 0; i < numberOfNodes; ++i) {
         visitedNodes[i] = false;
     }
     printNodesToOGFile(root, ogFile, visitedNodes);
@@ -320,7 +320,7 @@ void operatingGuidelines::printOGFile() const {
     ogFile << "  " << NodeNameForOG(root) << ';' << endl << endl;
 
     ogFile << "TRANSITIONS" << endl;
-    for (int i = 0; i < numberOfNodes; ++i) {
+    for (unsigned int i = 0; i < numberOfNodes; ++i) {
         visitedNodes[i] = false;
     }
     printTransitionsToOGFile(root, ogFile, visitedNodes);

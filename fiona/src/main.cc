@@ -206,12 +206,12 @@ void adjustOptionValues() {
 	}
 	trace(TRACE_0, "considering max. " + intToString(numberOfEvents) + " events at all:\n");
 	trace(TRACE_0, "    input events:\n" );
-	for (int e=0; e < PN->getInputPlaceCnt(); e++) {
+	for (unsigned int e=0; e < PN->getInputPlaceCnt(); e++) {
 		trace(TRACE_0, "\t" + string(PN->inputPlacesArray[e]->name));
 		trace(TRACE_0, "\t(max. " + intToString(PN->inputPlacesArray[e]->max_occurence) + "x)\n");
 	}
 	trace(TRACE_0, "    output events:\n" );
-	for (int e=0; e < PN->getOutputPlaceCnt(); e++) {
+	for (unsigned int e=0; e < PN->getOutputPlaceCnt(); e++) {
 		trace(TRACE_0, "\t" + string(PN->outputPlacesArray[e]->name));
 		trace(TRACE_0, "\t(max. " + intToString(PN->outputPlacesArray[e]->max_occurence) + "x)\n");
 	}

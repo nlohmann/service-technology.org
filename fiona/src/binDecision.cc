@@ -36,7 +36,7 @@
 #include "state.h"
 #include "binDecision.h"
  
-int bin_p; // (=place); index in CurrentMarking
+unsigned int bin_p; // (=place); index in CurrentMarking
 int bin_pb; // next bit of place to be processed;
 unsigned char bin_byte; // byte to be matched against tree vector; constructed from CurrentMarking
 int bin_t; // index in tree vector

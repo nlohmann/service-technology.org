@@ -381,7 +381,7 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 				}
 	
 				// get the activated output events			
-				for (int i = 0; i < PN->getPlaceCnt(); i++) {
+				for (unsigned int i = 0; i < PN->getPlaceCnt(); i++) {
 					if (PN->Places[i]->type == OUTPUT && PN->CurrentMarking[i] > 0) {
 						messageMultiSet output;
 						output.insert(i);
@@ -423,7 +423,7 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 					i++;
 				}
 				// get the activated output events			
-				for (int i = 0; i < PN->getPlaceCnt(); i++) {
+				for (unsigned int i = 0; i < PN->getPlaceCnt(); i++) {
 					if (PN->Places[i]->type == OUTPUT && PN->CurrentMarking[i] > 0) {
 						messageMultiSet output;
 						output.insert(i);
@@ -472,7 +472,7 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 #ifdef DEBUG
 	cout << "\t state "<< (*iter) << " activates the output events: " << endl;
 #endif		
-			int i = 0;
+			unsigned int i = 0;
 			clause * cl = new clause();			// create a new clause for this particular state
 
 			// "receiving before sending" reduction rule
@@ -501,7 +501,7 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 			for (i = 0; i < PN->getPlaceCnt(); i++) {
 				
 				if (PN->Places[i]->type == OUTPUT && PN->CurrentMarking[i] > 0) {	
-					for (int z = 0; z < PN->CurrentMarking[i]; z++) {			
+					for (unsigned int z = 0; z < PN->CurrentMarking[i]; z++) {			
 						outputMessages.insert(i);
 					}
 					

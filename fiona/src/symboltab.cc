@@ -46,7 +46,7 @@ SymbolTab::SymbolTab(unsigned int s = 65536)
 	size = s;
 	table = new Symbol * [s];
 	card = 0;
-	for(int i = 0; i < s;i++)
+	for(unsigned int i = 0; i < s;i++)
 	{
 		table[i] = (Symbol *) 0;
 	}
@@ -54,7 +54,7 @@ SymbolTab::SymbolTab(unsigned int s = 65536)
 
 SymbolTab::~SymbolTab()
 {
-	for(int i = 0;i < size;i++)
+	for(unsigned int i = 0;i < size;i++)
 	{
 		Symbol * temp;
 		while(table[i])

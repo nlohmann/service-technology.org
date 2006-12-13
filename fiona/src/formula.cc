@@ -118,7 +118,6 @@ void booleanformula::collectplaces(std::set<owfnPlace*>& places)
 }
 
 atomicformula::atomicformula(FType t, owfnPlace * pp, unsigned int kk) {
-//CG  unsigned int i;
   type = t;
   p = pp;
   k = kk;
@@ -165,7 +164,9 @@ bool atomicformula::init(unsigned int * CurrentMarking) {
 	case geq: if(CurrentMarking[p->index]>=k) return(value=true); return(value=false);
 	case  lt: if(CurrentMarking[p->index] <k) return(value=true); return(value=false);
 	case  gt: if(CurrentMarking[p->index] >k) return(value=true); return(value=false);
-        default: assert(false); /* should not happen, since this is an atomic formula */
+	case conj: /* fall through */
+	case disj: /* fall through */
+	case neg:  assert(false); break; // should never happen, since this is an atomic formula
     }
 
     return false;
@@ -185,7 +186,13 @@ bool binarybooleanformula::init(unsigned int * m) {
 	case disj: if(right -> init(m))
                        return value = true;
 		   return value;
-        default: assert(false); /* should not happen, since this is a binary boolean formula */
+	case eq:  /* fall through */
+	case neq: /* fall through */
+	case geq: /* fall through */
+	case leq: /* fall through */
+	case lt:  /* fall through */
+	case gt:  /* fall through */
+	case neg:  assert(false); break; // should never happen, since this is a binary boolean formula
     }
     return false;
 }
@@ -219,8 +226,14 @@ bool booleanformula::init(unsigned int * m) {
 			return value = true;
 		}
 		return value = false;
-        default: assert(false); /* should not happen, since this is an boolean formula */
-    }
+	case eq:  /* fall through */
+	case neq: /* fall through */
+	case geq: /* fall through */
+	case leq: /* fall through */
+	case lt:  /* fall through */
+	case gt:  /* fall through */
+	case neg:  assert(false); break; // should never happen, since this is a boolean formula
+	}
     return false;
 }
 
@@ -382,7 +395,13 @@ formula * binarybooleanformula::merge() {
 			f->value = false;
 		}
 		break;
-        default: assert(false); /* should not happen, since this is a binary boolean formula */
+	case eq:  /* fall through */
+	case neq: /* fall through */
+	case geq: /* fall through */
+	case leq: /* fall through */
+	case lt:  /* fall through */
+	case gt:  /* fall through */
+	case neg:  assert(false); break; // should never happen, since this is a binary boolean formula
 	}
 
 	return f;
@@ -444,7 +463,13 @@ formula * booleanformula::merge()
 			f->value = false;
 		}
 		break;
-        default: assert(false); /* should not happen, since this is a boolean formula */
+	case eq:  /* fall through */
+	case neq: /* fall through */
+	case geq: /* fall through */
+	case leq: /* fall through */
+	case lt:  /* fall through */
+	case gt:  /* fall through */
+	case neg:  assert(false); break; // should never happen, since this is a boolean formula
 	}
 
 	return f;
@@ -500,7 +525,9 @@ void atomicformula::update(unsigned int m) // m is new marking of place involved
 		case geq: if(m >= k) newvalue = true; break;
 		case gt: if(m > k) newvalue = true; break;
 		case lt: if(m < k) newvalue = true; break;
-                default: assert(false); /* should not happen, since this is an atomic formula */
+		case conj: /* fall through */
+		case disj: /* fall through */
+		case neg:  assert(false); break; // should never happen, since this is an atomic formula
 	}
 	if(newvalue != value)
 	{
@@ -597,7 +624,9 @@ formula * atomicformula::negate()
 	case leq: type = gt; break;
 	case eq: type = neq; break;
 	case neq: type = eq; break;
-        default: assert(false); /* should not happen, since this is an atomic formula */
+	case conj: /* fall through */
+	case disj: /* fall through */
+	case neg:  assert(false); break; // should never happen, since this is an aomic formula
 	}
 	p->cardprop++;
 	return this;

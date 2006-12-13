@@ -65,7 +65,7 @@ class owfnPlace : public Node {
 	  	// hash(m) = sum(p in P) p.hash_factor*CurrentMarking[p]
 	 	unsigned int index; // index in place array, necessary for symmetries
 	  	unsigned int references; // we remove isolated places 
-	  	int capacity;   // maximum capacity
+	  	unsigned int capacity;   // maximum capacity
 	  	int nrbits;     // nr of bits required for storing its marking (= log capacity)
 		int startbit;   // first bit representing this place in bit vector
 		int max_occurence;

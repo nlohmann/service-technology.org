@@ -53,11 +53,11 @@ int compare (const void * a, const void * b){
 
 //! \fn oWFN::oWFN()
 //! \brief constructor
-oWFN::oWFN() : arcCnt(0), placeHashValue(0), placeCnt(0),
-               placeInputCnt(0), placeOutputCnt(0), transCnt(0),
-               transNrEnabled(0), BitVectorSize(0), currentState(0),
-               startOfEnabledList(NULL), startOfQuasiEnabledList(NULL),
-               FinalCondition(NULL), filename(NULL)
+oWFN::oWFN() : placeCnt(0), arcCnt(0), transCnt(0), filename(NULL),
+               placeInputCnt(0), placeOutputCnt(0), FinalCondition(NULL),
+               currentState(0), transNrEnabled(0), placeHashValue(0),
+               BitVectorSize(0), startOfQuasiEnabledList(NULL),
+               startOfEnabledList(NULL)
 {
 	startOfEnabledList = (owfnTransition *) 0;
 
@@ -95,7 +95,7 @@ oWFN::~oWFN() {
 
 	delete[] binHashTable;
 	
-	for(int i = 0; i < placeCnt; i++) {
+	for(unsigned int i = 0; i < placeCnt; i++) {
 		if (Places[i]) {
 			delete Places[i];
 		}
@@ -103,7 +103,7 @@ oWFN::~oWFN() {
 	}	
 	delete[] Places;
 	
-	for(int i = 0; i < transCnt; i++) {
+	for(unsigned int i = 0; i < transCnt; i++) {
 		if (Transitions[i]) {
 			delete Transitions[i];
 		}
@@ -147,7 +147,7 @@ unsigned int oWFN::getOutputPlaceCnt() {
 //! \brief initializes the owfn; is called right after the parsing of the net file is done
 void oWFN::initialize() {
 	trace(TRACE_5, "oWFN::initialize(): start\n");
-	int i;
+	unsigned int i;
 	
 	// initialize places hashes
 	for(i = 0; i < placeCnt; i++) {
@@ -193,7 +193,7 @@ void oWFN::initialize() {
         CurrentMarking[i] = Places[i]->initial_marking;
   	}
  
-	for(int i = 0; i < transCnt; i++) {
+	for(unsigned int i = 0; i < transCnt; i++) {
 		Transitions[i]->check_enabled(this);
   	}
   	
@@ -255,7 +255,7 @@ void oWFN::initializeTransitions() {
 }
 
 void oWFN::removeisolated() {
-	unsigned int i,j;
+	unsigned int i;
 
 	owfnPlace * p;
 
@@ -334,7 +334,7 @@ void oWFN::addSuccStatesToList(vertex * n, State * currentState) {
 		}
 		
 		// add successors
-		for(int i = 0; i < currentState->CardFireList; i++) {
+		for(unsigned int i = 0; i < currentState->CardFireList; i++) {
 			if (n->addState(currentState->succ[i])) {	// add current successor
 				// its successors need only be added if state was not yet in current node
 				addSuccStatesToList(n, currentState->succ[i]);
@@ -367,7 +367,7 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, owfnPlace * outputPl
 		}
 		
 		// add successors
-		for(int i = 0; i < currentState->CardStubbornFireList; i++) {
+		for(unsigned int i = 0; i < currentState->CardStubbornFireList; i++) {
 			if (n->addState(currentState->succ[i])) {	// add current successor
 				// its successors need only be added if state was not yet in current node
 				addSuccStatesToListStubborn(stateSet, outputPlace, currentState->succ[i], n);
@@ -384,7 +384,7 @@ bool oWFN::checkMessageBound() {
 	// test marking of current state if message bound k reached
 	if (options[O_MESSAGES_MAX] == true) {      // k-message-bounded set
 		// test input places
-		for (int i = 0; i < placeInputCnt; i++) {
+		for (unsigned int i = 0; i < placeInputCnt; i++) {
 			if (CurrentMarking[inputPlacesArray[i]->index] > messages_manual) {
 				trace(TRACE_3, "\t\t\t checkMessageBound found violation for input place " + string(inputPlacesArray[i]->name) + "\n");
 				trace(TRACE_5, "oWFN::checkMessageBound(): end\n");
@@ -392,7 +392,7 @@ bool oWFN::checkMessageBound() {
 			}
 		}
 		// test output places
-		for (int i = 0; i < placeOutputCnt; i++) {
+		for (unsigned int i = 0; i < placeOutputCnt; i++) {
 			if (CurrentMarking[outputPlacesArray[i]->index] > messages_manual) {
 				trace(TRACE_3, "\t\t\t checkMessageBound found violation for output place " + string(outputPlacesArray[i]->name) + "\n");
 				trace(TRACE_5, "oWFN::checkMessageBound(): end\n");
@@ -418,7 +418,7 @@ void oWFN::computeAnnotationOutput(vertex * node, State * currentState) {
 
 	// get the successor states	and compute their corresponding annotation
 	if (currentState != NULL) {
-		for(int i = 0; i < currentState->CardFireList; i++) {
+		for(unsigned int i = 0; i < currentState->CardFireList; i++) {
 			if (currentState->succ[i]) {
 				computeAnnotationOutput(node, currentState->succ[i]);
 			}
@@ -453,7 +453,7 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 	// get the successor states	and compute their corresponding annotation
 	if (currentState != NULL && currentState->succ != NULL && currentState->succ[0] != NULL) {
 		marking = copyCurrentMarking();	// save the marking of the current state since it is the parent state of its successors
-		for(int i = 0; i < currentState->CardFireList; i++) {
+		for (unsigned int i = 0; i < currentState->CardFireList; i++) {
 			if (currentState->succ[i]) {
 				computeAnnotationInput(node, currentState->succ[i], marking, false);
 			}
@@ -470,7 +470,7 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 unsigned int * oWFN::copyCurrentMarking() {
 	unsigned int * copy = new unsigned int [placeCnt];
 
-	for (int i = 0; i < placeCnt; i++) {
+	for (unsigned int i = 0; i < placeCnt; i++) {
 		copy[i] = CurrentMarking[i];
 	}	
 	return copy;
@@ -479,7 +479,7 @@ unsigned int * oWFN::copyCurrentMarking() {
 
 void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
 
-	for (int i = 0; i < getPlaceCnt(); i++) {
+	for (unsigned int i = 0; i < getPlaceCnt(); i++) {
 		CurrentMarking[i] = copy[i];
 	}	
 	
@@ -507,9 +507,7 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal, owfnPla
 	trace(TRACE_5, "oWFN::calculateReachableStatesOutputEvent(vertex * n, bool minimal): start\n");
 
 	State * CurrentState;
-  	unsigned int i;
   	State * NewState;
-  	stateType type;
   	
 	CurrentState = binSearch(this);
 	
@@ -661,9 +659,7 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	trace(TRACE_5, "oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal): start\n");
 
 	State * CurrentState;
-  	unsigned int i;
   	State * NewState;
-  	stateType type;
   	
 	CurrentState = binSearch(this);
 	
@@ -699,7 +695,7 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	CurrentState->parent = (State *) 0;
 	assert(CurrentState->succ == NULL);
 	CurrentState->succ = new State * [CardFireList + 1];
-	for (int i = 0; i < CardFireList + 1; i++) {
+	for (unsigned int i = 0; i < CardFireList + 1; i++) {
 		CurrentState->succ[i] = NULL;
 	}
 	CurrentState->placeHashValue = placeHashValue;
@@ -770,7 +766,7 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	      		NewState->parent = CurrentState;
 				assert(NewState->succ == NULL);
 	      		NewState->succ =  new State * [CardFireList + 1];
-				for (int i = 0; i < CardFireList + 1; i++) {
+				for (unsigned int i = 0; i < CardFireList + 1; i++) {
 					NewState->succ[i] = NULL;	
 				}
 	      		NewState->placeHashValue = placeHashValue;
@@ -825,7 +821,6 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 	
 	State * CurrentState;
   	State * NewState;
-  	stateType type;
 
 	tempBinDecision = (binDecision *) 0;
 
@@ -1012,7 +1007,6 @@ void oWFN::calculateReachableStatesFull(vertex * n) {
 	
 	State * CurrentState;
   	State * NewState;
-  	stateType type;
   	
 	CurrentState = binSearch(this);
 	
@@ -1216,7 +1210,7 @@ void oWFN::printmarking() {
 	cout << "---------------------------------------------------------------" << endl;
 	cout << "\t(" << CurrentMarking << ")" << "\t[";
 	
-	for (int i = 0; i < placeCnt; i++) {
+	for (unsigned int i = 0; i < placeCnt; i++) {
 		if (CurrentMarking[i] > 0) {
 			if (CurrentMarking[i] > 5) {
 				if (comma) {
@@ -1227,7 +1221,7 @@ void oWFN::printmarking() {
 				cout << CurrentMarking[i];
 				comma = true;
 			} else {
-				for (int k = 0; k < CurrentMarking[i]; k++) {
+				for (unsigned int k = 0; k < CurrentMarking[i]; k++) {
 					if (comma) {
 						cout << ", ";
 					}
@@ -1246,7 +1240,7 @@ void oWFN::printmarking(unsigned int * marking) {
 	cout << "---------------------------------------------------------------" << endl;
 	cout << "\t(" << marking << ")" << "\t[";
 	
-	for (int i = 0; i < placeCnt; i++) {
+	for (unsigned int i = 0; i < placeCnt; i++) {
 		if (marking[i] > 0) {
 			if (marking[i] > 5) {
 				if (comma) {
@@ -1257,7 +1251,7 @@ void oWFN::printmarking(unsigned int * marking) {
 				cout << marking[i];
 				comma = true;
 			} else {
-				for (int k = 0; k < marking[i]; k++) {
+				for (unsigned int k = 0; k < marking[i]; k++) {
 					if (comma) {
 						cout << ", ";
 					}
@@ -1283,7 +1277,7 @@ char * oWFN::printMarking(unsigned int * marking) {
 	try {
 		char * buffer = new char[256];
 		strcpy(buffer, "");
-		for (int i = 0; i < placeCnt; i++) {
+		for (unsigned int i = 0; i < placeCnt; i++) {
 			if (marking[i] > 5) {
 				if (comma) {
 					strcat(buffer, ", ");
@@ -1293,7 +1287,7 @@ char * oWFN::printMarking(unsigned int * marking) {
 				sprintf(buffer, "%s%d", buffer, marking[i]);
 				comma = true;
 			} else {
-				for (int k = 0; k < marking[i]; k++) {
+				for (unsigned int k = 0; k < marking[i]; k++) {
 					if (comma) {
 						strcat(buffer, ", ");
 					}
@@ -1318,7 +1312,7 @@ char * oWFN::printCurrentMarkingForDot() {
 	try {
 		char * buffer = new char[256];
 		strcpy(buffer, "");
-		for (int i = 0; i < placeCnt; i++) {
+		for (unsigned int i = 0; i < placeCnt; i++) {
 			if (CurrentMarking[i] > 5) {
 				if (comma) {
 					strcat(buffer, ", ");
@@ -1328,7 +1322,7 @@ char * oWFN::printCurrentMarkingForDot() {
 				sprintf(buffer, "%s%d", buffer, CurrentMarking[i]);
 				comma = true;
 			} else {
-				for (int k = 0; k < CurrentMarking[i]; k++) {
+				for (unsigned int k = 0; k < CurrentMarking[i]; k++) {
 					if (comma) {
 						strcat(buffer, ", ");
 					}
@@ -1350,7 +1344,7 @@ char * oWFN::printCurrentMarkingForDot() {
 
 void oWFN::print_binDec(int h) {
 
-	for(int i=0; i < placeCnt; i++) {
+	for (unsigned int i=0; i < placeCnt; i++) {
 		cout << Places[i] -> name << ": " << Places[i] -> nrbits;
 	}
 	cout << endl;
@@ -1398,7 +1392,8 @@ void oWFN::addTransition(unsigned int i, owfnTransition * transition) {
 }
 
 
-void oWFN::addArc(Arc *arc) {
+void oWFN::addArc(Arc* arc) {
+    trace(TRACE_0, "WARNING: oWFN::addArc() called but not implemented.");
 }
 
 
@@ -1507,10 +1502,7 @@ stateType oWFN::typeOfState() {
 //! \fn bool oWFN::isMinimal()
 //! \brief returns true, if current state is minimal
 bool oWFN::isMinimal() {
-	
-	int i;
-	int k = 0;
-	for (i = 0; i < placeCnt; i++) {
+	for (unsigned int i = 0; i < placeCnt; i++) {
 		if (Places[i]->type == OUTPUT && CurrentMarking[i] > 0) {
 			return true;
 		}
@@ -1532,8 +1524,8 @@ bool oWFN::isMaximal() {
 bool oWFN::isFinal() {
 	trace(TRACE_5, "oWFN::bool oWFN::isFinal() : start\n");
 	if(FinalCondition) {
-		for (int currentplacenr = 0; currentplacenr < getPlaceCnt(); currentplacenr++) {
-		    for(int j=0; j < PN->Places[currentplacenr]->cardprop; j++) {
+		for (unsigned int currentplacenr = 0; currentplacenr < getPlaceCnt(); currentplacenr++) {
+		    for (unsigned int j=0; j < PN->Places[currentplacenr]->cardprop; j++) {
 				if (PN->Places[currentplacenr]->proposition != NULL) {
 				    PN->Places[currentplacenr]->proposition[j] -> update(PN->CurrentMarking[currentplacenr]);
 				}
@@ -1542,7 +1534,7 @@ bool oWFN::isFinal() {
 		trace(TRACE_5, "oWFN::bool oWFN::isFinal() : end\n");
 		return FinalCondition -> value;
 	} else {
-		for (int i = 0; i < getPlaceCnt(); i++) {
+		for (unsigned int i = 0; i < getPlaceCnt(); i++) {
 			if (Places[i]->type != INTERNAL && CurrentMarking[i] > 0) {
 				trace(TRACE_5, "oWFN::bool oWFN::isFinal() : end\n");
 				return false;
@@ -1809,15 +1801,3 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks()
 
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-

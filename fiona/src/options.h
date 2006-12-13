@@ -77,7 +77,7 @@ extern std::map<possibleParameters, bool> parameters;
 
 extern char * netfile;
 extern std::string ogfile;
-extern int messages_manual;
+extern unsigned int messages_manual;
 extern int events_manual;
 extern int bdd_reordermethod;
 

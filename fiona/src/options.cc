@@ -52,7 +52,7 @@ std::string ogfile;
 
 int commDepth_manual;
 int events_manual;
-int messages_manual;
+unsigned int messages_manual;
 int bdd_reordermethod;
 
 /// Filename of input file

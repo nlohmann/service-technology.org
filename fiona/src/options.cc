@@ -99,7 +99,7 @@ static struct option longopts[] =
   { "BDD",             required_argument, NULL, 'b' },
   { "exchangeability", no_argument,       NULL, 'x' },
   { "match",           required_argument, NULL, GETOPTLONG_MATCH },
-  NULL
+  { NULL,              0,                 NULL, 0   }
 };
 
 
@@ -174,7 +174,7 @@ void print_help() {
 }
 
 // Prints some version information
-void print_version(std::string name) {
+void print_version() {
   trace(std::string(PACKAGE_STRING) + " -- ");
   trace("Functional InteractiON Analysis of open workflow nets\n");
   trace("\n");
@@ -232,7 +232,7 @@ void parse_command_line(int argc, char* argv[]) {
     {
         switch (optc) {
             case 'h': print_help();      exit(0);
-            case 'v': print_version(""); exit(0);
+            case 'v': print_version();   exit(0);
             case 'd':
                 if (string(optarg) == "1") {
                     options[O_DEBUG] = true;

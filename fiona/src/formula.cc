@@ -36,11 +36,11 @@
 #include "mynew.h"
 #include "formula.h"
 
-unsigned int atomicformula::counttype(FType t) {
+unsigned int atomicformula::counttype(FType) {
 	return 1;
 }
 
-unsigned int unarybooleanformula::counttype(FType t) {
+unsigned int unarybooleanformula::counttype(FType) {
 	return 1;
 }
 
@@ -62,12 +62,12 @@ unsigned int booleanformula::counttype(FType t) {
 	return 1;
 }
 
-unsigned int atomicformula::collectsubs(FType ty, formula ** subs, unsigned int pos) {
+unsigned int atomicformula::collectsubs(FType, formula ** subs, unsigned int pos) {
 	subs[pos++] = this;
 	return pos;
 }
 	
-unsigned int unarybooleanformula::collectsubs(FType ty, formula ** subs, unsigned int pos) {
+unsigned int unarybooleanformula::collectsubs(FType, formula ** subs, unsigned int pos) {
 	subs[pos++] = this;
 	return pos;
 }

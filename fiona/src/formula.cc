@@ -118,7 +118,7 @@ void booleanformula::collectplaces(std::set<owfnPlace*>& places)
 }
 
 atomicformula::atomicformula(FType t, owfnPlace * pp, unsigned int kk) {
-  unsigned int i;
+//CG  unsigned int i;
   type = t;
   p = pp;
   k = kk;
@@ -158,14 +158,17 @@ booleanformula::~booleanformula()
 }
 
 bool atomicformula::init(unsigned int * CurrentMarking) {
-	switch(type) {
-		case  eq: if(CurrentMarking[p->index]==k) return(value=true); return(value=false);
-		case neq: if(CurrentMarking[p->index]!=k) return(value=true); return(value=false);
-		case leq: if(CurrentMarking[p->index]<=k) return(value=true); return(value=false);
-		case geq: if(CurrentMarking[p->index]>=k) return(value=true); return(value=false);
-		case  lt: if(CurrentMarking[p->index] <k) return(value=true); return(value=false);
-		case  gt: if(CurrentMarking[p->index] >k) return(value=true); return(value=false);
-	}
+    switch(type) {
+        case  eq: if(CurrentMarking[p->index]==k) return(value=true); return(value=false);
+	case neq: if(CurrentMarking[p->index]!=k) return(value=true); return(value=false);
+	case leq: if(CurrentMarking[p->index]<=k) return(value=true); return(value=false);
+	case geq: if(CurrentMarking[p->index]>=k) return(value=true); return(value=false);
+	case  lt: if(CurrentMarking[p->index] <k) return(value=true); return(value=false);
+	case  gt: if(CurrentMarking[p->index] >k) return(value=true); return(value=false);
+        default: assert(false); /* should not happen, since this is an atomic formula */
+    }
+
+    return false;
 }
 
 bool unarybooleanformula::init(unsigned int * m) {
@@ -174,36 +177,38 @@ bool unarybooleanformula::init(unsigned int * m) {
 }
 
 bool binarybooleanformula::init(unsigned int * m) {
-	value = left -> init(m);
-	switch(type) {
-		case conj: if(right -> init(m))
-						return value;
-				   return value = false;
-		case disj: if(right -> init(m))
-						return value = true;
-				   return value;
-	}
+    value = left -> init(m);
+    switch(type) {
+        case conj: if(right -> init(m))
+	               return value;
+		   return value = false;
+	case disj: if(right -> init(m))
+                       return value = true;
+		   return value;
+        default: assert(false); /* should not happen, since this is a binary boolean formula */
+    }
+    return false;
 }
 
 bool booleanformula::init(unsigned int * m) {
-	firstvalid = cardsub;
-	unsigned int n;
+    firstvalid = cardsub;
+    unsigned int n;
 
-	n=0;
-	while(n < firstvalid) {
-		if(sub[n] -> init(m)) {
-			formula * tmp;
-			firstvalid --;
-			tmp = sub[firstvalid];
-			sub[firstvalid] = sub[n];
-			sub[n] = tmp;
-			sub[n] -> parentindex = n;
-			sub[firstvalid] -> parentindex = firstvalid;
-		} else {
-			n++;
-		}
+    n=0;
+    while(n < firstvalid) {
+        if(sub[n] -> init(m)) {
+	    formula * tmp;
+	    firstvalid --;
+	    tmp = sub[firstvalid];
+	    sub[firstvalid] = sub[n];
+	    sub[n] = tmp;
+	    sub[n] -> parentindex = n;
+	    sub[firstvalid] -> parentindex = firstvalid;
+	} else {
+	    n++;
 	}
-	switch(type) {
+    }
+    switch(type) {
 	case conj:
 		if(firstvalid) {
 			return value = false;
@@ -214,7 +219,9 @@ bool booleanformula::init(unsigned int * m) {
 			return value = true;
 		}
 		return value = false;
-	}
+        default: assert(false); /* should not happen, since this is an boolean formula */
+    }
+    return false;
 }
 
 
@@ -272,6 +279,9 @@ binarybooleanformula * binarybooleanformula::flat_copy() {
 booleanformula * booleanformula::deep_copy() {
     unsigned int i;
     booleanformula * f;
+
+    f              = new booleanformula();
+
     formula **newsub;
     newsub = new formula * [cardsub];
     for(i=0;i<cardsub;i++) {
@@ -279,7 +289,6 @@ booleanformula * booleanformula::deep_copy() {
         newsub[i]->parent = f;
         newsub[i]->parentindex = i;
     }
-    f              = new booleanformula();
     f->type        = type;
     f->sub         = newsub;
     f->cardsub     = cardsub;
@@ -293,12 +302,12 @@ booleanformula * booleanformula::deep_copy() {
 booleanformula * booleanformula::flat_copy() {
     unsigned int i;
     booleanformula * f;
+    f              = new booleanformula();
     formula **newsub;
     newsub = new formula * [cardsub];
     for(i=0;i<cardsub;i++) {
         newsub[i] = sub[i];
     }
-    f              = new booleanformula();
     f->type        = type;
     f->sub         = newsub;
     f->cardsub     = cardsub;
@@ -373,6 +382,7 @@ formula * binarybooleanformula::merge() {
 			f->value = false;
 		}
 		break;
+        default: assert(false); /* should not happen, since this is a binary boolean formula */
 	}
 
 	return f;
@@ -434,6 +444,7 @@ formula * booleanformula::merge()
 			f->value = false;
 		}
 		break;
+        default: assert(false); /* should not happen, since this is a boolean formula */
 	}
 
 	return f;
@@ -489,6 +500,7 @@ void atomicformula::update(unsigned int m) // m is new marking of place involved
 		case geq: if(m >= k) newvalue = true; break;
 		case gt: if(m > k) newvalue = true; break;
 		case lt: if(m < k) newvalue = true; break;
+                default: assert(false); /* should not happen, since this is an atomic formula */
 	}
 	if(newvalue != value)
 	{
@@ -585,6 +597,7 @@ formula * atomicformula::negate()
 	case leq: type = gt; break;
 	case eq: type = neq; break;
 	case neq: type = eq; break;
+        default: assert(false); /* should not happen, since this is an atomic formula */
 	}
 	p->cardprop++;
 	return this;

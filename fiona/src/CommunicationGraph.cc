@@ -52,11 +52,11 @@ using namespace std;
 communicationGraph::communicationGraph(oWFN * _PN) :
     numberOfNodes(0),
     numberOfEdges(0),
-    actualDepth(0),
     numberOfBlueNodes(0),
-    numberOfBlackNodes(0),
     numberOfBlueEdges(0),
-    numberOfStatesAllNodes(0) {
+    numberOfBlackNodes(0),
+    numberOfStatesAllNodes(0),
+    actualDepth(0) {
 
     PN = _PN;
 }
@@ -213,7 +213,7 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
 
 		if (found == NULL) {
 			// copy the events used from the parent node
-			for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
+			for (unsigned int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
             	toAdd->eventsUsed[i] = currentVertex->eventsUsed[i];
         	}
 		}
@@ -319,7 +319,7 @@ vertex * communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeT
 	
 		currentVertex->setAnnotationEdges(edgeSucc);
 		
-        for (int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
+        for (unsigned int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
             toAdd->eventsUsed[i] = currentVertex->eventsUsed[i];
         }
 
@@ -586,7 +586,7 @@ void communicationGraph::printNodeStatistics() {
     vertex * tmp = root;
     bool visitedNodes[numberOfNodes];
 
-    for (int i = 0; i < numberOfNodes; i++) {
+    for (unsigned int i = 0; i < numberOfNodes; i++) {
         visitedNodes[i] = false;
     }
     
@@ -609,8 +609,8 @@ void communicationGraph::printNodeStatistics() {
 //! \brief creates a dot file of the graph
 void communicationGraph::printDotFile() {
     
-    int maxWritingSize = 1000;
-    int maxPrintingSize = 500;
+    unsigned int maxWritingSize = 1000;
+    unsigned int maxPrintingSize = 500;
     
     if (numberOfBlueNodes <= maxWritingSize) {
         
@@ -618,7 +618,7 @@ void communicationGraph::printDotFile() {
         vertex * tmp = root;
 
         bool visitedNodes[numberOfNodes];
-        for (int i = 0; i < numberOfNodes; i++) {
+        for (unsigned int i = 0; i < numberOfNodes; i++) {
             visitedNodes[i] = 0;
         }
 
@@ -830,11 +830,9 @@ void communicationGraph::computeNumberOfBlueNodesEdges(vertex * v, bool visitedN
 //! \param s the state that is checked for activating output events
 //! \brief returns true, if the given state activates at least one output event
 bool communicationGraph::stateActivatesOutputEvents(State * s) {
-    int i;
-   
     s->decode(PN);
     
-    for (i = 0; i < PN->getPlaceCnt(); i++) {
+    for (unsigned int i = 0; i < PN->getPlaceCnt(); i++) {
 
         if (PN->Places[i]->type == OUTPUT && PN->CurrentMarking[i] > 0) {
             return true;

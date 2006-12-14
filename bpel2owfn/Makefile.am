@@ -18,12 +18,12 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/12/14 17:50:01 $ by $Author: gierds $.
-# Version $Revision: 1.36 $
+# File last changed $Date: 2006/12/14 22:22:46 $ by $Author: nielslohmann $.
+# Version $Revision: 1.37 $
 
 SUBDIRS = src tests doc
 
-.PHONY: binarydistreadme
+.PHONY: binarydistreadme update
 
 
 dist-hook:
@@ -110,8 +110,8 @@ BINARYDISTDIR = $(distdir)-$(OS)
 
 # set OS for the directory-prefix
 binarydist: dvi pdf binarydistreadme
-	make --directory=src clean
-	make --directory=src
+	$(MAKE) --directory=src clean
+	$(MAKE) --directory=src
 	$(mkdir_p) $(BINARYDISTDIR)
 	cp doc/$(PACKAGE).pdf $(BINARYDISTDIR)
 	cp src/$(PACKAGE)$(EXEEXT) COPYING $(BINARYDISTDIR)
@@ -124,17 +124,17 @@ binarydist: dvi pdf binarydistreadme
 bindist_universal:
 	echo "you have to configure with:"
 	echo "  ./configure --disable-dependency-tracking"
-	make binarydist OS=mac-universal CXXFLAGS="-O3 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
+	$(MAKE) binarydist OS=mac-universal CXXFLAGS="-O3 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
 	  CFLAGS="-O3 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
 	  LDFLAGS="-arch i386 -arch ppc"
 
 # target to create an executable that is independet of Cygwin
 bindist_win32:
-	make binarydist OS=$(build_cpu)-mingw32 CXXFLAGS="-mno-cygwin -U _WIN32 -O3" CFLAGS="-mno-cygwin -U _WIN32 -O3"
+	$(MAKE) binarydist OS=$(build_cpu)-mingw32 CXXFLAGS="-mno-cygwin -U _WIN32 -O3" CFLAGS="-mno-cygwin -U _WIN32 -O3"
 
 # target for any other operating system
 bindist:
-	make binarydist CXXFLAGS="-O3" CFLAGS="-O3"
+	$(MAKE) binarydist CXXFLAGS="-O3" CFLAGS="-O3"
 
 
 ###############################################
@@ -164,3 +164,18 @@ gnupload_release: *.tar.gz
 	@read answer
 	gnupload --to ftp.gnu.org:bpel2owfn $^
 	rm $(^:.tar.gz=.tar.gz.sig)
+
+
+update:
+	@echo "====================================="
+	@echo " UPDATE VIA ANONYMOUS CVS REPOSITORY "
+	@echo "====================================="
+	@echo
+	@echo Are you sure you want to check out the latest source code from cvs.savannah.gnu.org?
+	@echo "If not, please press (crtl+c) now."
+	@read answer
+	$(MAKE) clean
+	cvs -z3 -d:pserver:anonymous@cvs.savannah.gnu.org:/sources/bpel2owfn co -d newsources bpel2owfn
+	rm -rf `find $(abs_top_srcdir)/newsources -name CVS`
+	cp $(abs_top_srcdir)/newsources/* $(abs_top_srcdir) -R -u -v
+	rm -fr $(abs_top_srcdir)/newsources

@@ -11,5 +11,3 @@ aclocal.m4
 config.status
 *.tar.gz
 ylwrap
-config.guess
-config.sub

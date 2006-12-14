@@ -640,7 +640,7 @@ means to debug small patterns.} the implemented Petri net patterns
 GNU BPEL2oWFN implements a graph representation of the generate Petri
 net. Furthermore, the @acronym{CFG} can be printed as dot output.
 
-@image{images/purchase,,7in}
+@c @image{images/purchase,,7in}
 
 @itemize
 @item yellow
@@ -846,12 +846,12 @@ Currently implemented Petri net-specific functions:
 
 GNU BPEL2oWFN implements the following structural reduction rules:
 
-@float
-@center @noindent @image{images/ra1,,1.2in}@ @ @ @ @ @ @ @ @ @ @image{images/rb1,,1.2in}
-@sp 1
-@center @noindent @image{images/ra2,,1.2in}@ @ @ @ @ @ @ @ @ @ @image{images/rb2,,1.2in}
-@sp 1
-@end float
+@c @float
+@c @center @noindent @image{images/ra1,,1.2in}@ @ @ @ @ @ @ @ @ @ @image{images/rb1,,1.2in}
+@c @sp 1
+@c @center @noindent @image{images/ra2,,1.2in}@ @ @ @ @ @ @ @ @ @ @image{images/rb2,,1.2in}
+@c @sp 1
+@c @end float
 
 
 @itemize

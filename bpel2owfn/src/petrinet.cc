@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/12/12 16:13:49 $
+ * \date    \$Date: 2006/12/14 17:35:16 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.171 $
+ * \version \$Revision: 1.172 $
  *
  * \ingroup petrinet
  */
@@ -1240,6 +1240,7 @@ void PetriNet::reenumerate()
  */
 void PetriNet::calculate_max_occurrences()
 {
+#ifdef USING_BPEL2OWFN
   extern map<unsigned int, ASTE*> ASTEmap;
 
   // process the input places
@@ -1293,4 +1294,5 @@ void PetriNet::calculate_max_occurrences()
 	(*p)->max_occurrences += ASTEmap[*activity_id]->max_occurrences;
     }
   }
+#endif
 }

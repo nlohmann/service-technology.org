@@ -24,17 +24,17 @@
  * \brief   Petri Net API: structural reduction
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2006/12/10 17:31:17 $
+ * \date    \$Date: 2006/12/14 17:35:16 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.48 $
+ * \version \$Revision: 1.49 $
  *
  * \ingroup petrinet
  */
@@ -47,6 +47,7 @@
  * Headers
  *****************************************************************************/
 
+#include <iostream>
 #include <list>
 #include <cassert>
 #include <set>
@@ -55,6 +56,8 @@
 #include "debug.h"		// debugging help
 #include "helpers.h"
 #include "options.h"
+
+using namespace std;
 
 
 

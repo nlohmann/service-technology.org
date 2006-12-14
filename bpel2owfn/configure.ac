@@ -18,13 +18,13 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006/12/14 17:42:01 $ by $Author: nielslohmann $.
-# Version $Revision: 1.27 $
+# File last changed $Date: 2006/12/14 22:27:54 $ by $Author: nielslohmann $.
+# Version $Revision: 1.28 $
 
 # Process this file with autoconf to produce a configure script.
-AC_PREREQ(2.60)
+AC_PREREQ(2.59)
 AC_INIT([GNU BPEL2oWFN],[2.0],[bpel2owfn-bug@gnu.org],[bpel2owfn])
-AC_REVISION($Revision: 1.27 $)
+AC_REVISION($Revision: 1.28 $)
 AM_INIT_AUTOMAKE
 
 

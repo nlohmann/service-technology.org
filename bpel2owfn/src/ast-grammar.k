@@ -24,21 +24,22 @@
  *
  * \brief   Abstract grammar of BPEL
  *
- * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $ 
+ * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          Christian Gierds <gierds@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2005-10-03
  *
- * \date    \$Date: 2006/12/10 17:31:14 $
+ * \date    \$Date: 2006/12/14 18:31:03 $
  * 
- * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ * \note    This file is part of the tool GNU BPEL2oWFN and was created during
+ *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.155 $
+ * \version \$Revision: 1.156 $
  */
 %}
 

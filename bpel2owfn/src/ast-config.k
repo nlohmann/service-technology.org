@@ -18,6 +18,29 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. *
 \*****************************************************************************/
 
+%{
+/*!
+ * \file    ast-config.cc
+ *
+ * \brief   Configuration of the AST
+ *
+ * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nielslohmann $ 
+ * 
+ * \since   2006-24-03
+ *
+ * \date    \$Date: 2006/12/14 18:31:03 $
+ * 
+ * \note    This file is part of the tool GNU BPEL2oWFN and was created during
+ *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
+ *
+ * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
+ *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
+ *
+ * \version \$Revision: 1.32 $
+ */
+%}
 
 
 /******************************************************************************
@@ -25,11 +48,20 @@
  *****************************************************************************/
 
 %{ HEADER
+
+/*!
+ * \file ast-config.h
+ * \brief Configuration of the AST (interface)
+ *
+ * See \ref ast-config.cc for more information.
+ */
+
+#include <cassert>
+
 #include "ast-system-k.h"	// phylum definitions
 #include "ast-system-rk.h"	// rewrite rules
 #include "ast-system-unpk.h"	// unparse rules
 #include "ast-system-yystype.h" // data types for tokens and non-terminals
-#include <cassert>		// assertion header (for radon)
 %}
 
 
@@ -142,6 +174,7 @@ void printer(const char *s, uview v)
 
 %{ KC_REWRITE
 #include <map>
+
 #include "ast-details.h"
 #include "options.h"
 
@@ -169,12 +202,8 @@ extern map<unsigned int, ASTE*> ASTEmap;
 #include "debug.h"
 #include "helpers.h"
 
-using std::string;
-using std::cerr;
-using std::endl;
-using std::map;
+using namespace std;
 
-typedef std::map<string, string> stringMap;
 
 
 

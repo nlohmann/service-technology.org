@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/12 16:13:49 $
+ * \date    \$Date: 2006/12/15 17:51:01 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.123 $
+ * \version \$Revision: 1.124 $
  *
  * \ingroup petrinet
  */
@@ -391,7 +391,7 @@ class PetriNet
     Transition* findTransition(string role);
 
     /// returns a set of all final places
-    set< Place * > getFinalPlaces();
+    set< Place * > getFinalPlaces() const;
 
     /// rename a node (i.e., rename one role in its history)
     void renamePlace(string old_name, string new_name);

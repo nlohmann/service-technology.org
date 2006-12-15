@@ -1,4 +1,4 @@
-/*****************************************************************************\
+	/*****************************************************************************\
  * Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
@@ -29,13 +29,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/12/14 17:35:16 $
+ * \date    \$Date: 2006/12/15 17:51:01 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.172 $
+ * \version \$Revision: 1.173 $
  *
  * \ingroup petrinet
  */
@@ -958,12 +958,16 @@ Transition *PetriNet::findTransition(string role)
   return static_cast<Transition*>(roleMap[role]);
 }
 
+
+
+
+
 /*!
  * Returns a set of all final places
  *
  * \return the set with all final places
  */
-set< Place * > PetriNet::getFinalPlaces()
+set< Place * > PetriNet::getFinalPlaces() const
 {
   set< Place * > result;
 

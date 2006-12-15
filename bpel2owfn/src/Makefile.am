@@ -1,25 +1,25 @@
-############################################################################
-# Copyright 2005, 2006 Niels Lohmann, Christian Gierds, Dennis Reinert     #
-#                                                                          #
-# This file is part of BPEL2oWFN.                                          #
-#                                                                          #
-# BPEL2oWFN is free software; you can redistribute it and/or modify it     #
-# under the terms of the GNU General Public License as published by the    #
-# Free Software Foundation; either version 2 of the License, or (at your   #
-# option) any later version.                                               #
-#                                                                          #
-# BPEL2oWFN is distributed in the hope that it will be useful, but WITHOUT #
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or    #
-# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for #
-# more details.                                                            #
-#                                                                          #
-# You should have received a copy of the GNU General Public License along  #
-# with BPEL2oWFN; if not, write to the Free Software Foundation, Inc., 51  #
-# Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
-############################################################################
+#############################################################################
+# Copyright 2005, 2006 Niels Lohmann                                        #
+#                                                                           #
+# This file is part of GNU BPEL2oWFN.                                       #
+#                                                                           #
+# GNU BPEL2oWFN is free software; you can redistribute it and/or modify it  #
+# under the terms of the GNU General Public License as published by the     #
+# Free Software Foundation; either version 2 of the License, or (at your    #
+# option) any later version.                                                #
+#                                                                           #
+# GNU BPEL2oWFN is distributed in the hope that it will be useful, but      #
+# WITHOUT ANY WARRANTY; without even the implied warranty of                #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General  #
+# Public License for more details.                                          #
+#                                                                           #
+# You should have received a copy of the GNU General Public License along   #
+# with GNU BPEL2oWFN; see file COPYING. if not, write to the Free Software  #
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
+#############################################################################
 
-# File last changed $Date: 2006/12/14 20:26:00 $ by $Author: nielslohmann $.
-# Version $Revision: 1.55 $
+# File last changed $Date: 2006/12/15 19:06:20 $ by $Author: nielslohmann $.
+# Version $Revision: 1.56 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -58,7 +58,7 @@ $(KCDUMMY): $(KCFILES_NECESSARY) $(KCFILES_TEMP)
 	$(KC) $(KCFLAGS) $^
 	-rm $(KCSOURCES_TEMP)
 
-$(KCFILES_NECESSARY:.k=.o): $(KCSOURCES) $(YYSOURCES)
+$(KCSOURCES:.k=.o): frontend-parser.cc $(KCDUMMY)
 
 
 # the list of sources

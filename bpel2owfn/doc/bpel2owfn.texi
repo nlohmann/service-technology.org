@@ -264,7 +264,7 @@ GNU BPEL2oWFN supports the following command-line options:
 @table @samp
 @item --help
 @itemx -h
-Print an overview of the command-line options and exit.
+Print a short overview of the command-line options and exit.
 
 @item --version
 @itemx -v

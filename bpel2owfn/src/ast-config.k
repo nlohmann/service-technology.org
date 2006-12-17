@@ -29,7 +29,7 @@
  * 
  * \since   2006-24-03
  *
- * \date    \$Date: 2006/12/14 18:31:03 $
+ * \date    \$Date: 2006/12/17 19:05:00 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  */
 %}
 
@@ -62,6 +62,8 @@
 #include "ast-system-rk.h"	// rewrite rules
 #include "ast-system-unpk.h"	// unparse rules
 #include "ast-system-yystype.h" // data types for tokens and non-terminals
+
+extern string forEach_suffix;
 %}
 
 
@@ -114,7 +116,10 @@ extern map<unsigned int, ASTE*> ASTEmap;	// introduced in ast-details.cc
 string currentScope;
 
 /// \todo (gierds) comment me!
-map <std::string, CFGBlock *> cfgMap;
+map <string, CFGBlock *> cfgMap;
+
+
+string forEach_suffix = "";		///< used to generate parallel <forEach> scopes
 
 
 set<string> ASTE_inputChannels;

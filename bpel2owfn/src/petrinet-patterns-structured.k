@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2006/12/17 14:44:31 $
+ * \date    \$Date: 2006/12/17 19:05:00 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
  */
 %}
 
@@ -1219,9 +1219,22 @@ void PForEach(impl_tForEach* abstract_phylum, uview current_view)
   	  Transition *t4 = PN.newTransition(prefix + "foreach_stopped");
   	  PN.newArc(t4, p4);
 
-/*
   	  // unparse the standard elements
   	  phylum->standardElements_1->unparse(pseudoPrinter, current_view);
+
+
+
+          assert (ASTEmap[phylum->tScope_1->id] != NULL);
+          if (ASTEmap[phylum->tScope_1->id]->max_occurrences != UINT_MAX)
+          {
+            for (unsigned int scope_number = 1; scope_number <= ASTEmap[phylum->tScope_1->id]->max_occurrences; scope_number++)
+            {
+              forEach_suffix = "_foreach_" + toString(scope_number);
+              cerr << forEach_suffix << endl;
+//              phylum->tScope_1->unparse(pseudoPrinter, current_view);
+            }
+          }
+
 
   	  // unparse the embedded scope
   	  phylum->tScope_1->unparse(pseudoPrinter, current_view);
@@ -1232,7 +1245,7 @@ void PForEach(impl_tForEach* abstract_phylum, uview current_view)
   	  PN.newArc(PN.findPlace(toString(phylum->tScope_1->id) + ".final"), t2);
   	  PN.newArc(t3, PN.findPlace(toString(phylum->tScope_1->id) + ".stop"));
   	  PN.newArc(PN.findPlace(toString(phylum->tScope_1->id) + ".stopped"), t4);
-*/  
+
 	  break;
 	}
 

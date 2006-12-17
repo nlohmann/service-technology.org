@@ -26,12 +26,13 @@
  *
  * This file defines and implements unparse rules to unparse BPEL to XML.
  * 
- * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          Christian Gierds <gierds@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/12/10 17:31:15 $
+ * \date    \$Date: 2006/12/17 11:42:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.64 $
+ * \version \$Revision: 1.65 $
  */
 
 %}

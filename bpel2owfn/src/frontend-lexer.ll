@@ -24,17 +24,12 @@
  *
  * \brief BPEL lexer
  *
- * This file defines and implements the lexic of BPEL. It consists mainly of
- * three types of terminal symbols: BPEL keywords as the are defined in the
- * BPEL4WS 1.1 specification, "arbitrary" strings for attribute names and
- * values, and special symbols as XML brackets, whitespace etc.
- *
  * \author  responsible Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of \$Author: nlohmann $
+ *          last changes of \$Author: nielslohmann $
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2006/12/10 17:31:16 $
+ * \date    \$Date: 2006/12/17 14:51:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -43,11 +38,10 @@
  * \note    This file was created using Flex reading file frontend-lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.48 $
+ * \version \$Revision: 1.49 $
  *
  * \todo    add rules to ignored everything non-BPEL
  * \todo    add a more elegant way to handle XSD-namespaces
- * \todo    overwork documentation: WS-BPEL can also be lexec
  *
  * \ingroup frontend
  */

@@ -37,7 +37,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2006/12/17 14:43:56 $
+ * \date    \$Date: 2006/12/17 16:19:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -47,7 +47,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.282 $
+ * \version \$Revision: 1.283 $
  *
  * \todo Overwork documentation: WS-BPEL can also be parsed!
  *
@@ -984,7 +984,7 @@ tRepeatUntil:
 
 tForEach:
   K_FOREACH arbitraryAttributes X_NEXT standardElements tStartCounterValue tFinalCounterValue tCompletionCondition tScope X_NEXT X_SLASH K_FOREACH
-    { $$ = ForEach($4, $5, $6, $7, Consactivity_list(activityScope($8), Nilactivity_list()), $2); }
+    { $$ = ForEach($4, $5, $6, $7, $8, $2); }
 ;
 
 tStartCounterValue:

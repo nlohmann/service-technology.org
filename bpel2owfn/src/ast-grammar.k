@@ -30,7 +30,7 @@
  * 
  * \since   2005-10-03
  *
- * \date    \$Date: 2006/12/17 14:43:56 $
+ * \date    \$Date: 2006/12/17 16:19:10 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.157 $
+ * \version \$Revision: 1.158 $
  */
 %}
 
@@ -462,7 +462,7 @@ tRepeatUntil:
 ******************************************************************************/
 
 tForEach:
-  ForEach(standardElements casestring casestring casestring activity_list integer)
+  ForEach(standardElements casestring casestring casestring tScope integer)
 ;
 
 

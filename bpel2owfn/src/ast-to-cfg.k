@@ -32,7 +32,7 @@
  *         
  * \since   2006-01-19
  *
- * \date    \$Date: 2006/12/17 14:43:56 $
+ * \date    \$Date: 2006/12/17 16:19:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.47 $
+ * \version \$Revision: 1.48 $
  */
 %}
 
@@ -796,14 +796,11 @@ ForEach(a,b,c,d,e,f) ->
   	}
 	e
 	{
-          foreach (scope=activityScope(Scope(*,*,*,*,*,*,*,*,*,*,_scopeid),*); activity_list e)
-          {
-	    CFGBlock * innerFirst = cfgMap.find(toString(_scopeid))->second->firstBlock;
-	    CFGBlock * innerLast = cfgMap.find(toString(_scopeid))->second->lastBlock;
-
-	    connectBlocks(block, innerFirst);
-	    connectBlocks(innerLast, block);
-          }	  
+	  CFGBlock * innerFirst = cfgMap.find(toString(e->id))->second->firstBlock;
+	  CFGBlock * innerLast = cfgMap.find(toString(e->id))->second->lastBlock;
+	  
+	  connectBlocks(block, innerFirst);
+	  connectBlocks(innerLast, block);
 	}
 	a // standard elements
   ]

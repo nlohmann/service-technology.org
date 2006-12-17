@@ -26,11 +26,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/12/10 17:31:14 $
+ * \date    \$Date: 2006/12/17 14:43:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.114 $
+ * \version \$Revision: 1.115 $
  */
 %}
 
@@ -1694,10 +1694,12 @@ ForEach(a,b,c,d,e,_id) ->
 
       myself->checkVariable("counterName");
 
+
       // distribute the forEach's id to the enclosed activity
-      assert(ASTEmap[e->id] != NULL);
-      ASTEmap[e->id]->parentActivityId = myid;
-      ASTEmap[e->id]->controlFlow = myself->controlFlow;
+      unsigned int embedded_scope_parentActivityId = myid;
+      controlFlowType embedded_scope_controlFlow = myself->controlFlow;
+      unsigned int embedded_scope_max_occurrences;
+
 
       // trigger [SA00074] and [SA00075]
       unsigned int startCounter = toUInt(b->name);
@@ -1715,7 +1717,7 @@ ForEach(a,b,c,d,e,_id) ->
         {
           if (myself->attributes["hu:maxloops"] != "")
             cerr << "ignoring attribute `hu:maxloops'" << endl; //TODO: make this a nice error message
-          ASTEmap[e->id]->max_occurrences = myself->max_occurrences * (finalCounter - startCounter);
+	  embedded_scope_max_occurrences = myself->max_occurrences * (finalCounter - startCounter);
           myself->max_loops = (finalCounter - startCounter);
         }
 
@@ -1727,32 +1729,39 @@ ForEach(a,b,c,d,e,_id) ->
   	// calculate the maximal occurrences of the enclosed activity
     	unsigned int max_loops = toUInt(myself->attributes["hu:maxloops"]);
       	if (max_loops != UINT_MAX && myself->max_occurrences != UINT_MAX)
-	  ASTEmap[e->id]->max_occurrences = myself->max_occurrences * max_loops;
+	  embedded_scope_max_occurrences = myself->max_occurrences * max_loops;
 	else
-	  ASTEmap[e->id]->max_occurrences = UINT_MAX;
+	  embedded_scope_max_occurrences = UINT_MAX;
 
         myself->max_loops = max_loops;
        }
+
+
+      // annotate embedded scopes
+      foreach (scope=activityScope(Scope(*,*,*,*,*,*,*,*,*,*,_scopeid),*); activity_list e)
+      {
+        assert(ASTEmap[_scopeid->value] != NULL);
+        ASTEmap[_scopeid->value]->parentActivityId = embedded_scope_parentActivityId;
+        ASTEmap[_scopeid->value]->controlFlow = embedded_scope_controlFlow;
+	ASTEmap[_scopeid->value]->max_occurrences = embedded_scope_max_occurrences;
+      }      
     }
     a e
     {
       // trigger [SA00076]
-      with (e)
+      foreach (scope=activityScope(Scope(*,_variables,*,*,*,*,*,*,*,*,*),*); activity_list e)
       {
-        e=Scope(*,_variables,*,*,*,*,*,*,*,*,*):
-          {
-            foreach (variable=Variable(_id2); tVariable_list _variables)
-            {
-              assert(ASTEmap[_id2->value] != NULL);
-              if (ASTEmap[_id2->value]->attributes["name"] == ASTEmap[_id->value]->attributes["counterName"])
-                SAerror(76, ASTEmap[_id2->value]->attributes["name"], ASTEmap[_id2->value]->attributes["referenceLine"]);
-            }            
-          }
+	foreach (variable=Variable(_id2); tVariable_list _variables)
+	{
+	  assert(ASTEmap[_id2->value] != NULL);
+	  if (ASTEmap[_id2->value]->attributes["name"] == ASTEmap[_id->value]->attributes["counterName"])
+	    SAerror(76, ASTEmap[_id2->value]->attributes["name"], ASTEmap[_id2->value]->attributes["referenceLine"]);
+	}
       }
 
       // collect enclosed source links
-      assert(ASTEmap[e->id] != NULL);
-      myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[e->id]->enclosedSourceLinks);
+//TODO      assert(ASTEmap[e->id] != NULL);
+//TODO      myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[e->id]->enclosedSourceLinks);
 
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );

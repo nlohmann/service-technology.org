@@ -28,11 +28,11 @@
  * associated control flow block.
  * 
  * \author  Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: nielslohmann $
  *         
  * \since   2006-01-19
  *
- * \date    \$Date: 2006/12/10 17:31:14 $
+ * \date    \$Date: 2006/12/17 14:43:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.46 $
+ * \version \$Revision: 1.47 $
  */
 %}
 
@@ -796,11 +796,14 @@ ForEach(a,b,c,d,e,f) ->
   	}
 	e
 	{
-	  CFGBlock * innerFirst = cfgMap.find(toString(e->id))->second->firstBlock;
-	  CFGBlock * innerLast = cfgMap.find(toString(e->id))->second->lastBlock;
-	  
-	  connectBlocks(block, innerFirst);
-	  connectBlocks(innerLast, block);
+          foreach (scope=activityScope(Scope(*,*,*,*,*,*,*,*,*,*,_scopeid),*); activity_list e)
+          {
+	    CFGBlock * innerFirst = cfgMap.find(toString(_scopeid))->second->firstBlock;
+	    CFGBlock * innerLast = cfgMap.find(toString(_scopeid))->second->lastBlock;
+
+	    connectBlocks(block, innerFirst);
+	    connectBlocks(innerLast, block);
+          }	  
 	}
 	a // standard elements
   ]

@@ -23,18 +23,19 @@
  *
  * \brief   debugging tools
  *
- * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          Christian Gierds <gierds@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/12/10 17:31:16 $
+ * \date    \$Date: 2006/12/17 19:21:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
  *
  * \ingroup debug
  */
@@ -164,7 +165,10 @@ int frontend_error(const char *msg)
  */
 void SAerror(unsigned int code, string information, int lineNumber)
 {
-  cerr << filename << ":" << lineNumber << " - [SA";
+  cerr << filename;
+  if (lineNumber != 0)
+   cerr << ":" << lineNumber;
+  cerr << " - [SA";
   cerr << setfill('0') << setw(5) << code;
   cerr << "] ";
 

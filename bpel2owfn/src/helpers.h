@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2006/12/10 17:31:16 $
+ * \date    \$Date: 2006/12/17 00:15:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.41 $
+ * \version \$Revision: 1.42 $
  *
  * \ingroup conversion
  * \ingroup debug
@@ -79,6 +79,7 @@ using namespace std;
 string toString(int i);
 ///converts a vector to a C++ string
 string toString(vector<unsigned int> &v);
+
 #ifdef USING_BPEL2OWFN
 /// converts integer to string
 string toString(kc::integer i);

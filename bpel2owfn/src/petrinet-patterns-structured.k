@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for BPEL's structured activities
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $ 
+ *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2006/12/06 13:07:22 $
+ * \date    \$Date: 2006/12/17 14:44:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  */
 %}
 
@@ -1171,3 +1171,75 @@ void PIf(impl_tIf* abstract_phylum, uview current_view)
 
   footer(phylum->id, true);
 }      
+
+
+
+
+
+/******************************************************************************
+  FOREACH
+******************************************************************************/
+
+void PForEach(impl_tForEach* abstract_phylum, uview current_view)
+{
+  impl_tForEach_ForEach* phylum = static_cast<impl_tForEach_ForEach*>(abstract_phylum);
+  assert(phylum != NULL);
+
+  header(phylum->id, true);
+  string prefix = toString(phylum->id) + ".internal.";
+
+
+  // the patterns for the parallel <forEach>
+  if (ASTEmap[phylum->id]->attributes["parallel"] == "yes")
+  {
+    switch(current_view)
+    {
+      case(petrinet_enum):
+      case(petrinetnew_enum):
+      case(petrinetsmall_enum):
+    	{
+  	  Place *p1 = PN.newPlace(prefix + "initial");
+  	  Place *p2 = PN.newPlace(prefix + "final");
+  	  Place *p3 = PN.newPlace(prefix + "stop");
+  	  Place *p4 = PN.newPlace(prefix + "stopped");
+  	  Place *p5 = PN.newPlace(prefix + "running");
+
+  	  Transition *t1 = PN.newTransition(prefix + "split");
+  	  PN.newArc(p1, t1);
+  	  PN.newArc(t1, p5);
+
+  	  Transition *t2 = PN.newTransition(prefix + "join");
+  	  PN.newArc(t2, p2);
+  	  PN.newArc(p5, t2);
+
+  	  Transition *t3 = PN.newTransition(prefix + "stop_foreach");
+  	  PN.newArc(p3, t3);
+  	  PN.newArc(p5, t3);
+
+  	  Transition *t4 = PN.newTransition(prefix + "foreach_stopped");
+  	  PN.newArc(t4, p4);
+
+/*
+  	  // unparse the standard elements
+  	  phylum->standardElements_1->unparse(pseudoPrinter, current_view);
+
+  	  // unparse the embedded scope
+  	  phylum->tScope_1->unparse(pseudoPrinter, current_view);
+
+
+  	  // embedd scope
+  	  PN.newArc(t1, PN.findPlace(toString(phylum->tScope_1->id) + ".initial"));
+  	  PN.newArc(PN.findPlace(toString(phylum->tScope_1->id) + ".final"), t2);
+  	  PN.newArc(t3, PN.findPlace(toString(phylum->tScope_1->id) + ".stop"));
+  	  PN.newArc(PN.findPlace(toString(phylum->tScope_1->id) + ".stopped"), t4);
+*/  
+	  break;
+	}
+
+      default: { /* no pattern in this case */ }
+    }
+  }
+
+
+  footer(phylum->id, true);
+}

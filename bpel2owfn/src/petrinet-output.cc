@@ -24,17 +24,17 @@
  * \brief   Petri Net API: file output
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/12/10 17:31:17 $
+ * \date    \$Date: 2006/12/19 17:15:55 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.64 $
+ * \version \$Revision: 1.65 $
  *
  * \ingroup petrinet
  */
@@ -437,14 +437,51 @@ void PetriNet::output_pnml(ostream *output) const
   (*output) << "<?xml version=\"1.0\" encoding=\"utf-8\"?>" << endl << endl;
   (*output) << "<!--" << endl;
   (*output) << "  Petri net created by " << PACKAGE_STRING << " reading file " << filename << "." << endl;
-  (*output) << "  See http://www.informatik.hu-berlin.de/top/tools4bpel/bpel2owfn" << endl;
-  (*output) << "  for more details." << endl;
+  (*output) << "  See http://www.gnu.org/software/bpel2owfn for more details." << endl;
   (*output) << "-->" << endl << endl;
 
   (*output) << "<pnml>" << endl;
-  (*output) << "  <net id=\"bpel-net\" type=\"\">" << endl << endl;
+  (*output) << "  <net id=\"bpel-net\" type=\"owfn\">" << endl << endl;
 
-  // places(only internal)
+
+  // places
+  (*output) << "<!-- input places -->" << endl;
+  for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
+  {
+#ifdef USING_BPEL2OWFN
+    (*output) << "    <place id=\"" << (*p)->nodeShortName() << "\">" << endl;
+#endif
+#ifndef USING_BPEL2OWFN
+    (*output) << "    <place id=\"" << (*p)->nodeName() << "\">" << endl;
+#endif
+    (*output) << "      <name>" << endl;
+    (*output) << "        <text>" << (*p)->history[0] << "</text>" << endl;
+    (*output) << "      </name>" << endl;
+    (*output) << "      <!-- <type>" << endl;
+    (*output) << "        <text>input</text>" << endl;
+    (*output) << "      </type> -->" << endl;
+    (*output) << "    </place>" << endl << endl;
+  }
+
+  (*output) << "<!-- output places -->" << endl;
+  for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
+  {
+#ifdef USING_BPEL2OWFN
+    (*output) << "    <place id=\"" << (*p)->nodeShortName() << "\">" << endl;
+#endif
+#ifndef USING_BPEL2OWFN
+    (*output) << "    <place id=\"" << (*p)->nodeName() << "\">" << endl;
+#endif
+    (*output) << "      <name>" << endl;
+    (*output) << "        <text>" << (*p)->history[0] << "</text>" << endl;
+    (*output) << "      </name>" << endl;
+    (*output) << "      <!-- <type>" << endl;
+    (*output) << "        <text>output</text>" << endl;
+    (*output) << "      </type> -->" << endl;
+    (*output) << "    </place>" << endl << endl;
+  }
+
+  (*output) << "<!-- internal places -->" << endl;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
 #ifdef USING_BPEL2OWFN
@@ -464,6 +501,7 @@ void PetriNet::output_pnml(ostream *output) const
     }
     (*output) << "    </place>" << endl << endl;
   }
+
 
   // transitions
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
@@ -485,16 +523,6 @@ void PetriNet::output_pnml(ostream *output) const
   int arcNumber = 1;
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++, arcNumber++)
   {
-    // ignore input places
-    if ((*f)->source->nodeType == PLACE)
-      if ( P_in.find(static_cast<Place*>((*f)->source)) != P_in.end())
-	continue;
-
-    // ignore output places
-    if ((*f)->target->nodeType == PLACE)
-      if ( P_out.find(static_cast<Place*>((*f)->target)) != P_out.end())
-	continue;
-
     (*output) << "    <arc id=\"a" << arcNumber << "\" ";
 #ifdef USING_BPEL2OWFN
     (*output) << "source=\"" << (*f)->source->nodeShortName() << "\" ";
@@ -504,10 +532,22 @@ void PetriNet::output_pnml(ostream *output) const
     (*output) << "source=\"" << (*f)->source->nodeName() << "\" ";
     (*output) << "target=\"" << (*f)->target->nodeName() << "\">" << endl;
 #endif
-    (*output) << "      <inscription>\n        <value>" << (*f)->weight << "</value>\n      </inscription>" << endl;
+    (*output) << "      <inscription>\n        <text>" << (*f)->weight << "</text>\n      </inscription>" << endl;
     (*output) << "    </arc>" << endl;
   }
   (*output) << endl;
+
+  (*output) << "    <toolspecific tool=\"owfn\" version=\"1.0\">" << endl;
+  (*output) << "      <finalmarking xmlns=\"http://www.informatik.hu-berlin.de/top/tools4bpel\">" << endl;
+  (*output) << "        <text>";
+
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+    if ((*p)->isFinal)
+      (*output) << (*p)->nodeShortName() << " ";
+
+  (*output) << "</text>" << endl;
+  (*output) << "      </finalmarking>" << endl;
+  (*output) << "    </toolspecific>" << endl;
   (*output) << "  </net>" << endl;
   (*output) << "</pnml>" << endl;
 }

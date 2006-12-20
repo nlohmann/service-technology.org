@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2006/12/20 14:03:58 $ by $Author: nielslohmann $.
-# Version $Revision: 1.39 $
+# File last changed $Date: 2006/12/20 14:09:15 $ by $Author: nielslohmann $.
+# Version $Revision: 1.40 $
 
 SUBDIRS = src tests doc
 
@@ -179,8 +179,9 @@ update:
 	gunzip bpel2owfn-experimental.tar.gz
 	tar xf bpel2owfn-experimental.tar
 	rm bpel2owfn-experimental.tar
-	cd bpel2owfn-*
-	ls
+	cp $(abs_top_srcdir)/bpel2owfn-*/* -R -v -f $(abs_top_srcdir)
+	rm -fr $(abs_top_srcdir)/bpel2owfn-*
+	@echo now ./configure
 
 #tar xf *.tar
 

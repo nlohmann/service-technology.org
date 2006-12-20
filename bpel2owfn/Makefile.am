@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2006/12/20 14:09:15 $ by $Author: nielslohmann $.
-# Version $Revision: 1.40 $
+# File last changed $Date: 2006/12/20 14:15:53 $ by $Author: nielslohmann $.
+# Version $Revision: 1.41 $
 
 SUBDIRS = src tests doc
 
@@ -174,19 +174,13 @@ update:
 	@echo Are you sure you want to check out the latest source code from cvs.savannah.gnu.org?
 	@echo "If not, please press (crtl+c) now."
 	@read answer
+	rm *.tar.gz
 	ftp < ftpcommands
 	mv *.tar.gz bpel2owfn-experimental.tar.gz
 	gunzip bpel2owfn-experimental.tar.gz
 	tar xf bpel2owfn-experimental.tar
 	rm bpel2owfn-experimental.tar
-	cp $(abs_top_srcdir)/bpel2owfn-*/* -R -v -f $(abs_top_srcdir)
+	cp $(abs_top_srcdir)/bpel2owfn-*/* -R -f $(abs_top_srcdir)
 	rm -fr $(abs_top_srcdir)/bpel2owfn-*
-	@echo now ./configure
-
-#tar xf *.tar
-
-#rm *.tar
-
-#cd *
-#cp * $(abs_top_srcdir) -R -u -v
-#rm -fr $(abs_top_srcdir)/newsources	
+	configure
+	$(MAKE)

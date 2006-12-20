@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2006/12/20 15:48:11 $ by $Author: nielslohmann $.
-# Version $Revision: 1.43 $
+# File last changed $Date: 2006/12/20 15:54:01 $ by $Author: nielslohmann $.
+# Version $Revision: 1.44 $
 
 SUBDIRS = src tests doc
 
@@ -174,6 +174,7 @@ update:
 	@echo Are you sure you want to check out the latest source code from cvs.savannah.gnu.org?
 	@echo "If not, please press (crtl+c) now."
 	@read answer
+	$(MAKE) maintainer-clean
 	-rm *.tar.gz
 	ftp < ftpcommands
 	mv *.tar.gz bpel2owfn-experimental.tar.gz

@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/12/15 17:51:01 $
+ * \date    \$Date: 2006/12/20 10:07:55 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.173 $
+ * \version \$Revision: 1.174 $
  *
  * \ingroup petrinet
  */
@@ -1256,7 +1256,11 @@ void PetriNet::calculate_max_occurrences()
     for (set<Node *>::iterator t = receiving_transitions.begin(); t != receiving_transitions.end(); t++)
       for (unsigned int i = 0; i < (*t)->history.size(); i++)
       {
-	unsigned int transition_activity_id = toUInt((*t)->history[i].substr(0, (*t)->history[i].find_first_of(".")));
+	// unsigned int transition_activity_id = toUInt((*t)->history[i].substr(0, (*t)->history[i].find_first_of(".")));
+        string act_id = (*t)->nodeFullName().substr(0, (*t)->nodeFullName().find_first_of("."));
+        
+        act_id = act_id.substr( act_id.find_last_of( "_" ) + 1 );
+	unsigned int transition_activity_id = toUInt( act_id );
 	assert(ASTEmap[transition_activity_id] != NULL);
 	receiving_activities.insert(transition_activity_id);
       }

@@ -28,14 +28,14 @@
  * 
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/12 16:13:48 $
+ * \date    \$Date: 2006/12/20 10:07:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.134 $
+ * \version \$Revision: 1.135 $
  */
 
 
@@ -211,7 +211,10 @@ int main( int argc, char *argv[])
 	else
 	  AST->unparse(kc::pseudoPrinter, kc::petrinet);
 
-	if (modus == M_CONSISTENCY)
+        // calculate maximum occurences
+        PN.calculate_max_occurrences(); 
+
+        if (modus == M_CONSISTENCY)
 	{
 	  unsigned int pos = file->rfind(".bpel", file->length());
 	  unsigned int pos2 = file->rfind("/", file->length());
@@ -303,7 +306,7 @@ int main( int argc, char *argv[])
     // now the net will not change any more, thus the nodes are re-enumerated
     // and the maximal occurrences of the nodes are calculated.
     PN.reenumerate(); 
-    PN.calculate_max_occurrences(); 
+//    PN.calculate_max_occurrences(); 
     cerr << PN.information() << endl;
 
 

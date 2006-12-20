@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/12/17 11:42:13 $
+ * \date    \$Date: 2006/12/20 11:50:18 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.218 $
+ * \version \$Revision: 1.219 $
  *
  */
 %}
@@ -704,7 +704,7 @@ This=userDefinedEventHandler(a,b,_id) ->
       Transition *t5 = PN.newTransition(prefix + "t5"); // t6 in MEH
       PN.newArc(p6, t5);
       PN.newArc(t5, p17);
-      if (!parameters[P_NOVARIABLES])
+      if (parameters[P_VARIABLES])
         PN.newArc(PN.findPlace("1.internal.clock"), t5, READ);
 
       Transition *t7 = PN.newTransition(prefix + "allFinished");
@@ -765,7 +765,7 @@ This=userDefinedEventHandler(a,b,_id) ->
 	Transition *onMessage_t3 = PN.newTransition(newPrefix + "t3");
 	PN.newArc(onMessage_p2, onMessage_t3);
 	PN.newArc(onMessage_t3, onMessage_p3);
-        if (!parameters[P_NOVARIABLES])
+        if (parameters[P_VARIABLES])
         {
 	  PN.newArc(PN.findPlace("variable." + ASTEmap[ThisBranch->id]->variableName), onMessage_t3);
 	  PN.newArc(onMessage_t3, PN.findPlace("variable." + ASTEmap[ThisBranch->id]->variableName));
@@ -805,7 +805,7 @@ This=userDefinedEventHandler(a,b,_id) ->
 	PN.newArc(onMessage_p11, onMessage_t11);
 	PN.newArc(onMessage_t11, onMessage_p12);
 
-	if (parameters[P_NOSTANDARDFAULTS] == false)
+	if (parameters[P_STANDARDFAULTS])
 	  Transition *t1 = throwFault(onMessage_p2, onMessage_p1, toString(onMessageCount-1) + ".p2", prefix, _id2, 0); // the toString-part fixed a bug
 
 	// arcs from the EH
@@ -843,7 +843,7 @@ This=userDefinedEventHandler(a,b,_id) ->
 	Transition *onAlarm_t1 = PN.newTransition(newPrefix + "t1");
 	PN.newArc(onAlarm_p3, onAlarm_t1);
 	PN.newArc(onAlarm_t1, onAlarm_p1);
-        if (!parameters[P_NOVARIABLES])
+        if (parameters[P_VARIABLES])
           PN.newArc(PN.findPlace("1.internal.clock"), onAlarm_t1, READ);
 
 	Transition *onAlarm_t2 = PN.newTransition(newPrefix + "t2");
@@ -934,7 +934,7 @@ This=implicitCompensationHandler(_id) provided (!ASTEmap[_id->value]->inProcess)
 
       // The following subnet is only needed if the standard faults are
       // switched on (i.e. not using the parameter "nostandardfaults").
-      if (parameters[P_NOSTANDARDFAULTS] == false)
+      if (parameters[P_STANDARDFAULTS])
       {
 	Place *p1  = PN.newPlace(prefix + "p1");
 
@@ -1065,7 +1065,7 @@ This=userDefinedCompensationHandler(innerActivity,_id) provided (!ASTEmap[_id->v
 
       // The following subnet is only needed if the standard faults are
       // switched on (i.e. not using the parameter "nostandardfaults").
-      if (parameters[P_NOSTANDARDFAULTS] == false)
+      if (parameters[P_STANDARDFAULTS])
       {
 	Place *p1  = PN.newPlace(prefix + "p1");
 

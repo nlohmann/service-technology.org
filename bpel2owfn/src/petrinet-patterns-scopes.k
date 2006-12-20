@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for BPEL's <scope> and <process>
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $ 
+ *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2006/12/07 10:49:48 $
+ * \date    \$Date: 2006/12/20 11:50:18 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.16 $
+ * \version \$Revision: 1.17 $
  */
 %}
 
@@ -119,7 +119,7 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 	}
 
       
-	if (!parameters[P_NOVARIABLES])
+	if (parameters[P_VARIABLES])
 	{
 	  // Create variable places and initially mark them.
 	  for (set<string>::iterator variable = variableNames.begin(); variable != variableNames.end(); variable++)

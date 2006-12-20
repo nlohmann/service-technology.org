@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for BPEL's basic activities
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $ 
+ *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2006/12/05 12:58:53 $
+ * \date    \$Date: 2006/12/20 11:50:18 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  */
 %}
 
@@ -139,7 +139,7 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	Transition *t1 = PN.newTransition(prefix + "read_var");
 	PN.newArc(p1, t1); 
 	PN.newArc(t1, p2);
-	if (!parameters[P_NOVARIABLES])
+	if (parameters[P_VARIABLES])
 	  PN.newArc(PN.findPlace("variable." + ASTEmap[phylum->id]->inputVariableName), t1, READ);
 
 	Transition *t2 = PN.newTransition(prefix + "invoke");
@@ -148,7 +148,7 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	PN.newArc(t2, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
 
 	// Transitions for the negative control flow.
-	if (parameters[P_NOSTANDARDFAULTS] == false)
+	if (parameters[P_STANDARDFAULTS])
 	  Transition *t3 = throwFault(p2, p4, "running", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
 
 	Transition *t4 = stop(p1, "initial", prefix);
@@ -213,7 +213,7 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	Transition *t1 = PN.newTransition(prefix + "read_var");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
-	if (!parameters[P_NOVARIABLES])
+	if (parameters[P_VARIABLES])
 	  PN.newArc(PN.findPlace("variable." + ASTEmap[phylum->id]->inputVariableName), t1, READ);
 
 	Transition *t2 = PN.newTransition(prefix + "invoke_out");
@@ -229,14 +229,14 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	Transition *t4 = PN.newTransition(prefix + "save_var");
 	PN.newArc(p4, t4);
 	PN.newArc(t4, p5);
-	if (!parameters[P_NOVARIABLES])
+	if (parameters[P_VARIABLES])
 	{
 	  PN.newArc(PN.findPlace("variable." + ASTEmap[phylum->id]->outputVariableName), t4);
 	  PN.newArc(t4, PN.findPlace("variable." + ASTEmap[phylum->id]->outputVariableName));
 	}
 
 	// Transitions for the negative control flow.
-	if (parameters[P_NOSTANDARDFAULTS] == false)
+	if (parameters[P_STANDARDFAULTS])
 	{
 	  Transition *t5 = throwFault(p4, p6, "running2", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
 	  Transition *t6 = throwFault(p2, p6, "running1", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
@@ -319,14 +319,14 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
 	Transition *t2 = PN.newTransition(prefix + "save_var");
 	PN.newArc(p2, t2);
 	PN.newArc(t2, p3);
-	if (!parameters[P_NOVARIABLES])
+	if (parameters[P_VARIABLES])
 	{
 	  PN.newArc(PN.findPlace("variable." + ASTEmap[phylum->id]->variableName), t2);
 	  PN.newArc(t2, PN.findPlace("variable." + ASTEmap[phylum->id]->variableName));
 	}
 
 	// Transitions for the negative control flow.
-	if (parameters[P_NOSTANDARDFAULTS] == false)
+	if (parameters[P_STANDARDFAULTS])
 	  Transition *t3 = throwFault(p2, p4, "running", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
 
 	Transition *t4 = stop(p1, "initial", prefix);
@@ -392,7 +392,7 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
 	Transition *t1 = PN.newTransition(prefix + "read_var");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
-	if (!parameters[P_NOVARIABLES])
+	if (parameters[P_VARIABLES])
 	  PN.newArc(PN.findPlace("variable." + ASTEmap[phylum->id]->variableName), t1, READ);
 
 	Transition *t2 = PN.newTransition(prefix + "reply");
@@ -401,7 +401,7 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
 	PN.newArc(t2, p3);
 
 	// Transitions for the negative control flow.
-	if (parameters[P_NOSTANDARDFAULTS] == false)
+	if (parameters[P_STANDARDFAULTS])
 	  Transition *t3 = throwFault(p2, p4, "running", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
 
 	Transition *t3 = stop(p1, "initial", prefix);
@@ -485,20 +485,20 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 	    Transition *t1 = PN.newTransition(newPrefix + "t1");
 	    PN.newArc(lastPlace, t1);
 	    PN.newArc(t1, p2);
-            if (!parameters[P_NOVARIABLES])
+            if (parameters[P_VARIABLES])
 	      PN.newArc(PN.findPlace("variable." + ASTEmap[from->id]->variableName), t1, READ);
 
 	    Transition *t2 = PN.newTransition(newPrefix + "t2");
 	    PN.newArc(p2, t2);
 	    PN.newArc(t2, p8);
-	    if (!parameters[P_NOVARIABLES])
+	    if (parameters[P_VARIABLES])
 	    {
 	      PN.newArc(PN.findPlace("variable." + ASTEmap[to->id]->variableName), t2);
 	      PN.newArc(t2, PN.findPlace("variable." + ASTEmap[to->id]->variableName));
 	    }
 
 	    // Transitions for the negative control flow.
-	    if (parameters[P_NOSTANDARDFAULTS] == false)
+	    if (parameters[P_STANDARDFAULTS])
 	      Transition *t3 = throwFault(p2, p4, "running", newPrefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
 	    
 	    Transition *t6 = stop(p4, "p4at" + toString(copyCount), prefix);
@@ -513,14 +513,14 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 	    Transition *t2 = PN.newTransition(newPrefix + "t2");
 	    PN.newArc(lastPlace, t2);
 	    PN.newArc(t2, p8);
-	    if (!parameters[P_NOVARIABLES])
+	    if (parameters[P_VARIABLES])
 	    {
 	      PN.newArc(PN.findPlace("variable." + ASTEmap[to->id]->variableName), t2);
 	      PN.newArc(t2, PN.findPlace("variable." + ASTEmap[to->id]->variableName));
 	    }
 
 	    // Transitions for the negative control flow.
-	    if (parameters[P_NOSTANDARDFAULTS] == false)
+	    if (parameters[P_STANDARDFAULTS])
 	      Transition *t3 = throwFault(lastPlace, p4, "initial", newPrefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
 
 	    Transition *t6 = stop(p4, "p4at" + toString(copyCount), prefix);
@@ -596,7 +596,7 @@ void PValidate(impl_tValidate* abstract_phylum, uview current_view)
 	PN.newArc(t2, p3);
 
 	// Transitions for the negative control flow.
-	if (parameters[P_NOSTANDARDFAULTS] == false)
+	if (parameters[P_STANDARDFAULTS])
 	  Transition *t3 = throwFault(p2, p4, "running", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
 
 	Transition *t4 = stop(p1, "initial", prefix);
@@ -660,7 +660,7 @@ void PWaitUntil(impl_tWait* abstract_phylum, uview current_view)
 	Transition *t1 = PN.newTransition(prefix + "waitUntil");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
-        if (!parameters[P_NOVARIABLES])
+        if (parameters[P_VARIABLES])
           PN.newArc(PN.findPlace("1.internal.clock"), t1, READ);
 
 	// Transitions for the negative control flow.
@@ -717,7 +717,7 @@ void PWaitFor(impl_tWait* abstract_phylum, uview current_view)
 	Transition *t1 = PN.newTransition(prefix + "readTime");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
-        if (!parameters[P_NOVARIABLES])
+        if (parameters[P_VARIABLES])
 	  PN.newArc(PN.findPlace("1.internal.clock"), t1, READ);
 
 	Transition *t2 = PN.newTransition(prefix + "waitFor");

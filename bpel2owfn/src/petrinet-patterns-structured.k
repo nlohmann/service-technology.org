@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2006/12/17 19:05:00 $
+ * \date    \$Date: 2006/12/20 11:50:18 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  */
 %}
 
@@ -99,7 +99,7 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 	// external control of loop condition	
 	Place *control_enter = NULL;
 	Place *control_leave = NULL;
-        if (parameters[P_CONTROLLOOPS])
+        if (parameters[P_LOOPCONTROL])
 	{
 	  control_enter = PN.newPlace("in.enterloop." + toString(phylum->id), IN);
 	  control_leave = PN.newPlace("in.leaveloop." + toString(phylum->id), IN);
@@ -120,18 +120,18 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 	  Transition *t1 = PN.newTransition(prefix + "skip");
 	  PN.newArc(p2, t1);
 	  PN.newArc(t1, p3);
-	  if (parameters[P_CONTROLLOOPS])
+	  if (parameters[P_LOOPCONTROL])
 	    PN.newArc(control_leave, t1);	  
 	  
 	  Transition *t4 = PN.newTransition(prefix + "loop");
 	  PN.newArc(t4, p1);
 	  PN.newArc(p5, t4);
-	  if (parameters[P_CONTROLLOOPS])
+	  if (parameters[P_LOOPCONTROL])
 	    PN.newArc(control_enter, t4);	  
 	}
 	
 	// Transitions for the negative control flow.
-	if (parameters[P_NOSTANDARDFAULTS] == false)
+	if (parameters[P_STANDARDFAULTS])
 	  Transition *t5 = throwFault(p2, p6, "running", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
 
 	Transition *t6 = stop(p1, "initial", prefix);
@@ -168,7 +168,7 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 		PN.newArc(p5, t4);
 		PN.newArc(p9_old, t4);
 		PN.newArc(t4, p9);
-      		if (parameters[P_CONTROLLOOPS])
+      		if (parameters[P_LOOPCONTROL])
       		  PN.newArc(control_enter, t4);
 	      }
 	      
@@ -178,7 +178,7 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 	      PN.newArc(t1, p3);
 	      PN.newArc(t1, p9_first);
 	      PN.newArc(p9, t1);
-    	      if (parameters[P_CONTROLLOOPS])
+    	      if (parameters[P_LOOPCONTROL])
     		PN.newArc(control_leave, t1);	      
 	      
 	      p9_old = p9;
@@ -220,7 +220,7 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 	// external control of loop condition	
 	Place *control_enter = NULL;
 	Place *control_leave = NULL;
-        if (parameters[P_CONTROLLOOPS])
+        if (parameters[P_LOOPCONTROL])
 	{
 	  control_enter = PN.newPlace("in.enterloop." + toString(phylum->id), IN);
 	  control_leave = PN.newPlace("in.leaveloop." + toString(phylum->id), IN);
@@ -230,13 +230,13 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 	Transition *t1 = PN.newTransition(prefix + "leave");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p3);
-	if (parameters[P_CONTROLLOOPS])
+	if (parameters[P_LOOPCONTROL])
 	  PN.newArc(control_leave, t1);
 
 	Transition *t2 = PN.newTransition(prefix + "loop");
 	PN.newArc(p4, t2);
 	PN.newArc(t2, p1);
-	if (parameters[P_CONTROLLOOPS])
+	if (parameters[P_LOOPCONTROL])
 	  PN.newArc(control_enter, t2);
 
 
@@ -293,7 +293,7 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 	// external control of loop condition	
 	Place *control_enter = NULL;
 	Place *control_leave = NULL;
-        if (parameters[P_CONTROLLOOPS])
+        if (parameters[P_LOOPCONTROL])
 	{
 	  control_enter = PN.newPlace("in.enterloop." + toString(phylum->id), IN);
 	  control_leave = PN.newPlace("in.leaveloop." + toString(phylum->id), IN);
@@ -310,18 +310,18 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 	  Transition *t2 = PN.newTransition(prefix + "end");
 	  PN.newArc(p3, t2);
 	  PN.newArc(t2, p4);
-	  if (parameters[P_CONTROLLOOPS])
+	  if (parameters[P_LOOPCONTROL])
 	    PN.newArc(control_leave, t2);
 	
 	  Transition *t3 = PN.newTransition(prefix + "repeat");
 	  PN.newArc(p3, t3);
 	  PN.newArc(t3, p1);
-	  if (parameters[P_CONTROLLOOPS])
+	  if (parameters[P_LOOPCONTROL])
 	    PN.newArc(control_enter, t3);
 	}
 
 	// Transitions for the negative control flow.
-	if (parameters[P_NOSTANDARDFAULTS] == false)
+	if (parameters[P_STANDARDFAULTS])
 	  Transition *t4 = throwFault(p3, p6, "running", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
 
 	Transition *t5 = stop(p1, "initial", prefix);
@@ -357,7 +357,7 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 		PN.newArc(p3, t4);
 		PN.newArc(p9_old, t4);
 		PN.newArc(t4, p9);
-		if (parameters[P_CONTROLLOOPS])
+		if (parameters[P_LOOPCONTROL])
 		  PN.newArc(control_enter, t4);
 	      }
 	      
@@ -367,7 +367,7 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 	      PN.newArc(t1, p4);
 	      PN.newArc(t1, p9_first);
 	      PN.newArc(p9, t1);
-    	      if (parameters[P_CONTROLLOOPS])
+    	      if (parameters[P_LOOPCONTROL])
     		PN.newArc(control_leave, t1);
 	      
 	      p9_old = p9;
@@ -401,7 +401,7 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 	// external control of loop condition
 	Place *control_enter = NULL;
 	Place *control_leave = NULL;
-        if (parameters[P_CONTROLLOOPS])
+        if (parameters[P_LOOPCONTROL])
 	{
 	  control_enter = PN.newPlace("in.enterloop." + toString(phylum->id), IN);
 	  control_leave = PN.newPlace("in.leaveloop." + toString(phylum->id), IN);
@@ -411,13 +411,13 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 	Transition *t1 = PN.newTransition(prefix + "end");
 	PN.newArc(p2, t1);
 	PN.newArc(t1, p3);
-	if (parameters[P_CONTROLLOOPS])
+	if (parameters[P_LOOPCONTROL])
 	  PN.newArc(control_leave, t1);
 
 	Transition *t2 = PN.newTransition(prefix + "repeat");
 	PN.newArc(p2, t2);
 	PN.newArc(t2, p1);
-	if (parameters[P_CONTROLLOOPS])
+	if (parameters[P_LOOPCONTROL])
 	  PN.newArc(control_enter, t2);
 
 
@@ -634,7 +634,7 @@ void PSwitch(impl_tSwitch* abstract_phylum, uview current_view)
 	PN.newArc(t3, p6);
 
 	// Transitions for the negative control flow.
-	if (parameters[P_NOSTANDARDFAULTS] == false)
+	if (parameters[P_STANDARDFAULTS])
 	  Transition *t7 = throwFault(p6, p10, "running", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
 
 	Transition *t8  = stop(p5, "initial", prefix);
@@ -822,7 +822,7 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 	Transition *t5 = PN.newTransition(prefix + "t5");
 	PN.newArc(p6, t5);
 	PN.newArc(t5, p7);
-        if (!parameters[P_NOVARIABLES])
+        if (parameters[P_VARIABLES])
 	  PN.newArc(PN.findPlace("1.internal.clock"), t5, READ);
 
   	// Transitions for the negative control flow.
@@ -859,14 +859,14 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 	  Transition *t3 = PN.newTransition(newPrefix + "t3");
 	  PN.newArc(p3, t3);
 	  PN.newArc(t3, PN.findPlace(innerActivity->id, ".initial"));
-          if (!parameters[P_NOVARIABLES])
+          if (parameters[P_VARIABLES])
           {
 	    PN.newArc(PN.findPlace("variable." + ASTEmap[ThisBranch->id]->variableName), t3);
 	    PN.newArc(t3, PN.findPlace("variable." + ASTEmap[ThisBranch->id]->variableName));
           }
 
 	  // Transitions for the negative control flow.
-	  if (parameters[P_NOSTANDARDFAULTS] == false)
+	  if (parameters[P_STANDARDFAULTS])
 	    Transition *t4 = throwFault(p3, p10, "p3", newPrefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
 
 	  Transition *t9  = stop(p3, "p3at" + message, prefix);
@@ -892,7 +892,7 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 	  Transition *t6 = PN.newTransition(newPrefix + "t6");
 	  PN.newArc(PN.findPlace(phylum->id, ".internal.TimeStamp"), t6);
 	  PN.newArc(t6, PN.findPlace(innerActivity->id, ".initial"));
-          if(!parameters[P_NOVARIABLES])
+          if(parameters[P_VARIABLES])
 	    PN.newArc(PN.findPlace("1.internal.clock"), t6, READ);
 	  
 	  // Embed the inner activity.

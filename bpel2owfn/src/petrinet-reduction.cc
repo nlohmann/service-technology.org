@@ -28,13 +28,13 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2006/12/14 17:35:16 $
+ * \date    \$Date: 2006/12/20 11:50:18 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
  *
  * \ingroup petrinet
  */
@@ -632,8 +632,8 @@ unsigned int PetriNet::reduce()
     reduce_self_loop_places();		// RC1
     reduce_self_loop_transitions();	// RC2
 
-    if (parameters[P_TRED])
-      reduce_transitive_places();
+//    if (parameters[P_TRED])
+//      reduce_transitive_places();
     
     trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification pass " + toString(passes++) + ": " + information() + "\n");
 

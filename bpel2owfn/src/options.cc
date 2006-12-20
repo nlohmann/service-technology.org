@@ -24,17 +24,17 @@
  * \brief   evaluation of command-line options
  *
  * \author  responsible: Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/10 17:31:17 $
+ * \date    \$Date: 2006/12/20 11:50:18 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.59 $
+ * \version \$Revision: 1.60 $
  */
 
 
@@ -161,10 +161,10 @@ void print_help()
   trace("    consistency             checks whether services communicate deadlock-freely\n");
   trace("\n");
   trace("  PARAMETER is one of the following (multiple parameters permitted):\n");
-  trace("    simplify                structurally simplify generated Petri net\n");
-  trace("    novariables             do not model BPEL variables\n");
-  trace("    nostandardfaults        do not model BPEL standard faults\n");
-  trace("    nofhfaults              do not model faults in fault handlers \n");
+  trace("    reduce                  structurally simplify generated Petri net\n");
+  trace("    variables               model BPEL variables\n");
+  trace("    standardfaults          model BPEL standard faults\n");
+  trace("    fhfaults                model faults in fault handlers \n");
   trace("    communicationonly       only model the communicational behavior\n");
   trace("    xor                     use mutually exclusive transition condition\n");
   trace("    wsbpel                  use the semantics of WS-BPEL 2.0\n");
@@ -364,26 +364,26 @@ void parse_command_line(int argc, char* argv[])
 		options[O_PARAMETER] = true;
 		parameter = string(optarg);
 		
-		if ( parameter == "simplify")
-		  parameters[P_SIMPLIFY] = true;
+		if ( parameter == "reduce")
+		  parameters[P_REDUCE] = true;
 		else if (parameter == "communicationonly")
 		  parameters[P_COMMUNICATIONONLY] = true;
-		else if (parameter == "nostandardfaults")
-		  parameters[P_NOSTANDARDFAULTS] = true;
-		else if (parameter == "nofhfaults")
-		  parameters[P_NOFHFAULTS] = true;
-		else if (parameter == "novariables")
-		  parameters[P_NOVARIABLES] = true;
-		else if (parameter == "tred")
-		  parameters[P_TRED] = true;
+		else if (parameter == "standardfaults")
+		  parameters[P_STANDARDFAULTS] = true;
+		else if (parameter == "fhfaults")
+		  parameters[P_FHFAULTS] = true;
+		else if (parameter == "variables")
+		  parameters[P_VARIABLES] = true;
+//		else if (parameter == "tred")
+//		  parameters[P_TRED] = true;
 		else if (parameter == "xor")
 		  parameters[P_XOR] = true;
-		else if (parameter == "new")
-		  parameters[P_NEW] = true;
+		else if (parameter == "wsbpel")
+		  parameters[P_WSBPEL] = true;
 		else if (parameter == "loopcount")
 		  parameters[P_LOOPCOUNT] = true;
-		else if (parameter == "controlloops")
-		  parameters[P_CONTROLLOOPS] = true;
+		else if (parameter == "loopcontrol")
+		  parameters[P_LOOPCONTROL] = true;
 		else
 		  trace(TRACE_ALWAYS, "Unknown parameter \"" + parameter +"\".\n");
 		

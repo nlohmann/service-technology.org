@@ -20,8 +20,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2006/12/15 19:06:42 $ by $Author: nielslohmann $.
-# Version $Revision: 1.10 $
+# File last changed $Date: 2006/12/20 11:50:18 $ by $Author: nielslohmann $.
+# Version $Revision: 1.11 $
 
 echo ""
 
@@ -34,7 +34,7 @@ bpel2owfn --input=$testdir/testfiles/loan.bpel --mode=petrinet --format=lola --o
 result2=$?
 
 echo "test: dot creation"
-bpel2owfn --input=$testdir/testfiles/shipping.bpel --mode=petrinet --parameter=simplify --format=dot --output=shipping &> /dev/null
+bpel2owfn --input=$testdir/testfiles/shipping.bpel --mode=petrinet --parameter=reduce --format=dot --output=shipping &> /dev/null
 result3=$?
 
 if test \( $result1 -eq 0 -a $result2 -eq 0 -a $result3 -eq 0 \) -a \

@@ -24,17 +24,17 @@
  * \brief   evaluation of command-line options
  *
  * \author  responsible: Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/10 17:31:17 $
+ * \date    \$Date: 2006/12/20 11:50:18 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.41 $
+ * \version \$Revision: 1.42 $
  */
 
 
@@ -126,16 +126,16 @@ typedef enum
  */
 typedef enum
 {
-  P_SIMPLIFY,		///< structural reduction rules
-  P_NOVARIABLES,	///< removes all variables from the model
-  P_NOSTANDARDFAULTS,	///< only user-defined faults can occur
-  P_NOFHFAULTS,		///< activities inside the FH throw no faults
+  P_REDUCE,		///< structural reduction rules
+  P_VARIABLES,		///< removes all variables from the model
+  P_STANDARDFAULTS,	///< only user-defined faults can occur
+  P_FHFAULTS,		///< activities inside the FH throw no faults
   P_COMMUNICATIONONLY,	///< creates the smallest possible net
-  P_TRED,		///< use transitive reduction
+//  P_TRED,		///< use transitive reduction
   P_XOR,		///< use XOR as transition condition
-  P_NEW,		///< use new (WS-BPEL) Petri net patterns
+  P_WSBPEL,		///< use new (WS-BPEL) Petri net patterns
   P_LOOPCOUNT,		///< use loop counters
-  P_CONTROLLOOPS	///< add communication to loops
+  P_LOOPCONTROL		///< add communication to loops
 } possibleParameters;
 
 

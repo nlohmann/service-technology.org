@@ -24,17 +24,17 @@
  * \brief   unparse helper tools
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/12/10 17:31:15 $
+ * \date    \$Date: 2006/12/20 11:50:18 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -141,7 +141,7 @@ Transition *throwFault(Place *p1, Place *p2,
 
 
   // fault handling for the `new' patterns
-  if (parameters[P_NEW])
+  if (parameters[P_WSBPEL])
   {
     switch (negativeControlFlow)
     {
@@ -237,7 +237,7 @@ Transition *throwFault(Place *p1, Place *p2,
 	// No transition is added if the parameter "nofhfaults" is set, since
 	// then it is not allowed for activities in the fault handler to throw
 	// fault.s
-	if (parameters[P_NOFHFAULTS])
+	if (!parameters[P_FHFAULTS])
 	  return NULL;
 
 	Transition *t1 = PN.newTransition(prefix + "throwFault." + p1name);

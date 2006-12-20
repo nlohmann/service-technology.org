@@ -28,13 +28,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/12/19 17:15:55 $
+ * \date    \$Date: 2006/12/20 11:50:18 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.65 $
+ * \version \$Revision: 1.66 $
  *
  * \ingroup petrinet
  */
@@ -383,7 +383,7 @@ void PetriNet::output_dot(ostream *output) const
   (*output) << "digraph N {" << endl;
   (*output) << " graph [fontname=\"Helvetica\", label=\"";
 
-  if (parameters[P_SIMPLIFY])
+  if (parameters[P_REDUCE])
     (*output) << "structural simplified ";
 
   (*output) << "Petri net generated from " << filename << "\"];" << endl;

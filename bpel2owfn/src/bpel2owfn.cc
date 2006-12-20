@@ -24,18 +24,18 @@
  * \brief   BPEL2oWFN's main
  * 
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/20 10:07:55 $
+ * \date    \$Date: 2006/12/20 11:50:18 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.135 $
+ * \version \$Revision: 1.136 $
  */
 
 
@@ -206,7 +206,7 @@ int main( int argc, char *argv[])
 	// choose Petri net patterns
 	if (parameters[P_COMMUNICATIONONLY] == true)
 	  AST->unparse(kc::pseudoPrinter, kc::petrinetsmall);
-	else if (parameters[P_NEW] == true)
+	else if (parameters[P_WSBPEL] == true)
 	  AST->unparse(kc::pseudoPrinter, kc::petrinetnew);
 	else
 	  AST->unparse(kc::pseudoPrinter, kc::petrinet);
@@ -225,7 +225,7 @@ int main( int argc, char *argv[])
 	  }
 	  
 	  // apply structural reduction rules?
-	  if (parameters[P_SIMPLIFY])
+	  if (parameters[P_REDUCE])
 	  {
 	    trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
 	    PN.reduce();
@@ -296,7 +296,7 @@ int main( int argc, char *argv[])
   if (modus == M_PETRINET || modus == M_CONSISTENCY)
   {
     // apply structural reduction rules?
-    if ( parameters[P_SIMPLIFY] )
+    if ( parameters[P_REDUCE] )
     {
       trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
       PN.reduce();

@@ -25,18 +25,18 @@
  * \brief   AST rewrite rules (implementation)
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006/10/11
  *
- * \date    \$Date: 2006/12/10 17:31:14 $
+ * \date    \$Date: 2006/12/20 11:50:18 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.19 $
+ * \version \$Revision: 1.20 $
  */
 %}
 
@@ -108,7 +108,7 @@ standardTerminationHandler(_id)
 /*
  * Default fault handler (cf. Sect. 12.5.1 in WS-BPEL 2.0)
  */
-implicitFaultHandler(_id) provided (parameters[P_NEW]) ->
+implicitFaultHandler(_id) provided (parameters[P_WSBPEL]) ->
 <implicit:
   userDefinedFaultHandler(
     NiltCatch_list(),
@@ -147,7 +147,7 @@ implicitFaultHandler(_id) provided (parameters[P_NEW]) ->
  * Default compensation handler (cf. Sect. 12.5.1 in WS-BPEL 2.0)
  */
 
-implicitCompensationHandler(_id) provided (parameters[P_NEW]) ->
+implicitCompensationHandler(_id) provided (parameters[P_WSBPEL]) ->
 <implicit:
   userDefinedCompensationHandler(
     activityCompensate(

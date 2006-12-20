@@ -18,17 +18,17 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2006/12/20 15:41:22 $ by $Author: nielslohmann $.
-# Version $Revision: 1.42 $
+# File last changed $Date: 2006/12/20 15:48:11 $ by $Author: nielslohmann $.
+# Version $Revision: 1.43 $
 
 SUBDIRS = src tests doc
 
 .PHONY: binarydistreadme update
 
-
 dist-hook:
 	rm -rf `find $(distdir) -name CVS`
 
+EXTRA_DIST = ftpcommands
 
 ####################################
 # Targets to clean generated files #

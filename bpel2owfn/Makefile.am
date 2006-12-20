@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2006/12/15 19:06:42 $ by $Author: nielslohmann $.
-# Version $Revision: 1.38 $
+# File last changed $Date: 2006/12/20 14:03:58 $ by $Author: nielslohmann $.
+# Version $Revision: 1.39 $
 
 SUBDIRS = src tests doc
 
@@ -147,7 +147,7 @@ gnupload_alpha: *.tar.gz
 	@echo "====================================="
 	@ls *.tar.gz -1
 	@echo
-	@echo Are you sure you want to upload these files to ftp://alpha.gnu.org/bpel2owfn?
+	@echo Are you sure you want to upload these files to ftp://alpha.gnu.org/gnu/bpel2owfn?
 	@echo "If not, please press (crtl+c) now."
 	@read answer
 	gnupload --to alpha.gnu.org:bpel2owfn $^
@@ -159,7 +159,7 @@ gnupload_release: *.tar.gz
 	@echo "============================================="
 	@ls *.tar.gz -1
 	@echo
-	@echo Are you sure you want to upload these files to ftp://ftp.gnu.org/bpel2owfn?
+	@echo Are you sure you want to upload these files to ftp://ftp.gnu.org/gnu/bpel2owfn?
 	@echo "If not, please press (crtl+c) now."
 	@read answer
 	gnupload --to ftp.gnu.org:bpel2owfn $^
@@ -167,15 +167,25 @@ gnupload_release: *.tar.gz
 
 
 update:
-	@echo "====================================="
-	@echo " UPDATE VIA ANONYMOUS CVS REPOSITORY "
-	@echo "====================================="
+	@echo "=========================="
+	@echo " UPDATE VIA ANONYMOUS FTP "
+	@echo "=========================="
 	@echo
 	@echo Are you sure you want to check out the latest source code from cvs.savannah.gnu.org?
 	@echo "If not, please press (crtl+c) now."
 	@read answer
-	$(MAKE) clean
-	cvs -z3 -d:pserver:anonymous@cvs.savannah.gnu.org:/sources/bpel2owfn co -d newsources bpel2owfn
-	rm -rf `find $(abs_top_srcdir)/newsources -name CVS`
-	cp $(abs_top_srcdir)/newsources/* $(abs_top_srcdir) -R -u -v
-	rm -fr $(abs_top_srcdir)/newsources
+	ftp < ftpcommands
+	mv *.tar.gz bpel2owfn-experimental.tar.gz
+	gunzip bpel2owfn-experimental.tar.gz
+	tar xf bpel2owfn-experimental.tar
+	rm bpel2owfn-experimental.tar
+	cd bpel2owfn-*
+	ls
+
+#tar xf *.tar
+
+#rm *.tar
+
+#cd *
+#cp * $(abs_top_srcdir) -R -u -v
+#rm -fr $(abs_top_srcdir)/newsources	

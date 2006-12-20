@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2006/12/20 14:15:53 $ by $Author: nielslohmann $.
-# Version $Revision: 1.41 $
+# File last changed $Date: 2006/12/20 15:41:22 $ by $Author: nielslohmann $.
+# Version $Revision: 1.42 $
 
 SUBDIRS = src tests doc
 
@@ -147,7 +147,7 @@ gnupload_alpha: *.tar.gz
 	@echo "====================================="
 	@ls *.tar.gz -1
 	@echo
-	@echo Are you sure you want to upload these files to ftp://alpha.gnu.org/gnu/bpel2owfn?
+	@echo Are you sure you want to upload these files to ftp://xalpha.gnu.org/gnu/bpel2owfn?
 	@echo "If not, please press (crtl+c) now."
 	@read answer
 	gnupload --to alpha.gnu.org:bpel2owfn $^
@@ -174,7 +174,7 @@ update:
 	@echo Are you sure you want to check out the latest source code from cvs.savannah.gnu.org?
 	@echo "If not, please press (crtl+c) now."
 	@read answer
-	rm *.tar.gz
+	-rm *.tar.gz
 	ftp < ftpcommands
 	mv *.tar.gz bpel2owfn-experimental.tar.gz
 	gunzip bpel2owfn-experimental.tar.gz

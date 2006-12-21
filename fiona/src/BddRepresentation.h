@@ -64,7 +64,7 @@ class BddRepresentation{
 		void printDotFile(char** names= NULL);
 		void print();
 		void save();
-		void BddRepresentation::PrintMemoryInUse();
+		void PrintMemoryInUse();
 
 		
         // Provides user defined operator new. Needed to trace all new

@@ -35,6 +35,7 @@
 
 #include "mynew.h"
 #include "formula.h"
+#include <cassert>
 
 unsigned int atomicformula::counttype(FType) {
 	return 1;

@@ -72,6 +72,8 @@ void trace(std::string message);
 
 std::string intToString(int);
 
+bool isNonNegativeInteger(const std::string& s);
+
 /// Signalling syntax errors.
 int yyerror(const char* msg);
 

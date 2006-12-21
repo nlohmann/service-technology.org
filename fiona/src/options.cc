@@ -183,6 +183,26 @@ void print_version() {
   trace("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
 }
 
+void printErrorInvalidNumberForOptionAndExit(const std::string& option,
+    const std::string& givenArgument)
+{
+    cerr << "Error:\tArgument for option " << option << " has to be a "
+            "non-negative number." << endl
+         << "\tInstead you gave '" << givenArgument
+         << "' as the argument for " << option << '.' << endl
+         << "\tEnter \"fiona --help\" for more information."
+         << endl;
+
+    exit(1);
+}
+
+void testForInvalidArgumentNumberAndPrintErrorAndExitIfNecessary(
+    const std::string& option, const std::string& givenArgument)
+{
+    if (!isNonNegativeInteger(givenArgument)) {
+        printErrorInvalidNumberForOptionAndExit(option, optarg);
+    }
+}
 
 // get parameters from options
 void parse_command_line(int argc, char* argv[]) {
@@ -287,10 +307,14 @@ void parse_command_line(int argc, char* argv[]) {
                 break;
             case 'm':
                 options[O_MESSAGES_MAX] = true;
+                testForInvalidArgumentNumberAndPrintErrorAndExitIfNecessary(
+                    "-m", optarg);
                 messages_manual = atoi(optarg);
                 break;
             case 'e':
                 options[O_EVENT_USE_MAX] = true;
+                testForInvalidArgumentNumberAndPrintErrorAndExitIfNecessary(
+                    "-e", optarg);
                 events_manual = atoi(optarg);
                 break;
             case 's':
@@ -331,6 +355,8 @@ void parse_command_line(int argc, char* argv[]) {
                 break;
             case 'b':
                 options[O_BDD] = true;
+                testForInvalidArgumentNumberAndPrintErrorAndExitIfNecessary(
+                    "-b", optarg);
                 i = atoi(optarg);
                 if (i >= 0 && i <= 21){
                     bdd_reordermethod = i;

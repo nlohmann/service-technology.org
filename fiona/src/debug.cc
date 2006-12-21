@@ -36,6 +36,7 @@
 #include "debug.h"
 
 #include <string>
+#include <cctype>
 #include <iostream>
 
 /// debug level
@@ -74,6 +75,17 @@ std::string intToString(int i) {
   sprintf(buffer, "%d", i);
   
   return std::string(buffer);
+}
+
+bool isNonNegativeInteger(const std::string& s)
+{
+    for (std::string::size_type i = 0; i != s.size(); ++i) {
+        if (!std::isdigit(s[i])) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 /*!

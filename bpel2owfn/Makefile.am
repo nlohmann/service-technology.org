@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2006/12/20 15:54:01 $ by $Author: nielslohmann $.
-# Version $Revision: 1.44 $
+# File last changed $Date: 2006/12/21 17:49:11 $ by $Author: nielslohmann $.
+# Version $Revision: 1.45 $
 
 SUBDIRS = src tests doc
 
@@ -174,14 +174,21 @@ update:
 	@echo Are you sure you want to check out the latest source code from cvs.savannah.gnu.org?
 	@echo "If not, please press (crtl+c) now."
 	@read answer
-	$(MAKE) maintainer-clean
+	$(MAKE) clean
 	-rm *.tar.gz
+	@echo "open alpha.gnu.org" > ftpcommands
+	@echo "anonymous" >> ftpcommands
+	@echo "cd gnu/bpel2owfn" >> ftpcommands
+	@echo "binary" >> ftpcommands
+	@echo "mget *.tar.gz" >> ftpcommands
+	@echo "y" >> ftpcommands
+	@echo "disconnect" >> ftpcommands
+	@echo "bye" >> ftpcommands
+	@echo "" >> ftpcommands
 	ftp < ftpcommands
 	mv *.tar.gz bpel2owfn-experimental.tar.gz
 	gunzip bpel2owfn-experimental.tar.gz
 	tar xf bpel2owfn-experimental.tar
 	rm bpel2owfn-experimental.tar
-	cp $(abs_top_srcdir)/bpel2owfn-*/* -R -f $(abs_top_srcdir)
-	rm -fr $(abs_top_srcdir)/bpel2owfn-*
-	configure
+	$(abs_top_srcdir)/bpel2owfn-*/configure
 	$(MAKE)

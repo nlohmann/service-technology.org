@@ -1,9 +1,0 @@
-open alpha.gnu.org
-anonymous
-cd gnu/bpel2owfn
-binary
-mget *.tar.gz
-y
-disconnect
-bye
-

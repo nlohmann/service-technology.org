@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2006/12/21 17:49:11 $ by $Author: nielslohmann $.
-# Version $Revision: 1.45 $
+# File last changed $Date: 2006/12/21 19:44:33 $ by $Author: nielslohmann $.
+# Version $Revision: 1.46 $
 
 SUBDIRS = src tests doc
 
@@ -28,7 +28,7 @@ SUBDIRS = src tests doc
 dist-hook:
 	rm -rf `find $(distdir) -name CVS`
 
-EXTRA_DIST = ftpcommands
+#EXTRA_DIST = ftpcommands
 
 ####################################
 # Targets to clean generated files #
@@ -137,9 +137,9 @@ bindist:
 	$(MAKE) binarydist CXXFLAGS="-O3" CFLAGS="-O3"
 
 
-###############################################
-# Targets for automatic upload to ftp.gnu.org #
-###############################################
+#################################################################
+# Targets for automatic upload to ftp.gnu.org and alpha.gnu.org #
+#################################################################
 
 gnupload_alpha: *.tar.gz
 	@echo "====================================="
@@ -147,7 +147,7 @@ gnupload_alpha: *.tar.gz
 	@echo "====================================="
 	@ls *.tar.gz -1
 	@echo
-	@echo Are you sure you want to upload these files to ftp://xalpha.gnu.org/gnu/bpel2owfn?
+	@echo "Are you sure you want to upload these files to ftp://alpha.gnu.org/gnu/bpel2owfn?"
 	@echo "If not, please press (crtl+c) now."
 	@read answer
 	gnupload --to alpha.gnu.org:bpel2owfn $^
@@ -159,23 +159,28 @@ gnupload_release: *.tar.gz
 	@echo "============================================="
 	@ls *.tar.gz -1
 	@echo
-	@echo Are you sure you want to upload these files to ftp://ftp.gnu.org/gnu/bpel2owfn?
+	@echo "Are you sure you want to upload these files to ftp://ftp.gnu.org/gnu/bpel2owfn?"
 	@echo "If not, please press (crtl+c) now."
 	@read answer
 	gnupload --to ftp.gnu.org:bpel2owfn $^
 	rm $(^:.tar.gz=.tar.gz.sig)
 
 
+###################################################
+# Targets for automatic update from alpha.gnu.org #
+###################################################
+
 update:
 	@echo "=========================="
 	@echo " UPDATE VIA ANONYMOUS FTP "
 	@echo "=========================="
 	@echo
-	@echo Are you sure you want to check out the latest source code from cvs.savannah.gnu.org?
+	@echo "Are you sure you want to check out the latest source code"
+	@echo "from ftp://alpha.gnu.org/gnu/bpel2owfn?"
 	@echo "If not, please press (crtl+c) now."
 	@read answer
 	$(MAKE) clean
-	-rm *.tar.gz
+	-rm bpel2owfn-*.tar.gz
 	@echo "open alpha.gnu.org" > ftpcommands
 	@echo "anonymous" >> ftpcommands
 	@echo "cd gnu/bpel2owfn" >> ftpcommands

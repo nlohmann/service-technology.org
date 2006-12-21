@@ -24,17 +24,17 @@
  * \brief   Petri Net API: file output
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/12/21 13:58:20 $
+ * \date    \$Date: 2006/12/21 14:52:50 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.67 $
+ * \version \$Revision: 1.68 $
  *
  * \ingroup petrinet
  */
@@ -345,54 +345,33 @@ string Place::output_dot() const
   result += " p" + toString(id) + "\t[label=\"" + nodeName() + "\"";
 #endif
 
+  if (tokens > 0)
+    result += " style=\"filled,setlinewidth(3)\"";
+  else
+    result += " style=\"filled\"";
 
-  if (tokens >= 1) { 
-
-    if (type == IN)
-      result += " style=\"bold,filled\" fillcolor=orange shape=ellipse";
-    if (type == OUT)
-      result += " style=\"bold,filled\" fillcolor=yellow shape=ellipse";
-    if (type == INOUT)
-      result += " style=\"bold,filled\" fillcolor=gold shape=ellipse";
- 
-    if (historyContains("1.internal.initial")
-             || isFinal )
-      result += " style=\"bold,filled\" fillcolor=gray";
-    else if (firstMemberIs("!link."))
-      result += " style=\"bold,filled\" fillcolor=red";
-    else if (firstMemberIs("link."))
-      result += " style=\"bold,filled\" fillcolor=green";
-    else if (firstMemberIs("variable."))
-      result += " style=\"bold,filled\" fillcolor=cyan";
-    else if (historyContains("1.internal.clock"))
-      result += " style=\"bold,filled\" fillcolor=seagreen";
-    else if (type == INTERNAL)
-      result += " style=\"bold\"";
-
-  } else {
-
-    if (type == IN)
-      result += " style=filled fillcolor=orange shape=ellipse";
-    if (type == OUT)
-      result += " style=filled fillcolor=yellow shape=ellipse";
-    if (type == INOUT)
-      result += " style=filled fillcolor=gold shape=ellipse";
- 
-    if (historyContains("1.internal.initial")
-             || isFinal )
-      result += " style=filled fillcolor=gray";
-    else if (firstMemberIs("!link."))
-      result += " style=filled fillcolor=red";
-    else if (firstMemberIs("link."))
-      result += " style=filled fillcolor=green";
-    else if (firstMemberIs("variable."))
-      result += " style=filled fillcolor=cyan";
-    else if (historyContains("1.internal.clock"))
-      result += " style=filled fillcolor=seagreen";
-
+  switch (type)
+  {
+    case (IN):  result += " fillcolor=orange shape=ellipse"; break;
+    case (OUT): result += " fillcolor=yellow shape=ellipse"; break;
+    default:    break;
   }
+
+  if (historyContains("1.internal.initial") || isFinal)
+    result += " fillcolor=gray";
+  else if (firstMemberIs("!link."))
+    result += " fillcolor=red";
+  else if (firstMemberIs("link."))
+    result += " fillcolor=green";
+  else if (firstMemberIs("variable."))
+    result += " fillcolor=cyan";
+  else if (historyContains("1.internal.clock"))
+    result += " fillcolor=seagreen";
+  else
+    result += " fillcolor=white";
     
   result += "];\n";
+
   return result;
 }
 

@@ -29,13 +29,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/15 17:51:01 $
+ * \date    \$Date: 2006/12/22 00:03:55 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.124 $
+ * \version \$Revision: 1.125 $
  *
  * \ingroup petrinet
  */
@@ -139,6 +139,7 @@ typedef enum
 {
   FORMAT_APNN,		///< Abstract Petri Net Notation (APNN)
   FORMAT_DOT,		///< Graphviz dot
+  FORMAT_INA,		///< INA
   FORMAT_INFO,		///< Info File
   FORMAT_LOLA,		///< LoLA
   FORMAT_OWFN,		///< Fiona open workflow net (oWFN)
@@ -460,6 +461,9 @@ class PetriNet
 
     /// DOT (Graphviz) output
     void output_dot(ostream *output) const;
+
+    /// INA output
+    void output_ina(ostream *output) const;
 
     /// info file output
     void output_info(ostream *output) const;

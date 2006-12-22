@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/20 11:50:18 $
+ * \date    \$Date: 2006/12/22 00:03:55 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
  */
 
 
@@ -111,6 +111,7 @@ typedef enum
   F_DOT,		///< Graphviz dot format
   F_PEP,		///< low-level PEP notation
   F_APNN,		///< Abstract Petri Net Notation
+  F_INA,		///< INA Petri net
   F_INFO,		///< BPEL2oWFN information file
   F_PNML,		///< Petri Net Markup Language
   F_TXT,		///< ASCII output (for the abstract syntax tree)

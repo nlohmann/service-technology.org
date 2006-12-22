@@ -28,14 +28,14 @@
  * 
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/20 11:50:18 $
+ * \date    \$Date: 2006/12/22 00:03:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.136 $
+ * \version \$Revision: 1.137 $
  */
 
 
@@ -413,6 +413,24 @@ int main( int argc, char *argv[])
       }
     }
     
+
+    // create INA output ?
+    if ( formats[F_INA] )
+    {
+      if (output_filename != "")
+      {
+	output = openOutput(output_filename + "." + suffixes[F_INA]);
+      }
+      trace(TRACE_INFORMATION, "-> Printing Petri net for INA ...\n");
+      PN.set_format(FORMAT_INA);
+      (*output) << PN;
+      if (output_filename != "")
+      {
+	closeOutput(output);
+	output = NULL;
+      }
+    }
+
 
     // create APNN output ?
     if ( formats[F_APNN] )

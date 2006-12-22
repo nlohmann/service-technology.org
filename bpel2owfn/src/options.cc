@@ -28,13 +28,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/20 11:50:18 $
+ * \date    \$Date: 2006/12/22 00:03:55 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.60 $
+ * \version \$Revision: 1.61 $
  */
 
 
@@ -170,7 +170,7 @@ void print_help()
   trace("    wsbpel                  use the semantics of WS-BPEL 2.0\n");
   trace("\n");
   trace("  FORMAT is one of the following (multiple formats permitted):\n");
-  trace("    lola, owfn, dot, pep, apnn, info, pnml, txt, info\n");
+  trace("    lola, owfn, dot, pep, apnn, ina, info, pnml, txt, info\n");
   trace("\n");
   trace("Examples:\n");
   trace("  bpel2owfn -i service.bpel -m petrinet -f owfn -o\n");
@@ -189,10 +189,10 @@ void print_help()
 void print_version()
 {
   trace(string(PACKAGE_STRING) + "\n\n");
-  trace("Copyright (C) 2005, 2006 Niels Lohmann, Christian Gierds and Dennis Reinert\n");
-
+//  trace("Copyright (C) 2006, 2007 Niels Lohmann, Christian Gierds and Martin Znamirowski\n");
+  trace("Copyright (C) 2005, 2006 Niels Lohmann and Christian Gierds\n\n");
   trace("There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR\n");
-  trace("PURPOSE. You may redistribute copies of BPEL2oWFN under the terms of the\n");
+  trace("PURPOSE. You may redistribute copies of " + string(PACKAGE_NAME) + " under the terms of the\n");
   trace("GNU General Public License. See file COPYING for information.\n");
 }
 
@@ -212,6 +212,7 @@ void parse_command_line(int argc, char* argv[])
   suffixes[F_LOLA] = "lola"  ;
   suffixes[F_OWFN] = "owfn"  ;
   suffixes[F_DOT]  = "dot"   ;
+  suffixes[F_INA]  = "pnt";
   suffixes[F_PEP]  = "ll_net";
   suffixes[F_APNN] = "apnn"  ;
   suffixes[F_INFO] = "info"  ;
@@ -220,7 +221,7 @@ void parse_command_line(int argc, char* argv[])
   suffixes[F_XML]  = "xml"   ;
 
   // this array helps us to automatically check the valid formats
-  possibleFormats format[] = { F_LOLA, F_OWFN, F_DOT, F_PEP, F_APNN, F_INFO, F_PNML, F_TXT, F_XML };
+  possibleFormats format[] = { F_LOLA, F_OWFN, F_DOT, F_INA, F_PEP, F_APNN, F_INFO, F_PNML, F_TXT, F_XML };
 
   // this map indicates, whether a certain format is valid for a mode
   map< pair<possibleModi,possibleFormats>, bool > validFormats;
@@ -232,6 +233,7 @@ void parse_command_line(int argc, char* argv[])
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_LOLA)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_OWFN)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_DOT )] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_INA )] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_PEP )] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_APNN)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_INFO)] = true;
@@ -240,6 +242,7 @@ void parse_command_line(int argc, char* argv[])
   validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_LOLA)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_OWFN)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_DOT )] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_INA )] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_PEP )] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_APNN)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_INFO)] = true;
@@ -347,6 +350,8 @@ void parse_command_line(int argc, char* argv[])
 		  formats[F_APNN] = true;
 		else if (parameter == suffixes[F_INFO])
 		  formats[F_INFO] = true;
+		else if (parameter == "ina")
+		  formats[F_INA] = true;
 		else if (parameter == suffixes[F_PNML])
 		  formats[F_PNML] = true;
 		else if (parameter == suffixes[F_TXT])

@@ -22,20 +22,20 @@
  * \file    bpel2owfn.cc
  *
  * \brief   BPEL2oWFN's main
- * 
+ *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
- * 
+ *          last changes of: \$Author: znamirow $
+ *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/22 00:03:55 $
- * 
+ * \date    \$Date: 2006/12/27 11:10:16 $
+ *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.137 $
+ * \version \$Revision: 1.138 $
  */
 
 
@@ -125,9 +125,9 @@ int main( int argc, char *argv[])
    * In case of false parameters call command line help function and exit.
    */
   parse_command_line(argc, argv);
-  
+
   PetriNet PN2 = PetriNet();
-  
+
   list< string >::iterator file = inputfiles.begin();
 
   do
@@ -135,19 +135,21 @@ int main( int argc, char *argv[])
     if (inputfiles.size() >= 1)
     {
       filename = *file;
-      if (!(frontend_in = fopen(filename.c_str(), "r")))
-	cerr << "file not found" << endl; /// \todo a "real" error message
+      if (!(frontend_in = fopen(filename.c_str(), "r"))) {
+		cerr << "Could not open file for reading: " << filename.c_str() << endl;
+		exit(1);
+	    }
     }
-    
+
     trace(TRACE_INFORMATION, "Parsing " + filename + " ...\n");
-  
+
     // invoke Bison parser
     int error = frontend_parse();
 
     if (!error)
     {
       trace(TRACE_INFORMATION, "Parsing complete.\n");
-      
+
       if ( filename != "<STDIN>" && frontend_in != NULL)
       {
 	trace(TRACE_INFORMATION," + Closing input file: " + filename + "\n");
@@ -180,7 +182,7 @@ int main( int argc, char *argv[])
 	  string dot_filename = output_filename + "." + suffixes[F_DOT];
 	  FILE *dotfile = fopen(dot_filename.c_str(), "w+");
 	  AST->fprintdot(dotfile, "", "", "", true, true, true);
-	  fclose(dotfile); 
+	  fclose(dotfile);
 #ifdef HAVE_DOT
   	  string systemcall = "dot -q -Tpng -o" + output_filename + ".png " + output_filename + "." + suffixes[F_DOT];
   	  trace(TRACE_INFORMATION, "Invoking dot with the following options:\n");
@@ -193,7 +195,7 @@ int main( int argc, char *argv[])
       }
 
 
-      // generate and process the control flow graph?      
+      // generate and process the control flow graph?
       if (modus == M_CFG)
 	processCFG();
 
@@ -202,7 +204,7 @@ int main( int argc, char *argv[])
       if (modus == M_PETRINET || modus == M_CONSISTENCY)
       {
 	trace(TRACE_INFORMATION, "-> Unparsing AST to Petri net ...\n");
-	
+
 	// choose Petri net patterns
 	if (parameters[P_COMMUNICATIONONLY] == true)
 	  AST->unparse(kc::pseudoPrinter, kc::petrinetsmall);
@@ -212,7 +214,7 @@ int main( int argc, char *argv[])
 	  AST->unparse(kc::pseudoPrinter, kc::petrinet);
 
         // calculate maximum occurences
-        PN.calculate_max_occurrences(); 
+        PN.calculate_max_occurrences();
 
         if (modus == M_CONSISTENCY)
 	{
@@ -223,14 +225,14 @@ int main( int argc, char *argv[])
 	  {
 	    prefix = file->substr(pos2 + 1, pos - pos2 - 1) + "_";
 	  }
-	  
+
 	  // apply structural reduction rules?
 	  if (parameters[P_REDUCE])
 	  {
 	    trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
 	    PN.reduce();
 	  }
-	  
+
 	  PN.addPrefix(prefix);
 	  PN2.compose(PN);
 	  PN = PetriNet();
@@ -246,7 +248,7 @@ int main( int argc, char *argv[])
     }
 
 
-    // reset global mappings (could be done somewhere else...)    
+    // reset global mappings (could be done somewhere else...)
     extern set<string> correlationSetNames;
     extern set<string> variableNames;
     extern set<string> partnerLinkNames;
@@ -301,12 +303,12 @@ int main( int argc, char *argv[])
       trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
       PN.reduce();
     }
-   
+
 
     // now the net will not change any more, thus the nodes are re-enumerated
     // and the maximal occurrences of the nodes are calculated.
-    PN.reenumerate(); 
-//    PN.calculate_max_occurrences(); 
+    PN.reenumerate();
+//    PN.calculate_max_occurrences();
     cerr << PN.information() << endl;
 
 
@@ -326,7 +328,7 @@ int main( int argc, char *argv[])
 	output = NULL;
       }
     }
-    
+
 
     // create LoLA output ?
     if ( formats[F_LOLA] )
@@ -347,7 +349,7 @@ int main( int argc, char *argv[])
 	closeOutput(output);
 	output = NULL;
       }
-      
+
       if (modus == M_CONSISTENCY)
       {
 	if (output_filename != "")
@@ -376,7 +378,7 @@ int main( int argc, char *argv[])
 	}
       }
     }
-    
+
 
     // create PNML output ?
     if ( formats[F_PNML] )
@@ -394,7 +396,7 @@ int main( int argc, char *argv[])
 	output = NULL;
       }
     }
-    
+
 
     // create PEP output ?
     if ( formats[F_PEP] )
@@ -412,7 +414,7 @@ int main( int argc, char *argv[])
 	output = NULL;
       }
     }
-    
+
 
     // create INA output ?
     if ( formats[F_INA] )
@@ -448,7 +450,7 @@ int main( int argc, char *argv[])
 	output = NULL;
       }
     }
-    
+
 
     // create dot output ?
     if ( formats[F_DOT] )
@@ -495,7 +497,7 @@ int main( int argc, char *argv[])
 
 
   // everything went fine
-  return 0;  
+  return 0;
 }
 
 

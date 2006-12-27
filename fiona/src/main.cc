@@ -39,6 +39,7 @@
 #include "options.h" 
 #include "main.h"
 #include "Exchangeability.h"
+#include "OGFromFile.h"
 #include <list>
 
 // #defines YY_FLEX_HAS_YYLEX_DESTROY if we can call yylex_destroy()
@@ -76,6 +77,7 @@ extern SymbolTab* GlobalTable;
 extern unsigned int State::card;
 // extern char * netfile;
 extern list<char*> netfiles;
+extern OGFromFile OGToMatch;
 
 char * reserve;
 //char * diagnosefilename;
@@ -351,8 +353,14 @@ int main(int argc, char ** argv) {
 				time_t seconds, seconds2;
 				
 				if (options[O_MATCH]) {
-					// TODO: match OG with oWFN
-					cout << "Matching is not implemented yet." << endl;
+					string reasonForFailedMatch;
+					if (PN->matchesWithOG(OGToMatch, reasonForFailedMatch)) {
+						trace(TRACE_0, "oWFN matches with OG: YES\n");
+					} else {
+						trace(TRACE_0, "oWFN matches with OG: NO\n");
+						trace(TRACE_0, "Match failed, because: " +
+						reasonForFailedMatch + "\n");
+					}
 				} else if (parameters[P_OG]) {
 			        // operating guideline is built
 			        operatingGuidelines * graph = new operatingGuidelines(PN);
@@ -400,7 +408,6 @@ int main(int argc, char ** argv) {
 					trace(TRACE_5, "graph deleted\n");
 		        
 				} else {
-			        
 			        // interaction graph is built
 			        interactionGraph * graph = new interactionGraph(PN);
 			

@@ -46,11 +46,12 @@
 %{
 // c-code (wird übernommen)
 
+#include "debug.h"
+#include "OGFromFile.h"
 #include "syntax_og.h"            // list of all tokens used
 #include <cstring>
 using namespace std;
 
-extern int og_yyerror(const char *msg);
 static void setlval();
 %}
 
@@ -66,8 +67,13 @@ NODES         { return key_nodes;       }
 INITIALNODE   { return key_initialnode; }
 TRANSITIONS   { return key_transitions; }
 
-TRUE          { return key_true;  }
-FALSE         { return key_false; }
+ /* We want to match 'true' and 'false' case insensitively, but at least my
+  * flex version did not accept the rule
+  *     (?i:TRUE)  { return key_true; }
+  * for case insensitive matching. So we have to do it by hand.
+  */
+[Tt][Rr][Uu][Ee]      { return key_true;  }
+[Ff][Aa][Ll][Ss][Ee]  { return key_false; }
 \*            { return op_and;    }
 \+            { return op_or;     }
 \(            { return lpar;      }

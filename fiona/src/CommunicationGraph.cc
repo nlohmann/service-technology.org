@@ -50,6 +50,8 @@ using namespace std;
 //! \param _PN
 //! \brief constructor
 communicationGraph::communicationGraph(oWFN * _PN) :
+    root(NULL),
+    currentVertex(NULL),
     numberOfNodes(0),
     numberOfEdges(0),
     numberOfBlueNodes(0),
@@ -721,8 +723,8 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
 			if (parameters[P_SHOW_STATES_PER_NODE]) {
             	for (iter = v->reachGraphStateSet.begin(); iter != v->reachGraphStateSet.end(); iter++) {
                 	(*iter)->decodeShowOnly(PN);
-//					os << "[" << PN->printCurrentMarkingForDot() << "]" << "(" << (*iter) << ")";
-                    os << "[" << PN->printCurrentMarkingForDot() << "]";
+//					os << "[" << PN->getCurrentMarkingAsString() << "]" << "(" << (*iter) << ")";
+                    os << "[" << PN->getCurrentMarkingAsString() << "]";
                     os << " (";
                     switch ((*iter)->type) {
                         case DEADLOCK: os << "DL" << ")"; break;

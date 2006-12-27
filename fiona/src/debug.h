@@ -77,6 +77,13 @@ bool isNonNegativeInteger(const std::string& s);
 /// Signalling syntax errors.
 int yyerror(const char* msg);
 
+/**
+ * Prints an error that has been encountered while parsing an OG file. The
+ * program exits after printing the error.
+ *
+ * @param msg Error message to print.
+ */
+int og_yyerror(const char* msg);
 
 #endif
 

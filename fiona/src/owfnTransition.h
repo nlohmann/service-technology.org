@@ -42,13 +42,15 @@ class oWFN;
 class owfnPlace;
 
 class owfnTransition : public Node {
+    private:
+        std::string labelForMatching;
 	public:
 		owfnTransition(char *);
 		~owfnTransition();
 	
 		bool quasiEnabled;
 		bool enabled;
-		
+
 		std::set<unsigned int> messageSet;
 		
 		unsigned int quasiEnabledNr;	//!< number of internal pre-places marked with appropriate tokens
@@ -102,6 +104,10 @@ class owfnTransition : public Node {
 		owfnTransition * nextontarjanstack; // stack organized as list
 		owfnTransition * nextoncallstack;	// stack organized as list 
 #endif
+
+        void setLabelForMatching(const std::string& label);
+        std::string getLabelForMatching() const;
+        bool hasNonTauLabelForMatching() const;
 
         // Provides user defined operator new. Needed to trace all new
         // operations on this class.

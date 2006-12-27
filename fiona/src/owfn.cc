@@ -38,6 +38,7 @@
 #include "debug.h"
 #include "CNF.h"
 #include "vertex.h"
+#include "OGFromFile.h"
 #include <stdlib.h>
 #include <cassert>
 #include <limits.h>
@@ -48,6 +49,8 @@ using namespace std;
 int compare (const void * a, const void * b){
 	owfnPlace *o1 = *((owfnPlace **)(a));
 	owfnPlace *o2 = *((owfnPlace **)(b));
+	assert(o1 != NULL);
+	assert(o2 != NULL);
 	return (strcmp(o1->name,o2->name));
 }
 
@@ -117,7 +120,7 @@ oWFN::~oWFN() {
 
 //! \fn unsigned int oWFN::getPlaceCnt()
 //! \brief returns the number of all places of the net
-unsigned int oWFN::getPlaceCnt() {
+unsigned int oWFN::getPlaceCnt() const {
 	return placeCnt;
 }
 
@@ -1203,142 +1206,47 @@ int oWFN::addInputMessage(messageMultiSet messages) {
 	return 1;		// place not found
 }
 
-
-// prints the CurrentMarking
-void oWFN::printmarking() {
-	bool comma = false;
-	cout << "---------------------------------------------------------------" << endl;
-	cout << "\t(" << CurrentMarking << ")" << "\t[";
-	
-	for (unsigned int i = 0; i < placeCnt; i++) {
-		if (CurrentMarking[i] > 0) {
-			if (CurrentMarking[i] > 5) {
-				if (comma) {
-					cout << ", ";
-				}
-				cout << Places[i]->name;
-				cout << ":";
-				cout << CurrentMarking[i];
-				comma = true;
-			} else {
-				for (unsigned int k = 0; k < CurrentMarking[i]; k++) {
-					if (comma) {
-						cout << ", ";
-					}
-					cout << Places[i]->name;
-					comma = true;
-				}
-			}
-		}	
-	}
-	cout << "]\n---------------------------------------------------------------" << endl;
+void oWFN::printCurrentMarking() const {
+    printMarking(CurrentMarking);
 }
 
-// prints a given marking
-void oWFN::printmarking(unsigned int * marking) {
-	bool comma = false;
-	cout << "---------------------------------------------------------------" << endl;
-	cout << "\t(" << marking << ")" << "\t[";
-	
-	for (unsigned int i = 0; i < placeCnt; i++) {
-		if (marking[i] > 0) {
-			if (marking[i] > 5) {
-				if (comma) {
-					cout << ", ";
-				}
-				cout << Places[i]->name;
-				cout << ":";
-				cout << marking[i];
-				comma = true;
-			} else {
-				for (unsigned int k = 0; k < marking[i]; k++) {
-					if (comma) {
-						cout << ", ";
-					}
-					cout << Places[i]->name;
-					comma = true;
-				}
-			}
-		}	
-	}
-	cout << "]\n---------------------------------------------------------------" << endl;
+void oWFN::printMarking(unsigned int * marking) const {
+    cout << "---------------------------------------------------------------"
+         << endl;
+    cout << "\t(" << marking << ")"
+         << "\t[" << getMarkingAsString(marking) << "]" << endl
+         << "---------------------------------------------------------------"
+         << endl;
 }
 
 
-//! \fn char * oWFN::printMarking(unsigned int * marking) 
-//! \param marking the marking to be printed out
-//! \brief returns the label of the given marking, that means the label consists of the names of the 
-//! places of the net that have tokens (is a multiset => occurance of name == number of tokens
-//
-// used in dotFile creation (communicationGraph::printGraphToDot)
-char * oWFN::printMarking(unsigned int * marking) {
-	bool comma = false;
-
-	try {
-		char * buffer = new char[256];
-		strcpy(buffer, "");
-		for (unsigned int i = 0; i < placeCnt; i++) {
-			if (marking[i] > 5) {
-				if (comma) {
-					strcat(buffer, ", ");
-				}
-				strcat(buffer, Places[i]->name);
-				strcat(buffer, ":");
-				sprintf(buffer, "%s%d", buffer, marking[i]);
-				comma = true;
-			} else {
-				for (unsigned int k = 0; k < marking[i]; k++) {
-					if (comma) {
-						strcat(buffer, ", ");
-					}
-					strcat(buffer, Places[i]->name);
-					comma = true;
-				}
-			}
-		}
-		return buffer;
-	} catch(bad_alloc) {
-		char mess[] = "\n! oWFN::printMarking failed !\n";
-		//write(2,mess,sizeof(mess));
-		cerr << mess;
-		_exit(2);
-	}
-
+string oWFN::getMarkingAsString(unsigned int * marking) const {
+    bool comma = false;
+    string buffer;
+    for (unsigned int i = 0; i < placeCnt; i++) {
+        if (marking[i] > 5) {
+            if (comma) {
+                buffer += ", ";
+            }
+            buffer += Places[i]->name;
+            buffer += ":";
+            buffer += intToString(marking[i]);
+            comma = true;
+        } else {
+            for (unsigned int k = 0; k < marking[i]; k++) {
+                if (comma) {
+                    buffer += ", ";
+                }
+                buffer += Places[i]->name;
+                comma = true;
+            }
+        }
+    }
+    return buffer;
 }
 
-char * oWFN::printCurrentMarkingForDot() {
-	bool comma = false;
-
-	try {
-		char * buffer = new char[256];
-		strcpy(buffer, "");
-		for (unsigned int i = 0; i < placeCnt; i++) {
-			if (CurrentMarking[i] > 5) {
-				if (comma) {
-					strcat(buffer, ", ");
-				}
-				strcat(buffer, Places[i]->name);
-				strcat(buffer, ":");
-				sprintf(buffer, "%s%d", buffer, CurrentMarking[i]);
-				comma = true;
-			} else {
-				for (unsigned int k = 0; k < CurrentMarking[i]; k++) {
-					if (comma) {
-						strcat(buffer, ", ");
-					}
-					strcat(buffer, Places[i]->name);
-					comma = true;
-				}
-			}
-		}
-		return buffer;
-	} catch(bad_alloc) {
-		char mess[] = "\n! oWFN::printMarking failed !\n";
-		//write(2,mess,sizeof(mess));
-		cerr << mess;
-		_exit(2);
-	}
-
+string oWFN::getCurrentMarkingAsString() const {
+    return getMarkingAsString(CurrentMarking);
 }
 
 
@@ -1399,6 +1307,11 @@ void oWFN::addArc(Arc* arc) {
 
 void oWFN::addPlace(unsigned int i, owfnPlace * place) {
 	placeCnt++;
+	if (place->type == INPUT) {
+		PN->placeInputCnt++;
+	} else if (place->type == OUTPUT) {
+		PN->placeOutputCnt++;
+	}
 	Places[i] = place;
 	place->index = i;
 	
@@ -1521,7 +1434,7 @@ bool oWFN::isMaximal() {
 //! \fn bool oWFN::isFinal()
 //! \brief checks if the current marking satisfies final condition or final marking, resp.
 //! if a final condition is given, a possible final marking is ignored
-bool oWFN::isFinal() {
+bool oWFN::isFinal() const {
 	trace(TRACE_5, "oWFN::bool oWFN::isFinal() : start\n");
 	if(FinalCondition) {
 		for (unsigned int currentplacenr = 0; currentplacenr < getPlaceCnt(); currentplacenr++) {
@@ -1801,3 +1714,233 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks()
 
 
 #endif
+
+bool oWFN::matchesWithOG(const OGFromFile& og, string& reasonForFailedMatch)
+{
+    // A temporary copy of the CurrentMarking. Used to revert to the
+    // CurrentMarking if firing of a transition leads to an already seen
+    // marking.
+    unsigned int* tmpCurrentMarking = NULL;
+    unsigned int tmpPlaceHashValue;
+
+    // Check whether the initial marking violates the message bound and exit
+    // with an error message if it does.
+    if (checkMessageBound()) {
+        reasonForFailedMatch = "Current marking: '" +
+            getCurrentMarkingAsString() + "' violated message bound.";
+        return false;
+    }
+
+    // Initialize the currentState with the initial marking.
+    State* currentState = binInsert(this);
+    currentState->firelist = firelist();
+    currentState->CardFireList = CardFireList;
+    currentState->current = 0;
+    currentState->parent = NULL;
+    currentState->succ = new State*[CardFireList + 1];
+    for (size_t istate = 0; istate != CardFireList + 1; ++istate) {
+        currentState->succ[istate] = NULL;
+    }
+    currentState->placeHashValue = placeHashValue;
+    currentState->type = typeOfState();
+
+    // Initialize the currentOGNode with the root node of the OG.
+    OGFromFileNode* currentOGNode = og.getRoot();
+
+    // In this loop, we build the reachability graph of the oWFN and check
+    // whether it matches with the OG.
+    while (currentState) {
+        // currentState is non-NULL. So we continue the depth first search from
+        // currentState.
+
+        // Check whether there are still enabled transitions to be fired in
+        // currentState (transitions that have not been processed yet while
+        // building the reachability graph). currentState->current holds the
+        // index of the last fired transition in the array of to be fired
+        // transitions currentState->firelist[].
+        if (currentState->current < currentState->CardFireList) {
+            // There is a not yet fired transition in currentState.
+
+            // Retrieve the transition leaving the current state that should be
+            // fired next.
+            owfnTransition* transition =
+                currentState->firelist[currentState->current];
+
+            // Save the current marking, so we can easily revert to it if
+            // firing the transition that we will try in this if-branch leads
+            // us to a state we have already seen.
+            if (tmpCurrentMarking != NULL) {
+                delete[] tmpCurrentMarking;
+                tmpCurrentMarking = NULL;
+            }
+            tmpCurrentMarking = copyCurrentMarking();
+            tmpPlaceHashValue = placeHashValue;
+
+            // Check whether the transition to be fired is also present in the
+            // OG. If not, exit this function returning false, because the oWFN
+            // does not match with the OG.
+            if (transition->hasNonTauLabelForMatching() &&
+                !currentOGNode->hasTransitionWithLabel(
+                    transition->getLabelForMatching()))
+            {
+                reasonForFailedMatch = "A transition labeled with '" +
+                    transition->getLabelForMatching() +
+                    "' leaves the marking '" +
+                    getCurrentMarkingAsString() +
+                    "' in the oWFN, but not the node '" +
+                    currentOGNode->getName() + "' in the OG.";
+
+                return false;
+            }
+
+            // Fire the to be tried transition. The thereby reached marking is
+            // saved to CurrentMarking.
+            transition->fire(this);
+
+            // Save the currentOGNode to a temporary copy, so we can easily
+            // revert to it if the state we reached to firing the current
+            // transition lead us to an already seen state.
+            OGFromFileNode* oldOGNode = currentOGNode;
+
+            // Fire the transition in the OG that belongs to the transition we
+            // just fired in the oWFN.
+            currentOGNode = currentOGNode->fireTransitionWithLabel(
+                transition->getLabelForMatching());
+
+            // Determine whether we have already seen the state we just
+            // reached.
+            State* newState = binSearch(this);
+            if (newState != NULL) {
+                // We have already seen the state we just reaching by firing
+                // the transition above. So we have to revert to the state that
+                // the transition left.
+                copyMarkingToCurrentMarking(tmpCurrentMarking);
+
+                // owfnTransition::backfire() does not actually backfire.
+                // It merely rechecks enabledness of all transitions in
+                // question with respect to CurrentMarking. Therefore you have
+                // to restore the CurrentMarking first and then call
+                // backfire() to undo the effect of a transition.
+                transition->backfire(this);
+                placeHashValue = tmpPlaceHashValue;
+                delete[] tmpCurrentMarking;
+                tmpCurrentMarking = NULL;
+                currentState->succ[currentState->current] = newState;
+
+                // Increment current to the index of the next to be fired
+                // transition.
+                currentState->current++;
+
+                // OGFromFileNode::backfire...() works as expected.
+                currentOGNode = currentOGNode->backfireTransitionWithLabel(
+                    transition->getLabelForMatching());
+            } else {
+                // The state we reached by firing the above transition is new.
+                // So we have to initialize this newly seen state.
+                newState = binInsert(this);
+                newState->firelist = firelist();
+                newState->CardFireList = CardFireList;
+                newState->current = 0;
+                newState->parent = currentState;
+                newState->succ = new State*[CardFireList + 1];
+                for (size_t istate = 0; istate != CardFireList + 1; ++istate) {
+                    newState->succ[istate] = NULL;
+                }
+                newState->placeHashValue = placeHashValue;
+                newState->type = typeOfState();
+                currentState->succ[currentState->current] = newState;
+                currentState = newState;
+
+                currentOGNode->setDepthFirstSearchParent(oldOGNode);
+
+                // Clean up the temporary copy of the former CurrentMarking
+                // because we do not longer need to be able to revert to it as
+                // we have a found a _new_ not yet seen state.
+                if (tmpCurrentMarking != NULL) {
+                    delete[] tmpCurrentMarking;
+                    tmpCurrentMarking = NULL;
+                }
+
+                // Check whether the initial marking violates the message bound
+                // and exit with an error message if it does.
+                if (checkMessageBound()) {
+                    reasonForFailedMatch = "Current marking: '" +
+                        getCurrentMarkingAsString() +
+                        "' violated message bound.";
+                    return false;
+                }
+            }
+        } else {
+            // There are no transitions left to fire. So we are about to
+            // backtrack to the parent of the currentState. But before we
+            // do this, we have to check whether the currentState satisfies
+            // the annotation of the corresponding OG node. So we construct
+            // an assignment for this node such that all propositions
+            // corresponding to currently enabled transitions are set to
+            // true and all others to false; furthermore the literal
+            // 'final' is set to true iff the currentState is a final
+            // state. Because in a OGFromFileFormulaAssignment every
+            // unmentioned literal is considered false, we only set those
+            // literals that should be considered true.
+            OGFromFileFormulaAssignment assignment =
+                makeAssignmentForOGMatchingForState(currentState);
+
+            if (!currentOGNode->assignmentSatisfiesAnnotation(assignment)) {
+                // Clean up the temporary copy of the former CurrentMarking
+                // just to be sure.
+                if (tmpCurrentMarking != NULL) {
+                    delete[] tmpCurrentMarking;
+                    tmpCurrentMarking = NULL;
+                }
+
+                reasonForFailedMatch = "The marking '" +
+                    getCurrentMarkingAsString() +
+                    "' of the oWFN does not satisfy the annotation '" +
+                    currentOGNode->getAnnotationAsString() +
+                    "' of the corresponding node '" +
+                    currentOGNode->getName() + "' in the OG.";
+
+                return false;
+            }
+
+            currentState = currentState->parent;
+            if (currentState != NULL) {
+                // Decode currentState into CurrentMarking such that
+                // currentState and CurrentMarking again denote the same
+                // state of the oWFN.
+                currentState->decode(this);
+                currentState->current++;
+                currentOGNode = currentOGNode->getDepthFirstSearchParent();
+            }
+        }
+    }
+
+    // Clean up before we return from the function.
+    if (tmpCurrentMarking != NULL) {
+        delete[] tmpCurrentMarking;
+        tmpCurrentMarking = NULL;
+    }
+
+    // We found no reason for the oWFN not to match with the OG. So it matches.
+    reasonForFailedMatch = "";
+    return true;
+}
+
+OGFromFileFormulaAssignment
+oWFN::makeAssignmentForOGMatchingForState(const State* currentState) const
+{
+    OGFromFileFormulaAssignment assignment;
+
+    for (unsigned int itransition = 0;
+         itransition != currentState->CardFireList; ++itransition)
+    {
+        owfnTransition* transition = currentState->firelist[itransition];
+        assignment.setToTrue(transition->getLabelForMatching());
+    }
+
+    if (isFinal()) {
+        assignment.setToTrue(OGFromFileFormulaAssignment::FINAL);
+    }
+
+    return assignment;
+}

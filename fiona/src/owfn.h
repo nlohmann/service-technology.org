@@ -54,6 +54,8 @@ class State;
 class PlSymbol;
 class TrSymbol;
 class Arc;
+class OGFromFile;
+class OGFromFileFormulaAssignment;
 
 class oWFN  {
 	private:
@@ -95,7 +97,7 @@ class oWFN  {
 
 		void initializeTransitions();		//!< calls the check_enabled function for all transitions
 
-		unsigned int getPlaceCnt();			//!< number of all places
+		unsigned int getPlaceCnt() const;			//!< number of all places
 		unsigned int placeInputCnt;			//!< number of input places
 		unsigned int placeOutputCnt;		//!< number of output places
 
@@ -176,14 +178,37 @@ class oWFN  {
 		stateType typeOfState();			// returns the type of state (transient, maximal, minimal)
 		bool isMaximal();					// returns true if the state is maximal
 		bool isMinimal();					// returns true if the state is minimal
-		char * printMarking(unsigned int *); // creates the label of the given marking
-		char * printCurrentMarkingForDot();  // creates the label of the current marking
+		/**
+		 * Returns the label of the given marking, that means the label
+		 * consists of the names of the places of the net that have tokens
+		 * (is a multiset => occurance of name == number of tokens used in
+		 * dotFile creation (communicationGraph::printGraphToDot).
+		 *
+		 * @param marking The marking to be printed out.
+		 */
+		std::string getMarkingAsString(unsigned int *) const;
+
+		/**
+		 * Returns the label of the CurrentMarking. See
+		 * getMarkingAsString() for more information.
+		 */
+		std::string getCurrentMarkingAsString() const;
+
 //		bool isFinalMarking(unsigned int *);	// is the given marking == final marking of the net?
-		bool isFinal();	// does current marking satisfy final condition/final marking of the net?
+		bool isFinal() const;	// does current marking satisfy final condition/final marking of the net?
 
 /* print the net */
-		void printmarking();
-		void printmarking(unsigned int *);
+
+		/** Prints the CurrentMarking. */
+		void printCurrentMarking() const;
+
+		/**
+		 * Prints the given marking.
+		 *
+		 * @param marking Marking to be printed.
+		 */
+		void printMarking(unsigned int * marking) const;
+
 		void print_binDec(int);
 		void print_binDec(binDecision *, int);
 		
@@ -195,6 +220,39 @@ class oWFN  {
 	    void deleteTransition(owfnTransition *);
 		
 		char * createLabel(messageMultiSet);	
+
+		/**
+		 * Matches this oWFN with the given operating guideline (OG).
+		 *
+		 * @param og Operating guideline against this oWFN should be matched.
+		 * @param reasonForFailedMatch In case of a failed match, holds a text
+		 *     describing why the matching failed.
+		 *
+		 * @retval true If this oWFN matches with given OG.
+		 * @retval false Otherwise.
+		 */
+		bool matchesWithOG(
+			const OGFromFile& og,
+			std::string& reasonForFailedMatch
+		);
+
+		/**
+		 * Creates an assignment for the given state of the oWFN used in the
+		 * matching algorithm. In this assignment the labels of transitions
+		 * leaving the given state are used as propositions and all transitions
+		 * that are enabled are assigned to true. Furthermore the proposition
+		 * 'final' is assigned to true iff the given state is a final state.
+		 * All other propositions are implicetly taken to be false. This
+		 * implicit behaviour should be (and is) implemented by the class
+		 * OGFromFileFormulaAssignment.
+		 *
+		 * @param currentState The state of this oWFN an assignment should be
+		 *     created for.
+		 * @returns The above described assignment for the given state.
+		 */
+		OGFromFileFormulaAssignment makeAssignmentForOGMatchingForState(
+			const State* currentState
+		) const;
 
         // Provides user defined operator new. Needed to trace all new
         // operations on this class.

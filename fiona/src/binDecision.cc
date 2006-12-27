@@ -114,7 +114,7 @@ State * binInsert(binDecision ** Bucket, oWFN * PN) {
 
 	trace(TRACE_5, "binInsert(binDecision ** Bucket, oWFN * PN): start\n");
 
-//	cout << "binInsert: inserting " << PN->printMarking(PN->CurrentMarking) << endl;
+//	cout << "binInsert: inserting " << PN->getMarkingAsString(PN->CurrentMarking) << endl;
 
 	binDecision * newd;
 	int vby, vbi;
@@ -277,7 +277,7 @@ State * binSearch(oWFN * PN) {
 
 State * binSearch(binDecision * Bucket, oWFN * PN) {
 	
-//	cout << "search for marking " << PN->printMarking(PN->CurrentMarking) << endl;
+//	cout << "search for marking " << PN->getMarkingAsString(PN->CurrentMarking) << endl;
 	
 	bin_dir = 0;
 	// search the state given in CurrentMarking in the binHashTable

@@ -187,6 +187,15 @@ net: key_place place_area key_marking {LocalTable = (SymbolTab *) 0;}
 		  
 			for(h = 0; h < PlaceTable->size; h++) {
 				for(ss = PlaceTable->table[h]; ss; ss = ss->next) {
+					// Ignore (do not add to PN) external places if oWFN should
+					// be matched with an OG. That is because we match the
+					// reachability graph of the inner of the oWFN with the OG.
+					if (options[O_MATCH] &&
+						((PlSymbol*)ss)->place->type != INTERNAL)
+					{
+						continue;
+					}
+
 					PN->addPlace(i++, ((PlSymbol *) ss)->place);
 				}
 			}
@@ -221,10 +230,28 @@ net: key_place place_area key_marking {LocalTable = (SymbolTab *) 0;}
 			// Create arc list of places pass 1 (count nr of arcs)
 			for(i = 0; i < TransitionTable->card; i++) {
 				for(j = 0; j < PN->Transitions[i]->NrOfArriving; j++) {
-					PN->Transitions[i]->ArrivingArcs[j]->pl->NrOfLeaving++;
+					owfnPlace* pl = PN->Transitions[i]->ArrivingArcs[j]->pl;
+
+					// Ignore external places if oWFN should be matched with an
+					// OG. That is because we match the reachability graph of
+					// the inner of the oWFN with the OG.
+					if (options[O_MATCH] && pl->type != INTERNAL) {
+						continue;
+					}
+
+					pl->NrOfLeaving++;
 				}
 				for(j=0;j < PN->Transitions[i]->NrOfLeaving;j++) {
-					PN->Transitions[i]->LeavingArcs[j]->pl->NrOfArriving++;
+					owfnPlace* pl = PN->Transitions[i]->LeavingArcs[j]->pl;
+
+					// Ignore external places if oWFN should be matched with an
+					// OG. That is because we match the reachability graph of
+					// the inner of the oWFN with the OG.
+					if (options[O_MATCH] && pl->type != INTERNAL) {
+						continue;
+					}
+
+					pl->NrOfArriving++;
 				}
 			}
 		
@@ -239,8 +266,10 @@ net: key_place place_area key_marking {LocalTable = (SymbolTab *) 0;}
 			// pass 3 (fill in arcs)
 			for(i = 0; i < TransitionTable->card; i++) {
 				for(j=0; j < PN->Transitions[i]->NrOfLeaving;j++) {
-					owfnPlace * pl;
-					pl = PN->Transitions[i]->LeavingArcs[j]->pl;
+					owfnPlace * pl = PN->Transitions[i]->LeavingArcs[j]->pl;
+                    if (options[O_MATCH] && pl->type != INTERNAL) {
+                        continue;
+                    }
 					pl->ArrivingArcs[pl->NrOfArriving] = PN->Transitions[i]->LeavingArcs[j];
 					pl->NrOfArriving++;
 					
@@ -249,8 +278,10 @@ net: key_place place_area key_marking {LocalTable = (SymbolTab *) 0;}
 //					}
 				}
 				for(j = 0;j < PN->Transitions[i]->NrOfArriving; j++) {
-					owfnPlace * pl;
-					pl = PN->Transitions[i]->ArrivingArcs[j]->pl;
+					owfnPlace * pl = PN->Transitions[i]->ArrivingArcs[j]->pl;
+                    if (options[O_MATCH] && pl->type != INTERNAL) {
+                        continue;
+                    }
 					pl->LeavingArcs[pl->NrOfLeaving] = PN->Transitions[i]->ArrivingArcs[j];
 					pl->NrOfLeaving ++;
 					
@@ -314,11 +345,6 @@ place: nodeident {
 		owfn_yyerror(error.c_str());
 	}
 	P = new owfnPlace($1, type, PN);
-	if (type == INPUT) {
-		PN->placeInputCnt++;
-	} else if (type == OUTPUT) {
-		PN->placeOutputCnt++;
-	} 
 	PS = new PlSymbol(P);
 	P->capacity = CurrentCapacity;
 	P->nrbits = CurrentCapacity > 0 ? logzwo(CurrentCapacity) : 32;
@@ -448,11 +474,38 @@ transition: key_transition tname key_consume arclist semicolon key_produce arcli
 	/* 2. Inliste eintragen */
 
 	/* Anzahl der Boegen */
-	for(card = 0, current = $4; current; card++, current = current->next);
+	card = 0;
+	for(current = $4; current; current = current->next) {
+		// Ignore external places if oWFN should be matched with an
+		// OG. That is because we match the reachability graph of
+		// the inner of the oWFN with the OG.
+		if (options[O_MATCH] && current->place->place->type != INTERNAL) {
+			continue;
+		}
+
+		++card;
+	}
 		
 	T->ArrivingArcs = new  Arc * [card+10];
 	/* Schleife ueber alle Boegen */
 	for(current = $4; current; current = current->next) {
+		if (current->place->place->type == OUTPUT) {
+			string msg = string("Transition '") + T->name + "' reads from "
+				"output place '" + current->place->place->name + "' which is "
+				"not allowed.";
+			owfn_yyerror(msg.c_str());
+		}
+
+		if (options[O_MATCH] && current->place->place->type != INTERNAL) {
+			if (T->hasNonTauLabelForMatching()) {
+				string msg = string("Transition '") + T->name + "' sends or "
+					"receives more than one message which is not allowed.";
+				owfn_yyerror(msg.c_str());
+			}
+			string labelForMatching = string("?") + current->place->place->name;
+			T->setLabelForMatching(labelForMatching);
+			continue;
+		}
 	/* gibt es Bogen schon? */
 
 		for(i = 0; i < T->NrOfArriving;i++) {
@@ -473,11 +526,31 @@ transition: key_transition tname key_consume arclist semicolon key_produce arcli
 	/* 2. Outliste eintragen */
 
 	/* Anzahl der Boegen */
-	for(card = 0, current = $7; current; card++, current = current->next);
+	card = 0;
+	for(current = $7; current; current = current->next) {
+		++card;
+	}
 
 	T->LeavingArcs = new  Arc * [card+10];
 	/* Schleife ueber alle Boegen */
 	for(current = $7; current; current = current->next) {
+		if (current->place->place->type == INPUT) {
+			string msg = string("Transition '") + T->name + "' writes to an "
+				"input place '" + current->place->place->name + "' which is "
+				"not allowed.";
+			owfn_yyerror(msg.c_str());
+		}
+
+		if (options[O_MATCH] && current->place->place->type != INTERNAL) {
+			if (T->hasNonTauLabelForMatching()) {
+				string msg = string("Transition '") + T->name + "' sends or "
+					"receives more than one message which is not allowed.";
+				owfn_yyerror(msg.c_str());
+			}
+			string labelForMatching = string("!") + current->place->place->name;
+			T->setLabelForMatching(labelForMatching);
+			continue;
+		}
 		/* gibt es Bogen schon? */
 
 		for(i = 0; i < T->NrOfLeaving; i++) {

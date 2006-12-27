@@ -18,8 +18,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2006-12-13 10:31:58 $ by $Author: bretschn $.
-# Version $Revision: 1.22 $
+# File last changed $Date: 2006-12-27 18:04:44 $ by $Author: bretschn $.
+# Version $Revision: 1.23 $
 
 bin_PROGRAMS = fiona
 
@@ -55,7 +55,8 @@ fiona_SOURCES = syntax_owfn.yy syntax_owfn_wrap.h \
 		BddLabel.h BddLabel.cc \
 		state.h state.cc \
 		newlogger.h newlogger.cc mynew.h \
-		Exchangeability.h Exchangeability.cc
+		Exchangeability.h Exchangeability.cc \
+		OGFromFile.h OGFromFile.cc
 
 BUILT_SOURCES = lexer_owfn.h
 

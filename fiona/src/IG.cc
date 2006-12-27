@@ -363,7 +363,7 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 				
 				i = 0;
 				// get the activated input events
-			//	cout << "state " << PN->printCurrentMarkingForDot() << " activates the input events: " << (*iter)->quasiFirelist << ", " << (*iter)->quasiFirelist[i] << endl;
+			//	cout << "state " << PN->getCurrentMarkingAsString() << " activates the input events: " << (*iter)->quasiFirelist << ", " << (*iter)->quasiFirelist[i] << endl;
 				while ((*iter)->quasiFirelist && (*iter)->quasiFirelist[i]) {
 					for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin();
 								index != (*iter)->quasiFirelist[i]->messageSet.end();
@@ -397,7 +397,7 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 		for (iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
 	
 	#ifdef DEBUG
-		//cout << "\t state " << PN->printMarking((*iter)->myMarking) << " activates the input events: " << endl;
+		//cout << "\t state " << PN->getMarkingAsString((*iter)->myMarking) << " activates the input events: " << endl;
 	#endif		
 			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {	// we just consider the maximal states only
 				
@@ -407,7 +407,7 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 				
 				i = 0;
 				// get the activated input events
-			//	cout << "state " << PN->printCurrentMarkingForDot() << " activates the input events: " << (*iter)->quasiFirelist << ", " << (*iter)->quasiFirelist[i] << endl;
+			//	cout << "state " << PN->getCurrentMarkingAsString() << " activates the input events: " << (*iter)->quasiFirelist << ", " << (*iter)->quasiFirelist[i] << endl;
 				while ((*iter)->quasiFirelist && (*iter)->quasiFirelist[i]) {
 					for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin();
 								index != (*iter)->quasiFirelist[i]->messageSet.end();

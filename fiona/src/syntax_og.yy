@@ -52,11 +52,30 @@ extern char* og_yytext;
 extern int og_yylex();
 
 
-// defined in "debug.h"
-extern int og_yyerror(const char *);
-
 #include "mynew.h"
+#include "debug.h"
 
+#include "OGFromFile.h"
+
+OGFromFile OGToMatch;
+
+using namespace std;
+
+void og_yyerror_unknown_node(const std::string& nodeName)
+{
+    string msg("Node ");
+    msg += nodeName;
+    msg += " is unknown.";
+    og_yyerror(msg.c_str());
+}
+
+void og_yyerror_node_already_defined(const std::string& nodeName)
+{
+    string msg("Node ");
+    msg += nodeName;
+    msg += " already defined.";
+    og_yyerror(msg.c_str());
+}
 %}
 
 // Bison options
@@ -79,13 +98,12 @@ extern int og_yyerror(const char *);
 
 %union {
     char * str;
+    OGFromFileFormula* formula;
 }
 
 /* the types of the non-terminal symbols */
 %type <str> ident
-%type <form> formula
-%type <form> key_true
-%type <form> key_false
+%type <formula> formula
 
 
 %%
@@ -103,24 +121,51 @@ nodes_list: nodes_list comma node
 | /* empty */
 ;
 
-node: ident colon formula {}
+node: ident colon formula
+    {
+        if (OGToMatch.hasNodeWithName($1)) {
+            og_yyerror_node_already_defined($1);
+        }
+
+        OGToMatch.addNode($1, $3);
+    }
 ;
 
-formula: lpar formula rpar {
-    // $$ = $2;
-}
-| formula op_and formula {
-    // $$ = new binarybooleanformula(conj,$1,$3);
-}
-| formula op_or formula {
-    // $$ = new binarybooleanformula(disj,$1,$3);
-}
+formula: lpar formula rpar
+    {
+        $$ = $2;
+    }
+| formula op_and formula
+    {
+        $$ = new OGFromFileFormulaBinaryAnd($1, $3);
+    }
+| formula op_or formula
+    {
+        $$ = new OGFromFileFormulaBinaryOr($1, $3);
+    }
 | key_true
+    {
+        $$ = new OGFromFileFormulaTrue;
+    }
 | key_false
-| ident {}
+    {
+        $$ = new OGFromFileFormulaFalse;
+    }
+| ident
+    {
+        $$ = new OGFromFileFormulaProposition($1);
+    }
 ;
 
-initialnode: key_initialnode ident semicolon
+initialnode: key_initialnode ident
+    {
+        if (!OGToMatch.hasNodeWithName($2)) {
+            og_yyerror_unknown_node($2);
+        }
+
+        OGToMatch.setRootToNodeWithName($2);
+    }
+    semicolon
 ;
 
 transitions: key_transitions transitions_list semicolon
@@ -131,5 +176,16 @@ transitions_list: transitions_list comma transition
 | /* empty */
 ;
 
-transition: ident arrow ident colon ident {}
+transition: ident arrow ident colon ident
+    {
+        if (!OGToMatch.hasNodeWithName($1)) {
+            og_yyerror_unknown_node($1);
+        }
+
+        if (!OGToMatch.hasNodeWithName($3)) {
+            og_yyerror_unknown_node($3);
+        }
+
+        OGToMatch.addTransition($1, $3, $5);
+    }
 ;

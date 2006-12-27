@@ -38,8 +38,10 @@
 #include "debug.h"
 #include "state.h"
 #include "options.h"
+#include "OGFromFile.h"
 
-owfnTransition::owfnTransition(char * name) : Node(name), quasiEnabled(false),
+owfnTransition::owfnTransition(char * name) : Node(name),
+    labelForMatching(OGFromFileFormulaAssignment::TAU), quasiEnabled(false),
     enabled(false), quasiEnabledNr(0), enabledNr(0), NextEnabled(NULL),
     PrevEnabled(NULL), NextQuasiEnabled(NULL), PrevQuasiEnabled(NULL), 
 	IncrPlaces(NULL), Incr(NULL), DecrPlaces(NULL), Decr(NULL) {
@@ -278,7 +280,7 @@ void owfnTransition::fire(oWFN * PN) {
 	}
 	for(p = DecrPlaces, i = Decr; * p != NULL; p++,i++) {
 		if (PN->CurrentMarking[(* p)->index] < *i) {
-			PN->printmarking();
+			PN->printCurrentMarking();
       		cerr << "marking of place " << (* p)->name << " is: " << PN->CurrentMarking[(* p)->index] << " but transition " << this->name << " consumes: " << *i << endl;
 			cerr << "number of states calculated so far: " << State::card << endl;
 			_exit(4);
@@ -489,9 +491,23 @@ void owfnTransition::check_enabled(oWFN * PN) {
 			excludeTransitionFromQuasiEnabledList(PN);	// delete transition from list of quasi enabled transtions
 		}
 	}
-	// cout << "current marking: " << PN->printCurrentMarkingForDot() << endl;
+	// cout << "current marking: " << PN->getCurrentMarkingAsString() << endl;
 	// cout << "transition " << name << " is quasiEnabled: " << quasiEnabled << " and enabled: " << enabled << endl;
 
    	trace(TRACE_5, "owfnTransition::check_enabled(oWFN * PN) : end\n");
 }
 
+void owfnTransition::setLabelForMatching(const std::string& label)
+{
+    labelForMatching = label;
+}
+
+std::string owfnTransition::getLabelForMatching() const
+{
+    return labelForMatching;
+}
+
+bool owfnTransition::hasNonTauLabelForMatching() const
+{
+    return getLabelForMatching() != OGFromFileFormulaAssignment::TAU;
+}

@@ -1,4 +1,4 @@
-	/*****************************************************************************\
+/*****************************************************************************\
  * Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/12/20 10:07:55 $
+ * \date    \$Date: 2006/12/30 00:53:04 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.174 $
+ * \version \$Revision: 1.175 $
  *
  * \ingroup petrinet
  */
@@ -114,6 +114,14 @@ bool Node::historyContains(string role) const
 
 
 
+Node::~Node()
+{
+}
+
+
+
+
+
 /*****************************************************************************/
 
 
@@ -125,14 +133,29 @@ bool Node::historyContains(string role) const
  * \pre my_source != NULL
  * \pre my_target != NULL
  */
-Arc::Arc(Node *my_source, Node *my_target, unsigned int my_weight)
+Arc::Arc(Node *my_source, Node *my_target, unsigned int my_weight) :
+  source(my_source),
+  target(my_target),
+  weight(my_weight)
 {
   assert(my_source != NULL);
   assert(my_target != NULL);
+}
 
-  source = my_source;
-  target = my_target;
-  weight = my_weight;
+
+
+
+
+/*!
+ * Changes the direction of an arc.
+ */
+void Arc::mirror()
+{
+  Node *old_source = source;
+  Node *old_target = target;
+
+  source = old_target;
+  target = old_source;
 }
 
 
@@ -1303,4 +1326,43 @@ void PetriNet::calculate_max_occurrences()
     }
   }
 #endif
+}
+
+
+
+
+
+/*!
+ * Swaps the input and output places, i.e. swaps the sets P_in and P_out and
+ * the adjacent arcs.
+ */
+void PetriNet::mirror()
+{
+  // swap arcs
+  for (set<Arc*>::iterator f = F.begin(); f != F.end(); f++)
+  {
+    if ( P_in.find( findPlace( ((*f)->source)->nodeShortName()) ) != P_in.end() )
+      (*f)->mirror();
+    else if ( P_out.find( findPlace( ((*f)->target)->nodeShortName()) ) != P_out.end() )
+      (*f)->mirror();
+  }
+
+  // swap input and output places
+  set<Place *> P_in_old = P_in;
+  set<Place *> P_out_old = P_out;
+  P_in = P_out_old;
+  P_out = P_in_old;
+  for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
+    (*p)->type = IN;
+  for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
+    (*p)->type = OUT;
+
+  // swap the transitions
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+  {
+    if ( (*t)->type == OUT )
+      (*t)->type = IN;
+    else if ( (*t)->type == IN )
+      (*t)->type = OUT;
+  }
 }

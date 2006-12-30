@@ -29,13 +29,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/22 00:03:55 $
+ * \date    \$Date: 2006/12/30 00:53:04 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.125 $
+ * \version \$Revision: 1.126 $
  *
  * \ingroup petrinet
  */
@@ -211,6 +211,9 @@ class Node
 
     /// the name of the type
     virtual string nodeTypeName() const;
+
+    /// destructor
+    virtual ~Node();
 };
 
 
@@ -263,6 +266,7 @@ class Transition: public Node
  * the enumeration #communication_type and an initial marking.
  *
  * \todo make nodeShortName() private
+ * \todo isFinal should allow more than one token
  *
  * \ingroup petrinet
 */
@@ -298,6 +302,7 @@ class Place: public Node
     /// the short name of the place (public to bpel2owfn.cc)
     string nodeShortName() const;
 
+    /// true if place is marked in the final marking
     bool isFinal;
 };
 
@@ -328,6 +333,9 @@ class Arc
   
     /// target node of the arc
     Node *target;
+
+    /// swaps source and target node of the arc
+    void mirror();
 
     /// weight of the arc (experimental)
     unsigned int weight;
@@ -400,6 +408,9 @@ class PetriNet
 
     /// applies structral reduction rules
     unsigned int reduce();
+
+    /// swaps input and output places
+    void mirror();
 
     /// adds a prefix to the name of all nodes of the net
     void addPrefix(string prefix);

@@ -28,13 +28,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/12/22 00:03:55 $
+ * \date    \$Date: 2006/12/30 00:53:04 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.69 $
+ * \version \$Revision: 1.70 $
  *
  * \ingroup petrinet
  */
@@ -369,7 +369,7 @@ string Place::output_dot() const
     result += " fillcolor=cyan";
   else if (historyContains("1.internal.clock"))
     result += " fillcolor=seagreen";
-  else
+  else if (type == INTERNAL)
     result += " fillcolor=white";
     
   result += "];\n";

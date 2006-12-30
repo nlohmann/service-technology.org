@@ -28,13 +28,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/12/20 11:50:18 $
+ * \date    \$Date: 2006/12/30 00:52:23 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.51 $
+ * \version \$Revision: 1.52 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -468,7 +468,7 @@ void dpeLinks(Transition *t, int id)
  * \param prefix            the prefix of the calling <scope>
  * \param my_max	    the maximal index of the direct parent loop
  */
-void process_loop_bounds(vector<unsigned int> &loop_bounds, vector<unsigned int> &loop_identifiers, string prefix, unsigned int my_max)
+void process_loop_bounds(const vector<unsigned int> &loop_bounds, const vector<unsigned int> &loop_identifiers, string prefix, unsigned int my_max)
 {
   extern PetriNet PN;	// introduced in main.c
 

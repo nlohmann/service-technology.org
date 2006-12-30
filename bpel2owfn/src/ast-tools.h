@@ -24,17 +24,17 @@
  * \brief   unparse helper tools
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/12/10 17:31:15 $
+ * \date    \$Date: 2006/12/30 00:52:23 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.23 $
+ * \version \$Revision: 1.24 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -131,7 +131,7 @@ inline void listAttributes ( kc::integer id )
 
 
 /// comment me!
-void process_loop_bounds(vector<unsigned int> &loop_bounds, vector<unsigned int> &loop_identifiers, string prefix, unsigned int my_max);
+void process_loop_bounds(const vector<unsigned int> &loop_bounds, const vector<unsigned int> &loop_identifiers, string prefix, unsigned int my_max);
 
 
 

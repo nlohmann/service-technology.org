@@ -29,13 +29,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2006/12/17 00:15:07 $
+ * \date    \$Date: 2006/12/30 00:52:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
  *
  * \ingroup conversion
  * \ingroup debug
@@ -78,7 +78,7 @@ using namespace std;
 /// converts int to string
 string toString(int i);
 ///converts a vector to a C++ string
-string toString(vector<unsigned int> &v);
+string toString(const vector<unsigned int> &v);
 
 #ifdef USING_BPEL2OWFN
 /// converts integer to string
@@ -99,7 +99,7 @@ void error();
 void cleanup();
 
 /// increases the index vector
-void next_index(vector<unsigned int> &current_index, vector<unsigned int> &max_index);
+void next_index(vector<unsigned int> &current_index, const vector<unsigned int> &max_index);
 
 
 

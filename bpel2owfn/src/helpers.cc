@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2006/12/10 17:31:16 $
+ * \date    \$Date: 2006/12/30 00:52:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.68 $
+ * \version \$Revision: 1.69 $
  *
  * \ingroup conversion
  * \ingroup debug
@@ -115,7 +115,7 @@ string toString(int i)
  *
  * \ingroup conversion
  */
-string toString(vector<unsigned int> &v)
+string toString(const vector<unsigned int> &v)
 {
   string result;
 
@@ -299,7 +299,7 @@ void cleanup()
  * \invariant Each index lies between 1 and its maximal value, i.e., 1 and the
  *            maximal value can be reached.
  */
-void next_index(vector<unsigned int> &current_index, vector<unsigned int> &max_index)
+void next_index(vector<unsigned int> &current_index, const vector<unsigned int> &max_index)
 {
   assert(current_index.size() == max_index.size());
 

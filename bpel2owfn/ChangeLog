@@ -116,10 +116,13 @@ Version 2.0 (6 December 2006)
 Copyright
 =========
 
-Copyright (C) 2005, 2006 Niels Lohmann
+Copyright (C) 2005, 2006, 2007 Niels Lohmann
 
      Copying and distribution of this file, with or without
      modification, are permitted in any medium without royalty provided
      the copyright notice and this notice are preserved.
+
+See `http://www.gnu.org/software/bpel2owfn' or the User's Manual for
+more information.
 
 END OF ChangeLog file for BPEL2oWFN Version 2.0

@@ -29,13 +29,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/30 12:48:02 $
+ * \date    \$Date: 2006/12/30 17:11:26 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.62 $
+ * \version \$Revision: 1.63 $
  */
 
 
@@ -183,7 +183,7 @@ void print_help()
   trace("\n");
   trace("Examples:\n");
   trace("  bpel2owfn -i service.bpel -m petrinet -f owfn -o\n");
-  trace("  bpel2owfn -i service.bpel -m petrinet -f dot -p simplify -o\n");
+  trace("  bpel2owfn -i service.bpel -m petrinet -f dot -p reduce -o\n");
   trace("\n");
   trace("Report bugs to <" + string(PACKAGE_BUGREPORT) + ">.\n");
 }
@@ -197,9 +197,11 @@ void print_help()
  */
 void print_version()
 {
+  // 80 chars
+  //    "12345678901234567890123456789012345678901234567890123456789012345678901234567890"
   trace(string(PACKAGE_STRING) + "\n\n");
-//  trace("Copyright (C) 2006, 2007 Niels Lohmann, Christian Gierds and Martin Znamirowski\n");
-  trace("Copyright (C) 2005, 2006 Niels Lohmann and Christian Gierds\n\n");
+  trace("Copyright (C) 2006, 2007  Niels Lohmann, Christian Gierds and Martin Znamirowski\n");
+  trace("Copyright (C) 2005  Niels Lohmann and Christian Gierds\n\n");
   trace("There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR\n");
   trace("PURPOSE. You may redistribute copies of " + string(PACKAGE_NAME) + " under the terms of the\n");
   trace("GNU General Public License. See file COPYING for information.\n");

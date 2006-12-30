@@ -15,7 +15,7 @@ This manual is for GNU BPEL2oWFN, version @value{VERSION}, a tool
 translating a web service described in @acronym{BPEL} into an open workflow net
 (@acronym{oWFN}), last updated @value{UPDATED}.
 
-Copyright @copyright{} 2005, 2006 Niels Lohmann
+Copyright @copyright{} 2005, 2006, 2007 Niels Lohmann
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document under the

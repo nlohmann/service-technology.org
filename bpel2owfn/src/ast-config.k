@@ -29,7 +29,7 @@
  * 
  * \since   2006-24-03
  *
- * \date    \$Date: 2006/12/30 12:48:01 $
+ * \date    \$Date: 2006/12/30 12:52:54 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
  *
  * \todo    Annotate the global mappings which function clear them.
  */
@@ -211,8 +211,6 @@ extern map<unsigned int, ASTE*> ASTEmap;
 
 #include "debug.h"
 #include "helpers.h"
-
-//using namespace std;
 
 
 

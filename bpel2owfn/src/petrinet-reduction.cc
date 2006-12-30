@@ -28,13 +28,13 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2006/12/20 11:50:18 $
+ * \date    \$Date: 2006/12/30 12:48:02 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  *
  * \ingroup petrinet
  */
@@ -51,13 +51,16 @@
 #include <list>
 #include <cassert>
 #include <set>
+#include <utility>
 
 #include "petrinet.h"
 #include "debug.h"		// debugging help
 #include "helpers.h"
 #include "options.h"
 
-using namespace std;
+using std::pair;
+using std::cerr;
+using std::endl;
 
 
 
@@ -67,8 +70,8 @@ using namespace std;
  * Global variables
  *****************************************************************************/
 
-set<unsigned int> visited;    // used for transitive reduction
-set<unsigned int> visited2;   // used for transitive reduction
+//set<unsigned int> visited;    // used for transitive reduction
+//set<unsigned int> visited2;   // used for transitive reduction
 
 
 

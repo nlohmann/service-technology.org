@@ -29,7 +29,7 @@
  * 
  * \since   2006-24-03
  *
- * \date    \$Date: 2006/12/17 19:05:00 $
+ * \date    \$Date: 2006/12/30 12:48:01 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,9 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.33 $
+ * \version \$Revision: 1.34 $
+ *
+ * \todo    Annotate the global mappings which function clear them.
  */
 %}
 
@@ -104,7 +106,11 @@ extern string forEach_suffix;
 #include "ast-details.h"
 #include "ast-tools.h"
 
-using namespace std;
+using std::map;
+using std::string;
+using std::set;
+using std::endl;
+using std::cerr;
 
 extern PetriNet PN;				// introduced in main.c
 extern CFGBlock * CFG;				// introduced in cfg.cc
@@ -122,18 +128,17 @@ map <string, CFGBlock *> cfgMap;
 string forEach_suffix = "";		///< used to generate parallel <forEach> scopes
 
 
-set<string> ASTE_inputChannels;
-set<string> ASTE_outputChannels;
+// the global mappings (though they are not global)
+set<string> ASTE_inputChannels;		///< \todo comment me
+set<string> ASTE_outputChannels;	///< \todo comment me
+set<string> ASTE_correlationSetNames;	///< a set holding all correlation set names (with prefix)
+set<string> ASTE_variableNames;		///< a set holding all variable names (with prefix)
+set<string> ASTE_partnerLinkNames;	///< a set holding all partnerLink names (with prefix)
+set<string> ASTE_linkNames;		///< a set holding all link names (with prefix)
+set<unsigned int> ASTE_startActivities;	///< a set of the ids of the start activities
 
-set<string> correlationSetNames;	///< a set holding all correlation set names (with prefix)
-set<string> variableNames;		///< a set holding all variable names (with prefix)
-set<string> partnerLinkNames;		///< a set holding all partnerLink names (with prefix)
-set<string> linkNames;			///< a set holding all link names (with prefix)
-
-set<unsigned int> startActivities;	///< a set of the ids of the start activities
-
-map<string, unsigned int> linkIdMap;	///< maps link names to identifiers
-map<string, unsigned int> scopeNames;	///< maps scope names to identifiers
+map<string, unsigned int> ASTE_linkIdMap;	///< maps link names to identifiers
+map<string, unsigned int> ASTE_scopeNames;	///< maps scope names to identifiers
 
 map<unsigned int, unsigned int> PPhasCompensateMap;
 
@@ -183,7 +188,7 @@ void printer(const char *s, uview v)
 #include "ast-details.h"
 #include "options.h"
 
-using namespace std;
+using std::map;
 
 extern map<unsigned int, ASTE*> ASTEmap;
 %}
@@ -207,7 +212,7 @@ extern map<unsigned int, ASTE*> ASTEmap;
 #include "debug.h"
 #include "helpers.h"
 
-using namespace std;
+//using namespace std;
 
 
 

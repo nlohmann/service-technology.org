@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/12/17 14:44:31 $
+ * \date    \$Date: 2006/12/30 12:48:01 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.79 $
+ * \version \$Revision: 1.80 $
  */
 %}
 
@@ -160,7 +160,10 @@ ForEach -> [petrinet petrinetnew petrinetsmall:
 ******************************************************************************/
 
 Process -> [petrinet petrinetnew petrinetsmall:
-  { PProcess($0, kc_current_view_base); }
+  { PProcess($0, kc_current_view_base);
+
+    // clear global mappings
+    ASTE_scopeNames.clear(); }
 ];
 
 Scope -> [petrinet petrinetnew petrinetsmall:

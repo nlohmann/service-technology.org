@@ -23,19 +23,20 @@
  *
  * \brief   BPEL2oWFN's main
  *
- * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          Christian Gierds <gierds@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/27 11:10:16 $
+ * \date    \$Date: 2006/12/30 12:48:01 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.138 $
+ * \version \$Revision: 1.139 $
  */
 
 
@@ -58,7 +59,8 @@
 #include "options.h"
 #include "ast-config.h"
 
-using namespace std;
+using std::cerr;
+using std::endl;
 
 
 
@@ -247,18 +249,6 @@ int main( int argc, char *argv[])
       return error;
     }
 
-
-    // reset global mappings (could be done somewhere else...)
-    extern set<string> correlationSetNames;
-    extern set<string> variableNames;
-    extern set<string> partnerLinkNames;
-    extern set<string> linkNames;
-    extern map<string, unsigned int> scopeNames;
-    correlationSetNames.clear();
-    variableNames.clear();
-    partnerLinkNames.clear();
-    linkNames.clear();
-    scopeNames.clear();
 
     file++;
   } while (modus == M_CONSISTENCY && file != inputfiles.end());

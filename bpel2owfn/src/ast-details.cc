@@ -23,19 +23,20 @@
  *
  * \brief   annotations of the AST
  *
- * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          Christian Gierds <gierds@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/12/10 17:31:13 $
+ * \date    \$Date: 2006/12/30 12:48:01 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.69 $
+ * \version \$Revision: 1.70 $
  */
 
 
@@ -55,15 +56,8 @@
 #include "helpers.h"
 #include "frontend-parser.h"
 
-
-
-
-
-/******************************************************************************
- * External variables
- *****************************************************************************/
-
-extern set<string> catches;
+using std::cerr;
+using std::endl;
 
 
 
@@ -79,6 +73,8 @@ extern set<string> catches;
  * \param myid an id of an AST node
  * \param mytype value of the type of the node using the token values defined
  *               by flex and bison
+ *
+ * \todo "real" initialization
  */
 ASTE::ASTE(unsigned int myid, unsigned int mytype)
 {
@@ -758,18 +754,20 @@ bool ASTE::findIsolatedAncestor()
 
 /*!
  * \brief defines a correlation set
+ *
+ * \todo comment me
  */
 string ASTE::defineCorrelationSet()
 {
-  extern set<string> correlationSetNames;
+  extern set<string> ASTE_correlationSetNames;
 
   string name = toString(parentScopeId) + "." + attributes["name"];
 
   // triggers [SA00044]
-  if (correlationSetNames.find(name) != correlationSetNames.end())
+  if (ASTE_correlationSetNames.find(name) != ASTE_correlationSetNames.end())
     SAerror(44, attributes["name"], attributes["referenceLine"]);
   else
-    correlationSetNames.insert(name);
+    ASTE_correlationSetNames.insert(name);
 
   return name;
 }
@@ -783,15 +781,15 @@ string ASTE::defineCorrelationSet()
  */
 string ASTE::defineVariable()
 {
-  extern set<string> variableNames;
+  extern set<string> ASTE_variableNames;
 
   string name = toString(parentScopeId) + "." + attributes["name"];
 
   // triggers [SA00023]
-  if (variableNames.find(name) != variableNames.end())
+  if (ASTE_variableNames.find(name) != ASTE_variableNames.end())
     SAerror(23, attributes["name"], attributes["referenceLine"]);
   else
-    variableNames.insert(name);
+    ASTE_variableNames.insert(name);
 
   return name;
 }
@@ -804,18 +802,20 @@ string ASTE::defineVariable()
  * \brief defines a link
  *
  * \return the unique name of the link
+ *
+ * \todo simplify the test using the result of the insertion
  */
 string ASTE::defineLink()
 {
-  extern set<string> linkNames;
+  extern set<string> ASTE_linkNames;
 
   string name = toString(parentActivityId) + "." + attributes["name"];
 
   // triggers [SA00064]
-  if (linkNames.find(name) != linkNames.end())
+  if (ASTE_linkNames.find(name) != ASTE_linkNames.end())
     SAerror(64, attributes["name"], attributes["referenceLine"]);
   else
-    linkNames.insert(name);
+    ASTE_linkNames.insert(name);
 
   return name;
 }
@@ -826,18 +826,20 @@ string ASTE::defineLink()
 
 /*!
  * \brief defines a partner link
+ *
+ * \todo comment me
  */
 string ASTE::definePartnerLink()
 {
-  extern set<string> partnerLinkNames;
+  extern set<string> ASTE_partnerLinkNames;
 
   string name = toString(parentScopeId) + "." + attributes["name"];
 
   // triggers [SA00018]
-  if (partnerLinkNames.find(name) != partnerLinkNames.end())
+  if (ASTE_partnerLinkNames.find(name) != ASTE_partnerLinkNames.end())
     SAerror(18, attributes["name"], attributes["referenceLine"]);
   else
-    partnerLinkNames.insert(name);
+    ASTE_partnerLinkNames.insert(name);
 
   return name;
 }
@@ -865,7 +867,7 @@ string ASTE::definePartnerLink()
 
 string ASTE::checkVariable(string attributename)
 {
-  extern set<string> variableNames;
+  extern set<string> ASTE_variableNames;
   extern string filename;
 
   string variableName = attributes[attributename];
@@ -876,7 +878,7 @@ string ASTE::checkVariable(string attributename)
 
   // travers the ancestor scopes
   for (vector<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
-    if (variableNames.find(toString(*scope) + "." + variableName) != variableNames.end())
+    if (ASTE_variableNames.find(toString(*scope) + "." + variableName) != ASTE_variableNames.end())
       return (toString(*scope) + "." + variableName);
 
   // display an error message
@@ -904,7 +906,7 @@ string ASTE::checkVariable(string attributename)
 string ASTE::checkLink()
 {
   extern map<unsigned int, ASTE*> ASTEmap;
-  extern set<string> linkNames;
+  extern set<string> ASTE_linkNames;
   extern string filename;
 
   string linkName = attributes["linkName"];
@@ -917,7 +919,7 @@ string ASTE::checkLink()
   for (vector<unsigned int>::iterator flow = ancestorActivities.begin(); flow != ancestorActivities.end(); flow++)
   {
     if (ASTEmap[*flow]->activityTypeName() == "flow")
-      if (linkNames.find(toString(*flow) + "." + linkName) != linkNames.end())
+      if (ASTE_linkNames.find(toString(*flow) + "." + linkName) != ASTE_linkNames.end())
 	return (toString(*flow) + "." + linkName);
   }
 
@@ -939,7 +941,7 @@ string ASTE::checkLink()
 string ASTE::checkPartnerLink()
 {
   extern map<unsigned int, ASTE*> ASTEmap;	
-  extern set<string> partnerLinkNames;
+  extern set<string> ASTE_partnerLinkNames;
   extern string filename;
 
   string partnerLinkName = attributes["partnerLink"];
@@ -950,7 +952,7 @@ string ASTE::checkPartnerLink()
 
   // travers the ancestor scopes
   for (vector<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
-    if (partnerLinkNames.find(toString(*scope) + "." + partnerLinkName) != partnerLinkNames.end())
+    if (ASTE_partnerLinkNames.find(toString(*scope) + "." + partnerLinkName) != ASTE_partnerLinkNames.end())
       return (toString(*scope) + "." + partnerLinkName);
 
   // trigger [SA00084]
@@ -980,7 +982,7 @@ string ASTE::checkPartnerLink()
 string ASTE::checkCorrelationSet()
 {
   extern map<unsigned int, ASTE*> ASTEmap;	
-  extern set<string> correlationSetNames;
+  extern set<string> ASTE_correlationSetNames;
   extern string filename;
 
   string correlationSetName = attributes["set"];
@@ -991,7 +993,7 @@ string ASTE::checkCorrelationSet()
 
   // travers the ancestor scopes
   for (vector<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
-    if (correlationSetNames.find(toString(*scope) + "." + correlationSetName) != correlationSetNames.end())
+    if (ASTE_correlationSetNames.find(toString(*scope) + "." + correlationSetName) != ASTE_correlationSetNames.end())
       return (toString(*scope) + "." + correlationSetName);
 
   // trigger [SA00088]

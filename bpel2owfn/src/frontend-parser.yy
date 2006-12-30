@@ -32,12 +32,13 @@
  * ast-grammar.k and implemented in \ref ast-grammar.cc and
  * \ref ast-grammar.h.
  * 
- * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2006/12/17 16:19:10 $
+ * \date    \$Date: 2006/12/30 12:48:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -47,7 +48,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.283 $
+ * \version \$Revision: 1.284 $
  *
  * \todo Overwork documentation: WS-BPEL can also be parsed!
  *
@@ -130,7 +131,8 @@
 
 
 using namespace kc;
-using namespace std;
+using std::cerr;
+using std::endl;
 
 
 

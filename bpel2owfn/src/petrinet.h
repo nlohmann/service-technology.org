@@ -29,13 +29,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/30 00:53:04 $
+ * \date    \$Date: 2006/12/30 12:48:02 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.126 $
+ * \version \$Revision: 1.127 $
  *
  * \ingroup petrinet
  */
@@ -61,7 +61,11 @@
 #include <set>
 #include <map>
 
-using namespace std;
+using std::string;
+using std::vector;
+using std::set;
+using std::map;
+using std::ostream;
 
 
 
@@ -341,7 +345,7 @@ class Arc
     unsigned int weight;
  
     /// DOT-output of the arc (used by PetriNet::dotOut())
-    string output_dot() const;
+    string output_dot(bool draw_interface = true) const;
 
     /// create an arc with a given weight
     Arc(Node *source, Node *target, unsigned int weight = 1);
@@ -428,7 +432,7 @@ class PetriNet
     string information() const;
 
     /// set the output format
-    void set_format(output_format my_format);
+    void set_format(output_format my_format, bool standard = true);
 
     /// calculate the maximal occurrences of communication
     void calculate_max_occurrences();
@@ -471,7 +475,7 @@ class PetriNet
     void output_apnn(ostream *output) const;
 
     /// DOT (Graphviz) output
-    void output_dot(ostream *output) const;
+    void output_dot(ostream *output, bool draw_interface = true) const;
 
     /// INA output
     void output_ina(ostream *output) const;
@@ -555,6 +559,9 @@ class PetriNet
 
     /// output file format
     output_format format;
+
+    /// a switch to change the style of the output format
+    bool use_standard_style;
 
     /// mapping of roles to nodes of the Petri net
     map<string, Node *> roleMap;

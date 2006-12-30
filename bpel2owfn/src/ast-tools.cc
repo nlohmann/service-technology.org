@@ -23,18 +23,19 @@
  *
  * \brief   unparse helper tools
  *
- * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/12/30 00:52:23 $
+ * \date    \$Date: 2006/12/30 12:48:01 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -45,13 +46,16 @@
 
 #include <cmath>
 #include <cassert>
+#include <utility>
 
 #include "options.h"
 #include "helpers.h"
 #include "ast-details.h"
 #include "ast-tools.h"
 
-using namespace std;
+using std::pair;
+using std::cerr;
+using std::endl;
 
 
 

@@ -29,7 +29,7 @@
  *
  * \since   2006-10-30
  *
- * \date    \$Date: 2006/12/17 11:42:13 $
+ * \date    \$Date: 2006/12/30 12:48:01 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  */
 %}
 
@@ -133,9 +133,9 @@ This=CompensateScope(a,b,_id) ->
       assert(This->id == _id->value);
 
       assert(ASTEmap[_id->value]->attributes["target"] != "");
-      assert(scopeNames[ASTEmap[_id->value]->attributes["target"]] != 0);
+      assert(ASTE_scopeNames[ASTEmap[_id->value]->attributes["target"]] != 0);
 
-      unsigned int scopeId = scopeNames[ASTEmap[_id->value]->attributes["target"]];
+      unsigned int scopeId = ASTE_scopeNames[ASTEmap[_id->value]->attributes["target"]];
 
       Place *p1 = PN.newPlace(prefix + "initial");
       Place *p2 = PN.newPlace(prefix + "final");

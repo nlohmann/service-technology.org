@@ -24,12 +24,12 @@
  *
  * \brief   Petri net patterns for BPEL's <scope> and <process>
  *
- * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2006/12/20 11:50:18 $
+ * \date    \$Date: 2006/12/30 12:48:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
  */
 %}
 
@@ -59,14 +59,17 @@
 #include "ast-details.h"
 #include "options.h"
 
+using std::cerr;
+using std::endl;
+
 extern PetriNet PN;
 extern map<unsigned int, ASTE*> ASTEmap;
 extern string currentScope;
 
 extern set<string> ASTE_inputChannels;
 extern set<string> ASTE_outputChannels;
-extern set<string> linkNames;
-extern set<string> variableNames;
+extern set<string> ASTE_linkNames;
+extern set<string> ASTE_variableNames;
 %}
 
 
@@ -112,7 +115,7 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
     	// Create the places for the links.
       	// The used list is filled during parsing and contains all links of the
 	// whole process -- also links defined in a deeper hierarchy.
-	for (set<string>::iterator link = linkNames.begin(); link != linkNames.end(); link++)
+	for (set<string>::iterator link = ASTE_linkNames.begin(); link != ASTE_linkNames.end(); link++)
 	{
 	  PN.newPlace("link." + *link);
 	  PN.newPlace("!link." + *link);
@@ -122,11 +125,13 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 	if (parameters[P_VARIABLES])
 	{
 	  // Create variable places and initially mark them.
-	  for (set<string>::iterator variable = variableNames.begin(); variable != variableNames.end(); variable++)
+	  for (set<string>::iterator variable = ASTE_variableNames.begin(); variable != ASTE_variableNames.end(); variable++)
 	  {
 	    Place *v = PN.newPlace("variable." + *variable);
 	    v->mark();
 	  }
+          // ASTE_variableNames is not used any more
+          ASTE_variableNames.clear();
   
 	  // Create a place for the global clock and mark it.
 	  Place *clock = PN.newPlace(prefix + "clock");
@@ -264,7 +269,7 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 
 
 	// Initialize the link places of the process.
-	for (set<string>::iterator link = linkNames.begin(); link != linkNames.end(); link++)
+	for (set<string>::iterator link = ASTE_linkNames.begin(); link != ASTE_linkNames.end(); link++)
 	  PN.newArc(t2, PN.findPlace("!link." + *link));
 
 
@@ -354,7 +359,7 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 	// Create the places for the links.
 	// The used list is filled during parsing and contains all links of the
 	// whole process -- also links defined in a deeper hierarchy.
-	for (set<string>::iterator link = linkNames.begin(); link != linkNames.end(); link++)
+	for (set<string>::iterator link = ASTE_linkNames.begin(); link != ASTE_linkNames.end(); link++)
 	{
 	  PN.newPlace("link." + *link);
 	  PN.newPlace("!link." + *link);
@@ -488,7 +493,7 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 	// Create the places for the links.
 	// The used list is filled during parsing and contains all links of the
 	// whole process -- also links defined in a deeper hierarchy.
-	for (set<string>::iterator link = linkNames.begin(); link != linkNames.end(); link++)
+	for (set<string>::iterator link = ASTE_linkNames.begin(); link != ASTE_linkNames.end(); link++)
 	{
 	  PN.newPlace("link." + *link);
 	  PN.newPlace("!link." + *link);
@@ -516,6 +521,9 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
     default: { /* no pattern in this case */ }
   }
 
+
+  // this global mapping is not used any more
+  ASTE_linkNames.clear();
 
   footer(phylum->id, true);
 }

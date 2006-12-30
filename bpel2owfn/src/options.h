@@ -23,18 +23,19 @@
  *
  * \brief   evaluation of command-line options
  *
- * \author  responsible: Christian Gierds <gierds@informatik.hu-berlin.de>,
+ * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/22 00:03:55 $
+ * \date    \$Date: 2006/12/30 12:48:02 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
  */
 
 
@@ -54,8 +55,14 @@
 
 #include <map>
 #include <list>
+#include <string>
+#include <iostream>
 
-using namespace std;
+using std::map;
+using std::list;
+using std::istream;
+using std::ostream;
+using std::string;
 
 
 

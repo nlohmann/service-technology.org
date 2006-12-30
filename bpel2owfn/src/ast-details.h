@@ -23,19 +23,20 @@
  *
  * \brief   annotations of the AST
  *
- * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          Christian Gierds <gierds@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nielslohmann $
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/12/10 17:31:14 $
+ * \date    \$Date: 2006/12/30 12:48:01 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.57 $
+ * \version \$Revision: 1.58 $
  */
 
 
@@ -56,12 +57,14 @@
 #include <map>
 #include <string>
 #include <set>
-#include <list>
 #include <vector>
 
 #include "ast-config.h"
 
-using namespace std;
+using std::map;
+using std::string;
+using std::set;
+using std::vector;
 
 
 

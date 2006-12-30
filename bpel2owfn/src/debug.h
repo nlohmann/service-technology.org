@@ -24,17 +24,17 @@
  * \brief   debugging tools
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2005/11/09
  *
- * \date    \$Date: 2006/12/10 17:31:16 $
+ * \date    \$Date: 2006/12/30 12:48:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.29 $
+ * \version \$Revision: 1.30 $
  *
  * \ingroup debug
  */
@@ -56,7 +56,7 @@
 
 #include <string>
 
-using namespace std;
+using std::string;
 
 
 

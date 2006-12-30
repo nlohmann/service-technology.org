@@ -29,13 +29,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2006/12/30 00:52:23 $
+ * \date    \$Date: 2006/12/30 12:48:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.69 $
+ * \version \$Revision: 1.70 $
  *
  * \ingroup conversion
  * \ingroup debug
@@ -57,6 +57,13 @@
 #include "helpers.h"
 #include "options.h"
 #include "debug.h"
+
+using std::istringstream;
+using std::cout;
+using std::cerr;
+using std::clog;
+using std::flush;
+using std::ofstream;
 
 
 

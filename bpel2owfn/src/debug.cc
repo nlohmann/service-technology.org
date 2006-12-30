@@ -29,13 +29,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/12/17 19:21:02 $
+ * \date    \$Date: 2006/12/30 12:48:01 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  *
  * \ingroup debug
  */
@@ -55,6 +55,12 @@
 #include "debug.h"
 #include "options.h"
 #include "helpers.h"
+
+using std::cerr;
+using std::endl;
+using std::setw;
+using std::setfill;
+using std::flush;
 
 
 

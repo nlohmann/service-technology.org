@@ -21,23 +21,23 @@
 /*!
  * \file cfg.cc
  *
- * \brief   control flow graph (implementation)
+ * \brief   control flow graph
  *
  * This file implements the class defined in cfg.h
  * 
- * \author  responsible: Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nlohmann $
+ * \author  Christian Gierds <gierds@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-01-19
  *
- * \date    \$Date: 2006/12/10 17:31:16 $
+ * \date    \$Date: 2006/12/30 12:48:01 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.40 $
+ * \version \$Revision: 1.41 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -45,6 +45,7 @@
 
 
 #include <cassert>
+#include <iostream>
 
 #include "cfg.h"
 #include "options.h"
@@ -52,6 +53,8 @@
 #include "ast-details.h"
 #include "ast-config.h"		// all you need from Kimwitu++
 
+using std::cerr;
+using std::endl;
 
 
 

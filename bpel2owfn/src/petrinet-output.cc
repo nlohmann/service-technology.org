@@ -28,13 +28,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/12/30 00:53:04 $
+ * \date    \$Date: 2006/12/30 12:48:02 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.70 $
+ * \version \$Revision: 1.71 $
  *
  * \ingroup petrinet
  */
@@ -61,6 +61,11 @@
 #ifndef USING_BPEL2OWFN
 #include "bpel2owfn_wrapper.h"
 #endif
+
+using std::endl;
+using std::setw;
+using std::right;
+using std::left;
 
 
 
@@ -275,8 +280,13 @@ void PetriNet::output_info(ostream *output) const
 /*!
  * DOT-output of the arc.
 */
-string Arc::output_dot() const
+string Arc::output_dot(bool draw_interface) const
 {
+  if (!draw_interface)
+    if ((source->nodeType == PLACE && source->type != INTERNAL) ||
+	(target->nodeType == PLACE && target->type != INTERNAL))
+      return "";
+
   string result = " ";
   if (source->nodeType == PLACE)
     result += "p" + toString(source->id) + " -> t" + toString(target->id);
@@ -385,8 +395,11 @@ string Place::output_dot() const
  * Creates a DOT output (see http://www.graphviz.org) of the Petri net. It uses
  * the digraph-statement and adds labels to transitions, places and arcs if
  * neccessary. It also distinguishes the three arc types of #arc_type.
+ *
+ * \param output the output stream
+ * \param draw_interface if set to true the interface will be drawn (standard)
  */
-void PetriNet::output_dot(ostream *output) const
+void PetriNet::output_dot(ostream *output, bool draw_interface) const
 {
   assert(output != NULL);
 
@@ -406,10 +419,14 @@ void PetriNet::output_dot(ostream *output) const
   (*output) << endl << " node [shape=circle];" << endl;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
     (*output) << (*p)->output_dot();
-  for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
-    (*output) << (*p)->output_dot();
-  for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
-    (*output) << (*p)->output_dot();
+
+  if (draw_interface)
+  {
+    for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
+      (*output) << (*p)->output_dot();
+    for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
+      (*output) << (*p)->output_dot();
+  }
 
   // list the transitions
   (*output) << endl << " node [shape=box regular=true];" << endl;
@@ -418,7 +435,7 @@ void PetriNet::output_dot(ostream *output) const
 
   // list the arcs
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
-    (*output) << (*f)->output_dot();
+    (*output) << (*f)->output_dot(draw_interface);
 
   (*output) << "}" << endl;
 }
@@ -438,7 +455,7 @@ void PetriNet::output_dot(ostream *output) const
  *
  * \pre output != NULL
  *
- * \todo Somehow add the input and output places to the PNML output.
+ * \todo See https://savannah.gnu.org/task/?6263 
  */
 void PetriNet::output_pnml(ostream *output) const
 {
@@ -1069,7 +1086,7 @@ ostream& operator<< (ostream& os, const PetriNet &obj)
   switch (obj.format)
   {
     case(FORMAT_APNN):	obj.output_apnn(&os); break;
-    case(FORMAT_DOT):	obj.output_dot(&os); break;
+    case(FORMAT_DOT):	obj.output_dot(&os, obj.use_standard_style); break;
     case(FORMAT_INA):	obj.output_ina(&os); break;
     case(FORMAT_INFO):	obj.output_info(&os); break;
     case(FORMAT_LOLA):	obj.output_lola(&os); break;
@@ -1090,8 +1107,10 @@ ostream& operator<< (ostream& os, const PetriNet &obj)
  * time.
  *
  * \param my_format the output format from the enumeration output_format.
+ * \param standard  if set to false a different output format style is used
  */
-void PetriNet::set_format(output_format my_format)
+void PetriNet::set_format(output_format my_format, bool standard)
 {
   format = my_format;
+  use_standard_style = standard;
 }

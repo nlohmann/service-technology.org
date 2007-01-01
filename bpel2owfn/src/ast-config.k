@@ -29,7 +29,7 @@
  * 
  * \since   2006-24-03
  *
- * \date    \$Date: 2006/12/30 12:52:54 $
+ * \date    \$Date: 2007/01/01 18:55:17 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.35 $
+ * \version \$Revision: 1.36 $
  *
  * \todo    Annotate the global mappings which function clear them.
  */
@@ -177,6 +177,7 @@ void printer(const char *s, uview v)
 // the rewrite views
 
 %rview implicit;
+%rview invoke;
 %rview newNames;
 
 

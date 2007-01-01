@@ -29,14 +29,14 @@
  * 
  * \since   2006/10/11
  *
- * \date    \$Date: 2006/12/20 11:50:18 $
+ * \date    \$Date: 2007/01/01 18:55:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  */
 %}
 
@@ -53,6 +53,91 @@
  * transformations described in the WS-BPEL specification (e.g. standard
  * FTC-handlers or <invoke> activities with FC-handlers).
  *****************************************************************************/
+
+
+/*
+ * "Transform" standard <invoke>.
+ */
+activityInvoke(
+  annotatedInvoke(
+    my_standardElements,
+    my_tCorrelation_list,
+    NoCatch(),
+    NoCatchAll(),
+    implicitCompensationHandler(a),
+    my_tToPart_list,
+    my_tFromPart_list,
+    my_integer
+  )
+)
+->
+< invoke:
+  activityInvoke(
+    Invoke(
+      my_standardElements,
+      my_tCorrelation_list,
+      my_tToPart_list,
+      my_tFromPart_list,
+      my_integer
+    )
+  )
+>;
+
+
+/*
+ * Implicit transformation of the <invoke> activity with fault or compensation
+ * handler (cf. Sect. 10.3 in WS-BPEL 2.0)
+ */
+activityInvoke(
+  annotatedInvoke(
+    my_standardElements,
+    my_tCorrelation_list,
+    my_tCatch,
+    my_tCatchAll,
+    my_tCompensationHandler,
+    my_tToPart_list,
+    my_tFromPart_list,
+    my_integer
+  )
+)
+->
+< invoke:
+  activityScope(
+    Scope(
+      my_standardElements,
+      NiltVariable_list(),
+      userDefinedFaultHandler(
+        ConstCatch_list(
+          my_tCatch,
+          NiltCatch_list()
+        ),
+        my_tCatchAll,
+        mkinteger(0)
+      ),
+      my_tCompensationHandler,
+      standardTerminationHandler(
+        mkinteger(0)
+      ),
+      implicitEventHandler(
+        mkinteger(0)
+      ),
+      NiltCorrelationSet_list(),
+      StopInScope(),
+      activityInvoke(
+        Invoke(
+          NoStandardElements(),
+          my_tCorrelation_list,
+          my_tToPart_list,
+          my_tFromPart_list,
+          my_integer
+        )
+      ),
+      NiltPartnerLink_list(),
+      mkinteger(0)
+    )
+  )
+>;
+
 
 /*
  * A shortcut in the parser is unfolded to empty list of target and source
@@ -159,90 +244,6 @@ implicitCompensationHandler(_id) provided (parameters[P_WSBPEL]) ->
     _id
   )
 >;      
-
-
-/*
- * Implicit transformation of the <invoke> activity with fault or compensation
- * handler (cf. Sect. 10.3 in WS-BPEL 2.0)
- */
-activityInvoke(
-  annotatedInvoke(
-    my_standardElements,
-    my_tCorrelation_list,
-    my_tCatch,
-    my_tCatchAll,
-    my_tCompensationHandler,
-    my_tToPart_list,
-    my_tFromPart_list,
-    my_integer
-  )
-)
-->
-< implicit:
-  activityScope(
-    Scope(
-      my_standardElements,
-      NiltVariable_list(),
-      userDefinedFaultHandler(
-        ConstCatch_list(
-          my_tCatch,
-          NiltCatch_list()
-        ),
-        my_tCatchAll,
-        mkinteger(0)
-      ),
-      my_tCompensationHandler,
-      standardTerminationHandler(
-        mkinteger(0)
-      ),
-      implicitEventHandler(
-        mkinteger(0)
-      ),
-      NiltCorrelationSet_list(),
-      StopInScope(),
-      activityInvoke(
-        Invoke(
-          NoStandardElements(),
-          my_tCorrelation_list,
-          my_tToPart_list,
-          my_tFromPart_list,
-          my_integer
-        )
-      ),
-      NiltPartnerLink_list(),
-      mkinteger(0)
-    )
-  )
->;
-
-
-/*
- * "Transform" standard <invoke>.
- */
-activityInvoke(
-  annotatedInvoke(
-    my_standardElements,
-    my_tCorrelation_list,
-    NoCatch(),
-    NoCatchAll(),
-    implicitCompensationHandler(a),
-    my_tToPart_list,
-    my_tFromPart_list,
-    my_integer
-  )
-)
-->
-< implicit:
-  activityInvoke(
-    Invoke(
-      my_standardElements,
-      my_tCorrelation_list,
-      my_tToPart_list,
-      my_tFromPart_list,
-      my_integer
-    )
-  )
->;
 
 
 /*

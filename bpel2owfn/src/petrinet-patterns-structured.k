@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2006/12/30 12:48:02 $
+ * \date    \$Date: 2007/01/01 18:55:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
  */
 %}
 
@@ -217,7 +217,6 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "running");
 	Place *p3 = PN.newPlace(prefix + "final");
-	Place *p4 = PN.newPlace(prefix + "done");
 	
 
 	// external control of loop condition	
@@ -237,8 +236,8 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 	  PN.newArc(control_leave, t1);
 
 	Transition *t2 = PN.newTransition(prefix + "loop");
-	PN.newArc(p4, t2);
-	PN.newArc(t2, p1);
+	PN.newArc(p1, t2);
+	PN.newArc(t2, p2);
 	if (parameters[P_LOOPCONTROL])
 	  PN.newArc(control_enter, t2);
 
@@ -252,7 +251,7 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 
 	// Embed the inner activity.
 	PN.mergePlaces(phylum->id, ".internal.running", phylum->activity_1->id, ".initial");
-	PN.mergePlaces(phylum->id, ".internal.done", phylum->activity_1->id, ".final");	
+	PN.mergePlaces(phylum->id, ".internal.initial", phylum->activity_1->id, ".final");	
 
 	break;
       }

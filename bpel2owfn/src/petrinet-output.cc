@@ -28,13 +28,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2006/12/30 12:48:02 $
+ * \date    \$Date: 2007/01/01 15:11:10 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.71 $
+ * \version \$Revision: 1.72 $
  *
  * \ingroup petrinet
  */
@@ -292,11 +292,17 @@ string Arc::output_dot(bool draw_interface) const
     result += "p" + toString(source->id) + " -> t" + toString(target->id);
   else
     result += "t" + toString(source->id) + " -> p" + toString(target->id);
+  
+  result += "\t[";
 
   if (weight != 1)
-    result += " [label=\"" + toString(weight) + "\"]";
+    result += "label=\"" + toString(weight) + "\"";
 
-  result += ";\n";
+    if ((source->nodeType == PLACE && source->type == INTERNAL) ||
+	(target->nodeType == PLACE && target->type == INTERNAL))
+      result += "weight=10000.0";
+
+  result += "]\n";
 
   return result;
 }
@@ -312,29 +318,28 @@ string Arc::output_dot(bool draw_interface) const
 string Transition::output_dot() const
 {
   string result;
+
+  result += " t" + toString(id) + "  \t";
+
 #ifdef USING_BPEL2OWFN
-  result += " t" + toString(id) + "\t[label=\"" + nodeShortName();
+  string label = nodeShortName();
+#else
+  string label = nodeName();
 #endif
-#ifndef USING_BPEL2OWFN
-  result += " t" + toString(id) + "\t[label=\"" + nodeName();
-#endif
- 
-  if (parameters[P_COMMUNICATIONONLY])
+
+  switch(type)
   {
-    result += "\\n";
-    result += nodeName();
+    case (IN):	result += "[fillcolor=orange]"; break;
+    case(OUT):	result += "[fillcolor=yellow]"; break;
+    case(INOUT):result += "[fillcolor=gold]"; break;
+    default:	break;
   }
-
-  result += "\"";
-
-  if (type == IN)
-    result += " style=filled fillcolor=orange";
-  if (type == OUT)
-    result += " style=filled fillcolor=yellow";
-  if (type == INOUT)
-    result += " style=filled fillcolor=gold";
   
-  result += "];\n";
+  result += "\n";
+
+  result += " t" + toString(id) + "_l\t[shape=none];\n";
+  result += " t" + toString(id) + "_l -> t" + toString(id) + " [headlabel=\"" + label + "\"]\n";
+
   return result;
 }
 
@@ -349,40 +354,47 @@ string Transition::output_dot() const
 string Place::output_dot() const
 {
   string result;
-  
+
+  result += " p" + toString(id) + "  \t[";//label=\"\"";
+
 #ifdef USING_BPEL2OWFN
-  result += " p" + toString(id) + "\t[label=\"" + nodeShortName() + "\"";
-#endif
-#ifndef USING_BPEL2OWFN
-  result += " p" + toString(id) + "\t[label=\"" + nodeName() + "\"";
+  string label = nodeShortName();
+#else
+  string label = nodeName();
 #endif
 
+  // truncate prefix (could be a problem with ports later on, but looks nice)
+  if (type != INTERNAL)
+    label = label.substr(label.find_last_of(".")+1, label.length());
+  
   if (tokens > 0)
-    result += " style=\"filled,setlinewidth(3)\"";
-  else
-    result += " style=\"filled\"";
+    result += "fillcolor=black peripheries=2 height=\".2\" width=\".2\" ";
 
   switch (type)
   {
-    case (IN):  result += " fillcolor=orange shape=ellipse"; break;
-    case (OUT): result += " fillcolor=yellow shape=ellipse"; break;
+    case (IN):  result += "fillcolor=orange"; break;
+    case (OUT): result += "fillcolor=yellow"; break;
     default:    break;
   }
 
-  if (historyContains("1.internal.initial") || isFinal)
-    result += " fillcolor=gray";
+  if (isFinal)
+    result += "fillcolor=gray";
   else if (firstMemberIs("!link."))
-    result += " fillcolor=red";
+    result += "fillcolor=red";
   else if (firstMemberIs("link."))
-    result += " fillcolor=green";
+    result += "fillcolor=green";
   else if (firstMemberIs("variable."))
-    result += " fillcolor=cyan";
+    result += "fillcolor=cyan";
   else if (historyContains("1.internal.clock"))
-    result += " fillcolor=seagreen";
-  else if (type == INTERNAL)
-    result += " fillcolor=white";
+    result += "fillcolor=seagreen";
     
-  result += "];\n";
+  result += "]\n";
+
+  result += " p" + toString(id) + "_l\t[shape=none];\n";
+  if (type == OUT)
+    result += " p" + toString(id) + " -> p" + toString(id) + "_l [taillabel=\"" + label + "\"]\n";
+  else
+    result += " p" + toString(id) + "_l -> p" + toString(id) + " [headlabel=\"" + label + "\"]\n";
 
   return result;
 }
@@ -404,19 +416,19 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
   assert(output != NULL);
 
   (*output) << "digraph N {" << endl;
-  (*output) << " graph [fontname=\"Helvetica\", label=\"";
+  (*output) << " graph [fontname=\"Helvetica\" nodesep=0.3 ranksep=\"0.2 equally\" label=\"";
 
   if (parameters[P_REDUCE])
     (*output) << "structural simplified ";
 
-  (*output) << "Petri net generated from " << filename << "\"];" << endl;
-  (*output) <<
-    " node [fontname=\"Helvetica\" fontsize=10 fixedsize];" << endl;
-  (*output) << " edge [fontname=\"Helvetica\" fontsize=10];" <<
-    endl << endl;
+  (*output) << "Petri net generated from " << filename << "\"]" << endl;
+  (*output) << " node [fixedsize width=\".3\" height=\".3\" label=\"\" style=filled fillcolor=white]" << endl;
+  (*output) << " edge [fontname=\"Helvetica\" fontsize=8  color=white arrowhead=none weight=\"20.0\"]" << endl << endl;
+
 
   // list the places
-  (*output) << endl << " node [shape=circle];" << endl;
+  (*output) << "\n // places" << endl;
+  (*output) << " node [shape=circle];" << endl;
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
     (*output) << (*p)->output_dot();
 
@@ -429,11 +441,31 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
   }
 
   // list the transitions
-  (*output) << endl << " node [shape=box regular=true];" << endl;
+  (*output) << "\n // transitions" << endl;
+  (*output) << " node [shape=box]" << endl;
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
     (*output) << (*t)->output_dot();
 
+
+  (*output) << "\n // cluster the inner of the net" << endl;
+  (*output) << " subgraph cluster1\n {\n ";
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+    (*output) << " t" << (*t)->id << " t" << (*t)->id << "_l";
+  (*output) << "\n ";
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  {
+    if ((*p)->historyContains("1.internal.initial"))
+      (*output) << " p" << (*p)->id;
+    else
+      (*output) << " p" << (*p)->id << " p" << (*p)->id << "_l";
+  }
+  (*output) << "\n  label=\"\" style=dashed" << endl;
+  (*output) << " }" << endl;
+
+
   // list the arcs
+  (*output) << "\n // arcs" << endl;
+  (*output) << " edge [fontname=\"Helvetica\" fontsize=8 arrowhead=normal color=black]" << endl;
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     (*output) << (*f)->output_dot(draw_interface);
 

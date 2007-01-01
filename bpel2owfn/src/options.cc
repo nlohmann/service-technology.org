@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/30 17:11:26 $
+ * \date    \$Date: 2007/01/01 12:52:05 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.63 $
+ * \version \$Revision: 1.64 $
  */
 
 
@@ -54,6 +54,7 @@
 
 #include "bpel2owfn.h"
 #include "options.h"
+#include "helpers.h"
 #include "debug.h"
 #include "getopt.h"	// for radon
 
@@ -141,7 +142,7 @@ const char *par_string = "hvm:li:of:p:d:";
 /*!
  * \brief prints an overview of all commandline arguments
  */
-void print_help() 
+void print_help()
 {
   extern string program_name;
 
@@ -158,7 +159,7 @@ void print_help()
   trace(" -o, --output[=NAME]        write output to file (NAME sets filename)\n");
   trace(" -f, --format=FORMAT        create output of the given format\n");
   trace(" -l, --log=NAME             create log file (NAME sets filename)\n");
-  trace(" -d, --debug=NUMBER         set a debug level (NUMBER=1..4)\n");
+  trace(" -d, --debug=NUMBER         set a debug level (NUMBER=1..4 or flex or bison)\n");
   trace(" -h, --help                 print this help list and exit\n");
   trace(" -v, --version              print program version and exit\n");
   trace("\n");
@@ -236,7 +237,7 @@ void parse_command_line(int argc, char* argv[])
 
   // this map indicates, whether a certain format is valid for a mode
   map< pair<possibleModi,possibleFormats>, bool > validFormats;
-  
+
   validFormats[pair<possibleModi,possibleFormats>(M_AST,F_DOT)] = true;
 
   validFormats[pair<possibleModi,possibleFormats>(M_PRETTY,F_XML)] = true;
@@ -304,11 +305,18 @@ void parse_command_line(int argc, char* argv[])
 		    modus = M_CONSISTENCY;
 		  else if (parameter == "cfg")
 		    modus = M_CFG;
-		  else
-		    trace(TRACE_ALWAYS, "Unknown mode \"" + parameter+ "\n");
+		  else  {
+		    trace(TRACE_ALWAYS, "Unknown mode \"" + parameter+ "\".\n");
+		    trace(TRACE_ALWAYS, "Use -h to get a list of valid modes.\n");		    
+		    cleanup();
+		    exit(1);
+		  }
 		  
-		  if (options[O_MODE] && modus != old_modus)
-		    trace(TRACE_ALWAYS, "Choose only one mode!\n");
+		  if (options[O_MODE] && modus != old_modus) {
+		    trace(TRACE_ALWAYS, "Multiple modes are given, please choose only one!\n");
+		    cleanup();
+		    exit(1);
+		  }
 		  
 		  options[O_MODE] = true;
 
@@ -333,14 +341,17 @@ void parse_command_line(int argc, char* argv[])
 
       case 'o':
 	      {
-		if (options[O_OUTPUT])
-		  trace(TRACE_WARNINGS, "Multiple output options are given, only last given name is used!\n");
+		if (options[O_OUTPUT]) {
+		  trace(TRACE_ALWAYS, "Multiple output options are given, please choose only one!\n");
+          cleanup();
+		  exit(1);
+		}
 		
 		options[O_OUTPUT] = true;
-		
+
 		if (optarg != NULL)
 		  output_filename = string(optarg);
-		
+
 		break;
 	      }
 
@@ -348,7 +359,7 @@ void parse_command_line(int argc, char* argv[])
 	      {
 		options[O_FORMAT] = true;
 		parameter = string(optarg);
-		
+
 		if (parameter == suffixes[F_LOLA])
 		  formats[F_LOLA] = true;
 		else if (parameter == suffixes[F_OWFN])
@@ -369,9 +380,13 @@ void parse_command_line(int argc, char* argv[])
 		  formats[F_TXT] = true;
 		else if (parameter == suffixes[F_XML])
 		  formats[F_XML] = true;
-		else
+		else {
 		  trace(TRACE_ALWAYS, "Unknown format \"" + parameter +"\".\n");
-		
+		  trace(TRACE_ALWAYS, "Use -h to get a list of valid formats.\n");		    
+    	  cleanup();
+		  exit(1);
+        }
+        
 		break;
 	      }
 
@@ -379,7 +394,7 @@ void parse_command_line(int argc, char* argv[])
 	      {
 		options[O_PARAMETER] = true;
 		parameter = string(optarg);
-		
+
 		if ( parameter == "reduce")
 		  parameters[P_REDUCE] = true;
 		else if (parameter == "communicationonly")
@@ -400,8 +415,12 @@ void parse_command_line(int argc, char* argv[])
 		  parameters[P_LOOPCOUNT] = true;
 		else if (parameter == "loopcontrol")
 		  parameters[P_LOOPCONTROL] = true;
-		else
+		else {
 		  trace(TRACE_ALWAYS, "Unknown parameter \"" + parameter +"\".\n");
+		  trace(TRACE_ALWAYS, "Use -h to get a list of valid parameters.\n");		    
+    	  cleanup();
+		  exit(1);
+		}
 		
 		break;
 	      }
@@ -410,7 +429,7 @@ void parse_command_line(int argc, char* argv[])
 	      {
 		options[O_DEBUG] = true;
 		parameter = string(optarg);
-		
+
 		if (parameter == "flex")
 		  frontend__flex_debug = 1;
 		else if (parameter == "bison")
@@ -423,15 +442,22 @@ void parse_command_line(int argc, char* argv[])
 		  debug_level = TRACE_DEBUG;
 		else if (parameter == "4")
 		  debug_level = TRACE_VERY_DEBUG;
-		else
-		  trace(TRACE_ALWAYS, "Unrecognised debug mode!\n");
-		
+		else {
+		  trace(TRACE_ALWAYS, "Unrecognised debug mode: \"" + parameter +"\"!\n");
+		  trace(TRACE_ALWAYS, "Use -h to get a list of valid debug modes.\n");		    
+    	  cleanup();
+		  exit(1);
+        }
+        
 		break;
 	      }
 
       default:
 	      {
 		trace("Unknown option!\n");
+        trace(TRACE_ALWAYS, "Use -h to get a list of valid options.\n");		    
+    	cleanup();
+		exit(1);
 		break;
 	      }
       }
@@ -459,7 +485,9 @@ void parse_command_line(int argc, char* argv[])
   {
     if (modus != M_CONSISTENCY && inputfiles.size() > 1)
     {
-      trace(TRACE_WARNINGS, "Multiple input options are given, only first one is used!\n");
+	  trace(TRACE_ALWAYS, "Multiple input options are given, please choose only one!\n");
+      cleanup();
+      exit(1);
     }
     list< string >::iterator file = inputfiles.begin();
     FILE * fin = NULL;
@@ -511,7 +539,7 @@ void parse_command_line(int argc, char* argv[])
       file++;
     }
   }
-	  
+
   if (options[O_LOG])
   {
     if (log_filename == "")
@@ -520,7 +548,7 @@ void parse_command_line(int argc, char* argv[])
     }
     log_output = openOutput(log_filename);
   }
-  
+
   // check for valid formats
   if ( options[O_MODE] )
   {
@@ -549,7 +577,7 @@ void parse_command_line(int argc, char* argv[])
   trace(TRACE_INFORMATION, "Modus operandi:\n");
   switch ( modus )
   {
-    case M_AST: 
+    case M_AST:
             trace(TRACE_INFORMATION, " - generate AST\n");
 	    break;
     case M_PRETTY:
@@ -578,7 +606,7 @@ void parse_command_line(int argc, char* argv[])
       trace(TRACE_INFORMATION, "   + output will be written in " + suffixes[format[i]] + " style\n");
     }
   }
-  
+
   if (options[O_LOG])
     trace(TRACE_INFORMATION, " - Logging additional information to \"" + log_filename + "\"\n");
 
@@ -599,7 +627,7 @@ void parse_command_line(int argc, char* argv[])
 ostream *openOutput(string name)
 {
   ofstream *file = new ofstream(name.c_str(), ofstream::out | ofstream::trunc | ofstream::binary);
-  
+
   if (!file->is_open())
     trace(TRACE_ALWAYS, "File \"" + name + "\" could not be opened for writing access!\n");
 

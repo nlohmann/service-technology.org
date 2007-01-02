@@ -28,13 +28,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/01/01 15:11:10 $
+ * \date    \$Date: 2007/01/02 11:46:02 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.72 $
+ * \version \$Revision: 1.73 $
  *
  * \ingroup petrinet
  */
@@ -367,8 +367,10 @@ string Place::output_dot() const
   if (type != INTERNAL)
     label = label.substr(label.find_last_of(".")+1, label.length());
   
-  if (tokens > 0)
+  if (tokens == 1)
     result += "fillcolor=black peripheries=2 height=\".2\" width=\".2\" ";
+  else if (tokens > 1)
+    result += "label=\"" + toString(tokens) + "\" fontcolor=black fontname=\"Helvetica\" fontsize=10";
 
   switch (type)
   {
@@ -454,7 +456,7 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
   (*output) << "\n ";
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
-    if ((*p)->historyContains("1.internal.initial"))
+    if ((*p)->tokens > 0)
       (*output) << " p" << (*p)->id;
     else
       (*output) << " p" << (*p)->id << " p" << (*p)->id << "_l";

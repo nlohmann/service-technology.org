@@ -65,7 +65,7 @@ public:
 	graphEdge * edge;
 	clause * nextElement; 
 
-	void addLiteral(char *);
+	void addLiteral(const std::string&);
 	
 	void setEdge(graphEdge *);
 	void setEdges(graphEdge *);

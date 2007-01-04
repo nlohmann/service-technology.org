@@ -223,7 +223,7 @@ class oWFN  {
 		void deletePlace(owfnPlace *);
 	    void deleteTransition(owfnTransition *);
 		
-		char * createLabel(messageMultiSet);	
+		std::string createLabel(messageMultiSet) const;
 
 		/**
 		 * Matches this oWFN with the given operating guideline (OG).

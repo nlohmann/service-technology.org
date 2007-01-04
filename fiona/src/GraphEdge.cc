@@ -43,11 +43,9 @@
 //!      his copy. graphEdge will in turn dealloc _its_ copy.
 //! \param typeP type of this edge (receiving, sending)
 //! \brief constructor
-graphEdge::graphEdge(vertex * nodeP, const char * labelP, edgeType typeP) {
+graphEdge::graphEdge(vertex * nodeP, const string& labelP, edgeType typeP) {
 	node = nodeP;
-	if (labelP) {
-		label = strdup(labelP);
-	}
+	label = labelP;
 	type = typeP; 
 	nextElement = NULL;	
 }
@@ -55,7 +53,6 @@ graphEdge::graphEdge(vertex * nodeP, const char * labelP, edgeType typeP) {
 //! \fn graphEdge::~graphEdge()
 //! \brief destructor
 graphEdge::~graphEdge() {
-    free(label);
 }
 
 //! \fn void graphEdge::setNextElement(graphEdge * element)
@@ -82,7 +79,7 @@ graphEdge * graphEdge::getNextElement() {
 //! \fn string graphEdge::getLabel()
 //! \return label of this edge
 //! \brief returns the label of this edge
-char * graphEdge::getLabel() {
+string graphEdge::getLabel() const {
  	return label;
 }
  

@@ -207,7 +207,7 @@ void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
 					//cout << "edge: " << v->getNumber() << " [" << element->getLabel() << "> " << vNext->getNumber() << endl;
 
 					//label	
-					DdNode * label = labelToBddMp(element->getLabel()); 
+					DdNode * label = labelToBddMp(element->getLabel().c_str()); 
 		
 					//nodes 
 					DdNode * nodes = nodesToBddMp(v->getNumber(), vNext->getNumber());
@@ -258,7 +258,7 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 			if (vNext != NULL){ //&& vNext->reachGraphStateSet.size() != 0 
 			
 				//label
-				DdNode * label = labelToBddMp(element->getLabel()); 
+				DdNode * label = labelToBddMp(element->getLabel().c_str()); 
 				//if (label == NULL) exit(1)
 
 				//nodes		    
@@ -304,7 +304,7 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 
 //! \fn DdNode*  BddRepresentation::labelToBddMp(char* label)
 //! \brief returns the BDD of a label (given as integer)
-DdNode* BddRepresentation::labelToBddMp(char* label) {
+DdNode* BddRepresentation::labelToBddMp(const char* label) {
 	
 	trace(TRACE_5, "BddRepresentation::labelToBddMp(char* label): start\n");
 	 
@@ -492,7 +492,7 @@ DdNode* BddRepresentation::CNFtoBddAnn(CNF* cl){
         	literal->edge->getNode()->reachGraphStateSet.size() > 0) {
         			
 //            cout << "search for label " << literal->edge->getLabel() << " ...";
-            BddLabel* label = labelTable->lookup(literal->edge->getLabel());
+            BddLabel* label = labelTable->lookup(literal->edge->getLabel().c_str());
             //if (!l) { cout << "  Label not found\n"; exit(1);}
 //            cout << "   found: nbr = " << label->nbr << endl;
             int i = label->nbr;

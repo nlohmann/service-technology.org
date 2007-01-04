@@ -85,7 +85,7 @@ class BddRepresentation{
 		map<unsigned int, unsigned int> nodeMap;
 		BddLabelTab * labelTable;
 		
-		DdNode* labelToBddMp(char* label);
+		DdNode* labelToBddMp(const char* label);
 		DdNode* nodesToBddMp(unsigned int node1, unsigned int node2);
 		DdNode* annotationToBddAnn(vertex * v);
 		DdNode* CNFtoBddAnn(CNF * cl);

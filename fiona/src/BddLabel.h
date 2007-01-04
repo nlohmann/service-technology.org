@@ -58,7 +58,7 @@ public:
 class BddLabelTab{
 	public:
 	BddLabel ** table;
-	BddLabel * lookup(char *);
+	BddLabel * lookup(const char *) const;
 	void add(BddLabel *);
 	BddLabelTab(unsigned int size = 65536);
   	~BddLabelTab();

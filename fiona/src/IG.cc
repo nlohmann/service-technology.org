@@ -513,7 +513,7 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 			bool subset = false;
 			bool supset = false;
 			
-			char * label;
+			string label;
 			
 			if (found) {
 				
@@ -632,7 +632,7 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 			bool subset = false;
 			bool supset = false;
 			
-			char * label;
+			string label;
 			
 			if (found) {
 				

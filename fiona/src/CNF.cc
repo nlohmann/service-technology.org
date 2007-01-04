@@ -83,7 +83,7 @@ void clause::setEdge(graphEdge * _edge) {
 //! \fn void clause::addLiteral(char * clauseLabel)
 //! \param clauseLabel the label to be added this clause list
 //! \brief adds the given label to this clause list
-void clause::addLiteral(char * label) {
+void clause::addLiteral(const string& label) {
     trace(TRACE_5, "clause::addLiteral(char * label) : start\n");
 //	cout << "\t " << label << endl;
 	
@@ -154,7 +154,7 @@ void clause::setEdges(graphEdge * edge) {
  	clause * cl = this;
  	
  	while (cl) {
-		if  (cl->edge != NULL && strcmp(cl->edge->getLabel(), edge->getLabel()) == 0) {
+		if  (cl->edge != NULL && cl->edge->getLabel() == edge->getLabel()) {
 			// we have found a pseudo edge with that label, so store the correct edge right here
 			cl->setEdge(edge);
 			trace(TRACE_5, "clause::setEdges(graphEdge * edge) : end\n");		
@@ -299,7 +299,7 @@ void CNF::setEdge(graphEdge * edge) {
  	if (edge->getNode() && edge->getNode()->getColor() != RED) {
 	
 	 	while (clauseTemp) {
-			if  (clauseTemp->edge != NULL && strcmp(clauseTemp->edge->getLabel(), edge->getLabel()) == 0) {
+			if  (clauseTemp->edge != NULL && clauseTemp->edge->getLabel() == edge->getLabel()) {
 				// we have found a pseudo edge with that label, so store the correct edge right here
 				if (clausePrev == NULL) {
 					cl = clauseTemp->nextElement;	

@@ -67,7 +67,7 @@ BddLabelTab::~BddLabelTab(){
 }
 
 	
-BddLabel * BddLabelTab::lookup(char * name){
+BddLabel * BddLabelTab::lookup(const char * name) const {
   	/* 1. Hashvalue bestimmen */
   	unsigned int h,i;
   	BddLabel * lst = (BddLabel *) 0;

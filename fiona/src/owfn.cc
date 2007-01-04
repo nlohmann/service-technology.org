@@ -1741,23 +1741,18 @@ bool oWFN::isFinal() const {
 }
 
 
-char * oWFN::createLabel(messageMultiSet m) {
-	char * label = new char[256];
-	char * actualMessage;
+string oWFN::createLabel(messageMultiSet m) const {
+	string label;
 	bool comma = false;
-	
-	strcpy(label, "");
 	
 	for (messageMultiSet::iterator iter1 = m.begin(); iter1 != m.end(); iter1++) {
 		if (comma) {
-			strcat(label, ", ");
+			label += ", ";
 		}
-		actualMessage = new char[strlen(Places[*iter1]->name)];
-		strcpy(actualMessage, Places[*iter1]->name);
-		strcat(label, actualMessage);
+		label += Places[*iter1]->name;
 		comma = true;
 	}
-	
+
 	return label;
 }
 

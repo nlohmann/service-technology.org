@@ -50,16 +50,16 @@ class graphEdge {
 
 private:
     vertex * node;				/*!< pointer to the node this arc is pointing to */
-    char * label;				/*!< label of the arc (usually the name of the event) */
+    std::string label;				/*!< label of the arc (usually the name of the event) */
     edgeType type;  			/*!< type of the arc (sending, receiving) */
     graphEdge * nextElement;	/*!< pointer to the next element in list */
     
 public:
-	graphEdge(vertex *, const char *, edgeType);
+	graphEdge(vertex *, const string&, edgeType);
 	~graphEdge();	
 	void setNextElement(graphEdge *);
 	graphEdge * getNextElement();
-	char * getLabel();
+	std::string getLabel() const;
 	edgeType getType();
 	vertex * getNode();
 	void setNode(vertex *);

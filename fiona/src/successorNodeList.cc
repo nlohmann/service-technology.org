@@ -91,7 +91,7 @@ bool successorNodeList::addNextNode(graphEdge * transition){
 		// test if this edge is already stored
 		if (tmpEdge->getNode() == transition->getNode() && 
 				tmpEdge->getType() == transition->getType() &&
-				strcmp(tmpEdge->getLabel(), transition->getLabel()) == 0) {
+				tmpEdge->getLabel() == transition->getLabel()) {
 			// yes, we have such an edge already -> return false, because no annotation shall be added either
 			return false;	
 		}

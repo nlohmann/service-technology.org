@@ -58,7 +58,7 @@ extern FILE *owfn_yyin;
 extern int owfn_yyerror();
 extern int owfn_yyparse();
 
-#ifdef YY_FLEX_HAS_YYLEX_DESTROY     
+#ifdef YY_FLEX_HAS_YYLEX_DESTROY
 extern int owfn_yylex_destroy();
 #endif
 
@@ -69,7 +69,7 @@ extern FILE *og_yyin;
 extern int og_yyerror();
 extern int og_yyparse();
 
-#ifdef YY_FLEX_HAS_YYLEX_DESTROY     
+#ifdef YY_FLEX_HAS_YYLEX_DESTROY
 extern int og_yylex_destroy();
 #endif
 
@@ -117,8 +117,8 @@ void readnet() {
 
     owfn_yyparse();
     fclose(owfn_yyin);
-    
-#ifdef YY_FLEX_HAS_YYLEX_DESTROY     
+
+#ifdef YY_FLEX_HAS_YYLEX_DESTROY
     owfn_yylex_destroy(); // must NOT be called before fclose(owfn_yyin);
 #endif
 
@@ -135,7 +135,7 @@ void readnet() {
     // to have sensible values.
     if (PN->FinalCondition) {
         PN->FinalCondition->init(PN->CurrentMarking);
-        
+
         formula* oldFinalCondition = PN->FinalCondition;
         PN->FinalCondition = PN->FinalCondition->merge();
         delete oldFinalCondition;

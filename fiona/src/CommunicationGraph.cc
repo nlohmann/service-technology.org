@@ -203,11 +203,12 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
     } else {
         vertex * found = findVertexInSet(toAdd); //findVertex(toAdd);
 
-        char * label = new char[256];
+//        char * label = new char[2056];
+        string label;
         bool comma = false;
         unsigned int offset = 0;
 
-        strcpy(label, "");
+//        strcpy(label, "");
         
         if (type == receiving) {
             offset = PN->placeInputCnt;
@@ -222,9 +223,11 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
 			
         for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
             if (comma) {
-                strcat(label, ", ");
+              //  strcat(label, ", ");
+              label += ", ";
             }
-            strcat(label, PN->Places[*iter]->name);
+           // strcat(label, PN->Places[*iter]->name);
+           	label += string(PN->Places[*iter]->name);
             comma = true;
             
             unsigned int i = 0;
@@ -250,7 +253,7 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
 
             toAdd->setNumber(numberOfNodes++);
 
-            graphEdge * edgeSucc = new graphEdge(toAdd, label, type);
+            graphEdge * edgeSucc = new graphEdge(toAdd, label.c_str(), type);
             currentVertex->addSuccessorNode(edgeSucc);
 
 			currentVertex->setAnnotationEdges(edgeSucc);
@@ -262,7 +265,7 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
 
             numberOfStatesAllNodes += toAdd->reachGraphStateSet.size();
 
-            delete[] label;
+       //     delete[] label;
 
             trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : end\n");
 
@@ -270,7 +273,7 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
         } else {
             trace(TRACE_1, "\t successor node already known: " + intToString(found->getNumber()) + "\n");
 
-            graphEdge * edgeSucc = new graphEdge(found, label, type);
+            graphEdge * edgeSucc = new graphEdge(found, label.c_str(), type);
             currentVertex->addSuccessorNode(edgeSucc);
 
 			currentVertex->setAnnotationEdges(edgeSucc);
@@ -278,13 +281,15 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
             numberOfEdges++;
 
             delete toAdd;
-            delete[] label;
+        //    delete[] label;
 
             trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : end\n");
 
             return false;
         }
     }
+    
+    return false;
 }
 
 
@@ -512,7 +517,7 @@ void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex *
 		for (StateSet::iterator iter2 = stateSet.begin(); iter2 != stateSet.end(); iter2++) {		
 			(*iter2)->decode(PN); // get the marking of the state
 			if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
-				PN->calculateReachableStatesOutputEvent(newNode, true, outputPlace);   // calc the reachable states from that marking
+				PN->calculateReachableStatesOutputEvent(newNode);   // calc the reachable states from that marking
 			}
 		}
 	//	binDeleteAll(PN->tempBinDecision);
@@ -551,13 +556,13 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
 	    		}
 		}
     } else {
-    	owfnPlace * outputPlace;
-    
-		// CHANGE THAT!!!!!!!!!!! is just a hack, stubborn set method does not yet work for more than one output event!
-		for (messageMultiSet::iterator iter = output.begin(); iter != output.end(); iter++) {
-			outputPlace = PN->Places[*iter];
-		}
-        // end hack
+//    	owfnPlace * outputPlace = NULL;
+//    
+//		// CHANGE THAT!!!!!!!!!!! is just a hack, stubborn set method does not yet work for more than one output event!
+//		for (messageMultiSet::iterator iter = output.begin(); iter != output.end(); iter++) {
+//			outputPlace = PN->Places[*iter];
+//		}
+//        // end hack
 
 		StateSet stateSet;
 
@@ -566,13 +571,13 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
         		
 			(*iter)->decode(PN);
 			// calculate temporary state set with the help of stubborn set method
-			PN->calculateReachableStates(stateSet, outputPlace, newNode);	
+			PN->calculateReachableStates(stateSet, output, newNode);	
 		}
 
 		for (StateSet::iterator iter2 = stateSet.begin(); iter2 != stateSet.end(); iter2++) {		
 			(*iter2)->decode(PN); // get the marking of the state
 			if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
-				PN->calculateReachableStatesOutputEvent(newNode, true, outputPlace);   // calc the reachable states from that marking
+				PN->calculateReachableStatesOutputEvent(newNode);   // calc the reachable states from that marking
 			}
 		}
 	//	binDeleteAll(PN->tempBinDecision);

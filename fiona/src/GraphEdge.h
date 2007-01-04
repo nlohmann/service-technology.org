@@ -55,7 +55,7 @@ private:
     graphEdge * nextElement;	/*!< pointer to the next element in list */
     
 public:
-	graphEdge(vertex *, char *, edgeType);
+	graphEdge(vertex *, const char *, edgeType);
 	~graphEdge();	
 	void setNextElement(graphEdge *);
 	graphEdge * getNextElement();

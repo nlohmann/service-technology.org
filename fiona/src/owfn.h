@@ -136,8 +136,9 @@ class oWFN  {
 		owfnTransition ** stubbornfirelistdeadlocks();  	// returns transitions to be fired for
 								// reduced state space that preserves deadlocks
 		owfnTransition ** stubbornfirelistmessage(owfnPlace *);
+		owfnTransition ** stubbornfirelistmessage(messageMultiSet);
 								// returns transitions to be fired for
-								// reduced state space for message
+								// reduced state space for message (or messages)
 								// successors
 #endif
 
@@ -150,6 +151,7 @@ class oWFN  {
 		void addSuccStatesToList(vertex *, State *);
 		
 		void addSuccStatesToListStubborn(StateSet &, owfnPlace * , State *, vertex *);
+		void addSuccStatesToListStubborn(StateSet &, messageMultiSet, State *, vertex *);
 		
 		void addSuccStatesToListOrig(vertex *, State *);
 		
@@ -164,9 +166,11 @@ class oWFN  {
 		
 		unsigned int * copyCurrentMarking();
 		void copyMarkingToCurrentMarking(unsigned int * copy);
-		void calculateReachableStatesOutputEvent(vertex *, bool, owfnPlace *);
+		void calculateReachableStatesOutputEvent(vertex *);
 		void calculateReachableStatesInputEvent(vertex *, bool);
 		void calculateReachableStates(StateSet&, owfnPlace *, vertex *);
+		void calculateReachableStates(StateSet&, messageMultiSet, vertex *); 
+		
 		void calculateReachableStatesFull(vertex *);
 		
 		void addInputMessage(unsigned int);

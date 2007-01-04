@@ -43,9 +43,11 @@
 //!      his copy. graphEdge will in turn dealloc _its_ copy.
 //! \param typeP type of this edge (receiving, sending)
 //! \brief constructor
-graphEdge::graphEdge(vertex * nodeP, char * labelP, edgeType typeP) {
+graphEdge::graphEdge(vertex * nodeP, const char * labelP, edgeType typeP) {
 	node = nodeP;
-	label = strdup(labelP);
+	if (labelP) {
+		label = strdup(labelP);
+	}
 	type = typeP; 
 	nextElement = NULL;	
 }

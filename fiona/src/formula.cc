@@ -35,6 +35,7 @@
 
 #include "mynew.h"
 #include "formula.h"
+#include "debug.h"
 #include <cassert>
 
 unsigned int atomicformula::counttype(FType) {
@@ -132,7 +133,11 @@ unarybooleanformula::unarybooleanformula(FType t, formula * l) {
 
 unarybooleanformula::~unarybooleanformula()
 {
+	trace(TRACE_5, "unarybooleanformula::~unarybooleanformula() : start\n");
+	
     delete sub;
+    
+    trace(TRACE_5, "unarybooleanformula::~unarybooleanformula() : end\n");
 }
 
 binarybooleanformula::binarybooleanformula(FType t, formula * l, formula * r) {
@@ -149,12 +154,14 @@ binarybooleanformula::~binarybooleanformula()
 
 booleanformula::~booleanformula()
 {
+	trace(TRACE_5, "booleanformula::~booleanformula() : start\n");
     for (size_t isub = 0; isub != cardsub; ++isub)
     {
         delete sub[isub];
     }
 
     delete[] sub;
+    trace(TRACE_5, "booleanformula::~booleanformula() : end\n");
 }
 
 bool atomicformula::init(unsigned int * CurrentMarking) {

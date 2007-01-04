@@ -112,9 +112,6 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * cur
 //! \param node current node of the graph
 //! \brief builds up the graph recursively
 void interactionGraph::buildGraph(vertex * currentNode) {
-
-	unsigned int elementInput = 0;
-	unsigned int elementOutput = 0;
 	
 	setOfMessages inputSet;
 	setOfMessages outputSet;
@@ -450,9 +447,8 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 //! \param inputMessages
 //! \brief creates a list of all output messages of the current node
 setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessages & inputMessages) {
-#ifdef DEBUG
-	cout << "interactionGraph::combineReceivingEvents(vertex * node): start" << endl;
-#endif
+	
+	trace(TRACE_5, "interactionGraph::combineReceivingEvents(vertex * node): start\n");
 
 	std::vector<StateSet::iterator> statesVector; 	// remember those states that activate an output event
 	
@@ -465,7 +461,9 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 	bool found = false;
 	bool skip = false;
 	
-	for (iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
+	if (!options[O_CALC_ALL_STATES]) { // in case of the state reduced graph
+	
+		for (iter = PN->setOfStatesTemp.begin(); iter != PN->setOfStatesTemp.end(); iter++) {
 
 		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {  // we just consider the maximal states only
 
@@ -583,10 +581,132 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 		}
 		
 	}
+	} else {
+		for (iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
+
+		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {  // we just consider the maximal states only
+
+#ifdef DEBUG
+	cout << "\t state "<< (*iter) << " activates the output events: " << endl;
+#endif		
+			unsigned int i = 0;
+			clause * cl = new clause();			// create a new clause for this particular state
+
+			// "receiving before sending" reduction rule
+			while (!stateActivatesOutputEvents(*iter) && 
+						(*iter)->quasiFirelist && 
+						(*iter)->quasiFirelist[i]) {
+				
+				for (std::set<unsigned int>::iterator index = (*iter)->quasiFirelist[i]->messageSet.begin();
+							index != (*iter)->quasiFirelist[i]->messageSet.end();
+							index++) {
+
+					messageMultiSet input;				// multiset holding one input message
+					input.insert(*index);
+					
+					inputMessages.insert(input);
+					
+					cl->addLiteral(PN->Places[*index]->name);
+				}
+				i++;
+			}			
+			
+			messageMultiSet outputMessages;		// multiset of all input messages of the current state
+			
+			(*iter)->decode(PN);
+			
+			for (i = 0; i < PN->getPlaceCnt(); i++) {
+				
+				if (PN->Places[i]->type == OUTPUT && PN->CurrentMarking[i] > 0) {	
+					for (unsigned int z = 0; z < PN->CurrentMarking[i]; z++) {			
+						outputMessages.insert(i);
+					}
+					
+					found = true;	
+#ifdef DEBUG
+	cout << "\t\t" << PN->Places[i]->name << endl;
+#endif
+				}	
+			}
+			
+			bool subset = false;
+			bool supset = false;
+			
+			char * label;
+			
+			if (found) {
+				
+				for (setOfMessages::iterator iter1 = listOfOutputMessageLists.begin(); 
+					iter1 != listOfOutputMessageLists.end();
+					iter1++) {
+					
+					subset = false;
+			
+					for (messageMultiSet::iterator tmp2 = (*iter1).begin(); tmp2 != (*iter1).end(); tmp2++) {
+						if (outputMessages.count(*tmp2) >= (*iter1).count(*tmp2)) {
+							subset = true;
+						} else {
+							subset = false;
+							break;
+						}
+					}
+					
+					if (subset) {
+						label = PN->createLabel(*iter1);
+						break;
+					}
+				}
+				
+				
+				if (!subset) {
+					for (setOfMessages::iterator iter1 = listOfOutputMessageLists.begin(); 
+						iter1 != listOfOutputMessageLists.end();
+						iter1++) {
+				
+						supset = false;
+					
+						for (messageMultiSet::iterator tmp2 = outputMessages.begin(); tmp2 != outputMessages.end(); tmp2++) {
+							if (outputMessages.count(*tmp2) <= (*iter1).count(*tmp2)) {
+								supset = true;
+							} else {
+								supset = false;
+								break;
+							}
+						}
+						if (supset) {
+							listOfOutputMessageLists.erase(iter1);
+							label = PN->createLabel(outputMessages);
+							break;
+						}
+					}
+					
+					if (supset) {
+						cl->addLiteral(label);	
+						listOfOutputMessageLists.insert(outputMessages);
+					}	
+				} else {
+					cl->addLiteral(label);	
+				}
+    			
+				if (!subset && !supset) {
+					listOfOutputMessageLists.insert(outputMessages);
+					cl->addLiteral(PN->createLabel(outputMessages));
+				} 
+				
+				found = false;
+				skip = false;
+			}
+			node->addClause(cl, (*iter)->type == FINALSTATE); 	// attach the new clause to the node
+		}
+		
+	}		
+	}
+
+	trace(TRACE_5, "interactionGraph::combineReceivingEvents(vertex * node): end\n");
 
     /* check the set of output-messages for containing subsets */
     /* e.g. the set contains [a, b] and [a, b, c] */
-    /* [a, b] is subset of [a, b, c], therefore the set [a, b, c] gets removed */
+    /* [a, b] is subset of [a, b, c], therefore the set [a, b, c] is removed */
     
    	return listOfOutputMessageLists;		
 }
@@ -641,7 +761,7 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 
 	trace(TRACE_5, "number of input events: " + intToString(inputMessages.size()) + "\n" );
 	trace(TRACE_5, "interactionGraph::receivingBeforeSending(vertex * node): end\n");
-   	return inputMessages;							// return the new state list	
+   	return inputMessages;   // return the list of activated input messages
 }
 
 //! \fn bool interactionGraph::terminateBuildingGraph(vertex * node) 
@@ -697,7 +817,7 @@ void interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, vert
 			if (options[O_CALC_ALL_STATES]) {
 				PN->calculateReachableStatesFull(node);	// calc the reachable states from that marking
 			} else {
-				PN->calculateReachableStatesOutputEvent(node, false, outputPlace);	// calc the reachable states from that marking
+				PN->calculateReachableStatesOutputEvent(node);	// calc the reachable states from that marking
 			}
 		}
 	}

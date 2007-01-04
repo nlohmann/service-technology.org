@@ -52,10 +52,14 @@ owfnPlace::owfnPlace(char * name, placeType _type, oWFN * _net) :
 //! \fn owfnPlace::~owfnPlace()
 //! \brief constructor
 owfnPlace::~owfnPlace() {
+	trace(TRACE_5, "owfnPlace::~owfnPlace() : start\n");
+	
     // delete the array with all propositions (atomicformulas) which mention
     // this place. The propositions themselves are deleted by the class oWFN
     // that recursively deletes its FinalCondition.
     delete[] proposition;
+
+	trace(TRACE_5, "owfnPlace::~owfnPlace() : end\n");
 }
 
 void owfnPlace::operator += (unsigned int i)

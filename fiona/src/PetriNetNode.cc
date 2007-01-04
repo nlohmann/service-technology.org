@@ -33,6 +33,7 @@
  
 #include "mynew.h"
 #include "petriNetNode.h"
+#include "debug.h"
 
 inline void Node::NewArriving(Arc & a) {
   Arc ** Old = ArrivingArcs;
@@ -59,6 +60,8 @@ inline void Node::NewLeaving(Arc & a) {
 }
 
 Node::~Node() {
+	trace(TRACE_5, "Node::~Node() : start\n");
+	
   delete [] name;
 
   // Transitions and places share pointers to the same arcs because every
@@ -73,6 +76,8 @@ Node::~Node() {
   delete [] ArrivingArcs;
 
   delete [] LeavingArcs;
+
+	trace(TRACE_5, "Node::~Node() : end\n");
 }
 
 Node::Node(char * n) : NrOfArriving(0), NrOfLeaving(0)

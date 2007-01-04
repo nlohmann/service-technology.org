@@ -556,14 +556,6 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
 	    		}
 		}
     } else {
-//    	owfnPlace * outputPlace = NULL;
-//    
-//		// CHANGE THAT!!!!!!!!!!! is just a hack, stubborn set method does not yet work for more than one output event!
-//		for (messageMultiSet::iterator iter = output.begin(); iter != output.end(); iter++) {
-//			outputPlace = PN->Places[*iter];
-//		}
-//        // end hack
-
 		StateSet stateSet;
 
 		for (StateSet::iterator iter = node->reachGraphStateSet.begin(); 

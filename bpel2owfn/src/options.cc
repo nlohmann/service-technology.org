@@ -29,13 +29,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/01/04 19:56:43 $
+ * \date    \$Date: 2007/01/04 20:22:41 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.65 $
+ * \version \$Revision: 1.66 $
  */
 
 
@@ -492,7 +492,7 @@ void parse_command_line(int argc, char* argv[])
     if (!(fin = fopen(file->c_str(), "r")))
     {
 	    trace(TRACE_ALWAYS, "File '" + *file + "' not found.\n");
-            exit(1);
+        exit(1);
     }
     fclose(fin);
     file++;
@@ -501,7 +501,7 @@ void parse_command_line(int argc, char* argv[])
       if (!(fin = fopen(file->c_str(), "r")))
       {
 	    trace(TRACE_ALWAYS, "File '" + *file + "' not found.\n");
-            exit(1);
+        exit(1);
       }
       else
       {
@@ -523,7 +523,10 @@ void parse_command_line(int argc, char* argv[])
     if ( not(options[O_INPUT]) )
     {
 	  output_filename = "stdof"; 
-    } else {
+      trace(TRACE_ALWAYS, "Output filename set to standard: stdof\n");
+    } 
+    else 
+    {
       list< string >::iterator file = inputfiles.begin();
       unsigned int pos = file->rfind(".bpel", file->length());
       if (pos == (file->length() - 5))
@@ -537,7 +540,7 @@ void parse_command_line(int argc, char* argv[])
         unsigned int pos2 = file->rfind("/", file->length());
         if (pos == (file->length() - 5))
         {
-	  output_filename += "_" + file->substr(pos2 + 1, pos - pos2 - 1);
+	      output_filename += "_" + file->substr(pos2 + 1, pos - pos2 - 1);
         }
         file++;
       }

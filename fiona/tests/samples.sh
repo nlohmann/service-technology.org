@@ -241,6 +241,135 @@ fi
 
 result=`expr $result + $mycoffeecontrol + $mycoffeebluenodes + $mycoffeeblueedges + $mycoffeestoredstates`
 
+
+############################################################################
+# IG
+############################################################################
+
+mycoffeebluenodes_soll=5
+mycoffeeblueedges_soll=5
+mycoffeestoredstates_soll=12
+
+echo running $FIONA -n $DIR/myCoffee.owfn -a -t IG
+OUTPUT=`$FIONA -n $DIR/myCoffee.owfn -a -t IG  2>&1`
+
+echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+mycoffeecontrol=$?
+
+echo $OUTPUT | grep "number of blue nodes: $mycoffeebluenodes_soll" > /dev/null
+mycoffeebluenodes=$?
+
+echo $OUTPUT | grep "number of blue edges: $mycoffeeblueedges_soll" > /dev/null
+mycoffeeblueedges=$?
+
+echo $OUTPUT | grep "number of states stored in nodes: $mycoffeestoredstates_soll" > /dev/null
+mycoffeestoredstates=$?
+
+if [ $mycoffeecontrol -ne 0 -o $mycoffeebluenodes -ne 0 -o $mycoffeeblueedges -ne 0 -o $mycoffeestoredstates -ne 0 ]
+then
+echo   ... failed to build IG correctly
+fi
+
+result=`expr $result + $mycoffeecontrol + $mycoffeebluenodes + $mycoffeeblueedges + $mycoffeestoredstates`
+
+############################################################################
+# reduced IG
+############################################################################
+
+mycoffeebluenodes_soll=5
+mycoffeeblueedges_soll=5
+mycoffeestoredstates_soll=12
+
+echo running $FIONA -n $DIR/myCoffee.owfn -a -r -t IG
+OUTPUT=`$FIONA -n $DIR/myCoffee.owfn -a -r -t IG  2>&1`
+
+echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+mycoffeecontrol=$?
+
+echo $OUTPUT | grep "number of blue nodes: $mycoffeebluenodes_soll" > /dev/null
+mycoffeebluenodes=$?
+
+echo $OUTPUT | grep "number of blue edges: $mycoffeeblueedges_soll" > /dev/null
+mycoffeeblueedges=$?
+
+echo $OUTPUT | grep "number of states stored in nodes: $mycoffeestoredstates_soll" > /dev/null
+mycoffeestoredstates=$?
+
+if [ $mycoffeecontrol -ne 0 -o $mycoffeebluenodes -ne 0 -o $mycoffeeblueedges -ne 0 -o $mycoffeestoredstates -ne 0 ]
+then
+echo   ... failed to build reduced IG correctly
+fi
+
+result=`expr $result + $mycoffeecontrol + $mycoffeebluenodes + $mycoffeeblueedges + $mycoffeestoredstates`
+
+############################################################################
+# reduced IG
+############################################################################
+
+mycoffeebluenodes_soll=5
+mycoffeeblueedges_soll=5
+mycoffeestoredstates_soll=5
+mycoffeestates_soll=19
+
+echo running $FIONA -n $DIR/myCoffee.owfn -r -t IG
+OUTPUT=`$FIONA -n $DIR/myCoffee.owfn -r -t IG  2>&1`
+
+echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+mycoffeecontrol=$?
+
+echo $OUTPUT | grep "number of states calculated: $mycoffeestates_soll" > /dev/null
+mycoffeestates=$?
+
+echo $OUTPUT | grep "number of blue nodes: $mycoffeebluenodes_soll" > /dev/null
+mycoffeebluenodes=$?
+
+echo $OUTPUT | grep "number of blue edges: $mycoffeeblueedges_soll" > /dev/null
+mycoffeeblueedges=$?
+
+echo $OUTPUT | grep "number of states stored in nodes: $mycoffeestoredstates_soll" > /dev/null
+mycoffeestoredstates=$?
+
+if [ $mycoffeecontrol -ne 0 -o $mycoffeestates -ne 0 -o $mycoffeebluenodes -ne 0 -o $mycoffeeblueedges -ne 0 -o $mycoffeestoredstates -ne 0 ]
+then
+echo   ... failed to build reduced IG correctly
+fi
+
+result=`expr $result + $mycoffeecontrol + $mycoffeebluenodes + $mycoffeeblueedges + $mycoffeestoredstates`
+
+############################################################################
+# IG with node reduction
+############################################################################
+
+mycoffeebluenodes_soll=5
+mycoffeeblueedges_soll=5
+mycoffeestoredstates_soll=5
+mycoffeestates_soll=19
+
+echo running $FIONA -n $DIR/myCoffee.owfn -t IG
+OUTPUT=`$FIONA -n $DIR/myCoffee.owfn -t IG  2>&1`
+
+echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+mycoffeecontrol=$?
+
+echo $OUTPUT | grep "number of states calculated: $mycoffeestates_soll" > /dev/null
+mycoffeestates=$?
+
+echo $OUTPUT | grep "number of blue nodes: $mycoffeebluenodes_soll" > /dev/null
+mycoffeebluenodes=$?
+
+echo $OUTPUT | grep "number of blue edges: $mycoffeeblueedges_soll" > /dev/null
+mycoffeeblueedges=$?
+
+echo $OUTPUT | grep "number of states stored in nodes: $mycoffeestoredstates_soll" > /dev/null
+mycoffeestoredstates=$?
+
+if [ $mycoffeecontrol -ne 0 -o $mycoffeestates -ne 0 -o $mycoffeebluenodes -ne 0 -o $mycoffeeblueedges -ne 0 -o $mycoffeestoredstates -ne 0 ]
+then
+echo   ... failed to build IG with node reduction correctly
+fi
+
+result=`expr $result + $mycoffeecontrol + $mycoffeebluenodes + $mycoffeeblueedges + $mycoffeestoredstates`
+
 ############################################################################
 
 keescoffee1bluenodes_soll=9

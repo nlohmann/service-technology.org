@@ -546,8 +546,6 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
 		trace(TRACE_2, "\n");
 	}      
         
-	trace(TRACE_2, " "); // just for nothing, but why do we need this?! otherwise, the IG computed under Win differs from the one computed under linux
-
     if (options[O_CALC_ALL_STATES]) {
 		for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
 	    		(*iter)->decode(PN);

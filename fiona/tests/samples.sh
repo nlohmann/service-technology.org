@@ -159,7 +159,7 @@ result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges + $shop
 
 shop6bluenodes_soll=6
 shop6blueedges_soll=5
-shop6storedstates_soll=3863 #2491
+shop6storedstates_soll=2491 #3863
 
 echo running $FIONA -n $DIR/06-03-23_BPM06_shop_sect_6.owfn -a -t IG
 OUTPUT=`$FIONA -n $DIR/06-03-23_BPM06_shop_sect_6.owfn -a -t IG  2>&1`

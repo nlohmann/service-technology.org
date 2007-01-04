@@ -29,13 +29,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/01/01 12:52:05 $
+ * \date    \$Date: 2007/01/04 19:56:43 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.64 $
+ * \version \$Revision: 1.65 $
  */
 
 
@@ -262,7 +262,6 @@ void parse_command_line(int argc, char* argv[])
 
   validFormats[pair<possibleModi,possibleFormats>(M_CFG,F_DOT)] = true;
 
-
   // the programme's name on the commandline
   string progname = string(argv[0]);
 
@@ -307,17 +306,17 @@ void parse_command_line(int argc, char* argv[])
 		    modus = M_CFG;
 		  else  {
 		    trace(TRACE_ALWAYS, "Unknown mode \"" + parameter+ "\".\n");
-		    trace(TRACE_ALWAYS, "Use -h to get a list of valid modes.\n");		    
+		    trace(TRACE_ALWAYS, "Use -h to get a list of valid modes.\n");
 		    cleanup();
 		    exit(1);
 		  }
-		  
+
 		  if (options[O_MODE] && modus != old_modus) {
 		    trace(TRACE_ALWAYS, "Multiple modes are given, please choose only one!\n");
 		    cleanup();
 		    exit(1);
 		  }
-		  
+
 		  options[O_MODE] = true;
 
 		  break;
@@ -346,7 +345,7 @@ void parse_command_line(int argc, char* argv[])
           cleanup();
 		  exit(1);
 		}
-		
+
 		options[O_OUTPUT] = true;
 
 		if (optarg != NULL)
@@ -382,11 +381,11 @@ void parse_command_line(int argc, char* argv[])
 		  formats[F_XML] = true;
 		else {
 		  trace(TRACE_ALWAYS, "Unknown format \"" + parameter +"\".\n");
-		  trace(TRACE_ALWAYS, "Use -h to get a list of valid formats.\n");		    
+		  trace(TRACE_ALWAYS, "Use -h to get a list of valid formats.\n");
     	  cleanup();
 		  exit(1);
         }
-        
+
 		break;
 	      }
 
@@ -417,11 +416,11 @@ void parse_command_line(int argc, char* argv[])
 		  parameters[P_LOOPCONTROL] = true;
 		else {
 		  trace(TRACE_ALWAYS, "Unknown parameter \"" + parameter +"\".\n");
-		  trace(TRACE_ALWAYS, "Use -h to get a list of valid parameters.\n");		    
+		  trace(TRACE_ALWAYS, "Use -h to get a list of valid parameters.\n");
     	  cleanup();
 		  exit(1);
 		}
-		
+
 		break;
 	      }
 
@@ -444,25 +443,24 @@ void parse_command_line(int argc, char* argv[])
 		  debug_level = TRACE_VERY_DEBUG;
 		else {
 		  trace(TRACE_ALWAYS, "Unrecognised debug mode: \"" + parameter +"\"!\n");
-		  trace(TRACE_ALWAYS, "Use -h to get a list of valid debug modes.\n");		    
+		  trace(TRACE_ALWAYS, "Use -h to get a list of valid debug modes.\n");
     	  cleanup();
 		  exit(1);
         }
-        
+
 		break;
 	      }
 
       default:
 	      {
 		trace("Unknown option!\n");
-        trace(TRACE_ALWAYS, "Use -h to get a list of valid options.\n");		    
+        trace(TRACE_ALWAYS, "Use -h to get a list of valid options.\n");
     	cleanup();
 		exit(1);
 		break;
 	      }
       }
   }
-
 
   // print help and exit
   if (options[O_HELP])
@@ -521,22 +519,29 @@ void parse_command_line(int argc, char* argv[])
   // set output file name if non is already chosen
   if ((options[O_OUTPUT] || options[O_LOG]) && (output_filename == ""))
   {
-    list< string >::iterator file = inputfiles.begin();
-    unsigned int pos = file->rfind(".bpel", file->length());
-    if (pos == (file->length() - 5))
+    // set output file name to a standard output filename in case of no inputfiles
+    if ( not(options[O_INPUT]) )
     {
-      output_filename = file->substr(0, pos);
-    }
-    file++;
-    while(modus == M_CONSISTENCY && file != inputfiles.end())
-    {
+	  output_filename = "stdof"; 
+    } else {
+      list< string >::iterator file = inputfiles.begin();
       unsigned int pos = file->rfind(".bpel", file->length());
-      unsigned int pos2 = file->rfind("/", file->length());
       if (pos == (file->length() - 5))
       {
-	output_filename += "_" + file->substr(pos2 + 1, pos - pos2 - 1);
+        output_filename = file->substr(0, pos);
       }
       file++;
+      while(modus == M_CONSISTENCY && file != inputfiles.end())
+      {
+        unsigned int pos = file->rfind(".bpel", file->length());
+        unsigned int pos2 = file->rfind("/", file->length());
+        if (pos == (file->length() - 5))
+        {
+	  output_filename += "_" + file->substr(pos2 + 1, pos - pos2 - 1);
+        }
+        file++;
+      }
+    
     }
   }
 

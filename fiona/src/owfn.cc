@@ -100,23 +100,14 @@ oWFN::~oWFN() {
 
 	delete[] binHashTable;
 	
-//	cout << "deleted binHashTable" << endl;
-//	cout << "placeCnt: " << placeCnt << endl;
 	for(unsigned int i = 0; i < placeCnt; i++) {
-//		cout << "i: " << i << endl;
-//		cout << "Places[i]: " << Places[i] << endl;
 		if (Places[i]) {
 			delete Places[i];
-//			cout << "deleted" << endl;
 		}
 		Places[i] = NULL;
 	}	
 	
-//	cout << "all places deleted in array" << endl;
-
 	delete[] Places;
-	
-//	cout << "deleted Places" << endl;
 	
 	for(unsigned int i = 0; i < transCnt; i++) {
 		if (Transitions[i]) {
@@ -432,8 +423,9 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, messageMultiSet mess
 		
 		// add successors
 		for(unsigned int i = 0; i < currentState->CardStubbornFireList; i++) {
-			if (n->addState(currentState->succ[i])) {	// add current successor
-				// its successors need only be added if state was not yet in current node
+			// test if successor state has not yet been added to the state set
+			if (stateSet.find(currentState->succ[i]) == stateSet.end()) {
+				// its successors need only be added if state was not yet in current state set
 				addSuccStatesToListStubborn(stateSet, messages, currentState->succ[i], n);
 			}
 		}
@@ -492,14 +484,13 @@ void oWFN::computeAnnotationOutput(vertex * node, State * currentState) {
 }
 
 
-//! \fn void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned int * markingPreviousState, bool isCurrentMarking)
+//! \fn void oWFN::computeAnnotationInput(vertex * node, State * currentState, bool isCurrentMarking)
 //! \param node the node that is calculated
 //! \param currentState the state for which the appropriate clause is to be created if this state is DL or FS
-//! \param markingPreviousState the marking of the parent state, needed to check whether this state needs to be added to the node's states
 //! \param isCurrentMarking flag, whether this state is the currentMarking or not
 //! \brief computes the CNF of the current node starting with the currentState, goes recursively through
 //! all of its successor states 
-void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned int * markingPreviousState, bool isCurrentMarking) {
+void oWFN::computeAnnotationInput(vertex * node, State * currentState, bool isCurrentMarking) {
 	trace(TRACE_5, "oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned int * markingPreviousState): start\n");
 	
 	unsigned int * marking = NULL;
@@ -519,7 +510,7 @@ void oWFN::computeAnnotationInput(vertex * node, State * currentState, unsigned 
 		marking = copyCurrentMarking();	// save the marking of the current state since it is the parent state of its successors
 		for (unsigned int i = 0; i < currentState->CardFireList; i++) {
 			if (currentState->succ[i]) {
-				computeAnnotationInput(node, currentState->succ[i], marking, false);
+				computeAnnotationInput(node, currentState->succ[i], false);
 			}
 		}
 		if (marking) {
@@ -665,11 +656,11 @@ void oWFN::calculateReachableStatesOutputEvent(vertex * n) {
       			NewState->firelist = stubbornfirelistdeadlocks();
 	      		NewState->CardFireList = CardFireList;
 	      		if (parameters[P_IG]) {
-			    if (NewState->quasiFirelist) {
-				delete [] NewState->quasiFirelist;
-				NewState->quasiFirelist = NULL;
-			    }
-			    NewState->quasiFirelist = quasiFirelist();
+				    if (NewState->quasiFirelist) {
+						delete [] NewState->quasiFirelist;
+						NewState->quasiFirelist = NULL;
+				    }
+			    	NewState->quasiFirelist = quasiFirelist();
 	      		}
 	      		NewState->current = 0;
 	      		NewState->parent = CurrentState;
@@ -733,7 +724,7 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	if (CurrentState != NULL) {
 		// marking already has a state -> put it (and all its successors) into the node
 		if (n->addState(CurrentState)) {
-			computeAnnotationInput(n, CurrentState, NULL, true);
+			computeAnnotationInput(n, CurrentState, true);
 		}
 		trace(TRACE_5, "oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal): end\n");
 		return;
@@ -768,7 +759,7 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	setOfStatesTemp.insert(CurrentState);
 	
 	n->addState(CurrentState);
-	computeAnnotationInput(n, CurrentState, NULL, true);
+	computeAnnotationInput(n, CurrentState, true);
 	  	
 	// building EG in a node
   	while(CurrentState) {
@@ -799,7 +790,7 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 		  		// Current marking already in bintree 
 				trace(TRACE_5, "Current marking already in bintree \n");
 				
-				computeAnnotationInput(n, NewState, tempCurrentMarking, true);
+				computeAnnotationInput(n, NewState, true);
 				
 				copyMarkingToCurrentMarking(tempCurrentMarking);
 				
@@ -840,7 +831,7 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 	      		CurrentState->succ[CurrentState->current] = NewState;
 	      		CurrentState = NewState;
 		      		
-				computeAnnotationInput(n, NewState, tempCurrentMarking, true);
+				computeAnnotationInput(n, NewState, true);
 				
 				if (tempCurrentMarking) {
 					delete[] tempCurrentMarking;
@@ -867,9 +858,10 @@ void oWFN::calculateReachableStatesInputEvent(vertex * n, bool minimal) {
 
 //! \fn void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, vertex * n)
 //! \param stateSet set of states
-//! \param outputPlace
-//! \param n
-//! \brief 
+//! \param outputPlace the output place of the net that is associated with the receiving event for which the new vertex is calculated
+//! \param n new vertex 
+//! \brief calculates the set of states reachable from the current marking and stores them in the new vertex
+//! this function is for the full IG and the OG since a single output place is considered
 void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, vertex * n) {
 
 	// calculates the EG starting at the current marking
@@ -1054,9 +1046,10 @@ void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace,
 
 //! \fn void oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, vertex * n)
 //! \param stateSet set of states
-//! \param outputPlace
-//! \param n
-//! \brief 
+//! \param outputPlace the output place of the net that is associated with the receiving event for which the new vertex is calculated
+//! \param n new vertex 
+//! \brief calculates the set of states reachable from the current marking and stores them in the new vertex
+//! this function is for the IG only since a multiset of output places is considered
 void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages, vertex * n) {
 
 	// calculates the EG starting at the current marking
@@ -1068,7 +1061,6 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 		trace(TRACE_3, "\t\t\t message bound violated; color of node " + intToString(n->getNumber()) + " set to RED (calculateReachableStates, oben)\n");
 		return;
 	}
-	
 	
 	State * CurrentState;
   	State * NewState;
@@ -1192,17 +1184,17 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 	      		
 	      		NewState->current = 0;
 	      		NewState->parent = CurrentState;
-			if (NewState->succ == NULL) {
-		      		NewState->succ =  new State * [CardFireList+1];
-				for (size_t istate = 0; istate != CardFireList+1; ++istate)
-				{
-					NewState->succ[istate] = NULL;
+				if (NewState->succ == NULL) {
+			      	NewState->succ =  new State * [CardFireList+1];
+					for (size_t istate = 0; istate != CardFireList+1; ++istate)
+					{
+						NewState->succ[istate] = NULL;
+					}
 				}
-			}
 	      		NewState->placeHashValue = placeHashValue;
 	      		NewState->type = typeOfState();
 	      		
-			assert(CurrentState->succ[CurrentState -> current] == NULL);
+				assert(CurrentState->succ[CurrentState -> current] == NULL);
 	      		CurrentState->succ[CurrentState -> current] = NewState;
 	      		CurrentState = NewState;
 		      		

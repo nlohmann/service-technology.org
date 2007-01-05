@@ -500,9 +500,7 @@ void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex *
 	    		}
 		}
     } else {
-    	owfnPlace * outputPlace;
-    
-		outputPlace = PN->Places[output];
+    	owfnPlace * outputPlace = PN->Places[output];
 
 		StateSet stateSet;
 
@@ -514,12 +512,19 @@ void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex *
 			PN->calculateReachableStates(stateSet, outputPlace, newNode);	
 		}
 
+		cout << "-------------------------------------------------------" << endl;
+		cout << "node " << node->getNumber() << " and output event " << outputPlace->name << endl;
+
 		for (StateSet::iterator iter2 = stateSet.begin(); iter2 != stateSet.end(); iter2++) {		
 			(*iter2)->decode(PN); // get the marking of the state
+			
+			cout << PN->getCurrentMarkingAsString() << endl;
+			
 			if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
 				PN->calculateReachableStatesOutputEvent(newNode);   // calc the reachable states from that marking
 			}
 		}
+		cout << "-------------------------------------------------------" << endl;
 	//	binDeleteAll(PN->tempBinDecision);
 		delete PN->tempBinDecision;
     }
@@ -534,7 +539,7 @@ void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex *
 // for IG
 void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) {
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) : start\n");
-    
+
   	PN->setOfStatesTemp.clear();
   	PN->visitedStates.clear();
         
@@ -548,10 +553,10 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
         
     if (options[O_CALC_ALL_STATES]) {
 		for (StateSet::iterator iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
-	    		(*iter)->decode(PN);
-	    		if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
-	        			PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
-	    		}
+    		(*iter)->decode(PN);
+    		if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
+        		PN->calculateReachableStatesFull(newNode);   // calc the reachable states from that marking
+    		}
 		}
     } else {
 		StateSet stateSet;
@@ -566,6 +571,7 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
 
 		for (StateSet::iterator iter2 = stateSet.begin(); iter2 != stateSet.end(); iter2++) {		
 			(*iter2)->decode(PN); // get the marking of the state
+			
 			if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
 				PN->calculateReachableStatesOutputEvent(newNode);   // calc the reachable states from that marking
 			}

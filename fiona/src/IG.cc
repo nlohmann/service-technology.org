@@ -191,7 +191,7 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	
 			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
 			currentVertex = currentNode;
-					
+			
 			calculateSuccStatesOutput(*iter, currentNode, v);
 			
 			if (AddVertex (v, *iter, receiving)) {
@@ -332,9 +332,9 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 
 //! \fn void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages & inputMessages, setOfMessages & outputMessages) {
 //! \param node the node for which the activated input events are calculated
-//! \param inputMessages
-//! \param outputMessages
-//! \brief creates a list of all activated input events (messages) of the current node
+//! \param inputMessages the set of input messages (sending events) that are activated in the current node 
+//! \param outputMessages the set of output messages (receiving events) that are activated in the current node 
+//! \brief creates a list of all activated sending and receiving events (input messages and output messages) of the current node
 void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages & inputMessages, setOfMessages & outputMessages) {
 	trace(TRACE_5, "interactionGraph::getActivatedEventsComputeCNF(vertex * node): start\n");
 
@@ -343,20 +343,20 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 
 	if (!options[O_CALC_ALL_STATES]) { // in case of the state reduced graph
 	
+		// as the current node has been computed a temporal set of states was created
+		// this set of states includes the deadlocks as well
 		for (iter = PN->setOfStatesTemp.begin(); iter != PN->setOfStatesTemp.end(); iter++) {
-	
-			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {	// we just consider the maximal states only
+			// we just consider the maximal states only
+			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {	
 				
 				clause * cl = new clause();			// create a new clause for this particular state
-				
-//				PN->copyMarkingToCurrentMarking((*iter)->myMarking);
-			    (*iter)->decode(PN);
+			    (*iter)->decode(PN);				// get the marking for this state
 
-				if ((*iter)->quasiFirelist) {
+				if ((*iter)->quasiFirelist) {		// delete the list of quasi enabled transitions
 				    delete [] (*iter)->quasiFirelist;
 				    (*iter)->quasiFirelist = NULL;
 				}	    
-				(*iter)->quasiFirelist = PN->quasiFirelist();
+				(*iter)->quasiFirelist = PN->quasiFirelist();	// get the firelist of the quasi enabled transitions
 				
 				i = 0;
 				// get the activated input events
@@ -391,6 +391,8 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 			}
 		}
 	} else {
+		// we calculate the graph with the whole set of states stored in the nodes
+		// so we use the set of states that were actually stored in the node 
 		for (iter = node->reachGraphStateSet.begin(); iter != node->reachGraphStateSet.end(); iter++) {
 	
 	#ifdef DEBUG

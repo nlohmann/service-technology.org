@@ -38,8 +38,7 @@
 #include "CNF.h"
 
 //! \fn vertex::vertex()
-//! \brief constructor for OG nodes
-// for OG
+//! \brief constructor
 vertex::vertex(int numberEvents) :
 			   color(BLUE),
 			   successorNodes(NULL),
@@ -53,7 +52,6 @@ vertex::vertex(int numberEvents) :
 	}
 
 	eventsToBeSeen = numberEvents;
-	
 }
 
 //! \fn vertex::~vertex()
@@ -114,9 +112,7 @@ bool vertex::addSuccessorNode(graphEdge * edge) {
 //! \brief adds the state s to the list of states
 bool vertex::addState(State * s) {
 	pair<StateSet::iterator, bool> result = reachGraphStateSet.insert(s);
-
     return result.second;       // returns whether the element got inserted (true) or not (false)
-	 
 }
 
 //! \fn void vertex::addClause(clause * newClause, bool _isFinalState)

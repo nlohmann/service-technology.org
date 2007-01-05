@@ -160,7 +160,7 @@ class oWFN  {
 
 		bool checkMessageBound();
 		void computeAnnotationOutput(vertex *, State *);
-		void computeAnnotationInput(vertex *, State *, unsigned int *, bool);
+		void computeAnnotationInput(vertex *, State *, bool);
 		
 		State * calculateNextSate();
 		

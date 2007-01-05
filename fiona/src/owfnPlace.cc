@@ -43,8 +43,13 @@
 //! \param _type
 //! \param _net
 //! \brief constructor
-owfnPlace::owfnPlace(char * name, placeType _type, oWFN * _net) : 
-	Node(name), type(_type), index(0), capacity(0), nrbits(0), max_occurence(1), cardprop(0), proposition(NULL) {
+owfnPlace::owfnPlace(char * name, placeType _type, oWFN * _net) :
+    Node(name), type(_type), index(0), capacity(0), nrbits(0),
+    max_occurence(1), cardprop(0), proposition(NULL)
+#ifdef STUBBORN
+    , PreTransitions(NULL)
+#endif
+{
   references = initial_marking = hash_factor = 0;
   net = _net;
 }
@@ -58,6 +63,10 @@ owfnPlace::~owfnPlace() {
     // this place. The propositions themselves are deleted by the class oWFN
     // that recursively deletes its FinalCondition.
     delete[] proposition;
+
+#ifdef STUBBORN
+    delete[] PreTransitions;
+#endif
 
 	trace(TRACE_5, "owfnPlace::~owfnPlace() : end\n");
 }

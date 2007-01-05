@@ -520,7 +520,8 @@ void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex *
 			}
 		}
 	//	binDeleteAll(PN->tempBinDecision);
-	//	delete PN->tempBinDecision;
+		delete PN->tempBinDecision;
+		PN->tempBinDecision = NULL;
     }
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node, vertex * newNode) : end\n");
 }
@@ -572,6 +573,7 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
 		}
 	//	binDeleteAll(PN->tempBinDecision);
 		delete PN->tempBinDecision;
+		PN->tempBinDecision = NULL;
     }
 
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) : end\n");

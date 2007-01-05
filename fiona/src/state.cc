@@ -44,6 +44,7 @@
 State::State() :
 				CardFireList(0),
 				firelist(NULL),
+				stubbornFirelist(NULL),
 				quasiFirelist(NULL),
 				current(0),
 				myMarking(NULL),
@@ -62,6 +63,9 @@ State::State() :
 State::~State() {
     if(firelist) {
 		delete [] firelist;
+    }
+    if(stubbornFirelist) {
+		delete [] stubbornFirelist;
     }
     if(quasiFirelist) {
 		delete [] quasiFirelist;

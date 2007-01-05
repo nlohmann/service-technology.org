@@ -44,7 +44,11 @@ owfnTransition::owfnTransition(char * name) : Node(name),
     labelForMatching(OGFromFileFormulaAssignment::TAU), quasiEnabled(false),
     enabled(false), quasiEnabledNr(0), enabledNr(0), NextEnabled(NULL),
     PrevEnabled(NULL), NextQuasiEnabled(NULL), PrevQuasiEnabled(NULL), 
-	IncrPlaces(NULL), Incr(NULL), DecrPlaces(NULL), Decr(NULL) {
+    IncrPlaces(NULL), Incr(NULL), DecrPlaces(NULL), Decr(NULL)
+#ifdef STUBBORN
+    , conflicting(NULL)
+#endif
+{
 		
 	NrOfArriving = 0;
 	NrOfLeaving = 0;
@@ -59,6 +63,9 @@ owfnTransition::~owfnTransition() {
 	delete[] Decr;
 	delete[] PrePlaces;
 	delete[] Pre;
+#ifdef STUBBORN
+	delete [] conflicting;
+#endif
 
 //	if (ImproveEnabling) {
 //		delete ImproveEnabling;

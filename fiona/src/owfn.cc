@@ -57,6 +57,7 @@ int compare (const void * a, const void * b){
 //! \fn oWFN::oWFN()
 //! \brief constructor
 oWFN::oWFN() : placeCnt(0), arcCnt(0), transCnt(0), filename(NULL),
+               tempBinDecision(NULL),
                placeInputCnt(0), placeOutputCnt(0), FinalCondition(NULL),
                currentState(0), transNrEnabled(0), placeHashValue(0),
                BitVectorSize(0), startOfQuasiEnabledList(NULL),
@@ -120,6 +121,7 @@ oWFN::~oWFN() {
 	delete[] CurrentMarking;
 	delete[] FinalMarking;
 	delete FinalCondition;
+	delete tempBinDecision;
 
 	trace(TRACE_5, "oWFN::~oWFN() : end\n");
 }
@@ -1128,8 +1130,11 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 		
 		trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, vertex * n) : end\n");
 		// nothing else to be done here
+		if (tempCurrentMarking) {
+			delete[] tempCurrentMarking;
+			tempCurrentMarking = NULL;
+		}
 		return ;
-		
 	}
 
 	// building EG in a node
@@ -1214,11 +1219,19 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 					n->setColor(RED);
 					trace(TRACE_3, "\t\t\t message bound violated; color of node " + intToString(n->getNumber()) + " set to RED (calculateReachableStates, during fire)\n");
 					trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, vertex * n) : end\n");
+					if (tempCurrentMarking != NULL) {
+						delete[] tempCurrentMarking;
+						tempCurrentMarking = NULL;
+					}
 					return;
 				}
 
 				bool somePlaceNotMarked = false; // remember if a place is not marked at the current marking
-	
+
+				if (tempCurrentMarking != NULL) {
+					delete[] tempCurrentMarking;
+					tempCurrentMarking = NULL;
+				}
 				tempCurrentMarking = copyCurrentMarking();
 	
 				// shall we save this state? meaning, are the correct output places marked?
@@ -1263,14 +1276,14 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 		}
 	}
 	if (tempCurrentMarking) {
-		delete[] tempCurrentMarking;	
+		delete[] tempCurrentMarking;
+		tempCurrentMarking = NULL;
 	}
 	
 	//binDeleteAll(*tempBinDecision);
 	
 	trace(TRACE_5, "oWFN::calculateReachableStates(StateSet& stateSet, owfnPlace * outputPlace, vertex * n) : end\n");
 	return;
-	
 }
 
 //! \fn void oWFN::calculateReachableStatesFull(vertex * n)

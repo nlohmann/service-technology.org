@@ -25,3 +25,15 @@ TESTS = testSequenceSuite.sh bddtest.sh extrema.sh samples.sh messages.sh \
 TESTS_ENVIRONMENT = testdir=$(top_srcdir)/tests PATH=.:../src:$$PATH
 
 EXTRA_DIST = $(TESTS) cyclic/*.owfn extrema/*.owfn messages/*.owfn samples/*.owfn sequence_suite/*.owfn matching/*.owfn matching/*.og
+
+# Generate check targets from $(TESTS). That is done by removing '.sh' from
+# every word in $(TESTS) and precede them by 'check-'. So one of many check
+# targets would be check-samples if samples.sh was in $(TESTS).
+SINGLE_CHECK_TARGETS = $(TESTS:%.sh=check-%)
+
+# All single check targets. For example check-samples.
+# The script belonging to the current check target is inferred from the
+# name of the target by removing the initial 'check-' and adding '.sh' to
+# the end.
+$(SINGLE_CHECK_TARGETS):
+	-$(TESTS_ENVIRONMENT) ./$(@:check-%=%.sh)

@@ -1107,12 +1107,20 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 		
 	bool somePlaceNotMarked = false; // remember if a place is not marked at the current marking
 	
-	// shall we save this state? meaning, are the correct output places marked?
+	if (tempCurrentMarking) {
+		delete[] tempCurrentMarking;
+		tempCurrentMarking = NULL;
+	}
+		
+	tempCurrentMarking = copyCurrentMarking();
+	
+	// shall we save this state? meaning, are the correct output places all marked?
 	for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
-		if (CurrentMarking[Places[*iter]->index] == 0) {
+		if (tempCurrentMarking[Places[*iter]->index] == 0) {
 			somePlaceNotMarked = true;
 			break;
-		}
+		} 
+		tempCurrentMarking[Places[*iter]->index] -= 1;
 	}
 
 	if (!somePlaceNotMarked) {	// if all places are appropriatly marked, we save this state
@@ -1136,6 +1144,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 				tempCurrentMarking = NULL;
 			}
 				
+			// remember the current marking
 			tempCurrentMarking = copyCurrentMarking();
 			tempPlaceHashValue = placeHashValue;
 				  		
@@ -1147,7 +1156,6 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 		  		// Current marking already in local bintree 
 				trace(TRACE_5, "Current marking already in local bintree \n");
 				
-				
 				bool somePlaceNotMarked = false; // remember if a place is not marked at the current marking
 	
 				// shall we save this state? meaning, are the correct output places marked?
@@ -1156,6 +1164,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 						somePlaceNotMarked = true;
 						break;
 					}
+					CurrentMarking[Places[*iter]->index] -= 1;
 				}
 			
 				if (!somePlaceNotMarked) {	// if all places are appropriatly marked, we save this state
@@ -1165,6 +1174,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 					addSuccStatesToListStubborn(stateSet, messages, NewState, n);
 				}
 					
+				// we don't need the current marking anymore so we step back to the marking before
 				copyMarkingToCurrentMarking(tempCurrentMarking);
 				
 				CurrentState->stubbornFirelist[CurrentState->current]->backfire(this);
@@ -1178,7 +1188,7 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 		   		CurrentState->succ[CurrentState->current] = NewState;
 	     		(CurrentState->current)++;
 	    	} else {
-			trace(TRACE_5, "Current marking new\n");
+				trace(TRACE_5, "Current marking new\n");
       			NewState = binInsert(&tempBinDecision, this);
       			NewState->stubbornFirelist = stubbornfirelistmessage(messages);
 	      		NewState->CardStubbornFireList = CardFireList;
@@ -1209,12 +1219,15 @@ void oWFN::calculateReachableStates(StateSet& stateSet, messageMultiSet messages
 
 				bool somePlaceNotMarked = false; // remember if a place is not marked at the current marking
 	
+				tempCurrentMarking = copyCurrentMarking();
+	
 				// shall we save this state? meaning, are the correct output places marked?
 				for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
-					if (CurrentMarking[Places[*iter]->index] == 0) {
+					if (tempCurrentMarking[Places[*iter]->index] == 0) {
 						somePlaceNotMarked = true;
 						break;
 					}
+					tempCurrentMarking[Places[*iter]->index] -= 1;
 				}
 			
 				if (!somePlaceNotMarked) {	// if all places are appropriatly marked, we save this state

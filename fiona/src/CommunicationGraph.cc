@@ -702,7 +702,7 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
     }
 
     if (parameters[P_SHOW_ALL_NODES]
-        || ( parameters[P_SHOW_NO_RED_NODES] && (v->getColor() != RED))
+        || (parameters[P_SHOW_NO_RED_NODES] && (v->getColor() != RED))
 		|| (!parameters[P_SHOW_NO_RED_NODES] && (v->getColor() == RED))
         || (v->getColor() == BLUE)
         || (v == root)) {
@@ -758,7 +758,7 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
 
             while ((element = v->getNextEdge()) != NULL) {
                 vertex * vNext = element->getNode();
-
+				
                 if (parameters[P_SHOW_ALL_NODES]
                     || (parameters[P_SHOW_NO_RED_NODES] && vNext->getColor() != RED)
                     || (!parameters[P_SHOW_NO_RED_NODES] && vNext->getColor() == RED)

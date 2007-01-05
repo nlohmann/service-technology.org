@@ -38,6 +38,8 @@ rm -f $DIR/*.og
 result=0
 
 ############################################################################
+# OG
+############################################################################
 
 shop3bluenodes_soll=12
 shop3blueedges_soll=15
@@ -61,6 +63,36 @@ shop3storedstates=$?
 if [ $shop3control -ne 0 -o $shop3bluenodes -ne 0 -o $shop3blueedges -ne 0 -o $shop3storedstates -ne 0 ]
 then
 echo   ... failed to build OG correctly
+fi
+
+result=`expr $result + $shop3control + $shop3bluenodes + $shop3blueedges + $shop3storedstates`
+
+############################################################################
+# OG with node reduction
+############################################################################
+
+shop3bluenodes_soll=12
+shop3blueedges_soll=15
+shop3storedstates_soll=236
+
+echo running $FIONA -n $DIR/06-03-23_BPM06_shop_sect_3.owfn -t OG
+OUTPUT=`$FIONA -n $DIR/06-03-23_BPM06_shop_sect_3.owfn -t OG  2>&1`
+
+echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+shop3control=$?
+
+echo $OUTPUT | grep "number of blue nodes: $shop3bluenodes_soll" > /dev/null
+shop3bluenodes=$?
+
+echo $OUTPUT | grep "number of blue edges: $shop3blueedges_soll" > /dev/null
+shop3blueedges=$?
+
+echo $OUTPUT | grep "number of states stored in nodes: $shop3storedstates_soll" > /dev/null
+shop3storedstates=$?
+
+if [ $shop3control -ne 0 -o $shop3bluenodes -ne 0 -o $shop3blueedges -ne 0 -o $shop3storedstates -ne 0 ]
+then
+echo   ... failed to build OG with node reduction correctly
 fi
 
 result=`expr $result + $shop3control + $shop3bluenodes + $shop3blueedges + $shop3storedstates`
@@ -96,6 +128,36 @@ fi
 result=`expr $result + $shop3control + $shop3bluenodes + $shop3blueedges + $shop3storedstates`
 
 ############################################################################
+# reduced IG with node reduction
+############################################################################
+
+shop3bluenodes_soll=11 
+shop3blueedges_soll=13 
+shop3storedstates_soll=83
+
+echo running $FIONA -n $DIR/06-03-23_BPM06_shop_sect_3.owfn -t IG
+OUTPUT=`$FIONA -n $DIR/06-03-23_BPM06_shop_sect_3.owfn -t IG 2>&1`
+
+echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+shop3control=$?
+
+echo $OUTPUT | grep "number of blue nodes: $shop3bluenodes_soll" > /dev/null
+shop3bluenodes=$?
+
+echo $OUTPUT | grep "number of blue edges: $shop3blueedges_soll" > /dev/null
+shop3blueedges=$?
+
+echo $OUTPUT | grep "number of states stored in nodes: $shop3storedstates_soll" > /dev/null
+shop3storedstates=$?
+
+if [ $shop3control -ne 0 -o $shop3bluenodes -ne 0 -o $shop3blueedges -ne 0 -o $shop3storedstates -ne 0 ]
+then
+echo   ... failed to build the IG with node reduction correctly
+fi
+
+result=`expr $result + $shop3control + $shop3bluenodes + $shop3blueedges + $shop3storedstates`
+
+############################################################################
 # IG reduced
 ############################################################################
 
@@ -126,6 +188,38 @@ fi
 result=`expr $result + $shop3control + $shop3bluenodes + $shop3blueedges + $shop3storedstates`
 
 ############################################################################
+# reduced IG with node reduction
+############################################################################
+
+shop3bluenodes_soll=8 
+shop3blueedges_soll=8 
+shop3storedstates_soll=33
+
+echo running $FIONA -n $DIR/06-03-23_BPM06_shop_sect_3.owfn -t IG -r
+OUTPUT=`$FIONA -n $DIR/06-03-23_BPM06_shop_sect_3.owfn -t IG -r 2>&1`
+
+echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+shop3control=$?
+
+echo $OUTPUT | grep "number of blue nodes: $shop3bluenodes_soll" > /dev/null
+shop3bluenodes=$?
+
+echo $OUTPUT | grep "number of blue edges: $shop3blueedges_soll" > /dev/null
+shop3blueedges=$?
+
+echo $OUTPUT | grep "number of states stored in nodes: $shop3storedstates_soll" > /dev/null
+shop3storedstates=$?
+
+if [ $shop3control -ne 0 -o $shop3bluenodes -ne 0 -o $shop3blueedges -ne 0 -o $shop3storedstates -ne 0 ]
+then
+echo   ... failed to build the reduced IG with node reduction correctly
+fi
+
+result=`expr $result + $shop3control + $shop3bluenodes + $shop3blueedges + $shop3storedstates`
+
+############################################################################
+# OG
+############################################################################
 
 shop6bluenodes_soll=7
 shop6blueedges_soll=7
@@ -154,6 +248,36 @@ fi
 result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges + $shop6storedstates`
 
 ############################################################################
+# OG with node reduction ... takes too long (more than a minute!)
+############################################################################
+
+#shop6bluenodes_soll=7
+#shop6blueedges_soll=7
+#shop6storedstates_soll=761
+
+#echo running $FIONA -n $DIR/06-03-23_BPM06_shop_sect_6.owfn -a -t OG
+#OUTPUT=`$FIONA -n $DIR/06-03-23_BPM06_shop_sect_6.owfn -a -t OG  2>&1`
+
+#echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+#shop6control=$?
+
+#echo $OUTPUT | grep "number of blue nodes: $shop6bluenodes_soll" > /dev/null
+#shop6bluenodes=$?
+
+#echo $OUTPUT | grep "number of blue edges: $shop6blueedges_soll" > /dev/null
+#shop6blueedges=$?
+
+#echo $OUTPUT | grep "number of states stored in nodes: $shop6storedstates_soll" > /dev/null
+#shop6storedstates=$?
+
+#if [ $shop6control -ne 0 -o $shop6bluenodes -ne 0 -o $shop6blueedges -ne 0 -o $shop6storedstates -ne 0 ]
+#then
+#echo   ... failed to build OG correctly
+#fi
+
+#result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges + $shop6storedstates`
+
+############################################################################
 # IG
 ############################################################################
 
@@ -179,6 +303,36 @@ shop6storedstates=$?
 if [ $shop6control -ne 0 -o $shop6bluenodes -ne 0 -o $shop6blueedges -ne 0 -o $shop6storedstates -ne 0 ]
 then
 echo   ... failed to build IG correctly
+fi
+
+result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges + $shop6storedstates`
+
+############################################################################
+# IG with node reduction
+############################################################################
+
+shop6bluenodes_soll=6
+shop6blueedges_soll=5
+shop6storedstates_soll=314  
+
+echo running $FIONA -n $DIR/06-03-23_BPM06_shop_sect_6.owfn -t IG
+OUTPUT=`$FIONA -n $DIR/06-03-23_BPM06_shop_sect_6.owfn -t IG 2>&1`
+
+echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+shop6control=$?
+
+echo $OUTPUT | grep "number of blue nodes: $shop6bluenodes_soll" > /dev/null
+shop6bluenodes=$?
+
+echo $OUTPUT | grep "number of blue edges: $shop6blueedges_soll" > /dev/null
+shop6blueedges=$?
+
+echo $OUTPUT | grep "number of states stored in nodes: $shop6storedstates_soll" > /dev/null
+shop6storedstates=$?
+
+if [ $shop6control -ne 0 -o $shop6bluenodes -ne 0 -o $shop6blueedges -ne 0 -o $shop6storedstates -ne 0 ]
+then
+echo   ... failed to build IG with node reduction correctly
 fi
 
 result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges + $shop6storedstates`
@@ -213,6 +367,38 @@ fi
 
 result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges + $shop6storedstates`
 
+############################################################################
+# reduced IG with node reduction
+############################################################################
+
+shop6bluenodes_soll=6
+shop6blueedges_soll=5
+shop6storedstates_soll=146  
+
+echo running $FIONA -n $DIR/06-03-23_BPM06_shop_sect_6.owfn -t IG -r
+OUTPUT=`$FIONA -n $DIR/06-03-23_BPM06_shop_sect_6.owfn -t IG -r 2>&1`
+
+echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+shop6control=$?
+
+echo $OUTPUT | grep "number of blue nodes: $shop6bluenodes_soll" > /dev/null
+shop6bluenodes=$?
+
+echo $OUTPUT | grep "number of blue edges: $shop6blueedges_soll" > /dev/null
+shop6blueedges=$?
+
+echo $OUTPUT | grep "number of states stored in nodes: $shop6storedstates_soll" > /dev/null
+shop6storedstates=$?
+
+if [ $shop6control -ne 0 -o $shop6bluenodes -ne 0 -o $shop6blueedges -ne 0 -o $shop6storedstates -ne 0 ]
+then
+echo   ... failed to build reduced IG with node reduction correctly
+fi
+
+result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges + $shop6storedstates`
+
+############################################################################
+# OG
 ############################################################################
 
 mycoffeebluenodes_soll=7

@@ -512,21 +512,15 @@ void communicationGraph::calculateSuccStatesOutput(unsigned int output, vertex *
 			PN->calculateReachableStates(stateSet, outputPlace, newNode);	
 		}
 
-		cout << "-------------------------------------------------------" << endl;
-		cout << "node " << node->getNumber() << " and output event " << outputPlace->name << endl;
-
 		for (StateSet::iterator iter2 = stateSet.begin(); iter2 != stateSet.end(); iter2++) {		
 			(*iter2)->decode(PN); // get the marking of the state
-			
-			cout << PN->getCurrentMarkingAsString() << endl;
 			
 			if (PN->removeOutputMessage(output)) {      // remove the output message from the current marking
 				PN->calculateReachableStatesOutputEvent(newNode);   // calc the reachable states from that marking
 			}
 		}
-		cout << "-------------------------------------------------------" << endl;
 	//	binDeleteAll(PN->tempBinDecision);
-		delete PN->tempBinDecision;
+	//	delete PN->tempBinDecision;
     }
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(unsigned int output, vertex * node, vertex * newNode) : end\n");
 }
@@ -577,7 +571,7 @@ void communicationGraph::calculateSuccStatesOutput(messageMultiSet output, verte
 			}
 		}
 	//	binDeleteAll(PN->tempBinDecision);
-	//	delete PN->tempBinDecision;
+		delete PN->tempBinDecision;
     }
 
     trace(TRACE_5, "reachGraph::calculateSuccStatesOutput(messageMultiSet output, vertex * node, vertex * newNode) : end\n");

@@ -377,7 +377,8 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, owfnPlace * outputPl
 		
 		// add successors
 		for(unsigned int i = 0; i < currentState->CardStubbornFireList; i++) {
-			if (n->addState(currentState->succ[i])) {	// add current successor
+			// test if successor state has not yet been added to the state set
+			if (stateSet.find(currentState->succ[i]) == stateSet.end()) {
 				// its successors need only be added if state was not yet in current node
 				addSuccStatesToListStubborn(stateSet, outputPlace, currentState->succ[i], n);
 			}

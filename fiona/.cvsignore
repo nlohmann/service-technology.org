@@ -7,6 +7,7 @@ config.log
 config.status
 configure
 *.owfn
+*.og
 *.out
 *.png
 depcomp

@@ -128,6 +128,7 @@ node: ident colon formula
         }
 
         OGToMatch.addNode($1, $3);
+        free($1);
     }
 ;
 
@@ -154,6 +155,7 @@ formula: lpar formula rpar
 | ident
     {
         $$ = new OGFromFileFormulaProposition($1);
+        free($1);
     }
 ;
 
@@ -164,6 +166,7 @@ initialnode: key_initialnode ident
         }
 
         OGToMatch.setRootToNodeWithName($2);
+        free($2);
     }
     semicolon
 ;
@@ -187,5 +190,8 @@ transition: ident arrow ident colon ident
         }
 
         OGToMatch.addTransition($1, $3, $5);
+        free($1);
+        free($3);
+        free($5);
     }
 ;

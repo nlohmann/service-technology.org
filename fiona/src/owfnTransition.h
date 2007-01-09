@@ -45,7 +45,7 @@ class owfnTransition : public Node {
     private:
         std::string labelForMatching;
 	public:
-		owfnTransition(char *);
+		owfnTransition(const std::string&);
 		~owfnTransition();
 	
 		bool quasiEnabled;

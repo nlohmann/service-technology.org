@@ -1,5 +1,6 @@
 /*****************************************************************************
- * Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Karsten Wolf       *
+ * Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Karsten Wolf,      *
+ *                      Jan Bretschneider                                    *
  *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *
@@ -35,93 +36,159 @@
 #define SYMBOLTAB_H
 
 #include "mynew.h"
-#include "petriNetNode.h"
-#include "dimensions.h"
-#include "owfnPlace.h"
-#include "owfnTransition.h"
+#include <map>
+#include <string>
 
+//-------------------------- forward declarations -----------------------------
 class Symbol;
+class PlSymbol;
+class TrSymbol;
+template <typename SymbolType> class SymbolTab;
+class owfnPlace;
+class owfnTransition;
 
+//---------------------------- global variables -------------------------------
+extern SymbolTab<PlSymbol>* PlaceTable;
+extern SymbolTab<TrSymbol>* TransitionTable;
+
+//----------------------------- class SymbolTab -------------------------------
+template <typename SymbolType>
 class SymbolTab
 {
-	public:
-	Symbol ** table;
-	Symbol * lookup(char *);
-	void add(Symbol *);
-	SymbolTab(unsigned int);
-  	~SymbolTab();
-	unsigned int card;
-	unsigned int size;
+private:
+    typedef std::map<std::string, SymbolType*> symbols_t;
+    typedef typename symbols_t::const_iterator const_iterator;
+    typedef typename symbols_t::size_type size_type;
+    symbols_t symbols;
+    const_iterator currentSymbolIter;
+    const_iterator begin() const;
+    const_iterator end() const;
+public:
+    ~SymbolTab();
+    void add(SymbolType*);
+    SymbolType* lookup(const std::string& name) const;
+    size_type getSize() const;
+    void initGetNextSymbol();
+    SymbolType* getNextSymbol();
 
+#undef new
     // Provides user defined operator new. Needed to trace all new operations
     // on this class.
-#undef new
     NEW_OPERATOR(SymbolTab)
 #define new NEW_NEW
 };
 
-extern SymbolTab * PlaceTable, * TransitionTable;
-	
-typedef enum {pl,tr} kinds;
+//------------------------------ class Symbol ---------------------------------
 class Symbol
 {
+private:
+    std::string name;
 public:
-  char * name;
-  kinds kind;
-  Symbol * next;
-  Symbol(char *, SymbolTab *);
-  ~Symbol();
+    Symbol(const std::string&);
+    std::string getName() const;
 
-  // Provides user defined operator new. Needed to trace all new operations
-  // on this class.
+    // Provides user defined operator new. Needed to trace all new operations
+    // on this class.
 #undef new
-  NEW_OPERATOR(Symbol)
+    NEW_OPERATOR(Symbol)
 #define new NEW_NEW
 };
 
+//----------------------------- class PlSymbol --------------------------------
 class PlSymbol: public Symbol
 {
+private:
+    owfnPlace* place;
 public:
-	owfnPlace * place;
-        PlSymbol(owfnPlace *); // LL- places
-        PlSymbol(char *); // HL-places
-  
-  // Provides user defined operator new. Needed to trace all new operations
-  // on this class.
+    PlSymbol(owfnPlace*);
+    owfnPlace* getPlace() const;
+
 #undef new
+    // Provides user defined operator new. Needed to trace all new operations
+    // on this class.
     NEW_OPERATOR(PlSymbl);
 #define new NEW_NEW
 };
 
+//----------------------------- class TrSymbol --------------------------------
 class TrSymbol: public Symbol
 {
+private:
+    owfnTransition* transition;
 public:
-	owfnTransition * transition;
-        TrSymbol(char *);
+    TrSymbol(owfnTransition* transition);
+    owfnTransition* getTransition() const;
 
-  // Provides user defined operator new. Needed to trace all new operations
-  // on this class.
-#undef new        
+#undef new
+    // Provides user defined operator new. Needed to trace all new operations
+    // on this class.
     NEW_OPERATOR(TrSymbol);
 #define new NEW_NEW
 };
 
-class IdList
+//--------- implementation of template functions of class SymbolTab -----------
+template <typename SymbolType>
+SymbolTab<SymbolType>::~SymbolTab()
 {
-	public:
-	char * name;
-	IdList * next;
-};
+    for (typename symbols_t::const_iterator symbolIter = symbols.begin();
+         symbolIter != symbols.end(); ++symbolIter)
+    {
+        delete symbolIter->second;
+    }
+}
 
+template <typename SymbolType>
+void SymbolTab<SymbolType>::add(SymbolType* s)
+{
+    symbols[s->getName()] = s;
+}
+
+template <typename SymbolType>
+SymbolType* SymbolTab<SymbolType>::lookup(const std::string& name) const
+{
+    typename symbols_t::const_iterator foundSymbolIter = symbols.find(name);
+    if (foundSymbolIter == symbols.end()) {
+        return NULL;
+    }
+
+    return foundSymbolIter->second;
+}
+
+template <typename SymbolType>
+typename SymbolTab<SymbolType>::size_type SymbolTab<SymbolType>::getSize() const
+{
+    return symbols.size();
+}
+
+template <typename SymbolType>
+typename SymbolTab<SymbolType>::const_iterator SymbolTab<SymbolType>::begin()
+const
+{
+    return symbols.begin();
+}
+
+template <typename SymbolType>
+typename SymbolTab<SymbolType>::const_iterator SymbolTab<SymbolType>::end()
+const
+{
+    return symbols.end();
+}
+
+template <typename SymbolType>
+void SymbolTab<SymbolType>::initGetNextSymbol()
+{
+    currentSymbolIter = begin();
+}
+
+template <typename SymbolType>
+SymbolType* SymbolTab<SymbolType>::getNextSymbol()
+{
+    if (currentSymbolIter == end()) {
+        return NULL;
+    }
+
+    SymbolType* result = currentSymbolIter->second;
+    ++currentSymbolIter;
+    return result;
+}
 #endif
-
-
-
-
-
-
-
-
-
-
-

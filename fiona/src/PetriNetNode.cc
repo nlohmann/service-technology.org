@@ -61,8 +61,6 @@ inline void Node::NewLeaving(Arc & a) {
 
 Node::~Node() {
 	trace(TRACE_5, "Node::~Node() : start\n");
-	
-  delete [] name;
 
   // Transitions and places share pointers to the same arcs because every
   // arriving arc of a transition is a leaving arc of a place and vice versa.
@@ -80,11 +78,9 @@ Node::~Node() {
 	trace(TRACE_5, "Node::~Node() : end\n");
 }
 
-Node::Node(char * n) : NrOfArriving(0), NrOfLeaving(0), ArrivingArcs(NULL),
-    LeavingArcs(NULL)
+Node::Node(const std::string& n) : name(n), NrOfArriving(0), NrOfLeaving(0),
+    ArrivingArcs(NULL), LeavingArcs(NULL)
 {
-  name = new char [strlen(n) + 1];
-  strcpy(name, n);
 }
 
 inline ostream& operator << (ostream & str,Node n)

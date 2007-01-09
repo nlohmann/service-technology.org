@@ -73,7 +73,6 @@ extern int og_yyparse();
 extern int og_yylex_destroy();
 #endif
 
-extern SymbolTab* GlobalTable;
 extern unsigned int State::card;
 // extern char * netfile;
 extern list<char*> netfiles;
@@ -272,8 +271,8 @@ int main(int argc, char ** argv) {
 		
 				// prepare getting the net
 				try {
-					PlaceTable = new SymbolTab(65536);
-					TransitionTable = new SymbolTab(65536);
+					PlaceTable = new SymbolTab<PlSymbol>;
+					TransitionTable = new SymbolTab<TrSymbol>;
 				}
 				catch(bad_alloc) {
 			        char mess[] = "\nnot enough space to read net\n";
@@ -319,8 +318,6 @@ int main(int argc, char ** argv) {
 				 net != petrinets.end(); net++) {
 				PN = *net;
 				netfile = PN->filename; 
-		
-				GlobalTable = new SymbolTab(1024);
 		
 				numberOfDecodes = 0;
 				garbagefound = 0;
@@ -448,7 +445,6 @@ int main(int argc, char ** argv) {
 				}
 		
 				delete PN;
-				delete GlobalTable;	
 			
 	//			cout << "numberOfDecodes: " << numberOfDecodes << endl;
 			

@@ -42,6 +42,7 @@
 #include <stdlib.h>
 #include <cassert>
 #include <limits.h>
+#include "owfnTransition.h"
 
 using namespace std;
 
@@ -51,7 +52,7 @@ int compare (const void * a, const void * b){
 	owfnPlace *o2 = *((owfnPlace **)(b));
 	assert(o1 != NULL);
 	assert(o2 != NULL);
-	return (strcmp(o1->name,o2->name));
+	return o1->name.compare(o2->name);
 }
 
 //! \fn oWFN::oWFN()
@@ -254,10 +255,11 @@ void oWFN::initializeTransitions() {
 		Transitions[i]->NextQuasiEnabled = (i == transCnt - 1 ? (owfnTransition *) 0 : Transitions[i+1]);
  		Transitions[i]->quasiEnabled = true;
   	}
-  	startOfEnabledList = Transitions[0];
+	startOfEnabledList = (getTransitionCnt() > 0) ? Transitions[0] : NULL;
+
   	transNrEnabled = transCnt;
 
-  	startOfQuasiEnabledList = Transitions[0];
+	startOfQuasiEnabledList = (getTransitionCnt() > 0) ? Transitions[0] : NULL;
   	transNrQuasiEnabled = transCnt; 
   	
 	for(i = 0; i < transCnt; i++) {

@@ -107,8 +107,6 @@ owfnTransition *T;
 Symbol * S;
 PlSymbol * PS;
 TrSymbol * TS;
-SymbolTab * GlobalTable;
-SymbolTab * LocalTable;
 oWFN * PN;					// the petri net
 
 placeType type = INTERNAL;		/* type of place */
@@ -149,7 +147,6 @@ placeType type = INTERNAL;		/* type of place */
 	int value;
 	int * exl;
 	arc_list * al;
-	IdList * idl;
 	owfnPlace * pl;
 	owfnTransition * tr;
 	TrSymbol * ts;
@@ -175,37 +172,32 @@ input:  net {
 }
 ;
 
-net: key_place place_area key_marking {LocalTable = (SymbolTab *) 0;} 
+net: key_place place_area key_marking
 		{
-			unsigned int i,h;
-			Symbol * ss;
-			
-			// Create array of places
-			PN->Places = new owfnPlace * [PlaceTable->card + 10];
-			
-			i = 0;
-		  
-			for(h = 0; h < PlaceTable->size; h++) {
-				for(ss = PlaceTable->table[h]; ss; ss = ss->next) {
-					// Ignore (do not add to PN) external places if oWFN should
-					// be matched with an OG. That is because we match the
-					// reachability graph of the inner of the oWFN with the OG.
-					if (options[O_MATCH] &&
-						((PlSymbol*)ss)->place->type != INTERNAL)
-					{
-						continue;
-					}
+			unsigned int i = 0;
 
-					PN->addPlace(i++, ((PlSymbol *) ss)->place);
+			// Create array of places
+			PN->Places = new owfnPlace * [PlaceTable->getSize()];
+
+			PlSymbol* plSymbol = NULL;
+			PlaceTable->initGetNextSymbol();
+			while ((plSymbol = PlaceTable->getNextSymbol()) != NULL) {
+				// Ignore (do not add to PN) external places if oWFN should
+				// be matched with an OG. That is because we match the
+				// reachability graph of the inner of the oWFN with the OG.
+				if (options[O_MATCH] &&
+					plSymbol->getPlace()->type != INTERNAL)
+				{
+					continue;
 				}
+
+				PN->addPlace(i++, plSymbol->getPlace());
 			}
 			
-			PlaceTable->card = i;
-			
-			PN->CurrentMarking = new unsigned int [PlaceTable->card + 10];
-			PN->FinalMarking = new unsigned int [PlaceTable->card + 10];
+			PN->CurrentMarking = new unsigned int [PlaceTable->getSize()];
+			PN->FinalMarking = new unsigned int [PlaceTable->getSize()];
 	
-		  	for (i = 0; i < PlaceTable->card; i++) {
+		  	for (unsigned int i = 0; i < PlaceTable->getSize(); i++) {
 		  		PN->FinalMarking[i] = 0;
 		  	}
 		  
@@ -214,22 +206,18 @@ net: key_place place_area key_marking {LocalTable = (SymbolTab *) 0;}
 		
 		markinglist semicolon final transitionlist 
 		{
-			unsigned int i,h,j;
-			Symbol * ss;
-
 			// Create array of transitions 
-			PN->Transitions = new owfnTransition * [TransitionTable -> card+10];
-			i = 0;
-			for(h = 0; h < TransitionTable->size; h++) {
-				for(ss = TransitionTable -> table[h];ss;ss = ss -> next) {
-					PN->addTransition(i++, ((TrSymbol *) ss)->transition);
-				}
+			PN->Transitions = new owfnTransition * [TransitionTable->getSize()];
+			unsigned int i = 0;
+			TrSymbol* trSymbol = NULL;
+			TransitionTable->initGetNextSymbol();
+			while ((trSymbol = TransitionTable->getNextSymbol()) != NULL) {
+				PN->addTransition(i++, trSymbol->getTransition());
 			}
-			TransitionTable->card = i;
-			
+
 			// Create arc list of places pass 1 (count nr of arcs)
-			for(i = 0; i < TransitionTable->card; i++) {
-				for(j = 0; j < PN->Transitions[i]->NrOfArriving; j++) {
+			for(unsigned int i = 0; i < PN->getTransitionCnt(); i++) {
+				for(unsigned int j = 0; j < PN->Transitions[i]->NrOfArriving; j++) {
 					owfnPlace* pl = PN->Transitions[i]->ArrivingArcs[j]->pl;
 
 					// Ignore external places if oWFN should be matched with an
@@ -241,7 +229,7 @@ net: key_place place_area key_marking {LocalTable = (SymbolTab *) 0;}
 
 					pl->NrOfLeaving++;
 				}
-				for(j=0;j < PN->Transitions[i]->NrOfLeaving;j++) {
+				for(unsigned int j=0;j < PN->Transitions[i]->NrOfLeaving;j++) {
 					owfnPlace* pl = PN->Transitions[i]->LeavingArcs[j]->pl;
 
 					// Ignore external places if oWFN should be matched with an
@@ -256,7 +244,7 @@ net: key_place place_area key_marking {LocalTable = (SymbolTab *) 0;}
 			}
 		
 			// pass 2 (allocate arc arrays)
-			for(i = 0; i < PlaceTable->card; i++) {
+			for (unsigned int i = 0; i < PN->getPlaceCnt(); i++) {
 				PN->Places[i]->ArrivingArcs = new Arc * [PN->Places[i]->NrOfArriving+10];
 				PN->Places[i]->NrOfArriving = 0;
 				PN->Places[i]->LeavingArcs = new Arc * [PN->Places[i]->NrOfLeaving+10];
@@ -264,8 +252,8 @@ net: key_place place_area key_marking {LocalTable = (SymbolTab *) 0;}
 			}
 		
 			// pass 3 (fill in arcs)
-			for(i = 0; i < TransitionTable->card; i++) {
-				for(j=0; j < PN->Transitions[i]->NrOfLeaving;j++) {
+			for (unsigned int i = 0; i < TransitionTable->getSize(); i++) {
+				for(unsigned int j=0; j < PN->Transitions[i]->NrOfLeaving;j++) {
 					owfnPlace * pl = PN->Transitions[i]->LeavingArcs[j]->pl;
                     if (options[O_MATCH] && pl->type != INTERNAL) {
                         continue;
@@ -277,7 +265,7 @@ net: key_place place_area key_marking {LocalTable = (SymbolTab *) 0;}
 //						PN->commDepth += PN->Transitions[i]->LeavingArcs[j]->Multiplicity;
 //					}
 				}
-				for(j = 0;j < PN->Transitions[i]->NrOfArriving; j++) {
+				for (unsigned int j = 0;j < PN->Transitions[i]->NrOfArriving; j++) {
 					owfnPlace * pl = PN->Transitions[i]->ArrivingArcs[j]->pl;
                     if (options[O_MATCH] && pl->type != INTERNAL) {
                         continue;
@@ -290,7 +278,8 @@ net: key_place place_area key_marking {LocalTable = (SymbolTab *) 0;}
 //					}
 				}
 			}
-			PN->startOfEnabledList = PN->Transitions[0];
+			PN->startOfEnabledList = (PN->getTransitionCnt() > 0) ?
+			                          PN->Transitions[0] : NULL;
 		}
 ;
 
@@ -345,7 +334,7 @@ place: nodeident {
 		owfn_yyerror(error.c_str());
 	}
 	P = new owfnPlace($1, type, PN);
-	PS = new PlSymbol(P);
+	PlaceTable->add(new PlSymbol(P));
 	P->capacity = CurrentCapacity;
 	P->nrbits = CurrentCapacity > 0 ? logzwo(CurrentCapacity) : 32;
 	P->max_occurence = events_manual;
@@ -379,11 +368,13 @@ commands:
     }
 | key_max_occurrences op_eq number commands
     {
-	sscanf($3, "%u", &(PS->place->max_occurence));
-	if (options[O_EVENT_USE_MAX] && PS->place->max_occurence > events_manual) {
-	    PS->place->max_occurence = events_manual;
-	}
-	numberOfEvents += PS->place->max_occurence - events_manual;
+        sscanf($3, "%u", &(PS->getPlace()->max_occurence));
+        if (options[O_EVENT_USE_MAX] &&
+            PS->getPlace()->max_occurence > events_manual)
+        {
+            PS->getPlace()->max_occurence = events_manual;
+        }
+        numberOfEvents += PS->getPlace()->max_occurence - events_manual;
     }
 ;
 
@@ -403,7 +394,7 @@ marking:
 		owfn_yyerror(error.c_str());
 	}
 	sscanf($3,"%u",&i);
-	*(PS->place) += i;
+	*(PS->getPlace()) += i;
 	free($1);
 	free($3);
       } 
@@ -416,7 +407,7 @@ marking:
 		owfn_yyerror(error.c_str());
 	}
 	sscanf("1","%u",&i);
-	*(PS->place) += i;
+	*(PS->getPlace()) += i;
 	free($1);
       }
 ;
@@ -436,7 +427,7 @@ finalmarking:
 		owfn_yyerror(error.c_str());
 	}
 	sscanf($3,"%u",&i);
-	PN->FinalMarking[PS->place->index] = i;
+	PN->FinalMarking[PS->getPlace()->index] = i;
 	free($1);
 	free($3);
       }
@@ -449,7 +440,7 @@ finalmarking:
 		owfn_yyerror(error.c_str());
 	}
 	sscanf("1","%u",&i);
-	PN->FinalMarking[PS->place->index] = i;
+	PN->FinalMarking[PS->getPlace()->index] = i;
 	free($1);
       }
 ;
@@ -468,10 +459,8 @@ transition: key_transition tname key_consume arclist semicolon key_produce arcli
 		string error = "Transition name " + string($2) + " was used twice!";
 		owfn_yyerror(error.c_str());
 	}
-	TS = new TrSymbol($2);
-	T = TS->transition = new owfnTransition(TS->name);	// counter++ in PN
-								// KS: macht Konstruktor von owfnTransition
-	/* 2. Inliste eintragen */
+	T = new owfnTransition($2);	// counter++ in PN
+	TransitionTable->add(new TrSymbol(T));
 
 	/* Anzahl der Boegen */
 	card = 0;
@@ -479,7 +468,7 @@ transition: key_transition tname key_consume arclist semicolon key_produce arcli
 		// Ignore external places if oWFN should be matched with an
 		// OG. That is because we match the reachability graph of
 		// the inner of the oWFN with the OG.
-		if (options[O_MATCH] && current->place->place->type != INTERNAL) {
+		if (options[O_MATCH] && current->place->getPlace()->type != INTERNAL) {
 			continue;
 		}
 
@@ -489,27 +478,28 @@ transition: key_transition tname key_consume arclist semicolon key_produce arcli
 	T->ArrivingArcs = new  Arc * [card+10];
 	/* Schleife ueber alle Boegen */
 	for(current = $4; current; current = current->next) {
-		if (current->place->place->type == OUTPUT) {
+		if (current->place->getPlace()->type == OUTPUT) {
 			string msg = string("Transition '") + T->name + "' reads from "
-				"output place '" + current->place->place->name + "' which is "
-				"not allowed.";
+				"output place '" + current->place->getPlace()->name +
+				"' which is not allowed.";
 			owfn_yyerror(msg.c_str());
 		}
 
-		if (options[O_MATCH] && current->place->place->type != INTERNAL) {
+		if (options[O_MATCH] && current->place->getPlace()->type != INTERNAL) {
 			if (T->hasNonTauLabelForMatching()) {
 				string msg = string("Transition '") + T->name + "' sends or "
 					"receives more than one message which is not allowed.";
 				owfn_yyerror(msg.c_str());
 			}
-			string labelForMatching = string("?") + current->place->place->name;
+			string labelForMatching = string("?") +
+				current->place->getPlace()->name;
 			T->setLabelForMatching(labelForMatching);
 			continue;
 		}
 	/* gibt es Bogen schon? */
 
 		for(i = 0; i < T->NrOfArriving;i++) {
-			if(current->place -> place == T->ArrivingArcs[i]->pl) {
+			if(current->place->getPlace() == T->ArrivingArcs[i]->pl) {
 				/* Bogen existiert, nur Vielfachheit addieren */
 				*(T->ArrivingArcs[i]) += current->nu;
 				break;
@@ -517,9 +507,10 @@ transition: key_transition tname key_consume arclist semicolon key_produce arcli
 		}
 
 		if(i >= T->NrOfArriving) {
-			T->ArrivingArcs[T->NrOfArriving] = new Arc(T,current->place->place,true,current->nu);
+			T->ArrivingArcs[T->NrOfArriving] =
+				new Arc(T, current->place->getPlace(), true, current->nu);
 			T->NrOfArriving++;
-			current -> place -> place -> references ++;
+			current->place->getPlace()->references ++;
 		}
 	}
 
@@ -534,27 +525,28 @@ transition: key_transition tname key_consume arclist semicolon key_produce arcli
 	T->LeavingArcs = new  Arc * [card+10];
 	/* Schleife ueber alle Boegen */
 	for(current = $7; current; current = current->next) {
-		if (current->place->place->type == INPUT) {
+		if (current->place->getPlace()->type == INPUT) {
 			string msg = string("Transition '") + T->name + "' writes to an "
-				"input place '" + current->place->place->name + "' which is "
-				"not allowed.";
+				"input place '" + current->place->getPlace()->name +
+				"' which is not allowed.";
 			owfn_yyerror(msg.c_str());
 		}
 
-		if (options[O_MATCH] && current->place->place->type != INTERNAL) {
+		if (options[O_MATCH] && current->place->getPlace()->type != INTERNAL) {
 			if (T->hasNonTauLabelForMatching()) {
 				string msg = string("Transition '") + T->name + "' sends or "
 					"receives more than one message which is not allowed.";
 				owfn_yyerror(msg.c_str());
 			}
-			string labelForMatching = string("!") + current->place->place->name;
+			string labelForMatching = string("!") +
+				current->place->getPlace()->name;
 			T->setLabelForMatching(labelForMatching);
 			continue;
 		}
 		/* gibt es Bogen schon? */
 
 		for(i = 0; i < T->NrOfLeaving; i++) {
-			if(current->place->place == T->LeavingArcs[i]->pl) {
+			if(current->place->getPlace() == T->LeavingArcs[i]->pl) {
 				/* Bogen existiert, nur Vielfachheit addieren */
 				*(T->LeavingArcs[i]) += current->nu;
 				break;
@@ -562,9 +554,10 @@ transition: key_transition tname key_consume arclist semicolon key_produce arcli
 		}
 
 		if(i >= T->NrOfLeaving) {
-			T->LeavingArcs[T->NrOfLeaving] = new Arc(T,current->place->place, false, current->nu);
+			T->LeavingArcs[T->NrOfLeaving] =
+				new Arc(T,current->place->getPlace(), false, current->nu);
 			T->NrOfLeaving++;
-			current->place->place->references++;
+			current->place->getPlace()->references++;
 		}
 	}
 
@@ -778,7 +771,7 @@ statepredicate: lpar statepredicate rpar {
 		owfn_yyerror(error.c_str());
 	}
 	sscanf($3,"%u",&i);
-	$$ = new atomicformula(eq,PS->place,i);
+	$$ = new atomicformula(eq, PS->getPlace(), i);
 	free($1);
 	free($3);
 }
@@ -790,7 +783,7 @@ statepredicate: lpar statepredicate rpar {
 		owfn_yyerror(error.c_str());
 	}
 	sscanf($3,"%u",&i);
-	$$ = new atomicformula(neq,PS->place,i);
+	$$ = new atomicformula(neq, PS->getPlace(), i);
 	free($1);
 	free($3);
 }
@@ -802,7 +795,7 @@ statepredicate: lpar statepredicate rpar {
 		owfn_yyerror(error.c_str());
 	}
 	sscanf($3,"%u",&i);
-	$$ = new atomicformula(lt,PS->place,i);
+	$$ = new atomicformula(lt, PS->getPlace(), i);
 	free($1);
 	free($3);
 }
@@ -814,7 +807,7 @@ statepredicate: lpar statepredicate rpar {
 		owfn_yyerror(error.c_str());
 	}
 	sscanf($3,"%u",&i);
-	$$ = new atomicformula(gt,PS->place,i);
+	$$ = new atomicformula(gt, PS->getPlace(), i);
 	free($1);
 	free($3);
 }
@@ -826,7 +819,7 @@ statepredicate: lpar statepredicate rpar {
 		owfn_yyerror(error.c_str());
 	}
 	sscanf($3,"%u",&i);
-	$$ = new atomicformula(geq,PS->place,i);
+	$$ = new atomicformula(geq, PS->getPlace(), i);
 	free($1);
 	free($3);
 }
@@ -838,7 +831,7 @@ statepredicate: lpar statepredicate rpar {
 		owfn_yyerror(error.c_str());
 	}
 	sscanf($3,"%u",&i);
-	$$ = new atomicformula(leq,PS->place,i);
+	$$ = new atomicformula(leq, PS->getPlace(), i);
 	free($1);
 	free($3);
 }

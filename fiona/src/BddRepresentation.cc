@@ -744,9 +744,9 @@ void BddRepresentation::save(){
     for (int i = 0; i < int(PN->placeInputCnt); ++i){
     	assert(i < nbrLabels + maxNodeBits);
     	//cout << "i: " << i << "   name: " << PN->inputPlacesArray[i]->name << "   nbr: " << labelTable->lookup(PN->inputPlacesArray[i]->name)->nbr << endl;
-    	char* tmp = new char [strlen(PN->inputPlacesArray[i]->name) + 2];
+    	char* tmp = new char [PN->inputPlacesArray[i]->name.size() + 2];
     	strcpy (tmp,"!");
-    	strcat (tmp, PN->inputPlacesArray[i]->name);
+    	strcat (tmp, PN->inputPlacesArray[i]->name.c_str());
     	unsigned int nbr = labelTable->lookup(PN->inputPlacesArray[i]->name)->nbr;
         names[nbr] = tmp;
     }
@@ -754,9 +754,9 @@ void BddRepresentation::save(){
     for (int i = 0; i < int(PN->placeOutputCnt); ++i){
 		assert(int(i+PN->placeInputCnt) < nbrLabels + maxNodeBits);
 		//cout << "i: " << i << "   name: " << PN->outputPlacesArray[i]->name << "   nbr: " << labelTable->lookup(PN->outputPlacesArray[i]->name)->nbr << endl;
-    	char* tmp = new char [strlen(PN->outputPlacesArray[i]->name) + 2];
+    	char* tmp = new char [PN->outputPlacesArray[i]->name.size() + 2];
     	strcpy (tmp,"?");
-    	strcat (tmp, PN->outputPlacesArray[i]->name);
+    	strcat (tmp, PN->outputPlacesArray[i]->name.c_str());
     	unsigned int nbr = labelTable->lookup(PN->outputPlacesArray[i]->name)->nbr;
         names[nbr] = tmp;
     }

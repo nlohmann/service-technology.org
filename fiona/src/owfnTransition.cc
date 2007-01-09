@@ -40,7 +40,7 @@
 #include "options.h"
 #include "OGFromFile.h"
 
-owfnTransition::owfnTransition(char * name) : Node(name),
+owfnTransition::owfnTransition(const std::string& name) : Node(name),
     labelForMatching(OGFromFileFormulaAssignment::TAU), quasiEnabled(false),
     enabled(false), quasiEnabledNr(0), enabledNr(0), NextEnabled(NULL),
     PrevEnabled(NULL), NextQuasiEnabled(NULL), PrevQuasiEnabled(NULL), 

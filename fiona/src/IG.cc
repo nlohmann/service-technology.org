@@ -38,6 +38,7 @@
 #include "debug.h"
 #include "CNF.h"
 #include "owfn.h"
+#include "owfnTransition.h"
 
 #include <vector>			// for combining receiving events
 

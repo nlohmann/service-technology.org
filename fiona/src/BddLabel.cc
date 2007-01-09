@@ -34,8 +34,8 @@
 #include "BddLabel.h"
 #include <string>
 
-BddLabel::BddLabel(char * c, int n, BddLabelTab * table){
-	name = c;
+BddLabel::BddLabel(const std::string& c, int n, BddLabelTab * table) : name(c)
+{
 	nbr = n;	
 	next = (BddLabel *) 0;
 	table->add(this);
@@ -67,18 +67,18 @@ BddLabelTab::~BddLabelTab(){
 }
 
 	
-BddLabel * BddLabelTab::lookup(const char * name) const {
+BddLabel * BddLabelTab::lookup(const std::string& name) const {
   	/* 1. Hashvalue bestimmen */
   	unsigned int h,i;
   	BddLabel * lst = (BddLabel *) 0;
   	h = 0;
-  	for(i = 0; i < strlen(name); i++){
+  	for(i = 0; i < name.size(); i++){
       	h += (int) name[i];
       	h %= size;
    	}
   	/* 2. suchen */
   	for(lst = table[h]; lst; lst = lst -> next){
-  		if(!strcmp(lst->name, name)){
+  		if (lst->name == name) {
 	   		break;
 	 	}
     }
@@ -89,7 +89,7 @@ void BddLabelTab::add(BddLabel * s){
   	/* 1. Hashvalue bestimmen */
   	unsigned int h,i;
   	h = 0;
-  	for(i = 0; i < strlen(s->name); i++){
+  	for(i = 0; i < s->name.size(); i++){
       	h += (int) s->name[i];
       	h %= size;
     }

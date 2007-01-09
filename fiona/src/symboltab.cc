@@ -1,5 +1,6 @@
 /*****************************************************************************
- * Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Karsten Wolf       *
+ * Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Karsten Wolf,      *
+ *                      Jan Bretschneider                                    *
  *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *
@@ -30,107 +31,40 @@
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  */
- 
+
 #include "mynew.h"
 #include "symboltab.h"
-#include "petriNetNode.h"
 #include "owfnPlace.h"
 #include "owfnTransition.h"
 
-SymbolTab * PlaceTable, * TransitionTable;
-extern SymbolTab * GlobalTable;
+SymbolTab<PlSymbol>* PlaceTable;
+SymbolTab<TrSymbol>* TransitionTable;
 
-SymbolTab::SymbolTab(unsigned int s = 65536)
+
+Symbol::Symbol(const std::string& n) : name(n)
 {
-
-	size = s;
-	table = new Symbol * [s];
-	card = 0;
-	for(unsigned int i = 0; i < s;i++)
-	{
-		table[i] = (Symbol *) 0;
-	}
 }
 
-SymbolTab::~SymbolTab()
+std::string Symbol::getName() const
 {
-	for(unsigned int i = 0;i < size;i++)
-	{
-		Symbol * temp;
-		while(table[i])
-		{
-			temp = table[i];
-			table[i] = table[i] -> next;
-			delete temp;
-		}	
-	}
-	delete [] table;
+    return name;
 }
 
-	
-Symbol * SymbolTab::lookup(char * name)
+PlSymbol::PlSymbol(owfnPlace* p) : Symbol(p->name), place(p)
 {
-  /* 1. Hashvalue bestimmen */
-  unsigned int h,i;
-  Symbol * lst;
-  h = 0;
-  for(i = 0;i<strlen(name);i++)
-    {
-      h += (int) name[i];
-      h %= size;
-    }
-  /* 2. suchen */
-  for(lst = table[h];lst;lst = lst -> next)
-    {
-      if(!strcmp(lst->name,name))
-	 {
-	   break;
-	 }
-    }
-  return lst;
-}
-  
-Symbol::Symbol(char * n, SymbolTab * table)
-{
-	name = strdup(n);
-	table->add(this);
-}
-void SymbolTab::add(Symbol * s)
-{
-  /* 1. Hashvalue bestimmen */
-  unsigned int h,i;
-  h = 0;
-  for(i = 0;i<strlen(s->name);i++)
-    {
-      h += (int) s->name[i];
-      h %= size;
-    }
-  /* 2. eintragen */
-  s->next = table[h];
-  table[h] = s;
-  card++;
 }
 
-Symbol::~Symbol()
+owfnPlace* PlSymbol::getPlace() const
 {
-    free(name);
+    return place;
 }
 
-PlSymbol::PlSymbol(char * txt):Symbol(txt,PlaceTable)
+TrSymbol::TrSymbol(owfnTransition* t) : Symbol(t->name), transition(t)
 {
-	place = (owfnPlace *) 0;
-	kind = pl;
 }
 
-PlSymbol::PlSymbol(owfnPlace * p):Symbol(p->name,PlaceTable)
+owfnTransition* TrSymbol::getTransition() const
 {
-	place = p;
-	kind = pl;
-}
-
-TrSymbol::TrSymbol(char * c):Symbol(c,TransitionTable)
-{
-	transition = (owfnTransition *) 0;
-	kind = tr;
+    return transition;
 }
 

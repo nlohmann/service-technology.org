@@ -45,12 +45,12 @@ class Arc;
 class Node {
 	public:
 		// unsigned int nr;
-		char * name; 
+		std::string name;
 		unsigned short int NrOfArriving;
 		unsigned short int NrOfLeaving;
 		Arc ** ArrivingArcs;
 		Arc ** LeavingArcs;
-		Node(char *);
+		Node(const std::string&);
 		ostream& operator << (ostream &);
 		~Node();
 		void NewArriving(Arc&);

@@ -303,7 +303,7 @@ vertex * communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeT
     assert(numberOfNodes > 0);
     assert(setOfVertices.size() > 0);
     
-    char * edgeLabel;
+    string edgeLabel;
     if (type == sending) {
         edgeLabel = PN->inputPlacesArray[label]->name;
     } else {

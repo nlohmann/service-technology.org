@@ -35,15 +35,16 @@
 #define BDDLABEL_H_
 
 #include "mynew.h" 
+#include <string>
 
 class BddLabelTab;
 
 class BddLabel{
 public:
-  char * name;	//name of Label
+  std::string name;	//name of Label
   unsigned int nbr;		//number of Label
   BddLabel * next;
-  BddLabel(char * c, int n, BddLabelTab * table);
+  BddLabel(const std::string& c, int n, BddLabelTab * table);
   ~BddLabel();
 
 // Provides user defined operator new. Needed to trace all new
@@ -58,7 +59,7 @@ public:
 class BddLabelTab{
 	public:
 	BddLabel ** table;
-	BddLabel * lookup(const char *) const;
+	BddLabel * lookup(const std::string&) const;
 	void add(BddLabel *);
 	BddLabelTab(unsigned int size = 65536);
   	~BddLabelTab();

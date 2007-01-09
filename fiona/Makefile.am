@@ -19,8 +19,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2007-01-05 11:51:00 $ by $Author: bretschn $.
-# Version $Revision: 1.7 $
+# File last changed $Date: 2007-01-09 14:40:01 $ by $Author: bretschn $.
+# Version $Revision: 1.8 $
 
 SUBDIRS = cudd src tests
 
@@ -118,4 +118,12 @@ libclean: clean
 
 # Do single checks in tests directory.
 check-%:
+	(cd tests && $(MAKE) $(AM_MAKEFLAGS) $@)
+
+# Do global memcheck in tests directory.
+memcheck:
+	(cd tests && $(MAKE) $(AM_MAKEFLAGS) $@)
+
+# Do single memchecks in tests directory.
+memcheck-%:
 	(cd tests && $(MAKE) $(AM_MAKEFLAGS) $@)

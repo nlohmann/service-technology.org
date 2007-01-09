@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/bash
 
 ############################################################################
 # Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Dennis Reinert,   #
@@ -21,6 +21,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
+source memcheck_helper.sh
+
 echo
 echo ---------------------------------------------------------------------
 echo running $0
@@ -34,160 +36,70 @@ FIONA=fiona
 rm -f $DIR/*.out
 rm -f $DIR/*.png
 rm -f $DIR/*.og
+rm -f $DIR/*.log
 
 ############################################################################
 
-echo running $FIONA -n $DIR/no_final_marking.owfn -a -t OG
-$FIONA -n $DIR/no_final_marking.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
-result1=$?
+owfns=(
+    $DIR/no_final_marking.owfn
+    $DIR/all_final_marking.owfn
+    $DIR/no_communication.owfn
+    $DIR/no_initial_marking.owfn
+    $DIR/no_initial_marking2.owfn
+    $DIR/empty.owfn
+    $DIR/one_input.owfn
+    $DIR/one_output.owfn
+    $DIR/one_input_marked.owfn
+    $DIR/one_output_marked.owfn
+    $DIR/one_input_one_output.owfn
+    $DIR/one_input_2.owfn
+    $DIR/multiple_input.owfn
+    $DIR/multiple_output.owfn
+    $DIR/multiple_input_multiple_output.owfn
+)
 
-if [ $result1 -ne 0 ] ; then
-    echo     ... FAILED
-    echo
-fi
+expectations_controllable=(
+    YES
+    NO
+    YES
+    NO
+    YES
+    YES
+    YES 
+    YES
+    NO
+    YES
+    YES
+    NO
+    YES
+    YES
+    YES
+)
 
-echo running $FIONA -n $DIR/all_final_marking.owfn -a -t OG
-$FIONA -n $DIR/all_final_marking.owfn -a -t OG 2>&1 | grep "net is controllable: NO" > /dev/null
-result2=$?
+result=0
 
-if [ $result2 -ne 0 ] ; then
-    echo     ... FAILED
-    echo
-fi
+for ((i=0; i<${#owfns[*]}; ++i)) do
+    owfn="${owfns[$i]}"
+    cmd="$FIONA -n $owfn -a -t OG"
+    
+    if [ "$memcheck" = "yes" ]; then
+        memchecklog="$owfn.a.OG.memcheck.log"
+        do_memcheck "$cmd" "$memchecklog"
+        result=$?
+    else
+        expectation_controllable="${expectations_controllable[$i]}"
+        echo running $cmd
+        $cmd 2>&1 | grep "net is controllable: $expectation_controllable" \
+            >/dev/null
+        result1=$?
 
-echo running $FIONA -n $DIR/no_communication.owfn -a -t OG
-$FIONA -n $DIR/no_communication.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
-result3=$?
-
-if [ $result3 -ne 0 ] ; then
-    echo     ... FAILED
-    echo
-fi
-
-echo running $FIONA -n $DIR/no_initial_marking.owfn -a -t OG
-$FIONA -n $DIR/no_initial_marking.owfn -a -t OG 2>&1 | grep "net is controllable: NO" > /dev/null
-result4=$?
-
-if [ $result4 -ne 0 ] ; then
-    echo     ... FAILED
-    echo
-fi
-
-echo running $FIONA -n $DIR/no_initial_marking2.owfn -a -t OG
-$FIONA -n $DIR/no_initial_marking2.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
-result5=$?
-
-if [ $result5 -ne 0 ] ; then
-    echo     ... FAILED
-    echo
-fi
-
-echo running $FIONA -n $DIR/empty.owfn -a -t OG
-$FIONA -n $DIR/empty.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
-result6=$?
-
-if [ $result6 -ne 0 ] ; then
-    echo     ... FAILED
-    echo
-fi
-
-echo running $FIONA -n $DIR/one_input.owfn -a -t OG
-$FIONA -n $DIR/one_input.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
-result7=$?
-
-if [ $result7 -ne 0 ] ; then
-    echo     ... FAILED
-    echo
-fi
-
-echo running $FIONA -n $DIR/one_output.owfn -a -t OG
-$FIONA -n $DIR/one_output.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
-result8=$?
-
-if [ $result8 -ne 0 ] ; then
-    echo     ... FAILED
-    echo
-fi
-
-echo running $FIONA -n $DIR/one_input_marked.owfn -a -t OG
-$FIONA -n $DIR/one_input_marked.owfn -a -t OG 2>&1 | grep "net is controllable: NO" > /dev/null
-result9=$?
-
-if [ $result9 -ne 0 ] ; then
-    echo     ... FAILED
-    echo
-fi
-
-echo running $FIONA -n $DIR/one_output_marked.owfn -a -t OG
-$FIONA -n $DIR/one_output_marked.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
-result10=$?
-
-if [ $result10 -ne 0 ] ; then
-    echo     ... FAILED
-    echo
-fi
-
-echo running $FIONA -n $DIR/one_input_one_output.owfn -a -t OG
-$FIONA -n $DIR/one_input_one_output.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
-result11=$?
-
-if [ $result11 -ne 0 ] ; then
-    echo     ... FAILED
-    echo
-fi
-
-echo running $FIONA -n $DIR/one_input_2.owfn -a -t OG
-$FIONA -n $DIR/one_input_2.owfn -a -t OG 2>&1 | grep "net is controllable: NO" > /dev/null
-result12=$?
-
-if [ $result12 -ne 0 ] ; then
-    echo     ... FAILED
-    echo
-fi
-
-echo running $FIONA -n $DIR/multiple_input.owfn -a -t OG
-$FIONA -n $DIR/multiple_input.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
-result13=$?
-
-if [ $result13 -ne 0 ] ; then
-    echo     ... FAILED
-    echo
-fi
-
-echo running $FIONA -n $DIR/multiple_output.owfn -a -t OG
-$FIONA -n $DIR/multiple_output.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
-result14=$?
-
-if [ $result14 -ne 0 ] ; then
-    echo     ... FAILED
-    echo
-fi
-
-echo running $FIONA -n $DIR/multiple_input_multiple_output.owfn -a -t OG
-$FIONA -n $DIR/multiple_input_multiple_output.owfn -a -t OG 2>&1 | grep "net is controllable: YES" > /dev/null
-result15=$?
-
-if [ $result15 -ne 0 ] ; then
-    echo     ... FAILED
-    echo
-fi
-
-#OUTPUT=`$FIONA -n $DIR/multiple_input_multiple_output.owfn -a -t OG 2>&1`
-#echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-#result15=$?
-
-############################################################################
-
-if test \( $result1 -eq 0 -a $result2 -eq 0 -a $result3 -eq 0 -a \
-           $result4 -eq 0 -a $result5 -eq 0 -a $result6 -eq 0 -a \
-           $result7 -eq 0 -a $result8 -eq 0 -a $result9 -eq 0 -a \
-           $result10 -eq 0 -a $result11 -eq 0 -a $result12 -eq 0 -a \
-           $result13 -eq 0 -a $result14 -eq 0 -a $result15 -eq 0 \)
-then
-  result=0
-else
-  result=1
-fi
+        if [ $result1 -ne 0 ] ; then
+            echo     ... FAILED
+            echo
+            result=1
+        fi
+    fi
+done;
 
 echo
 

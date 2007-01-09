@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/bash
 
 ############################################################################
 # Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Dennis Reinert,   #
@@ -21,6 +21,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
+source memcheck_helper.sh
+
 echo
 echo ---------------------------------------------------------------------
 echo running $0
@@ -35,26 +37,34 @@ rm -f $DIR/*.out
 rm -f $DIR/*.png
 rm -f $DIR/*.cudd
 rm -f $DIR/*.og
+rm -f $DIR/*.log
 
 ############################################################################
 
-echo running $FIONA -n $DIR/sequence5.owfn -a -b 4 -t OG
-$FIONA -n $DIR/sequence5.owfn -a -b 4 --graphtype=OG  2> /dev/null 1> /dev/null
-result5=$?
+owfn="$DIR/sequence5.owfn"
+cmd="$FIONA -n $owfn -a -b 4 -t OG"
 
-if [ $result5 -ne 0 ] ; then
-    echo     ... FAILED
-    echo
-fi
-
-############################################################################
-
-if test \( $result5 -eq 0 \) -a \
-    \( -f $DIR/sequence5.owfn.a.OG.png -a -f $DIR/sequence5.owfn.a.OG.out \)
-then
-  result=0
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.a.b4.IG.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$?
 else
-  result=1
+    echo running $cmd
+    $cmd  2>/dev/null 1>/dev/null
+    result5=$?
+
+    if [ $result5 -ne 0 ] ; then
+        echo     ... FAILED
+        echo
+    fi
+
+    if test \( $result5 -eq 0 \) -a \
+        \( -f $DIR/sequence5.owfn.a.OG.png -a -f $DIR/sequence5.owfn.a.OG.out \)
+    then
+      result=0
+    else
+      result=1
+    fi
 fi
 
 echo

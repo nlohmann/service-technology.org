@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 ############################################################################
 # Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Dennis Reinert,   #
@@ -21,6 +21,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
+source memcheck_helper.sh
+
 echo
 echo ---------------------------------------------------------------------
 echo running $0
@@ -34,6 +36,7 @@ FIONA=fiona
 rm -f $DIR/*.out
 rm -f $DIR/*.png
 rm -f $DIR/*.og
+rm -f $DIR/*.log
 
 ############################################################################
 
@@ -44,90 +47,122 @@ for i in 3 9;
 do
     #echo running sequence$i
 
-    echo running $FIONA -n $DIR/sequence${i}.owfn -a -t IG
+    owfn="$DIR/sequence${i}.owfn"
+    cmd="$FIONA -n $owfn -a -t IG"
 
-    OUTPUT=`$FIONA -n $DIR/sequence${i}.owfn -a --graphtype=IG  2>&1`
-    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-    resultIG=$?
-    echo $OUTPUT | grep "number of states calculated: $(((i+1)*(i+2)/2))" > /dev/null
-    resultIGNOSC=$?
-    echo $OUTPUT | grep "number of nodes: $((i+1))" > /dev/null
-    resultIGNON=$?
-    echo $OUTPUT | grep "number of edges: $i" > /dev/null
-    resultIGNOE=$?
-    echo $OUTPUT | grep "number of blue nodes: $((i+1))" > /dev/null
-    resultIGNOBN=$?
-    echo $OUTPUT | grep "number of blue edges: $i" > /dev/null
-    resultIGNOBE=$?
+    if [ "$memcheck" = "yes" ]; then
+        memchecklog="$owfn.a.IG.memcheck.log"
+        do_memcheck "$cmd" "$memchecklog"
+        result=$?
+    else
+        echo running $cmd
+        OUTPUT=`$cmd 2>&1`
+        echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+        resultIG=$?
+        echo $OUTPUT | grep "number of states calculated: $(((i+1)*(i+2)/2))" > /dev/null
+        resultIGNOSC=$?
+        echo $OUTPUT | grep "number of nodes: $((i+1))" > /dev/null
+        resultIGNON=$?
+        echo $OUTPUT | grep "number of edges: $i" > /dev/null
+        resultIGNOE=$?
+        echo $OUTPUT | grep "number of blue nodes: $((i+1))" > /dev/null
+        resultIGNOBN=$?
+        echo $OUTPUT | grep "number of blue edges: $i" > /dev/null
+        resultIGNOBE=$?
 
-    if [ $resultIG -ne 0 -o $resultIGNOSC -ne 0 -o $resultIGNON -ne 0 -o $resultIGNOE -ne 0 -o $resultIGNOBN -ne 0 -o $resultIGNOBE -ne 0 ]
-    then
-        result=1
-        echo   ... failed to build IG correctly
+        if [ $resultIG -ne 0 -o $resultIGNOSC -ne 0 -o $resultIGNON -ne 0 -o $resultIGNOE -ne 0 -o $resultIGNOBN -ne 0 -o $resultIGNOBE -ne 0 ]
+        then
+            result=1
+            echo   ... failed to build IG correctly
+        fi
     fi
 
-    echo running $FIONA -n $DIR/sequence${i}.owfn -t IG
 
-    OUTPUT=`$FIONA -n $DIR/sequence${i}.owfn --graphtype=IG  2>&1`
-    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-    resultIG=$?
-    echo $OUTPUT | grep "number of states calculated: $(((i+1)*(i+2)/2))" > /dev/null
-    resultIGNOSC=$?
-    echo $OUTPUT | grep "number of nodes: $((i+1))" > /dev/null
-    resultIGNON=$?
-    echo $OUTPUT | grep "number of edges: $i" > /dev/null
-    resultIGNOE=$?
-    echo $OUTPUT | grep "number of blue nodes: $((i+1))" > /dev/null
-    resultIGNOBN=$?
-    echo $OUTPUT | grep "number of blue edges: $i" > /dev/null
-    resultIGNOBE=$?
+    cmd="$FIONA -n $owfn -t IG"
 
-    if [ $resultIG -ne 0 -o $resultIGNOSC -ne 0 -o $resultIGNON -ne 0 -o $resultIGNOE -ne 0 -o $resultIGNOBN -ne 0 -o $resultIGNOBE -ne 0 ]
-    then
-        result=1
-        echo   ... failed to build IG \(with node reduction\) correctly
+    if [ "$memcheck" = "yes" ]; then
+        memchecklog="$owfn.IG.memcheck.log"
+        do_memcheck "$cmd" "$memchecklog"
+        result=$?
+    else
+        echo running $cmd
+        OUTPUT=`$cmd 2>&1`
+        echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+        resultIG=$?
+        echo $OUTPUT | grep "number of states calculated: $(((i+1)*(i+2)/2))" > /dev/null
+        resultIGNOSC=$?
+        echo $OUTPUT | grep "number of nodes: $((i+1))" > /dev/null
+        resultIGNON=$?
+        echo $OUTPUT | grep "number of edges: $i" > /dev/null
+        resultIGNOE=$?
+        echo $OUTPUT | grep "number of blue nodes: $((i+1))" > /dev/null
+        resultIGNOBN=$?
+        echo $OUTPUT | grep "number of blue edges: $i" > /dev/null
+        resultIGNOBE=$?
+
+        if [ $resultIG -ne 0 -o $resultIGNOSC -ne 0 -o $resultIGNON -ne 0 -o $resultIGNOE -ne 0 -o $resultIGNOBN -ne 0 -o $resultIGNOBE -ne 0 ]
+        then
+            result=1
+            echo   ... failed to build IG \(with node reduction\) correctly
+        fi
     fi
 
-    echo running $FIONA -n $DIR/sequence${i}.owfn -a -t OG
 
-    OUTPUT=`$FIONA -n $DIR/sequence${i}.owfn -a --graphtype=OG  2>&1`
-    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-    resultOG=$?
-    echo $OUTPUT | grep "number of states calculated: $(((2**(i+1))-1))" > /dev/null
-    resultOGNOSC=$?
-    echo $OUTPUT | grep "number of nodes: $((2**i))" > /dev/null
-    resultOGNON=$?
-    echo $OUTPUT | grep "number of edges: $((i*(2**(i-1))))" > /dev/null
-    resultOGNOE=$?
-    echo $OUTPUT | grep "number of blue nodes: $((2**i))" > /dev/null
-    resultOGNOBN=$?
-    echo $OUTPUT | grep "number of blue edges: $((i*(2**(i-1))))" > /dev/null
-    resultOGNOBE=$?
-    if [ $resultOG -ne 0 -o $resultOGNOSC -ne 0 -o $resultOGNON -ne 0 -o $resultOGNOE -ne 0 -o $resultOGNOBN -ne 0 -o $resultOGNOBE -ne 0 ]
-    then
-        result=1
-        echo   ... failed to build OG
+    cmd="$FIONA -n $owfn -a -t OG"
+
+    if [ "$memcheck" = "yes" ]; then
+        memchecklog="$owfn.a.OG.memcheck.log"
+        do_memcheck "$cmd" "$memchecklog"
+        result=$?
+    else
+        echo running $cmd
+        OUTPUT=`$cmd  2>&1`
+        echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+        resultOG=$?
+        echo $OUTPUT | grep "number of states calculated: $(((2**(i+1))-1))" > /dev/null
+        resultOGNOSC=$?
+        echo $OUTPUT | grep "number of nodes: $((2**i))" > /dev/null
+        resultOGNON=$?
+        echo $OUTPUT | grep "number of edges: $((i*(2**(i-1))))" > /dev/null
+        resultOGNOE=$?
+        echo $OUTPUT | grep "number of blue nodes: $((2**i))" > /dev/null
+        resultOGNOBN=$?
+        echo $OUTPUT | grep "number of blue edges: $((i*(2**(i-1))))" > /dev/null
+        resultOGNOBE=$?
+        if [ $resultOG -ne 0 -o $resultOGNOSC -ne 0 -o $resultOGNON -ne 0 -o $resultOGNOE -ne 0 -o $resultOGNOBN -ne 0 -o $resultOGNOBE -ne 0 ]
+        then
+            result=1
+            echo   ... failed to build OG
+        fi
     fi
 
-    echo running $FIONA -n $DIR/sequence${i}.owfn -t OG
 
-    OUTPUT=`$FIONA -n $DIR/sequence${i}.owfn --graphtype=OG  2>&1`
-    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-    resultOG=$?
-    echo $OUTPUT | grep "number of states calculated: $(((2**(i+1))-1))" > /dev/null
-    resultOGNOSC=$?
-    echo $OUTPUT | grep "number of nodes: $((2**i))" > /dev/null
-    resultOGNON=$?
-    echo $OUTPUT | grep "number of edges: $((i*(2**(i-1))))" > /dev/null
-    resultOGNOE=$?
-    echo $OUTPUT | grep "number of blue nodes: $((2**i))" > /dev/null
-    resultOGNOBN=$?
-    echo $OUTPUT | grep "number of blue edges: $((i*(2**(i-1))))" > /dev/null
-    resultOGNOBE=$?
-    if [ $resultOG -ne 0 -o $resultOGNOSC -ne 0 -o $resultOGNON -ne 0 -o $resultOGNOE -ne 0 -o $resultOGNOBN -ne 0 -o $resultOGNOBE -ne 0 ]
-    then
-        result=1
-        echo   ... failed to build OG \(with node reduction\) correctly
+    cmd="$FIONA -n $owfn -t OG"
+
+    if [ "$memcheck" = "yes" ]; then
+        memchecklog="$owfn.OG.memcheck.log"
+        do_memcheck "$cmd" "$memchecklog"
+        result=$?
+    else
+        echo running $cmd
+        OUTPUT=`$cmd 2>&1`
+        echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+        resultOG=$?
+        echo $OUTPUT | grep "number of states calculated: $(((2**(i+1))-1))" > /dev/null
+        resultOGNOSC=$?
+        echo $OUTPUT | grep "number of nodes: $((2**i))" > /dev/null
+        resultOGNON=$?
+        echo $OUTPUT | grep "number of edges: $((i*(2**(i-1))))" > /dev/null
+        resultOGNOE=$?
+        echo $OUTPUT | grep "number of blue nodes: $((2**i))" > /dev/null
+        resultOGNOBN=$?
+        echo $OUTPUT | grep "number of blue edges: $((i*(2**(i-1))))" > /dev/null
+        resultOGNOBE=$?
+        if [ $resultOG -ne 0 -o $resultOGNOSC -ne 0 -o $resultOGNON -ne 0 -o $resultOGNOE -ne 0 -o $resultOGNOBN -ne 0 -o $resultOGNOBE -ne 0 ]
+        then
+            result=1
+            echo   ... failed to build OG \(with node reduction\) correctly
+        fi
     fi
 
     let i=i+1

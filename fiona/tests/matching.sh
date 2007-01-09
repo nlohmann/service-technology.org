@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/bash
 
 ############################################################################
 # Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Dennis Reinert,   #
@@ -21,6 +21,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
+source memcheck_helper.sh
+
 echo
 echo ---------------------------------------------------------------------
 echo running $0
@@ -30,6 +32,9 @@ testdir=.
 DIR=$testdir/matching
 FIONA=fiona
 
+#loeschen aller erzeugten Dateien im letzten Durchlauf
+rm -f $DIR/*.log
+
 result=0
 
 og="$DIR/shop.og"
@@ -38,70 +43,94 @@ og="$DIR/shop.og"
 
 owfn="$DIR/client_match_1.owfn"
 cmd="$FIONA -n $owfn --match $og"
-echo running $cmd
-OUTPUT=`$cmd 2>&1`
-if [ $? -ne 0 ]; then
-    echo ... fiona exited with nonzero return value although it should not
-    result=1
-fi
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$?
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    if [ $? -ne 0 ]; then
+        echo ... fiona exited with nonzero return value although it should not
+        result=1
+    fi
 
-echo $OUTPUT | grep "oWFN matches with OG: YES" > /dev/null
-if [ $? -ne 0 ]; then
-    echo ... oWFN does not match with OG although it should
-    result=1
+    echo $OUTPUT | grep "oWFN matches with OG: YES" > /dev/null
+    if [ $? -ne 0 ]; then
+        echo ... oWFN does not match with OG although it should
+        result=1
+    fi
 fi
 
 ############################################################################
 
 owfn="$DIR/client_nomatch_1.owfn"
 cmd="$FIONA -n $owfn --match $og"
-echo running $cmd
-OUTPUT=`$cmd 2>&1`
-if [ $? -ne 0 ]; then
-    echo ... fiona exited with nonzero return value although it should not
-    result=1
-fi
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$?
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    if [ $? -ne 0 ]; then
+        echo ... fiona exited with nonzero return value although it should not
+        result=1
+    fi
 
-echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
-if [ $? -ne 0 ]; then
-    echo ... oWFN matches with OG although it should not
-    result=1
+    echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+    if [ $? -ne 0 ]; then
+        echo ... oWFN matches with OG although it should not
+        result=1
+    fi
 fi
 
 ############################################################################
 
 owfn="$DIR/client_nomatch_2.owfn"
 cmd="$FIONA -n $owfn --match $og"
-echo running $cmd
-OUTPUT=`$cmd 2>&1`
-if [ $? -ne 0 ]; then
-    echo ... fiona exited with nonzero return value although it should not
-    result=1
-fi
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$?
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    if [ $? -ne 0 ]; then
+        echo ... fiona exited with nonzero return value although it should not
+        result=1
+    fi
 
-echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
-if [ $? -ne 0 ]; then
-    echo ... oWFN matches with OG although it should not
-    result=1
+    echo $OUTPUT | grep "oWFN matches with OG: NO" > /dev/null
+    if [ $? -ne 0 ]; then
+        echo ... oWFN matches with OG although it should not
+        result=1
+    fi
 fi
 
 ############################################################################
 
 owfn="$DIR/client_nosupport_1.owfn"
 cmd="$FIONA -n $owfn --match $og"
-echo running $cmd
-OUTPUT=`$cmd 2>&1`
-if [ $? -eq 0 ]; then
-    echo ... fiona exited with zero return value although it should not
-    result=1
-fi
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.match.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$?
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    if [ $? -eq 0 ]; then
+        echo ... fiona exited with zero return value although it should not
+        result=1
+    fi
 
-echo $OUTPUT | grep "ends or receives more than one message" > /dev/null
-if [ $? -ne 0 ]; then
-    echo ... Parsing should have failed due to a transition reading or \
-        writing more than one message, but it seems there was a different \
-        reason.
-    result=1
+    echo $OUTPUT | grep "ends or receives more than one message" > /dev/null
+    if [ $? -ne 0 ]; then
+        echo ... Parsing should have failed due to a transition reading or \
+            writing more than one message, but it seems there was a different \
+            reason.
+        result=1
+    fi
 fi
 
 echo

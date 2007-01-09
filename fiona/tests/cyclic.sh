@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/bash
 
 ############################################################################
 # Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Dennis Reinert,   #
@@ -21,6 +21,8 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
+source memcheck_helper.sh
+
 echo
 echo ---------------------------------------------------------------------
 echo running $0
@@ -34,6 +36,7 @@ FIONA=fiona
 rm -f $DIR/*.out
 rm -f $DIR/*.png
 rm -f $DIR/*.og
+rm -f $DIR/*.log
 
 result=0
 
@@ -43,39 +46,55 @@ zyklusRbluenodes_soll=7
 zyklusRblueedges_soll=6
 zyklusRstoredstates_soll=0
 
-echo running $FIONA -a -t OG -n $DIR/zyklusR.owfn -e5
-OUTPUT=`$FIONA -a -t OG -n $DIR/zyklusR.owfn -e5 2>&1`
+owfn="$DIR/zyklusR.owfn"
+cmd="$FIONA -a -t OG -n $owfn -e5"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.a.e5.OG.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$?
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
 
-echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-zyklusRcontrol=$?
+    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+    zyklusRcontrol=$?
 
-echo $OUTPUT | grep "number of blue nodes: $zyklusRbluenodes_soll" > /dev/null
-zyklusRbluenodes=$?
+    echo $OUTPUT | grep "number of blue nodes: $zyklusRbluenodes_soll" > /dev/null
+    zyklusRbluenodes=$?
 
-echo $OUTPUT | grep "number of blue edges: $zyklusRblueedges_soll" > /dev/null
-zyklusRblueedges=$?
+    echo $OUTPUT | grep "number of blue edges: $zyklusRblueedges_soll" > /dev/null
+    zyklusRblueedges=$?
 
-if [ $zyklusRcontrol -ne 0 -o $zyklusRbluenodes -ne 0 -o $zyklusRblueedges -ne 0 ]
-then
-echo   ... failed to build OG correctly
+    if [ $zyklusRcontrol -ne 0 -o $zyklusRbluenodes -ne 0 -o $zyklusRblueedges -ne 0 ]
+    then
+    echo   ... failed to build OG correctly
+    fi
+
+    result=`expr $result + $zyklusRcontrol + $zyklusRbluenodes + $zyklusRblueedges`
 fi
-
-result=`expr $result + $zyklusRcontrol + $zyklusRbluenodes + $zyklusRblueedges`
 
 #############################################################################
 
-echo running $FIONA -a -t OG -n $DIR/zyklusP.owfn -e10 -m5
-OUTPUT=`$FIONA -a -t OG -n $DIR/zyklusP.owfn -e10 -m5  2>&1`
+owfn="$DIR/zyklusP.owfn"
+cmd="$FIONA -a -t OG -n $owfn -e10 -m5"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.a.e10.m5.OG.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$?
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
 
-echo $OUTPUT | grep "net is controllable: NO" > /dev/null
-zyklusPcontrol=$?
+    echo $OUTPUT | grep "net is controllable: NO" > /dev/null
+    zyklusPcontrol=$?
 
-if [ $zyklusPcontrol -ne 0 ]
-then
-echo   ... failed to build OG correctly
+    if [ $zyklusPcontrol -ne 0 ]
+    then
+    echo   ... failed to build OG correctly
+    fi
+
+    result=`expr $result + $zyklusPcontrol`
 fi
-
-result=`expr $result + $zyklusPcontrol`
 
 ############################################################################
 
@@ -83,27 +102,35 @@ zyklusPcommitbluenodes_soll=4
 zyklusPcommitblueedges_soll=5
 zyklusPcommitstoredstates_soll=11
 
-echo running $FIONA -a -t OG -n $DIR/zyklusPmitCommit.owfn -e2 -m1
-OUTPUT=`$FIONA -a -t OG -n $DIR/zyklusPmitCommit.owfn -e2 -m1  2>&1`
+owfn="$DIR/zyklusPmitCommit.owfn"
+cmd="$FIONA -a -t OG -n $owfn -e2 -m1"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.a.e2.m1.OG.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$?
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
 
-echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-zyklusPcommitcontrol=$?
+    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+    zyklusPcommitcontrol=$?
 
-echo $OUTPUT | grep "number of blue nodes: $zyklusPcommitbluenodes_soll" > /dev/null
-zyklusPcommitbluenodes=$?
+    echo $OUTPUT | grep "number of blue nodes: $zyklusPcommitbluenodes_soll" > /dev/null
+    zyklusPcommitbluenodes=$?
 
-echo $OUTPUT | grep "number of blue edges: $zyklusPcommitblueedges_soll" > /dev/null
-zyklusPcommitblueedges=$?
+    echo $OUTPUT | grep "number of blue edges: $zyklusPcommitblueedges_soll" > /dev/null
+    zyklusPcommitblueedges=$?
 
-echo $OUTPUT | grep "number of states stored in nodes: $zyklusPcommitstoredstates_soll" > /dev/null
-zyklusPcommitblueedges=$?
+    echo $OUTPUT | grep "number of states stored in nodes: $zyklusPcommitstoredstates_soll" > /dev/null
+    zyklusPcommitblueedges=$?
 
-if [ $zyklusPcommitcontrol -ne 0 -o $zyklusPcommitbluenodes -ne 0 -o $zyklusPcommitblueedges -ne 0 -o $zyklusPcommitblueedges -ne 0 ]
-then
-echo   ... failed to build OG correctly
+    if [ $zyklusPcommitcontrol -ne 0 -o $zyklusPcommitbluenodes -ne 0 -o $zyklusPcommitblueedges -ne 0 -o $zyklusPcommitblueedges -ne 0 ]
+    then
+    echo   ... failed to build OG correctly
+    fi
+
+    result=`expr $result + $zyklusPcommitcontrol + $zyklusPcommitbluenodes + $zyklusPcommitblueedges + $zyklusPcommitblueedges`
 fi
-
-result=`expr $result + $zyklusPcommitcontrol + $zyklusPcommitbluenodes + $zyklusPcommitblueedges + $zyklusPcommitblueedges`
 
 #############################################################################
 

@@ -22,7 +22,9 @@
 TESTS = testSequenceSuite.sh bddtest.sh extrema.sh samples.sh messages.sh \
 		cyclic.sh matching.sh
 
-TESTS_ENVIRONMENT = testdir=$(top_srcdir)/tests PATH=.:../src:$$PATH
+TESTS_ENVIRONMENT = testdir=$(top_srcdir)/tests PATH=".:../src:$$PATH"
+
+MEMCHECK_ENVIRONMENT = $(TESTS_ENVIRONMENT) memcheck=yes
 
 EXTRA_DIST = $(TESTS) cyclic/*.owfn extrema/*.owfn messages/*.owfn samples/*.owfn sequence_suite/*.owfn matching/*.owfn matching/*.og
 
@@ -37,3 +39,12 @@ SINGLE_CHECK_TARGETS = $(TESTS:%.sh=check-%)
 # the end.
 $(SINGLE_CHECK_TARGETS):
 	-$(TESTS_ENVIRONMENT) ./$(@:check-%=%.sh)
+
+# Global memcheck target. Runs all tests under valgrind.
+memcheck:
+	$(MAKE) $(AM_MAKEFLAGS) $(MEMCHECK_ENVIRONMENT) check
+
+# Create single memcheck target analogous to single check targets
+SINGLE_MEMCHECK_TARGETS = $(TESTS:%.sh=memcheck-%)
+$(SINGLE_MEMCHECK_TARGETS):
+	-$(MEMCHECK_ENVIRONMENT) ./$(@:memcheck-%=%.sh)

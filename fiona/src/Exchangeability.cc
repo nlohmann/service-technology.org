@@ -38,12 +38,17 @@
 #include <string.h>
 #include "Exchangeability.h"
 
-DdManager* Exchangeability::mgrMp = Cudd_Init(0, 0, CUDD_UNIQUE_SLOTS, CUDD_CACHE_SLOTS, 0);
-DdManager* Exchangeability::mgrAnn = Cudd_Init(0, 0, CUDD_UNIQUE_SLOTS, CUDD_CACHE_SLOTS, 0);
+DdManager* Exchangeability::mgrMp = NULL;
+DdManager* Exchangeability::mgrAnn = NULL;
 int Exchangeability::nbrBdd = 0;
  
 Exchangeability::Exchangeability(char* filename){
 	trace(TRACE_5, "Exchangeability::Exchangeability(char* filename): begin\n");		   
+    // Init cudd package when first Exchangeability object is created.
+    if (nbrBdd == 0) {
+        mgrMp = Cudd_Init(0, 0, CUDD_UNIQUE_SLOTS, CUDD_CACHE_SLOTS, 0);
+        mgrAnn = Cudd_Init(0, 0, CUDD_UNIQUE_SLOTS, CUDD_CACHE_SLOTS, 0);
+    }
     
     names = NULL;
     nbrVarAnn = 0;
@@ -79,11 +84,16 @@ Exchangeability::~Exchangeability(){
     //checkManager(mgrAnn, "mgrAnn");
     //checkManager(mgrMp, "mgrMp");
 
-    Cudd_Quit(mgrAnn);
-    Cudd_Quit(mgrMp);
-    
     --nbrBdd;
     assert(nbrBdd >= 0);
+    
+    // Clean up cudd package when last Exchangeability object is destroyed.
+    if (nbrBdd == 0) {
+        Cudd_Quit(mgrAnn);
+        mgrAnn = NULL;
+        Cudd_Quit(mgrMp);
+        mgrMp  = NULL;
+    }
     
     labelList.clear();
     

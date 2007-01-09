@@ -80,7 +80,8 @@ Node::~Node() {
 	trace(TRACE_5, "Node::~Node() : end\n");
 }
 
-Node::Node(char * n) : NrOfArriving(0), NrOfLeaving(0)
+Node::Node(char * n) : NrOfArriving(0), NrOfLeaving(0), ArrivingArcs(NULL),
+    LeavingArcs(NULL)
 {
   name = new char [strlen(n) + 1];
   strcpy(name, n);

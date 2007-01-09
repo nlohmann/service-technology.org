@@ -38,6 +38,11 @@ memchecklog_check_for_errors()
 memchecklog_check_for_leaks()
 {
     memchecklog=$1
+    grep "All heap blocks were freed -- no leaks are possible." "$memchecklog"\
+        >/dev/null
+    if [ $? -eq 0 ]; then
+        return 0
+    fi
     grep "definitely lost: 0 bytes" "$memchecklog" >/dev/null
     if [ $? -ne 0 ]; then
         return 1

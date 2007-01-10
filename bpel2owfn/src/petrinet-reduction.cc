@@ -28,13 +28,13 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2007/01/10 17:52:47 $
+ * \date    \$Date: 2007/01/10 18:07:20 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  *
  * \ingroup petrinet
  */
@@ -345,7 +345,7 @@ void PetriNet::reduce_identical_transitions()
 	    (preSet == preset(*t2)) &&	// precondition 2
 	    (postSet == postset(*t2)) && // precondition 3
 	    (sameweights(*t2)) && // precondition 4
-	    (arc_weight((*(preSet.begin())),(*t1)) == 1 && arc_weight((*t2), (*(postSet.begin()))) == 1 )) // precondition 4
+	    (arc_weight((*(preSet.begin())),(*t1)) == arc_weight((*t2), (*(postSet.begin()))))) // precondition 4
 	{
 	  string id1 = *((*t1)->history.begin());
 	  string id2 = *((*t2)->history.begin());

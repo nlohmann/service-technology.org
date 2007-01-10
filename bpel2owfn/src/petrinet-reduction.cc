@@ -24,17 +24,17 @@
  * \brief   Petri Net API: structural reduction
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2006/12/30 12:48:02 $
+ * \date    \$Date: 2007/01/10 17:52:47 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.51 $
+ * \version \$Revision: 1.52 $
  *
  * \ingroup petrinet
  */
@@ -169,13 +169,13 @@ unsigned int PetriNet::reduce_suspicious_transitions()
 void PetriNet::reduce_dead_nodes()
 {
   trace(TRACE_DEBUG, "[PN]\tRemoving structurally dead nodes...\n");
-  
+
   bool done = false;
 
   while (!done)
   {
     done = true;
-  
+
     list<Place*> deadPlaces;
     list<Transition*> deadTransitions;
     list<Place*> tempPlaces;
@@ -220,7 +220,7 @@ void PetriNet::reduce_dead_nodes()
       if (T. find(*t) != T.end())
 	removeTransition(*t);
 
-    
+
 
     // remove isolated communication places
     list<Place*> uselessInputPlaces;
@@ -253,7 +253,8 @@ void PetriNet::reduce_dead_nodes()
  * \brief Elimination of identical places (RB1):
  *
  * If there exist two distinct (precondition 1) places with identical preset
- * (precondition 2) and postset (precondition 3), then they can be merged.
+ * (precondition 2) and postset (precondition 3) and the weights of all incoming
+ * and outgoing arcs have the same value (precondition 4), then they can be merged.
  *
  * \image html rb1.png
  *
@@ -272,7 +273,7 @@ void PetriNet::reduce_identical_places()
     set<Node*> preSet  = preset(*p1);
     set<Node*> postSet = postset(*p1);
 
-    if ((preSet.empty()) || (postSet.empty()))
+    if ((preSet.empty()) || (postSet.empty()) || !(sameweights(*p1)))
       continue;
 
     for (set<Node*>:: iterator preTransition = preSet.begin(); preTransition != preSet.end(); preTransition++)
@@ -281,7 +282,9 @@ void PetriNet::reduce_identical_places()
       for (set<Node*>::iterator p2 = pPostSet.begin(); p2 != pPostSet.end(); p2++)
 	if ((*p1 != *p2) &&		// precondition 1
 	    (preSet == preset(*p2)) &&	// precondition 2
-	    (postSet == postset(*p2)))	// precondition 3
+	    (postSet == postset(*p2)) && // precondition 3
+	    (sameweights(*p2)) && // precondition 4
+	    (arc_weight((*preTransition), (*p1)) == arc_weight((*p2), (*(postSet.begin())))) ) // precondition 4
 	{
 	  string id1 = *((*p1)->history.begin());
 	  string id2 = *((*p2)->history.begin());
@@ -289,10 +292,10 @@ void PetriNet::reduce_identical_places()
 	}
     }
   }
-  
+
   trace(TRACE_VERY_DEBUG, "[PN]\tFound " + toString(placePairs.size()) + " places with same preset and postset...\n");
 
-  // merge the found transitions
+  // merge the found places
   for (set<pair<string, string> >::iterator labels = placePairs.begin();
       labels != placePairs.end(); labels++)
   {
@@ -310,7 +313,9 @@ void PetriNet::reduce_identical_places()
  * \brief Elimination of identical transitions (RB2):
  *
  * If there exist two distinct (precondition 1) transitions with identical
- * preset (precondition 2) and postset (precondition 3), then they can be merged.
+ * preset (precondition 2) and postset (precondition 3) and none of those two
+ * is connected to any arc with a weight other than 1 (precondition 4),
+ * then they can be merged.
  *
  * \image html ra2.png
  *
@@ -329,13 +334,18 @@ void PetriNet::reduce_identical_transitions()
     set<Node*> preSet  = preset(*t1);
     set<Node*> postSet = postset(*t1);
 
+    if (!(sameweights(*t1)))
+      continue;
+
     for (set<Node*>:: iterator prePlace = preSet.begin(); prePlace != preSet.end(); prePlace++)
     {
       set<Node*> pPostSet = postset(*prePlace);
       for (set<Node*>::iterator t2 = pPostSet.begin(); t2 != pPostSet.end(); t2++)
 	if ((*t1 != *t2) &&		// precondition 1
 	    (preSet == preset(*t2)) &&	// precondition 2
-	    (postSet == postset(*t2)))	// precondition 3
+	    (postSet == postset(*t2)) && // precondition 3
+	    (sameweights(*t2)) && // precondition 4
+	    (arc_weight((*(preSet.begin())),(*t1)) == 1 && arc_weight((*t2), (*(postSet.begin()))) == 1 )) // precondition 4
 	{
 	  string id1 = *((*t1)->history.begin());
 	  string id2 = *((*t2)->history.begin());
@@ -343,7 +353,7 @@ void PetriNet::reduce_identical_transitions()
 	}
     }
   }
-  
+
   trace(TRACE_VERY_DEBUG, "[PN]\tFound " + toString(transitionPairs.size()) + " transitions with same preset and postset...\n");
 
   // merge the found transitions
@@ -368,7 +378,8 @@ void PetriNet::reduce_identical_transitions()
  * (precondition 1) that are distinct (precondition 2) and where the place in
  * the preset has no other outgoing arcs (precondition 3), then the places
  * can be merged and the transition can be removed. Furthermore, none of the
- * places may be communicating (precondition 4).
+ * places may be communicating (precondition 4) and the included arcs must have
+ * the a weight of 1 (precondition 5).
  *
  * \image html ra1.png
  *
@@ -395,7 +406,8 @@ void PetriNet::reduce_series_places()
 	(prePlace != postPlace) &&			 // precondition 2
 	(postset(prePlace).size() == 1) &&		 // precondition 3
 	(prePlace->type == INTERNAL) &&			 // precondition 4
-	(postPlace->type == INTERNAL))
+	(postPlace->type == INTERNAL) &&
+	(arc_weight(prePlace, *t) == 1 && arc_weight(*t, postPlace) == 1)) // precondition 5
    {
       string id1 = *((*(preSet.begin()))->history.begin());
       string id2 = *((*(postSet.begin()))->history.begin());
@@ -411,7 +423,7 @@ void PetriNet::reduce_series_places()
     Transition* uselessTransition = findTransition(*label);
     if (uselessTransition != NULL)
       removeTransition(uselessTransition);
-  }  
+  }
 
   // merge place pairs
   for (set<pair<string, string> >::iterator placePair = placePairs.begin();
@@ -431,7 +443,8 @@ void PetriNet::reduce_series_places()
  * If there exists a place with singleton preset and postset (precondition 1)
  * and if the transition in its postset has no other incoming arcs
  * (precondition 2), then the preset and the postset can be merged and the
- * place can be removed.
+ * place can be removed. Furthermore the in and outgoing arcs have to have
+ * the same weight. (precondition 3).
  *
  * \image html ra2.png
  *
@@ -454,7 +467,8 @@ void PetriNet::reduce_series_transitions()
       Transition* t1 = static_cast<Transition*>(*(preset(*p).begin()));
       Transition* t2 = static_cast<Transition*>(*(postset(*p).begin()));
 
-      if (preset(t2).size() == 1) // precondition 2
+      if ((preset(t2).size() == 1) && // precondition 2
+          (arc_weight(t1, *p) == arc_weight(*p, t2))) // precondition 5
       {
 	string id1 = *(t1->history.begin());
 	string id2 = *(t2->history.begin());
@@ -627,7 +641,6 @@ unsigned int PetriNet::reduce()
     reduce_dead_nodes();
     reduce_unused_status_places();
     reduce_suspicious_transitions();
-
     reduce_identical_places();		// RB1
     reduce_identical_transitions();	// RB2
     reduce_series_places();		// RA1
@@ -637,7 +650,7 @@ unsigned int PetriNet::reduce()
 
 //    if (parameters[P_TRED])
 //      reduce_transitive_places();
-    
+
     trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification pass " + toString(passes++) + ": " + information() + "\n");
 
     done = (old == information());
@@ -668,6 +681,7 @@ unsigned int PetriNet::reduce()
  * \returns number of removed places
  *
  * \pre p is a place of the net
+ * \pre p incoming and outcoming arcs have the same weights
  * \pre p is not marked initially
  * \pre p has exactly one transition (t1) in its preset and exactly one
  *      transition (t2) in its postset
@@ -685,13 +699,14 @@ unsigned int PetriNet::reduce_transitive_places()
   unsigned int result = 0;
 
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
-    if ((*p)->tokens == 0)
-      if (postset(*p).size() == 1 && preset(*p).size() == 1)
+    if (sameweights(*p))
+      if ((*p)->tokens == 0)
+        if (postset(*p).size() == 1 && preset(*p).size() == 1)
 	if (preset(*p) != postset(*p))
 	{
 	  Transition *t1 = static_cast<Transition *>(*(preset(*p).begin()));
 	  Node *t2 = *(postset(*p).begin());
-	  
+
 	  set<Node *> postset_nodes = postset(t1);
 	  postset_nodes.erase(*p);
 	  bool done = false;
@@ -701,16 +716,16 @@ unsigned int PetriNet::reduce_transitive_places()
 	    // collect the nodes reachable from the current set of nodes
 	    unsigned int old_size = postset_nodes.size();
 	    set<Node *> new_nodes;
-	    
+
 	    for (set<Node *>::iterator n = postset_nodes.begin(); n != postset_nodes.end(); n++)
 	      new_nodes = setUnion(new_nodes, postset(*n));
-	    
+
 	    postset_nodes = setUnion(postset_nodes, new_nodes);
-	    
+
 	    // a fixed point is reached -- abort
 	    if (postset_nodes.size() == old_size)
 	      done = true;
-	    
+
 	    // t2 is reached: p can be removed -- abort
 	    if (postset_nodes.find(t2) != postset_nodes.end())
 	    {
@@ -732,7 +747,7 @@ unsigned int PetriNet::reduce_transitive_places()
   if (result > 0)
     cerr << "removed " << result << " transitive places" << endl;
 
-  return result;  
+  return result;
 }
 
 
@@ -814,7 +829,7 @@ void prune_acc(unsigned int i, map<unsigned int, set<unsigned int> > &Acc, map<u
 void PetriNet::transitiveReduction()
 {
   trace(TRACE_DEBUG, "[PN]\tApplying transitive reduction...\n");
-  
+
   set<unsigned int> nodes;
   map<unsigned int, set<unsigned int> > Adj;
 

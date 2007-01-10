@@ -334,7 +334,9 @@ place: nodeident {
 		owfn_yyerror(error.c_str());
 	}
 	P = new owfnPlace($1, type, PN);
-	PlaceTable->add(new PlSymbol(P));
+	// Set PS because nonterminal 'controlcommands' depends on it being set.
+	PS = new PlSymbol(P);
+	PlaceTable->add(PS);
 	P->capacity = CurrentCapacity;
 	P->nrbits = CurrentCapacity > 0 ? logzwo(CurrentCapacity) : 32;
 	P->max_occurence = events_manual;
@@ -369,6 +371,7 @@ commands:
 | key_max_occurrences op_eq number commands
     {
         sscanf($3, "%u", &(PS->getPlace()->max_occurence));
+        free($3);
         if (options[O_EVENT_USE_MAX] &&
             PS->getPlace()->max_occurence > events_manual)
         {

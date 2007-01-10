@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ############################################################################
 # Copyright 2005, 2006 Peter Massuthe, Daniela Weinberg, Dennis Reinert,   #
 #                      Jan Bretschneider and Christian Gierds              #
@@ -19,34 +21,44 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-TESTS = syntax.sh testSequenceSuite.sh bddtest.sh extrema.sh samples.sh \
-		messages.sh cyclic.sh matching.sh
+source memcheck_helper.sh
 
-TESTS_ENVIRONMENT = testdir=$(top_srcdir)/tests PATH=".:../src:$$PATH"
+echo
+echo ---------------------------------------------------------------------
+echo running $0
+echo
 
-MEMCHECK_ENVIRONMENT = $(TESTS_ENVIRONMENT) memcheck=yes
+testdir=.
+DIR=$testdir/syntax
+FIONA=fiona
 
-EXTRA_DIST = $(TESTS) cyclic/*.owfn extrema/*.owfn messages/*.owfn \
-			 samples/*.owfn sequence_suite/*.owfn matching/*.owfn \
-			 matching/*.og syntax/*.owfn
+#loeschen aller erzeugten Dateien im letzten Durchlauf
+rm -f $DIR/*.out
+rm -f $DIR/*.png
+rm -f $DIR/*.og
+rm -f $DIR/*.log
 
-# Generate check targets from $(TESTS). That is done by removing '.sh' from
-# every word in $(TESTS) and precede them by 'check-'. So one of many check
-# targets would be check-samples if samples.sh was in $(TESTS).
-SINGLE_CHECK_TARGETS = $(TESTS:%.sh=check-%)
+result=0
 
-# All single check targets. For example check-samples.
-# The script belonging to the current check target is inferred from the
-# name of the target by removing the initial 'check-' and adding '.sh' to
-# the end.
-$(SINGLE_CHECK_TARGETS):
-	-$(TESTS_ENVIRONMENT) ./$(@:check-%=%.sh)
+############################################################################
 
-# Global memcheck target. Runs all tests under valgrind.
-memcheck:
-	$(MAKE) $(AM_MAKEFLAGS) $(MEMCHECK_ENVIRONMENT) check
+owfn="$DIR/max_occurrence.owfn"
+cmd="$FIONA -n $owfn -t OG"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.OG.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$?
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+    if [ $? -ne 0 ]; then
+        echo ... fiona exited with nonzero return value although it should not
+        result=1
+    fi
+fi
 
-# Create single memcheck target analogous to single check targets
-SINGLE_MEMCHECK_TARGETS = $(TESTS:%.sh=memcheck-%)
-$(SINGLE_MEMCHECK_TARGETS):
-	-$(MEMCHECK_ENVIRONMENT) ./$(@:memcheck-%=%.sh)
+############################################################################
+
+echo
+
+exit $result

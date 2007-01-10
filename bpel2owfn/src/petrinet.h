@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/30 12:48:02 $
+ * \date    \$Date: 2007/01/10 17:41:54 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.127 $
+ * \version \$Revision: 1.128 $
  *
  * \ingroup petrinet
  */
@@ -250,7 +250,7 @@ class Transition: public Node
 
     /// the name of the type
     string nodeTypeName() const;
-    
+
     /// create a transition and add a first role to the history
     Transition(unsigned int id, string role);
 };
@@ -279,7 +279,7 @@ class Place: public Node
 {
   /// class PetriNet is allowed to access the privates of class Place
   friend class PetriNet;
- 
+
   private:
     /// initial marking of the place
     unsigned int tokens;
@@ -301,7 +301,7 @@ class Place: public Node
 
   public:
     /// mark the place
-    void mark(unsigned int tokens = 1);    
+    void mark(unsigned int tokens = 1);
 
     /// the short name of the place (public to bpel2owfn.cc)
     string nodeShortName() const;
@@ -334,7 +334,7 @@ class Arc
   private:
     /// source node of the arc
     Node *source;
-  
+
     /// target node of the arc
     Node *target;
 
@@ -343,7 +343,7 @@ class Arc
 
     /// weight of the arc (experimental)
     unsigned int weight;
- 
+
     /// DOT-output of the arc (used by PetriNet::dotOut())
     string output_dot(bool draw_interface = true) const;
 
@@ -374,12 +374,12 @@ class PetriNet
   public:
     /// adds a place with a given role and type
     Place* newPlace(string my_role, communication_type my_type = INTERNAL);
-  
+
     /// adds a transition with a given role
     Transition *newTransition(string my_role);
-  
+
     /// adds an arc given source and target node, and arc type
-    Arc *newArc(Node *my_source, Node *my_target, arc_type my_type = STANDARD, unsigned int my_weight = 1);   
+    Arc *newArc(Node *my_source, Node *my_target, arc_type my_type = STANDARD, unsigned int my_weight = 1);
 
 
     /// merges two places
@@ -390,7 +390,7 @@ class PetriNet
 
     /// merges two places given two identifiers and roles
     void mergePlaces(unsigned int id1, string role1, unsigned int id2, string role2);
-    
+
     /// merges two transitions
     void mergeTransitions(Transition *t1, Transition *t2);
 
@@ -436,7 +436,7 @@ class PetriNet
 
     /// calculate the maximal occurrences of communication
     void calculate_max_occurrences();
-    
+
 
     /// outputs the Petri net
     friend ostream& operator<< (ostream& os, const PetriNet &obj);
@@ -470,6 +470,8 @@ class PetriNet
     /// returns the arc weight between two nodes
     unsigned int arc_weight(Node *my_source, Node *my_target) const;
 
+	/// returns true if all arcs connecting to n have a weight of 1
+	bool sameweights(Node *n) const;
 
     /// APNN (Abstract Petri Net Notation) output
     void output_apnn(ostream *output) const;
@@ -491,7 +493,7 @@ class PetriNet
 
     /// low-level PEP output
     void output_pep(ostream *output) const;
-    
+
     /// PNML (Petri Net Markup Language) output
     void output_pnml(ostream *output) const;
 
@@ -501,7 +503,7 @@ class PetriNet
 
     /// calculates the postset of a node
     set<Node*> postset(Node *n) const;
-    
+
 
     /// remove unused status places
     unsigned int reduce_unused_status_places();
@@ -514,7 +516,7 @@ class PetriNet
 
     /// elimination of identical places
     void reduce_identical_places();
-    
+
     /// elimination of identical transitions
     void reduce_identical_transitions();
 

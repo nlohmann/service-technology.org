@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2006/12/30 00:53:04 $
+ * \date    \$Date: 2007/01/10 17:41:54 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.175 $
+ * \version \$Revision: 1.176 $
  *
  * \ingroup petrinet
  */
@@ -287,7 +287,7 @@ PetriNet::PetriNet(const PetriNet & net)
     Transition * newTransition = new Transition( **transition );
     newTransition->id = getId();
     T.insert( newTransition );
-    
+
     roleMap[ newTransition->nodeFullName() ] = newTransition;
 
     for(vector< string >::iterator name = (*transition)->history.begin(); name != (*transition)->history.end(); name++)
@@ -322,7 +322,7 @@ PetriNet & PetriNet::operator=(const PetriNet & net)
 
   for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
     delete *p;
-  
+
   for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
     delete *p;
 
@@ -384,7 +384,7 @@ PetriNet & PetriNet::operator=(const PetriNet & net)
     Transition * newTransition = new Transition( **transition );
     newTransition->id = getId();
     T.insert( newTransition );
-    
+
     roleMap[ newTransition->nodeFullName() ] = newTransition;
 
     for(vector< string >::iterator name = (*transition)->history.begin(); name != (*transition)->history.end(); name++)
@@ -420,7 +420,7 @@ PetriNet::~PetriNet()
 
   for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
     delete *p;
-  
+
   for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
     delete *p;
 
@@ -522,7 +522,7 @@ Arc *PetriNet::newArc(Node *my_source, Node *my_target, arc_type my_type, unsign
   if (my_source->nodeType == PLACE)
     if (P_in.find(static_cast<Place*>(my_source)) != P_in.end())
       (static_cast<Transition*>(my_target))->type = IN;
-    
+
   if (my_target->nodeType == PLACE)
     if (P_out.find(static_cast<Place*>(my_target)) != P_out.end())
       (static_cast<Transition*>(my_source))->type = OUT;
@@ -588,12 +588,12 @@ void PetriNet::removePlace(Place *p)
   detachNode(p);
 
   // Remove the roles of the place p, i.e. set the mappings to the NULL
-  // pointer.  
+  // pointer.
   for (vector<string>::iterator role = p->history.begin(); role != p->history.end(); role++)
     if (roleMap[*role] == p)
       roleMap[*role] = NULL;
 
-  
+
   // Decide from which set of places the place has to be removed.
   switch(p->type)
   {
@@ -621,7 +621,7 @@ void PetriNet::removeTransition(Transition *t)
   detachNode(t);
 
   // Remove the roles of the transition  t, i.e. set the mappings to the NULL
-  // pointer.  
+  // pointer.
   for (vector<string>::iterator role = t->history.begin(); role != t->history.end(); role++)
     if (roleMap[*role] == t)
       roleMap[*role] = NULL;
@@ -713,15 +713,31 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
     t12->history.push_back(*role);
   }
 
-  // create the arcs for t12
+  // create the weighted arcs for t12
+  set<Node *> pre1 = preset(t1);
+  set<Node *> post1 = postset(t1);
   set<Node *> pre12 = setUnion(preset(t1), preset(t2));
   set<Node *> post12 = setUnion(postset(t1), postset(t2));
+  set<Node *> pre2wo1 = setDifference(pre12,pre1);
+  set<Node *> post2wo1 = setDifference(post12,post1);
 
-  for (set<Node *>::iterator n = pre12.begin(); n != pre12.end(); n++)
-    newArc(static_cast<Place*>(*n), t12);
+  for (set<Node *>::iterator n = pre1.begin(); n != pre1.end(); n++)
+    newArc((*n), t12, STANDARD, arc_weight((*n),t1));
 
-  for (set<Node *>::iterator n = post12.begin(); n != post12.end(); n++)
-    newArc(t12, static_cast<Place*>(*n));
+  for (set<Node *>::iterator n = pre2wo1.begin(); n != pre2wo1.end(); n++)
+    newArc((*n), t12, STANDARD, arc_weight((*n),t2));
+
+  for (set<Node *>::iterator n = post1.begin(); n != post1.end(); n++)
+    newArc(t12, (*n), STANDARD, arc_weight(t1,(*n)));
+
+  for (set<Node *>::iterator n = post2wo1.begin(); n != post2wo1.end(); n++)
+    newArc(t12, (*n), STANDARD, arc_weight(t2,(*n)));
+
+//  for (set<Node *>::iterator n = pre12.begin(); n != pre12.end(); n++)
+//    newArc(static_cast<Place*>(*n), t12);
+
+//  for (set<Node *>::iterator n = post12.begin(); n != post12.end(); n++)
+//    newArc(t12, static_cast<Place*>(*n));
 
   removeTransition(t1);
   removeTransition(t2);
@@ -765,7 +781,7 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
 
   Place *p12 = newPlace("");
 
-  p12->tokens = max(p1->tokens, p2->tokens); 
+  p12->tokens = max(p1->tokens, p2->tokens);
   p12->isFinal = (p1->isFinal || p2->isFinal);
 
   for (vector<string>::iterator role = p1->history.begin(); role != p1->history.end(); role++)
@@ -780,14 +796,27 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
     roleMap[*role] = p12;
   }
 
+  // create the weighted arcs for p12
+
+  set<Node *> pre1 = preset(p1);
+  set<Node *> post1 = postset(p1);
   set<Node *> pre12 = setUnion(preset(p1), preset(p2));
   set<Node *> post12 = setUnion(postset(p1), postset(p2));
+  set<Node *> pre2wo1 = setDifference(pre12,pre1);
+  set<Node *> post2wo1 = setDifference(post12,post1);
 
-  for (set<Node *>::iterator n = pre12.begin(); n != pre12.end(); n++)
-    newArc((*n), p12);
 
-  for (set<Node *>::iterator n = post12.begin(); n != post12.end(); n++)
-    newArc(p12,(*n));
+  for (set<Node *>::iterator n = pre1.begin(); n != pre1.end(); n++)
+    newArc((*n), p12, STANDARD, arc_weight((*n),p1));
+
+  for (set<Node *>::iterator n = pre2wo1.begin(); n != pre2wo1.end(); n++)
+    newArc((*n), p12, STANDARD, arc_weight((*n),p2));
+
+  for (set<Node *>::iterator n = post1.begin(); n != post1.end(); n++)
+    newArc(p12, (*n), STANDARD, arc_weight(p1,(*n)));
+
+  for (set<Node *>::iterator n = post2wo1.begin(); n != post2wo1.end(); n++)
+    newArc(p12, (*n), STANDARD, arc_weight(p2,(*n)));
 
   removePlace(p1);
   removePlace(p2);
@@ -880,6 +909,35 @@ unsigned int PetriNet::arc_weight(Node *my_source, Node *my_target) const
   return 1;
 }
 
+/*!
+ * Returns true only if the given node's incoming and outgoing arcs all have
+ * the same weight.
+ *
+ * \param n node to be examined
+ * \pre n != NULL
+ */
+bool PetriNet::sameweights(Node *n) const
+{
+
+  assert(n != NULL);
+  bool first = true;
+  int w = 0;
+
+  for (set<Arc*>::iterator f = F.begin(); f != F.end(); f++)
+    if (((*f)->source == n) || ((*f)->target == n) )
+      if (first)
+      {
+        first=false;
+        w = (*f)->weight;
+      }
+	  else
+	  {
+	    if ( (*f)->weight != w)
+        return false;
+	  }
+
+  return true;
+}
 
 
 
@@ -923,7 +981,7 @@ set<Node *> PetriNet::postset(Node *n) const
   for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
     if ((*f)->source == n)
       result.insert((*f)->target);
-  
+
   return result;
 }
 
@@ -1122,7 +1180,7 @@ void PetriNet::compose(PetriNet &net)
     Transition * newTransition = new Transition( **transition );
     newTransition->id = getId();
     T.insert( newTransition );
-    
+
     roleMap[ newTransition->nodeFullName() ] = newTransition;
 
     for(vector< string >::iterator name = (*transition)->history.begin(); name != (*transition)->history.end(); name++)
@@ -1148,11 +1206,11 @@ void PetriNet::compose(PetriNet &net)
   for (set< Place * >::iterator place = P_in.begin(); place != P_in.end(); place ++)
   {
     set< Place * >::iterator oPlace = P_out.begin();
-    
+
     bool finished = false;
     while ( ! finished && oPlace != P_out.end())
     {
-        
+
       if ((*oPlace)->nodeFullName().erase(0,4) != (*place)->nodeFullName().erase(0,3))
 	oPlace++;
       else
@@ -1281,7 +1339,7 @@ void PetriNet::calculate_max_occurrences()
       {
 	// unsigned int transition_activity_id = toUInt((*t)->history[i].substr(0, (*t)->history[i].find_first_of(".")));
         string act_id = (*t)->nodeFullName().substr(0, (*t)->nodeFullName().find_first_of("."));
-        
+
         act_id = act_id.substr( act_id.find_last_of( "_" ) + 1 );
 	unsigned int transition_activity_id = toUInt( act_id );
 	assert(ASTEmap[transition_activity_id] != NULL);

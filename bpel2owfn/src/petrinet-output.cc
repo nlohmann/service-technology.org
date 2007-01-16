@@ -28,13 +28,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/01/02 11:46:02 $
+ * \date    \$Date: 2007/01/16 15:56:30 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.73 $
+ * \version \$Revision: 1.74 $
  *
  * \ingroup petrinet
  */
@@ -518,9 +518,9 @@ void PetriNet::output_pnml(ostream *output) const
     (*output) << "      <name>" << endl;
     (*output) << "        <text>" << (*p)->history[0] << "</text>" << endl;
     (*output) << "      </name>" << endl;
-    (*output) << "      <!-- <type>" << endl;
+    (*output) << "      <type>" << endl;
     (*output) << "        <text>input</text>" << endl;
-    (*output) << "      </type> -->" << endl;
+    (*output) << "      </type>" << endl;
     (*output) << "    </place>" << endl << endl;
   }
 
@@ -536,9 +536,9 @@ void PetriNet::output_pnml(ostream *output) const
     (*output) << "      <name>" << endl;
     (*output) << "        <text>" << (*p)->history[0] << "</text>" << endl;
     (*output) << "      </name>" << endl;
-    (*output) << "      <!-- <type>" << endl;
+    (*output) << "      <type>" << endl;
     (*output) << "        <text>output</text>" << endl;
-    (*output) << "      </type> -->" << endl;
+    (*output) << "      </type>" << endl;
     (*output) << "    </place>" << endl << endl;
   }
 

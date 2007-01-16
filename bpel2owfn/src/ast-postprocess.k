@@ -30,7 +30,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2006/12/30 12:48:01 $
+ * \date    \$Date: 2007/01/16 16:31:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.118 $
+ * \version \$Revision: 1.119 $
  */
 %}
 
@@ -1236,7 +1236,7 @@ Switch(a,b,c,_id) ->
       {
         assert(ASTEmap[innerActivity->id] != NULL);
         ASTEmap[innerActivity->id]->parentActivityId = myid;
-        ASTEmap[_id->value]->parentActivityId = myid;
+//        ASTEmap[_id2->value]->parentActivityId = myid;
         ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
         ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
       }

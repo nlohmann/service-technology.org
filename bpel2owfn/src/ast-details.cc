@@ -29,14 +29,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/12/30 12:48:01 $
+ * \date    \$Date: 2007/01/16 16:31:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.70 $
+ * \version \$Revision: 1.71 $
  */
 
 
@@ -1023,6 +1023,9 @@ string ASTE::checkCorrelationSet()
 
 /*!
  * \returns list of identifiers of all acestor activities
+ *
+ * \todo Add a check to prevent crash caused by too many elements (cf. task
+ *       #6393)
  */
 vector<unsigned int> ASTE::ancestorActivities() const
 {

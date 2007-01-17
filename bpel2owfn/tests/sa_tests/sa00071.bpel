@@ -1,0 +1,43 @@
+<process name="SA00071" targetNamespace="anyURI">
+
+  <flow>
+    <links>
+      <link name="goodlinkAtoB" />
+      <link name="badlink_faultHandler" />
+      <link name="badlink_terminationHandler" />
+      <link name="goodlink_faultHandler" />
+      <link name="goodlink_terminationHandler" />
+    </links>
+
+
+    <scope>
+      <faultHandlers>
+        <catchAll>
+          <empty name="fh">
+            <target linkName="badlink_faultHandler" />
+            <source linkName="goodlink_faultHandler" />
+          </empty>
+        </catchAll>
+      </faultHandlers>
+      <terminationHandler>
+        <empty name="th">
+          <target linkName="badlink_terminationHandler" />
+          <source linkName="goodlink_terminationHandler" />
+        </empty>
+      </terminationHandler>
+      <sequence>
+        <empty name="A">
+          <source linkName="goodlinkAtoB" />
+          <source linkName="badlink_faultHandler" />
+          <source linkName="badlink_terminationHandler" />
+        </empty>
+
+        <empty name="B">
+          <target linkName="goodlinkAtoB" />
+          <target linkName="goodlink_faultHandler" />
+          <target linkName="goodlink_terminationHandler" />
+        </empty>
+      </sequence>
+    </scope>
+  </flow>
+</process>

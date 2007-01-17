@@ -29,13 +29,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/01/17 10:17:23 $
+ * \date    \$Date: 2007/01/17 13:07:50 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.54 $
+ * \version \$Revision: 1.55 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -611,24 +611,40 @@ void check_SA00070( unsigned int id )
   ENTER("check_SA00070");
 
   extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
+  extern map<string, unsigned int> ASTE_linkIdMap;
   
-  for ( set< unsigned int >::iterator link = ASTEmap[ id ]->enclosedSourceLinks.begin();
-          link != ASTEmap[ id ]->enclosedSourceLinks.end();
-          link++ )
+  // go through all enclosed activities and look if there have sources or targets
+  for ( set< unsigned int >::iterator activities = ASTEmap[ id ]->enclosedActivities.begin();
+          activities != ASTEmap[ id ]->enclosedActivities.end();
+          activities++ )
   {
-    bool internal = false;
-    for ( set< unsigned int >::iterator activity = ASTEmap[ id ]->enclosedActivities.begin();
+    // whether it's source or target doesn't matter - the link must be defined inside the element that is checked
+    set< unsigned int > links = setUnion( ASTEmap[ *activities ]->sourceLinks, ASTEmap[ *activities ]->targetLinks );
+
+    // so check every source and target
+    for ( set< unsigned int>::iterator link = links.begin(); link != links.end(); link++ )
+    {
+      // get the id of the <link> element
+      unsigned int linkId = ASTE_linkIdMap[ ASTEmap[ *link ]->linkName ];
+      
+      // look if the linkId is inside the set of enclosed activities
+      bool internal = false;
+      for ( set< unsigned int >::iterator activity = ASTEmap[ id ]->enclosedActivities.begin();
             activity != ASTEmap[ id ]->enclosedActivities.end();
             activity++ )
-    {
-      if ( *activity == *link )
       {
-        internal = true;
+        // is this the right id?
+        if ( *activity == linkId )
+        {
+          // yeah, everything is fine
+          internal = true;
+        }
       }
-    }
-    if ( !internal )
-    {
-      SAerror( 70, ASTEmap[ *link ]->linkName, ASTEmap[ id ]->attributes[ "referenceLine" ] );
+      // the linkId doesn't belong to the set of enclosed activities, so trigger the error
+      if ( !internal )
+      {
+        SAerror( 70, ASTEmap[ *link ]->linkName, ASTEmap[ id ]->attributes[ "referenceLine" ] );
+      }
     }
   }
   LEAVE("check_SA00070");

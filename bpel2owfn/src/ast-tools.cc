@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/12/30 12:48:01 $
+ * \date    \$Date: 2007/01/17 10:17:23 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.53 $
+ * \version \$Revision: 1.54 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -544,6 +544,11 @@ namespace {
     map< pair< unsigned int, unsigned int >, activityRelationType > activityRelationMap;
 }
 
+
+/*!
+ *
+ * \comment me!
+ */
 activityRelationType activityRelation(unsigned int a, unsigned int b)
 {
     ENTER("activityRelation");
@@ -580,7 +585,6 @@ void enterConflictingActivities( set< unsigned int > a, set< unsigned int > b )
 void enclosedActivities( unsigned int a, unsigned int b )
 {
     ENTER("enclosedActivities");
-    // cerr << " # enclosed activities " << a << " <-> " << b << endl;
     activityRelationMap[pair<unsigned int, unsigned int>(a,b)] = AR_ENCLOSES;
     activityRelationMap[pair<unsigned int, unsigned int>(b,a)] = AR_DESCENDS;
     LEAVE("enclosedActivities");
@@ -598,6 +602,37 @@ void enterEnclosedActivities( unsigned int a, set< unsigned int > b )
   LEAVE("enterEnclosedActivities");
 }
 
+/******************************************************************************
+ * Functions for checking SA00070 and SA00071
+ *****************************************************************************/
+
+void check_SA00070( unsigned int id )
+{
+  ENTER("check_SA00070");
+
+  extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
+  
+  for ( set< unsigned int >::iterator link = ASTEmap[ id ]->enclosedSourceLinks.begin();
+          link != ASTEmap[ id ]->enclosedSourceLinks.end();
+          link++ )
+  {
+    bool internal = false;
+    for ( set< unsigned int >::iterator activity = ASTEmap[ id ]->enclosedActivities.begin();
+            activity != ASTEmap[ id ]->enclosedActivities.end();
+            activity++ )
+    {
+      if ( *activity == *link )
+      {
+        internal = true;
+      }
+    }
+    if ( !internal )
+    {
+      SAerror( 70, ASTEmap[ *link ]->linkName, ASTEmap[ id ]->attributes[ "referenceLine" ] );
+    }
+  }
+  LEAVE("check_SA00070");
+}
 
 /******************************************************************************
  * Functions for the XML (pretty) unparser defined in bpel-unparse-xml.k

@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/01/10 17:41:54 $
+ * \date    \$Date: 2007/01/17 10:17:23 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.176 $
+ * \version \$Revision: 1.177 $
  *
  * \ingroup petrinet
  */
@@ -110,12 +110,9 @@ bool Node::historyContains(string role) const
   return false;
 }
 
-
-
-
-
 Node::~Node()
 {
+  /* nothing to do */
 }
 
 
@@ -179,6 +176,11 @@ Transition::Transition(unsigned int my_id, string my_role)
     history.push_back(my_role);
 }
 
+Transition::~Transition()
+{
+  /* nothing to do */
+}
+
 
 
 
@@ -215,6 +217,11 @@ Place::Place(unsigned int my_id, string my_role, communication_type my_type) :
 void Place::mark(unsigned int my_tokens)
 {
   tokens = my_tokens;
+}
+
+Place::~Place()
+{
+  /* nothing to do */
 }
 
 

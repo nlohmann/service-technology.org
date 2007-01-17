@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2006/12/30 12:48:01 $
+ * \date    \$Date: 2007/01/17 10:17:23 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.25 $
+ * \version \$Revision: 1.26 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -107,7 +107,6 @@ void header(int id, bool indent = false);
 void footer(kc::integer id, bool indent = false);
 void footer(int id, bool indent = false);
 
-// extern map< pair< unsigned int, unsigned int >, activityRelationType > activityRelationMap;
 
 activityRelationType activityRelation( unsigned int a, unsigned int b );
 void conflictingActivities( unsigned int a, unsigned int b );
@@ -116,6 +115,11 @@ void enclosedActivities( unsigned int a, unsigned int b );
 void enterEnclosedActivities( unsigned int a, set< unsigned int > b );
 
 
+/******************************************************************************
+ * Functions for checking SA00070 and SA00071
+ *****************************************************************************/
+
+void check_SA00070( unsigned int id );
 
 
 

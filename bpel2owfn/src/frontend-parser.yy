@@ -34,11 +34,11 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2006/12/30 12:48:02 $
+ * \date    \$Date: 2007/01/17 10:17:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -48,7 +48,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.284 $
+ * \version \$Revision: 1.285 $
  *
  * \todo Overwork documentation: WS-BPEL can also be parsed!
  *
@@ -1058,16 +1058,16 @@ tLink:
 ******************************************************************************/
 
 tScope:
-  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
-  tCorrelationSets tFaultHandlers tCompensationHandler tTerminationHandler
+  K_SCOPE arbitraryAttributes X_NEXT standardElements
+  tVariables tCorrelationSets tFaultHandlers tCompensationHandler tTerminationHandler
   tEventHandlers activity 
   X_NEXT X_SLASH K_SCOPE
     { $$ = Scope($4, $5, $7, $8, $9, $10, $6, StopInScope(), $11, NiltPartnerLink_list(), $2); }
 | K_SCOPE arbitraryAttributes X_NEXT standardElements tPartnerLinks
-  tVariables tMessageExchanges tCorrelationSets tEventHandlers tFaultHandlers
-  tCompensationHandler tTerminationHandler activity 
+  tMessageExchanges tVariables tCorrelationSets tFaultHandlers
+  tCompensationHandler tTerminationHandler tEventHandlers activity 
   X_NEXT X_SLASH K_SCOPE
-    { $$ = Scope($4, $6, $10, $11, $12, $9, $8, StopInScope(), $13, $5, $2); }
+    { $$ = Scope($4, $7, $9, $10, $11, $12, $8, StopInScope(), $13, $5, $2); }
 
 ;
 

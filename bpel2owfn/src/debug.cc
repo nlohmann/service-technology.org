@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2006/12/30 12:48:01 $
+ * \date    \$Date: 2007/01/17 10:17:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.51 $
+ * \version \$Revision: 1.52 $
  *
  * \ingroup debug
  */
@@ -278,6 +278,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
 
     case(69):
       { cerr << information << " more than once as target" << endl;
+	break; }
+
+    case(70):
+      { cerr << "<link> `" << information << "' crosses boundary of a repeatable construct or of a compensation handler" << endl;
 	break; }
 
     case(72):

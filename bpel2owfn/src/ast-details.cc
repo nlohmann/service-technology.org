@@ -25,18 +25,18 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/01/16 16:31:35 $
+ * \date    \$Date: 2007/01/17 10:17:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.71 $
+ * \version \$Revision: 1.72 $
  */
 
 
@@ -907,7 +907,7 @@ string ASTE::checkLink()
 {
   extern map<unsigned int, ASTE*> ASTEmap;
   extern set<string> ASTE_linkNames;
-  extern string filename;
+//  extern string filename;
 
   string linkName = attributes["linkName"];
   if (linkName == "")

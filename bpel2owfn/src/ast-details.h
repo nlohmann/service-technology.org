@@ -25,18 +25,18 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2006/12/30 12:48:01 $
+ * \date    \$Date: 2007/01/17 10:17:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.58 $
+ * \version \$Revision: 1.59 $
  */
 
 
@@ -148,6 +148,7 @@ class ASTE
     unsigned int targetActivity;	///< id of the target of a <link>
     unsigned int sourceActivity;	///< id of the source of a <link>
 
+
     unsigned int max_occurrences;	///< number of maximum occurrences of the activity
     unsigned int max_loops;		///< number of maximum loops of the repeatable construct
 
@@ -159,7 +160,6 @@ class ASTE
     set<string> catches;		///< the <catch> branches of <faultHandlers> to detect duplicates
 
     set<unsigned int> enclosedActivities;       ///< set of all the enclosed activities
-//    set<unsigned int> conflictingActivities;    ///< set of all conflicting activities
 
     string createChannel(bool synchronousCommunication = false);
 

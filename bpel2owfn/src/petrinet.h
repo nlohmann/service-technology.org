@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/01/10 17:41:54 $
+ * \date    \$Date: 2007/01/17 10:17:23 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.128 $
+ * \version \$Revision: 1.129 $
  *
  * \ingroup petrinet
  */
@@ -181,6 +181,8 @@ class Node
     /// the name of the node
     string nodeFullName() const;
 
+    virtual ~Node();
+
   protected:
     /// type of node as defined in #communication_type
     communication_type type;
@@ -215,9 +217,6 @@ class Node
 
     /// the name of the type
     virtual string nodeTypeName() const;
-
-    /// destructor
-    virtual ~Node();
 };
 
 
@@ -253,6 +252,9 @@ class Transition: public Node
 
     /// create a transition and add a first role to the history
     Transition(unsigned int id, string role);
+
+  public:
+    virtual ~Transition();
 };
 
 
@@ -300,6 +302,8 @@ class Place: public Node
     // Place(Place&);
 
   public:
+    virtual ~Place();
+
     /// mark the place
     void mark(unsigned int tokens = 1);
 

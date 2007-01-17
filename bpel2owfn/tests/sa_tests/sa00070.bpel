@@ -1,0 +1,161 @@
+<process name="SA00070" targetNamespace="anyURI">
+
+  <flow>
+    <links>
+      <link name="goodlinkAtoB" />
+      <link name="badlink_while" />
+      <link name="badlink_repeatUntil" />
+      <link name="badlink_forEach" />
+      <link name="badlink_eventHandler" />
+      <link name="badlink_compensationHandler" />
+    </links>
+
+    <while>
+      <condition>bool-expr</condition>
+      <empty name="C">
+        <source linkName="badlink_while" />
+      </empty>
+    </while>
+    
+    <repeatUntil>
+      <empty name="D">
+        <source linkName="badlink_repeatUntil" />
+      </empty>
+      <condition>bool-expr</condition>
+    </repeatUntil>
+    
+    <forEach counterName="" parallel="no">
+      <startCounterValue>
+        0
+      </startCounterValue>
+      <finalCounterValue>
+        2
+      </finalCounterValue>
+      <scope>
+        <empty name="e">
+          <source linkName="badlink_forEach" />
+        </empty>
+      </scope>
+    </forEach>
+
+    <scope>
+      <compensationHandler>
+        <sequence>
+          <empty name="ch_A">
+            <source linkName="badlink_compensationHandler" />
+          </empty>
+          <empty name="ch_B">
+            <target linkName="badlink_compensationHandler" />
+          </empty>
+        </sequence>
+      </compensationHandler>
+      <eventHandlers>
+        <onAlarm>
+          <for>expr</for>
+          <empty name="eh_A">
+            <source linkName="badlink_eventHandler" />
+          </empty>
+        </onAlarm>
+      </eventHandlers>
+      <empty>
+        <target linkName="badlink_eventHandler" />
+      </empty>
+    </scope>
+
+    <while>
+      <condition>bool-expr</condition>
+        <flow>
+          <links>
+            <link name="goodlink_while" />
+          </links>
+          <empty name="gw_A">
+            <source linkName="goodlink_while" />
+          </empty>
+          <empty name="gw_B">
+            <target linkName="goodlink_while" />
+          </empty>
+        </flow>
+    </while>
+    
+    <repeatUntil>
+        <flow>
+          <links>
+            <link name="goodlink_repeatUntil" />
+          </links>
+          <empty name="gru_A">
+            <source linkName="goodlink_repeatUntil" />
+          </empty>
+          <empty name="gru_B">
+            <target linkName="goodlink_repeatUntil" />
+          </empty>
+        </flow>
+      <condition>bool-expr</condition>
+    </repeatUntil>
+    
+    <forEach counterName="" parallel="no">
+      <startCounterValue>
+        0
+      </startCounterValue>
+      <finalCounterValue>
+        2
+      </finalCounterValue>
+      <scope>
+        <flow>
+          <links>
+            <link name="goodlink_forEach" />
+          </links>
+            <empty name="gfe_A">
+              <source linkName="goodlink_forEach" />
+            </empty>
+            <empty name="gfe_B">
+              <target linkName="goodlink_forEach" />
+            </empty>
+          </flow>
+      </scope>
+    </forEach>
+
+    <scope>
+      <compensationHandler>
+        <flow>
+          <links>
+            <link name="goodlink_compensationHandler" />
+          </links>
+          <empty name="gch_A">
+            <source linkName="goodlink_compensationHandler" />
+          </empty>
+          <empty name="gch_B">
+            <target linkName="goodlink_compensationHandler" />
+          </empty>
+        </flow>
+      </compensationHandler>
+      <eventHandlers>
+        <onAlarm>
+          <for>expr</for>
+          <flow>
+            <links>
+              <link name="goodlink_eventHandler" />
+            </links>
+            <empty name="geh_A">
+              <source linkName="goodlink_eventHandler" />
+            </empty>
+            <empty name="geh_B">
+              <target linkName="goodlink_eventHandler" />
+            </empty>
+          </flow>
+        </onAlarm>
+      </eventHandlers>
+      <empty />
+    </scope>
+
+    <empty name="A">
+      <source linkName="goodlinkAtoB" />
+    </empty>
+
+    <empty name="B">
+      <target linkName="goodlinkAtoB" />
+      <target linkName="badlink_while" />
+      <target linkName="badlink_repeatUntil" />
+      <target linkName="badlink_forEach" />
+    </empty>
+  </flow>
+</process>

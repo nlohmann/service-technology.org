@@ -29,13 +29,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/01/17 13:07:50 $
+ * \date    \$Date: 2007/01/17 14:45:45 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.55 $
+ * \version \$Revision: 1.56 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -649,6 +649,53 @@ void check_SA00070( unsigned int id )
   }
   LEAVE("check_SA00070");
 }
+
+void check_SA00071( unsigned int id )
+{
+  ENTER("check_SA00071");
+
+  extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
+  extern map<string, unsigned int> ASTE_linkIdMap;
+ 
+  for ( set< unsigned int >::iterator activities = ASTEmap[ id ]->enclosedActivities.begin();
+          activities != ASTEmap[ id ]->enclosedActivities.end();
+          activities++ )
+  {
+    // whether it's source or target doesn't matter - the link must be defined inside the element that is checked
+    set< unsigned int > targets = ASTEmap[ *activities ]->targetLinks;
+
+    // so check every source and target
+    for ( set< unsigned int>::iterator link = targets.begin(); link != targets.end(); link++ )
+    {
+      // get the id of the <link> element
+      unsigned int linkId = ASTE_linkIdMap[ ASTEmap[ *link ]->linkName ];
+      
+      // look if the linkId is inside the set of enclosed activities
+      bool internal = false;
+      for ( set< unsigned int >::iterator activity = ASTEmap[ id ]->enclosedActivities.begin();
+            activity != ASTEmap[ id ]->enclosedActivities.end();
+            activity++ )
+      {
+        set< unsigned int > sources = ASTEmap[ *activity ]->enclosedSourceLinks;
+
+        // is this the right id?
+        if ( sources.find( linkId ) != sources.end() )
+        {
+          // yeah, everything is fine
+          internal = true;
+        }
+      }
+      // the linkId doesn't belong to the set of enclosed activities, so trigger the error
+      if ( !internal )
+      {
+        SAerror( 71, ASTEmap[ linkId ]->linkName, ASTEmap[ id ]->attributes[ "referenceLine" ] );
+      }
+    }
+  }
+
+  LEAVE("check_SA00071");
+}
+
 
 /******************************************************************************
  * Functions for the XML (pretty) unparser defined in bpel-unparse-xml.k

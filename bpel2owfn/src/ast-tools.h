@@ -29,13 +29,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/01/17 10:17:23 $
+ * \date    \$Date: 2007/01/17 14:45:45 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -120,7 +120,7 @@ void enterEnclosedActivities( unsigned int a, set< unsigned int > b );
  *****************************************************************************/
 
 void check_SA00070( unsigned int id );
-
+void check_SA00071( unsigned int id );
 
 
 /******************************************************************************

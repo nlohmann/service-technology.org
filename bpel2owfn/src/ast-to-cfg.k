@@ -28,11 +28,11 @@
  * associated control flow block.
  * 
  * \author  Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *         
  * \since   2006-01-19
  *
- * \date    \$Date: 2006/12/17 16:19:10 $
+ * \date    \$Date: 2007/01/17 14:45:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.48 $
+ * \version \$Revision: 1.49 $
  */
 %}
 
@@ -287,6 +287,41 @@ implicitCompensationHandler(_id) ->
   [cfg: {
 	  trace(TRACE_DEBUG, "[CFG] CompensationHandler (implicit)\n");
 	  CFGBlock * block = new CFGBlock(CFGCompensationHandler, $0->id, "implicitCompensationHandler"); 
+	  cfgMap[toString($0->id)] = block;
+	}
+
+  ];
+
+
+/******************************************************************************
+  TERMINATION HANDLER
+******************************************************************************/
+
+TerminationHandler(a,_id) ->
+  [cfg: {
+	  trace(TRACE_DEBUG, "[CFG] TerminationHandler (user defined)\n");
+	  CFGBlock * firstBlock = new CFGBlock(CFGTerminationHandler, $0->id, "TerminationHandler_begin"); 
+	  CFGBlock * lastBlock  = new CFGBlock(CFGTerminationHandler, $0->id, "TerminationHandler_end"); 
+	  cfgMap[toString($0->id)] = firstBlock;
+
+	  firstBlock->firstBlock = lastBlock->firstBlock = firstBlock;
+	  firstBlock->lastBlock  = lastBlock->lastBlock  = lastBlock;
+	}
+	a // inner activity
+	{
+	  CFGBlock * innerFirst = cfgMap.find(toString(a->id))->second->firstBlock;
+	  CFGBlock * innerLast  = cfgMap.find(toString(a->id))->second->lastBlock;
+	  
+	  connectBlocks(firstBlock, innerFirst);
+	  connectBlocks(innerLast, lastBlock);
+	}
+
+  ];
+
+standardTerminationHandler(_id) ->
+  [cfg: {
+	  trace(TRACE_DEBUG, "[CFG] TerminationHandler (standard)\n");
+	  CFGBlock * block = new CFGBlock(CFGCompensationHandler, $0->id, "standardTerminationHandler"); 
 	  cfgMap[toString($0->id)] = block;
 	}
 
@@ -950,6 +985,15 @@ Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
 
 	  connectBlocks(firstBlock, chFirst);
 	  connectBlocks(chLast, lastBlock);
+
+	}
+	e //terminationHandler
+	{
+	  CFGBlock * thFirst = cfgMap.find(toString(e->id))->second->firstBlock;
+	  CFGBlock * thLast  = cfgMap.find(toString(e->id))->second->lastBlock;
+
+	  connectBlocks(firstBlock, thFirst);
+	  connectBlocks(thLast, lastBlock);
 
 	}
 	f //eventHandler

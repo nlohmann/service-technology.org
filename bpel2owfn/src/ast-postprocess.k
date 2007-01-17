@@ -30,7 +30,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/01/17 13:07:50 $
+ * \date    \$Date: 2007/01/17 14:45:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.121 $
+ * \version \$Revision: 1.122 $
  */
 %}
 
@@ -321,6 +321,8 @@ Catch(a,_id) ->
       myself->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
       myself->enclosedActivities.insert( a->id );
       enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+
+      check_SA00071( myid );
     }
   ]
 ;
@@ -342,6 +344,8 @@ CatchAll(a,_id) ->
       myself->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
       myself->enclosedActivities.insert( a->id );
       enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+
+      check_SA00071( myid );
     }
   ]
 ;
@@ -567,6 +571,8 @@ TerminationHandler(a,_id) ->
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
       enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+
+      check_SA00071( myid );
     }
   ]
 ;

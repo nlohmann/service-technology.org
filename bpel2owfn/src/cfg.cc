@@ -30,14 +30,14 @@
  * 
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/01/17 13:20:39 $
+ * \date    \$Date: 2007/01/17 14:45:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -510,28 +510,34 @@ void CFGBlock::checkForCyclicLinks()
 
     if (type == CFGTarget)
     {
-      linkname = ASTEmap[id]->linkName; //(dynamic_cast<STSourceTarget*>(symTab.lookup(id)))->link->name;
+      trace( TRACE_VERY_DEBUG, "[CFG] Get Name of the link when target\n");
+      linkname = ASTEmap[id]->linkName;
     }
     else if (type == CFGSource)
     {
-      linkname = ASTEmap[id]->linkName; //(dynamic_cast<STSourceTarget*>(symTab.lookup(id)))->link->name;
+      trace( TRACE_VERY_DEBUG, "[CFG] Get Name of the link when source\n");
+      linkname = ASTEmap[id]->linkName;
     }
 
     
     if (type == CFGSource)
     {
+      trace( TRACE_VERY_DEBUG, "[CFG] Have we seen the target?\n");
       if (!targetsSeen.empty() && targetsSeen.find(linkname) != targetsSeen.end())
       {
         // triggers SA00072
 	SAerror(72, ASTEmap[ id ]->attributes["linkName"], toInt(ASTEmap[id]->attributes["referenceLine"]));
 	return;
       }
+      trace( TRACE_VERY_DEBUG, "[CFG] So get the target to the source\n");
       CFGBlock * targ = targets[dot_name()];
+      trace( TRACE_VERY_DEBUG, "[CFG] Unify the targets we have seen, now really\n");
       targ->targetsSeen = setUnion(targ->targetsSeen, targetsSeen);
       targ->checkForCyclicLinks();
     }
     else if (type == CFGTarget)
     {
+      trace( TRACE_VERY_DEBUG, "[CFG] Oh, we have a new target seen.\n" );
       targetsSeen.insert(linkname);
     }
 
@@ -539,16 +545,19 @@ void CFGBlock::checkForCyclicLinks()
     {
       for (list<CFGBlock*>::iterator iter = nextBlocks.begin(); iter != nextBlocks.end(); iter++)
       {
+        trace( TRACE_VERY_DEBUG, "[CFG] Unify the targets we have seen 2\n");
         (*iter)->targetsSeen = setUnion((*iter)->targetsSeen, targetsSeen);
 	(*iter)->checkForCyclicLinks();
       }
     }
   }
+  LEAVE("checkForCyclicLinks");
 }
 
 /// checks for cycles in control dependency
 void CFGBlock::checkForCyclicControlDependency()
 {
+  ENTER("checkForCyclicControlDependency");
   if ( processed )
   {
     return;
@@ -666,13 +675,16 @@ void CFGBlock::checkForCyclicControlDependency()
   else
   {
     processed = false;
+    LEAVE("checkForCyclicControlDependency");
     return;
   }
+  LEAVE("checkForCyclicControlDependency");
 }
 
 /// checks for conflicting receives
 void CFGBlock::checkForConflictingReceive()
 {
+  ENTER("checkForConflictingReceive");
   if (processed)
   {
     return;
@@ -794,9 +806,11 @@ void CFGBlock::checkForConflictingReceive()
   else
   {
     processed = false;
+    LEAVE("checkForConflictingReceive");
     return;
   }
 
+  LEAVE("checkForConflictingReceive");
 }
 
 

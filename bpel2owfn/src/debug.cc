@@ -29,13 +29,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/01/17 10:17:23 $
+ * \date    \$Date: 2007/01/17 14:45:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  *
  * \ingroup debug
  */
@@ -282,6 +282,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
 
     case(70):
       { cerr << "<link> `" << information << "' crosses boundary of a repeatable construct or of a compensation handler" << endl;
+	break; }
+
+    case(71):
+      { cerr << "<link> `" << information << "' crosses boundary of a fault handler or a termination handler, but is inbound" << endl;
 	break; }
 
     case(72):

@@ -38,7 +38,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/01/17 10:17:23 $
+ * \date    \$Date: 2007/01/18 13:11:44 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -48,7 +48,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.285 $
+ * \version \$Revision: 1.286 $
  *
  * \todo Overwork documentation: WS-BPEL can also be parsed!
  *
@@ -689,8 +689,8 @@ tReply:
 tInvoke:
   K_INVOKE arbitraryAttributes X_SLASH
     { $$ = Invoke(NoStandardElements(), NiltCorrelation_list(), NiltToPart_list(), NiltFromPart_list(), $2); }
-| K_INVOKE arbitraryAttributes X_NEXT X_SLASH K_INVOKE
-    { $$ = Invoke(NoStandardElements(), NiltCorrelation_list(), NiltToPart_list(), NiltFromPart_list(), $2); }
+//| K_INVOKE arbitraryAttributes X_NEXT X_SLASH K_INVOKE
+//    { $$ = Invoke(NoStandardElements(), NiltCorrelation_list(), NiltToPart_list(), NiltFromPart_list(), $2); }
 | K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations tCatch tCatchAll tCompensationHandler tToParts tFromParts X_SLASH K_INVOKE
     { $$ = annotatedInvoke($4, $5, $6, $7, $8, $9, $10, $2); }
 | K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations tCatchAll tCompensationHandler tToParts tFromParts X_SLASH K_INVOKE
@@ -1058,12 +1058,15 @@ tLink:
 ******************************************************************************/
 
 tScope:
+/*      
   K_SCOPE arbitraryAttributes X_NEXT standardElements
   tVariables tCorrelationSets tFaultHandlers tCompensationHandler tTerminationHandler
   tEventHandlers activity 
   X_NEXT X_SLASH K_SCOPE
     { $$ = Scope($4, $5, $7, $8, $9, $10, $6, StopInScope(), $11, NiltPartnerLink_list(), $2); }
-| K_SCOPE arbitraryAttributes X_NEXT standardElements tPartnerLinks
+| 
+*/
+  K_SCOPE arbitraryAttributes X_NEXT standardElements tPartnerLinks
   tMessageExchanges tVariables tCorrelationSets tFaultHandlers
   tCompensationHandler tTerminationHandler tEventHandlers activity 
   X_NEXT X_SLASH K_SCOPE

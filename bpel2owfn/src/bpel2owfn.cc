@@ -25,18 +25,18 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/01/01 18:55:17 $
+ * \date    \$Date: 2007/01/19 11:37:16 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.140 $
+ * \version \$Revision: 1.141 $
  */
 
 
@@ -424,6 +424,22 @@ int main( int argc, char *argv[])
       }
     }
 
+    // create SPIN output ?
+    if ( formats[F_SPIN] )
+    {
+      if (output_filename != "")
+      {
+	output = openOutput(output_filename + "." + suffixes[F_SPIN]);
+      }
+      trace(TRACE_INFORMATION, "-> Printing Petri net for SPIN ...\n");
+      PN.set_format(FORMAT_SPIN);
+      (*output) << PN;
+      if (output_filename != "")
+      {
+	closeOutput(output);
+	output = NULL;
+      }
+    }
 
     // create APNN output ?
     if ( formats[F_APNN] )

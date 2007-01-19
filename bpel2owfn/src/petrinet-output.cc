@@ -24,17 +24,17 @@
  * \brief   Petri Net API: file output
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/01/16 15:56:30 $
+ * \date    \$Date: 2007/01/19 11:37:16 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.74 $
+ * \version \$Revision: 1.75 $
  *
  * \ingroup petrinet
  */
@@ -752,6 +752,86 @@ void PetriNet::output_ina(ostream *output) const
 
 
 /*!
+ * Outputs the net in SPIN format.
+ *
+ * The complete syntax can be found at
+ * [WEBSITE]
+ *
+ * \param output  output stream
+ *
+ * \pre output != NULL
+ */
+void PetriNet::output_spin(ostream *output) const
+{
+  assert(output != NULL);
+  // net header
+  (*output) << "/* NO 1-safe */" << endl;
+
+  // places (only internal)
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+  {
+    (*output) << "byte p" << (*p)->id << "=" << (*p)->tokens << ";" << endl;
+  }
+
+  (*output) << "int {" << endl;
+  (*output) << "\tdo" << endl;
+
+
+  // transitions
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+  {
+    set<Node*> pre = preset(*t);
+    set<Node*> post = postset(*t);
+    int follower=0;
+    (*output) << "\t::atomic { (";
+    
+    if (pre.empty())
+    {
+      (*output) << "0";
+    }
+    else
+    {
+      for (set<Node *>::iterator p = pre.begin(); p != pre.end(); p++)
+      {
+        if(follower) 
+        {
+          (*output) << "&&";          
+        } 
+        else 
+        {
+          follower=1;
+        }
+        (*output) << "(p" << (*p)->id << ">=" << arc_weight(*p,*t) << ")";
+      }
+    }
+
+    (*output) << ") -> ";
+  
+    for (set<Node *>::iterator p = pre.begin(); p != pre.end(); p++)
+    {
+      (*output) << "p" << (*p)->id << "=p" << (*p)->id << "-" << arc_weight(*p,*t) << ";";
+    }
+
+    (*output) << endl << "\t\t\t";
+    
+    for (set<Node *>::iterator p = post.begin(); p != post.end(); p++)
+    {
+      (*output) << "p" << (*p)->id << "=p" << (*p)->id << "+" << arc_weight(*t,*p) << ";";
+    }
+
+    (*output) << " }" << endl;
+    
+  }
+  
+    (*output) << "\tod;" << endl;
+    (*output) << "}" << endl;
+}
+
+
+
+
+
+/*!
  * Outputs the net in APNN (Abstract Petri Net Notation).
  *
  * \param output  output stream
@@ -1122,6 +1202,7 @@ ostream& operator<< (ostream& os, const PetriNet &obj)
     case(FORMAT_APNN):	obj.output_apnn(&os); break;
     case(FORMAT_DOT):	obj.output_dot(&os, obj.use_standard_style); break;
     case(FORMAT_INA):	obj.output_ina(&os); break;
+    case(FORMAT_SPIN):	obj.output_spin(&os); break;
     case(FORMAT_INFO):	obj.output_info(&os); break;
     case(FORMAT_LOLA):	obj.output_lola(&os); break;
     case(FORMAT_OWFN):	obj.output_owfn(&os); break;

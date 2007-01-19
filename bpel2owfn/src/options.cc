@@ -29,13 +29,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/01/04 20:22:41 $
+ * \date    \$Date: 2007/01/19 11:37:16 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.66 $
+ * \version \$Revision: 1.67 $
  */
 
 
@@ -180,7 +180,7 @@ void print_help()
   trace("    wsbpel                  use the semantics of WS-BPEL 2.0\n");
   trace("\n");
   trace("  FORMAT is one of the following (multiple formats permitted):\n");
-  trace("    lola, owfn, dot, pep, apnn, ina, info, pnml, txt, info\n");
+  trace("    lola, owfn, dot, pep, apnn, ina, spin, info, pnml, txt, info\n");
   trace("\n");
   trace("Examples:\n");
   trace("  bpel2owfn -i service.bpel -m petrinet -f owfn -o\n");
@@ -225,6 +225,7 @@ void parse_command_line(int argc, char* argv[])
   suffixes[F_OWFN] = "owfn"  ;
   suffixes[F_DOT]  = "dot"   ;
   suffixes[F_INA]  = "pnt";
+  suffixes[F_SPIN]  = "spin";
   suffixes[F_PEP]  = "ll_net";
   suffixes[F_APNN] = "apnn"  ;
   suffixes[F_INFO] = "info"  ;
@@ -233,7 +234,7 @@ void parse_command_line(int argc, char* argv[])
   suffixes[F_XML]  = "xml"   ;
 
   // this array helps us to automatically check the valid formats
-  possibleFormats format[] = { F_LOLA, F_OWFN, F_DOT, F_INA, F_PEP, F_APNN, F_INFO, F_PNML, F_TXT, F_XML };
+  possibleFormats format[] = { F_LOLA, F_OWFN, F_DOT, F_INA, F_SPIN, F_PEP, F_APNN, F_INFO, F_PNML, F_TXT, F_XML };
 
   // this map indicates, whether a certain format is valid for a mode
   map< pair<possibleModi,possibleFormats>, bool > validFormats;
@@ -246,6 +247,7 @@ void parse_command_line(int argc, char* argv[])
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_OWFN)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_DOT )] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_INA )] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_SPIN)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_PEP )] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_APNN)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_PETRINET,F_INFO)] = true;
@@ -255,6 +257,7 @@ void parse_command_line(int argc, char* argv[])
   validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_OWFN)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_DOT )] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_INA )] = true;
+  validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_SPIN)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_PEP )] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_APNN)] = true;
   validFormats[pair<possibleModi,possibleFormats>(M_CONSISTENCY,F_INFO)] = true;
@@ -373,6 +376,8 @@ void parse_command_line(int argc, char* argv[])
 		  formats[F_INFO] = true;
 		else if (parameter == "ina")
 		  formats[F_INA] = true;
+		else if (parameter == "spin")
+		  formats[F_SPIN] = true;
 		else if (parameter == suffixes[F_PNML])
 		  formats[F_PNML] = true;
 		else if (parameter == suffixes[F_TXT])

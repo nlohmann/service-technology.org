@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/01/17 10:17:23 $
+ * \date    \$Date: 2007/01/19 11:37:16 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.129 $
+ * \version \$Revision: 1.130 $
  *
  * \ingroup petrinet
  */
@@ -144,6 +144,7 @@ typedef enum
   FORMAT_APNN,		///< Abstract Petri Net Notation (APNN)
   FORMAT_DOT,		///< Graphviz dot
   FORMAT_INA,		///< INA
+  FORMAT_SPIN,		///< INA
   FORMAT_INFO,		///< Info File
   FORMAT_LOLA,		///< LoLA
   FORMAT_OWFN,		///< Fiona open workflow net (oWFN)
@@ -485,6 +486,9 @@ class PetriNet
 
     /// INA output
     void output_ina(ostream *output) const;
+
+    /// SPIN output
+    void output_spin(ostream *output) const;
 
     /// info file output
     void output_info(ostream *output) const;

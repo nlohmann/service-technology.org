@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2006/12/30 12:48:02 $
+ * \date    \$Date: 2007/01/19 11:37:16 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.44 $
+ * \version \$Revision: 1.45 $
  */
 
 
@@ -119,6 +119,7 @@ typedef enum
   F_PEP,		///< low-level PEP notation
   F_APNN,		///< Abstract Petri Net Notation
   F_INA,		///< INA Petri net
+  F_SPIN,		///< SPIN Petri net
   F_INFO,		///< BPEL2oWFN information file
   F_PNML,		///< Petri Net Markup Language
   F_TXT,		///< ASCII output (for the abstract syntax tree)

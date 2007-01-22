@@ -34,11 +34,11 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/01/18 13:11:44 $
+ * \date    \$Date: 2007/01/22 10:24:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -48,7 +48,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.286 $
+ * \version \$Revision: 1.287 $
  *
  * \todo Overwork documentation: WS-BPEL can also be parsed!
  *
@@ -691,10 +691,10 @@ tInvoke:
     { $$ = Invoke(NoStandardElements(), NiltCorrelation_list(), NiltToPart_list(), NiltFromPart_list(), $2); }
 //| K_INVOKE arbitraryAttributes X_NEXT X_SLASH K_INVOKE
 //    { $$ = Invoke(NoStandardElements(), NiltCorrelation_list(), NiltToPart_list(), NiltFromPart_list(), $2); }
-| K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations tCatch tCatchAll tCompensationHandler tToParts tFromParts X_SLASH K_INVOKE
+| K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations tCatch_list tCatchAll tCompensationHandler tToParts tFromParts X_SLASH K_INVOKE
     { $$ = annotatedInvoke($4, $5, $6, $7, $8, $9, $10, $2); }
-| K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations tCatchAll tCompensationHandler tToParts tFromParts X_SLASH K_INVOKE
-    { $$ = annotatedInvoke($4, $5, NoCatch(), $6, $7, $8, $9, $2); }
+//| K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations tCatchAll tCompensationHandler tToParts tFromParts X_SLASH K_INVOKE
+//    { $$ = annotatedInvoke($4, $5, NoCatch(), $6, $7, $8, $9, $2); }
 ;
 
 
@@ -1058,20 +1058,17 @@ tLink:
 ******************************************************************************/
 
 tScope:
-/*      
-  K_SCOPE arbitraryAttributes X_NEXT standardElements
-  tVariables tCorrelationSets tFaultHandlers tCompensationHandler tTerminationHandler
+  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
+  tCorrelationSets tFaultHandlers tCompensationHandler
   tEventHandlers activity 
   X_NEXT X_SLASH K_SCOPE
-    { $$ = Scope($4, $5, $7, $8, $9, $10, $6, StopInScope(), $11, NiltPartnerLink_list(), $2); }
+    { $$ = Scope($4, $5, $7, $8, standardTerminationHandler(mkinteger(0)), $9, $6, StopInScope(), $10, NiltPartnerLink_list(), $2); }
 | 
-*/
-  K_SCOPE arbitraryAttributes X_NEXT standardElements tPartnerLinks
-  tMessageExchanges tVariables tCorrelationSets tFaultHandlers
-  tCompensationHandler tTerminationHandler tEventHandlers activity 
+  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables tPartnerLinks
+  tMessageExchanges tCorrelationSets tEventHandlers tFaultHandlers
+  tCompensationHandler tTerminationHandler activity 
   X_NEXT X_SLASH K_SCOPE
-    { $$ = Scope($4, $7, $9, $10, $11, $12, $8, StopInScope(), $13, $5, $2); }
-
+    { $$ = Scope($4, $5, $10, $11, $12, $9, $8, StopInScope(), $13, $6, $2); }
 ;
 
 

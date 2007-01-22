@@ -30,7 +30,7 @@
  * 
  * \since   2005-10-03
  *
- * \date    \$Date: 2006/12/17 16:19:10 $
+ * \date    \$Date: 2007/01/22 10:24:57 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.158 $
+ * \version \$Revision: 1.159 $
  */
 %}
 
@@ -160,7 +160,7 @@ tCatch_list: list tCatch;
 
 tCatch:
   Catch(activity integer)
-| NoCatch()
+//| NoCatch()
 ;
 
 tCatchAll:
@@ -287,7 +287,7 @@ tInvoke:
 | SynchronousInvoke(standardElements tCorrelation_list tToPart_list tFromPart_list integer)
 | AsynchronousInvoke(standardElements tCorrelation_list tToPart_list tFromPart_list integer)
   /* will be disposed during postprocessing: */
-| annotatedInvoke(standardElements tCorrelation_list tCatch tCatchAll tCompensationHandler tToPart_list tFromPart_list integer)
+| annotatedInvoke(standardElements tCorrelation_list tCatch_list tCatchAll tCompensationHandler tToPart_list tFromPart_list integer)
 ;
 
 

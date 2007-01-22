@@ -29,14 +29,14 @@
  * 
  * \since   2006/10/11
  *
- * \date    \$Date: 2007/01/01 18:55:17 $
+ * \date    \$Date: 2007/01/22 10:24:57 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  */
 %}
 
@@ -62,7 +62,7 @@ activityInvoke(
   annotatedInvoke(
     my_standardElements,
     my_tCorrelation_list,
-    NoCatch(),
+    NiltCatch_list(),
     NoCatchAll(),
     implicitCompensationHandler(a),
     my_tToPart_list,
@@ -92,7 +92,7 @@ activityInvoke(
   annotatedInvoke(
     my_standardElements,
     my_tCorrelation_list,
-    my_tCatch,
+    my_tCatchList,
     my_tCatchAll,
     my_tCompensationHandler,
     my_tToPart_list,
@@ -107,10 +107,7 @@ activityInvoke(
       my_standardElements,
       NiltVariable_list(),
       userDefinedFaultHandler(
-        ConstCatch_list(
-          my_tCatch,
-          NiltCatch_list()
-        ),
+        my_tCatchList,
         my_tCatchAll,
         mkinteger(0)
       ),
@@ -249,7 +246,7 @@ implicitCompensationHandler(_id) provided (parameters[P_WSBPEL]) ->
 /*
  * A list of <catch> branches is empty if it just encloses a NoCatch
  * element.
- */
+ *
 ConstCatch_list(
   NoCatch(),
   NiltCatch_list()
@@ -258,6 +255,7 @@ ConstCatch_list(
 <implicit:
   NiltCatch_list()
 >;
+*/
 
 
 /*

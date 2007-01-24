@@ -29,13 +29,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/01/17 14:45:45 $
+ * \date    \$Date: 2007/01/24 13:27:39 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.56 $
+ * \version \$Revision: 1.57 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -546,8 +546,16 @@ namespace {
 
 
 /*!
+ * \brief Returns the relationship between to activities.
  *
- * \comment me!
+ * Two activities are always in some kind of relationship. Either conflicting, concurrent, or consecutively.
+ * This method returns this relationship as analyzed in postprocessing.
+ *
+ * \param a	the id of the first activity
+ * \param b	the id of the second activity
+ * \returns     the relationship of a and b
+ *
+ * \ingroup creation
  */
 activityRelationType activityRelation(unsigned int a, unsigned int b)
 {
@@ -556,6 +564,14 @@ activityRelationType activityRelation(unsigned int a, unsigned int b)
     LEAVE("activityRelation");
 }
 
+/*!
+ * \brief Defines two activities as conflicting.
+ *
+ * \param a	the id of the first activity
+ * \param b	the id of the second activity
+ *
+ * \ingroup creation
+ */
 void conflictingActivities(unsigned int a, unsigned int b)
 {
     ENTER("conflictingActivities");
@@ -565,6 +581,14 @@ void conflictingActivities(unsigned int a, unsigned int b)
     LEAVE("conflictingActivities");
 }
 
+/*!
+ * \brief For two sets of activities define each pair of an a and a b activity as conflicting.
+ *
+ * \param a	the first set activity ids
+ * \param b	the second set activity ids
+ *
+ * \ingroup creation
+ */
 void enterConflictingActivities( set< unsigned int > a, set< unsigned int > b )
 {
   ENTER("enterConflictingActivities");
@@ -582,6 +606,14 @@ void enterConflictingActivities( set< unsigned int > a, set< unsigned int > b )
   LEAVE("enterConflictingActivities");
 }
 
+/*!
+ * \brief Defines two activities as enclodes.
+ *
+ * \param a	the id of the first activity
+ * \param b	the id of the second activity
+ *
+ * \ingroup creation
+ */
 void enclosedActivities( unsigned int a, unsigned int b )
 {
     ENTER("enclosedActivities");
@@ -590,6 +622,14 @@ void enclosedActivities( unsigned int a, unsigned int b )
     LEAVE("enclosedActivities");
 }
 
+/*!
+ * \brief For two sets of activities define each pair of an a and a b activity as enclosed.
+ *
+ * \param a	the first set activity ids
+ * \param b	the second set activity ids
+ *
+ * \ingroup creation
+ */
 void enterEnclosedActivities( unsigned int a, set< unsigned int > b )
 {
   ENTER("enterEnclosedActivities");
@@ -606,6 +646,12 @@ void enterEnclosedActivities( unsigned int a, set< unsigned int > b )
  * Functions for checking SA00070 and SA00071
  *****************************************************************************/
 
+/*!
+ * \brief Checks for Static Analysis item SA00070.
+ *
+ * \param id  the id of the item to be checked
+ *
+ */
 void check_SA00070( unsigned int id )
 {
   ENTER("check_SA00070");
@@ -650,6 +696,12 @@ void check_SA00070( unsigned int id )
   LEAVE("check_SA00070");
 }
 
+/*!
+ * \brief Checks for Static Analysis item SA00071.
+ *
+ * \param id  the id of the item to be checked
+ *
+ */
 void check_SA00071( unsigned int id )
 {
   ENTER("check_SA00071");
@@ -747,7 +799,10 @@ void indown()
 
 
 /*!
- * \todo comment me
+ * \brief Lists attributes for use in pretty printer mode
+ *
+ * \param id  the id of the activity, whose attributes should be printed
+ *
  */
 void listAttributes ( unsigned int id )
 {

@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2006/12/30 12:48:02 $
+ * \date    \$Date: 2007/01/24 13:27:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.70 $
+ * \version \$Revision: 1.71 $
  *
  * \ingroup conversion
  * \ingroup debug
@@ -59,6 +59,7 @@
 #include "debug.h"
 
 using std::istringstream;
+using std::ostringstream;
 using std::cout;
 using std::cerr;
 using std::clog;
@@ -103,10 +104,11 @@ string toString(kc::integer i)
  */
 string toString(int i)
 {
-  char buffer[20];
-  sprintf(buffer, "%d", i);
+  std::ostringstream buffer;
   
-  return string(buffer);
+  buffer << i;
+  
+  return buffer.str();
 }
 
 

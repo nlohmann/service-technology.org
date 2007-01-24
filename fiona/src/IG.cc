@@ -82,10 +82,11 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * cur
 
 			if (currentNode->eventsUsed[i] >= PN->inputPlacesArray[i]->max_occurence) {
 				// this input event shall not be sent anymore, so quit here
-				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");
-				trace(TRACE_3, "maximal occurances of event ");
+				trace(TRACE_3, "maximal occurrences of event ");
 				trace(TRACE_3, PN->inputPlacesArray[i]->name);
 				trace(TRACE_3, " reached\n");
+
+				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");
 				return false;
 			}
 		} else if (typeOfPlace == receiving) {
@@ -96,10 +97,10 @@ bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * cur
 			}
 			if (currentNode->eventsUsed[i + PN->placeInputCnt] >= PN->outputPlacesArray[i]->max_occurence) {
 				// this output event shall not be received anymore, so quit here
-				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");
-				trace(TRACE_3, "maximal occurances of event ");
-				trace(TRACE_3, PN->inputPlacesArray[i]->name);
+				trace(TRACE_3, "maximal occurrences of event ");
+				trace(TRACE_3, PN->outputPlacesArray[i]->name);
 				trace(TRACE_3, " reached\n");
+				trace(TRACE_5, "oWFN::checkMaximalEvents(messageMultiSet input, vertex * currentNode, bool typeOfPlace): end\n");				
 				return false;		
 			}
 		}

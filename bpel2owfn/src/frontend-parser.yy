@@ -34,11 +34,11 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/01/22 10:24:57 $
+ * \date    \$Date: 2007/01/25 15:46:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -48,7 +48,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.287 $
+ * \version \$Revision: 1.288 $
  *
  * \todo Overwork documentation: WS-BPEL can also be parsed!
  *
@@ -191,6 +191,7 @@ unsigned int ASTEid = 1;
 %type <yt_tCompensate> tCompensate
 %type <yt_tCompensate> tCompensateScope
 %type <yt_tCompensationHandler> tCompensationHandler
+%type <yt_tCompensationHandler> truetCompensationHandler
 %type <yt_casestring> tCompletionCondition
 %type <yt_tCopy_list> tCopy_list
 %type <yt_tCopy> tCopy
@@ -205,8 +206,10 @@ unsigned int ASTEid = 1;
 %type <yt_tElseIf_list> tElseIf_list
 %type <yt_tEmpty> tEmpty
 %type <yt_tEventHandlers> tEventHandlers
+%type <yt_tEventHandlers> truetEventHandlers
 %type <yt_tExit> tExit
 %type <yt_tFaultHandlers> tFaultHandlers
+%type <yt_tFaultHandlers> truetFaultHandlers
 %type <yt_casestring> tFinalCounterValue
 %type <yt_tFlow> tFlow
 %type <yt_tForEach> tForEach
@@ -230,6 +233,7 @@ unsigned int ASTEid = 1;
 %type <yt_tPartner> tPartner
 %type <yt_tPartnerLink_list> tPartnerLink_list
 %type <yt_tPartnerLink_list> tPartnerLinks
+%type <yt_tPartnerLink_list> truetPartnerLinks
 %type <yt_tPartnerLink> tPartnerLink
 %type <yt_tPick> tPick
 %type <yt_tProcess> tProcess
@@ -247,6 +251,7 @@ unsigned int ASTEid = 1;
 %type <yt_tTarget> tTarget
 %type <yt_tTerminate> tTerminate
 %type <yt_tTerminationHandler> tTerminationHandler
+%type <yt_tTerminationHandler> truetTerminationHandler
 %type <yt_tThrow> tThrow
 %type <yt_tTo> tTo
 %type <yt_tToPart> tToPart
@@ -1057,6 +1062,7 @@ tLink:
   SCOPE
 ******************************************************************************/
 
+/* OLD SCOPE START
 tScope:
   K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
   tCorrelationSets tFaultHandlers tCompensationHandler
@@ -1064,16 +1070,137 @@ tScope:
   X_NEXT X_SLASH K_SCOPE
     { $$ = Scope($4, $5, $7, $8, standardTerminationHandler(mkinteger(0)), $9, $6, StopInScope(), $10, NiltPartnerLink_list(), $2); }
 | 
-  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables tPartnerLinks
+  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables tPartnerLinks 
   tMessageExchanges tCorrelationSets tEventHandlers tFaultHandlers
   tCompensationHandler tTerminationHandler activity 
   X_NEXT X_SLASH K_SCOPE
     { $$ = Scope($4, $5, $10, $11, $12, $9, $8, StopInScope(), $13, $6, $2); }
 ;
 
+OLD SCOPE END */
 
+/* HELPERS */
 
+truetTerminationHandler:
+  K_TERMINATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_TERMINATIONHANDLER X_NEXT
+    { $$ = TerminationHandler($3, mkinteger(0)); }
+;
 
+truetCompensationHandler:
+  K_COMPENSATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_COMPENSATIONHANDLER X_NEXT
+    { $$ = userDefinedCompensationHandler($3, mkinteger(0)); }
+;
+
+truetFaultHandlers:
+  K_FAULTHANDLERS X_NEXT tCatch_list tCatchAll X_SLASH K_FAULTHANDLERS X_NEXT
+    { $$ = userDefinedFaultHandler($3, $4, mkinteger(0)); }
+;
+
+truetEventHandlers:
+  K_EVENTHANDLERS X_NEXT tOnMessage_list tOnAlarm_list X_SLASH K_EVENTHANDLERS X_NEXT
+    { $$ = userDefinedEventHandler($3, $4, mkinteger(0)); }
+;
+
+truetPartnerLinks:
+  K_PARTNERLINKS arbitraryAttributes X_NEXT tPartnerLink_list X_SLASH K_PARTNERLINKS X_NEXT
+    { $$ = $4; } 
+;
+
+truetMessageExchanges:
+  K_MESSAGEEXCHANGES X_NEXT tMessageExchange_list X_SLASH K_MESSAGEEXCHANGES X_NEXT
+;
+
+/* ALTERNATIVE */
+
+tScope:
+  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
+  tCorrelationSets activity 
+  X_NEXT X_SLASH K_SCOPE
+    { $$ = Scope($4, $5, implicitFaultHandler(mkinteger(0)), implicitCompensationHandler(mkinteger(0)), standardTerminationHandler(mkinteger(0)), implicitEventHandler(mkinteger(0)), $6, StopInScope(), $7, NiltPartnerLink_list(), $2); }
+| 
+  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
+  tCorrelationSets truetFaultHandlers activity 
+  X_NEXT X_SLASH K_SCOPE
+    { $$ = Scope($4, $5, $7, implicitCompensationHandler(mkinteger(0)), standardTerminationHandler(mkinteger(0)), implicitEventHandler(mkinteger(0)), $6, StopInScope(), $8, NiltPartnerLink_list(), $2); }
+| 
+  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
+  tCorrelationSets truetCompensationHandler activity 
+  X_NEXT X_SLASH K_SCOPE
+    { $$ = Scope($4, $5, implicitFaultHandler(mkinteger(0)), $7, standardTerminationHandler(mkinteger(0)), implicitEventHandler(mkinteger(0)), $6, StopInScope(), $8, NiltPartnerLink_list(), $2); }
+| 
+  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
+  tCorrelationSets truetEventHandlers activity 
+  X_NEXT X_SLASH K_SCOPE
+    { $$ = Scope($4, $5, implicitFaultHandler(mkinteger(0)), implicitCompensationHandler(mkinteger(0)), standardTerminationHandler(mkinteger(0)), $7, $6, StopInScope(), $8, NiltPartnerLink_list(), $2); }
+| 
+  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
+  tCorrelationSets truetFaultHandlers 
+  truetEventHandlers activity 
+  X_NEXT X_SLASH K_SCOPE
+    { $$ = Scope($4, $5, $7, implicitCompensationHandler(mkinteger(0)), standardTerminationHandler(mkinteger(0)), $8, $6, StopInScope(), $9, NiltPartnerLink_list(), $2); }
+| 
+  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
+  tCorrelationSets truetCompensationHandler 
+  truetEventHandlers activity 
+  X_NEXT X_SLASH K_SCOPE
+    { $$ = Scope($4, $5, implicitFaultHandler(mkinteger(0)), $7, standardTerminationHandler(mkinteger(0)), $8, $6, StopInScope(), $9, NiltPartnerLink_list(), $2); }
+|
+  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
+  tCorrelationSets truetFaultHandlers truetCompensationHandler
+  truetEventHandlers activity 
+  X_NEXT X_SLASH K_SCOPE
+    { $$ = Scope($4, $5, $7, $8, standardTerminationHandler(mkinteger(0)), $9, $6, StopInScope(), $10, NiltPartnerLink_list(), $2); }
+|
+  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
+  tCorrelationSets truetFaultHandlers truetCompensationHandler
+  activity 
+  X_NEXT X_SLASH K_SCOPE
+    { $$ = Scope($4, $5, $7, $8, standardTerminationHandler(mkinteger(0)), implicitEventHandler(mkinteger(0)), $6, StopInScope(), $9, NiltPartnerLink_list(), $2); }
+|
+  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables truetPartnerLinks 
+  tMessageExchanges tCorrelationSets tEventHandlers tFaultHandlers
+  tCompensationHandler tTerminationHandler activity 
+  X_NEXT X_SLASH K_SCOPE
+    { $$ = Scope($4, $5, $10, $11, $12, $9, $8, StopInScope(), $13, $6, $2); }
+| 
+  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
+  truetMessageExchanges tCorrelationSets tEventHandlers tFaultHandlers
+  tCompensationHandler tTerminationHandler activity 
+  X_NEXT X_SLASH K_SCOPE
+    { $$ = Scope($4, $5, $9, $10, $11, $8, $7, StopInScope(), $12, NiltPartnerLink_list(), $2); }
+| 
+  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
+  tCorrelationSets truetEventHandlers truetFaultHandlers
+  tCompensationHandler tTerminationHandler activity 
+  X_NEXT X_SLASH K_SCOPE
+    { $$ = Scope($4, $5, $8, $9, $10, $7, $6, StopInScope(), $11, NiltPartnerLink_list(), $2); }
+| 
+  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
+  tCorrelationSets truetEventHandlers truetCompensationHandler tTerminationHandler activity 
+  X_NEXT X_SLASH K_SCOPE
+    { $$ = Scope($4, $5, implicitFaultHandler(mkinteger(0)), $8, $9, $7, $6, StopInScope(), $10, NiltPartnerLink_list(), $2); }
+| 
+  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
+  tCorrelationSets truetFaultHandlers
+  truetCompensationHandler truetTerminationHandler activity 
+  X_NEXT X_SLASH K_SCOPE
+    { $$ = Scope($4, $5, $7, $8, $9, implicitEventHandler(mkinteger(0)), $6, StopInScope(), $10, NiltPartnerLink_list(), $2); }
+|  
+  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
+  tCorrelationSets truetEventHandlers truetTerminationHandler activity 
+  X_NEXT X_SLASH K_SCOPE
+    { $$ = Scope($4, $5, implicitFaultHandler(mkinteger(0)), implicitCompensationHandler(mkinteger(0)), $8, $7, $6, StopInScope(), $9, NiltPartnerLink_list(), $2); }
+| 
+  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
+  tCorrelationSets truetFaultHandlers truetTerminationHandler activity 
+  X_NEXT X_SLASH K_SCOPE
+    { $$ = Scope($4, $5, $7, implicitCompensationHandler(mkinteger(0)), $8, implicitEventHandler(mkinteger(0)), $6, StopInScope(), $9, NiltPartnerLink_list(), $2); }
+| 
+  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
+  tCorrelationSets truetCompensationHandler truetTerminationHandler activity 
+  X_NEXT X_SLASH K_SCOPE
+    { $$ = Scope($4, $5, implicitFaultHandler(mkinteger(0)), $7, $8, implicitEventHandler(mkinteger(0)), $6, StopInScope(), $9, NiltPartnerLink_list(), $2); }
+;
 
 /******************************************************************************
   ATTRIBUTES

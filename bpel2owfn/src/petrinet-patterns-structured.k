@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for BPEL's structured activities
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $ 
+ *          last changes of: \$Author: gierds $ 
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/01/01 18:55:17 $
+ * \date    \$Date: 2007/01/26 14:44:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  */
 %}
 
@@ -560,10 +560,10 @@ void PFlow(impl_tFlow* abstract_phylum, uview current_view)
 	foreach (innerActivity; activity_list phylum->activity_list_1)
 	{
 	  PN.newArc(t2, PN.findPlace(innerActivity->id, ".initial"));
-	  PN.newArc(t5, PN.findPlace(innerActivity->id, ".stop"));
-	  PN.newArc(PN.findPlace(innerActivity->id, ".stopped"), t6);
-	  PN.newArc(PN.findPlace(innerActivity->id, ".final"), t3);
-	}
+       	  PN.newArc(t5, PN.findPlace(innerActivity->id, ".stop"));
+       	  PN.newArc(PN.findPlace(innerActivity->id, ".stopped"), t6);
+       	  PN.newArc(PN.findPlace(innerActivity->id, ".final"), t3);
+       	}
 
 	break;
       }
@@ -1192,7 +1192,7 @@ void PForEach(impl_tForEach* abstract_phylum, uview current_view)
 
 
   // the patterns for the parallel <forEach>
-  if (ASTEmap[phylum->id]->attributes["parallel"] == "yes")
+  if (ASTEmap[phylum->id]->attributes["parallel"] == "no")
   {
     switch(current_view)
     {
@@ -1253,6 +1253,10 @@ void PForEach(impl_tForEach* abstract_phylum, uview current_view)
 
       default: { /* no pattern in this case */ }
     }
+  }
+  else
+  {
+    assert( false == "No pattern for parallel FOREACH, yet!" );
   }
 
 

@@ -30,7 +30,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/01/17 14:45:45 $
+ * \date    \$Date: 2007/01/26 14:44:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.122 $
+ * \version \$Revision: 1.123 $
  */
 %}
 
@@ -453,7 +453,7 @@ OnMessage(a,b,c,_id) ->
 ;
 
 OnAlarm(a,_id) ->
-  [postprocessing: a
+  [postprocessing: 
     {
       int myid = _id->value;
       ASTE *myself = ASTEmap[myid];
@@ -2002,10 +2002,14 @@ Target(a) ->
 
       // trigger [SA00066]
       assert(ASTEmap[linkId] != NULL);
-      if (ASTEmap[linkId]->targetActivity != 0)
+      if (ASTEmap[linkId]->targetActivity != 0) 
+      {
         SAerror(66, myself->attributes["linkName"], myself->attributes["referenceLine"]);
+      }
       else
+      {
         ASTEmap[linkId]->targetActivity = myself->parentActivityId;
+      }
     }
   ]
 ;
@@ -2019,6 +2023,7 @@ Source(a) ->
       myself->checkAttributes();
       myself->linkName = myself->checkLink();
 
+
       // find the id of the link used as source here and add that link to the
       // parent activity
       assert(ASTEmap[myself->parentActivityId] != NULL);
@@ -2029,9 +2034,13 @@ Source(a) ->
       // trigger [SA00066]
       assert(ASTEmap[linkId] != NULL);
       if (ASTEmap[linkId]->sourceActivity != 0)
+      {
         SAerror(66, myself->attributes["linkName"], myself->attributes["referenceLine"]);
+      }
       else
+      {
         ASTEmap[linkId]->sourceActivity = myself->parentActivityId;
+      }
     }
   ]
 ;

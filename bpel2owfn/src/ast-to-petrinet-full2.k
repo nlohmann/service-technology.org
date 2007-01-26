@@ -25,11 +25,11 @@
  * \brief   Petri net unparser (implementation)
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/12/30 12:48:01 $
+ * \date    \$Date: 2007/01/26 14:44:40 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.80 $
+ * \version \$Revision: 1.81 $
  */
 %}
 
@@ -553,7 +553,7 @@ This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF) ->
 
       // Transitions for the negative control flow.
       Transition *t2 = throwFault(p8, p11, "initial", prefix, mkinteger(This->parentId), ASTEmap[This->parentId]->controlFlow);
-
+      
       Transition *t3 = stop(p8, "initial", prefix);
       Transition *t4 = stop(p11, "p11", prefix);
 
@@ -565,8 +565,11 @@ This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF) ->
 	Place *p3 = PN.findPlace("link." + ASTEmap[target->id]->linkName);
 	PN.newArc(t1, p1);
 	PN.newArc(p3, t1);
-	PN.newArc(t2, p1);
-	PN.newArc(p3, t2);
+        if ( t2 != NULL )
+        {
+	  PN.newArc(t2, p1);
+       	  PN.newArc(p3, t2);
+        }
       }
 
 /*
@@ -839,8 +842,11 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF) ->
 	Place *p3 = PN.findPlace("link." + ASTEmap[target->id]->linkName);
         PN.newArc(t2, p1);
 	PN.newArc(p3, t2);
-	PN.newArc(t5, p1);
-	PN.newArc(p3, t5);
+        if ( t5 != NULL )
+        {
+	  PN.newArc(t5, p1);
+	  PN.newArc(p3, t5);
+        }
       }
 
 

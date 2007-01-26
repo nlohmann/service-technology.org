@@ -28,11 +28,11 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/12/17 11:42:13 $
+ * \date    \$Date: 2007/01/26 14:44:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.65 $
+ * \version \$Revision: 1.66 $
  */
 
 %}
@@ -456,7 +456,7 @@ Flow(a,b,c,_id) ->
 ;
 
 Link(_id) ->
-  [xml: { in(); } "<link id=\"" _id "\"/>\n"]
+  [xml: { in(); } "<link id=\"" _id "\"" { listAttributes( _id ); } "/>\n"]
 ;
 
 

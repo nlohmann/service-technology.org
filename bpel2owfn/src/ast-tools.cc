@@ -29,13 +29,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/01/24 13:27:39 $
+ * \date    \$Date: 2007/01/26 14:44:40 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.57 $
+ * \version \$Revision: 1.58 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -213,7 +213,6 @@ Transition *throwFault(Place *p1, Place *p2,
     return NULL;
   }
 
-
   // fault handling for the `old' patterns
   switch (negativeControlFlow)
   {
@@ -282,6 +281,7 @@ Transition *throwFault(Place *p1, Place *p2,
 
     default:
       {
+        assert(false);
 	return NULL; /* should never happen */
       }
   }
@@ -575,7 +575,6 @@ activityRelationType activityRelation(unsigned int a, unsigned int b)
 void conflictingActivities(unsigned int a, unsigned int b)
 {
     ENTER("conflictingActivities");
-    // cerr << " # conflicting activities " << a << " <-> " << b << endl;
     activityRelationMap[pair<unsigned int, unsigned int>(a,b)] = AR_CONFLICT;
     activityRelationMap[pair<unsigned int, unsigned int>(b,a)] = AR_CONFLICT;
     LEAVE("conflictingActivities");

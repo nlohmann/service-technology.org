@@ -24,17 +24,17 @@
  * \brief   Petri Net API: file output
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/01/30 14:53:11 $
+ * \date    \$Date: 2007/01/30 22:54:45 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.76 $
+ * \version \$Revision: 1.77 $
  *
  * \ingroup petrinet
  */
@@ -364,7 +364,7 @@ string Place::output_dot() const
 #endif
 
   // truncate prefix (could be a problem with ports later on, but looks nice)
-  if (type != INTERNAL)
+//  if (type != INTERNAL)
     // label = label.substr(label.find_last_of(".")+1, label.length());
   
   if (tokens == 1)

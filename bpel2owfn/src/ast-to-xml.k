@@ -32,7 +32,7 @@
  * 
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/01/26 14:44:40 $
+ * \date    \$Date: 2007/01/30 14:53:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.66 $
+ * \version \$Revision: 1.67 $
  */
 
 %}
@@ -131,7 +131,7 @@ userDefinedEventHandler(a,b,_id) ->
 ;
 
 OnMessage(a,b,c,_id) ->
-  [xml: { inup(); } "<onMessage" { listAttributes( _id ); } ">\n"
+  [xml: { inup(); } "<onMessage id=\"" _id "\"" { listAttributes( _id ); } ">\n"
 
   { if (a->length() == 0) }
     ${ /* no correlation sets */ $}

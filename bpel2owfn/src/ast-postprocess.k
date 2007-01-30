@@ -30,7 +30,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/01/26 14:44:40 $
+ * \date    \$Date: 2007/01/30 14:53:11 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.123 $
+ * \version \$Revision: 1.124 $
  */
 %}
 
@@ -1851,7 +1851,7 @@ Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
 
       ASTEmap[myself->parentScopeId]->enclosedScopes.insert(myid);
 
-      myself->hasEH = (string(e->op_name()) == "userDefinedEventHandler");
+      myself->hasEH = (string(f->op_name()) == "userDefinedEventHandler");
 
 
       // distribute the scopes' id to the enclosed FH/CH/EH/TH/activity

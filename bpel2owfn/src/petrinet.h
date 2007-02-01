@@ -29,13 +29,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/01/19 11:37:16 $
+ * \date    \$Date: 2007/02/01 14:14:20 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
- *          the project Tools4BPEL at the Humboldt-Universit‰t zu Berlin. See
+ *          the project Tools4BPEL at the Humboldt-Universit√§t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.130 $
+ * \version \$Revision: 1.131 $
  *
  * \ingroup petrinet
  */
@@ -539,6 +539,9 @@ class PetriNet
 
     /// elimination of self-loop transitions
     unsigned int reduce_self_loop_transitions();
+
+    /// elimination of identical places
+    void reduce_equal_places();
 
     /// remove transitive places
     unsigned int reduce_transitive_places();

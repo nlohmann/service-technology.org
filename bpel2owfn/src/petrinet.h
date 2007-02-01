@@ -1,5 +1,6 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      *
+ * Copyright 2007        Niels Lohmann, Christian Gierds, Martin Znamirowski *
+ * Copyright 2005, 2006  Niels Lohmann, Christian Gierds                     *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
@@ -25,17 +26,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/02/01 14:14:20 $
+ * \date    \$Date: 2007/02/01 18:58:52 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
- *          the project Tools4BPEL at the Humboldt-Universit√§t zu Berlin. See
+ *          the project Tools4BPEL at the Humboldt-Universit‰t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.131 $
+ * \version \$Revision: 1.132 $
  *
  * \ingroup petrinet
  */
@@ -182,12 +183,12 @@ class Node
     /// the name of the node
     string nodeFullName() const;
 
+    /// type of node as defined in #communication_type
+    communication_type type;
+    
     virtual ~Node();
 
   protected:
-    /// type of node as defined in #communication_type
-    communication_type type;
-
     /// the set of roles (i.e. the history) of the node
     vector<string> history;
 
@@ -443,6 +444,13 @@ class PetriNet
     void calculate_max_occurrences();
 
 
+    /// calculates the preset of a node
+    set<Node*> preset(Node *n) const;
+
+    /// calculates the postset of a node
+    set<Node*> postset(Node *n) const;
+
+
     /// outputs the Petri net
     friend ostream& operator<< (ostream& os, const PetriNet &obj);
 
@@ -475,8 +483,8 @@ class PetriNet
     /// returns the arc weight between two nodes
     unsigned int arc_weight(Node *my_source, Node *my_target) const;
 
-	/// returns true if all arcs connecting to n have a weight of 1
-	bool sameweights(Node *n) const;
+    /// returns true if all arcs connecting to n have a weight of 1
+    bool sameweights(Node *n) const;
 
     /// APNN (Abstract Petri Net Notation) output
     void output_apnn(ostream *output) const;
@@ -504,13 +512,6 @@ class PetriNet
 
     /// PNML (Petri Net Markup Language) output
     void output_pnml(ostream *output) const;
-
-
-    /// calculates the preset of a node
-    set<Node*> preset(Node *n) const;
-
-    /// calculates the postset of a node
-    set<Node*> postset(Node *n) const;
 
 
     /// remove unused status places

@@ -28,13 +28,13 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2007/02/01 14:14:20 $
+ * \date    \$Date: 2007/02/01 14:34:33 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.55 $
+ * \version \$Revision: 1.56 $
  *
  * \ingroup petrinet
  */
@@ -613,7 +613,7 @@ unsigned int PetriNet::reduce_self_loop_transitions()
  * \brief Elimination of equal places (RD1):
  *
  * If there exist two distinct (precondition 1) places with only one (precondition 2) 
- * outgoing arc with a weight of 1 (precondistion 3) each leading to two distinct 
+ * outgoing arc with a weight of 1 (precondition 3) each leading to two distinct 
  * (precondition 4) Transitions t1 and t2, which have identical presets and postsets excluding
  * p1 and p2 (precondition 5) then p2 and t2 can be removed by directing all arcs that 
  * once led to p2 to p1.
@@ -625,43 +625,43 @@ void PetriNet::reduce_equal_places()
   trace(TRACE_DEBUG, "[PN]\tApplying rule ST4 (elimination of equal places)...\n");
   set<pair<string, string> > placePairs;
 
-  // iterate the places
+  // Testing all preconditions
   for (set<Place*>::iterator p1 = P.begin(); p1 != P.end(); p1++)
   {
     set<Node*> preSet1  = preset(*p1);
     set<Node*> postSet1 = postset(*p1);
 
-    if (postSet1.size() !=1)
+    if (postSet1.size() !=1) //precondition 2
       continue;
 
-    if (arc_weight(*p1,*postSet1.begin())!=1)
+    if (arc_weight(*p1,*postSet1.begin())!=1) //precondition 3
       continue;
 	 
 	 Node* t1= *postSet1.begin();
 
     for (set<Place*>::iterator p2 = P.begin(); p2 != P.end(); p2++)
     {
-      if(*p1 == *p2)
+      if(*p1 == *p2) // precondition 1
 		  continue;
   
       set<Node*> preSet2  = preset(*p2);
       set<Node*> postSet2 = postset(*p2);
 
-		 if (postSet2.size() !=1)
+		 if (postSet2.size() !=1) //precondition 2
         continue;
 
-      if (arc_weight(*p2,*postSet2.begin()) !=1)
+      if (arc_weight(*p2,*postSet2.begin()) !=1) //precondition 3
         continue;
 
    	 Node* t2 = *postSet2.begin();
 
-      if (t1 == t2)
+      if (t1 == t2) //precondition 4
         continue;
 
 		 set<Node*> postSetT1 = postset (t1);
 		 set<Node*> postSetT2 = postset (t2);
 
-		 if (postSetT1 != postSet2)
+		 if (postSetT1 != postSet2) //precondition 5
 			continue;
 
 		 set<Node*> preSetT1 = preset (t1);
@@ -670,7 +670,7 @@ void PetriNet::reduce_equal_places()
 		 preSetT1.erase(*p1);
 		 preSetT2.erase(*p2);
 
-		 if (preSetT1 != preSetT2)
+		 if (preSetT1 != preSetT2) //precondition 5
 		   continue;
 
 	    string id1 = *((*p1)->history.begin());
@@ -697,6 +697,7 @@ void PetriNet::reduce_equal_places()
     for (set<Node*>::iterator n = preSet2.begin(); n != preSet2.end(); n++)
 	 {
 		arcadd=0;
+		// test if there has already been an arc
 	   if(preSet1.find(*n) != preSet1.end())
 		{
 			arcadd = arcadd + arc_weight(*n, p1);
@@ -704,7 +705,7 @@ void PetriNet::reduce_equal_places()
           if (((*f)->source == *n) || ((*f)->target == p1))
 				 removeArc(*f);
 		}
-		newArc(*n, p1, STANDARD, arcadd);
+		newArc(*n, p1, STANDARD, (arc_weight(*n,p2) + arcadd));
 	 }
 	 p1->tokens = p1->tokens + p2->tokens;
 	

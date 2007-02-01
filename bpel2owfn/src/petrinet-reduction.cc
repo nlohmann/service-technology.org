@@ -28,13 +28,13 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2007/02/01 14:34:33 $
+ * \date    \$Date: 2007/02/01 15:09:04 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.56 $
+ * \version \$Revision: 1.57 $
  *
  * \ingroup petrinet
  */
@@ -618,6 +618,8 @@ unsigned int PetriNet::reduce_self_loop_transitions()
  * p1 and p2 (precondition 5) then p2 and t2 can be removed by directing all arcs that 
  * once led to p2 to p1.
  *
+ * Added precondition 0, which ensures that the place which is going to be removed is not an input
+ * place.
  */
 void PetriNet::reduce_equal_places()
 {
@@ -641,6 +643,9 @@ void PetriNet::reduce_equal_places()
 
     for (set<Place*>::iterator p2 = P.begin(); p2 != P.end(); p2++)
     {
+   	 if ((*p2)->type != INTERNAL) //precondition 0
+		 continue;
+
       if(*p1 == *p2) // precondition 1
 		  continue;
   

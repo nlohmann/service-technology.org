@@ -28,13 +28,13 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2007/01/10 18:07:20 $
+ * \date    \$Date: 2007/02/01 12:19:07 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
- *          the project Tools4BPEL at the Humboldt-Universit‰t zu Berlin. See
+ *          the project Tools4BPEL at the Humboldt-Universit√§t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.53 $
+ * \version \$Revision: 1.54 $
  *
  * \ingroup petrinet
  */
@@ -171,6 +171,7 @@ void PetriNet::reduce_dead_nodes()
   trace(TRACE_DEBUG, "[PN]\tRemoving structurally dead nodes...\n");
 
   bool done = false;
+  bool arcs = true;
 
   while (!done)
   {
@@ -180,15 +181,26 @@ void PetriNet::reduce_dead_nodes()
     list<Transition*> deadTransitions;
     list<Place*> tempPlaces;
 
-    // find unmarked places with empty preset
+    // find insufficiently marked places with empty preset
     for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
     {
-      if (preset(*p).empty() && (*p)->tokens == 0)
+      if (preset(*p).empty()) //&& (*p)->tokens == 0)
       {
-	deadPlaces.push_back(*p);
-	tempPlaces.push_back(*p);
-	trace(TRACE_VERY_DEBUG, "[PN]\tPlace p" + toString((*p)->id) + " is structurally dead.\n");
-	done = false;
+			arcs=true;			
+			for(set<Node*>::iterator t = postset(*p).begin(); t != postset(*p).end(); t++)
+			{
+				if(arc_weight(*p,*t) <= (*p)->tokens)	
+				{
+					arcs=false;
+				}
+			}
+			if(arcs)
+			{
+				deadPlaces.push_back(*p);
+				tempPlaces.push_back(*p);
+				trace(TRACE_VERY_DEBUG, "[PN]\tPlace p" + toString((*p)->id) + " is structurally dead.\n");
+				done = false;
+			}
       }
     }
 
@@ -280,7 +292,7 @@ void PetriNet::reduce_identical_places()
     {
       set<Node*> pPostSet = postset(*preTransition);
       for (set<Node*>::iterator p2 = pPostSet.begin(); p2 != pPostSet.end(); p2++)
-	if ((*p1 != *p2) &&		// precondition 1
+	 if ((*p1 != *p2) &&		// precondition 1
 	    (preSet == preset(*p2)) &&	// precondition 2
 	    (postSet == postset(*p2)) && // precondition 3
 	    (sameweights(*p2)) && // precondition 4

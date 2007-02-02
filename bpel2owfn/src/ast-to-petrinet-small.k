@@ -25,11 +25,11 @@
  * \brief   Petri net unparser (implementation)
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/12/17 11:42:13 $
+ * \date    \$Date: 2007/02/02 12:51:23 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.84 $
+ * \version \$Revision: 1.85 $
  *
  */
 %}
@@ -164,6 +164,9 @@ This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF)
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 23\n");
       cerr << "no patterns allowed with suppressJoinFailure=\"no\"" << endl;
+
+      // we should do a litlle bit more here, but I don't like to go on (will fail anyway)
+      assert(false);
     }
   ]
 ;

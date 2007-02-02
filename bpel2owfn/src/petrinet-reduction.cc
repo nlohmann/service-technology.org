@@ -24,17 +24,17 @@
  * \brief   Petri Net API: structural reduction
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2007/02/01 15:09:04 $
+ * \date    \$Date: 2007/02/02 10:47:09 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.57 $
+ * \version \$Revision: 1.58 $
  *
  * \ingroup petrinet
  */
@@ -186,8 +186,9 @@ void PetriNet::reduce_dead_nodes()
     {
       if (preset(*p).empty()) //&& (*p)->tokens == 0)
       {
-			arcs=true;			
-			for(set<Node*>::iterator t = postset(*p).begin(); t != postset(*p).end(); t++)
+			arcs=true;		
+                        set<Node*> postSet = postset(*p);
+			for(set<Node*>::iterator t = postSet.begin(); t != postSet.end(); t++)
 			{
 				if(arc_weight(*p,*t) <= (*p)->tokens)	
 				{

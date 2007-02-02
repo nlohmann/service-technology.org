@@ -24,17 +24,17 @@
  * \brief   Petri Net API: structural reduction
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2007/02/02 10:47:09 $
+ * \date    \$Date: 2007/02/02 14:30:35 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.58 $
+ * \version \$Revision: 1.59 $
  *
  * \ingroup petrinet
  */
@@ -770,7 +770,7 @@ unsigned int PetriNet::reduce()
     reduce_series_transitions();	// RA2
     reduce_self_loop_places();		// RC1
     reduce_self_loop_transitions();	// RC2
-    reduce_equal_places();				//RD1
+//    reduce_equal_places();				//RD1
 //    if (parameters[P_TRED])
 //      reduce_transitive_places();
 

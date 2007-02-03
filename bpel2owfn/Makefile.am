@@ -1,5 +1,5 @@
 #############################################################################
-# Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      #
+# Copyright (C) 2005, 2006, 2007 Niels Lohmann, Christian Gierds            #
 #                                                                           #
 # This file is part of GNU BPEL2oWFN.                                       #
 #                                                                           #
@@ -18,22 +18,25 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2006/12/22 15:46:02 $ by $Author: nielslohmann $.
-# Version $Revision: 1.47 $
+# File last changed $Date: 2007/02/03 11:54:59 $ by $Author: nielslohmann $.
+# Version $Revision: 1.48 $
 
+# Where else are Makefiles?
 SUBDIRS = src tests doc
 
+# Which targets have no dependencies (i.e. always succeed)?
 .PHONY: binarydistreadme update
 
+# do not publish CVS files
 dist-hook:
 	rm -rf `find $(distdir) -name CVS`
 
-#EXTRA_DIST = ftpcommands
 
 ####################################
 # Targets to clean generated files #
 ####################################
 
+# always remove vi's temporary files
 CLEANFILES = -r *~
 
 # all files that require the permission to execute
@@ -79,11 +82,13 @@ hu-prepare: maintainer-clean
 # Targets for binary distributions #
 ####################################
 
+# an operating system string (composed of information from configure)
 OS = $(build_cpu)-$(build_os)
 
 # a README file for a binary distribution
 binarydistreadme:
-	@echo -e Copyright \(C\) 2005, 2006 Niels Lohmann and Christian Gierds > BINARYREADME
+	@echo -e Copyright \(C\) 2007 Niels Lohmann, Christian Gierds, and Martin Znamirowski > BINARYREADME
+	@echo -e Copyright \(C\) 2005, 2006 Niels Lohmann and Christian Gierds >> BINARYREADME
 	@echo >> BINARYREADME
 	@echo -e This is a binary distribution of GNU BPEL2oWFN, a tool translating business >> BINARYREADME
 	@echo -e processes described in BPEL to open workflow nets \(oWFN\). The sources >> BINARYREADME
@@ -107,7 +112,9 @@ binarydistreadme:
 # name of the directory/archive for a binary distribution
 BINARYDISTDIR = $(distdir)-$(OS)
 
-# set OS for the directory-prefix
+# create a binary distribution tarball consisting of a binary executable of
+# the respective system, a PDF documentation and the README file for binary
+# distributions (see target "binarydistreadme").
 binarydist: dvi pdf binarydistreadme
 	$(MAKE) --directory=src clean
 	$(MAKE) --directory=src
@@ -127,7 +134,10 @@ bindist_universal:
 	  CFLAGS="-O3 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
 	  LDFLAGS="-arch i386 -arch ppc"
 
-# target to create an executable that is independet of Cygwin
+# Target to create an executable that is independet of Cygwin (i.e. uses the
+# MinGW libraries insread of Cygwin's own libraries. Whether the compilation
+# succeeded can be checked with "cygcheck ./bpel2owfn.exe", which displays all
+# library dependencies.
 bindist_win32:
 	$(MAKE) binarydist OS=$(build_cpu)-mingw32 CXXFLAGS="-mno-cygwin -U _WIN32 -O3" CFLAGS="-mno-cygwin -U _WIN32 -O3"
 

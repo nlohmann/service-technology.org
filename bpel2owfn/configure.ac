@@ -1,5 +1,5 @@
 #############################################################################
-# Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      #
+# Copyright (C) 2005, 2006, 2007 Niels Lohmann, Christian Gierds            #
 #                                                                           #
 # This file is part of GNU BPEL2oWFN.                                       #
 #                                                                           #
@@ -18,13 +18,14 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2006/12/15 19:06:42 $ by $Author: nielslohmann $.
-# Version $Revision: 1.29 $
+# File last changed $Date: 2007/02/03 11:54:59 $ by $Author: nielslohmann $.
+# Version $Revision: 1.30 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT([GNU BPEL2oWFN],[2.0],[bpel2owfn-bug@gnu.org],[bpel2owfn])
-AC_REVISION($Revision: 1.29 $)
+AC_COPYRIGHT([Copyright (C) 2005, 2006, 2007 Niels Lohmann, Christian Gierds])
+AC_REVISION($Revision: 1.30 $)
 AM_INIT_AUTOMAKE
 
 

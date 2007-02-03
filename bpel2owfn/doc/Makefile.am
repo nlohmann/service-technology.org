@@ -1,5 +1,5 @@
 #############################################################################
-# Copyright 2005, 2006 Niels Lohmann                                        #
+# Copyright (C) 2005, 2006, 2007 Niels Lohmann                              #
 #                                                                           #
 # This file is part of GNU BPEL2oWFN.                                       #
 #                                                                           #
@@ -18,9 +18,11 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2006/12/15 19:06:42 $ by $Author: nielslohmann $.
-# Version $Revision: 1.19 $
+# File last changed $Date: 2007/02/03 11:54:59 $ by $Author: nielslohmann $.
+# Version $Revision: 1.20 $
 
+
+# the manual
 info_TEXINFOS = bpel2owfn.texi
 
 bpel2owfn_TEXINFOS = fdl.texi \
@@ -31,7 +33,8 @@ bpel2owfn_TEXINFOS = fdl.texi \
 		     images/tools4bpel.pdf \
 		     images/tools4bpel.png
 
-# rules for the installation manual
+
+# the installation manual
 install_TEXINFOS = install.texi
 
 CLEANFILES = install.aux \
@@ -48,6 +51,7 @@ CLEANFILES = install.aux \
 	     install.tp
 
 EXTRA_DIST = install.texi
+
 
 # rules to create the distribution documentation
 hu-createdistdocs: install.texi

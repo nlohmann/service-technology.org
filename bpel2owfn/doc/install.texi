@@ -580,7 +580,7 @@ building GNU BPEL2oWFN:
 @item @acronym{GNU} Compiler Collection 3.4.4 (cygming special, gdc 0.12, using dmd 0.125)
 @item Flex version 2.5.4
 @item @acronym{GNU} Bison version 2.3
-@item Kimwitu++ version 2.3.8
+@item Kimwitu++ version 2.3.10
 @end itemize
 
 The version numbers are not to be understood as system requirements, but as a
@@ -768,6 +768,8 @@ The Petri net patterns were created by:
 
 We would like to thank:
 @itemize
+@item Jeffrey Bedard@*
+for providing a GUI for BPEL2oWFN using his tool @code{antiright}
 @item Sylvain Beucler, @i{GNU Project}@*
 for his help moving BPEL2oWFN to Savannah
 @item Maarten Boote, @i{Technische Universiteit Eindhoven}@*

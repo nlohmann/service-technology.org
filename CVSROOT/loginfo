@@ -34,3 +34,4 @@ pnml2owfn (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email4 %{sVv}
 atpn2007 (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email-tacas %{sVv}; /vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/backup)
 dke2007 (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email3 %{sVv}; /vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/backup)
 adapter (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email-adapter %{sVv}; /vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/backup)
+comparison (/vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/commit-email-comparison %{sVv}; /vol/neon-vol2/parallel/nlohmann/tools4bpel/conf/backup)

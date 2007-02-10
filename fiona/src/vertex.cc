@@ -36,6 +36,7 @@
 #include "successorNodeList.h"
 #include "vertex.h"
 #include "CNF.h"
+#include "cnf_formula.h" // needed in vertex::getCNF()
 
 //! \fn vertex::vertex()
 //! \brief constructor
@@ -225,7 +226,26 @@ string vertex::getCNF() {
 		mal = true;
 		cl = cl->nextElement;
 	}
-	
+
+
+	/*
+	 * The following three calls were added by Niels to simplify the string
+	 * representation of CNF formulas in the DOT output of an OG. All
+	 * needed code is implemented in files "cnf_formula.h" and
+	 * "cnf-formula.cc". If the following three calls are removed,
+	 * everything is (as ugly) as before.
+	 */
+
+	// 1. create a CNF_Formula object from the CNF string representation
+      	CNF_Formula formula = CNF_Formula(CNFString);
+
+	// 2. simplify the CNF formula inside the CNF_Formula object
+	formula.simplify();
+
+	// 3. create a string representation of the simplified formula
+	CNFString = formula.to_string();	
+
+
 	return CNFString;
 }
 

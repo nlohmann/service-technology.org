@@ -25,11 +25,11 @@
  * \brief   Petri net unparser (implementation)
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/02/02 12:51:23 $
+ * \date    \$Date: 2007/02/11 18:18:35 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.85 $
+ * \version \$Revision: 1.86 $
  *
  */
 %}
@@ -208,52 +208,64 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF)
       dpeLinks(t2, parentId);
 
 
-      // evaluate the join condition
-      if (string(jc->op_name()) == "standardJoinCondition")
+
+      /************************************************************************
+       * evaluate the join condition
+       ***********************************************************************/
+
+      // containers for the join transitions and the incoming links
+      map<unsigned int, Transition*> joinTransitions;
+      map<unsigned int, Place*> trueLinks;
+      map<unsigned int, Place*> falseLinks;
+      unsigned int transitionNumber = (unsigned int)pow(2.0, a->length());
+
+      // fill link containers
+      int linkCount = 0;
+      foreach (target; tTarget_list a)
       {
-        // containers for the join transitions and the incoming links
-        map<unsigned int, Transition*> joinTransitions;
-        map<unsigned int, Place*> trueLinks;
-        map<unsigned int, Place*> falseLinks;
+        Place *linkT = PN.findPlace("link." + ASTEmap[target->id]->linkName);
+	Place *linkF = PN.findPlace("!link." + ASTEmap[target->id]->linkName);
 
+        trueLinks[linkCount] = linkT;
+        falseLinks[linkCount] = linkF;
 
-        // fill link containers
-        int linkCount = 0;
-	foreach (target; tTarget_list a)
-	{
-	  Place *linkT = PN.findPlace("link." + ASTEmap[target->id]->linkName);
-	  Place *linkF = PN.findPlace("!link." + ASTEmap[target->id]->linkName);
+        linkCount++;
+      }
 
-          trueLinks[linkCount] = linkT;
-          falseLinks[linkCount] = linkF;
+      // add transitions and connect them with the links
+      for (unsigned int i = 0; i < transitionNumber; i++)
+      {
+        joinTransitions[i] = PN.newTransition(prefix + "join" + toString(i));
 
-          linkCount++;
-	}
-
-
-        // fill transition container and create OR-join
-        unsigned int transitionNumber = (unsigned int)pow(2.0, a->length());
-        for (unsigned int i = 0; i < transitionNumber; i++)
+        for (unsigned int j = 0; j < linkCount; j++)
         {
-          joinTransitions[i] = PN.newTransition(prefix + "join" + toString(i));
-
-          for (unsigned int j = 0; j < linkCount; j++)
-          {
-            if (((i >> j) % 2) == 0) // this rather cryptic expression correctly connects the links
-              PN.newArc(trueLinks[j], joinTransitions[i]);
-            else
-              PN.newArc(falseLinks[j], joinTransitions[i]);
-          }
-
-          // only one transition makes the join fail
-          if (i == transitionNumber-1)
-            PN.newArc(joinTransitions[i], p4);
+          if (((i >> j) % 2) == 0) // this rather cryptic expression correctly connects the links
+            PN.newArc(trueLinks[j], joinTransitions[i]);
           else
-            PN.newArc(joinTransitions[i], p3);
+            PN.newArc(falseLinks[j], joinTransitions[i]);
         }
       }
-      else
+
+
+      // case 1: standard join condition
+      if (string(jc->op_name()) == "standardJoinCondition")
+      {
+        // create OR-join
+        for (unsigned int i = 0; i < transitionNumber; i++)
+        {
+          // only one transition makes the join fail
+          if (i == transitionNumber-1)
+            PN.newArc(joinTransitions[i], p4); // p4=joinFalse
+          else
+            PN.newArc(joinTransitions[i], p3); // p3=joinTrue
+        }
+      }
+      else // case 2: user-defined join condition
+      {
         cerr << "user-defined join conditions are not yet supported!" << endl;
+        jc->print();
+      }
+
 
 
       // Embed the inner activity.

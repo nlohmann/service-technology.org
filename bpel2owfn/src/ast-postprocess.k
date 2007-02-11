@@ -26,11 +26,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/01/30 14:53:11 $
+ * \date    \$Date: 2007/02/11 18:18:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.124 $
+ * \version \$Revision: 1.125 $
  */
 %}
 
@@ -1933,7 +1933,7 @@ Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
   STANDARD ELEMENTS
 ******************************************************************************/
 
-StandardElements(a,b,c) ->
+StandardElements(a,b, _joinCondition) ->
   [postprocessing:
     {
       assert(ASTEmap[$0->parentId] != NULL);
@@ -1953,8 +1953,10 @@ StandardElements(a,b,c) ->
         ASTEmap[sourceLink->id]->parentActivityId = $0->parentId;
       }
 
+      // pass the id to the join condition
+      _joinCondition->parentId = $0->parentId;
     }
-    a b c
+    a b _joinCondition
     {
     
       set<string> targetLinks;
@@ -2045,3 +2047,14 @@ Source(a) ->
   ]
 ;
 
+
+
+/* skip printing user-defined join conditions */
+userDefinedJoinCondition(exp) ->
+  [postprocessing:
+     {
+       assert(ASTEmap[$0->parentId] != NULL);
+       cerr << "user-defined join condition embedded to <" << ASTEmap[$0->parentId]->activityTypeName() << "> with id " << $0->parentId << endl;
+     }
+  ]
+;

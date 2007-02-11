@@ -1,4 +1,5 @@
 /*****************************************************************************\
+ * Copyright 2007       Niels Lohmann                                        *
  * Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
@@ -30,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/02/11 20:45:38 $
+ * \date    \$Date: 2007/02/11 20:53:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.126 $
+ * \version \$Revision: 1.127 $
  */
 %}
 

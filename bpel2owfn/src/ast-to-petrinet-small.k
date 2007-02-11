@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/02/11 18:18:35 $
+ * \date    \$Date: 2007/02/11 20:45:38 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.86 $
+ * \version \$Revision: 1.87 $
  *
  */
 %}
@@ -210,7 +210,7 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF)
 
 
       /************************************************************************
-       * evaluate the join condition
+       * pattern for the join condition
        ***********************************************************************/
 
       // containers for the join transitions and the incoming links
@@ -220,7 +220,7 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF)
       unsigned int transitionNumber = (unsigned int)pow(2.0, a->length());
 
       // fill link containers
-      int linkCount = 0;
+      unsigned int linkCount = 0;
       foreach (target; tTarget_list a)
       {
         Place *linkT = PN.findPlace("link." + ASTEmap[target->id]->linkName);
@@ -239,13 +239,12 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF)
 
         for (unsigned int j = 0; j < linkCount; j++)
         {
-          if (((i >> j) % 2) == 0) // this rather cryptic expression correctly connects the links
+          if (((i >> j) % 2) == 0) // don't ask me why this is working :-|
             PN.newArc(trueLinks[j], joinTransitions[i]);
           else
             PN.newArc(falseLinks[j], joinTransitions[i]);
         }
       }
-
 
       // case 1: standard join condition
       if (string(jc->op_name()) == "standardJoinCondition")
@@ -262,8 +261,16 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF)
       }
       else // case 2: user-defined join condition
       {
-        cerr << "user-defined join conditions are not yet supported!" << endl;
-        jc->print();
+        // create pattern for join condition
+        for (unsigned int i = 0; i < transitionNumber; i++)
+        {
+          cerr << i << " " << joinCondition_result[i] << endl;
+
+          if (joinCondition_result[i])
+            PN.newArc(joinTransitions[i], p3);
+          else
+            PN.newArc(joinTransitions[i], p4);
+        }
       }
 
 
@@ -367,52 +374,70 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
 
 
 
-      // evaluate the join condition
+      /************************************************************************
+       * pattern for the join condition
+       ***********************************************************************/
+
+      // containers for the join transitions and the incoming links
+      map<unsigned int, Transition*> joinTransitions;
+      map<unsigned int, Place*> trueLinks;
+      map<unsigned int, Place*> falseLinks;
+      unsigned int transitionNumber = (unsigned int)pow(2.0, a->length());
+
+      // fill link containers
+      unsigned int linkCount = 0;
+      foreach (target; tTarget_list a)
+      {
+        Place *linkT = PN.findPlace("link." + ASTEmap[target->id]->linkName);
+	Place *linkF = PN.findPlace("!link." + ASTEmap[target->id]->linkName);
+
+        trueLinks[linkCount] = linkT;
+        falseLinks[linkCount] = linkF;
+
+        linkCount++;
+      }
+
+      // add transitions and connect them with the links
+      for (unsigned int i = 0; i < transitionNumber; i++)
+      {
+        joinTransitions[i] = PN.newTransition(prefix + "join" + toString(i));
+
+        for (unsigned int j = 0; j < linkCount; j++)
+        {
+          if (((i >> j) % 2) == 0) // don't ask me why this is working :-|
+            PN.newArc(trueLinks[j], joinTransitions[i]);
+          else
+            PN.newArc(falseLinks[j], joinTransitions[i]);
+        }
+      }
+
+      // case 1: standard join condition
       if (string(jc->op_name()) == "standardJoinCondition")
       {
-        // containers for the join transitions and the incoming links
-        map<unsigned int, Transition*> joinTransitions;
-        map<unsigned int, Place*> trueLinks;
-        map<unsigned int, Place*> falseLinks;
-
-
-        // fill link containers
-        int linkCount = 0;
-	foreach (target; tTarget_list a)
-	{
-	  Place *linkT = PN.findPlace("link." + ASTEmap[target->id]->linkName);
-	  Place *linkF = PN.findPlace("!link." + ASTEmap[target->id]->linkName);
-
-          trueLinks[linkCount] = linkT;
-          falseLinks[linkCount] = linkF;
-
-          linkCount++;
-	}
-
-
-        // fill transition container and create OR-join
-        unsigned int transitionNumber = (unsigned int)pow(2.0, a->length());
+        // create OR-join
         for (unsigned int i = 0; i < transitionNumber; i++)
         {
-          joinTransitions[i] = PN.newTransition(prefix + "join" + toString(i));
-
-          for (unsigned int j = 0; j < linkCount; j++)
-          {
-            if (((i >> j) % 2) == 0) // this rather cryptic expression correctly connects the links
-              PN.newArc(trueLinks[j], joinTransitions[i]);
-            else
-              PN.newArc(falseLinks[j], joinTransitions[i]);
-          }
-
           // only one transition makes the join fail
           if (i == transitionNumber-1)
+            PN.newArc(joinTransitions[i], p5); // p5=joinFalse
+          else
+            PN.newArc(joinTransitions[i], p6); // p6=joinTrue
+        }
+      }
+      else // case 2: user-defined join condition
+      {
+        // create pattern for join condition
+        for (unsigned int i = 0; i < transitionNumber; i++)
+        {
+          cerr << i << " " << joinCondition_result[i] << endl;
+
+          if (joinCondition_result[i])
             PN.newArc(joinTransitions[i], p5);
           else
             PN.newArc(joinTransitions[i], p6);
         }
       }
-      else
-        cerr << "user-defined join conditions are not yet supported!" << endl;
+
 
 
 

@@ -30,7 +30,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/02/11 18:18:35 $
+ * \date    \$Date: 2007/02/11 20:45:38 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.125 $
+ * \version \$Revision: 1.126 $
  */
 %}
 
@@ -1939,11 +1939,15 @@ StandardElements(a,b, _joinCondition) ->
       assert(ASTEmap[$0->parentId] != NULL);
       $0->suppressJF = (ASTEmap[$0->parentId]->attributes["suppressJoinFailure"] == "yes");
 
+      unsigned int linkCount = 0;
       foreach(targetLink; tTarget_list a)
       {
         assert(ASTEmap[targetLink->id] != NULL);
         ASTEmap[targetLink->id]->controlFlow = ASTEmap[$0->parentId]->controlFlow;
         ASTEmap[targetLink->id]->parentActivityId = $0->parentId;
+        
+        // links are numbered and stored in joinCondition_links map
+        joinCondition_links[ASTEmap[targetLink->id]->attributes["linkName"]] = linkCount++;
       }
 
       foreach(sourceLink; tSource_list b)
@@ -1953,10 +1957,46 @@ StandardElements(a,b, _joinCondition) ->
         ASTEmap[sourceLink->id]->parentActivityId = $0->parentId;
       }
 
-      // pass the id to the join condition
-      _joinCondition->parentId = $0->parentId;
+      /*
+       * Calculate the join condition for all possible link statuses:
+       *
+       * There are 2^n possible assignments for n ingoing links (first
+       * for-loop). For each assignment (second for-loop) set the links
+       * respectively. Then call an uparser "evaluation" to actually
+       * calculate the join condition for the current assignment. The result
+       * is stored in mapping "joinCondition_result", indexed by the number of
+       * the assignment (0 .. 2^n -1).
+       */
+      unsigned int assignments = (unsigned int)pow(2.0, a->length());
+      for (unsigned int assignment = 0; assignment < assignments; assignment++)
+      {
+        // set the links according to the current assignment
+        for (unsigned int link = 0; link < linkCount; link++)
+        {
+          if (((assignment >> link) % 2) == 0) // don't ask why this is working :-|
+            joinCondition_linkStatus[link] = true;
+          else
+            joinCondition_linkStatus[link] = false;
+        }
+
+        // evaluate the join condition in the current assignment
+        _joinCondition->unparse(pseudoPrinter, evaluation);
+
+        // save the result
+        with(_joinCondition)
+        {
+          _joinCondition = userDefinedJoinCondition(_exp):
+	    { joinCondition_result[assignment] = _exp->value; }
+          default: {}
+        }
+      }
+      
+      // clear mappings that are not used any more
+      joinCondition_links.clear();
+      joinCondition_linkStatus.clear();
+
     }
-    a b _joinCondition
+    a b
     {
     
       set<string> targetLinks;
@@ -2049,12 +2089,26 @@ Source(a) ->
 
 
 
-/* skip printing user-defined join conditions */
-userDefinedJoinCondition(exp) ->
-  [postprocessing:
-     {
-       assert(ASTEmap[$0->parentId] != NULL);
-       cerr << "user-defined join condition embedded to <" << ASTEmap[$0->parentId]->activityTypeName() << "> with id " << $0->parentId << endl;
-     }
+
+/* evaluate join condition */
+This=Term(_linkname) ->
+  [evaluation:
+    { $0->value = joinCondition_linkStatus[joinCondition_links[_linkname->name]]; }
+  ]
+;
+
+This=Conjunction(_exp1, _exp2) ->
+  [evaluation:
+    _exp1
+    _exp2
+    { $0->value = (_exp1->value && _exp2->value); }
+  ]
+;
+
+This = Disjunction(_exp1, _exp2) ->
+  [evaluation:
+    _exp1
+    _exp2
+    { $0->value = (_exp1->value || _exp2->value); }
   ]
 ;

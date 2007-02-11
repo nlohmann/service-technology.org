@@ -29,7 +29,7 @@
  * 
  * \since   2006-24-03
  *
- * \date    \$Date: 2007/01/01 18:55:17 $
+ * \date    \$Date: 2007/02/11 20:45:38 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.36 $
+ * \version \$Revision: 1.37 $
  *
  * \todo    Annotate the global mappings which function clear them.
  */
@@ -84,6 +84,7 @@ extern string forEach_suffix;
 %uview xml;
 %uview cfg;
 %uview postprocessing;
+%uview evaluation;
 
 
 // the header file
@@ -139,6 +140,13 @@ set<unsigned int> ASTE_startActivities;	///< a set of the ids of the start activ
 
 map<string, unsigned int> ASTE_linkIdMap;	///< maps link names to identifiers
 map<string, unsigned int> ASTE_scopeNames;	///< maps scope names to identifiers
+
+
+map<string, unsigned int> joinCondition_links;		///< used to evaluate joinConditions: maps link names to a temporary link number
+map<unsigned int, bool> joinCondition_linkStatus;	///< used to evaluate joinConditions: maps temporary link numbers to Boolean assignment
+map<unsigned int, bool> joinCondition_result;		///< used to evaluate joinConditions: maps assignment number to Boolean result (used in Petri net unparser)
+
+
 
 map<unsigned int, unsigned int> PPhasCompensateMap;
 

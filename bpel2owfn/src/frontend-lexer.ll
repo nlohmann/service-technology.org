@@ -1,5 +1,5 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann                                        *
+ * Copyright 2005, 2006, 2007 Niels Lohmann                                  *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
@@ -29,7 +29,7 @@
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2006/12/30 12:48:02 $
+ * \date    \$Date: 2007/02/11 17:56:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Flex reading file frontend-lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  *
  * \todo    add rules to ignored everything non-BPEL
  * \todo    add a more elegant way to handle XSD-namespaces
@@ -159,7 +159,7 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 
  /* everything needed to evaluate join conditons (must be above the attributes section) */
 <ATTRIBUTE>"joinCondition"		{ return K_JOINCONDITION; }
-<ATTRIBUTE>"getLinkStatus"		{ return K_GETLINKSTATUS; }
+<ATTRIBUTE>{bpwsns}?"getLinkStatus"	{ return K_GETLINKSTATUS; }
 <ATTRIBUTE>"and"			{ return K_AND; }
 <ATTRIBUTE>"or"				{ return K_OR; }
 <ATTRIBUTE>"("				{ return LBRACKET; }
@@ -220,6 +220,7 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 <INITIAL>{bpwsns}?"if"			{ BEGIN(ATTRIBUTE); return K_IF; }
 <INITIAL>{bpwsns}?"import"		{ BEGIN(ATTRIBUTE); return K_IMPORT; }
 <INITIAL>{bpwsns}?"invoke"		{ BEGIN(ATTRIBUTE); return K_INVOKE; }
+<INITIAL>{bpwsns}?"joinCondition"	{ BEGIN(ATTRIBUTE); return K_JOINCONDITION; }
 <INITIAL>{bpwsns}?"link"		{ BEGIN(ATTRIBUTE); return K_LINK; }
 <INITIAL>{bpwsns}?"links"		{ BEGIN(ATTRIBUTE); return K_LINKS; }
 <INITIAL>{bpwsns}?"literal"		{ BEGIN(ATTRIBUTE); return K_LITERAL; }
@@ -266,14 +267,17 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
  /* white space */
 {whitespace}			{ /* skip white space */ }
 
-<INITIAL>{name}			{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
-                                  return X_NAME; }
-<INITIAL>"$"{name}		{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
-                                  return VARIABLENAME; }
+
+ /* some things for join conditions */
+{bpwsns}?"getLinkStatus"	{ return K_GETLINKSTATUS; }
+"and"				{ return K_AND; }
+"or"				{ return K_OR; }
+"("				{ return LBRACKET; }
+")"				{ return RBRACKET; }
+"'"				{ return APOSTROPHE; }
 
 
  /* some things for transition conditions */
-
 "&ge;"		{ return GREATEROREQUAL; }
 "&gt;"		{ return GREATER; }
 "&lt;"		{ return LESS; }
@@ -282,6 +286,12 @@ docu_end		"</documentation>"[ \t\r\n]*"<"
 "!="		{ return NOTEQUAL; }
 "'"		{ return APOSTROPHE; }
 
+
+ /* names and numbers */
+<INITIAL>{name}			{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
+                                  return X_NAME; }
+<INITIAL>"$"{name}		{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
+                                  return VARIABLENAME; }
 {number}	{ frontend_lval.yt_casestring = kc::mkcasestring(frontend_text);
                   return NUMBER; }
 

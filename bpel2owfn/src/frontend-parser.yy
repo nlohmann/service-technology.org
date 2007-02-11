@@ -1,4 +1,5 @@
 /*****************************************************************************\
+ * Copyright 2007       Niels Lohmann, Martin Znamirowski                    *
  * Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
@@ -34,11 +35,11 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/01/25 15:46:10 $
+ * \date    \$Date: 2007/02/11 17:56:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -48,7 +49,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.288 $
+ * \version \$Revision: 1.289 $
  *
  * \todo Overwork documentation: WS-BPEL can also be parsed!
  *
@@ -93,6 +94,8 @@
 %token <yt_casestring> X_NAME
 %token <yt_casestring> X_STRING
 
+%left K_OR
+%left K_AND
 
 // the start symbol of the grammar
 %start tProcess
@@ -219,6 +222,7 @@ unsigned int ASTEid = 1;
 %type <yt_tFromPart_list> tFromParts
 %type <yt_tIf> tIf
 %type <yt_tInvoke> tInvoke
+%type <yt_joinCondition> tJoinCondition
 %type <yt_tLink_list> tLink_list
 %type <yt_tLink_list> tLinks
 %type <yt_tLink> tLink
@@ -1117,86 +1121,71 @@ tScope:
   tCorrelationSets activity 
   X_NEXT X_SLASH K_SCOPE
     { $$ = Scope($4, $5, implicitFaultHandler(mkinteger(0)), implicitCompensationHandler(mkinteger(0)), standardTerminationHandler(mkinteger(0)), implicitEventHandler(mkinteger(0)), $6, StopInScope(), $7, NiltPartnerLink_list(), $2); }
-| 
-  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
+| K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
   tCorrelationSets truetFaultHandlers activity 
   X_NEXT X_SLASH K_SCOPE
     { $$ = Scope($4, $5, $7, implicitCompensationHandler(mkinteger(0)), standardTerminationHandler(mkinteger(0)), implicitEventHandler(mkinteger(0)), $6, StopInScope(), $8, NiltPartnerLink_list(), $2); }
-| 
-  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
+| K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
   tCorrelationSets truetCompensationHandler activity 
   X_NEXT X_SLASH K_SCOPE
     { $$ = Scope($4, $5, implicitFaultHandler(mkinteger(0)), $7, standardTerminationHandler(mkinteger(0)), implicitEventHandler(mkinteger(0)), $6, StopInScope(), $8, NiltPartnerLink_list(), $2); }
-| 
-  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
+| K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
   tCorrelationSets truetEventHandlers activity 
   X_NEXT X_SLASH K_SCOPE
     { $$ = Scope($4, $5, implicitFaultHandler(mkinteger(0)), implicitCompensationHandler(mkinteger(0)), standardTerminationHandler(mkinteger(0)), $7, $6, StopInScope(), $8, NiltPartnerLink_list(), $2); }
-| 
-  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
+| K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
   tCorrelationSets truetFaultHandlers 
   truetEventHandlers activity 
   X_NEXT X_SLASH K_SCOPE
     { $$ = Scope($4, $5, $7, implicitCompensationHandler(mkinteger(0)), standardTerminationHandler(mkinteger(0)), $8, $6, StopInScope(), $9, NiltPartnerLink_list(), $2); }
-| 
-  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
+| K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
   tCorrelationSets truetCompensationHandler 
   truetEventHandlers activity 
   X_NEXT X_SLASH K_SCOPE
     { $$ = Scope($4, $5, implicitFaultHandler(mkinteger(0)), $7, standardTerminationHandler(mkinteger(0)), $8, $6, StopInScope(), $9, NiltPartnerLink_list(), $2); }
-|
-  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
+| K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
   tCorrelationSets truetFaultHandlers truetCompensationHandler
   truetEventHandlers activity 
   X_NEXT X_SLASH K_SCOPE
     { $$ = Scope($4, $5, $7, $8, standardTerminationHandler(mkinteger(0)), $9, $6, StopInScope(), $10, NiltPartnerLink_list(), $2); }
-|
-  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
+| K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
   tCorrelationSets truetFaultHandlers truetCompensationHandler
   activity 
   X_NEXT X_SLASH K_SCOPE
     { $$ = Scope($4, $5, $7, $8, standardTerminationHandler(mkinteger(0)), implicitEventHandler(mkinteger(0)), $6, StopInScope(), $9, NiltPartnerLink_list(), $2); }
-|
-  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables truetPartnerLinks 
+| K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables truetPartnerLinks 
   tMessageExchanges tCorrelationSets tEventHandlers tFaultHandlers
   tCompensationHandler tTerminationHandler activity 
   X_NEXT X_SLASH K_SCOPE
     { $$ = Scope($4, $5, $10, $11, $12, $9, $8, StopInScope(), $13, $6, $2); }
-| 
-  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
+| K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
   truetMessageExchanges tCorrelationSets tEventHandlers tFaultHandlers
   tCompensationHandler tTerminationHandler activity 
   X_NEXT X_SLASH K_SCOPE
     { $$ = Scope($4, $5, $9, $10, $11, $8, $7, StopInScope(), $12, NiltPartnerLink_list(), $2); }
-| 
-  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
+| K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
   tCorrelationSets truetEventHandlers truetFaultHandlers
   tCompensationHandler tTerminationHandler activity 
   X_NEXT X_SLASH K_SCOPE
     { $$ = Scope($4, $5, $8, $9, $10, $7, $6, StopInScope(), $11, NiltPartnerLink_list(), $2); }
-| 
-  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
+| K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
   tCorrelationSets truetEventHandlers truetCompensationHandler tTerminationHandler activity 
   X_NEXT X_SLASH K_SCOPE
     { $$ = Scope($4, $5, implicitFaultHandler(mkinteger(0)), $8, $9, $7, $6, StopInScope(), $10, NiltPartnerLink_list(), $2); }
-| 
-  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
+| K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
   tCorrelationSets truetFaultHandlers
   truetCompensationHandler truetTerminationHandler activity 
   X_NEXT X_SLASH K_SCOPE
     { $$ = Scope($4, $5, $7, $8, $9, implicitEventHandler(mkinteger(0)), $6, StopInScope(), $10, NiltPartnerLink_list(), $2); }
-|  
-  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
+| K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
   tCorrelationSets truetEventHandlers truetTerminationHandler activity 
   X_NEXT X_SLASH K_SCOPE
     { $$ = Scope($4, $5, implicitFaultHandler(mkinteger(0)), implicitCompensationHandler(mkinteger(0)), $8, $7, $6, StopInScope(), $9, NiltPartnerLink_list(), $2); }
-| 
-  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
+| K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
   tCorrelationSets truetFaultHandlers truetTerminationHandler activity 
   X_NEXT X_SLASH K_SCOPE
     { $$ = Scope($4, $5, $7, implicitCompensationHandler(mkinteger(0)), $8, implicitEventHandler(mkinteger(0)), $6, StopInScope(), $9, NiltPartnerLink_list(), $2); }
-| 
-  K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
+| K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
   tCorrelationSets truetCompensationHandler truetTerminationHandler activity 
   X_NEXT X_SLASH K_SCOPE
     { $$ = Scope($4, $5, implicitFaultHandler(mkinteger(0)), $7, $8, implicitEventHandler(mkinteger(0)), $6, StopInScope(), $9, NiltPartnerLink_list(), $2); }
@@ -1239,14 +1228,14 @@ standardElements:
   tTarget_list tSource_list
     { $$ = StandardElements($1, $2, currentJoinCondition);
       currentJoinCondition = standardJoinCondition(); }
-| K_TARGETS X_NEXT tTarget X_NEXT tTarget_list X_SLASH K_TARGETS X_NEXT
-    { $$ = StandardElements(ConstTarget_list($3, $5), NiltSource_list(), currentJoinCondition);
+| K_TARGETS X_NEXT tJoinCondition tTarget X_NEXT tTarget_list X_SLASH K_TARGETS X_NEXT
+    { $$ = StandardElements(ConstTarget_list($4, $6), NiltSource_list(), currentJoinCondition);
       currentJoinCondition = standardJoinCondition(); }
-| K_SOURCES X_NEXT tSource X_NEXT tSource_list X_SLASH K_SOURCES X_NEXT
-    { $$ = StandardElements(NiltTarget_list(), ConstSource_list($3, $5), currentJoinCondition);
+| K_SOURCES X_NEXT tJoinCondition tSource X_NEXT tSource_list X_SLASH K_SOURCES X_NEXT
+    { $$ = StandardElements(NiltTarget_list(), ConstSource_list($4, $6), currentJoinCondition);
       currentJoinCondition = standardJoinCondition(); }
-| K_TARGETS X_NEXT tTarget X_NEXT tTarget_list X_SLASH K_TARGETS X_NEXT K_SOURCES X_NEXT tSource X_NEXT tSource_list X_SLASH K_SOURCES X_NEXT
-    { $$ = StandardElements(ConstTarget_list($3, $5), ConstSource_list($11, $13), currentJoinCondition);
+| K_TARGETS X_NEXT tJoinCondition tTarget X_NEXT tTarget_list X_SLASH K_TARGETS X_NEXT K_SOURCES X_NEXT tSource X_NEXT tSource_list X_SLASH K_SOURCES X_NEXT
+    { $$ = StandardElements(ConstTarget_list($4, $6), ConstSource_list($12, $14), currentJoinCondition);
       currentJoinCondition = standardJoinCondition(); }
 ;
 
@@ -1283,7 +1272,14 @@ tTransitionCondition:
 | K_TRANSITIONCONDITION X_CLOSE transitionCondition X_OPEN X_SLASH K_TRANSITIONCONDITION X_NEXT
 ;
 
-joinCondition:
+tJoinCondition:
+  /* empty */
+    { $$ = standardJoinCondition(); }
+| K_JOINCONDITION X_CLOSE booleanLinkCondition X_OPEN X_SLASH K_JOINCONDITION X_NEXT
+    { $$ = currentJoinCondition = userDefinedJoinCondition($3); }
+;
+
+joinCondition: /* a join condition as attribute */
   K_JOINCONDITION X_EQUALS booleanLinkCondition
     { currentJoinCondition = userDefinedJoinCondition($3);
       currentJoinCondition->print(); }
@@ -1298,6 +1294,10 @@ booleanLinkCondition:
     { $$ = Conjunction($2, $4); }
 | LBRACKET booleanLinkCondition K_OR booleanLinkCondition RBRACKET
     { $$ = Disjunction($2, $4); }
+| booleanLinkCondition K_AND booleanLinkCondition
+    { $$ = Conjunction($1, $3); }
+| booleanLinkCondition K_OR booleanLinkCondition
+    { $$ = Disjunction($1, $3); }
 ;
 
 transitionCondition:

@@ -1,5 +1,6 @@
 #############################################################################
-# Copyright (C) 2005, 2006, 2007 Niels Lohmann, Christian Gierds            #
+# Copyright (C) 2007       Niels Lohmann                                    #
+# Copyright (C) 2005, 2006 Niels Lohmann, Christian Gierds                  #
 #                                                                           #
 # This file is part of GNU BPEL2oWFN.                                       #
 #                                                                           #
@@ -18,14 +19,12 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/02/03 11:54:59 $ by $Author: nielslohmann $.
-# Version $Revision: 1.30 $
+# File last changed $Date: 2007/02/12 12:03:54 $ by $Author: nielslohmann $.
+# Version $Revision: 1.31 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT([GNU BPEL2oWFN],[2.0],[bpel2owfn-bug@gnu.org],[bpel2owfn])
-AC_COPYRIGHT([Copyright (C) 2005, 2006, 2007 Niels Lohmann, Christian Gierds])
-AC_REVISION($Revision: 1.30 $)
 AM_INIT_AUTOMAKE
 
 
@@ -45,44 +44,29 @@ AC_CANONICAL_BUILD
 
 # Checks for C/C++ details.
 AC_LANG([C++])
-AC_C_INLINE
 AC_PROG_CXX
 AC_PROG_CC
-AC_PROG_MAKE_SET
-AC_PROG_INSTALL
-AC_TYPE_SIZE_T
 
+# Don't set any compiler flags.
+CXXFLAGS=""
+CFLAGS=""
 
 # Checks for header files and functions.
-AC_HEADER_STDC
-AC_CHECK_HEADERS([assert.h libintl.h malloc.h stdlib.h string.h strings.h unistd.h stddef.h])
+AC_CHECK_HEADERS([assert.h])
 AC_CHECK_FUNCS([pow])
-AC_FUNC_REALLOC
-
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_HEADER_STDBOOL
-AC_C_CONST
-
-
-# Checks for library functions.
-AC_FUNC_ERROR_AT_LINE
-AC_FUNC_MALLOC
-AC_FUNC_ALLOCA
-AC_CHECK_FUNCS([memset])
 
 
 # Preprocessor directive to share Petri net class
 AC_DEFINE(USING_BPEL2OWFN, 1, [Petri net class belongs to BPEL2oWFN.])
 
 
-# Check for the compiler generators
+# Check for the compiler generators and dot
 AC_PROG_YACC
 AC_PROG_LEX
 
 AC_CHECK_PROG(KC, kc++, kc++, not found)
 if test "$KC" = "not found"; then
- AC_MSG_WARN([Kimwitu++ was not found.])
+ AC_MSG_WARN([Kimwitu++ was not found. You will not be able to complile BPEL2oWFN from scratch.])
 fi
 
 AC_CHECK_PROG(DOT, dot, dot, not found)

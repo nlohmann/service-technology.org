@@ -1,5 +1,6 @@
 #############################################################################
-# Copyright (C) 2005, 2006, 2007 Niels Lohmann, Christian Gierds            #
+# Copyright (C) 2007       Niels Lohmann                                    #
+# Copyright (C) 2005, 2006 Niels Lohmann, Christian Gierds                  #
 #                                                                           #
 # This file is part of GNU BPEL2oWFN.                                       #
 #                                                                           #
@@ -18,8 +19,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/02/03 11:54:59 $ by $Author: nielslohmann $.
-# Version $Revision: 1.48 $
+# File last changed $Date: 2007/02/12 12:03:54 $ by $Author: nielslohmann $.
+# Version $Revision: 1.49 $
 
 # Where else are Makefiles?
 SUBDIRS = src tests doc
@@ -115,9 +116,9 @@ BINARYDISTDIR = $(distdir)-$(OS)
 # create a binary distribution tarball consisting of a binary executable of
 # the respective system, a PDF documentation and the README file for binary
 # distributions (see target "binarydistreadme").
-binarydist: dvi pdf binarydistreadme
+binarydist: pdf binarydistreadme
 	$(MAKE) --directory=src clean
-	$(MAKE) --directory=src
+	$(MAKE) --directory=src CXXFLAGS+="-O3" CFLAGS+="-O3" # use optimization
 	$(mkdir_p) $(BINARYDISTDIR)
 	cp doc/$(PACKAGE).pdf $(BINARYDISTDIR)
 	cp src/$(PACKAGE)$(EXEEXT) COPYING $(BINARYDISTDIR)
@@ -130,8 +131,8 @@ binarydist: dvi pdf binarydistreadme
 bindist_universal:
 	echo "you have to configure with:"
 	echo "  ./configure --disable-dependency-tracking"
-	$(MAKE) binarydist OS=mac-universal CXXFLAGS="-O3 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
-	  CFLAGS="-O3 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
+	$(MAKE) binarydist OS=mac-universal CXXFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
+	  CFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
 	  LDFLAGS="-arch i386 -arch ppc"
 
 # Target to create an executable that is independet of Cygwin (i.e. uses the
@@ -139,7 +140,7 @@ bindist_universal:
 # succeeded can be checked with "cygcheck ./bpel2owfn.exe", which displays all
 # library dependencies.
 bindist_win32:
-	$(MAKE) binarydist OS=$(build_cpu)-mingw32 CXXFLAGS="-mno-cygwin -U _WIN32 -O3" CFLAGS="-mno-cygwin -U _WIN32 -O3"
+	$(MAKE) binarydist OS=$(build_cpu)-mingw32 CXXFLAGS="-mno-cygwin -U _WIN32" CFLAGS="-mno-cygwin -U _WIN32"
 
 # target for any other operating system
 bindist:

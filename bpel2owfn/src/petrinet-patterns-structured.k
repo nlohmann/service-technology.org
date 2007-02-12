@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for BPEL's structured activities
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $ 
+ *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/01/26 14:44:40 $
+ * \date    \$Date: 2007/02/12 09:56:01 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.19 $
+ * \version \$Revision: 1.20 $
  */
 %}
 
@@ -1127,7 +1127,7 @@ void PIf(impl_tIf* abstract_phylum, uview current_view)
 	  {
 	    // embed inner activity
             PN.newArc(t1, PN.findPlace(innerActivity->id, ".initial"));
-	    PN.mergePlaces(phylum->id, ".internal.final", _id2->value, ".final");
+	    PN.mergePlaces(phylum->id, ".internal.final", innerActivity->id, ".final");
 	  }
 	  
 	  elseBranch=NoElse(_id2):

@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/02/12 08:42:13 $
+ * \date    \$Date: 2007/02/12 09:56:01 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.128 $
+ * \version \$Revision: 1.129 $
  */
 %}
 
@@ -2134,7 +2134,10 @@ Term(_linkname) ->
         SAerror(73, _linkname->name, ASTEmap[$0->parentId]->attributes["referenceLine"]);
       }
       else
-        $0->value = joinCondition_linkStatus[joinCondition_links[_linkname->name]];
+      {
+        // numbering in joinCondition_linkStatus should start with 0, thus subtract 1
+        $0->value = joinCondition_linkStatus[joinCondition_links[_linkname->name] -1];
+      }
     }
   ]
 ;

@@ -55,3 +55,4 @@ bpel2owfn.exe.stackdump
 *.dot
 *.out
 *.exe
+*.og

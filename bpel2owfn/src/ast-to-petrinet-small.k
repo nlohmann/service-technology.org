@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/02/11 20:53:02 $
+ * \date    \$Date: 2007/02/12 08:42:13 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.88 $
+ * \version \$Revision: 1.89 $
  *
  */
 %}
@@ -264,8 +264,6 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF)
         // create pattern for join condition
         for (unsigned int i = 0; i < transitionNumber; i++)
         {
-          cerr << i << " " << joinCondition_result[i] << endl;
-
           if (joinCondition_result[i])
             PN.newArc(joinTransitions[i], p3);
           else
@@ -429,8 +427,6 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
         // create pattern for join condition
         for (unsigned int i = 0; i < transitionNumber; i++)
         {
-          cerr << i << " " << joinCondition_result[i] << endl;
-
           if (joinCondition_result[i])
             PN.newArc(joinTransitions[i], p5);
           else

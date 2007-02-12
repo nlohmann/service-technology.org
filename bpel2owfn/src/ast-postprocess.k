@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/02/11 20:53:02 $
+ * \date    \$Date: 2007/02/12 08:42:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.127 $
+ * \version \$Revision: 1.128 $
  */
 %}
 
@@ -1940,6 +1940,11 @@ StandardElements(a,b, _joinCondition) ->
       assert(ASTEmap[$0->parentId] != NULL);
       $0->suppressJF = (ASTEmap[$0->parentId]->attributes["suppressJoinFailure"] == "yes");
 
+      // pass id to join condition
+      _joinCondition->parentId = $0->parentId;
+    }
+    _joinCondition
+    {
       unsigned int linkCount = 0;
       foreach(targetLink; tTarget_list a)
       {
@@ -1948,7 +1953,7 @@ StandardElements(a,b, _joinCondition) ->
         ASTEmap[targetLink->id]->parentActivityId = $0->parentId;
         
         // links are numbered and stored in joinCondition_links map
-        joinCondition_links[ASTEmap[targetLink->id]->attributes["linkName"]] = linkCount++;
+        joinCondition_links[ASTEmap[targetLink->id]->attributes["linkName"]] = ++linkCount; // start enumerating with '1'
       }
 
       foreach(sourceLink; tSource_list b)
@@ -2088,17 +2093,53 @@ Source(a) ->
   ]
 ;
 
-
-
-
-/* evaluate join condition */
-This=Term(_linkname) ->
-  [evaluation:
-    { $0->value = joinCondition_linkStatus[joinCondition_links[_linkname->name]]; }
+userDefinedJoinCondition(_exp) ->
+  [postprocessing:
+    { _exp->parentId = $0->parentId; }
+    _exp
   ]
 ;
 
-This=Conjunction(_exp1, _exp2) ->
+Conjunction(_exp1, _exp2) -> 
+  [postprocessing:
+    { _exp1->parentId = _exp2->parentId = $0->parentId; }
+    _exp1 _exp2
+  ]
+;
+
+Disjunction(_exp1, _exp2) -> 
+  [postprocessing:
+    { _exp1->parentId = _exp2->parentId = $0->parentId; }
+    _exp1 _exp2
+  ]
+;
+
+Term(_linkname) -> [postprocessing: ];
+
+
+
+
+
+/***************************
+ * EVALUATE JOIN CONDITION *
+ ***************************/
+Term(_linkname) ->
+  [evaluation:
+    {
+      // if no value was set in this join condition, the link is not inside the
+      // target link list of the current activity --> triggeer SA00073
+      if (joinCondition_links[_linkname->name] == 0)
+      {
+        assert(ASTEmap[$0->parentId] != NULL);
+        SAerror(73, _linkname->name, ASTEmap[$0->parentId]->attributes["referenceLine"]);
+      }
+      else
+        $0->value = joinCondition_linkStatus[joinCondition_links[_linkname->name]];
+    }
+  ]
+;
+
+Conjunction(_exp1, _exp2) ->
   [evaluation:
     _exp1
     _exp2
@@ -2106,7 +2147,7 @@ This=Conjunction(_exp1, _exp2) ->
   ]
 ;
 
-This = Disjunction(_exp1, _exp2) ->
+Disjunction(_exp1, _exp2) ->
   [evaluation:
     _exp1
     _exp2

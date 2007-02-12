@@ -31,7 +31,7 @@
  * 
  * \since   2005-10-03
  *
- * \date    \$Date: 2007/02/11 20:53:02 $
+ * \date    \$Date: 2007/02/12 08:42:13 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.162 $
+ * \version \$Revision: 1.163 $
  */
 %}
 
@@ -555,6 +555,9 @@ tSource:
 joinCondition:
   standardJoinCondition()
 | userDefinedJoinCondition(expression)
+  {
+    int parentId;
+  }
 ;
 
 
@@ -563,6 +566,7 @@ expression:
 | Conjunction(expression expression)
 | Disjunction(expression expression)
   {
+    int parentId;
     bool value = false;
   }
 ;

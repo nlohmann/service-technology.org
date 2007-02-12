@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/01/17 14:45:45 $
+ * \date    \$Date: 2007/02/12 08:42:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.53 $
+ * \version \$Revision: 1.54 $
  *
  * \ingroup debug
  */
@@ -290,6 +290,10 @@ void SAerror(unsigned int code, string information, int lineNumber)
 
     case(72):
       { cerr << "<link> `" << information << "' closes a control cycle" << endl;
+	break; }
+
+    case(73):
+      { cerr << "<link> `" << information << "' used in a join condition is not an incoming link of this activity" << endl;
 	break; }
 
     case(74):

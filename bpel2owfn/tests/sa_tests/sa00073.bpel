@@ -1,0 +1,31 @@
+<process name="unreachableTask" suppressJoinFailure="yes">
+
+  <flow name="FL" suppressJoinFailure="yes">
+    <links>
+      <link name="x1" />
+      <link name="x2" />
+    </links>
+    
+    <receive operation="A1">
+      <sources>
+	<source linkName="x1" />
+      </sources>
+    </receive>
+
+    <receive operation="A2">
+      <sources>
+	<source linkName="x2" />
+      </sources>
+    </receive>
+
+    <receive operation="A3">
+      <targets>
+	<joinCondition>
+	  bpws:getLinkStatus('x1') and bpws:getLinkStatus('x3')
+	</joinCondition>
+	<target linkName="x1" />
+	<target linkName="x2" />
+      </targets>
+    </receive>
+  </flow>
+</process>

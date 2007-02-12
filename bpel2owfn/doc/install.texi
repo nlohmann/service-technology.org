@@ -252,7 +252,6 @@ values to create a @file{Makefile} in each directory of the package. Entering
 
 should lead to an output like:
 
-@c @cartouche
 @smallexample
 checking for a BSD-compatible install... /usr/bin/install -c
 checking whether build environment is sane... yes
@@ -260,7 +259,6 @@ checking for a thread-safe mkdir -p... /usr/bin/mkdir -p
 checking for gawk... gawk
 checking whether make sets $(MAKE)... yes
 checking build system type... i686-pc-cygwin
-checking for style of include used by make... GNU
 checking for g++... g++
 checking for C++ compiler default output file name... a.exe
 checking whether the C++ compiler works... yes
@@ -269,18 +267,13 @@ checking for suffix of executables... .exe
 checking for suffix of object files... o
 checking whether we are using the GNU C++ compiler... yes
 checking whether g++ accepts -g... yes
+checking for style of include used by make... GNU
 checking dependency style of g++... gcc3
-checking for inline... inline
-checking whether we are using the GNU C++ compiler... (cached) yes
-checking whether g++ accepts -g... (cached) yes
-checking dependency style of g++... (cached) gcc3
 checking for gcc... gcc
 checking whether we are using the GNU C compiler... yes
 checking whether gcc accepts -g... yes
 checking for gcc option to accept ISO C89... none needed
 checking dependency style of gcc... gcc3
-checking whether make sets $(MAKE)... (cached) yes
-checking for a BSD-compatible install... /usr/bin/install -c
 checking how to run the C++ preprocessor... g++ -E
 checking for grep that handles long lines and -e... /usr/bin/grep
 checking for egrep... /usr/bin/grep -E
@@ -294,40 +287,14 @@ checking for strings.h... yes
 checking for inttypes.h... yes
 checking for stdint.h... yes
 checking for unistd.h... yes
-checking for size_t... yes
-checking for ANSI C header files... (cached) yes
 checking assert.h usability... yes
 checking assert.h presence... yes
 checking for assert.h... yes
-checking libintl.h usability... yes
-checking libintl.h presence... yes
-checking for libintl.h... yes
-checking malloc.h usability... yes
-checking malloc.h presence... yes
-checking for malloc.h... yes
-checking for stdlib.h... (cached) yes
-checking for string.h... (cached) yes
-checking for strings.h... (cached) yes
-checking for unistd.h... (cached) yes
-checking stddef.h usability... yes
-checking stddef.h presence... yes
-checking for stddef.h... yes
 checking for pow... yes
-checking for stdlib.h... (cached) yes
-checking for GNU libc compatible realloc... yes
-checking for stdbool.h that conforms to C99... yes
-checking for _Bool... no
-checking for an ANSI C-conforming const... yes
-checking for error_at_line... no
-checking for stdlib.h... (cached) yes
-checking for GNU libc compatible malloc... yes
-checking for working alloca.h... yes
-checking for alloca... yes
-checking for memset... yes
 checking for bison... bison -y
 checking for flex... flex
-checking for yywrap in -lfl... yes
 checking lex output file root... lex.yy
+checking lex library... none needed
 checking whether yytext is a pointer... no
 checking for kc++... kc++
 checking for dot... dot
@@ -339,7 +306,6 @@ config.status: creating tests/Makefile
 config.status: creating src/bpel2owfn.h
 config.status: executing depfiles commands
 @end smallexample
-@c @end cartouche
 
 In some cases the configure script complains (i.e.@: warns) about tools which
 could not be found in your system path. In this case please check

@@ -247,6 +247,8 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 
 	trace(TRACE_5, "BddRepresentation::addOrDeleteLeavingEdges(vertex* v): start\n");		
 	
+	//hier noch Annotation berechnen
+	
 	v->resetIteratingSuccNodes();
 	
 	if (v->reachGraphStateSet.size() != 0){
@@ -255,8 +257,10 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 		
 		while((element = v->getNextEdge()) != NULL){
 			vertex* vNext = element->getNode();
-			if (vNext != NULL){ //&& vNext->reachGraphStateSet.size() != 0 
-			
+			if (vNext != NULL){
+				
+				//cout << "current edge: " << v->getNumber() << " [" << element->getLabel() << "> " << vNext->getNumber() << endl;
+								
 				//label
 				DdNode * label = labelToBddMp(element->getLabel().c_str()); 
 				//if (label == NULL) exit(1)
@@ -271,23 +275,26 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 				Cudd_Ref(edge);
 				Cudd_RecursiveDeref(mgrMp, label);
 				Cudd_RecursiveDeref(mgrMp, nodes);
-				/* cout << "bddMp " << v->getNumber() << " [" << element->getLabel() << "> "
-					<< vNext->getNumber() << " :\t"; Cudd_PrintMinterm(this->mgrMp, edge);
-				cout << "--------------------------------\n";
-				*/
+				
+				cout << "edge: " << v->getNumber() << " [" << element->getLabel() << "> " << vNext->getNumber() << endl;
+					cout << "edge: " << getBddNumber(v->getNumber()) << " [" << element->getLabel() << "> "
+						<< getBddNumber(vNext->getNumber()) << " -new-\n";
+					Cudd_PrintMinterm(mgrMp, edge);
+					
 					
 				if (v->getColor() == BLUE && vNext->getColor() == BLUE ) { //add blue edges
+					cout << "add current edge " << v->getNumber() << "->" << vNext->getNumber() << endl;
+					cout << "--------------------------------\n";
 					DdNode* tmp = Cudd_bddOr(mgrMp, edge, bddMp);
 					// if (tmp == NULL) exit(1);
 					Cudd_Ref(tmp);
 					Cudd_RecursiveDeref(mgrMp, edge);
 					Cudd_RecursiveDeref(mgrMp, bddMp);
 					bddMp = tmp;	 
-			
-					//cout << "add edge " << v->getNumber() << "->" << vNext->getNumber() << endl;
-						
 				} 
 				else { //delete red edge (vermutl. unnötig, da keine roten Kanten im BDD)
+					cout << "delete edge " << v->getNumber() << "->" << vNext->getNumber() << endl;
+					cout << "--------------------------------\n";
 					DdNode* tmp = Cudd_bddAnd(mgrMp, bddMp, Cudd_Not(edge));
 					// if (tmp == NULL) exit(1);
 					Cudd_Ref(tmp);

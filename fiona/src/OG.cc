@@ -51,6 +51,13 @@ operatingGuidelines::operatingGuidelines(oWFN * _PN) : communicationGraph(_PN) {
 		unsigned int nbrLabels = PN->placeInputCnt + PN->placeOutputCnt;
 		bdd = new BddRepresentation(nbrLabels, (Cudd_ReorderingType)bdd_reordermethod);
 	 }
+
+	//für direkte symbolische Berechnung
+	if (false){
+		unsigned int nbrLabels = PN->placeInputCnt + PN->placeOutputCnt;
+		cout << "nbrLabels: " << nbrLabels << endl;
+		bdd = new BddRepresentation(nbrLabels, (Cudd_ReorderingType)bdd_reordermethod);
+	}
 }
 
 //! \fn operatingGuidelines::~operatingGuidelines() 
@@ -67,7 +74,7 @@ operatingGuidelines::~operatingGuidelines() {
 //! \param currentNode current node of the graph
 //! \brief builds up the graph recursively
 void operatingGuidelines::buildGraph(vertex * currentNode) {
-
+		
 	actualDepth++;
 
 	trace(TRACE_1, "\n=================================================================\n");
@@ -145,7 +152,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	}
 
 	i = 0;
-		
+	
 	trace(TRACE_2, "\t\t\t iterating over outputSet\n");
 	// iterate over all elements of outputSet
 	while (i < PN->placeOutputCnt) {
@@ -191,9 +198,13 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 
 	trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + "\n");
 
-/*
-	if (options[O_BDD] == true){
+	
+	
+	if (false){
+		cout << "currentNode: " << currentNode->getNumber() << endl;		
 		bdd->addOrDeleteLeavingEdges(currentNode);
+	}
+/*
 		//	currentNode->resetIteratingSuccNodes();
 		if (currentNode->reachGraphStateSet.size() != 0){	 
 			graphEdge* element;
@@ -296,7 +307,7 @@ void operatingGuidelines::convertToBdd() {
     this->bdd->convertRootNode(root);
     this->bdd->generateRepresentation(tmp, visitedNodes);
     this->bdd->reorder((Cudd_ReorderingType)bdd_reordermethod);
-    trace(TRACE_5,"operatingGuidelines::convertToBdd()\n");
+    trace(TRACE_5,"operatingGuidelines::convertToBdd(): end\n");
 }
 
 void operatingGuidelines::printOGFile() const {

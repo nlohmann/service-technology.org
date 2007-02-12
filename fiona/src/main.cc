@@ -365,6 +365,10 @@ int main(int argc, char ** argv) {
 			        seconds = time (NULL);
 			
 			        graph->calculateRootNode();	// creates the root node and calculates its reachability graph (set of states)
+					
+					if (false){
+						graph->bdd->convertRootNode(graph->getRoot());
+					}
 					graph->buildGraph(graph->getRoot()); // build operating guideline
 					
 			        seconds2 = time (NULL);

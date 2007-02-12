@@ -1,4 +1,5 @@
 /*****************************************************************************\
+ * Copyright 2007       Niels Lohmann                                        *
  * Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
@@ -29,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/02/12 08:42:13 $
+ * \date    \$Date: 2007/02/12 10:09:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.54 $
+ * \version \$Revision: 1.55 $
  *
  * \ingroup debug
  */

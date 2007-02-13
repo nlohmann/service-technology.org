@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for BPEL's <scope> and <process>
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $ 
+ *          last changes of: \$Author: gierds $ 
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2006/12/30 12:48:02 $
+ * \date    \$Date: 2007/02/13 14:41:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  */
 %}
 
@@ -477,7 +477,7 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 	PN.mergePlaces(PN.findPlace(prefix + "inner_stop"),       PN.findPlace(phylum->activity_1->id, ".stop"));
 	PN.mergePlaces(PN.findPlace(prefix + "inner_stopped"),    PN.findPlace(phylum->activity_1->id, ".stopped"));      
 
-	break;
+        break;
       }
 
     case(petrinetsmall_enum):
@@ -1018,6 +1018,40 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
 
 	// unparse the termination handler
 	phylum->tTerminationHandler_1->unparse(pseudoPrinter, current_view);
+
+	// unparse the fault handlers
+	phylum->tEventHandlers_1->unparse(pseudoPrinter, current_view);
+
+
+	if (ASTEmap[phylum->id]->hasEH)
+	{
+          Place *p26 = PN.newPlace(prefix + "p26");
+          Place *p27 = PN.newPlace(prefix + "p27");
+          Place *p28 = PN.newPlace(prefix + "p28");
+
+          PN.newArc(t1, p23);
+          PN.newArc(p26, t2);
+
+	  Transition *t13 = PN.newTransition(prefix + "t13");
+	  PN.newArc(p27, t13);
+	  PN.newArc(PN.findPlace(prefix + "p15"), t13);
+          PN.newArc(t13, p28);
+          
+          Transition *t14 = PN.newTransition(prefix + "t14");
+	  PN.newArc(PN.findPlace(prefix + "p21"), t14);
+          PN.newArc(p27, t14);
+          PN.newArc(t14, p28);
+          PN.newArc(t14, PN.findPlace(prefix + "p22"));
+	  
+          
+          PN.mergePlaces(PN.findPlace(toString(phylum->tEventHandlers_1->id) + ".internal.initial"),   PN.findPlace(prefix + "p23"));
+          PN.mergePlaces(PN.findPlace(toString(phylum->tEventHandlers_1->id) + ".internal.running"),   PN.findPlace(prefix + "p27"));
+          PN.mergePlaces(PN.findPlace(toString(phylum->tEventHandlers_1->id) + ".internal.finishing"), PN.findPlace(prefix + "p28"));
+          PN.mergePlaces(PN.findPlace(toString(phylum->tEventHandlers_1->id) + ".internal.stop"),      PN.findPlace(prefix + "p22"));
+          PN.mergePlaces(PN.findPlace(toString(phylum->tEventHandlers_1->id) + ".internal.stopped"),   PN.findPlace(prefix + "p13"));
+          PN.mergePlaces(PN.findPlace(toString(phylum->tEventHandlers_1->id) + ".internal.fault"),     PN.findPlace(prefix + "p3"));
+          PN.mergePlaces(PN.findPlace(toString(phylum->tEventHandlers_1->id) + ".internal.final"),     PN.findPlace(prefix + "p26"));
+	}
 
 
 	// embed fault handler

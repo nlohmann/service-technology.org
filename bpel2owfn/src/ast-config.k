@@ -25,11 +25,11 @@
  * \brief   Configuration of the AST
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $ 
+ *          last changes of: \$Author: gierds $ 
  * 
  * \since   2006-24-03
  *
- * \date    \$Date: 2007/02/11 20:53:02 $
+ * \date    \$Date: 2007/02/13 14:41:08 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.38 $
+ * \version \$Revision: 1.39 $
  *
  * \todo    Annotate the global mappings which function clear them.
  */
@@ -140,6 +140,7 @@ set<unsigned int> ASTE_startActivities;	///< a set of the ids of the start activ
 
 map<string, unsigned int> ASTE_linkIdMap;	///< maps link names to identifiers
 map<string, unsigned int> ASTE_scopeNames;	///< maps scope names to identifiers
+map<string, unsigned int> ASTE_partnerLinks;    ///< maps partnerlink names to identifiers
 
 
 map<string, unsigned int> joinCondition_links;		///< used to evaluate joinConditions: maps link names to a temporary link number

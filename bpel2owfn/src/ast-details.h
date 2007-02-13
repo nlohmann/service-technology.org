@@ -29,14 +29,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/01/17 10:17:23 $
+ * \date    \$Date: 2007/02/13 14:41:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.59 $
+ * \version \$Revision: 1.60 $
  */
 
 
@@ -66,8 +66,8 @@ using std::string;
 using std::set;
 using std::vector;
 
-
-
+class ASTE;
+class pPartnerLink;
 
 
 /******************************************************************************
@@ -137,6 +137,8 @@ class ASTE
     string outputVariableName;		///< (unique) name of an output variable
     string linkName;			///< (unique) name of a link
 
+    pPartnerLink * plRoleDetails;        ///< additional information (myRole, partnerRole) for role-based matching of PartnerLinks
+
     bool hasEH;				///< true if <process> or <scope> have <eventHandlers>
     bool hasCatchAll;			///< true if <faultHandlers> have a <catchAll> branch
     bool inProcess;			///< true if <compensationHandler> is embedded to a <process>
@@ -185,9 +187,21 @@ class ASTE
     string activityTypeName() const;
 
     ASTE(unsigned int myid, unsigned int mytype);
+    virtual ~ASTE();
 };
 
+class pPartnerLink {
+  public:
+    
+    string name;
+    string partnerLinkType;
+    string myRole;
+    string partnerRole;
 
+    pPartnerLink(string n, string type, string me, string you);
+    
+    bool operator==(pPartnerLink & pl);
+};
 
 
 

@@ -29,14 +29,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/01/17 10:17:23 $
+ * \date    \$Date: 2007/02/13 14:41:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.72 $
+ * \version \$Revision: 1.73 $
  */
 
 
@@ -76,28 +76,30 @@ using std::endl;
  *
  * \todo "real" initialization
  */
-ASTE::ASTE(unsigned int myid, unsigned int mytype)
+ASTE::ASTE(unsigned int myid, unsigned int mytype) :
+  id(myid), type(mytype),
+  plRoleDetails(NULL), inProcess(false), isStartActivity(false), targetActivity(0),
+  sourceActivity(0), max_occurrences(1), max_loops(UINT_MAX), controlFlow(POSITIVECF)
 {
   extern map<unsigned int, map<string, string> > temporaryAttributeMap;
 
   assert(myid != 0);
 
-  id = myid;
-  type = mytype;
   attributes = temporaryAttributeMap[id];
-
-  inProcess = false;		// required initialization!
-  isStartActivity = false;	// required initialization!
-  targetActivity = 0;		// required initialization!
-  sourceActivity = 0;		// required initialization!
-  max_occurrences = 1;		// required initialization!
-  max_loops = UINT_MAX;		// required initialization!
-
-  controlFlow = POSITIVECF;	// required initialization!
 }
 
 
-
+/*!
+ * \brief destructor
+ */
+ASTE::~ASTE()
+{
+  if (plRoleDetails != NULL)
+  {
+    delete(plRoleDetails);
+    plRoleDetails = NULL;
+  }
+}
 
 
 /******************************************************************************
@@ -672,6 +674,10 @@ string ASTE::createChannel(bool synchronousCommunication)
     case(K_RECEIVE):
     case(K_ONMESSAGE):
       {
+        if (plRoleDetails != NULL)
+        {
+          channelName = plRoleDetails->partnerRole + "." + plRoleDetails->myRole + "." + attributes["operation"];
+        }
 	ASTE_inputChannels.insert(channelName);
 	break;
       }
@@ -679,10 +685,20 @@ string ASTE::createChannel(bool synchronousCommunication)
     case(K_INVOKE):
     case(K_REPLY):
       {
+        if (plRoleDetails != NULL)
+        {
+          channelName = plRoleDetails->myRole + "." + plRoleDetails->partnerRole + "." + attributes["operation"];
+        }
 	ASTE_outputChannels.insert(channelName);
 
 	if (synchronousCommunication)
+        {
+          if (plRoleDetails != NULL)
+          {
+            channelName = plRoleDetails->partnerRole + "." + plRoleDetails->myRole + "." + attributes["operation"];
+          }
 	  ASTE_inputChannels.insert(channelName);
+        }
 
 	break;
       }
@@ -832,14 +848,18 @@ string ASTE::defineLink()
 string ASTE::definePartnerLink()
 {
   extern set<string> ASTE_partnerLinkNames;
+  extern map<string, unsigned int> ASTE_partnerLinks;
 
   string name = toString(parentScopeId) + "." + attributes["name"];
 
   // triggers [SA00018]
   if (ASTE_partnerLinkNames.find(name) != ASTE_partnerLinkNames.end())
     SAerror(18, attributes["name"], attributes["referenceLine"]);
-  else
+  else 
+  {
     ASTE_partnerLinkNames.insert(name);
+    ASTE_partnerLinks[ attributes["name"] ] = id;
+  }
 
   return name;
 }
@@ -942,6 +962,7 @@ string ASTE::checkPartnerLink()
 {
   extern map<unsigned int, ASTE*> ASTEmap;	
   extern set<string> ASTE_partnerLinkNames;
+  extern map<string, unsigned int> ASTE_partnerLinks;
   extern string filename;
 
   string partnerLinkName = attributes["partnerLink"];
@@ -952,8 +973,20 @@ string ASTE::checkPartnerLink()
 
   // travers the ancestor scopes
   for (vector<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
+  {
     if (ASTE_partnerLinkNames.find(toString(*scope) + "." + partnerLinkName) != ASTE_partnerLinkNames.end())
+    {
+      string partnerLinkType = ASTEmap[ ASTE_partnerLinks[partnerLinkName] ]->attributes["partnerLinkType"];
+      string myRole          = ASTEmap[ ASTE_partnerLinks[partnerLinkName] ]->attributes["myRole"];
+      string partnerRole     = ASTEmap[ ASTE_partnerLinks[partnerLinkName] ]->attributes["partnerRole"];
+
+      if (partnerLinkType != "" && myRole != "" && partnerRole != "")
+      {
+        plRoleDetails = new pPartnerLink(partnerLinkName, partnerLinkType, myRole, partnerRole);
+      }
       return (toString(*scope) + "." + partnerLinkName);
+    }
+  }
 
   // trigger [SA00084]
   assert(ASTEmap[parentActivityId] != NULL);
@@ -1198,4 +1231,34 @@ string ASTE::activityTypeName() const
 
     default:			return "unknown"; /* should not happen */
   }
+}
+
+/*!
+ *  \brief constructor
+ *
+ *  Initializes the PartnerLink information.
+ *
+ *  \param n the name of the PartnerLink
+ *  \param type the partnerLinkType
+ *  \param me my role
+ *  \param you the role of the partner
+ *
+ */
+pPartnerLink::pPartnerLink(string n, string type, string me, string you) :
+  name(n), partnerLinkType(type), myRole(me), partnerRole(you)
+{
+  /* nothing more to be done */
+}
+
+/*!
+ *  Implements the semantical matching of PartnerLinks
+ *
+ *  \param pl the partnerLink which should be checked for matching
+ *
+ *  \return true iff partnerLinkType matches and myRole und partnerRole correspond accordingly
+ *
+ */
+bool pPartnerLink::operator==(pPartnerLink & pl)
+{
+  return (pl.partnerLinkType == partnerLinkType && pl.myRole == partnerRole && pl.partnerRole == myRole);
 }

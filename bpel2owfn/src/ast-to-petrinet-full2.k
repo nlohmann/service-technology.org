@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/01/26 14:44:40 $
+ * \date    \$Date: 2007/02/13 14:41:08 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.81 $
+ * \version \$Revision: 1.82 $
  */
 %}
 
@@ -413,7 +413,7 @@ This=CompensateScope(a,b,_id) provided (ASTEmap[_id->value]->controlFlow == FHCF
 ******************************************************************************/
 
 This=StandardElements(NiltTarget_list(), NiltSource_list(), jc) ->
-  [petrinet petrinetnew:
+  [petrinet:
     {
       string prefix = toString(This->parentId) + ".";
       string newPrefix = toString(This->parentId) + ".internal";
@@ -451,7 +451,7 @@ This=StandardElements(NiltTarget_list(), NiltSource_list(), jc) ->
  *****************************************************************************/
 
 This=StandardElements(NiltTarget_list(), a, jc) ->
-  [petrinet petrinetnew:
+  [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 22\n");
       string prefix = toString(This->parentId) + ".";
@@ -533,7 +533,7 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
  *****************************************************************************/
 
 This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF) ->
-  [petrinet petrinetnew:
+  [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 23\n");
       string prefix = toString(This->parentId) + ".";
@@ -603,7 +603,7 @@ This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF) ->
  *****************************************************************************/
 
 This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF) ->
-  [petrinet petrinetnew:
+  [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 24\n");
       string prefix = toString(This->parentId) + ".";
@@ -670,7 +670,7 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF) ->
  *****************************************************************************/
 
 This=StandardElements(a,b, jc) provided (This->suppressJF) ->
-  [petrinet petrinetnew:
+  [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 25\n");
       string prefix = toString(This->parentId) + ".";
@@ -784,7 +784,7 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
  *****************************************************************************/
 
 This=StandardElements(a,b, jc) provided (!This->suppressJF) ->
-  [petrinet petrinetnew:
+  [petrinet:
     {
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 26\n");
       string prefix = toString(This->parentId) + ".";
@@ -888,3 +888,4 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF) ->
     }
   ]
 ;
+

@@ -29,13 +29,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/01/17 10:17:23 $
+ * \date    \$Date: 2007/02/13 14:41:08 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.177 $
+ * \version \$Revision: 1.178 $
  *
  * \ingroup petrinet
  */
@@ -1209,7 +1209,7 @@ void PetriNet::compose(PetriNet &net)
   set< Place * > eraseP_in;
   set< Place * > additionalP_out;
 
-  // merge appropreate input and output places (same name, different prefixes)
+  // merge appropriate input and output places (same name, different prefixes)
   for (set< Place * >::iterator place = P_in.begin(); place != P_in.end(); place ++)
   {
     set< Place * >::iterator oPlace = P_out.begin();

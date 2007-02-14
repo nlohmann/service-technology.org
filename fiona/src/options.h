@@ -53,6 +53,7 @@ typedef enum
 	O_SHOW_NODES,	//!<
 	O_CALC_ALL_STATES,
 	O_BDD,
+	O_OTF, //on the fly
 	O_EX,
 	O_MATCH
 } possibleOptions;

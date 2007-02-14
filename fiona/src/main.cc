@@ -366,7 +366,7 @@ int main(int argc, char ** argv) {
 			
 			        graph->calculateRootNode();	// creates the root node and calculates its reachability graph (set of states)
 					
-					if (false){
+					if (options[O_OTF]){
 						graph->bdd->convertRootNode(graph->getRoot());
 					}
 					graph->buildGraph(graph->getRoot()); // build operating guideline
@@ -391,7 +391,13 @@ int main(int argc, char ** argv) {
 			        graph->printDotFile();
 			        graph->printOGFile();
 			        
-			        if (options[O_BDD] == true) {
+			        if (options[O_OTF]) {
+						//graph->bdd->printDotFile();
+						//graph->bdd->print();
+						graph->bdd->save("OTF");
+			        }
+			        
+			        if (options[O_BDD]) {
 						trace(TRACE_0, "\nbuilding the BDDs...\n");
 						seconds = time (NULL);
 						graph->convertToBdd();      

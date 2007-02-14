@@ -47,17 +47,10 @@
 //! \brief constructor
 operatingGuidelines::operatingGuidelines(oWFN * _PN) : communicationGraph(_PN) {
 	
-	 if (options[O_BDD] == true) {
+	 if (options[O_BDD] == true || options[O_OTF]) {
 		unsigned int nbrLabels = PN->placeInputCnt + PN->placeOutputCnt;
 		bdd = new BddRepresentation(nbrLabels, (Cudd_ReorderingType)bdd_reordermethod);
 	 }
-
-	//für direkte symbolische Berechnung
-	if (false){
-		unsigned int nbrLabels = PN->placeInputCnt + PN->placeOutputCnt;
-		cout << "nbrLabels: " << nbrLabels << endl;
-		bdd = new BddRepresentation(nbrLabels, (Cudd_ReorderingType)bdd_reordermethod);
-	}
 }
 
 //! \fn operatingGuidelines::~operatingGuidelines() 
@@ -200,25 +193,11 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 
 	
 	
-	if (false){
-		cout << "currentNode: " << currentNode->getNumber() << endl;		
+	if (options[O_OTF]){
+		//cout << "currentNode: " << currentNode->getNumber() << endl;	
 		bdd->addOrDeleteLeavingEdges(currentNode);
 	}
-/*
-		//	currentNode->resetIteratingSuccNodes();
-		if (currentNode->reachGraphStateSet.size() != 0){	 
-			graphEdge* element;
-			//cout << "currentNode: " << currentNode->getNumber() << "\tdelete node: ";
-			while((element = currentNode->getNextEdge()) != NULL){
-				vertex* vNext = element->getNode();
-				//cout << vNext->getNumber()<< "  ";
-				setOfVertices.erase(vNext); 
-				delete vNext; 
-			}
-			//cout << endl;
-		}
-	}
-*/
+
 }
 
 //! \fn void operatingGuidelines::computeCNF(vertex * node)

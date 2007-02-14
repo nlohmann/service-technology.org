@@ -174,6 +174,10 @@ void BddRepresentation::convertRootNode(vertex* root){
 	
 	nodeMap.insert(make_pair(root->getNumber(), 0));
 	
+	/*for (int i = 1; i<=3; ++i){
+		nodeMap.insert(make_pair(i, i));
+	}*/
+	
 	trace(TRACE_5, "void BddRepresentation::convertRootNode(vertex* root): end\n"); 
 }
 
@@ -224,7 +228,6 @@ void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
 						<< getBddNumber(vNext->getNumber()) << " -new-\n";
 					Cudd_PrintMinterm(mgrMp, edge);
 					cout << "--------------------------------\n";*/
-						
 					tmp = Cudd_bddOr(mgrMp, edge, bddMp);
 					// if (tmp == NULL) exit(1);
 					Cudd_Ref(tmp);
@@ -247,8 +250,25 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 
 	trace(TRACE_5, "BddRepresentation::addOrDeleteLeavingEdges(vertex* v): start\n");		
 	
-	//hier noch Annotation berechnen
-	
+	assert(v->getColor() != BLACK);
+	if (v->getColor() == BLUE){	//add annotation
+		DdNode * annotation = annotationToBddAnn(v);
+		DdNode* tmp = Cudd_bddOr(mgrAnn, annotation, bddAnn);
+		//  if (tmp == NULL) exit(1);
+		Cudd_Ref(tmp);
+		Cudd_RecursiveDeref(mgrAnn, annotation);
+		Cudd_RecursiveDeref(mgrAnn, bddAnn);
+		bddAnn = tmp;	
+	}
+	else {	//delete annotation
+		DdNode * annotation = annotationToBddAnn(v);
+		DdNode* tmp = Cudd_bddAnd(mgrAnn, annotation, Cudd_Not(bddAnn));
+		//  if (tmp == NULL) exit(1);
+		Cudd_Ref(tmp);
+		Cudd_RecursiveDeref(mgrAnn, annotation);
+		Cudd_RecursiveDeref(mgrAnn, bddAnn);
+		bddAnn = tmp;	
+	}
 	v->resetIteratingSuccNodes();
 	
 	if (v->reachGraphStateSet.size() != 0){
@@ -276,15 +296,13 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 				Cudd_RecursiveDeref(mgrMp, label);
 				Cudd_RecursiveDeref(mgrMp, nodes);
 				
-				cout << "edge: " << v->getNumber() << " [" << element->getLabel() << "> " << vNext->getNumber() << endl;
-					cout << "edge: " << getBddNumber(v->getNumber()) << " [" << element->getLabel() << "> "
-						<< getBddNumber(vNext->getNumber()) << " -new-\n";
-					Cudd_PrintMinterm(mgrMp, edge);
-					
-					
+				/*cout << "edge: " << v->getNumber() << " [" << element->getLabel() << "> " << vNext->getNumber() << endl;
+				cout << "edge: " << getBddNumber(v->getNumber()) << " [" << element->getLabel() << "> "
+				     << getBddNumber(vNext->getNumber()) << " -new-\n";
+				Cudd_PrintMinterm(mgrMp, edge);	*/
 				if (v->getColor() == BLUE && vNext->getColor() == BLUE ) { //add blue edges
-					cout << "add current edge " << v->getNumber() << "->" << vNext->getNumber() << endl;
-					cout << "--------------------------------\n";
+					/*cout << "add current edge " << endl;
+					cout << "--------------------------------\n";*/
 					DdNode* tmp = Cudd_bddOr(mgrMp, edge, bddMp);
 					// if (tmp == NULL) exit(1);
 					Cudd_Ref(tmp);
@@ -292,9 +310,9 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 					Cudd_RecursiveDeref(mgrMp, bddMp);
 					bddMp = tmp;	 
 				} 
-				else { //delete red edge (vermutl. unnötig, da keine roten Kanten im BDD)
-					cout << "delete edge " << v->getNumber() << "->" << vNext->getNumber() << endl;
-					cout << "--------------------------------\n";
+				else { //delete red edge
+					/*cout << "delete edge " << v->getNumber() << "->" << vNext->getNumber() << endl;
+					cout << "--------------------------------\n";*/
 					DdNode* tmp = Cudd_bddAnd(mgrMp, bddMp, Cudd_Not(edge));
 					// if (tmp == NULL) exit(1);
 					Cudd_Ref(tmp);
@@ -682,18 +700,18 @@ void BddRepresentation::reorder(Cudd_ReorderingType heuristic){
 //! \fn void BddRepresentation::printDotFile(char** varNames)
 //! \brief creates dot files of the BDDs
 //    mit dot -Tps fileName -o neu.ps kann das BDD graphisch dargestellt werden
-void BddRepresentation::printDotFile(char** varNames){
+void BddRepresentation::printDotFile(char** varNames, char* option){
 	if ((Cudd_DagSize(bddMp) < 200000)&&(Cudd_DagSize(bddAnn) < 200000) ) {
 	
 		char bufferMp[256]; 
 		char bufferAnn[256];
 
 		if (options[O_CALC_ALL_STATES]) {
-	                sprintf(bufferMp, "%s.a.OG.BDD_MP.out", netfile);
-	                sprintf(bufferAnn, "%s.a.OG.BDD_ANN.out", netfile); 
+	                sprintf(bufferMp, "%s.a.%s.BDD_MP.out", netfile, option);
+	                sprintf(bufferAnn, "%s.a.%s.BDD_ANN.out", netfile, option); 
 	            } else {
-	                sprintf(bufferMp, "%s.OG.BDD_MP.out", netfile);
-	                sprintf(bufferAnn, "%s.OG.BDD_ANN.out", netfile);
+	                sprintf(bufferMp, "%s.%s.BDD_MP.out", netfile, option);
+	                sprintf(bufferAnn, "%s.%s.BDD_ANN.out", netfile, option);
 	            }
             
             FILE* fpMp;
@@ -742,7 +760,7 @@ void BddRepresentation::print(){
 
 //! \fn void BddRepresentation::save()
 //! \brief save bddMp and bddAnn in file
-void BddRepresentation::save(){
+void BddRepresentation::save(char* option){
 	int size = nbrLabels + maxNodeBits;
 	char** names = new char*[size];
 
@@ -788,11 +806,11 @@ void BddRepresentation::save(){
 	char bufferAnn[256];
 	
 	if (options[O_CALC_ALL_STATES]) {
-                sprintf(bufferMp, "%s.a.OG.BDD_MP.cudd", netfile);
-                sprintf(bufferAnn, "%s.a.OG.BDD_ANN.cudd", netfile); 
+                sprintf(bufferMp, "%s.a.%s.BDD_MP.cudd", netfile, option);
+                sprintf(bufferAnn, "%s.a.%s.BDD_ANN.cudd", netfile, option); 
     } else {
-        sprintf(bufferMp, "%s.OG.BDD_MP.cudd", netfile);
-        sprintf(bufferAnn, "%s.OG.BDD_ANN.cudd", netfile);
+        sprintf(bufferMp, "%s.%s.BDD_MP.cudd", netfile, option);
+        sprintf(bufferAnn, "%s.%s.BDD_ANN.cudd", netfile, option);
     }
     
    	cout << "\nsaving the BDDs... \n";

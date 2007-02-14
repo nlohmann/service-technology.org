@@ -97,13 +97,14 @@ static struct option longopts[] =
   { "messagemaximum",  required_argument, NULL, 'm' },
   { "eventsmaximum",   required_argument, NULL, 'e' },
   { "BDD",             required_argument, NULL, 'b' },
+  { "OnTheFly",        required_argument, NULL, 'B' },
   { "exchangeability", no_argument,       NULL, 'x' },
   { "match",           required_argument, NULL, GETOPTLONG_MATCH },
   { NULL,              0,                 NULL, 0   }
 };
 
 
-const char * par_string = "hvd:n:t:s:arm:e:b:x";
+const char * par_string = "hvd:n:t:s:arm:e:b:B:x";
 
 // --------------------- functions for command line evaluation ------------------------
 // Prints an overview of all commandline arguments.
@@ -138,7 +139,7 @@ void print_help() {
   trace(" -x | --exchangeability ........ check for two oWFN the equality of its\n");
   trace("                                 operating guidelines (the BDD-representation\n");
   trace("                                 must have been computed before)\n");
-  trace("                                 syntax: -n netfile1 -n netfile2 -x\n");
+  trace("                                 syntax: -n netfile1.owfn -n netfile2.owfn -x\n");
   trace(" -b | --BDD=<reordering> ....... enable BDD construction (only relevant for OG)\n");
   trace("                                 argument <reordering> specifies reodering\n");
   trace("                                 method:\n");
@@ -164,6 +165,10 @@ void print_help() {
   trace("                                   19 - CUDD_REORDER_LINEAR_CONVERGE\n");
   trace("                                   20 - CUDD_REORDER_LAZY_SIFT\n");
   trace("                                   21 - CUDD_REORDER_EXACT\n");
+  trace(" -B | --OnTheFly=<reordering> ...enable BDD construction on the fly\n");
+  trace("                                 (only relevant for OG)\n");
+  trace("                                 argument <reordering> specifies reodering\n");
+  trace("                                 method (see option -b)\n");
   trace(" --match=<OG filename> ......... check if given oWFN (-n) matches with\n");
   trace("                                 operating guideline given in <OG filename>\n");
   trace("\n");
@@ -223,6 +228,7 @@ void parse_command_line(int argc, char* argv[]) {
     options[O_CALC_REDUCED_IG] = false;
     options[O_OWFN_NAME] = false;
     options[O_BDD] = false;
+    options[O_OTF] = false;
     options[O_EX] = false;
     options[O_MATCH] = false;
 
@@ -357,6 +363,21 @@ void parse_command_line(int argc, char* argv[]) {
                 options[O_BDD] = true;
                 testForInvalidArgumentNumberAndPrintErrorAndExitIfNecessary(
                     "-b", optarg);
+                i = atoi(optarg);
+                if (i >= 0 && i <= 21){
+                    bdd_reordermethod = i;
+                } else {
+                    cerr << "Error:\twrong BDD reorder method" << endl
+                         << "\tEnter \"fiona --help\" for more information."
+                         << endl;
+                    exit(1);
+                }
+                break;
+            case 'B':
+                options[O_OTF] = true;
+                options[O_BDD] = false;
+                testForInvalidArgumentNumberAndPrintErrorAndExitIfNecessary(
+                    "-B", optarg);
                 i = atoi(optarg);
                 if (i >= 0 && i <= 21){
                     bdd_reordermethod = i;

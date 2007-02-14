@@ -61,9 +61,9 @@ class BddRepresentation{
 		void generateRepresentation(vertex* v, bool visitedNodes[]);
 		void addOrDeleteLeavingEdges(vertex* v);
 		void reorder(Cudd_ReorderingType heuristic = CUDD_REORDER_SIFT);
-		void printDotFile(char** names= NULL);
+		void printDotFile(char** names= NULL, char* option = "OG");
 		void print();
-		void save();
+		void save(char* option = "OG");
 		void PrintMemoryInUse();
 
 		

@@ -324,8 +324,6 @@ vertex * communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeT
 		currentVertex->addSuccessorNode(edgeSucc);
 		currentVertex->setAnnotationEdges(edgeSucc);
 	
-		currentVertex->setAnnotationEdges(edgeSucc);
-		
         for (unsigned int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
             toAdd->eventsUsed[i] = currentVertex->eventsUsed[i];
         }

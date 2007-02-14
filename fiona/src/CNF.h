@@ -60,19 +60,19 @@ public:
 	clause(graphEdge *);
 	~clause();	
 	
-	bool fake;
-	
-	graphEdge * edge;
-	clause * nextElement; 
+	bool fake;			//!< this literal has no real edge assigned to it yet (-> fake edge)
+		
+	graphEdge * edge;	//!< edge associated with this literal, does not need to be a real one in the graph
+	clause * nextElement; //!< pointer to the next literal of this clause
 
-	void addLiteral(const std::string&);
+	void addLiteral(const std::string&);  //!< add another literal to this clause
 	
-	void setEdge(graphEdge *);
-	void setEdges(graphEdge *);
+	void setEdge(graphEdge *);	//!< set the edge of this literal to the edge given
+	void setEdges(graphEdge *); //!< parse the whole clause and look for the appropriate fake edge, which is to be substituted
 	
-	string getClauseString();
+	string getClauseString();  //!< generates the string represented by this clause
 	
-	vertexColor getColor();
+	vertexColor getColor();	//!< calculates the color of this clause
 
     // Provides user defined operator new. Needed to trace all new operations
     // on this class.
@@ -95,19 +95,19 @@ public:
 	CNF();
 	~CNF();
 
-	clause * cl;		
-	CNF * nextElement;			// !< next element in CNF
-	bool isFinalState;			// indicates whether this clause belongs to a final state or not
+	clause * cl;				//!< pointer to the clause
+	CNF * nextElement;			//!< next element in CNF
+	bool isFinalState;			//!< indicates whether this clause belongs to a final state or not
+		
+	vertexColor getColor();		//!< returns the color of the CNF
+	vertexColor calcClauseColor();	//!< calculates the color of the clauses and thus of the CNF
 	
-	vertexColor getColor();
-	vertexColor calcClauseColor();
-	
-	void addClause(clause *);
-	void setEdge(graphEdge *);
+	void addClause(clause *);	//!< adds a new clause to the CNF
+	void setEdge(graphEdge *);	//!< sets the real edge in all those literals of all clauses of this CNF if needed
 
-	int numberOfElements();
+	int numberOfElements();	//!< returns the number of elements of this CNF
 	
-	string getCNFString();
+	string getCNFString();	//!< returns the CNF's string
 
     // Provides user defined operator new. Needed to trace all new operations
     // on this class.

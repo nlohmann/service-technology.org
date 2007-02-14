@@ -1,0 +1,622 @@
+\input texinfo
+@setfilename fiona
+@include version.texi
+@afourpaper
+@finalout
+@settitle @acronym{Fiona} User's Manual
+
+@c ----------------------------------------------------------------------------
+
+@copying
+
+@b{About this document:}
+
+This manual is for @acronym{Fiona}, Version @value{VERSION}.
+@acronym{Fiona} is a tool to automatically analyze the interactional behavior
+of a given open workflow net (@acronym{oWFN}). This manual does not explain how to setup or install
+@acronym{Fiona}. For this information please read the
+Installation Manual which is part of the distribution or can be
+downloaded from the website of @acronym{Fiona}
+(@url{http://www.informatik.hu-berlin.de/top/tools4bpel/fiona}).
+Last update @value{UPDATED}.
+
+@vskip 20pt
+
+Copyright @copyright{} 2007 Daniela Weinberg
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+@acronym{Fiona} is licensed under the @acronym{GNU} General
+Public License.
+
+Copyright @copyright{} 2005, 2006, 2007 Daniela Weinberg, Peter Massuthe, Karsten Wolf,
+Kathrin Kaschner, Christian Gierds and Jan Bretschneider.
+
+@iftex
+@image{images/tools4bpel,,0.4in}
+@end iftex
+
+@ifhtml
+@image{images/tools4bpel}
+@end ifhtml
+
+@acronym{Fiona} is part of the Tools4@acronym{BPEL} project
+funded by the Bundesministerium f@"ur Bildung und Forschung. See
+@url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
+@end copying
+
+@c ----------------------------------------------------------------------------
+
+@titlepage
+
+@ifnottex
+@title @acronym{Fiona}
+@end ifnottex
+
+@subtitle Functional Interaction Analysis for open Workflow Nets
+@subtitle @acronym{Fiona} Version @value{VERSION}, @value{UPDATED}
+@vskip 4pt
+@subtitle User's Manual
+
+@author Daniela Weinberg
+
+@page
+
+
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@c ----------------------------------------------------------------------------
+
+@ifnottex
+@node Top
+@top @acronym{Fiona}
+@insertcopying
+@end ifnottex
+
+@c ----------------------------------------------------------------------------
+
+@menu
+* Overview:: What @acronym{Fiona} does.
+* Invoking Fiona:: How to invoke @acronym{Fiona}.
+* File Format owfn:: The file format that @acronym{Fiona} uses as input.
+* Interaction Graph:: Deciding the controllability of an @acronym{oWFN} efficiently.
+* Operating Guideline:: Generating the operating guideline of an @acronym{oWFN}.
+* Limitations and Bugs:: What @acronym{Fiona} cannot do.
+* Future Work:: What @acronym{Fiona} will do in the future.
+* References:: Bibliography of cited literature.
+* GNU General Public License::
+@end menu
+
+@c ----------------------------------------------------------------------------
+
+@contents
+@paragraphindent none
+
+
+@c ----------------------------------------------------------------------------
+
+@node Overview
+@chapter Overview
+
+@section Introduction
+
+@acronym{Fiona} is a tool to automatically analyze the interactional behavior of a given
+open workflow net (@acronym{oWFN}) [MRS05].
+It provides two techniques:
+
+@itemize
+@item it checks for the controllability of the given net by
+computing the interactiong graph [Wei06],
+@item it calculates the operating guideline [MRS05] for the
+net.
+@end itemize
+
+Fiona uses oWFNs as its input which is the output of the tool @acronym{BPEL2oWFN}. Thus,
+any @acronym{BPEL} (@acronym{Business Process Execution Language for Web Services}) [ACD@math{^+}03]
+process can easily be analyzed.
+
+To compute the states of the graph nodes @acronym{Fiona} uses the efficient algorithms that
+were implemented in the model checking tool @acronym{LoLA}.
+
+
+@acronym{Fiona} was written by Daniela Weinberg, Peter Massuthe, Karsten Wolf, Kathrin Kaschner,
+Christian Gierds and Jan Bretschneider. It is part of the Tools4@acronym{BPEL} project
+funded by the German Bundesministerium f@"ur Bildung und Forschung. See
+@url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
+
+
+
+@c ----------------------------------------------------------------------------
+
+@node Invoking Fiona
+@chapter Invoking @acronym{Fiona}
+
+
+A given @acronym{oWFN} can be analyzed in two ways by @acronym{Fiona}.
+Therefore the standard invocation of @acronym{Fiona} is:
+
+@itemize
+@item checking controllability: @code{fiona -n inputNet.owfn -t IG}
+@item calculating the operating guideline: @code{fiona -n inputNet.owfn -t OG}
+@end itemize
+
+where @file{inputNet.owfn} contains an @acronym{oWFN} written in the appropriate
+format @ref{File Format owfn}.
+The option @samp{-t IG} lets @acronym{Fiona} generate the interaction graph of the given net.
+In case the graph's size is not too big, a png graphics is created that shows the
+interaction graph. Further, an output is written on the command line indicating the
+size of the graph and the statement whether the oWFN is controllable or not.
+
+The option @samp{-t OG} lets @acronym{Fiona} generate the operating guideline of the
+given @acronym{oWFN}. In case the graph's size is not too big, a png graphics is created that shows the
+interaction graph. Further, an output is written on the command line indicating the
+size of the graph and the statement whether the oWFN is controllable or not.
+
+For more examples, see @ref{Examples}.
+
+@acronym{Fiona} can be called without any parameter. In this case, it calculates the
+interaction graph of the @acronym{oWFN}, that is being read from the standard input
+(@code{stdin}).
+
+
+
+@section Options
+
+@acronym{Fiona} supports the following command-line options:
+
+@table @samp
+@item --help
+@itemx -h
+Print an overview of the command-line options and exit.
+@*
+
+@item --version
+@itemx -v
+Print version information and exit.
+@*
+
+@item --debug=<level>
+@itemx  -d
+Set the debug <level> to
+@example
+1 - show nodes and dfs information
+2 - show analysis information (i.e. colors)
+3 - show information on events and states
+5 - show detailed information on everything
+@end example
+
+@item --net=<filename>
+@itemx -n
+Read input owfn from <filename>
+@*
+
+@item --graphtype=<type>
+@itemx -t
+Selects the graph <type> to be calculated:
+    OG - operating guideline
+    IG - interaction graph (default)
+
+@item --messagemaximum=<level>
+@itemx -m
+Set the maximum number of same messages per state to <level>
+@*
+
+@item --eventsmaximum=<level>
+@itemx -e
+set event to occur at most <level> times (only relevant for OG)
+@*
+
+@item --reduceIG
+@itemx -r
+use reduction rules for IG
+@*
+
+@item --show=<parameter>
+@itemx -s
+different display options <parameter>:
+@example
+allnodes - show nodes of all colors
+blue     - show blue nodes only (default)
+rednodes - show blue and red nodes (no empty node and no black nodes)
+empty    - show empty node
+allstates- show all calculated states per node
+@end example
+
+@item --exchangeability
+@itemx -x
+check for two oWFN the equality of its operating guidelines (the BDD-representation
+must have been computed before) syntax: -n netfile1 -n netfile2 -x
+@*
+
+@item --BDD=<reordering>
+@itemx -b
+enable BDD construction (only relevant for OG) argument <reordering> specifies reodering
+method:
+@example
+0 - CUDD_REORDER_SAME
+1 - CUDD_REORDER_NONE
+2 - CUDD_REORDER_RANDOM
+3 - CUDD_REORDER_RANDOM_PIVOT
+4 - CUDD_REORDER_SIFT
+5 - CUDD_REORDER_SIFT_CONVERGE
+6 - CUDD_REORDER_SYMM_SIFT
+7 - CUDD_REORDER_SYMM_SIFT_CONV
+8 - CUDD_REORDER_WINDOW2
+9 - CUDD_REORDER_WINDOW3
+10 - CUDD_REORDER_WINDOW4
+11 - CUDD_REORDER_WINDOW2_CONV
+12 - CUDD_REORDER_WINDOW3_CONV
+13 - CUDD_REORDER_WINDOW4_CONV
+14 - CUDD_REORDER_GROUP_SIFT
+15 - CUDD_REORDER_GROUP_SIFT_CONV
+16 - CUDD_REORDER_ANNEALING
+17 - CUDD_REORDER_GENETIC
+18 - CUDD_REORDER_LINEAR
+19 - CUDD_REORDER_LINEAR_CONVERGE
+20 - CUDD_REORDER_LAZY_SIFT
+21 - CUDD_REORDER_EXACT
+@end example
+
+@item --match=<OG filename>
+@itemx -b
+check if given oWFN (-n) matches with operating guideline given in <OG filename>
+
+
+@end table
+
+@anchor{Examples}
+@section Examples
+In this section we show some examples how @acronym{Fiona} can be
+invoked.
+
+@table @samp
+@item ....
+
+
+@end table
+
+
+@c ----------------------------------------------------------------------------
+
+@node File Format owfn
+@chapter File Format @acronym{owfn}
+
+@acronym{Fiona} expects the @acronym{owfn} file format as its input.
+
+An open workflow net is a Petri net with an @i{interface}, i.e.@: two sets of
+places: @i{input places} and @i{output places}. Additionally an open workflow
+net has a set of final markings. To represent @acronym{oWFN}s
+the @acronym{LoLA} format was extended to implement this categorization.
+
+@section Syntax of the owfn file format
+The owfn file consists of 4 sections:
+@itemize
+@item @code{PLACES},
+@item @code{INITIALMARKING},
+@item @code{FINALMARKING} or @code{FINALCONDITION}
+@item and a section to specify the transitions of the net.
+@end itemize
+First, the places of the net are specified. Here we distinguish between @code{INTERNAL}, @code{INPUT} and
+@code{OUTPUT} places. Then the @code{INITIALMARKING} of the net has to be specified. After that
+one can either declare a @code{FINALMARKING} or a @code{FINALCONDITION}.
+In the transition section one has to specify all the transitions of the net.
+Comments can be written in between  @{ and @}.
+
+In the @code{INITIALMARKING}, @code{FINALMARKING}, @code{FINALCONDITION}, after
+each place name one can specify the number of tokens on that place (e.g. @code{p1: 2}). If no number is
+given (e.g. @code{p1}) one token is assumed. In the transition section the number after a place indicates the weight
+of the arrow pointing to or from the place.
+
+@example
+@{ sample oWFN @}
+
+PLACE
+  INTERNAL
+    p1,
+    p2;
+  INPUT
+    a,
+    b;
+  OUTPUT
+    x,
+    y;
+
+INITIALMARKING
+  p1:  2;
+
+FINALMARKING
+  p2: 1;
+
+TRANSITION t1
+CONSUME
+  p1,
+  a,
+  b;
+PRODUCE
+  p2,
+  x,
+  y;
+@end example
+
+@section Usage of special FINALCONDITION options
+
+On the usage of @code{ALL_OTHER_PLACES_EMPTY, ALL_OTHER_INTERNAL_PLACES_EMPTY}, and
+@code{ALL_OTHER_EXTERNAL_PLACES_EMPTY} in FINALCONDITION
+
+
+Suppose you have an @acronym{oWFN} with many places and you want to specify in the
+@code{FINALCONDITION} of your @acronym{oWFN} that a state is a final state iff one certain place
+of your @acronym{oWFN} has exactly one token and all other places are empty. How do you
+do this? Saying
+
+    @code{FINALCONDITION p1 = 1;}
+
+is insufficient if there are other places except p1, because then the state
+@code{p1 = 1, p2 = 1} also is a final state because it fulfills the @code{FINALCONDITION}.
+
+
+Specifying
+
+    @code{FINALCONDITION p1 = 1 AND p2 = 0 AND p3 = 0 AND ...;}
+
+may become long and tedious to type if your oWFN has many places. Therefore the
+keyword @code{ALL_OTHER_PLACES_EMPTY} exists. Using this keyword you can now specify
+the following:
+
+    @code{FINALCONDITION p1 = 1 AND ALL_OTHER_PLACES_EMPTY;}
+
+meaning exactly what you expect it to mean, namely the same as
+
+    @code{FINALCONDITION p1 = 1 AND p2 = 0 and p3 = 0;}
+
+if your oWFN has exactly the places @code{p1, p2, and p3.}
+
+
+If you require only the internal places of your oWFN to be empty, use the
+keyword @code{ALL_OTHER_INTERNAL_PLACES_EMPTY}. Requiring the same for the external
+places only (that are all non-internal or interface places) can be achieved
+with the keyword @code{ALL_OTHER_EXTERNAL_PLACES_EMPTY}.
+
+All three keywords can be combined at will. Saying
+
+    @code{FINALCONDITION p1 = 1 AND ALL_OTHER_INTERNAL_PLACES_EMPTY AND
+                              ALL_OTHER_EXTERNAL_PLACES_EMPTY;}
+
+is the same as
+
+    @code{FINALCONDITION p1 = 1 AND ALL_OTHER_PLACES_EMPTY;}
+
+which in turn is the same as
+
+    @code{FINALCONDITION p1 = 1 AND ALL_OTHER_PLACES_EMPTY AND;
+                              ALL_OTHER_INTERNAL_PLACES_EMPTY AND
+                              ALL_OTHER_EXTERNAL_PLACES_EMPTY;}
+
+The latter, of course, is highly redundant.
+
+
+All three keywords can only be used as the right hand side of a conjunction
+with another state predicate while the whole conjunction is then again a state
+predicate. So the rule is
+
+    @code{statepredicate := statepredicate AND ALL_OTHER_PLACES_EMPTY}
+
+The scope of @code{ALL_OTHER_PLACES_EMPTY} is the left hand side of state predicate of
+the above conjunction. All places that are not mentioned in the left hand side
+predicate are then required to be empty.
+
+For you to decide the scope of @code{ALL_OTHER_PLACES_EMPTY}, it is crucial that you
+understand all bracing and precedence rules of state predicate formulas and
+that you can construct the fully braced form of your formula in your mind!
+
+Suppose you have an oWFN with places @code{p1, p2, p3, and p4}. Then the formula:
+
+    @code{FINALCONDITION p1 = 1 AND ALL_OTHER_PLACES_EMPTY OR
+                   p2 = 1 AND ALL_OTHER_PLACES_EMPTY;}
+
+expands to
+
+    @code{FINALCONDITION (p1 = 1 AND p2 = 0 AND p3 = 0 AND p4 = 0) OR
+                   (p2 = 1 AND p1 = 0 AND p3 = 0 AND p4 = 0);}
+
+because AND takes precedence over OR.
+
+In the same oWFN the formula
+
+    @code{FINALCONDITION p1 = 1 AND ALL_OTHER_PLACES_EMPTY AND p2 = 1;}
+
+expands to
+
+    @code{FINALCONDITION p1 = 1 AND p2 = 0 AND p3 = 0 AND p4 = 0 AND p2 = 1;}
+
+because AND is left associative. So the fully braced form of the original
+formula is
+
+    @code{FINALCONDITION (((p1 = 1) AND ALL_OTHER_PLACES_EMPTY) AND (p2 = 1));}
+
+Consequently @code{(p1 = 1)} is the scope of @code{ALL_OTHER_PLACES_EMPTY}. Therefore
+@code{ALL_OTHER_PLACES_EMPTY} expands to @code{((p2 = 0) AND (p3 = 0) AND (p4 = 0))}. Putting
+it all together and removing redundant braces results in
+
+    @code{FINALCONDITION p1 = 1 AND p2 = 0 AND p3 = 0 AND p4 = 0 AND p2 = 1;}
+
+which is the formula that was stated as the expansion in the first place.
+
+As you have probably already noticed, this formula is unsatisfiable because it
+requires p2 to be empty and marked at the same time. Therefore it is
+recommended to use @code{ALL_OTHER_PLACES_EMPTY} only at the very end of an n-ary
+conjunction (or anywhere along with proper explicit bracing).
+
+The same rules, of course, apply to @code{ALL_OTHER_INTERNAL_PLACES_EMPTY} and
+@code{ALL_OTHER_EXTERNAL_PLACES_EMPTY}.
+
+Now, feel free to use and misuse these great keywords at your own private risk.
+
+
+@c ----------------------------------------------------------------------------
+
+@node Interaction Graph
+@chapter Interaction Graph
+
+@c ----------------------------------------------------------------------------
+
+@node Operating Guideline
+@chapter Operating Guideline
+
+@section Explicit Representation
+
+@section Symbolic Representation
+
+@c ----------------------------------------------------------------------------
+
+@node Limitations and Bugs
+@chapter Limitations and Bugs
+
+
+
+@c @section Limitations
+@c
+@c The current version of @acronym{Fiona} underlies several limitations:
+@c
+@c @itemize
+@c @item ........
+@c @end itemize
+
+
+
+@section Known Bugs
+
+........
+
+@itemize
+
+@item @b{Problem:} .......
+ @end itemize
+@b{Solution:} ........
+
+
+
+@anchor{Reporting Bugs}
+@section Reporting Bugs
+
+If you find a bug in @acronym{Fiona}, please first check that it
+is not a known bug listed in `Known Bugs'. Otherwise please send us
+an electronic mail to @email{weinberg@@informatik.hu-berlin.de}.
+Include the version number which you can find by running
+@samp{fiona --version}. Also include in your message the input
+@acronym{owfn} process and the output that the program produced. We
+will try to answer your mail within a week.
+
+If you have other questions, comments or suggestions about
+@acronym{Fiona}, contact us via electronic mail to
+@email{weinberg@@informatik.hu-berlin.de}.
+
+
+
+@section Contact Person
+Daniela Weinberg
+
+Humboldt-Universit@"at zu Berlin@*
+Institut f@"ur Informatik@*
+Unter den Linden 6@*
+10099 Berlin, Germany
+
+@table @asis
+@itemx Homepage
+@url{http://www.informatik.hu-berlin.de/top/mitarbeiter/weinberg}
+
+@itemx E-mail
+@email{weinberg@@informatik.hu-berlin.de}
+
+@itemx Phone
+(+49) (30) 2093-3083
+
+@itemx Fax
+(+49) (30) 2093-3067
+@end table
+
+
+
+
+@c ----------------------------------------------------------------------------
+
+@node Future Work
+@chapter Future Work
+
+For future releases of @acronym{Fiona} the following features are planned:
+
+@itemize
+
+@c @item ....
+@end itemize
+
+
+
+
+
+@c ----------------------------------------------------------------------------
+
+@node References
+@appendix References
+
+@table @asis
+
+@item [ACD@math{^+}03]
+Tony Andrews, Francisco Curbera, Hitesh Dholakia, Yaron Goland, Johannes Klein,
+Frank Leymann, Kevin Liu, Dieter Roller, Doug Smith, Satish Thatte, Ivana
+Trickovic, and Sanjiva Weerawarana. @b{Business Process Execution Language for
+Web Services, Version 1.1}. Technical report, BEA Systems, IBM, Microsoft, SAP,
+Siebel Systems. May 2003.
+
+
+@item [Fiona]
+Peter Massuthe and Daniela Weinberg. @b{Fiona}.@footnote{Soon available at @url{http://www.informatik.hu-berlin.de/top/tools4bpel/fiona}}
+
+
+@item [LoLA]
+Karsten Schmidt. @b{@acronym{LoLA}: A Low Level Analyser}. Manual.
+@footnote{@url{http://www.informatik.hu-berlin.de/top/lola/doku.ps}}
+
+@item [Mar03]
+Axel Martens. @b{Verteilte Gesch@"aftsprozesse -- Modellierung und Verifikation
+mit Hilfe von Web Services} @i{(in German)}. PhD thesis, Humboldt-Universit@"at
+zu Berlin, Mathematisch-Naturwissenschaftliche Fakult@"at II, 2003.
+
+
+@item [MRS05]
+Peter Massuthe, Wolfgang Reisig, and Karsten Schmidt. @b{An Operating Guideline
+Approach to the SOA}. Proceedings of the 2nd South-East European Workshop on
+Formal Methods 2005 (@acronym{SEEFM}05), Ohrid, Republic of Macedonia, 2005.
+@footnote{@url{http://www.informatik.hu-berlin.de/top/download/publications/MassutheReisigSchmidt-OGApproach.ps}}
+
+
+@item [Sch00]
+Karsten Schmidt. @b{@acronym{LoLA}: A Low Level Analyser}. In: Mogens Nielsen,
+and Dan Simpson, editors: @i{Application and Theory of Petri Nets, 21st
+International Conference (@acronym{ICATPN} 2000)}, pp. 465-474, Springer-Verlag
+(@acronym{LNCS} 1825), June 2000.
+
+
+@item [Wei04]
+Daniela Weinberg. @b{Analyse der Bedienbarkeit}. Diplomarbeit,
+Humboldt-Universit@"at zu Berlin, October 2004.
+@footnote{@url{http://www.informatik.hu-berlin.de/top/download/publications/weinberg04.pdf}}
+
+
+@end table
+
+
+
+
+
+@c ----------------------------------------------------------------------------
+
+@include gpl.texi
+
+
+@bye
+@c hello.texi ends here

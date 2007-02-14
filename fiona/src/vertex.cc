@@ -294,6 +294,21 @@ int vertex::getNumberOfDeadlocks() {
 	return count;
 }
 
+//! \fn void vertex::propagateToSuccessors() 
+//! \brief in case the current node got the color in the finalanalysis, this decision is propagated to its
+//! successor nodes
+void vertex::propagateToSuccessors() {
+	resetIteratingSuccNodes();
+	graphEdge * element;
+
+    while ((element = getNextEdge()) != NULL) {
+    	if (element->getNode()->getColor() != RED) {
+    		element->getNode()->analyseNode(true);	// analyse the successor node again
+    	}
+    }
+    
+}
+
 //! \fn analysisResult vertex::analyseNode(bool finalAnalysis)
 //! \brief analyses the node and sets its color, if the node gets to be red, then TERMINATE is returned
 analysisResult vertex::analyseNode(bool finalAnalysis) {
@@ -349,6 +364,7 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
                         trace(TRACE_3, "\t\t ...terminate\n");
                         color = RED;
                         trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
+                        propagateToSuccessors();
                         return TERMINATE;
                         break;
                     case BLUE:  // found a blue state (i.e. deadlock is resolved)
@@ -360,6 +376,7 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
                             trace(TRACE_3, "node analysed red (final analysis)");
                             trace(TRACE_3, "\t ...terminate\n");
                             trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
+                            propagateToSuccessors();
                             return TERMINATE;           // <---------------------???
                         } else {
                             color = BLACK;
@@ -382,6 +399,7 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
 
             // all clauses considered
             trace(TRACE_3, "all states checked, node becomes ");
+            
             if (c == BLACK && finalState) {
             	c = BLUE;
                 trace(TRACE_3, "blue");
@@ -395,6 +413,10 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
             }
             
             color = c;
+            
+            if (c == RED && finalAnalysis) {
+            	propagateToSuccessors();	
+            }
             
             if (finalState) {
                 trace(TRACE_3, " ...terminate\n");

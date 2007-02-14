@@ -47,14 +47,22 @@
 
 using namespace std;
 
+
+//! \fn clause::clause()
+//! \brief constructor
 clause::clause() : fake(false), edge(NULL), nextElement(NULL) {
 	
 }
 
+//! \fn clause::clause(graphEdge * _edge)
+//! \param _edge the edge this clause is associated with
+//! \brief constructor
 clause::clause(graphEdge * _edge) : edge(_edge), nextElement(NULL) {
 	
 }
 
+//! \fn clause::~clause()
+//! \brief destructor
 clause::~clause() {
 	trace(TRACE_5, "clause::~clause() : start\n");
 	if (edge != NULL && fake) {
@@ -63,6 +71,9 @@ clause::~clause() {
 	trace(TRACE_5, "clause::~clause() : end\n");
 }
 
+//! \fn void clause::setEdge(graphEdge * _edge)
+//! \param _edge the edge that this clause shall be associated with
+//! \brief adds the given edge to this clause 
 void clause::setEdge(graphEdge * _edge) {
     trace(TRACE_5, "clause::setEdge(graphEdge * edge) : start\n");
 	
@@ -70,25 +81,25 @@ void clause::setEdge(graphEdge * _edge) {
 		if (fake) {  // in case we have stored a "fake" edge, we delete that one
 			delete edge;	
 		} 
-		fake = false;
-		edge = _edge;					// set the edge stored to the one given
-	} else {
-		fake = false;
-		edge = _edge;
-	}	
+	}
+	
+	fake = false;	// now we have a real edge! no fake one anymore
+	edge = _edge;   // set the edge stored to the one given
+
     trace(TRACE_5, "clause::setEdge(graphEdge * edge) : end\n");
 	
 }
 
-//! \fn void clause::addLiteral(char * clauseLabel)
-//! \param clauseLabel the label to be added this clause list
-//! \brief adds the given label to this clause list
+//! \fn void clause::addLiteral(const string& label)
+//! \param label the label to be added to the clause list
+//! \brief adds the given label to the clause list
 void clause::addLiteral(const string& label) {
     trace(TRACE_5, "clause::addLiteral(char * label) : start\n");
-//	cout << "\t " << label << endl;
 	
 	clause * cl = this;
 	
+	// create a fake edge temporarily since the real edge has not been created yet,
+	// but we know, that this state has a clause with the given label
 	graphEdge * newEdge = new graphEdge(NULL, label, sending);
 	
 	if (!edge) {
@@ -102,7 +113,7 @@ void clause::addLiteral(const string& label) {
 		cl = cl->nextElement;	
 	}	  
 	cl->nextElement = new clause(newEdge);	// create a new clause literal	
-	cl->nextElement->fake = true;
+	cl->nextElement->fake = true;			// since we don't have a real edge yet, we mark it as fake
 	
     trace(TRACE_5, "clause::addLiteral(char * label) : end\n");
 }
@@ -146,8 +157,8 @@ string clause::getClauseString() {
 }
 
 //! \fn void clause::setEdges(graphEdge * edge)
-//! \param edge
-//! \brief sets the the clause's edges to the given edge
+//! \param edge the edge that will replace a fake edge being stored in the literal's list
+//! \brief sets the literal's edges to the given edge
 void clause::setEdges(graphEdge * edge) {
     trace(TRACE_5, "clause::setEdges(graphEdge * edge) : start\n");
 	
@@ -173,7 +184,7 @@ CNF::CNF() : cl(NULL), nextElement(NULL) {
 }
 
 //! \fn CNF::~CNF()
-//! \brief destructor
+//! \brief destructor, iterates over all clauses and deletes each one of them
 CNF::~CNF() {
 	clause * clauseTemp1 = cl;
 	clause * clauseTemp2;
@@ -306,12 +317,10 @@ void CNF::setEdge(graphEdge * edge) {
 				} else {
 					clausePrev->nextElement = clauseTemp->nextElement;
 				}				
-				
 			}
 			clausePrev = clauseTemp;		// remember this clause
 	 		clauseTemp = clauseTemp->nextElement;	
 	 	}
- 		
  		return;	
  	}
  	
@@ -331,5 +340,4 @@ int CNF::numberOfElements() {
  	}
 	
 	return count;
-
 }

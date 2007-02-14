@@ -114,6 +114,8 @@ public:
     int getNumberOfDeadlocks();
     analysisResult analyseNode(bool);
     
+    void propagateToSuccessors();
+    
     
 //    friend bool operator == (vertex const&, vertex const& );		// could be changed and replaced by hash-value
     friend bool operator < (vertex const&, vertex const& );

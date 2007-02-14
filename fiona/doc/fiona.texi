@@ -51,9 +51,7 @@ funded by the Bundesministerium f@"ur Bildung und Forschung. See
 
 @titlepage
 
-@ifnottex
 @title @acronym{Fiona}
-@end ifnottex
 
 @subtitle Functional Interaction Analysis for open Workflow Nets
 @subtitle @acronym{Fiona} Version @value{VERSION}, @value{UPDATED}

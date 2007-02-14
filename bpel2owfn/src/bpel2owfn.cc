@@ -25,18 +25,18 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/01/19 11:37:16 $
+ * \date    \$Date: 2007/02/14 14:07:22 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.141 $
+ * \version \$Revision: 1.142 $
  */
 
 
@@ -341,7 +341,7 @@ int main( int argc, char *argv[])
 	output = NULL;
       }
 
-      if (modus == M_CONSISTENCY)
+      if (modus == M_CONSISTENCY || modus == M_PETRINET)
       {
 	if (output_filename != "")
 	{

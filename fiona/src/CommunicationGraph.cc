@@ -223,10 +223,8 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
 			
         for (messageMultiSet::iterator iter = messages.begin(); iter != messages.end(); iter++) {
             if (comma) {
-              //  strcat(label, ", ");
               label += ", ";
             }
-           // strcat(label, PN->Places[*iter]->name);
            	label += string(PN->Places[*iter]->name);
             comma = true;
             
@@ -253,7 +251,7 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
 
             toAdd->setNumber(numberOfNodes++);
 
-            graphEdge * edgeSucc = new graphEdge(toAdd, label.c_str(), type);
+            graphEdge * edgeSucc = new graphEdge(toAdd, label, type);
             currentVertex->addSuccessorNode(edgeSucc);
 
 			currentVertex->setAnnotationEdges(edgeSucc);
@@ -261,11 +259,12 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
             currentVertex = toAdd;
             numberOfEdges++;
 
+	        graphEdge * edgePred = new graphEdge(currentVertex, label, type);
+			toAdd->addPredecessorNode(edgePred);
+
             setOfVertices.insert(toAdd);
 
             numberOfStatesAllNodes += toAdd->reachGraphStateSet.size();
-
-       //     delete[] label;
 
             trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : end\n");
 
@@ -273,15 +272,17 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
         } else {
             trace(TRACE_1, "\t successor node already known: " + intToString(found->getNumber()) + "\n");
 
-            graphEdge * edgeSucc = new graphEdge(found, label.c_str(), type);
+            graphEdge * edgeSucc = new graphEdge(found, label, type);
             currentVertex->addSuccessorNode(edgeSucc);
 
 			currentVertex->setAnnotationEdges(edgeSucc);
 			
             numberOfEdges++;
+            
+    	    graphEdge * edgePred = new graphEdge(currentVertex, label, type);
+			found->addPredecessorNode(edgePred);            
 
             delete toAdd;
-        //    delete[] label;
 
             trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : end\n");
 
@@ -723,13 +724,33 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
 
 			if (parameters[P_SHOW_STATES_PER_NODE]) {
             	for (iter = v->reachGraphStateSet.begin(); iter != v->reachGraphStateSet.end(); iter++) {
-                	(*iter)->decodeShowOnly(PN);
-//					os << "[" << PN->getCurrentMarkingAsString() << "]" << "(" << (*iter) << ")";
+//                	(*iter)->decodeShowOnly(PN);
+                	
+                	(*iter)->decode(PN);	// need to decide if it is an external or internal deadlock
                     os << "[" << PN->getCurrentMarkingAsString() << "]";
                     os << " (";
+                    
+                    string kindOfDeadlock;
+                    int i;
+                    
                     switch ((*iter)->type) {
-                        case DEADLOCK: os << "DL" << ")"; break;
+                        case DEADLOCK: 	
+                        				kindOfDeadlock = "i"; // letter for 'i' internal or 'e' external deadlock
+                        				if (PN->transNrQuasiEnabled > 0) {
+                        					kindOfDeadlock = "e";
+                        				} else {
+                        					for (i = 0; i < PN->placeOutputCnt; i++) {
+                        						if (PN->CurrentMarking[PN->outputPlacesArray[i]->index] > 0) {
+                        							kindOfDeadlock = "e";
+                        							continue;
+                        						}
+                        					}
+                        				}
+                        				os << kindOfDeadlock << "DL" << ")"; 
+                        				break;
+                        				
                         case FINALSTATE: os << "FS" << ")"; break;
+                        
                         default: os << "TR" << ")"; break;
                     }                                                
 	                os << "\\n";

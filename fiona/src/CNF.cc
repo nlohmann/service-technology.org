@@ -227,13 +227,16 @@ vertexColor CNF::calcClauseColor() {
 					|| literal->edge->getNode()->getColor() == BLACK)) {
 		
             clauseColor = BLUE;
+   //         trace(TRACE_4, "literal " +  + " points to a blue node " + intToString(literal->edge->getNode()->getNumber()) + "\n");
         }
 		// second case: the literal points to a red node, so we delete that literal
         if (literal->edge != NULL && 
         		literal->edge->getNode() != NULL && 
         		literal->edge->getNode()->getColor() == RED) {
             // delete that literal in the clause since it points to a red node
-
+			
+	//		trace(TRACE_4, "literal points to a red node " + intToString(literal->edge->getNode()->getNumber()) + " ... delete that one\n");
+			
             if (literalPrev != NULL) {
             	literalPrev->nextElement = literal->nextElement;
             } else if (cl == literal) {
@@ -256,6 +259,7 @@ vertexColor CNF::calcClauseColor() {
 		// therefore clause cannot be evaluated and is indefinite
 		// however, still removing red literals from clause
         
+//        trace(TRACE_5, "literal points to a black node " + intToString(literal->edge->getNode()->getNumber()) + "\n");
         literalPrev = literal;			// remember this literal
 		literal = literal->nextElement;	
 	}

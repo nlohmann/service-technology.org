@@ -73,8 +73,12 @@ protected:
 	vertexColor color; 						//!< color of vertex
 	successorNodeList * successorNodes;		//!< list of all the nodes succeeding this one 
 											//!< including the edge between them
+	
+	successorNodeList * predecessorNodes;	//!< list of all blue nodes preceding this one 
+											//!< including the edge between them
 
     unsigned int numberOfVertex;					//!< number of this vertex in the graph
+    
     
 public:
 	vertex(int);
@@ -84,6 +88,7 @@ public:
 
 	int * eventsUsed;
 	int eventsToBeSeen;
+	bool finalAnalysisDone;
 	
     unsigned int getNumber() const;
     
@@ -92,6 +97,7 @@ public:
     
     void setNumber(unsigned int);
     bool addSuccessorNode(graphEdge *);
+    bool addPredecessorNode(graphEdge *);
     
     bool addState(State *);
     
@@ -100,10 +106,13 @@ public:
    
 	int numberOfElementsInAnnotation();
  
-    graphEdge * getNextEdge();
+    graphEdge * getNextSuccEdge();
+    graphEdge * getNextPredEdge();
+
     successorNodeList * getSuccessorNodes();
     
     void resetIteratingSuccNodes();
+    void resetIteratingPredNodes();
    
     void setColor(vertexColor c);
     vertexColor getColor();
@@ -115,6 +124,7 @@ public:
     analysisResult analyseNode(bool);
     
     void propagateToSuccessors();
+    void propagateToPredecessors();
     
     
 //    friend bool operator == (vertex const&, vertex const& );		// could be changed and replaced by hash-value

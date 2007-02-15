@@ -151,3 +151,34 @@ graphEdge * successorNodeList::getNextElement() {
 	}
 	return NULL;
 }
+
+//! \fn void successorNodeList::removeNodeFromList(vertex * node, bool iterating)
+//! \param node a pointer to the node that shall be remove from the list
+//! \param iterating flag to show whether we are iterating through the list right now
+//! \brief remove the given node from the list
+void successorNodeList::removeNodeFromList(vertex * node, bool iterating) {
+	if (firstElement == NULL) {
+		return ;	
+	}
+
+	graphEdge * prevEdge = firstElement;
+	graphEdge * tmpEdge;
+	tmpEdge = firstElement;
+	
+	while (tmpEdge) {
+		// test if this edge is the one to be removed
+		if (tmpEdge->getNode() == node) {
+			if (iterating) {
+				nextElement = prevEdge;				// in case we are iterating through the list, we have to
+													// visit the previous element once again
+			}
+			prevEdge = tmpEdge->getNextElement();	// let the previous element point to the next element of 
+													// the element that shall be removed
+cout << "remove edge" << endl;
+			delete tmpEdge;							// remove element from list, the node itself is not deleted
+			return;
+		}
+		prevEdge = tmpEdge;
+		tmpEdge = tmpEdge->getNextElement();	
+	}		
+}

@@ -340,7 +340,7 @@ void operatingGuidelines::printNodesToOGFile(vertex * v, fstream& os,
     // recursively process successor nodes that have not been visited yet
     graphEdge* edge;
     v->resetIteratingSuccNodes();
-    while ((edge = v->getNextEdge()) != NULL) {
+    while ((edge = v->getNextSuccEdge()) != NULL) {
         vertex* vNext = edge->getNode();
 
         // do not process nodes already visited
@@ -378,7 +378,7 @@ void operatingGuidelines::printTransitionsToOGFile(vertex * v, fstream& os,
     // recursively process successor nodes that have not been visited yet
     graphEdge* edge;
     v->resetIteratingSuccNodes();
-    while ((edge = v->getNextEdge()) != NULL) {
+    while ((edge = v->getNextSuccEdge()) != NULL) {
         vertex* vNext = edge->getNode();
 
         // only output blue nodes

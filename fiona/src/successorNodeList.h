@@ -47,18 +47,16 @@ class vertex;
 class successorNodeList {
 
 private:    
-    graphEdge * firstElement;		//!< pointer to the first element of the list
-    graphEdge * nextElement;		//!< pointer to the next element in the list while iterating through the list
+    graphEdge * firstElement;	//!< pointer to the first element of the list
+    graphEdge * nextElement;	//!< pointer to the next element in the list while iterating through the list
     
     bool end;			/*!< we have reached the end of the iterating process, or not */
     
 public:
-
     successorNodeList();    
     ~successorNodeList(); 
     
     void deleteList(graphEdge *);   
-//    bool addNextNode(vertex *, char *, edgeType);
     bool addNextNode(graphEdge *);
     
     void setFirstElement(graphEdge *);
@@ -67,6 +65,8 @@ public:
     
     void resetIterating();
     graphEdge * getNextElement();
+    
+	void removeNodeFromList(vertex *, bool);
     
     // Provides user defined operator new. Needed to trace all new operations
     // on this class.

@@ -43,8 +43,10 @@
 vertex::vertex(int numberEvents) :
 			   color(BLUE),
 			   successorNodes(NULL),
+			   predecessorNodes(NULL),
 			   numberOfVertex(0),
-			   annotation(NULL) {
+			   annotation(NULL),
+			   finalAnalysisDone(false) {
 
 	eventsUsed = new int [numberEvents];
 	
@@ -62,6 +64,10 @@ vertex::~vertex() {
 
 	if (successorNodes != NULL) {
 		delete successorNodes;
+	}
+	
+	if (predecessorNodes != NULL) {
+		delete predecessorNodes;
 	}
 	
 	if (eventsUsed != NULL) {
@@ -105,7 +111,17 @@ bool vertex::addSuccessorNode(graphEdge * edge) {
 	}	
 	eventsToBeSeen--;
 	return successorNodes->addNextNode(edge);
-	
+}
+
+//! \fn bool vertex::addPredecessorNode(graphEdge * edge) 
+//! \param edge pointer to the edge which is to point to the predecessor node
+//! \brief adds the node v to the list of preceding nodes of this node using the edge
+//! given by the parameters
+bool vertex::addPredecessorNode(graphEdge * edge) {
+	if (predecessorNodes == NULL) {
+		predecessorNodes = new successorNodeList();	
+	}	
+	return predecessorNodes->addNextNode(edge);
 }
 
 //! \fn void vertex::addState(State * s) 
@@ -149,12 +165,23 @@ void vertex::addClause(clause * newClause, bool _isFinalState) {
     trace(TRACE_5, "vertex::addClause(clause * newClause) : end\n");
 }
 
-//! \fn graphEdge * vertex::getNextEdge()
+//! \fn graphEdge * vertex::getNextSuccEdge()
 //! \return pointer to the next edge of the successor node list
 //! \brief returns a pointer to the next edge of the successor node list
-graphEdge * vertex::getNextEdge() {
+graphEdge * vertex::getNextSuccEdge() {
 	if (successorNodes != NULL) {
 		return successorNodes->getNextElement();
+	} else {
+		return NULL;
+	}
+}
+
+//! \fn graphEdge * vertex::getNextPredEdge()
+//! \return pointer to the next edge of the successor node list
+//! \brief returns a pointer to the next edge of the successor node list
+graphEdge * vertex::getNextPredEdge() {
+	if (predecessorNodes != NULL) {
+		return predecessorNodes->getNextElement();
 	} else {
 		return NULL;
 	}
@@ -172,6 +199,14 @@ successorNodeList * vertex::getSuccessorNodes() {
 void vertex::resetIteratingSuccNodes() {
 	if (successorNodes != NULL) {
 		successorNodes->resetIterating();
+	}
+}
+
+//! \fn void vertex::resetIteratingPredNodes()
+//! \brief resets the iteration process of the successor node list
+void vertex::resetIteratingPredNodes() {
+	if (predecessorNodes != NULL) {
+		predecessorNodes->resetIterating();
 	}
 }
 
@@ -237,7 +272,7 @@ string vertex::getCNF() {
 	 */
 
 	// 1. create a CNF_Formula object from the CNF string representation
-      	CNF_Formula formula = CNF_Formula(CNFString);
+   CNF_Formula formula = CNF_Formula(CNFString);
 
 	// 2. simplify the CNF formula inside the CNF_Formula object
 	formula.simplify();
@@ -301,12 +336,30 @@ void vertex::propagateToSuccessors() {
 	resetIteratingSuccNodes();
 	graphEdge * element;
 
-    while ((element = getNextEdge()) != NULL) {
+    while ((element = getNextSuccEdge()) != NULL) {
     	if (element->getNode()->getColor() != RED) {
     		element->getNode()->analyseNode(true);	// analyse the successor node again
     	}
     }
     
+}
+
+//! \fn void vertex::propagateToPredecessors() 
+//! \brief in case the current node got the color in the finalanalysis, this decision is propagated to its
+//! predecessor nodes
+void vertex::propagateToPredecessors() {
+	
+	resetIteratingPredNodes();
+	graphEdge * element;
+
+    while ((element = getNextPredEdge()) != NULL) {
+    	if (element->getNode()->getColor() != RED && element->getNode()->finalAnalysisDone) {
+    		element->getNode()->analyseNode(true);	// analyse the preceding node again
+    	}
+    	if (element->getNode()->getColor() == RED) {
+    	//	predecessorNodes->removeNodeFromList(element->getNode(), true);			
+    	}
+    }   
 }
 
 //! \fn analysisResult vertex::analyseNode(bool finalAnalysis)
@@ -321,6 +374,10 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
     }
 
     trace(TRACE_3, intToString(numberOfVertex) + ": ");
+
+	vertexColor beforeAnalysis = color;
+	
+	finalAnalysisDone = finalAnalysis;
 
     if (color != RED) {          // red nodes stay red forever
         if (reachGraphStateSet.size() == 0) {
@@ -364,7 +421,10 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
                         trace(TRACE_3, "\t\t ...terminate\n");
                         color = RED;
                         trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
-                        propagateToSuccessors();
+                        if (beforeAnalysis == BLUE) {
+			            	propagateToSuccessors();	
+			            	propagateToPredecessors();	
+			            }
                         return TERMINATE;
                         break;
                     case BLUE:  // found a blue state (i.e. deadlock is resolved)
@@ -376,7 +436,10 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
                             trace(TRACE_3, "node analysed red (final analysis)");
                             trace(TRACE_3, "\t ...terminate\n");
                             trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
-                            propagateToSuccessors();
+                            if (beforeAnalysis == BLUE) {
+				            	propagateToSuccessors();	
+				            	propagateToPredecessors();	
+				            }
                             return TERMINATE;           // <---------------------???
                         } else {
                             color = BLACK;
@@ -414,8 +477,9 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
             
             color = c;
             
-            if (c == RED && finalAnalysis) {
+            if (beforeAnalysis == BLUE && c == RED) {
             	propagateToSuccessors();	
+            	propagateToPredecessors();	
             }
             
             if (finalState) {

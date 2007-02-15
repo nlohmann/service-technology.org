@@ -201,7 +201,7 @@ void BddRepresentation::generateRepresentation(vertex* v, bool visitedNodes[]){
 			visitedNodes[v->getNumber()] = 1;
 			graphEdge* element;
 			
-			while((element = v->getNextEdge()) != NULL){;
+			while((element = v->getNextSuccEdge()) != NULL){;
 				vertex* vNext = element->getNode();
 				
 				if (vNext->getColor() == BLUE && 
@@ -275,7 +275,7 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 		
 		graphEdge* element;
 		
-		while((element = v->getNextEdge()) != NULL){
+		while((element = v->getNextSuccEdge()) != NULL){
 			vertex* vNext = element->getNode();
 			if (vNext != NULL){
 				

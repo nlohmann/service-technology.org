@@ -333,6 +333,9 @@ vertex * communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeT
         }
 
         toAdd->eventsUsed[offset + label]++;
+        
+        graphEdge * edgePred = new graphEdge(currentVertex, edgeLabel, type);
+		toAdd->addPredecessorNode(edgePred);
 
         currentVertex = toAdd;
         numberOfEdges++;
@@ -357,6 +360,9 @@ vertex * communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeT
         if (type == receiving) {
             offset = PN->placeInputCnt;
         }
+
+        graphEdge * edgePred = new graphEdge(currentVertex, edgeLabel, type);
+		found->addPredecessorNode(edgePred);
 
         delete toAdd;
 	
@@ -756,7 +762,7 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
             graphEdge * element;
             string label;
 
-            while ((element = v->getNextEdge()) != NULL) {
+            while ((element = v->getNextSuccEdge()) != NULL) {
                 vertex * vNext = element->getNode();
 				
                 if (parameters[P_SHOW_ALL_NODES]
@@ -809,7 +815,7 @@ void communicationGraph::computeNumberOfBlueNodesEdges(vertex * v, bool visitedN
         visitedNodes[v->getNumber()] = true;
         graphEdge * element;
 
-        while ((element = v->getNextEdge()) != NULL) {
+        while ((element = v->getNextSuccEdge()) != NULL) {
             vertex * vNext = element->getNode();
             if (vNext->getColor() == BLUE && 
     			(parameters[P_SHOW_EMPTY_NODE] || vNext->reachGraphStateSet.size() != 0)) {

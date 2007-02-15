@@ -47,6 +47,9 @@ bool CNF_Formula::is_superset(const Clause *a, const Clause *b)
  */
 CNF_Formula::CNF_Formula(std::string &formula_text)
 {
+  if (formula_text == "")
+    return;
+
   do // iterate the clauses
   {
     std::string clause_text;    

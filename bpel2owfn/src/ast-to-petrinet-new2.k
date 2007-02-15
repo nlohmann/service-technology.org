@@ -29,7 +29,7 @@
  *
  * \since   2006-10-30
  *
- * \date    \$Date: 2007/02/13 14:41:08 $
+ * \date    \$Date: 2007/02/15 15:21:20 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
  */
 %}
 
@@ -143,22 +143,22 @@ This=CompensateScope(a,b,_id) ->
       Place *p4 = PN.newPlace(prefix + "stopped");
       Place *p5 = PN.newPlace(prefix + "compensating");
 
-      Transition *t1 = PN.newTransition(prefix + "begin_compensation");
+      Transition *t1 = PN.newTransition(prefix + "call_ch");
       PN.newArc(p1, t1);
       PN.newArc(t1, p5);
       PN.newArc(t1, PN.findPlace(toString(scopeId) + ".internal.compensate"));
 
-      Transition *t2 = PN.newTransition(prefix + "complete_compensation");
+      Transition *t2 = PN.newTransition(prefix + "finish");
       PN.newArc(p5, t2);
       PN.newArc(t2, p2);
       PN.newArc(PN.findPlace(toString(scopeId) + ".internal.compensated"), t2);
 
-      Transition *t3 = PN.newTransition(prefix + "stop_compensation");
+      Transition *t3 = PN.newTransition(prefix + "stop_ch");
       PN.newArc(p3, t3);
       PN.newArc(p5, t3, READ);
       PN.newArc(t3, PN.findPlace(toString(scopeId) + ".internal.ch_stop"));
 
-      Transition *t4 = PN.newTransition(prefix + "compensation_stopped");
+      Transition *t4 = PN.newTransition(prefix + "ch_stopped");
       PN.newArc(t4, p4);
       PN.newArc(p5, t4);
       PN.newArc(PN.findPlace(toString(scopeId) + ".internal.ch_stopped"), t4);

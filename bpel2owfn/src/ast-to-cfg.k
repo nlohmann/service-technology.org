@@ -32,7 +32,7 @@
  *         
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/01/17 14:45:45 $
+ * \date    \$Date: 2007/02/15 15:21:20 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.49 $
+ * \version \$Revision: 1.50 $
  */
 %}
 
@@ -228,6 +228,7 @@ userDefinedEventHandler(a,b,_id) ->
  	    CFGBlock * innerFirst = cfgMap.find(toString(innerActivity->id))->second->firstBlock;
 	    CFGBlock * innerLast = cfgMap.find(toString(innerActivity->id))->second->lastBlock;
 	    CFGBlock * onMessageBlock = new CFGBlock(CFGOnMessage, message->id, "OnMessage_" + toString(i++)); 
+            onMessageBlock->channel_name = ASTEmap[message->id]->channelName;
 	  
 	    connectBlocks(firstBlock, onMessageBlock);
 	    connectBlocks(onMessageBlock, innerFirst);
@@ -930,9 +931,8 @@ Pick(a,b,c,d) ->
  	    CFGBlock * innerFirst = cfgMap.find(toString(innerActivity->id))->second->firstBlock;
 	    CFGBlock * innerLast = cfgMap.find(toString(innerActivity->id))->second->lastBlock;
 	    CFGBlock * onMessageBlock = new CFGBlock(CFGOnMessage, message->id, "OnMessage_" + toString(i++)); 
-//NL	    onMessageBlock->channel_name = (dynamic_cast<STCommunicationActivity*>(symTab.lookup($0->id)))->channelId; 
-	    onMessageBlock->channel_name = ASTEmap[$0->id]->channelName;
-	  
+	    onMessageBlock->channel_name = ASTEmap[message->id]->channelName;
+       	  
 	    connectBlocks(firstBlock, onMessageBlock);
 	    connectBlocks(onMessageBlock, innerFirst);
 	    connectBlocks(innerLast, lastBlock);

@@ -30,14 +30,14 @@
  * 
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/01/17 14:45:45 $
+ * \date    \$Date: 2007/02/15 15:21:20 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.43 $
+ * \version \$Revision: 1.44 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -691,7 +691,10 @@ void CFGBlock::checkForConflictingReceive()
   }
 
   processed = true;
-  
+  if (type == CFGWhile)
+    (*(prevBlocks.begin()))->checkForConflictingReceive();
+
+
   bool allPrerequisites = true;
   // check if all entries are allready processed
   if (!nextBlocks.empty())
@@ -700,7 +703,7 @@ void CFGBlock::checkForConflictingReceive()
     list<CFGBlock *>::iterator blockBegin = nextBlocks.begin();
     if (type == CFGWhile || type == CFGForEach || type == CFGRepeatUntil && label == "Until" )
     {
-      blockBegin++;
+      // blockBegin++;
     }
     for (list<CFGBlock *>::iterator iter = blockBegin; iter != nextBlocks.end(); iter++)
     {
@@ -718,13 +721,13 @@ void CFGBlock::checkForConflictingReceive()
       list<CFGBlock *>::iterator blockBegin = nextBlocks.begin();
       if (type == CFGWhile || type == CFGForEach || type == CFGRepeatUntil && label == "Until" )
       {
-	blockBegin++;
+	// blockBegin++;
       }
       receives = (*blockBegin)->receives;
       for (list<CFGBlock *>::iterator iter = blockBegin; iter != nextBlocks.end(); iter++)
       {
 	// the actual check for duplicate receives but only for flows
-	if (type == CFGFlow && label == "Flow_begin" || type == CFGProcess && label == "Process_begin")
+	if (type == CFGFlow && label == "Flow_begin" || type == CFGProcess && label == "Process_begin" || type == CFGScope && label == "Scope_begin" || type == CFGPick && label == "Pick_begin")
 	{
 	  for (set< pair< string, long> >::iterator elemA = (*iter)->receives.begin(); elemA != (*iter)->receives.end(); elemA++)
 	  {
@@ -756,7 +759,7 @@ void CFGBlock::checkForConflictingReceive()
 		trace("\n");
 	    }
 	  }
-	  receives.insert(pair<string, long>( ASTEmap[id]->channelName, (*iter)->id));
+	  receives.insert(pair<string, long>( (*iter)->channel_name, (*iter)->id));
 	}
 	// 
 	receives = setUnion(receives, (*iter)->receives);
@@ -782,12 +785,12 @@ void CFGBlock::checkForConflictingReceive()
     }
     if (type == CFGReceive)
     {
-      receives.insert(pair<string, long>( ASTEmap[id]->channelName, id));
+      receives.insert(pair<string, long>( channel_name, id));
     }
     if (type == CFGInvoke)
     {
       if( temporaryAttributeMap[id]["outputVariable"] != "") {
-	receives.insert(pair<string, long>( ASTEmap[id]->channelName, id));
+	receives.insert(pair<string, long>( channel_name, id));
       }
     }
     if (!prevBlocks.empty())

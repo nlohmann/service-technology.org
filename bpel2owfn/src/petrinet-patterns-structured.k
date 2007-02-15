@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for BPEL's structured activities
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $ 
+ *          last changes of: \$Author: gierds $ 
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/02/12 10:09:13 $
+ * \date    \$Date: 2007/02/15 15:21:20 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  */
 %}
 
@@ -87,7 +87,6 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
   switch(current_view)
   {
     case(petrinet_enum):
-    case(petrinetnew_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "running");
@@ -206,6 +205,84 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 	// Embed the inner activity.
 	PN.mergePlaces(phylum->id, ".internal.p4",      phylum->activity_1->id, ".initial");
 	PN.mergePlaces(phylum->id, ".internal.p5",      phylum->activity_1->id, ".final");
+	PN.mergePlaces(phylum->id, ".internal.stop",    phylum->activity_1->id, ".stop");
+	PN.mergePlaces(phylum->id, ".internal.stopped", phylum->activity_1->id, ".stopped");
+	
+	break;
+      }
+
+    case(petrinetnew_enum):
+      {
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "running");
+	Place *p3 = PN.newPlace(prefix + "p3");
+	Place *p4 = PN.newPlace(prefix + "final");
+	Place *p5 = PN.newPlace(prefix + "stop");
+	Place *p6 = PN.newPlace(prefix + "stopped");
+        Place *p7 = PN.newPlace(prefix + "p7");	
+
+	// external control of loop condition	
+	Place *control_enter = NULL;
+	Place *control_leave = NULL;
+        if (parameters[P_LOOPCONTROL])
+	{
+	  control_enter = PN.newPlace("in.enterloop." + toString(phylum->id), IN);
+	  control_leave = PN.newPlace("in.leaveloop." + toString(phylum->id), IN);
+        }
+
+
+	Transition *t1 = PN.newTransition(prefix + "read_condition");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p2);
+	
+
+        // the single loop/skip transition is only needed when loops are not counted
+	if (!parameters[P_LOOPCOUNT])
+	{
+	  Transition *t2 = PN.newTransition(prefix + "start");
+	  PN.newArc(p2, t2);
+	  PN.newArc(t2, p3);
+          if (parameters[P_LOOPCONTROL])
+	  {
+            PN.newArc(control_enter, t2);
+          }
+
+	  Transition *t3 = PN.newTransition(prefix + "end");
+	  PN.newArc(p2, t3);
+	  PN.newArc(t3, p4);
+          if (parameters[P_LOOPCONTROL])
+	  {
+            PN.newArc(control_leave, t3);
+          }
+	}
+	
+	// Transitions for the negative control flow.
+	if (parameters[P_STANDARDFAULTS])
+	  Transition *t5 = throwFault(p2, p7, "running", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
+
+	Transition *t6 = stop(p2, "running", prefix);
+	Transition *t7 = stop(p4, "final", prefix);
+	Transition *t8 = stop(p7, "p7", prefix);
+
+// ab hier wird's fuzzy, nochmal mit Niels reden
+	
+	// the subnet if loops are counted
+	if (parameters[P_LOOPCOUNT])
+	{
+	}
+	
+// hier geht es wieder
+
+	// unparse the standard elements
+	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
+
+	// unparse the embedded activity
+	phylum->activity_1->unparse(pseudoPrinter, current_view);
+	
+	
+	// Embed the inner activity.
+	PN.mergePlaces(phylum->id, ".internal.p3",      phylum->activity_1->id, ".initial");
+	PN.mergePlaces(phylum->id, ".internal.initial", phylum->activity_1->id, ".final");
 	PN.mergePlaces(phylum->id, ".internal.stop",    phylum->activity_1->id, ".stop");
 	PN.mergePlaces(phylum->id, ".internal.stopped", phylum->activity_1->id, ".stopped");
 	

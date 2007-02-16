@@ -342,7 +342,7 @@ fi
 
 shop6bluenodes_soll=6
 shop6blueedges_soll=5
-shop6storedstates_soll=2491 #3863
+shop6storedstates_soll=3863
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_6.owfn"
 cmd="$FIONA -n $owfn -a -t IG"

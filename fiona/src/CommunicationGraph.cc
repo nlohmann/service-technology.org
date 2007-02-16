@@ -203,12 +203,9 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
     } else {
         vertex * found = findVertexInSet(toAdd); //findVertex(toAdd);
 
-//        char * label = new char[2056];
         string label;
         bool comma = false;
         unsigned int offset = 0;
-
-//        strcpy(label, "");
         
         if (type == receiving) {
             offset = PN->placeInputCnt;
@@ -259,9 +256,11 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
             currentVertex = toAdd;
             numberOfEdges++;
 
-	        graphEdge * edgePred = new graphEdge(currentVertex, label, type);
-			toAdd->addPredecessorNode(edgePred);
-
+			if (currentVertex->getColor() != RED) {
+		        graphEdge * edgePred = new graphEdge(currentVertex, label, type);
+				toAdd->addPredecessorNode(edgePred);
+			}
+			
             setOfVertices.insert(toAdd);
 
             numberOfStatesAllNodes += toAdd->reachGraphStateSet.size();
@@ -279,9 +278,11 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
 			
             numberOfEdges++;
             
-    	    graphEdge * edgePred = new graphEdge(currentVertex, label, type);
-			found->addPredecessorNode(edgePred);            
-
+            if (currentVertex->getColor() != RED) {
+	    	    graphEdge * edgePred = new graphEdge(currentVertex, label, type);
+				found->addPredecessorNode(edgePred);            
+            }
+            
             delete toAdd;
 
             trace(TRACE_5, "reachGraph::AddVertex (vertex * toAdd, messageMultiSet messages, edgeType type) : end\n");
@@ -335,9 +336,11 @@ vertex * communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeT
 
         toAdd->eventsUsed[offset + label]++;
         
-        graphEdge * edgePred = new graphEdge(currentVertex, edgeLabel, type);
-		toAdd->addPredecessorNode(edgePred);
-
+        if (currentVertex->getColor() != RED) {
+	        graphEdge * edgePred = new graphEdge(currentVertex, edgeLabel, type);
+			toAdd->addPredecessorNode(edgePred);
+        }
+        
         currentVertex = toAdd;
         numberOfEdges++;
 
@@ -362,9 +365,11 @@ vertex * communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeT
             offset = PN->placeInputCnt;
         }
 
-        graphEdge * edgePred = new graphEdge(currentVertex, edgeLabel, type);
-		found->addPredecessorNode(edgePred);
-
+		if (currentVertex->getColor() != RED) {
+	        graphEdge * edgePred = new graphEdge(currentVertex, edgeLabel, type);
+			found->addPredecessorNode(edgePred);
+		}
+		
         delete toAdd;
 	
 //		found->eventsUsed[offset + label]++;

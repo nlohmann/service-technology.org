@@ -348,7 +348,6 @@ void vertex::propagateToSuccessors() {
 //! \brief in case the current node got the color in the finalanalysis, this decision is propagated to its
 //! predecessor nodes
 void vertex::propagateToPredecessors() {
-	
 	resetIteratingPredNodes();
 	graphEdge * element;
 
@@ -357,7 +356,7 @@ void vertex::propagateToPredecessors() {
     		element->getNode()->analyseNode(true);	// analyse the preceding node again
     	}
     	if (element->getNode()->getColor() == RED) {
-    	//	predecessorNodes->removeNodeFromList(element->getNode(), true);			
+    		predecessorNodes->removeNodeFromList(element->getNode(), true);			
     	}
     }   
 }

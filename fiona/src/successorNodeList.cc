@@ -162,22 +162,26 @@ void successorNodeList::removeNodeFromList(vertex * node, bool iterating) {
 	}
 
 	graphEdge * prevEdge = firstElement;
-	graphEdge * tmpEdge;
-	tmpEdge = firstElement;
+	graphEdge * tmpEdge = firstElement;
 	
 	while (tmpEdge) {
 		// test if this edge is the one to be removed
 		if (tmpEdge->getNode() == node) {
-			if (iterating) {
-				nextElement = prevEdge;				// in case we are iterating through the list, we have to
-													// visit the previous element once again
+			if (tmpEdge == firstElement) {
+				firstElement = tmpEdge->getNextElement();
+				nextElement = NULL;
+			} else {
+				nextElement = prevEdge;
+				prevEdge->setNextElement(tmpEdge->getNextElement());	
+				if (iterating) {
+					nextElement = prevEdge;	// in case we are iterating through the list, we have to
+											// visit the previous element once again
+				}				
 			}
-			prevEdge = tmpEdge->getNextElement();	// let the previous element point to the next element of 
-													// the element that shall be removed
-cout << "remove edge" << endl;
 			delete tmpEdge;							// remove element from list, the node itself is not deleted
 			return;
 		}
+		// not the one, so go on
 		prevEdge = tmpEdge;
 		tmpEdge = tmpEdge->getNextElement();	
 	}		

@@ -28,7 +28,7 @@ echo ---------------------------------------------------------------------
 echo running $0
 echo
 
-#testdir=.
+testdir=.
 DIR=$testdir/sequence_suite
 FIONA=fiona
 
@@ -70,4 +70,3 @@ fi
 echo
 
 exit $result
-

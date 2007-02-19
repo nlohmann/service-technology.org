@@ -28,13 +28,13 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2007/02/02 14:30:35 $
+ * \date    \$Date: 2007/02/19 14:49:46 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.59 $
+ * \version \$Revision: 1.60 $
  *
  * \ingroup petrinet
  */
@@ -625,8 +625,10 @@ unsigned int PetriNet::reduce_self_loop_transitions()
 void PetriNet::reduce_equal_places()
 {
 
-  trace(TRACE_DEBUG, "[PN]\tApplying rule ST4 (elimination of equal places)...\n");
+  trace(TRACE_DEBUG, "[PN]\tApplying rule RD1 (elimination of equal places)...\n");
   set<pair<string, string> > placePairs;
+  set<pair<string, string> > delPairs;
+  bool safe = true;
 
   // Testing all preconditions
   for (set<Place*>::iterator p1 = P.begin(); p1 != P.end(); p1++)
@@ -649,7 +651,7 @@ void PetriNet::reduce_equal_places()
 
       if(*p1 == *p2) // precondition 1
 		  continue;
-  
+
       set<Node*> preSet2  = preset(*p2);
       set<Node*> postSet2 = postset(*p2);
 
@@ -667,7 +669,7 @@ void PetriNet::reduce_equal_places()
 		 set<Node*> postSetT1 = postset (t1);
 		 set<Node*> postSetT2 = postset (t2);
 
-		 if (postSetT1 != postSet2) //precondition 5
+		 if (postSetT1 != postSetT2) //precondition 5
 			continue;
 
 		 set<Node*> preSetT1 = preset (t1);
@@ -681,15 +683,26 @@ void PetriNet::reduce_equal_places()
 
 	    string id1 = *((*p1)->history.begin());
 	    string id2 = *((*p2)->history.begin());
-	    placePairs.insert(pair<string, string>(id1, id2));
+	    
+	    for (set<pair<string, string> >::iterator labels = placePairs.begin();
+	    labels != placePairs.end(); labels++)
+	    {
+	      if ( (labels->first==id1) || (labels->second==id1) || (labels->first==id2) || (labels->second==id2))
+	        safe = false;
+	    }
+	    
+	    if (placePairs.find(pair<string, string>(id2, id1)) == placePairs.end() && safe)
+	    {
+	      placePairs.insert(pair<string, string>(id1, id2));
+	    }
 	 }
   }
 
 
-  // Do the reduction
   for (set<pair<string, string> >::iterator labels = placePairs.begin();
       labels != placePairs.end(); labels++)
   {
+    trace(TRACE_DEBUG, "[PN]\tFound something to reduce with RD1!\n");
     Place* p1 = findPlace(labels->first);
     Place* p2 = findPlace(labels->second);
 
@@ -719,6 +732,7 @@ void PetriNet::reduce_equal_places()
 	 removeTransition(findTransition(trans_id));    
   }
 }
+
 
 
 
@@ -770,7 +784,7 @@ unsigned int PetriNet::reduce()
     reduce_series_transitions();	// RA2
     reduce_self_loop_places();		// RC1
     reduce_self_loop_transitions();	// RC2
-//    reduce_equal_places();				//RD1
+    reduce_equal_places();		// RD1
 //    if (parameters[P_TRED])
 //      reduce_transitive_places();
 

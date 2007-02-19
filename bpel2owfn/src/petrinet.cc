@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/02/13 14:41:08 $
+ * \date    \$Date: 2007/02/19 14:48:31 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.178 $
+ * \version \$Revision: 1.179 $
  *
  * \ingroup petrinet
  */
@@ -685,7 +685,10 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 
   assert(t1 != NULL);
   assert(t2 != NULL);
-
+  
+  bool sametarget = false;
+  set<Arc *>::iterator delArc;
+  
   Node *t12 = newTransition("");
 
   // organize the communication type of the new transition
@@ -724,9 +727,9 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
   set<Node *> pre1 = preset(t1);
   set<Node *> post1 = postset(t1);
   set<Node *> pre12 = setUnion(preset(t1), preset(t2));
-  set<Node *> post12 = setUnion(postset(t1), postset(t2));
+  set<Node *> post2 = postset(t2);
   set<Node *> pre2wo1 = setDifference(pre12,pre1);
-  set<Node *> post2wo1 = setDifference(post12,post1);
+//  set<Node *> post2wo1 = pnapi::setDifference(post12,post1);
 
   for (set<Node *>::iterator n = pre1.begin(); n != pre1.end(); n++)
     newArc((*n), t12, STANDARD, arc_weight((*n),t1));
@@ -734,11 +737,32 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
   for (set<Node *>::iterator n = pre2wo1.begin(); n != pre2wo1.end(); n++)
     newArc((*n), t12, STANDARD, arc_weight((*n),t2));
 
-  for (set<Node *>::iterator n = post1.begin(); n != post1.end(); n++)
+  for (set<Node *>::iterator n = post1.begin(); n != post1.end(); n++) 
     newArc(t12, (*n), STANDARD, arc_weight(t1,(*n)));
 
-  for (set<Node *>::iterator n = post2wo1.begin(); n != post2wo1.end(); n++)
+  for (set<Node *>::iterator n = post2.begin(); n != post2.end(); n++)
+  {
+    
+    for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
+      if (((*f)->source == t12) && ((*f)->target == (*n)))
+        {
+        sametarget = true;
+        delArc=f;
+        }
+        
+        
+    if (sametarget)
+    {
+    int weightsave = arc_weight(t12,(*n));
+    removeArc(*delArc);
+    newArc(t12, (*n), STANDARD, (arc_weight(t2,(*n)) + weightsave));
+    sametarget = false;
+    }
+    else
+    {
     newArc(t12, (*n), STANDARD, arc_weight(t2,(*n)));
+    }
+  }
 
 //  for (set<Node *>::iterator n = pre12.begin(); n != pre12.end(); n++)
 //    newArc(static_cast<Place*>(*n), t12);

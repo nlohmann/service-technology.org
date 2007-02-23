@@ -28,13 +28,13 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2007/02/19 14:49:46 $
+ * \date    \$Date: 2007/02/23 11:25:08 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.60 $
+ * \version \$Revision: 1.61 $
  *
  * \ingroup petrinet
  */
@@ -376,7 +376,7 @@ void PetriNet::reduce_identical_transitions()
     Transition* t1 = findTransition(labels->first);
     Transition* t2 = findTransition(labels->second);
 
-    mergeTransitions(t1, t2);
+    mergeParallelTransitions(t1, t2);
   }
 }
 
@@ -784,7 +784,7 @@ unsigned int PetriNet::reduce()
     reduce_series_transitions();	// RA2
     reduce_self_loop_places();		// RC1
     reduce_self_loop_transitions();	// RC2
-    reduce_equal_places();		// RD1
+//    reduce_equal_places();		// RD1
 //    if (parameters[P_TRED])
 //      reduce_transitive_places();
 

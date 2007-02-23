@@ -26,17 +26,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/02/01 18:58:52 $
+ * \date    \$Date: 2007/02/23 11:25:08 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.132 $
+ * \version \$Revision: 1.133 $
  *
  * \ingroup petrinet
  */
@@ -399,6 +399,9 @@ class PetriNet
 
     /// merges two transitions
     void mergeTransitions(Transition *t1, Transition *t2);
+
+    /// merges two parallel transitions
+    void mergeParallelTransitions(Transition *t1, Transition *t2);
 
     /// finds place given a role
     Place* findPlace(string role);

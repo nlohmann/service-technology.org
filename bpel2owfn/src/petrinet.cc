@@ -29,13 +29,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/02/19 14:48:31 $
+ * \date    \$Date: 2007/02/23 11:25:08 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.179 $
+ * \version \$Revision: 1.180 $
  *
  * \ingroup petrinet
  */
@@ -775,6 +775,91 @@ void PetriNet::mergeTransitions(Transition *t1, Transition *t2)
 }
 
 
+/*!
+ * Merges two parallel transitions. Given transitions t1 and t2:
+ *
+ * -# a new transition t12 with empty history is created
+ * -# this transition gets the union of the histories of transition t1 and t2
+ * -# the presets and postsets of t1 and t2 are calculated and united
+ * -# t12 is connected with all the places in the preset and postset
+ * -# the transitions t1 and t2 are removed
+ *
+ * \param t1 first transition
+ * \param t2 second transition
+ * \pre t1 != NULL
+ * \pre t2 != NULL
+ * \post Transitions t1 and t2 removed.
+ * \post Transition t12 having the incoming and outgoing arcs of t1 and t2 and
+ *       the union of the histories of t1 and t2.
+ */
+void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
+{
+  if (t1 == t2)
+    return;
+
+  assert(t1 != NULL);
+  assert(t2 != NULL);
+  
+  bool sametarget = false;
+  set<Arc *>::iterator delArc;
+  
+  Node *t12 = newTransition("");
+
+  // organize the communication type of the new transition
+  if (t1->type == t2->type)
+    t12->type = t1->type;
+
+  if ((t1->type == IN && t2->type == INTERNAL) ||
+      (t1->type == INTERNAL && t2->type == IN))
+    t12->type = IN;
+
+  if ((t1->type == INTERNAL && t2->type == OUT) ||
+      (t1->type == OUT && t2->type == INTERNAL))
+    t12->type = OUT;
+
+  if ((t1->type == OUT && t2->type == IN) ||
+      (t1->type == IN && t2->type == OUT) ||
+      (t1->type == INOUT || t2->type == INOUT))
+    t12->type = INOUT;
+
+
+  // copy t1's history to t12
+  for (vector<string>::iterator role = t1->history.begin(); role != t1->history.end(); role++)
+  {
+    roleMap[*role] = t12;
+    t12->history.push_back(*role);
+  }
+
+  // copy t2's history to t12
+  for (vector<string>::iterator role = t2->history.begin(); role != t2->history.end(); role++)
+  {
+    roleMap[*role] = t12;
+    t12->history.push_back(*role);
+  }
+
+  // create the weighted arcs for t12
+  set<Node *> pre1 = preset(t1);
+  set<Node *> post1 = postset(t1);
+  set<Node *> pre12 = setUnion(preset(t1), preset(t2));
+  set<Node *> post12 = postset(t2);
+  set<Node *> pre2wo1 = setDifference(pre12,pre1);
+  set<Node *> post2wo1 = setDifference(post12,post1);
+
+  for (set<Node *>::iterator n = pre1.begin(); n != pre1.end(); n++)
+    newArc((*n), t12, STANDARD, arc_weight((*n),t1));
+
+  for (set<Node *>::iterator n = pre2wo1.begin(); n != pre2wo1.end(); n++)
+    newArc((*n), t12, STANDARD, arc_weight((*n),t2));
+
+  for (set<Node *>::iterator n = post1.begin(); n != post1.end(); n++) 
+    newArc(t12, (*n), STANDARD, arc_weight(t1,(*n)));
+
+  for (set<Node *>::iterator n = post2wo1.begin(); n != post2wo1.end(); n++)
+    newArc((*n), t12, STANDARD, arc_weight((*n),t2));
+
+  removeTransition(t1);
+  removeTransition(t2);
+}
 
 
 

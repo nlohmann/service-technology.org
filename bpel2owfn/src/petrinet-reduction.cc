@@ -29,13 +29,13 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2007/02/23 13:51:18 $
+ * \date    \$Date: 2007/02/23 15:19:29 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.64 $
+ * \version \$Revision: 1.65 $
  *
  * \ingroup petrinet
  */
@@ -56,6 +56,7 @@
 
 #include "petrinet.h"
 #include "helpers.h"		// helper functions (toString, setUnion)
+#include "debug.h"		// (trace)
 
 using std::list;
 using std::pair;

@@ -1,4 +1,5 @@
 /*****************************************************************************\
+ * Copyright 2007 Niels Lohmann, Martin Znamirowksi                          *
  * Copyright 2006 Niels Lohmann                                              *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
@@ -28,13 +29,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/01/30 22:54:45 $
+ * \date    \$Date: 2007/02/23 12:13:10 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.77 $
+ * \version \$Revision: 1.78 $
  *
  * \ingroup petrinet
  */
@@ -50,17 +51,10 @@
 #include <iomanip>
 
 #include "petrinet.h"		// to define member functions
-#include "helpers.h"		// helper functions
-#include "options.h"
-
-#ifdef USING_BPEL2OWFN
+#include "helpers.h"		// helper functions (toString)
+#include "options.h"		// (parameters)
 #include "bpel2owfn.h"
 #include "ast-details.h"
-#endif
-
-#ifndef USING_BPEL2OWFN
-#include "bpel2owfn_wrapper.h"
-#endif
 
 using std::endl;
 using std::setw;

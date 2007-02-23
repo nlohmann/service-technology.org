@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/02/23 11:25:08 $
+ * \date    \$Date: 2007/02/23 12:13:10 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.180 $
+ * \version \$Revision: 1.181 $
  *
  * \ingroup petrinet
  */
@@ -52,10 +52,10 @@
 #include <iostream>
 
 #include "petrinet.h"
-#include "helpers.h"		// helper functions
+#include "helpers.h"		// helper functions (setUnion, setDifference, max, toString)
 
 #ifdef USING_BPEL2OWFN
-#include "ast-details.h"
+#include "ast-details.h"	// for class ASTE
 #endif
 
 

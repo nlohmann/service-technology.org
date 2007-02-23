@@ -1,5 +1,6 @@
 /*****************************************************************************\
- * Copyright 2006 Niels Lohmann                                              *
+ * Copyright 2007        Niels Lohmann, Christian Gierds, Martin Znamirowski *
+ * Copyright 2005, 2006  Niels Lohmann, Christian Gierds                     *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
@@ -24,17 +25,17 @@
  * \brief   Petri Net API: structural reduction
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2007/02/23 11:25:08 $
+ * \date    \$Date: 2007/02/23 12:13:10 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.61 $
+ * \version \$Revision: 1.62 $
  *
  * \ingroup petrinet
  */
@@ -54,10 +55,9 @@
 #include <utility>
 
 #include "petrinet.h"
-#include "debug.h"		// debugging help
-#include "helpers.h"
-#include "options.h"
+#include "helpers.h"		// helper functions (toString, setUnion)
 
+using std::list;
 using std::pair;
 using std::cerr;
 using std::endl;

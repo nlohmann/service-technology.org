@@ -1,5 +1,5 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      *
+ * Copyright 2005, 2006, 2007 Niels Lohmann, Christian Gierds                *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2007/01/24 13:27:39 $
+ * \date    \$Date: 2007/02/23 13:30:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.71 $
+ * \version \$Revision: 1.72 $
  *
  * \ingroup conversion
  * \ingroup debug
@@ -49,14 +49,11 @@
  * Headers
  *****************************************************************************/
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <climits>
+#include <fstream>	// (std::ofstream)
+#include <sstream>	// (std::ostringstream, std::istringstream)
 
 #include "helpers.h"
 #include "options.h"
-#include "debug.h"
 
 using std::istringstream;
 using std::ostringstream;

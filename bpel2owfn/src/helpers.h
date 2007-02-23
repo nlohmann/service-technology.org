@@ -29,13 +29,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2006/12/30 12:48:02 $
+ * \date    \$Date: 2007/02/23 13:30:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.44 $
+ * \version \$Revision: 1.45 $
  *
  * \ingroup conversion
  * \ingroup debug
@@ -60,11 +60,7 @@
 #include <string>
 #include <vector>
 
-#include "bpel2owfn.h"
-
-#ifdef USING_BPEL2OWFN
-#include "ast-config.h"		// all you need from Kimwitu++
-#endif
+#include "ast-config.h"		// for kc::integer
 
 using std::vector;
 using std::string;

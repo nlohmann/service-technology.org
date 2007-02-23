@@ -1,5 +1,5 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      *
+ * Copyright 2005, 2006, 2007 Niels Lohmann, Christian Gierds                *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
@@ -29,13 +29,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/02/23 12:13:10 $
+ * \date    \$Date: 2007/02/23 13:30:05 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.181 $
+ * \version \$Revision: 1.182 $
  *
  * \ingroup petrinet
  */
@@ -53,10 +53,7 @@
 
 #include "petrinet.h"
 #include "helpers.h"		// helper functions (setUnion, setDifference, max, toString)
-
-#ifdef USING_BPEL2OWFN
-#include "ast-details.h"	// for class ASTE
-#endif
+#include "ast-details.h"	// (class ASTE)
 
 
 

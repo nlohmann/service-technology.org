@@ -29,13 +29,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/02/23 12:13:10 $
+ * \date    \$Date: 2007/02/23 13:30:05 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.78 $
+ * \version \$Revision: 1.79 $
  *
  * \ingroup petrinet
  */
@@ -48,13 +48,13 @@
  * Headers
  *****************************************************************************/
 
-#include <iomanip>
+#include <iomanip>		// (std::setw)
 
 #include "petrinet.h"		// to define member functions
 #include "helpers.h"		// helper functions (toString)
 #include "options.h"		// (parameters)
-#include "bpel2owfn.h"
-#include "ast-details.h"
+#include "bpel2owfn.h"		// (PACKAGE_STRING)
+#include "ast-details.h"	// (class ASTE)
 
 using std::endl;
 using std::setw;

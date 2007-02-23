@@ -29,13 +29,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/02/23 13:30:05 $
+ * \date    \$Date: 2007/02/23 13:51:18 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.79 $
+ * \version \$Revision: 1.80 $
  *
  * \ingroup petrinet
  */
@@ -53,8 +53,19 @@
 #include "petrinet.h"		// to define member functions
 #include "helpers.h"		// helper functions (toString)
 #include "options.h"		// (parameters)
-#include "bpel2owfn.h"		// (PACKAGE_STRING)
+#include "bpel2owfn.h"
+
+
+#ifdef USING_BPEL2OWFN
 #include "ast-details.h"	// (class ASTE)
+#else
+#warning "using Petri Net API outside BPEL2oWFN"
+class ASTE; 			// forward declaration of class ASTE
+#ifndef PACKAGE_STRING
+#define PACKAGE_STRING "Petri Net API"
+#endif
+#endif
+
 
 using std::endl;
 using std::setw;

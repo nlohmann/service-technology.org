@@ -29,13 +29,13 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2007/02/23 13:30:05 $
+ * \date    \$Date: 2007/02/23 13:51:18 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.63 $
+ * \version \$Revision: 1.64 $
  *
  * \ingroup petrinet
  */
@@ -56,23 +56,11 @@
 
 #include "petrinet.h"
 #include "helpers.h"		// helper functions (toString, setUnion)
-#include "debug.h"
 
 using std::list;
 using std::pair;
 using std::cerr;
 using std::endl;
-
-
-
-
-
-/******************************************************************************
- * Global variables
- *****************************************************************************/
-
-//set<unsigned int> visited;    // used for transitive reduction
-//set<unsigned int> visited2;   // used for transitive reduction
 
 
 
@@ -786,8 +774,6 @@ unsigned int PetriNet::reduce()
     reduce_self_loop_places();		// RC1
     reduce_self_loop_transitions();	// RC2
 //    reduce_equal_places();		// RD1
-//    if (parameters[P_TRED])
-//      reduce_transitive_places();
 
     trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification pass " + toString(passes++) + ": " + information() + "\n");
 
@@ -800,230 +786,3 @@ unsigned int PetriNet::reduce()
 
   return passes;
 }
-
-
-
-
-
-/*!
- * Removes transitive places, i.e. places that are marked iff another subnet is
- * marked. Transitivity means that there exist at least two paths in the net
- * from p's preset to p's postset, and p itself is on the shorter path.
- * Therefore p is marked while the net fires that longer path, thus p is marked
- * iff the other path is marked. Thus, p can be removed, because the transition
- * t2 in its postset can only fire if the tokens from the longer reach its
- * preset.
- *
- * \note This is an experimental rule.
- *
- * \returns number of removed places
- *
- * \pre p is a place of the net
- * \pre p incoming and outcoming arcs have the same weights
- * \pre p is not marked initially
- * \pre p has exactly one transition (t1) in its preset and exactly one
- *      transition (t2) in its postset
- * \pre t1 and t2 are distinct transitions
- * \pre there exists a path from t1 to t2 such that p is not part of it
- *
- * \post p is removed
- *
- * \todo remove debug output
- * \todo overwork the preconditions and postconditions
- */
-unsigned int PetriNet::reduce_transitive_places()
-{
-  list<Place *> transitive_places;
-  unsigned int result = 0;
-
-  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
-    if (sameweights(*p))
-      if ((*p)->tokens == 0)
-        if (postset(*p).size() == 1 && preset(*p).size() == 1)
-	if (preset(*p) != postset(*p))
-	{
-	  Transition *t1 = static_cast<Transition *>(*(preset(*p).begin()));
-	  Node *t2 = *(postset(*p).begin());
-
-	  set<Node *> postset_nodes = postset(t1);
-	  postset_nodes.erase(*p);
-	  bool done = false;
-
-	  do
-	  {
-	    // collect the nodes reachable from the current set of nodes
-	    unsigned int old_size = postset_nodes.size();
-	    set<Node *> new_nodes;
-
-	    for (set<Node *>::iterator n = postset_nodes.begin(); n != postset_nodes.end(); n++)
-	      new_nodes = setUnion(new_nodes, postset(*n));
-
-	    postset_nodes = setUnion(postset_nodes, new_nodes);
-
-	    // a fixed point is reached -- abort
-	    if (postset_nodes.size() == old_size)
-	      done = true;
-
-	    // t2 is reached: p can be removed -- abort
-	    if (postset_nodes.find(t2) != postset_nodes.end())
-	    {
-	      done = true;
-	      transitive_places.push_back(*p);
-	    }
-	  } while (!done);
-	}
-
-
-  // remove transitive places
-  for (list<Place *>::iterator p = transitive_places.begin(); p != transitive_places.end(); p++)
-    if (P.find(*p) != P.end())
-    {
-      removePlace(*p);
-      result++;
-    }
-
-  if (result > 0)
-    cerr << "removed " << result << " transitive places" << endl;
-
-  return result;
-}
-
-
-
-
-
-
-/******************************************************************************
- * TRANSITIVE REDUCTION (alpha state)
- *****************************************************************************/
-
-/*
-// depth-first search returning the set of reachable nodes
-set<unsigned int> dfs(unsigned int i, map<unsigned int, set<unsigned int> > &Adj)
-{
-  set<unsigned int> result;
-  result.insert(i);
-  visited2.insert(i);
-
-  for (set<unsigned int>::iterator it = Adj[i].begin(); it != Adj[i].end(); it++)
-  {
-    if (visited2.find(*it) == visited2.end())
-      result = setUnion(result, dfs(*it, Adj));
-  }
-
-  return result;
-}
-
-
-
-
-
-// creates accessibility list from adjacency list
-map<unsigned int, set<unsigned int> > toAcc(map<unsigned int, set<unsigned int> > &Adj, set<unsigned int> &nodes)
-{
-  map<unsigned int, set<unsigned int> > result;
-
-  for (set<unsigned int>::iterator it = nodes.begin(); it != nodes.end(); it++)
-  {
-    result[*it] = dfs(*it, Adj);
-    result[*it].erase(*it);
-    visited2.clear();
-  }
-
-  trace(TRACE_VERY_DEBUG, "[PN]\tDFS complete.\n");
-
-  return result;
-}
-
-
-
-
-
-void prune_acc(unsigned int i, map<unsigned int, set<unsigned int> > &Acc, map<unsigned int, set<unsigned int> > &Adj)
-{
-  trace(TRACE_VERY_DEBUG, "[PN]\tCalling prune_acc for t" + toString(i) + "\n");
-
-  for (set<unsigned int>::iterator it = Acc[i].begin(); it != Acc[i].end(); it++)
-  {
-    if (Acc[*it].empty())
-      visited.insert(*it);
-    else
-      prune_acc(*it, Acc, Adj);
-  }
-
-  for (set<unsigned int>::iterator it = Acc[i].begin(); it != Acc[i].end(); it++)
-    for (set<unsigned int>::iterator it2 = Adj[*it].begin(); it2 != Adj[*it].end(); it2++)
-      if (Acc[i].find(*it2) != Acc[i].end())
-	Adj[i].erase(*it2);
-
-  visited.insert(i);
-}
-
-
-
-
-
-// wrapper functions for the transitive reduction
-void PetriNet::transitiveReduction()
-{
-  trace(TRACE_DEBUG, "[PN]\tApplying transitive reduction...\n");
-
-  set<unsigned int> nodes;
-  map<unsigned int, set<unsigned int> > Adj;
-
-  // generate the list of nodes
-  for (set<Transition*>::iterator t = T.begin(); t != T.end(); t++)
-    nodes.insert((*t)->id);
-
-  // generate the adjacency lists
-  for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
-  {
-    set<Node*> pre = preset(*p);
-    set<Node*> post = postset(*p);
-
-    if (pre.size() > 0 && post.size() > 0)
-      for (set<Node*>::iterator t1 = pre.begin(); t1 != pre.end(); t1++)
-	for (set<Node*>::iterator t2 = post.begin(); t2 != post.end(); t2++)
-	  Adj[(*t1)->id].insert((*t2)->id);
-  }
-
-  // generate the accessibility list
-  map<unsigned int, set<unsigned int> > Acc = toAcc(Adj, nodes);
-
-  // the accessibility is base for the transitive reduction
-  map<unsigned int, set<unsigned int> > Adj_reduced = Acc;
-
-  // iterate the nodes and reduce
-  for (set<unsigned int>::iterator it = nodes.begin(); it != nodes.end(); it++)
-  {
-    if (visited.find(*it) == visited.end())
-      prune_acc(*it, Acc, Adj_reduced);
-  }
-
-  visited.clear();
-
-  set<Place*> transitivePlaces;
-
-  for (set<unsigned int>::iterator it = nodes.begin(); it != nodes.end(); it++)
-  {
-    set<unsigned int> difference = setDifference(Adj[*it], Adj_reduced[*it]);
-    for (set<unsigned int>::iterator it2 = difference.begin(); it2 != difference.end(); it2++)
-      transitivePlaces.insert(findPlace(*it, *it2));
-  }
-
-  int actualDeleted = 0;
-
-  // remove transitive places
-  for (set<Place*>::iterator p = transitivePlaces.begin(); p != transitivePlaces.end(); p++)
-  {
-    // only remove places that are not conflicting
-    if ( postset(*p).size() == 1 )
-    {
-      actualDeleted++;
-      removePlace(*p);
-    }
-  }
-
-  trace(TRACE_DEBUG, "[PN]\tRemoved " + toString(actualDeleted) + " transitive places\n");
-}
-*/

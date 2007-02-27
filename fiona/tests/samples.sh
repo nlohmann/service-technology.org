@@ -158,8 +158,8 @@ fi
 # reduced IG with node reduction
 ############################################################################
 
-shop3bluenodes_soll=11 
-shop3blueedges_soll=13 
+shop3bluenodes_soll=11
+shop3blueedges_soll=13
 shop3storedstates_soll=83
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
@@ -234,8 +234,8 @@ fi
 # reduced IG with node reduction
 ############################################################################
 
-shop3bluenodes_soll=8 
-shop3blueedges_soll=8 
+shop3bluenodes_soll=8
+shop3blueedges_soll=8
 shop3storedstates_soll=33
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_3.owfn"
@@ -380,7 +380,7 @@ fi
 
 shop6bluenodes_soll=6
 shop6blueedges_soll=5
-shop6storedstates_soll=314  
+shop6storedstates_soll=314
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_6.owfn"
 cmd="$FIONA -n $owfn -t IG"
@@ -456,7 +456,7 @@ fi
 
 shop6bluenodes_soll=6
 shop6blueedges_soll=5
-shop6storedstates_soll=146  
+shop6storedstates_soll=146
 
 owfn="$DIR/06-03-23_BPM06_shop_sect_6.owfn"
 cmd="$FIONA -n $owfn -t IG -r"
@@ -725,12 +725,12 @@ fi
 
 ############################################################################
 
-keescoffee2bluenodes_soll=27
-keescoffee2blueedges_soll=62
-keescoffee2storedstates_soll=1008
+keescoffee2bluenodes_soll=20
+keescoffee2blueedges_soll=41
+keescoffee2storedstates_soll=212
 
 owfn="$DIR/keesCoffee_condition.owfn"
-cmd="$FIONA -n $owfn -a -t OG -e 2"
+cmd="$FIONA -n $owfn -a -t OG -e 3 -m 1"
 if [ "$memcheck" = "yes" ]; then
     memchecklog="$owfn.a.e2.OG.memcheck.log"
     do_memcheck "$cmd" "$memchecklog"

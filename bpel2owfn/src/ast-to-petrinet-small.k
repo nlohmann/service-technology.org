@@ -25,11 +25,11 @@
  * \brief   Petri net unparser (implementation)
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/02/12 08:42:13 $
+ * \date    \$Date: 2007/02/27 14:55:07 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.89 $
+ * \version \$Revision: 1.90 $
  *
  */
 %}
@@ -62,8 +62,8 @@ This=StandardElements(NiltTarget_list(), NiltSource_list(), jc) ->
       Place *p2 = PN.newPlace(prefix + "final");
 
       // Embed the inner activity.
-      PN.mergePlaces(p1, PN.findPlace(newPrefix + ".initial"));
-      PN.mergePlaces(p2, PN.findPlace(newPrefix + ".final"));
+      PN.mergePlaces(p1, newPrefix + ".initial");
+      PN.mergePlaces(p2, newPrefix + ".final");
     }
   ]
 ;
@@ -143,8 +143,8 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
 
 
       // Embed the inner activity.
-      PN.mergePlaces(p1, PN.findPlace(newPrefix + ".initial"));
-      PN.mergePlaces(p2, PN.findPlace(newPrefix + ".final"));
+      PN.mergePlaces(p1, newPrefix + ".initial");
+      PN.mergePlaces(p2, newPrefix + ".final");
     }
   ]
 ;
@@ -274,8 +274,8 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF)
 
 
       // Embed the inner activity.
-      PN.mergePlaces(p5, PN.findPlace(newPrefix + ".initial"));
-      PN.mergePlaces(p2, PN.findPlace(newPrefix + ".final"));
+      PN.mergePlaces(p5, newPrefix + ".initial");
+      PN.mergePlaces(p2, newPrefix + ".final");
     }
   ]
 ;
@@ -438,8 +438,8 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
 
 
       // Embed the inner activity.
-      PN.mergePlaces(p2, PN.findPlace(newPrefix + ".initial"));
-      PN.mergePlaces(p3, PN.findPlace(newPrefix + ".final"));
+      PN.mergePlaces(p2, newPrefix + ".initial");
+      PN.mergePlaces(p3, newPrefix + ".final");
     }
   ]
 ;

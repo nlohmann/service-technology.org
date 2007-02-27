@@ -26,17 +26,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/02/23 13:51:18 $
+ * \date    \$Date: 2007/02/27 14:55:07 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.134 $
+ * \version \$Revision: 1.135 $
  *
  * \ingroup petrinet
  */
@@ -389,7 +389,13 @@ class PetriNet
 
 
     /// merges two places
-    void mergePlaces(Place *p1, Place *p2);
+    void mergePlaces(Place * & p1, Place * & p2);
+
+    /// merges two places
+    void mergePlaces(string role1, Place * & p2);
+
+    /// merges two places
+    void mergePlaces(Place * & p1, string role2);
 
     /// merges two places given two roles
     void mergePlaces(string role1, string role2);

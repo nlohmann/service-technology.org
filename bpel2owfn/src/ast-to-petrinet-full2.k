@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/02/13 14:41:08 $
+ * \date    \$Date: 2007/02/27 14:55:07 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.82 $
+ * \version \$Revision: 1.83 $
  */
 %}
 
@@ -236,8 +236,8 @@ This=Compensate(a,_id) provided (ASTEmap[_id->value]->controlFlow == CHCF) ->
 
 
       // Embed this <compensate /> activity in compensation handler.
-      PN.mergePlaces(p4, PN.findPlace(currentScope + "internal.compensationHandler.p10"));
-      PN.mergePlaces(p6, PN.findPlace(currentScope + "internal.compensationHandler.p12"));
+      PN.mergePlaces(p4, currentScope + "internal.compensationHandler.p10");
+      PN.mergePlaces(p6, currentScope + "internal.compensationHandler.p12");
     }
     a // standardElements
     {
@@ -289,8 +289,8 @@ This=Compensate(a,_id) provided (ASTEmap[_id->value]->controlFlow == FHCF) ->
 
 
       // Embed this <compensate /> activity in fault handler.
-      PN.mergePlaces(p5, PN.findPlace(currentScope + "faultHandler.ch_fh"));
-      PN.mergePlaces(p6, PN.findPlace(currentScope + "faultHandler.ch_out"));
+      PN.mergePlaces(p5, currentScope + "faultHandler.ch_fh");
+      PN.mergePlaces(p6, currentScope + "faultHandler.ch_out");
     }
     a // standardElements
     {
@@ -342,7 +342,7 @@ This=CompensateScope(a,b,_id) provided (ASTEmap[_id->value]->controlFlow == CHCF
 
 
       // Embed this <compensate scope="C"/> activity in compensation handler.
-      PN.mergePlaces(p4, PN.findPlace(currentScope + "internal.compensationHandler.p10"));
+      PN.mergePlaces(p4, currentScope + "internal.compensationHandler.p10");
     }
     a // standardElements
     {
@@ -394,8 +394,8 @@ This=CompensateScope(a,b,_id) provided (ASTEmap[_id->value]->controlFlow == FHCF
 
 
       // Embed this <compensate scope="C"/> activity in fault handler.
-      PN.mergePlaces(p5, PN.findPlace(currentScope + "faultHandler.ch_fh"));
-      PN.mergePlaces(p6, PN.findPlace(currentScope + "faultHandler.ch_out"));
+      PN.mergePlaces(p5, currentScope + "faultHandler.ch_fh");
+      PN.mergePlaces(p6, currentScope + "faultHandler.ch_out");
     }
     a // standardElements
     {
@@ -429,15 +429,15 @@ This=StandardElements(NiltTarget_list(), NiltSource_list(), jc) ->
       if (This->dpe > 0)
       {
 	Place *p1 = PN.newPlace(prefix + "negLink");
-	PN.mergePlaces(p1, PN.findPlace(newPrefix + ".negLink"));
+	PN.mergePlaces(p1, newPrefix + ".negLink");
       }
 */
 
       // Embed the inner activity.
-      PN.mergePlaces(p2, PN.findPlace(newPrefix + ".initial"));
-      PN.mergePlaces(p3, PN.findPlace(newPrefix + ".final"));
-      PN.mergePlaces(p4, PN.findPlace(newPrefix + ".stop"));
-      PN.mergePlaces(p5, PN.findPlace(newPrefix + ".stopped"));
+      PN.mergePlaces(p2, newPrefix + ".initial");
+      PN.mergePlaces(p3, newPrefix + ".final");
+      PN.mergePlaces(p4, newPrefix + ".stop");
+      PN.mergePlaces(p5, newPrefix + ".stopped");
     }
   ]
 ;
@@ -490,7 +490,7 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
 	if (p3 != NULL)
 	{
 	  PN.newArc(t1, p3);
-	  PN.mergePlaces(p3, PN.findPlace(newPrefix + ".negLink"));
+	  PN.mergePlaces(p3, newPrefix + ".negLink");
 	}
       }
 */
@@ -515,10 +515,10 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
 
 
       // Embed the inner activity.
-      PN.mergePlaces(p2, PN.findPlace(newPrefix + ".initial"));
-      PN.mergePlaces(p4, PN.findPlace(newPrefix + ".final"));
-      PN.mergePlaces(p6, PN.findPlace(newPrefix + ".stop"));
-      PN.mergePlaces(p7, PN.findPlace(newPrefix + ".stopped"));
+      PN.mergePlaces(p2, newPrefix + ".initial");
+      PN.mergePlaces(p4, newPrefix + ".final");
+      PN.mergePlaces(p6, newPrefix + ".stop");
+      PN.mergePlaces(p7, newPrefix + ".stopped");
    }
   ]
 ;
@@ -585,10 +585,10 @@ This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF) ->
 */
       
       // Embed the inner activity.
-      PN.mergePlaces(p6,  PN.findPlace(newPrefix + ".initial"));
-      PN.mergePlaces(p7,  PN.findPlace(newPrefix + ".final"));
-      PN.mergePlaces(p9,  PN.findPlace(newPrefix + ".stop"));
-      PN.mergePlaces(p10, PN.findPlace(newPrefix + ".stopped"));
+      PN.mergePlaces(p6,  newPrefix + ".initial");
+      PN.mergePlaces(p7,  newPrefix + ".final");
+      PN.mergePlaces(p9,  newPrefix + ".stop");
+      PN.mergePlaces(p10, newPrefix + ".stopped");
     }
   ]
 ;
@@ -652,10 +652,10 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF) ->
 */
 
       // Embed the inner activity.
-      PN.mergePlaces(p6, PN.findPlace(newPrefix + ".initial"));
-      PN.mergePlaces(p7, PN.findPlace(newPrefix + ".final"));
-      PN.mergePlaces(p9, PN.findPlace(newPrefix + ".stop"));
-      PN.mergePlaces(p10, PN.findPlace(newPrefix + ".stopped"));
+      PN.mergePlaces(p6, newPrefix + ".initial");
+      PN.mergePlaces(p7, newPrefix + ".final");
+      PN.mergePlaces(p9, newPrefix + ".stop");
+      PN.mergePlaces(p10, newPrefix + ".stopped");
     }
   ]
 ;
@@ -760,15 +760,15 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
       {
 	PN.newArc(t5, p10);
 	if (This->dpe > 0)
-	  PN.mergePlaces(p10, PN.findPlace(newPrefix + ".negLink"));
+	  PN.mergePlaces(p10, newPrefix + ".negLink");
       }
 */
 
       // Embed the inner activity.
-      PN.mergePlaces(p11, PN.findPlace(newPrefix + ".initial"));
-      PN.mergePlaces(p12, PN.findPlace(newPrefix + ".final"));
-      PN.mergePlaces(p14, PN.findPlace(newPrefix + ".stop"));
-      PN.mergePlaces(p15, PN.findPlace(newPrefix + ".stopped"));
+      PN.mergePlaces(p11, newPrefix + ".initial");
+      PN.mergePlaces(p12, newPrefix + ".final");
+      PN.mergePlaces(p14, newPrefix + ".stop");
+      PN.mergePlaces(p15, newPrefix + ".stopped");
     }
   ]
 ;
@@ -876,15 +876,15 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF) ->
       {
 	PN.newArc(t5, p10);
 //	if (This->dpe > 0)
-//	  PN.mergePlaces(p10, PN.findPlace(newPrefix + ".negLink"));
+//	  PN.mergePlaces(p10, newPrefix + ".negLink");
       }
 
 
       // Embed the inner activity.
-      PN.mergePlaces(p11, PN.findPlace(newPrefix + ".initial"));
-      PN.mergePlaces(p12, PN.findPlace(newPrefix + ".final"));
-      PN.mergePlaces(p14, PN.findPlace(newPrefix + ".stop"));
-      PN.mergePlaces(p15, PN.findPlace(newPrefix + ".stopped"));
+      PN.mergePlaces(p11, newPrefix + ".initial");
+      PN.mergePlaces(p12, newPrefix + ".final");
+      PN.mergePlaces(p14, newPrefix + ".stop");
+      PN.mergePlaces(p15, newPrefix + ".stopped");
     }
   ]
 ;

@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/02/15 15:21:20 $
+ * \date    \$Date: 2007/02/27 14:55:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  */
 %}
 
@@ -331,10 +331,10 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 
 
 	// Embed the inner activity of the process.
-	PN.mergePlaces(PN.findPlace("1.internal.p19"), PN.findPlace(phylum->activity_1->id, ".initial"));
-	PN.mergePlaces(PN.findPlace("1.internal.p20"), PN.findPlace(phylum->activity_1->id, ".final"));
-	PN.mergePlaces(PN.findPlace("1.internal.p21"), PN.findPlace(phylum->activity_1->id, ".stop"));
-	PN.mergePlaces(PN.findPlace("1.internal.p22"), PN.findPlace(phylum->activity_1->id, ".stopped"));
+	PN.mergePlaces("1.internal.p19", toString(phylum->activity_1->id) + ".initial");
+	PN.mergePlaces("1.internal.p20", toString(phylum->activity_1->id) + ".final");
+	PN.mergePlaces("1.internal.p21", toString(phylum->activity_1->id) + ".stop");
+	PN.mergePlaces("1.internal.p22", toString(phylum->activity_1->id) + ".stopped");
 
 	break;
       }
@@ -465,17 +465,17 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 
 
   	// embed fault handler
-    	PN.mergePlaces(PN.findPlace(prefix + "fh_fault"),      PN.findPlace(prefix + "faultHandler.fault"));
-      	PN.mergePlaces(PN.findPlace(prefix + "inner_stopped"), PN.findPlace(prefix + "faultHandler.initial"));
-	PN.mergePlaces(PN.findPlace(prefix + "final"),         PN.findPlace(prefix + "faultHandler.final"));
-	PN.mergePlaces(PN.findPlace(prefix + "inner_stop"),    PN.findPlace(prefix + "faultHandler.stop"));
-	PN.mergePlaces(PN.findPlace(prefix + "final"),         PN.findPlace(prefix + "faultHandler.stopped"));
+    	PN.mergePlaces(prefix + "fh_fault",      prefix + "faultHandler.fault");
+      	PN.mergePlaces(prefix + "inner_stopped", prefix + "faultHandler.initial");
+	PN.mergePlaces(prefix + "final",         prefix + "faultHandler.final");
+	PN.mergePlaces(prefix + "inner_stop",    prefix + "faultHandler.stop");
+	PN.mergePlaces(prefix + "final",         prefix + "faultHandler.stopped");
 
 	// embed inner activity
-	PN.mergePlaces(PN.findPlace(prefix + "activity_initial"), PN.findPlace(phylum->activity_1->id, ".initial"));
-	PN.mergePlaces(PN.findPlace(prefix + "activity_final"),   PN.findPlace(phylum->activity_1->id, ".final"));
-	PN.mergePlaces(PN.findPlace(prefix + "inner_stop"),       PN.findPlace(phylum->activity_1->id, ".stop"));
-	PN.mergePlaces(PN.findPlace(prefix + "inner_stopped"),    PN.findPlace(phylum->activity_1->id, ".stopped"));      
+	PN.mergePlaces(prefix + "activity_initial", toString(phylum->activity_1->id) + ".initial");
+	PN.mergePlaces(prefix + "activity_final",   toString(phylum->activity_1->id) + ".final");
+	PN.mergePlaces(prefix + "inner_stop",       toString(phylum->activity_1->id) + ".stop");
+	PN.mergePlaces(prefix + "inner_stopped",    toString(phylum->activity_1->id) + ".stopped");
 
         break;
       }
@@ -512,8 +512,8 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 	phylum->activity_1->unparse(pseudoPrinter, current_view);
 
 
-	PN.mergePlaces(PN.findPlace("1.internal.initial"), PN.findPlace(phylum->activity_1->id, ".initial"));
-	PN.mergePlaces(PN.findPlace("1.internal.final"), PN.findPlace(phylum->activity_1->id, ".final"));
+	PN.mergePlaces("1.internal.initial", toString(phylum->activity_1->id) + ".initial");
+	PN.mergePlaces("1.internal.final",   toString(phylum->activity_1->id) + ".final");
 
 	break;
       }
@@ -709,10 +709,10 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
 	PN.newArc(PN.findPlace(toString(ASTEmap[phylum->id]->parentScopeId) + ".internal.!Active"), t13, READ);
 
 	// Merge places with parent scope.
-	PN.mergePlaces(PN.findPlace(toString(ASTEmap[phylum->id]->parentScopeId) +
+	PN.mergePlaces((toString(ASTEmap[phylum->id]->parentScopeId) +
 	      ".internal.compensationHandler.compScope." + toString(phylum->id)), p3); // was "....internal.compScope."
-	PN.mergePlaces(PN.findPlace(toString(ASTEmap[phylum->id]->parentScopeId) + ".internal.scopeCompensated"), p56);
-	PN.mergePlaces(PN.findPlace(toString(ASTEmap[phylum->id]->parentScopeId) + ".internal.upperTerminate"), p46);
+	PN.mergePlaces((toString(ASTEmap[phylum->id]->parentScopeId) + ".internal.scopeCompensated"), p56);
+	PN.mergePlaces((toString(ASTEmap[phylum->id]->parentScopeId) + ".internal.upperTerminate"), p46);
 
 
 	// unparse the stop pattern
@@ -821,15 +821,15 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
 
 
 	// Embed the inner activity of the scope.
-	PN.mergePlaces(PN.findPlace(prefix + "p21"), PN.findPlace(phylum->activity_1->id, ".initial"));
-	PN.mergePlaces(PN.findPlace(prefix + "p22"), PN.findPlace(phylum->activity_1->id, ".final"));
-	PN.mergePlaces(PN.findPlace(prefix + "p23"), PN.findPlace(phylum->activity_1->id, ".stop"));
-	PN.mergePlaces(PN.findPlace(prefix + "p24"), PN.findPlace(phylum->activity_1->id, ".stopped"));
+	PN.mergePlaces(prefix + "p21", toString(phylum->activity_1->id) + ".initial");
+	PN.mergePlaces(prefix + "p22", toString(phylum->activity_1->id) + ".final");
+	PN.mergePlaces(prefix + "p23", toString(phylum->activity_1->id) + ".stop");
+	PN.mergePlaces(prefix + "p24", toString(phylum->activity_1->id) + ".stopped");
 
 
 	// Merge (!)Terminated places
-	PN.mergePlaces(PN.findPlace("1.internal.!Terminated"), p8);
-	PN.mergePlaces(PN.findPlace("1.internal.Terminated"), p9);
+	PN.mergePlaces("1.internal.!Terminated", p8);
+	PN.mergePlaces("1.internal.Terminated", p9);
 
 	break;
       }
@@ -996,7 +996,7 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
 	    PN.newArc(PN.findPlace(prefix + "compensate"), t17);
 	    PN.newArc(t17, PN.findPlace(prefix + "ch_initial"));
 
-	    PN.mergePlaces(PN.findPlace(prefix + "compensated1"), PN.findPlace(prefix + "compensate"));
+	    PN.mergePlaces(prefix + "compensated1", prefix + "compensate");
 	  }
 	}
 
@@ -1044,22 +1044,22 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
           PN.newArc(t14, p22);
 	  
           
-          PN.mergePlaces(PN.findPlace(toString(phylum->tEventHandlers_1->id) + ".internal.initial"),   PN.findPlace(prefix + "p23"));
-          PN.mergePlaces(PN.findPlace(toString(phylum->tEventHandlers_1->id) + ".internal.running"),   PN.findPlace(prefix + "p27"));
-          PN.mergePlaces(PN.findPlace(toString(phylum->tEventHandlers_1->id) + ".internal.finishing"), PN.findPlace(prefix + "p28"));
-          PN.mergePlaces(PN.findPlace(toString(phylum->tEventHandlers_1->id) + ".internal.stop"),      PN.findPlace(prefix + "p22"));
-          PN.mergePlaces(PN.findPlace(toString(phylum->tEventHandlers_1->id) + ".internal.stopped"),   PN.findPlace(prefix + "p13"));
-          PN.mergePlaces(PN.findPlace(toString(phylum->tEventHandlers_1->id) + ".internal.fault"),     PN.findPlace(prefix + "p3"));
-          PN.mergePlaces(PN.findPlace(toString(phylum->tEventHandlers_1->id) + ".internal.final"),     PN.findPlace(prefix + "p26"));
+          PN.mergePlaces((toString(phylum->tEventHandlers_1->id) + ".internal.initial"),   (prefix + "p23"));
+          PN.mergePlaces((toString(phylum->tEventHandlers_1->id) + ".internal.running"),   (prefix + "p27"));
+          PN.mergePlaces((toString(phylum->tEventHandlers_1->id) + ".internal.finishing"), (prefix + "p28"));
+          PN.mergePlaces((toString(phylum->tEventHandlers_1->id) + ".internal.stop"),      (prefix + "p22"));
+          PN.mergePlaces((toString(phylum->tEventHandlers_1->id) + ".internal.stopped"),   (prefix + "p13"));
+          PN.mergePlaces((toString(phylum->tEventHandlers_1->id) + ".internal.fault"),     (prefix + "p3"));
+          PN.mergePlaces((toString(phylum->tEventHandlers_1->id) + ".internal.final"),     (prefix + "p26"));
 	}
 
 
 	// embed fault handler
-	PN.mergePlaces(PN.findPlace(prefix + "inner_stopped"), PN.findPlace(prefix + "faultHandler.initial"));
-	PN.mergePlaces(PN.findPlace(prefix + "fh_fault"),      PN.findPlace(prefix + "faultHandler.fault"));
-	PN.mergePlaces(PN.findPlace(prefix + "final"),         PN.findPlace(prefix + "faultHandler.final"));
-	PN.mergePlaces(PN.findPlace(prefix + "stop"),          PN.findPlace(prefix + "faultHandler.stop"));
-	PN.mergePlaces(PN.findPlace(prefix + "stopped"),       PN.findPlace(prefix + "faultHandler.stopped"));
+	PN.mergePlaces((prefix + "inner_stopped"), (prefix + "faultHandler.initial"));
+	PN.mergePlaces((prefix + "fh_fault"),      (prefix + "faultHandler.fault"));
+	PN.mergePlaces((prefix + "final"),         (prefix + "faultHandler.final"));
+	PN.mergePlaces((prefix + "stop"),          (prefix + "faultHandler.stop"));
+	PN.mergePlaces((prefix + "stopped"),       (prefix + "faultHandler.stopped"));
 
 	impl_tCompensationHandler *d = phylum->tCompensationHandler_1;
 
@@ -1068,32 +1068,32 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
 	{
 	  d = userDefinedCompensationHandler(ch_activity, *):
 	  {
-	    PN.mergePlaces(PN.findPlace(prefix + "ch_initial"),  PN.findPlace(ch_activity->id, ".initial"));
-	    PN.mergePlaces(PN.findPlace(prefix + "ch_stop"),        PN.findPlace(ch_activity->id, ".stop"));
-	    PN.mergePlaces(PN.findPlace(prefix + "ch_stopped"),     PN.findPlace(ch_activity->id, ".stopped"));
+	    PN.mergePlaces((prefix + "ch_initial"), (toString(ch_activity->id) + ".initial"));
+	    PN.mergePlaces((prefix + "ch_stop"),    (toString(ch_activity->id) + ".stop"));
+	    PN.mergePlaces((prefix + "ch_stopped"), (toString(ch_activity->id) + ".stopped"));
 
 	    if (ASTEmap[phylum->id]->ancestorLoops().size() != 0 && parameters[P_LOOPCOUNT])
-	      PN.mergePlaces(PN.findPlace(prefix + "compensated1"), PN.findPlace(ch_activity->id, ".final"));
+	      PN.mergePlaces((prefix + "compensated1"), (toString(ch_activity->id) + ".final"));
 	    else
-	      PN.mergePlaces(PN.findPlace(prefix + "compensated"), PN.findPlace(ch_activity->id, ".final"));
+	      PN.mergePlaces((prefix + "compensated"),  (toString(ch_activity->id) + ".final"));
 	  }
 	  default: { assert(false); }
 	}
 
 	// embed termination handler
-	PN.mergePlaces(PN.findPlace(prefix + "th_initial"), PN.findPlace(prefix + "terminationHandler.initial"));
-	PN.mergePlaces(PN.findPlace(prefix + "stopped"),    PN.findPlace(prefix + "terminationHandler.final"));
-	PN.mergePlaces(PN.findPlace(prefix + "stop"),       PN.findPlace(prefix + "terminationHandler.stop"));
-	PN.mergePlaces(PN.findPlace(prefix + "stopped"),    PN.findPlace(prefix + "terminationHandler.final"));
+	PN.mergePlaces((prefix + "th_initial"), (prefix + "terminationHandler.initial"));
+	PN.mergePlaces((prefix + "stopped"),    (prefix + "terminationHandler.final"));
+	PN.mergePlaces((prefix + "stop"),       (prefix + "terminationHandler.stop"));
+	PN.mergePlaces((prefix + "stopped"),    (prefix + "terminationHandler.final"));
 
 	// embed inner activity
-	PN.mergePlaces(PN.findPlace(prefix + "activity_initial"), PN.findPlace(phylum->activity_1->id, ".initial"));
-	PN.mergePlaces(PN.findPlace(prefix + "activity_final"),   PN.findPlace(phylum->activity_1->id, ".final"));
-	PN.mergePlaces(PN.findPlace(prefix + "stop"),             PN.findPlace(phylum->activity_1->id, ".stop"));
-	PN.mergePlaces(PN.findPlace(prefix + "inner_stopped"),    PN.findPlace(phylum->activity_1->id, ".stopped"));
+	PN.mergePlaces((prefix + "activity_initial"), (toString(phylum->activity_1->id) + ".initial"));
+	PN.mergePlaces((prefix + "activity_final"),   (toString(phylum->activity_1->id) + ".final"));
+	PN.mergePlaces((prefix + "stop"),             (toString(phylum->activity_1->id) + ".stop"));
+	PN.mergePlaces((prefix + "inner_stopped"),    (toString(phylum->activity_1->id) + ".stopped"));
 
       	// merge `ch_fault_up' place with `ch_fault_in' place of the parent scope
-    	PN.mergePlaces(PN.findPlace(prefix + "ch_fault_up"), PN.findPlace(ASTEmap[phylum->id]->parentScopeId, ".internal.ch_fault_in"));
+    	PN.mergePlaces((prefix + "ch_fault_up"), (toString(ASTEmap[phylum->id]->parentScopeId) + ".internal.ch_fault_in"));
   
 	break;
       }
@@ -1446,28 +1446,28 @@ void PEventHandlers(impl_tEventHandlers* abstract_phylum, uview current_view)
 	  Place *p9 = PN.newPlace(prefix + "p9." + toString(event_number));
 	  Place *p10 = PN.newPlace(prefix + "finished." + toString(event_number));
 
-          PN.newArc(t1, p7);
-          PN.newArc(t4, p9);
-          PN.newArc(t5, p9);
-          PN.newArc(p10, t6);
-          PN.newArc(p10, t7);
+          PN.newArc(t1, PN.findPlace(prefix + "pending." + toString(event_number)));
+          PN.newArc(t4, PN.findPlace(prefix + "p9." + toString(event_number)));
+          PN.newArc(t5, PN.findPlace(prefix + "p9." + toString(event_number)));
+          PN.newArc(PN.findPlace(prefix + "finished." + toString(event_number)), t6);
+          PN.newArc(PN.findPlace(prefix + "finished." + toString(event_number)), t7);
 
           Transition *t2 = PN.newTransition(prefix + "event." + toString(event_number));
-          PN.newArc(p7, t2);
+          PN.newArc(PN.findPlace(prefix + "pending." + toString(event_number)), t2);
           PN.newArc(p2, t2, READ);
           PN.newArc(PN.findPlace("in." + ASTEmap[my_integer->value]->channelName), t2);
-          PN.newArc(t2, p8);
+          PN.newArc(t2, PN.findPlace(prefix + "p8." + toString(event_number)));
 
           Transition *t3 = PN.newTransition(prefix + "finish." + toString(event_number));
-          PN.newArc(p7, t3);
+          PN.newArc(PN.findPlace(prefix + "pending." + toString(event_number)), t3);
           PN.newArc(p3, t3, READ);
-          PN.newArc(t3, p10);
+          PN.newArc(t3, PN.findPlace(prefix + "finished." + toString(event_number)));
 
-	  PN.mergePlaces(p8,  PN.findPlace(toString(my_activity->id) + ".internal.initial"));
-	  PN.mergePlaces(p9,  PN.findPlace(toString(my_activity->id) + ".internal.stop"));
-	  PN.mergePlaces(p10, PN.findPlace(toString(my_activity->id) + ".internal.stopped"));
-	  PN.mergePlaces(p7,  PN.findPlace(toString(my_activity->id) + ".internal.final"));
-	  PN.mergePlaces(p12,  PN.findPlace(toString(my_activity->id) + ".internal.fault"));
+	  PN.mergePlaces((prefix + "p8." + toString(event_number)),       (toString(my_activity->id) + ".internal.initial"));
+	  PN.mergePlaces((prefix + "p9." + toString(event_number)),       (toString(my_activity->id) + ".internal.stop"));
+	  PN.mergePlaces((prefix + "finished." + toString(event_number)), (toString(my_activity->id) + ".internal.stopped"));
+	  PN.mergePlaces((prefix + "pending." + toString(event_number)),  (toString(my_activity->id) + ".internal.final"));
+	  PN.mergePlaces((prefix + "fault"),                              (toString(my_activity->id) + ".internal.fault"));
 
 	  event_number++;
 	}
@@ -1484,27 +1484,27 @@ void PEventHandlers(impl_tEventHandlers* abstract_phylum, uview current_view)
 	  Place *p9 = PN.newPlace(prefix + "p9." + toString(event_number));
 	  Place *p10 = PN.newPlace(prefix + "finished." + toString(event_number));
 
-          PN.newArc(t1, p7);
-          PN.newArc(t4, p9);
-          PN.newArc(t5, p9);
-          PN.newArc(p10, t6);
-          PN.newArc(p10, t7);
+          PN.newArc(t1, PN.findPlace(prefix + "pending." + toString(event_number)));
+          PN.newArc(t4, PN.findPlace(prefix + "p9." + toString(event_number)));
+          PN.newArc(t5, PN.findPlace(prefix + "p9." + toString(event_number)));
+          PN.newArc(PN.findPlace(prefix + "finished." + toString(event_number)), t6);
+          PN.newArc(PN.findPlace(prefix + "finished." + toString(event_number)), t7);
 
           Transition *t2 = PN.newTransition(prefix + "event." + toString(event_number));
-          PN.newArc(p7, t2);
+          PN.newArc(PN.findPlace(prefix + "pending." + toString(event_number)), t2);
           PN.newArc(p2, t2, READ);
-          PN.newArc(t2, p8);
+          PN.newArc(t2, PN.findPlace(prefix + "p8." + toString(event_number)));
 
           Transition *t3 = PN.newTransition(prefix + "finish." + toString(event_number));
-          PN.newArc(p7, t3);
+          PN.newArc(PN.findPlace(prefix + "pending." + toString(event_number)), t3);
           PN.newArc(p3, t3, READ);
-          PN.newArc(t3, p10);
+          PN.newArc(t3, PN.findPlace(prefix + "finished." + toString(event_number)));
 
-	  PN.mergePlaces(p8,  PN.findPlace(toString(my_activity->id) + ".internal.initial"));
-	  PN.mergePlaces(p9,  PN.findPlace(toString(my_activity->id) + ".internal.stop"));
-	  PN.mergePlaces(p10, PN.findPlace(toString(my_activity->id) + ".internal.stopped"));
-	  PN.mergePlaces(p7,  PN.findPlace(toString(my_activity->id) + ".internal.final"));
-	  PN.mergePlaces(p12,  PN.findPlace(toString(my_activity->id) + ".internal.fault"));
+	  PN.mergePlaces((prefix + "p8." + toString(event_number)),       (toString(my_activity->id) + ".internal.initial"));
+	  PN.mergePlaces((prefix + "p9." + toString(event_number)),       (toString(my_activity->id) + ".internal.stop"));
+	  PN.mergePlaces((prefix + "finished." + toString(event_number)), (toString(my_activity->id) + ".internal.stopped"));
+	  PN.mergePlaces((prefix + "pending." + toString(event_number)),  (toString(my_activity->id) + ".internal.final"));
+	  PN.mergePlaces((prefix + "fault"),                              (toString(my_activity->id) + ".internal.fault"));
 
           // \TODO check for <repeatEvery> 
 

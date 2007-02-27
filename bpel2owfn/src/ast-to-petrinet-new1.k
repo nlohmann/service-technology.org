@@ -25,11 +25,11 @@
  * \brief   Petri net unparser (implementation)
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2006-10-29
  *
- * \date    \$Date: 2006/12/17 11:42:13 $
+ * \date    \$Date: 2007/02/27 14:55:07 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  *
  */
 %}
@@ -92,8 +92,8 @@ This=userDefinedFaultHandler(a,b, _id) ->
         PN.newArc(t6, p2);
 	PN.newArc(PN.findPlace(innerActivity->id, ".final"), t6);
 
-	PN.mergePlaces(PN.findPlace(prefix + "inner_stop"), PN.findPlace(innerActivity->id, ".stop"));
-	PN.mergePlaces(PN.findPlace(prefix + "stopped"), PN.findPlace(innerActivity->id, ".stopped"));
+	PN.mergePlaces(prefix + "inner_stop", toString(innerActivity->id) + ".stop");
+	PN.mergePlaces(prefix + "stopped", toString(innerActivity->id) + ".stopped");
       }
 
       with(b)
@@ -111,8 +111,8 @@ This=userDefinedFaultHandler(a,b, _id) ->
           PN.newArc(t7, p2);
 	  PN.newArc(PN.findPlace(innerActivity->id, ".final"), t7);
 
-	  PN.mergePlaces(PN.findPlace(prefix + "inner_stop"), PN.findPlace(innerActivity->id, ".stop"));
-	  PN.mergePlaces(PN.findPlace(prefix + "stopped"), PN.findPlace(innerActivity->id, ".stopped"));
+	  PN.mergePlaces(prefix + "inner_stop", toString(innerActivity->id) + ".stop");
+	  PN.mergePlaces(prefix + "stopped", toString(innerActivity->id) + ".stopped");
 	}
 
         NoCatchAll():
@@ -209,10 +209,10 @@ TerminationHandler(a, _id) ->
     a
     {
       // embed inner activity
-      PN.mergePlaces(PN.findPlace(prefix + "inner_initial"), PN.findPlace(a->id, ".initial"));
-      PN.mergePlaces(PN.findPlace(prefix + "inner_final"),   PN.findPlace(a->id, ".final"));
-      PN.mergePlaces(PN.findPlace(prefix + "stop"),          PN.findPlace(a->id, ".stop"));
-      PN.mergePlaces(PN.findPlace(prefix + "inner_final"),   PN.findPlace(a->id, ".stopped"));
+      PN.mergePlaces(prefix + "inner_initial", toString(a->id) + ".initial");
+      PN.mergePlaces(prefix + "inner_final",   toString(a->id) + ".final");
+      PN.mergePlaces(prefix + "stop",          toString(a->id) + ".stop");
+      PN.mergePlaces(prefix + "inner_final",   toString(a->id) + ".stopped");
       
       footer(_id->value, true);
     }

@@ -29,7 +29,7 @@
  *
  * \since   2006-10-30
  *
- * \date    \$Date: 2007/02/15 15:21:20 $
+ * \date    \$Date: 2007/02/27 14:55:07 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  */
 %}
 
@@ -191,10 +191,10 @@ This=StandardElements(NiltTarget_list(), NiltSource_list(), jc) ->
       Place *p5 = PN.newPlace(prefix + "stopped");
 
       // Embed the inner activity.
-      PN.mergePlaces(p2, PN.findPlace(newPrefix + ".initial"));
-      PN.mergePlaces(p3, PN.findPlace(newPrefix + ".final"));
-      PN.mergePlaces(p4, PN.findPlace(newPrefix + ".stop"));
-      PN.mergePlaces(p5, PN.findPlace(newPrefix + ".stopped"));
+      PN.mergePlaces(p2, newPrefix + ".initial");
+      PN.mergePlaces(p3, newPrefix + ".final");
+      PN.mergePlaces(p4, newPrefix + ".stop");
+      PN.mergePlaces(p5, newPrefix + ".stopped");
     }
   ]
 ;
@@ -219,8 +219,6 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
       Place *p3 = PN.newPlace(prefix + "final");
       Place *p6 = PN.newPlace(prefix + "stop");
       Place *p7 = PN.newPlace(prefix + "stopped");
-      PN.mergePlaces(p6, PN.findPlace(newPrefix + ".stop"));
-      PN.mergePlaces(p7, PN.findPlace(newPrefix + ".stopped"));
 
       Transition *tf = stop(p3, "final", prefix);
 
@@ -279,8 +277,10 @@ This=StandardElements(NiltTarget_list(), a, jc) ->
 
 
       // Embed the inner activity.
-      PN.mergePlaces(p1, PN.findPlace(newPrefix + ".initial"));
-      PN.mergePlaces(p2, PN.findPlace(newPrefix + ".final"));
+      PN.mergePlaces(p1, newPrefix + ".initial");
+      PN.mergePlaces(p2, newPrefix + ".final");
+      PN.mergePlaces(p6, newPrefix + ".stop");
+      PN.mergePlaces(p7, newPrefix + ".stopped");
     }
   ]
 ;
@@ -310,9 +310,6 @@ This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF)
       Place *p6 = PN.newPlace(prefix + "stop");
       Place *p7 = PN.newPlace(prefix + "stopped");
       Place *p8 = PN.newPlace(prefix + "faulted");
-
-      PN.mergePlaces(p6, PN.findPlace(newPrefix + ".stop"));
-      PN.mergePlaces(p7, PN.findPlace(newPrefix + ".stopped"));
 
       Transition *t1 = PN.newTransition(prefix + "start");
       PN.newArc(p1, t1);
@@ -400,8 +397,11 @@ This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF)
 
 
       // Embed the inner activity.
-      PN.mergePlaces(p5, PN.findPlace(newPrefix + ".initial"));
-      PN.mergePlaces(p2, PN.findPlace(newPrefix + ".final"));
+      PN.mergePlaces(p5, newPrefix + ".initial");
+      PN.mergePlaces(p2, newPrefix + ".final");
+      PN.mergePlaces(p6, newPrefix + ".stop");
+      PN.mergePlaces(p7, newPrefix + ".stopped");
+
     }
   ]
 ;
@@ -430,8 +430,6 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF)
       Place *p5 = PN.newPlace(prefix + "begin");
       Place *p6 = PN.newPlace(prefix + "stop");
       Place *p7 = PN.newPlace(prefix + "stopped");
-      PN.mergePlaces(p6, PN.findPlace(newPrefix + ".stop"));
-      PN.mergePlaces(p7, PN.findPlace(newPrefix + ".stopped"));
 
       Transition *t1 = PN.newTransition(prefix + "start");
       PN.newArc(p1, t1);
@@ -513,8 +511,11 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF)
 
 
       // Embed the inner activity.
-      PN.mergePlaces(p5, PN.findPlace(newPrefix + ".initial"));
-      PN.mergePlaces(p2, PN.findPlace(newPrefix + ".final"));
+      PN.mergePlaces(p5, newPrefix + ".initial");
+      PN.mergePlaces(p2, newPrefix + ".final");
+      PN.mergePlaces(p6, newPrefix + ".stop");
+      PN.mergePlaces(p7, newPrefix + ".stopped");
+
     }
   ]
 ;
@@ -544,8 +545,6 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
       Place *p6 = PN.newPlace(prefix + "joinTrue");
       Place *p7 = PN.newPlace(prefix + "stop");
       Place *p8 = PN.newPlace(prefix + "stopped");
-      PN.mergePlaces(p7, PN.findPlace(newPrefix + ".stop"));
-      PN.mergePlaces(p8, PN.findPlace(newPrefix + ".stopped"));
 
       Transition *t1 = PN.newTransition(prefix + "start");
       PN.newArc(p1, t1);
@@ -681,8 +680,10 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
 
 
       // Embed the inner activity.
-      PN.mergePlaces(p2, PN.findPlace(newPrefix + ".initial"));
-      PN.mergePlaces(p3, PN.findPlace(newPrefix + ".final"));
+      PN.mergePlaces(p2, newPrefix + ".initial");
+      PN.mergePlaces(p3, newPrefix + ".final");
+      PN.mergePlaces(p7, newPrefix + ".stop");
+      PN.mergePlaces(p8, newPrefix + ".stopped");
     }
   ]
 ;
@@ -713,9 +714,6 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF)
       Place *p7 = PN.newPlace(prefix + "stop");
       Place *p8 = PN.newPlace(prefix + "stopped");
       Place *p9 = PN.newPlace(prefix + "faulted");
-
-      PN.mergePlaces(p7, PN.findPlace(newPrefix + ".stop"));
-      PN.mergePlaces(p8, PN.findPlace(newPrefix + ".stopped"));
 
       Transition *t1 = PN.newTransition(prefix + "start");
       PN.newArc(p1, t1);
@@ -859,8 +857,11 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF)
 
 
       // Embed the inner activity.
-      PN.mergePlaces(p2, PN.findPlace(newPrefix + ".initial"));
-      PN.mergePlaces(p3, PN.findPlace(newPrefix + ".final"));
+      PN.mergePlaces(p2, newPrefix + ".initial");
+      PN.mergePlaces(p3, newPrefix + ".final");
+      PN.mergePlaces(p7, newPrefix + ".stop");
+      PN.mergePlaces(p8, newPrefix + ".stopped");
+
     }
   ]
 ;

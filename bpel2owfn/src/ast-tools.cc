@@ -29,13 +29,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/01/26 14:44:40 $
+ * \date    \$Date: 2007/02/27 14:55:07 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.58 $
+ * \version \$Revision: 1.59 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -514,7 +514,7 @@ void process_loop_bounds(const vector<unsigned int> &loop_bounds, const vector<u
     PN.newArc(PN.findPlace(prefix + "compensate"), t17);
     PN.newArc(t17, PN.findPlace(prefix + "ch_initial"));
 
-    PN.mergePlaces(PN.findPlace(prefix + "compensated1"), PN.findPlace(prefix + "compensate"));
+    PN.mergePlaces(prefix + "compensated1", prefix + "compensate");
 
     // connect transitions with counters of ancestor loops
     for (unsigned i = 0; i < loop_identifiers.size(); i++)

@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/02/23 13:30:05 $
+ * \date    \$Date: 2007/02/27 14:55:07 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.182 $
+ * \version \$Revision: 1.183 $
  *
  * \ingroup petrinet
  */
@@ -879,13 +879,16 @@ void PetriNet::mergeParallelTransitions(Transition *t1, Transition *t2)
  * \post Place p12 having the incoming and outgoing arcs of p1 and p2 and the
  *       union of the histories of t1 and t2.
  */
-void PetriNet::mergePlaces(Place *p1, Place *p2)
+void PetriNet::mergePlaces(Place * & p1, Place * & p2)
 {
   if (p1 == p2)
     return;
 
   if (p1 == NULL || p2 == NULL)
+  {
+    // cerr << "[PN] At least one parameter of mergePlaces was NULL!" << endl;
     return;
+  }
 
   assert(p1 != NULL);
   assert(p2 != NULL);
@@ -933,6 +936,9 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
 
   removePlace(p1);
   removePlace(p2);
+
+  p1 = NULL;
+  p2 = NULL;
 }
 
 
@@ -945,9 +951,22 @@ void PetriNet::mergePlaces(Place *p1, Place *p2)
  */
 void PetriNet::mergePlaces(string role1, string role2)
 {
-  mergePlaces(findPlace(role1), findPlace(role2));
+  Place * p1 = findPlace(role1);
+  Place * p2 = findPlace(role2);
+  mergePlaces( p1, p2 );
 }
 
+void PetriNet::mergePlaces(Place * & p1, string role2)
+{
+  Place * p2 = findPlace(role2);
+  mergePlaces( p1, p2 );
+}
+
+void PetriNet::mergePlaces(string role1, Place * & p2)
+{
+  Place * p1 = findPlace(role1);
+  mergePlaces( p1, p2 );
+}
 
 
 
@@ -1113,9 +1132,9 @@ set<Node *> PetriNet::postset(Node *n) const
  *
  * \todo make this function "const"
  */
-Place *PetriNet::findPlace(string role)
+Place * PetriNet::findPlace(string role)
 {
-  return static_cast<Place*>(roleMap[role]);
+  return (static_cast<Place * >(roleMap[role]));
 }
 
 
@@ -1131,9 +1150,9 @@ Place *PetriNet::findPlace(string role)
  *
  * \todo make this function "const"
  */
-Place *PetriNet::findPlace(unsigned int id, string role)
+Place * PetriNet::findPlace(unsigned int id, string role)
 {
-  return static_cast<Place*>(roleMap[toString(id) + role]);
+  return (static_cast<Place * >(roleMap[toString(id) + role]));
 }
 
 
@@ -1340,7 +1359,7 @@ void PetriNet::compose(PetriNet &net)
         (*oPlace)->history[0] = (*oPlace)->nodeFullName();
         P.insert(*place);
         P.insert(*oPlace);
-        mergePlaces(*place,*oPlace);
+        mergePlaces((*place)->nodeFullName(), (*oPlace)->nodeFullName());
         eraseP_in.insert(*place);
         P_out.erase(*oPlace);
       }

@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/02/15 15:21:20 $
+ * \date    \$Date: 2007/02/27 14:55:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
  */
 %}
 
@@ -600,7 +600,6 @@ void PFlow(impl_tFlow* abstract_phylum, uview current_view)
   switch(current_view)
   {
     case(petrinet_enum):
-    case(petrinetnew_enum):
       {
 	Place *p7  = PN.newPlace(prefix + "initial");
 	Place *p8  = PN.newPlace(prefix + "final");
@@ -640,6 +639,51 @@ void PFlow(impl_tFlow* abstract_phylum, uview current_view)
        	  PN.newArc(t5, PN.findPlace(innerActivity->id, ".stop"));
        	  PN.newArc(PN.findPlace(innerActivity->id, ".stopped"), t6);
        	  PN.newArc(PN.findPlace(innerActivity->id, ".final"), t3);
+       	}
+
+	break;
+      }
+
+    case(petrinetnew_enum):
+      {
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "final");
+	Place *p3 = PN.newPlace(prefix + "stop");
+	Place *p4 = PN.newPlace(prefix + "stopped");
+	Place *p5 = PN.newPlace(prefix + "running");
+
+	Transition *t1 = PN.newTransition(prefix + "split");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p5);
+
+	Transition *t2 = PN.newTransition(prefix + "join");
+	PN.newArc(p5, t2);
+	PN.newArc(t2, p2);
+
+	Transition *t3 = PN.newTransition(prefix + "stop_all");
+	PN.newArc(p3, t3);
+	PN.newArc(p5, t3);
+
+	Transition *t4 = PN.newTransition(prefix + "all_stopped");
+	PN.newArc(t4, p4);
+
+	// Transitions for the negative control flow.
+	Transition *t5 = stop(p1, "initial", prefix);
+	Transition *t6 = stop(p2, "final", prefix);
+
+	// unparse the standard elements
+	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
+
+	// unparse the embedded activity
+	phylum->activity_list_1->unparse(pseudoPrinter, current_view);
+
+	// embed the inner activity 
+	foreach (innerActivity; activity_list phylum->activity_list_1)
+	{
+	  PN.newArc(t1, PN.findPlace(innerActivity->id, ".initial"));
+       	  PN.newArc(t3, PN.findPlace(innerActivity->id, ".stop"));
+       	  PN.newArc(PN.findPlace(innerActivity->id, ".stopped"), t4);
+       	  PN.newArc(PN.findPlace(innerActivity->id, ".final"), t2);
        	}
 
 	break;
@@ -890,7 +934,6 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
   switch(current_view)
   {
     case(petrinet_enum):
-    case(petrinetnew_enum):
       {
 	Place *p5 = PN.newPlace(prefix + "final");
 	Place *p6 = PN.newPlace(prefix + "initial");
@@ -978,6 +1021,76 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 	  PN.mergePlaces(phylum->id, ".stop",    innerActivity->id, ".stop");
 	  PN.mergePlaces(phylum->id, ".stopped", innerActivity->id, ".stopped");
 	  PN.mergePlaces(phylum->id, ".final",   innerActivity->id, ".final");
+
+	  trace(TRACE_DEBUG, "[PNU]\t\t</onAlarm>\n");
+	}
+
+	break;
+      }
+
+    case(petrinetnew_enum):
+      {
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "final");
+	Place *p3 = PN.newPlace(prefix + "stop");
+	Place *p4 = PN.newPlace(prefix + "stopped");
+
+  	// Transitions for the negative control flow.
+    	Transition *t4 = stop(p1, "initial", prefix);
+
+	// unparse the standard elements
+	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
+
+	// unparse the onMessage branches
+	phylum->tOnMessage_list_1->unparse(pseudoPrinter, current_view);
+	
+	// unparse the onAlarm branches
+	phylum->tOnAlarm_list_1->unparse(pseudoPrinter, current_view);
+
+  	// Traverse the <onMessage> branches.
+	int onMessageCount = 1;
+	foreach (ThisBranch = OnMessage(_corr,_from,innerActivity,_id2); tOnMessage_list phylum->tOnMessage_list_1)
+	{
+	  trace(TRACE_DEBUG, "[PNU]\t\t<onMessage>\n");
+	  string message = toString(onMessageCount++);
+	  string newPrefix = prefix + "onMessage" + message + ".";
+	  
+	  Place *p5 = PN.newPlace(newPrefix + "p5");
+
+	  Transition *t1 = PN.newTransition(newPrefix + "onMessage_" + message);
+          PN.newArc(PN.findPlace(prefix + "initial"), t1);
+	  PN.newArc(PN.findPlace("in." + ASTEmap[ThisBranch->id]->channelName), t1);
+	  PN.newArc(t1, PN.findPlace(newPrefix + "p5"));
+
+	  // Embed the inner activity.
+	  PN.mergePlaces(newPrefix + "p5", toString(innerActivity->id) + ".initial");
+	  PN.mergePlaces(phylum->id, ".stop",        innerActivity->id, ".stop");
+	  PN.mergePlaces(phylum->id, ".stopped",     innerActivity->id, ".stopped");
+	  PN.mergePlaces(phylum->id, ".final",       innerActivity->id, ".final");
+
+	  trace(TRACE_DEBUG, "[PNU]\t\t</onMessage>\n");
+	}
+
+	
+	// Traverse the <onAlarm> branches.
+	int onAlarmCount = 1;
+	foreach (onAlarmBranch=OnAlarm(innerActivity); tOnAlarm_list phylum->tOnAlarm_list_1)
+	{
+	  trace(TRACE_DEBUG, "[PNU]\t\t<onAlarm>\n");
+          string alarm = toString(onAlarmCount++);
+	  string newPrefix = prefix + "onAlarm" + alarm + ".";
+
+	  Place *p7 = PN.newPlace(newPrefix + "p7");
+
+	  Transition *t3= PN.newTransition(newPrefix + "onAlarm_" + alarm);
+          PN.newArc(PN.findPlace(prefix + "initial"), t3);
+	  PN.newArc(t3, PN.findPlace(newPrefix + "p7"));
+
+	  // Embed the inner activity.
+	  PN.mergePlaces(newPrefix + "p7", toString(innerActivity->id) + ".initial");
+	  PN.mergePlaces(phylum->id, ".stop",        innerActivity->id, ".stop");
+	  PN.mergePlaces(phylum->id, ".stopped",     innerActivity->id, ".stopped");
+	  PN.mergePlaces(phylum->id, ".final",       innerActivity->id, ".final");
 
 	  trace(TRACE_DEBUG, "[PNU]\t\t</onAlarm>\n");
 	}

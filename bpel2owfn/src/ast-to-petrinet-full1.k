@@ -25,11 +25,11 @@
  * \brief   Petri net unparser (implementation)
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2006/12/20 11:50:18 $
+ * \date    \$Date: 2007/02/27 14:55:07 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.219 $
+ * \version \$Revision: 1.220 $
  *
  */
 %}
@@ -168,8 +168,8 @@ This=userDefinedFaultHandler(a,b, _id) provided (ASTEmap[_id->value]->inProcess)
 	// Embed innerActivity_1 to innerActivity_n-1.
 	PN.newArc(t1, PN.findPlace(innerActivity->id, ".initial"));
 	PN.newArc(PN.findPlace(innerActivity->id, ".final"), t2);
-	PN.mergePlaces(PN.findPlace("1.internal.faultHandler.p11"), PN.findPlace(innerActivity->id, ".stop"));
-	PN.mergePlaces(PN.findPlace("1.internal.faultHandler.p12"), PN.findPlace(innerActivity->id, ".stopped"));
+	PN.mergePlaces("1.internal.faultHandler.p11", toString(innerActivity->id) + ".stop");
+	PN.mergePlaces("1.internal.faultHandler.p12", toString(innerActivity->id) + ".stopped");
 
 	PN.newArc(p4, t1);
 	PN.newArc(p7, t1, READ);
@@ -186,8 +186,8 @@ This=userDefinedFaultHandler(a,b, _id) provided (ASTEmap[_id->value]->inProcess)
 	  // Embed innerActivity_n.
 	  PN.newArc(t3, PN.findPlace(innerActivity->id, ".initial"));
 	  PN.newArc(PN.findPlace(innerActivity->id, ".final"), t4);
-	  PN.mergePlaces(PN.findPlace("1.internal.faultHandler.p11"), PN.findPlace(innerActivity->id, ".stop"));
-	  PN.mergePlaces(PN.findPlace("1.internal.faultHandler.p12"), PN.findPlace(innerActivity->id, ".stopped"));
+	  PN.mergePlaces("1.internal.faultHandler.p11", toString(innerActivity->id) + ".stop");
+	  PN.mergePlaces("1.internal.faultHandler.p12", toString(innerActivity->id) + ".stopped");
 
 	  PN.newArc(p4, t3);
 	  PN.newArc(p7, t3, READ);
@@ -433,12 +433,12 @@ This=userDefinedFaultHandler(a,b,_id) provided (!ASTEmap[_id->value]->inProcess)
 
 
 	// Embed the left <compensate />-element.
-	PN.mergePlaces(PN.findPlace(prefix + "p10"), compensate1_p1);
-	PN.mergePlaces(PN.findPlace(prefix + "p11"), compensate1_p3);
-	PN.mergePlaces(PN.findPlace(prefix + "p13"), compensate1_p4);
-	PN.mergePlaces(PN.findPlace(prefix + "ch_fh"), compensate1_p5);
-	PN.mergePlaces(PN.findPlace(prefix + "ch_out"), compensate1_p6);
-	PN.mergePlaces(PN.findPlace(prefix + "p14"), compensate1_p7);
+	PN.mergePlaces(prefix + "p10", compensate1_p1);
+	PN.mergePlaces(prefix + "p11", compensate1_p3);
+	PN.mergePlaces(prefix + "p13", compensate1_p4);
+	PN.mergePlaces(prefix + "ch_fh", compensate1_p5);
+	PN.mergePlaces(prefix + "ch_out", compensate1_p6);
+	PN.mergePlaces(prefix + "p14", compensate1_p7);
       }
 
       // The right <compensate />-element.
@@ -479,10 +479,10 @@ This=userDefinedFaultHandler(a,b,_id) provided (!ASTEmap[_id->value]->inProcess)
 
 
       // Embed the right <compensate />-element.
-      PN.mergePlaces(PN.findPlace(prefix + "p21"), compensate2_p1);
-      PN.mergePlaces(PN.findPlace(prefix + "p22"), compensate2_p3);
-      PN.mergePlaces(PN.findPlace(prefix + "ch_fh"), compensate2_p5);
-      PN.mergePlaces(PN.findPlace(prefix + "ch_out"), compensate2_p6);
+      PN.mergePlaces(prefix + "p21", compensate2_p1);
+      PN.mergePlaces(prefix + "p22", compensate2_p3);
+      PN.mergePlaces(prefix + "ch_fh", compensate2_p5);
+      PN.mergePlaces(prefix + "ch_out", compensate2_p6);
     }
     a // catch branches
     b // catchAll branch
@@ -505,8 +505,8 @@ This=userDefinedFaultHandler(a,b,_id) provided (!ASTEmap[_id->value]->inProcess)
 
 
 	// Embed innerActivity_1 to innerActivity_1-n.
-	PN.mergePlaces(PN.findPlace(prefix + "p13"), PN.findPlace(innerActivity->id, ".stop"));
-	PN.mergePlaces(PN.findPlace(prefix + "p14"), PN.findPlace(innerActivity->id, ".stopped"));
+	PN.mergePlaces(prefix + "p13", toString(innerActivity->id) + ".stop");
+	PN.mergePlaces(prefix + "p14", toString(innerActivity->id) + ".stopped");
       }
 
       with(b) {
@@ -526,8 +526,8 @@ This=userDefinedFaultHandler(a,b,_id) provided (!ASTEmap[_id->value]->inProcess)
 
 
 	  // Embed innerActivity_n.
-	  PN.mergePlaces(PN.findPlace(prefix + "p13"), PN.findPlace(innerActivity->id, ".stop"));
-	  PN.mergePlaces(PN.findPlace(prefix + "p14"), PN.findPlace(innerActivity->id, ".stopped"));
+	  PN.mergePlaces(prefix + "p13", toString(innerActivity->id) + ".stop");
+	  PN.mergePlaces(prefix + "p14", toString(innerActivity->id) + ".stopped");
 	}
 	default: { /* this should never happen */ }
       }
@@ -819,10 +819,10 @@ This=userDefinedEventHandler(a,b,_id) ->
 	PN.newArc(onMessage_p12, t16);
 
 	// embed the innerActivity
-	PN.mergePlaces(onMessage_p3,  PN.findPlace(innerActivity->id, ".initial"));
-	PN.mergePlaces(onMessage_p11, PN.findPlace(innerActivity->id, ".stop"));
-	PN.mergePlaces(onMessage_p12, PN.findPlace(innerActivity->id, ".stopped"));
-	PN.mergePlaces(onMessage_p4,  PN.findPlace(innerActivity->id, ".final"));
+	PN.mergePlaces(onMessage_p3,  toString(innerActivity->id) + ".initial");
+	PN.mergePlaces(onMessage_p11, toString(innerActivity->id) + ".stop");
+	PN.mergePlaces(onMessage_p12, toString(innerActivity->id) + ".stopped");
+	PN.mergePlaces(onMessage_p4,  toString(innerActivity->id) + ".final");
       }
 
 
@@ -885,10 +885,10 @@ This=userDefinedEventHandler(a,b,_id) ->
 
 
 	// Embed the innerActivity.
-	PN.mergePlaces(onAlarm_p1,  PN.findPlace(innerActivity->id, ".initial"));
-	PN.mergePlaces(onAlarm_p9,  PN.findPlace(innerActivity->id, ".stop"));
-	PN.mergePlaces(onAlarm_p10, PN.findPlace(innerActivity->id, ".stopped"));
-	PN.mergePlaces(onAlarm_p2,  PN.findPlace(innerActivity->id, ".final"));
+	PN.mergePlaces(onAlarm_p1,  toString(innerActivity->id) + ".initial");
+	PN.mergePlaces(onAlarm_p9,  toString(innerActivity->id) + ".stop");
+	PN.mergePlaces(onAlarm_p10, toString(innerActivity->id) + ".stopped");
+	PN.mergePlaces(onAlarm_p2,  toString(innerActivity->id) + ".final");
 
 	onAlarmCount++;
       }
@@ -1191,8 +1191,8 @@ This=userDefinedCompensationHandler(innerActivity,_id) provided (!ASTEmap[_id->v
       // Embed inner activity.
       PN.newArc(t4, PN.findPlace(innerActivity->id, ".initial"));
       PN.newArc(PN.findPlace(innerActivity->id, ".final"), t5);
-      PN.mergePlaces(p24, PN.findPlace(innerActivity->id, ".stop"));
-      PN.mergePlaces(p13, PN.findPlace(innerActivity->id, ".stopped"));
+      PN.mergePlaces(p24, toString(innerActivity->id) + ".stop");
+      PN.mergePlaces(p13, toString(innerActivity->id) + ".stopped");
 
       trace(TRACE_DEBUG, "[PNU]" + inString() + "</userDefinedCompensationHandler scope=\"" + currentScope + "\">\n");
     }

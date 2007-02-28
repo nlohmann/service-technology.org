@@ -25,18 +25,18 @@
  * \brief   AST rewrite rules (implementation)
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2006/10/11
  *
- * \date    \$Date: 2007/01/22 10:24:57 $
+ * \date    \$Date: 2007/02/28 09:56:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
  */
 %}
 
@@ -191,7 +191,7 @@ standardTerminationHandler(_id)
  * Default fault handler (cf. Sect. 12.5.1 in WS-BPEL 2.0)
  */
 implicitFaultHandler(_id) provided (parameters[P_WSBPEL]) ->
-<implicit:
+< implicit:
   userDefinedFaultHandler(
     NiltCatch_list(),
     CatchAll(
@@ -230,7 +230,7 @@ implicitFaultHandler(_id) provided (parameters[P_WSBPEL]) ->
  */
 
 implicitCompensationHandler(_id) provided (parameters[P_WSBPEL]) ->
-<implicit:
+< implicit:
   userDefinedCompensationHandler(
     activityCompensate(
       Compensate(
@@ -282,7 +282,7 @@ activityScope(
   )
 )
 ->
-<implicit:
+< implicit:
   activityScope(
     Scope(
       my_standardElements,
@@ -320,13 +320,13 @@ activityScope(
  */
 Wait(a,_id) provided (ASTEmap[_id->value]->attributes["for"] != "")
 ->
-<newNames:
+< newNames:
   WaitFor(a,_id)
 >;
 
 Wait(a,_id) provided (ASTEmap[_id->value]->attributes["until"] != "")
 ->
-<newNames:
+< newNames:
   WaitUntil(a,_id)
 >;
 
@@ -336,12 +336,12 @@ Wait(a,_id) provided (ASTEmap[_id->value]->attributes["until"] != "")
  */
 Invoke(a,b,c,d,_id) provided (ASTEmap[_id->value]->attributes["outputVariable"] != "")
 ->
-<newNames:
+< newNames:
   SynchronousInvoke(a,b,c,d,_id)
 >;
 
 Invoke(a,b,c,d,_id) provided (ASTEmap[_id->value]->attributes["outputVariable"] == "")
 ->
-<newNames:
+< newNames:
   AsynchronousInvoke(a,b,c,d,_id)
 >;

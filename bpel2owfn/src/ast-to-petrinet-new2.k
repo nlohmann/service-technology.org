@@ -29,7 +29,7 @@
  *
  * \since   2006-10-30
  *
- * \date    \$Date: 2007/02/27 14:55:07 $
+ * \date    \$Date: 2007/02/28 09:56:23 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,140 +39,9 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.28 $
+ * \version \$Revision: 1.29 $
  */
 %}
-
-
-
-
-
-/******************************************************************************
-  COMPENSATE
-
-  The <compensate> activity concurrently calls all compensation handlers of
-  the enclosed scopes. If there are no enclosed scopes, the Petri net pattern
-  can be simplified and consists of a single place both labelled with
-  "initial" and "final".
-******************************************************************************/
-
-This=Compensate(a,_id) ->
-  [petrinetnew:
-    {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
-      assert(This->id == _id->value);
-      assert(ASTEmap[_id->value] != NULL);
-
-      Place *p1 = PN.newPlace(prefix + "initial");
-      Place *p2 = PN.newPlace(prefix + "final");
-
-      assert(ASTEmap[ASTEmap[_id->value]->parentScopeId] != NULL);
-      if (!ASTEmap[ASTEmap[_id->value]->parentScopeId]->enclosedScopes.empty())
-      {
-        Place *p5 = PN.newPlace(prefix + "compensating");
-        Place *p3 = PN.newPlace(prefix + "stop");
-        Place *p4 = PN.newPlace(prefix + "stopped");
-
-        Transition *t1 = PN.newTransition(prefix + "begin_compensation");
-        PN.newArc(p1, t1);
-        PN.newArc(t1, p5);
-
-        Transition *t2 = PN.newTransition(prefix + "complete_compensation");
-        PN.newArc(p5, t2);
-        PN.newArc(t2, p2);
-
-        Transition *t3 = PN.newTransition(prefix + "stop_compensation");
-        PN.newArc(p3, t3);
-        PN.newArc(p5, t3, READ);
-
-        Transition *t4 = PN.newTransition(prefix + "compensation_stopped");
-        PN.newArc(t4, p4);
-        PN.newArc(p5, t4);
-
-        // connect the transitions with all enclosed scopes
-        assert(ASTEmap[ASTEmap[_id->value]->parentScopeId] != NULL);
-        for (set<unsigned int>::iterator it = ASTEmap[ASTEmap[_id->value]->parentScopeId]->enclosedScopes.begin();
-             it != ASTEmap[ASTEmap[_id->value]->parentScopeId]->enclosedScopes.end(); it++)
-        {
-          PN.newArc(t1, PN.findPlace(toString(*it) + ".internal.compensate"));
-          PN.newArc(PN.findPlace(toString(*it) + ".internal.compensated"), t2);
-          PN.newArc(t3, PN.findPlace(toString(*it) + ".internal.ch_stop"));
-          PN.newArc(PN.findPlace(toString(*it) + ".internal.ch_stopped"), t4);
-        }
-
-        // Transitions for the negative control flow.
-        Transition *t5 = stop(p1, "initial", prefix);
-        Transition *t6 = stop(p2, "final", prefix);
-      }
-      else // no enclosed scopes
-      {
-        PN.mergePlaces(p1, p2);
-      }
-    }
-    a // standardElements
-    {
-      footer(This->id);
-    }
-  ]
-;
-
-
-
-
-
-/******************************************************************************
-  COMPENSATE SCOPE                                               (WS-BPEL 2.0)
-******************************************************************************/
-
-This=CompensateScope(a,b,_id) ->
-  [petrinetnew:
-    {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
-      assert(This->id == _id->value);
-
-      assert(ASTEmap[_id->value]->attributes["target"] != "");
-      assert(ASTE_scopeNames[ASTEmap[_id->value]->attributes["target"]] != 0);
-
-      unsigned int scopeId = ASTE_scopeNames[ASTEmap[_id->value]->attributes["target"]];
-
-      Place *p1 = PN.newPlace(prefix + "initial");
-      Place *p2 = PN.newPlace(prefix + "final");
-      Place *p3 = PN.newPlace(prefix + "stop");
-      Place *p4 = PN.newPlace(prefix + "stopped");
-      Place *p5 = PN.newPlace(prefix + "compensating");
-
-      Transition *t1 = PN.newTransition(prefix + "call_ch");
-      PN.newArc(p1, t1);
-      PN.newArc(t1, p5);
-      PN.newArc(t1, PN.findPlace(toString(scopeId) + ".internal.compensate"));
-
-      Transition *t2 = PN.newTransition(prefix + "finish");
-      PN.newArc(p5, t2);
-      PN.newArc(t2, p2);
-      PN.newArc(PN.findPlace(toString(scopeId) + ".internal.compensated"), t2);
-
-      Transition *t3 = PN.newTransition(prefix + "stop_ch");
-      PN.newArc(p3, t3);
-      PN.newArc(p5, t3, READ);
-      PN.newArc(t3, PN.findPlace(toString(scopeId) + ".internal.ch_stop"));
-
-      Transition *t4 = PN.newTransition(prefix + "ch_stopped");
-      PN.newArc(t4, p4);
-      PN.newArc(p5, t4);
-      PN.newArc(PN.findPlace(toString(scopeId) + ".internal.ch_stopped"), t4);
-
-      // Transitions for the negative control flow.
-      Transition *t5 = stop(p1, "initial", prefix);
-      Transition *t6 = stop(p2, "final", prefix);
-    }
-    a // standardElements
-    {
-      footer(This->id);
-    }
-  ]
-;
 
 
 /******************************************************************************

@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/02/27 14:55:07 $
+ * \date    \$Date: 2007/02/28 09:56:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  */
 %}
 
@@ -64,6 +64,7 @@ using std::endl;
 
 extern PetriNet PN;
 extern map<unsigned int, ASTE*> ASTEmap;
+extern map<string, unsigned int> ASTE_scopeNames;
 extern string currentScope;
 %}
 
@@ -1176,6 +1177,56 @@ void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
   
   switch(current_view)
   {
+    case(petrinetnew_enum):
+      {
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "final");
+        Place *p3 = PN.newPlace(prefix + "stop");
+        Place *p4 = PN.newPlace(prefix + "stopped");
+        Place *p5 = PN.newPlace(prefix + "compensating");
+	
+	Transition *t1 = PN.newTransition(prefix + "call_ch");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p5);
+
+	Transition *t2 = PN.newTransition(prefix + "finish");
+	PN.newArc(p5, t2);
+	PN.newArc(t2, p1);
+
+        Transition *t3 = PN.newTransition(prefix + "stop_ch");
+        PN.newArc(p3, t3);
+        PN.newArc(p5, t3, READ);
+
+        Transition *t4 = PN.newTransition(prefix + "ch_stopped");
+        PN.newArc(p5, t4);
+        PN.newArc(t4, p4);
+
+
+        // connect with places of enclosed scopes of the parent activity
+        unsigned int parentId = ASTEmap[ phylum->id ]->parentScopeId;
+        if( ! ASTEmap[ parentId ]->enclosedScopes.empty() )
+        {
+          for( set< unsigned int >::iterator scope = ASTEmap[ parentId ]->enclosedScopes.begin();
+                                             scope != ASTEmap[ parentId ]->enclosedScopes.end();
+                                             scope++ )
+          {
+            string newPrefix = toString(*scope) + ".internal.";
+            PN.newArc(t1, PN.findPlace(newPrefix + "compensate"));
+            PN.newArc(t3, PN.findPlace(newPrefix + "ch_stop"));
+            PN.newArc(PN.findPlace(newPrefix + "ch_stopped"),  t4);
+            PN.newArc(PN.findPlace(newPrefix + "compensated"), t2);
+          }
+          Transition *t5 = stop(p1, "initial", prefix);
+          Transition *t6 = stop(p2, "final",   prefix);
+        }
+        else
+        {
+          PN.mergePlaces(p1, p2);
+        }
+
+        break;
+      }
+
     case(petrinetsmall_enum):
       {
 	cerr << "the <compensate> activity cannot be modelled!" << endl;
@@ -1217,9 +1268,46 @@ void PCompensateScope(impl_tCompensate* abstract_phylum, uview current_view)
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";
 
-  
   switch(current_view)
   {
+    case(petrinetnew_enum):
+      {
+
+	Place *p1 = PN.newPlace(prefix + "initial");
+	Place *p2 = PN.newPlace(prefix + "final");
+        Place *p3 = PN.newPlace(prefix + "stop");
+        Place *p4 = PN.newPlace(prefix + "stopped");
+        Place *p5 = PN.newPlace(prefix + "compensating");
+	
+	Transition *t1 = PN.newTransition(prefix + "call_ch");
+	PN.newArc(p1, t1);
+	PN.newArc(t1, p5);
+
+	Transition *t2 = PN.newTransition(prefix + "finish");
+	PN.newArc(p5, t2);
+	PN.newArc(t2, p1);
+
+        Transition *t3 = PN.newTransition(prefix + "stop_ch");
+        PN.newArc(p3, t3);
+        PN.newArc(p5, t3, READ);
+
+        Transition *t4 = PN.newTransition(prefix + "ch_stopped");
+        PN.newArc(p5, t4);
+        PN.newArc(t4, p4);
+
+
+        string newPrefix = toString(ASTE_scopeNames[ASTEmap[phylum->id]->attributes["target"]]) + ".internal.";
+        PN.newArc(t1, PN.findPlace(newPrefix + "compensate"));
+        PN.newArc(t3, PN.findPlace(newPrefix + "ch_stop"));
+        PN.newArc(PN.findPlace(newPrefix + "ch_stopped"),  t4);
+        PN.newArc(PN.findPlace(newPrefix + "compensated"), t2);
+        
+        Transition *t5 = stop(p1, "initial", prefix);
+        Transition *t6 = stop(p2, "final",   prefix);
+
+        break;
+      }
+
     case(petrinetsmall_enum):
       {
 	cerr << "the <compensateScope> activity cannot be modelled!" << endl;

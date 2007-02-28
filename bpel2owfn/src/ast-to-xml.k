@@ -32,7 +32,7 @@
  * 
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/01/30 14:53:11 $
+ * \date    \$Date: 2007/02/28 09:56:23 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.67 $
+ * \version \$Revision: 1.68 $
  */
 
 %}
@@ -75,7 +75,7 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
   { else }
     ${ { inup(); } "<correlationSets>\n" d { indown(); } "</correlationSets>\n" $}
 
-  e f g /* h */  i { indown(); } "</process>\n"]
+  e f g h i { indown(); } "</process>\n"]
 ;
 
 
@@ -114,7 +114,7 @@ Catch(a,_id) ->
 ;
 
 CatchAll(a,_id) ->
-  [xml: { inup(); } "<catchAll>\n" _id { indown(); } "</catchAll>\n"]
+  [xml: { inup(); } "<catchAll id=\"" _id "\"" { listAttributes( _id ); } ">\n" a { indown(); } "</catchAll>\n"]
 ;
 
 

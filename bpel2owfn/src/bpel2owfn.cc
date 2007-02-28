@@ -29,14 +29,14 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/02/27 09:21:39 $
+ * \date    \$Date: 2007/02/28 09:56:23 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.143 $
+ * \version \$Revision: 1.144 $
  */
 
 
@@ -199,8 +199,25 @@ int main( int argc, char *argv[])
 	  AST->print();
       }
 
+      if (modus == M_PRETTY)
+      {
+        if (formats[F_XML])
+        {
+          if (output_filename != "")
+          {
+            output = openOutput(output_filename + "." + suffixes[F_XML]);
+          }
+          trace(TRACE_INFORMATION, "-> Printing \"pretty\" XML ...\n");
+          AST->unparse(kc::printer, kc::xml);
+          if (output_filename != "")
+          {
+            closeOutput(output);
+	    output = NULL;
+          }
+        }
+      }
 
-      // generate and process the control flow graph?
+        // generate and process the control flow graph?
       if (modus == M_CFG)
 	processCFG();
 
@@ -262,31 +279,8 @@ int main( int argc, char *argv[])
    * parsing complete
    */
 
-
-
-
   if (modus == M_CONSISTENCY)
     PN = PN2;
-
-
-  if (modus == M_PRETTY)
-  {
-    if (formats[F_XML])
-    {
-      if (output_filename != "")
-      {
-	output = openOutput(output_filename + "." + suffixes[F_XML]);
-      }
-      trace(TRACE_INFORMATION, "-> Printing \"pretty\" XML ...\n");
-      AST->unparse(kc::printer, kc::xml);
-      if (output_filename != "")
-      {
-	closeOutput(output);
-	output = NULL;
-      }
-    }
-  }
-
 
   if (modus == M_PETRINET || modus == M_CONSISTENCY)
   {

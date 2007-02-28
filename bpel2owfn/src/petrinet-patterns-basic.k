@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/02/28 09:56:23 $
+ * \date    \$Date: 2007/02/28 11:38:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  */
 %}
 
@@ -1222,6 +1222,7 @@ void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
         else
         {
           PN.mergePlaces(p1, p2);
+          PN.mergePlaces(p3, p4);
         }
 
         break;

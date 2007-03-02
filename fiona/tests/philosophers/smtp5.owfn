@@ -1,0 +1,175 @@
+PLACE
+  INTERNAL p, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p12, p13, p14, p15, p16, p17, p18, p19, counter;
+  INPUT
+    ELHO,   { HELO bzw. EHLO startet die SMTP-Sitzung und identifiziert den Client am Server. }
+    NOOP {$ MAX_OCCURRENCES = 3 $},   { NOOP bewirkt eine Antwort vom Server. Damit wird die Verbindungstrennung durch einen Timeout verhindert. }
+    HELO,   { HELO bzw. EHLO startet die SMTP-Sitzung und identifiziert den Client am Server. }
+    QUIT,   { QUIT beendet die Verbindung zum SMTP-Server. Der Server liefert eine letzte Antwort zurück. }
+    MAIL,   { MAIL leitet die Mailübertragung ein und liefert gleich die Absender-Adresse mit (FROM). }
+    RCPT,   { RCPT gibt die Adresse eines oder mehrere Empfänger an. }
+    DATA,   { Mit DATA wird die Übermittlung der eigentlichen E-Mail-Nachricht gekennzeichnet. }
+    connect,
+{    MailLines,}
+    MailEnd;
+
+  OUTPUT
+    m220, { Server bereit. }
+    m250 {$ MAX_OCCURRENCES = 5 $}, { Kommando ausgeführt. }
+    m354, { Starte Empfang der Mail. }
+    m211 {$ MAX_OCCURRENCES = 5 $}, { System-Status oder System-Hilfe. }
+    m221; { Server beendet Verbindung. }
+
+INITIALMARKING
+  p, counter: 5;
+
+FINALMARKING
+  p13;
+
+
+{ Server bereit. }
+
+TRANSITION t0
+CONSUME p, connect;
+PRODUCE p0;
+
+TRANSITION t1 { Bestätigung: Server bereit. }
+CONSUME p0;
+PRODUCE p1, m220;
+
+
+{ Anmeldung }
+
+TRANSITION t2 { Anmeldung mit HELO }
+CONSUME p1, HELO;
+PRODUCE p2;
+
+TRANSITION t3 { Anmeldung mit ELHO }
+CONSUME p1, ELHO;
+PRODUCE p2;
+
+TRANSITION t4 { Bestätigung und weiter }
+CONSUME p2;
+PRODUCE p3, m250;
+
+
+{ Mailübertragung einleiten, Absender angeben }
+
+TRANSITION t5 { Mailübertragung einleiten }
+CONSUME p3, MAIL;
+PRODUCE p4;
+
+TRANSITION t6 { Bestätigung und weiter }
+CONSUME p4;
+PRODUCE p5, m250;
+
+
+{ Absender angeben. }
+
+TRANSITION t7 { erster Absender }
+CONSUME p5, RCPT, counter;
+PRODUCE p6;
+
+TRANSITION t8 { Bestätigung und weiter }
+CONSUME p6;
+PRODUCE p7, m250;
+
+TRANSITION t9 { weitere Absender }
+CONSUME p7, RCPT, counter;
+PRODUCE p19;
+
+TRANSITION t32 { Bestätigung und weiter }
+CONSUME p19;
+PRODUCE p7, m250;
+
+
+{ Übermittlung der eigentlichen Mail einleiten }
+
+TRANSITION t10 { Übermittlung einleiten }
+CONSUME p7, DATA;
+PRODUCE p8;
+
+TRANSITION t11 { Bestätigung: Starte Empfang der Mail; Beenden mit "CRLF". "CRLF". }
+CONSUME p8;
+PRODUCE p9, m354;
+
+{TRANSITION t12  Empfang von Daten.
+CONSUME p9, MailLines, counter;
+PRODUCE p9;}
+
+TRANSITION t13 { Empfang des Abbruchszeichens. }
+CONSUME p9, MailEnd;
+PRODUCE p10;
+
+TRANSITION t14 { Bestätigung und zurück zum Anfang }
+CONSUME p10;
+PRODUCE p3, m250;
+
+
+{ Zwischendurch kann mit QUIT abgebrochen werden. }
+
+TRANSITION t17 { Abbruch nach Login }
+CONSUME p1, QUIT;
+PRODUCE p12;
+
+TRANSITION t18 { Abbruch nach HELO/ELHO }
+CONSUME p3, QUIT;
+PRODUCE p12;
+
+TRANSITION t19 { Abbruch nach MAIL }
+CONSUME p5, QUIT;
+PRODUCE p12;
+
+TRANSITION t20 { Abbruch nach RCPT }
+CONSUME p7, QUIT;
+PRODUCE p12;
+
+TRANSITION t21 { Abbruch während Maildaten }
+CONSUME p9, QUIT;
+PRODUCE p12;
+
+TRANSITION t16 { Bestätigung: Server beendet Verbindung. }
+CONSUME p12;
+PRODUCE p13, m221;
+
+
+{ NOOP }
+
+TRANSITION t22 { NOOP nach Login }
+CONSUME p1, NOOP, counter;
+PRODUCE p14;
+
+TRANSITION t23 { Bestätigung: System-Status oder System-Hilfe. }
+CONSUME p14;
+PRODUCE p1, m211;
+
+TRANSITION t24 { NOOP nach HELO/ELHO }
+CONSUME p3, NOOP, counter;
+PRODUCE p15;
+
+TRANSITION t25 { Bestätigung: System-Status oder System-Hilfe. }
+CONSUME p15;
+PRODUCE p3, m211;
+
+TRANSITION t26 { NOOP nach MAIL }
+CONSUME p5, NOOP, counter;
+PRODUCE p16;
+
+TRANSITION t27 { Bestätigung: System-Status oder System-Hilfe. }
+CONSUME p16;
+PRODUCE p5, m211;
+
+TRANSITION t28 { NOOP nach RCPT }
+CONSUME p7, NOOP, counter;
+PRODUCE p17;
+
+TRANSITION t29 { Bestätigung: System-Status oder System-Hilfe. }
+CONSUME p17;
+PRODUCE p7, m211;
+
+TRANSITION t30 { NOOP während Maildaten }
+CONSUME p9, NOOP, counter;
+PRODUCE p18;
+
+TRANSITION t31 { Bestätigung: System-Status oder System-Hilfe. }
+CONSUME p18;
+PRODUCE p9, m211;

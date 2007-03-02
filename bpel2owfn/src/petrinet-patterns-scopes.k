@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for BPEL's <scope> and <process>
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $ 
+ *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/02/27 14:55:07 $
+ * \date    \$Date: 2007/03/02 09:28:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  */
 %}
 
@@ -1019,7 +1019,7 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
 	// unparse the termination handler
 	phylum->tTerminationHandler_1->unparse(pseudoPrinter, current_view);
 
-	// unparse the fault handlers
+	// unparse the event handlers
 	phylum->tEventHandlers_1->unparse(pseudoPrinter, current_view);
 
 
@@ -1048,8 +1048,8 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
           PN.mergePlaces((toString(phylum->tEventHandlers_1->id) + ".internal.running"),   (prefix + "p27"));
           PN.mergePlaces((toString(phylum->tEventHandlers_1->id) + ".internal.finishing"), (prefix + "p28"));
           PN.mergePlaces((toString(phylum->tEventHandlers_1->id) + ".internal.stop"),      (prefix + "p22"));
-          PN.mergePlaces((toString(phylum->tEventHandlers_1->id) + ".internal.stopped"),   (prefix + "p13"));
-          PN.mergePlaces((toString(phylum->tEventHandlers_1->id) + ".internal.fault"),     (prefix + "p3"));
+          PN.mergePlaces((toString(phylum->tEventHandlers_1->id) + ".internal.stopped"),   (prefix + "inner_stopped")); // was: "p13"
+          PN.mergePlaces((toString(phylum->tEventHandlers_1->id) + ".internal.fault"),     (prefix + "fault_in")); // obsolete?
           PN.mergePlaces((toString(phylum->tEventHandlers_1->id) + ".internal.final"),     (prefix + "p26"));
 	}
 
@@ -1467,7 +1467,7 @@ void PEventHandlers(impl_tEventHandlers* abstract_phylum, uview current_view)
 	  PN.mergePlaces((prefix + "p9." + toString(event_number)),       (toString(my_activity->id) + ".internal.stop"));
 	  PN.mergePlaces((prefix + "finished." + toString(event_number)), (toString(my_activity->id) + ".internal.stopped"));
 	  PN.mergePlaces((prefix + "pending." + toString(event_number)),  (toString(my_activity->id) + ".internal.final"));
-	  PN.mergePlaces((prefix + "fault"),                              (toString(my_activity->id) + ".internal.fault"));
+//	  PN.mergePlaces((prefix + "fault"),                              (toString(my_activity->id) + ".internal.fault")); // should be obsolete...
 
 	  event_number++;
 	}
@@ -1504,7 +1504,7 @@ void PEventHandlers(impl_tEventHandlers* abstract_phylum, uview current_view)
 	  PN.mergePlaces((prefix + "p9." + toString(event_number)),       (toString(my_activity->id) + ".internal.stop"));
 	  PN.mergePlaces((prefix + "finished." + toString(event_number)), (toString(my_activity->id) + ".internal.stopped"));
 	  PN.mergePlaces((prefix + "pending." + toString(event_number)),  (toString(my_activity->id) + ".internal.final"));
-	  PN.mergePlaces((prefix + "fault"),                              (toString(my_activity->id) + ".internal.fault"));
+//	  PN.mergePlaces((prefix + "fault"),                              (toString(my_activity->id) + ".internal.fault")); // should be obsolete
 
           // \TODO check for <repeatEvery> 
 

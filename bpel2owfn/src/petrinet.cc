@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/02/28 09:56:23 $
+ * \date    \$Date: 2007/03/02 09:28:45 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.184 $
+ * \version \$Revision: 1.185 $
  *
  * \ingroup petrinet
  */
@@ -886,7 +886,7 @@ void PetriNet::mergePlaces(Place * & p1, Place * & p2)
 
   if (p1 == NULL || p2 == NULL)
   {
-    // cerr << "[PN] At least one parameter of mergePlaces was NULL!" << endl;
+    //cerr << "[PN] At least one parameter of mergePlaces was NULL!" << endl;
     assert(false);
     return;
   }
@@ -954,34 +954,33 @@ void PetriNet::mergePlaces(string role1, string role2)
 {
   Place * p1 = findPlace(role1);
   Place * p2 = findPlace(role2);
+
   if ( p1 == NULL )
-  {
-    std::cerr << "p1 " << role1 << std::endl; 
-  }
+    std::cerr << "p1 has role '" << role1 << "'" << std::endl; 
+
   if ( p2 == NULL )
-  {
-    std::cerr << "p2 " << role2 << std::endl; 
-  }
+    std::cerr << "p2 has role '" << role2 << "'" << std::endl; 
+
   mergePlaces( p1, p2 );
 }
 
 void PetriNet::mergePlaces(Place * & p1, string role2)
 {
   Place * p2 = findPlace(role2);
+
   if ( p2 == NULL )
-  {
-    std::cerr << "p2 " << role2 << std::endl; 
-  }
+    std::cerr << "p2 has role '" << role2 << "'" << std::endl; 
+
   mergePlaces( p1, p2 );
 }
 
 void PetriNet::mergePlaces(string role1, Place * & p2)
 {
   Place * p1 = findPlace(role1);
+
   if ( p1 == NULL )
-  {
-    std::cerr << "p1 " << role1 << std::endl; 
-  }
+    std::cerr << "p1 has role '" << role1 << "'" << std::endl; 
+  
   mergePlaces( p1, p2 );
 }
 

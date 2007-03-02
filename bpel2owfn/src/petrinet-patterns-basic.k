@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for BPEL's basic activities
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $ 
+ *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/02/28 11:38:15 $
+ * \date    \$Date: 2007/03/02 09:28:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.22 $
+ * \version \$Revision: 1.23 $
  */
 %}
 
@@ -170,7 +170,7 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	Place *p4 = PN.newPlace(prefix + "final");
 	Place *p5 = PN.newPlace(prefix + "stop");
 	Place *p6 = PN.newPlace(prefix + "stopped");
-	Place *p7 = PN.newPlace(prefix + "fault");
+	Place *p7 = PN.newPlace(prefix + "faulted");
 
 	Transition *t1 = PN.newTransition(prefix + "read_variable");
 	PN.newArc(p1, t1); 
@@ -385,7 +385,7 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
 	Place *p4 = PN.newPlace(prefix + "final");
 	Place *p5 = PN.newPlace(prefix + "stop");
 	Place *p6 = PN.newPlace(prefix + "stopped");
-	Place *p7 = PN.newPlace(prefix + "fault");
+	Place *p7 = PN.newPlace(prefix + "faulted");
 
 	Transition *t1 = PN.newTransition(prefix + "receive");
 	PN.newArc(PN.findPlace("in." + ASTEmap[phylum->id]->channelName), t1);
@@ -895,6 +895,7 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
 	Place *p2 = PN.newPlace(prefix + "faulted");
 	Place *p3 = PN.newPlace(prefix + "stop");
 	Place *p4 = PN.newPlace(prefix + "stopped");
+	Place *p5 = PN.newPlace(prefix + "final"); // it's OK that this place is not connected
 
 	// Transitions for the negative control flow.
 	Transition *t1 = throwFault(p1, p2, "initial", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
@@ -945,8 +946,8 @@ void PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";
 
-
   Place *p1 = PN.newPlace(prefix + "initial");
+  Place *p5 = PN.newPlace(prefix + "final"); // it's OK that this place is not connected
   
   assert(ASTEmap[phylum->id] != NULL);
   Place *p2 = PN.newPlace(prefix + "faulted");

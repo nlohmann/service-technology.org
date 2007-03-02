@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for BPEL's structured activities
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $ 
+ *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/02/27 14:55:07 $
+ * \date    \$Date: 2007/03/02 09:28:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.23 $
+ * \version \$Revision: 1.24 $
  */
 %}
 
@@ -764,7 +764,6 @@ void PSwitch(impl_tSwitch* abstract_phylum, uview current_view)
 	Transition *t9  = stop(p6, "running", prefix);
 	Transition *t10 = stop(p10, "p10", prefix);
 
-
 	impl_tOtherwise_Otherwise *otherwise = static_cast<impl_tOtherwise_Otherwise*>(phylum->tOtherwise_1);
 
 	// unparse the standard elements
@@ -775,8 +774,6 @@ void PSwitch(impl_tSwitch* abstract_phylum, uview current_view)
 	
 	// unparse the otherwise activity
 	otherwise->activity_1->unparse(pseudoPrinter, current_view);
-
-	
 
 	int currentCase = 1;
 	Transition *last;
@@ -1070,7 +1067,6 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 
 	  trace(TRACE_DEBUG, "[PNU]\t\t</onMessage>\n");
 	}
-
 	
 	// Traverse the <onAlarm> branches.
 	int onAlarmCount = 1;
@@ -1094,7 +1090,6 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 
 	  trace(TRACE_DEBUG, "[PNU]\t\t</onAlarm>\n");
 	}
-
 	break;
       }
 

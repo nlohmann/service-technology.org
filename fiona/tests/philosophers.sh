@@ -27,12 +27,6 @@ testdir=.
 DIR=$testdir/philosophers
 FIONA=fiona
 
-#loeschen aller erzeugten Dateien im letzten Durchlauf
-rm -f $DIR/*.out
-rm -f $DIR/*.png
-rm -f $DIR/*.og
-rm -f $DIR/*.log
-
 echo
 echo ---------------------------------------------------------------------
 echo running: $FIONA -a -t OG -n $DIR/phcontrol3.unf.owfn -e1 -m1

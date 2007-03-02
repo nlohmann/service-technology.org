@@ -2,7 +2,7 @@ PLACE
   INTERNAL p, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p12, p13, p14, p15, p16, p17, p18, p19, counter;
   INPUT
     ELHO,   { HELO bzw. EHLO startet die SMTP-Sitzung und identifiziert den Client am Server. }
-    NOOP {$ MAX_OCCURRENCES = 3 $},   { NOOP bewirkt eine Antwort vom Server. Damit wird die Verbindungstrennung durch einen Timeout verhindert. }
+    NOOP {$ MAX_OCCURRENCES = 5 $},   { NOOP bewirkt eine Antwort vom Server. Damit wird die Verbindungstrennung durch einen Timeout verhindert. }
     HELO,   { HELO bzw. EHLO startet die SMTP-Sitzung und identifiziert den Client am Server. }
     QUIT,   { QUIT beendet die Verbindung zum SMTP-Server. Der Server liefert eine letzte Antwort zurück. }
     MAIL,   { MAIL leitet die Mailübertragung ein und liefert gleich die Absender-Adresse mit (FROM). }
@@ -14,9 +14,9 @@ PLACE
 
   OUTPUT
     m220, { Server bereit. }
-    m250 {$ MAX_OCCURRENCES = 5 $}, { Kommando ausgeführt. }
+    m250 {$ MAX_OCCURRENCES = 10 $}, { Kommando ausgeführt. }
     m354, { Starte Empfang der Mail. }
-    m211 {$ MAX_OCCURRENCES = 5 $}, { System-Status oder System-Hilfe. }
+    m211 {$ MAX_OCCURRENCES = 10 $}, { System-Status oder System-Hilfe. }
     m221; { Server beendet Verbindung. }
 
 INITIALMARKING

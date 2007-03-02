@@ -14,9 +14,9 @@ PLACE
 
   OUTPUT
     m220, { Server bereit. }
-    m250 {$ MAX_OCCURRENCES = 5 $}, { Kommando ausgeführt. }
+    m250 {$ MAX_OCCURRENCES = 10 $}, { Kommando ausgeführt. }
     m354, { Starte Empfang der Mail. }
-    m211 {$ MAX_OCCURRENCES = 5 $}, { System-Status oder System-Hilfe. }
+    m211 {$ MAX_OCCURRENCES = 10 $}, { System-Status oder System-Hilfe. }
     m221; { Server beendet Verbindung. }
 
 INITIALMARKING

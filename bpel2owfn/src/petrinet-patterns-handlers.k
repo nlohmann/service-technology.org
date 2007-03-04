@@ -29,7 +29,7 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/04 13:47:27 $
+ * \date    \$Date: 2007/03/04 13:56:24 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.1 $
+ * \version \$Revision: 1.2 $
  */
 %}
 
@@ -73,6 +73,12 @@ extern set<string> ASTE_variableNames;
 %}
 
 
+
+
+
+/******************************************************************************
+  FAULT HANDLERS
+******************************************************************************/
 
 This=userDefinedFaultHandler(a,b, _id) ->
   [petrinetnew:
@@ -182,15 +188,10 @@ CatchAll(a, _id) ->
 
 
 
-userDefinedCompensationHandler(a, _id) ->
-  [petrinetnew:
-    { header(_id->value, true); }
-    a
-    { footer(_id->value, true); }
-  ]
-;
 
-
+/******************************************************************************
+  TERMINATION HANDLER
+******************************************************************************/
 
 TerminationHandler(a, _id) ->
   [petrinetnew:
@@ -245,6 +246,21 @@ TerminationHandler(a, _id) ->
   ]
 ;
 
+
+
+
+
+/******************************************************************************
+  COMPENSATION HANDLER
+******************************************************************************/
+
+userDefinedCompensationHandler(a, _id) ->
+  [petrinetnew:
+    { header(_id->value, true); }
+    a
+    { footer(_id->value, true); }
+  ]
+;
 
 
 

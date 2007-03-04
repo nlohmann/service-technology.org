@@ -39,7 +39,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/02/11 17:56:55 $
+ * \date    \$Date: 2007/03/04 13:03:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -49,7 +49,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.289 $
+ * \version \$Revision: 1.290 $
  *
  * \todo Overwork documentation: WS-BPEL can also be parsed!
  *
@@ -253,7 +253,7 @@ unsigned int ASTEid = 1;
 %type <yt_tSwitch> tSwitch
 %type <yt_tTarget_list> tTarget_list
 %type <yt_tTarget> tTarget
-%type <yt_tTerminate> tTerminate
+%type <yt_tExit> tTerminate
 %type <yt_tTerminationHandler> tTerminationHandler
 %type <yt_tTerminationHandler> truetTerminationHandler
 %type <yt_tThrow> tThrow
@@ -304,7 +304,7 @@ activity:
 | tValidate		{ $$ = activityValidate($1);	}
 | tEmpty		{ $$ = activityEmpty($1);	}
 | tWait			{ $$ = activityWait($1);	}
-| tTerminate		{ $$ = activityTerminate($1);	}
+| tTerminate		{ $$ = activityExit($1);	}
 | tExit			{ $$ = activityExit($1);	}
 | tThrow		{ $$ = activityThrow($1);	}
 | tRethrow		{ $$ = activityRethrow($1);	}
@@ -820,9 +820,9 @@ tUntil:
 
 tTerminate:
   K_TERMINATE arbitraryAttributes X_NEXT standardElements X_SLASH K_TERMINATE
-    { $$ = Terminate($4, $2); }
+    { $$ = Exit($4, $2); }
 | K_TERMINATE arbitraryAttributes X_SLASH
-    { $$ = Terminate(NoStandardElements(), $2); }
+    { $$ = Exit(NoStandardElements(), $2); }
 ;
 
 

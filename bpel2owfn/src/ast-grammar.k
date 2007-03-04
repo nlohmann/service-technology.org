@@ -31,7 +31,7 @@
  * 
  * \since   2005-10-03
  *
- * \date    \$Date: 2007/02/12 08:42:13 $
+ * \date    \$Date: 2007/03/04 13:03:45 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.163 $
+ * \version \$Revision: 1.164 $
  */
 %}
 
@@ -102,7 +102,6 @@ activity:
 | activityValidate(tValidate)
 | activityEmpty(tEmpty)
 | activityWait(tWait)
-| activityTerminate(tTerminate)
 | activityExit(tExit)
 | activityThrow(tThrow)
 | activityRethrow(tRethrow)
@@ -346,16 +345,7 @@ tWait:
 
 
 /******************************************************************************
-  TERMINATE                                                      (BPEL4WS 1.1)
-******************************************************************************/
-
-tTerminate:
-  Terminate(standardElements integer)
-;
-
-
-/******************************************************************************
-  EXIT                                                           (WS-BPEL 2.0)
+  EXIT / TERMINATE
 ******************************************************************************/
 
 tExit:
@@ -586,7 +576,6 @@ expression:
 %ctor activityValidate()		{ id = tValidate_1->id; }
 %ctor activityEmpty()			{ id = tEmpty_1->id; }
 %ctor activityWait()			{ id = tWait_1->id; }
-%ctor activityTerminate()		{ id = tTerminate_1->id; }
 %ctor activityExit()			{ id = tExit_1->id; }
 %ctor activityThrow()			{ id = tThrow_1->id; }
 %ctor activityRethrow()			{ id = tRethrow_1->id; }
@@ -634,7 +623,6 @@ expression:
 %ctor Wait() 				{ CTOR(K_WAIT) }
 %ctor WaitFor() 			{ CTOR(K_WAIT) }
 %ctor WaitUntil() 			{ CTOR(K_WAIT) }
-%ctor Terminate()			{ CTOR(K_TERMINATE) }
 %ctor Exit()				{ CTOR(K_EXIT) }
 %ctor Throw()				{ CTOR(K_THROW) }
 %ctor Rethrow()				{ CTOR(K_RETHROW) }

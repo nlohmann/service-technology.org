@@ -25,11 +25,11 @@
  * \brief   Petri net unparser (implementation)
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/02/28 09:56:23 $
+ * \date    \$Date: 2007/03/04 13:03:45 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.84 $
+ * \version \$Revision: 1.85 $
  */
 %}
 
@@ -93,10 +93,6 @@ Throw -> [petrinet petrinetnew petrinetsmall:
 
 Rethrow -> [petrinetnew:
   { PRethrow($0, kc_current_view_base); }
-];
-
-Terminate -> [petrinet petrinetnew petrinetsmall:
-  { PTerminate($0, kc_current_view_base); }
 ];
 
 Exit -> [petrinet petrinetnew petrinetsmall:

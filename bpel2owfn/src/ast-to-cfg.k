@@ -28,11 +28,11 @@
  * associated control flow block.
  * 
  * \author  Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *         
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/02/15 15:21:20 $
+ * \date    \$Date: 2007/03/04 13:03:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.50 $
+ * \version \$Revision: 1.51 $
  */
 %}
 
@@ -594,22 +594,7 @@ CompensateScope(a,name,b) ->
 
 
 /******************************************************************************
-  TERMINATE
-******************************************************************************/
-
-Terminate(a,b) ->
-  [cfg: { 
-	  trace(TRACE_DEBUG, "[CFG] Terminate\n");
-	  CFGBlock * block = new CFGBlock(CFGTerminate, $0->id, "Terminate"); 
-
-	  cfgMap[toString($0->id)] = block; 
-  	}
-	a // standard elements
-  ]
-;
-
-/******************************************************************************
-  EXIT                                                           (WS-BPEL 2.0)
+  EXIT / TERMINATE
 ******************************************************************************/
 
 Exit(a,b) ->

@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/02 09:28:45 $
+ * \date    \$Date: 2007/03/04 13:03:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.23 $
+ * \version \$Revision: 1.24 $
  */
 %}
 
@@ -974,101 +974,7 @@ void PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
 
 
 /******************************************************************************
-  TERMINATE
-******************************************************************************/
-
-void PTerminate(impl_tTerminate* abstract_phylum, uview current_view)
-{
-  impl_tTerminate_Terminate* phylum = static_cast<impl_tTerminate_Terminate*>(abstract_phylum);
-  assert(phylum != NULL);
-
-  header(phylum->id);
-  string prefix = toString(phylum->id) + ".internal.";
-
-  
-  switch(current_view)
-  {
-    case(petrinet_enum):
-      {
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-	Place *p3 = PN.newPlace(prefix + "stop");
-	Place *p4 = PN.findPlace("1.internal.!Terminated");
-	Place *p5 = PN.findPlace("1.internal.Terminated");
-	Place *p6 = PN.findPlace(currentScope + "upperTerminate");
-	Place *p7 = PN.newPlace(prefix + "stopped");
-
-	Transition *t1 = PN.newTransition(prefix + "t1");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-	PN.newArc(p5, t1, READ);
-
-	Transition *t2 = PN.newTransition(prefix + "t2");
-	PN.newArc(p1, t2);
-	PN.newArc(t2, p2);
-	PN.newArc(t2, p5);
-	PN.newArc(p4, t2);
-	PN.newArc(t2, p6);
-
-	// Transitions for the negative control flow.
-	Transition *t3 = stop(p1, "initial", prefix);
-	Transition *t4 = stop(p2, "final", prefix);
-
-	break;
-      }
-
-    case(petrinetnew_enum):
-      {
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "done");
-	Place *p3 = PN.newPlace(prefix + "stop");
-	Place *p4 = PN.newPlace(prefix + "stopped");
-	Place *p5 = PN.newPlace(prefix + "final");
-
-	Transition *t1 = PN.newTransition(prefix + "exit");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-	PN.newArc(PN.findPlace("1.internal.!Exiting"), t1);
-	PN.newArc(t1, PN.findPlace("1.internal.Exiting"));
-	PN.newArc(t1, PN.findPlace("1.internal.inner_stop"));
-
-	// Transitions for the negative control flow.
-	Transition *t2 = stop(p1, "initial", prefix);
-	Transition *t3 = stop(p2, "done", prefix);
-	break;
-      }
-
-    case(petrinetsmall_enum):
-      {
-	cerr << "the <terminate> activity cannot be modelled!" << endl;
-
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-	
-	Transition *t1 = PN.newTransition(prefix + "empty");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-
-	break;
-      }      
-
-    default: { /* no pattern in this case */ }
-  }
-
-
-  // unparse the standard elements
-  phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
-
-  footer(phylum->id);
-}
-
-
-
-
-
-/******************************************************************************
-  EXIT
+  EXIT / TERMINATE
 ******************************************************************************/
 
 void PExit(impl_tExit* abstract_phylum, uview current_view)

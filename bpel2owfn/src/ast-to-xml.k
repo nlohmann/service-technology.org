@@ -28,11 +28,11 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/02/28 09:56:23 $
+ * \date    \$Date: 2007/03/04 13:03:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.68 $
+ * \version \$Revision: 1.69 $
  */
 
 %}
@@ -310,16 +310,7 @@ WaitUntil(a,_id) ->
 
 
 /******************************************************************************
-  TERMINATE
-******************************************************************************/
-
-Terminate(a,_id) ->
-  [xml: { inup(); } "<terminate id=\"" _id "\"" { listAttributes( _id ); } ">\n" a { indown(); } "</terminate>\n"]
-;
-
-
-/******************************************************************************
-  EXIT
+  EXIT / TERMINATE
 ******************************************************************************/
 
 Exit(a,_id) ->

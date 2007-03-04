@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/02/12 09:56:01 $
+ * \date    \$Date: 2007/03/04 13:03:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.129 $
+ * \version \$Revision: 1.130 $
  */
 %}
 
@@ -1113,31 +1113,7 @@ CompensateScope(a,b,_id) ->
 
 
 /******************************************************************************
-  TERMINATE                                                      (BPEL4WS 1.1)
-******************************************************************************/
-
-Terminate(a,_id) ->
-  [postprocessing:
-    {
-      int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
-      assert(myself != NULL);
-
-      a->parentId = myid;
-
-      myself->parentScopeId = PPcurrentScope;
-      myself->checkAttributes();
-    }
-    a
-    {
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
-    }
-  ]
-;
-
-
-/******************************************************************************
-  EXIT                                                           (WS-BPEL 2.0)
+  EXIT / TERMINATE
 ******************************************************************************/
 
 Exit(a,_id) ->

@@ -29,13 +29,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/03/04 13:40:41 $
+ * \date    \$Date: 2007/03/04 14:31:59 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.60 $
+ * \version \$Revision: 1.61 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -750,4 +750,41 @@ void listAttributes ( unsigned int id )
     }
   }
   *output << result;
+}
+
+
+
+
+
+/******************************************************************************
+ * Other functions
+ *****************************************************************************/
+
+/*!
+ * The function increases the indices in the vector and propagates resulting
+ * carries. For example, if the index vector [3,2] is increased and the maximal
+ * bounds are [5,2] the resulting vector is [4,1].
+ *
+ * \param current_index  vector holding the current indices
+ * \param max_index      vector holding the upper bounds of the indices
+ *
+ * \post Index vector is increased according to the described rules.
+ *
+ * \invariant Each index lies between 1 and its maximal value, i.e., 1 and the
+ *            maximal value can be reached.
+ */
+void next_index(vector<unsigned int> &current_index, const vector<unsigned int> &max_index)
+{
+  assert(current_index.size() == max_index.size());
+
+  for (unsigned int i = 0; i < current_index.size(); i++)
+  {
+    if (current_index[i] < max_index[i])
+    {
+      current_index[i]++;
+      break;
+    }
+    else
+      current_index[i] = 1;
+  }
 }

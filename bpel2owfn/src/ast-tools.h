@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/01/17 14:45:45 $
+ * \date    \$Date: 2007/03/04 14:31:59 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -113,6 +113,11 @@ void conflictingActivities( unsigned int a, unsigned int b );
 void enterConflictingActivities( set< unsigned int > a, set< unsigned int > b );
 void enclosedActivities( unsigned int a, unsigned int b );
 void enterEnclosedActivities( unsigned int a, set< unsigned int > b );
+
+
+/// increases the index vector
+void next_index(vector<unsigned int> &current_index, const vector<unsigned int> &max_index);
+
 
 
 /******************************************************************************

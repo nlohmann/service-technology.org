@@ -28,13 +28,13 @@
  * 
  * \since   2005/11/09
  *
- * \date    \$Date: 2006/12/30 12:48:02 $
+ * \date    \$Date: 2007/03/04 14:31:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.30 $
+ * \version \$Revision: 1.31 $
  *
  * \ingroup debug
  */
@@ -114,7 +114,10 @@ int frontend_error(const char *msg);
 void SAerror(unsigned int code, string information = "", int lineNumber = 0);
 void SAerror(unsigned int code, string information, string lineNumber);
 
-
+/// calls #cleanup() then exits
+void error();
+/// closes all open files and delete all pointers
+void cleanup();
 
 
 

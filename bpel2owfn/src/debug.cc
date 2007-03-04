@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/02/12 10:09:13 $
+ * \date    \$Date: 2007/03/04 14:31:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.55 $
+ * \version \$Revision: 1.56 $
  *
  * \ingroup debug
  */
@@ -55,13 +55,16 @@
 
 #include "debug.h"
 #include "options.h"
-#include "helpers.h"
+#include "helpers.h"	// for toInt
 
 using std::cerr;
+using std::clog;
+using std::cout;
 using std::endl;
 using std::setw;
 using std::setfill;
 using std::flush;
+using std::ofstream;
 
 
 
@@ -374,4 +377,81 @@ void SAerror(unsigned int code, string information, int lineNumber)
 void SAerror(unsigned int code, string information, string lineNumber)
 {
   SAerror(code, information, toInt(lineNumber));
+}
+
+
+
+
+/******************************************************************************
+ * Error handling functions
+ *****************************************************************************/
+
+/*!
+ * Some output in case an error has occured.
+ *
+ * \post all goals from #cleanup
+ * \post programm terminated
+ *
+ * \todo move this to debug.cc and debug.h
+ *
+ * \ingroup debug
+ */
+void error()
+{
+  trace("\nAn error has occured while parsing \"" + filename + "\"!\n\n");
+  trace(TRACE_WARNINGS, "-> Any output file might be in an undefinded state.\n");
+
+  cleanup();
+
+  if (log_filename != "")
+  {
+    trace("\nProgramme aborted due to error.\n\n");
+    trace("Please check logfile for detailed information!\n\n");
+  }
+
+  exit(1);
+}
+
+
+
+
+
+/*!
+ * Cleans up. Afterwards we should have an almost defined state.
+ *
+ * \post input file closed
+ * \post current output file closed
+ * \post log file closed
+ *
+ * \todo move this to debug.cc and debug.h
+ *
+ * \ingroup debug
+ */
+void cleanup()
+{
+  trace(TRACE_INFORMATION,"Cleaning up ...\n");
+
+  if ( filename != "<STDIN>" && frontend_in != NULL)
+  {
+    trace(TRACE_INFORMATION," + Closing input file: " + filename + "\n");
+    fclose(frontend_in);
+  }
+ 
+  if ( output != &cout && output != &clog && output != log_output && output != NULL )
+  {
+    trace(TRACE_INFORMATION," + Closing output file: " + output_filename + ".X\n");
+    (*output) << flush;
+    (static_cast<ofstream*>(output))->close();
+    delete(output);
+    output = NULL;
+  }
+ 
+  if ( log_output != &clog )
+  {
+    trace(TRACE_INFORMATION," + Closing log file: " + log_filename + "\n");
+    (*log_output) << flush;
+    (static_cast<ofstream*>(log_output))->close();
+    delete(log_output);
+    log_output = &cerr;
+  }
 }

@@ -29,16 +29,15 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2007/02/23 15:19:29 $
+ * \date    \$Date: 2007/03/04 14:31:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.46 $
+ * \version \$Revision: 1.47 $
  *
  * \ingroup conversion
- * \ingroup debug
  */
 
 
@@ -95,14 +94,6 @@ unsigned int toUInt(string s);
 
 /// returns the maximum of two unsigned ints
 unsigned int max(unsigned int a, unsigned int b);
-
-/// calls #cleanup() then exits
-void error();
-/// closes all open files and delete all pointers
-void cleanup();
-
-/// increases the index vector
-void next_index(vector<unsigned int> &current_index, const vector<unsigned int> &max_index);
 
 
 

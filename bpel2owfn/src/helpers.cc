@@ -29,13 +29,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2007/02/23 15:19:29 $
+ * \date    \$Date: 2007/03/04 14:31:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.73 $
+ * \version \$Revision: 1.74 $
  *
  * \ingroup conversion
  * \ingroup debug
@@ -205,119 +205,4 @@ unsigned int max(unsigned int a, unsigned int b)
     return a;
   else
     return b;
-}
-
-
-
-
-
-/******************************************************************************
- * Error handling functions
- *****************************************************************************/
-
-/*!
- * Some output in case an error has occured.
- *
- * \post all goals from #cleanup
- * \post programm terminated
- *
- * \todo move this to debug.cc and debug.h
- *
- * \ingroup debug
- */
-void error()
-{
-  trace("\nAn error has occured while parsing \"" + filename + "\"!\n\n");
-  trace(TRACE_WARNINGS, "-> Any output file might be in an undefinded state.\n");
-
-  cleanup();
-
-  if (log_filename != "")
-  {
-    trace("\nProgramme aborted due to error.\n\n");
-    trace("Please check logfile for detailed information!\n\n");
-  }
-
-  exit(1);
-}
-
-
-
-
-
-/*!
- * Cleans up. Afterwards we should have an almost defined state.
- *
- * \post input file closed
- * \post current output file closed
- * \post log file closed
- *
- * \todo move this to debug.cc and debug.h
- *
- * \ingroup debug
- */
-void cleanup()
-{
-  trace(TRACE_INFORMATION,"Cleaning up ...\n");
-
-  if ( filename != "<STDIN>" && frontend_in != NULL)
-  {
-    trace(TRACE_INFORMATION," + Closing input file: " + filename + "\n");
-    fclose(frontend_in);
-  }
- 
-  if ( output != &cout && output != &clog && output != log_output && output != NULL )
-  {
-    trace(TRACE_INFORMATION," + Closing output file: " + output_filename + ".X\n");
-    (*output) << flush;
-    (static_cast<ofstream*>(output))->close();
-    delete(output);
-    output = NULL;
-  }
- 
-  if ( log_output != &clog )
-  {
-    trace(TRACE_INFORMATION," + Closing log file: " + log_filename + "\n");
-    (*log_output) << flush;
-    (static_cast<ofstream*>(log_output))->close();
-    delete(log_output);
-    log_output = &cerr;
-  }
-}
-
-
-
-
-
-/******************************************************************************
- * Other functions
- *****************************************************************************/
-
-/*!
- * The function increases the indices in the vector and propagates resulting
- * carries. For example, if the index vector [3,2] is increased and the maximal
- * bounds are [5,2] the resulting vector is [4,1].
- *
- * \param current_index  vector holding the current indices
- * \param max_index      vector holding the upper bounds of the indices
- *
- * \post Index vector is increased according to the described rules.
- *
- * \invariant Each index lies between 1 and its maximal value, i.e., 1 and the
- *            maximal value can be reached.
- */
-void next_index(vector<unsigned int> &current_index, const vector<unsigned int> &max_index)
-{
-  assert(current_index.size() == max_index.size());
-
-  for (unsigned int i = 0; i < current_index.size(); i++)
-  {
-    if (current_index[i] < max_index[i])
-    {
-      current_index[i]++;
-      break;
-    }
-    else
-      current_index[i] = 1;
-  }
 }

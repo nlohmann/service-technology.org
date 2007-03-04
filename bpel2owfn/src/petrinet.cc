@@ -29,13 +29,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/03/02 09:28:45 $
+ * \date    \$Date: 2007/03/04 14:31:59 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.185 $
+ * \version \$Revision: 1.186 $
  *
  * \ingroup petrinet
  */
@@ -53,7 +53,17 @@
 
 #include "petrinet.h"
 #include "helpers.h"		// helper functions (setUnion, setDifference, max, toString)
+#include "bpel2owfn.h"
+
+#ifdef USING_BPEL2OWFN
 #include "ast-details.h"	// (class ASTE)
+#else
+#warning "using Petri Net API outside BPEL2oWFN"
+class ASTE; 			// forward declaration of class ASTE
+#ifndef PACKAGE_STRING
+#define PACKAGE_STRING "Petri Net API"
+#endif
+#endif
 
 
 

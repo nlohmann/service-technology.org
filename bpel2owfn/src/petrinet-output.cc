@@ -29,13 +29,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/02/23 13:51:18 $
+ * \date    \$Date: 2007/03/04 19:00:59 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.80 $
+ * \version \$Revision: 1.81 $
  *
  * \ingroup petrinet
  */
@@ -59,6 +59,7 @@
 #ifdef USING_BPEL2OWFN
 #include "ast-details.h"	// (class ASTE)
 #else
+#include "pnapi.h"
 #warning "using Petri Net API outside BPEL2oWFN"
 class ASTE; 			// forward declaration of class ASTE
 #ifndef PACKAGE_STRING

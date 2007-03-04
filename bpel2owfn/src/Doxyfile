@@ -20,8 +20,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/02/03 11:54:59 $ by $Author: nielslohmann $.
-# Version $Revision: 1.15 $
+# File last changed $Date: 2007/03/04 16:44:26 $ by $Author: nielslohmann $.
+# Version $Revision: 1.16 $
 
 #---------------------------------------------------------------------------
 # Project related configuration options
@@ -60,7 +60,7 @@ TAB_SIZE               = 8
 ALIASES                = 
 OPTIMIZE_OUTPUT_FOR_C  = YES
 OPTIMIZE_OUTPUT_JAVA   = NO
-BUILTIN_STL_SUPPORT    = YES
+BUILTIN_STL_SUPPORT    = NO
 DISTRIBUTE_GROUP_DOC   = NO
 SUBGROUPING            = YES
 #---------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann                                        *
+ * Copyright 2005, 2006, 2007 Niels Lohmann                                  *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/03/04 13:15:34 $
+ * \date    \$Date: 2007/03/04 13:35:43 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.86 $
+ * \version \$Revision: 1.87 $
  */
 %}
 
@@ -51,43 +51,43 @@
   BASIC ACTIVITIES
 ******************************************************************************/
 
-Empty -> [petrinet petrinetnew petrinetsmall:
+Empty -> [petrinetnew petrinetsmall:
   { PEmpty($0, kc_current_view_base); }
 ];
 
-AsynchronousInvoke -> [petrinet petrinetnew petrinetsmall:
+AsynchronousInvoke -> [petrinetnew petrinetsmall:
   { PAsynchronousInvoke($0, kc_current_view_base); }
 ];
 
-SynchronousInvoke -> [petrinet petrinetnew petrinetsmall:
+SynchronousInvoke -> [petrinetnew petrinetsmall:
   { PSynchronousInvoke($0, kc_current_view_base); }
 ];
 
-Receive -> [petrinet petrinetnew petrinetsmall:
+Receive -> [petrinetnew petrinetsmall:
   { PReceive($0, kc_current_view_base); }
 ];
 
-Reply -> [petrinet petrinetnew petrinetsmall:
+Reply -> [petrinetnew petrinetsmall:
   { PReply($0, kc_current_view_base); }
 ];
 
-Assign -> [petrinet petrinetnew petrinetsmall:
+Assign -> [petrinetnew petrinetsmall:
   { PAssign($0, kc_current_view_base); }
 ];
 
-Validate -> [petrinet petrinetnew petrinetsmall:
+Validate -> [petrinetnew petrinetsmall:
   { PValidate($0, kc_current_view_base); }
 ];
 
-WaitUntil -> [petrinet petrinetnew petrinetsmall:
+WaitUntil -> [petrinetnew petrinetsmall:
   { PWaitUntil($0, kc_current_view_base); }
 ];
 
-WaitFor -> [petrinet petrinetnew petrinetsmall:
+WaitFor -> [petrinetnew petrinetsmall:
   { PWaitFor($0, kc_current_view_base); }
 ];
 
-Throw -> [petrinet petrinetnew petrinetsmall:
+Throw -> [petrinetnew petrinetsmall:
   { PThrow($0, kc_current_view_base); }
 ];
 
@@ -95,7 +95,7 @@ Rethrow -> [petrinetnew:
   { PRethrow($0, kc_current_view_base); }
 ];
 
-Exit -> [petrinet petrinetnew petrinetsmall:
+Exit -> [petrinetnew petrinetsmall:
   { PExit($0, kc_current_view_base); }
 ];
 
@@ -115,35 +115,35 @@ CompensateScope -> [petrinetnew petrinetsmall:
   STRUCTURED ACTIVITIES
 ******************************************************************************/
 
-While -> [petrinet petrinetnew petrinetsmall:
+While -> [petrinetnew petrinetsmall:
   { PWhile($0, kc_current_view_base); }
 ];
 
-RepeatUntil -> [petrinet petrinetnew petrinetsmall:
+RepeatUntil -> [petrinetnew petrinetsmall:
   { PRepeatUntil($0, kc_current_view_base); }
 ];
 
-Sequence -> [petrinet petrinetnew petrinetsmall:
+Sequence -> [petrinetnew petrinetsmall:
   { PSequence($0, kc_current_view_base); }
 ];
 
-Flow -> [petrinet petrinetnew petrinetsmall:
+Flow -> [petrinetnew petrinetsmall:
   { PFlow($0, kc_current_view_base); }
 ];
 
-Switch -> [petrinet petrinetnew petrinetsmall:
+Switch -> [petrinetnew petrinetsmall:
   { PSwitch($0, kc_current_view_base); }
 ];
 
-Pick -> [petrinet petrinetnew petrinetsmall:
+Pick -> [petrinetnew petrinetsmall:
   { PPick($0, kc_current_view_base); }
 ];
 
-If -> [petrinet petrinetnew petrinetsmall:
+If -> [petrinetnew petrinetsmall:
   { PIf($0, kc_current_view_base); }
 ];
 
-ForEach -> [petrinet petrinetnew petrinetsmall:
+ForEach -> [petrinetnew petrinetsmall:
   { PForEach($0, kc_current_view_base); }
 ];
 
@@ -155,247 +155,17 @@ ForEach -> [petrinet petrinetnew petrinetsmall:
   SCOPE / PROCESS
 ******************************************************************************/
 
-Process -> [petrinet petrinetnew petrinetsmall:
+Process -> [petrinetnew petrinetsmall:
   { PProcess($0, kc_current_view_base);
 
     // clear global mappings
     ASTE_scopeNames.clear(); }
 ];
 
-Scope -> [petrinet petrinetnew petrinetsmall:
+Scope -> [petrinetnew petrinetsmall:
   { PScope($0, kc_current_view_base); }
-];
-
-StopInProcess -> [petrinet:
-  { PStop($0, kc_current_view_base); }
-];
-
-StopInScope -> [petrinet:
-  { PStop($0, kc_current_view_base); }
 ];
 
 userDefinedEventHandler -> [petrinetnew:
   { PEventHandlers($0, kc_current_view_base); }
 ];
-
-
-
-
-/******************************************************************************
-  COMPENSATE
-******************************************************************************/
-
-/*
- * The compensate patterns for the four described scnearios of Fig. 38-41:
- *  - <compensate /> in a compensation handler
- *  - <compensate /> in a fault handler
- *  - <compensate scope="C"/> in a compensation handler
- *  - <compensate scope="C"/> in a fault handler
- */
-
-/*
- * The <compensate/> activity as depicted in Fig. 38. As the context (embedded
- * in a compensation handler) is clear, the pattern is directly embedded to the
- * compensation handler of the current scope.
- */
-
-This=Compensate(a,_id) provided (ASTEmap[_id->value]->controlFlow == CHCF) ->
-  [petrinet:
-    {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
-      assert(This->id == _id->value);
-
-      Place *p1 = PN.newPlace(prefix + "initial");
-      Place *p2 = PN.newPlace(prefix + "running");
-      Place *p3 = PN.newPlace(prefix + "final");
-      Place *p4 = PN.newPlace(prefix + "stop");
-      Place *p5 = PN.newPlace(prefix + "comp");
-      Place *p6 = PN.newPlace(prefix + "done");
-      Place *p7 = PN.newPlace(prefix + "stopped");
-
-      Transition *t1 = PN.newTransition(prefix + "t1");
-      PN.newArc(p1, t1);
-      PN.newArc(t1, p2);
-      PN.newArc(t1, p5);
-
-      Transition *t2 = PN.newTransition(prefix + "t2");
-      PN.newArc(p2, t2);
-      PN.newArc(t2, p3);
-      PN.newArc(p6, t2);
-
-
-      // Transitions for the negative control flow.
-      Transition *t3 = stop(p1, "initial", prefix);
-      Transition *t4 = stop(p2, "running", prefix);
-      Transition *t5 = stop(p3, "final", prefix);
-
-
-      // Embed this <compensate /> activity in compensation handler.
-      PN.mergePlaces(p4, currentScope + "internal.compensationHandler.p10");
-      PN.mergePlaces(p6, currentScope + "internal.compensationHandler.p12");
-    }
-    a // standardElements
-    {
-      footer(This->id);
-    }
-  ]
-;
-
-
-
-
-
-/*
- * The <compensate/> activity as depicted in Fig. 39. As the context (embedded
- * in a fault handler) is clear, the pattern is directly embedded to the fault
- * handler of the current scope.
- */
-
-This=Compensate(a,_id) provided (ASTEmap[_id->value]->controlFlow == FHCF) ->
-  [petrinet:
-    {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
-      assert(This->id == _id->value);
-
-      Place *p1 = PN.newPlace(prefix + "initial");
-      Place *p2 = PN.newPlace(prefix + "running");
-      Place *p3 = PN.newPlace(prefix + "final");
-      Place *p4 = PN.newPlace(prefix + "stop");
-      Place *p5 = PN.newPlace(prefix + "ch_fh");
-      Place *p6 = PN.newPlace(prefix + "ch_out");
-      Place *p7 = PN.newPlace(prefix + "stopped");
-
-      Transition *t1 = PN.newTransition(prefix + "t1");
-      PN.newArc(p1, t1);
-      PN.newArc(t1, p2);
-      PN.newArc(t1, p5);
-
-      Transition *t2 = PN.newTransition(prefix + "t2");
-      PN.newArc(p2, t2);
-      PN.newArc(t2, p3);
-      PN.newArc(p6, t2);
-
-
-      // Transitions for the negative control flow.
-      Transition *t3 = stop(p1, "initial", prefix);
-      Transition *t4 = stop(p2, "running", prefix);
-      Transition *t5 = stop(p3, "final", prefix);
-
-
-      // Embed this <compensate /> activity in fault handler.
-      PN.mergePlaces(p5, currentScope + "faultHandler.ch_fh");
-      PN.mergePlaces(p6, currentScope + "faultHandler.ch_out");
-    }
-    a // standardElements
-    {
-      footer(This->id);
-    }
-  ]
-;
-
-
-
-
-
-/*
- * The <compensate scope="C"/> activity as depicted in Fig. 40. As the context
- * (embedded in a compensation handler) is clear, the pattern is directly
- * embedded to the compensation handler of the current scope.
- */
-
-This=CompensateScope(a,b,_id) provided (ASTEmap[_id->value]->controlFlow == CHCF) ->
-  [petrinet:
-    {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
-      assert(This->id == _id->value);
-
-      Place *p1 = PN.newPlace(prefix + "initial");
-      Place *p2 = PN.newPlace(prefix + "running");
-      Place *p3 = PN.newPlace(prefix + "final");
-      Place *p4 = PN.newPlace(prefix + "stop");
-      Place *p5 = PN.newPlace(prefix + "compScope");
-      Place *p6 = PN.newPlace(prefix + "scopeCompensated");
-      Place *p7 = PN.newPlace(prefix + "stopped");
-
-      Transition *t1 = PN.newTransition(prefix + "t1");
-      PN.newArc(p1, t1);
-      PN.newArc(t1, p2);
-      PN.newArc(t1, p5);
-
-      Transition *t2 = PN.newTransition(prefix + "t2");
-      PN.newArc(p2, t2);
-      PN.newArc(t2, p3);
-      PN.newArc(p6, t2);
-
-
-      // Transitions for the negative control flow.
-      Transition *t3 = stop(p1, "initial", prefix);
-      Transition *t4 = stop(p2, "running", prefix);
-      Transition *t5 = stop(p3, "final", prefix);
-
-
-      // Embed this <compensate scope="C"/> activity in compensation handler.
-      PN.mergePlaces(p4, currentScope + "internal.compensationHandler.p10");
-    }
-    a // standardElements
-    {
-      footer(This->id);
-    }
-  ]
-;
-
-
-
-
-
-/*
- * The <compensate scope="C"/> activity as depicted in Fig.41. As the context
- * (embedded in a fault handler) is clear, the pattern is directly embedded to
- * the fault handler of the current scope.
- */
-
-This=CompensateScope(a,b,_id) provided (ASTEmap[_id->value]->controlFlow == FHCF) ->
-  [petrinet:
-    {
-      header(This->id);
-      string prefix = toString(This->id) + ".internal.";
-      assert(This->id == _id->value);
-
-      Place *p1 = PN.newPlace(prefix + "initial");
-      Place *p2 = PN.newPlace(prefix + "running");
-      Place *p3 = PN.newPlace(prefix + "final");
-      Place *p4 = PN.newPlace(prefix + "stop");
-      Place *p5 = PN.newPlace(prefix + "ch_in");
-      Place *p6 = PN.newPlace(prefix + "compensated");
-      Place *p7 = PN.newPlace(prefix + "stopped");
-
-      Transition *t1 = PN.newTransition(prefix + "t1");
-      PN.newArc(p1, t1);
-      PN.newArc(t1, p2);
-      PN.newArc(t1, p5);
-
-      Transition *t2 = PN.newTransition(prefix + "t2");
-      PN.newArc(p2, t2);
-      PN.newArc(t2, p3);
-      PN.newArc(p6, t2);
-
-
-      // Transitions for the negative control flow.
-      Transition *t3 = stop(p1, "initial", prefix);
-      Transition *t4 = stop(p2, "running", prefix);
-      Transition *t5 = stop(p3, "final", prefix);
-
-
-      // Embed this <compensate scope="C"/> activity in fault handler.
-      PN.mergePlaces(p5, currentScope + "faultHandler.ch_fh");
-      PN.mergePlaces(p6, currentScope + "faultHandler.ch_out");
-    }
-    a // standardElements
-    {
-      footer(This->id);
-    }
-  ]
-;

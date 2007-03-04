@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/03/04 15:10:58 $
+ * \date    \$Date: 2007/03/04 16:42:31 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.3 $
  */
 %}
 
@@ -152,7 +152,7 @@ ForEach -> [petrinetnew petrinetsmall:
 
 
 /******************************************************************************
-  SCOPE / PROCESS
+  COPE / PROCESS
 ******************************************************************************/
 
 Process -> [petrinetnew petrinetsmall:
@@ -166,14 +166,18 @@ Scope -> [petrinetnew petrinetsmall:
   { PScope($0, kc_current_view_base); }
 ];
 
-userDefinedEventHandler -> [petrinetnew:
-  { PEventHandlers($0, kc_current_view_base); }
-];
-
-userDefinedFaultHandler -> [petrinetnew:
+FaultHandlers -> [petrinetnew:
   { PFaultHandlers($0, kc_current_view_base); }
 ];
 
 TerminationHandler -> [petrinetnew:
   { PTerminationHandler($0, kc_current_view_base); }
+];
+
+CompensationHandler -> [petrinetnew:
+  { PCompensationHandler($0, kc_current_view_base); }
+];
+
+EventHandlers -> [petrinetnew:
+  { PEventHandlers($0, kc_current_view_base); }
 ];

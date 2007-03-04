@@ -29,7 +29,7 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/04 15:10:58 $
+ * \date    \$Date: 2007/03/04 16:42:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  */
 %}
 
@@ -82,7 +82,7 @@ extern set<string> ASTE_variableNames;
 
 void PFaultHandlers(impl_tFaultHandlers* abstract_phylum, uview current_view)
 {
-  impl_tFaultHandlers_userDefinedFaultHandler* phylum = static_cast<impl_tFaultHandlers_userDefinedFaultHandler*>(abstract_phylum);
+  impl_tFaultHandlers_FaultHandlers* phylum = static_cast<impl_tFaultHandlers_FaultHandlers*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id, true);
@@ -261,13 +261,28 @@ void PTerminationHandler(impl_tTerminationHandler* abstract_phylum, uview curren
   COMPENSATION HANDLER
 ******************************************************************************/
 
-userDefinedCompensationHandler(a, _id) ->
-  [petrinetnew:
-    { header(_id->value, true); }
-    a
-    { footer(_id->value, true); }
-  ]
-;
+void PCompensationHandler(impl_tCompensationHandler* abstract_phylum, uview current_view)
+{
+  impl_tCompensationHandler_CompensationHandler* phylum = static_cast<impl_tCompensationHandler_CompensationHandler*>(abstract_phylum);
+  assert(phylum != NULL);
+
+  header(phylum->id, true);
+
+  switch(current_view)
+  {
+    case(petrinetnew_enum):
+      {
+	// unparse inner activity
+	phylum->activity_1->unparse(pseudoPrinter, current_view);
+
+	break;
+      }
+
+    default: { /* no pattern in this case */ }
+  }
+
+  footer(phylum->id, true);
+}
 
 
 
@@ -279,7 +294,7 @@ userDefinedCompensationHandler(a, _id) ->
 
 void PEventHandlers(impl_tEventHandlers* abstract_phylum, uview current_view)
 {
-  impl_tEventHandlers_userDefinedEventHandler* phylum = static_cast<impl_tEventHandlers_userDefinedEventHandler*>(abstract_phylum);
+  impl_tEventHandlers_EventHandlers* phylum = static_cast<impl_tEventHandlers_EventHandlers*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id, true);

@@ -31,7 +31,7 @@
  * 
  * \since   2005-10-03
  *
- * \date    \$Date: 2007/03/04 13:03:45 $
+ * \date    \$Date: 2007/03/04 16:42:31 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.164 $
+ * \version \$Revision: 1.165 $
  */
 %}
 
@@ -79,16 +79,9 @@ tProcess:
       tFaultHandlers
       tCompensationHandler
       tEventHandlers
-      tStop
       activity
       integer
       )
-;
-
-
-tStop:
-  StopInProcess()
-| StopInScope()
 ;
 
 
@@ -152,15 +145,14 @@ tPartner:
 ******************************************************************************/
 
 tFaultHandlers:
-  userDefinedFaultHandler(tCatch_list tCatchAll integer)
-| implicitFaultHandler(integer)
+  standardFaultHandlers(integer)
+| FaultHandlers(tCatch_list tCatchAll integer)
 ;
 
 tCatch_list: list tCatch;
 
 tCatch:
   Catch(activity integer)
-//| NoCatch()
 ;
 
 tCatchAll:
@@ -170,12 +162,32 @@ tCatchAll:
 
 
 /******************************************************************************
+  TERMINATION HANDLER
+******************************************************************************/
+
+tTerminationHandler:
+  standardTerminationHandler(integer)
+| TerminationHandler(activity integer)
+;
+
+
+/******************************************************************************
+  COMPENSATION HANDLERS
+******************************************************************************/
+
+tCompensationHandler:
+  standardCompensationHandler(integer)
+| CompensationHandler(activity integer)
+;
+
+
+/******************************************************************************
   EVENT HANDLERS
 ******************************************************************************/
 
 tEventHandlers:
-  implicitEventHandler(integer)
-| userDefinedEventHandler(tOnMessage_list tOnAlarm_list integer)
+  emptyEventHandlers(integer)
+| EventHandlers(tOnMessage_list tOnAlarm_list integer)
 ;
 
 // onMessage is called onEvent in WS-BPEL 2.0
@@ -189,20 +201,6 @@ tOnAlarm_list: list tOnAlarm;
 
 tOnAlarm:
   OnAlarm(activity integer)
-;
-
-
-/******************************************************************************
-  COMPENSATION HANDLERS
-******************************************************************************/
-
-tCompensationHandler:
-  implicitCompensationHandler(integer)
-| userDefinedCompensationHandler(activity integer)
-  {
-    bool hasCompensateWithoutScope = false;
-    bool hasCompensateWithScope = false;
-  }
 ;
 
 
@@ -494,21 +492,10 @@ tScope:
       tTerminationHandler
       tEventHandlers
       tCorrelationSet_list
-      tStop
       activity
       tPartnerLink_list
       integer
       )
-;
-
-
-/******************************************************************************
-  TERMINATION HANDLER
-******************************************************************************/
-
-tTerminationHandler:
-  standardTerminationHandler(integer)
-| TerminationHandler(activity integer)
 ;
 
 
@@ -593,16 +580,16 @@ expression:
 %ctor Process()				{ CTOR(K_PROCESS) }
 %ctor PartnerLink()			{ CTOR(K_PARTNERLINK) }
 %ctor Partner()				{ CTOR(K_PARTNER) }
-%ctor implicitFaultHandler()		{ CTOR(K_FAULTHANDLERS) }
-%ctor userDefinedFaultHandler()		{ CTOR(K_FAULTHANDLERS) }
+%ctor standardFaultHandlers()		{ CTOR(K_FAULTHANDLERS) }
+%ctor FaultHandlers()			{ CTOR(K_FAULTHANDLERS) }
 %ctor Catch()				{ CTOR(K_CATCH) }
 %ctor CatchAll()			{ CTOR(K_CATCHALL) }
-%ctor implicitEventHandler()		{ CTOR(K_EVENTHANDLERS) }
-%ctor userDefinedEventHandler()		{ CTOR(K_EVENTHANDLERS) }
+%ctor emptyEventHandlers()		{ CTOR(K_EVENTHANDLERS) }
+%ctor EventHandlers()			{ CTOR(K_EVENTHANDLERS) }
 %ctor OnMessage()			{ CTOR(K_ONMESSAGE) }
 %ctor OnAlarm()				{ CTOR(K_ONALARM) }
-%ctor implicitCompensationHandler()	{ CTOR(K_COMPENSATIONHANDLER) }
-%ctor userDefinedCompensationHandler()	{ CTOR(K_COMPENSATIONHANDLER) }
+%ctor standardCompensationHandler()	{ CTOR(K_COMPENSATIONHANDLER) }
+%ctor CompensationHandler()		{ CTOR(K_COMPENSATIONHANDLER) }
 %ctor Variable()			{ CTOR(K_VARIABLE) }
 %ctor CorrelationSet()			{ CTOR(K_CORRELATIONSET) }
 %ctor Correlation()			{ CTOR(K_CORRELATION) }

@@ -1,5 +1,5 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      *
+ * Copyright 2005, 2006, 2007 Niels Lohmann, Christian Gierds                *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
@@ -32,7 +32,7 @@
  * 
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/03/04 13:03:45 $
+ * \date    \$Date: 2007/03/04 16:42:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.69 $
+ * \version \$Revision: 1.70 $
  */
 
 %}
@@ -52,7 +52,7 @@
   PROCESS
 ******************************************************************************/
 
-Process(a,b,c,d,e,f,g,h,i,_id) ->
+Process(a,b,c,d,e,f,g,i,_id) ->
   [xml: { inup(); } "<process id=\"" _id "\"" { listAttributes( _id ); } ">\n" 
   
   { if (a->length() == 0) }
@@ -75,7 +75,7 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
   { else }
     ${ { inup(); } "<correlationSets>\n" d { indown(); } "</correlationSets>\n" $}
 
-  e f g h i { indown(); } "</process>\n"]
+  e f g i { indown(); } "</process>\n"]
 ;
 
 
@@ -101,11 +101,7 @@ Partner(a,_id) ->
   FAULT HANDLERS
 ******************************************************************************/
 
-implicitFaultHandler(_id) ->
-  [xml: ]
-;
-  
-userDefinedFaultHandler(a,b,_id) ->
+FaultHandlers(a,b,_id) ->
   [xml: { inup(); } "<faultHandlers id=\"" _id "\">\n" a b { indown(); } "</faultHandlers>\n"]
 ;
 
@@ -122,11 +118,11 @@ CatchAll(a,_id) ->
   EVENT HANDLERS
 ******************************************************************************/
 
-implicitEventHandler(_id) ->
+emptyEventHandlers(_id) ->
   [xml: ]
 ;
-  
-userDefinedEventHandler(a,b,_id) ->
+
+EventHandlers(a,b,_id) ->
   [xml: { inup(); } "<eventHandlers id=\"" _id "\">\n" a b { indown(); } "</eventHandlers>\n"]
 ;
 
@@ -154,12 +150,8 @@ OnAlarm(a,_id) ->
 /******************************************************************************
   COMPENSATION HANDLERS
 ******************************************************************************/
-
-implicitCompensationHandler(_id) ->
-  [xml: ]
-;
-  
-userDefinedCompensationHandler(a,_id) ->
+ 
+CompensationHandler(a,_id) ->
   [xml: { inup(); } "<compensationHandler id=\"" _id "\">\n" a { indown(); } "</compensationHandler>\n"]
 ;
 
@@ -455,7 +447,7 @@ Link(_id) ->
   SCOPE
 ******************************************************************************/
 
-Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
+Scope(a,b,c,d,e,f,g,i,j,_id) ->
   [xml: { inup(); } "<scope id=\"" _id "\"" { listAttributes( _id ); } ">\n" 
   
   a

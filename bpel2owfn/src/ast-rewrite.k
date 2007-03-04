@@ -29,14 +29,14 @@
  * 
  * \since   2006/10/11
  *
- * \date    \$Date: 2007/03/04 13:40:41 $
+ * \date    \$Date: 2007/03/04 16:42:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  */
 %}
 
@@ -64,7 +64,7 @@ activityInvoke(
     my_tCorrelation_list,
     NiltCatch_list(),
     NoCatchAll(),
-    implicitCompensationHandler(a),
+    standardCompensationHandler(a),
     my_tToPart_list,
     my_tFromPart_list,
     my_integer
@@ -106,7 +106,7 @@ activityInvoke(
     Scope(
       my_standardElements,
       NiltVariable_list(),
-      userDefinedFaultHandler(
+      FaultHandlers(
         my_tCatchList,
         my_tCatchAll,
         mkinteger(0)
@@ -115,11 +115,10 @@ activityInvoke(
       standardTerminationHandler(
         mkinteger(0)
       ),
-      implicitEventHandler(
+      emptyEventHandlers(
         mkinteger(0)
       ),
       NiltCorrelationSet_list(),
-      StopInScope(),
       activityInvoke(
         Invoke(
           NoStandardElements(),
@@ -190,9 +189,9 @@ standardTerminationHandler(_id)
 /*
  * Default fault handler (cf. Sect. 12.5.1 in WS-BPEL 2.0)
  */
-implicitFaultHandler(_id) ->
+standardFaultHandlers(_id) ->
 < implicit:
-  userDefinedFaultHandler(
+  FaultHandlers(
     NiltCatch_list(),
     CatchAll(
       activitySequence(
@@ -229,9 +228,9 @@ implicitFaultHandler(_id) ->
  * Default compensation handler (cf. Sect. 12.5.1 in WS-BPEL 2.0)
  */
 
-implicitCompensationHandler(_id) ->
+standardCompensationHandler(_id) ->
 < implicit:
-  userDefinedCompensationHandler(
+  CompensationHandler(
     activityCompensate(
       Compensate(
         NoStandardElements(),
@@ -266,7 +265,7 @@ activityScope(
   Scope(
     my_standardElements,
     my_variables,
-    userDefinedFaultHandler(
+    FaultHandlers(
       NiltCatch_list(),
       NoCatchAll(),
       my_fh_integer
@@ -275,7 +274,6 @@ activityScope(
     my_terminationHandler,
     my_eventHandler,
     my_correlationSets,
-    my_stop,
     activityInvoke(myinvoke),
     my_partnerlinks,
     my_integer
@@ -287,14 +285,13 @@ activityScope(
     Scope(
       my_standardElements,
       my_variables,
-      implicitFaultHandler(
+      standardFaultHandlers(
         my_fh_integer
       ),
       my_compensationHandler,
       my_terminationHandler,
       my_eventHandler,
       my_correlationSets,
-      my_stop,
       activityInvoke(myinvoke),
       my_partnerlinks,
       my_integer

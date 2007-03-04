@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/03/04 13:03:45 $
+ * \date    \$Date: 2007/03/04 16:42:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.130 $
+ * \version \$Revision: 1.131 $
  */
 %}
 
@@ -52,7 +52,7 @@
   PROCESS
 ******************************************************************************/
 
-Process(a,b,c,d,e,f,g,h,i,_id) ->
+Process(a,b,c,d,e,f,g,i,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
@@ -80,7 +80,7 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
     }
     a b c d
     i // inner activity
-    e f g h
+    e f g
     {
       // collect enclosed source links
       assert(ASTEmap[i->id] != NULL);
@@ -98,12 +98,6 @@ Process(a,b,c,d,e,f,g,h,i,_id) ->
 
       enterConflictingActivities( innerIds, faultIds );
       enterConflictingActivities( faultIds, compIds );
-
-      // add an attribute to the compensation handler
-      if(PPhasCompensateMap[myid] == 1)
-        f->hasCompensateWithoutScope = true;
-      if(PPhasCompensateMap[myid] == 2)
-        f->hasCompensateWithScope = true;
 
       // pass list of enclosed scopes to the compensation handler
       ASTEmap[f->id]->enclosedScopes = myself->enclosedScopes;
@@ -212,7 +206,7 @@ Partner(a,_id) ->
   FAULT HANDLERS
 ******************************************************************************/
 
-userDefinedFaultHandler(a,b,_id) ->
+FaultHandlers(a,b,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
@@ -288,7 +282,7 @@ userDefinedFaultHandler(a,b,_id) ->
   ]
 ;
 
-implicitFaultHandler(_id) ->
+standardFaultHandlers(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
@@ -356,7 +350,7 @@ CatchAll(a,_id) ->
   EVENT HANDLERS
 ******************************************************************************/
 
-implicitEventHandler(_id) ->
+emptyEventHandlers(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
@@ -370,7 +364,7 @@ implicitEventHandler(_id) ->
   ]
 ;
 
-userDefinedEventHandler(a,b,_id) ->
+EventHandlers(a,b,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
@@ -485,7 +479,7 @@ OnAlarm(a,_id) ->
   COMPENSATION HANDLERS
 ******************************************************************************/
 
-implicitCompensationHandler(_id) ->
+standardCompensationHandler(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
@@ -499,7 +493,7 @@ implicitCompensationHandler(_id) ->
   ]
 ;
 
-userDefinedCompensationHandler(a,_id) ->
+CompensationHandler(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
@@ -1771,7 +1765,7 @@ ForEach(a,b,c,d,e,_id) ->
       // trigger [SA00076]
       with (e)
       {
-        e=Scope(*,_variables,*,*,*,*,*,*,*,*,*):
+        e=Scope(*,_variables,*,*,*,*,*,*,*,*):
           {
             foreach (variable=Variable(_id2); tVariable_list _variables)
             {
@@ -1800,7 +1794,7 @@ ForEach(a,b,c,d,e,_id) ->
   SCOPE
 ******************************************************************************/
 
-Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
+Scope(a,b,c,d,e,f,g,i,j,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
@@ -1866,14 +1860,8 @@ Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
     }
     a b j g
     i // inner activity
-    c d e f h
+    c d e f
     {
-      // add an attribute to the compensation handler
-      if(PPhasCompensateMap[myid] == 1)
-        d->hasCompensateWithoutScope = true;
-      if(PPhasCompensateMap[myid] == 2)
-        d->hasCompensateWithScope = true;
-
       set< unsigned int > innerIds = ASTEmap[ i->id ]->enclosedActivities;
       innerIds.insert( i->id );
       set< unsigned int > faultIds = ASTEmap[ c->id ]->enclosedActivities;

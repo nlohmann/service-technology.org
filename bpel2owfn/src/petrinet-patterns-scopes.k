@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/03/04 13:47:27 $
+ * \date    \$Date: 2007/03/04 16:42:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  */
 %}
 
@@ -526,7 +526,7 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
 	// embed compensation handler
 	with (d)
 	{
-	  d = userDefinedCompensationHandler(ch_activity, *):
+	  d = CompensationHandler(ch_activity, *):
 	  {
 	    PN.mergePlaces((prefix + "ch_initial"), (toString(ch_activity->id) + ".initial"));
 	    PN.mergePlaces((prefix + "ch_stop"),    (toString(ch_activity->id) + ".stop"));

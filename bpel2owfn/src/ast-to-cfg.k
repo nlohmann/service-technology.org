@@ -32,7 +32,7 @@
  *         
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/03/04 13:03:45 $
+ * \date    \$Date: 2007/03/04 16:42:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.51 $
+ * \version \$Revision: 1.52 $
  */
 %}
 
@@ -54,7 +54,7 @@
   PROCESS
 ******************************************************************************/
 
-Process(a,b,c,d,e,f,g,h,i,j) ->
+Process(a,b,c,d,e,f,g,i,j) ->
   [cfg: {
           // reset data structures
 	  cfgMap = map<std::string, CFGBlock *>();
@@ -127,7 +127,7 @@ Process(a,b,c,d,e,f,g,h,i,j) ->
   FAULT HANDLERS
 ******************************************************************************/
 
-This=userDefinedFaultHandler(a,catchAll = CatchAll(b,c),_id) ->
+This=FaultHandlers(a,catchAll = CatchAll(b,c),_id) ->
   [cfg: {
 	  trace(TRACE_DEBUG, "[CFG] FaultHandler (user defined)\n");
 	  CFGBlock* firstBlock = new CFGBlock(CFGFaultHandler, $0->id, "FaultHandler_begin"); 
@@ -162,7 +162,7 @@ This=userDefinedFaultHandler(a,catchAll = CatchAll(b,c),_id) ->
 	}
   ];
 
-This=userDefinedFaultHandler(a,NoCatchAll(),_id) ->
+This=FaultHandlers(a,NoCatchAll(),_id) ->
   [cfg: {
 	  trace(TRACE_DEBUG, "[CFG] FaultHandler (user defined, no catchAll)\n");
 	  CFGBlock * firstBlock = new CFGBlock(CFGFaultHandler, $0->id, "FaultHandler_begin"); 
@@ -187,7 +187,7 @@ This=userDefinedFaultHandler(a,NoCatchAll(),_id) ->
 	}
   ];
 
-implicitFaultHandler(_id) ->
+standardFaultHandlers(_id) ->
   [cfg: {
 	  trace(TRACE_DEBUG, "[CFG] FaultHandler (implicit)\n");
 	  CFGBlock * block = new CFGBlock(CFGFaultHandler, $0->id, "implicitFaultHandler"); 
@@ -200,7 +200,7 @@ implicitFaultHandler(_id) ->
   EVENT HANDLERS
 ******************************************************************************/
 
-userDefinedEventHandler(a,b,_id) ->
+EventHandlers(a,b,_id) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] EventHandler (user defined)\n");
 	  CFGBlock * firstBlock = new CFGBlock(CFGPick, $0->id, "EventHandler_begin"); 
@@ -249,7 +249,7 @@ userDefinedEventHandler(a,b,_id) ->
   ]
 ;
 
-implicitEventHandler(_id) ->
+emptyEventHandlers(_id) ->
   [cfg: {
 	  trace(TRACE_DEBUG, "[CFG] EventHandler (implicit)\n");
 	  CFGBlock * block = new CFGBlock(CFGEventHandler, $0->id, "implicitEventHandler"); 
@@ -263,7 +263,7 @@ implicitEventHandler(_id) ->
   COMPENSATION HANDLERS
 ******************************************************************************/
 
-userDefinedCompensationHandler(a,_id) ->
+CompensationHandler(a,_id) ->
   [cfg: {
 	  trace(TRACE_DEBUG, "[CFG] CompensationHandler (user defined)\n");
 	  CFGBlock * firstBlock = new CFGBlock(CFGCompensationHandler, $0->id, "CompensationHandler_begin"); 
@@ -284,7 +284,7 @@ userDefinedCompensationHandler(a,_id) ->
 
   ];
 
-implicitCompensationHandler(_id) ->
+standardCompensationHandler(_id) ->
   [cfg: {
 	  trace(TRACE_DEBUG, "[CFG] CompensationHandler (implicit)\n");
 	  CFGBlock * block = new CFGBlock(CFGCompensationHandler, $0->id, "implicitCompensationHandler"); 
@@ -943,7 +943,7 @@ Pick(a,b,c,d) ->
   SCOPE
 ******************************************************************************/
 
-Scope(a,b,c,d,e,f,g,h,i,j,_id) ->
+Scope(a,b,c,d,e,f,g,i,j,_id) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Scope\n");
 	  CFGBlock * firstBlock = new CFGBlock(CFGScope, $0->id, "Scope_begin"); 

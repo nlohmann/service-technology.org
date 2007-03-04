@@ -541,8 +541,8 @@ building GNU BPEL2oWFN:
 @itemize
 @item Intel Pentium M processor, 1.60 GHz
 @item 2 GB RAM
-@item Microsoft Windows XP Home Edition Service Pack 2
-@item Cygwin with cygwin.dll version 1.5.23-2
+@item Microsoft Windows Vista Business
+@item Cygwin with cygwin.dll version 1.5.24-2
 @item @acronym{GNU} Compiler Collection 3.4.4 (cygming special, gdc 0.12, using dmd 0.125)
 @item Flex version 2.5.4
 @item @acronym{GNU} Bison version 2.3

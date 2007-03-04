@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/03/04 16:42:31 $
+ * \date    \$Date: 2007/03/04 17:44:40 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  */
 %}
 
@@ -152,7 +152,7 @@ ForEach -> [petrinetnew petrinetsmall:
 
 
 /******************************************************************************
-  COPE / PROCESS
+  SCOPE / PROCESS
 ******************************************************************************/
 
 Process -> [petrinetnew petrinetsmall:
@@ -165,6 +165,14 @@ Process -> [petrinetnew petrinetsmall:
 Scope -> [petrinetnew petrinetsmall:
   { PScope($0, kc_current_view_base); }
 ];
+
+
+
+
+
+/******************************************************************************
+  HANDLERS
+******************************************************************************/
 
 FaultHandlers -> [petrinetnew:
   { PFaultHandlers($0, kc_current_view_base); }
@@ -180,4 +188,20 @@ CompensationHandler -> [petrinetnew:
 
 EventHandlers -> [petrinetnew:
   { PEventHandlers($0, kc_current_view_base); }
+];
+
+
+
+
+
+/******************************************************************************
+  STANDARD ELEMENTS
+******************************************************************************/
+
+StandardElements(NiltTarget_list(), NiltSource_list(), jc) -> [petrinetnew petrinetsmall:
+  { PLinkWrapper0($0, kc_current_view_base); }
+];
+
+StandardElements(NiltTarget_list(), a, jc) -> [petrinetnew petrinetsmall:
+  { PLinkWrapper1($0, kc_current_view_base); }
 ];

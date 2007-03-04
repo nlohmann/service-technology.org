@@ -1,112 +1,211 @@
-/*
- * This file contains the wrappers for the standard elements
+/*****************************************************************************\
+ * Copyright 2007 Niels Lohmann                                              *
+ *                                                                           *
+ * This file is part of GNU BPEL2oWFN.                                       *
+ *                                                                           *
+ * GNU BPEL2oWFN is free software; you can redistribute it and/or modify it  *
+ * under the terms of the GNU General Public License as published by the     *
+ * Free Software Foundation; either version 2 of the License, or (at your    *
+ * option) any later version.                                                *
+ *                                                                           *
+ * GNU BPEL2oWFN is distributed in the hope that it will be useful, but      *
+ * WITHOUT ANY WARRANTY; without even the implied warranty of                *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General  *
+ * Public License for more details.                                          *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License along   *
+ * with GNU BPEL2oWFN; see file COPYING. if not, write to the Free Software  *
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. *
+\*****************************************************************************/
+
+%{
+/*!
+ * \file    petrinet-patterns-links.cc
+ *
+ * \brief   Petri net patterns for the link wrappers
+ *
+ * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nielslohmann $ 
+ * 
+ * \since   2007-03-04
+ *
+ * \date    \$Date: 2007/03/04 17:44:40 $
+ * 
+ * \note    This file is part of the tool BPEL2oWFN and was created during the
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
+ *
+ * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
+ *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
+ *
+ * \version \$Revision: 1.2 $
  */
+%}
+
+
+%{ HEADER
+/*!
+ * \file petrinet-patterns-links.h
+ * \brief Petri net patterns for the link wrappers
+ *
+ * See \ref petrinet-patterns-links.cc for more information.
+ */
+%}
+
+%{
+#include "ast-config.h"
+#include "helpers.h"
+#include "ast-tools.h"
+#include "ast-details.h"
+#include "options.h"
+
+using std::cerr;
+using std::endl;
+
+extern PetriNet PN;
+extern map<unsigned int, ASTE*> ASTEmap;
+extern string currentScope;
+
+extern set<string> ASTE_inputChannels;
+extern set<string> ASTE_outputChannels;
+extern set<string> ASTE_linkNames;
+extern set<string> ASTE_variableNames;
+%}
 
 
 
 
 
-
-/******************************************************************************
-  SMALL PATTERNS (COMMUNICATION ONLY)
-******************************************************************************/
-
-This=StandardElements(NiltTarget_list(), NiltSource_list(), jc) ->
-  [petrinetsmall:
-    {
-      string prefix = toString(This->parentId) + ".";
-      string newPrefix = toString(This->parentId) + ".internal";
-
-      Place *p1 = PN.newPlace(prefix + "initial");
-      Place *p2 = PN.newPlace(prefix + "final");
-
-      // Embed the inner activity.
-      PN.mergePlaces(p1, newPrefix + ".initial");
-      PN.mergePlaces(p2, newPrefix + ".final");
-    }
-  ]
-;
-
-
-
-
-
-/******************************************************************************
- * Figure 22: Pattern for an activity that is source of links.
+/*****************************************************************************
+ * WRAPPER PATTERN 0                                                         *
+ * activity has neither incoming nor outgoing links                          *
  *****************************************************************************/
 
-This=StandardElements(NiltTarget_list(), a, jc) ->
-  [petrinetsmall:
+void PLinkWrapper0(impl_standardElements* abstract_phylum, uview current_view)
+{
+  impl_standardElements_StandardElements* phylum = static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
+  assert(phylum != NULL);
+
+  string prefix = toString(phylum->parentId) + ".";
+  string newPrefix = toString(phylum->parentId) + ".internal";
+
+  trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern: no links" + "\n");
+
+  // Add new interface places.
+  Place *p1 = PN.newPlace(prefix + "initial");
+  Place *p2 = PN.newPlace(prefix + "final");
+  Place *p3 = NULL;
+  Place *p4 = NULL;
+  if (current_view != petrinetsmall_enum)
+  {
+    p3 = PN.newPlace(prefix + "stop");
+    p4 = PN.newPlace(prefix + "stopped");
+  }
+
+  // Embed the inner activity.
+  PN.mergePlaces(p1, newPrefix + ".initial");
+  PN.mergePlaces(p2, newPrefix + ".final");
+  if (current_view != petrinetsmall_enum)
+  {
+    PN.mergePlaces(p3, newPrefix + ".stop");
+    PN.mergePlaces(p4, newPrefix + ".stopped");
+  }
+}
+
+
+
+
+
+/*****************************************************************************
+ * WRAPPER PATTERN 1                                                         *
+ * activity has outgoing links                                               *
+ *****************************************************************************/
+
+void PLinkWrapper1(impl_standardElements* abstract_phylum, uview current_view)
+{
+  impl_standardElements_StandardElements* phylum = static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
+  assert(phylum != NULL);
+
+  string prefix = toString(phylum->parentId) + ".";
+  string newPrefix = toString(phylum->parentId) + ".internal";
+
+  trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern: outgoing links" + "\n");
+
+  // Add new interface places.
+  Place *p1 = PN.newPlace(prefix + "initial");
+  Place *p2 = PN.newPlace(prefix + "done");
+  Place *p3 = PN.newPlace(prefix + "final");
+  Place *p6 = NULL;
+  Place *p7 = NULL;
+  if (current_view != petrinetsmall_enum)
+  {
+    p6 = PN.newPlace(prefix + "stop");
+    p7 = PN.newPlace(prefix + "stopped");
+
+    Transition *tf = stop(p3, "final", prefix);
+  }
+
+
+  unsigned int linkCounter = 1;
+  if (parameters[P_XOR] && (phylum->tSource_list_1->length() > 1))
+  {
+    // Set the outgoing links (XOR given).
+    foreach (source; tSource_list phylum->tSource_list_1)
     {
-      trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 22 (new)\n");
-      string prefix = toString(This->parentId) + ".";
-      string newPrefix = toString(This->parentId) + ".internal";
+      Transition *t1 = PN.newTransition(prefix + "setLinks" + toString(linkCounter++));
+      PN.newArc(p2, t1);
+      PN.newArc(t1, p3);
 
-      Place *p1 = PN.newPlace(prefix + "initial");
-      Place *p2 = PN.newPlace(prefix + "done");
-      Place *p3 = PN.newPlace(prefix + "final");
+      Place *p4 = PN.findPlace("link." + ASTEmap[source->id]->linkName);
+      PN.newArc(t1, p4);
 
-
-      unsigned int linkCounter = 1;
-      if (parameters[P_XOR] && (a->length() > 1))
+      foreach (source2; tSource_list phylum->tSource_list_1)
       {
-	// Set the outgoing links (XOR given).
-	foreach (source; tSource_list a)
+	if (ASTEmap[source2->id]->linkName != ASTEmap[source->id]->linkName)
 	{
-  	  Transition *t1 = PN.newTransition(prefix + "setLinks" + toString(linkCounter++));
-    	  PN.newArc(p2, t1);
-      	  PN.newArc(t1, p3);
-
-          Place *p4 = PN.findPlace("link." + ASTEmap[source->id]->linkName);
-	  PN.newArc(t1, p4);
-
-          foreach (source2; tSource_list a)
-          {
-            if (ASTEmap[source2->id]->linkName != ASTEmap[source->id]->linkName)
-            {
-              Place *p5 = PN.findPlace("!link." + ASTEmap[source2->id]->linkName);
-	      PN.newArc(t1, p5);
-            }
-          }
-
-          string givenTransitionCondition = ASTEmap[source->id]->attributes["transitionCondition"];
-          if (givenTransitionCondition != "" && givenTransitionCondition != "true")
-          {
-            cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
-            cerr << "Using XOR instead." << endl << endl;
-          }
-        }
-      }
-      else
-      {
-  	Transition *t1 = PN.newTransition(prefix + "setLinks");
-    	PN.newArc(p2, t1);
-      	PN.newArc(t1, p3);
-
-	// Set the outgoing links (standard transition condition expected).
-	foreach (source; tSource_list a)
-	{
-          Place *p4 = PN.findPlace("link." + ASTEmap[source->id]->linkName);
-	  PN.newArc(t1, p4);
-
-          string givenTransitionCondition = ASTEmap[source->id]->attributes["transitionCondition"];
-          if (givenTransitionCondition != "" && givenTransitionCondition != "true")
-          {
-            cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
-            cerr << "Using standard transition \"true\" instead." << endl << endl;
-          }
-        }
-      }
-
-
-
-
-      // Embed the inner activity.
-      PN.mergePlaces(p1, newPrefix + ".initial");
-      PN.mergePlaces(p2, newPrefix + ".final");
+	  Place *p5 = PN.findPlace("!link." + ASTEmap[source2->id]->linkName);
+	  PN.newArc(t1, p5);
+	}
     }
-  ]
-;
+
+    string givenTransitionCondition = ASTEmap[source->id]->attributes["transitionCondition"];
+    if ((givenTransitionCondition != "") && (givenTransitionCondition != "true"))
+    {
+      cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
+      cerr << "Using XOR instead." << endl << endl;
+      }
+    }
+  }
+  else
+  {
+    Transition *t1 = PN.newTransition(prefix + "setLinks");
+    PN.newArc(p2, t1);
+    PN.newArc(t1, p3);
+
+    // Set the outgoing links (standard transition condition expected).
+    foreach (source; tSource_list phylum->tSource_list_1)
+    {
+      Place *p4 = PN.findPlace("link." + ASTEmap[source->id]->linkName);
+      PN.newArc(t1, p4);
+
+      string givenTransitionCondition = ASTEmap[source->id]->attributes["transitionCondition"];
+      if (givenTransitionCondition != "" && givenTransitionCondition != "true")
+      {
+        cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
+        cerr << "Using standard transition \"true\" instead." << endl << endl;
+      }
+    }
+  }
+
+  // Embed the inner activity.
+  PN.mergePlaces(p1, newPrefix + ".initial");
+  PN.mergePlaces(p2, newPrefix + ".final");
+  if (current_view != petrinetsmall_enum)
+  {
+    PN.mergePlaces(p6, newPrefix + ".stop");
+    PN.mergePlaces(p7, newPrefix + ".stopped");
+  }
+}
 
 
 
@@ -431,122 +530,6 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF)
 
 
 
-
-
-
-
-
-
-
-/******************************************************************************
-  NEW PATTERNS (WS-BPEL)
-******************************************************************************/
-
-This=StandardElements(NiltTarget_list(), NiltSource_list(), jc) ->
-  [petrinetnew:
-    {
-      string prefix = toString(This->parentId) + ".";
-      string newPrefix = toString(This->parentId) + ".internal";
-
-      Place *p2 = PN.newPlace(prefix + "initial");
-      Place *p3 = PN.newPlace(prefix + "final");
-      Place *p4 = PN.newPlace(prefix + "stop");
-      Place *p5 = PN.newPlace(prefix + "stopped");
-
-      // Embed the inner activity.
-      PN.mergePlaces(p2, newPrefix + ".initial");
-      PN.mergePlaces(p3, newPrefix + ".final");
-      PN.mergePlaces(p4, newPrefix + ".stop");
-      PN.mergePlaces(p5, newPrefix + ".stopped");
-    }
-  ]
-;
-
-
-
-
-
-/******************************************************************************
- * Figure 22: Pattern for an activity that is source of links.
- *****************************************************************************/
-
-This=StandardElements(NiltTarget_list(), a, jc) ->
-  [petrinetnew:
-    {
-      trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 22 (new)\n");
-      string prefix = toString(This->parentId) + ".";
-      string newPrefix = toString(This->parentId) + ".internal";
-
-      Place *p1 = PN.newPlace(prefix + "initial");
-      Place *p2 = PN.newPlace(prefix + "done");
-      Place *p3 = PN.newPlace(prefix + "final");
-      Place *p6 = PN.newPlace(prefix + "stop");
-      Place *p7 = PN.newPlace(prefix + "stopped");
-
-      Transition *tf = stop(p3, "final", prefix);
-
-      unsigned int linkCounter = 1;
-      if (parameters[P_XOR] && (a->length() > 1))
-      {
-	// Set the outgoing links (XOR given).
-	foreach (source; tSource_list a)
-	{
-  	  Transition *t1 = PN.newTransition(prefix + "setLinks" + toString(linkCounter++));
-    	  PN.newArc(p2, t1);
-      	  PN.newArc(t1, p3);
-
-          Place *p4 = PN.findPlace("link." + ASTEmap[source->id]->linkName);
-	  PN.newArc(t1, p4);
-
-          foreach (source2; tSource_list a)
-          {
-            if (ASTEmap[source2->id]->linkName != ASTEmap[source->id]->linkName)
-            {
-              Place *p5 = PN.findPlace("!link." + ASTEmap[source2->id]->linkName);
-	      PN.newArc(t1, p5);
-            }
-          }
-
-          string givenTransitionCondition = ASTEmap[source->id]->attributes["transitionCondition"];
-          if (givenTransitionCondition != "" && givenTransitionCondition != "true")
-          {
-            cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
-            cerr << "Using XOR instead." << endl << endl;
-          }
-        }
-      }
-      else
-      {
-  	Transition *t1 = PN.newTransition(prefix + "setLinks");
-    	PN.newArc(p2, t1);
-      	PN.newArc(t1, p3);
-
-	// Set the outgoing links (standard transition condition expected).
-	foreach (source; tSource_list a)
-	{
-          Place *p4 = PN.findPlace("link." + ASTEmap[source->id]->linkName);
-	  PN.newArc(t1, p4);
-
-          string givenTransitionCondition = ASTEmap[source->id]->attributes["transitionCondition"];
-          if (givenTransitionCondition != "" && givenTransitionCondition != "true")
-          {
-            cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
-            cerr << "Using standard transition \"true\" instead." << endl << endl;
-          }
-        }
-      }
-
-
-
-
-      // Embed the inner activity.
-      PN.mergePlaces(p1, newPrefix + ".initial");
-      PN.mergePlaces(p2, newPrefix + ".final");
-      PN.mergePlaces(p6, newPrefix + ".stop");
-      PN.mergePlaces(p7, newPrefix + ".stopped");
-    }
-  ]
-;
 
 
 

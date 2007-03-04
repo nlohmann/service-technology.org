@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/04 13:47:27 $ by $Author: nielslohmann $.
-# Version $Revision: 1.60 $
+# File last changed $Date: 2007/03/04 17:44:40 $ by $Author: nielslohmann $.
+# Version $Revision: 1.61 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -46,16 +46,17 @@ KCDUMMY = ast-system-dummy.cc
 
 # files that create C++ files that are not linked to the
 # executable and thus can be deleted before compilation
+# (usually the unparsers)
 KCFILES_TEMP = ast-to-petrinet.k \
-	       petrinet-patterns-links.k \
 	       ast-to-xml.k ast-to-cfg.k \
 	       ast-postprocess.k ast-rewrite.k
 
 # files that create C++ that have to be linked to executable
 KCFILES_NECESSARY = petrinet-patterns-basic.k \
 		    petrinet-patterns-structured.k \
-		    petrinet-patterns-scopes.k\
+		    petrinet-patterns-scopes.k\		    
 		    petrinet-patterns-handlers.k \
+		    petrinet-patterns-links.k \
 		    ast-grammar.k \
 		    ast-config.k
 

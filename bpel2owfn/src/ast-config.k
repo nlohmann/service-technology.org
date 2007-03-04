@@ -29,7 +29,7 @@
  * 
  * \since   2006-24-03
  *
- * \date    \$Date: 2007/03/04 13:56:24 $
+ * \date    \$Date: 2007/03/04 17:44:40 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
  *
  * \todo    Annotate the global mappings which function clear them.
  */
@@ -102,6 +102,7 @@ extern string forEach_suffix;
 #include "petrinet-patterns-structured.h"
 #include "petrinet-patterns-scopes.h"
 #include "petrinet-patterns-handlers.h"
+#include "petrinet-patterns-links.h"
 #include "options.h"
 #include "cfg.h"
 #include "helpers.h"

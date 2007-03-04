@@ -29,7 +29,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/03/04 17:44:40 $
+ * \date    \$Date: 2007/03/04 18:16:33 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          bpel-unparse-petri.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  */
 %}
 
@@ -205,3 +205,8 @@ StandardElements(NiltTarget_list(), NiltSource_list(), jc) -> [petrinetnew petri
 StandardElements(NiltTarget_list(), a, jc) -> [petrinetnew petrinetsmall:
   { PLinkWrapper1($0, kc_current_view_base); }
 ];
+
+This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF) -> [petrinetnew petrinetsmall:
+  { PLinkWrapper2($0, kc_current_view_base); }
+];
+

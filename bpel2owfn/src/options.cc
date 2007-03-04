@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/01/19 11:37:16 $
+ * \date    \$Date: 2007/03/04 13:40:41 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.67 $
+ * \version \$Revision: 1.68 $
  */
 
 
@@ -177,7 +177,6 @@ void print_help()
   trace("    fhfaults                model faults in fault handlers \n");
   trace("    communicationonly       only model the communicational behavior\n");
   trace("    xor                     use mutually exclusive transition condition\n");
-  trace("    wsbpel                  use the semantics of WS-BPEL 2.0\n");
   trace("\n");
   trace("  FORMAT is one of the following (multiple formats permitted):\n");
   trace("    lola, owfn, dot, pep, apnn, ina, spin, info, pnml, txt, info\n");
@@ -413,8 +412,6 @@ void parse_command_line(int argc, char* argv[])
 //		  parameters[P_TRED] = true;
 		else if (parameter == "xor")
 		  parameters[P_XOR] = true;
-		else if (parameter == "wsbpel")
-		  parameters[P_WSBPEL] = true;
 		else if (parameter == "loopcount")
 		  parameters[P_LOOPCOUNT] = true;
 		else if (parameter == "loopcontrol")

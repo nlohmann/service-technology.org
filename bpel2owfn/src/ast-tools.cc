@@ -25,17 +25,17 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/02/27 14:55:07 $
+ * \date    \$Date: 2007/03/04 13:40:41 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.59 $
+ * \version \$Revision: 1.60 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -145,8 +145,6 @@ Transition *throwFault(Place *p1, Place *p2,
 
 
   // fault handling for the `new' patterns
-  if (parameters[P_WSBPEL])
-  {
     switch (negativeControlFlow)
     {
       case(0): // activity in scope or process
@@ -211,80 +209,6 @@ Transition *throwFault(Place *p1, Place *p2,
         }
     }
     return NULL;
-  }
-
-  // fault handling for the `old' patterns
-  switch (negativeControlFlow)
-  {
-    case(0): // activity in scope or process
-      {
-	Transition *t1 = PN.newTransition(prefix + "throwFault." + p1name);
-	PN.newArc(PN.findPlace(currentScope + "Active"), t1);
-	PN.newArc(t1, PN.findPlace(currentScope + "!Active"));
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-	PN.newArc(t1, PN.findPlace(currentScope + "stop.fault_in"));
-
-	if (!preventFurtherFaults)
-	{
-	  Transition *t2 = PN.newTransition(prefix + "ignoreFault." + p1name);
-	  PN.newArc(PN.findPlace(currentScope + "!Active"), t2, READ);
-	  PN.newArc(p1, t2);
-	  PN.newArc(t2, p2);
-	}
-	return t1;
-      }
-
-    case(1): // activity in fault handler
-      {
-	// No transition is added if the parameter "nofhfaults" is set, since
-	// then it is not allowed for activities in the fault handler to throw
-	// fault.s
-	if (!parameters[P_FHFAULTS])
-	  return NULL;
-
-	Transition *t1 = PN.newTransition(prefix + "throwFault." + p1name);
-	PN.newArc(PN.findPlace(currentScope + "!FHFaulted"), t1);
-	PN.newArc(t1, PN.findPlace(currentScope + "FHFaulted"));
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-	PN.newArc(t1, PN.findPlace(currentScope + "stop.fh_fault_in"));
-
-	if (!preventFurtherFaults)
-	{
-	  Transition *t2 = PN.newTransition(prefix + "ignoreFault." + p1name);
-	  PN.newArc(PN.findPlace(currentScope + "FHFaulted"), t2, READ);
-	  PN.newArc(p1, t2);
-	  PN.newArc(t2, p2);
-	}
-	return t1;
-      }
-
-    case(2): // activity in compensation handler
-      {
-       	Transition *t1 = PN.newTransition(prefix + "throwFault." + p1name);
-    	PN.newArc(PN.findPlace(currentScope + "!CHFaulted"), t1);
-      	PN.newArc(t1, PN.findPlace(currentScope + "CHFaulted"));
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-	PN.newArc(t1, PN.findPlace(currentScope + "stop.ch_fault_in"));
-
-	if (!preventFurtherFaults)
-	{
-	  Transition *t2 = PN.newTransition(prefix + "ignoreFault." + p1name);
-	  PN.newArc(PN.findPlace(currentScope + "CHFaulted"), t2, READ);
-	  PN.newArc(p1, t2);
-	  PN.newArc(t2, p2);
-	}
-	return t1;
-      }
-
-    default:
-      {
-        assert(false);
-	return NULL; /* should never happen */
-      }
-  }
 }
 
 

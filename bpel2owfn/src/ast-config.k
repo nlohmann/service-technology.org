@@ -25,11 +25,11 @@
  * \brief   Configuration of the AST
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $ 
+ *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2006-24-03
  *
- * \date    \$Date: 2007/02/13 14:41:08 $
+ * \date    \$Date: 2007/03/04 13:40:41 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.39 $
+ * \version \$Revision: 1.40 $
  *
  * \todo    Annotate the global mappings which function clear them.
  */
@@ -78,7 +78,6 @@ extern string forEach_suffix;
 
 // the unparse views
 
-%uview petrinet;
 %uview petrinetsmall;
 %uview petrinetnew;
 %uview xml;

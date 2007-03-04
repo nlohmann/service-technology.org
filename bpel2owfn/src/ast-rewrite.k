@@ -1,5 +1,5 @@
 /*****************************************************************************\
- * Copyright 2006 Niels Lohmann                                              *
+ * Copyright 2006, 2007 Niels Lohmann                                        *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
@@ -25,18 +25,18 @@
  * \brief   AST rewrite rules (implementation)
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006/10/11
  *
- * \date    \$Date: 2007/02/28 09:56:23 $
+ * \date    \$Date: 2007/03/04 13:40:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.23 $
+ * \version \$Revision: 1.24 $
  */
 %}
 
@@ -190,7 +190,7 @@ standardTerminationHandler(_id)
 /*
  * Default fault handler (cf. Sect. 12.5.1 in WS-BPEL 2.0)
  */
-implicitFaultHandler(_id) provided (parameters[P_WSBPEL]) ->
+implicitFaultHandler(_id) ->
 < implicit:
   userDefinedFaultHandler(
     NiltCatch_list(),
@@ -229,7 +229,7 @@ implicitFaultHandler(_id) provided (parameters[P_WSBPEL]) ->
  * Default compensation handler (cf. Sect. 12.5.1 in WS-BPEL 2.0)
  */
 
-implicitCompensationHandler(_id) provided (parameters[P_WSBPEL]) ->
+implicitCompensationHandler(_id) ->
 < implicit:
   userDefinedCompensationHandler(
     activityCompensate(

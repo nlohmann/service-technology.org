@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/02 09:28:45 $
+ * \date    \$Date: 2007/03/04 13:40:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  */
 %}
 
@@ -86,131 +86,6 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 
   switch(current_view)
   {
-    case(petrinet_enum):
-      {
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "running");
-	Place *p3 = PN.newPlace(prefix + "final");
-	Place *p4 = PN.newPlace(prefix + "p4");
-	Place *p5 = PN.newPlace(prefix + "p5");
-	Place *p6 = PN.newPlace(prefix + "p6");
-	Place *p7 = PN.newPlace(prefix + "stop");
-	Place *p8 = PN.newPlace(prefix + "stopped");
-	
-
-	// external control of loop condition	
-	Place *control_enter = NULL;
-	Place *control_leave = NULL;
-        if (parameters[P_LOOPCONTROL])
-	{
-	  control_enter = PN.newPlace("in.enterloop." + toString(phylum->id), IN);
-	  control_leave = PN.newPlace("in.leaveloop." + toString(phylum->id), IN);
-        }
-
-
-	Transition *t2 = PN.newTransition(prefix + "read_var");
-	PN.newArc(p1, t2);
-	PN.newArc(t2, p2);
-	
-	Transition *t3 = PN.newTransition(prefix + "start");
-	PN.newArc(p2, t3);
-	PN.newArc(t3, p4);
-
-	// the single loop/skip transition is only needed when loops are not counted
-	if (!parameters[P_LOOPCOUNT])
-	{
-	  Transition *t1 = PN.newTransition(prefix + "skip");
-	  PN.newArc(p2, t1);
-	  PN.newArc(t1, p3);
-	  if (parameters[P_LOOPCONTROL])
-	    PN.newArc(control_leave, t1);	  
-	  
-	  Transition *t4 = PN.newTransition(prefix + "loop");
-	  PN.newArc(t4, p1);
-	  PN.newArc(p5, t4);
-	  if (parameters[P_LOOPCONTROL])
-	    PN.newArc(control_enter, t4);	  
-	}
-	
-	// Transitions for the negative control flow.
-	if (parameters[P_STANDARDFAULTS])
-	  Transition *t5 = throwFault(p2, p6, "running", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
-
-	Transition *t6 = stop(p1, "initial", prefix);
-	Transition *t7 = stop(p2, "running", prefix);
-	Transition *t8 = stop(p6, "p6", prefix);
-	Transition *t9 = stop(p3, "final", prefix);
-
-	
-	// the subnet if loops are counted
-	if (parameters[P_LOOPCOUNT])
-	{
-	  unsigned int max_loops = ASTEmap[phylum->id]->max_loops;
-	  if (max_loops == UINT_MAX)
-	    cerr << "no max loop provided!" << endl;
-	  else
-	  {
-	    Place *p9_old = NULL;
-	    Place *p9_first = NULL;
-	    for (unsigned i = 1; i <= max_loops; i++)
-	    {
-	      Place *p9 = PN.newPlace(prefix + "count." + toString(i));
-
-	      if (i == 1)
-	      {
-		p9->mark();
-		p9_first = p9;
-	      }
-	      
-	      if (i > 1)
-	      {
-		assert(p9_old != NULL);
-		Transition *t4 = PN.newTransition(prefix + "loop" + toString(i-1));
-		PN.newArc(t4, p1);
-		PN.newArc(p5, t4);
-		PN.newArc(p9_old, t4);
-		PN.newArc(t4, p9);
-      		if (parameters[P_LOOPCONTROL])
-      		  PN.newArc(control_enter, t4);
-	      }
-	      
-	      assert(p9_first != NULL);
-	      Transition *t1 = PN.newTransition(prefix + "skip" + toString(i));
-	      PN.newArc(p2, t1);
-	      PN.newArc(t1, p3);
-	      PN.newArc(t1, p9_first);
-	      PN.newArc(p9, t1);
-    	      if (parameters[P_LOOPCONTROL])
-    		PN.newArc(control_leave, t1);	      
-	      
-	      p9_old = p9;
-	    }
-	    
-	    Transition *t10 = PN.newTransition(prefix + "finish");
-	    PN.newArc(p9_old, t10);
-	    PN.newArc(p5, t10);
-	    PN.newArc(t10, p3);
-	    PN.newArc(t10, p9_first);
-	  }
-	}
-	
-	
-	// unparse the standard elements
-	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
-	// unparse the embedded activity
-	phylum->activity_1->unparse(pseudoPrinter, current_view);
-	
-	
-	// Embed the inner activity.
-	PN.mergePlaces(phylum->id, ".internal.p4",      phylum->activity_1->id, ".initial");
-	PN.mergePlaces(phylum->id, ".internal.p5",      phylum->activity_1->id, ".final");
-	PN.mergePlaces(phylum->id, ".internal.stop",    phylum->activity_1->id, ".stop");
-	PN.mergePlaces(phylum->id, ".internal.stopped", phylum->activity_1->id, ".stopped");
-	
-	break;
-      }
-
     case(petrinetnew_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");
@@ -358,7 +233,6 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 
   switch (current_view)
   {
-    case(petrinet_enum):
     case(petrinetnew_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");
@@ -599,51 +473,6 @@ void PFlow(impl_tFlow* abstract_phylum, uview current_view)
 
   switch(current_view)
   {
-    case(petrinet_enum):
-      {
-	Place *p7  = PN.newPlace(prefix + "initial");
-	Place *p8  = PN.newPlace(prefix + "final");
-	Place *p9  = PN.newPlace(prefix + "running");
-	Place *p15 = PN.newPlace(prefix + "stop");
-	Place *p16 = PN.newPlace(prefix + "stopped");
-
-	Transition *t2 = PN.newTransition(prefix + "t2");
-	PN.newArc(p7, t2);
-	PN.newArc(t2, p9);
-
-	Transition *t3 = PN.newTransition(prefix + "t3");
-	PN.newArc(t3, p8);
-	PN.newArc(p9, t3);
-
-	Transition *t5 = PN.newTransition(prefix + "t5");
-	PN.newArc(p9, t5);
-	PN.newArc(p15, t5);
-
-	Transition *t6 = PN.newTransition(prefix + "innerStopped");
-	PN.newArc(t6, p16);
-
-	// Transitions for the negative control flow.
-	Transition *t4 = stop(p7, "initial", prefix);
-	Transition *t7 = stop(p8, "final", prefix);
-
-	// unparse the standard elements
-	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
-	// unparse the embedded activity
-	phylum->activity_list_1->unparse(pseudoPrinter, current_view);
-
-	// embed the inner activity 
-	foreach (innerActivity; activity_list phylum->activity_list_1)
-	{
-	  PN.newArc(t2, PN.findPlace(innerActivity->id, ".initial"));
-       	  PN.newArc(t5, PN.findPlace(innerActivity->id, ".stop"));
-       	  PN.newArc(PN.findPlace(innerActivity->id, ".stopped"), t6);
-       	  PN.newArc(PN.findPlace(innerActivity->id, ".final"), t3);
-       	}
-
-	break;
-      }
-
     case(petrinetnew_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");
@@ -742,7 +571,6 @@ void PSwitch(impl_tSwitch* abstract_phylum, uview current_view)
   
   switch(current_view)
   {
-    case(petrinet_enum):
     case(petrinetnew_enum):
       {
 	Place *p4 =  PN.newPlace(prefix + "final");
@@ -930,101 +758,6 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
   
   switch(current_view)
   {
-    case(petrinet_enum):
-      {
-	Place *p5 = PN.newPlace(prefix + "final");
-	Place *p6 = PN.newPlace(prefix + "initial");
-	Place *p7 = PN.newPlace(prefix + "TimeStamp");
-	Place *p11 = PN.newPlace(prefix + "stop");
-	Place *p12 = PN.newPlace(prefix + "stopped");
-
-	Transition *t5 = PN.newTransition(prefix + "t5");
-	PN.newArc(p6, t5);
-	PN.newArc(t5, p7);
-        if (parameters[P_VARIABLES])
-	  PN.newArc(PN.findPlace("1.internal.clock"), t5, READ);
-
-  	// Transitions for the negative control flow.
-    	Transition *t7 = stop(p6, "initial", prefix);
-      	Transition *t8 = stop(p7, "TimeStamp", prefix);
-
-
-	// unparse the standard elements
-	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
-	// unparse the onMessage branches
-	phylum->tOnMessage_list_1->unparse(pseudoPrinter, current_view);
-	
-	// unparse the onAlarm branches
-	phylum->tOnAlarm_list_1->unparse(pseudoPrinter, current_view);
-
-
-  	// Traverse the <onMessage> branches.
-	int onMessageCount = 1;
-	foreach (ThisBranch = OnMessage(_corr,_from,innerActivity,_id2); tOnMessage_list phylum->tOnMessage_list_1)
-	{
-	  trace(TRACE_DEBUG, "[PNU]\t\t<onMessage>\n");
-	  string message = toString(onMessageCount++);
-	  string newPrefix = prefix + "onMessage" + message + ".";
-	  
-	  Place *p3 = PN.newPlace(newPrefix + "p3");
-	  Place *p10 = PN.newPlace(newPrefix + "p10");
-
-	  Transition *t2 = PN.newTransition(newPrefix + "t2");
-	  PN.newArc(PN.findPlace("in." + ASTEmap[ThisBranch->id]->channelName), t2);
-	  PN.newArc(PN.findPlace(phylum->id, ".internal.TimeStamp"), t2);
-	  PN.newArc(t2, p3);
-
-	  Transition *t3 = PN.newTransition(newPrefix + "t3");
-	  PN.newArc(p3, t3);
-	  PN.newArc(t3, PN.findPlace(innerActivity->id, ".initial"));
-          if (parameters[P_VARIABLES])
-          {
-	    PN.newArc(PN.findPlace("variable." + ASTEmap[ThisBranch->id]->variableName), t3);
-	    PN.newArc(t3, PN.findPlace("variable." + ASTEmap[ThisBranch->id]->variableName));
-          }
-
-	  // Transitions for the negative control flow.
-	  if (parameters[P_STANDARDFAULTS])
-	    Transition *t4 = throwFault(p3, p10, "p3", newPrefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
-
-	  Transition *t9  = stop(p3, "p3at" + message, prefix);
-	  Transition *t10 = stop(p10, "p10at" + message, prefix);
-
-	  
-	  // Embed the inner activity.
-	  PN.mergePlaces(phylum->id, ".stop",    innerActivity->id, ".stop");
-	  PN.mergePlaces(phylum->id, ".stopped", innerActivity->id, ".stopped");
-	  PN.mergePlaces(phylum->id, ".final",   innerActivity->id, ".final");
-
-	  trace(TRACE_DEBUG, "[PNU]\t\t</onMessage>\n");
-	}
-
-	
-	// Traverse the <onAlarm> branches.
-	int onAlarmCount = 1;
-	foreach (onAlarmBranch=OnAlarm(innerActivity); tOnAlarm_list phylum->tOnAlarm_list_1)
-	{
-	  trace(TRACE_DEBUG, "[PNU]\t\t<onAlarm>\n");
-	  string newPrefix = prefix + "onAlarm" + toString(onAlarmCount++) + ".";
-
-	  Transition *t6 = PN.newTransition(newPrefix + "t6");
-	  PN.newArc(PN.findPlace(phylum->id, ".internal.TimeStamp"), t6);
-	  PN.newArc(t6, PN.findPlace(innerActivity->id, ".initial"));
-          if(parameters[P_VARIABLES])
-	    PN.newArc(PN.findPlace("1.internal.clock"), t6, READ);
-	  
-	  // Embed the inner activity.
-	  PN.mergePlaces(phylum->id, ".stop",    innerActivity->id, ".stop");
-	  PN.mergePlaces(phylum->id, ".stopped", innerActivity->id, ".stopped");
-	  PN.mergePlaces(phylum->id, ".final",   innerActivity->id, ".final");
-
-	  trace(TRACE_DEBUG, "[PNU]\t\t</onAlarm>\n");
-	}
-
-	break;
-      }
-
     case(petrinetnew_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");
@@ -1208,7 +941,6 @@ void PIf(impl_tIf* abstract_phylum, uview current_view)
    */
   switch(current_view)
   {
-    case(petrinet_enum):
     case(petrinetnew_enum):
       {
 	Place *p1 =  PN.newPlace(prefix + "initial");
@@ -1381,7 +1113,6 @@ void PForEach(impl_tForEach* abstract_phylum, uview current_view)
   {
     switch(current_view)
     {
-      case(petrinet_enum):
       case(petrinetnew_enum):
       case(petrinetsmall_enum):
     	{

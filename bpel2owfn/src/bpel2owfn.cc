@@ -25,18 +25,18 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/02/28 09:56:23 $
+ * \date    \$Date: 2007/03/04 13:40:41 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.144 $
+ * \version \$Revision: 1.145 $
  */
 
 
@@ -230,10 +230,8 @@ int main( int argc, char *argv[])
 	// choose Petri net patterns
 	if (parameters[P_COMMUNICATIONONLY] == true)
 	  AST->unparse(kc::pseudoPrinter, kc::petrinetsmall);
-	else if (parameters[P_WSBPEL] == true)
-	  AST->unparse(kc::pseudoPrinter, kc::petrinetnew);
 	else
-	  AST->unparse(kc::pseudoPrinter, kc::petrinet);
+	  AST->unparse(kc::pseudoPrinter, kc::petrinetnew);
 
         // calculate maximum occurences
         PN.calculate_max_occurrences();

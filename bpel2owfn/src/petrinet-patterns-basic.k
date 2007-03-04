@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/04 13:03:45 $
+ * \date    \$Date: 2007/03/04 13:40:41 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.24 $
+ * \version \$Revision: 1.25 $
  */
 %}
 
@@ -130,38 +130,6 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 
   switch(current_view)
   {
-    case(petrinet_enum):
-      {
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "running");
-	Place *p3 = PN.newPlace(prefix + "final");
-	Place *p4 = PN.newPlace(prefix + "p4");
-	Place *p5 = PN.newPlace(prefix + "stop");
-	Place *p6 = PN.newPlace(prefix + "stopped");
-
-	Transition *t1 = PN.newTransition(prefix + "read_var");
-	PN.newArc(p1, t1); 
-	PN.newArc(t1, p2);
-	if (parameters[P_VARIABLES])
-	  PN.newArc(PN.findPlace("variable." + ASTEmap[phylum->id]->inputVariableName), t1, READ);
-
-	Transition *t2 = PN.newTransition(prefix + "invoke");
-	PN.newArc(p2, t2);
-	PN.newArc(t2, p3);
-	PN.newArc(t2, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
-
-	// Transitions for the negative control flow.
-	if (parameters[P_STANDARDFAULTS])
-	  Transition *t3 = throwFault(p2, p4, "running", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
-
-	Transition *t4 = stop(p1, "initial", prefix);
-	Transition *t5 = stop(p2, "running", prefix);
-	Transition *t6 = stop(p4, "p4", prefix);
-	Transition *t7 = stop(p3, "final", prefix);
-
-	break;
-      }
-
     case(petrinetnew_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");
@@ -239,7 +207,6 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 
   switch(current_view)
   {
-    case(petrinet_enum):
     case(petrinetnew_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");
@@ -342,42 +309,7 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
 
   switch(current_view)
   {
-    case(petrinet_enum):
-      {
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "running");
-	Place *p3 = PN.newPlace(prefix + "final");
-	Place *p4 = PN.newPlace(prefix + "p4");
-	Place *p5 = PN.newPlace(prefix + "stop");
-	Place *p6 = PN.newPlace(prefix + "stopped");
-
-	Transition *t1 = PN.newTransition(prefix + "receive");
-	PN.newArc(PN.findPlace("in." + ASTEmap[phylum->id]->channelName), t1);
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-
-	Transition *t2 = PN.newTransition(prefix + "save_var");
-	PN.newArc(p2, t2);
-	PN.newArc(t2, p3);
-	if (parameters[P_VARIABLES])
-	{
-	  PN.newArc(PN.findPlace("variable." + ASTEmap[phylum->id]->variableName), t2);
-	  PN.newArc(t2, PN.findPlace("variable." + ASTEmap[phylum->id]->variableName));
-	}
-
-	// Transitions for the negative control flow.
-	if (parameters[P_STANDARDFAULTS])
-	  Transition *t3 = throwFault(p2, p4, "running", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
-
-	Transition *t4 = stop(p1, "initial", prefix);
-	Transition *t5 = stop(p2, "running", prefix);
-	Transition *t6 = stop(p4, "p4", prefix);
-	Transition *t7 = stop(p3, "final", prefix);
-
-	break;
-      }
-
-    case(petrinetnew_enum):
+     case(petrinetnew_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "buffer");
@@ -461,38 +393,6 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
 
   switch(current_view)
   {
-    case(petrinet_enum):
-      {
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "running");
-	Place *p3 = PN.newPlace(prefix + "final");
-	Place *p4 = PN.newPlace(prefix + "p4");
-	Place *p5 = PN.newPlace(prefix + "stop");
-	Place *p6 = PN.newPlace(prefix + "stopped");
-
-	Transition *t1 = PN.newTransition(prefix + "read_var");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-	if (parameters[P_VARIABLES])
-	  PN.newArc(PN.findPlace("variable." + ASTEmap[phylum->id]->variableName), t1, READ);
-
-	Transition *t2 = PN.newTransition(prefix + "reply");
-	PN.newArc(t2, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
-	PN.newArc(p2, t2);
-	PN.newArc(t2, p3);
-
-	// Transitions for the negative control flow.
-	if (parameters[P_STANDARDFAULTS])
-	  Transition *t3 = throwFault(p2, p4, "running", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
-
-	Transition *t3 = stop(p1, "initial", prefix);
-	Transition *t5 = stop(p2, "running", prefix);
-	Transition *t6 = stop(p4, "p4", prefix);
-	Transition *t7 = stop(p3, "final", prefix);
-
-	break;
-      }
-
     case(petrinetnew_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");
@@ -570,7 +470,6 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 
   switch (current_view)
   {
-    case(petrinet_enum):
     case(petrinetnew_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");
@@ -692,7 +591,6 @@ void PValidate(impl_tValidate* abstract_phylum, uview current_view)
   
   switch (current_view)
   {
-    case(petrinet_enum):
     case(petrinetnew_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");
@@ -764,7 +662,6 @@ void PWaitUntil(impl_tWait* abstract_phylum, uview current_view)
 
   switch (current_view)
   {
-    case(petrinet_enum):
     case(petrinetnew_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");
@@ -820,7 +717,6 @@ void PWaitFor(impl_tWait* abstract_phylum, uview current_view)
 
   switch (current_view)
   {
-    case(petrinet_enum):
     case(petrinetnew_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");
@@ -888,7 +784,6 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
 
   switch(current_view)
   {
-    case(petrinet_enum):
     case(petrinetnew_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");
@@ -988,35 +883,6 @@ void PExit(impl_tExit* abstract_phylum, uview current_view)
   
   switch(current_view)
   {
-    case(petrinet_enum):
-      {
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-	Place *p3 = PN.newPlace(prefix + "stop");
-	Place *p4 = PN.findPlace("1.internal.!Terminated");
-	Place *p5 = PN.findPlace("1.internal.Terminated");
-	Place *p6 = PN.findPlace(currentScope + "upperTerminate");
-	Place *p7 = PN.newPlace(prefix + "stopped");
-
-	Transition *t1 = PN.newTransition(prefix + "t1");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-	PN.newArc(p5, t1, READ);
-
-	Transition *t2 = PN.newTransition(prefix + "t2");
-	PN.newArc(p1, t2);
-	PN.newArc(t2, p2);
-	PN.newArc(t2, p5);
-	PN.newArc(p4, t2);
-	PN.newArc(t2, p6);
-
-	// Transitions for the negative control flow.
-	Transition *t3 = stop(p1, "initial", prefix);
-	Transition *t4 = stop(p2, "final", prefix);
-
-	break;
-      }
-
     case(petrinetnew_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");

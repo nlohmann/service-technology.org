@@ -29,13 +29,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/03/05 15:15:33 $
+ * \date    \$Date: 2007/03/05 16:08:35 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.63 $
+ * \version \$Revision: 1.64 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -53,6 +53,7 @@
 #include "ast-details.h"
 #include "ast-tools.h"
 #include "globals.h"
+#include "debug.h"
 
 using std::pair;
 using std::cerr;

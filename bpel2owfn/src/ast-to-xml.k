@@ -32,7 +32,7 @@
  * 
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/03/05 11:13:15 $
+ * \date    \$Date: 2007/03/05 16:08:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,9 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.71 $
+ * \version \$Revision: 1.72 $
+ *
+ * \todo    Add support for the <terminationHandler>
  */
 
 %}
@@ -217,10 +219,6 @@ Reply(a,b,c,_id) ->
   INVOKE
 ******************************************************************************/
 
-Invoke(a,b,c,d,_id) ->
-  [xml: { inup(); } "<invoke id=\"" _id "\"" { listAttributes( _id ); } ">\n" a b c d { indown(); } "</invoke>\n"]
-;
-
 SynchronousInvoke(a,b,c,d,_id) ->
   [xml: { inup(); } "<invoke id=\"" _id "\"" { listAttributes( _id ); } ">\n" a b c d { indown(); } "</invoke>\n"]
 ;
@@ -287,10 +285,6 @@ Empty(a,_id) ->
 /******************************************************************************
   WAIT
 ******************************************************************************/
-
-Wait(a,_id) ->
-  [xml: { inup(); } "<wait id=\"" _id "\"" { listAttributes( _id ); } ">\n" a { indown(); } "</wait>\n"]
-;
 
 WaitFor(a,_id) ->
   [xml: { inup(); } "<wait id=\"" _id "\"" { listAttributes( _id ); } ">\n" a { indown(); } "</wait>\n"]

@@ -29,14 +29,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/03/05 12:36:25 $
+ * \date    \$Date: 2007/03/05 16:08:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.62 $
+ * \version \$Revision: 1.63 $
  */
 
 
@@ -70,6 +70,9 @@ class ASTE;
 class pPartnerLink;
 
 
+
+
+
 /******************************************************************************
  * Data structures
  *****************************************************************************/
@@ -98,6 +101,8 @@ typedef enum
   T_BPELVARIABLENAME,	///< a variable name (NCName without ".")
   T_UINT		///< unsigned integers
 } attributeType;
+
+
 
 
 
@@ -195,6 +200,13 @@ class ASTE
     virtual ~ASTE();
 };
 
+
+
+
+
+/*!
+ * \todo comment me!
+ */
 class pPartnerLink {
   public:
     
@@ -207,6 +219,8 @@ class pPartnerLink {
     
     bool operator==(pPartnerLink & pl);
 };
+
+
 
 
 

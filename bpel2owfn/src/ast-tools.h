@@ -29,13 +29,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/03/04 14:31:59 $
+ * \date    \$Date: 2007/03/05 16:08:35 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.28 $
+ * \version \$Revision: 1.29 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -62,7 +62,6 @@
 #include <vector>
 
 #include "petrinet.h"
-#include "debug.h"
 #include "ast-details.h"
 
 using std::string;

@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/03/05 14:30:34 $
+ * \date    \$Date: 2007/03/05 16:08:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.135 $
+ * \version \$Revision: 1.136 $
  */
 %}
 
@@ -284,23 +284,6 @@ FaultHandlers(a,b,_id) ->
   ]
 ;
 
-/*
-standardFaultHandlers(_id) ->
-  [postprocessing:
-    {
-      int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
-      assert(myself != NULL);
-
-      myself->parentScopeId = globals::PPcurrentScope;
-      myself->inProcess = (myself->parentScopeId == 1);
-
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
-    }
-  ]
-;
-*/
-
 Catch(a,_id) ->
   [postprocessing:
     {
@@ -491,22 +474,6 @@ OnAlarm(a,_id) ->
 /******************************************************************************
   COMPENSATION HANDLERS
 ******************************************************************************/
-
-/*
-standardCompensationHandler(_id) ->
-  [postprocessing:
-    {
-      int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
-      assert(myself != NULL);
-
-      myself->parentScopeId = globals::PPcurrentScope;
-
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
-    }
-  ]
-;
-*/
 
 CompensationHandler(a,_id) ->
   [postprocessing:

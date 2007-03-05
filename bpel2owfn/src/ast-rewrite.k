@@ -24,19 +24,35 @@
  *
  * \brief   AST rewrite rules (implementation)
  *
+ *          After applying the rewrite rules "invoke" and "implict", the
+ *          abstract syntax tree does not contain the following phyla:
+ *           - activityInvoke
+ *           - NoStandardElements
+ *           - NoOtherwise
+ *           - standardTerminationHandler
+ *           - standardFaultHandlers
+ *           - standardCompensationHandler
+ *
+ *          After applying these rules, the postprocessing is invoked.
+ *
+ *          Then, the rewrite rules "newNames" are applied, removing the
+ *          following phyla:
+ *           - Wait
+ *           - Invoke
+ *   
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006/10/11
  *
- * \date    \$Date: 2007/03/04 16:42:31 $
+ * \date    \$Date: 2007/03/05 16:08:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.25 $
+ * \version \$Revision: 1.26 $
  */
 %}
 
@@ -169,7 +185,7 @@ NoOtherwise()
 
 
 /*
- * Default Termination Handler (cf. Sect. 12.5.1 in WS-BPEL 2.0)
+ * Standard Termination Handler (cf. Sect. 12.5.1 in WS-BPEL 2.0)
  */
 standardTerminationHandler(_id)
 ->
@@ -187,7 +203,7 @@ standardTerminationHandler(_id)
 
 
 /*
- * Default fault handler (cf. Sect. 12.5.1 in WS-BPEL 2.0)
+ * Standard fault handlers (cf. Sect. 12.5.1 in WS-BPEL 2.0)
  */
 standardFaultHandlers(_id) ->
 < implicit:
@@ -225,9 +241,8 @@ standardFaultHandlers(_id) ->
 
 
 /*
- * Default compensation handler (cf. Sect. 12.5.1 in WS-BPEL 2.0)
+ * Standard Compensation Handler (cf. Sect. 12.5.1 in WS-BPEL 2.0)
  */
-
 standardCompensationHandler(_id) ->
 < implicit:
   CompensationHandler(
@@ -240,21 +255,6 @@ standardCompensationHandler(_id) ->
     _id
   )
 >;      
-
-
-/*
- * A list of <catch> branches is empty if it just encloses a NoCatch
- * element.
- *
-ConstCatch_list(
-  NoCatch(),
-  NiltCatch_list()
-)
-->
-<implicit:
-  NiltCatch_list()
->;
-*/
 
 
 /*

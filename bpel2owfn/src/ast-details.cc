@@ -29,14 +29,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/03/05 15:15:33 $
+ * \date    \$Date: 2007/03/05 16:08:35 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.78 $
+ * \version \$Revision: 1.79 $
  */
 
 
@@ -101,6 +101,9 @@ ASTE::~ASTE()
     plRoleDetails = NULL;
   }
 }
+
+
+
 
 
 /******************************************************************************
@@ -866,7 +869,6 @@ string ASTE::definePartnerLink()
  * functions to check entities like variables, links, etc.
  *****************************************************************************/
 
-
 /*!
  * \brief checks a variable and returns its name
  *
@@ -992,6 +994,7 @@ string ASTE::checkPartnerLink()
 
   return "";
 }
+
 
 
 
@@ -1221,37 +1224,6 @@ string ASTE::activityTypeName() const
   }
 }
 
-/*!
- *  \brief constructor
- *
- *  Initializes the PartnerLink information.
- *
- *  \param n the name of the PartnerLink
- *  \param type the partnerLinkType
- *  \param me my role
- *  \param you the role of the partner
- *
- */
-pPartnerLink::pPartnerLink(string n, string type, string me, string you) :
-  name(n), partnerLinkType(type), myRole(me), partnerRole(you)
-{
-  /* nothing more to be done */
-}
-
-/*!
- *  Implements the semantical matching of PartnerLinks
- *
- *  \param pl the partnerLink which should be checked for matching
- *
- *  \return true iff partnerLinkType matches and myRole und partnerRole correspond accordingly
- *
- */
-bool pPartnerLink::operator==(pPartnerLink & pl)
-{
-  return (pl.partnerLinkType == partnerLinkType && pl.myRole == partnerRole && pl.partnerRole == myRole);
-}
-
-
 
 
 
@@ -1306,4 +1278,47 @@ void ASTE::output()
   // process children
   for (set<unsigned int>::iterator it = enclosedActivities.begin(); it != enclosedActivities.end(); it++)
     ASTEmap[*it]->output();
+}
+
+
+
+
+
+/*****************************************************************************
+ * Class pPartnerLink                                                        *
+ *****************************************************************************/
+
+
+/*!
+ *  \brief constructor
+ *
+ *  Initializes the PartnerLink information.
+ *
+ *  \param n the name of the PartnerLink
+ *  \param type the partnerLinkType
+ *  \param me my role
+ *  \param you the role of the partner
+ *
+ */
+pPartnerLink::pPartnerLink(string n, string type, string me, string you) :
+  name(n), partnerLinkType(type), myRole(me), partnerRole(you)
+{
+  /* nothing more to be done */
+}
+
+
+
+
+
+/*!
+ *  Implements the semantical matching of PartnerLinks
+ *
+ *  \param pl the partnerLink which should be checked for matching
+ *
+ *  \return true iff partnerLinkType matches and myRole und partnerRole correspond accordingly
+ *
+ */
+bool pPartnerLink::operator==(pPartnerLink & pl)
+{
+  return (pl.partnerLinkType == partnerLinkType && pl.myRole == partnerRole && pl.partnerRole == myRole);
 }

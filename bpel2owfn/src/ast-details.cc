@@ -29,14 +29,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/03/05 11:13:15 $
+ * \date    \$Date: 2007/03/05 12:36:25 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.75 $
+ * \version \$Revision: 1.76 $
  */
 
 
@@ -79,7 +79,7 @@ using std::endl;
 ASTE::ASTE(unsigned int myid, unsigned int mytype) :
   id(myid), type(mytype),
   plRoleDetails(NULL), isStartActivity(false), targetActivity(0),
-  sourceActivity(0), max_occurrences(1), max_loops(UINT_MAX), controlFlow(POSITIVECF), drawn(false)
+  sourceActivity(0), max_occurrences(1), max_loops(UINT_MAX), controlFlow(POSITIVECF), drawn(false), enclosedFH(0), enclosedCH(0)
 {
   extern map<unsigned int, map<string, string> > temporaryAttributeMap;
 
@@ -1276,10 +1276,14 @@ bool pPartnerLink::operator==(pPartnerLink & pl)
 void ASTE::output()
 {
   extern map<unsigned int, ASTE*> ASTEmap;
+  extern map<string, unsigned int> ASTE_scopeNames;
 
   if (drawn)
     return;
 
+  drawn = true;
+
+  // arcs to parents
   if (activityTypeName() != "link")
   {
     cerr << id << " [label=\"" << id << " " << activityTypeName() << "\"]" << endl;
@@ -1288,13 +1292,36 @@ void ASTE::output()
       cerr << parentActivityId << " -> " << id << endl;
   }
 
+  // arcs for links
   if (activityTypeName() == "link")
     cerr << sourceActivity << " -> " << targetActivity << "[label = \"" << id << " link\" color=blue]" << endl;
 
-  drawn = true;
 
-  for (set<unsigned int>::iterator it = enclosedActivities.begin(); it != enclosedActivities.end(); it++)
+  // arcs for compensation
+  if (activityTypeName() == "compensateScope")
   {
-    ASTEmap[*it]->output();
+    cerr << id << " -> " << ASTE_scopeNames[attributes["target"]] << "[color=green]" << endl;
   }
+
+  if (activityTypeName() == "compensate")
+  {
+    for (set<unsigned int>::iterator it = ASTEmap[parentScopeId]->enclosedScopes.begin(); it != ASTEmap[parentScopeId]->enclosedScopes.end(); it++)
+      cerr << id << " -> " << ASTEmap[*it]->enclosedCH << "[color=green]" << endl;
+  }
+
+  
+  // arcs for faults
+  if (activityTypeName() == "throw")
+  {
+    cerr << id << " -> " << ASTEmap[parentScopeId]->enclosedFH << "[color=red]" << endl;
+  }
+  if (activityTypeName() == "rethrow" && parentScopeId != 1)
+  {
+    cerr << id << " -> " << ASTEmap[ASTEmap[ASTEmap[parentScopeId]->id]->parentScopeId]->enclosedFH << "[color=red]" << endl;
+  }
+
+
+  // process children
+  for (set<unsigned int>::iterator it = enclosedActivities.begin(); it != enclosedActivities.end(); it++)
+    ASTEmap[*it]->output();
 }

@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/03/05 11:36:56 $
+ * \date    \$Date: 2007/03/05 12:36:25 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.133 $
+ * \version \$Revision: 1.134 $
  */
 %}
 
@@ -77,6 +77,8 @@ Process(a,b,c,d,e,g,i,_id) ->
 //      ASTEmap[f->id]->parentActivityId = myid;
       ASTEmap[g->id]->parentActivityId = myid;
       ASTEmap[i->id]->parentActivityId = myid;
+
+      myself->enclosedFH = e->id;
     }
     a b c d
     i // inner activity
@@ -222,7 +224,7 @@ FaultHandlers(a,b,_id) ->
       foreach(branch=Catch(innerActivity); tCatch_list a)
       {
         assert(ASTEmap[innerActivity->id] != NULL);
-        ASTEmap[innerActivity->id]->parentActivityId = myid;
+        ASTEmap[innerActivity->id]->parentActivityId = myid; // this is not intended: the activity should be child of the catch
         ASTEmap[branch->id]->parentActivityId = myid;
         ASTEmap[innerActivity->id]->controlFlow = FHCF;
         ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
@@ -318,6 +320,8 @@ Catch(a,_id) ->
       myself->enclosedActivities.insert( a->id );
       enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
 
+      ASTEmap[a->id]->parentActivityId = myid; // necessary/safe?
+
       // necessary?
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );      
 
@@ -343,6 +347,8 @@ CatchAll(a,_id) ->
       myself->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
       myself->enclosedActivities.insert( a->id );
       enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+
+      ASTEmap[a->id]->parentActivityId = myid; // necessary/safe?
 
       // necessary?
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );      
@@ -1853,6 +1859,9 @@ Scope(a,b,c,d,e,f,g,i,j,_id) ->
       ASTEmap[e->id]->parentActivityId = myid;
       ASTEmap[f->id]->parentActivityId = myid;
       ASTEmap[i->id]->parentActivityId = myid;
+
+      myself->enclosedFH = c->id;
+      myself->enclosedCH = d->id;
 
       ASTEmap[c->id]->max_occurrences = myself->max_occurrences;
       ASTEmap[d->id]->max_occurrences = myself->max_occurrences;

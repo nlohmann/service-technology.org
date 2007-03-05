@@ -30,7 +30,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/05 14:30:34 $
+ * \date    \$Date: 2007/03/05 15:15:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  */
 %}
 
@@ -59,6 +59,7 @@
 #include "ast-tools.h"
 #include "ast-details.h"
 #include "options.h"
+#include "globals.h"
 
 using std::cerr;
 using std::endl;
@@ -66,10 +67,6 @@ using std::endl;
 extern PetriNet PN;
 extern map<unsigned int, ASTE*> ASTEmap;
 
-namespace globals
-{
-  extern map<string, unsigned int> ASTE_scopeNames;
-}
 %}
 
 

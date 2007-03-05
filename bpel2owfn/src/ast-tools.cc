@@ -29,13 +29,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/03/05 14:30:34 $
+ * \date    \$Date: 2007/03/05 15:15:33 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.62 $
+ * \version \$Revision: 1.63 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -52,6 +52,7 @@
 #include "helpers.h"
 #include "ast-details.h"
 #include "ast-tools.h"
+#include "globals.h"
 
 using std::pair;
 using std::cerr;
@@ -71,10 +72,6 @@ unsigned int indent = 0;
 /// number of spaces to be added when indention is increased
 unsigned int indentStep = 4;
 
-namespace globals
-{
-  extern map<string, unsigned int> ASTE_linkIdMap;
-}
 
 
 

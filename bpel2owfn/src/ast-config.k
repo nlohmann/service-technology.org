@@ -29,7 +29,7 @@
  * 
  * \since   2006-24-03
  *
- * \date    \$Date: 2007/03/05 14:30:34 $
+ * \date    \$Date: 2007/03/05 15:15:33 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.44 $
+ * \version \$Revision: 1.45 $
  *
  * \todo    Annotate the global mappings which function clear them.
  */
@@ -108,6 +108,7 @@ extern string forEach_suffix;
 #include "helpers.h"
 #include "ast-details.h"
 #include "ast-tools.h"
+#include "globals.h"
 
 using std::map;
 using std::string;
@@ -119,40 +120,6 @@ extern PetriNet PN;				// introduced in main.c
 extern CFGBlock * CFG;				// introduced in cfg.cc
 extern map<unsigned int, ASTE*> ASTEmap;	// introduced in ast-details.cc
 
-
-namespace globals {
-  /// prefix of the current scope (read by the stop pattern and used to direct
-  /// failures to the correct fault_in place)
-  string currentScope;
-
-  /// \todo (gierds) comment me!
-  map <string, CFGBlock *> cfgMap;
-
-
-  string forEach_suffix = "";		///< used to generate parallel <forEach> scopes
-
-
-  // the global mappings (though they are not global)
-  set<string> ASTE_inputChannels;		///< \todo comment me
-  set<string> ASTE_outputChannels;	///< \todo comment me
-  set<string> ASTE_correlationSetNames;	///< a set holding all correlation set names (with prefix)
-  set<string> ASTE_variableNames;		///< a set holding all variable names (with prefix)
-  set<string> ASTE_partnerLinkNames;	///< a set holding all partnerLink names (with prefix)
-  set<string> ASTE_linkNames;		///< a set holding all link names (with prefix)
-  set<unsigned int> ASTE_startActivities;	///< a set of the ids of the start activities
-
-  map<string, unsigned int> ASTE_linkIdMap;	///< maps link names to identifiers
-  map<string, unsigned int> ASTE_scopeNames;	///< maps scope names to identifiers
-  map<string, unsigned int> ASTE_partnerLinks;    ///< maps partnerlink names to identifiers
-
-  map<string, unsigned int> joinCondition_links;		///< used to evaluate joinConditions: maps link names to a temporary link number
-  map<unsigned int, bool> joinCondition_linkStatus;	///< used to evaluate joinConditions: maps temporary link numbers to Boolean assignment
-  map<unsigned int, bool> joinCondition_result;		///< used to evaluate joinConditions: maps assignment number to Boolean result (used in Petri net unparser)
-
-  map<unsigned int, unsigned int> PPhasCompensateMap;
-
-  unsigned int PPcurrentScope = 0;	///< the identifier of the current scope
-}
 %}
 
 

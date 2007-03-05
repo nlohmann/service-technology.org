@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/04 19:27:35 $ by $Author: nielslohmann $.
-# Version $Revision: 1.63 $
+# File last changed $Date: 2007/03/05 15:15:33 $ by $Author: nielslohmann $.
+# Version $Revision: 1.64 $
 
 bin_PROGRAMS = bpel2owfn
 lib_LIBRARIES = lib_pnapi.a
@@ -93,6 +93,7 @@ bpel2owfn_SOURCES = $(KCDUMMY)\
 		    frontend-parser.yy frontend-parser.h\
 		    frontend-lexer.ll\
 		    bpel2owfn.cc\
+		    globals.cc globals.h\
 		    debug.cc debug.h\
 		    helpers.cc helpers.h\
 		    cfg.cc cfg.h\

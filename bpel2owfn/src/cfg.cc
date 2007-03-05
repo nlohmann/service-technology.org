@@ -30,14 +30,14 @@
  * 
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/03/05 14:30:34 $
+ * \date    \$Date: 2007/03/05 15:15:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.45 $
+ * \version \$Revision: 1.46 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -52,6 +52,7 @@
 #include "debug.h"
 #include "ast-details.h"
 #include "ast-config.h"		// all you need from Kimwitu++
+#include "globals.h"
 
 using std::cerr;
 using std::endl;
@@ -62,9 +63,6 @@ using std::endl;
 extern map<unsigned int, map<string, string> > temporaryAttributeMap;
 extern map<unsigned int, ASTE*> ASTEmap;
 
-namespace globals {
-  extern map< string, CFGBlock* > cfgMap;
-}
 
 
 /// The CFG

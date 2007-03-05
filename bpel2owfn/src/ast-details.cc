@@ -29,14 +29,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/03/05 14:30:34 $
+ * \date    \$Date: 2007/03/05 15:15:33 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.77 $
+ * \version \$Revision: 1.78 $
  */
 
 
@@ -55,22 +55,11 @@
 #include "debug.h"
 #include "helpers.h"
 #include "frontend-parser.h"
+#include "globals.h"
 
 using std::cerr;
 using std::endl;
 
-namespace globals {
-  extern set<string> ASTE_partnerLinkNames;
-  extern map<string, unsigned int> ASTE_partnerLinks;
-  extern set<string> ASTE_inputChannels;
-  extern set<string> ASTE_outputChannels;
-  extern set<string> ASTE_variableNames;
-  extern set<string> ASTE_linkNames;
-  extern set<string> ASTE_correlationSetNames;
-  extern map<string, unsigned int> ASTE_scopeNames;
-  extern set<string> ASTE_partnerLinkNames;
-  extern map<string, unsigned int> ASTE_partnerLinks; 
-}
 
 
 

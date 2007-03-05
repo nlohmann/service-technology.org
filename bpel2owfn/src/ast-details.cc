@@ -29,14 +29,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/03/05 12:36:25 $
+ * \date    \$Date: 2007/03/05 14:30:34 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.76 $
+ * \version \$Revision: 1.77 $
  */
 
 
@@ -59,6 +59,18 @@
 using std::cerr;
 using std::endl;
 
+namespace globals {
+  extern set<string> ASTE_partnerLinkNames;
+  extern map<string, unsigned int> ASTE_partnerLinks;
+  extern set<string> ASTE_inputChannels;
+  extern set<string> ASTE_outputChannels;
+  extern set<string> ASTE_variableNames;
+  extern set<string> ASTE_linkNames;
+  extern set<string> ASTE_correlationSetNames;
+  extern map<string, unsigned int> ASTE_scopeNames;
+  extern set<string> ASTE_partnerLinkNames;
+  extern map<string, unsigned int> ASTE_partnerLinks; 
+}
 
 
 
@@ -664,9 +676,6 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
  */
 string ASTE::createChannel(bool synchronousCommunication)
 {
-  extern set<string> ASTE_inputChannels;
-  extern set<string> ASTE_outputChannels;
-
   string channelName = attributes["partnerLink"] + "." + attributes["operation"];
   if (channelName == ".")
   {
@@ -683,7 +692,7 @@ string ASTE::createChannel(bool synchronousCommunication)
 //NL        {
 //NL          channelName = plRoleDetails->partnerRole + "." + plRoleDetails->myRole + "." + attributes["operation"];
 //NL        }
-	ASTE_inputChannels.insert(channelName);
+	globals::ASTE_inputChannels.insert(channelName);
 	break;
       }
 
@@ -694,7 +703,7 @@ string ASTE::createChannel(bool synchronousCommunication)
 //NL        {
 //NL          channelName = plRoleDetails->myRole + "." + plRoleDetails->partnerRole + "." + attributes["operation"];
 //NL        }
-	ASTE_outputChannels.insert(channelName);
+	globals::ASTE_outputChannels.insert(channelName);
 
 	if (synchronousCommunication)
         {
@@ -702,7 +711,7 @@ string ASTE::createChannel(bool synchronousCommunication)
 //NL          {
 //NL            channelName = plRoleDetails->partnerRole + "." + plRoleDetails->myRole + "." + attributes["operation"];
 //NL          }
-	  ASTE_inputChannels.insert(channelName);
+	  globals::ASTE_inputChannels.insert(channelName);
         }
 
 	break;
@@ -780,15 +789,13 @@ bool ASTE::findIsolatedAncestor()
  */
 string ASTE::defineCorrelationSet()
 {
-  extern set<string> ASTE_correlationSetNames;
-
   string name = toString(parentScopeId) + "." + attributes["name"];
 
   // triggers [SA00044]
-  if (ASTE_correlationSetNames.find(name) != ASTE_correlationSetNames.end())
+  if (globals::ASTE_correlationSetNames.find(name) != globals::ASTE_correlationSetNames.end())
     SAerror(44, attributes["name"], attributes["referenceLine"]);
   else
-    ASTE_correlationSetNames.insert(name);
+    globals::ASTE_correlationSetNames.insert(name);
 
   return name;
 }
@@ -802,15 +809,13 @@ string ASTE::defineCorrelationSet()
  */
 string ASTE::defineVariable()
 {
-  extern set<string> ASTE_variableNames;
-
   string name = toString(parentScopeId) + "." + attributes["name"];
 
   // triggers [SA00023]
-  if (ASTE_variableNames.find(name) != ASTE_variableNames.end())
+  if (globals::ASTE_variableNames.find(name) != globals::ASTE_variableNames.end())
     SAerror(23, attributes["name"], attributes["referenceLine"]);
   else
-    ASTE_variableNames.insert(name);
+    globals::ASTE_variableNames.insert(name);
 
   return name;
 }
@@ -828,15 +833,13 @@ string ASTE::defineVariable()
  */
 string ASTE::defineLink()
 {
-  extern set<string> ASTE_linkNames;
-
   string name = toString(parentActivityId) + "." + attributes["name"];
 
   // triggers [SA00064]
-  if (ASTE_linkNames.find(name) != ASTE_linkNames.end())
+  if (globals::ASTE_linkNames.find(name) != globals::ASTE_linkNames.end())
     SAerror(64, attributes["name"], attributes["referenceLine"]);
   else
-    ASTE_linkNames.insert(name);
+    globals::ASTE_linkNames.insert(name);
 
   return name;
 }
@@ -852,18 +855,15 @@ string ASTE::defineLink()
  */
 string ASTE::definePartnerLink()
 {
-  extern set<string> ASTE_partnerLinkNames;
-  extern map<string, unsigned int> ASTE_partnerLinks;
-
   string name = toString(parentScopeId) + "." + attributes["name"];
 
   // triggers [SA00018]
-  if (ASTE_partnerLinkNames.find(name) != ASTE_partnerLinkNames.end())
+  if (globals::ASTE_partnerLinkNames.find(name) != globals::ASTE_partnerLinkNames.end())
     SAerror(18, attributes["name"], attributes["referenceLine"]);
   else 
   {
-    ASTE_partnerLinkNames.insert(name);
-    ASTE_partnerLinks[ attributes["name"] ] = id;
+    globals::ASTE_partnerLinkNames.insert(name);
+    globals::ASTE_partnerLinks[ attributes["name"] ] = id;
   }
 
   return name;
@@ -892,7 +892,6 @@ string ASTE::definePartnerLink()
 
 string ASTE::checkVariable(string attributename)
 {
-  extern set<string> ASTE_variableNames;
   extern string filename;
 
   string variableName = attributes[attributename];
@@ -901,9 +900,9 @@ string ASTE::checkVariable(string attributename)
 
   vector<unsigned int> ancestorScopes = this->ancestorScopes();
 
-  // travers the ancestor scopes
+  // traverse the ancestor scopes
   for (vector<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
-    if (ASTE_variableNames.find(toString(*scope) + "." + variableName) != ASTE_variableNames.end())
+    if (globals::ASTE_variableNames.find(toString(*scope) + "." + variableName) != globals::ASTE_variableNames.end())
       return (toString(*scope) + "." + variableName);
 
   // display an error message
@@ -931,8 +930,6 @@ string ASTE::checkVariable(string attributename)
 string ASTE::checkLink()
 {
   extern map<unsigned int, ASTE*> ASTEmap;
-  extern set<string> ASTE_linkNames;
-//  extern string filename;
 
   string linkName = attributes["linkName"];
   if (linkName == "")
@@ -944,7 +941,7 @@ string ASTE::checkLink()
   for (vector<unsigned int>::iterator flow = ancestorActivities.begin(); flow != ancestorActivities.end(); flow++)
   {
     if (ASTEmap[*flow]->activityTypeName() == "flow")
-      if (ASTE_linkNames.find(toString(*flow) + "." + linkName) != ASTE_linkNames.end())
+      if (globals::ASTE_linkNames.find(toString(*flow) + "." + linkName) != globals::ASTE_linkNames.end())
 	return (toString(*flow) + "." + linkName);
   }
 
@@ -966,8 +963,6 @@ string ASTE::checkLink()
 string ASTE::checkPartnerLink()
 {
   extern map<unsigned int, ASTE*> ASTEmap;	
-  extern set<string> ASTE_partnerLinkNames;
-  extern map<string, unsigned int> ASTE_partnerLinks;
   extern string filename;
 
   string partnerLinkName = attributes["partnerLink"];
@@ -976,14 +971,14 @@ string ASTE::checkPartnerLink()
 
   vector<unsigned int> ancestorScopes = this->ancestorScopes();
 
-  // travers the ancestor scopes
+  // traverse the ancestor scopes
   for (vector<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
   {
-    if (ASTE_partnerLinkNames.find(toString(*scope) + "." + partnerLinkName) != ASTE_partnerLinkNames.end())
+    if (globals::ASTE_partnerLinkNames.find(toString(*scope) + "." + partnerLinkName) != globals::ASTE_partnerLinkNames.end())
     {
-      string partnerLinkType = ASTEmap[ ASTE_partnerLinks[partnerLinkName] ]->attributes["partnerLinkType"];
-      string myRole          = ASTEmap[ ASTE_partnerLinks[partnerLinkName] ]->attributes["myRole"];
-      string partnerRole     = ASTEmap[ ASTE_partnerLinks[partnerLinkName] ]->attributes["partnerRole"];
+      string partnerLinkType = ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->attributes["partnerLinkType"];
+      string myRole          = ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->attributes["myRole"];
+      string partnerRole     = ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->attributes["partnerRole"];
 
       if (partnerLinkType != "" && myRole != "" && partnerRole != "")
       {
@@ -1020,7 +1015,6 @@ string ASTE::checkPartnerLink()
 string ASTE::checkCorrelationSet()
 {
   extern map<unsigned int, ASTE*> ASTEmap;	
-  extern set<string> ASTE_correlationSetNames;
   extern string filename;
 
   string correlationSetName = attributes["set"];
@@ -1031,7 +1025,7 @@ string ASTE::checkCorrelationSet()
 
   // travers the ancestor scopes
   for (vector<unsigned int>::iterator scope = ancestorScopes.begin(); scope != ancestorScopes.end(); scope++)
-    if (ASTE_correlationSetNames.find(toString(*scope) + "." + correlationSetName) != ASTE_correlationSetNames.end())
+    if (globals::ASTE_correlationSetNames.find(toString(*scope) + "." + correlationSetName) != globals::ASTE_correlationSetNames.end())
       return (toString(*scope) + "." + correlationSetName);
 
   // trigger [SA00088]
@@ -1276,7 +1270,6 @@ bool pPartnerLink::operator==(pPartnerLink & pl)
 void ASTE::output()
 {
   extern map<unsigned int, ASTE*> ASTEmap;
-  extern map<string, unsigned int> ASTE_scopeNames;
 
   if (drawn)
     return;
@@ -1300,7 +1293,7 @@ void ASTE::output()
   // arcs for compensation
   if (activityTypeName() == "compensateScope")
   {
-    cerr << id << " -> " << ASTE_scopeNames[attributes["target"]] << "[color=green]" << endl;
+    cerr << id << " -> " << ASTEmap[globals::ASTE_scopeNames[attributes["target"]]]->enclosedCH << "[color=green]" << endl;
   }
 
   if (activityTypeName() == "compensate")

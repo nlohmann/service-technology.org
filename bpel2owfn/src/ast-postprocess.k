@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/03/05 12:36:25 $
+ * \date    \$Date: 2007/03/05 14:30:34 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.134 $
+ * \version \$Revision: 1.135 $
  */
 %}
 
@@ -61,7 +61,7 @@ Process(a,b,c,d,e,g,i,_id) ->
 
       myself->parentScopeId = myid;
       myself->parentActivityId = myid;
-      PPcurrentScope = myid;
+      globals::PPcurrentScope = myid;
 
       // annotate AST and check information
       myself->checkAttributes();
@@ -105,14 +105,14 @@ Process(a,b,c,d,e,g,i,_id) ->
 //      ASTEmap[f->id]->enclosedScopes = myself->enclosedScopes;
 
       // trigger [SA00015]
-      if (ASTE_startActivities.empty())
+      if (globals::ASTE_startActivities.empty())
         SAerror(15, "", myself->attributes["referenceLine"]);
 
       // trigger [SA00066]
       // should be actually calculated at a <flow> activity, but "linksOK" is
       // used below to avoid an assertion failure
       bool linksOK = true;
-      for(map<string, unsigned int>::iterator it = ASTE_linkIdMap.begin(); it != ASTE_linkIdMap.end(); it++)
+      for(map<string, unsigned int>::iterator it = globals::ASTE_linkIdMap.begin(); it != globals::ASTE_linkIdMap.end(); it++)
       {
         if ( it-> first != "" )
         {
@@ -142,11 +142,11 @@ Process(a,b,c,d,e,g,i,_id) ->
 
       // trigger [SA00057]
       set<string> reallySharedCorrelationSets;
-      if (ASTE_startActivities.size() > 1)
+      if (globals::ASTE_startActivities.size() > 1)
       {
-  	for (set<unsigned int>::iterator it = ASTE_startActivities.begin(); it != ASTE_startActivities.end(); it++)
+  	for (set<unsigned int>::iterator it = globals::ASTE_startActivities.begin(); it != globals::ASTE_startActivities.end(); it++)
   	{
-  	  if (it == ASTE_startActivities.begin())
+  	  if (it == globals::ASTE_startActivities.begin())
     	    reallySharedCorrelationSets = ASTEmap[*it]->sharedCorrelationSets;
   	  else
 	    reallySharedCorrelationSets = setIntersection(reallySharedCorrelationSets, ASTEmap[*it]->sharedCorrelationSets);
@@ -162,14 +162,14 @@ Process(a,b,c,d,e,g,i,_id) ->
       // this assertion guarantees that we did not forget a link and encounter
       // problems generating the Petri net
       if (linksOK)
-        assert(myself->enclosedSourceLinks.size() == ASTE_linkNames.size());
+        assert(myself->enclosedSourceLinks.size() == globals::ASTE_linkNames.size());
 
 
       // clear global maps
-      ASTE_correlationSetNames.clear(); // correlation sets are only tested but not used for output
-      ASTE_partnerLinkNames.clear();    // the same with partner links
-      ASTE_startActivities.clear();	// the same with start activities
-      ASTE_linkIdMap.clear();		// the same with this mapping
+      globals::ASTE_correlationSetNames.clear(); // correlation sets are only tested but not used for output
+      globals::ASTE_partnerLinkNames.clear();    // the same with partner links
+      globals::ASTE_startActivities.clear();	// the same with start activities
+      globals::ASTE_linkIdMap.clear();		// the same with this mapping
     }
   ]
 ;
@@ -186,7 +186,7 @@ PartnerLink(_id) ->
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
 
       myself->definePartnerLink();
@@ -215,7 +215,7 @@ FaultHandlers(a,b,_id) ->
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->hasCatchAll = (b->op_name() == "CatchAll");
 //      myself->inProcess = (myself->parentScopeId == 1);
 
@@ -292,7 +292,7 @@ standardFaultHandlers(_id) ->
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->inProcess = (myself->parentScopeId == 1);
 
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
@@ -370,7 +370,7 @@ emptyEventHandlers(_id) ->
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
 
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
     }
@@ -384,7 +384,7 @@ EventHandlers(a,b,_id) ->
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->max_occurrences = UINT_MAX; // TODO: calculate me
 
       // triggers SA00083
@@ -425,7 +425,7 @@ OnMessage(a,b,c,_id) ->
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       assert(ASTEmap[myself->parentActivityId] != NULL);
       myself->checkAttributes();
 
@@ -467,7 +467,7 @@ OnAlarm(a,_id) ->
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       assert(ASTEmap[myself->parentActivityId] != NULL);
       //todo: cyclic-attribute if "repeatEvery" is set
 
@@ -500,7 +500,7 @@ standardCompensationHandler(_id) ->
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
 
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
     }
@@ -515,7 +515,7 @@ CompensationHandler(a,_id) ->
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
 
       // distribute the compensation handlers's id to the enclosed activity
       // also mark the activities as "inside compensation handlers"
@@ -566,7 +566,7 @@ TerminationHandler(a,_id) ->
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
 
       // distribute the termination handlers's id to the enclosed activity
       // also mark the activities as "inside termination handlers"
@@ -605,7 +605,7 @@ Variable(_id) ->
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
       myself->defineVariable();
     }
@@ -624,7 +624,7 @@ CorrelationSet(_id) ->
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
       myself->defineCorrelationSet();
     }
@@ -643,7 +643,7 @@ Correlation(_id) ->
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
       string correlationSetName = myself->checkCorrelationSet();
 
@@ -701,7 +701,7 @@ Empty(a,_id) ->
 
       a->parentId = myid;
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
     }
     a
@@ -725,7 +725,7 @@ Invoke(a,b,c,d,_id) ->
 
       a->parentId = myid;
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
 
       /* above is generic */
@@ -771,7 +771,7 @@ Receive(a,b,c,_id) ->
 
       a->parentId = myid;
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
 
       /* above is generic */
@@ -795,7 +795,7 @@ Receive(a,b,c,_id) ->
     {
       if (myself->isStartActivity)
       {
-        ASTE_startActivities.insert(myid);
+        globals::ASTE_startActivities.insert(myid);
 
         // trigger [SA00056]
         if (!ASTEmap[myself->parentActivityId]->checkAncestors() || !myself->targetLinks.empty())
@@ -821,7 +821,7 @@ Reply(a,b,c,_id) ->
 
       a->parentId = myid;
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
 
       /* above is generic */
@@ -862,7 +862,7 @@ Assign(a,b,_id) ->
 
       a->parentId = myid;
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
     }
     a b
@@ -883,7 +883,7 @@ From(_id) ->
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
 
       myself->checkPartnerLink();
@@ -899,7 +899,7 @@ To(_id) ->
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
 
       myself->checkPartnerLink();
@@ -922,7 +922,7 @@ Validate(a,_id) ->
 
       a->parentId = myid;
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
     }
     a
@@ -946,7 +946,7 @@ Wait(a,_id) ->
 
       a->parentId = myid;
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
     }
     a
@@ -970,7 +970,7 @@ Throw(a,_id) ->
 
       a->parentId = myid;
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
     }
     a
@@ -994,7 +994,7 @@ Rethrow(a,_id) ->
 
       a->parentId = myid;
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
 
       /* above is generic */
@@ -1035,7 +1035,7 @@ Compensate(a,_id) ->
 
       a->parentId = myid;
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
 
       /* above is generic */
@@ -1060,7 +1060,7 @@ Compensate(a,_id) ->
 
       // register this compensate at the current scope
       /* here we can check whether it is the only compensate activity */
-      PPhasCompensateMap[PPcurrentScope] = 1;
+      globals::PPhasCompensateMap[globals::PPcurrentScope] = 1;
     }
     a
     {
@@ -1088,7 +1088,7 @@ CompensateScope(a,b,_id) ->
       if (myself->attributes["target"] == "")
         myself->attributes["target"] = string(b->name);
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
 
       /* above is generic */
@@ -1112,14 +1112,14 @@ CompensateScope(a,b,_id) ->
 
 
       // triggers SA00078 and SA00077
-      if (ASTE_scopeNames[myself->attributes["target"]] == 0)
+      if (globals::ASTE_scopeNames[myself->attributes["target"]] == 0)
         SAerror(78, myself->attributes["target"], myself->attributes["referenceLine"]);
-      else if (ASTEmap[myself->parentScopeId]->enclosedScopes.find(ASTE_scopeNames[myself->attributes["target"]]) == ASTEmap[myself->parentScopeId]->enclosedScopes.end())
+      else if (ASTEmap[myself->parentScopeId]->enclosedScopes.find(globals::ASTE_scopeNames[myself->attributes["target"]]) == ASTEmap[myself->parentScopeId]->enclosedScopes.end())
         SAerror(77, myself->attributes["target"], myself->attributes["referenceLine"]);
 
       // register this compensate at the current scope
       /* here we can check whether it is the only compensate activity */
-      PPhasCompensateMap[PPcurrentScope] = 2;
+      globals::PPhasCompensateMap[globals::PPcurrentScope] = 2;
     }
     a
     {
@@ -1142,7 +1142,7 @@ Exit(a,_id) ->
 
       a->parentId = myid;
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
     }
     a
@@ -1166,7 +1166,7 @@ Flow(a,b,c,_id) ->
 
       a->parentId = myid;
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
 
       /* above is generic */
@@ -1236,12 +1236,12 @@ Link(_id) ->
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
 
       myself->linkName = myself->defineLink();
 
-      ASTE_linkIdMap[ myself->linkName ] = myid;
+      globals::ASTE_linkIdMap[ myself->linkName ] = myid;
 
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
     }
@@ -1262,7 +1262,7 @@ Switch(a,b,c,_id) ->
 
       a->parentId = myid;
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
 
       /* above is generic */
@@ -1338,7 +1338,7 @@ Case(a,_id) ->
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
     }
     a
@@ -1357,7 +1357,7 @@ Otherwise(a,_id) ->
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
     }
     a
     {
@@ -1382,7 +1382,7 @@ If(a,b,c,_id) ->
 
       a->parentId = myid;
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
 
       /* above is generic */
@@ -1443,7 +1443,7 @@ ElseIf(a,_id) ->
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
     }
     a
@@ -1462,7 +1462,7 @@ Else(a,_id) ->
       ASTE *myself = ASTEmap[myid];
       assert(myself != NULL);
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
     }
     a
     {
@@ -1490,7 +1490,7 @@ While(a,b,_id) ->
 
       a->parentId = myid;
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
 
       /* above is generic */
@@ -1541,7 +1541,7 @@ RepeatUntil(a,b,_id) ->
 
       a->parentId = myid;
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
 
       /* above is generic */
@@ -1592,7 +1592,7 @@ Sequence(a,b,_id) ->
 
       a->parentId = myid;
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
 
       /* above is generic */
@@ -1643,7 +1643,7 @@ Pick(a,b,c,_id) ->
 
       a->parentId = myid;
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
 
       /* above is generic */
@@ -1670,7 +1670,7 @@ Pick(a,b,c,_id) ->
     {
       if (myself->isStartActivity)
       {
-        ASTE_startActivities.insert(myid);
+        globals::ASTE_startActivities.insert(myid);
 
         // trigger [SA00062]
         if (c->length() != 0)
@@ -1736,7 +1736,7 @@ ForEach(a,b,c,d,e,_id) ->
 
       a->parentId = myid;
 
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
       myself->checkAttributes();
 
       /* above is generic */
@@ -1826,10 +1826,10 @@ Scope(a,b,c,d,e,f,g,i,j,_id) ->
       a->parentId = myid;
 
       // my parent is the current scope
-      myself->parentScopeId = PPcurrentScope;
+      myself->parentScopeId = globals::PPcurrentScope;
 
       // now I am the current scope
-      PPcurrentScope = myid;
+      globals::PPcurrentScope = myid;
 
       assert(ASTEmap[myself->parentActivityId] != NULL);
       assert(ASTEmap[myself->parentScopeId] != NULL);
@@ -1873,10 +1873,10 @@ Scope(a,b,c,d,e,f,g,i,j,_id) ->
       if (myself->attributes["name"] != "")
       {
         // trigger [SA00092]
-        if (ASTE_scopeNames[myself->attributes["name"]] != 0)
+        if (globals::ASTE_scopeNames[myself->attributes["name"]] != 0)
           SAerror(92, myself->attributes["name"], myself->attributes["referenceLine"]);
         
-        ASTE_scopeNames[myself->attributes["name"]] = myid;
+        globals::ASTE_scopeNames[myself->attributes["name"]] = myid;
       }
 
       // trigger [SA00091]
@@ -1910,7 +1910,7 @@ Scope(a,b,c,d,e,f,g,i,j,_id) ->
       myself->enclosedSourceLinks = setUnion( myself->enclosedSourceLinks, ASTEmap[f->id]->enclosedSourceLinks );
 
       // everybody after me has the same parent scope as me
-      PPcurrentScope = myself->parentScopeId;
+      globals::PPcurrentScope = myself->parentScopeId;
 
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
@@ -1942,8 +1942,8 @@ StandardElements(a,b, _joinCondition) ->
         ASTEmap[targetLink->id]->controlFlow = ASTEmap[$0->parentId]->controlFlow;
         ASTEmap[targetLink->id]->parentActivityId = $0->parentId;
         
-        // links are numbered and stored in joinCondition_links map
-        joinCondition_links[ASTEmap[targetLink->id]->attributes["linkName"]] = ++linkCount; // start enumerating with '1'
+        // links are numbered and stored in globals::joinCondition_links map
+        globals::joinCondition_links[ASTEmap[targetLink->id]->attributes["linkName"]] = ++linkCount; // start enumerating with '1'
       }
 
       foreach(sourceLink; tSource_list b)
@@ -1960,7 +1960,7 @@ StandardElements(a,b, _joinCondition) ->
        * for-loop). For each assignment (second for-loop) set the links
        * respectively. Then call an uparser "evaluation" to actually
        * calculate the join condition for the current assignment. The result
-       * is stored in mapping "joinCondition_result", indexed by the number of
+       * is stored in mapping "globals::joinCondition_result", indexed by the number of
        * the assignment (0 .. 2^n -1).
        */
       unsigned int assignments = (unsigned int)pow(2.0, a->length());
@@ -1970,9 +1970,9 @@ StandardElements(a,b, _joinCondition) ->
         for (unsigned int link = 0; link < linkCount; link++)
         {
           if (((assignment >> link) % 2) == 0) // don't ask why this is working :-|
-            joinCondition_linkStatus[link] = true;
+            globals::joinCondition_linkStatus[link] = true;
           else
-            joinCondition_linkStatus[link] = false;
+            globals::joinCondition_linkStatus[link] = false;
         }
 
         // evaluate the join condition in the current assignment
@@ -1982,14 +1982,14 @@ StandardElements(a,b, _joinCondition) ->
         with(_joinCondition)
         {
           _joinCondition = userDefinedJoinCondition(_exp):
-	    { joinCondition_result[assignment] = _exp->value; }
+	    { globals::joinCondition_result[assignment] = _exp->value; }
           default: {}
         }
       }
       
       // clear mappings that are not used any more
-      joinCondition_links.clear();
-      joinCondition_linkStatus.clear();
+      globals::joinCondition_links.clear();
+      globals::joinCondition_linkStatus.clear();
 
     }
     a b
@@ -2002,7 +2002,7 @@ StandardElements(a,b, _joinCondition) ->
         string linkName = ASTEmap[targetLink->id]->linkName;
         if (targetLinks.find(linkName) != targetLinks.end())
           SAerror(69, "<" + ASTEmap[$0->parentId]->activityTypeName() + "> must not use <link> `" +
-                  linkName + "'", ASTEmap[ASTE_linkIdMap[linkName]]->attributes["referenceLine"]);
+                  linkName + "'", ASTEmap[globals::ASTE_linkIdMap[linkName]]->attributes["referenceLine"]);
         else
           targetLinks.insert(linkName);
       }
@@ -2014,7 +2014,7 @@ StandardElements(a,b, _joinCondition) ->
         string linkName = ASTEmap[sourceLink->id]->linkName;
         if (sourceLinks.find(linkName) != sourceLinks.end())
           SAerror(68, "<" + ASTEmap[$0->parentId]->activityTypeName() + "> must not use <link> `" +
-                  linkName + "'", ASTEmap[ASTE_linkIdMap[linkName]]->attributes["referenceLine"]);
+                  linkName + "'", ASTEmap[globals::ASTE_linkIdMap[linkName]]->attributes["referenceLine"]);
         else
           sourceLinks.insert(linkName);
       }
@@ -2034,7 +2034,7 @@ Target(a) ->
 
       // find the id of the link used as target here and add that link to the
       // parent activity
-      unsigned int linkId = ASTE_linkIdMap[ myself->linkName ];
+      unsigned int linkId = globals::ASTE_linkIdMap[ myself->linkName ];
       assert(ASTEmap[myself->parentActivityId] != NULL);
       ASTEmap[myself->parentActivityId]->targetLinks.insert(linkId);
 
@@ -2065,7 +2065,7 @@ Source(a) ->
       // find the id of the link used as source here and add that link to the
       // parent activity
       assert(ASTEmap[myself->parentActivityId] != NULL);
-      unsigned int linkId = ASTE_linkIdMap[ myself->linkName ];
+      unsigned int linkId = globals::ASTE_linkIdMap[ myself->linkName ];
       ASTEmap[myself->parentActivityId]->enclosedSourceLinks.insert(linkId);
       ASTEmap[myself->parentActivityId]->sourceLinks.insert(linkId);
 
@@ -2118,15 +2118,15 @@ Term(_linkname) ->
     {
       // if no value was set in this join condition, the link is not inside the
       // target link list of the current activity --> triggeer SA00073
-      if (joinCondition_links[_linkname->name] == 0)
+      if (globals::joinCondition_links[_linkname->name] == 0)
       {
         assert(ASTEmap[$0->parentId] != NULL);
         SAerror(73, _linkname->name, ASTEmap[$0->parentId]->attributes["referenceLine"]);
       }
       else
       {
-        // numbering in joinCondition_linkStatus should start with 0, thus subtract 1
-        $0->value = joinCondition_linkStatus[joinCondition_links[_linkname->name] -1];
+        // numbering in globals::joinCondition_linkStatus should start with 0, thus subtract 1
+        $0->value = globals::joinCondition_linkStatus[globals::joinCondition_links[_linkname->name] -1];
       }
     }
   ]

@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/03/04 16:42:31 $
+ * \date    \$Date: 2007/03/05 14:30:34 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.25 $
+ * \version \$Revision: 1.26 $
  */
 %}
 
@@ -64,12 +64,14 @@ using std::endl;
 
 extern PetriNet PN;
 extern map<unsigned int, ASTE*> ASTEmap;
-extern string currentScope;
 
-extern set<string> ASTE_inputChannels;
-extern set<string> ASTE_outputChannels;
-extern set<string> ASTE_linkNames;
-extern set<string> ASTE_variableNames;
+namespace globals {
+  extern string currentScope;
+  extern set<string> ASTE_inputChannels;
+  extern set<string> ASTE_outputChannels;
+  extern set<string> ASTE_linkNames;
+  extern set<string> ASTE_variableNames;
+}
 %}
 
 
@@ -93,21 +95,21 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
   {
     case(petrinetnew_enum):
       {
-	currentScope = prefix;
+	globals::currentScope = prefix;
 
 	// Create the interface places.
 	// The used lists are filled during parsing mapping each combination of
 	// partnerLink, portType and operation to one input (resp. output) place.
-	for (set<string>::iterator in = ASTE_inputChannels.begin(); in != ASTE_inputChannels.end(); in++)
+	for (set<string>::iterator in = globals::ASTE_inputChannels.begin(); in != globals::ASTE_inputChannels.end(); in++)
 	  PN.newPlace("in." + *in, IN);
-	for (set<string>::iterator out = ASTE_outputChannels.begin(); out != ASTE_outputChannels.end(); out++)
+	for (set<string>::iterator out = globals::ASTE_outputChannels.begin(); out != globals::ASTE_outputChannels.end(); out++)
 	  PN.newPlace("out." + *out, OUT);
 
 
 	// Create the places for the links.
 	// The used list is filled during parsing and contains all links of the
 	// whole process -- also links defined in a deeper hierarchy.
-	for (set<string>::iterator link = ASTE_linkNames.begin(); link != ASTE_linkNames.end(); link++)
+	for (set<string>::iterator link = globals::ASTE_linkNames.begin(); link != globals::ASTE_linkNames.end(); link++)
 	{
 	  PN.newPlace("link." + *link);
 	  PN.newPlace("!link." + *link);
@@ -233,15 +235,15 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 	// Create the interface places.
 	// The used lists are filled during parsing mapping each combination of
 	// partnerLink, portType and operation to one input (resp. output) place.
-	for (set<string>::iterator in = ASTE_inputChannels.begin(); in != ASTE_inputChannels.end(); in++)
+	for (set<string>::iterator in = globals::ASTE_inputChannels.begin(); in != globals::ASTE_inputChannels.end(); in++)
 	  PN.newPlace("in." + *in, IN);
-	for (set<string>::iterator out = ASTE_outputChannels.begin(); out != ASTE_outputChannels.end(); out++)
+	for (set<string>::iterator out = globals::ASTE_outputChannels.begin(); out != globals::ASTE_outputChannels.end(); out++)
 	  PN.newPlace("out." + *out, OUT);
 
 	// Create the places for the links.
 	// The used list is filled during parsing and contains all links of the
 	// whole process -- also links defined in a deeper hierarchy.
-	for (set<string>::iterator link = ASTE_linkNames.begin(); link != ASTE_linkNames.end(); link++)
+	for (set<string>::iterator link = globals::ASTE_linkNames.begin(); link != globals::ASTE_linkNames.end(); link++)
 	{
 	  PN.newPlace("link." + *link);
 	  PN.newPlace("!link." + *link);
@@ -271,7 +273,7 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 
 
   // this global mapping is not used any more
-  ASTE_linkNames.clear();
+  globals::ASTE_linkNames.clear();
 
   footer(phylum->id, true);
 }
@@ -296,7 +298,7 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
   {
     case(petrinetnew_enum):
       {
-	currentScope = prefix;
+	globals::currentScope = prefix;
 
 	Place *p1  = PN.newPlace(prefix + "initial");
 	Place *p2  = PN.newPlace(prefix + "final");

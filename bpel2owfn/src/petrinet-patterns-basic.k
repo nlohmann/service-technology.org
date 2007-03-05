@@ -30,7 +30,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/04 15:10:58 $
+ * \date    \$Date: 2007/03/05 14:30:34 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
  */
 %}
 
@@ -65,8 +65,11 @@ using std::endl;
 
 extern PetriNet PN;
 extern map<unsigned int, ASTE*> ASTEmap;
-extern map<string, unsigned int> ASTE_scopeNames;
-extern string currentScope;
+
+namespace globals
+{
+  extern map<string, unsigned int> ASTE_scopeNames;
+}
 %}
 
 
@@ -1071,7 +1074,7 @@ void PCompensateScope(impl_tCompensate* abstract_phylum, uview current_view)
         PN.newArc(t4, p4);
 
 
-        string newPrefix = toString(ASTE_scopeNames[ASTEmap[phylum->id]->attributes["target"]]) + ".internal.";
+        string newPrefix = toString(globals::ASTE_scopeNames[ASTEmap[phylum->id]->attributes["target"]]) + ".internal.";
         PN.newArc(t1, PN.findPlace(newPrefix + "compensate"));
         PN.newArc(t3, PN.findPlace(newPrefix + "ch_stop"));
         PN.newArc(PN.findPlace(newPrefix + "ch_stopped"),  t4);

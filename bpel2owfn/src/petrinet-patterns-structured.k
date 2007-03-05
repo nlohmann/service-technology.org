@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/04 13:40:41 $
+ * \date    \$Date: 2007/03/05 14:30:34 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.25 $
+ * \version \$Revision: 1.26 $
  */
 %}
 
@@ -64,7 +64,11 @@ using std::endl;
 
 extern PetriNet PN;
 extern map<unsigned int, ASTE*> ASTEmap;
-extern string currentScope;
+
+namespace globals {
+  extern string currentScope;
+  extern string forEach_suffix;
+}
 %}
 
 
@@ -1147,8 +1151,8 @@ void PForEach(impl_tForEach* abstract_phylum, uview current_view)
           {
             for (unsigned int scope_number = 1; scope_number <= ASTEmap[phylum->tScope_1->id]->max_occurrences; scope_number++)
             {
-              forEach_suffix = "_foreach_" + toString(scope_number);
-              cerr << forEach_suffix << endl;
+              globals::forEach_suffix = "_foreach_" + toString(scope_number);
+              cerr << globals::forEach_suffix << endl;
 //              phylum->tScope_1->unparse(pseudoPrinter, current_view);
             }
           }

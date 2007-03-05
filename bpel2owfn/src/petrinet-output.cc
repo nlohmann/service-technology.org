@@ -29,13 +29,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/03/04 19:00:59 $
+ * \date    \$Date: 2007/03/05 14:30:34 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.81 $
+ * \version \$Revision: 1.82 $
  *
  * \ingroup petrinet
  */
@@ -48,6 +48,7 @@
  * Headers
  *****************************************************************************/
 
+#include <cassert>
 #include <iomanip>		// (std::setw)
 
 #include "petrinet.h"		// to define member functions

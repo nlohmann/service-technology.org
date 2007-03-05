@@ -29,13 +29,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/03/04 14:31:59 $
+ * \date    \$Date: 2007/03/05 14:30:34 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.61 $
+ * \version \$Revision: 1.62 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -71,6 +71,10 @@ unsigned int indent = 0;
 /// number of spaces to be added when indention is increased
 unsigned int indentStep = 4;
 
+namespace globals
+{
+  extern map<string, unsigned int> ASTE_linkIdMap;
+}
 
 
 
@@ -580,7 +584,6 @@ void check_SA00070( unsigned int id )
   ENTER("check_SA00070");
 
   extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
-  extern map<string, unsigned int> ASTE_linkIdMap;
   
   // go through all enclosed activities and look if there have sources or targets
   for ( set< unsigned int >::iterator activities = ASTEmap[ id ]->enclosedActivities.begin();
@@ -594,7 +597,7 @@ void check_SA00070( unsigned int id )
     for ( set< unsigned int>::iterator link = links.begin(); link != links.end(); link++ )
     {
       // get the id of the <link> element
-      unsigned int linkId = ASTE_linkIdMap[ ASTEmap[ *link ]->linkName ];
+      unsigned int linkId = globals::ASTE_linkIdMap[ ASTEmap[ *link ]->linkName ];
       
       // look if the linkId is inside the set of enclosed activities
       bool internal = false;
@@ -630,7 +633,6 @@ void check_SA00071( unsigned int id )
   ENTER("check_SA00071");
 
   extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
-  extern map<string, unsigned int> ASTE_linkIdMap;
  
   for ( set< unsigned int >::iterator activities = ASTEmap[ id ]->enclosedActivities.begin();
           activities != ASTEmap[ id ]->enclosedActivities.end();
@@ -643,7 +645,7 @@ void check_SA00071( unsigned int id )
     for ( set< unsigned int>::iterator link = targets.begin(); link != targets.end(); link++ )
     {
       // get the id of the <link> element
-      unsigned int linkId = ASTE_linkIdMap[ ASTEmap[ *link ]->linkName ];
+      unsigned int linkId = globals::ASTE_linkIdMap[ ASTEmap[ *link ]->linkName ];
       
       // look if the linkId is inside the set of enclosed activities
       bool internal = false;

@@ -26,18 +26,18 @@
  * This file implements the class defined in cfg.h
  * 
  * \author  Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/02/15 15:21:20 $
+ * \date    \$Date: 2007/03/05 14:30:34 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.44 $
+ * \version \$Revision: 1.45 $
  *
  * \todo    - commandline option to control drawing of clusters 
  */
@@ -61,6 +61,11 @@ using std::endl;
 
 extern map<unsigned int, map<string, string> > temporaryAttributeMap;
 extern map<unsigned int, ASTE*> ASTEmap;
+
+namespace globals {
+  extern map< string, CFGBlock* > cfgMap;
+}
+
 
 /// The CFG
 CFGBlock * CFG = NULL;
@@ -634,10 +639,9 @@ void CFGBlock::checkForCyclicControlDependency()
 //              cerr << "Looking at scope " << current << endl;
 	      if ( ! seen[ current ] )
 	      {
-                extern map< string, CFGBlock* > cfgMap;
 		seen[ current ] = true;
 //		for ( set< unsigned int >::iterator peer = ASTEmap[ current ]->peerScopes.begin(); peer != ASTEmap[ current ]->peerScopes.end(); peer++ )
-		for ( set< unsigned int >::iterator peer = cfgMap[ toString(current) ]->lastBlock->controllingPeers.begin(); peer != cfgMap[ toString(current) ]->lastBlock->controllingPeers.end(); peer++ )
+		for ( set< unsigned int >::iterator peer = globals::cfgMap[ toString(current) ]->lastBlock->controllingPeers.begin(); peer != globals::cfgMap[ toString(current) ]->lastBlock->controllingPeers.end(); peer++ )
 		{
 		  // is there a cycle?
 //                  cerr << "    peer " << *peer << endl;

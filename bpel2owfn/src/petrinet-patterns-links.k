@@ -29,7 +29,7 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/05 08:38:45 $
+ * \date    \$Date: 2007/03/05 14:30:34 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  */
 %}
 
@@ -73,10 +73,13 @@ using std::map;
 extern PetriNet PN;
 extern map<unsigned int, ASTE*> ASTEmap;
 
-/* todo: put this to the functions */
-  extern map<string, unsigned int> joinCondition_links;
-  extern map<unsigned int, bool> joinCondition_linkStatus;
-  extern map<unsigned int, bool> joinCondition_result;
+namespace globals {
+
+/* todo: move this to the functions */
+extern map<string, unsigned int> globals::joinCondition_links;
+extern map<unsigned int, bool> globals::joinCondition_linkStatus;
+extern map<unsigned int, bool> globals::joinCondition_result;
+}
 %}
 
 
@@ -337,7 +340,7 @@ void PLinkWrapper2(impl_standardElements* abstract_phylum, uview current_view)
     // create pattern for join condition
     for (unsigned int i = 0; i < transitionNumber; i++)
     {
-      if (joinCondition_result[i])
+      if (globals::joinCondition_result[i])
         PN.newArc(joinTransitions[i], p3);
       else
         PN.newArc(joinTransitions[i], p4);
@@ -477,7 +480,7 @@ void PLinkWrapper3(impl_standardElements* abstract_phylum, uview current_view)
     // create pattern for join condition
     for (unsigned int i = 0; i < transitionNumber; i++)
     {
-      if (joinCondition_result[i])
+      if (globals::joinCondition_result[i])
         PN.newArc(joinTransitions[i], p3);
       else
         PN.newArc(joinTransitions[i], p4);
@@ -639,7 +642,7 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
         // create pattern for join condition
         for (unsigned int i = 0; i < transitionNumber; i++)
         {
-          if (joinCondition_result[i])
+          if (globals::joinCondition_result[i])
             PN.newArc(joinTransitions[i], p5);
           else
             PN.newArc(joinTransitions[i], p6);
@@ -844,7 +847,7 @@ This=StandardElements(a,b, jc) provided (This->suppressJF) ->
         // create pattern for join condition
         for (unsigned int i = 0; i < transitionNumber; i++)
         {
-          if (joinCondition_result[i])
+          if (globals::joinCondition_result[i])
             PN.newArc(joinTransitions[i], p5);
           else
             PN.newArc(joinTransitions[i], p6);
@@ -1023,7 +1026,7 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF)
         // create pattern for join condition
         for (unsigned int i = 0; i < transitionNumber; i++)
         {
-          if (joinCondition_result[i])
+          if (globals::joinCondition_result[i])
             PN.newArc(joinTransitions[i], p5);
           else
             PN.newArc(joinTransitions[i], p6);

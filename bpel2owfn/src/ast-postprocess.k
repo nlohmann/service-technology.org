@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/03/05 11:13:15 $
+ * \date    \$Date: 2007/03/05 11:36:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.132 $
+ * \version \$Revision: 1.133 $
  */
 %}
 
@@ -1076,6 +1076,11 @@ CompensateScope(a,b,_id) ->
       assert(myself != NULL);
 
       a->parentId = myid;
+
+      // copy attribute from AST to attribute map
+      // (necessary to be able to parse BPEL4WS 1.1)
+      if (myself->attributes["target"] == "")
+        myself->attributes["target"] = string(b->name);
 
       myself->parentScopeId = PPcurrentScope;
       myself->checkAttributes();

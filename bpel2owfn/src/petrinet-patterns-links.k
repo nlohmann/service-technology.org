@@ -29,7 +29,7 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/05 07:45:31 $
+ * \date    \$Date: 2007/03/05 08:38:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
  */
 %}
 
@@ -90,7 +90,7 @@ extern map<unsigned int, ASTE*> ASTEmap;
 
 void PLinkWrapper0(impl_standardElements* abstract_phylum, uview current_view)
 {
-  trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern: no links" + "\n");
+  trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern 0: no links\n");
 
   impl_standardElements_StandardElements* phylum = static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
   assert(phylum != NULL);
@@ -133,7 +133,7 @@ void PLinkWrapper0(impl_standardElements* abstract_phylum, uview current_view)
 
 void PLinkWrapper1(impl_standardElements* abstract_phylum, uview current_view)
 {
-  trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern: outgoing links" + "\n");
+  trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern 1: outgoing links, suppress join failures\n");
 
   impl_standardElements_StandardElements* phylum = static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
   assert(phylum != NULL);
@@ -240,7 +240,7 @@ void PLinkWrapper1(impl_standardElements* abstract_phylum, uview current_view)
 
 void PLinkWrapper2(impl_standardElements* abstract_phylum, uview current_view)
 {
-  trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern: outgoing links" + "\n");
+  trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern 2: outgoing links, don't suppress join failures\n");
 
   impl_standardElements_StandardElements* phylum = static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
   assert(phylum != NULL);
@@ -706,6 +706,8 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF)
 This=StandardElements(a,b, jc) provided (This->suppressJF) ->
   [petrinetnew:
     {
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern 4: incoming and outgoing links, suppress join failures\n");
+
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 25 (new)\n");
       string prefix = toString(This->parentId) + ".";
       string newPrefix = toString(This->parentId) + ".internal";
@@ -874,6 +876,8 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF)
  ->
   [petrinetnew:
     {
+      trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern 5: incoming and outgoing links, don't suppress join failures\n");
+
       trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 26 (new)\n");
       string prefix = toString(This->parentId) + ".";
       string newPrefix = toString(This->parentId) + ".internal";

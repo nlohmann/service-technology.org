@@ -25,18 +25,18 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/02/13 14:41:08 $
+ * \date    \$Date: 2007/03/05 08:38:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.73 $
+ * \version \$Revision: 1.74 $
  */
 
 
@@ -655,6 +655,11 @@ void ASTE::checkAttributeType(string attribute, attributeType type)
 /*!
  * \brief creates a channel for communicating activities
  *
+ * \bug The <invoke> activity has one field "channelName" used for the input
+ *      and output channel. The "plRoleDetails"-stuff creates different strings
+ *      for input and output channels. Thus, the Petri net unparser cannot find
+ *      the channel place.
+ *
  * \return name of the channel
  */
 string ASTE::createChannel(bool synchronousCommunication)
@@ -674,10 +679,10 @@ string ASTE::createChannel(bool synchronousCommunication)
     case(K_RECEIVE):
     case(K_ONMESSAGE):
       {
-        if (plRoleDetails != NULL)
-        {
-          channelName = plRoleDetails->partnerRole + "." + plRoleDetails->myRole + "." + attributes["operation"];
-        }
+//NL        if (plRoleDetails != NULL)
+//NL        {
+//NL          channelName = plRoleDetails->partnerRole + "." + plRoleDetails->myRole + "." + attributes["operation"];
+//NL        }
 	ASTE_inputChannels.insert(channelName);
 	break;
       }
@@ -685,18 +690,18 @@ string ASTE::createChannel(bool synchronousCommunication)
     case(K_INVOKE):
     case(K_REPLY):
       {
-        if (plRoleDetails != NULL)
-        {
-          channelName = plRoleDetails->myRole + "." + plRoleDetails->partnerRole + "." + attributes["operation"];
-        }
+//NL        if (plRoleDetails != NULL)
+//NL        {
+//NL          channelName = plRoleDetails->myRole + "." + plRoleDetails->partnerRole + "." + attributes["operation"];
+//NL        }
 	ASTE_outputChannels.insert(channelName);
 
 	if (synchronousCommunication)
         {
-          if (plRoleDetails != NULL)
-          {
-            channelName = plRoleDetails->partnerRole + "." + plRoleDetails->myRole + "." + attributes["operation"];
-          }
+//NL          if (plRoleDetails != NULL)
+//NL          {
+//NL            channelName = plRoleDetails->partnerRole + "." + plRoleDetails->myRole + "." + attributes["operation"];
+//NL          }
 	  ASTE_inputChannels.insert(channelName);
         }
 

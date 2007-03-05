@@ -20,8 +20,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/05 18:39:42 $ by $Author: nielslohmann $.
-# Version $Revision: 1.17 $
+# File last changed $Date: 2007/03/05 18:55:48 $ by $Author: nielslohmann $.
+# Version $Revision: 1.18 $
 
 #---------------------------------------------------------------------------
 # Project related configuration options
@@ -140,7 +140,7 @@ EXCLUDE_PATTERNS       = ast-system*.* getopt*.*
 EXAMPLE_PATH           = 
 EXAMPLE_PATTERNS       = *
 EXAMPLE_RECURSIVE      = NO
-IMAGE_PATH             = ../doc/images
+IMAGE_PATH             = ../doc/patterns
 INPUT_FILTER           = 
 FILTER_PATTERNS        = 
 FILTER_SOURCE_FILES    = NO

@@ -45,7 +45,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/05 18:39:43 $
+ * \date    \$Date: 2007/03/05 18:55:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -55,7 +55,7 @@
  *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.29 $
+ * \version \$Revision: 1.30 $
  */
 %}
 
@@ -96,7 +96,7 @@ extern map<unsigned int, ASTE*> ASTEmap;
 /*!
  * \fn void kc::PEmpty(impl_tEmpty *abstract_phylum, uview current_view)
  * \brief Pattern for the <empty> activity.
- * \image html "../../../doc/patterns/empty.png" "pattern"
+ * \image html "empty.png" "pattern"
  */
 %}
 void PEmpty(impl_tEmpty* abstract_phylum, uview current_view)
@@ -151,7 +151,7 @@ void PEmpty(impl_tEmpty* abstract_phylum, uview current_view)
 /*!
  * \fn void kc::PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
  * \brief Pattern for asynchronous <invoke> activity.
- * \image html "../../../doc/patterns/invoke_a.png" "pattern"
+ * \image html "invoke_a.png" "pattern"
  */
 %}
 void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
@@ -231,7 +231,7 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 /*!
  * \fn void kc::PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
  * \brief Pattern for the synchronous <invoke> activity.
- * \image html "../../../doc/patterns/invoke_s.png" "pattern"
+ * \image html "invoke_s.png" "pattern"
  */
 %}
 void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
@@ -340,7 +340,7 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 /*!
  * \fn void kc::PReceive(impl_tReceive* abstract_phylum, uview current_view)
  * \brief Pattern for the <receive> activity.
- * \image html "../../../doc/patterns/receive.png" "pattern"
+ * \image html "receive.png" "pattern"
  */
 %}
 void PReceive(impl_tReceive* abstract_phylum, uview current_view)
@@ -433,7 +433,7 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
 /*!
  * \fn void kc::PReply(impl_tReply* abstract_phylum, uview current_view)
  * \brief Pattern for the <reply> activity.
- * \image html "../../../doc/patterns/reply.png" "pattern"
+ * \image html "reply.png" "pattern"
  */
 %}
 void PReply(impl_tReply* abstract_phylum, uview current_view)
@@ -518,7 +518,7 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
 /*!
  * \fn void kc::PAssign(impl_tAssign* abstract_phylum, uview current_view)
  * \brief Pattern for the <assign> activity.
- * \image html "../../../doc/patterns/assign.png" "pattern"
+ * \image html "assign.png" "pattern"
  */
 %}
 void PAssign(impl_tAssign* abstract_phylum, uview current_view)
@@ -647,7 +647,7 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 /*!
  * \fn void kc::PValidate(impl_tValidate* abstract_phylum, uview current_view)
  * \brief Pattern for the <validate> activity.
- * \image html "../../../doc/patterns/validate.png" "pattern"
+ * \image html "validate.png" "pattern"
  */
 %}
 void PValidate(impl_tValidate* abstract_phylum, uview current_view)
@@ -852,7 +852,7 @@ void PWaitFor(impl_tWait* abstract_phylum, uview current_view)
 /*!
  * \fn void kc::PThrow(impl_tThrow* abstract_phylum, uview current_view)
  * \brief Pattern for the <throw> activity.
- * \image html "../../../doc/patterns/throw.png" "pattern"
+ * \image html "throw.png" "pattern"
  */
 %}
 void PThrow(impl_tThrow* abstract_phylum, uview current_view)
@@ -920,7 +920,7 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
 /*!
  * \fn void kc::PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
  * \brief Pattern for the <rethrow> activity.
- * \image html "../../../doc/patterns/rethrow.png" "pattern"
+ * \image html "rethrow.png" "pattern"
  * The gray place is from the <faultHandlers> pattern.
  */
 %}
@@ -969,7 +969,7 @@ void PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
 /*!
  * \fn void kc::PExit(impl_tExit* abstract_phylum, uview current_view)
  * \brief Pattern for the <exit> activity.
- * \image html "../../../doc/patterns/exit.png" "pattern"
+ * \image html "exit.png" "pattern"
  * The gray places are from the <process> pattern.
  */
 %}
@@ -1044,7 +1044,7 @@ void PExit(impl_tExit* abstract_phylum, uview current_view)
 /*!
  * \fn void kc::PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
  * \brief Pattern for the <compensate> activity.
- * \image html "../../../doc/patterns/compensate.png" "pattern"
+ * \image html "compensate.png" "pattern"
  * The gray places are from the child <scope> patterns.
  */
 %}
@@ -1150,7 +1150,7 @@ void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
 /*!
  * \fn void kc::PCompensateScope(impl_tCompensate* abstract_phylum, uview current_view)
  * \brief Pattern for the <compensateScope> activity.
- * \image html "../../../doc/patterns/compensatescope.png" "pattern"
+ * \image html "compensatescope.png" "pattern"
  * The gray places are from the target child <scope> pattern.
  */
 %}

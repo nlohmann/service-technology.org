@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/05 18:39:43 $
+ * \date    \$Date: 2007/03/05 18:55:48 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.28 $
+ * \version \$Revision: 1.29 $
  */
 %}
 
@@ -79,7 +79,7 @@ extern map<unsigned int, ASTE*> ASTEmap;
 /*!
  * \fn void kc::PWhile(impl_tWhile* abstract_phylum, uview current_view)
  * \brief Pattern for the <while> activity.
- * \image html "../../../doc/patterns/while.png" "pattern"
+ * \image html "while.png" "pattern"
  */
 %}
 void PWhile(impl_tWhile* abstract_phylum, uview current_view)
@@ -234,7 +234,7 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 /*!
  * \fn void kc::PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
  * \brief Pattern for the <repeatUntil> activity.
- * \image html "../../../doc/patterns/repeatuntil.png" "pattern"
+ * \image html "repeatuntil.png" "pattern"
  */
 %}
 void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
@@ -419,7 +419,7 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 /*!
  * \fn void kc::PSequence(impl_tSequence* abstract_phylum, uview current_view)
  * \brief Pattern for the <sequence> activity.
- * \image html "../../../doc/patterns/sequence.png" "pattern"
+ * \image html "sequence.png" "pattern"
  */
 %}
 void PSequence(impl_tSequence* abstract_phylum, uview current_view)
@@ -487,7 +487,7 @@ void PSequence(impl_tSequence* abstract_phylum, uview current_view)
 /*!
  * \fn void kc::PFlow(impl_tFlow* abstract_phylum, uview current_view)
  * \brief Pattern for the <flow> activity.
- * \image html "../../../doc/patterns/flow.png" "pattern"
+ * \image html "flow.png" "pattern"
  */
 %}
 void PFlow(impl_tFlow* abstract_phylum, uview current_view)
@@ -779,7 +779,7 @@ void PSwitch(impl_tSwitch* abstract_phylum, uview current_view)
 /*!
  * \fn void kc::PPick(impl_tPick* abstract_phylum, uview current_view)
  * \brief Pattern for the <pick> activity.
- * \image html "../../../doc/patterns/pick.png" "pattern"
+ * \image html "pick.png" "pattern"
  */
 %}
 void PPick(impl_tPick* abstract_phylum, uview current_view)
@@ -966,7 +966,7 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 /*!
  * \fn void kc::PIf(impl_tIf* abstract_phylum, uview current_view)
  * \brief Pattern for the <if> activity.
- * \image html "../../../doc/patterns/if.png" "pattern"
+ * \image html "if.png" "pattern"
  */
 %}
 void PIf(impl_tIf* abstract_phylum, uview current_view)

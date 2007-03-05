@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/03/04 16:42:31 $
+ * \date    \$Date: 2007/03/05 11:13:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.131 $
+ * \version \$Revision: 1.132 $
  */
 %}
 
@@ -52,7 +52,7 @@
   PROCESS
 ******************************************************************************/
 
-Process(a,b,c,d,e,f,g,i,_id) ->
+Process(a,b,c,d,e,g,i,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
@@ -66,41 +66,41 @@ Process(a,b,c,d,e,f,g,i,_id) ->
       // annotate AST and check information
       myself->checkAttributes();
       myself->hasEH = (string(g->op_name()) == "userDefinedEventHandler");
-      ASTEmap[f->id]->inProcess = true;
+//      ASTEmap[f->id]->inProcess = true;
 
       // distribute the process' id to the enclosed FH/CH/EH/activity
       assert(ASTEmap[e->id] != NULL);
-      assert(ASTEmap[f->id] != NULL);
+//      assert(ASTEmap[f->id] != NULL);
       assert(ASTEmap[g->id] != NULL);
       assert(ASTEmap[i->id] != NULL);
       ASTEmap[e->id]->parentActivityId = myid;
-      ASTEmap[f->id]->parentActivityId = myid;
+//      ASTEmap[f->id]->parentActivityId = myid;
       ASTEmap[g->id]->parentActivityId = myid;
       ASTEmap[i->id]->parentActivityId = myid;
     }
     a b c d
     i // inner activity
-    e f g
+    e g
     {
       // collect enclosed source links
       assert(ASTEmap[i->id] != NULL);
       myself->enclosedSourceLinks = ASTEmap[i->id]->enclosedSourceLinks;
       myself->enclosedSourceLinks = setUnion( myself->enclosedSourceLinks, ASTEmap[e->id]->enclosedSourceLinks );
-      myself->enclosedSourceLinks = setUnion( myself->enclosedSourceLinks, ASTEmap[f->id]->enclosedSourceLinks );
+//      myself->enclosedSourceLinks = setUnion( myself->enclosedSourceLinks, ASTEmap[f->id]->enclosedSourceLinks );
       myself->enclosedSourceLinks = setUnion( myself->enclosedSourceLinks, ASTEmap[g->id]->enclosedSourceLinks );
 
       set< unsigned int > innerIds = ASTEmap[ i->id ]->enclosedActivities;
       innerIds.insert( i->id );
       set< unsigned int > faultIds = ASTEmap[ e->id ]->enclosedActivities;
       faultIds.insert( e->id );
-      set< unsigned int > compIds = ASTEmap[ f->id ]->enclosedActivities;
-      compIds.insert( f->id );
+//      set< unsigned int > compIds = ASTEmap[ f->id ]->enclosedActivities;
+//      compIds.insert( f->id );
 
       enterConflictingActivities( innerIds, faultIds );
-      enterConflictingActivities( faultIds, compIds );
+//      enterConflictingActivities( faultIds, compIds );
 
       // pass list of enclosed scopes to the compensation handler
-      ASTEmap[f->id]->enclosedScopes = myself->enclosedScopes;
+//      ASTEmap[f->id]->enclosedScopes = myself->enclosedScopes;
 
       // trigger [SA00015]
       if (ASTE_startActivities.empty())
@@ -215,7 +215,7 @@ FaultHandlers(a,b,_id) ->
 
       myself->parentScopeId = PPcurrentScope;
       myself->hasCatchAll = (b->op_name() == "CatchAll");
-      myself->inProcess = (myself->parentScopeId == 1);
+//      myself->inProcess = (myself->parentScopeId == 1);
 
       // distribute the fault handlers's id to the enclosed catch/catchAll branches
       // also mark the activities as "inside fault handlers"
@@ -282,6 +282,7 @@ FaultHandlers(a,b,_id) ->
   ]
 ;
 
+/*
 standardFaultHandlers(_id) ->
   [postprocessing:
     {
@@ -296,7 +297,7 @@ standardFaultHandlers(_id) ->
     }
   ]
 ;
-
+*/
 
 Catch(a,_id) ->
   [postprocessing:
@@ -316,6 +317,9 @@ Catch(a,_id) ->
       myself->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
       myself->enclosedActivities.insert( a->id );
       enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+
+      // necessary?
+      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );      
 
       check_SA00071( myid );
     }
@@ -339,6 +343,9 @@ CatchAll(a,_id) ->
       myself->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
       myself->enclosedActivities.insert( a->id );
       enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+
+      // necessary?
+      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );      
 
       check_SA00071( myid );
     }
@@ -479,6 +486,7 @@ OnAlarm(a,_id) ->
   COMPENSATION HANDLERS
 ******************************************************************************/
 
+/*
 standardCompensationHandler(_id) ->
   [postprocessing:
     {
@@ -492,6 +500,7 @@ standardCompensationHandler(_id) ->
     }
   ]
 ;
+*/
 
 CompensationHandler(a,_id) ->
   [postprocessing:
@@ -518,7 +527,10 @@ CompensationHandler(a,_id) ->
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
       ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
       enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
-      
+
+      // necessary?
+      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );      
+
       check_SA00070( myid );
 
       // trigger SA00079

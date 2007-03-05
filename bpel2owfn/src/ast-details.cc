@@ -29,14 +29,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/03/05 08:38:45 $
+ * \date    \$Date: 2007/03/05 11:13:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.74 $
+ * \version \$Revision: 1.75 $
  */
 
 
@@ -78,8 +78,8 @@ using std::endl;
  */
 ASTE::ASTE(unsigned int myid, unsigned int mytype) :
   id(myid), type(mytype),
-  plRoleDetails(NULL), inProcess(false), isStartActivity(false), targetActivity(0),
-  sourceActivity(0), max_occurrences(1), max_loops(UINT_MAX), controlFlow(POSITIVECF)
+  plRoleDetails(NULL), isStartActivity(false), targetActivity(0),
+  sourceActivity(0), max_occurrences(1), max_loops(UINT_MAX), controlFlow(POSITIVECF), drawn(false)
 {
   extern map<unsigned int, map<string, string> > temporaryAttributeMap;
 
@@ -1266,4 +1266,35 @@ pPartnerLink::pPartnerLink(string n, string type, string me, string you) :
 bool pPartnerLink::operator==(pPartnerLink & pl)
 {
   return (pl.partnerLinkType == partnerLinkType && pl.myRole == partnerRole && pl.partnerRole == myRole);
+}
+
+
+
+
+
+
+void ASTE::output()
+{
+  extern map<unsigned int, ASTE*> ASTEmap;
+
+  if (drawn)
+    return;
+
+  if (activityTypeName() != "link")
+  {
+    cerr << id << " [label=\"" << id << " " << activityTypeName() << "\"]" << endl;
+
+    if (id != 1)
+      cerr << parentActivityId << " -> " << id << endl;
+  }
+
+  if (activityTypeName() == "link")
+    cerr << sourceActivity << " -> " << targetActivity << "[label = \"" << id << " link\" color=blue]" << endl;
+
+  drawn = true;
+
+  for (set<unsigned int>::iterator it = enclosedActivities.begin(); it != enclosedActivities.end(); it++)
+  {
+    ASTEmap[*it]->output();
+  }
 }

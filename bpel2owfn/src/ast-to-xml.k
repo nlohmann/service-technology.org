@@ -32,7 +32,7 @@
  * 
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/03/04 16:42:31 $
+ * \date    \$Date: 2007/03/05 11:13:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.70 $
+ * \version \$Revision: 1.71 $
  */
 
 %}
@@ -52,7 +52,7 @@
   PROCESS
 ******************************************************************************/
 
-Process(a,b,c,d,e,f,g,i,_id) ->
+Process(a,b,c,d,e,g,i,_id) ->
   [xml: { inup(); } "<process id=\"" _id "\"" { listAttributes( _id ); } ">\n" 
   
   { if (a->length() == 0) }
@@ -75,7 +75,7 @@ Process(a,b,c,d,e,f,g,i,_id) ->
   { else }
     ${ { inup(); } "<correlationSets>\n" d { indown(); } "</correlationSets>\n" $}
 
-  e f g i { indown(); } "</process>\n"]
+  e g i { indown(); } "</process>\n"]
 ;
 
 

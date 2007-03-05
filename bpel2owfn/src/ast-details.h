@@ -25,18 +25,18 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/02/13 14:41:08 $
+ * \date    \$Date: 2007/03/05 11:13:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.60 $
+ * \version \$Revision: 1.61 $
  */
 
 
@@ -141,7 +141,6 @@ class ASTE
 
     bool hasEH;				///< true if <process> or <scope> have <eventHandlers>
     bool hasCatchAll;			///< true if <faultHandlers> have a <catchAll> branch
-    bool inProcess;			///< true if <compensationHandler> is embedded to a <process>
     bool isStartActivity;		///< true if "createInstance" attribute is set to "yes"
 
     set<unsigned int> sourceLinks;	///< outgoing links
@@ -185,6 +184,9 @@ class ASTE
     string definePartnerLink();
 
     string activityTypeName() const;
+
+    void output();
+    bool drawn;
 
     ASTE(unsigned int myid, unsigned int mytype);
     virtual ~ASTE();

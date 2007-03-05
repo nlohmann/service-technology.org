@@ -39,7 +39,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/03/04 16:42:31 $
+ * \date    \$Date: 2007/03/05 11:13:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -49,7 +49,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.291 $
+ * \version \$Revision: 1.292 $
  *
  * \todo Overwork documentation: WS-BPEL can also be parsed!
  *
@@ -290,7 +290,7 @@ tProcess:
   X_OPEN K_PROCESS arbitraryAttributes X_NEXT tExtensions imports tPartnerLinks
   tPartners tMessageExchanges tVariables tCorrelationSets tFaultHandlers
   tCompensationHandler tEventHandlers activity X_NEXT X_SLASH K_PROCESS X_CLOSE
-    { AST = $$ = Process($8, $9, $11, $12, $13, $14, $15, $16, $4); }
+    { AST = $$ = Process($8, $9, $11, $12, $13, $15, $16, $4); }
 ;
 
 /*---------------------------------------------------------------------------*/

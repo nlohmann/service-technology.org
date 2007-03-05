@@ -29,14 +29,14 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/03/04 13:40:41 $
+ * \date    \$Date: 2007/03/05 11:13:15 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.145 $
+ * \version \$Revision: 1.146 $
  */
 
 
@@ -52,6 +52,7 @@
 #include <fstream>
 #include <string>
 #include <cassert>
+#include <map>
 
 #include "bpel2owfn.h"          // generated configuration file
 
@@ -60,9 +61,12 @@
 #include "debug.h"		// debugging help
 #include "options.h"
 #include "ast-config.h"
+#include "ast-details.h"
 
 using std::cerr;
 using std::endl;
+using std::string;
+using std::map;
 
 
 
@@ -78,6 +82,7 @@ extern int frontend__flex_debug;		// from flex
 extern FILE *frontend_in;			// from flex
 extern kc::tProcess AST;
 
+extern map<unsigned int, ASTE*> ASTEmap;
 
 
 
@@ -177,6 +182,10 @@ int main( int argc, char *argv[])
       AST = AST->rewrite(kc::newNames);
       trace(TRACE_INFORMATION, "Rewriting 2 complete...\n");
 
+// an experiment      
+//      cerr << "digraph G{" << endl;
+//      ASTEmap[1]->output();
+//      cerr << "}" << endl;
 
       // print the AST?
       if (modus == M_AST)

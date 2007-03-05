@@ -32,7 +32,7 @@
  *         
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/03/04 16:42:31 $
+ * \date    \$Date: 2007/03/05 11:13:15 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.52 $
+ * \version \$Revision: 1.53 $
  */
 %}
 
@@ -54,7 +54,7 @@
   PROCESS
 ******************************************************************************/
 
-Process(a,b,c,d,e,f,g,i,j) ->
+Process(a,b,c,d,e,g,i,j) ->
   [cfg: {
           // reset data structures
 	  cfgMap = map<std::string, CFGBlock *>();
@@ -83,16 +83,16 @@ Process(a,b,c,d,e,f,g,i,j) ->
 	  connectBlocks(firstBlock, fhFirst);
 	  connectBlocks(fhLast, lastBlock);
 	}
-	f //compensationHandler
-	{
-          // create blocks for the compensation handlers
-	  CFGBlock* chFirst = cfgMap.find(toString(f->id))->second->firstBlock;
-	  CFGBlock* chLast  = cfgMap.find(toString(f->id))->second->lastBlock;
-
-          // embed compensation handler block
-	  connectBlocks(firstBlock, chFirst);
-	  connectBlocks(chLast, lastBlock);
-	}
+//NL	f //compensationHandler
+//NL	{
+//NL          // create blocks for the compensation handlers
+//NL	  CFGBlock* chFirst = cfgMap.find(toString(f->id))->second->firstBlock;
+//NL	  CFGBlock* chLast  = cfgMap.find(toString(f->id))->second->lastBlock;
+//NL
+//NL          // embed compensation handler block
+//NL	  connectBlocks(firstBlock, chFirst);
+//NL	  connectBlocks(chLast, lastBlock);
+//NL	}
 	g //eventHandler
 	{
 	  CFGBlock * ehFirst = cfgMap.find(toString(g->id))->second->firstBlock;

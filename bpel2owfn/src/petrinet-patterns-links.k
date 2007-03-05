@@ -29,7 +29,7 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/04 18:16:33 $
+ * \date    \$Date: 2007/03/05 07:45:31 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.3 $
+ * \version \$Revision: 1.4 $
  */
 %}
 
@@ -72,16 +72,11 @@ using std::map;
 
 extern PetriNet PN;
 extern map<unsigned int, ASTE*> ASTEmap;
-extern string currentScope;
 
-extern set<string> ASTE_inputChannels;
-extern set<string> ASTE_outputChannels;
-extern set<string> ASTE_linkNames;
-extern set<string> ASTE_variableNames;
-
-extern map<string, unsigned int> joinCondition_links;
-extern map<unsigned int, bool> joinCondition_linkStatus;
-extern map<unsigned int, bool> joinCondition_result;
+/* todo: put this to the functions */
+  extern map<string, unsigned int> joinCondition_links;
+  extern map<unsigned int, bool> joinCondition_linkStatus;
+  extern map<unsigned int, bool> joinCondition_result;
 %}
 
 
@@ -287,9 +282,9 @@ void PLinkWrapper2(impl_standardElements* abstract_phylum, uview current_view)
 
 
 
-  /************************************************************************
+  /*
    * pattern for the join condition
-   ***********************************************************************/
+   */
 
   // containers for the join transitions and the incoming links
   map<unsigned int, Transition*> joinTransitions;
@@ -365,23 +360,138 @@ void PLinkWrapper2(impl_standardElements* abstract_phylum, uview current_view)
 
 
 
-/******************************************************************************
- * Figure 23: Pattern for an activity that is target of links in case of
- * suppressJoinFailure="no".
+/*****************************************************************************
+ * WRAPPER PATTERN 3                                                         *
+ * activity has incoming links, suppressJoinFailure is set to "false"        *
  *****************************************************************************/
 
-This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF)
- ->
-  [petrinetsmall:
-    {
-      trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 23\n");
-      cerr << "no patterns allowed with suppressJoinFailure=\"no\"" << endl;
+void PLinkWrapper3(impl_standardElements* abstract_phylum, uview current_view)
+{
+  trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern: outgoing links" + "\n");
 
-      // we should do a litlle bit more here, but I don't like to go on (will fail anyway)
-      assert(false);
+  impl_standardElements_StandardElements* phylum = static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
+  assert(phylum != NULL);
+
+  string prefix = toString(phylum->parentId) + ".";
+  string newPrefix = toString(phylum->parentId) + ".internal";
+
+
+
+
+  if (petrinetsmall_enum == current_view)
+  {
+    cerr << "no patterns allowed with suppressJoinFailure=\"no\"" << endl;
+    assert(false);
+    /* in fact, this should not be an error -- just a warning */
+    return;
+  }
+
+
+  // Add new interface places.
+  Place *p1 = PN.newPlace(prefix + "initial");
+  Place *p2 = PN.newPlace(prefix + "final");
+  Place *p3 = PN.newPlace(prefix + "joinTrue");
+  Place *p4 = PN.newPlace(prefix + "joinFalse");
+  Place *p5 = PN.newPlace(prefix + "begin");
+  Place *p6 = PN.newPlace(prefix + "stop");
+  Place *p7 = PN.newPlace(prefix + "stopped");
+  Place *p8 = PN.newPlace(prefix + "faulted");
+
+ // Join condition evalates to true: start activity.
+   Transition *t1 = PN.newTransition(prefix + "start");
+  PN.newArc(p1, t1);
+  PN.newArc(p3, t1);
+  PN.newArc(t1, p5);
+
+  // Join condition evalates to false: skip activity and throw fault.
+  Transition *t2 = PN.newTransition(prefix + "skip");
+  PN.newArc(p1, t2);
+  PN.newArc(p4, t2);
+//  PN.newArc(t2, p2);
+  PN.newArc(t2, p8);
+  // the fault is not thrown!
+
+  // The activity can be stopped as several places. (todo: check this)
+  Transition *t3 = stop(p1, "initial", prefix);
+  Transition *t4 = stop(p3, "joinTrue", prefix);
+  Transition *t5 = stop(p4, "joinFalse", prefix);
+  Transition *t6 = stop(p8, "faulted", prefix);
+
+  // When activity is skipped, sets enclosed source links to false.
+  dpeLinks(t2, phylum->parentId);
+
+
+
+  /*
+   * pattern for the join condition
+   */
+
+  // containers for the join transitions and the incoming links
+  map<unsigned int, Transition*> joinTransitions;
+  map<unsigned int, Place*> trueLinks;
+  map<unsigned int, Place*> falseLinks;
+  unsigned int transitionNumber = (unsigned int)pow(2.0, phylum->tTarget_list_1->length());
+
+  // fill link containers
+  unsigned int linkCount = 0;
+  foreach (target; tTarget_list phylum->tTarget_list_1)
+  {
+    Place *linkT = PN.findPlace("link." + ASTEmap[target->id]->linkName);
+    Place *linkF = PN.findPlace("!link." + ASTEmap[target->id]->linkName);
+
+    trueLinks[linkCount] = linkT;
+    falseLinks[linkCount] = linkF;
+
+    linkCount++;
+  }
+
+  // add transitions and connect them with the links
+  for (unsigned int i = 0; i < transitionNumber; i++)
+  {
+    joinTransitions[i] = PN.newTransition(prefix + "join" + toString(i));
+
+    for (unsigned int j = 0; j < linkCount; j++)
+    {
+      if (((i >> j) % 2) == 0) // don't ask me why this is working :-|
+        PN.newArc(trueLinks[j], joinTransitions[i]);
+      else
+        PN.newArc(falseLinks[j], joinTransitions[i]);
     }
-  ]
-;
+  }
+
+  // case 1: standard join condition
+  if (string(phylum->joinCondition_1->op_name()) == "standardJoinCondition")
+  {
+    // create OR-join
+    for (unsigned int i = 0; i < transitionNumber; i++)
+    {
+      // only one transition makes the join fail
+      if (i == transitionNumber-1)
+        PN.newArc(joinTransitions[i], p4); // p4=joinFalse
+      else
+        PN.newArc(joinTransitions[i], p3); // p3=joinTrue
+    }
+  }
+  else // case 2: user-defined join condition
+  {
+    // create pattern for join condition
+    for (unsigned int i = 0; i < transitionNumber; i++)
+    {
+      if (joinCondition_result[i])
+        PN.newArc(joinTransitions[i], p3);
+      else
+        PN.newArc(joinTransitions[i], p4);
+    }
+  }
+
+
+
+  // Embed the inner activity.
+  PN.mergePlaces(p5, newPrefix + ".initial");
+  PN.mergePlaces(p2, newPrefix + ".final");
+  PN.mergePlaces(p6, newPrefix + ".stop");
+  PN.mergePlaces(p7, newPrefix + ".stopped");
+}
 
 
 
@@ -583,128 +693,6 @@ This=StandardElements(a,b, jc) provided (!This->suppressJF)
 
 
 
-
-
-
-
-
-
-/******************************************************************************
- * Figure 23: Pattern for an activity that is target of links in case of
- * suppressJoinFailure="no".
- *****************************************************************************/
-
-This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF)
- ->
-  [petrinetnew:
-    {
-      trace(TRACE_DEBUG, "[PNU]" + inString() + "Fig. 23 (new)\n");
-      string prefix = toString(This->parentId) + ".";
-      string newPrefix = toString(This->parentId) + ".internal";
-
-      Place *p1 = PN.newPlace(prefix + "initial");
-      Place *p2 = PN.newPlace(prefix + "final");
-      Place *p3 = PN.newPlace(prefix + "joinTrue");
-      Place *p4 = PN.newPlace(prefix + "joinFalse");
-      Place *p5 = PN.newPlace(prefix + "begin");
-      Place *p6 = PN.newPlace(prefix + "stop");
-      Place *p7 = PN.newPlace(prefix + "stopped");
-      Place *p8 = PN.newPlace(prefix + "faulted");
-
-      Transition *t1 = PN.newTransition(prefix + "start");
-      PN.newArc(p1, t1);
-      PN.newArc(p3, t1);
-      PN.newArc(t1, p5);
-
-      Transition *t2 = PN.newTransition(prefix + "skip");
-      PN.newArc(p1, t2);
-      PN.newArc(p4, t2);
-      PN.newArc(t2, p2);
-      PN.newArc(t2, p8);
-
-      Transition *t3 = stop(p1, "initial", prefix);
-      Transition *t4 = stop(p3, "joinTrue", prefix);
-      Transition *t5 = stop(p4, "joinFalse", prefix);
-      Transition *t6 = stop(p8, "faulted", prefix);
-
-      // sets enclosed source links to false
-      dpeLinks(t2, parentId);
-
-
-
-      /************************************************************************
-       * pattern for the join condition
-       ***********************************************************************/
-
-      // containers for the join transitions and the incoming links
-      map<unsigned int, Transition*> joinTransitions;
-      map<unsigned int, Place*> trueLinks;
-      map<unsigned int, Place*> falseLinks;
-      unsigned int transitionNumber = (unsigned int)pow(2.0, a->length());
-
-      // fill link containers
-      unsigned int linkCount = 0;
-      foreach (target; tTarget_list a)
-      {
-        Place *linkT = PN.findPlace("link." + ASTEmap[target->id]->linkName);
-	Place *linkF = PN.findPlace("!link." + ASTEmap[target->id]->linkName);
-
-        trueLinks[linkCount] = linkT;
-        falseLinks[linkCount] = linkF;
-
-        linkCount++;
-      }
-
-      // add transitions and connect them with the links
-      for (unsigned int i = 0; i < transitionNumber; i++)
-      {
-        joinTransitions[i] = PN.newTransition(prefix + "join" + toString(i));
-
-        for (unsigned int j = 0; j < linkCount; j++)
-        {
-          if (((i >> j) % 2) == 0) // don't ask me why this is working :-|
-            PN.newArc(trueLinks[j], joinTransitions[i]);
-          else
-            PN.newArc(falseLinks[j], joinTransitions[i]);
-        }
-      }
-
-      // case 1: standard join condition
-      if (string(jc->op_name()) == "standardJoinCondition")
-      {
-        // create OR-join
-        for (unsigned int i = 0; i < transitionNumber; i++)
-        {
-          // only one transition makes the join fail
-          if (i == transitionNumber-1)
-            PN.newArc(joinTransitions[i], p4); // p4=joinFalse
-          else
-            PN.newArc(joinTransitions[i], p3); // p3=joinTrue
-        }
-      }
-      else // case 2: user-defined join condition
-      {
-        // create pattern for join condition
-        for (unsigned int i = 0; i < transitionNumber; i++)
-        {
-          if (joinCondition_result[i])
-            PN.newArc(joinTransitions[i], p3);
-          else
-            PN.newArc(joinTransitions[i], p4);
-        }
-      }
-
-
-
-      // Embed the inner activity.
-      PN.mergePlaces(p5, newPrefix + ".initial");
-      PN.mergePlaces(p2, newPrefix + ".final");
-      PN.mergePlaces(p6, newPrefix + ".stop");
-      PN.mergePlaces(p7, newPrefix + ".stopped");
-
-    }
-  ]
-;
 
 
 

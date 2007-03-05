@@ -20,8 +20,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/04 16:44:26 $ by $Author: nielslohmann $.
-# Version $Revision: 1.16 $
+# File last changed $Date: 2007/03/05 18:39:42 $ by $Author: nielslohmann $.
+# Version $Revision: 1.17 $
 
 #---------------------------------------------------------------------------
 # Project related configuration options
@@ -95,7 +95,7 @@ FILE_VERSION_FILTER    =
 #---------------------------------------------------------------------------
 # configuration options related to warning and progress messages
 #---------------------------------------------------------------------------
-QUIET                  = NO
+QUIET                  = YES
 WARNINGS               = YES
 WARN_IF_UNDOCUMENTED   = YES
 WARN_IF_DOC_ERROR      = YES

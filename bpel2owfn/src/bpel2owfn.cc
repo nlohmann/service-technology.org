@@ -29,14 +29,14 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/03/05 11:13:15 $
+ * \date    \$Date: 2007/03/05 18:39:43 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.146 $
+ * \version \$Revision: 1.147 $
  */
 
 
@@ -64,6 +64,7 @@
 #include "ast-details.h"
 
 using std::cerr;
+using std::cout;
 using std::endl;
 using std::string;
 using std::map;
@@ -183,9 +184,9 @@ int main( int argc, char *argv[])
       trace(TRACE_INFORMATION, "Rewriting 2 complete...\n");
 
 // an experiment      
-//      cerr << "digraph G{" << endl;
+//      cout << "digraph G{" << endl;
 //      ASTEmap[1]->output();
-//      cerr << "}" << endl;
+//      cout << "}" << endl;
 
       // print the AST?
       if (modus == M_AST)

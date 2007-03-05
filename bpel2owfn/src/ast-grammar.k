@@ -25,22 +25,24 @@
  *
  * \brief   Abstract grammar of BPEL
  *
+ *          This grammar describes the abstract syntax tree.
+ *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2005-10-03
  *
- * \date    \$Date: 2007/03/05 11:13:15 $
+ * \date    \$Date: 2007/03/05 18:39:42 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
+ * \note    This file was created using Kimwitu++ reading file ast-grammar.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.166 $
+ * \version \$Revision: 1.167 $
  */
 %}
 
@@ -56,9 +58,9 @@
 #include "ast-details.h"
 #include "ast-config.h"
 #include "frontend-parser.h"
+
 extern map<unsigned int, ASTE*> ASTEmap;
 extern int ASTEid;
-
 %}
 
 
@@ -77,7 +79,6 @@ tProcess:
       tVariable_list
       tCorrelationSet_list
       tFaultHandlers
-//      tCompensationHandler
       tEventHandlers
       activity
       integer
@@ -280,12 +281,10 @@ tReply:
 ******************************************************************************/
 
 tInvoke:
-  /* will be disposed during postprocessing: */
-  Invoke(standardElements tCorrelation_list tToPart_list tFromPart_list integer)
+  Invoke(standardElements tCorrelation_list tToPart_list tFromPart_list integer) /* will be replaced in rewriting */
 | SynchronousInvoke(standardElements tCorrelation_list tToPart_list tFromPart_list integer)
 | AsynchronousInvoke(standardElements tCorrelation_list tToPart_list tFromPart_list integer)
-  /* will be disposed during postprocessing: */
-| annotatedInvoke(standardElements tCorrelation_list tCatch_list tCatchAll tCompensationHandler tToPart_list tFromPart_list integer)
+| annotatedInvoke(standardElements tCorrelation_list tCatch_list tCatchAll tCompensationHandler tToPart_list tFromPart_list integer) /* will be replaced in rewriting */
 ;
 
 
@@ -334,9 +333,8 @@ tEmpty:
   WAIT
 ******************************************************************************/
 
-/* will be disposed during postprocessing */
 tWait:
-  Wait(standardElements integer)
+  Wait(standardElements integer)	/* will be replaced in rewriting */
 | WaitFor(standardElements integer)
 | WaitUntil(standardElements integer)
 ;
@@ -404,7 +402,7 @@ tCase:
 
 tOtherwise:
   Otherwise(activity integer)
-| NoOtherwise()
+| NoOtherwise()			/* will be replaced in rewriting */
 ;
 
 

@@ -29,16 +29,17 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/05 15:15:33 $
+ * \date    \$Date: 2007/03/05 18:39:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
+ * \note    This file was created using Kimwitu++ reading file
+ *          petrinet-patterns-links.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  */
 %}
 
@@ -80,8 +81,9 @@ extern map<unsigned int, ASTE*> ASTEmap;
 
 
 /*****************************************************************************
- * WRAPPER PATTERN 0                                                         *
- * activity has neither incoming nor outgoing links                          *
+ * WRAPPER PATTERN 0
+ * 
+ * Activity has neither incoming nor outgoing links.
  *****************************************************************************/
 
 void PLinkWrapper0(impl_standardElements* abstract_phylum, uview current_view)
@@ -123,13 +125,14 @@ void PLinkWrapper0(impl_standardElements* abstract_phylum, uview current_view)
 
 
 /*****************************************************************************
- * WRAPPER PATTERN 1                                                         *
- * activity has outgoing links                                               *
+ * WRAPPER PATTERN 1
+ *
+ * Activity has outgoing links only.
  *****************************************************************************/
 
 void PLinkWrapper1(impl_standardElements* abstract_phylum, uview current_view)
 {
-  trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern 1: outgoing links, suppress join failures\n");
+  trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern 1\n");
 
   impl_standardElements_StandardElements* phylum = static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
   assert(phylum != NULL);
@@ -230,13 +233,15 @@ void PLinkWrapper1(impl_standardElements* abstract_phylum, uview current_view)
 
 
 /*****************************************************************************
- * WRAPPER PATTERN 2                                                         *
- * activity has incoming links, suppressJoinFailure is set to "true"         *
+ * WRAPPER PATTERN 2
+ *
+ * Activity has incoming links only, with attribute suppressJoinFailure is
+ * set to "true".
  *****************************************************************************/
 
 void PLinkWrapper2(impl_standardElements* abstract_phylum, uview current_view)
 {
-  trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern 2: outgoing links, don't suppress join failures\n");
+  trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern 2\n");
 
   impl_standardElements_StandardElements* phylum = static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
   assert(phylum != NULL);
@@ -357,13 +362,15 @@ void PLinkWrapper2(impl_standardElements* abstract_phylum, uview current_view)
 
 
 /*****************************************************************************
- * WRAPPER PATTERN 3                                                         *
- * activity has incoming links, suppressJoinFailure is set to "false"        *
+ * WRAPPER PATTERN 3
+ *
+ * Activity has incoming links only, with attribute suppressJoinFailure is
+ * set to "false".
  *****************************************************************************/
 
 void PLinkWrapper3(impl_standardElements* abstract_phylum, uview current_view)
 {
-  trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern: outgoing links" + "\n");
+  trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern 3\n");
 
   impl_standardElements_StandardElements* phylum = static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
   assert(phylum != NULL);

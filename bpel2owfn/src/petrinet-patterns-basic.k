@@ -25,21 +25,37 @@
  *
  * \brief   Petri net patterns for BPEL's basic activities
  *
+ *          This file implements the patterns for BPEL's basic activities,
+ *          namely:
+ *            - <empty>
+ *            - <invoke> (asynchronous and synchronous)
+ *            - <receive>
+ *            - <reply>
+ *            - <assign>
+ *            - <validate>
+ *            - <wait> (deadline and duration)
+ *            - <throw>
+ *            - <rethrow>
+ *            - <exit> / <terminate>
+ *            - <compensate>
+ *            - <compensateScope>
+ *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/05 15:15:33 $
+ * \date    \$Date: 2007/03/05 18:39:43 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \note    This file was created using Kimwitu++ reading file petrinet-patterns-basic.k.
+ * \note    This file was created using Kimwitu++ reading file
+ *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.28 $
+ * \version \$Revision: 1.29 $
  */
 %}
 
@@ -76,6 +92,13 @@ extern map<unsigned int, ASTE*> ASTEmap;
   EMPTY
 ******************************************************************************/
 
+%{
+/*!
+ * \fn void kc::PEmpty(impl_tEmpty *abstract_phylum, uview current_view)
+ * \brief Pattern for the <empty> activity.
+ * \image html "../../../doc/patterns/empty.png" "pattern"
+ */
+%}
 void PEmpty(impl_tEmpty* abstract_phylum, uview current_view)
 {
   impl_tEmpty_Empty* phylum = static_cast<impl_tEmpty_Empty*>(abstract_phylum);
@@ -119,8 +142,18 @@ void PEmpty(impl_tEmpty* abstract_phylum, uview current_view)
 
 /******************************************************************************
   INVOKE
+
+  The <invoke> activity has two patterns: one for the asynchronous version
+  and one for the synchronous version.
 ******************************************************************************/
 
+%{
+/*!
+ * \fn void kc::PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
+ * \brief Pattern for asynchronous <invoke> activity.
+ * \image html "../../../doc/patterns/invoke_a.png" "pattern"
+ */
+%}
 void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 {
   impl_tInvoke_AsynchronousInvoke* phylum = static_cast<impl_tInvoke_AsynchronousInvoke*>(abstract_phylum);
@@ -194,9 +227,13 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 }
 
 
-
-
-
+%{
+/*!
+ * \fn void kc::PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
+ * \brief Pattern for the synchronous <invoke> activity.
+ * \image html "../../../doc/patterns/invoke_s.png" "pattern"
+ */
+%}
 void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 {
   impl_tInvoke_SynchronousInvoke* phylum = static_cast<impl_tInvoke_SynchronousInvoke*>(abstract_phylum);
@@ -299,6 +336,13 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
   RECEIVE
 ******************************************************************************/
 
+%{
+/*!
+ * \fn void kc::PReceive(impl_tReceive* abstract_phylum, uview current_view)
+ * \brief Pattern for the <receive> activity.
+ * \image html "../../../doc/patterns/receive.png" "pattern"
+ */
+%}
 void PReceive(impl_tReceive* abstract_phylum, uview current_view)
 {
   impl_tReceive_Receive* phylum = static_cast<impl_tReceive_Receive*>(abstract_phylum);
@@ -342,8 +386,10 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
 	// Transitions for the negative control flow.
 	if (parameters[P_STANDARDFAULTS])
         {
-	  Transition *t4 = throwFault(p2, p7, "buffer", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
-	  Transition *t5 = throwFault(p3, p7, "received", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
+	  Transition *t4 = throwFault(p2, p7, "buffer", prefix,
+                             mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
+	  Transition *t5 = throwFault(p3, p7, "received", prefix,
+                             mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
         }
 
 	Transition *t6 = stop(p1, "initial", prefix);
@@ -383,6 +429,13 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
   REPLY
 ******************************************************************************/
 
+%{
+/*!
+ * \fn void kc::PReply(impl_tReply* abstract_phylum, uview current_view)
+ * \brief Pattern for the <reply> activity.
+ * \image html "../../../doc/patterns/reply.png" "pattern"
+ */
+%}
 void PReply(impl_tReply* abstract_phylum, uview current_view)
 {
   impl_tReply_Reply* phylum = static_cast<impl_tReply_Reply*>(abstract_phylum);
@@ -417,7 +470,8 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
 	// Transitions for the negative control flow.
 	if (parameters[P_STANDARDFAULTS])
         {
-	  Transition *t3 = throwFault(p2, p4, "running", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
+	  Transition *t3 = throwFault(p2, p4, "running", prefix,
+                             mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
   	  Transition *t6 = stop(p4, "p4", prefix);
         }
 
@@ -460,6 +514,13 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
   ASSIGN
 ******************************************************************************/
 
+%{
+/*!
+ * \fn void kc::PAssign(impl_tAssign* abstract_phylum, uview current_view)
+ * \brief Pattern for the <assign> activity.
+ * \image html "../../../doc/patterns/assign.png" "pattern"
+ */
+%}
 void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 {
   impl_tAssign_Assign* phylum = static_cast<impl_tAssign_Assign*>(abstract_phylum);
@@ -514,7 +575,8 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 
 	    // Transitions for the negative control flow.
 	    if (parameters[P_STANDARDFAULTS])
-	      Transition *t3 = throwFault(p2, p4, "running", newPrefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
+	      Transition *t3 = throwFault(p2, p4, "running", newPrefix,
+                                 mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
 	    
 	    Transition *t6 = stop(p4, "p4at" + toString(copyCount), prefix);
 	    
@@ -536,7 +598,8 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 
 	    // Transitions for the negative control flow.
 	    if (parameters[P_STANDARDFAULTS])
-	      Transition *t3 = throwFault(lastPlace, p4, "initial", newPrefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
+	      Transition *t3 = throwFault(lastPlace, p4, "initial", newPrefix,
+                                 mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
 
 	    Transition *t6 = stop(p4, "p4at" + toString(copyCount), prefix);
 
@@ -580,6 +643,13 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
   VALIDATE
 ******************************************************************************/
 
+%{
+/*!
+ * \fn void kc::PValidate(impl_tValidate* abstract_phylum, uview current_view)
+ * \brief Pattern for the <validate> activity.
+ * \image html "../../../doc/patterns/validate.png" "pattern"
+ */
+%}
 void PValidate(impl_tValidate* abstract_phylum, uview current_view)
 {
   impl_tValidate_Validate* phylum = static_cast<impl_tValidate_Validate*>(abstract_phylum);
@@ -611,7 +681,8 @@ void PValidate(impl_tValidate* abstract_phylum, uview current_view)
 
 	// Transitions for the negative control flow.
 	if (parameters[P_STANDARDFAULTS])
-	  Transition *t3 = throwFault(p2, p4, "running", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
+	  Transition *t3 = throwFault(p2, p4, "running", prefix,
+                             mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
 
 	Transition *t4 = stop(p1, "initial", prefix);
 	Transition *t5 = stop(p2, "running", prefix);
@@ -650,6 +721,9 @@ void PValidate(impl_tValidate* abstract_phylum, uview current_view)
 
 /******************************************************************************
   WAIT
+
+  The <wait> activity has two patterns: one for the "wait until" (deadline)
+  version and one for the "wait for" (duration) version.
 ******************************************************************************/
 
 void PWaitUntil(impl_tWait* abstract_phylum, uview current_view)
@@ -774,6 +848,13 @@ void PWaitFor(impl_tWait* abstract_phylum, uview current_view)
   THROW
 ******************************************************************************/
 
+%{
+/*!
+ * \fn void kc::PThrow(impl_tThrow* abstract_phylum, uview current_view)
+ * \brief Pattern for the <throw> activity.
+ * \image html "../../../doc/patterns/throw.png" "pattern"
+ */
+%}
 void PThrow(impl_tThrow* abstract_phylum, uview current_view)
 {
   impl_tThrow_Throw* phylum = static_cast<impl_tThrow_Throw*>(abstract_phylum);
@@ -794,7 +875,8 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
 	Place *p5 = PN.newPlace(prefix + "final"); // it's OK that this place is not connected
 
 	// Transitions for the negative control flow.
-	Transition *t1 = throwFault(p1, p2, "initial", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
+	Transition *t1 = throwFault(p1, p2, "initial", prefix,
+                           mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
 	Transition *t2 = stop(p1, "initial", prefix);
 	Transition *t3 = stop(p2, "faulted", prefix);
 
@@ -834,6 +916,14 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
   RETHROW
 ******************************************************************************/
 
+%{
+/*!
+ * \fn void kc::PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
+ * \brief Pattern for the <rethrow> activity.
+ * \image html "../../../doc/patterns/rethrow.png" "pattern"
+ * The gray place is from the <faultHandlers> pattern.
+ */
+%}
 void PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
 {
   impl_tRethrow_Rethrow* phylum = static_cast<impl_tRethrow_Rethrow*>(abstract_phylum);
@@ -871,8 +961,18 @@ void PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
 
 /******************************************************************************
   EXIT / TERMINATE
+
+  The patterns for <exit> and <terminate> are the same.
 ******************************************************************************/
 
+%{
+/*!
+ * \fn void kc::PExit(impl_tExit* abstract_phylum, uview current_view)
+ * \brief Pattern for the <exit> activity.
+ * \image html "../../../doc/patterns/exit.png" "pattern"
+ * The gray places are from the <process> pattern.
+ */
+%}
 void PExit(impl_tExit* abstract_phylum, uview current_view)
 {
   impl_tExit_Exit* phylum = static_cast<impl_tExit_Exit*>(abstract_phylum);
@@ -940,6 +1040,14 @@ void PExit(impl_tExit* abstract_phylum, uview current_view)
   COMPENSATE
 ******************************************************************************/
 
+%{
+/*!
+ * \fn void kc::PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
+ * \brief Pattern for the <compensate> activity.
+ * \image html "../../../doc/patterns/compensate.png" "pattern"
+ * The gray places are from the child <scope> patterns.
+ */
+%}
 void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
 {
   impl_tCompensate_Compensate* phylum = static_cast<impl_tCompensate_Compensate*>(abstract_phylum);
@@ -1033,8 +1141,19 @@ void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
 
 /******************************************************************************
   COMPENSATE SCOPE
+
+  The <compensate scope="a"> activity of BPEL4WS 1.1 has been replaced by a
+  <compensateScope target="a"> activity.
 ******************************************************************************/
 
+%{
+/*!
+ * \fn void kc::PCompensateScope(impl_tCompensate* abstract_phylum, uview current_view)
+ * \brief Pattern for the <compensateScope> activity.
+ * \image html "../../../doc/patterns/compensatescope.png" "pattern"
+ * The gray places are from the target child <scope> pattern.
+ */
+%}
 void PCompensateScope(impl_tCompensate* abstract_phylum, uview current_view)
 {
   impl_tCompensate_CompensateScope* phylum = static_cast<impl_tCompensate_CompensateScope*>(abstract_phylum);

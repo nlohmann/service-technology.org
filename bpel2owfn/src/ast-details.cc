@@ -29,14 +29,14 @@
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/03/05 16:08:35 $
+ * \date    \$Date: 2007/03/05 18:39:42 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.79 $
+ * \version \$Revision: 1.80 $
  */
 
 
@@ -58,6 +58,7 @@
 #include "globals.h"
 
 using std::cerr;
+using std::cout;
 using std::endl;
 
 
@@ -1240,38 +1241,38 @@ void ASTE::output()
   // arcs to parents
   if (activityTypeName() != "link")
   {
-    cerr << id << " [label=\"" << id << " " << activityTypeName() << "\"]" << endl;
+    cout << id << " [label=\"" << id << " " << activityTypeName() << "\"]" << endl;
 
     if (id != 1)
-      cerr << parentActivityId << " -> " << id << endl;
+      cout << parentActivityId << " -> " << id << endl;
   }
 
   // arcs for links
   if (activityTypeName() == "link")
-    cerr << sourceActivity << " -> " << targetActivity << "[label = \"" << id << " link\" color=blue]" << endl;
+    cout << sourceActivity << " -> " << targetActivity << "[label = \"" << id << " link\" color=blue]" << endl;
 
 
   // arcs for compensation
   if (activityTypeName() == "compensateScope")
   {
-    cerr << id << " -> " << ASTEmap[globals::ASTE_scopeNames[attributes["target"]]]->enclosedCH << "[color=green]" << endl;
+    cout << id << " -> " << ASTEmap[globals::ASTE_scopeNames[attributes["target"]]]->enclosedCH << "[color=green]" << endl;
   }
 
   if (activityTypeName() == "compensate")
   {
     for (set<unsigned int>::iterator it = ASTEmap[parentScopeId]->enclosedScopes.begin(); it != ASTEmap[parentScopeId]->enclosedScopes.end(); it++)
-      cerr << id << " -> " << ASTEmap[*it]->enclosedCH << "[color=green]" << endl;
+      cout << id << " -> " << ASTEmap[*it]->enclosedCH << "[color=green]" << endl;
   }
 
   
   // arcs for faults
   if (activityTypeName() == "throw")
   {
-    cerr << id << " -> " << ASTEmap[parentScopeId]->enclosedFH << "[color=red]" << endl;
+    cout << id << " -> " << ASTEmap[parentScopeId]->enclosedFH << "[color=red]" << endl;
   }
   if (activityTypeName() == "rethrow" && parentScopeId != 1)
   {
-    cerr << id << " -> " << ASTEmap[ASTEmap[ASTEmap[parentScopeId]->id]->parentScopeId]->enclosedFH << "[color=red]" << endl;
+    cout << id << " -> " << ASTEmap[ASTEmap[ASTEmap[parentScopeId]->id]->parentScopeId]->enclosedFH << "[color=red]" << endl;
   }
 
 

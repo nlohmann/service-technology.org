@@ -20,26 +20,29 @@
 
 %{
 /*!
- * \file    ast-to-petrinet-full2.cc
+ * \file    ast-to-petrinet.cc
  *
  * \brief   Petri net unparser (implementation)
+ *
+ *          This unparser traverses the abstract syntax tree and calls the
+ *          functions for the Petri net patterns.
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/03/05 14:30:34 $
+ * \date    \$Date: 2007/03/05 18:39:43 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  * \note    This file was created using Kimwitu++ reading file
- *          bpel-unparse-petri.k.
+ *          ast-to-petrinet.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  */
 %}
 
@@ -49,6 +52,8 @@
 
 /******************************************************************************
   BASIC ACTIVITIES
+
+  These patterns are implemented in file "petrinet-patterns-basic.k".
 ******************************************************************************/
 
 Empty -> [petrinetnew petrinetsmall:
@@ -113,6 +118,8 @@ CompensateScope -> [petrinetnew petrinetsmall:
 
 /******************************************************************************
   STRUCTURED ACTIVITIES
+
+  These patterns are implemented in file "petrinet-patterns-structured.k".
 ******************************************************************************/
 
 While -> [petrinetnew petrinetsmall:
@@ -153,6 +160,8 @@ ForEach -> [petrinetnew petrinetsmall:
 
 /******************************************************************************
   SCOPE / PROCESS
+
+  These patterns are implemented in file "petrinet-patterns-scopes.k".
 ******************************************************************************/
 
 Process -> [petrinetnew petrinetsmall:
@@ -172,6 +181,8 @@ Scope -> [petrinetnew petrinetsmall:
 
 /******************************************************************************
   HANDLERS
+
+  These patterns are implemented in file "petrinet-patterns-handlers.k".
 ******************************************************************************/
 
 FaultHandlers -> [petrinetnew:
@@ -195,7 +206,9 @@ EventHandlers -> [petrinetnew:
 
 
 /******************************************************************************
-  STANDARD ELEMENTS
+  STANDARD ELEMENTS / LINKS
+
+  These patterns are implemented in file "petrinet-patterns-links.k".
 ******************************************************************************/
 
 StandardElements(NiltTarget_list(), NiltSource_list(), jc) -> [petrinetnew petrinetsmall:
@@ -213,4 +226,3 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF) -> [
 This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF) -> [petrinetnew petrinetsmall:
   { PLinkWrapper3($0, kc_current_view_base); }
 ];
-

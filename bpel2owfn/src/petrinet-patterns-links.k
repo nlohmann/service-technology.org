@@ -40,7 +40,7 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/06 14:21:56 $
+ * \date    \$Date: 2007/03/06 15:08:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          petrinet-patterns-links.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  */
 %}
 
@@ -159,6 +159,8 @@ void P_LinkWrapper0(impl_standardElements* abstract_phylum, uview current_view)
  *
  *          Wrapper pattern for an activity that has only outgoing links.
  *
+ * \image   html "wrapper1.png" "high-level pattern"
+ *
  * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
  * \param   current_view     the current unparse view
  */
@@ -169,39 +171,31 @@ void P_LinkWrapper1(impl_standardElements* abstract_phylum, uview current_view)
 
   impl_standardElements_StandardElements* phylum = static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
   assert(phylum != NULL);
-
+  
+  // Organize prefixes.
   string prefix = toString(phylum->parentId) + ".";
   string newPrefix = toString(phylum->parentId) + ".internal";
-
-
 
   // Add new interface places.
   Place *p1 = PN.newPlace(prefix + "initial");
   Place *p2 = PN.newPlace(prefix + "final");
-  Place *p3 = NULL;
-  Place *p4 = NULL;
   Place *p5 = PN.newPlace(prefix + "done");
-  if (current_view != petrinetsmall_enum)
-  {
-    p3 = PN.newPlace(prefix + "stop");
-    p4 = PN.newPlace(prefix + "stopped");
-  }
-
-
-  // The activity can be stopped at the final place.
-  if (current_view != petrinetsmall_enum)
-    Transition *t = stop(p2, "final", prefix);
-
   
-  // model the transition condition
+  // Model the transition condition.
   P_transitionCondition(prefix, phylum->tSource_list_1);
-
 
   // Embed the inner activity.
   PN.mergePlaces(p1, newPrefix + ".initial");
   PN.mergePlaces(p5, newPrefix + ".final");
+
+  // Add stop places and stopping transitions.
   if (current_view != petrinetsmall_enum)
   {
+    Place *p3 = PN.newPlace(prefix + "stop");
+    Place *p4 = PN.newPlace(prefix + "stopped");
+
+    Transition *t = stop(p2, "final", prefix);
+
     PN.mergePlaces(p3, newPrefix + ".stop");
     PN.mergePlaces(p4, newPrefix + ".stopped");
   }

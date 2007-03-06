@@ -29,7 +29,7 @@
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/03/06 14:21:56 $
+ * \date    \$Date: 2007/03/06 15:08:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
 */
 %}
 
@@ -296,6 +296,9 @@ void dpeLinks(Transition *t, int id)
  *
  * \param   prefix        the prefix of the activity's pattern
  * \param   source_links  the list of outgoing links of the activity
+ *
+ * \todo    Implement nondeterministic transition condition and add respective
+ *          parameter.
  */
 %}
 void P_transitionCondition(string prefix, tSource_list source_links)
@@ -303,11 +306,11 @@ void P_transitionCondition(string prefix, tSource_list source_links)
   // Find the places of the wrapper pattern. The "done" place is marked when
   // the activity completes. The "final" place is marked after the outgoing
   // links are set.
-  Place *p5 = PN.findPlace(prefix + "done");
-  Place *p2 = PN.findPlace(prefix + "final");
+  Place *p_done = PN.findPlace(prefix + "done");
+  Place *p_final = PN.findPlace(prefix + "final");
 
-  assert(p5 != NULL);
-  assert(p2 != NULL);
+  assert(p_done != NULL);
+  assert(p_final != NULL);
 
 
   /*
@@ -316,14 +319,15 @@ void P_transitionCondition(string prefix, tSource_list source_links)
    */
   if (parameters[P_XOR] && (source_links->length() > 1))
   {
+    // Traverse the source links.
     foreach (source; tSource_list source_links)
     {
       unsigned int linkCounter = 1;
 
-      // Add a transition for each link.
+      // Add a transition.
       Transition *t1 = PN.newTransition(prefix + "setLinks" + toString(linkCounter++));
-      PN.newArc(p5, t1);
-      PN.newArc(t1, p2);
+      PN.newArc(p_done, t1);
+      PN.newArc(t1, p_final);
 
       // Set one link to true.
       Place *link_true = PN.findPlace("link." + ASTEmap[source->id]->linkName);
@@ -357,10 +361,10 @@ void P_transitionCondition(string prefix, tSource_list source_links)
   {
     // Add a transition for all links.
     Transition *t1 = PN.newTransition(prefix + "setLinks");
-    PN.newArc(p5, t1);
-    PN.newArc(t1, p2);
+    PN.newArc(p_done, t1);
+    PN.newArc(t1, p_final);
 
-    // Set all links to true..
+    // Set all links to true.
     foreach (source; tSource_list source_links)
     {
       Place *link_true = PN.findPlace("link." + ASTEmap[source->id]->linkName);

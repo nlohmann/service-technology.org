@@ -29,14 +29,14 @@
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/03/06 13:07:42 $
+ * \date    \$Date: 2007/03/06 15:18:19 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.64 $
+ * \version \$Revision: 1.65 $
  */
 
 
@@ -206,18 +206,23 @@ class ASTE
 
 
 /*!
- * \todo comment me!
+ * \brief Data structure to save information about the different roles of a partner link
+ *
+ * In order to do a role based matching (which means an according naming) of channels
+ * some information of a partner link have to be stored.
  */
 class pPartnerLink {
   public:
     
-    string name;
-    string partnerLinkType;
-    string myRole;
-    string partnerRole;
+    string name;              ///< name of the partner link
+    string partnerLinkType;   ///< the partner link type
+    string myRole;            ///< role of the process when using this partner link
+    string partnerRole;       ///< role of the partner when using this partner link
 
+    /// the constructor
     pPartnerLink(string n, string type, string me, string you);
     
+    /// self defined equals-operator
     bool operator==(pPartnerLink & pl);
 };
 

@@ -45,7 +45,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/06 13:07:42 $
+ * \date    \$Date: 2007/03/06 15:18:19 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -55,7 +55,7 @@
  *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.33 $
+ * \version \$Revision: 1.34 $
  */
 %}
 
@@ -171,14 +171,20 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	Place *p2 = PN.newPlace(prefix + "final");
 	Place *p3 = PN.newPlace(prefix + "stop");
 	Place *p4 = PN.newPlace(prefix + "stopped");
+        Place *p5 = PN.newPlace(prefix + "faulted");
 
+        /*
 	Transition *t1 = PN.newTransition(prefix + "invoke");
 	PN.newArc(p1, t1); 
 	PN.newArc(t1, p2);
 	PN.newArc(t1, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
+        */
+
+        sendingTransition("invoke", p1, p2, PN.findPlace("out." + ASTEmap[phylum->id]->channelName), p5, prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
 
 	Transition *t2 = stop(p1, "initial", prefix);
 	Transition *t3 = stop(p2, "final", prefix);
+        Transition *t4 = stop(p5, "faulted", prefix);
 
 	break;
       }
@@ -233,8 +239,10 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	Place *p3 = PN.newPlace(prefix + "final");
 	Place *p4 = PN.newPlace(prefix + "stop");
 	Place *p5 = PN.newPlace(prefix + "stopped");
+        Place *p6 = PN.newPlace(prefix + "faulted");
 
-	Transition *t1 = PN.newTransition(prefix + "invoke_out");
+	/*
+        Transition *t1 = PN.newTransition(prefix + "invoke_out");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
 	PN.newArc(t1, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
@@ -243,11 +251,16 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	PN.newArc(t2, PN.findPlace("in." + ASTEmap[phylum->id]->channelName2));
 	PN.newArc(p5, t2);
 	PN.newArc(t2, p3);
+        */
 
+        sendingTransition("invoke_out",  p1, p2, PN.findPlace("out." + ASTEmap[phylum->id]->channelName), p6, prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
+
+        receivingTransition("invoke_in", p2, p3, PN.findPlace("in." + ASTEmap[phylum->id]->channelName2), p6, prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
 	
 	Transition *t3 = stop(p1, "initial", prefix);
 	Transition *t4 = stop(p2, "running", prefix);
 	Transition *t5 = stop(p3, "final", prefix);
+        Transition *t6 = stop(p6, "faulted", prefix);
 	
 	break;
       }
@@ -314,14 +327,20 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
 	Place *p2 = PN.newPlace(prefix + "final");
 	Place *p3 = PN.newPlace(prefix + "stop");
 	Place *p4 = PN.newPlace(prefix + "stopped");
+        Place *p5 = PN.newPlace(prefix + "faulted");
 
-	Transition *t1 = PN.newTransition(prefix + "receive");
+	/*
+        Transition *t1 = PN.newTransition(prefix + "receive");
 	PN.newArc(PN.findPlace("in." + ASTEmap[phylum->id]->channelName), t1);
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
+        */
+
+        receivingTransition("receive", p1, p2, PN.findPlace("in." + ASTEmap[phylum->id]->channelName), p5, prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
 
 	Transition *t2 = stop(p1, "initial", prefix);
 	Transition *t3 = stop(p2, "final", prefix);
+        Transition *t4 = stop(p5, "faulted", prefix);
 
 	break;
       }
@@ -381,14 +400,20 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
 	Place *p2 = PN.newPlace(prefix + "final");
 	Place *p3 = PN.newPlace(prefix + "stop");
 	Place *p4 = PN.newPlace(prefix + "stopped");
+        Place *p5 = PN.newPlace(prefix + "faulted");
 
+        /*
 	Transition *t1 = PN.newTransition(prefix + "read_var");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
 	PN.newArc(t1, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
+        */
+
+        sendingTransition("reply", p1, p2, PN.findPlace("out." + ASTEmap[phylum->id]->channelName), p5, prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
 
         Transition *t2 = stop(p1, "initial", prefix);
 	Transition *t3 = stop(p2, "final", prefix);
+        Transition *t4 = stop(p5, "faulted", prefix);
 
 	break;
       }

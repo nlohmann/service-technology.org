@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for shortcuts
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $ 
+ *          last changes of: \$Author: gierds $ 
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/03/06 15:08:28 $
+ * \date    \$Date: 2007/03/06 15:18:19 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
 */
 %}
 
@@ -284,8 +284,138 @@ void dpeLinks(Transition *t, int id)
   LEAVE("[ASTT]");
 }
 
+%{
+/*!
+ * \brief Adds a receiving pattern
+ *
+ * \param   name        the name of the communication transition
+ * \param   prePlace    the place before the pattern (needed to connect correctly)
+ * \param   postPlace   the place after the pattern (needed to connect correctly)
+ * \param   channel     the place acting as channel place
+ * \param   faultPlace  the place of the pattern, where faults are stored
+ * \param   prefix      the prefix of the places and transitions
+ * \param   id          the id of the callin activity
+ * \param   negativeControlFlow  signals where the activity is located:
+ *                                - 0: inside a scope or the process
+ *                                - 1: inside a fault handler
+ *                                - 2: inside a compensation handler
+ *
+ * \param   preventFurtherFaults  controls what happens to further faults
+ *                                 - true: these faults are prevented (standard)
+ *                                 - false: these faults are suppressed
+ */
+%}
+void receivingTransition(string name, Place *prePlace, Place *postPlace,
+    Place *channel, Place *faultPlace, string prefix, integer id,
+    int negativeControlFlow, bool preventFurtherFaults = true )
+{
+  ENTER("[ASTT] receivingTransition");
+
+  assert( prePlace != NULL );
+  assert( postPlace != NULL );
+  assert( channel != NULL );
+  assert( faultPlace != NULL );
+
+  std::string newPrefix = prefix + name + ".";
+
+  Place *p1 = PN.newPlace(newPrefix + "buffer");
+  Place *p2 = PN.newPlace(newPrefix + "received");
+
+  Transition *t1 = PN.newTransition(newPrefix + "receive");
+  PN.newArc(prePlace, t1);
+  PN.newArc(channel, t1);
+  // reading arc from correlation set
+  PN.newArc(t1, p1);
+
+  Transition *t2 = PN.newTransition(newPrefix + "write_variable");
+  PN.newArc(p1, t2);
+  PN.newArc(t2, p2);
+  if (parameters[P_VARIABLES])
+  {
+    PN.newArc(PN.findPlace("variable." + ASTEmap[id->value]->variableName), t2);
+    PN.newArc(t2, PN.findPlace("variable." + ASTEmap[id->value]->variableName));
+  }
+
+  Transition *t3 = PN.newTransition(newPrefix + "finish");
+  PN.newArc(p2, t3);
+  PN.newArc(t3, postPlace);
+
+  Transition *t4 = stop(p1, name + ".buffer", prefix);
+  Transition *t5 = stop(p2, name + ".received", prefix);
+
+  if (parameters[P_STANDARDFAULTS])
+  {
+    Transition *t6 = throwFault(p1, faultPlace, "buffer", newPrefix, id, ASTEmap[id->value]->controlFlow, preventFurtherFaults);
+    Transition *t7 = throwFault(p2, faultPlace, "received", newPrefix, id, ASTEmap[id->value]->controlFlow, preventFurtherFaults);
+  }
 
 
+  LEAVE("[ASTT] receivingTransition");
+}
+
+%{
+/*!
+ * \brief Adds a sending pattern
+ *
+ * \param   name        the name of the communication transition
+ * \param   prePlace    the place before the pattern (needed to connect correctly)
+ * \param   postPlace   the place after the pattern (needed to connect correctly)
+ * \param   channel     the place acting as channel place
+ * \param   faultPlace  the place of the pattern, where faults are stored
+ * \param   prefix      the prefix of the places and transitions
+ * \param   id          the id of the callin activity
+ * \param   negativeControlFlow  signals where the activity is located:
+ *                                - 0: inside a scope or the process
+ *                                - 1: inside a fault handler
+ *                                - 2: inside a compensation handler
+ *
+ * \param   preventFurtherFaults  controls what happens to further faults
+ *                                 - true: these faults are prevented (standard)
+ *                                 - false: these faults are suppressed
+ */
+%}
+void sendingTransition(string name, Place *prePlace, Place *postPlace,
+    Place *channel, Place *faultPlace, string prefix, integer id,
+    int negativeControlFlow, bool preventFurtherFaults = true )
+{
+  ENTER("[ASTT] sendingTransition");
+
+  std::string newPrefix = prefix + name + ".";
+
+  Place *p1 = PN.newPlace(newPrefix + "buffer");
+  Place *p2 = PN.newPlace(newPrefix + "sent");
+
+  Transition *t1 = PN.newTransition(newPrefix + "read_variable");
+  PN.newArc(prePlace, t1);
+  PN.newArc(t1, p1);
+  if (parameters[P_VARIABLES])
+  {
+    PN.newArc(PN.findPlace("variable." + ASTEmap[id->value]->variableName), t1, READ);
+  }
+
+
+  Transition *t2 = PN.newTransition(newPrefix + "send");
+  PN.newArc(p1, t2);
+  PN.newArc(t2, channel);
+  // reading arc from correlation set
+  PN.newArc(t2, p2);
+
+  Transition *t3 = PN.newTransition(newPrefix + "finish");
+  PN.newArc(p2, t3);
+  PN.newArc(t3, postPlace);
+
+  Transition *t4 = stop(p1, name + ".buffer", prefix);
+  Transition *t5 = stop(p2, name + ".sent", prefix);
+
+  if (parameters[P_STANDARDFAULTS])
+  {
+    Transition *t6 = throwFault(p1, faultPlace, "buffer", newPrefix, id, ASTEmap[id->value]->controlFlow, preventFurtherFaults);
+    Transition *t7 = throwFault(p2, faultPlace, "sent", newPrefix, id, ASTEmap[id->value]->controlFlow, preventFurtherFaults);
+  }
+
+
+  LEAVE("[ASTT] sendingTransition");
+}
 
 
 %{
@@ -477,3 +607,6 @@ void P_joinCondition(string prefix, tTarget_list target_links, joinCondition jc)
     }  
   }
 }
+
+
+

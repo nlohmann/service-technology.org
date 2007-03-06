@@ -25,18 +25,18 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/03/05 18:39:42 $
+ * \date    \$Date: 2007/03/06 13:07:42 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.80 $
+ * \version \$Revision: 1.81 $
  */
 
 
@@ -681,10 +681,10 @@ string ASTE::createChannel(bool synchronousCommunication)
     case(K_RECEIVE):
     case(K_ONMESSAGE):
       {
-//NL        if (plRoleDetails != NULL)
-//NL        {
-//NL          channelName = plRoleDetails->partnerRole + "." + plRoleDetails->myRole + "." + attributes["operation"];
-//NL        }
+        if (plRoleDetails != NULL)
+        {
+          channelName = plRoleDetails->partnerRole + "." + plRoleDetails->myRole + "." + attributes["operation"];
+        }
 	globals::ASTE_inputChannels.insert(channelName);
 	break;
       }
@@ -692,19 +692,21 @@ string ASTE::createChannel(bool synchronousCommunication)
     case(K_INVOKE):
     case(K_REPLY):
       {
-//NL        if (plRoleDetails != NULL)
-//NL        {
-//NL          channelName = plRoleDetails->myRole + "." + plRoleDetails->partnerRole + "." + attributes["operation"];
-//NL        }
+        if (plRoleDetails != NULL)
+        {
+          channelName = plRoleDetails->myRole + "." + plRoleDetails->partnerRole + "." + attributes["operation"];
+        }
 	globals::ASTE_outputChannels.insert(channelName);
 
 	if (synchronousCommunication)
         {
-//NL          if (plRoleDetails != NULL)
-//NL          {
-//NL            channelName = plRoleDetails->partnerRole + "." + plRoleDetails->myRole + "." + attributes["operation"];
-//NL          }
-	  globals::ASTE_inputChannels.insert(channelName);
+          string channelName2 = attributes["partnerLink"] + "." + attributes["operation"];
+          if (plRoleDetails != NULL)
+          {
+            channelName2 = plRoleDetails->partnerRole + "." + plRoleDetails->myRole + "." + attributes["operation"];
+          }
+          this->channelName2 = channelName2;
+	  globals::ASTE_inputChannels.insert(channelName2);
         }
 
 	break;

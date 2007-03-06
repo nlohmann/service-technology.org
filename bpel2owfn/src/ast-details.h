@@ -25,18 +25,18 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/03/05 16:08:35 $
+ * \date    \$Date: 2007/03/06 13:07:42 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.63 $
+ * \version \$Revision: 1.64 $
  */
 
 
@@ -137,6 +137,7 @@ class ASTE
     controlFlowType controlFlow;	///< the kind of control flow the activity is embedded in
 
     string channelName;			///< name of a channel
+    string channelName2;		///< name of a channel (for synchronous invoke)
     string variableName;		///< (unique) name of a variable
     string inputVariableName;		///< (unique) name of an input variable
     string outputVariableName;		///< (unique) name of an output variable

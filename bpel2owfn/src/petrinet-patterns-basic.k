@@ -41,11 +41,11 @@
  *            - <compensateScope>
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $ 
+ *          last changes of: \$Author: gierds $ 
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/06 11:47:59 $
+ * \date    \$Date: 2007/03/06 13:07:42 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -55,7 +55,7 @@
  *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  */
 %}
 
@@ -240,7 +240,7 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	PN.newArc(t1, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
 
         Transition *t2 = PN.newTransition(prefix + "invoke_in");
-	PN.newArc(t2, PN.findPlace("in." + ASTEmap[phylum->id]->channelName));
+	PN.newArc(t2, PN.findPlace("in." + ASTEmap[phylum->id]->channelName2));
 	PN.newArc(p5, t2);
 	PN.newArc(t2, p3);
 

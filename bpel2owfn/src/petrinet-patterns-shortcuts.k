@@ -1,3 +1,59 @@
+/*****************************************************************************\
+ * Copyright 2007 Niels Lohmann                                              *
+ *                                                                           *
+ * This file is part of GNU BPEL2oWFN.                                       *
+ *                                                                           *
+ * GNU BPEL2oWFN is free software; you can redistribute it and/or modify it  *
+ * under the terms of the GNU General Public License as published by the     *
+ * Free Software Foundation; either version 2 of the License, or (at your    *
+ * option) any later version.                                                *
+ *                                                                           *
+ * GNU BPEL2oWFN is distributed in the hope that it will be useful, but      *
+ * WITHOUT ANY WARRANTY; without even the implied warranty of                *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General  *
+ * Public License for more details.                                          *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License along   *
+ * with GNU BPEL2oWFN; see file COPYING. if not, write to the Free Software  *
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. *
+\*****************************************************************************/
+
+%{
+/*!
+ * \file    petrinet-patterns-shortcuts.cc
+ *
+ * \brief   Petri net patterns for shortcuts
+ *
+ * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nielslohmann $ 
+ * 
+ * \since   2007-03-06
+ *
+ * \date    \$Date: 2007/03/06 12:45:58 $
+ * 
+ * \note    This file is part of the tool BPEL2oWFN and was created during the
+ *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
+ *
+ * \note    This file was created using Kimwitu++ reading file
+ *          petrinet-patterns-shortcuts.k.
+ *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
+ *
+ * \version \$Revision: 1.4 $
+*/
+%}
+
+
+%{ HEADER
+/*!
+ * \file petrinet-patterns-shortcuts.h
+ * \brief Petri net patterns for shortcuts
+ *
+ * See \ref petrinet-patterns-shortcuts.cc for more information.
+ */
+%}
+
+
 %{ HEADER
 #include "petrinet.h"
 %}
@@ -17,37 +73,39 @@ extern map<unsigned int, ASTE*> ASTEmap;
 
 
 /*!
- * \brief generates transition and places to throw a fault
+ * \fn      Transition *kc::throwFault(Place *p1, Place *p2, string p1name, string prefix, integer id, int negativeControlFlow, bool preventFurtherFaults = true)
  *
- * This functions generates a subnet to model the throwing of a fault. It
- * models faults in any control flow of the BPEL process as well as in any
- * patterns used.
+ * \brief   generates transition and places to throw a fault
  *
- * \param p1  the place in positive control flow from which the control flow
- *            enters the negative control flow
+ *          This functions generates a subnet to model the throwing of a fault.
+ *          It models faults in any control flow of the BPEL process as well as
+ *          in any patterns used.
  *
- * \param p2  the place of the pattern on which a token shall be produced which
- *            can only be removed by stopping the pattern
+ * \param   p1  the place in positive control flow from which the control flow
+ *              enters the negative control flow
  *
- * \param p1name  name of place p1 which is used to label the generated
- *                transitions (e.g. if p1 is called "running" generated
- *                transitions end with this name (e.g. "throwFault.running")
+ * \param   p2  the place of the pattern on which a token shall be produced which
+ *              can only be removed by stopping the pattern
  *
- * \param prefix  prefix of the pattern to label generated places and
- *                transitions
+ * \param   p1name  name of place p1 which is used to label the generated
+ *                  transitions (e.g. if p1 is called "running" generated
+ *                  transitions end with this name (e.g. "throwFault.running")
  *
- * \param id  identifier of the caller activity
+ * \param   prefix  prefix of the pattern to label generated places and
+ *                  transitions
  *
- * \param negativeControlFlow  signals where the activity is located:
- *                             - 0: inside a scope or the process
- *                             - 1: inside a fault handler
- *                             - 2: inside a compensation handler
+ * \param   id  identifier of the caller activity
  *
- * \param preventFurtherFaults  controls what happens to further faults
- *                               - true: these faults are prevented (standard)
- *                               - false: these faults are suppressed
+ * \param   negativeControlFlow  signals where the activity is located:
+ *                                - 0: inside a scope or the process
+ *                                - 1: inside a fault handler
+ *                                - 2: inside a compensation handler
  *
- * \return a pointer to the (first) generated fault transition
+ * \param   preventFurtherFaults  controls what happens to further faults
+ *                                 - true: these faults are prevented (standard)
+ *                                 - false: these faults are suppressed
+ *
+ * \return  a pointer to the (first) generated fault transition
 */
 Transition *throwFault(Place *p1, Place *p2,
     string p1name, string prefix, integer id,
@@ -147,21 +205,23 @@ Transition *throwFault(Place *p1, Place *p2,
 
 
 /*!
- * \brief generates a subnet to stop
+ * \fn      Transition *kc::stop(Place *p, string p_name, string prefix)
  *
- * Generates a transition and places to stop the activity, i.e. a
- * transition moving a token on the "stop" place to "stopped".
+ * \brief   generates a subnet to stop
  *
- * \param p  the place in control flow from which the token is move to
- *           "stop"
+ *          Generates a transition and places to stop the activity, i.e. a
+ *          transition moving a token on the "stop" place to "stopped".
  *
- * \param p_name  name of place p which is used to label the generated
- *                transition (e.g. if p1 is called "running" generated
- *                transition end with this name (e.g. "stop.running")
+ * \param   p  the place in control flow from which the token is move to
+ *             "stop"
  *
- * \param prefix  prefix of the pattern to label generated transition
+ * \param   p_name  name of place p which is used to label the generated
+ *                  transition (e.g. if p1 is called "running" generated
+ *                  transition end with this name (e.g. "stop.running")
  *
- * \return a pointer to the stop transition
+ * \param   prefix  prefix of the pattern to label generated transition
+ *
+ * \return  a pointer to the stop transition
  */
 Transition *stop(Place *p, string p_name, string prefix)
 {
@@ -183,15 +243,15 @@ Transition *stop(Place *p, string p_name, string prefix)
 
 
 
-
-
 /*!
- * \brief add a subnet for dead-path elimination
+ * \fn      void kc::dpeLinks(Transition *t, int id)
  *
- * Creates arcs to set links on dead paths to false.
+ * \brief   add a subnet for dead-path elimination
  *
- * \param t	transition that invokes DPE
- * \param id	the identifier of the AST node
+ *          Creates arcs to set links on dead paths to false.
+ *
+ * \param   t   transition that invokes DPE
+ * \param   id  the identifier of the AST node
  */
 void dpeLinks(Transition *t, int id)
 {

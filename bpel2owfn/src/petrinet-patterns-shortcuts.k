@@ -3,16 +3,10 @@
 %}
 
 %{
-#include "ast-config.h"
-#include "helpers.h"
-#include "ast-tools.h"
 #include "ast-details.h"
 #include "options.h"
 #include "globals.h"
 #include "petrinet.h"
-
-using std::cerr;
-using std::endl;
 
 extern PetriNet PN;
 extern map<unsigned int, ASTE*> ASTEmap;
@@ -54,17 +48,11 @@ extern map<unsigned int, ASTE*> ASTEmap;
  *                               - false: these faults are suppressed
  *
  * \return a pointer to the (first) generated fault transition
- *
- * \ingroup creation
 */
 Transition *throwFault(Place *p1, Place *p2,
     string p1name, string prefix, integer id,
     int negativeControlFlow, bool preventFurtherFaults = true)
 {
-  extern string currentScope;	// introduced in bpel-unparse.k
-//  extern PetriNet PN;		// introduced in main.c
-//  extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
-
   assert(p1 != NULL);
   assert(p2 != NULL);
 
@@ -174,13 +162,9 @@ Transition *throwFault(Place *p1, Place *p2,
  * \param prefix  prefix of the pattern to label generated transition
  *
  * \return a pointer to the stop transition
- *
- * \ingroup creation
  */
 Transition *stop(Place *p, string p_name, string prefix)
 {
-//  extern PetriNet PN;	// introduced in main.c
-
   assert(p != NULL);
 
   // no stop transitions in case of "nano" parameter
@@ -208,15 +192,10 @@ Transition *stop(Place *p, string p_name, string prefix)
  *
  * \param t	transition that invokes DPE
  * \param id	the identifier of the AST node
- *
- * \ingroup creation
  */
 void dpeLinks(Transition *t, int id)
 {
   ENTER("[ASTT]");
-
-//  extern PetriNet PN;	// introduced in main.c
-//  extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
 
   assert(t != NULL);
   assert(ASTEmap[id] != NULL);
@@ -232,5 +211,3 @@ void dpeLinks(Transition *t, int id)
 
   LEAVE("[ASTT]");
 }
-
-

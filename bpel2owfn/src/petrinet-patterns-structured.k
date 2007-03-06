@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/05 18:55:48 $
+ * \date    \$Date: 2007/03/06 09:23:22 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,8 +38,8 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.29 $
- */
+ * \version \$Revision: 1.30 $
+*/
 %}
 
 
@@ -588,6 +588,12 @@ void PFlow(impl_tFlow* abstract_phylum, uview current_view)
   SWITCH
 ******************************************************************************/
 
+%{
+/*!
+ * \fn void kc::PSwitch(impl_tSwitch* abstract_phylum, uview current_view)
+ * \brief Pattern for the <switch> activity.
+ */
+%}
 void PSwitch(impl_tSwitch* abstract_phylum, uview current_view)
 {
   impl_tSwitch_Switch* phylum = static_cast<impl_tSwitch_Switch*>(abstract_phylum);

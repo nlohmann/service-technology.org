@@ -29,7 +29,7 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/05 15:15:33 $
+ * \date    \$Date: 2007/03/06 09:23:22 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
  */
 %}
 
@@ -75,6 +75,13 @@ extern map<unsigned int, ASTE*> ASTEmap;
   FAULT HANDLERS
 ******************************************************************************/
 
+%{
+/*!
+ * \fn void kc::PFaultHandlers(impl_tFaultHandlers* abstract_phylum, uview current_view)
+ * \brief Pattern for the <faultHandlers> construct.
+ * \image html "fh.png" "pattern"
+ */
+%}
 void PFaultHandlers(impl_tFaultHandlers* abstract_phylum, uview current_view)
 {
   impl_tFaultHandlers_FaultHandlers* phylum = static_cast<impl_tFaultHandlers_FaultHandlers*>(abstract_phylum);
@@ -182,6 +189,13 @@ void PFaultHandlers(impl_tFaultHandlers* abstract_phylum, uview current_view)
   TERMINATION HANDLER
 ******************************************************************************/
 
+%{
+/*!
+ * \fn void kc::PTerminationHandler(impl_tTerminationHandler* abstract_phylum, uview current_view)
+ * \brief Pattern for the <terminationHandler> construct.
+ * \image html "th.png" "pattern"
+ */
+%}
 void PTerminationHandler(impl_tTerminationHandler* abstract_phylum, uview current_view)
 {
   impl_tTerminationHandler_TerminationHandler* phylum = static_cast<impl_tTerminationHandler_TerminationHandler*>(abstract_phylum);
@@ -256,6 +270,12 @@ void PTerminationHandler(impl_tTerminationHandler* abstract_phylum, uview curren
   COMPENSATION HANDLER
 ******************************************************************************/
 
+%{
+/*!
+ * \fn void kc::PCompensationHandler(impl_tCompensationHandler* abstract_phylum, uview current_view)
+ * \brief Pattern for the <compensationHandler> construct.
+ */
+%}
 void PCompensationHandler(impl_tCompensationHandler* abstract_phylum, uview current_view)
 {
   impl_tCompensationHandler_CompensationHandler* phylum = static_cast<impl_tCompensationHandler_CompensationHandler*>(abstract_phylum);
@@ -287,6 +307,12 @@ void PCompensationHandler(impl_tCompensationHandler* abstract_phylum, uview curr
   EVENT HANDLERS
 ******************************************************************************/
 
+%{
+/*!
+ * \fn void kc::PEventHandlers(impl_tEventHandlers* abstract_phylum, uview current_view)
+ * \brief Pattern for the <eventHandlers> construct.
+ */
+%}
 void PEventHandlers(impl_tEventHandlers* abstract_phylum, uview current_view)
 {
   impl_tEventHandlers_EventHandlers* phylum = static_cast<impl_tEventHandlers_EventHandlers*>(abstract_phylum);

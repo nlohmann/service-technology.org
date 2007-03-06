@@ -41,11 +41,11 @@
  *            - <compensateScope>
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $ 
+ *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/06 15:18:19 $
+ * \date    \$Date: 2007/03/06 15:19:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -55,7 +55,7 @@
  *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
  */
 %}
 
@@ -685,11 +685,15 @@ void PValidate(impl_tValidate* abstract_phylum, uview current_view)
 
 /******************************************************************************
   WAIT
-
-  The <wait> activity has two patterns: one for the "wait until" (deadline)
-  version and one for the "wait for" (duration) version.
 ******************************************************************************/
 
+%{
+/*!
+ * \fn void kc::PWait(impl_tWait* abstract_phylum, uview current_view)
+ * \brief Pattern for the <wait> activity.
+ * \image html "wait.png" "pattern"
+ */
+%}
 void PWait(impl_tWait* abstract_phylum, uview current_view)
 {
   impl_tWait_Wait* phylum = static_cast<impl_tWait_Wait*>(abstract_phylum);
@@ -741,121 +745,6 @@ void PWait(impl_tWait* abstract_phylum, uview current_view)
 
   footer(phylum->id);      
 }
-
-void PWaitUntil(impl_tWait* abstract_phylum, uview current_view)
-{
-  impl_tWait_WaitUntil* phylum = static_cast<impl_tWait_WaitUntil*>(abstract_phylum);
-  assert(phylum != NULL);
-
-  header(phylum->id);
-  string prefix = toString(phylum->id) + ".internal.";
-
-
-  switch (current_view)
-  {
-    case(petrinetnew_enum):
-      {
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-	Place *p3 = PN.newPlace(prefix + "stop");
-	Place *p4 = PN.newPlace(prefix + "stopped");
-
-	Transition *t1 = PN.newTransition(prefix + "waitUntil");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-        if (parameters[P_VARIABLES])
-          PN.newArc(PN.findPlace("1.internal.clock"), t1, READ);
-
-	// Transitions for the negative control flow.
-	Transition *t2 = stop(p1, "initial", prefix);
-	Transition *t3 = stop(p2, "final", prefix);
-
-	break;
-      }
-
-    case (petrinetsmall_enum):
-      {
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-
-	Transition *t1 = PN.newTransition(prefix + "waitUntil");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-
-	break;
-      }
-
-    default: { /* no pattern in this case */ }
-  }
-
-
-  // unparse the standard elements
-  phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
-
-  footer(phylum->id);      
-}
-
-
-void PWaitFor(impl_tWait* abstract_phylum, uview current_view)
-{
-  impl_tWait_WaitFor* phylum = static_cast<impl_tWait_WaitFor*>(abstract_phylum);
-  assert(phylum != NULL);
-
-  header(phylum->id);
-  string prefix = toString(phylum->id) + ".internal.";
-
-
-  switch (current_view)
-  {
-    case(petrinetnew_enum):
-      {
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "TimeStamp");
-	Place *p3 = PN.newPlace(prefix + "final");
-	Place *p4 = PN.newPlace(prefix + "stop");
-	Place *p5 = PN.newPlace(prefix + "stopped");
-
-	Transition *t1 = PN.newTransition(prefix + "readTime");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-        if (parameters[P_VARIABLES])
-	  PN.newArc(PN.findPlace("1.internal.clock"), t1, READ);
-
-	Transition *t2 = PN.newTransition(prefix + "waitFor");
-	PN.newArc(p2, t2);
-	PN.newArc(t2, p3);
-	PN.newArc(PN.findPlace("1.internal.clock"), t2, READ);
-
-	// Transitions for the negative control flow.
-	Transition *t3 = stop(p1, "initial", prefix);
-	Transition *t4 = stop(p2, "TimeStamp", prefix);
-	Transition *t5 = stop(p3, "final", prefix);
-      }
-
-    case (petrinetsmall_enum):
-      {
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-
-	Transition *t1 = PN.newTransition(prefix + "waitFor");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-
-	break;
-      }
-
-    default: { /* no pattern in this case */ }
-  }
-
-
-  // unparse the standard elements
-  phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
-
-  footer(phylum->id);      
-}
-
 
 
 

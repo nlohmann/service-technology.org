@@ -36,8 +36,7 @@
  *          After applying these rules, the postprocessing is invoked.
  *
  *          Then, the rewrite rules "newNames" are applied, removing the
- *          following phyla:
- *           - Wait
+ *          following phylum:
  *           - Invoke
  *   
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
@@ -45,14 +44,14 @@
  * 
  * \since   2006/10/11
  *
- * \date    \$Date: 2007/03/05 16:08:35 $
+ * \date    \$Date: 2007/03/06 15:19:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.26 $
+ * \version \$Revision: 1.27 $
  */
 %}
 
@@ -307,26 +306,9 @@ activityScope(
  * RENAMING REWRITE RULES
  *
  * These rules rewrite some AST phyla to simplify the later Petri net
- * generation. In particular, the two <wait> activities (for vs. until) and
- * the two <invoke> activities (synchronous vs. asynchronous) are
- * distinguished.
+ * generation. In particular, the two <invoke> activities (synchronous vs.
+ * asynchronous) are distinguished.
  *****************************************************************************/
-
-/*
- * Rewrite-rules to distinguish <wait> activities
- */
-Wait(a,_id) provided (ASTEmap[_id->value]->attributes["for"] != "")
-->
-< newNames:
-  WaitFor(a,_id)
->;
-
-Wait(a,_id) provided (ASTEmap[_id->value]->attributes["until"] != "")
-->
-< newNames:
-  WaitUntil(a,_id)
->;
-
 
 /*
  * Rewrite-rules to distinguish <invoke> activities

@@ -32,7 +32,7 @@
  *         
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/03/05 14:30:34 $
+ * \date    \$Date: 2007/03/06 15:19:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.54 $
+ * \version \$Revision: 1.55 $
  */
 %}
 
@@ -501,28 +501,6 @@ Wait(a,b) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Wait\n");
 	  CFGBlock * block = new CFGBlock(CFGWait, $0->id, "Wait"); 
-
-	  globals::cfgMap[toString($0->id)] = block; 
-  	} 
-	a // standard elements
-  ]
-;
-
-WaitFor(a,b) ->
-  [cfg: { 
-	  trace(TRACE_DEBUG, "[CFG] WaitFor\n");
-	  CFGBlock * block = new CFGBlock(CFGWait, $0->id, "WaitFor"); 
-
-	  globals::cfgMap[toString($0->id)] = block; 
-  	} 
-	a // standard elements
-  ]
-;
-
-WaitUntil(a,b) ->
-  [cfg: { 
-	  trace(TRACE_DEBUG, "[CFG] WaitUntil\n");
-	  CFGBlock * block = new CFGBlock(CFGWait, $0->id, "WaitUntil"); 
 
 	  globals::cfgMap[toString($0->id)] = block; 
   	} 

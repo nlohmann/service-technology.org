@@ -33,7 +33,7 @@
  * 
  * \since   2005-10-03
  *
- * \date    \$Date: 2007/03/05 18:39:42 $
+ * \date    \$Date: 2007/03/06 15:19:58 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file ast-grammar.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.167 $
+ * \version \$Revision: 1.168 $
  */
 %}
 
@@ -334,9 +334,7 @@ tEmpty:
 ******************************************************************************/
 
 tWait:
-  Wait(standardElements integer)	/* will be replaced in rewriting */
-| WaitFor(standardElements integer)
-| WaitUntil(standardElements integer)
+  Wait(standardElements integer)
 ;
 
 
@@ -606,8 +604,6 @@ expression:
 %ctor Validate()			{ CTOR(K_VALIDATE) }
 %ctor Empty()				{ CTOR(K_EMPTY) }
 %ctor Wait() 				{ CTOR(K_WAIT) }
-%ctor WaitFor() 			{ CTOR(K_WAIT) }
-%ctor WaitUntil() 			{ CTOR(K_WAIT) }
 %ctor Exit()				{ CTOR(K_EXIT) }
 %ctor Throw()				{ CTOR(K_THROW) }
 %ctor Rethrow()				{ CTOR(K_RETHROW) }

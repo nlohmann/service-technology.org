@@ -32,7 +32,7 @@
  * 
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/03/05 16:08:35 $
+ * \date    \$Date: 2007/03/06 15:19:58 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.72 $
+ * \version \$Revision: 1.73 $
  *
  * \todo    Add support for the <terminationHandler>
  */
@@ -286,11 +286,7 @@ Empty(a,_id) ->
   WAIT
 ******************************************************************************/
 
-WaitFor(a,_id) ->
-  [xml: { inup(); } "<wait id=\"" _id "\"" { listAttributes( _id ); } ">\n" a { indown(); } "</wait>\n"]
-;
-
-WaitUntil(a,_id) ->
+Wait(a,_id) ->
   [xml: { inup(); } "<wait id=\"" _id "\"" { listAttributes( _id ); } ">\n" a { indown(); } "</wait>\n"]
 ;
 

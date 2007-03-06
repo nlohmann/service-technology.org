@@ -32,7 +32,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/03/06 14:21:56 $
+ * \date    \$Date: 2007/03/06 15:19:58 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  *          ast-to-petrinet.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  */
 %}
 
@@ -84,12 +84,8 @@ Validate -> [petrinetnew petrinetsmall:
   { PValidate($0, kc_current_view_base); }
 ];
 
-WaitUntil -> [petrinetnew petrinetsmall:
-  { PWaitUntil($0, kc_current_view_base); }
-];
-
-WaitFor -> [petrinetnew petrinetsmall:
-  { PWaitFor($0, kc_current_view_base); }
+Wait -> [petrinetnew petrinetsmall:
+  { PWait($0, kc_current_view_base); }
 ];
 
 Throw -> [petrinetnew petrinetsmall:

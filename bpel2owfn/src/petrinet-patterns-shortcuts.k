@@ -1,34 +1,26 @@
-/*
-#include <string>
+%{ HEADER
+#include "petrinet.h"
+%}
 
-#include "petrinet-patterns-shortcuts.h"
+%{
+#include "ast-config.h"
+#include "helpers.h"
+#include "ast-tools.h"
+#include "ast-details.h"
+#include "options.h"
+#include "globals.h"
 #include "petrinet.h"
 
-using std::string;
-*/
+using std::cerr;
+using std::endl;
 
-/******************************************************************************
- * Functions for the Petri net unparser defined in bpel-unparse-petri.k
- *****************************************************************************/
-
-/*
-Transition *throwFault(Place *p1, Place *p2,
-    string p1name, string prefix, kc::integer id,
-    int negativeControlFlow, bool preventFurtherFaults = true);
-Transition *stop(Place *p, string p_name, string prefix);
-void dpeLinks(Transition* t, int id);
-*/
+extern PetriNet PN;
+extern map<unsigned int, ASTE*> ASTEmap;
+%}
 
 
 
 
-
-
-
-
-/******************************************************************************
- * Functions for the Petri net unparsers
- *****************************************************************************/
 
 /*!
  * \brief generates transition and places to throw a fault
@@ -70,8 +62,8 @@ Transition *throwFault(Place *p1, Place *p2,
     int negativeControlFlow, bool preventFurtherFaults = true)
 {
   extern string currentScope;	// introduced in bpel-unparse.k
-  extern PetriNet PN;		// introduced in main.c
-  extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
+//  extern PetriNet PN;		// introduced in main.c
+//  extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
 
   assert(p1 != NULL);
   assert(p2 != NULL);
@@ -187,7 +179,7 @@ Transition *throwFault(Place *p1, Place *p2,
  */
 Transition *stop(Place *p, string p_name, string prefix)
 {
-  extern PetriNet PN;	// introduced in main.c
+//  extern PetriNet PN;	// introduced in main.c
 
   assert(p != NULL);
 
@@ -223,8 +215,8 @@ void dpeLinks(Transition *t, int id)
 {
   ENTER("[ASTT]");
 
-  extern PetriNet PN;	// introduced in main.c
-  extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
+//  extern PetriNet PN;	// introduced in main.c
+//  extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
 
   assert(t != NULL);
   assert(ASTEmap[id] != NULL);

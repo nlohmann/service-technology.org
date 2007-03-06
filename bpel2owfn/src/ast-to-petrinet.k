@@ -32,7 +32,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/03/05 18:39:43 $
+ * \date    \$Date: 2007/03/06 10:36:49 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  *          ast-to-petrinet.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.8 $
+ * \version \$Revision: 1.9 $
  */
 %}
 
@@ -225,4 +225,12 @@ This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF) -> [
 
 This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF) -> [petrinetnew petrinetsmall:
   { PLinkWrapper3($0, kc_current_view_base); }
+];
+
+This=StandardElements(a,b, jc) provided (This->suppressJF) -> [petrinetnew petrinetsmall:
+  { PLinkWrapper4($0, kc_current_view_base); }
+];
+
+This=StandardElements(a,b, jc) provided (!This->suppressJF) -> [petrinetnew petrinetsmall:
+  { PLinkWrapper5($0, kc_current_view_base); }
 ];

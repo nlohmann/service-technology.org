@@ -29,7 +29,7 @@
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/03/06 14:01:39 $
+ * \date    \$Date: 2007/03/06 14:21:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.6 $
+ * \version \$Revision: 1.7 $
 */
 %}
 
@@ -384,11 +384,17 @@ void P_transitionCondition(string prefix, tSource_list source_links)
 %{
 /*!
  * \fn void kc::P_joinCondition(string prefix, tTarget_list target_links, joinCondition jc)
+ *
+ * \brief   Pattern to model the join condition of an activity
+ *
+ * \param   prefix        the prefix of the activity's pattern
+ * \param   target_links  the list of incoming links of the activity
+ * \param   jc            the join condition
  */
 %}
 void P_joinCondition(string prefix, tTarget_list target_links, joinCondition jc)
 {
-  // containers for the join transitions and the incoming links
+  // Containers for the join transitions and the incoming links.
   map<unsigned int, Transition*> joinTransitions;
   map<unsigned int, Place*> trueLinks;
   map<unsigned int, Place*> falseLinks;
@@ -400,55 +406,70 @@ void P_joinCondition(string prefix, tTarget_list target_links, joinCondition jc)
   assert(p5 != NULL);
   assert(p6 != NULL);
 
-      // fill link containers
-      unsigned int linkCount = 0;
-      foreach (target; tTarget_list target_links)
-      {
-        Place *linkT = PN.findPlace("link." + ASTEmap[target->id]->linkName);
-	Place *linkF = PN.findPlace("!link." + ASTEmap[target->id]->linkName);
 
-        trueLinks[linkCount] = linkT;
-        falseLinks[linkCount] = linkF;
+  // Fill containers with places modelling links set to true (trueLinks) and
+  // false (falseLinks).
+  unsigned int linkCount = 0;
+  foreach (target; tTarget_list target_links)
+  {
+    Place *linkT = PN.findPlace("link." + ASTEmap[target->id]->linkName);
+    Place *linkF = PN.findPlace("!link." + ASTEmap[target->id]->linkName);
+    
+    trueLinks[linkCount] = linkT;
+    falseLinks[linkCount] = linkF;
 
-        linkCount++;
-      }
+    linkCount++;
+  }
 
-      // add transitions and connect them with the links
-      for (unsigned int i = 0; i < transitionNumber; i++)
-      {
-        joinTransitions[i] = PN.newTransition(prefix + "join" + toString(i));
 
-        for (unsigned int j = 0; j < linkCount; j++)
-        {
-          if (((i >> j) % 2) == 0) // don't ask me why this is working :-|
-            PN.newArc(trueLinks[j], joinTransitions[i]);
-          else
-            PN.newArc(falseLinks[j], joinTransitions[i]);
-        }
-      }
+  // Add transitions and connect them with the links.
+  for (unsigned int i = 0; i < transitionNumber; i++)
+  {
+    joinTransitions[i] = PN.newTransition(prefix + "join" + toString(i));
 
-      // case 1: standard join condition
-      if (string(jc->op_name()) == "standardJoinCondition")
-      {
-        // create OR-join
-        for (unsigned int i = 0; i < transitionNumber; i++)
-        {
-          // only one transition makes the join fail
-          if (i == transitionNumber-1)
-            PN.newArc(joinTransitions[i], p5); // p5=joinFalse
-          else
-            PN.newArc(joinTransitions[i], p6); // p6=joinTrue
-        }
-      }
-      else // case 2: user-defined join condition
-      {
-        // create pattern for join condition
-        for (unsigned int i = 0; i < transitionNumber; i++)
-        {
-          if (globals::joinCondition_result[i])
-            PN.newArc(joinTransitions[i], p5);
-          else
-            PN.newArc(joinTransitions[i], p6);
-        }
-      }
+    for (unsigned int j = 0; j < linkCount; j++)
+    {
+      if (((i >> j) % 2) == 0) // don't ask me why this is working :-|
+	PN.newArc(trueLinks[j], joinTransitions[i]);
+      else
+	PN.newArc(falseLinks[j], joinTransitions[i]);  
+    }
+  }
+
+  /*
+   * case 1: No join condition was specified. In this case, use the standard
+   *         join condition. This join condition evaluates to true if at least
+   *         one incoming link is set to true ("1 out of n", OR).
+   */
+  if (string(jc->op_name()) == "standardJoinCondition")
+  {
+    // Traverse the different cases.
+    for (unsigned int i = 0; i < transitionNumber; i++)
+    {
+      // Only one transition makes the join fail. All others set the join
+      // transition to true.
+      if (i == transitionNumber-1)
+	PN.newArc(joinTransitions[i], p5); // p5=joinFalse
+      else
+	PN.newArc(joinTransitions[i], p6); // p6=joinTrue
+    }
+  }
+
+  /*
+   * case 2: A join condition is specified. The results for the different cases
+   *         have been calculated in the postprocessing and stored in the
+   *         global variable "globals::joinCondition_result".
+   */
+  else
+  {
+    // Traverse the different cases.
+    for (unsigned int i = 0; i < transitionNumber; i++)
+    {
+      // Connect transitions according to the stored result.
+      if (globals::joinCondition_result[i])
+	PN.newArc(joinTransitions[i], p5);
+      else
+	PN.newArc(joinTransitions[i], p6);
+    }  
+  }
 }

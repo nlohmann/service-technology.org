@@ -32,7 +32,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/03/06 10:36:49 $
+ * \date    \$Date: 2007/03/06 14:21:56 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  *          ast-to-petrinet.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  */
 %}
 
@@ -212,25 +212,25 @@ EventHandlers -> [petrinetnew:
 ******************************************************************************/
 
 StandardElements(NiltTarget_list(), NiltSource_list(), jc) -> [petrinetnew petrinetsmall:
-  { PLinkWrapper0($0, kc_current_view_base); }
+  { P_LinkWrapper0($0, kc_current_view_base); }
 ];
 
 StandardElements(NiltTarget_list(), a, jc) -> [petrinetnew petrinetsmall:
-  { PLinkWrapper1($0, kc_current_view_base); }
+  { P_LinkWrapper1($0, kc_current_view_base); }
 ];
 
 This=StandardElements(a, NiltSource_list(), jc) provided (This->suppressJF) -> [petrinetnew petrinetsmall:
-  { PLinkWrapper2($0, kc_current_view_base); }
+  { P_LinkWrapper2($0, kc_current_view_base); }
 ];
 
 This=StandardElements(a, NiltSource_list(), jc) provided (!This->suppressJF) -> [petrinetnew petrinetsmall:
-  { PLinkWrapper3($0, kc_current_view_base); }
+  { P_LinkWrapper3($0, kc_current_view_base); }
 ];
 
 This=StandardElements(a,b, jc) provided (This->suppressJF) -> [petrinetnew petrinetsmall:
-  { PLinkWrapper4($0, kc_current_view_base); }
+  { P_LinkWrapper4($0, kc_current_view_base); }
 ];
 
 This=StandardElements(a,b, jc) provided (!This->suppressJF) -> [petrinetnew petrinetsmall:
-  { PLinkWrapper5($0, kc_current_view_base); }
+  { P_LinkWrapper5($0, kc_current_view_base); }
 ];

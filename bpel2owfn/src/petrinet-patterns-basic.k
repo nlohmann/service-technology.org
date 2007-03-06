@@ -41,11 +41,11 @@
  *            - <compensateScope>
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $ 
+ *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/06 11:28:49 $
+ * \date    \$Date: 2007/03/06 11:47:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -55,7 +55,7 @@
  *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  */
 %}
 
@@ -76,6 +76,7 @@
 #include "ast-details.h"
 #include "options.h"
 #include "globals.h"
+#include "petrinet-patterns-shortcuts.h"
 
 using std::cerr;
 using std::endl;
@@ -228,7 +229,7 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
     case(petrinetnew_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");
-        Place *p2 = PN.newPlace(prefix + "running")
+        Place *p2 = PN.newPlace(prefix + "running");
 	Place *p3 = PN.newPlace(prefix + "final");
 	Place *p4 = PN.newPlace(prefix + "stop");
 	Place *p5 = PN.newPlace(prefix + "stopped");
@@ -572,7 +573,7 @@ void PValidate(impl_tValidate* abstract_phylum, uview current_view)
   
   switch (current_view)
   {
-    case(petrinet_enum):
+/*    case(petrinetnew_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "running");
@@ -601,7 +602,7 @@ void PValidate(impl_tValidate* abstract_phylum, uview current_view)
 
 	break;
       }
-
+*/
     case(petrinetnew_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");
@@ -675,7 +676,6 @@ void PWait(impl_tWait* abstract_phylum, uview current_view)
 
   switch (current_view)
   {
-    case(petrinet_enum):
     case(petrinetnew_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");
@@ -857,7 +857,8 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
 
   switch(current_view)
   {
-    case(petrinet_enum):
+/* 
+   case(petrinet_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "faulted");
@@ -873,7 +874,7 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
 
 	break;
       }
-
+*/
     case(petrinetnew_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");
@@ -945,7 +946,7 @@ void PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
   string prefix = toString(phylum->id) + ".internal.";
 
   Place *p1 = PN.newPlace(prefix + "initial");
-  Place *p5 = PN.newPlace(prefix + "final"); // it's OK that this place is not connected
+//  Place *p5 = PN.newPlace(prefix + "final"); // it's OK that this place is not connected
   
   // assert(ASTEmap[phylum->id] != NULL);
   Place *p2 = PN.newPlace(prefix + "faulted");

@@ -29,16 +29,15 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/03/05 16:08:35 $
+ * \date    \$Date: 2007/03/06 11:47:59 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.29 $
+ * \version \$Revision: 1.30 $
  *
  * \ingroup debug
- * \ingroup creation
  */
 
 
@@ -95,11 +94,6 @@ typedef enum
  * Functions for the Petri net unparser defined in bpel-unparse-petri.k
  *****************************************************************************/
 
-Transition *throwFault(Place *p1, Place *p2,
-    string p1name, string prefix, kc::integer id,
-    int negativeControlFlow, bool preventFurtherFaults = true);
-Transition *stop(Place *p, string p_name, string prefix);
-void dpeLinks(Transition* t, int id);
 string inString();
 void header(kc::integer id, bool indent = false);
 void header(int id, bool indent = false);
@@ -154,8 +148,3 @@ void process_loop_bounds(const vector<unsigned int> &loop_bounds, const vector<u
 
 
 #endif
-
-
-/*!
- * \defgroup creation Petri Net Creation Module
- */

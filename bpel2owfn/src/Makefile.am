@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/05 15:15:33 $ by $Author: nielslohmann $.
-# Version $Revision: 1.64 $
+# File last changed $Date: 2007/03/06 11:47:59 $ by $Author: nielslohmann $.
+# Version $Revision: 1.65 $
 
 bin_PROGRAMS = bpel2owfn
 lib_LIBRARIES = lib_pnapi.a
@@ -57,6 +57,7 @@ KCFILES_NECESSARY = petrinet-patterns-basic.k \
 		    petrinet-patterns-scopes.k \
 		    petrinet-patterns-handlers.k \
 		    petrinet-patterns-links.k \
+		    petrinet-patterns-shortcuts.k \
 		    ast-grammar.k \
 		    ast-config.k
 

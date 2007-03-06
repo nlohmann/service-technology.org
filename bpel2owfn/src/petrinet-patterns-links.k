@@ -40,7 +40,7 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/06 10:36:49 $
+ * \date    \$Date: 2007/03/06 11:47:59 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          petrinet-patterns-links.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  */
 %}
 
@@ -76,6 +76,7 @@
 #include "ast-details.h"
 #include "options.h"
 #include "globals.h"
+#include "petrinet-patterns-shortcuts.h"
 
 using std::cerr;
 using std::endl;

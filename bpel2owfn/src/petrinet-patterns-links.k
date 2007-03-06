@@ -40,7 +40,7 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/06 13:45:22 $
+ * \date    \$Date: 2007/03/06 14:01:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          petrinet-patterns-links.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
  */
 %}
 
@@ -193,7 +193,7 @@ void PLinkWrapper1(impl_standardElements* abstract_phylum, uview current_view)
     Transition *t = stop(p2, "final", prefix);
 
   
-  transitionCondition(prefix, phylum->tSource_list_1);
+  P_transitionCondition(prefix, phylum->tSource_list_1);
 
 
   // Embed the inner activity.
@@ -270,68 +270,8 @@ void PLinkWrapper2(impl_standardElements* abstract_phylum, uview current_view)
   dpeLinks(t2, phylum->parentId);
 
 
+  P_joinCondition(prefix, phylum->tTarget_list_1, phylum->joinCondition_1);
 
-  /*
-   * pattern for the join condition
-   */
-
-  // containers for the join transitions and the incoming links
-  map<unsigned int, Transition*> joinTransitions;
-  map<unsigned int, Place*> trueLinks;
-  map<unsigned int, Place*> falseLinks;
-  unsigned int transitionNumber = (unsigned int)pow(2.0, phylum->tTarget_list_1->length());
-
-  // fill link containers
-  unsigned int linkCount = 0;
-  foreach (target; tTarget_list phylum->tTarget_list_1)
-  {
-    Place *linkT = PN.findPlace("link." + ASTEmap[target->id]->linkName);
-    Place *linkF = PN.findPlace("!link." + ASTEmap[target->id]->linkName);
-
-    trueLinks[linkCount] = linkT;
-    falseLinks[linkCount] = linkF;
-
-    linkCount++;
-  }
-
-  // add transitions and connect them with the links
-  for (unsigned int i = 0; i < transitionNumber; i++)
-  {
-    joinTransitions[i] = PN.newTransition(prefix + "join" + toString(i));
-
-    for (unsigned int j = 0; j < linkCount; j++)
-    {
-      if (((i >> j) % 2) == 0) // don't ask me why this is working :-|
-        PN.newArc(trueLinks[j], joinTransitions[i]);
-      else
-        PN.newArc(falseLinks[j], joinTransitions[i]);
-    }
-  }
-
-  // case 1: standard join condition
-  if (string(phylum->joinCondition_1->op_name()) == "standardJoinCondition")
-  {
-    // create OR-join
-    for (unsigned int i = 0; i < transitionNumber; i++)
-    {
-      // only one transition makes the join fail
-      if (i == transitionNumber-1)
-        PN.newArc(joinTransitions[i], p4); // p4=joinFalse
-      else
-        PN.newArc(joinTransitions[i], p3); // p3=joinTrue
-    }
-  }
-  else // case 2: user-defined join condition
-  {
-    // create pattern for join condition
-    for (unsigned int i = 0; i < transitionNumber; i++)
-    {
-      if (globals::joinCondition_result[i])
-        PN.newArc(joinTransitions[i], p3);
-      else
-        PN.newArc(joinTransitions[i], p4);
-    }
-  }
 
 
 
@@ -424,68 +364,8 @@ void PLinkWrapper3(impl_standardElements* abstract_phylum, uview current_view)
   dpeLinks(t2, phylum->parentId);
 
 
+  P_joinCondition(prefix, phylum->tTarget_list_1, phylum->joinCondition_1);
 
-  /*
-   * pattern for the join condition
-   */
-
-  // containers for the join transitions and the incoming links
-  map<unsigned int, Transition*> joinTransitions;
-  map<unsigned int, Place*> trueLinks;
-  map<unsigned int, Place*> falseLinks;
-  unsigned int transitionNumber = (unsigned int)pow(2.0, phylum->tTarget_list_1->length());
-
-  // fill link containers
-  unsigned int linkCount = 0;
-  foreach (target; tTarget_list phylum->tTarget_list_1)
-  {
-    Place *linkT = PN.findPlace("link." + ASTEmap[target->id]->linkName);
-    Place *linkF = PN.findPlace("!link." + ASTEmap[target->id]->linkName);
-
-    trueLinks[linkCount] = linkT;
-    falseLinks[linkCount] = linkF;
-
-    linkCount++;
-  }
-
-  // add transitions and connect them with the links
-  for (unsigned int i = 0; i < transitionNumber; i++)
-  {
-    joinTransitions[i] = PN.newTransition(prefix + "join" + toString(i));
-
-    for (unsigned int j = 0; j < linkCount; j++)
-    {
-      if (((i >> j) % 2) == 0) // don't ask me why this is working :-|
-        PN.newArc(trueLinks[j], joinTransitions[i]);
-      else
-        PN.newArc(falseLinks[j], joinTransitions[i]);
-    }
-  }
-
-  // case 1: standard join condition
-  if (string(phylum->joinCondition_1->op_name()) == "standardJoinCondition")
-  {
-    // create OR-join
-    for (unsigned int i = 0; i < transitionNumber; i++)
-    {
-      // only one transition makes the join fail
-      if (i == transitionNumber-1)
-        PN.newArc(joinTransitions[i], p4); // p4=joinFalse
-      else
-        PN.newArc(joinTransitions[i], p3); // p3=joinTrue
-    }
-  }
-  else // case 2: user-defined join condition
-  {
-    // create pattern for join condition
-    for (unsigned int i = 0; i < transitionNumber; i++)
-    {
-      if (globals::joinCondition_result[i])
-        PN.newArc(joinTransitions[i], p3);
-      else
-        PN.newArc(joinTransitions[i], p4);
-    }
-  }
 
 
 
@@ -558,70 +438,9 @@ void PLinkWrapper4(impl_standardElements* abstract_phylum, uview current_view)
   dpeLinks(t2, phylum->parentId);
 
 
-  transitionCondition(prefix, phylum->tSource_list_1);
+  P_transitionCondition(prefix, phylum->tSource_list_1);
+  P_joinCondition(prefix, phylum->tTarget_list_1, phylum->joinCondition_1);
 
-
-  /************************************************************************
-   * pattern for the join condition
-   ***********************************************************************/
-
-  // containers for the join transitions and the incoming links
-  map<unsigned int, Transition*> joinTransitions;
-  map<unsigned int, Place*> trueLinks;
-  map<unsigned int, Place*> falseLinks;
-  unsigned int transitionNumber = (unsigned int)pow(2.0, phylum->tTarget_list_1->length());
-
-  // fill link containers
-  unsigned int linkCount = 0;
-  foreach (target; tTarget_list phylum->tTarget_list_1)
-  {
-    Place *linkT = PN.findPlace("link." + ASTEmap[target->id]->linkName);
-    Place *linkF = PN.findPlace("!link." + ASTEmap[target->id]->linkName);
-
-    trueLinks[linkCount] = linkT;
-    falseLinks[linkCount] = linkF;
-
-    linkCount++;
-  }
-
-  // add transitions and connect them with the links
-  for (unsigned int i = 0; i < transitionNumber; i++)
-  {
-    joinTransitions[i] = PN.newTransition(prefix + "join" + toString(i));
-    
-    for (unsigned int j = 0; j < linkCount; j++)
-    {
-      if (((i >> j) % 2) == 0) // don't ask me why this is working :-|
-	PN.newArc(trueLinks[j], joinTransitions[i]);
-      else
-	PN.newArc(falseLinks[j], joinTransitions[i]);
-    }
-  }
-
-  // case 1: standard join condition
-  if (string(phylum->joinCondition_1->op_name()) == "standardJoinCondition")
-  {
-    // create OR-join
-    for (unsigned int i = 0; i < transitionNumber; i++)
-    {
-      // only one transition makes the join fail
-      if (i == transitionNumber-1)
-	PN.newArc(joinTransitions[i], p5); // p5=joinFalse
-      else
-	PN.newArc(joinTransitions[i], p6); // p6=joinTrue
-    }
-  }
-  else // case 2: user-defined join condition
-  {
-    // create pattern for join condition
-    for (unsigned int i = 0; i < transitionNumber; i++)
-    {
-      if (globals::joinCondition_result[i])
-	PN.newArc(joinTransitions[i], p5);
-      else
-	PN.newArc(joinTransitions[i], p6);
-    }
-  }
 
 
   // Embed the inner activity.
@@ -710,72 +529,8 @@ void PLinkWrapper5(impl_standardElements* abstract_phylum, uview current_view)
       dpeLinks(t2, phylum->parentId);
 
 
-  transitionCondition(prefix, phylum->tSource_list_1);
-
-
-
-      /************************************************************************
-       * pattern for the join condition
-       ***********************************************************************/
-
-      // containers for the join transitions and the incoming links
-      map<unsigned int, Transition*> joinTransitions;
-      map<unsigned int, Place*> trueLinks;
-      map<unsigned int, Place*> falseLinks;
-      unsigned int transitionNumber = (unsigned int)pow(2.0, phylum->tTarget_list_1->length());
-
-      // fill link containers
-      unsigned int linkCount = 0;
-      foreach (target; tTarget_list phylum->tTarget_list_1)
-      {
-        Place *linkT = PN.findPlace("link." + ASTEmap[target->id]->linkName);
-	Place *linkF = PN.findPlace("!link." + ASTEmap[target->id]->linkName);
-
-        trueLinks[linkCount] = linkT;
-        falseLinks[linkCount] = linkF;
-
-        linkCount++;
-      }
-
-      // add transitions and connect them with the links
-      for (unsigned int i = 0; i < transitionNumber; i++)
-      {
-        joinTransitions[i] = PN.newTransition(prefix + "join" + toString(i));
-
-        for (unsigned int j = 0; j < linkCount; j++)
-        {
-          if (((i >> j) % 2) == 0) // don't ask me why this is working :-|
-            PN.newArc(trueLinks[j], joinTransitions[i]);
-          else
-            PN.newArc(falseLinks[j], joinTransitions[i]);
-        }
-      }
-
-      // case 1: standard join condition
-      if (string(phylum->joinCondition_1->op_name()) == "standardJoinCondition")
-      {
-        // create OR-join
-        for (unsigned int i = 0; i < transitionNumber; i++)
-        {
-          // only one transition makes the join fail
-          if (i == transitionNumber-1)
-            PN.newArc(joinTransitions[i], p5); // p5=joinFalse
-          else
-            PN.newArc(joinTransitions[i], p6); // p6=joinTrue
-        }
-      }
-      else // case 2: user-defined join condition
-      {
-        // create pattern for join condition
-        for (unsigned int i = 0; i < transitionNumber; i++)
-        {
-          if (globals::joinCondition_result[i])
-            PN.newArc(joinTransitions[i], p5);
-          else
-            PN.newArc(joinTransitions[i], p6);
-        }
-      }
-
+  P_transitionCondition(prefix, phylum->tSource_list_1);
+  P_joinCondition(prefix, phylum->tTarget_list_1, phylum->joinCondition_1);
 
 
 

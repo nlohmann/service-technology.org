@@ -29,7 +29,7 @@
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/03/06 13:45:22 $
+ * \date    \$Date: 2007/03/06 14:01:39 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.5 $
+ * \version \$Revision: 1.6 $
 */
 %}
 
@@ -60,6 +60,7 @@
 
 %{
 #include <iostream>
+#include <cmath>
 
 #include "ast-details.h"
 #include "options.h"
@@ -286,9 +287,10 @@ void dpeLinks(Transition *t, int id)
 
 
 
+
 %{
 /*!
- * \fn void kc::transitionCondition(string prefix, tSource_list source_links)
+ * \fn void kc::P_transitionCondition(string prefix, tSource_list source_links)
  *
  * \brief   Pattern to model the transition condition of an activity
  *
@@ -296,7 +298,7 @@ void dpeLinks(Transition *t, int id)
  * \param   source_links  the list of outgoing links of the activity
  */
 %}
-void transitionCondition(string prefix, tSource_list source_links)
+void P_transitionCondition(string prefix, tSource_list source_links)
 {
   // Find the places of the wrapper pattern. The "done" place is marked when
   // the activity completes. The "final" place is marked after the outgoing
@@ -373,4 +375,80 @@ void transitionCondition(string prefix, tSource_list source_links)
       }
     }
   }
+}
+
+
+
+
+
+%{
+/*!
+ * \fn void kc::P_joinCondition(string prefix, tTarget_list target_links, joinCondition jc)
+ */
+%}
+void P_joinCondition(string prefix, tTarget_list target_links, joinCondition jc)
+{
+  // containers for the join transitions and the incoming links
+  map<unsigned int, Transition*> joinTransitions;
+  map<unsigned int, Place*> trueLinks;
+  map<unsigned int, Place*> falseLinks;
+  unsigned int transitionNumber = (unsigned int)pow(2.0, target_links->length());
+
+  Place *p5 = PN.findPlace(prefix + "joinFalse");
+  Place *p6 = PN.findPlace(prefix + "joinTrue");
+
+  assert(p5 != NULL);
+  assert(p6 != NULL);
+
+      // fill link containers
+      unsigned int linkCount = 0;
+      foreach (target; tTarget_list target_links)
+      {
+        Place *linkT = PN.findPlace("link." + ASTEmap[target->id]->linkName);
+	Place *linkF = PN.findPlace("!link." + ASTEmap[target->id]->linkName);
+
+        trueLinks[linkCount] = linkT;
+        falseLinks[linkCount] = linkF;
+
+        linkCount++;
+      }
+
+      // add transitions and connect them with the links
+      for (unsigned int i = 0; i < transitionNumber; i++)
+      {
+        joinTransitions[i] = PN.newTransition(prefix + "join" + toString(i));
+
+        for (unsigned int j = 0; j < linkCount; j++)
+        {
+          if (((i >> j) % 2) == 0) // don't ask me why this is working :-|
+            PN.newArc(trueLinks[j], joinTransitions[i]);
+          else
+            PN.newArc(falseLinks[j], joinTransitions[i]);
+        }
+      }
+
+      // case 1: standard join condition
+      if (string(jc->op_name()) == "standardJoinCondition")
+      {
+        // create OR-join
+        for (unsigned int i = 0; i < transitionNumber; i++)
+        {
+          // only one transition makes the join fail
+          if (i == transitionNumber-1)
+            PN.newArc(joinTransitions[i], p5); // p5=joinFalse
+          else
+            PN.newArc(joinTransitions[i], p6); // p6=joinTrue
+        }
+      }
+      else // case 2: user-defined join condition
+      {
+        // create pattern for join condition
+        for (unsigned int i = 0; i < transitionNumber; i++)
+        {
+          if (globals::joinCondition_result[i])
+            PN.newArc(joinTransitions[i], p5);
+          else
+            PN.newArc(joinTransitions[i], p6);
+        }
+      }
 }

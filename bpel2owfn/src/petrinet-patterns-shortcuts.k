@@ -29,7 +29,7 @@
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/03/06 12:45:58 $
+ * \date    \$Date: 2007/03/06 13:45:22 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.4 $
+ * \version \$Revision: 1.5 $
 */
 %}
 
@@ -59,6 +59,8 @@
 %}
 
 %{
+#include <iostream>
+
 #include "ast-details.h"
 #include "options.h"
 #include "globals.h"
@@ -66,12 +68,16 @@
 
 extern PetriNet PN;
 extern map<unsigned int, ASTE*> ASTEmap;
+
+using std::cerr;
+using std::endl;
 %}
 
 
 
 
 
+%{
 /*!
  * \fn      Transition *kc::throwFault(Place *p1, Place *p2, string p1name, string prefix, integer id, int negativeControlFlow, bool preventFurtherFaults = true)
  *
@@ -107,6 +113,7 @@ extern map<unsigned int, ASTE*> ASTEmap;
  *
  * \return  a pointer to the (first) generated fault transition
 */
+%}
 Transition *throwFault(Place *p1, Place *p2,
     string p1name, string prefix, integer id,
     int negativeControlFlow, bool preventFurtherFaults = true)
@@ -204,6 +211,7 @@ Transition *throwFault(Place *p1, Place *p2,
 
 
 
+%{
 /*!
  * \fn      Transition *kc::stop(Place *p, string p_name, string prefix)
  *
@@ -223,6 +231,7 @@ Transition *throwFault(Place *p1, Place *p2,
  *
  * \return  a pointer to the stop transition
  */
+%}
 Transition *stop(Place *p, string p_name, string prefix)
 {
   assert(p != NULL);
@@ -243,6 +252,7 @@ Transition *stop(Place *p, string p_name, string prefix)
 
 
 
+%{
 /*!
  * \fn      void kc::dpeLinks(Transition *t, int id)
  *
@@ -253,6 +263,7 @@ Transition *stop(Place *p, string p_name, string prefix)
  * \param   t   transition that invokes DPE
  * \param   id  the identifier of the AST node
  */
+%}
 void dpeLinks(Transition *t, int id)
 {
   ENTER("[ASTT]");
@@ -270,4 +281,96 @@ void dpeLinks(Transition *t, int id)
   }
 
   LEAVE("[ASTT]");
+}
+
+
+
+
+%{
+/*!
+ * \fn void kc::transitionCondition(string prefix, tSource_list source_links)
+ *
+ * \brief   Pattern to model the transition condition of an activity
+ *
+ * \param   prefix        the prefix of the activity's pattern
+ * \param   source_links  the list of outgoing links of the activity
+ */
+%}
+void transitionCondition(string prefix, tSource_list source_links)
+{
+  // Find the places of the wrapper pattern. The "done" place is marked when
+  // the activity completes. The "final" place is marked after the outgoing
+  // links are set.
+  Place *p5 = PN.findPlace(prefix + "done");
+  Place *p2 = PN.findPlace(prefix + "final");
+
+  assert(p5 != NULL);
+  assert(p2 != NULL);
+
+
+  /*
+   * case 1: use XOR for the links (outgoing links are set to true mutually
+   *         exclusive, i.e. "1 out of n")
+   */
+  if (parameters[P_XOR] && (source_links->length() > 1))
+  {
+    foreach (source; tSource_list source_links)
+    {
+      unsigned int linkCounter = 1;
+
+      // Add a transition for each link.
+      Transition *t1 = PN.newTransition(prefix + "setLinks" + toString(linkCounter++));
+      PN.newArc(p5, t1);
+      PN.newArc(t1, p2);
+
+      // Set one link to true.
+      Place *link_true = PN.findPlace("link." + ASTEmap[source->id]->linkName);
+      PN.newArc(t1, link_true);
+
+      // Set the other links to false.
+      foreach (source2; tSource_list source_links)
+      {
+	if (ASTEmap[source2->id]->linkName != ASTEmap[source->id]->linkName)
+	{
+	  Place *link_false = PN.findPlace("!link." + ASTEmap[source2->id]->linkName);
+	  PN.newArc(t1, link_false);
+	}
+      }
+
+      // User-defined transition conditions will be ignored.
+      string givenTransitionCondition = ASTEmap[source->id]->attributes["transitionCondition"];
+      if ((givenTransitionCondition != "") && (givenTransitionCondition != "true"))
+      {
+        cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
+        cerr << "Using XOR instead." << endl << endl;
+      }
+    }
+  }
+
+  /*
+   * case 2: use the standard transition condition (all outgoing links are set
+   *         to true, i.e. "n out of n")
+   */
+  else
+  {
+    // Add a transition for all links.
+    Transition *t1 = PN.newTransition(prefix + "setLinks");
+    PN.newArc(p5, t1);
+    PN.newArc(t1, p2);
+
+    // Set all links to true..
+    foreach (source; tSource_list source_links)
+    {
+      Place *link_true = PN.findPlace("link." + ASTEmap[source->id]->linkName);
+      PN.newArc(t1, link_true);
+
+      // User-defined transition conditions will be ignored.
+      string givenTransitionCondition = ASTEmap[source->id]->attributes["transitionCondition"];
+      if (givenTransitionCondition != "" && givenTransitionCondition != "true")
+      {
+        cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
+        cerr << "Using standard transition \"true\" instead." << endl << endl;
+      }
+    }
+  }
 }

@@ -40,7 +40,7 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/06 11:47:59 $
+ * \date    \$Date: 2007/03/06 13:45:22 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          petrinet-patterns-links.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  */
 %}
 
@@ -192,63 +192,8 @@ void PLinkWrapper1(impl_standardElements* abstract_phylum, uview current_view)
   if (current_view != petrinetsmall_enum)
     Transition *t = stop(p2, "final", prefix);
 
-
-  // Set the outgoing links according to the transition condition.
-  unsigned int linkCounter = 1;
-  if (parameters[P_XOR] && (phylum->tSource_list_1->length() > 1))
-  {
-    // Use XOR for the links.
-    foreach (source; tSource_list phylum->tSource_list_1)
-    {
-      // Add a transition for each link.
-      Transition *t1 = PN.newTransition(prefix + "setLinks" + toString(linkCounter++));
-      PN.newArc(p2, t1);
-      PN.newArc(t1, p3);
-
-      // Set one link to true.
-      Place *p4 = PN.findPlace("link." + ASTEmap[source->id]->linkName);
-      PN.newArc(t1, p4);
-
-      foreach (source2; tSource_list phylum->tSource_list_1)
-      {
-        // Set the other links to false.
-	if (ASTEmap[source2->id]->linkName != ASTEmap[source->id]->linkName)
-	{
-	  Place *p5 = PN.findPlace("!link." + ASTEmap[source2->id]->linkName);
-	  PN.newArc(t1, p5);
-	}
-      }
-
-      // User-defined transition conditions will be ignored.
-      string givenTransitionCondition = ASTEmap[source->id]->attributes["transitionCondition"];
-      if ((givenTransitionCondition != "") && (givenTransitionCondition != "true"))
-      {
-        cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
-        cerr << "Using XOR instead." << endl << endl;
-      }
-    }
-  }
-  else
-  {
-    Transition *t1 = PN.newTransition(prefix + "setLinks");
-    PN.newArc(p2, t1);
-    PN.newArc(t1, p3);
-
-    // Use standard transition condition (true).
-    foreach (source; tSource_list phylum->tSource_list_1)
-    {
-      Place *p4 = PN.findPlace("link." + ASTEmap[source->id]->linkName);
-      PN.newArc(t1, p4);
-
-      // User-defined transition conditions will be ignored.
-      string givenTransitionCondition = ASTEmap[source->id]->attributes["transitionCondition"];
-      if (givenTransitionCondition != "" && givenTransitionCondition != "true")
-      {
-        cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
-        cerr << "Using standard transition \"true\" instead." << endl << endl;
-      }
-    }
-  }
+  
+  transitionCondition(prefix, phylum->tSource_list_1);
 
 
   // Embed the inner activity.
@@ -612,56 +557,9 @@ void PLinkWrapper4(impl_standardElements* abstract_phylum, uview current_view)
   // sets enclosed source links to false
   dpeLinks(t2, phylum->parentId);
 
-  unsigned int linkCounter = 1;
-  if (parameters[P_XOR] && (phylum->tSource_list_1->length() > 1))
-  {
-    // Set the outgoing links (XOR given).
-    foreach (source; tSource_list phylum->tSource_list_1)
-    {
-      Transition *t3 = PN.newTransition(prefix + "setLinks" + toString(linkCounter++));
-      PN.newArc(p3, t3);
-      PN.newArc(t3, p4);
 
-      Place *p7 = PN.findPlace("link." + ASTEmap[source->id]->linkName);
-      PN.newArc(t3, p7);
+  transitionCondition(prefix, phylum->tSource_list_1);
 
-      foreach (source2; tSource_list phylum->tSource_list_1)
-      {
-	if (source2 != source)
-	{
-	  Place *p8 = PN.findPlace("!link." + ASTEmap[source2->id]->linkName);
-	  PN.newArc(t3, p8);
-	}
-      }
-
-      string givenTransitionCondition = ASTEmap[source->id]->attributes["transitionCondition"];
-      if (givenTransitionCondition != "" && givenTransitionCondition != "true")
-      {
-	cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
-	cerr << "Using XOR instead." << endl << endl;
-      }
-    }
-  }
-  else
-  {
-    Transition *t3 = PN.newTransition(prefix + "setLinks");
-    PN.newArc(p3, t3);
-    PN.newArc(t3, p4);
-      
-    // Set the outgoing links (standard transition condition expected).
-    foreach (source; tSource_list phylum->tSource_list_1)
-    {
-      Place *p7 = PN.findPlace("link." + ASTEmap[source->id]->linkName);
-      PN.newArc(t3, p7);
-      
-      string givenTransitionCondition = ASTEmap[source->id]->attributes["transitionCondition"];
-      if (givenTransitionCondition != "" && givenTransitionCondition != "true")
-      {
-	cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
-	cerr << "Using standard transition \"true\" instead." << endl << endl;
-      }
-    }
-  }
 
   /************************************************************************
    * pattern for the join condition
@@ -811,58 +709,8 @@ void PLinkWrapper5(impl_standardElements* abstract_phylum, uview current_view)
       // sets enclosed source links to false
       dpeLinks(t2, phylum->parentId);
 
-      unsigned int linkCounter = 1;
-      if (parameters[P_XOR] && (phylum->tSource_list_1->length() > 1))
-      {
-	// Set the outgoing links (XOR given).
-	foreach (source; tSource_list phylum->tSource_list_1)
-	{
-  	  Transition *t3 = PN.newTransition(prefix + "setLinks" + toString(linkCounter++));
-    	  PN.newArc(p3, t3);
-      	  PN.newArc(t3, p4);
 
-          Place *p7 = PN.findPlace("link." + ASTEmap[source->id]->linkName);
-	  PN.newArc(t3, p7);
-
-          foreach (source2; tSource_list phylum->tSource_list_1)
-          {
-            if (source2 != source)
-            {
-              Place *p8 = PN.findPlace("!link." + ASTEmap[source2->id]->linkName);
-	      PN.newArc(t3, p8);
-            }
-          }
-
-          string givenTransitionCondition = ASTEmap[source->id]->attributes["transitionCondition"];
-          if (givenTransitionCondition != "" && givenTransitionCondition != "true")
-          {
-            cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
-            cerr << "Using XOR instead." << endl << endl;
-          }
-        }
-      }
-      else
-      {
-  	Transition *t3 = PN.newTransition(prefix + "setLinks");
-    	PN.newArc(p3, t3);
-      	PN.newArc(t3, p4);
-      
-	// Set the outgoing links (standard transition condition expected).
-	foreach (source; tSource_list phylum->tSource_list_1)
-        {
-	  Place *p7 = PN.findPlace("link." + ASTEmap[source->id]->linkName);
-          PN.newArc(t3, p7);
-
-          string givenTransitionCondition = ASTEmap[source->id]->attributes["transitionCondition"];
-          if (givenTransitionCondition != "" && givenTransitionCondition != "true")
-          {
-            cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
-            cerr << "Using standard transition \"true\" instead." << endl << endl;
-          }
-        }
-      }
-
-
+  transitionCondition(prefix, phylum->tSource_list_1);
 
 
 

@@ -41,11 +41,11 @@
  *            - <compensateScope>
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $ 
+ *          last changes of: \$Author: gierds $ 
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/06 15:19:58 $
+ * \date    \$Date: 2007/03/07 12:35:55 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -55,7 +55,7 @@
  *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.35 $
+ * \version \$Revision: 1.36 $
  */
 %}
 
@@ -277,7 +277,7 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	PN.newArc(t1, p2);
 
 	Transition *t2 = PN.newTransition(prefix + "invokeI");
-	PN.newArc(PN.findPlace("in." + ASTEmap[phylum->id]->channelName), t2);
+	PN.newArc(PN.findPlace("in." + ASTEmap[phylum->id]->channelName2), t2);
 	PN.newArc(p2, t2);
 	PN.newArc(t2, p3);
 
@@ -771,42 +771,20 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
 
   switch(current_view)
   {
-/* 
-   case(petrinet_enum):
-      {
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "faulted");
-	Place *p3 = PN.newPlace(prefix + "stop");
-	Place *p4 = PN.newPlace(prefix + "stopped");
-	Place *p5 = PN.newPlace(prefix + "final"); // it's OK that this place is not connected
-
-	// Transitions for the negative control flow.
-	Transition *t1 = throwFault(p1, p2, "initial", prefix,
-                           mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
-	Transition *t2 = stop(p1, "initial", prefix);
-	Transition *t3 = stop(p2, "faulted", prefix);
-
-	break;
-      }
-*/
     case(petrinetnew_enum):
       {
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "faulted");
-        Place *p3 = PN.newPlace(prefix + "fault");
+//        Place *p3 = PN.newPlace(prefix + "fault");
 	Place *p4 = PN.newPlace(prefix + "stop");
 	Place *p5 = PN.newPlace(prefix + "stopped");
         Place *p6 = PN.newPlace(prefix + "final");
 
-	// Transitions for the negative control flow.
-	Transition *t1 = PN.newTransition(prefix + "throw");
-        PN.newArc(p1, t1);
-        PN.newArc(t1, p2);
-        PN.newArc(t1, p3);
-
 	Transition *t2 = stop(p1, "initial", prefix);
 	Transition *t3 = stop(p2, "faulted", prefix);
 
+        Transition *t4 = throwFault(p1, p2, "throw", prefix,
+                                 mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
 	break;
       }
 

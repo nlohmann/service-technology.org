@@ -41,11 +41,11 @@
  *            - <compensateScope>
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $ 
+ *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/07 14:39:19 $
+ * \date    \$Date: 2007/03/07 16:12:01 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -55,7 +55,7 @@
  *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.37 $
+ * \version \$Revision: 1.38 $
  */
 %}
 
@@ -83,7 +83,6 @@ using std::endl;
 
 extern PetriNet PN;
 extern map<unsigned int, ASTE*> ASTEmap;
-
 %}
 
 
@@ -95,9 +94,11 @@ extern map<unsigned int, ASTE*> ASTEmap;
 
 %{
 /*!
- * \fn void kc::PEmpty(impl_tEmpty *abstract_phylum, uview current_view)
- * \brief Pattern for the <empty> activity.
- * \image html "empty.png" "pattern"
+ * \fn      void kc::PEmpty(impl_tEmpty *abstract_phylum, uview current_view)
+ *
+ * \brief   Pattern for the <empty> activity.
+ *
+ *          \image html "empty.png" "pattern"
  */
 %}
 void PEmpty(impl_tEmpty* abstract_phylum, uview current_view)
@@ -108,19 +109,16 @@ void PEmpty(impl_tEmpty* abstract_phylum, uview current_view)
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";  
 
-
-  // places
+  // Places.
   Place *p1 = PN.newPlace(prefix + "initial");
   Place *p2 = PN.newPlace(prefix + "final");
 
-
-  // transitions
+  // A transition modelling the <empty> activity.
   Transition *t1 = PN.newTransition(prefix + "empty");
   PN.newArc(p1, t1);
   PN.newArc(t1, p2);
 
-
-  // places and transitions for the negative control flow
+  // Stop places and stopping transitions.
   if (current_view != petrinetsmall_enum)
   {
     Place *p3 = PN.newPlace(prefix + "stop");
@@ -129,10 +127,8 @@ void PEmpty(impl_tEmpty* abstract_phylum, uview current_view)
     Transition *t3 = stop(p2, "final", prefix);
   }
 
-
-  // unparse the standard elements
+  // Unparse the standard elements.
   phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
 
   footer(phylum->id);
 }
@@ -150,9 +146,11 @@ void PEmpty(impl_tEmpty* abstract_phylum, uview current_view)
 
 %{
 /*!
- * \fn void kc::PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
- * \brief Pattern for asynchronous <invoke> activity.
- * \image html "invoke_a.png" "pattern"
+ * \fn      void kc::PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
+ *
+ * \brief   Pattern for asynchronous <invoke> activity.
+ *
+ *          \image html "invoke_a.png" "pattern"
  */
 %}
 void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
@@ -167,21 +165,20 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
   {
     case(petrinetnew_enum):
       {
+        // Places.
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "final");
 	Place *p3 = PN.newPlace(prefix + "stop");
 	Place *p4 = PN.newPlace(prefix + "stopped");
         Place *p5 = PN.newPlace(prefix + "faulted");
 
-        /*
-	Transition *t1 = PN.newTransition(prefix + "invoke");
-	PN.newArc(p1, t1); 
-	PN.newArc(t1, p2);
-	PN.newArc(t1, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
-        */
+        // A subnet sending a message (replacement of t1).
+        sendingTransition("invoke", p1, p2,
+                          PN.findPlace("out." + ASTEmap[phylum->id]->channelName),
+                          p5, prefix, mkinteger(phylum->id),
+                          ASTEmap[phylum->id]->controlFlow);
 
-        sendingTransition("invoke", p1, p2, PN.findPlace("out." + ASTEmap[phylum->id]->channelName), p5, prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
-
+        // Stopping transitions.
 	Transition *t2 = stop(p1, "initial", prefix);
 	Transition *t3 = stop(p2, "final", prefix);
         Transition *t4 = stop(p5, "faulted", prefix);
@@ -191,9 +188,11 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 
     case(petrinetsmall_enum):
       {
+        // Places.
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "final");
 
+        // A transition sending a message.
 	Transition *t1 = PN.newTransition(prefix + "invoke");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
@@ -205,10 +204,8 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
     default: { /* no pattern in this case */ }      
   }
 
-
-  // unparse the standard elements
+  // Unparse the standard elements.
   phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
 
   footer(phylum->id);
 }
@@ -216,9 +213,11 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 
 %{
 /*!
- * \fn void kc::PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
- * \brief Pattern for the synchronous <invoke> activity.
- * \image html "invoke_s.png" "pattern"
+ * \fn      void kc::PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
+ *
+ * \brief   Pattern for the synchronous <invoke> activity.
+ *
+ *          \image html "invoke_s.png" "pattern"
  */
 %}
 void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
@@ -229,11 +228,11 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";
 
-
   switch(current_view)
   {
     case(petrinetnew_enum):
       {
+        // Places.
 	Place *p1 = PN.newPlace(prefix + "initial");
         Place *p2 = PN.newPlace(prefix + "running");
 	Place *p3 = PN.newPlace(prefix + "final");
@@ -241,22 +240,19 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	Place *p5 = PN.newPlace(prefix + "stopped");
         Place *p6 = PN.newPlace(prefix + "faulted");
 
-	/*
-        Transition *t1 = PN.newTransition(prefix + "invoke_out");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-	PN.newArc(t1, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
+        // A subnet sending a message (replacement of t1).
+        sendingTransition("invoke_out",  p1, p2,
+                          PN.findPlace("out." + ASTEmap[phylum->id]->channelName),
+                          p6, prefix, mkinteger(phylum->id),
+                          ASTEmap[phylum->id]->controlFlow);
 
-        Transition *t2 = PN.newTransition(prefix + "invoke_in");
-	PN.newArc(t2, PN.findPlace("in." + ASTEmap[phylum->id]->channelName2));
-	PN.newArc(p5, t2);
-	PN.newArc(t2, p3);
-        */
-
-        sendingTransition("invoke_out",  p1, p2, PN.findPlace("out." + ASTEmap[phylum->id]->channelName), p6, prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
-
-        receivingTransition("invoke_in", p2, p3, PN.findPlace("in." + ASTEmap[phylum->id]->channelName2), p6, prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
+        // A subnet receiving a message (replacement of t2).
+        receivingTransition("invoke_in", p2, p3,
+                            PN.findPlace("in." + ASTEmap[phylum->id]->channelName2),
+                            p6, prefix, mkinteger(phylum->id),
+                            ASTEmap[phylum->id]->controlFlow);
 	
+        // Stopping transitions.
 	Transition *t3 = stop(p1, "initial", prefix);
 	Transition *t4 = stop(p2, "running", prefix);
 	Transition *t5 = stop(p3, "final", prefix);
@@ -267,15 +263,18 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 
     case(petrinetsmall_enum):
       {
+        // Places.
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "running");
 	Place *p3 = PN.newPlace(prefix + "final");
 
+        // A transition for the outgoing message.
 	Transition *t1 = PN.newTransition(prefix + "invokeO");
 	PN.newArc(t1, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
 
+        // A transition for the incoming message.
 	Transition *t2 = PN.newTransition(prefix + "invokeI");
 	PN.newArc(PN.findPlace("in." + ASTEmap[phylum->id]->channelName2), t2);
 	PN.newArc(p2, t2);
@@ -287,10 +286,8 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
     default: { /* no pattern in this case */ }
   }
 
-
-  // unparse the standard elements
+  // Unparse the standard elements.
   phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
 
   footer(phylum->id);
 }
@@ -305,9 +302,11 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 
 %{
 /*!
- * \fn void kc::PReceive(impl_tReceive* abstract_phylum, uview current_view)
- * \brief Pattern for the <receive> activity.
- * \image html "receive.png" "pattern"
+ * \fn      void kc::PReceive(impl_tReceive* abstract_phylum, uview current_view)
+ *
+ * \brief   Pattern for the <receive> activity.
+ * 
+ *          \image html "receive.png" "pattern"
  */
 %}
 void PReceive(impl_tReceive* abstract_phylum, uview current_view)
@@ -318,26 +317,24 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";  
 
-
   switch(current_view)
   {
      case(petrinetnew_enum):
       {
+        // Places.
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "final");
 	Place *p3 = PN.newPlace(prefix + "stop");
 	Place *p4 = PN.newPlace(prefix + "stopped");
         Place *p5 = PN.newPlace(prefix + "faulted");
 
-	/*
-        Transition *t1 = PN.newTransition(prefix + "receive");
-	PN.newArc(PN.findPlace("in." + ASTEmap[phylum->id]->channelName), t1);
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-        */
+        // A subnet receiving a message (replacement of t1).
+        receivingTransition("receive", p1, p2,
+                            PN.findPlace("in." + ASTEmap[phylum->id]->channelName),
+                            p5, prefix, mkinteger(phylum->id),
+                            ASTEmap[phylum->id]->controlFlow);
 
-        receivingTransition("receive", p1, p2, PN.findPlace("in." + ASTEmap[phylum->id]->channelName), p5, prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
-
+        // Stopping transitions.
 	Transition *t2 = stop(p1, "initial", prefix);
 	Transition *t3 = stop(p2, "final", prefix);
         Transition *t4 = stop(p5, "faulted", prefix);
@@ -347,9 +344,11 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
 
     case(petrinetsmall_enum):
       {
+        // Places.
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "final");
 
+        // A transition receiving a message.
 	Transition *t1 = PN.newTransition(prefix + "receive");
 	PN.newArc(PN.findPlace("in." + ASTEmap[phylum->id]->channelName), t1);
 	PN.newArc(p1, t1);
@@ -361,10 +360,8 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
     default: { /* no pattern in this case */ }      
   }
 
-
-  // unparse the standard elements
+  // Unparse the standard elements.
   phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
 
   footer(phylum->id);      
 }
@@ -378,9 +375,11 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
 
 %{
 /*!
- * \fn void kc::PReply(impl_tReply* abstract_phylum, uview current_view)
- * \brief Pattern for the <reply> activity.
- * \image html "reply.png" "pattern"
+ * \fn      void kc::PReply(impl_tReply* abstract_phylum, uview current_view)
+ *
+ * \brief   Pattern for the <reply> activity.
+ *
+ *          \image html "reply.png" "pattern"
  */
 %}
 void PReply(impl_tReply* abstract_phylum, uview current_view)
@@ -391,26 +390,24 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";  
 
-
   switch(current_view)
   {
     case(petrinetnew_enum):
       {
+        // Places.
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "final");
 	Place *p3 = PN.newPlace(prefix + "stop");
 	Place *p4 = PN.newPlace(prefix + "stopped");
         Place *p5 = PN.newPlace(prefix + "faulted");
 
-        /*
-	Transition *t1 = PN.newTransition(prefix + "read_var");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-	PN.newArc(t1, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
-        */
+        // A subnet sending a message (replacement of t1).
+        sendingTransition("reply", p1, p2,
+                          PN.findPlace("out." + ASTEmap[phylum->id]->channelName),
+                          p5, prefix, mkinteger(phylum->id),
+                          ASTEmap[phylum->id]->controlFlow);
 
-        sendingTransition("reply", p1, p2, PN.findPlace("out." + ASTEmap[phylum->id]->channelName), p5, prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
-
+        // Stopping transitions.
         Transition *t2 = stop(p1, "initial", prefix);
 	Transition *t3 = stop(p2, "final", prefix);
         Transition *t4 = stop(p5, "faulted", prefix);
@@ -420,9 +417,11 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
 
     case(petrinetsmall_enum):
       {
+        // Places.
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "final");
 
+        // A transition sending a message.
 	Transition *t1 = PN.newTransition(prefix + "reply");
 	PN.newArc(t1, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
 	PN.newArc(p1, t1);
@@ -434,10 +433,8 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
     default: { /* no pattern in this case */ }      
   }
 
-
-  // unparse the standard elements
+  // Unparse the standard elements.
   phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
 
   footer(phylum->id);
 }
@@ -452,9 +449,13 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
 
 %{
 /*!
- * \fn void kc::PAssign(impl_tAssign* abstract_phylum, uview current_view)
- * \brief Pattern for the <assign> activity.
- * \image html "assign.png" "pattern"
+ * \fn      void kc::PAssign(impl_tAssign* abstract_phylum, uview current_view)
+ *
+ * \brief   Pattern for the <assign> activity.
+ *
+ *          \image html "assign.png" "pattern"
+ * 
+ * \todo    Overwork this pattern and adjust it to the new semantics.
  */
 %}
 void PAssign(impl_tAssign* abstract_phylum, uview current_view)
@@ -470,6 +471,7 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
   {
     case(petrinetnew_enum):
       {
+        // Places.
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p3 = PN.newPlace(prefix + "final");
 	Place *p5 = PN.newPlace(prefix + "stop");
@@ -581,9 +583,14 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 
 %{
 /*!
- * \fn void kc::PValidate(impl_tValidate* abstract_phylum, uview current_view)
- * \brief Pattern for the <validate> activity.
- * \image html "validate.png" "pattern"
+ * \fn       void kc::PValidate(impl_tValidate* abstract_phylum, uview current_view)
+ *
+ * \brief    Pattern for the <validate> activity.
+ *
+ *           \image html "validate.png" "pattern"
+ *
+ * \todo     Overwork this pattern and connect it with the respective
+ *           variable.
  */
 %}
 void PValidate(impl_tValidate* abstract_phylum, uview current_view)
@@ -594,61 +601,35 @@ void PValidate(impl_tValidate* abstract_phylum, uview current_view)
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";
 
-
-  
   switch (current_view)
   {
-/*    case(petrinetnew_enum):
-      {
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "running");
-	Place *p3 = PN.newPlace(prefix + "final");
-	Place *p4 = PN.newPlace(prefix + "p4");
-	Place *p5 = PN.newPlace(prefix + "stop");
-	Place *p6 = PN.newPlace(prefix + "stopped");
-
-	Transition *t1 = PN.newTransition(prefix + "t1");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-
-	Transition *t2 = PN.newTransition(prefix + "t2");
-	PN.newArc(p2, t2);
-	PN.newArc(t2, p3);
-
-	// Transitions for the negative control flow.
-	if (parameters[P_STANDARDFAULTS])
-	  Transition *t3 = throwFault(p2, p4, "running", prefix,
-                             mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
-
-	Transition *t4 = stop(p1, "initial", prefix);
-	Transition *t5 = stop(p2, "running", prefix);
-	Transition *t6 = stop(p4, "p4", prefix);
-	Transition *t7 = stop(p3, "final", prefix);
-
-	break;
-      }
-*/
     case(petrinetnew_enum):
       {
+        // Places
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "running");
 	Place *p3 = PN.newPlace(prefix + "final");
 	Place *p4 = PN.newPlace(prefix + "stop");
 	Place *p5 = PN.newPlace(prefix + "stopped");
-        Place *p6 = PN.newPlace(prefix + "fault");
+        Place *p6 = PN.newPlace(prefix + "faulted");
 
-	Transition *t1 = PN.newTransition(prefix + "t1");
+	Transition *t1 = PN.newTransition(prefix + "read_variable");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
 
-	Transition *t2 = PN.newTransition(prefix + "t2");
+	Transition *t2 = PN.newTransition(prefix + "continue");
 	PN.newArc(p2, t2);
 	PN.newArc(t2, p3);
 
 	// Transitions for the negative control flow.
 	if (parameters[P_STANDARDFAULTS])
-	  Transition *t3 = throwFault(p2, p6, "running", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
+        {
+	  Transition *t3 = throwFault(p2, p6, "running", prefix,
+                                      mkinteger(phylum->id),
+                                      ASTEmap[phylum->id]->controlFlow);
+        }
 
+        // Stopping transitions.
 	Transition *t4 = stop(p1, "initial", prefix);
 	Transition *t5 = stop(p2, "running", prefix);
 	Transition *t6 = stop(p3, "final", prefix);
@@ -658,9 +639,11 @@ void PValidate(impl_tValidate* abstract_phylum, uview current_view)
 
     case(petrinetsmall_enum):
       {
+        // Places.
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "final");
 
+        // Bogus validation.
 	Transition *t1 = PN.newTransition(prefix + "validate");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
@@ -671,10 +654,8 @@ void PValidate(impl_tValidate* abstract_phylum, uview current_view)
     default: { /* no pattern in this case */ }
   }
 
-
-  // unparse the standard elements
+  // Unparse the standard elements.
   phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
 
   footer(phylum->id);
 }
@@ -689,9 +670,14 @@ void PValidate(impl_tValidate* abstract_phylum, uview current_view)
 
 %{
 /*!
- * \fn void kc::PWait(impl_tWait* abstract_phylum, uview current_view)
- * \brief Pattern for the <wait> activity.
- * \image html "wait.png" "pattern"
+ * \fn      void kc::PWait(impl_tWait* abstract_phylum, uview current_view)
+ *
+ * \brief   Pattern for the <wait> activity.
+ *
+ *          \image html "wait.png" "pattern"
+ *
+ *          As we do not model time, the <wait> pattern is modeled by the
+ *          pattern of the <empty> activity.
  */
 %}
 void PWait(impl_tWait* abstract_phylum, uview current_view)
@@ -702,46 +688,26 @@ void PWait(impl_tWait* abstract_phylum, uview current_view)
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";
 
+  // Places.
+  Place *p1 = PN.newPlace(prefix + "initial");
+  Place *p2 = PN.newPlace(prefix + "final");
 
-  switch (current_view)
+  // A transition modelling the <empty> activity.
+  Transition *t1 = PN.newTransition(prefix + "wait");
+  PN.newArc(p1, t1);
+  PN.newArc(t1, p2);
+
+  // Stop places and stopping transitions.
+  if (current_view != petrinetsmall_enum)
   {
-    case(petrinetnew_enum):
-      {
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-	Place *p3 = PN.newPlace(prefix + "stop");
-	Place *p4 = PN.newPlace(prefix + "stopped");
-
-	Transition *t1 = PN.newTransition(prefix + "wait");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-
-        // Transitions for the negative control flow.
-	Transition *t2 = stop(p1, "initial", prefix);
-	Transition *t3 = stop(p2, "final", prefix);
-
-	break;
-      }
-
-    case (petrinetsmall_enum):
-      {
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "final");
-
-	Transition *t1 = PN.newTransition(prefix + "wait");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
-
-	break;
-      }
-
-    default: { /* no pattern in this case */ }
+    Place *p3 = PN.newPlace(prefix + "stop");
+    Place *p4 = PN.newPlace(prefix + "stopped");
+    Transition *t2 = stop(p1, "initial", prefix);
+    Transition *t3 = stop(p2, "final", prefix);
   }
 
-
-  // unparse the standard elements
+  // Unparse the standard elements.
   phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
 
   footer(phylum->id);      
 }
@@ -755,9 +721,17 @@ void PWait(impl_tWait* abstract_phylum, uview current_view)
 
 %{
 /*!
- * \fn void kc::PThrow(impl_tThrow* abstract_phylum, uview current_view)
- * \brief Pattern for the <throw> activity.
- * \image html "throw.png" "pattern"
+ * \fn      void kc::PThrow(impl_tThrow* abstract_phylum, uview current_view)
+ *
+ * \brief   Pattern for the <throw> activity.
+ *
+ *          \image html "throw.png" "pattern"
+ *
+ * \note    This pattern is replaced by an <empty> activity in the
+ *          "communicationonly" patterns.
+ *
+ * \todo    Handle the outgoing links of the throw activity. Right now, they
+ *          are not set at all.
  */
 %}
 void PThrow(impl_tThrow* abstract_phylum, uview current_view)
@@ -768,23 +742,28 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";
 
-
   switch(current_view)
   {
     case(petrinetnew_enum):
       {
+        // Places. Place "final" is not connected, as the <throw> activity
+        // stops the positive control flow. The "fault" place is not modeled as
+        // faults are organized by the "throwFault" function.
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "faulted");
-//        Place *p3 = PN.newPlace(prefix + "fault");
 	Place *p4 = PN.newPlace(prefix + "stop");
 	Place *p5 = PN.newPlace(prefix + "stopped");
         Place *p6 = PN.newPlace(prefix + "final");
 
+        // Throw a fault.
+        Transition *t1 = throwFault(p1, p2, "throw", prefix,
+                                    mkinteger(phylum->id),
+                                    ASTEmap[phylum->id]->controlFlow);
+
+        // Stopping transitions.
 	Transition *t2 = stop(p1, "initial", prefix);
 	Transition *t3 = stop(p2, "faulted", prefix);
 
-        Transition *t4 = throwFault(p1, p2, "throw", prefix,
-                                 mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
 	break;
       }
 
@@ -792,9 +771,9 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
       {
 	cerr << "the <throw> activity cannot be modelled!" << endl;
 
+        // Model an <empty> activity instead.
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "final");
-	
 	Transition *t1 = PN.newTransition(prefix + "empty");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
@@ -805,10 +784,8 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
     default: { /* no pattern in this case */ }
   }
 
-
-  // unparse the standard elements
+  // Unparse the standard elements.
   phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
 
   footer(phylum->id);      
 }
@@ -823,10 +800,19 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
 
 %{
 /*!
- * \fn void kc::PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
- * \brief Pattern for the <rethrow> activity.
- * \image html "rethrow.png" "pattern"
- * The gray place is from the <faultHandlers> pattern.
+ * \fn      void kc::PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
+ *
+ * \brief   Pattern for the <rethrow> activity.
+ *
+ *          \image html "rethrow.png" "pattern"
+ * 
+ *          The gray place is from the <faultHandlers> pattern.
+ *
+ * \todo    Check whether this pattern should also use the "throwFault"
+ *          function.
+ *
+ * \todo    Handle the outgoing links of the throw activity. Right now, they
+ *          are not set at all.
  */
 %}
 void PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
@@ -837,10 +823,8 @@ void PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";
 
+  // Places.
   Place *p1 = PN.newPlace(prefix + "initial");
-//  Place *p5 = PN.newPlace(prefix + "final"); // it's OK that this place is not connected
-  
-  // assert(ASTEmap[phylum->id] != NULL);
   Place *p2 = PN.newPlace(prefix + "faulted");
   Place *p3 = PN.newPlace(prefix + "fault");
   Place *p4 = PN.newPlace(prefix + "stop");
@@ -854,13 +838,12 @@ void PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
   PN.newArc(t1, p2);
   PN.newArc(t1, p3);
 
+  // Stopping transitions.
   Transition *t2 = stop(p1, "initial", prefix);
   Transition *t3 = stop(p2, "faulted", prefix);
 
-
-  // unparse the standard elements
+  // Unparse the standard elements.
   phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
 
   footer(phylum->id);
 }
@@ -871,16 +854,23 @@ void PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
 
 /******************************************************************************
   EXIT / TERMINATE
-
-  The patterns for <exit> and <terminate> are the same.
 ******************************************************************************/
 
 %{
 /*!
- * \fn void kc::PExit(impl_tExit* abstract_phylum, uview current_view)
- * \brief Pattern for the <exit> activity.
- * \image html "exit.png" "pattern"
- * The gray places are from the <process> pattern.
+ * \fn      void kc::PExit(impl_tExit* abstract_phylum, uview current_view)
+ *
+ * \brief   Pattern for the <exit> activity.
+ * 
+ *          \image html "exit.png" "pattern"
+ *          
+ *          The gray places are from the <process> pattern.
+ *
+ * \note    The patterns for <exit> activity (WS-BPEL 2.0) and the <terminate>
+ *          activity (BPEL4WS 1.1) are the same.
+ *
+ * \note    This pattern is replaced by an <empty> activity in the
+ *          "communicationonly" patterns.
  */
 %}
 void PExit(impl_tExit* abstract_phylum, uview current_view)
@@ -891,17 +881,19 @@ void PExit(impl_tExit* abstract_phylum, uview current_view)
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";
 
-  
   switch(current_view)
   {
     case(petrinetnew_enum):
       {
+        // Places. Place "final" is not connected, as the <exit> activity
+        // stops the control flow of the <process>.
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "done");
 	Place *p3 = PN.newPlace(prefix + "stop");
 	Place *p4 = PN.newPlace(prefix + "stopped");
         Place *p5 = PN.newPlace(prefix + "final");
 
+        // Signal the <process> termination.
         Transition *t1 = PN.newTransition(prefix + "exit");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
@@ -909,7 +901,7 @@ void PExit(impl_tExit* abstract_phylum, uview current_view)
 	PN.newArc(t1, PN.findPlace("1.internal.Exiting"));
 	PN.newArc(t1, PN.findPlace("1.internal.inner_stop"));
 
-	// Transitions for the negative control flow.
+	// Stopping transitions.
 	Transition *t2 = stop(p1, "initial", prefix);
 	Transition *t3 = stop(p2, "done", prefix);
 
@@ -920,9 +912,9 @@ void PExit(impl_tExit* abstract_phylum, uview current_view)
       {
 	cerr << "the <exit> activity cannot be modelled!" << endl;
 
+        // Model an <empty> activity instead.
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "final");
-	
 	Transition *t1 = PN.newTransition(prefix + "empty");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
@@ -933,10 +925,8 @@ void PExit(impl_tExit* abstract_phylum, uview current_view)
     default: { /* no pattern in this case */ }
   }
 
-
-  // unparse the standard elements
+  // Unparse the standard elements.
   phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
 
   footer(phylum->id);
 }
@@ -951,10 +941,20 @@ void PExit(impl_tExit* abstract_phylum, uview current_view)
 
 %{
 /*!
- * \fn void kc::PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
- * \brief Pattern for the <compensate> activity.
- * \image html "compensate.png" "pattern"
- * The gray places are from the child <scope> patterns.
+ * \fn      void kc::PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
+ *
+ * \brief   Pattern for the <compensate> activity.
+ *          
+ *          \image html "compensate.png" "pattern"
+ *
+ *          The gray places are from the child <scope> patterns.
+ *
+ * \note    This pattern is replaced by an <empty> activity in the
+ *          "communicationonly" patterns.
+ *
+ * \todo    Do I really need a pattern for "communicationonly" as
+ *          <compensate> activities are only allowed in the negative control
+ *          flow?
  */
 %}
 void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
@@ -965,55 +965,52 @@ void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
   header(phylum->id);
   string prefix = toString(phylum->id) + ".internal.";
 
-  
   switch(current_view)
   {
     case(petrinetnew_enum):
       {
+        // Places.
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "final");
         Place *p3 = PN.newPlace(prefix + "stop");
         Place *p4 = PN.newPlace(prefix + "stopped");
         Place *p5 = PN.newPlace(prefix + "compensating");
 	
+        // Concurrently call all compensation handlers of the child scopes.
 	Transition *t1 = PN.newTransition(prefix + "call_ch");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p5);
 
+        // Finish activity after called compensation handlers have finished.
 	Transition *t2 = PN.newTransition(prefix + "finish");
 	PN.newArc(p5, t2);
 	PN.newArc(t2, p1);
 
+        // Forward stop request to compensation handler.
         Transition *t3 = PN.newTransition(prefix + "stop_ch");
         PN.newArc(p3, t3);
         PN.newArc(p5, t3, READ);
 
+        // Set state to "stopped" after compensation handler has stopped.
         Transition *t4 = PN.newTransition(prefix + "ch_stopped");
         PN.newArc(p5, t4);
         PN.newArc(t4, p4);
 
+        // Stopping transitions.
+        Transition *t5 = stop(p1, "initial", prefix);
+        Transition *t6 = stop(p2, "final",   prefix);
 
-        // connect with places of enclosed scopes of the parent activity
+        // Connect with places of child scopes.
         unsigned int parentId = ASTEmap[ phylum->id ]->parentScopeId;
-        if( ! ASTEmap[ parentId ]->enclosedScopes.empty() )
+        for( set< unsigned int >::iterator scope = ASTEmap[ parentId ]->enclosedScopes.begin();
+                                           scope != ASTEmap[ parentId ]->enclosedScopes.end();
+                                           scope++ )
         {
-          for( set< unsigned int >::iterator scope = ASTEmap[ parentId ]->enclosedScopes.begin();
-                                             scope != ASTEmap[ parentId ]->enclosedScopes.end();
-                                             scope++ )
-          {
-            string newPrefix = toString(*scope) + ".internal.";
-            PN.newArc(t1, PN.findPlace(newPrefix + "compensate"));
-            PN.newArc(t3, PN.findPlace(newPrefix + "ch_stop"));
-            PN.newArc(PN.findPlace(newPrefix + "ch_stopped"),  t4);
-            PN.newArc(PN.findPlace(newPrefix + "compensated"), t2);
-          }
-          Transition *t5 = stop(p1, "initial", prefix);
-          Transition *t6 = stop(p2, "final",   prefix);
-        }
-        else
-        {
-          PN.mergePlaces(p1, p2);
-          PN.mergePlaces(p3, p4);
+          string newPrefix = toString(*scope) + ".internal.";
+          PN.newArc(t1, PN.findPlace(newPrefix + "compensate"));
+          PN.newArc(t3, PN.findPlace(newPrefix + "ch_stop"));
+          PN.newArc(PN.findPlace(newPrefix + "ch_stopped"),  t4);
+          PN.newArc(PN.findPlace(newPrefix + "compensated"), t2);
         }
 
         break;
@@ -1023,9 +1020,9 @@ void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
       {
 	cerr << "the <compensate> activity cannot be modelled!" << endl;
 
+        // Model an <empty> activity instead.
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "final");
-	
 	Transition *t1 = PN.newTransition(prefix + "empty");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
@@ -1036,10 +1033,8 @@ void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
     default: { /* no pattern in this case */ }
   }
 
-
-  // unparse the standard elements
+  // Unparse the standard elements.
   phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
 
   footer(phylum->id);
 }
@@ -1050,17 +1045,27 @@ void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
 
 /******************************************************************************
   COMPENSATE SCOPE
-
-  The <compensate scope="a"> activity of BPEL4WS 1.1 has been replaced by a
-  <compensateScope target="a"> activity.
 ******************************************************************************/
 
 %{
 /*!
- * \fn void kc::PCompensateScope(impl_tCompensate* abstract_phylum, uview current_view)
- * \brief Pattern for the <compensateScope> activity.
- * \image html "compensatescope.png" "pattern"
- * The gray places are from the target child <scope> pattern.
+ * \fn      void kc::PCompensateScope(impl_tCompensate* abstract_phylum, uview current_view)
+ *
+ * \brief   Pattern for the <compensateScope> activity.
+ *
+ *          \image html "compensatescope.png" "pattern"
+ *
+ *          The gray places are from the target <scope> pattern.
+ *
+ * \note    The <compensate scope="a"> activity of BPEL4WS 1.1 has been
+ *          replaced by a <compensateScope target="a"> activity during parsing.
+ *
+ * \note    This pattern is replaced by an <empty> activity in the
+ *          "communicationonly" patterns.
+ *
+ * \todo    Do I really need a pattern for "communicationonly" as
+ *          <compensateScope> activities are only allowed in the negative
+ *          control flow?
  */
 %}
 void PCompensateScope(impl_tCompensate* abstract_phylum, uview current_view)
@@ -1075,36 +1080,41 @@ void PCompensateScope(impl_tCompensate* abstract_phylum, uview current_view)
   {
     case(petrinetnew_enum):
       {
+        // Find the prefix of the target scope.
+        string newPrefix = toString(globals::ASTE_scopeNames[ASTEmap[phylum->id]->attributes["target"]]) + ".internal.";
 
+        // Places.
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "final");
         Place *p3 = PN.newPlace(prefix + "stop");
         Place *p4 = PN.newPlace(prefix + "stopped");
         Place *p5 = PN.newPlace(prefix + "compensating");
 	
+        // Call the compensation handler of the target scope.
 	Transition *t1 = PN.newTransition(prefix + "call_ch");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p5);
+        PN.newArc(t1, PN.findPlace(newPrefix + "compensate"));
 
+        // Finish activity after called compensation handler has finished.
 	Transition *t2 = PN.newTransition(prefix + "finish");
 	PN.newArc(p5, t2);
 	PN.newArc(t2, p1);
+        PN.newArc(PN.findPlace(newPrefix + "compensated"), t2);
 
+        // Forward stop request to compensation handler.
         Transition *t3 = PN.newTransition(prefix + "stop_ch");
         PN.newArc(p3, t3);
         PN.newArc(p5, t3, READ);
+        PN.newArc(t3, PN.findPlace(newPrefix + "ch_stop"));
 
+        // Set state to "stopped" after compensation handler has stopped.
         Transition *t4 = PN.newTransition(prefix + "ch_stopped");
         PN.newArc(p5, t4);
         PN.newArc(t4, p4);
-
-
-        string newPrefix = toString(globals::ASTE_scopeNames[ASTEmap[phylum->id]->attributes["target"]]) + ".internal.";
-        PN.newArc(t1, PN.findPlace(newPrefix + "compensate"));
-        PN.newArc(t3, PN.findPlace(newPrefix + "ch_stop"));
         PN.newArc(PN.findPlace(newPrefix + "ch_stopped"),  t4);
-        PN.newArc(PN.findPlace(newPrefix + "compensated"), t2);
-        
+
+        // Stopping transitions.        
         Transition *t5 = stop(p1, "initial", prefix);
         Transition *t6 = stop(p2, "final",   prefix);
 
@@ -1115,9 +1125,9 @@ void PCompensateScope(impl_tCompensate* abstract_phylum, uview current_view)
       {
 	cerr << "the <compensateScope> activity cannot be modelled!" << endl;
 
+        // Model an <empty> activity instead.
 	Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "final");
-	
 	Transition *t1 = PN.newTransition(prefix + "empty");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
@@ -1128,10 +1138,8 @@ void PCompensateScope(impl_tCompensate* abstract_phylum, uview current_view)
     default: { /* no pattern in this case */ }
   }
 
-
-  // unparse the standard elements
+  // Unparse the standard elements.
   phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
 
   footer(phylum->id);
 }

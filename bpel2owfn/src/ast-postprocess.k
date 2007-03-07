@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/03/05 16:08:35 $
+ * \date    \$Date: 2007/03/07 14:02:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.136 $
+ * \version \$Revision: 1.137 $
  */
 %}
 
@@ -2083,17 +2083,22 @@ Term(_linkname) -> [postprocessing: ];
 Term(_linkname) ->
   [evaluation:
     {
+      // If there was a `$' preceeding the link name, it is removed here.
+      string linkname_string = string(_linkname->name);
+      if (linkname_string[0] == '$')
+        linkname_string = linkname_string.substr(1, linkname_string.length() -1);
+
       // if no value was set in this join condition, the link is not inside the
       // target link list of the current activity --> triggeer SA00073
-      if (globals::joinCondition_links[_linkname->name] == 0)
+      if (globals::joinCondition_links[linkname_string] == 0)
       {
         assert(ASTEmap[$0->parentId] != NULL);
-        SAerror(73, _linkname->name, ASTEmap[$0->parentId]->attributes["referenceLine"]);
+        SAerror(73, linkname_string, ASTEmap[$0->parentId]->attributes["referenceLine"]);
       }
       else
       {
         // numbering in globals::joinCondition_linkStatus should start with 0, thus subtract 1
-        $0->value = globals::joinCondition_linkStatus[globals::joinCondition_links[_linkname->name] -1];
+        $0->value = globals::joinCondition_linkStatus[globals::joinCondition_links[linkname_string] -1];
       }
     }
   ]

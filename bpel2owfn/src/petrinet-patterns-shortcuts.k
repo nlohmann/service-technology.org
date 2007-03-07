@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for shortcuts
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $ 
+ *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/03/07 11:35:54 $
+ * \date    \$Date: 2007/03/07 14:02:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
 */
 %}
 
@@ -626,9 +626,9 @@ void P_joinCondition(string prefix, tTarget_list target_links, joinCondition jc)
     {
       // Connect transitions according to the stored result.
       if (globals::joinCondition_result[i])
-	PN.newArc(joinTransitions[i], p_jc_false);
-      else
 	PN.newArc(joinTransitions[i], p_jc_true);
+      else
+	PN.newArc(joinTransitions[i], p_jc_false);
     }  
   }
 }

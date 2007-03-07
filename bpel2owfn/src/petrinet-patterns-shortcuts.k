@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for shortcuts
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $ 
+ *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/03/06 15:18:19 $
+ * \date    \$Date: 2007/03/07 07:46:40 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
 */
 %}
 
@@ -284,6 +284,10 @@ void dpeLinks(Transition *t, int id)
   LEAVE("[ASTT]");
 }
 
+
+
+
+
 %{
 /*!
  * \brief Adds a receiving pattern
@@ -353,6 +357,10 @@ void receivingTransition(string name, Place *prePlace, Place *postPlace,
   LEAVE("[ASTT] receivingTransition");
 }
 
+
+
+
+
 %{
 /*!
  * \brief Adds a sending pattern
@@ -416,6 +424,9 @@ void sendingTransition(string name, Place *prePlace, Place *postPlace,
 
   LEAVE("[ASTT] sendingTransition");
 }
+
+
+
 
 
 %{
@@ -524,6 +535,9 @@ void P_transitionCondition(string prefix, tSource_list source_links)
  * \param   prefix        the prefix of the activity's pattern
  * \param   target_links  the list of incoming links of the activity
  * \param   jc            the join condition
+ *
+ * \todo    I wonder whether the pattern is also working if a process has more
+ *          than one join condition.
  */
 %}
 void P_joinCondition(string prefix, tTarget_list target_links, joinCondition jc)
@@ -607,6 +621,3 @@ void P_joinCondition(string prefix, tTarget_list target_links, joinCondition jc)
     }  
   }
 }
-
-
-

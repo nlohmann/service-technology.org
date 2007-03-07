@@ -621,7 +621,7 @@ void communicationGraph::printDotFile() {
     unsigned int maxWritingSize = 1000;
     unsigned int maxPrintingSize = 500;
     
-    if (numberOfBlueNodes <= maxWritingSize) {
+    if (true) { // numberOfBlueNodes <= maxWritingSize) {
         
 		trace(TRACE_0, "creating the dot file of the graph...\n");	
         vertex * tmp = root;

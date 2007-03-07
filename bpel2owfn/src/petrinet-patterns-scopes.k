@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for BPEL's <scope> and <process>
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $ 
+ *          last changes of: \$Author: gierds $ 
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/03/06 11:47:59 $
+ * \date    \$Date: 2007/03/07 11:35:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.28 $
+ * \version \$Revision: 1.29 $
  */
 %}
 
@@ -132,6 +132,15 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 	PN.newArc(t1, p5);
 	PN.newArc(p6, t1);
 	PN.newArc(t1, p11);
+
+        if ( parameters[P_VARIABLES] )
+        {
+          for ( set<string>::iterator variable = globals::ASTE_variableNames.begin(); variable != globals::ASTE_variableNames.end(); variable++ )
+          {
+            Place * pVar = PN.newPlace("variable." + (*variable));
+            PN.newArc(t1, pVar);
+          }
+        }
 
 	Transition *t2 = PN.newTransition(prefix + "finalize");
 	PN.newArc(t2, p2);

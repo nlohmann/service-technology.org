@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for shortcuts
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $ 
+ *          last changes of: \$Author: gierds $ 
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/03/07 09:34:13 $
+ * \date    \$Date: 2007/03/07 11:35:54 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.11 $
+ * \version \$Revision: 1.12 $
 */
 %}
 
@@ -334,10 +334,16 @@ void receivingTransition(string name, Place *prePlace, Place *postPlace,
   Transition *t2 = PN.newTransition(newPrefix + "write_variable");
   PN.newArc(p1, t2);
   PN.newArc(t2, p2);
+
   if (parameters[P_VARIABLES])
   {
-    PN.newArc(PN.findPlace("variable." + ASTEmap[id->value]->variableName), t2);
-    PN.newArc(t2, PN.findPlace("variable." + ASTEmap[id->value]->variableName));
+    string varName = "variable." + ASTEmap[id->value]->variableName;
+    if ( name == "invoke_in" )
+    {
+      varName = "variable." + ASTEmap[id->value]->outputVariableName;
+    }
+    PN.newArc(PN.findPlace(varName), t2);
+    PN.newArc(t2, PN.findPlace(varName));
   }
 
   Transition *t3 = PN.newTransition(newPrefix + "finish");
@@ -396,11 +402,16 @@ void sendingTransition(string name, Place *prePlace, Place *postPlace,
   Transition *t1 = PN.newTransition(newPrefix + "read_variable");
   PN.newArc(prePlace, t1);
   PN.newArc(t1, p1);
+
   if (parameters[P_VARIABLES])
   {
-    PN.newArc(PN.findPlace("variable." + ASTEmap[id->value]->variableName), t1, READ);
+    string varName = "variable." + ASTEmap[id->value]->variableName;
+    if ( name == "invoke" || name == "invoke_out" )
+    {
+      varName = "variable." + ASTEmap[id->value]->inputVariableName;
+    }
+    PN.newArc(PN.findPlace(varName), t1, READ);
   }
-
 
   Transition *t2 = PN.newTransition(newPrefix + "send");
   PN.newArc(p1, t2);

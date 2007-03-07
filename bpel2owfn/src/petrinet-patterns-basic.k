@@ -45,7 +45,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/07 12:35:55 $
+ * \date    \$Date: 2007/03/07 14:39:19 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -55,7 +55,7 @@
  *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.36 $
+ * \version \$Revision: 1.37 $
  */
 %}
 
@@ -907,7 +907,7 @@ void PExit(impl_tExit* abstract_phylum, uview current_view)
 	PN.newArc(t1, p2);
 	PN.newArc(PN.findPlace("1.internal.!Exiting"), t1);
 	PN.newArc(t1, PN.findPlace("1.internal.Exiting"));
-	PN.newArc(t1, PN.findPlace("1.internal.exit"));
+	PN.newArc(t1, PN.findPlace("1.internal.inner_stop"));
 
 	// Transitions for the negative control flow.
 	Transition *t2 = stop(p1, "initial", prefix);

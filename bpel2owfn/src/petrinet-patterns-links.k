@@ -40,7 +40,7 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/07 10:41:36 $
+ * \date    \$Date: 2007/03/07 11:40:09 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          petrinet-patterns-links.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.17 $
+ * \version \$Revision: 1.18 $
  */
 %}
 
@@ -353,9 +353,7 @@ void P_LinkWrapper3(impl_standardElements* abstract_phylum, uview current_view)
 
   // The activity can be stopped as several places. (todo: check this)
   Transition *t3 = stop(p1, "initial", prefix);
-  Transition *t4 = stop(p6, "jc_true", prefix);
-  Transition *t5 = stop(p7, "jc_false", prefix);
-  Transition *t6 = stop(p9, "faulted", prefix);
+  Transition *t4 = stop(p9, "faulted", prefix);
 
   // Model the join condition.
   P_joinCondition(prefix, phylum->tTarget_list_1, phylum->joinCondition_1);
@@ -407,23 +405,23 @@ void P_LinkWrapper4(impl_standardElements* abstract_phylum, uview current_view)
 
   // Add new interface places.
   Place *p1 = PN.newPlace(prefix + "initial");
-  Place *p2 = PN.newPlace(prefix + "begin");
-  Place *p3 = PN.newPlace(prefix + "done");
-  Place *p4 = PN.newPlace(prefix + "final");
-  Place *p5 = PN.newPlace(prefix + "jc_false");
-  Place *p6 = PN.newPlace(prefix + "jc_true");
+  Place *p2 = PN.newPlace(prefix + "final");
+  Place *p5 = PN.newPlace(prefix + "jc_true");
+  Place *p6 = PN.newPlace(prefix + "jc_false");
+  Place *p7 = PN.newPlace(prefix + "begin");
+  Place *p8 = PN.newPlace(prefix + "done");
 
   // Join condition evalates to true: start activity.
   Transition *t1 = PN.newTransition(prefix + "start");
   PN.newArc(p1, t1);
-  PN.newArc(p6, t1);
-  PN.newArc(t1, p2);
+  PN.newArc(p5, t1);
+  PN.newArc(t1, p7);
 
   // Join condition evalates to false: skip activity.
   Transition *t2 = PN.newTransition(prefix + "skip");
   PN.newArc(p1, t2);
-  PN.newArc(p5, t2);
-  PN.newArc(t2, p4);
+  PN.newArc(p6, t2);
+  PN.newArc(t2, p2);
 
   // When activity is skipped, sets enclosed source links to false.
   dpeLinks(t2, phylum->parentId);
@@ -435,17 +433,20 @@ void P_LinkWrapper4(impl_standardElements* abstract_phylum, uview current_view)
   P_joinCondition(prefix, phylum->tTarget_list_1, phylum->joinCondition_1);
 
   // Embed the inner activity.
-  PN.mergePlaces(p2, newPrefix + ".initial");
-  PN.mergePlaces(p3, newPrefix + ".final"); 
+  PN.mergePlaces(p7, newPrefix + ".initial");
+  PN.mergePlaces(p8, newPrefix + ".final"); 
 
-  // Add stop places.
+  // Add stop places and stopping transitions.
   if (current_view != petrinetsmall_enum)
   {
-    Place *p7 = PN.newPlace(prefix + "stop");
-    Place *p8 = PN.newPlace(prefix + "stopped");
+    Place *p3 = PN.newPlace(prefix + "stop");
+    Place *p4 = PN.newPlace(prefix + "stopped");
 
-    PN.mergePlaces(p7, newPrefix + ".stop");
-    PN.mergePlaces(p8, newPrefix + ".stopped");
+    Transition *t3 = stop(p1, "initial", prefix);
+    Transition *t4 = stop(p2, "final", prefix);
+
+    PN.mergePlaces(p3, newPrefix + ".stop");
+    PN.mergePlaces(p4, newPrefix + ".stopped");
   }
 }
 
@@ -499,39 +500,37 @@ void P_LinkWrapper5(impl_standardElements* abstract_phylum, uview current_view)
 
   // Add new interface places.
   Place *p1 = PN.newPlace(prefix + "initial");
-  Place *p2 = PN.newPlace(prefix + "begin");
-  Place *p3 = PN.newPlace(prefix + "done");
-  Place *p4 = PN.newPlace(prefix + "final");
-  Place *p5 = PN.newPlace(prefix + "jc_false");
+  Place *p2 = PN.newPlace(prefix + "final");
+  Place *p3 = PN.newPlace(prefix + "stop");
+  Place *p4 = PN.newPlace(prefix + "stopped");
   Place *p6 = PN.newPlace(prefix + "jc_true");
-  Place *p7 = PN.newPlace(prefix + "stop");
-  Place *p8 = PN.newPlace(prefix + "stopped");
-  Place *p9 = PN.newPlace(prefix + "faulted");
+  Place *p7 = PN.newPlace(prefix + "jc_false");
+  Place *p8 = PN.newPlace(prefix + "begin");
+  Place *p9 = PN.newPlace(prefix + "done");
+  Place *p10 = PN.newPlace(prefix + "faulted");
 
   // Join condition evalates to true: start activity.
   Transition *t1 = PN.newTransition(prefix + "start");
   PN.newArc(p1, t1);
   PN.newArc(p6, t1);
-  PN.newArc(t1, p2);
+  PN.newArc(t1, p8);
 
   // Join condition evalates to false: skip activity and throw fault. The
   // transition is not labeled "skip", but "throwFault.joinFailure".
-  Transition *t2 = PN.newTransition(prefix + "skip");
+  Transition *t2 = throwFault(p7, p10, "joinFailure", prefix,
+                              mkinteger(phylum->parentId),
+                              ASTEmap[phylum->parentId]->controlFlow);
   PN.newArc(p1, t2);
-  PN.newArc(p5, t2);
-  PN.newArc(t2, p4);
-  PN.newArc(t2, p9);
-  /* todo */
-
-  // The activity can be stopped as several places. (todo: check this)
-  Transition *t6 = stop(p1, "initial", prefix);
-  Transition *t7 = stop(p4, "final", prefix);
-  Transition *t8 = stop(p5, "jc_true", prefix);
-  Transition *t9 = stop(p6, "jc_false", prefix);
-  Transition *t10 = stop(p9, "faulted", prefix);
+  PN.newArc(p7, t2);
+  PN.newArc(t2, p10);
 
   // Sets enclosed source links to false.
   dpeLinks(t2, phylum->parentId);
+
+  // The activity can be stopped as several places. (todo: check this)
+  Transition *t3 = stop(p1, "initial", prefix);
+  Transition *t4 = stop(p2, "final", prefix);
+  Transition *t5 = stop(p10, "faulted", prefix);
 
   // Model the transition condition.
   P_transitionCondition(prefix, phylum->tSource_list_1);
@@ -540,8 +539,8 @@ void P_LinkWrapper5(impl_standardElements* abstract_phylum, uview current_view)
   P_joinCondition(prefix, phylum->tTarget_list_1, phylum->joinCondition_1);
 
   // Embed the inner activity.
-  PN.mergePlaces(p2, newPrefix + ".initial");
-  PN.mergePlaces(p3, newPrefix + ".final");
-  PN.mergePlaces(p7, newPrefix + ".stop");
-  PN.mergePlaces(p8, newPrefix + ".stopped");
+  PN.mergePlaces(p8, newPrefix + ".initial");
+  PN.mergePlaces(p9, newPrefix + ".final");
+  PN.mergePlaces(p3, newPrefix + ".stop");
+  PN.mergePlaces(p4, newPrefix + ".stopped");
 }

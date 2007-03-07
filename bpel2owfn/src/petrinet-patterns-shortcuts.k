@@ -29,7 +29,7 @@
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/03/07 07:46:40 $
+ * \date    \$Date: 2007/03/07 09:34:13 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
 */
 %}
 
@@ -548,11 +548,11 @@ void P_joinCondition(string prefix, tTarget_list target_links, joinCondition jc)
   map<unsigned int, Place*> falseLinks;
   unsigned int transitionNumber = (unsigned int)pow(2.0, target_links->length());
 
-  Place *p5 = PN.findPlace(prefix + "joinFalse");
-  Place *p6 = PN.findPlace(prefix + "joinTrue");
+  Place *p_jc_false = PN.findPlace(prefix + "jc_false");
+  Place *p_jc_true = PN.findPlace(prefix + "jc_true");
 
-  assert(p5 != NULL);
-  assert(p6 != NULL);
+  assert(p_jc_false != NULL);
+  assert(p_jc_true != NULL);
 
 
   // Fill containers with places modelling links set to true (trueLinks) and
@@ -597,9 +597,9 @@ void P_joinCondition(string prefix, tTarget_list target_links, joinCondition jc)
       // Only one transition makes the join fail. All others set the join
       // transition to true.
       if (i == transitionNumber-1)
-	PN.newArc(joinTransitions[i], p5); // p5=joinFalse
+	PN.newArc(joinTransitions[i], p_jc_false);
       else
-	PN.newArc(joinTransitions[i], p6); // p6=joinTrue
+	PN.newArc(joinTransitions[i], p_jc_true);
     }
   }
 
@@ -615,9 +615,9 @@ void P_joinCondition(string prefix, tTarget_list target_links, joinCondition jc)
     {
       // Connect transitions according to the stored result.
       if (globals::joinCondition_result[i])
-	PN.newArc(joinTransitions[i], p5);
+	PN.newArc(joinTransitions[i], p_jc_false);
       else
-	PN.newArc(joinTransitions[i], p6);
+	PN.newArc(joinTransitions[i], p_jc_true);
     }  
   }
 }

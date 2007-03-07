@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/03/05 15:15:33 $
+ * \date    \$Date: 2007/03/07 14:35:34 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.1 $
+ * \version \$Revision: 1.2 $
  */
 
 
@@ -54,6 +54,8 @@ using std::set;
 using std::string;
 using std::map;
 
+
+/// namespace for global variables
 namespace globals {
   /// prefix of the current scope (read by the stop pattern and used to direct
   /// failures to the correct fault_in place)
@@ -81,7 +83,10 @@ namespace globals {
 
   extern map<string, unsigned int> joinCondition_links;		///< used to evaluate joinConditions: maps link names to a temporary link number
   extern map<unsigned int, bool> joinCondition_linkStatus;	///< used to evaluate joinConditions: maps temporary link numbers to Boolean assignment
-  extern map<unsigned int, bool> joinCondition_result;		///< used to evaluate joinConditions: maps assignment number to Boolean result (used in Petri net unparser)
+  
+  /// Used to evaluate joinConditions: maps an id of a join condition togehter
+  /// with an assignment number to a Boolean result.
+  extern map<unsigned int, map<unsigned int, bool > > joinCondition_result;
 
   extern map<unsigned int, unsigned int> PPhasCompensateMap;
 

@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/03/05 15:15:33 $
+ * \date    \$Date: 2007/03/07 14:35:34 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.1 $
+ * \version \$Revision: 1.2 $
  */
 
 
@@ -64,7 +64,7 @@ namespace globals {
 
   map<string, unsigned int> joinCondition_links;
   map<unsigned int, bool> joinCondition_linkStatus;
-  map<unsigned int, bool> joinCondition_result;
+  map<unsigned int, map<unsigned int, bool > > joinCondition_result;
 
   map<unsigned int, unsigned int> PPhasCompensateMap;
 

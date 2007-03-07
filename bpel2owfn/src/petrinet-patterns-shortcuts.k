@@ -29,7 +29,7 @@
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/03/07 14:02:09 $
+ * \date    \$Date: 2007/03/07 14:35:34 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
 */
 %}
 
@@ -546,9 +546,6 @@ void P_transitionCondition(string prefix, tSource_list source_links)
  * \param   prefix        the prefix of the activity's pattern
  * \param   target_links  the list of incoming links of the activity
  * \param   jc            the join condition
- *
- * \todo    I wonder whether the pattern is also working if a process has more
- *          than one join condition.
  */
 %}
 void P_joinCondition(string prefix, tTarget_list target_links, joinCondition jc)
@@ -625,7 +622,7 @@ void P_joinCondition(string prefix, tTarget_list target_links, joinCondition jc)
     for (unsigned int i = 0; i < transitionNumber; i++)
     {
       // Connect transitions according to the stored result.
-      if (globals::joinCondition_result[i])
+      if (globals::joinCondition_result[jc->parentId][i])
 	PN.newArc(joinTransitions[i], p_jc_true);
       else
 	PN.newArc(joinTransitions[i], p_jc_false);

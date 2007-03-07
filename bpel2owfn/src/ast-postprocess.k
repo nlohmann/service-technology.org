@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/03/07 14:02:09 $
+ * \date    \$Date: 2007/03/07 14:35:34 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.137 $
+ * \version \$Revision: 1.138 $
  */
 %}
 
@@ -1949,7 +1949,7 @@ StandardElements(a,b, _joinCondition) ->
         with(_joinCondition)
         {
           _joinCondition = userDefinedJoinCondition(_exp):
-	    { globals::joinCondition_result[assignment] = _exp->value; }
+	    { globals::joinCondition_result[_joinCondition->parentId][assignment] = _exp->value; }
           default: {}
         }
       }

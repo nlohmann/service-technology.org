@@ -41,11 +41,12 @@
  *            - <compensateScope>
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/07 16:12:01 $
+ * \date    \$Date: 2007/03/07 16:32:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -55,7 +56,7 @@
  *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.38 $
+ * \version \$Revision: 1.39 $
  */
 %}
 
@@ -99,6 +100,9 @@ extern map<unsigned int, ASTE*> ASTEmap;
  * \brief   Pattern for the <empty> activity.
  *
  *          \image html "empty.png" "pattern"
+ *
+ * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
+ * \param   current_view     the current unparse view
  */
 %}
 void PEmpty(impl_tEmpty* abstract_phylum, uview current_view)
@@ -151,11 +155,15 @@ void PEmpty(impl_tEmpty* abstract_phylum, uview current_view)
  * \brief   Pattern for asynchronous <invoke> activity.
  *
  *          \image html "invoke_a.png" "pattern"
+ *
+ * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
+ * \param   current_view     the current unparse view
  */
 %}
 void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 {
-  impl_tInvoke_AsynchronousInvoke* phylum = static_cast<impl_tInvoke_AsynchronousInvoke*>(abstract_phylum);
+  impl_tInvoke_AsynchronousInvoke* phylum =
+    static_cast<impl_tInvoke_AsynchronousInvoke*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -218,11 +226,15 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
  * \brief   Pattern for the synchronous <invoke> activity.
  *
  *          \image html "invoke_s.png" "pattern"
+ *
+ * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
+ * \param   current_view     the current unparse view
  */
 %}
 void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 {
-  impl_tInvoke_SynchronousInvoke* phylum = static_cast<impl_tInvoke_SynchronousInvoke*>(abstract_phylum);
+  impl_tInvoke_SynchronousInvoke* phylum =
+    static_cast<impl_tInvoke_SynchronousInvoke*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -307,11 +319,15 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
  * \brief   Pattern for the <receive> activity.
  * 
  *          \image html "receive.png" "pattern"
+ *
+ * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
+ * \param   current_view     the current unparse view
  */
 %}
 void PReceive(impl_tReceive* abstract_phylum, uview current_view)
 {
-  impl_tReceive_Receive* phylum = static_cast<impl_tReceive_Receive*>(abstract_phylum);
+  impl_tReceive_Receive* phylum =
+    static_cast<impl_tReceive_Receive*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -380,6 +396,9 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
  * \brief   Pattern for the <reply> activity.
  *
  *          \image html "reply.png" "pattern"
+ *
+ * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
+ * \param   current_view     the current unparse view
  */
 %}
 void PReply(impl_tReply* abstract_phylum, uview current_view)
@@ -454,13 +473,17 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
  * \brief   Pattern for the <assign> activity.
  *
  *          \image html "assign.png" "pattern"
+ *
+ * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
+ * \param   current_view     the current unparse view
  * 
  * \todo    Overwork this pattern and adjust it to the new semantics.
  */
 %}
 void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 {
-  impl_tAssign_Assign* phylum = static_cast<impl_tAssign_Assign*>(abstract_phylum);
+  impl_tAssign_Assign* phylum =
+    static_cast<impl_tAssign_Assign*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -583,19 +606,22 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 
 %{
 /*!
- * \fn       void kc::PValidate(impl_tValidate* abstract_phylum, uview current_view)
+ * \fn      void kc::PValidate(impl_tValidate* abstract_phylum, uview current_view)
  *
- * \brief    Pattern for the <validate> activity.
+ * \brief   Pattern for the <validate> activity.
  *
- *           \image html "validate.png" "pattern"
+ *          \image html "validate.png" "pattern"
  *
- * \todo     Overwork this pattern and connect it with the respective
- *           variable.
+ * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
+ * \param   current_view     the current unparse view
+ *
+ * \todo    Overwork this pattern and connect it with the respective variable.
  */
 %}
 void PValidate(impl_tValidate* abstract_phylum, uview current_view)
 {
-  impl_tValidate_Validate* phylum = static_cast<impl_tValidate_Validate*>(abstract_phylum);
+  impl_tValidate_Validate* phylum =
+    static_cast<impl_tValidate_Validate*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -678,6 +704,9 @@ void PValidate(impl_tValidate* abstract_phylum, uview current_view)
  *
  *          As we do not model time, the <wait> pattern is modeled by the
  *          pattern of the <empty> activity.
+ *
+ * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
+ * \param   current_view     the current unparse view
  */
 %}
 void PWait(impl_tWait* abstract_phylum, uview current_view)
@@ -726,6 +755,9 @@ void PWait(impl_tWait* abstract_phylum, uview current_view)
  * \brief   Pattern for the <throw> activity.
  *
  *          \image html "throw.png" "pattern"
+ *
+ * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
+ * \param   current_view     the current unparse view
  *
  * \note    This pattern is replaced by an <empty> activity in the
  *          "communicationonly" patterns.
@@ -808,6 +840,9 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
  * 
  *          The gray place is from the <faultHandlers> pattern.
  *
+ * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
+ * \param   current_view     the current unparse view
+ *
  * \todo    Check whether this pattern should also use the "throwFault"
  *          function.
  *
@@ -817,7 +852,8 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
 %}
 void PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
 {
-  impl_tRethrow_Rethrow* phylum = static_cast<impl_tRethrow_Rethrow*>(abstract_phylum);
+  impl_tRethrow_Rethrow* phylum =
+    static_cast<impl_tRethrow_Rethrow*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -833,7 +869,8 @@ void PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
 
   // Transitions for the negative control flow.
   Transition *t1 = PN.newTransition(prefix + "rethrow");
-  PN.newArc(PN.findPlace(toString(ASTEmap[phylum->id]->parentScopeId) + ".internal.faultHandler.fault"), t1, READ);
+  PN.newArc(PN.findPlace(toString(ASTEmap[phylum->id]->parentScopeId) +
+            ".internal.faultHandler.fault"), t1, READ);
   PN.newArc(p1, t1);
   PN.newArc(t1, p2);
   PN.newArc(t1, p3);
@@ -865,6 +902,9 @@ void PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
  *          \image html "exit.png" "pattern"
  *          
  *          The gray places are from the <process> pattern.
+ *
+ * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
+ * \param   current_view     the current unparse view
  *
  * \note    The patterns for <exit> activity (WS-BPEL 2.0) and the <terminate>
  *          activity (BPEL4WS 1.1) are the same.
@@ -949,6 +989,9 @@ void PExit(impl_tExit* abstract_phylum, uview current_view)
  *
  *          The gray places are from the child <scope> patterns.
  *
+ * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
+ * \param   current_view     the current unparse view
+ *
  * \note    This pattern is replaced by an <empty> activity in the
  *          "communicationonly" patterns.
  *
@@ -959,7 +1002,8 @@ void PExit(impl_tExit* abstract_phylum, uview current_view)
 %}
 void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
 {
-  impl_tCompensate_Compensate* phylum = static_cast<impl_tCompensate_Compensate*>(abstract_phylum);
+  impl_tCompensate_Compensate* phylum =
+    static_cast<impl_tCompensate_Compensate*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -1057,6 +1101,9 @@ void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
  *
  *          The gray places are from the target <scope> pattern.
  *
+ * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
+ * \param   current_view     the current unparse view
+ *
  * \note    The <compensate scope="a"> activity of BPEL4WS 1.1 has been
  *          replaced by a <compensateScope target="a"> activity during parsing.
  *
@@ -1070,7 +1117,8 @@ void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
 %}
 void PCompensateScope(impl_tCompensate* abstract_phylum, uview current_view)
 {
-  impl_tCompensate_CompensateScope* phylum = static_cast<impl_tCompensate_CompensateScope*>(abstract_phylum);
+  impl_tCompensate_CompensateScope* phylum =
+    static_cast<impl_tCompensate_CompensateScope*>(abstract_phylum);
   assert(phylum != NULL);
 
   header(phylum->id);
@@ -1081,7 +1129,8 @@ void PCompensateScope(impl_tCompensate* abstract_phylum, uview current_view)
     case(petrinetnew_enum):
       {
         // Find the prefix of the target scope.
-        string newPrefix = toString(globals::ASTE_scopeNames[ASTEmap[phylum->id]->attributes["target"]]) + ".internal.";
+        string newPrefix =
+          toString(globals::ASTE_scopeNames[ASTEmap[phylum->id]->attributes["target"]]) + ".internal.";
 
         // Places.
 	Place *p1 = PN.newPlace(prefix + "initial");

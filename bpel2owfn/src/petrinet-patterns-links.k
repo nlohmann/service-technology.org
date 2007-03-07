@@ -40,7 +40,7 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/07 11:40:09 $
+ * \date    \$Date: 2007/03/07 16:32:17 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          petrinet-patterns-links.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.18 $
+ * \version \$Revision: 1.19 $
  */
 %}
 
@@ -220,7 +220,6 @@ void P_LinkWrapper1(impl_standardElements* abstract_phylum, uview current_view)
  *
  * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
  * \param   current_view     the current unparse view
- *
  */
 %}
 void P_LinkWrapper2(impl_standardElements* abstract_phylum, uview current_view)

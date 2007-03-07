@@ -91,6 +91,8 @@ protected:
 	vertex * root;                   //!< the root node of the graph
 	vertex * currentVertex;          //!< the vertex we are working on at a certain time
 
+    double global_progress;
+    
     unsigned int numberOfNodes;            	//!< the number of vertices of the graph
 	unsigned int numberOfEdges;           	//!< the number of edges of the graph
 

@@ -65,9 +65,12 @@ operatingGuidelines::~operatingGuidelines() {
 
 //! \fn void operatingGuidelines::buildGraph(vertex * currentNode)
 //! \param currentNode current node of the graph
+//! \param progress_plus the additional progress when the subgraph starting at this node is finished 
 //! \brief builds up the graph recursively
-void operatingGuidelines::buildGraph(vertex * currentNode) {
+void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus) {
 		
+	// at this point, the states inside the current node node are already computed!
+	
 	actualDepth++;
 
 	trace(TRACE_1, "\n=================================================================\n");
@@ -81,28 +84,44 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	trace(TRACE_2, intToString(currentNode->reachGraphStateSet.size()) + "\n");
 
 	if (currentNode->getColor() == RED) {
-		// this may happen due to a message bound violation in function calculateReachableStatesFull
+		// this may happen due to a message bound violation in current node
+		// then, function calculateReachableStatesFull sets node color RED
 		trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color RED\n");
 		trace(TRACE_1, "=================================================================\n");
+		
+		trace(TRACE_2, "adding " + intToString(int(100 * progress_plus)) + " to progress since color is red\n");
+		global_progress += progress_plus;
+		trace(TRACE_0, "\t global_progress: " + intToString(int(100 * global_progress)) + " % \n");
 		return;
 	}
 
 	// get the annotation of the node (CNF)
 	computeCNF(currentNode);					// calculate CNF of this node
 
-	// stop when communication depth reached
-	if (terminateBuildGraph(currentNode)) {
-		// node is a leaf
-		analyseNode(currentNode, true);
-		assert(currentNode->getColor() != BLACK);
-		trace(TRACE_1, "=================================================================\n");
-		return;
-	}
+//	// stop when communication depth reached
+//	if (terminateBuildGraph(currentNode)) {
+//		
+//		// obsolete!!!		
+//		assert(false);
+//		
+//		// node is a leaf
+//		analyseNode(currentNode, true);
+//		assert(currentNode->getColor() != BLACK);
+//		trace(TRACE_1, "=================================================================\n");
+//		
+////		cout << "adding " << progress_plus << "since node is a leaf" << endl;
+//		global_progress += progress_plus;
+//		trace(TRACE_0, "\t global_progress: " + intToString(int(100 * global_progress)) + "\n");
+//		return;
+//	}
 
 	trace(TRACE_1, "=================================================================\n");
 
 	// communication depth not yet reached, going down
 	unsigned int i = 0;
+	
+	double your_progress = progress_plus * (1 / double(PN->getInputPlaceCnt() + PN->getOutputPlaceCnt()));
+	
 	trace(TRACE_2, "\t\t\t iterating over inputSet\n");
 	// iterate over all elements of inputSet
 	while (i < PN->placeInputCnt) {
@@ -126,20 +145,33 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 				trace(TRACE_2, " suppressed (message bound violated)\n");
 
 				numberDeletedVertices--;
+
+				trace(TRACE_2, "adding " + intToString(int(100 * your_progress)) + " to progress (input event suppressed due to message bound violation)\n");
+				global_progress += your_progress;
+				trace(TRACE_0, "\t global_progress: " + intToString(int(100 * global_progress)) + " % \n");
+				
 				delete v;
 			} else {
 				if (v = AddVertex(v, i, sending)) {
-					buildGraph(v);				// going down with sending event...
+					buildGraph(v, your_progress);	// going down with sending event...
 	
 					trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 //					analyseNode(currentNode, false);
 					actualDepth--;
+				} else {
+					trace(TRACE_2, "adding " + intToString(int(100 * your_progress)) + " to progress (node already known, input)\n");
+					global_progress += your_progress;
+					trace(TRACE_0, "\t global_progress: " + intToString(int(100 * global_progress)) + " % \n");
 				}
 			}
 		} else {
 			trace(TRACE_2, "\t\t\t\t\t    sending event: !");
 			trace(TRACE_2, string(PN->inputPlacesArray[i]->name));
 			trace(TRACE_2, " suppressed (max_occurence reached)\n");
+
+			trace(TRACE_2, "adding " + intToString(int(100 * your_progress)) + " to progress (input event suppressed)\n");
+			global_progress += your_progress;
+			trace(TRACE_0, "\t global_progress: " + intToString(int(100 * global_progress)) + " % \n");
 		}
 		i++;
 	}
@@ -161,16 +193,24 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 			calculateSuccStatesOutput(PN->outputPlacesArray[i]->index, currentNode, v);
 			
 			if (v = AddVertex(v, i, receiving)) {
-				buildGraph(v);				// going down with receiving event...
+				buildGraph(v, your_progress);				// going down with receiving event...
 
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 //				analyseNode(currentNode, false);
 				actualDepth--;
+			} else {
+				trace(TRACE_2, "adding " + intToString(int(100 * your_progress)) + " to progress (node already known, output)\n");
+				global_progress += your_progress;
+				trace(TRACE_0, "\t global_progress: " + intToString(int(100 * global_progress)) + " % \n");
 			}
 		} else {
-				trace(TRACE_2, "\t\t\t\t\t  receiving event: ?");
-				trace(TRACE_2, string(PN->outputPlacesArray[i]->name));
-				trace(TRACE_2, " suppressed (max_occurence reached)\n");
+			trace(TRACE_2, "\t\t\t\t\t  receiving event: ?");
+			trace(TRACE_2, string(PN->outputPlacesArray[i]->name));
+			trace(TRACE_2, " suppressed (max_occurence reached)\n");
+
+			trace(TRACE_2, "adding " + intToString(int(100 * your_progress)) + " to progress (output event suppressed)\n");
+			global_progress += your_progress;
+			trace(TRACE_0, "\t global_progress: " + intToString(int(100 * global_progress)) + " % \n");
 		}
 		i++;
 	}
@@ -192,12 +232,10 @@ void operatingGuidelines::buildGraph(vertex * currentNode) {
 	trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + "\n");
 
 	
-	
 	if (options[O_OTF]){
 		//cout << "currentNode: " << currentNode->getNumber() << endl;	
 		bdd->addOrDeleteLeavingEdges(currentNode);
 	}
-
 }
 
 //! \fn void operatingGuidelines::computeCNF(vertex * node)

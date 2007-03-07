@@ -237,25 +237,24 @@ int main(int argc, char ** argv) {
 	    // evaluate command line options
 	    parse_command_line(argc, argv);
 	    
-	    if (options[O_EX] == true){
+	    if (options[O_EX] == true) {
 	    	//check equality of two operating guidelines
 			if (netfiles.size() == 2){
 				list<char*>::iterator netiter = netfiles.begin();
         		Exchangeability* og1 = new Exchangeability(*netiter);        		
         		Exchangeability* og2 = new Exchangeability(*(++netiter));
         		trace(TRACE_0, "The two operating guidelines are equal: ");
-        		if (og1->check(og2) == true){
+        		if (og1->check(og2) == true) {
         			trace(TRACE_0, "YES\n");
         		}
-        		else{
+        		else {
         			trace(TRACE_0, "NO\n");
         		}
 			}	
         	else {
         		cerr << "Error: \t If option -x is used, exactly two oWFN must be entered\n" << endl;
         	}			
-		}
-		else {
+		} else {
 	
 		    list<char*>::iterator netiter = netfiles.begin();
 	
@@ -310,6 +309,7 @@ int main(int argc, char ** argv) {
 				
 				netiter++;
 			} while (netfiles.begin() != netfiles.end() && netiter != netfiles.end());
+			
 			if (options[O_MATCH]) {
 				readog();
 			}
@@ -346,10 +346,13 @@ int main(int argc, char ** argv) {
 				// adjust commDepth and events_manual
 				adjustOptionValues();
 				
-				// ------------------- start computation -------------------------
+				// start computation
 				time_t seconds, seconds2;
 				
 				if (options[O_MATCH]) {
+					
+// ---------------- matching ---------------------
+
 					string reasonForFailedMatch;
 					if (PN->matchesWithOG(OGToMatch, reasonForFailedMatch)) {
 						trace(TRACE_0, "oWFN matches with OG: YES\n");
@@ -358,8 +361,11 @@ int main(int argc, char ** argv) {
 						trace(TRACE_0, "Match failed, because: " +
 						reasonForFailedMatch + "\n");
 					}
+					
 				} else if (parameters[P_OG]) {
-			        // operating guideline is built
+
+// ---------------- operating guideline is built ---------------------
+
 			        operatingGuidelines * graph = new operatingGuidelines(PN);
 			        trace(TRACE_0, "building the operating guideline...\n");
 			        seconds = time (NULL);
@@ -369,7 +375,8 @@ int main(int argc, char ** argv) {
 					if (options[O_OTF]){
 						graph->bdd->convertRootNode(graph->getRoot());
 					}
-					graph->buildGraph(graph->getRoot()); // build operating guideline
+					
+					graph->buildGraph(graph->getRoot(), 1); // build operating guideline
 					
 			        seconds2 = time (NULL);
 			        trace(TRACE_0, "building the operating guideline finished.\n");
@@ -410,12 +417,14 @@ int main(int argc, char ** argv) {
 			        }
 			
 					trace(TRACE_5, "computation finished -- trying to delete graph\n");
-	//				getchar();
+					// trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
 					delete graph;
 					trace(TRACE_5, "graph deleted\n");
 		        
 				} else {
-			        // interaction graph is built
+					
+// ---------------- interaction graph is built ---------------------
+			        
 			        interactionGraph * graph = new interactionGraph(PN);
 			
 			        if (options[O_CALC_REDUCED_IG]) {
@@ -449,7 +458,7 @@ int main(int argc, char ** argv) {
 					graph->printDotFile();				// for IG
 		
 					trace(TRACE_5, "computation finished -- trying to delete graph\n");
-	//				getchar();
+	//				trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
 					delete graph;
 					trace(TRACE_5, "graph deleted\n");
 				}

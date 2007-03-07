@@ -171,7 +171,7 @@ void clause::setEdges(graphEdge * edge) {
 			trace(TRACE_5, "clause::setEdges(graphEdge * edge) : end\n");		
 			return;
 		}
- 		cl = cl->nextElement;	
+ 		cl = cl->nextElement;
  	}
     trace(TRACE_5, "clause::setEdges(graphEdge * edge) : end\n");
 	

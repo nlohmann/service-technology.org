@@ -42,7 +42,6 @@
 #include "binDecision.h"
 #include <cassert>
 
-
 using namespace std;
 
 
@@ -52,6 +51,7 @@ using namespace std;
 communicationGraph::communicationGraph(oWFN * _PN) :
     root(NULL),
     currentVertex(NULL),
+    global_progress(0),
     numberOfNodes(0),
     numberOfEdges(0),
     numberOfBlueNodes(0),

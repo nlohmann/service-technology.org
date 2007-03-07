@@ -43,7 +43,7 @@
 #include "CNF.h"
 
 #include "util.h"
-#include "cudd.h" 
+#include "cudd.h"
 #include "cuddInt.h"
 #include "dddmp.h"
 

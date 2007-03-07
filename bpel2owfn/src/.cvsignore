@@ -1,4 +1,5 @@
 .deps
+doc
 stamp-h1
 Makefile
 Makefile.in
@@ -30,6 +31,8 @@ petrinet-patterns-links.h
 petrinet-patterns-links.cc
 petrinet-patterns-shortcuts.h
 petrinet-patterns-shortcuts.cc
+petrinet-patterns-handlers.h
+petrinet-patterns-handlers.cc
 frontend-lexer.cc
 frontend-parser.cc
 frontend-parser.h

@@ -40,7 +40,7 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/07 09:34:13 $
+ * \date    \$Date: 2007/03/07 10:13:00 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          petrinet-patterns-links.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
  */
 %}
 
@@ -113,31 +113,28 @@ void P_LinkWrapper0(impl_standardElements* abstract_phylum, uview current_view)
 {
   trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern 0: no links\n");
 
-  impl_standardElements_StandardElements* phylum = static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
+  impl_standardElements_StandardElements* phylum =
+    static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
   assert(phylum != NULL);
 
+  // Organize prefixes.
   string prefix = toString(phylum->parentId) + ".";
   string newPrefix = toString(phylum->parentId) + ".internal";
-
-
 
   // Add new interface places.
   Place *p1 = PN.newPlace(prefix + "initial");
   Place *p2 = PN.newPlace(prefix + "final");
-  Place *p3 = NULL;
-  Place *p4 = NULL;
-  if (current_view != petrinetsmall_enum)
-  {
-    p3 = PN.newPlace(prefix + "stop");
-    p4 = PN.newPlace(prefix + "stopped");
-  }
-
 
   // Embed the inner activity.
   PN.mergePlaces(p1, newPrefix + ".initial");
   PN.mergePlaces(p2, newPrefix + ".final");
+
+  // Add stop places.
   if (current_view != petrinetsmall_enum)
   {
+    Place *p3 = PN.newPlace(prefix + "stop");
+    Place *p4 = PN.newPlace(prefix + "stopped");
+
     PN.mergePlaces(p3, newPrefix + ".stop");
     PN.mergePlaces(p4, newPrefix + ".stopped");
   }
@@ -169,7 +166,8 @@ void P_LinkWrapper1(impl_standardElements* abstract_phylum, uview current_view)
 {
   trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern 1\n");
 
-  impl_standardElements_StandardElements* phylum = static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
+  impl_standardElements_StandardElements* phylum =
+    static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
   assert(phylum != NULL);
   
   // Organize prefixes.
@@ -229,7 +227,8 @@ void P_LinkWrapper2(impl_standardElements* abstract_phylum, uview current_view)
 {
   trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern 2\n");
 
-  impl_standardElements_StandardElements* phylum = static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
+  impl_standardElements_StandardElements* phylum =
+    static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
   assert(phylum != NULL);
 
   // Organize prefixes.
@@ -295,6 +294,8 @@ void P_LinkWrapper2(impl_standardElements* abstract_phylum, uview current_view)
  *          Wrapper pattern for an activity that has incoming links only, with
  *          attribute "suppressJoinFailure" set to "false".
  *
+ *          \image html "wrapper3.png" "pattern"
+ *
  * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
  * \param   current_view     the current unparse view
  *
@@ -305,67 +306,65 @@ void P_LinkWrapper3(impl_standardElements* abstract_phylum, uview current_view)
 {
   trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern 3\n");
 
-  impl_standardElements_StandardElements* phylum = static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
+  impl_standardElements_StandardElements* phylum =
+    static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
   assert(phylum != NULL);
 
+  // Organize prefixes.
   string prefix = toString(phylum->parentId) + ".";
   string newPrefix = toString(phylum->parentId) + ".internal";
 
-
-
-
+  // Display warning message if small patterns are used. Then use wrapper
+  // pattern which models the case where join failures are suppressed.
   if (petrinetsmall_enum == current_view)
   {
-    cerr << "no patterns allowed with suppressJoinFailure=\"no\"" << endl;
-    assert(false);
-    /* in fact, this should not be an error -- just a warning */
+    cerr << "ignoring attribute suppressJoinFailure=\"no\"" << endl;
+    P_LinkWrapper2(abstract_phylum, current_view);
     return;
   }
 
-
-  // Add new interface places.
+  // Add new interface places (p5 is not modeled).
   Place *p1 = PN.newPlace(prefix + "initial");
   Place *p2 = PN.newPlace(prefix + "final");
-  Place *p3 = PN.newPlace(prefix + "jc_true");
-  Place *p4 = PN.newPlace(prefix + "jc_false");
-  Place *p5 = PN.newPlace(prefix + "begin");
-  Place *p6 = PN.newPlace(prefix + "stop");
-  Place *p7 = PN.newPlace(prefix + "stopped");
-  Place *p8 = PN.newPlace(prefix + "faulted");
+  Place *p3 = PN.newPlace(prefix + "stop");
+  Place *p4 = PN.newPlace(prefix + "stopped");
+  Place *p6 = PN.newPlace(prefix + "jc_true");
+  Place *p7 = PN.newPlace(prefix + "jc_false");
+  Place *p8 = PN.newPlace(prefix + "begin");
+  Place *p9 = PN.newPlace(prefix + "faulted");
 
- // Join condition evalates to true: start activity.
-   Transition *t1 = PN.newTransition(prefix + "start");
+  // Join condition evalates to true: start activity.
+  Transition *t1 = PN.newTransition(prefix + "start");
   PN.newArc(p1, t1);
-  PN.newArc(p3, t1);
-  PN.newArc(t1, p5);
+  PN.newArc(p6, t1);
+  PN.newArc(t1, p8);
 
-  // Join condition evalates to false: skip activity and throw fault.
-  Transition *t2 = PN.newTransition(prefix + "skip");
+  // Join condition evalates to false: skip activity and throw fault. The
+  // transition is not labeled "skip", but "throwFault.joinFailure".
+  Transition *t2 = throwFault(p7, p9, "joinFailure", prefix,
+                              mkinteger(phylum->parentId),
+                              ASTEmap[phylum->parentId]->controlFlow);
   PN.newArc(p1, t2);
-  PN.newArc(p4, t2);
-//  PN.newArc(t2, p2);
-  PN.newArc(t2, p8);
-  // the fault is not thrown!
-
-  // The activity can be stopped as several places. (todo: check this)
-  Transition *t3 = stop(p1, "initial", prefix);
-  Transition *t4 = stop(p3, "jc_true", prefix);
-  Transition *t5 = stop(p4, "jc_false", prefix);
-  Transition *t6 = stop(p8, "faulted", prefix);
+  PN.newArc(p7, t2);
+  PN.newArc(t2, p9);
 
   // When activity is skipped, sets enclosed source links to false.
   dpeLinks(t2, phylum->parentId);
 
+  // The activity can be stopped as several places. (todo: check this)
+  Transition *t3 = stop(p1, "initial", prefix);
+  Transition *t4 = stop(p6, "jc_true", prefix);
+  Transition *t5 = stop(p7, "jc_false", prefix);
+  Transition *t6 = stop(p9, "faulted", prefix);
 
-  // model the join condition
+  // Model the join condition.
   P_joinCondition(prefix, phylum->tTarget_list_1, phylum->joinCondition_1);
 
-
   // Embed the inner activity.
-  PN.mergePlaces(p5, newPrefix + ".initial");
+  PN.mergePlaces(p8, newPrefix + ".initial");
   PN.mergePlaces(p2, newPrefix + ".final");
-  PN.mergePlaces(p6, newPrefix + ".stop");
-  PN.mergePlaces(p7, newPrefix + ".stopped");
+  PN.mergePlaces(p3, newPrefix + ".stop");
+  PN.mergePlaces(p4, newPrefix + ".stopped");
 }
 
 
@@ -394,54 +393,53 @@ void P_LinkWrapper4(impl_standardElements* abstract_phylum, uview current_view)
 {
   trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern 4\n");
 
-  impl_standardElements_StandardElements* phylum = static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
+  impl_standardElements_StandardElements* phylum =
+    static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
   assert(phylum != NULL);
 
+  // Organize prefixes.
   string prefix = toString(phylum->parentId) + ".";
   string newPrefix = toString(phylum->parentId) + ".internal";
 
-
-
+  // Add new interface places.
   Place *p1 = PN.newPlace(prefix + "initial");
   Place *p2 = PN.newPlace(prefix + "begin");
   Place *p3 = PN.newPlace(prefix + "done");
   Place *p4 = PN.newPlace(prefix + "final");
   Place *p5 = PN.newPlace(prefix + "jc_false");
   Place *p6 = PN.newPlace(prefix + "jc_true");
-  Place *p7 = NULL;
-  Place *p8 = NULL;
-  if (current_view != petrinetsmall_enum)
-  {
-    p7 = PN.newPlace(prefix + "stop");
-    p8 = PN.newPlace(prefix + "stopped");
-  }
 
+  // Join condition evalates to true: start activity.
   Transition *t1 = PN.newTransition(prefix + "start");
   PN.newArc(p1, t1);
   PN.newArc(p6, t1);
   PN.newArc(t1, p2);
 
+  // Join condition evalates to false: skip activity.
   Transition *t2 = PN.newTransition(prefix + "skip");
   PN.newArc(p1, t2);
   PN.newArc(p5, t2);
   PN.newArc(t2, p4);
 
-
-  // sets enclosed source links to false
+  // When activity is skipped, sets enclosed source links to false.
   dpeLinks(t2, phylum->parentId);
 
-  // model the transition condition
+  // Model the transition condition.
   P_transitionCondition(prefix, phylum->tSource_list_1);
 
-  // model the join condition
+  // Model the join condition.
   P_joinCondition(prefix, phylum->tTarget_list_1, phylum->joinCondition_1);
-
 
   // Embed the inner activity.
   PN.mergePlaces(p2, newPrefix + ".initial");
   PN.mergePlaces(p3, newPrefix + ".final"); 
+
+  // Add stop places.
   if (current_view != petrinetsmall_enum)
   {
+    Place *p7 = PN.newPlace(prefix + "stop");
+    Place *p8 = PN.newPlace(prefix + "stopped");
+
     PN.mergePlaces(p7, newPrefix + ".stop");
     PN.mergePlaces(p8, newPrefix + ".stopped");
   }
@@ -474,7 +472,8 @@ void P_LinkWrapper5(impl_standardElements* abstract_phylum, uview current_view)
 {
   trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern 5\n");
 
-  impl_standardElements_StandardElements* phylum = static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
+  impl_standardElements_StandardElements* phylum =
+    static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
   assert(phylum != NULL);
 
   string prefix = toString(phylum->parentId) + ".";

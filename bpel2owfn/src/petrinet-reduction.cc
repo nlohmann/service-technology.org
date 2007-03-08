@@ -25,17 +25,17 @@
  * \brief   Petri Net API: structural reduction
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: znamirow $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2007/02/23 15:19:29 $
+ * \date    \$Date: 2007/03/08 13:24:44 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.65 $
+ * \version \$Revision: 1.66 $
  *
  * \ingroup petrinet
  */
@@ -89,6 +89,7 @@ using std::endl;
  */
 unsigned int PetriNet::reduce_unused_status_places()
 {
+  trace(TRACE_DEBUG, "[PN]\tReducing unused places...\n");
   list<Place *> unused_status_places;
   unsigned int result = 0;
 
@@ -105,7 +106,7 @@ unsigned int PetriNet::reduce_unused_status_places()
       removePlace(*p);
       result++;
     }
-
+    trace(TRACE_DEBUG, "\"reduce_unused_places\" removed " + toString(result) + " places.\n");
   return result;
 }
 
@@ -128,6 +129,7 @@ unsigned int PetriNet::reduce_unused_status_places()
  */
 unsigned int PetriNet::reduce_suspicious_transitions()
 {
+  trace(TRACE_DEBUG, "[PN]\tReducing suspicious transitions...\n");
   list<Transition*> suspiciousTransitions;
   unsigned int result = 0;
 
@@ -144,6 +146,7 @@ unsigned int PetriNet::reduce_suspicious_transitions()
       result++;
     }
 
+  trace(TRACE_DEBUG, "\"reduce_suspicious_transitions\" removed " + toString(result) + " transitions.\n");
   return result;
 }
 
@@ -159,7 +162,7 @@ unsigned int PetriNet::reduce_suspicious_transitions()
 void PetriNet::reduce_dead_nodes()
 {
   trace(TRACE_DEBUG, "[PN]\tRemoving structurally dead nodes...\n");
-
+  int result = 0;
   bool done = false;
   bool arcs = true;
 
@@ -217,12 +220,17 @@ void PetriNet::reduce_dead_nodes()
     // remove dead places and transitions
     for (list<Place*>::iterator p = deadPlaces.begin(); p != deadPlaces.end(); p++)
       if (P.find(*p) != P.end())
+      {
 	removePlace(*p);
+	result++;
+      }
 
     for (list<Transition*>::iterator t = deadTransitions.begin(); t != deadTransitions.end(); t++)
       if (T. find(*t) != T.end())
+      {
 	removeTransition(*t);
-
+	result++;
+      }
 
 
     // remove isolated communication places
@@ -234,7 +242,10 @@ void PetriNet::reduce_dead_nodes()
 
     for (list<Place*>::iterator p = uselessInputPlaces.begin(); p != uselessInputPlaces.end(); p++)
       if (P_in.find(*p) != P_in.end())
+      {
 	P_in.erase(*p);
+	result++;
+      }
 
     list<Place*> uselessOutputPlaces;
 
@@ -244,8 +255,12 @@ void PetriNet::reduce_dead_nodes()
 
     for (list<Place*>::iterator p = uselessOutputPlaces.begin(); p != uselessOutputPlaces.end(); p++)
       if (P_out.find(*p) != P_out.end())
+      {
 	P_out.erase(*p);
+	result++;
+      }
   }
+  trace(TRACE_DEBUG, "\"remove_structural_dead_nodes\" removed " + toString(result) + " nodes.\n");  
 }
 
 
@@ -266,6 +281,7 @@ void PetriNet::reduce_dead_nodes()
  */
 void PetriNet::reduce_identical_places()
 {
+  int result=0;
   set<pair<string, string> > placePairs;
 
   trace(TRACE_DEBUG, "[PN]\tApplying rule RB1 (elimination of identical places)...\n");
@@ -305,7 +321,9 @@ void PetriNet::reduce_identical_places()
     Place* p1 = findPlace(labels->first);
     Place* p2 = findPlace(labels->second);
     mergePlaces(p1, p2);
+    result++;
   }
+  trace(TRACE_DEBUG, "\"RB1\" removed " + toString(result) + " places.\n");
 }
 
 
@@ -327,6 +345,7 @@ void PetriNet::reduce_identical_places()
  */
 void PetriNet::reduce_identical_transitions()
 {
+  int result=0;
   set<pair<string, string> > transitionPairs;
 
   trace(TRACE_DEBUG, "[PN]\tApplying rule RB2 (elimination of identical transitions)...\n");
@@ -367,7 +386,9 @@ void PetriNet::reduce_identical_transitions()
     Transition* t2 = findTransition(labels->second);
 
     mergeParallelTransitions(t1, t2);
+    result++;
   }
+  trace(TRACE_DEBUG, "\"RB2\" removed " + toString(result) + " transitions.\n");    
 }
 
 
@@ -391,6 +412,7 @@ void PetriNet::reduce_identical_transitions()
 */
 void PetriNet::reduce_series_places()
 {
+  int result=0;
   trace(TRACE_DEBUG, "[PN]\tApplying rule RA1 (fusion of series places)...\n");
 
   set<string> uselessTransitions;
@@ -433,7 +455,9 @@ void PetriNet::reduce_series_places()
       placePair != placePairs.end(); placePair++)
   {
     mergePlaces(placePair->first, placePair->second);
+    result++;
   }
+  trace(TRACE_DEBUG, "\"RA1\" removed " + toString(result) + " places.\n");    
 }
 
 
@@ -457,6 +481,7 @@ void PetriNet::reduce_series_places()
 void PetriNet::reduce_series_transitions()
 {
   trace(TRACE_DEBUG, "[PN]\tApplying rule RA2 (fusion of series transitions)...\n");
+  int result=0;
 
   set<string> uselessPlaces;
   set<pair<string, string> > transitionPairs;
@@ -498,7 +523,9 @@ void PetriNet::reduce_series_transitions()
     Transition* t1 = findTransition(transitionPair->first);
     Transition* t2 = findTransition(transitionPair->second);
     mergeTransitions(t1, t2);
+    result++;
   }
+  trace(TRACE_DEBUG, "\"RA2\" removed " + toString(result) + " transitions.\n");    
 }
 
 
@@ -527,6 +554,7 @@ void PetriNet::reduce_series_transitions()
  */
 unsigned int PetriNet::reduce_self_loop_places()
 {
+  trace(TRACE_DEBUG, "[PN]\tApplying rule RC1 (Elimination of self-loop places)...\n");
   list<Place *> self_loop_places;
   unsigned int result = 0;
 
@@ -547,6 +575,7 @@ unsigned int PetriNet::reduce_self_loop_places()
 
   if (result > 0)
     cerr << "removed " << result << " self-loop places" << endl;
+  trace(TRACE_DEBUG, "\"RC1\" removed " + toString(result) + " places.\n");    
 
   return result;
 }
@@ -576,6 +605,7 @@ unsigned int PetriNet::reduce_self_loop_places()
  */
 unsigned int PetriNet::reduce_self_loop_transitions()
 {
+  trace(TRACE_DEBUG, "[PN]\tApplying rule RC1 (Elimination of self-loop transitions)...\n");
   list<Transition *> self_loop_transitions;
   unsigned int result = 0;
 
@@ -595,7 +625,7 @@ unsigned int PetriNet::reduce_self_loop_transitions()
 
   if (result > 0)
     cerr << "removed " << result << " self-loop transitions" << endl;
-
+  trace(TRACE_DEBUG, "\"RC2\" removed " + toString(result) + " transitions.\n");    
   return result;
 }
 
@@ -616,6 +646,7 @@ void PetriNet::reduce_equal_places()
 {
 
   trace(TRACE_DEBUG, "[PN]\tApplying rule RD1 (elimination of equal places)...\n");
+  int result=0;
   set<pair<string, string> > placePairs;
   set<pair<string, string> > delPairs;
   bool safe = true;
@@ -719,8 +750,10 @@ void PetriNet::reduce_equal_places()
 	 p1->tokens = p1->tokens + p2->tokens;
 	
 	 removePlace(p2);
-	 removeTransition(findTransition(trans_id));    
+	 removeTransition(findTransition(trans_id)); 
+	 result++;   
   }
+  trace(TRACE_DEBUG, "\"RD4\" removed " + toString(result) + " places.\n");    
 }
 
 

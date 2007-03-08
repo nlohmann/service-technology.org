@@ -208,12 +208,12 @@ void adjustOptionValues() {
 	trace(TRACE_0, "considering max. " + intToString(numberOfEvents) + " events at all:\n");
 	trace(TRACE_0, "    input events:\n" );
 	for (unsigned int e=0; e < PN->getInputPlaceCnt(); e++) {
-		trace(TRACE_0, "\t" + string(PN->inputPlacesArray[e]->name));
+		trace(TRACE_0, "\t " + string(PN->inputPlacesArray[e]->name));
 		trace(TRACE_0, "\t(max. " + intToString(PN->inputPlacesArray[e]->max_occurence) + "x)\n");
 	}
 	trace(TRACE_0, "    output events:\n" );
 	for (unsigned int e=0; e < PN->getOutputPlaceCnt(); e++) {
-		trace(TRACE_0, "\t" + string(PN->outputPlacesArray[e]->name));
+		trace(TRACE_0, "\t " + string(PN->outputPlacesArray[e]->name));
 		trace(TRACE_0, "\t(max. " + intToString(PN->outputPlacesArray[e]->max_occurence) + "x)\n");
 	}
 	
@@ -370,6 +370,7 @@ int main(int argc, char ** argv) {
 			        trace(TRACE_0, "building the operating guideline...\n");
 			        seconds = time (NULL);
 			
+			        graph->printProgressFirst();
 			        graph->calculateRootNode();	// creates the root node and calculates its reachability graph (set of states)
 					
 					if (options[O_OTF]){
@@ -379,7 +380,7 @@ int main(int argc, char ** argv) {
 					graph->buildGraph(graph->getRoot(), 1); // build operating guideline
 					
 			        seconds2 = time (NULL);
-			        trace(TRACE_0, "building the operating guideline finished.\n");
+			        trace(TRACE_0, "\nbuilding the operating guideline finished.\n\n");
 			        cout << difftime(seconds2,seconds) << " s consumed for building graph" << endl;
 			
 			        trace(TRACE_0, "\nnet is controllable: ");
@@ -438,7 +439,7 @@ int main(int argc, char ** argv) {
 			        if (options[O_CALC_REDUCED_IG]) {
 						trace(TRACE_0, "building the reduced interaction graph finished.\n");
 					} else {
-						trace(TRACE_0, "building the interaction graph finished.\n");
+						trace(TRACE_0, "\nbuilding the interaction graph finished.\n");
 					}
 		
 			        cout << difftime(seconds2,seconds) << " s consumed for building graph" << endl;

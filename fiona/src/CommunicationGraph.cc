@@ -42,6 +42,9 @@
 #include "binDecision.h"
 #include <cassert>
 
+double global_progress = 0;
+int show_progress = 0;
+
 using namespace std;
 
 
@@ -51,7 +54,8 @@ using namespace std;
 communicationGraph::communicationGraph(oWFN * _PN) :
     root(NULL),
     currentVertex(NULL),
-    global_progress(0),
+//    global_progress(0),
+//    show_progress(0),
     numberOfNodes(0),
     numberOfEdges(0),
     numberOfBlueNodes(0),
@@ -618,7 +622,7 @@ void communicationGraph::printNodeStatistics() {
 //! \brief creates a dot file of the graph
 void communicationGraph::printDotFile() {
     
-    unsigned int maxWritingSize = 1000;
+    // unsigned int maxWritingSize = 1000;
     unsigned int maxPrintingSize = 500;
     
     if (true) { // numberOfBlueNodes <= maxWritingSize) {
@@ -736,7 +740,7 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
                     os << " (";
                     
                     string kindOfDeadlock;
-                    int i;
+                    unsigned int i;
                     
                     switch ((*iter)->type) {
                         case DEADLOCK: 	
@@ -923,14 +927,75 @@ analysisResult communicationGraph::analyseNode(vertex * node, bool finalAnalysis
 }
 
 
+//! \fn void communicationGraph::addProgress(double toAddValue)
+//! \param toAddValue the additional progress value
+//! \brief adds toAddValue to global progress value
+void communicationGraph::addProgress(double toAddValue) {
+	
+	trace(TRACE_2, "\t adding ");
+
+	// double2int in per cent = trunc(100*value)
+	trace(TRACE_2, intToString(int(100 * toAddValue)));
+	trace(TRACE_2, ",");
+	// precision 4 digits after comma = (x * 100 * 1000) mod 1000 
+	
+	int aftercomma = int(100 * 10000 * toAddValue) % 10000;
+	
+	if (aftercomma <   10) trace(TRACE_2, "0");
+	if (aftercomma <  100) trace(TRACE_2, "0");
+	if (aftercomma < 1000) trace(TRACE_2, "0");
+	
+	trace(TRACE_2, intToString(aftercomma));
+
+	trace(TRACE_2, " to progress\n");
+
+	global_progress += toAddValue;
+
+}
+
+
+//! \fn void communicationGraph::printProgress()
+//! \brief prints the current global progress value depending whether the value
+//! changed significantly and depending on the debug-level set
+void communicationGraph::printProgress() {
+		
+	int progress_step_size = 5;
+	int current_progress = int(100 * global_progress);
+
+    if (current_progress >= (show_progress + progress_step_size)) {
+    	// significant progress change
+		if (debug_level == TRACE_0) {
+			trace(TRACE_0, " " + intToString(current_progress) + " ");
+		} else {
+			trace(TRACE_0, "\t progress: " + intToString(current_progress) + " %\n");
+    	}
+		// assigning next progress value to show
+		show_progress = current_progress;
+    }
+}
+
+
+//! \fn void communicationGraph::printProgress()
+//! \brief prints the current global progress value depending whether the value
+//! changed significantly and depending on the debug-level set
+void communicationGraph::printProgressFirst() {
+		
+	if (debug_level == TRACE_0) {
+		trace(TRACE_0, "\t progress (in %): 0 ");
+	} else {
+		trace(TRACE_0, "\t progress: 0 %\n");
+   	}
+}
+
+
 //! \fn bool communicationGraph::terminateBuildGraph(vertex * currentNode)
 //! \param currentNode the node for which termination is decided
 //! \brief decides whether a leaf node of the graph is reached;
 //! either because of reaching communication depth or because there are no events left
-bool communicationGraph::terminateBuildGraph(vertex * /*currentNode*/) {
-	
-	return false;
-
+//bool communicationGraph::terminateBuildGraph(vertex * /*currentNode*/) {
+//	
+//	return false;
+//
 //	// check whether there are input or output events left
 //	// (i.e. their max_occurences value is not reached)
 //	int i;
@@ -946,5 +1011,5 @@ bool communicationGraph::terminateBuildGraph(vertex * /*currentNode*/) {
 //		}
 //	}
 //	return true;
-}
+//}
 

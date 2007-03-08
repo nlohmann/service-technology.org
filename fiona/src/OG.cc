@@ -88,36 +88,18 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 		// then, function calculateReachableStatesFull sets node color RED
 		trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color RED\n");
 		trace(TRACE_1, "=================================================================\n");
-		
-		trace(TRACE_2, "adding " + intToString(int(100 * progress_plus)) + " to progress since color is red\n");
-		global_progress += progress_plus;
-		trace(TRACE_0, "\t global_progress: " + intToString(int(100 * global_progress)) + " % \n");
+
+		addProgress(progress_plus);
+		printProgress();
+
 		return;
 	}
 
 	// get the annotation of the node (CNF)
 	computeCNF(currentNode);					// calculate CNF of this node
 
-//	// stop when communication depth reached
-//	if (terminateBuildGraph(currentNode)) {
-//		
-//		// obsolete!!!		
-//		assert(false);
-//		
-//		// node is a leaf
-//		analyseNode(currentNode, true);
-//		assert(currentNode->getColor() != BLACK);
-//		trace(TRACE_1, "=================================================================\n");
-//		
-////		cout << "adding " << progress_plus << "since node is a leaf" << endl;
-//		global_progress += progress_plus;
-//		trace(TRACE_0, "\t global_progress: " + intToString(int(100 * global_progress)) + "\n");
-//		return;
-//	}
-
 	trace(TRACE_1, "=================================================================\n");
 
-	// communication depth not yet reached, going down
 	unsigned int i = 0;
 	
 	double your_progress = progress_plus * (1 / double(PN->getInputPlaceCnt() + PN->getOutputPlaceCnt()));
@@ -146,9 +128,8 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 
 				numberDeletedVertices--;
 
-				trace(TRACE_2, "adding " + intToString(int(100 * your_progress)) + " to progress (input event suppressed due to message bound violation)\n");
-				global_progress += your_progress;
-				trace(TRACE_0, "\t global_progress: " + intToString(int(100 * global_progress)) + " % \n");
+				addProgress(your_progress);
+				printProgress();
 				
 				delete v;
 			} else {
@@ -159,9 +140,10 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 //					analyseNode(currentNode, false);
 					actualDepth--;
 				} else {
-					trace(TRACE_2, "adding " + intToString(int(100 * your_progress)) + " to progress (node already known, input)\n");
-					global_progress += your_progress;
-					trace(TRACE_0, "\t global_progress: " + intToString(int(100 * global_progress)) + " % \n");
+
+					addProgress(your_progress);
+					printProgress();
+
 				}
 			}
 		} else {
@@ -169,9 +151,8 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 			trace(TRACE_2, string(PN->inputPlacesArray[i]->name));
 			trace(TRACE_2, " suppressed (max_occurence reached)\n");
 
-			trace(TRACE_2, "adding " + intToString(int(100 * your_progress)) + " to progress (input event suppressed)\n");
-			global_progress += your_progress;
-			trace(TRACE_0, "\t global_progress: " + intToString(int(100 * global_progress)) + " % \n");
+			addProgress(your_progress);
+			printProgress();
 		}
 		i++;
 	}
@@ -193,24 +174,25 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 			calculateSuccStatesOutput(PN->outputPlacesArray[i]->index, currentNode, v);
 			
 			if (v = AddVertex(v, i, receiving)) {
-				buildGraph(v, your_progress);				// going down with receiving event...
+				// node was new, hence going down with receiving event...
+				buildGraph(v, your_progress);
 
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 //				analyseNode(currentNode, false);
 				actualDepth--;
 			} else {
-				trace(TRACE_2, "adding " + intToString(int(100 * your_progress)) + " to progress (node already known, output)\n");
-				global_progress += your_progress;
-				trace(TRACE_0, "\t global_progress: " + intToString(int(100 * global_progress)) + " % \n");
+
+				addProgress(your_progress);
+				printProgress();
+
 			}
 		} else {
 			trace(TRACE_2, "\t\t\t\t\t  receiving event: ?");
 			trace(TRACE_2, string(PN->outputPlacesArray[i]->name));
 			trace(TRACE_2, " suppressed (max_occurence reached)\n");
 
-			trace(TRACE_2, "adding " + intToString(int(100 * your_progress)) + " to progress (output event suppressed)\n");
-			global_progress += your_progress;
-			trace(TRACE_0, "\t global_progress: " + intToString(int(100 * global_progress)) + " % \n");
+			addProgress(your_progress);
+			printProgress();
 		}
 		i++;
 	}

@@ -45,6 +45,10 @@
 
 using namespace std;
 
+extern double global_progress;
+extern int show_progress;
+
+
 class oWFN;
 class State;
 
@@ -91,8 +95,9 @@ protected:
 	vertex * root;                   //!< the root node of the graph
 	vertex * currentVertex;          //!< the vertex we are working on at a certain time
 
-    double global_progress;
-    
+	void addProgress(double);
+	void printProgress();
+
     unsigned int numberOfNodes;            	//!< the number of vertices of the graph
 	unsigned int numberOfEdges;           	//!< the number of edges of the graph
 
@@ -130,7 +135,9 @@ public:
     vertex * AddVertex(vertex *, unsigned int, edgeType);
     bool AddVertex(vertex *, messageMultiSet, edgeType);
 
-	bool terminateBuildGraph(vertex *);
+	// bool terminateBuildGraph(vertex *);
+	
+	void printProgressFirst();
 
     void buildGraphRandom();
 

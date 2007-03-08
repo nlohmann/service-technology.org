@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for BPEL's <scope> and <process>
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $ 
+ *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/03/07 11:35:54 $
+ * \date    \$Date: 2007/03/08 09:45:05 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.29 $
+ * \version \$Revision: 1.30 $
  */
 %}
 
@@ -85,30 +85,30 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
   string prefix = toString(phylum->id) + ".internal.";
 
 
+  // Create the interface places.
+  // The used lists are filled during parsing mapping each combination of
+  // partnerLink, portType and operation to one input (resp. output) place.
+  for (set<string>::iterator in = globals::ASTE_inputChannels.begin(); in != globals::ASTE_inputChannels.end(); in++)
+       PN.newPlace("in." + *in, IN);
+  for (set<string>::iterator out = globals::ASTE_outputChannels.begin(); out != globals::ASTE_outputChannels.end(); out++)
+       PN.newPlace("out." + *out, OUT);
+
+
+  // Create the places for the links.
+  // The used list is filled during parsing and contains all links of the
+  // whole process -- also links defined in a deeper hierarchy.
+  for (set<string>::iterator link = globals::ASTE_linkNames.begin(); link != globals::ASTE_linkNames.end(); link++)
+  {
+    PN.newPlace("link." + *link);
+    PN.newPlace("!link." + *link);
+  }
+
+
   switch(current_view)
   {
     case(petrinetnew_enum):
       {
 	globals::currentScope = prefix;
-
-	// Create the interface places.
-	// The used lists are filled during parsing mapping each combination of
-	// partnerLink, portType and operation to one input (resp. output) place.
-	for (set<string>::iterator in = globals::ASTE_inputChannels.begin(); in != globals::ASTE_inputChannels.end(); in++)
-	  PN.newPlace("in." + *in, IN);
-	for (set<string>::iterator out = globals::ASTE_outputChannels.begin(); out != globals::ASTE_outputChannels.end(); out++)
-	  PN.newPlace("out." + *out, OUT);
-
-
-	// Create the places for the links.
-	// The used list is filled during parsing and contains all links of the
-	// whole process -- also links defined in a deeper hierarchy.
-	for (set<string>::iterator link = globals::ASTE_linkNames.begin(); link != globals::ASTE_linkNames.end(); link++)
-	{
-	  PN.newPlace("link." + *link);
-	  PN.newPlace("!link." + *link);
-	}
-
 
 	Place *p1  = PN.newPlace(prefix + "initial"); p1->mark();
 	Place *p2  = PN.newPlace(prefix + "final");
@@ -201,7 +201,7 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 	// unparse the fault handlers
 	phylum->tFaultHandlers_1->unparse(pseudoPrinter, current_view);
 
-	// unparse the fault handlers
+	// unparse the event handlers
 	phylum->tEventHandlers_1->unparse(pseudoPrinter, current_view);
 
 
@@ -235,23 +235,6 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 
     case(petrinetsmall_enum):
       {
-	// Create the interface places.
-	// The used lists are filled during parsing mapping each combination of
-	// partnerLink, portType and operation to one input (resp. output) place.
-	for (set<string>::iterator in = globals::ASTE_inputChannels.begin(); in != globals::ASTE_inputChannels.end(); in++)
-	  PN.newPlace("in." + *in, IN);
-	for (set<string>::iterator out = globals::ASTE_outputChannels.begin(); out != globals::ASTE_outputChannels.end(); out++)
-	  PN.newPlace("out." + *out, OUT);
-
-	// Create the places for the links.
-	// The used list is filled during parsing and contains all links of the
-	// whole process -- also links defined in a deeper hierarchy.
-	for (set<string>::iterator link = globals::ASTE_linkNames.begin(); link != globals::ASTE_linkNames.end(); link++)
-	{
-	  PN.newPlace("link." + *link);
-	  PN.newPlace("!link." + *link);
-	}
-
 	// Create the initial place of the process pattern and mark it.
 	Place *p1 = PN.newPlace(prefix + "initial");
 	p1->mark();
@@ -280,6 +263,7 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 
   footer(phylum->id, true);
 }
+
 
 
 

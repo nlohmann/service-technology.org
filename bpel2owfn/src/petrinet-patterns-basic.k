@@ -46,7 +46,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/07 16:32:17 $
+ * \date    \$Date: 2007/03/08 13:38:20 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -56,7 +56,7 @@
  *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.39 $
+ * \version \$Revision: 1.40 $
  */
 %}
 
@@ -740,6 +740,7 @@ void PWait(impl_tWait* abstract_phylum, uview current_view)
 
   footer(phylum->id);      
 }
+
 
 
 

@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for BPEL's <scope> and <process>
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $ 
+ *          last changes of: \$Author: gierds $ 
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/03/08 09:45:05 $
+ * \date    \$Date: 2007/03/08 13:20:45 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.30 $
+ * \version \$Revision: 1.31 $
  */
 %}
 
@@ -325,7 +325,7 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
 	PN.newArc(t2, p10);
 	PN.newArc(t2, p11);
 	PN.newArc(p12, t2);
-	PN.newArc(p15, t2);
+//	PN.newArc(p15, t2);
 
 	Transition *t3 = PN.newTransition(prefix + "ft");
 	PN.newArc(p3, t3);
@@ -487,7 +487,7 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
           PN.newArc(t13, p28);
           
           Transition *t14 = PN.newTransition(prefix + "t14");
-	  PN.newArc(p21, t14);
+	  PN.newArc(PN.findPlace(toString(phylum->activity_1->id) + ".stopped"), t14);
           PN.newArc(p27, t14);
           PN.newArc(t14, p28);
           PN.newArc(t14, p22);

@@ -29,13 +29,13 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2007/03/08 14:11:24 $
+ * \date    \$Date: 2007/03/08 14:54:49 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.67 $
+ * \version \$Revision: 1.68 $
  *
  * \ingroup petrinet
  */
@@ -107,7 +107,8 @@ unsigned int PetriNet::reduce_unused_status_places()
       removePlace(*p);
       result++;
     }
-    trace(TRACE_DEBUG, "\"reduce_unused_places\" removed " + toString(result) + " places.\n");
+  if (result!=0)
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " places.\n");
   return result;
 }
 
@@ -147,7 +148,8 @@ unsigned int PetriNet::reduce_suspicious_transitions()
       result++;
     }
 
-  trace(TRACE_DEBUG, "\"reduce_suspicious_transitions\" removed " + toString(result) + " transitions.\n");
+  if (result!=0)
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " transitions.\n");
   return result;
 }
 
@@ -261,7 +263,8 @@ void PetriNet::reduce_dead_nodes()
 	result++;
       }
   }
-  trace(TRACE_DEBUG, "\"remove_structural_dead_nodes\" removed " + toString(result) + " nodes.\n");  
+  if (result!=0)
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " nodes.\n");
 }
 
 
@@ -324,7 +327,8 @@ void PetriNet::reduce_identical_places()
     mergePlaces(p1, p2);
     result++;
   }
-  trace(TRACE_DEBUG, "\"RB1\" removed " + toString(result) + " places.\n");
+  if (result!=0)
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " places.\n");
 }
 
 
@@ -389,7 +393,8 @@ void PetriNet::reduce_identical_transitions()
     mergeParallelTransitions(t1, t2);
     result++;
   }
-  trace(TRACE_DEBUG, "\"RB2\" removed " + toString(result) + " transitions.\n");    
+  if (result!=0)
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " transitions.\n");
 }
 
 
@@ -458,7 +463,8 @@ void PetriNet::reduce_series_places()
     mergePlaces(placePair->first, placePair->second);
     result++;
   }
-  trace(TRACE_DEBUG, "\"RA1\" removed " + toString(result) + " places.\n");    
+  if (result!=0)
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " places.\n");
 }
 
 
@@ -526,7 +532,8 @@ void PetriNet::reduce_series_transitions()
     mergeTransitions(t1, t2);
     result++;
   }
-  trace(TRACE_DEBUG, "\"RA2\" removed " + toString(result) + " transitions.\n");    
+  if (result!=0)
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " transitions.\n");
 }
 
 
@@ -574,9 +581,8 @@ unsigned int PetriNet::reduce_self_loop_places()
       result++;
     }
 
-  if (result > 0)
-    cerr << "removed " << result << " self-loop places" << endl;
-  trace(TRACE_DEBUG, "\"RC1\" removed " + toString(result) + " places.\n");    
+  if (result!=0)
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " places.\n");
 
   return result;
 }
@@ -624,9 +630,8 @@ unsigned int PetriNet::reduce_self_loop_transitions()
       result++;
     }
 
-  if (result > 0)
-    cerr << "removed " << result << " self-loop transitions" << endl;
-  trace(TRACE_DEBUG, "\"RC2\" removed " + toString(result) + " transitions.\n");    
+  if (result!=0)
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " transitions.\n");
   return result;
 }
 
@@ -754,7 +759,8 @@ void PetriNet::reduce_equal_places()
 	 removeTransition(findTransition(trans_id)); 
 	 result++;   
   }
-  trace(TRACE_DEBUG, "\"RD4\" removed " + toString(result) + " places.\n");    
+  if (result!=0)
+    trace(TRACE_DEBUG, "[PN]\t...removed " + toString(result) + " places.\n");
 }
 
 
@@ -808,7 +814,7 @@ unsigned int PetriNet::reduce()
     reduce_series_transitions();	// RA2
     reduce_self_loop_places();		// RC1
     reduce_self_loop_transitions();	// RC2
-//    reduce_equal_places();		// RD1
+    reduce_equal_places();		// RD1
 
     trace(TRACE_DEBUG, "[PN]\tPetri net size after simplification pass " + toString(passes++) + ": " + information() + "\n");
 

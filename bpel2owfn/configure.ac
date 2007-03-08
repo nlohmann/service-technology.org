@@ -19,8 +19,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/04 19:27:35 $ by $Author: nielslohmann $.
-# Version $Revision: 1.32 $
+# File last changed $Date: 2007/03/08 14:54:00 $ by $Author: nielslohmann $.
+# Version $Revision: 1.33 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
@@ -46,9 +46,6 @@ AC_CANONICAL_BUILD
 AC_LANG([C++])
 AC_PROG_CXX
 AC_PROG_CC
-
-# Indicates the use of libraries.
-AC_PROG_RANLIB
 
 # Don't set any compiler flags.
 CXXFLAGS=""

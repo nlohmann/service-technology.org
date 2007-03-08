@@ -18,11 +18,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/07 09:34:35 $ by $Author: nielslohmann $.
-# Version $Revision: 1.66 $
+# File last changed $Date: 2007/03/08 14:54:00 $ by $Author: nielslohmann $.
+# Version $Revision: 1.67 $
 
 bin_PROGRAMS = bpel2owfn
-lib_LIBRARIES = lib_pnapi.a
 
 # define flags for Kimwitu++:
 #  - create a file "ast-system-yystype.h" for Flex and Bison
@@ -101,16 +100,10 @@ bpel2owfn_SOURCES = $(KCDUMMY)\
 		    options.cc options.h\
 		    getopt.h getopt.c getopt1.c\
 		    ast-tools.cc ast-tools.h\
-		    ast-details.cc ast-details.h
+		    ast-details.cc ast-details.h \
+		    petrinet.h petrinet.cc \
+		    petrinet-output.cc petrinet-reduction.cc
 
-lib_pnapi_a_SOURCES = $(KCDUMMY) \
-		      petrinet.h petrinet.cc \
-		      petrinet-output.cc petrinet-reduction.cc \
-		      debug.cc debug.h\
-		      helpers.cc helpers.h\
-		      options.h
-
-bpel2owfn_LDADD = lib_pnapi.a
 
 ############################
 # organization of cleaning #

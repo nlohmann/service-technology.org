@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/08 13:38:02 $
+ * \date    \$Date: 2007/03/08 14:42:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.33 $
+ * \version \$Revision: 1.34 $
 */
 %}
 
@@ -789,6 +789,11 @@ void PSwitch(impl_tSwitch* abstract_phylum, uview current_view)
  * \brief   Pattern for the <pick> activity.
  *
  *          \image html "pick.png" "pattern"
+ *
+ * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
+ * \param   current_view     the current unparse view
+ * 
+ * \todo    Use "receivingTransition" function in <onMessage> branches.
  */
 %}
 void PPick(impl_tPick* abstract_phylum, uview current_view)
@@ -813,30 +818,28 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
     Transition *t4 = stop(p1, "initial", prefix);
   }
 
-  // Unparse the standard elements, the onMessage branches and the onAlarm
-  // branches.
+  // Unparse the standard elements.
   phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-  phylum->tOnMessage_list_1->unparse(pseudoPrinter, current_view);
-  phylum->tOnAlarm_list_1->unparse(pseudoPrinter, current_view);
+
 
   // Traverse the <onMessage> branches.
   unsigned int branch_count = 1;
   foreach (ThisBranch = OnMessage(_corr,_from,innerActivity,_id2); tOnMessage_list phylum->tOnMessage_list_1)
   {
-    trace(TRACE_DEBUG, "[PNU]\t\t<onMessage>\n");
+    header(_id2->value, true);
     string branch = toString(branch_count++);
 
-    Place *p5 = PN.newPlace(prefix + "begin_" + branch);
+    // Unparse the embedded activity.
+    innerActivity->unparse(pseudoPrinter, current_view);
 
     // Message-receiving transition.
     Transition *t1 = PN.newTransition(prefix + "onMessage_" + branch);
-    PN.newArc(p1, t1);
+    PN.newArc(PN.findPlace(prefix + "initial"), t1);
     PN.newArc(PN.findPlace("in." + ASTEmap[ThisBranch->id]->channelName), t1);
-    PN.newArc(t1, p5);
+    PN.newArc(t1, PN.findPlace(toString(innerActivity->id) + ".initial"));
 
     // Embed the inner activity.
-    PN.mergePlaces(p5, toString(innerActivity->id) + ".initial");
-    PN.mergePlaces(phylum->id, ".final",       innerActivity->id, ".final");
+    PN.mergePlaces(phylum->id, ".final", innerActivity->id, ".final");
 
     if (current_view != petrinetsmall_enum)
     {
@@ -844,24 +847,26 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
       PN.mergePlaces(phylum->id, ".stopped",     innerActivity->id, ".stopped");
     }
 
-    trace(TRACE_DEBUG, "[PNU]\t\t</onMessage>\n");
+    footer(_id2->value, true);
   }
 
+
   // Traverse the <onAlarm> branches.
-  foreach (onAlarmBranch=OnAlarm(innerActivity); tOnAlarm_list phylum->tOnAlarm_list_1)
+  foreach (onAlarmBranch=OnAlarm(innerActivity,_id2); tOnAlarm_list phylum->tOnAlarm_list_1)
   {
-    trace(TRACE_DEBUG, "[PNU]\t\t<onAlarm>\n");
+    header(_id2->value, true);
     string branch = toString(branch_count++);
 
-    Place *p7 = PN.newPlace(prefix + "begin_" + branch);
-    
+    // Unparse the embedded activity.
+    innerActivity->unparse(pseudoPrinter, current_view);
+
+    // The <onAlarm> transition.
     Transition *t3 = PN.newTransition(prefix + "onAlarm_" + branch);
-    PN.newArc(p1, t3);
-    PN.newArc(t3, p7);
+    PN.newArc(PN.findPlace(prefix + "initial"), t3);
+    PN.newArc(t3, PN.findPlace(toString(innerActivity->id) + ".initial"));
 
     // Embed the inner activity.
-    PN.mergePlaces(p7, toString(innerActivity->id) + ".initial");
-    PN.mergePlaces(phylum->id, ".final",       innerActivity->id, ".final");
+    PN.mergePlaces(phylum->id, ".final", innerActivity->id, ".final");
 
     if (current_view != petrinetsmall_enum)
     {
@@ -869,7 +874,7 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
       PN.mergePlaces(phylum->id, ".stopped",     innerActivity->id, ".stopped");
     }
 
-    trace(TRACE_DEBUG, "[PNU]\t\t</onAlarm>\n");
+    footer(_id2->value, true);
   }
   
 
@@ -877,7 +882,6 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
   // firing of the respective t1/t3-transition) has set the links of all other
   // branches to false.
   branch_count = 1;
-
   foreach (OnMessage(corr_1, from_1, innerActivity1, _id1); tOnMessage_list phylum->tOnMessage_list_1) {
     foreach (OnMessage(corr_2, from_2, innerActivity2, _id2); tOnMessage_list phylum->tOnMessage_list_1) {
       if ((innerActivity1 != innerActivity2))

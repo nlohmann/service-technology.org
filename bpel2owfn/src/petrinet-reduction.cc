@@ -29,13 +29,13 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2007/03/08 13:24:44 $
+ * \date    \$Date: 2007/03/08 14:11:24 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.66 $
+ * \version \$Revision: 1.67 $
  *
  * \ingroup petrinet
  */
@@ -97,6 +97,7 @@ unsigned int PetriNet::reduce_unused_status_places()
   for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
     if ( postset(*p).empty() )
       if ( !( (*p)->isFinal ) )
+        if ( (*p)->tokens == 0 )
   	unused_status_places.push_back(*p);
 
   // remove unused places
@@ -177,7 +178,7 @@ void PetriNet::reduce_dead_nodes()
     // find insufficiently marked places with empty preset
     for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
     {
-      if (preset(*p).empty()) //&& (*p)->tokens == 0)
+      if (preset(*p).empty() && (*p)->tokens == 0 && !((*p)->isFinal))
       {
 			arcs=true;		
                         set<Node*> postSet = postset(*p);

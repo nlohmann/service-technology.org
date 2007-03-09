@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for BPEL's structured activities
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $ 
+ *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/09 11:45:39 $
+ * \date    \$Date: 2007/03/09 12:17:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.36 $
+ * \version \$Revision: 1.37 $
 */
 %}
 
@@ -596,199 +596,6 @@ void PFlow(impl_tFlow* abstract_phylum, uview current_view)
 
 
 /******************************************************************************
-  SWITCH
-******************************************************************************/
-
-%{
-/*!
- * \fn void kc::PSwitch(impl_tSwitch* abstract_phylum, uview current_view)
- * \brief Pattern for the <switch> activity.
- */
-%}
-void PSwitch(impl_tSwitch* abstract_phylum, uview current_view)
-{
-  impl_tSwitch_Switch* phylum = static_cast<impl_tSwitch_Switch*>(abstract_phylum);
-  assert(phylum != NULL);
-
-  header(phylum->id, true);
-  string prefix = toString(phylum->id) + ".internal.";
-
-  
-  switch(current_view)
-  {
-    case(petrinetnew_enum):
-      {
-	Place *p4 =  PN.newPlace(prefix + "final");
-	Place *p5 =  PN.newPlace(prefix + "initial");
-	Place *p6 =  PN.newPlace(prefix + "running");
-	Place *p10 = PN.newPlace(prefix + "p10");
-	Place *p11 = PN.newPlace(prefix + "stop");
-	Place *p12 = PN.newPlace(prefix + "stopped");
-
-	Transition *t3 = PN.newTransition(prefix + "t3");
-	PN.newArc(p5, t3);
-	PN.newArc(t3, p6);
-
-	// Transitions for the negative control flow.
-	if (parameters[P_STANDARDFAULTS])
-	  Transition *t7 = throwFault(p6, p10, "running", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
-
-	Transition *t8  = stop(p5, "initial", prefix);
-	Transition *t9  = stop(p6, "running", prefix);
-	Transition *t10 = stop(p10, "p10", prefix);
-
-	impl_tOtherwise_Otherwise *otherwise = static_cast<impl_tOtherwise_Otherwise*>(phylum->tOtherwise_1);
-
-	// unparse the standard elements
-	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
-	// unparse the case branches
-	phylum->tCase_list_1->unparse(pseudoPrinter, current_view);
-	
-	// unparse the otherwise activity
-	otherwise->activity_1->unparse(pseudoPrinter, current_view);
-
-	int currentCase = 1;
-	Transition *last;
-	foreach (caseBranch=Case(innerActivity); tCase_list phylum->tCase_list_1)
-	{
-	  string caseNumber = toString(currentCase);
-	  
-	  trace(TRACE_VERY_DEBUG, "[PNU]\tEmbedding case branch " + caseNumber + "...\n");
-
-	  Transition *t2 = NULL;
-	  Transition *t4 = NULL;
-	  
-	  if (currentCase == 1)
-	  {
-	    // two transitions: guard fulfilled or not
-	    t2 = PN.newTransition(prefix + "t2.case1");
-	    t4 = PN.newTransition(prefix + "t4.case1");
-
-	    // arcs connecting "running"-place
-	    PN.newArc(PN.findPlace(phylum->id, ".internal.running"), t2);
-	    PN.newArc(PN.findPlace(phylum->id, ".internal.running"), t4);
-
-	    last = t4;
-	  }
-	  else
-	  {
-	    // two transitions: guard fulfilled or not
-	    t2 = PN.newTransition(prefix + "t2.case" + caseNumber);
-	    t4 = PN.newTransition(prefix + "t4.case" + caseNumber);
-
-	    // "running"-place and connecting arcs
-	    Place *running =  PN.newPlace(prefix + "running.case" + caseNumber);
-	    PN.newArc(last, running);
-	    PN.newArc(running, t2);
-	    PN.newArc(running, t4);
-	    
-	    Transition *t11 = stop(running, "runningCase" + caseNumber, prefix);
-	    
-	    last = t4;
-	  }
-	  
-	  // Embed the inner activity.
-	  PN.newArc(t2, PN.findPlace(innerActivity->id, ".initial"));
-	  PN.mergePlaces(phylum->id, ".internal.final",   innerActivity->id, ".final");
-	  PN.mergePlaces(phylum->id, ".internal.stop",    innerActivity->id, ".stop");
-	  PN.mergePlaces(phylum->id, ".internal.stopped", innerActivity->id, ".stopped");
-	  
-	  currentCase++;
-	}
-	
-	trace(TRACE_VERY_DEBUG, "[PNU]\tEmbedding otherwise branch...\n");
-	// The <otherwise> branch.
-	Transition *t2 = PN.newTransition(prefix + "t2.otherwise");
-
-	// "running"-place and connecting arcs
-	Place *running = PN.newPlace(prefix + "running.otherwise");
-	PN.newArc(running, t2);
-	PN.newArc(last, running);
-	
-	Transition *tnoname = stop(running, "runningOtherwise", prefix);
-	
-	// embed inner activity
-	PN.newArc(t2, PN.findPlace(otherwise->activity_1->id, ".initial"));
-	PN.mergePlaces(phylum->id, ".internal.final",   otherwise->activity_1->id, ".final");
-	PN.mergePlaces(phylum->id, ".internal.stop",    otherwise->activity_1->id, ".stop");
-	PN.mergePlaces(phylum->id, ".internal.stopped", otherwise->activity_1->id, ".stopped");
-
-	break;
-      }
-
-    case(petrinetsmall_enum):
-      {
-	Place *p1 =  PN.newPlace(prefix + "final");
-	Place *p2 =  PN.newPlace(prefix + "initial");
-
-
-	impl_tOtherwise_Otherwise *otherwise = static_cast<impl_tOtherwise_Otherwise*>(phylum->tOtherwise_1);
-
-	// unparse the standard elements
-	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
-	// unparse the case branches
-	phylum->tCase_list_1->unparse(pseudoPrinter, current_view);
-	
-	// unparse the otherwise activity
-	otherwise->activity_1->unparse(pseudoPrinter, current_view);
-	
-
-	// the <case> branches
-	int currentCase = 1;
-	foreach (caseBranch=Case(innerActivity,_id2); tCase_list phylum->tCase_list_1)
-	{
-	  string caseNumber = toString(currentCase++);
-	  Transition* t1 = PN.newTransition(prefix + "case" + caseNumber);
-	  PN.newArc(PN.findPlace(phylum->id, ".internal.initial"), t1); // added ".internal" here
-	  
-	  // Embed the inner activity.
-	  PN.newArc(t1, PN.findPlace(innerActivity->id, ".initial"));
-	  PN.mergePlaces(phylum->id, ".internal.final", innerActivity->id, ".final");
-	}
-
-	// the <otherwise> branch
-	Transition *t1 = PN.newTransition(prefix + "caseo");
-	PN.newArc(PN.findPlace(phylum->id, ".internal.initial"), t1); // added ".internal" here
-
-	// embed inner activity
-	PN.newArc(t1, PN.findPlace(otherwise->activity_1->id, ".initial"));
-	PN.mergePlaces(phylum->id, ".internal.final", otherwise->activity_1->id, ".final");
-
-
-	// Create the arcs for the Dead Path elimination: each chosen activity
-	// (i.e. firing of the respective t2-transition) has set the links of all
-	// other branches to false.
-	currentCase = 1;
-	foreach (Case(innerActivity1); tCase_list phylum->tCase_list_1)
-	{
-	  foreach (Case(innerActivity2); tCase_list phylum->tCase_list_1)
-	  {
-	    if (innerActivity1 != innerActivity2)
-            dpeLinks(PN.findTransition(prefix + "case" + toString(currentCase)), innerActivity2->id); // case -> case'
-	  }
-
-	  dpeLinks(PN.findTransition(prefix + "case" + toString(currentCase)), otherwise->activity_1->id); // case -> otherwise
-	  dpeLinks(PN.findTransition(prefix + "caseo"), innerActivity1->id); // otherwise -> case
-	  currentCase++;
-	}
-
-	break;
-      }
-
-    default: { /* no pattern in this case */ }
-  }
-
-
-  footer(phylum->id, true);
-}
-
-
-
-
-
-/******************************************************************************
   PICK
 ******************************************************************************/
 
@@ -926,7 +733,7 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 
 
 /******************************************************************************
-  IF
+  IF / SWITCH
 ******************************************************************************/
 
 %{
@@ -1066,7 +873,7 @@ void PIf(impl_tIf* abstract_phylum, uview current_view)
   }
 
   footer(phylum->id, true);
-}      
+}
 
 
 

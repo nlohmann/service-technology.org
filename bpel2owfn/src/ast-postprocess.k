@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/03/08 13:20:45 $
+ * \date    \$Date: 2007/03/09 12:17:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.139 $
+ * \version \$Revision: 1.140 $
  */
 %}
 
@@ -1217,127 +1217,7 @@ Link(_id) ->
 
 
 /******************************************************************************
-  SWITCH                                                         (BPEL4WS 1.1)
-******************************************************************************/
-
-Switch(a,b,c,_id) ->
-  [postprocessing:
-    {
-      int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
-      assert(myself != NULL);
-
-      a->parentId = myid;
-
-      myself->parentScopeId = globals::PPcurrentScope;
-      myself->checkAttributes();
-
-      /* above is generic */
-
-      // distribute the switch's id to the enclosed activities
-      // also distribute the control flow
-      foreach(branch=Case(innerActivity,_id2); tCase_list b)
-      {
-        assert(ASTEmap[innerActivity->id] != NULL);
-        ASTEmap[innerActivity->id]->parentActivityId = myid;
-//        ASTEmap[_id2->value]->parentActivityId = myid;
-        ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
-        ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
-      }
-
-      // process Otherwise-branch
-      with(c)
-      {
-        c=Otherwise(d,e):
-        { 
-          assert(ASTEmap[d->id] != NULL);
-          ASTEmap[d->id]->parentActivityId = myid;
-          ASTEmap[d->id]->controlFlow = myself->controlFlow;
-          ASTEmap[d->id]->max_occurrences = myself->max_occurrences;
-          
-        }
-        default: { /* do nothing */ }
-      }
-    }
-    a b c
-    {
-      // collect enclosed source links
-      foreach(branch=Case(innerActivity,_id2); tCase_list b)
-      {
-        assert(ASTEmap[innerActivity->id] != NULL);
-        myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
-
-        foreach(otherbranch=Case(secondActivity,_id3); tCase_list b)
-        {
-          if ( _id2->value < _id3->value )
-          {
-            enterConflictingActivities( ASTEmap[ _id2->value ]->enclosedActivities, ASTEmap[ _id3->value ]->enclosedActivities );
-          }
-        }
-      }
-
-      with(c)
-      {
-        c=Otherwise(d,e):
-        {
-          assert(ASTEmap[d->id] != NULL);
-          myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[d->id]->enclosedSourceLinks);
-
-          foreach(otherbranch=Case(secondActivity,_id3); tCase_list b)
-          {
-            enterConflictingActivities( ASTEmap[ e->value ]->enclosedActivities, ASTEmap[ _id3->value ]->enclosedActivities );
-          }
-        }
-        default: { /* do nothing */ }
-      }
-
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
-      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
-    }
-  ]
-;
-
-Case(a,_id) ->
-  [postprocessing:
-    {
-      int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
-      assert(myself != NULL);
-
-      myself->parentScopeId = globals::PPcurrentScope;
-      myself->checkAttributes();
-    }
-    a
-    {
-      myself->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
-      myself->enclosedActivities.insert( a->id );
-      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
-    }
-  ]
-;
-
-Otherwise(a,_id) ->
-  [postprocessing:
-    {
-      int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
-      assert(myself != NULL);
-
-      myself->parentScopeId = globals::PPcurrentScope;
-    }
-    a
-    {
-      myself->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
-      myself->enclosedActivities.insert( a->id );
-      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
-    }
-  ]
-;
-
-
-/******************************************************************************
-  IF                                                             (WS-BPEL 2.0)
+  IF / SWITCH
 ******************************************************************************/
 
 If(a,b,c,_id) ->

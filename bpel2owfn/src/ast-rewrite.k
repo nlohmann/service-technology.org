@@ -44,14 +44,14 @@
  * 
  * \since   2006/10/11
  *
- * \date    \$Date: 2007/03/06 15:19:58 $
+ * \date    \$Date: 2007/03/09 12:17:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.27 $
+ * \version \$Revision: 1.28 $
  */
 %}
 
@@ -161,24 +161,6 @@ NoStandardElements()
     NiltTarget_list(),
     NiltSource_list(),
     standardJoinCondition()
-  )
->;
-
-
-/*
- * Implicit Otherwise Branch (cf. Sect. 12.2 in BPEL4WS 1.1)
- */
-NoOtherwise()
-->
-< implicit:
-  Otherwise(
-    activityEmpty(
-      Empty(
-        NoStandardElements(),
-        mkinteger(0)
-      )
-    ),
-    mkinteger(0)
   )
 >;
 

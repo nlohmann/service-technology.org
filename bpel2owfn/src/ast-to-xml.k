@@ -32,7 +32,7 @@
  * 
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/03/06 15:19:58 $
+ * \date    \$Date: 2007/03/09 12:17:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.73 $
+ * \version \$Revision: 1.74 $
  *
  * \todo    Add support for the <terminationHandler>
  */
@@ -341,24 +341,7 @@ Sequence(a,b,_id) ->
 
 
 /******************************************************************************
-  SWITCH
-******************************************************************************/
-
-Switch(a,b,c,_id) ->
-  [xml: { inup(); } "<switch id=\"" _id "\"" { listAttributes( _id ); } ">\n" a b c { indown(); } "</switch>\n"]
-;
-
-Case(a,_id) ->
-  [xml: { inup(); } "<case id=\"" _id "\"" { listAttributes( _id ); } ">\n" a { indown(); } "</case>\n"]
-;
-
-Otherwise(a,_id) ->
-  [xml: { inup(); } "<otherwise id=\"" _id "\">\n" a { indown(); } "</otherwise>\n"]
-;
-
-
-/******************************************************************************
-  IF                                                            (WS-BPEL 2.0)
+  IF / SWITCH
 ******************************************************************************/
 
 If(a,b,c,_id) ->

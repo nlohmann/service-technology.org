@@ -32,7 +32,7 @@
  *         
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/03/06 15:19:58 $
+ * \date    \$Date: 2007/03/09 12:17:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.55 $
+ * \version \$Revision: 1.56 $
  */
 %}
 
@@ -622,53 +622,7 @@ Flow(a,b,c,d) ->
 
 
 /******************************************************************************
-  SWITCH
-******************************************************************************/
-
-This=Switch(a,b,Otherwise(c,d),e) ->
-  [cfg: {
-	  trace(TRACE_DEBUG, "[CFG] Switch\n");
-	  CFGBlock * firstBlock = new CFGBlock(CFGSwitch, $0->id, "Switch_begin"); 
-	  CFGBlock * lastBlock = new CFGBlock(CFGSwitch, $0->id, "Switch_end");
-
-	  firstBlock->firstBlock = lastBlock->firstBlock = firstBlock;
-	  firstBlock->lastBlock  = lastBlock->lastBlock  = lastBlock;
-	  
-	  globals::cfgMap[toString($0->id)] = firstBlock; 
-	}
-	b // tCase_list
-	c // tOtherwise
-	{
-	  CFGBlock * last = firstBlock;
-	  int i = 1;
-	  foreach(caseBranch=Case(innerActivity); tCase_list b)
-	  {
-	    CFGBlock * caseBlock = new CFGBlock(CFGCase, This->id, "Case_" + toString(i));
-	    
- 	    CFGBlock * innerFirst = globals::cfgMap.find(toString(innerActivity->id))->second->firstBlock;
-	    CFGBlock * innerLast = globals::cfgMap.find(toString(innerActivity->id))->second->lastBlock;
-
-	    connectBlocks(last, caseBlock);
-	    connectBlocks(caseBlock, innerFirst);
-	    connectBlocks(innerLast, lastBlock);
-
-	    last = caseBlock;	    
-	    i++;
-	  } 
-          CFGBlock * otherwiseBlock = new CFGBlock(CFGOtherwise, $0->id, "Otherwise");
- 	  CFGBlock * innerFirst = globals::cfgMap.find(toString(c->id))->second->firstBlock;
-	  CFGBlock * innerLast = globals::cfgMap.find(toString(c->id))->second->lastBlock;
-
-	  connectBlocks(last, otherwiseBlock);
-	  connectBlocks(otherwiseBlock, innerFirst);
-	  connectBlocks(innerLast, lastBlock);
-  	}
-	a // standard elements
-  ]
-;
-
-/******************************************************************************
-  IF                                                             (WS-BPEL 2.0)
+  IF / SWITCH
 ******************************************************************************/
 
 This=If(a,b,Else(c,d),e) ->

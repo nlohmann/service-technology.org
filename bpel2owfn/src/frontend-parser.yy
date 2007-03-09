@@ -39,7 +39,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/03/09 10:01:56 $
+ * \date    \$Date: 2007/03/09 12:17:08 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -49,7 +49,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.294 $
+ * \version \$Revision: 1.295 $
  *
  * \todo Overwork documentation: WS-BPEL can also be parsed!
  *
@@ -187,8 +187,8 @@ int ASTEid = 1;
 %type <yt_standardElements> standardElements
 %type <yt_tAssign> tAssign
 %type <yt_casestring> tBranches
-%type <yt_tCase_list> tCase_list
-%type <yt_tCase> tCase
+%type <yt_tElseIf_list> tCase_list
+%type <yt_tElseIf> tCase
 %type <yt_tCatch_list> tCatch_list
 %type <yt_tCatch> tCatch
 %type <yt_tCatchAll> tCatchAll
@@ -232,7 +232,7 @@ int ASTEid = 1;
 %type <yt_tOnMessage> tOnEvent
 %type <yt_tOnMessage_list> tOnMessage_list
 %type <yt_tOnMessage> tOnMessage
-%type <yt_tOtherwise> tOtherwise
+%type <yt_tElse> tOtherwise
 %type <yt_tPartner_list> tPartner_list
 %type <yt_tPartner_list> tPartners
 %type <yt_tPartner> tPartner
@@ -251,7 +251,6 @@ int ASTEid = 1;
 %type <yt_tSource_list> tSource_list
 %type <yt_tSource> tSource
 %type <yt_casestring> tStartCounterValue
-%type <yt_tSwitch> tSwitch
 %type <yt_tTarget_list> tTarget_list
 %type <yt_tTarget> tTarget
 %type <yt_tExit> tTerminate
@@ -312,7 +311,6 @@ activity:
 | tCompensate		{ $$ = activityCompensate($1);	}
 | tCompensateScope	{ $$ = activityCompensate($1);	}
 | tSequence		{ $$ = activitySequence($1);	}
-| tSwitch		{ $$ = activitySwitch($1);	}
 | tIf			{ $$ = activityIf($1);		}
 | tWhile		{ $$ = activityWhile($1);	}
 | tRepeatUntil		{ $$ = activityRepeatUntil($1);	}
@@ -904,44 +902,14 @@ tSequence:
 
 
 /******************************************************************************
-  SWITCH                                                         (BPEL4WS 1.1)
-******************************************************************************/
-
-tSwitch:
-  K_SWITCH arbitraryAttributes X_NEXT standardElements tCase_list tOtherwise X_SLASH K_SWITCH
-    { $$ = Switch($4, $5, $6, $2); }
-;
-
-tCase_list:
-  tCase X_NEXT
-    { $$ = ConstCase_list($1, NiltCase_list()); }
-| tCase X_NEXT tCase_list
-    { $$ = ConstCase_list($1, $3); }
-;
-
-tCase:
-  K_CASE arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CASE
-    { $$ = Case($4, $2); }
-;
-
-
-tOtherwise:
-  /* empty */
-    { $$ = NoOtherwise(); }
-| K_OTHERWISE arbitraryAttributes X_SLASH // wrong BPEL, yet widely-used...
-    { $$ = NoOtherwise(); }
-| K_OTHERWISE arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_OTHERWISE X_NEXT
-    { $$ = Otherwise($4, $2); }
-;
-
-
-/******************************************************************************
-  IF                                                             (WS-BPEL 2.0)
+  IF / SWITCH
 ******************************************************************************/
 
 tIf:
   K_IF arbitraryAttributes X_NEXT standardElements tCondition activity X_NEXT tElseIf_list tElse X_SLASH K_IF
     { $$ = If($4, ConstElseIf_list(ElseIf($6, mkinteger(0)), $8), $9, $2); }
+| K_SWITCH arbitraryAttributes X_NEXT standardElements tCase_list tOtherwise X_SLASH K_SWITCH
+    { $$ = If($4, $5, $6, $2); }
 ;
 
 tCondition:
@@ -965,6 +933,29 @@ tElse:
     { $$ = NoElse(mkinteger(0)); }
 | K_ELSE X_NEXT activity X_NEXT X_SLASH K_ELSE X_NEXT
     { $$ = Else($3, mkinteger(0)); }
+;
+
+
+tCase_list:
+  tCase X_NEXT
+    { $$ = ConstElseIf_list($1, NiltElseIf_list()); }
+| tCase X_NEXT tCase_list
+    { $$ = ConstElseIf_list($1, $3); }
+;
+
+tCase:
+  K_CASE arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_CASE
+    { $$ = ElseIf($4, $2); }
+;
+
+
+tOtherwise:
+  /* empty */
+    { $$ = Else(activityEmpty(Empty(NoStandardElements(), mkinteger(0))), mkinteger(0)); }
+| K_OTHERWISE arbitraryAttributes X_SLASH // wrong BPEL, yet widely-used :-( ...
+    { $$ = Else(activityEmpty(Empty(NoStandardElements(), mkinteger(0))), mkinteger(0)); }
+| K_OTHERWISE arbitraryAttributes X_NEXT activity X_NEXT X_SLASH K_OTHERWISE X_NEXT
+    { $$ = Else($4, $2); }
 ;
 
 

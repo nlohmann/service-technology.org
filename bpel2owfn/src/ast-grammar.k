@@ -33,7 +33,7 @@
  * 
  * \since   2005-10-03
  *
- * \date    \$Date: 2007/03/06 15:19:58 $
+ * \date    \$Date: 2007/03/09 12:17:08 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file ast-grammar.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.168 $
+ * \version \$Revision: 1.169 $
  */
 %}
 
@@ -101,7 +101,6 @@ activity:
 | activityRethrow(tRethrow)
 | activityCompensate(tCompensate)
 | activitySequence(tSequence)
-| activitySwitch(tSwitch)
 | activityIf(tIf)
 | activityWhile(tWhile)
 | activityRepeatUntil(tRepeatUntil)
@@ -385,27 +384,7 @@ tSequence:
 
 
 /******************************************************************************
-  SWITCH                                                         (BPEL4WS 1.1)
-******************************************************************************/
-
-tSwitch:
-  Switch(standardElements tCase_list tOtherwise integer)
-;
-
-tCase_list: list tCase;
-
-tCase:
-  Case(activity integer)
-;
-
-tOtherwise:
-  Otherwise(activity integer)
-| NoOtherwise()			/* will be replaced in rewriting */
-;
-
-
-/******************************************************************************
-  IF                                                             (WS-BPEL 2.0)
+  IF / SWITCH
 ******************************************************************************/
 
 tIf:
@@ -564,7 +543,6 @@ expression:
 %ctor activityRethrow()			{ id = tRethrow_1->id; }
 %ctor activityCompensate()		{ id = tCompensate_1->id; }
 %ctor activitySequence()		{ id = tSequence_1->id; }
-%ctor activitySwitch()			{ id = tSwitch_1->id; }
 %ctor activityIf()			{ id = tIf_1->id; }
 %ctor activityWhile()			{ id = tWhile_1->id; }
 %ctor activityRepeatUntil()		{ id = tRepeatUntil_1->id; }
@@ -610,9 +588,6 @@ expression:
 %ctor Compensate()			{ CTOR(K_COMPENSATE) }
 %ctor CompensateScope()			{ CTOR(K_COMPENSATESCOPE) }
 %ctor Sequence()			{ CTOR(K_SEQUENCE) }
-%ctor Switch()				{ CTOR(K_SWITCH) }
-%ctor Case()				{ CTOR(K_CASE) }
-%ctor Otherwise()			{ CTOR(K_OTHERWISE) }
 %ctor If() 				{ CTOR(K_IF) }
 %ctor ElseIf()				{ CTOR(K_ELSEIF) }
 %ctor Else()				{ CTOR(K_ELSE) }

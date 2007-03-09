@@ -39,7 +39,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/03/07 14:02:09 $
+ * \date    \$Date: 2007/03/09 10:01:56 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -49,7 +49,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.293 $
+ * \version \$Revision: 1.294 $
  *
  * \todo Overwork documentation: WS-BPEL can also be parsed!
  *
@@ -171,7 +171,7 @@ map<unsigned int, ASTE*> ASTEmap;
 map<unsigned int, map<string, string> > temporaryAttributeMap;
 
 /// identifier of the next AST element
-unsigned int ASTEid = 1;
+int ASTEid = 1;
 
 %}
 
@@ -941,7 +941,7 @@ tOtherwise:
 
 tIf:
   K_IF arbitraryAttributes X_NEXT standardElements tCondition activity X_NEXT tElseIf_list tElse X_SLASH K_IF
-    { $$ = If($4, ConstElseIf_list(ElseIf($6, mkinteger($6->id)), $8), $9, $2); }
+    { $$ = If($4, ConstElseIf_list(ElseIf($6, mkinteger(0)), $8), $9, $2); }
 ;
 
 tCondition:

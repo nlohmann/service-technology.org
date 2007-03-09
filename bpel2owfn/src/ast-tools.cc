@@ -29,13 +29,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/03/06 11:47:59 $
+ * \date    \$Date: 2007/03/09 12:59:02 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.65 $
+ * \version \$Revision: 1.66 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -71,7 +71,7 @@ using std::endl;
 unsigned int indent = 0;
 
 /// number of spaces to be added when indention is increased
-unsigned int indentStep = 4;
+unsigned int indentStep = 2;
 
 
 

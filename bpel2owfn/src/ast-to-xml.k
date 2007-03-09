@@ -32,7 +32,7 @@
  * 
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/03/09 12:17:08 $
+ * \date    \$Date: 2007/03/09 12:59:02 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.74 $
+ * \version \$Revision: 1.75 $
  *
  * \todo    Add support for the <terminationHandler>
  */
@@ -344,8 +344,8 @@ Sequence(a,b,_id) ->
   IF / SWITCH
 ******************************************************************************/
 
-If(a,b,c,_id) ->
-  [xml: { inup(); } "<if id=\"" _id "\"" { listAttributes( _id ); } ">\n" a b c { indown(); } "</if>\n"]
+If(a, ConstElseIf_list(ElseIf(b,_id2), c),d,_id) ->
+  [xml: { inup(); } "<if id=\"" _id "\"" { listAttributes( _id ); } ">\n" {  } a b c d { indown(); } "</if>\n"]
 ;
 
 ElseIf(a,_id) ->
@@ -412,7 +412,7 @@ Flow(a,b,c,_id) ->
 ;
 
 Link(_id) ->
-  [xml: { in(); } "<link id=\"" _id "\"" { listAttributes( _id ); } "/>\n"]
+  [xml: { in(); } "<link id=\"" _id "\"" { listAttributes( _id ); } " />\n"]
 ;
 
 
@@ -439,6 +439,11 @@ Scope(a,b,c,d,e,f,g,i,j,_id) ->
 /******************************************************************************
   STANDARD ELEMENTS
 ******************************************************************************/
+
+StandardElements(NiltTarget_list(), NiltSource_list(),jc) -> [xml: ];
+StandardElements(NiltTarget_list(), a,jc) -> [xml: { inup(); } "<sources>\n" a { indown(); } "</sources>\n" ];
+StandardElements(a, NiltSource_list(),jc) -> [xml: { inup(); } "<targets>\n" a { indown(); } "</targets>\n" ];
+StandardElements(a, b,jc) -> [xml: { inup(); } "<targets>\n" a { indown(); } "</targets>\n" { inup(); } "<sources>\n" b { indown(); } "</sources>\n" ];
 
 Target(a) ->
   [xml: { in(); } "<target" { listAttributes( a ); } " />\n"]

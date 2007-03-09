@@ -40,7 +40,7 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/07 16:32:17 $
+ * \date    \$Date: 2007/03/09 10:02:14 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          petrinet-patterns-links.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.19 $
+ * \version \$Revision: 1.20 $
  */
 %}
 
@@ -111,8 +111,6 @@ extern map<unsigned int, ASTE*> ASTEmap;
 %}
 void P_LinkWrapper0(impl_standardElements* abstract_phylum, uview current_view)
 {
-  trace(TRACE_DEBUG, "[PNU]" + inString() + "  wrapper-pattern 0: no links\n");
-
   impl_standardElements_StandardElements* phylum =
     static_cast<impl_standardElements_StandardElements*>(abstract_phylum);
   assert(phylum != NULL);

@@ -55,10 +55,12 @@ Exchangeability::Exchangeability(char* filename){
 	loadBdd(filename);
 	++nbrBdd;
 	Cudd_ReorderingType method = (Cudd_ReorderingType)4;
-	if (Cudd_ReorderingStatus(mgrMp, &method) == 1){cout << "automatic reordering is enabled";} 
+	if (Cudd_ReorderingStatus(mgrMp, &method) == 1) {
+		cout << "automatic reordering is enabled";
+	} 
 	 
-	for (int i = 0; i < nbrVarAnn; ++i){
-        if (names[i][0] == '!' || names[i][0] == '?'){
+	for (int i = 0; i < nbrVarAnn; ++i) {
+        if (names[i][0] == '!' || names[i][0] == '?') {
            (labelList).push_back(names[i]);
         }
     }

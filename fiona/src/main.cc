@@ -97,6 +97,11 @@ void myown_newhandler() {
     throw bad_alloc();
 }
 
+int owfn_yywrap() {
+    return 1;
+}
+
+
 void readnet() {
     owfn_yydebug = 0;
     owfn_yy_flex_debug = 0;
@@ -144,10 +149,6 @@ void readnet() {
     }
 }
 
-
-int owfn_yywrap() {
-    return 1;
-}
 
 void readog() {
     og_yydebug = 0;
@@ -229,6 +230,14 @@ void adjustOptionValues() {
 
 int main(int argc, char ** argv) {
 
+//	parse_command_line(argc, argv);
+//	readog();
+//	Exchangeability* og1 = new Exchangeability(*netfiles.begin());
+//	trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
+//	NewLogger::printall();
+//	return 0;
+//	
+	
 	list<oWFN*> petrinets;
 
 	// 0. eigenen New-Handler installieren
@@ -239,21 +248,19 @@ int main(int argc, char ** argv) {
 	    
 	    if (options[O_EX] == true) {
 	    	//check equality of two operating guidelines
-			if (netfiles.size() == 2){
+			if (netfiles.size() == 2) {
 				list<char*>::iterator netiter = netfiles.begin();
         		Exchangeability* og1 = new Exchangeability(*netiter);        		
         		Exchangeability* og2 = new Exchangeability(*(++netiter));
         		trace(TRACE_0, "The two operating guidelines are equal: ");
         		if (og1->check(og2) == true) {
         			trace(TRACE_0, "YES\n");
-        		}
-        		else {
+        		} else {
         			trace(TRACE_0, "NO\n");
         		}
-			}	
-        	else {
+			} else {
         		cerr << "Error: \t If option -x is used, exactly two oWFN must be entered\n" << endl;
-        	}			
+        	}
 		} else {
 	
 		    list<char*>::iterator netiter = netfiles.begin();

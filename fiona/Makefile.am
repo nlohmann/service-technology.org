@@ -19,15 +19,15 @@
 # Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.                     #
 ############################################################################
 
-# File last changed $Date: 2007-03-02 10:42:16 $ by $Author: massuthe $.
-# Version $Revision: 1.10 $
+# File last changed $Date: 2007-03-09 13:20:16 $ by $Author: massuthe $.
+# Version $Revision: 1.11 $
 
 SUBDIRS = cudd src tests
 
 .PHONY: binarydistreadme
 
 # all files that require the permission to execute
-SHELLSCRIPTS = tests/testSequenceSuite tests/testSequenceSuite2 tests/extrema.sh
+SHELLSCRIPTS = tests/*.sh
 
 # delete all files that can be created by other files
 hu-prepare: maintainer-clean

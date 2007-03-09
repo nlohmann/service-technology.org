@@ -250,7 +250,7 @@ int main(int argc, char ** argv) {
 	    	//check equality of two operating guidelines
 			if (netfiles.size() == 2) {
 				list<char*>::iterator netiter = netfiles.begin();
-        		Exchangeability* og1 = new Exchangeability(*netiter);        		
+        		Exchangeability* og1 = new Exchangeability(*netiter);
         		Exchangeability* og2 = new Exchangeability(*(++netiter));
         		trace(TRACE_0, "The two operating guidelines are equal: ");
         		if (og1->check(og2) == true) {

@@ -4,7 +4,7 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT(Fiona, 1.5, weinberg@informatik.hu-berlin.de, fiona)
-AC_REVISION($Revision: 1.15 $)
+AC_REVISION($Revision: 1.16 $)
 
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/fiona.h)
@@ -45,13 +45,13 @@ AC_TYPE_OFF_T
 AC_TYPE_SIZE_T
 
 # Checks for library functions.
-AC_FUNC_FORK
-AC_FUNC_MALLOC
-AC_FUNC_MEMCMP
-AC_FUNC_REALLOC
-AC_FUNC_STRCOLL
-AC_FUNC_WAIT3
-AC_CHECK_FUNCS([bzero dup2 floor gethostname getpagesize memchr memmove memset pow sqrt strchr strcspn strerror strpbrk strrchr strspn strstr])
+#AC_FUNC_FORK
+#AC_FUNC_MALLOC
+#AC_FUNC_MEMCMP
+#AC_FUNC_REALLOC
+#AC_FUNC_STRCOLL
+#AC_FUNC_WAIT3
+#AC_CHECK_FUNCS([bzero dup2 floor gethostname getpagesize memchr memmove memset pow sqrt strchr strcspn strerror strpbrk strrchr strspn strstr])
 
 AC_PROG_LEX
 if test "$LEX" != "flex"; then

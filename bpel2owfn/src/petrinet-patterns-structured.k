@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/08 14:42:47 $
+ * \date    \$Date: 2007/03/09 10:01:32 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
 */
 %}
 
@@ -921,9 +921,19 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 
 %{
 /*!
- * \fn void kc::PIf(impl_tIf* abstract_phylum, uview current_view)
- * \brief Pattern for the <if> activity.
- * \image html "if.png" "pattern"
+ * \fn      void kc::PIf(impl_tIf* abstract_phylum, uview current_view)
+ *
+ * \brief   Pattern for the <if> activity.
+ *
+ *          \image html "if.png" "pattern"
+ *
+ * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
+ * \param   current_view     the current unparse view
+ *
+ * \note    The branches are not checked sequentially, but in parallel. This
+ *          would make a difference in colored Petri nets, but as we are
+ *          modeling data-driven decisions by nondeterminism, the <if> can be
+ *          modeled by a single conflicting place.
  */
 %}
 void PIf(impl_tIf* abstract_phylum, uview current_view)
@@ -934,158 +944,116 @@ void PIf(impl_tIf* abstract_phylum, uview current_view)
   header(phylum->id, true);
   string prefix = toString(phylum->id) + ".internal.";
 
-  /*
-   * Ad hoc and not quite correct version of the pattern: the branches are not
-   * checked sequentially, but in parallel. FIXME!
-   */
-  switch(current_view)
+
+  // Places.
+  Place *p1 =  PN.newPlace(prefix + "initial");
+  Place *p2 =  PN.newPlace(prefix + "final");
+
+  // Stop places and stopping transitions.
+  if (current_view != petrinetsmall_enum)
   {
-    case(petrinetnew_enum):
-      {
-	Place *p1 =  PN.newPlace(prefix + "initial");
-	Place *p2 =  PN.newPlace(prefix + "final");
-	Place *p3 =  PN.newPlace(prefix + "stop");
-	Place *p4 =  PN.newPlace(prefix + "stopped");
+    Place *p3 =  PN.newPlace(prefix + "stop");
+    Place *p4 =  PN.newPlace(prefix + "stopped");
 
-    	Transition *t9 = stop(p1, "initial", prefix);
-    	Transition *t10 = stop(p2, "final", prefix);
-
-
-	// unparse the standard elements
-	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
-	// unparse the elseIf branches
-	phylum->tElseIf_list_1->unparse(pseudoPrinter, current_view);
-	
-	// unparse the else branch
-	phylum->tElse_1->unparse(pseudoPrinter, current_view);
-
-
-	int currentCase = 1;
-	foreach (caseBranch=ElseIf(innerActivity, _id2); tElseIf_list phylum->tElseIf_list_1)
-	{
-	  string caseNumber = toString(currentCase++);
-	  Transition* t1 = PN.newTransition(prefix + "case" + caseNumber);
-	  PN.newArc(PN.findPlace(phylum->id, ".internal.initial"), t1); // added ".internal" here
-	  
-	  // Embed the inner activity.
-	  PN.newArc(t1, PN.findPlace(innerActivity->id, ".initial"));
-	  PN.mergePlaces(phylum->id, ".internal.final", innerActivity->id, ".final");
-	  PN.mergePlaces(phylum->id, ".internal.stop", innerActivity->id, ".stop");
-	  PN.mergePlaces(phylum->id, ".internal.stopped", innerActivity->id, ".stopped");
-	}
-	
-	// The <else> branch.
-	Transition *t3 = PN.newTransition(prefix + "caseo");
-	PN.newArc(PN.findPlace(phylum->id, ".internal.initial"), t3); // added ".internal" here
-
-	impl_tElse *elseBranch = phylum->tElse_1;
-
-	with (elseBranch)
-	{
-	  elseBranch=Else(innerActivity,_id2):
-	  {
-	    // embed inner activity
-            PN.newArc(t3, PN.findPlace(innerActivity->id, ".initial"));
-	    PN.mergePlaces(phylum->id, ".internal.final", innerActivity->id, ".final");
-	    PN.mergePlaces(phylum->id, ".internal.stop", innerActivity->id, ".stop");
-	    PN.mergePlaces(phylum->id, ".internal.stopped", innerActivity->id, ".stopped");
-	  }
-	  
-	  elseBranch=NoElse(_id2):
-	  {
-	    PN.newArc(t3, PN.findPlace(phylum->id, ".internal.final"));
-	  }
-	  
-	  default: { /* do nothing */ }
-	}
-
-	break;
-      }
-
-    case(petrinetsmall_enum):
-      {
-	Place *p1 =  PN.newPlace(prefix + "initial");
-	Place *p2 =  PN.newPlace(prefix + "final");
-
-
-	// unparse the standard elements
-	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
-	// unparse the elseIf branches
-	phylum->tElseIf_list_1->unparse(pseudoPrinter, current_view);
-	
-	// unparse the else branch
-	phylum->tElse_1->unparse(pseudoPrinter, current_view);
-
-
-	int currentCase = 1;
-	foreach (caseBranch=ElseIf(innerActivity, _id2); tElseIf_list phylum->tElseIf_list_1)
-	{
-	  string caseNumber = toString(currentCase++);
-	  Transition* t1 = PN.newTransition(prefix + "case" + caseNumber);
-	  PN.newArc(PN.findPlace(phylum->id, ".internal.initial"), t1); // added ".internal" here
-	  
-	  // Embed the inner activity.
-	  PN.newArc(t1, PN.findPlace(innerActivity->id, ".initial"));
-	  PN.mergePlaces(phylum->id, ".internal.final", _id2->value, ".final");
-	}
-	
-	// The <else> branch.
-	Transition *t1 = PN.newTransition(prefix + "caseo");
-	PN.newArc(PN.findPlace(phylum->id, ".internal.initial"), t1); // added ".internal" here
-
-	impl_tElse *elseBranch = phylum->tElse_1;
-
-	with (elseBranch)
-	{
-	  elseBranch=Else(innerActivity,_id2):
-	  {
-	    // embed inner activity
-            PN.newArc(t1, PN.findPlace(innerActivity->id, ".initial"));
-	    PN.mergePlaces(phylum->id, ".internal.final", innerActivity->id, ".final");
-	  }
-	  
-	  elseBranch=NoElse(_id2):
-	  {
-	    PN.newArc(t1, PN.findPlace(phylum->id, ".internal.final"));
-	  }
-	  
-	  default: { /* do nothing */ }
-	}
-	
-	
-	// Create the arcs for the Dead Path elimination: each chosen activity
-	// (i.e. firing of the respective t2-transition) has set the links of all
-	// other branches to false.
-	currentCase = 1;
-	foreach (ElseIf(innerActivity1); tElseIf_list phylum->tElseIf_list_1)
-	{
-	  foreach (ElseIf(innerActivity2); tElseIf_list phylum->tElseIf_list_1)
-	  {
-	    if (innerActivity1 != innerActivity2)
-	    {
-	      dpeLinks(PN.findTransition(prefix + "case" + toString(currentCase)), innerActivity2->id); // case -> case'
-	    }
-	  }
-	  with (elseBranch)
-	  {
-	    elseBranch=Else(innerActivity3,_id2):
-	    {
-	      dpeLinks(PN.findTransition(prefix + "case" + toString(currentCase)), innerActivity3->id); // case -> otherwise
-	      dpeLinks(PN.findTransition(prefix + "caseo"), innerActivity1->id); // otherwise -> case
-	    }
-	    default: { /* do nothing */ }
-	  }
-	  currentCase++;
-	}
-
-	break;
-      }
-
-    default: { /* no pattern in this case */ }
+    Transition *t9 = stop(p1, "initial", prefix);
+    Transition *t10 = stop(p2, "final", prefix);
   }
 
+  // Unparse the standard elements.
+  phylum->standardElements_1->unparse(pseudoPrinter, current_view);
+
+
+  // Traverse the <elseif> branches (the first activity is also an <elseif>
+  // branch).
+  unsigned int currentCase = 1;
+  foreach (caseBranch=ElseIf(innerActivity, _id2); tElseIf_list phylum->tElseIf_list_1)
+  {
+    header(_id2->value, true);
+    string branch = toString(currentCase++);
+
+    // Unparse the embedded activity.
+    innerActivity->unparse(pseudoPrinter, current_view);
+
+    // Transition chosing this branch.
+    Transition* t1 = PN.newTransition(prefix + "case" + branch);
+    PN.newArc(PN.findPlace(prefix + "initial"), t1);
+
+    // Embed the inner activity.
+    PN.newArc(t1, PN.findPlace(innerActivity->id, ".initial"));
+    PN.mergePlaces(phylum->id, ".internal.final", innerActivity->id, ".final");
+    PN.mergePlaces(phylum->id, ".internal.stop", innerActivity->id, ".stop");
+    PN.mergePlaces(phylum->id, ".internal.stopped", innerActivity->id, ".stopped");
+
+    footer(_id2->value, true);
+  }
+
+
+  // The <else> branch.
+  Transition *t3 = PN.newTransition(prefix + "caseo");
+  PN.newArc(PN.findPlace(prefix + "initial"), t3);
+
+  impl_tElse *elseBranch = phylum->tElse_1;
+  with (elseBranch)
+  {
+    elseBranch=Else(innerActivity,_id2):
+    {
+      header(_id2->value, true);
+      
+      // Unparse the embedded activity.
+      phylum->tElse_1->unparse(pseudoPrinter, current_view);
+
+      // Embed inner activity.
+      PN.newArc(t3, PN.findPlace(innerActivity->id, ".initial"));
+      PN.mergePlaces(phylum->id, ".internal.final", innerActivity->id, ".final");
+  
+      if (current_view != petrinetsmall_enum)
+      {
+	PN.mergePlaces(phylum->id, ".internal.stop", innerActivity->id, ".stop");
+	PN.mergePlaces(phylum->id, ".internal.stopped", innerActivity->id, ".stopped");
+      }
+
+      footer(_id2->value, true);
+    }
+
+    elseBranch=NoElse(_id2):
+    {
+      PN.newArc(t3, PN.findPlace(phylum->id, ".internal.final"));
+    }
+
+    default: { /* do nothing */ }
+  }
+
+
+  // Create the arcs for the Dead Path elimination: each chosen activity (i.e.
+  // firing of the respective t2-transition) has set the links of all other
+  // branches to false.
+  currentCase = 1;
+  foreach (ElseIf(innerActivity1); tElseIf_list phylum->tElseIf_list_1)
+  {
+    foreach (ElseIf(innerActivity2); tElseIf_list phylum->tElseIf_list_1)
+    {
+      if (innerActivity1 != innerActivity2)
+      {
+	dpeLinks(PN.findTransition(prefix + "case" + toString(currentCase)), innerActivity2->id); // case -> case'
+      }
+    }
+
+    with (elseBranch)
+    {
+      elseBranch=Else(innerActivity3,_id2):
+      {
+	dpeLinks(PN.findTransition(prefix + "case" + toString(currentCase)), innerActivity3->id); // case -> otherwise
+	dpeLinks(PN.findTransition(prefix + "caseo"), innerActivity1->id); // otherwise -> case
+      }
+      
+      default:
+      {
+	dpeLinks(PN.findTransition(prefix + "caseo"), innerActivity1->id); // otherwise -> case
+      }
+    }
+    
+    currentCase++;
+  }
 
   footer(phylum->id, true);
 }      

@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/09 12:17:08 $
+ * \date    \$Date: 2007/03/09 13:36:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.37 $
+ * \version \$Revision: 1.38 $
 */
 %}
 
@@ -428,9 +428,14 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 
 %{
 /*!
- * \fn void kc::PSequence(impl_tSequence* abstract_phylum, uview current_view)
- * \brief Pattern for the <sequence> activity.
- * \image html "sequence.png" "pattern"
+ * \fn      void kc::PSequence(impl_tSequence* abstract_phylum, uview current_view)
+ *
+ * \brief   Pattern for the <sequence> activity.
+ * 
+ *          \image html "sequence.png" "pattern"
+ *
+ * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
+ * \param   current_view     the current unparse view
  */
 %}
 void PSequence(impl_tSequence* abstract_phylum, uview current_view)
@@ -441,27 +446,26 @@ void PSequence(impl_tSequence* abstract_phylum, uview current_view)
   header(phylum->id, true);
   string prefix = toString(phylum->id) + ".internal.";
 
-
+  // Places.
   Place *p1  = PN.newPlace(prefix + "initial");
   Place *p2  = PN.newPlace(prefix + "final");
 
+  // Stopping places.
   if (current_view != petrinetsmall_enum)
   {
     Place *p3 = PN.newPlace(prefix + "stop");
     Place *p4 = PN.newPlace(prefix + "stopped");
   }
 
-
-  // unparse the standard elements
+  // Unparse the standard elements.
   phylum->standardElements_1->unparse(pseudoPrinter, current_view);
 
-  // unparse the embedded activity
+  // Unparse the embedded activities.
   phylum->activity_list_1->unparse(pseudoPrinter, current_view);
 
-
+  // Connect the embedded activities.
   int activityCount = 1;
   impl_activity* lastActivity;
-
   foreach (innerActivity; activity_list phylum->activity_list_1)
   {
     if (activityCount == 1)
@@ -481,7 +485,6 @@ void PSequence(impl_tSequence* abstract_phylum, uview current_view)
     lastActivity = innerActivity;
     activityCount++;
   }
-
 
   footer(phylum->id, true);
 }
@@ -740,7 +743,7 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
 /*!
  * \fn      void kc::PIf(impl_tIf* abstract_phylum, uview current_view)
  *
- * \brief   Pattern for the <if> activity.
+ * \brief   Pattern for the <if> and <switch> activity.
  *
  *          \image html "if.png" "pattern"
  *
@@ -751,6 +754,13 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
  *          would make a difference in colored Petri nets, but as we are
  *          modeling data-driven decisions by nondeterminism, the <if> can be
  *          modeled by a single conflicting place.
+ *
+ * \note    The <switch> activity of BPEL4WS 1.1 is modeled with the same
+ *          pattern as the <if> activity as the two activity have similar
+ *          semantics. The only difference is that an absent <otherwise> branch
+ *          in the <switch> activity has to be filled with an <empty> activity
+ *          rather than with a shortcut transition as an absent <else> branch.
+ *          This implicit <empty> activity is added by the parser.
  */
 %}
 void PIf(impl_tIf* abstract_phylum, uview current_view)

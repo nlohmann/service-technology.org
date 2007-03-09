@@ -691,7 +691,7 @@ void communicationGraph::printDotFile() {
 			trace(TRACE_0, string(buffer) + "\n");
             system(buffer);
         } else {
-        	trace(TRACE_0, "graph is too big to create the graphics; ");
+        	trace(TRACE_0, "graph is too big to create the graphics;\n");
 			trace(TRACE_0, string(buffer) + "\n");
         }
     } else {

@@ -100,12 +100,54 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 
 	trace(TRACE_1, "=================================================================\n");
 
-	unsigned int i = 0;
+//	double your_progress = progress_plus * (1 / double(PN->getInputPlaceCnt() + PN->getOutputPlaceCnt()));
+	double your_progress = progress_plus * (1 / double(PN->getInputPlaceCnt()));
 	
-	double your_progress = progress_plus * (1 / double(PN->getInputPlaceCnt() + PN->getOutputPlaceCnt()));
-	
-	trace(TRACE_2, "\t\t\t iterating over inputSet\n");
-	// iterate over all elements of inputSet
+	unsigned int i = 0;	
+
+	// iterate over all elements of outputSet of the oWFN
+	trace(TRACE_2, "\t\t\t iterating over outputSet of the oWFN\n");
+	while (i < PN->placeOutputCnt) {
+
+		trace(TRACE_2, "\t\t\t\t  receiving event: ?");
+		trace(TRACE_2, string(PN->outputPlacesArray[i]->name) + "\n");
+	    
+		if (currentNode->eventsUsed[i + PN->placeInputCnt] < PN->outputPlacesArray[i]->max_occurence) {
+				
+			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
+			currentVertex = currentNode;
+			
+			calculateSuccStatesOutput(PN->outputPlacesArray[i]->index, currentNode, v);
+			
+			if (v = AddVertex(v, i, receiving)) {
+				// node was new, hence going down with receiving event...
+				//buildGraph(v, your_progress);
+				buildGraph(v, 0);
+
+				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
+//				analyseNode(currentNode, false);
+				actualDepth--;
+			} else {
+
+//				addProgress(your_progress);
+//				printProgress();
+
+			}
+		} else {
+			trace(TRACE_2, "\t\t\t\t\t  receiving event: ?");
+			trace(TRACE_2, string(PN->outputPlacesArray[i]->name));
+			trace(TRACE_2, " suppressed (max_occurence reached)\n");
+
+//			addProgress(your_progress);
+//			printProgress();
+		}
+		i++;
+	}
+
+	i = 0;
+
+	// iterate over all elements of inputSet of the oWFN
+	trace(TRACE_2, "\t\t\t iterating over inputSet of the oWFN\n");
 	while (i < PN->placeInputCnt) {
 
 		trace(TRACE_2, "\t\t\t\t    sending event: !");
@@ -157,46 +199,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 		i++;
 	}
 
-	i = 0;
-	
-	trace(TRACE_2, "\t\t\t iterating over outputSet\n");
-	// iterate over all elements of outputSet
-	while (i < PN->placeOutputCnt) {
-
-		trace(TRACE_2, "\t\t\t\t  receiving event: ?");
-		trace(TRACE_2, string(PN->outputPlacesArray[i]->name) + "\n");
-	    
-		if (currentNode->eventsUsed[i + PN->placeInputCnt] < PN->outputPlacesArray[i]->max_occurence) {
-				
-			vertex * v = new vertex(PN->placeInputCnt + PN->placeOutputCnt);	// create new vertex of the graph
-			currentVertex = currentNode;
-			
-			calculateSuccStatesOutput(PN->outputPlacesArray[i]->index, currentNode, v);
-			
-			if (v = AddVertex(v, i, receiving)) {
-				// node was new, hence going down with receiving event...
-				buildGraph(v, your_progress);
-
-				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
-//				analyseNode(currentNode, false);
-				actualDepth--;
-			} else {
-
-				addProgress(your_progress);
-				printProgress();
-
-			}
-		} else {
-			trace(TRACE_2, "\t\t\t\t\t  receiving event: ?");
-			trace(TRACE_2, string(PN->outputPlacesArray[i]->name));
-			trace(TRACE_2, " suppressed (max_occurence reached)\n");
-
-			addProgress(your_progress);
-			printProgress();
-		}
-		i++;
-	}
-
+	// finished iterating over successors
 	trace(TRACE_2, "\t\t\t no events left...\n");
 
 	analyseNode(currentNode, true);

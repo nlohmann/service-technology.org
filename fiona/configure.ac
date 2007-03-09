@@ -4,7 +4,7 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
 AC_INIT(Fiona, 1.5, weinberg@informatik.hu-berlin.de, fiona)
-AC_REVISION($Revision: 1.16 $)
+AC_REVISION($Revision: 1.17 $)
 
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/fiona.h)
@@ -61,6 +61,10 @@ fi
 AC_CHECK_PROG(YACC, bison, bison, not found)
 if test "$YACC" = "not found"; then
  AC_MSG_ERROR([bison was not found.])
+fi
+
+if test "`uname -o`" != "Cygwin" ; then
+ac_default_prefix=$HOME
 fi
 
 # Check for --enable-64bit parameter to enable 64bit compilation

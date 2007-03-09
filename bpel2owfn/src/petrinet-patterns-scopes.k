@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/03/08 13:20:45 $
+ * \date    \$Date: 2007/03/09 10:41:49 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.31 $
+ * \version \$Revision: 1.32 $
  */
 %}
 
@@ -539,7 +539,8 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
 	PN.mergePlaces((prefix + "activity_initial"), (toString(phylum->activity_1->id) + ".initial"));
 	PN.mergePlaces((prefix + "activity_final"),   (toString(phylum->activity_1->id) + ".final"));
 	PN.mergePlaces((prefix + "stop"),             (toString(phylum->activity_1->id) + ".stop"));
-	PN.mergePlaces((prefix + "inner_stopped"),    (toString(phylum->activity_1->id) + ".stopped"));
+	PN.mergePlaces((prefix + "stopped"),          (toString(phylum->activity_1->id) + ".stopped"));
+        
 
       	// merge `ch_fault_up' place with `ch_fault_in' place of the parent scope
     	PN.mergePlaces((prefix + "ch_fault_up"), (toString(ASTEmap[phylum->id]->parentScopeId) + ".internal.ch_fault_in"));

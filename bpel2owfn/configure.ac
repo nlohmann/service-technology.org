@@ -19,12 +19,12 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/08 14:54:00 $ by $Author: nielslohmann $.
-# Version $Revision: 1.33 $
+# File last changed $Date: 2007/03/09 10:04:37 $ by $Author: nielslohmann $.
+# Version $Revision: 1.34 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([GNU BPEL2oWFN],[2.0],[bpel2owfn-bug@gnu.org],[bpel2owfn])
+AC_INIT([GNU BPEL2oWFN],[2.0.0],[bpel2owfn-bug@gnu.org],[bpel2owfn])
 AM_INIT_AUTOMAKE
 
 
@@ -43,7 +43,6 @@ AC_CANONICAL_BUILD
 
 
 # Checks for C/C++ details.
-AC_LANG([C++])
 AC_PROG_CXX
 AC_PROG_CC
 
@@ -52,8 +51,9 @@ CXXFLAGS=""
 CFLAGS=""
 
 # Checks for header files and functions.
-AC_CHECK_HEADERS([assert.h])
-AC_CHECK_FUNCS([pow])
+AC_FUNC_ALLOCA
+AC_HEADER_STDC
+AC_CHECK_HEADERS([libintl.h malloc.h stddef.h stdlib.h string.h strings.h unistd.h assert.h])
 
 
 # Preprocessor directive to share Petri net class
@@ -63,6 +63,18 @@ AC_DEFINE(USING_BPEL2OWFN, 1, [Petri net class belongs to BPEL2oWFN.])
 # Check for the compiler generators and dot
 AC_PROG_YACC
 AC_PROG_LEX
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_STDBOOL
+AC_C_CONST
+AC_C_INLINE
+AC_TYPE_SIZE_T
+
+# Checks for library functions.
+AC_FUNC_ERROR_AT_LINE
+AC_FUNC_MALLOC
+AC_FUNC_REALLOC
+AC_CHECK_FUNCS([memset pow])
 
 AC_CHECK_PROG(KC, kc++, kc++, not found)
 if test "$KC" = "not found"; then

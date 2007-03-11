@@ -29,13 +29,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/03/04 13:40:41 $
+ * \date    \$Date: 2007/03/11 11:26:30 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.68 $
+ * \version \$Revision: 1.69 $
  */
 
 
@@ -153,30 +153,30 @@ void print_help()
   trace("Usage: " + program_name + " [OPTION]\n");
   trace("\n");
   trace("Options:\n");
-  trace(" -m, --mode=MODE            use the given mode\n");
-  trace(" -p, --parameter=PARAMETER  modify processing with given parameter\n");
-  trace(" -i, --input=FILE           read input from FILE\n");
-  trace(" -o, --output[=NAME]        write output to file (NAME sets filename)\n");
-  trace(" -f, --format=FORMAT        create output of the given format\n");
-  trace(" -l, --log=NAME             create log file (NAME sets filename)\n");
-  trace(" -d, --debug=NUMBER         set a debug level (NUMBER=1..4 or flex or bison)\n");
-  trace(" -h, --help                 print this help list and exit\n");
-  trace(" -v, --version              print program version and exit\n");
+  trace(" -m, --mode=MODE        use the given mode\n");
+  trace(" -p, --parameter=PARAM  modify processing with given parameter\n");
+  trace(" -i, --input=FILE       read input from FILE\n");
+  trace(" -o, --output[=NAME]    write output to file (NAME sets filename)\n");
+  trace(" -f, --format=FORMAT    create output of the given format\n");
+  trace(" -l, --log=NAME         create log file (NAME sets filename)\n");
+  trace(" -d, --debug=NUMBER     set a debug level (NUMBER=1..4 or \"flex\" or \"bison\")\n");
+  trace(" -h, --help             print this help list and exit\n");
+  trace(" -v, --version          print program version and exit\n");
   trace("\n");
   trace("  MODE is one of the following (at most one mode permitted):\n");
-  trace("    petrinet                create a Petri net representation\n");
-  trace("    ast                     print the abstract syntax tree\n");
-  trace("    pretty                  pretty-print the input BPEL process\n");
-  trace("    cfg                     build a control flow graph\n");
-  trace("    consistency             checks whether services communicate deadlock-freely\n");
+  trace("    petrinet            create a Petri net model\n");
+  trace("    ast                 print the abstract syntax tree\n");
+  trace("    pretty              pretty-print the input BPEL process\n");
+  trace("    cfg                 build a control flow graph\n");
+  trace("    consistency         checks whether services communicate deadlock-freely\n");
   trace("\n");
   trace("  PARAMETER is one of the following (multiple parameters permitted):\n");
-  trace("    reduce                  structurally simplify generated Petri net\n");
-  trace("    variables               model BPEL variables\n");
-  trace("    standardfaults          model BPEL standard faults\n");
-  trace("    fhfaults                model faults in fault handlers \n");
-  trace("    communicationonly       only model the communicational behavior\n");
-  trace("    xor                     use mutually exclusive transition condition\n");
+  trace("    reduce              structurally simplify generated Petri net\n");
+  trace("    variables           model BPEL variables\n");
+  trace("    standardfaults      model BPEL standard faults\n");
+  trace("    fhfaults            model faults in fault handlers \n");
+  trace("    communicationonly   only model the communicational behavior\n");
+  trace("    xor                 use mutually exclusive transition condition\n");
   trace("\n");
   trace("  FORMAT is one of the following (multiple formats permitted):\n");
   trace("    lola, owfn, dot, pep, apnn, ina, spin, info, pnml, txt, info\n");
@@ -199,12 +199,13 @@ void print_version()
 {
   // 80 chars
   //    "12345678901234567890123456789012345678901234567890123456789012345678901234567890"
-  trace(string(PACKAGE_STRING) + "\n\n");
-  trace("Copyright (C) 2006, 2007  Niels Lohmann, Christian Gierds and Martin Znamirowski\n");
-  trace("Copyright (C) 2005  Niels Lohmann and Christian Gierds\n\n");
+  trace(string(PACKAGE_STRING) + " (compiled " + string(__DATE__) + ")\n\n");
+  trace("Copyright (C) 2006, 2007 Niels Lohmann, Christian Gierds and Martin Znamirowski\n");
+  trace("Copyright (C) 2005 Niels Lohmann and Christian Gierds\n\n");
   trace("There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR\n");
   trace("PURPOSE. You may redistribute copies of " + string(PACKAGE_NAME) + " under the terms of the\n");
-  trace("GNU General Public License. See file COPYING for information.\n");
+  trace("GNU General Public License. See file COPYING for information.\n\n");
+  trace("See http://www.gnu.org/software/bpel2owfn for more information\n");
 }
 
 

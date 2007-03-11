@@ -32,7 +32,7 @@
  *
  * \since   2005-11-01
  *
- * \date    \$Date: 2007/03/09 12:17:08 $
+ * \date    \$Date: 2007/03/11 11:26:19 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  *          ast-to-petrinet.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.12 $
+ * \version \$Revision: 1.13 $
  */
 %}
 
@@ -189,7 +189,7 @@ CompensationHandler -> [petrinetnew:
   { PCompensationHandler($0, kc_current_view_base); }
 ];
 
-EventHandlers -> [petrinetnew:
+EventHandlers -> [petrinetnew petrinetsmall:
   { PEventHandlers($0, kc_current_view_base); }
 ];
 

@@ -29,7 +29,7 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/06 11:47:59 $
+ * \date    \$Date: 2007/03/11 11:26:19 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.7 $
+ * \version \$Revision: 1.8 $
  */
 %}
 
@@ -310,8 +310,20 @@ void PCompensationHandler(impl_tCompensationHandler* abstract_phylum, uview curr
 
 %{
 /*!
- * \fn void kc::PEventHandlers(impl_tEventHandlers* abstract_phylum, uview current_view)
- * \brief Pattern for the <eventHandlers> construct.
+ * \fn      void kc::PEventHandlers(impl_tEventHandlers* abstract_phylum, uview current_view)
+ *
+ * \brief   Pattern for the <eventHandlers> construct.
+ *
+ * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
+ * \param   current_view     the current unparse view
+ * 
+ * \todo    Use "receivingTransition" function in <onEvent> branches.
+ * 
+ * \todo    Implement <onAlarm> pattern.
+ *
+ * \todo    Implement <onAlarm> pattern with "repeatEvery" attribute.
+ *
+ * \todo    Check the pattern with stopping constructs.
  */
 %}
 void PEventHandlers(impl_tEventHandlers* abstract_phylum, uview current_view)
@@ -322,124 +334,127 @@ void PEventHandlers(impl_tEventHandlers* abstract_phylum, uview current_view)
   header(phylum->id, true);
   string prefix = toString(phylum->id) + ".internal.";
 
-  switch(current_view)
+  // Places.
+  Place *p1 = PN.newPlace(prefix + "initial");
+  Place *p2 = PN.newPlace(prefix + "disabled");
+  Place *p3 = PN.newPlace(prefix + "start");
+  Place *p4 = PN.newPlace(prefix + "active");
+  Place *p7 = PN.newPlace(prefix + "disabling");
+
+  // Initialize the event handlers.
+  Transition *t1 = PN.newTransition(prefix + "start_eh");
+  PN.newArc(p1, t1);
+  PN.newArc(t1, p3);
+  PN.newArc(t1, p4);
+
+  // Disable the event handlers.
+  Transition *t2 = PN.newTransition(prefix + "disable_eh");
+  PN.newArc(p7, t2);
+  PN.newArc(t2, p2);
+
+
+  // Stop places and stopping transitions.
+  if (current_view != petrinetsmall_enum)
   {
-    case(petrinetnew_enum):
-      {
-	Place *p1 = PN.newPlace(prefix + "initial");
-	Place *p2 = PN.newPlace(prefix + "running");
-	Place *p3 = PN.newPlace(prefix + "finishing");
-	Place *p4 = PN.newPlace(prefix + "final");
-	Place *p5 = PN.newPlace(prefix + "stop");
-	Place *p6 = PN.newPlace(prefix + "stopped");
-	Place *p11 = PN.newPlace(prefix + "stopping");
-        Place *p12 = PN.newPlace(prefix + "fault");
+    Place *p5 = PN.newPlace(prefix + "stop");
+    Place *p6 = PN.newPlace(prefix + "stopped");
 
-	Transition *t1 = PN.newTransition(prefix + "start_eh");
-	PN.newArc(p1, t1);
-	PN.newArc(t1, p2);
+    // Stop event handlers when active.
+    Transition *t7 = PN.newTransition(prefix + "stop_active");
+    PN.newArc(p4, t7);
+    PN.newArc(p5, t7);
 
-	Transition *t4 = PN.newTransition(prefix + "stop_running");
-	PN.newArc(p2, t4);
-	PN.newArc(p5, t4);
-	PN.newArc(t4, p11);
+    // Stop event handlers when disabling.
+    Transition *t8 = PN.newTransition(prefix + "stop_disabling");
+    PN.newArc(p5, t8);
+    PN.newArc(p7, t8);
 
-	Transition *t5 = PN.newTransition(prefix + "stop_finishing");
-        PN.newArc(p3, t5);
-        PN.newArc(p5, t5);
-	PN.newArc(t5, p11);
-
-	Transition *t6 = PN.newTransition(prefix + "eh_stopped");
-        PN.newArc(p11, t6);
-	PN.newArc(t6, p6);
-
-	Transition *t7 = PN.newTransition(prefix + "finish_eh");
-        PN.newArc(p3, t7);
-	PN.newArc(t7, p4);
-
-
-	// traverse the <onMessage> branches
-	unsigned int event_number = 1;
-	foreach(branch=OnMessage(my_corr, my_from, my_activity, my_integer); tOnMessage_list phylum->tOnMessage_list_1)
-	{
-	  assert(ASTEmap[my_integer->value] != NULL);
-	  my_activity->unparse(pseudoPrinter, current_view);
-
-	  Place *p7 = PN.newPlace(prefix + "pending." + toString(event_number));
-	  Place *p8 = PN.newPlace(prefix + "p8." + toString(event_number));
-	  Place *p9 = PN.newPlace(prefix + "p9." + toString(event_number));
-	  Place *p10 = PN.newPlace(prefix + "finished." + toString(event_number));
-
-          PN.newArc(t1, PN.findPlace(prefix + "pending." + toString(event_number)));
-          PN.newArc(t4, PN.findPlace(prefix + "p9." + toString(event_number)));
-          PN.newArc(t5, PN.findPlace(prefix + "p9." + toString(event_number)));
-          PN.newArc(PN.findPlace(prefix + "finished." + toString(event_number)), t6);
-          PN.newArc(PN.findPlace(prefix + "finished." + toString(event_number)), t7);
-
-          Transition *t2 = PN.newTransition(prefix + "event." + toString(event_number));
-          PN.newArc(PN.findPlace(prefix + "pending." + toString(event_number)), t2);
-          PN.newArc(p2, t2, READ);
-          PN.newArc(PN.findPlace("in." + ASTEmap[my_integer->value]->channelName), t2);
-          PN.newArc(t2, PN.findPlace(prefix + "p8." + toString(event_number)));
-
-          Transition *t3 = PN.newTransition(prefix + "finish." + toString(event_number));
-          PN.newArc(PN.findPlace(prefix + "pending." + toString(event_number)), t3);
-          PN.newArc(p3, t3, READ);
-          PN.newArc(t3, PN.findPlace(prefix + "finished." + toString(event_number)));
-
-	  PN.mergePlaces((prefix + "p8." + toString(event_number)),       (toString(my_activity->id) + ".internal.initial"));
-	  PN.mergePlaces((prefix + "p9." + toString(event_number)),       (toString(my_activity->id) + ".internal.stop"));
-	  PN.mergePlaces((prefix + "finished." + toString(event_number)), (toString(my_activity->id) + ".internal.stopped"));
-	  PN.mergePlaces((prefix + "pending." + toString(event_number)),  (toString(my_activity->id) + ".internal.final"));
-//	  PN.mergePlaces((prefix + "fault"),                              (toString(my_activity->id) + ".internal.fault")); // should be obsolete...
-
-	  event_number++;
-	}
-
-
-	// traverse the <onAlarm> branches
-	foreach(branch=OnAlarm(my_activity, my_integer); tOnAlarm_list phylum->tOnAlarm_list_1)
-	{
-	  assert(ASTEmap[my_integer->value] != NULL);
-	  my_activity->unparse(pseudoPrinter, current_view);
-
-	  Place *p7 = PN.newPlace(prefix + "pending." + toString(event_number));
-	  Place *p8 = PN.newPlace(prefix + "p8." + toString(event_number));
-	  Place *p9 = PN.newPlace(prefix + "p9." + toString(event_number));
-	  Place *p10 = PN.newPlace(prefix + "finished." + toString(event_number));
-
-          PN.newArc(t1, PN.findPlace(prefix + "pending." + toString(event_number)));
-          PN.newArc(t4, PN.findPlace(prefix + "p9." + toString(event_number)));
-          PN.newArc(t5, PN.findPlace(prefix + "p9." + toString(event_number)));
-          PN.newArc(PN.findPlace(prefix + "finished." + toString(event_number)), t6);
-          PN.newArc(PN.findPlace(prefix + "finished." + toString(event_number)), t7);
-
-          Transition *t2 = PN.newTransition(prefix + "event." + toString(event_number));
-          PN.newArc(PN.findPlace(prefix + "pending." + toString(event_number)), t2);
-          PN.newArc(p2, t2, READ);
-          PN.newArc(t2, PN.findPlace(prefix + "p8." + toString(event_number)));
-
-          Transition *t3 = PN.newTransition(prefix + "finish." + toString(event_number));
-          PN.newArc(PN.findPlace(prefix + "pending." + toString(event_number)), t3);
-          PN.newArc(p3, t3, READ);
-          PN.newArc(t3, PN.findPlace(prefix + "finished." + toString(event_number)));
-
-	  PN.mergePlaces((prefix + "p8." + toString(event_number)),       (toString(my_activity->id) + ".internal.initial"));
-	  PN.mergePlaces((prefix + "p9." + toString(event_number)),       (toString(my_activity->id) + ".internal.stop"));
-	  PN.mergePlaces((prefix + "finished." + toString(event_number)), (toString(my_activity->id) + ".internal.stopped"));
-	  PN.mergePlaces((prefix + "pending." + toString(event_number)),  (toString(my_activity->id) + ".internal.final"));
-//	  PN.mergePlaces((prefix + "fault"),                              (toString(my_activity->id) + ".internal.fault")); // should be obsolete
-
-          // \TODO check for <repeatEvery> 
-
-	  event_number++;
-	}
-
-	break;
-      }
-
-    default: { /* no pattern in this case */ }
+    // Event handlers stopped.
+    Transition *t11 = PN.newTransition(prefix + "eh_stopped");
+    PN.newArc(t11, p6);
   }
+
+
+  // Traverse the <onEvent> branches.
+  unsigned int event_number = 1;
+  foreach(branch=OnMessage(my_corr, my_from, my_activity, my_integer); tOnMessage_list phylum->tOnMessage_list_1)
+  {
+    header(my_integer->value, true);
+    string event = toString(event_number++);
+
+    // Unparse the embedded activity.
+    my_activity->unparse(pseudoPrinter, current_view);
+
+
+    // Places.
+    Place *p8 = PN.newPlace(prefix + "active." + event);
+    Place *p9 = PN.newPlace(prefix + "disabled." + event);
+    Place *p10 = PN.findPlace(my_activity->id, ".initial");
+    Place *p13 = PN.findPlace(my_activity->id, ".final");
+
+    // Start embedded activity.
+    Transition *t4 = PN.newTransition(prefix + "onEvent." + event);
+    PN.newArc(p8, t4);
+    PN.newArc(t4, p10);
+    PN.newArc(PN.findPlace("in." + ASTEmap[branch->id]->channelName), t4);
+
+    // Re-activate the <onEvent> handler.
+    Transition *t5 = PN.newTransition(prefix + "loop." + event);
+    PN.newArc(t5, p8);
+    PN.newArc(p13, t5);
+    PN.newArc(PN.findPlace(prefix + "active"), t5, READ);
+
+    // Disable <onEvent> handler (activity finished).
+    Transition *t6 = PN.newTransition(prefix + "disable_finished." + event);
+    PN.newArc(t6, p9);
+    PN.newArc(p13, t6);
+    PN.newArc(PN.findPlace(prefix + "disabling"), t6, READ);
+
+    // Disable <onEvent> handler (activity not started).
+    Transition *t12 = PN.newTransition(prefix + "disable_active." + event);
+    PN.newArc(t12, p9);
+    PN.newArc(p8, t12);
+    PN.newArc(PN.findPlace(prefix + "disabling"), t12, READ);
+
+
+    PN.newArc(t1, p8);
+    PN.newArc(p9, t2);
+
+
+    // Stop places and stopping transitions.
+    if (current_view != petrinetsmall_enum)
+    {
+      Place *p11 = PN.findPlace(my_activity->id, ".stop");
+      Place *p12 = PN.findPlace(my_activity->id, ".stopped");
+
+      Transition *t9 = PN.newTransition(prefix + "stop_active." + event);
+      PN.newArc(p8, t9);
+      PN.newArc(p11, t9);
+      PN.newArc(t9, p12);
+
+      Transition *t10 = PN.newTransition(prefix + "stop_disabled." + event);
+      PN.newArc(p9, t10);
+      PN.newArc(p11, t10);
+      PN.newArc(t10, p12);
+
+      Transition *t7 = PN.findTransition(prefix + "stop_active");
+      Transition *t8 = PN.findTransition(prefix + "stop_disabling");
+      Transition *t11 = PN.findTransition(prefix + "eh_stopped");    
+      PN.newArc(t7, p11);
+      PN.newArc(t8, p11);
+      PN.newArc(p12, t11);
+    }
+
+    footer(my_integer->value, true);
+  }
+
+
+  // Traverse the <onAlarm> branches.
+  foreach(branch=OnAlarm(my_activity, my_integer); tOnAlarm_list phylum->tOnAlarm_list_1)
+  {
+    /* todo */
+  }
+
 
   footer(phylum->id, true);
 }

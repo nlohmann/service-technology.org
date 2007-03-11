@@ -1,4 +1,5 @@
 /*****************************************************************************\
+ * Copyright 2007 Niels Lohmann, Christian Gierds                            *
  * Copyright 2006 Niels Lohmann                                              *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
@@ -25,11 +26,12 @@
  * \brief   Petri net patterns for BPEL's <scope> and <process>
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $ 
+ *          Christian Gierds <gierds@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/03/09 10:41:49 $
+ * \date    \$Date: 2007/03/11 11:26:19 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.32 $
+ * \version \$Revision: 1.33 $
  */
 %}
 
@@ -550,23 +552,51 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
 
     case(petrinetsmall_enum):
       {
-        cerr << "the handlers of the <scope>-activity will not be modelled!" << endl;
-
-	Place *p1 = PN.newPlace(prefix + "initial");
+        Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "final");
 
-
-	// unparse the standard elements
+        // Unparse the standard elements
 	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
-
-	// unparse the embedded activity
+        
+        // Unparse the embedded activity.
 	phylum->activity_1->unparse(pseudoPrinter, current_view);
 
-  
-	// Embed the inner activity.
-	PN.mergePlaces(phylum->id, ".internal.initial", phylum->activity_1->id, ".initial");
-	PN.mergePlaces(phylum->id, ".internal.final", phylum->activity_1->id, ".final");
 
+        if (ASTEmap[phylum->id]->hasEH == false)
+        {
+  	  // Embed the inner activity.
+  	  PN.mergePlaces(phylum->id, ".internal.initial", phylum->activity_1->id, ".initial");
+  	  PN.mergePlaces(phylum->id, ".internal.final", phylum->activity_1->id, ".final");
+        }
+
+
+        if (ASTEmap[phylum->id]->hasEH == true)
+        {
+	  Place *p3 = PN.newPlace(prefix + "activity_begin");
+	  Place *p4 = PN.newPlace(prefix + "activity_done");
+	  Place *p5 = PN.newPlace(prefix + "disabling_eh");
+	  Place *p6 = PN.newPlace(prefix + "active_eh");
+
+          Transition *t1 = PN.newTransition(prefix + "disable_eh");
+          PN.newArc(p4, t1);
+          PN.newArc(t1, p5);
+          PN.newArc(p6, t1);
+
+  	  // Unparse the event handlers.
+  	  phylum->tEventHandlers_1->unparse(pseudoPrinter, current_view);
+
+  	  // Embed the inner activity.
+  	  PN.mergePlaces(phylum->id, ".internal.activity_begin", phylum->activity_1->id, ".initial");
+  	  PN.mergePlaces(phylum->id, ".internal.activity_done", phylum->activity_1->id, ".final");
+
+          // Embed the event handlers.
+          PN.mergePlaces(phylum->id, ".internal.initial",        phylum->tEventHandlers_1->id, ".internal.initial");
+          PN.mergePlaces(phylum->id, ".internal.final",          phylum->tEventHandlers_1->id, ".internal.disabled");
+          PN.mergePlaces(phylum->id, ".internal.disabling_eh",   phylum->tEventHandlers_1->id, ".internal.disabling");
+          PN.mergePlaces(phylum->id, ".internal.active_eh",      phylum->tEventHandlers_1->id, ".internal.active");
+          PN.mergePlaces(phylum->id, ".internal.activity_begin", phylum->tEventHandlers_1->id, ".internal.start");
+        }
+  
 	break;
       }
 

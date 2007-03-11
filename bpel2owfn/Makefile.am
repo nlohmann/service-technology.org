@@ -19,11 +19,11 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/02/12 12:03:54 $ by $Author: nielslohmann $.
-# Version $Revision: 1.49 $
+# File last changed $Date: 2007/03/11 22:13:18 $ by $Author: nielslohmann $.
+# Version $Revision: 1.50 $
 
 # Where else are Makefiles?
-SUBDIRS = src tests doc
+SUBDIRS = src tests doc rpm
 
 # Which targets have no dependencies (i.e. always succeed)?
 .PHONY: binarydistreadme update
@@ -207,3 +207,20 @@ update:
 	rm bpel2owfn-experimental.tar
 	$(abs_top_srcdir)/bpel2owfn-*/configure
 	$(MAKE)
+
+
+
+
+## ---------------------------------------------------------------------------
+## Produce an rpm package using dist or from the given tarball
+#  Usage:
+#    make rpm-dist
+#    make release=1 rpm-dist
+#    make rpm-this
+#    make version=2.3.22 release=2 rpm-this
+#    make rpm-dist cparams='--enable-kanji --quiet' mparams='CFLAGS="-O2 -g"'
+
+rpm-dist: dist rpm-this
+
+rpm-this:
+	(cd rpm && $(MAKE) $(AM_MAKEFLAGS) rpm) || exit 1

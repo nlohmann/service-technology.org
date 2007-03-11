@@ -19,8 +19,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/09 10:04:37 $ by $Author: nielslohmann $.
-# Version $Revision: 1.34 $
+# File last changed $Date: 2007/03/11 22:13:18 $ by $Author: nielslohmann $.
+# Version $Revision: 1.35 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
@@ -94,7 +94,9 @@ fi
 AC_CONFIG_FILES([Makefile \
 	  doc/Makefile \
 	  src/Makefile \
-	  tests/Makefile
+	  tests/Makefile \
+	  rpm/Makefile \
+	  rpm/bpel2owfn.spec
 	  ])
 
 AC_OUTPUT

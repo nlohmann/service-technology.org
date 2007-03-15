@@ -54,16 +54,16 @@ class State;
 	\par History
 		- 2006-07-11 creation
  */
-class clause {
+class literal {
 public:
-	clause();
-	clause(graphEdge *);
-	~clause();
+	literal();
+	literal(graphEdge *);
+	~literal();
 	
 	bool fake;				//!< this literal has no real edge assigned to it yet (-> fake edge)
 		
 	graphEdge * edge;		//!< edge associated with this literal, does not need to be a real one in the graph
-	clause * nextElement;	//!< pointer to the next literal of this clause
+	literal * nextElement;	//!< pointer to the next literal of this clause
 
 	void addLiteral(const std::string&);  //!< add another literal to this clause
 	
@@ -76,7 +76,7 @@ public:
 
 // Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new
-    NEW_OPERATOR(clause)
+    NEW_OPERATOR(literal)
 #define new NEW_NEW
 };
 
@@ -94,17 +94,16 @@ public:
 	CNF();
 	~CNF();
 
-	clause * firstLiteral;			//!< pointer to the first literal of current clause
+	literal * firstLiteral;			//!< pointer to the first literal of current clause
 	CNF * nextElement;				//!< next element in CNF
 	bool isFinalState;				//!< indicates whether this clause belongs to a final state or not
 		
 	vertexColor getColor();			//!< returns the color of the CNF
 	vertexColor calcClauseColor();	//!< calculates the color of the clauses and thus of the CNF
-	
-	void addClause(clause *);		//!< adds a new clause to the CNF
-	void setEdge(graphEdge *);		//!< sets the real edge in all those literals of all clauses of this CNF if needed
 
-	int getNumberOfElements();		//!< returns the number of elements of this CNF
+//	void setEdge(graphEdge *);		//!< sets the real edge in all those literals of all clauses of this CNF if needed
+
+//	int getNumberOfElements();		//!< returns the number of elements of this CNF
 	
 	string getClauseString();			//!< returns the CNF's string
 

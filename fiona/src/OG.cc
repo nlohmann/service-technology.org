@@ -243,24 +243,25 @@ void operatingGuidelines::computeCNF(vertex* node) {
 			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) {
 				// we just consider the maximal states only
 				
-				clause * cl = new clause();
-				
 				// get the marking of this state
 				(*iter)->decodeShowOnly(PN);
 							
+				// this clause's first literal
+				literal * myFirstLiteral = new literal();
+				
 				// get the activated output events
 				for (unsigned int i = 0; i < PN->placeOutputCnt; i++) {
 					if (PN->CurrentMarking[PN->outputPlacesArray[i]->index] > 0) {
-						cl->addLiteral(PN->outputPlacesArray[i]->name);	
+						myFirstLiteral->addLiteral(PN->outputPlacesArray[i]->name);	
 					}
 				}
 
 				// get all the input events
 				for (unsigned int i = 0; i < PN->placeInputCnt; i++) {
-					cl->addLiteral(PN->inputPlacesArray[i]->name);
+					myFirstLiteral->addLiteral(PN->inputPlacesArray[i]->name);
 				}
 
-				node->addClause(cl, (*iter)->type == FINALSTATE);
+				node->addClause(myFirstLiteral, (*iter)->type == FINALSTATE);
 			}
 		}
 	} else {	// no state reduction
@@ -271,7 +272,7 @@ void operatingGuidelines::computeCNF(vertex* node) {
 			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {
 				// we just consider the maximal states only
 				
-				clause * cl = new clause();
+				literal * myFirstLiteral = new literal();
 				
 				// get the marking of this state
 				(*iter)->decodeShowOnly(PN);
@@ -279,16 +280,16 @@ void operatingGuidelines::computeCNF(vertex* node) {
 				// get the activated output events
 				for (unsigned int i = 0; i < PN->placeOutputCnt; i++) {
 					if (PN->CurrentMarking[PN->outputPlacesArray[i]->index] > 0) {
-						cl->addLiteral(PN->outputPlacesArray[i]->name);	
+						myFirstLiteral->addLiteral(PN->outputPlacesArray[i]->name);	
 					}
 				}
 
 				// get all the input events
 				for (unsigned int i = 0; i < PN->placeInputCnt; i++) {
-					cl->addLiteral(PN->inputPlacesArray[i]->name);
+					myFirstLiteral->addLiteral(PN->inputPlacesArray[i]->name);
 				}
 				
-				node->addClause(cl, (*iter)->type == FINALSTATE);
+				node->addClause(myFirstLiteral, (*iter)->type == FINALSTATE);
 			}
 		}
 	}

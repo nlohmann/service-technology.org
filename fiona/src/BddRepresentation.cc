@@ -508,7 +508,7 @@ DdNode* BddRepresentation::CNFtoBddAnn(CNF* myclause){
 	DdNode* clause1 = Cudd_Not(Cudd_ReadOne(mgrAnn));
     Cudd_Ref(clause1);
     
-	clause* currentLiteral = myclause->firstLiteral;  // get the first literal of the clause
+	literal* currentLiteral = myclause->firstLiteral;  // get the first literal of the clause
 
     while (currentLiteral) {
         if (currentLiteral->edge != NULL && 

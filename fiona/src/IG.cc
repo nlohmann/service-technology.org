@@ -351,7 +351,7 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 			// we just consider the maximal states only
 			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {	
 				
-				clause * cl = new clause();			// create a new clause for this particular state
+				literal * cl = new literal();			// create a new clause for this particular state
 			    (*iter)->decode(PN);				// get the marking for this state
 
 				if ((*iter)->quasiFirelist) {		// delete the list of quasi enabled transitions
@@ -403,7 +403,7 @@ void interactionGraph::getActivatedEventsComputeCNF(vertex * node, setOfMessages
 			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {	// we just consider the maximal states only
 				
 	
-				clause * cl = new clause();			// create a new clause for this particular state
+				literal * cl = new literal();			// create a new clause for this particular state
 				(*iter)->decode(PN);
 				
 				i = 0;
@@ -475,7 +475,7 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 	cout << "\t state "<< (*iter) << " activates the output events: " << endl;
 #endif		
 			unsigned int i = 0;
-			clause * cl = new clause();			// create a new clause for this particular state
+			literal * cl = new literal();			// create a new clause for this particular state
 
 			// "receiving before sending" reduction rule
 			while (!stateActivatesOutputEvents(*iter) && 
@@ -594,7 +594,7 @@ setOfMessages interactionGraph::combineReceivingEvents(vertex * node, setOfMessa
 	cout << "\t state "<< (*iter) << " activates the output events: " << endl;
 #endif		
 			unsigned int i = 0;
-			clause * cl = new clause();			// create a new clause for this particular state
+			literal * cl = new literal();			// create a new clause for this particular state
 
 			// "receiving before sending" reduction rule
 			while (!stateActivatesOutputEvents(*iter) && 
@@ -735,7 +735,7 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
 
 		if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {				// we just consider the maximal states only
 			i = 0;
-			clause * cl = new clause();
+			literal * cl = new literal();
 			
 			(*iter)->decode(PN);
 			while (!stateActivatesOutputEvents(*iter) && 

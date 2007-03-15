@@ -46,7 +46,7 @@ using namespace std;
 class State;
 class graphEdge;
 class successorNodeList;
-class clause;
+class literal;
 class CNF;
 
 
@@ -105,7 +105,7 @@ public:
     CNF * getAnnotation();
     string getCNFString();
     
-    void addClause(clause *, bool);
+    void addClause(literal *, bool);
     void setAnnotationEdges(graphEdge *);
    
 //	int numberOfElementsInAnnotation();

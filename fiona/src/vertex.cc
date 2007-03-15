@@ -141,12 +141,12 @@ bool vertex::addState(State * s) {
 }
 
 
-//! \fn void vertex::addClause(clause * newClause, bool _isFinalState)
-//! \param newClause the clause to be added to this CNF
+//! \fn void vertex::addClause(literal * myFirstLiteral, bool _isFinalState)
+//! \param myFirstLiteral the current clause's first literal
 //! \param _isFinalState determines whether clause points to a final state or not
-//! \brief adds the given clause to the CNF of the node
-void vertex::addClause(clause * newClause, bool _isFinalState) {
-    trace(TRACE_5, "vertex::addClause(clause * newClause) : start\n");
+//! \brief adds a new clause to the CNF of the node
+void vertex::addClause(literal * myFirstLiteral, bool _isFinalState) {
+    trace(TRACE_5, "vertex::addClause(literal * myFirstLiteral) : start\n");
 	
 	CNF * cnfElement = firstClause;
 	
@@ -155,23 +155,23 @@ void vertex::addClause(clause * newClause, bool _isFinalState) {
 	
 	if (cnfElement == NULL) {
 		firstClause = new CNF();
-		firstClause->addClause(newClause);
+		firstClause->firstLiteral = myFirstLiteral;
 		firstClause->isFinalState = _isFinalState;
-		trace(TRACE_5, "vertex::addClause(clause * newClause) : end\n");
+		trace(TRACE_5, "vertex::addClause(clause * myFirstLiteral) : end\n");
 //		cout << "number of elements in annotation of node " << numberOfVertex << " : " << numberOfElementsInAnnotation() << endl;
-		return ;	
+		return;
 	}
-	
+
 	while (cnfElement->nextElement) {		// get the last clause of the CNF
-		cnfElement = cnfElement->nextElement;	
+		cnfElement = cnfElement->nextElement;
 	}
 	cnfElement->nextElement = new CNF();
-	cnfElement->nextElement->addClause(newClause);	// create a new clause literal	
+	cnfElement->nextElement->firstLiteral = myFirstLiteral;	// create a new clause literal
 	cnfElement->nextElement->isFinalState = _isFinalState;
 
 //	cout << "number of elements in annotation of node " << numberOfVertex << " : " << numberOfElementsInAnnotation() << endl;
 		
-    trace(TRACE_5, "vertex::addClause(clause * newClause) : end\n");
+    trace(TRACE_5, "vertex::addClause(clause * myFirstLiteral) : end\n");
 }
 
 

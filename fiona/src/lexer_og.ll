@@ -46,6 +46,9 @@
 %{
 // c-code (wird übernommen)
 
+// We don't need yyunput().
+#define YY_NO_UNPUT
+
 #include "debug.h"
 #include "OGFromFile.h"
 #include "syntax_og.h"            // list of all tokens used

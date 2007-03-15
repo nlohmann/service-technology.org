@@ -76,7 +76,7 @@ owfnTransition::~owfnTransition() {
 }
 
 
-void owfnTransition::set_hashchange(oWFN * PN) {
+void owfnTransition::set_hashchange() {
 	unsigned int i;
 
 	hash_change = 0;
@@ -231,7 +231,7 @@ void owfnTransition::initialize(oWFN * PN) {
   ImproveDisabling[i] = (owfnTransition *) 0;
   PN->transNrQuasiEnabled = 0;
  
-  set_hashchange(PN);
+  set_hashchange();
 #ifdef STUBBORN
 	stamp =0;
 	NextStubborn = 0;

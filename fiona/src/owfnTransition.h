@@ -85,7 +85,7 @@ class owfnTransition : public Node {
   		
   		void check_enabled(oWFN *); // test if tr is enabled. If necessary, rearrange list
 		int hash_change; // change of hash value by firing t;
-		void set_hashchange(oWFN *);
+		void set_hashchange();
 		unsigned int lastdisabled; 	// dfsnum of last state where
 							  		// some fired transition disables this one
 		unsigned int lastfired; 	// dfsnum of last state where this tr. was fired

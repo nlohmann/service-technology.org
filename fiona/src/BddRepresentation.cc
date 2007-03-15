@@ -490,16 +490,16 @@ DdNode* BddRepresentation::annotationToBddAnn(vertex* v){
 }
 
 
-DdNode* BddRepresentation::CNFtoBddAnn(CNF* cl){
+DdNode* BddRepresentation::CNFtoBddAnn(CNF* myclause){
 	DdNode* tmp;
 	
-	if (cl == NULL) {		// since there is no clause we can't conclude anything
+	if (myclause == NULL) {		// since there is no clause we can't conclude anything
 		tmp = Cudd_Not(Cudd_ReadOne(mgrAnn));
 		Cudd_Ref(tmp);
 		return tmp;  //"(false)";	
 	}
 	
-	if (cl->isFinalState) {
+	if (myclause->isFinalState) {
 		tmp = Cudd_ReadOne(mgrAnn);
 		Cudd_Ref(tmp);
 		return tmp;  //"(true)";
@@ -508,16 +508,16 @@ DdNode* BddRepresentation::CNFtoBddAnn(CNF* cl){
 	DdNode* clause1 = Cudd_Not(Cudd_ReadOne(mgrAnn));
     Cudd_Ref(clause1);
     
-	clause* literal = cl->cl;  // get the first literal of the clause
+	clause* currentLiteral = myclause->firstLiteral;  // get the first literal of the clause
 
-    while (literal) {
-        if (literal->edge != NULL && 
-        	literal->edge->getNode() != NULL && 
-        	literal->edge->getNode()->getColor() != RED && 
-        	literal->edge->getNode()->reachGraphStateSet.size() > 0) {
+    while (currentLiteral) {
+        if (currentLiteral->edge != NULL && 
+        	currentLiteral->edge->getNode() != NULL && 
+        	currentLiteral->edge->getNode()->getColor() != RED && 
+        	currentLiteral->edge->getNode()->reachGraphStateSet.size() > 0) {
         			
 //            cout << "search for label " << literal->edge->getLabel() << " ...";
-            BddLabel* label = labelTable->lookup(literal->edge->getLabel().c_str());
+            BddLabel* label = labelTable->lookup(currentLiteral->edge->getLabel().c_str());
             //if (!l) { cout << "  Label not found\n"; exit(1);}
 //            cout << "   found: nbr = " << label->nbr << endl;
             int i = label->nbr;
@@ -526,7 +526,7 @@ DdNode* BddRepresentation::CNFtoBddAnn(CNF* cl){
     		Cudd_RecursiveDeref(mgrAnn, clause1);
     		clause1 = tmp;
         }   	
-    	literal = literal->nextElement;	
+    	currentLiteral = currentLiteral->nextElement;	
     }
       
 //	cout<< "clause: \n"; Cudd_PrintMinterm(mgrAnn, clause1);

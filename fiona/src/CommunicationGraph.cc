@@ -243,7 +243,7 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
 	            toAdd->eventsUsed[offset + i]++;
 			} else {
 				found->eventsUsed[offset + i]++;
-		}
+			}
         }
 
         if (found == NULL) {
@@ -253,12 +253,12 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
             toAdd->setNumber(numberOfNodes++);
 
             graphEdge * edgeSucc = new graphEdge(toAdd, label, type);
-            currentVertex->addSuccessorNode(edgeSucc);
-
-			currentVertex->setAnnotationEdges(edgeSucc);
-			
-            currentVertex = toAdd;
             numberOfEdges++;
+
+            currentVertex->addSuccessorNode(edgeSucc);
+			currentVertex->setAnnotationEdges(edgeSucc);
+
+            currentVertex = toAdd;
 
 			if (currentVertex->getColor() != RED) {
 		        graphEdge * edgePred = new graphEdge(currentVertex, label, type);
@@ -276,12 +276,11 @@ bool communicationGraph::AddVertex (vertex * toAdd, messageMultiSet messages, ed
             trace(TRACE_1, "\t successor node already known: " + intToString(found->getNumber()) + "\n");
 
             graphEdge * edgeSucc = new graphEdge(found, label, type);
-            currentVertex->addSuccessorNode(edgeSucc);
-
-			currentVertex->setAnnotationEdges(edgeSucc);
-			
             numberOfEdges++;
-            
+
+            currentVertex->addSuccessorNode(edgeSucc);
+			currentVertex->setAnnotationEdges(edgeSucc);
+
             if (currentVertex->getColor() != RED) {
 	    	    graphEdge * edgePred = new graphEdge(currentVertex, label, type);
 				found->addPredecessorNode(edgePred);            
@@ -325,11 +324,13 @@ vertex * communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeT
         toAdd->setNumber(numberOfNodes++);
         numberOfBlueNodes++;			// all nodes initially blue
 
+		// draw a new edge to the new node
         graphEdge * edgeSucc = new graphEdge(toAdd, edgeLabel, type);
+        numberOfEdges++;
 
 		currentVertex->addSuccessorNode(edgeSucc);
 		currentVertex->setAnnotationEdges(edgeSucc);
-	
+
         for (unsigned int i = 0; i < (PN->placeInputCnt + PN->placeOutputCnt); i++) {
             toAdd->eventsUsed[i] = currentVertex->eventsUsed[i];
         }
@@ -346,7 +347,6 @@ vertex * communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeT
         }
         
         currentVertex = toAdd;
-        numberOfEdges++;
 
         setOfVertices.insert(toAdd);
 
@@ -356,25 +356,25 @@ vertex * communicationGraph::AddVertex(vertex * toAdd, unsigned int label, edgeT
 
         return toAdd;
     } else {
-        trace(TRACE_1, "\t computed successor node already known: " + intToString(found->getNumber()) + "\n");
+		trace(TRACE_1, "\t computed successor node already known: " + intToString(found->getNumber()) + "\n");
 
-        graphEdge * edgeSucc = new graphEdge(found, edgeLabel, type);
-        
-        if (currentVertex->addSuccessorNode(edgeSucc)) {
-	        numberOfEdges++;
-        }
+		// draw a new edge to the old node
+		graphEdge * edgeSucc = new graphEdge(found, edgeLabel, type);
+		numberOfEdges++;
+
+		currentVertex->addSuccessorNode(edgeSucc);
 		currentVertex->setAnnotationEdges(edgeSucc);
 
-        if (type == receiving) {
-            offset = PN->placeInputCnt;
-        }
+		if (type == receiving) {
+			offset = PN->placeInputCnt;
+		}
 
 		if (currentVertex->getColor() != RED) {
 	        graphEdge * edgePred = new graphEdge(currentVertex, edgeLabel, type);
 			found->addPredecessorNode(edgePred);
 		}
 		
-        delete toAdd;
+		delete toAdd;
 	
 //		found->eventsUsed[offset + label]++;
 		
@@ -772,7 +772,7 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
                 } else if (v->reachGraphStateSet.size() == 0) {
                     CNF += "(true)";
                 } else {
-                	CNF += v->getCNF();
+                	CNF += v->getCNFString();
                 }
             }
 

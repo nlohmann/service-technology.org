@@ -50,15 +50,20 @@ using namespace std;
 
 //! \fn clause::clause()
 //! \brief constructor
-clause::clause() : fake(false), edge(NULL), nextElement(NULL) {
-	
+clause::clause() :
+	fake(false),
+	edge(NULL),
+	nextElement(NULL) {
+
 }
 
 
 //! \fn clause::clause(graphEdge * _edge)
 //! \param _edge the edge this clause is associated with
 //! \brief constructor
-clause::clause(graphEdge * _edge) : edge(_edge), nextElement(NULL) {
+clause::clause(graphEdge * _edge) :
+	edge(_edge),
+	nextElement(NULL) {
 	
 }
 
@@ -74,36 +79,16 @@ clause::~clause() {
 }
 
 
-//! \fn void clause::setEdge(graphEdge * _edge)
-//! \param _edge the edge that this clause shall be associated with
-//! \brief adds the given edge to this clause 
-void clause::setEdge(graphEdge * _edge) {
-    trace(TRACE_5, "clause::setEdge(graphEdge * edge) : start\n");
-	
-	if (edge != NULL) {
-		if (fake) {  // in case we have stored a "fake" edge, we delete that one
-			delete edge;	
-		} 
-	}
-	
-	fake = false;	// now we have a real edge! no fake one anymore
-	edge = _edge;   // set the edge stored to the one given
-
-    trace(TRACE_5, "clause::setEdge(graphEdge * edge) : end\n");
-	
-}
-
-
 //! \fn void clause::addLiteral(const string& label)
 //! \param label the label to be added to the clause list
-//! \brief adds the given label to the clause list
+//! \brief adds the given label to the list of literals
 void clause::addLiteral(const string& label) {
     trace(TRACE_5, "clause::addLiteral(char * label) : start\n");
 	
-	clause * cl = this;
+	clause * currentLiteral = this;
 	
 	// create a fake edge temporarily since the real edge has not been created yet,
-	// but we know, that this state has a clause with the given label
+	// but we know that this state has a literal with the given label
 	graphEdge * newEdge = new graphEdge(NULL, label, sending);
 	
 	if (!edge) {
@@ -113,13 +98,55 @@ void clause::addLiteral(const string& label) {
 		return ;	
 	}
 	
-	while (cl->nextElement) {		// get the last literal of the clause
-		cl = cl->nextElement;	
+	while (currentLiteral->nextElement) {		// get the last literal of the clause
+		currentLiteral = currentLiteral->nextElement;	
 	}	  
-	cl->nextElement = new clause(newEdge);	// create a new clause literal	
-	cl->nextElement->fake = true;			// since we don't have a real edge yet, we mark it as fake
+	currentLiteral->nextElement = new clause(newEdge);	// create a new clause literal	
+	currentLiteral->nextElement->fake = true;			// since we don't have a real edge yet, we mark it as fake
 	
     trace(TRACE_5, "clause::addLiteral(char * label) : end\n");
+}
+
+
+//! \fn void clause::setEdge(graphEdge * _edge)
+//! \param _edge the edge that this clause shall be associated with
+//! \brief adds the given edge to this clause
+void clause::setEdge(graphEdge * _edge) {
+    trace(TRACE_5, "clause::setEdge(graphEdge * edge) : start\n");
+	
+	assert(edge != NULL);
+	
+	if (fake) {  // in case we have stored a "fake" edge, we delete that one
+		delete edge;	
+	}
+
+	fake = false;	// now we have a real edge! no fake one anymore
+	edge = _edge;   // set the edge stored to the one given
+
+    trace(TRACE_5, "clause::setEdge(graphEdge * edge) : end\n");
+}
+
+
+//! \fn void clause::setEdges(graphEdge * edge)
+//! \param edge the edge that will replace a fake edge being stored in the literal's list
+//! \brief sets the literal's edges to the given edge
+void clause::setEdges(graphEdge * edge) {
+    trace(TRACE_5, "clause::setEdges(graphEdge * edge) : start\n");
+	
+ 	clause * currentLiteral = this;
+ 	
+ 	// iterate over all literals and replace all fake edges that have the label
+ 	// "edge" by the real edge
+ 	while (currentLiteral) {
+		if  (currentLiteral->edge != NULL && currentLiteral->edge->getLabel() == edge->getLabel()) {
+			// we have found a pseudo edge with that label, so store the correct edge right here
+			currentLiteral->setEdge(edge);
+			trace(TRACE_5, "clause::setEdges(graphEdge * edge) : end\n");		
+			return;
+		}
+ 		currentLiteral = currentLiteral->nextElement;
+ 	}
+    trace(TRACE_5, "clause::setEdges(graphEdge * edge) : end\n");
 }
 
 
@@ -162,31 +189,11 @@ string clause::getClauseString() {
 }
 
 
-//! \fn void clause::setEdges(graphEdge * edge)
-//! \param edge the edge that will replace a fake edge being stored in the literal's list
-//! \brief sets the literal's edges to the given edge
-void clause::setEdges(graphEdge * edge) {
-    trace(TRACE_5, "clause::setEdges(graphEdge * edge) : start\n");
-	
- 	clause * cl = this;
- 	
- 	while (cl) {
-		if  (cl->edge != NULL && cl->edge->getLabel() == edge->getLabel()) {
-			// we have found a pseudo edge with that label, so store the correct edge right here
-			cl->setEdge(edge);
-			trace(TRACE_5, "clause::setEdges(graphEdge * edge) : end\n");		
-			return;
-		}
- 		cl = cl->nextElement;
- 	}
-    trace(TRACE_5, "clause::setEdges(graphEdge * edge) : end\n");
-	
-}
-
-
 //! \fn CNF::CNF()
 //! \brief constructor
-CNF::CNF() : cl(NULL), nextElement(NULL) {
+CNF::CNF() :
+	firstLiteral(NULL),
+	nextElement(NULL) {
 
 }
 
@@ -194,7 +201,7 @@ CNF::CNF() : cl(NULL), nextElement(NULL) {
 //! \fn CNF::~CNF()
 //! \brief destructor, iterates over all clauses and deletes each one of them
 CNF::~CNF() {
-	clause * clauseTemp1 = cl;
+	clause * clauseTemp1 = firstLiteral;
 	clause * clauseTemp2;
 	
 	while (clauseTemp1) {
@@ -209,78 +216,79 @@ CNF::~CNF() {
 //! \param newClause the clause to be added to this CNF
 //! \brief adds the given clause to this CNF
 void CNF::addClause(clause * newClause) {
-	cl = newClause;
+	firstLiteral = newClause;
 }
 
 
 //! \fn vertexColor CNF::calcClauseColor()
-//! \return RED, if the state is a bad state (it is red ;-)), BLUE if it shurely is good, BLACK otherwise
-//! \brief RED, if the state is a bad state (it is red ;-)), BLUE if it shurely is good, BLACK otherwise
+//! \return RED, if the state is a bad state (it is red ;-)), BLUE if it shurely is good
+//! \brief RED, if the state is a bad state (it is red ;-)), BLUE if it shurely is good
 //! a state is RED, if all events it activates lead to bad nodes
 vertexColor CNF::calcClauseColor() {
 
 	trace(TRACE_5, "CNF::calcClauseColor(): start\n");
 
-	if (cl == NULL) {		// since there is no clause we can't conclude anything
+	if (firstLiteral == NULL) {		// since there is no clause we can't conclude anything
 		return RED;			// is not intended to happen
 	}
-	clause * literal = cl;			// point to the first literal of the clause
-	clause * literalPrev = NULL;
-	vertexColor clauseColor = BLACK;
+	clause * currentLiteral = firstLiteral;			// point to the first literal of the clause
+	clause * lastConsideredLiteral = NULL;
+	vertexColor clauseColor = RED;	// initially empty disjunction
 	
-	while (literal) {					// check the clause stored
+	while (currentLiteral) {
+		// check each literal of clause,
+		// clause gets BLUE if at least one literal points to a blue node
+
+		// bevor first case: the literal is a fake
+//		if (literal->fake) {
+//			// trace(TRACE_4, "successor for literal yet unknown\n");
+//			clauseColor = BLUE;
+//			break;
+//        }
 
 		// first case: the literal points to a blue node
-		if (literal->edge != NULL &&
-				literal->edge->getNode() != NULL && 
-				(literal->edge->getNode()->getColor() == BLUE
-					|| literal->edge->getNode()->getColor() == BLACK)) {
-		
-            clauseColor = BLUE;
-   //         trace(TRACE_4, "literal " +  + " points to a blue node " + intToString(literal->edge->getNode()->getNumber()) + "\n");
+		if (currentLiteral->edge != NULL && currentLiteral->edge->getNode() != NULL
+		   && (currentLiteral->edge->getNode()->getColor() == BLUE)) {
+
+			clauseColor = BLUE;
+			break;
         }
+
 		// second case: the literal points to a red node, so we delete that literal
-        if (literal->edge != NULL && 
-        		literal->edge->getNode() != NULL && 
-        		literal->edge->getNode()->getColor() == RED) {
-            // delete that literal in the clause since it points to a red node
+		if (currentLiteral->edge != NULL && currentLiteral->edge->getNode() != NULL
+        	     && currentLiteral->edge->getNode()->getColor() == RED) {
 			
-	//		trace(TRACE_4, "literal points to a red node " + intToString(literal->edge->getNode()->getNumber()) + " ... delete that one\n");
-			
-            if (literalPrev != NULL) {
-            	literalPrev->nextElement = literal->nextElement;
-            } else if (cl == literal) {
-            	cl = literal->nextElement;
-            	if (cl == NULL) {
-            		delete literal;
+            if (lastConsideredLiteral != NULL) {
+            	lastConsideredLiteral->nextElement = currentLiteral->nextElement;
+            } else if (firstLiteral == currentLiteral) {
+            	firstLiteral = currentLiteral->nextElement;
+            	if (firstLiteral == NULL) {
+            		delete currentLiteral;
             		trace(TRACE_5, "CNF::calcClauseColor(): end\n");
             		return RED;	
             	}
             }
             
-            clause * literalTemp = literal->nextElement;	// remember the next literal in list
+            clause * literalTemp = currentLiteral->nextElement;	// remember the next literal in list
       
-	        delete literal;
-            literal = literalTemp;		// get the remembered literal
-            continue ;
+	        delete currentLiteral;
+            currentLiteral = literalTemp;		// get the remembered literal
+            continue;
         }
-        
+
+
 		// third case: current literal cannot be evaluated
 		// therefore clause cannot be evaluated and is indefinite
 		// however, still removing red literals from clause
-        
-//        trace(TRACE_5, "literal points to a black node " + intToString(literal->edge->getNode()->getNumber()) + "\n");
-        literalPrev = literal;			// remember this literal
-		literal = literal->nextElement;	
+		// assert(false);
+		
+//		trace(TRACE_5, "literal points to a black node " + intToString(literal->edge->getNode()->getNumber()) + "\n");
+        lastConsideredLiteral = currentLiteral;			// remember this literal
+		currentLiteral = currentLiteral->nextElement;
 	}
 	
 	trace(TRACE_5, "CNF::calcClauseColor(): end\n");
 	
-//	if (indefinite) {
-//		return BLACK;
-//	} else {
-//	    return RED;
-//	}
 	return clauseColor;
 }
 
@@ -288,11 +296,12 @@ vertexColor CNF::calcClauseColor() {
 //! \fn string CNF::getCNFString()
 //! \return the CNF as a string
 //! \brief returns the CNF as a string
-string CNF::getCNFString() {
+string CNF::getClauseString() {
 	
     string clauseString = "";
 
-	if (cl == NULL) {		// since theres is no clause we can't conclude anything
+	// rekursive break
+	if (firstLiteral == NULL) {		// since theres is no clause we can't conclude anything
 		return "(false)";	
 	}
 	
@@ -300,19 +309,10 @@ string CNF::getCNFString() {
 		return "(true)";
 	}
 
-	clause * literal = cl;  // get the first literal of the clause
-
- //   while (literal) {
- //       if (moreThanOne) {
- //       	clauseString += " + ";	
- //       }
-        clauseString += literal->getClauseString();
- //       moreThanOne = true;
-            	
- //   	literal = literal->nextElement;	
- //   }
-    
-    return clauseString;
+	// rekursively going down
+	clause * currentLiteral = firstLiteral;  // get the first literal of the clause
+	clauseString += currentLiteral->getClauseString();
+	return clauseString;
 }
 
 
@@ -320,7 +320,7 @@ string CNF::getCNFString() {
 //! \param edge
 //! \brief sets the the clause's edge to the given edge
 void CNF::setEdge(graphEdge * edge) {
- 	clause * clauseTemp = cl;
+ 	clause * clauseTemp = firstLiteral;
  	clause * clausePrev = NULL;
  	
  	if (edge->getNode() && edge->getNode()->getColor() != RED) {
@@ -329,7 +329,7 @@ void CNF::setEdge(graphEdge * edge) {
 			if  (clauseTemp->edge != NULL && clauseTemp->edge->getLabel() == edge->getLabel()) {
 				// we have found a pseudo edge with that label, so store the correct edge right here
 				if (clausePrev == NULL) {
-					cl = clauseTemp->nextElement;
+					firstLiteral = clauseTemp->nextElement;
 				} else {
 					clausePrev->nextElement = clauseTemp->nextElement;
 				}				
@@ -347,13 +347,13 @@ void CNF::setEdge(graphEdge * edge) {
 }
 
 
-int CNF::numberOfElements() {
-	clause * literal = cl;
+int CNF::getNumberOfElements() {
+	clause * currentLiteral = firstLiteral;
  	int count = 0;
 
- 	while (literal) {
+ 	while (currentLiteral) {
  		count++;
-		literal = literal->nextElement;
+		currentLiteral = currentLiteral->nextElement;
  	}
 	
 	return count;

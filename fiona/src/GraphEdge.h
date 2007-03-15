@@ -41,33 +41,30 @@
 
 using namespace std;
 
-
 class vertex;
-
 
 class graphEdge {
 
-
 private:
-    vertex * node;				/*!< pointer to the node this arc is pointing to */
-    std::string label;				/*!< label of the arc (usually the name of the event) */
-    edgeType type;  			/*!< type of the arc (sending, receiving) */
-    graphEdge * nextElement;	/*!< pointer to the next element in list */
-    
+    vertex * node;				//!< pointer to the node this arc is pointing to
+    std::string label;			//!< label of the arc (usually the name of the event)
+    edgeType type;  			//!< type of the arc (sending, receiving)
+    graphEdge * nextElement;	//!< pointer to the next element in list
+
 public:
 	graphEdge(vertex *, const string&, edgeType);
-	~graphEdge();	
+	~graphEdge();
 	void setNextElement(graphEdge *);
 	graphEdge * getNextElement();
 	std::string getLabel() const;
 	edgeType getType();
 	vertex * getNode();
 	void setNode(vertex *);
-    
-    // Provides user defined operator new. Needed to trace all new operations
-    // on this class.
+
+// Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new
     NEW_OPERATOR(graphEdge)
 #define new NEW_NEW
 };
 #endif //GRAPHEDGE_H
+

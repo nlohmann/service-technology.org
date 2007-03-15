@@ -60,10 +60,10 @@ public:
 	clause(graphEdge *);
 	~clause();
 	
-	bool fake;			//!< this literal has no real edge assigned to it yet (-> fake edge)
+	bool fake;				//!< this literal has no real edge assigned to it yet (-> fake edge)
 		
-	graphEdge * edge;	//!< edge associated with this literal, does not need to be a real one in the graph
-	clause * nextElement; //!< pointer to the next literal of this clause
+	graphEdge * edge;		//!< edge associated with this literal, does not need to be a real one in the graph
+	clause * nextElement;	//!< pointer to the next literal of this clause
 
 	void addLiteral(const std::string&);  //!< add another literal to this clause
 	
@@ -74,8 +74,7 @@ public:
 	
 	vertexColor getColor();	//!< calculates the color of this clause
 
-    // Provides user defined operator new. Needed to trace all new operations
-    // on this class.
+// Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new
     NEW_OPERATOR(clause)
 #define new NEW_NEW
@@ -95,7 +94,7 @@ public:
 	CNF();
 	~CNF();
 
-	clause * cl;					//!< pointer to the clause
+	clause * firstLiteral;			//!< pointer to the first literal of current clause
 	CNF * nextElement;				//!< next element in CNF
 	bool isFinalState;				//!< indicates whether this clause belongs to a final state or not
 		
@@ -105,12 +104,11 @@ public:
 	void addClause(clause *);		//!< adds a new clause to the CNF
 	void setEdge(graphEdge *);		//!< sets the real edge in all those literals of all clauses of this CNF if needed
 
-	int numberOfElements();			//!< returns the number of elements of this CNF
+	int getNumberOfElements();		//!< returns the number of elements of this CNF
 	
-	string getCNFString();			//!< returns the CNF's string
+	string getClauseString();			//!< returns the CNF's string
 
-    // Provides user defined operator new. Needed to trace all new operations
-    // on this class.
+// Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new
     NEW_OPERATOR(CNF)
 #define new NEW_NEW

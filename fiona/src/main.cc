@@ -402,8 +402,11 @@ int main(int argc, char ** argv) {
 		    	    trace(TRACE_0, "    number of edges: " + intToString(graph->getNumberOfEdges()) + "\n");
 					trace(TRACE_0, "    (numberDeletedVertices: " + intToString(numberDeletedVertices) + ")\n");
 		                
+		            trace(TRACE_5, "printNodeStatistics...\n");
 		            graph->printNodeStatistics();
+			        trace(TRACE_5, "printDotFile...\n");
 			        graph->printDotFile();
+			        trace(TRACE_5, "printOGFile...\n");
 			        graph->printOGFile();
 			        
 			        if (options[O_OTF]) {

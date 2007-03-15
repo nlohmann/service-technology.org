@@ -128,7 +128,7 @@ public:
     
     unsigned int getNumberOfNodes() const;
     unsigned int getNumberOfEdges() const;
-
+    
     unsigned int getNumberOfBlueNodes();
     unsigned int getNumberOfBlueEdges() const;
 

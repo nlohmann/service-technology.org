@@ -141,7 +141,7 @@ private:
         OGFromFileNode* parentNode);
     OGFromFileNode* getParentNodeForTransitionLabel(
         const std::string& transitionLabel) const;
-    OGFromFileFormula* annotation;
+    OGFromFileFormula* firstClause;
     OGFromFileNode* depthFirstSearchParent;
 public:
     OGFromFileNode(const std::string& name_, OGFromFileFormula* annotation_);

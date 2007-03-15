@@ -44,10 +44,10 @@ using namespace std;
 //! \fn successorNodeList::successorNodeList()
 //! \brief constructor 
 successorNodeList::successorNodeList() : 
-	firstElement(NULL), 
-	nextElement(NULL) 
-{
-	end = false;		
+	firstElement(NULL),
+	nextElement(NULL) {
+
+	duringIteration = true;
 }
 
 //! \fn successorNodeList::~successorNodeList()
@@ -61,96 +61,72 @@ successorNodeList::~successorNodeList() {
 //! \brief deletes the whole list recursively
 void successorNodeList::deleteList(graphEdge * element) {
 	if (element == NULL) {
-		return ;
+		return;
 	} else {
 		deleteList(element->getNextElement());
 	}
-	if (element != NULL) {
-		delete element;
-	}
+
+	delete element;
 }
 
-//! \fn bool successorNodeList::addNextNode(graphEdge * transition)
-//! \param transition the transition/ edge which is to be added to the list
-//! \return  true, if everything is fine, false otherwise
-//! \brief adding an additional node to the end of the list 
-bool successorNodeList::addNextNode(graphEdge * transition){
-/* TODO: return true if everythings okay, false otherwise */
-	
-	//graphEdge * transition = new graphEdge(node, label, type);
+//! \fn void successorNodeList::addNextNode(graphEdge * newEdge)
+//! \param newEdge the edge which is to be added to the list
+//! \brief adding an additional node to the end of the list
+void successorNodeList::addNextNode(graphEdge * newEdge) {
+
 	if (firstElement == NULL) {
-		firstElement = transition;
-		return true;	
+		firstElement = newEdge;
+		return;
 	}
 
-	graphEdge * tmpEdge;
-	
-	tmpEdge = firstElement;
-	
+	graphEdge * tmpEdge = firstElement;
+
 	while (tmpEdge) {
-		// test if this edge is already stored
-		if (tmpEdge->getNode() == transition->getNode() && 
-				tmpEdge->getType() == transition->getType() &&
-				tmpEdge->getLabel() == transition->getLabel()) {
-			// yes, we have such an edge already -> return false, because no annotation shall be added either
-			return false;	
-		}
 		if (tmpEdge->getNextElement() != NULL) {
-			tmpEdge = tmpEdge->getNextElement();	
+			tmpEdge = tmpEdge->getNextElement();
 		} else {
-			tmpEdge->setNextElement(transition);
-			return true;
+			tmpEdge->setNextElement(newEdge);
+			return;
 		}
 	}
-	return true;
+	return;
 }
 
-//! \fn void successorNodeList::setFirstElement(graphEdge * _edge)
-//! \param _edge the new first element
-//! \brief sets the first element of the list to _edge
-void successorNodeList::setFirstElement(graphEdge * _edge) {
-	firstElement = _edge;
-}
-
-//! \fn graphEdge * successorNodeList::getFirstElement()
-//! \return the first element of the list
-//! \brief returns the first element of the list
-graphEdge * successorNodeList::getFirstElement(){
-	return firstElement;
-}
-
-//! \fn graphEdge * successorNodeList::findElement(vertex * node)
-//! \param node pointer to the node to be searched for
-//! \return a pointer to the corresponding graphEdge, or NULL if the search did not succeed
-//! \brief searches for an element in the list ??? do we need this function ??? no implementation yet!
-graphEdge * successorNodeList::findElement(vertex * /*node*/) {
-	return NULL;
-}
 
 //! \fn void successorNodeList::resetIterating()
 //! \brief resets the iteration through the list, so one can start a whole new iteration
 void successorNodeList::resetIterating() {
 	nextElement = NULL;
-	end = false;	
+	duringIteration = true;
 }
+
 
 //! \fn graphEdge * successorNodeList::getNextElement()
 //! \return a pointer to the next graphEdge in case of iterating through the list, NULL if the end of the list has been reached
 //! \brief returns a pointer to the next graphEdge in case of iterating through the list, NULL if the end of the list has been reached
 graphEdge * successorNodeList::getNextElement() {
-	if (!end) {
+	if (duringIteration) {
+		// we have to return the next element
 		if (nextElement == NULL) {
+			// next element is the first one
 			nextElement = firstElement;
+			return nextElement;
 		} else {
+			// return successor if not the last node
 			nextElement = nextElement->getNextElement();
 			if (nextElement == NULL) {
-				end = true;
+				duringIteration = false;
 			}
+			return nextElement;
 		}
-		return nextElement;
+	} else {
+		// last time we gave back the last node
+		nextElement = NULL;
+		duringIteration = true;
+		return NULL;
 	}
-	return NULL;
 }
+
 
 //! \fn void successorNodeList::removeNodeFromList(vertex * node, bool iterating)
 //! \param node a pointer to the node that shall be remove from the list
@@ -158,7 +134,7 @@ graphEdge * successorNodeList::getNextElement() {
 //! \brief remove the given node from the list
 void successorNodeList::removeNodeFromList(vertex * node, bool iterating) {
 	if (firstElement == NULL) {
-		return ;	
+		return;	
 	}
 
 	graphEdge * prevEdge = firstElement;

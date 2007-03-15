@@ -62,68 +62,70 @@ typedef std::set<State*, StateCompare> StateSet;
 class vertex {
 
 protected:
+    unsigned int numberOfVertex;			//!< number of this vertex in the graph
+
 	vertexColor color; 						//!< color of vertex
+    CNF * firstClause;						//!< annotation of this node (a CNF)
+
 	successorNodeList * successorNodes;		//!< list of all the nodes succeeding this one 
 											//!< including the edge between them
 	
 	successorNodeList * predecessorNodes;	//!< list of all blue nodes preceding this one 
 											//!< including the edge between them
 
-    unsigned int numberOfVertex;			//!< number of this vertex in the graph
-
 public:
+	// vertex management
 	vertex(int);
 	~vertex ();
-	
-    CNF * annotation;						//!< annotation of this node (a CNF)
 
 	int * eventsUsed;
 	int eventsToBeSeen;
-	bool finalAnalysisDone;
 	
-    unsigned int getNumber() const;
+    unsigned int getNumber() const;    
+    void setNumber(unsigned int);
+
+	// states in vertex
+    bool addState(State *);
+    int getNumberOfDeadlocks();
     
     StateSet reachGraphStateSet;		// this set contains only a reduced number of states in case the state reduced graph is to be build
 //    StateSet setOfStatesTemp;	// this set contains all states
-    
-    void setNumber(unsigned int);
-    bool addSuccessorNode(graphEdge *);
-    bool addPredecessorNode(graphEdge *);
-    
-    bool addState(State *);
+
+	// traversing successors/predecessors
+    void addSuccessorNode(graphEdge *);
+    void addPredecessorNode(graphEdge *);
+
+    graphEdge * getNextSuccEdge();
+    graphEdge * getNextPredEdge();
+
+    void resetIteratingSuccNodes();
+    void resetIteratingPredNodes();
+
+	// annotation
+    CNF * getAnnotation();
+    string getCNFString();
     
     void addClause(clause *, bool);
     void setAnnotationEdges(graphEdge *);
    
-	int numberOfElementsInAnnotation();
- 
-    graphEdge * getNextSuccEdge();
-    graphEdge * getNextPredEdge();
+//	int numberOfElementsInAnnotation();
 
-    successorNodeList * getSuccessorNodes();
-    
-    void resetIteratingSuccNodes();
-    void resetIteratingPredNodes();
-   
-    void setColor(vertexColor c);
-    vertexColor getColor();
-    
-    string getCNF();
-    CNF * getAnnotation();
-    
-    int getNumberOfDeadlocks();
+	// analysis   
+	bool finalAnalysisDone;
+
     analysisResult analyseNode(bool);
-    
+
+    vertexColor getColor();
+    void setColor(vertexColor c);
+
     void propagateToSuccessors();
     void propagateToPredecessors();
-    
-    
-//    friend bool operator == (vertex const&, vertex const& );		// could be changed and replaced by hash-value
-    friend bool operator < (vertex const&, vertex const& );
-//    friend ostream& operator << (std::ostream& os, const vertex& v);
 
-    // Provides user defined operator new. Needed to trace all new operations
-    // on this class.
+//	friend bool operator == (vertex const&, vertex const& );		// could be changed and replaced by hash-value
+	friend bool operator < (vertex const&, vertex const& );
+//	friend ostream& operator << (std::ostream& os, const vertex& v);
+
+// Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new
     NEW_OPERATOR(vertex)
 #define new NEW_NEW

@@ -176,7 +176,8 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 				delete v;
 			} else {
 				if (v = AddVertex(v, i, sending)) {
-					buildGraph(v, your_progress);	// going down with sending event...
+					// node was new, hence going down with sending event...
+					buildGraph(v, your_progress);
 	
 					trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 //					analyseNode(currentNode, false);
@@ -230,7 +231,7 @@ void operatingGuidelines::computeCNF(vertex* node) {
 	
 	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): start\n");
 	
-	assert(node->annotation == NULL);
+	assert(node->getAnnotation() == NULL);
 	
 	StateSet::iterator iter;			// iterator over the states of the node
 	
@@ -361,7 +362,7 @@ void operatingGuidelines::printNodesToOGFile(vertex * v, fstream& os,
     os << "  " << NodeNameForOG(v);
 
     // print node annotation
-    os << " : " << v->getCNF();
+    os << " : " << v->getCNFString();
 
     // mark current node as visited
     visitedNodes[v->getNumber()] = true;

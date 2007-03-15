@@ -46,8 +46,8 @@
 graphEdge::graphEdge(vertex * nodeP, const string& labelP, edgeType typeP) {
 	node = nodeP;
 	label = labelP;
-	type = typeP; 
-	nextElement = NULL;	
+	type = typeP;
+	nextElement = NULL;
 }
  
 //! \fn graphEdge::~graphEdge()

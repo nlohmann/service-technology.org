@@ -167,10 +167,11 @@ std::string OGFromFileFormulaProposition::asString() const
     return proposition;
 }
 
-OGFromFileNode::OGFromFileNode(const std::string& name_,
-    OGFromFileFormula* annotation_) :
-    name(name_), annotation(annotation_), depthFirstSearchParent(NULL)
-{
+OGFromFileNode::OGFromFileNode(const std::string& name_, OGFromFileFormula* annotation_) :
+    name(name_),
+	firstClause(annotation_),
+	depthFirstSearchParent(NULL) {
+
 }
 
 OGFromFileNode::~OGFromFileNode()
@@ -181,7 +182,7 @@ OGFromFileNode::~OGFromFileNode()
         delete *trans_iter;
     }
 
-    delete annotation;
+    delete firstClause;
 }
 
 void OGFromFileNode::addParentNodeForTransitionLabel(
@@ -254,14 +255,14 @@ OGFromFileNode* OGFromFileNode::backfireTransitionWithLabel(
 bool OGFromFileNode::assignmentSatisfiesAnnotation(
     const OGFromFileFormulaAssignment& assignment) const
 {
-    assert(annotation != NULL);
-    return annotation->satisfies(assignment);
+    assert(firstClause != NULL);
+    return firstClause->satisfies(assignment);
 }
 
 std::string OGFromFileNode::getAnnotationAsString() const
 {
-    assert(annotation != NULL);
-    return annotation->asString();
+    assert(firstClause != NULL);
+    return firstClause->asString();
 }
 
 void OGFromFileNode::setDepthFirstSearchParent(

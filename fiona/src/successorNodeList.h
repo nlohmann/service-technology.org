@@ -49,27 +49,22 @@ class successorNodeList {
 private:    
     graphEdge * firstElement;	//!< pointer to the first element of the list
     graphEdge * nextElement;	//!< pointer to the next element in the list while iterating through the list
+public:    
+    bool duringIteration;			/*!< we have reached the end of the iterating process, or not */
     
-    bool end;			/*!< we have reached the end of the iterating process, or not */
-    
-public:
+//public:
     successorNodeList();    
     ~successorNodeList(); 
     
     void deleteList(graphEdge *);   
-    bool addNextNode(graphEdge *);
-    
-    void setFirstElement(graphEdge *);
-    graphEdge * getFirstElement();
-    graphEdge * findElement(vertex * node);
+    void addNextNode(graphEdge *);
     
     void resetIterating();
     graphEdge * getNextElement();
     
 	void removeNodeFromList(vertex *, bool);
     
-    // Provides user defined operator new. Needed to trace all new operations
-    // on this class.
+// Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new
     NEW_OPERATOR(successorNodeList)
 #define new NEW_NEW

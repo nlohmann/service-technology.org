@@ -38,7 +38,6 @@
 #include <string>
 #include <ostream>
 #include <set>
-//#include "state.h"
 
 #include "enums.h"
 
@@ -52,23 +51,16 @@ class CNF;
 
 
 struct StateCompare {
-
   bool operator() ( State const * left, State const * right) {
-//    if (left->minimal && right->minimal) {
 	    return (left < right);
-//    } else {
-//    	return false;
-//    }
   }
-
-}; // StateCompare 
-
+}; // StateCompare
 
 typedef std::set<State*, StateCompare> StateSet;
 
 
-class vertex
-{
+class vertex {
+
 protected:
 	vertexColor color; 						//!< color of vertex
 	successorNodeList * successorNodes;		//!< list of all the nodes succeeding this one 
@@ -77,9 +69,8 @@ protected:
 	successorNodeList * predecessorNodes;	//!< list of all blue nodes preceding this one 
 											//!< including the edge between them
 
-    unsigned int numberOfVertex;					//!< number of this vertex in the graph
-    
-    
+    unsigned int numberOfVertex;			//!< number of this vertex in the graph
+
 public:
 	vertex(int);
 	~vertex ();

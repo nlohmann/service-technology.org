@@ -58,7 +58,7 @@ class clause {
 public:
 	clause();
 	clause(graphEdge *);
-	~clause();	
+	~clause();
 	
 	bool fake;			//!< this literal has no real edge assigned to it yet (-> fake edge)
 		
@@ -95,19 +95,19 @@ public:
 	CNF();
 	~CNF();
 
-	clause * cl;				//!< pointer to the clause
-	CNF * nextElement;			//!< next element in CNF
-	bool isFinalState;			//!< indicates whether this clause belongs to a final state or not
+	clause * cl;					//!< pointer to the clause
+	CNF * nextElement;				//!< next element in CNF
+	bool isFinalState;				//!< indicates whether this clause belongs to a final state or not
 		
-	vertexColor getColor();		//!< returns the color of the CNF
+	vertexColor getColor();			//!< returns the color of the CNF
 	vertexColor calcClauseColor();	//!< calculates the color of the clauses and thus of the CNF
 	
-	void addClause(clause *);	//!< adds a new clause to the CNF
-	void setEdge(graphEdge *);	//!< sets the real edge in all those literals of all clauses of this CNF if needed
+	void addClause(clause *);		//!< adds a new clause to the CNF
+	void setEdge(graphEdge *);		//!< sets the real edge in all those literals of all clauses of this CNF if needed
 
-	int numberOfElements();	//!< returns the number of elements of this CNF
+	int numberOfElements();			//!< returns the number of elements of this CNF
 	
-	string getCNFString();	//!< returns the CNF's string
+	string getCNFString();			//!< returns the CNF's string
 
     // Provides user defined operator new. Needed to trace all new operations
     // on this class.

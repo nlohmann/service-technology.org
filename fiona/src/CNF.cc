@@ -54,6 +54,7 @@ clause::clause() : fake(false), edge(NULL), nextElement(NULL) {
 	
 }
 
+
 //! \fn clause::clause(graphEdge * _edge)
 //! \param _edge the edge this clause is associated with
 //! \brief constructor
@@ -61,15 +62,17 @@ clause::clause(graphEdge * _edge) : edge(_edge), nextElement(NULL) {
 	
 }
 
+
 //! \fn clause::~clause()
 //! \brief destructor
 clause::~clause() {
 	trace(TRACE_5, "clause::~clause() : start\n");
 	if (edge != NULL && fake) {
-		 delete edge;	
+		 delete edge;
 	}
 	trace(TRACE_5, "clause::~clause() : end\n");
 }
+
 
 //! \fn void clause::setEdge(graphEdge * _edge)
 //! \param _edge the edge that this clause shall be associated with
@@ -89,6 +92,7 @@ void clause::setEdge(graphEdge * _edge) {
     trace(TRACE_5, "clause::setEdge(graphEdge * edge) : end\n");
 	
 }
+
 
 //! \fn void clause::addLiteral(const string& label)
 //! \param label the label to be added to the clause list
@@ -117,6 +121,7 @@ void clause::addLiteral(const string& label) {
 	
     trace(TRACE_5, "clause::addLiteral(char * label) : end\n");
 }
+
 
 //! \fn string clause::getClauseString()
 //! \return the clause as a string
@@ -156,6 +161,7 @@ string clause::getClauseString() {
     return clauseString;
 }
 
+
 //! \fn void clause::setEdges(graphEdge * edge)
 //! \param edge the edge that will replace a fake edge being stored in the literal's list
 //! \brief sets the literal's edges to the given edge
@@ -177,11 +183,13 @@ void clause::setEdges(graphEdge * edge) {
 	
 }
 
+
 //! \fn CNF::CNF()
 //! \brief constructor
 CNF::CNF() : cl(NULL), nextElement(NULL) {
 
 }
+
 
 //! \fn CNF::~CNF()
 //! \brief destructor, iterates over all clauses and deletes each one of them
@@ -196,12 +204,14 @@ CNF::~CNF() {
 	}
 }
 
+
 //! \fn void CNF::addClause(clause * newClause)
 //! \param newClause the clause to be added to this CNF
 //! \brief adds the given clause to this CNF
 void CNF::addClause(clause * newClause) {
 	cl = newClause;
 }
+
 
 //! \fn vertexColor CNF::calcClauseColor()
 //! \return RED, if the state is a bad state (it is red ;-)), BLUE if it shurely is good, BLACK otherwise
@@ -274,6 +284,7 @@ vertexColor CNF::calcClauseColor() {
 	return clauseColor;
 }
 
+
 //! \fn string CNF::getCNFString()
 //! \return the CNF as a string
 //! \brief returns the CNF as a string
@@ -304,6 +315,7 @@ string CNF::getCNFString() {
     return clauseString;
 }
 
+
 //! \fn void CNF::setEdge(graphEdge * edge)
 //! \param edge
 //! \brief sets the the clause's edge to the given edge
@@ -312,27 +324,28 @@ void CNF::setEdge(graphEdge * edge) {
  	clause * clausePrev = NULL;
  	
  	if (edge->getNode() && edge->getNode()->getColor() != RED) {
-	
+
 	 	while (clauseTemp) {
 			if  (clauseTemp->edge != NULL && clauseTemp->edge->getLabel() == edge->getLabel()) {
 				// we have found a pseudo edge with that label, so store the correct edge right here
 				if (clausePrev == NULL) {
-					cl = clauseTemp->nextElement;	
+					cl = clauseTemp->nextElement;
 				} else {
 					clausePrev->nextElement = clauseTemp->nextElement;
 				}				
 			}
 			clausePrev = clauseTemp;		// remember this clause
-	 		clauseTemp = clauseTemp->nextElement;	
+	 		clauseTemp = clauseTemp->nextElement;
 	 	}
- 		return;	
+ 		return;
  	}
  	
  	while (clauseTemp) {
-		clauseTemp->setEdges(edge);				
+		clauseTemp->setEdges(edge);
  		clauseTemp = clauseTemp->nextElement;	
  	}
 }
+
 
 int CNF::numberOfElements() {
 	clause * literal = cl;
@@ -340,7 +353,7 @@ int CNF::numberOfElements() {
 
  	while (literal) {
  		count++;
-		literal = literal->nextElement;	
+		literal = literal->nextElement;
  	}
 	
 	return count;

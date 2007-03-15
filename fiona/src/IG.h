@@ -41,6 +41,12 @@ class oWFN;
 
 class interactionGraph : public communicationGraph {
 	public:
+        // Provides user defined operator new. Needed to trace all new
+        // operations on this class.
+#undef new
+        NEW_OPERATOR(interactionGraph)
+#define new NEW_NEW
+
 		interactionGraph(oWFN *);
 		~interactionGraph();
 	
@@ -60,11 +66,6 @@ class interactionGraph : public communicationGraph {
     	void calculateSuccStatesOutputSet(messageMultiSet, vertex *);
     	void calculateSuccStatesInputReduced(messageMultiSet, vertex *);
         
-        // Provides user defined operator new. Needed to trace all new
-        // operations on this class.
-#undef new
-        NEW_OPERATOR(interactionGraph)
-#define new NEW_NEW
 };
 
 #endif /*IG_H_*/

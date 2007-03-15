@@ -42,7 +42,7 @@ DdManager* Exchangeability::mgrMp = NULL;
 DdManager* Exchangeability::mgrAnn = NULL;
 int Exchangeability::nbrBdd = 0;
  
-Exchangeability::Exchangeability(char* filename){
+Exchangeability::Exchangeability(char* filename) {
 	trace(TRACE_5, "Exchangeability::Exchangeability(char* filename): begin\n");		   
     // Init cudd package when first Exchangeability object is created.
     if (nbrBdd == 0) {
@@ -53,6 +53,9 @@ Exchangeability::Exchangeability(char* filename){
     names = NULL;
     nbrVarAnn = 0;
 	loadBdd(filename);
+	
+	return;
+	
 	++nbrBdd;
 	Cudd_ReorderingType method = (Cudd_ReorderingType)4;
 	if (Cudd_ReorderingStatus(mgrMp, &method) == 1) {

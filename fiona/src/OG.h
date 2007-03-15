@@ -45,6 +45,12 @@ class oWFN;
 class operatingGuidelines : public communicationGraph {
 	
 	public:
+        // Provides user defined operator new. Needed to trace all new
+        // operations on this class.
+#undef new
+        NEW_OPERATOR(operatingGuidelines)
+#define new NEW_NEW
+
 		operatingGuidelines(oWFN *);
 		~operatingGuidelines();
 	
@@ -73,12 +79,6 @@ class operatingGuidelines : public communicationGraph {
          * section. */
         void printTransitionsToOGFile(vertex * v, fstream& os,
             bool visitedNodes[]) const;
-
-        // Provides user defined operator new. Needed to trace all new
-        // operations on this class.
-#undef new
-        NEW_OPERATOR(operatingGuidelines)
-#define new NEW_NEW
 };
 
 

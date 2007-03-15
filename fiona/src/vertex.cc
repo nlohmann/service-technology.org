@@ -155,7 +155,7 @@ void vertex::addClause(clause * newClause, bool _isFinalState) {
 	
 	while (cnfElement->nextElement) {		// get the last clause of the CNF
 		cnfElement = cnfElement->nextElement;	
-	}	  
+	}
 	cnfElement->nextElement = new CNF();
 	cnfElement->nextElement->addClause(newClause);	// create a new clause literal	
 	cnfElement->nextElement->isFinalState = _isFinalState;

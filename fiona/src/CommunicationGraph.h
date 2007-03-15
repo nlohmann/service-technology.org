@@ -87,7 +87,7 @@ typedef std::set<vertex*, compareVertices> vertexSet;
 typedef std::set<messageMultiSet, compareMessageMultiSets> setOfMessages;
 
 
-/* reachability graph */
+/* communication graph */
 class communicationGraph {
 protected:
 	oWFN * PN;                   	//!< pointer to the underlying petri net
@@ -111,6 +111,12 @@ protected:
 	unsigned int actualDepth; 				//!< actual depth in graph
   
 public:
+
+// Provides user defined operator new. Needed to trace all new operations on this class.
+#undef new
+	NEW_OPERATOR(communicationGraph)
+#define new NEW_NEW
+
 	communicationGraph(oWFN *);
 	~communicationGraph();
 

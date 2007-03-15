@@ -114,17 +114,17 @@ void owfnPlace::set_hash(unsigned int i)
   */
 }
 
-void owfnPlace::set_marking(unsigned int i)
-{
-  net->placeHashValue -= hash_factor * initial_marking;
-  initial_marking = i;
- net->placeHashValue += hash_factor * initial_marking;
-  net->placeHashValue %= HASHSIZE;
-  
-/*
-  hash_value -= hash_factor * initial_marking;
-  initial_marking = i;
- hash_value += hash_factor * initial_marking;
-  hash_value %= HASHSIZE;
-*/
-}  
+//void owfnPlace::set_marking(unsigned int i)
+//{
+//  net->placeHashValue -= hash_factor * initial_marking;
+//  initial_marking = i;
+// net->placeHashValue += hash_factor * initial_marking;
+//  net->placeHashValue %= HASHSIZE;
+//  
+///*
+//  hash_value -= hash_factor * initial_marking;
+//  initial_marking = i;
+// hash_value += hash_factor * initial_marking;
+//  hash_value %= HASHSIZE;
+//*/
+//}  

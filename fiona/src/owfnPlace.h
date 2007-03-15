@@ -59,7 +59,7 @@ class owfnPlace : public Node {
 	  	void operator += (unsigned int);  // increment marking of place
 	  	void operator -= (unsigned int);  // decrement marking of place
 	  	bool operator >= (unsigned int);  // test enabledness with respect to place
-	  	void set_marking(unsigned int);   // set initial 1marking of place;
+//	  	void set_marking(unsigned int);   // set initial 1marking of place;
 	  	void set_hash(unsigned int);      // define a factor for hash value calculation
 	  	// hash(m) = sum(p in P) p.hash_factor*CurrentMarking[p]
 	 	unsigned int index; // index in place array, necessary for symmetries

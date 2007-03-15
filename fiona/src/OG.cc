@@ -226,9 +226,12 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 //! \fn void operatingGuidelines::computeCNF(vertex * node)
 //! \param node the node for which the annotation is calculated
 //! \brief calculates the annotation (CNF) for the node
-void operatingGuidelines::computeCNF(vertex * node) {
+void operatingGuidelines::computeCNF(vertex* node) {
 	
 	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): start\n");
+	
+	assert(node->annotation == NULL);
+	
 	StateSet::iterator iter;			// iterator over the states of the node
 	
 	if (!options[O_CALC_ALL_STATES]) { // in case of the state reduced graph
@@ -236,7 +239,7 @@ void operatingGuidelines::computeCNF(vertex * node) {
 		// iterate over all states of the node
 		for (iter = PN->setOfStatesTemp.begin();
 			 iter != PN->setOfStatesTemp.end(); iter++) {
-			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE)  {
+			if ((*iter)->type == DEADLOCK || (*iter)->type == FINALSTATE) {
 				// we just consider the maximal states only
 				
 				clause * cl = new clause();
@@ -250,12 +253,12 @@ void operatingGuidelines::computeCNF(vertex * node) {
 						cl->addLiteral(PN->outputPlacesArray[i]->name);	
 					}
 				}
-				
+
 				// get all the input events
 				for (unsigned int i = 0; i < PN->placeInputCnt; i++) {
 					cl->addLiteral(PN->inputPlacesArray[i]->name);
 				}
-				
+
 				node->addClause(cl, (*iter)->type == FINALSTATE);
 			}
 		}
@@ -278,7 +281,7 @@ void operatingGuidelines::computeCNF(vertex * node) {
 						cl->addLiteral(PN->outputPlacesArray[i]->name);	
 					}
 				}
-				
+
 				// get all the input events
 				for (unsigned int i = 0; i < PN->placeInputCnt; i++) {
 					cl->addLiteral(PN->inputPlacesArray[i]->name);
@@ -288,9 +291,12 @@ void operatingGuidelines::computeCNF(vertex * node) {
 			}
 		}
 	}
-		
+
 	PN->setOfStatesTemp.clear();
-	
+
+//	if (node->reachGraphStateSet.size() != 0)
+//		assert(node->annotation != NULL);
+
 	trace(TRACE_5, "operatingGuidelines::computeCNF(vertex * node): end\n");
 }
 
@@ -321,21 +327,21 @@ void operatingGuidelines::printOGFile() const {
     fstream ogFile(ogFilename.c_str(), ios_base::out | ios_base::trunc);
 
     bool visitedNodes[numberOfNodes];
-
-    ogFile << "NODES" << endl;
     for (unsigned int i = 0; i < numberOfNodes; ++i) {
         visitedNodes[i] = false;
     }
+
+    ogFile << "NODES" << endl;
     printNodesToOGFile(root, ogFile, visitedNodes);
     ogFile << ';' << endl << endl;
 
     ogFile << "INITIALNODE" << endl;
     ogFile << "  " << NodeNameForOG(root) << ';' << endl << endl;
 
-    ogFile << "TRANSITIONS" << endl;
     for (unsigned int i = 0; i < numberOfNodes; ++i) {
         visitedNodes[i] = false;
     }
+    ogFile << "TRANSITIONS" << endl;
     printTransitionsToOGFile(root, ogFile, visitedNodes);
     ogFile << ';' << endl;
 
@@ -343,8 +349,8 @@ void operatingGuidelines::printOGFile() const {
 }
 
 void operatingGuidelines::printNodesToOGFile(vertex * v, fstream& os,
-    bool visitedNodes[]) const
-{
+    bool visitedNodes[]) const {
+
     if (v == NULL)
         return;
 
@@ -378,15 +384,14 @@ void operatingGuidelines::printNodesToOGFile(vertex * v, fstream& os,
     }
 }
 
-string operatingGuidelines::NodeNameForOG(const vertex* v) const
-{
+string operatingGuidelines::NodeNameForOG(const vertex* v) const {
     assert(v != NULL);
     return "#" + intToString(v->getNumber());
 }
 
 void operatingGuidelines::printTransitionsToOGFile(vertex * v, fstream& os,
-    bool visitedNodes[]) const
-{
+    bool visitedNodes[]) const {
+
     if (v == NULL)
         return;
 
@@ -412,8 +417,7 @@ void operatingGuidelines::printTransitionsToOGFile(vertex * v, fstream& os,
         // needed)
         if (firstTransitionSeen) {
             os << ',' << endl;
-        }
-        else {
+        } else {
             firstTransitionSeen = true;
         }
 

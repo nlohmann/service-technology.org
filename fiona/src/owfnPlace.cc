@@ -128,15 +128,3 @@ void owfnPlace::set_marking(unsigned int i)
   hash_value %= HASHSIZE;
 */
 }  
-
-void owfnPlace::set_cmarking(unsigned int i)
-{
-    // TODO: implement owfnPlace::set_cmarking() or delete it.
-    trace(TRACE_0, "WARNING: owfnPlace::set_cmarking() called but not "
-        "implemented");
-/*  hash_value -= hash_factor * CurrentMarking[index];
-  CurrentMarking[index] = i;
- hash_value += hash_factor *CurrentMarking[index];
-  hash_value %= HASHSIZE;*/
-}  
-

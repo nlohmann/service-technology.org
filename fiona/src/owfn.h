@@ -218,8 +218,6 @@ class oWFN  {
 		
 		void removeisolated();
 
-		void addArc(Arc *);
-		
 		void deletePlace(owfnPlace *);
 	    void deleteTransition(owfnTransition *);
 		

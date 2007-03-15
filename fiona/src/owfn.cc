@@ -1597,11 +1597,6 @@ void oWFN::addTransition(unsigned int i, owfnTransition * transition) {
 }
 
 
-void oWFN::addArc(Arc* arc) {
-    trace(TRACE_0, "WARNING: oWFN::addArc() called but not implemented.");
-}
-
-
 void oWFN::addPlace(unsigned int i, owfnPlace * place) {
 	placeCnt++;
 	if (place->type == INPUT) {

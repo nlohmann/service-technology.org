@@ -44,6 +44,277 @@ result=0
 # OG
 ############################################################################
 
+mycoffeebluenodes_soll=7
+mycoffeeblueedges_soll=9
+mycoffeestoredstates_soll=24
+
+owfn="$DIR/myCoffee.owfn"
+cmd="$FIONA -n $owfn -a -t OG"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.a.OG.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$?
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+    mycoffeecontrol=$?
+
+    echo $OUTPUT | grep "number of blue nodes: $mycoffeebluenodes_soll" > /dev/null
+    mycoffeebluenodes=$?
+
+    echo $OUTPUT | grep "number of blue edges: $mycoffeeblueedges_soll" > /dev/null
+    mycoffeeblueedges=$?
+
+    echo $OUTPUT | grep "number of states stored in nodes: $mycoffeestoredstates_soll" > /dev/null
+    mycoffeestoredstates=$?
+
+    if [ $mycoffeecontrol -ne 0 -o $mycoffeebluenodes -ne 0 -o $mycoffeeblueedges -ne 0 -o $mycoffeestoredstates -ne 0 ]
+    then
+    echo   ... failed to build OG correctly
+    fi
+
+    result=`expr $result + $mycoffeecontrol + $mycoffeebluenodes + $mycoffeeblueedges + $mycoffeestoredstates`
+fi
+
+
+############################################################################
+# IG
+############################################################################
+
+mycoffeebluenodes_soll=5
+mycoffeeblueedges_soll=5
+mycoffeestoredstates_soll=12
+
+owfn="$DIR/myCoffee.owfn"
+cmd="$FIONA -n $owfn -a -t IG"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.a.IG.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$?
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+    mycoffeecontrol=$?
+
+    echo $OUTPUT | grep "number of blue nodes: $mycoffeebluenodes_soll" > /dev/null
+    mycoffeebluenodes=$?
+
+    echo $OUTPUT | grep "number of blue edges: $mycoffeeblueedges_soll" > /dev/null
+    mycoffeeblueedges=$?
+
+    echo $OUTPUT | grep "number of states stored in nodes: $mycoffeestoredstates_soll" > /dev/null
+    mycoffeestoredstates=$?
+
+    if [ $mycoffeecontrol -ne 0 -o $mycoffeebluenodes -ne 0 -o $mycoffeeblueedges -ne 0 -o $mycoffeestoredstates -ne 0 ]
+    then
+    echo   ... failed to build IG correctly
+    fi
+
+    result=`expr $result + $mycoffeecontrol + $mycoffeebluenodes + $mycoffeeblueedges + $mycoffeestoredstates`
+fi
+
+############################################################################
+# reduced IG
+############################################################################
+
+mycoffeebluenodes_soll=5
+mycoffeeblueedges_soll=5
+mycoffeestoredstates_soll=12
+
+owfn="$DIR/myCoffee.owfn"
+cmd="$FIONA -n $owfn -a -r -t IG"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.a.r.IG.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$?
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+    mycoffeecontrol=$?
+
+    echo $OUTPUT | grep "number of blue nodes: $mycoffeebluenodes_soll" > /dev/null
+    mycoffeebluenodes=$?
+
+    echo $OUTPUT | grep "number of blue edges: $mycoffeeblueedges_soll" > /dev/null
+    mycoffeeblueedges=$?
+
+    echo $OUTPUT | grep "number of states stored in nodes: $mycoffeestoredstates_soll" > /dev/null
+    mycoffeestoredstates=$?
+
+    if [ $mycoffeecontrol -ne 0 -o $mycoffeebluenodes -ne 0 -o $mycoffeeblueedges -ne 0 -o $mycoffeestoredstates -ne 0 ]
+    then
+    echo   ... failed to build reduced IG correctly
+    fi
+
+    result=`expr $result + $mycoffeecontrol + $mycoffeebluenodes + $mycoffeeblueedges + $mycoffeestoredstates`
+fi
+
+############################################################################
+# reduced IG
+############################################################################
+
+mycoffeebluenodes_soll=5
+mycoffeeblueedges_soll=5
+mycoffeestoredstates_soll=5
+mycoffeestates_soll=19
+
+owfn="$DIR/myCoffee.owfn"
+cmd="$FIONA -n $owfn -r -t IG"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.r.IG.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$?
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+    mycoffeecontrol=$?
+
+    echo $OUTPUT | grep "number of states calculated: $mycoffeestates_soll" > /dev/null
+    mycoffeestates=$?
+
+    echo $OUTPUT | grep "number of blue nodes: $mycoffeebluenodes_soll" > /dev/null
+    mycoffeebluenodes=$?
+
+    echo $OUTPUT | grep "number of blue edges: $mycoffeeblueedges_soll" > /dev/null
+    mycoffeeblueedges=$?
+
+    echo $OUTPUT | grep "number of states stored in nodes: $mycoffeestoredstates_soll" > /dev/null
+    mycoffeestoredstates=$?
+
+    if [ $mycoffeecontrol -ne 0 -o $mycoffeestates -ne 0 -o $mycoffeebluenodes -ne 0 -o $mycoffeeblueedges -ne 0 -o $mycoffeestoredstates -ne 0 ]
+    then
+    echo   ... failed to build reduced IG correctly
+    fi
+
+    result=`expr $result + $mycoffeecontrol + $mycoffeebluenodes + $mycoffeeblueedges + $mycoffeestoredstates`
+fi
+
+############################################################################
+# IG with node reduction
+############################################################################
+
+mycoffeebluenodes_soll=5
+mycoffeeblueedges_soll=5
+mycoffeestoredstates_soll=5
+mycoffeestates_soll=19
+
+owfn="$DIR/myCoffee.owfn"
+cmd="$FIONA -n $owfn -t IG"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.IG.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$?
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+    mycoffeecontrol=$?
+
+    echo $OUTPUT | grep "number of states calculated: $mycoffeestates_soll" > /dev/null
+    mycoffeestates=$?
+
+    echo $OUTPUT | grep "number of blue nodes: $mycoffeebluenodes_soll" > /dev/null
+    mycoffeebluenodes=$?
+
+    echo $OUTPUT | grep "number of blue edges: $mycoffeeblueedges_soll" > /dev/null
+    mycoffeeblueedges=$?
+
+    echo $OUTPUT | grep "number of states stored in nodes: $mycoffeestoredstates_soll" > /dev/null
+    mycoffeestoredstates=$?
+
+    if [ $mycoffeecontrol -ne 0 -o $mycoffeestates -ne 0 -o $mycoffeebluenodes -ne 0 -o $mycoffeeblueedges -ne 0 -o $mycoffeestoredstates -ne 0 ]
+    then
+    echo   ... failed to build IG with node reduction correctly
+    fi
+
+    result=`expr $result + $mycoffeecontrol + $mycoffeebluenodes + $mycoffeeblueedges + $mycoffeestoredstates`
+fi
+
+############################################################################
+
+keescoffee1bluenodes_soll=9
+keescoffee1blueedges_soll=13
+keescoffee1storedstates_soll=100
+
+owfn="$DIR/keesCoffee_condition.owfn"
+cmd="$FIONA -n $owfn -a -t OG -e 1"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.a.e1.OG.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$?
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+    keescoffee1control=$?
+
+    echo $OUTPUT | grep "number of blue nodes: $keescoffee1bluenodes_soll" > /dev/null
+    keescoffee1bluenodes=$?
+
+    echo $OUTPUT | grep "number of blue edges: $keescoffee1blueedges_soll" > /dev/null
+    keescoffee1blueedges=$?
+
+    echo $OUTPUT | grep "number of states stored in nodes: $keescoffee1storedstates_soll" > /dev/null
+    keescoffee1storedstates=$?
+
+    if [ $keescoffee1control -ne 0 -o $keescoffee1bluenodes -ne 0 -o $keescoffee1blueedges -ne 0 -o $keescoffee1storedstates -ne 0 ]
+    then
+    echo   ... failed to build OG correctly
+    fi
+
+    result=`expr $result + $keescoffee1control + $keescoffee1bluenodes + $keescoffee1blueedges + $keescoffee1storedstates`
+fi
+
+############################################################################
+
+keescoffee2bluenodes_soll=20
+keescoffee2blueedges_soll=41
+keescoffee2storedstates_soll=212
+
+owfn="$DIR/keesCoffee_condition.owfn"
+cmd="$FIONA -n $owfn -a -t OG -e 3 -m 1"
+if [ "$memcheck" = "yes" ]; then
+    memchecklog="$owfn.a.e2.OG.memcheck.log"
+    do_memcheck "$cmd" "$memchecklog"
+    result=$?
+else
+    echo running $cmd
+    OUTPUT=`$cmd 2>&1`
+
+    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
+    keescoffee2control=$?
+
+    echo $OUTPUT | grep "number of blue nodes: $keescoffee2bluenodes_soll" > /dev/null
+    keescoffee2bluenodes=$?
+
+    echo $OUTPUT | grep "number of blue edges: $keescoffee2blueedges_soll" > /dev/null
+    keescoffee2blueedges=$?
+
+    echo $OUTPUT | grep "number of states stored in nodes: $keescoffee2storedstates_soll" > /dev/null
+    keescoffee2storedstates=$?
+
+    if [ $keescoffee2control -ne 0 -o $keescoffee2bluenodes -ne 0 -o $keescoffee2blueedges -ne 0 -o $keescoffee2storedstates -ne 0 ]
+    then
+    echo   ... failed to build OG correctly
+    fi
+
+    result=`expr $result + $keescoffee2control + $keescoffee2bluenodes + $keescoffee2blueedges + $keescoffee2storedstates`
+fi
+
+############################################################################
+# OG
+############################################################################
+
 shop3bluenodes_soll=12
 shop3blueedges_soll=15
 shop3storedstates_soll=1878
@@ -486,277 +757,6 @@ else
     fi
 
     result=`expr $result + $shop6control + $shop6bluenodes + $shop6blueedges + $shop6storedstates`
-fi
-
-############################################################################
-# OG
-############################################################################
-
-mycoffeebluenodes_soll=7
-mycoffeeblueedges_soll=9
-mycoffeestoredstates_soll=24
-
-owfn="$DIR/myCoffee.owfn"
-cmd="$FIONA -n $owfn -a -t OG"
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.a.OG.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$?
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-    mycoffeecontrol=$?
-
-    echo $OUTPUT | grep "number of blue nodes: $mycoffeebluenodes_soll" > /dev/null
-    mycoffeebluenodes=$?
-
-    echo $OUTPUT | grep "number of blue edges: $mycoffeeblueedges_soll" > /dev/null
-    mycoffeeblueedges=$?
-
-    echo $OUTPUT | grep "number of states stored in nodes: $mycoffeestoredstates_soll" > /dev/null
-    mycoffeestoredstates=$?
-
-    if [ $mycoffeecontrol -ne 0 -o $mycoffeebluenodes -ne 0 -o $mycoffeeblueedges -ne 0 -o $mycoffeestoredstates -ne 0 ]
-    then
-    echo   ... failed to build OG correctly
-    fi
-
-    result=`expr $result + $mycoffeecontrol + $mycoffeebluenodes + $mycoffeeblueedges + $mycoffeestoredstates`
-fi
-
-
-############################################################################
-# IG
-############################################################################
-
-mycoffeebluenodes_soll=5
-mycoffeeblueedges_soll=5
-mycoffeestoredstates_soll=12
-
-owfn="$DIR/myCoffee.owfn"
-cmd="$FIONA -n $owfn -a -t IG"
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.a.IG.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$?
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-    mycoffeecontrol=$?
-
-    echo $OUTPUT | grep "number of blue nodes: $mycoffeebluenodes_soll" > /dev/null
-    mycoffeebluenodes=$?
-
-    echo $OUTPUT | grep "number of blue edges: $mycoffeeblueedges_soll" > /dev/null
-    mycoffeeblueedges=$?
-
-    echo $OUTPUT | grep "number of states stored in nodes: $mycoffeestoredstates_soll" > /dev/null
-    mycoffeestoredstates=$?
-
-    if [ $mycoffeecontrol -ne 0 -o $mycoffeebluenodes -ne 0 -o $mycoffeeblueedges -ne 0 -o $mycoffeestoredstates -ne 0 ]
-    then
-    echo   ... failed to build IG correctly
-    fi
-
-    result=`expr $result + $mycoffeecontrol + $mycoffeebluenodes + $mycoffeeblueedges + $mycoffeestoredstates`
-fi
-
-############################################################################
-# reduced IG
-############################################################################
-
-mycoffeebluenodes_soll=5
-mycoffeeblueedges_soll=5
-mycoffeestoredstates_soll=12
-
-owfn="$DIR/myCoffee.owfn"
-cmd="$FIONA -n $owfn -a -r -t IG"
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.a.r.IG.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$?
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-    mycoffeecontrol=$?
-
-    echo $OUTPUT | grep "number of blue nodes: $mycoffeebluenodes_soll" > /dev/null
-    mycoffeebluenodes=$?
-
-    echo $OUTPUT | grep "number of blue edges: $mycoffeeblueedges_soll" > /dev/null
-    mycoffeeblueedges=$?
-
-    echo $OUTPUT | grep "number of states stored in nodes: $mycoffeestoredstates_soll" > /dev/null
-    mycoffeestoredstates=$?
-
-    if [ $mycoffeecontrol -ne 0 -o $mycoffeebluenodes -ne 0 -o $mycoffeeblueedges -ne 0 -o $mycoffeestoredstates -ne 0 ]
-    then
-    echo   ... failed to build reduced IG correctly
-    fi
-
-    result=`expr $result + $mycoffeecontrol + $mycoffeebluenodes + $mycoffeeblueedges + $mycoffeestoredstates`
-fi
-
-############################################################################
-# reduced IG
-############################################################################
-
-mycoffeebluenodes_soll=5
-mycoffeeblueedges_soll=5
-mycoffeestoredstates_soll=5
-mycoffeestates_soll=19
-
-owfn="$DIR/myCoffee.owfn"
-cmd="$FIONA -n $owfn -r -t IG"
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.r.IG.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$?
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-    mycoffeecontrol=$?
-
-    echo $OUTPUT | grep "number of states calculated: $mycoffeestates_soll" > /dev/null
-    mycoffeestates=$?
-
-    echo $OUTPUT | grep "number of blue nodes: $mycoffeebluenodes_soll" > /dev/null
-    mycoffeebluenodes=$?
-
-    echo $OUTPUT | grep "number of blue edges: $mycoffeeblueedges_soll" > /dev/null
-    mycoffeeblueedges=$?
-
-    echo $OUTPUT | grep "number of states stored in nodes: $mycoffeestoredstates_soll" > /dev/null
-    mycoffeestoredstates=$?
-
-    if [ $mycoffeecontrol -ne 0 -o $mycoffeestates -ne 0 -o $mycoffeebluenodes -ne 0 -o $mycoffeeblueedges -ne 0 -o $mycoffeestoredstates -ne 0 ]
-    then
-    echo   ... failed to build reduced IG correctly
-    fi
-
-    result=`expr $result + $mycoffeecontrol + $mycoffeebluenodes + $mycoffeeblueedges + $mycoffeestoredstates`
-fi
-
-############################################################################
-# IG with node reduction
-############################################################################
-
-mycoffeebluenodes_soll=5
-mycoffeeblueedges_soll=5
-mycoffeestoredstates_soll=5
-mycoffeestates_soll=19
-
-owfn="$DIR/myCoffee.owfn"
-cmd="$FIONA -n $owfn -t IG"
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.IG.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$?
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-    mycoffeecontrol=$?
-
-    echo $OUTPUT | grep "number of states calculated: $mycoffeestates_soll" > /dev/null
-    mycoffeestates=$?
-
-    echo $OUTPUT | grep "number of blue nodes: $mycoffeebluenodes_soll" > /dev/null
-    mycoffeebluenodes=$?
-
-    echo $OUTPUT | grep "number of blue edges: $mycoffeeblueedges_soll" > /dev/null
-    mycoffeeblueedges=$?
-
-    echo $OUTPUT | grep "number of states stored in nodes: $mycoffeestoredstates_soll" > /dev/null
-    mycoffeestoredstates=$?
-
-    if [ $mycoffeecontrol -ne 0 -o $mycoffeestates -ne 0 -o $mycoffeebluenodes -ne 0 -o $mycoffeeblueedges -ne 0 -o $mycoffeestoredstates -ne 0 ]
-    then
-    echo   ... failed to build IG with node reduction correctly
-    fi
-
-    result=`expr $result + $mycoffeecontrol + $mycoffeebluenodes + $mycoffeeblueedges + $mycoffeestoredstates`
-fi
-
-############################################################################
-
-keescoffee1bluenodes_soll=9
-keescoffee1blueedges_soll=13
-keescoffee1storedstates_soll=100
-
-owfn="$DIR/keesCoffee_condition.owfn"
-cmd="$FIONA -n $owfn -a -t OG -e 1"
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.a.e1.OG.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$?
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-    keescoffee1control=$?
-
-    echo $OUTPUT | grep "number of blue nodes: $keescoffee1bluenodes_soll" > /dev/null
-    keescoffee1bluenodes=$?
-
-    echo $OUTPUT | grep "number of blue edges: $keescoffee1blueedges_soll" > /dev/null
-    keescoffee1blueedges=$?
-
-    echo $OUTPUT | grep "number of states stored in nodes: $keescoffee1storedstates_soll" > /dev/null
-    keescoffee1storedstates=$?
-
-    if [ $keescoffee1control -ne 0 -o $keescoffee1bluenodes -ne 0 -o $keescoffee1blueedges -ne 0 -o $keescoffee1storedstates -ne 0 ]
-    then
-    echo   ... failed to build OG correctly
-    fi
-
-    result=`expr $result + $keescoffee1control + $keescoffee1bluenodes + $keescoffee1blueedges + $keescoffee1storedstates`
-fi
-
-############################################################################
-
-keescoffee2bluenodes_soll=20
-keescoffee2blueedges_soll=41
-keescoffee2storedstates_soll=212
-
-owfn="$DIR/keesCoffee_condition.owfn"
-cmd="$FIONA -n $owfn -a -t OG -e 3 -m 1"
-if [ "$memcheck" = "yes" ]; then
-    memchecklog="$owfn.a.e2.OG.memcheck.log"
-    do_memcheck "$cmd" "$memchecklog"
-    result=$?
-else
-    echo running $cmd
-    OUTPUT=`$cmd 2>&1`
-
-    echo $OUTPUT | grep "net is controllable: YES" > /dev/null
-    keescoffee2control=$?
-
-    echo $OUTPUT | grep "number of blue nodes: $keescoffee2bluenodes_soll" > /dev/null
-    keescoffee2bluenodes=$?
-
-    echo $OUTPUT | grep "number of blue edges: $keescoffee2blueedges_soll" > /dev/null
-    keescoffee2blueedges=$?
-
-    echo $OUTPUT | grep "number of states stored in nodes: $keescoffee2storedstates_soll" > /dev/null
-    keescoffee2storedstates=$?
-
-    if [ $keescoffee2control -ne 0 -o $keescoffee2bluenodes -ne 0 -o $keescoffee2blueedges -ne 0 -o $keescoffee2storedstates -ne 0 ]
-    then
-    echo   ... failed to build OG correctly
-    fi
-
-    result=`expr $result + $keescoffee2control + $keescoffee2bluenodes + $keescoffee2blueedges + $keescoffee2storedstates`
 fi
 
 ############################################################################

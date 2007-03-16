@@ -1,5 +1,5 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      *
+ * Copyright 2005, 2006, 2007 Niels Lohmann, Christian Gierds                *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
@@ -29,14 +29,14 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/03/06 09:23:21 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.148 $
+ * \version \$Revision: 1.149 $
  */
 
 
@@ -62,6 +62,7 @@
 #include "options.h"
 #include "ast-config.h"
 #include "ast-details.h"
+#include "globals.h"
 
 using std::cerr;
 using std::cout;
@@ -81,9 +82,7 @@ extern int frontend_parse();			// from Bison
 extern int frontend_debug;			// from Bison
 extern int frontend__flex_debug;		// from flex
 extern FILE *frontend_in;			// from flex
-extern kc::tProcess AST;
 
-extern map<unsigned int, ASTE*> ASTEmap;
 
 
 
@@ -94,12 +93,6 @@ extern map<unsigned int, ASTE*> ASTEmap;
 
 /// The Petri Net
 PetriNet PN = PetriNet();
-
-/// string holding the invocation of BPEL2oWFN
-string invocation;
-
-/// string holding the called program name of BPEL2oWFN
-string program_name;
 
 
 
@@ -120,14 +113,14 @@ string program_name;
  */
 int main( int argc, char *argv[])
 {
-  program_name = string(argv[0]);
+  globals::program_name = string(argv[0]);
 
   // generate the invocation string
   for (int i = 0; i < argc; i++)
   {
-    invocation += string(argv[i]);
+    globals::invocation += string(argv[i]);
     if (i != (argc-1))
-      invocation += " ";
+      globals::invocation += " ";
   }
 
   /*
@@ -169,23 +162,26 @@ int main( int argc, char *argv[])
 
       // apply first set of rewrite rules
       trace(TRACE_INFORMATION, "Rewriting...\n");
-      AST = AST->rewrite(kc::invoke);
-      AST = AST->rewrite(kc::implicit);
+      globals::AST = globals::AST->rewrite(kc::invoke);
+      globals::AST = globals::AST->rewrite(kc::implicit);
       trace(TRACE_INFORMATION, "Rewriting complete...\n");
 
       // postprocess and annotate the AST
       trace(TRACE_INFORMATION, "Postprocessing...\n");
-      AST->unparse(kc::printer, kc::postprocessing);
+      globals::AST->unparse(kc::printer, kc::postprocessing);
       trace(TRACE_INFORMATION, "Postprocessing complete...\n");
 
       // apply second set of rewrite rules
       trace(TRACE_INFORMATION, "Rewriting 2...\n");
-      AST = AST->rewrite(kc::newNames);
+      globals::AST = globals::AST->rewrite(kc::newNames);
       trace(TRACE_INFORMATION, "Rewriting 2 complete...\n");
+
+      // print information about the process
+      show_process_information();
 
 // an experiment      
 //      cout << "digraph G{" << endl;
-//      ASTEmap[1]->output();
+//      globals::ASTEmap[1]->output();
 //      cout << "}" << endl;
 
       // print the AST?
@@ -196,7 +192,7 @@ int main( int argc, char *argv[])
 	{
 	  string dot_filename = output_filename + "." + suffixes[F_DOT];
 	  FILE *dotfile = fopen(dot_filename.c_str(), "w+");
-	  AST->fprintdot(dotfile, "", "", "", true, true, true);
+	  globals::AST->fprintdot(dotfile, "", "", "", true, true, true);
 	  fclose(dotfile);
 #ifdef HAVE_DOT
   	  string systemcall = "dot -q -Tpng -o" + output_filename + ".png " + output_filename + "." + suffixes[F_DOT];
@@ -206,7 +202,7 @@ int main( int argc, char *argv[])
 #endif
 	}
 	else
-	  AST->print();
+	  globals::AST->print();
       }
 
       if (modus == M_PRETTY)
@@ -218,7 +214,7 @@ int main( int argc, char *argv[])
             output = openOutput(output_filename + "." + suffixes[F_XML]);
           }
           trace(TRACE_INFORMATION, "-> Printing \"pretty\" XML ...\n");
-          AST->unparse(kc::printer, kc::xml);
+          globals::AST->unparse(kc::printer, kc::xml);
           if (output_filename != "")
           {
             closeOutput(output);
@@ -239,9 +235,9 @@ int main( int argc, char *argv[])
 
 	// choose Petri net patterns
 	if (parameters[P_COMMUNICATIONONLY] == true)
-	  AST->unparse(kc::pseudoPrinter, kc::petrinetsmall);
+	  globals::AST->unparse(kc::pseudoPrinter, kc::petrinetsmall);
 	else
-	  AST->unparse(kc::pseudoPrinter, kc::petrinetnew);
+	  globals::AST->unparse(kc::pseudoPrinter, kc::petrinetnew);
 
         // calculate maximum occurences
         PN.calculate_max_occurrences();
@@ -267,7 +263,7 @@ int main( int argc, char *argv[])
 	  PN2.compose(PN);
 	  PN = PetriNet();
 
-	  AST = NULL;
+	  globals::AST = NULL;
 	}
       }
     }

@@ -19,8 +19,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/11 22:13:18 $ by $Author: nielslohmann $.
-# Version $Revision: 1.35 $
+# File last changed $Date: 2007/03/16 07:17:16 $ by $Author: nielslohmann $.
+# Version $Revision: 1.36 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
@@ -46,9 +46,12 @@ AC_CANONICAL_BUILD
 AC_PROG_CXX
 AC_PROG_CC
 
-# Don't set any compiler flags.
-CXXFLAGS=""
-CFLAGS=""
+
+# Set compiler flags to warn a lot and to check compliance to ANSI C++
+# (un-comment or change to "-O2" before distribution).
+CXXFLAGS="-ansi -Wall -Wextra -Wno-unused -Wunreachable-code"
+CFLAGS="-ansi -Wall -Wextra -Wno-unused -Wunreachable-code"
+
 
 # Checks for header files and functions.
 AC_FUNC_ALLOCA
@@ -60,21 +63,23 @@ AC_CHECK_HEADERS([libintl.h malloc.h stddef.h stdlib.h string.h strings.h unistd
 AC_DEFINE(USING_BPEL2OWFN, 1, [Petri net class belongs to BPEL2oWFN.])
 
 
-# Check for the compiler generators and dot
-AC_PROG_YACC
-AC_PROG_LEX
-
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
 AC_C_CONST
 AC_C_INLINE
 AC_TYPE_SIZE_T
 
+
 # Checks for library functions.
 AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_CHECK_FUNCS([memset pow])
+
+
+# Check for optional programs.
+AC_PROG_YACC
+AC_PROG_LEX
 
 AC_CHECK_PROG(KC, kc++, kc++, not found)
 if test "$KC" = "not found"; then
@@ -94,9 +99,11 @@ fi
 AC_CONFIG_FILES([Makefile \
 	  doc/Makefile \
 	  src/Makefile \
+	  src/Doxyfile \
 	  tests/Makefile \
 	  rpm/Makefile \
 	  rpm/bpel2owfn.spec
 	  ])
+
 
 AC_OUTPUT

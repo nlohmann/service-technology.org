@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for BPEL's structured activities
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $ 
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/09 13:36:51 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.38 $
+ * \version \$Revision: 1.39 $
 */
 %}
 
@@ -65,7 +65,6 @@ using std::cerr;
 using std::endl;
 
 extern PetriNet PN;
-extern map<unsigned int, ASTE*> ASTEmap;
 %}
 
 
@@ -141,7 +140,7 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
 	
 	// Transitions for the negative control flow.
 	if (parameters[P_STANDARDFAULTS])
-	  Transition *t5 = throwFault(p2, p7, "running", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
+	  Transition *t5 = throwFault(p2, p7, "running", prefix, mkinteger(phylum->id), globals::ASTEmap[phylum->id]->controlFlow);
 
 	Transition *t6 = stop(p2, "running", prefix);
 	Transition *t7 = stop(p4, "final", prefix);
@@ -286,7 +285,7 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 	Transition *t6 = stop(p7, "faulted", prefix);
 
 	if (parameters[P_STANDARDFAULTS])
-	  Transition *t7 = throwFault(p3, p7, "running", prefix, mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
+	  Transition *t7 = throwFault(p3, p7, "running", prefix, mkinteger(phylum->id), globals::ASTEmap[phylum->id]->controlFlow);
 	
 
 	// the single loop/skip transition is only needed when loops are not counted
@@ -309,7 +308,7 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
 	// the subnet if loops are counted
 	if (parameters[P_LOOPCOUNT])
 	{
-	  unsigned int max_loops = ASTEmap[phylum->id]->max_loops;
+	  unsigned int max_loops = globals::ASTEmap[phylum->id]->max_loops;
 	  if (max_loops == UINT_MAX)
 	    cerr << "no max loop provided!" << endl;
 	  else
@@ -655,7 +654,7 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
     // Message-receiving transition.
     Transition *t1 = PN.newTransition(prefix + "onMessage_" + branch);
     PN.newArc(PN.findPlace(prefix + "initial"), t1);
-    PN.newArc(PN.findPlace("in." + ASTEmap[ThisBranch->id]->channelName), t1);
+    PN.newArc(PN.findPlace("in." + globals::ASTEmap[ThisBranch->id]->channelName), t1);
     PN.newArc(t1, PN.findPlace(toString(innerActivity->id) + ".initial"));
 
     // Embed the inner activity.
@@ -903,7 +902,7 @@ void PForEach(impl_tForEach* abstract_phylum, uview current_view)
 
 
   // the patterns for the parallel <forEach>
-  if (ASTEmap[phylum->id]->attributes["parallel"] == "no")
+  if (globals::ASTEmap[phylum->id]->attributes["parallel"] == "no")
   {
     switch(current_view)
     {
@@ -936,10 +935,10 @@ void PForEach(impl_tForEach* abstract_phylum, uview current_view)
 
 
 
-          assert (ASTEmap[phylum->tScope_1->id] != NULL);
-          if (ASTEmap[phylum->tScope_1->id]->max_occurrences != UINT_MAX)
+          assert (globals::ASTEmap[phylum->tScope_1->id] != NULL);
+          if (globals::ASTEmap[phylum->tScope_1->id]->max_occurrences != UINT_MAX)
           {
-            for (unsigned int scope_number = 1; scope_number <= ASTEmap[phylum->tScope_1->id]->max_occurrences; scope_number++)
+            for (unsigned int scope_number = 1; scope_number <= globals::ASTEmap[phylum->tScope_1->id]->max_occurrences; scope_number++)
             {
               globals::forEach_suffix = "_foreach_" + toString(scope_number);
               cerr << globals::forEach_suffix << endl;

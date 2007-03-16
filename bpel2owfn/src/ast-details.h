@@ -25,18 +25,18 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  *          
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/03/06 15:18:19 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.65 $
+ * \version \$Revision: 1.66 $
  */
 
 
@@ -113,8 +113,7 @@ typedef enum
 /*!
  * \brief AST extensions
  *
- * \todo comment me!
- * \todo really comment me!
+ * \todo Comment this class properly.
  */
 class ASTE
 {
@@ -152,8 +151,8 @@ class ASTE
     set<unsigned int> sourceLinks;	///< outgoing links
     set<unsigned int> targetLinks;	///< ingoing links
 
-    unsigned int targetActivity;	///< id of the target of a <link>
     unsigned int sourceActivity;	///< id of the source of a <link>
+    unsigned int targetActivity;	///< id of the target of a <link>
 
 
     unsigned int max_occurrences;	///< number of maximum occurrences of the activity
@@ -206,10 +205,14 @@ class ASTE
 
 
 /*!
- * \brief Data structure to save information about the different roles of a partner link
+ * \brief   Data structure to save information about the different roles of a
+ *          partner link
  *
- * In order to do a role based matching (which means an according naming) of channels
- * some information of a partner link have to be stored.
+ *          In order to do a role based matching (which means an according
+ *          naming) of channels some information of a partner link have to be
+ *          stored.
+ *
+ * \todo    Comment me!
  */
 class pPartnerLink {
   public:

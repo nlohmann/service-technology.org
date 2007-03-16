@@ -30,13 +30,13 @@
  *
  * \since   2005/11/09
  *          
- * \date    \$Date: 2007/03/04 14:31:59 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.56 $
+ * \version \$Revision: 1.57 $
  *
  * \ingroup debug
  */
@@ -56,6 +56,7 @@
 #include "debug.h"
 #include "options.h"
 #include "helpers.h"	// for toInt
+#include "globals.h"
 
 using std::cerr;
 using std::clog;
@@ -125,6 +126,37 @@ void trace(trace_level pTraceLevel, string message)
 void trace(string message)
 {
   trace(TRACE_ALWAYS, message);
+}
+
+
+
+
+
+/*!
+ * \brief print information about the proces
+ */
+void show_process_information()
+{
+  cerr << globals::process_information.basic_activities +
+    globals::process_information.structured_activities +
+    globals::process_information.scopes << " activities";
+  cerr << " (" << globals::process_information.basic_activities <<
+    " basic, ";
+  cerr << globals::process_information.structured_activities <<
+    " structured, ";
+  cerr << globals::process_information.scopes << " scopes)" << endl;
+
+  cerr << globals::process_information.fault_handlers +
+    globals::process_information.termination_handlers +
+    globals::process_information.compensation_handlers +
+    globals::process_information.event_handlers << " user-defined handlers (";
+  cerr << globals::process_information.fault_handlers << " FH, ";
+  cerr << globals::process_information.termination_handlers << " TH, ";
+  cerr << globals::process_information.compensation_handlers << " CH, ";
+  cerr << globals::process_information.event_handlers << " EH)" << endl;
+
+  cerr << globals::process_information.links << " links, ";
+  cerr << globals::process_information.variables << " variables" << endl;
 }
 
 

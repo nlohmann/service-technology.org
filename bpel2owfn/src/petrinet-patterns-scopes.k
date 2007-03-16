@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $ 
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/03/11 11:26:19 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.33 $
+ * \version \$Revision: 1.34 $
  */
 %}
 
@@ -67,7 +67,6 @@ using std::cerr;
 using std::endl;
 
 extern PetriNet PN;
-extern map<unsigned int, ASTE*> ASTEmap;
 %}
 
 
@@ -78,6 +77,16 @@ extern map<unsigned int, ASTE*> ASTEmap;
   PROCESS
 ******************************************************************************/
 
+%{
+/*!
+ * \fn      void kc::PProcess(impl_tProcess* abstract_phylum, uview current_view)
+ *
+ * \brief   Pattern for the <process>.
+ *
+ * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
+ * \param   current_view     the current unparse view
+ */
+%}
 void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 {
   impl_tProcess_Process* phylum = static_cast<impl_tProcess_Process*>(abstract_phylum);
@@ -86,19 +95,18 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
   header(phylum->id, true);
   string prefix = toString(phylum->id) + ".internal.";
 
-
-  // Create the interface places.
-  // The used lists are filled during parsing mapping each combination of
-  // partnerLink, portType and operation to one input (resp. output) place.
+  // Create the interface places. The used lists are filled during parsing
+  // mapping each combination of partnerLink, portType and operation to one
+  // input (resp. output) place.
   for (set<string>::iterator in = globals::ASTE_inputChannels.begin(); in != globals::ASTE_inputChannels.end(); in++)
        PN.newPlace("in." + *in, IN);
   for (set<string>::iterator out = globals::ASTE_outputChannels.begin(); out != globals::ASTE_outputChannels.end(); out++)
        PN.newPlace("out." + *out, OUT);
 
 
-  // Create the places for the links.
-  // The used list is filled during parsing and contains all links of the
-  // whole process -- also links defined in a deeper hierarchy.
+  // Create the places for the links. The used list is filled during parsing
+  // and contains all links of the whole process -- also links defined in a
+  // deeper hierarchy.
   for (set<string>::iterator link = globals::ASTE_linkNames.begin(); link != globals::ASTE_linkNames.end(); link++)
   {
     PN.newPlace("link." + *link);
@@ -110,23 +118,28 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
   {
     case(petrinetnew_enum):
       {
-	globals::currentScope = prefix;
-
-	Place *p1  = PN.newPlace(prefix + "initial"); p1->mark();
+        // Places.
+	Place *p1  = PN.newPlace(prefix + "initial");
 	Place *p2  = PN.newPlace(prefix + "final");
 	Place *p3  = PN.newPlace(prefix + "fault_in");
 	Place *p4  = PN.newPlace(prefix + "exit");
 	Place *p5  = PN.newPlace(prefix + "Active");
-	Place *p6  = PN.newPlace(prefix + "!Active"); p6->mark();
+	Place *p6  = PN.newPlace(prefix + "!Active");
 	Place *p7  = PN.newPlace(prefix + "Exiting");
-	Place *p8  = PN.newPlace(prefix + "!Exiting"); p8->mark();
+	Place *p8  = PN.newPlace(prefix + "!Exiting");
 	Place *p9  = PN.newPlace(prefix + "inner_stop");
 	Place *p10 = PN.newPlace(prefix + "inner_stopped");
-	Place *p11 = PN.newPlace(prefix + "activity_initial");
-	Place *p12 = PN.newPlace(prefix + "activity_final");
+	Place *p11 = PN.newPlace(prefix + "eha_initial");
+	Place *p12 = PN.newPlace(prefix + "eha_final");
 	Place *p13 = PN.newPlace(prefix + "fh_fault");
 	Place *p14 = PN.newPlace(prefix + "ch_fault_in");
 
+        // Process is initially in states "!Active" and "!Exiting".
+        p6->mark();
+        p8->mark();
+
+        // Indicate the process's initial and final marking.
+        p1->mark();
         p2->isFinal = true;
 
 	Transition *t1 = PN.newTransition(prefix + "initialize");
@@ -135,6 +148,8 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 	PN.newArc(p6, t1);
 	PN.newArc(t1, p11);
 
+        // Create places for the variables and connect them with the
+        // initializing transition.
         if ( parameters[P_VARIABLES] )
         {
           for ( set<string>::iterator variable = globals::ASTE_variableNames.begin(); variable != globals::ASTE_variableNames.end(); variable++ )
@@ -148,7 +163,7 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 	PN.newArc(t2, p2);
 	PN.newArc(p5, t2);
 	PN.newArc(t2, p6);
-	if (!ASTEmap[phylum->id]->hasEH)
+	if (!globals::ASTEmap[phylum->id]->hasEH)
 	  PN.newArc(p12, t2);
 
 	Transition *t3 = PN.newTransition(prefix + "ft");
@@ -197,62 +212,104 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
 	PN.newArc(p14, t10);
 
 
-	// unparse the embedded activity
-	phylum->activity_1->unparse(pseudoPrinter, current_view);
-
-	// unparse the fault handlers
-	phylum->tFaultHandlers_1->unparse(pseudoPrinter, current_view);
-
-	// unparse the event handlers
-	phylum->tEventHandlers_1->unparse(pseudoPrinter, current_view);
-
-
-	if (ASTEmap[phylum->id]->hasEH)
+        // Create subpattern for the event handlers and the inner activity.
+        if (globals::ASTEmap[phylum->id]->hasEH)
 	{
-	  Transition *t11 = PN.newTransition(prefix + "finish_eh");
-	  PN.newArc(p12, t11);
-	  PN.newArc(PN.findPlace(toString(phylum->tEventHandlers_1->id) + ".internal.running"), t11);
-	  PN.newArc(t11, PN.findPlace(toString(phylum->tEventHandlers_1->id) + ".internal.finishing"));
+          Place *p15 = PN.newPlace(prefix + "eh_start");
+          Place *p16 = PN.newPlace(prefix + "eh_active");
+          Place *p17 = PN.newPlace(prefix + "eh_disabling");
+          Place *p18 = PN.newPlace(prefix + "eh_stopped");
+          Place *p19 = PN.newPlace(prefix + "ia_final");
 
-	  PN.newArc(t1, PN.findPlace(toString(phylum->tEventHandlers_1->id) + ".internal.initial"));
-	  PN.newArc(PN.findPlace(toString(phylum->tEventHandlers_1->id) + ".internal.final"), t2);
-	}
+          Transition *t11 = PN.newTransition(prefix + "disable_eh");
+          PN.newArc(p19, t11);
+          PN.newArc(p16, t11);
+          PN.newArc(t11, p17);
+
+          // Unparse and embed the event handlers.
+	  phylum->tEventHandlers_1->unparse(pseudoPrinter, current_view);
+          PN.mergePlaces((prefix + "eha_initial"),  (toString(phylum->tEventHandlers_1->id) + ".initial"));
+          PN.mergePlaces((prefix + "inner_stop"),   (toString(phylum->tEventHandlers_1->id) + ".stop"));
+          PN.mergePlaces((prefix + "eha_final"),    (toString(phylum->tEventHandlers_1->id) + ".disabled"));
+          PN.mergePlaces((prefix + "eh_start"),     (toString(phylum->tEventHandlers_1->id) + ".start"));
+          PN.mergePlaces((prefix + "eh_active"),    (toString(phylum->tEventHandlers_1->id) + ".active"));
+          PN.mergePlaces((prefix + "eh_disabling"), (toString(phylum->tEventHandlers_1->id) + ".disabling"));
+          PN.mergePlaces((prefix + "eh_stopped"),   (toString(phylum->tEventHandlers_1->id) + ".stopped"));
+
+          // Unparse and embed the inner activity.
+  	  phylum->activity_1->unparse(pseudoPrinter, current_view);
+	  PN.mergePlaces((prefix + "eh_start"),      (toString(phylum->activity_1->id) + ".initial"));
+	  PN.mergePlaces((prefix + "ia_final"),      (toString(phylum->activity_1->id) + ".final"));
+	  PN.mergePlaces((prefix + "eh_stopped"),    (toString(phylum->activity_1->id) + ".stop"));
+	  PN.mergePlaces((prefix + "inner_stopped"), (toString(phylum->activity_1->id) + ".stopped"));
+        }
+        else
+        {
+          // Unparse and embed the inner activity.
+  	  phylum->activity_1->unparse(pseudoPrinter, current_view);
+	  PN.mergePlaces((prefix + "eha_initial"),   (toString(phylum->activity_1->id) + ".initial"));
+	  PN.mergePlaces((prefix + "eha_final"),     (toString(phylum->activity_1->id) + ".final"));
+	  PN.mergePlaces((prefix + "inner_stop"),    (toString(phylum->activity_1->id) + ".stop"));
+	  PN.mergePlaces((prefix + "inner_stopped"), (toString(phylum->activity_1->id) + ".stopped"));
+        }
 
 
-  	// embed fault handler
-    	PN.mergePlaces(prefix + "fh_fault",      prefix + "faultHandler.fault");
-      	PN.mergePlaces(prefix + "inner_stopped", prefix + "faultHandler.initial");
-	PN.mergePlaces(prefix + "final",         prefix + "faultHandler.final");
-	PN.mergePlaces(prefix + "inner_stop",    prefix + "faultHandler.stop");
-	PN.mergePlaces(prefix + "final",         prefix + "faultHandler.stopped");
-
-	// embed inner activity
-	PN.mergePlaces(prefix + "activity_initial", toString(phylum->activity_1->id) + ".initial");
-	PN.mergePlaces(prefix + "activity_final",   toString(phylum->activity_1->id) + ".final");
-	PN.mergePlaces(prefix + "inner_stop",       toString(phylum->activity_1->id) + ".stop");
-	PN.mergePlaces(prefix + "inner_stopped",    toString(phylum->activity_1->id) + ".stopped");
+	// Unparse the fault handlers (the handlers embed themselves to the
+	// process).
+	phylum->tFaultHandlers_1->unparse(pseudoPrinter, current_view);
 
         break;
       }
 
+
     case(petrinetsmall_enum):
       {
-	// Create the initial place of the process pattern and mark it.
-	Place *p1 = PN.newPlace(prefix + "initial");
-	p1->mark();
-      
-	// Create the internal places of the process pattern.
+        // Places.
+        Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "final");
 
+        // Indicate the process's initial and final marking.
+	p1->mark();
         p2->isFinal = true;
-
-	// unparse the embedded activity
+       
+        // Unparse the embedded activity.
 	phylum->activity_1->unparse(pseudoPrinter, current_view);
 
+        // No event handlers: embed activity.
+        if (globals::ASTEmap[phylum->id]->hasEH == false)
+        {
+  	  PN.mergePlaces(phylum->id, ".internal.initial", phylum->activity_1->id, ".initial");
+  	  PN.mergePlaces(phylum->id, ".internal.final", phylum->activity_1->id, ".final");
+        }
 
-	PN.mergePlaces("1.internal.initial", toString(phylum->activity_1->id) + ".initial");
-	PN.mergePlaces("1.internal.final",   toString(phylum->activity_1->id) + ".final");
+        // Event handlers present.
+        if (globals::ASTEmap[phylum->id]->hasEH == true)
+        {
+	  Place *p3 = PN.newPlace(prefix + "activity_begin");
+	  Place *p4 = PN.newPlace(prefix + "activity_done");
+	  Place *p5 = PN.newPlace(prefix + "disabling_eh");
+	  Place *p6 = PN.newPlace(prefix + "active_eh");
 
+          Transition *t1 = PN.newTransition(prefix + "disable_eh");
+          PN.newArc(p4, t1);
+          PN.newArc(t1, p5);
+          PN.newArc(p6, t1);
+
+  	  // Unparse the event handlers.
+  	  phylum->tEventHandlers_1->unparse(pseudoPrinter, current_view);
+
+  	  // Embed the inner activity.
+  	  PN.mergePlaces(phylum->id, ".internal.activity_begin", phylum->activity_1->id, ".initial");
+  	  PN.mergePlaces(phylum->id, ".internal.activity_done", phylum->activity_1->id, ".final");
+
+          // Embed the event handlers.
+          PN.mergePlaces(phylum->id, ".internal.initial",        phylum->tEventHandlers_1->id, ".initial");
+          PN.mergePlaces(phylum->id, ".internal.final",          phylum->tEventHandlers_1->id, ".disabled");
+          PN.mergePlaces(phylum->id, ".internal.disabling_eh",   phylum->tEventHandlers_1->id, ".disabling");
+          PN.mergePlaces(phylum->id, ".internal.active_eh",      phylum->tEventHandlers_1->id, ".active");
+          PN.mergePlaces(phylum->id, ".internal.activity_begin", phylum->tEventHandlers_1->id, ".start");
+        }
+  
 	break;
       }
 
@@ -274,10 +331,23 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
   SCOPE
 ******************************************************************************/
 
+%{
+/*!
+ * \fn      void kc::PScope(impl_tScope* abstract_phylum, uview current_view)
+ *
+ * \brief   Pattern for the <scope> activity.
+ *
+ * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
+ * \param   current_view     the current unparse view
+ *
+ * \todo    Remove or implement code snippet for loop count parameter.
+ */
+%}
 void PScope(impl_tScope* abstract_phylum, uview current_view)
 {
   impl_tScope_Scope* phylum = static_cast<impl_tScope_Scope*>(abstract_phylum);
   assert(phylum != NULL);
+  assert(globals::ASTEmap[phylum->id] != NULL);
 
   header(phylum->id, true);
   string prefix = toString(phylum->id) + ".internal.";
@@ -287,8 +357,7 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
   {
     case(petrinetnew_enum):
       {
-	globals::currentScope = prefix;
-
+        // Places.
 	Place *p1  = PN.newPlace(prefix + "initial");
 	Place *p2  = PN.newPlace(prefix + "final");
 	Place *p3  = PN.newPlace(prefix + "fault_in");
@@ -298,59 +367,71 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
 	Place *p7  = PN.newPlace(prefix + "stopped");
 	Place *p8  = PN.newPlace(prefix + "fault_up");
 	Place *p9  = PN.newPlace(prefix + "Active");
-	Place *p10 = PN.newPlace(prefix + "!Active"); p10->mark();
+	Place *p10 = PN.newPlace(prefix + "!Active");
 	Place *p11 = PN.newPlace(prefix + "Successful");
-	Place *p12 = PN.newPlace(prefix + "!Successful"); p12->mark();
+	Place *p12 = PN.newPlace(prefix + "!Successful");
 	Place *p13 = PN.newPlace(prefix + "inner_stopped");
-	Place *p14 = PN.newPlace(prefix + "activity_initial");
-	Place *p15 = PN.newPlace(prefix + "activity_final");
+	Place *p14 = PN.newPlace(prefix + "eha_initial");
+	Place *p15 = PN.newPlace(prefix + "eha_final");
 	Place *p16 = PN.newPlace(prefix + "fh_fault");
 	Place *p17 = PN.newPlace(prefix + "ch_initial");
 	Place *p18 = PN.newPlace(prefix + "th_initial");
 	Place *p19 = PN.newPlace(prefix + "ch_fault_in");
 	Place *p20 = PN.newPlace(prefix + "ch_fault_up");
-	Place *p21 = PN.newPlace(prefix + "p21"); p21->mark();
-	Place *p22 = PN.newPlace(prefix + "p22");
-	Place *p23 = PN.newPlace(prefix + "p23");
-	Place *p24 = PN.newPlace(prefix + "ch_stop");
-	Place *p25 = PN.newPlace(prefix + "ch_stopped");
+	Place *p21 = PN.newPlace(prefix + "!ThrownCHFault");
+	Place *p22 = PN.newPlace(prefix + "ThrownCHFault");
+	Place *p23 = PN.newPlace(prefix + "ch_stop");
+	Place *p24 = PN.newPlace(prefix + "ch_stopped");
 
+        // Scope is initially in states "!Active", "!Successful" and "!ThrownCHFault".
+        p10->mark();
+        p12->mark();
+        p21->mark();
+
+        // Initialize scope: start inner activity, set state to "Active".
 	Transition *t1 = PN.newTransition(prefix + "initialize");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p9);
 	PN.newArc(p10, t1);
-	PN.newArc(t1, p14);
+        PN.newArc(t1, p14);
 
+        // Finalize scope: end inner activity, set state to "Successful".
 	Transition *t2 = PN.newTransition(prefix + "finalize");
 	PN.newArc(t2, p2);
 	PN.newArc(p9, t2);
 	PN.newArc(t2, p10);
 	PN.newArc(t2, p11);
 	PN.newArc(p12, t2);
-//	PN.newArc(p15, t2);
+        PN.newArc(p15, t2);
 
-	Transition *t3 = PN.newTransition(prefix + "ft");
+        // Forced termination: stop inner activity.
+	Transition *t3 = PN.newTransition(prefix + "forced_termination");
 	PN.newArc(p3, t3);
 	PN.newArc(t3, p6);
 	PN.newArc(p9, t3);
 	PN.newArc(t3, p10);
 	PN.newArc(t3, p16);
 
+        // Ignore further faults.
 	Transition *t4 = PN.newTransition(prefix + "ignore_fault");
 	PN.newArc(p3, t4);
 	PN.newArc(p10, t4, READ);
 
+        // Start compensation handler.
 	Transition *t5 = PN.newTransition(prefix + "start_ch");
 	PN.newArc(p4, t5);
 	PN.newArc(p11, t5);
 	PN.newArc(t5, p12);
 	PN.newArc(t5, p17);
 
+        // Skip compensation handler (in case that it was already called or the
+        // scope did not complete successfully).
 	Transition *t6 = PN.newTransition(prefix + "skip_ch");
 	PN.newArc(p4, t6);
 	PN.newArc(t6, p5);
 	PN.newArc(p12, t6, READ);
 
+        // Start termination handler (in case the process is not exiting).
 	Transition *t7 = PN.newTransition(prefix + "start_th");
 	PN.newArc(p9, t7);
 	PN.newArc(t7, p10);
@@ -358,11 +439,15 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
 	PN.newArc(t7, p18);
 	PN.newArc(PN.findPlace("1.internal.!Exiting"), t7, READ);
 
+        // Skip termination handler (in case the process is exiting).
 	Transition *t8 = PN.newTransition(prefix + "skip_th");
 	PN.newArc(t8, p7);
 	PN.newArc(p13, t8);
 	PN.newArc(PN.findPlace("1.internal.Exiting"), t8, READ);
 
+        // Rethrow compensation handler's fault (in case this scope's fault
+        // handlers are uninstalled and it is the first compensation handler's
+        // fault to be thrown up).
 	Transition *t9 = PN.newTransition(prefix + "rethrow_ch_fault");
 	PN.newArc(p10, t9, READ);
 	PN.newArc(p19, t9);
@@ -370,6 +455,9 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
 	PN.newArc(p21, t9);
 	PN.newArc(t9, p22);
 
+        // Handle compensation handler's fault (in case this scope's fault
+        // handlers are installed and it is the first compensation handler's
+        // fault thrown to this scope.
 	Transition *t10 = PN.newTransition(prefix + "handle_ch_fault");
 	PN.newArc(t10, p3);
 	PN.newArc(p9, t10, READ);
@@ -377,200 +465,100 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
 	PN.newArc(p21, t10);
 	PN.newArc(t10, p22);
 
+        // Ignore compensation handler's fault (in case it is not the first one
+        // thrown to this scope).
 	Transition *t11 = PN.newTransition(prefix + "ignore_ch_fault");
 	PN.newArc(p19, t11);
 	PN.newArc(p22, t11, READ);
 
+        // Stopping transitions.
 	Transition *t12 = stop(p1, "initial", prefix);
-
-	// now comes everything we need for compensation in loops
-	assert(ASTEmap[phylum->id] != NULL);
-	if (ASTEmap[phylum->id]->ancestorLoops().size() != 0 && parameters[P_LOOPCOUNT])
-	{
-	  // rename existing places
-	  PN.renamePlace(prefix + "final", prefix + "final1");
-	  PN.renamePlace(prefix + "compensate", prefix + "compensate1");
-	  PN.renamePlace(prefix + "compensated", prefix + "compensated1");
-
-	  // add new places (the interface places of the wrapper)
-	  Place *p21 = PN.newPlace(prefix + "final");
-	  Place *p22 = PN.newPlace(prefix + "compensate");
-	  Place *p23 = PN.newPlace(prefix + "compensated");
-
-	  vector<unsigned int> ancestor_loops = ASTEmap[phylum->id]->ancestorLoops();
-	  cerr << ancestor_loops.size() << " ancestor_loops" << endl;
-	  if (ancestor_loops.size() > 1)
-	  {
-	    vector<unsigned int> loop_bounds;
-	    vector<unsigned int> loop_identifiers;
-	    unsigned int i = 0;
-	    for (vector<unsigned int>::iterator loop = ancestor_loops.begin(); loop != ancestor_loops.end(); loop++)
-	    {
-	      assert(ASTEmap[*loop] != NULL);
-
-	      if (loop == ancestor_loops.begin())
-		continue;
-  
-	      loop_bounds.push_back(ASTEmap[*loop]->max_loops);
-	      loop_identifiers.push_back(*loop);
-	    }
-
-	    process_loop_bounds(loop_bounds, loop_identifiers, prefix, ASTEmap[*ancestor_loops.begin()]->max_loops); 
-	  }
-	  else
-	  {
-	    Place *c1 = PN.newPlace(prefix + "c");
-	    Place *c2 = PN.newPlace(prefix + "!c");
-	    c2->mark(ASTEmap[*ancestor_loops.begin()]->max_loops);
-	    
-	    Transition *t14 = PN.newTransition(prefix + "t14");
-	    PN.newArc(PN.findPlace(prefix + "final1"), t14);
-	    PN.newArc(PN.findPlace(prefix + "!Successful"), t14, READ);
-	    PN.newArc(t14, PN.findPlace(prefix + "final"));
-
-	    Transition *t15 = PN.newTransition(prefix + "t15");
-	    PN.newArc(t15, c1);
-	    PN.newArc(c2, t15);
-	    PN.newArc(PN.findPlace(prefix + "final1"), t15);
-	    PN.newArc(PN.findPlace(prefix + "Successful"), t15);
-	    PN.newArc(t15, PN.findPlace(prefix + "!Successful"));
-	    PN.newArc(t15, PN.findPlace(prefix + "final"));
-
-	    Transition *t16 = PN.newTransition(prefix + "t16");
-	    PN.newArc(c2, t16, READ, ASTEmap[*ancestor_loops.begin()]->max_loops);
-	    PN.newArc(PN.findPlace(prefix + "compensated1"), t16);
-	    PN.newArc(t16, PN.findPlace(prefix + "compensated"));
-
-	    Transition *t17 = PN.newTransition(prefix + "t17");
-	    PN.newArc(c1, t17);
-	    PN.newArc(t17, c2);
-	    PN.newArc(PN.findPlace(prefix + "compensate"), t17);
-	    PN.newArc(t17, PN.findPlace(prefix + "ch_initial"));
-
-	    PN.mergePlaces(prefix + "compensated1", prefix + "compensate");
-	  }
-	}
-
-	// don't stop from "final1" -- that's why this line is down here
-	Transition *t13 = stop(PN.findPlace(prefix + "final"), "final", prefix);
+	Transition *t13 = stop(p2, "final", prefix);
 
 
-	// unparse the standard elements
+	// Unparse the standard elements.
 	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
 
-	// unparse the embedded activity
-	phylum->activity_1->unparse(pseudoPrinter, current_view);
 
-	// unparse the fault handlers
+        // Create subpattern for the event handlers and the inner activity.
+        if (globals::ASTEmap[phylum->id]->hasEH)
+	{
+          Place *p25 = PN.newPlace(prefix + "eh_start");
+          Place *p26 = PN.newPlace(prefix + "eh_active");
+          Place *p27 = PN.newPlace(prefix + "eh_disabling");
+          Place *p28 = PN.newPlace(prefix + "eh_stopped");
+          Place *p29 = PN.newPlace(prefix + "ia_final");
+
+          Transition *t14 = PN.newTransition(prefix + "disable_eh");
+          PN.newArc(p29, t14);
+          PN.newArc(p26, t14);
+          PN.newArc(t14, p27);
+
+          // Unparse and embed the event handlers.
+	  phylum->tEventHandlers_1->unparse(pseudoPrinter, current_view);
+          PN.mergePlaces((prefix + "eha_initial"),  (toString(phylum->tEventHandlers_1->id) + ".initial"));
+          PN.mergePlaces((prefix + "stop"),         (toString(phylum->tEventHandlers_1->id) + ".stop"));
+          PN.mergePlaces((prefix + "eha_final"),    (toString(phylum->tEventHandlers_1->id) + ".disabled"));
+          PN.mergePlaces((prefix + "eh_start"),     (toString(phylum->tEventHandlers_1->id) + ".start"));
+          PN.mergePlaces((prefix + "eh_active"),    (toString(phylum->tEventHandlers_1->id) + ".active"));
+          PN.mergePlaces((prefix + "eh_disabling"), (toString(phylum->tEventHandlers_1->id) + ".disabling"));
+          PN.mergePlaces((prefix + "eh_stopped"),   (toString(phylum->tEventHandlers_1->id) + ".stopped"));
+
+          // Unparse and embed the inner activity.
+  	  phylum->activity_1->unparse(pseudoPrinter, current_view);
+	  PN.mergePlaces((prefix + "eh_start"),      (toString(phylum->activity_1->id) + ".initial"));
+	  PN.mergePlaces((prefix + "ia_final"),      (toString(phylum->activity_1->id) + ".final"));
+	  PN.mergePlaces((prefix + "eh_stopped"),    (toString(phylum->activity_1->id) + ".stop"));
+	  PN.mergePlaces((prefix + "inner_stopped"), (toString(phylum->activity_1->id) + ".stopped"));
+        }
+        else
+        {
+          // Unparse and embed the inner activity.
+  	  phylum->activity_1->unparse(pseudoPrinter, current_view);
+	  PN.mergePlaces((prefix + "eha_initial"),   (toString(phylum->activity_1->id) + ".initial"));
+	  PN.mergePlaces((prefix + "eha_final"),     (toString(phylum->activity_1->id) + ".final"));
+	  PN.mergePlaces((prefix + "stop"),          (toString(phylum->activity_1->id) + ".stop"));
+	  PN.mergePlaces((prefix + "inner_stopped"), (toString(phylum->activity_1->id) + ".stopped"));
+        }
+
+
+        // Unparse the FTC handlers (the handlers embed themselves to this
+        // scope).
 	phylum->tFaultHandlers_1->unparse(pseudoPrinter, current_view);
-
-	// unparse the compensation handler
-	phylum->tCompensationHandler_1->unparse(pseudoPrinter, current_view);
-
-	// unparse the termination handler
 	phylum->tTerminationHandler_1->unparse(pseudoPrinter, current_view);
-
-	// unparse the event handlers
-	phylum->tEventHandlers_1->unparse(pseudoPrinter, current_view);
+       	phylum->tCompensationHandler_1->unparse(pseudoPrinter, current_view); 
 
 
-        if (ASTEmap[phylum->id]->hasEH)
-	{
-          Place *p26 = PN.newPlace(prefix + "p26");
-          Place *p27 = PN.newPlace(prefix + "p27");
-          Place *p28 = PN.newPlace(prefix + "p28");
-
-          PN.newArc(t1, p23);
-          PN.newArc(p26, t2);
-
-	  Transition *t13 = PN.newTransition(prefix + "t13");
-	  PN.newArc(p27, t13);
-	  PN.newArc(p15, t13);
-          PN.newArc(t13, p28);
-          
-          Transition *t14 = PN.newTransition(prefix + "t14");
-	  PN.newArc(PN.findPlace(toString(phylum->activity_1->id) + ".stopped"), t14);
-          PN.newArc(p27, t14);
-          PN.newArc(t14, p28);
-          PN.newArc(t14, p22);
-	  
-          
-          PN.mergePlaces((toString(phylum->tEventHandlers_1->id) + ".internal.initial"),   (prefix + "p23"));
-          PN.mergePlaces((toString(phylum->tEventHandlers_1->id) + ".internal.running"),   (prefix + "p27"));
-          PN.mergePlaces((toString(phylum->tEventHandlers_1->id) + ".internal.finishing"), (prefix + "p28"));
-          PN.mergePlaces((toString(phylum->tEventHandlers_1->id) + ".internal.stop"),      (prefix + "p22"));
-          PN.mergePlaces((toString(phylum->tEventHandlers_1->id) + ".internal.stopped"),   (prefix + "inner_stopped")); // was: "p13"
-          PN.mergePlaces((toString(phylum->tEventHandlers_1->id) + ".internal.fault"),     (prefix + "fault_in")); // obsolete?
-          PN.mergePlaces((toString(phylum->tEventHandlers_1->id) + ".internal.final"),     (prefix + "p26"));
-	}
-
-
-	// embed fault handler
-	PN.mergePlaces((prefix + "inner_stopped"), (prefix + "faultHandler.initial"));
-	PN.mergePlaces((prefix + "fh_fault"),      (prefix + "faultHandler.fault"));
-	PN.mergePlaces((prefix + "final"),         (prefix + "faultHandler.final"));
-	PN.mergePlaces((prefix + "stop"),          (prefix + "faultHandler.stop"));
-	PN.mergePlaces((prefix + "stopped"),       (prefix + "faultHandler.stopped"));
-
-	impl_tCompensationHandler *d = phylum->tCompensationHandler_1;
-
-	// embed compensation handler
-	with (d)
-	{
-	  d = CompensationHandler(ch_activity, *):
-	  {
-	    PN.mergePlaces((prefix + "ch_initial"), (toString(ch_activity->id) + ".initial"));
-	    PN.mergePlaces((prefix + "ch_stop"),    (toString(ch_activity->id) + ".stop"));
-	    PN.mergePlaces((prefix + "ch_stopped"), (toString(ch_activity->id) + ".stopped"));
-
-	    if (ASTEmap[phylum->id]->ancestorLoops().size() != 0 && parameters[P_LOOPCOUNT])
-	      PN.mergePlaces((prefix + "compensated1"), (toString(ch_activity->id) + ".final"));
-	    else
-	      PN.mergePlaces((prefix + "compensated"),  (toString(ch_activity->id) + ".final"));
-	  }
-	  default: { assert(false); }
-	}
-
-	// embed termination handler
-	PN.mergePlaces((prefix + "th_initial"), (prefix + "terminationHandler.initial"));
-	PN.mergePlaces((prefix + "stopped"),    (prefix + "terminationHandler.final"));
-	PN.mergePlaces((prefix + "stop"),       (prefix + "terminationHandler.stop"));
-	PN.mergePlaces((prefix + "stopped"),    (prefix + "terminationHandler.final"));
-
-	// embed inner activity
-	PN.mergePlaces((prefix + "activity_initial"), (toString(phylum->activity_1->id) + ".initial"));
-	PN.mergePlaces((prefix + "activity_final"),   (toString(phylum->activity_1->id) + ".final"));
-	PN.mergePlaces((prefix + "stop"),             (toString(phylum->activity_1->id) + ".stop"));
-	PN.mergePlaces((prefix + "stopped"),          (toString(phylum->activity_1->id) + ".stopped"));
-        
-
-      	// merge `ch_fault_up' place with `ch_fault_in' place of the parent scope
-    	PN.mergePlaces((prefix + "ch_fault_up"), (toString(ASTEmap[phylum->id]->parentScopeId) + ".internal.ch_fault_in"));
+      	// Embed scope to parent scope: Merge `ch_fault_up' place with
+      	// `ch_fault_in' place of the parent scope.
+    	PN.mergePlaces((prefix + "ch_fault_up"), (toString(globals::ASTEmap[phylum->id]->parentScopeId) + ".internal.ch_fault_in"));
   
 	break;
       }
 
+
+
     case(petrinetsmall_enum):
       {
+        // Places.
         Place *p1 = PN.newPlace(prefix + "initial");
 	Place *p2 = PN.newPlace(prefix + "final");
 
-        // Unparse the standard elements
+        // Unparse the standard elements.
 	phylum->standardElements_1->unparse(pseudoPrinter, current_view);
         
         // Unparse the embedded activity.
 	phylum->activity_1->unparse(pseudoPrinter, current_view);
 
-
-        if (ASTEmap[phylum->id]->hasEH == false)
+        // No event handlers: embed activity.
+        if (globals::ASTEmap[phylum->id]->hasEH == false)
         {
-  	  // Embed the inner activity.
   	  PN.mergePlaces(phylum->id, ".internal.initial", phylum->activity_1->id, ".initial");
   	  PN.mergePlaces(phylum->id, ".internal.final", phylum->activity_1->id, ".final");
         }
 
-
-        if (ASTEmap[phylum->id]->hasEH == true)
+        // Event handlers present.
+        if (globals::ASTEmap[phylum->id]->hasEH == true)
         {
 	  Place *p3 = PN.newPlace(prefix + "activity_begin");
 	  Place *p4 = PN.newPlace(prefix + "activity_done");
@@ -590,11 +578,11 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
   	  PN.mergePlaces(phylum->id, ".internal.activity_done", phylum->activity_1->id, ".final");
 
           // Embed the event handlers.
-          PN.mergePlaces(phylum->id, ".internal.initial",        phylum->tEventHandlers_1->id, ".internal.initial");
-          PN.mergePlaces(phylum->id, ".internal.final",          phylum->tEventHandlers_1->id, ".internal.disabled");
-          PN.mergePlaces(phylum->id, ".internal.disabling_eh",   phylum->tEventHandlers_1->id, ".internal.disabling");
-          PN.mergePlaces(phylum->id, ".internal.active_eh",      phylum->tEventHandlers_1->id, ".internal.active");
-          PN.mergePlaces(phylum->id, ".internal.activity_begin", phylum->tEventHandlers_1->id, ".internal.start");
+          PN.mergePlaces(phylum->id, ".internal.initial",        phylum->tEventHandlers_1->id, ".initial");
+          PN.mergePlaces(phylum->id, ".internal.final",          phylum->tEventHandlers_1->id, ".disabled");
+          PN.mergePlaces(phylum->id, ".internal.disabling_eh",   phylum->tEventHandlers_1->id, ".disabling");
+          PN.mergePlaces(phylum->id, ".internal.active_eh",      phylum->tEventHandlers_1->id, ".active");
+          PN.mergePlaces(phylum->id, ".internal.activity_begin", phylum->tEventHandlers_1->id, ".start");
         }
   
 	break;
@@ -606,3 +594,84 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
 
   footer(phylum->id, true);
 }
+
+
+
+
+
+
+
+/*
+	// now comes everything we need for compensation in loops
+	assert(globals::ASTEmap[phylum->id] != NULL);
+	if (globals::ASTEmap[phylum->id]->ancestorLoops().size() != 0 && parameters[P_LOOPCOUNT])
+	{
+	  // rename existing places
+	  PN.renamePlace(prefix + "final", prefix + "final1");
+	  PN.renamePlace(prefix + "compensate", prefix + "compensate1");
+	  PN.renamePlace(prefix + "compensated", prefix + "compensated1");
+
+	  // add new places (the interface places of the wrapper)
+	  Place *p21 = PN.newPlace(prefix + "final");
+	  Place *p22 = PN.newPlace(prefix + "compensate");
+	  Place *p23 = PN.newPlace(prefix + "compensated");
+
+	  vector<unsigned int> ancestor_loops = globals::ASTEmap[phylum->id]->ancestorLoops();
+	  cerr << ancestor_loops.size() << " ancestor_loops" << endl;
+	  if (ancestor_loops.size() > 1)
+	  {
+	    vector<unsigned int> loop_bounds;
+	    vector<unsigned int> loop_identifiers;
+	    unsigned int i = 0;
+	    for (vector<unsigned int>::iterator loop = ancestor_loops.begin(); loop != ancestor_loops.end(); loop++)
+	    {
+	      assert(globals::ASTEmap[*loop] != NULL);
+
+	      if (loop == ancestor_loops.begin())
+		continue;
+  
+	      loop_bounds.push_back(globals::ASTEmap[*loop]->max_loops);
+	      loop_identifiers.push_back(*loop);
+	    }
+
+	    process_loop_bounds(loop_bounds, loop_identifiers, prefix, globals::ASTEmap[*ancestor_loops.begin()]->max_loops); 
+	  }
+	  else
+	  {
+	    Place *c1 = PN.newPlace(prefix + "c");
+	    Place *c2 = PN.newPlace(prefix + "!c");
+	    c2->mark(globals::ASTEmap[*ancestor_loops.begin()]->max_loops);
+	    
+	    Transition *t14 = PN.newTransition(prefix + "t14");
+	    PN.newArc(PN.findPlace(prefix + "final1"), t14);
+	    PN.newArc(PN.findPlace(prefix + "!Successful"), t14, READ);
+	    PN.newArc(t14, PN.findPlace(prefix + "final"));
+
+	    Transition *t15 = PN.newTransition(prefix + "t15");
+	    PN.newArc(t15, c1);
+	    PN.newArc(c2, t15);
+	    PN.newArc(PN.findPlace(prefix + "final1"), t15);
+	    PN.newArc(PN.findPlace(prefix + "Successful"), t15);
+	    PN.newArc(t15, PN.findPlace(prefix + "!Successful"));
+	    PN.newArc(t15, PN.findPlace(prefix + "final"));
+
+	    Transition *t16 = PN.newTransition(prefix + "t16");
+	    PN.newArc(c2, t16, READ, globals::ASTEmap[*ancestor_loops.begin()]->max_loops);
+	    PN.newArc(PN.findPlace(prefix + "compensated1"), t16);
+	    PN.newArc(t16, PN.findPlace(prefix + "compensated"));
+
+	    Transition *t17 = PN.newTransition(prefix + "t17");
+	    PN.newArc(c1, t17);
+	    PN.newArc(t17, c2);
+	    PN.newArc(PN.findPlace(prefix + "compensate"), t17);
+	    PN.newArc(t17, PN.findPlace(prefix + "ch_initial"));
+
+	    PN.mergePlaces(prefix + "compensated1", prefix + "compensate");
+	  }
+	}
+
+	// don't stop from "final1" -- that's why this line is down here
+	Transition *t13 = stop(PN.findPlace(prefix + "final"), "final", prefix);
+
+        // that line is moved up as I commented this out...
+*/

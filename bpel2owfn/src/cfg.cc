@@ -19,27 +19,30 @@
 \*****************************************************************************/
 
 /*!
- * \file cfg.cc
+ * \file    cfg.cc
  *
  * \brief   control flow graph
  *
- * This file implements the class defined in cfg.h
+ *          This file implements the class defined in cfg.h
  * 
  * \author  Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/03/05 15:15:33 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.46 $
+ * \version \$Revision: 1.47 $
  *
- * \todo    - commandline option to control drawing of clusters 
+ * \todo    
+ *          - commandline option to control drawing of clusters 
+ *          - do not use "temporaryAttributeMap", because it should be deleted
+ *            during postprocessing
  */
 
 
@@ -58,10 +61,6 @@ using std::cerr;
 using std::endl;
 
 
-
-
-extern map<unsigned int, map<string, string> > temporaryAttributeMap;
-extern map<unsigned int, ASTE*> ASTEmap;
 
 
 
@@ -151,10 +150,10 @@ void CFGBlock::print_dot()
 	(*output) << iter->first << "," << iter->second << "\\n";
       }
     }
-    if (! ASTEmap[id]->peerScopes.empty())
+    if (! globals::ASTEmap[id]->peerScopes.empty())
     {
       (*output) << "\\npeer scopes: \\n ";
-      for (set< unsigned int  >::iterator iter = ASTEmap[id]->peerScopes.begin(); iter != ASTEmap[id]->peerScopes.end(); iter++)
+      for (set< unsigned int  >::iterator iter = globals::ASTEmap[id]->peerScopes.begin(); iter != globals::ASTEmap[id]->peerScopes.end(); iter++)
       {
 	(*output) << (*iter) << "\\n";
       }
@@ -450,18 +449,20 @@ void CFGBlock::checkForUninitializedVariables()
 
   switch(type)
   {
-    case CFGReply     : var = ASTEmap[id]->variableName; break;
-    case CFGFrom      : var = ASTEmap[id]->variableName; break;
-    case CFGInvoke    : var = ASTEmap[id]->inputVariableName; 
+    case CFGReply     : var = globals::ASTEmap[id]->variableName; break;
+    case CFGFrom      : var = globals::ASTEmap[id]->variableName; break;
+    case CFGInvoke    : var = globals::ASTEmap[id]->inputVariableName; 
 			attributeName = "inputVariable";
 			break;
+
+    default: { /* A switch needs a default branch! */ }
   }
   
   if ((type == CFGReply || type == CFGFrom || type == CFGInvoke) && var != "")
   {
     if (initializedVariables.find(var) == initializedVariables.end())
     {
-      trace("[CFG] WARNING: Variable \"" + temporaryAttributeMap[id][attributeName] 
+      trace("[CFG] WARNING: Variable \"" + globals::temporaryAttributeMap[id][attributeName] 
 //	      + "\" ("+ var +") (activity ID = " 
 //	      + toString(id->value)  
 	      + "\" in line " 
@@ -476,16 +477,17 @@ void CFGBlock::checkForUninitializedVariables()
     
   switch(type)
   {
-    case CFGReceive   : var = ASTEmap[id]->variableName; break;
-    case CFGCatch     : var = ASTEmap[id]->variableName; 
+    case CFGReceive   : var = globals::ASTEmap[id]->variableName; break;
+    case CFGCatch     : var = globals::ASTEmap[id]->variableName; 
 			attributeName = "faultVariable"; 
 			break;
-    case CFGTo        : var = ASTEmap[id]->variableName; break;
-    case CFGInvoke    : var = ASTEmap[id]->outputVariableName;
+    case CFGTo        : var = globals::ASTEmap[id]->variableName; break;
+    case CFGInvoke    : var = globals::ASTEmap[id]->outputVariableName;
 			attributeName = "outputVariable";
 			break;
-    case CFGOnMessage : var = ASTEmap[id]->variableName; break;
-//      default: // should not happen (thinks Niels)
+    case CFGOnMessage : var = globals::ASTEmap[id]->variableName; break;
+
+    default: { /* A switch needs a default branch! */ }
   }
   
   if ((type == CFGReceive || type == CFGCatch || type == CFGTo || type==CFGInvoke || type == CFGOnMessage) && var != "")
@@ -514,12 +516,12 @@ void CFGBlock::checkForCyclicLinks()
     if (type == CFGTarget)
     {
       trace( TRACE_VERY_DEBUG, "[CFG] Get Name of the link when target\n");
-      linkname = ASTEmap[id]->linkName;
+      linkname = globals::ASTEmap[id]->linkName;
     }
     else if (type == CFGSource)
     {
       trace( TRACE_VERY_DEBUG, "[CFG] Get Name of the link when source\n");
-      linkname = ASTEmap[id]->linkName;
+      linkname = globals::ASTEmap[id]->linkName;
     }
 
     
@@ -529,7 +531,7 @@ void CFGBlock::checkForCyclicLinks()
       if (!targetsSeen.empty() && targetsSeen.find(linkname) != targetsSeen.end())
       {
         // triggers SA00072
-	SAerror(72, ASTEmap[ id ]->attributes["linkName"], toInt(ASTEmap[id]->attributes["referenceLine"]));
+	SAerror(72, globals::ASTEmap[ id ]->attributes["linkName"], toInt(globals::ASTEmap[id]->attributes["referenceLine"]));
 	return;
       }
       trace( TRACE_VERY_DEBUG, "[CFG] So get the target to the source\n");
@@ -592,13 +594,13 @@ void CFGBlock::checkForCyclicControlDependency()
   {
     if ( type == CFGTarget )
     {
-      unsigned int possiblePeer = ASTEmap[ ASTEmap[ sources[ dot_name() ]->id ]->parentActivityId ]->parentScopeId;
+      unsigned int possiblePeer = globals::ASTEmap[ globals::ASTEmap[ sources[ dot_name() ]->id ]->parentActivityId ]->parentScopeId;
       unsigned int parentId = id;
-      parentId = ASTEmap[ parentId ]->parentActivityId;
+      parentId = globals::ASTEmap[ parentId ]->parentActivityId;
 
       while ( parentId != 1 && parentId != possiblePeer )
       {
-	parentId = ASTEmap[parentId]->parentScopeId;
+	parentId = globals::ASTEmap[parentId]->parentScopeId;
       }
       if ( parentId == 1 && parentId != possiblePeer )
       {
@@ -610,18 +612,18 @@ void CFGBlock::checkForCyclicControlDependency()
     {
       // find direct child scopes
       unsigned int child = 0;
-      for ( set< unsigned int >::iterator enclosedScope = ASTEmap[ ASTEmap[ id ]->parentScopeId ]->enclosedScopes.begin(); 
-					  enclosedScope != ASTEmap[ ASTEmap[ id ]->parentScopeId ]->enclosedScopes.end(); 
+      for ( set< unsigned int >::iterator enclosedScope = globals::ASTEmap[ globals::ASTEmap[ id ]->parentScopeId ]->enclosedScopes.begin(); 
+					  enclosedScope != globals::ASTEmap[ globals::ASTEmap[ id ]->parentScopeId ]->enclosedScopes.end(); 
 					  enclosedScope++)
       {
-	if ( ASTEmap[ *enclosedScope ]->parentScopeId == ASTEmap[ id ]->parentScopeId )
+	if ( globals::ASTEmap[ *enclosedScope ]->parentScopeId == globals::ASTEmap[ id ]->parentScopeId )
 	{
 	  child = *enclosedScope;
 	}
       }
       if ( child != 0 )
       {
-	set< unsigned int > subscopes ( ASTEmap[ child ]->peerScopes );
+	set< unsigned int > subscopes ( globals::ASTEmap[ child ]->peerScopes );
 	subscopes.insert( child );
 	map< unsigned int, bool > seen;
 	for ( set< unsigned int >::iterator scope = subscopes.begin(); scope != subscopes.end(); scope++ )
@@ -638,14 +640,14 @@ void CFGBlock::checkForCyclicControlDependency()
 	      if ( ! seen[ current ] )
 	      {
 		seen[ current ] = true;
-//		for ( set< unsigned int >::iterator peer = ASTEmap[ current ]->peerScopes.begin(); peer != ASTEmap[ current ]->peerScopes.end(); peer++ )
+//		for ( set< unsigned int >::iterator peer = globals::ASTEmap[ current ]->peerScopes.begin(); peer != globals::ASTEmap[ current ]->peerScopes.end(); peer++ )
 		for ( set< unsigned int >::iterator peer = globals::cfgMap[ toString(current) ]->lastBlock->controllingPeers.begin(); peer != globals::cfgMap[ toString(current) ]->lastBlock->controllingPeers.end(); peer++ )
 		{
 		  // is there a cycle?
 //                  cerr << "    peer " << *peer << endl;
 		  if ( seen [ *peer ] )
 		  {
-		    SAerror( 82, "", toInt( ASTEmap[ *peer ]->attributes[ "referenceLine" ] ) );
+		    SAerror( 82, "", toInt( globals::ASTEmap[ *peer ]->attributes[ "referenceLine" ] ) );
                     return;
 		  }
 		  else
@@ -791,7 +793,7 @@ void CFGBlock::checkForConflictingReceive()
     }
     if (type == CFGInvoke)
     {
-      if( temporaryAttributeMap[id]["outputVariable"] != "") {
+      if( globals::temporaryAttributeMap[id]["outputVariable"] != "") {
 	receives.insert(pair<string, long>( channel_name, id));
       }
     }
@@ -823,13 +825,11 @@ void CFGBlock::checkForConflictingReceive()
 
 void processCFG()
 {
-  extern kc::tProcess AST;
-
   assert(modus == M_CFG);
 
   CFG = NULL;
   trace(TRACE_INFORMATION, "-> Unparsing AST to CFG ...\n");
-  AST->unparse(kc::pseudoPrinter, kc::cfg);
+  globals::AST->unparse(kc::pseudoPrinter, kc::cfg);
   
   //trace(TRACE_DEBUG, "[CFG] checking for DPE\n");
   // do some business with CFG

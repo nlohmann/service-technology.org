@@ -1,5 +1,5 @@
 /*****************************************************************************\
- * Copyright 2005, 2006 Niels Lohmann, Christian Gierds                      *
+ * Copyright 2005, 2006, 2007 Niels Lohmann, Christian Gierds                *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
@@ -29,13 +29,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/03/11 11:26:30 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.69 $
+ * \version \$Revision: 1.70 $
  */
 
 
@@ -57,6 +57,7 @@
 #include "helpers.h"
 #include "debug.h"
 #include "getopt.h"	// for radon
+#include "globals.h"
 
 using std::cin;
 using std::cout;
@@ -144,13 +145,11 @@ const char *par_string = "hvm:li:of:p:d:";
  */
 void print_help()
 {
-  extern string program_name;
-
   // 80 chars
   //    "12345678901234567890123456789012345678901234567890123456789012345678901234567890"
   trace(string(PACKAGE_NAME) + " - translates a BPEL process to an open workflow net\n");
   trace("\n");
-  trace("Usage: " + program_name + " [OPTION]\n");
+  trace("Usage: " + globals::program_name + " [OPTION]\n");
   trace("\n");
   trace("Options:\n");
   trace(" -m, --mode=MODE        use the given mode\n");
@@ -599,6 +598,9 @@ void parse_command_line(int argc, char* argv[])
 	    break;
     case M_PETRINET:
 	    trace(TRACE_INFORMATION, " - generate Petri net\n");
+	    break;
+    case M_CONSISTENCY:
+	    trace(TRACE_INFORMATION, " - consistency mode\n");
 	    break;
   }
 

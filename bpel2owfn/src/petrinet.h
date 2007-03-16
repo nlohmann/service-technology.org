@@ -26,17 +26,18 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/02/27 14:55:07 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.135 $
+ * \version \$Revision: 1.136 $
  *
  * \ingroup petrinet
  */
@@ -273,8 +274,9 @@ class Transition: public Node
  * functions and variables from class #Node, each place has a type defined in
  * the enumeration #communication_type and an initial marking.
  *
- * \todo make nodeShortName() private
- * \todo isFinal should allow more than one token
+ * \todo
+ *       - Make nodeShortName() private.
+ *       - isFinal should allow more than one token
  *
  * \ingroup petrinet
 */

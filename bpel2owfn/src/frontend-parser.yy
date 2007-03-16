@@ -25,13 +25,13 @@
  *
  * \brief   BPEL parser
  *
- * This file defines and implements the grammar of BPEL using standard 
- * BNF-rules to describe the originally XML-based syntax as it is specified in
- * the BPEL4WS 1.1 specification. All terminals are passed from the lexer
- * (implemented in \ref frontend-lexer.cc). Besides simple syntax-checking the
- * grammar is used to build the abstract syntax tree as it is defined in
- * ast-grammar.k and implemented in \ref ast-grammar.cc and
- * \ref ast-grammar.h.
+ *          This file defines and implements the grammar of BPEL using standard
+ *          BNF-rules to describe the originally XML-based syntax as it is
+ *          specified in the WS-BPEL 2.0 and the BPEL4WS 1.1 specification. All
+ *          terminals are passed from the lexer (implemented in
+ *          \ref frontend-lexer.cc). Besides simple syntax-checking the grammar
+ *          is used to build the abstract syntax tree as it is defined in
+ *          ast-grammar.k.
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
@@ -39,7 +39,7 @@
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/03/09 12:17:08 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -49,11 +49,12 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.295 $
- *
- * \todo Overwork documentation: WS-BPEL can also be parsed!
+ * \version \$Revision: 1.296 $
  *
  * \ingroup frontend
+ *
+ * \todo    Check whether the out-commented code lines in the <invoke> and
+            <scope> section can be removed.
  */
 %}
 
@@ -80,7 +81,7 @@
  */
 
 /*!
- * \enum frontend_tokentype
+ * \enum yytokentype
  * \brief list of possible tokens
  * \ingroup frontend
  */
@@ -88,39 +89,73 @@
 
 
 
-// the terminal symbols (tokens)
-%token APOSTROPHE EQUAL GREATER GREATEROREQUAL K_AND K_ASSIGN K_BRANCHES K_CASE K_CATCH K_CATCHALL K_COMPENSATE K_COMPENSATESCOPE K_COMPENSATIONHANDLER K_COMPLETIONCONDITION K_CONDITION K_COPY K_CORRELATION K_CORRELATIONS K_CORRELATIONSET K_CORRELATIONSETS K_ELSE K_ELSEIF K_EMPTY K_EVENTHANDLERS K_EXIT K_EXTENSION K_EXTENSIONACTIVITY K_EXTENSIONASSIGNOPERATION K_EXTENSIONS K_FAULTHANDLERS K_FINALCOUNTERVALUE K_FLOW K_FOR K_FOREACH K_FROM K_FROMPART K_FROMPARTS K_GETLINKSTATUS K_IF K_IMPORT K_INVOKE K_JOINCONDITION K_LINK K_LINKS K_LITERAL K_MESSAGEEXCHANGE K_MESSAGEEXCHANGES K_ONALARM K_ONEVENT K_ONMESSAGE K_OR K_OTHERWISE K_PARTNER K_PARTNERLINK K_PARTNERLINKS K_PARTNERS K_PICK K_PROCESS K_QUERY K_RECEIVE K_REPEATEVERY K_REPEATUNTIL K_REPLY K_RETHROW K_SCOPE K_SEQUENCE K_SOURCE K_SOURCES K_STARTCOUNTERVALUE K_SWITCH K_TARGET K_TARGETS K_TERMINATE K_TERMINATIONHANDLER K_THROW K_TO K_TOPART K_TOPARTS K_TRANSITIONCONDITION K_UNTIL K_VALIDATE K_VARIABLE K_VARIABLES K_WAIT K_WHILE LBRACKET LESS LESSOREQUAL NOTEQUAL RBRACKET X_CLOSE X_EQUALS X_NEXT X_OPEN X_SLASH
+/******************************************************************************
+ * Terminal symbols (tokens).
+ *****************************************************************************/
+
+%token APOSTROPHE EQUAL GREATER GREATEROREQUAL K_AND K_ASSIGN K_BRANCHES K_CASE
+%token K_CATCH K_CATCHALL K_COMPENSATE K_COMPENSATESCOPE K_COMPENSATIONHANDLER
+%token K_COMPLETIONCONDITION K_CONDITION K_COPY K_CORRELATION K_CORRELATIONS
+%token K_CORRELATIONSET K_CORRELATIONSETS K_ELSE K_ELSEIF K_EMPTY
+%token K_EVENTHANDLERS K_EXIT K_EXTENSION K_EXTENSIONACTIVITY
+%token K_EXTENSIONASSIGNOPERATION K_EXTENSIONS K_FAULTHANDLERS
+%token K_FINALCOUNTERVALUE K_FLOW K_FOR K_FOREACH K_FROM K_FROMPART K_FROMPARTS
+%token K_GETLINKSTATUS K_IF K_IMPORT K_INVOKE K_JOINCONDITION K_LINK K_LINKS
+%token K_LITERAL K_MESSAGEEXCHANGE K_MESSAGEEXCHANGES K_ONALARM K_ONEVENT
+%token K_ONMESSAGE K_OR K_OTHERWISE K_PARTNER K_PARTNERLINK K_PARTNERLINKS
+%token K_PARTNERS K_PICK K_PROCESS K_QUERY K_RECEIVE K_REPEATEVERY
+%token K_REPEATUNTIL K_REPLY K_RETHROW K_SCOPE K_SEQUENCE K_SOURCE K_SOURCES
+%token K_STARTCOUNTERVALUE K_SWITCH K_TARGET K_TARGETS K_TERMINATE
+%token K_TERMINATIONHANDLER K_THROW K_TO K_TOPART K_TOPARTS
+%token K_TRANSITIONCONDITION K_UNTIL K_VALIDATE K_VARIABLE K_VARIABLES K_WAIT
+%token K_WHILE LBRACKET LESS LESSOREQUAL NOTEQUAL RBRACKET X_CLOSE X_EQUALS
+%token X_NEXT X_OPEN X_SLASH
 %token <yt_casestring> NUMBER
 %token <yt_casestring> X_NAME
 %token <yt_casestring> VARIABLENAME
 %token <yt_casestring> X_STRING
 
+// OR and AND are left-associative.
 %left K_OR
 %left K_AND
 
-// the start symbol of the grammar
+// The start symbol of the grammar.
 %start tProcess
 
 
-// Bison generates a list of all used tokens in file "parser.h" (for flex)
+
+/******************************************************************************
+ * Bison options.
+ *****************************************************************************/
+
+// Bison generates a list of all used tokens in file "frontend-parser.h" (for
+// Flex).
 %token_table
 
 %defines
 %yacc
 
+// We know what we are doing. Abort if any shift/reduce or reduce/reduce errors
+// arise.
+%expect 0
+
+// All "yy"-prefixes are replaced with "frontend_".
 %name-prefix="frontend_"
 
 
+
+
+
 %{
-
-
-
-// options for Bison
+// Options for Bison (1): Enable debug mode for verbose messages during
+// parsing. The messages can be enabled by using command-line parameter
+// "-d bison".
 #define YYDEBUG 1
-#define YYERROR_VERBOSE 1  // for verbose error messages
+#define YYERROR_VERBOSE 1
 
-
-// to avoid the message "parser stack overflow"
+// Options for Bison (2): To avoid the message "parser stack overflow". or
+// "memory exhausted". These values are just guesses. Increase them if
+// necessary.
 #define YYMAXDEPTH 1000000
 #define YYINITDEPTH 10000
 
@@ -128,9 +163,10 @@
 #include <cassert>
 #include <map>
 
-#include "ast-config.h"		// all you need from Kimwitu++
+#include "ast-config.h"
 #include "helpers.h"
 #include "debug.h"
+#include "globals.h"
 #include "ast-details.h"
 
 
@@ -140,17 +176,13 @@ using std::endl;
 
 
 
-
-
 /******************************************************************************
  * External variables
  *****************************************************************************/
 
-extern char *frontend_text;	// from flex
-extern int frontend_lex();	// from flex
-extern int frontend_lineno;	// from flex
-
-
+extern char *frontend_text;	// from flex: the current token
+extern int frontend_lex();	// from flex: the lexer funtion
+extern int frontend_lineno;	// from flex: the current line number
 
 
 
@@ -158,37 +190,33 @@ extern int frontend_lineno;	// from flex
  * Global variables
  *****************************************************************************/
 
-/// the root of the abstract syntax tree
-tProcess AST;
-
-/// a pointer to the current join condition
+/// A pointer to the current join condition.
 impl_joinCondition* currentJoinCondition = standardJoinCondition();
-
-/// the map of all AST elements
-map<unsigned int, ASTE*> ASTEmap;
-
-/// a temporary mapping of attributs
-map<unsigned int, map<string, string> > temporaryAttributeMap;
-
-/// identifier of the next AST element
-int ASTEid = 1;
-
 %}
 
 
 
-/* the types of the non-terminal symbols */
+/******************************************************************************
+ * Non-terminal symbols.
+ *****************************************************************************/
+
+/*
+ * The types of the non-terminal symbols: Bison symbols are mapped to Kimwitu++
+ * phyla.
+ */
 %type <yt_activity_list> activity_list
 %type <yt_activity> activity
 %type <yt_casestring> constant
+%type <yt_casestring> tBranches
+%type <yt_casestring> tCompletionCondition
+%type <yt_casestring> tFinalCounterValue
 %type <yt_casestring> tLiteral
+%type <yt_casestring> tStartCounterValue
 %type <yt_expression> booleanLinkCondition
 %type <yt_integer> arbitraryAttributes
+%type <yt_joinCondition> tJoinCondition
 %type <yt_standardElements> standardElements
 %type <yt_tAssign> tAssign
-%type <yt_casestring> tBranches
-%type <yt_tElseIf_list> tCase_list
-%type <yt_tElseIf> tCase
 %type <yt_tCatch_list> tCatch_list
 %type <yt_tCatch> tCatch
 %type <yt_tCatchAll> tCatchAll
@@ -196,7 +224,6 @@ int ASTEid = 1;
 %type <yt_tCompensate> tCompensateScope
 %type <yt_tCompensationHandler> tCompensationHandler
 %type <yt_tCompensationHandler> truetCompensationHandler
-%type <yt_casestring> tCompletionCondition
 %type <yt_tCopy_list> tCopy_list
 %type <yt_tCopy> tCopy
 %type <yt_tCorrelation_list> tCorrelation_list
@@ -206,33 +233,33 @@ int ASTEid = 1;
 %type <yt_tCorrelationSet_list> tCorrelationSets
 %type <yt_tCorrelationSet> tCorrelationSet
 %type <yt_tElse> tElse
-%type <yt_tElseIf> tElseIf
+%type <yt_tElse> tOtherwise
+%type <yt_tElseIf_list> tCase_list
 %type <yt_tElseIf_list> tElseIf_list
+%type <yt_tElseIf> tCase
+%type <yt_tElseIf> tElseIf
 %type <yt_tEmpty> tEmpty
 %type <yt_tEventHandlers> tEventHandlers
 %type <yt_tEventHandlers> truetEventHandlers
 %type <yt_tExit> tExit
 %type <yt_tFaultHandlers> tFaultHandlers
 %type <yt_tFaultHandlers> truetFaultHandlers
-%type <yt_casestring> tFinalCounterValue
 %type <yt_tFlow> tFlow
 %type <yt_tForEach> tForEach
 %type <yt_tFrom> tFrom
-%type <yt_tFromPart> tFromPart
 %type <yt_tFromPart_list> tFromPart_list
 %type <yt_tFromPart_list> tFromParts
+%type <yt_tFromPart> tFromPart
 %type <yt_tIf> tIf
 %type <yt_tInvoke> tInvoke
-%type <yt_joinCondition> tJoinCondition
 %type <yt_tLink_list> tLink_list
 %type <yt_tLink_list> tLinks
 %type <yt_tLink> tLink
 %type <yt_tOnAlarm_list> tOnAlarm_list
 %type <yt_tOnAlarm> tOnAlarm
-%type <yt_tOnMessage> tOnEvent
 %type <yt_tOnMessage_list> tOnMessage_list
+%type <yt_tOnMessage> tOnEvent
 %type <yt_tOnMessage> tOnMessage
-%type <yt_tElse> tOtherwise
 %type <yt_tPartner_list> tPartner_list
 %type <yt_tPartner_list> tPartners
 %type <yt_tPartner> tPartner
@@ -243,30 +270,29 @@ int ASTEid = 1;
 %type <yt_tPick> tPick
 %type <yt_tProcess> tProcess
 %type <yt_tReceive> tReceive
-%type <yt_tReply> tReply
 %type <yt_tRepeatUntil> tRepeatUntil
+%type <yt_tReply> tReply
 %type <yt_tRethrow> tRethrow
 %type <yt_tScope> tScope
 %type <yt_tSequence> tSequence
 %type <yt_tSource_list> tSource_list
 %type <yt_tSource> tSource
-%type <yt_casestring> tStartCounterValue
 %type <yt_tTarget_list> tTarget_list
 %type <yt_tTarget> tTarget
-%type <yt_tExit> tTerminate
-%type <yt_tTerminationHandler> tTerminationHandler
 %type <yt_tTerminationHandler> truetTerminationHandler
+%type <yt_tTerminationHandler> tTerminationHandler
 %type <yt_tThrow> tThrow
 %type <yt_tTo> tTo
-%type <yt_tToPart> tToPart
 %type <yt_tToPart_list> tToPart_list
 %type <yt_tToPart_list> tToParts
+%type <yt_tToPart> tToPart
 %type <yt_tValidate> tValidate
 %type <yt_tVariable_list> tVariable_list
 %type <yt_tVariable_list> tVariables
 %type <yt_tVariable> tVariable
 %type <yt_tWait> tWait
 %type <yt_tWhile> tWhile
+
 
 
 
@@ -283,14 +309,14 @@ tProcess:
       // initialisation (for multiple input files, i.e. `consistency' mode)
       frontend_lineno = 0;
       currentJoinCondition = standardJoinCondition();
-      temporaryAttributeMap.clear();
-      ASTEmap.clear();
-      ASTEid = 1;
+      globals::temporaryAttributeMap.clear();
+      globals::ASTEmap.clear();
+      globals::ASTEid = 1;
     }
   X_OPEN K_PROCESS arbitraryAttributes X_NEXT tExtensions imports tPartnerLinks
   tPartners tMessageExchanges tVariables tCorrelationSets tFaultHandlers
   tCompensationHandler tEventHandlers activity X_NEXT X_SLASH K_PROCESS X_CLOSE
-    { AST = $$ = Process($8, $9, $11, $12, $13, $15, $16, $4); }
+    { globals::AST = $$ = Process($8, $9, $11, $12, $13, $15, $16, $4); }
 ;
 
 /*---------------------------------------------------------------------------*/
@@ -304,7 +330,6 @@ activity:
 | tValidate		{ $$ = activityValidate($1);	}
 | tEmpty		{ $$ = activityEmpty($1);	}
 | tWait			{ $$ = activityWait($1);	}
-| tTerminate		{ $$ = activityExit($1);	}
 | tExit			{ $$ = activityExit($1);	}
 | tThrow		{ $$ = activityThrow($1);	}
 | tRethrow		{ $$ = activityRethrow($1);	}
@@ -329,7 +354,7 @@ activity_list:
 
 
 /******************************************************************************
-  EXTENSIONS AND IMPORTS                                         (WS-BPEL 2.0)
+  EXTENSIONS AND IMPORTS
 ******************************************************************************/
 
 imports:
@@ -380,7 +405,7 @@ tPartnerLink:
 
 
 /******************************************************************************
-  PARTNERS                                                       (BPEL4WS 1.1)
+  PARTNERS
 ******************************************************************************/
 
 tPartners:
@@ -404,7 +429,7 @@ tPartner:
 
 
 /******************************************************************************
-  MESSAGE EXCHANGES                                              (WS-BPEL 2.0)
+  MESSAGE EXCHANGES
 ******************************************************************************/
 
 tMessageExchanges:
@@ -432,9 +457,9 @@ tMessageExchange:
 
 tFaultHandlers:
   /* empty */
-    { $$ = standardFaultHandlers(mkinteger(0)); }
+    { $$ = volatile_standardFaultHandlers(mkinteger(0)); }
 | K_FAULTHANDLERS X_NEXT tCatch_list tCatchAll X_SLASH K_FAULTHANDLERS X_NEXT
-    { $$ = FaultHandlers($3, $4, mkinteger(0)); }
+    { $$ = FaultHandlers($3, $4, mkinteger(0)); globals::process_information.fault_handlers++; }
 ;
 
 tCatch_list:
@@ -463,21 +488,21 @@ tCatchAll:
 
 tCompensationHandler:
   /* empty */
-    { $$ = standardCompensationHandler(mkinteger(0)); }
+    { $$ = volatile_standardCompensationHandler(mkinteger(0)); }
 | K_COMPENSATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_COMPENSATIONHANDLER X_NEXT
-    { $$ = CompensationHandler($3, mkinteger(0)); }
+    { $$ = CompensationHandler($3, mkinteger(0)); globals::process_information.compensation_handlers++; }
 ;
 
 
 /******************************************************************************
-  TERMINATION HANDLER                                            (WS-BPEL 2.0)
+  TERMINATION HANDLER
 ******************************************************************************/
 
 tTerminationHandler:
   /* empty */
-    { $$ = standardTerminationHandler(mkinteger(0)); }
+    { $$ = volatile_standardTerminationHandler(mkinteger(0)); }
 | K_TERMINATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_TERMINATIONHANDLER X_NEXT
-    { $$ = TerminationHandler($3, mkinteger(0)); }
+    { $$ = TerminationHandler($3, mkinteger(0)); globals::process_information.termination_handlers++; }
 ;
 
 
@@ -489,7 +514,7 @@ tEventHandlers:
   /* empty */
     { $$ = emptyEventHandlers(mkinteger(0)); }
 | K_EVENTHANDLERS X_NEXT tOnMessage_list tOnAlarm_list X_SLASH K_EVENTHANDLERS X_NEXT
-    { $$ = EventHandlers($3, $4, mkinteger(0)); }
+    { $$ = EventHandlers($3, $4, mkinteger(0)); globals::process_information.event_handlers++; }
 ;
 
 tOnMessage_list:
@@ -617,7 +642,7 @@ tCorrelation:
 
 
 /******************************************************************************
-  FROM & TO PARTS                                                (WS-BPEL 2.0)
+  FROM & TO PARTS
 ******************************************************************************/
 
 tToParts:
@@ -696,11 +721,11 @@ tReply:
 
 tInvoke:
   K_INVOKE arbitraryAttributes X_SLASH
-    { $$ = Invoke(NoStandardElements(), NiltCorrelation_list(), NiltToPart_list(), NiltFromPart_list(), $2); }
+    { $$ = volatile_Invoke(NoStandardElements(), NiltCorrelation_list(), NiltToPart_list(), NiltFromPart_list(), $2); }
 //| K_INVOKE arbitraryAttributes X_NEXT X_SLASH K_INVOKE
 //    { $$ = Invoke(NoStandardElements(), NiltCorrelation_list(), NiltToPart_list(), NiltFromPart_list(), $2); }
 | K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations tCatch_list tCatchAll tCompensationHandler tToParts tFromParts X_SLASH K_INVOKE
-    { $$ = annotatedInvoke($4, $5, $6, $7, $8, $9, $10, $2); }
+    { $$ = volatile_annotatedInvoke($4, $5, $6, $7, $8, $9, $10, $2); }
 //| K_INVOKE arbitraryAttributes X_NEXT standardElements tCorrelations tCatchAll tCompensationHandler tToParts tFromParts X_SLASH K_INVOKE
 //    { $$ = annotatedInvoke($4, $5, NoCatch(), $6, $7, $8, $9, $2); }
 ;
@@ -766,7 +791,7 @@ tTo:
 
 
 /******************************************************************************
-  VALIDATE                                                       (WS-BPEL 2.0)
+  VALIDATE
 ******************************************************************************/
 
 tValidate:
@@ -814,25 +839,20 @@ tUntil:
 
 
 /******************************************************************************
-  TERMINATE                                                      (BPEL4WS 1.1)
-******************************************************************************/
+  EXIT
 
-tTerminate:
-  K_TERMINATE arbitraryAttributes X_NEXT standardElements X_SLASH K_TERMINATE
-    { $$ = Exit($4, $2); }
-| K_TERMINATE arbitraryAttributes X_SLASH
-    { $$ = Exit(NoStandardElements(), $2); }
-;
-
-
-/******************************************************************************
-  EXIT                                                           (WS-BPEL 2.0)
+  Both the <exit> activity (WS-BPEL 2.0) and the <terminate> (BPEL4WS 1.1)
+  activity is parsed to phylum Exit().
 ******************************************************************************/
 
 tExit:
   K_EXIT arbitraryAttributes X_NEXT standardElements X_SLASH K_EXIT
     { $$ = Exit($4, $2); }
 | K_EXIT arbitraryAttributes X_SLASH
+    { $$ = Exit(NoStandardElements(), $2); }
+| K_TERMINATE arbitraryAttributes X_NEXT standardElements X_SLASH K_TERMINATE
+    { $$ = Exit($4, $2); }
+| K_TERMINATE arbitraryAttributes X_SLASH
     { $$ = Exit(NoStandardElements(), $2); }
 ;
 
@@ -850,7 +870,7 @@ tThrow:
 
 
 /******************************************************************************
-  RETHROW                                                        (WS-BPEL 2.0)
+  RETHROW
 ******************************************************************************/
 
 tRethrow:
@@ -862,32 +882,33 @@ tRethrow:
 
 
 /******************************************************************************
-  COMPENSATE
+  COMPENSATE AND COMPENSATESCOPE
+
+  The <compensate> and <compensateScope> activities share the same phylum
+  type as BPEL4WS 1.1 and WS-BPEL 2.0 have different syntactical definitions:
+  A <compensate scope="a"> activity in BPEL4WS 1.1 is equivalent to an activity 
+  <compensateScope target="a"> in WS-BPEL 2.0.
 ******************************************************************************/
 
 tCompensate:
   K_COMPENSATE arbitraryAttributes X_NEXT standardElements X_SLASH K_COMPENSATE
-    { if(temporaryAttributeMap[$2->value]["scope"] == "")
+    { if(globals::temporaryAttributeMap[$2->value]["scope"] == "")
         $$ = Compensate($4, $2);
       else
-        $$ = CompensateScope($4, mkcasestring(temporaryAttributeMap[$2->value]["scope"].c_str()), $2); }
+        $$ = CompensateScope($4, mkcasestring(globals::temporaryAttributeMap[$2->value]["scope"].c_str()), $2); }
 | K_COMPENSATE arbitraryAttributes X_SLASH
-    { if(temporaryAttributeMap[$2->value]["scope"] == "")
+    { if(globals::temporaryAttributeMap[$2->value]["scope"] == "")
         $$ = Compensate(NoStandardElements(), $2);
       else
-        $$ = CompensateScope(NoStandardElements(), mkcasestring(temporaryAttributeMap[$2->value]["scope"].c_str()), $2); }
+        $$ = CompensateScope(NoStandardElements(), mkcasestring(globals::temporaryAttributeMap[$2->value]["scope"].c_str()), $2); }
 ;
 
 
-/******************************************************************************
-  COMPENSATESCOPE                                                (WS-BPEL 2.0)
-******************************************************************************/
-
 tCompensateScope:
   K_COMPENSATESCOPE arbitraryAttributes X_NEXT standardElements X_SLASH K_COMPENSATESCOPE
-    { $$ = CompensateScope($4, mkcasestring(temporaryAttributeMap[$2->value]["target"].c_str()), $2); }
+    { $$ = CompensateScope($4, mkcasestring(globals::temporaryAttributeMap[$2->value]["target"].c_str()), $2); }
 | K_COMPENSATESCOPE arbitraryAttributes X_SLASH
-    { $$ = CompensateScope(NoStandardElements(), mkcasestring(temporaryAttributeMap[$2->value]["target"].c_str()), $2); }
+    { $$ = CompensateScope(NoStandardElements(), mkcasestring(globals::temporaryAttributeMap[$2->value]["target"].c_str()), $2); }
 ;
 
 
@@ -972,7 +993,7 @@ tWhile:
 
 
 /******************************************************************************
-  REPEATUNTIL                                                    (WS-BPEL 2.0)
+  REPEATUNTIL
 ******************************************************************************/
 
 tRepeatUntil:
@@ -982,7 +1003,7 @@ tRepeatUntil:
 
 
 /******************************************************************************
-  FOREACH                                                        (WS-BPEL 2.0)
+  FOREACH
 ******************************************************************************/
 
 tForEach:
@@ -1079,22 +1100,22 @@ OLD SCOPE END */
 
 truetTerminationHandler:
   K_TERMINATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_TERMINATIONHANDLER X_NEXT
-    { $$ = TerminationHandler($3, mkinteger(0)); }
+    { $$ = TerminationHandler($3, mkinteger(0)); globals::process_information.termination_handlers++; }
 ;
 
 truetCompensationHandler:
   K_COMPENSATIONHANDLER X_NEXT activity X_NEXT X_SLASH K_COMPENSATIONHANDLER X_NEXT
-    { $$ = CompensationHandler($3, mkinteger(0)); }
+    { $$ = CompensationHandler($3, mkinteger(0)); globals::process_information.compensation_handlers++; }
 ;
 
 truetFaultHandlers:
   K_FAULTHANDLERS X_NEXT tCatch_list tCatchAll X_SLASH K_FAULTHANDLERS X_NEXT
-    { $$ = FaultHandlers($3, $4, mkinteger(0)); }
+    { $$ = FaultHandlers($3, $4, mkinteger(0)); globals::process_information.fault_handlers++; }
 ;
 
 truetEventHandlers:
   K_EVENTHANDLERS X_NEXT tOnMessage_list tOnAlarm_list X_SLASH K_EVENTHANDLERS X_NEXT
-    { $$ = EventHandlers($3, $4, mkinteger(0)); }
+    { $$ = EventHandlers($3, $4, mkinteger(0)); globals::process_information.event_handlers++; }
 ;
 
 truetPartnerLinks:
@@ -1112,39 +1133,39 @@ tScope:
   K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
   tCorrelationSets activity 
   X_NEXT X_SLASH K_SCOPE
-    { $$ = Scope($4, $5, standardFaultHandlers(mkinteger(0)), standardCompensationHandler(mkinteger(0)), standardTerminationHandler(mkinteger(0)), emptyEventHandlers(mkinteger(0)), $6, $7, NiltPartnerLink_list(), $2); }
+    { $$ = Scope($4, $5, volatile_standardFaultHandlers(mkinteger(0)), volatile_standardCompensationHandler(mkinteger(0)), volatile_standardTerminationHandler(mkinteger(0)), emptyEventHandlers(mkinteger(0)), $6, $7, NiltPartnerLink_list(), $2); }
 | K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
   tCorrelationSets truetFaultHandlers activity 
   X_NEXT X_SLASH K_SCOPE
-    { $$ = Scope($4, $5, $7, standardCompensationHandler(mkinteger(0)), standardTerminationHandler(mkinteger(0)), emptyEventHandlers(mkinteger(0)), $6, $8, NiltPartnerLink_list(), $2); }
+    { $$ = Scope($4, $5, $7, volatile_standardCompensationHandler(mkinteger(0)), volatile_standardTerminationHandler(mkinteger(0)), emptyEventHandlers(mkinteger(0)), $6, $8, NiltPartnerLink_list(), $2); }
 | K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
   tCorrelationSets truetCompensationHandler activity 
   X_NEXT X_SLASH K_SCOPE
-    { $$ = Scope($4, $5, standardFaultHandlers(mkinteger(0)), $7, standardTerminationHandler(mkinteger(0)), emptyEventHandlers(mkinteger(0)), $6, $8, NiltPartnerLink_list(), $2); }
+    { $$ = Scope($4, $5, volatile_standardFaultHandlers(mkinteger(0)), $7, volatile_standardTerminationHandler(mkinteger(0)), emptyEventHandlers(mkinteger(0)), $6, $8, NiltPartnerLink_list(), $2); }
 | K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
   tCorrelationSets truetEventHandlers activity 
   X_NEXT X_SLASH K_SCOPE
-    { $$ = Scope($4, $5, standardFaultHandlers(mkinteger(0)), standardCompensationHandler(mkinteger(0)), standardTerminationHandler(mkinteger(0)), $7, $6, $8, NiltPartnerLink_list(), $2); }
+    { $$ = Scope($4, $5, volatile_standardFaultHandlers(mkinteger(0)), volatile_standardCompensationHandler(mkinteger(0)), volatile_standardTerminationHandler(mkinteger(0)), $7, $6, $8, NiltPartnerLink_list(), $2); }
 | K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
   tCorrelationSets truetFaultHandlers 
   truetEventHandlers activity 
   X_NEXT X_SLASH K_SCOPE
-    { $$ = Scope($4, $5, $7, standardCompensationHandler(mkinteger(0)), standardTerminationHandler(mkinteger(0)), $8, $6, $9, NiltPartnerLink_list(), $2); }
+    { $$ = Scope($4, $5, $7, volatile_standardCompensationHandler(mkinteger(0)), volatile_standardTerminationHandler(mkinteger(0)), $8, $6, $9, NiltPartnerLink_list(), $2); }
 | K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
   tCorrelationSets truetCompensationHandler 
   truetEventHandlers activity 
   X_NEXT X_SLASH K_SCOPE
-    { $$ = Scope($4, $5, standardFaultHandlers(mkinteger(0)), $7, standardTerminationHandler(mkinteger(0)), $8, $6, $9, NiltPartnerLink_list(), $2); }
+    { $$ = Scope($4, $5, volatile_standardFaultHandlers(mkinteger(0)), $7, volatile_standardTerminationHandler(mkinteger(0)), $8, $6, $9, NiltPartnerLink_list(), $2); }
 | K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
   tCorrelationSets truetFaultHandlers truetCompensationHandler
   truetEventHandlers activity 
   X_NEXT X_SLASH K_SCOPE
-    { $$ = Scope($4, $5, $7, $8, standardTerminationHandler(mkinteger(0)), $9, $6, $10, NiltPartnerLink_list(), $2); }
+    { $$ = Scope($4, $5, $7, $8, volatile_standardTerminationHandler(mkinteger(0)), $9, $6, $10, NiltPartnerLink_list(), $2); }
 | K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables
   tCorrelationSets truetFaultHandlers truetCompensationHandler
   activity 
   X_NEXT X_SLASH K_SCOPE
-    { $$ = Scope($4, $5, $7, $8, standardTerminationHandler(mkinteger(0)), emptyEventHandlers(mkinteger(0)), $6, $9, NiltPartnerLink_list(), $2); }
+    { $$ = Scope($4, $5, $7, $8, volatile_standardTerminationHandler(mkinteger(0)), emptyEventHandlers(mkinteger(0)), $6, $9, NiltPartnerLink_list(), $2); }
 | K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables truetPartnerLinks 
   tMessageExchanges tCorrelationSets tEventHandlers tFaultHandlers
   tCompensationHandler tTerminationHandler activity 
@@ -1163,7 +1184,7 @@ tScope:
 | K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
   tCorrelationSets truetEventHandlers truetCompensationHandler tTerminationHandler activity 
   X_NEXT X_SLASH K_SCOPE
-    { $$ = Scope($4, $5, standardFaultHandlers(mkinteger(0)), $8, $9, $7, $6, $10, NiltPartnerLink_list(), $2); }
+    { $$ = Scope($4, $5, volatile_standardFaultHandlers(mkinteger(0)), $8, $9, $7, $6, $10, NiltPartnerLink_list(), $2); }
 | K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
   tCorrelationSets truetFaultHandlers
   truetCompensationHandler truetTerminationHandler activity 
@@ -1172,16 +1193,20 @@ tScope:
 | K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
   tCorrelationSets truetEventHandlers truetTerminationHandler activity 
   X_NEXT X_SLASH K_SCOPE
-    { $$ = Scope($4, $5, standardFaultHandlers(mkinteger(0)), standardCompensationHandler(mkinteger(0)), $8, $7, $6, $9, NiltPartnerLink_list(), $2); }
+    { $$ = Scope($4, $5, volatile_standardFaultHandlers(mkinteger(0)), volatile_standardCompensationHandler(mkinteger(0)), $8, $7, $6, $9, NiltPartnerLink_list(), $2); }
 | K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
   tCorrelationSets truetFaultHandlers truetTerminationHandler activity 
   X_NEXT X_SLASH K_SCOPE
-    { $$ = Scope($4, $5, $7, standardCompensationHandler(mkinteger(0)), $8, emptyEventHandlers(mkinteger(0)), $6, $9, NiltPartnerLink_list(), $2); }
+    { $$ = Scope($4, $5, $7, volatile_standardCompensationHandler(mkinteger(0)), $8, emptyEventHandlers(mkinteger(0)), $6, $9, NiltPartnerLink_list(), $2); }
 | K_SCOPE arbitraryAttributes X_NEXT standardElements tVariables 
   tCorrelationSets truetCompensationHandler truetTerminationHandler activity 
   X_NEXT X_SLASH K_SCOPE
-    { $$ = Scope($4, $5, standardFaultHandlers(mkinteger(0)), $7, $8, emptyEventHandlers(mkinteger(0)), $6, $9, NiltPartnerLink_list(), $2); }
+    { $$ = Scope($4, $5, volatile_standardFaultHandlers(mkinteger(0)), $7, $8, emptyEventHandlers(mkinteger(0)), $6, $9, NiltPartnerLink_list(), $2); }
 ;
+
+
+
+
 
 /******************************************************************************
   ATTRIBUTES
@@ -1198,11 +1223,11 @@ tScope:
 
 arbitraryAttributes:
   /* empty */
-     { $$ = mkinteger(ASTEid++); // generate a new id
-       temporaryAttributeMap[ASTEid-1]["referenceLine"] = toString(frontend_lineno-1); // remember the file position
+     { $$ = mkinteger(globals::ASTEid++); // generate a new id
+       globals::temporaryAttributeMap[globals::ASTEid-1]["referenceLine"] = toString(frontend_lineno-1); // remember the file position
      }
 | X_NAME X_EQUALS X_STRING arbitraryAttributes
-     { temporaryAttributeMap[$4->value][$1->name] = $3->name;
+     { globals::temporaryAttributeMap[$4->value][$1->name] = $3->name;
        $$ = $4; }
 | joinCondition arbitraryAttributes
      { $$ = $2; }

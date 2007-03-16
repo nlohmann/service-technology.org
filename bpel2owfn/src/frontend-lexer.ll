@@ -29,7 +29,7 @@
  *
  * \since   2005-11-10
  *
- * \date    \$Date: 2007/02/11 17:56:55 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,10 +38,11 @@
  * \note    This file was created using Flex reading file frontend-lexer.ll.
  *          See http://www.gnu.org/software/flex for details.
  *
- * \version \$Revision: 1.51 $
+ * \version \$Revision: 1.52 $
  *
- * \todo    add rules to ignored everything non-BPEL
- * \todo    add a more elegant way to handle XSD-namespaces
+ * \todo    
+ *          - Add rules to ignored everything non-BPEL.
+ *          - Add a more elegant way to handle XSD-namespaces
  *
  * \ingroup frontend
  */
@@ -82,13 +83,21 @@
 
 
 
- /* flex options */
+ /*
+   Flex options:
+    - noyywrap: only one input file
+    - nodefault: generate no default rule (?)
+    - yylineno: manage the current line of the input file
+    - debug: allow debug messages -- use command-line option "d flex"
+    - always-interactive: to avoid call of fileno() to be ANSI C compliant
+    - outfile: filename is set to "ley.yy.c" and is further managed by Automake
+    - prefix: all functions and variables are prefixed with "frontend_"
+ */
 %option noyywrap
-%option yylineno
 %option nodefault
+%option yylineno
 %option debug
-
-
+%option always-interactive
 %option outfile="lex.yy.c"
 %option prefix="frontend_"
 
@@ -105,7 +114,7 @@ extern int frontend_error(const char *msg);
 
 
 /// current start condition of the lexer
-int currentView;
+unsigned int currentView;
 
 
 %}

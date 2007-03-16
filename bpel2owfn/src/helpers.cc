@@ -29,15 +29,14 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2007/03/04 14:31:59 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.74 $
+ * \version \$Revision: 1.75 $
  *
- * \ingroup conversion
  * \ingroup debug
  */
 
@@ -74,12 +73,10 @@ using std::ofstream;
 
 #ifdef USING_BPEL2OWFN
 /*!
- * Converts a Kimwitu++ kc::integer to a C++ string.
+ * Converts a Kimwitu++ kc::integer to a C++ string object.
  *
  * \param i Kimwitu++ integer
- * \return  C++ string representing i
- *
- * \ingroup conversion
+ * \return  C++ string object representing i
  */
 string toString(kc::integer i)
 {
@@ -91,14 +88,10 @@ string toString(kc::integer i)
 
 
 /*!
- * Converts a C++ int to a C++ string.
+ * Converts a C++ int to a C++ string object.
  *
  * \param i standard C int
- * \return  C++ string representing i
- *
- * \pre \f$i < 10^{20} \f$
- *
- * \ingroup conversion
+ * \return  C++ string object representing i
  */
 string toString(int i)
 {
@@ -118,9 +111,7 @@ string toString(int i)
  * integers are seperated by a period.
  *
  * \param v  an STL vector of unsigned ints
- * \return   C++ string representation of v
- *
- * \ingroup conversion
+ * \return   C++ string object representation of v
  */
 string toString(const vector<unsigned int> &v)
 {
@@ -142,12 +133,10 @@ string toString(const vector<unsigned int> &v)
 
 
 /*!
- * Converts a C++ string to a C++ int.
+ * Converts a C++ string object to a C++ int.
  *
- * \param s C++ string
+ * \param s C++ string object
  * \return int representing s or INT_MAX if the conversion failed
- *
- * \ingroup conversion
  */
 int toInt(string s)
 {
@@ -168,13 +157,11 @@ int toInt(string s)
 
 
 /*!
- * Converts a C++ string to a C++ unsigned int.
+ * Converts a C++ string object to a C++ unsigned int.
  *
- * \param s C++ string
+ * \param s C++ string object
  * \return unsigned int representing s or UINT_MAX if the conversion failed
  *         (e.g. a negative value was passed)
- *
- * \ingroup conversion
  */
 unsigned int toUInt(string s)
 {

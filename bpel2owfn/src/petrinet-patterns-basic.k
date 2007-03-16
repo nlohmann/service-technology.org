@@ -36,17 +36,17 @@
  *            - <wait> (deadline and duration)
  *            - <throw>
  *            - <rethrow>
- *            - <exit> / <terminate>
+ *            - <exit>
  *            - <compensate>
  *            - <compensateScope>
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $ 
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/08 13:38:20 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -56,7 +56,7 @@
  *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.40 $
+ * \version \$Revision: 1.41 $
  */
 %}
 
@@ -83,7 +83,6 @@ using std::cerr;
 using std::endl;
 
 extern PetriNet PN;
-extern map<unsigned int, ASTE*> ASTEmap;
 %}
 
 
@@ -182,9 +181,9 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 
         // A subnet sending a message (replacement of t1).
         sendingTransition("invoke", p1, p2,
-                          PN.findPlace("out." + ASTEmap[phylum->id]->channelName),
+                          PN.findPlace("out." + globals::ASTEmap[phylum->id]->channelName),
                           p5, prefix, mkinteger(phylum->id),
-                          ASTEmap[phylum->id]->controlFlow);
+                          globals::ASTEmap[phylum->id]->controlFlow);
 
         // Stopping transitions.
 	Transition *t2 = stop(p1, "initial", prefix);
@@ -204,7 +203,7 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 	Transition *t1 = PN.newTransition(prefix + "invoke");
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
-	PN.newArc(t1, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
+	PN.newArc(t1, PN.findPlace("out." + globals::ASTEmap[phylum->id]->channelName));
 	
 	break;
       }
@@ -254,15 +253,15 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 
         // A subnet sending a message (replacement of t1).
         sendingTransition("invoke_out",  p1, p2,
-                          PN.findPlace("out." + ASTEmap[phylum->id]->channelName),
+                          PN.findPlace("out." + globals::ASTEmap[phylum->id]->channelName),
                           p6, prefix, mkinteger(phylum->id),
-                          ASTEmap[phylum->id]->controlFlow);
+                          globals::ASTEmap[phylum->id]->controlFlow);
 
         // A subnet receiving a message (replacement of t2).
         receivingTransition("invoke_in", p2, p3,
-                            PN.findPlace("in." + ASTEmap[phylum->id]->channelName2),
+                            PN.findPlace("in." + globals::ASTEmap[phylum->id]->channelName2),
                             p6, prefix, mkinteger(phylum->id),
-                            ASTEmap[phylum->id]->controlFlow);
+                            globals::ASTEmap[phylum->id]->controlFlow);
 	
         // Stopping transitions.
 	Transition *t3 = stop(p1, "initial", prefix);
@@ -282,13 +281,13 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
 
         // A transition for the outgoing message.
 	Transition *t1 = PN.newTransition(prefix + "invokeO");
-	PN.newArc(t1, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
+	PN.newArc(t1, PN.findPlace("out." + globals::ASTEmap[phylum->id]->channelName));
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
 
         // A transition for the incoming message.
 	Transition *t2 = PN.newTransition(prefix + "invokeI");
-	PN.newArc(PN.findPlace("in." + ASTEmap[phylum->id]->channelName2), t2);
+	PN.newArc(PN.findPlace("in." + globals::ASTEmap[phylum->id]->channelName2), t2);
 	PN.newArc(p2, t2);
 	PN.newArc(t2, p3);
 
@@ -346,9 +345,9 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
 
         // A subnet receiving a message (replacement of t1).
         receivingTransition("receive", p1, p2,
-                            PN.findPlace("in." + ASTEmap[phylum->id]->channelName),
+                            PN.findPlace("in." + globals::ASTEmap[phylum->id]->channelName),
                             p5, prefix, mkinteger(phylum->id),
-                            ASTEmap[phylum->id]->controlFlow);
+                            globals::ASTEmap[phylum->id]->controlFlow);
 
         // Stopping transitions.
 	Transition *t2 = stop(p1, "initial", prefix);
@@ -366,7 +365,7 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
 
         // A transition receiving a message.
 	Transition *t1 = PN.newTransition(prefix + "receive");
-	PN.newArc(PN.findPlace("in." + ASTEmap[phylum->id]->channelName), t1);
+	PN.newArc(PN.findPlace("in." + globals::ASTEmap[phylum->id]->channelName), t1);
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
 
@@ -422,9 +421,9 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
 
         // A subnet sending a message (replacement of t1).
         sendingTransition("reply", p1, p2,
-                          PN.findPlace("out." + ASTEmap[phylum->id]->channelName),
+                          PN.findPlace("out." + globals::ASTEmap[phylum->id]->channelName),
                           p5, prefix, mkinteger(phylum->id),
-                          ASTEmap[phylum->id]->controlFlow);
+                          globals::ASTEmap[phylum->id]->controlFlow);
 
         // Stopping transitions.
         Transition *t2 = stop(p1, "initial", prefix);
@@ -442,7 +441,7 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
 
         // A transition sending a message.
 	Transition *t1 = PN.newTransition(prefix + "reply");
-	PN.newArc(t1, PN.findPlace("out." + ASTEmap[phylum->id]->channelName));
+	PN.newArc(t1, PN.findPlace("out." + globals::ASTEmap[phylum->id]->channelName));
 	PN.newArc(p1, t1);
 	PN.newArc(t1, p2);
 
@@ -513,7 +512,7 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 	{
 	  string newPrefix = prefix + "copy." + toString(copyCount) + ".";
 
-	  if (ASTEmap[from->id]->variableName != "")
+	  if (globals::ASTEmap[from->id]->variableName != "")
 	  {
 	    Place *p2 = PN.newPlace(newPrefix + "running");
 	    Place *p4 = PN.newPlace(newPrefix + "p4");
@@ -523,21 +522,21 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 	    PN.newArc(lastPlace, t1);
 	    PN.newArc(t1, p2);
             if (parameters[P_VARIABLES])
-	      PN.newArc(PN.findPlace("variable." + ASTEmap[from->id]->variableName), t1, READ);
+	      PN.newArc(PN.findPlace("variable." + globals::ASTEmap[from->id]->variableName), t1, READ);
 
 	    Transition *t2 = PN.newTransition(newPrefix + "t2");
 	    PN.newArc(p2, t2);
 	    PN.newArc(t2, p8);
 	    if (parameters[P_VARIABLES])
 	    {
-	      PN.newArc(PN.findPlace("variable." + ASTEmap[to->id]->variableName), t2);
-	      PN.newArc(t2, PN.findPlace("variable." + ASTEmap[to->id]->variableName));
+	      PN.newArc(PN.findPlace("variable." + globals::ASTEmap[to->id]->variableName), t2);
+	      PN.newArc(t2, PN.findPlace("variable." + globals::ASTEmap[to->id]->variableName));
 	    }
 
 	    // Transitions for the negative control flow.
 	    if (parameters[P_STANDARDFAULTS])
 	      Transition *t3 = throwFault(p2, p4, "running", newPrefix,
-                                 mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
+                                 mkinteger(phylum->id), globals::ASTEmap[phylum->id]->controlFlow);
 	    
 	    Transition *t6 = stop(p4, "p4at" + toString(copyCount), prefix);
 	    
@@ -553,14 +552,14 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
 	    PN.newArc(t2, p8);
 	    if (parameters[P_VARIABLES])
 	    {
-	      PN.newArc(PN.findPlace("variable." + ASTEmap[to->id]->variableName), t2);
-	      PN.newArc(t2, PN.findPlace("variable." + ASTEmap[to->id]->variableName));
+	      PN.newArc(PN.findPlace("variable." + globals::ASTEmap[to->id]->variableName), t2);
+	      PN.newArc(t2, PN.findPlace("variable." + globals::ASTEmap[to->id]->variableName));
 	    }
 
 	    // Transitions for the negative control flow.
 	    if (parameters[P_STANDARDFAULTS])
 	      Transition *t3 = throwFault(lastPlace, p4, "initial", newPrefix,
-                                 mkinteger(phylum->id), ASTEmap[phylum->id]->controlFlow);
+                                 mkinteger(phylum->id), globals::ASTEmap[phylum->id]->controlFlow);
 
 	    Transition *t6 = stop(p4, "p4at" + toString(copyCount), prefix);
 
@@ -652,7 +651,7 @@ void PValidate(impl_tValidate* abstract_phylum, uview current_view)
         {
 	  Transition *t3 = throwFault(p2, p6, "running", prefix,
                                       mkinteger(phylum->id),
-                                      ASTEmap[phylum->id]->controlFlow);
+                                      globals::ASTEmap[phylum->id]->controlFlow);
         }
 
         // Stopping transitions.
@@ -791,7 +790,7 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
         // Throw a fault.
         Transition *t1 = throwFault(p1, p2, "throw", prefix,
                                     mkinteger(phylum->id),
-                                    ASTEmap[phylum->id]->controlFlow);
+                                    globals::ASTEmap[phylum->id]->controlFlow);
 
         // Stopping transitions.
 	Transition *t2 = stop(p1, "initial", prefix);
@@ -844,11 +843,11 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
  * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
  * \param   current_view     the current unparse view
  *
- * \todo    Check whether this pattern should also use the "throwFault"
- *          function.
- *
- * \todo    Handle the outgoing links of the throw activity. Right now, they
- *          are not set at all.
+ * \todo    
+ *          - Check whether this pattern should also use the "throwFault"
+ *            function.
+ *          - Handle the outgoing links of the throw activity. Right now, they
+ *            are not set at all.
  */
 %}
 void PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
@@ -870,8 +869,8 @@ void PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
 
   // Transitions for the negative control flow.
   Transition *t1 = PN.newTransition(prefix + "rethrow");
-  PN.newArc(PN.findPlace(toString(ASTEmap[phylum->id]->parentScopeId) +
-            ".internal.faultHandler.fault"), t1, READ);
+  PN.newArc(PN.findPlace(toString(globals::ASTEmap[phylum->id]->parentScopeId) +
+            ".faultHandlers.fault"), t1, READ);
   PN.newArc(p1, t1);
   PN.newArc(t1, p2);
   PN.newArc(t1, p3);
@@ -995,10 +994,6 @@ void PExit(impl_tExit* abstract_phylum, uview current_view)
  *
  * \note    This pattern is replaced by an <empty> activity in the
  *          "communicationonly" patterns.
- *
- * \todo    Do I really need a pattern for "communicationonly" as
- *          <compensate> activities are only allowed in the negative control
- *          flow?
  */
 %}
 void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
@@ -1046,9 +1041,9 @@ void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
         Transition *t6 = stop(p2, "final",   prefix);
 
         // Connect with places of child scopes.
-        unsigned int parentId = ASTEmap[ phylum->id ]->parentScopeId;
-        for( set< unsigned int >::iterator scope = ASTEmap[ parentId ]->enclosedScopes.begin();
-                                           scope != ASTEmap[ parentId ]->enclosedScopes.end();
+        unsigned int parentId = globals::ASTEmap[ phylum->id ]->parentScopeId;
+        for( set< unsigned int >::iterator scope = globals::ASTEmap[ parentId ]->enclosedScopes.begin();
+                                           scope != globals::ASTEmap[ parentId ]->enclosedScopes.end();
                                            scope++ )
         {
           string newPrefix = toString(*scope) + ".internal.";
@@ -1110,10 +1105,6 @@ void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
  *
  * \note    This pattern is replaced by an <empty> activity in the
  *          "communicationonly" patterns.
- *
- * \todo    Do I really need a pattern for "communicationonly" as
- *          <compensateScope> activities are only allowed in the negative
- *          control flow?
  */
 %}
 void PCompensateScope(impl_tCompensate* abstract_phylum, uview current_view)
@@ -1131,7 +1122,7 @@ void PCompensateScope(impl_tCompensate* abstract_phylum, uview current_view)
       {
         // Find the prefix of the target scope.
         string newPrefix =
-          toString(globals::ASTE_scopeNames[ASTEmap[phylum->id]->attributes["target"]]) + ".internal.";
+          toString(globals::ASTE_scopeNames[globals::ASTEmap[phylum->id]->attributes["target"]]) + ".internal.";
 
         // Places.
 	Place *p1 = PN.newPlace(prefix + "initial");

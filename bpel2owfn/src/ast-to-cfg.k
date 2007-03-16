@@ -32,7 +32,7 @@
  *         
  * \since   2006-01-19
  *
- * \date    \$Date: 2007/03/09 12:17:08 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  *          bpel-unparse-cfg.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.56 $
+ * \version \$Revision: 1.57 $
  */
 %}
 
@@ -187,14 +187,6 @@ This=FaultHandlers(a,NoCatchAll(),_id) ->
 	}
   ];
 
-standardFaultHandlers(_id) ->
-  [cfg: {
-	  trace(TRACE_DEBUG, "[CFG] FaultHandler (implicit)\n");
-	  CFGBlock * block = new CFGBlock(CFGFaultHandler, $0->id, "implicitFaultHandler"); 
-	  globals::cfgMap[toString($0->id)] = block;
-	}
-  ];
-
 
 /******************************************************************************
   EVENT HANDLERS
@@ -228,7 +220,7 @@ EventHandlers(a,b,_id) ->
  	    CFGBlock * innerFirst = globals::cfgMap.find(toString(innerActivity->id))->second->firstBlock;
 	    CFGBlock * innerLast = globals::cfgMap.find(toString(innerActivity->id))->second->lastBlock;
 	    CFGBlock * onMessageBlock = new CFGBlock(CFGOnMessage, message->id, "OnMessage_" + toString(i++)); 
-            onMessageBlock->channel_name = ASTEmap[message->id]->channelName;
+            onMessageBlock->channel_name = globals::ASTEmap[message->id]->channelName;
 	  
 	    connectBlocks(firstBlock, onMessageBlock);
 	    connectBlocks(onMessageBlock, innerFirst);
@@ -284,14 +276,6 @@ CompensationHandler(a,_id) ->
 
   ];
 
-standardCompensationHandler(_id) ->
-  [cfg: {
-	  trace(TRACE_DEBUG, "[CFG] CompensationHandler (implicit)\n");
-	  CFGBlock * block = new CFGBlock(CFGCompensationHandler, $0->id, "implicitCompensationHandler"); 
-	  globals::cfgMap[toString($0->id)] = block;
-	}
-
-  ];
 
 
 /******************************************************************************
@@ -315,15 +299,6 @@ TerminationHandler(a,_id) ->
 	  
 	  connectBlocks(firstBlock, innerFirst);
 	  connectBlocks(innerLast, lastBlock);
-	}
-
-  ];
-
-standardTerminationHandler(_id) ->
-  [cfg: {
-	  trace(TRACE_DEBUG, "[CFG] TerminationHandler (standard)\n");
-	  CFGBlock * block = new CFGBlock(CFGCompensationHandler, $0->id, "standardTerminationHandler"); 
-	  globals::cfgMap[toString($0->id)] = block;
 	}
 
   ];
@@ -378,26 +353,13 @@ Empty(a,b) ->
   INVOKE
 ******************************************************************************/
 
-Invoke(a,b,c,d,e) ->
-  [cfg: { 
-	  trace(TRACE_DEBUG, "[CFG] Invoke\n");
-	  CFGBlock * block = new CFGBlock(CFGInvoke, $0->id, "Invoke");
-
-//NL	  block->channel_name = (dynamic_cast<STCommunicationActivity*>(symTab.lookup($0->id)))->channelId; 
-	  block->channel_name = ASTEmap[e->value]->channelName;
-
-	  globals::cfgMap[toString($0->id)] = block; 
-  	}
-	a // standard elements
-  ];
-
 SynchronousInvoke(a,b,c,d,e) ->
   [cfg: { 
 	  trace(TRACE_DEBUG, "[CFG] Invoke\n");
 	  CFGBlock * block = new CFGBlock(CFGInvoke, $0->id, "Invoke");
 
 //NL	  block->channel_name = (dynamic_cast<STCommunicationActivity*>(symTab.lookup($0->id)))->channelId; 
-	  block->channel_name = ASTEmap[e->value]->channelName;
+	  block->channel_name = globals::ASTEmap[e->value]->channelName;
 
 	  globals::cfgMap[toString($0->id)] = block; 
   	}
@@ -410,7 +372,7 @@ AsynchronousInvoke(a,b,c,d,e) ->
 	  CFGBlock * block = new CFGBlock(CFGInvoke, $0->id, "Invoke");
 
 //NL	  block->channel_name = (dynamic_cast<STCommunicationActivity*>(symTab.lookup($0->id)))->channelId; 
-	  block->channel_name = ASTEmap[e->value]->channelName;
+	  block->channel_name = globals::ASTEmap[e->value]->channelName;
 
 	  globals::cfgMap[toString($0->id)] = block; 
   	}
@@ -429,7 +391,7 @@ Receive(a,b,c,d) ->
 	  CFGBlock * block = new CFGBlock(CFGReceive, $0->id, "Receive"); 
 
 //NL	  block->channel_name = (dynamic_cast<STCommunicationActivity*>(symTab.lookup($0->id)))->channelId; 
-	  block->channel_name = ASTEmap[d->value]->channelName;
+	  block->channel_name = globals::ASTEmap[d->value]->channelName;
 
 	  globals::cfgMap[toString($0->id)] = block; 
     	}
@@ -448,7 +410,7 @@ Reply(a,b,c,d) ->
 	  CFGBlock * block = new CFGBlock(CFGReply, $0->id, "Reply"); 
 
 //NL	  block->channel_name = (dynamic_cast<STCommunicationActivity*>(symTab.lookup($0->id)))->channelId; 
-	  block->channel_name = ASTEmap[d->value]->channelName;
+	  block->channel_name = globals::ASTEmap[d->value]->channelName;
 
 	  globals::cfgMap[toString($0->id)] = block; 
   	}
@@ -848,7 +810,7 @@ Pick(a,b,c,d) ->
  	    CFGBlock * innerFirst = globals::cfgMap.find(toString(innerActivity->id))->second->firstBlock;
 	    CFGBlock * innerLast = globals::cfgMap.find(toString(innerActivity->id))->second->lastBlock;
 	    CFGBlock * onMessageBlock = new CFGBlock(CFGOnMessage, message->id, "OnMessage_" + toString(i++)); 
-	    onMessageBlock->channel_name = ASTEmap[message->id]->channelName;
+	    onMessageBlock->channel_name = globals::ASTEmap[message->id]->channelName;
        	  
 	    connectBlocks(firstBlock, onMessageBlock);
 	    connectBlocks(onMessageBlock, innerFirst);
@@ -953,9 +915,9 @@ This=StandardElements(a,b, jc) ->
 //NL	  STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
 	  //CFGBlock * target = new CFGBlock(CFGTarget, $0->parentId, "Target_" + std::string(linkST->name));
 //NL	  CFGBlock * target = new CFGBlock(CFGTarget, link->id, "Target_" + std::string(linkST->name));
-          CFGBlock * target = new CFGBlock(CFGTarget, link->id, "Target_" + ASTEmap[link->id]->linkName);
+          CFGBlock * target = new CFGBlock(CFGTarget, link->id, "Target_" + globals::ASTEmap[link->id]->linkName);
 //NL	  targets["Source_" + std::string(linkST->name)] = target;
-	  targets["Source_" + ASTEmap[link->id]->linkName] = target;
+	  targets["Source_" + globals::ASTEmap[link->id]->linkName] = target;
 	  /// \todo: use link to connect source and target
 /*	  for (list<CFGBlock *>::iterator iter = innerFirst->prevBlocks.begin(); iter != innerFirst->prevBlocks.end(); iter++)
 	  {
@@ -976,9 +938,9 @@ This=StandardElements(a,b, jc) ->
 //NL	  STLink *linkST = (dynamic_cast<STSourceTarget*> (symTab.lookup(link->id)))->link;
 	  //CFGBlock * source = new CFGBlock(CFGSource, $0->parentId, "Source_" + std::string(linkST->name));
 //NL	  CFGBlock * source = new CFGBlock(CFGSource, link->id, "Source_" + std::string(linkST->name));
-	  CFGBlock * source = new CFGBlock(CFGSource, link->id, "Source_" + ASTEmap[link->id]->linkName);
+	  CFGBlock * source = new CFGBlock(CFGSource, link->id, "Source_" + globals::ASTEmap[link->id]->linkName);
 //NL	  sources["Target_" + std::string(linkST->name)] = source;
-	  sources["Target_" + ASTEmap[link->id]->linkName] = source;
+	  sources["Target_" + globals::ASTEmap[link->id]->linkName] = source;
 
 	  /// \todo: use link to connect source and target
 

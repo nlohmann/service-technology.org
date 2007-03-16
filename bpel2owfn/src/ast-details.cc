@@ -25,18 +25,18 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2005/07/02
  *
- * \date    \$Date: 2007/03/06 13:07:42 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.81 $
+ * \version \$Revision: 1.82 $
  */
 
 
@@ -79,15 +79,28 @@ using std::endl;
  * \todo "real" initialization
  */
 ASTE::ASTE(unsigned int myid, unsigned int mytype) :
-  id(myid), type(mytype),
-  plRoleDetails(NULL), isStartActivity(false), targetActivity(0),
-  sourceActivity(0), max_occurrences(1), max_loops(UINT_MAX), controlFlow(POSITIVECF), drawn(false), enclosedFH(0), enclosedCH(0)
+  id(myid), type(mytype), controlFlow(POSITIVECF), 
+  plRoleDetails(NULL), isStartActivity(false),
+  sourceActivity(0), targetActivity(0), max_occurrences(1), max_loops(UINT_MAX), enclosedFH(0), enclosedCH(0), drawn(false)
 {
-  extern map<unsigned int, map<string, string> > temporaryAttributeMap;
-
   assert(myid != 0);
 
-  attributes = temporaryAttributeMap[id];
+  attributes = globals::temporaryAttributeMap[id];
+
+  switch (mytype)
+  {
+    case(K_LINK):	globals::process_information.links++; break;
+    case(K_SCOPE):	globals::process_information.scopes++; break;
+    case(K_VARIABLE):	globals::process_information.variables++; break;
+
+    case(K_EMPTY): case(K_INVOKE): case(K_RECEIVE): case(K_REPLY): case(K_ASSIGN):
+    case(K_VALIDATE): case(K_WAIT): case(K_THROW): case(K_RETHROW):
+    case(K_EXIT): case(K_COMPENSATE): case(K_COMPENSATESCOPE):
+						   globals::process_information.basic_activities++; break;
+
+    case(K_WHILE): case(K_REPEATUNTIL): case(K_SEQUENCE): case(K_FLOW): case(K_PICK): case(K_IF): case(K_FOREACH):
+						   globals::process_information.structured_activities++; break;
+  }
 }
 
 
@@ -157,8 +170,6 @@ void ASTE::setStandardAttributes(string names[], string values[], unsigned int l
  */
 void ASTE::checkAttributes()
 {
-  extern map<unsigned int, ASTE*> ASTEmap;
-
   // pass 1: set the default values
   switch (type)
   {
@@ -253,9 +264,9 @@ void ASTE::checkAttributes()
     case(K_SCOPE):
       {
 	/* organize the exitOnStandardFault attribute */
-	assert(ASTEmap[parentScopeId] != NULL);
+	assert(globals::ASTEmap[parentScopeId] != NULL);
 	if (attributes["exitOnStandardFault"] == "")
-	  attributes["exitOnStandardFault"] = ASTEmap[parentScopeId]->attributes["exitOnStandardFault"];
+	  attributes["exitOnStandardFault"] = globals::ASTEmap[parentScopeId]->attributes["exitOnStandardFault"];
 	else
 	  checkAttributeType("exitOnStandardFault", T_BOOLEAN);
 
@@ -285,10 +296,10 @@ void ASTE::checkAttributes()
     case(K_PICK):
       {
 	/* organize the suppressJoinFailure attribute */
-	assert(ASTEmap[parentActivityId] != NULL);
-	assert(ASTEmap[parentScopeId] != NULL);
+	assert(globals::ASTEmap[parentActivityId] != NULL);
+	assert(globals::ASTEmap[parentScopeId] != NULL);
 	if (attributes["suppressJoinFailure"] == "")
-	  attributes["suppressJoinFailure"] = ASTEmap[parentActivityId]->attributes["suppressJoinFailure"];
+	  attributes["suppressJoinFailure"] = globals::ASTEmap[parentActivityId]->attributes["suppressJoinFailure"];
 	else
 	  checkAttributeType("suppressJoinFailure", T_BOOLEAN);
 
@@ -296,7 +307,7 @@ void ASTE::checkAttributes()
 	// to a fault, compensation, event or termination handler, thus the
 	// value of the surrounding scope should be taken.
 	if (attributes["suppressJoinFailure"] == "")
-	  attributes["suppressJoinFailure"] = ASTEmap[parentScopeId]->attributes["suppressJoinFailure"];
+	  attributes["suppressJoinFailure"] = globals::ASTEmap[parentScopeId]->attributes["suppressJoinFailure"];
 
 	assert(attributes["suppressJoinFailure"] != "");
 	
@@ -339,11 +350,11 @@ void ASTE::checkAttributes()
 	  + "|" + attributes["faultMessageType"];
 
 	// trigger [SA00093]
-	assert(ASTEmap[parentActivityId] != NULL);
-	if (ASTEmap[parentActivityId]->catches.find(catchString) != ASTEmap[parentActivityId]->catches.end())
+	assert(globals::ASTEmap[parentActivityId] != NULL);
+	if (globals::ASTEmap[parentActivityId]->catches.find(catchString) != globals::ASTEmap[parentActivityId]->catches.end())
 	  SAerror(93, "", attributes["referenceLine"]);
 	else
-	  ASTEmap[parentActivityId]->catches.insert(catchString);
+	  globals::ASTEmap[parentActivityId]->catches.insert(catchString);
 
 	break;
       }
@@ -732,8 +743,6 @@ string ASTE::createChannel(bool synchronousCommunication)
  */
 bool ASTE::checkAncestors()
 {
-  extern map<unsigned int, ASTE*> ASTEmap;
-
   if (activityTypeName() != "scope" &&
       activityTypeName() != "flow" &&
       activityTypeName() != "sequence" &&      
@@ -743,7 +752,7 @@ bool ASTE::checkAncestors()
   if (id == 1)
     return true;
   
-  return ASTEmap[parentActivityId]->checkAncestors();
+  return globals::ASTEmap[parentActivityId]->checkAncestors();
 }
 
 
@@ -758,15 +767,13 @@ bool ASTE::checkAncestors()
  */
 bool ASTE::findIsolatedAncestor()
 {
-  extern map<unsigned int, ASTE*> ASTEmap;
-
   if (id == 1)
     return false;
 
   if (attributes["isolated"] == "yes")
     return true;
   else
-    return ASTEmap[parentScopeId]->findIsolatedAncestor();
+    return globals::ASTEmap[parentScopeId]->findIsolatedAncestor();
 }
 
 
@@ -923,8 +930,6 @@ string ASTE::checkVariable(string attributename)
 
 string ASTE::checkLink()
 {
-  extern map<unsigned int, ASTE*> ASTEmap;
-
   string linkName = attributes["linkName"];
   if (linkName == "")
     return linkName;
@@ -934,7 +939,7 @@ string ASTE::checkLink()
   // travers the ancestor flows
   for (vector<unsigned int>::iterator flow = ancestorActivities.begin(); flow != ancestorActivities.end(); flow++)
   {
-    if (ASTEmap[*flow]->activityTypeName() == "flow")
+    if (globals::ASTEmap[*flow]->activityTypeName() == "flow")
       if (globals::ASTE_linkNames.find(toString(*flow) + "." + linkName) != globals::ASTE_linkNames.end())
 	return (toString(*flow) + "." + linkName);
   }
@@ -956,7 +961,6 @@ string ASTE::checkLink()
  */
 string ASTE::checkPartnerLink()
 {
-  extern map<unsigned int, ASTE*> ASTEmap;	
   extern string filename;
 
   string partnerLinkName = attributes["partnerLink"];
@@ -970,9 +974,9 @@ string ASTE::checkPartnerLink()
   {
     if (globals::ASTE_partnerLinkNames.find(toString(*scope) + "." + partnerLinkName) != globals::ASTE_partnerLinkNames.end())
     {
-      string partnerLinkType = ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->attributes["partnerLinkType"];
-      string myRole          = ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->attributes["myRole"];
-      string partnerRole     = ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->attributes["partnerRole"];
+      string partnerLinkType = globals::ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->attributes["partnerLinkType"];
+      string myRole          = globals::ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->attributes["myRole"];
+      string partnerRole     = globals::ASTEmap[ globals::ASTE_partnerLinks[partnerLinkName] ]->attributes["partnerRole"];
 
       if (partnerLinkType != "" && myRole != "" && partnerRole != "")
       {
@@ -983,8 +987,8 @@ string ASTE::checkPartnerLink()
   }
 
   // trigger [SA00084]
-  assert(ASTEmap[parentActivityId] != NULL);
-  if (ASTEmap[parentActivityId]->activityTypeName() == "eventHandlers")
+  assert(globals::ASTEmap[parentActivityId] != NULL);
+  if (globals::ASTEmap[parentActivityId]->activityTypeName() == "eventHandlers")
   {
     SAerror(84, partnerLinkName, attributes["referenceLine"]);
     return partnerLinkName;
@@ -1009,7 +1013,6 @@ string ASTE::checkPartnerLink()
  */
 string ASTE::checkCorrelationSet()
 {
-  extern map<unsigned int, ASTE*> ASTEmap;	
   extern string filename;
 
   string correlationSetName = attributes["set"];
@@ -1024,9 +1027,9 @@ string ASTE::checkCorrelationSet()
       return (toString(*scope) + "." + correlationSetName);
 
   // trigger [SA00088]
-  assert(ASTEmap[parentActivityId] != NULL);
-  assert(ASTEmap[ASTEmap[parentActivityId]->parentActivityId] != NULL);
-  if (ASTEmap[ASTEmap[parentActivityId]->parentActivityId]->activityTypeName() == "eventHandlers")
+  assert(globals::ASTEmap[parentActivityId] != NULL);
+  assert(globals::ASTEmap[globals::ASTEmap[parentActivityId]->parentActivityId] != NULL);
+  if (globals::ASTEmap[globals::ASTEmap[parentActivityId]->parentActivityId]->activityTypeName() == "eventHandlers")
   {
     SAerror(88, correlationSetName, attributes["referenceLine"]);
     return correlationSetName;
@@ -1035,7 +1038,7 @@ string ASTE::checkCorrelationSet()
   // display an error message
   cerr << filename << ":" << attributes["referenceLine"];
   cerr << " - <correlationSet> `" << correlationSetName << "' referenced in <";
-  cerr << ASTEmap[parentActivityId]->activityTypeName() << "> was not defined before" << endl;
+  cerr << globals::ASTEmap[parentActivityId]->activityTypeName() << "> was not defined before" << endl;
 
   return "";
 }
@@ -1056,14 +1059,13 @@ string ASTE::checkCorrelationSet()
  */
 vector<unsigned int> ASTE::ancestorActivities() const
 {
-  extern map<unsigned int, ASTE*> ASTEmap;
   vector<unsigned int> result;
   
   if (id != 1)
   {
     result.push_back(parentActivityId);
-    assert(ASTEmap[parentActivityId] != NULL);
-    vector<unsigned int> result2 = ASTEmap[parentActivityId]->ancestorActivities();
+    assert(globals::ASTEmap[parentActivityId] != NULL);
+    vector<unsigned int> result2 = globals::ASTEmap[parentActivityId]->ancestorActivities();
     result.insert(result.end(), result2.begin(), result2.end());
     
     return result;
@@ -1081,14 +1083,13 @@ vector<unsigned int> ASTE::ancestorActivities() const
  */
 vector<unsigned int> ASTE::ancestorScopes() const
 {
-  extern map<unsigned int, ASTE*> ASTEmap;
   vector<unsigned int> result;
 
   if (id != 1)
   {
     result.push_back(parentScopeId);
-    assert(ASTEmap[parentScopeId] != NULL);
-    vector<unsigned int> result2 = ASTEmap[parentScopeId]->ancestorScopes();
+    assert(globals::ASTEmap[parentScopeId] != NULL);
+    vector<unsigned int> result2 = globals::ASTEmap[parentScopeId]->ancestorScopes();
     result.insert(result.end(), result2.begin(), result2.end());
     
     return result;
@@ -1107,20 +1108,19 @@ vector<unsigned int> ASTE::ancestorScopes() const
  */
 vector<unsigned int> ASTE::ancestorLoops() const
 {
-  extern map<unsigned int, ASTE*> ASTEmap;
   vector<unsigned int> result;
 
   if (id != 1)
   {
-    assert(ASTEmap[parentActivityId] != NULL);
+    assert(globals::ASTEmap[parentActivityId] != NULL);
 
-    if (ASTEmap[parentActivityId]->activityTypeName() == "while" ||
-	ASTEmap[parentActivityId]->activityTypeName() == "repeatUntil" ||
-	ASTEmap[parentActivityId]->activityTypeName() == "forEach")
+    if (globals::ASTEmap[parentActivityId]->activityTypeName() == "while" ||
+	globals::ASTEmap[parentActivityId]->activityTypeName() == "repeatUntil" ||
+	globals::ASTEmap[parentActivityId]->activityTypeName() == "forEach")
     {
       result.push_back(parentActivityId);
     }
-    vector<unsigned int> result2 = ASTEmap[parentActivityId]->ancestorLoops();
+    vector<unsigned int> result2 = globals::ASTEmap[parentActivityId]->ancestorLoops();
     result.insert(result.end(), result2.begin(), result2.end());
     
     return result;
@@ -1233,8 +1233,6 @@ string ASTE::activityTypeName() const
 
 void ASTE::output()
 {
-  extern map<unsigned int, ASTE*> ASTEmap;
-
   if (drawn)
     return;
 
@@ -1257,30 +1255,30 @@ void ASTE::output()
   // arcs for compensation
   if (activityTypeName() == "compensateScope")
   {
-    cout << id << " -> " << ASTEmap[globals::ASTE_scopeNames[attributes["target"]]]->enclosedCH << "[color=green]" << endl;
+    cout << id << " -> " << globals::ASTEmap[globals::ASTE_scopeNames[attributes["target"]]]->enclosedCH << "[color=green]" << endl;
   }
 
   if (activityTypeName() == "compensate")
   {
-    for (set<unsigned int>::iterator it = ASTEmap[parentScopeId]->enclosedScopes.begin(); it != ASTEmap[parentScopeId]->enclosedScopes.end(); it++)
-      cout << id << " -> " << ASTEmap[*it]->enclosedCH << "[color=green]" << endl;
+    for (set<unsigned int>::iterator it = globals::ASTEmap[parentScopeId]->enclosedScopes.begin(); it != globals::ASTEmap[parentScopeId]->enclosedScopes.end(); it++)
+      cout << id << " -> " << globals::ASTEmap[*it]->enclosedCH << "[color=green]" << endl;
   }
 
   
   // arcs for faults
   if (activityTypeName() == "throw")
   {
-    cout << id << " -> " << ASTEmap[parentScopeId]->enclosedFH << "[color=red]" << endl;
+    cout << id << " -> " << globals::ASTEmap[parentScopeId]->enclosedFH << "[color=red]" << endl;
   }
   if (activityTypeName() == "rethrow" && parentScopeId != 1)
   {
-    cout << id << " -> " << ASTEmap[ASTEmap[ASTEmap[parentScopeId]->id]->parentScopeId]->enclosedFH << "[color=red]" << endl;
+    cout << id << " -> " << globals::ASTEmap[globals::ASTEmap[globals::ASTEmap[parentScopeId]->id]->parentScopeId]->enclosedFH << "[color=red]" << endl;
   }
 
 
   // process children
   for (set<unsigned int>::iterator it = enclosedActivities.begin(); it != enclosedActivities.end(); it++)
-    ASTEmap[*it]->output();
+    globals::ASTEmap[*it]->output();
 }
 
 

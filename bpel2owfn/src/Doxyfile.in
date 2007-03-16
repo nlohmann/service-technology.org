@@ -20,14 +20,14 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/05 18:55:48 $ by $Author: nielslohmann $.
-# Version $Revision: 1.18 $
+# File last changed $Date: 2007/03/16 07:17:16 $ by $Author: nielslohmann $.
+# Version $Revision: 1.1 $
 
 #---------------------------------------------------------------------------
 # Project related configuration options
 #---------------------------------------------------------------------------
-PROJECT_NAME           = "GNU BPEL2oWFN"
-PROJECT_NUMBER         = "Version 2.0 (pre-release)"
+PROJECT_NAME           = "@PACKAGE_NAME@"
+PROJECT_NUMBER         = "Version @PACKAGE_VERSION@"
 OUTPUT_DIRECTORY       = doc
 CREATE_SUBDIRS         = NO
 OUTPUT_LANGUAGE        = English
@@ -136,7 +136,7 @@ FILE_PATTERNS          = *.c \
 RECURSIVE              = NO
 EXCLUDE                = 
 EXCLUDE_SYMLINKS       = NO
-EXCLUDE_PATTERNS       = ast-system*.* getopt*.*
+EXCLUDE_PATTERNS       = ast-system*.* getopt*.* ast-grammar.* ast-config.*
 EXAMPLE_PATH           = 
 EXAMPLE_PATTERNS       = *
 EXAMPLE_RECURSIVE      = NO

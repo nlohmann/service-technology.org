@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/03/07 14:35:34 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.3 $
  */
 
 
@@ -69,4 +69,30 @@ namespace globals {
   map<unsigned int, unsigned int> PPhasCompensateMap;
 
   unsigned int PPcurrentScope = 0;
+
+  s_process_information process_information = {0,0,0,0,0,0,0,0,0};
+
+/// The map of all AST elements: maps an identifier of an AST phylum to an
+/// object holding more information.
+map<unsigned int, ASTE*> ASTEmap;
+
+/// A temporary mapping of attributes. This mapping is filled during parsing
+/// and is copied during post-processing to the AST annotation.
+map<unsigned int, map<string, string> > temporaryAttributeMap;
+
+/// Identifier of the next AST element. The process's id is 1.
+int ASTEid = 1;
+
+/// The root of the abstract syntax tree.
+tProcess AST;
+
+
+
+/// string holding the invocation of BPEL2oWFN
+string invocation="";
+
+/// string holding the called program name of BPEL2oWFN
+string program_name ="";
+
+
 }

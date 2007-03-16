@@ -1,5 +1,5 @@
 /*****************************************************************************\
- * Copyright 2007 Niels Lohmann                                              *
+ * Copyright 2007 Niels Lohmann, Christian Gierds                            *
  *                                                                           *
  * This file is part of GNU BPEL2oWFN.                                       *
  *                                                                           *
@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for shortcuts
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $ 
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/03/07 14:35:34 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.14 $
+ * \version \$Revision: 1.15 $
 */
 %}
 
@@ -68,7 +68,6 @@
 #include "petrinet.h"
 
 extern PetriNet PN;
-extern map<unsigned int, ASTE*> ASTEmap;
 
 using std::cerr;
 using std::endl;
@@ -130,7 +129,7 @@ Transition *throwFault(Place *p1, Place *p2,
 
   // if attribute "exitOnStandardFault" is set to "yes", the process should
   // terminate rather than handling the fault
-  if (ASTEmap[ASTEmap[id->value]->parentScopeId]->attributes["exitOnStandardFault"] == "yes")
+  if (globals::ASTEmap[globals::ASTEmap[id->value]->parentScopeId]->attributes["exitOnStandardFault"] == "yes")
   {
     Transition *t1 = PN.newTransition(prefix + "exitOnStandardFault." + p1name);
     PN.newArc(p1, t1);
@@ -146,7 +145,7 @@ Transition *throwFault(Place *p1, Place *p2,
     {
       case(0): // activity in scope or process
 	{
-          unsigned int parentId = ASTEmap[id->value]->parentScopeId;
+          unsigned int parentId = globals::ASTEmap[id->value]->parentScopeId;
 
 	  Transition *t1 = PN.newTransition(prefix + "throwFault." + p1name);
 	  PN.newArc(p1, t1);
@@ -161,7 +160,7 @@ Transition *throwFault(Place *p1, Place *p2,
 	{
 	  // The parent scope is just the scope of the handler or the
 	  // activity. Thus, we are interested in the parent's parent.
-          unsigned int parentId = ASTEmap[ASTEmap[id->value]->parentScopeId]->parentScopeId;
+          unsigned int parentId = globals::ASTEmap[globals::ASTEmap[id->value]->parentScopeId]->parentScopeId;
 
 	  Transition *t1;
 	  if (negativeControlFlow == 4)
@@ -172,7 +171,7 @@ Transition *throwFault(Place *p1, Place *p2,
 	  PN.newArc(p1, t1);
 	  PN.newArc(t1, p2);
 
-	  if (ASTEmap[id->value]->parentScopeId == 1)
+	  if (globals::ASTEmap[id->value]->parentScopeId == 1)
 	    PN.newArc(t1, PN.findPlace(toString(parentId) + ".internal.exit"));
 	  else
 	    PN.newArc(t1, PN.findPlace(toString(parentId) + ".internal.fault_in"));
@@ -182,7 +181,7 @@ Transition *throwFault(Place *p1, Place *p2,
 
       case(2): // activity in compensation handler
 	{
-          unsigned int parentId = ASTEmap[id->value]->parentScopeId;
+          unsigned int parentId = globals::ASTEmap[id->value]->parentScopeId;
 
           // parent scope of a compensation handler shouldn't be the process :)
 	  assert(parentId != 1);
@@ -197,12 +196,12 @@ Transition *throwFault(Place *p1, Place *p2,
 
       case(3): // activity in termination handler
         {
-          unsigned int parentId = ASTEmap[id->value]->parentScopeId;
+          unsigned int parentId = globals::ASTEmap[id->value]->parentScopeId;
 
 	  Transition *t1 = PN.newTransition(prefix + "signalFault." + p1name);
 	  PN.newArc(p1, t1);
 	  PN.newArc(t1, p2);
-	  PN.newArc(t1, PN.findPlace(toString(parentId) + ".internal.terminationHandler.inner_fault"));
+	  PN.newArc(t1, PN.findPlace(toString(parentId) + ".terminationHandler.inner_fault"));
         }
     }
     return NULL;
@@ -270,14 +269,14 @@ void dpeLinks(Transition *t, int id)
   ENTER("[ASTT]");
 
   assert(t != NULL);
-  assert(ASTEmap[id] != NULL);
+  assert(globals::ASTEmap[id] != NULL);
 
-  for (set<unsigned int>::iterator linkID = ASTEmap[id]->enclosedSourceLinks.begin();
-      linkID != ASTEmap[id]->enclosedSourceLinks.end();
+  for (set<unsigned int>::iterator linkID = globals::ASTEmap[id]->enclosedSourceLinks.begin();
+      linkID != globals::ASTEmap[id]->enclosedSourceLinks.end();
       linkID++)
   {
-    assert(ASTEmap[*linkID] != NULL);
-    string linkName = ASTEmap[*linkID]->linkName;
+    assert(globals::ASTEmap[*linkID] != NULL);
+    string linkName = globals::ASTEmap[*linkID]->linkName;
     PN.newArc(t, PN.findPlace("!link." + linkName));
   }
 
@@ -337,10 +336,10 @@ void receivingTransition(string name, Place *prePlace, Place *postPlace,
 
   if (parameters[P_VARIABLES])
   {
-    string varName = "variable." + ASTEmap[id->value]->variableName;
+    string varName = "variable." + globals::ASTEmap[id->value]->variableName;
     if ( name == "invoke_in" )
     {
-      varName = "variable." + ASTEmap[id->value]->outputVariableName;
+      varName = "variable." + globals::ASTEmap[id->value]->outputVariableName;
     }
     PN.newArc(PN.findPlace(varName), t2);
     PN.newArc(t2, PN.findPlace(varName));
@@ -355,8 +354,8 @@ void receivingTransition(string name, Place *prePlace, Place *postPlace,
 
   if (parameters[P_STANDARDFAULTS])
   {
-    Transition *t6 = throwFault(p1, faultPlace, "buffer", newPrefix, id, ASTEmap[id->value]->controlFlow, preventFurtherFaults);
-    Transition *t7 = throwFault(p2, faultPlace, "received", newPrefix, id, ASTEmap[id->value]->controlFlow, preventFurtherFaults);
+    Transition *t6 = throwFault(p1, faultPlace, "buffer", newPrefix, id, globals::ASTEmap[id->value]->controlFlow, preventFurtherFaults);
+    Transition *t7 = throwFault(p2, faultPlace, "received", newPrefix, id, globals::ASTEmap[id->value]->controlFlow, preventFurtherFaults);
   }
 
 
@@ -405,10 +404,10 @@ void sendingTransition(string name, Place *prePlace, Place *postPlace,
 
   if (parameters[P_VARIABLES])
   {
-    string varName = "variable." + ASTEmap[id->value]->variableName;
+    string varName = "variable." + globals::ASTEmap[id->value]->variableName;
     if ( name == "invoke" || name == "invoke_out" )
     {
-      varName = "variable." + ASTEmap[id->value]->inputVariableName;
+      varName = "variable." + globals::ASTEmap[id->value]->inputVariableName;
     }
     PN.newArc(PN.findPlace(varName), t1, READ);
   }
@@ -428,8 +427,8 @@ void sendingTransition(string name, Place *prePlace, Place *postPlace,
 
   if (parameters[P_STANDARDFAULTS])
   {
-    Transition *t6 = throwFault(p1, faultPlace, "buffer", newPrefix, id, ASTEmap[id->value]->controlFlow, preventFurtherFaults);
-    Transition *t7 = throwFault(p2, faultPlace, "sent", newPrefix, id, ASTEmap[id->value]->controlFlow, preventFurtherFaults);
+    Transition *t6 = throwFault(p1, faultPlace, "buffer", newPrefix, id, globals::ASTEmap[id->value]->controlFlow, preventFurtherFaults);
+    Transition *t7 = throwFault(p2, faultPlace, "sent", newPrefix, id, globals::ASTEmap[id->value]->controlFlow, preventFurtherFaults);
   }
 
 
@@ -482,21 +481,21 @@ void P_transitionCondition(string prefix, tSource_list source_links)
       PN.newArc(t1, p_final);
 
       // Set one link to true.
-      Place *link_true = PN.findPlace("link." + ASTEmap[source->id]->linkName);
+      Place *link_true = PN.findPlace("link." + globals::ASTEmap[source->id]->linkName);
       PN.newArc(t1, link_true);
 
       // Set the other links to false.
       foreach (source2; tSource_list source_links)
       {
-	if (ASTEmap[source2->id]->linkName != ASTEmap[source->id]->linkName)
+	if (globals::ASTEmap[source2->id]->linkName != globals::ASTEmap[source->id]->linkName)
 	{
-	  Place *link_false = PN.findPlace("!link." + ASTEmap[source2->id]->linkName);
+	  Place *link_false = PN.findPlace("!link." + globals::ASTEmap[source2->id]->linkName);
 	  PN.newArc(t1, link_false);
 	}
       }
 
       // User-defined transition conditions will be ignored.
-      string givenTransitionCondition = ASTEmap[source->id]->attributes["transitionCondition"];
+      string givenTransitionCondition = globals::ASTEmap[source->id]->attributes["transitionCondition"];
       if ((givenTransitionCondition != "") && (givenTransitionCondition != "true"))
       {
         cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
@@ -519,11 +518,11 @@ void P_transitionCondition(string prefix, tSource_list source_links)
     // Set all links to true.
     foreach (source; tSource_list source_links)
     {
-      Place *link_true = PN.findPlace("link." + ASTEmap[source->id]->linkName);
+      Place *link_true = PN.findPlace("link." + globals::ASTEmap[source->id]->linkName);
       PN.newArc(t1, link_true);
 
       // User-defined transition conditions will be ignored.
-      string givenTransitionCondition = ASTEmap[source->id]->attributes["transitionCondition"];
+      string givenTransitionCondition = globals::ASTEmap[source->id]->attributes["transitionCondition"];
       if (givenTransitionCondition != "" && givenTransitionCondition != "true")
       {
         cerr << "Ignoring user-defined transition condition \"" << givenTransitionCondition << "\"" << endl;
@@ -568,8 +567,8 @@ void P_joinCondition(string prefix, tTarget_list target_links, joinCondition jc)
   unsigned int linkCount = 0;
   foreach (target; tTarget_list target_links)
   {
-    Place *linkT = PN.findPlace("link." + ASTEmap[target->id]->linkName);
-    Place *linkF = PN.findPlace("!link." + ASTEmap[target->id]->linkName);
+    Place *linkT = PN.findPlace("link." + globals::ASTEmap[target->id]->linkName);
+    Place *linkF = PN.findPlace("!link." + globals::ASTEmap[target->id]->linkName);
     
     trueLinks[linkCount] = linkT;
     falseLinks[linkCount] = linkF;

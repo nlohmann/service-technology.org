@@ -29,15 +29,13 @@
  * 
  * \since   2005/11/11
  *
- * \date    \$Date: 2007/03/04 14:31:59 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.47 $
- *
- * \ingroup conversion
+ * \version \$Revision: 1.48 $
  */
 
 
@@ -171,9 +169,3 @@ set<T> setDifference(set<T> a, set<T> b)
 
 
 #endif
-
-
-
-/*!
- *\defgroup conversion Conversion Functions
- */

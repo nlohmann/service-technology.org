@@ -25,11 +25,11 @@
  * \brief   Configuration of the AST
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $ 
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2006-24-03
  *
- * \date    \$Date: 2007/03/09 10:01:56 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-abstract.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.46 $
+ * \version \$Revision: 1.47 $
  *
  * \todo    Annotate the global mappings which function clear them.
  */
@@ -118,8 +118,6 @@ using std::cerr;
 
 extern PetriNet PN;				// introduced in main.c
 extern CFGBlock * CFG;				// introduced in cfg.cc
-extern map<unsigned int, ASTE*> ASTEmap;	// introduced in ast-details.cc
-
 %}
 
 
@@ -165,10 +163,7 @@ void printer(const char *s, uview v)
 
 #include "ast-details.h"
 #include "options.h"
-
-using std::map;
-
-extern map<unsigned int, ASTE*> ASTEmap;
+#include "globals.h"
 %}
 
 
@@ -190,27 +185,30 @@ extern map<unsigned int, ASTE*> ASTEmap;
 #include "debug.h"
 #include "helpers.h"
 
-extern int ASTEid;
-
 // a preprocessor directive for the quite generic constructors
 #define CTOR(token) { \
   ENTER("[AST]"); \
   assert(integer_1 != NULL); \
   if (integer_1->value == 0) \
   { \
-    id = ASTEid; \
-    integer_1 = mkinteger(ASTEid++); \
+    id = globals::ASTEid; \
+    integer_1 = mkinteger(globals::ASTEid++); \
   } \
   else { \
     id = integer_1->value; \
   } \
-  if (ASTEmap[id] == NULL) \
+  if (globals::ASTEmap[id] == NULL) \
   { \
-    ASTEmap[id] = new ASTE(id, token); \
+    globals::ASTEmap[id] = new ASTE(id, token); \
   } \
-  assert(ASTEmap[id] != NULL); \
-  ASTEmap[id]->phylum = this; \
+  assert(globals::ASTEmap[id] != NULL); \
+  globals::ASTEmap[id]->phylum = this; \
   LEAVE("[AST]"); \
 }
+
+
+// use to get ANSI C
+#undef kc_strcasecmp
+#define kc_strcasecmp strcmp
 
 %}

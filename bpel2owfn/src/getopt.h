@@ -150,8 +150,8 @@ struct option
 
 extern int getopt (int argc, char *const *argv, const char *__shortopts);
 # else /* not __GNU_LIBRARY__ */
-// changed 2006-01-31 by gierds: under Unix this line brings us into trouble
-// extern int getopt ();
+/* changed 2006-01-31 by gierds: under Unix this line brings us into trouble
+   extern int getopt (); */
 # endif /* __GNU_LIBRARY__ */
 
 # ifndef __need_getopt

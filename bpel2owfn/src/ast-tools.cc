@@ -29,13 +29,13 @@
  *
  * \since   2006/02/08
  *
- * \date    \$Date: 2007/03/09 12:59:02 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.66 $
+ * \version \$Revision: 1.67 $
  *
  * \ingroup debug
  * \ingroup creation
@@ -113,9 +113,7 @@ string inString()
 */
 void header(int id, bool myindent)
 {
-  extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
-
-  trace(TRACE_DEBUG, "[PNU]" + inString() + "<" + ASTEmap[id]->activityTypeName() + " id=" + toString(id) + ">\n");
+  trace(TRACE_DEBUG, "[PNU]" + inString() + "<" + globals::ASTEmap[id]->activityTypeName() + " id=" + toString(id) + ">\n");
 
   if (myindent)
     indent += indentStep;
@@ -153,12 +151,10 @@ void header(kc::integer id, bool myindent)
  */
 void footer(int id, bool myindent)
 {
-  extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
-
   if (myindent)
     indent -= indentStep;
 
-  trace(TRACE_DEBUG, "[PNU]" + inString() + "</" + ASTEmap[id]->activityTypeName() + " id=" + toString(id) + ">\n");
+  trace(TRACE_DEBUG, "[PNU]" + inString() + "</" + globals::ASTEmap[id]->activityTypeName() + " id=" + toString(id) + ">\n");
 }
 
 
@@ -369,26 +365,24 @@ void check_SA00070( unsigned int id )
 {
   ENTER("check_SA00070");
 
-  extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
-  
   // go through all enclosed activities and look if there have sources or targets
-  for ( set< unsigned int >::iterator activities = ASTEmap[ id ]->enclosedActivities.begin();
-          activities != ASTEmap[ id ]->enclosedActivities.end();
+  for ( set< unsigned int >::iterator activities = globals::ASTEmap[ id ]->enclosedActivities.begin();
+          activities != globals::ASTEmap[ id ]->enclosedActivities.end();
           activities++ )
   {
     // whether it's source or target doesn't matter - the link must be defined inside the element that is checked
-    set< unsigned int > links = setUnion( ASTEmap[ *activities ]->sourceLinks, ASTEmap[ *activities ]->targetLinks );
+    set< unsigned int > links = setUnion( globals::ASTEmap[ *activities ]->sourceLinks, globals::ASTEmap[ *activities ]->targetLinks );
 
     // so check every source and target
     for ( set< unsigned int>::iterator link = links.begin(); link != links.end(); link++ )
     {
       // get the id of the <link> element
-      unsigned int linkId = globals::ASTE_linkIdMap[ ASTEmap[ *link ]->linkName ];
+      unsigned int linkId = globals::ASTE_linkIdMap[ globals::ASTEmap[ *link ]->linkName ];
       
       // look if the linkId is inside the set of enclosed activities
       bool internal = false;
-      for ( set< unsigned int >::iterator activity = ASTEmap[ id ]->enclosedActivities.begin();
-            activity != ASTEmap[ id ]->enclosedActivities.end();
+      for ( set< unsigned int >::iterator activity = globals::ASTEmap[ id ]->enclosedActivities.begin();
+            activity != globals::ASTEmap[ id ]->enclosedActivities.end();
             activity++ )
       {
         // is this the right id?
@@ -401,12 +395,16 @@ void check_SA00070( unsigned int id )
       // the linkId doesn't belong to the set of enclosed activities, so trigger the error
       if ( !internal )
       {
-        SAerror( 70, ASTEmap[ *link ]->linkName, ASTEmap[ id ]->attributes[ "referenceLine" ] );
+        SAerror( 70, globals::ASTEmap[ *link ]->linkName, globals::ASTEmap[ id ]->attributes[ "referenceLine" ] );
       }
     }
   }
   LEAVE("check_SA00070");
 }
+
+
+
+
 
 /*!
  * \brief Checks for Static Analysis item SA00071.
@@ -418,28 +416,26 @@ void check_SA00071( unsigned int id )
 {
   ENTER("check_SA00071");
 
-  extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
- 
-  for ( set< unsigned int >::iterator activities = ASTEmap[ id ]->enclosedActivities.begin();
-          activities != ASTEmap[ id ]->enclosedActivities.end();
+  for ( set< unsigned int >::iterator activities = globals::ASTEmap[ id ]->enclosedActivities.begin();
+          activities != globals::ASTEmap[ id ]->enclosedActivities.end();
           activities++ )
   {
     // whether it's source or target doesn't matter - the link must be defined inside the element that is checked
-    set< unsigned int > targets = ASTEmap[ *activities ]->targetLinks;
+    set< unsigned int > targets = globals::ASTEmap[ *activities ]->targetLinks;
 
     // so check every source and target
     for ( set< unsigned int>::iterator link = targets.begin(); link != targets.end(); link++ )
     {
       // get the id of the <link> element
-      unsigned int linkId = globals::ASTE_linkIdMap[ ASTEmap[ *link ]->linkName ];
+      unsigned int linkId = globals::ASTE_linkIdMap[ globals::ASTEmap[ *link ]->linkName ];
       
       // look if the linkId is inside the set of enclosed activities
       bool internal = false;
-      for ( set< unsigned int >::iterator activity = ASTEmap[ id ]->enclosedActivities.begin();
-            activity != ASTEmap[ id ]->enclosedActivities.end();
+      for ( set< unsigned int >::iterator activity = globals::ASTEmap[ id ]->enclosedActivities.begin();
+            activity != globals::ASTEmap[ id ]->enclosedActivities.end();
             activity++ )
       {
-        set< unsigned int > sources = ASTEmap[ *activity ]->enclosedSourceLinks;
+        set< unsigned int > sources = globals::ASTEmap[ *activity ]->enclosedSourceLinks;
 
         // is this the right id?
         if ( sources.find( linkId ) != sources.end() )
@@ -451,13 +447,16 @@ void check_SA00071( unsigned int id )
       // the linkId doesn't belong to the set of enclosed activities, so trigger the error
       if ( !internal )
       {
-        SAerror( 71, ASTEmap[ linkId ]->linkName, ASTEmap[ id ]->attributes[ "referenceLine" ] );
+        SAerror( 71, globals::ASTEmap[ linkId ]->linkName, globals::ASTEmap[ id ]->attributes[ "referenceLine" ] );
       }
     }
   }
 
   LEAVE("check_SA00071");
 }
+
+
+
 
 
 /******************************************************************************
@@ -517,10 +516,8 @@ void indown()
  */
 void listAttributes ( unsigned int id )
 {
-  extern map<unsigned int, ASTE*> ASTEmap; // introduced in bpel-unparse-tools.h
-
   string result = "";
-  for (map< string, string >::iterator attribute = ASTEmap[ id ]->attributes.begin(); attribute != ASTEmap[ id ]->attributes.end(); attribute++ )
+  for (map< string, string >::iterator attribute = globals::ASTEmap[ id ]->attributes.begin(); attribute != globals::ASTEmap[ id ]->attributes.end(); attribute++ )
   {
     if ( attribute->second != "" &&
          attribute->first != "referenceLine" &&

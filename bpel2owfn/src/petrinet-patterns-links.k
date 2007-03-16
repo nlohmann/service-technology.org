@@ -36,11 +36,11 @@
  *             suppressJoinFailure="no"
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $ 
+ *          last changes of: \$Author: nielslohmann $
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/09 10:02:14 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          petrinet-patterns-links.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.20 $
+ * \version \$Revision: 1.21 $
  */
 %}
 
@@ -85,7 +85,6 @@ using std::string;
 using std::map;
 
 extern PetriNet PN;
-extern map<unsigned int, ASTE*> ASTEmap;
 %}
 
 
@@ -98,15 +97,15 @@ extern map<unsigned int, ASTE*> ASTEmap;
 
 %{
 /*!
- * \fn void kc::P_LinkWrapper0(impl_standardElements* abstract_phylum, uview current_view)
+ * \fn      void kc::P_LinkWrapper0(impl_standardElements* abstract_phylum, uview current_view)
  *
- * \brief Wrapper Pattern 0
+ * \brief   Wrapper Pattern 0
  *
- * Wrapper pattern for an activity that has neither incoming nor outgoing
- * links.
+ *          Wrapper pattern for an activity that has neither incoming nor
+ *          outgoing links.
  *
- * \param abstract_phylum  pointer to the phylum of the abstract syntax tree
- * \param current_view     the current unparse view
+ * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
+ * \param   current_view     the current unparse view
  */
 %}
 void P_LinkWrapper0(impl_standardElements* abstract_phylum, uview current_view)
@@ -340,7 +339,7 @@ void P_LinkWrapper3(impl_standardElements* abstract_phylum, uview current_view)
   // transition is not labeled "skip", but "throwFault.joinFailure".
   Transition *t2 = throwFault(p7, p9, "joinFailure", prefix,
                               mkinteger(phylum->parentId),
-                              ASTEmap[phylum->parentId]->controlFlow);
+                              globals::ASTEmap[phylum->parentId]->controlFlow);
   PN.newArc(p1, t2);
   PN.newArc(p7, t2);
   PN.newArc(t2, p9);
@@ -516,7 +515,7 @@ void P_LinkWrapper5(impl_standardElements* abstract_phylum, uview current_view)
   // transition is not labeled "skip", but "throwFault.joinFailure".
   Transition *t2 = throwFault(p7, p10, "joinFailure", prefix,
                               mkinteger(phylum->parentId),
-                              ASTEmap[phylum->parentId]->controlFlow);
+                              globals::ASTEmap[phylum->parentId]->controlFlow);
   PN.newArc(p1, t2);
   PN.newArc(p7, t2);
   PN.newArc(t2, p10);

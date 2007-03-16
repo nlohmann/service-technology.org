@@ -25,17 +25,19 @@
  * \brief   Petri Net API: structural reduction
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: znamirow $
+ *          Christian Gierds <gierds@informatik.hu-berlin.de>,
+ *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
+ *          last changes of: \$Author: nielslohmann $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2007/03/08 14:54:49 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.68 $
+ * \version \$Revision: 1.69 $
  *
  * \ingroup petrinet
  */
@@ -280,8 +282,9 @@ void PetriNet::reduce_dead_nodes()
  *
  * \image html rb1.png
  *
- * \todo Overwork the preconditions and postconditions.
- * \todo Re-organize the storing and removing of nodes.
+ * \todo 
+ *       - Overwork the preconditions and postconditions.
+ *       - Re-organize the storing and removing of nodes.
  */
 void PetriNet::reduce_identical_places()
 {
@@ -345,8 +348,9 @@ void PetriNet::reduce_identical_places()
  *
  * \image html ra2.png
  *
- * \todo Overwork the preconditions and postconditions.
- * \todo Re-organize the storing and removing of nodes.
+ * \todo
+ *       - Overwork the preconditions and postconditions.
+ *       - Re-organize the storing and removing of nodes.
  */
 void PetriNet::reduce_identical_transitions()
 {
@@ -413,8 +417,9 @@ void PetriNet::reduce_identical_transitions()
  *
  * \image html ra1.png
  *
- * \todo Overwork the preconditions and postconditions.
- * \todo Re-organize the storing and removing of nodes.
+ * \todo
+ *       - Overwork the preconditions and postconditions.
+ *       - Re-organize the storing and removing of nodes.
 */
 void PetriNet::reduce_series_places()
 {
@@ -482,8 +487,9 @@ void PetriNet::reduce_series_places()
  *
  * \image html ra2.png
  *
- * \todo Overwork the preconditions and postconditions.
- * \todo Re-organize the storing and removing of nodes.
+ * \todo
+ *       - Overwork the preconditions and postconditions.
+ *       - Re-organize the storing and removing of nodes.
  */
 void PetriNet::reduce_series_transitions()
 {
@@ -557,8 +563,6 @@ void PetriNet::reduce_series_transitions()
  * \pre \f$ p \f$'s preset and postset are equal: \f$ p^\bullet = {}^\bullet p \f$
  *
  * \post \f$ p \f$ is removed: \f$ P' = P \; \backslash \; \{p\} \f$
- *
- * \todo remove debug output
  */
 unsigned int PetriNet::reduce_self_loop_places()
 {
@@ -607,8 +611,6 @@ unsigned int PetriNet::reduce_self_loop_places()
  * \pre \f$ t \f$'s preset and postset are equal: \f$ t^\bullet = {}^\bullet t \f$
  *
  * \post \f$ t \f$ is removed: \f$ T' = T \; \backslash \; \{t\} \f$
- *
- * \todo remove debug output
  */
 unsigned int PetriNet::reduce_self_loop_transitions()
 {
@@ -768,13 +770,11 @@ void PetriNet::reduce_equal_places()
 
 /*!
  * Removes unnecessary nodes of the generated Petri net:
- *
  *  - structural dead nodes
  *  - unused status places
  *  - suspicious transitions
  *
  * Applys some simple structural reduction rules for Petri nets:
- *
  *  - elimination of identical places (RB1)
  *  - elimination of identical transitions (RB2)
  *  - fusion of series places (RA1)
@@ -788,11 +788,10 @@ void PetriNet::reduce_equal_places()
  *
  * \return the number of passes until a fixed point was reached
  *
- * \todo improve performance
- * \todo implement more reduction rules
- * \todo pass a parameter to this function to choose the property of the model to
- *       be preserved
- * \todo adjust rules to allow for arc weights
+ * \todo
+ *       - Improve performance of the rules.
+ *       - Pass a parameter to this function to choose the property of the
+ *         model to be preserved.
  */
 unsigned int PetriNet::reduce()
 {

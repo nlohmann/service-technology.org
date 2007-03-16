@@ -28,13 +28,13 @@
  * 
  * \since   2007/03/05
  *
- * \date    \$Date: 2007/03/07 14:35:34 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.2 $
+ * \version \$Revision: 1.3 $
  */
 
 
@@ -48,11 +48,28 @@
 #include <string>
 #include <map>
 
+#include "ast-config.h"
+#include "ast-details.h"
 #include "cfg.h"
 
 using std::set;
 using std::string;
 using std::map;
+
+
+  /// \todo comment me!
+  struct s_process_information
+  {
+    unsigned int basic_activities;
+    unsigned int structured_activities;
+    unsigned int scopes;
+    unsigned int event_handlers;
+    unsigned int fault_handlers;
+    unsigned int termination_handlers;
+    unsigned int compensation_handlers;
+    unsigned int variables;
+    unsigned int links;
+  };
 
 
 /// namespace for global variables
@@ -91,6 +108,23 @@ namespace globals {
   extern map<unsigned int, unsigned int> PPhasCompensateMap;
 
   extern unsigned int PPcurrentScope;	///< the identifier of the current scope
+
+  extern s_process_information process_information;
+
+
+
+  // used during parsing
+  extern map<unsigned int, ASTE*> ASTEmap;
+  extern map<unsigned int, map<string, string> > temporaryAttributeMap;
+  extern int ASTEid;  
+
+  extern kc::tProcess AST;
+
+
+
+extern string invocation;
+extern string program_name;
+
 }
 
 #endif

@@ -33,7 +33,7 @@
  * 
  * \since   2005-10-03
  *
- * \date    \$Date: 2007/03/09 12:17:08 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  * 
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -42,7 +42,7 @@
  * \note    This file was created using Kimwitu++ reading file ast-grammar.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.169 $
+ * \version \$Revision: 1.170 $
  */
 %}
 
@@ -57,10 +57,8 @@
 
 #include "ast-details.h"
 #include "ast-config.h"
+#include "globals.h"
 #include "frontend-parser.h"
-
-extern map<unsigned int, ASTE*> ASTEmap;
-extern int ASTEid;
 %}
 
 
@@ -145,7 +143,7 @@ tPartner:
 ******************************************************************************/
 
 tFaultHandlers:
-  standardFaultHandlers(integer)
+  volatile_standardFaultHandlers(integer)
 | FaultHandlers(tCatch_list tCatchAll integer)
 ;
 
@@ -166,17 +164,17 @@ tCatchAll:
 ******************************************************************************/
 
 tTerminationHandler:
-  standardTerminationHandler(integer)
+  volatile_standardTerminationHandler(integer)
 | TerminationHandler(activity integer)
 ;
 
 
 /******************************************************************************
-  COMPENSATION HANDLERS
+  COMPENSATION HANDLER
 ******************************************************************************/
 
 tCompensationHandler:
-  standardCompensationHandler(integer)
+  volatile_standardCompensationHandler(integer)
 | CompensationHandler(activity integer)
 ;
 
@@ -238,7 +236,7 @@ tCorrelation:
 
 
 /******************************************************************************
-  TO & FROM PARTS                                                (WS-BPEL 2.0)
+  TO & FROM PARTS
 ******************************************************************************/
 
 tToPart_list: list tToPart;
@@ -280,10 +278,10 @@ tReply:
 ******************************************************************************/
 
 tInvoke:
-  Invoke(standardElements tCorrelation_list tToPart_list tFromPart_list integer) /* will be replaced in rewriting */
+  volatile_Invoke(standardElements tCorrelation_list tToPart_list tFromPart_list integer)
 | SynchronousInvoke(standardElements tCorrelation_list tToPart_list tFromPart_list integer)
 | AsynchronousInvoke(standardElements tCorrelation_list tToPart_list tFromPart_list integer)
-| annotatedInvoke(standardElements tCorrelation_list tCatch_list tCatchAll tCompensationHandler tToPart_list tFromPart_list integer) /* will be replaced in rewriting */
+| volatile_annotatedInvoke(standardElements tCorrelation_list tCatch_list tCatchAll tCompensationHandler tToPart_list tFromPart_list integer)
 ;
 
 
@@ -311,7 +309,7 @@ tTo:
 
 
 /******************************************************************************
-  VALIDATE                                                       (WS-BPEL 2.0)
+  VALIDATE
 ******************************************************************************/
 
 tValidate:
@@ -356,7 +354,7 @@ tThrow:
 
 
 /******************************************************************************
-  RETHROW                                                        (WS-BPEL 2.0)
+  RETHROW
 ******************************************************************************/
 
 tRethrow:
@@ -365,7 +363,7 @@ tRethrow:
 
 
 /******************************************************************************
-  COMPENSATE / COMPENSATESCOPE                                   (WS-BPEL 2.0)
+  COMPENSATE / COMPENSATESCOPE
 ******************************************************************************/
 
 tCompensate:
@@ -384,7 +382,7 @@ tSequence:
 
 
 /******************************************************************************
-  IF / SWITCH
+  IF
 ******************************************************************************/
 
 tIf:
@@ -413,7 +411,7 @@ tWhile:
 
 
 /******************************************************************************
-  REPEATUNTIL                                                    (WS-BPEL 2.0)
+  REPEATUNTIL
 ******************************************************************************/
 
 tRepeatUntil:
@@ -422,7 +420,7 @@ tRepeatUntil:
 
 
 /******************************************************************************
-  FOREACH                                                        (WS-BPEL 2.0)
+  FOREACH
 ******************************************************************************/
 
 tForEach:
@@ -531,75 +529,75 @@ expression:
   CONSTRUCTORS
 ******************************************************************************/
 
-%ctor activityReceive()			{ id = tReceive_1->id; }
-%ctor activityReply()			{ id = tReply_1->id; }
-%ctor activityInvoke()			{ id = tInvoke_1->id; }
 %ctor activityAssign()			{ id = tAssign_1->id; }
-%ctor activityValidate()		{ id = tValidate_1->id; }
-%ctor activityEmpty()			{ id = tEmpty_1->id; }
-%ctor activityWait()			{ id = tWait_1->id; }
-%ctor activityExit()			{ id = tExit_1->id; }
-%ctor activityThrow()			{ id = tThrow_1->id; }
-%ctor activityRethrow()			{ id = tRethrow_1->id; }
 %ctor activityCompensate()		{ id = tCompensate_1->id; }
-%ctor activitySequence()		{ id = tSequence_1->id; }
-%ctor activityIf()			{ id = tIf_1->id; }
-%ctor activityWhile()			{ id = tWhile_1->id; }
-%ctor activityRepeatUntil()		{ id = tRepeatUntil_1->id; }
-%ctor activityForEach()			{ id = tForEach_1->id; }
-%ctor activityPick()			{ id = tPick_1->id; }
+%ctor activityEmpty()			{ id = tEmpty_1->id; }
+%ctor activityExit()			{ id = tExit_1->id; }
 %ctor activityFlow()			{ id = tFlow_1->id; }
+%ctor activityForEach()			{ id = tForEach_1->id; }
+%ctor activityIf()			{ id = tIf_1->id; }
+%ctor activityInvoke()			{ id = tInvoke_1->id; }
+%ctor activityPick()			{ id = tPick_1->id; }
+%ctor activityReceive()			{ id = tReceive_1->id; }
+%ctor activityRepeatUntil()		{ id = tRepeatUntil_1->id; }
+%ctor activityReply()			{ id = tReply_1->id; }
+%ctor activityRethrow()			{ id = tRethrow_1->id; }
 %ctor activityScope()			{ id = tScope_1->id; }
+%ctor activitySequence()		{ id = tSequence_1->id; }
+%ctor activityThrow()			{ id = tThrow_1->id; }
+%ctor activityValidate()		{ id = tValidate_1->id; }
+%ctor activityWait()			{ id = tWait_1->id; }
+%ctor activityWhile()			{ id = tWhile_1->id; }
 
-%ctor Process()				{ CTOR(K_PROCESS) }
-%ctor PartnerLink()			{ CTOR(K_PARTNERLINK) }
-%ctor Partner()				{ CTOR(K_PARTNER) }
-%ctor standardFaultHandlers()		{ CTOR(K_FAULTHANDLERS) }
-%ctor FaultHandlers()			{ CTOR(K_FAULTHANDLERS) }
+%ctor Assign()				{ CTOR(K_ASSIGN) }
+%ctor AsynchronousInvoke()		{ CTOR(K_INVOKE) }
 %ctor Catch()				{ CTOR(K_CATCH) }
 %ctor CatchAll()			{ CTOR(K_CATCHALL) }
-%ctor emptyEventHandlers()		{ CTOR(K_EVENTHANDLERS) }
-%ctor EventHandlers()			{ CTOR(K_EVENTHANDLERS) }
-%ctor OnMessage()			{ CTOR(K_ONMESSAGE) }
-%ctor OnAlarm()				{ CTOR(K_ONALARM) }
-%ctor standardCompensationHandler()	{ CTOR(K_COMPENSATIONHANDLER) }
-%ctor CompensationHandler()		{ CTOR(K_COMPENSATIONHANDLER) }
-%ctor Variable()			{ CTOR(K_VARIABLE) }
-%ctor CorrelationSet()			{ CTOR(K_CORRELATIONSET) }
-%ctor Correlation()			{ CTOR(K_CORRELATION) }
-%ctor ToPart()				{ CTOR(K_TOPART) }
-%ctor FromPart()			{ CTOR(K_FROMPART) }
-%ctor Receive()				{ CTOR(K_RECEIVE) }
-%ctor Reply()				{ CTOR(K_REPLY) }
-%ctor Invoke()				{ CTOR(K_INVOKE) }
-%ctor SynchronousInvoke()		{ CTOR(K_INVOKE) }
-%ctor AsynchronousInvoke()		{ CTOR(K_INVOKE) }
-%ctor annotatedInvoke()			{ CTOR(K_INVOKE) }
-%ctor Assign()				{ CTOR(K_ASSIGN) }
-%ctor Copy()				{ CTOR(K_COPY) }
-%ctor From()				{ CTOR(K_FROM) }
-%ctor To()				{ CTOR(K_TO) }
-%ctor Validate()			{ CTOR(K_VALIDATE) }
-%ctor Empty()				{ CTOR(K_EMPTY) }
-%ctor Wait() 				{ CTOR(K_WAIT) }
-%ctor Exit()				{ CTOR(K_EXIT) }
-%ctor Throw()				{ CTOR(K_THROW) }
-%ctor Rethrow()				{ CTOR(K_RETHROW) }
 %ctor Compensate()			{ CTOR(K_COMPENSATE) }
 %ctor CompensateScope()			{ CTOR(K_COMPENSATESCOPE) }
-%ctor Sequence()			{ CTOR(K_SEQUENCE) }
-%ctor If() 				{ CTOR(K_IF) }
-%ctor ElseIf()				{ CTOR(K_ELSEIF) }
+%ctor CompensationHandler()		{ CTOR(K_COMPENSATIONHANDLER) }
+%ctor Copy()				{ CTOR(K_COPY) }
+%ctor Correlation()			{ CTOR(K_CORRELATION) }
+%ctor CorrelationSet()			{ CTOR(K_CORRELATIONSET) }
 %ctor Else()				{ CTOR(K_ELSE) }
-%ctor NoElse()				{ CTOR(K_ELSE) }
-%ctor While()				{ CTOR(K_WHILE) }
-%ctor RepeatUntil()			{ CTOR(K_REPEATUNTIL) }
-%ctor ForEach()				{ CTOR(K_FOREACH) }
-%ctor Pick()				{ CTOR(K_PICK) }
+%ctor ElseIf()				{ CTOR(K_ELSEIF) }
+%ctor Empty()				{ CTOR(K_EMPTY) }
+%ctor emptyEventHandlers()		{ CTOR(K_EVENTHANDLERS) }
+%ctor EventHandlers()			{ CTOR(K_EVENTHANDLERS) }
+%ctor Exit()				{ CTOR(K_EXIT) }
+%ctor FaultHandlers()			{ CTOR(K_FAULTHANDLERS) }
 %ctor Flow()				{ CTOR(K_FLOW) }
+%ctor ForEach()				{ CTOR(K_FOREACH) }
+%ctor From()				{ CTOR(K_FROM) }
+%ctor FromPart()			{ CTOR(K_FROMPART) }
+%ctor If() 				{ CTOR(K_IF) }
 %ctor Link()				{ CTOR(K_LINK) }
+%ctor NoElse()				{ CTOR(K_ELSE) }
+%ctor OnAlarm()				{ CTOR(K_ONALARM) }
+%ctor OnMessage()			{ CTOR(K_ONMESSAGE) }
+%ctor Partner()				{ CTOR(K_PARTNER) }
+%ctor PartnerLink()			{ CTOR(K_PARTNERLINK) }
+%ctor Pick()				{ CTOR(K_PICK) }
+%ctor Process()				{ CTOR(K_PROCESS) }
+%ctor Receive()				{ CTOR(K_RECEIVE) }
+%ctor RepeatUntil()			{ CTOR(K_REPEATUNTIL) }
+%ctor Reply()				{ CTOR(K_REPLY) }
+%ctor Rethrow()				{ CTOR(K_RETHROW) }
 %ctor Scope()				{ CTOR(K_SCOPE) }
-%ctor standardTerminationHandler()	{ CTOR(K_TERMINATIONHANDLER) }
-%ctor TerminationHandler()		{ CTOR(K_TERMINATIONHANDLER) }
-%ctor Target()				{ CTOR(K_TARGET) }
+%ctor Sequence()			{ CTOR(K_SEQUENCE) }
 %ctor Source()				{ CTOR(K_SOURCE) }
+%ctor SynchronousInvoke()		{ CTOR(K_INVOKE) }
+%ctor Target()				{ CTOR(K_TARGET) }
+%ctor TerminationHandler()		{ CTOR(K_TERMINATIONHANDLER) }
+%ctor Throw()				{ CTOR(K_THROW) }
+%ctor To()				{ CTOR(K_TO) }
+%ctor ToPart()				{ CTOR(K_TOPART) }
+%ctor Validate()			{ CTOR(K_VALIDATE) }
+%ctor Variable()			{ CTOR(K_VARIABLE) }
+%ctor volatile_annotatedInvoke()		{ CTOR(K_INVOKE) }
+%ctor volatile_Invoke()				{ CTOR(K_INVOKE) }
+%ctor volatile_standardCompensationHandler()	{ CTOR(K_COMPENSATIONHANDLER) }
+%ctor volatile_standardFaultHandlers()		{ CTOR(K_FAULTHANDLERS) }
+%ctor volatile_standardTerminationHandler()	{ CTOR(K_TERMINATIONHANDLER) }
+%ctor Wait() 				{ CTOR(K_WAIT) }
+%ctor While()				{ CTOR(K_WHILE) }

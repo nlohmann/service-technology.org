@@ -31,7 +31,7 @@
  * 
  * \since   2006-07-02
  *
- * \date    \$Date: 2007/03/09 12:17:08 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file bpel-unparse.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.140 $
+ * \version \$Revision: 1.141 $
  */
 %}
 
@@ -56,7 +56,7 @@ Process(a,b,c,d,e,g,i,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       myself->parentScopeId = myid;
@@ -65,18 +65,18 @@ Process(a,b,c,d,e,g,i,_id) ->
 
       // annotate AST and check information
       myself->checkAttributes();
-      myself->hasEH = (string(g->op_name()) == "userDefinedEventHandler");
-//      ASTEmap[f->id]->inProcess = true;
+      myself->hasEH = (string(g->op_name()) == "EventHandlers");
+//      globals::ASTEmap[f->id]->inProcess = true;
 
       // distribute the process' id to the enclosed FH/CH/EH/activity
-      assert(ASTEmap[e->id] != NULL);
-//      assert(ASTEmap[f->id] != NULL);
-      assert(ASTEmap[g->id] != NULL);
-      assert(ASTEmap[i->id] != NULL);
-      ASTEmap[e->id]->parentActivityId = myid;
-//      ASTEmap[f->id]->parentActivityId = myid;
-      ASTEmap[g->id]->parentActivityId = myid;
-      ASTEmap[i->id]->parentActivityId = myid;
+      assert(globals::ASTEmap[e->id] != NULL);
+//      assert(globals::ASTEmap[f->id] != NULL);
+      assert(globals::ASTEmap[g->id] != NULL);
+      assert(globals::ASTEmap[i->id] != NULL);
+      globals::ASTEmap[e->id]->parentActivityId = myid;
+//      globals::ASTEmap[f->id]->parentActivityId = myid;
+      globals::ASTEmap[g->id]->parentActivityId = myid;
+      globals::ASTEmap[i->id]->parentActivityId = myid;
 
       myself->enclosedFH = e->id;
     }
@@ -85,24 +85,24 @@ Process(a,b,c,d,e,g,i,_id) ->
     e g
     {
       // collect enclosed source links
-      assert(ASTEmap[i->id] != NULL);
-      myself->enclosedSourceLinks = ASTEmap[i->id]->enclosedSourceLinks;
-      myself->enclosedSourceLinks = setUnion( myself->enclosedSourceLinks, ASTEmap[e->id]->enclosedSourceLinks );
-//      myself->enclosedSourceLinks = setUnion( myself->enclosedSourceLinks, ASTEmap[f->id]->enclosedSourceLinks );
-      myself->enclosedSourceLinks = setUnion( myself->enclosedSourceLinks, ASTEmap[g->id]->enclosedSourceLinks );
+      assert(globals::ASTEmap[i->id] != NULL);
+      myself->enclosedSourceLinks = globals::ASTEmap[i->id]->enclosedSourceLinks;
+      myself->enclosedSourceLinks = setUnion( myself->enclosedSourceLinks, globals::ASTEmap[e->id]->enclosedSourceLinks );
+//      myself->enclosedSourceLinks = setUnion( myself->enclosedSourceLinks, globals::ASTEmap[f->id]->enclosedSourceLinks );
+      myself->enclosedSourceLinks = setUnion( myself->enclosedSourceLinks, globals::ASTEmap[g->id]->enclosedSourceLinks );
 
-      set< unsigned int > innerIds = ASTEmap[ i->id ]->enclosedActivities;
+      set< unsigned int > innerIds = globals::ASTEmap[ i->id ]->enclosedActivities;
       innerIds.insert( i->id );
-      set< unsigned int > faultIds = ASTEmap[ e->id ]->enclosedActivities;
+      set< unsigned int > faultIds = globals::ASTEmap[ e->id ]->enclosedActivities;
       faultIds.insert( e->id );
-//      set< unsigned int > compIds = ASTEmap[ f->id ]->enclosedActivities;
+//      set< unsigned int > compIds = globals::ASTEmap[ f->id ]->enclosedActivities;
 //      compIds.insert( f->id );
 
       enterConflictingActivities( innerIds, faultIds );
 //      enterConflictingActivities( faultIds, compIds );
 
       // pass list of enclosed scopes to the compensation handler
-//      ASTEmap[f->id]->enclosedScopes = myself->enclosedScopes;
+//      globals::ASTEmap[f->id]->enclosedScopes = myself->enclosedScopes;
 
       // trigger [SA00015]
       if (globals::ASTE_startActivities.empty())
@@ -116,26 +116,26 @@ Process(a,b,c,d,e,g,i,_id) ->
       {
         if ( it-> first != "" )
         {
-          assert(ASTEmap[it->second] != NULL);
+          assert(globals::ASTEmap[it->second] != NULL);
   
-          if ((ASTEmap[it->second]->targetActivity == 0) || (ASTEmap[it->second]->sourceActivity == 0))
+          if ((globals::ASTEmap[it->second]->targetActivity == 0) || (globals::ASTEmap[it->second]->sourceActivity == 0))
           {
-            SAerror(66, it->first, ASTEmap[it->second]->attributes["referenceLine"]);
+            SAerror(66, it->first, globals::ASTEmap[it->second]->attributes["referenceLine"]);
             linksOK = false;
           }
 
           // trigger [SA00067]
           if (linksOK)
           {
-            assert(ASTEmap[ASTEmap[it->second]->sourceActivity] != NULL);
-            assert(ASTEmap[ASTEmap[it->second]->targetActivity] != NULL);
-            set<unsigned int> otherSources = ASTEmap[ASTEmap[it->second]->sourceActivity]->sourceLinks;
-            set<unsigned int> otherTargets = ASTEmap[ASTEmap[it->second]->targetActivity]->targetLinks;
+            assert(globals::ASTEmap[globals::ASTEmap[it->second]->sourceActivity] != NULL);
+            assert(globals::ASTEmap[globals::ASTEmap[it->second]->targetActivity] != NULL);
+            set<unsigned int> otherSources = globals::ASTEmap[globals::ASTEmap[it->second]->sourceActivity]->sourceLinks;
+            set<unsigned int> otherTargets = globals::ASTEmap[globals::ASTEmap[it->second]->targetActivity]->targetLinks;
             set<unsigned int> jointLinks = setIntersection(otherSources, otherTargets);
             jointLinks.erase(it->second);
 
             if (jointLinks.size() > 0)
-              SAerror(67, "`" + it->first + "' and <link> `" + ASTEmap[*(jointLinks.begin())]->attributes["name"] + "'", ASTEmap[it->second]->attributes["referenceLine"]);
+              SAerror(67, "`" + it->first + "' and <link> `" + globals::ASTEmap[*(jointLinks.begin())]->attributes["name"] + "'", globals::ASTEmap[it->second]->attributes["referenceLine"]);
           }
         }
       }
@@ -147,13 +147,13 @@ Process(a,b,c,d,e,g,i,_id) ->
   	for (set<unsigned int>::iterator it = globals::ASTE_startActivities.begin(); it != globals::ASTE_startActivities.end(); it++)
   	{
   	  if (it == globals::ASTE_startActivities.begin())
-    	    reallySharedCorrelationSets = ASTEmap[*it]->sharedCorrelationSets;
+    	    reallySharedCorrelationSets = globals::ASTEmap[*it]->sharedCorrelationSets;
   	  else
-	    reallySharedCorrelationSets = setIntersection(reallySharedCorrelationSets, ASTEmap[*it]->sharedCorrelationSets);
+	    reallySharedCorrelationSets = setIntersection(reallySharedCorrelationSets, globals::ASTEmap[*it]->sharedCorrelationSets);
 
   	  if (reallySharedCorrelationSets.empty())
   	  {
-  	    SAerror(57, "", ASTEmap[*it]->attributes["referenceLine"]);
+  	    SAerror(57, "", globals::ASTEmap[*it]->attributes["referenceLine"]);
       	    break;
     	  }
   	}
@@ -183,7 +183,7 @@ PartnerLink(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       myself->parentScopeId = globals::PPcurrentScope;
@@ -212,7 +212,7 @@ FaultHandlers(a,b,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       myself->parentScopeId = globals::PPcurrentScope;
@@ -223,11 +223,11 @@ FaultHandlers(a,b,_id) ->
       // also mark the activities as "inside fault handlers"
       foreach(branch=Catch(innerActivity); tCatch_list a)
       {
-        assert(ASTEmap[innerActivity->id] != NULL);
-        ASTEmap[innerActivity->id]->parentActivityId = myid; // this is not intended: the activity should be child of the catch
-        ASTEmap[branch->id]->parentActivityId = myid;
-        ASTEmap[innerActivity->id]->controlFlow = FHCF;
-        ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
+        assert(globals::ASTEmap[innerActivity->id] != NULL);
+        globals::ASTEmap[innerActivity->id]->parentActivityId = myid; // this is not intended: the activity should be child of the catch
+        globals::ASTEmap[branch->id]->parentActivityId = myid;
+        globals::ASTEmap[innerActivity->id]->controlFlow = FHCF;
+        globals::ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
       }
 
       // check whether a <catchAll>-branch with an enclosed activity is present
@@ -236,25 +236,25 @@ FaultHandlers(a,b,_id) ->
       {
         CatchAll(c,_id) :
         {
-          assert(ASTEmap[c->id] != NULL);
-//NL//          ASTEmap[c->id]->parentActivityId = myid;
-          ASTEmap[b->id]->parentActivityId = myid;
-          ASTEmap[c->id]->controlFlow = FHCF;
-          ASTEmap[c->id]->max_occurrences = myself->max_occurrences;
+          assert(globals::ASTEmap[c->id] != NULL);
+//NL//          globals::ASTEmap[c->id]->parentActivityId = myid;
+          globals::ASTEmap[b->id]->parentActivityId = myid;
+          globals::ASTEmap[c->id]->controlFlow = FHCF;
+          globals::ASTEmap[c->id]->max_occurrences = myself->max_occurrences;
         }
         default :
         {
           // triggers SA00080
           if (a->length() == 0)
-            SAerror(80, "", toInt(ASTEmap[myself->parentScopeId]->attributes["referenceLine"]));
+            SAerror(80, "", toInt(globals::ASTEmap[myself->parentScopeId]->attributes["referenceLine"]));
         }
       }
     }
     a b
     {
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
-      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
 
       foreach(branch=Catch(innerActivity,_id2); tCatch_list a)
       {
@@ -262,7 +262,7 @@ FaultHandlers(a,b,_id) ->
         {
           if ( _id2->value < _id3->value )
           {
-            enterConflictingActivities( ASTEmap[ _id2->value ]->enclosedActivities, ASTEmap[ _id3->value ]->enclosedActivities );
+            enterConflictingActivities( globals::ASTEmap[ _id2->value ]->enclosedActivities, globals::ASTEmap[ _id3->value ]->enclosedActivities );
           }
         }
       }
@@ -273,7 +273,7 @@ FaultHandlers(a,b,_id) ->
         {
           foreach(otherbranch=Catch(secondActivity,_id3); tCatch_list a)
           {
-            enterConflictingActivities( ASTEmap[ _id2->value ]->enclosedActivities, ASTEmap[ _id3->value ]->enclosedActivities );
+            enterConflictingActivities( globals::ASTEmap[ _id2->value ]->enclosedActivities, globals::ASTEmap[ _id3->value ]->enclosedActivities );
           }
         }
         default :
@@ -288,7 +288,7 @@ Catch(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       myself->checkAttributes();
@@ -296,17 +296,17 @@ Catch(a,_id) ->
     a
     {
       // collect enclosed source links
-      assert(ASTEmap[a->id] != NULL);
-      ASTEmap[ myself->parentActivityId ]->enclosedSourceLinks = setUnion(ASTEmap[ myself->parentActivityId ]->enclosedSourceLinks, ASTEmap[a->id]->enclosedSourceLinks);
+      assert(globals::ASTEmap[a->id] != NULL);
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedSourceLinks = setUnion(globals::ASTEmap[ myself->parentActivityId ]->enclosedSourceLinks, globals::ASTEmap[a->id]->enclosedSourceLinks);
 
-      myself->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
+      myself->enclosedActivities = globals::ASTEmap[ a->id ]->enclosedActivities;
       myself->enclosedActivities.insert( a->id );
-      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+      enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
 
-      ASTEmap[a->id]->parentActivityId = myid; // necessary/safe?
+      globals::ASTEmap[a->id]->parentActivityId = myid; // necessary/safe?
 
       // necessary?
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );      
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );      
 
       check_SA00071( myid );
     }
@@ -317,24 +317,24 @@ CatchAll(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
-      ASTEmap[a->id]->parentActivityId = myid;
+      globals::ASTEmap[a->id]->parentActivityId = myid;
     }
     a
     {
       // collect enclosed source links
-      assert(ASTEmap[a->id] != NULL);
-      ASTEmap[ myself->parentActivityId ]->enclosedSourceLinks = setUnion(ASTEmap[ myself->parentActivityId ]->enclosedSourceLinks, ASTEmap[a->id]->enclosedSourceLinks);
+      assert(globals::ASTEmap[a->id] != NULL);
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedSourceLinks = setUnion(globals::ASTEmap[ myself->parentActivityId ]->enclosedSourceLinks, globals::ASTEmap[a->id]->enclosedSourceLinks);
 
-      myself->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
+      myself->enclosedActivities = globals::ASTEmap[ a->id ]->enclosedActivities;
       myself->enclosedActivities.insert( a->id );
-      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+      enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
 
-      ASTEmap[a->id]->parentActivityId = myid; // necessary/safe?
+      globals::ASTEmap[a->id]->parentActivityId = myid; // necessary/safe?
 
       // necessary?
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );      
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );      
 
       check_SA00071( myid );
     }
@@ -350,12 +350,12 @@ emptyEventHandlers(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       myself->parentScopeId = globals::PPcurrentScope;
 
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
     }
   ]
 ;
@@ -364,7 +364,7 @@ EventHandlers(a,b,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       myself->parentScopeId = globals::PPcurrentScope;
@@ -372,29 +372,29 @@ EventHandlers(a,b,_id) ->
 
       // triggers SA00083
       if (a->length() == 0 && b->length() == 0)
-        SAerror(83, "", toInt(ASTEmap[myself->parentScopeId]->attributes["referenceLine"]));
+        SAerror(83, "", toInt(globals::ASTEmap[myself->parentScopeId]->attributes["referenceLine"]));
 
       // distribute the event handlers's id to the enclosed activities
       foreach(branch=OnMessage(_cor,_from,_act,_id2); tOnMessage_list a)
       {
-        assert(ASTEmap[_id2->value] != NULL);
-        ASTEmap[_id2->value]->parentActivityId = myid;
-        ASTEmap[branch->id]->parentActivityId = myid;
-        ASTEmap[_id2->value]->controlFlow = myself->controlFlow;
+        assert(globals::ASTEmap[_id2->value] != NULL);
+        globals::ASTEmap[_id2->value]->parentActivityId = myid;
+        globals::ASTEmap[branch->id]->parentActivityId = myid;
+        globals::ASTEmap[_id2->value]->controlFlow = myself->controlFlow;
       }
       foreach(branch=OnAlarm(innerActivity); tOnAlarm_list b)
       {
-        assert(ASTEmap[innerActivity->id] != NULL);
-        ASTEmap[innerActivity->id]->parentActivityId = myid;
-        ASTEmap[branch->id]->parentActivityId = myid;
-        ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
+        assert(globals::ASTEmap[innerActivity->id] != NULL);
+        globals::ASTEmap[innerActivity->id]->parentActivityId = myid;
+        globals::ASTEmap[branch->id]->parentActivityId = myid;
+        globals::ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
       }
     }
     a b
     {
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
-      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
 
       check_SA00070( myid );
     }
@@ -405,11 +405,11 @@ OnMessage(a,b,c,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       myself->parentScopeId = globals::PPcurrentScope;
-      assert(ASTEmap[myself->parentActivityId] != NULL);
+      assert(globals::ASTEmap[myself->parentActivityId] != NULL);
       myself->checkAttributes();
 
       myself->checkPartnerLink();
@@ -421,24 +421,24 @@ OnMessage(a,b,c,_id) ->
       myself->channelName = myself->createChannel();
       myself->variableName = myself->checkVariable("variable");
 
-      assert(ASTEmap[c->id] != NULL);
-      ASTEmap[c->id]->parentActivityId = myid;
+      assert(globals::ASTEmap[c->id] != NULL);
+      globals::ASTEmap[c->id]->parentActivityId = myid;
 
       foreach(correlation=Correlation(_id2); tCorrelation_list a)
       {
-        assert(ASTEmap[_id2->value] != NULL);
-        ASTEmap[_id2->value]->parentActivityId = myid;
+        assert(globals::ASTEmap[_id2->value] != NULL);
+        globals::ASTEmap[_id2->value]->parentActivityId = myid;
       }
     }
     a b c
     {
       // collect enclosed source links
-      assert(ASTEmap[c->id] != NULL);
-      ASTEmap[ myself->parentActivityId ]->enclosedSourceLinks = setUnion(ASTEmap[ myself->parentActivityId ]->enclosedSourceLinks, ASTEmap[c->id]->enclosedSourceLinks);
+      assert(globals::ASTEmap[c->id] != NULL);
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedSourceLinks = setUnion(globals::ASTEmap[ myself->parentActivityId ]->enclosedSourceLinks, globals::ASTEmap[c->id]->enclosedSourceLinks);
 
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
-      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -447,25 +447,25 @@ OnAlarm(a,_id) ->
   [postprocessing: 
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       myself->parentScopeId = globals::PPcurrentScope;
-      assert(ASTEmap[myself->parentActivityId] != NULL);
+      assert(globals::ASTEmap[myself->parentActivityId] != NULL);
       //todo: cyclic-attribute if "repeatEvery" is set
 
-      assert(ASTEmap[a->id] != NULL);
-      ASTEmap[a->id]->parentActivityId = myid;
+      assert(globals::ASTEmap[a->id] != NULL);
+      globals::ASTEmap[a->id]->parentActivityId = myid;
     }
     a
     {
       // collect enclosed source links
-      assert(ASTEmap[a->id] != NULL);
-      ASTEmap[ myself->parentActivityId ]->enclosedSourceLinks = setUnion(ASTEmap[ myself->parentActivityId ]->enclosedSourceLinks, ASTEmap[a->id]->enclosedSourceLinks);
+      assert(globals::ASTEmap[a->id] != NULL);
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedSourceLinks = setUnion(globals::ASTEmap[ myself->parentActivityId ]->enclosedSourceLinks, globals::ASTEmap[a->id]->enclosedSourceLinks);
 
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
-      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -479,30 +479,30 @@ CompensationHandler(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       myself->parentScopeId = globals::PPcurrentScope;
 
       // distribute the compensation handlers's id to the enclosed activity
       // also mark the activities as "inside compensation handlers"
-      assert(ASTEmap[a->id] != NULL);
-      ASTEmap[a->id]->parentActivityId = myid;
-      ASTEmap[a->id]->controlFlow = CHCF;
-      ASTEmap[a->id]->max_occurrences = myself->max_occurrences;
+      assert(globals::ASTEmap[a->id] != NULL);
+      globals::ASTEmap[a->id]->parentActivityId = myid;
+      globals::ASTEmap[a->id]->controlFlow = CHCF;
+      globals::ASTEmap[a->id]->max_occurrences = myself->max_occurrences;
     }
     a
     {
       // collect enclosed source links
-      assert(ASTEmap[a->id] != NULL);
-      myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[a->id]->enclosedSourceLinks);
+      assert(globals::ASTEmap[a->id] != NULL);
+      myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, globals::ASTEmap[a->id]->enclosedSourceLinks);
 
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
-      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
 
       // necessary?
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );      
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );      
 
       check_SA00070( myid );
 
@@ -510,7 +510,7 @@ CompensationHandler(a,_id) ->
       vector<unsigned int> ancestors = myself->ancestorActivities();
       if (ancestors.size() > 1)
       {
-      	string ancestor = ASTEmap[ancestors[1]]->activityTypeName();
+      	string ancestor = globals::ASTEmap[ancestors[1]]->activityTypeName();
     	if (ancestor == "catch" ||
   	    ancestor == "catchAll" ||
   	    ancestor == "terminationHandler" ||
@@ -530,27 +530,27 @@ TerminationHandler(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       myself->parentScopeId = globals::PPcurrentScope;
 
       // distribute the termination handlers's id to the enclosed activity
       // also mark the activities as "inside termination handlers"
-      assert(ASTEmap[a->id] != NULL);
-      ASTEmap[a->id]->parentActivityId = myid;
-      ASTEmap[a->id]->controlFlow = THCF;
-      ASTEmap[a->id]->max_occurrences = myself->max_occurrences;
+      assert(globals::ASTEmap[a->id] != NULL);
+      globals::ASTEmap[a->id]->parentActivityId = myid;
+      globals::ASTEmap[a->id]->controlFlow = THCF;
+      globals::ASTEmap[a->id]->max_occurrences = myself->max_occurrences;
     }
     a
     {
       // collect enclosed source links
-      assert(ASTEmap[a->id] != NULL);
-      myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[a->id]->enclosedSourceLinks);
+      assert(globals::ASTEmap[a->id] != NULL);
+      myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, globals::ASTEmap[a->id]->enclosedSourceLinks);
 
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
-      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
 
       check_SA00071( myid );
     }
@@ -569,7 +569,7 @@ Variable(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       myself->parentScopeId = globals::PPcurrentScope;
@@ -588,7 +588,7 @@ CorrelationSet(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       myself->parentScopeId = globals::PPcurrentScope;
@@ -607,7 +607,7 @@ Correlation(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       myself->parentScopeId = globals::PPcurrentScope;
@@ -615,11 +615,11 @@ Correlation(_id) ->
       string correlationSetName = myself->checkCorrelationSet();
 
       // needed to trigger [SA00057] later
-      assert(ASTEmap[myself->parentActivityId] != NULL);
-      if (ASTEmap[myself->parentActivityId]->isStartActivity &&
+      assert(globals::ASTEmap[myself->parentActivityId] != NULL);
+      if (globals::ASTEmap[myself->parentActivityId]->isStartActivity &&
           myself->attributes["initiate"] == "join")
       {
-        ASTEmap[myself->parentActivityId]->sharedCorrelationSets.insert(correlationSetName);
+        globals::ASTEmap[myself->parentActivityId]->sharedCorrelationSets.insert(correlationSetName);
       }
     }
   ]
@@ -634,7 +634,7 @@ ToPart(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       myself->checkAttributes();
@@ -646,7 +646,7 @@ FromPart(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       myself->checkAttributes();
@@ -663,7 +663,7 @@ Empty(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       a->parentId = myid;
@@ -673,7 +673,7 @@ Empty(a,_id) ->
     }
     a
     {
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
     }
   ]
 ;
@@ -683,11 +683,11 @@ Empty(a,_id) ->
   INVOKE
 ******************************************************************************/
 
-Invoke(a,b,c,d,_id) ->
+volatile_Invoke(a,b,c,d,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       a->parentId = myid;
@@ -713,13 +713,13 @@ Invoke(a,b,c,d,_id) ->
 
       foreach(correlation=Correlation(_id2); tCorrelation_list b)
       {
-        assert(ASTEmap[_id2->value] != NULL);
-        ASTEmap[_id2->value]->parentActivityId = myid;
+        assert(globals::ASTEmap[_id2->value] != NULL);
+        globals::ASTEmap[_id2->value]->parentActivityId = myid;
       }
     }
     a b
     {
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
     }
   ]
 ;
@@ -733,7 +733,7 @@ Receive(a,b,c,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       a->parentId = myid;
@@ -754,8 +754,8 @@ Receive(a,b,c,_id) ->
 
       foreach(correlation=Correlation(_id2); tCorrelation_list b)
       {
-        assert(ASTEmap[_id2->value] != NULL);
-        ASTEmap[_id2->value]->parentActivityId = myid;
+        assert(globals::ASTEmap[_id2->value] != NULL);
+        globals::ASTEmap[_id2->value]->parentActivityId = myid;
       }
     }
     a b
@@ -765,11 +765,11 @@ Receive(a,b,c,_id) ->
         globals::ASTE_startActivities.insert(myid);
 
         // trigger [SA00056]
-        if (!ASTEmap[myself->parentActivityId]->checkAncestors() || !myself->targetLinks.empty())
+        if (!globals::ASTEmap[myself->parentActivityId]->checkAncestors() || !myself->targetLinks.empty())
           SAerror(56, "<receive>", myself->attributes["referenceLine"]);
       }
 
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
     }
   ]
 ;
@@ -783,7 +783,7 @@ Reply(a,b,c,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       a->parentId = myid;
@@ -804,13 +804,13 @@ Reply(a,b,c,_id) ->
 
       foreach(correlation=Correlation(_id2); tCorrelation_list b)
       {
-        assert(ASTEmap[_id2->value] != NULL);
-        ASTEmap[_id2->value]->parentActivityId = myid;
+        assert(globals::ASTEmap[_id2->value] != NULL);
+        globals::ASTEmap[_id2->value]->parentActivityId = myid;
       }
     }
     a b
     {
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
     }
   ]
 ;
@@ -824,7 +824,7 @@ Assign(a,b,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       a->parentId = myid;
@@ -834,7 +834,7 @@ Assign(a,b,_id) ->
     }
     a b
     {
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
     }
   ]
 ;
@@ -847,7 +847,7 @@ From(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       myself->parentScopeId = globals::PPcurrentScope;
@@ -863,7 +863,7 @@ To(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       myself->parentScopeId = globals::PPcurrentScope;
@@ -877,14 +877,14 @@ To(_id) ->
 
 
 /******************************************************************************
-  VALIDATE                                                       (WS-BPEL 2.0)
+  VALIDATE
 ******************************************************************************/
 
 Validate(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       a->parentId = myid;
@@ -894,7 +894,7 @@ Validate(a,_id) ->
     }
     a
     {
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
     }
   ]
 ;
@@ -908,7 +908,7 @@ Wait(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       a->parentId = myid;
@@ -918,7 +918,7 @@ Wait(a,_id) ->
     }
     a
     {
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
     }
   ]
 ;
@@ -932,7 +932,7 @@ Throw(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       a->parentId = myid;
@@ -942,21 +942,21 @@ Throw(a,_id) ->
     }
     a
     {
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
     }
   ]
 ;
 
 
 /******************************************************************************
-  RETHROW                                                        (WS-BPEL 2.0)
+  RETHROW
 ******************************************************************************/
 
 Rethrow(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       a->parentId = myid;
@@ -971,8 +971,8 @@ Rethrow(a,_id) ->
       vector<unsigned int> ancestorActivities = myself->ancestorActivities();
       for (vector<unsigned int>::iterator it = ancestorActivities.begin(); it != ancestorActivities.end(); it++)
       {
-        assert(ASTEmap[*it] != NULL);
-        if (ASTEmap[*it]->activityTypeName() == "faultHandlers")
+        assert(globals::ASTEmap[*it] != NULL);
+        if (globals::ASTEmap[*it]->activityTypeName() == "faultHandlers")
         {
           correctUse = true;
           break;
@@ -983,7 +983,7 @@ Rethrow(a,_id) ->
     }
     a
     {
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
     }
   ]
 ;
@@ -997,7 +997,7 @@ Compensate(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       a->parentId = myid;
@@ -1013,9 +1013,9 @@ Compensate(a,_id) ->
 
       for (vector<unsigned int>::iterator it = ancestorActivities.begin(); it != ancestorActivities.end(); it++)
       {
-        if (ASTEmap[*it]->activityTypeName() == "faultHandlers" ||
-            ASTEmap[*it]->activityTypeName() == "compensationHandler" ||
-            ASTEmap[*it]->activityTypeName() == "terminationHandler")
+        if (globals::ASTEmap[*it]->activityTypeName() == "faultHandlers" ||
+            globals::ASTEmap[*it]->activityTypeName() == "compensationHandler" ||
+            globals::ASTEmap[*it]->activityTypeName() == "terminationHandler")
         {
           correctUse = true;
           break;
@@ -1031,21 +1031,21 @@ Compensate(a,_id) ->
     }
     a
     {
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
     }
   ]
 ;
 
 
 /******************************************************************************
-  COMPENSATE SCOPE                                               (WS-BPEL 2.0)
+  COMPENSATE SCOPE
 ******************************************************************************/
 
 CompensateScope(a,b,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       a->parentId = myid;
@@ -1066,9 +1066,9 @@ CompensateScope(a,b,_id) ->
       vector<unsigned int> ancestorActivities = myself->ancestorActivities();
       for (vector<unsigned int>::iterator it = ancestorActivities.begin(); it != ancestorActivities.end(); it++)
       {
-        if (ASTEmap[*it]->activityTypeName() == "faultHandlers" ||
-            ASTEmap[*it]->activityTypeName() == "compensationHandler" ||
-            ASTEmap[*it]->activityTypeName() == "terminationHandler")
+        if (globals::ASTEmap[*it]->activityTypeName() == "faultHandlers" ||
+            globals::ASTEmap[*it]->activityTypeName() == "compensationHandler" ||
+            globals::ASTEmap[*it]->activityTypeName() == "terminationHandler")
         {
           correctUse = true;
           break;
@@ -1081,7 +1081,7 @@ CompensateScope(a,b,_id) ->
       // triggers SA00078 and SA00077
       if (globals::ASTE_scopeNames[myself->attributes["target"]] == 0)
         SAerror(78, myself->attributes["target"], myself->attributes["referenceLine"]);
-      else if (ASTEmap[myself->parentScopeId]->enclosedScopes.find(globals::ASTE_scopeNames[myself->attributes["target"]]) == ASTEmap[myself->parentScopeId]->enclosedScopes.end())
+      else if (globals::ASTEmap[myself->parentScopeId]->enclosedScopes.find(globals::ASTE_scopeNames[myself->attributes["target"]]) == globals::ASTEmap[myself->parentScopeId]->enclosedScopes.end())
         SAerror(77, myself->attributes["target"], myself->attributes["referenceLine"]);
 
       // register this compensate at the current scope
@@ -1090,21 +1090,21 @@ CompensateScope(a,b,_id) ->
     }
     a
     {
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
     }
   ]
 ;
 
 
 /******************************************************************************
-  EXIT / TERMINATE
+  EXIT
 ******************************************************************************/
 
 Exit(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       a->parentId = myid;
@@ -1114,7 +1114,7 @@ Exit(a,_id) ->
     }
     a
     {
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
     }
   ]
 ;
@@ -1128,7 +1128,7 @@ Flow(a,b,c,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       a->parentId = myid;
@@ -1142,16 +1142,16 @@ Flow(a,b,c,_id) ->
       // also distribute the control flow type
       foreach(innerActivity; activity_list c)
       {
-        assert(ASTEmap[innerActivity->id] != NULL);
-        ASTEmap[innerActivity->id]->parentActivityId = myid;
-        ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
-        ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
+        assert(globals::ASTEmap[innerActivity->id] != NULL);
+        globals::ASTEmap[innerActivity->id]->parentActivityId = myid;
+        globals::ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
+        globals::ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
       }
       foreach(link; tLink_list b)
       {
-        assert(ASTEmap[link->id] != NULL);
-        ASTEmap[ link->id ]->parentActivityId = myid;
-        ASTEmap[ myid ]->enclosedActivities.insert( link->id );
+        assert(globals::ASTEmap[link->id] != NULL);
+        globals::ASTEmap[ link->id ]->parentActivityId = myid;
+        globals::ASTEmap[ myid ]->enclosedActivities.insert( link->id );
       }
     }
     a b c
@@ -1162,11 +1162,11 @@ Flow(a,b,c,_id) ->
       foreach(innerActivity; activity_list c)
       {
         // collect enclosed source links
-        assert(ASTEmap[innerActivity->id] != NULL);
-        myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
+        assert(globals::ASTEmap[innerActivity->id] != NULL);
+        myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, globals::ASTEmap[innerActivity->id]->enclosedSourceLinks);
 
         // collect start activities (for [SA00056])
-        if (ASTEmap[innerActivity->id]->isStartActivity)
+        if (globals::ASTEmap[innerActivity->id]->isStartActivity)
           startActivityId = innerActivity->id;
       }
 
@@ -1175,12 +1175,12 @@ Flow(a,b,c,_id) ->
       {
 	foreach(innerActivity; activity_list c)
 	{
-          assert(ASTEmap[innerActivity->id] != NULL);
+          assert(globals::ASTEmap[innerActivity->id] != NULL);
 	
-	  if (!ASTEmap[innerActivity->id]->isStartActivity &&
-	      ASTEmap[innerActivity->id]->targetLinks.empty())
+	  if (!globals::ASTEmap[innerActivity->id]->isStartActivity &&
+	      globals::ASTEmap[innerActivity->id]->targetLinks.empty())
           {
-	    SAerror(56, "<" + ASTEmap[startActivityId]->activityTypeName() + ">", ASTEmap[startActivityId]->attributes["referenceLine"]);
+	    SAerror(56, "<" + globals::ASTEmap[startActivityId]->activityTypeName() + ">", globals::ASTEmap[startActivityId]->attributes["referenceLine"]);
             break;
           }
 	}
@@ -1189,9 +1189,9 @@ Flow(a,b,c,_id) ->
       /* here we can check whether each link was used as source and target */
 
 
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
-      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -1200,7 +1200,7 @@ Link(_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       myself->parentScopeId = globals::PPcurrentScope;
@@ -1210,21 +1210,21 @@ Link(_id) ->
 
       globals::ASTE_linkIdMap[ myself->linkName ] = myid;
 
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
     }
   ]
 ;
 
 
 /******************************************************************************
-  IF / SWITCH
+  IF
 ******************************************************************************/
 
 If(a,b,c,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       a->parentId = myid;
@@ -1238,10 +1238,10 @@ If(a,b,c,_id) ->
       // also distribute the control flow
       foreach(branch=ElseIf(innerActivity,_id2); tElseIf_list b)
       {
-        assert(ASTEmap[innerActivity->id] != NULL);
-        ASTEmap[innerActivity->id]->parentActivityId = myid;
-        ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
-        ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
+        assert(globals::ASTEmap[innerActivity->id] != NULL);
+        globals::ASTEmap[innerActivity->id]->parentActivityId = myid;
+        globals::ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
+        globals::ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
       }
 
       // process Else-branch
@@ -1249,10 +1249,10 @@ If(a,b,c,_id) ->
       {
         c=Else(d,_id2):
         { 
-          assert(ASTEmap[d->id] != NULL);
-          ASTEmap[d->id]->parentActivityId = myid;
-          ASTEmap[d->id]->controlFlow = myself->controlFlow;
-          ASTEmap[d->id]->max_occurrences = myself->max_occurrences;
+          assert(globals::ASTEmap[d->id] != NULL);
+          globals::ASTEmap[d->id]->parentActivityId = myid;
+          globals::ASTEmap[d->id]->controlFlow = myself->controlFlow;
+          globals::ASTEmap[d->id]->max_occurrences = myself->max_occurrences;
         }
         default: { /* do nothing */ }
       }
@@ -1262,23 +1262,23 @@ If(a,b,c,_id) ->
       // collect enclosed source links
       foreach(branch=ElseIf(innerActivity,_id2); tElseIf_list b)
       {
-        assert(ASTEmap[innerActivity->id] != NULL);
-        myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
+        assert(globals::ASTEmap[innerActivity->id] != NULL);
+        myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, globals::ASTEmap[innerActivity->id]->enclosedSourceLinks);
       }
 
       with(c)
       {
         c=Else(d,_id2):
         {
-          assert(ASTEmap[d->id] != NULL);
-          myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[d->id]->enclosedSourceLinks);
+          assert(globals::ASTEmap[d->id] != NULL);
+          myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, globals::ASTEmap[d->id]->enclosedSourceLinks);
         }
         default: { /* do nothing */ }
       }
 
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
-      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -1287,7 +1287,7 @@ ElseIf(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       myself->parentScopeId = globals::PPcurrentScope;
@@ -1295,9 +1295,9 @@ ElseIf(a,_id) ->
     }
     a
     {
-      myself->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
+      myself->enclosedActivities = globals::ASTEmap[ a->id ]->enclosedActivities;
       myself->enclosedActivities.insert( a->id );
-      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+      enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -1306,16 +1306,16 @@ Else(a,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       myself->parentScopeId = globals::PPcurrentScope;
     }
     a
     {
-      myself->enclosedActivities = ASTEmap[ a->id ]->enclosedActivities;
+      myself->enclosedActivities = globals::ASTEmap[ a->id ]->enclosedActivities;
       myself->enclosedActivities.insert( a->id );
-      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+      enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -1332,7 +1332,7 @@ While(a,b,_id) ->
     {
       // manage identifiers
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       a->parentId = myid;
@@ -1343,28 +1343,28 @@ While(a,b,_id) ->
       /* above is generic */
 
       // distribute the while's id to the enclosed activity
-      assert(ASTEmap[b->id] != NULL);
-      ASTEmap[b->id]->parentActivityId = myid;
-      ASTEmap[b->id]->controlFlow = myself->controlFlow;
+      assert(globals::ASTEmap[b->id] != NULL);
+      globals::ASTEmap[b->id]->parentActivityId = myid;
+      globals::ASTEmap[b->id]->controlFlow = myself->controlFlow;
 
       // calculate the maximal occurrences of the enclosed activity
       unsigned int max_loops = toUInt(myself->attributes["hu:maxloops"]);
       if (max_loops != UINT_MAX && myself->max_occurrences != UINT_MAX)
-        ASTEmap[b->id]->max_occurrences = myself->max_occurrences * max_loops;
+        globals::ASTEmap[b->id]->max_occurrences = myself->max_occurrences * max_loops;
       else
-        ASTEmap[b->id]->max_occurrences = UINT_MAX;
+        globals::ASTEmap[b->id]->max_occurrences = UINT_MAX;
 
       myself->max_loops = max_loops;
     }
     a b
     {
       // collect enclosed source links
-      assert(ASTEmap[b->id] != NULL);
-      myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[b->id]->enclosedSourceLinks);
+      assert(globals::ASTEmap[b->id] != NULL);
+      myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, globals::ASTEmap[b->id]->enclosedSourceLinks);
 
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
-      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
 
       check_SA00070( myid );
     }
@@ -1376,14 +1376,14 @@ While(a,b,_id) ->
 
 
 /******************************************************************************
-  REPEAT UNTIL                                                   (WS-BPEL 2.0)
+  REPEAT UNTIL
 ******************************************************************************/
 
 RepeatUntil(a,b,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       a->parentId = myid;
@@ -1394,28 +1394,28 @@ RepeatUntil(a,b,_id) ->
       /* above is generic */
 
       // distribute the repeatUntil's id to the enclosed activity
-      assert(ASTEmap[b->id] != NULL);
-      ASTEmap[b->id]->parentActivityId = myid;
-      ASTEmap[b->id]->controlFlow = myself->controlFlow;
+      assert(globals::ASTEmap[b->id] != NULL);
+      globals::ASTEmap[b->id]->parentActivityId = myid;
+      globals::ASTEmap[b->id]->controlFlow = myself->controlFlow;
 
       // calculate the maximal occurrences of the enclosed activity
       unsigned int max_loops = toUInt(myself->attributes["hu:maxloops"]);
       if (max_loops != UINT_MAX && myself->max_occurrences != UINT_MAX)
-        ASTEmap[b->id]->max_occurrences = myself->max_occurrences * max_loops;
+        globals::ASTEmap[b->id]->max_occurrences = myself->max_occurrences * max_loops;
       else
-        ASTEmap[b->id]->max_occurrences = UINT_MAX;
+        globals::ASTEmap[b->id]->max_occurrences = UINT_MAX;
       
       myself->max_loops = max_loops;
     }
     a b
     {
       // collect enclosed source links
-      assert(ASTEmap[b->id] != NULL);
-      myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[b->id]->enclosedSourceLinks);
+      assert(globals::ASTEmap[b->id] != NULL);
+      myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, globals::ASTEmap[b->id]->enclosedSourceLinks);
 
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
-      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
       
       check_SA00070( myid );
     }
@@ -1434,7 +1434,7 @@ Sequence(a,b,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       a->parentId = myid;
@@ -1447,10 +1447,10 @@ Sequence(a,b,_id) ->
       // distribute the sequence's id to the enclosed activities
       foreach(innerActivity; activity_list b)
       {
-        assert(ASTEmap[innerActivity->id] != NULL);
-        ASTEmap[innerActivity->id]->parentActivityId = myid;
-        ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
-        ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
+        assert(globals::ASTEmap[innerActivity->id] != NULL);
+        globals::ASTEmap[innerActivity->id]->parentActivityId = myid;
+        globals::ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
+        globals::ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
       }
     }
     a b
@@ -1460,18 +1460,18 @@ Sequence(a,b,_id) ->
       int activityCount = 1;
       foreach(innerActivity; activity_list b)
       {
-        assert(ASTEmap[innerActivity->id] != NULL);
+        assert(globals::ASTEmap[innerActivity->id] != NULL);
 
-        myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
+        myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, globals::ASTEmap[innerActivity->id]->enclosedSourceLinks);
 
         // trigger [SA00056]
-        if (ASTEmap[innerActivity->id]->isStartActivity && activityCount++ > 1)
-          SAerror(56, "<" + ASTEmap[innerActivity->id]->activityTypeName() + ">", ASTEmap[innerActivity->id]->attributes["referenceLine"]);
+        if (globals::ASTEmap[innerActivity->id]->isStartActivity && activityCount++ > 1)
+          SAerror(56, "<" + globals::ASTEmap[innerActivity->id]->activityTypeName() + ">", globals::ASTEmap[innerActivity->id]->attributes["referenceLine"]);
       }
 
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
-      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -1485,7 +1485,7 @@ Pick(a,b,c,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       a->parentId = myid;
@@ -1498,19 +1498,19 @@ Pick(a,b,c,_id) ->
       // distribute the pick's id to the enclosed activities
       foreach(branch=OnMessage(_corr,_from,innerActivity,_id2); tOnMessage_list b)
       {
-        assert(ASTEmap[innerActivity->id] != NULL);
-        ASTEmap[innerActivity->id]->parentActivityId = myid;
-        ASTEmap[branch->id]->parentActivityId = myid;
-        ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
-        ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
+        assert(globals::ASTEmap[innerActivity->id] != NULL);
+        globals::ASTEmap[innerActivity->id]->parentActivityId = myid;
+        globals::ASTEmap[branch->id]->parentActivityId = myid;
+        globals::ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
+        globals::ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
       }
       foreach(branch=OnAlarm(innerActivity); tOnAlarm_list c)
       {
-        assert(ASTEmap[innerActivity->id] != NULL);
-        ASTEmap[innerActivity->id]->parentActivityId = myid;
-        ASTEmap[branch->id]->parentActivityId = myid;
-        ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
-        ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
+        assert(globals::ASTEmap[innerActivity->id] != NULL);
+        globals::ASTEmap[innerActivity->id]->parentActivityId = myid;
+        globals::ASTEmap[branch->id]->parentActivityId = myid;
+        globals::ASTEmap[innerActivity->id]->controlFlow = myself->controlFlow;
+        globals::ASTEmap[innerActivity->id]->max_occurrences = myself->max_occurrences;
       }
     }
     a b c
@@ -1524,61 +1524,61 @@ Pick(a,b,c,_id) ->
           SAerror(62, "", myself->attributes["referenceLine"]);
 
         // trigger [SA00056]
-        if (!ASTEmap[myself->parentActivityId]->checkAncestors() || !myself->targetLinks.empty())
+        if (!globals::ASTEmap[myself->parentActivityId]->checkAncestors() || !myself->targetLinks.empty())
           SAerror(56, "<pick>", myself->attributes["referenceLine"]);
       }
 
       // collect enclosed source links
       foreach(branch=OnMessage(_corr,_from,innerActivity,_id2); tOnMessage_list b)
       {
-        assert(ASTEmap[innerActivity->id] != NULL);
-        myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
+        assert(globals::ASTEmap[innerActivity->id] != NULL);
+        myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, globals::ASTEmap[innerActivity->id]->enclosedSourceLinks);
 
         foreach(otherbranch=OnMessage(*,*,secondActivity,_id3); tOnMessage_list b)
         {
           if (_id2->value < _id3->value)
           {
-            enterConflictingActivities( ASTEmap[ _id2->value ]->enclosedActivities, ASTEmap[ _id3->value ]->enclosedActivities );
+            enterConflictingActivities( globals::ASTEmap[ _id2->value ]->enclosedActivities, globals::ASTEmap[ _id3->value ]->enclosedActivities );
           }
         }
       }
       foreach(branch=OnAlarm(innerActivity); tOnAlarm_list c)
       {
-        assert(ASTEmap[innerActivity->id] != NULL);
-        myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[innerActivity->id]->enclosedSourceLinks);
+        assert(globals::ASTEmap[innerActivity->id] != NULL);
+        myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, globals::ASTEmap[innerActivity->id]->enclosedSourceLinks);
 
         foreach(otherbranch=OnMessage(*,*,secondActivity,*); tOnMessage_list b)
         {
-          enterConflictingActivities( ASTEmap[ innerActivity->id ]->enclosedActivities, ASTEmap[ secondActivity->id ]->enclosedActivities );
+          enterConflictingActivities( globals::ASTEmap[ innerActivity->id ]->enclosedActivities, globals::ASTEmap[ secondActivity->id ]->enclosedActivities );
         }
 
         foreach(otherbranch=OnAlarm(secondActivity); tOnAlarm_list c)
         {
           if (innerActivity->id < secondActivity->id)
           {
-            enterConflictingActivities( ASTEmap[ innerActivity->id ]->enclosedActivities, ASTEmap[ secondActivity->id ]->enclosedActivities );
+            enterConflictingActivities( globals::ASTEmap[ innerActivity->id ]->enclosedActivities, globals::ASTEmap[ secondActivity->id ]->enclosedActivities );
           }
         }
       }
 
 
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
-      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
 
 
 /******************************************************************************
-  FOREACH                                                        (WS-BPEL 2.0)
+  FOREACH
 ******************************************************************************/
 
 ForEach(a,b,c,d,e,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
 
       a->parentId = myid;
@@ -1591,9 +1591,9 @@ ForEach(a,b,c,d,e,_id) ->
       myself->checkVariable("counterName");
 
       // distribute the forEach's id to the enclosed activity
-      assert(ASTEmap[e->id] != NULL);
-      ASTEmap[e->id]->parentActivityId = myid;
-      ASTEmap[e->id]->controlFlow = myself->controlFlow;
+      assert(globals::ASTEmap[e->id] != NULL);
+      globals::ASTEmap[e->id]->parentActivityId = myid;
+      globals::ASTEmap[e->id]->controlFlow = myself->controlFlow;
 
       // trigger [SA00074] and [SA00075]
       unsigned int startCounter = toUInt(b->name);
@@ -1611,7 +1611,7 @@ ForEach(a,b,c,d,e,_id) ->
         {
           if (myself->attributes["hu:maxloops"] != "")
             cerr << "ignoring attribute `hu:maxloops'" << endl; //TODO: make this a nice error message
-          ASTEmap[e->id]->max_occurrences = myself->max_occurrences * (finalCounter - startCounter);
+          globals::ASTEmap[e->id]->max_occurrences = myself->max_occurrences * (finalCounter - startCounter);
           myself->max_loops = (finalCounter - startCounter);
         }
 
@@ -1623,9 +1623,9 @@ ForEach(a,b,c,d,e,_id) ->
   	// calculate the maximal occurrences of the enclosed activity
     	unsigned int max_loops = toUInt(myself->attributes["hu:maxloops"]);
       	if (max_loops != UINT_MAX && myself->max_occurrences != UINT_MAX)
-	  ASTEmap[e->id]->max_occurrences = myself->max_occurrences * max_loops;
+	  globals::ASTEmap[e->id]->max_occurrences = myself->max_occurrences * max_loops;
 	else
-	  ASTEmap[e->id]->max_occurrences = UINT_MAX;
+	  globals::ASTEmap[e->id]->max_occurrences = UINT_MAX;
 
         myself->max_loops = max_loops;
        }
@@ -1639,20 +1639,20 @@ ForEach(a,b,c,d,e,_id) ->
           {
             foreach (variable=Variable(_id2); tVariable_list _variables)
             {
-              assert(ASTEmap[_id2->value] != NULL);
-              if (ASTEmap[_id2->value]->attributes["name"] == ASTEmap[_id->value]->attributes["counterName"])
-                SAerror(76, ASTEmap[_id2->value]->attributes["name"], ASTEmap[_id2->value]->attributes["referenceLine"]);
+              assert(globals::ASTEmap[_id2->value] != NULL);
+              if (globals::ASTEmap[_id2->value]->attributes["name"] == globals::ASTEmap[_id->value]->attributes["counterName"])
+                SAerror(76, globals::ASTEmap[_id2->value]->attributes["name"], globals::ASTEmap[_id2->value]->attributes["referenceLine"]);
             }            
           }
       }
 
       // collect enclosed source links
-      assert(ASTEmap[e->id] != NULL);
-      myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[e->id]->enclosedSourceLinks);
+      assert(globals::ASTEmap[e->id] != NULL);
+      myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, globals::ASTEmap[e->id]->enclosedSourceLinks);
 
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
-      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
 
       check_SA00070( myid );
     }
@@ -1668,7 +1668,7 @@ Scope(a,b,c,d,e,f,g,i,j,_id) ->
   [postprocessing:
     {
       int myid = _id->value;
-      ASTE *myself = ASTEmap[myid];
+      ASTE *myself = globals::ASTEmap[myid];
       assert(myself != NULL);
       a->parentId = myid;
 
@@ -1678,43 +1678,43 @@ Scope(a,b,c,d,e,f,g,i,j,_id) ->
       // now I am the current scope
       globals::PPcurrentScope = myid;
 
-      assert(ASTEmap[myself->parentActivityId] != NULL);
-      assert(ASTEmap[myself->parentScopeId] != NULL);
+      assert(globals::ASTEmap[myself->parentActivityId] != NULL);
+      assert(globals::ASTEmap[myself->parentScopeId] != NULL);
       myself->checkAttributes();
 
-      for ( std::set<unsigned int>::iterator peerScope = ASTEmap[myself->parentScopeId]->enclosedScopes.begin(); 
-	    peerScope != ASTEmap[myself->parentScopeId]->enclosedScopes.end(); 
+      for ( std::set<unsigned int>::iterator peerScope = globals::ASTEmap[myself->parentScopeId]->enclosedScopes.begin(); 
+	    peerScope != globals::ASTEmap[myself->parentScopeId]->enclosedScopes.end(); 
 	    peerScope++)
       {
-	ASTEmap[*peerScope]->peerScopes.insert(myid);
-	ASTEmap[myid]->peerScopes.insert(*peerScope);
+	globals::ASTEmap[*peerScope]->peerScopes.insert(myid);
+	globals::ASTEmap[myid]->peerScopes.insert(*peerScope);
       }
 
-      ASTEmap[myself->parentScopeId]->enclosedScopes.insert(myid);
+      globals::ASTEmap[myself->parentScopeId]->enclosedScopes.insert(myid);
 
       myself->hasEH = (string(f->op_name()) == "EventHandlers");
 
 
       // distribute the scopes' id to the enclosed FH/CH/EH/TH/activity
-      assert(ASTEmap[c->id] != NULL);
-      assert(ASTEmap[d->id] != NULL);
-      assert(ASTEmap[e->id] != NULL);
-      assert(ASTEmap[f->id] != NULL);
-      assert(ASTEmap[i->id] != NULL);
-      ASTEmap[c->id]->parentActivityId = myid;
-      ASTEmap[d->id]->parentActivityId = myid;
-      ASTEmap[e->id]->parentActivityId = myid;
-      ASTEmap[f->id]->parentActivityId = myid;
-      ASTEmap[i->id]->parentActivityId = myid;
+      assert(globals::ASTEmap[c->id] != NULL);
+      assert(globals::ASTEmap[d->id] != NULL);
+      assert(globals::ASTEmap[e->id] != NULL);
+      assert(globals::ASTEmap[f->id] != NULL);
+      assert(globals::ASTEmap[i->id] != NULL);
+      globals::ASTEmap[c->id]->parentActivityId = myid;
+      globals::ASTEmap[d->id]->parentActivityId = myid;
+      globals::ASTEmap[e->id]->parentActivityId = myid;
+      globals::ASTEmap[f->id]->parentActivityId = myid;
+      globals::ASTEmap[i->id]->parentActivityId = myid;
 
       myself->enclosedFH = c->id;
       myself->enclosedCH = d->id;
 
-      ASTEmap[c->id]->max_occurrences = myself->max_occurrences;
-      ASTEmap[d->id]->max_occurrences = myself->max_occurrences;
-      ASTEmap[e->id]->max_occurrences = myself->max_occurrences;
-      ASTEmap[f->id]->max_occurrences = myself->max_occurrences;
-      ASTEmap[i->id]->max_occurrences = myself->max_occurrences;
+      globals::ASTEmap[c->id]->max_occurrences = myself->max_occurrences;
+      globals::ASTEmap[d->id]->max_occurrences = myself->max_occurrences;
+      globals::ASTEmap[e->id]->max_occurrences = myself->max_occurrences;
+      globals::ASTEmap[f->id]->max_occurrences = myself->max_occurrences;
+      globals::ASTEmap[i->id]->max_occurrences = myself->max_occurrences;
 
       // remember the scope's name for compensation
       if (myself->attributes["name"] != "")
@@ -1728,40 +1728,40 @@ Scope(a,b,c,d,e,f,g,i,j,_id) ->
 
       // trigger [SA00091]
       if (myself->attributes["isolated"] == "yes" &&
-          ASTEmap[myself->parentScopeId]->findIsolatedAncestor())
+          globals::ASTEmap[myself->parentScopeId]->findIsolatedAncestor())
         SAerror(91, "", myself->attributes["referenceLine"]);
     }
     a b j g
     i // inner activity
     c d e f
     {
-      set< unsigned int > innerIds = ASTEmap[ i->id ]->enclosedActivities;
+      set< unsigned int > innerIds = globals::ASTEmap[ i->id ]->enclosedActivities;
       innerIds.insert( i->id );
-      set< unsigned int > faultIds = ASTEmap[ c->id ]->enclosedActivities;
+      set< unsigned int > faultIds = globals::ASTEmap[ c->id ]->enclosedActivities;
       faultIds.insert( c->id );
-      set< unsigned int > compIds = ASTEmap[ d->id ]->enclosedActivities;
+      set< unsigned int > compIds = globals::ASTEmap[ d->id ]->enclosedActivities;
       compIds.insert( d->id );
 
       enterConflictingActivities( innerIds, faultIds );
       enterConflictingActivities( faultIds, compIds );
 
       // pass list of enclosed scopes to the compensation handler
-      ASTEmap[d->id]->enclosedScopes = myself->enclosedScopes;
+      globals::ASTEmap[d->id]->enclosedScopes = myself->enclosedScopes;
 
       // collect enclosed source links
-      assert(ASTEmap[i->id] != NULL);
-      myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, ASTEmap[i->id]->enclosedSourceLinks);
-      myself->enclosedSourceLinks = setUnion( myself->enclosedSourceLinks, ASTEmap[c->id]->enclosedSourceLinks );
-      myself->enclosedSourceLinks = setUnion( myself->enclosedSourceLinks, ASTEmap[d->id]->enclosedSourceLinks );
-      myself->enclosedSourceLinks = setUnion( myself->enclosedSourceLinks, ASTEmap[e->id]->enclosedSourceLinks );
-      myself->enclosedSourceLinks = setUnion( myself->enclosedSourceLinks, ASTEmap[f->id]->enclosedSourceLinks );
+      assert(globals::ASTEmap[i->id] != NULL);
+      myself->enclosedSourceLinks = setUnion(myself->enclosedSourceLinks, globals::ASTEmap[i->id]->enclosedSourceLinks);
+      myself->enclosedSourceLinks = setUnion( myself->enclosedSourceLinks, globals::ASTEmap[c->id]->enclosedSourceLinks );
+      myself->enclosedSourceLinks = setUnion( myself->enclosedSourceLinks, globals::ASTEmap[d->id]->enclosedSourceLinks );
+      myself->enclosedSourceLinks = setUnion( myself->enclosedSourceLinks, globals::ASTEmap[e->id]->enclosedSourceLinks );
+      myself->enclosedSourceLinks = setUnion( myself->enclosedSourceLinks, globals::ASTEmap[f->id]->enclosedSourceLinks );
 
       // everybody after me has the same parent scope as me
       globals::PPcurrentScope = myself->parentScopeId;
 
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
-      ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
-      enterEnclosedActivities( myid, ASTEmap[ myid ]->enclosedActivities );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myid );
+      globals::ASTEmap[ myself->parentActivityId ]->enclosedActivities.insert( myself->enclosedActivities.begin(), myself->enclosedActivities.end() );
+      enterEnclosedActivities( myid, globals::ASTEmap[ myid ]->enclosedActivities );
     }
   ]
 ;
@@ -1774,8 +1774,8 @@ Scope(a,b,c,d,e,f,g,i,j,_id) ->
 StandardElements(a,b, _joinCondition) ->
   [postprocessing:
     {
-      assert(ASTEmap[$0->parentId] != NULL);
-      $0->suppressJF = (ASTEmap[$0->parentId]->attributes["suppressJoinFailure"] == "yes");
+      assert(globals::ASTEmap[$0->parentId] != NULL);
+      $0->suppressJF = (globals::ASTEmap[$0->parentId]->attributes["suppressJoinFailure"] == "yes");
 
       // pass id to join condition
       _joinCondition->parentId = $0->parentId;
@@ -1785,19 +1785,19 @@ StandardElements(a,b, _joinCondition) ->
       unsigned int linkCount = 0;
       foreach(targetLink; tTarget_list a)
       {
-        assert(ASTEmap[targetLink->id] != NULL);
-        ASTEmap[targetLink->id]->controlFlow = ASTEmap[$0->parentId]->controlFlow;
-        ASTEmap[targetLink->id]->parentActivityId = $0->parentId;
+        assert(globals::ASTEmap[targetLink->id] != NULL);
+        globals::ASTEmap[targetLink->id]->controlFlow = globals::ASTEmap[$0->parentId]->controlFlow;
+        globals::ASTEmap[targetLink->id]->parentActivityId = $0->parentId;
         
         // links are numbered and stored in globals::joinCondition_links map
-        globals::joinCondition_links[ASTEmap[targetLink->id]->attributes["linkName"]] = ++linkCount; // start enumerating with '1'
+        globals::joinCondition_links[globals::ASTEmap[targetLink->id]->attributes["linkName"]] = ++linkCount; // start enumerating with '1'
       }
 
       foreach(sourceLink; tSource_list b)
       {
-        assert(ASTEmap[sourceLink->id] != NULL);
-        ASTEmap[sourceLink->id]->controlFlow = ASTEmap[$0->parentId]->controlFlow;
-        ASTEmap[sourceLink->id]->parentActivityId = $0->parentId;
+        assert(globals::ASTEmap[sourceLink->id] != NULL);
+        globals::ASTEmap[sourceLink->id]->controlFlow = globals::ASTEmap[$0->parentId]->controlFlow;
+        globals::ASTEmap[sourceLink->id]->parentActivityId = $0->parentId;
       }
 
       /*
@@ -1846,10 +1846,10 @@ StandardElements(a,b, _joinCondition) ->
       foreach(targetLink; tTarget_list a)
       {
         // trigger [SA00069]
-        string linkName = ASTEmap[targetLink->id]->linkName;
+        string linkName = globals::ASTEmap[targetLink->id]->linkName;
         if (targetLinks.find(linkName) != targetLinks.end())
-          SAerror(69, "<" + ASTEmap[$0->parentId]->activityTypeName() + "> must not use <link> `" +
-                  linkName + "'", ASTEmap[globals::ASTE_linkIdMap[linkName]]->attributes["referenceLine"]);
+          SAerror(69, "<" + globals::ASTEmap[$0->parentId]->activityTypeName() + "> must not use <link> `" +
+                  linkName + "'", globals::ASTEmap[globals::ASTE_linkIdMap[linkName]]->attributes["referenceLine"]);
         else
           targetLinks.insert(linkName);
       }
@@ -1858,10 +1858,10 @@ StandardElements(a,b, _joinCondition) ->
       foreach(sourceLink; tSource_list b)
       {
         // trigger [SA00068]
-        string linkName = ASTEmap[sourceLink->id]->linkName;
+        string linkName = globals::ASTEmap[sourceLink->id]->linkName;
         if (sourceLinks.find(linkName) != sourceLinks.end())
-          SAerror(68, "<" + ASTEmap[$0->parentId]->activityTypeName() + "> must not use <link> `" +
-                  linkName + "'", ASTEmap[globals::ASTE_linkIdMap[linkName]]->attributes["referenceLine"]);
+          SAerror(68, "<" + globals::ASTEmap[$0->parentId]->activityTypeName() + "> must not use <link> `" +
+                  linkName + "'", globals::ASTEmap[globals::ASTE_linkIdMap[linkName]]->attributes["referenceLine"]);
         else
           sourceLinks.insert(linkName);
       }
@@ -1873,7 +1873,7 @@ StandardElements(a,b, _joinCondition) ->
 Target(a) ->
   [postprocessing:
     {
-      ASTE *myself = ASTEmap[$0->id];
+      ASTE *myself = globals::ASTEmap[$0->id];
       assert(myself != NULL);
 
       myself->checkAttributes();
@@ -1882,18 +1882,18 @@ Target(a) ->
       // find the id of the link used as target here and add that link to the
       // parent activity
       unsigned int linkId = globals::ASTE_linkIdMap[ myself->linkName ];
-      assert(ASTEmap[myself->parentActivityId] != NULL);
-      ASTEmap[myself->parentActivityId]->targetLinks.insert(linkId);
+      assert(globals::ASTEmap[myself->parentActivityId] != NULL);
+      globals::ASTEmap[myself->parentActivityId]->targetLinks.insert(linkId);
 
       // trigger [SA00066]
-      assert(ASTEmap[linkId] != NULL);
-      if (ASTEmap[linkId]->targetActivity != 0) 
+      assert(globals::ASTEmap[linkId] != NULL);
+      if (globals::ASTEmap[linkId]->targetActivity != 0) 
       {
         SAerror(66, myself->attributes["linkName"], myself->attributes["referenceLine"]);
       }
       else
       {
-        ASTEmap[linkId]->targetActivity = myself->parentActivityId;
+        globals::ASTEmap[linkId]->targetActivity = myself->parentActivityId;
       }
     }
   ]
@@ -1902,7 +1902,7 @@ Target(a) ->
 Source(a) ->
   [postprocessing:
     {
-      ASTE *myself = ASTEmap[$0->id];
+      ASTE *myself = globals::ASTEmap[$0->id];
       assert(myself != NULL);
 
       myself->checkAttributes();
@@ -1911,20 +1911,20 @@ Source(a) ->
 
       // find the id of the link used as source here and add that link to the
       // parent activity
-      assert(ASTEmap[myself->parentActivityId] != NULL);
+      assert(globals::ASTEmap[myself->parentActivityId] != NULL);
       unsigned int linkId = globals::ASTE_linkIdMap[ myself->linkName ];
-      ASTEmap[myself->parentActivityId]->enclosedSourceLinks.insert(linkId);
-      ASTEmap[myself->parentActivityId]->sourceLinks.insert(linkId);
+      globals::ASTEmap[myself->parentActivityId]->enclosedSourceLinks.insert(linkId);
+      globals::ASTEmap[myself->parentActivityId]->sourceLinks.insert(linkId);
 
       // trigger [SA00066]
-      assert(ASTEmap[linkId] != NULL);
-      if (ASTEmap[linkId]->sourceActivity != 0)
+      assert(globals::ASTEmap[linkId] != NULL);
+      if (globals::ASTEmap[linkId]->sourceActivity != 0)
       {
         SAerror(66, myself->attributes["linkName"], myself->attributes["referenceLine"]);
       }
       else
       {
-        ASTEmap[linkId]->sourceActivity = myself->parentActivityId;
+        globals::ASTEmap[linkId]->sourceActivity = myself->parentActivityId;
       }
     }
   ]
@@ -1972,8 +1972,8 @@ Term(_linkname) ->
       // target link list of the current activity --> triggeer SA00073
       if (globals::joinCondition_links[linkname_string] == 0)
       {
-        assert(ASTEmap[$0->parentId] != NULL);
-        SAerror(73, linkname_string, ASTEmap[$0->parentId]->attributes["referenceLine"]);
+        assert(globals::ASTEmap[$0->parentId] != NULL);
+        SAerror(73, linkname_string, globals::ASTEmap[$0->parentId]->attributes["referenceLine"]);
       }
       else
       {

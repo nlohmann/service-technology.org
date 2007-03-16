@@ -29,13 +29,13 @@
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/03/04 14:31:59 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.186 $
+ * \version \$Revision: 1.187 $
  *
  * \ingroup petrinet
  */
@@ -57,6 +57,7 @@
 
 #ifdef USING_BPEL2OWFN
 #include "ast-details.h"	// (class ASTE)
+#include "globals.h"
 #else
 #warning "using Petri Net API outside BPEL2oWFN"
 class ASTE; 			// forward declaration of class ASTE
@@ -896,7 +897,7 @@ void PetriNet::mergePlaces(Place * & p1, Place * & p2)
 
   if (p1 == NULL || p2 == NULL)
   {
-    //cerr << "[PN] At least one parameter of mergePlaces was NULL!" << endl;
+    std::cerr << "[PN] At least one parameter of mergePlaces was NULL!" << std::endl;
     assert(false);
     return;
   }
@@ -1079,7 +1080,7 @@ bool PetriNet::sameweights(Node *n) const
 
   assert(n != NULL);
   bool first = true;
-  int w = 0;
+  unsigned int w = 0;
 
   for (set<Arc*>::iterator f = F.begin(); f != F.end(); f++)
     if (((*f)->source == n) || ((*f)->target == n) )
@@ -1484,8 +1485,6 @@ void PetriNet::reenumerate()
 void PetriNet::calculate_max_occurrences()
 {
 #ifdef USING_BPEL2OWFN
-  extern map<unsigned int, ASTE*> ASTEmap;
-
   // process the input places
   for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
   {
@@ -1500,21 +1499,21 @@ void PetriNet::calculate_max_occurrences()
 
         act_id = act_id.substr( act_id.find_last_of( "_" ) + 1 );
 	unsigned int transition_activity_id = toUInt( act_id );
-	assert(ASTEmap[transition_activity_id] != NULL);
+	assert(globals::ASTEmap[transition_activity_id] != NULL);
 	receiving_activities.insert(transition_activity_id);
       }
 
     for (set<unsigned int>::iterator activity_id = receiving_activities.begin(); activity_id != receiving_activities.end(); activity_id++)
     {
-      if (ASTEmap[*activity_id]->max_occurrences == UINT_MAX)
+      if (globals::ASTEmap[*activity_id]->max_occurrences == UINT_MAX)
 	(*p)->max_occurrences = UINT_MAX;
       else if ((*p)->max_occurrences != UINT_MAX)
       {
-	if (ASTEmap[*activity_id]->activityTypeName() == "repeatUntil" ||
-	    ASTEmap[*activity_id]->activityTypeName() == "while")
-	  (*p)->max_occurrences += ASTEmap[*activity_id]->max_loops;
+	if (globals::ASTEmap[*activity_id]->activityTypeName() == "repeatUntil" ||
+	    globals::ASTEmap[*activity_id]->activityTypeName() == "while")
+	  (*p)->max_occurrences += globals::ASTEmap[*activity_id]->max_loops;
 	else
-	  (*p)->max_occurrences += ASTEmap[*activity_id]->max_occurrences;
+	  (*p)->max_occurrences += globals::ASTEmap[*activity_id]->max_occurrences;
       }
     }
   }
@@ -1529,16 +1528,16 @@ void PetriNet::calculate_max_occurrences()
       for (unsigned int i = 0; i < (*t)->history.size(); i++)
       {
 	unsigned int transition_activity_id = toUInt((*t)->history[i].substr(0, (*t)->history[i].find_first_of(".")));
-	assert(ASTEmap[transition_activity_id] != NULL);
+	assert(globals::ASTEmap[transition_activity_id] != NULL);
 	sending_activities.insert(transition_activity_id);
       }
 
     for (set<unsigned int>::iterator activity_id = sending_activities.begin(); activity_id != sending_activities.end(); activity_id++)
     {
-      if (ASTEmap[*activity_id]->max_occurrences == UINT_MAX)
+      if (globals::ASTEmap[*activity_id]->max_occurrences == UINT_MAX)
 	(*p)->max_occurrences = UINT_MAX;
       else if ((*p)->max_occurrences != UINT_MAX)
-	(*p)->max_occurrences += ASTEmap[*activity_id]->max_occurrences;
+	(*p)->max_occurrences += globals::ASTEmap[*activity_id]->max_occurrences;
     }
   }
 #endif

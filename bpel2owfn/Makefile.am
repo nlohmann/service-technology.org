@@ -19,8 +19,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/11 22:17:25 $ by $Author: nielslohmann $.
-# Version $Revision: 1.51 $
+# File last changed $Date: 2007/03/16 07:17:16 $ by $Author: nielslohmann $
+# Version $Revision: 1.52 $
 
 # Where else are Makefiles?
 SUBDIRS = src tests doc rpm
@@ -41,9 +41,14 @@ dist-hook:
 CLEANFILES = -r *~
 
 # all files that require the permission to execute
-SHELLSCRIPTS = tests/test1 tests/test2 tests/test3 tests/test4 tests/test5
+SHELLSCRIPTS = tests/test1 \
+	       tests/test2 \
+	       tests/test3 \
+	       tests/test4 \
+	       tests/test5
 
-# delete all files that can be created by other files
+# Delete all files that can be created by other files, repair file
+# permissions and set filetype to UNIX.
 hu-prepare: maintainer-clean
 	-rm -f COPYING
 	-rm -f aclocal.m4
@@ -61,12 +66,14 @@ hu-prepare: maintainer-clean
 	-rm -f doc/version.texi
 	-rm -f doc/Makefile.in
 	-rm -f src/Makefile.in
+	-rm -f src/Doxyfile
 	-rm -f -r src/.deps
 	-rm -f src/bpel2owfn.h.in
 	-rm -f tests/Makefile.in
 	-rm -f rpm/Makefile.in	
 	find -type d -exec chmod 755 {} \;
 	find -type f -exec chmod 644 {} \;
+	-find -type f -exec dos2unix {} \;
 	chmod 755 $(SHELLSCRIPTS)
 	@echo "-----------------------------------------------------"
 	@echo "To recreate installation status enter"
@@ -210,10 +217,11 @@ update:
 	$(MAKE)
 
 
+#####################################
+# Targets to create and RPM package #
+#####################################
 
-
-## ---------------------------------------------------------------------------
-## Produce an rpm package using dist or from the given tarball
+#  Produce an rpm package using dist or from the given tarball
 #  Usage:
 #    make rpm-dist
 #    make release=1 rpm-dist

@@ -44,14 +44,14 @@
  * 
  * \since   2006/10/11
  *
- * \date    \$Date: 2007/03/09 12:17:08 $
+ * \date    \$Date: 2007/03/16 07:17:16 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.28 $
+ * \version \$Revision: 1.29 $
  */
 %}
 
@@ -74,12 +74,12 @@
  * "Transform" standard <invoke>.
  */
 activityInvoke(
-  annotatedInvoke(
+  volatile_annotatedInvoke(
     my_standardElements,
     my_tCorrelation_list,
     NiltCatch_list(),
     NoCatchAll(),
-    standardCompensationHandler(a),
+    volatile_standardCompensationHandler(a),
     my_tToPart_list,
     my_tFromPart_list,
     my_integer
@@ -88,7 +88,7 @@ activityInvoke(
 ->
 < invoke:
   activityInvoke(
-    Invoke(
+    volatile_Invoke(
       my_standardElements,
       my_tCorrelation_list,
       my_tToPart_list,
@@ -104,7 +104,7 @@ activityInvoke(
  * handler (cf. Sect. 10.3 in WS-BPEL 2.0)
  */
 activityInvoke(
-  annotatedInvoke(
+  volatile_annotatedInvoke(
     my_standardElements,
     my_tCorrelation_list,
     my_tCatchList,
@@ -127,7 +127,7 @@ activityInvoke(
         mkinteger(0)
       ),
       my_tCompensationHandler,
-      standardTerminationHandler(
+      volatile_standardTerminationHandler(
         mkinteger(0)
       ),
       emptyEventHandlers(
@@ -135,7 +135,7 @@ activityInvoke(
       ),
       NiltCorrelationSet_list(),
       activityInvoke(
-        Invoke(
+        volatile_Invoke(
           NoStandardElements(),
           my_tCorrelation_list,
           my_tToPart_list,
@@ -168,7 +168,7 @@ NoStandardElements()
 /*
  * Standard Termination Handler (cf. Sect. 12.5.1 in WS-BPEL 2.0)
  */
-standardTerminationHandler(_id)
+volatile_standardTerminationHandler(_id)
 ->
 < implicit:
   TerminationHandler(
@@ -186,7 +186,7 @@ standardTerminationHandler(_id)
 /*
  * Standard fault handlers (cf. Sect. 12.5.1 in WS-BPEL 2.0)
  */
-standardFaultHandlers(_id) ->
+volatile_standardFaultHandlers(_id) ->
 < implicit:
   FaultHandlers(
     NiltCatch_list(),
@@ -224,7 +224,7 @@ standardFaultHandlers(_id) ->
 /*
  * Standard Compensation Handler (cf. Sect. 12.5.1 in WS-BPEL 2.0)
  */
-standardCompensationHandler(_id) ->
+volatile_standardCompensationHandler(_id) ->
 < implicit:
   CompensationHandler(
     activityCompensate(
@@ -266,7 +266,7 @@ activityScope(
     Scope(
       my_standardElements,
       my_variables,
-      standardFaultHandlers(
+      volatile_standardFaultHandlers(
         my_fh_integer
       ),
       my_compensationHandler,
@@ -290,18 +290,20 @@ activityScope(
  * These rules rewrite some AST phyla to simplify the later Petri net
  * generation. In particular, the two <invoke> activities (synchronous vs.
  * asynchronous) are distinguished.
+ *
+ * Note: If not variable is given, an asynchronous <invoke> is created.
  *****************************************************************************/
 
 /*
  * Rewrite-rules to distinguish <invoke> activities
  */
-Invoke(a,b,c,d,_id) provided (ASTEmap[_id->value]->attributes["outputVariable"] != "")
+volatile_Invoke(a,b,c,d,_id) provided (globals::ASTEmap[_id->value]->attributes["outputVariable"] != "")
 ->
 < newNames:
   SynchronousInvoke(a,b,c,d,_id)
 >;
 
-Invoke(a,b,c,d,_id) provided (ASTEmap[_id->value]->attributes["outputVariable"] == "")
+volatile_Invoke(a,b,c,d,_id)
 ->
 < newNames:
   AsynchronousInvoke(a,b,c,d,_id)

@@ -40,18 +40,25 @@
 #include "options.h"
 #include "OGFromFile.h"
 
-owfnTransition::owfnTransition(const std::string& name) : Node(name),
-    labelForMatching(OGFromFileFormulaAssignment::TAU), quasiEnabled(false),
-    enabled(false), quasiEnabledNr(0), enabledNr(0), NextEnabled(NULL),
-    PrevEnabled(NULL), NextQuasiEnabled(NULL), PrevQuasiEnabled(NULL), 
-    IncrPlaces(NULL), Incr(NULL), DecrPlaces(NULL), Decr(NULL)
+owfnTransition::owfnTransition(const std::string& name) :
+    Node(name),
+    labelForMatching(OGFromFileFormulaAssignment::TAU),
+    quasiEnabledNr(0),
+    enabledNr(0),
+    IncrPlaces(NULL),
+    Incr(NULL),
+    DecrPlaces(NULL),
+    Decr(NULL),
 #ifdef STUBBORN
-    , conflicting(NULL)
+    conflicting(NULL),
 #endif
+    quasiEnabled(false),
+    enabled(false),
+    NextEnabled(NULL),
+    PrevEnabled(NULL),
+    NextQuasiEnabled(NULL),
+    PrevQuasiEnabled(NULL)
 {
-		
-	NrOfArriving = 0;
-	NrOfLeaving = 0;
 }
 
 owfnTransition::~owfnTransition() {
@@ -66,13 +73,6 @@ owfnTransition::~owfnTransition() {
 #ifdef STUBBORN
 	delete [] conflicting;
 #endif
-
-//	if (ImproveEnabling) {
-//		delete ImproveEnabling;
-//	}			
-//	if (ImproveDisabling) {
-//		delete ImproveDisabling;
-//	}			
 }
 
 

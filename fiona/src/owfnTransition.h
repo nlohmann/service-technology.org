@@ -41,79 +41,150 @@
 class oWFN;
 class owfnPlace;
 
-class owfnTransition : public Node {
+class owfnTransition: public Node
+{
     private:
         std::string labelForMatching;
-	public:
-		owfnTransition(const std::string&);
-		~owfnTransition();
-	
-		bool quasiEnabled;
-		bool enabled;
 
-		std::set<unsigned int> messageSet;
-		
-		unsigned int quasiEnabledNr;	//!< number of internal pre-places marked with appropriate tokens
-		unsigned int enabledNr;			//!< number of input pre-places marked with appropriate tokens
-		
-		owfnTransition * NextEnabled;
-		owfnTransition * PrevEnabled; 	// double linking in list of enabled transitions
-  										// in the sequel, lists are NIL-terminated
-		owfnTransition * NextQuasiEnabled;
-		owfnTransition * PrevQuasiEnabled; 	// double linking in list of quasi enabled transitions
-  											// in the sequel, lists are NIL-terminated								
+        /** number of internal pre-places marked with appropriate tokens */
+        unsigned int quasiEnabledNr;
 
-		owfnPlace* * PrePlaces; // Places to be checked for enabledness
-		unsigned int * Pre; // Multiplicity to be checked
-		owfnPlace* * IncrPlaces; // Places that are incremented by transition
-		unsigned int * Incr; // Amount of increment
-		owfnPlace* * DecrPlaces; // Places that are decremented by transition
-		unsigned int * Decr; // amount of decrement
-		
-		owfnTransition ** ImproveEnabling; 	// list of transitions where enabledness
-  											//must be checked again after firing this transition
-  		owfnTransition ** ImproveDisabling; // list of transitions where disabledness
-  											// must be checked again after firing this transition
-  		void initialize(oWFN *); // Set above arrays, list, enabled...
-  		void fire(oWFN *); // replace current marking by successor marking, force
-  								// enabling test where necessary
-  		void backfire(oWFN * PN); // fire transition backwards to replace original state,
-  										// force enabling tests where necessary
-  										
-  		void excludeTransitionFromEnabledList(oWFN * );
-  		void excludeTransitionFromQuasiEnabledList(oWFN * );
-  		
-  		void check_enabled(oWFN *); // test if tr is enabled. If necessary, rearrange list
-		int hash_change; // change of hash value by firing t;
-		void set_hashchange();
-		unsigned int lastdisabled; 	// dfsnum of last state where
-							  		// some fired transition disables this one
-		unsigned int lastfired; 	// dfsnum of last state where this tr. was fired
+        /** number of input pre-places marked with appropriate tokens */
+        unsigned int enabledNr;
 
-// *** Definitions for stubborn set calculations
+        /** Places to be checked for enabledness */
+        owfnPlace* *PrePlaces;
+
+        /** Multiplicity to be checked */
+        unsigned int *Pre;
+
+        /** Places that are incremented by transition */
+        owfnPlace **IncrPlaces;
+
+        /** Amount of increment */
+        unsigned int *Incr;
+
+        /** Places that are decremented by transition */
+        owfnPlace **DecrPlaces;
+
+        /** amount of decrement */
+        unsigned int *Decr;
+
+        /**
+         * list of transitions where enabledness must be checked again after
+         * firing this transition
+         */
+        owfnTransition **ImproveEnabling;
+
+        /**
+         * list of transitions where disabledness must be checked again after
+         * firing this transition
+         */
+        owfnTransition **ImproveDisabling;
+
+        void excludeTransitionFromEnabledList(oWFN *);
+        void excludeTransitionFromQuasiEnabledList(oWFN *);
+
+        /**  change of hash value by firing t; */
+        int hash_change;
+        void set_hashchange();
+
+        /**
+         * dfsnum of last state where some fired transition disables this one
+         */
+        unsigned int lastdisabled;
+
+        /** dfsnum of last state where this tr. was fired */
+        unsigned int lastfired;
+
 #ifdef STUBBORN
-		owfnTransition * NextStubborn;    	// elements of stubborn set are organized as linked list
-		bool instubborn;		// ... and marked
-		owfnPlace * scapegoat;		// an insufficiently marked pre-place, if this disabled
-		owfnTransition ** mustbeincluded;	// If this is in stubborn set, so must be the ones in array
-		owfnTransition ** conflicting;	// conflicting transitions, for use as mustbeincluded
-		unsigned int dfs;		// stubborn sets are calculated through scc detection
-		unsigned int min;		// = Tarjan's lowlink
-		unsigned int stamp;		// used to mark visited transitions
-		unsigned int mbiindex;		// currently processed index in mustbeincluded
-		owfnTransition * nextontarjanstack; // stack organized as list
-		owfnTransition * nextoncallstack;	// stack organized as list 
+        /** an insufficiently marked pre-place, if this disabled */
+        owfnPlace *scapegoat;
+
+        /** conflicting transitions, for use as mustbeincluded */
+        owfnTransition **conflicting;
 #endif
+
+    public:
+        owfnTransition(const std::string&);
+        ~owfnTransition();
+        bool quasiEnabled;
+        bool enabled;
+        std::set<unsigned int> messageSet;
+
+        /**
+         * double linking in list of enabled transitions. in the sequel,
+         * lists are NIL-terminated
+         */
+        owfnTransition *NextEnabled;
+        owfnTransition *PrevEnabled;
+
+        /**
+         * double linking in list of quasi enabled transitions in the sequel,
+         * lists are NIL-terminated
+         */
+        owfnTransition *NextQuasiEnabled;
+        owfnTransition *PrevQuasiEnabled;
+
+        /** Set above arrays, list, enabled... */
+        void initialize(oWFN *);
+
+        /**
+         * replace current marking by successor marking, force enabling test
+         * where necessary
+         */
+        void fire(oWFN *);
+
+        /**
+         * fire transition backwards to replace original state, force enabling
+         * tests where necessary
+         */
+        void backfire(oWFN *PN);
+
+        /** test if tr is enabled. If necessary, rearrange list; */
+        void check_enabled(oWFN *);
 
         void setLabelForMatching(const std::string& label);
         std::string getLabelForMatching() const;
         bool hasNonTauLabelForMatching() const;
 
-        // Provides user defined operator new. Needed to trace all new
-        // operations on this class.
 #undef new
+        /**
+         * Provides user defined operator new. Needed to trace all new
+         * operations on this class.
+         */
         NEW_OPERATOR(owfnTransition)
 #define new NEW_NEW
+
+#ifdef STUBBORN
+
+        /** elements of stubborn set are organized as linked list */
+        owfnTransition *NextStubborn;
+
+        /** elements of stubborn set are marked. */
+        bool instubborn;
+
+        /** If this is in stubborn set, so must be the ones in array */
+        owfnTransition **mustbeincluded;
+
+        /** stubborn sets are calculated through scc detection */
+        unsigned int dfs;
+
+        /** Tarjan's lowlink */
+        unsigned int min;
+
+        /** used to mark visited transitions */
+        unsigned int stamp;
+
+        /** currently processed index in mustbeincluded */
+        unsigned int mbiindex;
+
+        /** stack organized as list */
+        owfnTransition *nextontarjanstack;
+
+        /** stack organized as list */
+        owfnTransition *nextoncallstack;
+#endif
 };
 
 #endif /*OWFNTRANSITION_H_*/

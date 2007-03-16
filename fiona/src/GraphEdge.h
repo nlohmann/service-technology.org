@@ -56,7 +56,7 @@ public:
 	~graphEdge();
 	void setNextElement(graphEdge *);
 	graphEdge * getNextElement();
-	std::string getLabel() const;
+	string getLabel() const;
 	edgeType getType();
 	vertex * getNode();
 	void setNode(vertex *);

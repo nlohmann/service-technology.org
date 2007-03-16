@@ -38,7 +38,8 @@
 #include "CNF.h"
 #include "cnf_formula.h" // needed in vertex::getCNF()
 
-//! \fn vertex::vertex()
+//! \fn vertex::vertex(int numberEvents)
+//! \param numberEvents the number of events that have to be processed from this node
 //! \brief constructor
 vertex::vertex(int numberEvents) :
 			   numberOfVertex(0),
@@ -89,7 +90,7 @@ vertex::~vertex() {
 }
 
 
-//! \fn unsigned int vertex::getNumber()
+//! \fn unsigned int vertex::getNumber() const
 //! \return number of this node
 //! \brief returns the number of this node
 unsigned int vertex::getNumber() const {

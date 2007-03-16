@@ -127,7 +127,7 @@ oWFN::~oWFN() {
 	trace(TRACE_5, "oWFN::~oWFN() : end\n");
 }
 
-//! \fn unsigned int oWFN::getPlaceCnt()
+//! \fn unsigned int oWFN::getPlaceCnt() const
 //! \brief returns the number of all places of the net
 unsigned int oWFN::getPlaceCnt() const {
 	return placeCnt;
@@ -357,8 +357,9 @@ void oWFN::addSuccStatesToList(vertex * n, State * currentState) {
 }
 
 
-//! \fn void oWFN::addSuccStatesToListStubborn(StateSet * stateSet, owfnPlace * outputPlace, State * currentState, vertex * n)
+//! \fn void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, owfnPlace * outputPlace, State * currentState, vertex * n)
 //! \param stateSet 
+//! \param outputPlace
 //! \param currentState
 //! \param n
 //! \brief decodes state, checks for message bound violation and adds successors recursively
@@ -390,8 +391,9 @@ void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, owfnPlace * outputPl
 	}
 }
 
-//! \fn void oWFN::addSuccStatesToListStubborn(StateSet * stateSet, owfnPlace * outputPlace, State * currentState, vertex * n)
-//! \param stateSet 
+//! \fn void oWFN::addSuccStatesToListStubborn(StateSet & stateSet, messageMultiSet messages, State * currentState, vertex * n)
+//! \param stateSet
+//! \param messages  
 //! \param currentState
 //! \param n
 //! \brief decodes state, checks for message bound violation and adds successors recursively
@@ -560,7 +562,6 @@ void oWFN::copyMarkingToCurrentMarking(unsigned int * copy) {
 
 //! \fn void oWFN::calculateReachableStatesOutputEvent(vertex * n) 
 //! \param n the node to be calculated in case of an output event
-//! \param minimal the current state is minimal in the vertex
 //! \brief calculates the reduced set of states of the new vertex in case of an output event
 void oWFN::calculateReachableStatesOutputEvent(vertex * n) {
 	// calculates the EG starting at the current marking
@@ -1723,7 +1724,7 @@ bool oWFN::isMaximal() {
 }
 
 
-//! \fn bool oWFN::isFinal()
+//! \fn bool oWFN::isFinal() const
 //! \brief checks if the current marking satisfies final condition or final marking, resp.
 //! if a final condition is given, a possible final marking is ignored
 bool oWFN::isFinal() const {
@@ -2048,12 +2049,10 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
 	}
 	trace(TRACE_5, "owfnTransition ** oWFN::stubbornfirelistdeadlocks(): end\n");
 }
-
-
 #endif
 
-bool oWFN::matchesWithOG(const OGFromFile& og, string& reasonForFailedMatch)
-{
+
+bool oWFN::matchesWithOG(const OGFromFile& og, string& reasonForFailedMatch) {
     // A temporary copy of the CurrentMarking. Used to revert to the
     // CurrentMarking if firing of a transition leads to an already seen
     // marking.
@@ -2263,9 +2262,8 @@ bool oWFN::matchesWithOG(const OGFromFile& og, string& reasonForFailedMatch)
     return true;
 }
 
-OGFromFileFormulaAssignment
-oWFN::makeAssignmentForOGMatchingForState(const State* currentState) const
-{
+
+OGFromFileFormulaAssignment oWFN::makeAssignmentForOGMatchingForState(const State* currentState) const {
     OGFromFileFormulaAssignment assignment;
 
     for (unsigned int itransition = 0;

@@ -95,6 +95,10 @@ bool isNonNegativeInteger(const std::string& s)
  *
  * \param msg a message (mostly "Parse error") and some more information e.g.
  *            the location of the syntax error.
+ * \param yylineno
+ * \param yytext
+ * \param file
+ * 
  * \return 1, since an error occured
  */
 int yyerror(const char* msg, int yylineno, const char* yytext, const char* file)

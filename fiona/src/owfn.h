@@ -190,7 +190,7 @@ class oWFN  {
 		 *
 		 * @param marking The marking to be printed out.
 		 */
-		std::string getMarkingAsString(unsigned int *) const;
+		std::string getMarkingAsString(unsigned int * marking) const;
 
 		/**
 		 * Returns the label of the CurrentMarking. See
@@ -235,7 +235,7 @@ class oWFN  {
 		 */
 		bool matchesWithOG(
 			const OGFromFile& og,
-			std::string& reasonForFailedMatch
+			string& reasonForFailedMatch
 		);
 
 		/**
@@ -256,8 +256,7 @@ class oWFN  {
 			const State* currentState
 		) const;
 
-        // Provides user defined operator new. Needed to trace all new
-        // operations on this class.
+// Provides user defined operator new. Needed to trace all new operations on this class.
 #undef new
         NEW_OPERATOR(oWFN)
 #define new NEW_NEW

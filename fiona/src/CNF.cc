@@ -79,10 +79,10 @@ literal::~literal() {
 }
 
 
-//! \fn void literal::addLiteral(const string& label)
+//! \fn void literal::addLiteral(const std::string& label)
 //! \param label the label to be added to the literal list
 //! \brief adds the given label to the list of literals
-void literal::addLiteral(const string& label) {
+void literal::addLiteral(const std::string& label) {
     trace(TRACE_5, "literal::addLiteral(char * label) : start\n");
 	
 	literal * currentLiteral = this;
@@ -279,7 +279,7 @@ vertexColor CNF::calcClauseColor() {
 }
 
 
-//! \fn string CNF::getCNFString()
+//! \fn string CNF::getClauseString()
 //! \return the clause as a string
 //! \brief returns the current clause as a string
 string CNF::getClauseString() {

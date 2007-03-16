@@ -91,9 +91,9 @@ vertex * communicationGraph::getRoot() const {
 }
 
 
-//! \fn unsigned int communicationGraph::getNumberOfVertices() const
-//! \return number of vertices
-//! \brief returns the number of vertices of the graph
+//! \fn unsigned int communicationGraph::getNumberOfNodes() const
+//! \return number of nodes
+//! \brief returns the number of nodes of the graph (IG or OG)
 unsigned int communicationGraph::getNumberOfNodes() const {
     return numberOfNodes;
 }
@@ -115,7 +115,7 @@ unsigned int communicationGraph::getNumberOfBlueNodes() {
 }
 
 
-//! \fn unsigned int communicationGraph::getNumberBlueOfEdges() const
+//! \fn unsigned int communicationGraph::getNumberOfBlueEdges() const
 //! \return number of blue edges
 //! \brief returns the number of blue edges of the graph
 unsigned int communicationGraph::getNumberOfBlueEdges() const {
@@ -988,10 +988,10 @@ void communicationGraph::printProgressFirst() {
 }
 
 
-//! \fn bool communicationGraph::terminateBuildGraph(vertex * currentNode)
-//! \param currentNode the node for which termination is decided
-//! \brief decides whether a leaf node of the graph is reached;
-//! either because of reaching communication depth or because there are no events left
+////! \fn bool communicationGraph::terminateBuildGraph(vertex * currentNode)
+////! \param currentNode the node for which termination is decided
+////! \brief decides whether a leaf node of the graph is reached;
+////! either because of reaching communication depth or because there are no events left
 //bool communicationGraph::terminateBuildGraph(vertex * /*currentNode*/) {
 //	
 //	return false;

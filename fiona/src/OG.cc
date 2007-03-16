@@ -63,7 +63,7 @@ operatingGuidelines::~operatingGuidelines() {
 	  
 }
 
-//! \fn void operatingGuidelines::buildGraph(vertex * currentNode)
+//! \fn void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 //! \param currentNode current node of the graph
 //! \param progress_plus the additional progress when the subgraph starting at this node is finished 
 //! \brief builds up the graph recursively

@@ -66,8 +66,10 @@ void interactionGraph::buildGraph() {
 	}
 }
 
-//! \fn bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * currentNode, bool typeOfPlace)
+//! \fn bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * currentNode, edgeType typeOfPlace)
+//! \param messages
 //! \param currentNode the node from which the input event is to be sent
+//! \param typeOfPlace
 //! \brief checks whether the set of input messages contains at least one input message
 //! that has been sent at its maximum
 bool interactionGraph::checkMaximalEvents(messageMultiSet messages, vertex * currentNode, edgeType typeOfPlace) {

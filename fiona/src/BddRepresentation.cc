@@ -327,7 +327,7 @@ void BddRepresentation::addOrDeleteLeavingEdges(vertex* v){
 }
 
 
-//! \fn DdNode*  BddRepresentation::labelToBddMp(char* label)
+//! \fn DdNode*  BddRepresentation::labelToBddMp(const char* label)
 //! \brief returns the BDD of a label (given as integer)
 DdNode* BddRepresentation::labelToBddMp(const char* label) {
 	
@@ -697,7 +697,7 @@ void BddRepresentation::reorder(Cudd_ReorderingType heuristic){
 }
 
 
-//! \fn void BddRepresentation::printDotFile(char** varNames)
+//! \fn void BddRepresentation::printDotFile(char** varNames, char* option)
 //! \brief creates dot files of the BDDs
 //    mit dot -Tps fileName -o neu.ps kann das BDD graphisch dargestellt werden
 void BddRepresentation::printDotFile(char** varNames, char* option){
@@ -758,7 +758,7 @@ void BddRepresentation::print(){
 }
 
 
-//! \fn void BddRepresentation::save()
+//! \fn void BddRepresentation::save(char* option)
 //! \brief save bddMp and bddAnn in file
 void BddRepresentation::save(char* option){
 	int size = nbrLabels + maxNodeBits;

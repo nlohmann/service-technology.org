@@ -41,6 +41,7 @@
 
 #include <stddef.h>
 #include <string>
+#include <cassert>
 #include "main.h"
 #include "enums.h"
 #include "debug.h"

@@ -35,7 +35,7 @@
 #include "OGFromFile.h"
 #include <cassert>
 
-OGFromFileNode::OGFromFileNode(const std::string& name_, OGFromFileFormula* annotation_) :
+OGFromFileNode::OGFromFileNode(const std::string& name_, CommGraphFormula* annotation_) :
     name(name_),
     firstClause(annotation_),
     depthFirstSearchParent(NULL) {
@@ -121,7 +121,7 @@ OGFromFileNode* OGFromFileNode::backfireTransitionWithLabel(
 }
 
 bool OGFromFileNode::assignmentSatisfiesAnnotation(
-    const OGFromFileFormulaAssignment& assignment) const
+    const CommGraphFormulaAssignment& assignment) const
 {
     assert(firstClause != NULL);
     return firstClause->satisfies(assignment);
@@ -179,7 +179,7 @@ void OGFromFile::addNode(OGFromFileNode* node)
 }
 
 OGFromFileNode* OGFromFile::addNode(const std::string& nodeName,
-    OGFromFileFormula* annotation)
+    CommGraphFormula* annotation)
 {
     OGFromFileNode* node = new OGFromFileNode(nodeName, annotation);
     addNode(node);

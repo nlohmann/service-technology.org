@@ -55,7 +55,7 @@ class PlSymbol;
 class TrSymbol;
 class Arc;
 class OGFromFile;
-class OGFromFileFormulaAssignment;
+class CommGraphFormulaAssignment;
 
 class oWFN  {
 	private:
@@ -252,7 +252,7 @@ class oWFN  {
 		 *     created for.
 		 * @returns The above described assignment for the given state.
 		 */
-		OGFromFileFormulaAssignment makeAssignmentForOGMatchingForState(
+		CommGraphFormulaAssignment makeAssignmentForOGMatchingForState(
 			const State* currentState
 		) const;
 

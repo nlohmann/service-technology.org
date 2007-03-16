@@ -42,7 +42,7 @@
 
 owfnTransition::owfnTransition(const std::string& name) :
     Node(name),
-    labelForMatching(OGFromFileFormulaAssignment::TAU),
+    labelForMatching(CommGraphFormulaAssignment::TAU),
     quasiEnabledNr(0),
     enabledNr(0),
     IncrPlaces(NULL),
@@ -516,5 +516,5 @@ std::string owfnTransition::getLabelForMatching() const
 
 bool owfnTransition::hasNonTauLabelForMatching() const
 {
-    return getLabelForMatching() != OGFromFileFormulaAssignment::TAU;
+    return getLabelForMatching() != CommGraphFormulaAssignment::TAU;
 }

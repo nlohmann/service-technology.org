@@ -35,18 +35,18 @@
 #include "commGraphFormula.h"
 #include <cassert>
 
-const std::string OGFromFileFormulaAssignment::TAU = std::string("tau");
-const std::string OGFromFileFormulaAssignment::FINAL = std::string("final");
+const std::string CommGraphFormulaAssignment::TAU = std::string("tau");
+const std::string CommGraphFormulaAssignment::FINAL = std::string("final");
 
-void OGFromFileFormulaAssignment::set(const std::string& label, bool value) {
+void CommGraphFormulaAssignment::set(const std::string& label, bool value) {
     label2bool[label] = value;
 }
 
-void OGFromFileFormulaAssignment::setToTrue(const std::string& label) {
+void CommGraphFormulaAssignment::setToTrue(const std::string& label) {
     set(label, true);
 }
 
-bool OGFromFileFormulaAssignment::get(const std::string& label) const {
+bool CommGraphFormulaAssignment::get(const std::string& label) const {
     label2bool_t::const_iterator label2bool_iter = label2bool.find(label);
 
     if (label2bool_iter == label2bool.end())
@@ -55,46 +55,46 @@ bool OGFromFileFormulaAssignment::get(const std::string& label) const {
     return label2bool_iter->second;
 }
 
-bool OGFromFileFormula::satisfies(const OGFromFileFormulaAssignment& assignment) const {
+bool CommGraphFormula::satisfies(const CommGraphFormulaAssignment& assignment) const {
     return value(assignment) == true;
 }
 
-OGFromFileFormulaBinary::OGFromFileFormulaBinary(OGFromFileFormula* lhs_,
-    OGFromFileFormula* rhs_) : lhs(lhs_), rhs(rhs_)
+CommGraphFormulaBinary::CommGraphFormulaBinary(CommGraphFormula* lhs_,
+    CommGraphFormula* rhs_) : lhs(lhs_), rhs(rhs_)
 {
 }
 
-OGFromFileFormulaBinary::~OGFromFileFormulaBinary()
+CommGraphFormulaBinary::~CommGraphFormulaBinary()
 {
     delete lhs;
     delete rhs;
 }
 
-bool OGFromFileFormulaBinary::lhsValue(
-    const OGFromFileFormulaAssignment& assignment) const
+bool CommGraphFormulaBinary::lhsValue(
+    const CommGraphFormulaAssignment& assignment) const
 {
     return lhs->value(assignment);
 }
 
-bool OGFromFileFormulaBinary::rhsValue(
-    const OGFromFileFormulaAssignment& assignment) const
+bool CommGraphFormulaBinary::rhsValue(
+    const CommGraphFormulaAssignment& assignment) const
 {
     return rhs->value(assignment);
 }
 
-std::string OGFromFileFormulaBinary::asString() const
+std::string CommGraphFormulaBinary::asString() const
 {
     return "(" + lhs->asString() + " " + getOperator() + " " +
         rhs->asString() + ")";
 }
 
-OGFromFileFormulaBinaryAnd::OGFromFileFormulaBinaryAnd(OGFromFileFormula* lhs_,
-    OGFromFileFormula* rhs_) : OGFromFileFormulaBinary(lhs_, rhs_)
+CommGraphFormulaBinaryAnd::CommGraphFormulaBinaryAnd(CommGraphFormula* lhs_,
+    CommGraphFormula* rhs_) : CommGraphFormulaBinary(lhs_, rhs_)
 {
 }
 
-bool OGFromFileFormulaBinaryAnd::value(
-    const OGFromFileFormulaAssignment& assignment) const
+bool CommGraphFormulaBinaryAnd::value(
+    const CommGraphFormulaAssignment& assignment) const
 {
     if (!lhsValue(assignment))
         return false;
@@ -102,18 +102,18 @@ bool OGFromFileFormulaBinaryAnd::value(
     return rhsValue(assignment);
 }
 
-std::string OGFromFileFormulaBinaryAnd::getOperator() const
+std::string CommGraphFormulaBinaryAnd::getOperator() const
 {
     return "*";
 }
 
-OGFromFileFormulaBinaryOr::OGFromFileFormulaBinaryOr(OGFromFileFormula* lhs_,
-    OGFromFileFormula* rhs_) : OGFromFileFormulaBinary(lhs_, rhs_)
+CommGraphFormulaBinaryOr::CommGraphFormulaBinaryOr(CommGraphFormula* lhs_,
+    CommGraphFormula* rhs_) : CommGraphFormulaBinary(lhs_, rhs_)
 {
 }
 
-bool OGFromFileFormulaBinaryOr::value(
-    const OGFromFileFormulaAssignment& assignment) const
+bool CommGraphFormulaBinaryOr::value(
+    const CommGraphFormulaAssignment& assignment) const
 {
     if (lhsValue(assignment))
         return true;
@@ -121,43 +121,43 @@ bool OGFromFileFormulaBinaryOr::value(
     return rhsValue(assignment);
 }
 
-std::string OGFromFileFormulaBinaryOr::getOperator() const
+std::string CommGraphFormulaBinaryOr::getOperator() const
 {
     return "+";
 }
 
-bool OGFromFileFormulaTrue::value(const OGFromFileFormulaAssignment&) const
+bool CommGraphFormulaTrue::value(const CommGraphFormulaAssignment&) const
 {
     return true;
 }
 
-std::string OGFromFileFormulaTrue::asString() const
+std::string CommGraphFormulaTrue::asString() const
 {
     return "true";
 }
 
-bool OGFromFileFormulaFalse::value(const OGFromFileFormulaAssignment&) const
+bool CommGraphFormulaFalse::value(const CommGraphFormulaAssignment&) const
 {
     return false;
 }
 
-std::string OGFromFileFormulaFalse::asString() const
+std::string CommGraphFormulaFalse::asString() const
 {
     return "false";
 }
 
-OGFromFileFormulaProposition::OGFromFileFormulaProposition(
+CommGraphFormulaProposition::CommGraphFormulaProposition(
     const std::string& proposition_) : proposition(proposition_)
 {
 }
 
-bool OGFromFileFormulaProposition::value(
-    const OGFromFileFormulaAssignment& assignment) const
+bool CommGraphFormulaProposition::value(
+    const CommGraphFormulaAssignment& assignment) const
 {
     return assignment.get(proposition);
 }
 
-std::string OGFromFileFormulaProposition::asString() const
+std::string CommGraphFormulaProposition::asString() const
 {
     return proposition;
 }

@@ -39,7 +39,7 @@
 #include <set>
 #include <map>
 
-class OGFromFileFormulaAssignment {
+class CommGraphFormulaAssignment {
 private:
     typedef std::map<std::string, bool> label2bool_t;
     label2bool_t label2bool;
@@ -53,65 +53,65 @@ public:
     bool get(const std::string& label) const;
 };
 
-class OGFromFileFormula {
+class CommGraphFormula {
 public:
-    virtual ~OGFromFileFormula() {};
-    virtual bool value(const OGFromFileFormulaAssignment& assignment) const = 0;
-    virtual bool satisfies(const OGFromFileFormulaAssignment& assignment) const;
+    virtual ~CommGraphFormula() {};
+    virtual bool value(const CommGraphFormulaAssignment& assignment) const = 0;
+    virtual bool satisfies(const CommGraphFormulaAssignment& assignment) const;
     virtual std::string asString() const = 0;
 };
 
-class OGFromFileFormulaBinary : public OGFromFileFormula {
+class CommGraphFormulaBinary : public CommGraphFormula {
 private:
-    OGFromFileFormula* lhs;
-    OGFromFileFormula* rhs;
+    CommGraphFormula* lhs;
+    CommGraphFormula* rhs;
 public:
-    OGFromFileFormulaBinary(OGFromFileFormula* lhs, OGFromFileFormula* rhs);
-    virtual ~OGFromFileFormulaBinary();
-    virtual bool value(const OGFromFileFormulaAssignment& assignment) const = 0;
-    bool lhsValue(const OGFromFileFormulaAssignment& assignment) const;
-    bool rhsValue(const OGFromFileFormulaAssignment& assignment) const;
+    CommGraphFormulaBinary(CommGraphFormula* lhs, CommGraphFormula* rhs);
+    virtual ~CommGraphFormulaBinary();
+    virtual bool value(const CommGraphFormulaAssignment& assignment) const = 0;
+    bool lhsValue(const CommGraphFormulaAssignment& assignment) const;
+    bool rhsValue(const CommGraphFormulaAssignment& assignment) const;
     virtual std::string asString() const;
     virtual std::string getOperator() const = 0;
 };
 
-class OGFromFileFormulaBinaryAnd : public OGFromFileFormulaBinary {
+class CommGraphFormulaBinaryAnd : public CommGraphFormulaBinary {
 public:
-    OGFromFileFormulaBinaryAnd(OGFromFileFormula* lhs, OGFromFileFormula* rhs);
-    virtual ~OGFromFileFormulaBinaryAnd() {};
-    virtual bool value(const OGFromFileFormulaAssignment& assignment) const;
+    CommGraphFormulaBinaryAnd(CommGraphFormula* lhs, CommGraphFormula* rhs);
+    virtual ~CommGraphFormulaBinaryAnd() {};
+    virtual bool value(const CommGraphFormulaAssignment& assignment) const;
     virtual std::string getOperator() const;
 };
 
-class OGFromFileFormulaBinaryOr : public OGFromFileFormulaBinary {
+class CommGraphFormulaBinaryOr : public CommGraphFormulaBinary {
 public:
-    OGFromFileFormulaBinaryOr(OGFromFileFormula* lhs, OGFromFileFormula* rhs);
-    virtual ~OGFromFileFormulaBinaryOr() {};
-    virtual bool value(const OGFromFileFormulaAssignment& assignment) const;
+    CommGraphFormulaBinaryOr(CommGraphFormula* lhs, CommGraphFormula* rhs);
+    virtual ~CommGraphFormulaBinaryOr() {};
+    virtual bool value(const CommGraphFormulaAssignment& assignment) const;
     virtual std::string getOperator() const;
 };
 
-class OGFromFileFormulaTrue : public OGFromFileFormula {
+class CommGraphFormulaTrue : public CommGraphFormula {
 public:
-    virtual ~OGFromFileFormulaTrue() {};
-    virtual bool value(const OGFromFileFormulaAssignment& assignment) const;
+    virtual ~CommGraphFormulaTrue() {};
+    virtual bool value(const CommGraphFormulaAssignment& assignment) const;
     virtual std::string asString() const;
 };
 
-class OGFromFileFormulaFalse : public OGFromFileFormula {
+class CommGraphFormulaFalse : public CommGraphFormula {
 public:
-    virtual ~OGFromFileFormulaFalse() {};
-    virtual bool value(const OGFromFileFormulaAssignment& assignment) const;
+    virtual ~CommGraphFormulaFalse() {};
+    virtual bool value(const CommGraphFormulaAssignment& assignment) const;
     virtual std::string asString() const;
 };
 
-class OGFromFileFormulaProposition : public OGFromFileFormula {
+class CommGraphFormulaProposition : public CommGraphFormula {
 private:
     std::string proposition;
 public:
-    OGFromFileFormulaProposition(const std::string& proposition_);
-    virtual ~OGFromFileFormulaProposition() {};
-    virtual bool value(const OGFromFileFormulaAssignment& assignment) const;
+    CommGraphFormulaProposition(const std::string& proposition_);
+    virtual ~CommGraphFormulaProposition() {};
+    virtual bool value(const CommGraphFormulaAssignment& assignment) const;
     virtual std::string asString() const;
 };
 

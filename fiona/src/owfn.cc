@@ -2219,7 +2219,7 @@ bool oWFN::matchesWithOG(const OGFromFile& og, string& reasonForFailedMatch) {
             // state. Because in a OGFromFileFormulaAssignment every
             // unmentioned literal is considered false, we only set those
             // literals that should be considered true.
-            OGFromFileFormulaAssignment assignment =
+            CommGraphFormulaAssignment assignment =
                 makeAssignmentForOGMatchingForState(currentState);
 
             if (!currentOGNode->assignmentSatisfiesAnnotation(assignment)) {
@@ -2264,8 +2264,8 @@ bool oWFN::matchesWithOG(const OGFromFile& og, string& reasonForFailedMatch) {
 }
 
 
-OGFromFileFormulaAssignment oWFN::makeAssignmentForOGMatchingForState(const State* currentState) const {
-    OGFromFileFormulaAssignment assignment;
+CommGraphFormulaAssignment oWFN::makeAssignmentForOGMatchingForState(const State* currentState) const {
+    CommGraphFormulaAssignment assignment;
 
     for (unsigned int itransition = 0;
          itransition != currentState->CardFireList; ++itransition)
@@ -2275,7 +2275,7 @@ OGFromFileFormulaAssignment oWFN::makeAssignmentForOGMatchingForState(const Stat
     }
 
     if (isFinal()) {
-        assignment.setToTrue(OGFromFileFormulaAssignment::FINAL);
+        assignment.setToTrue(CommGraphFormulaAssignment::FINAL);
     }
 
     return assignment;

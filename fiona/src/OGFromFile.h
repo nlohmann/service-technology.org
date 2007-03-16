@@ -57,10 +57,10 @@ private:
         OGFromFileNode* parentNode);
     OGFromFileNode* getParentNodeForTransitionLabel(
         const std::string& transitionLabel) const;
-    OGFromFileFormula* firstClause;
+    CommGraphFormula* firstClause;
     OGFromFileNode* depthFirstSearchParent;
 public:
-    OGFromFileNode(const std::string& name_, OGFromFileFormula* annotation_);
+    OGFromFileNode(const std::string& name_, CommGraphFormula* annotation_);
     ~OGFromFileNode();
     std::string getName() const;
     void addTransition(OGFromFileTransition* transition);
@@ -71,7 +71,7 @@ public:
     OGFromFileNode* backfireTransitionWithLabel(
         const std::string& transitionLabel) const;
     bool assignmentSatisfiesAnnotation(
-        const OGFromFileFormulaAssignment& assignment) const;
+        const CommGraphFormulaAssignment& assignment) const;
     std::string getAnnotationAsString() const;
     void setDepthFirstSearchParent(OGFromFileNode* depthFirstSearchParent);
     OGFromFileNode* getDepthFirstSearchParent() const;
@@ -103,7 +103,7 @@ public:
     ~OGFromFile();
     void addNode(OGFromFileNode* node);
     OGFromFileNode* addNode(const std::string& nodeName,
-        OGFromFileFormula* annotation);
+        CommGraphFormula* annotation);
     void addTransition(const std::string& srcName, const std::string& dstName,
         const std::string& label);
     bool hasNodeWithName(const std::string& nodeName) const;

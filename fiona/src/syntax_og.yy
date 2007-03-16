@@ -98,7 +98,7 @@ void og_yyerror_node_already_defined(const std::string& nodeName)
 
 %union {
     char * str;
-    OGFromFileFormula* formula;
+    CommGraphFormula* formula;
 }
 
 /* the types of the non-terminal symbols */
@@ -138,23 +138,23 @@ formula: lpar formula rpar
     }
 | formula op_and formula
     {
-        $$ = new OGFromFileFormulaBinaryAnd($1, $3);
+        $$ = new CommGraphFormulaBinaryAnd($1, $3);
     }
 | formula op_or formula
     {
-        $$ = new OGFromFileFormulaBinaryOr($1, $3);
+        $$ = new CommGraphFormulaBinaryOr($1, $3);
     }
 | key_true
     {
-        $$ = new OGFromFileFormulaTrue;
+        $$ = new CommGraphFormulaTrue;
     }
 | key_false
     {
-        $$ = new OGFromFileFormulaFalse;
+        $$ = new CommGraphFormulaFalse;
     }
 | ident
     {
-        $$ = new OGFromFileFormulaProposition($1);
+        $$ = new CommGraphFormulaProposition($1);
         free($1);
     }
 ;

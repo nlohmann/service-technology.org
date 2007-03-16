@@ -138,11 +138,11 @@ formula: lpar formula rpar
     }
 | formula op_and formula
     {
-        $$ = new CommGraphFormulaBinaryAnd($1, $3);
+        $$ = new CommGraphFormulaMultiaryAnd($1, $3);
     }
 | formula op_or formula
     {
-        $$ = new CommGraphFormulaBinaryOr($1, $3);
+        $$ = new CommGraphFormulaMultiaryOr($1, $3);
     }
 | key_true
     {

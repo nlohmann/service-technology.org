@@ -39,6 +39,8 @@
 #include <set>
 #include <map>
 
+class CommGraphFormulaFixed;
+
 class CommGraphFormulaAssignment {
 private:
     typedef std::map<std::string, bool> label2bool_t;
@@ -56,53 +58,65 @@ public:
 class CommGraphFormula {
 public:
     virtual ~CommGraphFormula() {};
-    virtual bool value(const CommGraphFormulaAssignment& assignment) const = 0;
     virtual bool satisfies(const CommGraphFormulaAssignment& assignment) const;
     virtual std::string asString() const = 0;
+    virtual bool value(const CommGraphFormulaAssignment& assignment) const = 0;
 };
 
-class CommGraphFormulaBinary : public CommGraphFormula {
+class CommGraphFormulaMultiary : public CommGraphFormula {
 private:
-    CommGraphFormula* lhs;
-    CommGraphFormula* rhs;
+    typedef std::set<CommGraphFormula*> subFormulas_t;
+    subFormulas_t subFormulas;
 public:
-    CommGraphFormulaBinary(CommGraphFormula* lhs, CommGraphFormula* rhs);
-    virtual ~CommGraphFormulaBinary();
-    virtual bool value(const CommGraphFormulaAssignment& assignment) const = 0;
-    bool lhsValue(const CommGraphFormulaAssignment& assignment) const;
-    bool rhsValue(const CommGraphFormulaAssignment& assignment) const;
+    CommGraphFormulaMultiary(CommGraphFormula* lhs, CommGraphFormula* rhs);
+    virtual ~CommGraphFormulaMultiary();
     virtual std::string asString() const;
     virtual std::string getOperator() const = 0;
-};
-
-class CommGraphFormulaBinaryAnd : public CommGraphFormulaBinary {
-public:
-    CommGraphFormulaBinaryAnd(CommGraphFormula* lhs, CommGraphFormula* rhs);
-    virtual ~CommGraphFormulaBinaryAnd() {};
     virtual bool value(const CommGraphFormulaAssignment& assignment) const;
-    virtual std::string getOperator() const;
+    virtual const CommGraphFormulaFixed& getEmptyFormulaEquivalent() const = 0;
 };
 
-class CommGraphFormulaBinaryOr : public CommGraphFormulaBinary {
+class CommGraphFormulaMultiaryAnd : public CommGraphFormulaMultiary {
+private:    
+    static const CommGraphFormulaFixed emptyFormulaEquivalent;
 public:
-    CommGraphFormulaBinaryOr(CommGraphFormula* lhs, CommGraphFormula* rhs);
-    virtual ~CommGraphFormulaBinaryOr() {};
+    CommGraphFormulaMultiaryAnd(CommGraphFormula* lhs, CommGraphFormula* rhs);
+    virtual ~CommGraphFormulaMultiaryAnd() {};
+    virtual std::string getOperator() const;
+    virtual const CommGraphFormulaFixed& getEmptyFormulaEquivalent() const;
+};
+
+class CommGraphFormulaMultiaryOr : public CommGraphFormulaMultiary {
+private:    
+    static const CommGraphFormulaFixed emptyFormulaEquivalent;
+public:
+    CommGraphFormulaMultiaryOr(CommGraphFormula* lhs, CommGraphFormula* rhs);
+    virtual ~CommGraphFormulaMultiaryOr() {};
+    virtual std::string getOperator() const;
+    virtual const CommGraphFormulaFixed& getEmptyFormulaEquivalent() const;
+};
+
+class CommGraphFormulaFixed : public CommGraphFormula {
+private:
+    std::string _asString;
+    bool _value;
+public:
+    CommGraphFormulaFixed(bool value, const std::string& asString);
+    virtual ~CommGraphFormulaFixed() {};
     virtual bool value(const CommGraphFormulaAssignment& assignment) const;
-    virtual std::string getOperator() const;
+    virtual std::string asString() const;
 };
 
-class CommGraphFormulaTrue : public CommGraphFormula {
+class CommGraphFormulaTrue : public CommGraphFormulaFixed {
 public:
+    CommGraphFormulaTrue();
     virtual ~CommGraphFormulaTrue() {};
-    virtual bool value(const CommGraphFormulaAssignment& assignment) const;
-    virtual std::string asString() const;
 };
 
-class CommGraphFormulaFalse : public CommGraphFormula {
+class CommGraphFormulaFalse : public CommGraphFormulaFixed {
 public:
+    CommGraphFormulaFalse();
     virtual ~CommGraphFormulaFalse() {};
-    virtual bool value(const CommGraphFormulaAssignment& assignment) const;
-    virtual std::string asString() const;
 };
 
 class CommGraphFormulaProposition : public CommGraphFormula {

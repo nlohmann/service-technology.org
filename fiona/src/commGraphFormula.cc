@@ -59,91 +59,119 @@ bool CommGraphFormula::satisfies(const CommGraphFormulaAssignment& assignment) c
     return value(assignment) == true;
 }
 
-CommGraphFormulaBinary::CommGraphFormulaBinary(CommGraphFormula* lhs_,
-    CommGraphFormula* rhs_) : lhs(lhs_), rhs(rhs_)
+CommGraphFormulaMultiary::CommGraphFormulaMultiary(CommGraphFormula* lhs,
+    CommGraphFormula* rhs)
 {
+    subFormulas.insert(lhs);
+    subFormulas.insert(rhs);
 }
 
-CommGraphFormulaBinary::~CommGraphFormulaBinary()
+CommGraphFormulaMultiary::~CommGraphFormulaMultiary()
 {
-    delete lhs;
-    delete rhs;
+    for (subFormulas_t::const_iterator currentFormula = subFormulas.begin();
+        currentFormula != subFormulas.end(); ++currentFormula)
+    {
+        delete *currentFormula;
+    }
 }
 
-bool CommGraphFormulaBinary::lhsValue(
+std::string CommGraphFormulaMultiary::asString() const
+{
+    if (subFormulas.empty())
+        return getEmptyFormulaEquivalent().asString();
+
+    subFormulas_t::const_iterator currentFormula = subFormulas.begin();
+    std::string formulaString = '(' + (*currentFormula)->asString();
+
+    while (++currentFormula != subFormulas.end())
+    {
+        formulaString += getOperator() + " " +
+            (*currentFormula)->asString();
+    }
+
+    return formulaString + ')';
+}
+
+bool CommGraphFormulaMultiary::value(
     const CommGraphFormulaAssignment& assignment) const
 {
-    return lhs->value(assignment);
+    for (subFormulas_t::const_iterator currentFormula = subFormulas.begin();
+        currentFormula != subFormulas.end(); ++currentFormula)
+    {
+        if ((*currentFormula)->value(assignment) !=
+            getEmptyFormulaEquivalent().value(assignment))
+        {
+            return !getEmptyFormulaEquivalent().value(assignment);
+        }
+    }
+
+    return getEmptyFormulaEquivalent().value(assignment);
 }
 
-bool CommGraphFormulaBinary::rhsValue(
-    const CommGraphFormulaAssignment& assignment) const
+CommGraphFormulaMultiaryAnd::CommGraphFormulaMultiaryAnd(
+    CommGraphFormula* lhs_, CommGraphFormula* rhs_) :
+    CommGraphFormulaMultiary(lhs_, rhs_)
 {
-    return rhs->value(assignment);
 }
 
-std::string CommGraphFormulaBinary::asString() const
-{
-    return "(" + lhs->asString() + " " + getOperator() + " " +
-        rhs->asString() + ")";
-}
-
-CommGraphFormulaBinaryAnd::CommGraphFormulaBinaryAnd(CommGraphFormula* lhs_,
-    CommGraphFormula* rhs_) : CommGraphFormulaBinary(lhs_, rhs_)
-{
-}
-
-bool CommGraphFormulaBinaryAnd::value(
-    const CommGraphFormulaAssignment& assignment) const
-{
-    if (!lhsValue(assignment))
-        return false;
-
-    return rhsValue(assignment);
-}
-
-std::string CommGraphFormulaBinaryAnd::getOperator() const
+std::string CommGraphFormulaMultiaryAnd::getOperator() const
 {
     return "*";
 }
 
-CommGraphFormulaBinaryOr::CommGraphFormulaBinaryOr(CommGraphFormula* lhs_,
-    CommGraphFormula* rhs_) : CommGraphFormulaBinary(lhs_, rhs_)
+const CommGraphFormulaFixed
+CommGraphFormulaMultiaryAnd::emptyFormulaEquivalent = CommGraphFormulaTrue();
+
+const CommGraphFormulaFixed&
+CommGraphFormulaMultiaryAnd::getEmptyFormulaEquivalent() const
+{
+    return emptyFormulaEquivalent;
+}
+
+CommGraphFormulaMultiaryOr::CommGraphFormulaMultiaryOr(CommGraphFormula* lhs_,
+    CommGraphFormula* rhs_) : CommGraphFormulaMultiary(lhs_, rhs_)
 {
 }
 
-bool CommGraphFormulaBinaryOr::value(
-    const CommGraphFormulaAssignment& assignment) const
-{
-    if (lhsValue(assignment))
-        return true;
-
-    return rhsValue(assignment);
-}
-
-std::string CommGraphFormulaBinaryOr::getOperator() const
+std::string CommGraphFormulaMultiaryOr::getOperator() const
 {
     return "+";
 }
 
-bool CommGraphFormulaTrue::value(const CommGraphFormulaAssignment&) const
+const CommGraphFormulaFixed
+CommGraphFormulaMultiaryOr::emptyFormulaEquivalent = CommGraphFormulaFalse();
+
+const CommGraphFormulaFixed&
+CommGraphFormulaMultiaryOr::getEmptyFormulaEquivalent() const
 {
-    return true;
+    return emptyFormulaEquivalent;
 }
 
-std::string CommGraphFormulaTrue::asString() const
+CommGraphFormulaFixed::CommGraphFormulaFixed(bool value,
+    const std::string& asString) :
+    _asString(asString),
+    _value(value)
 {
-    return "true";
 }
 
-bool CommGraphFormulaFalse::value(const CommGraphFormulaAssignment&) const
+std::string CommGraphFormulaFixed::asString() const
 {
-    return false;
+    return _asString;
 }
 
-std::string CommGraphFormulaFalse::asString() const
+bool CommGraphFormulaFixed::value(const CommGraphFormulaAssignment&) const
 {
-    return "false";
+    return _value;
+}
+
+CommGraphFormulaTrue::CommGraphFormulaTrue() :
+    CommGraphFormulaFixed(true, "true")
+{
+}
+
+CommGraphFormulaFalse::CommGraphFormulaFalse() :
+    CommGraphFormulaFixed(false, "false")
+{
 }
 
 CommGraphFormulaProposition::CommGraphFormulaProposition(

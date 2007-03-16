@@ -43,6 +43,7 @@
 #include <cassert>
 #include <limits.h>
 #include "owfnTransition.h"
+#include "commGraphFormula.h"
 
 using namespace std;
 

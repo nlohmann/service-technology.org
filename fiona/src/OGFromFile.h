@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright 2005, 2006 Jan Bretschneider                                    *
+ * Copyright 2005, 2006, 2007 Jan Bretschneider, Peter Massuthe              *
  *                                                                           *
  * This file is part of Fiona.                                               *
  *                                                                           *
@@ -42,95 +42,11 @@
 #include <string>
 #include <set>
 #include <map>
-
-class OGFromFileFormulaAssignment
-{
-private:
-    typedef std::map<std::string, bool> label2bool_t;
-    label2bool_t label2bool;
-public:
-    // Reserverd labels:
-    static const std::string TAU;
-    static const std::string FINAL;
-
-    void set(const std::string& label, bool value);
-    void setToTrue(const std::string& label);
-    bool get(const std::string& label) const;
-};
-
-class OGFromFileFormula
-{
-public:
-    virtual ~OGFromFileFormula() {};
-    virtual bool value(const OGFromFileFormulaAssignment& assignment) const = 0;
-    virtual bool satisfies(const OGFromFileFormulaAssignment& assignment) const;
-    virtual std::string asString() const = 0;
-};
-
-class OGFromFileFormulaBinary : public OGFromFileFormula
-{
-private:
-    OGFromFileFormula* lhs;
-    OGFromFileFormula* rhs;
-public:
-    OGFromFileFormulaBinary(OGFromFileFormula* lhs, OGFromFileFormula* rhs);
-    virtual ~OGFromFileFormulaBinary();
-    virtual bool value(const OGFromFileFormulaAssignment& assignment) const = 0;
-    bool lhsValue(const OGFromFileFormulaAssignment& assignment) const;
-    bool rhsValue(const OGFromFileFormulaAssignment& assignment) const;
-    virtual std::string asString() const;
-    virtual std::string getOperator() const = 0;
-};
-
-class OGFromFileFormulaBinaryAnd : public OGFromFileFormulaBinary
-{
-public:    
-    OGFromFileFormulaBinaryAnd(OGFromFileFormula* lhs, OGFromFileFormula* rhs);
-    virtual ~OGFromFileFormulaBinaryAnd() {};
-    virtual bool value(const OGFromFileFormulaAssignment& assignment) const;
-    virtual std::string getOperator() const;
-};
-
-class OGFromFileFormulaBinaryOr : public OGFromFileFormulaBinary
-{
-public:    
-    OGFromFileFormulaBinaryOr(OGFromFileFormula* lhs, OGFromFileFormula* rhs);
-    virtual ~OGFromFileFormulaBinaryOr() {};
-    virtual bool value(const OGFromFileFormulaAssignment& assignment) const;
-    virtual std::string getOperator() const;
-};
-
-class OGFromFileFormulaTrue : public OGFromFileFormula
-{
-public:    
-    virtual ~OGFromFileFormulaTrue() {};
-    virtual bool value(const OGFromFileFormulaAssignment& assignment) const;
-    virtual std::string asString() const;
-};
-
-class OGFromFileFormulaFalse : public OGFromFileFormula
-{
-public:    
-    virtual ~OGFromFileFormulaFalse() {};
-    virtual bool value(const OGFromFileFormulaAssignment& assignment) const;
-    virtual std::string asString() const;
-};
-
-class OGFromFileFormulaProposition : public OGFromFileFormula
-{
-private:
-    std::string proposition;
-public:    
-    OGFromFileFormulaProposition(const std::string& proposition_);
-    virtual ~OGFromFileFormulaProposition() {};
-    virtual bool value(const OGFromFileFormulaAssignment& assignment) const;
-    virtual std::string asString() const;
-};
+#include "commGraphFormula.h"
 
 class OGFromFileTransition;
 
-class OGFromFileNode
-{
+class OGFromFileNode {
 private:
     std::string name;
     typedef std::set<OGFromFileTransition*> transitions_t;
@@ -161,8 +77,7 @@ public:
     OGFromFileNode* getDepthFirstSearchParent() const;
 };
 
-class OGFromFileTransition
-{
+class OGFromFileTransition {
 private:
     OGFromFileNode* src;
     OGFromFileNode* dst;
@@ -176,8 +91,7 @@ public:
 
 class oWFN;
 
-class OGFromFile
-{
+class OGFromFile {
 private:
     OGFromFileNode* root;
     typedef std::set<OGFromFileNode*> nodes_t;

@@ -47,6 +47,9 @@
 %{
 // c-code (wird übernommen)
 
+// We don't need yyunput().
+#define YY_NO_UNPUT
+
 #include "syntax_owfn_wrap.h"			// list of all tokens used
 #include <string>
 

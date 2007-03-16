@@ -42,11 +42,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $ 
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/03/16 09:35:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -56,7 +56,7 @@
  *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.41 $
+ * \version \$Revision: 1.42 $
  */
 %}
 
@@ -862,18 +862,17 @@ void PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
   // Places.
   Place *p1 = PN.newPlace(prefix + "initial");
   Place *p2 = PN.newPlace(prefix + "faulted");
-  Place *p3 = PN.newPlace(prefix + "fault");
   Place *p4 = PN.newPlace(prefix + "stop");
   Place *p5 = PN.newPlace(prefix + "stopped");
   Place *p6 = PN.newPlace(prefix + "final");
 
   // Transitions for the negative control flow.
-  Transition *t1 = PN.newTransition(prefix + "rethrow");
+  Transition *t1 = throwFault(p1, p2, "rethrow", prefix,
+                                    mkinteger(phylum->id),
+                                    globals::ASTEmap[phylum->id]->controlFlow);
+
   PN.newArc(PN.findPlace(toString(globals::ASTEmap[phylum->id]->parentScopeId) +
             ".faultHandlers.fault"), t1, READ);
-  PN.newArc(p1, t1);
-  PN.newArc(t1, p2);
-  PN.newArc(t1, p3);
 
   // Stopping transitions.
   Transition *t2 = stop(p1, "initial", prefix);
@@ -1015,7 +1014,7 @@ void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
         Place *p3 = PN.newPlace(prefix + "stop");
         Place *p4 = PN.newPlace(prefix + "stopped");
         Place *p5 = PN.newPlace(prefix + "compensating");
-	
+
         // Concurrently call all compensation handlers of the child scopes.
 	Transition *t1 = PN.newTransition(prefix + "call_ch");
 	PN.newArc(p1, t1);
@@ -1024,24 +1023,30 @@ void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
         // Finish activity after called compensation handlers have finished.
 	Transition *t2 = PN.newTransition(prefix + "finish");
 	PN.newArc(p5, t2);
-	PN.newArc(t2, p1);
+	PN.newArc(t2, p2);
 
-        // Forward stop request to compensation handler.
-        Transition *t3 = PN.newTransition(prefix + "stop_ch");
-        PN.newArc(p3, t3);
-        PN.newArc(p5, t3, READ);
+        Transition *t3 = NULL;
+        Transition *t4 = NULL;
 
-        // Set state to "stopped" after compensation handler has stopped.
-        Transition *t4 = PN.newTransition(prefix + "ch_stopped");
-        PN.newArc(p5, t4);
-        PN.newArc(t4, p4);
+        unsigned int parentId = globals::ASTEmap[ phylum->id ]->parentScopeId;
+        if ( !globals::ASTEmap[ parentId ]->enclosedScopes.empty() )
+        {
+          // Forward stop request to compensation handler.
+          t3 = PN.newTransition(prefix + "stop_ch");
+          PN.newArc(p3, t3);
+          PN.newArc(p5, t3, READ);
+
+          // Set state to "stopped" after compensation handler has stopped.
+          t4 = PN.newTransition(prefix + "ch_stopped");
+          PN.newArc(p5, t4);
+          PN.newArc(t4, p4);
+        }
 
         // Stopping transitions.
         Transition *t5 = stop(p1, "initial", prefix);
         Transition *t6 = stop(p2, "final",   prefix);
 
         // Connect with places of child scopes.
-        unsigned int parentId = globals::ASTEmap[ phylum->id ]->parentScopeId;
         for( set< unsigned int >::iterator scope = globals::ASTEmap[ parentId ]->enclosedScopes.begin();
                                            scope != globals::ASTEmap[ parentId ]->enclosedScopes.end();
                                            scope++ )
@@ -1140,7 +1145,7 @@ void PCompensateScope(impl_tCompensate* abstract_phylum, uview current_view)
         // Finish activity after called compensation handler has finished.
 	Transition *t2 = PN.newTransition(prefix + "finish");
 	PN.newArc(p5, t2);
-	PN.newArc(t2, p1);
+	PN.newArc(t2, p2);
         PN.newArc(PN.findPlace(newPrefix + "compensated"), t2);
 
         // Forward stop request to compensation handler.

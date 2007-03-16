@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for the handlers
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $ 
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/03/16 09:35:10 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.9 $
+ * \version \$Revision: 1.10 $
  */
 %}
 
@@ -117,6 +117,7 @@ void PFaultHandlers(impl_tFaultHandlers* abstract_phylum, uview current_view)
   Transition *t5 = PN.newTransition(prefix + "stop_fh");
   PN.newArc(p4, t5);
   PN.newArc(p7, t5);
+  PN.newArc(p3, t5);
   PN.newArc(t5, p8);
 
   Transition *t9 = stop(p2, "final", prefix);
@@ -131,7 +132,7 @@ void PFaultHandlers(impl_tFaultHandlers* abstract_phylum, uview current_view)
 
     Transition *t1 = PN.newTransition(prefix + "catch" + toString(catchBranches));
     PN.newArc(p1, t1);
-    PN.newArc(p3, t1);
+    PN.newArc(p3, t1, READ);
     PN.newArc(t1, p7);
     PN.newArc(t1, PN.findPlace(innerActivity->id, ".initial"));
 
@@ -156,7 +157,7 @@ void PFaultHandlers(impl_tFaultHandlers* abstract_phylum, uview current_view)
 
       Transition *t2 = PN.newTransition(prefix + "catchAll");
       PN.newArc(p1, t2);
-      PN.newArc(p3, t2);
+      PN.newArc(p3, t2, READ);
       PN.newArc(t2, p7);
       PN.newArc(t2, PN.findPlace(innerActivity->id, ".initial"));
 

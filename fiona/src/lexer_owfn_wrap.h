@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 /*!
- * \file    lexer_wrap.h
+ * \file    lexer_owfn_wrap.h
  *
  * \brief   compatibility wrapper for the lexer
  *

@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 /*!
- * \file    lexer_og.ll
+ * \file    lexer_og.cc
  *
  * \brief   the lexer for the OG file format
  *

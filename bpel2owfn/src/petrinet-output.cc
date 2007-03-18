@@ -30,13 +30,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/03/18 19:04:25 $
+ * \date    \$Date: 2007/03/18 21:23:07 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.84 $
+ * \version \$Revision: 1.85 $
  *
  * \ingroup petrinet
  */
@@ -85,7 +85,9 @@ using std::left;
  *****************************************************************************/
 
 /*!
- * \return the name of the node type
+ * \brief   the name of the type
+ *
+ *          dummy-implementation of virtual function
  */
 string Node::nodeTypeName() const
 {
@@ -97,7 +99,9 @@ string Node::nodeTypeName() const
 
 
 /*!
- * \return the name of the node type
+ * \brief   the name of the type
+ *
+ * \return  the name of the node type, i.e., "place"
  */
 string Place::nodeTypeName() const
 {
@@ -109,7 +113,9 @@ string Place::nodeTypeName() const
 
 
 /*!
- * \return the name of the node type
+ * \brief   the name of the type
+ *
+ * \return  the name of the node type, i.e., "transition"
  */
 string Transition::nodeTypeName() const
 {
@@ -121,7 +127,9 @@ string Transition::nodeTypeName() const
 
 
 /*!
- * dummy-implementation of virtual function
+ * \brief   the short name of the node
+ *
+ *          dummy-implementation of virtual function
  */
 string Node::nodeShortName() const
 {
@@ -133,7 +141,9 @@ string Node::nodeShortName() const
 
 
 /*!
- * \return the (nice) name of the node for DOT output
+ * \brief   the name of the node
+ *
+ * \return  the (nice) name of the node for DOT output
  */
 string Node::nodeName() const
 {
@@ -149,8 +159,13 @@ string Node::nodeName() const
 }
 
 
+
+
+
 /*!
- * \return the name of the node for DOT output
+ * \brief   the name of the node
+ *
+ * \return  the name of the node for DOT output
  */
 string Node::nodeFullName() const
 {
@@ -168,7 +183,9 @@ string Node::nodeFullName() const
 
 
 /*!
- * \return the short name of the place, e.g. for LoLA output
+ * \brief   the short name of the place
+ *
+ * \return  the short name of the place, e.g. for LoLA output
  */
 string Place::nodeShortName() const
 {
@@ -183,7 +200,9 @@ string Place::nodeShortName() const
 
 
 /*!
- * \return the short name of the transition, e.g. for LoLA output
+ * \brief   the short name of the transition
+ *
+ * \return  the short name of the transition, e.g. for LoLA output
  */
 string Transition::nodeShortName() const
 {
@@ -195,7 +214,9 @@ string Transition::nodeShortName() const
 
 
 /*!
- * \return string containing information about the net
+ * \brief   statistical output
+ *
+ * \return  string containing information about the net
  */
 string PetriNet::information() const
 {
@@ -212,11 +233,13 @@ string PetriNet::information() const
 
 
 /*!
- * Prints information about the generated Petri net. In particular, for each
- * place and transition all roles of the history are printed to understand
- * the net and maybe LoLA's witness pathes later.
+ * \brief   info file output
  *
- * \todo put this to the nodes
+ *          Prints information about the generated Petri net. In particular,
+ *          for each place and transition all roles of the history are printed
+ *          to understand the net and maybe LoLA's witness pathes later.
+ *
+ * \todo    Put this to the nodes.
  */
 void PetriNet::output_info(ostream *output) const
 {
@@ -287,7 +310,7 @@ void PetriNet::output_info(ostream *output) const
 
 
 /*!
- * DOT-output of the arc.
+ * \brief   DOT-output of the arc (used by PetriNet::dotOut())
 */
 string Arc::output_dot(bool draw_interface) const
 {
@@ -321,8 +344,12 @@ string Arc::output_dot(bool draw_interface) const
 
 
 /*!
- * DOT-output of the transition. Transitions are colored corresponding to their
- * initial role.
+ * \brief   DOT-output of the transition (used by PetriNet::dotOut())
+ *
+ *          DOT-output of the transition. Transitions are colored
+ *          corresponding to their initial role.
+ *
+ * \todo    Explain colors used.
 */
 string Transition::output_dot() const
 {
@@ -338,7 +365,7 @@ string Transition::output_dot() const
 
   switch(type)
   {
-    case (IN):	result += "[fillcolor=orange]"; break;
+    case(IN):	result += "[fillcolor=orange]"; break;
     case(OUT):	result += "[fillcolor=yellow]"; break;
     case(INOUT):result += "[fillcolor=gold]"; break;
     default:	break;
@@ -357,8 +384,12 @@ string Transition::output_dot() const
 
 
 /*!
- * DOT-output of the place. Places are colored corresponding to their initial
- * role. Places get bold outlines if they are marked.
+ * \brief   DOT-output of the place (used by PetriNet::dotOut())
+ *
+ *          DOT-output of the place. Places are colored corresponding to their
+ *          initial role.
+ *
+ * \todo    Explain colors used.
 */
 string Place::output_dot() const
 {
@@ -415,12 +446,16 @@ string Place::output_dot() const
 
 
 /*!
- * Creates a DOT output (see http://www.graphviz.org) of the Petri net. It uses
- * the digraph-statement and adds labels to transitions, places and arcs if
- * neccessary. It also distinguishes the three arc types of #arc_type.
+ * \brief   DOT (Graphviz) output
  *
- * \param output the output stream
- * \param draw_interface if set to true the interface will be drawn (standard)
+ *          Creates a DOT output (see http://www.graphviz.org) of the Petri
+ *          net. It uses the digraph-statement and adds labels to transitions,
+ *          places and arcs if neccessary.
+ *
+ * \param   output the output stream
+ * \param   draw_interface if set to true the interface will be drawn (standard)
+ *
+ * \todo    Add syntax reference.
  */
 void PetriNet::output_dot(ostream *output, bool draw_interface) const
 {
@@ -430,7 +465,7 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
   (*output) << " graph [fontname=\"Helvetica\" nodesep=0.3 ranksep=\"0.2 equally\" label=\"";
 
   if (parameters[P_REDUCE])
-    (*output) << "structural simplified ";
+    (*output) << "structurally reduced ";
 
   (*output) << "Petri net generated from " << filename << "\"]" << endl;
   (*output) << " node [fixedsize width=\".3\" height=\".3\" label=\"\" style=filled fillcolor=white]" << endl;
@@ -492,13 +527,17 @@ void PetriNet::output_dot(ostream *output, bool draw_interface) const
  *****************************************************************************/
 
 /*!
- * Outputs the net in PNML (Petri Net Markup Language).
+ * \brief   PNML (Petri Net Markup Language) output
  *
- * \param output  output stream
+ *          Outputs the net in PNML (Petri Net Markup Language).
  *
- * \pre output != NULL
+ * \param   output  output stream
  *
- * \todo See https://savannah.gnu.org/task/?6263 
+ * \pre     output != NULL
+ *
+ * \note    - See https://savannah.gnu.org/task/?6263 
+ *          - The complete syntax can be found at
+ *            http://www.petriweb.org/specs/epnml-1.1/pnmldef.pdf
  */
 void PetriNet::output_pnml(ostream *output) const
 {
@@ -627,11 +666,17 @@ void PetriNet::output_pnml(ostream *output) const
 
 
 /*!
- * Outputs the net in low-level PEP notation.
+ * \brief   low-level PEP output
  *
- * \param output  output stream
+ *          Outputs the net in low-level PEP notation.
  *
- * \pre output != NULL
+ * \param   output  output stream
+ *
+ * \pre     output != NULL
+ *
+ * \todo    
+ *          - Add syntax reference.
+ *          - Does PEP also work with non-safe Petri nets?
  */
 void PetriNet::output_pep(ostream *output) const
 {
@@ -675,16 +720,18 @@ void PetriNet::output_pep(ostream *output) const
 
 
 /*!
- * Outputs the net in INA format.
+ * \brief   INA output
  *
- * The complete syntax can be found at
- * http://www2.informatik.hu-berlin.de/lehrstuehle/automaten/ina/node14.html
+ *          Outputs the net in INA format.
  *
- * \param output  output stream
+ * \param   output  output stream
  *
- * \pre output != NULL
+ * \pre     output != NULL
  *
- * \todo check whether arc weights are in the correct order
+ * \node    The complete syntax can be found at
+ *          http://www2.informatik.hu-berlin.de/lehrstuehle/automaten/ina/node14.html
+ *
+ * \todo    Check whether arc weights are in the correct order.
  */
 void PetriNet::output_ina(ostream *output) const
 {
@@ -758,14 +805,15 @@ void PetriNet::output_ina(ostream *output) const
 
 
 /*!
- * Outputs the net in SPIN format.
+ * \brief   SPIN output
  *
- * The complete syntax can be found at
- * [WEBSITE]
+ *          Outputs the net in SPIN format.
  *
- * \param output  output stream
+ * \param   output  output stream
  *
- * \pre output != NULL
+ * \pre     output != NULL
+ *
+ * \todo    Add syntax reference.
  */
 void PetriNet::output_spin(ostream *output) const
 {
@@ -836,11 +884,15 @@ void PetriNet::output_spin(ostream *output) const
 
 
 /*!
- * Outputs the net in APNN (Abstract Petri Net Notation).
+ * \brief   APNN (Abstract Petri Net Notation) output
  *
- * \param output  output stream
+ *          Outputs the net in APNN (Abstract Petri Net Notation).
  *
- * \pre output != NULL
+ * \param   output  output stream
+ *
+ * \pre     output != NULL
+ *
+ * \todo    Add syntax reference.
 */
 void PetriNet::output_apnn(ostream *output) const
 {
@@ -848,7 +900,7 @@ void PetriNet::output_apnn(ostream *output) const
 
   (*output) << "\\beginnet{" << filename << "}" << endl << endl;
 
-  // places(only internal)
+  // places (only internal)
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
   {
     (*output) << "  \\place{" << (*p)->nodeShortName() << "}{";
@@ -893,11 +945,15 @@ void PetriNet::output_apnn(ostream *output) const
 
 
 /*!
- * Outputs the net in LoLA-format.
+ * \brief   LoLA-output
  *
- * \param output  output stream
+ *          Outputs the net in LoLA-format.
  *
- * \pre output != NULL
+ * \param   output  output stream
+ *
+ * \pre     output != NULL
+ *
+ * \todo    Add syntax reference.
  */
 void PetriNet::output_lola(ostream *output) const
 {
@@ -985,12 +1041,16 @@ void PetriNet::output_lola(ostream *output) const
  *****************************************************************************/
 
 /*!
- * Outputs the net in oWFN-format.
+ * \brief   oWFN-output
  *
- * \param output  output stream
+ *          Outputs the net in oWFN-format.
  *
- * \pre output != NULL
- * \pre PetriNet::calculate_max_occurrences() called
+ * \param   output  output stream
+ *
+ * \pre     output != NULL
+ * \pre     PetriNet::calculate_max_occurrences() called
+ *
+ * \todo    Add syntax reference.
  */
 void PetriNet::output_owfn(ostream *output) const
 {
@@ -1175,11 +1235,13 @@ void PetriNet::output_owfn(ostream *output) const
 
 
 /*!
- * Stream the PetriNet object to a given output stream, using the file format
- * set before uing PetriNet::set_format().
+ * \brief   outputs the Petri net
  *
- * \param os  an output stream to which the net is streamed
- * \param obj a PetriNet object
+ *          Stream the PetriNet object to a given output stream, using the
+ *          file format set before uing PetriNet::set_format().
+ *
+ * \param   os  an output stream to which the net is streamed
+ * \param   obj a PetriNet object
  */
 ostream& operator<< (ostream& os, const PetriNet &obj)
 {
@@ -1203,12 +1265,15 @@ ostream& operator<< (ostream& os, const PetriNet &obj)
 
 
 
+
 /*!
- * Set the output format to be used when the <<-operator is called the next
- * time.
+ * \brief   set the output format
  *
- * \param my_format the output format from the enumeration output_format.
- * \param standard  if set to false a different output format style is used
+ *          Set the output format to be used when the <<-operator is called
+ *          the next time.
+ *
+ * \param   my_format  the output format from the enumeration output_format.
+ * \param   standard   if set to false a different output format style is used
  */
 void PetriNet::set_format(output_format my_format, bool standard)
 {

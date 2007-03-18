@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/03/18 19:04:25 $
+ * \date    \$Date: 2007/03/18 21:23:07 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.137 $
+ * \version \$Revision: 1.138 $
  *
  * \ingroup petrinet
  */
@@ -319,7 +319,7 @@ class Place: public Node
     /// mark the place
     void mark(unsigned int tokens = 1);
 
-    /// the short name of the place (public to bpel2owfn.cc)
+    /// the short name of the place
     string nodeShortName() const;
 
     /// true if place is marked in the final marking

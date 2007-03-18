@@ -29,7 +29,7 @@
  * 
  * \since   2007-03-06
  *
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/03/18 21:23:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -39,7 +39,7 @@
  *          petrinet-patterns-shortcuts.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.15 $
+ * \version \$Revision: 1.16 $
 */
 %}
 
@@ -112,6 +112,8 @@ using std::endl;
  *                                 - false: these faults are suppressed
  *
  * \return  a pointer to the (first) generated fault transition
+ *
+ * \ingroup patterns
 */
 %}
 Transition *throwFault(Place *p1, Place *p2,
@@ -230,6 +232,8 @@ Transition *throwFault(Place *p1, Place *p2,
  * \param   prefix  prefix of the pattern to label generated transition
  *
  * \return  a pointer to the stop transition
+ *
+ * \ingroup patterns
  */
 %}
 Transition *stop(Place *p, string p_name, string prefix)
@@ -262,6 +266,8 @@ Transition *stop(Place *p, string p_name, string prefix)
  *
  * \param   t   transition that invokes DPE
  * \param   id  the identifier of the AST node
+ *
+ * \ingroup patterns
  */
 %}
 void dpeLinks(Transition *t, int id)
@@ -306,6 +312,8 @@ void dpeLinks(Transition *t, int id)
  * \param   preventFurtherFaults  controls what happens to further faults
  *                                 - true: these faults are prevented (standard)
  *                                 - false: these faults are suppressed
+ *
+ * \ingroup patterns
  */
 %}
 void receivingTransition(string name, Place *prePlace, Place *postPlace,
@@ -385,6 +393,8 @@ void receivingTransition(string name, Place *prePlace, Place *postPlace,
  * \param   preventFurtherFaults  controls what happens to further faults
  *                                 - true: these faults are prevented (standard)
  *                                 - false: these faults are suppressed
+ *
+ * \ingroup patterns
  */
 %}
 void sendingTransition(string name, Place *prePlace, Place *postPlace,
@@ -447,6 +457,8 @@ void sendingTransition(string name, Place *prePlace, Place *postPlace,
  *
  * \param   prefix        the prefix of the activity's pattern
  * \param   source_links  the list of outgoing links of the activity
+ *
+ * \ingroup patterns
  *
  * \todo    Implement nondeterministic transition condition and add respective
  *          parameter.
@@ -545,6 +557,8 @@ void P_transitionCondition(string prefix, tSource_list source_links)
  * \param   prefix        the prefix of the activity's pattern
  * \param   target_links  the list of incoming links of the activity
  * \param   jc            the join condition
+ *
+ * \ingroup patterns
  */
 %}
 void P_joinCondition(string prefix, tTarget_list target_links, joinCondition jc)

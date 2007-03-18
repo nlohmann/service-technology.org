@@ -42,11 +42,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $ 
+ *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/16 09:35:10 $
+ * \date    \$Date: 2007/03/18 21:23:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -56,7 +56,7 @@
  *          petrinet-patterns-basic.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.42 $
+ * \version \$Revision: 1.43 $
  */
 %}
 
@@ -102,6 +102,8 @@ extern PetriNet PN;
  *
  * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
  * \param   current_view     the current unparse view
+ *
+ * \ingroup patterns
  */
 %}
 void PEmpty(impl_tEmpty* abstract_phylum, uview current_view)
@@ -157,6 +159,8 @@ void PEmpty(impl_tEmpty* abstract_phylum, uview current_view)
  *
  * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
  * \param   current_view     the current unparse view
+ *
+ * \ingroup patterns
  */
 %}
 void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
@@ -228,6 +232,8 @@ void PAsynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
  *
  * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
  * \param   current_view     the current unparse view
+ *
+ * \ingroup patterns
  */
 %}
 void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
@@ -321,6 +327,8 @@ void PSynchronousInvoke(impl_tInvoke* abstract_phylum, uview current_view)
  *
  * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
  * \param   current_view     the current unparse view
+ *
+ * \ingroup patterns
  */
 %}
 void PReceive(impl_tReceive* abstract_phylum, uview current_view)
@@ -398,6 +406,8 @@ void PReceive(impl_tReceive* abstract_phylum, uview current_view)
  *
  * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
  * \param   current_view     the current unparse view
+ *
+ * \ingroup patterns
  */
 %}
 void PReply(impl_tReply* abstract_phylum, uview current_view)
@@ -475,6 +485,8 @@ void PReply(impl_tReply* abstract_phylum, uview current_view)
  *
  * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
  * \param   current_view     the current unparse view
+ *
+ * \ingroup patterns
  * 
  * \todo    Overwork this pattern and adjust it to the new semantics.
  */
@@ -614,6 +626,8 @@ void PAssign(impl_tAssign* abstract_phylum, uview current_view)
  * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
  * \param   current_view     the current unparse view
  *
+ * \ingroup patterns
+ *
  * \todo    Overwork this pattern and connect it with the respective variable.
  */
 %}
@@ -706,6 +720,8 @@ void PValidate(impl_tValidate* abstract_phylum, uview current_view)
  *
  * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
  * \param   current_view     the current unparse view
+ *
+ * \ingroup patterns
  */
 %}
 void PWait(impl_tWait* abstract_phylum, uview current_view)
@@ -761,6 +777,8 @@ void PWait(impl_tWait* abstract_phylum, uview current_view)
  *
  * \note    This pattern is replaced by an <empty> activity in the
  *          "communicationonly" patterns.
+ *
+ * \ingroup patterns
  *
  * \todo    Handle the outgoing links of the throw activity. Right now, they
  *          are not set at all.
@@ -843,6 +861,8 @@ void PThrow(impl_tThrow* abstract_phylum, uview current_view)
  * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
  * \param   current_view     the current unparse view
  *
+ * \ingroup patterns
+ *
  * \todo    
  *          - Check whether this pattern should also use the "throwFault"
  *            function.
@@ -910,6 +930,8 @@ void PRethrow(impl_tRethrow* abstract_phylum, uview current_view)
  *
  * \note    This pattern is replaced by an <empty> activity in the
  *          "communicationonly" patterns.
+ *
+ * \ingroup patterns
  */
 %}
 void PExit(impl_tExit* abstract_phylum, uview current_view)
@@ -993,6 +1015,8 @@ void PExit(impl_tExit* abstract_phylum, uview current_view)
  *
  * \note    This pattern is replaced by an <empty> activity in the
  *          "communicationonly" patterns.
+ *
+ * \ingroup patterns
  */
 %}
 void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
@@ -1110,6 +1134,8 @@ void PCompensate(impl_tCompensate* abstract_phylum, uview current_view)
  *
  * \note    This pattern is replaced by an <empty> activity in the
  *          "communicationonly" patterns.
+ *
+ * \ingroup patterns
  */
 %}
 void PCompensateScope(impl_tCompensate* abstract_phylum, uview current_view)

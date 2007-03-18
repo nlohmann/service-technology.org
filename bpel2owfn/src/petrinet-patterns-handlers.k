@@ -25,11 +25,11 @@
  * \brief   Petri net patterns for the handlers
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
- *          last changes of: \$Author: gierds $ 
+ *          last changes of: \$Author: nielslohmann $ 
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/16 09:35:10 $
+ * \date    \$Date: 2007/03/18 21:23:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.10 $
+ * \version \$Revision: 1.11 $
  */
 %}
 
@@ -88,6 +88,8 @@ extern PetriNet PN;
  * \todo    
  *          - Replace NoCatchAll by a CatchAll phylum with a <rethrow> activity?
  *          - Implement the new <faultHandlers> pattern.
+ *
+ * \ingroup patterns
  */
 %}
 void PFaultHandlers(impl_tFaultHandlers* abstract_phylum, uview current_view)
@@ -216,6 +218,8 @@ void PFaultHandlers(impl_tFaultHandlers* abstract_phylum, uview current_view)
  * \param   current_view     the current unparse view
  *
  * \note    This function embeds the <terminationHandler> to the parent scope.
+ *
+ * \ingroup patterns
  */
 %}
 void PTerminationHandler(impl_tTerminationHandler* abstract_phylum, uview current_view)
@@ -300,6 +304,8 @@ void PTerminationHandler(impl_tTerminationHandler* abstract_phylum, uview curren
  * \param   current_view     the current unparse view
  *
  * \note    This function embeds the <compensationHandler> to the parent scope.
+ *
+ * \ingroup patterns
  *
  * \todo    Remove or implement code snippet for loop count parameter.
  */

@@ -40,7 +40,7 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/03/18 21:23:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -50,7 +50,7 @@
  *          petrinet-patterns-links.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.21 $
+ * \version \$Revision: 1.22 $
  */
 %}
 
@@ -106,6 +106,8 @@ extern PetriNet PN;
  *
  * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
  * \param   current_view     the current unparse view
+ *
+ * \ingroup patterns
  */
 %}
 void P_LinkWrapper0(impl_standardElements* abstract_phylum, uview current_view)
@@ -157,6 +159,8 @@ void P_LinkWrapper0(impl_standardElements* abstract_phylum, uview current_view)
  *
  * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
  * \param   current_view     the current unparse view
+ *
+ * \ingroup patterns
  */
 %}
 void P_LinkWrapper1(impl_standardElements* abstract_phylum, uview current_view)
@@ -217,6 +221,8 @@ void P_LinkWrapper1(impl_standardElements* abstract_phylum, uview current_view)
  *
  * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
  * \param   current_view     the current unparse view
+ *
+ * \ingroup patterns
  */
 %}
 void P_LinkWrapper2(impl_standardElements* abstract_phylum, uview current_view)
@@ -296,6 +302,8 @@ void P_LinkWrapper2(impl_standardElements* abstract_phylum, uview current_view)
  * \param   current_view     the current unparse view
  *
  * \note    In mode "communication only", wrapper pattern 2 is used instead.
+ *
+ * \ingroup patterns
  */
 %}
 void P_LinkWrapper3(impl_standardElements* abstract_phylum, uview current_view)
@@ -384,6 +392,8 @@ void P_LinkWrapper3(impl_standardElements* abstract_phylum, uview current_view)
  * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
  * \param   current_view     the current unparse view
  *
+ * \ingroup patterns
+ *
  * \todo    Check this pattern.
  */
 %}
@@ -469,6 +479,8 @@ void P_LinkWrapper4(impl_standardElements* abstract_phylum, uview current_view)
  * \param   current_view     the current unparse view
  *
  * \note    In mode "communication only", wrapper pattern 4 is used instead.
+ *
+ * \ingroup patterns
  *
  * \todo    Check this pattern.
  */

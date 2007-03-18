@@ -29,7 +29,7 @@
  * 
  * \since   2006-11-26
  *
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/03/18 21:23:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-structured.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.39 $
+ * \version \$Revision: 1.40 $
 */
 %}
 
@@ -80,6 +80,8 @@ extern PetriNet PN;
  * \fn void kc::PWhile(impl_tWhile* abstract_phylum, uview current_view)
  * \brief Pattern for the <while> activity.
  * \image html "while.png" "pattern"
+ *
+ * \ingroup patterns
  */
 %}
 void PWhile(impl_tWhile* abstract_phylum, uview current_view)
@@ -235,6 +237,8 @@ void PWhile(impl_tWhile* abstract_phylum, uview current_view)
  * \fn void kc::PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
  * \brief Pattern for the <repeatUntil> activity.
  * \image html "repeatuntil.png" "pattern"
+ *
+ * \ingroup patterns
  */
 %}
 void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
@@ -435,6 +439,8 @@ void PRepeatUntil(impl_tRepeatUntil* abstract_phylum, uview current_view)
  *
  * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
  * \param   current_view     the current unparse view
+ *
+ * \ingroup patterns
  */
 %}
 void PSequence(impl_tSequence* abstract_phylum, uview current_view)
@@ -501,6 +507,8 @@ void PSequence(impl_tSequence* abstract_phylum, uview current_view)
  * \fn void kc::PFlow(impl_tFlow* abstract_phylum, uview current_view)
  * \brief Pattern for the <flow> activity.
  * \image html "flow.png" "pattern"
+ *
+ * \ingroup patterns
  */
 %}
 void PFlow(impl_tFlow* abstract_phylum, uview current_view)
@@ -611,6 +619,8 @@ void PFlow(impl_tFlow* abstract_phylum, uview current_view)
  *
  * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
  * \param   current_view     the current unparse view
+ *
+ * \ingroup patterns
  * 
  * \todo    Use "receivingTransition" function in <onMessage> branches.
  */
@@ -760,6 +770,8 @@ void PPick(impl_tPick* abstract_phylum, uview current_view)
  *          in the <switch> activity has to be filled with an <empty> activity
  *          rather than with a shortcut transition as an absent <else> branch.
  *          This implicit <empty> activity is added by the parser.
+ *
+ * \ingroup patterns
  */
 %}
 void PIf(impl_tIf* abstract_phylum, uview current_view)

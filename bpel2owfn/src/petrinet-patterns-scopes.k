@@ -31,7 +31,7 @@
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/03/18 21:23:07 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.34 $
+ * \version \$Revision: 1.35 $
  */
 %}
 
@@ -85,6 +85,8 @@ extern PetriNet PN;
  *
  * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
  * \param   current_view     the current unparse view
+ *
+ * \ingroup patterns
  */
 %}
 void PProcess(impl_tProcess* abstract_phylum, uview current_view)
@@ -339,6 +341,8 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
  *
  * \param   abstract_phylum  pointer to the phylum of the abstract syntax tree
  * \param   current_view     the current unparse view
+ *
+ * \ingroup patterns
  *
  * \todo    Remove or implement code snippet for loop count parameter.
  */

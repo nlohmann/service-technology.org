@@ -31,13 +31,13 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/03/18 19:04:25 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.69 $
+ * \version \$Revision: 1.70 $
  *
  * \ingroup petrinet
  */
@@ -97,7 +97,7 @@ unsigned int PetriNet::reduce_unused_status_places()
 
   // find unused status places
   for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
-    if ( postset(*p).empty() )
+    if ( (*p)->postset.empty() )
       if ( !( (*p)->isFinal ) )
         if ( (*p)->tokens == 0 )
   	unused_status_places.push_back(*p);
@@ -139,7 +139,7 @@ unsigned int PetriNet::reduce_suspicious_transitions()
 
   // find suspicious transitions
   for (set<Transition*>::iterator t = T.begin(); t != T.end(); t++)
-    if (postset(*t).empty() || preset(*t).empty())
+    if ((*t)->postset.empty() || (*t)->preset.empty())
       suspiciousTransitions.push_back(*t);
 
   // remove suspicious transitions
@@ -182,11 +182,10 @@ void PetriNet::reduce_dead_nodes()
     // find insufficiently marked places with empty preset
     for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
     {
-      if (preset(*p).empty() && (*p)->tokens == 0 && !((*p)->isFinal))
+      if ((*p)->preset.empty() && (*p)->tokens == 0 && !((*p)->isFinal))
       {
 			arcs=true;		
-                        set<Node*> postSet = postset(*p);
-			for(set<Node*>::iterator t = postSet.begin(); t != postSet.end(); t++)
+			for(set<Node*>::iterator t = (*p)->postset.begin(); t != (*p)->postset.end(); t++)
 			{
 				if(arc_weight(*p,*t) <= (*p)->tokens)	
 				{
@@ -210,10 +209,9 @@ void PetriNet::reduce_dead_nodes()
       assert(p != NULL);
 
       tempPlaces.pop_back();
-      set<Node*> ps = postset(p);
 
       // transitions in the postset of a dead place are dead
-      for (set<Node*>::iterator t = ps.begin(); t != ps.end(); t++)
+      for (set<Node*>::iterator t = p->postset.begin(); t != p->postset.end(); t++)
       {
       	deadTransitions.push_back( static_cast<Transition*>(*t) );
 	trace(TRACE_VERY_DEBUG, "[PN]\tTransition t" + toString((*t)->id) + " is structurally dead\n");
@@ -242,7 +240,7 @@ void PetriNet::reduce_dead_nodes()
     list<Place*> uselessInputPlaces;
 
     for (set<Place*>::iterator p = P_in.begin(); p != P_in.end(); p++)
-      if (postset(*p).empty())
+      if ((*p)->postset.empty())
 	uselessInputPlaces.push_back(*p);
 
     for (list<Place*>::iterator p = uselessInputPlaces.begin(); p != uselessInputPlaces.end(); p++)
@@ -255,7 +253,7 @@ void PetriNet::reduce_dead_nodes()
     list<Place*> uselessOutputPlaces;
 
     for (set<Place*>::iterator p = P_out.begin(); p != P_out.end(); p++)
-      if (preset(*p).empty())
+      if ((*p)->preset.empty())
 	uselessOutputPlaces.push_back(*p);
 
     for (list<Place*>::iterator p = uselessOutputPlaces.begin(); p != uselessOutputPlaces.end(); p++)
@@ -280,8 +278,6 @@ void PetriNet::reduce_dead_nodes()
  * (precondition 2) and postset (precondition 3) and the weights of all incoming
  * and outgoing arcs have the same value (precondition 4), then they can be merged.
  *
- * \image html rb1.png
- *
  * \todo 
  *       - Overwork the preconditions and postconditions.
  *       - Re-organize the storing and removing of nodes.
@@ -296,21 +292,17 @@ void PetriNet::reduce_identical_places()
   // iterate the places
   for (set<Place*>::iterator p1 = P.begin(); p1 != P.end(); p1++)
   {
-    set<Node*> preSet  = preset(*p1);
-    set<Node*> postSet = postset(*p1);
-
-    if ((preSet.empty()) || (postSet.empty()) || !(sameweights(*p1)))
+    if (((*p1)->preset.empty()) || ((*p1)->postset.empty()) || !(sameweights(*p1)))
       continue;
 
-    for (set<Node*>:: iterator preTransition = preSet.begin(); preTransition != preSet.end(); preTransition++)
+    for (set<Node*>:: iterator preTransition = (*p1)->preset.begin(); preTransition != (*p1)->preset.end(); preTransition++)
     {
-      set<Node*> pPostSet = postset(*preTransition);
-      for (set<Node*>::iterator p2 = pPostSet.begin(); p2 != pPostSet.end(); p2++)
+      for (set<Node*>::iterator p2 = (*preTransition)->postset.begin(); p2 != (*preTransition)->postset.end(); p2++)
 	 if ((*p1 != *p2) &&		// precondition 1
-	    (preSet == preset(*p2)) &&	// precondition 2
-	    (postSet == postset(*p2)) && // precondition 3
+	    ((*p1)->preset == (*p2)->preset) &&	// precondition 2
+	    ((*p1)->postset == (*p2)->postset) && // precondition 3
 	    (sameweights(*p2)) && // precondition 4
-	    (arc_weight((*preTransition), (*p1)) == arc_weight((*p2), (*(postSet.begin())))) ) // precondition 4
+	    (arc_weight((*preTransition), (*p1)) == arc_weight((*p2), (*((*p1)->postset.begin())))) ) // precondition 4
 	{
 	  string id1 = *((*p1)->history.begin());
 	  string id2 = *((*p2)->history.begin());
@@ -346,8 +338,6 @@ void PetriNet::reduce_identical_places()
  * is connected to any arc with a weight other than 1 (precondition 4),
  * then they can be merged.
  *
- * \image html ra2.png
- *
  * \todo
  *       - Overwork the preconditions and postconditions.
  *       - Re-organize the storing and removing of nodes.
@@ -362,21 +352,17 @@ void PetriNet::reduce_identical_transitions()
   // iterate the transitions
   for (set<Transition*>::iterator t1 = T.begin(); t1 != T.end(); t1++)
   {
-    set<Node*> preSet  = preset(*t1);
-    set<Node*> postSet = postset(*t1);
-
     if (!(sameweights(*t1)))
       continue;
 
-    for (set<Node*>:: iterator prePlace = preSet.begin(); prePlace != preSet.end(); prePlace++)
+    for (set<Node*>:: iterator prePlace = (*t1)->preset.begin(); prePlace != (*t1)->preset.end(); prePlace++)
     {
-      set<Node*> pPostSet = postset(*prePlace);
-      for (set<Node*>::iterator t2 = pPostSet.begin(); t2 != pPostSet.end(); t2++)
+      for (set<Node*>::iterator t2 = (*prePlace)->postset.begin(); t2 != (*prePlace)->postset.end(); t2++)
 	if ((*t1 != *t2) &&		// precondition 1
-	    (preSet == preset(*t2)) &&	// precondition 2
-	    (postSet == postset(*t2)) && // precondition 3
+	    ((*t1)->preset == (*t2)->preset) &&	// precondition 2
+	    ((*t1)->postset == (*t2)->postset) && // precondition 3
 	    (sameweights(*t2)) && // precondition 4
-	    (arc_weight((*(preSet.begin())),(*t1)) == arc_weight((*t2), (*(postSet.begin()))))) // precondition 4
+	    (arc_weight((*((*t1)->preset.begin())),(*t1)) == arc_weight((*t2), (*((*t1)->postset.begin()))))) // precondition 4
 	{
 	  string id1 = *((*t1)->history.begin());
 	  string id2 = *((*t2)->history.begin());
@@ -415,8 +401,6 @@ void PetriNet::reduce_identical_transitions()
  * places may be communicating (precondition 4) and the included arcs must have
  * a weight of 1 (precondition 5).
  *
- * \image html ra1.png
- *
  * \todo
  *       - Overwork the preconditions and postconditions.
  *       - Re-organize the storing and removing of nodes.
@@ -433,20 +417,18 @@ void PetriNet::reduce_series_places()
   // iterate the transtions
   for (set<Transition*>::iterator t = T.begin(); t != T.end(); t++)
   {
-    set<Node*> postSet = postset(*t);
-    set<Node*> preSet  = preset (*t);
-    Place* prePlace = static_cast<Place*>(*(preSet.begin()));
-    Place* postPlace = static_cast<Place*>(*(postSet.begin()));
+    Place* prePlace = static_cast<Place*>(*((*t)->preset.begin()));
+    Place* postPlace = static_cast<Place*>(*((*t)->postset.begin()));
 
-    if ((preSet.size() == 1) &&	(postSet.size() == 1) && // precondition 1
+    if (((*t)->preset.size() == 1) && ((*t)->postset.size() == 1) && // precondition 1
 	(prePlace != postPlace) &&			 // precondition 2
-	(postset(prePlace).size() == 1) &&		 // precondition 3
+	((prePlace)->postset.size() == 1) &&		 // precondition 3
 	(prePlace->type == INTERNAL) &&			 // precondition 4
 	(postPlace->type == INTERNAL) &&
 	(arc_weight(prePlace, *t) == 1 && arc_weight(*t, postPlace) == 1)) // precondition 5
    {
-      string id1 = *((*(preSet.begin()))->history.begin());
-      string id2 = *((*(postSet.begin()))->history.begin());
+      string id1 = *((*((*t)->preset.begin()))->history.begin());
+      string id2 = *((*((*t)->postset.begin()))->history.begin());
       placePairs.insert(pair<string, string>(id1, id2));
       uselessTransitions.insert(*((*t)->history.begin()));
     }
@@ -485,8 +467,6 @@ void PetriNet::reduce_series_places()
  * place can be removed. Furthermore the in and outgoing arcs have to have
  * the same weight. (precondition 3).
  *
- * \image html ra2.png
- *
  * \todo
  *       - Overwork the preconditions and postconditions.
  *       - Re-organize the storing and removing of nodes.
@@ -503,12 +483,12 @@ void PetriNet::reduce_series_transitions()
   // iterate the places
   for (set<Place*>::iterator p = P.begin(); p != P.end(); p++)
   {
-    if ((postset(*p).size() == 1) && (preset(*p).size() == 1)) // precondition 1
+    if (((*p)->postset.size() == 1) && ((*p)->preset.size() == 1)) // precondition 1
     {
-      Transition* t1 = static_cast<Transition*>(*(preset(*p).begin()));
-      Transition* t2 = static_cast<Transition*>(*(postset(*p).begin()));
+      Transition* t1 = static_cast<Transition*>(*((*p)->preset.begin()));
+      Transition* t2 = static_cast<Transition*>(*((*p)->postset.begin()));
 
-      if ((preset(t2).size() == 1) && // precondition 2
+      if (((t2)->preset.size() == 1) && // precondition 2
           (arc_weight(t1, *p) == arc_weight(*p, t2))) // precondition 5
       {
 	string id1 = *(t1->history.begin());
@@ -573,8 +553,8 @@ unsigned int PetriNet::reduce_self_loop_places()
   // find places fulfilling the preconditions
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
     if ((*p)->tokens > 0)
-      if (postset(*p).size() == 1 && preset(*p).size() == 1)
-	if (preset(*p) == postset(*p))
+      if ((*p)->postset.size() == 1 && (*p)->preset.size() == 1)
+	if ((*p)->preset == (*p)->postset)
 	  self_loop_places.push_back(*p);
 
   // remove useless places
@@ -620,8 +600,8 @@ unsigned int PetriNet::reduce_self_loop_transitions()
 
   // find transitions fulfilling the preconditions
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
-    if (postset(*t).size() == 1 && preset(*t).size() == 1)
-      if (preset(*t) == postset(*t))
+    if ((*t)->postset.size() == 1 && (*t)->preset.size() == 1)
+      if ((*t)->preset == (*t)->postset)
 	self_loop_transitions.push_back(*t);
 
   // remove useless transitions
@@ -638,6 +618,9 @@ unsigned int PetriNet::reduce_self_loop_transitions()
 }
 
 
+
+
+
 /*!
  * \brief Elimination of equal places (RD1):
  *
@@ -649,6 +632,9 @@ unsigned int PetriNet::reduce_self_loop_transitions()
  *
  * Added precondition 0, which ensures that the place which is going to be removed is not an input
  * place.
+ *
+ * \todo Znamirowski: Overwork this function! For example, "preSet1" is not used in the first for-loop!
+ * \todo Use members "preset" and "postset" instead of functions.
  */
 void PetriNet::reduce_equal_places()
 {

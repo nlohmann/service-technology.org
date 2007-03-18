@@ -31,13 +31,13 @@
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/03/18 19:04:25 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.136 $
+ * \version \$Revision: 1.137 $
  *
  * \ingroup petrinet
  */
@@ -78,11 +78,11 @@ using std::ostream;
  *****************************************************************************/
 
 /*!
- * \brief place and transition types
+ * \brief   place and transition types
  *
- * Enumeration of the possible types of a place or transition, i.e. whether
- * a place or transition is internal, receives a message, sends a message or
- * both.
+ *          Enumeration of the possible types of a place or transition, i.e.
+ *          whether a place or transition is internal, receives a message,
+ *          sends a message or both.
  *
  * \ingroup petrinet
  */
@@ -99,10 +99,11 @@ typedef enum
 
 
 /*!
- * \brief arc types
+ * \brief   arc types
  *
- * Enumeration of the possible types of an arc, i.e. whether it is a standard
- * arc or a read arc. The latter will be "unfolded" to a loop.
+ *          Enumeration of the possible types of an arc, i.e. whether it is a
+ *          standard arc or a read arc. The latter will be "unfolded" to a
+ *          loop.
  *
  * \ingroup petrinet
  */
@@ -117,10 +118,10 @@ typedef enum
 
 
 /*!
- * \brief node types
+ * \brief   node types
  *
- * Enumeration of the possible types of a node, i.e. whether it is a place or
- * a transition.
+ *          Enumeration of the possible types of a node, i.e. whether it is a
+ *          place or a transition.
  *
  * \ingroup petrinet
  */
@@ -135,9 +136,9 @@ typedef enum
 
 
 /*!
- * \brief file formats
+ * \brief   file formats
  *
- * Enumeration of the possible output file formats.
+ *          Enumeration of the possible output file formats.
  *
  * \ingroup petrinet
  */
@@ -163,11 +164,11 @@ typedef enum
  *****************************************************************************/
 
 /*!
- * \brief unspecified Petri net nodes
+ * \brief   unspecified Petri net nodes
  *
- * Class to represent nodes (i.e. places and transitions) of Petri nets. Each
- * node has an id and a history (i.e. the list of roles the node had during
- * the processing of a BPEL-file).
+ *          Class to represent nodes (i.e. places and transitions) of Petri
+ *          nets. Each node has an id and a history (i.e. the list of roles the
+ *          node had during the processing of a BPEL-file).
  *
  * \ingroup petrinet
 */
@@ -187,6 +188,7 @@ class Node
     /// type of node as defined in #communication_type
     communication_type type;
     
+    /// destructor
     virtual ~Node();
 
   protected:
@@ -201,6 +203,12 @@ class Node
 
     /// an additional prefix for the name in order to distinguish nodes of different nets
     string prefix;
+
+    /// the preset of this node
+    set<Node*> preset;
+
+    /// the postset of this node
+    set<Node*> postset;
 
 
     /// true if first role contains role
@@ -230,10 +238,10 @@ class Node
 
 
 /*!
- * \brief transitions of the Petri net
+ * \brief   transitions of the Petri net
  *
- * Class to represent transitions of Petri nets. Each transition inherits the
- * functions and variables from class #Node.
+ *          Class to represent transitions of Petri nets. Each transition
+ *          inherits the functions and variables from class #Node.
  *
  * \ingroup petrinet
 */
@@ -257,6 +265,7 @@ class Transition: public Node
     Transition(unsigned int id, string role);
 
   public:
+    /// destructor
     virtual ~Transition();
 };
 
@@ -268,17 +277,18 @@ class Transition: public Node
 
 
 /*!
- * \brief places of the Petri net
+ * \brief   places of the Petri net
  *
- * Class to represent places of Petri nets. In addition to the inherited
- * functions and variables from class #Node, each place has a type defined in
- * the enumeration #communication_type and an initial marking.
+ *          Class to represent places of Petri nets. In addition to the
+ *          inherited functions and variables from class #Node, each place has
+ *          a type defined in the enumeration #communication_type and an
+ *          initial marking.
+ *
+ * \ingroup petrinet
  *
  * \todo
  *       - Make nodeShortName() private.
- *       - isFinal should allow more than one token
- *
- * \ingroup petrinet
+ *       - #isFinal should allow more than one token.
 */
 
 class Place: public Node
@@ -302,10 +312,8 @@ class Place: public Node
     /// create a place and add a first role to the history
     Place(unsigned int id, string role, communication_type type);
 
-    // Copy constructor for deep copying
-    // Place(Place&);
-
   public:
+    /// destructor
     virtual ~Place();
 
     /// mark the place
@@ -326,10 +334,10 @@ class Place: public Node
 
 
 /*!
- * \brief arcs of the Petri net
+ * \brief   arcs of the Petri net
  *
- * Class to represent arcs of Petri nets. An arc written as a tupel (n1,n2)
- * has n1 as #source and n2 as #target.
+ *          Class to represent arcs of Petri nets. An arc written as a tupel
+ *          (n1,n2) has n1 as #source and n2 as #target.
  *
  * \ingroup petrinet
 */
@@ -357,6 +365,10 @@ class Arc
 
     /// create an arc with a given weight
     Arc(Node *source, Node *target, unsigned int weight = 1);
+
+  public:
+    /// destructor
+    virtual ~Arc();
 };
 
 
@@ -367,11 +379,11 @@ class Arc
 
 
 /*!
- * \brief A Petri net
+ * \brief   A Petri net
  *
- * Class to represent Petri nets. The net is consists of places of class
- * #Place, transitions of class #Transition and arcs of class #Arc. The sets
- * are saved in three lists #P, #T and #F.
+ *          Class to represent Petri nets. The net is consists of places of
+ *          class #Place, transitions of class #Transition and arcs of class
+ *          #Arc. The sets are saved in three lists #P, #T and #F.
  *
  * \ingroup petrinet
  */
@@ -412,13 +424,13 @@ class PetriNet
     void mergeParallelTransitions(Transition *t1, Transition *t2);
 
     /// finds place given a role
-    Place* findPlace(string role);
+    Place* findPlace(string role) const;
 
     /// finds place given an id with a role
-    Place* findPlace(unsigned int id, string role);
+    Place* findPlace(unsigned int id, string role) const;
 
     /// finds transition given a role
-    Transition* findTransition(string role);
+    Transition* findTransition(string role) const;
 
     /// returns a set of all final places
     set< Place * > getFinalPlaces() const;
@@ -496,6 +508,7 @@ class PetriNet
 
     /// returns true if all arcs connecting to n have a weight of 1
     bool sameweights(Node *n) const;
+
 
     /// APNN (Abstract Petri Net Notation) output
     void output_apnn(ostream *output) const;
@@ -594,6 +607,8 @@ class PetriNet
 
 
 #endif
+
+
 
 
 

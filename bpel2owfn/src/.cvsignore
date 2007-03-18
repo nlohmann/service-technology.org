@@ -1,6 +1,8 @@
 .deps
+.timestamp
 doc
 stamp-h1
+Doxyfile
 Makefile
 Makefile.in
 bpel2owfn.h

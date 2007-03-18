@@ -30,13 +30,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/03/18 19:04:25 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.83 $
+ * \version \$Revision: 1.84 $
  *
  * \ingroup petrinet
  */
@@ -698,12 +698,9 @@ void PetriNet::output_ina(ostream *output) const
   {
     (*output) << setw(3) << (*p)->id << " " << (*p)->tokens << "     ";
 
-    set<Node*> pre = preset(*p);
-    set<Node*> post = postset(*p);
-
-    for (set<Node*>::iterator t = pre.begin(); t != pre.end(); t++)
+    for (set<Node*>::iterator t = (*p)->preset.begin(); t != (*p)->preset.end(); t++)
     {
-      if (t != pre.begin())
+      if (t != (*p)->preset.begin())
 	(*output) << " ";
       
       (*output) << (*t)->id << ":" << arc_weight(*t, *p);
@@ -711,9 +708,9 @@ void PetriNet::output_ina(ostream *output) const
 
     (*output) << ", ";
 
-    for (set<Node*>::iterator t = post.begin(); t != post.end(); t++)
+    for (set<Node*>::iterator t = (*p)->postset.begin(); t != (*p)->postset.end(); t++)
     {
-      if (t != post.begin())
+      if (t != (*p)->postset.begin())
 	(*output) << " ";
       
       (*output) << (*t)->id << ":" << arc_weight(*p, *t);
@@ -789,18 +786,16 @@ void PetriNet::output_spin(ostream *output) const
   // transitions
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
   {
-    set<Node*> pre = preset(*t);
-    set<Node*> post = postset(*t);
     int follower=0;
     (*output) << "\t::atomic { (";
     
-    if (pre.empty())
+    if ((*t)->preset.empty())
     {
       (*output) << "0";
     }
     else
     {
-      for (set<Node *>::iterator p = pre.begin(); p != pre.end(); p++)
+      for (set<Node *>::iterator p = (*t)->preset.begin(); p != (*t)->preset.end(); p++)
       {
         if(follower) 
         {
@@ -816,14 +811,14 @@ void PetriNet::output_spin(ostream *output) const
 
     (*output) << ") -> ";
   
-    for (set<Node *>::iterator p = pre.begin(); p != pre.end(); p++)
+    for (set<Node *>::iterator p = (*t)->preset.begin(); p != (*t)->preset.end(); p++)
     {
       (*output) << "p" << (*p)->id << "=p" << (*p)->id << "-" << arc_weight(*p,*t) << ";";
     }
 
     (*output) << endl << "\t\t\t";
     
-    for (set<Node *>::iterator p = post.begin(); p != post.end(); p++)
+    for (set<Node *>::iterator p = (*t)->postset.begin(); p != (*t)->postset.end(); p++)
     {
       (*output) << "p" << (*p)->id << "=p" << (*p)->id << "+" << arc_weight(*t,*p) << ";";
     }
@@ -943,15 +938,11 @@ void PetriNet::output_lola(ostream *output) const
   // transitions
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
   {
-    (*output) << "TRANSITION " << (*t)->nodeShortName();
-
-    (*output) << endl;
-    set<Node *> consume = preset(*t);
-    set<Node *> produce = postset(*t);
+    (*output) << "TRANSITION " << (*t)->nodeShortName() << endl;
     
     (*output) << "CONSUME" << endl;
     count = 1;
-    for (set<Node *>::iterator pre = consume.begin(); pre != consume.end(); count++, pre++)
+    for (set<Node *>::iterator pre = (*t)->preset.begin(); pre != (*t)->preset.end(); count++, pre++)
     {
       // ignore input places
       if ( (*pre)->nodeType == PLACE )
@@ -960,14 +951,14 @@ void PetriNet::output_lola(ostream *output) const
 
       (*output) << "  " << (*pre)->nodeShortName() << ":\t" << arc_weight(*pre, *t);
 
-      if (count < consume.size())
+      if (count < (*t)->preset.size())
 	(*output) << "," << endl;
     }
     (*output) << ";" << endl;
     
     (*output) << "PRODUCE" << endl;
     count = 1;
-    for (set<Node *>::iterator post = produce.begin(); post != produce.end(); count++, post++)
+    for (set<Node *>::iterator post = (*t)->postset.begin(); post != (*t)->postset.end(); count++, post++)
     {
       // ignore output places
       if ( (*post)->nodeType == PLACE )
@@ -976,7 +967,7 @@ void PetriNet::output_lola(ostream *output) const
 
       (*output) << "  " << (*post)->nodeShortName() << ":\t" << arc_weight(*t, *post);
 
-      if (count < produce.size())
+      if (count < (*t)->postset.size())
 	(*output) << "," << endl;
     }
     
@@ -1140,12 +1131,9 @@ void PetriNet::output_owfn(ostream *output) const
       case(INOUT):	(*output) << " { input/output }" << endl; break;
     }
 
-    set<Node *> consume = preset(*t);
-    set<Node *> produce = postset(*t);
-    
     (*output) << "  CONSUME ";
     count = 1;
-    for (set<Node *>::iterator pre = consume.begin(); pre != consume.end(); count++, pre++)
+    for (set<Node *>::iterator pre = (*t)->preset.begin(); pre != (*t)->preset.end(); count++, pre++)
     {
 #ifdef USING_BPEL2OWFN
       (*output) << (*pre)->nodeShortName();
@@ -1155,7 +1143,7 @@ void PetriNet::output_owfn(ostream *output) const
       if (arc_weight(*pre, *t) != 1)
 	(*output) << ":" << arc_weight(*pre, *t);
 
-      if (count < consume.size())
+      if (count < (*t)->preset.size())
 	(*output) << ", ";
     }
     (*output) << ";" << endl;
@@ -1163,7 +1151,7 @@ void PetriNet::output_owfn(ostream *output) const
     (*output) << "  PRODUCE ";
 
     count = 1;
-    for (set<Node *>::iterator post = produce.begin(); post != produce.end(); count++, post++)
+    for (set<Node *>::iterator post = (*t)->postset.begin(); post != (*t)->postset.end(); count++, post++)
     {
 #ifdef USING_BPEL2OWFN
       (*output) << (*post)->nodeShortName();
@@ -1173,7 +1161,7 @@ void PetriNet::output_owfn(ostream *output) const
       if (arc_weight(*t, *post) != 1)
 	(*output) << ":" << arc_weight(*t, *post);
       
-      if (count < produce.size())
+      if (count < (*t)->postset.size())
 	(*output) << ", ";
     }
     

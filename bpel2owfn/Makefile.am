@@ -19,8 +19,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/16 07:17:16 $ by $Author: nielslohmann $
-# Version $Revision: 1.52 $
+# File last changed $Date: 2007/03/18 19:17:10 $ by $Author: nielslohmann $
+# Version $Revision: 1.53 $
 
 # Where else are Makefiles?
 SUBDIRS = src tests doc rpm
@@ -66,9 +66,8 @@ hu-prepare: maintainer-clean
 	-rm -f doc/version.texi
 	-rm -f doc/Makefile.in
 	-rm -f src/Makefile.in
-	-rm -f src/Doxyfile
-	-rm -f -r src/.deps
 	-rm -f src/bpel2owfn.h.in
+	-rm -f -r src/.deps
 	-rm -f tests/Makefile.in
 	-rm -f rpm/Makefile.in	
 	find -type d -exec chmod 755 {} \;

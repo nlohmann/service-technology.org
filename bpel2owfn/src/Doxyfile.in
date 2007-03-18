@@ -1,4 +1,4 @@
-# Doxyfile 1.5.0
+# Doxyfile 1.5.1
 
 #############################################################################
 # Copyright (C) 2005, 2006, 2007 Niels Lohmann                              #
@@ -20,8 +20,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/16 07:17:16 $ by $Author: nielslohmann $.
-# Version $Revision: 1.1 $
+# File last changed $Date: 2007/03/18 21:43:34 $ by $Author: nielslohmann $.
+# Version $Revision: 1.2 $
 
 #---------------------------------------------------------------------------
 # Project related configuration options
@@ -31,7 +31,7 @@ PROJECT_NUMBER         = "Version @PACKAGE_VERSION@"
 OUTPUT_DIRECTORY       = doc
 CREATE_SUBDIRS         = NO
 OUTPUT_LANGUAGE        = English
-USE_WINDOWS_ENCODING   = YES
+USE_WINDOWS_ENCODING   = NO
 BRIEF_MEMBER_DESC      = YES
 REPEAT_BRIEF           = YES
 ABBREVIATE_BRIEF       = "The $name class" \
@@ -58,7 +58,7 @@ INHERIT_DOCS           = YES
 SEPARATE_MEMBER_PAGES  = YES
 TAB_SIZE               = 8
 ALIASES                = 
-OPTIMIZE_OUTPUT_FOR_C  = YES
+OPTIMIZE_OUTPUT_FOR_C  = NO
 OPTIMIZE_OUTPUT_JAVA   = NO
 BUILTIN_STL_SUPPORT    = NO
 DISTRIBUTE_GROUP_DOC   = NO

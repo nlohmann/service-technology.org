@@ -67,7 +67,7 @@ std::string toString(int x)
     //os << x << std::ends;
     //std::string s(os.str());
     //return s;
-    
+
     // C-like:
     char s[40];
     sprintf(s, "%d", x);
@@ -75,14 +75,14 @@ std::string toString(int x)
 }
 
 LogInfo::LogInfo() :
-    type(), filepos(), allocCallCount(0), deallocCallCount(0), allocated_mem(0),
+    allocCallCount(0), deallocCallCount(0), allocated_mem(0),
     peak_allocated_mem(0)
 {
 }
 
 LogInfo::LogInfo(const string& type_, const string& filepos_) :
-    type(type_), filepos(filepos_), allocCallCount(0), deallocCallCount(0),
-    allocated_mem(0), peak_allocated_mem(0)
+    allocCallCount(0), deallocCallCount(0), allocated_mem(0),
+    peak_allocated_mem(0), type(type_), filepos(filepos_)
 {
 }
 
@@ -132,8 +132,8 @@ bool LogInfo::compare_by_peakmem(const LogInfo* lhs, const LogInfo* rhs)
 }
 
 TypeLogInfo::TypeLogInfo() :
-    type(), allocCallCount(0), deallocCallCount(0), peak_allocated_mem(0),
-    allocated_mem(0)
+    allocCallCount(0), deallocCallCount(0), allocated_mem(0),
+    peak_allocated_mem(0)
 {
 }
 
@@ -201,7 +201,7 @@ void NewLogger::logAllocation(std::string type, std::string filepos,
     {
         log[key] = new LogInfo(type, filepos);
     }
-    
+
     log[key]->logAllocation(size);
 
     if (pointerLog.find(pointer) != pointerLog.end())
@@ -234,7 +234,7 @@ void NewLogger::logDeallocation(const void* pointer)
     // a pointer for which we have no log information.
     if (pointerLog.find(pointer) == pointerLog.end())
         return;
-    
+
     PointerInfo pinfo = pointerLog.find(pointer)->second;
     pinfo.logDeallocation();
     pointerLog.erase(pointer);
@@ -286,17 +286,17 @@ void NewLogger::printall_by_typesize()
 
     format.filepos_length =
         max(table_head1_filepos.size(), table_head2_filepos.size());
-    
+
     format.callcount_length =
         max(table_head1_callcount.size(), table_head2_callcount.size());
 
     format.allocated_mem_length =
         max(table_head1_mem.size(), table_head2_mem.size());
-    
+
     // Needed to determine column widths for callcount and memory column.
     size_t max_callcount     = 0;
     size_t max_allocated_mem = 0;
-    
+
     // We use a multiset to sort memory allocation info by memory allocated.
     typedef bool (*log_by_size_compare_t)(const LogInfo*, const LogInfo*);
     typedef multiset<LogInfo*, log_by_size_compare_t> log_by_size_t;
@@ -310,10 +310,10 @@ void NewLogger::printall_by_typesize()
 
     // Saves total number of allocation calls.
     size_t total_alloccallcount = 0;
-    
+
     // Saves total number of deallocation calls.
     size_t total_dealloccallcount = 0;
-    
+
     // determine allocated memory per type and sort by size (descending)
     typedef std::map<std::string, TypeLogInfo> typelog_t;
     typelog_t typelog;
@@ -329,18 +329,18 @@ void NewLogger::printall_by_typesize()
 
         format.filepos_length =
             max(iter->second->filepos.size(), format.filepos_length);
-        
+
         typelog[iter->second->type].type = iter->second->type;
 
         typelog[iter->second->type].peak_allocated_mem +=
             iter->second->getPeakAllocatedMem();
-       
+
         typelog[iter->second->type].allocated_mem +=
             iter->second->getAllocatedMem();
-       
+
         typelog[iter->second->type].allocCallCount +=
             iter->second->getAllocCallCount();
-        
+
         typelog[iter->second->type].deallocCallCount +=
             iter->second->getDeallocCallCount();
     }
@@ -348,21 +348,21 @@ void NewLogger::printall_by_typesize()
     // Another multimap to sort per type memory allocation info by size.
     typedef bool (*typelog_by_size_compare_t)(const TypeLogInfo&,
         const TypeLogInfo&);
-    
+
     typedef multiset<TypeLogInfo, typelog_by_size_compare_t> typelog_by_size_t;
     typelog_by_size_t typelog_by_size(&TypeLogInfo::compare_by_peakmem);
-    
+
     for (typelog_t::const_iterator iter = typelog.begin();
         iter != typelog.end(); ++iter)
     {
         typelog_by_size.insert(iter->second);
-        
+
         format.type_length = max(iter->second.type.size(), format.type_length);
         max_callcount      = max(max_callcount, iter->second.allocCallCount);
         max_allocated_mem  = max(max_allocated_mem,
             iter->second.peak_allocated_mem);
     }
-    
+
     // determine space needed for call count column
     format.callcount_length =
         max((size_t)floor(log10((double) max_callcount)) + 1, format.callcount_length);
@@ -381,7 +381,7 @@ void NewLogger::printall_by_typesize()
     printReportRow(table_head2_type, table_head2_filepos, table_head2_callcount,
         table_head2_mem, format);
     printReportDoubleLine(format);
-    
+
 
     // For each type ...
     for (typelog_by_size_t::const_reverse_iterator typeiter =
@@ -391,11 +391,11 @@ void NewLogger::printall_by_typesize()
         // Print summary for current type.
         string print_type = typeiter->type.size() != 0 ?
                                  typeiter->type : table_type_no_type;
-        
+
         printReportRow(print_type, "total", typeiter->allocCallCount,
             typeiter->deallocCallCount, typeiter->peak_allocated_mem,
             typeiter->allocated_mem, format);
-        
+
         std::string current_type = typeiter->type;
 
         // Print "file:line"-entries for current type

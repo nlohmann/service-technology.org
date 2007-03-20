@@ -38,25 +38,27 @@
 const std::string CommGraphFormulaAssignment::TAU = std::string("tau");
 const std::string CommGraphFormulaAssignment::FINAL = std::string("final");
 
-void CommGraphFormulaAssignment::set(const std::string& label, bool value) {
-    label2bool[label] = value;
+void CommGraphFormulaAssignment::set(const std::string& literal, bool value) {
+    literal2bool[literal] = value;
 }
 
-void CommGraphFormulaAssignment::setToTrue(const std::string& label) {
-    set(label, true);
+void CommGraphFormulaAssignment::setToTrue(const std::string& literal) {
+    set(literal, true);
 }
 
-bool CommGraphFormulaAssignment::get(const std::string& label) const {
-    label2bool_t::const_iterator label2bool_iter = label2bool.find(label);
+bool CommGraphFormulaAssignment::get(const std::string& literal) const {
+    literal2bool_t::const_iterator literal2bool_iter = literal2bool.find(literal);
 
-    if (label2bool_iter == label2bool.end())
+    if (literal2bool_iter == literal2bool.end())
         return false;
 
-    return label2bool_iter->second;
+    return literal2bool_iter->second;
 }
 
-bool CommGraphFormula::satisfies(const CommGraphFormulaAssignment& assignment) const {
-    return value(assignment) == true;
+bool CommGraphFormula::satisfies(const CommGraphFormulaAssignment& assignment)
+    const
+{
+    return value(assignment);
 }
 
 CommGraphFormulaMultiary::CommGraphFormulaMultiary(CommGraphFormula* lhs,
@@ -174,18 +176,18 @@ CommGraphFormulaFalse::CommGraphFormulaFalse() :
 {
 }
 
-CommGraphFormulaProposition::CommGraphFormulaProposition(
-    const std::string& proposition_) : proposition(proposition_)
+CommGraphFormulaLiteral::CommGraphFormulaLiteral(const std::string& literal_) :
+    literal(literal_)
 {
 }
 
-bool CommGraphFormulaProposition::value(
+bool CommGraphFormulaLiteral::value(
     const CommGraphFormulaAssignment& assignment) const
 {
-    return assignment.get(proposition);
+    return assignment.get(literal);
 }
 
-std::string CommGraphFormulaProposition::asString() const
+std::string CommGraphFormulaLiteral::asString() const
 {
-    return proposition;
+    return literal;
 }

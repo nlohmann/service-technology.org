@@ -154,7 +154,7 @@ formula: lpar formula rpar
     }
 | ident
     {
-        $$ = new CommGraphFormulaProposition($1);
+        $$ = new CommGraphFormulaLiteral($1);
         free($1);
     }
 ;

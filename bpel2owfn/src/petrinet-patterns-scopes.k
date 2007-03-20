@@ -27,11 +27,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  * 
  * \since   2006-11-29
  *
- * \date    \$Date: 2007/03/18 21:23:07 $
+ * \date    \$Date: 2007/03/20 14:08:28 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -40,7 +40,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.35 $
+ * \version \$Revision: 1.36 $
  */
 %}
 
@@ -220,6 +220,7 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
           Place *p15 = PN.newPlace(prefix + "eh_start");
           Place *p16 = PN.newPlace(prefix + "eh_active");
           Place *p17 = PN.newPlace(prefix + "eh_disabling");
+          Place *p20 = PN.newPlace(prefix + "eh_disabled");
           Place *p18 = PN.newPlace(prefix + "eh_stopped");
           Place *p19 = PN.newPlace(prefix + "ia_final");
 
@@ -227,6 +228,11 @@ void PProcess(impl_tProcess* abstract_phylum, uview current_view)
           PN.newArc(p19, t11);
           PN.newArc(p16, t11);
           PN.newArc(t11, p17);
+
+          Transition *t12 = PN.newTransition(prefix + "eh_finalize");
+          PN.newArc(p19, t12);
+          PN.newArc(p20, t12);
+          PN.newArc(t12, p12);
 
           // Unparse and embed the event handlers.
 	  phylum->tEventHandlers_1->unparse(pseudoPrinter, current_view);
@@ -490,19 +496,25 @@ void PScope(impl_tScope* abstract_phylum, uview current_view)
           Place *p25 = PN.newPlace(prefix + "eh_start");
           Place *p26 = PN.newPlace(prefix + "eh_active");
           Place *p27 = PN.newPlace(prefix + "eh_disabling");
+          Place *p30 = PN.newPlace(prefix + "eh_disabled");
           Place *p28 = PN.newPlace(prefix + "eh_stopped");
           Place *p29 = PN.newPlace(prefix + "ia_final");
 
           Transition *t14 = PN.newTransition(prefix + "disable_eh");
-          PN.newArc(p29, t14);
+          PN.newArc(p29, t14, READ);
           PN.newArc(p26, t14);
           PN.newArc(t14, p27);
+
+          Transition *t15 = PN.newTransition(prefix + "eh_finalize");
+          PN.newArc(p29, t15);
+          PN.newArc(p30, t15);
+          PN.newArc(t15, p15);
 
           // Unparse and embed the event handlers.
 	  phylum->tEventHandlers_1->unparse(pseudoPrinter, current_view);
           PN.mergePlaces((prefix + "eha_initial"),  (toString(phylum->tEventHandlers_1->id) + ".initial"));
           PN.mergePlaces((prefix + "stop"),         (toString(phylum->tEventHandlers_1->id) + ".stop"));
-          PN.mergePlaces((prefix + "eha_final"),    (toString(phylum->tEventHandlers_1->id) + ".disabled"));
+          PN.mergePlaces((prefix + "eh_disabled"),    (toString(phylum->tEventHandlers_1->id) + ".disabled"));
           PN.mergePlaces((prefix + "eh_start"),     (toString(phylum->tEventHandlers_1->id) + ".start"));
           PN.mergePlaces((prefix + "eh_active"),    (toString(phylum->tEventHandlers_1->id) + ".active"));
           PN.mergePlaces((prefix + "eh_disabling"), (toString(phylum->tEventHandlers_1->id) + ".disabling"));

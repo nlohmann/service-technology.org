@@ -37,6 +37,7 @@
 #include "vertex.h"
 #include "CNF.h"
 #include "cnf_formula.h" // needed in vertex::getCNF()
+#include <cassert>
 
 //! \fn vertex::vertex(int numberEvents)
 //! \param numberEvents the number of events that have to be processed from this node

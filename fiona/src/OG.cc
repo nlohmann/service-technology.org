@@ -98,9 +98,6 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 	// get the annotation of the node (CNF)
 	computeCNF(currentNode);					// calculate CNF of this node
 	
-	cout << "returned from computeCNF: " << currentNode->getCNF_formula()->asString() << endl;
-	
-
 	trace(TRACE_1, "=================================================================\n");
 
 //	double your_progress = progress_plus * (1 / double(PN->getInputPlaceCnt() + PN->getOutputPlaceCnt()));
@@ -255,7 +252,11 @@ void operatingGuidelines::computeCNF(vertex* node) {
 				literal * myFirstLiteral = new literal();
 				CommGraphFormulaMultiaryOr* myclause = new CommGraphFormulaMultiaryOr();
 				
-				cout << "\n\t a new clause was generated: " << myclause->asString() << endl;
+				// in case of a final state we add special literal "final" to the clause
+				if ((*iter)->type == FINALSTATE) {
+					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteralFinal();
+					myclause->addSubFormula(myliteral);
+				}
 				
 				// get the activated output events
 				for (unsigned int i = 0; i < PN->placeOutputCnt; i++) {
@@ -276,8 +277,6 @@ void operatingGuidelines::computeCNF(vertex* node) {
 				}
 
 				node->addClause(myFirstLiteral, (*iter)->type == FINALSTATE);
-
-				cout << "\n\t building clause finished: " << myclause->asString() << endl;
 				node->addClause(myclause);
 			}
 		}
@@ -297,10 +296,14 @@ void operatingGuidelines::computeCNF(vertex* node) {
 							
 				// this clause's first literal
 				literal * myFirstLiteral = new literal();
-				
 				CommGraphFormulaMultiaryOr* myclause = new CommGraphFormulaMultiaryOr();
-				cout << "\n\t a new clause was generated: " << myclause->asString() << endl;
 
+				// in case of a final state we add special literal "final" to the clause
+				if ((*iter)->type == FINALSTATE) {
+					CommGraphFormulaLiteral* myliteral = new CommGraphFormulaLiteralFinal();
+					myclause->addSubFormula(myliteral);
+				}
+				
 				// get the activated output events
 				for (unsigned int i = 0; i < PN->placeOutputCnt; i++) {
 					if (PN->CurrentMarking[PN->outputPlacesArray[i]->index] > 0) {
@@ -320,12 +323,7 @@ void operatingGuidelines::computeCNF(vertex* node) {
 				}
 				
 				node->addClause(myFirstLiteral, (*iter)->type == FINALSTATE);
-
-				cout << "\n\t building clause finished: " << myclause->asString() << endl;
-
-				cout << "annotation before: " << node->getCNF_formula()->asString() << endl;
 				node->addClause(myclause);
-				cout << "annotation afterwards: " << node->getCNF_formula()->asString() << endl;
 				
 				// TODO: an dieser stelle prüfen, ob myclause false ist -> dann knoten rot machen
 			}

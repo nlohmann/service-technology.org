@@ -81,6 +81,9 @@ vertex::~vertex() {
 	CNF * cnfTemp1 = firstClause;
 	CNF * cnfTemp2;
 	
+	delete annotation;
+	
+	
 	while (cnfTemp1) {
 		cnfTemp2 = cnfTemp1->nextElement;
 		delete cnfTemp1;	

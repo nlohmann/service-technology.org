@@ -56,7 +56,7 @@ private:
 
 public:
     /**
-     * Reverved literal TAU is used for edges in OGs denoting internal steps.
+     * Reserved literal TAU is used for edges in OGs denoting internal steps.
      */
     static const std::string TAU;
 
@@ -331,6 +331,17 @@ private:
     /** The string representation of this literal. */
     std::string literal;
 public:
+	/**
+     * Reserved literal TAU is used for edges in OGs denoting internal steps.
+     */
+    static const std::string TAU_L;
+
+    /**
+     * Reserved literal FINAL is used notations of nodes in OGs to denote
+     * possible final states.
+     */
+    static const std::string FINAL_L;
+
     /**
      * Constructs a literal with the given string representation.
      * @param literal String representation of this literal.
@@ -341,4 +352,39 @@ public:
     virtual std::string asString() const;
 };
 
+/**
+ * A special literal FINAL.
+ */
+class CommGraphFormulaLiteralFinal : public CommGraphFormulaLiteral {
+private:
+    /** The string representation of this literal. */
+//    std::string literal;
+public:
+    /**
+     * Constructs a literal with the given string representation.
+     * @param literal String representation of this literal.
+     */
+    CommGraphFormulaLiteralFinal();
+    virtual ~CommGraphFormulaLiteralFinal() {};
+//    virtual bool value(const CommGraphFormulaAssignment& assignment) const;
+//    virtual std::string asString() const;
+};
+
+/**
+ * A special literal TAU.
+ */
+class CommGraphFormulaLiteralTau : public CommGraphFormulaLiteral {
+private:
+    /** The string representation of this literal. */
+//    std::string literal;
+public:
+    /**
+     * Constructs a literal with the given string representation.
+     * @param literal String representation of this literal.
+     */
+    CommGraphFormulaLiteralTau();
+    virtual ~CommGraphFormulaLiteralTau() {};
+//    virtual bool value(const CommGraphFormulaAssignment& assignment) const;
+//    virtual std::string asString() const;
+};
 #endif

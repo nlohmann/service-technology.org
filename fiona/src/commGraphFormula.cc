@@ -36,8 +36,11 @@
 #include "debug.h"
 #include <cassert>
 
-const std::string CommGraphFormulaAssignment::TAU = std::string("tau");
 const std::string CommGraphFormulaAssignment::FINAL = std::string("final");
+const std::string CommGraphFormulaAssignment::TAU = std::string("tau");
+const std::string CommGraphFormulaLiteral::FINAL_L = std::string("final");
+const std::string CommGraphFormulaLiteral::TAU_L = std::string("tau");
+
 
 void CommGraphFormulaAssignment::set(const std::string& literal, bool value) {
     literal2bool[literal] = value;
@@ -256,3 +259,16 @@ std::string CommGraphFormulaLiteral::asString() const
 {
     return literal;
 }
+
+
+CommGraphFormulaLiteralFinal::CommGraphFormulaLiteralFinal() :
+    CommGraphFormulaLiteral(CommGraphFormulaLiteral::FINAL_L)
+{
+}
+
+
+CommGraphFormulaLiteralTau::CommGraphFormulaLiteralTau() :
+    CommGraphFormulaLiteral(CommGraphFormulaLiteral::TAU_L)
+{
+}
+

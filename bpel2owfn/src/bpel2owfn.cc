@@ -25,18 +25,18 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005/10/18
  *
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/03/21 17:00:00 $
  *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/forschung/projekte/tools4bpel
  *          for details.
  *
- * \version \$Revision: 1.149 $
+ * \version \$Revision: 1.150 $
  */
 
 
@@ -259,7 +259,7 @@ int main( int argc, char *argv[])
 	    PN.reduce();
 	  }
 
-	  PN.addPrefix(prefix);
+          PN.addPrefix(prefix);
 	  PN2.compose(PN);
 	  PN = PetriNet();
 
@@ -276,7 +276,6 @@ int main( int argc, char *argv[])
 
     file++;
   } while (modus == M_CONSISTENCY && file != inputfiles.end());
-
 
 
   /*

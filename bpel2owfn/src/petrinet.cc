@@ -27,17 +27,17 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005-10-18
  *
- * \date    \$Date: 2007/03/18 19:04:25 $
+ * \date    \$Date: 2007/03/21 17:00:00 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.188 $
+ * \version \$Revision: 1.189 $
  *
  * \ingroup petrinet
  */
@@ -317,6 +317,30 @@ PetriNet::PetriNet() :
  */
 PetriNet::PetriNet(const PetriNet & net)
 {
+  // cleaning up old net
+  for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
+    delete *f;
+
+  for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
+    delete *p;
+
+  for (set<Place *>::iterator p = P_in.begin(); p != P_in.end(); p++)
+    delete *p;
+
+  for (set<Place *>::iterator p = P_out.begin(); p != P_out.end(); p++)
+    delete *p;
+
+  for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
+    delete *t;
+
+  P.clear();
+  P_in.clear();
+  P_out.clear();
+  T.clear();
+  F.clear();
+  roleMap.clear();
+
+
   nextId = 1;
   format = FORMAT_OWFN;
 
@@ -394,6 +418,9 @@ PetriNet::PetriNet(const PetriNet & net)
 PetriNet & PetriNet::operator=(const PetriNet & net)
 {
   // cleaning up old net
+  for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
+    delete *f;
+
   for (set<Place *>::iterator p = P.begin(); p != P.end(); p++)
     delete *p;
 
@@ -406,15 +433,13 @@ PetriNet & PetriNet::operator=(const PetriNet & net)
   for (set<Transition *>::iterator t = T.begin(); t != T.end(); t++)
     delete *t;
 
-  for (set<Arc *>::iterator f = F.begin(); f != F.end(); f++)
-    delete *f;
-
   P.clear();
   P_in.clear();
   P_out.clear();
   T.clear();
   F.clear();
   roleMap.clear();
+
 
   nextId = 1;
   format = FORMAT_OWFN;
@@ -424,6 +449,8 @@ PetriNet & PetriNet::operator=(const PetriNet & net)
   {
     Place * newPlace = new Place( **place );
     newPlace->id = getId();
+    newPlace->preset.clear();
+    newPlace->postset.clear();
     P.insert( newPlace );
 
     roleMap[ newPlace->nodeFullName() ] = newPlace;
@@ -436,6 +463,8 @@ PetriNet & PetriNet::operator=(const PetriNet & net)
   {
     Place * newPlace = new Place( **place );
     newPlace->id = getId();
+    newPlace->preset.clear();
+    newPlace->postset.clear();
     P_in.insert( newPlace );
 
     roleMap[ newPlace->nodeFullName() ] = newPlace;
@@ -448,6 +477,8 @@ PetriNet & PetriNet::operator=(const PetriNet & net)
   {
     Place * newPlace = new Place( **place );
     newPlace->id = getId();
+    newPlace->preset.clear();
+    newPlace->postset.clear();
     P_out.insert( newPlace );
 
     roleMap[ newPlace->nodeFullName() ] = newPlace;
@@ -460,6 +491,8 @@ PetriNet & PetriNet::operator=(const PetriNet & net)
   {
     Transition * newTransition = new Transition( **transition );
     newTransition->id = getId();
+    newTransition->preset.clear();
+    newTransition->postset.clear();
     T.insert( newTransition );
 
     roleMap[ newTransition->nodeFullName() ] = newTransition;
@@ -1303,9 +1336,17 @@ set<Node *> PetriNet::postset(Node *n) const
  * \param   role  the demanded role
  * \return  a pointer to the place or a NULL pointer if the place was not found.
  */
-Place *PetriNet::findPlace(string role) const
+Place *PetriNet::findPlace(string role) 
 {
-  return (static_cast<Place *>(roleMap.find(role)->second));
+  map< std::string, Node* >::iterator p = roleMap.find(role);
+  if (p != roleMap.end() )
+  {
+    return (static_cast<Place *>(p->second));
+  }
+  else
+  {
+    return NULL;
+  }
 }
 
 
@@ -1322,7 +1363,7 @@ Place *PetriNet::findPlace(string role) const
  * \return  a pointer to the place or a NULL pointer if the place was not
  *          found.
  */
-Place *PetriNet::findPlace(unsigned int id, string role) const
+Place *PetriNet::findPlace(unsigned int id, string role)
 {
   return findPlace(toString(id) + role);
 }
@@ -1450,11 +1491,14 @@ void PetriNet::addPrefix(string prefix)
  */
 void PetriNet::compose(PetriNet &net)
 {
+  using namespace std;
   // add all internal places
   for (set< Place * >::iterator place = net.P.begin(); place != net.P.end(); place ++)
   {
     Place * newPlace = new Place( **place );
     newPlace->id = getId();
+    newPlace->preset.clear();
+    newPlace->postset.clear();
     P.insert( newPlace );
 
     roleMap[ newPlace->nodeFullName() ] = newPlace;
@@ -1467,6 +1511,8 @@ void PetriNet::compose(PetriNet &net)
   {
     Place * newPlace = new Place( **place );
     newPlace->id = getId();
+    newPlace->preset.clear();
+    newPlace->postset.clear();
     P_in.insert( newPlace );
 
     roleMap[ newPlace->nodeFullName() ] = newPlace;
@@ -1479,6 +1525,8 @@ void PetriNet::compose(PetriNet &net)
   {
     Place * newPlace = new Place( **place );
     newPlace->id = getId();
+    newPlace->preset.clear();
+    newPlace->postset.clear();
     P_out.insert( newPlace );
 
     roleMap[ newPlace->nodeFullName() ] = newPlace;
@@ -1491,6 +1539,8 @@ void PetriNet::compose(PetriNet &net)
   {
     Transition * newTransition = new Transition( **transition );
     newTransition->id = getId();
+    newTransition->preset.clear();
+    newTransition->postset.clear();
     T.insert( newTransition );
 
     roleMap[ newTransition->nodeFullName() ] = newTransition;
@@ -1518,7 +1568,6 @@ void PetriNet::compose(PetriNet &net)
   for (set< Place * >::iterator place = P_in.begin(); place != P_in.end(); place ++)
   {
     set< Place * >::iterator oPlace = P_out.begin();
-
     bool finished = false;
     while ( ! finished && oPlace != P_out.end())
     {
@@ -1529,14 +1578,16 @@ void PetriNet::compose(PetriNet &net)
 	finished = true;
     }
 
-    if (oPlace != P_out.end())
+   if (finished)
     {
       if ( (*place)->prefix != (*oPlace)->prefix )
       {
         (*place)->type = INTERNAL;
         (*place)->history[0] = (*place)->nodeFullName();
+        roleMap[(*place)->nodeFullName()] = (*place);
         (*oPlace)->type = INTERNAL;
         (*oPlace)->history[0] = (*oPlace)->nodeFullName();
+        roleMap[(*oPlace)->nodeFullName()] = (*oPlace);
         P.insert(*place);
         P.insert(*oPlace);
         mergePlaces((*place)->nodeFullName(), (*oPlace)->nodeFullName());

@@ -35,11 +35,11 @@
  * 
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
- *          last changes of: \$Author: nielslohmann $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2005/11/10
  *
- * \date    \$Date: 2007/03/16 07:17:16 $
+ * \date    \$Date: 2007/03/21 17:00:00 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -49,7 +49,7 @@
  *          frontend-parser.yy.
  *          See http://www.gnu.org/software/bison/bison.html for details
  *
- * \version \$Revision: 1.296 $
+ * \version \$Revision: 1.297 $
  *
  * \ingroup frontend
  *
@@ -312,6 +312,19 @@ tProcess:
       globals::temporaryAttributeMap.clear();
       globals::ASTEmap.clear();
       globals::ASTEid = 1;
+      globals::ASTE_inputChannels.clear();
+      globals::ASTE_outputChannels.clear();
+      globals::ASTE_correlationSetNames.clear();
+      globals::ASTE_variableNames.clear();
+      globals::ASTE_partnerLinkNames.clear();
+      globals::ASTE_linkNames.clear();
+      globals::ASTE_startActivities.clear();
+      globals::ASTE_linkIdMap.clear();
+      globals::ASTE_scopeNames.clear();
+      globals::ASTE_partnerLinks.clear();
+      globals::joinCondition_links.clear();
+      globals::joinCondition_linkStatus.clear();
+      globals::joinCondition_result.clear();
     }
   X_OPEN K_PROCESS arbitraryAttributes X_NEXT tExtensions imports tPartnerLinks
   tPartners tMessageExchanges tVariables tCorrelationSets tFaultHandlers

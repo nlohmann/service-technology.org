@@ -61,7 +61,7 @@ class interactionGraph : public communicationGraph {
 		setOfMessages combineReceivingEvents(vertex *, setOfMessages &);
 		setOfMessages receivingBeforeSending(vertex *);
 
-    	bool terminateBuildingGraph(vertex *);
+    	//bool terminateBuildingGraph(vertex *);
     	
     	void calculateSuccStatesOutputSet(messageMultiSet, vertex *);
     	void calculateSuccStatesInputReduced(messageMultiSet, vertex *);

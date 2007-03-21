@@ -321,6 +321,18 @@ CNF_formula* vertex::getCNF_formula() {
 	return annotation;
 }
 
+void vertex::removeLiteralFromFormula(unsigned int i, edgeType type) {
+	trace(TRACE_5, "vertex::removeLiteralFromFormula(unsigned int i, edgeType type) : start\n");
+	
+	if (type == sending) {
+		cout << "remove literal !" << PN->inputPlacesArray[i]->name << " from annotation of node number " << getNumber() << endl;
+	} else {
+		cout << "remove literal ?" << PN->outputPlacesArray[i]->name << " from annotation of node number " << getNumber() << endl;
+	}
+	
+	trace(TRACE_5, "vertex::removeLiteralFromFormula(unsigned int i, edgeType type) : end\n");
+}
+
 
 //int vertex::numberOfElementsInAnnotation() {
 //	CNF * cl = annotation;
@@ -331,6 +343,7 @@ CNF_formula* vertex::getCNF_formula() {
 //	}
 //	return count;
 //}
+
 
 //! \fn void vertex::setColor(vertexColor c)
 //! \param c color of vertex
@@ -408,14 +421,14 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
 
     trace(TRACE_3, intToString(numberOfVertex) + ": ");
 
-	vertexColor beforeAnalysis = color;
+	vertexColor beforeAnalysis = getColor();
 	
 	finalAnalysisDone = finalAnalysis;
 
-    if (color != RED) {          // red nodes stay red forever
+    if (beforeAnalysis != RED) {          // red nodes stay red forever
         if (reachGraphStateSet.size() == 0) {
             // we analyse an empty node; it becomes blue
-            color = BLUE;
+            setColor(BLUE);
             trace(TRACE_3, "\t\t\t node analysed blue (empty node)");
             trace(TRACE_3, "\t ...terminate\n");
             trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
@@ -440,19 +453,20 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
                     cTmp = cl->calcClauseColor();
                     switch (cTmp) {
                     case RED:   // found a red clause; so node becomes red
-                        if (color == BLACK) {
+                        if (getColor() == BLACK) {
                             // node was black
+                            assert(false);
                             trace(TRACE_3, "node analysed red \t");
-                            color = RED;
-                        } else if (color == RED) {
+                            setColor(RED);
+                        } else if (getColor() == RED) {
                             // this should not be the case!
                             trace(TRACE_3, "analyseNode called when node already red!!!");
-                        } else if (color == BLUE) {
+                        } else if (getColor() == BLUE) {
                             // this should not be the case!
                             trace(TRACE_3, "analyseNode called when node already blue!!!");
                         }
                         trace(TRACE_3, "\t\t ...terminate\n");
-                        color = RED;
+                        setColor(RED);
                         trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
                         if (beforeAnalysis == BLUE) {
 			            	propagateToSuccessors();	
@@ -464,8 +478,10 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
                         c = BLUE;
                         break;
                     case BLACK: // no definite result of state analysis
+                        
+                        assert(false);
                         if (finalAnalysis) {
-                            color = RED;
+                            setColor(RED);
                             trace(TRACE_3, "node analysed red (final analysis)");
                             trace(TRACE_3, "\t ...terminate\n");
                             trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
@@ -475,7 +491,8 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
 				            }
                             return TERMINATE;           // <---------------------???
                         } else {
-                            color = BLACK;
+                        	assert(false);
+                            setColor(BLACK);
                             trace(TRACE_3, "node still indefinite \t\t ...continue\n");
                             trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
                             return CONTINUE;
@@ -483,8 +500,9 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
                         break;
                     }
                 } else {
+                	assert(false);
                     // still events left to resolve deadlocks...
-                    color = BLACK;
+                    setColor(BLACK);
                     trace(TRACE_3, "node still indefinite \t\t ...continue\n");
                     trace(TRACE_5, "vertex::analyseNode(bool finalAnalysis) : end\n");
                     return CONTINUE;
@@ -497,9 +515,11 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
             trace(TRACE_3, "all states checked, node becomes ");
             
             if (c == BLACK && finalState) {
+            	assert(false);
             	c = BLUE;
                 trace(TRACE_3, "blue");
             } else if (c == BLACK && !finalState && finalAnalysis) {
+            	assert(false);
             	c = RED;
                 trace(TRACE_3, "red");
             } else if (c == RED) {
@@ -508,7 +528,7 @@ analysisResult vertex::analyseNode(bool finalAnalysis) {
                 trace(TRACE_3, "blue");
             }
             
-            color = c;
+            setColor(c);
             
             if (beforeAnalysis == BLUE && c == RED) {
             	propagateToSuccessors();	

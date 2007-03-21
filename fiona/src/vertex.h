@@ -125,6 +125,8 @@ public:
     vertexColor getColor();
     void setColor(vertexColor c);
 
+	void removeLiteralFromFormula(unsigned int, edgeType);
+	
     void propagateToSuccessors();
     void propagateToPredecessors();
 

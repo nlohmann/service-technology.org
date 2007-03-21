@@ -131,19 +131,19 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 	trace(TRACE_3, "\t number of states in node: ");
 	trace(TRACE_3, intToString(currentNode->reachGraphStateSet.size()) + "\n");
 
-	if (terminateBuildingGraph(currentNode)) {
-		string color;
-		if (currentNode->getColor() == RED) {
-			color = "RED";
-		} else if (currentNode->getColor() == BLUE) {
-			color = "BLUE";
-		} else {
-			color = "BLACK";
-		}
-
-		trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + " (leaf)\n");	
-		return;
-	}
+//	if (terminateBuildingGraph(currentNode)) {
+//		string color;
+//		if (currentNode->getColor() == RED) {
+//			color = "RED";
+//		} else if (currentNode->getColor() == BLUE) {
+//			color = "BLUE";
+//		} else {
+//			color = "BLACK";
+//		}
+//
+//		trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + " (leaf)\n");	
+//		return;
+//	}
 	
 	trace(TRACE_5, "iterating over inputSet\n");
 	// iterate over all elements of inputSet
@@ -177,8 +177,8 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 			
 					buildGraph(v);
 					trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
-					analyseNode(currentNode, false);
-					trace(TRACE_5, "node analysed\n");
+					//analyseNode(currentNode, false);
+					//trace(TRACE_5, "node analysed\n");
 #ifdef LOOP
 	}
 #endif	
@@ -207,8 +207,8 @@ void interactionGraph::buildGraph(vertex * currentNode) {
 #endif
 				buildGraph(v);
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
-				analyseNode(currentNode, false);
-				trace(TRACE_5, "node analysed\n");
+				//analyseNode(currentNode, false);
+				//trace(TRACE_5, "node analysed\n");
 		
 #ifdef LOOP
 		}
@@ -261,19 +261,19 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 
 	actualDepth++;
 
-	if (terminateBuildingGraph(currentNode)) {
-		string color;
-		if (currentNode->getColor() == RED) {
-			color = "RED";
-		} else if (currentNode->getColor() == BLUE) {
-			color = "BLUE";
-		} else {
-			color = "BLACK";
-		}
-
-		trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + " (leaf)\n");	
-		return;
-	}
+//	if (terminateBuildingGraph(currentNode)) {
+//		string color;
+//		if (currentNode->getColor() == RED) {
+//			color = "RED";
+//		} else if (currentNode->getColor() == BLUE) {
+//			color = "BLUE";
+//		} else {
+//			color = "BLACK";
+//		}
+//
+//		trace(TRACE_1, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + " (leaf)\n");	
+//		return;
+//	}
 
 	trace(TRACE_3, "iterating over inputSet\n");
 	// iterate over all elements of inputSet
@@ -290,8 +290,8 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 			if (AddVertex (v, *iter, sending)) {
 				buildReducedGraph(v);
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
-				analyseNode(currentNode, false);
-				trace(TRACE_5, "node analysed\n");
+				//analyseNode(currentNode, false);
+				//trace(TRACE_5, "node analysed\n");
 			}
 		}
 	}
@@ -312,8 +312,8 @@ void interactionGraph::buildReducedGraph(vertex * currentNode) {
 			if (AddVertex (v, *iter, receiving)) {
 				buildReducedGraph(v);
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
-				analyseNode(currentNode, false);
-				trace(TRACE_5, "node analysed\n");
+				//analyseNode(currentNode, false);
+				//trace(TRACE_5, "node analysed\n");
 			}	
 		}	
 	}
@@ -770,24 +770,24 @@ setOfMessages interactionGraph::receivingBeforeSending(vertex * node) {
    	return inputMessages;   // return the list of activated input messages
 }
 
-//! \fn bool interactionGraph::terminateBuildingGraph(vertex * node) 
-//! \param node the node to be inspected
-//! \brief return true, if building up shall be terminated at the given node, false otherwise 
-bool interactionGraph::terminateBuildingGraph(vertex * node) {
-	
-	if (analyseNode(node, false) == TERMINATE) {
-		trace(TRACE_5, "node analysed\n");
-		return true;
-	}
-//	if (actualDepth > PN->commDepth) {			// we have reached the maximal communication depth
-//		if (node->getColor() != BLUE) {
-//			node->setColor(RED);
-//		}
-//		return true;	
-//	}
-	trace(TRACE_5, "node analysed\n");
-	return false;
-}
+////! \fn bool interactionGraph::terminateBuildingGraph(vertex * node) 
+////! \param node the node to be inspected
+////! \brief return true, if building up shall be terminated at the given node, false otherwise 
+//bool interactionGraph::terminateBuildingGraph(vertex * node) {
+//	
+////	if (analyseNode(node, false) == TERMINATE) {
+////		trace(TRACE_5, "node analysed\n");
+////		return true;
+////	}
+////	if (actualDepth > PN->commDepth) {			// we have reached the maximal communication depth
+////		if (node->getColor() != BLUE) {
+////			node->setColor(RED);
+////		}
+////		return true;	
+////	}
+//	//trace(TRACE_5, "node analysed\n");
+//	return false;
+//}
 
 //! \fn void interactionGraph::calculateSuccStatesOutputSet(messageMultiSet output, vertex * node)
 //! \param output the output messages that are taken from the marking

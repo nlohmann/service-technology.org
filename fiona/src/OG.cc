@@ -119,15 +119,35 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 			
 			calculateSuccStatesOutput(PN->outputPlacesArray[i]->index, currentNode, v);
 			
-			if (v = AddVertex(v, i, receiving)) {
+			// was the new node computed before? 
+			vertex * found = findVertexInSet(v);
+			
+			if (found == NULL) {
 				// node was new, hence going down with receiving event...
-				//buildGraph(v, your_progress);
+				AddVertex(v, i, receiving, true);
+				// buildGraph(v, your_progress);
 				buildGraph(v, 0);
+				
+				if (v->getColor() == RED) {
+					currentNode->removeLiteralFromFormula(i, receiving);
+				}
 
 				trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 //				analyseNode(currentNode, false);
 				actualDepth--;
 			} else {
+				// In case the successor node v was already known, an edge to the old
+				// node is drawn by function AddVertex.
+				AddVertex(found, i, receiving, false);
+				if (found->getColor() == RED) {
+					currentNode->removeLiteralFromFormula(i, receiving);
+				}
+				delete v;
+
+				// Still, if that node was computed red before, the literal
+				// of the edge from currentNode to the old node must be removed in the
+				// annotation of currentNode.
+				
 
 //				addProgress(your_progress);
 //				printProgress();
@@ -137,6 +157,8 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 			trace(TRACE_2, "\t\t\t\t\t  receiving event: ?");
 			trace(TRACE_2, string(PN->outputPlacesArray[i]->name));
 			trace(TRACE_2, " suppressed (max_occurence reached)\n");
+
+			currentNode->removeLiteralFromFormula(i, receiving);
 
 //			addProgress(your_progress);
 //			printProgress();
@@ -175,14 +197,34 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 				
 				delete v;
 			} else {
-				if (v = AddVertex(v, i, sending)) {
+				// if (v = AddVertex(v, i, sending)) {
+				// was the new node computed before? 
+				vertex * found = findVertexInSet(v);
+			
+				if (found == NULL) {
 					// node was new, hence going down with sending event...
+					AddVertex(v, i, sending, true);
 					buildGraph(v, your_progress);
 	
+					if (v->getColor() == RED) {
+						currentNode->removeLiteralFromFormula(i, sending);
+					}
+
 					trace(TRACE_1, "\t\t backtracking to node " + intToString(currentNode->getNumber()) + "\n");
 //					analyseNode(currentNode, false);
 					actualDepth--;
 				} else {
+					// In case the successor node was already known, an edge to the old
+					// node is drawn by function AddVertex.
+					AddVertex(found, i, sending, false);
+
+					// Still, if that node was computed red before, the literal
+					// of the edge from currentNode to the old node must be removed
+					// in the annotation of currentNode.
+					if (found->getColor() == RED) {
+						currentNode->removeLiteralFromFormula(i, sending);
+					}
+					delete v;
 
 					addProgress(your_progress);
 					printProgress();
@@ -193,6 +235,8 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 			trace(TRACE_2, "\t\t\t\t\t    sending event: !");
 			trace(TRACE_2, string(PN->inputPlacesArray[i]->name));
 			trace(TRACE_2, " suppressed (max_occurence reached)\n");
+
+			currentNode->removeLiteralFromFormula(i, sending);
 
 			addProgress(your_progress);
 			printProgress();
@@ -217,7 +261,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 	trace(TRACE_3, "\t\t\t node " + intToString(currentNode->getNumber()) + " has color " + color + "\n");
 
 	
-	if (options[O_OTF]){
+	if (options[O_OTF]) {
 		//cout << "currentNode: " << currentNode->getNumber() << endl;	
 		bdd->addOrDeleteLeavingEdges(currentNode);
 	}

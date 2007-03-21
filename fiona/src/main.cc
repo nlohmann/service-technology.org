@@ -376,7 +376,7 @@ int main(int argc, char ** argv) {
 			        trace(TRACE_0, "building the operating guideline...\n");
 			        seconds = time (NULL);
 			
-			        graph->printProgressFirst();
+			        //graph->printProgressFirst();
 			        graph->calculateRootNode();	// creates the root node and calculates its reachability graph (set of states)
 					
 					if (options[O_OTF]){

@@ -138,7 +138,7 @@ public:
 
     vertex * findVertexInSet(vertex *);
 
-    vertex * AddVertex(vertex *, unsigned int, edgeType);
+    void AddVertex(vertex *, unsigned int, edgeType, bool);
     bool AddVertex(vertex *, messageMultiSet, edgeType);
 
 	// bool terminateBuildGraph(vertex *);

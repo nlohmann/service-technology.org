@@ -126,7 +126,7 @@ placeType type = INTERNAL;		/* type of place */
 %token key_all_other_external_places_empty
 %token key_max_unique_events key_on_loop key_max_occurrences
 %token key_true key_false lcontrol rcontrol
-%token comma colon semicolon ident number
+%token comma colon semicolon ident number negative_number
 %token lpar rpar
 
 %nonassoc op_eq op_ne op_gt op_lt op_ge op_le
@@ -157,6 +157,7 @@ placeType type = INTERNAL;		/* type of place */
 /* the types of the non-terminal symbols */
 %type <str> ident
 %type <str> number
+%type <str> negative_number
 %type <str> tname
 %type <str> nodeident
 %type <al> arclist
@@ -371,6 +372,17 @@ commands:
 | key_max_occurrences op_eq number commands
     {
         sscanf($3, "%u", &(PS->getPlace()->max_occurence));
+        free($3);
+        if (options[O_EVENT_USE_MAX] &&
+            PS->getPlace()->max_occurence > events_manual)
+        {
+            PS->getPlace()->max_occurence = events_manual;
+        }
+        numberOfEvents += PS->getPlace()->max_occurence - events_manual;
+    }
+| key_max_occurrences op_eq negative_number commands
+    {
+        sscanf($3, "%d", &(PS->getPlace()->max_occurence));
         free($3);
         if (options[O_EVENT_USE_MAX] &&
             PS->getPlace()->max_occurence > events_manual)

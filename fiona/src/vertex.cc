@@ -49,7 +49,7 @@ vertex::vertex(int numberEvents) :
 			   predecessorNodes(NULL),
 			   finalAnalysisDone(false) {
 
-	annotation = CNF_formula();
+	annotation = new CNF_formula();
 
 	eventsUsed = new int [numberEvents];
 	
@@ -182,7 +182,7 @@ void vertex::addClause(literal * myFirstLiteral, bool _isFinalState) {
 //! \param myclause the clause to be added to the annotation of the current node
 //! \brief adds a new clause to the CNF formula of the node
 void vertex::addClause(CommGraphFormulaMultiaryOr* myclause) {
-	annotation.addClause(myclause);
+	annotation->addClause(myclause);
 }
 
 
@@ -314,7 +314,7 @@ CNF * vertex::getAnnotation() {
 }
 
 
-CNF_formula vertex::getCNF_formula() {
+CNF_formula* vertex::getCNF_formula() {
 	return annotation;
 }
 

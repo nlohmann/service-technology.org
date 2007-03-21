@@ -69,7 +69,7 @@ protected:
 	vertexColor color; 						//!< color of vertex
 
     CNF * firstClause;						//!< annotation of this node (a CNF)
-	CNF_formula annotation;					//!< annotation of this node (a CNF) as a formula 
+	CNF_formula* annotation;				//!< annotation of this node (a CNF) as a formula 
 	
 	
 	successorNodeList * successorNodes;		//!< list of all the nodes succeeding this one 
@@ -108,7 +108,7 @@ public:
 
 	// annotation
     CNF * getAnnotation();
-    CNF_formula getCNF_formula();
+    CNF_formula* getCNF_formula();
     string getCNFString();
     
     void addClause(literal *, bool);

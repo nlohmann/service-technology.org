@@ -780,7 +780,7 @@ void communicationGraph::printGraphToDot(vertex * v, fstream& os, bool visitedNo
 			
 			cout << "alive" << endl;
 			
-			CNF += v->getCNF_formula().asString();
+			CNF += v->getCNF_formula()->asString();
 			
 			cout << "still alive" << endl;
 

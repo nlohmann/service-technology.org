@@ -98,7 +98,7 @@ void operatingGuidelines::buildGraph(vertex * currentNode, double progress_plus)
 	// get the annotation of the node (CNF)
 	computeCNF(currentNode);					// calculate CNF of this node
 	
-	cout << "returned from computeCNF: " << currentNode->getCNF_formula().asString() << endl;
+	cout << "returned from computeCNF: " << currentNode->getCNF_formula()->asString() << endl;
 	
 
 	trace(TRACE_1, "=================================================================\n");
@@ -236,7 +236,7 @@ void operatingGuidelines::computeCNF(vertex* node) {
 	
 	// initially, the annoation is empty (and therefore equivalent to true)
 	assert(node->getAnnotation() == NULL);
-	assert(node->getCNF_formula().asString() == "true");
+	assert(node->getCNF_formula()->asString() == "true");
 	
 	StateSet::iterator iter;			// iterator over the states of the node
 	
@@ -323,9 +323,9 @@ void operatingGuidelines::computeCNF(vertex* node) {
 
 				cout << "\n\t building clause finished: " << myclause->asString() << endl;
 
-				cout << "annotation before: " << node->getCNF_formula().asString() << endl;
+				cout << "annotation before: " << node->getCNF_formula()->asString() << endl;
 				node->addClause(myclause);
-				cout << "annotation afterwards: " << node->getCNF_formula().asString() << endl;
+				cout << "annotation afterwards: " << node->getCNF_formula()->asString() << endl;
 				
 				// TODO: an dieser stelle prüfen, ob myclause false ist -> dann knoten rot machen
 			}

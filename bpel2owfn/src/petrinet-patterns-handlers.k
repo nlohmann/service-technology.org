@@ -29,7 +29,7 @@
  * 
  * \since   2007-03-04
  *
- * \date    \$Date: 2007/03/20 14:29:33 $
+ * \date    \$Date: 2007/03/21 12:10:51 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
@@ -38,7 +38,7 @@
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
  *          See http://site.informatik.hu-berlin.de/kimwitu++ for details.
  *
- * \version \$Revision: 1.13 $
+ * \version \$Revision: 1.14 $
  */
 %}
 
@@ -331,6 +331,7 @@ void PCompensationHandler(impl_tCompensationHandler* abstract_phylum, uview curr
   // Embed compensation handler (i.e., the compensation handler's inner
   // activity) to parent scope.
   PN.mergePlaces((toString(globals::ASTEmap[phylum->id]->parentScopeId) + ".internal.ch_initial"), (toString(phylum->activity_1->id) + ".initial"));
+  PN.mergePlaces((toString(globals::ASTEmap[phylum->id]->parentScopeId) + ".internal.compensated"), (toString(phylum->activity_1->id) + ".final"));
   PN.mergePlaces((toString(globals::ASTEmap[phylum->id]->parentScopeId) + ".internal.ch_stop"),    (toString(phylum->activity_1->id) + ".stop"));
   PN.mergePlaces((toString(globals::ASTEmap[phylum->id]->parentScopeId) + ".internal.ch_stopped"), (toString(phylum->activity_1->id) + ".stopped"));
 

@@ -19,8 +19,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/21 08:25:02 $ by $Author: nielslohmann $.
-# Version $Revision: 1.37 $
+# File last changed $Date: 2007/03/21 10:16:15 $ by $Author: gierds $.
+# Version $Revision: 1.38 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
@@ -56,7 +56,6 @@ CFLAGS="-ansi -Wall -Wno-unused -Wunreachable-code -pedantic"
 # Checks for header files and functions.
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
-AC_HEADER_ASSERT
 
 AC_CHECK_HEADERS([libintl.h malloc.h stddef.h stdlib.h string.h strings.h unistd.h])
 

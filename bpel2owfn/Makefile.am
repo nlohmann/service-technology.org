@@ -19,8 +19,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/18 19:17:10 $ by $Author: nielslohmann $
-# Version $Revision: 1.53 $
+# File last changed $Date: 2007/03/21 08:25:02 $ by $Author: nielslohmann $
+# Version $Revision: 1.54 $
 
 # Where else are Makefiles?
 SUBDIRS = src tests doc rpm
@@ -98,10 +98,10 @@ binarydistreadme:
 	@echo -e Copyright \(C\) 2007 Niels Lohmann, Christian Gierds, and Martin Znamirowski > BINARYREADME
 	@echo -e Copyright \(C\) 2005, 2006 Niels Lohmann and Christian Gierds >> BINARYREADME
 	@echo >> BINARYREADME
-	@echo -e This is a binary distribution of GNU BPEL2oWFN, a tool translating business >> BINARYREADME
-	@echo -e processes described in BPEL to open workflow nets \(oWFN\). The sources >> BINARYREADME
-	@echo -e of GNU BPEL2oWFN can be downloaded from the website of GNU BPEL2oWFN >> BINARYREADME
-	@echo -e \(http://www.gnu.org/software/bpel2owfn\). >> BINARYREADME
+	@echo -e This is a binary distribution of @PACKAGE_NAME@ @PACKAGE_VERSION@, a tool translating >> BINARYREADME
+	@echo -e business processes described in BPEL to open workflow nets \(oWFN\). >> BINARYREADME
+	@echo -e The sources of GNU BPEL2oWFN can be downloaded from the website of >> BINARYREADME
+	@echo -e GNU BPEL2oWFN \(http://www.gnu.org/software/bpel2owfn\). >> BINARYREADME
 	@echo >> BINARYREADME
 	@echo -e GNU BPEL2oWFN is free software\; you can redistribute it and/or modify it >> BINARYREADME
 	@echo -e under the terms of the GNU General Public License as published by the >> BINARYREADME
@@ -125,7 +125,7 @@ BINARYDISTDIR = $(distdir)-$(OS)
 # distributions (see target "binarydistreadme").
 binarydist: pdf binarydistreadme
 	$(MAKE) --directory=src clean
-	$(MAKE) --directory=src CXXFLAGS+="-O3" CFLAGS+="-O3" # use optimization
+	$(MAKE) --directory=src CXXFLAGS+="-O3 -D NDEBUG" CFLAGS+="-O3 -D NDEBUG" # use optimization
 	$(mkdir_p) $(BINARYDISTDIR)
 	cp doc/$(PACKAGE).pdf $(BINARYDISTDIR)
 	cp src/$(PACKAGE)$(EXEEXT) COPYING $(BINARYDISTDIR)
@@ -136,8 +136,8 @@ binarydist: pdf binarydistreadme
 
 # target to create a Mac Universal binary
 bindist_universal:
-	echo "you have to configure with:"
-	echo "  ./configure --disable-dependency-tracking"
+	@echo "you have to configure with:"
+	@echo "  ./configure --disable-dependency-tracking"
 	$(MAKE) binarydist OS=mac-universal CXXFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
 	  CFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
 	  LDFLAGS="-arch i386 -arch ppc"
@@ -147,7 +147,7 @@ bindist_universal:
 # succeeded can be checked with "cygcheck ./bpel2owfn.exe", which displays all
 # library dependencies.
 bindist_win32:
-	$(MAKE) binarydist OS=$(build_cpu)-mingw32 CXXFLAGS="-mno-cygwin -U _WIN32" CFLAGS="-mno-cygwin -U _WIN32"
+	$(MAKE) binarydist OS=$(build_cpu)-win32 CXXFLAGS="-mno-cygwin -U _WIN32" CFLAGS="-mno-cygwin -U _WIN32"
 
 # target for any other operating system
 bindist:

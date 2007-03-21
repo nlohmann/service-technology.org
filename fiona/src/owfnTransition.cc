@@ -40,20 +40,32 @@
 #include "options.h"
 #include "OGFromFile.h"
 
+AdjacentPlace::AdjacentPlace(owfnPlace* place, unsigned int multiplicity) :
+    place_(place),
+    multiplicity_(multiplicity)
+{
+}
+
+owfnPlace* AdjacentPlace::getOwfnPlace() const
+{
+    return place_;
+}
+
+unsigned int AdjacentPlace::getMultiplicity() const
+{
+    return multiplicity_;
+}
+
 owfnTransition::owfnTransition(const std::string& name) :
     Node(name),
     labelForMatching(CommGraphFormulaAssignment::TAU),
+    isEnabled_(false),
+    isQuasiEnabled_(false),
     quasiEnabledNr(0),
     enabledNr(0),
-    IncrPlaces(NULL),
-    Incr(NULL),
-    DecrPlaces(NULL),
-    Decr(NULL),
 #ifdef STUBBORN
     conflicting(NULL),
 #endif
-    quasiEnabled(false),
-    enabled(false),
     NextEnabled(NULL),
     PrevEnabled(NULL),
     NextQuasiEnabled(NULL),
@@ -62,29 +74,49 @@ owfnTransition::owfnTransition(const std::string& name) :
 }
 
 owfnTransition::~owfnTransition() {
-	delete[] ImproveEnabling;
-	delete[] ImproveDisabling;
-	delete[] IncrPlaces;
-	delete[] Incr;
-	delete[] DecrPlaces;
-	delete[] Decr;
-	delete[] PrePlaces;
-	delete[] Pre;
 #ifdef STUBBORN
 	delete [] conflicting;
 #endif
 }
 
+bool owfnTransition::isEnabled() const
+{
+    return isEnabled_;
+}
+
+void owfnTransition::setEnabled(bool isEnabled)
+{
+    isEnabled_ = isEnabled;
+}
+
+bool owfnTransition::isQuasiEnabled() const
+{
+    return isQuasiEnabled_;
+}
+
+void owfnTransition::setQuasiEnabled(bool isQuasiEnabled)
+{
+    isQuasiEnabled_ = isQuasiEnabled;
+}
+
+#ifdef STUBBORN
+bool owfnTransition::prePlaceIsScapegoatForDisabledness(AdjacentPlace prePlace)
+    const
+{
+    return (PN->CurrentMarking[prePlace.getOwfnPlace()->index] <
+            prePlace.getMultiplicity());
+}
+#endif
 
 void owfnTransition::set_hashchange() {
-	unsigned int i;
-
 	hash_change = 0;
-	for(i = 0; IncrPlaces[i] != NULL; i++) {
-		hash_change += Incr[i] * IncrPlaces[i]->hash_factor;
+	for(AdjacentPlaces_t::size_type i = 0; i != IncrPlaces.size(); ++i) {
+		hash_change += IncrPlaces[i].getMultiplicity() *
+		               IncrPlaces[i].getOwfnPlace()->hash_factor;
 	}
-	for(i = 0; DecrPlaces[i] != NULL; i++) {
-		hash_change -= Decr[i] * DecrPlaces[i]->hash_factor;
+	for(AdjacentPlaces_t::size_type i = 0; i != DecrPlaces.size(); ++i) {
+		hash_change -= DecrPlaces[i].getMultiplicity() *
+		               DecrPlaces[i].getOwfnPlace()->hash_factor;
 	}
 	hash_change %= HASHSIZE;
 }
@@ -93,17 +125,13 @@ void owfnTransition::initialize(oWFN * PN) {
 
   unsigned int i,j,k;
   // Create list of Pre-Places for enabling test
-  PrePlaces = new owfnPlace*  [NrOfArriving + 1];
-  Pre = new unsigned int [NrOfArriving + 1];
-  for(i = 0; i < NrOfArriving;i++)
-    {
-      PrePlaces[i] = ArrivingArcs[i]->pl;
-      Pre[i] = ArrivingArcs[i]->Multiplicity;
-    }
-  PrePlaces[NrOfArriving] = NULL;
+  for (i = 0; i < NrOfArriving; ++i)
+  {
+      PrePlaces.push_back(
+          AdjacentPlace(ArrivingArcs[i]->pl, ArrivingArcs[i]->Multiplicity)
+      );
+  }
   // Create list of places where transition increments marking
-  IncrPlaces = new owfnPlace* [NrOfLeaving + 1];
-  Incr = new unsigned int [NrOfLeaving + 1];
   
   k=0;
   for(i = 0; i < NrOfLeaving;i++)
@@ -122,25 +150,23 @@ void owfnTransition::initialize(oWFN * PN) {
 	  if(LeavingArcs[i]->Multiplicity > ArrivingArcs[j]->Multiplicity)
 	    {
 	      // indeed, transition increments place
-	      IncrPlaces[k] = LeavingArcs[i]->pl;
-	      Incr[k] = LeavingArcs[i]->Multiplicity - ArrivingArcs[j]->Multiplicity;
-	      k++;
+	      IncrPlaces.push_back(
+	          AdjacentPlace(
+	              LeavingArcs[i]->pl,
+	              LeavingArcs[i]->Multiplicity - ArrivingArcs[j]->Multiplicity
+	          )
+	      );
 	    } 
 	}
       else
 	{
 	  // no loop place
-	  IncrPlaces[k] = LeavingArcs[i]->pl;
-	  Incr[k] = LeavingArcs[i]->Multiplicity;
-	  k++;
+	  IncrPlaces.push_back(
+	      AdjacentPlace(LeavingArcs[i]->pl, LeavingArcs[i]->Multiplicity)
+	  );
 	}
     }
-  IncrPlaces[k] = NULL;
-  Incr[k] = 0;
   // Create list of places where transition decrements marking
-  DecrPlaces = new owfnPlace* [NrOfArriving + 1];
-  Decr = new unsigned int [NrOfArriving + 1];
-  k=0;
   for(i = 0; i < NrOfArriving;i++)
     {
       //Is oWFNPlace a loop place?
@@ -157,78 +183,76 @@ void owfnTransition::initialize(oWFN * PN) {
 	  if(ArrivingArcs[i]->Multiplicity > LeavingArcs[j]->Multiplicity)
 	    {
 	      // indeed, transition decrements place
-	      DecrPlaces[k] = ArrivingArcs[i]->pl;
-	      Decr[k] = ArrivingArcs[i]->Multiplicity - LeavingArcs[j]->Multiplicity;
-	      k++;
+	      DecrPlaces.push_back(
+	          AdjacentPlace(
+	              ArrivingArcs[i]->pl,
+	              ArrivingArcs[i]->Multiplicity - LeavingArcs[j]->Multiplicity
+	          )
+	      );
 	    } 
 	}
       else
 	{
 	  // no loop place
-	  DecrPlaces[k] = ArrivingArcs[i]->pl;
-	  Decr[k] = ArrivingArcs[i]->Multiplicity;
-	  k++;
+	  DecrPlaces.push_back(
+	      AdjacentPlace(ArrivingArcs[i]->pl, ArrivingArcs[i]->Multiplicity)
+	  );
 	}
     }
-  DecrPlaces[k] = NULL;
-  Decr[k] = 0;
   // Create list of transitions where enabledness can change
   // if this transition fires. For collecting these transitions, we
   // abuse the Enabled linked list
   PN->startOfEnabledList = (owfnTransition *) 0;
   PN->transNrEnabled = 0;
-  for(i=0;IncrPlaces[i] != NULL;i++)
+  for (AdjacentPlaces_t::size_type i = 0; i != IncrPlaces.size(); ++i)
     {
-      for(j=0;j<IncrPlaces[i]->NrOfLeaving;j++)
+      owfnPlace* incrOwfnPlace = IncrPlaces[i].getOwfnPlace();
+      for (j = 0; j < incrOwfnPlace->NrOfLeaving;j++)
 	{
-	  if(!(IncrPlaces[i]->LeavingArcs)[j]->tr->enabled)
+	  if (!(incrOwfnPlace->LeavingArcs)[j]->tr->isEnabled())
 	    {
 	      // not yet in list
-	      (IncrPlaces[i]->LeavingArcs)[j]->tr->NextEnabled = PN->startOfEnabledList;
-	      PN->startOfEnabledList = (IncrPlaces[i]->LeavingArcs)[j]->tr;
+	      (incrOwfnPlace->LeavingArcs)[j]->tr->NextEnabled = PN->startOfEnabledList;
+	      PN->startOfEnabledList = (incrOwfnPlace->LeavingArcs)[j]->tr;
 	      PN->transNrEnabled++;
-	      (IncrPlaces[i]->LeavingArcs)[j]->tr->enabled = true;
+	      (incrOwfnPlace->LeavingArcs)[j]->tr->setEnabled(true);
 	    }
 	}
     }
 
-  ImproveEnabling = new owfnTransition * [PN->transNrEnabled + 1];
-  for(i=0; PN->startOfEnabledList; PN->startOfEnabledList = PN->startOfEnabledList -> NextEnabled,i++)
+  for( ; PN->startOfEnabledList; PN->startOfEnabledList = PN->startOfEnabledList -> NextEnabled)
     {
-      PN->startOfEnabledList->enabled = false;
-      ImproveEnabling[i] = PN->startOfEnabledList;
+      PN->startOfEnabledList->setEnabled(false);
+      ImproveEnabling.push_back(PN->startOfEnabledList);
     }
-  ImproveEnabling[i] = (owfnTransition *) 0;
   // Create list of transitions where enabledness can change
   // if this transition fires. For collecting these transitions, we
   // abuse the Enabled linked list
   PN->startOfEnabledList = (owfnTransition *) 0;
   PN->transNrEnabled = 0;
   
-  for(i=0;DecrPlaces[i] != NULL;i++)
+  for (AdjacentPlaces_t::size_type i = 0; i != DecrPlaces.size(); ++i)
     {
-      for(j=0;j < DecrPlaces[i]->NrOfLeaving;j++)
+      owfnPlace* decrOwfnPlace = DecrPlaces[i].getOwfnPlace();
+      for(j=0;j < decrOwfnPlace->NrOfLeaving;j++)
 	{
-	  if(!(DecrPlaces[i]->LeavingArcs)[j]->tr->enabled)
+	  if(!(decrOwfnPlace->LeavingArcs)[j]->tr->isEnabled())
 	    {
 	      // not yet in list
-	      (DecrPlaces[i]->LeavingArcs)[j]->tr->NextEnabled = PN->startOfEnabledList;
-	      PN->startOfEnabledList = (DecrPlaces[i]->LeavingArcs)[j]->tr;
+	      (decrOwfnPlace->LeavingArcs)[j]->tr->NextEnabled = PN->startOfEnabledList;
+	      PN->startOfEnabledList = (decrOwfnPlace->LeavingArcs)[j]->tr;
 	      PN->transNrEnabled++;
-	      (DecrPlaces[i]->LeavingArcs)[j]->tr->enabled = true;
+	      (decrOwfnPlace->LeavingArcs)[j]->tr->setEnabled(true);
 	    }
 	}
     }
   	
-  	ImproveDisabling = new owfnTransition * [PN->transNrEnabled + 1];
-  	
-  	for(i=0; PN->startOfEnabledList; PN->startOfEnabledList = PN->startOfEnabledList -> NextEnabled,i++) {
-		PN->startOfEnabledList->enabled = false;
-		ImproveDisabling[i] = PN->startOfEnabledList;
+  	for( ; PN->startOfEnabledList; PN->startOfEnabledList = PN->startOfEnabledList -> NextEnabled) {
+		PN->startOfEnabledList->setEnabled(false);
+		ImproveDisabling.push_back(PN->startOfEnabledList);
     }
     
     
-  ImproveDisabling[i] = (owfnTransition *) 0;
   PN->transNrQuasiEnabled = 0;
  
   set_hashchange();
@@ -240,18 +264,20 @@ void owfnTransition::initialize(oWFN * PN) {
 	// create list of conflicting transitions
 	PN -> startOfEnabledList = (owfnTransition *) 0;
 	PN->transNrEnabled = 0;
-	for(i=0;PrePlaces[i];i++)
+	for (i = 0; i != PrePlaces.size(); ++i)
 	{
-		for(j=0;j<PrePlaces[i]->NrOfLeaving;j++)
+		AdjacentPlace prePlace = PrePlaces[i];
+		owfnPlace* preOwfnPlace = prePlace.getOwfnPlace();
+		for(j = 0; j < preOwfnPlace->NrOfLeaving; j++)
 		{
-			if(PrePlaces[i]->LeavingArcs[j]->tr != this)
+			if(preOwfnPlace->LeavingArcs[j]->tr != this)
 			{
-				if(!(PrePlaces[i]->LeavingArcs)[j]->tr -> enabled)
+				if(!(preOwfnPlace->LeavingArcs)[j]->tr ->isEnabled())
 				{
-					(PrePlaces[i]->LeavingArcs)[j]->tr->NextEnabled = PN->startOfEnabledList;
-					PN->startOfEnabledList = (PrePlaces[i]->LeavingArcs)[j]->tr;
+					(preOwfnPlace->LeavingArcs)[j]->tr->NextEnabled = PN->startOfEnabledList;
+					PN->startOfEnabledList = (preOwfnPlace->LeavingArcs)[j]->tr;
 					PN->transNrEnabled ++;
-					(PrePlaces[i]->LeavingArcs)[j]->tr->enabled = true;
+					(preOwfnPlace->LeavingArcs)[j]->tr->setEnabled(true);
 				}
 			}
 		}
@@ -259,7 +285,7 @@ void owfnTransition::initialize(oWFN * PN) {
 	conflicting = new owfnTransition * [PN->transNrEnabled + 1];
 	for(i=0;PN->startOfEnabledList;PN->startOfEnabledList = PN->startOfEnabledList ->NextEnabled,i++)
 	{
-		PN->startOfEnabledList ->enabled = false;
+		PN->startOfEnabledList ->setEnabled(false);
 		conflicting[i] = PN->startOfEnabledList;
 	}
 	conflicting[i] = (owfnTransition *) 0;
@@ -270,43 +296,48 @@ void owfnTransition::initialize(oWFN * PN) {
 
 
 void owfnTransition::fire(oWFN * PN) {
-	owfnPlace* * p;
-	owfnTransition ** t;
-	unsigned int * i;
 
 	trace(TRACE_5, "owfnTransition::fire(oWFN * PN) : start\n");
 			
-	for(p = IncrPlaces,i = Incr; *p != NULL; p++,i++) {
-		PN->CurrentMarking[(* p)->index] += * i;
+	for (AdjacentPlaces_t::size_type i = 0; i != IncrPlaces.size(); ++i) {
+		AdjacentPlace incrPlace = IncrPlaces[i];
+		owfnPlace* incrOwfnPlace = incrPlace.getOwfnPlace();
+		PN->CurrentMarking[incrOwfnPlace->index] += incrPlace.getMultiplicity();
 #ifdef CHECKCAPACITY
-		if(PN->CurrentMarking[(* p)->index] > (* p)->capacity) {
-			cerr << "capacity of place " << (* p)->name << " exceeded!" << endl;
+		if(PN->CurrentMarking[incrOwfnPlace->index] > incrOwfnPlace->capacity) {
+			cerr << "capacity of place " << incrOwfnPlace->name << " exceeded!" << endl;
 			_exit(4);
 		}
 #endif
 	}
-	for(p = DecrPlaces, i = Decr; * p != NULL; p++,i++) {
-		if (PN->CurrentMarking[(* p)->index] < *i) {
+	for (AdjacentPlaces_t::size_type i = 0; i != DecrPlaces.size(); ++i) {
+		AdjacentPlace decrPlace = DecrPlaces[i];
+        owfnPlace* decrOwfnPlace = decrPlace.getOwfnPlace();
+		if (PN->CurrentMarking[decrOwfnPlace->index] < decrPlace.getMultiplicity()) {
 			PN->printCurrentMarking();
-      		cerr << "marking of place " << (* p)->name << " is: " << PN->CurrentMarking[(* p)->index] << " but transition " << this->name << " consumes: " << *i << endl;
+      		cerr << "marking of place " << decrOwfnPlace->name << " is: " << PN->CurrentMarking[decrOwfnPlace->index] << " but transition " << this->name << " consumes: " << decrPlace.getMultiplicity() << endl;
 			cerr << "number of states calculated so far: " << State::card << endl;
 			_exit(4);
 		} else {
-			PN->CurrentMarking[(* p)->index] -= * i;
+			PN->CurrentMarking[decrOwfnPlace->index] -= decrPlace.getMultiplicity();
 		}
     }
 
 
 	PN->placeHashValue += hash_change;
 	PN->placeHashValue %= HASHSIZE;
-	for(t = ImproveEnabling; *t; t++) {
-		if(!((*t) -> enabled) || !((*t) -> quasiEnabled)) {
-			(*t)->check_enabled(PN);
+	for (ImproveDisEnabling_t::size_type i = 0; i != ImproveEnabling.size();
+	     ++i) {
+		owfnTransition* transition = ImproveEnabling[i];
+		if (!(transition->isEnabled()) || !(transition->isQuasiEnabled())) {
+			transition->check_enabled(PN);
 		}
 	}
-	for(t = ImproveDisabling; *t; t++) {
-		if((*t)->enabled || (*t)->quasiEnabled) {
-			(*t)->check_enabled(PN);
+	for(ImproveDisEnabling_t::size_type i = 0; i != ImproveDisabling.size();
+		++i) {
+		owfnTransition* transition = ImproveDisabling[i];
+		if(transition->isEnabled() || transition->isQuasiEnabled()) {
+			transition->check_enabled(PN);
 		}
 	}
 
@@ -329,7 +360,7 @@ void owfnTransition::fire(oWFN * PN) {
 //            }
 //        }
 //    }
-    
+
    	trace(TRACE_5, "owfnTransition::fire(oWFN * PN) : end\n");
 }
 
@@ -342,7 +373,6 @@ void owfnTransition::fire(oWFN * PN) {
 
 void owfnTransition::backfire(oWFN * PN)
 {
-  owfnTransition ** t;
 
 /*
   owfnPlace* * p;
@@ -358,21 +388,26 @@ void owfnTransition::backfire(oWFN * PN)
   PN->placeHashValue -= hash_change;
   PN->placeHashValue %= HASHSIZE;
 */ 
-  for(t = ImproveEnabling;*t;t++)
+
+    for (ImproveDisEnabling_t::size_type i = 0; i != ImproveEnabling.size();
+         ++i)
     {
-      if((*t) -> enabled)
-	{
-	  (*t)->check_enabled(PN);
-	}
-    }
-  for(t = ImproveDisabling;*t;t++)
-    {
-      if(!((*t)->enabled))
-	{
-	  (*t)->check_enabled(PN);
-	}
+        owfnTransition* transition = ImproveEnabling[i];
+        if (transition->isEnabled())
+        {
+            transition->check_enabled(PN);
+        }
     }
 
+    for (ImproveDisEnabling_t::size_type i = 0; i != ImproveDisabling.size();
+         ++i)
+    {
+        owfnTransition* transition = ImproveDisabling[i];
+        if (!transition->isEnabled())
+        {
+            transition->check_enabled(PN);
+        }
+    }
 
     // update value of formula after having fired t
 //    for(p = DecrPlaces,i = Decr; * p != NULL; p++,i++)
@@ -425,32 +460,32 @@ void owfnTransition::excludeTransitionFromQuasiEnabledList(oWFN * PN) {
 void owfnTransition::check_enabled(oWFN * PN) {
    	trace(TRACE_5, "owfnTransition::check_enabled(oWFN * PN) : start\n");
 
-	owfnPlace* * p;
-	unsigned int *i;
-
 	messageSet.clear();
 
 	enabledNr = quasiEnabledNr = 0;		// suppose no pre-place has appropriate marking at all
 #ifdef STUBBORN
 	mustbeincluded = conflicting;
 #endif
-	for(p = PrePlaces , i = Pre ; *p != NULL; p++ , i++) {
-		if(PN->CurrentMarking[(* p)->index] < *i) {
+	for (AdjacentPlaces_t::size_type iPrePlace = 0; iPrePlace != PrePlaces.size();
+	     ++iPrePlace) {
+		AdjacentPlace prePlace = PrePlaces[iPrePlace];
+		owfnPlace* preOwfnPlace = prePlace.getOwfnPlace();
+		if (prePlaceIsScapegoatForDisabledness(prePlace)) {
 #ifdef STUBBORN
-			scapegoat = *p;
-			mustbeincluded = (*p)->PreTransitions;
+			scapegoat = preOwfnPlace;
+			mustbeincluded = preOwfnPlace->PreTransitions;
 #endif
-			if ((* p)->type == INPUT) {
-				messageSet.insert((* p)->index);
+			if (preOwfnPlace->type == INPUT) {
+				messageSet.insert(preOwfnPlace->index);
 				quasiEnabledNr++;	// remember that we have found an input pre-place with no appropriate marking
 			}
-		} else if(PN->CurrentMarking[(* p)->index] >= *i) {
+		} else {
 			enabledNr++;	// remember that we have found a pre-place with appropriate marking
 		}
 	}
 	
 	if(enabledNr == NrOfArriving) {		// there are as many pre-places appropriatly marked as there are incoming arcs
-		if (!enabled || PN->startOfEnabledList == 0) {		// transition was not enabled before
+		if (!isEnabled() || PN->startOfEnabledList == 0) {		// transition was not enabled before
 			// include transition into list of enabled transitions
 			NextEnabled = PN->startOfEnabledList;
 			if(PN->startOfEnabledList) {
@@ -458,17 +493,17 @@ void owfnTransition::check_enabled(oWFN * PN) {
 			}
 			PN->startOfEnabledList = this;
 			PrevEnabled = (owfnTransition *) 0;
-			enabled = true;
+			setEnabled(true);
 			PN->transNrEnabled++;
 		}
-		if (quasiEnabled) {		// transition was quasi enabled before
-			quasiEnabled = false;
+		if (isQuasiEnabled()) {		// transition was quasi enabled before
+			setQuasiEnabled(false);
 			PN->transNrQuasiEnabled--;
 			excludeTransitionFromQuasiEnabledList(PN);		// delete transition from list of quasi enabled transtions
 		}
 	} else if ((enabledNr + quasiEnabledNr) == NrOfArriving) {
 		// transition is quasi enabled
-		if (!quasiEnabled) {          // transition was not quasi enabled before
+		if (!isQuasiEnabled()) {  // transition was not quasi enabled before
 			// include transition into list of quasi enabled transitions
 			NextQuasiEnabled = PN->startOfQuasiEnabledList;
 			if(PN->startOfQuasiEnabledList) {
@@ -476,30 +511,30 @@ void owfnTransition::check_enabled(oWFN * PN) {
 			}
 			PN->startOfQuasiEnabledList = this;
 			PrevQuasiEnabled = (owfnTransition *) 0;
-			quasiEnabled = true;
+			setQuasiEnabled(true);
 			PN->transNrQuasiEnabled++;
 		} 
-		if (enabled) {		// transition was enabled before
-			enabled = false;
+		if (isEnabled()) {		// transition was enabled before
+			setEnabled(false);
 			PN->transNrEnabled--;
 			excludeTransitionFromEnabledList(PN);		// delete transition from list of enabled transtions
 			
 		}
 	} else {	// transition is not enabled at all
-	    if (enabled) {		// transition was enabled before
-			enabled = false;
+	    if (isEnabled()) {		// transition was enabled before
+			setEnabled(false);
 			PN->transNrEnabled--;
 			excludeTransitionFromEnabledList(PN);		// delete transition from list of enabled transtions
 
 		}
-		if (quasiEnabled) {  // transition was quasi enabled before
-			quasiEnabled = false;
+		if (isQuasiEnabled()) {  // transition was quasi enabled before
+			setQuasiEnabled(false);
 			PN->transNrQuasiEnabled--;
 			excludeTransitionFromQuasiEnabledList(PN);	// delete transition from list of quasi enabled transtions
 		}
 	}
 	// cout << "current marking: " << PN->getCurrentMarkingAsString() << endl;
-	// cout << "transition " << name << " is quasiEnabled: " << quasiEnabled << " and enabled: " << enabled << endl;
+	// cout << "transition " << name << " is quasiEnabled: " << isQuasiEnabled() << " and enabled: " << enabled << endl;
 
    	trace(TRACE_5, "owfnTransition::check_enabled(oWFN * PN) : end\n");
 }

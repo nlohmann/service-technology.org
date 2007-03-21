@@ -37,14 +37,56 @@
 #include "mynew.h"
 #include "petriNetNode.h"
 #include <set>
+#include <vector>
 
 class oWFN;
 class owfnPlace;
+
+/**
+ * A place that is adjecent to a owfnTransition. An owfnTransition can have
+ * multiple AdjacentPlaces. Each contains a pointer to its corresponding
+ * owfnPlace and stores the multiplicity of the arc between that place and the
+ * owning owfnTransition.
+ */
+class AdjacentPlace
+{
+    private:
+        /**
+         * Points to corresponding owfnPlace.
+         */
+        owfnPlace* place_;
+
+        /**
+         * The multiplicity of the arc between the corresponding owfnPlace and
+         * the owfnTransition that owns this PrePlace.
+         */
+        unsigned int multiplicity_;
+    public:
+        /**
+         * Creates a AdjacentPlace from the given place and multiplicity.
+         */
+        AdjacentPlace(owfnPlace* place, unsigned int multiplicity);
+
+        /**
+         * Returns the owfnPlace that belongs to this AdjacentPlace.
+         */
+        owfnPlace* getOwfnPlace() const;
+
+        /**
+         * Returns the multiplicity of the arc between the corresponding
+         * owfnPlace and the owning owfnTransition.
+         */
+        unsigned int getMultiplicity() const;
+};
 
 class owfnTransition: public Node
 {
     private:
         std::string labelForMatching;
+
+        bool isEnabled_;
+
+        bool isQuasiEnabled_;
 
         /** number of internal pre-places marked with appropriate tokens */
         unsigned int quasiEnabledNr;
@@ -52,35 +94,42 @@ class owfnTransition: public Node
         /** number of input pre-places marked with appropriate tokens */
         unsigned int enabledNr;
 
-        /** Places to be checked for enabledness */
-        owfnPlace* *PrePlaces;
+        /**
+         * Type of the containers holding all adjacent places of this
+         * transition. */
+        typedef std::vector<AdjacentPlace> AdjacentPlaces_t;
 
-        /** Multiplicity to be checked */
-        unsigned int *Pre;
+        /** Places with their multiplicities to be checked for enabledness. */
+        AdjacentPlaces_t PrePlaces;
 
-        /** Places that are incremented by transition */
-        owfnPlace **IncrPlaces;
+        /**
+         * Places that are incremented by transition; together with the
+         * corresponding amounts of increment.
+         */
+        AdjacentPlaces_t IncrPlaces;
 
-        /** Amount of increment */
-        unsigned int *Incr;
+        /**
+         * Places that are decremented by transition; together with the
+         * corresponding amounts of decrement.
+         */
+        AdjacentPlaces_t DecrPlaces;
 
-        /** Places that are decremented by transition */
-        owfnPlace **DecrPlaces;
-
-        /** amount of decrement */
-        unsigned int *Decr;
+        /**
+         * Type for ImproveEnabling and ImproveDisabling.
+         */
+        typedef std::vector<owfnTransition*> ImproveDisEnabling_t;
 
         /**
          * list of transitions where enabledness must be checked again after
          * firing this transition
          */
-        owfnTransition **ImproveEnabling;
+        ImproveDisEnabling_t ImproveEnabling;
 
         /**
          * list of transitions where disabledness must be checked again after
          * firing this transition
          */
-        owfnTransition **ImproveDisabling;
+        ImproveDisEnabling_t ImproveDisabling;
 
         void excludeTransitionFromEnabledList(oWFN *);
         void excludeTransitionFromQuasiEnabledList(oWFN *);
@@ -98,6 +147,8 @@ class owfnTransition: public Node
         unsigned int lastfired;
 
 #ifdef STUBBORN
+        bool prePlaceIsScapegoatForDisabledness(AdjacentPlace prePlace) const;
+
         /** an insufficiently marked pre-place, if this disabled */
         owfnPlace *scapegoat;
 
@@ -106,10 +157,39 @@ class owfnTransition: public Node
 #endif
 
     public:
-        owfnTransition(const std::string&);
+        /**
+         * Constructs an owfnTransition with the given namen.
+         * @param name Name of this owfnTransition.
+         */
+        owfnTransition(const std::string& name);
+
+        /**
+         * Destroys this owfnTransition.
+         */
         ~owfnTransition();
-        bool quasiEnabled;
-        bool enabled;
+
+        /**
+         * Returns whether this owfnTransition is enabled or not.
+         */
+        bool isEnabled() const;
+
+        /**
+         * Set enabledness of this owfnTransition.
+         * @param isEnabled New value of enabledness.
+         */
+        void setEnabled(bool isEnabled);
+
+        /**
+         * Returns wether this owfnTransition in quasi enabled.
+         */
+        bool isQuasiEnabled() const;
+
+        /**
+         * Sets quasi enabledness of this owfnTransition.
+         * @param isQuasiEnabled New value of quasi enabledness.
+         */
+        void setQuasiEnabled(bool isQuasiEnabled);
+
         std::set<unsigned int> messageSet;
 
         /**

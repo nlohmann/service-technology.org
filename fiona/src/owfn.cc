@@ -194,8 +194,8 @@ void oWFN::initialize() {
   	
 	// initialize transitions
   	for(i = 0; i < transCnt; i++) {
-		Transitions[i]->enabled = false;
-		Transitions[i]->quasiEnabled = false;
+		Transitions[i]->setEnabled(false);
+		Transitions[i]->setQuasiEnabled(false);
   	}
   	
   	for(i = 0; i < transCnt; i++) {
@@ -251,10 +251,10 @@ void oWFN::initializeTransitions() {
   	for(i = 0; i < transCnt; i++) {
 		Transitions[i]->PrevEnabled = (i == 0 ? (owfnTransition *) 0 : Transitions[i-1]);
 		Transitions[i]->NextEnabled = (i == transCnt - 1 ? (owfnTransition *) 0 : Transitions[i+1]);
- 		Transitions[i]->enabled = true;
+ 		Transitions[i]->setEnabled(true);
 		Transitions[i]->PrevQuasiEnabled = (i == 0 ? (owfnTransition *) 0 : Transitions[i-1]);
 		Transitions[i]->NextQuasiEnabled = (i == transCnt - 1 ? (owfnTransition *) 0 : Transitions[i+1]);
- 		Transitions[i]->quasiEnabled = true;
+ 		Transitions[i]->setQuasiEnabled(true);
   	}
 	startOfEnabledList = (getTransitionCnt() > 0) ? Transitions[0] : NULL;
 
@@ -1788,7 +1788,7 @@ void stubbornclosure(oWFN * net)
 	net->NrStubborn = 0;
 	for(current = net -> StartOfStubbornList;current; current = current -> NextStubborn)
 	{
-		if(current -> enabled)
+		if (current->isEnabled())
 		{
 			net -> NrStubborn ++;
 		}
@@ -1850,7 +1850,7 @@ owfnTransition ** oWFN::stubbornfirelistmessage(owfnPlace * mess) {
 	for(t=StartOfStubbornList, i=0;t; t = t -> NextStubborn)
 	{
 		t -> instubborn = false;
-		if(t -> enabled)
+		if (t->isEnabled())
 		{
 			result[i++] = t;
 		}
@@ -1904,7 +1904,7 @@ owfnTransition ** oWFN::stubbornfirelistmessage(messageMultiSet messages) {
 	result = new owfnTransition * [NrStubborn + 1];
 	for(t=StartOfStubbornList, i=0;t; t = t -> NextStubborn) {
 		t -> instubborn = false;
-		if(t -> enabled) {
+		if (t->isEnabled()) {
 			result[i++] = t;
 		}
 	}
@@ -2004,7 +2004,7 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
 				// if enabled -> final sequence
 				while(1)
 				{
-					if(TarjanStack -> enabled)
+					if (TarjanStack->isEnabled())
 					{
 						// final sequence
 						unsigned int cardstubborn;
@@ -2013,14 +2013,14 @@ owfnTransition ** oWFN::stubbornfirelistdeadlocks() {
 						cardstubborn = 0;
 						for(t = TarjanStack;;t = t -> nextontarjanstack)
 						{
-							if(t -> enabled) cardstubborn ++;
+							if (t->isEnabled()) cardstubborn ++;
 							if(t == current) break;
 						}
 						result = new owfnTransition * [cardstubborn + 1];
 						cardstubborn = 0;
 						for(t = TarjanStack;;t = t -> nextontarjanstack)
 						{
-							if(t -> enabled)
+							if (t->isEnabled())
 							{
 								result[cardstubborn++] = t;
 							}

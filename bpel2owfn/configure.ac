@@ -19,8 +19,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/21 10:16:15 $ by $Author: gierds $.
-# Version $Revision: 1.38 $
+# File last changed $Date: 2007/03/21 16:57:56 $ by $Author: nielslohmann $.
+# Version $Revision: 1.39 $
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
@@ -47,10 +47,9 @@ AC_PROG_CXX
 AC_PROG_CC
 
 
-# Set compiler flags to warn a lot and to check compliance to ANSI C++
-# (un-comment or change to "-O2" before distribution).
-CXXFLAGS="-ansi -Wall -Wno-unused -Wunreachable-code -pedantic"
-CFLAGS="-ansi -Wall -Wno-unused -Wunreachable-code -pedantic"
+# Unset compiler flags to avoid optimization.
+CXXFLAGS=""
+CFLAGS=""
 
 
 # Checks for header files and functions.

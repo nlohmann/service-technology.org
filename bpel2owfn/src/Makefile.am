@@ -18,8 +18,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. #
 #############################################################################
 
-# File last changed $Date: 2007/03/21 16:38:10 $ by $Author: nielslohmann $.
-# Version $Revision: 1.69 $
+# File last changed $Date: 2007/03/21 16:57:56 $ by $Author: nielslohmann $.
+# Version $Revision: 1.70 $
 
 bin_PROGRAMS = bpel2owfn
 
@@ -36,8 +36,10 @@ bin_PROGRAMS = bpel2owfn
 #  - do not create functions for phylum I/O
 KCFLAGS = --yystype --file-prefix=ast-system- --suffix=cc --no-csgio
 
-#bpel2owfn_CXXFLAGS = ""
-#bpel2owfn_CFLAGS = ""
+# Set compiler flags to warn a lot and to check compliance to ANSI C++
+# (un-comment or change to "-O2" before distribution).
+bpel2owfn_CXXFLAGS = -ansi -Wall -Wno-unused -Wunreachable-code -pedantic
+bpel2owfn_CFLAGS = -ansi -Wall -Wno-unused -Wunreachable-code -pedantic
 
 
 

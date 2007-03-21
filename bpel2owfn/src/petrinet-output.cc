@@ -30,13 +30,13 @@
  *
  * \since   created: 2006-03-16
  *
- * \date    \$Date: 2007/03/18 21:23:07 $
+ * \date    \$Date: 2007/03/21 16:37:52 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
- * \version \$Revision: 1.85 $
+ * \version \$Revision: 1.86 $
  *
  * \ingroup petrinet
  */
@@ -1102,6 +1102,8 @@ void PetriNet::output_owfn(ostream *output) const
    
     if ((*p)->max_occurrences != UINT_MAX && (*p)->max_occurrences != 0)
       (*output) << " {$ MAX_OCCURRENCES = " << (*p)->max_occurrences << " $}";
+    if ((*p)->max_occurrences == UINT_MAX)
+      (*output) << " {$ MAX_OCCURRENCES = -1 $}";
 
     if (count < P_in.size())
       (*output) << "," << endl;
@@ -1122,6 +1124,8 @@ void PetriNet::output_owfn(ostream *output) const
     
     if ((*p)->max_occurrences != UINT_MAX && (*p)->max_occurrences != 0)
       (*output) << " {$ MAX_OCCURRENCES = " << (*p)->max_occurrences << " $}";
+    if ((*p)->max_occurrences == UINT_MAX)
+      (*output) << " {$ MAX_OCCURRENCES = -1 $}";
 
     if (count < P_out.size())
       (*output) << "," << endl;

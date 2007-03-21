@@ -232,7 +232,6 @@ int main(int argc, char ** argv) {
 
 //	parse_command_line(argc, argv);
 //	readog();
-//	Exchangeability* og1 = new Exchangeability(*netfiles.begin());
 //	trace(TRACE_0, "HIT A KEY TO CONTINUE"); getchar();
 //	NewLogger::printall();
 //	return 0;
